@@ -182,4 +182,16 @@ Geometry::getTypeName() const
     }
 }
 
+void
+Geometry::setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
+{
+    m_renderMaterial = renderMaterial;
+}
+
+std::shared_ptr<RenderMaterial>
+Geometry::getRenderMaterial() const
+{
+    return m_renderMaterial;
+}
+
 } // imstk

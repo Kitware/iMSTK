@@ -139,6 +139,7 @@ VTKRenderDelegate::update()
 {
     // TODO : only when rigid transform applied
     this->updateActorTransform();
+    this->updateActorProperties();
 }
 
 void
@@ -157,6 +158,66 @@ VTKRenderDelegate::updateActorTransform()
                           angleAxis.axis()[1],
                           angleAxis.axis()[2]);
     m_transform->Translate(pos[0], pos[1], pos[2]);
+}
+
+void
+VTKRenderDelegate::updateActorProperties()
+{
+    auto material = this->getGeometry()->getRenderMaterial();
+
+    if (!material || !material->m_modified)
+    {
+        return;
+    }
+
+    auto actorProperty = m_actor->GetProperty();
+
+    // Colors & Light
+    auto diffuseColor = material->m_diffuseColor;
+    auto specularColor = material->m_specularColor;
+    auto specularity = material->m_specularity;
+    actorProperty->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+    actorProperty->SetSpecularColor(specularColor.r, specularColor.g, specularColor.b);
+    actorProperty->SetSpecularPower(specularity);
+    actorProperty->SetSpecular(1.0);
+
+    // Material state is now up to date
+    material->m_modified = false;
+
+    if (!material->m_stateModified)
+    {
+        return;
+    }
+
+    // Display mode
+    switch (material->m_displayMode)
+    {
+    case RenderMaterial::DisplayMode::WIREFRAME:
+        actorProperty->SetRepresentationToWireframe();
+        actorProperty->SetEdgeVisibility(false);
+        break;
+    case RenderMaterial::DisplayMode::POINTS:
+        actorProperty->SetRepresentationToPoints();
+        actorProperty->SetEdgeVisibility(false);
+        break;
+    case RenderMaterial::DisplayMode::WIREFRAME_SURFACE:
+        actorProperty->SetRepresentationToSurface();
+        actorProperty->SetEdgeVisibility(true);
+        break;
+    case RenderMaterial::DisplayMode::SURFACE:
+    default:
+        actorProperty->SetRepresentationToSurface();
+        actorProperty->SetEdgeVisibility(false);
+        break;
+    }
+
+    // Display properties
+    actorProperty->SetLineWidth(material->m_lineWidth);
+    actorProperty->SetPointSize(material->m_pointSize);
+    actorProperty->SetBackfaceCulling(material->m_backfaceCulling);
+
+    // Material state is now up to date
+    material->m_stateModified = false;
 }
 
 } // imstk

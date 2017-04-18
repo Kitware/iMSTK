@@ -24,6 +24,7 @@
 #include "imstkScene.h"
 #include "imstkCamera.h"
 #include "imstkVTKRenderDelegate.h"
+#include "imstkVTKSurfaceMeshRenderDelegate.h"
 
 #include "vtkLightActor.h"
 #include "vtkCameraActor.h"
@@ -58,6 +59,16 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
 
         m_renderDelegates.push_back( delegate );
         m_objectVtkActors.push_back( delegate->getVtkActor() );
+    }
+
+    // Initialize textures for surface mesh render delegates
+    for ( const auto& renderDelegate : m_renderDelegates )
+    {
+        auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate);
+        if (smRenderDelegate)
+        {
+            smRenderDelegate->initializeTextures(m_textureManager);
+        }
     }
 
     // Lights and light actors

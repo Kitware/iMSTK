@@ -2,19 +2,14 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Geometry
+imstk_add_library( Materials
   DEPENDS
     Core
-    Assimp
-    Materials
-    VegaFEM::volumetricMesh
-    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
-  include(imstkAddTest)
-  imstk_add_test( Geometry )
+if( iMSTK_BUILD_TESTING )
+  add_subdirectory( Testing )
 endif()

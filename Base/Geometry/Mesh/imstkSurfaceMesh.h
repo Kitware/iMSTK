@@ -147,17 +147,10 @@ public:
     int getNumTriangles() const;
 
     ///
-    /// \brief Set/Get the array defining the default texture coordinates
+    /// \brief Set/Get the array defining the default material coordinates
     ///
     void setDefaultTCoords(std::string arrayName);
     std::string getDefaultTCoords();
-
-    ///
-    /// \brief Add texture by giving the texture file name and the texture coordinates array name
-    ///
-    void addTexture(std::string tFileName, std::string tCoordsName = "");
-    const std::map<std::string, std::string>& getTextureMap() const;
-    std::string getTexture(std::string tCoordsName) const;
 
 protected:
 
@@ -171,8 +164,7 @@ protected:
     StdVectorOfVec3d m_vertexTangents; ///> Tangents of the vertices
     StdVectorOfVec3d m_vertexBitangents; ///> Bitangents of the vertices
 
-    std::string m_defaultTCoords = ""; ///> Name of the array used as default texture coordinates
-    std::map<std::string, std::string> m_textureMap; ///> Mapping texture coordinates to texture
+    std::string m_defaultTCoords = ""; ///> Name of the array used as default material coordinates
 };
 
 } // imstk

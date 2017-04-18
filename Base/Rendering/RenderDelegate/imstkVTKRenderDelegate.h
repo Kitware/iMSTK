@@ -25,12 +25,16 @@
 #include <memory>
 
 #include "imstkGeometry.h"
+#include "imstkRenderMaterial.h"
+#include "imstkVTKTextureDelegate.h"
+#include "imstkTextureManager.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkTransform.h"
+#include "vtkProperty.h"
 
 namespace imstk
 {
@@ -50,34 +54,39 @@ public:
     ~VTKRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Instantiate proper render delegate
     ///
-    static std::shared_ptr<VTKRenderDelegate> make_delegate(std::shared_ptr<Geometry>geom);
+    static std::shared_ptr<VTKRenderDelegate> make_delegate(std::shared_ptr<Geometry> geom);
 
     ///
-    /// \brief
+    /// \brief Set up normals and mapper
     ///
     void setUpMapper(vtkAlgorithmOutput *source, const bool rigid);
 
     ///
-    /// \brief
+    /// \brief Return geometry to render
     ///
     virtual std::shared_ptr<Geometry> getGeometry() const = 0;
 
     ///
-    /// \brief
+    /// \brief Get VTK renderered object
     ///
     vtkSmartPointer<vtkActor> getVtkActor() const;
 
     ///
-    /// \brief
+    /// \brief Update render delegate
     ///
     virtual void update();
 
     ///
-    /// \brief
+    /// \brief Update rendere delegate transform based on the geometry shallow transform
     ///
     void updateActorTransform();
+
+    ///
+    /// \brief Update render delegate properties based on the geometry render material
+    ///
+    void updateActorProperties();
 
 protected:
     ///

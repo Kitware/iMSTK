@@ -26,6 +26,8 @@
 #include <vector>
 
 #include "imstkMath.h"
+#include "imstkTextureManager.h"
+#include "imstkVTKTextureDelegate.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderer.h"
@@ -115,6 +117,8 @@ protected:
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
 
     Mode m_currentMode = Mode::EMPTY;
+
+    TextureManager<VTKTextureDelegate> m_textureManager;
 };
 }
 
