@@ -74,6 +74,7 @@
 #include "imstkInteractionPair.h"
 #include "imstkMeshToPlaneCD.h"
 #include "imstkMeshToSphereCD.h"
+#include "imstkVirtualCouplingCH.h"
 
 // logger
 #include "g3log/g3log.hpp"
@@ -127,8 +128,8 @@ void testLapToolController();
 void testScreenShotUtility();
 void testDeformableBodyCollision();
 void liverToolInteraction();
-void testBoneDrilling();
 void testCapsule();
+void testVirtualCoupling();
 
 int main()
 {
@@ -169,9 +170,9 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    testPbdCloth();
+    //testPbdCloth();
     //testPbdCollision();
-    testDeformableBody();
+    //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
 
@@ -199,7 +200,7 @@ int main()
     ------------------*/
     //testScenesManagement();
     //testVectorPlotters();
-    //testBoneDrilling();
+    testVirtualCoupling();
 
 
     return 0;
@@ -2518,55 +2519,70 @@ void liverToolInteraction()
     sdk->startSimulation(true);
 }
 
-void testBoneDrilling()
+void testVirtualCoupling()
 {
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
-    auto scene = sdk->createNewScene("BoneDrilling");
+    auto scene = sdk->createNewScene("VirtualCoupling");
 
-    //Read the cube hex mesh files (bunch of points in the space)
-    //std::string iFile = iMSTK_DATA_ROOT"/cube-hexMesh-60002/hexCube.msh";
-    std::string iFile = iMSTK_DATA_ROOT"/cube-hexMesh/hexCube.msh";
-    auto mesh = MeshIO::read(iFile);
-    if (!mesh)
-    {
-        LOG(WARNING) << "testBoneDrilling::Failed to read the MSH file: " << iFile;
-    }
-    auto volHexMesh = std::dynamic_pointer_cast<imstk::HexahedralMesh>(mesh);
+    // Create a plane in the scene
+    auto planeGeom = std::make_shared<imstk::Plane>(WORLD_ORIGIN, UP_VECTOR, 1.0);
+    planeGeom->scale(400);
+    planeGeom->translate(Vec3d(0., -50, 0.));
+    auto planeObj = std::make_shared<imstk::CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
 
-    // Create and add cube in the scene
-    auto visualObject = std::make_shared<imstk::VisualObject>("cube");
-    visualObject->setVisualGeometry(volHexMesh);
-    scene->addSceneObject(visualObject);
+    // Create the virtual coupling object controller
+#ifdef iMSTK_USE_OPENHAPTICS
 
-    // Create and add burr-tool object in the scene
-    auto createAndAddVisualSceneObject =
-        [](std::shared_ptr<imstk::Scene> scene,
-        const std::string& fileName,
-        const std::string& objectName) ->
-        std::shared_ptr<imstk::SceneObject>
-    {
-        auto mesh = imstk::MeshIO::read(fileName);
-        auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
-        SurfaceMesh->translate(Vec3d(0.2,0.2,0.2));
-        SurfaceMesh->rotate(Vec3d(1.0,0.0,0.0), 90);
-        // Create object and add to scene
-        auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
-        meshObject->setVisualGeometry(SurfaceMesh);
-        meshObject->setName(objectName);
-        scene->addSceneObject(meshObject);
-        return meshObject;
-    };
-   auto burrTool = createAndAddVisualSceneObject(scene,iMSTK_DATA_ROOT"/sceneObjects/burr-tool2.obj","burrTool");
+    // Device clients
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
 
-    // Get spherical burr tool in the scene.
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
 
-    // Set Camera configuration
+    // Device tracker
+    auto deviceTracker = std::make_shared<imstk::DeviceTracker>(client);
+
+    // Create a virtual coupling object
+    auto visualGeom = std::make_shared<imstk::Sphere>(WORLD_ORIGIN, 20);
+    auto collidingGeom = std::make_shared<imstk::Sphere>(WORLD_ORIGIN, 20);
+    auto obj = std::make_shared<CollidingObject>("VirtualCouplingObject");
+    obj->setCollidingGeometry(collidingGeom);
+    obj->setVisualGeometry(visualGeom);
+
+    // Add virtual coupling object (with visual, colliding, and physics geometry) in the scene.
+    scene->addSceneObject(obj);
+
+    // Create and add virtual coupling object controller in the scene
+    auto objController = std::make_shared<imstk::SceneObjectController>(obj, deviceTracker);
+    scene->addObjectController(objController);
+
+    // Create a collision graph
+    auto graph = scene->getCollisionGraph();
+    auto pair = graph->addInteractionPair(planeObj, obj,
+                                          CollisionDetection::Type::UnidirectionalPlaneToSphere,
+                                          CollisionHandling::Type::None,
+                                          CollisionHandling::Type::VirtualCoupling);
+
+    // Customize collision handling algorithm
+    auto colHandlingAlgo = std::dynamic_pointer_cast<VirtualCouplingCH>(pair->getCollisionHandlingB());
+    colHandlingAlgo->setStiffness(5e-01);
+    colHandlingAlgo->setDamping(0.005);
+
+#endif
+
+    // Move Camera
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(0.5, 0.5, 0.5));
+    cam->setPosition(imstk::Vec3d(200, 200, 200));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
 
     //Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
+
 }

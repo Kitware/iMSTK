@@ -132,4 +132,21 @@ InteractionPair::getObjectsPair() const
     return m_objects;
 }
 
+std::shared_ptr<CollisionDetection>
+InteractionPair::getCollisionDetection() const
+{
+    return m_colDetect;
+}
+
+std::shared_ptr<CollisionHandling>
+InteractionPair::getCollisionHandlingA() const
+{
+    return m_colHandlingA;
+}
+
+std::shared_ptr<CollisionHandling>
+InteractionPair::getCollisionHandlingB() const
+{
+    return m_colHandlingB;
+}
 }

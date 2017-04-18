@@ -57,11 +57,8 @@ UnidirectionalPlaneToSphereCD::computeCollisionData()
     Vec3d planeAColPt = sphereBPos - n*d;
     Vec3d sphereBColPt = sphereBPos - n*r;
 
-    // Compute the direction from plane to sphere
-    Vec3d dirAtoB = (d > 0.0 ? 1.0 : -1.0)*n;
-
     // Set collisionData
-    m_colData.PDColData.push_back({planeAColPt, sphereBColPt, dirAtoB, penetrationDepth});
+    m_colData.PDColData.push_back({planeAColPt, sphereBColPt, n, penetrationDepth});
 }
 
 } //iMSTK

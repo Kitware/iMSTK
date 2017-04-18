@@ -62,6 +62,7 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
     return intPair;
 }
 
+//TODO: Refactor -> PBD only
 void CollisionGraph::addInteractionPair(std::shared_ptr<PbdInteractionPair> pair)
 {
     m_interactionPbdPairList.push_back(pair);
