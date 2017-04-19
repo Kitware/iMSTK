@@ -78,6 +78,7 @@
 
 // logger
 #include "g3log/g3log.hpp"
+#include "imstkLogger.h"
 
 // imstk utilities
 #include "imstkPlotterUtils.h"
@@ -189,7 +190,7 @@ int main()
     Test devices, controllers
     ------------------*/
     //testObjectController();
-    //testTwoFalcons();
+    testTwoFalcons();
     //testCameraController();
     //testTwoOmnis();
     //testLapToolController();
@@ -200,7 +201,7 @@ int main()
     ------------------*/
     //testScenesManagement();
     //testVectorPlotters();
-    testVirtualCoupling();
+    //testVirtualCoupling();
 
 
     return 0;
@@ -596,28 +597,53 @@ void testTwoFalcons()
     cam->setPosition(Vec3d(0, 18, 40));
 
     // Print device tracking info (callback)
+    Logger* logger;
     unsigned int displayCpt = 0;
-    auto postUpdateFoo = [&displayCpt](Module* module)
+    auto postInitFoo = [&logger](Module* module)
     {
-        // Show every 1000 updates
-        if (++displayCpt < 1000)
-        {
-            return;
-        }
-        displayCpt = 0;
-
+        logger = new Logger(module->getName());
+        logger->setFrequency(5);
+    };
+    auto postUpdateFoo = [&displayCpt, &logger](Module* module)
+    {
         // Print position & velocity
-        // NB: Could write this in a file, or store it in an array
         auto client = static_cast<VRPNDeviceClient*>(module);
         Vec3d p = client->getPosition();
         Vec3d v = client->getVelocity();
-        std::cout << "\r-- " << module->getName()
-                  << " pos = (" <<  p[0] << ", " << p[1] << ", "  << p[2] << ") "
-                  << " vel = (" <<  v[0] << ", " << v[1] << ", "  << v[2] << ")"
-                  << std::flush;
+        std::string message =
+                " pos = (" +  std::to_string(p[0])
+                + ", " +  std::to_string(p[1])
+                + ", "  +  std::to_string(p[2]) + ") "
+                + " vel = (" +  std::to_string(v[0])
+                + ", " + std::to_string(v[1])
+                + ", "  + std::to_string(v[2]) + ")";
+
+        // Show every 1000 updates in standard
+        if (++displayCpt > 1000)
+        {
+            std::cout << "\r-- " << module->getName() << message << std::flush;
+            displayCpt = 0;
+        }
+
+        // Asynchronous log
+        if (logger->readyForLoggingWithFrequency())
+        {
+            logger->log(message, true);
+            logger->updateLogTime();
+        }
     };
+    auto postCleanUpFoo = [&logger](Module* module)
+    {
+        logger->shutdown();
+        delete logger;
+    };
+
+    falcon0->setPostInitCallback(postInitFoo);
     falcon0->setPostUpdateCallback(postUpdateFoo);
-    //falcon1->setPostUpdateCallback(postUpdateFoo);
+    falcon0->setPostCleanUpCallback(postCleanUpFoo);
+//    falcon1->setPostInitCallback(postInitFoo);
+//    falcon1->setPostUpdateCallback(postUpdateFoo);
+//    falcon1->setPostCleanUpCallback(postCleanUpFoo);
 
     // Run
     sdk->setCurrentScene(scene);
