@@ -19,45 +19,98 @@
 
 =========================================================================*/
 
-#ifndef imstkLogUtility_h
-#define imstkLogUtility_h
+#ifndef imstkLogger_h
+#define imstkLogger_h
 
 #include <string>
 #include <iostream>
-
-#include "g3log/logmessage.hpp"
-#include "g3log/logworker.hpp"
+#include <fstream>
+#include <mutex>
+#include <map>
+#include <thread>
+#include <condition_variable>
+#include <memory>
 
 namespace imstk
 {
 
 ///
-/// \struct stdSink
+/// \class Logger
 ///
-/// \brief
+/// \brief The logger class. This class can be instantiated multiple times.
+///        It runs on a seperate thread and buffers the output using system
+///        internal buffering to maintain good performance. If the program crashes,
+///        then unflushed content will NOT be preserved.
 ///
-struct stdSink
+class Logger
 {
-    // Linux xterm color
-    // http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
-    enum FG_Color { YELLOW = 33, RED = 31, GREEN = 32, WHITE = 97 };
+public:
+    ///
+    /// \brief Logger instantiation method
+    /// \params filename this name will be used in the file name of the log file
+    ///
+    Logger(std::string filename);
+    ~Logger();
 
-    FG_Color GetColor(const LEVELS level) const;
-    void ReceiveLogMessage(g3::LogMessageMover logEntry);
-};
+    ///
+    /// \brief Log one line.
+    /// \params message the message to log
+    /// \params prependTime defines if the current time is prepended to
+    ///         the message. Disabled by default.
+    ///
+    void log(std::string message, bool prependTime = false);
 
-///
-/// \struct LogUtility
-///
-/// \brief
-///
-struct LogUtility
-{
-    void createLogger(std::string name, std::string path);
+    ///
+    /// \brief Sets the frequency in Hz. This also updates the period.
+    /// \params frequency the frequency in Hz
+    ///
+    void setFrequency(int frequency);
 
-    std::unique_ptr<g3::LogWorker>                m_g3logWorker;
-    std::unique_ptr<g3::SinkHandle<g3::FileSink> >m_fileSinkHandle;
-    std::unique_ptr<g3::SinkHandle<stdSink> >     m_stdSinkHandle;
+    ///
+    /// \brief Log one formatted line with four data points.
+    /// \returns frequency in Hz
+    ///
+    int getFrequency();
+
+    ///
+    /// \brief Checks if outside of one period from last log time.
+    ///        This method does NOT update log time.
+    /// \returns true when outside of one period from last log time
+    ///
+    bool readyForLoggingWithFrequency();
+
+    ///
+    /// \brief Updates the last log time
+    ///
+    void updateLogTime();
+
+    ///
+    /// \brief Logger thread loop
+    /// \params logger a handle for the logger
+    ///
+    static void eventLoop(Logger * logger);
+
+    ///
+    /// \brief Shuts down and cleans up logger safely
+    ///
+    void shutdown();
+
+private:
+    static std::string getCurrentTimeFormatted();
+
+    // Mutex for performance reasons
+    std::mutex* m_mutex;
+    std::string m_message;
+    bool m_changed = false;
+    bool m_running = true;
+
+    int m_frequency = 30;
+    int m_period = 1000 / 30;
+    long long m_lastLogTime = 0;
+
+    std::string m_filename;
+    std::thread* m_thread;
+    std::condition_variable m_condition;
 };
 
 }

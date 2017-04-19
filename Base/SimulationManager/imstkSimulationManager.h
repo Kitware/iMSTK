@@ -32,7 +32,7 @@
 #include "imstkModule.h"
 #include "imstkSceneManager.h"
 #include "imstkVTKViewer.h"
-#include "imstkLogger.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

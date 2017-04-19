@@ -20,51 +20,159 @@
 =========================================================================*/
 
 #include "imstkLogger.h"
+#include <cstring>
 
 namespace imstk
 {
 
-stdSink::FG_Color
-stdSink::GetColor(const LEVELS level) const
+Logger::Logger(std::string filename)
 {
-    if (level.value == WARNING.value)   return YELLOW;
-    if (level.value == DEBUG.value)   return GREEN;
-    if (level.value == FATAL.value)   return RED;
-    return WHITE;
+    m_filename = filename + this->getCurrentTimeFormatted() + ".log";
+    m_mutex = new std::mutex();
+    m_thread = new std::thread(Logger::eventLoop, this);
+}
+
+Logger::~Logger()
+{
+    delete m_mutex;
+    m_thread->join();
+    delete m_thread;
+}
+
+std::string
+Logger::getCurrentTimeFormatted() {
+    time_t now = time(0);
+    int year = gmtime(&now)->tm_year + 1900;
+    int day = gmtime(&now)->tm_mday;
+    int month = gmtime(&now)->tm_mon;
+    int hour = gmtime(&now)->tm_hour;
+    int min = gmtime(&now)->tm_min;
+    int sec = gmtime(&now)->tm_sec;
+
+    std::string year_string = std::to_string(year);
+    std::string day_string = std::to_string(day);
+    if (day < 10)
+    {
+        day_string = "0" + day_string;
+    }
+    std::string month_string = std::to_string(month);
+    if (month < 10)
+    {
+        month_string = "0" + month_string;
+    }
+    std::string hour_string = std::to_string(hour);
+    if (hour < 10)
+    {
+        hour_string = "0" + hour_string;
+    }
+    std::string min_string = std::to_string(min);
+    if (min < 10)
+    {
+        min_string = "0" + min_string;
+    }
+    std::string sec_string = std::to_string(sec);
+    if (sec < 10)
+    {
+        sec_string = "0" + sec_string;
+    }
+
+    return year_string + day_string + month_string + "-" + hour_string + min_string + sec_string;
 }
 
 void
-stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
+Logger::eventLoop(Logger * logger)
 {
-    auto level = logEntry.get()._level;
-    auto message = logEntry.get().message();
+    std::ofstream file(logger->m_filename);
 
-#ifndef WIN32
-    auto color = GetColor(level);
-    std::cout << "\033[" << color << "m"
-              << message
-              << "\033[m" << std::endl;
-#else
-    if (level.value == WARNING.value || level.value == FATAL.value)
-    {
-        std::cerr << message << std::endl;
-    }
-    else
-    {
-        std::cout << message << std::endl;
-    }
-#endif
+    char buffer[1024];
+    std::fill_n(buffer, 1024, '\0');
 
+    while (logger->m_running) {
+        std::unique_lock<std::mutex> ul(*logger->m_mutex);
+        logger->m_condition.wait(ul, [logger]{return logger->m_changed; });
+
+        if (!logger->m_running) {
+            logger->m_changed = false;
+            ul.unlock();
+            break;
+        }
+
+        std::strcpy(buffer, logger->m_message.c_str());
+        logger->m_changed = false;
+
+        ul.unlock();
+        logger->m_condition.notify_one();
+
+        file << buffer << "\n";
+    }
+    file.close();
+    logger->m_condition.notify_one();
 }
 
 void
-LogUtility::createLogger(std::string name, std::string path)
+Logger::log(std::string message, bool prependTime /* = false */)
 {
-    m_g3logWorker    = g3::LogWorker::createLogWorker();
-    m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path);
-    m_stdSinkHandle  = m_g3logWorker->addSink(
-        std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage);
-    g3::initializeLogging(m_g3logWorker.get());
+    if (prependTime)
+    {
+        m_message = this->getCurrentTimeFormatted() + " ";
+    }
+    m_message += message;
+
+    // Safely setting the change state
+    {
+        std::lock_guard<std::mutex> guard(*m_mutex);
+        m_changed = true;
+    }
+
+    m_condition.notify_one();
+    std::unique_lock<std::mutex> ul(*m_mutex);
+    m_condition.wait(ul, [this]{return !m_changed; });
+    ul.unlock();
+}
+bool
+Logger::readyForLoggingWithFrequency()
+{
+    long long currentMilliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count();
+    if (currentMilliseconds - m_lastLogTime > m_period)
+    {
+        return true;
+    }
+    return false;
+}
+
+void
+Logger::updateLogTime()
+{
+    m_lastLogTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock().now().time_since_epoch()).count();
+}
+
+void
+Logger::setFrequency(int frequency)
+{
+    m_frequency = frequency;
+    m_period = 1000 / m_frequency;
+}
+
+int
+Logger::getFrequency()
+{
+    return m_frequency;
+}
+
+void
+Logger::shutdown()
+{
+    // Safely setting the running state
+    {
+        std::lock_guard<std::mutex> guard(*m_mutex);
+        m_changed = true;
+        m_running = false;
+    }
+
+    m_condition.notify_one();
+    std::unique_lock<std::mutex> ul(*m_mutex);
+    m_condition.wait(ul, [this]{return !m_changed; });
+    ul.unlock();
 }
 
 }
