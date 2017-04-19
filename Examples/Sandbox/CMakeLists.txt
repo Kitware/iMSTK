@@ -47,6 +47,9 @@ list(APPEND FILE_LIST
     oneTet/,REGEX:.*
     spheres/,REGEX:.*
     spring/,REGEX:.*
-    tetBeads/,REGEX:.*)
+    tetBeads/,REGEX:.*
+    textured_organs/,REGEX:.*
+    textured_organs/texture_set_1/,REGEX:.*
+    textured_organs/texture_set_2/,REGEX:.*)
 
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})

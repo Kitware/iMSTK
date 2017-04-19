@@ -342,44 +342,4 @@ SurfaceMesh::getDefaultTCoords()
     return m_defaultTCoords;
 }
 
-void
-SurfaceMesh::addTexture(std::string tFileName, std::string tCoordsName)
-{
-    if (tCoordsName == "")
-    {
-        tCoordsName = m_defaultTCoords;
-        if (tCoordsName == "")
-        {
-            LOG(WARNING) << "Can not add texture without default texture coordinates. ";
-            return;
-        }
-    }
-
-    if (!m_pointDataMap.count(tCoordsName))
-    {
-        LOG(WARNING) << "Mesh does not hold any array named " << tCoordsName << ". "
-                     << "Can not add texture.";
-        return;
-    }
-
-    m_textureMap[tCoordsName] = tFileName;
-}
-const std::map<std::string, std::string>&
-SurfaceMesh::getTextureMap() const
-{
-    return m_textureMap;
-}
-
-std::string
-SurfaceMesh::getTexture(std::string tCoordsName) const
-{
-    if (!m_textureMap.count(tCoordsName))
-    {
-        LOG(WARNING) << "No texture filename associated with coordinates " << tCoordsName << ".";
-        return "";
-    }
-
-    return m_textureMap.at(tCoordsName);
-}
-
 } // imstk

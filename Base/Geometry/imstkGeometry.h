@@ -23,7 +23,9 @@
 #define imstkGeometry_h
 
 #include "g3log/g3log.hpp"
+
 #include "imstkMath.h"
+#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
@@ -142,12 +144,19 @@ public:
     ///
     const std::string getTypeName() const;
 
+    ///
+    /// \brief Set/Get render material
+    ///
+    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
+
 protected:
 
     Type m_type; ///> Geometry type
     Vec3d  m_position; ///> position
     Quatd  m_orientation; ///> orientation
     double m_scaling = 1; ///> Scaling
+    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; // Render material
 };
 
 } //imstk

@@ -19,61 +19,59 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKSurfaceMeshRenderDelegate_h
-#define imstkVTKSurfaceMeshRenderDelegate_h
+#ifndef imstkVTKTexture_h
+#define imstkVTKTexture_h
 
-#include <memory>
-
-#include "imstkVTKRenderDelegate.h"
-#include "imstkVTKTextureDelegate.h"
+#include "imstkTexture.h"
+#include "imstkTextureDelegate.h"
 #include "imstkTextureManager.h"
 
-class vtkDoubleArray;
+#include <vtkTexture.h>
+#include <vtkSmartPointer.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkImageReader2.h>
+
+#include <string>
+#include <memory>
 
 namespace imstk
 {
 
-class SurfaceMesh;
+class VTKTextureDelegate;
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class VTKTexture
 ///
-/// \brief
+/// \brief VTK texture implementation.
 ///
-class VTKSurfaceMeshRenderDelegate : public VTKRenderDelegate
+class VTKTextureDelegate : TextureDelegate
 {
 public:
     ///
-    /// \brief
+    /// \brief Default constructor
     ///
-    ~VTKSurfaceMeshRenderDelegate() = default;
-
-    ///
-    /// \brief
-    ///
-    VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh);
-
-    ///
-    /// \brief
-    ///
-    void update() override;
-
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Initialize textures
-    ///
-    void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
+    VTKTextureDelegate() {}
 
 protected:
+    template<class T> friend class TextureManager;
+    friend class VTKSurfaceMeshRenderDelegate;
 
-    std::shared_ptr<SurfaceMesh> m_geometry; ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    ///
+    /// \brief Gets the VTK texture
+    ///
+    /// \returns VTK texture
+    ///
+    vtkSmartPointer<vtkTexture> getTexture() const;
+
+    ///
+    /// \brief Implementation of texture loading
+    ///
+    virtual void loadTexture(std::shared_ptr<Texture> texture);
+
+
+    vtkSmartPointer<vtkTexture> m_sourceTexture;    ///< VTK texture
 };
 
 }
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+#endif

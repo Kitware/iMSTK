@@ -36,6 +36,7 @@
 #include <vtkImageReader2.h>
 #include <vtkTexture.h>
 #include <vtkProperty.h>
+#include <vtkOpenGLPolyDataMapper.h>
 
 #include "g3log/g3log.hpp"
 
@@ -85,62 +86,27 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
 
+    if (m_geometry->getDefaultTCoords() != "")
+    {
+        // Convert texture coordinates
+        auto tcoords = m_geometry->getPointDataArray(m_geometry->getDefaultTCoords());
+        auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
+        vtkTCoords->SetNumberOfComponents(2);
+        vtkTCoords->SetName(m_geometry->getDefaultTCoords().c_str());
+
+        for (auto const tcoord : tcoords)
+        {
+            double tuple[2] = { tcoord[0], tcoord[1] };
+            vtkTCoords->InsertNextTuple(tuple);
+        }
+
+        polydata->GetPointData()->SetTCoords(vtkTCoords);
+    }
+
     // Setup Mapper & Actor
     this->setUpMapper(source->GetOutputPort(), false);
     this->updateActorTransform();
-
-    // Copy textures
-    int unit = 0;
-    auto readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
-    for (auto const &texturePair : surfaceMesh->getTextureMap())
-    {
-        std::string tCoordsName = texturePair.first;
-        std::string tFileName = texturePair.second;
-
-        // Convert texture coordinates
-        auto tcoords = surfaceMesh->getPointDataArray(tCoordsName);
-        auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
-        vtkTCoords->SetNumberOfComponents(2);
-        vtkTCoords->SetName(tCoordsName.c_str());
-        for (auto const tcoord : tcoords)
-        {
-            double tuple[2] = {tcoord[0], tcoord[1]};
-            vtkTCoords->InsertNextTuple(tuple);
-        }
-        polydata->GetPointData()->SetTCoords(vtkTCoords);
-
-        // Read texture image
-        auto imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
-        if (!imgReader)
-        {
-            LOG(WARNING) << "Could not find reader for " << tFileName;
-            continue;
-        }
-        imgReader->SetFileName(tFileName.c_str());
-        imgReader->Update();
-        auto texture = vtkSmartPointer<vtkTexture>::New();
-        texture->SetInputConnection(imgReader->GetOutputPort());
-        texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
-        /* /!\ VTKTextureWrapMode not yet supported in VTK 7
-         * See here for some work that needs to be imported back to upstream:
-         * https://gitlab.kitware.com/iMSTK/vtk/commit/62a7ecd8a5f54e243c26960de22d5d1d23ef932b
-         *
-        texture->SetWrapMode(vtkTexture::VTKTextureWrapMode::ClampToBorder);
-
-         * /!\ MultiTextureAttribute not yet supported in VTK 7
-         * See here for some work that needs to be imported back to upstream:
-         * https://gitlab.kitware.com/iMSTK/vtk/commit/ae373026755db42b6fdce5093109ef1a39a76340
-         *
-        // Link texture unit to texture attribute
-        m_mapper->MapDataArrayToMultiTextureAttribute(unit, tCoordsName.c_str(),
-                                                      vtkDataObject::FIELD_ASSOCIATION_POINTS);
-        */
-
-        // Set texture
-        m_actor->GetProperty()->SetTexture(unit, texture);
-
-        unit++;
-    }
+    this->updateActorProperties();
 }
 
 void
@@ -156,6 +122,48 @@ std::shared_ptr<Geometry>
 VTKSurfaceMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
+}
+
+void
+VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelegate>& textureManager)
+{
+    auto material = m_geometry->getRenderMaterial();
+    if (material == nullptr)
+    {
+        return;
+    }
+
+    // Go through all of the textures
+    for (int unit = 0; unit < Texture::Type::NONE; unit++)
+    {
+        // Get imstk texture
+        auto texture = material->getTexture((Texture::Type)unit);
+        if (texture->getPath() == "")
+        {
+            continue;
+        }
+
+        // Get vtk texture
+        auto textureDelegate = textureManager.getTextureDelegate(texture);
+
+        /* /!\ VTKTextureWrapMode not yet supported in VTK 7
+        * See here for some work that needs to be imported back to upstream:
+        * https://gitlab.kitware.com/iMSTK/vtk/commit/62a7ecd8a5f54e243c26960de22d5d1d23ef932b
+        *
+        texture->SetWrapMode(vtkTexture::VTKTextureWrapMode::ClampToBorder);
+
+        * /!\ MultiTextureAttribute not yet supported in VTK 7
+        * See here for some work that needs to be imported back to upstream:
+        * https://gitlab.kitware.com/iMSTK/vtk/commit/ae373026755db42b6fdce5093109ef1a39a76340
+        *
+        // Link texture unit to texture attribute
+        m_mapper->MapDataArrayToMultiTextureAttribute(unit, tCoordsName.c_str(),
+                                                    vtkDataObject::FIELD_ASSOCIATION_POINTS);
+        */
+
+        // Set texture
+        m_actor->GetProperty()->SetTexture(unit, textureDelegate->getTexture());
+    }
 }
 
 } // imstk

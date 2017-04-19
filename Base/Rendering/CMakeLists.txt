@@ -5,6 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( Rendering
   H_FILES
     imstkVTKRenderer.h
+    imstkVTKTextureDelegate.h
     RenderDelegate/imstkVTKCubeRenderDelegate.h
     RenderDelegate/imstkVTKLineMeshRenderDelegate.h
     RenderDelegate/imstkVTKPlaneRenderDelegate.h
@@ -18,6 +19,7 @@ imstk_add_library( Rendering
 
   CPP_FILES
     imstkVTKRenderer.cpp
+    imstkVTKTextureDelegate.cpp
     RenderDelegate/imstkVTKCubeRenderDelegate.cpp
     RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
