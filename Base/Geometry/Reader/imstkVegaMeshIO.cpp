@@ -140,7 +140,7 @@ void
 VegaMeshIO::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
                              StdVectorOfVec3d& vertices)
 {
-    for(size_t i = 0; i < vegaMesh->getNumVertices(); ++i)
+    for(int i = 0; i < vegaMesh->getNumVertices(); ++i)
     {
         auto pos = *vegaMesh->getVertex(i);
         vertices.emplace_back(pos[0], pos[1], pos[2]);
@@ -155,9 +155,9 @@ VegaMeshIO::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
     std::array<size_t,dim> cell;
     for(size_t cellId = 0; cellId < vegaMesh->getNumElements(); ++cellId)
     {
-        for (size_t i = 0; i < vegaMesh->getNumElementVertices(); ++i)
+        for (int i = 0; i < vegaMesh->getNumElementVertices(); ++i)
         {
-            cell[i] = vegaMesh->getVertexIndex(cellId,i);
+            cell[i] = vegaMesh->getVertexIndex(int(cellId),i);
         }
         cells.emplace_back(cell);
     }
@@ -189,13 +189,13 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
         std::vector<int> elements;
         for (const auto & tet : tetArray)
         {
-            elements.emplace_back(tet[0]);
-            elements.emplace_back(tet[1]);
-            elements.emplace_back(tet[2]);
-            elements.emplace_back(tet[3]);
+            elements.emplace_back(int(tet[0]));
+            elements.emplace_back(int(tet[1]));
+            elements.emplace_back(int(tet[2]));
+            elements.emplace_back(int(tet[3]));
         }
 
-        std::shared_ptr<vega::VolumetricMesh> vegaMesh(new vega::TetMesh(imstkVolTetMesh->getNumVertices(), &vertices[0], imstkVolTetMesh->getNumTetrahedra(), &elements[0], E, nu, density));
+        std::shared_ptr<vega::VolumetricMesh> vegaMesh(new vega::TetMesh(int(imstkVolTetMesh->getNumVertices()), &vertices[0], int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density));
         if (!vegaMesh)
         {
             LOG(WARNING) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";

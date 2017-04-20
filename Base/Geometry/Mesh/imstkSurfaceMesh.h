@@ -144,7 +144,7 @@ public:
     ///
     /// \brief Returns the number of triangles
     ///
-    int getNumTriangles() const;
+    size_t getNumTriangles() const;
 
     ///
     /// \brief Set/Get the array defining the default material coordinates

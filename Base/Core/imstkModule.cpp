@@ -52,7 +52,7 @@ Module::start()
     // Keep active, wait for terminating call
     std::chrono::steady_clock::time_point previous_t = std::chrono::steady_clock::now() - std::chrono::minutes(1);
     std::chrono::steady_clock::time_point current_t;
-    int elapsed;
+    long long elapsed;
     while (m_status !=  ModuleStatus::TERMINATING)
     {
         if (m_status == ModuleStatus::PAUSING)

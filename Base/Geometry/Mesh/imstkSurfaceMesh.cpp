@@ -161,13 +161,13 @@ SurfaceMesh::computeVerticesNormals()
 void
 SurfaceMesh::optimizeForDataLocality()
 {
-    const int numVertices = this->getNumVertices();
-    const int numTriangles = this->getNumTriangles();
+    const size_t numVertices = this->getNumVertices();
+    const size_t numTriangles = this->getNumTriangles();
 
     // First find the list of triangles a given vertex is part of
-    std::vector<std::vector<int>> vertexNeighbors;
+    std::vector<std::vector<size_t>> vertexNeighbors;
     vertexNeighbors.resize(this->getNumVertices());
-    int triId = 0;
+    size_t triId = 0;
     for (const auto &tri : this->getTrianglesVertices())
     {
         vertexNeighbors[tri[0]].push_back(triId);
@@ -178,11 +178,11 @@ SurfaceMesh::optimizeForDataLocality()
     }
 
     std::vector<TriangleArray> optimizedConnectivity;
-    std::vector<int> optimallyOrderedNodes;
-    std::list<int> triUnderConsideration;
+    std::vector<size_t> optimallyOrderedNodes;
+    std::list<size_t> triUnderConsideration;
     std::vector<bool> isNodeAdded(numVertices, false);
     std::vector<bool> isTriangleAdded(numTriangles, false);
-    std::list<int> newlyAddedNodes;
+    std::list<size_t> newlyAddedNodes;
 
     // A. Initialize
     optimallyOrderedNodes.push_back(0);
@@ -324,7 +324,7 @@ SurfaceMesh::getVertexBitangents() const
     return m_vertexBitangents;
 }
 
-int
+size_t
 SurfaceMesh::getNumTriangles() const
 {
     return this->m_trianglesVertices.size();

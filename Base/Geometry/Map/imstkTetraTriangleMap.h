@@ -84,13 +84,13 @@ public:
     ///
     /// \brief Find the closest tetrahedron based on the distance to their centroids for a given point in 3D space
     ///
-    static int findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
+    static size_t findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
                                       const Vec3d& pos);
 
     ///
     /// \brief Find the tetrahedron that encloses a given point in 3D space
     ///
-    static int findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
+    static size_t findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
                                         const Vec3d& pos);
 
 protected:

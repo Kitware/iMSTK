@@ -142,7 +142,7 @@ HexahedralMesh::getHexahedronVertices(const int& hexaNum) const
     return m_hexahedraVertices.at(hexaNum);
 }
 
-int
+size_t
 HexahedralMesh::getNumHexahedra() const
 {
     return m_hexahedraVertices.size();

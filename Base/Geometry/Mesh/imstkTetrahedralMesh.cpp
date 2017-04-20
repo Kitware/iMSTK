@@ -135,15 +135,14 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
             c = tetVertArray[facePattern[t][2]];
 
             // search in reverse
-            for (int i = surfaceTri.size() - 1; i >= 0; i--)
+            for (auto it=surfaceTri.rbegin(); it!=surfaceTri.rend(); ++it)
             {
-                const auto &triA = surfaceTri.at(i);
-                if (((triA[0] == a) && ((triA[1] == b && triA[2] == c) || (triA[1] == c && triA[2] == b))) ||
-                    ((triA[1] == a) && ((triA[0] == b && triA[2] == c) || (triA[0] == c && triA[2] == b))) ||
-                    ((triA[2] == a) && ((triA[1] == b && triA[0] == c) || (triA[1] == c && triA[0] == b))))
+                if ((((*it)[0] == a) && (((*it)[1] == b && (*it)[2] == c) || ((*it)[1] == c && (*it)[2] == b))) ||
+                    (((*it)[1] == a) && (((*it)[0] == b && (*it)[2] == c) || ((*it)[0] == c && (*it)[2] == b))) ||
+                    (((*it)[2] == a) && (((*it)[1] == b && (*it)[0] == c) || ((*it)[1] == c && (*it)[0] == b))))
                 {
                     unique = false;
-                    foundAt = i;
+                    foundAt = surfaceTri.size() - 1 - (it - surfaceTri.rbegin());
                     break;
                 }
             }
@@ -178,10 +177,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 
         if (normal.dot(centroid - this->getVertexPosition(tetRemainingVert.at(faceId))) > 0)
         {
-            // swap
-            int tmpIndex = surfaceTri[faceId][2];
-            surfaceTri[faceId][2] = surfaceTri[faceId][1];
-            surfaceTri[faceId][2] = tmpIndex;
+            std::swap(surfaceTri[faceId][2], surfaceTri[faceId][1]);
         }
     }
 
@@ -289,7 +285,7 @@ TetrahedralMesh::getTetrahedronVertices(const size_t& tetId) const
     return m_tetrahedraVertices.at(tetId);
 }
 
-int
+size_t
 TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraVertices.size();

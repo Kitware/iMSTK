@@ -32,7 +32,7 @@ namespace imstk
 {
 
 void
-VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, size_t id)
+VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, int id)
 {
     m_deviceInfoMap[deviceName] = std::make_pair(deviceType,id);
 
@@ -56,7 +56,7 @@ VRPNDeviceServer::initModule()
     {
         std::string name = device.first;
         DeviceType type = device.second.first;
-        size_t id = device.second.second;
+        auto id = device.second.second;
 
         switch (type)
         {

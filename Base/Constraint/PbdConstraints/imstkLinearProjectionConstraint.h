@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    LinearProjectionConstraint(const unsigned int& nodeId, const bool isFixed = false);
+    LinearProjectionConstraint(const size_t& nodeId, const bool isFixed = false);
     LinearProjectionConstraint() = delete;
 
     ///
@@ -49,12 +49,12 @@ public:
     ///
     /// \brief Form the projection
     ///
-    void setProjection(const unsigned int& nodeId, const Vec3d& p, const Vec3d& q = Vec3d::Zero());
+    void setProjection(const size_t& nodeId, const Vec3d& p, const Vec3d& q = Vec3d::Zero());
 
     ///
     /// \brief Set the projector to simulate Dirichlet conditions
     ///
-    void setProjectorToDirichlet(const unsigned int& nodeId);
+    void setProjectorToDirichlet(const size_t& nodeId);
 
     ///
     /// \brief Reset the linear projector
@@ -88,13 +88,13 @@ public:
     ///
     /// \brief Get the node id
     ///
-    inline const unsigned int& getNodeId() const
+    inline const size_t& getNodeId() const
     {
         return m_nodeId;
     }
 
 private:
-    unsigned int m_nodeId;                  ///> Node id
+    size_t m_nodeId;                  ///> Node id
     bool m_isFixedConstraint = false;       ///> Flag to know if that node is fixed
     Mat3d m_projection = Mat3d::Identity(); ///> Orthogonal projector
     Vec3d m_value = Vec3d(0., 0., 0.);      ///> Value in the subspace: range(I-m_projector)

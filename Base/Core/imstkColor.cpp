@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, const Color& c)
     os << "R = " << c.r << '\n'
        << "G = " << c.g << '\n'
        << "B = " << c.b << '\n'
-       << "\u03B1 = " << c.a ;
+       << "A = " << c.a ;
     return os;
 }
 

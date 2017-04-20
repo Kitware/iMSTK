@@ -90,17 +90,24 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     {
         // Convert texture coordinates
         auto tcoords = m_geometry->getPointDataArray(m_geometry->getDefaultTCoords());
-        auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
-        vtkTCoords->SetNumberOfComponents(2);
-        vtkTCoords->SetName(m_geometry->getDefaultTCoords().c_str());
-
-        for (auto const tcoord : tcoords)
+        if (tcoords == nullptr)
         {
-            double tuple[2] = { tcoord[0], tcoord[1] };
-            vtkTCoords->InsertNextTuple(tuple);
+            LOG(WARNING) << "No default texture coordinates array for geometry " << m_geometry;
         }
+        else
+        {
+            auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
+            vtkTCoords->SetNumberOfComponents(2);
+            vtkTCoords->SetName(m_geometry->getDefaultTCoords().c_str());
 
-        polydata->GetPointData()->SetTCoords(vtkTCoords);
+            for (auto const tcoord : *tcoords)
+            {
+                double tuple[2] = { tcoord[0], tcoord[1] };
+                vtkTCoords->InsertNextTuple(tuple);
+            }
+
+            polydata->GetPointData()->SetTCoords(vtkTCoords);
+        }
     }
 
     // Setup Mapper & Actor

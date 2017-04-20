@@ -416,6 +416,9 @@ MSHMeshIO::numElemNodes(const ElemType & elType)
         case ElemType::tetrahedronThirdOrder:           return 20;
         case ElemType::tetrahedronFourthOrder:          return 35;
         case ElemType::tetrahedronFifthOrder:           return 56;
+        default:
+            LOG(WARNING) << "MSHMeshIO::numElemNodes: Unknown element type";
+            return 0;
     }
 }
 

@@ -119,7 +119,7 @@ public:
     ///
     /// \brief Returns the number of tetrahedra
     ///
-    int getNumTetrahedra() const;
+    size_t getNumTetrahedra() const;
 
 protected:
     std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra

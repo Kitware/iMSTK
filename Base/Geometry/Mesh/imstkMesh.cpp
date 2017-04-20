@@ -195,15 +195,16 @@ Mesh::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& 
     m_pointDataMap[arrayName] = arrayData;
 }
 
-const StdVectorOfVectorf&
+const StdVectorOfVectorf* const
 Mesh::getPointDataArray(const std::string& arrayName) const
 {
-    if (!m_pointDataMap.count(arrayName))
+    auto it = m_pointDataMap.find(arrayName);
+    if (it == m_pointDataMap.end())
     {
         LOG(WARNING) << "No array with such name holds any point data.";
-        return StdVectorOfVectorf();
+        return nullptr;
     }
-    return m_pointDataMap.at(arrayName);
+    return &(it->second);
 }
 
 const size_t
