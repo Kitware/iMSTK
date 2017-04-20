@@ -39,7 +39,7 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     m_geometry(hexahedralMesh)
 {
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);

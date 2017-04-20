@@ -96,7 +96,7 @@ public:
     ///
     /// \brief Computes the normals of all the vertices
     ///
-    void computeVerticesNormals();
+    void computeVertexNormals();
 
     ///
     /// \brief Rewire the node order and triangle connectivity to optimize for memory layout

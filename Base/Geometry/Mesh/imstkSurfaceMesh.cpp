@@ -36,7 +36,7 @@ SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
 
     if (computeDerivedData)
     {
-        computeVerticesNormals();
+        computeVertexNormals();
     }
 }
 
@@ -133,7 +133,7 @@ SurfaceMesh::computeTrianglesNormals()
 }
 
 void
-SurfaceMesh::computeVerticesNormals()
+SurfaceMesh::computeVertexNormals()
 {
     m_vertexNormals.resize(m_vertexPositions.size());
 

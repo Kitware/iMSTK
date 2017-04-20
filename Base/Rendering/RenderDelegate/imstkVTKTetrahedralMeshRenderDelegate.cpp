@@ -38,7 +38,7 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     m_geometry(tetrahedralMesh)
 {
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);

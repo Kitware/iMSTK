@@ -37,7 +37,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     m_geometry(lineMesh)
 {
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);

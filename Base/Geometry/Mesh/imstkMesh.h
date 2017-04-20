@@ -124,12 +124,12 @@ public:
     const Vec3d& getVertexDisplacement(const size_t& vertNum) const;
 
     ///
-    /// \brief Sets the point data for all arrays at each vertice
+    /// \brief Sets the point data for all arrays at each vertex
     ///
     void setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData);
 
     ///
-    /// \brief Get the map of the point data for all arrays at each vertice
+    /// \brief Get the map of the point data for all arrays at each vertex
     ///
     const std::map<std::string, StdVectorOfVectorf>& getPointDataMap() const;
 
@@ -163,7 +163,7 @@ protected:
     ///
     /// \brief Get vertices positions
     ///
-    StdVectorOfVec3d& getVerticesPositionsNotConst()
+    StdVectorOfVec3d& getVertexPositionsNotConst()
     {
         return m_vertexPositions;
     }
