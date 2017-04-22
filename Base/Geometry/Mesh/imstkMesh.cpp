@@ -189,7 +189,7 @@ Mesh::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& 
     m_pointDataMap[arrayName] = arrayData;
 }
 
-const StdVectorOfVectorf* const
+const StdVectorOfVectorf*
 Mesh::getPointDataArray(const std::string& arrayName) const
 {
     auto it = m_pointDataMap.find(arrayName);

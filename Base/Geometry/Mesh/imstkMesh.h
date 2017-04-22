@@ -132,7 +132,7 @@ public:
     ///
     /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
     ///
-    const StdVectorOfVectorf* const getPointDataArray(const std::string& arrayName) const;
+    const StdVectorOfVectorf* getPointDataArray(const std::string& arrayName) const;
 
     ///
     /// \brief Returns the number of total vertices in the mesh
