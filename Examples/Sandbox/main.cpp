@@ -129,6 +129,7 @@ void testDeformableBodyCollision();
 void liverToolInteraction();
 void testCapsule();
 void testVirtualCoupling();
+void testGeometryTransforms();
 
 int main()
 {
@@ -139,7 +140,7 @@ int main()
     /*------------------
     Test rendering
     ------------------*/
-    testMultiObjectWithTextures();
+    //testMultiObjectWithTextures();
     //testViewer();
     //testScreenShotUtility();
     //testCapsule();
@@ -161,6 +162,7 @@ int main()
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
     //testAnalyticalGeometry();
+    testGeometryTransforms();
 
 
     /*------------------
@@ -2520,6 +2522,55 @@ void testVirtualCoupling()
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
 
     //Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(false);
+}
+
+void testGeometryTransforms()
+{
+
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("testGeometryTransforms");
+
+    auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj", "Dragon");
+
+    auto surfaceMesh = sceneObj->getVisualGeometry();
+    surfaceMesh->scale(5., Geometry::TransformType::ConcatenateToTransform);
+
+    //  Plane
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->scale(80, Geometry::TransformType::ConcatenateToTransform);
+    planeGeom->translate(0, -20, 0, Geometry::TransformType::ConcatenateToTransform);
+    planeGeom->rotate(Vec3d(0, 1., 0), PI/4, Geometry::TransformType::ConcatenateToTransform);
+
+    auto planeObj = std::make_shared<VisualObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    //  Cube
+    auto cubeGeom = std::make_shared<Cube>();
+    cubeGeom->setWidth(20.);
+    cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
+    cubeGeom->rotate(Vec3d(1., 1., 0), PI / 4, Geometry::TransformType::ApplyToData);
+
+    auto cubeObj = std::make_shared<VisualObject>("Cube");
+    cubeObj->setVisualGeometry(cubeGeom);
+    scene->addSceneObject(cubeObj);
+
+    // Rotate the dragon every frame
+    auto rotateFunc = [&surfaceMesh](Module* module)
+    {
+        surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+    };
+    sdk->getSceneManager("testGeometryTransforms")->setPostUpdateCallback(rotateFunc);
+
+    // Set Camera configuration
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0, 30, 30));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 }
