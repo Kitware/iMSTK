@@ -37,20 +37,56 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 
     auto readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
 
-    // Read texture image
-    auto imgReader = readerFactory->CreateImageReader2(texture->getPath().c_str());
-    if (!imgReader)
-    {
-        LOG(WARNING) << "VTKTextureDelegate::loadTexture error: could not find reader for "
-                     << tFileName;
-        return;
-    }
-
-    imgReader->SetFileName(tFileName.c_str());
-    imgReader->Update();
     m_sourceTexture = vtkSmartPointer<vtkTexture>::New();
-    m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
-    m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
-    m_sourceTexture->RepeatOff();
+
+    if (texture->getType() == Texture::CUBEMAP)
+    {
+        std::string sideNames[6] = {"posx", "negx", "posy", "negy", "posz", "negz"};
+        m_sourceTexture->SetCubeMap(true);
+
+        for (int i = 0; i < 6; i++)
+        {
+            vtkImageReader2 * imgReader;
+
+            auto index = tFileName.find(".");
+            auto tempName = tFileName.substr(0, index);
+            auto extension = tFileName.substr(index);
+            auto sideName = tempName + sideNames[i] + extension;
+
+            imgReader = readerFactory->CreateImageReader2(sideName.c_str());
+
+            if (!imgReader)
+            {
+                LOG(WARNING) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+                             << sideName;
+                return;
+            }
+
+            auto imageFlip = vtkSmartPointer<vtkImageFlip>::New();
+            imageFlip->SetFilteredAxis(1);
+            imgReader->SetFileName(sideName.c_str());
+            imgReader->Update();
+            imageFlip->SetInputConnection(imgReader->GetOutputPort());
+            m_sourceTexture->SetInputConnection(i, imageFlip->GetOutputPort());
+        }
+    }
+    else
+    {
+        vtkImageReader2 * imgReader;
+        imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
+
+        if (!imgReader)
+        {
+            LOG(WARNING) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+                         << tFileName;
+            return;
+        }
+
+        imgReader->SetFileName(tFileName.c_str());
+        imgReader->Update();
+        m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+        m_sourceTexture->RepeatOff();
+        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
+    }
 }
 }

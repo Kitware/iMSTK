@@ -37,7 +37,7 @@ VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true);
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry);
 }
 
 void

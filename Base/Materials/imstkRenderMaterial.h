@@ -52,25 +52,25 @@ public:
     ///
     /// \brief Get/Set display mode
     ///
-    const DisplayMode getDisplayMode() const;
+    DisplayMode getDisplayMode() const;
     void setDisplayMode(const DisplayMode displayMode);
 
     ///
     /// \brief Get/Set line width or the wireframe
     ///
-    const float getLineWidth() const;
+    float getLineWidth() const;
     void setLineWidth(const float width);
 
     ///
     /// \brief Get/Set point size
     ///
-    const float getPointSize() const;
+    float getPointSize() const;
     void setPointSize(const float size);
 
     ///
     /// \brief Backface culling on/off
     ///
-    const bool getBackFaceCulling() const;
+    bool getBackFaceCulling() const;
     void setBackFaceCulling(const bool culling);
     void backfaceCullingOn();
     void backfaceCullingOff();
@@ -82,16 +82,16 @@ public:
     void setDiffuseColor(const Color color);
 
     ///
-    /// \brief Get/Set the specular color (only set for metals)
+    /// \brief Get/Set the metalness
     ///
-    const Color& getSpecularColor() const;
-    void setSpecularColor(const Color color);
+    const float& getMetalness() const;
+    void setMetalness(const float metalness);
 
     ///
-    /// \brief Get/Set the specularity
+    /// \brief Get/Set the roughness
     ///
-    const float& getSpecularity() const;
-    void setSpecularity(const float specularity);
+    const float& getRoughness() const;
+    void setRoughness(const float roughness);
 
     ///
     /// \brief Add/Get texture
@@ -123,10 +123,10 @@ protected:
 
     // Colors
     Color m_diffuseColor = Color::White;
-    Color m_specularColor = Color::Black;
 
     // Classical values
-    float m_specularity = 0.0; ///< Not shiny by default
+    float m_metalness = 0.0; ///< Value for metalness with range: [0.0, 1.0]
+    float m_roughness = 0.0; ///< Value for roughness with range: [0.0, 1.0]
 
     // Textures
     std::vector<std::shared_ptr<Texture>> m_textures; ///< Ordered by Texture::Type

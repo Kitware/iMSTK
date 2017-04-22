@@ -32,7 +32,7 @@ RenderMaterial::RenderMaterial()
     }
 }
 
-const RenderMaterial::DisplayMode
+RenderMaterial::DisplayMode
 RenderMaterial::getDisplayMode() const
 {
     return m_displayMode;
@@ -50,7 +50,7 @@ RenderMaterial::setDisplayMode(const DisplayMode displayMode)
     m_modified = true;
 }
 
-const float
+float
 RenderMaterial::getLineWidth() const
 {
     return m_lineWidth;
@@ -68,7 +68,7 @@ RenderMaterial::setLineWidth(const float width)
     m_modified = true;
 }
 
-const float
+float
 RenderMaterial::getPointSize() const
 {
     return m_pointSize;
@@ -86,7 +86,7 @@ RenderMaterial::setPointSize(const float size)
     m_modified = true;
 }
 
-const bool
+bool
 RenderMaterial::getBackFaceCulling() const
 {
     return m_backfaceCulling;
@@ -129,29 +129,28 @@ RenderMaterial::setDiffuseColor(const Color color)
     m_modified = true;
 }
 
-const Color&
-RenderMaterial::getSpecularColor() const
+const float&
+RenderMaterial::getMetalness() const
 {
-    return m_specularColor;
+    return m_metalness;
 }
 
 void
-RenderMaterial::setSpecularColor(const Color color)
+RenderMaterial::setMetalness(const float metalness)
 {
-    m_specularColor = color;
-    m_modified = true;
+    m_metalness = metalness;
 }
 
 const float&
-RenderMaterial::getSpecularity() const
+RenderMaterial::getRoughness() const
 {
-    return m_specularity;
+    return m_roughness;
 }
 
 void
-RenderMaterial::setSpecularity(const float specularity)
+RenderMaterial::setRoughness(const float roughness)
 {
-    m_specularity = specularity;
+    m_roughness = roughness;
 }
 
 std::shared_ptr<Texture>

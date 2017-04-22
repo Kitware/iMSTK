@@ -4,7 +4,7 @@
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
   GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git
-  GIT_TAG 1f89d2d1acf154522cbaab67766066c72817659e
+  GIT_TAG 7b563776b89f829b382ba080d8963a04d7a47ecc
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
       -DBUILD_EXAMPLES:BOOL=OFF

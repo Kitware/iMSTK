@@ -114,6 +114,14 @@ public:
     ///
     virtual void OnMouseWheelBackward() override;
 
+    ///
+    /// \brief Not implemented
+    ///
+    virtual void OnFourthButtonDown(){};
+    virtual void OnFifthButtonDown(){};
+    virtual void OnFourthButtonUp(){};
+    virtual void OnFifthButtonUp(){};
+
 private:
 
     VTKInteractorStyle();

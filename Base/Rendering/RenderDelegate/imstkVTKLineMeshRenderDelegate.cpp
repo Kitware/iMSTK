@@ -51,7 +51,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     m_geometry->m_dataModified = false;
 
     // Setup Mapper & Actor
-    this->setUpMapper(lines->GetOutputPort(), true);
+    this->setUpMapper(lines->GetOutputPort(), true, m_geometry);
 
     // Update Transform, Render Properties
     this->update();

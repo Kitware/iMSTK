@@ -154,7 +154,8 @@ Mesh::setVertexDisplacements(const Vectord& u)
     m_transformApplied = false;
 }
 
-void Mesh::translateVertices(const Vec3d& t)
+void
+Mesh::translateVertices(const Vec3d& t)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
@@ -200,7 +201,7 @@ Mesh::getPointDataArray(const std::string& arrayName) const
     return &(it->second);
 }
 
-const size_t
+size_t
 Mesh::getNumVertices() const
 {
     return m_initialVertexPositions.size();

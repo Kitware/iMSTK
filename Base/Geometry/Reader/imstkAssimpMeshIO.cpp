@@ -116,7 +116,7 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
         }
     }
 
-    if (importedMesh->HasTangentsAndBitangents())
+    if (importedMesh->HasTangentsAndBitangents() && importedMesh->HasTextureCoords(0))
     {
         for (unsigned int i = 0; i < numVertices; i++)
         {
@@ -136,7 +136,7 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
     mesh->setVertexTangents(tangents);
     mesh->setVertexBitangents(bitangents);
 
-    // UV coordinates normals
+    // UV coordinates
     StdVectorOfVectorf UVs(numVertices);
     if (importedMesh->HasTextureCoords(0))
     {

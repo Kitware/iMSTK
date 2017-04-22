@@ -136,7 +136,7 @@ public:
     ///
     /// \brief Returns the number of total vertices in the mesh
     ///
-    const size_t getNumVertices() const;
+    size_t getNumVertices() const;
 
     ///
     /// \brief Set the topologyChanged flag
