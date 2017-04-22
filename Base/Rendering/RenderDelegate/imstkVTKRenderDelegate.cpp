@@ -137,7 +137,7 @@ VTKRenderDelegate::getVtkActor() const
 void
 VTKRenderDelegate::update()
 {
-    // TODO : only when rigid transform applied
+    this->updateDataSource();
     this->updateActorTransform();
     this->updateActorProperties();
 }
@@ -145,19 +145,16 @@ VTKRenderDelegate::update()
 void
 VTKRenderDelegate::updateActorTransform()
 {
-    auto scaling   = this->getGeometry()->getScaling();
-    auto pos       = this->getGeometry()->getPosition();
-    auto quat      = this->getGeometry()->getOrientation();
-    auto angleAxis = Rotd(quat);
-
-    m_transform->Identity();
-    m_transform->PostMultiply();
-    m_transform->Scale(scaling, scaling, scaling);
-    m_transform->RotateWXYZ(angleAxis.angle() * 180 / PI,
-                          angleAxis.axis()[0],
-                          angleAxis.axis()[1],
-                          angleAxis.axis()[2]);
-    m_transform->Translate(pos[0], pos[1], pos[2]);
+    auto geom = this->getGeometry();
+    if (!geom->m_transformModified)
+    {
+        return;
+    }
+    AffineTransform3d T(geom->m_transform.matrix());
+    T.scale(geom->getScaling());
+    T.matrix().transposeInPlace();
+    m_transform->SetMatrix(T.data());
+    geom->m_transformModified = false;
 }
 
 void

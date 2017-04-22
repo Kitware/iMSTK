@@ -27,7 +27,7 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkPlane.h"
 
-#include "vtkPlaneSource.h"
+#include "vtkTransformPolyDataFilter.h"
 
 namespace imstk
 {
@@ -41,23 +41,30 @@ class VTKPlaneRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor
     ///
-    VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane);
+    VTKPlaneRenderDelegate(std::shared_ptr<Plane> plane);
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
     ~VTKPlaneRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Update plane source based on the plane geometry
     ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    void updateDataSource() override;
+
+    ///
+    /// \brief Returns the plane geometry
+    ///
+    std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
 
     std::shared_ptr<Plane> m_geometry;  ///> Geometry
+
+    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
 };
 
 } // imstk

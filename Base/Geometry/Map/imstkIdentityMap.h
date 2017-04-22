@@ -53,7 +53,7 @@ public:
     ///
     /// \brief Check the validity of the map
     ///
-    bool isValid() const { return true; };
+    bool isValid() const override { return true; }
 
     // Accessors
 

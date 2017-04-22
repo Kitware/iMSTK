@@ -41,15 +41,15 @@ MeshToPlaneCD::computeCollisionData()
     auto planePos = m_plane->getPosition();
 
     // TODO: Fix this issue of extra computation in future
-    auto rotatedNormal = m_plane->getOrientation()*m_plane->getNormal();
+    auto planeNormal = m_plane->getNormal();
 
     size_t nodeId = 0;
     for (const auto& p : m_mesh->getVertexPositions())
     {
-        auto peneDistance = (planePos - p).dot(rotatedNormal);
+        auto peneDistance = (planePos - p).dot(planeNormal);
         if (peneDistance <= 0.0)
         {
-            m_colData.MAColData.push_back({ nodeId, rotatedNormal * -peneDistance });
+            m_colData.MAColData.push_back({ nodeId, planeNormal * -peneDistance });
         }
         nodeId++;
     }

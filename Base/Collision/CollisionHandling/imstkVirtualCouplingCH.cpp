@@ -23,6 +23,7 @@
 
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
+#include "imstkAnalyticalGeometry.h"
 
 #include <g3log/g3log.hpp>
 
@@ -32,12 +33,15 @@ namespace imstk
 void
 VirtualCouplingCH::computeContactForces()
 {
+    const auto collidingGeometry = std::static_pointer_cast<AnalyticalGeometry>(m_object->getCollidingGeometry());
+    const auto visualGeometry =  std::static_pointer_cast<AnalyticalGeometry>(m_object->getVisualGeometry());
+
     // Check if any collisions
-    const auto collidingObjPos = m_object->getCollidingGeometry()->getPosition();
+    const auto collidingObjPos = collidingGeometry->getPosition();
     if (m_colData.PDColData.empty())
     {
         // Set the visual object position same as the colliding object position
-        m_object->getVisualGeometry()->setPosition(collidingObjPos);
+        visualGeometry->setPosition(collidingObjPos);
         return;
     }
 
@@ -50,7 +54,7 @@ VirtualCouplingCH::computeContactForces()
 
     // Update the visual object position
     const auto visualObjPos = collidingObjPos + t;
-    m_object->getVisualGeometry()->setPosition(visualObjPos);
+    visualGeometry->setPosition(visualObjPos);
 
     // Spring force
     Vec3d  force = m_stiffness * (visualObjPos - collidingObjPos);

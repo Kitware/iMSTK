@@ -42,29 +42,29 @@ class VTKHexahedralMeshRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief
-    ///
-    ~VTKHexahedralMeshRenderDelegate() = default;
-
-    ///
-    /// \brief
+    /// \brief Constructor
     ///
     VTKHexahedralMeshRenderDelegate(std::shared_ptr<HexahedralMesh> hexahedralMesh);
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
-    void update() override;
+    ~VTKHexahedralMeshRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Update unstructured grid source based on the hexahedral mesh
+    ///
+    void updateDataSource() override;
+
+    ///
+    /// \brief Returns the hexahedral mesh
     ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
 
-    std::shared_ptr<HexahedralMesh> m_geometry; ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    std::shared_ptr<HexahedralMesh> m_geometry;             ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 
 } // imstk

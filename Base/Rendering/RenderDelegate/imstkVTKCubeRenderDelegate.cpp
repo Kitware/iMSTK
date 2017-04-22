@@ -21,26 +21,48 @@
 
 #include "imstkVTKCubeRenderDelegate.h"
 
-#include "g3log/g3log.hpp"
+#include "vtkCubeSource.h"
 
 namespace imstk
 {
 
 VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube>cube) :
-    m_geometry(cube)
+    m_geometry(cube),
+    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
-    auto width = m_geometry->getWidth();
+    auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
+    cubeSource->SetCenter(0, 0, 0);
+    cubeSource->SetXLength(1.0);
+    cubeSource->SetYLength(1.0);
+    cubeSource->SetZLength(1.0);
 
-    auto source = vtkSmartPointer<vtkCubeSource>::New();
+    m_transformFilter->SetInputConnection(cubeSource->GetOutputPort());
+    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
-    source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
-    source->SetXLength(width);
-    source->SetYLength(width);
-    source->SetZLength(width);
+    this->update();
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true);
+}
 
-    // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), true);
-    this->updateActorTransform();
+void
+VTKCubeRenderDelegate::updateDataSource()
+{
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
+
+    Geometry::DataType type = Geometry::DataType::PreTransform;
+
+    AffineTransform3d T = AffineTransform3d::Identity();
+    T.translate(m_geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
+    T.scale(m_geometry->getWidth(type));
+    T.matrix().transposeInPlace();
+
+    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
+    vtkT->SetMatrix(T.data());
+
+    m_geometry->m_dataModified = false;
 }
 
 std::shared_ptr<Geometry>

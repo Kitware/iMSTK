@@ -23,7 +23,7 @@
 #define imstkCapsule_h
 
 // imstk
-#include "imstkGeometry.h"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk
 {
@@ -33,20 +33,13 @@ namespace imstk
 ///
 /// \brief Capsule geometry
 ///
-class Capsule : public Geometry
+class Capsule : public AnalyticalGeometry
 {
 public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const Vec3d& position = WORLD_ORIGIN,
-            const double& radius = 1.,
-            const double& height = 1.) :
-            m_radius(radius),
-            m_height(height),
-            Geometry(Geometry::Type::Capsule,
-                     position,
-                     Quatd::Identity()){}
+    Capsule() : AnalyticalGeometry(Type::Capsule) {}
 
     ///
     /// \brief Default destructor
@@ -63,31 +56,36 @@ public:
     ///
     double getVolume() const override;
 
-    // Accessors
     ///
     /// \brief Returns the radius of the capsule
     ///
-    const double& getRadius() const{ return m_radius; };
+    double getRadius(DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the radius of the capsule
     ///
-    void setRadius(const double& r);
+    void setRadius(const double r);
 
     ///
-    /// \brief Returns the height of the capsule
+    /// \brief Returns the length of the capsule
     ///
-    const double& getHeight() const { return m_height; }
+    double getLength(DataType type = DataType::PostTransform);
 
     ///
-    /// \brief Sets the height of the capsule
+    /// \brief Sets the length of the capsule
     ///
-    void setHeight(const double& h);
+    void setLength(const double l);
 
 protected:
+    friend class VTKCapsuleRenderDelegate;
 
-    double m_radius; ///> Radius of the hemispheres at the end of the capsule
-    double m_height; ///> Length between the centers of two hemispheres
+    void applyScaling(const double s) override;
+    void updatePostTransformData() override;
+
+    double m_radius = 1.0;              ///> Radius of the hemispheres at the end of the capsule
+    double m_radiusPostTransform = 1.0; ///> Radius after transform
+    double m_length = 1.0;              ///> Length between the centers of two hemispheres
+    double m_lengthPostTransform = 1.0; ///> Length after transform
 };
 
 } // imstk

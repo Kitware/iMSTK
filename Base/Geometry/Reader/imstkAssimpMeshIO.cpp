@@ -149,10 +149,9 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
             UV[1] = texcoords[i].y;
             UVs[i] = UV;
         }
+        mesh->setDefaultTCoords("tCoords");
+        mesh->setPointDataArray("tCoords",UVs);
     }
-
-    mesh->setDefaultTCoords("tCoords");
-    mesh->setPointDataArray("tCoords",UVs);
 
     return mesh;
 }

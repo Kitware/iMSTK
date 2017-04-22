@@ -52,17 +52,21 @@ TEST_F(imstkPlaneTest, SetGetWidth)
 
 TEST_F(imstkPlaneTest, SetGetNormal)
 {
-    m_plane.setNormal(Vec3d(0.2, -0.3, 0.9));
-    EXPECT_EQ(m_plane.getNormal(), Vec3d(0.2, -0.3, 0.9));
+    Vec3d n1 = Vec3d(0.2, -0.3, 0.9);
+    Vec3d n2 = Vec3d(0.003, -0.001, 0.002);
+    Vec3d n3 = Vec3d(400000000, -500000000, 600000000);
 
-    m_plane.setNormal(Vec3d(0.003, -0.001, 0.002));
-    EXPECT_EQ(m_plane.getNormal(), Vec3d(0.003, -0.001, 0.002));
+    m_plane.setNormal(n1);
+    EXPECT_TRUE(m_plane.getNormal().isApprox(n1.normalized()));
 
-    m_plane.setNormal(Vec3d(400000000, -500000000, 600000000));
-    EXPECT_EQ(m_plane.getNormal(), Vec3d(400000000, -500000000, 600000000));
+    m_plane.setNormal(n2);
+    EXPECT_TRUE(m_plane.getNormal().isApprox(n2.normalized()));
 
-    m_plane.setNormal(WORLD_ORIGIN);
-    EXPECT_NE(m_plane.getNormal(), WORLD_ORIGIN);
+    m_plane.setNormal(n3);
+    EXPECT_TRUE(m_plane.getNormal().isApprox(n3.normalized()));
+
+    m_plane.setNormal(0, 0, 0);
+    EXPECT_FALSE(m_plane.getNormal().isApprox(Vec3d(0, 0, 0)));
 }
 
 TEST_F(imstkPlaneTest, GetVolume)

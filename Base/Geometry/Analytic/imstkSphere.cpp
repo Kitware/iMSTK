@@ -29,7 +29,7 @@ namespace imstk
 void
 Sphere::print() const
 {
-    Geometry::print();
+    AnalyticalGeometry::print();
     LOG(INFO) << "Radius: " << m_radius;
 }
 
@@ -39,21 +39,50 @@ Sphere::getVolume() const
     return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius;
 }
 
-const double&
-Sphere::getRadius() const
+double
+Sphere::getRadius(DataType type /* = DataType::PostTransform */)
 {
+    if (type == DataType::PostTransform)
+    {
+        this->updatePostTransformData();
+        return m_radiusPostTransform;
+    }
     return m_radius;
 }
 
 void
-Sphere::setRadius(const double& radius)
+Sphere::setRadius(const double r)
 {
-    if(radius <= 0)
+    if(r <= 0)
     {
         LOG(WARNING) << "Sphere::setRadius error: radius should be positive.";
         return;
     }
-    m_radius = radius;
+    if (m_radius == r)
+    {
+        return;
+    }
+    m_radius = r;
+    m_dataModified = true;
+    m_transformApplied = false;
+}
+
+void
+Sphere::applyScaling(const double s)
+{
+    this->setRadius(m_radius * s);
+}
+
+void
+Sphere::updatePostTransformData()
+{
+    if (m_transformApplied)
+    {
+        return;
+    }
+    AnalyticalGeometry::updatePostTransformData();
+    m_radiusPostTransform = m_scaling * m_radius;
+    m_transformApplied = true;
 }
 
 } // imstk

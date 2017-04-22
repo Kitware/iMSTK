@@ -38,7 +38,7 @@ UnidirectionalPlaneToSphereCD::computeCollisionData()
 
     // Get geometry properties
     const Vec3d sphereBPos = m_sphereB->getPosition();
-    const double r = m_sphereB->getRadius() * m_sphereB->getScaling();
+    const double r = m_sphereB->getRadius();
     const Vec3d planeAPos = m_planeA->getPosition();
     const Vec3d n = m_planeA->getNormal();
 

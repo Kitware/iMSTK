@@ -37,21 +37,50 @@ Cube::getVolume() const
     return m_width*m_width*m_width;
 }
 
-const double&
-Cube::getWidth() const
+double
+Cube::getWidth(DataType type /* = DataType::PostTransform */)
 {
+    if (type == DataType::PostTransform)
+    {
+        this->updatePostTransformData();
+        return m_widthPostTransform;
+    }
     return m_width;
 }
 
 void
-Cube::setWidth(const double& width)
+Cube::setWidth(const double w)
 {
-    if(width <= 0)
+    if (w <= 0)
     {
         LOG(WARNING) << "Cube::setWidth error: width should be positive.";
         return;
     }
-    m_width = width;
+    if (m_width == w)
+    {
+        return;
+    }
+    m_width = w;
+    m_dataModified = true;
+    m_transformApplied = false;
+}
+
+void
+Cube::applyScaling(const double s)
+{
+    this->setWidth(m_width * s);
+}
+
+void
+Cube::updatePostTransformData()
+{
+    if (m_transformApplied)
+    {
+        return;
+    }
+    AnalyticalGeometry::updatePostTransformData();
+    m_widthPostTransform = m_scaling * m_width;
+    m_transformApplied = true;
 }
 
 } // imstk

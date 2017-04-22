@@ -27,7 +27,7 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkSphere.h"
 
-#include "vtkSphereSource.h"
+#include "vtkTransformPolyDataFilter.h"
 
 namespace imstk
 {
@@ -41,22 +41,28 @@ class VTKSphereRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor
+    ///
+    VTKSphereRenderDelegate(std::shared_ptr<Sphere> sphere);
+
+    ///
+    /// \brief Destructor
     ///
     ~VTKSphereRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Update sphere source based on the sphere geometry
     ///
-    VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere);
+    void updateDataSource() override;
 
     ///
-    /// \brief
+    /// \brief Returns the sphere geometry
     ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
-    std::shared_ptr<Sphere> m_geometry; ///>
+    std::shared_ptr<Sphere> m_geometry;         ///> Geometry
+    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
 };
 
 } // imstk

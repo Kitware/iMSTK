@@ -34,8 +34,8 @@ namespace imstk
 void
 LaparoscopicToolController::initOffsets()
 {
-    m_trackingController->setTranslationOffset(m_shaft->getMasterGeometry()->getPosition());
-    m_trackingController->setRotationOffset(m_shaft->getMasterGeometry()->getOrientation());
+    m_trackingController->setTranslationOffset(m_shaft->getMasterGeometry()->getTranslation());
+    m_trackingController->setRotationOffset(Quatd(m_shaft->getMasterGeometry()->getRotation()));
 
     m_trackingController->getDeviceClient()->setButtonsEnabled(true);
 }
@@ -71,18 +71,18 @@ LaparoscopicToolController::updateControlledObjects()
     // Update orientation of parts
     Quatd jawRotUpper;
     jawRotUpper = r*Rotd(m_jawAngle, m_jawRotationAxis);
-    m_upperJaw->getMasterGeometry()->setOrientation(jawRotUpper);
+    m_upperJaw->getMasterGeometry()->setRotation(jawRotUpper);
 
     Quatd jawRotLower;
     jawRotLower = r*Rotd(-m_jawAngle, m_jawRotationAxis);
-    m_lowerJaw->getMasterGeometry()->setOrientation(jawRotLower);
+    m_lowerJaw->getMasterGeometry()->setRotation(jawRotLower);
 
-    m_shaft->getMasterGeometry()->setOrientation(r);
+    m_shaft->getMasterGeometry()->setRotation(r);
 
     // Update positions of parts
-    m_shaft->getMasterGeometry()->setPosition(p);
-    m_upperJaw->getMasterGeometry()->setPosition(p);
-    m_lowerJaw->getMasterGeometry()->setPosition(p);
+    m_shaft->getMasterGeometry()->setTranslation(p);
+    m_upperJaw->getMasterGeometry()->setTranslation(p);
+    m_lowerJaw->getMasterGeometry()->setTranslation(p);
 }
 
 void

@@ -42,29 +42,29 @@ class VTKTetrahedralMeshRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief
-    ///
-    ~VTKTetrahedralMeshRenderDelegate() = default;
-
-    ///
-    /// \brief
+    /// \brief Constructor
     ///
     VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh);
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
-    void update() override;
+    ~VTKTetrahedralMeshRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Update unstructured grid source based on the tetrahedral mesh
+    ///
+    void updateDataSource() override;
+
+    ///
+    /// \brief Returns the tetrahedral mesh
     ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
 
-    std::shared_ptr<TetrahedralMesh> m_geometry; ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    std::shared_ptr<TetrahedralMesh> m_geometry;            ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 
 } // imstk

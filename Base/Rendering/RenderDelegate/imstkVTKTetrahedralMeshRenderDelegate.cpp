@@ -29,18 +29,16 @@
 #include <vtkDoubleArray.h>
 #include <vtkCellArray.h>
 
-#include "g3log/g3log.hpp"
-
 namespace imstk
 {
 
 VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
-    m_geometry(tetrahedralMesh)
+    m_geometry(tetrahedralMesh),
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
@@ -65,25 +63,28 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     auto unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     unstructuredGrid->SetPoints(points);
     unstructuredGrid->SetCells(VTK_TETRA, cells);
+    m_geometry->m_dataModified = false;
 
-    // Mapper
+    // Mapper & Actor
     auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
     mapper->SetInputData(unstructuredGrid);
-
-    // Actor
     m_actor->SetMapper(mapper);
 
-    // Transform
-    this->updateActorTransform();
+    // Update Transform, Render Properties
+    this->update();
 }
 
 void
-VTKTetrahedralMeshRenderDelegate::update()
+VTKTetrahedralMeshRenderDelegate::updateDataSource()
 {
-    // Base class update
-    VTKRenderDelegate::update();
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
 
-    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
+    m_mappedVertexArray->Modified();
+
+    m_geometry->m_dataModified = false;
 }
 
 

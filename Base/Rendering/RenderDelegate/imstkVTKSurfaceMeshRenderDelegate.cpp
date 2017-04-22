@@ -38,18 +38,16 @@
 #include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
 
-#include "g3log/g3log.hpp"
-
 namespace imstk
 {
 
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
-    m_geometry(surfaceMesh)
+    m_geometry(surfaceMesh),
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
@@ -85,7 +83,9 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
+    m_geometry->m_dataModified = false;
 
+    // Setup texture coordinates
     if (m_geometry->getDefaultTCoords() != "")
     {
         // Convert texture coordinates
@@ -110,25 +110,22 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
         }
     }
 
-    // Setup Mapper & Actor
+    // Update Transform, Render Properties
+    this->update();
     this->setUpMapper(source->GetOutputPort(), false);
-    this->updateActorTransform();
-    this->updateActorProperties();
 }
 
 void
-VTKSurfaceMeshRenderDelegate::update()
+VTKSurfaceMeshRenderDelegate::updateDataSource()
 {
-    // Base class update
-    VTKRenderDelegate::update();
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
 
-    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
-}
+    m_mappedVertexArray->Modified();
 
-std::shared_ptr<Geometry>
-VTKSurfaceMeshRenderDelegate::getGeometry() const
-{
-    return m_geometry;
+    m_geometry->m_dataModified = false;
 }
 
 void
@@ -171,6 +168,12 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         // Set texture
         m_actor->GetProperty()->SetTexture(unit, textureDelegate->getTexture());
     }
+}
+
+std::shared_ptr<Geometry>
+VTKSurfaceMeshRenderDelegate::getGeometry() const
+{
+    return m_geometry;
 }
 
 } // imstk

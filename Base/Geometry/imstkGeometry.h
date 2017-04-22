@@ -54,14 +54,31 @@ public:
     };
 
     ///
+    /// \brief Enumeration for the transformation to apply
+    /// \params ApplyToTransform to apply the transformation to the data
+    /// \params ApplyToTransform to apply the transformation to the transform matrix
+    ///
+    enum class TransformType
+    {
+        ApplyToData,
+        ConcatenateToTransform
+    };
+
+    ///
+    /// \brief Enumeration for the data to retrieve
+    /// \params PreTransform for data where transform matrix is not applied
+    /// \params PostTransform for data where transform matrix is applied
+    ///
+    enum class DataType
+    {
+        PreTransform,
+        PostTransform
+    };
+
+    ///
     /// \brief Constructor
     ///
-    Geometry(Type type,
-             const Vec3d& position = WORLD_ORIGIN,
-             const Quatd& orientation = Quatd::Identity()) :
-        m_type(type),
-        m_position(position),
-        m_orientation(orientation){}
+    Geometry(Type type) : m_type(type) {}
 
     ///
     /// \brief Destructor
@@ -81,68 +98,68 @@ public:
     ///
     /// \brief Translate the geometry in Cartesian space
     ///
-    void         translate(const Vec3d& t);
-    void         translate(const double& x,
-                           const double& y,
-                           const double& z);
+    void translate(const Vec3d& t,
+                   TransformType type = TransformType::ConcatenateToTransform);
+    void translate(double x, double y, double z,
+                   TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Rotate the geometry in Cartesian space
     ///
-    void         rotate(const Quatd& r);
-    void         rotate(const Mat3d& r);
-    void         rotate(const Vec3d & axis,
-                        const double& angle);
+    void rotate(const Quatd& q,
+                TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Mat3d& m,
+                TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Vec3d& axis, double angle,
+                TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Scale in Cartesian directions
     ///
-    void         scale(const double& scaling);
+    void scale(double scaling,
+               TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Applies a rigid transform to the geometry
     ///
-    void        transform(const RigidTransform3d& transform);
+    void transform(RigidTransform3d T,
+                   TransformType type = TransformType::ConcatenateToTransform);
 
     ///
-    /// \brief Returns true if the geometry is a mesh, else returns false
+    /// \brief Get/Set translation
     ///
-    bool isMesh() const;
-
-    // Accessors
-
-    ///
-    /// \brief Get/Set position
-    ///
-    const Vec3d& getPosition() const;
-    void         setPosition(const Vec3d& position);
-    void         setPosition(const double& x,
-                             const double& y,
-                             const double& z);
+    Vec3d getTranslation() const;
+    void setTranslation(const Vec3d t);
+    void setTranslation(double x, double y, double z);
 
     ///
-    /// \brief Get/Set orientation
+    /// \brief Get/Set rotation
     ///
-    const Quatd       & getOrientation() const;
-    void                setOrientation(const Quatd& orientation);
-    void                setOrientation(const Mat3d& orientation);
-    void                setOrientation(const Vec3d & axis,
-                                       const double& angle);
+    Mat3d getRotation() const;
+    void setRotation(const Mat3d m);
+    void setRotation(const Quatd q);
+    void setRotation(const Vec3d axis, const double angle);
+
     ///
     /// \brief Get/Set scaling
     ///
-    const double      & getScaling() const;
-    void                setScaling(const double& scaling);
+    double getScaling() const;
+    void setScaling(const double s);
 
     ///
     /// \brief Returns the type of the geometry
     ///
-    const Type& getType() const;
+    Type getType() const;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
     ///
     const std::string getTypeName() const;
+
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    bool isMesh() const;
 
     ///
     /// \brief Set/Get render material
@@ -151,12 +168,23 @@ public:
     std::shared_ptr<RenderMaterial> getRenderMaterial() const;
 
 protected:
+    friend class VTKRenderDelegate;
+
+    virtual void applyTranslation(const Vec3d t) = 0;
+    virtual void applyRotation(const Mat3d r) = 0;
+    virtual void applyScaling(const double s) = 0;
+    virtual void updatePostTransformData() = 0;
 
     Type m_type; ///> Geometry type
-    Vec3d  m_position; ///> position
-    Quatd  m_orientation; ///> orientation
-    double m_scaling = 1; ///> Scaling
-    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; // Render material
+
+    bool m_dataModified = false;
+    bool m_transformModified = false;
+    bool m_transformApplied = true;
+
+    RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transform
+    double m_scaling = 1.0;
+
+    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; ///> Render material
 };
 
 } //imstk

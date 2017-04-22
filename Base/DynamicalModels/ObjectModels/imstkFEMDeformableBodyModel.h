@@ -189,7 +189,7 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& solution, const stateUpdateType updateType);
+    void updateBodyStates(const Vectord& solution, const stateUpdateType updateType) override;
     void updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType);
 
     ///

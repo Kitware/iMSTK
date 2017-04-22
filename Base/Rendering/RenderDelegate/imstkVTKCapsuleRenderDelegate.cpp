@@ -21,26 +21,55 @@
 
 #include "imstkVTKCapsuleRenderDelegate.h"
 
+#include "vtkCapsuleSource.h"
+
 namespace imstk
 {
 
 VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule) :
-m_capsuleGeometry(capsule)
+    m_geometry(capsule),
+    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
-    auto source = vtkSmartPointer<vtkCapsuleSource>::New();
+    Geometry::DataType type = Geometry::DataType::PreTransform;
+    auto capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
+    capsuleSource->SetRadius(m_geometry->getRadius(type));
+    capsuleSource->SetCylinderLength(m_geometry->getLength(type));
+    capsuleSource->SetLatLongTessellation(20);
+    capsuleSource->SetPhiResolution(20);
+    capsuleSource->SetThetaResolution(20);
 
-    source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
-    source->SetRadius(m_capsuleGeometry->getRadius());
-    source->SetCylinderLength(m_capsuleGeometry->getHeight());
+    m_transformFilter->SetInputConnection(capsuleSource->GetOutputPort());
+    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
-    // Set the resolution for rendering
-    source->SetLatLongTessellation(10);
-    source->SetPhiResolution(10);
-    source->SetThetaResolution(10);
+    this->update();
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true);
+}
 
-    // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), true);
-    this->updateActorTransform();
+void
+VTKCapsuleRenderDelegate::updateDataSource()
+{
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
+
+    Geometry::DataType type = Geometry::DataType::PreTransform;
+
+    AffineTransform3d T = AffineTransform3d::Identity();
+    T.translate(m_geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
+    T.matrix().transposeInPlace();
+
+    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
+    vtkT->SetMatrix(T.data());
+
+    m_geometry->m_dataModified = false;
+}
+
+std::shared_ptr<Geometry>
+VTKCapsuleRenderDelegate::getGeometry() const
+{
+    return m_geometry;
 }
 
 } // imstk

@@ -22,7 +22,7 @@
 #ifndef imstkCube_h
 #define imstkCube_h
 
-#include "imstkGeometry.h"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk {
 
@@ -31,17 +31,11 @@ namespace imstk {
 ///
 /// \brief Cube geometry
 ///
-class Cube : public Geometry
+class Cube : public AnalyticalGeometry
 {
 public:
 
-    Cube(const Vec3d & position = WORLD_ORIGIN,
-         const double& width = 1) :
-        Geometry(Geometry::Type::Cube,
-                 position,
-                 Quatd::Identity()),
-        m_width(width)
-    {}
+    Cube() : AnalyticalGeometry(Type::Cube) {}
 
     ~Cube() = default;
 
@@ -55,20 +49,25 @@ public:
     ///
     double getVolume() const override;
 
-    // Accessors
     ///
     /// \brief Returns the width of the cube
     ///
-    const double& getWidth() const;
+    double getWidth(DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the width of the cube
     ///
-    void setWidth(const double& width);
+    void setWidth(const double w);
 
 protected:
+    friend class VTKCubeRenderDelegate;
 
-    double m_width; ///> width of the cube
+    void applyScaling(const double s) override;
+    void updatePostTransformData() override;
+
+    double m_width = 1.0;               ///> Width of the cube
+    double m_widthPostTransform = 1.0;  ///> Width of the cube once transform applied
+
 };
 }
 

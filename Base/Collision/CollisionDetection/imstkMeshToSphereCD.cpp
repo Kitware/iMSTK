@@ -39,7 +39,7 @@ MeshToSphereCD::computeCollisionData()
 
     // Get sphere properties
     auto spherePos = m_sphere->getPosition();
-    auto radius = m_sphere->getRadius() * m_sphere->getScaling();
+    auto radius = m_sphere->getRadius();
 
     size_t nodeId = 0;
     for (const auto& p : m_mesh->getVertexPositions())

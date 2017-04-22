@@ -37,9 +37,9 @@ SphereToSphereCD::computeCollisionData()
 
     // Get geometry properties
     Vec3d sphereAPos = m_sphereA->getPosition();
-    double rA = m_sphereA->getRadius() * m_sphereA->getScaling();
+    double rA = m_sphereA->getRadius();
     Vec3d sphereBPos = m_sphereB->getPosition();
-    double rB = m_sphereB->getRadius() * m_sphereB->getScaling();
+    double rB = m_sphereB->getRadius();
 
     // Compute direction vector
     Vec3d dirAToB = sphereBPos - sphereAPos;

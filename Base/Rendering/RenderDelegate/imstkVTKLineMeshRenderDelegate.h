@@ -42,29 +42,29 @@ class VTKLineMeshRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief
-    ///
-    ~VTKLineMeshRenderDelegate() = default;
-
-    ///
-    /// \brief
+    /// \brief Constructor
     ///
     VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh);
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
-    void update() override;
+    ~VTKLineMeshRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Update line source based on the line mesh
+    ///
+    void updateDataSource() override;
+
+    ///
+    /// \brief Returns the line mesh
     ///
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
 
-    std::shared_ptr<LineMesh>  m_geometry; ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    std::shared_ptr<LineMesh>  m_geometry;                  ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 
 };
 
