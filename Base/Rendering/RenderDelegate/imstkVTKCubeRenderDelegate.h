@@ -27,7 +27,7 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkCube.h"
 
-#include "vtkCubeSource.h"
+#include "vtkTransformPolyDataFilter.h"
 
 namespace imstk
 {
@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKCubeRenderDelegate(std::shared_ptr<Cube>cube);
+    VTKCubeRenderDelegate(std::shared_ptr<Cube> cube);
 
     ///
     /// \brief Destructor
@@ -51,12 +51,19 @@ public:
     ~VTKCubeRenderDelegate() = default;
 
     ///
-    /// \brief Get the geometry
+    /// \brief Update cube source based on the cube geometry
     ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    void updateDataSource() override;
+
+    ///
+    /// \brief Returns the cube geometry
+    ///
+    std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
     std::shared_ptr<Cube> m_geometry;   ///> Geometry
+
+    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 
 } // imstk

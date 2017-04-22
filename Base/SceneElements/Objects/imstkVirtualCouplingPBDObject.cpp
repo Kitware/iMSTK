@@ -33,8 +33,8 @@ namespace imstk
 void
 VirtualCouplingPBDObject::initOffsets()
 {
-    m_translationOffset = m_collidingGeometry->getPosition();
-    m_rotationOffset = m_collidingGeometry->getOrientation();
+    m_translationOffset = m_collidingGeometry->getTranslation();
+    m_rotationOffset = m_collidingGeometry->getRotation();
 }
 
 void
@@ -50,11 +50,11 @@ VirtualCouplingPBDObject::updateFromDevice()
     }
 
     Vec3d p = getPosition();
-    Quatd r = getRotation();
+    Quatd r = Quatd(getRotation());
 
     // Update colliding geometry
-    m_visualGeometry->setPosition(p);
-    m_visualGeometry->setOrientation(r);
+    m_visualGeometry->setTranslation(p);
+    m_visualGeometry->setRotation(r);
 
     computeTransform(p, r, transform);
 

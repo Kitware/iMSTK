@@ -42,8 +42,8 @@ IsometricMap::apply()
     }
 
     // Set the follower mesh configuration to that of master
-    m_slave->setPosition(m_master->getPosition());
-    m_slave->setOrientation(m_master->getOrientation());
+    m_slave->setTranslation(m_master->getTranslation());
+    m_slave->setRotation(m_master->getRotation());
 
     // Apply the offset transform
     m_slave->transform(m_rigidTransform);

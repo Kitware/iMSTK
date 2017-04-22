@@ -92,15 +92,15 @@ createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
         return nullptr;
     }
 
-    geom->scale(scale);
-    geom->translate(t);
+    geom->scale(scale, Geometry::TransformType::ApplyToData);
+    geom->translate(t, Geometry::TransformType::ApplyToData);
 
     auto sceneObj = std::make_shared<imstk::VisualObject>(objName);
     sceneObj->setVisualGeometry(geom);
     scene->addSceneObject(sceneObj);
 
     return sceneObj;
-};
+}
 
 ///
 /// \brief Create a analytical colliding scene object that and add it to the scene
@@ -144,8 +144,8 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
         return nullptr;
     }
 
-    geom->scale(scale);
-    geom->translate(t);
+    geom->scale(scale, Geometry::TransformType::ApplyToData);
+    geom->translate(t, Geometry::TransformType::ApplyToData);
 
     auto sceneObj = std::make_shared<imstk::CollidingObject>(objName);
     sceneObj->setVisualGeometry(geom);
@@ -153,7 +153,7 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
     scene->addSceneObject(sceneObj);
 
     return sceneObj;
-};
+}
 
 ///
 /// \brief Read a mesh, create a visual scene object and add to the scene
@@ -185,7 +185,7 @@ createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
     scene->addSceneObject(meshSceneObject);
 
     return meshSceneObject;
-};
+}
 
 ///
 /// \brief Create a non-linear system using FEM dynamic model
@@ -215,7 +215,7 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     return nlSystem;
-};
+}
 
 } //apiutils
 

@@ -44,34 +44,34 @@ class VTKSurfaceMeshRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief
-    ///
-    ~VTKSurfaceMeshRenderDelegate() = default;
-
-    ///
-    /// \brief
+    /// \brief Constructor
     ///
     VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
-    void update() override;
+    ~VTKSurfaceMeshRenderDelegate() = default;
 
     ///
-    /// \brief
+    /// \brief Update polydata source based on the surface mesh geometry
     ///
-    std::shared_ptr<Geometry> getGeometry() const override;
+    void updateDataSource() override;
 
     ///
     /// \brief Initialize textures
     ///
     void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
 
+    ///
+    /// \brief Returns the surface mesh
+    ///
+    std::shared_ptr<Geometry> getGeometry() const override;
+
 protected:
 
-    std::shared_ptr<SurfaceMesh> m_geometry; ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    std::shared_ptr<SurfaceMesh> m_geometry;                ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 
 }

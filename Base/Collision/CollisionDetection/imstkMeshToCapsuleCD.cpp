@@ -38,13 +38,13 @@ MeshToCapsuleCD::computeCollisionData()
     m_colData.clearAll();
 
     auto capsulePos = m_capsule->getPosition();
-    auto height = m_capsule->getHeight() * m_capsule->getScaling();
-    auto radius = m_capsule->getRadius() * m_capsule->getScaling();
+    auto length = m_capsule->getLength();
+    auto radius = m_capsule->getRadius();
 
     // Get position of end points of the capsule
     // TODO: Fix this issue of extra computation in future
     auto p0 = capsulePos;
-    auto p1 = m_capsule->getOrientation()*Vec3d(0., height, 0.) + capsulePos;
+    auto p1 = p0 + m_capsule->getOrientationAxis() * length;
     auto mid = 0.5*(p0 + p1);
     auto p = p1 - p0;
     auto pDotp = p.dot(p);
@@ -54,7 +54,7 @@ MeshToCapsuleCD::computeCollisionData()
     for (const auto& q : m_mesh->getVertexPositions())
     {
         // First, check collision with bounding sphere
-        if ((mid - q).norm() > (radius + height*0.5))
+        if ((mid - q).norm() > (radius + length*0.5))
         {
             nodeId++;
             continue;

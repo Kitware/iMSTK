@@ -28,18 +28,16 @@
 #include <vtkPoints.h>
 #include <vtkDoubleArray.h>
 
-#include "g3log/g3log.hpp"
-
 namespace imstk
 {
 
 VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh) :
-    m_geometry(lineMesh)
+    m_geometry(lineMesh),
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
     StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
@@ -51,19 +49,26 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     // Create line
     auto lines = vtkSmartPointer<vtkLineSource>::New();
     lines->SetPoints(points);
+    m_geometry->m_dataModified = false;
 
     // Setup Mapper & Actor
     this->setUpMapper(lines->GetOutputPort(), true);
-    this->updateActorTransform();
+
+    // Update Transform, Render Properties
+    this->update();
 }
 
 void
-VTKLineMeshRenderDelegate::update()
+VTKLineMeshRenderDelegate::updateDataSource()
 {
-    // Base class update
-    VTKRenderDelegate::update();
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
 
-    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
+    m_mappedVertexArray->Modified();
+
+    m_geometry->m_dataModified = false;
 }
 
 std::shared_ptr<Geometry>

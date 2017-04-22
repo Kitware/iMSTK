@@ -28,133 +28,183 @@ void
 Geometry::print() const
 {
     LOG(INFO) << this->getTypeName();
-    LOG(INFO) << "Position: " << "(" << m_position.x() << ", " << m_position.y() << ", " << m_position.z() << ")";
-    LOG(INFO) << "Orientation:\n" << m_orientation.toRotationMatrix();
+
+    Vec3d t = m_transform.translation();
+    Mat3d r = m_transform.rotation();
     LOG(INFO) << "Scaling: " << m_scaling;
+    LOG(INFO) << "Translation: " << "(" << t.x() << ", " << t.y() << ", " << t.z() << ")";
+    LOG(INFO) << "Rotation:\n" << r;
 }
 
 void
-Geometry::translate(const Vec3d& t)
+Geometry::translate(const Vec3d& t, TransformType type)
 {
-    m_position += t;
+    if (t.isApprox(Vec3d::Zero()))
+    {
+        return;
+    }
+
+    if (type == TransformType::ConcatenateToTransform)
+    {
+        m_transform.translate(t);
+        m_transformModified = true;
+        m_transformApplied = false;
+    }
+    else
+    {
+        this->applyTranslation(t);
+        m_dataModified = true;
+    }
 }
 
 void
-Geometry::translate(const double& x,
-                    const double& y,
-                    const double& z)
+Geometry::translate(double x, double y, double z, TransformType type)
 {
-    this->translate(Vec3d(x, y, z));
+    this->translate(Vec3d(x, y, z), type);
 }
 
 void
-Geometry::rotate(const Quatd& r)
+Geometry::rotate(const Mat3d& r, TransformType type)
 {
-    m_orientation = r * m_orientation;
+    if (r.isApprox(Mat3d::Identity()))
+    {
+        return;
+    }
+
+    if (type == TransformType::ConcatenateToTransform)
+    {
+        m_transform.rotate(r);
+        m_transformModified = true;
+        m_transformApplied = false;
+    }
+    else
+    {
+        this->applyRotation(r);
+        m_dataModified = true;
+    }
 }
 
 void
-Geometry::rotate(const Mat3d& r)
+Geometry::rotate(const Quatd& q, TransformType type)
 {
-    this->rotate(Quatd(r));
+    this->rotate(q.toRotationMatrix(), type);
 }
 
 void
-Geometry::rotate(const Vec3d& axis, const double& angle)
+Geometry::rotate(const Vec3d& axis, double angle, TransformType type)
 {
-    this->rotate(Quatd(Rotd(angle, axis)));
+    this->rotate(Rotd(angle, axis).toRotationMatrix(), type);
 }
 
 void
-Geometry::scale(const double& scaling)
+Geometry::scale(double s, TransformType type)
 {
-    if(scaling <= 0)
+    if(s <= 0)
     {
         LOG(WARNING) << "Geometry::scale error: scaling should be positive.";
         return;
     }
-    m_scaling *= scaling;
+    if (s == 1.0)
+    {
+        return;
+    }
+
+    if (type == TransformType::ConcatenateToTransform)
+    {
+        m_scaling *= s;
+        m_transformModified = true;
+        m_transformApplied = false;
+    }
+    else
+    {
+        this->applyScaling(s);
+        m_dataModified = true;
+    }
 }
 
 void
-Geometry::transform(const RigidTransform3d& transform)
+Geometry::transform(RigidTransform3d T, TransformType type)
 {
-    this->rotate(transform.rotation());
-    this->translate(transform.translation());
+    if (type == TransformType::ConcatenateToTransform)
+    {
+        m_transform = T * m_transform;
+        m_transformModified = true;
+        m_transformApplied = false;
+    }
+    else
+    {
+        this->applyTranslation(T.translation());
+        this->applyRotation(T.rotation());
+        m_dataModified = true;
+    }
 }
 
-bool
-Geometry::isMesh() const
+Vec3d
+Geometry::getTranslation() const
 {
-    return (this->m_type == Type::HexahedralMesh ||
-            this->m_type == Type::SurfaceMesh ||
-            this->m_type == Type::TetrahedralMesh ||
-            this->m_type == Type::LineMesh
-            ) ? true : false;
-}
-
-const Vec3d&
-Geometry::getPosition() const
-{
-    return m_position;
-}
-
-void
-Geometry::setPosition(const Vec3d& position)
-{
-    m_position = position;
+    return m_transform.translation();
 }
 
 void
-Geometry::setPosition(const double& x,
-                      const double& y,
-                      const double& z)
+Geometry::setTranslation(const Vec3d t)
 {
-    this->setPosition(Vec3d(x, y, z));
-}
-
-const Quatd&
-Geometry::getOrientation() const
-{
-    return m_orientation;
+    m_transform.translation() = t;
+    m_transformModified = true;
+    m_transformApplied = false;
 }
 
 void
-Geometry::setOrientation(const Quatd& orientation)
+Geometry::setTranslation(const double x, const double y, const double z)
 {
-    m_orientation = orientation;
+    this->setTranslation(Vec3d(x, y, z));
+}
+
+Mat3d
+Geometry::getRotation() const
+{
+    return m_transform.linear();
 }
 
 void
-Geometry::setOrientation(const Mat3d& orientation)
+Geometry::setRotation(const Mat3d m)
 {
-    this->setOrientation(Quatd(orientation));
+    m_transform.linear() = m;
+    m_transformModified = true;
+    m_transformApplied = false;
 }
 
 void
-Geometry::setOrientation(const Vec3d& axis, const double& angle)
+Geometry::setRotation(const Quatd q)
 {
-    this->setOrientation(Quatd(Rotd(angle, axis)));
+    this->setRotation(q.toRotationMatrix());
 }
 
-const double&
+void
+Geometry::setRotation(const Vec3d axis, const double angle)
+{
+    this->setRotation(Rotd(angle, axis).toRotationMatrix());
+}
+
+double
 Geometry::getScaling() const
 {
     return m_scaling;
 }
 
 void
-Geometry::setScaling(const double& scaling)
+Geometry::setScaling(double s)
 {
-    if(scaling <= 0)
+    if(s <= 0)
     {
         LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
         return;
     }
-    m_scaling = scaling;
+    m_scaling = s;
+    m_transformModified = true;
+    m_transformApplied = false;
 }
 
-const Geometry::Type&
+Geometry::Type
 Geometry::getType() const
 {
     return m_type;
@@ -180,6 +230,16 @@ Geometry::getTypeName() const
     default:
         return "Mesh type not determined!";
     }
+}
+
+bool
+Geometry::isMesh() const
+{
+    return (this->m_type == Type::HexahedralMesh ||
+            this->m_type == Type::SurfaceMesh ||
+            this->m_type == Type::TetrahedralMesh ||
+            this->m_type == Type::LineMesh
+            ) ? true : false;
 }
 
 void

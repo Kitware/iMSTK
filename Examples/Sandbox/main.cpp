@@ -292,7 +292,7 @@ void testMshAndVegaIO()
 
     // Create object B
     auto objectB = std::make_shared<imstk::VisualObject>("meshObjectVEGA");
-    surfaceMeshB->translate(Vec3d(3, 0, 0));
+    surfaceMeshB->translate(Vec3d(3, 0, 0), Geometry::TransformType::ApplyToData);
     objectB->setVisualGeometry(surfaceMeshB);
 
     // Add objects to the scene
@@ -313,7 +313,7 @@ void testMultiObjectWithTextures()
     // Read surface mesh
     auto objMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/textured_organs/heart.obj");
     auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
-    surfaceMesh->setPosition(-8, 0, 0);
+    surfaceMesh->translate(-8, 0, 0, Geometry::TransformType::ApplyToData);
 
     // Read and setup texture/material
     auto texture = std::make_shared<Texture>(iMSTK_DATA_ROOT"/textured_organs/texture_set_1/diffuse.png");
@@ -334,7 +334,6 @@ void testMultiObjectWithTextures()
         // Read surface mesh1
         auto objMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/textured_organs/heart.obj");
         auto surfaceMesh1 = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh1);
-        surfaceMesh1->setPosition(0, 0, 0);
 
         // Read and setup texture/material
         if (secondObjectTexture)
@@ -606,7 +605,7 @@ void testTwoOmnis()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 0, 10));
     auto sphere0Geom = sphere0Obj->getVisualGeometry();
-    cam->setFocalPoint(sphere0Geom->getPosition());
+    cam->setFocalPoint(Vec3d(-2, 2.5, 0));
 
     // Run
     sdk->setCurrentScene(scene);
@@ -631,8 +630,8 @@ void testObjectController()
 
     // Object
     auto geom = std::make_shared<imstk::Cube>();
-    geom->setPosition(imstk::UP_VECTOR);
-    geom->scale(2);
+    geom->setPosition(0, 1, 0);
+    geom->setWidth(2);
 
     auto object = std::make_shared<imstk::CollidingObject>("VirtualObject");
     object->setVisualGeometry(geom);
@@ -744,8 +743,9 @@ void testViewer()
     auto cubeObj = apiutils::createVisualAnalyticalSceneObject(
         imstk::Geometry::Type::Cube, sceneTest, "VisualCube", 0.5, Vec3d(1.0, -1.0, 0.5));
     auto cubeGeom = cubeObj->getVisualGeometry();
-    cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4);
-    cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4);
+    // rotates could be replaced by cubeGeom->setOrientationAxis(1,1,1) (normalized inside)
+    cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4, Geometry::TransformType::ApplyToData);
+    cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4, Geometry::TransformType::ApplyToData);
 
     // Sphere
     auto sphereObj = apiutils::createVisualAnalyticalSceneObject(
@@ -755,6 +755,7 @@ void testViewer()
     auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
     whiteLight->setPosition(imstk::Vec3d(5, 8, 5));
     whiteLight->setPositional();
+    sceneTest->addLight(whiteLight);
 
     // Light (red)
     auto colorLight = std::make_shared<imstk::Light>("colorLight");
@@ -763,12 +764,6 @@ void testViewer()
     colorLight->setColor(imstk::Color::Red);
     colorLight->setPositional();
     colorLight->setSpotAngle(15);
-
-    // Add in scene
-    sceneTest->addSceneObject(planeObj);
-    sceneTest->addSceneObject(cubeObj);
-    sceneTest->addSceneObject(sphereObj);
-    sceneTest->addLight(whiteLight);
     sceneTest->addLight(colorLight);
 
     // Update Camera
@@ -792,9 +787,10 @@ void testCapsule()
 
     // Capsule
     auto capsuleObj = apiutils::createVisualAnalyticalSceneObject(
-        imstk::Geometry::Type::Capsule, scene, "VisualCapsule", 2., Vec3d(0., 1., 0.));
+        imstk::Geometry::Type::Capsule, scene, "VisualCapsule", 2.0, Vec3d(0., 1., 0.));
     auto capsuleGeom = capsuleObj->getVisualGeometry();
-    capsuleGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4);
+    // rotates could be replaced by cubeGeom->setOrientationAxis(1,1,0) (normalized inside)
+    capsuleGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4, Geometry::TransformType::ApplyToData);
 
 #ifdef iMSTK_USE_OPENHAPTICS
     // Device Client
@@ -839,7 +835,7 @@ void testAnalyticalGeometry()
     LOG(INFO) << "w = " << width;
 
     LOG(INFO) << "-- Plane : Create";
-    auto plane = std::make_shared<imstk::Plane>(pos, norm, width);
+    auto plane = std::make_shared<imstk::Plane>();
     LOG(INFO) << "p = " << plane->getPosition();
     LOG(INFO) << "n = " << plane->getNormal();
     LOG(INFO) << "w = " << plane->getWidth();
@@ -849,7 +845,7 @@ void testAnalyticalGeometry()
     LOG(INFO) << "p = " << plane->getPosition();
 
     LOG(INFO) << "-- Plane : Translate";
-    plane->translate(imstk::Vec3d(2, 1, -3));
+    plane->translate(imstk::Vec3d(2, 1, -3), Geometry::TransformType::ApplyToData);
     LOG(INFO) << "p = " << plane->getPosition();
 
     LOG(INFO) << "-- Plane : Set Normal";
@@ -857,7 +853,7 @@ void testAnalyticalGeometry()
     LOG(INFO) << "n = " << plane->getNormal();
 
     LOG(INFO) << "-- Plane : Rotate";
-    plane->rotate(imstk::UP_VECTOR, imstk::PI_2);
+    plane->rotate(imstk::UP_VECTOR, imstk::PI_2, Geometry::TransformType::ApplyToData);
     LOG(INFO) << "n = " << plane->getNormal();
 }
 
@@ -915,13 +911,13 @@ void testIsometricMap()
 
     // Cube
     auto cubeGeom = std::make_shared<imstk::Cube>();
-    cubeGeom->scale(0.5);
+    cubeGeom->setWidth(0.5);
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
     // Sphere
     auto sphereGeom = std::make_shared<imstk::Sphere>();
-    sphereGeom->scale(0.3);
+    sphereGeom->setRadius(0.3);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
@@ -932,7 +928,7 @@ void testIsometricMap()
     // Isometric Map
     auto transform = imstk::RigidTransform3d::Identity();
     transform.translate(imstk::Vec3d(0.0, 1.0, 0.0));
-    transform.rotate(imstk::Rotd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
+    transform.rotate(Rotd(PI_4, imstk::Vec3d(0, 1.0, 0)));
 
     auto rigidMap = std::make_shared<imstk::IsometricMap>();
     rigidMap->setMaster(sphereObj->getVisualGeometry());
@@ -1237,8 +1233,8 @@ void testDeformableBody()
 
     // f. Scene object 2: Plane
     auto planeGeom = std::make_shared<Plane>();
-    planeGeom->scale(40);
-    planeGeom->translate(0, -6, 0);
+    planeGeom->setWidth(40);
+    planeGeom->setPosition(0, -6, 0);
     auto planeObj = std::make_shared<CollidingObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
@@ -1383,8 +1379,8 @@ void testPbdVolume()
 
 
     auto planeGeom = std::make_shared<Plane>();
-    planeGeom->scale(40);
-    planeGeom->translate(0, -6, 0);
+    planeGeom->setWidth(40);
+    planeGeom->setTranslation(0, -6, 0);
     auto planeObj = std::make_shared<CollidingObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
@@ -2162,23 +2158,24 @@ void testScreenShotUtility()
 
     // Plane
     auto planeGeom = std::make_shared<imstk::Plane>();
-    planeGeom->scale(10);
+    planeGeom->setWidth(10);
     auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
     planeObj->setVisualGeometry(planeGeom);
 
     // Cube
     auto cubeGeom = std::make_shared<imstk::Cube>();
-    cubeGeom->scale(0.5);
-    cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4);
-    cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4);
-    cubeGeom->translate(1.0, -1.0, 0.5);
+    cubeGeom->setWidth(0.5);
+    cubeGeom->setPosition(1.0, -1.0, 0.5);
+    // rotates could be replaced by cubeGeom->setOrientationAxis(1,1,1) (normalized inside)
+    cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4, Geometry::TransformType::ApplyToData);
+    cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4, Geometry::TransformType::ApplyToData);
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
     // Sphere
     auto sphereGeom = std::make_shared<imstk::Sphere>();
-    sphereGeom->scale(0.3);
-    sphereGeom->translate(0, 2, 0);
+    sphereGeom->setRadius(0.3);
+    sphereGeom->setPosition(0, 2, 0);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
@@ -2227,10 +2224,10 @@ void testDeformableBodyCollision()
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("OneTetraCH");
 
-    auto geom = std::make_shared<imstk::Plane>(WORLD_ORIGIN, -UP_VECTOR, 1.);
+    auto geom = std::make_shared<imstk::Plane>();
 
-    geom->scale(100);
-    geom->translate(Vec3d(0., -20., 0.));
+    geom->setWidth(100);
+    geom->setPosition(Vec3d(0., -20., 0.));
 
     auto planeObj = std::make_shared<imstk::CollidingObject>("VisualPlane");
     planeObj->setVisualGeometry(geom);
@@ -2465,9 +2462,9 @@ void testVirtualCoupling()
     auto scene = sdk->createNewScene("VirtualCoupling");
 
     // Create a plane in the scene
-    auto planeGeom = std::make_shared<imstk::Plane>(WORLD_ORIGIN, UP_VECTOR, 1.0);
-    planeGeom->scale(400);
-    planeGeom->translate(Vec3d(0., -50, 0.));
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->setWidth(400);
+    planeGeom->setPosition(0.0, -50, 0.0);
     auto planeObj = std::make_shared<imstk::CollidingObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
@@ -2488,8 +2485,10 @@ void testVirtualCoupling()
     auto deviceTracker = std::make_shared<imstk::DeviceTracker>(client);
 
     // Create a virtual coupling object
-    auto visualGeom = std::make_shared<imstk::Sphere>(WORLD_ORIGIN, 20);
-    auto collidingGeom = std::make_shared<imstk::Sphere>(WORLD_ORIGIN, 20);
+    auto visualGeom = std::make_shared<imstk::Sphere>();
+    visualGeom->setRadius(20);
+    auto collidingGeom = std::make_shared<imstk::Sphere>();
+    collidingGeom->setRadius(20);
     auto obj = std::make_shared<CollidingObject>("VirtualCouplingObject");
     obj->setCollidingGeometry(collidingGeom);
     obj->setVisualGeometry(visualGeom);

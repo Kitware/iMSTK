@@ -23,7 +23,7 @@
 #define imstkPlane_h
 
 // imstk
-#include "imstkGeometry.h"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk
 {
@@ -33,21 +33,13 @@ namespace imstk
 ///
 /// \brief Plane geometry
 ///
-class Plane : public Geometry
+class Plane : public AnalyticalGeometry
 {
 public:
     ///
     /// \brief Constructor
     ///
-    Plane(const Vec3d & position = WORLD_ORIGIN,
-          const Vec3d & normal = UP_VECTOR,
-          const double& width = 1) :
-        Geometry(Geometry::Type::Plane,
-                 position,
-                 Quatd::FromTwoVectors(UP_VECTOR, normal)),
-        m_width(width),
-        m_normal(normal)
-    {}
+    Plane() : AnalyticalGeometry(Type::Plane) {}
 
     ///
     /// \brief Default destructor
@@ -64,30 +56,35 @@ public:
     ///
     double getVolume() const override;
 
-    // Accessors
     ///
     /// \brief Returns the normal of the plane
     ///
-    Vec3d getNormal() const;
+    Vec3d getNormal(DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the normal to the plane
     ///
-    void setNormal(const Vec3d& normal);
+    void setNormal(const Vec3d n);
+    void setNormal(double x, double y, double z);
 
     ///
     /// \brief Returns the width of the plane
     ///
-    const double& getWidth() const;
+    double getWidth(DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the width of the plane
     ///
-    void setWidth(const double& width);
+    void setWidth(const double w);
 
 protected:
-    double m_width; ///> Width of the plane (for display)
-    Vec3d m_normal; ///> Normal of the plane
+    friend class VTKPlaneRenderDelegate;
+
+    void applyScaling(const double s) override;
+    void updatePostTransformData() override;
+
+    double m_width = 1.0;               ///> Width of the plane
+    double m_widthPostTransform = 1.0;  ///> Width of the plane once transform applied
 };
 
 } // imstk

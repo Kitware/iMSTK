@@ -29,8 +29,6 @@ Mesh::initialize(const StdVectorOfVec3d& vertices)
 {
     this->setInitialVertexPositions(vertices);
     this->setVertexPositions(vertices);
-    StdVectorOfVec3d disp = StdVectorOfVec3d(vertices.size(), imstk::Vec3d(0.0, 0.0, 0.0));
-    this->setVertexDisplacements(disp);
 }
 
 void
@@ -38,7 +36,7 @@ Mesh::clear()
 {
     m_initialVertexPositions.clear();
     m_vertexPositions.clear();
-    m_vertexDisplacements.clear();
+    m_vertexPositionsPostTransform.clear();
 }
 
 void
@@ -84,7 +82,6 @@ void
 Mesh::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
 {
     m_initialVertexPositions = vertices;
-    m_vertexDisplacements= vertices;
 }
 
 const StdVectorOfVec3d&
@@ -103,11 +100,18 @@ void
 Mesh::setVertexPositions(const StdVectorOfVec3d& vertices)
 {
     m_vertexPositions = vertices;
+    m_dataModified = true;
+    m_transformApplied = false;
 }
 
 const StdVectorOfVec3d&
-Mesh::getVertexPositions() const
+Mesh::getVertexPositions(DataType type /* = DataType::PostTransform */)
 {
+    if (type == DataType::PostTransform)
+    {
+        this->updatePostTransformData();
+        return m_vertexPositionsPostTransform;
+    }
     return m_vertexPositions;
 }
 
@@ -115,60 +119,50 @@ void
 Mesh::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
 {
     m_vertexPositions.at(vertNum) = pos;
+    m_dataModified = true;
+    m_transformApplied = false;
 }
 
 const Vec3d&
-Mesh::getVertexPosition(const size_t& vertNum) const
+Mesh::getVertexPosition(const size_t& vertNum, DataType type)
 {
-    return m_vertexPositions.at(vertNum);
+    return this->getVertexPositions(type).at(vertNum);
 }
 
 void
 Mesh::setVertexDisplacements(const StdVectorOfVec3d& diff)
 {
-    m_vertexDisplacements = diff;
+    assert(diff.size() == m_vertexPositions.size());
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
+    {
+        m_vertexPositions[i] = m_initialVertexPositions[i] + diff[i];
+    }
+    m_dataModified = true;
+    m_transformApplied = false;
 }
 
 void
 Mesh::setVertexDisplacements(const Vectord& u)
 {
-    assert(u.size() == 3 * m_vertexDisplacements.size());
+    assert(u.size() == 3 * m_vertexPositions.size());
     size_t dofId = 0;
-    for (auto &vDisp : m_vertexDisplacements)
-    {
-        vDisp = Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
-        dofId += 3;
-    }
-
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
-        m_vertexPositions[i] = m_initialVertexPositions[i] + m_vertexDisplacements[i];
+        m_vertexPositions[i] = m_initialVertexPositions[i] + Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
+        dofId += 3;
     }
+    m_dataModified = true;
+    m_transformApplied = false;
 }
 
 void Mesh::translateVertices(const Vec3d& t)
 {
-    for (auto &vDisp : m_vertexDisplacements)
-    {
-        vDisp += t;
-    }
-
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
-        m_vertexPositions[i] = m_initialVertexPositions[i] + m_vertexDisplacements[i];
+        m_vertexPositions[i] += t;
     }
-}
-
-const StdVectorOfVec3d&
-Mesh::getVertexDisplacements() const
-{
-    return m_vertexDisplacements;
-}
-
-const Vec3d&
-Mesh::getVertexDisplacement(const size_t& vertNum) const
-{
-    return m_vertexDisplacements.at(vertNum);
+    m_dataModified = true;
+    m_transformApplied = false;
 }
 
 void
@@ -211,6 +205,63 @@ const size_t
 Mesh::getNumVertices() const
 {
     return m_initialVertexPositions.size();
+}
+
+
+void
+Mesh::applyTranslation(const Vec3d t)
+{
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
+    {
+        m_vertexPositions[i] += t;
+    }
+    m_dataModified = true;
+    m_transformApplied = false;
+}
+
+void
+Mesh::applyRotation(const Mat3d r)
+{
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
+    {
+        m_vertexPositions[i] = r * m_vertexPositions[i];
+    }
+    m_dataModified = true;
+    m_transformApplied = false;
+}
+
+void
+Mesh::applyScaling(const double s)
+{
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
+    {
+        m_vertexPositions[i] = s * m_vertexPositions[i];
+    }
+    m_dataModified = true;
+    m_transformApplied = false;
+}
+
+void
+Mesh::updatePostTransformData()
+{
+    if (m_transformApplied)
+    {
+        return;
+    }
+
+    if (m_vertexPositionsPostTransform.size() != m_vertexPositions.size())
+    {
+        m_vertexPositionsPostTransform.clear();
+        m_vertexPositionsPostTransform.resize(m_vertexPositions.size());
+    }
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
+    {
+        // NOTE: Right now scaling is appended on top of the rigid transform
+        // for scaling around the mesh center, and not concatenated within
+        // the transform, for ease of use.
+        m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i]* m_scaling);
+    }
+    m_transformApplied = true;
 }
 
 } // imstk

@@ -27,7 +27,7 @@ namespace imstk
 void
 Plane::print() const
 {
-    Geometry::print();
+    AnalyticalGeometry::print();
     LOG(INFO) << "Width: " << m_width;
 }
 
@@ -38,37 +38,67 @@ Plane::getVolume() const
 }
 
 Vec3d
-Plane::getNormal() const
+Plane::getNormal(DataType type /* = DataType::PostTransform */)
 {
-    return m_normal;
+    return this->getOrientationAxis(type);
 }
 
 void
-Plane::setNormal(const Vec3d& normal)
+Plane::setNormal(const Vec3d n)
 {
-    if(normal == Vec3d::Zero())
-    {
-        LOG(WARNING) << "Plane::setNormal: can't set normal to zero vector";
-        return;
-    }
-    m_normal = normal;
+    this->setOrientationAxis(n);
 }
 
-const double&
-Plane::getWidth() const
+void
+Plane::setNormal(double x, double y, double z)
 {
+    this->setNormal(Vec3d(x, y, z));
+}
+
+double
+Plane::getWidth(DataType type /* = DataType::PostTransform */)
+{
+    if (type == DataType::PostTransform)
+    {
+        this->updatePostTransformData();
+        return m_widthPostTransform;
+    }
     return m_width;
 }
 
 void
-Plane::setWidth(const double& width)
+Plane::setWidth(const double w)
 {
-    if(width <= 0)
+    if (w <= 0)
     {
         LOG(WARNING) << "Plane::setWidth error: width should be positive.";
         return;
     }
-    m_width = width;
+    if (m_width == w)
+    {
+        return;
+    }
+    m_width = w;
+    m_dataModified = true;
+    m_transformApplied = false;
+}
+
+void
+Plane::applyScaling(const double s)
+{
+    this->setWidth(m_width * s);
+}
+
+void
+Plane::updatePostTransformData()
+{
+    if (m_transformApplied)
+    {
+        return;
+    }
+    AnalyticalGeometry::updatePostTransformData();
+    m_widthPostTransform = m_scaling * m_width;
+    m_transformApplied = true;
 }
 
 } // imstk

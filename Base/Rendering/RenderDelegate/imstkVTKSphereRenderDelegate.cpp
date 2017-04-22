@@ -21,24 +21,47 @@
 
 #include "imstkVTKSphereRenderDelegate.h"
 
-#include "g3log/g3log.hpp"
+#include "vtkSphereSource.h"
 
 namespace imstk
 {
 
 VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
-    m_geometry(sphere)
+    m_geometry(sphere),
+    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
-    auto source = vtkSmartPointer<vtkSphereSource>::New();
+    auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
+    sphereSource->SetCenter(0, 0, 0);
+    sphereSource->SetRadius(1.0);
+    sphereSource->SetPhiResolution(20);
+    sphereSource->SetThetaResolution(20);
 
-    source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
-    source->SetRadius(m_geometry->getRadius());
-    source->SetPhiResolution(20);
-    source->SetThetaResolution(20);
+    m_transformFilter->SetInputConnection(sphereSource->GetOutputPort());
+    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
-    // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), true);
-    this->updateActorTransform();
+    this->update();
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true);
+}
+
+void
+VTKSphereRenderDelegate::updateDataSource()
+{
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
+
+    Geometry::DataType type = Geometry::DataType::PreTransform;
+
+    AffineTransform3d T = AffineTransform3d::Identity();
+    T.translate(m_geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
+    T.scale(m_geometry->getRadius(type));
+    T.matrix().transposeInPlace();
+
+    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
+    vtkT->SetMatrix(T.data());
+    m_geometry->m_dataModified = false;
 }
 
 std::shared_ptr<Geometry>

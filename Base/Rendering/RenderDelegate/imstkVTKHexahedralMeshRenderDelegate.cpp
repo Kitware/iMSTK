@@ -30,18 +30,16 @@
 #include <vtkCellArray.h>
 #include <vtkProperty.h>
 
-#include "g3log/g3log.hpp"
-
 namespace imstk
 {
 
 VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr<HexahedralMesh> hexahedralMesh) :
-    m_geometry(hexahedralMesh)
+    m_geometry(hexahedralMesh),
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
     StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
@@ -66,26 +64,28 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     auto unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     unstructuredGrid->SetPoints(points);
     unstructuredGrid->SetCells(VTK_HEXAHEDRON, cells);
+    m_geometry->m_dataModified = false;
 
-    // Mapper
+    // Mapper & Actor
     auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
     mapper->SetInputData(unstructuredGrid);
-
-    // Actor
     m_actor->SetMapper(mapper);
-    m_actor->GetProperty()->EdgeVisibilityOn();
 
-    // Transform
-    this->updateActorTransform();
+    // Update Transform, Render Properties
+    this->update();
 }
 
 void
-VTKHexahedralMeshRenderDelegate::update()
+VTKHexahedralMeshRenderDelegate::updateDataSource()
 {
-    // Base class update
-    VTKRenderDelegate::update();
+    if (!m_geometry->m_dataModified)
+    {
+        return;
+    }
 
-    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
+    m_mappedVertexArray->Modified();
+
+    m_geometry->m_dataModified = false;
 }
 
 

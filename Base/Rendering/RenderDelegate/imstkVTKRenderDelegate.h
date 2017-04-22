@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Update render delegate
     ///
-    virtual void update();
+    void update();
 
     ///
     /// \brief Update rendere delegate transform based on the geometry shallow transform
@@ -87,6 +87,11 @@ public:
     /// \brief Update render delegate properties based on the geometry render material
     ///
     void updateActorProperties();
+
+    ///
+    /// \brief Update render delegate source based on the geometry internal data
+    ///
+    virtual void updateDataSource() = 0;
 
 protected:
     ///

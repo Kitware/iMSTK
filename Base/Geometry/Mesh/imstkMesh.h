@@ -86,7 +86,7 @@ public:
     ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
-    const StdVectorOfVec3d& getVertexPositions() const;
+    const StdVectorOfVec3d& getVertexPositions(DataType type = DataType::PostTransform);
 
     ///
     /// \brief Set the current position of a vertex given its index to certain position
@@ -96,7 +96,8 @@ public:
     ///
     /// \brief Returns the position of a vertex given its index
     ///
-    const Vec3d& getVertexPosition(const size_t& vertNum) const;
+    const Vec3d& getVertexPosition(const size_t& vertNum,
+                                   DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the displacements of mesh vertices from an array
@@ -109,19 +110,9 @@ public:
     void setVertexDisplacements(const Vectord& u);
 
     ///
-    /// \brief Deep translation of vertices using the given 3D vector
+    /// \brief Concatenate the displacements of mesh vertices using the given 3D vector
     ///
     void translateVertices(const Vec3d& t);
-
-    ///
-    /// \brief Returns the vector displacements of mesh vertices
-    ///
-    const StdVectorOfVec3d& getVertexDisplacements() const;
-
-    ///
-    /// \brief Returns the displacement of a given vertex
-    ///
-    const Vec3d& getVertexDisplacement(const size_t& vertNum) const;
 
     ///
     /// \brief Sets the point data for all arrays at each vertex
@@ -153,7 +144,7 @@ protected:
     ///
     /// \brief Protected constructor
     ///
-    Mesh(Geometry::Type type) : Geometry(type) {}
+    Mesh(Type type) : Geometry(type) {}
 
     friend class VTKSurfaceMeshRenderDelegate;
     friend class VTKTetrahedralMeshRenderDelegate;
@@ -168,13 +159,14 @@ protected:
         return m_vertexPositions;
     }
 
-    //   Orientation * Scaling * initialVerticesPositions
-    // + Position (Initial translation)
-    // + verticesDisplacements
-    // = verticesPositions
-    StdVectorOfVec3d m_initialVertexPositions; //> Initial positions of vertices
-    StdVectorOfVec3d m_vertexPositions; //> Current positions of vertices
-    StdVectorOfVec3d m_vertexDisplacements; //> Displacements of vertices
+    void applyTranslation(const Vec3d t) override;
+    void applyRotation(const Mat3d r) override;
+    void applyScaling(const double s) override;
+    void updatePostTransformData() override;
+
+    StdVectorOfVec3d m_initialVertexPositions;       ///> Initial positions of vertices
+    StdVectorOfVec3d m_vertexPositions;              ///> Current positions of vertices
+    StdVectorOfVec3d m_vertexPositionsPostTransform; ///> Positions of vertices after transform
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 };

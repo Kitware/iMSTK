@@ -23,7 +23,7 @@
 #define imstkSphere_h
 
 // imstk
-#include "imstkGeometry.h"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk
 {
@@ -33,19 +33,13 @@ namespace imstk
 ///
 /// \brief Sphere geometry
 ///
-class Sphere : public Geometry
+class Sphere : public AnalyticalGeometry
 {
 public:
     ///
     /// \brief Constructor
     ///
-    Sphere(const Vec3d & position = WORLD_ORIGIN,
-           const double& radius = 1) :
-        Geometry(Geometry::Type::Sphere,
-                 position,
-                 Quatd::Identity()),
-        m_radius(radius)
-    {}
+    Sphere() : AnalyticalGeometry(Type::Sphere) {}
 
     ///
     /// \brief Default destructor
@@ -62,20 +56,24 @@ public:
     ///
     double getVolume() const override;
 
-    // Accessors
     ///
     /// \brief Returns the radius of the sphere
     ///
-    const double& getRadius() const;
+    double getRadius(DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the radius of the sphere
     ///
-    void setRadius(const double& radius);
+    void setRadius(const double r);
 
 protected:
+    friend class VTKSphereRenderDelegate;
 
-    double m_radius; ///> Radius of the sphere
+    void applyScaling(const double s) override;
+    void updatePostTransformData() override;
+
+    double m_radius = 1.0;              ///> Radius of the sphere
+    double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
 };
 
 } // imstk

@@ -27,7 +27,7 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkCapsule.h"
 
-#include "vtkCapsuleSource.h"
+#include "vtkTransformPolyDataFilter.h"
 
 namespace imstk
 {
@@ -41,22 +41,28 @@ class VTKCapsuleRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief Default destructor
-    ///
-    ~VTKCapsuleRenderDelegate() = default;
-
-    ///
     /// \brief Constructor
     ///
     VTKCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule);
 
     ///
-    /// \brief Returns the capsule geometry object
+    /// \brief destructor
     ///
-    std::shared_ptr<Geometry>getGeometry() const override { return m_capsuleGeometry; }
+    ~VTKCapsuleRenderDelegate() = default;
+
+    ///
+    /// \brief Update capsule source based on the capsule geometry
+    ///
+    void updateDataSource() override;
+
+    ///
+    /// \brief Returns the capsule geometry
+    ///
+    std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
-    std::shared_ptr<Capsule> m_capsuleGeometry; ///>Capsule geometry
+    std::shared_ptr<Capsule> m_geometry; ///> Geometry
+    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 
 } // imstk

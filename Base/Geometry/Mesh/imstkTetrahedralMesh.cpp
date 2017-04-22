@@ -71,7 +71,7 @@ TetrahedralMesh::getVolume() const
     {
         for (int i = 0; i < 4; ++i)
         {
-            v[i] = this->getVertexPosition(tetVertices[i]);
+            v[i] = m_vertexPositions[tetVertices[i]];
         }
 
         A << v[0][0], v[0][1], v[0][2], 1,
@@ -226,7 +226,7 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
 
     for (int i = 0; i < 4; ++i)
     {
-        v[i] = this->getVertexPosition(tetVertices[i]);
+        v[i] = m_vertexPositions[tetVertices[i]];
     }
 
     Mat4d A;
@@ -250,10 +250,10 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
 void
 TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const
 {
-    auto v1 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[0]);
-    auto v2 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[1]);
-    auto v3 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[2]);
-    auto v4 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[3]);
+    auto v1 = m_vertexPositions[m_tetrahedraVertices.at(tetId)[0]];
+    auto v2 = m_vertexPositions[m_tetrahedraVertices.at(tetId)[1]];
+    auto v3 = m_vertexPositions[m_tetrahedraVertices.at(tetId)[2]];
+    auto v4 = m_vertexPositions[m_tetrahedraVertices.at(tetId)[3]];
 
     std::array<double, 4> arrayx = { v1[0], v2[0], v3[0], v4[0] };
     std::array<double, 4> arrayy = { v1[1], v2[1], v3[1], v4[1] };
