@@ -121,8 +121,16 @@ public:
     ///
     size_t getNumTetrahedra() const;
 
+    ///
+    /// \brief Get/set method for removed elements from the mesh
+    ///
+    void setTetrahedraAsRemoved(const unsigned int tetId){ m_removedMeshElems[tetId] = true; }
+    const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
+
 protected:
-    std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra
+    std::vector<TetraArray> m_tetrahedraVertices;///< vertices of the tetrahedra
+
+    std::vector<bool> m_removedMeshElems;
 };
 
 }
