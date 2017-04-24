@@ -32,6 +32,7 @@
 // Objects
 #include "imstkForceModelConfig.h"
 #include "imstkFEMDeformableBodyModel.h"
+#include "imstkDynamicObject.h"
 #include "imstkDeformableObject.h"
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
@@ -77,6 +78,7 @@
 #include "imstkVirtualCouplingCH.h"
 #include "imstkMeshToSpherePickingCD.h"
 #include "imstkPickingCH.h"
+#include "imstkBoneDrillingCH.h"
 
 // logger
 #include "g3log/g3log.hpp"
@@ -133,6 +135,7 @@ void testCapsule();
 void testVirtualCoupling();
 void testGeometryTransforms();
 void testPicking();
+void testBoneDrilling();
 
 int main()
 {
@@ -204,6 +207,7 @@ int main()
     //testScenesManagement();
     //testVectorPlotters();
     //testVirtualCoupling();
+    testBoneDrilling();
 
 
     return 0;
@@ -2577,6 +2581,7 @@ void testGeometryTransforms()
     sdk->startSimulation(false);
 }
 
+
 void testPicking()
 {
     // SDK and Scene
@@ -2587,7 +2592,7 @@ void testPicking()
     // Create plane visual scene object
     //----------------------------------------------------------
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(
-    imstk::Geometry::Type::Plane, scene, "VisualPlane", 100, Vec3d(0., -20., 0.));
+        imstk::Geometry::Type::Plane, scene, "VisualPlane", 100, Vec3d(0., -20., 0.));
 
     //----------------------------------------------------------
     // Create Nidus FE deformable scene object
@@ -2705,3 +2710,70 @@ void testPicking()
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
+
+
+void testBoneDrilling()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("BoneDrilling");
+
+    // Add virtual coupling object in the scene.
+#ifdef iMSTK_USE_OPENHAPTICS
+
+    // Device clients
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
+
+    // Device tracker
+    auto deviceTracker = std::make_shared<imstk::DeviceTracker>(client);
+
+    // Create bone scene object
+    // Load the mesh
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+    auto bone = std::make_shared<CollidingObject>("Bone");
+    bone->setCollidingGeometry(tetMesh);
+    bone->setVisualGeometry(tetMesh);
+    scene->addSceneObject(bone);
+
+    // Create a virtual coupling object: Drill
+    auto drillVisualGeom = std::make_shared<imstk::Sphere>();
+    drillVisualGeom->setRadius(3.);
+    auto drillCollidingGeom = std::make_shared<imstk::Sphere>();
+    drillCollidingGeom->setRadius(3.);
+    auto drill = std::make_shared<CollidingObject>("Drill");
+    drill->setCollidingGeometry(drillCollidingGeom);
+    drill->setVisualGeometry(drillVisualGeom);
+    scene->addSceneObject(drill);
+
+    // Create and add virtual coupling object controller in the scene
+    auto objController = std::make_shared<imstk::SceneObjectController>(drill, deviceTracker);
+    scene->addObjectController(objController);
+
+    // Create a collision graph
+    auto graph = scene->getCollisionGraph();
+    auto pair = graph->addInteractionPair(bone,
+                                          drill,
+                                          CollisionDetection::Type::MeshToSphere,
+                                          CollisionHandling::Type::BoneDrilling,
+                                          CollisionHandling::Type::None);
+
+#endif
+
+    //Run
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0, 0, 15));
+
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(false);
+}
+
