@@ -521,44 +521,47 @@ void testTwoFalcons()
     // Print device tracking info (callback)
     Logger* logger;
     unsigned int displayCpt = 0;
-    auto postInitFoo = [&logger](Module* module)
-    {
-        logger = new Logger(module->getName());
-        logger->setFrequency(5);
-    };
-    auto postUpdateFoo = [&displayCpt, &logger](Module* module)
-    {
-        // Print position & velocity
-        auto client = static_cast<VRPNDeviceClient*>(module);
-        Vec3d p = client->getPosition();
-        Vec3d v = client->getVelocity();
-        std::string message =
-                " pos = (" +  std::to_string(p[0])
-                + ", " +  std::to_string(p[1])
-                + ", "  +  std::to_string(p[2]) + ") "
-                + " vel = (" +  std::to_string(v[0])
-                + ", " + std::to_string(v[1])
-                + ", "  + std::to_string(v[2]) + ")";
-
-        // Show every 1000 updates in standard
-        if (++displayCpt > 1000)
+    auto postInitFoo =
+        [&logger](Module* module)
         {
-            std::cout << "\r-- " << module->getName() << message << std::flush;
-            displayCpt = 0;
-        }
-
-        // Asynchronous log
-        if (logger->readyForLoggingWithFrequency())
+            logger = new Logger(module->getName());
+            logger->setFrequency(5);
+        };
+    auto postUpdateFoo =
+        [&displayCpt, &logger](Module* module)
         {
-            logger->log(message, true);
-            logger->updateLogTime();
-        }
-    };
-    auto postCleanUpFoo = [&logger](Module* module)
-    {
-        logger->shutdown();
-        delete logger;
-    };
+            // Print position & velocity
+            auto client = static_cast<VRPNDeviceClient*>(module);
+            Vec3d p = client->getPosition();
+            Vec3d v = client->getVelocity();
+            std::string message =
+                    " pos = (" +  std::to_string(p[0])
+                    + ", " +  std::to_string(p[1])
+                    + ", "  +  std::to_string(p[2]) + ") "
+                    + " vel = (" +  std::to_string(v[0])
+                    + ", " + std::to_string(v[1])
+                    + ", "  + std::to_string(v[2]) + ")";
+        
+            // Show every 1000 updates in standard
+            if (++displayCpt > 1000)
+            {
+                std::cout << "\r-- " << module->getName() << message << std::flush;
+                displayCpt = 0;
+            }
+        
+            // Asynchronous log
+            if (logger->readyForLoggingWithFrequency())
+            {
+                logger->log(message, true);
+                logger->updateLogTime();
+            }
+        };
+    auto postCleanUpFoo =
+        [&logger](Module* module)
+        {
+            logger->shutdown();
+            delete logger;
+        };
 
     falcon0->setPostInitCallback(postInitFoo);
     falcon0->setPostUpdateCallback(postUpdateFoo);
@@ -2565,10 +2568,11 @@ void testGeometryTransforms()
     scene->addSceneObject(cubeObj);
 
     // Rotate the dragon every frame
-    auto rotateFunc = [&surfaceMesh](Module* module)
-    {
-        surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
-    };
+    auto rotateFunc =
+        [&surfaceMesh](Module* module)
+        {
+            surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+        };
     sdk->getSceneManager("testGeometryTransforms")->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration

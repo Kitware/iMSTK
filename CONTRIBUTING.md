@@ -133,6 +133,9 @@ The SpatialHashtable class implements a 2D data structure that can map keys to v
 **/
 ```
 
+#### Code style check
+You can and should use the `uncrustify` tool to check and/or adjust code style of your files. It is run as part of git's pre-commit hook, as part of test suite invoked by CTest or by building *RUN_TESTS* target in Visual Studio. You can also run it manually by building *uncrustifyRun* target, but in that mode your files will be overwritten so make sure you commit your work beforehand to easily see the style changes automatically made by `uncrustify`.
+
 ### Testing your code
 *Coming soon - Please refer to the rest of the code in the meantime*
 

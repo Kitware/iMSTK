@@ -95,16 +95,17 @@ if [[ ! "$ENABLED" == "true" ]]; then
     printf "\tgit config uncrustify.enabled true\n"
     printf "\tgit config uncrustify.path path/to/uncrustify #should be in Superbuild/Uncrustify-build/bin\n"
     printf "\tgit config uncrustify.conf path/to/config.cfg #should be in Utilities/Uncrustify\n"
+    exit 1;
+fi
 
-    if [[ "$SKIP" == "true" ]]; then
-        printf "\nTo stop skipping style checking (recommended), do:\n"
-        printf "\tgit config uncrustify.skip false\n\n"
-        exit 0;
-    else
-        printf "\nTo skip style checking (not recommended), do:\n"
-        printf "\tgit config uncrustify.skip true\n\n"
-        exit 1;
-    fi
+if [[ "$SKIP" == "true" ]]; then
+    printf "Skipping style checking. To stop it (recommended), do:\n"
+    printf "\tgit config uncrustify.skip false\n\n"
+    exit 0;
+else
+    printf "Running style check on modified files.\n"
+    printf "To skip style checking (not recommended), do:\n"
+    printf "\tgit config uncrustify.skip true\n\n"
 fi
 
 # check whether the given file matches any of the set extensions

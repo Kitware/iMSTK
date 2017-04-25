@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdDihedralConstraint
 ///
@@ -45,22 +44,22 @@ public:
     ///
     inline Type getType() const override { return Type::Dihedral; }
 
-    ///
-    /// \brief initConstraint
-    ///        p3
-    ///       / | \
-                ///      /  |  \
-                ///     p0  |  p1
-    ///      \  |  /
-    ///       \ | /
-    ///         p2
-    /// \param model
-    /// \param pIdx1 index of p0
-    /// \param pIdx2 index of p1
-    /// \param pIdx3 index of p2
-    /// \param pIdx4 index of p3
-    /// \param k stiffness
-    ///
+    /**
+      \brief initConstraint
+             p3
+            / | \
+           /  |  \
+          p0  |  p1
+           \  |  /
+            \ | /
+              p2
+      \param model
+      \param pIdx1 index of p0
+      \param pIdx2 index of p1
+      \param pIdx3 index of p2
+      \param pIdx4 index of p3
+      \param k stiffness
+    */
     void initConstraint(PbdModel &model,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
@@ -75,7 +74,6 @@ public:
     double m_restAngle; ///> Rest angle
     double m_stiffness; ///> Angular stiffness
 };
-
 } //imstk
 
 #endif // imstkPbdDihedralConstraint_h
