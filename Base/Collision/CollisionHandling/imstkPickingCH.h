@@ -71,6 +71,7 @@ public:
     ///
     void addPickConstraints(std::shared_ptr<DeformableObject> deformableObj);
 
+    ///
     /// \brief Get the vector denoting the filter
     ///
     void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
@@ -78,6 +79,7 @@ public:
         m_DynamicLinearProjConstraints = f;
     }
 
+    ///
     /// \brief Get the vector denoting the filter
     ///
     std::vector<LinearProjectionConstraint>& getDynamicLinearProjectors()

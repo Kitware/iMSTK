@@ -50,7 +50,8 @@ public:
         None,
         Penalty,
         VirtualCoupling,
-        NodalPicking
+        NodalPicking,
+        BoneDrilling
     };
 
     ///

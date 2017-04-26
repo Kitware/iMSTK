@@ -28,6 +28,11 @@
 #include <vtkPoints.h>
 #include <vtkDoubleArray.h>
 #include <vtkCellArray.h>
+#include <vtkProperty.h>
+#include <vtkPolyData.h>
+#include <vtkPointData.h>
+#include <vtkFloatArray.h>
+#include <vtkNew.h>
 
 namespace imstk
 {
@@ -60,14 +65,15 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     }
 
     // Create Unstructured Grid
-    auto unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
-    unstructuredGrid->SetPoints(points);
-    unstructuredGrid->SetCells(VTK_TETRA, cells);
-    m_geometry->m_dataModified = false;
+    m_mesh = vtkSmartPointer<vtkUnstructuredGrid>::New();
+    m_mesh->SetPoints(points);
+    m_mesh->SetCells(VTK_TETRA, cells);
 
     // Mapper & Actor
     auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-    mapper->SetInputData(unstructuredGrid);
+    mapper->SetInputData(m_mesh);
+
+    // Actor
     m_actor->SetMapper(mapper);
 
     // Update Transform, Render Properties
@@ -82,9 +88,35 @@ VTKTetrahedralMeshRenderDelegate::updateDataSource()
         return;
     }
 
-    m_mappedVertexArray->Modified();
+    if (m_geometry->getTopologyChangedFlag())
+    {
+        m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
 
-    m_geometry->m_dataModified = false;
+        // Copy cells
+        auto& maskedTets = std::dynamic_pointer_cast<TetrahedralMesh>(m_geometry)->getRemovedTetrahedra();
+
+        auto cells = vtkSmartPointer<vtkCellArray>::New();
+        vtkIdType cell[4];
+        size_t tetId = 0;
+
+        // Assign new cells
+        for (const auto &t : m_geometry->getTetrahedraVertices())
+        {
+            if (!maskedTets[tetId])
+            {
+                for (size_t i = 0; i < 4; ++i)
+                {
+                    cell[i] = t[i];
+                }
+                cells->InsertNextCell(4, cell);
+            }
+
+            tetId++;
+        }
+        m_mesh->SetCells(VTK_TETRA, cells);
+        m_geometry->setTopologyChangedFlag(false);
+    }
+    m_geometry->m_dataModified = true;
 }
 
 

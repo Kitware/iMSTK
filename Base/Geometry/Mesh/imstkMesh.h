@@ -139,6 +139,12 @@ public:
     ///
     const size_t getNumVertices() const;
 
+    ///
+    /// \brief Set the topologyChanged flag
+    ///
+    void setTopologyChangedFlag(const bool flag) { m_topologyChanged = flag; }
+    bool getTopologyChangedFlag() const { return m_topologyChanged; };
+
 protected:
 
     ///
@@ -169,6 +175,8 @@ protected:
     StdVectorOfVec3d m_vertexPositionsPostTransform; ///> Positions of vertices after transform
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
+
+    bool m_topologyChanged = false;
 };
 
 } // imstk
