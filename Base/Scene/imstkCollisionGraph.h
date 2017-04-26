@@ -44,7 +44,9 @@ namespace imstk
 class CollisionGraph
 {
 public:
-    using CollidingObjectPtr = std::shared_ptr<CollidingObject>;
+    using CollidingObjectPtr = std::shared_ptr < CollidingObject > ;
+    using CollisionHandlingPtr = std::shared_ptr < CollisionHandling > ;
+    using CollisionDetectionPtr = std::shared_ptr < CollisionDetection > ;
     using InteractionPairPtr = std::shared_ptr<InteractionPair>;
 
     ///
@@ -67,6 +69,12 @@ public:
                                           CollisionHandling::Type CHBType);
 
     //TODO: Refactor -> PBD only
+    InteractionPairPtr addInteractionPair(CollidingObjectPtr A,
+                                          CollidingObjectPtr B,
+                                          CollisionDetectionPtr CD,
+                                          CollisionHandlingPtr CHA,
+                                          CollisionHandlingPtr CHB);
+
     void addInteractionPair(std::shared_ptr<PbdInteractionPair> pair);
 
     ///
@@ -95,8 +103,8 @@ public:
 protected:
     std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList; //TODO: Refactor -> PBD only
 
-    std::vector<InteractionPairPtr> m_interactionPairList; //!< All interaction pairs in the collision graph
-    std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; //!< Map of interaction pairs per colliding object
+    std::vector<InteractionPairPtr> m_interactionPairList; ///< All interaction pairs in the collision graph
+    std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
 };
 
 }

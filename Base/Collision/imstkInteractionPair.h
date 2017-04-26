@@ -55,6 +55,12 @@ public:
                     CollisionHandling::Type CHAType,
                     CollisionHandling::Type CHBType);
 
+    InteractionPair(std::shared_ptr<CollidingObject> A,
+                    std::shared_ptr<CollidingObject> B,
+                    std::shared_ptr<CollisionDetection> CD,
+                    std::shared_ptr<CollisionHandling> CHA,
+                    std::shared_ptr<CollisionHandling> CHB);
+
     ///
     /// \brief Destructor
     ///
