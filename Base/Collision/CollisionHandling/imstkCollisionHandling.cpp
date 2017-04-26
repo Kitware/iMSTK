@@ -23,6 +23,8 @@
 
 #include "imstkPenaltyCH.h"
 #include "imstkVirtualCouplingCH.h"
+#include "imstkPickingCH.h"
+#include "imstkDeformableObject.h"
 
 #include <g3log/g3log.hpp>
 
@@ -48,10 +50,34 @@ CollisionHandling::make_collision_handling(const Type& type,
     {
     case Type::None:
         return nullptr;
+
     case Type::Penalty:
+        if (objA->getType() == SceneObject::Type::Visual)
+        {
+            LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
+                << "penalty collision handling only implemented for colliding objects.";
+            return nullptr;
+        }
+
         return std::make_shared<PenaltyCH>(side, colData, objA);
+
     case Type::VirtualCoupling:
+
         return std::make_shared<VirtualCouplingCH>(side, colData, objA );
+
+    case Type::NodalPicking:
+
+        if (objA->getType() == SceneObject::Type::Visual)
+        {
+            LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
+                << "penalty collision handling only implemented for colliding objects.";
+            return nullptr;
+        }
+        if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(objA))
+        {
+            return std::make_shared<PickingCH>(side, colData, defObj);
+        }
+
     default:
         LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";
         return nullptr;
