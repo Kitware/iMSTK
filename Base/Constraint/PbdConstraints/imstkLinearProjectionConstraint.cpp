@@ -43,11 +43,12 @@ LinearProjectionConstraint::setProjection(const size_t& nodeId, const Vec3d& p, 
 }
 
 void
-LinearProjectionConstraint::setProjectorToDirichlet(const size_t& nodeId)
+LinearProjectionConstraint::setProjectorToDirichlet(const unsigned int& nodeId, const Vec3d z)
 {
     m_nodeId = nodeId;
     m_projection = Mat3d::Zero();
     m_isFixedConstraint = true;
+    m_value = z;
 }
 
 void
