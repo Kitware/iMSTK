@@ -25,7 +25,7 @@
 #include <memory>
 
 #include "imstkCollisionDetection.h"
-#include "imstkDeviceTracker.h"`
+#include "imstkDeviceTracker.h"
 
 namespace imstk
 {
