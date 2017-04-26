@@ -50,7 +50,8 @@ public:
         MeshToSphere,
         MeshToPlane,
         MeshToMesh,
-        MeshToCapsule
+        MeshToCapsule,
+        MeshToSpherePicking
     };
 
     ///

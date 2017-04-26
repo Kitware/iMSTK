@@ -27,6 +27,7 @@
 #include "imstkMeshToSphereCD.h"
 #include "imstkMeshToPlaneCD.h"
 #include "imstkMeshToMeshCD.h"
+#include "imstkMeshToSpherePickingCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkPlane.h"
@@ -134,6 +135,21 @@ CollisionDetection::make_collision_detection(const Type& type,
             return nullptr;
         }
         return std::make_shared<MeshToMeshCD>(meshA, meshB, colData);
+    }
+    break;
+    case Type::MeshToSpherePicking:
+    {
+        auto mesh = std::dynamic_pointer_cast<Mesh>(objA->getCollidingGeometry());
+        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+
+        // Geometries check
+        if (mesh == nullptr || sphere == nullptr)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                << "invalid object geometries for SphereToSphere collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<MeshToSpherePickingCD>(mesh, sphere, colData);
     }
     break;
     default:
