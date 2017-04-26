@@ -75,6 +75,8 @@
 #include "imstkMeshToPlaneCD.h"
 #include "imstkMeshToSphereCD.h"
 #include "imstkVirtualCouplingCH.h"
+#include "imstkMeshToSpherePickingCD.h"
+#include "imstkPickingCH.h"
 
 // logger
 #include "g3log/g3log.hpp"
@@ -130,6 +132,7 @@ void liverToolInteraction();
 void testCapsule();
 void testVirtualCoupling();
 void testGeometryTransforms();
+void testPicking();
 
 int main()
 {
@@ -162,7 +165,7 @@ int main()
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
     //testAnalyticalGeometry();
-    testGeometryTransforms();
+    //testGeometryTransforms();
 
 
     /*------------------
@@ -174,6 +177,7 @@ int main()
     //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
+    //testPicking();
 
 
     /*------------------
@@ -188,11 +192,11 @@ int main()
     Test devices, controllers
     ------------------*/
     //testObjectController();
-    testTwoFalcons();
+    //testTwoFalcons();
     //testCameraController();
     //testTwoOmnis();
     //testLapToolController();
-
+    testPicking();
 
     /*------------------
     Test Misc.
@@ -352,7 +356,7 @@ void testMultiObjectWithTextures()
         object1->setVisualGeometry(surfaceMesh1); // change to any mesh created above
         scene->addSceneObject(object1);
     }
-    
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -664,7 +668,7 @@ void testCameraController()
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -1256,11 +1260,9 @@ void testDeformableBody()
     for (auto i : dynaModel->getFixNodeIds())
     {
         auto s = LinearProjectionConstraint(i, false);
-        s.setProjectorToDirichlet(i);
-        s.setValue(Vec3d(0.001, 0, 0));
+        s.setProjectorToDirichlet(i, Vec3d(0.001, 0, 0));
         projList.push_back(s);
     }
-    nlSystem->setLinearProjectors(projList);
 
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
@@ -1271,9 +1273,9 @@ void testDeformableBody()
 
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
+    cgLinSolver->setLinearProjectors(&projList);
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
-    //nlSolver->setToFullyImplicit();
     scene->addNonlinearSolver(nlSolver);
 
     // Display UPS
@@ -2286,7 +2288,6 @@ void testDeformableBodyCollision()
     {
         linProj.push_back(LinearProjectionConstraint(id, true));
     }
-    nlSystem->setLinearProjectors(linProj);
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
@@ -2294,6 +2295,7 @@ void testDeformableBodyCollision()
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
     auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    cgLinSolver->setLinearProjectors(&linProj);
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
@@ -2386,7 +2388,6 @@ void liverToolInteraction()
     {
         linProj.push_back(LinearProjectionConstraint(id, true));
     }
-    nlSystem->setLinearProjectors(linProj);
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
@@ -2394,6 +2395,7 @@ void liverToolInteraction()
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
     auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    cgLinSolver->setLinearProjectors(&linProj);
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
     //nlSolver->setToFullyImplicit();
@@ -2573,4 +2575,133 @@ void testGeometryTransforms()
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
+}
+
+void testPicking()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("Picking");
+
+    //----------------------------------------------------------
+    // Create plane visual scene object
+    //----------------------------------------------------------
+    auto planeObj = apiutils::createVisualAnalyticalSceneObject(
+    imstk::Geometry::Type::Plane, scene, "VisualPlane", 100, Vec3d(0., -20., 0.));
+
+    //----------------------------------------------------------
+    // Create Nidus FE deformable scene object
+    //----------------------------------------------------------
+    // Load a tetrahedral mesh
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+    // Extract the surface mesh
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    volTetMesh->extractSurfaceMesh(surfMesh);
+
+    // Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+    oneToOneNodalMap->compute();
+
+    // Configure the dynamic model
+    auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
+    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->initialize(volTetMesh);
+
+    // Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    // Configure Scene Object
+    auto physicsObj = std::make_shared<DeformableObject>("deformableObj");
+    physicsObj->setVisualGeometry(surfMesh);
+    physicsObj->setCollidingGeometry(volTetMesh);
+    physicsObj->setPhysicsGeometry(volTetMesh);
+    physicsObj->setPhysicsToVisualMap(oneToOneNodalMap);
+    physicsObj->setDynamicalModel(dynaModel);
+    physicsObj->initialize();
+    scene->addSceneObject(physicsObj);
+
+    //----------------------------------------------------------
+    // Create a nonlinear system and its solver
+    //----------------------------------------------------------
+    auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
+    std::vector<LinearProjectionConstraint> linProj;
+    for (auto id : dynaModel->getFixNodeIds())
+    {
+        linProj.push_back(LinearProjectionConstraint(id, true));
+    }
+    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
+    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
+    nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
+    std::vector<LinearProjectionConstraint> dynLinProj;
+
+    // create a non-linear solver and add to the scene
+    auto nlSolver = std::make_shared<NewtonSolver>();
+    auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    cgLinSolver->setLinearProjectors(&linProj);
+    cgLinSolver->setDynamicLinearProjectors(&dynLinProj);
+    nlSolver->setLinearSolver(cgLinSolver);
+    nlSolver->setSystem(nlSystem);
+    scene->addNonlinearSolver(nlSolver);
+
+    //----------------------------------------------------------
+    // Create object controller
+    //----------------------------------------------------------
+#ifdef iMSTK_USE_OPENHAPTICS
+
+    // Device clients
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
+
+    // Sphere0
+    auto sphereForPickObj = apiutils::createCollidingAnalyticalSceneObject(
+        imstk::Geometry::Type::Sphere, scene, "Sphere0", 1, Vec3d(0., 0., 0.));
+
+    auto pickTrackingCtrl = std::make_shared<imstk::DeviceTracker>(client);
+    //pickTrackingCtrl->setTranslationOffset(Vec3d(0., 0., 24.));
+
+    auto pickController = std::make_shared<imstk::SceneObjectController>(sphereForPickObj, pickTrackingCtrl);
+    scene->addObjectController(pickController);
+
+    CollisionData coldata;
+    auto sphereGeo = std::dynamic_pointer_cast<Sphere>(sphereForPickObj->getCollidingGeometry());
+
+    // Create collision detection for picking
+    auto pickingCD = std::make_shared<MeshToSpherePickingCD>(volTetMesh, sphereGeo, coldata);
+    pickingCD->setDeviceTrackerAndButton(pickTrackingCtrl, 0);
+
+    // Create contact handling for picking
+    auto pickingCH = std::make_shared<PickingCH>(CollisionHandling::Side::A, coldata, physicsObj);
+    pickingCH->setDynamicLinearProjectors(&dynLinProj);
+
+    // Create collision pair
+    scene->getCollisionGraph()->addInteractionPair(physicsObj, sphereForPickObj, pickingCD, pickingCH, nullptr);
+#endif
+
+    // Set Camera configuration
+    auto cam = scene->getCamera();
+    auto camPosition = imstk::Vec3d(0, 40, 80);
+    cam->setPosition(camPosition);
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+    // Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(true);
 }

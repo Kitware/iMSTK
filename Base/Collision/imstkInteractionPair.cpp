@@ -23,7 +23,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
                                  std::shared_ptr<CollidingObject> B,
@@ -40,7 +41,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
         return;
     }
 
-    // Check if objects are differents
+    // Check if objects are different
     if (A == B)
     {
         LOG(WARNING) << "InteractionPair error: object cannot interact with itself.";
@@ -86,6 +87,36 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     m_colDetect = CD;
     m_colHandlingA = CHA;
     m_colHandlingB = CHB;
+    m_valid = true;
+}
+
+InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
+                                 std::shared_ptr<CollidingObject> B,
+                                 std::shared_ptr<CollisionDetection> CD,
+                                 std::shared_ptr<CollisionHandling> CHA,
+                                 std::shared_ptr<CollisionHandling> CHB)
+{
+    m_valid = false;
+
+    // Check that objects exist
+    if (A == nullptr || B == nullptr)
+    {
+        LOG(WARNING) << "InteractionPair error: invalid objects (nullptr).";
+        return;
+    }
+
+    // Check if objects are different
+    if (A == B)
+    {
+        LOG(WARNING) << "InteractionPair error: object cannot interact with itself.";
+        return;
+    }
+
+    m_objects = ObjectsPair(A, B);
+    m_colDetect = CD;
+    m_colHandlingA = CHA;
+    m_colHandlingB = CHB;
+    m_colData = CD->getCollisionData();
     m_valid = true;
 }
 

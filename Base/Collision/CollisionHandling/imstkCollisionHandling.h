@@ -49,7 +49,8 @@ public:
     {
         None,
         Penalty,
-        VirtualCoupling
+        VirtualCoupling,
+        NodalPicking
     };
 
     ///

@@ -144,7 +144,7 @@ NewtonSolver::updateJacobian(const Vectord& x)
     auto &b = m_nonLinearSystem->m_F(x, m_isSemiImplicit);
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
-    linearSystem->setLinearProjectors(m_nonLinearSystem->getLinearProjectors());
+    //linearSystem->setLinearProjectors(m_nonLinearSystem->getLinearProjectors()); // TODO: Left for near future reference. Clear in future.
     m_linearSolver->setSystem(linearSystem);
 
     return b.dot(b);

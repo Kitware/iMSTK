@@ -62,10 +62,48 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
     return intPair;
 }
 
+
 //TODO: Refactor -> PBD only
-void CollisionGraph::addInteractionPair(std::shared_ptr<PbdInteractionPair> pair)
+void
+CollisionGraph::addInteractionPair(std::shared_ptr<PbdInteractionPair> pair)
 {
     m_interactionPbdPairList.push_back(pair);
+}
+
+std::shared_ptr<InteractionPair>
+CollisionGraph::addInteractionPair(CollidingObjectPtr A,
+                                   CollidingObjectPtr B,
+                                   CollisionDetectionPtr CD,
+                                   CollisionHandlingPtr CHA,
+                                   CollisionHandlingPtr CHB)
+{
+    // Check that interaction pair does not exist
+    if (this->getInteractionPair(A, B) != nullptr)
+    {
+        LOG(WARNING) << "CollisionGraph::addInteractionPair error: interaction already defined for "
+            << A->getName() << " & " << B->getName() << ".";
+        return nullptr;
+    }
+
+    // Create interaction pair
+    auto intPair = std::make_shared<InteractionPair>(A, B, CD, CHA, CHB);
+
+    // Check validity
+    if (!intPair->isValid())
+    {
+        LOG(WARNING) << "CollisionGraph::addInteractionPair error: could not create interaction for "
+            << A->getName() << " & " << B->getName() << " with those parameters.";
+        intPair.reset();
+        return nullptr;
+    }
+
+    // Populate book-keeping
+    m_interactionPairList.push_back(intPair);
+    m_interactionPairMap[A].push_back(intPair);
+    m_interactionPairMap[B].push_back(intPair);
+
+    // Return interaction pair
+    return intPair;
 }
 
 bool

@@ -68,7 +68,7 @@ ConjugateGradient::solve(Vectord& x)
         return;
     }
 
-    if (m_linearSystem->getLinearProjectors().size() == 0)
+    if (m_FixedLinearProjConstraints->size() == 0)
     {
         x = m_cgSolver.solve(m_linearSystem->getRHSVector());
     }
@@ -81,16 +81,17 @@ ConjugateGradient::solve(Vectord& x)
 void
 ConjugateGradient::modifiedCGSolve(Vectord& x)
 {
-    const auto &linearProjectors = m_linearSystem->getLinearProjectors();
     const auto &b = m_linearSystem->getRHSVector();
     const auto &A = m_linearSystem->getMatrix();
 
     // Set the initial guess to zero
     x.setZero();
-    applyLinearProjectionFilter(x, linearProjectors, true);
+    applyLinearProjectionFilter(x, *m_DynamicLinearProjConstraints, true);
+    applyLinearProjectionFilter(x, *m_FixedLinearProjConstraints, true);
 
     auto res = b;
-    applyLinearProjectionFilter(res, linearProjectors, false);
+    applyLinearProjectionFilter(res, *m_DynamicLinearProjConstraints, false);
+    applyLinearProjectionFilter(res, *m_FixedLinearProjConstraints, false);
     auto c = res;
     auto delta = res.dot(res);
     auto deltaPrev = delta;
@@ -103,7 +104,8 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
     while (delta > eps)
     {
         q = A * c;
-        applyLinearProjectionFilter(q, linearProjectors, false);
+        applyLinearProjectionFilter(q, *m_DynamicLinearProjConstraints, false);
+        applyLinearProjectionFilter(q, *m_FixedLinearProjConstraints, false);
         dotval = c.dot(q);
         if (dotval != 0.0)
         {
@@ -120,7 +122,8 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
         delta = res.dot(res);
         c *= delta / deltaPrev;
         c += res;
-        applyLinearProjectionFilter(c, linearProjectors, false);
+        applyLinearProjectionFilter(c, *m_DynamicLinearProjConstraints, false);
+        applyLinearProjectionFilter(c, *m_FixedLinearProjConstraints, false);
 
         if (++iterNum >= m_maxIterations)
         {

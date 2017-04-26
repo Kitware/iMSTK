@@ -130,6 +130,14 @@ struct PointTetrahedronCollisionData
     WeightsArray BarycentricCoordinates;
 };
 
+struct PickingCollisionData
+{
+    // map of node and point position
+    Vec3d ptPos;
+    size_t nodeId;
+    bool touchStatus;
+};
+
 ///
 /// \struct CollisionData
 ///
@@ -147,6 +155,7 @@ public:
         EEColData.clear();
         MAColData.clear();
         PTColData.clear();
+        NodePickData.clear();
     }
 
     std::vector<PositionDirectionCollisionData> PDColData; ///< Position Direction collision data
@@ -155,6 +164,7 @@ public:
     std::vector<EdgeEdgeCollisionData> EEColData;          ///< Edge Edge collision data
     std::vector<MeshToAnalyticalCollisionData> MAColData;  ///< Mesh to analytical collision data
     std::vector<PointTetrahedronCollisionData> PTColData;  ///< Point Tetrahedron collision data
+    std::vector<PickingCollisionData> NodePickData;        ///< List of points that are picked
 };
 
 }
