@@ -209,7 +209,6 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
     {
         linProj.push_back(LinearProjectionConstraint(i, true));
     }
-    nlSystem->setLinearProjectors(linProj);
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());

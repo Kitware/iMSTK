@@ -92,7 +92,7 @@ namespace imstk
 
         /// \brief Get the vector denoting the filter
         ///
-        void setLinearProjectors(std::vector<LinearProjectionConstraint>& f)
+        /*void setLinearProjectors(std::vector<LinearProjectionConstraint>& f)
         {
             m_LinearProjConstraints = &f;
         }
@@ -102,7 +102,7 @@ namespace imstk
         std::vector<LinearProjectionConstraint>& getLinearProjectors()
         {
             return *m_LinearProjConstraints;
-        }
+        }*/
 
         ///
         /// \brief Set the update function
@@ -120,6 +120,20 @@ namespace imstk
             m_FUpdatePrevState = updateFunc;
         }
 
+        /// \brief Get the vector denoting the filter
+        ///
+        /*void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
+        {
+            m_DynamicLinearProjConstraints = f;
+        }
+
+        /// \brief Get the vector denoting the filter
+        ///
+        std::vector<LinearProjectionConstraint>& getDynamicLinearProjectors()
+        {
+            return *m_DynamicLinearProjConstraints;
+        }*/
+
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
     MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
@@ -127,7 +141,8 @@ public:
 
     UpdateFunctionType m_FUpdate;
     UpdatePrevStateFunctionType m_FUpdatePrevState;
-    std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
+    /*std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
+    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;*/
 };
 
 } // imstk

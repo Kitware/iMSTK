@@ -98,6 +98,34 @@ public:
     /// \brief Apply a filter to the vector supplied
     ///
     void applyLinearProjectionFilter(Vectord& x, const std::vector<LinearProjectionConstraint>& linProj, const bool setVal);
+
+    /// \brief Get the vector denoting the filter
+    ///
+    void setLinearProjectors(std::vector<LinearProjectionConstraint>* f)
+    {
+        m_FixedLinearProjConstraints = f;
+    }
+
+    /// \brief Get the vector denoting the filter
+    ///
+    std::vector<LinearProjectionConstraint>& getLinearProjectors()
+    {
+        return *m_FixedLinearProjConstraints;
+    }
+
+    /// \brief Get the vector denoting the filter
+    ///
+    void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
+    {
+        m_DynamicLinearProjConstraints = f;
+    }
+
+    /// \brief Get the vector denoting the filter
+    ///
+    std::vector<LinearProjectionConstraint>& getDynamicLinearProjectors()
+    {
+        return *m_DynamicLinearProjConstraints;
+    }
 private:
 
     ///
@@ -107,6 +135,9 @@ private:
 
     ///> Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<SparseMatrixd> m_cgSolver;
+
+    std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints;
+    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
 };
 
 } // imstk

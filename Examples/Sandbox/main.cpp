@@ -1256,11 +1256,9 @@ void testDeformableBody()
     for (auto i : dynaModel->getFixNodeIds())
     {
         auto s = LinearProjectionConstraint(i, false);
-        s.setProjectorToDirichlet(i);
-        s.setValue(Vec3d(0.001, 0, 0));
+        s.setProjectorToDirichlet(i, Vec3d(0.001, 0, 0));
         projList.push_back(s);
     }
-    nlSystem->setLinearProjectors(projList);
 
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
@@ -1271,9 +1269,9 @@ void testDeformableBody()
 
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
+    cgLinSolver->setLinearProjectors(&projList);
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
-    //nlSolver->setToFullyImplicit();
     scene->addNonlinearSolver(nlSolver);
 
     // Display UPS
@@ -2286,7 +2284,6 @@ void testDeformableBodyCollision()
     {
         linProj.push_back(LinearProjectionConstraint(id, true));
     }
-    nlSystem->setLinearProjectors(linProj);
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
@@ -2294,6 +2291,7 @@ void testDeformableBodyCollision()
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
     auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    cgLinSolver->setLinearProjectors(&linProj);
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
@@ -2386,7 +2384,6 @@ void liverToolInteraction()
     {
         linProj.push_back(LinearProjectionConstraint(id, true));
     }
-    nlSystem->setLinearProjectors(linProj);
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
@@ -2394,6 +2391,7 @@ void liverToolInteraction()
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
     auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    cgLinSolver->setLinearProjectors(&linProj);
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
     //nlSolver->setToFullyImplicit();
