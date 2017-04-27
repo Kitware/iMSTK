@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 RenderMaterial::RenderMaterial()
 {
     // Instantiating one type of each texture per material
@@ -176,5 +175,4 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
     }
     m_textures[texture->getType()] = texture;
 }
-
 }

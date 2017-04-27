@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 VectorizedState::initialize(const size_t numDof)
 {
@@ -69,5 +68,4 @@ VectorizedState::setState(std::shared_ptr<VectorizedState> rhs)
     m_qDot = rhs->getQDot();
     m_qDotDot = rhs->getQDotDot();
 }
-
 } // imstk

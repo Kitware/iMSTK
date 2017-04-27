@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 class PbdModel;
 
 ///
@@ -62,7 +61,6 @@ public:
     std::shared_ptr<PbdModel> m_model1;
     std::shared_ptr<PbdModel> m_model2;
 };
-
 }
 
 #endif // imstkPbdCollisionConstraint_h

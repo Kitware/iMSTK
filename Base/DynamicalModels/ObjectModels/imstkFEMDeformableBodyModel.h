@@ -47,7 +47,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class FEMDeformableBodyModel
 ///
@@ -57,8 +56,7 @@ namespace imstk
 ///
 class FEMDeformableBodyModel : public DynamicalModel<VectorizedState>
 {
-
-    using kinematicState = VectorizedState;
+using kinematicState = VectorizedState;
 public:
     ///
     /// \brief Constructor
@@ -266,7 +264,6 @@ protected:
 
     bool m_damped = false;                                                ///> Viscous or structurally damped system
 };
-
 } // imstk
 
 #endif // ifndef imstkFEMDeformableBodyModel_h

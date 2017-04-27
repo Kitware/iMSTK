@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Base class for iterative linear solvers.
 ///
@@ -84,7 +83,6 @@ protected:
     size_t m_maxIterations = 100;   ///> Maximum number of iterations to be performed.
     Vectord m_residual;             ///> Storage for residual vector.
 };
-
 } //imstk
 
 #endif // imstkIterativeLinearSystem_h

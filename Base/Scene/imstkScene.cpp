@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 bool
 Scene::isObjectRegistered(std::string sceneObjectName) const
 {
@@ -195,5 +194,4 @@ void Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> contr
 {
     m_objectControllers.push_back(controller);
 }
-
 } // imstk

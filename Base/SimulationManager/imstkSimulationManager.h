@@ -36,7 +36,6 @@
 
 namespace imstk
 {
-
 using SimulationStatus = ModuleStatus;
 
 ///
@@ -176,7 +175,6 @@ private:
     std::shared_ptr<VTKViewer> m_viewer = std::make_shared<VTKViewer>(this);
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
-
 } // imstk
 
 #endif // ifndef imstkSimulationManager_h

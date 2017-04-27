@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
     m_geometry(sphere),
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
@@ -69,5 +68,4 @@ VTKSphereRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 class CollisionData;
 
 ///
@@ -83,7 +82,6 @@ private:
     std::shared_ptr<TetrahedralMesh> m_meshB;     ///> Mesh B
     SpatialHashTableSeparateChaining m_hashTable; ///> Spatial hash table
 };
-
 }
 
 #endif // ifndef imstkTetrahedralMeshCD_h

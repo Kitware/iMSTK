@@ -32,28 +32,28 @@
 
 namespace imstk
 {
-    // TODO: Move to appropriate place
-    enum class ForceModelType
-    {
-        StVK,
-        Corotational,
-        Linear,
-        Invertible,
-        MassSpring,
-        PBD,
-        Rigid,
-        Fluid,
-        none
-    };
+// TODO: Move to appropriate place
+enum class ForceModelType
+{
+    StVK,
+    Corotational,
+    Linear,
+    Invertible,
+    MassSpring,
+    PBD,
+    Rigid,
+    Fluid,
+    none
+};
 
-    // TODO: Move to appropriate place
-    enum class HyperElasticMaterialType
-    {
-        StVK,
-        NeoHookean,
-        MooneyRivlin,
-        none
-    };
+// TODO: Move to appropriate place
+enum class HyperElasticMaterialType
+{
+    StVK,
+    NeoHookean,
+    MooneyRivlin,
+    none
+};
 
 ///
 /// \class ForceModelConfig
@@ -95,36 +95,36 @@ namespace imstk
 ///   TODO: Convert this to input through JSON format
 class ForceModelConfig
 {
-    // TODO: Do this in a better way
-    struct customOptionsList
-    {
-        char femMethod[256];
-        char invertibleMaterial[256];
-        char fixedDOFFilename[256];
-        double dampingMassCoefficient = 0.1;
-        double dampingStiffnessCoefficient = 0.01;
-        double dampingLaplacianCoefficient = 0.0;
-        double deformationCompliance = 1.0;
-        double gravity = -9.81;
-        double compressionResistance = 500.0;
-        double inversionThreshold = -std::numeric_limits< double >::max();
-        int numberOfThreads = 0;
-    };
+// TODO: Do this in a better way
+struct customOptionsList
+{
+    char femMethod[256];
+    char invertibleMaterial[256];
+    char fixedDOFFilename[256];
+    double dampingMassCoefficient = 0.1;
+    double dampingStiffnessCoefficient = 0.01;
+    double dampingLaplacianCoefficient = 0.0;
+    double deformationCompliance = 1.0;
+    double gravity = -9.81;
+    double compressionResistance = 500.0;
+    double inversionThreshold = -std::numeric_limits< double >::max();
+    int numberOfThreads = 0;
+};
 
-    struct customOptionsNameList
-    {
-        std::string femMethodName = "femMethod";
-        std::string invertibleMaterialName = "invertibleMaterial";
-        std::string fixedDOFFilenameName = "fixedDOFFilename";
-        std::string dampingMassCoefficientName = "dampingMassCoefficient";
-        std::string dampingLaplacianCoefficientName = "dampingLaplacianCoefficient";
-        std::string dampingStiffnessCoefficientName = "dampingStiffnessCoefficient";
-        std::string deformationComplianceName = "deformationCompliance";
-        std::string compressionResistanceName = "compressionResistance";
-        std::string inversionThresholdName = "inversionThreshold";
-        std::string numberOfThreadsName = "numberOfThreads";
-        std::string gravityName = "gravity";
-    };
+struct customOptionsNameList
+{
+    std::string femMethodName = "femMethod";
+    std::string invertibleMaterialName = "invertibleMaterial";
+    std::string fixedDOFFilenameName = "fixedDOFFilename";
+    std::string dampingMassCoefficientName = "dampingMassCoefficient";
+    std::string dampingLaplacianCoefficientName = "dampingLaplacianCoefficient";
+    std::string dampingStiffnessCoefficientName = "dampingStiffnessCoefficient";
+    std::string deformationComplianceName = "deformationCompliance";
+    std::string compressionResistanceName = "compressionResistance";
+    std::string inversionThresholdName = "inversionThreshold";
+    std::string numberOfThreadsName = "numberOfThreads";
+    std::string gravityName = "gravity";
+};
 public:
 
     ///
@@ -189,7 +189,6 @@ protected:
 
     bool m_loadSuccessful; ///> Configuration loading is successful
 };
-
 } // imstk
 
 #endif // imstkForceModelConfig_h

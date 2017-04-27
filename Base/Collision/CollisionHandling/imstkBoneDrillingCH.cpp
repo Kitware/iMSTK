@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 BoneDrillingCH::BoneDrillingCH(const Side& side,
                                const CollisionData& colData,
                                std::shared_ptr<CollidingObject> bone,
@@ -73,8 +72,6 @@ BoneDrillingCH::BoneDrillingCH(const Side& side,
             m_nodalCardinalSet[vert].push_back(i);
         }
     }
-
-
 }
 
 void
@@ -155,5 +152,4 @@ BoneDrillingCH::computeContactForces()
     m_initialStep = false;
     m_prevPos = devicePosition;
 }
-
 }// iMSTK

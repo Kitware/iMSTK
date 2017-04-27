@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<InteractionPair>
 CollisionGraph::addInteractionPair(CollidingObjectPtr A,
                                    CollidingObjectPtr B,
@@ -81,7 +80,7 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
     if (this->getInteractionPair(A, B) != nullptr)
     {
         LOG(WARNING) << "CollisionGraph::addInteractionPair error: interaction already defined for "
-            << A->getName() << " & " << B->getName() << ".";
+                     << A->getName() << " & " << B->getName() << ".";
         return nullptr;
     }
 
@@ -92,7 +91,7 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
     if (!intPair->isValid())
     {
         LOG(WARNING) << "CollisionGraph::addInteractionPair error: could not create interaction for "
-            << A->getName() << " & " << B->getName() << " with those parameters.";
+                     << A->getName() << " & " << B->getName() << " with those parameters.";
         intPair.reset();
         return nullptr;
     }
@@ -156,7 +155,7 @@ CollisionGraph::removeInteractionPair(InteractionPairPtr intPair)
                                        intPair->getObjectsPair().second);
 }
 
-const std::vector<std::shared_ptr<PbdInteractionPair> > &
+const std::vector<std::shared_ptr<PbdInteractionPair>> &
 CollisionGraph::getPbdPairList() const
 {
     return m_interactionPbdPairList;
@@ -187,5 +186,4 @@ CollisionGraph::getInteractionPairMap() const
 {
     return m_interactionPairMap;
 }
-
 } // imstk

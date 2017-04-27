@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 class Plane;
 class Sphere;
 class CollisionData;
@@ -46,8 +45,8 @@ public:
     /// \brief Constructor
     ///
     BidirectionalPlaneToSphere(std::shared_ptr<Plane> planeA,
-                    std::shared_ptr<Sphere> sphereB,
-                    CollisionData& colData) :
+                               std::shared_ptr<Sphere> sphereB,
+                               CollisionData& colData) :
         CollisionDetection(CollisionDetection::Type::BidirectionalPlaneToSphere, colData),
         m_planeA(planeA),
         m_sphereB(sphereB)
@@ -68,7 +67,6 @@ private:
     std::shared_ptr<Plane> m_planeA;    ///>
     std::shared_ptr<Sphere> m_sphereB;  ///>
 };
-
 }
 
 #endif // ifndef imstkBidirectionalPlaneToSphereCD_h

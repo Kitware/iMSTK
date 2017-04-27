@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Geometry
 ///
@@ -186,7 +185,6 @@ protected:
 
     std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; ///> Render material
 };
-
 } //imstk
 
 #endif // ifndef imstkGeometry_h

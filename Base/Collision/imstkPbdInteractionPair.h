@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdInteractionPair
 ///
@@ -41,7 +40,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdInteractionPair(std::shared_ptr<PbdObject> A, std::shared_ptr<PbdObject> B):
+    PbdInteractionPair(std::shared_ptr<PbdObject> A, std::shared_ptr<PbdObject> B) :
         first(A), second(B) {}
 
     ///
@@ -81,7 +80,6 @@ private:
     std::shared_ptr<PbdObject> second;
     unsigned int maxIter;
 };
-
 }
 
 #endif // imstkPbdInteractionPair_h

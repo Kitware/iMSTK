@@ -24,7 +24,6 @@
 
 namespace  imstk
 {
-
 void
 PbdVolumeConstraint::initConstraint(PbdModel &model, const size_t &pIdx1,
                                     const size_t &pIdx2, const size_t &pIdx3,
@@ -105,5 +104,4 @@ PbdVolumeConstraint::solvePositionConstraint(PbdModel &model)
 
     return true;
 }
-
 } // imstk

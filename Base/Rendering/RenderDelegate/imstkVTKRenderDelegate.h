@@ -38,7 +38,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class RenderDelegate
 ///

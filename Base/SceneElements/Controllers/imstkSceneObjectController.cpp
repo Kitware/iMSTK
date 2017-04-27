@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 void
 SceneObjectController::initOffsets()
 {
@@ -63,5 +62,4 @@ SceneObjectController::applyForces()
         m_trackingController->getDeviceClient()->setForce(collidingObject->getForce());
     }
 }
-
 } // imstk

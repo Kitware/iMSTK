@@ -27,9 +27,8 @@
 
 namespace imstk
 {
-
 // TODO: Complete this
-class RigidBodyState{};
+class RigidBodyState {};
 
 ///
 /// \class RigidObject
@@ -54,9 +53,7 @@ public:
     ~RigidObject() = default;
 
 protected:
-
 };
-
 } // imstk
 
 #endif // ifndef imstkRigidObject_h

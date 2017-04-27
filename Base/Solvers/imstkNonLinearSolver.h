@@ -33,15 +33,14 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Base class for non-linear solvers
 ///
 class NonLinearSolver : public SolverBase
 {
 public:
-    using JacobianType = std::function < const SparseMatrixd&(const Vectord&) > ;
-    using UpdateIterateType = std::function < void(const Vectord&, Vectord&) > ;
+    using JacobianType = std::function < const SparseMatrixd& (const Vectord&) >;
+    using UpdateIterateType = std::function < void(const Vectord&, Vectord&) >;
     using FunctionType = NonLinearSystem::VectorFunctionType;
 
 public:
@@ -142,7 +141,6 @@ protected:
     UpdateIterateType m_updateIterate;                  ///< Update iteration function
     bool m_isSemiImplicit = true;                       ///> Semi-Implicit solver
 };
-
 } // imstk
 
 #endif // SOLVERS_NONLINEARSOLVER_H

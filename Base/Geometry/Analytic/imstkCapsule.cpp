@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 void Capsule::print() const
 {
     Geometry::print();
@@ -105,5 +104,4 @@ Capsule::updatePostTransformData()
     m_lengthPostTransform = m_scaling * m_length;
     m_transformApplied = true;
 }
-
 } // imstk

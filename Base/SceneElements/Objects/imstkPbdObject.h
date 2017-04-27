@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 class Geometry;
 class GeometryMap;
 
@@ -81,7 +80,6 @@ protected:
 
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };
-
 } // imstk
 
 #endif // imstkPbdObject_h

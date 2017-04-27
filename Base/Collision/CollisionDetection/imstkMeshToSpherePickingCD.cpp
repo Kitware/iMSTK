@@ -26,7 +26,6 @@ limitations under the License.
 
 namespace imstk
 {
-
 void
 MeshToSpherePickingCD::computeCollisionData()
 {
@@ -53,5 +52,4 @@ MeshToSpherePickingCD::computeCollisionData()
         nodeId++;
     }
 }
-
 }

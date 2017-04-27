@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<Geometry>
 CollidingObject::getCollidingGeometry() const
 {
@@ -86,5 +85,4 @@ CollidingObject::updateGeometries()
         m_collidingToVisualMap->apply();
     }
 }
-
 } // imstk

@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<SurfaceMesh>
 VolumetricMesh::getAttachedSurfaceMesh()
 {
@@ -58,5 +57,4 @@ VolumetricMesh::setAttachedVegaMesh(std::shared_ptr<vega::VolumetricMesh> surfac
 {
     m_attachedVegaMesh = surfaceMesh;
 }
-
 } // imstk

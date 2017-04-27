@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 OneToOneMap::compute()
 {
@@ -35,16 +34,16 @@ OneToOneMap::compute()
 
     // returns the first matching vertex
     auto findMatchingVertex = [](std::shared_ptr<Mesh> masterMesh, const Vec3d& p) -> size_t
-    {
-        for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
-        {
-            if (masterMesh->getInitialVertexPosition(nodeId) == p)
-            {
-                return nodeId;
-            }
-        }
-        return -1;
-    };
+                              {
+                                  for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
+                                  {
+                                      if (masterMesh->getInitialVertexPosition(nodeId) == p)
+                                      {
+                                          return nodeId;
+                                      }
+                                  }
+                                  return -1;
+                              };
 
     auto meshMaster = std::dynamic_pointer_cast<Mesh>(m_master);
     auto meshSlave = std::dynamic_pointer_cast<Mesh>(m_slave);
@@ -159,5 +158,4 @@ OneToOneMap::setSlave(std::shared_ptr<Geometry> slave)
     }
     GeometryMap::setSlave(slave);
 }
-
 } // imstk

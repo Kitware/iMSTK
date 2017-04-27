@@ -36,7 +36,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class IsotropicHyperelasticFEForceModel
 ///
@@ -44,16 +43,15 @@ namespace imstk
 ///
 class IsotropicHyperelasticFEForceModel : public InternalForceModel
 {
-
 public:
     ///
     /// \brief Constructor
     ///
     IsotropicHyperelasticFEForceModel(const HyperElasticMaterialType materialType,
-        std::shared_ptr<vega::VolumetricMesh> mesh,
-        const double inversionThreshold,
-        const bool withGravity = true,
-        const double gravity = 10.0) : InternalForceModel()
+                                      std::shared_ptr<vega::VolumetricMesh> mesh,
+                                      const double inversionThreshold,
+                                      const bool withGravity = true,
+                                      const double gravity = 10.0) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
@@ -61,29 +59,29 @@ public:
         const double compressionResistance = 500;
         switch (materialType)
         {
-            case HyperElasticMaterialType::StVK:
-                m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(
+        case HyperElasticMaterialType::StVK:
+            m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(
                     tetMesh.get(),
                     enableCompressionResistance,
                     compressionResistance);
-                break;
+            break;
 
-            case HyperElasticMaterialType::NeoHookean:
-                m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(
+        case HyperElasticMaterialType::NeoHookean:
+            m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(
                     tetMesh.get(),
                     enableCompressionResistance,
                     compressionResistance);
-                break;
+            break;
 
-            case HyperElasticMaterialType::MooneyRivlin:
-                m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(
+        case HyperElasticMaterialType::MooneyRivlin:
+            m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(
                     tetMesh.get(),
                     enableCompressionResistance,
                     compressionResistance);
-                break;
+            break;
 
-            default:
-                LOG(WARNING) << "Error: Invalid hyperelastic material type.";
+        default:
+            LOG(WARNING) << "Error: Invalid hyperelastic material type.";
         }
 
         m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(
@@ -154,7 +152,6 @@ protected:
     std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///>
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;           ///>
 };
-
 } // imstk
 
 #endif // imstkHyperElasticFEMForceModel_h

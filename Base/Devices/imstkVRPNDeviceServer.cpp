@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 void
 VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, int id)
 {
@@ -117,5 +116,4 @@ VRPNDeviceServer::cleanUpModule()
     m_serverConnection->removeReference();
     //delete(m_connection);
 }
-
 } // imstk

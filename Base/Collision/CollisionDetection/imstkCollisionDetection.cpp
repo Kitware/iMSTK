@@ -38,7 +38,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<CollisionDetection>
 CollisionDetection::make_collision_detection(const Type& type,
                                              std::shared_ptr<CollidingObject> objA,
@@ -101,7 +100,7 @@ CollisionDetection::make_collision_detection(const Type& type,
         if (mesh == nullptr || sphere == nullptr)
         {
             LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
-                << "invalid object geometries for SphereToSphere collision detection.";
+                         << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
         return std::make_shared<MeshToSphereCD>(mesh, sphere, colData);
@@ -116,7 +115,7 @@ CollisionDetection::make_collision_detection(const Type& type,
         if (mesh == nullptr || plane == nullptr)
         {
             LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
-                << "invalid object geometries for SphereToSphere collision detection.";
+                         << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
         return std::make_shared<MeshToPlaneCD>(mesh, plane, colData);
@@ -146,7 +145,7 @@ CollisionDetection::make_collision_detection(const Type& type,
         if (mesh == nullptr || sphere == nullptr)
         {
             LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
-                << "invalid object geometries for SphereToSphere collision detection.";
+                         << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
         return std::make_shared<MeshToSpherePickingCD>(mesh, sphere, colData);

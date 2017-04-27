@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Do ranges [a,b] and [c,d] intersect?
 ///
@@ -158,7 +157,6 @@ testPointToTriAABB(const double& x1, const double& y1, const double& z1,
                           z1 - prox1, z1 + prox1, min_x - prox2, max_x + prox2,
                           min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
 }
-
 }
 
 #endif // ifndef imstkIntersectionTestUtils_h

@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 IsometricMap::apply()
 {
@@ -60,5 +59,4 @@ IsometricMap::getTransform() const
 {
     return m_rigidTransform;
 }
-
 } // imstk

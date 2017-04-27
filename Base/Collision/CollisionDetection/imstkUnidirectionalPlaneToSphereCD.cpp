@@ -29,7 +29,6 @@
 #include <g3log/g3log.hpp>
 
 namespace imstk {
-
 void
 UnidirectionalPlaneToSphereCD::computeCollisionData()
 {
@@ -60,5 +59,4 @@ UnidirectionalPlaneToSphereCD::computeCollisionData()
     // Set collisionData
     m_colData.PDColData.push_back({planeAColPt, sphereBColPt, n, penetrationDepth});
 }
-
 } //iMSTK

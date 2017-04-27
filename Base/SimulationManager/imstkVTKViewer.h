@@ -39,7 +39,6 @@
 
 namespace imstk
 {
-
 class SimulationManager;
 
 ///
@@ -139,7 +138,7 @@ public:
     // Set custom behaviour to be run on every frame.
     // The return of the function will not have any  effect.
     void setOnTimerFunction(VTKEventHandlerFunction func);
-    
+
     ///
     /// \brief access screen shot utility
     ///
@@ -154,7 +153,6 @@ protected:
     std::shared_ptr<VTKScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
     bool m_running = false;
 };
-
 } // imstk
 
 #endif // ifndef imstkViewer_h

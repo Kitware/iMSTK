@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 class Mesh;
 class Sphere;
 class CollisionData;
@@ -47,12 +46,12 @@ public:
     /// \brief Constructor
     ///
     MeshToSpherePickingCD(std::shared_ptr<Mesh> mesh,
-				   std::shared_ptr<Sphere> sphere,
-				   CollisionData& colData) :
-				   CollisionDetection(CollisionDetection::Type::MeshToSphere,
-                                      colData),
-				                      m_mesh(mesh),
-				                      m_sphere(sphere){}
+                          std::shared_ptr<Sphere> sphere,
+                          CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::MeshToSphere,
+                           colData),
+        m_mesh(mesh),
+        m_sphere(sphere){}
 
     ///
     /// \brief Destructor
@@ -77,7 +76,6 @@ private:
     std::shared_ptr<imstk::DeviceTracker> m_deviceTracker;  ///> Device tracker to get the button status
     unsigned int m_buttonId = 0; ///> button id
 };
-
 }
 
 #endif // ifndef imstkMeshToSphereCD_h

@@ -34,7 +34,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class HDAPIDeviceServer
 /// \brief Devices server using HDAPI
@@ -46,7 +45,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    HDAPIDeviceServer(): Module("HDAPIDeviceServer")
+    HDAPIDeviceServer() : Module("HDAPIDeviceServer")
     {}
 
     ///
@@ -79,9 +78,7 @@ protected:
 private:
 
     std::vector<std::shared_ptr<HDAPIDeviceClient>> m_deviceClients; ///< list of OpenHaptics
-
 };
-
 } // imstk
 
 #endif // ifndef imstkHDAPIDeviceServer_h

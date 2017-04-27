@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh) :
     m_geometry(lineMesh),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
@@ -76,5 +75,4 @@ VTKLineMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

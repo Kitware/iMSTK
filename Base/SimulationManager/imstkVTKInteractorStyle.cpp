@@ -34,7 +34,6 @@
 
 namespace imstk
 {
-
 vtkStandardNewMacro(VTKInteractorStyle);
 
 VTKInteractorStyle::VTKInteractorStyle()
@@ -135,7 +134,7 @@ VTKInteractorStyle::OnChar()
        m_onCharFunctionMap.at(key) &&
        m_onCharFunctionMap.at(key)(this))
     {
-      return;
+        return;
     }
 
     SimulationStatus status = m_simManager->getStatus();
@@ -200,7 +199,7 @@ VTKInteractorStyle::OnMouseMove()
     if(m_onMouseMoveFunction &&
        m_onMouseMoveFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -221,7 +220,7 @@ VTKInteractorStyle::OnLeftButtonDown()
     if(m_onLeftButtonDownFunction &&
        m_onLeftButtonDownFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -242,7 +241,7 @@ VTKInteractorStyle::OnLeftButtonUp()
     if(m_onLeftButtonUpFunction &&
        m_onLeftButtonUpFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -263,7 +262,7 @@ VTKInteractorStyle::OnMiddleButtonDown()
     if(m_onMiddleButtonDownFunction &&
        m_onMiddleButtonDownFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -284,7 +283,7 @@ VTKInteractorStyle::OnMiddleButtonUp()
     if(m_onMiddleButtonUpFunction &&
        m_onMiddleButtonUpFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -305,7 +304,7 @@ VTKInteractorStyle::OnRightButtonDown()
     if(m_onRightButtonDownFunction &&
        m_onRightButtonDownFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -326,7 +325,7 @@ VTKInteractorStyle::OnRightButtonUp()
     if(m_onRightButtonUpFunction &&
        m_onRightButtonUpFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -347,7 +346,7 @@ VTKInteractorStyle::OnMouseWheelForward()
     if(m_onMouseWheelForwardFunction &&
        m_onMouseWheelForwardFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -368,7 +367,7 @@ VTKInteractorStyle::OnMouseWheelBackward()
     if(m_onMouseWheelBackwardFunction &&
        m_onMouseWheelBackwardFunction(this))
     {
-      return;
+        return;
     }
 
     // Default behavior : ignore mouse if simulation active
@@ -380,5 +379,4 @@ VTKInteractorStyle::OnMouseWheelBackward()
     // Else : use base class interaction
     vtkBaseInteractorStyle::OnMouseWheelBackward();
 }
-
 } // imstk

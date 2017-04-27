@@ -30,109 +30,108 @@
 
 namespace imstk
 {
-
 ///
 /// \class NonLinearSystem
 ///
 /// \brief Base class for a multi-variable nonlinear system
 ///
-    class NonLinearSystem
+class NonLinearSystem
+{
+public:
+    using VectorFunctionType = std::function < const Vectord& (const Vectord&, const bool) >;
+    using MatrixFunctionType = std::function < const SparseMatrixd& (const Vectord&) >;
+    using UpdateFunctionType = std::function < void(const Vectord&, const bool) >;
+    using UpdatePrevStateFunctionType = std::function <void()>;
+
+public:
+    ///
+    /// \brief default Constructor/Destructor
+    ///
+    NonLinearSystem(){};
+    NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
+
+    virtual ~NonLinearSystem(){};
+
+
+    ///
+    /// \brief Set nonlinear method that evaluates the nonlinear function.
+    ///
+    virtual void setFunction(const VectorFunctionType& function);
+
+    ///
+    /// \brief Set the method that evaluates the gradient of the nonlinear function
+    ///
+    virtual void setJacobian(const MatrixFunctionType& function);
+
+    ///
+    /// \brief Evaluate function at a given state
+    ///
+    virtual const Vectord& evaluateF(const Vectord& x, const bool isSemiImplicit);
+
+    ///
+    /// \brief Evaluate gradient of the function at a given state
+    ///
+    virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
+
+    ///
+    /// \brief
+    ///
+    void setUnknownVector(Vectord& v)
     {
-    public:
-        using VectorFunctionType = std::function < const Vectord&(const Vectord&, const bool) >;
-        using MatrixFunctionType = std::function < const SparseMatrixd&(const Vectord&) > ;
-        using UpdateFunctionType = std::function < void(const Vectord&, const bool) > ;
-        using UpdatePrevStateFunctionType = std::function <void()>;
+        m_unknown = &v;
+    }
 
-    public:
-        ///
-        /// \brief default Constructor/Destructor
-        ///
-        NonLinearSystem(){};
-        NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
+    ///
+    /// \brief Get the vector used to populate the solution
+    ///
+    Vectord& getUnknownVector()
+    {
+        return *m_unknown;
+    }
 
-        virtual ~NonLinearSystem(){};
+    /// \brief Get the vector denoting the filter
+    ///
+    /*void setLinearProjectors(std::vector<LinearProjectionConstraint>& f)
+    {
+        m_LinearProjConstraints = &f;
+    }
 
+    /// \brief Get the vector denoting the filter
+    ///
+    std::vector<LinearProjectionConstraint>& getLinearProjectors()
+    {
+        return *m_LinearProjConstraints;
+    }*/
 
-        ///
-        /// \brief Set nonlinear method that evaluates the nonlinear function.
-        ///
-        virtual void setFunction(const VectorFunctionType& function);
+    ///
+    /// \brief Set the update function
+    ///
+    void setUpdateFunction(const UpdateFunctionType& updateFunc)
+    {
+        m_FUpdate = updateFunc;
+    }
 
-        ///
-        /// \brief Set the method that evaluates the gradient of the nonlinear function
-        ///
-        virtual void setJacobian(const MatrixFunctionType& function);
+    ///
+    /// \brief Set the update function
+    ///
+    void setUpdatePreviousStatesFunction(const UpdatePrevStateFunctionType& updateFunc)
+    {
+        m_FUpdatePrevState = updateFunc;
+    }
 
-        ///
-        /// \brief Evaluate function at a given state
-        ///
-        virtual const Vectord& evaluateF(const Vectord& x, const bool isSemiImplicit);
+    /// \brief Get the vector denoting the filter
+    ///
+    /*void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
+    {
+        m_DynamicLinearProjConstraints = f;
+    }
 
-        ///
-        /// \brief Evaluate gradient of the function at a given state
-        ///
-        virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
-
-        ///
-        /// \brief
-        ///
-        void setUnknownVector(Vectord& v)
-        {
-            m_unknown = &v;
-        }
-
-        ///
-        /// \brief Get the vector used to populate the solution
-        ///
-        Vectord& getUnknownVector()
-        {
-            return *m_unknown;
-        }
-
-        /// \brief Get the vector denoting the filter
-        ///
-        /*void setLinearProjectors(std::vector<LinearProjectionConstraint>& f)
-        {
-            m_LinearProjConstraints = &f;
-        }
-
-        /// \brief Get the vector denoting the filter
-        ///
-        std::vector<LinearProjectionConstraint>& getLinearProjectors()
-        {
-            return *m_LinearProjConstraints;
-        }*/
-
-        ///
-        /// \brief Set the update function
-        ///
-        void setUpdateFunction(const UpdateFunctionType& updateFunc)
-        {
-            m_FUpdate = updateFunc;
-        }
-
-        ///
-        /// \brief Set the update function
-        ///
-        void setUpdatePreviousStatesFunction(const UpdatePrevStateFunctionType& updateFunc)
-        {
-            m_FUpdatePrevState = updateFunc;
-        }
-
-        /// \brief Get the vector denoting the filter
-        ///
-        /*void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
-        {
-            m_DynamicLinearProjConstraints = f;
-        }
-
-        /// \brief Get the vector denoting the filter
-        ///
-        std::vector<LinearProjectionConstraint>& getDynamicLinearProjectors()
-        {
-            return *m_DynamicLinearProjConstraints;
-        }*/
+    /// \brief Get the vector denoting the filter
+    ///
+    std::vector<LinearProjectionConstraint>& getDynamicLinearProjectors()
+    {
+        return *m_DynamicLinearProjConstraints;
+    }*/
 
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
@@ -144,7 +143,6 @@ public:
     /*std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;*/
 };
-
 } // imstk
 
 #endif // imstkNonlinearSystem_h

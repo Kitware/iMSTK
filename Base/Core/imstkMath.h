@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 // 2D vector
 using Vec2f = Eigen::Vector2f;
 using Vec2d = Eigen::Vector2d;
@@ -81,7 +80,7 @@ using Matrixd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 using SparseMatrixf = Eigen::SparseMatrix < float, Eigen::RowMajor >;
 
 // A dynamic size sparse matrix of doubles
-using SparseMatrixd = Eigen::SparseMatrix < double, Eigen::RowMajor > ;
+using SparseMatrixd = Eigen::SparseMatrix < double, Eigen::RowMajor >;
 
 // Rigid transform (translation and rotation)
 using RigidTransform3f = Eigen::Isometry3f;
@@ -121,6 +120,5 @@ const double MAX_F = std::numeric_limits<float>::max();
 const double MIN_F = std::numeric_limits<float>::min();
 
 const double MACHINE_PRECISION = std::numeric_limits<double>::denorm_min();
-
 }
 #endif // ifndef imstkMath_h

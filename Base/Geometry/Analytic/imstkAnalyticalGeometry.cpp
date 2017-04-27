@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 AnalyticalGeometry::print() const
 {
@@ -109,5 +108,4 @@ AnalyticalGeometry::updatePostTransformData()
     m_orientationAxisPostTransform.normalize();
     m_positionPostTransform = m_position + m_transform.translation();
 }
-
 } // imstk

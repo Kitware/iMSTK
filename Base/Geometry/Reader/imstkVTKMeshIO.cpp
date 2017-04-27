@@ -39,37 +39,36 @@
 
 namespace imstk
 {
-
 std::shared_ptr<Mesh>
 VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
 {
     switch (meshType)
     {
-    case MeshFileType::VTK :
+    case MeshFileType::VTK:
     {
         return VTKMeshIO::readVtkGenericFormatData<vtkGenericDataObjectReader>(filePath);
     }
-    case MeshFileType::VTU :
+    case MeshFileType::VTU:
     {
         return VTKMeshIO::readVtkUnstructuredGrid<vtkXMLUnstructuredGridReader>(filePath);
     }
-    case MeshFileType::VTP :
+    case MeshFileType::VTP:
     {
         return VTKMeshIO::readVtkPolyData<vtkXMLPolyDataReader>(filePath);
     }
-    case MeshFileType::STL :
+    case MeshFileType::STL:
     {
         return VTKMeshIO::readVtkPolyData<vtkSTLReader>(filePath);
     }
-    case MeshFileType::PLY :
+    case MeshFileType::PLY:
     {
         return VTKMeshIO::readVtkPolyData<vtkPLYReader>(filePath);
     }
-    case MeshFileType::OBJ :
+    case MeshFileType::OBJ:
     {
         return VTKMeshIO::readVtkPolyData<vtkOBJReader>(filePath);
     }
-    default :
+    default:
     {
         LOG(WARNING) << "VTKMeshIO::read error: file type not supported";
         return nullptr;
@@ -241,14 +240,16 @@ VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
     VTKMeshIO::copyPointData(vtkMesh->GetPointData(), dataMap);
     if (!dataMap.empty())
     {
-      mesh->setPointDataMap(dataMap);
+        mesh->setPointDataMap(dataMap);
     }
 
     // Active Texture
     if (auto pointData = vtkMesh->GetPointData())
-    if (auto tcoords = pointData->GetTCoords())
     {
-        mesh->setDefaultTCoords(tcoords->GetName());
+        if (auto tcoords = pointData->GetTCoords())
+        {
+            mesh->setDefaultTCoords(tcoords->GetName());
+        }
     }
 
     return mesh;
@@ -382,7 +383,6 @@ void VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells
 
     for (size_t i = 0; i < cells.size(); i++)
     {
-
         vtkCells->InsertNextCell(dim);
         for (size_t k = 0; k < dim; k++)
         {
@@ -440,13 +440,12 @@ VTKMeshIO::copyPointData(vtkPointData* pointData, std::map<std::string, StdVecto
             array->GetTuple(j, tupleData);
             Vectorf tuple(nbrOfComp);
             for (int k = 0; k < nbrOfComp; k++)
-              {
-              tuple[k] = tupleData[k];
-              }
+            {
+                tuple[k] = tupleData[k];
+            }
             data.push_back(tuple);
         }
         dataMap[name] = data;
     }
 }
-
 } // imstk

@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Stop Watch utility class
 ///
@@ -157,7 +156,6 @@ private:
 ///
 class UPSCounter
 {
-
 public:
     ///
     /// \brief Constructor/Destructor
@@ -194,7 +192,6 @@ protected:
     unsigned int m_ups = 0;         ///> Most up-to-date ups
     unsigned int m_updateCount = 0; ///> Current update count
 };
-
 }
 
 #endif // ifndef imstkTimer_h

@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 IdentityMap::apply()
 {
@@ -51,5 +50,4 @@ IdentityMap::getTransform() const
 {
     return RigidTransform3d::Identity();
 }
-
 } // imstk

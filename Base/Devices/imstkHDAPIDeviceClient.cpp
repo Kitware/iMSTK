@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 void
 HDAPIDeviceClient::init()
 {
@@ -94,6 +93,5 @@ HDAPIDeviceClient::hapticCallback(void* pData)
 
     return HD_CALLBACK_DONE;
 }
-
 } // imstk
 #endif // ifdef iMSTK_USE_OPENHAPTICS

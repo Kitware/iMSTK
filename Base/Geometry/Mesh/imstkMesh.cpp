@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 Mesh::initialize(const StdVectorOfVec3d& vertices)
 {
@@ -263,5 +262,4 @@ Mesh::updatePostTransformData()
     }
     m_transformApplied = true;
 }
-
 } // imstk

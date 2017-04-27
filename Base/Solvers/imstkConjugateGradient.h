@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Conjugate gradient sparse linear solver for SPD matrices
 ///
@@ -56,7 +55,7 @@ public:
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override{};
+    void iterate(Vectord& x, bool updateResidual = true) override {};
 
     ///
     /// \brief Solve the system of equations.
@@ -139,7 +138,6 @@ private:
     std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints;
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
 };
-
 } // imstk
 
 #endif // imstkConjugateGradient_h

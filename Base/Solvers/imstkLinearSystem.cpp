@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 //template<typename SystemMatrixType>
 //LinearSystem<SystemMatrixType>::LinearSystem(const SystemMatrixType &matrix, const Vectord &b)
 //{
@@ -86,5 +85,4 @@ LinearSystem<SystemMatrixType>::getSize()
 {
     return m_A.size();
 }
-
 } //imstk

@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Newton method. This version of the newton method is based on the work
 ///     by Tim Kelly and others at NC State University. The algorithm is globally convergent
@@ -219,7 +218,6 @@ private:
     bool m_useArmijo;                                 ///> True if Armijo liner search is desired
     std::vector<double> m_fnorms;                     ///> Consecutive function norms
 };
-
 } // imstk
 
 #endif // SOLVERS_INEXACTNEWTON_H

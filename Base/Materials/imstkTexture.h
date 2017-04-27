@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Texture
 ///
@@ -36,7 +35,6 @@ namespace imstk
 ///
 class Texture
 {
-
 public:
     ///
     /// \brief Texture type - determines filtering
@@ -81,30 +79,29 @@ protected:
     Type m_type;            ///< Texture type
     std::string m_path;     ///< Texture file path
 };
-
 }
 
 // This method is defined to allow for the map to be properly indexed by Texture objects
 namespace std
 {
-    template<> struct less<std::shared_ptr<imstk::Texture>>
+template<> struct less<std::shared_ptr<imstk::Texture>>
+{
+    bool operator() (const std::shared_ptr<imstk::Texture>& texture1,
+                     const std::shared_ptr<imstk::Texture>& texture2) const
     {
-        bool operator() (const std::shared_ptr<imstk::Texture>& texture1,
-            const std::shared_ptr<imstk::Texture>& texture2) const
+        if (texture2->getType() != texture2->getType())
         {
-            if (texture2->getType() != texture2->getType())
-            {
-                return (texture2->getType() < texture2->getType());
-            }
-
-            if (texture1->getPath() != texture2->getPath())
-            {
-                return (texture1->getPath() < texture2->getPath());
-            }
-
-            return false;
+            return (texture2->getType() < texture2->getType());
         }
-    };
+
+        if (texture1->getPath() != texture2->getPath())
+        {
+            return (texture1->getPath() < texture2->getPath());
+        }
+
+        return false;
+    }
+};
 }
 
 #endif

@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 TetrahedralMesh::initialize(const StdVectorOfVec3d& vertices,
                             const std::vector<TetraArray>& tetrahedra,
@@ -82,9 +81,9 @@ TetrahedralMesh::getVolume() const
         }
 
         A << v[0][0], v[0][1], v[0][2], 1,
-             v[1][0], v[1][1], v[1][2], 1,
-             v[2][0], v[2][1], v[2][2], 1,
-             v[3][0], v[3][1], v[3][2], 1;
+            v[1][0], v[1][1], v[1][2], 1,
+            v[2][0], v[2][1], v[2][2], 1,
+            v[3][0], v[3][1], v[3][2], 1;
 
         double det = A.determinant();
         if (det < 0)
@@ -118,7 +117,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     }
 
     using triArray = SurfaceMesh::TriangleArray;
-    const std::vector<triArray> facePattern = { triArray{ { 0, 1, 2 } }, triArray{ { 0, 1, 3 } }, triArray{ { 0, 2, 3 } }, triArray{ { 1, 2, 3 } } };
+    const std::vector<triArray> facePattern = { triArray { { 0, 1, 2 } }, triArray { { 0, 1, 3 } }, triArray { { 0, 2, 3 } }, triArray { { 1, 2, 3 } } };
 
     // Find and store the tetrahedral faces that are unique
     auto vertArray = this->getTetrahedraVertices();
@@ -142,7 +141,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
             c = tetVertArray[facePattern[t][2]];
 
             // search in reverse
-            for (auto it=surfaceTri.rbegin(); it!=surfaceTri.rend(); ++it)
+            for (auto it = surfaceTri.rbegin(); it != surfaceTri.rend(); ++it)
             {
                 if ((((*it)[0] == a) && (((*it)[1] == b && (*it)[2] == c) || ((*it)[1] == c && (*it)[2] == b))) ||
                     (((*it)[1] == a) && (((*it)[0] == b && (*it)[2] == c) || ((*it)[0] == c && (*it)[2] == b))) ||
@@ -156,7 +155,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 
             if (unique)
             {
-                surfaceTri.push_back(triArray{ { a, b, c } });
+                surfaceTri.push_back(triArray { { a, b, c } });
                 surfaceTriTet.push_back(tetId);
                 tetRemainingVert.push_back(3 - t);
             }
@@ -238,9 +237,9 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
 
     Mat4d A;
     A << v[0][0], v[0][1], v[0][2], 1,
-         v[1][0], v[1][1], v[1][2], 1,
-         v[2][0], v[2][1], v[2][2], 1,
-         v[3][0], v[3][1], v[3][2], 1;
+        v[1][0], v[1][1], v[1][2], 1,
+        v[2][0], v[2][1], v[2][2], 1,
+        v[3][0], v[3][1], v[3][2], 1;
 
     det = A.determinant();
 
@@ -297,5 +296,4 @@ TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraVertices.size();
 }
-
 } // imstk

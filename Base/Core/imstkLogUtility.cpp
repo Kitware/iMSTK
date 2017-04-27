@@ -22,13 +22,21 @@ limitations under the License.
 
 namespace imstk
 {
-
 stdSink::FG_Color
 stdSink::GetColor(const LEVELS level) const
 {
-    if (level.value == WARNING.value)   return YELLOW;
-    if (level.value == DEBUG.value)   return GREEN;
-    if (level.value == FATAL.value)   return RED;
+    if (level.value == WARNING.value)
+    {
+        return YELLOW;
+    }
+    if (level.value == DEBUG.value)
+    {
+        return GREEN;
+    }
+    if (level.value == FATAL.value)
+    {
+        return RED;
+    }
     return WHITE;
 }
 
@@ -41,8 +49,8 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 #ifndef WIN32
     auto color = GetColor(level);
     std::cout << "\033[" << color << "m"
-        << message
-        << "\033[m" << std::endl;
+              << message
+              << "\033[m" << std::endl;
 #else
     if (level.value == WARNING.value || level.value == FATAL.value)
     {
@@ -62,7 +70,6 @@ LogUtility::createLogger(std::string name, std::string path)
     m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path);
     m_stdSinkHandle = m_g3logWorker->addSink(
         std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage);
-        g3::initializeLogging(m_g3logWorker.get());
+    g3::initializeLogging(m_g3logWorker.get());
 }
-
 }

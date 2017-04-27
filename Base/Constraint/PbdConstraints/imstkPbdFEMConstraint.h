@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdFEMConstraint
 ///
@@ -61,7 +60,6 @@ public:
     MaterialType m_material;    ///> Material type
     Mat3d m_invRestMat;         ///>
 };
-
 }
 
 #endif // imstkPbdFEMConstraint_h

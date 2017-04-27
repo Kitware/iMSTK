@@ -32,7 +32,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class SurfaceMesh
 ///
@@ -166,7 +165,6 @@ protected:
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default material coordinates
 };
-
 } // imstk
 
 #endif // ifndef imstkSurfaceMesh_h

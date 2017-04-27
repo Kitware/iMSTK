@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
                         const std::vector<TriangleArray>& triangles,
@@ -253,7 +252,7 @@ SurfaceMesh::optimizeForDataLocality()
             vertId[j] = (std::find(optimallyOrderedNodes.begin(),
                                    optimallyOrderedNodes.end(),
                                    optimizedConnectivity.at(i)[j]) -
-                                   optimallyOrderedNodes.begin()) ;
+                         optimallyOrderedNodes.begin());
         }
 
         TriangleArray tmpTriArray = { { vertId[0], vertId[1], vertId[2] } };
@@ -341,5 +340,4 @@ SurfaceMesh::getDefaultTCoords()
 {
     return m_defaultTCoords;
 }
-
 } // imstk

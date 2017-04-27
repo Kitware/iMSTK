@@ -24,7 +24,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class SceneObjectControllerBase
 ///
@@ -59,7 +58,6 @@ public:
     ///
     virtual void setTrackerToOutOfDate() = 0;
 };
-
 } // imstk
 
 #endif // ifndef imstkSceneObjectControllerBase_h

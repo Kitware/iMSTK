@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \struct Color
 ///
@@ -103,6 +102,5 @@ struct Color
     static Color Pink;
     static Color Yellow;
 };
-
 }
 #endif // ifndef imstkColor_h

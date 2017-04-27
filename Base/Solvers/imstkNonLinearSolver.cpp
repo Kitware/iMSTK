@@ -23,15 +23,17 @@
 
 namespace imstk
 {
-
-NonLinearSolver::NonLinearSolver(): m_sigma(std::array < double, 2 > {{0.1, 0.5}}),
-                                    m_alpha(1e-4),
-                                    m_armijoMax(30)
+NonLinearSolver::NonLinearSolver() : m_sigma(std::array < double, 2 >
+    {
+        {0.1, 0.5}
+    }),
+    m_alpha(1e-4),
+    m_armijoMax(30)
 {
     m_updateIterate = [](const Vectord& dx, Vectord& x)
-    {
-        x += dx;
-    };
+                      {
+                          x += dx;
+                      };
 }
 
 double
@@ -74,7 +76,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
         // Exit if the function norm satisfies the Armijo-Goldstein condition
         if(currentFnorm < (1.0 - m_alpha * lambda[0])*previousFnorm)
         {
-        // TODO: Log this
+            // TODO: Log this
             return currentFnorm;
         }
 
@@ -181,5 +183,4 @@ NonLinearSolver::setUpdateIterate(const NonLinearSolver::UpdateIterateType& newU
 {
     m_updateIterate = newUpdateIterate;
 }
-
 } // imstk

@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ////
 /// \class AreaConstraint
 ///
@@ -61,7 +60,6 @@ public:
     double m_restArea; ///> Area at the rest position
     double m_stiffness; ///> Stiffness of the area constraint
 };
-
 } // imstk
 
 #endif // imstkPbdAreaConstraint_h

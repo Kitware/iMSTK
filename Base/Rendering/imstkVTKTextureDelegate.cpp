@@ -24,7 +24,6 @@
 
 namespace imstk
 {
-
 vtkSmartPointer<vtkTexture>
 VTKTextureDelegate::getTexture() const
 {
@@ -53,5 +52,4 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
     m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
 }
-
 }

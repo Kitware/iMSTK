@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 const Vec3d&
 Camera::getPosition() const
 {
@@ -119,5 +118,4 @@ Camera::setupController(std::shared_ptr<DeviceClient> deviceClient)
     }
     return m_controller;
 }
-
 } // imstk

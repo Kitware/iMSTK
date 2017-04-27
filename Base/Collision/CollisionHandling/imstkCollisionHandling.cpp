@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<CollisionHandling>
 CollisionHandling::make_collision_handling(const Type& type,
                                            const Side& side,
@@ -56,7 +55,7 @@ CollisionHandling::make_collision_handling(const Type& type,
         if (objA->getType() == SceneObject::Type::Visual)
         {
             LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                << "penalty collision handling only implemented for colliding objects.";
+                         << "penalty collision handling only implemented for colliding objects.";
             return nullptr;
         }
 
@@ -71,7 +70,7 @@ CollisionHandling::make_collision_handling(const Type& type,
         if (objA->getType() == SceneObject::Type::Visual)
         {
             LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                << "penalty collision handling only implemented for colliding objects.";
+                         << "penalty collision handling only implemented for colliding objects.";
             return nullptr;
         }
         if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(objA))
@@ -87,5 +86,4 @@ CollisionHandling::make_collision_handling(const Type& type,
         return nullptr;
     }
 }
-
 }

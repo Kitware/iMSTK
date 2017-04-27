@@ -27,7 +27,6 @@
 #include <g3log/g3log.hpp>
 
 namespace imstk {
-
 MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
                            std::shared_ptr<SurfaceMesh> meshB,
                            CollisionData& colData) :
@@ -113,5 +112,4 @@ MeshToMeshCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
     colData.VTColData.push_back(VertexTriangleCollisionData(vidA, fidB, t));
     //LOG(INFO) <<"VF: vA("<<vidA<<"), fB("<<fidB<<") \t\t@ t="<<t;
 }
-
 }

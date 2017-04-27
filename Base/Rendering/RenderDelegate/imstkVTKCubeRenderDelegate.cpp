@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube>cube) :
     m_geometry(cube),
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
@@ -70,5 +69,4 @@ VTKCubeRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

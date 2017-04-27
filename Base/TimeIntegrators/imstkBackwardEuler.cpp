@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 BackwardEuler::updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
                                   std::shared_ptr<VectorizedState> currentState,
@@ -59,5 +58,4 @@ BackwardEuler::updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
     currentState->getQ() = u;
     currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
 }
-
 } // imstk

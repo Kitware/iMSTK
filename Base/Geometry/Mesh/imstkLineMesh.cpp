@@ -27,7 +27,8 @@ namespace imstk
 {
 void
 LineMesh::clear()
-{}
+{
+}
 
 void
 LineMesh::print() const
@@ -42,7 +43,7 @@ LineMesh::getVolume() const
 }
 
 void
-LineMesh::setConnectivity(const std::vector<std::vector<int> >& lines)
+LineMesh::setConnectivity(const std::vector<std::vector<int>>& lines)
 {
     m_lines = lines;
 }
@@ -64,5 +65,4 @@ LineMesh::getLine(int index) const
 {
     return m_lines[index];
 }
-
 } // imstk

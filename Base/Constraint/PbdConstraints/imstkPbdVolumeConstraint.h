@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VolumeConstraint
 ///
@@ -61,7 +60,6 @@ public:
     double m_restVolume; ///> Rest volume
     double m_stiffness;  ///> Stiffness of the volume constraint
 };
-
 }
 
 #endif // imstkPbdVolumeConstraint_h

@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 Plane::print() const
 {
@@ -100,5 +99,4 @@ Plane::updatePostTransformData()
     m_widthPostTransform = m_scaling * m_width;
     m_transformApplied = true;
 }
-
 } // imstk

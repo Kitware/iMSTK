@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<Scene>
 VTKViewer::getCurrentScene() const
 {
@@ -254,5 +253,4 @@ VTKViewer::getScreenCaptureUtility() const
 {
     return m_screenCapturer;
 }
-
 } // imstk

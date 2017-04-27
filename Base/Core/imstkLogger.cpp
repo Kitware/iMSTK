@@ -24,7 +24,6 @@
 
 namespace imstk
 {
-
 Logger::Logger(std::string filename)
 {
     m_filename = filename + this->getCurrentTimeFormatted() + ".log";
@@ -40,7 +39,8 @@ Logger::~Logger()
 }
 
 std::string
-Logger::getCurrentTimeFormatted() {
+Logger::getCurrentTimeFormatted()
+{
     time_t now = time(0);
     int year = gmtime(&now)->tm_year + 1900;
     int day = gmtime(&now)->tm_mday;
@@ -89,9 +89,10 @@ Logger::eventLoop(Logger * logger)
 
     while (logger->m_running) {
         std::unique_lock<std::mutex> ul(*logger->m_mutex);
-        logger->m_condition.wait(ul, [logger]{return logger->m_changed; });
+        logger->m_condition.wait(ul, [logger] {return logger->m_changed; });
 
-        if (!logger->m_running) {
+        if (!logger->m_running)
+        {
             logger->m_changed = false;
             ul.unlock();
             break;
@@ -126,7 +127,7 @@ Logger::log(std::string message, bool prependTime /* = false */)
 
     m_condition.notify_one();
     std::unique_lock<std::mutex> ul(*m_mutex);
-    m_condition.wait(ul, [this]{return !m_changed; });
+    m_condition.wait(ul, [this] {return !m_changed; });
     ul.unlock();
 }
 bool
@@ -171,8 +172,7 @@ Logger::shutdown()
 
     m_condition.notify_one();
     std::unique_lock<std::mutex> ul(*m_mutex);
-    m_condition.wait(ul, [this]{return !m_changed; });
+    m_condition.wait(ul, [this] {return !m_changed; });
     ul.unlock();
 }
-
 }

@@ -32,7 +32,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VolumetricMesh
 ///
@@ -78,9 +77,7 @@ protected:
 
     std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh = nullptr; ///> Attached surface mesh
     std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh = nullptr; ///> Attached vega mesh
-
 };
-
 } // imstk
 
 #endif // ifndef imstkVolumetricMesh_h

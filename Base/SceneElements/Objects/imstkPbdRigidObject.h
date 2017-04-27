@@ -25,7 +25,6 @@
 #include "imstkPbdObject.h"
 namespace imstk
 {
-
 class Geometry;
 class GeometryMap;
 
@@ -66,9 +65,7 @@ public:
     virtual void updatePbdStates();
 
 protected:
-
 };
-
 } // imstk
 
 #endif // ifndef imstkPbdRigidObject_h

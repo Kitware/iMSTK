@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Mesh
 ///
@@ -178,7 +177,6 @@ protected:
 
     bool m_topologyChanged = false;
 };
-
 } // imstk
 
 #endif // ifndef imstkMesh_h

@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class DeviceClient
 /// \brief Base class for any device client
@@ -102,7 +101,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DeviceClient(std::string name, std::string ip):
+    DeviceClient(std::string name, std::string ip) :
         m_deviceName(name),
         m_ip(ip)
     {}
@@ -121,7 +120,6 @@ protected:
     std::map<size_t, bool> m_buttons;        ///< Buttons: true = pressed/false = not pressed
     Vec3d m_force = Vec3d::Zero();           ///< Force vector
 };
-
 }
 
 #endif // ifndef imstkDeviceClient_h

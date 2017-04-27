@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Sphere
 ///
@@ -75,7 +74,6 @@ protected:
     double m_radius = 1.0;              ///> Radius of the sphere
     double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
 };
-
 } // imstk
 
 #endif // ifndef imstkSphere_h

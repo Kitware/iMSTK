@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 CorotationalFEMForceModel::CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp) : InternalForceModel(), m_warp(warp)
 {
     auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
@@ -70,5 +69,4 @@ CorotationalFEMForceModel::setTangentStiffness(std::shared_ptr<vega::SparseMatri
 {
     m_vegaTangentStiffnessMatrix = K;
 }
-
 }

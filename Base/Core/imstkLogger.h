@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Logger
 ///
@@ -112,6 +111,5 @@ private:
     std::thread* m_thread;
     std::condition_variable m_condition;
 };
-
 }
 #endif // ifndef imstkLogUtility_h

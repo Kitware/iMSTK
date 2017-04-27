@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 class Mesh;
 class Plane;
 class CollisionData;
@@ -48,10 +47,10 @@ public:
     MeshToPlaneCD(std::shared_ptr<Mesh> mesh,
                   std::shared_ptr<Plane> plane,
                   CollisionData& colData) :
-				  CollisionDetection(CollisionDetection::Type::MeshToSphere,
-                  colData),
-				  m_mesh(mesh),
-				  m_plane(plane){}
+        CollisionDetection(CollisionDetection::Type::MeshToSphere,
+                           colData),
+        m_mesh(mesh),
+        m_plane(plane){}
 
     ///
     /// \brief Destructor
@@ -68,7 +67,6 @@ private:
     std::shared_ptr<Mesh> m_mesh;      ///> Mesh
     std::shared_ptr<Plane> m_plane;    ///> Plane
 };
-
 }
 
 #endif // ifndef imstkMeshToPlaneCD_h

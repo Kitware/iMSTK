@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 class CollidingObject;
 class CollisionData;
 class DeviceTracker;
@@ -98,9 +97,7 @@ private:
 
     bool m_initialStep = true;                  ///> Number of times steps
     Vec3d m_prevPos;                            ///> Previous position of the colliding object
-
 };
-
 }
 
 #endif // ifndef imstkBoneDrillingCH_h

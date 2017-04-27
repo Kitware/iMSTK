@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<Mesh>
 MeshIO::read(const std::string& filePath)
 {
@@ -44,20 +43,20 @@ MeshIO::read(const std::string& filePath)
     MeshFileType meshType = MeshIO::getFileType(filePath);
     switch (meshType)
     {
-    case MeshFileType::VTK :
-    case MeshFileType::VTU :
-    case MeshFileType::VTP :
-    case MeshFileType::STL :
-    case MeshFileType::PLY :
+    case MeshFileType::VTK:
+    case MeshFileType::VTU:
+    case MeshFileType::VTP:
+    case MeshFileType::STL:
+    case MeshFileType::PLY:
         return VTKMeshIO::read(filePath, meshType);
         break;
-    case MeshFileType::OBJ :
-    case MeshFileType::DAE :
-    case MeshFileType::FBX :
-    case MeshFileType::_3DS :
+    case MeshFileType::OBJ:
+    case MeshFileType::DAE:
+    case MeshFileType::FBX:
+    case MeshFileType::_3DS:
         return AssimpMeshIO::read(filePath, meshType);
         break;
-    case MeshFileType::VEG :
+    case MeshFileType::VEG:
         return VegaMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::MSH:
@@ -146,19 +145,18 @@ MeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& f
     MeshFileType meshType = MeshIO::getFileType(filePath);
     switch (meshType)
     {
-        case MeshFileType::VEG:
-            return VegaMeshIO::write(imstkMesh, filePath, meshType);
-            break;
-        case MeshFileType::VTU:
-        case MeshFileType::VTP:
-        case MeshFileType::STL:
-        case MeshFileType::PLY:
-            return VTKMeshIO::write(imstkMesh, filePath, meshType);
-            break;
+    case MeshFileType::VEG:
+        return VegaMeshIO::write(imstkMesh, filePath, meshType);
+        break;
+    case MeshFileType::VTU:
+    case MeshFileType::VTP:
+    case MeshFileType::STL:
+    case MeshFileType::PLY:
+        return VTKMeshIO::write(imstkMesh, filePath, meshType);
+        break;
     }
 
     LOG(WARNING) << "MeshIO::write error: file type not supported";
     return false;
 }
-
 } // imstk

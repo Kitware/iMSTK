@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdDistanceConstraint
 ///
@@ -60,7 +59,6 @@ public:
     double m_restLength; ///> Rest length between the nodes
     double m_stiffness;  ///> Stiffness of the constaint
 };
-
 } // imstk
 
 #endif // imstkPbdDistanceConstraint_h

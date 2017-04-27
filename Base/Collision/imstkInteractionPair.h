@@ -34,7 +34,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class InteractionPair
 ///
@@ -42,7 +41,7 @@ namespace imstk
 ///
 class InteractionPair
 {
-    using ObjectsPair = std::pair<std::shared_ptr<CollidingObject>, std::shared_ptr<CollidingObject>>;
+using ObjectsPair = std::pair<std::shared_ptr<CollidingObject>, std::shared_ptr<CollidingObject>>;
 
 public:
 
@@ -111,7 +110,6 @@ protected:
 
     bool m_valid;
 };
-
 }
 
 #endif // ifndef imstkInteractionPair_h

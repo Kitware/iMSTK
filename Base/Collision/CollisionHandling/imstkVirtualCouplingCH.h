@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 class CollidingObject;
 class CollisionData;
 
@@ -46,8 +45,8 @@ public:
     VirtualCouplingCH(const Side& side,
                       const CollisionData& colData,
                       std::shared_ptr<CollidingObject> obj) :
-                      CollisionHandling(Type::VirtualCoupling, side, colData),
-                      m_object(obj) {}
+        CollisionHandling(Type::VirtualCoupling, side, colData),
+        m_object(obj) {}
 
     VirtualCouplingCH() = delete;
 
@@ -81,9 +80,7 @@ private:
 
     double m_stiffness = 5e-01;                 ///> Stiffness coefficient use to compute spring force
     double m_damping = 0.005;                   ///> Damping coefficient used to compute damping force
-
 };
-
 }
 
 #endif // ifndef imstkVirtualCouplingCH_h

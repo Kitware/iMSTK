@@ -37,7 +37,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VTKMeshIO
 ///
@@ -149,9 +148,7 @@ protected:
     /// \brief
     ///
     static void copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
-
 };
-
 } // imstk
 
 #endif // ifndef imstkVTKMeshIO_h

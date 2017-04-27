@@ -26,14 +26,13 @@
 
 namespace imstk
 {
-
 ///
 /// \class FEMTetConstraint
 ///
 /// \brief The FEMTetConstraint class class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.
 ///
-class PbdFEMTetConstraint : public  PbdFEMConstraint
+class PbdFEMTetConstraint : public PbdFEMConstraint
 {
 public:
     ///
@@ -59,7 +58,6 @@ public:
     ///
     bool solvePositionConstraint(PbdModel& model) override;
 };
-
 } // imstk
 
 #endif // imstkPbdFeConstraint_h

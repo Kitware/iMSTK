@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class SpatialHashTable
 ///
@@ -54,7 +53,6 @@ protected:
 
     double m_cellSize[3];
 };
-
 }
 
 #endif

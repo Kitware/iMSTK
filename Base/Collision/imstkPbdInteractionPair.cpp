@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 bool
 PbdInteractionPair::doBroadPhaseCollision()
 {
@@ -407,5 +406,4 @@ PbdInteractionPair::resolveCollision()
         }
     }
 }
-
 } // imstk

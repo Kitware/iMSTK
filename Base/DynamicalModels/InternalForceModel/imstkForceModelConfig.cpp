@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSuccessful(false)
 {
     if (configFileName.empty())
@@ -150,5 +149,4 @@ ForceModelConfig::print()
         LOG(INFO) << fo.first << ": " << fo.second;
     }
 }
-
 } // imstk

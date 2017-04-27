@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 class SceneObjectControllerBase;
 
 ///
@@ -43,8 +42,8 @@ class SceneObjectControllerBase;
 ///
 class Scene
 {
-    template<class T>
-    using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
+template<class T>
+using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
 public:
 
@@ -146,7 +145,6 @@ protected:
     std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
 };
-
 } // imstk
 
 #endif // ifndef imstkScene_h

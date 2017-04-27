@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Type of the time dependent mathematical model
 ///
@@ -131,7 +130,6 @@ protected:
 
     std::size_t m_numDOF; ///> Total number of degree of freedom
 };
-
 } // imstk
 
 #endif // ifndef imstkDynamicalModel_h

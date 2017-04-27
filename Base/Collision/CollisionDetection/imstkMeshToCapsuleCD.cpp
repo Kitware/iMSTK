@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 void
 MeshToCapsuleCD::computeCollisionData()
 {
@@ -76,5 +75,4 @@ MeshToCapsuleCD::computeCollisionData()
         nodeId++;
     }
 }
-
 } // imstk

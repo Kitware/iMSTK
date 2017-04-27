@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 GeometryMap::mute()
 {
@@ -59,20 +58,20 @@ GeometryMap::getTypeName() const
 {
     switch (m_type)
     {
-        case Type::Isometric:
-            return "Isometric map";
-        case Type::Identity:
-            return "Identity map";
-        case Type::TetraTriangle:
-            return "Tetra-Triangle map";
-        case Type::HexaTriangle:
-            return "Hexa-Triangle map";
-        case Type::TetraTetra:
-            return "Tetra-Tetra map";
-        case Type::OneToOne:
-            return "One-to-One nodal map";
-        default:
-            return "Map type not determined!";
+    case Type::Isometric:
+        return "Isometric map";
+    case Type::Identity:
+        return "Identity map";
+    case Type::TetraTriangle:
+        return "Tetra-Triangle map";
+    case Type::HexaTriangle:
+        return "Hexa-Triangle map";
+    case Type::TetraTetra:
+        return "Tetra-Tetra map";
+    case Type::OneToOne:
+        return "One-to-One nodal map";
+    default:
+        return "Map type not determined!";
     }
 }
 
@@ -99,5 +98,4 @@ GeometryMap::getSlave() const
 {
     return m_slave;
 }
-
 } // imstk

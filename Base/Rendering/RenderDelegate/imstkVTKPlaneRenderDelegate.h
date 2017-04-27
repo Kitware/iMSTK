@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PlaneRenderDelegate
 ///
@@ -66,7 +65,6 @@ protected:
 
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
 };
-
 } // imstk
 
 #endif // ifndef imstkPlaneRenderDelegate_h

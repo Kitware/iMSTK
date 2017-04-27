@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 //template<typename SystemMatrixType>
 //LinearSolver<SystemMatrixType>::LinearSolver() : m_linearSystem(nullptr)
 //{
@@ -44,5 +43,4 @@ namespace imstk
 //{
 //    return m_linearSystem;
 //}
-
 } //imstk

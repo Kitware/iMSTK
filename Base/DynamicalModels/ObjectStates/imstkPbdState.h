@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdState
 ///
@@ -78,7 +77,6 @@ private:
     StdVectorOfVec3d m_vel; ///> Nodal velocities
     StdVectorOfVec3d m_acc; ///> Nodal acelerations
 };
-
 } // imstk
 
 #endif // imstkPbdState_h

@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class DeviceTracker
 ///
@@ -129,7 +128,6 @@ protected:
     Quatd m_currentRot;
     bool m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
 };
-
 } // imstk
 
 #endif // ifndef imstkDeviceTracker_h

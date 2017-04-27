@@ -37,7 +37,6 @@
 
 namespace imstk
 {
-
 class StVKForceModel : public InternalForceModel
 {
 public:
@@ -45,8 +44,8 @@ public:
     /// \brief Constructor
     ///
     StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
-        const bool withGravity = true,
-        const double gravity = 10.0) : InternalForceModel()
+                   const bool withGravity = true,
+                   const double gravity = 10.0) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
         vega::StVKElementABCD *precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
@@ -110,7 +109,6 @@ protected:
     std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaStVKStiffnessMatrix;
     bool ownStiffnessMatrix;
 };
-
 } // imstk
 
 #endif // imstkStVKForceModel_h

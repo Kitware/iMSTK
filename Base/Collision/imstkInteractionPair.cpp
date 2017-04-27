@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
                                  std::shared_ptr<CollidingObject> B,
                                  CollisionDetection::Type CDType,
@@ -64,7 +63,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
         if (CHA == nullptr)
         {
             LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
-                        << A->getName() << "' object.";
+                         << A->getName() << "' object.";
             return;
         }
     }
@@ -77,7 +76,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
         if (CHB == nullptr)
         {
             LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
-                        << B->getName() << "' object.";
+                         << B->getName() << "' object.";
             return;
         }
     }

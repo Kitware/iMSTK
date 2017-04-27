@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 class Geometry;
 
 ///
@@ -130,7 +129,6 @@ protected:
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
     bool m_updateVisualFromPhysicsGeometry = true; ///> Defines if visual is updated from colliding mapping or physics mapping
 };
-
 } // imstk
 
 #endif // ifndef imstkDynamicObject_h

@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 const
 SimulationStatus& SimulationManager::getStatus() const
 {
@@ -385,7 +384,7 @@ SimulationManager::endSimulation()
     // End all scenes
     for (auto pair : m_sceneManagerMap)
     {
-        std::string  sceneName   = pair.first;
+        std::string sceneName   = pair.first;
         ModuleStatus sceneStatus = pair.second->getStatus();
 
         if (sceneStatus != ModuleStatus::INACTIVE)
@@ -404,5 +403,4 @@ SimulationManager::startModuleInNewThread(std::shared_ptr<Module>module)
 {
     m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
-
 } // imstk
