@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 Texture::Texture(std::string path, Type type)
 {
     m_path = path;
@@ -41,5 +40,4 @@ Texture::getPath() const
 {
     return m_path;
 }
-
 }

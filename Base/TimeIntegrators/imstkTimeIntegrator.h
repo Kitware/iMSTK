@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class TimeIntegrator
 ///
@@ -87,7 +86,6 @@ protected:
     Type m_type; ///> Type of the time integrator
     double m_dT; ///> Delta T
 };
-
 } // imstk
 
 #endif // ifndef imstkTimeIntegrator_h

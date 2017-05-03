@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 void
 Module::start()
 {
@@ -208,5 +207,4 @@ Module::setFrequency(const double f)
     }
     m_loopDelay = 1000.0/f;
 }
-
 }

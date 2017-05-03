@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class SphereRenderDelegate
 ///
@@ -64,7 +63,6 @@ protected:
     std::shared_ptr<Sphere> m_geometry;         ///> Geometry
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
 };
-
 } // imstk
 
 #endif // ifndef imstkSphereRenderDelegate_h

@@ -48,7 +48,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<VTKRenderDelegate>
 VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 {
@@ -216,5 +215,4 @@ VTKRenderDelegate::updateActorProperties()
     // Material state is now up to date
     material->m_stateModified = false;
 }
-
 } // imstk

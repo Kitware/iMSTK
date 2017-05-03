@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 class Geometry;
 
 class CollidingObject : public SceneObject
@@ -84,11 +83,9 @@ protected:
     std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
     std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
     Vec3d m_force = Vec3d::Zero();
-
 };
 
 using StaticObject = CollidingObject;
-
 }// imstk
 
 #endif // ifndef imstkCollidingObject_h

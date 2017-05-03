@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class LinearProjectionConstraint
 ///
@@ -93,7 +92,6 @@ private:
     Mat3d m_projection = Mat3d::Identity(); ///> Orthogonal projector
     Vec3d m_value = Vec3d(0., 0., 0.);      ///> Value in the subspace: range(I-m_projector)
 };
-
 } // imstk
 
 #endif // imstkLinearProjectionConstraint_h

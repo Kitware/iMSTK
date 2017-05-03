@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class CubeRenderDelegate
 ///
@@ -65,7 +64,6 @@ protected:
 
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
-
 } // imstk
 
 #endif // ifndef imstkCubeRenderDelegate_h

@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class GeometryMap
 ///
@@ -132,9 +131,7 @@ protected:
 
     std::shared_ptr<Geometry> m_master; ///> the geometry which dictates the configuration
     std::shared_ptr<Geometry> m_slave;  ///> the geometry which follows the master
-
 };
-
 }
 
 #endif // imstkGeometryMap_h

@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 TetraTriangleMap::compute()
 {
@@ -125,7 +124,7 @@ TetraTriangleMap::isValid() const
     for (size_t tetId = 0; tetId < m_verticesEnclosingTetraId.size(); ++tetId)
     {
         if (!(m_verticesEnclosingTetraId.at(tetId) < totalElementsMaster &&
-            m_verticesEnclosingTetraId.at(tetId) >= 0))
+              m_verticesEnclosingTetraId.at(tetId) >= 0))
         {
             return false;
         }
@@ -216,5 +215,4 @@ TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetr
     }
     return enclosingTetrahedron;
 }
-
 } // imstk

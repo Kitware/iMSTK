@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 class Geometry;
 class DeviceClient;
 
@@ -98,10 +97,9 @@ protected:
     Type m_type; ///> Type of the scene object
     std::string m_name; ///> Custom name of the scene object
     std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
- };
+};
 
 using VisualObject = SceneObject;
-
 } // imstk
 
 #endif // ifndef imstkSceneObject_h

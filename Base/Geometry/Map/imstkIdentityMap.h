@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class IdentityMap
 ///
@@ -67,7 +66,6 @@ public:
     ///
     const RigidTransform3d getTransform() const;
 };
-
 } // imstk
 
 #endif // imstkIdentityMap_h

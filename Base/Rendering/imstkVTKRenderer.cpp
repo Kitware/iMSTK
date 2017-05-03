@@ -35,7 +35,6 @@
 
 namespace imstk
 {
-
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
 {
     // Object actors
@@ -111,7 +110,6 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
     }
 
     this->setMode(Mode::SIMULATION);
-
 }
 
 vtkSmartPointer<vtkRenderer>
@@ -235,5 +233,4 @@ VTKRenderer::updateBackground(Vec3d backgroundOne, Vec3d backgroundTwo /*= Vec3d
         m_vtkRenderer->GradientBackgroundOff();
     }
 }
-
 } // imstk

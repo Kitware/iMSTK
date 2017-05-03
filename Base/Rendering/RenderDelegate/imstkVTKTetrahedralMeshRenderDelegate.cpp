@@ -36,7 +36,6 @@
 
 namespace imstk
 {
-
 VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
     m_geometry(tetrahedralMesh),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
@@ -125,5 +124,4 @@ VTKTetrahedralMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

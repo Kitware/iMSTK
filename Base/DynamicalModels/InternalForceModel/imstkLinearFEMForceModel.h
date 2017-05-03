@@ -36,7 +36,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class LinearFEMForceModel
 ///
@@ -49,8 +48,8 @@ public:
     /// \brief Constructor
     ///
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
-        const bool withGravity = true,
-        const double gravity = -9.81) : InternalForceModel()
+                        const bool withGravity = true,
+                        const double gravity = -9.81) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
@@ -130,7 +129,6 @@ protected:
     // tmp
     vega::SparseMatrix *m_stiffnessMatrixRawPtr;
 };
-
 } // imstk
 
 #endif // imstkLinearFEMForceModel_h

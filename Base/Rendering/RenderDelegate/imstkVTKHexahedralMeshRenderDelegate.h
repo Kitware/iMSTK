@@ -30,7 +30,6 @@ class vtkDoubleArray;
 
 namespace imstk
 {
-
 class HexahedralMesh;
 
 ///
@@ -66,7 +65,6 @@ protected:
     std::shared_ptr<HexahedralMesh> m_geometry;             ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
-
 } // imstk
 
 #endif // ifndef imstkTetrahedralMeshRenderDelegate_h

@@ -32,7 +32,6 @@ class vtkTextActor;
 
 namespace imstk
 {
-
 class SimulationManager;
 class VTKInteractorStyle; // pre-define class needed for VTKEventHandlerFunction
 
@@ -145,8 +144,6 @@ private:
     std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
     double m_lastFps; ///> last framerate value used for moving average estimate
 };
-
-
 } // imstk
 
 #endif // ifndef imstkInteractorStyle_h

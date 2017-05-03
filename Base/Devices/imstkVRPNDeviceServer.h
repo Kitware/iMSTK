@@ -36,7 +36,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Enumeration for device types
 ///
@@ -60,7 +59,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceServer(std::string machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO):
+    VRPNDeviceServer(std::string machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO) :
         m_machine(machine),
         m_port(port),
         Module(machine + ":" + std::to_string(port))
@@ -101,9 +100,7 @@ private:
     std::map<std::string, std::pair<DeviceType, int>> m_deviceInfoMap;///< list of iMSTK client info
     vrpn_Connection * m_serverConnection;                             ///< VRPN server connection
     vrpn_MainloopContainer* m_deviceConnections;                      ///< VRPN device connections
-
 };
-
 } // imstk
 
 #endif // ifndef imstkVRPNDeviceServer_h

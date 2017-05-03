@@ -30,9 +30,10 @@
 
 namespace imstk
 {
-
 FEMDeformableBodyModel::FEMDeformableBodyModel() :
-DynamicalModel(DynamicalModelType::elastoDynamics){}
+    DynamicalModel(DynamicalModelType::elastoDynamics)
+{
+}
 
 void
 FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
@@ -214,7 +215,6 @@ FEMDeformableBodyModel::initializeForceModel()
 
     default:
         LOG(WARNING) << "DeformableBodyModel::initializeForceModel: Unknown force model type";
-
     } //switch
 }
 
@@ -546,8 +546,8 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
 
 void
 FEMDeformableBodyModel::updateBodyIntermediateStates(
-                        const Vectord& solution,
-                        const stateUpdateType updateType)
+    const Vectord& solution,
+    const stateUpdateType updateType)
 {
     auto &uPrev = m_previousState->getQ();
     auto &u = m_currentState->getQ();
@@ -578,48 +578,48 @@ NonLinearSystem::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return[&, this](const Vectord& q, const bool semiImplicit) -> const Vectord&
-    {
-        (semiImplicit) ?
-        this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
-        this->computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+    return [&, this](const Vectord &q, const bool semiImplicit)->const Vectord &
+           {
+               (semiImplicit) ?
+               this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
+               this->computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
-        return m_Feff;
-    };
+               return m_Feff;
+           };
 }
 
 NonLinearSystem::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
     // Gradient of the nonlinear objective function given the current state
-    return [&, this](const Vectord& q) -> const SparseMatrixd&
-    {
-        this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+    return [&, this](const Vectord &q)->const SparseMatrixd &
+           {
+               this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
-        return m_Keff;
-    };
+               return m_Keff;
+           };
 }
 
 NonLinearSystem::UpdateFunctionType
 FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return[&, this](const Vectord& q, const bool fullyImplicit) -> void
-    {
-        (fullyImplicit) ?
-        this->updateBodyIntermediateStates(q, m_updateType) :
-        this->updateBodyStates(q, m_updateType);
-    };
+    return [&, this](const Vectord &q, const bool fullyImplicit)->void
+           {
+               (fullyImplicit) ?
+               this->updateBodyIntermediateStates(q, m_updateType) :
+               this->updateBodyStates(q, m_updateType);
+           };
 }
 
 NonLinearSystem::UpdatePrevStateFunctionType
 FEMDeformableBodyModel::getUpdatePrevStateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return[&, this]() -> void
-    {
-        this->updateBodyPreviousStates();
-    };
+    return [&, this]()->void
+           {
+               this->updateBodyPreviousStates();
+           };
 }
 
 void
@@ -649,5 +649,4 @@ FEMDeformableBodyModel::getContactForce()
 {
     return m_Fcontact;
 }
-
 } // imstk

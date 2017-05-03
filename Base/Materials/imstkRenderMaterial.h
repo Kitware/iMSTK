@@ -33,9 +33,6 @@
 
 namespace imstk
 {
-
-
-
 class RenderMaterial
 {
 public:
@@ -124,7 +121,6 @@ protected:
     bool m_stateModified = true; ///< Flag for expensive state changes
     bool m_modified = true; ///< Flag for any material property changes
 };
-
 }
 
 #endif

@@ -25,17 +25,18 @@
 
 namespace imstk
 {
-
 VTKScreenCaptureUtility::VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix /*= "Screenshot-"*/)
-    :m_screenShotNumber(0)
+    : m_screenShotNumber(0)
 {
     m_screenShotPrefix = prefix;
     if (rw != nullptr)
+    {
         m_renderWindow = rw;
+    }
 }
 
-    
-void 
+
+void
 VTKScreenCaptureUtility::saveScreenShot()
 {
     if (m_renderWindow == nullptr)
@@ -70,13 +71,13 @@ VTKScreenCaptureUtility::saveScreenShot()
 }
 
 
-unsigned int 
+unsigned int
 VTKScreenCaptureUtility::getScreenShotNumber() const
 {
     return m_screenShotNumber;
 }
 
-void 
+void
 VTKScreenCaptureUtility::setScreenShotPrefix(const std::string newPrefix)
 {
     if (m_screenShotPrefix.compare(newPrefix) != 0)
@@ -91,6 +92,4 @@ VTKScreenCaptureUtility::resetScreenShotNumber()
 {
     m_screenShotNumber = 0;
 }
-
-
 } // imstk

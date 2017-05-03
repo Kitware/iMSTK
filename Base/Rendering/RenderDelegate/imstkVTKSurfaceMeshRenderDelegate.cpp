@@ -40,7 +40,6 @@
 
 namespace imstk
 {
-
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
     m_geometry(surfaceMesh),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
@@ -175,5 +174,4 @@ VTKSurfaceMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

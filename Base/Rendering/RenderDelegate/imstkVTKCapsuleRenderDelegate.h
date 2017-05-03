@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class CapsuleRenderDelegate
 ///
@@ -64,7 +63,6 @@ protected:
     std::shared_ptr<Capsule> m_geometry; ///> Geometry
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
-
 } // imstk
 
 #endif // ifndef imstkCapsuleRenderDelegate_h

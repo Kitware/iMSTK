@@ -23,20 +23,21 @@
 
 namespace imstk
 {
-
 const double
 StopWatch::wcTimerConstants[] = {
     1.0,
     1 / 1000.0,
     1 / (1000.0*60.0),
-    1 / (1000.0*60.0 * 60) };
+    1 / (1000.0*60.0 * 60)
+};
 
 const double
 CpuTimer::cpuTimerConstants[] = {
     1000.0 / CLOCKS_PER_SEC,
     1.0 / CLOCKS_PER_SEC,
     1.0 / (CLOCKS_PER_SEC * 60.0),
-    1.0 / (CLOCKS_PER_SEC * 60.0 * 60.0) };
+    1.0 / (CLOCKS_PER_SEC * 60.0 * 60.0)
+};
 
 void
 StopWatch::start()
@@ -121,7 +122,8 @@ void
 StopWatch::printTimeElapsed(std::string const& name /* = std::string("noName")*/,
                             const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
-    switch (unitType) {
+    switch (unitType)
+    {
     case TimeUnitType::milliSeconds:
         LOG(INFO) << name << ": " << this->getTimeElapsed(unitType) << " ms.";
         break;
@@ -149,8 +151,8 @@ double
 StopWatch::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
     return std::chrono::duration<double, std::milli>
-        (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
-        wcTimerConstants[(int)unitType];
+           (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
+           wcTimerConstants[(int)unitType];
 }
 
 double
@@ -181,5 +183,4 @@ UPSCounter::setEndPointOfUpdate()
         m_accumulatedTimer = 0.;
     }
 }
-
 }

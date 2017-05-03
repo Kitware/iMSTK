@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 class SurfaceMesh;
 class CollisionData;
 
@@ -85,7 +84,6 @@ private:
     std::shared_ptr<DeformModel> m_modelA;  ///>
     std::shared_ptr<DeformModel> m_modelB;  ///>
 };
-
 }
 
 #endif // ifndef imstkMeshToMeshCD_h

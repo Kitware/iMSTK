@@ -28,7 +28,6 @@
 #include <g3log/g3log.hpp>
 
 namespace imstk {
-
 void
 SphereToSphereCD::computeCollisionData()
 {
@@ -62,5 +61,4 @@ SphereToSphereCD::computeCollisionData()
     // Set collisionData
     m_colData.PDColData.push_back({sphereAColPt, sphereBColPt, dirAToB, penetrationDepth});
 }
-
 }

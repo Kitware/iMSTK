@@ -42,10 +42,8 @@
 
 namespace imstk
 {
-
 namespace apiutils
 {
-
 ///
 /// \brief Create a analytical visual scene object that and add it to the scene
 ///
@@ -193,7 +191,6 @@ createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
 std::shared_ptr<imstk::NonLinearSystem>
 createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
 {
-
     if (!dynaModel)
     {
         LOG(WARNING) << "createNonLinearSystem: Dynamic model is not valid!";
@@ -215,9 +212,7 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
 
     return nlSystem;
 }
-
 } //apiutils
-
 } // imstk
 
 #endif // imstkAPIUtilities_h

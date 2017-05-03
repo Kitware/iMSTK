@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdModel
 ///
@@ -218,7 +217,6 @@ protected:
 
     double m_dt; ///> Time step size
 };
-
 } // imstk
 
 #endif // imstkPbdModel_h

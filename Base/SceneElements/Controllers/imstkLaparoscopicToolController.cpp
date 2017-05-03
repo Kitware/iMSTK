@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 void
 LaparoscopicToolController::initOffsets()
 {
@@ -107,5 +106,4 @@ LaparoscopicToolController::applyForces()
 
     m_trackingController->getDeviceClient()->setForce(force);
 }
-
 } // imstk

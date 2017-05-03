@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 InternalForceModel::updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double *values)
 {
@@ -45,5 +44,4 @@ InternalForceModel::updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> v
         offset += rowLengths[row];
     }
 }
-
 } // imstk

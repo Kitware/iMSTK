@@ -32,7 +32,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Enumeration the mesh file type
 ///
@@ -92,9 +91,7 @@ protected:
     /// \brief Returns the type of the file
     ///
     static const MeshFileType getFileType(const std::string& filePath);
-
 };
-
 } // imstk
 
 #endif // ifndef imstkMeshIO_h

@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 const LightType
 Light::getType()
 {
@@ -89,8 +88,8 @@ Light::setFocalPoint(const Vec3d& p)
 
 void
 Light::setFocalPoint(const double& x,
-                   const double& y,
-                   const double& z)
+                     const double& y,
+                     const double& z)
 {
     this->warningIfHeadLight();
     m_vtkLight->SetFocalPoint(x, y, z);
@@ -199,5 +198,4 @@ Light::warningIfHeadLight()
                      << "edit those parameters.";
     }
 }
-
 } // imstk

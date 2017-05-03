@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule) :
     m_geometry(capsule),
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
@@ -71,5 +70,4 @@ VTKCapsuleRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Capsule
 ///
@@ -87,7 +86,6 @@ protected:
     double m_length = 1.0;              ///> Length between the centers of two hemispheres
     double m_lengthPostTransform = 1.0; ///> Length after transform
 };
-
 } // imstk
 
 #endif // ifndef imstkCapsule_h

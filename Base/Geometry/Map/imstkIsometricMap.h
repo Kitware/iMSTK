@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class IsometricMap
 ///
@@ -81,9 +80,7 @@ public:
 protected:
 
     RigidTransform3d m_rigidTransform; ///> Rigid transform
-
 };
-
 } // imstk
 
 #endif // imstkIsometricMap_h

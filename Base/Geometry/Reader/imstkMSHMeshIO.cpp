@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<imstk::VolumetricMesh>
 MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
 {
@@ -124,7 +123,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
             break;
         }
     }
-    LOG(INFO) << "The MSH mesh comprises of: \n" << '\t' << "Number of NODES: " << nNodes ;
+    LOG(INFO) << "The MSH mesh comprises of: \n" << '\t' << "Number of NODES: " << nNodes;
 
     // Get the node IDs and the node coordinates
     nodeIDs.resize(nNodes);
@@ -151,7 +150,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
             mshLineStream >> node_yC;
             // z coordinate
             mshLineStream >> node_zC;
-            nodesCoords.push_back(Vec3d{ stod(node_xC), stod(node_yC), stod(node_zC) });
+            nodesCoords.push_back(Vec3d { stod(node_xC), stod(node_yC), stod(node_zC) });
             ++nodes_count;
         }
     }
@@ -385,41 +384,40 @@ MSHMeshIO::numElemNodes(const ElemType & elType)
 {
     switch (elType)
     {
-        case ElemType::line:                            return 2;
-        case ElemType::triangle:                        return 3;
-        case ElemType::quadrangle:                      return 4;
-        case ElemType::tetrahedron:                     return 4;
-        case ElemType::hexahedron:                      return 8;
-        case ElemType::prism:                           return 6;
-        case ElemType::pyramid:                         return 5;
-        case ElemType::lineSecondOrder:                 return 3;
-        case ElemType::triangleSecondOrder:             return 6;
-        case ElemType::quadrangleSecondOrderType1:      return 9;
-        case ElemType::tetrahedronSecondOrder:          return 10;
-        case ElemType::hexahedronSecondOrderType1:      return 27;
-        case ElemType::prismSecondOrderType1:           return 18;
-        case ElemType::pyramidSecondOrderType1:         return 14;
-        case ElemType::point:                           return 1;
-        case ElemType::quadrangleSecondOrderType2:      return 8;
-        case ElemType::hexahedronSecondOrderType2:      return 20;
-        case ElemType::prismSecondOrderType2:           return 15;
-        case ElemType::pyramidSecondOrderType2:         return 13;
-        case ElemType::triangleThirdOrderIncomplete:    return 9;
-        case ElemType::triangleThirdOrder:              return 10;
-        case ElemType::triangleFourthOrderIncomplete:   return 12;
-        case ElemType::triangleFourthOrder:             return 15;
-        case ElemType::triangleFifthOrderIncomplete:    return 15;
-        case ElemType::triangleFifthOrder:              return 21;
-        case ElemType::edgeThirdOrder:                  return 4;
-        case ElemType::edgeFourthOrder:                 return 5;
-        case ElemType::edgeFifthOrder:                  return 6;
-        case ElemType::tetrahedronThirdOrder:           return 20;
-        case ElemType::tetrahedronFourthOrder:          return 35;
-        case ElemType::tetrahedronFifthOrder:           return 56;
-        default:
-            LOG(WARNING) << "MSHMeshIO::numElemNodes: Unknown element type";
-            return 0;
+    case ElemType::line:                            return 2;
+    case ElemType::triangle:                        return 3;
+    case ElemType::quadrangle:                      return 4;
+    case ElemType::tetrahedron:                     return 4;
+    case ElemType::hexahedron:                      return 8;
+    case ElemType::prism:                           return 6;
+    case ElemType::pyramid:                         return 5;
+    case ElemType::lineSecondOrder:                 return 3;
+    case ElemType::triangleSecondOrder:             return 6;
+    case ElemType::quadrangleSecondOrderType1:      return 9;
+    case ElemType::tetrahedronSecondOrder:          return 10;
+    case ElemType::hexahedronSecondOrderType1:      return 27;
+    case ElemType::prismSecondOrderType1:           return 18;
+    case ElemType::pyramidSecondOrderType1:         return 14;
+    case ElemType::point:                           return 1;
+    case ElemType::quadrangleSecondOrderType2:      return 8;
+    case ElemType::hexahedronSecondOrderType2:      return 20;
+    case ElemType::prismSecondOrderType2:           return 15;
+    case ElemType::pyramidSecondOrderType2:         return 13;
+    case ElemType::triangleThirdOrderIncomplete:    return 9;
+    case ElemType::triangleThirdOrder:              return 10;
+    case ElemType::triangleFourthOrderIncomplete:   return 12;
+    case ElemType::triangleFourthOrder:             return 15;
+    case ElemType::triangleFifthOrderIncomplete:    return 15;
+    case ElemType::triangleFifthOrder:              return 21;
+    case ElemType::edgeThirdOrder:                  return 4;
+    case ElemType::edgeFourthOrder:                 return 5;
+    case ElemType::edgeFifthOrder:                  return 6;
+    case ElemType::tetrahedronThirdOrder:           return 20;
+    case ElemType::tetrahedronFourthOrder:          return 35;
+    case ElemType::tetrahedronFifthOrder:           return 56;
+    default:
+        LOG(WARNING) << "MSHMeshIO::numElemNodes: Unknown element type";
+        return 0;
     }
 }
-
 } // iMSTK

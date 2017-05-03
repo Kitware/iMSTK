@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 class CollidingObject;
 class CollisionData;
 
@@ -58,9 +57,9 @@ public:
     /// \brief Static factory for collision detection sub classes
     ///
     static std::shared_ptr<CollisionDetection> make_collision_detection(const Type& type,
-            std::shared_ptr<CollidingObject> objA,
-            std::shared_ptr<CollidingObject> objB,
-            CollisionData& colData);
+                                                                        std::shared_ptr<CollidingObject> objA,
+                                                                        std::shared_ptr<CollidingObject> objB,
+                                                                        CollisionData& colData);
 
     ///
     /// \brief Constructor
@@ -95,9 +94,7 @@ protected:
 
     Type m_type;              ///< Collision detection algorithm type
     CollisionData& m_colData; ///< Collision data
-
 };
-
 }
 
 #endif // ifndef imstkCollisionDetection_h

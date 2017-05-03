@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 class Mesh;
 class Sphere;
 class CollisionData;
@@ -46,12 +45,12 @@ public:
     /// \brief Constructor
     ///
     MeshToSphereCD(std::shared_ptr<Mesh> mesh,
-				   std::shared_ptr<Sphere> sphere,
-				   CollisionData& colData) :
-				   CollisionDetection(CollisionDetection::Type::MeshToSphere,
-                   colData),
-				   m_mesh(mesh),
-				   m_sphere(sphere){}
+                   std::shared_ptr<Sphere> sphere,
+                   CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::MeshToSphere,
+                           colData),
+        m_mesh(mesh),
+        m_sphere(sphere){}
 
     ///
     /// \brief Destructor
@@ -68,7 +67,6 @@ private:
     std::shared_ptr<Mesh> m_mesh;       ///> Mesh
     std::shared_ptr<Sphere> m_sphere;  ///> Sphere
 };
-
 }
 
 #endif // ifndef imstkMeshToSphereCD_h

@@ -26,13 +26,11 @@
 
 namespace imstk
 {
-
 ///
 /// \brief The PbdPointTriangleConstraint class for point-triangle collision response
 ///
 class PbdPointTriangleConstraint : public PbdCollisionConstraint
 {
-
 public:
     PbdPointTriangleConstraint() : PbdCollisionConstraint(1,3)
     {}
@@ -62,7 +60,6 @@ public:
     ///
     bool solvePositionConstraint();
 };
-
 }
 
 #endif // imstkPbdPointTriangleCollConstraint_h

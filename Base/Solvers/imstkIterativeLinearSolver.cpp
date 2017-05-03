@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 IterativeLinearSolver::setMaxNumIterations(const size_t maxIter)
 {
@@ -87,5 +86,4 @@ IterativeLinearSolver::solve(Vectord& x)
         this->iterate(x);
     }
 }
-
 } //imstk

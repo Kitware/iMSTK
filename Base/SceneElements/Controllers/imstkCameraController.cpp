@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 void
 CameraController::initModule()
 {
@@ -72,6 +71,6 @@ CameraController::runModule()
 
 void
 CameraController::cleanUpModule()
-{}
-
+{
+}
 } // imstk

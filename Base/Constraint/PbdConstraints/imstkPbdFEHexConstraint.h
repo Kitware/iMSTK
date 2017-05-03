@@ -26,14 +26,13 @@
 
 namespace imstk
 {
-
 ///
 /// \class FEMHexConstraint
 ///
 /// \brief The FEMHexConstraint class class for constraint as the elastic energy
 /// computed by linear shape functions with hexahedral mesh.
 ///
-class PbdFEMHexConstraint : public  PbdFEMConstraint
+class PbdFEMHexConstraint : public PbdFEMConstraint
 {
 public:
     ///
@@ -51,17 +50,16 @@ public:
     /// \brief Initializes the FEM hexahedral element constraint
     ///
     bool initConstraint(PbdModel& model, const unsigned int& pIdx1,
-        const unsigned int& pIdx2, const unsigned int& pIdx3,
-        const unsigned int& pIdx4, const unsigned int& pIdx5,
-        const unsigned int& pIdx6, const unsigned int& pIdx7,
-        const unsigned int& pIdx8);
+                        const unsigned int& pIdx2, const unsigned int& pIdx3,
+                        const unsigned int& pIdx4, const unsigned int& pIdx5,
+                        const unsigned int& pIdx6, const unsigned int& pIdx7,
+                        const unsigned int& pIdx8);
 
     ///
     /// \brief Solves the FEM hexahedral element constraint
     ///
     bool solvePositionConstraint(PbdModel &model) override;
 };
-
 } // imstk
 
 #endif // imstkPbdFeHexConstraint_h

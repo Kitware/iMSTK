@@ -34,7 +34,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class CorotationalFEMForceModel
 ///
@@ -89,7 +88,6 @@ protected:
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
     int m_warp;
 };
-
 } // imstk
 
 #endif // imstkCorotationalFEMForceModel_h

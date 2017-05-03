@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VegaMeshIO
 ///
@@ -42,7 +41,6 @@ namespace imstk
 ///
 class VegaMeshIO
 {
-
 public:
     ///
     /// \brief Default constructor
@@ -91,7 +89,6 @@ protected:
     template<size_t dim>
     static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, std::vector<std::array<size_t,dim>>& cells);
 };
-
 } // imstk
 
 #endif // ifndef imstkVegaMeshIO_h

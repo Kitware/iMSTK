@@ -29,13 +29,11 @@
 
 namespace imstk
 {
-
 ///
 /// \class Newmark-beta time integration
 ///
 class NewmarkBeta : public TimeIntegrator
 {
-
 public:
     ///
     /// \brief Constructor
@@ -57,7 +55,6 @@ public:
 
     void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dU)
     {
-
     }
 
     void updateStateGivenV(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& v)
@@ -69,7 +66,6 @@ public:
 
     void updateStateGivenU(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& u)
     {
-
     }
 protected:
     double m_beta;
@@ -80,7 +76,6 @@ protected:
 //    std::array<double, 3> m_beta = { { 1, -1, 0 } };
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
-
 } // imstk
 
 #endif // ifndef imstkBackwardEuler_h

@@ -37,7 +37,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
@@ -49,7 +48,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceClient(std::string deviceName, std::string ip):
+    VRPNDeviceClient(std::string deviceName, std::string ip) :
         DeviceClient(deviceName, ip),
         Module(deviceName+"@"+ip)
     {}

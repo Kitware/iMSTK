@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 bool
 DeviceTracker::updateTrackingData()
 {
@@ -42,12 +41,30 @@ DeviceTracker::updateTrackingData()
     m_currentRot = m_deviceClient->getOrientation();
 
     // Apply inverse if needed
-    if (m_invertFlags & InvertFlag::transX) m_currentPos[0] = -m_currentPos[0];
-    if (m_invertFlags & InvertFlag::transY) m_currentPos[1] = -m_currentPos[1];
-    if (m_invertFlags & InvertFlag::transZ) m_currentPos[2] = -m_currentPos[2];
-    if (m_invertFlags & InvertFlag::rotX) m_currentRot.x() = -m_currentRot.x();
-    if (m_invertFlags & InvertFlag::rotY) m_currentRot.y() = -m_currentRot.y();
-    if (m_invertFlags & InvertFlag::rotZ) m_currentRot.z() = -m_currentRot.z();
+    if (m_invertFlags & InvertFlag::transX)
+    {
+        m_currentPos[0] = -m_currentPos[0];
+    }
+    if (m_invertFlags & InvertFlag::transY)
+    {
+        m_currentPos[1] = -m_currentPos[1];
+    }
+    if (m_invertFlags & InvertFlag::transZ)
+    {
+        m_currentPos[2] = -m_currentPos[2];
+    }
+    if (m_invertFlags & InvertFlag::rotX)
+    {
+        m_currentRot.x() = -m_currentRot.x();
+    }
+    if (m_invertFlags & InvertFlag::rotY)
+    {
+        m_currentRot.y() = -m_currentRot.y();
+    }
+    if (m_invertFlags & InvertFlag::rotZ)
+    {
+        m_currentRot.z() = -m_currentRot.z();
+    }
 
     // Apply Offsets
     m_currentPos = m_rotationOffset * m_currentPos * m_scaling + m_translationOffset;
@@ -117,5 +134,4 @@ DeviceTracker::setInversionFlags(unsigned char f)
 {
     m_invertFlags = f;
 }
-
 } // imstk

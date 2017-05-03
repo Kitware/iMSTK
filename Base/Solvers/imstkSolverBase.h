@@ -24,13 +24,11 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Base class for solvers
 ///
 class SolverBase
 {
-
 public:
     ///
     /// \brief Default Constructor/Destructor
@@ -38,10 +36,8 @@ public:
     SolverBase() = default;
     virtual ~SolverBase() = default;
 
-    virtual void solve() =0;
-
+    virtual void solve() = 0;
 };
-
 } // imstk
 
 #endif // SOLVERS_NONLINEARSOLVER_H

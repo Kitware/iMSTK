@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 NonLinearSystem::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF)
 {
     m_F = F;
@@ -55,5 +54,4 @@ NonLinearSystem::evaluateJacobian(const Vectord& x)
 {
     return m_dF(x);
 }
-
 } //imstk

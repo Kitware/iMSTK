@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class InternalForceModel
 ///
@@ -40,7 +39,6 @@ namespace imstk
 ///
 class InternalForceModel
 {
-
 public:
     ///
     /// \brief Constructor
@@ -81,9 +79,7 @@ public:
     /// \brief
     ///
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) = 0;
-
 };
-
 } //imstk
 
 #endif // ifndef imstkTimeIntegrator_h

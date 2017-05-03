@@ -29,13 +29,11 @@
 
 namespace imstk
 {
-
 ///
 /// \class Backward Euler time integration
 ///
 class BackwardEuler : public TimeIntegrator
 {
-
 public:
     ///
     /// \brief Constructor
@@ -82,7 +80,6 @@ protected:
 //    std::array<double, 3> m_beta = { { 1, -1, 0 } };
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
-
 } // imstk
 
 #endif // ifndef imstkBackwardEuler_h

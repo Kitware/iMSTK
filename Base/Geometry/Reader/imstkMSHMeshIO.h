@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class MSHMeshIO
 ///
@@ -100,7 +99,6 @@ protected:
     //
     static size_t numElemNodes(const ElemType& elType);
 };
-
 }
 
 #endif// imstkMSHMeshIO_h

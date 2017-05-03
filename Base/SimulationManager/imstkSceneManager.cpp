@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<Scene>
 SceneManager::getScene()
 {
@@ -169,5 +168,4 @@ SceneManager::startModuleInNewThread(std::shared_ptr<Module> module)
 {
     m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
-
 } // imstk

@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 bool
 PbdObject::initialize(int nCons, ...)
 {
@@ -58,7 +57,7 @@ PbdObject::initialize(int nCons, ...)
             ++len;
         }
 
-        if (strncmp("FEM",&s[0],len)==0)
+        if (strncmp("FEM",&s[0],len) == 0)
         {
             int pos = len+1;
             len = 0;
@@ -67,17 +66,17 @@ PbdObject::initialize(int nCons, ...)
                 ++len;
             }
 
-            if (strncmp("Corotation",&s[pos],len)==0)
+            if (strncmp("Corotation",&s[pos],len) == 0)
             {
                 LOG(INFO) << "Creating Corotation constraints";
                 m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation);
             }
-            else if (strncmp("NeoHookean",&s[pos],len)==0)
+            else if (strncmp("NeoHookean",&s[pos],len) == 0)
             {
                 LOG(INFO) << "Creating Neohookean constraints";
                 m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean);
             }
-            else if (strncmp("Stvk",&s[pos],len)==0)
+            else if (strncmp("Stvk",&s[pos],len) == 0)
             {
                 LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
                 m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
@@ -91,28 +90,28 @@ PbdObject::initialize(int nCons, ...)
             sscanf(&s[pos+len+1], "%f %f", &YoungModulus, &PoissonRatio);
             m_pbdModel->computeLameConstants(YoungModulus, PoissonRatio);
         }
-        else if (strncmp("Volume",&s[0],len)==0)
+        else if (strncmp("Volume",&s[0],len) == 0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
-            LOG(INFO) << "Creating Volume constraints " << stiffness ;
+            LOG(INFO) << "Creating Volume constraints " << stiffness;
             m_pbdModel->initializeVolumeConstraints(stiffness);
         }
-        else if (strncmp("Distance",&s[0],len)==0)
+        else if (strncmp("Distance",&s[0],len) == 0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Distance constraints " << stiffness;
             m_pbdModel->initializeDistanceConstraints(stiffness);
         }
-        else if (strncmp("Area",&s[0],len)==0)
+        else if (strncmp("Area",&s[0],len) == 0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Area constraints " << stiffness;
             m_pbdModel->initializeAreaConstraints(stiffness);
         }
-        else if (strncmp("Dihedral",&s[0],len)==0)
+        else if (strncmp("Dihedral",&s[0],len) == 0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
@@ -198,5 +197,4 @@ PbdObject::solveConstraints()
         m_pbdModel->projectConstraints();
     }
 }
-
 } //imstk

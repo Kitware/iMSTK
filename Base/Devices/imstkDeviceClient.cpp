@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 const std::string&
 DeviceClient::getIp()
 {
@@ -145,5 +144,4 @@ DeviceClient::setForce(Vec3d force)
 {
     m_force = force;
 }
-
 } // imstk

@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class LinearSystem
 /// \brief Represents the linear system of the form \f$ Ax = b \f$
@@ -34,7 +33,6 @@ namespace imstk
 template<typename SystemMatrixType>
 class LinearSystem : public NonLinearSystem
 {
-
 public:
     ///
     /// \brief Constructor/destructor(s). This class can't be constructed without
@@ -111,25 +109,25 @@ public:
     /// \brief Returns template expression for the lower triangular part of A.
     ///
     Eigen::TriangularView < SystemMatrixType, Eigen::Lower >
-        getLowerTriangular() const;
+    getLowerTriangular() const;
 
     ///
     /// \brief Returns template expression for the strict lower triangular part of A.
     ///
     Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyLower >
-        getStrictLowerTriangular() const;
+    getStrictLowerTriangular() const;
 
     ///
     /// \brief Returns template expression for the upper triangular part of A.
     ///
     Eigen::TriangularView < SystemMatrixType, Eigen::Upper >
-        getUpperTrianglular() const;
+    getUpperTrianglular() const;
 
     ///
     /// \brief Returns template expression for the strict upper triangular part of A.
     ///
     Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyUpper >
-        getStrictUpperTriangular() const;
+    getStrictUpperTriangular() const;
 
     ///
     /// \brief Get the value of the function F
@@ -147,7 +145,6 @@ private:
 
     Vectord m_f; ///> Scratch storage for matrix-vector operations
 };
-
 } // imstk
 
 #endif // imstkLinearSystem_h

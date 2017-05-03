@@ -23,7 +23,7 @@
 #define imstkDirectLinearSolver_h
 
 #include <Eigen/Sparse>
-#include<Eigen/SparseLU>
+#include <Eigen/SparseLU>
 
 // iMSTK includes
 #include "imstkLinearSolver.h"
@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 template<typename MatrixType> class DirectLinearSolver;
 
 ///
@@ -117,7 +116,6 @@ public:
 private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;//?
 };
-
 } // imstk
 
 #endif // imstkDirectLinearSolver_h

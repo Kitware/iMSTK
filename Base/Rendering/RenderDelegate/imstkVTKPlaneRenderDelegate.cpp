@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     m_geometry(plane),
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
@@ -68,5 +67,4 @@ VTKPlaneRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-
 } // imstk

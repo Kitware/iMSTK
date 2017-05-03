@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Force Model
 ///
@@ -41,7 +40,7 @@ namespace imstk
 ///
 class FEElasticityForceModel : public InternalForceModel
 {
-    using class vega::LinearFEMForceModel FEElasticForceModel;
+using class vega::LinearFEMForceModel FEElasticForceModel;
 
 public:
     ///
@@ -74,7 +73,6 @@ public:
 protected:
     std::shared_ptr<FEElasticForceModel> m_feElasticForceModel;
 };
-
 }
 
 #endif // ifndef imstkTimeIntegrator_h

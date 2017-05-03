@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining()
     : SpatialHashTable()
 {
@@ -72,24 +71,28 @@ SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Ve
     auto max_z = std::fmax(corner1.z(), corner2.z());
 
     std::unordered_set<PointEntry> tempPoints(0);
-    
+
     // Coarse iteration (false positives may exist)
     for (double x = min_x; x < max_x + m_cellSize[0]; x += m_cellSize[0])
-    for (double y = min_y; y < max_y + m_cellSize[1]; y += m_cellSize[1])
-    for (double z = min_z; z < max_z + m_cellSize[2]; z += m_cellSize[2])
     {
-        PointEntry point;
-        point.point = Vec3d(x, y, z);
-        point.cellSize = m_cellSize;
-
-        auto bucket = m_table->bucket(point);
-
-        auto first = m_table->begin(bucket);
-        auto last = m_table->end(bucket);
-
-        for (auto p = first; p != last; ++p)
+        for (double y = min_y; y < max_y + m_cellSize[1]; y += m_cellSize[1])
         {
-            tempPoints.insert(*p);
+            for (double z = min_z; z < max_z + m_cellSize[2]; z += m_cellSize[2])
+            {
+                PointEntry point;
+                point.point = Vec3d(x, y, z);
+                point.cellSize = m_cellSize;
+
+                auto bucket = m_table->bucket(point);
+
+                auto first = m_table->begin(bucket);
+                auto last = m_table->end(bucket);
+
+                for (auto p = first; p != last; ++p)
+                {
+                    tempPoints.insert(*p);
+                }
+            }
         }
     }
 
@@ -135,6 +138,4 @@ SpatialHashTableSeparateChaining::rehash()
 {
     m_table->rehash(m_table->bucket_count());
 }
-
 }
-

@@ -34,7 +34,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Enumeration for the type of light
 ///
@@ -95,8 +94,8 @@ public:
     ///
     void setFocalPoint(const Vec3d& p);
     void setFocalPoint(const double& x,
-                     const double& y,
-                     const double& z);
+                       const double& y,
+                       const double& z);
 
     ///
     /// \brief
@@ -182,7 +181,6 @@ protected:
     vtkSmartPointer<vtkLight> m_vtkLight = vtkSmartPointer<vtkLight>::New();
     std::string m_name;
 };
-
 } // imstk
 
 #endif // ifndef imstkLight_h

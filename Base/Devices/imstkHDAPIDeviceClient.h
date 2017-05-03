@@ -34,7 +34,6 @@
 
 namespace imstk
 {
-
 struct HD_state
 {
     HDdouble pos[3];
@@ -54,7 +53,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    HDAPIDeviceClient(std::string name): DeviceClient(name, "localhost"){}
+    HDAPIDeviceClient(std::string name) : DeviceClient(name, "localhost"){}
     virtual ~HDAPIDeviceClient(){}
 
 protected:
@@ -84,7 +83,6 @@ private:
 
     HHD m_handle;     ///< device handle
     HD_state m_state; ///< device reading state
-
 };
 }
 

@@ -27,7 +27,6 @@
 #include <g3log/g3log.hpp>
 
 namespace imstk {
-
 TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                                std::shared_ptr<TetrahedralMesh> meshB,
                                CollisionData& colData) :
@@ -44,7 +43,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     Vec3d vPos;
     const auto eps = MACHINE_PRECISION;
     const double eps2 = 1e-10;
-    
+
     //tetrahedron belonging part of penetration type does not change
     auto cType = static_cast<PointTetrahedronCollisionData::CollisionType>(idOffset > 0);
 
@@ -70,7 +69,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                     vId != vInd[1] &&
                     vId != vInd[2] &&
                     vId != vInd[3])
-                {                    
+                {
                     //this determines vertex belonging part of the penetration type
                     //and gets vertex position
                     if (vId < m_meshA->getNumVertices())
@@ -115,5 +114,4 @@ TetraToTetraCD::computeCollisionData()
     this->findCollisionsForMeshWithinHashTable(m_meshA, 0);
     this->findCollisionsForMeshWithinHashTable(m_meshB, m_meshA->getNumVertices());
 }
-
 }

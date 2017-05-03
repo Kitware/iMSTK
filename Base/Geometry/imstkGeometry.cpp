@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 Geometry::print() const
 {
@@ -253,5 +252,4 @@ Geometry::getRenderMaterial() const
 {
     return m_renderMaterial;
 }
-
 } // imstk

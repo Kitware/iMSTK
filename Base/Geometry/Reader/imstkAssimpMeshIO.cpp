@@ -25,19 +25,18 @@
 
 namespace imstk
 {
-
 std::shared_ptr<SurfaceMesh>
 AssimpMeshIO::read(const std::string& filePath, MeshFileType type)
 {
     switch (type)
     {
-    case MeshFileType::OBJ :
-    case MeshFileType::DAE :
-    case MeshFileType::FBX :
-    case MeshFileType::_3DS :
+    case MeshFileType::OBJ:
+    case MeshFileType::DAE:
+    case MeshFileType::FBX:
+    case MeshFileType::_3DS:
         return AssimpMeshIO::readMeshData(filePath);
         break;
-    default :
+    default:
         LOG(WARNING) << "AssimpMeshIO::read error: file type not supported";
         return nullptr;
         break;
@@ -155,5 +154,4 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
 
     return mesh;
 }
-
 }

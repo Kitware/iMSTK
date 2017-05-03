@@ -24,11 +24,10 @@
 
 namespace  imstk
 {
-
 bool
 PbdFEMTetConstraint::initConstraint(PbdModel &model,
-                                 const size_t& pIdx1, const size_t& pIdx2,
-                                 const size_t& pIdx3, const size_t& pIdx4)
+                                    const size_t& pIdx1, const size_t& pIdx2,
+                                    const size_t& pIdx3, const size_t& pIdx4)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
@@ -93,9 +92,8 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
 
     switch (m_material)
     {
-
-        // P(F) = F*(2*mu*E + lambda*tr(E)*I)
-        // E = (F^T*F - I)/2
+    // P(F) = F*(2*mu*E + lambda*tr(E)*I)
+    // E = (F^T*F - I)/2
     case MaterialType::StVK:
     {
         Mat3d E;
@@ -184,9 +182,9 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     Mat3d gradC = m_elementVolume*P*m_invRestMat.transpose();
 
     double sum = im1*gradC.col(0).squaredNorm()
-        + im2*gradC.col(1).squaredNorm()
-        + im3*gradC.col(2).squaredNorm()
-        + im4*(gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
+                 + im2*gradC.col(1).squaredNorm()
+                 + im3*gradC.col(2).squaredNorm()
+                 + im4*(gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
 
     if (sum < m_epsilon)
     {
@@ -219,5 +217,4 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
 
     return true;
 }
-
 } // imstk

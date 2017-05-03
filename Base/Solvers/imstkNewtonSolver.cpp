@@ -27,8 +27,7 @@
 
 namespace imstk
 {
-
-NewtonSolver::NewtonSolver():
+NewtonSolver::NewtonSolver() :
     m_linearSolver(std::make_shared<ConjugateGradient>()),
     m_forcingTerm(0.9),
     m_absoluteTolerance(1e-3),
@@ -36,7 +35,9 @@ NewtonSolver::NewtonSolver():
     m_gamma(0.9),
     m_etaMax(0.9),
     m_maxIterations(1),
-    m_useArmijo(true){}
+    m_useArmijo(true)
+{
+}
 
 void
 NewtonSolver::solveGivenState(Vectord& x)
@@ -107,7 +108,7 @@ NewtonSolver::solve()
             error0 = error;
         }
 
-        if (error / error0 < epsilon && iterNum>0)
+        if (error / error0 < epsilon && iterNum > 0)
         {
             //std::cout << "Num. of Newton Iterations: " << i << "\tError ratio: " << error/error0 << std::endl;
             break;
@@ -189,5 +190,4 @@ NewtonSolver::getAbsoluteTolerance() const
 {
     return m_absoluteTolerance;
 }
-
 } // imstk

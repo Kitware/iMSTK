@@ -24,12 +24,11 @@
 
 namespace imstk
 {
-
 void
 PbdEdgeEdgeConstraint::initConstraint(std::shared_ptr<PbdModel> model1,
-                                    const size_t& pIdx1, const size_t& pIdx2,
-                                    std::shared_ptr<PbdModel> model2,
-                                    const size_t& pIdx3, const size_t& pIdx4)
+                                      const size_t& pIdx1, const size_t& pIdx2,
+                                      std::shared_ptr<PbdModel> model2,
+                                      const size_t& pIdx3, const size_t& pIdx4)
 {
     m_model1 = model1;
     m_model2 = model2;
@@ -104,9 +103,9 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     const auto im3 = m_model2->getInvMass(i3);
 
     auto lambda = im0*grad0.squaredNorm() +
-                    im1*grad1.squaredNorm() +
-                    im2*grad2.squaredNorm() +
-                    im3*grad3.squaredNorm();
+                  im1*grad1.squaredNorm() +
+                  im2*grad2.squaredNorm() +
+                  im3*grad3.squaredNorm();
 
     lambda = (l - dist)/lambda;
 
@@ -134,5 +133,4 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
 
     return true;
 }
-
 } // imstk

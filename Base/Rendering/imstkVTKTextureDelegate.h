@@ -36,7 +36,6 @@
 
 namespace imstk
 {
-
 class VTKTextureDelegate;
 
 ///
@@ -71,7 +70,6 @@ protected:
 
     vtkSmartPointer<vtkTexture> m_sourceTexture;    ///< VTK texture
 };
-
 }
 
 #endif

@@ -24,7 +24,6 @@
 
 namespace  imstk
 {
-
 void
 PbdDistanceConstraint::initConstraint(PbdModel& model, const size_t& pIdx1,
                                       const size_t& pIdx2, const double k)
@@ -78,5 +77,4 @@ PbdDistanceConstraint::solvePositionConstraint(PbdModel &model)
     }
     return true;
 }
-
 } // imstk

@@ -24,7 +24,6 @@
 
 namespace imstk
 {
-
 void
 PbdPointTriangleConstraint::initConstraint(std::shared_ptr<PbdModel> model1, const size_t& pIdx1,
                                            std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
@@ -121,5 +120,4 @@ PbdPointTriangleConstraint::solvePositionConstraint()
 
     return true;
 }
-
 } // imstk

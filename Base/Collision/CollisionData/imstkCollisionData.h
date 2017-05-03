@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 ///
 /// \struct PositionDirectionCollisionData
 ///
@@ -118,7 +117,8 @@ struct EdgeEdgeCollisionData
 ///
 struct PointTetrahedronCollisionData
 {
-    enum CollisionType {
+    enum CollisionType
+    {
         aPenetratingA = 0, // A self-penetration
         aPenetratingB = 1, // vertex is from mesh A, tetrahedron is from mesh B
         bPenetratingA = 2, // vertex is from mesh B, tetrahedron is from mesh A
@@ -166,7 +166,6 @@ public:
     std::vector<PointTetrahedronCollisionData> PTColData;  ///< Point Tetrahedron collision data
     std::vector<PickingCollisionData> NodePickData;        ///< List of points that are picked
 };
-
 }
 
 #endif // ifndef imstkCollisionData_h

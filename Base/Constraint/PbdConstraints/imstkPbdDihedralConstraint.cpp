@@ -24,7 +24,6 @@
 
 namespace  imstk
 {
-
 void
 PbdDihedralConstraint::initConstraint(PbdModel &model,
                                       const size_t& pIdx1, const size_t& pIdx2,
@@ -100,9 +99,9 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
     const auto grad3 = (e.dot(e2) / (A1*l))*n1 + (e.dot(e4) / (A2*l))*n2;
 
     auto lambda = im0*grad0.squaredNorm() +
-                im1*grad1.squaredNorm() +
-                im2*grad2.squaredNorm() +
-                im3*grad3.squaredNorm();
+                  im1*grad1.squaredNorm() +
+                  im2*grad2.squaredNorm() +
+                  im3*grad3.squaredNorm();
 
     // huge difference if use acos instead of atan2
     lambda = (atan2(n1.cross(n2).dot(e), l*n1.dot(n2)) - m_restAngle) / lambda * m_stiffness;
@@ -129,5 +128,4 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
 
     return true;
 }
-
 } // imstk

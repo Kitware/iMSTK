@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Plane
 ///
@@ -86,7 +85,6 @@ protected:
     double m_width = 1.0;               ///> Width of the plane
     double m_widthPostTransform = 1.0;  ///> Width of the plane once transform applied
 };
-
 } // imstk
 
 #endif // ifndef imstkPlane_h

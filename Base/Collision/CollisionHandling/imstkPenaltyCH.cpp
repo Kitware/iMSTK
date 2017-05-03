@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 void
 PenaltyCH::computeContactForces()
 {
@@ -123,5 +122,4 @@ PenaltyCH::computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObje
         force(nodeDofID + 2) += nodalForce.z();
     }
 }
-
 }

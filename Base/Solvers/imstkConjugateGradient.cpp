@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 ConjugateGradient::ConjugateGradient()
 {
     m_cgSolver.setMaxIterations(m_maxIterations);
@@ -176,5 +175,4 @@ ConjugateGradient::solve(Vectord& x, const double tolerance)
     this->setTolerance(tolerance);
     this->solve(x);
 }
-
 } // imstk

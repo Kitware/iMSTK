@@ -26,13 +26,11 @@
 
 namespace imstk
 {
-
 ///
 /// \brief The PbdEdgeEdgeConstraint class for edge-edge collision response
 ///
 class PbdEdgeEdgeConstraint : public PbdCollisionConstraint
 {
-
 public:
     PbdEdgeEdgeConstraint() : PbdCollisionConstraint(2,2) {}
 
@@ -59,7 +57,6 @@ public:
     ///
     bool solvePositionConstraint();
 };
-
 }
 
 #endif // imstkPbdEdgeEdgeCollConstraint_h

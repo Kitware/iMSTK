@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 std::shared_ptr<Geometry>
 SceneObject::getVisualGeometry() const
 {
@@ -68,5 +67,4 @@ SceneObject::setName(const std::string& name)
 {
     m_name = name;
 }
-
 } // imstk

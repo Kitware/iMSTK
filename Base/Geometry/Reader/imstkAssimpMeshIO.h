@@ -32,7 +32,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class AssimpMeshIO
 ///
@@ -55,7 +54,6 @@ protected:
     ///
     static std::shared_ptr<SurfaceMesh> readMeshData(const std::string& filePath);
 };
-
 }
 
 #endif

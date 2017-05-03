@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class TetraTriangleMap
 ///
@@ -85,19 +84,18 @@ public:
     /// \brief Find the closest tetrahedron based on the distance to their centroids for a given point in 3D space
     ///
     static size_t findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
-                                      const Vec3d& pos);
+                                         const Vec3d& pos);
 
     ///
     /// \brief Find the tetrahedron that encloses a given point in 3D space
     ///
     static size_t findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
-                                        const Vec3d& pos);
+                                           const Vec3d& pos);
 
 protected:
     std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
     std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
 };
-
 } // imstk
 
 #endif // imstkTetraTriangleMap_h

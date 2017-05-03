@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Enumerations for the status of the module
 ///
@@ -49,7 +48,7 @@ enum class ModuleStatus
 ///
 class Module
 {
-    using CallbackFunction = std::function<void(Module* module)>;
+using CallbackFunction = std::function<void(Module* module)>;
 
 public:
     ///
@@ -146,12 +145,11 @@ protected:
     CallbackFunction m_preCleanUpCallback;  ///> function callback preceding module cleanup
     CallbackFunction m_postCleanUpCallback; ///> function callback following module cleanup
 
-    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE}; ///> Module status
+    std::atomic<ModuleStatus> m_status {ModuleStatus::INACTIVE}; ///> Module status
 
-    std::string  m_name;    ///> Name of the module
+    std::string m_name;     ///> Name of the module
     double m_loopDelay;     ///> Loop delay
 };
-
 }
 
 #endif // ifndef imstkModule_h

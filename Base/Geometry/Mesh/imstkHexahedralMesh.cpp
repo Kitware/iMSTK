@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 HexahedralMesh::initialize(const StdVectorOfVec3d& vertices,
                            const std::vector<HexaArray>& hexahedra,
@@ -80,8 +79,8 @@ HexahedralMesh::getVolume() const
         c = v[3] - v[5];
 
         A << a[0], b[0], c[0],
-             a[1], b[1], c[1],
-             a[2], b[2], c[2];
+            a[1], b[1], c[1],
+            a[2], b[2], c[2];
 
         volume += A.determinant();
 
@@ -89,8 +88,8 @@ HexahedralMesh::getVolume() const
         c = v[5] - v[6];
 
         A << a[0], b[0], c[0],
-             a[1], b[1], c[1],
-             a[2], b[2], c[2];
+            a[1], b[1], c[1],
+            a[2], b[2], c[2];
 
         volume += A.determinant();
 
@@ -98,8 +97,8 @@ HexahedralMesh::getVolume() const
         c = v[6] - v[3];
 
         A << a[0], b[0], c[0],
-             a[1], b[1], c[1],
-             a[2], b[2], c[2];
+            a[1], b[1], c[1],
+            a[2], b[2], c[2];
 
         volume += A.determinant();
     }
@@ -147,5 +146,4 @@ HexahedralMesh::getNumHexahedra() const
 {
     return m_hexahedraVertices.size();
 }
-
 } // imstk

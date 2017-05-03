@@ -30,7 +30,6 @@ class vtkDoubleArray;
 
 namespace imstk
 {
-
 class LineMesh;
 
 ///
@@ -65,9 +64,7 @@ protected:
 
     std::shared_ptr<LineMesh>  m_geometry;                  ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
-
 };
-
 }
 
 #endif // ifndef imstkLineMeshRenderDelegate_h

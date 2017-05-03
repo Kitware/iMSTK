@@ -140,8 +140,8 @@ void testBoneDrilling();
 int main()
 {
     std::cout << "****************\n"
-        << "Starting Sandbox\n"
-        << "****************\n";
+              << "Starting Sandbox\n"
+              << "****************\n";
 
     /*------------------
     Test rendering
@@ -233,9 +233,9 @@ void testLapToolController()
         imstk::Geometry::Type::Plane, scene, "VisualPlane", 100., imstk::Vec3d(0., -20., 0.));
 
     // laparoscopic tool
-    auto pivot = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/laptool/pivot.obj", "pivot");
-    auto upperJaw = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/laptool/upper.obj", "upperJaw");
-    auto lowerJaw = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/laptool/lower.obj", "lowerJaw");
+    auto pivot = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/laptool/pivot.obj", "pivot");
+    auto upperJaw = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/laptool/upper.obj", "upperJaw");
+    auto lowerJaw = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/laptool/lower.obj", "lowerJaw");
 
     auto trackingCtrl = std::make_shared<imstk::DeviceTracker>(client0);
     trackingCtrl->setTranslationScaling(0.5);
@@ -262,7 +262,7 @@ void testMshAndVegaIO()
     auto scene = sdk->createNewScene("SceneTestMesh");
 
     // Load a volumetric mesh (from .msh file)
-    std::string ifile = iMSTK_DATA_ROOT"/liver/liver.msh";
+    std::string ifile = iMSTK_DATA_ROOT "/liver/liver.msh";
     auto volMeshA = imstk::MeshIO::read(ifile);
     if (!volMeshA)
     {
@@ -280,7 +280,7 @@ void testMshAndVegaIO()
     objectA->setVisualGeometry(surfaceMeshA);
 
     // Write a .veg file
-    std::string ofile = iMSTK_DATA_ROOT"/liver/liver.veg";
+    std::string ofile = iMSTK_DATA_ROOT "/liver/liver.veg";
     auto writeStatus = imstk::MeshIO::write(volMeshA, ofile);
     std::cout << "------------------------------Summary----------------------------------------------------\n";
     std::cout << "Following file conversion: " << ((writeStatus) ? "Success \n" : "Failure \n");
@@ -321,12 +321,12 @@ void testMultiObjectWithTextures()
     auto scene = sdk->createNewScene("multiObjectWithTexturesTest");
 
     // Read surface mesh
-    auto objMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/textured_organs/heart.obj");
+    auto objMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
     auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
     surfaceMesh->translate(-8, 0, 0, Geometry::TransformType::ApplyToData);
 
     // Read and setup texture/material
-    auto texture = std::make_shared<Texture>(iMSTK_DATA_ROOT"/textured_organs/texture_set_1/diffuse.png");
+    auto texture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textured_organs/texture_set_1/diffuse.png");
     auto material = std::make_shared<RenderMaterial>();
     material->addTexture(texture);
     surfaceMesh->setRenderMaterial(material);
@@ -342,13 +342,13 @@ void testMultiObjectWithTextures()
     if (secondObject)
     {
         // Read surface mesh1
-        auto objMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/textured_organs/heart.obj");
+        auto objMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
         auto surfaceMesh1 = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh1);
 
         // Read and setup texture/material
         if (secondObjectTexture)
         {
-            auto texture1 = std::make_shared<Texture>(iMSTK_DATA_ROOT"/textured_organs/texture_set_2/diffuse.png");
+            auto texture1 = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textured_organs/texture_set_2/diffuse.png");
             auto material1 = std::make_shared<RenderMaterial>();
             material1->addTexture(texture1);
             material1->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
@@ -372,8 +372,8 @@ void testMeshCCD()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("MeshCCDTest");
 
-    auto mesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/big.vtk");
-    auto mesh2 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_0.vtk");
+    auto mesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/big.vtk");
+    auto mesh2 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_0.vtk");
 
     // Obj1
     auto obj1 = std::make_shared<CollidingObject>("obj1");
@@ -397,13 +397,13 @@ void testMeshCCD()
     auto t = std::thread([mesh2]
     {
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_1 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_1.vtk");
+        auto mesh2_1 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_1.vtk");
         mesh2->setVertexPositions(mesh2_1->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_2 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_2.vtk");
+        auto mesh2_2 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_2.vtk");
         mesh2->setVertexPositions(mesh2_2->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_3 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_3.vtk");
+        auto mesh2_3 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_3.vtk");
         mesh2->setVertexPositions(mesh2_3->getVertexPositions());
     });
 
@@ -521,18 +521,20 @@ void testTwoFalcons()
     // Print device tracking info (callback)
     Logger* logger;
     unsigned int displayCpt = 0;
-    auto postInitFoo = [&logger](Module* module)
-    {
-        logger = new Logger(module->getName());
-        logger->setFrequency(5);
-    };
-    auto postUpdateFoo = [&displayCpt, &logger](Module* module)
-    {
-        // Print position & velocity
-        auto client = static_cast<VRPNDeviceClient*>(module);
-        Vec3d p = client->getPosition();
-        Vec3d v = client->getVelocity();
-        std::string message =
+    auto postInitFoo =
+        [&logger](Module* module)
+        {
+            logger = new Logger(module->getName());
+            logger->setFrequency(5);
+        };
+    auto postUpdateFoo =
+        [&displayCpt, &logger](Module* module)
+        {
+            // Print position & velocity
+            auto client = static_cast<VRPNDeviceClient*>(module);
+            Vec3d p = client->getPosition();
+            Vec3d v = client->getVelocity();
+            std::string message =
                 " pos = (" +  std::to_string(p[0])
                 + ", " +  std::to_string(p[1])
                 + ", "  +  std::to_string(p[2]) + ") "
@@ -540,25 +542,26 @@ void testTwoFalcons()
                 + ", " + std::to_string(v[1])
                 + ", "  + std::to_string(v[2]) + ")";
 
-        // Show every 1000 updates in standard
-        if (++displayCpt > 1000)
-        {
-            std::cout << "\r-- " << module->getName() << message << std::flush;
-            displayCpt = 0;
-        }
+            // Show every 1000 updates in standard
+            if (++displayCpt > 1000)
+            {
+                std::cout << "\r-- " << module->getName() << message << std::flush;
+                displayCpt = 0;
+            }
 
-        // Asynchronous log
-        if (logger->readyForLoggingWithFrequency())
+            // Asynchronous log
+            if (logger->readyForLoggingWithFrequency())
+            {
+                logger->log(message, true);
+                logger->updateLogTime();
+            }
+        };
+    auto postCleanUpFoo =
+        [&logger](Module* module)
         {
-            logger->log(message, true);
-            logger->updateLogTime();
-        }
-    };
-    auto postCleanUpFoo = [&logger](Module* module)
-    {
-        logger->shutdown();
-        delete logger;
-    };
+            logger->shutdown();
+            delete logger;
+        };
 
     falcon0->setPostInitCallback(postInitFoo);
     falcon0->setPostUpdateCallback(postUpdateFoo);
@@ -684,7 +687,7 @@ void testCameraController()
 
 
     // Mesh
-    auto mesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj");
+    auto mesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
     meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);
@@ -723,7 +726,7 @@ void testReadMesh()
 
     // Read volumetricMesh
     //auto vtkMesh2 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/nidus/nidus.vtk");
-    auto vegaMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    auto vegaMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract surface mesh
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
@@ -1181,7 +1184,7 @@ void testDeformableBody()
     scene->getCamera()->setPosition(0, 2.0, 40.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
     //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
     //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/liver/liver.veg");
     //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
@@ -1224,7 +1227,7 @@ void testDeformableBody()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     //dynaModel->configure(iMSTK_DATA_ROOT"/asianDragon/asianDragon.config");
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
     dynaModel->initialize(volTetMesh);
@@ -1335,7 +1338,7 @@ void testPbdVolume()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -1370,13 +1373,13 @@ void testPbdVolume()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
 
-    deformableObj->initialize(/*Number of Constraints*/1,
-        /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
-        /*Mass*/1.0,
-        /*Gravity*/"0 -9.8 0",
-        /*TimeStep*/0.01,
-        /*FixedPoint*/"51 127 178",
-        /*NumberOfIterationInConstraintSolver*/5
+    deformableObj->initialize(/*Number of Constraints*/ 1,
+        /*Constraint configuration*/ "FEM NeoHookean 100.0 0.3",
+        /*Mass*/ 1.0,
+        /*Gravity*/ "0 -9.8 0",
+        /*TimeStep*/ 0.01,
+        /*FixedPoint*/ "51 127 178",
+        /*NumberOfIterationInConstraintSolver*/ 5
         );
 
     auto pbdSolver = std::make_shared<PbdSolver>();
@@ -1396,7 +1399,6 @@ void testPbdVolume()
 
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
-
 }
 
 void testPbdCloth()
@@ -1450,14 +1452,14 @@ void testPbdCloth()
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
-    deformableObj->initialize(/*Number of constraints*/2,
-        /*Constraint configuration*/"Distance 0.1",
-        /*Constraint configuration*/"Dihedral 0.001",
-        /*Mass*/1.0,
-        /*Gravity*/"0 -9.8 0",
-        /*TimeStep*/0.01,
-        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10 11",
-        /*NumberOfIterationInConstraintSolver*/5
+    deformableObj->initialize(/*Number of constraints*/ 2,
+        /*Constraint configuration*/ "Distance 0.1",
+        /*Constraint configuration*/ "Dihedral 0.001",
+        /*Mass*/ 1.0,
+        /*Gravity*/ "0 -9.8 0",
+        /*TimeStep*/ 0.01,
+        /*FixedPoint*/ "1 2 3 4 5 6 7 8 9 10 11",
+        /*NumberOfIterationInConstraintSolver*/ 5
         );
 
     // Solver
@@ -1519,7 +1521,7 @@ void testPbdCollision()
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
     // dragon
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -1563,15 +1565,15 @@ void testPbdCollision()
     auto pbdModel = std::make_shared<PbdModel>();
     deformableObj->setDynamicalModel(pbdModel);
 
-    deformableObj->initialize(/*Number of Constraints*/1,
-        /*Constraint configuration*/"FEM NeoHookean 1.0 0.3",
-        /*Mass*/1.0,
-        /*Gravity*/"0 -9.8 0",
-        /*TimeStep*/0.001,
-        /*FixedPoint*/"",
-        /*NumberOfIterationInConstraintSolver*/2,
-        /*Proximity*/0.1,
-        /*Contact stiffness*/0.01);
+    deformableObj->initialize(/*Number of Constraints*/ 1,
+        /*Constraint configuration*/ "FEM NeoHookean 1.0 0.3",
+        /*Mass*/ 1.0,
+        /*Gravity*/ "0 -9.8 0",
+        /*TimeStep*/ 0.001,
+        /*FixedPoint*/ "",
+        /*NumberOfIterationInConstraintSolver*/ 2,
+        /*Proximity*/ 0.1,
+        /*Contact stiffness*/ 0.01);
 
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
@@ -1581,7 +1583,8 @@ void testPbdCollision()
 
     bool clothTest = 0;
     bool volumetric = !clothTest;
-    if (clothTest){
+    if (clothTest)
+    {
         auto clothMesh = std::make_shared<imstk::SurfaceMesh>();
         imstk::StdVectorOfVec3d vertList;
         double width = 60.0;
@@ -1606,7 +1609,6 @@ void testPbdCollision()
                 const double y = (double)dy*j;
                 const double x = (double)dx*i;
                 vertList[i*nCols + j] = Vec3d(x - 30, -10, y - 30);
-
             }
         }
         clothMesh->setInitialVertexPositions(vertList);
@@ -1639,16 +1641,16 @@ void testPbdCollision()
         floor->setPhysicsToCollidingMap(oneToOneFloor);
         floor->setPhysicsToVisualMap(oneToOneFloor);
         //floor->setCollidingToVisualMap(oneToOneFloor);
-        floor->initialize(/*Number of constraints*/2,
-            /*Constraint configuration*/"Distance 0.1",
-            /*Constraint configuration*/"Dihedral 0.001",
-            /*Mass*/0.1,
-            /*Gravity*/"0 9.8 0",
-            /*TimeStep*/0.002,
-            /*FixedPoint*/fixed_corner.c_str(),
-            /*NumberOfIterationInConstraintSolver*/5,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/0.95);
+        floor->initialize(/*Number of constraints*/ 2,
+            /*Constraint configuration*/ "Distance 0.1",
+            /*Constraint configuration*/ "Dihedral 0.001",
+            /*Mass*/ 0.1,
+            /*Gravity*/ "0 9.8 0",
+            /*TimeStep*/ 0.002,
+            /*FixedPoint*/ fixed_corner.c_str(),
+            /*NumberOfIterationInConstraintSolver*/ 5,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 0.95);
         scene->addSceneObject(floor);
 
         std::cout << "nbr of vertices in cloth mesh" << clothMesh->getNumVertices() << std::endl;
@@ -1662,8 +1664,9 @@ void testPbdCollision()
 
         scene->getCamera()->setPosition(0, 0, 50);
     }
-    else if (0){
-        auto tetMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    else if (0)
+    {
+        auto tetMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
         if (!tetMesh1)
         {
             LOG(WARNING) << "Could not read mesh from file.";
@@ -1681,7 +1684,8 @@ void testPbdCollision()
 
         auto vs = volTetMesh1->getInitialVertexPositions();
         Vec3d tmpPos;
-        for (int i = 0; i < volTetMesh1->getNumVertices(); ++i){
+        for (int i = 0; i < volTetMesh1->getNumVertices(); ++i)
+        {
             tmpPos = volTetMesh1->getVertexPosition(i);
             tmpPos[1] -= 6;
             volTetMesh1->setVertexPosition(i, tmpPos);
@@ -1714,15 +1718,15 @@ void testPbdCollision()
         deformableObj1->setPhysicsToCollidingMap(deformMapP2C1);
         deformableObj1->setPhysicsToVisualMap(deformMapP2V1);
         deformableObj1->setCollidingToVisualMap(deformMapC2V1);
-        deformableObj1->initialize(/*Number of Constraints*/1,
-            /*Constraint configuration*/"FEM NeoHookean 10.0 0.5",
-            /*Mass*/0.0,
-            /*Gravity*/"0 -9.8 0",
-            /*TimeStep*/0.002,
-            /*FixedPoint*/"",
-            /*NumberOfIterationInConstraintSolver*/2,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/0.01);
+        deformableObj1->initialize(/*Number of Constraints*/ 1,
+            /*Constraint configuration*/ "FEM NeoHookean 10.0 0.5",
+            /*Mass*/ 0.0,
+            /*Gravity*/ "0 -9.8 0",
+            /*TimeStep*/ 0.002,
+            /*FixedPoint*/ "",
+            /*NumberOfIterationInConstraintSolver*/ 2,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 0.01);
 
         scene->addSceneObject(deformableObj1);
 
@@ -1733,7 +1737,8 @@ void testPbdCollision()
 
         colGraph->addInteractionPair(pair);
     }
-    else{
+    else
+    {
         // floor
 
         imstk::StdVectorOfVec3d vertList;
@@ -1751,7 +1756,6 @@ void testPbdCollision()
                 const double y = (double)dy*j;
                 const double x = (double)dx*i;
                 vertList[i*nCols + j] = Vec3d(x - 50, -10.0, y - 50);
-
             }
         }
 
@@ -1803,10 +1807,10 @@ void testPbdCollision()
         auto pbdModel2 = std::make_shared<PbdModel>();
         floor->setDynamicalModel(pbdModel2);
 
-        floor->initialize(/*Number of Constraints*/0,
-            /*Mass*/0.0,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/1.0);
+        floor->initialize(/*Number of Constraints*/ 0,
+            /*Mass*/ 0.0,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 1.0);
 
         auto pbdSolverfloor = std::make_shared<PbdSolver>();
         pbdSolverfloor->setPbdObject(floor);
@@ -1852,7 +1856,8 @@ void testLineMesh()
     std::cout << "Select deformable: 0 for volumetric mesh, 1 for surface mesh..." << std::endl;
     std::cin >> clothTest;
 
-    if (line){
+    if (line)
+    {
         // Read LineMesh
         auto lineMeshColliding = std::make_shared<imstk::LineMesh>();
         auto lineMeshVisual = std::make_shared<imstk::LineMesh>();
@@ -1863,8 +1868,9 @@ void testLineMesh()
         vertList[0] = Vec3d(0.0, -10.0, -10.0);
         vertList[1] = Vec3d(0.0, 0.0, -10.0);
         vertList[2] = Vec3d(0.0, 0.0, -30.0);
-        std::vector<std::vector<int> > connectivity;
-        for (int i = 0; i < 2;){
+        std::vector<std::vector<int>> connectivity;
+        for (int i = 0; i < 2; )
+        {
             std::vector<int> line;
             line.push_back(i);
             i++;
@@ -1913,19 +1919,20 @@ void testLineMesh()
         linesTool->setCollidingToVisualMap(mapC2V);
         linesTool->setPhysicsToVisualMap(mapP2V);
         linesTool->setColldingToPhysicsMap(mapC2P);
-        linesTool->initialize(/*Number of constraints*/1,
-            /*Constraint configuration*/"Distance 100",
-            /*Mass*/0.0,
-            /*Gravity*/"0 -9.8 0",
-            /*TimeStep*/0.002,
-            /*FixedPoint*/"0 1 2",
-            /*NumberOfIterationInConstraintSolver*/5,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/0.1);
+        linesTool->initialize(/*Number of constraints*/ 1,
+            /*Constraint configuration*/ "Distance 100",
+            /*Mass*/ 0.0,
+            /*Gravity*/ "0 -9.8 0",
+            /*TimeStep*/ 0.002,
+            /*FixedPoint*/ "0 1 2",
+            /*NumberOfIterationInConstraintSolver*/ 5,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 0.1);
         scene->addSceneObject(linesTool);
     }
-    else{
-        std::string path2obj = iMSTK_DATA_ROOT"/ETI/resources/Tools/blade2.obj";
+    else
+    {
+        std::string path2obj = iMSTK_DATA_ROOT "/ETI/resources/Tools/blade2.obj";
 
         auto collidingMesh = imstk::MeshIO::read(path2obj);
         auto viusalMesh = imstk::MeshIO::read(path2obj);
@@ -1958,22 +1965,21 @@ void testLineMesh()
         blade->setCollidingToVisualMap(bladeMapC2V);
         blade->setPhysicsToVisualMap(bladeMapP2V);
         blade->setColldingToPhysicsMap(bladeMapC2P);
-        blade->initialize(/*Number of constraints*/1,
-            /*Constraint configuration*/"Distance 0.1",
-            /*Mass*/0.0,
-            /*Gravity*/"0 0 0",
-            /*TimeStep*/0.001,
-            /*FixedPoint*/"",
-            /*NumberOfIterationInConstraintSolver*/5,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/0.01);
+        blade->initialize(/*Number of constraints*/ 1,
+            /*Constraint configuration*/ "Distance 0.1",
+            /*Mass*/ 0.0,
+            /*Gravity*/ "0 0 0",
+            /*TimeStep*/ 0.001,
+            /*FixedPoint*/ "",
+            /*NumberOfIterationInConstraintSolver*/ 5,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 0.01);
         scene->addSceneObject(blade);
     }
 
 
-
-    if (clothTest){
-
+    if (clothTest)
+    {
         imstk::StdVectorOfVec3d vertList;
         double width = 60.0;
         double height = 60.0;
@@ -1997,7 +2003,6 @@ void testLineMesh()
                 const double y = (double)dy*j;
                 const double x = (double)dx*i;
                 vertList[i*nCols + j] = Vec3d(x - 30, -25, y - 60);
-
             }
         }
 
@@ -2045,16 +2050,16 @@ void testLineMesh()
         floor->setPhysicsToCollidingMap(clothMapP2C);
         floor->setPhysicsToVisualMap(clothMapP2V);
         floor->setCollidingToVisualMap(clothMapC2V);
-        floor->initialize(/*Number of constraints*/2,
-            /*Constraint configuration*/"Distance 0.1",
-            /*Constraint configuration*/"Dihedral 0.001",
-            /*Mass*/0.1,
-            /*Gravity*/"0 -9.8 0",
-            /*TimeStep*/0.001,
-            /*FixedPoint*/fixed_corner.c_str(),
-            /*NumberOfIterationInConstraintSolver*/5,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/0.1);
+        floor->initialize(/*Number of constraints*/ 2,
+            /*Constraint configuration*/ "Distance 0.1",
+            /*Constraint configuration*/ "Dihedral 0.001",
+            /*Mass*/ 0.1,
+            /*Gravity*/ "0 -9.8 0",
+            /*TimeStep*/ 0.001,
+            /*FixedPoint*/ fixed_corner.c_str(),
+            /*NumberOfIterationInConstraintSolver*/ 5,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 0.1);
         scene->addSceneObject(floor);
 
         std::cout << "nbr of vertices in cloth mesh" << clothMeshVisual->getNumVertices() << std::endl;
@@ -2062,9 +2067,13 @@ void testLineMesh()
         // Collisions
         auto clothTestcolGraph = scene->getCollisionGraph();
         if (line)
+        {
             tool = linesTool;
+        }
         else
+        {
             tool = blade;
+        }
 
         auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(tool, floor));
         pair1->setNumberOfInterations(5);
@@ -2073,9 +2082,10 @@ void testLineMesh()
 
         scene->getCamera()->setPosition(0, 0, 50);
     }
-    else{
+    else
+    {
         //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/ETI/resources/Human/tongue.veg");
-        auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+        auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
         if (!tetMesh)
         {
             LOG(WARNING) << "Could not read mesh from file.";
@@ -2128,15 +2138,15 @@ void testLineMesh()
         deformableObj->setPhysicsToCollidingMap(dragonMapP2C);
         deformableObj->setPhysicsToVisualMap(dragonMapP2V);
         deformableObj->setCollidingToVisualMap(dragonMapC2V);
-        deformableObj->initialize(/*Number of Constraints*/1,
-            /*Constraint configuration*/"FEM NeoHookean 10.0 0.3",
-            /*Mass*/0.1,
-            /*Gravity*/"0 0 0",
-            /*TimeStep*/0.001,
-            /*FixedPoint*/"",
-            /*NumberOfIterationInConstraintSolver*/5,
-            /*Proximity*/0.1,
-            /*Contact stiffness*/0.01);
+        deformableObj->initialize(/*Number of Constraints*/ 1,
+            /*Constraint configuration*/ "FEM NeoHookean 10.0 0.3",
+            /*Mass*/ 0.1,
+            /*Gravity*/ "0 0 0",
+            /*TimeStep*/ 0.001,
+            /*FixedPoint*/ "",
+            /*NumberOfIterationInConstraintSolver*/ 5,
+            /*Proximity*/ 0.1,
+            /*Contact stiffness*/ 0.01);
 
         scene->addSceneObject(deformableObj);
         std::cout << "nbr of vertices in tongue mesh = " << surfMesh->getNumVertices() << std::endl;
@@ -2243,7 +2253,7 @@ void testDeformableBodyCollision()
     scene->addSceneObject(planeObj);
 
     // Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -2268,7 +2278,7 @@ void testDeformableBodyCollision()
 
     // Configure the dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     dynaModel->initialize(volTetMesh);
 
     // Create and add Backward Euler time integrator
@@ -2338,7 +2348,7 @@ void liverToolInteraction()
     //----------------------------------------------------------
 
     // Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
     //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/liver/liver.veg");
 
     if (!tetMesh)
@@ -2366,7 +2376,7 @@ void liverToolInteraction()
     // Configure the dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
-    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     dynaModel->initialize(volTetMesh);
 
     // Create and add Backward Euler time integrator
@@ -2413,7 +2423,6 @@ void liverToolInteraction()
                                                               std::dynamic_pointer_cast<imstk::Plane>(planeObj->getCollidingGeometry()),
                                                               *collData.get());
     auto collHandling = std::make_shared<imstk::PenaltyMeshToRigidCH>(imstk::CollisionHandling::Side::A, *collData.get(), deformableObj);*/
-
 
 
     //----------------------------------------------------------
@@ -2534,12 +2543,11 @@ void testVirtualCoupling()
 
 void testGeometryTransforms()
 {
-
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("testGeometryTransforms");
 
-    auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj", "Dragon");
+    auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
     auto surfaceMesh = sceneObj->getVisualGeometry();
     surfaceMesh->scale(5., Geometry::TransformType::ConcatenateToTransform);
@@ -2565,10 +2573,11 @@ void testGeometryTransforms()
     scene->addSceneObject(cubeObj);
 
     // Rotate the dragon every frame
-    auto rotateFunc = [&surfaceMesh](Module* module)
-    {
-        surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
-    };
+    auto rotateFunc =
+        [&surfaceMesh](Module* module)
+        {
+            surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+        };
     sdk->getSceneManager("testGeometryTransforms")->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration
@@ -2598,7 +2607,7 @@ void testPicking()
     // Create Nidus FE deformable scene object
     //----------------------------------------------------------
     // Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
 
     if (!tetMesh)
     {
@@ -2623,7 +2632,7 @@ void testPicking()
 
     // Configure the dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     dynaModel->initialize(volTetMesh);
 
     // Create and add Backward Euler time integrator
@@ -2734,7 +2743,7 @@ void testBoneDrilling()
 
     // Create bone scene object
     // Load the mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -2776,4 +2785,3 @@ void testBoneDrilling()
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 }
-

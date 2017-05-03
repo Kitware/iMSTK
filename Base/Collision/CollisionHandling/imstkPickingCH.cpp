@@ -24,7 +24,6 @@ limitations under the License.
 
 namespace imstk
 {
-
 void
 PickingCH::computeContactForces()
 {
@@ -35,7 +34,7 @@ PickingCH::computeContactForces()
     else
     {
         LOG(WARNING) << "PickingCH::handleCollision error: "
-            << "no picking collision handling available the object";
+                     << "no picking collision handling available the object";
     }
 }
 
@@ -52,7 +51,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     if (deformableObj == nullptr)
     {
         LOG(WARNING) << "PenaltyRigidCH::addPickConstraints error: "
-            << " not a deformable object.";
+                     << " not a deformable object.";
         return;
     }
 
@@ -69,7 +68,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
         auto vprev = Vec3d(Vprev(nodeDof), Vprev(nodeDof + 1), Vprev(nodeDof + 2));
         auto uprev = Vec3d(Uprev(nodeDof), Uprev(nodeDof + 1), Uprev(nodeDof + 2));
         auto x = (CD.ptPos + PhysTetMesh->getVertexPosition(CD.nodeId) -
-                 PhysTetMesh->getInitialVertexPosition(CD.nodeId) - uprev) / dT - vprev;
+                  PhysTetMesh->getInitialVertexPosition(CD.nodeId) - uprev) / dT - vprev;
 
         auto pickProjector = LinearProjectionConstraint(CD.nodeId, true);
         pickProjector.setProjectorToDirichlet(CD.nodeId, x);
@@ -77,5 +76,4 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
         m_DynamicLinearProjConstraints->push_back(pickProjector);
     }
 }
-
 }

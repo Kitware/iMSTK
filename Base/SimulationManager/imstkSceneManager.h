@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class SceneManager
 ///
@@ -81,7 +80,6 @@ protected:
     std::shared_ptr<Scene> m_scene; ///> Scene that is being managed
     std::unordered_map<std::string, std::thread> m_threadMap;   ///>
 };
-
 } // imstk
 
 #endif // ifndef imstkSceneManager_h

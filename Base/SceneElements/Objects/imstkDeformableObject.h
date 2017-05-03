@@ -32,7 +32,6 @@
 
 namespace imstk
 {
-
 class Geometry;
 class GeometryMap;
 
@@ -110,7 +109,6 @@ public:
 protected:
     std::shared_ptr<FEMDeformableBodyModel> m_defModel;
 };
-
 } // imstk
 
 #endif // ifndef imstkDeformableObject_h

@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 DirectLinearSolver<Matrixd>::
 DirectLinearSolver(const Matrixd &matrix, const Vectord &b)
 {
@@ -94,5 +93,4 @@ DirectLinearSolver<Matrixd>::solve(Vectord &x)
     auto b = m_linearSystem->getRHSVector();
     x = m_solver.solve(b);
 }
-
 } // imstk

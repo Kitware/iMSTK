@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 void
 HDAPIDeviceServer::addDeviceClient(std::shared_ptr<HDAPIDeviceClient> client)
 {
@@ -64,7 +63,6 @@ HDAPIDeviceServer::cleanUpModule()
         client->cleanUp();
     }
 }
-
 } // imstk
 
 #endif // ifdef iMSTK_USE_OMNI

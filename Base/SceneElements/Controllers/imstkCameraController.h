@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class CameraController
 ///
@@ -71,9 +70,7 @@ protected:
     void cleanUpModule() override;
 
     Camera& m_camera; ///< Camera controlled by the external device
-
 };
-
 } // imstk
 
 #endif // ifndef imstkCameraController_h

@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 class Mesh;
 class Capsule;
 class CollisionData;
@@ -46,12 +45,12 @@ public:
     /// \brief Constructor
     ///
     MeshToCapsuleCD(std::shared_ptr<Mesh> mesh,
-				   std::shared_ptr<Capsule> capsule,
-				   CollisionData& colData) :
-				   CollisionDetection(CollisionDetection::Type::MeshToCapsule,
-                   colData),
-				   m_mesh(mesh),
-				   m_capsule(capsule){}
+                    std::shared_ptr<Capsule> capsule,
+                    CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::MeshToCapsule,
+                           colData),
+        m_mesh(mesh),
+        m_capsule(capsule){}
 
     ///
     /// \brief Destructor
@@ -68,7 +67,6 @@ private:
     std::shared_ptr<Mesh> m_mesh;       ///> Mesh
     std::shared_ptr<Capsule> m_capsule; ///> Capsule
 };
-
 }
 
 #endif // ifndef imstkMeshToCapsuleCD_h

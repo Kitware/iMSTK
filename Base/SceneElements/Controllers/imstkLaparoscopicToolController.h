@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class LaparoscopicTool
 ///
@@ -128,7 +127,6 @@ protected:
 
     Vec3d m_jawRotationAxis = Vec3d(0, 1., 0);  ///< Angle of the jaws
 };
-
 } // imstk
 
 #endif // ifndef imstkLaparoscopicToolController_h

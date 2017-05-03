@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class AnalyticalGeometry
 ///
@@ -70,13 +69,12 @@ protected:
     void applyRotation(const Mat3d r) override;
     virtual void updatePostTransformData() override;
 
-    Vec3d  m_position = WORLD_ORIGIN;              ///> position
-    Vec3d  m_positionPostTransform = WORLD_ORIGIN; ///> position once transform applied
+    Vec3d m_position = WORLD_ORIGIN;               ///> position
+    Vec3d m_positionPostTransform = WORLD_ORIGIN;  ///> position once transform applied
 
-    Vec3d  m_orientationAxis = UP_VECTOR;              ///> orientation
-    Vec3d  m_orientationAxisPostTransform = UP_VECTOR; ///> orientation once transform applied
+    Vec3d m_orientationAxis = UP_VECTOR;               ///> orientation
+    Vec3d m_orientationAxisPostTransform = UP_VECTOR;  ///> orientation once transform applied
 };
-
 } //imstk
 
 #endif // ifndef imstkGeometry_h

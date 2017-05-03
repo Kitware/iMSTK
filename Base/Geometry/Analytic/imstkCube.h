@@ -25,7 +25,6 @@
 #include "imstkAnalyticalGeometry.h"
 
 namespace imstk {
-
 ///
 /// \class Cube
 ///
@@ -67,7 +66,6 @@ protected:
 
     double m_width = 1.0;               ///> Width of the cube
     double m_widthPostTransform = 1.0;  ///> Width of the cube once transform applied
-
 };
 }
 

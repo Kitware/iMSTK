@@ -31,11 +31,10 @@
 
 namespace imstk
 {
-
 ///
 /// \class VTKScreenCaptureUtility
 ///
-/// \brief Utility class to manage screen capture through VTK  
+/// \brief Utility class to manage screen capture through VTK
 ///
 class VTKScreenCaptureUtility
 {
@@ -75,7 +74,6 @@ protected:
     unsigned int m_screenShotNumber; //> screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
     std::string m_screenShotPrefix; //> the prefix for the screenshots to be saved
 };
-
 } // imstk
 
 #endif // ifndef imstkScreenCaptureUtility_h

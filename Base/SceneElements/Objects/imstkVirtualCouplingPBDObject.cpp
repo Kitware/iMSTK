@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 void
 VirtualCouplingPBDObject::initOffsets()
 {
@@ -83,7 +82,8 @@ VirtualCouplingPBDObject::updateFromDevice()
 }
 
 void
-VirtualCouplingPBDObject::computeTransform(Vec3d& pos, Quatd& quat, Eigen::Matrix4d& t){
+VirtualCouplingPBDObject::computeTransform(Vec3d& pos, Quatd& quat, Eigen::Matrix4d& t)
+{
     auto scaling = m_collidingGeometry->getScaling();
     auto angleAxis = Rotd(quat);
 
@@ -93,7 +93,7 @@ VirtualCouplingPBDObject::computeTransform(Vec3d& pos, Quatd& quat, Eigen::Matri
     t(2, 2) = scaling;
 
     Eigen::Affine3d rot =
-            Eigen::Affine3d(
+        Eigen::Affine3d(
                 Eigen::AngleAxisd(
                     angleAxis.angle() * 180 / PI,
                     Eigen::Vector3d(angleAxis.axis()[0],angleAxis.axis()[1],angleAxis.axis()[2])
@@ -125,26 +125,31 @@ VirtualCouplingPBDObject::setForce(Vec3d force)
 }
 
 void
-VirtualCouplingPBDObject::resetCollidingGeometry(){
-
-    if (m_collidingGeometry->isMesh()){
+VirtualCouplingPBDObject::resetCollidingGeometry()
+{
+    if (m_collidingGeometry->isMesh())
+    {
         auto collidingMesh = std::dynamic_pointer_cast<Mesh>(m_collidingGeometry);
         collidingMesh->setVertexPositions(collidingMesh->getInitialVertexPositions());
     }
-    else{
+    else
+    {
         std::cout << "Not a mesh." << std::endl;
     }
 }
 
-std::shared_ptr<GeometryMap> VirtualCouplingPBDObject::getColldingToPhysicsMap() const{
+std::shared_ptr<GeometryMap> VirtualCouplingPBDObject::getColldingToPhysicsMap() const
+{
     return m_collidingToPhysicsGeomMap;
 }
 
-void VirtualCouplingPBDObject::setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map){
+void VirtualCouplingPBDObject::setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map)
+{
     m_collidingToPhysicsGeomMap = map;
 }
 
-void VirtualCouplingPBDObject::applyCollidingToPhysics(){
+void VirtualCouplingPBDObject::applyCollidingToPhysics()
+{
     if (m_collidingToPhysicsGeomMap && m_physicsGeometry)
     {
         m_collidingToPhysicsGeomMap->apply();

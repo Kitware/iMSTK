@@ -33,9 +33,8 @@
 
 namespace imstk
 {
-
 PbdModel::PbdModel() :
-DynamicalModel(DynamicalModelType::positionBasedDynamics)
+    DynamicalModel(DynamicalModelType::positionBasedDynamics)
 {
     m_initialState = std::make_shared<PbdState>();
     m_previousState = std::make_shared<PbdState>();
@@ -326,7 +325,7 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
             rs.resize(it - rs.begin());
             if (rs.size() > 1)
             {
-                int idx = (rs[0] == k)?1:0;
+                int idx = (rs[0] == k) ? 1 : 0;
                 SurfaceMesh::TriangleArray& t = elements[rs[idx]];
                 for (int i = 0; i < 3; ++i)
                 {
@@ -350,7 +349,7 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
             rs.resize(it - rs.begin());
             if (rs.size() > 1)
             {
-                int idx = (rs[0] == k)?1:0;
+                int idx = (rs[0] == k) ? 1 : 0;
                 auto& t = elements[rs[idx]];
                 for (int i = 0; i < 3; ++i)
                 {
@@ -375,7 +374,7 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
             rs.resize(it - rs.begin());
             if (rs.size() > 1)
             {
-                int idx = (rs[0] == k)?1:0;
+                int idx = (rs[0] == k) ? 1 : 0;
                 auto& t = elements[rs[idx]];
                 for (int i = 0; i < 3; ++i)
                 {
@@ -495,5 +494,4 @@ PbdModel::updateVelocity()
         }
     }
 }
-
 } // imstk

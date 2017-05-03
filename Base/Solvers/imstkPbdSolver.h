@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class PbdSolver
 ///

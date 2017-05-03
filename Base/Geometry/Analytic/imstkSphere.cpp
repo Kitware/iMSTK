@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 void
 Sphere::print() const
 {
@@ -84,5 +83,4 @@ Sphere::updatePostTransformData()
     m_radiusPostTransform = m_scaling * m_radius;
     m_transformApplied = true;
 }
-
 } // imstk

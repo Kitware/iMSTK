@@ -30,19 +30,16 @@
 
 namespace imstk
 {
-
 struct PointEntry
 {
     Vec3d point;
     unsigned long ID;
     double * cellSize;
 };
-
 }
 
 namespace std
 {
-
 template<> struct hash<imstk::PointEntry>
 {
     size_t operator()(const imstk::PointEntry& point) const
@@ -70,14 +67,12 @@ template<> struct equal_to<imstk::PointEntry>
         }
 
         return true;
-   }
+    }
 };
-
 }
 
 namespace imstk
 {
-
 ///
 /// \class SpatialHashTableSeparateChaining
 ///
@@ -139,7 +134,6 @@ protected:
 
     std::shared_ptr<std::unordered_set<PointEntry>> m_table;
 };
-
 }
 
 #endif

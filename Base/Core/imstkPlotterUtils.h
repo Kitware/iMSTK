@@ -32,10 +32,8 @@
 
 namespace imstk
 {
-
 namespace plotterutils
 {
-
 ///
 /// \brief Write a Matlab script to plot a given vector
 ///
@@ -182,9 +180,7 @@ static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* f
     // show the plot
     scriptFile << "plt.show()\n";
 }
-
 } // plotters
-
 } // imstk
 
 #endif // ifndef imstkPlotterUtils_h

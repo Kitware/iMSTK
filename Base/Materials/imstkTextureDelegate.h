@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class TextureDelegate
 ///
@@ -50,7 +49,6 @@ protected:
     ///
     virtual void loadTexture(std::shared_ptr<Texture> texture) = 0;
 };
-
 }
 
 #endif

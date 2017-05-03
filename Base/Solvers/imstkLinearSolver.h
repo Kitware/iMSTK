@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Base class for linear solvers
 ///
@@ -39,7 +38,7 @@ class LinearSolver
 {
 public:
     using MatrixType = SystemMatrixType;
-    using LinearSystemType = LinearSystem < MatrixType > ;
+    using LinearSystemType = LinearSystem < MatrixType >;
 
     enum class Type
     {
@@ -112,7 +111,6 @@ protected:
     double m_tolerance = 1.0e-4;                        ///> default tolerance
     std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };
-
 } // imstk
 
 #endif // imstkLinearSolver_h

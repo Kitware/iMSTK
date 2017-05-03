@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class TetrahedralMesh
 ///
@@ -132,7 +131,6 @@ protected:
 
     std::vector<bool> m_removedMeshElems;
 };
-
 }
 
 #endif // ifndef imstkTetrahedralMesh_h

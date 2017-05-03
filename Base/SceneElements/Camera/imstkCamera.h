@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 class CameraController;
 class DeviceClient;
 
@@ -121,7 +120,6 @@ protected:
     Vec3d m_viewUp = UP_VECTOR;         ///>
     double m_viewAngle = 60;            ///>
 };
-
 } // imstk
 
 #endif // ifndef imstkCamera_h

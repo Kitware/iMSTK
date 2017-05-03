@@ -35,7 +35,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class CollisionGraph
 ///
@@ -44,9 +43,9 @@ namespace imstk
 class CollisionGraph
 {
 public:
-    using CollidingObjectPtr = std::shared_ptr < CollidingObject > ;
-    using CollisionHandlingPtr = std::shared_ptr < CollisionHandling > ;
-    using CollisionDetectionPtr = std::shared_ptr < CollisionDetection > ;
+    using CollidingObjectPtr = std::shared_ptr < CollidingObject >;
+    using CollisionHandlingPtr = std::shared_ptr < CollisionHandling >;
+    using CollisionDetectionPtr = std::shared_ptr < CollisionDetection >;
     using InteractionPairPtr = std::shared_ptr<InteractionPair>;
 
     ///
@@ -93,7 +92,7 @@ public:
     ///
     const std::vector<InteractionPairPtr>& getInteractionPairList() const;
 
-    const std::vector<std::shared_ptr<PbdInteractionPair> > &getPbdPairList() const;
+    const std::vector<std::shared_ptr<PbdInteractionPair>> &getPbdPairList() const;
 
     ///
     /// \brief Returns a map of all interaction pairs per object
@@ -106,6 +105,5 @@ protected:
     std::vector<InteractionPairPtr> m_interactionPairList; ///< All interaction pairs in the collision graph
     std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
 };
-
 }
 #endif // ifndef imstkCollisionGraph_h

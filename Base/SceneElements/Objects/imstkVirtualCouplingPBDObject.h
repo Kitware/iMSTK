@@ -26,7 +26,6 @@
 #include "imstkPbdRigidObject.h"
 namespace imstk
 {
-
 class Geometry;
 class GeometryMap;
 
@@ -109,8 +108,6 @@ protected:
     //Maps
     std::shared_ptr<GeometryMap> m_collidingToPhysicsGeomMap;   ///> Maps from collision to physics geometry
 };
-
-
 } // imstk
 
 #endif // ifndef imstkVirtualCouplingObject_h

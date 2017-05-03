@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 class CollidingObject;
 class DeformableObject;
 class CollisionData;
@@ -50,7 +49,7 @@ public:
     ///
     PickingCH(const Side& side,
               const CollisionData& colData,
-              std::shared_ptr<DeformableObject> obj):
+              std::shared_ptr<DeformableObject> obj) :
         CollisionHandling(Type::NodalPicking, side, colData),
         m_object(obj){}
 
@@ -92,7 +91,6 @@ private:
     std::shared_ptr<DeformableObject> m_object;     ///> Deformable object
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
 };
-
 }
 
 #endif // ifndef imstkPenaltyCH_h

@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class LineMesh
 ///
@@ -67,7 +66,7 @@ public:
     ///
     /// \brief
     ///
-    void setConnectivity(const std::vector<std::vector<int> >& lines);
+    void setConnectivity(const std::vector<std::vector<int>>& lines);
 
     ///
     /// \brief
@@ -77,7 +76,7 @@ public:
     ///
     /// \brief
     ///
-    std::vector<std::vector<int> > getLines() const;
+    std::vector<std::vector<int>> getLines() const;
 
     ///
     /// \brief
@@ -85,9 +84,8 @@ public:
     std::vector<int> getLine(int index) const;
 
 private:
-    std::vector<std::vector<int> > m_lines; ///> line connectivity
+    std::vector<std::vector<int>> m_lines;  ///> line connectivity
 };
-
 } // imstk
 
 #endif // ifndef imstkLineMesh_h

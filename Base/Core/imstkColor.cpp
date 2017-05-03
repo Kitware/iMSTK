@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 bool isColorRangeCorrect( double c )
 {
     return (c >= 0 && c <= 1.0);
@@ -93,7 +92,7 @@ std::ostream& operator<<(std::ostream& os, const Color& c)
     os << "R = " << c.r << '\n'
        << "G = " << c.g << '\n'
        << "B = " << c.b << '\n'
-       << "A = " << c.a ;
+       << "A = " << c.a;
     return os;
 }
 
@@ -153,5 +152,4 @@ Color::getValue() const
 {
     return rgba;
 }
-
 }

@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 Vectord&
 DeformableObject::getContactForce()
 {
@@ -84,5 +83,4 @@ DeformableObject::getPrevAccelerations() const
 {
     return m_defModel->getPreviousState()->getQDotDot();
 }
-
 } // imstk

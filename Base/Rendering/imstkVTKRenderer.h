@@ -37,7 +37,6 @@
 
 namespace imstk
 {
-
 class Scene;
 class Camera;
 class VTKRenderDelegate;
