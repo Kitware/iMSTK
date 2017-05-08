@@ -38,6 +38,7 @@ namespace imstk
 ///
 class SceneObjectController : public SceneObjectControllerBase
 {
+    using ControllerCallbackFunction = std::function<void(SceneObjectController* hdapiClient)>;
 public:
     ///
     /// \brief Constructor
@@ -84,9 +85,16 @@ public:
     inline std::shared_ptr<DeviceTracker> getTrackingController() const { return m_trackingController; }
     inline void setTrackingController(std::shared_ptr<DeviceTracker> controller) { m_trackingController = controller; }
 
+    ///
+    /// \brief Setting custom behavior functions
+    ///
+    inline void setUpdateCallback(ControllerCallbackFunction foo) { m_updateCallback = foo; }
+
 protected:
     std::shared_ptr<DeviceTracker> m_trackingController; ///< Device tracker
     std::shared_ptr<SceneObject> m_sceneObject;          ///< SceneObject controlled by the Tracker
+    //Callback functions
+    ControllerCallbackFunction m_updateCallback;   ///> function callback preceding module update
 };
 
 } // imstk

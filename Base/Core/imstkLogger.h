@@ -50,7 +50,7 @@ public:
     /// \params filename this name will be used in the file name of the log file
     ///
     Logger(std::string filename);
-    ~Logger();
+    virtual ~Logger();
 
     ///
     /// \brief Log one line.
@@ -94,6 +94,11 @@ public:
     /// \brief Shuts down and cleans up logger safely
     ///
     void shutdown();
+
+    ///
+    /// \brief Get the file name
+    ///
+    inline std::string getFileName() const { return m_filename; }
 
 private:
     static std::string getCurrentTimeFormatted();

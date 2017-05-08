@@ -84,7 +84,6 @@ private:
 
     HHD m_handle;     ///< device handle
     HD_state m_state; ///< device reading state
-
 };
 }
 

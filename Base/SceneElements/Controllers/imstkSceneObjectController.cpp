@@ -50,6 +50,11 @@ SceneObjectController::updateControlledObjects()
         }
     }
 
+    if (m_updateCallback)
+    {
+        m_updateCallback(this);
+    }
+
     // Update colliding geometry
     m_sceneObject->getMasterGeometry()->setTranslation(m_trackingController->getPosition());
     m_sceneObject->getMasterGeometry()->setRotation(m_trackingController->getRotation());

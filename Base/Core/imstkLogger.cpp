@@ -27,7 +27,7 @@ namespace imstk
 
 Logger::Logger(std::string filename)
 {
-    m_filename = filename + this->getCurrentTimeFormatted() + ".log";
+    m_filename = filename + "_" + this->getCurrentTimeFormatted() + ".log";
     m_mutex = new std::mutex();
     m_thread = new std::thread(Logger::eventLoop, this);
 }
@@ -83,9 +83,7 @@ void
 Logger::eventLoop(Logger * logger)
 {
     std::ofstream file(logger->m_filename);
-
-    char buffer[1024];
-    std::fill_n(buffer, 1024, '\0');
+    std::string buffer;
 
     while (logger->m_running) {
         std::unique_lock<std::mutex> ul(*logger->m_mutex);
@@ -97,13 +95,13 @@ Logger::eventLoop(Logger * logger)
             break;
         }
 
-        std::strcpy(buffer, logger->m_message.c_str());
+        buffer = logger->m_message;
         logger->m_changed = false;
 
         ul.unlock();
         logger->m_condition.notify_one();
 
-        file << buffer << "\n";
+        file << buffer;
     }
     file.close();
     logger->m_condition.notify_one();
@@ -112,6 +110,7 @@ Logger::eventLoop(Logger * logger)
 void
 Logger::log(std::string message, bool prependTime /* = false */)
 {
+    m_message = "";
     if (prependTime)
     {
         m_message = this->getCurrentTimeFormatted() + " ";
