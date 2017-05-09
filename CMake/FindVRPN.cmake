@@ -77,6 +77,13 @@ endif()
 #-----------------------------------------------------------------------------
 # Find library
 #-----------------------------------------------------------------------------
+find_library(VRPNSERVER_LIBRARY
+  NAMES
+    vrpnserver
+    vrpnserverd
+  )
+mark_as_advanced(VRPNSERVER_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${VRPNSERVER_LIBRARY})
 
 find_library(VRPN_LIBRARY
   NAMES
@@ -85,14 +92,6 @@ find_library(VRPN_LIBRARY
   )
 mark_as_advanced(VRPN_LIBRARY)
 list(APPEND VRPN_LIBRARIES ${VRPN_LIBRARY})
-
-find_library(VRPNSERVER_LIBRARY
-  NAMES
-    vrpnserver
-    vrpnserverd
-  )
-mark_as_advanced(VRPNSERVER_LIBRARY)
-list(APPEND VRPN_LIBRARIES ${VRPNSERVER_LIBRARY})
 
 find_library(QUAT_LIBRARY
   NAMES
