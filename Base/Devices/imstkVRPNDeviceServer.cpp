@@ -105,7 +105,8 @@ VRPNDeviceServer::initModule()
         case DeviceType::ARDUINO_IMU:
         {
             SerialInfo connectionSettings = m_SerialInfoMap[name];
-            m_deviceConnections->add(new vrpn_Streaming_Arduino(name.c_str(), m_serverConnection, connectionSettings.port, connectionSettings.baudRate));
+            //open with 6 channels (max needed for IMU, can use less)
+            m_deviceConnections->add(new vrpn_Streaming_Arduino(name.c_str(), m_serverConnection, connectionSettings.port, 6,connectionSettings.baudRate));
         } break;
         default:
         {
