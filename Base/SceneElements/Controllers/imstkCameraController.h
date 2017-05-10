@@ -53,23 +53,44 @@ public:
     ///
     ~CameraController() = default;
 
+    ///
+    /// \brief Set the offsets based on the current camera pose
+    ///
+    void setOffsetUsingCurrentCameraPose();
+
+    ///
+    /// \brief Get/Set translation offset of the camera
+    ///
+    const Vec3d& getCameraTranslationOffset() const;
+    void setCameraTranslationOffset(const Vec3d& t);
+
+    ///
+    /// \brief Get/Set rotation offset of the camera
+    ///
+    const Quatd& getCameraRotationOffset() const;
+    void setCameraRotationOffset(const Quatd& r);
+
+
 protected:
     ///
     /// \brief
     ///
-    void initModule() override;
+    virtual void initModule() override;
 
     ///
     /// \brief
     ///
-    void runModule() override;
+    virtual void runModule() override;
 
     ///
     /// \brief
     ///
-    void cleanUpModule() override;
+    void cleanUpModule() override {};
 
     Camera& m_camera; ///< Camera controlled by the external device
+
+    Vec3d m_cameraTranslationOffset = WORLD_ORIGIN;     ///< Translation offset for the camera over tracking data
+    Quatd m_cameraRotationalOffset = Quatd::Identity(); ///< camera head angle offset (in deg)
 };
 } // imstk
 

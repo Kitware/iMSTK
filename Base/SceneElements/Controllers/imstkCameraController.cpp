@@ -30,6 +30,38 @@ namespace imstk
 void
 CameraController::initModule()
 {
+}
+
+void
+CameraController::runModule()
+{
+    if (!m_trackingDataUptoDate)
+    {
+        if (!updateTrackingData())
+        {
+            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
+            return;
+        }
+    }
+
+    Vec3d p = getPosition();
+    Quatd r = getRotation();
+
+    // Apply Offsets over the device pose
+    p = p + m_cameraTranslationOffset;      // Offset the device position
+    r *= m_cameraRotationalOffset;          // Apply camera head rotation offset
+
+    // Set camera info
+    m_camera.setPosition(p);
+    m_camera.setFocalPoint((r*FORWARD_VECTOR)+p);
+    m_camera.setViewUp(r*UP_VECTOR);
+
+    m_trackingDataUptoDate = false;
+}
+
+void
+CameraController::setOffsetUsingCurrentCameraPose()
+{
     auto pos = m_camera.getPosition();
     auto viewUp = m_camera.getViewUp();
     auto focus = m_camera.getFocalPoint();
@@ -47,30 +79,26 @@ CameraController::initModule()
 }
 
 void
-CameraController::runModule()
+CameraController::setCameraRotationOffset(const Quatd& r)
 {
-    if (!m_trackingDataUptoDate)
-    {
-        if (!updateTrackingData())
-        {
-            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
-            return;
-        }
-    }
-
-    const Vec3d p = getPosition();
-    const Quatd r = getRotation();
-
-    // Set camera info
-    m_camera.setPosition(p);
-    m_camera.setFocalPoint((r*FORWARD_VECTOR)+p);
-    m_camera.setViewUp(r*UP_VECTOR);
-
-    m_trackingDataUptoDate = false;
+    m_cameraRotationalOffset = r;
 }
 
 void
-CameraController::cleanUpModule()
+CameraController::setCameraTranslationOffset(const Vec3d& t)
 {
+    m_cameraTranslationOffset = t;
+}
+
+const Vec3d&
+CameraController::getCameraTranslationOffset() const
+{
+    return m_cameraTranslationOffset;
+}
+
+const Quatd&
+CameraController::getCameraRotationOffset() const
+{
+    return m_cameraRotationalOffset;
 }
 } // imstk
