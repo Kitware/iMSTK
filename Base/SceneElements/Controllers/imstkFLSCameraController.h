@@ -23,6 +23,7 @@
 #define imstkFLSCameraController_h
 
 #include "imstkCameraController.h"
+#include "imstkVRPNArduinoDeviceClient.h"
 
 namespace imstk
 {
@@ -65,6 +66,8 @@ public:
     void setCameraAngulationTranslationOffset(const double t);
     double getCameraAngulationTranslationOffset() const;
 
+    void setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> aClient);
+
 protected:
 
     ///
@@ -73,9 +76,11 @@ protected:
     void runModule() override;
 
     double m_cameraHeadAngleOffset = 0;                   ///< camera head angle offset (in deg)
-    double m_cameraAngulationOffset = 0.;                 ///< Rotation offset for the camera via telescope angulation
     Quatd m_cameraAngulationRotOffset = Quatd::Identity();///< Rotation offset for the camera via telescope angulation
     double m_angulationTranslationOffset = 0.1;
+    std::shared_ptr<VRPNArduinoDeviceClient> arduinoClient;
+    bool arduinoActive = false;
+    double m_rollOffset = 0;
 };
 } // imstk
 

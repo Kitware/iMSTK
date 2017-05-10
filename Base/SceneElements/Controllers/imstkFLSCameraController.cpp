@@ -52,6 +52,15 @@ FLSCameraController::getCameraAngulationOffset() const
     return m_cameraAngulationOffset;
 }
 
+void 
+FLSCameraController::setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> aClient)
+{
+  arduinoActive = true;
+  arduinoClient = aClient;
+  
+  m_rollOffset = arduinoClient->getRoll();
+}
+
 void
 FLSCameraController::setCameraAngulationTranslationOffset(const double t)
 {
@@ -67,6 +76,7 @@ FLSCameraController::getCameraAngulationTranslationOffset() const
 void
 FLSCameraController::runModule()
 {
+    this->setCameraHeadAngleOffset(arduinoClient->getRoll());
     auto roff = Quatd(Eigen::AngleAxisd(m_cameraHeadAngleOffset*PI / 180., Vec3d(0., 0., 1.)));
     roff *= m_cameraAngulationRotOffset;
     this->setCameraRotationOffset(roff);

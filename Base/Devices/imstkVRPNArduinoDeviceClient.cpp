@@ -57,8 +57,9 @@ VRPNArduinoDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGC
 {
     auto deviceClient = reinterpret_cast<VRPNArduinoDeviceClient*>(userData);
 
-    deviceClient->m_ypr << a.channel[0], a.channel[1], a.channel[2];
-    deviceClient->m_accel << a.channel[3], a.channel[4], a.channel[5];
+    //deviceClient->m_ypr << a.channel[0], a.channel[1], a.channel[2];
+    //deviceClient->m_accel << a.channel[3], a.channel[4], a.channel[5];
+    deviceClient->m_roll = a.channel[0];
 
 }
 

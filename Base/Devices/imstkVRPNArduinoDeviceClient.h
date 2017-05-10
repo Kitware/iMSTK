@@ -56,6 +56,11 @@ public:
     virtual ~VRPNArduinoDeviceClient()
     {}
 
+    Vec3d& getYPR() {return m_ypr;}
+
+    Vec3d& getAcceleration(){return m_accel;}
+    float getRoll(){return m_roll;}
+
 protected:
     ///
     /// \brief Initialize device client module
@@ -84,9 +89,11 @@ private:
     ///
     static void VRPN_CALLBACK analogChangeHandler(void *userData, const _vrpn_ANALOGCB a);
 
+
     std::shared_ptr<vrpn_Analog_Remote> m_vrpnAnalog;           //!< VRPN position/orientation interface
     Vec3d m_ypr = Vec3d::Zero();
     Vec3d m_accel = Vec3d::Zero();
+    float m_roll = 0;
 };
 }
 
