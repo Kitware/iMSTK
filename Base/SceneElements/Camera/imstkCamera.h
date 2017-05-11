@@ -110,7 +110,7 @@ public:
     ///
     /// \brief
     ///
-    std::shared_ptr<CameraController> setupController(std::shared_ptr<DeviceClient> deviceClient);
+    std::shared_ptr<CameraController> setController(std::shared_ptr<CameraController> controller);
 
 protected:
     std::shared_ptr<CameraController> m_controller;   ///>

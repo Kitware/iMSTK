@@ -106,16 +106,9 @@ Camera::getController() const
 }
 
 std::shared_ptr<CameraController>
-Camera::setupController(std::shared_ptr<DeviceClient> deviceClient)
+Camera::setController(std::shared_ptr<CameraController> controller)
 {
-    if(m_controller == nullptr)
-    {
-        m_controller = std::make_shared<CameraController>(*this, deviceClient);
-    }
-    else
-    {
-        m_controller->setDeviceClient(deviceClient);
-    }
+    m_controller = controller;
     return m_controller;
 }
 } // imstk

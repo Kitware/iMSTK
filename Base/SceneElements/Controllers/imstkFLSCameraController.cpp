@@ -76,7 +76,10 @@ FLSCameraController::getCameraAngulationTranslationOffset() const
 void
 FLSCameraController::runModule()
 {
-    this->setCameraHeadAngleOffset(arduinoClient->getRoll());
+    if (arduinoActive)
+    {
+      this->setCameraHeadAngleOffset(arduinoClient->getRoll() - m_rollOffset);
+    }
     auto roff = Quatd(Eigen::AngleAxisd(m_cameraHeadAngleOffset*PI / 180., Vec3d(0., 0., 1.)));
     roff *= m_cameraAngulationRotOffset;
     this->setCameraRotationOffset(roff);
