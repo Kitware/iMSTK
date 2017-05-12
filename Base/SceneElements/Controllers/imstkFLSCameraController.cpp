@@ -40,24 +40,62 @@ FLSCameraController::getCameraHeadAngleOffset() const
 }
 
 void
-FLSCameraController::setCameraAngulationOffset(const Quatd& r)
+FLSCameraController::setCameraAngulationOffset(const double angle)
 {
-    m_cameraAngulationOffset = r;
+    m_cameraAngulationOffset = angle;
+    m_cameraAngulationRotOffset = Quatd(Eigen::AngleAxisd(angle*PI / 180., Vec3d(0., 1., 0.)));
 }
 
-const imstk::Quatd&
+double
 FLSCameraController::getCameraAngulationOffset() const
 {
     return m_cameraAngulationOffset;
 }
 
 void
+FLSCameraController::setCameraAngulationTranslationOffset(const double t)
+{
+    m_angulationTranslationOffset = t;
+}
+
+double
+FLSCameraController::getCameraAngulationTranslationOffset() const
+{
+    return m_angulationTranslationOffset;
+}
+
+void
 FLSCameraController::runModule()
 {
     auto roff = Quatd(Eigen::AngleAxisd(m_cameraHeadAngleOffset*PI / 180., Vec3d(0., 0., 1.)));
-    roff *= m_cameraAngulationOffset;
-    this->setRotationOffset(roff);
+    roff *= m_cameraAngulationRotOffset;
+    this->setCameraRotationOffset(roff);
 
-    CameraController::runModule();
+    if (!m_trackingDataUptoDate)
+    {
+        if (!updateTrackingData())
+        {
+            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
+            return;
+        }
+    }
+
+    Vec3d p = getPosition();
+    Quatd r = getRotation();
+
+    m_cameraTranslationOffset = r*Vec3d(m_angulationTranslationOffset*cos(m_cameraAngulationOffset*PI / 180.),
+                                        0.,
+                                        m_angulationTranslationOffset*sin(m_cameraAngulationOffset*PI / 180.));
+
+    // Apply Offsets over the device pose
+    p += m_cameraTranslationOffset;      // Offset the device position
+    r *= m_cameraRotationalOffset;       // Apply camera head rotation offset
+
+    // Set camera pose
+    m_camera.setPosition(p);
+    m_camera.setFocalPoint(r*FORWARD_VECTOR + p);
+    m_camera.setViewUp(r*UP_VECTOR);
+
+    m_trackingDataUptoDate = false;
 }
 } // imstk
