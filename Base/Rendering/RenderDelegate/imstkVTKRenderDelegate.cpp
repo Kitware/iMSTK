@@ -26,11 +26,14 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCapsule.h"
+#include "imstkCylinder.h"
 #include "imstkCube.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
+
+// VTK render delegates
 #include "imstkVTKPlaneRenderDelegate.h"
 #include "imstkVTKSphereRenderDelegate.h"
 #include "imstkVTKCapsuleRenderDelegate.h"
@@ -39,6 +42,7 @@
 #include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
+#include "imstkVTKCylinderRenderDelegate.h"
 
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLVertexBufferObject.h"
@@ -49,7 +53,7 @@
 namespace imstk
 {
 std::shared_ptr<VTKRenderDelegate>
-VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
+VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
 {
     switch (geom->getType())
     {
@@ -72,6 +76,11 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
     {
         auto cube = std::dynamic_pointer_cast<Cube>(geom);
         return std::make_shared<VTKCubeRenderDelegate>(cube);
+    }
+    case Geometry::Type::Cylinder:
+    {
+        auto cylinder = std::dynamic_pointer_cast<Cylinder>(geom);
+        return std::make_shared<VTKCylinderRenderDelegate>(cylinder);
     }
     case Geometry::Type::SurfaceMesh:
     {

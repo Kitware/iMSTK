@@ -51,6 +51,7 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCube.h"
+#include "imstkCylinder.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkSurfaceMesh.h"
@@ -168,7 +169,7 @@ int main()
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
     //testAnalyticalGeometry();
-    //testGeometryTransforms();
+    testGeometryTransforms();
 
 
     /*------------------
@@ -199,7 +200,7 @@ int main()
     //testCameraController();
     //testTwoOmnis();
     //testLapToolController();
-    testPicking();
+    //testPicking();
 
     /*------------------
     Test Misc.
@@ -2571,6 +2572,17 @@ void testGeometryTransforms()
     auto cubeObj = std::make_shared<VisualObject>("Cube");
     cubeObj->setVisualGeometry(cubeGeom);
     scene->addSceneObject(cubeObj);
+
+    //  Cylinder
+    auto CylinderGeom = std::make_shared<Cylinder>();
+    CylinderGeom->setRadius(4.);
+    CylinderGeom->setLength(8.);
+    CylinderGeom->scale(0.4, Geometry::TransformType::ConcatenateToTransform);
+    CylinderGeom->rotate(Vec3d(1., 1., 0), PI / 2, Geometry::TransformType::ApplyToData);
+
+    auto CylinderObj = std::make_shared<VisualObject>("Cylinder");
+    CylinderObj->setVisualGeometry(CylinderGeom);
+    scene->addSceneObject(CylinderObj);
 
     // Rotate the dragon every frame
     auto rotateFunc =

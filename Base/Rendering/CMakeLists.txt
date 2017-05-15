@@ -9,6 +9,7 @@ imstk_add_library( Rendering
     RenderDelegate/imstkVTKCubeRenderDelegate.h
     RenderDelegate/imstkVTKLineMeshRenderDelegate.h
     RenderDelegate/imstkVTKPlaneRenderDelegate.h
+    RenderDelegate/imstkVTKCylinderRenderDelegate.h
     RenderDelegate/imstkVTKCapsuleRenderDelegate.h
     RenderDelegate/imstkVTKRenderDelegate.h
     RenderDelegate/imstkVTKSphereRenderDelegate.h
@@ -23,6 +24,7 @@ imstk_add_library( Rendering
     RenderDelegate/imstkVTKCubeRenderDelegate.cpp
     RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
+    RenderDelegate/imstkVTKCylinderRenderDelegate.cpp
     RenderDelegate/imstkVTKCapsuleRenderDelegate.cpp
     RenderDelegate/imstkVTKRenderDelegate.cpp
     RenderDelegate/imstkVTKSphereRenderDelegate.cpp
