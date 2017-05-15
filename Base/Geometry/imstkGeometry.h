@@ -44,6 +44,7 @@ public:
     {
         Plane,
         Sphere,
+        Cylinder,
         Cube,
         SurfaceMesh,
         TetrahedralMesh,
