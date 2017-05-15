@@ -19,23 +19,24 @@
 
 =========================================================================*/
 
-#include "imstkVTKCubeRenderDelegate.h"
+#include "imstkVTKCylinderRenderDelegate.h"
 
-#include "vtkCubeSource.h"
+#include "vtkCylinderSource.h"
 
 namespace imstk
 {
-VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube> cube) :
-    m_geometry(cube),
+VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<Cylinder> cylinder) :
+    m_geometry(cylinder),
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
-    auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
-    cubeSource->SetCenter(0, 0, 0);
-    cubeSource->SetXLength(1.0);
-    cubeSource->SetYLength(1.0);
-    cubeSource->SetZLength(1.0);
+    Geometry::DataType type = Geometry::DataType::PreTransform;
+    auto cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
+    cylinderSource->SetCenter(0., 0., 0.);
+    cylinderSource->SetRadius(cylinder->getRadius(type));
+    cylinderSource->SetHeight(cylinder->getLength(type));
+    cylinderSource->SetResolution(100);
 
-    m_transformFilter->SetInputConnection(cubeSource->GetOutputPort());
+    m_transformFilter->SetInputConnection(cylinderSource->GetOutputPort());
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
@@ -43,7 +44,7 @@ VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube> cube) :
 }
 
 void
-VTKCubeRenderDelegate::updateDataSource()
+VTKCylinderRenderDelegate::updateDataSource()
 {
     if (!m_geometry->m_dataModified)
     {
@@ -55,7 +56,7 @@ VTKCubeRenderDelegate::updateDataSource()
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(m_geometry->getPosition(type));
     T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
-    T.scale(m_geometry->getWidth(type));
+    T.scale(m_geometry->getRadius(type));
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
@@ -65,7 +66,7 @@ VTKCubeRenderDelegate::updateDataSource()
 }
 
 std::shared_ptr<Geometry>
-VTKCubeRenderDelegate::getGeometry() const
+VTKCylinderRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
