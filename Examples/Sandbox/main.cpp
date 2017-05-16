@@ -699,8 +699,10 @@ void testCameraController()
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
+    auto camControllerInput = std::make_shared<CameraController>(*cam, client);
+
     // Set camera controller
-    auto camController = cam->setupController(client);
+    auto camController = cam->setController(camControllerInput);
     //camController->setTranslationScaling(100);
     //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
     camController->setInversionFlags(imstk::CameraController::InvertFlag::rotY |

@@ -45,7 +45,8 @@ enum class DeviceType
     NAVIGATOR_3DCONNEXION,
     NOVINT_FALCON,
     PHANTOM_OMNI,
-    OSVR_HDK
+    OSVR_HDK,
+    ARDUINO_IMU
 };
 
 ///
@@ -75,6 +76,12 @@ public:
     ///
     void addDevice(std::string deviceName, DeviceType deviceType, int id = 0);
 
+
+    ///
+    /// \brief Add serial device
+    ///
+    void addSerialDevice(std::string deviceName, DeviceType deviceType, std::string port = "COM6", int baudRate = 57600, int id = 0);
+
 protected:
 
     ///
@@ -94,10 +101,17 @@ protected:
 
 private:
 
+    struct SerialInfo
+    {
+        int baudRate;
+        std::string port;
+    };
+
     const std::string m_machine; ///< machine name or IP
     const int m_port;            ///< connection port
 
     std::map<std::string, std::pair<DeviceType, int>> m_deviceInfoMap;///< list of iMSTK client info
+    std::map<std::string, SerialInfo> m_SerialInfoMap;
     vrpn_Connection * m_serverConnection;                             ///< VRPN server connection
     vrpn_MainloopContainer* m_deviceConnections;                      ///< VRPN device connections
 };

@@ -25,6 +25,7 @@
 #include "vrpn_Tracker_NovintFalcon.h"
 #include "server_src/vrpn_Phantom.h"
 #include "vrpn_Tracker_OSVRHackerDevKit.h"
+#include "vrpn_Streaming_Arduino.h"
 
 #include "g3log/g3log.hpp"
 
@@ -41,6 +42,16 @@ VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, int i
                      << "currently unstable for the Phantom Omni (no force feedback implemented).\n"
                      << "Use HDAPIDeviceClient instead of VRPNDeviceServer/Client for ";
     }
+}
+
+void
+VRPNDeviceServer::addSerialDevice(std::string deviceName, DeviceType deviceType, std::string port, int baudRate, int id)
+{
+    SerialInfo serialSettings;
+    serialSettings.baudRate = baudRate;
+    serialSettings.port = port;
+    m_deviceInfoMap[deviceName] = std::make_pair(deviceType,id);
+    m_SerialInfoMap[deviceName] = serialSettings;
 }
 
 void
@@ -90,6 +101,12 @@ VRPNDeviceServer::initModule()
         case DeviceType::OSVR_HDK:
         {
             m_deviceConnections->add(new vrpn_Tracker_OSVRHackerDevKit(name.c_str(), m_serverConnection));
+        } break;
+        case DeviceType::ARDUINO_IMU:
+        {
+            SerialInfo connectionSettings = m_SerialInfoMap[name];
+            //open with 6 channels (max needed for IMU, can use less)
+            m_deviceConnections->add(new vrpn_Streaming_Arduino(name.c_str(), m_serverConnection, connectionSettings.port, 6,connectionSettings.baudRate));
         } break;
         default:
         {

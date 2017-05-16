@@ -30,8 +30,8 @@ endif()
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
-  GIT_REPOSITORY https://github.com/agirault/vrpn
-  GIT_TAG 6928eb52d458392f34f4b0c20930abfed2bf6355
+  GIT_REPOSITORY https://github.com/sjh26/vrpn
+  GIT_TAG 6721b5ea8972cf6bcbaccdd2d32479dd77b74b53
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
     -DBUILD_TESTING:BOOL=OFF
