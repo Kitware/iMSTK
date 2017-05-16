@@ -55,16 +55,10 @@ public:
     const double getCameraHeadAngleOffset() const;
 
     ///
-    /// \brief Get/Set the rotation offset due to angulation
+    /// \brief Get/Set the angulation
     ///
-    void setCameraAngulationOffset(const double angle);
-    double getCameraAngulationOffset() const;
-
-    ///
-    /// \brief Get/Set the translation offset due to angulation
-    ///
-    void setCameraAngulationTranslationOffset(const double t);
-    double getCameraAngulationTranslationOffset() const;
+    void setCameraAngulation(const double angle);
+    double getCameraAngulation() const ;
 
     void setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> aClient);
 
@@ -75,11 +69,12 @@ protected:
     ///
     void runModule() override;
 
-    double m_cameraHeadAngleOffset = 0;                   ///< camera head angle offset (in deg)
-    Quatd m_cameraAngulationRotOffset = Quatd::Identity();///< Rotation offset for the camera via telescope angulation
-    double m_angulationTranslationOffset = 0.1;
+    double m_cameraHeadAngleOffset = 0;                            ///< camera head angle offset (in deg)
+    double m_cameraAngulation = 0;                                 ///the actual angulation!!! 0, 30, 45 deg
+    Quatd m_cameraAngulationRotOffset = Quatd::Identity();         ///< Rotation offset for the camera via telescope angulation
     std::shared_ptr<VRPNArduinoDeviceClient> arduinoClient;
     bool arduinoActive = false;
+    bool calibrated = false;
     double m_rollOffset = 0;
 };
 } // imstk

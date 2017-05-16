@@ -39,18 +39,20 @@ FLSCameraController::getCameraHeadAngleOffset() const
     return m_cameraHeadAngleOffset;
 }
 
+
+
 void
-FLSCameraController::setCameraAngulationOffset(const double angle)
+FLSCameraController::setCameraAngulation(const double angle)
 {
-    m_cameraAngulationOffset = angle;
-    m_cameraAngulationRotOffset = Quatd(Eigen::AngleAxisd(angle*PI / 180., Vec3d(0., 1., 0.)));
+  m_cameraAngulation = angle;
+  m_cameraAngulationRotOffset = Quatd(Eigen::AngleAxisd(angle*PI / 180., Vec3d(0., 1., 0.)));
 }
 
 double
-FLSCameraController::getCameraAngulationOffset() const
+FLSCameraController::getCameraAngulation() const
 {
-    return m_cameraAngulationOffset;
-}
+  return m_cameraAngulation;
+  }
 
 void 
 FLSCameraController::setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> aClient)
@@ -58,30 +60,26 @@ FLSCameraController::setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> a
   arduinoActive = true;
   arduinoClient = aClient;
   
-  m_rollOffset = arduinoClient->getRoll();
-}
-
-void
-FLSCameraController::setCameraAngulationTranslationOffset(const double t)
-{
-    m_angulationTranslationOffset = t;
-}
-
-double
-FLSCameraController::getCameraAngulationTranslationOffset() const
-{
-    return m_angulationTranslationOffset;
 }
 
 void
 FLSCameraController::runModule()
 {
-    if (arduinoActive)
+
+    //Get head angle from Arduino, performing calibration if this is the first valid report
+    if (arduinoActive & calibrated)
     {
       this->setCameraHeadAngleOffset(arduinoClient->getRoll() - m_rollOffset);
     }
+    else if (arduinoActive)
+    {
+      if (arduinoClient->getRoll() != 0){
+        std::cout << "FLS Camera Controller:  Calibration complete; Safe to move camera" << std::endl;
+        m_rollOffset = arduinoClient->getRoll();
+        calibrated = true;
+      }
+    }
     auto roff = Quatd(Eigen::AngleAxisd(m_cameraHeadAngleOffset*PI / 180., Vec3d(0., 0., 1.)));
-    roff *= m_cameraAngulationRotOffset;
     this->setCameraRotationOffset(roff);
 
     if (!m_trackingDataUptoDate)
@@ -96,18 +94,22 @@ FLSCameraController::runModule()
     Vec3d p = getPosition();
     Quatd r = getRotation();
 
-    m_cameraTranslationOffset = r*Vec3d(m_angulationTranslationOffset*cos(m_cameraAngulationOffset*PI / 180.),
-                                        0.,
-                                        m_angulationTranslationOffset*sin(m_cameraAngulationOffset*PI / 180.));
+
+    //Adjust the upward angulation position to the center of the ROM
+    auto angulationDirectionOffset = Quatd(Eigen::AngleAxisd(-90*PI / 180., Vec3d(0., 0., 1.)));
+    r *= angulationDirectionOffset;
+
 
     // Apply Offsets over the device pose
     p += m_cameraTranslationOffset;      // Offset the device position
-    r *= m_cameraRotationalOffset;       // Apply camera head rotation offset
+
+    //Apply offset from angulation
+    r *= m_cameraAngulationRotOffset;
 
     // Set camera pose
-    m_camera.setPosition(p);
-    m_camera.setFocalPoint(r*FORWARD_VECTOR + p);
-    m_camera.setViewUp(r*UP_VECTOR);
+    m_camera.setPosition(p);                                         //position of camera
+    m_camera.setFocalPoint(r*FORWARD_VECTOR + p);                    //direction camera is looking
+    m_camera.setViewUp(m_cameraRotationalOffset*UP_VECTOR);          //Orientation of camera
 
     m_trackingDataUptoDate = false;
 }
