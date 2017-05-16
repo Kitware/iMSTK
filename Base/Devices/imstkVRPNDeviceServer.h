@@ -101,9 +101,10 @@ protected:
 
 private:
 
-    struct SerialInfo{
-      int baudRate;
-      std::string port;
+    struct SerialInfo
+    {
+        int baudRate;
+        std::string port;
     };
 
     const std::string m_machine; ///< machine name or IP

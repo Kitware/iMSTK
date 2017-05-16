@@ -32,7 +32,6 @@ VRPNArduinoDeviceClient::initModule()
 
     m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
     m_vrpnAnalog->register_change_handler(this, analogChangeHandler);
-
 }
 
 void
@@ -44,11 +43,9 @@ VRPNArduinoDeviceClient::runModule()
 void
 VRPNArduinoDeviceClient::cleanUpModule()
 {
-
     m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
 
     m_vrpnAnalog.reset();
-
 }
 
 
@@ -60,8 +57,5 @@ VRPNArduinoDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGC
     //deviceClient->m_ypr << a.channel[0], a.channel[1], a.channel[2];
     //deviceClient->m_accel << a.channel[3], a.channel[4], a.channel[5];
     deviceClient->m_roll = a.channel[0];
-
 }
-
-
 } // imstk

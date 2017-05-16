@@ -58,7 +58,7 @@ public:
     /// \brief Get/Set the angulation
     ///
     void setCameraAngulation(const double angle);
-    double getCameraAngulation() const ;
+    double getCameraAngulation() const;
 
     void setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> aClient);
 
