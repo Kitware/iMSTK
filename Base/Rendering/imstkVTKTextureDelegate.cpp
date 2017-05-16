@@ -51,5 +51,6 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     m_sourceTexture = vtkSmartPointer<vtkTexture>::New();
     m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
     m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+    m_sourceTexture->RepeatOff();
 }
 }
