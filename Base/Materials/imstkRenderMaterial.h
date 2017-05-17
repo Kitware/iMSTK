@@ -99,6 +99,12 @@ public:
     void addTexture(std::shared_ptr<Texture> texture);
     std::shared_ptr<Texture> getTexture(Texture::Type type);
 
+    ///
+    /// \brief Turn on/off flat shading
+    ///
+    void flatShadingOn();
+    void flatShadingOff();
+
 protected:
     friend class VTKRenderDelegate;
 
@@ -120,6 +126,7 @@ protected:
 
     bool m_stateModified = true; ///< Flag for expensive state changes
     bool m_modified = true; ///< Flag for any material property changes
+    bool m_flatShading = false;
 };
 }
 

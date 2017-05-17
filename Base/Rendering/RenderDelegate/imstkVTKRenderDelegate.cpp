@@ -213,6 +213,14 @@ VTKRenderDelegate::updateActorProperties()
     default:
         actorProperty->SetRepresentationToSurface();
         actorProperty->SetEdgeVisibility(false);
+        if (material->m_flatShading)
+        {
+            actorProperty->SetInterpolationToFlat();
+        }
+        else
+        {
+            actorProperty->SetInterpolationToGouraud();
+        }
         break;
     }
 
