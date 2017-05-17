@@ -37,7 +37,7 @@ HDAPIDeviceClient::init()
 
     //flush error stack
     HDErrorInfo errorFlush;
-    while (HD_DEVICE_ERROR(errorFlush = hdGetError())){}
+    while (HD_DEVICE_ERROR(errorFlush = hdGetError())) {}
 
     // Open Device
     m_handle = hdInitDevice(this->getDeviceName().c_str());
