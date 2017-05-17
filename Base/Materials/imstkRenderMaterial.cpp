@@ -175,4 +175,16 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
     }
     m_textures[texture->getType()] = texture;
 }
+
+void
+RenderMaterial::flatShadingOn()
+{
+    m_flatShading = true;
+}
+
+void
+RenderMaterial::flatShadingOff()
+{
+    m_flatShading = false;
+}
 }
