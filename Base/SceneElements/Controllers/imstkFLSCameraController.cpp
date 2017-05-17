@@ -61,6 +61,24 @@ FLSCameraController::setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> a
 }
 
 void
+FLSCameraController::recalibrate()
+{
+  if (arduinoActive & calibrated)
+  {
+    if (arduinoClient->getRoll() != 0)
+    {
+      m_rollOffset = arduinoClient->getRoll();
+      std::cout << "FLS Camera Controller:  Calibration complete" << std::endl;
+      calibrated = true;
+    }
+    else
+    {
+      std::cout << "FLS Camera Controller:  Cannot calibrate - device still warming up" << std::endl;
+    }
+  }
+}
+
+void
 FLSCameraController::runModule()
 {
     //Get head angle from Arduino, performing calibration if this is the first valid report
@@ -72,7 +90,7 @@ FLSCameraController::runModule()
     {
         if (arduinoClient->getRoll() != 0)
         {
-            std::cout << "FLS Camera Controller:  Calibration complete; Safe to move camera" << std::endl;
+            std::cout << "FLS Camera Controller:  Autocalibration complete" << std::endl;
             m_rollOffset = arduinoClient->getRoll();
             calibrated = true;
         }

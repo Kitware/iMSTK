@@ -32,6 +32,7 @@ VRPNArduinoDeviceClient::initModule()
 
     m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
     m_vrpnAnalog->register_change_handler(this, analogChangeHandler);
+    m_vrpnAnalog->shutup = true;
 }
 
 void
@@ -43,9 +44,10 @@ VRPNArduinoDeviceClient::runModule()
 void
 VRPNArduinoDeviceClient::cleanUpModule()
 {
-    m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
+    //Module cleanup is causing TCP errors - seems to work fine without it
+    //m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
+    //m_vrpnAnalog.reset();
 
-    m_vrpnAnalog.reset();
 }
 
 

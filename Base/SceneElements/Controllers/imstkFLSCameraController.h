@@ -62,6 +62,8 @@ public:
 
     void setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> aClient);
 
+    void recalibrate();
+
 protected:
 
     ///
