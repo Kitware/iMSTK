@@ -55,6 +55,12 @@ public:
     const double getCameraHeadAngleOffset() const;
 
     ///
+    /// \brief Get/Set the cameraHead angle calibration offset
+    ///
+    void setAngleCalibration( const double angle);
+    double getAngleCalibration();
+
+    ///
     /// \brief Get/Set the angulation
     ///
     void setCameraAngulation(const double angle);

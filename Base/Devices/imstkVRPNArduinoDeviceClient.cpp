@@ -47,7 +47,6 @@ VRPNArduinoDeviceClient::cleanUpModule()
     //Module cleanup is causing TCP errors - seems to work fine without it
     //m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
     //m_vrpnAnalog.reset();
-
 }
 
 
