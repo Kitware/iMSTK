@@ -61,22 +61,43 @@ FLSCameraController::setArduinoDevice(std::shared_ptr<VRPNArduinoDeviceClient> a
 }
 
 void
-FLSCameraController::runModule()
+FLSCameraController::setAngleCalibration(const double angle)
 {
-    //Get head angle from Arduino, performing calibration if this is the first valid report
-    if (arduinoActive & calibrated)
-    {
-        this->setCameraHeadAngleOffset(arduinoClient->getRoll() - m_rollOffset);
-    }
-    else if (arduinoActive)
+    m_rollOffset = angle;
+}
+
+double FLSCameraController::getAngleCalibration()
+{
+    return m_rollOffset;
+}
+
+void
+FLSCameraController::recalibrate()
+{
+    if (arduinoActive)
     {
         if (arduinoClient->getRoll() != 0)
         {
-            std::cout << "FLS Camera Controller:  Calibration complete; Safe to move camera" << std::endl;
             m_rollOffset = arduinoClient->getRoll();
+            std::cout << "FLS Camera Controller:  Calibration complete" << std::endl;
             calibrated = true;
         }
+        else
+        {
+            std::cout << "FLS Camera Controller:  Cannot calibrate - bad input from device" << std::endl;
+        }
     }
+}
+
+void
+FLSCameraController::runModule()
+{
+    //Get head angle from Arduino
+    if (arduinoActive)
+    {
+        this->setCameraHeadAngleOffset(arduinoClient->getRoll() - m_rollOffset);
+    }
+
     auto roff = Quatd(Eigen::AngleAxisd(m_cameraHeadAngleOffset*PI / 180., Vec3d(0., 0., 1.)));
     this->setCameraRotationOffset(roff);
 
