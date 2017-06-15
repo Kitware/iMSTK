@@ -32,6 +32,8 @@ namespace imstk
 void
 VirtualCouplingCH::computeContactForces()
 {
+    m_offset.setZero();
+
     const auto collidingGeometry = std::static_pointer_cast<AnalyticalGeometry>(m_object->getCollidingGeometry());
     const auto visualGeometry =  std::static_pointer_cast<AnalyticalGeometry>(m_object->getVisualGeometry());
 
@@ -56,7 +58,8 @@ VirtualCouplingCH::computeContactForces()
     visualGeometry->setPosition(visualObjPos);
 
     // Spring force
-    Vec3d force = m_stiffness * (visualObjPos - collidingObjPos);
+    m_offset = (visualObjPos - collidingObjPos);
+    Vec3d force = m_stiffness * m_offset;
 
     // Damping force
     const double dt = 0.1; // Time step size to calculate the object velocity
@@ -68,5 +71,11 @@ VirtualCouplingCH::computeContactForces()
     // Housekeeping
     m_initialStep = false;
     m_prevPos = collidingObjPos;
+}
+
+imstk::Vec3d
+VirtualCouplingCH::getOffset()
+{
+    return m_offset;
 }
 }// iMSTK

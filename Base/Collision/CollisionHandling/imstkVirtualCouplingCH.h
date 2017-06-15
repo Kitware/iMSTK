@@ -72,11 +72,17 @@ public:
     inline double getDamping() const { return m_damping; }
     inline void setDamping(const double damping) { m_damping = damping; }
 
+    ///
+    /// \brief Get the offset of the
+    ///
+    Vec3d getOffset();
+
 private:
 
     std::shared_ptr<CollidingObject> m_object;  ///> colliding object
     bool m_initialStep = true;                  ///> Number of times steps
     Vec3d m_prevPos;                            ///> Previous position of the colliding object
+    Vec3d m_offset;
 
     double m_stiffness = 5e-01;                 ///> Stiffness coefficient use to compute spring force
     double m_damping = 0.005;                   ///> Damping coefficient used to compute damping force
