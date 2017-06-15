@@ -137,6 +137,7 @@ void testVirtualCoupling();
 void testGeometryTransforms();
 void testPicking();
 void testBoneDrilling();
+void testVirtualCouplingCylinder();
 
 int main()
 {
@@ -169,7 +170,7 @@ int main()
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
     //testAnalyticalGeometry();
-    testGeometryTransforms();
+    //testGeometryTransforms();
 
 
     /*------------------
@@ -207,8 +208,9 @@ int main()
     ------------------*/
     //testScenesManagement();
     //testVectorPlotters();
-    //testVirtualCoupling();
-    testBoneDrilling();
+    testVirtualCoupling();
+    //testBoneDrilling();
+    testVirtualCouplingCylinder();
 
 
     return 0;
@@ -2494,7 +2496,7 @@ void testVirtualCoupling()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -2796,6 +2798,84 @@ void testBoneDrilling()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 0, 15));
 
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(false);
+}
+
+// test virtual coupling for cylinder to sphere collision
+void testVirtualCouplingCylinder()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("VirtualCouplingCylinderSphere");
+
+    // Create a plane in the scene (visual)
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->setWidth(10);
+    planeGeom->setPosition(0.0, -50, 0.0);
+    auto planeObj = std::make_shared<imstk::VisualObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // Create the virtual coupling object controller
+#ifdef iMSTK_USE_OPENHAPTICS
+
+    // Device clients
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
+
+    // Device tracker
+    auto deviceTracker = std::make_shared<imstk::DeviceTracker>(client);
+
+    // Create a virtual coupling object
+    auto visualGeom = std::make_shared<imstk::Sphere>();
+    visualGeom->setRadius(5.);
+    auto collidingGeom = std::make_shared<imstk::Sphere>();
+    collidingGeom->setRadius(5);
+    auto virtualCouplingSphereObj = std::make_shared<CollidingObject>("VirtualCouplingObject");
+    virtualCouplingSphereObj->setCollidingGeometry(collidingGeom);
+    virtualCouplingSphereObj->setVisualGeometry(visualGeom);
+    scene->addSceneObject(virtualCouplingSphereObj);
+
+    // Create colliding cylinder scene object
+    auto CylinderGeom = std::make_shared<Cylinder>();
+    //CylinderGeom->setRadius(20.);
+    //CylinderGeom->setLength(40.);
+
+    auto CylinderObj = std::make_shared<CollidingObject>("Cylinder");
+    CylinderObj->setVisualGeometry(CylinderGeom);
+    CylinderObj->setCollidingGeometry(CylinderGeom);
+    scene->addSceneObject(CylinderObj);
+
+    // Create and add virtual coupling object controller in the scene
+    auto objController = std::make_shared<imstk::SceneObjectController>(virtualCouplingSphereObj,
+                                                                        deviceTracker);
+    scene->addObjectController(objController);
+
+    // Create a collision graph
+    auto graph = scene->getCollisionGraph();
+    auto pair = graph->addInteractionPair(CylinderObj, virtualCouplingSphereObj,
+        CollisionDetection::Type::SphereToCylinder,
+        CollisionHandling::Type::None,
+        CollisionHandling::Type::VirtualCoupling);
+
+    // Customize collision handling algorithm
+    auto colHandlingAlgo = std::dynamic_pointer_cast<VirtualCouplingCH>(pair->getCollisionHandlingB());
+    colHandlingAlgo->setStiffness(5e-1);
+    colHandlingAlgo->setDamping(0.005);
+
+#endif
+
+    // Move Camera
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(200, 200, 200));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    //Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 }
