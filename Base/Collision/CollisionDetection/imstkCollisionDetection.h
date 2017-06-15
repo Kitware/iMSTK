@@ -45,6 +45,7 @@ public:
     {
         UnidirectionalPlaneToSphere,
         BidirectionalPlaneToSphere,
+        SphereToCylinder,
         SphereToSphere,
         MeshToSphere,
         MeshToPlane,
