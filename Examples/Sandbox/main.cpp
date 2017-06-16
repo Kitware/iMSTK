@@ -2515,6 +2515,10 @@ void testVirtualCoupling()
     obj->setCollidingGeometry(collidingGeom);
     obj->setVisualGeometry(visualGeom);
 
+    auto material = std::make_shared<RenderMaterial>();
+    //material->setVisibilityOff();
+    visualGeom->setRenderMaterial(material);
+
     // Add virtual coupling object (with visual, colliding, and physics geometry) in the scene.
     scene->addSceneObject(obj);
 

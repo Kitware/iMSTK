@@ -207,5 +207,4 @@ RenderMaterial::getVisibility() const
 {
     return m_isVisible;
 }
-
 }
