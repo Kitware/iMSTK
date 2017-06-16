@@ -105,6 +105,13 @@ public:
     void flatShadingOn();
     void flatShadingOff();
 
+    ///
+    /// \brief Turn on/off visibility
+    ///
+    void setVisibilityOff();
+    void setVisibilityOn();
+    bool getVisibility() const;
+
 protected:
     friend class VTKRenderDelegate;
 
@@ -124,8 +131,11 @@ protected:
     // Textures
     std::vector<std::shared_ptr<Texture>> m_textures; ///< Ordered by Texture::Type
 
+    // Visibility
+    bool m_isVisible = true;
+
     bool m_stateModified = true; ///< Flag for expensive state changes
-    bool m_modified = true; ///< Flag for any material property changes
+    bool m_modified = true;      ///< Flag for any material property changes
     bool m_flatShading = false;
 };
 }

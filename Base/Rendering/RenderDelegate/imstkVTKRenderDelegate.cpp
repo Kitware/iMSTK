@@ -231,5 +231,16 @@ VTKRenderDelegate::updateActorProperties()
 
     // Material state is now up to date
     material->m_stateModified = false;
+
+    if (material->getVisibility())
+    {
+        m_actor->VisibilityOn();
+        return;
+    }
+    else
+    {
+        m_actor->VisibilityOff();
+        return;
+    }
 }
 } // imstk
