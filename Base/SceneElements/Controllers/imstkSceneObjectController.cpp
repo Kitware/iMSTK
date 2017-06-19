@@ -30,12 +30,6 @@
 
 namespace imstk
 {
-void
-SceneObjectController::initOffsets()
-{
-    m_trackingController->setTranslationOffset(m_sceneObject->getMasterGeometry()->getTranslation());
-    m_trackingController->setRotationOffset(Quatd(m_sceneObject->getMasterGeometry()->getRotation()));
-}
 
 void
 SceneObjectController::updateControlledObjects()

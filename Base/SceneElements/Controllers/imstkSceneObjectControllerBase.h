@@ -39,11 +39,6 @@ public:
     ~SceneObjectControllerBase() = default;
 
     ///
-    /// \brief Initialize offset based on object geometry
-    ///
-    virtual void initOffsets() = 0;
-
-    ///
     /// \brief Update controlled scene objects using latest tracking information
     ///
     virtual void updateControlledObjects() = 0;

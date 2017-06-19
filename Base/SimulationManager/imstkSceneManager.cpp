@@ -48,12 +48,6 @@ SceneManager::initModule()
         this->startModuleInNewThread(camController);
     }
 
-    // Update objects controlled by the device controllers
-    for (auto controller : m_scene->getSceneObjectControllers())
-    {
-        controller->initOffsets();
-    }
-
     // Init virtual coupling objects offsets
     for (auto obj : m_scene->getSceneObjects())
     {
