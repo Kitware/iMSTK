@@ -127,7 +127,6 @@ InteractionPair::computeCollisionData()
         LOG(WARNING) << "InteractionPair::computeCollisionData error: interaction not valid.";
         return;
     }
-
     m_colDetect->computeCollisionData();
 }
 

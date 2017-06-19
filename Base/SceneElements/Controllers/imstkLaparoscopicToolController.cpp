@@ -30,14 +30,6 @@
 
 namespace imstk
 {
-void
-LaparoscopicToolController::initOffsets()
-{
-    m_trackingController->setTranslationOffset(m_shaft->getMasterGeometry()->getTranslation());
-    m_trackingController->setRotationOffset(Quatd(m_shaft->getMasterGeometry()->getRotation()));
-
-    m_trackingController->getDeviceClient()->setButtonsEnabled(true);
-}
 
 void
 LaparoscopicToolController::updateControlledObjects()

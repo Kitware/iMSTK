@@ -53,7 +53,10 @@ public:
         m_trackingController(trackingController),
         m_shaft(shaft),
         m_upperJaw(upperJaw),
-        m_lowerJaw(lowerJaw) {}
+        m_lowerJaw(lowerJaw)
+    {
+        m_trackingController->getDeviceClient()->setButtonsEnabled(true);
+    }
 
     LaparoscopicToolController() = delete; //not allowed for now
 
@@ -61,11 +64,6 @@ public:
     /// \brief Destructor
     ///
     ~LaparoscopicToolController() = default;
-
-    ///
-    /// \brief Initialize offset based on object geometry
-    ///
-    void initOffsets() override;
 
     ///
     /// \brief Update controlled laparoscopic tool using latest tracking information
