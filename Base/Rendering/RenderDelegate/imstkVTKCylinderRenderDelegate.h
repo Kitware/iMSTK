@@ -29,6 +29,7 @@
 
 #include "vtkTransformPolyDataFilter.h"
 
+#include "vtkCylinderSource.h"
 namespace imstk
 {
 ///
@@ -60,6 +61,8 @@ public:
     std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
+    vtkSmartPointer<vtkCylinderSource> cylinderSource;
+
     std::shared_ptr<Cylinder> m_geometry;   ///> Geometry
 
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source

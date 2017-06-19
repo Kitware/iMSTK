@@ -2825,7 +2825,7 @@ void testVirtualCouplingCylinder()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 2");
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -2839,20 +2839,20 @@ void testVirtualCouplingCylinder()
     auto visualGeom = std::make_shared<imstk::Sphere>();
     visualGeom->setRadius(5.);
     auto collidingGeom = std::make_shared<imstk::Sphere>();
-    collidingGeom->setRadius(5);
+    collidingGeom->setRadius(5.);
     auto virtualCouplingSphereObj = std::make_shared<CollidingObject>("VirtualCouplingObject");
     virtualCouplingSphereObj->setCollidingGeometry(collidingGeom);
     virtualCouplingSphereObj->setVisualGeometry(visualGeom);
     scene->addSceneObject(virtualCouplingSphereObj);
 
     // Create colliding cylinder scene object
-    auto CylinderGeom = std::make_shared<Cylinder>();
-    //CylinderGeom->setRadius(20.);
-    //CylinderGeom->setLength(40.);
+    auto CylinderGeomVis = std::make_shared<Cylinder>();
+    CylinderGeomVis->setRadius(10.);
+    CylinderGeomVis->setLength(40.);
 
     auto CylinderObj = std::make_shared<CollidingObject>("Cylinder");
-    CylinderObj->setVisualGeometry(CylinderGeom);
-    CylinderObj->setCollidingGeometry(CylinderGeom);
+    CylinderObj->setVisualGeometry(CylinderGeomVis);
+    CylinderObj->setCollidingGeometry(CylinderGeomVis);
     scene->addSceneObject(CylinderObj);
 
     // Create and add virtual coupling object controller in the scene
