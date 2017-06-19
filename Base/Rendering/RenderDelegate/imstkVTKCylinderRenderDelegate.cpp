@@ -21,8 +21,6 @@
 
 #include "imstkVTKCylinderRenderDelegate.h"
 
-#include "vtkCylinderSource.h"
-
 namespace imstk
 {
 VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<Cylinder> cylinder) :
@@ -30,10 +28,10 @@ VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<Cylinder> c
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
     Geometry::DataType type = Geometry::DataType::PreTransform;
-    auto cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
+    cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
     cylinderSource->SetCenter(0., 0., 0.);
-    cylinderSource->SetRadius(cylinder->getRadius(type));
-    cylinderSource->SetHeight(cylinder->getLength(type));
+    cylinderSource->SetRadius(1.);
+    cylinderSource->SetHeight(m_geometry->getLength());
     cylinderSource->SetResolution(100);
 
     m_transformFilter->SetInputConnection(cylinderSource->GetOutputPort());
@@ -53,10 +51,13 @@ VTKCylinderRenderDelegate::updateDataSource()
 
     Geometry::DataType type = Geometry::DataType::PreTransform;
 
+    cylinderSource->SetRadius(m_geometry->getRadius());
+    cylinderSource->SetHeight(m_geometry->getLength());
+
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(m_geometry->getPosition(type));
     T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
-    T.scale(m_geometry->getRadius(type));
+    T.scale(1.0);
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
