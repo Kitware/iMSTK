@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 void
 SceneObjectController::updateControlledObjects()
 {
