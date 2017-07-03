@@ -136,6 +136,19 @@ The SpatialHashtable class implements a 2D data structure that can map keys to v
 #### Code style check
 You can and should use the `uncrustify` tool to check and/or adjust code style of your files. It is run as part of git's pre-commit hook, as part of test suite invoked by CTest or by building *RUN_TESTS* target in Visual Studio. You can also run it manually by building *uncrustifyRun* target, but in that mode your files will be overwritten so make sure you commit your work beforehand to easily see the style changes automatically made by `uncrustify`.
 
+To temporarily disable style checking as part of a commit hook, run:
+```sh
+git config uncrustify.skip true
+```
+Then commit your changes. Then build *uncrustify* target, e.g.:
+```sh
+make uncrustify
+```
+You can view the changes by running `git diff`. If the changes are minor, add them to your previous commit, `git commit --amend`. If the changes make the style uglier (it can happen sometimes), the best solution is usually to re-write your original code to avoid the questionable style changes from having to be made. Only rarely should you use \*INDENT-ON\* and \*INDENT-OFF\* keywords in comments to disable uncrustify's style check for a portion of the code. Once everything is sorted out, enable uncrustify:
+```sh
+git config uncrustify.skip false
+```
+
 ### Testing your code
 *Coming soon - Please refer to the rest of the code in the meantime*
 
