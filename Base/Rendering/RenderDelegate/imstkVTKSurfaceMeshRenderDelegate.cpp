@@ -72,13 +72,6 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     polydata->SetPoints(points);
     polydata->SetPolys(cells);
 
-    // Check for cell consistency
-    auto consistentCellsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
-    consistentCellsFilter->SplittingOff();
-    consistentCellsFilter->SetInputData(polydata);
-    consistentCellsFilter->Update();
-    polydata->SetPolys(consistentCellsFilter->GetOutput()->GetPolys());
-
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
