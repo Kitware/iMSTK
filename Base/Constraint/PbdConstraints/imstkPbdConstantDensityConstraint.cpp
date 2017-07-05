@@ -24,7 +24,6 @@ limitations under the License.
 
 namespace imstk
 {
-
 void
 PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double k)
 {
@@ -45,9 +44,9 @@ PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double k)
     m_deltaPositions.resize(np);
     m_neighbors.resize(np * m_maxNumNeighbors);
 
-	m_xPosIndexes.resize(np);
-	m_yPosIndexes.resize(np);
-	m_zPosIndexes.resize(np);
+    m_xPosIndexes.resize(np);
+    m_yPosIndexes.resize(np);
+    m_zPosIndexes.resize(np);
 }
 
 bool
@@ -61,14 +60,14 @@ PbdConstantDensityConstraint::solvePositionConstraint(PbdModel& model)
 
     //This loop should be replaced with parallellization
     /*for (int index = 0; index < np; index++)
-	{
-		PointTable(pos[index], index);
-	}*/
-	for (int index = 0; index < np; index++)
-	{
-		//UpdateNeighbors(index, pos);
-		UpdateNeighborsBruteForce(pos[index], index, pos);
-	}
+        {
+                PointTable(pos[index], index);
+        }*/
+    for (int index = 0; index < np; index++)
+    {
+        //UpdateNeighbors(index, pos);
+        UpdateNeighborsBruteForce(pos[index], index, pos);
+    }
     for (int index = 0; index < np; index++)
     {
         CalculateDensityEstimate(pos[index], index, pos);
@@ -144,83 +143,93 @@ PbdConstantDensityConstraint::Length(const Vec3d &p1)
 inline void
 PbdConstantDensityConstraint::ClearNeighbors(const int &np)
 {
-	m_numNeighbors.clear();
-	m_neighbors.clear();
-	m_numNeighbors.resize(np);
-	m_neighbors.resize(np * m_maxNumNeighbors);
+    m_numNeighbors.clear();
+    m_neighbors.clear();
+    m_numNeighbors.resize(np);
+    m_neighbors.resize(np * m_maxNumNeighbors);
 }
 
-inline void 
+inline void
 PbdConstantDensityConstraint::PointTable(const Vec3d &pi, const int &index)
 {
-	m_xPosIndexes[index] = (pi[0] - pi[0] * m_maxDist) / m_maxDist;
-	m_yPosIndexes[index] = (pi[1] - pi[1] * m_maxDist) / m_maxDist;
-	m_zPosIndexes[index] = (pi[2] - pi[2] * m_maxDist) / m_maxDist;
+    m_xPosIndexes[index] = (pi[0] - pi[0] * m_maxDist) / m_maxDist;
+    m_yPosIndexes[index] = (pi[1] - pi[1] * m_maxDist) / m_maxDist;
+    m_zPosIndexes[index] = (pi[2] - pi[2] * m_maxDist) / m_maxDist;
 }
 
-inline void 
+inline void
 PbdConstantDensityConstraint::UpdateNeighbors(const int &index, const StdVectorOfVec3d &positions)
 {
-	int ip = m_xPosIndexes[index];
-	int jp = m_yPosIndexes[index];
-	int kp = m_zPosIndexes[index];
+    int ip = m_xPosIndexes[index];
+    int jp = m_yPosIndexes[index];
+    int kp = m_zPosIndexes[index];
 
-	int np = m_zPosIndexes.size();
-	int neighborCount = 0;
+    int np = m_zPosIndexes.size();
+    int neighborCount = 0;
 
-	int ibound = ip - 2;
-	if (ibound < 0)
-		ibound = 0;
-	int jbound = jp - 2;
-	if (jbound < 0)
-		jbound = 0;
-	int kbound = kp - 2;
-	if (kbound < 0)
-		kbound = 0;
-	for (int i = 0; i < np; i++)
-	{
-		if (neighborCount >= m_maxNumNeighbors || i == index)
-			continue;
-		if (m_xPosIndexes[i] > ibound && m_xPosIndexes[i] < (ip + 2))
-		{
-			if (m_yPosIndexes[i] > jbound && m_yPosIndexes[i] < (jp + 2))
-			{
-				if (m_zPosIndexes[i] > kbound && m_zPosIndexes[i] < (kp + 2))
-				{
-					m_neighbors[index * m_maxNumNeighbors + neighborCount] = i;
-					neighborCount++;
-				}
-			}	
-		}
-	}
-	m_numNeighbors[index] = neighborCount;
+    int ibound = ip - 2;
+    if (ibound < 0)
+    {
+        ibound = 0;
+    }
+    int jbound = jp - 2;
+    if (jbound < 0)
+    {
+        jbound = 0;
+    }
+    int kbound = kp - 2;
+    if (kbound < 0)
+    {
+        kbound = 0;
+    }
+    for (int i = 0; i < np; i++)
+    {
+        if (neighborCount >= m_maxNumNeighbors || i == index)
+        {
+            continue;
+        }
+        if (m_xPosIndexes[i] > ibound && m_xPosIndexes[i] < (ip + 2))
+        {
+            if (m_yPosIndexes[i] > jbound && m_yPosIndexes[i] < (jp + 2))
+            {
+                if (m_zPosIndexes[i] > kbound && m_zPosIndexes[i] < (kp + 2))
+                {
+                    m_neighbors[index * m_maxNumNeighbors + neighborCount] = i;
+                    neighborCount++;
+                }
+            }
+        }
+    }
+    m_numNeighbors[index] = neighborCount;
 }
 
 //brute Force
-inline 
+inline
 void PbdConstantDensityConstraint::UpdateNeighborsBruteForce(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions)
 {
-	double neighborRadius = 2 * m_maxDist;
-	Vec3d r;
-	double rLength;
-	int neighborCount = 0;
-	//loop over all points
-	for (int j = 0; j < positions.size(); j++)
-	{
-		if (j != index)
-		{
-			if (neighborCount >= m_maxNumNeighbors)
-				continue;
-			r = pi - positions[j];
-			rLength = Length(r);
-			if (rLength < neighborRadius)
-			{
-				m_neighbors[index * m_maxNumNeighbors + neighborCount] = j;
-				neighborCount++;
-			}
-		}
-	}
-	m_numNeighbors[index] = neighborCount;
+    double neighborRadius = 2 * m_maxDist;
+    Vec3d r;
+    double rLength;
+    int neighborCount = 0;
+    //loop over all points
+    for (int j = 0; j < positions.size(); j++)
+    {
+        if (j != index)
+        {
+            if (neighborCount >= m_maxNumNeighbors)
+            {
+                continue;
+            }
+            r = pi - positions[j];
+            rLength = Length(r);
+            if (rLength < neighborRadius)
+            {
+                m_neighbors[index * m_maxNumNeighbors + neighborCount] = j;
+                neighborCount++;
+            }
+        }
+    }
+    m_numNeighbors[index] = neighborCount;
 }
 
 

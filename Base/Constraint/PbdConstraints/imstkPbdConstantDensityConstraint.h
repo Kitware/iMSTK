@@ -56,9 +56,9 @@ private:
     double Length(const Vec3d &);
 
     void PointTable(const Vec3d &pi, const int &index);
-	void UpdateNeighbors(const int &index, const StdVectorOfVec3d &positions);
-	void UpdateNeighborsBruteForce(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
-	void ClearNeighbors(const int &np);
+    void UpdateNeighbors(const int &index, const StdVectorOfVec3d &positions);
+    void UpdateNeighborsBruteForce(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
+    void ClearNeighbors(const int &np);
     void CalculateDensityEstimate(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
     void CalculateLambdaScalingFactor(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
     void DeltaPosition(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
@@ -77,9 +77,9 @@ private:
     std::vector<Vec3d> m_deltaPositions;       ///> delta positions
     std::vector<int> m_neighbors;              ///> index of neighbors
     std::vector<int> m_numNeighbors;           ///> number of neighbors
-	std::vector<int> m_xPosIndexes;
-	std::vector<int> m_yPosIndexes;
-	std::vector<int> m_zPosIndexes;
+    std::vector<int> m_xPosIndexes;
+    std::vector<int> m_yPosIndexes;
+    std::vector<int> m_zPosIndexes;
 };
 }
 
