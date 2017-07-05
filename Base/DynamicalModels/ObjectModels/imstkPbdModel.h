@@ -125,6 +125,13 @@ public:
     /// \brief addConstraint add elastic constraint
     /// \param constraint
     ///
+    bool initializeConstantDensityConstraint(const double& stiffness);
+
+    ///
+    /// \todo: add the initialization parameters for the constraint
+    /// \param...
+    ///
+
     inline void addConstraint(std::shared_ptr<PbdConstraint> constraint) { m_constraints.push_back(constraint); }
 
     ///

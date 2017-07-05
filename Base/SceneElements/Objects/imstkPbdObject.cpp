@@ -118,6 +118,13 @@ PbdObject::initialize(int nCons, ...)
             LOG(INFO) << "Creating Dihedral constraints " << stiffness;
             m_pbdModel->initializeDihedralConstraints(stiffness);
         }
+        else if (strncmp("ConstantDensity", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            LOG(INFO) << "Creating Constant Density constraints ";
+            m_pbdModel->initializeConstantDensityConstraint(stiffness);
+        }
         else
         {
             exit(0);

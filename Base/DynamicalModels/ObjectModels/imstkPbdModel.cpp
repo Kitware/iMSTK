@@ -28,6 +28,7 @@
 #include "imstkPbdAreaConstraint.h"
 #include "imstkPbdFETetConstraint.h"
 #include "imstkPbdFEHexConstraint.h"
+#include "imstkPbdConstantDensityConstraint.h"
 
 #include <g3log/g3log.hpp>
 
@@ -392,6 +393,24 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
             E[tri[2]][tri[0]] = 0;
         }
     }
+    return true;
+}
+
+bool
+PbdModel::initializeConstantDensityConstraint(const double& stiffness)
+{
+    // check if constraint type matches the mesh type
+    if (m_mesh->getType() != Geometry::Type::SurfaceMesh && m_mesh->getType() != Geometry::Type::TetrahedralMesh && m_mesh->getType() != Geometry::Type::LineMesh &&
+        m_mesh->getType() != Geometry::Type::HexahedralMesh)
+    {
+        LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
+        return false;
+    }
+
+    auto c = std::make_shared<PbdConstantDensityConstraint>();
+    c->initConstraint(*this, stiffness);
+    m_constraints.push_back(c);
+
     return true;
 }
 
