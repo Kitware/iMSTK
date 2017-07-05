@@ -126,6 +126,7 @@ void testVectorPlotters();
 void testPbdVolume();
 void testPbdCloth();
 void testPbdCollision();
+void testPbdFluid();
 void testLineMesh();
 void testMshAndVegaIO();
 void testLapToolController();
@@ -179,6 +180,7 @@ int main()
     //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
+    testPbdFluid();
     //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
@@ -208,9 +210,9 @@ int main()
     ------------------*/
     //testScenesManagement();
     //testVectorPlotters();
-    testVirtualCoupling();
+    //testVirtualCoupling();
     //testBoneDrilling();
-    testVirtualCouplingCylinder();
+    //testVirtualCouplingCylinder();
 
 
     return 0;
@@ -1830,6 +1832,237 @@ void testPbdCollision()
 
         colGraph->addInteractionPair(pair);
     }
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(true);
+}
+
+void testPbdFluid()
+{
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("PBDFluidTest");
+
+    scene->getCamera()->setPosition(0, 10.0, 15.0);
+
+    // dragon
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/turtle/turtle-volumetric-homogeneous.veg");
+    //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    auto surfMeshVisual = std::make_shared<imstk::SurfaceMesh>();
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
+    volTetMesh->extractSurfaceMesh(surfMeshVisual);
+
+    auto deformMapP2V = std::make_shared<imstk::OneToOneMap>();
+    deformMapP2V->setMaster(tetMesh);
+    deformMapP2V->setSlave(surfMeshVisual);
+    deformMapP2V->compute();
+
+    auto deformMapC2V = std::make_shared<imstk::OneToOneMap>();
+    deformMapC2V->setMaster(surfMesh);
+    deformMapC2V->setSlave(surfMeshVisual);
+    deformMapC2V->compute();
+
+    auto deformMapP2C = std::make_shared<imstk::OneToOneMap>();
+    deformMapP2C->setMaster(tetMesh);
+    deformMapP2C->setSlave(surfMesh);
+    deformMapP2C->compute();
+
+    auto deformableObj = std::make_shared<PbdObject>("Dragon");
+    deformableObj->setVisualGeometry(surfMeshVisual);
+    deformableObj->setCollidingGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToCollidingMap(deformMapP2C);
+    deformableObj->setPhysicsToVisualMap(deformMapP2V);
+    deformableObj->setCollidingToVisualMap(deformMapC2V);
+
+    auto pbdModel = std::make_shared<PbdModel>();
+    deformableObj->setDynamicalModel(pbdModel);
+
+    deformableObj->initialize(/*Number of Constraints*/ 1,
+        /*Constraint configuration*/ "ConstantDensity 1.0 0.3",
+        /*Mass*/ 1.0,
+        /*Gravity*/ "0 -9.8 0",
+        /*TimeStep*/ 0.005,
+        /*FixedPoint*/ "94 113 178 179 194 196 280 303",
+        /*NumberOfIterationInConstraintSolver*/ 2,
+        /*Proximity*/ 0.1,
+        /*Contact stiffness*/ 1.0);
+
+    auto pbdSolver = std::make_shared<PbdSolver>();
+    pbdSolver->setPbdObject(deformableObj);
+    scene->addNonlinearSolver(pbdSolver);
+
+    scene->addSceneObject(deformableObj);
+
+    // box
+    imstk::StdVectorOfVec3d vertList;
+    int nSides = 5;
+    double width = 40.0;
+    double height = 40.0;
+    int nRows = 2;
+    int nCols = 2;
+    vertList.resize(nRows*nCols*nSides);
+    const double dy = width / (double)(nCols - 1);
+    const double dx = height / (double)(nRows - 1);
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            const double y = (double)dy*j;
+            const double x = (double)dx*i;
+            vertList[i*nCols + j] = Vec3d(x - 20, -10.0, y - 20);
+        }
+    }
+
+    // c. Add connectivity data
+    std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+    for (std::size_t i = 0; i < nRows - 1; ++i)
+    {
+        for (std::size_t j = 0; j < nCols - 1; j++)
+        {
+            imstk::SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
+            tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+
+    int nPointPerSide = nRows * nCols;
+    //sidewalls 1 and 2 of box
+    width = 10.0;
+    height = 40.0;
+    nRows = 2;
+    nCols = 2;
+    const double dz = width / (double)(nCols - 1);
+    const double dx1 = height / (double)(nRows - 1);
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            const double z = (double)dz*j;
+            const double x = (double)dx1*i;
+            vertList[(nPointPerSide)+i*nCols + j] = Vec3d(x - 20, z - 10.0, 20);
+            vertList[(nPointPerSide*2)+i*nCols + j] = Vec3d(x - 20, z - 10.0, -20);
+        }
+    }
+
+    // c. Add connectivity data
+    for (std::size_t i = 0; i < nRows - 1; ++i)
+    {
+        for (std::size_t j = 0; j < nCols - 1; j++)
+        {
+            imstk::SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { (nPointPerSide)+i*nCols + j, (nPointPerSide)+i*nCols + j + 1, (nPointPerSide)+(i + 1)*nCols + j } };
+            tri[1] = { { (nPointPerSide)+(i + 1)*nCols + j + 1, (nPointPerSide)+(i + 1)*nCols + j, (nPointPerSide)+i*nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+            tri[0] = { { (nPointPerSide*2)+i*nCols + j, (nPointPerSide*2)+i*nCols + j + 1, (nPointPerSide*2)+(i + 1)*nCols + j } };
+            tri[1] = { { (nPointPerSide*2)+(i + 1)*nCols + j + 1, (nPointPerSide*2)+(i + 1)*nCols + j, (nPointPerSide*2)+i*nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+
+    //sidewalls 3 and 4 of box
+    width = 10.0;
+    height = 40.0;
+    nRows = 2;
+    nCols = 2;
+    const double dz1 = width / (double)(nCols - 1);
+    const double dy1 = height / (double)(nRows - 1);
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            const double z = (double)dz1*j;
+            const double y = (double)dy1*i;
+            vertList[(nPointPerSide * 3)+i*nCols + j] = Vec3d(20, z - 10.0, y-20);
+            vertList[(nPointPerSide * 4) + i*nCols + j] = Vec3d(-20, z - 10.0, y-20);
+        }
+    }
+
+    // c. Add connectivity data
+    for (std::size_t i = 0; i < nRows - 1; ++i)
+    {
+        for (std::size_t j = 0; j < nCols - 1; j++)
+        {
+            imstk::SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { (nPointPerSide * 3)+i*nCols + j, (nPointPerSide * 3)+i*nCols + j + 1, (nPointPerSide * 3)+(i + 1)*nCols + j } };
+            tri[1] = { { (nPointPerSide * 3)+(i + 1)*nCols + j + 1, (nPointPerSide * 3)+(i + 1)*nCols + j, (nPointPerSide * 3)+i*nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+            tri[0] = { { (nPointPerSide * 4) + i*nCols + j, (nPointPerSide * 4) + i*nCols + j + 1, (nPointPerSide * 4) + (i + 1)*nCols + j } };
+            tri[1] = { { (nPointPerSide * 4) + (i + 1)*nCols + j + 1, (nPointPerSide * 4) + (i + 1)*nCols + j, (nPointPerSide * 4) + i*nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+
+    auto floorMeshColliding = std::make_shared<imstk::SurfaceMesh>();
+    floorMeshColliding->initialize(vertList, triangles);
+    auto floorMeshVisual = std::make_shared<imstk::SurfaceMesh>();
+    floorMeshVisual->initialize(vertList, triangles);
+    auto floorMeshPhysics = std::make_shared<imstk::SurfaceMesh>();
+    floorMeshPhysics->initialize(vertList, triangles);
+
+
+    auto floorMapP2V = std::make_shared<imstk::OneToOneMap>();
+    floorMapP2V->setMaster(floorMeshPhysics);
+    floorMapP2V->setSlave(floorMeshVisual);
+    floorMapP2V->compute();
+
+
+    auto floorMapP2C = std::make_shared<imstk::OneToOneMap>();
+    floorMapP2C->setMaster(floorMeshPhysics);
+    floorMapP2C->setSlave(floorMeshColliding);
+    floorMapP2C->compute();
+
+    auto floorMapC2V = std::make_shared<imstk::OneToOneMap>();
+    floorMapC2V->setMaster(floorMeshColliding);
+    floorMapC2V->setSlave(floorMeshVisual);
+    floorMapC2V->compute();
+
+    auto floor = std::make_shared<PbdObject>("Floor");
+    floor->setCollidingGeometry(floorMeshColliding);
+    floor->setVisualGeometry(floorMeshVisual);
+    floor->setPhysicsGeometry(floorMeshPhysics);
+    floor->setPhysicsToCollidingMap(floorMapP2C);
+    floor->setPhysicsToVisualMap(floorMapP2V);
+    floor->setCollidingToVisualMap(floorMapC2V);
+
+    auto pbdModel2 = std::make_shared<PbdModel>();
+    floor->setDynamicalModel(pbdModel2);
+
+    floor->initialize(/*Number of Constraints*/ 0,
+        /*Mass*/ 0.0,
+        /*Proximity*/ 0.1,
+        /*Contact stiffness*/ 1.0);
+
+    auto pbdSolverfloor = std::make_shared<PbdSolver>();
+    pbdSolverfloor->setPbdObject(floor);
+    scene->addNonlinearSolver(pbdSolverfloor);
+
+    scene->addSceneObject(floor);
+
+    // Collisions
+    auto colGraph = scene->getCollisionGraph();
+    auto pair = std::make_shared<PbdInteractionPair>(PbdInteractionPair(deformableObj, floor));
+    pair->setNumberOfInterations(2);
+
+    colGraph->addInteractionPair(pair);
+
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
