@@ -126,6 +126,7 @@ void testVectorPlotters();
 void testPbdVolume();
 void testPbdCloth();
 void testPbdCollision();
+void testPbdFluidBenchmarking();
 void testPbdFluid();
 void testLineMesh();
 void testMshAndVegaIO();
@@ -180,6 +181,7 @@ int main()
     //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
+    testPbdFluidBenchmarking();
     testPbdFluid();
     //testDeformableBody();
     //testDeformableBodyCollision();
@@ -1525,7 +1527,7 @@ void testPbdCollision()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PbdCollisionTest");
 
-    scene->getCamera()->setPosition(0, 10.0, 25.0);
+    scene->getCamera()->setPosition(0, 10.0, 15.0);
 
     // dragon
     auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
@@ -1834,6 +1836,218 @@ void testPbdCollision()
     }
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
+}
+
+void testPbdFluidBenchmarking()
+{
+	std::vector<int> nPointsList = { 5, 10, 20 };
+	std::vector<int> cubeSizeList = { 1, 1, 2 };
+
+	int nPointsPerSide = 10;
+	double cubeLength = 1;
+
+	auto sdk = std::make_shared<SimulationManager>();
+	auto scene = sdk->createNewScene("PBDFluidBenchmarking");
+
+	scene->getCamera()->setPosition(0, 10.0, 25.0);
+
+	//Create Mesh
+	imstk::StdVectorOfVec3d vertList;
+	int nPoints = pow(nPointsPerSide, 3);
+	const double spacing = cubeLength / nPointsPerSide;
+
+	vertList.resize(nPoints);
+	for (int i = 0; i < nPointsPerSide; ++i)
+	{
+		for (int j = 0; j < nPointsPerSide; j++)
+		{
+			for (int k = 0; k < nPointsPerSide; k++)
+			{
+				vertList[i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k] = Vec3d((double)i * spacing, (double)j * spacing, (double)k * spacing);
+			}
+		}
+	}
+	std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+	for (size_t i = 0; i < nPointsPerSide - 1; i++)
+	{
+		for (size_t j = 0; j < nPointsPerSide - 1; j++)
+		{
+			for (size_t k = 0; k < nPointsPerSide - 1; k++)
+			{
+				imstk::SurfaceMesh::TriangleArray tri[3];
+				tri[0] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k, i*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k, (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
+				tri[1] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k, (i + 1)*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k, (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
+				triangles.push_back(tri[0]);
+				triangles.push_back(tri[1]);
+			}
+		}
+	}
+
+	auto cubeMeshColliding = std::make_shared<imstk::SurfaceMesh>();
+	cubeMeshColliding->initialize(vertList, triangles);
+	auto cubeMeshVisual = std::make_shared<imstk::SurfaceMesh>();
+	cubeMeshVisual->initialize(vertList, triangles);
+	auto cubeMeshPhysics = std::make_shared<imstk::SurfaceMesh>();
+	cubeMeshPhysics->initialize(vertList, triangles);
+
+	auto material1 = std::make_shared<RenderMaterial>();
+	material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
+	cubeMeshVisual->setRenderMaterial(material1);
+
+
+	auto cubeMapP2V = std::make_shared<imstk::OneToOneMap>();
+	cubeMapP2V->setMaster(cubeMeshPhysics);
+	cubeMapP2V->setSlave(cubeMeshVisual);
+	cubeMapP2V->compute();
+
+	auto cubeMapP2C = std::make_shared<imstk::OneToOneMap>();
+	cubeMapP2C->setMaster(cubeMeshPhysics);
+	cubeMapP2C->setSlave(cubeMeshColliding);
+	cubeMapP2C->compute();
+
+	auto cubeMapC2V = std::make_shared<imstk::OneToOneMap>();
+	cubeMapC2V->setMaster(cubeMeshColliding);
+	cubeMapC2V->setSlave(cubeMeshVisual);
+	cubeMapC2V->compute();
+
+	auto cube = std::make_shared<PbdObject>("Cube");
+	cube->setCollidingGeometry(cubeMeshColliding);
+	cube->setVisualGeometry(cubeMeshVisual);
+	cube->setPhysicsGeometry(cubeMeshPhysics);
+	cube->setPhysicsToCollidingMap(cubeMapP2C);
+	cube->setPhysicsToVisualMap(cubeMapP2V);
+	cube->setCollidingToVisualMap(cubeMapC2V);
+
+	auto pbdModel = std::make_shared<PbdModel>();
+	cube->setDynamicalModel(pbdModel);
+
+	cube->initialize(/*Number of Constraints*/ 1,
+		/*Constraint configuration*/ "ConstantDensity 1.0 0.3",
+		/*Mass*/ 1.0,
+		/*Gravity*/ "0 -9.8 0",
+		/*TimeStep*/ 0.005,
+		/*FixedPoint*/ "",
+		/*NumberOfIterationInConstraintSolver*/ 2,
+		/*Proximity*/ 0.1,
+		/*Contact stiffness*/ 1.0);
+
+	auto pbdSolver = std::make_shared<PbdSolver>();
+	pbdSolver->setPbdObject(cube);
+	scene->addNonlinearSolver(pbdSolver);
+
+	scene->addSceneObject(cube);
+
+	// plane
+	double width = 40.0;
+	double height = 40.0;
+	int nRows = 2;
+	int nCols = 2;
+	vertList.resize(nRows*nCols);
+	const double dy = width / (double)(nCols - 1);
+	const double dx = height / (double)(nRows - 1);
+	for (int i = 0; i < nRows; ++i)
+	{
+		for (int j = 0; j < nCols; j++)
+		{
+			const double y = (double)dy*j;
+			const double x = (double)dx*i;
+			vertList[i*nCols + j] = Vec3d(x - 20, -0.5, y - 20);
+		}
+	}
+
+	// c. Add connectivity data
+	triangles.clear();
+	for (std::size_t i = 0; i < nRows - 1; ++i)
+	{
+		for (std::size_t j = 0; j < nCols - 1; j++)
+		{
+			imstk::SurfaceMesh::TriangleArray tri[2];
+			tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
+			tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+			triangles.push_back(tri[0]);
+			triangles.push_back(tri[1]);
+		}
+	}
+
+	auto floorMeshColliding = std::make_shared<imstk::SurfaceMesh>();
+	floorMeshColliding->initialize(vertList, triangles);
+	auto floorMeshVisual = std::make_shared<imstk::SurfaceMesh>();
+	floorMeshVisual->initialize(vertList, triangles);
+	auto floorMeshPhysics = std::make_shared<imstk::SurfaceMesh>();
+	floorMeshPhysics->initialize(vertList, triangles);
+
+
+	auto floorMapP2V = std::make_shared<imstk::OneToOneMap>();
+	floorMapP2V->setMaster(floorMeshPhysics);
+	floorMapP2V->setSlave(floorMeshVisual);
+	floorMapP2V->compute();
+
+
+	auto floorMapP2C = std::make_shared<imstk::OneToOneMap>();
+	floorMapP2C->setMaster(floorMeshPhysics);
+	floorMapP2C->setSlave(floorMeshColliding);
+	floorMapP2C->compute();
+
+	auto floorMapC2V = std::make_shared<imstk::OneToOneMap>();
+	floorMapC2V->setMaster(floorMeshColliding);
+	floorMapC2V->setSlave(floorMeshVisual);
+	floorMapC2V->compute();
+
+	auto floor = std::make_shared<PbdObject>("Floor");
+	floor->setCollidingGeometry(floorMeshColliding);
+	floor->setVisualGeometry(floorMeshVisual);
+	floor->setPhysicsGeometry(floorMeshPhysics);
+	floor->setPhysicsToCollidingMap(floorMapP2C);
+	floor->setPhysicsToVisualMap(floorMapP2V);
+	floor->setCollidingToVisualMap(floorMapC2V);
+
+	auto pbdModel2 = std::make_shared<PbdModel>();
+	floor->setDynamicalModel(pbdModel2);
+
+	floor->initialize(/*Number of Constraints*/ 0,
+		/*Mass*/ 0.0,
+		/*Proximity*/ 0.1,
+		/*Contact stiffness*/ 1.0);
+
+	auto pbdSolverfloor = std::make_shared<PbdSolver>();
+	pbdSolverfloor->setPbdObject(floor);
+	scene->addNonlinearSolver(pbdSolverfloor);
+
+	scene->addSceneObject(floor);
+
+	// Collisions
+	auto colGraph = scene->getCollisionGraph();
+	auto pair = std::make_shared<PbdInteractionPair>(PbdInteractionPair(cube, floor));
+	pair->setNumberOfInterations(2);
+
+	colGraph->addInteractionPair(pair);
+
+	// Display UPS
+	auto ups = std::make_shared<UPSCounter>();
+	auto sceneManager = sdk->getSceneManager("PBDFluidBenchmarking");
+	sceneManager->setPreInitCallback([](Module* module)
+	{
+		LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
+	});
+	sceneManager->setPreUpdateCallback([&ups](Module* module)
+	{
+		ups->setStartPointOfUpdate();
+	});
+	sceneManager->setPostUpdateCallback([&ups](Module* module)
+	{
+		ups->setEndPointOfUpdate();
+		std::cout << "\r-- " << module->getName() << " running at "
+			<< ups->getUPS() << " ups   " << std::flush;
+	});
+	sceneManager->setPostCleanUpCallback([](Module* module)
+	{
+		LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
+	});
+
+    scene->getCamera()->setPosition(0, 10.0, 10.0);
+
+	sdk->setCurrentScene(scene);
+	sdk->startSimulation(true);
 }
 
 void testPbdFluid()
