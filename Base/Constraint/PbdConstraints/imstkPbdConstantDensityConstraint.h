@@ -23,10 +23,14 @@ limitations under the License.
 #define imstkPbdConstantDensityConstraint_h
 
 #include "imstkPbdConstraint.h"
-#include "../Collision/CollisionDetection/DataStructures/imstkSpatialHashTableSeparateChaining.h"
 
 namespace imstk
 {
+///
+/// \class PbdConstantDensityConstraint
+///
+/// \brief Implements the constant density constraint to simulate fluids
+///
 class PbdConstantDensityConstraint : public PbdConstraint
 {
 public:
@@ -34,6 +38,7 @@ public:
     /// \brief constructor
     ///
     PbdConstantDensityConstraint() : PbdConstraint() { m_vertexIds.resize(1); }
+
     ///
     /// \Constant Density Constraint Initialization
     ///
@@ -50,33 +55,73 @@ public:
     bool solvePositionConstraint(PbdModel &model);
 
 private:
-    double WPoly6(const Vec3d &pi, const Vec3d &pj);
-    double WSpiky(const Vec3d &pi, const Vec3d &pj);
-    Vec3d GradSpiky(const Vec3d &pi, const Vec3d &pj);
-    double Length(const Vec3d &);
+    ///
+    /// \brief Smoothing kernel WPoly6 for density estimation
+    ///
+    double wPoly6(const Vec3d &pi, const Vec3d &pj);
 
-    void PointTable(const Vec3d &pi, const int &index);
-    void UpdateNeighbors(const int &index, const StdVectorOfVec3d &positions);
-    void UpdateNeighborsBruteForce(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
-    void ClearNeighbors(const int &np);
-    void CalculateDensityEstimate(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
-    void CalculateLambdaScalingFactor(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
-    void DeltaPosition(const Vec3d &pi, const int &index, const StdVectorOfVec3d &positions);
-    void UpdatePositions(Vec3d &pi, const int &index);
+    ///
+    /// \brief Smoothing kernel Spiky for gradient calculation
+    ///
+    double wSpiky(const Vec3d &pi, const Vec3d &pj);
+
+    ///
+    /// \brief
+    ///
+    Vec3d gradSpiky(const Vec3d &pi, const Vec3d &pj);
+
+    ///
+    /// \brief Update the neighbors of each node using burte force search O(n*n)
+    ///
+    void updateNeighborsBruteForce(const Vec3d &pi, const size_t &index, const StdVectorOfVec3d &positions);
+
+    ///
+    /// \brief Clear the list of neighbors
+    ///
+    void clearNeighbors(const size_t &np);
+
+    ///
+    /// \brief
+    ///
+    void calculateDensityEstimate(const Vec3d &pi, const size_t &index, const StdVectorOfVec3d &positions);
+
+    ///
+    /// \brief
+    ///
+    void calculateLambdaScalingFactor(const Vec3d &pi, const size_t &index, const StdVectorOfVec3d &positions);
+
+    ///
+    /// \brief
+    ///
+    void updatePositions(const Vec3d &pi, const size_t &index, StdVectorOfVec3d &positions);
+
+    ///
+    /// \brief Set/Get rest density
+    ///
+    void setDensity(const double density) { m_restDensity = density; }
+    double getDensity() { return m_restDensity; }
+
+    ///
+    /// \brief Set/Get max. neighbor distance
+    ///
+    void setMaxNeighborDistance(const double dist) { m_maxDist = dist; }
+    double getMaxNeighborDistance() { return m_restDensity; }
 
 private:
     double m_wPoly6Coeff;
     double m_wSpikyCoeff;
-    double m_maxDist;
-    double m_relaxationParameter;
-    double m_restDensity;
-    int m_maxNumNeighbors;
 
-    std::vector<double> m_lambdas;             ///> lambdas
-    std::vector<double> m_densities;           ///> densities
-    std::vector<Vec3d> m_deltaPositions;       ///> delta positions
-    std::vector<int> m_neighbors;              ///> index of neighbors
-    std::vector<int> m_numNeighbors;           ///> number of neighbors
+    double m_maxDist = 0.2;                 ///> Max. neighbor distance
+    double m_relaxationParameter = 600.0;   ///> Relaxation parameter
+    double m_restDensity = 6378.0;          ///> Fluid density
+    int m_maxNumNeighbors = 50;             ///> Max. number of neighbors
+
+    std::vector<double> m_lambdas;          ///> lambdas
+    std::vector<double> m_densities;        ///> densities
+    std::vector<Vec3d> m_deltaPositions;    ///> delta positions
+    std::vector<int> m_neighbors;           ///> index of neighbors
+    std::vector<int> m_numNeighbors;        ///> number of neighbors
+
     std::vector<int> m_xPosIndexes;
     std::vector<int> m_yPosIndexes;
     std::vector<int> m_zPosIndexes;

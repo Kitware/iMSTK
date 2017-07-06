@@ -1863,10 +1863,12 @@ void testPbdFluidBenchmarking()
         {
             for (int k = 0; k < nPointsPerSide; k++)
             {
-                vertList[i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k] = Vec3d((double)i * spacing, (double)j * spacing, (double)k * spacing);
+                vertList[i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k] =
+                    Vec3d((double)i * spacing, (double)j * spacing, (double)k * spacing);
             }
         }
     }
+
     std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
     for (size_t i = 0; i < nPointsPerSide - 1; i++)
     {
@@ -1875,8 +1877,15 @@ void testPbdFluidBenchmarking()
             for (size_t k = 0; k < nPointsPerSide - 1; k++)
             {
                 imstk::SurfaceMesh::TriangleArray tri[3];
-                tri[0] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k, i*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k, (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
-                tri[1] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k, (i + 1)*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k, (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
+
+                tri[0] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k,
+                                             i*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k,
+                             (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
+
+                tri[1] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k,
+                             (i + 1)*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k,
+                             (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
+
                 triangles.push_back(tri[0]);
                 triangles.push_back(tri[1]);
             }
@@ -1892,8 +1901,9 @@ void testPbdFluidBenchmarking()
 
     auto material1 = std::make_shared<RenderMaterial>();
     material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
+    material1->setDiffuseColor(Color::Blue);
+    material1->setPointSize(3.0);
     cubeMeshVisual->setRenderMaterial(material1);
-
 
     auto cubeMapP2V = std::make_shared<imstk::OneToOneMap>();
     cubeMapP2V->setMaster(cubeMeshPhysics);
@@ -2044,6 +2054,12 @@ void testPbdFluidBenchmarking()
         LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
         });
 
+    // Light (white)
+    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    whiteLight->setPosition(Vec3d(5, 8, 5));
+    whiteLight->setColor(Color::White);
+    scene->addLight(whiteLight);
+
     scene->getCamera()->setPosition(0, 10.0, 10.0);
 
     sdk->setCurrentScene(scene);
@@ -2058,8 +2074,8 @@ void testPbdFluid()
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 
     // dragon
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/turtle/turtle-volumetric-homogeneous.veg");
-    //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/turtle/turtle-volumetric-homogeneous.veg");
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -2076,6 +2092,13 @@ void testPbdFluid()
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
     volTetMesh->extractSurfaceMesh(surfMeshVisual);
+
+    auto material1 = std::make_shared<RenderMaterial>();
+    material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
+    material1->setDiffuseColor(Color::Blue);
+    material1->setSpecularColor(Color::Blue);
+    material1->setPointSize(6.0);
+    surfMeshVisual->setRenderMaterial(material1);
 
     auto deformMapP2V = std::make_shared<imstk::OneToOneMap>();
     deformMapP2V->setMaster(tetMesh);
@@ -2276,6 +2299,12 @@ void testPbdFluid()
     pair->setNumberOfInterations(2);
 
     colGraph->addInteractionPair(pair);
+
+    // Light (white)
+    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    whiteLight->setPosition(Vec3d(5, 8, 5));
+    whiteLight->setColor(Color::White);
+    scene->addLight(whiteLight);
 
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
