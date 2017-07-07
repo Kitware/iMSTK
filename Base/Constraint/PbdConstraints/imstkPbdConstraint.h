@@ -45,6 +45,7 @@ public:
         Volume,
         FEMTet,
         FEMHex,
+        ConstantDensity,
         none
     };
 
