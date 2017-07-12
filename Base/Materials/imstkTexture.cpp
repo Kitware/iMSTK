@@ -29,7 +29,7 @@ Texture::Texture(std::string path, Type type)
     m_type = type;
 }
 
-const Texture::Type
+Texture::Type
 Texture::getType() const
 {
     return m_type;

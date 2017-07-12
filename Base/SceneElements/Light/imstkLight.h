@@ -39,14 +39,15 @@ namespace imstk
 ///
 enum class LightType
 {
-    SCENE_LIGHT,
-    HEAD_LIGHT
+    DIRECTIONAL_LIGHT,
+    POINT_LIGHT,
+    SPOT_LIGHT
 };
 
 ///
 /// \class Light
 ///
-/// \brief Generic class for scene lights
+/// \brief Abstract class for lights
 ///
 class Light
 {
@@ -54,17 +55,7 @@ public:
     ///
     /// \brief
     ///
-    Light(std::string name) : m_name(name) {}
-
-    ///
-    /// \brief
-    ///
-    ~Light() = default;
-
-    ///
-    /// \brief
-    ///
-    const LightType getType();
+    LightType getType();
 
     ///
     /// \brief
@@ -72,25 +63,12 @@ public:
     void setType(const LightType& type);
 
     ///
-    /// \brief
-    ///
-    const Vec3d getPosition() const;
-
-    ///
-    /// \brief
-    ///
-    void setPosition(const Vec3d& p);
-    void setPosition(const double& x,
-                     const double& y,
-                     const double& z);
-
-    ///
-    /// \brief
+    /// \brief Get the light focal point
     ///
     const Vec3d getFocalPoint() const;
 
     ///
-    /// \brief
+    /// \brief Set the light focal point
     ///
     void setFocalPoint(const Vec3d& p);
     void setFocalPoint(const double& x,
@@ -100,7 +78,7 @@ public:
     ///
     /// \brief
     ///
-    const bool isOn();
+    bool isOn();
 
     ///
     /// \brief
@@ -110,7 +88,7 @@ public:
     ///
     /// \brief
     ///
-    const bool isOff();
+    bool isOff();
 
     ///
     /// \brief
@@ -118,68 +96,124 @@ public:
     void switchOff();
 
     ///
-    /// \brief
-    ///
-    const bool isPositional();
-
-    ///
-    /// \brief
-    ///
-    void setPositional();
-
-    ///
-    /// \brief
-    ///
-    const bool isDirectional();
-
-    ///
-    /// \brief
-    ///
-    void setDirectional();
-
-    ///
-    /// \brief
-    ///
-    const double getSpotAngle() const;
-
-    ///
-    /// \brief
-    ///
-    void setSpotAngle(const double& angle);
-
-    ///
-    /// \brief
+    /// \brief Get the light color
     ///
     const Color getColor() const;
 
     ///
-    /// \brief
+    /// \brief Set the light color
     ///
     void setColor(const Color& c);
 
     ///
-    /// \brief
+    /// \brief Get the light intensity
+    ///
+    float getIntensity() const;
+
+    ///
+    /// \brief Set the light intensity. This value is unbounded.
+    ///
+    void setIntensity(float intensity);
+
+    ///
+    /// \brief Get the VTK light
     ///
     vtkSmartPointer<vtkLight> getVtkLight() const;
 
     ///
-    /// \brief
+    /// \brief Get the light name
     ///
     const std::string& getName() const;
 
     ///
-    /// \brief
+    /// \brief Set the light name
     ///
     void setName(std::string name);
 
 protected:
-    ///
-    /// \brief
-    ///
-    void warningIfHeadLight();
+    Light(std::string name)
+    {
+        m_name = name;
+    };
 
     vtkSmartPointer<vtkLight> m_vtkLight = vtkSmartPointer<vtkLight>::New();
     std::string m_name;
+    LightType m_type;
+};
+
+///
+/// \class DirectionalLight
+///
+/// \brief Directional light class
+///
+/// A directional light has no position or range. The focal point is the
+/// direction.
+///
+class DirectionalLight : public Light
+{
+public:
+    DirectionalLight(std::string name) : Light(name)
+    {
+        m_type = LightType::DIRECTIONAL_LIGHT;
+        m_vtkLight->SetPositional(false);
+    };
+};
+
+///
+/// \class PointLight
+///
+/// \brief Point light class
+///
+/// A point light has a position, and it's range is determined by it's
+/// intensity.
+///
+class PointLight : public Light
+{
+public:
+    PointLight(std::string name) : Light(name)
+    {
+        m_type = LightType::POINT_LIGHT;
+        m_vtkLight->SetPositional(true);
+        m_vtkLight->SetConeAngle(179.0);
+    };
+
+    ///
+    /// \brief Get the light position
+    ///
+    const Vec3d getPosition() const;
+
+    ///
+    /// \brief Set the light position
+    ///
+    void setPosition(const Vec3d& p);
+    void setPosition(const double& x,
+                     const double& y,
+                     const double& z);
+};
+
+///
+/// \class Spot light class
+///
+/// \brief A spot light is a point light in a cone shape.
+///
+class SpotLight : public PointLight
+{
+public:
+    SpotLight(std::string name) : PointLight(name)
+    {
+        m_type = LightType::SPOT_LIGHT;
+        m_vtkLight->SetConeAngle(45);
+    };
+
+    ///
+    /// \brief Get the spotlight angle in degrees
+    ///
+    double getSpotAngle() const;
+
+    ///
+    /// \brief Set the spotlight angle in degrees
+    ///
+    void setSpotAngle(const double& angle);
 };
 } // imstk
 

@@ -74,7 +74,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
     for ( const auto& light : scene->getLights() )
     {
         m_vtkLights.push_back( light->getVtkLight() );
-        if( light->isPositional() )
+        if (light->getType() == LightType::POINT_LIGHT ||
+            light->getType() == LightType::SPOT_LIGHT)
         {
             auto lightActor = vtkSmartPointer<vtkLightActor>::New();
             lightActor->SetLight( light->getVtkLight() );

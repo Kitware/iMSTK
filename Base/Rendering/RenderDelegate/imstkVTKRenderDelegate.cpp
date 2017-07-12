@@ -111,7 +111,9 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
 }
 
 void
-VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source, const bool rigid)
+VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source,
+                               const bool rigid,
+                               std::shared_ptr<Geometry> geometry)
 {
     // Add normals
     vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
@@ -130,9 +132,16 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source, const bool rigid)
 
     // Disable auto Shift & Scale which is slow for deformable objects
     // as it needs to compute a bounding box at every frame
-    if(auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+    if(auto mapper = VTKCustomPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
     {
         mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+
+        if (!geometry->getRenderMaterial())
+        {
+            geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+        }
+
+        mapper->setGeometry(geometry);
     }
 }
 
@@ -179,12 +188,7 @@ VTKRenderDelegate::updateActorProperties()
 
     // Colors & Light
     auto diffuseColor = material->m_diffuseColor;
-    auto specularColor = material->m_specularColor;
-    auto specularity = material->m_specularity;
     actorProperty->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b);
-    actorProperty->SetSpecularColor(specularColor.r, specularColor.g, specularColor.b);
-    actorProperty->SetSpecularPower(specularity);
-    actorProperty->SetSpecular(1.0);
 
     // Material state is now up to date
     material->m_modified = false;

@@ -102,9 +102,26 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
         }
     }
 
+    // Update tangents
+    if (m_geometry->getVertexTangents().size() > 0)
+    {
+        auto tangents = vtkSmartPointer<vtkFloatArray>::New();
+        tangents->SetName("tangents");
+        tangents->SetNumberOfComponents(3);
+
+        for (auto const tangent : m_geometry->getVertexTangents())
+        {
+            float tempTangent[3] = {(float)tangent[0],
+                                    (float)tangent[1],
+                                    (float)tangent[2]};
+            tangents->InsertNextTuple(tempTangent);
+        }
+        polydata->GetPointData()->AddArray(tangents);
+    }
+
     // Update Transform, Render Properties
     this->update();
-    this->setUpMapper(source->GetOutputPort(), false);
+    this->setUpMapper(source->GetOutputPort(), false, m_geometry);
 }
 
 void
@@ -128,6 +145,8 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     {
         return;
     }
+
+    unsigned int currentUnit = 0;
 
     // Go through all of the textures
     for (int unit = 0; unit < Texture::Type::NONE; unit++)
@@ -158,7 +177,8 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         */
 
         // Set texture
-        m_actor->GetProperty()->SetTexture(unit, textureDelegate->getTexture());
+        m_actor->GetProperty()->SetTexture(currentUnit, textureDelegate->getTexture());
+        currentUnit++;
     }
 }
 

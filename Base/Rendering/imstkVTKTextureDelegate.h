@@ -30,6 +30,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkImageReader2.h>
+#include <vtkImageFlip.h>
 
 #include <string>
 #include <memory>

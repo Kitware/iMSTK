@@ -150,7 +150,7 @@ int main()
     /*------------------
     Test rendering
     ------------------*/
-    //testMultiObjectWithTextures();
+    testMultiObjectWithTextures();
     //testViewer();
     //testScreenShotUtility();
     //testCapsule();
@@ -256,6 +256,12 @@ void testLapToolController()
     cam->setPosition(imstk::Vec3d(0, 30, 60));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -316,6 +322,12 @@ void testMshAndVegaIO()
     scene->addSceneObject(objectA);
     scene->addSceneObject(objectB);
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -328,14 +340,17 @@ void testMultiObjectWithTextures()
     auto scene = sdk->createNewScene("multiObjectWithTexturesTest");
 
     // Read surface mesh
-    auto objMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
+    auto objMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
     surfaceMesh->translate(-8, 0, 0, Geometry::TransformType::ApplyToData);
 
     // Read and setup texture/material
-    auto texture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textured_organs/texture_set_1/diffuse.png");
+    auto diffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textured_organs/texture_set_1/diffuse.png");
+    auto cubemapTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textures/cubemaps/clouds1_.jpg", Texture::CUBEMAP);
     auto material = std::make_shared<RenderMaterial>();
-    material->addTexture(texture);
+    material->addTexture(diffuseTexture);
+    material->addTexture(cubemapTexture);
+    material->setRoughness(1.0);
     surfaceMesh->setRenderMaterial(material);
 
     // Create object and add to scene
@@ -349,15 +364,19 @@ void testMultiObjectWithTextures()
     if (secondObject)
     {
         // Read surface mesh1
-        auto objMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
+        auto objMesh1 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/big.vtk");
         auto surfaceMesh1 = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh1);
 
         // Read and setup texture/material
         if (secondObjectTexture)
         {
-            auto texture1 = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textured_organs/texture_set_2/diffuse.png");
+            auto diffuseTexture1 = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textured_organs/texture_set_2/diffuse.png");
+            auto cubemapTexture1 = std::make_shared<Texture>(iMSTK_DATA_ROOT "/textures/cubemaps/clouds1_.jpg", Texture::CUBEMAP);
             auto material1 = std::make_shared<RenderMaterial>();
-            material1->addTexture(texture1);
+            material1->addTexture(diffuseTexture1);
+            material1->addTexture(cubemapTexture1);
+            material1->setMetalness(1.0);
+            material1->setRoughness(0.0);
             material1->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
             surfaceMesh1->setRenderMaterial(material1);
         }
@@ -367,6 +386,12 @@ void testMultiObjectWithTextures()
         object1->setVisualGeometry(surfaceMesh1); // change to any mesh created above
         scene->addSceneObject(object1);
     }
+
+    // Light (white)
+    auto whiteLight = std::make_shared<imstk::DirectionalLight>("whiteLight");
+    whiteLight->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    whiteLight->setIntensity(10);
+    scene->addLight(whiteLight);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -413,6 +438,12 @@ void testMeshCCD()
         auto mesh2_3 = imstk::MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_3.vtk");
         mesh2->setVertexPositions(mesh2_3->getVertexPositions());
     });
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -475,6 +506,12 @@ void testPenaltyRigidCollision()
         CollisionDetection::Type::SphereToSphere,
         CollisionHandling::Type::Penalty,
         CollisionHandling::Type::Penalty);
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -577,6 +614,12 @@ void testTwoFalcons()
 //    falcon1->setPostUpdateCallback(postUpdateFoo);
 //    falcon1->setPostCleanUpCallback(postCleanUpFoo);
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -627,6 +670,12 @@ void testTwoOmnis()
     auto sphere0Geom = sphere0Obj->getVisualGeometry();
     cam->setFocalPoint(Vec3d(-2, 2.5, 0));
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
@@ -667,6 +716,12 @@ void testObjectController()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 0, 10));
     cam->setFocalPoint(geom->getPosition());
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -715,6 +770,12 @@ void testCameraController()
                                      imstk::CameraController::InvertFlag::rotZ);
 #endif
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -747,6 +808,12 @@ void testReadMesh()
     object->setVisualGeometry(surfaceMesh); // change to any mesh created above
     scene->addSceneObject(object);
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -774,18 +841,18 @@ void testViewer()
         imstk::Geometry::Type::Sphere, sceneTest, "VisualSphere", 0.3, Vec3d(0, 2., 0));
 
     // Light (white)
-    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    auto whiteLight = std::make_shared<imstk::PointLight>("whiteLight");
     whiteLight->setPosition(imstk::Vec3d(5, 8, 5));
-    whiteLight->setPositional();
+    whiteLight->setIntensity(100);
     sceneTest->addLight(whiteLight);
 
     // Light (red)
-    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    auto colorLight = std::make_shared<imstk::SpotLight>("colorLight");
     colorLight->setPosition(imstk::Vec3d(4, -3, 1));
     colorLight->setFocalPoint(imstk::Vec3d(0, 0, 0));
     colorLight->setColor(imstk::Color::Red);
-    colorLight->setPositional();
-    colorLight->setSpotAngle(15);
+    colorLight->setIntensity(100);
+    colorLight->setSpotAngle(1);
     sceneTest->addLight(colorLight);
 
     // Update Camera
@@ -837,6 +904,12 @@ void testCapsule()
     auto cam1 = scene->getCamera();
     cam1->setPosition(imstk::Vec3d(5., 5., 5.));
     cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -966,6 +1039,12 @@ void testIsometricMap()
     sphereGeom->setPosition(1.0, 0.0, 1.0);
     rigidMap->apply();
     LOG(INFO) << cubeGeom->getPosition();
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    geometryMapTest->addLight(light);
 
     // Start simulation
     sdk->setCurrentScene(geometryMapTest);
@@ -1316,6 +1395,12 @@ void testDeformableBody()
         LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
     });
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run the simulation
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -1406,6 +1491,12 @@ void testPbdVolume()
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
@@ -1477,17 +1568,17 @@ void testPbdCloth()
     scene->addNonlinearSolver(pbdSolver);
 
     // Light (white)
-    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    auto whiteLight = std::make_shared<imstk::PointLight>("whiteLight");
     whiteLight->setPosition(imstk::Vec3d(10, 2, 10));
+    whiteLight->setIntensity(100);
     whiteLight->setFocalPoint(imstk::Vec3d(0, -2, 0));
-    whiteLight->setPositional();
 
     // Light (red)
-    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    auto colorLight = std::make_shared<imstk::SpotLight>("colorLight");
     colorLight->setPosition(imstk::Vec3d(5, -3, 5));
     colorLight->setFocalPoint(imstk::Vec3d(-5, -5, 0));
+    colorLight->setIntensity(100);
     colorLight->setColor(imstk::Color::Red);
-    colorLight->setPositional();
     colorLight->setSpotAngle(15);
 
     // Add in scene
@@ -1834,6 +1925,13 @@ void testPbdCollision()
 
         colGraph->addInteractionPair(pair);
     }
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
@@ -2643,6 +2741,13 @@ void testLineMesh()
         scene->getCamera()->setPosition(0, 5, 5);
         scene->getCamera()->setFocalPoint(surfMesh.get()->getInitialVertexPosition(20));
     }
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -2679,16 +2784,16 @@ void testScreenShotUtility()
     sphereObj->setVisualGeometry(sphereGeom);
 
     // Light (white)
-    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    auto whiteLight = std::make_shared<imstk::PointLight>("whiteLight");
+    whiteLight->setIntensity(100);
     whiteLight->setPosition(imstk::Vec3d(5, 8, 5));
-    whiteLight->setPositional();
 
     // Light (red)
-    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    auto colorLight = std::make_shared<imstk::SpotLight>("colorLight");
     colorLight->setPosition(imstk::Vec3d(4, -3, 1));
     colorLight->setFocalPoint(imstk::Vec3d(0, 0, 0));
+    colorLight->setIntensity(100);
     colorLight->setColor(imstk::Color::Red);
-    colorLight->setPositional();
     colorLight->setSpotAngle(15);
 
     // Add in scene
@@ -2806,6 +2911,12 @@ void testDeformableBodyCollision()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 20, 20));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -2948,6 +3059,12 @@ void liverToolInteraction()
     cam->setPosition(imstk::Vec3d(0, 20, 20));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -3021,6 +3138,12 @@ void testVirtualCoupling()
     cam->setPosition(imstk::Vec3d(200, 200, 200));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     //Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
@@ -3080,6 +3203,12 @@ void testGeometryTransforms()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 30, 30));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     // Run
     sdk->setCurrentScene(scene);
@@ -3274,6 +3403,12 @@ void testBoneDrilling()
 
 #endif
 
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
     //Run
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 0, 15));
@@ -3354,6 +3489,12 @@ void testVirtualCouplingCylinder()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(200, 200, 200));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Light
+    auto light = std::make_shared<imstk::DirectionalLight>("light");
+    light->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
 
     //Run
     sdk->setCurrentScene(scene);

@@ -28,6 +28,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkVTKTextureDelegate.h"
 #include "imstkTextureManager.h"
+#include "imstkVTKCustomPolyDataMapper.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
@@ -60,7 +61,9 @@ public:
     ///
     /// \brief Set up normals and mapper
     ///
-    void setUpMapper(vtkAlgorithmOutput *source, const bool rigid);
+    void setUpMapper(vtkAlgorithmOutput *source,
+                     const bool rigid,
+                     std::shared_ptr<Geometry> geometry);
 
     ///
     /// \brief Return geometry to render
@@ -99,14 +102,14 @@ protected:
     VTKRenderDelegate()
     {
         m_actor = vtkSmartPointer<vtkActor>::New();
-        m_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        m_mapper = vtkSmartPointer<VTKCustomPolyDataMapper>::New();
         m_transform = vtkSmartPointer<vtkTransform>::New();
         m_actor->SetMapper(m_mapper);
         m_actor->SetUserTransform(m_transform);
     }
 
     vtkSmartPointer<vtkActor> m_actor;
-    vtkSmartPointer<vtkPolyDataMapper> m_mapper;
+    vtkSmartPointer<VTKCustomPolyDataMapper> m_mapper;
     vtkSmartPointer<vtkTransform> m_transform;
 };
 }

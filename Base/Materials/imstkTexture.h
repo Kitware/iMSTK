@@ -67,7 +67,7 @@ public:
     ///
     /// \brief Get type
     ///
-    const Type getType() const;
+    Type getType() const;
 
     ///
     /// \brief Get path

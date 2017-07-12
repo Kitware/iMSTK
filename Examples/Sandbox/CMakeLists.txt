@@ -50,6 +50,15 @@ list(APPEND FILE_LIST
     tetBeads/,REGEX:.*
     textured_organs/,REGEX:.*
     textured_organs/texture_set_1/,REGEX:.*
-    textured_organs/texture_set_2/,REGEX:.*)
+    textured_organs/texture_set_2/,REGEX:.*
+    textures/cubemaps/,REGEX:.*)
 
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
+#-----------------------------------------------------------------------------
+# Shaders
+#-----------------------------------------------------------------------------
+file(COPY ${CMAKE_SOURCE_DIR}/Base/Rendering/VTKShaders
+  DESTINATION ${PROJECT_BINARY_DIR}/Shaders)
+file(COPY ${CMAKE_SOURCE_DIR}/Base/Rendering/VTKShaders
+  DESTINATION ${CMAKE_PROGRAM_PATH}/Shaders)
