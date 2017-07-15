@@ -2153,9 +2153,9 @@ void testPbdFluidBenchmarking()
         });
 
     // Light (white)
-    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
-    whiteLight->setPosition(Vec3d(5, 8, 5));
-    whiteLight->setColor(Color::White);
+    auto whiteLight = std::make_shared<imstk::DirectionalLight>("whiteLight");
+    whiteLight->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
 
     scene->getCamera()->setPosition(0, 10.0, 10.0);
@@ -2194,7 +2194,6 @@ void testPbdFluid()
     auto material1 = std::make_shared<RenderMaterial>();
     material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
     material1->setDiffuseColor(Color::Blue);
-    material1->setSpecularColor(Color::Blue);
     material1->setPointSize(6.0);
     surfMeshVisual->setRenderMaterial(material1);
 
@@ -2399,9 +2398,9 @@ void testPbdFluid()
     colGraph->addInteractionPair(pair);
 
     // Light (white)
-    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
-    whiteLight->setPosition(Vec3d(5, 8, 5));
-    whiteLight->setColor(Color::White);
+    auto whiteLight = std::make_shared<imstk::DirectionalLight>("whiteLight");
+    whiteLight->setFocalPoint(imstk::Vec3d(5, -8, -5));
+    whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
 
     sdk->setCurrentScene(scene);
