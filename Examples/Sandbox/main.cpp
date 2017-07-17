@@ -19,12 +19,6 @@
 
 =========================================================================*/
 
-#include <cstring>
-#include <iostream>
-#include <memory>
-#include <thread>
-#include <iomanip>
-
 #include "imstkMath.h"
 #include "imstkTimer.h"
 #include "imstkSimulationManager.h"
@@ -32,8 +26,10 @@
 // Objects
 #include "imstkForceModelConfig.h"
 #include "imstkFEMDeformableBodyModel.h"
+#include "imstkVirtualCouplingPBDObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkDeformableObject.h"
+#include "imstkPbdObject.h"
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
@@ -63,7 +59,7 @@
 #include "imstkIsometricMap.h"
 #include "imstkOneToOneMap.h"
 
-// Devices
+// Devices and controllers
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkVRPNDeviceClient.h"
@@ -89,9 +85,6 @@
 #include "imstkPlotterUtils.h"
 #include "imstkAPIUtilities.h"
 
-#include "imstkVirtualCouplingPBDObject.h"
-#include "imstkPbdObject.h"
-
 // testVTKTexture
 #include <vtkOBJReader.h>
 #include <vtkPolyDataMapper.h>
@@ -103,122 +96,13 @@
 #include <string>
 #include <vtkJPEGReader.h>
 
+// global variables
+const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni2Name = "Phantom2";
+const std::string novintFalcon1Name = "device0";
+const std::string novintFalcon2Name = "device1";
+
 using namespace imstk;
-
-void testMeshCCD();
-void testPenaltyRigidCollision();
-void testTwoFalcons();
-void testObjectController();
-void testCameraController();
-void testReadMesh();
-void testViewer();
-void testAnalyticalGeometry();
-void testScenesManagement();
-void testIsometricMap();
-void testTetraTriangleMap();
-void testOneToOneNodalMap();
-void testExtractSurfaceMesh();
-void testSurfaceMeshOptimizer();
-void testDeformableBody();
-void testMultiObjectWithTextures();
-void testTwoOmnis();
-void testVectorPlotters();
-void testPbdVolume();
-void testPbdCloth();
-void testPbdCollision();
-void testPbdFluidBenchmarking();
-void testPbdFluid();
-void testLineMesh();
-void testMshAndVegaIO();
-void testLapToolController();
-void testScreenShotUtility();
-void testDeformableBodyCollision();
-void liverToolInteraction();
-void testCapsule();
-void testVirtualCoupling();
-void testGeometryTransforms();
-void testPicking();
-void testBoneDrilling();
-void testVirtualCouplingCylinder();
-
-int main()
-{
-    std::cout << "****************\n"
-              << "Starting Sandbox\n"
-              << "****************\n";
-
-    /*------------------
-    Test rendering
-    ------------------*/
-    testMultiObjectWithTextures();
-    //testViewer();
-    //testScreenShotUtility();
-    //testCapsule();
-
-
-    /*------------------
-    Test CD and CR
-    ------------------*/
-    //testMeshCCD();
-    //testPenaltyRigidCollision();
-
-
-    /*------------------
-    Test geometry, maps
-    ------------------*/
-    //testIsometricMap();
-    //testTetraTriangleMap();
-    //testExtractSurfaceMesh();
-    //testOneToOneNodalMap();
-    //testSurfaceMeshOptimizer();
-    //testAnalyticalGeometry();
-    //testGeometryTransforms();
-
-
-    /*------------------
-    Test physics
-    ------------------*/
-    //testPbdVolume();
-    //testPbdCloth();
-    //testPbdCollision();
-    testPbdFluidBenchmarking();
-    testPbdFluid();
-    //testDeformableBody();
-    //testDeformableBodyCollision();
-    //liverToolInteraction();
-    //testPicking();
-
-
-    /*------------------
-    Test mesh I/O
-    ------------------*/
-    //testLineMesh();
-    //testMshAndVegaIO();
-    //testReadMesh();
-
-
-    /*------------------
-    Test devices, controllers
-    ------------------*/
-    //testObjectController();
-    //testTwoFalcons();
-    //testCameraController();
-    //testTwoOmnis();
-    //testLapToolController();
-    //testPicking();
-
-    /*------------------
-    Test Misc.
-    ------------------*/
-    //testScenesManagement();
-    //testVectorPlotters();
-    //testVirtualCoupling();
-    //testBoneDrilling();
-    //testVirtualCouplingCylinder();
-
-
-    return 0;
-}
 
 void testLapToolController()
 {
@@ -228,7 +112,7 @@ void testLapToolController()
     auto scene = sdk->createNewScene("TestLapToolController");
 
     // Device clients
-    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -459,13 +343,13 @@ void testPenaltyRigidCollision()
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>();
-    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON, 0);
-    server->addDevice("device1", imstk::DeviceType::NOVINT_FALCON, 1);
+    server->addDevice(novintFalcon1Name, imstk::DeviceType::NOVINT_FALCON, 0);
+    server->addDevice(novintFalcon2Name, imstk::DeviceType::NOVINT_FALCON, 1);
     sdk->addModule(server);
 
     // Falcon clients
-    auto client0 = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost");
-    auto client1 = std::make_shared<imstk::VRPNDeviceClient>("device1", "localhost");
+    auto client0 = std::make_shared<imstk::VRPNDeviceClient>(novintFalcon1Name, "localhost");
+    auto client1 = std::make_shared<imstk::VRPNDeviceClient>(novintFalcon2Name, "localhost");
     client0->setForceEnabled(true);
     client1->setForceEnabled(true);
     sdk->addModule(client0);
@@ -633,8 +517,8 @@ void testTwoOmnis()
     auto scene = sdk->createNewScene("OmnisTestScene");
 
     // Device clients
-    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
-    auto client1 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 2");
+    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
+    auto client1 = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni2Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -690,7 +574,7 @@ void testObjectController()
     auto scene = sdk->createNewScene("SceneTestDevice");
 
     // Device Client
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -737,7 +621,7 @@ void testCameraController()
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -883,7 +767,7 @@ void testCapsule()
 
 #ifdef iMSTK_USE_OPENHAPTICS
     // Device Client
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -2415,7 +2299,7 @@ void testLineMesh()
     auto scene = sdk->createNewScene("TestLineMesh");
 
     // Device clients
-    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -3022,7 +2906,7 @@ void liverToolInteraction()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -3088,7 +2972,7 @@ void testVirtualCoupling()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -3302,7 +3186,7 @@ void testPicking()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -3355,7 +3239,7 @@ void testBoneDrilling()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -3435,7 +3319,7 @@ void testVirtualCouplingCylinder()
 #ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 2");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>(phantomOmni1Name);
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -3498,4 +3382,82 @@ void testVirtualCouplingCylinder()
     //Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
+}
+
+int main()
+{
+    std::cout << "****************\n"
+              << "Starting Sandbox\n"
+              << "****************\n";
+
+    /*------------------
+    Test rendering
+    ------------------*/
+    //testMultiObjectWithTextures();
+    //testViewer();
+    //testScreenShotUtility();
+    //testCapsule();
+
+
+    /*------------------
+    Test CD and CR
+    ------------------*/
+    //testMeshCCD();
+    //testPenaltyRigidCollision();
+
+
+    /*------------------
+    Test geometry, maps
+    ------------------*/
+    //testIsometricMap();
+    //testTetraTriangleMap();
+    //testExtractSurfaceMesh();
+    //testOneToOneNodalMap();
+    //testSurfaceMeshOptimizer();
+    //testAnalyticalGeometry();
+    //testGeometryTransforms();
+
+
+    /*------------------
+    Test physics
+    ------------------*/
+    //testPbdVolume();
+    //testPbdCloth();
+    //testPbdCollision();
+    //testPbdFluidBenchmarking();
+    //testPbdFluid();
+    //testDeformableBody();
+    //testDeformableBodyCollision();
+    //liverToolInteraction();
+    //testPicking();
+
+
+    /*------------------
+    Test mesh I/O
+    ------------------*/
+    //testLineMesh();
+    //testMshAndVegaIO();
+    //testReadMesh();
+
+
+    /*------------------
+    Test devices, controllers
+    ------------------*/
+    //testObjectController();
+    //testTwoFalcons();
+    //testCameraController();
+    //testTwoOmnis();
+    //testLapToolController();
+
+    /*------------------
+    Test Misc.
+    ------------------*/
+    //testScenesManagement();
+    //testVectorPlotters();
+    //testVirtualCoupling();
+    //testBoneDrilling();
+    testVirtualCouplingCylinder();
+
+
+    return 0;
 }
