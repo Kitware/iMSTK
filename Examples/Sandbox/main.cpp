@@ -33,6 +33,7 @@
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
+#include "imstkRigidObject.h"
 
 // Time Integrators
 #include "imstkBackwardEuler.h"
@@ -3226,6 +3227,34 @@ void testVirtualCouplingCylinder()
     sdk->startSimulation(false);
 }
 
+void testRigidBody()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("RigidObjectPhysocs");
+    // Create a plane in the scene (visual)
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->setWidth(10);
+    planeGeom->setPosition(0.0, -50, 0.0);
+    auto planeObj = std::make_shared<imstk::VisualObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+#ifdef iMSTK_USE_ODE 
+    auto rgidibody = imstk::RigidObject("Rigid Object Yo!");
+    rgidibody.setup();
+#endif
+
+    // Move Camera
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(200, 200, 200));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    //Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(false);
+}
+
 int main()
 {
     std::cout << "****************\n"
@@ -3263,12 +3292,13 @@ int main()
     /*------------------
     Test physics
     ------------------*/
-    testPbdVolume();
+    //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
-    testPbdFluidBenchmarking();
-    testPbdFluid();
-    testDeformableBody();
+
+    //testPbdFluidBenchmarking();
+    //testPbdFluid();
+    //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();
@@ -3299,7 +3329,7 @@ int main()
     //testVirtualCoupling();
     //testBoneDrilling();
     //testVirtualCouplingCylinder();
-
+    testRigidBody();
 
     return 0;
 }

@@ -47,6 +47,9 @@ public:
         m_type = Type::Rigid;
     }
 
+    // This is just a simple function to test ODE
+    void setup();
+
     ///
     /// \brief Destructor
     ///
