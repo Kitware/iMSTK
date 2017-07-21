@@ -340,4 +340,105 @@ SurfaceMesh::getDefaultTCoords()
 {
     return m_defaultTCoords;
 }
+void
+SurfaceMesh::correctWindingOrder()
+{
+    // Enforce consistency in winding of a particular triangle with its neighbor (master)
+    auto enforceWindingConsistency =
+        [this](const size_t masterTriId, const size_t neighTriId)
+        {
+            const auto& masterTri = m_trianglesVertices[masterTriId];
+            auto& neighTri = m_trianglesVertices[neighTriId];
+
+            for (unsigned int l = 0; l < 3; ++l)
+            {
+                for (unsigned int k = 0; k < 3; ++k)
+                {
+                    if (masterTri[k] == neighTri[l] && masterTri[(k + 1) % 3] == neighTri[(l + 1) % 3])
+                    {
+                        // Flip the order of neighbor triangle
+                        auto tempId = neighTri[0];
+                        neighTri[0] = neighTri[1];
+                        neighTri[1] = tempId;
+                        break;
+                    }
+                }
+            }
+        };
+
+    // Search for triangle neighbors that share a common edge
+    auto getTriangleNeighbors =
+        [this](const size_t triID, int* neig)
+        {
+            const auto& currentTri = m_trianglesVertices[triID];
+            size_t currentId = 0;
+            int numNeigh = 0;
+            for (auto& tri : m_trianglesVertices)
+            {
+                if (triID == currentId)
+                {
+                    currentId++;
+                    continue;
+                }
+
+                int numCommon = 0;
+                for (int i = 0; i < 3; ++i)
+                {
+                    if (currentTri[i] == tri[0] || currentTri[i] == tri[1] || currentTri[i] == tri[2])
+                    {
+                        numCommon++;
+                        if (numCommon == 2)
+                        {
+                            neig[numNeigh] = (int)currentId;
+                            numNeigh++;
+
+                            if (numNeigh == 3)
+                            {
+                                return;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                currentId++;
+            }
+        };
+
+    // Start with a reference triangle and enforce the consistency of its neighbors
+    // Keep track of those neighbor triangles whose order is enforced but its neighbors not
+    // necessarily enforced (trianglesCorrected). Continue this until there is no
+    // triangle left in the list
+    std::vector<bool> trianglesCorrected(this->getNumTriangles(), false);
+    std::vector<size_t> correctedTriangles;
+
+    size_t currentTriangle = 0; // Start with triangle 0
+    correctedTriangles.push_back(currentTriangle);
+    trianglesCorrected[currentTriangle] = true;
+    do
+    {
+        currentTriangle = correctedTriangles[0];
+        int neighborTri[3] = {-1, -1, -1};
+        getTriangleNeighbors(currentTriangle, &neighborTri[0]);
+
+        for (int i = 0; i < 3; ++i)
+        {
+            if (neighborTri[i] >= 0 && !trianglesCorrected[neighborTri[i]])
+            {
+                enforceWindingConsistency(currentTriangle, neighborTri[i]);
+
+                correctedTriangles.push_back(neighborTri[i]);
+                trianglesCorrected[neighborTri[i]] = true;
+            }
+        }
+
+        correctedTriangles.erase(std::remove(correctedTriangles.begin(),
+                                             correctedTriangles.end(),
+                                             currentTriangle),
+                                 correctedTriangles.end());
+    }
+    while (correctedTriangles.size() > 0);
+}
 } // imstk

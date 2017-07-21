@@ -151,6 +151,11 @@ public:
     void setDefaultTCoords(std::string arrayName);
     std::string getDefaultTCoords();
 
+    ///
+    /// \brief Enforces consistency in the winding order of the triangles
+    ///
+    void correctWindingOrder();
+
 protected:
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
