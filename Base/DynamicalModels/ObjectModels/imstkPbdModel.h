@@ -170,6 +170,12 @@ public:
     void setGravity(const Vec3d& g) { m_gravity = g; };
 
     ///
+    /// \brief Set/get viscous damping coefficient. Will be applied globally
+    ///
+    void setViscousDamping(const double damping);
+    double getViscousDamping() {return m_viscousDampingCoeff; }
+
+    ///
     /// \brief Set uniform mass to all the nodes
     ///
     void setUniformMass(const double& val);
@@ -209,20 +215,22 @@ protected:
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
 
     // Lame's constants
-    double m_mu; ///> Lame constant
-    double m_lambda; ///> Lame constant
+    double m_mu;                        ///> Lame constant
+    double m_lambda;                    ///> Lame constant
 
     // Mass properties
-    std::vector<double> m_mass; ///> Mass of nodes
-    std::vector<double> m_invMass; ///> Inverse of mass of nodes
+    std::vector<double> m_mass;         ///> Mass of nodes
+    std::vector<double> m_invMass;      ///> Inverse of mass of nodes
 
-    double m_contactStiffness; ///> Contact stiffness for collisions
-    Vec3d m_gravity; ///> Gravity
+    double m_contactStiffness;            ///> Contact stiffness for collisions
+    Vec3d m_gravity;                      ///> Gravity
 
-    unsigned int m_maxIter; ///> Max. pbd iterations
-    double m_proximity; ///> Proximity for collisions
+    double m_viscousDampingCoeff = 0.01;  ///> Viscous damping coefficient [0, 1]
 
-    double m_dt; ///> Time step size
+    unsigned int m_maxIter;               ///> Max. pbd iterations
+    double m_proximity;                   ///> Proximity for collisions
+
+    double m_dt;                          ///> Time step size
 };
 } // imstk
 
