@@ -151,6 +151,16 @@ public:
     void setDefaultTCoords(std::string arrayName);
     std::string getDefaultTCoords();
 
+    ///
+    /// \brief Flip the normals for the whole mesh by reversing the winding order
+    ///
+    void flipNormals();
+
+    ///
+    /// \brief Enforces consistency in the winding order of the triangles
+    ///
+    void correctWindingOrder();
+
 protected:
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity

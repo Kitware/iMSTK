@@ -1331,7 +1331,11 @@ void testPbdVolume()
         LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
         return;
     }
-    volTetMesh->extractSurfaceMesh(surfMesh);
+    volTetMesh->extractSurfaceMesh(surfMesh, true);
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    surfMesh->setRenderMaterial(material);
 
     // d. Construct a map
 
@@ -3422,7 +3426,7 @@ int main()
     Test physics
     ------------------*/
     testPbdVolume();
-    testPbdCloth();
+    //testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
