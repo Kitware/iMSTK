@@ -108,7 +108,7 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
 }
 
 bool
-TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
+TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const bool enforceWindingConsistency /* = false*/)
 {
     if (!surfaceMesh)
     {
@@ -218,6 +218,11 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 
     // Create and attach surface mesh
     surfaceMesh->initialize(vertPositions, surfaceTri);
+
+    if (enforceWindingConsistency)
+    {
+        surfaceMesh->correctWindingOrder();
+    }
 
     return true;
 }
