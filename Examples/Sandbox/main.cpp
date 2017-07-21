@@ -3231,23 +3231,59 @@ void testRigidBody()
 {
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
-    auto scene = sdk->createNewScene("RigidObjectPhysocs");
+    auto scene = sdk->createNewScene("RigidObjectPhysics");
     // Create a plane in the scene (visual)
     auto planeGeom = std::make_shared<imstk::Plane>();
     planeGeom->setWidth(10);
-    planeGeom->setPosition(0.0, -50, 0.0);
+    planeGeom->setPosition(0.0, 2.5, 0.0);
     auto planeObj = std::make_shared<imstk::VisualObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
-#ifdef iMSTK_USE_ODE 
-    auto rgidibody = imstk::RigidObject("Rigid Object Yo!");
-    rgidibody.setup();
+    int counter = 1000;
+
+#ifdef iMSTK_USE_ODE
+    //Initialize rigid body
+    //Initialize imstk side of things.
+    auto sphereObj = apiutils::createVisualAnalyticalSceneObject(
+        imstk::Geometry::Type::Sphere, scene, "VisualSphere", 1.0, Vec3d(0., 3.0, 0.));
+
+    auto sceneManager = sdk->getSceneManager("RigidObjectPhysics");
+
+    sceneManager->setPreInitCallback([&](Module* module)
+    {
+        imstk::RigidObject::initOde();
+        imstk::RigidObject::setup();
+    });
+
+    sceneManager->setPreUpdateCallback([&](Module* module)
+    {
+        if (counter == 0)
+        {
+            imstk::RigidObject::simulationStep();
+            counter = 1000;
+        }
+        else
+        {
+            counter--;
+        }
+    });
+    sceneManager->setPostUpdateCallback([&](Module* module)
+    {
+        imstk::Vec3d pos;
+        imstk::Mat3d matrix;
+        imstk::RigidObject::getGeometryConfig(pos, matrix);
+        sphereObj->getVisualGeometry()->setTranslation(pos);
+    });
+    sceneManager->setPostCleanUpCallback([&](Module* module)
+    {
+        imstk::RigidObject::closeOde();
+    });
 #endif
 
     // Move Camera
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(200, 200, 200));
+    cam->setPosition(imstk::Vec3d(10, 10, 10));
     cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
 
     //Run
