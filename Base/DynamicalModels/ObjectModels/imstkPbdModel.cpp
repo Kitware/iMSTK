@@ -440,6 +440,19 @@ PbdModel::updatePbdStateFromPhysicsGeometry()
 }
 
 void
+PbdModel::setViscousDamping(const double damping)
+{
+    if (damping >= 0 && damping <= 1)
+    {
+        m_viscousDampingCoeff = damping;
+    }
+    else
+    {
+        LOG(WARNING) << "WARNING - PbdModel::setViscousDamping:  Viscous damping coefficients is out of bounds [0, 1]";
+    }
+}
+
+void
 PbdModel::setUniformMass(const double& val)
 {
     if (val != 0.0)
@@ -493,7 +506,7 @@ PbdModel::integratePosition()
         {
             vel[i] += (accn[i] + m_gravity)*m_dt;
             prevPos[i] = pos[i];
-            pos[i] += vel[i] * m_dt;
+            pos[i] += (1.0 - m_viscousDampingCoeff)*vel[i] * m_dt;
         }
     }
 }

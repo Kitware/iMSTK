@@ -3421,8 +3421,8 @@ int main()
     /*------------------
     Test physics
     ------------------*/
-    //testPbdVolume();
-    //testPbdCloth();
+    testPbdVolume();
+    testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
@@ -3456,7 +3456,7 @@ int main()
     //testVectorPlotters();
     //testVirtualCoupling();
     //testBoneDrilling();
-    testVirtualCouplingCylinder();
+    //testVirtualCouplingCylinder();
 
 
     return 0;
