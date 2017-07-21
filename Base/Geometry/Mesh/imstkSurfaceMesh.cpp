@@ -340,6 +340,18 @@ SurfaceMesh::getDefaultTCoords()
 {
     return m_defaultTCoords;
 }
+
+void
+SurfaceMesh::flipNormals()
+{
+    for (auto& tri : m_trianglesVertices)
+    {
+        auto temp = tri[0];
+        tri[0] = tri[1];
+        tri[1] = temp;
+    }
+}
+
 void
 SurfaceMesh::correctWindingOrder()
 {

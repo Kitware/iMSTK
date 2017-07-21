@@ -152,6 +152,11 @@ public:
     std::string getDefaultTCoords();
 
     ///
+    /// \brief Flip the normals for the whole mesh by reversing the winding order
+    ///
+    void flipNormals();
+
+    ///
     /// \brief Enforces consistency in the winding order of the triangles
     ///
     void correctWindingOrder();
