@@ -82,9 +82,10 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
 void
 VTKTetrahedralMeshRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    if (m_geometry->m_dataModified)
     {
-        return;
+        m_mappedVertexArray->Modified();
+        m_geometry->m_dataModified = false;
     }
 
     if (m_geometry->getTopologyChangedFlag())
@@ -115,7 +116,6 @@ VTKTetrahedralMeshRenderDelegate::updateDataSource()
         m_mesh->SetCells(VTK_TETRA, cells);
         m_geometry->setTopologyChangedFlag(false);
     }
-    m_geometry->m_dataModified = true;
 }
 
 
