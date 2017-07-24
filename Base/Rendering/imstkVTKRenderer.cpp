@@ -100,7 +100,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
     ///TODO : based on scene properties
     // Customize background colors
     m_vtkRenderer->SetBackground(0.66,0.66,0.66);
-    m_vtkRenderer->SetBackground2(157.0/255.0*0.66, 186/255.0*0.66, 192.0/255.0*0.66);
+    m_vtkRenderer->SetBackground2(0.406, 0.481, 0.497);
     m_vtkRenderer->GradientBackgroundOn();
 
     ///TODO : only on deformable objects with UseBounds (need vtk update)
@@ -221,7 +221,7 @@ VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 }
 
 void
-VTKRenderer::updateBackground(Vec3d backgroundOne, Vec3d backgroundTwo /*= Vec3d::Zero()*/, bool gradientBackground /*= false*/)
+VTKRenderer::updateBackground(const Vec3d backgroundOne, const Vec3d backgroundTwo /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
 {
     m_vtkRenderer->SetBackground(backgroundOne.x(), backgroundOne.y(), backgroundOne.z());
     if (gradientBackground)

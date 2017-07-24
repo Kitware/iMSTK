@@ -92,8 +92,9 @@ public:
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
 
     ///
-    /// \brief
-    void updateBackground(Vec3d color1, Vec3d color2 = Vec3d::Zero(), bool gradientBackground = false);
+    /// \brief Update background colors
+    ///
+    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
 protected:
     ///

@@ -253,4 +253,10 @@ VTKViewer::getScreenCaptureUtility() const
 {
     return m_screenCapturer;
 }
+
+void
+VTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
+{
+    this->getCurrentRenderer()->updateBackground(color1, color2, gradientBackground);
+}
 } // imstk
