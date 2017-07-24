@@ -127,14 +127,11 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
 void
 VTKSurfaceMeshRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    if (m_geometry->m_dataModified)
     {
-        return;
+        m_mappedVertexArray->Modified();
+        m_geometry->m_dataModified = false;
     }
-
-    m_mappedVertexArray->Modified();
-
-    m_geometry->m_dataModified = false;
 }
 
 void
