@@ -135,14 +135,23 @@ public:
     void setOnRightButtonUpFunction(VTKEventHandlerFunction func);
     void setOnMouseWheelForwardFunction(VTKEventHandlerFunction func);
     void setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func);
-    // Set custom behaviour to be run on every frame.
-    // The return of the function will not have any  effect.
+
+    ///
+    /// \brief Set custom behavior to be run on every frame.
+    /// The return of the function will not have any  effect.
+    ///
     void setOnTimerFunction(VTKEventHandlerFunction func);
 
     ///
-    /// \brief access screen shot utility
+    /// \brief Access screen shot utility
     ///
     std::shared_ptr<VTKScreenCaptureUtility> getScreenCaptureUtility() const;
+
+    ///
+    /// \brief Set the coloring of the screen background
+    /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
+    ///
+    void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
 protected:
 
