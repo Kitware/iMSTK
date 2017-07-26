@@ -43,7 +43,7 @@ PbdModel::PbdModel() :
 }
 
 void
-PbdModel::setModelGeometry(std::shared_ptr<Mesh> m)
+PbdModel::setModelGeometry(std::shared_ptr<PointSet> m)
 {
     m_mesh = m;
 }

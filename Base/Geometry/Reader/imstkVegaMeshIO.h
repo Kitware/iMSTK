@@ -65,7 +65,7 @@ public:
     ///
     /// \brief Write a volumetric mesh in vega file format
     ///
-    static bool write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType);
+    static bool write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType);
 
 protected:
     ///

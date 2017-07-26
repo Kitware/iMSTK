@@ -30,7 +30,7 @@ SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
 {
     this->clear();
 
-    Mesh::initialize(vertices);
+    PointSet::initialize(vertices);
     setTrianglesVertices(triangles);
 
     if (computeDerivedData)
@@ -42,7 +42,7 @@ SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
 void
 SurfaceMesh::clear()
 {
-    Mesh::clear();
+    PointSet::clear();
     m_trianglesVertices.clear();
     m_vertexNeighborTriangles.clear();
     m_vertexNeighborVertices.clear();
@@ -53,7 +53,7 @@ SurfaceMesh::clear()
 void
 SurfaceMesh::print() const
 {
-    Mesh::print();
+    PointSet::print();
 
     LOG(INFO) << "Number of triangles: " << this->getNumTriangles();
     LOG(INFO) << "Triangles:";

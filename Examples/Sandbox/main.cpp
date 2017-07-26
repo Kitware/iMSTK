@@ -70,10 +70,10 @@
 
 // Collisions
 #include "imstkInteractionPair.h"
-#include "imstkMeshToPlaneCD.h"
-#include "imstkMeshToSphereCD.h"
+#include "imstkPointSetToPlaneCD.h"
+#include "imstkPointSetToSphereCD.h"
 #include "imstkVirtualCouplingCH.h"
-#include "imstkMeshToSpherePickingCD.h"
+#include "imstkPointSetToSpherePickingCD.h"
 #include "imstkPickingCH.h"
 #include "imstkBoneDrillingCH.h"
 
@@ -1171,7 +1171,7 @@ void testDeformableBody()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -1328,7 +1328,7 @@ void testPbdVolume()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
@@ -1522,7 +1522,7 @@ void testPbdCollision()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -1667,7 +1667,7 @@ void testPbdCollision()
         auto volTetMesh1 = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh1);
         if (!volTetMesh1)
         {
-            LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+            LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
             return;
         }
 
@@ -1838,7 +1838,7 @@ void testPbdFluidBenchmarking()
 
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
-    //Create Mesh
+    //Create PointSet
     imstk::StdVectorOfVec3d vertList;
     int nPoints = pow(nPointsPerSide, 3);
     const double spacing = cubeLength / nPointsPerSide;
@@ -1856,7 +1856,7 @@ void testPbdFluidBenchmarking()
         }
     }
 
-    auto cubeMesh = std::make_shared<imstk::Mesh>();
+    auto cubeMesh = std::make_shared<imstk::PointSet>();
     cubeMesh->initialize(vertList);
 
     auto material1 = std::make_shared<RenderMaterial>();
@@ -2023,7 +2023,7 @@ void testPbdFluid()
         return;
     }
 
-    auto fluidMesh = std::make_shared<imstk::Mesh>();
+    auto fluidMesh = std::make_shared<imstk::PointSet>();
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());
 
     auto material1 = std::make_shared<RenderMaterial>();
@@ -2489,7 +2489,7 @@ void testLineMesh()
         auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
         if (!volTetMesh)
         {
-            LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+            LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
             return;
         }
 
@@ -2666,7 +2666,7 @@ void testDeformableBodyCollision()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -2718,7 +2718,7 @@ void testDeformableBodyCollision()
     // Create collision detection and handling
     scene->getCollisionGraph()->addInteractionPair(deformableObj,
         planeObj,
-        CollisionDetection::Type::MeshToPlane,
+        CollisionDetection::Type::PointSetToPlane,
         CollisionHandling::Type::Penalty,
         CollisionHandling::Type::None);
 
@@ -2769,7 +2769,7 @@ void liverToolInteraction()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -2863,7 +2863,7 @@ void liverToolInteraction()
 
     scene->getCollisionGraph()->addInteractionPair(deformableObj,
                                                    sphere0Obj,
-                                                   CollisionDetection::Type::MeshToSphere,
+                                                   CollisionDetection::Type::PointSetToSphere,
                                                    CollisionHandling::Type::Penalty,
                                                    CollisionHandling::Type::None);
 
@@ -3058,7 +3058,7 @@ void testPicking()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
@@ -3139,7 +3139,7 @@ void testPicking()
     auto sphereGeo = std::dynamic_pointer_cast<Sphere>(sphereForPickObj->getCollidingGeometry());
 
     // Create collision detection for picking
-    auto pickingCD = std::make_shared<MeshToSpherePickingCD>(volTetMesh, sphereGeo, coldata);
+    auto pickingCD = std::make_shared<PointSetToSpherePickingCD>(volTetMesh, sphereGeo, coldata);
     pickingCD->setDeviceTrackerAndButton(pickTrackingCtrl, 0);
 
     // Create contact handling for picking
@@ -3212,7 +3212,7 @@ void testBoneDrilling()
     auto graph = scene->getCollisionGraph();
     auto pair = graph->addInteractionPair(bone,
                                           drill,
-                                          CollisionDetection::Type::MeshToSphere,
+                                          CollisionDetection::Type::PointSetToSphere,
                                           CollisionHandling::Type::BoneDrilling,
                                           CollisionHandling::Type::None);
 

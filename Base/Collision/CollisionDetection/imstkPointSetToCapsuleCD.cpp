@@ -19,11 +19,11 @@
 
 =========================================================================*/
 
-#include "imstkMeshToCapsuleCD.h"
+#include "imstkPointSetToCapsuleCD.h"
 
 #include "imstkCollisionData.h"
 #include "imstkCapsule.h"
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 #include "imstkMath.h"
 
 #include <g3log/g3log.hpp>
@@ -31,7 +31,7 @@
 namespace imstk
 {
 void
-MeshToCapsuleCD::computeCollisionData()
+PointSetToCapsuleCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData.clearAll();
@@ -50,7 +50,7 @@ MeshToCapsuleCD::computeCollisionData()
     auto pDotp0 = p.dot(p0);
 
     size_t nodeId = 0;
-    for (const auto& q : m_mesh->getVertexPositions())
+    for (const auto& q : m_pointSet->getVertexPositions())
     {
         // First, check collision with bounding sphere
         if ((mid - q).norm() > (radius + length*0.5))

@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkVTKPointSetRenderDelegate.h"
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 
 #include <vtkTrivialProducer.h>
 #include <vtkDoubleArray.h>
@@ -28,7 +28,7 @@
 
 namespace imstk
 {
-VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<Mesh> mesh) :
+VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<PointSet> mesh) :
     m_geometry(mesh),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {

@@ -101,6 +101,8 @@ public:
 
 protected:
 
+    friend class VTKHexahedralMeshRenderDelegate;
+
     std::vector<HexaArray> m_hexahedraVertices; ///< vertices of the hexahedra
 };
 } // imstk

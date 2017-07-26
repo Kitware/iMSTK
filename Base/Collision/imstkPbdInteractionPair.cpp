@@ -32,8 +32,8 @@ PbdInteractionPair::doBroadPhaseCollision()
 {
     auto g1 = first->getCollidingGeometry();
     auto g2 = second->getCollidingGeometry();
-    auto mesh1 = std::static_pointer_cast<Mesh>(g1);
-    auto mesh2 = std::static_pointer_cast<Mesh>(g2);
+    auto mesh1 = std::static_pointer_cast<PointSet>(g1);
+    auto mesh2 = std::static_pointer_cast<PointSet>(g2);
 
     Vec3d min1, max1;
     mesh1->computeBoundingBox(min1, max1);
@@ -168,7 +168,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
     }
     else if (g1->getType() == Geometry::Type::PointSet)
     {
-        auto mesh1 = std::static_pointer_cast<Mesh>(g1);
+        auto mesh1 = std::static_pointer_cast<PointSet>(g1);
 
         // brute force, use BVH or spatial grid would be much better
         // point

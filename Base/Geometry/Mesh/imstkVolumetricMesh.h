@@ -24,7 +24,7 @@
 
 #include <memory>
 
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 
 // Vega
@@ -37,7 +37,7 @@ namespace imstk
 ///
 /// \brief Base class for all volume mesh types
 ///
-class VolumetricMesh : public Mesh
+class VolumetricMesh : public PointSet
 {
 public:
 
@@ -73,7 +73,7 @@ public:
 
 protected:
 
-    VolumetricMesh(Geometry::Type type) : Mesh(type) {}
+    VolumetricMesh(Geometry::Type type) : PointSet(type) {}
 
     std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh = nullptr; ///> Attached surface mesh
     std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh = nullptr; ///> Attached vega mesh

@@ -19,15 +19,15 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkMeshToSpherePickingCD.h"
+#include "imstkPointSetToSpherePickingCD.h"
 #include "imstkCollisionData.h"
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 #include "imstkSphere.h"
 
 namespace imstk
 {
 void
-MeshToSpherePickingCD::computeCollisionData()
+PointSetToSpherePickingCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData.clearAll();
@@ -42,7 +42,7 @@ MeshToSpherePickingCD::computeCollisionData()
     auto radius = m_sphere->getRadius()*m_sphere->getScaling();
 
     size_t nodeId = 0;
-    for (const auto& p : m_mesh->getVertexPositions())
+    for (const auto& p : m_pointSet->getVertexPositions())
     {
         auto dist = (spherePos - p).norm();
         if (dist <= radius)

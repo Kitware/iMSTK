@@ -59,8 +59,8 @@ public:
     ///
     /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
     ///
-    void setModelGeometry(std::shared_ptr<Mesh> m);
-    std::shared_ptr<Mesh> getModelGeometry() const { return m_mesh; }
+    void setModelGeometry(std::shared_ptr<PointSet> m);
+    std::shared_ptr<PointSet> getModelGeometry() const { return m_mesh; }
 
     ///
     /// \brief setElasticModulus
@@ -211,7 +211,7 @@ public:
     void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) override {};
 
 protected:
-    std::shared_ptr<Mesh> m_mesh;   ///> Mesh on which the pbd model operates on
+    std::shared_ptr<PointSet> m_mesh;   ///> PointSet on which the pbd model operates on
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
 
     // Lame's constants

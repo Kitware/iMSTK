@@ -47,7 +47,7 @@ VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 }
 
 bool
-VegaMeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType)
+VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType)
 {
     if (meshType != MeshFileType::VEG)
     {

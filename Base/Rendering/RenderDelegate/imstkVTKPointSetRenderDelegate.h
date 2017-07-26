@@ -30,7 +30,7 @@ class vtkDoubleArray;
 
 namespace imstk
 {
-class Mesh;
+class PointSet;
 
 ///
 /// \class PointSetRenderDelegate
@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKPointSetRenderDelegate(std::shared_ptr<Mesh> mesh);
+    VTKPointSetRenderDelegate(std::shared_ptr<PointSet> mesh);
 
     ///
     /// \brief Destructor
@@ -62,7 +62,7 @@ public:
 
 protected:
 
-    std::shared_ptr<Mesh> m_geometry;                ///> Geometry to render
+    std::shared_ptr<PointSet> m_geometry;                ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }

@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToSphereCD_h
-#define imstkMeshToSphereCD_h
+#ifndef imstkPointSetToPlaneCD_h
+#define imstkPointSetToPlaneCD_h
 
 #include <memory>
 
@@ -28,34 +28,34 @@
 
 namespace imstk
 {
-class Mesh;
-class Sphere;
+class PointSet;
+class Plane;
 class CollisionData;
 
 ///
-/// \class MeshToSphereCD
+/// \class PointSetToPlaneCD
 ///
-/// \brief Mesh to sphere collision detection
+/// \brief PointSet to plane collision detection
 ///
-class MeshToSphereCD : public CollisionDetection
+class PointSetToPlaneCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    MeshToSphereCD(std::shared_ptr<Mesh> mesh,
-                   std::shared_ptr<Sphere> sphere,
-                   CollisionData& colData) :
-        CollisionDetection(CollisionDetection::Type::MeshToSphere,
+    PointSetToPlaneCD(std::shared_ptr<PointSet> pointSet,
+                      std::shared_ptr<Plane> plane,
+                      CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::PointSetToSphere,
                            colData),
-        m_mesh(mesh),
-        m_sphere(sphere){}
+        m_pointSet(pointSet),
+        m_plane(plane){}
 
     ///
     /// \brief Destructor
     ///
-    ~MeshToSphereCD() = default;
+    ~PointSetToPlaneCD() = default;
 
     ///
     /// \brief Detect collision and compute collision data
@@ -64,9 +64,9 @@ public:
 
 private:
 
-    std::shared_ptr<Mesh> m_mesh;       ///> Mesh
-    std::shared_ptr<Sphere> m_sphere;  ///> Sphere
+    std::shared_ptr<PointSet> m_pointSet;      ///> PointSet
+    std::shared_ptr<Plane> m_plane;            ///> Plane
 };
 }
 
-#endif // ifndef imstkMeshToSphereCD_h
+#endif // ifndef imstkPointSetToPlaneCD_h

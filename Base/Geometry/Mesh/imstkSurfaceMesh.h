@@ -28,7 +28,7 @@
 #include <set>
 
 // imstk
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 
 namespace imstk
 {
@@ -37,7 +37,7 @@ namespace imstk
 ///
 /// \brief Surface triangular mesh
 ///
-class SurfaceMesh : public Mesh
+class SurfaceMesh : public PointSet
 {
 public:
 
@@ -47,7 +47,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SurfaceMesh() : Mesh(Geometry::Type::SurfaceMesh) {}
+    SurfaceMesh() : PointSet(Geometry::Type::SurfaceMesh) {}
 
     ///
     /// \brief Default destructor
@@ -162,6 +162,8 @@ public:
     void correctWindingOrder();
 
 protected:
+
+    friend class VTKSurfaceMeshRenderDelegate;
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
 

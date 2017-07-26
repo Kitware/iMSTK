@@ -33,7 +33,7 @@ OneToOneMap::compute()
     }
 
     // returns the first matching vertex
-    auto findMatchingVertex = [](std::shared_ptr<Mesh> masterMesh, const Vec3d& p) -> size_t
+    auto findMatchingVertex = [](std::shared_ptr<PointSet> masterMesh, const Vec3d& p) -> size_t
                               {
                                   for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
                                   {
@@ -45,8 +45,8 @@ OneToOneMap::compute()
                                   return -1;
                               };
 
-    auto meshMaster = std::dynamic_pointer_cast<Mesh>(m_master);
-    auto meshSlave = std::dynamic_pointer_cast<Mesh>(m_slave);
+    auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
+    auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
 
     m_oneToOneMap.clear();
     for (size_t nodeId = 0; nodeId < meshSlave->getNumVertices(); ++nodeId)
@@ -69,8 +69,8 @@ OneToOneMap::compute()
 bool
 OneToOneMap::isValid() const
 {
-    auto meshMaster = std::dynamic_pointer_cast<Mesh> (m_master);
-    auto meshSlave = std::dynamic_pointer_cast<Mesh> (m_slave);
+    auto meshMaster = std::dynamic_pointer_cast<PointSet> (m_master);
+    auto meshSlave = std::dynamic_pointer_cast<PointSet> (m_slave);
 
     auto numVertMaster = meshMaster->getNumVertices();
     auto numVertSlave = meshSlave->getNumVertices();
@@ -114,8 +114,8 @@ OneToOneMap::apply()
         return;
     }
 
-    auto meshMaster = std::dynamic_pointer_cast<Mesh>(m_master);
-    auto meshSlave = std::dynamic_pointer_cast<Mesh>(m_slave);
+    auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
+    auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
 
     for (auto const& mapValue : m_oneToOneMap)
     {

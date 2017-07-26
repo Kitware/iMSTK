@@ -59,12 +59,12 @@ public:
     ///
     /// \brief
     ///
-    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType);
+    static std::shared_ptr<PointSet> read(const std::string& filePath, MeshFileType meshType);
 
     ///
     /// \brief Writes the given mesh to the specified file path.
     ///
-    static bool write(const std::shared_ptr<Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType);
+    static bool write(const std::shared_ptr<PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType);
 
 protected:
 
@@ -72,7 +72,7 @@ protected:
     /// \brief
     ///
     template<typename ReaderType>
-    static std::shared_ptr<Mesh> readVtkGenericFormatData(const std::string& filePath);
+    static std::shared_ptr<PointSet> readVtkGenericFormatData(const std::string& filePath);
 
     ///
     /// \brief

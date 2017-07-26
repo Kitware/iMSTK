@@ -28,7 +28,7 @@
 #include <array>
 
 // imstk
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 
 namespace imstk
 {
@@ -73,12 +73,12 @@ public:
     ///
     /// \brief Read external file
     ///
-    static std::shared_ptr<Mesh> read(const std::string& filePath);
+    static std::shared_ptr<PointSet> read(const std::string& filePath);
 
     ///
     /// \brief Write external file
     ///
-    static bool write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath);
+    static bool write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath);
 
     ///
     /// \brief Returns true if the file exists, else false
