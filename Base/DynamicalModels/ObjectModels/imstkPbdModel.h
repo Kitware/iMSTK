@@ -219,10 +219,10 @@ protected:
     double m_lambda;                    ///> Lame constant
 
     // Mass properties
-    std::vector<double> m_mass;         ///> Mass of nodes
-    std::vector<double> m_invMass;      ///> Inverse of mass of nodes
+    std::vector<double> m_mass;           ///> Mass of nodes
+    std::vector<double> m_invMass;        ///> Inverse of mass of nodes
 
-    double m_contactStiffness;            ///> Contact stiffness for collisions
+    double m_contactStiffness = 1.;       ///> Contact stiffness for collisions
     Vec3d m_gravity;                      ///> Gravity
 
     double m_viscousDampingCoeff = 0.01;  ///> Viscous damping coefficient [0, 1]

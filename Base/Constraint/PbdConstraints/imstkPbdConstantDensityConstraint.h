@@ -37,7 +37,7 @@ public:
     ///
     /// \brief constructor
     ///
-    PbdConstantDensityConstraint() : PbdConstraint() { m_vertexIds.resize(1); }
+    PbdConstantDensityConstraint() : PbdConstraint() {}
 
     ///
     /// \Constant Density Constraint Initialization
@@ -73,27 +73,27 @@ private:
     ///
     /// \brief Update the neighbors of each node using burte force search O(n*n)
     ///
-    void updateNeighborsBruteForce(const Vec3d &pi, const size_t &index, const StdVectorOfVec3d &positions);
+    void updateNeighborsBruteForce(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
 
     ///
     /// \brief Clear the list of neighbors
     ///
-    void clearNeighbors(const size_t &np);
+    void clearNeighbors(const size_t np);
 
     ///
     /// \brief
     ///
-    void calculateDensityEstimate(const Vec3d &pi, const size_t &index, const StdVectorOfVec3d &positions);
+    void calculateDensityEstimate(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
 
     ///
     /// \brief
     ///
-    void calculateLambdaScalingFactor(const Vec3d &pi, const size_t &index, const StdVectorOfVec3d &positions);
+    void calculateLambdaScalingFactor(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
 
     ///
     /// \brief
     ///
-    void updatePositions(const Vec3d &pi, const size_t &index, StdVectorOfVec3d &positions);
+    void updatePositions(const Vec3d &pi, const size_t index, StdVectorOfVec3d &positions);
 
     ///
     /// \brief Set/Get rest density
@@ -121,10 +121,6 @@ private:
     std::vector<Vec3d> m_deltaPositions;    ///> delta positions
     std::vector<int> m_neighbors;           ///> index of neighbors
     std::vector<int> m_numNeighbors;        ///> number of neighbors
-
-    std::vector<int> m_xPosIndexes;
-    std::vector<int> m_yPosIndexes;
-    std::vector<int> m_zPosIndexes;
 };
 }
 

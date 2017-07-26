@@ -96,7 +96,7 @@ PbdPointTriangleConstraint::solvePositionConstraint()
 
     lambda = (l - dist)/lambda;
 
-//    LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
+    //LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
 
     if (im0 > 0)
     {

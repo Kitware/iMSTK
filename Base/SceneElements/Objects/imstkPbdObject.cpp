@@ -167,7 +167,7 @@ PbdObject::initialize(int nCons, ...)
         m_pbdModel->setMaxNumIterations(va_arg(args,int));
     }
 
-    if (m_physicsToCollidingGeomMap && m_collidingGeometry)
+    if (m_collidingGeometry)
     {
         m_pbdModel->setProximity(va_arg(args,double));
         m_pbdModel->setContactStiffness(va_arg(args,double));
