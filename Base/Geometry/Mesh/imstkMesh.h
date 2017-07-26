@@ -34,11 +34,16 @@ namespace imstk
 class Mesh : public Geometry
 {
 public:
+
+    ///
+    /// \brief Protected constructor
+    ///
+    Mesh(Geometry::Type type = Geometry::Type::PointSet) : Geometry(type) {}
+
     ///
     /// \brief Destructor
     ///
     ~Mesh() = default;
-    //Mesh() = default;
 
     ///
     /// \brief Initializes the data structure given vertex positions
@@ -54,6 +59,11 @@ public:
     /// \brief Print the mesh info
     ///
     virtual void print() const override;
+
+    ///
+    /// \brief Returns the volume of the geometry (if valid)
+    ///
+    virtual double getVolume() const { return 0; };
 
     ///
     /// \brief Compute the bounding box for the entire mesh
@@ -146,15 +156,11 @@ public:
 
 protected:
 
-    ///
-    /// \brief Protected constructor
-    ///
-    Mesh(Type type) : Geometry(type) {}
-
     friend class VTKSurfaceMeshRenderDelegate;
     friend class VTKTetrahedralMeshRenderDelegate;
     friend class VTKLineMeshRenderDelegate;
     friend class VTKHexahedralMeshRenderDelegate;
+    friend class VTKPointSetRenderDelegate;
 
     ///
     /// \brief Get vertices positions

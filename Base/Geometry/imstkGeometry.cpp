@@ -245,6 +245,16 @@ void
 Geometry::setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
 {
     m_renderMaterial = renderMaterial;
+
+    // Enforce RenderMaterial::DisplayMode::POINTS if the connectivity information is missing
+    if (m_type == Type::PointSet)
+    {
+        if (m_renderMaterial->getDisplayMode() != RenderMaterial::DisplayMode::POINTS)
+        {
+            LOG(WARNING) << "Geometry::setRenderMaterial: The mesh doesn't have a connectivity. Enforcing RenderMaterial::DisplayMode::POINTS display mode";
+            m_renderMaterial->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
+        }
+    }
 }
 
 std::shared_ptr<RenderMaterial>

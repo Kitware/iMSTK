@@ -17,6 +17,7 @@ imstk_add_library( Rendering
     RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.h
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
     RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.h
+    RenderDelegate/imstkVTKPointSetRenderDelegate.h
     RenderDelegate/vtkCapsuleSource.h
 
   CPP_FILES
@@ -33,6 +34,7 @@ imstk_add_library( Rendering
     RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.cpp
+    RenderDelegate/imstkVTKPointSetRenderDelegate.cpp
     RenderDelegate/vtkCapsuleSource.cpp
 
   SUBDIR_LIST
