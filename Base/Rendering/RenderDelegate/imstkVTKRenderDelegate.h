@@ -60,9 +60,12 @@ public:
 
     ///
     /// \brief Set up normals and mapper
+    /// \param source input data object
+    /// \param notSurfaceMesh if the mesh isn't a surface Mesh
+    /// \param geometry the geometry object
     ///
     void setUpMapper(vtkAlgorithmOutput *source,
-                     const bool rigid,
+                     const bool notSurfaceMesh,
                      std::shared_ptr<Geometry> geometry);
 
     ///

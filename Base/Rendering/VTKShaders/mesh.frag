@@ -20,6 +20,9 @@ uniform vec4 lightDirection[16];
 #ifdef SHADED
 uniform sampler2D diffuseTexture;
 uniform samplerCube cubemapTexture;
+uniform vec3 diffuseColorUniform = vec3(1);
+#else
+uniform vec3 debugColor = vec3(0);
 #endif
 
 // Material properties
@@ -49,6 +52,8 @@ void main()
 
 #ifdef DIFFUSE_TEXTURE
     diffuseColor = pow(texture(diffuseTexture, vertex.uv).rgb, vec3(2.2));
+#else
+    diffuseColor = diffuseColorUniform;
 #endif
 #ifdef CUBEMAP_TEXTURE
     reflectionColor = pow(texture(cubemapTexture, reflect(cameraDirection, normal)).rgb, vec3(2.2));
@@ -93,7 +98,7 @@ void main()
 
     gl_FragData[0] = vec4(pow(finalColor, vec3(1.0 / 2.2)), 1);
 #else
-    gl_FragData[0] = vec4(0, 0, 0, 1);
+    gl_FragData[0] = vec4(debugColor, 1);
 #endif
 }
 

@@ -82,6 +82,12 @@ public:
     void setDiffuseColor(const Color color);
 
     ///
+    /// \brief Get/Set the color of the wireframe and points
+    ///
+    const Color& getDebugColor() const;
+    void setDebugColor(const Color color);
+
+    ///
     /// \brief Get/Set the metalness
     ///
     const float& getMetalness() const;
@@ -132,6 +138,7 @@ protected:
 
     // Colors
     Color m_diffuseColor = Color::White;
+    Color m_debugColor = Color::Black;
 
     // Classical values
     float m_metalness = 0.0; ///< Value for metalness with range: [0.0, 1.0]

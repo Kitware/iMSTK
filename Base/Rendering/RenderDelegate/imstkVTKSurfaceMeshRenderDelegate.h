@@ -71,6 +71,7 @@ protected:
 
     std::shared_ptr<SurfaceMesh> m_geometry;                ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
 };
 }
 
