@@ -35,7 +35,8 @@ class PointSet;
 ///
 /// \class PointSetRenderDelegate
 ///
-/// \brief
+/// \brief Render delegate for point set. A 3D glyph of spheres is
+/// created to render each node
 ///
 class VTKPointSetRenderDelegate : public VTKRenderDelegate
 {
@@ -62,7 +63,7 @@ public:
 
 protected:
 
-    std::shared_ptr<PointSet> m_geometry;                ///> Geometry to render
+    std::shared_ptr<PointSet> m_geometry;                   ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }

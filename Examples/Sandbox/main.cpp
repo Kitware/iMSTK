@@ -1859,12 +1859,6 @@ void testPbdFluidBenchmarking()
     auto cubeMesh = std::make_shared<imstk::PointSet>();
     cubeMesh->initialize(vertList);
 
-    auto material1 = std::make_shared<RenderMaterial>();
-    material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
-    material1->setDiffuseColor(Color::Blue);
-    material1->setPointSize(5.0);
-    cubeMesh->setRenderMaterial(material1);
-
     auto cube = std::make_shared<PbdObject>("Cube");
     cube->setCollidingGeometry(cubeMesh);
     cube->setVisualGeometry(cubeMesh);

@@ -25,6 +25,8 @@
 #include <vtkTrivialProducer.h>
 #include <vtkDoubleArray.h>
 #include <vtkVertexGlyphFilter.h>
+#include <vtkSphereSource.h>
+#include <vtkGlyph3D.h>
 
 namespace imstk
 {
@@ -47,25 +49,31 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<PointSet> m
     auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
     pointsPolydata->SetPoints(points);
 
-    auto vertexFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
+    auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+
+    auto glyph = vtkSmartPointer<vtkGlyph3D>::New();
+
 #if VTK_MAJOR_VERSION <= 5
-    vertexFilter->SetInputConnection(pointsPolydata->GetProducerPort());
+    glyph->SetSource(sphere->GetOutput());
+    glyph->SetInput(selectPoints->GetOutput());
 #else
-    vertexFilter->SetInputData(pointsPolydata);
+    glyph->SetSourceConnection(sphere->GetOutputPort());
+    glyph->SetInputData(pointsPolydata);
 #endif
-    vertexFilter->Update();
     m_geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
 
     // Setup custom mapper
-    m_mapper->SetInputConnection(vertexFilter->GetOutputPort());
+    m_mapper->SetInputConnection(glyph->GetOutputPort());
     auto mapper = VTKCustomPolyDataMapper::SafeDownCast(m_mapper.GetPointer());
     if (!mesh->getRenderMaterial())
     {
         mesh->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
+    sphere->SetRadius(mesh->getRenderMaterial()->getSphereGlyphSize());
+
     mapper->setGeometry(mesh);
 }
 
