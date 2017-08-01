@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 bool
 Scene::initialize()
 {

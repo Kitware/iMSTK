@@ -1862,7 +1862,7 @@ void testPbdFluidBenchmarking()
     cube->setPhysicsGeometry(cubeMesh);
 
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(cubeMeshPhysics);
+    pbdModel->setModelGeometry(cubeMesh);
     pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "ConstantDensity 1.0 0.3",
         /*Mass*/ 1.0,
@@ -2028,7 +2028,7 @@ void testPbdFluid()
     deformableObj->setPhysicsGeometry(fluidMesh);
 
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->setModelGeometry(fluidMesh);
     pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "ConstantDensity 1.0 0.3",
         /*Mass*/ 1.0,

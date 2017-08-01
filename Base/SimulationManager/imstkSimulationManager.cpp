@@ -194,7 +194,7 @@ SimulationManager::setCurrentScene(std::string newSceneName, bool unloadCurrentS
         return;
     }
 
-    std::shared_ptr<Scene> newScene = this->getScene(newSceneName);
+    auto newScene = this->getScene(newSceneName);
     if (!newScene)
     {
         LOG(WARNING) << "Can not find scene";
@@ -253,6 +253,7 @@ SimulationManager::setCurrentScene(std::string newSceneName, bool unloadCurrentS
 void
 SimulationManager::startSimulation(bool debug)
 {
+    this->getCurrentScene()->initialize();
     if (m_status != SimulationStatus::INACTIVE)
     {
         LOG(WARNING) << "Simulation already active";
