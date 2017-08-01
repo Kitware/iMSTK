@@ -147,22 +147,35 @@ PbdModel::initialize()
 
             if (strncmp("Corotation", &s[pos], len) == 0)
             {
-                LOG(INFO) << "Creating Corotation constraints";
-                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation);
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation))
+                {
+                    return false;
+                }
+                ;
             }
             else if (strncmp("NeoHookean", &s[pos], len) == 0)
             {
-                LOG(INFO) << "Creating Neohookean constraints";
-                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean);
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean))
+                {
+                    return false;
+                }
+                ;
             }
             else if (strncmp("Stvk", &s[pos], len) == 0)
             {
-                LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
-                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK))
+                {
+                    return false;
+                }
+                ;
             }
             else
             { // default
-                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK))
+                {
+                    return false;
+                }
+                ;
             }
 
             float YoungModulus, PoissonRatio;
@@ -173,40 +186,56 @@ PbdModel::initialize()
         {
             float stiffness;
             sscanf(&s[len + 1], "%f", &stiffness);
-            LOG(INFO) << "Creating Volume constraints " << stiffness;
-            this->initializeVolumeConstraints(stiffness);
+            if (!this->initializeVolumeConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
         }
         else if (strncmp("Distance", &s[0], len) == 0)
         {
             float stiffness;
             sscanf(&s[len + 1], "%f", &stiffness);
-            LOG(INFO) << "Creating Distance constraints " << stiffness;
-            this->initializeDistanceConstraints(stiffness);
+            if (!this->initializeDistanceConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
         }
         else if (strncmp("Area", &s[0], len) == 0)
         {
             float stiffness;
             sscanf(&s[len + 1], "%f", &stiffness);
-            LOG(INFO) << "Creating Area constraints " << stiffness;
-            this->initializeAreaConstraints(stiffness);
+            if (!this->initializeAreaConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
         }
         else if (strncmp("Dihedral", &s[0], len) == 0)
         {
             float stiffness;
             sscanf(&s[len + 1], "%f", &stiffness);
-            LOG(INFO) << "Creating Dihedral constraints " << stiffness;
-            this->initializeDihedralConstraints(stiffness);
+            if (!this->initializeDihedralConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
         }
         else if (strncmp("ConstantDensity", &s[0], len) == 0)
         {
             float stiffness;
             sscanf(&s[len + 1], "%f", &stiffness);
-            LOG(INFO) << "Creating Constant Density constraints ";
-            this->initializeConstantDensityConstraint(stiffness);
+            if (!this->initializeConstantDensityConstraint(stiffness))
+            {
+                return false;
+            }
+            ;
         }
         else
         {
-            exit(0);
+            LOG(WARNING) << "PbdModel::initialize() - Type of PBD constraints not identified!";
+            return false;
         }
     }
     return true;

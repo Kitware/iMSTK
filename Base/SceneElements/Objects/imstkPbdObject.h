@@ -56,10 +56,9 @@ public:
     virtual ~PbdObject() = default;
 
     ///
-    /// \brief Initialize the pbd configuration
-    /// TODO: Parse from config file
+    /// \brief Initialize the pbd scene object
     ///
-    bool initialize(int nCons, ...);
+    bool initialize() override;
 
     ///
     /// \brief Update the position based on Verlet time stepping rule
