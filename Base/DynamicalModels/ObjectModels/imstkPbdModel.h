@@ -52,15 +52,24 @@ public:
     ~PbdModel() = default;
 
     ///
-    /// \brief Initialize the states
-    ///
-    bool initialize();
-
-    ///
     /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
     ///
     void setModelGeometry(std::shared_ptr<PointSet> m);
     std::shared_ptr<PointSet> getModelGeometry() const { return m_mesh; }
+
+    ///
+    /// \brief Configure the PBD model. Arguments should be in the following order
+    /// 1. Number of Constraints (eg: 1)
+    /// 2. Constraint configuration (eg: "FEM NeoHookean 1.0 0.3")
+    /// 3. Mass (eg: 1.0)
+    /// 4. Gravity (eg: "0 -9.8 0")
+    /// 5. TimeStep (eg: 0.001)
+    /// 6. FixedPoint (eg: "10, 21")
+    /// 7. NumberOfIterationInConstraintSolver (eg: 2)
+    /// 8. Proximity (eg: 0.1)
+    /// 9. Contact stiffness (eg: 0.01)
+    ///
+    bool configure(const int nCons, ...);
 
     ///
     /// \brief setElasticModulus
@@ -210,17 +219,26 @@ public:
     ///
     void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) override {};
 
+    ///
+    /// \brief Initialize the scene object
+    ///
+    bool initialize() override;
+
 protected:
     std::shared_ptr<PointSet> m_mesh;   ///> PointSet on which the pbd model operates on
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
+
+    std::vector<std::size_t> m_fixedNodeIds;        ///> Nodal IDs of the nodes that are fixed
+    std::vector<std::string> m_constraintConfig;
 
     // Lame's constants
     double m_mu;                        ///> Lame constant
     double m_lambda;                    ///> Lame constant
 
     // Mass properties
-    std::vector<double> m_mass;           ///> Mass of nodes
-    std::vector<double> m_invMass;        ///> Inverse of mass of nodes
+    double m_uniformMassValue = 1.0;
+    std::vector<double> m_mass;         ///> Mass of nodes
+    std::vector<double> m_invMass;      ///> Inverse of mass of nodes
 
     double m_contactStiffness = 1.;       ///> Contact stiffness for collisions
     Vec3d m_gravity;                      ///> Gravity

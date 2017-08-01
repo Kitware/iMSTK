@@ -89,16 +89,16 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
     m_forceModelConfiguration = std::make_shared<ForceModelConfig>(configFileName);
 }
 
-void
-FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
+bool
+FEMDeformableBodyModel::initialize()
 {
-    this->setModelGeometry(physicsMesh);
+    auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
 
     // prerequisite of for successfully initializing
     if (!m_forceModelGeometry || !m_forceModelConfiguration)
     {
         LOG(WARNING) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
-        return;
+        return false;
     }
 
     m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
@@ -119,6 +119,8 @@ FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
     m_Fcontact.setConstant(0.0);
     m_qSol.resize(m_numDOF);
     m_qSol.setConstant(0.0);
+
+    return true;
 }
 
 void

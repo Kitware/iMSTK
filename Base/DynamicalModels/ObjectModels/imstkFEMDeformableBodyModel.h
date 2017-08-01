@@ -100,7 +100,7 @@ public:
     ///
     /// \brief Initialize the deformable body model
     ///
-    void initialize(std::shared_ptr<VolumetricMesh> physicsMesh);
+    bool initialize() override;
 
     ///
     /// \brief Load the initial conditions of the deformable object

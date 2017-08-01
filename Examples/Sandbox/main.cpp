@@ -1202,7 +1202,7 @@ void testDeformableBody()
     dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     //dynaModel->configure(iMSTK_DATA_ROOT"/asianDragon/asianDragon.config");
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
-    dynaModel->initialize(volTetMesh);
+    dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
@@ -1349,13 +1349,8 @@ void testPbdVolume()
 
     auto deformableObj = std::make_shared<PbdObject>("Beam");
     auto pbdModel = std::make_shared<PbdModel>();
-
-    deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->setVisualGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(volTetMesh);
-    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-
-    deformableObj->initialize(/*Number of Constraints*/ 1,
+    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "FEM NeoHookean 100.0 0.3",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
@@ -1364,12 +1359,16 @@ void testPbdVolume()
         /*NumberOfIterationInConstraintSolver*/ 5
         );
 
+    deformableObj->setDynamicalModel(pbdModel);
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
     scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
-
 
     auto planeGeom = std::make_shared<Plane>();
     planeGeom->setWidth(40);
@@ -1435,21 +1434,21 @@ void testPbdCloth()
 
     surfMesh->setTrianglesVertices(triangles);
 
-    // Object & Model
+    // Create Object & Model
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
     auto pbdModel = std::make_shared<PbdModel>();
-    deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->setVisualGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(surfMesh);
-    deformableObj->initialize(/*Number of constraints*/ 2,
+    pbdModel->setModelGeometry(surfMesh);
+    pbdModel->configure(/*Number of constraints*/ 2,
         /*Constraint configuration*/ "Distance 0.1",
         /*Constraint configuration*/ "Dihedral 0.001",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
         /*TimeStep*/ 0.01,
         /*FixedPoint*/ "1 2 3 4 5 6 7 8 9 10 11",
-        /*NumberOfIterationInConstraintSolver*/ 5
-        );
+        /*NumberOfIterationInConstraintSolver*/ 5);
+    deformableObj->setDynamicalModel(pbdModel);
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(surfMesh);
 
     // Solver
     auto pbdSolver = std::make_shared<PbdSolver>();
@@ -1552,9 +1551,7 @@ void testPbdCollision()
     deformableObj->setCollidingToVisualMap(deformMapC2V);
 
     auto pbdModel = std::make_shared<PbdModel>();
-    deformableObj->setDynamicalModel(pbdModel);
-
-    deformableObj->initialize(/*Number of Constraints*/ 1,
+    pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "FEM NeoHookean 1.0 0.3",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
@@ -1563,6 +1560,7 @@ void testPbdCollision()
         /*NumberOfIterationInConstraintSolver*/ 2,
         /*Proximity*/ 0.1,
         /*Contact stiffness*/ 0.01);
+    deformableObj->setDynamicalModel(pbdModel);
 
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
@@ -1630,16 +1628,16 @@ void testPbdCollision()
         floor->setPhysicsToCollidingMap(oneToOneFloor);
         floor->setPhysicsToVisualMap(oneToOneFloor);
         //floor->setCollidingToVisualMap(oneToOneFloor);
-        floor->initialize(/*Number of constraints*/ 2,
-            /*Constraint configuration*/ "Distance 0.1",
-            /*Constraint configuration*/ "Dihedral 0.001",
-            /*Mass*/ 0.1,
-            /*Gravity*/ "0 9.8 0",
-            /*TimeStep*/ 0.002,
-            /*FixedPoint*/ fixed_corner.c_str(),
-            /*NumberOfIterationInConstraintSolver*/ 5,
-            /*Proximity*/ 0.1,
-            /*Contact stiffness*/ 0.95);
+        //floor->initialize(/*Number of constraints*/ 2,
+        //                  /*Constraint configuration*/ "Distance 0.1",
+        //                  /*Constraint configuration*/ "Dihedral 0.001",
+        //                  /*Mass*/ 0.1,
+        //                  /*Gravity*/ "0 9.8 0",
+        //                  /*TimeStep*/ 0.002,
+        //                  /*FixedPoint*/ fixed_corner.c_str(),
+        //                  /*NumberOfIterationInConstraintSolver*/ 5,
+        //                  /*Proximity*/ 0.1,
+        //                  /*Contact stiffness*/ 0.95);
         scene->addSceneObject(floor);
 
         std::cout << "nbr of vertices in cloth mesh" << clothMesh->getNumVertices() << std::endl;
@@ -1707,15 +1705,15 @@ void testPbdCollision()
         deformableObj1->setPhysicsToCollidingMap(deformMapP2C1);
         deformableObj1->setPhysicsToVisualMap(deformMapP2V1);
         deformableObj1->setCollidingToVisualMap(deformMapC2V1);
-        deformableObj1->initialize(/*Number of Constraints*/ 1,
-            /*Constraint configuration*/ "FEM NeoHookean 10.0 0.5",
-            /*Mass*/ 0.0,
-            /*Gravity*/ "0 -9.8 0",
-            /*TimeStep*/ 0.002,
-            /*FixedPoint*/ "",
-            /*NumberOfIterationInConstraintSolver*/ 2,
-            /*Proximity*/ 0.1,
-            /*Contact stiffness*/ 0.01);
+        //deformableObj1->initialize(/*Number of Constraints*/ 1,
+        //                           /*Constraint configuration*/ "FEM NeoHookean 10.0 0.5",
+        //                           /*Mass*/ 0.0,
+        //                           /*Gravity*/ "0 -9.8 0",
+        //                           /*TimeStep*/ 0.002,
+        //                           /*FixedPoint*/ "",
+        //                           /*NumberOfIterationInConstraintSolver*/ 2,
+        //                           /*Proximity*/ 0.1,
+        //                           /*Contact stiffness*/ 0.01);
 
         scene->addSceneObject(deformableObj1);
 
@@ -1794,12 +1792,11 @@ void testPbdCollision()
         floor->setCollidingToVisualMap(floorMapC2V);
 
         auto pbdModel2 = std::make_shared<PbdModel>();
-        floor->setDynamicalModel(pbdModel2);
-
-        floor->initialize(/*Number of Constraints*/ 0,
+        pbdModel2->configure(/*Number of Constraints*/ 0,
             /*Mass*/ 0.0,
             /*Proximity*/ 0.1,
             /*Contact stiffness*/ 1.0);
+        floor->setDynamicalModel(pbdModel2);
 
         auto pbdSolverfloor = std::make_shared<PbdSolver>();
         pbdSolverfloor->setPbdObject(floor);
@@ -1865,9 +1862,8 @@ void testPbdFluidBenchmarking()
     cube->setPhysicsGeometry(cubeMesh);
 
     auto pbdModel = std::make_shared<PbdModel>();
-    cube->setDynamicalModel(pbdModel);
-
-    cube->initialize(/*Number of Constraints*/ 1,
+    pbdModel->setModelGeometry(cubeMeshPhysics);
+    pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "ConstantDensity 1.0 0.3",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
@@ -1876,6 +1872,7 @@ void testPbdFluidBenchmarking()
         /*NumberOfIterationInConstraintSolver*/ 2,
         /*Proximity*/ 0.2,
         /*Contact stiffness*/ 1.0);
+    cube->setDynamicalModel(pbdModel);
 
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(cube);
@@ -1946,12 +1943,12 @@ void testPbdFluidBenchmarking()
     floor->setCollidingToVisualMap(floorMapC2V);
 
     auto pbdModel2 = std::make_shared<PbdModel>();
-    floor->setDynamicalModel(pbdModel2);
-
-    floor->initialize(/*Number of Constraints*/ 0,
+    pbdModel2->setModelGeometry(floorMeshPhysics);
+    pbdModel2->configure(/*Number of Constraints*/ 0,
         /*Mass*/ 0.0,
         /*Proximity*/ 0.1,
         /*Contact stiffness*/ 1.0);
+    floor->setDynamicalModel(pbdModel2);
 
     auto pbdSolverfloor = std::make_shared<PbdSolver>();
     pbdSolverfloor->setPbdObject(floor);
@@ -2031,9 +2028,8 @@ void testPbdFluid()
     deformableObj->setPhysicsGeometry(fluidMesh);
 
     auto pbdModel = std::make_shared<PbdModel>();
-    deformableObj->setDynamicalModel(pbdModel);
-
-    deformableObj->initialize(/*Number of Constraints*/ 1,
+    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "ConstantDensity 1.0 0.3",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
@@ -2042,6 +2038,7 @@ void testPbdFluid()
         /*NumberOfIterationInConstraintSolver*/ 2,
         /*Proximity*/ 0.1,
         /*Contact stiffness*/ 1.0);
+    deformableObj->setDynamicalModel(pbdModel);
 
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
@@ -2187,12 +2184,12 @@ void testPbdFluid()
     floor->setCollidingToVisualMap(floorMapC2V);
 
     auto pbdModel2 = std::make_shared<PbdModel>();
-    floor->setDynamicalModel(pbdModel2);
-
-    floor->initialize(/*Number of Constraints*/ 0,
+    pbdModel2->setModelGeometry(floorMeshPhysics);
+    pbdModel2->configure(/*Number of Constraints*/ 0,
         /*Mass*/ 0.0,
         /*Proximity*/ 0.1,
         /*Contact stiffness*/ 1.0);
+    floor->setDynamicalModel(pbdModel2);
 
     auto pbdSolverfloor = std::make_shared<PbdSolver>();
     pbdSolverfloor->setPbdObject(floor);
@@ -2246,11 +2243,7 @@ void testLineMesh()
 
     if (line)
     {
-        // Read LineMesh
-        auto lineMeshColliding = std::make_shared<imstk::LineMesh>();
-        auto lineMeshVisual = std::make_shared<imstk::LineMesh>();
-        auto lineMeshPhysics = std::make_shared<imstk::LineMesh>();
-
+        // Make LineMesh
         imstk::StdVectorOfVec3d vertList;
         vertList.resize(3);
         vertList[0] = Vec3d(0.0, -10.0, -10.0);
@@ -2267,101 +2260,43 @@ void testLineMesh()
             connectivity.push_back(line);
         }
 
-        lineMeshColliding->setInitialVertexPositions(vertList);
-        lineMeshColliding->setVertexPositions(vertList);
-        lineMeshColliding->setConnectivity(connectivity);
+        auto lineMesh = std::make_shared<imstk::LineMesh>();
+        lineMesh->setInitialVertexPositions(vertList);
+        lineMesh->setVertexPositions(vertList);
+        lineMesh->setConnectivity(connectivity);
 
-        lineMeshPhysics->setInitialVertexPositions(vertList);
-        lineMeshPhysics->setVertexPositions(vertList);
-        lineMeshPhysics->setConnectivity(connectivity);
-
-        lineMeshVisual->setInitialVertexPositions(vertList);
-        lineMeshVisual->setVertexPositions(vertList);
-        lineMeshVisual->setConnectivity(connectivity);
-
-
-        auto mapC2P = std::make_shared<imstk::OneToOneMap>();
-        mapC2P->setMaster(lineMeshColliding);
-        mapC2P->setSlave(lineMeshPhysics);
-        mapC2P->compute();
-
-        auto mapC2V = std::make_shared<imstk::OneToOneMap>();
-        mapC2V->setMaster(lineMeshColliding);
-        mapC2V->setSlave(lineMeshVisual);
-        mapC2V->compute();
-
-        auto mapP2C = std::make_shared<imstk::OneToOneMap>();
-        mapP2C->setMaster(lineMeshPhysics);
-        mapP2C->setSlave(lineMeshColliding);
-        mapP2C->compute();
-
-        auto mapP2V = std::make_shared<imstk::OneToOneMap>();
-        mapP2V->setMaster(lineMeshPhysics);
-        mapP2V->setSlave(lineMeshVisual);
-        mapP2V->compute();
-
-        linesTool->setCollidingGeometry(lineMeshColliding);
-        linesTool->setVisualGeometry(lineMeshVisual);
-        linesTool->setPhysicsGeometry(lineMeshPhysics);
-        linesTool->setPhysicsToCollidingMap(mapP2C);
-        linesTool->setCollidingToVisualMap(mapC2V);
-        linesTool->setPhysicsToVisualMap(mapP2V);
-        linesTool->setColldingToPhysicsMap(mapC2P);
-        linesTool->initialize(/*Number of constraints*/ 1,
-            /*Constraint configuration*/ "Distance 100",
-            /*Mass*/ 0.0,
-            /*Gravity*/ "0 -9.8 0",
-            /*TimeStep*/ 0.002,
-            /*FixedPoint*/ "0 1 2",
-            /*NumberOfIterationInConstraintSolver*/ 5,
-            /*Proximity*/ 0.1,
-            /*Contact stiffness*/ 0.1);
+        linesTool->setCollidingGeometry(lineMesh);
+        linesTool->setVisualGeometry(lineMesh);
+        linesTool->setPhysicsGeometry(lineMesh);
+        //linesTool->initialize(/*Number of constraints*/ 1,
+        //                      /*Constraint configuration*/ "Distance 100",
+        //                      /*Mass*/ 0.0,
+        //                      /*Gravity*/ "0 -9.8 0",
+        //                      /*TimeStep*/ 0.002,
+        //                      /*FixedPoint*/ "0 1 2",
+        //                      /*NumberOfIterationInConstraintSolver*/ 5,
+        //                      /*Proximity*/ 0.1,
+        //                      /*Contact stiffness*/ 0.1);
         scene->addSceneObject(linesTool);
     }
     else
     {
         std::string path2obj = iMSTK_DATA_ROOT "/ETI/resources/Tools/blade2.obj";
 
-        auto collidingMesh = imstk::MeshIO::read(path2obj);
-        auto viusalMesh = imstk::MeshIO::read(path2obj);
-        auto physicsMesh = imstk::MeshIO::read(path2obj);
+        auto bladeMesh = imstk::MeshIO::read(path2obj);
 
-        auto bladeMapP2V = std::make_shared<imstk::OneToOneMap>();
-        bladeMapP2V->setMaster(physicsMesh);
-        bladeMapP2V->setSlave(viusalMesh);
-        bladeMapP2V->compute();
-
-        auto bladeMapP2C = std::make_shared<imstk::OneToOneMap>();
-        bladeMapP2C->setMaster(physicsMesh);
-        bladeMapP2C->setSlave(collidingMesh);
-        bladeMapP2C->compute();
-
-        auto bladeMapC2V = std::make_shared<imstk::OneToOneMap>();
-        bladeMapC2V->setMaster(collidingMesh);
-        bladeMapC2V->setSlave(viusalMesh);
-        bladeMapC2V->compute();
-
-        auto bladeMapC2P = std::make_shared<imstk::OneToOneMap>();
-        bladeMapC2P->setMaster(collidingMesh);
-        bladeMapC2P->setSlave(physicsMesh);
-        bladeMapC2P->compute();
-
-        blade->setCollidingGeometry(collidingMesh);
-        blade->setVisualGeometry(viusalMesh);
-        blade->setPhysicsGeometry(physicsMesh);
-        blade->setPhysicsToCollidingMap(bladeMapP2C);
-        blade->setCollidingToVisualMap(bladeMapC2V);
-        blade->setPhysicsToVisualMap(bladeMapP2V);
-        blade->setColldingToPhysicsMap(bladeMapC2P);
-        blade->initialize(/*Number of constraints*/ 1,
-            /*Constraint configuration*/ "Distance 0.1",
-            /*Mass*/ 0.0,
-            /*Gravity*/ "0 0 0",
-            /*TimeStep*/ 0.001,
-            /*FixedPoint*/ "",
-            /*NumberOfIterationInConstraintSolver*/ 5,
-            /*Proximity*/ 0.1,
-            /*Contact stiffness*/ 0.01);
+        blade->setCollidingGeometry(bladeMesh);
+        blade->setVisualGeometry(bladeMesh);
+        blade->setPhysicsGeometry(bladeMesh);
+        //blade->initialize(/*Number of constraints*/ 1,
+        //                  /*Constraint configuration*/ "Distance 0.1",
+        //                  /*Mass*/ 0.0,
+        //                  /*Gravity*/ "0 0 0",
+        //                  /*TimeStep*/ 0.001,
+        //                  /*FixedPoint*/ "",
+        //                  /*NumberOfIterationInConstraintSolver*/ 5,
+        //                  /*Proximity*/ 0.1,
+        //                  /*Contact stiffness*/ 0.01);
         scene->addSceneObject(blade);
     }
 
@@ -2410,35 +2345,13 @@ void testLineMesh()
 
         auto clothMeshVisual = std::make_shared<imstk::SurfaceMesh>();
         clothMeshVisual->initialize(vertList, triangles);
-        auto clothMeshColliding = std::make_shared<imstk::SurfaceMesh>();
-        clothMeshColliding->initialize(vertList, triangles);
-        auto clothMeshPhysics = std::make_shared<imstk::SurfaceMesh>();
-        clothMeshPhysics->initialize(vertList, triangles);
 
-        auto clothMapP2V = std::make_shared<imstk::OneToOneMap>();
-        clothMapP2V->setMaster(clothMeshPhysics);
-        clothMapP2V->setSlave(clothMeshVisual);
-        clothMapP2V->compute();
-
-        auto clothMapC2V = std::make_shared<imstk::OneToOneMap>();
-        clothMapC2V->setMaster(clothMeshColliding);
-        clothMapC2V->setSlave(clothMeshVisual);
-        clothMapC2V->compute();
-
-        auto clothMapP2C = std::make_shared<imstk::OneToOneMap>();
-        clothMapP2C->setMaster(clothMeshPhysics);
-        clothMapP2C->setSlave(clothMeshColliding);
-        clothMapP2C->compute();
-
-
-        auto floor = std::make_shared<PbdObject>("cloth");
-        floor->setCollidingGeometry(clothMeshColliding);
-        floor->setVisualGeometry(clothMeshVisual);
-        floor->setPhysicsGeometry(clothMeshPhysics);
-        floor->setPhysicsToCollidingMap(clothMapP2C);
-        floor->setPhysicsToVisualMap(clothMapP2V);
-        floor->setCollidingToVisualMap(clothMapC2V);
-        floor->initialize(/*Number of constraints*/ 2,
+        auto clothObject = std::make_shared<PbdObject>("cloth");
+        clothObject->setCollidingGeometry(clothMeshVisual);
+        clothObject->setVisualGeometry(clothMeshVisual);
+        clothObject->setPhysicsGeometry(clothMeshVisual);
+        auto clothModel = std::make_shared<PbdModel>();
+        clothModel->configure(/*Number of constraints*/ 2,
             /*Constraint configuration*/ "Distance 0.1",
             /*Constraint configuration*/ "Dihedral 0.001",
             /*Mass*/ 0.1,
@@ -2448,7 +2361,8 @@ void testLineMesh()
             /*NumberOfIterationInConstraintSolver*/ 5,
             /*Proximity*/ 0.1,
             /*Contact stiffness*/ 0.1);
-        scene->addSceneObject(floor);
+        clothObject->setDynamicalModel(clothModel);
+        scene->addSceneObject(clothObject);
 
         std::cout << "nbr of vertices in cloth mesh" << clothMeshVisual->getNumVertices() << std::endl;
 
@@ -2463,7 +2377,7 @@ void testLineMesh()
             tool = blade;
         }
 
-        auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(tool, floor));
+        auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(tool, clothObject));
         pair1->setNumberOfInterations(5);
 
         clothTestcolGraph->addInteractionPair(pair1);
@@ -2526,7 +2440,9 @@ void testLineMesh()
         deformableObj->setPhysicsToCollidingMap(dragonMapP2C);
         deformableObj->setPhysicsToVisualMap(dragonMapP2V);
         deformableObj->setCollidingToVisualMap(dragonMapC2V);
-        deformableObj->initialize(/*Number of Constraints*/ 1,
+
+        auto pbdDefModel = std::make_shared<PbdModel>();
+        pbdDefModel->configure(/*Number of Constraints*/ 1,
             /*Constraint configuration*/ "FEM NeoHookean 10.0 0.3",
             /*Mass*/ 0.1,
             /*Gravity*/ "0 0 0",
@@ -2535,7 +2451,7 @@ void testLineMesh()
             /*NumberOfIterationInConstraintSolver*/ 5,
             /*Proximity*/ 0.1,
             /*Contact stiffness*/ 0.01);
-
+        deformableObj->setDynamicalModel(pbdDefModel);
         scene->addSceneObject(deformableObj);
         std::cout << "nbr of vertices in tongue mesh = " << surfMesh->getNumVertices() << std::endl;
 
@@ -2674,7 +2590,7 @@ void testDeformableBodyCollision()
     // Configure the dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
     dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
-    dynaModel->initialize(volTetMesh);
+    dynaModel->setModelGeometry(volTetMesh);
 
     // Create and add Backward Euler time integrator
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);
@@ -2778,7 +2694,7 @@ void liverToolInteraction()
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
     dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
-    dynaModel->initialize(volTetMesh);
+    dynaModel->setModelGeometry(volTetMesh);
 
     // Create and add Backward Euler time integrator
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);
@@ -3067,7 +2983,7 @@ void testPicking()
     // Configure the dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
     dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
-    dynaModel->initialize(volTetMesh);
+    dynaModel->setModelGeometry(volTetMesh);
 
     // Create and add Backward Euler time integrator
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);
@@ -3347,7 +3263,7 @@ int main()
     /*------------------
     Test physics
     ------------------*/
-    //testPbdVolume();
+    testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
     testPbdFluidBenchmarking();

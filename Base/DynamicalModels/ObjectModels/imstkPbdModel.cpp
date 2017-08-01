@@ -37,9 +37,6 @@ namespace imstk
 PbdModel::PbdModel() :
     DynamicalModel(DynamicalModelType::positionBasedDynamics)
 {
-    m_initialState = std::make_shared<PbdState>();
-    m_previousState = std::make_shared<PbdState>();
-    m_currentState = std::make_shared<PbdState>();
 }
 
 void
@@ -49,10 +46,59 @@ PbdModel::setModelGeometry(std::shared_ptr<PointSet> m)
 }
 
 bool
+PbdModel::configure(const int nCons, ...)
+{
+    va_list args;
+    va_start(args, nCons);
+    for (int i = 0; i < nCons; ++i)
+    {
+        m_constraintConfig.push_back(std::string(va_arg(args, char*)));
+    }
+
+    m_uniformMassValue = va_arg(args, double);
+
+    if (nCons > 0)
+    {
+        char *sgrav = va_arg(args, char*);
+        std::stringstream gStream(sgrav);
+        float x, y, z;
+        gStream >> x;
+        gStream >> y;
+        gStream >> z;
+        Vec3d g(x,y,z);
+        this->setGravity(g);
+
+        this->setTimeStep(va_arg(args, double));
+
+        char *s = va_arg(args, char*);
+        if (strlen(s) > 0)
+        {
+            std::stringstream stream(s);
+            size_t n;
+            while (stream >> n)
+            {
+                m_fixedNodeIds.push_back(n-1);
+            }
+        }
+        this->setMaxNumIterations(va_arg(args, int));
+    }
+    this->setProximity(va_arg(args, double));
+    this->setContactStiffness(va_arg(args, double));
+    this->setNumDegreeOfFreedom(this->getModelGeometry()->getNumVertices() * 3);
+    va_end(args);
+
+    return true;
+}
+
+bool
 PbdModel::initialize()
 {
     if (m_mesh)
     {
+        m_initialState = std::make_shared<PbdState>();
+        m_previousState = std::make_shared<PbdState>();
+        m_currentState = std::make_shared<PbdState>();
+
         bool option[3] = { 1, 0, 0 };
         m_initialState->initialize(m_mesh, option);
         m_previousState->initialize(m_mesh, option);
@@ -64,16 +110,106 @@ PbdModel::initialize()
         m_currentState->setPositions(m_mesh->getVertexPositions());
 
         auto nP = m_mesh->getNumVertices();
-        m_invMass.resize(nP, 0);
-        m_mass.resize(nP, 0);
 
-        return true;
+        m_mass.resize(nP, 0);
+        this->setUniformMass(m_uniformMassValue);
+
+        m_invMass.resize(nP, 0);
+        for (auto i :m_fixedNodeIds)
+        {
+            setFixedPoint(i);
+        }
     }
     else
     {
         LOG(WARNING) << "Model geometry is not yet set! Cannot initialize without model geometry.";
         return false;
     }
+
+    auto nCons = m_constraintConfig.size();
+    for (int i = 0; i < nCons; ++i)
+    {
+        auto s = m_constraintConfig.at(i).c_str();
+        int len = 0;
+        while (s[len] != ' ' && s[len] != '\0')
+        {
+            ++len;
+        }
+
+        if (strncmp("FEM", &s[0], len) == 0)
+        {
+            int pos = len + 1;
+            len = 0;
+            while (s[pos + len] != ' ' && s[pos + len] != '\0')
+            {
+                ++len;
+            }
+
+            if (strncmp("Corotation", &s[pos], len) == 0)
+            {
+                LOG(INFO) << "Creating Corotation constraints";
+                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation);
+            }
+            else if (strncmp("NeoHookean", &s[pos], len) == 0)
+            {
+                LOG(INFO) << "Creating Neohookean constraints";
+                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean);
+            }
+            else if (strncmp("Stvk", &s[pos], len) == 0)
+            {
+                LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
+                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
+            }
+            else
+            { // default
+                this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
+            }
+
+            float YoungModulus, PoissonRatio;
+            sscanf(&s[pos + len + 1], "%f %f", &YoungModulus, &PoissonRatio);
+            this->computeLameConstants(YoungModulus, PoissonRatio);
+        }
+        else if (strncmp("Volume", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            LOG(INFO) << "Creating Volume constraints " << stiffness;
+            this->initializeVolumeConstraints(stiffness);
+        }
+        else if (strncmp("Distance", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            LOG(INFO) << "Creating Distance constraints " << stiffness;
+            this->initializeDistanceConstraints(stiffness);
+        }
+        else if (strncmp("Area", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            LOG(INFO) << "Creating Area constraints " << stiffness;
+            this->initializeAreaConstraints(stiffness);
+        }
+        else if (strncmp("Dihedral", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            LOG(INFO) << "Creating Dihedral constraints " << stiffness;
+            this->initializeDihedralConstraints(stiffness);
+        }
+        else if (strncmp("ConstantDensity", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            LOG(INFO) << "Creating Constant Density constraints ";
+            this->initializeConstantDensityConstraint(stiffness);
+        }
+        else
+        {
+            exit(0);
+        }
+    }
+    return true;
 }
 
 void PbdModel::computeLameConstants(const double& E, const double nu)
