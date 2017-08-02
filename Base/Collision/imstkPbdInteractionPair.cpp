@@ -32,8 +32,8 @@ PbdInteractionPair::doBroadPhaseCollision()
 {
     auto g1 = first->getCollidingGeometry();
     auto g2 = second->getCollidingGeometry();
-    auto mesh1 = std::static_pointer_cast<Mesh>(g1);
-    auto mesh2 = std::static_pointer_cast<Mesh>(g2);
+    auto mesh1 = std::static_pointer_cast<PointSet>(g1);
+    auto mesh2 = std::static_pointer_cast<PointSet>(g2);
 
     Vec3d min1, max1;
     mesh1->computeBoundingBox(min1, max1);
@@ -93,7 +93,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     p2[0], p2[1], p2[2], prox1, prox2))
                 {
                     auto c = std::make_shared<PbdPointTriangleConstraint>();
-                    c->initConstraint(dynaModel1, map1->getMapIdx(i),
+                    c->initConstraint(dynaModel1, i,
                         dynaModel2, map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
                     m_collisionConstraints.push_back(c);
                 }
@@ -166,6 +166,38 @@ PbdInteractionPair::doNarrowPhaseCollision()
             }
         }
     }
+    else if (g1->getType() == Geometry::Type::PointSet)
+    {
+        auto mesh1 = std::static_pointer_cast<PointSet>(g1);
+
+        // brute force, use BVH or spatial grid would be much better
+        // point
+        for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
+        {
+            const auto p = mesh1->getVertexPosition(i);
+            auto elements = mesh2->getTrianglesVertices();
+
+            for (size_t j = 0; j < elements.size(); ++j)
+            {
+                auto& e = elements[j];
+                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+
+                if (testPointToTriAABB(p[0], p[1], p[2],
+                    p0[0], p0[1], p0[2],
+                    p1[0], p1[1], p1[2],
+                    p2[0], p2[1], p2[2], prox1, prox2))
+                {
+                    auto c = std::make_shared<PbdPointTriangleConstraint>();
+                    auto mappedIndex1 = (map1) ? map1->getMapIdx(i) : i;
+
+                    c->initConstraint(dynaModel1, mappedIndex1, dynaModel2, map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
+                    m_collisionConstraints.push_back(c);
+                }
+            }
+        }
+    }
     else
     {
         auto mesh1 = std::static_pointer_cast<SurfaceMesh>(g1);
@@ -175,7 +207,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
             const Vec3d p = mesh1->getVertexPosition(i);
-            std::vector<SurfaceMesh::TriangleArray> elements = mesh2->getTrianglesVertices();
+            auto elements = mesh2->getTrianglesVertices();
 
             for (size_t j = 0; j < elements.size(); ++j)
             {

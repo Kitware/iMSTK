@@ -28,7 +28,7 @@ HexahedralMesh::initialize(const StdVectorOfVec3d& vertices,
                            const std::vector<HexaArray>& hexahedra,
                            bool computeAttachedSurfaceMesh)
 {
-    Mesh::initialize(vertices);
+    PointSet::initialize(vertices);
     this->setHexahedraVertices(hexahedra);
 
     if(computeAttachedSurfaceMesh)
@@ -40,7 +40,7 @@ HexahedralMesh::initialize(const StdVectorOfVec3d& vertices,
 void
 HexahedralMesh::clear()
 {
-    Mesh::clear();
+    PointSet::clear();
     m_hexahedraVertices.clear();
 }
 

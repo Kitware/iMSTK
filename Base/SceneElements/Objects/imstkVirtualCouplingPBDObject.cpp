@@ -57,7 +57,7 @@ VirtualCouplingPBDObject::updateFromDevice()
 
     computeTransform(p, r, transform);
 
-    auto collidingMesh = std::dynamic_pointer_cast<Mesh>(m_collidingGeometry);
+    auto collidingMesh = std::dynamic_pointer_cast<PointSet>(m_collidingGeometry);
 
     Vec4d vertexPos4;
     vertexPos4.w() = 1;
@@ -129,7 +129,7 @@ VirtualCouplingPBDObject::resetCollidingGeometry()
 {
     if (m_collidingGeometry->isMesh())
     {
-        auto collidingMesh = std::dynamic_pointer_cast<Mesh>(m_collidingGeometry);
+        auto collidingMesh = std::dynamic_pointer_cast<PointSet>(m_collidingGeometry);
         collidingMesh->setVertexPositions(collidingMesh->getInitialVertexPositions());
     }
     else

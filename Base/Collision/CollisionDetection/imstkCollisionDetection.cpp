@@ -24,11 +24,11 @@
 #include "imstkUnidirectionalPlaneToSphereCD.h"
 #include "imstkBidirectionalPlaneToSphereCD.h"
 #include "imstkSphereToSphereCD.h"
-#include "imstkMeshToSphereCD.h"
-#include "imstkMeshToPlaneCD.h"
+#include "imstkPointSetToSphereCD.h"
+#include "imstkPointSetToPlaneCD.h"
 #include "imstkMeshToMeshCD.h"
 #include "imstkSphereCylinderCD.h"
-#include "imstkMeshToSpherePickingCD.h"
+#include "imstkPointSetToSpherePickingCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkPlane.h"
@@ -107,9 +107,9 @@ CollisionDetection::make_collision_detection(const Type& type,
         return std::make_shared<SphereCylinderCD>(sphere, cylinder, colData);
     }
     break;
-    case Type::MeshToSphere:
+    case Type::PointSetToSphere:
     {
-        auto mesh = std::dynamic_pointer_cast<Mesh>(objA->getCollidingGeometry());
+        auto mesh = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -119,12 +119,12 @@ CollisionDetection::make_collision_detection(const Type& type,
                          << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
-        return std::make_shared<MeshToSphereCD>(mesh, sphere, colData);
+        return std::make_shared<PointSetToSphereCD>(mesh, sphere, colData);
     }
     break;
-    case Type::MeshToPlane:
+    case Type::PointSetToPlane:
     {
-        auto mesh = std::dynamic_pointer_cast<Mesh>(objA->getCollidingGeometry());
+        auto mesh = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto plane = std::dynamic_pointer_cast<Plane>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -134,7 +134,7 @@ CollisionDetection::make_collision_detection(const Type& type,
                          << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
-        return std::make_shared<MeshToPlaneCD>(mesh, plane, colData);
+        return std::make_shared<PointSetToPlaneCD>(mesh, plane, colData);
     }
     break;
     case Type::MeshToMesh:
@@ -152,9 +152,9 @@ CollisionDetection::make_collision_detection(const Type& type,
         return std::make_shared<MeshToMeshCD>(meshA, meshB, colData);
     }
     break;
-    case Type::MeshToSpherePicking:
+    case Type::PointSetToSpherePicking:
     {
-        auto mesh = std::dynamic_pointer_cast<Mesh>(objA->getCollidingGeometry());
+        auto mesh = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -164,7 +164,7 @@ CollisionDetection::make_collision_detection(const Type& type,
                          << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
-        return std::make_shared<MeshToSpherePickingCD>(mesh, sphere, colData);
+        return std::make_shared<PointSetToSpherePickingCD>(mesh, sphere, colData);
     }
     break;
     default:

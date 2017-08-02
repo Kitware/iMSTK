@@ -47,11 +47,11 @@ public:
         BidirectionalPlaneToSphere,
         SphereToCylinder,
         SphereToSphere,
-        MeshToSphere,
-        MeshToPlane,
+        PointSetToSphere,
+        PointSetToPlane,
         MeshToMesh,
-        MeshToCapsule,
-        MeshToSpherePicking
+        PointSetToCapsule,
+        PointSetToSpherePicking
     };
 
     ///

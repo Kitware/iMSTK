@@ -28,7 +28,7 @@ TetrahedralMesh::initialize(const StdVectorOfVec3d& vertices,
                             const std::vector<TetraArray>& tetrahedra,
                             bool computeAttachedSurfaceMesh)
 {
-    Mesh::initialize(vertices);
+    PointSet::initialize(vertices);
     this->setTetrahedraVertices(tetrahedra);
 
     if (computeAttachedSurfaceMesh)
@@ -47,14 +47,14 @@ TetrahedralMesh::initialize(const StdVectorOfVec3d& vertices,
 void
 TetrahedralMesh::clear()
 {
-    Mesh::clear();
+    PointSet::clear();
     m_tetrahedraVertices.clear();
 }
 
 void
 TetrahedralMesh::print() const
 {
-    Mesh::print();
+    PointSet::print();
 
     LOG(INFO) << "Number of tetrahedra: " << this->getNumTetrahedra();
     LOG(INFO) << "Tetrahedra:";

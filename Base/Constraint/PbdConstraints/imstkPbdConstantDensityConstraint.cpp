@@ -41,10 +41,6 @@ PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double k)
     m_numNeighbors.resize(np);
     m_deltaPositions.resize(np);
     m_neighbors.resize(np * m_maxNumNeighbors);
-
-    m_xPosIndexes.resize(np);
-    m_yPosIndexes.resize(np);
-    m_zPosIndexes.resize(np);
 }
 
 bool
@@ -101,7 +97,7 @@ PbdConstantDensityConstraint::gradSpiky(const Vec3d &pi, const Vec3d &pj)
 }
 
 inline void
-PbdConstantDensityConstraint::clearNeighbors(const size_t &np)
+PbdConstantDensityConstraint::clearNeighbors(const size_t np)
 {
     m_numNeighbors.clear();
     m_neighbors.clear();
@@ -111,7 +107,7 @@ PbdConstantDensityConstraint::clearNeighbors(const size_t &np)
 
 inline void
 PbdConstantDensityConstraint::updateNeighborsBruteForce(const Vec3d &pi,
-                                                        const size_t &index,
+                                                        const size_t index,
                                                         const StdVectorOfVec3d &positions)
 {
     const double neighborRadius = m_maxDist;
@@ -141,7 +137,7 @@ PbdConstantDensityConstraint::updateNeighborsBruteForce(const Vec3d &pi,
 
 inline void
 PbdConstantDensityConstraint::calculateDensityEstimate(const Vec3d &pi,
-                                                       const size_t &index,
+                                                       const size_t index,
                                                        const StdVectorOfVec3d &positions)
 {
     double densitySum = 0.0;
@@ -155,7 +151,7 @@ PbdConstantDensityConstraint::calculateDensityEstimate(const Vec3d &pi,
 
 inline void
 PbdConstantDensityConstraint::calculateLambdaScalingFactor(const Vec3d &pi,
-                                                           const size_t &index,
+                                                           const size_t index,
                                                            const StdVectorOfVec3d &positions)
 {
     const double densityConstraint = (m_densities[index] / m_restDensity) - 1;
@@ -170,7 +166,7 @@ PbdConstantDensityConstraint::calculateLambdaScalingFactor(const Vec3d &pi,
 
 inline void
 PbdConstantDensityConstraint::updatePositions(const Vec3d &pi,
-                                              const size_t &index,
+                                              const size_t index,
                                               StdVectorOfVec3d &positions)
 {
     //Make sure the point is valid

@@ -70,10 +70,10 @@
 
 // Collisions
 #include "imstkInteractionPair.h"
-#include "imstkMeshToPlaneCD.h"
-#include "imstkMeshToSphereCD.h"
+#include "imstkPointSetToPlaneCD.h"
+#include "imstkPointSetToSphereCD.h"
 #include "imstkVirtualCouplingCH.h"
-#include "imstkMeshToSpherePickingCD.h"
+#include "imstkPointSetToSpherePickingCD.h"
 #include "imstkPickingCH.h"
 #include "imstkBoneDrillingCH.h"
 
@@ -1171,7 +1171,7 @@ void testDeformableBody()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -1328,7 +1328,7 @@ void testPbdVolume()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
@@ -1522,7 +1522,7 @@ void testPbdCollision()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -1667,7 +1667,7 @@ void testPbdCollision()
         auto volTetMesh1 = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh1);
         if (!volTetMesh1)
         {
-            LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+            LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
             return;
         }
 
@@ -1838,7 +1838,7 @@ void testPbdFluidBenchmarking()
 
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
-    //Create Mesh
+    //Create PointSet
     imstk::StdVectorOfVec3d vertList;
     int nPoints = pow(nPointsPerSide, 3);
     const double spacing = cubeLength / nPointsPerSide;
@@ -1856,64 +1856,13 @@ void testPbdFluidBenchmarking()
         }
     }
 
-    std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-    for (size_t i = 0; i < nPointsPerSide - 1; i++)
-    {
-        for (size_t j = 0; j < nPointsPerSide - 1; j++)
-        {
-            for (size_t k = 0; k < nPointsPerSide - 1; k++)
-            {
-                imstk::SurfaceMesh::TriangleArray tri[3];
-
-                tri[0] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k,
-                                             i*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k,
-                             (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
-
-                tri[1] = { { i*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k,
-                             (i + 1)*nPointsPerSide*nPointsPerSide + j*nPointsPerSide + k,
-                             (i + 1)*nPointsPerSide*nPointsPerSide + (j + 1)*nPointsPerSide + k } };
-
-                triangles.push_back(tri[0]);
-                triangles.push_back(tri[1]);
-            }
-        }
-    }
-
-    auto cubeMeshColliding = std::make_shared<imstk::SurfaceMesh>();
-    cubeMeshColliding->initialize(vertList, triangles);
-    auto cubeMeshVisual = std::make_shared<imstk::SurfaceMesh>();
-    cubeMeshVisual->initialize(vertList, triangles);
-    auto cubeMeshPhysics = std::make_shared<imstk::SurfaceMesh>();
-    cubeMeshPhysics->initialize(vertList, triangles);
-
-    auto material1 = std::make_shared<RenderMaterial>();
-    material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
-    material1->setDiffuseColor(Color::Blue);
-    material1->setPointSize(3.0);
-    cubeMeshVisual->setRenderMaterial(material1);
-
-    auto cubeMapP2V = std::make_shared<imstk::OneToOneMap>();
-    cubeMapP2V->setMaster(cubeMeshPhysics);
-    cubeMapP2V->setSlave(cubeMeshVisual);
-    cubeMapP2V->compute();
-
-    auto cubeMapP2C = std::make_shared<imstk::OneToOneMap>();
-    cubeMapP2C->setMaster(cubeMeshPhysics);
-    cubeMapP2C->setSlave(cubeMeshColliding);
-    cubeMapP2C->compute();
-
-    auto cubeMapC2V = std::make_shared<imstk::OneToOneMap>();
-    cubeMapC2V->setMaster(cubeMeshColliding);
-    cubeMapC2V->setSlave(cubeMeshVisual);
-    cubeMapC2V->compute();
+    auto cubeMesh = std::make_shared<imstk::PointSet>();
+    cubeMesh->initialize(vertList);
 
     auto cube = std::make_shared<PbdObject>("Cube");
-    cube->setCollidingGeometry(cubeMeshColliding);
-    cube->setVisualGeometry(cubeMeshVisual);
-    cube->setPhysicsGeometry(cubeMeshPhysics);
-    cube->setPhysicsToCollidingMap(cubeMapP2C);
-    cube->setPhysicsToVisualMap(cubeMapP2V);
-    cube->setCollidingToVisualMap(cubeMapC2V);
+    cube->setCollidingGeometry(cubeMesh);
+    cube->setVisualGeometry(cubeMesh);
+    cube->setPhysicsGeometry(cubeMesh);
 
     auto pbdModel = std::make_shared<PbdModel>();
     cube->setDynamicalModel(pbdModel);
@@ -1925,7 +1874,7 @@ void testPbdFluidBenchmarking()
         /*TimeStep*/ 0.005,
         /*FixedPoint*/ "",
         /*NumberOfIterationInConstraintSolver*/ 2,
-        /*Proximity*/ 0.1,
+        /*Proximity*/ 0.2,
         /*Contact stiffness*/ 1.0);
 
     auto pbdSolver = std::make_shared<PbdSolver>();
@@ -1953,7 +1902,7 @@ void testPbdFluidBenchmarking()
     }
 
     // c. Add connectivity data
-    triangles.clear();
+    std::vector<SurfaceMesh::TriangleArray> triangles;
     for (std::size_t i = 0; i < nRows - 1; ++i)
     {
         for (std::size_t j = 0; j < nCols - 1; j++)
@@ -1973,12 +1922,10 @@ void testPbdFluidBenchmarking()
     auto floorMeshPhysics = std::make_shared<imstk::SurfaceMesh>();
     floorMeshPhysics->initialize(vertList, triangles);
 
-
     auto floorMapP2V = std::make_shared<imstk::OneToOneMap>();
     floorMapP2V->setMaster(floorMeshPhysics);
     floorMapP2V->setSlave(floorMeshVisual);
     floorMapP2V->compute();
-
 
     auto floorMapP2C = std::make_shared<imstk::OneToOneMap>();
     floorMapP2C->setMaster(floorMeshPhysics);
@@ -2017,6 +1964,8 @@ void testPbdFluidBenchmarking()
     auto pair = std::make_shared<PbdInteractionPair>(PbdInteractionPair(cube, floor));
     pair->setNumberOfInterations(2);
 
+    auto dynaModel1 = std::static_pointer_cast<PbdModel>(cube->getDynamicalModel());
+
     colGraph->addInteractionPair(pair);
 
     // Display UPS
@@ -2025,21 +1974,21 @@ void testPbdFluidBenchmarking()
     sceneManager->setPreInitCallback([](Module* module)
     {
         LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
-        });
+    });
     sceneManager->setPreUpdateCallback([&ups](Module* module)
     {
         ups->setStartPointOfUpdate();
-        });
+    });
     sceneManager->setPostUpdateCallback([&ups](Module* module)
     {
         ups->setEndPointOfUpdate();
         std::cout << "\r-- " << module->getName() << " running at "
                   << ups->getUPS() << " ups   " << std::flush;
-        });
+    });
     sceneManager->setPostCleanUpCallback([](Module* module)
     {
         LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
-        });
+    });
 
     // Light (white)
     auto whiteLight = std::make_shared<imstk::DirectionalLight>("whiteLight");
@@ -2061,7 +2010,6 @@ void testPbdFluid()
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 
     // dragon
-    //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/turtle/turtle-volumetric-homogeneous.veg");
     auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
@@ -2069,45 +2017,18 @@ void testPbdFluid()
         return;
     }
 
-    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
-    auto surfMeshVisual = std::make_shared<imstk::SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
-    if (!volTetMesh)
-    {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
-        return;
-    }
-    volTetMesh->extractSurfaceMesh(surfMesh);
-    volTetMesh->extractSurfaceMesh(surfMeshVisual);
+    auto fluidMesh = std::make_shared<imstk::PointSet>();
+    fluidMesh->initialize(tetMesh->getInitialVertexPositions());
 
     auto material1 = std::make_shared<RenderMaterial>();
-    material1->setDisplayMode(RenderMaterial::DisplayMode::POINTS);
     material1->setDiffuseColor(Color::Blue);
     material1->setPointSize(6.0);
-    surfMeshVisual->setRenderMaterial(material1);
-
-    auto deformMapP2V = std::make_shared<imstk::OneToOneMap>();
-    deformMapP2V->setMaster(tetMesh);
-    deformMapP2V->setSlave(surfMeshVisual);
-    deformMapP2V->compute();
-
-    auto deformMapC2V = std::make_shared<imstk::OneToOneMap>();
-    deformMapC2V->setMaster(surfMesh);
-    deformMapC2V->setSlave(surfMeshVisual);
-    deformMapC2V->compute();
-
-    auto deformMapP2C = std::make_shared<imstk::OneToOneMap>();
-    deformMapP2C->setMaster(tetMesh);
-    deformMapP2C->setSlave(surfMesh);
-    deformMapP2C->compute();
+    fluidMesh->setRenderMaterial(material1);
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
-    deformableObj->setVisualGeometry(surfMeshVisual);
-    deformableObj->setCollidingGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(volTetMesh);
-    deformableObj->setPhysicsToCollidingMap(deformMapP2C);
-    deformableObj->setPhysicsToVisualMap(deformMapP2V);
-    deformableObj->setCollidingToVisualMap(deformMapC2V);
+    deformableObj->setVisualGeometry(fluidMesh);
+    deformableObj->setCollidingGeometry(fluidMesh);
+    deformableObj->setPhysicsGeometry(fluidMesh);
 
     auto pbdModel = std::make_shared<PbdModel>();
     deformableObj->setDynamicalModel(pbdModel);
@@ -2117,7 +2038,7 @@ void testPbdFluid()
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
         /*TimeStep*/ 0.005,
-        /*FixedPoint*/ "94 113 178 179 194 196 280 303",
+        /*FixedPoint*/ "",
         /*NumberOfIterationInConstraintSolver*/ 2,
         /*Proximity*/ 0.1,
         /*Contact stiffness*/ 1.0);
@@ -2562,7 +2483,7 @@ void testLineMesh()
         auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
         if (!volTetMesh)
         {
-            LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+            LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
             return;
         }
 
@@ -2739,7 +2660,7 @@ void testDeformableBodyCollision()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -2791,7 +2712,7 @@ void testDeformableBodyCollision()
     // Create collision detection and handling
     scene->getCollisionGraph()->addInteractionPair(deformableObj,
         planeObj,
-        CollisionDetection::Type::MeshToPlane,
+        CollisionDetection::Type::PointSetToPlane,
         CollisionHandling::Type::Penalty,
         CollisionHandling::Type::None);
 
@@ -2842,7 +2763,7 @@ void liverToolInteraction()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -2936,7 +2857,7 @@ void liverToolInteraction()
 
     scene->getCollisionGraph()->addInteractionPair(deformableObj,
                                                    sphere0Obj,
-                                                   CollisionDetection::Type::MeshToSphere,
+                                                   CollisionDetection::Type::PointSetToSphere,
                                                    CollisionHandling::Type::Penalty,
                                                    CollisionHandling::Type::None);
 
@@ -3131,7 +3052,7 @@ void testPicking()
     auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        LOG(WARNING) << "Dynamic pointer cast from imstk::PointSet to imstk::TetrahedralMesh failed!";
         return;
     }
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
@@ -3212,7 +3133,7 @@ void testPicking()
     auto sphereGeo = std::dynamic_pointer_cast<Sphere>(sphereForPickObj->getCollidingGeometry());
 
     // Create collision detection for picking
-    auto pickingCD = std::make_shared<MeshToSpherePickingCD>(volTetMesh, sphereGeo, coldata);
+    auto pickingCD = std::make_shared<PointSetToSpherePickingCD>(volTetMesh, sphereGeo, coldata);
     pickingCD->setDeviceTrackerAndButton(pickTrackingCtrl, 0);
 
     // Create contact handling for picking
@@ -3285,7 +3206,7 @@ void testBoneDrilling()
     auto graph = scene->getCollisionGraph();
     auto pair = graph->addInteractionPair(bone,
                                           drill,
-                                          CollisionDetection::Type::MeshToSphere,
+                                          CollisionDetection::Type::PointSetToSphere,
                                           CollisionHandling::Type::BoneDrilling,
                                           CollisionHandling::Type::None);
 
@@ -3426,11 +3347,11 @@ int main()
     /*------------------
     Test physics
     ------------------*/
-    testPbdVolume();
+    //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
-    //testPbdFluidBenchmarking();
-    //testPbdFluid();
+    testPbdFluidBenchmarking();
+    testPbdFluid();
     //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();

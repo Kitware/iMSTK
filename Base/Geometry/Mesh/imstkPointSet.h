@@ -19,26 +19,31 @@
 
 =========================================================================*/
 
-#ifndef imstkMesh_h
-#define imstkMesh_h
+#ifndef imstkPointSet_h
+#define imstkPointSet_h
 
 #include "imstkGeometry.h"
 
 namespace imstk
 {
 ///
-/// \class Mesh
+/// \class PointSet
 ///
 /// \brief Base class for all geometries represented by discrete points and elements
 ///
-class Mesh : public Geometry
+class PointSet : public Geometry
 {
 public:
+
+    ///
+    /// \brief Protected constructor
+    ///
+    PointSet(Geometry::Type type = Geometry::Type::PointSet) : Geometry(type) {}
+
     ///
     /// \brief Destructor
     ///
-    ~Mesh() = default;
-    //Mesh() = default;
+    ~PointSet() = default;
 
     ///
     /// \brief Initializes the data structure given vertex positions
@@ -54,6 +59,11 @@ public:
     /// \brief Print the mesh info
     ///
     virtual void print() const override;
+
+    ///
+    /// \brief Returns the volume of the geometry (if valid)
+    ///
+    virtual double getVolume() const { return 0; };
 
     ///
     /// \brief Compute the bounding box for the entire mesh
@@ -146,15 +156,7 @@ public:
 
 protected:
 
-    ///
-    /// \brief Protected constructor
-    ///
-    Mesh(Type type) : Geometry(type) {}
-
-    friend class VTKSurfaceMeshRenderDelegate;
-    friend class VTKTetrahedralMeshRenderDelegate;
-    friend class VTKLineMeshRenderDelegate;
-    friend class VTKHexahedralMeshRenderDelegate;
+    friend class VTKPointSetRenderDelegate;
 
     ///
     /// \brief Get vertices positions
@@ -179,4 +181,4 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkMesh_h
+#endif // ifndef imstkPointSet_h

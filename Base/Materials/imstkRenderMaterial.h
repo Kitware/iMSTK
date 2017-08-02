@@ -94,6 +94,12 @@ public:
     void setRoughness(const float roughness);
 
     ///
+    /// \brief Get/Set the roughness
+    ///
+    const double& getSphereGlyphSize() const;
+    void setSphereGlyphSize(const double size);
+
+    ///
     /// \brief Add/Get texture
     ///
     void addTexture(std::shared_ptr<Texture> texture);
@@ -120,6 +126,9 @@ protected:
     float m_lineWidth = 1.0;
     float m_pointSize = 1.0;
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
+
+    // Sphere size used for glyph in rendering (valid only for point set)
+    double m_sphereGlyphSize = 0.05;
 
     // Colors
     Color m_diffuseColor = Color::White;

@@ -17,65 +17,56 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
-#ifndef imstkMeshToSpherePickingCD_h
-#define imstkMeshToSpherePickingCD_h
+#ifndef imstkPointSetToSphereCD_h
+#define imstkPointSetToSphereCD_h
 
 #include <memory>
 
 #include "imstkCollisionDetection.h"
-#include "imstkDeviceTracker.h"
 
 namespace imstk
 {
-class Mesh;
+class PointSet;
 class Sphere;
 class CollisionData;
 
 ///
-/// \class MeshToSpherePickingCD
+/// \class PointSetToSphereCD
 ///
-/// \brief Mesh to sphere collision detection while picking
+/// \brief PointSet to sphere collision detection
 ///
-class MeshToSpherePickingCD : public CollisionDetection
+class PointSetToSphereCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    MeshToSpherePickingCD(std::shared_ptr<Mesh> mesh,
-                          std::shared_ptr<Sphere> sphere,
-                          CollisionData& colData) :
-        CollisionDetection(CollisionDetection::Type::MeshToSphere,
+    PointSetToSphereCD(std::shared_ptr<PointSet> pointSet,
+                       std::shared_ptr<Sphere> sphere,
+                       CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::PointSetToSphere,
                            colData),
-        m_mesh(mesh),
+        m_pointSet(pointSet),
         m_sphere(sphere){}
 
     ///
     /// \brief Destructor
     ///
-    ~MeshToSpherePickingCD() = default;
+    ~PointSetToSphereCD() = default;
 
     ///
     /// \brief Detect collision and compute collision data
     ///
     void computeCollisionData() override;
 
-    ///
-    /// \brief Set device tracker and the id of the button
-    ///
-    void setDeviceTrackerAndButton(const std::shared_ptr<imstk::DeviceTracker> devTracker,
-                                   const unsigned int buttonId = 0){ m_deviceTracker = devTracker; }
 private:
 
-    std::shared_ptr<Mesh> m_mesh;      ///> Mesh
-    std::shared_ptr<Sphere> m_sphere;  ///> Sphere
-
-    std::shared_ptr<imstk::DeviceTracker> m_deviceTracker;  ///> Device tracker to get the button status
-    unsigned int m_buttonId = 0; ///> button id
+    std::shared_ptr<PointSet> m_pointSet;       ///> PointSet
+    std::shared_ptr<Sphere> m_sphere;           ///> Sphere
 };
 }
 
-#endif // ifndef imstkMeshToSphereCD_h
+#endif // ifndef imstkPointSetToSphereCD_h

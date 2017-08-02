@@ -33,7 +33,7 @@ LineMesh::clear()
 void
 LineMesh::print() const
 {
-    Mesh::print();
+    PointSet::print();
 }
 
 double

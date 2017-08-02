@@ -19,36 +19,36 @@
 
 =========================================================================*/
 
-#include "imstkMeshToPlaneCD.h"
+#include "imstkPointSetToSphereCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkMesh.h"
+#include "imstkSphere.h"
+#include "imstkPointSet.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk
 {
 void
-MeshToPlaneCD::computeCollisionData()
+PointSetToSphereCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData.clearAll();
 
-    // Get plane properties
-    auto planePos = m_plane->getPosition();
-
-    // TODO: Fix this issue of extra computation in future
-    auto planeNormal = m_plane->getNormal();
+    // Get sphere properties
+    auto spherePos = m_sphere->getPosition();
+    auto radius = m_sphere->getRadius();
 
     size_t nodeId = 0;
-    for (const auto& p : m_mesh->getVertexPositions())
+    for (const auto& p : m_pointSet->getVertexPositions())
     {
-        auto peneDistance = (planePos - p).dot(planeNormal);
-        if (peneDistance <= 0.0)
+        auto dist = (spherePos - p).norm();
+        if (dist <= radius)
         {
-            m_colData.MAColData.push_back({ nodeId, planeNormal * -peneDistance });
+            auto direction = (spherePos - p)/dist;
+            auto pointOnSphere = spherePos - radius*direction;
+            m_colData.MAColData.push_back({ nodeId, p - pointOnSphere });
         }
         nodeId++;
     }

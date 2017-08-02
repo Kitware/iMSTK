@@ -28,6 +28,7 @@
 #include "imstkCapsule.h"
 #include "imstkCylinder.h"
 #include "imstkCube.h"
+#include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
 #include "imstkTetrahedralMesh.h"
@@ -43,6 +44,7 @@
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
+#include "imstkVTKPointSetRenderDelegate.h"
 
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLVertexBufferObject.h"
@@ -69,8 +71,8 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
     }
     case Geometry::Type::Capsule:
     {
-        auto sphere = std::dynamic_pointer_cast<Capsule>(geom);
-        return std::make_shared<VTKCapsuleRenderDelegate>(sphere);
+        auto capsule = std::dynamic_pointer_cast<Capsule>(geom);
+        return std::make_shared<VTKCapsuleRenderDelegate>(capsule);
     }
     case Geometry::Type::Cube:
     {
@@ -81,6 +83,11 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
     {
         auto cylinder = std::dynamic_pointer_cast<Cylinder>(geom);
         return std::make_shared<VTKCylinderRenderDelegate>(cylinder);
+    }
+    case Geometry::Type::PointSet:
+    {
+        auto pointSet = std::dynamic_pointer_cast<PointSet>(geom);
+        return std::make_shared<VTKPointSetRenderDelegate>(pointSet);
     }
     case Geometry::Type::SurfaceMesh:
     {

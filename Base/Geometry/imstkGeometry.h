@@ -46,6 +46,7 @@ public:
         Sphere,
         Cylinder,
         Cube,
+        PointSet,
         SurfaceMesh,
         TetrahedralMesh,
         HexahedralMesh,

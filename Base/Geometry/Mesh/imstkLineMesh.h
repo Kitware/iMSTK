@@ -24,7 +24,7 @@
 
 #include <memory>
 
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 
 
 namespace imstk
@@ -34,14 +34,14 @@ namespace imstk
 ///
 /// \brief Base class for all volume mesh types
 ///
-class LineMesh : public Mesh
+class LineMesh : public PointSet
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    LineMesh() : Mesh(Geometry::Type::LineMesh) {}
+    LineMesh() : PointSet(Geometry::Type::LineMesh) {}
 
     ///
     /// \brief Default destructor
@@ -84,6 +84,9 @@ public:
     std::vector<int> getLine(int index) const;
 
 private:
+
+    friend class VTKLineMeshRenderDelegate;
+
     std::vector<std::vector<int>> m_lines;  ///> line connectivity
 };
 } // imstk

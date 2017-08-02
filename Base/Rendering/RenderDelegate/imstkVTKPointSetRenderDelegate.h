@@ -19,54 +19,53 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToPlaneCD_h
-#define imstkMeshToPlaneCD_h
+#ifndef imstkVTKPointSetRenderDelegate_h
+#define imstkVTKPointSetRenderDelegate_h
 
 #include <memory>
 
-#include "imstkCollisionDetection.h"
+#include "imstkVTKRenderDelegate.h"
+
+class vtkDoubleArray;
 
 namespace imstk
 {
-class Mesh;
-class Plane;
-class CollisionData;
+class PointSet;
 
 ///
-/// \class MeshToPlaneCD
+/// \class PointSetRenderDelegate
 ///
-/// \brief Mesh to plane collision detection
+/// \brief Render delegate for point set. A 3D glyph of spheres is
+/// created to render each node
 ///
-class MeshToPlaneCD : public CollisionDetection
+class VTKPointSetRenderDelegate : public VTKRenderDelegate
 {
 public:
-
     ///
     /// \brief Constructor
     ///
-    MeshToPlaneCD(std::shared_ptr<Mesh> mesh,
-                  std::shared_ptr<Plane> plane,
-                  CollisionData& colData) :
-        CollisionDetection(CollisionDetection::Type::MeshToSphere,
-                           colData),
-        m_mesh(mesh),
-        m_plane(plane){}
+    VTKPointSetRenderDelegate(std::shared_ptr<PointSet> mesh);
 
     ///
     /// \brief Destructor
     ///
-    ~MeshToPlaneCD() = default;
+    ~VTKPointSetRenderDelegate() = default;
 
     ///
-    /// \brief Detect collision and compute collision data
+    /// \brief Update polydata source based on the mesh geometry
     ///
-    void computeCollisionData() override;
+    void updateDataSource() override;
 
-private:
+    ///
+    /// \brief Returns the surface mesh
+    ///
+    std::shared_ptr<Geometry> getGeometry() const override;
 
-    std::shared_ptr<Mesh> m_mesh;      ///> Mesh
-    std::shared_ptr<Plane> m_plane;    ///> Plane
+protected:
+
+    std::shared_ptr<PointSet> m_geometry;                   ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }
 
-#endif // ifndef imstkMeshToPlaneCD_h
+#endif // ifndef imstkSurfaceMeshRenderDelegate_h

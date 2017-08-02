@@ -153,6 +153,18 @@ RenderMaterial::setRoughness(const float roughness)
     m_roughness = roughness;
 }
 
+const double&
+RenderMaterial::getSphereGlyphSize() const
+{
+    return m_sphereGlyphSize;
+}
+
+void
+RenderMaterial::setSphereGlyphSize(const double size)
+{
+    m_sphereGlyphSize = size;
+}
+
 std::shared_ptr<Texture>
 RenderMaterial::getTexture(Texture::Type type)
 {

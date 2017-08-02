@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToCapsuleCD_h
-#define imstkMeshToCapsuleCD_h
+#ifndef imstkPointSetToCapsuleCD_h
+#define imstkPointSetToCapsuleCD_h
 
 #include <memory>
 
@@ -28,34 +28,34 @@
 
 namespace imstk
 {
-class Mesh;
+class PointSet;
 class Capsule;
 class CollisionData;
 
 ///
-/// \class MeshToCapsuleCD
+/// \class PointSetToCapsuleCD
 ///
-/// \brief Mesh to Capsule collision detection
+/// \brief PointSet to Capsule collision detection
 ///
-class MeshToCapsuleCD : public CollisionDetection
+class PointSetToCapsuleCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    MeshToCapsuleCD(std::shared_ptr<Mesh> mesh,
-                    std::shared_ptr<Capsule> capsule,
-                    CollisionData& colData) :
-        CollisionDetection(CollisionDetection::Type::MeshToCapsule,
+    PointSetToCapsuleCD(std::shared_ptr<PointSet> pointSet,
+                        std::shared_ptr<Capsule> capsule,
+                        CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::PointSetToCapsule,
                            colData),
-        m_mesh(mesh),
+        m_pointSet(pointSet),
         m_capsule(capsule){}
 
     ///
     /// \brief Destructor
     ///
-    ~MeshToCapsuleCD() = default;
+    ~PointSetToCapsuleCD() = default;
 
     ///
     /// \brief Detect collision and compute collision data
@@ -64,9 +64,9 @@ public:
 
 private:
 
-    std::shared_ptr<Mesh> m_mesh;       ///> Mesh
-    std::shared_ptr<Capsule> m_capsule; ///> Capsule
+    std::shared_ptr<PointSet> m_pointSet;       ///> PointSet
+    std::shared_ptr<Capsule> m_capsule;         ///> Capsule
 };
 }
 
-#endif // ifndef imstkMeshToCapsuleCD_h
+#endif // ifndef imstkPointSetToCapsuleCD_h

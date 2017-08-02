@@ -31,7 +31,7 @@
 
 namespace imstk
 {
-std::shared_ptr<Mesh>
+std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
     if (!MeshIO::fileExists(filePath))
@@ -140,7 +140,7 @@ MeshIO::getFileType(const std::string& filePath)
 }
 
 bool
-MeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath)
+MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath)
 {
     MeshFileType meshType = MeshIO::getFileType(filePath);
     switch (meshType)

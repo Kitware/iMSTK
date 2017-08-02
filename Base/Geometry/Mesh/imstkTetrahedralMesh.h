@@ -128,6 +128,9 @@ public:
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
 
 protected:
+
+    friend class VTKTetrahedralMeshRenderDelegate;
+
     std::vector<TetraArray> m_tetrahedraVertices;///< vertices of the tetrahedra
 
     std::vector<bool> m_removedMeshElems;

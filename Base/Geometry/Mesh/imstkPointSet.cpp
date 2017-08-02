@@ -19,19 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 
 namespace imstk
 {
 void
-Mesh::initialize(const StdVectorOfVec3d& vertices)
+PointSet::initialize(const StdVectorOfVec3d& vertices)
 {
     this->setInitialVertexPositions(vertices);
     this->setVertexPositions(vertices);
 }
 
 void
-Mesh::clear()
+PointSet::clear()
 {
     m_initialVertexPositions.clear();
     m_vertexPositions.clear();
@@ -39,7 +39,7 @@ Mesh::clear()
 }
 
 void
-Mesh::print() const
+PointSet::print() const
 {
     Geometry::print();
     LOG(INFO) << "Number of vertices: " << this->getNumVertices();
@@ -51,7 +51,7 @@ Mesh::print() const
 }
 
 void
-Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
+PointSet::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
 {
     min = Vec3d(MAX_D, MAX_D, MAX_D);
     max = Vec3d(-MAX_D, -MAX_D, -MAX_D);
@@ -78,25 +78,25 @@ Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
 }
 
 void
-Mesh::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
+PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
 {
     m_initialVertexPositions = vertices;
 }
 
 const StdVectorOfVec3d&
-Mesh::getInitialVertexPositions() const
+PointSet::getInitialVertexPositions() const
 {
     return m_initialVertexPositions;
 }
 
 const Vec3d&
-Mesh::getInitialVertexPosition(const size_t& vertNum) const
+PointSet::getInitialVertexPosition(const size_t& vertNum) const
 {
     return m_initialVertexPositions.at(vertNum);
 }
 
 void
-Mesh::setVertexPositions(const StdVectorOfVec3d& vertices)
+PointSet::setVertexPositions(const StdVectorOfVec3d& vertices)
 {
     m_vertexPositions = vertices;
     m_dataModified = true;
@@ -104,7 +104,7 @@ Mesh::setVertexPositions(const StdVectorOfVec3d& vertices)
 }
 
 const StdVectorOfVec3d&
-Mesh::getVertexPositions(DataType type /* = DataType::PostTransform */)
+PointSet::getVertexPositions(DataType type /* = DataType::PostTransform */)
 {
     if (type == DataType::PostTransform)
     {
@@ -115,7 +115,7 @@ Mesh::getVertexPositions(DataType type /* = DataType::PostTransform */)
 }
 
 void
-Mesh::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
+PointSet::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
 {
     m_vertexPositions.at(vertNum) = pos;
     m_dataModified = true;
@@ -123,13 +123,13 @@ Mesh::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
 }
 
 const Vec3d&
-Mesh::getVertexPosition(const size_t& vertNum, DataType type)
+PointSet::getVertexPosition(const size_t& vertNum, DataType type)
 {
     return this->getVertexPositions(type).at(vertNum);
 }
 
 void
-Mesh::setVertexDisplacements(const StdVectorOfVec3d& diff)
+PointSet::setVertexDisplacements(const StdVectorOfVec3d& diff)
 {
     assert(diff.size() == m_vertexPositions.size());
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
@@ -141,7 +141,7 @@ Mesh::setVertexDisplacements(const StdVectorOfVec3d& diff)
 }
 
 void
-Mesh::setVertexDisplacements(const Vectord& u)
+PointSet::setVertexDisplacements(const Vectord& u)
 {
     assert(u.size() == 3 * m_vertexPositions.size());
     size_t dofId = 0;
@@ -155,7 +155,7 @@ Mesh::setVertexDisplacements(const Vectord& u)
 }
 
 void
-Mesh::translateVertices(const Vec3d& t)
+PointSet::translateVertices(const Vec3d& t)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
@@ -166,19 +166,19 @@ Mesh::translateVertices(const Vec3d& t)
 }
 
 void
-Mesh::setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData)
+PointSet::setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData)
 {
     m_pointDataMap = pointData;
 }
 
 const std::map<std::string, StdVectorOfVectorf>&
-Mesh::getPointDataMap() const
+PointSet::getPointDataMap() const
 {
     return m_pointDataMap;
 }
 
 void
-Mesh::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData)
+PointSet::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData)
 {
     if ( arrayData.size() != this->getNumVertices())
     {
@@ -190,7 +190,7 @@ Mesh::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& 
 }
 
 const StdVectorOfVectorf*
-Mesh::getPointDataArray(const std::string& arrayName) const
+PointSet::getPointDataArray(const std::string& arrayName) const
 {
     auto it = m_pointDataMap.find(arrayName);
     if (it == m_pointDataMap.end())
@@ -202,14 +202,14 @@ Mesh::getPointDataArray(const std::string& arrayName) const
 }
 
 size_t
-Mesh::getNumVertices() const
+PointSet::getNumVertices() const
 {
     return m_initialVertexPositions.size();
 }
 
 
 void
-Mesh::applyTranslation(const Vec3d t)
+PointSet::applyTranslation(const Vec3d t)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
@@ -220,7 +220,7 @@ Mesh::applyTranslation(const Vec3d t)
 }
 
 void
-Mesh::applyRotation(const Mat3d r)
+PointSet::applyRotation(const Mat3d r)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
@@ -231,7 +231,7 @@ Mesh::applyRotation(const Mat3d r)
 }
 
 void
-Mesh::applyScaling(const double s)
+PointSet::applyScaling(const double s)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
@@ -242,7 +242,7 @@ Mesh::applyScaling(const double s)
 }
 
 void
-Mesh::updatePostTransformData()
+PointSet::updatePostTransformData()
 {
     if (m_transformApplied)
     {

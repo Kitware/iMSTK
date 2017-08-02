@@ -25,7 +25,7 @@
 #include <Eigen/Dense>
 #include <vector>
 
-#include "imstkMesh.h"
+#include "imstkPointSet.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -48,7 +48,7 @@ public:
     /// \brief Initialize the pbd state
     ///
     void initialize(const size_t numNodes, const bool (&options)[3]);
-    void initialize(const std::shared_ptr<Mesh>& m, const bool(&options)[3]);
+    void initialize(const std::shared_ptr<PointSet>& m, const bool(&options)[3]);
 
     ///
     /// \brief Get/Set nodal position given the index

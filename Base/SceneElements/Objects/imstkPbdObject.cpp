@@ -29,7 +29,7 @@ namespace imstk
 bool
 PbdObject::initialize(int nCons, ...)
 {
-    std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(m_physicsGeometry);
+    std::shared_ptr<PointSet> mesh = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
     if (mesh == nullptr)
     {
         LOG(WARNING) << "Physics geometry is not a mesh!";
@@ -167,7 +167,7 @@ PbdObject::initialize(int nCons, ...)
         m_pbdModel->setMaxNumIterations(va_arg(args,int));
     }
 
-    if (m_physicsToCollidingGeomMap && m_collidingGeometry)
+    if (m_collidingGeometry)
     {
         m_pbdModel->setProximity(va_arg(args,double));
         m_pbdModel->setContactStiffness(va_arg(args,double));

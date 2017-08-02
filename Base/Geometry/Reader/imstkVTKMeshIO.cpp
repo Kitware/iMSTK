@@ -39,7 +39,7 @@
 
 namespace imstk
 {
-std::shared_ptr<Mesh>
+std::shared_ptr<PointSet>
 VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
 {
     switch (meshType)
@@ -77,7 +77,7 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
 }
 
 bool
-VTKMeshIO::write(const std::shared_ptr<Mesh> imstkMesh, const std::string & filePath, const MeshFileType meshType)
+VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string & filePath, const MeshFileType meshType)
 {
     if (auto vMesh = std::dynamic_pointer_cast<VolumetricMesh>(imstkMesh))
     {
@@ -113,7 +113,7 @@ VTKMeshIO::write(const std::shared_ptr<Mesh> imstkMesh, const std::string & file
 }
 
 template<typename ReaderType>
-std::shared_ptr<Mesh>
+std::shared_ptr<PointSet>
 VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
 {
     auto reader = vtkSmartPointer<ReaderType>::New();
