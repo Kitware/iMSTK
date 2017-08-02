@@ -85,6 +85,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
 
     // Global Axis
     auto axes = vtkSmartPointer<vtkAxesActor>::New();
+    axes->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
+    axes->SetAxisLabels(false);
     m_debugVtkActors.push_back( axes );
 
     // Camera and camera actor
