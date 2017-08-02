@@ -241,7 +241,8 @@ PbdModel::initialize()
     return true;
 }
 
-void PbdModel::computeLameConstants(const double& E, const double nu)
+void
+PbdModel::computeLameConstants(const double E, const double nu)
 {
     m_mu = E/(2*(1+nu));
     m_lambda = E*nu/((1-2*nu)*(1+nu));
@@ -273,7 +274,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
 }
 
 bool
-PbdModel::initializeVolumeConstraints(const double& stiffness)
+PbdModel::initializeVolumeConstraints(const double stiffness)
 {
     // Check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
@@ -298,7 +299,7 @@ PbdModel::initializeVolumeConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeDistanceConstraints(const double& stiffness)
+PbdModel::initializeDistanceConstraints(const double stiffness)
 {
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
@@ -421,7 +422,7 @@ PbdModel::initializeDistanceConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeAreaConstraints(const double& stiffness)
+PbdModel::initializeAreaConstraints(const double stiffness)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
@@ -446,7 +447,7 @@ PbdModel::initializeAreaConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeDihedralConstraints(const double& stiffness)
+PbdModel::initializeDihedralConstraints(const double stiffness)
 {
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
@@ -468,7 +469,10 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
         onering[tri[2]].push_back(k);
     }
 
-    std::vector<std::vector<bool>> E(triMesh->getNumVertices(), std::vector<bool>(triMesh->getNumVertices(), 1));
+    std::vector<std::vector<bool>> E(triMesh->getNumVertices(),
+                                     std::vector<bool>(triMesh->getNumVertices(),
+                                     1));
+
     for (size_t k = 0; k < elements.size(); ++k)
     {
         auto& tri = elements[k];
@@ -562,11 +566,14 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeConstantDensityConstraint(const double& stiffness)
+PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh && m_mesh->getType() != Geometry::Type::TetrahedralMesh && m_mesh->getType() != Geometry::Type::LineMesh &&
-        m_mesh->getType() != Geometry::Type::HexahedralMesh && m_mesh->getType() != Geometry::Type::PointSet)
+    if (m_mesh->getType() != Geometry::Type::SurfaceMesh &&
+        m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
+        m_mesh->getType() != Geometry::Type::LineMesh &&
+        m_mesh->getType() != Geometry::Type::HexahedralMesh &&
+        m_mesh->getType() != Geometry::Type::PointSet)
     {
         LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
         return false;
@@ -613,12 +620,13 @@ PbdModel::setViscousDamping(const double damping)
     }
     else
     {
-        LOG(WARNING) << "WARNING - PbdModel::setViscousDamping:  Viscous damping coefficients is out of bounds [0, 1]";
+        LOG(WARNING) << "WARNING - PbdModel::setViscousDamping:  " <<
+            "Viscous damping coefficients is out of bounds [0, 1]";
     }
 }
 
 void
-PbdModel::setUniformMass(const double& val)
+PbdModel::setUniformMass(const double val)
 {
     if (val != 0.0)
     {
@@ -633,7 +641,7 @@ PbdModel::setUniformMass(const double& val)
 }
 
 void
-PbdModel::setParticleMass(const double& val, const size_t& idx)
+PbdModel::setParticleMass(const double val, const size_t idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
@@ -643,7 +651,7 @@ PbdModel::setParticleMass(const double& val, const size_t& idx)
 }
 
 void
-PbdModel::setFixedPoint(const size_t& idx)
+PbdModel::setFixedPoint(const size_t idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
@@ -652,7 +660,7 @@ PbdModel::setFixedPoint(const size_t& idx)
 }
 
 double
-PbdModel::getInvMass(const size_t& idx) const
+PbdModel::getInvMass(const size_t idx) const
 {
     return m_invMass[idx];
 }

@@ -76,33 +76,33 @@ public:
     /// \param E  Young's modulus
     /// \param nu Poisson's ratio
     ///
-    void computeLameConstants(const double& E, const double nu);
+    void computeLameConstants(const double E, const double nu);
 
     ///
     /// \brief Returns the first Lame constant
     ///
-    const double& getFirstLame() const { return m_mu; }
+    const double getFirstLame() const { return m_mu; }
 
     ///
     /// \brief Returns the second Lame constant
     ///
-    const double& getSecondLame() const { return m_lambda; }
+    const double getSecondLame() const { return m_lambda; }
 
     ///
     /// \brief Set the maximum number of iterations for the pbd solver
     ///
-    void setMaxNumIterations(const unsigned int& n) { m_maxIter = n; }
+    void setMaxNumIterations(const unsigned int n) { m_maxIter = n; }
 
     ///
     /// \brief Get/Set proximity used for collision
     ///
-    void setProximity(const double& prox) { m_proximity = prox; }
+    void setProximity(const double prox) { m_proximity = prox; }
     double getProximity() const { return m_proximity; }
 
     ///
     /// \brief Get/Set contact stiffness that is used for collision constraints
     ///
-    void setContactStiffness(const double& stiffness) { m_contactStiffness = stiffness;}
+    void setContactStiffness(const double stiffness) { m_contactStiffness = stiffness;}
     double getContactStiffness() const { return m_contactStiffness; }
 
     ///
@@ -113,28 +113,28 @@ public:
     ///
     /// \brief Initialize volume constraints
     ///
-    bool initializeVolumeConstraints(const double& stiffness);
+    bool initializeVolumeConstraints(const double stiffness);
 
     ///
     /// \brief Initialize distance constraints
     ///
-    bool initializeDistanceConstraints(const double& stiffness);
+    bool initializeDistanceConstraints(const double stiffness);
 
     ///
     /// \brief Initialize area constraints
     ///
-    bool initializeAreaConstraints(const double& stiffness);
+    bool initializeAreaConstraints(const double stiffness);
 
     ///
     /// \brief Initialize dihedral constraints
     ///
-    bool initializeDihedralConstraints(const double& stiffness);
+    bool initializeDihedralConstraints(const double stiffness);
 
     ///
     /// \brief addConstraint add elastic constraint
     /// \param constraint
     ///
-    bool initializeConstantDensityConstraint(const double& stiffness);
+    bool initializeConstantDensityConstraint(const double stiffness);
 
     ///
     /// \todo: add the initialization parameters for the constraint
@@ -144,29 +144,29 @@ public:
     inline void addConstraint(std::shared_ptr<PbdConstraint> constraint) { m_constraints.push_back(constraint); }
 
     ///
-    /// \brief compute delta x and update position
+    /// \brief compute delta x (position) and update position
     ///
     void projectConstraints();
 
     ///
-    /// \brief Update the model geometry from the newest pbd state
+    /// \brief Update the model geometry from the newest PBD state
     ///
     void updatePhysicsGeometry() override;
 
     ///
-    /// \brief Update the pbd state from the model geometry
+    /// \brief Update the PBD state from the model geometry
     ///
     void updatePbdStateFromPhysicsGeometry();
 
     ///
-    /// \brief Returns true if there is atleast one constraint
+    /// \brief Returns true if there is at least one constraint
     ///
     inline bool hasConstraints() const { return !m_constraints.empty(); }
 
     ///
     /// \brief Set the time step size
     ///
-    void setTimeStep(const double& timeStep) { m_dt = timeStep; };
+    void setTimeStep(const double timeStep) { m_dt = timeStep; };
 
     ///
     /// \brief Returns the time step size
@@ -187,22 +187,22 @@ public:
     ///
     /// \brief Set uniform mass to all the nodes
     ///
-    void setUniformMass(const double& val);
+    void setUniformMass(const double val);
 
     ///
     /// \brief Set mass to particular node
     ///
-    void setParticleMass(const double& val, const size_t& idx);
+    void setParticleMass(const double val, const size_t idx);
 
     ///
     /// \brief Se the node as fixed
     ///
-    void setFixedPoint(const size_t& idx);
+    void setFixedPoint(const size_t idx);
 
     ///
     /// \brief Get the inverse of mass of a certain node
     ///
-    double getInvMass(const size_t& idx) const;
+    double getInvMass(const size_t idx) const;
 
     ///
     /// \brief Time integrate the position
@@ -215,40 +215,41 @@ public:
     void updateVelocity();
 
     ///
-    /// \brief
+    /// \brief Update body states given the newest update and the type of update
     ///
-    void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) override {};
+    void updateBodyStates(const Vectord& q,
+                          const stateUpdateType updateType = stateUpdateType::displacement) override {};
 
     ///
-    /// \brief Initialize the scene object
+    /// \brief Initialize the PBD model
     ///
     bool initialize() override;
 
 protected:
-    std::shared_ptr<PointSet> m_mesh;   ///> PointSet on which the pbd model operates on
-    std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
+    std::shared_ptr<PointSet> m_mesh;                           ///> PointSet on which the pbd model operates on
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;  ///> List of pbd constraints
 
-    std::vector<std::size_t> m_fixedNodeIds;        ///> Nodal IDs of the nodes that are fixed
+    std::vector<std::size_t> m_fixedNodeIds;                    ///> Nodal IDs of the nodes that are fixed
     std::vector<std::string> m_constraintConfig;
 
     // Lame's constants
-    double m_mu;                        ///> Lame constant
-    double m_lambda;                    ///> Lame constant
+    double m_mu;                            ///> Lame constant
+    double m_lambda;                        ///> Lame constant
 
     // Mass properties
     double m_uniformMassValue = 1.0;
-    std::vector<double> m_mass;         ///> Mass of nodes
-    std::vector<double> m_invMass;      ///> Inverse of mass of nodes
+    std::vector<double> m_mass;             ///> Mass of nodes
+    std::vector<double> m_invMass;          ///> Inverse of mass of nodes
 
-    double m_contactStiffness = 1.;       ///> Contact stiffness for collisions
-    Vec3d m_gravity;                      ///> Gravity
+    double m_contactStiffness = 1.;         ///> Contact stiffness for collisions
+    Vec3d m_gravity;                        ///> Gravity
 
-    double m_viscousDampingCoeff = 0.01;  ///> Viscous damping coefficient [0, 1]
+    double m_viscousDampingCoeff = 0.01;    ///> Viscous damping coefficient [0, 1]
 
-    unsigned int m_maxIter;               ///> Max. pbd iterations
-    double m_proximity;                   ///> Proximity for collisions
+    unsigned int m_maxIter;                 ///> Max. pbd iterations
+    double m_proximity;                     ///> Proximity for collisions
 
-    double m_dt;                          ///> Time step size
+    double m_dt;                            ///> Time step size
 };
 } // imstk
 
