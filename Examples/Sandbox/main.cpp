@@ -1213,7 +1213,7 @@ void testDeformableBody()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
-    deformableObj->initialize();
+    //deformableObj->initialize();
     scene->addSceneObject(deformableObj);
 
     // f. Scene object 2: Plane
@@ -2603,7 +2603,7 @@ void testDeformableBodyCollision()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap);
     deformableObj->setDynamicalModel(dynaModel);
-    deformableObj->initialize();
+    //deformableObj->initialize();
     scene->addSceneObject(deformableObj);
 
     // Create a nonlinear system and solver
@@ -2707,7 +2707,7 @@ void liverToolInteraction()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap);
     deformableObj->setDynamicalModel(dynaModel);
-    deformableObj->initialize();
+    //deformableObj->initialize();
     scene->addSceneObject(deformableObj);
 
     //----------------------------------------------------------
@@ -2996,7 +2996,7 @@ void testPicking()
     physicsObj->setPhysicsGeometry(volTetMesh);
     physicsObj->setPhysicsToVisualMap(oneToOneNodalMap);
     physicsObj->setDynamicalModel(dynaModel);
-    physicsObj->initialize();
+    //physicsObj->initialize();
     scene->addSceneObject(physicsObj);
 
     //----------------------------------------------------------
@@ -3268,7 +3268,7 @@ int main()
     //testPbdCollision();
     testPbdFluidBenchmarking();
     testPbdFluid();
-    //testDeformableBody();
+    testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();
