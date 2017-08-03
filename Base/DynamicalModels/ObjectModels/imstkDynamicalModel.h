@@ -119,6 +119,11 @@ public:
     ///
     virtual void updatePhysicsGeometry(){};
 
+    ///
+    /// \brief Initialize the dynamical model
+    ///
+    virtual bool initialize() = 0;
+
 protected:
 
     DynamicalModelType m_type; ///> Mathematical model type

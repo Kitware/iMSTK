@@ -88,6 +88,11 @@ public:
     ///
     virtual void updateGeometries() {};
 
+    ///
+    /// \brief Initialize the scene object
+    ///
+    virtual bool initialize(){ return true; };
+
 protected:
     ///
     /// \brief Assigns the type of the object

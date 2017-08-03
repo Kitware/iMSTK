@@ -58,6 +58,11 @@ public:
     ~Scene() = default;
 
     ///
+    /// \brief Initialize the scene
+    ///
+    bool initialize();
+
+    ///
     /// \brief Returns true if the object with a given name is registered, else false
     ///
     bool isObjectRegistered(std::string sceneObjectName) const;

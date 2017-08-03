@@ -28,6 +28,21 @@
 namespace imstk
 {
 bool
+Scene::initialize()
+{
+    for (auto const& it : m_sceneObjectsMap)
+    {
+        auto sceneObject = it.second;
+        if (!sceneObject->initialize())
+        {
+            LOG(WARNING) << "Error initializing scene object: " << sceneObject->getName();
+            return false;
+        }
+    }
+    return true;
+}
+
+bool
 Scene::isObjectRegistered(std::string sceneObjectName) const
 {
     return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();

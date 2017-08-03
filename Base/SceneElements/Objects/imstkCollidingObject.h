@@ -78,6 +78,21 @@ public:
     ///
     virtual void updateGeometries() override;
 
+    ///
+    /// \brief Initialize the scene object
+    ///
+    virtual bool initialize()
+    {
+        if (SceneObject::initialize())
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 protected:
 
     std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions

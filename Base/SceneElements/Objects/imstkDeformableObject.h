@@ -56,9 +56,9 @@ public:
     ~DeformableObject() = default;
 
     ///
-    /// \brief
+    /// \brief Initialize the deformable object
     ///
-    bool initialize();
+    bool initialize() override;
 
     ///
     /// \brief Initialize the kinematic state of the body

@@ -100,7 +100,7 @@ public:
     ///
     /// \brief Initialize the deformable body model
     ///
-    void initialize(std::shared_ptr<VolumetricMesh> physicsMesh);
+    bool initialize() override;
 
     ///
     /// \brief Load the initial conditions of the deformable object
@@ -110,37 +110,37 @@ public:
     ///
     /// \brief Load the boundary conditions from external file
     ///
-    void loadBoundaryConditions();
+    bool loadBoundaryConditions();
 
     ///
     /// \brief Initialize the force model
     ///
-    void initializeForceModel();
+    bool initializeForceModel();
 
     ///
     /// \brief Initialize the mass matrix from the mesh
     ///
-    void initializeMassMatrix(const bool saveToDisk = false);
+    bool initializeMassMatrix(const bool saveToDisk = false);
 
     ///
     /// \brief Initialize the damping (combines structural and viscous damping) matrix
     ///
-    void initializeDampingMatrix();
+    bool initializeDampingMatrix();
 
     ///
     /// \brief Initialize the tangent stiffness matrix
     ///
-    void initializeTangentStiffness();
+    bool initializeTangentStiffness();
 
     ///
     /// \brief Initialize the gravity force
     ///
-    void initializeGravityForce();
+    bool initializeGravityForce();
 
     ///
     /// \brief Initialize explicit external forces
     ///
-    void initializeExplicitExternalForces();
+    bool initializeExplicitExternalForces();
 
     ///
     /// \brief Initialize the Eigen matrix with data inside vega sparse matrix

@@ -26,11 +26,9 @@ namespace imstk
 Vectord&
 DeformableObject::getContactForce()
 {
-    //m_defModel = std::dynamic_pointer_cast<imstk::DeformableBodyModel>(m_dynamicalModel);
-
     if (!m_defModel)
     {
-        LOG(WARNING) << "Dynamics pointer cast failure in DeformableObject::getContactForce()";
+        LOG(WARNING) << "deformation model pointer not valid DeformableObject::getContactForce()";
     }
 
     return m_defModel->getContactForce();
@@ -40,12 +38,15 @@ bool
 DeformableObject::initialize()
 {
     m_defModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
-    if (m_defModel == nullptr)
+    if (m_defModel)
     {
-        LOG(WARNING) << "Dynamic model set is not of expected type (DeformableBodyModel)!";
+        return DynamicObject::initialize();
+    }
+    else
+    {
+        LOG(WARNING) << "Dynamics pointer cast failure in DeformableObject::initialize()";
         return false;
     }
-    return true;
 }
 
 const Vectord&

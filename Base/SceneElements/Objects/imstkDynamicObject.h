@@ -114,6 +114,21 @@ public:
         }
     }
 
+    ///
+    /// \brief Initialize the scene object
+    ///
+    virtual bool initialize() override
+    {
+        if (CollidingObject::initialize())
+        {
+            return m_dynamicalModel->initialize();
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 protected:
 
     ///
@@ -122,12 +137,12 @@ protected:
     DynamicObject(std::string name) : CollidingObject(name){}
 
     std::shared_ptr<DynamicalModel<StateType>> m_dynamicalModel;        ///> Dynamical model
-    std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
+    std::shared_ptr<Geometry> m_physicsGeometry;                        ///> Geometry used for Physics
 
     //Maps
-    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
-    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
-    bool m_updateVisualFromPhysicsGeometry = true; ///> Defines if visual is updated from colliding mapping or physics mapping
+    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;           ///> Maps from Physics to collision geometry
+    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;              ///> Maps from Physics to visual geometry
+    bool m_updateVisualFromPhysicsGeometry = true;                      ///> Defines if visual is updated from colliding mapping or physics mapping
 };
 } // imstk
 

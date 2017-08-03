@@ -37,9 +37,6 @@ namespace imstk
 PbdModel::PbdModel() :
     DynamicalModel(DynamicalModelType::positionBasedDynamics)
 {
-    m_initialState = std::make_shared<PbdState>();
-    m_previousState = std::make_shared<PbdState>();
-    m_currentState = std::make_shared<PbdState>();
 }
 
 void
@@ -49,10 +46,59 @@ PbdModel::setModelGeometry(std::shared_ptr<PointSet> m)
 }
 
 bool
+PbdModel::configure(const int nCons, ...)
+{
+    va_list args;
+    va_start(args, nCons);
+    for (int i = 0; i < nCons; ++i)
+    {
+        m_constraintConfig.push_back(std::string(va_arg(args, char*)));
+    }
+
+    m_uniformMassValue = va_arg(args, double);
+
+    if (nCons > 0)
+    {
+        char *sgrav = va_arg(args, char*);
+        std::stringstream gStream(sgrav);
+        float x, y, z;
+        gStream >> x;
+        gStream >> y;
+        gStream >> z;
+        Vec3d g(x,y,z);
+        this->setGravity(g);
+
+        this->setTimeStep(va_arg(args, double));
+
+        char *s = va_arg(args, char*);
+        if (strlen(s) > 0)
+        {
+            std::stringstream stream(s);
+            size_t n;
+            while (stream >> n)
+            {
+                m_fixedNodeIds.push_back(n-1);
+            }
+        }
+        this->setMaxNumIterations(va_arg(args, int));
+    }
+    this->setProximity(va_arg(args, double));
+    this->setContactStiffness(va_arg(args, double));
+    this->setNumDegreeOfFreedom(this->getModelGeometry()->getNumVertices() * 3);
+    va_end(args);
+
+    return true;
+}
+
+bool
 PbdModel::initialize()
 {
     if (m_mesh)
     {
+        m_initialState = std::make_shared<PbdState>();
+        m_previousState = std::make_shared<PbdState>();
+        m_currentState = std::make_shared<PbdState>();
+
         bool option[3] = { 1, 0, 0 };
         m_initialState->initialize(m_mesh, option);
         m_previousState->initialize(m_mesh, option);
@@ -64,19 +110,139 @@ PbdModel::initialize()
         m_currentState->setPositions(m_mesh->getVertexPositions());
 
         auto nP = m_mesh->getNumVertices();
-        m_invMass.resize(nP, 0);
-        m_mass.resize(nP, 0);
 
-        return true;
+        m_mass.resize(nP, 0);
+        this->setUniformMass(m_uniformMassValue);
+
+        m_invMass.resize(nP, 0);
+        for (auto i :m_fixedNodeIds)
+        {
+            setFixedPoint(i);
+        }
     }
     else
     {
         LOG(WARNING) << "Model geometry is not yet set! Cannot initialize without model geometry.";
         return false;
     }
+
+    auto nCons = m_constraintConfig.size();
+    for (int i = 0; i < nCons; ++i)
+    {
+        auto s = m_constraintConfig.at(i).c_str();
+        int len = 0;
+        while (s[len] != ' ' && s[len] != '\0')
+        {
+            ++len;
+        }
+
+        if (strncmp("FEM", &s[0], len) == 0)
+        {
+            int pos = len + 1;
+            len = 0;
+            while (s[pos + len] != ' ' && s[pos + len] != '\0')
+            {
+                ++len;
+            }
+
+            if (strncmp("Corotation", &s[pos], len) == 0)
+            {
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation))
+                {
+                    return false;
+                }
+                ;
+            }
+            else if (strncmp("NeoHookean", &s[pos], len) == 0)
+            {
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean))
+                {
+                    return false;
+                }
+                ;
+            }
+            else if (strncmp("Stvk", &s[pos], len) == 0)
+            {
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK))
+                {
+                    return false;
+                }
+                ;
+            }
+            else
+            { // default
+                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK))
+                {
+                    return false;
+                }
+                ;
+            }
+
+            float YoungModulus, PoissonRatio;
+            sscanf(&s[pos + len + 1], "%f %f", &YoungModulus, &PoissonRatio);
+            this->computeLameConstants(YoungModulus, PoissonRatio);
+        }
+        else if (strncmp("Volume", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            if (!this->initializeVolumeConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
+        }
+        else if (strncmp("Distance", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            if (!this->initializeDistanceConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
+        }
+        else if (strncmp("Area", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            if (!this->initializeAreaConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
+        }
+        else if (strncmp("Dihedral", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            if (!this->initializeDihedralConstraints(stiffness))
+            {
+                return false;
+            }
+            ;
+        }
+        else if (strncmp("ConstantDensity", &s[0], len) == 0)
+        {
+            float stiffness;
+            sscanf(&s[len + 1], "%f", &stiffness);
+            if (!this->initializeConstantDensityConstraint(stiffness))
+            {
+                return false;
+            }
+            ;
+        }
+        else
+        {
+            LOG(WARNING) << "PbdModel::initialize() - Type of PBD constraints not identified!";
+            return false;
+        }
+    }
+    return true;
 }
 
-void PbdModel::computeLameConstants(const double& E, const double nu)
+void
+PbdModel::computeLameConstants(const double E, const double nu)
 {
     m_mu = E/(2*(1+nu));
     m_lambda = E*nu/((1-2*nu)*(1+nu));
@@ -108,7 +274,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
 }
 
 bool
-PbdModel::initializeVolumeConstraints(const double& stiffness)
+PbdModel::initializeVolumeConstraints(const double stiffness)
 {
     // Check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
@@ -133,7 +299,7 @@ PbdModel::initializeVolumeConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeDistanceConstraints(const double& stiffness)
+PbdModel::initializeDistanceConstraints(const double stiffness)
 {
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
@@ -256,7 +422,7 @@ PbdModel::initializeDistanceConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeAreaConstraints(const double& stiffness)
+PbdModel::initializeAreaConstraints(const double stiffness)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
@@ -281,7 +447,7 @@ PbdModel::initializeAreaConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeDihedralConstraints(const double& stiffness)
+PbdModel::initializeDihedralConstraints(const double stiffness)
 {
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
@@ -303,7 +469,10 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
         onering[tri[2]].push_back(k);
     }
 
-    std::vector<std::vector<bool>> E(triMesh->getNumVertices(), std::vector<bool>(triMesh->getNumVertices(), 1));
+    std::vector<std::vector<bool>> E(triMesh->getNumVertices(),
+                                     std::vector<bool>(triMesh->getNumVertices(),
+                                     1));
+
     for (size_t k = 0; k < elements.size(); ++k)
     {
         auto& tri = elements[k];
@@ -397,11 +566,14 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
 }
 
 bool
-PbdModel::initializeConstantDensityConstraint(const double& stiffness)
+PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh && m_mesh->getType() != Geometry::Type::TetrahedralMesh && m_mesh->getType() != Geometry::Type::LineMesh &&
-        m_mesh->getType() != Geometry::Type::HexahedralMesh && m_mesh->getType() != Geometry::Type::PointSet)
+    if (m_mesh->getType() != Geometry::Type::SurfaceMesh &&
+        m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
+        m_mesh->getType() != Geometry::Type::LineMesh &&
+        m_mesh->getType() != Geometry::Type::HexahedralMesh &&
+        m_mesh->getType() != Geometry::Type::PointSet)
     {
         LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
         return false;
@@ -448,12 +620,13 @@ PbdModel::setViscousDamping(const double damping)
     }
     else
     {
-        LOG(WARNING) << "WARNING - PbdModel::setViscousDamping:  Viscous damping coefficients is out of bounds [0, 1]";
+        LOG(WARNING) << "WARNING - PbdModel::setViscousDamping:  " <<
+            "Viscous damping coefficients is out of bounds [0, 1]";
     }
 }
 
 void
-PbdModel::setUniformMass(const double& val)
+PbdModel::setUniformMass(const double val)
 {
     if (val != 0.0)
     {
@@ -468,7 +641,7 @@ PbdModel::setUniformMass(const double& val)
 }
 
 void
-PbdModel::setParticleMass(const double& val, const size_t& idx)
+PbdModel::setParticleMass(const double val, const size_t idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
@@ -478,7 +651,7 @@ PbdModel::setParticleMass(const double& val, const size_t& idx)
 }
 
 void
-PbdModel::setFixedPoint(const size_t& idx)
+PbdModel::setFixedPoint(const size_t idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
@@ -487,7 +660,7 @@ PbdModel::setFixedPoint(const size_t& idx)
 }
 
 double
-PbdModel::getInvMass(const size_t& idx) const
+PbdModel::getInvMass(const size_t idx) const
 {
     return m_invMass[idx];
 }

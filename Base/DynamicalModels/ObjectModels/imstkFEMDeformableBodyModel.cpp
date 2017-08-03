@@ -89,28 +89,55 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
     m_forceModelConfiguration = std::make_shared<ForceModelConfig>(configFileName);
 }
 
-void
-FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
+bool
+FEMDeformableBodyModel::initialize()
 {
-    this->setModelGeometry(physicsMesh);
-
     // prerequisite of for successfully initializing
     if (!m_forceModelGeometry || !m_forceModelConfiguration)
     {
         LOG(WARNING) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
-        return;
+        return false;
     }
 
+    auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
 
-    this->initializeForceModel();
-    this->initializeMassMatrix();
-    this->initializeDampingMatrix();
-    this->initializeTangentStiffness();
+    if (!this->initializeForceModel())
+    {
+        return false;
+    }
+    ;
+    if (!this->initializeMassMatrix())
+    {
+        return false;
+    }
+    ;
+    if (!this->initializeDampingMatrix())
+    {
+        return false;
+    }
+    ;
+    if (!this->initializeTangentStiffness())
+    {
+        return false;
+    }
+    ;
     this->loadInitialStates();
-    this->loadBoundaryConditions();
-    this->initializeGravityForce();
-    this->initializeExplicitExternalForces();
+    if (!this->loadBoundaryConditions())
+    {
+        return false;
+    }
+    ;
+    if (!this->initializeGravityForce())
+    {
+        return false;
+    }
+    ;
+    if (!this->initializeExplicitExternalForces())
+    {
+        return false;
+    }
+    ;
 
     m_Feff.resize(m_numDOF);
     m_Finternal.resize(m_numDOF);
@@ -119,18 +146,25 @@ FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
     m_Fcontact.setConstant(0.0);
     m_qSol.resize(m_numDOF);
     m_qSol.setConstant(0.0);
+
+    return true;
 }
 
 void
 FEMDeformableBodyModel::loadInitialStates()
 {
+    if (m_numDOF == 0)
+    {
+        LOG(WARNING) << "FEMDeformableBodyModel::loadInitialStates() - Num. of degree of freedom is zero!";
+    }
+
     // For now the initial states are set to zero
     m_initialState = std::make_shared<kinematicState>(m_numDOF);
     m_previousState = std::make_shared<kinematicState>(m_numDOF);
     m_currentState = std::make_shared<kinematicState>(m_numDOF);
 }
 
-void
+bool
 FEMDeformableBodyModel::loadBoundaryConditions()
 {
     auto fileName = m_forceModelConfiguration->getStringOptionsMap().at("fixedDOFFilename");
@@ -138,7 +172,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
     if (fileName.empty())
     {
         LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: The external boundary conditions file name is empty";
-        return;
+        return false;
     }
     else
     {
@@ -147,7 +181,6 @@ FEMDeformableBodyModel::loadBoundaryConditions()
         if (file.peek() == std::ifstream::traits_type::eof())
         {
             LOG(INFO) << "DeformableBodyModel::loadBoundaryConditions: The external boundary conditions file is empty";
-            return;
         }
 
         if (file.is_open())
@@ -165,6 +198,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
                 {
                     LOG(WARNING) << "FEMDeformableBodyModel::loadBoundaryConditions(): " <<
                         "The boundary condition node id provided is greater than number of nodes and hence excluded!!";
+                    return false;
                 }
             }
 
@@ -174,11 +208,13 @@ FEMDeformableBodyModel::loadBoundaryConditions()
         else
         {
             LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: Could not open boundary conditions file!";
+            return false;
         }
     }
+    return true;
 }
 
-void
+bool
 FEMDeformableBodyModel::initializeForceModel()
 {
     const double g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
@@ -215,16 +251,19 @@ FEMDeformableBodyModel::initializeForceModel()
 
     default:
         LOG(WARNING) << "DeformableBodyModel::initializeForceModel: Unknown force model type";
+        return false;
     } //switch
+
+    return true;
 }
 
-void
+bool
 FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 {
     if (!m_forceModelGeometry)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
-        return;
+        return false;
     }
 
     vega::SparseMatrix *vegaMatrix;
@@ -235,9 +274,11 @@ FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
     this->initializeEigenMatrixFromVegaMatrix(*vegaMatrix, m_M);
 
     // TODO: Add option to save mass matrix to file
+
+    return true;
 }
 
-void
+bool
 FEMDeformableBodyModel::initializeDampingMatrix()
 {
     auto dampingLaplacianCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
@@ -248,13 +289,13 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 
     if (!m_damped)
     {
-        return;
+        return false;
     }
 
-    if (dampingLaplacianCoefficient <= 0.0)
+    if (dampingLaplacianCoefficient < 0.0)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeDampingMatrix Damping coefficient is negative!";
-        return;
+        return false;
     }
 
     auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
@@ -265,7 +306,7 @@ FEMDeformableBodyModel::initializeDampingMatrix()
     if (!meshGraph)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeDampingMatrix: Mesh graph not avaliable!";
-        return;
+        return false;
     }
 
     vega::SparseMatrix *matrix;
@@ -274,7 +315,7 @@ FEMDeformableBodyModel::initializeDampingMatrix()
     if (!matrix)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeDampingMatrix: Mesh Laplacian not avaliable!";
-        return;
+        return false;
     }
 
     matrix->ScalarMultiply(dampingLaplacianCoefficient);
@@ -282,15 +323,17 @@ FEMDeformableBodyModel::initializeDampingMatrix()
     m_vegaDampingMatrix.reset(matrix);
 
     this->initializeEigenMatrixFromVegaMatrix(*matrix, m_C);
+
+    return true;
 }
 
-void
+bool
 FEMDeformableBodyModel::initializeTangentStiffness()
 {
     if (!m_internalForceModel)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
-        return;
+        return false;
     }
 
     vega::SparseMatrix *matrix;
@@ -299,13 +342,13 @@ FEMDeformableBodyModel::initializeTangentStiffness()
     if (!matrix)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
-        return;
+        return false;
     }
 
     if (!m_vegaMassMatrix)
     {
         LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
-        return;
+        return false;
     }
 
     matrix->BuildSubMatrixIndices(*m_vegaMassMatrix.get());
@@ -329,9 +372,11 @@ FEMDeformableBodyModel::initializeTangentStiffness()
     }
 
     m_internalForceModel->setTangentStiffness(m_vegaTangentStiffnessMatrix);
+
+    return true;
 }
 
-void
+bool
 FEMDeformableBodyModel::initializeGravityForce()
 {
     m_Fgravity.resize(m_numDOF);
@@ -339,6 +384,8 @@ FEMDeformableBodyModel::initializeGravityForce()
     const double gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
 
     m_vegaPhysicsMesh->computeGravity(m_Fgravity.data(), gravity);
+
+    return true;
 }
 
 void
@@ -448,11 +495,13 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
     }
 }
 
-void
+bool
 FEMDeformableBodyModel::initializeExplicitExternalForces()
 {
     m_FexplicitExternal.resize(m_numDOF);
     m_FexplicitExternal.setZero();
+
+    return true;
 }
 
 void
