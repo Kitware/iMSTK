@@ -17,4 +17,3 @@ imstk_add_external_project( SFML
   #RELATIVE_INCLUDE_PATH ""
   #VERBOSE
   )
-
