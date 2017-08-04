@@ -110,6 +110,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(VTK)
   imstk_define_dependency(VRPN)
   imstk_define_dependency(LibNiFalcon)
+  imstk_define_dependency(SFML)
 
   option(${PROJECT_NAME}_USE_ODE "Build iMSTK with ODE support." OFF)
   if(${PROJECT_NAME}_USE_ODE)
@@ -242,7 +243,7 @@ find_package( VRPN REQUIRED )
 include_directories( ${VRPN_INCLUDE_DIRS} )
 add_definitions( -DVRPN_USE_LIBNIFALCON )
 if(${PROJECT_NAME}_USE_OMNI)
-  add_definitions( -DiMSTK_USE_OPENHAPTICS )
+  add_definitions( -DiMSTK_USE_OPENHAPTICS )  
   add_definitions( -DVRPN_USE_PHANTOM_SERVER )
 else()
   remove_definitions( -DiMSTK_USE_OPENHAPTICS )
@@ -268,6 +269,9 @@ if(${PROJECT_NAME}_USE_Vulkan)
 else()
   remove_definitions( -DiMSTK_USE_Vulkan )
 endif()
+
+# SFML
+find_package( SFML REQUIRED )
 
 # Google Test
 if(BUILD_TESTING)
