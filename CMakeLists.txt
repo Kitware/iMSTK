@@ -103,6 +103,16 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(VRPN)
   imstk_define_dependency(LibNiFalcon)
 
+  option(${PROJECT_NAME}_USE_ODE "Build iMSTK with ODE support." OFF)
+  if(${PROJECT_NAME}_USE_ODE)
+    imstk_define_dependency(ODE)
+  endif()
+
+  #----------------------------------------------------
+  # Setting up ODE from preinstalled directories.
+  #----------------------------------------------------
+  #include(CMake/External/External_ODE.cmake)
+
   if(BUILD_TESTING)
     imstk_define_dependency(GoogleTest)
 
@@ -215,6 +225,17 @@ if(${PROJECT_NAME}_USE_OMNI)
 else()
   remove_definitions( -DiMSTK_USE_OPENHAPTICS )
   remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
+endif()
+
+# ODE
+if(${PROJECT_NAME}_USE_ODE)
+    find_package(ODE)
+    # Assuming that ODE was compiled with Double precision.
+    add_definitions( -DdDOUBLE ) # Needed by ODE library.
+    add_definitions( -DiMSTK_USE_ODE )
+else()
+    remove_definitions( -DdDouble )
+    remove_definitions( -DiMSTK_USE_ODE )
 endif()
 
 # Google Test

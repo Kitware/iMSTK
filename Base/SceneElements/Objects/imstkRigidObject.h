@@ -22,8 +22,10 @@
 #ifndef imstkRigidObject_h
 #define imstkRigidObject_h
 
+#ifdef iMSTK_USE_ODE
 // imstk
 #include "imstkDynamicObject.h"
+#include "ode/ode.h"
 
 namespace imstk
 {
@@ -47,6 +49,28 @@ public:
         m_type = Type::Rigid;
     }
 
+    //ode related functions
+
+    //
+    // callback called at every loop
+    //
+    static void odeNearCallback(void *data, dGeomID o1, dGeomID o2);
+
+    // initialize ode
+    static void initOde();
+
+    // close ode
+    static void closeOde();
+
+    //
+    static void simulationStep();
+
+    //
+    static void getGeometryConfig(imstk::Vec3d &p, imstk::Mat3d &orientation);
+
+    // This is just a simple function to test ODE
+    static void setup();
+
     ///
     /// \brief Destructor
     ///
@@ -55,5 +79,5 @@ public:
 protected:
 };
 } // imstk
-
+#endif //imstk_USE_ODE
 #endif // ifndef imstkRigidObject_h
