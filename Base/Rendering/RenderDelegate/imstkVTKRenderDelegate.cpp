@@ -119,23 +119,22 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
 
 void
 VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source,
-                               const bool rigid,
+                               const bool notSurfaceMesh,
                                std::shared_ptr<Geometry> geometry)
 {
     // Add normals
-    vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
-    if (rigid)
+    if (notSurfaceMesh)
     {
+        vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
         normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
         vtkPolyDataNormals::SafeDownCast(normalGen)->SplittingOff();
+        normalGen->SetInputConnection(source);
+        m_mapper->SetInputConnection(normalGen->GetOutputPort());
     }
     else
     {
-        normalGen = vtkSmartPointer<vtkTriangleMeshPointNormals>::New();
+        m_mapper->SetInputConnection(source);
     }
-    normalGen->SetInputConnection(source);
-
-    m_mapper->SetInputConnection(normalGen->GetOutputPort());
 
     // Disable auto Shift & Scale which is slow for deformable objects
     // as it needs to compute a bounding box at every frame

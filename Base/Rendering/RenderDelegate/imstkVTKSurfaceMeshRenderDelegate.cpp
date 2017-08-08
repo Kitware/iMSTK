@@ -42,7 +42,8 @@ namespace imstk
 {
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
     m_geometry(surfaceMesh),
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
     StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
@@ -72,6 +73,15 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     polydata->SetPoints(points);
     polydata->SetPolys(cells);
 
+    // Map normals
+    m_geometry->computeVertexNormals();
+
+    StdVectorOfVec3d& normals = m_geometry->getVertexNormalsNotConst();
+    double* normalData = reinterpret_cast<double*>(normals.data());
+    m_mappedNormalArray->SetNumberOfComponents(3);
+    m_mappedNormalArray->SetArray(normalData, normals.size()*3, 1);
+    polydata->GetPointData()->SetNormals(m_mappedNormalArray);
+
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
@@ -94,7 +104,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
 
             for (auto const tcoord : *tcoords)
             {
-                double tuple[2] = { tcoord[0], tcoord[1] };
+                float tuple[2] = { tcoord[0], tcoord[1] };
                 vtkTCoords->InsertNextTuple(tuple);
             }
 
@@ -129,7 +139,16 @@ VTKSurfaceMeshRenderDelegate::updateDataSource()
 {
     if (m_geometry->m_dataModified)
     {
+        m_geometry->computeVertexNormals();
+
+        StdVectorOfVec3d& normals = m_geometry->getVertexNormalsNotConst();
+        double* normalData = reinterpret_cast<double*>(normals.data());
+        m_mappedNormalArray->SetNumberOfComponents(3);
+        m_mappedNormalArray->SetArray(normalData, normals.size()*3, 1);
+        this->m_mapper->GetInput()->GetPointData()->SetNormals(m_mappedNormalArray);
+
         m_mappedVertexArray->Modified();
+        m_mappedNormalArray->Modified();
         m_geometry->m_dataModified = false;
     }
 }

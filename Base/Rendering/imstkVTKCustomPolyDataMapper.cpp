@@ -99,6 +99,7 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     vtkActor * actor)
 {
     auto textures = this->GetTextures(actor);
+    auto material = m_geometry->getRenderMaterial();
 
     helper.VAO->Bind();
 
@@ -196,8 +197,8 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
 
     helper.AttributeUpdateTime.Modified();
 
-    helper.Program->SetUniformf("metalness", m_geometry->getRenderMaterial()->getMetalness());
-    helper.Program->SetUniformf("roughness", m_geometry->getRenderMaterial()->getRoughness());
+    helper.Program->SetUniformf("metalness", material->getMetalness());
+    helper.Program->SetUniformf("roughness", material->getRoughness());
 
     unsigned int textureCount = 0;
     unsigned int currentTexture = 0;
@@ -206,7 +207,11 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
 
     if (this->GetOpenGLMode(actor->GetProperty()->GetRepresentation(), helper.PrimitiveType) == GL_TRIANGLES)
     {
-        auto diffuseTexture = m_geometry->getRenderMaterial()->getTexture(Texture::DIFFUSE);
+        auto diffuseColorTemp = material->getDiffuseColor();
+        float diffuseColor[3] = {diffuseColorTemp.r, diffuseColorTemp.g, diffuseColorTemp.b};
+        helper.Program->SetUniform3f("diffuseColorUniform", diffuseColor);
+
+        auto diffuseTexture = material->getTexture(Texture::DIFFUSE);
         if (diffuseTexture->getPath() != "" && textureCount < textures.size())
         {
             auto texture = (vtkOpenGLTexture*)textures[currentTexture];
@@ -215,7 +220,7 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
             currentTexture++;
         }
 
-        auto cubemapTexture = m_geometry->getRenderMaterial()->getTexture(Texture::CUBEMAP);
+        auto cubemapTexture = material->getTexture(Texture::CUBEMAP);
         if (cubemapTexture->getPath() != "" && textureCount < textures.size())
         {
             auto texture = (vtkOpenGLTexture*)textures[currentTexture];
@@ -223,6 +228,14 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
             renderWindow->DeactivateTexture(texture->GetTextureObject());
             currentTexture++;
         }
+    }
+    else
+    {
+        auto debugColorTemp = material->getDebugColor();
+        float debugColor[3] = {(float)debugColorTemp.r,
+                               (float)debugColorTemp.g,
+                               (float)debugColorTemp.b};
+        helper.Program->SetUniform3f("debugColor", debugColor);
     }
 }
 

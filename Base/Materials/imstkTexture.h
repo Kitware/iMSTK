@@ -89,9 +89,9 @@ template<> struct less<std::shared_ptr<imstk::Texture>>
     bool operator() (const std::shared_ptr<imstk::Texture>& texture1,
                      const std::shared_ptr<imstk::Texture>& texture2) const
     {
-        if (texture2->getType() != texture2->getType())
+        if (texture1->getType() != texture2->getType())
         {
-            return (texture2->getType() < texture2->getType());
+            return (texture1->getType() < texture2->getType());
         }
 
         if (texture1->getPath() != texture2->getPath())

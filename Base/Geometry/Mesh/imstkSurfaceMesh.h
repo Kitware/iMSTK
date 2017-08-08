@@ -26,12 +26,48 @@
 #include <array>
 #include <list>
 #include <set>
+#include <unordered_set>
+#include <memory>
 
 // imstk
 #include "imstkPointSet.h"
 
 namespace imstk
 {
+///
+/// \brief Helper class for indentifying duplicate points
+///
+struct NormalGroup
+{
+    Vec3d position;
+    Vec3d normal;
+};
+}
+
+// This method is defined to allow for the map to be properly indexed by Texture objects
+namespace std
+{
+template<> struct less<imstk::NormalGroup>
+{
+    bool operator() (const imstk::NormalGroup& group1,
+                     const imstk::NormalGroup& group2) const
+    {
+        if (group1.position != group2.position)
+        {
+            return (group1.position.x() < group2.position.x());
+        }
+
+        if (group1.normal != group2.normal)
+        {
+            return (group1.normal.x() < group2.normal.x());
+        }
+
+        return false;
+    }
+};
+}
+
+namespace imstk {
 ///
 /// \class SurfaceMesh
 ///
@@ -56,10 +92,19 @@ public:
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
-    ///  triangle connectivity and texture coordinates
+    ///  triangle connectivity
     ///
     void initialize(const StdVectorOfVec3d& vertices,
                     const std::vector<TriangleArray>& triangles,
+                    const bool computeDerivedData = false);
+
+    ///
+    /// \brief Initializes the rest of the data structures given vertex positions,
+    ///  triangle connectivity, and normals
+    ///
+    void initialize(const StdVectorOfVec3d& vertices,
+                    const std::vector<TriangleArray>& triangles,
+                    const StdVectorOfVec3d& normals,
                     const bool computeDerivedData = false);
 
     ///
@@ -161,9 +206,19 @@ public:
     ///
     void correctWindingOrder();
 
+    ///
+    /// \brief Finds vertices along vertex seams that share geometric properties
+    ///
+    void computeUVSeamVertexGroups();
+
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;
+
+    ///
+    /// \brief Get vertex normals
+    ///
+    StdVectorOfVec3d& getVertexNormalsNotConst();
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
 
@@ -174,6 +229,8 @@ protected:
     StdVectorOfVec3d m_vertexNormals; ///> Normals of the vertices
     StdVectorOfVec3d m_vertexTangents; ///> Tangents of the vertices
     StdVectorOfVec3d m_vertexBitangents; ///> Bitangents of the vertices
+
+    std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default material coordinates
 };

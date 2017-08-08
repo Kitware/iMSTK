@@ -52,7 +52,8 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
         aiPostProcessSteps::aiProcess_GenSmoothNormals |
         aiPostProcessSteps::aiProcess_CalcTangentSpace |
         aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
-        aiPostProcessSteps::aiProcess_Triangulate);
+        aiPostProcessSteps::aiProcess_Triangulate |
+        aiPostProcessSteps::aiProcess_ImproveCacheLocality);
 
     // Check if there is actually a mesh or if the file can be read
     if (!scene || !scene->HasMeshes())
@@ -98,8 +99,6 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
         triangles[i][2] = indices[2];
     }
 
-    mesh->initialize(positions, triangles, false);
-
     // Vertex normals, tangents, and bitangents
     StdVectorOfVec3d normals(numVertices);
     StdVectorOfVec3d tangents(numVertices);
@@ -131,6 +130,8 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
             bitangents[i] = Vec3d(bitangentX, bitangentY, bitangentZ);
         }
     }
+
+    mesh->initialize(positions, triangles, normals, false);
 
     mesh->setVertexNormals(normals);
     mesh->setVertexTangents(tangents);
