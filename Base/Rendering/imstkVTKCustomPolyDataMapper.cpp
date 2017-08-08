@@ -208,7 +208,9 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     if (this->GetOpenGLMode(actor->GetProperty()->GetRepresentation(), helper.PrimitiveType) == GL_TRIANGLES)
     {
         auto diffuseColorTemp = material->getDiffuseColor();
-        float diffuseColor[3] = {diffuseColorTemp.r, diffuseColorTemp.g, diffuseColorTemp.b};
+        float diffuseColor[3] = {(float)diffuseColorTemp.r,
+                                 (float)diffuseColorTemp.g,
+                                 (float)diffuseColorTemp.b};
         helper.Program->SetUniform3f("diffuseColorUniform", diffuseColor);
 
         auto diffuseTexture = material->getTexture(Texture::DIFFUSE);
