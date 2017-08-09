@@ -140,6 +140,11 @@ public:
     ///
     void addObjectController(std::shared_ptr<SceneObjectControllerBase> controller);
 
+    ///
+    /// \brief
+    ///
+    bool isInitialized() const { return m_isInitialized; }
+
 protected:
 
     std::string m_name; ///> Name of the scene
@@ -149,6 +154,8 @@ protected:
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
+
+    bool m_isInitialized = false;
 };
 } // imstk
 

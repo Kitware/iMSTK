@@ -143,7 +143,7 @@ VTKInteractorStyle::OnChar()
     if (status == SimulationStatus::INACTIVE && (key == 's' || key == 'S'))
     {
         m_fpsActor->SetVisibility(m_displayFps);
-        m_simManager->startSimulation();
+        m_simManager->launchSimulation();
     }
     // end Simulation
     else if (status != SimulationStatus::INACTIVE &&

@@ -39,6 +39,7 @@ Scene::initialize()
             return false;
         }
     }
+    m_isInitialized = true;
     return true;
 }
 

@@ -106,38 +106,38 @@ FEMDeformableBodyModel::initialize()
     {
         return false;
     }
-    ;
+
     if (!this->initializeMassMatrix())
     {
         return false;
     }
-    ;
+
     if (!this->initializeDampingMatrix())
     {
         return false;
     }
-    ;
+
     if (!this->initializeTangentStiffness())
     {
         return false;
     }
-    ;
+
     this->loadInitialStates();
+
     if (!this->loadBoundaryConditions())
     {
         return false;
     }
-    ;
+
     if (!this->initializeGravityForce())
     {
         return false;
     }
-    ;
+
     if (!this->initializeExplicitExternalForces())
     {
         return false;
     }
-    ;
 
     m_Feff.resize(m_numDOF);
     m_Finternal.resize(m_numDOF);
