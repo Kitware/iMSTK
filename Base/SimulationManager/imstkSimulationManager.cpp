@@ -98,8 +98,8 @@ SimulationManager::createNewScene(std::string&& newSceneName)
     if (this->isSceneRegistered(newSceneName))
     {
         LOG(WARNING) << "Can not create new scene: '" << newSceneName
-            << "' is already registered in this simulation\n"
-            << "You can create a new scene using an unique name";
+                     << "' is already registered in this simulation\n"
+                     << "You can create a new scene using an unique name";
         return nullptr;
     }
 
