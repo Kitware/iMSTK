@@ -38,7 +38,11 @@ public:
     ///
     /// \brief
     ///
-    CollidingObject(std::string name) : SceneObject(name)
+    CollidingObject(const std::string& name) : SceneObject(name)
+    {
+        m_type = Type::Colliding;
+    }
+    CollidingObject(std::string&& name) : SceneObject(std::move(name))
     {
         m_type = Type::Colliding;
     }

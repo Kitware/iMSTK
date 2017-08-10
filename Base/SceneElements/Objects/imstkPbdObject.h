@@ -45,7 +45,11 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdObject(std::string name) : DynamicObject(name)
+    PbdObject(const std::string& name) : DynamicObject(name)
+    {
+        m_type = SceneObject::Type::Pbd;
+    }
+    PbdObject(std::string&& name) : DynamicObject(std::move(name))
     {
         m_type = SceneObject::Type::Pbd;
     }
