@@ -44,7 +44,7 @@ Scene::initialize()
 }
 
 bool
-Scene::isObjectRegistered(std::string sceneObjectName) const
+Scene::isObjectRegistered(const std::string& sceneObjectName) const
 {
     return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();
 }
@@ -71,7 +71,7 @@ Scene::getSceneObjectControllers() const
 }
 
 std::shared_ptr<SceneObject>
-Scene::getSceneObject(std::string sceneObjectName) const
+Scene::getSceneObject(const std::string& sceneObjectName) const
 {
     if (!this->isObjectRegistered(sceneObjectName))
     {
@@ -100,7 +100,7 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 }
 
 void
-Scene::removeSceneObject(std::string sceneObjectName)
+Scene::removeSceneObject(const std::string& sceneObjectName)
 {
     if (!this->isObjectRegistered(sceneObjectName))
     {
@@ -114,7 +114,7 @@ Scene::removeSceneObject(std::string sceneObjectName)
 }
 
 bool
-Scene::isLightRegistered(std::string lightName) const
+Scene::isLightRegistered(const std::string& lightName) const
 {
     return m_lightsMap.find(lightName) != m_lightsMap.end();
 }
@@ -135,7 +135,7 @@ Scene::getLights() const
 }
 
 std::shared_ptr<Light>
-Scene::getLight(std::string lightName) const
+Scene::getLight(const std::string& lightName) const
 {
     if (!this->isLightRegistered(lightName))
     {
@@ -148,7 +148,7 @@ Scene::getLight(std::string lightName) const
 }
 
 void
-Scene::addLight(std::shared_ptr<Light>newLight)
+Scene::addLight(std::shared_ptr<Light> newLight)
 {
     std::string newlightName = newLight->getName();
 
@@ -164,7 +164,7 @@ Scene::addLight(std::shared_ptr<Light>newLight)
 }
 
 void
-Scene::removeLight(std::string lightName)
+Scene::removeLight(const std::string& lightName)
 {
     if (!this->isLightRegistered(lightName))
     {
