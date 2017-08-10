@@ -34,7 +34,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-//Screenshot utility
+// Screenshot utility
 #include "imstkVTKScreenCaptureUtility.h"
 
 namespace imstk
@@ -56,8 +56,8 @@ public:
     {
         m_interactorStyle->m_simManager = manager;
         m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
-        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( m_interactorStyle );
-        m_vtkRenderWindow->SetSize(1000,800);
+        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle(m_interactorStyle);
+        m_vtkRenderWindow->SetSize(1000, 800);
         m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
     }
 
@@ -69,23 +69,23 @@ public:
     ///
     /// \brief Get scene currently being rendered
     ///
-    std::shared_ptr<Scene> getCurrentScene() const;
+    std::shared_ptr<Scene> getActiveScene() const;
 
     ///
     /// \brief Set scene to be rendered
     ///
-    void setCurrentScene(std::shared_ptr<Scene>scene);
+    void setActiveScene(std::shared_ptr<Scene> scene);
 
     ///
     /// \brief Retrieve the renderer associated with the current scene
     ///
-    std::shared_ptr<VTKRenderer> getCurrentRenderer() const;
+    std::shared_ptr<VTKRenderer> getActiveRenderer() const;
 
     ///
     /// \brief Setup the current renderer to render what's needed
     /// based on the mode chosen
     ///
-    void setRenderingMode(VTKRenderer::Mode mode);
+    void setRenderingMode(const VTKRenderer::Mode mode);
 
     ///
     /// \brief Get the current renderer mode
@@ -105,12 +105,12 @@ public:
     ///
     /// \brief Get pointer to the vtkRenderWindow rendering
     ///
-    vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
+    vtkSmartPointer<vtkRenderWindow> getVtkRenderWindow() const;
 
     ///
     /// \brief Returns true if the Viewer is rendering
     ///
-    const bool& isRendering() const;
+    bool isRendering() const;
 
     ///
     /// \brief Get the target FPS for rendering
@@ -120,7 +120,7 @@ public:
     ///
     /// \brief Set the target FPS for rendering
     ///
-    void setTargetFrameRate(const double& fps);
+    void setTargetFrameRate(const double fps);
 
     ///
     /// \brief Set custom event handlers on interactor style
@@ -157,7 +157,7 @@ protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     vtkSmartPointer<VTKInteractorStyle> m_interactorStyle = vtkSmartPointer<VTKInteractorStyle>::New();
-    std::shared_ptr<Scene> m_currentScene;
+    std::shared_ptr<Scene> m_activeScene;
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<VTKRenderer>> m_rendererMap;
     std::shared_ptr<VTKScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
     bool m_running = false;

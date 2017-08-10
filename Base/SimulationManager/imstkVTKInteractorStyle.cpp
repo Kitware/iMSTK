@@ -78,10 +78,10 @@ VTKInteractorStyle::OnTimer()
     }
 
     // Update Camera
-    m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(m_simManager->getCurrentScene()->getCamera());
+    m_simManager->getViewer()->getActiveRenderer()->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
 
     // Update render delegates
-    m_simManager->getViewer()->getCurrentRenderer()->updateRenderDelegates();
+    m_simManager->getViewer()->getActiveRenderer()->updateRenderDelegates();
 
     // Reset camera clipping range
     this->CurrentRenderer->ResetCameraClippingRange();
@@ -115,10 +115,10 @@ VTKInteractorStyle::OnTimer()
         this->Interactor->CreateOneShotTimer(1);
     }
 
-    // Call custom behaviour
+    // Call custom behavior
     if (m_onTimerFunction)
     {
-        // Call the custom behaviour to run on every frame
+        // Call the custom behavior to run on every frame
         m_onTimerFunction(this);
     }
 }
