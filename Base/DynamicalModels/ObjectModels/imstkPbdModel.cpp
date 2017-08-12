@@ -112,9 +112,9 @@ PbdModel::initialize()
         auto nP = m_mesh->getNumVertices();
 
         m_mass.resize(nP, 0);
+        m_invMass.resize(nP, 0);
         this->setUniformMass(m_uniformMassValue);
 
-        m_invMass.resize(nP, 0);
         for (auto i :m_fixedNodeIds)
         {
             setFixedPoint(i);
