@@ -102,42 +102,18 @@ FEMDeformableBodyModel::initialize()
     auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
 
-    if (!this->initializeForceModel())
-    {
-        return false;
-    }
-
-    if (!this->initializeMassMatrix())
-    {
-        return false;
-    }
-
-    if (!this->initializeDampingMatrix())
-    {
-        return false;
-    }
-
-    if (!this->initializeTangentStiffness())
+    if (!this->initializeForceModel() ||
+        !this->initializeMassMatrix() ||
+        !this->initializeDampingMatrix() ||
+        !this->initializeTangentStiffness() ||
+        !this->loadBoundaryConditions() ||
+        !this->initializeGravityForce() ||
+        !this->initializeExplicitExternalForces())
     {
         return false;
     }
 
     this->loadInitialStates();
-
-    if (!this->loadBoundaryConditions())
-    {
-        return false;
-    }
-
-    if (!this->initializeGravityForce())
-    {
-        return false;
-    }
-
-    if (!this->initializeExplicitExternalForces())
-    {
-        return false;
-    }
 
     m_Feff.resize(m_numDOF);
     m_Finternal.resize(m_numDOF);
@@ -285,11 +261,10 @@ FEMDeformableBodyModel::initializeDampingMatrix()
     auto dampingMassCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
     auto dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
 
-    m_damped = (dampingStiffnessCoefficient == 0.0 && dampingLaplacianCoefficient == 0.0 && dampingMassCoefficient == 0.0) ? false : true;
-
-    if (!m_damped)
+    if (dampingStiffnessCoefficient == 0.0 && dampingLaplacianCoefficient == 0.0 && dampingMassCoefficient == 0.0)
     {
-        return false;
+        LOG(WARNING) << "FEMDeformableBodyModel::initializeDampingMatrix() - All the damping parameters are zero!";
+        return true;
     }
 
     if (dampingLaplacianCoefficient < 0.0)
