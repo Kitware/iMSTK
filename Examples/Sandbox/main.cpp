@@ -1154,11 +1154,11 @@ void testDeformableBody()
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("DeformableBodyTest");
-    scene->getCamera()->setPosition(0, 2.0, 40.0);
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
-    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
+    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/liver/liver.veg");
     //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
     if (!tetMesh)
@@ -1175,7 +1175,7 @@ void testDeformableBody()
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
         return;
     }
-    volTetMesh->extractSurfaceMesh(surfMesh);
+    volTetMesh->extractSurfaceMesh(surfMesh, true);
 
     StopWatch wct;
     CpuTimer cput;
@@ -1200,12 +1200,16 @@ void testDeformableBody()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
-    //dynaModel->configure(iMSTK_DATA_ROOT"/asianDragon/asianDragon.config");
+    //dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
+    dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
     dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    surfMesh->setRenderMaterial(material);
 
     // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");
@@ -1214,7 +1218,6 @@ void testDeformableBody()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
-    //deformableObj->initialize();
     scene->addSceneObject(deformableObj);
 
     // f. Scene object 2: Plane
@@ -1387,7 +1390,7 @@ void testPbdVolume()
 
     sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    sdk->startSimulation(true);
+    sdk->startSimulation();
 }
 
 void testPbdCloth()
@@ -1450,6 +1453,8 @@ void testPbdCloth()
     deformableObj->setPhysicsGeometry(surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
+    material->setBackFaceCulling(false);
+    material->setDiffuseColor(Color::LightGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     surfMesh->setRenderMaterial(material);
 
@@ -1459,18 +1464,17 @@ void testPbdCloth()
     scene->addNonlinearSolver(pbdSolver);
 
     // Light (white)
-    auto whiteLight = std::make_shared<PointLight>("whiteLight");
-    whiteLight->setPosition(Vec3d(10, 2, 10));
-    whiteLight->setIntensity(100);
-    whiteLight->setFocalPoint(Vec3d(0, -2, 0));
+    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
+    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
+    whiteLight->setIntensity(7);
 
     // Light (red)
     auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(5, -3, 5));
-    colorLight->setFocalPoint(Vec3d(-5, -5, 0));
+    colorLight->setPosition(Vec3d(-5, -3, 5));
+    colorLight->setFocalPoint(Vec3d(0, -5, 5));
     colorLight->setIntensity(100);
     colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(15);
+    colorLight->setSpotAngle(30);
 
     // Add in scene
     scene->addLight(whiteLight);
@@ -1500,7 +1504,7 @@ void testPbdCloth()
     });
 
     scene->getCamera()->setFocalPoint(0, -5, 5);
-    scene->getCamera()->setPosition(5, 10.0, 15.0);
+    scene->getCamera()->setPosition(-15., -5.0, 15.0);
 
     // Start
     sdk->setActiveScene(scene);
@@ -1512,7 +1516,7 @@ void testPbdCollision()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PbdCollisionTest");
 
-    scene->getCamera()->setPosition(0, 10.0, 15.0);
+    scene->getCamera()->setPosition(0, 10.0, 10.0);
 
     // dragon
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
