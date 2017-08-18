@@ -47,18 +47,18 @@ enum class LightType
 ///
 /// \class Light
 ///
-/// \brief Abstract class for lights
+/// \brief Abstract base class for lights
 ///
 class Light
 {
 public:
     ///
-    /// \brief
+    /// \brief Returns the type of light (see imstk::LightType)
     ///
-    LightType getType();
+    LightType getType() const;
 
     ///
-    /// \brief
+    /// \brief Set the type of the light
     ///
     void setType(const LightType& type);
 
@@ -76,22 +76,22 @@ public:
                        const double& z);
 
     ///
-    /// \brief
+    /// \brief Get the status (On/off) of the light
     ///
-    bool isOn();
+    bool isOn() const;
 
     ///
-    /// \brief
+    /// \brief Switch the light On
     ///
-    void switchOn();
+    void switchOn() const;
 
     ///
-    /// \brief
+    /// \brief Get the status (On/off) of the light
     ///
-    bool isOff();
+    bool isOff() const;
 
     ///
-    /// \brief
+    /// \brief Switch the light Off
     ///
     void switchOff();
 
@@ -128,13 +128,12 @@ public:
     ///
     /// \brief Set the light name
     ///
-    void setName(std::string name);
+    void setName(const std::string& name);
+    void setName(const std::string&& name);
 
 protected:
-    Light(std::string name)
-    {
-        m_name = name;
-    };
+    Light(const std::string& name) : m_name(name){};
+    Light(std::string&& name) : m_name(std::move(name)){};
 
     vtkSmartPointer<vtkLight> m_vtkLight = vtkSmartPointer<vtkLight>::New();
     std::string m_name;
@@ -152,7 +151,15 @@ protected:
 class DirectionalLight : public Light
 {
 public:
-    DirectionalLight(std::string name) : Light(name)
+    ///
+    /// \brief Constructor
+    ///
+    DirectionalLight(const std::string& name) : Light(name)
+    {
+        m_type = LightType::DIRECTIONAL_LIGHT;
+        m_vtkLight->SetPositional(false);
+    };
+    DirectionalLight(std::string&& name) : Light(std::move(name))
     {
         m_type = LightType::DIRECTIONAL_LIGHT;
         m_vtkLight->SetPositional(false);
@@ -170,7 +177,16 @@ public:
 class PointLight : public Light
 {
 public:
-    PointLight(std::string name) : Light(name)
+    ///
+    /// \brief Constructors
+    ///
+    PointLight(const std::string& name) : Light(name)
+    {
+        m_type = LightType::POINT_LIGHT;
+        m_vtkLight->SetPositional(true);
+        m_vtkLight->SetConeAngle(179.0);
+    };
+    PointLight(std::string&& name) : Light(std::move(name))
     {
         m_type = LightType::POINT_LIGHT;
         m_vtkLight->SetPositional(true);
@@ -199,7 +215,15 @@ public:
 class SpotLight : public PointLight
 {
 public:
-    SpotLight(std::string name) : PointLight(name)
+    ///
+    /// \brief Constructors
+    ///
+    SpotLight(const std::string& name) : PointLight(name)
+    {
+        m_type = LightType::SPOT_LIGHT;
+        m_vtkLight->SetConeAngle(45);
+    };
+    SpotLight(std::string&& name) : PointLight(std::move(name))
     {
         m_type = LightType::SPOT_LIGHT;
         m_vtkLight->SetConeAngle(45);

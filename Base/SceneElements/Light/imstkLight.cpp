@@ -26,7 +26,7 @@
 namespace imstk
 {
 LightType
-Light::getType()
+Light::getType() const
 {
     return m_type;
 }
@@ -82,19 +82,19 @@ Light::setFocalPoint(const double& x,
 }
 
 bool
-Light::isOn()
+Light::isOn() const
 {
     return m_vtkLight->GetSwitch() != 0;
 }
 
 void
-Light::switchOn()
+Light::switchOn() const
 {
     m_vtkLight->SwitchOn();
 }
 
 bool
-Light::isOff()
+Light::isOff() const
 {
     return !this->isOn();
 }
@@ -156,8 +156,14 @@ Light::getName() const
 }
 
 void
-Light::setName(std::string name)
+Light::setName(const std::string& name)
 {
     m_name = name;
+}
+
+void
+Light::setName(const std::string&& name)
+{
+    m_name = std::move(name);
 }
 } // imstk

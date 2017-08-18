@@ -41,11 +41,14 @@ Module::start()
     {
         m_preInitCallback(this);
     }
+
     this->initModule();
+
     if (m_postInitCallback)
     {
         m_postInitCallback(this);
     }
+
     m_status = ModuleStatus::RUNNING;
 
     // Keep active, wait for terminating call
@@ -100,7 +103,9 @@ Module::start()
     {
         m_preCleanUpCallback(this);
     }
+
     this->cleanUpModule();
+
     if (m_postCleanUpCallback)
     {
         m_postCleanUpCallback(this);

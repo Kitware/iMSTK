@@ -51,7 +51,11 @@ public:
     ///
     /// \brief Constructor
     ///
-    SceneObject(std::string name) : m_name(name)
+    SceneObject(const std::string& name) : m_name(name)
+    {
+        m_type = Type::Visual;
+    }
+    SceneObject(std::string&& name) : m_name(std::move(name))
     {
         m_type = Type::Visual;
     }

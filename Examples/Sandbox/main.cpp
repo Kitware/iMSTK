@@ -148,7 +148,7 @@ void testLapToolController()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 #endif
 }
@@ -214,7 +214,7 @@ void testMshAndVegaIO()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -279,7 +279,7 @@ void testMultiObjectWithTextures()
     scene->addLight(whiteLight);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -331,7 +331,7 @@ void testMeshCCD()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
     t.join();
 }
@@ -399,7 +399,7 @@ void testPenaltyRigidCollision()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -506,7 +506,7 @@ void testTwoFalcons()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -562,7 +562,7 @@ void testTwoOmnis()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 #endif
 }
@@ -609,7 +609,7 @@ void testObjectController()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 #endif
 }
@@ -662,7 +662,7 @@ void testCameraController()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -700,7 +700,7 @@ void testReadMesh()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -746,7 +746,7 @@ void testViewer()
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
     // Run
-    sdk->setCurrentScene(sceneTest);
+    sdk->setActiveScene(sceneTest);
     sdk->startSimulation(true);
 }
 
@@ -797,7 +797,7 @@ void testCapsule()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -857,18 +857,18 @@ void testScenesManagement()
     // switch
     LOG(INFO) << "-- Test scene switch";
     int delay = 5;
-    sdk->setCurrentScene(scene1);
+    sdk->setActiveScene(scene1);
     sdk->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setCurrentScene(scene2, false);
+    sdk->setActiveScene(scene2, false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setCurrentScene(scene1, true);
+    sdk->setActiveScene(scene1, true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sdk->endSimulation();
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
-    sdk->setCurrentScene(scene2);
+    sdk->setActiveScene(scene2);
     sdk->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sdk->pauseSimulation();
@@ -932,7 +932,7 @@ void testIsometricMap()
     geometryMapTest->addLight(light);
 
     // Start simulation
-    sdk->setCurrentScene(geometryMapTest);
+    sdk->setActiveScene(geometryMapTest);
     sdk->startSimulation(VTKRenderer::Mode::DEBUG);
 }
 
@@ -1154,11 +1154,11 @@ void testDeformableBody()
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("DeformableBodyTest");
-    scene->getCamera()->setPosition(0, 2.0, 40.0);
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
-    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.veg");
+    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
+    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/liver/liver.veg");
     //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
     if (!tetMesh)
@@ -1175,7 +1175,7 @@ void testDeformableBody()
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
         return;
     }
-    volTetMesh->extractSurfaceMesh(surfMesh);
+    volTetMesh->extractSurfaceMesh(surfMesh, true);
 
     StopWatch wct;
     CpuTimer cput;
@@ -1200,12 +1200,16 @@ void testDeformableBody()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
-    //dynaModel->configure(iMSTK_DATA_ROOT"/asianDragon/asianDragon.config");
+    //dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
+    dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
     dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    surfMesh->setRenderMaterial(material);
 
     // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");
@@ -1214,7 +1218,6 @@ void testDeformableBody()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
-    //deformableObj->initialize();
     scene->addSceneObject(deformableObj);
 
     // f. Scene object 2: Plane
@@ -1260,7 +1263,7 @@ void testDeformableBody()
 
     // Display UPS
     auto ups = std::make_shared<UPSCounter>();
-    auto sceneManager = sdk->getSceneManager("DeformableBodyTest");
+    auto sceneManager = sdk->getSceneManager(scene);
     sceneManager->setPreInitCallback([](Module* module)
     {
         LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
@@ -1287,7 +1290,7 @@ void testDeformableBody()
     scene->addLight(light);
 
     // Run the simulation
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -1385,17 +1388,15 @@ void testPbdVolume()
     light->setIntensity(1);
     scene->addLight(light);
 
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    sdk->startSimulation(true);
+    sdk->startSimulation();
 }
 
 void testPbdCloth()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDClothTest");
-    scene->getCamera()->setPosition(6.0, 2.0, 20.0);
-    scene->getCamera()->setFocalPoint(0, -5, 5);
 
     // a. Construct a sample triangular mesh
 
@@ -1451,24 +1452,29 @@ void testPbdCloth()
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
 
+    auto material = std::make_shared<RenderMaterial>();
+    material->setBackFaceCulling(false);
+    material->setDiffuseColor(Color::LightGray);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    surfMesh->setRenderMaterial(material);
+
     // Solver
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
     scene->addNonlinearSolver(pbdSolver);
 
     // Light (white)
-    auto whiteLight = std::make_shared<PointLight>("whiteLight");
-    whiteLight->setPosition(Vec3d(10, 2, 10));
-    whiteLight->setIntensity(100);
-    whiteLight->setFocalPoint(Vec3d(0, -2, 0));
+    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
+    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
+    whiteLight->setIntensity(7);
 
     // Light (red)
     auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(5, -3, 5));
-    colorLight->setFocalPoint(Vec3d(-5, -5, 0));
+    colorLight->setPosition(Vec3d(-5, -3, 5));
+    colorLight->setFocalPoint(Vec3d(0, -5, 5));
     colorLight->setIntensity(100);
     colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(15);
+    colorLight->setSpotAngle(30);
 
     // Add in scene
     scene->addLight(whiteLight);
@@ -1477,7 +1483,7 @@ void testPbdCloth()
 
     // Display UPS
     auto ups = std::make_shared<UPSCounter>();
-    auto sceneManager = sdk->getSceneManager("PositionBasedDynamicsTest");
+    auto sceneManager = sdk->getSceneManager(scene);
     sceneManager->setPreInitCallback([](Module* module)
     {
         LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
@@ -1497,8 +1503,11 @@ void testPbdCloth()
         LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
     });
 
+    scene->getCamera()->setFocalPoint(0, -5, 5);
+    scene->getCamera()->setPosition(-15., -5.0, 15.0);
+
     // Start
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -1507,7 +1516,7 @@ void testPbdCollision()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PbdCollisionTest");
 
-    scene->getCamera()->setPosition(0, 10.0, 15.0);
+    scene->getCamera()->setPosition(0, 10.0, 10.0);
 
     // dragon
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
@@ -1819,7 +1828,7 @@ void testPbdCollision()
     light->setIntensity(1);
     scene->addLight(light);
 
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2001,7 +2010,7 @@ void testPbdFluidBenchmarking()
 
     scene->getCamera()->setPosition(0, 10.0, 10.0);
 
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2216,7 +2225,7 @@ void testPbdFluid()
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
 
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2480,7 +2489,7 @@ void testLineMesh()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 #endif
 }
@@ -2549,7 +2558,7 @@ void testScreenShotUtility()
     });
 
     // Run
-    sdk->setCurrentScene(sceneTest);
+    sdk->setActiveScene(sceneTest);
     sdk->startSimulation(true);
 }
 
@@ -2650,7 +2659,7 @@ void testDeformableBodyCollision()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2797,7 +2806,7 @@ void liverToolInteraction()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2876,7 +2885,7 @@ void testVirtualCoupling()
     scene->addLight(light);
 
     //Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 }
 
@@ -2928,7 +2937,7 @@ void testGeometryTransforms()
         {
             surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
         };
-    sdk->getSceneManager("testGeometryTransforms")->setPostUpdateCallback(rotateFunc);
+    sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration
     auto cam = scene->getCamera();
@@ -2942,7 +2951,7 @@ void testGeometryTransforms()
     scene->addLight(light);
 
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 }
 
@@ -3072,7 +3081,7 @@ void testPicking()
     cam->setPosition(camPosition);
     cam->setFocalPoint(Vec3d(0, 0, 0));
     // Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -3144,7 +3153,7 @@ void testBoneDrilling()
     auto cam = scene->getCamera();
     cam->setPosition(Vec3d(0, 0, 15));
 
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 }
 
@@ -3228,7 +3237,7 @@ void testVirtualCouplingCylinder()
     scene->addLight(light);
 
     //Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 }
 
@@ -3292,7 +3301,7 @@ void testRigidBody()
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
     //Run
-    sdk->setCurrentScene(scene);
+    sdk->setActiveScene(scene);
     sdk->startSimulation(false);
 }
 
@@ -3334,10 +3343,10 @@ int main()
     Test physics
     ------------------*/
     testPbdVolume();
-    //testPbdCloth();
+    testPbdCloth();
     //testPbdCollision();
     testPbdFluidBenchmarking();
-    //testPbdFluid();
+    testPbdFluid();
     //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();

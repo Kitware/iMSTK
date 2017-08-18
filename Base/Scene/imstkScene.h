@@ -50,7 +50,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    Scene(std::string name) : m_name(name) {}
+    Scene(const std::string& name) : m_name(name) {}
+    Scene(std::string&& name) : m_name(std::move(name)) {}
 
     ///
     /// \brief Destructor
@@ -65,7 +66,7 @@ public:
     ///
     /// \brief Returns true if the object with a given name is registered, else false
     ///
-    bool isObjectRegistered(std::string sceneObjectName) const;
+    bool isObjectRegistered(const std::string& sceneObjectName) const;
 
     ///
     /// \brief Return a vector of shared pointers to the scene objects
@@ -81,18 +82,18 @@ public:
     ///
     /// \brief Get a scene object of a specific name
     ///
-    std::shared_ptr<SceneObject> getSceneObject(std::string sceneObjectName) const;
+    std::shared_ptr<SceneObject> getSceneObject(const std::string& sceneObjectName) const;
 
     ///
     /// \brief Add/remove a scene object
     ///
     void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
-    void removeSceneObject(std::string sceneObjectName);
+    void removeSceneObject(const std::string& sceneObjectName);
 
     ///
     /// \brief
     ///
-    bool isLightRegistered(std::string lightName) const;
+    bool isLightRegistered(const std::string& lightName) const;
 
     ///
     /// \brief Return a vector of lights in the scene
@@ -102,13 +103,13 @@ public:
     ///
     /// \brief Get a light with a given name
     ///
-    std::shared_ptr<Light> getLight(std::string lightName) const;
+    std::shared_ptr<Light> getLight(const std::string& lightName) const;
 
     ///
     /// \brief Add/remove lights from the scene
     ///
     void addLight(std::shared_ptr<Light> newLight);
-    void removeLight(std::string lightName);
+    void removeLight(const std::string& lightName);
 
     ///
     /// \brief Get the name of the scene
@@ -140,6 +141,11 @@ public:
     ///
     void addObjectController(std::shared_ptr<SceneObjectControllerBase> controller);
 
+    ///
+    /// \brief
+    ///
+    bool isInitialized() const { return m_isInitialized; }
+
 protected:
 
     std::string m_name; ///> Name of the scene
@@ -149,6 +155,8 @@ protected:
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
+
+    bool m_isInitialized = false;
 };
 } // imstk
 

@@ -28,25 +28,25 @@
 namespace imstk
 {
 std::shared_ptr<Scene>
-VTKViewer::getCurrentScene() const
+VTKViewer::getActiveScene() const
 {
-    return m_currentScene;
+    return m_activeScene;
 }
 
 void
-VTKViewer::setCurrentScene(std::shared_ptr<Scene>scene)
+VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
 {
     // If already current scene
-    if( scene == m_currentScene )
+    if( scene == m_activeScene )
     {
         LOG(WARNING) << scene->getName() << " already is the viewer current scene.";
         return;
     }
 
     // If the current scene has a renderer, remove it
-    if( m_currentScene )
+    if( m_activeScene )
     {
-        auto vtkRenderer = this->getCurrentRenderer()->getVtkRenderer();
+        auto vtkRenderer = this->getActiveRenderer()->getVtkRenderer();
         if(m_vtkRenderWindow->HasRenderer(vtkRenderer))
         {
             m_vtkRenderWindow->RemoveRenderer(vtkRenderer);
@@ -54,34 +54,34 @@ VTKViewer::setCurrentScene(std::shared_ptr<Scene>scene)
     }
 
     // Update current scene
-    m_currentScene = scene;
+    m_activeScene = scene;
 
     // Create renderer if it doesn't exist
-    if (!m_rendererMap.count(m_currentScene))
+    if (!m_rendererMap.count(m_activeScene))
     {
-        m_rendererMap[m_currentScene] = std::make_shared<VTKRenderer>(m_currentScene);
+        m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene);
     }
 
     // Set renderer to renderWindow
-    m_vtkRenderWindow->AddRenderer(this->getCurrentRenderer()->getVtkRenderer());
+    m_vtkRenderWindow->AddRenderer(this->getActiveRenderer()->getVtkRenderer());
 
     // Set renderer to interactorStyle
-    m_interactorStyle->SetCurrentRenderer(this->getCurrentRenderer()->getVtkRenderer());
+    m_interactorStyle->SetCurrentRenderer(this->getActiveRenderer()->getVtkRenderer());
 
     // Set name to renderWindow
-    m_vtkRenderWindow->SetWindowName(m_currentScene->getName().data());
+    m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
 }
 
 std::shared_ptr<VTKRenderer>
-VTKViewer::getCurrentRenderer() const
+VTKViewer::getActiveRenderer() const
 {
-    return m_rendererMap.at(m_currentScene);
+    return m_rendererMap.at(m_activeScene);
 }
 
 void
-VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
+VTKViewer::setRenderingMode(const VTKRenderer::Mode mode)
 {
-    if( !m_currentScene )
+    if( !m_activeScene )
     {
         LOG(WARNING) << "Missing scene, can not set rendering mode.\n"
                      << "Use Viewer::setCurrentScene to setup scene.";
@@ -89,7 +89,7 @@ VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
     }
 
     // Setup renderer
-    this->getCurrentRenderer()->setMode(mode);
+    this->getActiveRenderer()->setMode(mode);
     if( !m_running )
     {
         return;
@@ -116,17 +116,18 @@ VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
 const VTKRenderer::Mode&
 VTKViewer::getRenderingMode()
 {
-    return this->getCurrentRenderer()->getMode();
+    return this->getActiveRenderer()->getMode();
 }
 
 void
 VTKViewer::startRenderingLoop()
 {
     m_running = true;
-    m_vtkRenderWindow->GetInteractor()->Initialize();
-    m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
-    m_vtkRenderWindow->GetInteractor()->Start();
-    m_vtkRenderWindow->GetInteractor()->DestroyTimer();
+    auto interactor = m_vtkRenderWindow->GetInteractor();
+    interactor->Initialize();
+    interactor->CreateOneShotTimer(0);
+    interactor->Start();
+    interactor->DestroyTimer();
     m_running = false;
 }
 
@@ -146,7 +147,7 @@ VTKViewer::getVtkRenderWindow() const
     return m_vtkRenderWindow;
 }
 
-const bool&
+bool
 VTKViewer::isRendering() const
 {
     return m_running;
@@ -165,7 +166,7 @@ VTKViewer::getTargetFrameRate() const
 }
 
 void
-VTKViewer::setTargetFrameRate(const double& fps)
+VTKViewer::setTargetFrameRate(const double fps)
 {
     if(fps < 0)
     {
@@ -257,6 +258,6 @@ VTKViewer::getScreenCaptureUtility() const
 void
 VTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
 {
-    this->getCurrentRenderer()->updateBackground(color1, color2, gradientBackground);
+    this->getActiveRenderer()->updateBackground(color1, color2, gradientBackground);
 }
 } // imstk

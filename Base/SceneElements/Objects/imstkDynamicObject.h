@@ -134,7 +134,8 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DynamicObject(std::string name) : CollidingObject(name){}
+    DynamicObject(const std::string& name) : CollidingObject(name){}
+    DynamicObject(std::string&& name) : CollidingObject(std::move(name)){}
 
     std::shared_ptr<DynamicalModel<StateType>> m_dynamicalModel;        ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry;                        ///> Geometry used for Physics

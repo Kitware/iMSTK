@@ -41,7 +41,7 @@ using SimulationStatus = ModuleStatus;
 ///
 /// \class SimulationManager
 ///
-/// \brief
+/// \brief This class manages the overall simulation. The simulation can contain multiple scenes.
 ///
 class SimulationManager
 {
@@ -61,101 +61,121 @@ public:
     ~SimulationManager() = default;
 
     ///
-    /// \brief
+    /// \brief Returns the simulation status
     ///
     const SimulationStatus& getStatus() const;
 
     // Scene
 
     ///
-    /// \brief
+    /// \brief Returns true if the scene is registered, else false
     ///
-    bool isSceneRegistered(std::string sceneName) const;
+    bool isSceneRegistered(const std::string& sceneName) const;
 
     ///
-    /// \brief
+    /// \brief Returns the scene manager given the scene
     ///
-    std::shared_ptr<SceneManager> getSceneManager(std::string sceneName) const;
+    std::shared_ptr<SceneManager> getSceneManager(const std::string& sceneName) const;
+    std::shared_ptr<SceneManager> getSceneManager(std::shared_ptr<Scene> scene) const;
 
     ///
-    /// \brief
+    /// \brief Returns the scene with a given name
     ///
-    std::shared_ptr<Scene> getScene(std::string sceneName) const;
+    std::shared_ptr<Scene> getScene(const std::string& sceneName) const;
 
     ///
-    /// \brief
+    /// \brief Returns the scene that is currently active
     ///
-    std::shared_ptr<Scene> getCurrentScene() const;
+    std::shared_ptr<Scene> getActiveScene() const;
 
     ///
-    /// \brief
+    /// \brief Create a new scene with a given name
     ///
-    std::shared_ptr<Scene> createNewScene(std::string newSceneName);
+    std::shared_ptr<Scene> createNewScene(const std::string& newSceneName);
+    std::shared_ptr<Scene> createNewScene(std::string&& newSceneName);
 
     ///
-    /// \brief
+    /// \brief Create a new scene with default name
     ///
     std::shared_ptr<Scene> createNewScene();
 
     ///
-    /// \brief
+    /// \brief Add a new scene with given name to the scene list
     ///
     void addScene(std::shared_ptr<Scene> newScene);
 
     ///
-    /// \brief
+    /// \brief Remove the scene with given name from the scene list
     ///
-    void removeScene(std::string sceneName);
+    void removeScene(const std::string& sceneName);
 
     // Modules
 
     ///
-    /// \brief
+    /// \brief Returns true if the modules is registered, else false
     ///
-    bool isModuleRegistered(std::string moduleName) const;
+    bool isModuleRegistered(const std::string& moduleName) const;
 
     ///
-    /// \brief
+    /// \brief Returns the module given the name
     ///
-    std::shared_ptr<Module> getModule(std::string moduleName) const;
+    std::shared_ptr<Module> getModule(const std::string& moduleName) const;
 
     ///
-    /// \brief
+    /// \brief Add a new module with a given name
     ///
     void addModule(std::shared_ptr<Module> newModule);
 
     ///
-    /// \brief
+    /// \brief Remove the module with a given name
     ///
-    void removeModule(std::string moduleName);
+    void removeModule(const std::string& moduleName);
 
-    // Viewer
+    ///
+    /// \brief Returns the vtk viewer
+    ///
     std::shared_ptr<VTKViewer> getViewer() const;
 
     // Simulation
-    ///
-    /// \brief
-    ///
-    void setCurrentScene(std::string newSceneName, bool unloadCurrentScene = false);
-    void setCurrentScene(std::shared_ptr<Scene> scene, bool unloadCurrentScene = false);
 
     ///
-    /// \brief
+    /// \brief Set the current scene to the one with the supplied name
     ///
-    void startSimulation(bool debug = false);
+    void setActiveScene(const std::string& newSceneName,
+                        const bool unloadCurrentScene = false);
+    void setActiveScene(std::shared_ptr<Scene> scene,
+                        const bool unloadCurrentScene = false);
 
     ///
-    /// \brief
+    /// \brief Start the viewer
+    ///
+    void startViewer(const bool debug = true);
+
+    ///
+    /// \brief Launch simulation for the first time.
+    /// 1. Initialize the active scene if not initialized already.
+    /// 2. Launches separate threads for each module.
+    ///
+    void launchSimulation();
+
+    ///
+    /// \brief Start the simulation by initializing the active scene
+    ///
+    void startSimulation(const bool startSimulationPaused = true,
+                         const bool viewerInDebugMode = false);
+
+    ///
+    /// \brief Run the simulation from a paused state
     ///
     void runSimulation();
 
     ///
-    /// \brief
+    /// \brief Pause the simulation
     ///
     void pauseSimulation();
 
     ///
-    /// \brief
+    /// \brief End the simulation
     ///
     void endSimulation();
 
@@ -165,7 +185,7 @@ private:
 
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 
-    std::string m_currentSceneName = "";
+    std::string m_activeSceneName = "";
     std::unordered_map<std::string, std::shared_ptr<SceneManager>> m_sceneManagerMap;
 
     std::unordered_map<std::string, std::shared_ptr<Module>> m_modulesMap;
