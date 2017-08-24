@@ -254,19 +254,19 @@ endif()
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Base/Core)
-add_subdirectory(Base/Geometry)
-add_subdirectory(Base/Devices)
-add_subdirectory(Base/Rendering)
-add_subdirectory(Base/Solvers)
-add_subdirectory(Base/DynamicalModels)
-add_subdirectory(Base/TimeIntegrators)
-add_subdirectory(Base/SceneElements)
-add_subdirectory(Base/Collision)
-add_subdirectory(Base/Scene)
-add_subdirectory(Base/SimulationManager)
-add_subdirectory(Base/Constraint)
-add_subdirectory(Base/Materials)
+add_subdirectory(Source/Core)
+add_subdirectory(Source/Geometry)
+add_subdirectory(Source/Devices)
+add_subdirectory(Source/Rendering)
+add_subdirectory(Source/Solvers)
+add_subdirectory(Source/DynamicalModels)
+add_subdirectory(Source/TimeIntegrators)
+add_subdirectory(Source/SceneElements)
+add_subdirectory(Source/Collision)
+add_subdirectory(Source/Scene)
+add_subdirectory(Source/SimulationManager)
+add_subdirectory(Source/Constraint)
+add_subdirectory(Source/Materials)
 
 #--------------------------------------------------------------------------
 # Export Targets
