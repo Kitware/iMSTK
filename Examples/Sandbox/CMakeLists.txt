@@ -58,7 +58,7 @@ imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 #-----------------------------------------------------------------------------
 # Shaders
 #-----------------------------------------------------------------------------
-file(COPY ${CMAKE_SOURCE_DIR}/Base/Rendering/VTKShaders
+file(COPY ${CMAKE_SOURCE_DIR}/Source/Rendering/VTKShaders
   DESTINATION ${PROJECT_BINARY_DIR}/Shaders)
-file(COPY ${CMAKE_SOURCE_DIR}/Base/Rendering/VTKShaders
+file(COPY ${CMAKE_SOURCE_DIR}/Source/Rendering/VTKShaders
   DESTINATION ${CMAKE_PROGRAM_PATH}/Shaders)
