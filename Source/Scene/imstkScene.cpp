@@ -228,5 +228,4 @@ Scene::reset()
         }
     }
 }
-
 } // imstk
