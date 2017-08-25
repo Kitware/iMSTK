@@ -177,6 +177,11 @@ public:
     ///
     /// \brief End the simulation
     ///
+    void resetSimulation();
+
+    ///
+    /// \brief
+    ///
     void endSimulation();
 
 private:

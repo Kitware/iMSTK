@@ -437,6 +437,15 @@ SimulationManager::pauseSimulation()
 }
 
 void
+SimulationManager::resetSimulation()
+{
+    LOG(INFO) << "Resetting simulation";
+
+    // Reset scene
+    this->getScene(m_activeSceneName)->reset();
+}
+
+void
 SimulationManager::endSimulation()
 {
     if ((m_status != SimulationStatus::RUNNING) &&

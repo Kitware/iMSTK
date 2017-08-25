@@ -189,6 +189,10 @@ VTKInteractorStyle::OnChar()
         m_fpsActor->SetVisibility(m_displayFps);
         this->Interactor->Render();
     }
+    else if (key == 'r' || key == 'R')
+    {
+        m_simManager->resetSimulation();
+    }
 }
 
 void
