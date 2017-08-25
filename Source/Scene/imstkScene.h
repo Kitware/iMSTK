@@ -146,6 +146,11 @@ public:
     ///
     bool isInitialized() const { return m_isInitialized; }
 
+    ///
+    /// \brief Reset the scene
+    ///
+    void reset();
+
 protected:
 
     std::string m_name; ///> Name of the scene

@@ -201,13 +201,32 @@ Scene::getSolvers()
     return m_solvers;
 }
 
-void Scene::addNonlinearSolver(std::shared_ptr<SolverBase> solver)
+void
+Scene::addNonlinearSolver(std::shared_ptr<SolverBase> solver)
 {
     m_solvers.push_back(solver);
 }
 
-void Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller)
+void
+Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller)
 {
     m_objectControllers.push_back(controller);
 }
+
+void
+Scene::reset()
+{
+    // Apply the geometry and apply maps to all the objects
+    for (auto obj : this->getSceneObjects())
+    {
+        const auto objType = obj->getType();
+        if (objType == SceneObject::Type::Rigid ||
+            objType == SceneObject::Type::FEMDeformable ||
+            objType == SceneObject::Type::Pbd)
+        {
+            obj->reset();
+        }
+    }
+}
+
 } // imstk
