@@ -92,11 +92,11 @@ public:
     ///
     /// \brief Reset the current state to the initial state
     ///
-    /*virtual void resetToInitialState()
+    virtual void resetToInitialState()
     {
-    m_currentState->setState(m_initialState);
-    m_previousState->setState(m_initialState);
-    }*/
+        m_currentState->setState(m_initialState);
+        m_previousState->setState(m_initialState);
+    }
 
     ///
     /// \brief Returns the number of degrees of freedom
@@ -135,6 +135,7 @@ protected:
 
     std::size_t m_numDOF; ///> Total number of degree of freedom
 };
+
 } // imstk
 
 #endif // ifndef imstkDynamicalModel_h

@@ -72,6 +72,11 @@ public:
     ///
     StdVectorOfVec3d& getAccelerations() { return m_acc; };
 
+    ///
+    /// \brief Set the state to a given one
+    ///
+    void setState(std::shared_ptr<PbdState> rhs);
+
 private:
     StdVectorOfVec3d m_pos; ///> Nodal positions
     StdVectorOfVec3d m_vel; ///> Nodal velocities

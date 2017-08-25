@@ -97,6 +97,11 @@ public:
     ///
     virtual bool initialize(){ return true; };
 
+    ///
+    /// \brief
+    ///
+    virtual void reset(){};
+
 protected:
     ///
     /// \brief Assigns the type of the object
