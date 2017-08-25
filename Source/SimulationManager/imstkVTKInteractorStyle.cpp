@@ -71,12 +71,6 @@ VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
 void
 VTKInteractorStyle::OnTimer()
 {
-    if (m_simManager->getStatus() != SimulationStatus::RUNNING)
-    {
-        this->Interactor->CreateOneShotTimer(m_targetMS);
-        return;
-    }
-
     // Update Camera
     m_simManager->getViewer()->getActiveRenderer()->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
 
