@@ -1355,7 +1355,7 @@ void testPbdVolume()
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(volTetMesh);
     pbdModel->configure(/*Number of Constraints*/ 1,
-        /*Constraint configuration*/ "FEM NeoHookean 100.0 0.3",
+        /*Constraint configuration*/ "FEM StVk 100.0 0.3",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
         /*TimeStep*/ 0.01,
@@ -1436,7 +1436,7 @@ void testPbdCloth()
 
     surfMesh->setTrianglesVertices(triangles);
 
-    // Create Object & Model
+    // Object & Model
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(surfMesh);

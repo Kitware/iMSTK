@@ -30,7 +30,14 @@
 namespace imstk
 {
 // TODO: Complete this
-class RigidBodyState {};
+class RigidBodyState
+{
+public:
+    ///
+    /// \brief Set the state to a given one
+    ///
+    void setState(std::shared_ptr<RigidBodyState> rhs){};
+};
 
 ///
 /// \class RigidObject

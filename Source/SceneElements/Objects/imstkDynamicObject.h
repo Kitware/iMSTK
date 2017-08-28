@@ -129,6 +129,15 @@ public:
         }
     }
 
+    ///
+    /// \brief Reset the dynamic object to its initial state
+    ///
+    virtual void reset() override
+    {
+        m_dynamicalModel->resetToInitialState();
+        this->updateGeometries();
+    };
+
 protected:
 
     ///

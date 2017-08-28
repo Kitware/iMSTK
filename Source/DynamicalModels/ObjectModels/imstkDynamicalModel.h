@@ -92,11 +92,11 @@ public:
     ///
     /// \brief Reset the current state to the initial state
     ///
-    /*virtual void resetToInitialState()
+    virtual void resetToInitialState()
     {
-    m_currentState->setState(m_initialState);
-    m_previousState->setState(m_initialState);
-    }*/
+        m_currentState->setState(m_initialState);
+        m_previousState->setState(m_initialState);
+    }
 
     ///
     /// \brief Returns the number of degrees of freedom

@@ -79,6 +79,11 @@ public:
     ///
     virtual void solveConstraints();
 
+    ///
+    /// \brief Reset the PBD object to its initial state
+    ///
+    void reset() override;
+
 protected:
 
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model

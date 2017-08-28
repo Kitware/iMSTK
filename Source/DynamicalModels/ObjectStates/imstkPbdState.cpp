@@ -48,4 +48,12 @@ PbdState::initialize(const std::shared_ptr<PointSet>& m, const bool (&options)[3
 {
     this->initialize(m->getNumVertices(), options);
 }
+
+void
+PbdState::setState(std::shared_ptr<PbdState> rhs)
+{
+    m_pos = rhs->getPositions();
+    m_vel = rhs->getVelocities();
+    m_acc = rhs->getAccelerations();
+}
 } // imstk

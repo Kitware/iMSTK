@@ -71,12 +71,6 @@ VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
 void
 VTKInteractorStyle::OnTimer()
 {
-    if (m_simManager->getStatus() != SimulationStatus::RUNNING)
-    {
-        this->Interactor->CreateOneShotTimer(m_targetMS);
-        return;
-    }
-
     // Update Camera
     m_simManager->getViewer()->getActiveRenderer()->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
 
@@ -139,20 +133,7 @@ VTKInteractorStyle::OnChar()
 
     SimulationStatus status = m_simManager->getStatus();
 
-    // start simulation
-    if (status == SimulationStatus::INACTIVE && (key == 's' || key == 'S'))
-    {
-        m_fpsActor->SetVisibility(m_displayFps);
-        m_simManager->launchSimulation();
-    }
-    // end Simulation
-    else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q' || key == 'e' || key == 'E'))
-    {
-        m_fpsActor->VisibilityOff();
-        m_simManager->endSimulation();
-    }
-    else if (key == ' ')
+    if (key == ' ')
     {
         // pause simulation
         if (status == SimulationStatus::RUNNING)
@@ -164,9 +145,20 @@ VTKInteractorStyle::OnChar()
         {
             m_simManager->runSimulation();
         }
+        // Launch simulation if inactive
+        if (status == SimulationStatus::INACTIVE)
+        {
+            m_fpsActor->SetVisibility(m_displayFps);
+            m_simManager->launchSimulation();
+        }
     }
-    // switch rendering mode
-    else if (key == 'd' || key == 'D')
+    else if (status != SimulationStatus::INACTIVE &&
+             (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
+    {
+        m_fpsActor->VisibilityOff();
+        m_simManager->endSimulation();
+    }
+    else if (key == 'd' || key == 'D') // switch rendering mode
     {
         if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::SIMULATION)
         {
@@ -177,17 +169,19 @@ VTKInteractorStyle::OnChar()
             m_simManager->getViewer()->setRenderingMode(VTKRenderer::Mode::DEBUG);
         }
     }
-    // quit viewer
-    else if (key == '\u001B')
+    else if (key == '\u001B') // quit viewer
     {
         m_simManager->getViewer()->endRenderingLoop();
     }
-    // switch framerate display
-    else if (key == 'p' || key == 'P')
+    else if (key == 'p' || key == 'P') // switch framerate display
     {
         m_displayFps = !m_displayFps;
         m_fpsActor->SetVisibility(m_displayFps);
         this->Interactor->Render();
+    }
+    else if (key == 'r' || key == 'R')
+    {
+        m_simManager->resetSimulation();
     }
 }
 

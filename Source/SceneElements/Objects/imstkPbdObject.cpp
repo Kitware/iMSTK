@@ -67,4 +67,11 @@ PbdObject::solveConstraints()
         m_pbdModel->projectConstraints();
     }
 }
+
+void
+PbdObject::reset()
+{
+    DynamicObject<PbdState>::reset();
+    this->updateVelocity();
+}
 } //imstk
