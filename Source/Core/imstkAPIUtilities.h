@@ -212,6 +212,35 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
 
     return nlSystem;
 }
+
+///
+/// \brief Print number of updates for second for a given scene
+///
+void
+printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter> ups)
+{
+    sceneManager->setPreInitCallback([](Module* module)
+            {
+                LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
+    });
+
+    sceneManager->setPreUpdateCallback([&ups](Module* module)
+            {
+                ups->setStartPointOfUpdate();
+    });
+
+    sceneManager->setPostUpdateCallback([&ups](Module* module)
+            {
+                ups->setEndPointOfUpdate();
+                std::cout << "\r-- " << module->getName() << " running at "
+                          << ups->getUPS() << " ups   " << std::flush;
+    });
+
+    sceneManager->setPostCleanUpCallback([](Module* module)
+            {
+                LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
+    });
+}
 } //apiutils
 } // imstk
 
