@@ -152,6 +152,11 @@ public:
     void startViewer(const bool debug = true);
 
     ///
+    /// \brief Print user keyboard controls
+    ///
+    void printUserControlsInfo();
+
+    ///
     /// \brief Launch simulation for the first time.
     /// 1. Initialize the active scene if not initialized already.
     /// 2. Launches separate threads for each module.

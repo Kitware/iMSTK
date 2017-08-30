@@ -368,6 +368,8 @@ SimulationManager::startViewer(const bool debug /*= true*/)
     // Start Rendering
     if (!m_viewer->isRendering())
     {
+        this->printUserControlsInfo();
+
         LOG(INFO) << "Starting viewer";
 
         m_viewer->startRenderingLoop(); // Infinite loop
@@ -380,6 +382,20 @@ SimulationManager::startViewer(const bool debug /*= true*/)
             this->endSimulation();
         }
     }
+}
+
+void
+SimulationManager::printUserControlsInfo()
+{
+    LOG(INFO) <<
+        "\n------------------------\n" <<
+        "     User controls\n" <<
+        "------------------------\n" <<
+        "<space> - pause or unpause simulation\n" <<
+        "  R/r   - reset simulation\n" <<
+        "  D/d   - toggle between debug and simulation rendering modes\n" <<
+        "  P/p   - Display render frame rate on the screen\n" <<
+        "------------------------\n\n";
 }
 
 void
