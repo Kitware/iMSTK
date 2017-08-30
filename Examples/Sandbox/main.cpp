@@ -495,9 +495,6 @@ void testTwoFalcons()
     falcon0->setPostInitCallback(postInitFoo);
     falcon0->setPostUpdateCallback(postUpdateFoo);
     falcon0->setPostCleanUpCallback(postCleanUpFoo);
-//    falcon1->setPostInitCallback(postInitFoo);
-//    falcon1->setPostUpdateCallback(postUpdateFoo);
-//    falcon1->setPostCleanUpCallback(postCleanUpFoo);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
@@ -1261,27 +1258,9 @@ void testDeformableBody()
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
 
-    // Display UPS
+    // print UPS
     auto ups = std::make_shared<UPSCounter>();
-    auto sceneManager = sdk->getSceneManager(scene);
-    sceneManager->setPreInitCallback([](Module* module)
-    {
-        LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
-    });
-    sceneManager->setPreUpdateCallback([&ups](Module* module)
-    {
-        ups->setStartPointOfUpdate();
-    });
-    sceneManager->setPostUpdateCallback([&ups](Module* module)
-    {
-        ups->setEndPointOfUpdate();
-        std::cout << "\r-- " << module->getName() << " running at "
-                  << ups->getUPS() << " ups   " << std::flush;
-    });
-    sceneManager->setPostCleanUpCallback([](Module* module)
-    {
-        LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
-    });
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
@@ -1388,6 +1367,10 @@ void testPbdVolume()
     light->setIntensity(1);
     scene->addLight(light);
 
+    // print UPS
+    auto ups = std::make_shared<UPSCounter>();
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);
+
     sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
     sdk->startSimulation();
@@ -1445,7 +1428,7 @@ void testPbdCloth()
         /*Constraint configuration*/ "Dihedral 0.001",
         /*Mass*/ 1.0,
         /*Gravity*/ "0 -9.8 0",
-        /*TimeStep*/ 0.01,
+        /*TimeStep*/ 0.03,
         /*FixedPoint*/ "1 2 3 4 5 6 7 8 9 10 11",
         /*NumberOfIterationInConstraintSolver*/ 5);
     deformableObj->setDynamicalModel(pbdModel);
@@ -1481,27 +1464,9 @@ void testPbdCloth()
     scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
 
-    // Display UPS
+    // print UPS
     auto ups = std::make_shared<UPSCounter>();
-    auto sceneManager = sdk->getSceneManager(scene);
-    sceneManager->setPreInitCallback([](Module* module)
-    {
-        LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
-    });
-    sceneManager->setPreUpdateCallback([&ups](Module* module)
-    {
-        ups->setStartPointOfUpdate();
-    });
-    sceneManager->setPostUpdateCallback([&ups](Module* module)
-    {
-        ups->setEndPointOfUpdate();
-        std::cout << "\r-- " << module->getName() << " running at "
-                  << ups->getUPS() << " ups   " << std::flush;
-    });
-    sceneManager->setPostCleanUpCallback([](Module* module)
-    {
-        LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
-    });
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);
 
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
@@ -1980,27 +1945,9 @@ void testPbdFluidBenchmarking()
 
     colGraph->addInteractionPair(pair);
 
-    // Display UPS
+    // print UPS
     auto ups = std::make_shared<UPSCounter>();
-    auto sceneManager = sdk->getSceneManager("PBDFluidBenchmarking");
-    sceneManager->setPreInitCallback([](Module* module)
-    {
-        LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
-    });
-    sceneManager->setPreUpdateCallback([&ups](Module* module)
-    {
-        ups->setStartPointOfUpdate();
-    });
-    sceneManager->setPostUpdateCallback([&ups](Module* module)
-    {
-        ups->setEndPointOfUpdate();
-        std::cout << "\r-- " << module->getName() << " running at "
-                  << ups->getUPS() << " ups   " << std::flush;
-    });
-    sceneManager->setPostCleanUpCallback([](Module* module)
-    {
-        LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
-    });
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
@@ -2224,6 +2171,10 @@ void testPbdFluid()
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
+
+    // print UPS
+    auto ups = std::make_shared<UPSCounter>();
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);
 
     sdk->setActiveScene(scene);
     sdk->startSimulation(true);
