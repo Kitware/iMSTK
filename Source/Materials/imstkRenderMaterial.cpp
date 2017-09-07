@@ -50,6 +50,24 @@ RenderMaterial::setDisplayMode(const DisplayMode displayMode)
     m_modified = true;
 }
 
+bool
+RenderMaterial::getTessellated() const
+{
+    return m_tessellated;
+}
+
+void
+RenderMaterial::setTessellated(const bool tessellated)
+{
+    if (tessellated == m_tessellated)
+    {
+        return;
+    }
+    m_tessellated = tessellated;
+    m_stateModified = true;
+    m_modified = true;
+}
+
 float
 RenderMaterial::getLineWidth() const
 {

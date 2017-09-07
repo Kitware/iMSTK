@@ -19,31 +19,31 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#include "imstkViewer.h"
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+std::shared_ptr<Scene>
+Viewer::getActiveScene() const
 {
-    m_path = path;
-    m_type = type;
+    return m_activeScene;
 }
 
-Texture::Type
-Texture::getType() const
+std::shared_ptr<Renderer>
+Viewer::getActiveRenderer() const
 {
-    return m_type;
+    return m_rendererMap.at(m_activeScene);
 }
 
-const std::string
-Texture::getPath() const
+const bool&
+Viewer::isRendering() const
 {
-    return m_path;
+    return m_running;
 }
 
-bool
-Texture::getMipmapsEnabled()
+std::shared_ptr<ScreenCaptureUtility>
+Viewer::getScreenCaptureUtility() const
 {
-    return m_mipmapsEnabled;
+    return m_screenCapturer;
 }
 }

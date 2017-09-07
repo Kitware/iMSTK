@@ -22,37 +22,22 @@
 #ifndef imstkScreenCaptureUtility_h
 #define imstkScreenCaptureUtility_h
 
-#include "vtkNew.h"
-#include "vtkRenderWindow.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkPNGWriter.h"
-
 #include <string>
 
 namespace imstk
 {
 ///
-/// \class VTKScreenCaptureUtility
+/// \class ScreenCaptureUtility
 ///
-/// \brief Utility class to manage screen capture through VTK
+/// \brief Utility class to manage screen capture
 ///
-class VTKScreenCaptureUtility
+class ScreenCaptureUtility
 {
 public:
     ///
-    /// \brief Constructor
-    ///
-    VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix = "Screenshot-");
-
-    ///
-    /// \brief Destructor
-    ///
-    ~VTKScreenCaptureUtility() = default;
-
-    ///
     /// \brief Saves the screenshot as a png file
     ///
-    void saveScreenShot();
+    virtual void saveScreenShot(){};
 
     ///
     /// \brief Returns the number of the screenshot
@@ -68,9 +53,16 @@ public:
     void resetScreenShotNumber();
 
 protected:
-    vtkNew<vtkWindowToImageFilter> m_windowToImageFilter;
-    vtkNew<vtkPNGWriter> m_pngWriter; //> using vtk's png writer to save the screenshots
-    vtkRenderWindow* m_renderWindow; //> render window whose screen shot will be taken
+    ///
+    /// \brief Constructor
+    ///
+    ScreenCaptureUtility(){};
+
+    ///
+    /// \brief Destructor
+    ///
+    ~ScreenCaptureUtility() = default;
+
     unsigned int m_screenShotNumber; //> screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
     std::string m_screenShotPrefix; //> the prefix for the screenshots to be saved
 };

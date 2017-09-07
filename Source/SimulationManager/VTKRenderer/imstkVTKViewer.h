@@ -25,16 +25,19 @@
 #include <memory>
 #include <unordered_map>
 
+#include "g3log/g3log.hpp"
+
 #include "imstkScene.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKInteractorStyle.h"
 #include "imstkVTKScreenCaptureUtility.h"
-
+#include "imstkViewer.h"
+#include "imstkVTKRenderDelegate.h"
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-// Screenshot utility
+//Screenshot utility
 #include "imstkVTKScreenCaptureUtility.h"
 
 namespace imstk
@@ -46,7 +49,7 @@ class SimulationManager;
 ///
 /// \brief Viewer
 ///
-class VTKViewer
+class VTKViewer : public Viewer
 {
 public:
     ///
@@ -56,10 +59,15 @@ public:
     {
         m_interactorStyle->m_simManager = manager;
         m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
-        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle(m_interactorStyle);
-        m_vtkRenderWindow->SetSize(1000, 800);
+        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( m_interactorStyle );
+        m_vtkRenderWindow->SetSize(1000,800);
         m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
     }
+
+    ///
+    /// \brief Destructor
+    ///
+    virtual void setRenderingMode(Renderer::Mode mode);
 
     ///
     /// \brief Destructor
@@ -67,50 +75,29 @@ public:
     ~VTKViewer() = default;
 
     ///
-    /// \brief Get scene currently being rendered
-    ///
-    std::shared_ptr<Scene> getActiveScene() const;
-
-    ///
     /// \brief Set scene to be rendered
     ///
-    void setActiveScene(std::shared_ptr<Scene> scene);
-
-    ///
-    /// \brief Retrieve the renderer associated with the current scene
-    ///
-    std::shared_ptr<VTKRenderer> getActiveRenderer() const;
-
-    ///
-    /// \brief Setup the current renderer to render what's needed
-    /// based on the mode chosen
-    ///
-    void setRenderingMode(const VTKRenderer::Mode mode);
+    virtual void setActiveScene(std::shared_ptr<Scene>scene);
 
     ///
     /// \brief Get the current renderer mode
     ///
-    const VTKRenderer::Mode& getRenderingMode();
+    virtual const Renderer::Mode getRenderingMode();
 
     ///
     /// \brief Start rendering
     ///
-    void startRenderingLoop();
+    virtual void startRenderingLoop();
 
     ///
     /// \brief Terminate rendering
     ///
-    void endRenderingLoop();
+    virtual void endRenderingLoop();
 
     ///
     /// \brief Get pointer to the vtkRenderWindow rendering
     ///
-    vtkSmartPointer<vtkRenderWindow> getVtkRenderWindow() const;
-
-    ///
-    /// \brief Returns true if the Viewer is rendering
-    ///
-    bool isRendering() const;
+    vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
 
     ///
     /// \brief Get the target FPS for rendering
@@ -120,7 +107,7 @@ public:
     ///
     /// \brief Set the target FPS for rendering
     ///
-    void setTargetFrameRate(const double fps);
+    void setTargetFrameRate(const double& fps);
 
     ///
     /// \brief Set custom event handlers on interactor style
@@ -151,16 +138,12 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     vtkSmartPointer<VTKInteractorStyle> m_interactorStyle = vtkSmartPointer<VTKInteractorStyle>::New();
-    std::shared_ptr<Scene> m_activeScene;
-    std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<VTKRenderer>> m_rendererMap;
-    std::shared_ptr<VTKScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
-    bool m_running = false;
 };
 } // imstk
 

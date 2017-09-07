@@ -19,31 +19,52 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#ifndef imstkRenderer_h
+#define imstkRenderer_h
+
+#include "imstkTextureManager.h"
+#include "imstkMath.h"
+
+#include <memory>
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+class Renderer
 {
-    m_path = path;
-    m_type = type;
+public:
+    ///
+    /// \brief Enumerations for the render mode
+    ///
+    enum Mode
+    {
+        EMPTY,
+        DEBUG,
+        SIMULATION
+    };
+
+    ///
+    /// \brief Get renderer
+    ///
+    virtual std::shared_ptr<Renderer> getRenderer();
+
+    ///
+    /// \brief Set rendering mode
+    ///
+    virtual void setMode(Renderer::Mode mode);
+
+    ///
+    /// \brief Get rendering mode
+    ///
+    virtual const Renderer::Mode& getMode();
+
+    ///
+    /// \brief Update background colors
+    ///
+    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false){};
+
+protected:
+    Renderer::Mode m_currentMode = Renderer::Mode::EMPTY;
+};
 }
 
-Texture::Type
-Texture::getType() const
-{
-    return m_type;
-}
-
-const std::string
-Texture::getPath() const
-{
-    return m_path;
-}
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+#endif

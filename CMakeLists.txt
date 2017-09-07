@@ -88,6 +88,14 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(Uncrustify)
   endif()
 
+  option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
+
+  if(${PROJECT_NAME}_USE_Vulkan)
+    imstk_define_dependency(glfw)
+    imstk_define_dependency(glm)
+    imstk_define_dependency(gli)
+  endif()
+
   if(WIN32)
     imstk_define_dependency(PThreads)
     imstk_define_dependency(Libusb) #for VRPN
@@ -196,6 +204,20 @@ endif(Uncrustify_EXECUTABLE)
 find_package( Assimp REQUIRED )
 include_directories( ${Assimp_INCLUDE_DIRS} )
 
+if( ${PROJECT_NAME}_USE_Vulkan )
+  # glfw
+  find_package(glfw)
+  include_directories( ${glfw_INCLUDE_DIR} )
+
+  # glm
+  find_package(glm)
+  include_directories( ${glm_INCLUDE_DIR} )
+
+  # gli
+  find_package(gli)
+  include_directories( ${gli_INCLUDE_DIR} )
+endif()
+
 # g3log
 find_package( g3log REQUIRED )
 include_directories( ${g3log_INCLUDE_DIR} )
@@ -236,6 +258,15 @@ if(${PROJECT_NAME}_USE_ODE)
 else()
     remove_definitions( -DdDouble )
     remove_definitions( -DiMSTK_USE_ODE )
+endif()
+
+# Vulkan
+if(${PROJECT_NAME}_USE_Vulkan)
+  find_package( VulkanSDK )
+  include_directories( ${VulkanSDK_INCLUDE_DIR} )
+  add_definitions( -DiMSTK_USE_Vulkan )
+else()
+  remove_definitions( -DiMSTK_USE_Vulkan )
 endif()
 
 # Google Test

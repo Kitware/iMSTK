@@ -19,31 +19,40 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#ifndef imstkVulkanScreenCaptureUtility_h
+#define imstkVulkanScreenCaptureUtility_h
+
+#include "imstkScreenCaptureUtility.h"
+
+#include <string>
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+///
+/// \class VulkanScreenCaptureUtility
+///
+/// \brief Utility class to manage screen capture through Vulkan
+///
+class VulkanScreenCaptureUtility : public ScreenCaptureUtility
 {
-    m_path = path;
-    m_type = type;
-}
+public:
+    ///
+    /// \brief Constructor
+    ///
+    VulkanScreenCaptureUtility(const std::string prefix = "Screenshot-");
 
-Texture::Type
-Texture::getType() const
-{
-    return m_type;
-}
+    ///
+    /// \brief Destructor
+    ///
+    ~VulkanScreenCaptureUtility() = default;
 
-const std::string
-Texture::getPath() const
-{
-    return m_path;
-}
+    ///
+    /// \brief Saves the screenshot as a png file
+    ///
+    virtual void saveScreenShot();
 
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+protected:
+};
+} // imstk
+
+#endif // ifndef imstkScreenCaptureUtility_h

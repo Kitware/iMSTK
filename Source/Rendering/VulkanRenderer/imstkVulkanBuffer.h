@@ -19,31 +19,30 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#ifndef imstkVulkanBuffer_h
+#define imstkVulkanBuffer_h
+
+#include "vulkan/vulkan.h"
+
+#include "glm/glm.hpp"
+
+#include <vector>
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+///
+/// \class VulkanBuffer
+///
+/// \brief Abstract class for buffers
+///
+class VulkanBuffer
 {
-    m_path = path;
-    m_type = type;
+public:
+    ///
+    /// \brief Binds the buffer to memory
+    ///
+    virtual void bind(){};
+};
 }
 
-Texture::Type
-Texture::getType() const
-{
-    return m_type;
-}
-
-const std::string
-Texture::getPath() const
-{
-    return m_path;
-}
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+#endif

@@ -1,0 +1,103 @@
+/*=========================================================================
+
+   Library: iMSTK
+
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+=========================================================================*/
+
+#ifndef imstkViewer_h
+#define imstkViewer_h
+
+#include <memory>
+#include "imstkScene.h"
+#include "imstkRenderer.h"
+#include "imstkScreenCaptureUtility.h"
+
+namespace imstk
+{
+class SimulationManager;
+
+class Viewer
+{
+public:
+
+    Viewer(){};
+
+    Viewer(SimulationManager * manager){};
+
+    ///
+    /// \brief Get scene currently being rendered
+    ///
+    std::shared_ptr<Scene> getActiveScene() const;
+
+    ///
+    /// \brief Set scene to be rendered
+    ///
+    virtual void setActiveScene(std::shared_ptr<Scene>scene){};
+
+    ///
+    /// \brief Start rendering
+    ///
+    virtual void startRenderingLoop(){};
+
+    ///
+    /// \brief Terminate rendering
+    ///
+    virtual void endRenderingLoop(){};
+
+    ///
+    /// \brief Setup the current renderer to render what's needed
+    /// based on the mode chosen
+    ///
+    virtual void setRenderingMode(Renderer::Mode mode){};
+
+    ///
+    /// \brief Get the current renderer's mode
+    ///
+    virtual const Renderer::Mode getRenderingMode(){ return Renderer::Mode::EMPTY; };
+
+    ///
+    /// \brief Returns true if the Viewer is rendering
+    ///
+    const bool& isRendering() const;
+
+    ///
+    /// \brief Retrieve the renderer associated with the current scene
+    ///
+    std::shared_ptr<Renderer> getActiveRenderer() const;
+
+    ///
+    /// \brief access screen shot utility
+    ///
+    std::shared_ptr<ScreenCaptureUtility> getScreenCaptureUtility() const;
+
+    ///
+    /// \brief Set the coloring of the screen background
+    /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
+    ///
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false){};
+
+protected:
+    std::shared_ptr<Scene> m_activeScene;
+
+    std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
+    bool m_running = false;
+    std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
+};
+}
+
+#endif

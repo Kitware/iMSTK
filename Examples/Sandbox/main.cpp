@@ -218,6 +218,79 @@ void testMshAndVegaIO()
     sdk->startSimulation(true);
 }
 
+void testVTKTexture()
+{
+    // Parse command line arguments
+
+    std::string inputFilename = iMSTK_DATA_ROOT "/ETI/resources/OperatingRoom/cloth.obj";
+    std::string texturename = iMSTK_DATA_ROOT "/ETI/resources/TextureOR/cloth.jpg";
+
+    std::string inputFilename1 = iMSTK_DATA_ROOT "/ETI/resources/OperatingRoom/bed1.obj";
+    std::string texturename1 = iMSTK_DATA_ROOT "/ETI/resources/TextureOR/bed-1.jpg";
+
+    vtkSmartPointer<vtkOBJReader> reader =
+        vtkSmartPointer<vtkOBJReader>::New();
+    reader->SetFileName(inputFilename.c_str());
+    reader->Update();
+
+
+    vtkSmartPointer<vtkOBJReader> reader1 =
+        vtkSmartPointer<vtkOBJReader>::New();
+    reader1->SetFileName(inputFilename1.c_str());
+    reader1->Update();
+
+    // Visualize
+    vtkSmartPointer<vtkPolyDataMapper> mapper =
+        vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(reader->GetOutputPort());
+
+    vtkSmartPointer<vtkPolyDataMapper> mapper1 =
+        vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper1->SetInputConnection(reader1->GetOutputPort());
+
+    vtkSmartPointer<vtkActor> actor =
+        vtkSmartPointer<vtkActor>::New();
+    actor->SetMapper(mapper);
+
+    vtkSmartPointer<vtkActor> actor1 =
+        vtkSmartPointer<vtkActor>::New();
+    actor1->SetMapper(mapper1);
+
+    vtkSmartPointer<vtkJPEGReader> jpgReader =
+        vtkSmartPointer<vtkJPEGReader>::New();
+    jpgReader->SetFileName(texturename.c_str());
+    jpgReader->Update();
+    vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+    texture->SetInputConnection(jpgReader->GetOutputPort());
+    texture->InterpolateOn();
+    actor->SetTexture(texture);
+
+    vtkSmartPointer<vtkJPEGReader> jpgReader1 =
+        vtkSmartPointer<vtkJPEGReader>::New();
+    jpgReader1->SetFileName(texturename1.c_str());
+    jpgReader1->Update();
+    vtkSmartPointer<vtkTexture> texture1 = vtkSmartPointer<vtkTexture>::New();
+    texture1->SetInputConnection(jpgReader1->GetOutputPort());
+    texture1->InterpolateOn();
+    actor1->SetTexture(texture1);
+
+    vtkSmartPointer<vtkRenderer> renderer =
+        vtkSmartPointer<vtkRenderer>::New();
+    renderer->AddActor(actor);
+    renderer->AddActor(actor1);
+    renderer->SetBackground(.3, .6, .3); // Background color green
+
+    vtkSmartPointer<vtkRenderWindow> renderWindow =
+        vtkSmartPointer<vtkRenderWindow>::New();
+    renderWindow->AddRenderer(renderer);
+
+    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+        vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    renderWindowInteractor->SetRenderWindow(renderWindow);
+
+    renderWindowInteractor->Start();
+}
+
 void testMultiObjectWithTextures()
 {
     // SDK and Scene
@@ -930,7 +1003,7 @@ void testIsometricMap()
 
     // Start simulation
     sdk->setActiveScene(geometryMapTest);
-    sdk->startSimulation(VTKRenderer::Mode::DEBUG);
+    sdk->startSimulation(imstk::Renderer::Mode::DEBUG);
 }
 
 void testTetraTriangleMap()
@@ -2499,14 +2572,19 @@ void testScreenShotUtility()
     cam1->setPosition(Vec3d(-5.5, 2.5, 32));
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
+#ifndef iMSTK_USE_Vulkan
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto screenShotUtility
+        = std::dynamic_pointer_cast<VTKScreenCaptureUtility>(viewer->getScreenCaptureUtility());
     // Set up for screen shot
     sdk->getViewer()->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
     // Create a call back on key press of 'b' to take the screen shot
-    sdk->getViewer()->setOnCharFunction('b', [&](VTKInteractorStyle* c) -> bool
+    viewer->setOnCharFunction('b', [&](VTKInteractorStyle* c) -> bool
     {
-        sdk->getViewer()->getScreenCaptureUtility()->saveScreenShot();
+        screenShotUtility->saveScreenShot();
         return false;
     });
+#endif
 
     // Run
     sdk->setActiveScene(sceneTest);
@@ -3293,11 +3371,11 @@ int main()
     /*------------------
     Test physics
     ------------------*/
-    testPbdVolume();
+    //testPbdVolume();
     testPbdCloth();
     //testPbdCollision();
-    testPbdFluidBenchmarking();
-    testPbdFluid();
+    //testPbdFluidBenchmarking();
+    //testPbdFluid();
     //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();

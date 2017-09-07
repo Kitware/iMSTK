@@ -19,31 +19,36 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#ifndef imstkVulkanMemoryManager_h
+#define imstkVulkanMemoryManager_h
+
+#include "vulkan/vulkan.h"
+
+#include <vector>
+
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+class VulkanMemoryManager
 {
-    m_path = path;
-    m_type = type;
-}
+public:
+    VulkanMemoryManager();
+    void clear();
 
-Texture::Type
-Texture::getType() const
-{
-    return m_type;
-}
+    VkDeviceMemory * allocateMemory(
+        const VkMemoryRequirements& memoryRequirements,
+        uint32_t location);
 
-const std::string
-Texture::getPath() const
-{
-    return m_path;
-}
+    VkPhysicalDevice m_physicalDevice;
+    VkDevice m_device;
+    uint32_t m_queueFamilyIndex;
+    VkCommandBuffer * m_transferCommandBuffer;
+    VkQueue * m_transferQueue;
 
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+protected:
+    std::vector<VkDeviceMemory*> m_memoryAllocations;
+};
+};
+
+#endif

@@ -17,33 +17,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=========================================================================*/
+   =========================================================================*/
 
-#include "imstkTexture.h"
+#include "imstkScreenCaptureUtility.h"
+
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+unsigned int
+ScreenCaptureUtility::getScreenShotNumber() const
 {
-    m_path = path;
-    m_type = type;
+    return m_screenShotNumber;
 }
 
-Texture::Type
-Texture::getType() const
+void
+ScreenCaptureUtility::setScreenShotPrefix(const std::string newPrefix)
 {
-    return m_type;
+    if (m_screenShotPrefix.compare(newPrefix) != 0)
+    {
+        m_screenShotPrefix = newPrefix;
+        m_screenShotNumber = 0;
+    }
 }
 
-const std::string
-Texture::getPath() const
+void
+ScreenCaptureUtility::resetScreenShotNumber()
 {
-    return m_path;
+    m_screenShotNumber = 0;
 }
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+} // imstk

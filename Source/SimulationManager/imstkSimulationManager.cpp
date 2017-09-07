@@ -27,8 +27,20 @@
 
 namespace imstk
 {
-const SimulationStatus&
-SimulationManager::getStatus() const
+SimulationManager::SimulationManager()
+{
+    // Init g3logger
+    m_logUtil->createLogger("simulation", "./");
+
+#ifdef iMSTK_USE_Vulkan
+    m_viewer = std::make_shared<VulkanViewer>(this);
+#else
+    m_viewer = std::make_shared<VTKViewer>(this);
+#endif
+}
+
+const
+SimulationStatus& SimulationManager::getStatus() const
 {
     return m_status;
 }
@@ -198,7 +210,7 @@ SimulationManager::removeModule(const std::string& moduleName)
     LOG(INFO) << "Module removed: " << moduleName;
 }
 
-std::shared_ptr<VTKViewer>
+std::shared_ptr<Viewer>
 SimulationManager::getViewer() const
 {
     return m_viewer;
@@ -244,14 +256,14 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
     // render scene in debug, update current scene, and return
     if (m_status == SimulationStatus::INACTIVE)
     {
-        m_viewer->setRenderingMode(VTKRenderer::Mode::DEBUG);
+        m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
         m_activeSceneName = newSceneName;
         return;
     }
 
     // If rendering and simulation active:
     // render scene in simulation mode, and update simulation
-    m_viewer->setRenderingMode(VTKRenderer::Mode::SIMULATION);
+    m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
 
     // Stop/Pause running scene
     auto oldSceneManager = m_sceneManagerMap.at(m_activeSceneName);
@@ -363,7 +375,7 @@ SimulationManager::startSimulation(const bool startSimulationPaused /*= true*/,
 void
 SimulationManager::startViewer(const bool debug /*= true*/)
 {
-    m_viewer->setRenderingMode(debug ? VTKRenderer::Mode::DEBUG : VTKRenderer::Mode::SIMULATION);
+    m_viewer->setRenderingMode(debug ? Renderer::Mode::DEBUG : Renderer::Mode::SIMULATION);
 
     // Start Rendering
     if (!m_viewer->isRendering())
@@ -476,7 +488,7 @@ SimulationManager::endSimulation()
     }
 
     // Update Renderer
-    m_viewer->setRenderingMode(VTKRenderer::Mode::DEBUG);
+    m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
 
     // End modules
     for(const auto& pair : m_modulesMap)

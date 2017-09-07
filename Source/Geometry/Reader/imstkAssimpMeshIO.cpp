@@ -80,6 +80,7 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
 
     // Vertex positions
     StdVectorOfVec3d positions(numVertices);
+
     for (unsigned int i = 0; i < numVertices; i++)
     {
         auto positionX = importedMesh->mVertices[i].x;
@@ -90,6 +91,7 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
 
     // Triangles
     std::vector<SurfaceMesh::TriangleArray> triangles(numTriangles);
+
     for (unsigned int i = 0; i < numTriangles; i++)
     {
         auto triangle = importedMesh->mFaces[i];
@@ -152,7 +154,6 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
         mesh->setDefaultTCoords("tCoords");
         mesh->setPointDataArray("tCoords",UVs);
     }
-
     return mesh;
 }
 }

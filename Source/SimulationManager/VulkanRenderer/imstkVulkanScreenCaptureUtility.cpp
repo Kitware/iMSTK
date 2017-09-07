@@ -19,31 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#include "imstkVulkanScreenCaptureUtility.h"
+
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+VulkanScreenCaptureUtility::VulkanScreenCaptureUtility(const std::string prefix /*= "Screenshot-"*/)
 {
-    m_path = path;
-    m_type = type;
+    m_screenShotNumber = 0;
+    m_screenShotPrefix = prefix;
 }
 
-Texture::Type
-Texture::getType() const
+void
+VulkanScreenCaptureUtility::saveScreenShot()
 {
-    return m_type;
-}
+    LOG(WARNING) << "Screen capture not supported\n";
 
-const std::string
-Texture::getPath() const
-{
-    return m_path;
+    m_screenShotNumber++;
 }
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+} // imstk

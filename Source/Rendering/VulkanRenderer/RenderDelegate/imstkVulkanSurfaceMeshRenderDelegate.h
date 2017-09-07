@@ -19,31 +19,47 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#ifndef imstkVulkanSurfaceMeshRenderDelegate_h
+#define imstkVulkanSurfaceMeshRenderDelegate_h
+
+#include "imstkSurfaceMesh.h"
+
+#include "imstkVulkanRenderDelegate.h"
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
-{
-    m_path = path;
-    m_type = type;
+class VulkanSurfaceMeshRenderDelegate : public VulkanRenderDelegate {
+public:
+
+    ///
+    /// \brief Default destructor
+    ///
+    ~VulkanSurfaceMeshRenderDelegate() = default;
+
+    ///
+    /// \brief Default constructor
+    ///
+    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager);
+
+    ///
+    /// \brief Update render geometry
+    ///
+    void update() override;
+
+    ///
+    /// \brief Get source geometry
+    ///
+    std::shared_ptr<Geometry> getGeometry() const override;
+
+
+    ///
+    /// \brief Fill vertex buffer
+    ///
+    void updateVertexBuffer();
+
+protected:
+    std::shared_ptr<SurfaceMesh> m_geometry;
+};
 }
 
-Texture::Type
-Texture::getType() const
-{
-    return m_type;
-}
-
-const std::string
-Texture::getPath() const
-{
-    return m_path;
-}
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-}
+#endif

@@ -19,31 +19,25 @@
 
 =========================================================================*/
 
-#include "imstkTexture.h"
+#include "imstkRenderer.h"
 
 namespace imstk
 {
-Texture::Texture(std::string path, Type type)
+std::shared_ptr<Renderer>
+Renderer::getRenderer()
 {
-    m_path = path;
-    m_type = type;
+    return nullptr;
 }
 
-Texture::Type
-Texture::getType() const
+void
+Renderer::setMode(Renderer::Mode mode)
 {
-    return m_type;
+    m_currentMode = mode;
 }
 
-const std::string
-Texture::getPath() const
+const Renderer::Mode&
+Renderer::getMode()
 {
-    return m_path;
-}
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
+    return m_currentMode;
 }
 }

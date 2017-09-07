@@ -27,12 +27,17 @@
 #include <thread>
 #include <memory>
 
-#include "imstkVTKRenderer.h"
 #include "imstkScene.h"
 #include "imstkModule.h"
 #include "imstkSceneManager.h"
-#include "imstkVTKViewer.h"
 #include "imstkLogUtility.h"
+#include "imstkViewer.h"
+
+#ifdef iMSTK_USE_Vulkan
+#include "imstkVulkanViewer.h"
+#else
+#include "imstkVTKViewer.h"
+#endif
 
 namespace imstk
 {
@@ -49,11 +54,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SimulationManager()
-    {
-        // Init g3logger
-        m_logUtil->createLogger("simulation", "./");
-    }
+    SimulationManager();
 
     ///
     /// \brief Default destructor
@@ -131,10 +132,8 @@ public:
     ///
     void removeModule(const std::string& moduleName);
 
-    ///
-    /// \brief Returns the vtk viewer
-    ///
-    std::shared_ptr<VTKViewer> getViewer() const;
+    // Viewer
+    std::shared_ptr<Viewer> getViewer() const;
 
     // Simulation
 
@@ -202,7 +201,7 @@ private:
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
-    std::shared_ptr<VTKViewer> m_viewer = std::make_shared<VTKViewer>(this);
+    std::shared_ptr<Viewer> m_viewer;
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
 } // imstk

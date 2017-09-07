@@ -122,7 +122,7 @@ VTKRenderer::getVtkRenderer() const
 }
 
 void
-VTKRenderer::setMode(Mode mode)
+VTKRenderer::setMode(Renderer::Mode mode)
 {
     if( mode == Mode::EMPTY && m_currentMode != Mode::EMPTY )
     {
@@ -172,12 +172,6 @@ VTKRenderer::setMode(Mode mode)
     }
 
     m_currentMode = mode;
-}
-
-const VTKRenderer::Mode&
-VTKRenderer::getMode()
-{
-    return m_currentMode;
 }
 
 void
