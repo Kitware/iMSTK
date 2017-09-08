@@ -28,6 +28,7 @@
 #include "imstkMath.h"
 #include "imstkTextureManager.h"
 #include "imstkVTKTextureDelegate.h"
+#include "imstkRenderer.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderer.h"
@@ -46,19 +47,9 @@ class VTKRenderDelegate;
 ///
 /// \brief
 ///
-class VTKRenderer
+class VTKRenderer : public Renderer
 {
 public:
-    ///
-    /// \brief Enumerations for the render mode
-    ///
-    enum Mode
-    {
-        EMPTY,
-        DEBUG,
-        SIMULATION
-    };
-
     ///
     /// \brief Constructor
     ///
@@ -73,8 +64,7 @@ public:
     /// \brief Set/Get the rendering mode which defined the
     /// visibility of the renderer actors and the default camera
     ///
-    void setMode(Mode mode);
-    const Mode& getMode();
+    virtual void setMode(Mode mode);
 
     ///
     /// \brief
@@ -94,7 +84,7 @@ public:
     ///
     /// \brief Update background colors
     ///
-    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
+    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
 protected:
     ///
@@ -115,8 +105,6 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
 
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
-
-    Mode m_currentMode = Mode::EMPTY;
 
     TextureManager<VTKTextureDelegate> m_textureManager;
 };

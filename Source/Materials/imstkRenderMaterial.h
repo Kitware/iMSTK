@@ -56,6 +56,12 @@ public:
     void setDisplayMode(const DisplayMode displayMode);
 
     ///
+    /// \brief Get/Set tessellated
+    ///
+    bool getTessellated() const;
+    void setTessellated(const bool tessellated);
+
+    ///
     /// \brief Get/Set line width or the wireframe
     ///
     float getLineWidth() const;
@@ -129,6 +135,7 @@ protected:
 
     // State
     DisplayMode m_displayMode = DisplayMode::SURFACE;
+    bool m_tessellated = false;
     float m_lineWidth = 1.0;
     float m_pointSize = 1.0;
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false

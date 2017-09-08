@@ -1,46 +1,111 @@
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
+
+set(VTK_H_FILES
+    VTKRenderer/imstkVTKRenderer.h
+    VTKRenderer/imstkVTKTextureDelegate.h
+    VTKRenderer/imstkVTKCustomPolyDataMapper.h
+    VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKSphereRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKCapsuleRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKCylinderRenderDelegate.h
+    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h)
+
+set(VTK_CPP_FILES
+    VTKRenderer/imstkVTKRenderer.cpp
+    VTKRenderer/imstkVTKTextureDelegate.cpp
+    VTKRenderer/imstkVTKCustomPolyDataMapper.cpp
+    VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKSphereRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKCapsuleRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKCylinderRenderDelegate.cpp
+    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.cpp)
+
+set(VULKAN_H_FILES
+    VulkanRenderer/imstkVulkanRenderer.h
+    VulkanRenderer/RenderDelegate/imstkVulkanCapsuleRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanCubeRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanPlaneRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanSphereRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanSurfaceMeshRenderDelegate.h
+    VulkanRenderer/imstkVulkanMaterialDelegate.h
+    VulkanRenderer/imstkVulkanTextureDelegate.h
+    VulkanRenderer/imstkVulkanMemoryManager.h
+    VulkanRenderer/imstkVulkanValidation.h
+    VulkanRenderer/imstkVulkanBuffer.h
+    VulkanRenderer/imstkVulkanUniformBuffer.h
+    VulkanRenderer/imstkVulkanVertexBuffer.h
+    VulkanRenderer/imstkVulkanFramebuffer.h
+    VulkanRenderer/PostProcessing/imstkVulkanPostProcess.h
+    VulkanRenderer/PostProcessing/imstkVulkanPostProcessingChain.h)
+
+set(VULKAN_CPP_FILES
+    VulkanRenderer/imstkVulkanRenderer.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanCapsuleRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanCubeRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanPlaneRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanSphereRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanSurfaceMeshRenderDelegate.cpp
+    VulkanRenderer/imstkVulkanMaterialDelegate.cpp
+    VulkanRenderer/imstkVulkanTextureDelegate.cpp
+    VulkanRenderer/imstkVulkanMemoryManager.cpp
+    VulkanRenderer/imstkVulkanUniformBuffer.cpp
+    VulkanRenderer/imstkVulkanVertexBuffer.cpp
+    VulkanRenderer/imstkVulkanFramebuffer.cpp
+    VulkanRenderer/PostProcessing/imstkVulkanPostProcess.cpp
+    VulkanRenderer/PostProcessing/imstkVulkanPostProcessingChain.cpp)
+
+if( NOT iMSTK_USE_Vulkan )
+  set(RENDERING_H_FILES ${VTK_H_FILES})
+  set(RENDERING_CPP_FILES ${VTK_CPP_FILES})
+  set(RENDERING_SUBDIR
+    VTKRenderer
+    VTKRenderer/RenderDelegate)
+  set(RENDERING_DEPENDENCIES)
+else()
+  set(RENDERING_H_FILES ${VULKAN_H_FILES})
+  set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
+  set(RENDERING_SUBDIR
+    VulkanRenderer
+    VulkanRenderer/RenderDelegate
+    VulkanRenderer/PostProcessing)
+  set(RENDERING_DEPENDENCIES
+    ${VulkanSDK_LIBRARIES}
+    glfw
+    glm
+    gli)
+endif()
+
 include(imstkAddLibrary)
 imstk_add_library( Rendering
   H_FILES
-    imstkVTKRenderer.h
-    imstkVTKTextureDelegate.h
-    imstkVTKCustomPolyDataMapper.h
-    RenderDelegate/imstkVTKCubeRenderDelegate.h
-    RenderDelegate/imstkVTKLineMeshRenderDelegate.h
-    RenderDelegate/imstkVTKPlaneRenderDelegate.h
-    RenderDelegate/imstkVTKCylinderRenderDelegate.h
-    RenderDelegate/imstkVTKCapsuleRenderDelegate.h
-    RenderDelegate/imstkVTKRenderDelegate.h
-    RenderDelegate/imstkVTKSphereRenderDelegate.h
-    RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.h
-    RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
-    RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.h
-    RenderDelegate/imstkVTKPointSetRenderDelegate.h
-    RenderDelegate/vtkCapsuleSource.h
-
+    imstkRenderer.h
+    ${RENDERING_H_FILES}
+    vtkCapsuleSource.h
   CPP_FILES
-    imstkVTKRenderer.cpp
-    imstkVTKTextureDelegate.cpp
-    imstkVTKCustomPolyDataMapper.cpp
-    RenderDelegate/imstkVTKCubeRenderDelegate.cpp
-    RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
-    RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
-    RenderDelegate/imstkVTKCylinderRenderDelegate.cpp
-    RenderDelegate/imstkVTKCapsuleRenderDelegate.cpp
-    RenderDelegate/imstkVTKRenderDelegate.cpp
-    RenderDelegate/imstkVTKSphereRenderDelegate.cpp
-    RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.cpp
-    RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
-    RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.cpp
-    RenderDelegate/imstkVTKPointSetRenderDelegate.cpp
-    RenderDelegate/vtkCapsuleSource.cpp
-
+    imstkRenderer.cpp
+    ${RENDERING_CPP_FILES}
+    vtkCapsuleSource.cpp
   SUBDIR_LIST
-    RenderDelegate
+    ${RENDERING_SUBDIR}
   DEPENDS
     ${VTK_LIBRARIES}
+    ${RENDERING_DEPENDENCIES}
     Scene
   #VERBOSE
   )

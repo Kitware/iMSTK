@@ -30,9 +30,6 @@ namespace imstk
 ///
 /// \class Texture
 ///
-/// \brief iMSTK texture class. There are a few texture types that
-///     dictate how texture are to be treated.
-///
 class Texture
 {
 public:
@@ -46,9 +43,12 @@ public:
         SPECULAR,
         ROUGHNESS,
         METALNESS,
+        SUBSURFACE_SCATTERING,
         AMBIENT_OCCLUSION,
         CAVITY,
         CUBEMAP,
+        IRRADIANCE_CUBEMAP,
+        RADIANCE_CUBEMAP,
         NONE
     };
 
@@ -74,10 +74,17 @@ public:
     ///
     const std::string getPath() const;
 
-protected:
+    ///
+    /// \brief Get type
+    ///
+    bool getMipmapsEnabled();
 
+protected:
     Type m_type;            ///< Texture type
     std::string m_path;     ///< Texture file path
+
+    // Helps with texture aliasing (and a little with performance)
+    bool m_mipmapsEnabled = true;
 };
 }
 

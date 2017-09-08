@@ -21,33 +21,25 @@
 
 #include "imstkVTKViewer.h"
 
-#include "g3log/g3log.hpp"
-
 #include "imstkVTKRenderDelegate.h"
 
 namespace imstk
 {
-std::shared_ptr<Scene>
-VTKViewer::getActiveScene() const
-{
-    return m_activeScene;
-}
-
 void
-VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
+VTKViewer::setActiveScene(std::shared_ptr<Scene>scene)
 {
     // If already current scene
-    if( scene == m_activeScene )
+    if (scene == m_activeScene)
     {
         LOG(WARNING) << scene->getName() << " already is the viewer current scene.";
         return;
     }
 
     // If the current scene has a renderer, remove it
-    if( m_activeScene )
+    if (m_activeScene)
     {
-        auto vtkRenderer = this->getActiveRenderer()->getVtkRenderer();
-        if(m_vtkRenderWindow->HasRenderer(vtkRenderer))
+        auto vtkRenderer = std::dynamic_pointer_cast<VTKRenderer>(this->getActiveRenderer())->getVtkRenderer();
+        if (m_vtkRenderWindow->HasRenderer(vtkRenderer))
         {
             m_vtkRenderWindow->RemoveRenderer(vtkRenderer);
         }
@@ -62,26 +54,23 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
         m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene);
     }
 
+    // Cast to VTK renderer
+    auto vtkRenderer = std::dynamic_pointer_cast<VTKRenderer>(this->getActiveRenderer())->getVtkRenderer();
+
     // Set renderer to renderWindow
-    m_vtkRenderWindow->AddRenderer(this->getActiveRenderer()->getVtkRenderer());
+    m_vtkRenderWindow->AddRenderer(vtkRenderer);
 
     // Set renderer to interactorStyle
-    m_interactorStyle->SetCurrentRenderer(this->getActiveRenderer()->getVtkRenderer());
+    m_interactorStyle->SetCurrentRenderer(vtkRenderer);
 
     // Set name to renderWindow
     m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
 }
 
-std::shared_ptr<VTKRenderer>
-VTKViewer::getActiveRenderer() const
-{
-    return m_rendererMap.at(m_activeScene);
-}
-
 void
-VTKViewer::setRenderingMode(const VTKRenderer::Mode mode)
+VTKViewer::setRenderingMode(Renderer::Mode mode)
 {
-    if( !m_activeScene )
+    if (!m_activeScene)
     {
         LOG(WARNING) << "Missing scene, can not set rendering mode.\n"
                      << "Use Viewer::setCurrentScene to setup scene.";
@@ -90,7 +79,7 @@ VTKViewer::setRenderingMode(const VTKRenderer::Mode mode)
 
     // Setup renderer
     this->getActiveRenderer()->setMode(mode);
-    if( !m_running )
+    if (!m_running)
     {
         return;
     }
@@ -99,8 +88,9 @@ VTKViewer::setRenderingMode(const VTKRenderer::Mode mode)
     m_vtkRenderWindow->Render();
 
     // Setup render window
-    if (mode == VTKRenderer::Mode::SIMULATION)
+    if (mode == Renderer::Mode::SIMULATION)
     {
+        m_interactorStyle->HighlightProp(nullptr);
         m_vtkRenderWindow->HideCursor();
         //m_vtkRenderWindow->BordersOff();
         //m_vtkRenderWindow->FullScreenOn(1);
@@ -113,7 +103,7 @@ VTKViewer::setRenderingMode(const VTKRenderer::Mode mode)
     }
 }
 
-const VTKRenderer::Mode&
+const Renderer::Mode
 VTKViewer::getRenderingMode()
 {
     return this->getActiveRenderer()->getMode();
@@ -123,11 +113,10 @@ void
 VTKViewer::startRenderingLoop()
 {
     m_running = true;
-    auto interactor = m_vtkRenderWindow->GetInteractor();
-    interactor->Initialize();
-    interactor->CreateOneShotTimer(0);
-    interactor->Start();
-    interactor->DestroyTimer();
+    m_vtkRenderWindow->GetInteractor()->Initialize();
+    m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
+    m_vtkRenderWindow->GetInteractor()->Start();
+    m_vtkRenderWindow->GetInteractor()->DestroyTimer();
     m_running = false;
 }
 
@@ -147,12 +136,6 @@ VTKViewer::getVtkRenderWindow() const
     return m_vtkRenderWindow;
 }
 
-bool
-VTKViewer::isRendering() const
-{
-    return m_running;
-}
-
 double
 VTKViewer::getTargetFrameRate() const
 {
@@ -166,7 +149,7 @@ VTKViewer::getTargetFrameRate() const
 }
 
 void
-VTKViewer::setTargetFrameRate(const double fps)
+VTKViewer::setTargetFrameRate(const double& fps)
 {
     if(fps < 0)
     {
@@ -252,7 +235,7 @@ VTKViewer::setOnTimerFunction(VTKEventHandlerFunction func)
 std::shared_ptr<VTKScreenCaptureUtility>
 VTKViewer::getScreenCaptureUtility() const
 {
-    return m_screenCapturer;
+    return std::static_pointer_cast<VTKScreenCaptureUtility>(m_screenCapturer);
 }
 
 void

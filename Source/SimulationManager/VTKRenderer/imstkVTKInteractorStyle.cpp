@@ -71,11 +71,13 @@ VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
 void
 VTKInteractorStyle::OnTimer()
 {
+    auto renderer = std::static_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer());
+
     // Update Camera
-    m_simManager->getViewer()->getActiveRenderer()->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
+    renderer->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
 
     // Update render delegates
-    m_simManager->getViewer()->getActiveRenderer()->updateRenderDelegates();
+    renderer->updateRenderDelegates();
 
     // Reset camera clipping range
     this->CurrentRenderer->ResetCameraClippingRange();
@@ -160,13 +162,13 @@ VTKInteractorStyle::OnChar()
     }
     else if (key == 'd' || key == 'D') // switch rendering mode
     {
-        if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::SIMULATION)
+        if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::SIMULATION)
         {
-            m_simManager->getViewer()->setRenderingMode(VTKRenderer::Mode::SIMULATION);
+            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::SIMULATION);
         }
         else
         {
-            m_simManager->getViewer()->setRenderingMode(VTKRenderer::Mode::DEBUG);
+            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::DEBUG);
         }
     }
     else if (key == '\u001B') // quit viewer
@@ -197,7 +199,7 @@ VTKInteractorStyle::OnMouseMove()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -218,7 +220,7 @@ VTKInteractorStyle::OnLeftButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -239,7 +241,7 @@ VTKInteractorStyle::OnLeftButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -260,7 +262,7 @@ VTKInteractorStyle::OnMiddleButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -281,7 +283,7 @@ VTKInteractorStyle::OnMiddleButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -302,7 +304,7 @@ VTKInteractorStyle::OnRightButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -323,7 +325,7 @@ VTKInteractorStyle::OnRightButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -344,7 +346,7 @@ VTKInteractorStyle::OnMouseWheelForward()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -365,7 +367,7 @@ VTKInteractorStyle::OnMouseWheelBackward()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }

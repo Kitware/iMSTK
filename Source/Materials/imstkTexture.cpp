@@ -40,4 +40,10 @@ Texture::getPath() const
 {
     return m_path;
 }
+
+bool
+Texture::getMipmapsEnabled()
+{
+    return m_mipmapsEnabled;
+}
 }
