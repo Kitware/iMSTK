@@ -47,6 +47,8 @@ VulkanRenderer::initialize()
     m_creationInfo.enabledExtensionCount = (uint32_t)m_extensions.size();
     m_creationInfo.ppEnabledExtensionNames = &m_extensions[0];
 
+    std::cout << "\n" << "Vulkan Renderer Information:" << std::endl;
+
     for (int i = 0; i < m_extensions.size(); i++)
     {
         std::cout << "Enabled extension: " << m_creationInfo.ppEnabledExtensionNames[i] << std::endl;

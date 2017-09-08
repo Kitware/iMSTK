@@ -91,6 +91,11 @@ To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geom
   2. Configure your CMake project with the variable `iMSTK_USE_OMNI` set to `ON`.
   3. After configuration, the CMake variable `OPENHAPTICS_ROOT_DIR` should be set to the OpenHaptics path on your system.
 
+* ##### Vulkan Renderer
+To use the Vulkan renderer, follow these steps:
+  * Download the [VulkanSDK](https://vulkan.lunarg.com/).
+  * Download your GPU vendor's latest drivers.
+  * Enable the `iMSTK_USE_Vulkan` option in CMake.
 
 ## Using iMSTK in your application
 *Coming soon*
