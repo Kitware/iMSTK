@@ -97,8 +97,12 @@
 #include <string>
 #include <vtkJPEGReader.h>
 
+#ifdef iMSTK_AUDIO_ENABLED
+
 // Audio
 #include <SFML/Audio.hpp>
+
+#endif
 
 // global variables
 const std::string phantomOmni1Name = "Phantom1";
@@ -3340,6 +3344,7 @@ void testRigidBody()
 // Example modified from SFML/Examples
 void testSound(const std::string& filename)
 {
+#ifdef iMSTK_AUDIO_ENABLED
     // Load a sound buffer from a .wav file
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename))
@@ -3378,11 +3383,15 @@ void testSound(const std::string& filename)
         std::cout << std::flush;
     }
     std::cout << "\n" << std::endl;
+#else
+    LOG(INFO) << "testSound: Audio is supported only on windows!";
+#endif
 }
 
 // Example modified from SFML/Examples
 void playMusic(const std::string& filename)
 {
+#ifdef iMSTK_AUDIO_ENABLED
     // Load an ogg music file
     sf::Music music;
     if (!music.openFromFile(filename))
@@ -3411,6 +3420,9 @@ void playMusic(const std::string& filename)
         std::cout << std::flush;
     }
     std::cout << "\n" << std::endl;
+#else
+    LOG(INFO) << "playMusic: Audio is supported only on windows!";
+#endif
 }
 
 void testAudio()
@@ -3463,7 +3475,7 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    testPbdCloth();
+    //testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
