@@ -9,12 +9,6 @@ if(NOT GIT_EXECUTABLE)
   find_package(Git REQUIRED)
 endif()
 
-option(${PROJECT_NAME}_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http instead." ON)
-set(git_protocol "git")
-if(NOT ${PROJECT_NAME}_USE_GIT_PROTOCOL)
-  set(git_protocol "http")
-endif()
-
 #-----------------------------------------------------------------------------
 # Output Directories
 #-----------------------------------------------------------------------------
