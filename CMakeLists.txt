@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
 project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
+if(UNIX AND NOT APPLE)
+  set(LINUX TRUE)
+endif()
+  
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
 #-----------------------------------------------------------------------------
@@ -110,6 +114,14 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(VTK)
   imstk_define_dependency(VRPN)
   imstk_define_dependency(LibNiFalcon)
+
+  if(APPLE OR LINUX)
+   message("Warning: Building iMSTK WITHOUT audio support!")
+   set(${PROJECT_NAME}_AUDIO_ENABLED OFF)    
+  else()
+   set(${PROJECT_NAME}_AUDIO_ENABLED "Windows OS detected: Building iMSTK with AUDIO support." ON)  
+    imstk_define_dependency(SFML)  
+  endif()
 
   option(${PROJECT_NAME}_USE_ODE "Build iMSTK with ODE support." OFF)
   if(${PROJECT_NAME}_USE_ODE)
@@ -267,6 +279,14 @@ if(${PROJECT_NAME}_USE_Vulkan)
   add_definitions( -DiMSTK_USE_Vulkan )
 else()
   remove_definitions( -DiMSTK_USE_Vulkan )
+endif()
+
+# SFML
+if(APPLE OR LINUX)
+  remove_definitions( -DiMSTK_AUDIO_ENABLED )
+else()
+  find_package( SFML REQUIRED )
+  add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()
 
 # Google Test

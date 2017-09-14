@@ -26,10 +26,15 @@ add_executable(${PROJECT_NAME} main.cpp)
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}
+if(UNIX)
+  target_link_libraries(${PROJECT_NAME}
+  SimulationManager)     
+else()
+  target_link_libraries(${PROJECT_NAME}
   SimulationManager
-)
-
+  SFML) 
+endif()
+  
 #-----------------------------------------------------------------------------
 # Associate external data
 #-----------------------------------------------------------------------------
@@ -48,6 +53,7 @@ list(APPEND FILE_LIST
     spheres/,REGEX:.*
     spring/,REGEX:.*
     tetBeads/,REGEX:.*
+    sound/,REGEX:.*
     textured_organs/,REGEX:.*
     textured_organs/texture_set_1/,REGEX:.*
     textured_organs/texture_set_2/,REGEX:.*
