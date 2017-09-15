@@ -145,6 +145,36 @@ SceneManager::runModule()
     {
         controller->setTrackerToOutOfDate();
     }
+<<<<<<< HEAD
+=======
+
+    auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+
+    // Update time step size of the dynamic objects
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (obj->getType() == SceneObject::Type::Pbd)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                }
+            }
+        }
+        else if (obj->getType() == SceneObject::Type::FEMDeformable)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                }
+            }
+        }
+    }
+>>>>>>> 2decf6e... initial
 }
 
 void

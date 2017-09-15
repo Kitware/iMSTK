@@ -167,11 +167,18 @@ public:
     /// \brief Set the time step size
     ///
     void setTimeStep(const double timeStep) { m_dt = timeStep; };
+    void setDefaultTimeStep(const double timeStep) { m_DefaultDt = timeStep; };
+
+    ///
+    /// \brief Set the time step size to fixed size
+    ///
+    void setTimeStepSizeType(const TimeSteppingType type) override;
 
     ///
     /// \brief Returns the time step size
     ///
     double getTimeStep() const { return m_dt; };
+    double getDefaultTimeStep() const { return m_DefaultDt; };
 
     ///
     /// \brief Set the gravity
@@ -250,6 +257,7 @@ protected:
     double m_proximity;                     ///> Proximity for collisions
 
     double m_dt;                            ///> Time step size
+    double m_DefaultDt;                     ///> Default Time step size
 };
 } // imstk
 

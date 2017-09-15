@@ -42,6 +42,15 @@ enum class DynamicalModelType
 };
 
 ///
+/// \brief Type of the update of the state of the body
+///
+enum class TimeSteppingType
+{
+    realTime,
+    fixed
+};
+
+///
 /// \class DynamicalModel
 ///
 /// \brief Base class for mathematical model of the physics governing the dynamic object
@@ -62,6 +71,7 @@ public:
         deltaVelocity,
         none
     };
+
 
 public:
     ///
@@ -120,9 +130,25 @@ public:
     virtual void updatePhysicsGeometry(){};
 
     ///
+    /// \brief Set the time step size
+    ///
+    virtual void setTimeStep(const double timeStep) = 0;
+
+    ///
+    /// \brief Returns the time step size
+    ///
+    virtual double getTimeStep() const = 0;
+
+    ///
     /// \brief Initialize the dynamical model
     ///
     virtual bool initialize() = 0;
+
+    ///
+    /// \brief Set the type of approach used to update the time step size after every frame
+    ///
+    virtual void setTimeStepSizeType(const TimeSteppingType type){ m_timeStepSizeType = type; }
+    TimeSteppingType getTimeStepSizeType(){ return m_timeStepSizeType; }
 
 protected:
 
@@ -134,6 +160,8 @@ protected:
     std::shared_ptr<StateType> m_previousState;     ///> Previous state
 
     std::size_t m_numDOF; ///> Total number of degree of freedom
+
+    TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
 };
 } // imstk
 
