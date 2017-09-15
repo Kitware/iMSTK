@@ -28,6 +28,7 @@
 #include "imstkDeformableObject.h"
 #include "imstkVirtualCouplingPBDObject.h"
 #include "imstkGeometryMap.h"
+#include "imstkTimer.h"
 
 #include "g3log/g3log.hpp"
 
@@ -61,6 +62,10 @@ SceneManager::initModule()
 void
 SceneManager::runModule()
 {
+    StopWatch wwt;
+
+    wwt.start();
+
     // Reset Contact forces to 0
     for (auto obj : m_scene->getSceneObjects())
     {
@@ -145,8 +150,6 @@ SceneManager::runModule()
     {
         controller->setTrackerToOutOfDate();
     }
-<<<<<<< HEAD
-=======
 
     auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
 
@@ -174,7 +177,6 @@ SceneManager::runModule()
             }
         }
     }
->>>>>>> 2decf6e... initial
 }
 
 void
