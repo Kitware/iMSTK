@@ -28,6 +28,7 @@
 #include "imstkDeformableObject.h"
 #include "imstkVirtualCouplingPBDObject.h"
 #include "imstkGeometryMap.h"
+#include "imstkTimer.h"
 
 #include "g3log/g3log.hpp"
 
@@ -61,6 +62,10 @@ SceneManager::initModule()
 void
 SceneManager::runModule()
 {
+    StopWatch wwt;
+
+    wwt.start();
+
     // Reset Contact forces to 0
     for (auto obj : m_scene->getSceneObjects())
     {
@@ -144,6 +149,33 @@ SceneManager::runModule()
     for (auto controller : m_scene->getSceneObjectControllers())
     {
         controller->setTrackerToOutOfDate();
+    }
+
+    auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+
+    // Update time step size of the dynamic objects
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (obj->getType() == SceneObject::Type::Pbd)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                }
+            }
+        }
+        else if (obj->getType() == SceneObject::Type::FEMDeformable)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                }
+            }
+        }
     }
 }
 

@@ -233,6 +233,21 @@ public:
     ///
     std::vector<std::size_t>& getFixNodeIds() { return m_fixedNodeIds; }
 
+    ///
+    /// \brief Set the time step size
+    ///
+    virtual void setTimeStep(const double timeStep) { m_timeIntegrator->setTimestepSize(timeStep); };
+
+    ///
+    /// \brief Returns the time step size
+    ///
+    virtual double getTimeStep() const { return m_timeIntegrator->getTimestepSize(); };
+
+    ///
+    /// \brief Set the time step size to fixed size
+    ///
+    void setFixedSizeTimeStepping();
+
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator

@@ -69,6 +69,7 @@ PbdModel::configure(const int nCons, ...)
         this->setGravity(g);
 
         this->setTimeStep(va_arg(args, double));
+        this->setDefaultTimeStep(m_dt);
 
         char *s = va_arg(args, char*);
         if (strlen(s) > 0)
@@ -609,6 +610,16 @@ void
 PbdModel::updatePbdStateFromPhysicsGeometry()
 {
     m_currentState->setPositions(m_mesh->getVertexPositions());
+}
+
+void
+PbdModel::setTimeStepSizeType(const TimeSteppingType type)
+{
+    m_timeStepSizeType = type;
+    if (type == TimeSteppingType::fixed)
+    {
+        m_dt = m_DefaultDt;
+    }
 }
 
 void

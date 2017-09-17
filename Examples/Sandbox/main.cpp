@@ -1279,6 +1279,7 @@ void testDeformableBody()
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
     //dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+    dynaModel->setTimeStepSizeType(TimeSteppingType::realTime);
     //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
     dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
@@ -3479,7 +3480,7 @@ int main()
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
-    //testDeformableBody();
+    testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();
@@ -3505,7 +3506,7 @@ int main()
     /*------------------
     Test Misc.
     ------------------*/
-    testAudio();
+    //testAudio();
     //testScenesManagement();
     //testVectorPlotters();
     //testVirtualCoupling();

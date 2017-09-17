@@ -673,4 +673,11 @@ FEMDeformableBodyModel::getContactForce()
 {
     return m_Fcontact;
 }
+
+void
+FEMDeformableBodyModel::setFixedSizeTimeStepping()
+{
+    m_timeStepSizeType = TimeSteppingType::fixed;
+    m_timeIntegrator->setTimestepSizeToDefault();
+}
 } // imstk
