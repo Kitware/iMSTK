@@ -180,12 +180,6 @@ public:
     const StdVectorOfVec3d& getVertexTangents() const;
 
     ///
-    /// \brief Set/Get vector of bitangents of all the vertices
-    ///
-    void setVertexBitangents(const StdVectorOfVec3d& bitangents);
-    const StdVectorOfVec3d& getVertexBitangents() const;
-
-    ///
     /// \brief Returns the number of triangles
     ///
     size_t getNumTriangles() const;
@@ -211,6 +205,17 @@ public:
     ///
     void computeUVSeamVertexGroups();
 
+    ///
+    /// \brief Set load factor
+    /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
+    ///
+    virtual void setLoadFactor(double loadFactor);
+
+    ///
+    /// \brief Get the maximum number of triangles
+    ///
+    size_t getMaxNumTriangles();
+
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;
@@ -233,6 +238,10 @@ protected:
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default material coordinates
+
+    size_t m_originalNumTriangles = 0;
+    size_t m_maxNumTriangles = 0;
+
 };
 } // imstk
 

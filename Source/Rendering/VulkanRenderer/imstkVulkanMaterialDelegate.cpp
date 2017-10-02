@@ -233,7 +233,7 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     m_pipelineComponents.vertexBindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     // Vertex Attributes
-    m_pipelineComponents.vertexAttributeDescription.resize(5);
+    m_pipelineComponents.vertexAttributeDescription.resize(4);
 
     m_pipelineComponents.vertexAttributeDescription[0].location = 0;
     m_pipelineComponents.vertexAttributeDescription[0].binding = 0;
@@ -252,13 +252,8 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
 
     m_pipelineComponents.vertexAttributeDescription[3].location = 3;
     m_pipelineComponents.vertexAttributeDescription[3].binding = 0;
-    m_pipelineComponents.vertexAttributeDescription[3].format = VK_FORMAT_R32G32B32_SFLOAT;
-    m_pipelineComponents.vertexAttributeDescription[3].offset = offsetof(VulkanBasicVertex, bitangent);
-
-    m_pipelineComponents.vertexAttributeDescription[4].location = 4;
-    m_pipelineComponents.vertexAttributeDescription[4].binding = 0;
-    m_pipelineComponents.vertexAttributeDescription[4].format = VK_FORMAT_R32G32_SFLOAT;
-    m_pipelineComponents.vertexAttributeDescription[4].offset = offsetof(VulkanBasicVertex, uv);
+    m_pipelineComponents.vertexAttributeDescription[3].format = VK_FORMAT_R32G32_SFLOAT;
+    m_pipelineComponents.vertexAttributeDescription[3].offset = offsetof(VulkanBasicVertex, uv);
 
     // Pipeline stages
     m_pipelineComponents.vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;

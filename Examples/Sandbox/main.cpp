@@ -3476,11 +3476,11 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    //testPbdCloth();
+    testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
-    testDeformableBody();
+    //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();

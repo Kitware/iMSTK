@@ -26,8 +26,8 @@ namespace imstk
 VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager)
     : m_geometry(surfaceMesh)
 {
-    m_numVertices = (uint32_t)m_geometry->getNumVertices();
-    m_numTriangles = (uint32_t)m_geometry->getNumTriangles();
+    m_numVertices = (uint32_t)m_geometry->getMaxNumVertices();
+    m_numTriangles = (uint32_t)m_geometry->getMaxNumTriangles();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
     this->initializeData(memoryManager, m_geometry->getRenderMaterial());
@@ -44,7 +44,6 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
 
     auto normals = m_geometry->getVertexNormals();
     auto tangents = m_geometry->getVertexTangents();
-    auto bitangents = m_geometry->getVertexBitangents();
     const StdVectorOfVectorf* UVs;
 
     if (m_geometry->getDefaultTCoords() != "")
@@ -77,11 +76,6 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
                 tangents[i][0],
                 tangents[i][1],
                 tangents[i][2]);
-
-            vertices[i].bitangent = glm::vec3(
-                bitangents[i][0],
-                bitangents[i][1],
-                bitangents[i][2]);
         }
 
         if (UVs && UVs->size() == m_geometry->getNumVertices())

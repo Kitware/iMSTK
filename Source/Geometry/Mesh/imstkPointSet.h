@@ -154,6 +154,18 @@ public:
     void setTopologyChangedFlag(const bool flag) { m_topologyChanged = flag; }
     bool getTopologyChangedFlag() const { return m_topologyChanged; };
 
+    ///
+    /// \brief Set load factor
+    /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
+    ///
+    virtual void setLoadFactor(double loadFactor);
+    virtual double getLoadFactor();
+
+    ///
+    /// \brief Get the maximum number of vertices
+    ///
+    size_t getMaxNumVertices();
+
 protected:
 
     friend class VTKPointSetRenderDelegate;
@@ -178,6 +190,10 @@ protected:
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 
     bool m_topologyChanged = false;
+
+    double m_loadFactor = 2.0;
+    size_t m_maxNumVertices = 0;
+    size_t m_originalNumVertices = 0;
 };
 } // imstk
 

@@ -306,7 +306,20 @@ SurfaceMesh::getTrianglesVertices() const
 void
 SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
 {
-    m_trianglesVertices = triangles;
+    if (m_originalNumTriangles == 0)
+    {
+        m_originalNumTriangles = triangles.size();
+        m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+    }
+
+    if (triangles.size() <= m_maxNumTriangles)
+    {
+        m_trianglesVertices = triangles;
+    }
+    else
+    {
+        LOG(WARNING) << "Triangles not set, exceeded maximum number of triangles";
+    }
 }
 
 const StdVectorOfVec3d&
@@ -324,7 +337,14 @@ SurfaceMesh::getTriangleNormal(size_t i) const
 void
 SurfaceMesh::setVertexNormals(const StdVectorOfVec3d& normals)
 {
-    m_vertexNormals = normals;
+    if (normals.size() <= m_maxNumVertices)
+    {
+        m_vertexNormals = normals;
+    }
+    else
+    {
+        LOG(WARNING) << "Normals not set, exceeded maximum number of vertices";
+    }     
 }
 
 const StdVectorOfVec3d&
@@ -342,25 +362,20 @@ SurfaceMesh::getVertexNormalsNotConst()
 void
 SurfaceMesh::setVertexTangents(const StdVectorOfVec3d& tangents)
 {
-    m_vertexTangents = tangents;
+    if (tangents.size() <= m_maxNumVertices)
+    {
+        m_vertexTangents = tangents;
+    }
+    else
+    {
+        LOG(WARNING) << "Tangents not set, exceeded maximum number of vertices";
+    }    
 }
 
 const StdVectorOfVec3d&
 SurfaceMesh::getVertexTangents() const
 {
     return m_vertexTangents;
-}
-
-void
-SurfaceMesh::setVertexBitangents(const StdVectorOfVec3d& bitangents)
-{
-    m_vertexBitangents = bitangents;
-}
-
-const StdVectorOfVec3d&
-SurfaceMesh::getVertexBitangents() const
-{
-    return m_vertexBitangents;
 }
 
 size_t
@@ -513,4 +528,19 @@ SurfaceMesh::computeUVSeamVertexGroups()
         m_UVSeamVertexGroups[group]->push_back(i);
     }
 }
+
+void
+SurfaceMesh::setLoadFactor(double loadFactor)
+{
+    m_loadFactor = loadFactor;
+    m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+    m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+}
+
+size_t
+SurfaceMesh::getMaxNumTriangles()
+{
+    return m_maxNumTriangles;
+}
+
 } // imstk

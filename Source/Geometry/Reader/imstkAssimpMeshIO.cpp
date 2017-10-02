@@ -137,7 +137,6 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
 
     mesh->setVertexNormals(normals);
     mesh->setVertexTangents(tangents);
-    mesh->setVertexBitangents(bitangents);
 
     // UV coordinates
     StdVectorOfVectorf UVs(numVertices);
