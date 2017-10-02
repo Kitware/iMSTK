@@ -85,6 +85,7 @@ PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
         m_initialVertexPositions = vertices;
         m_originalNumVertices = vertices.size();
         m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+        m_vertexPositions.reserve(m_maxNumVertices);
     }
     else
     {
@@ -285,6 +286,7 @@ PointSet::setLoadFactor(double loadFactor)
 {
     m_loadFactor = loadFactor;
     m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+    m_vertexPositions.reserve(m_maxNumVertices);
 }
 
 double
@@ -298,5 +300,4 @@ PointSet::getMaxNumVertices()
 {
     return m_maxNumVertices;
 }
-
 } // imstk

@@ -233,7 +233,6 @@ protected:
     StdVectorOfVec3d m_triangleNormals; ///> Normals to the triangles
     StdVectorOfVec3d m_vertexNormals; ///> Normals of the vertices
     StdVectorOfVec3d m_vertexTangents; ///> Tangents of the vertices
-    StdVectorOfVec3d m_vertexBitangents; ///> Bitangents of the vertices
 
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 
@@ -241,7 +240,6 @@ protected:
 
     size_t m_originalNumTriangles = 0;
     size_t m_maxNumTriangles = 0;
-
 };
 } // imstk
 

@@ -310,6 +310,9 @@ SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
     {
         m_originalNumTriangles = triangles.size();
         m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+        m_trianglesVertices.reserve(m_maxNumTriangles);
+        m_vertexNormals.reserve(m_maxNumVertices);
+        m_vertexTangents.reserve(m_maxNumVertices);
     }
 
     if (triangles.size() <= m_maxNumTriangles)
@@ -344,7 +347,7 @@ SurfaceMesh::setVertexNormals(const StdVectorOfVec3d& normals)
     else
     {
         LOG(WARNING) << "Normals not set, exceeded maximum number of vertices";
-    }     
+    }
 }
 
 const StdVectorOfVec3d&
@@ -369,7 +372,7 @@ SurfaceMesh::setVertexTangents(const StdVectorOfVec3d& tangents)
     else
     {
         LOG(WARNING) << "Tangents not set, exceeded maximum number of vertices";
-    }    
+    }
 }
 
 const StdVectorOfVec3d&
@@ -535,6 +538,9 @@ SurfaceMesh::setLoadFactor(double loadFactor)
     m_loadFactor = loadFactor;
     m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
     m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+    m_trianglesVertices.reserve(m_maxNumTriangles);
+    m_vertexNormals.reserve(m_maxNumVertices);
+    m_vertexTangents.reserve(m_maxNumVertices);
 }
 
 size_t
@@ -542,5 +548,4 @@ SurfaceMesh::getMaxNumTriangles()
 {
     return m_maxNumTriangles;
 }
-
 } // imstk
