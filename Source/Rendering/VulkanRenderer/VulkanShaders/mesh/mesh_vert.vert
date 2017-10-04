@@ -7,8 +7,7 @@ layout (constant_id = 3) const bool hasNormalTexture = false;
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec3 vertexTangent;
-layout (location = 3) in vec3 vertexBitangent;
-layout (location = 4) in vec2 vertexUV;
+layout (location = 3) in vec2 vertexUV;
 
 struct light
 {
@@ -44,9 +43,8 @@ void main(void)
     vec4 position = locals.transform * vec4(vertexPosition, 1.0);
     vec4 normal = normalize(locals.transform * vec4(normalize(vertexNormal), 0.0));
     vec4 tangent = normalize(locals.transform * vec4(normalize(vertexTangent), 0.0));
-    vec4 bitangent = normalize(locals.transform * vec4(normalize(vertexBitangent), 0.0));
 
-    bitangent = vec4(cross(normal.xyz, tangent.xyz), 0.0);
+    vec4 bitangent = vec4(cross(normal.xyz, tangent.xyz), 0.0);
 
     vertex.TBN = mat3(tangent.xyz, bitangent.xyz, normal.xyz);
 

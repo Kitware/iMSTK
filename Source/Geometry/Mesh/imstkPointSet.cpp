@@ -80,7 +80,17 @@ PointSet::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
 void
 PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
 {
-    m_initialVertexPositions = vertices;
+    if (m_originalNumVertices == 0)
+    {
+        m_initialVertexPositions = vertices;
+        m_originalNumVertices = vertices.size();
+        m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+        m_vertexPositions.reserve(m_maxNumVertices);
+    }
+    else
+    {
+        LOG(WARNING) << "Already set initial vertices";
+    }
 }
 
 const StdVectorOfVec3d&
@@ -98,9 +108,16 @@ PointSet::getInitialVertexPosition(const size_t& vertNum) const
 void
 PointSet::setVertexPositions(const StdVectorOfVec3d& vertices)
 {
-    m_vertexPositions = vertices;
-    m_dataModified = true;
-    m_transformApplied = false;
+    if (vertices.size() <= m_maxNumVertices)
+    {
+        m_vertexPositions = vertices;
+        m_dataModified = true;
+        m_transformApplied = false;
+    }
+    else
+    {
+        LOG(WARNING) << "Vertices not set, exceeded maximum number of vertices";
+    }
 }
 
 const StdVectorOfVec3d&
@@ -262,5 +279,25 @@ PointSet::updatePostTransformData()
         m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i]* m_scaling);
     }
     m_transformApplied = true;
+}
+
+void
+PointSet::setLoadFactor(double loadFactor)
+{
+    m_loadFactor = loadFactor;
+    m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+    m_vertexPositions.reserve(m_maxNumVertices);
+}
+
+double
+PointSet::getLoadFactor()
+{
+    return m_loadFactor;
+}
+
+size_t
+PointSet::getMaxNumVertices()
+{
+    return m_maxNumVertices;
 }
 } // imstk
