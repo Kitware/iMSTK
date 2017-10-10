@@ -4,7 +4,7 @@
 include(imstkAddExternalProject)
 imstk_add_external_project( Assimp
   GIT_REPOSITORY https://github.com/assimp/assimp.git
-  GIT_TAG v4.0.1
+  GIT_TAG v3.3.1
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
     -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
