@@ -43,7 +43,7 @@ set(copy_libusb_pdb_command
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( Libusb
-  URL http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.7z
+  URL http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.7z https://data.kitware.com/api/v1/item/59cbcefd8d777f7d33e9d9d7/download
   URL_MD5 7fbcf5580b8ffc88f3af6eddd638de9f
   DOWNLOAD_DIR ${Libusb_PREFIX}
   SOURCE_DIR ${Libusb_EXTRACT_DIR}
