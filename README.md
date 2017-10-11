@@ -53,7 +53,7 @@ Designed more specifically for developers, the issue tracker allows developers t
 
 ## Prerequisites
 * Git
-* CMake 3.2 or higher
+* CMake 3.9 or higher
 
 ##### On Linux:
 
