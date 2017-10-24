@@ -48,6 +48,12 @@ PbdModel::setModelGeometry(std::shared_ptr<PointSet> m)
 bool
 PbdModel::configure(const int nCons, ...)
 {
+    if (!this->getModelGeometry())
+    {
+        LOG(WARNING) << "PbdModel::configure - Set PBD Model geometry before configuration!";
+        return false;
+    }
+
     va_list args;
     va_start(args, nCons);
     for (int i = 0; i < nCons; ++i)
@@ -86,6 +92,7 @@ PbdModel::configure(const int nCons, ...)
     this->setProximity(va_arg(args, double));
     this->setContactStiffness(va_arg(args, double));
     this->setNumDegreeOfFreedom(this->getModelGeometry()->getNumVertices() * 3);
+
     va_end(args);
 
     return true;
