@@ -1580,17 +1580,20 @@ void testPbdCollision()
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
         return;
     }
-    volTetMesh->extractSurfaceMesh(surfMesh);
-    volTetMesh->extractSurfaceMesh(surfMeshVisual);
+    volTetMesh->extractSurfaceMesh(surfMesh, true);
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    surfMesh->setRenderMaterial(material);
 
     auto deformMapP2V = std::make_shared<OneToOneMap>();
     deformMapP2V->setMaster(tetMesh);
-    deformMapP2V->setSlave(surfMeshVisual);
+    deformMapP2V->setSlave(surfMesh);
     deformMapP2V->compute();
 
     auto deformMapC2V = std::make_shared<OneToOneMap>();
     deformMapC2V->setMaster(surfMesh);
-    deformMapC2V->setSlave(surfMeshVisual);
+    deformMapC2V->setSlave(surfMesh);
     deformMapC2V->compute();
 
     auto deformMapP2C = std::make_shared<OneToOneMap>();
@@ -1599,7 +1602,7 @@ void testPbdCollision()
     deformMapP2C->compute();
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
-    deformableObj->setVisualGeometry(surfMeshVisual);
+    deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
@@ -1607,6 +1610,7 @@ void testPbdCollision()
     deformableObj->setCollidingToVisualMap(deformMapC2V);
 
     auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(volTetMesh);
     pbdModel->configure(/*Number of Constraints*/ 1,
         /*Constraint configuration*/ "FEM NeoHookean 1.0 0.3",
         /*Mass*/ 1.0,
@@ -1782,8 +1786,7 @@ void testPbdCollision()
     }
     else
     {
-        // floor
-
+        // Build floor geometry
         StdVectorOfVec3d vertList;
         double width = 100.0;
         double height = 100.0;
@@ -1815,39 +1818,38 @@ void testPbdCollision()
                 triangles.push_back(tri[1]);
             }
         }
-        auto floorMeshColliding = std::make_shared<SurfaceMesh>();
-        floorMeshColliding->initialize(vertList, triangles);
-        auto floorMeshVisual = std::make_shared<SurfaceMesh>();
-        floorMeshVisual->initialize(vertList, triangles);
-        auto floorMeshPhysics = std::make_shared<SurfaceMesh>();
-        floorMeshPhysics->initialize(vertList, triangles);
+        auto floorMesh = std::make_shared<SurfaceMesh>();
+        floorMesh->initialize(vertList, triangles);
 
+        auto materialFloor = std::make_shared<RenderMaterial>();
+        materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+        floorMesh->setRenderMaterial(materialFloor);
 
         auto floorMapP2V = std::make_shared<OneToOneMap>();
-        floorMapP2V->setMaster(floorMeshPhysics);
-        floorMapP2V->setSlave(floorMeshVisual);
+        floorMapP2V->setMaster(floorMesh);
+        floorMapP2V->setSlave(floorMesh);
         floorMapP2V->compute();
 
-
         auto floorMapP2C = std::make_shared<OneToOneMap>();
-        floorMapP2C->setMaster(floorMeshPhysics);
-        floorMapP2C->setSlave(floorMeshColliding);
+        floorMapP2C->setMaster(floorMesh);
+        floorMapP2C->setSlave(floorMesh);
         floorMapP2C->compute();
 
         auto floorMapC2V = std::make_shared<OneToOneMap>();
-        floorMapC2V->setMaster(floorMeshColliding);
-        floorMapC2V->setSlave(floorMeshVisual);
+        floorMapC2V->setMaster(floorMesh);
+        floorMapC2V->setSlave(floorMesh);
         floorMapC2V->compute();
 
         auto floor = std::make_shared<PbdObject>("Floor");
-        floor->setCollidingGeometry(floorMeshColliding);
-        floor->setVisualGeometry(floorMeshVisual);
-        floor->setPhysicsGeometry(floorMeshPhysics);
+        floor->setCollidingGeometry(floorMesh);
+        floor->setVisualGeometry(floorMesh);
+        floor->setPhysicsGeometry(floorMesh);
         floor->setPhysicsToCollidingMap(floorMapP2C);
         floor->setPhysicsToVisualMap(floorMapP2V);
         floor->setCollidingToVisualMap(floorMapC2V);
 
         auto pbdModel2 = std::make_shared<PbdModel>();
+        pbdModel2->setModelGeometry(floorMesh);
         pbdModel2->configure(/*Number of Constraints*/ 0,
             /*Mass*/ 0.0,
             /*Proximity*/ 0.1,
@@ -3476,8 +3478,8 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    testPbdCloth();
-    //testPbdCollision();
+    //testPbdCloth();
+    testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
     //testDeformableBody();
