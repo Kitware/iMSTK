@@ -231,6 +231,7 @@ PointSet::applyTranslation(const Vec3d t)
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
         m_vertexPositions[i] += t;
+        m_initialVertexPositions[i] += t;
     }
     m_dataModified = true;
     m_transformApplied = false;
@@ -242,6 +243,7 @@ PointSet::applyRotation(const Mat3d r)
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
         m_vertexPositions[i] = r * m_vertexPositions[i];
+        m_initialVertexPositions[i] = r * m_initialVertexPositions[i];
     }
     m_dataModified = true;
     m_transformApplied = false;
@@ -253,6 +255,7 @@ PointSet::applyScaling(const double s)
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
         m_vertexPositions[i] = s * m_vertexPositions[i];
+        m_initialVertexPositions[i] = s * m_initialVertexPositions[i];
     }
     m_dataModified = true;
     m_transformApplied = false;
