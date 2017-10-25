@@ -50,10 +50,13 @@ MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
 void
 MeshToMeshCD::computeCollisionData()
 {
+    // Clear collisionData
+    m_colData.clearAll();
+
     // Update model
     m_modelA->UpdateVert(m_meshA->getVertexPositions());
     m_modelB->UpdateVert(m_meshB->getVertexPositions());
-    m_modelB->UpdateBoxes();
+    m_modelA->UpdateBoxes();
     m_modelB->UpdateBoxes();
 
     // Update BVH
