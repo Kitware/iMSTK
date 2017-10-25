@@ -369,8 +369,8 @@ void testMeshCCD()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("MeshCCDTest");
 
-    auto mesh1 = MeshIO::read(iMSTK_DATA_ROOT "/spheres/big.vtk");
-    auto mesh2 = MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_0.vtk");
+    auto mesh1 = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    auto mesh2 = MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
 
     // Obj1
     auto obj1 = std::make_shared<CollidingObject>("obj1");
@@ -378,11 +378,25 @@ void testMeshCCD()
     obj1->setCollidingGeometry(mesh1);
     scene->addSceneObject(obj1);
 
+    // set configure Obj1 rendering
+    auto matObj1 = std::make_shared<RenderMaterial>();
+    matObj1->setBackFaceCulling(false);
+    matObj1->setDiffuseColor(Color::Green);
+    matObj1->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    mesh1->setRenderMaterial(matObj1);
+
     // Obj2
     auto obj2 = std::make_shared<CollidingObject>("obj2");
     obj2->setVisualGeometry(mesh2);
     obj2->setCollidingGeometry(mesh2);
     scene->addSceneObject(obj2);
+
+    // set configure Obj2 rendering
+    auto matObj2 = std::make_shared<RenderMaterial>();
+    matObj2->setBackFaceCulling(false);
+    matObj2->setDiffuseColor(Color::Green);
+    matObj2->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    mesh2->setRenderMaterial(matObj2);
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
@@ -391,18 +405,12 @@ void testMeshCCD()
         CollisionHandling::Type::None,
         CollisionHandling::Type::None);
 
-    auto t = std::thread([mesh2]
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_1 = MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_1.vtk");
-        mesh2->setVertexPositions(mesh2_1->getVertexPositions());
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_2 = MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_2.vtk");
-        mesh2->setVertexPositions(mesh2_2->getVertexPositions());
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_3 = MeshIO::read(iMSTK_DATA_ROOT "/spheres/small_3.vtk");
-        mesh2->setVertexPositions(mesh2_3->getVertexPositions());
-    });
+    // Rotate the obj1 every frame
+    auto rotateFunc = [&](Module* module)
+                      {
+                          mesh1->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+                      };
+    sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
@@ -413,7 +421,6 @@ void testMeshCCD()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(true);
-    t.join();
 }
 
 void testPenaltyRigidCollision()
@@ -3458,7 +3465,7 @@ int main()
     /*------------------
     Test CD and CR
     ------------------*/
-    //testMeshCCD();
+    testMeshCCD();
     //testPenaltyRigidCollision();
 
 
@@ -3479,7 +3486,7 @@ int main()
     ------------------*/
     //testPbdVolume();
     //testPbdCloth();
-    testPbdCollision();
+    //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
     //testDeformableBody();
