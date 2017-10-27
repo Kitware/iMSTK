@@ -2,19 +2,14 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Collision
+imstk_add_library( Datastructures
   DEPENDS
-    Datastructures
-    SCCD
-    Geometry
-    SceneElements
-    DynamicalModels
+    Core 
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
-  include(imstkAddTest)
-  imstk_add_test( Collision )
+if( iMSTK_BUILD_TESTING )
+  add_subdirectory( Testing )
 endif()

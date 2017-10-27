@@ -28,7 +28,7 @@
 // imstk
 #include "imstkCollisionDetection.h"
 #include "imstkTetrahedralMesh.h"
-#include "DataStructures/imstkSpatialHashTableSeparateChaining.h"
+#include "imstkSpatialHashTableSeparateChaining.h"
 #include "DeformModel.h"
 
 namespace imstk
