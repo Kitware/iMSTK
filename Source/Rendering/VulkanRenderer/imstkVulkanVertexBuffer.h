@@ -44,6 +44,7 @@ struct VulkanBasicVertex
     glm::vec3 normal;
     glm::vec3 tangent;
     glm::vec2 uv;
+    glm::vec3 color;
 };
 
 class VulkanVertexBuffer : public VulkanBuffer

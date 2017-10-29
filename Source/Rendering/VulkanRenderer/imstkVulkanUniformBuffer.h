@@ -51,6 +51,7 @@ struct VulkanLocalFragmentUniforms
     float emissivity;
     float roughness;
     float metalness;
+    glm::vec4 debugColor;
 };
 
 struct VulkanLocalDecalFragmentUniforms

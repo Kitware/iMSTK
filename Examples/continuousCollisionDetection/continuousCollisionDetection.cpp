@@ -46,7 +46,7 @@ int main()
     // set configure Obj1 rendering
     auto matObj1 = std::make_shared<RenderMaterial>();
     matObj1->setBackFaceCulling(false);
-    matObj1->setDiffuseColor(Color::Green);
+    matObj1->setColor(Color::Green);
     matObj1->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     mesh1->setRenderMaterial(matObj1);
 
@@ -59,7 +59,7 @@ int main()
     // set configure Obj2 rendering
     auto matObj2 = std::make_shared<RenderMaterial>();
     matObj2->setBackFaceCulling(false);
-    matObj2->setDiffuseColor(Color::Green);
+    matObj2->setColor(Color::Green);
     matObj2->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     mesh2->setRenderMaterial(matObj2);
 

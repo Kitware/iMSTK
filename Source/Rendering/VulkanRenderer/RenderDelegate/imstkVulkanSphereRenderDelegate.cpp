@@ -97,7 +97,7 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> s
 }
 
 void
-VulkanSphereRenderDelegate::update(uint32_t frameIndex)
+VulkanSphereRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
 }

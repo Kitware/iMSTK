@@ -91,7 +91,7 @@ int main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDiffuseColor(Color::LightGray);
+    material->setColor(Color::LightGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     surfMesh->setRenderMaterial(material);
 

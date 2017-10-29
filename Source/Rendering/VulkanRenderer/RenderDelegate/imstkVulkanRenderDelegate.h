@@ -64,7 +64,7 @@ public:
     ///        in that memory is directly mapped from the Geometry to the
     ///        RenderDelegate.
     ///
-    virtual void update(uint32_t frameIndex){};
+    virtual void update(const uint32_t frameIndex){};
 
     ///
     /// \brief Initialize memory backing

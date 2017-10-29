@@ -135,15 +135,15 @@ RenderMaterial::backfaceCullingOff()
 }
 
 const Color&
-RenderMaterial::getDiffuseColor() const
+RenderMaterial::getColor() const
 {
-    return m_diffuseColor;
+    return m_color;
 }
 
 void
-RenderMaterial::setDiffuseColor(const Color color)
+RenderMaterial::setColor(const Color color)
 {
-    m_diffuseColor = color;
+    m_color = color;
     m_modified = true;
 }
 
@@ -289,5 +289,11 @@ bool
 RenderMaterial::isDecal()
 {
     return m_isDecal;
+}
+
+bool
+RenderMaterial::isLineMesh()
+{
+    return m_isLineMesh;
 }
 }

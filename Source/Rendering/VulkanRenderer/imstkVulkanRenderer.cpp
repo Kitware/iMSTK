@@ -161,9 +161,18 @@ VulkanRenderer::setupGPUs()
     deviceExtensions[0] = "VK_KHR_swapchain";
 
     // Enabling optional Vulkan features
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceFeatures(m_physicalDevices[0], &deviceFeatures);
+
     VkPhysicalDeviceFeatures features = {VK_FALSE};
     features.fillModeNonSolid = VK_TRUE;
     features.tessellationShader = VK_TRUE;
+    features.wideLines = deviceFeatures.wideLines;
+
+    if (features.wideLines == VK_TRUE)
+    {
+        m_supportsWideLines = true;
+    }
 
     VkDeviceCreateInfo deviceInfo;
     deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;

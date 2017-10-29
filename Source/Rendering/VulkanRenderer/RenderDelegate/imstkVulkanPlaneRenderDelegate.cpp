@@ -98,7 +98,7 @@ VulkanPlaneRenderDelegate::VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plan
 }
 
 void
-VulkanPlaneRenderDelegate::update(uint32_t frameIndex)
+VulkanPlaneRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
 }

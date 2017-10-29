@@ -23,6 +23,7 @@
 #define imstkLineMesh_h
 
 #include <memory>
+#include <array>
 
 #include "imstkPointSet.h"
 
@@ -38,6 +39,8 @@ class LineMesh : public PointSet
 {
 public:
 
+    using LineArray = std::array<size_t, 2>;
+
     ///
     /// \brief Constructor
     ///
@@ -47,6 +50,13 @@ public:
     /// \brief Default destructor
     ///
     ~LineMesh() = default;
+
+    ///
+    /// \brief Initializes the rest of the data structures given vertex positions and
+    ///  line connectivity
+    ///
+    void initialize(const StdVectorOfVec3d& vertices,
+                    const std::vector<LineArray>& lines);
 
     ///
     /// \brief
@@ -66,7 +76,12 @@ public:
     ///
     /// \brief
     ///
-    void setConnectivity(const std::vector<std::vector<int>>& lines);
+    void setVertexColors(const std::vector<Color>& colors);
+
+    ///
+    /// \brief
+    ///
+    void setLinesVertices(const std::vector<LineArray>& lines);
 
     ///
     /// \brief
@@ -76,18 +91,22 @@ public:
     ///
     /// \brief
     ///
-    std::vector<std::vector<int>> getLines() const;
+    std::vector<LineArray> getLinesVertices() const;
 
     ///
     /// \brief
     ///
-    std::vector<int> getLine(int index) const;
+    std::vector<Color> getVertexColors() const;
 
 private:
 
     friend class VTKLineMeshRenderDelegate;
 
-    std::vector<std::vector<int>> m_lines;  ///> line connectivity
+    size_t m_originalNumLines = 0;
+    size_t m_maxNumLines = 0;
+
+    std::vector<LineArray> m_lines;  ///> line connectivity
+    std::vector<Color> m_vertexColors;
 };
 } // imstk
 

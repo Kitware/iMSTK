@@ -84,8 +84,8 @@ public:
     ///
     /// \brief Get/Set the diffuse color
     ///
-    const Color& getDiffuseColor() const;
-    void setDiffuseColor(const Color color);
+    const Color& getColor() const;
+    void setColor(const Color color);
 
     ///
     /// \brief Get/Set the color of the wireframe and points
@@ -153,10 +153,13 @@ public:
     ///
     bool isDecal();
 
+    bool isLineMesh();
+
 protected:
     friend class VTKRenderDelegate;
     friend class VulkanRenderDelegate;
     friend class VulkanDecalRenderDelegate;
+    friend class VulkanLineMeshRenderDelegate;
 
     // State
     DisplayMode m_displayMode = DisplayMode::SURFACE;
@@ -165,12 +168,13 @@ protected:
     float m_pointSize = 1.0;
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
     bool m_isDecal = false;
+    bool m_isLineMesh = false;
 
     // Sphere size used for glyph in rendering (valid only for point set)
     double m_sphereGlyphSize = 0.05;
 
     // Colors
-    Color m_diffuseColor = Color::White;
+    Color m_color = Color::White;
     Color m_debugColor = Color::Black;
 
     // Classical values

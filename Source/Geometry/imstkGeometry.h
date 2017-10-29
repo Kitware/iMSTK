@@ -173,6 +173,8 @@ public:
 protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
+
+    friend class VulkanLineMeshRenderDelegate;
     friend class VulkanRenderDelegate;
     friend class VulkanSurfaceMeshRenderDelegate;
     friend class VulkanRenderer;

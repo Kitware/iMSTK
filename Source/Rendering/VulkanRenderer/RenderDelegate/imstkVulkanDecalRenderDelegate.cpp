@@ -78,7 +78,7 @@ VulkanDecalRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, st
 }
 
 void
-VulkanDecalRenderDelegate::update(uint32_t frameIndex, std::shared_ptr<Camera> camera)
+VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Camera> camera)
 {
     unsigned int index = 0;
 
@@ -97,7 +97,7 @@ VulkanDecalRenderDelegate::update(uint32_t frameIndex, std::shared_ptr<Camera> c
 
     auto mat = m_geometry->getRenderMaterial();
 
-    auto color = mat->getDiffuseColor();
+    auto color = mat->getColor();
     m_decalFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
     m_decalFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
     m_decalFragmentUniforms.emissivity = mat->getEmissivity();

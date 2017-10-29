@@ -282,6 +282,9 @@ protected:
 
     std::vector<VkFence> m_commandBufferSubmit;
 
+    // Device limits and features
+    bool m_supportsWideLines = false;
+
     glm::mat4 m_projectionMatrix;
 
     VulkanInternalImage * m_shadowMaps; ///< a single texture array (hence why it's one image)

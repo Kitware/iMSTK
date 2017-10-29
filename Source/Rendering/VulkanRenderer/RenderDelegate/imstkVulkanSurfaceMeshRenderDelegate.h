@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Update render geometry
     ///
-    void update(uint32_t frameIndex) override;
+    void update(const uint32_t frameIndex) override;
 
     ///
     /// \brief Get source geometry

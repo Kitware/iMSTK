@@ -136,6 +136,9 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     m_constants.numLights = renderer->m_constants.numLights;
     m_constants.tessellation = m_material->getTessellated();
+    m_constants.shaded = m_material->getDisplayMode() == RenderMaterial::DisplayMode::SURFACE
+                         && !m_material->isLineMesh()
+                         && !m_depthPrePass;
     m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_depthOnlyPass;
     m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
     m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_depthOnlyPass;
@@ -156,6 +159,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
         offsetof(VulkanMaterialConstants, numLights));
     this->addSpecializationConstant(sizeof(m_constants.tessellation),
         offsetof(VulkanMaterialConstants, tessellation));
+    this->addSpecializationConstant(sizeof(m_constants.shaded),
+        offsetof(VulkanMaterialConstants, shaded));
     this->addSpecializationConstant(sizeof(m_constants.diffuseTexture),
         offsetof(VulkanMaterialConstants, diffuseTexture));
     this->addSpecializationConstant(sizeof(m_constants.normalTexture),
@@ -244,7 +249,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.vertexBindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     // Vertex Attributes
-    m_pipelineComponents.vertexAttributeDescription.resize(4);
+    m_pipelineComponents.vertexAttributeDescription.resize(5);
 
     m_pipelineComponents.vertexAttributeDescription[0].location = 0;
     m_pipelineComponents.vertexAttributeDescription[0].binding = 0;
@@ -266,6 +271,11 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.vertexAttributeDescription[3].format = VK_FORMAT_R32G32_SFLOAT;
     m_pipelineComponents.vertexAttributeDescription[3].offset = offsetof(VulkanBasicVertex, uv);
 
+    m_pipelineComponents.vertexAttributeDescription[4].location = 4;
+    m_pipelineComponents.vertexAttributeDescription[4].binding = 0;
+    m_pipelineComponents.vertexAttributeDescription[4].format = VK_FORMAT_R32G32B32_SFLOAT;
+    m_pipelineComponents.vertexAttributeDescription[4].offset = offsetof(VulkanBasicVertex, color);
+
     // Pipeline stages
     m_pipelineComponents.vertexInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     m_pipelineComponents.vertexInfo.pNext = nullptr;
@@ -279,7 +289,11 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.inputAssemblyInfo.pNext = nullptr;
     m_pipelineComponents.inputAssemblyInfo.flags = 0;
 
-    if (m_material->getTessellated())
+    if (m_material->isLineMesh())
+    {
+        m_pipelineComponents.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
+    }
+    else if (m_material->getTessellated())
     {
         m_pipelineComponents.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_PATCH_LIST;
     }
@@ -347,7 +361,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.rasterizationInfo.depthBiasConstantFactor = 0.0;
     m_pipelineComponents.rasterizationInfo.depthBiasClamp = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor = 0.0;
-    m_pipelineComponents.rasterizationInfo.lineWidth = 1.0;
+    m_pipelineComponents.rasterizationInfo.lineWidth = renderer->m_supportsWideLines ? m_material->getLineWidth() : 1.0;
 
     m_pipelineComponents.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     m_pipelineComponents.multisampleInfo.pNext = nullptr;

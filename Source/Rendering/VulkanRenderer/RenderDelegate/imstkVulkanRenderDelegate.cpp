@@ -30,6 +30,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkDecalPool.h"
+#include "imstkLineMesh.h"
 
 #include "imstkVulkanPlaneRenderDelegate.h"
 #include "imstkVulkanSphereRenderDelegate.h"
@@ -37,6 +38,7 @@
 #include "imstkVulkanCapsuleRenderDelegate.h"
 #include "imstkVulkanSurfaceMeshRenderDelegate.h"
 #include "imstkVulkanDecalRenderDelegate.h"
+#include "imstkVulkanLineMeshRenderDelegate.h"
 
 namespace imstk
 {
@@ -75,13 +77,13 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemory
     {
         auto tetrahedralMesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
         return std::make_shared<VulkanTetrahedralMeshRenderDelegate>(tetrahedralMesh);
-    }
+    }*/
     case Geometry::Type::LineMesh:
     {
-        LOG(WARNING) << "RenderDelegate::make_delegate error: LineMeshRenderDelegate not yet implemented";
-        return nullptr;
+        auto lineMesh = std::dynamic_pointer_cast<LineMesh>(geom);
+        return std::make_shared<VulkanLineMeshRenderDelegate>(lineMesh, memoryManager);
     }
-    case Geometry::Type::HexahedralMesh:
+    /*case Geometry::Type::HexahedralMesh:
     {
         LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
         return nullptr;
@@ -174,12 +176,16 @@ VulkanRenderDelegate::updateUniforms(uint32_t frameIndex)
 
     auto mat = geometry->getRenderMaterial();
 
-    auto color = mat->getDiffuseColor();
+    auto color = mat->getColor();
     m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
     m_localFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
     m_localFragmentUniforms.emissivity = mat->getEmissivity();
     m_localFragmentUniforms.roughness = mat->getRoughness();
     m_localFragmentUniforms.metalness = mat->getMetalness();
+
+    auto debugColor = mat->getDebugColor();
+    m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
+    m_localFragmentUniforms.debugColor = glm::vec4(debugColor.r, debugColor.g, debugColor.b, debugColor.a);
 
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalFragmentUniforms),
         (void*)&m_localFragmentUniforms, frameIndex);
