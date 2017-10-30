@@ -29,6 +29,7 @@
 #include "imstkVirtualCouplingPBDObject.h"
 #include "imstkGeometryMap.h"
 #include "imstkTimer.h"
+#include "imstkPbdSolver.h"
 
 #include "g3log/g3log.hpp"
 
@@ -108,6 +109,8 @@ SceneManager::runModule()
     for (auto solvers : m_scene->getSolvers())
     {
         solvers->solve();
+
+        auto xx = std::dynamic_pointer_cast<PbdSolver>(solvers);
     }
 
     // Apply the geometry and apply maps to all the objects

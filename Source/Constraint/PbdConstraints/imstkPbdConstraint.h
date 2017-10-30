@@ -73,7 +73,7 @@ public:
     void setTolerance(const double eps) { m_epsilon = eps; }
 
 public:
-    std::vector<size_t> m_vertexIds; ///> index of points for the constraint
+    std::vector<size_t> m_vertexIds;   ///> index of points for the constraint
     double m_epsilon = 1.0e-6;         ///> Tolerance used for the costraints
 };
 }

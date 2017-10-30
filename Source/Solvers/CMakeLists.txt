@@ -5,6 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( Solvers
   DEPENDS
     Core
+    Datastructures
     Constraints
   )
 
