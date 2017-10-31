@@ -2,11 +2,9 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Solvers
+imstk_add_library( Datastructures
   DEPENDS
-    Core
-    Datastructures
-    Constraints
+    Core 
   )
 
 #-----------------------------------------------------------------------------

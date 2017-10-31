@@ -4,6 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Collision
   DEPENDS
+    Datastructures
     SCCD
     Geometry
     SceneElements

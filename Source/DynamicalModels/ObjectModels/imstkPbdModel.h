@@ -232,6 +232,11 @@ public:
     ///
     bool initialize() override;
 
+    ///
+    /// \brief Return Constraints
+    ///
+    const std::vector<std::shared_ptr<PbdConstraint>> getConstraints() const { return m_constraints; };
+
 protected:
     std::shared_ptr<PointSet> m_mesh;                           ///> PointSet on which the pbd model operates on
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints;  ///> List of pbd constraints
