@@ -114,7 +114,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         auto bloomVerticalBlurPass = std::make_shared<VulkanPostProcess>(renderer, level);
         bloomVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastOutput][level]);
         bloomVerticalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastInput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
-        bloomVerticalBlurPass->initialize(renderer, "./Shaders/Vulkan/PostProcessing/blur_vertical_frag.spv");
+        bloomVerticalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/blur_vertical_frag.spv");
         bloomVerticalBlurPass->m_pushConstantData[0] = std::max(renderer->m_width >> level, 1u);
         bloomVerticalBlurPass->m_pushConstantData[1] = std::max(renderer->m_height >> level, 1u);
         bloomVerticalBlurPass->m_pushConstantData[2] = bloomSamples;

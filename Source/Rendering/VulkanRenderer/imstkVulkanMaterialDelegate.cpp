@@ -61,77 +61,49 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     m_memoryManager->m_device = renderer->m_renderDevice;
     m_memoryManager->m_queueFamilyIndex = renderer->m_renderQueueFamily;
 
-    std::string vertexShaderPath = "./Shaders/VulkanShaders/Mesh/mesh_vert.spv";
-    std::ifstream vertexShaderDataStream(vertexShaderPath, std::ios_base::binary);
-    char vertexShaderData[16000];
-    vertexShaderDataStream.read(vertexShaderData, 15999);
-    vertexShaderData[(int)vertexShaderDataStream.gcount()] = '\0';
-
-    VkShaderModuleCreateInfo vertexShaderInfo;
-    vertexShaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    vertexShaderInfo.pNext = nullptr;
-    vertexShaderInfo.flags = 0;
-    vertexShaderInfo.codeSize = vertexShaderDataStream.gcount();
-    vertexShaderInfo.pCode = (uint32_t *)vertexShaderData;
-    if (vkCreateShaderModule(renderer->m_renderDevice, &vertexShaderInfo, nullptr, &m_pipelineComponents.vertexShader) != VK_SUCCESS)
+    if (m_material->isDecal())
     {
-        LOG(FATAL) << "Unable to build vertex shader : " << vertexShaderPath;
+        VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/decal_vert.spv",
+            renderer->m_renderDevice,
+            m_pipelineComponents.vertexShader);
+    }
+    else
+    {
+        VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_vert.spv",
+            renderer->m_renderDevice,
+            m_pipelineComponents.vertexShader);
     }
 
     if (m_material->getTessellated())
     {
-        std::string tessellationControlShaderPath = "./Shaders/VulkanShaders/Mesh/mesh_tesc.spv";
-        std::ifstream tessellationControlShaderDataStream(tessellationControlShaderPath, std::ios_base::binary);
-        char tessellationControlShaderData[16000];
-        tessellationControlShaderDataStream.read(tessellationControlShaderData, 15999);
-        tessellationControlShaderData[(int)tessellationControlShaderDataStream.gcount()] = '\0';
+        VulkanShaderLoader tessellationControlShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_tesc.spv",
+            renderer->m_renderDevice,
+            m_pipelineComponents.tessellationControlShader);
 
-        VkShaderModuleCreateInfo tessellationControlShaderInfo;
-        tessellationControlShaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        tessellationControlShaderInfo.pNext = nullptr;
-        tessellationControlShaderInfo.flags = 0;
-        tessellationControlShaderInfo.codeSize = tessellationControlShaderDataStream.gcount();
-        tessellationControlShaderInfo.pCode = (uint32_t *)tessellationControlShaderData;
-        if (vkCreateShaderModule(renderer->m_renderDevice, &tessellationControlShaderInfo, nullptr, &m_pipelineComponents.tessellationControlShader) != VK_SUCCESS)
-        {
-            LOG(FATAL) << "Unable to build fragment shader: " << tessellationControlShaderPath;
-        }
-
-        std::string tessellatedEvaluationShaderPath = "./Shaders/VulkanShaders/Mesh/mesh_tese.spv";
-        std::ifstream tessellationEvaluationShaderDataStream(tessellatedEvaluationShaderPath, std::ios_base::binary);
-        char tessellationEvaluationShaderData[16000];
-        tessellationEvaluationShaderDataStream.read(tessellationEvaluationShaderData, 15999);
-        tessellationEvaluationShaderData[(int)tessellationEvaluationShaderDataStream.gcount()] = '\0';
-
-        VkShaderModuleCreateInfo tessellationEvaluationShaderInfo;
-        tessellationEvaluationShaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        tessellationEvaluationShaderInfo.pNext = nullptr;
-        tessellationEvaluationShaderInfo.flags = 0;
-        tessellationEvaluationShaderInfo.codeSize = tessellationEvaluationShaderDataStream.gcount();
-        tessellationEvaluationShaderInfo.pCode = (uint32_t *)tessellationEvaluationShaderData;
-        if (vkCreateShaderModule(renderer->m_renderDevice, &tessellationEvaluationShaderInfo, nullptr, &m_pipelineComponents.tessellationEvaluationShader) != VK_SUCCESS)
-        {
-            LOG(FATAL) << "Unable to build fragment shader: " << tessellatedEvaluationShaderPath;
-        }
+        VulkanShaderLoader tessellationEvaluationShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_tese.spv",
+            renderer->m_renderDevice,
+            m_pipelineComponents.tessellationEvaluationShader);
     }
 
-    std::string fragmentShaderPath = "./Shaders/VulkanShaders/Mesh/mesh_frag.spv";
-    std::ifstream fragmentShaderDataStream(fragmentShaderPath, std::ios_base::binary);
-    char fragmentShaderData[16000];
-    fragmentShaderDataStream.read(fragmentShaderData, 15999);
-    fragmentShaderData[(int)fragmentShaderDataStream.gcount()] = '\0';
-
-    VkShaderModuleCreateInfo fragmentShaderInfo;
-    fragmentShaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    fragmentShaderInfo.pNext = nullptr;
-    fragmentShaderInfo.flags = 0;
-    fragmentShaderInfo.codeSize = fragmentShaderDataStream.gcount();
-    fragmentShaderInfo.pCode = (uint32_t *)fragmentShaderData;
-    if (vkCreateShaderModule(renderer->m_renderDevice, &fragmentShaderInfo, nullptr, &m_pipelineComponents.fragmentShader) != VK_SUCCESS)
+    if (m_material->isDecal())
     {
-        LOG(FATAL) << "Unable to build fragment shader: " << fragmentShaderPath;
+        VulkanShaderLoader fragmentShaderLoader("F:/iMSTK/Source/Rendering/VulkanRenderer/VulkanShaders/Mesh/decal_frag.spv",
+            renderer->m_renderDevice,
+            m_pipelineComponents.fragmentShader);
+    }
+    else
+    {
+        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_frag.spv",
+            renderer->m_renderDevice,
+            m_pipelineComponents.fragmentShader);
     }
 
+    this->buildMaterial(renderer);
+}
+
+void
+VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
+{
     // Copy renderer constants to material constants
     renderer->m_constants.numLights = (uint32_t)renderer->m_scene->getLights().size();
 
@@ -284,8 +256,7 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     m_pipelineComponents.tessellationInfo.flags = 0;
     if (m_material->getTessellated())
     {
-        m_pipelineComponents.tessellationInfo.patchControlPoints =
-            3;//renderer->m_deviceLimits.maxTessellationPatchSize;
+        m_pipelineComponents.tessellationInfo.patchControlPoints = 3;
     }
     else
     {
@@ -329,7 +300,8 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
         m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
     }
 
-    m_pipelineComponents.rasterizationInfo.cullMode = VK_CULL_MODE_NONE; // TODO: Allow backface culling
+    m_pipelineComponents.rasterizationInfo.cullMode =
+        m_material->getBackFaceCulling() ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
     m_pipelineComponents.rasterizationInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     m_pipelineComponents.rasterizationInfo.depthBiasEnable = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.depthBiasConstantFactor = 0.0;
@@ -364,11 +336,13 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     states[1].writeMask = 0;
     states[1].reference = 0;
 
+    bool depthWrite = !m_material->isDecal();
+
     m_pipelineComponents.depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     m_pipelineComponents.depthStencilInfo.pNext = nullptr;
     m_pipelineComponents.depthStencilInfo.flags = 0;
     m_pipelineComponents.depthStencilInfo.depthTestEnable = VK_TRUE;
-    m_pipelineComponents.depthStencilInfo.depthWriteEnable = VK_TRUE;
+    m_pipelineComponents.depthStencilInfo.depthWriteEnable = depthWrite;
     m_pipelineComponents.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS;
     m_pipelineComponents.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.stencilTestEnable = VK_FALSE;
@@ -378,11 +352,14 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     m_pipelineComponents.depthStencilInfo.maxDepthBounds = VK_FALSE;
 
     m_pipelineComponents.colorBlendAttachments.resize(3);
+
+    int blendMode = m_material->isDecal() ? VK_TRUE : VK_FALSE;
+
     for (int i = 0; i < m_pipelineComponents.colorBlendAttachments.size(); i++)
     {
-        m_pipelineComponents.colorBlendAttachments[i].blendEnable = VK_FALSE;
-        m_pipelineComponents.colorBlendAttachments[i].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-        m_pipelineComponents.colorBlendAttachments[i].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
+        m_pipelineComponents.colorBlendAttachments[i].blendEnable = blendMode;
+        m_pipelineComponents.colorBlendAttachments[i].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+        m_pipelineComponents.colorBlendAttachments[i].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
         m_pipelineComponents.colorBlendAttachments[i].colorBlendOp = VK_BLEND_OP_ADD;
         m_pipelineComponents.colorBlendAttachments[i].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         m_pipelineComponents.colorBlendAttachments[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
@@ -435,6 +412,13 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     m_graphicsPipelineInfo.subpass = 0;
     m_graphicsPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     m_graphicsPipelineInfo.basePipelineIndex = 0;
+
+    vkCreateGraphicsPipelines(renderer->m_renderDevice,
+        renderer->m_pipelineCache,
+        1,
+        &m_graphicsPipelineInfo,
+        nullptr,
+        &m_pipeline);
 }
 
 void
@@ -521,6 +505,8 @@ VulkanMaterialDelegate::createDescriptors(VulkanRenderer * renderer)
 void
 VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
 {
+    m_numTextures = 0;
+
     m_descriptorSets.resize(2);
     m_descriptorSetLayouts.resize(2);
 
@@ -575,6 +561,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         fragmentLayoutBinding.pImmutableSamplers = nullptr;
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
     }
 
     // Normal texture
@@ -586,6 +573,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         fragmentLayoutBinding.pImmutableSamplers = nullptr;
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
     }
 
     // Roughness texture
@@ -597,6 +585,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         fragmentLayoutBinding.pImmutableSamplers = nullptr;
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
     }
 
     // Metalness texture
@@ -608,6 +597,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         fragmentLayoutBinding.pImmutableSamplers = nullptr;
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
     }
 
     // Subsurface scattering texture
@@ -619,6 +609,20 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
         fragmentLayoutBinding.pImmutableSamplers = nullptr;
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
+    }
+
+    // Depth buffer texture
+    if (m_material->isDecal())
+    {
+        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+        fragmentLayoutBinding.binding = 7;
+        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        fragmentLayoutBinding.descriptorCount = 1;
+        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragmentLayoutBinding.pImmutableSamplers = nullptr;
+        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
     }
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo[2];
@@ -665,7 +669,7 @@ VulkanMaterialDelegate::createDescriptorPool(VulkanRenderer * renderer)
     {
         VkDescriptorPoolSize poolSize;
         poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSize.descriptorCount = 5; // Number of textures
+        poolSize.descriptorCount = m_numTextures; // Number of textures
         descriptorPoolSizes.push_back(poolSize);
     }
 
@@ -752,6 +756,15 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
         textureInfo.sampler = m_subsurfaceScatteringTexture->m_sampler;
         textureInfo.imageView = m_subsurfaceScatteringTexture->m_imageView;
         textureInfo.imageLayout = m_subsurfaceScatteringTexture->m_layout;
+        fragmentTextureInfo.push_back(textureInfo);
+    }
+
+    if (m_material->isDecal())
+    {
+        VkDescriptorImageInfo textureInfo;
+        textureInfo.sampler = renderer->m_HDRImageSampler;
+        textureInfo.imageView = renderer->m_depthImageView[0];
+        textureInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
         fragmentTextureInfo.push_back(textureInfo);
     }
 

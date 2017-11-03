@@ -94,9 +94,10 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
 
+  imstk_define_dependency(glm)
+
   if(${PROJECT_NAME}_USE_Vulkan)
-    imstk_define_dependency(glfw)
-    imstk_define_dependency(glm)
+    imstk_define_dependency(glfw)  
     imstk_define_dependency(gli)
   endif()
 

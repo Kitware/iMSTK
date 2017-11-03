@@ -19,48 +19,54 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanSurfaceMeshRenderDelegate_h
-#define imstkVulkanSurfaceMeshRenderDelegate_h
+#ifndef imstkVulkanDecalRenderDelegate_h
+#define imstkVulkanDecalRenderDelegate_h
 
-#include "imstkSurfaceMesh.h"
-
+#include "imstkDecalPool.h"
+#include "imstkCamera.h"
 #include "imstkVulkanRenderDelegate.h"
 
 namespace imstk
 {
-class VulkanSurfaceMeshRenderDelegate : public VulkanRenderDelegate {
+class VulkanDecalRenderDelegate : public VulkanRenderDelegate {
 public:
 
     ///
     /// \brief Default destructor
     ///
-    ~VulkanSurfaceMeshRenderDelegate() = default;
+    ~VulkanDecalRenderDelegate() = default;
 
     ///
     /// \brief Default constructor
     ///
-    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager);
+    VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool, VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry
     ///
-    void update() override;
+    void update(std::shared_ptr<Camera> camera);
 
     ///
     /// \brief Get source geometry
     ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
-
     ///
     /// \brief Fill vertex buffer
     ///
     void updateVertexBuffer();
 
-protected:
-    std::shared_ptr<SurfaceMesh> m_geometry;
+    ///
+    /// \brief Initialize data
+    ///
+    void initializeData(VulkanMemoryManager& memoryManager,
+                        std::shared_ptr<RenderMaterial> material = nullptr);
 
-    VulkanLocalVertexUniforms m_localVertexUniforms;
+protected:
+    std::shared_ptr<DecalPool> m_geometry;
+
+    VulkanLocalDecalVertexUniforms m_decalVertexUniforms;
+    VulkanLocalDecalFragmentUniforms m_decalFragmentUniforms;
 };
 }
 

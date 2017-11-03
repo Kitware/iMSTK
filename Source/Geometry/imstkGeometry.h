@@ -51,7 +51,9 @@ public:
         TetrahedralMesh,
         HexahedralMesh,
         LineMesh,
-        Capsule
+        Capsule,
+        Decal,
+        DecalPool
     };
 
     ///
@@ -170,6 +172,8 @@ public:
 
 protected:
     friend class VTKRenderDelegate;
+    friend class VulkanRenderDelegate;
+    friend class VulkanSurfaceMeshRenderDelegate;
 
     virtual void applyTranslation(const Vec3d t) = 0;
     virtual void applyRotation(const Mat3d r) = 0;

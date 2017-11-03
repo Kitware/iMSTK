@@ -61,6 +61,8 @@ protected:
 
     std::vector<std::array<uint32_t, 3>> m_sphereTriangles;
     std::vector<VulkanBasicVertex> m_sphereVertices;
+
+    VulkanLocalVertexUniforms m_localVertexUniforms;
 };
 }
 

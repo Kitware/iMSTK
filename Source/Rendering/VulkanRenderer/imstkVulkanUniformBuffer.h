@@ -38,17 +38,28 @@ struct VulkanLocalVertexUniforms
     glm::mat4 transform;
 };
 
+struct VulkanLocalDecalVertexUniforms
+{
+    glm::mat4 transform[128];
+};
+
 struct VulkanLocalFragmentUniforms
 {
+    glm::vec4 colorUniform;
     glm::mat4 transform;
+};
+
+struct VulkanLocalDecalFragmentUniforms
+{
+    glm::mat4 inverse[128];
 };
 
 struct VulkanLight
 {
-    glm::vec3 lightVector;
-    float lightAngle;
-    glm::vec3 lightColor;
-    float lightIntensity;
+    glm::vec3 position; // 3 position, 1 type
+    int type;
+    glm::vec4 color; // 3 color, 1 intensity
+    glm::vec4 direction; // 3 direction, 1 angle
 };
 
 struct VulkanGlobalVertexUniforms
@@ -61,6 +72,9 @@ struct VulkanGlobalVertexUniforms
 
 struct VulkanGlobalFragmentUniforms
 {
+    glm::mat4 inverseViewMatrix;
+    glm::mat4 inverseProjectionMatrix;
+    glm::vec4 resolution;
     VulkanLight lights[16];
 };
 

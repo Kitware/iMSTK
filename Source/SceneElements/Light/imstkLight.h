@@ -70,8 +70,8 @@ public:
     ///
     /// \brief Set the light focal point
     ///
-    void setFocalPoint(const Vec3d& p);
-    void setFocalPoint(const double& x,
+    virtual void setFocalPoint(const Vec3d& p);
+    virtual void setFocalPoint(const double& x,
                        const double& y,
                        const double& z);
 
@@ -158,12 +158,20 @@ public:
     {
         m_type = LightType::DIRECTIONAL_LIGHT;
         m_vtkLight->SetPositional(false);
+        this->setFocalPoint(-1, -1, -1);
     };
     DirectionalLight(std::string&& name) : Light(std::move(name))
     {
         m_type = LightType::DIRECTIONAL_LIGHT;
         m_vtkLight->SetPositional(false);
+        this->setFocalPoint(-1, -1, -1);
     };
+
+    virtual void setFocalPoint(const Vec3d& p);
+
+    virtual void setFocalPoint(const double& x,
+                       const double& y,
+                       const double& z);
 };
 
 ///

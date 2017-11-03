@@ -31,8 +31,7 @@ layout (set = 1, binding = 0) uniform globalUniforms
 
 layout (set = 1, binding = 1) uniform localUniforms
 {
-    vec4 color;
-    mat4 transform;
+    mat4 inverse[128];
 } locals;
 
 layout (location = 0) in vertexData{
@@ -41,6 +40,7 @@ layout (location = 0) in vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
+    int index;
 }vertex;
 
 layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
@@ -48,7 +48,7 @@ layout (set = 1, binding = 3) uniform sampler2D normalTexture;
 layout (set = 1, binding = 4) uniform sampler2D roughnessTexture;
 layout (set = 1, binding = 5) uniform sampler2D metalnessTexture;
 layout (set = 1, binding = 6) uniform sampler2D subsurfaceScatteringTexture;
-//layout (set = 1, binding = 6) uniform samplerCube irradianceCubemapTexture;
+layout (set = 1, binding = 7) uniform sampler2D depthTexture;
 
 // Constants
 const float PI = 3.1415;
@@ -66,6 +66,8 @@ float roughness = 1.0;
 float metalness = 0.0;
 float subsurfaceScattering = 0.0;
 vec3 diffuseIndirect = vec3(0, 0, 0);
+float opacity = 1.0;
+vec2 uv = vec2(0);
 
 // Functions
 void readTextures();
@@ -73,9 +75,20 @@ void calculateIndirectLighting();
 void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightIntensity);
 float geometryTerm(vec3 vector);
 float squared(float x);
+vec3 reconstructPosition(float depth);
 
 void main(void)
 {
+    vec4 position = vec4(reconstructPosition(texture(depthTexture, gl_FragCoord.xy/globals.resolution.xy).x), 1);
+
+    vec4 visualPosition = position;
+    position = locals.inverse[vertex.index] * position;
+    uv = position.xy + 0.5;
+
+    if (abs(position.x) > 0.5) discard;
+    if (abs(position.y) > 0.5) discard;
+    if (abs(position.z) > 0.5) discard;
+
     readTextures();
 
     // If it's 0, then there's a divide by zero error
@@ -114,29 +127,31 @@ void main(void)
         calculatePBRLighting(normalize(lightRay), globals.lights[i].color.rgb, lightIntensity);
     }
 
-    finalDiffuse *= diffuseColor;
-    outputColor = vec4(finalDiffuse, 1);
-    outputSpecular = vec4(finalSpecular, 1);
+    finalDiffuse = diffuseColor;
+    outputColor = vec4(finalDiffuse, opacity);
+    outputSpecular = vec4(finalSpecular, opacity);
 
     outputNormal = vec4(normal, subsurfaceScattering);
 }
 
 void readTextures()
 {
-    float mipLevel = textureQueryLod(diffuseTexture, vertex.uv).x;
+    float mipLevel = textureQueryLod(diffuseTexture, uv).x;
 
     if (hasDiffuseTexture)
     {
-        diffuseColor = texture(diffuseTexture, vertex.uv, mipLevel).rgb;
+        vec4 diffuseColorTemp = texture(diffuseTexture, uv, mipLevel);
+        diffuseColor = diffuseColorTemp.rgb;
+        opacity = diffuseColorTemp.a;
     }
     else
     {
-        diffuseColor = locals.color.rgb;
+        diffuseColor = vec3(1, 0, 0);//locals.color.rgb;
     }
 
     if (hasNormalTexture)
     {
-        normal = vertex.TBN * normalize((2.0 * texture(normalTexture, vertex.uv, mipLevel).rgb) - 1.0);
+        normal = vertex.TBN * normalize((2.0 * texture(normalTexture, uv, mipLevel).rgb) - 1.0);
     }
     else
     {
@@ -145,17 +160,17 @@ void readTextures()
 
     if (hasRoughnessTexture)
     {
-        roughness = texture(roughnessTexture, vertex.uv, mipLevel).r;
+        roughness = texture(roughnessTexture, uv, mipLevel).r;
     }
 
     if (hasMetalnessTexture)
     {
-        metalness = texture(metalnessTexture, vertex.uv, mipLevel).r;
+        metalness = texture(metalnessTexture, uv, mipLevel).r;
     }
 
     if (hasSubsurfaceScatteringTexture)
     {
-        subsurfaceScattering = texture(subsurfaceScatteringTexture, vertex.uv, mipLevel).r;
+        subsurfaceScattering = texture(subsurfaceScatteringTexture, uv, mipLevel).r;
     }
 }
 
@@ -215,4 +230,20 @@ float geometryTerm(vec3 vector)
 float squared(float x)
 {
     return x * x;
+}
+
+vec3 reconstructPosition(float depth)
+{
+    vec3 coords = vec3(gl_FragCoord.xy / globals.resolution.xy, 1);
+    coords.x = 2 * coords.x - 1;
+    coords.y = 2 * coords.y - 1;
+    coords.z = depth;
+
+    vec4 position = vec4(coords, 1);
+    position = globals.inverseProjectionMatrix * position;
+    position /= position.w;
+
+    position = globals.inverseViewMatrix * position;
+
+    return position.xyz;
 }

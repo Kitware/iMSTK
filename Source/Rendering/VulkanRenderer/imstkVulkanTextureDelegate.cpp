@@ -255,6 +255,12 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
             memset(&imageEditData[4 * (y_offset + x) + colorChannels],
                 (unsigned char)255,
                 (4 - colorChannels) * sizeof(unsigned char));
+
+            // For alpha channel
+            if (m_channels == 4)
+            {
+                imageEditData[4 * (y_offset + x) + 3] = m_data[m_channels * (y_offset + x) + 3];
+            }
         }
     }
 

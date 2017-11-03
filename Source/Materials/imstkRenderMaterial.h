@@ -130,8 +130,12 @@ public:
     void setVisibilityOn();
     bool getVisibility() const;
 
+    bool isDecal();
+
 protected:
     friend class VTKRenderDelegate;
+    friend class VulkanRenderDelegate;
+    friend class VulkanDecalRenderDelegate;
 
     // State
     DisplayMode m_displayMode = DisplayMode::SURFACE;
@@ -139,6 +143,7 @@ protected:
     float m_lineWidth = 1.0;
     float m_pointSize = 1.0;
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
+    bool m_isDecal = false;
 
     // Sphere size used for glyph in rendering (valid only for point set)
     double m_sphereGlyphSize = 0.05;

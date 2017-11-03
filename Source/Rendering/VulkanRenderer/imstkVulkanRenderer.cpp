@@ -104,37 +104,6 @@ VulkanRenderer::initialize()
     pipelineCacheCreateInfo.pInitialData = nullptr;
 
     vkCreatePipelineCache(m_renderDevice, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache);
-
-    // Geometry pipeline creation
-    for (int i = 0; i < m_scene->getSceneObjects().size(); i++)
-    {
-        std::shared_ptr<Geometry> geometry = m_scene->getSceneObjects()[i]->getVisualGeometry();
-        auto renderDelegate = loadGeometry(geometry);
-
-        if (renderDelegate)
-        {
-            auto material = renderDelegate->m_material;
-            material->initialize(this);
-
-            graphicsPipelines.push_back(material->m_pipeline);
-            graphicsPipelinesInfo.push_back(material->m_graphicsPipelineInfo);
-        }
-    }
-
-    if (graphicsPipelines.size() > 0)
-    {
-        vkCreateGraphicsPipelines(m_renderDevice,
-            m_pipelineCache,
-            (uint32_t)graphicsPipelines.size(),
-            &graphicsPipelinesInfo[0],
-            nullptr,
-            &graphicsPipelines[0]);
-    }
-
-    for (int i = 0; i < m_renderDelegates.size(); i++)
-    {
-        m_renderDelegates[i]->m_material->m_pipeline = graphicsPipelines[i];
-    }
 }
 
 void
@@ -272,119 +241,10 @@ void
 VulkanRenderer::setupRenderPasses()
 {
     // Number of geometry passes
-    m_renderPasses.resize(1);
+    m_renderPasses.resize(2);
 
-    VkAttachmentDescription attachments[4];
-
-    // Color attachment
-    attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_R16G16B16A16_SFLOAT;
-    attachments[0].samples = m_samples;
-    attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-    // Depth attachment
-    attachments[1].flags = 0;
-    attachments[1].format = VK_FORMAT_D32_SFLOAT;
-    attachments[1].samples = m_samples;
-    attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-
-    // Normal attachment
-    attachments[2].flags = 0;
-    attachments[2].format = VK_FORMAT_R8G8B8A8_SNORM;
-    attachments[2].samples = m_samples;
-    attachments[2].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[2].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-    // Specular attachment
-    attachments[3].flags = 0;
-    attachments[3].format = VK_FORMAT_R16G16B16A16_SFLOAT;
-    attachments[3].samples = m_samples;
-    attachments[3].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    attachments[3].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[3].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[3].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[3].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[3].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-    // Color attachment
-    VkAttachmentReference colorReference;
-    colorReference.attachment = 0;
-    colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    // Depth attachment
-    VkAttachmentReference depthReference;
-    depthReference.attachment = 1;
-    depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-    // Normal attachment
-    VkAttachmentReference normalReference;
-    normalReference.attachment = 2;
-    normalReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    // Specular attachment
-    VkAttachmentReference specularReference;
-    specularReference.attachment = 3;
-    specularReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    // Render subpasses
-    VkSubpassDescription subpassInfo[1];
-
-    // First pass: geometry
-    VkAttachmentReference colorAttachments[] = { colorReference, normalReference, specularReference };
-    subpassInfo[0].flags = 0;
-    subpassInfo[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpassInfo[0].inputAttachmentCount = 0;
-    subpassInfo[0].pInputAttachments = nullptr;
-    subpassInfo[0].colorAttachmentCount = 3;
-    subpassInfo[0].pColorAttachments = colorAttachments;
-    subpassInfo[0].pResolveAttachments = nullptr;
-    subpassInfo[0].pDepthStencilAttachment = &depthReference;
-    subpassInfo[0].preserveAttachmentCount = 0;
-    subpassInfo[0].pPreserveAttachments = nullptr;
-
-    VkSubpassDependency dependencies[2];
-    dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-    dependencies[0].dstSubpass = 0;
-    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
-    dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-    dependencies[1].srcSubpass = 0;
-    dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-    dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
-    dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-    dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-    VkRenderPassCreateInfo renderPassInfo;
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.pNext = nullptr;
-    renderPassInfo.flags = 0;
-    renderPassInfo.attachmentCount = 4;
-    renderPassInfo.pAttachments = attachments;
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = subpassInfo;
-    renderPassInfo.dependencyCount = 2;
-    renderPassInfo.pDependencies = dependencies;
-
-    vkCreateRenderPass(m_renderDevice, &renderPassInfo, nullptr, &m_renderPasses[0]);
+    VulkanRenderPassGenerator::generateOpaqueRenderPass(m_renderDevice, m_renderPasses[0], m_samples);
+    VulkanRenderPassGenerator::generateDecalRenderPass(m_renderDevice, m_renderPasses[1], m_samples);
 }
 
 void
@@ -392,6 +252,10 @@ VulkanRenderer::resizeFramebuffers(VkSwapchainKHR * swapchain, int width, int he
 {
     m_width = width;
     m_height = height;
+
+    this->deleteFramebuffers();
+
+    this->initializeFramebuffers(swapchain);
 
     std::vector<VkPipeline> pipelines;
     std::vector<VkGraphicsPipelineCreateInfo> pipelineInfos;
@@ -418,10 +282,6 @@ VulkanRenderer::resizeFramebuffers(VkSwapchainKHR * swapchain, int width, int he
     {
         m_renderDelegates[i]->m_material->m_pipeline = pipelines[i];
     }
-
-    this->deleteFramebuffers();
-
-    this->initializeFramebuffers(swapchain);
 }
 
 void
@@ -690,6 +550,14 @@ VulkanRenderer::initializeFramebuffers(VkSwapchainKHR * swapchain)
     m_drawingFramebuffers[0]->setDepth(&m_depthImageView[0], VK_FORMAT_D32_SFLOAT);
     m_drawingFramebuffers[0]->setNormal(&m_normalImageView, VK_FORMAT_R8G8B8A8_SNORM);
     m_drawingFramebuffers[0]->initializeFramebuffer(&m_renderPasses[0]);
+
+    m_drawingFramebuffers.push_back(
+        std::make_shared<VulkanFramebuffer>(m_memoryManager, m_width, m_height, false, m_samples));
+    m_drawingFramebuffers[1]->setColor(&m_HDRImageView[0][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+    m_drawingFramebuffers[1]->setSpecular(&m_HDRImageView[1][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+    m_drawingFramebuffers[1]->setDepth(&m_depthImageView[0], VK_FORMAT_D32_SFLOAT);
+    m_drawingFramebuffers[1]->setNormal(&m_normalImageView, VK_FORMAT_R8G8B8A8_SNORM);
+    m_drawingFramebuffers[1]->initializeFramebuffer(&m_renderPasses[1]);
 }
 
 void
@@ -755,6 +623,11 @@ VulkanRenderer::renderFrame()
     // Update local uniforms
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        {
+            auto decalPool = std::dynamic_pointer_cast<VulkanDecalRenderDelegate>(m_renderDelegates[renderDelegateIndex]);
+            decalPool->update(m_scene->getCamera());
+        }
         m_renderDelegates[renderDelegateIndex]->update();
     }
 
@@ -799,9 +672,11 @@ VulkanRenderer::renderFrame()
     vkCmdBeginRenderPass(m_renderCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
     VkDeviceSize deviceSize = { 0 };
 
-    // Pass 1: Render all geometry
+    // Pass 1: Render opaque geometry
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool) { continue; }
+
         auto material = m_renderDelegates[renderDelegateIndex]->m_material;
         vkCmdBindPipeline(m_renderCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
 
@@ -816,13 +691,45 @@ VulkanRenderer::renderFrame()
         vkCmdBindIndexBuffer(m_renderCommandBuffer, buffers->m_indexBuffer, deviceSize, VK_INDEX_TYPE_UINT32);
         vkCmdDrawIndexed(m_renderCommandBuffer, buffers->m_numIndices, 1, 0, 0, 0);
     }
+    vkCmdEndRenderPass(m_renderCommandBuffer);
+
+    // Pass 2: Render decals
+    VkRenderPassBeginInfo decalRenderPassBeginInfo;
+    decalRenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    decalRenderPassBeginInfo.pNext = nullptr;
+    decalRenderPassBeginInfo.renderPass = m_renderPasses[1];
+    decalRenderPassBeginInfo.framebuffer = m_drawingFramebuffers[1]->m_framebuffer;
+    decalRenderPassBeginInfo.renderArea = renderArea;
+    decalRenderPassBeginInfo.clearValueCount = 0;
+    decalRenderPassBeginInfo.pClearValues = &clearValues[0];
+    vkCmdBeginRenderPass(m_renderCommandBuffer, &decalRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
+    {
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool) { continue; }
+
+        auto geometry = std::dynamic_pointer_cast<DecalPool>(m_renderDelegates[renderDelegateIndex]->getGeometry());
+        auto material = m_renderDelegates[renderDelegateIndex]->m_material;
+        vkCmdBindPipeline(m_renderCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
+
+        vkCmdBindDescriptorSets(m_renderCommandBuffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            material->m_pipelineLayout, 0, (uint32_t)material->m_descriptorSets.size(),
+            &material->m_descriptorSets[0], 0, &m_dynamicOffsets);
+
+        auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
+
+        vkCmdBindVertexBuffers(m_renderCommandBuffer, 0, 1, &buffers->m_vertexBuffer, &deviceSize);
+        vkCmdBindIndexBuffer(m_renderCommandBuffer, buffers->m_indexBuffer, deviceSize, VK_INDEX_TYPE_UINT32);
+        vkCmdDrawIndexed(m_renderCommandBuffer, buffers->m_numIndices, geometry->getNumDecals(), 0, 0, 0);
+    }
 
     vkCmdEndRenderPass(m_renderCommandBuffer);
     vkEndCommandBuffer(m_renderCommandBuffer);
 
     vkBeginCommandBuffer(m_postProcessingCommandBuffer, &commandBufferBeginInfo);
 
-    // Pass 2 to N - 1: Post processing
+    // Pass 3 to N - 1: Post processing
     for (unsigned int postProcessIndex = 0; postProcessIndex < m_postProcessingChain->m_postProcesses.size(); postProcessIndex++)
     {
         clearValues[0].color = { { 1.0, 0.0, 0.0, 1 } }; // Color
@@ -952,6 +859,18 @@ VulkanRenderer::setupSynchronization()
     vkCreateFence(m_renderDevice, &fenceInfo, nullptr, &m_commandBufferSubmit);
 }
 
+void
+VulkanRenderer::loadAllGeometry()
+{
+    for (auto sceneObject : m_scene->getSceneObjects())
+    {
+        if (sceneObject->getVisualGeometry())
+        {
+            auto renderDelegate = this->loadGeometry(sceneObject->getVisualGeometry());
+        }
+    }
+}
+
 std::shared_ptr<VulkanRenderDelegate>
 VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry)
 {
@@ -960,6 +879,7 @@ VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry)
     {
         m_renderDelegates.push_back(renderDelegate);
         renderDelegate->getBuffer()->initializeBuffers(m_memoryManager);
+        renderDelegate->m_material->initialize(this);
     }
     return renderDelegate;
 }
@@ -1034,15 +954,17 @@ VulkanRenderer::updateGlobalUniforms()
         auto camera = m_scene->getCamera();
         m_fov = (float)glm::radians(camera->getViewAngle());
         m_globalVertexUniforms.projectionMatrix = glm::perspective(m_fov, (float)(m_width) / (float)(m_height), m_nearPlane, m_farPlane);
-        m_globalVertexUniforms.projectionMatrix[1][1] *= -1; // Must do this for Vulkan
+        glm::mat4 correctionMatrix; // for Vulkan rendering
+        correctionMatrix[1][1] = -1;
+        correctionMatrix[2][2] = 0.5;
+        correctionMatrix[3][2] = 0.5;
+        m_globalVertexUniforms.projectionMatrix *= correctionMatrix;
 
         // View matrix
-
         auto eye = glm::tvec3<float>(camera->getPosition().x(), camera->getPosition().y(), camera->getPosition().z());
         auto center = glm::tvec3<float>(camera->getFocalPoint().x(), camera->getFocalPoint().y(), camera->getFocalPoint().z());
         auto up = glm::tvec3<float>(camera->getViewUp().x(), camera->getViewUp().y(), camera->getViewUp().z());
         m_globalVertexUniforms.cameraPosition = glm::vec4(camera->getPosition().x(), camera->getPosition().y(), camera->getPosition().z(), 0.0);
-
         m_globalVertexUniforms.viewMatrix = glm::lookAt(eye, center, up);
     }
 
@@ -1055,20 +977,42 @@ VulkanRenderer::updateGlobalUniforms()
             // Only supports directional lights right now
             auto focalPoint = lights[i]->getFocalPoint();
             auto position = Vec3d(0,0,0);
+            int type = 1;
 
-            m_globalFragmentUniforms.lights[i].lightVector.x = position.x() - focalPoint.x();
-            m_globalFragmentUniforms.lights[i].lightVector.y = position.y() - focalPoint.y();
-            m_globalFragmentUniforms.lights[i].lightVector.z = position.z() - focalPoint.z();
+            if (lights[i]->getType() == LightType::POINT_LIGHT || lights[i]->getType() == LightType::SPOT_LIGHT)
+            {
+                position = std::static_pointer_cast<PointLight>(lights[i])->getPosition();
+                type = 2;
+            }
 
-            m_globalFragmentUniforms.lights[i].lightVector = glm::normalize(m_globalFragmentUniforms.lights[i].lightVector);
+            m_globalFragmentUniforms.lights[i].position = glm::vec3(position.x(), position.y(), position.z());
+
+            m_globalFragmentUniforms.lights[i].direction.x = focalPoint.x() - position.x();
+            m_globalFragmentUniforms.lights[i].direction.y = focalPoint.y() - position.y();
+            m_globalFragmentUniforms.lights[i].direction.z = focalPoint.z() - position.z();
+
+            m_globalFragmentUniforms.lights[i].direction = glm::normalize(m_globalFragmentUniforms.lights[i].direction);
 
             Color lightColor = lights[i]->getColor();
-            m_globalFragmentUniforms.lights[i].lightColor.r = lightColor.r;
-            m_globalFragmentUniforms.lights[i].lightColor.g = lightColor.g;
-            m_globalFragmentUniforms.lights[i].lightColor.b = lightColor.b;
+            m_globalFragmentUniforms.lights[i].color = glm::vec4(lightColor.r, lightColor.g, lightColor.b, 1.0);
 
-            memcpy(&m_globalVertexUniforms.lights, &m_globalFragmentUniforms.lights, sizeof(m_globalFragmentUniforms.lights));
+            if (lights[i]->getType() == LightType::SPOT_LIGHT)
+            {
+                m_globalFragmentUniforms.lights[i].direction.a =
+                    glm::radians(std::static_pointer_cast<SpotLight>(lights[i])->getSpotAngle());
+                type = 3;
+            }
+
+            m_globalFragmentUniforms.lights[i].color.a = lights[i]->getIntensity();
+
+            m_globalFragmentUniforms.lights[i].type = type;
         }
+
+        memcpy(&m_globalVertexUniforms.lights, &m_globalFragmentUniforms.lights, sizeof(m_globalFragmentUniforms.lights));
+
+        m_globalFragmentUniforms.inverseViewMatrix = glm::inverse(m_globalVertexUniforms.viewMatrix);
+        m_globalFragmentUniforms.inverseProjectionMatrix = glm::inverse(m_globalVertexUniforms.projectionMatrix);
+        m_globalFragmentUniforms.resolution = glm::vec4(m_width, m_height, 0, 0);
     }
 
     m_globalVertexUniformBuffer->updateUniforms(sizeof(VulkanGlobalVertexUniforms), &m_globalVertexUniforms);

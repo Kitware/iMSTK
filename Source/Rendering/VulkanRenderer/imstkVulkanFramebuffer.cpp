@@ -95,7 +95,7 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
         framebufferAttachments.push_back(*m_normalImageView);
     }
 
-    // Normal attachment
+    // Specular attachment
     if (m_specularFormat != VK_FORMAT_UNDEFINED)
     {
         VkAttachmentDescription attachment;

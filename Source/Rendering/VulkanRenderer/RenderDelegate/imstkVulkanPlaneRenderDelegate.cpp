@@ -82,7 +82,12 @@ VulkanPlaneRenderDelegate::VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plan
     m_numTriangles = (uint32_t)m_planeTriangles.size();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    this->initializeData(memoryManager);
+    if (!m_geometry->getRenderMaterial())
+    {
+        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+    }
+
+    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
 
     m_vertexBuffer->updateVertexBuffer(&m_planeVertices, &m_planeTriangles);
 

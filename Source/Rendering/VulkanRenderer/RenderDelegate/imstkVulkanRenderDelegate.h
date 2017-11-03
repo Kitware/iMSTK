@@ -84,12 +84,14 @@ public:
     /// \brief Initialize data
     ///
     void initializeData(VulkanMemoryManager& memoryManager,
-                        std::shared_ptr<RenderMaterial> material = nullptr);
+                        std::shared_ptr<RenderMaterial> material);
 
     ///
     /// \brief Initialize data
     ///
     void updateTransform(std::shared_ptr<Geometry> geometry);
+
+    void updateUniforms(std::shared_ptr<Geometry> geometry);
 
 protected:
     friend class VulkanVertexBuffer;

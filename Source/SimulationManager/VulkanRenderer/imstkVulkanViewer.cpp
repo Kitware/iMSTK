@@ -45,6 +45,8 @@ VulkanViewer::startRenderingLoop()
     this->setupSwapchain();
     m_renderer->initializeFramebuffers(&m_swapchain);
 
+    m_renderer->loadAllGeometry();
+
     while (!glfwWindowShouldClose(m_window))
     {
         m_renderer->renderFrame();

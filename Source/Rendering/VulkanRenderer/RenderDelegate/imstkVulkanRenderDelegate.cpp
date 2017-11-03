@@ -29,12 +29,14 @@
 #include "imstkCapsule.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkDecalPool.h"
 
 #include "imstkVulkanPlaneRenderDelegate.h"
 #include "imstkVulkanSphereRenderDelegate.h"
 #include "imstkVulkanCubeRenderDelegate.h"
 #include "imstkVulkanCapsuleRenderDelegate.h"
 #include "imstkVulkanSurfaceMeshRenderDelegate.h"
+#include "imstkVulkanDecalRenderDelegate.h"
 
 namespace imstk
 {
@@ -82,7 +84,12 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemory
     {
         LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
         return nullptr;
-    }*/
+    }*/ 
+    case Geometry::Type::DecalPool:
+    {
+        auto decalPool = std::dynamic_pointer_cast<DecalPool>(geom);
+        return std::make_shared<VulkanDecalRenderDelegate>(decalPool, memoryManager);
+    }
     default:
     {
         LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
@@ -141,4 +148,21 @@ VulkanRenderDelegate::updateTransform(std::shared_ptr<Geometry> geometry)
 
     m_localVertexUniforms.transform = transform;
 }
+
+void
+VulkanRenderDelegate::updateUniforms(std::shared_ptr<Geometry> geometry)
+{
+    this->updateTransform(geometry);
+    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
+        (void *)&m_localVertexUniforms);
+
+    auto mat = geometry->getRenderMaterial();
+
+    auto color = mat->getDiffuseColor();
+    m_localFragmentUniforms.colorUniform = glm::vec4(color.r, color.g, color.b, color.a);
+
+    m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
+        (void*)&m_localFragmentUniforms);
+}
+
 }

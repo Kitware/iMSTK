@@ -19,49 +19,52 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanSurfaceMeshRenderDelegate_h
-#define imstkVulkanSurfaceMeshRenderDelegate_h
+#ifndef imstkDecal_h
+#define imstkDecal_h
 
-#include "imstkSurfaceMesh.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/quaternion.hpp"
 
-#include "imstkVulkanRenderDelegate.h"
+#include "imstkMath.h"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk
 {
-class VulkanSurfaceMeshRenderDelegate : public VulkanRenderDelegate {
+
+class Decal : public AnalyticalGeometry
+{
 public:
+    Decal();
+
+    ~Decal() = default;
 
     ///
-    /// \brief Default destructor
+    /// \brief Print the cube info
     ///
-    ~VulkanSurfaceMeshRenderDelegate() = default;
+    void print() const override;
 
     ///
-    /// \brief Default constructor
+    /// \brief Returns the volume of the cube
     ///
-    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager);
+    double getVolume() const override;
 
     ///
-    /// \brief Update render geometry
+    /// \brief Update decal transforms
     ///
-    void update() override;
-
-    ///
-    /// \brief Get source geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-
-    ///
-    /// \brief Fill vertex buffer
-    ///
-    void updateVertexBuffer();
+    void updateDecal(glm::mat4& viewMatrix);
 
 protected:
-    std::shared_ptr<SurfaceMesh> m_geometry;
+    friend class VulkanDecalRenderDelegate;
 
-    VulkanLocalVertexUniforms m_localVertexUniforms;
+    void applyScaling(const double s) override;
+
+    glm::vec3 m_dimensions;
+
+    glm::mat4 m_transform;
+    glm::mat4 m_inverse;
 };
+
 }
 
 #endif

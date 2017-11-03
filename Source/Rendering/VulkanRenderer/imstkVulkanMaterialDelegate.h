@@ -28,6 +28,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkVulkanUniformBuffer.h"
 #include "imstkVulkanTextureDelegate.h"
+#include "imstkVulkanUtilities.h"
 
 #include <memory>
 #include <vector>
@@ -94,11 +95,14 @@ protected:
     ///
     void createPipeline(VulkanRenderer * renderer);
 
+    void buildMaterial(VulkanRenderer * renderer);
+
     void initializeTextures(VulkanRenderer * renderer);
 
     void initialize(VulkanRenderer * renderer);
 
     void addSpecializationConstant(uint32_t size, uint32_t offset);
+
     uint32_t m_numConstants = 0;
     VulkanMaterialConstants m_constants;
 

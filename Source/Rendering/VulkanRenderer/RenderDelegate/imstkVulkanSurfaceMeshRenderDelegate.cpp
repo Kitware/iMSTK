@@ -30,6 +30,11 @@ VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr
     m_numTriangles = (uint32_t)m_geometry->getMaxNumTriangles();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
+    if (!m_geometry->getRenderMaterial())
+    {
+        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+    }
+
     this->initializeData(memoryManager, m_geometry->getRenderMaterial());
 
     this->updateVertexBuffer();
@@ -102,13 +107,15 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
 void
 VulkanSurfaceMeshRenderDelegate::update()
 {
-    this->updateTransform(m_geometry);
-    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
-        (void *)&m_localVertexUniforms);
+    this->updateUniforms(m_geometry);
 
-    m_geometry->computeVertexNormals(); // This method needs to be rewritten
-    // TODO: only update if deformable
-    this->updateVertexBuffer();
+    if (m_geometry->m_dataModified)
+    {
+        m_geometry->computeVertexNormals();
+        this->updateVertexBuffer();
+        m_geometry->m_dataModified = false;
+    }
+
 }
 
 std::shared_ptr<Geometry>

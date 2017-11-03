@@ -34,19 +34,19 @@
 
 #include "imstkScene.h"
 #include "imstkRenderer.h"
+#include "imstkDecalPool.h"
 
 #include "imstkVulkanValidation.h"
 #include "imstkVulkanVertexBuffer.h"
 #include "imstkVulkanUniformBuffer.h"
 #include "imstkVulkanRenderDelegate.h"
 #include "imstkVulkanMaterialDelegate.h"
-
+#include "imstkVulkanDecalRenderDelegate.h"
 #include "imstkVulkanPostProcess.h"
 #include "imstkVulkanPostProcessingChain.h"
-
 #include "imstkVulkanMemoryManager.h"
-
 #include "imstkVulkanFramebuffer.h"
+#include "imstkVulkanRenderPassGenerator.h"
 
 namespace imstk
 {
@@ -142,6 +142,7 @@ protected:
     friend class VulkanPostProcessingChain;
 
     void initialize();
+    void loadAllGeometry();
     std::shared_ptr<VulkanRenderDelegate> loadGeometry(std::shared_ptr<Geometry> geometry);
 
     unsigned int m_width = 1000;
