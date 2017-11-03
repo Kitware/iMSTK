@@ -99,7 +99,7 @@ VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, V
 void
 VulkanCubeRenderDelegate::update()
 {
-    this->updateUniforms(m_geometry);
+    this->updateUniforms();
 }
 
 std::shared_ptr<Geometry>

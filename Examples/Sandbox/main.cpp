@@ -60,6 +60,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkLineMesh.h"
+#include "imstkDecalPool.h"
 
 // Maps
 #include "imstkTetraTriangleMap.h"
@@ -2653,13 +2654,13 @@ void testScreenShotUtility()
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
 #ifndef iMSTK_USE_Vulkan
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer = sdk->getViewer();
     auto screenShotUtility
         = std::dynamic_pointer_cast<VTKScreenCaptureUtility>(viewer->getScreenCaptureUtility());
     // Set up for screen shot
-    sdk->getViewer()->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
+    viewer->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
     // Create a call back on key press of 'b' to take the screen shot
-    viewer->setOnCharFunction('b', [&](VTKInteractorStyle* c) -> bool
+    viewer->setOnCharFunction('b', [&](InteractorStyle* c) -> bool
     {
         screenShotUtility->saveScreenShot();
         return false;

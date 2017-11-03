@@ -221,7 +221,7 @@ PointSet::getPointDataArray(const std::string& arrayName) const
 size_t
 PointSet::getNumVertices() const
 {
-    return m_initialVertexPositions.size();
+    return m_vertexPositions.size();
 }
 
 

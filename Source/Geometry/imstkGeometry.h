@@ -171,9 +171,11 @@ public:
     std::shared_ptr<RenderMaterial> getRenderMaterial() const;
 
 protected:
+    friend class VTKRenderer;
     friend class VTKRenderDelegate;
     friend class VulkanRenderDelegate;
     friend class VulkanSurfaceMeshRenderDelegate;
+    friend class VulkanRenderer;
 
     virtual void applyTranslation(const Vec3d t) = 0;
     virtual void applyRotation(const Mat3d r) = 0;
@@ -185,6 +187,7 @@ protected:
     bool m_dataModified = false;
     bool m_transformModified = false;
     bool m_transformApplied = true;
+    bool m_renderDelegateCreated = false;
 
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transform
     double m_scaling = 1.0;

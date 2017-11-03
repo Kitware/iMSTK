@@ -217,14 +217,14 @@ endif(Uncrustify_EXECUTABLE)
 find_package( Assimp REQUIRED )
 include_directories( ${Assimp_INCLUDE_DIRS} )
 
+# glm
+find_package(glm)
+include_directories( ${glm_INCLUDE_DIR} )
+
 if( ${PROJECT_NAME}_USE_Vulkan )
   # glfw
   find_package(glfw)
   include_directories( ${glfw_INCLUDE_DIR} )
-
-  # glm
-  find_package(glm)
-  include_directories( ${glm_INCLUDE_DIR} )
 
   # gli
   find_package(gli)

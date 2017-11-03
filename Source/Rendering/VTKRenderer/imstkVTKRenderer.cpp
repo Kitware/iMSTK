@@ -37,28 +37,8 @@ namespace imstk
 {
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
 {
-    // Object actors
-    for ( const auto& obj : scene->getSceneObjects() )
-    {
-        auto geom     = obj->getVisualGeometry();
-        if (geom == nullptr)
-        {
-            LOG(WARNING) << "Renderer::Renderer error: Could not retrieve visual geometry for '"
-                         << obj->getName() << "'.";
-            continue;
-        }
-
-        auto delegate = VTKRenderDelegate::make_delegate( geom );
-        if (delegate == nullptr)
-        {
-            LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
-                         << obj->getName() << "'.";
-            continue;
-        }
-
-        m_renderDelegates.push_back( delegate );
-        m_objectVtkActors.push_back( delegate->getVtkActor() );
-    }
+    m_scene = scene;
+    this->updateRenderDelegates();
 
     // Initialize textures for surface mesh render delegates
     for ( const auto& renderDelegate : m_renderDelegates )
@@ -192,6 +172,27 @@ VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
 void
 VTKRenderer::updateRenderDelegates()
 {
+    // Object actors
+    for ( const auto& obj : m_scene->getSceneObjects() )
+    {
+        auto geom = obj->getVisualGeometry();
+        if (geom && !geom->m_renderDelegateCreated)
+        {
+            auto delegate = VTKRenderDelegate::make_delegate( geom );
+            if (delegate == nullptr)
+            {
+                LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                             << obj->getName() << "'.";
+                continue;
+            }
+
+            m_renderDelegates.push_back( delegate );
+            m_objectVtkActors.push_back( delegate->getVtkActor() );
+            m_vtkRenderer->AddActor(delegate->getVtkActor());
+            geom->m_renderDelegateCreated = true;
+        }
+    }
+
     for (auto delegate : m_renderDelegates)
     {
         delegate->update();

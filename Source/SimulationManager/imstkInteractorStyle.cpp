@@ -19,19 +19,9 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
 
-#include "vulkan/vulkan.h"
+#include "imstkInteractorStyle.h"
 
 namespace imstk
 {
-class VulkanRenderPassGenerator
-{
-public:
-    static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-};
 }
-
-#endif

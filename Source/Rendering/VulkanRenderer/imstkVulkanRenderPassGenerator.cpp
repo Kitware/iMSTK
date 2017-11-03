@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 void
 VulkanRenderPassGenerator::generateOpaqueRenderPass(
     VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples)
@@ -257,5 +256,4 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
 
     vkCreateRenderPass(device, &renderPassInfo[0], nullptr, &renderPass);
 }
-
 }

@@ -255,5 +255,4 @@ RenderMaterial::isDecal()
 {
     return m_isDecal;
 }
-
 }

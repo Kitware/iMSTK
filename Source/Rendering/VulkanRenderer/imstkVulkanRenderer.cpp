@@ -617,6 +617,8 @@ VulkanRenderer::renderFrame()
 {
     m_frameNumber++;
 
+    this->loadAllGeometry();
+
     // Update global uniforms
     this->updateGlobalUniforms();
 
@@ -648,7 +650,7 @@ VulkanRenderer::renderFrame()
     renderArea.extent = { m_width, m_height };
 
     std::array<VkClearValue, 4> clearValues;
-    clearValues[0].color = { { 0.5, 0.5, 0.5, 1 } }; // Color
+    clearValues[0].color = { { (float)m_backgroundColor[0], (float)m_backgroundColor[1], (float)m_backgroundColor[2], 1 } }; // Color
     clearValues[1].depthStencil = { { 1.0 }, { 0 } }; // Depth
     clearValues[2].color = { { 0, 0, 0, 0 } }; // Normal
     clearValues[3].color = { { 0, 0, 0, 0 } }; // Specular
@@ -675,7 +677,10 @@ VulkanRenderer::renderFrame()
     // Pass 1: Render opaque geometry
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool) { continue; }
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        {
+            continue;
+        }
 
         auto material = m_renderDelegates[renderDelegateIndex]->m_material;
         vkCmdBindPipeline(m_renderCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
@@ -706,7 +711,10 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool) { continue; }
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool)
+        {
+            continue;
+        }
 
         auto geometry = std::dynamic_pointer_cast<DecalPool>(m_renderDelegates[renderDelegateIndex]->getGeometry());
         auto material = m_renderDelegates[renderDelegateIndex]->m_material;
@@ -862,11 +870,14 @@ VulkanRenderer::setupSynchronization()
 void
 VulkanRenderer::loadAllGeometry()
 {
+    // Add new objects
     for (auto sceneObject : m_scene->getSceneObjects())
     {
-        if (sceneObject->getVisualGeometry())
+        auto geometry = sceneObject->getVisualGeometry();
+
+        if (geometry && !geometry->m_renderDelegateCreated)
         {
-            auto renderDelegate = this->loadGeometry(sceneObject->getVisualGeometry());
+            auto renderDelegate = this->loadGeometry(geometry);
         }
     }
 }

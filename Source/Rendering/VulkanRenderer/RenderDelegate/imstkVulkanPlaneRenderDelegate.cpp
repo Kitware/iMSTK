@@ -97,7 +97,7 @@ VulkanPlaneRenderDelegate::VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plan
 void
 VulkanPlaneRenderDelegate::update()
 {
-    this->updateTransform(m_geometry);
+    this->updateTransform();
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
         (void *)&m_localVertexUniforms);
 }

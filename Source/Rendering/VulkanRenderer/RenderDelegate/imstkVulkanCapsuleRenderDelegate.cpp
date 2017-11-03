@@ -99,7 +99,7 @@ VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule
 void
 VulkanCapsuleRenderDelegate::update()
 {
-    this->updateUniforms(m_geometry);
+    this->updateUniforms();
 }
 
 std::shared_ptr<Geometry>

@@ -67,8 +67,8 @@ DirectionalLight::setFocalPoint(const Vec3d& p)
 
 void
 DirectionalLight::setFocalPoint(const double& x,
-                     const double& y,
-                     const double& z)
+                                const double& y,
+                                const double& z)
 {
     if (x != 0 || y != 0 || z != 0)
     {

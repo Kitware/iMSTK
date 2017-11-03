@@ -106,6 +106,8 @@ protected:
 
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
 
+    std::shared_ptr<Scene> m_scene;
+
     TextureManager<VTKTextureDelegate> m_textureManager;
 };
 }

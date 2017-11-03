@@ -26,12 +26,30 @@ namespace imstk
 VulkanViewer::VulkanViewer(SimulationManager * manager)
 {
     m_simManager = manager;
+
+    auto interactor = std::make_shared<VulkanInteractorStyle>();
+
+    interactor->m_simManager = m_simManager;
+
+    m_interactorStyle = interactor;
 }
 
 void
 VulkanViewer::setActiveScene(std::shared_ptr<Scene>scene)
 {
     m_renderer = std::make_shared<VulkanRenderer>(scene);
+    m_renderer->m_backgroundColor = m_backgroundColor;
+}
+
+void
+VulkanViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2, const bool gradientBackground)
+{
+    m_backgroundColor = color1;
+
+    if (m_renderer)
+    {
+        m_renderer->m_backgroundColor = m_backgroundColor;
+    }
 }
 
 void
@@ -51,7 +69,7 @@ VulkanViewer::startRenderingLoop()
     {
         m_renderer->renderFrame();
         glfwPollEvents();
-        m_interactorStyle->OnTimer();
+        std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
     }
 
     m_running = false;
@@ -93,10 +111,7 @@ VulkanViewer::createWindow()
     VkResult status = glfwCreateWindowSurface(*m_renderer->m_instance, m_window, nullptr, &m_surface);
     std::cout << status << std::endl;
 
-    m_interactorStyle = std::make_shared<VulkanInteractorStyle>();
-
-    m_interactorStyle->setWindow(m_window, this);
-    m_interactorStyle->m_simManager = m_simManager;
+    std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->setWindow(m_window, this);
 }
 
 void

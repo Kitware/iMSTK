@@ -25,10 +25,12 @@
 #include "GLFW/glfw3.h"
 
 #include "imstkVulkanInteractorStyleTrackballCamera.h"
+#include "imstkInteractorStyle.h"
 
 #include <iostream>
 #include <unordered_map>
 #include <functional>
+#include <cctype>
 
 namespace imstk
 {
@@ -37,13 +39,11 @@ class VulkanViewer;
 
 using VulkanBaseInteractorStyle = VulkanInteractorStyleTrackballCamera;
 
-using VulkanEventHandlerFunction = std::function< bool(VulkanInteractorStyle * iStyle) >;
-
-class VulkanInteractorStyle : public VulkanBaseInteractorStyle
+class VulkanInteractorStyle : public VulkanBaseInteractorStyle, public InteractorStyle
 {
 public:
     VulkanInteractorStyle();
-    ~VulkanInteractorStyle(){};
+    virtual ~VulkanInteractorStyle(){};
 
     virtual void OnTimer();
     virtual void OnChar(int keyID, int type);
@@ -59,17 +59,6 @@ public:
 
 private:
     friend class VulkanViewer;
-
-    std::unordered_map<char, VulkanEventHandlerFunction> m_onCharFunctionMap;
-    VulkanEventHandlerFunction m_onMouseMoveFunction;
-    VulkanEventHandlerFunction m_onLeftButtonDownFunction;
-    VulkanEventHandlerFunction m_onLeftButtonUpFunction;
-    VulkanEventHandlerFunction m_onMiddleButtonDownFunction;
-    VulkanEventHandlerFunction m_onMiddleButtonUpFunction;
-    VulkanEventHandlerFunction m_onRightButtonDownFunction;
-    VulkanEventHandlerFunction m_onRightButtonUpFunction;
-    VulkanEventHandlerFunction m_onMouseWheelForwardFunction;
-    VulkanEventHandlerFunction m_onMouseWheelBackwardFunction;
 };
 }
 

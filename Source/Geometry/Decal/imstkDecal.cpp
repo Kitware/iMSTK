@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 Decal::Decal()
     : AnalyticalGeometry(Geometry::Type::Decal)
 {
@@ -35,8 +34,8 @@ Decal::print() const
 {
     Geometry::print();
     LOG(INFO) << "Dimensions: " << m_dimensions.x
-        << ", " << m_dimensions.y
-        << ", " << m_dimensions.z;
+              << ", " << m_dimensions.y
+              << ", " << m_dimensions.z;
 }
 
 double
@@ -56,7 +55,7 @@ Decal::updateDecal(glm::mat4& viewMatrix)
 {
     glm::mat4 transform;
 
-    glm::vec3 scale((float)this->getScaling());
+    glm::vec3 scale((float) this->getScaling());
     transform = glm::scale(transform, scale);
 
     auto rotation = this->getRotation();
@@ -74,5 +73,4 @@ Decal::updateDecal(glm::mat4& viewMatrix)
 
     m_inverse = glm::inverse(m_transform);
 }
-
 }

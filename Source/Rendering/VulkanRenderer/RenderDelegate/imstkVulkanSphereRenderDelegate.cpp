@@ -99,7 +99,7 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> s
 void
 VulkanSphereRenderDelegate::update()
 {
-    this->updateUniforms(m_geometry);
+    this->updateUniforms();
 }
 
 std::shared_ptr<Geometry>

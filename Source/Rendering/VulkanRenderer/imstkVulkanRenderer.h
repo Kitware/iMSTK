@@ -26,6 +26,7 @@
 #include <memory>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
 #include "vulkan/vulkan.h"
 
@@ -239,6 +240,7 @@ protected:
     std::vector<std::shared_ptr<VulkanRenderDelegate>> m_renderDelegates;
 
     uint32_t m_renderQueueFamily = 0;
+    Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
 };
 }
 

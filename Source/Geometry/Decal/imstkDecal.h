@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 class Decal : public AnalyticalGeometry
 {
 public:
@@ -64,7 +63,6 @@ protected:
     glm::mat4 m_transform;
     glm::mat4 m_inverse;
 };
-
 }
 
 #endif

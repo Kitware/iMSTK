@@ -43,12 +43,14 @@ imstk_add_library( SimulationManager
     imstkSimulationManager.h
     imstkViewer.h
     imstkScreenCaptureUtility.h
+    imstkInteractorStyle.h
     ${SIMULATIONMANAGER_H_FILES}
   CPP_FILES
     imstkSceneManager.cpp
     imstkSimulationManager.cpp
     imstkViewer.cpp
     imstkScreenCaptureUtility.cpp
+    imstkInteractorStyle.cpp
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}

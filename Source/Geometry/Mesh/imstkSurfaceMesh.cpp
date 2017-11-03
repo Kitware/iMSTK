@@ -91,6 +91,7 @@ SurfaceMesh::getVolume() const
 void
 SurfaceMesh::computeVertexNeighborTriangles()
 {
+    m_vertexNeighborTriangles.clear();
     m_vertexNeighborTriangles.resize(m_vertexPositions.size());
 
     size_t triangleId = 0;
@@ -107,9 +108,10 @@ SurfaceMesh::computeVertexNeighborTriangles()
 void
 SurfaceMesh::computeVertexNeighborVertices()
 {
+    m_vertexNeighborVertices.clear();
     m_vertexNeighborVertices.resize(m_vertexPositions.size());
 
-    if (m_vertexNeighborTriangles.empty())
+    if (m_vertexNeighborTriangles.size() != m_vertexPositions.size())
     {
         this->computeVertexNeighborTriangles();
     }
@@ -148,12 +150,14 @@ SurfaceMesh::computeTrianglesNormals()
 void
 SurfaceMesh::computeVertexNormals()
 {
-    m_vertexNormals.resize(m_vertexPositions.size());
-
-    if (m_vertexNeighborTriangles.empty())
+    if (m_topologyChanged)
     {
         this->computeVertexNeighborTriangles();
+        this->computeUVSeamVertexGroups();
+        m_topologyChanged = false;
     }
+
+    m_vertexNormals.resize(m_vertexPositions.size());
 
     this->computeTrianglesNormals();
 
@@ -168,15 +172,17 @@ SurfaceMesh::computeVertexNormals()
     }
 
     // Correct for UV seams
+    Vec3d normal;
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
     {
         NormalGroup group = {m_vertexPositions[vertexId], m_vertexNormals[vertexId]};
 
-        m_vertexNormals[vertexId] = temp_normals[vertexId];
+        normal = temp_normals[vertexId];
 
         if (m_UVSeamVertexGroups.find(group) == m_UVSeamVertexGroups.end())
         {
-            m_vertexNormals[vertexId].normalize();
+            normal.normalize();
+            m_vertexNormals[vertexId] = normal;
             continue;
         }
 
@@ -184,10 +190,11 @@ SurfaceMesh::computeVertexNormals()
 
         for (auto index : seamGroup)
         {
-            m_vertexNormals[vertexId] += temp_normals[index];
+            normal += temp_normals[index];
         }
 
-        m_vertexNormals[vertexId].normalize();
+        normal.normalize();
+        m_vertexNormals[vertexId] = normal;
     }
 }
 
@@ -313,10 +320,12 @@ SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
         m_trianglesVertices.reserve(m_maxNumTriangles);
         m_vertexNormals.reserve(m_maxNumVertices);
         m_vertexTangents.reserve(m_maxNumVertices);
+        m_topologyChanged = true;
     }
 
     if (triangles.size() <= m_maxNumTriangles)
     {
+        m_topologyChanged = true;
         m_trianglesVertices = triangles;
     }
     else
@@ -517,6 +526,11 @@ SurfaceMesh::computeUVSeamVertexGroups()
 {
     // Reset vertex groups
     m_UVSeamVertexGroups.clear();
+
+    if (m_vertexPositions.size() != m_vertexNormals.size())
+    {
+        return;
+    }
 
     // Initial pass to bin vertices based on positions
     for (size_t i = 0; i < m_vertexPositions.size(); i++)

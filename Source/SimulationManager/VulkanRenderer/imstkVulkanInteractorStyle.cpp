@@ -33,12 +33,19 @@ VulkanInteractorStyle::VulkanInteractorStyle()
 void
 VulkanInteractorStyle::OnTimer()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onTimerFunction &&
+       m_onTimerFunction(this))
+    {
+        return;
+    }
 }
 
 void
 VulkanInteractorStyle::OnChar(int keyID, int type)
 {
-    char key = (char)keyID;
+    char key = std::tolower((char)keyID);
 
     if (type != GLFW_PRESS)
     {

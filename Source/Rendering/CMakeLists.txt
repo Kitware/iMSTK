@@ -92,7 +92,6 @@ else()
   set(RENDERING_DEPENDENCIES
     ${VulkanSDK_LIBRARIES}
     glfw
-    glm
     gli)
 endif()
 
@@ -112,6 +111,7 @@ imstk_add_library( Rendering
     ${VTK_LIBRARIES}
     ${RENDERING_DEPENDENCIES}
     Scene
+    glm
   #VERBOSE
   )
 

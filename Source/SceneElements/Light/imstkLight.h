@@ -72,8 +72,8 @@ public:
     ///
     virtual void setFocalPoint(const Vec3d& p);
     virtual void setFocalPoint(const double& x,
-                       const double& y,
-                       const double& z);
+                               const double& y,
+                               const double& z);
 
     ///
     /// \brief Get the status (On/off) of the light
@@ -170,8 +170,8 @@ public:
     virtual void setFocalPoint(const Vec3d& p);
 
     virtual void setFocalPoint(const double& x,
-                       const double& y,
-                       const double& z);
+                               const double& y,
+                               const double& z);
 };
 
 ///

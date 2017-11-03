@@ -57,9 +57,11 @@ public:
     ///
     VTKViewer(SimulationManager* manager = nullptr)
     {
-        m_interactorStyle->m_simManager = manager;
+        m_interactorStyle = std::make_shared<VTKInteractorStyle>();
+        auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
+        vtkInteractorStyle->m_simManager = manager;
         m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
-        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( m_interactorStyle );
+        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( vtkInteractorStyle.get() );
         m_vtkRenderWindow->SetSize(1000,800);
         m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
     }
@@ -110,26 +112,6 @@ public:
     void setTargetFrameRate(const double& fps);
 
     ///
-    /// \brief Set custom event handlers on interactor style
-    ///
-    void setOnCharFunction(char c, VTKEventHandlerFunction func);
-    void setOnMouseMoveFunction(VTKEventHandlerFunction func);
-    void setOnLeftButtonDownFunction(VTKEventHandlerFunction func);
-    void setOnLeftButtonUpFunction(VTKEventHandlerFunction func);
-    void setOnMiddleButtonDownFunction(VTKEventHandlerFunction func);
-    void setOnMiddleButtonUpFunction(VTKEventHandlerFunction func);
-    void setOnRightButtonDownFunction(VTKEventHandlerFunction func);
-    void setOnRightButtonUpFunction(VTKEventHandlerFunction func);
-    void setOnMouseWheelForwardFunction(VTKEventHandlerFunction func);
-    void setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func);
-
-    ///
-    /// \brief Set custom behavior to be run on every frame.
-    /// The return of the function will not have any  effect.
-    ///
-    void setOnTimerFunction(VTKEventHandlerFunction func);
-
-    ///
     /// \brief Access screen shot utility
     ///
     std::shared_ptr<VTKScreenCaptureUtility> getScreenCaptureUtility() const;
@@ -143,7 +125,6 @@ public:
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<VTKInteractorStyle> m_interactorStyle = vtkSmartPointer<VTKInteractorStyle>::New();
 };
 } // imstk
 

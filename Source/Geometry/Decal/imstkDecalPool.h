@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 class DecalPool : public Geometry
 {
 public:
@@ -72,7 +71,6 @@ protected:
     glm::vec3 m_vertexPositions[8];
     glm::ivec3 m_triangles[12];
 };
-
 }
 
 #endif

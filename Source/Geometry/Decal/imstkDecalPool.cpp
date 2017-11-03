@@ -23,7 +23,6 @@
 
 namespace imstk
 {
-
 DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/)
     : Geometry(Geometry::Type::DecalPool)
 {
@@ -102,7 +101,7 @@ DecalPool::removeDecal()
 
 std::deque<std::shared_ptr<Decal>>&
 DecalPool::getDecals()
-{    
+{
     return m_orderedDecals;
 }
 
@@ -129,5 +128,4 @@ DecalPool::getMaxNumDecals()
 {
     return m_maxNumDecals;
 }
-
 }

@@ -30,7 +30,6 @@
 
 namespace imstk
 {
-
 class VulkanShaderLoader
 {
 public:
@@ -61,7 +60,6 @@ public:
 protected:
     std::shared_ptr<std::vector<char>> m_data;
 };
-
 }
 
 #endif

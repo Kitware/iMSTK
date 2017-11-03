@@ -37,7 +37,7 @@ VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> 
     }
     m_geometry->getRenderMaterial()->m_isDecal = true;
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());    
+    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
 
     this->updateVertexBuffer();
 }
