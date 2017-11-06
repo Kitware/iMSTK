@@ -844,6 +844,48 @@ void testViewer()
     sdk->startSimulation(true);
 }
 
+void testRendering()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("RenderingTest");
+
+    // Head mesh
+    auto head = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
+    auto headMesh = std::dynamic_pointer_cast<SurfaceMesh>(head);
+    auto headObject = std::make_shared<VisualObject>("Head");
+    headObject->setVisualGeometry(headMesh);
+    scene->addSceneObject(headObject);
+
+    // Head material
+    auto headMaterial = std::make_shared<RenderMaterial>();
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/diffuse.jpg", Texture::DIFFUSE);
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/normal.png", Texture::NORMAL);
+    auto headRoughnessTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/roughness.jpg", Texture::ROUGHNESS);
+    auto headSSSTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/sss.jpg", Texture::SUBSURFACE_SCATTERING);
+    headMaterial->addTexture(headDiffuseTexture);
+    headMaterial->addTexture(headNormalTexture);
+    headMaterial->addTexture(headRoughnessTexture);
+    headMaterial->addTexture(headSSSTexture);
+    headMesh->setRenderMaterial(headMaterial);
+
+    // Position camera
+    auto cam = scene->getCamera();
+    cam->setPosition(0, 0.25, 2);
+    cam->setFocalPoint(0, 0.25, 0);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>("Light");
+    light->setIntensity(7);
+    light->setColor(Color(1.0, 0.95, 0.8));
+    scene->addLight(light);
+
+    // Run
+    sdk->setActiveScene(scene);
+    sdk->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
+    sdk->startSimulation(true);
+}
+
 void testCapsule()
 {
     // SDK and Scene
@@ -3522,6 +3564,7 @@ int main()
     ------------------*/
     //testMultiObjectWithTextures();
     //testViewer();
+    testRendering();
     //testScreenShotUtility();
     //testCapsule();
 

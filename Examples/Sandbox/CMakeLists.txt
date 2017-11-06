@@ -44,6 +44,7 @@ list(APPEND FILE_LIST
     biceps_zones/,REGEX:.*
     cube/,REGEX:*
     cylinder/,REGEX:.*
+    head/,REGEX:.*
     human/,REGEX:.*
     laptool/,REGEX:.*
     liver/,REGEX:.*

@@ -48,6 +48,7 @@ VTKInteractorStyle::VTKInteractorStyle()
 VTKInteractorStyle::~VTKInteractorStyle()
 {
     m_fpsActor->Delete();
+    this->SetReferenceCount(0);
 }
 
 void
