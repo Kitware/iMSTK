@@ -189,7 +189,7 @@ void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightInten
 
     // Fresnel term: Schlick's approximation
     vec3 F_0 = mix(vec3(0.04), diffuseColor, metalness);
-    vec3 F = (F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, halfway), 0), 5);
+    vec3 F = max((F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, halfway), 0), 5), 0);
 
     // Geometry term: Schlick's GGX
     float G = geometryTerm(cameraDirection) * geometryTerm(lightDirection);

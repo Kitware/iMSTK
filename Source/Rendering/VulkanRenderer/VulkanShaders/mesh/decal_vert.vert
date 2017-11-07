@@ -36,7 +36,7 @@ layout (location = 0) out vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
-    int index;
+    flat int index;
 }vertex;
 
 void main(void)

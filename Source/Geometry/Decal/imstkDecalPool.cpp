@@ -26,13 +26,13 @@ namespace imstk
 DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/)
     : Geometry(Geometry::Type::DecalPool)
 {
-    if (maxNumDecals <= 256)
+    if (maxNumDecals <= 128)
     {
         m_maxNumDecals = maxNumDecals;
     }
     else
     {
-        m_maxNumDecals = 256;
+        m_maxNumDecals = 128;
         LOG(WARNING) << "The maximum number of decals is 256";
     }
 

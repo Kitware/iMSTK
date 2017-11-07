@@ -1,8 +1,7 @@
 #version 450
 
 layout (location = 0) out vec4 outputColor;
-layout (location = 1) out vec4 outputNormal;
-layout (location = 2) out vec4 outputSpecular;
+layout (location = 1) out vec4 outputSpecular;
 
 layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
@@ -40,7 +39,7 @@ layout (location = 0) in vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
-    int index;
+    flat int index;
 }vertex;
 
 layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
@@ -48,7 +47,8 @@ layout (set = 1, binding = 3) uniform sampler2D normalTexture;
 layout (set = 1, binding = 4) uniform sampler2D roughnessTexture;
 layout (set = 1, binding = 5) uniform sampler2D metalnessTexture;
 layout (set = 1, binding = 6) uniform sampler2D subsurfaceScatteringTexture;
-layout (set = 1, binding = 7) uniform sampler2D depthTexture;
+layout (set = 1, binding = 7) uniform sampler2D depthAttachment;
+layout (set = 1, binding = 8) uniform sampler2D normalAttachment;
 
 // Constants
 const float PI = 3.1415;
@@ -79,9 +79,8 @@ vec3 reconstructPosition(float depth);
 
 void main(void)
 {
-    vec4 position = vec4(reconstructPosition(texture(depthTexture, gl_FragCoord.xy/globals.resolution.xy).x), 1);
+    vec4 position = vec4(reconstructPosition(texture(depthAttachment, gl_FragCoord.xy/globals.resolution.xy).x), 1);
 
-    vec4 visualPosition = position;
     position = locals.inverse[vertex.index] * position;
     uv = position.xy + 0.5;
 
@@ -90,6 +89,8 @@ void main(void)
     if (abs(position.z) > 0.5) discard;
 
     readTextures();
+
+    normal = texture(normalAttachment, gl_FragCoord.xy/globals.resolution.xy).rgb;
 
     // If it's 0, then there's a divide by zero error
     roughness = max(roughness * roughness, 0.0001);
@@ -127,11 +128,9 @@ void main(void)
         calculatePBRLighting(normalize(lightRay), globals.lights[i].color.rgb, lightIntensity);
     }
 
-    finalDiffuse = diffuseColor;
+    finalDiffuse *= diffuseColor;
     outputColor = vec4(finalDiffuse, opacity);
     outputSpecular = vec4(finalSpecular, opacity);
-
-    outputNormal = vec4(normal, subsurfaceScattering);
 }
 
 void readTextures()
@@ -204,7 +203,7 @@ void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightInten
 
     // Fresnel term: Schlick's approximation
     vec3 F_0 = mix(vec3(0.04), diffuseColor, metalness);
-    vec3 F = (F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, halfway), 0), 5);
+    vec3 F = max((F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, halfway), 0), 5), 0);
 
     // Geometry term: Schlick's GGX
     float G = geometryTerm(cameraDirection) * geometryTerm(lightDirection);

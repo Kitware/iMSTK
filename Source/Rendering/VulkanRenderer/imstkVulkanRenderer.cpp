@@ -264,23 +264,7 @@ VulkanRenderer::resizeFramebuffers(VkSwapchainKHR * swapchain, int width, int he
     {
         auto material = m_renderDelegates[i]->m_material;
         vkDestroyPipeline(m_renderDevice, material->m_pipeline, nullptr);
-        material->createPipeline(this);
-        pipelines.push_back(material->m_pipeline);
-        pipelineInfos.push_back(material->m_graphicsPipelineInfo);
-    }
-    if (pipelines.size() > 0)
-    {
-        vkCreateGraphicsPipelines(m_renderDevice,
-            m_pipelineCache,
-            (uint32_t)m_renderDelegates.size(),
-            &pipelineInfos[0],
-            nullptr,
-            &pipelines[0]);
-    }
-
-    for (int i = 0; i < m_renderDelegates.size(); i++)
-    {
-        m_renderDelegates[i]->m_material->m_pipeline = pipelines[i];
+        material->initialize(this);
     }
 }
 
@@ -427,32 +411,32 @@ VulkanRenderer::initializeFramebuffers(VkSwapchainKHR * swapchain)
         vkCreateImageView(m_renderDevice, &imageViewInfo, nullptr, &m_normalImageView);
     }
 
+    VkSamplerCreateInfo samplerInfo;
+    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext = nullptr;
+    samplerInfo.flags = 0;
+    samplerInfo.magFilter = VK_FILTER_LINEAR;
+    samplerInfo.minFilter = VK_FILTER_LINEAR;
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR; // Trilinear interpolation
+    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
+    samplerInfo.mipLodBias = 0.0;
+    samplerInfo.anisotropyEnable = VK_FALSE;
+    samplerInfo.maxAnisotropy = 1.0;
+    samplerInfo.compareEnable = VK_FALSE;
+    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.minLod = 0;
+    samplerInfo.maxLod = 0;
+    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+    samplerInfo.unnormalizedCoordinates = VK_FALSE;
+
+    vkCreateSampler(m_renderDevice, &samplerInfo, nullptr, &m_HDRImageSampler);
+
     for (int i = 0; i < 3; i++)
     {
         m_HDRImageView[i].resize(m_mipLevels);
         m_HDRImageMemory[i].resize(m_mipLevels);
-
-        VkSamplerCreateInfo samplerInfo;
-        samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.pNext = nullptr;
-        samplerInfo.flags = 0;
-        samplerInfo.magFilter = VK_FILTER_LINEAR;
-        samplerInfo.minFilter = VK_FILTER_LINEAR;
-        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR; // Trilinear interpolation
-        samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.mipLodBias = 0.0;
-        samplerInfo.anisotropyEnable = VK_FALSE; // TODO:: add option to enable
-        samplerInfo.maxAnisotropy = 1.0;
-        samplerInfo.compareEnable = VK_FALSE;
-        samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-        samplerInfo.minLod = 0;
-        samplerInfo.maxLod = 0;
-        samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
-        samplerInfo.unnormalizedCoordinates = VK_FALSE;
-
-        vkCreateSampler(m_renderDevice, &samplerInfo, nullptr, &m_HDRImageSampler);
 
         for (uint32_t j = 0; j < m_mipLevels; j++)
         {
@@ -556,7 +540,6 @@ VulkanRenderer::initializeFramebuffers(VkSwapchainKHR * swapchain)
     m_drawingFramebuffers[1]->setColor(&m_HDRImageView[0][0], VK_FORMAT_R16G16B16A16_SFLOAT);
     m_drawingFramebuffers[1]->setSpecular(&m_HDRImageView[1][0], VK_FORMAT_R16G16B16A16_SFLOAT);
     m_drawingFramebuffers[1]->setDepth(&m_depthImageView[0], VK_FORMAT_D32_SFLOAT);
-    m_drawingFramebuffers[1]->setNormal(&m_normalImageView, VK_FORMAT_R8G8B8A8_SNORM);
     m_drawingFramebuffers[1]->initializeFramebuffer(&m_renderPasses[1]);
 }
 

@@ -44,6 +44,7 @@ list(APPEND FILE_LIST
     biceps_zones/,REGEX:.*
     cube/,REGEX:*
     cylinder/,REGEX:.*
+    decals/,REGEX:.*
     head/,REGEX:.*
     human/,REGEX:.*
     laptool/,REGEX:.*

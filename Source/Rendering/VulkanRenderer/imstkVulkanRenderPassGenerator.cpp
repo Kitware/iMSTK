@@ -144,7 +144,7 @@ void
 VulkanRenderPassGenerator::generateDecalRenderPass(
     VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples)
 {
-    VkAttachmentDescription attachments[4];
+    VkAttachmentDescription attachments[3];
 
     // Color attachment
     attachments[0].flags = 0;
@@ -168,9 +168,9 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 
-    // Normal attachment
+    // Specular attachment
     attachments[2].flags = 0;
-    attachments[2].format = VK_FORMAT_R8G8B8A8_SNORM;
+    attachments[2].format = VK_FORMAT_R16G16B16A16_SFLOAT;
     attachments[2].samples = samples;
     attachments[2].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -178,17 +178,6 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     attachments[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     attachments[2].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-    // Specular attachment
-    attachments[3].flags = 0;
-    attachments[3].format = VK_FORMAT_R16G16B16A16_SFLOAT;
-    attachments[3].samples = samples;
-    attachments[3].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
-    attachments[3].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-    attachments[3].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    attachments[3].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[3].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[3].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     // Color attachment
     VkAttachmentReference diffuseReference;
@@ -200,26 +189,21 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     depthReference.attachment = 1;
     depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-    // Normal attachment
-    VkAttachmentReference normalReference;
-    normalReference.attachment = 2;
-    normalReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
     // Specular attachment
     VkAttachmentReference specularReference;
-    specularReference.attachment = 3;
+    specularReference.attachment = 2;
     specularReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Render subpasses
     VkSubpassDescription subpassInfo[2];
 
     // First pass: geometry
-    VkAttachmentReference colorAttachments[] = { diffuseReference, normalReference, specularReference };
+    VkAttachmentReference colorAttachments[] = { diffuseReference, specularReference };
     subpassInfo[0].flags = 0;
     subpassInfo[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpassInfo[0].inputAttachmentCount = 0;
     subpassInfo[0].pInputAttachments = nullptr;
-    subpassInfo[0].colorAttachmentCount = 3;
+    subpassInfo[0].colorAttachmentCount = 2;
     subpassInfo[0].pColorAttachments = colorAttachments;
     subpassInfo[0].pResolveAttachments = nullptr;
     subpassInfo[0].pDepthStencilAttachment = &depthReference;
@@ -247,7 +231,7 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassInfo[0].pNext = nullptr;
     renderPassInfo[0].flags = 0;
-    renderPassInfo[0].attachmentCount = 4;
+    renderPassInfo[0].attachmentCount = 3;
     renderPassInfo[0].pAttachments = attachments;
     renderPassInfo[0].subpassCount = 1;
     renderPassInfo[0].pSubpasses = &subpassInfo[0];

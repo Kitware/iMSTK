@@ -351,7 +351,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.depthStencilInfo.minDepthBounds = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.maxDepthBounds = VK_FALSE;
 
-    m_pipelineComponents.colorBlendAttachments.resize(3);
+    size_t numAttachments = m_material->isDecal() ? 2 : 3;
+    m_pipelineComponents.colorBlendAttachments.resize(numAttachments);
 
     int blendMode = m_material->isDecal() ? VK_TRUE : VK_FALSE;
 
@@ -393,6 +394,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     vkCreatePipelineLayout(renderer->m_renderDevice, &layoutInfo, nullptr, &m_pipelineLayout);
 
+    VkRenderPass renderPass = m_material->isDecal() ? renderer->m_renderPasses[1] : renderer->m_renderPasses[0];
+
     m_graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     m_graphicsPipelineInfo.pNext = nullptr;
     m_graphicsPipelineInfo.flags = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
@@ -408,7 +411,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_graphicsPipelineInfo.pColorBlendState = &m_pipelineComponents.colorBlendInfo;
     m_graphicsPipelineInfo.pDynamicState = nullptr;
     m_graphicsPipelineInfo.layout = m_pipelineLayout;
-    m_graphicsPipelineInfo.renderPass = renderer->m_renderPasses[0];
+    m_graphicsPipelineInfo.renderPass = renderPass;
     m_graphicsPipelineInfo.subpass = 0;
     m_graphicsPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
     m_graphicsPipelineInfo.basePipelineIndex = 0;
@@ -625,6 +628,19 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         m_numTextures++;
     }
 
+    // Normal buffer texture
+    if (m_material->isDecal())
+    {
+        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+        fragmentLayoutBinding.binding = 8;
+        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        fragmentLayoutBinding.descriptorCount = 1;
+        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragmentLayoutBinding.pImmutableSamplers = nullptr;
+        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+        m_numTextures++;
+    }
+
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo[2];
     descriptorSetLayoutInfo[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     descriptorSetLayoutInfo[0].pNext = nullptr;
@@ -765,6 +781,15 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
         textureInfo.sampler = renderer->m_HDRImageSampler;
         textureInfo.imageView = renderer->m_depthImageView[0];
         textureInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        fragmentTextureInfo.push_back(textureInfo);
+    }
+
+    if (m_material->isDecal())
+    {
+        VkDescriptorImageInfo textureInfo;
+        textureInfo.sampler = renderer->m_HDRImageSampler;
+        textureInfo.imageView = renderer->m_normalImageView;
+        textureInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         fragmentTextureInfo.push_back(textureInfo);
     }
 

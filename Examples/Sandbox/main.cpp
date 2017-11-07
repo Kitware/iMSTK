@@ -844,6 +844,60 @@ void testViewer()
     sdk->startSimulation(true);
 }
 
+void testDecals()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("DecalsTest");
+
+    // Position camera
+    auto cam = scene->getCamera();
+    cam->setPosition(0, 3, 6);
+    cam->setFocalPoint(0, 0, 0);
+
+    // Decals
+    auto decalMaterial = std::make_shared<RenderMaterial>();
+    auto decalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/decals/blood_decal.png", Texture::DIFFUSE);
+    decalMaterial->addTexture(decalTexture);
+
+    auto decalPool = std::make_shared<DecalPool>();
+    auto decalObject = std::make_shared<VisualObject>("Decals");
+    decalPool->setRenderMaterial(decalMaterial);
+    decalObject->setVisualGeometry(decalPool);
+
+    for (int i = -1; i < 2; i++)
+    {
+        auto decal = decalPool->addDecal();
+        decal->setPosition(i, 0, 0.25);
+        decal->setRotation(RIGHT_VECTOR, PI_4);
+        decal->setScaling(0.5);
+    }
+
+    scene->addSceneObject(decalObject);
+
+    // Sphere
+    auto sphere = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "sphere", 0.25);
+    sphere->getVisualGeometry()->translate(1, 0, 0);
+
+    // Cube
+    auto cube = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.25);
+    cube->getVisualGeometry()->translate(0, 0, 0.1);
+    cube->getVisualGeometry()->rotate(UP_VECTOR, PI_4);
+
+    // Plane
+    auto plane = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "plane", 10);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>("Light");
+    light->setIntensity(7);
+    light->setColor(Color(1.0, 0.95, 0.8));
+    scene->addLight(light);
+
+    // Run
+    sdk->setActiveScene(scene);
+    sdk->startSimulation(true);
+}
+
 void testRendering()
 {
     // SDK and Scene
@@ -3564,7 +3618,8 @@ int main()
     ------------------*/
     //testMultiObjectWithTextures();
     //testViewer();
-    testRendering();
+    testDecals();
+    //testRendering();
     //testScreenShotUtility();
     //testCapsule();
 
