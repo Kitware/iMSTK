@@ -1346,8 +1346,8 @@ void testDeformableBody()
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     // create a linear solver
-    auto linSolver = std::make_shared<ConjugateGradient>();
-    //auto linSolver = std::make_shared<GaussSeidel>();
+    //auto linSolver = std::make_shared<ConjugateGradient>();
+    auto linSolver = std::make_shared<GaussSeidel>();
     //auto linSolver = std::make_shared<Jacobi>();
     //auto linSolver = std::make_shared<SOR>(0.4);
 
@@ -1601,6 +1601,29 @@ void testGraph()
     g2.print();
     auto colorsG2 = g2.doGreedyColoring(1);
 
+    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    if (!tetMesh)
+    {
+        std::cout << "Could not read mesh from file." << std::endl;
+        return;
+    }
+    else
+    {
+        auto volMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
+        if (!volMesh)
+        {
+            LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+            return;
+        }
+        auto colorsGVMesh = volMesh->getMeshGraph().doGreedyColoring(true);
+
+
+        auto surfMesh = std::make_shared<SurfaceMesh>();
+        volMesh->extractSurfaceMesh(surfMesh, true);
+        auto colorsGSMesh = surfMesh->getMeshGraph().doGreedyColoring(true);
+    }
+
+    std::cout << "Press any key to exit!" << std::endl;
     getchar();
 }
 
@@ -3562,7 +3585,7 @@ int main()
     //testBoneDrilling();
     //testVirtualCouplingCylinder();
     //testRigidBody();
-    //testGraph();
+    testGraph();
 
     return 0;
 }
