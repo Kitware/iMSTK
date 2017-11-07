@@ -303,4 +303,12 @@ PointSet::getMaxNumVertices()
 {
     return m_maxNumVertices;
 }
+
+Graph
+PointSet::getMeshGraph()
+{
+    LOG(WARNING) << "The graph of a point set has no edges";
+
+    return Graph(this->getNumVertices());
+}
 } // imstk

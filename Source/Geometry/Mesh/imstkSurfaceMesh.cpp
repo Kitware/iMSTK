@@ -548,4 +548,18 @@ SurfaceMesh::getMaxNumTriangles()
 {
     return m_maxNumTriangles;
 }
+
+Graph
+SurfaceMesh::getMeshGraph()
+{
+    Graph gMesh(this->getNumVertices());
+    for (auto tri : this->getTrianglesVertices())
+    {
+        gMesh.addEdge(tri[0], tri[1]);
+        gMesh.addEdge(tri[0], tri[2]);
+        gMesh.addEdge(tri[1], tri[2]);
+    }
+
+    return std::move(gMesh);
+}
 } // imstk

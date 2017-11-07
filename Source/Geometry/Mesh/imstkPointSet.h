@@ -23,6 +23,7 @@
 #define imstkPointSet_h
 
 #include "imstkGeometry.h"
+#include "imstkGraph.h"
 
 namespace imstk
 {
@@ -165,6 +166,11 @@ public:
     /// \brief Get the maximum number of vertices
     ///
     size_t getMaxNumVertices();
+
+    ///
+    /// \brief Returns the mesh graph
+    ///
+    virtual Graph getMeshGraph();
 
 protected:
 

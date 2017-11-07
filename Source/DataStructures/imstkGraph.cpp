@@ -113,12 +113,13 @@ Graph::doGreedyColoring(bool print /*= false*/) const
     if (print)
     {
         std::cout << "Num. of colors: " << *max_element(begin(result), end(result)) + 1 << std::endl;
-        for (auto i = 0; i < numNodes; ++i)
+        /*for (auto i = 0; i < numNodes; ++i)
         {
-            std::cout << "Vertex " << i << " --->  Color " << result[i] << std::endl;
+            std::cout << "V " << i << "-Color " << result[i] << " | ";
         }
+        std::cout << std::endl;*/
     }
 
-    return result;
+    return std::move(result);
 }
 }
