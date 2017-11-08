@@ -95,7 +95,7 @@ public:
         }
 
         // Form the node-constraint adjacency list
-        std::vector<std::vector<int>> adj(maxVertId+1);
+        std::vector<std::vector<size_t>> adj(maxVertId+1);
         size_t constrId = 0;
         for (const auto& constr : constraints)
         {
