@@ -301,4 +301,20 @@ TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraVertices.size();
 }
+
+Graph
+TetrahedralMesh::getMeshGraph()
+{
+    Graph gMesh(this->getNumVertices());
+    for (auto tet : this->getTetrahedraVertices())
+    {
+        gMesh.addEdge(tet[0], tet[1]);
+        gMesh.addEdge(tet[0], tet[2]);
+        gMesh.addEdge(tet[0], tet[3]);
+        gMesh.addEdge(tet[1], tet[2]);
+        gMesh.addEdge(tet[1], tet[3]);
+        gMesh.addEdge(tet[2], tet[3]);
+    }
+    return std::move(gMesh);
+}
 } // imstk

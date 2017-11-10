@@ -5,6 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( Geometry
   DEPENDS
     Core
+    Datastructures
     Assimp
     Materials
     VegaFEM::volumetricMesh

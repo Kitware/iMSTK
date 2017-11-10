@@ -46,6 +46,9 @@
 #include "imstkNewtonSolver.h"
 #include "imstkConjugateGradient.h"
 #include "imstkPbdSolver.h"
+#include "imstkGaussSeidel.h"
+#include "imstkJacobi.h"
+#include "imstkSOR.h"
 
 // Geometry
 #include "imstkPlane.h"
@@ -420,6 +423,9 @@ void testMeshCCD()
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1);
     scene->addLight(light);
+
+    // set the position of the camera
+    scene->getCamera()->setPosition(0., 0., 10);
 
     // Run
     sdk->setActiveScene(scene);
@@ -1340,12 +1346,15 @@ void testDeformableBody()
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     // create a linear solver
-    auto cgLinSolver = std::make_shared<ConjugateGradient>();
+    //auto linSolver = std::make_shared<ConjugateGradient>();
+    auto linSolver = std::make_shared<GaussSeidel>();
+    //auto linSolver = std::make_shared<Jacobi>();
+    //auto linSolver = std::make_shared<SOR>(0.4);
 
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
-    cgLinSolver->setLinearProjectors(&projList);
-    nlSolver->setLinearSolver(cgLinSolver);
+    linSolver->setLinearProjectors(&projList);
+    nlSolver->setLinearSolver(linSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
 
@@ -1592,6 +1601,29 @@ void testGraph()
     g2.print();
     auto colorsG2 = g2.doGreedyColoring(1);
 
+    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    if (!tetMesh)
+    {
+        std::cout << "Could not read mesh from file." << std::endl;
+        return;
+    }
+    else
+    {
+        auto volMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
+        if (!volMesh)
+        {
+            LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+            return;
+        }
+        auto colorsGVMesh = volMesh->getMeshGraph().doGreedyColoring(true);
+
+
+        auto surfMesh = std::make_shared<SurfaceMesh>();
+        volMesh->extractSurfaceMesh(surfMesh, true);
+        auto colorsGSMesh = surfMesh->getMeshGraph().doGreedyColoring(true);
+    }
+
+    std::cout << "Press any key to exit!" << std::endl;
     getchar();
 }
 
@@ -3496,7 +3528,7 @@ int main()
     /*------------------
     Test CD and CR
     ------------------*/
-    testMeshCCD();
+    //testMeshCCD();
     //testPenaltyRigidCollision();
 
 
@@ -3515,12 +3547,12 @@ int main()
     /*------------------
     Test physics
     ------------------*/
-    testPbdVolume();
+    //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
-    //testDeformableBody();
+    testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();
@@ -3553,7 +3585,7 @@ int main()
     //testBoneDrilling();
     //testVirtualCouplingCylinder();
     //testRigidBody();
-    //testGraph();
+    testGraph();
 
     return 0;
 }

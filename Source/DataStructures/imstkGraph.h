@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Constructor/destructor
     ///
-    Graph(const int size){ m_adjList.resize(size); };
+    Graph(const size_t size){ m_adjList.resize(size); };
     Graph(vector<Edge> edges);
     ~Graph() = default;
 

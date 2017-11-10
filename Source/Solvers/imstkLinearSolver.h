@@ -107,7 +107,7 @@ public:
     virtual bool isIterative() const = 0;
 
 protected:
-    Type m_Type;                                        ///> Type of the scene object
+    Type m_type = Type::none;                                 ///> Type of the scene object
     double m_tolerance = 1.0e-4;                        ///> default tolerance
     std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };

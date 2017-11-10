@@ -28,8 +28,8 @@ Graph::Graph(vector<Edge> edges)
     // add edges to the undirected graph
     for (size_t i = 0; i < edges.size(); i++)
     {
-        int src = edges[i].src;
-        int dest = edges[i].dest;
+        size_t src = edges[i].src;
+        size_t dest = edges[i].dest;
 
         m_adjList[src].push_back(dest);
         m_adjList[dest].push_back(src);
@@ -58,7 +58,7 @@ Graph::print() const
     {
         cout << "\t[" << i << "] : ";
 
-        for (int v : m_adjList[i])
+        for (auto v : m_adjList[i])
         {
             cout << v << " ";
         }
@@ -115,10 +115,11 @@ Graph::doGreedyColoring(bool print /*= false*/) const
         std::cout << "Num. of colors: " << *max_element(begin(result), end(result)) + 1 << std::endl;
         for (auto i = 0; i < numNodes; ++i)
         {
-            std::cout << "Vertex " << i << " --->  Color " << result[i] << std::endl;
+            std::cout << "V " << i << "-C " << result[i] << " | ";
         }
+        std::cout << std::endl;
     }
 
-    return result;
+    return std::move(result);
 }
 }
