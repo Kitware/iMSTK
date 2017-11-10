@@ -217,7 +217,7 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
 /// \brief Print number of updates for second for a given scene
 ///
 void
-printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter> ups)
+printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>& ups)
 {
     sceneManager->setPreInitCallback([](Module* module)
             {
