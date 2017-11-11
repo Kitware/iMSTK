@@ -46,4 +46,70 @@ Viewer::getScreenCaptureUtility() const
 {
     return m_screenCapturer;
 }
+
+void
+Viewer::setOnCharFunction(char c, EventHandlerFunction func)
+{
+    m_interactorStyle->m_onCharFunctionMap[c] = func;
+}
+
+void
+Viewer::setOnMouseMoveFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onMouseMoveFunction = func;
+}
+
+void
+Viewer::setOnLeftButtonDownFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onLeftButtonDownFunction = func;
+}
+
+void
+Viewer::setOnLeftButtonUpFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onLeftButtonUpFunction = func;
+}
+
+void
+Viewer::setOnMiddleButtonDownFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onMiddleButtonDownFunction = func;
+}
+
+void
+Viewer::setOnMiddleButtonUpFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onMiddleButtonUpFunction = func;
+}
+
+void
+Viewer::setOnRightButtonDownFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onRightButtonDownFunction = func;
+}
+
+void
+Viewer::setOnRightButtonUpFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onRightButtonUpFunction = func;
+}
+
+void
+Viewer::setOnMouseWheelForwardFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onMouseWheelForwardFunction = func;
+}
+
+void
+Viewer::setOnMouseWheelBackwardFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onMouseWheelBackwardFunction = func;
+}
+
+void
+Viewer::setOnTimerFunction(EventHandlerFunction func)
+{
+    m_interactorStyle->m_onTimerFunction = func;
+}
 }

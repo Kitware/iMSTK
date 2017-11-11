@@ -15,16 +15,25 @@ layout (constant_id = 7) const bool hasSubsurfaceScatteringTexture = false;
 
 struct light
 {
-    vec3 lightVector;
-    float lightAngle;
-    vec3 lightColor;
-    float lightIntensity;
+    vec3 position;
+    int type;
+    vec4 color;
+    vec4 direction;
 };
 
 layout (set = 1, binding = 0) uniform globalUniforms
 {
+    mat4 inverseViewMatrix;
+    mat4 inverseProjectionMatrix;
+    vec4 resolution;
     light lights[16];
 } globals;
+
+layout (set = 1, binding = 1) uniform localUniforms
+{
+    vec4 color;
+    mat4 transform;
+} locals;
 
 layout (location = 0) in vertexData{
     vec3 position;
@@ -61,8 +70,7 @@ vec3 diffuseIndirect = vec3(0, 0, 0);
 // Functions
 void readTextures();
 void calculateIndirectLighting();
-void calculateClassicalLighting(vec3 lightDirection, vec3 lightColor);
-void calculatePBRLighting(vec3 lightDirection, vec3 lightColor);
+void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightIntensity);
 float geometryTerm(vec3 vector);
 float squared(float x);
 
@@ -77,9 +85,33 @@ void main(void)
 
     //calculateIndirectLighting();
 
+    vec3 lightRay = vec3(0);
+    float lightIntensity = 0;
+
     for (int i = 0; i < numLights; i++)
     {
-        calculatePBRLighting(normalize(globals.lights[i].lightVector), globals.lights[i].lightColor * 5);
+        int type = globals.lights[i].type;
+        if (type > 1)
+        {
+            lightRay = vertex.position.xyz - globals.lights[i].position.xyz;
+            float distanceSquared = dot(lightRay, lightRay);
+            lightIntensity = globals.lights[i].color.a / distanceSquared;
+
+            if (type == 3)
+            {
+                if (globals.lights[i].direction.a > dot(normalize(lightRay), normalize(globals.lights[i].direction.xyz)))
+                {
+                    lightIntensity = 0;
+                }
+            }
+        }
+        else
+        {
+            lightIntensity = globals.lights[i].color.a;
+            lightRay = globals.lights[i].direction.xyz;
+        }
+
+        calculatePBRLighting(normalize(lightRay), globals.lights[i].color.rgb, lightIntensity);
     }
 
     finalDiffuse *= diffuseColor;
@@ -96,6 +128,10 @@ void readTextures()
     if (hasDiffuseTexture)
     {
         diffuseColor = texture(diffuseTexture, vertex.uv, mipLevel).rgb;
+    }
+    else
+    {
+        diffuseColor = locals.color.rgb;
     }
 
     if (hasNormalTexture)
@@ -136,24 +172,10 @@ void calculateIndirectLighting()
     finalDiffuse += diffuseIndirect * k_d;
 }
 
-void calculateClassicalLighting(vec3 lightDirection, vec3 lightColor)
+void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightIntensity)
 {
     // Lambert BRDF
-    float l_dot_n = max(dot(normal, lightDirection), 0);
-
-    vec3 halfway = normalize(lightDirection + cameraDirection);
-
-    // Blinn-Phong BRDF
-    float specularity = max(dot(normal, halfway), 0);
-    specularPow = pow(specularity, specularValue);
-		
-    finalDiffuse += lightColor * l_dot_n;
-    finalSpecular += specularPow * specularColor * l_dot_n;
-}
-
-void calculatePBRLighting(vec3 lightDirection, vec3 lightColor)
-{
-    // Lambert BRDF
+    lightDirection *= -1;
     float diffusePow = 1.0 / PI;
     float l_dot_n = max(dot(normal, lightDirection), 0);
 
@@ -167,7 +189,7 @@ void calculatePBRLighting(vec3 lightDirection, vec3 lightColor)
 
     // Fresnel term: Schlick's approximation
     vec3 F_0 = mix(vec3(0.04), diffuseColor, metalness);
-    vec3 F = (F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, halfway), 0), 5);
+    vec3 F = max((F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, halfway), 0), 5), 0);
 
     // Geometry term: Schlick's GGX
     float G = geometryTerm(cameraDirection) * geometryTerm(lightDirection);
@@ -179,8 +201,8 @@ void calculatePBRLighting(vec3 lightDirection, vec3 lightColor)
     vec3 k_s = F;
     vec3 k_d = (1 - k_s) * (1.0 - metalness);
 
-    finalDiffuse += k_d * diffusePow * lightColor * l_dot_n;
-    finalSpecular += specularPow * specularColor * lightColor * l_dot_n;
+    finalDiffuse += k_d * diffusePow * lightColor * l_dot_n * lightIntensity;
+    finalSpecular += specularPow * specularColor * lightColor * l_dot_n * lightIntensity;
 }
 
 float geometryTerm(vec3 vector)

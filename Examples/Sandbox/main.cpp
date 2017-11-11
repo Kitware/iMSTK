@@ -60,6 +60,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkLineMesh.h"
+#include "imstkDecalPool.h"
 
 // Maps
 #include "imstkTetraTriangleMap.h"
@@ -840,6 +841,102 @@ void testViewer()
 
     // Run
     sdk->setActiveScene(sceneTest);
+    sdk->startSimulation(true);
+}
+
+void testDecals()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("DecalsTest");
+
+    // Position camera
+    auto cam = scene->getCamera();
+    cam->setPosition(0, 3, 6);
+    cam->setFocalPoint(0, 0, 0);
+
+    // Decals
+    auto decalMaterial = std::make_shared<RenderMaterial>();
+    auto decalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/decals/blood_decal.png", Texture::DIFFUSE);
+    decalMaterial->addTexture(decalTexture);
+
+    auto decalPool = std::make_shared<DecalPool>();
+    auto decalObject = std::make_shared<VisualObject>("Decals");
+    decalPool->setRenderMaterial(decalMaterial);
+    decalObject->setVisualGeometry(decalPool);
+
+    for (int i = -1; i < 2; i++)
+    {
+        auto decal = decalPool->addDecal();
+        decal->setPosition(i, 0, 0.25);
+        decal->setRotation(RIGHT_VECTOR, PI_4);
+        decal->setScaling(0.5);
+    }
+
+    scene->addSceneObject(decalObject);
+
+    // Sphere
+    auto sphere = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "sphere", 0.25);
+    sphere->getVisualGeometry()->translate(1, 0, 0);
+
+    // Cube
+    auto cube = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.25);
+    cube->getVisualGeometry()->translate(0, 0, 0.1);
+    cube->getVisualGeometry()->rotate(UP_VECTOR, PI_4);
+
+    // Plane
+    auto plane = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "plane", 10);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>("Light");
+    light->setIntensity(7);
+    light->setColor(Color(1.0, 0.95, 0.8));
+    scene->addLight(light);
+
+    // Run
+    sdk->setActiveScene(scene);
+    sdk->startSimulation(true);
+}
+
+void testRendering()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("RenderingTest");
+
+    // Head mesh
+    auto head = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
+    auto headMesh = std::dynamic_pointer_cast<SurfaceMesh>(head);
+    auto headObject = std::make_shared<VisualObject>("Head");
+    headObject->setVisualGeometry(headMesh);
+    scene->addSceneObject(headObject);
+
+    // Head material
+    auto headMaterial = std::make_shared<RenderMaterial>();
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/diffuse.jpg", Texture::DIFFUSE);
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/normal.png", Texture::NORMAL);
+    auto headRoughnessTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/roughness.jpg", Texture::ROUGHNESS);
+    auto headSSSTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/sss.jpg", Texture::SUBSURFACE_SCATTERING);
+    headMaterial->addTexture(headDiffuseTexture);
+    headMaterial->addTexture(headNormalTexture);
+    headMaterial->addTexture(headRoughnessTexture);
+    headMaterial->addTexture(headSSSTexture);
+    headMesh->setRenderMaterial(headMaterial);
+
+    // Position camera
+    auto cam = scene->getCamera();
+    cam->setPosition(0, 0.25, 2);
+    cam->setFocalPoint(0, 0.25, 0);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>("Light");
+    light->setIntensity(7);
+    light->setColor(Color(1.0, 0.95, 0.8));
+    scene->addLight(light);
+
+    // Run
+    sdk->setActiveScene(scene);
+    sdk->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
     sdk->startSimulation(true);
 }
 
@@ -2653,13 +2750,13 @@ void testScreenShotUtility()
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
 #ifndef iMSTK_USE_Vulkan
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer = sdk->getViewer();
     auto screenShotUtility
         = std::dynamic_pointer_cast<VTKScreenCaptureUtility>(viewer->getScreenCaptureUtility());
     // Set up for screen shot
-    sdk->getViewer()->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
+    viewer->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
     // Create a call back on key press of 'b' to take the screen shot
-    viewer->setOnCharFunction('b', [&](VTKInteractorStyle* c) -> bool
+    viewer->setOnCharFunction('b', [&](InteractorStyle* c) -> bool
     {
         screenShotUtility->saveScreenShot();
         return false;
@@ -3521,6 +3618,8 @@ int main()
     ------------------*/
     //testMultiObjectWithTextures();
     //testViewer();
+    testDecals();
+    //testRendering();
     //testScreenShotUtility();
     //testCapsule();
 

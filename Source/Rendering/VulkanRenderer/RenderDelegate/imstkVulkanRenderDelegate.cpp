@@ -29,18 +29,21 @@
 #include "imstkCapsule.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkDecalPool.h"
 
 #include "imstkVulkanPlaneRenderDelegate.h"
 #include "imstkVulkanSphereRenderDelegate.h"
 #include "imstkVulkanCubeRenderDelegate.h"
 #include "imstkVulkanCapsuleRenderDelegate.h"
 #include "imstkVulkanSurfaceMeshRenderDelegate.h"
+#include "imstkVulkanDecalRenderDelegate.h"
 
 namespace imstk
 {
 std::shared_ptr<VulkanRenderDelegate>
 VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemoryManager& memoryManager)
 {
+    geom->m_renderDelegateCreated = true;
     switch (geom->getType())
     {
     case Geometry::Type::Plane:
@@ -83,9 +86,15 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemory
         LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
         return nullptr;
     }*/
+    case Geometry::Type::DecalPool:
+    {
+        auto decalPool = std::dynamic_pointer_cast<DecalPool>(geom);
+        return std::make_shared<VulkanDecalRenderDelegate>(decalPool, memoryManager);
+    }
     default:
     {
         LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
+        geom->m_renderDelegateCreated = false;
         return nullptr;
     }
     }
@@ -117,28 +126,41 @@ VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::sh
         material,
         memoryManager);
 
-    m_vertexBuffer = std::make_shared<VulkanVertexBuffer>(memoryManager, m_numVertices, m_vertexSize, m_numTriangles);
+    m_vertexBuffer = std::make_shared<VulkanVertexBuffer>(memoryManager,
+        m_numVertices,
+        m_vertexSize,
+        m_numTriangles,
+        m_loadFactor);
 }
 
 void
-VulkanRenderDelegate::updateTransform(std::shared_ptr<Geometry> geometry)
+VulkanRenderDelegate::updateTransform()
 {
-    glm::mat4 transform;
+    auto geometry = this->getGeometry();
+    if (!geometry->m_transformModified)
+    {
+        return;
+    }
+    AffineTransform3d T(geometry->m_transform.matrix());
+    T.scale(geometry->getScaling());
+    m_localVertexUniforms.transform = glm::make_mat4(T.data());
+    geometry->m_transformModified = false;
+}
 
-    glm::vec3 scale(geometry->getScaling());
-    transform = glm::scale(transform, scale);
+void
+VulkanRenderDelegate::updateUniforms()
+{
+    auto geometry = this->getGeometry();
+    this->updateTransform();
+    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
+        (void *)&m_localVertexUniforms);
 
-    auto rotation = geometry->getRotation();
-    glm::mat3 rotationMatrix(rotation(0, 0), rotation(0, 1), rotation(0, 2),
-                             rotation(1, 0), rotation(1, 1), rotation(1, 2),
-                             rotation(2, 0), rotation(2, 1), rotation(2, 2));
+    auto mat = geometry->getRenderMaterial();
 
-    transform = glm::mat4(rotationMatrix) * transform;
+    auto color = mat->getDiffuseColor();
+    m_localFragmentUniforms.colorUniform = glm::vec4(color.r, color.g, color.b, color.a);
 
-    transform[3][0] = geometry->getTranslation().x();
-    transform[3][1] = geometry->getTranslation().y();
-    transform[3][2] = geometry->getTranslation().z();
-
-    m_localVertexUniforms.transform = transform;
+    m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
+        (void*)&m_localFragmentUniforms);
 }
 }

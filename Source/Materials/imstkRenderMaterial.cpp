@@ -249,4 +249,10 @@ RenderMaterial::getVisibility() const
 {
     return m_isVisible;
 }
+
+bool
+RenderMaterial::isDecal()
+{
+    return m_isDecal;
+}
 }

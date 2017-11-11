@@ -27,32 +27,30 @@
 #include <unordered_map>
 #include <functional>
 
+#include "imstkInteractorStyle.h"
+
 #include "vtkInteractorStyleTrackballCamera.h"
 class vtkTextActor;
 
 namespace imstk
 {
 class SimulationManager;
-class VTKInteractorStyle; // pre-define class needed for VTKEventHandlerFunction
 
 /// Base class of the vtk interactor style used
 using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
-
-/// Signature of custom function called in each even callback.
-/// Return true to override base class behavior, or false to maintain it.
-using VTKEventHandlerFunction = std::function< bool(VTKInteractorStyle* iStyle) >;
 
 ///
 /// \class classname
 ///
 /// \brief
 ///
-class VTKInteractorStyle : public vtkBaseInteractorStyle
+class VTKInteractorStyle : public vtkBaseInteractorStyle, public InteractorStyle
 {
 public:
-
-    static VTKInteractorStyle *New();
     vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle);
+
+    VTKInteractorStyle();
+    virtual ~VTKInteractorStyle();
 
     ///
     /// \brief Set current renderer
@@ -123,25 +121,7 @@ public:
     virtual void OnFifthButtonUp(){};
 
 private:
-
-    VTKInteractorStyle();
-    ~VTKInteractorStyle();
-
     friend class VTKViewer;
-
-    /// Custom event handlers
-    /// Return true to override default event slot
-    std::unordered_map<char, VTKEventHandlerFunction> m_onCharFunctionMap;
-    VTKEventHandlerFunction m_onMouseMoveFunction;
-    VTKEventHandlerFunction m_onLeftButtonDownFunction;
-    VTKEventHandlerFunction m_onLeftButtonUpFunction;
-    VTKEventHandlerFunction m_onMiddleButtonDownFunction;
-    VTKEventHandlerFunction m_onMiddleButtonUpFunction;
-    VTKEventHandlerFunction m_onRightButtonDownFunction;
-    VTKEventHandlerFunction m_onRightButtonUpFunction;
-    VTKEventHandlerFunction m_onMouseWheelForwardFunction;
-    VTKEventHandlerFunction m_onMouseWheelBackwardFunction;
-    VTKEventHandlerFunction m_onTimerFunction;
 
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
     double m_targetMS; ///> expected time between each render frame (in ms)

@@ -59,6 +59,8 @@ public:
 
 protected:
     std::shared_ptr<SurfaceMesh> m_geometry;
+
+    VulkanLocalVertexUniforms m_localVertexUniforms;
 };
 }
 

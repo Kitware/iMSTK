@@ -34,8 +34,6 @@
 
 namespace imstk
 {
-vtkStandardNewMacro(VTKInteractorStyle);
-
 VTKInteractorStyle::VTKInteractorStyle()
 {
     m_targetMS = 0.0; // 0 for no wait time
@@ -50,6 +48,7 @@ VTKInteractorStyle::VTKInteractorStyle()
 VTKInteractorStyle::~VTKInteractorStyle()
 {
     m_fpsActor->Delete();
+    this->SetReferenceCount(0);
 }
 
 void

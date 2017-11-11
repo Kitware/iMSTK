@@ -59,6 +59,27 @@ PointLight::setPosition(const double& x,
     m_vtkLight->SetPosition(x, y, z);
 }
 
+void
+DirectionalLight::setFocalPoint(const Vec3d& p)
+{
+    this->setFocalPoint(p[0], p[1], p[2]);
+}
+
+void
+DirectionalLight::setFocalPoint(const double& x,
+                                const double& y,
+                                const double& z)
+{
+    if (x != 0 || y != 0 || z != 0)
+    {
+        m_vtkLight->SetFocalPoint(x, y, z);
+    }
+    else
+    {
+        LOG(WARNING) << "Directional lights can't have focal point at (0, 0, 0)";
+    }
+}
+
 const Vec3d
 Light::getFocalPoint() const
 {

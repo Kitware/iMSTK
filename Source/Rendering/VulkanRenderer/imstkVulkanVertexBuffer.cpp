@@ -27,13 +27,14 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
                                        unsigned int numVertices,
                                        unsigned int vertexSize,
                                        unsigned int numTriangles,
+                                       double loadFactor,
                                        VulkanVertexBufferMode mode)
 {
     m_mode = mode;
     m_renderDevice = memoryManager.m_device;
-    m_vertexBufferSize = numVertices * vertexSize;
+    m_vertexBufferSize = (uint32_t)(numVertices * vertexSize * loadFactor);
     m_numIndices = numTriangles;
-    m_indexBufferSize = m_numIndices * 3 * sizeof(uint32_t);
+    m_indexBufferSize = (uint32_t)(m_numIndices * 3 * sizeof(uint32_t) * loadFactor);
 
     // Vertex buffer
     {
@@ -226,5 +227,11 @@ VulkanVertexBuffer::initializeBuffers(VulkanMemoryManager& memoryManager)
 
     vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, nullptr);
     vkDeviceWaitIdle(memoryManager.m_device);
+}
+
+void
+VulkanVertexBuffer::setNumIndices(uint32_t numIndices)
+{
+    m_numIndices = numIndices;
 }
 }

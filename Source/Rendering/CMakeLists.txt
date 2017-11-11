@@ -38,6 +38,7 @@ set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanRenderer.h
     VulkanRenderer/RenderDelegate/imstkVulkanCapsuleRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanCubeRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanDecalRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanPlaneRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanSphereRenderDelegate.h
@@ -50,6 +51,8 @@ set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanUniformBuffer.h
     VulkanRenderer/imstkVulkanVertexBuffer.h
     VulkanRenderer/imstkVulkanFramebuffer.h
+    VulkanRenderer/imstkVulkanUtilities.h
+    VulkanRenderer/imstkVulkanRenderPassGenerator.h
     VulkanRenderer/PostProcessing/imstkVulkanPostProcess.h
     VulkanRenderer/PostProcessing/imstkVulkanPostProcessingChain.h)
 
@@ -57,6 +60,7 @@ set(VULKAN_CPP_FILES
     VulkanRenderer/imstkVulkanRenderer.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanCapsuleRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanCubeRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanDecalRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanPlaneRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanSphereRenderDelegate.cpp
@@ -67,6 +71,7 @@ set(VULKAN_CPP_FILES
     VulkanRenderer/imstkVulkanUniformBuffer.cpp
     VulkanRenderer/imstkVulkanVertexBuffer.cpp
     VulkanRenderer/imstkVulkanFramebuffer.cpp
+    VulkanRenderer/imstkVulkanRenderPassGenerator.cpp
     VulkanRenderer/PostProcessing/imstkVulkanPostProcess.cpp
     VulkanRenderer/PostProcessing/imstkVulkanPostProcessingChain.cpp)
 
@@ -87,7 +92,6 @@ else()
   set(RENDERING_DEPENDENCIES
     ${VulkanSDK_LIBRARIES}
     glfw
-    glm
     gli)
 endif()
 
@@ -107,6 +111,7 @@ imstk_add_library( Rendering
     ${VTK_LIBRARIES}
     ${RENDERING_DEPENDENCIES}
     Scene
+    glm
   #VERBOSE
   )
 

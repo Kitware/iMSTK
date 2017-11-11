@@ -23,9 +23,11 @@
 #define imstkViewer_h
 
 #include <memory>
+
 #include "imstkScene.h"
 #include "imstkRenderer.h"
 #include "imstkScreenCaptureUtility.h"
+#include "imstkInteractorStyle.h"
 
 namespace imstk
 {
@@ -91,12 +93,34 @@ public:
     ///
     virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false){};
 
+    ///
+    /// \brief Set custom event handlers on interactor style
+    ///
+    void setOnCharFunction(char c, EventHandlerFunction func);
+    void setOnMouseMoveFunction(EventHandlerFunction func);
+    void setOnLeftButtonDownFunction(EventHandlerFunction func);
+    void setOnLeftButtonUpFunction(EventHandlerFunction func);
+    void setOnMiddleButtonDownFunction(EventHandlerFunction func);
+    void setOnMiddleButtonUpFunction(EventHandlerFunction func);
+    void setOnRightButtonDownFunction(EventHandlerFunction func);
+    void setOnRightButtonUpFunction(EventHandlerFunction func);
+    void setOnMouseWheelForwardFunction(EventHandlerFunction func);
+    void setOnMouseWheelBackwardFunction(EventHandlerFunction func);
+
+    ///
+    /// \brief Set custom behavior to be run on every frame.
+    /// The return of the function will not have any  effect.
+    ///
+    void setOnTimerFunction(EventHandlerFunction func);
+
 protected:
     std::shared_ptr<Scene> m_activeScene;
 
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
     bool m_running = false;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
+
+    std::shared_ptr<InteractorStyle> m_interactorStyle;
 };
 }
 

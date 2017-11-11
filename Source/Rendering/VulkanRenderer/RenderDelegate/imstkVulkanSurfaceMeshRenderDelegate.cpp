@@ -26,9 +26,15 @@ namespace imstk
 VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager)
     : m_geometry(surfaceMesh)
 {
-    m_numVertices = (uint32_t)m_geometry->getMaxNumVertices();
-    m_numTriangles = (uint32_t)m_geometry->getMaxNumTriangles();
+    m_numVertices = (uint32_t)m_geometry->getNumVertices();
+    m_numTriangles = (uint32_t)m_geometry->getNumTriangles();
+    m_loadFactor = m_geometry->getLoadFactor();
     m_vertexSize = sizeof(VulkanBasicVertex);
+
+    if (!m_geometry->getRenderMaterial())
+    {
+        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+    }
 
     this->initializeData(memoryManager, m_geometry->getRenderMaterial());
 
@@ -55,12 +61,13 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
         UVs = nullptr;
     }
 
+    auto vertexPositions = m_geometry->getVertexPositions(Geometry::DataType::PreTransform);
     for (unsigned i = 0; i < m_geometry->getNumVertices(); i++)
     {
         vertices[i].position = glm::vec3(
-            m_geometry->getVertexPosition(i)[0],
-            m_geometry->getVertexPosition(i)[1],
-            m_geometry->getVertexPosition(i)[2]);
+            vertexPositions[i][0],
+            vertexPositions[i][1],
+            vertexPositions[i][2]);
 
         if (normals.size() == m_geometry->getNumVertices())
         {
@@ -90,6 +97,7 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
 
     auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->mapTriangles();
 
+    m_vertexBuffer->setNumIndices((uint32_t)m_geometry->getNumTriangles() * 3);
     for (unsigned i = 0; i < m_geometry->getNumTriangles(); i++)
     {
         triangles[i][0] = (uint32_t)m_geometry->getTrianglesVertices()[i][0];
@@ -102,13 +110,14 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
 void
 VulkanSurfaceMeshRenderDelegate::update()
 {
-    this->updateTransform(m_geometry);
-    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
-        (void *)&m_localVertexUniforms);
+    this->updateUniforms();
 
-    m_geometry->computeVertexNormals(); // This method needs to be rewritten
-    // TODO: only update if deformable
-    this->updateVertexBuffer();
+    if (m_geometry->m_dataModified)
+    {
+        m_geometry->computeVertexNormals();
+        this->updateVertexBuffer();
+        m_geometry->m_dataModified = false;
+    }
 }
 
 std::shared_ptr<Geometry>

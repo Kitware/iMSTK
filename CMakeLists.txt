@@ -94,9 +94,10 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
 
+  imstk_define_dependency(glm)
+
   if(${PROJECT_NAME}_USE_Vulkan)
-    imstk_define_dependency(glfw)
-    imstk_define_dependency(glm)
+    imstk_define_dependency(glfw)  
     imstk_define_dependency(gli)
   endif()
 
@@ -216,14 +217,14 @@ endif(Uncrustify_EXECUTABLE)
 find_package( Assimp REQUIRED )
 include_directories( ${Assimp_INCLUDE_DIRS} )
 
+# glm
+find_package(glm)
+include_directories( ${glm_INCLUDE_DIR} )
+
 if( ${PROJECT_NAME}_USE_Vulkan )
   # glfw
   find_package(glfw)
   include_directories( ${glfw_INCLUDE_DIR} )
-
-  # glm
-  find_package(glm)
-  include_directories( ${glm_INCLUDE_DIR} )
 
   # gli
   find_package(gli)

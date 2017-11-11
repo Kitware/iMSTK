@@ -84,7 +84,12 @@ VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, V
     m_numTriangles = (uint32_t)m_cubeTriangles.size();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    this->initializeData(memoryManager);
+    if (!m_geometry->getRenderMaterial())
+    {
+        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+    }
+
+    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
 
     m_vertexBuffer->updateVertexBuffer(&m_cubeVertices, &m_cubeTriangles);
 
@@ -94,9 +99,7 @@ VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, V
 void
 VulkanCubeRenderDelegate::update()
 {
-    this->updateTransform(m_geometry);
-    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
-        (void *)&m_localVertexUniforms);
+    this->updateUniforms();
 }
 
 std::shared_ptr<Geometry>

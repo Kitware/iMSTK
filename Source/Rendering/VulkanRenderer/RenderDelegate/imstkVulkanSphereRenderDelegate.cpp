@@ -84,7 +84,12 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> s
     m_numTriangles = (uint32_t)m_sphereTriangles.size();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    this->initializeData(memoryManager);
+    if (!m_geometry->getRenderMaterial())
+    {
+        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+    }
+
+    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
 
     m_vertexBuffer->updateVertexBuffer(&m_sphereVertices, &m_sphereTriangles);
 
@@ -94,9 +99,7 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> s
 void
 VulkanSphereRenderDelegate::update()
 {
-    this->updateTransform(m_geometry);
-    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
-        (void *)&m_localVertexUniforms);
+    this->updateUniforms();
 }
 
 std::shared_ptr<Geometry>

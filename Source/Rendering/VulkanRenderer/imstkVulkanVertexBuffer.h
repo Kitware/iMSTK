@@ -54,6 +54,7 @@ public:
                        unsigned int numVertices,
                        unsigned int vertexSize,
                        unsigned int numTriangles,
+                       double loadFactor = 1.0,
                        VulkanVertexBufferMode mode = VERTEX_BUFFER_STATIC);
 
     void * mapVertices();
@@ -78,6 +79,8 @@ public:
     void uploadBuffers(VkCommandBuffer& commandBuffer);
 
     void initializeBuffers(VulkanMemoryManager& memoryManager);
+
+    void setNumIndices(uint32_t numIndices);
 
 private:
     friend class VulkanRenderer;

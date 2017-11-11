@@ -61,7 +61,7 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene>scene)
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
 
     // Set renderer to interactorStyle
-    m_interactorStyle->SetCurrentRenderer(vtkRenderer);
+    std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->SetCurrentRenderer(vtkRenderer);
 
     // Set name to renderWindow
     m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
@@ -90,7 +90,7 @@ VTKViewer::setRenderingMode(Renderer::Mode mode)
     // Setup render window
     if (mode == Renderer::Mode::SIMULATION)
     {
-        m_interactorStyle->HighlightProp(nullptr);
+        std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->HighlightProp(nullptr);
         m_vtkRenderWindow->HideCursor();
         //m_vtkRenderWindow->BordersOff();
         //m_vtkRenderWindow->FullScreenOn(1);
@@ -139,18 +139,21 @@ VTKViewer::getVtkRenderWindow() const
 double
 VTKViewer::getTargetFrameRate() const
 {
-    if(m_interactorStyle->m_targetMS == 0)
+    auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
+    if(vtkInteractorStyle->m_targetMS == 0)
     {
         LOG(WARNING) << "VTKViewer::getTargetFrameRate warning: render target period is set to 0ms, "
                      << "therefore not regulated by a framerate. Returning 0.";
         return 0;
     }
-    return 1000.0/m_interactorStyle->m_targetMS;
+    return 1000.0/vtkInteractorStyle->m_targetMS;
 }
 
 void
 VTKViewer::setTargetFrameRate(const double& fps)
 {
+    auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
+
     if(fps < 0)
     {
         LOG(WARNING) << "VTKViewer::setTargetFrameRate error: framerate must be positive, "
@@ -159,78 +162,13 @@ VTKViewer::setTargetFrameRate(const double& fps)
     }
     if(fps == 0)
     {
-        m_interactorStyle->m_targetMS = 0;
+        vtkInteractorStyle->m_targetMS = 0;
         return;
     }
-    m_interactorStyle->m_targetMS = 1000.0/fps;
-    std::cout << "Target framerate: " << fps << " (" << m_interactorStyle->m_targetMS << " ms)"<< std::endl;
+    vtkInteractorStyle->m_targetMS = 1000.0/fps;
+    std::cout << "Target framerate: " << fps << " (" << vtkInteractorStyle->m_targetMS << " ms)"<< std::endl;
 }
 
-void
-VTKViewer::setOnCharFunction(char c, VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onCharFunctionMap[c] = func;
-}
-
-void
-VTKViewer::setOnMouseMoveFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onMouseMoveFunction = func;
-}
-
-void
-VTKViewer::setOnLeftButtonDownFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onLeftButtonDownFunction = func;
-}
-
-void
-VTKViewer::setOnLeftButtonUpFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onLeftButtonUpFunction = func;
-}
-
-void
-VTKViewer::setOnMiddleButtonDownFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onMiddleButtonDownFunction = func;
-}
-
-void
-VTKViewer::setOnMiddleButtonUpFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onMiddleButtonUpFunction = func;
-}
-
-void
-VTKViewer::setOnRightButtonDownFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onRightButtonDownFunction = func;
-}
-
-void
-VTKViewer::setOnRightButtonUpFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onRightButtonUpFunction = func;
-}
-
-void
-VTKViewer::setOnMouseWheelForwardFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onMouseWheelForwardFunction = func;
-}
-
-void
-VTKViewer::setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onMouseWheelBackwardFunction = func;
-}
-
-void
-VTKViewer::setOnTimerFunction(VTKEventHandlerFunction func)
-{
-    m_interactorStyle->m_onTimerFunction = func;
-}
 
 std::shared_ptr<VTKScreenCaptureUtility>
 VTKViewer::getScreenCaptureUtility() const

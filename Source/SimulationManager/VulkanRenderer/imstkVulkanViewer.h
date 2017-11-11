@@ -52,6 +52,12 @@ public:
     ///
     void setupSwapchain();
 
+    ///
+    /// \brief Set the coloring of the screen background
+    /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
+    ///
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) override;
+
 protected:
     friend class VulkanInteractorStyle;
     friend class VulkanInteractorStyleTrackballCamera;
@@ -73,7 +79,8 @@ protected:
 
     uint32_t m_physicalFormatsCount;
     VkSurfaceFormatKHR * m_physicalFormats;
-    std::shared_ptr<VulkanInteractorStyle> m_interactorStyle;
+
+    Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
 };
 }
 #endif

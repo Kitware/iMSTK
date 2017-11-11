@@ -25,6 +25,7 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <array>
 
@@ -84,12 +85,14 @@ public:
     /// \brief Initialize data
     ///
     void initializeData(VulkanMemoryManager& memoryManager,
-                        std::shared_ptr<RenderMaterial> material = nullptr);
+                        std::shared_ptr<RenderMaterial> material);
 
     ///
     /// \brief Initialize data
     ///
-    void updateTransform(std::shared_ptr<Geometry> geometry);
+    void updateTransform();
+
+    void updateUniforms();
 
 protected:
     friend class VulkanVertexBuffer;
@@ -99,6 +102,7 @@ protected:
     unsigned int m_numTriangles;
     unsigned int m_numVertices;
     unsigned int m_vertexSize;
+    double m_loadFactor = 1.0;
 
     ///
     /// \brief Default constructor (protected)
