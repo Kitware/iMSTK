@@ -397,8 +397,8 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
             copyInfos[currentRegion].imageSubresource = layersDestination;
             copyInfos[currentRegion].imageOffset = { 0, 0, 0 };
             copyInfos[currentRegion].imageExtent = {
-                m_cubemap[layer][level].extent().x,
-                m_cubemap[layer][level].extent().y,
+                (uint32_t)m_cubemap[layer][level].extent().x,
+                (uint32_t)m_cubemap[layer][level].extent().y,
                 1
             };
             currentOffset += (unsigned int)m_cubemap[layer][level].size();
