@@ -80,6 +80,24 @@ DirectionalLight::setFocalPoint(const double& x,
     }
 }
 
+void
+DirectionalLight::setCastsShadow(bool shadow)
+{
+    m_castShadow = shadow;
+}
+
+void
+DirectionalLight::setShadowCenter(Vec3f position)
+{
+    m_shadowCenter = position;
+}
+
+void
+DirectionalLight::setShadowRange(float range)
+{
+    m_shadowRange = range;
+}
+
 const Vec3d
 Light::getFocalPoint() const
 {

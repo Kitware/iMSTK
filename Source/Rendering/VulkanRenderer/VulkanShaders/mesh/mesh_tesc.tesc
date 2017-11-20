@@ -44,7 +44,7 @@ layout (location = 0) out vertexDataTessellation{
     vec3 cameraPosition;
 }vertexTessellation[];
 
-patch out TrianglePatch
+layout (location = 7) patch out TrianglePatch
 {
     vec3 b300;
     vec3 b030;

@@ -60,6 +60,101 @@ public:
 protected:
     std::shared_ptr<std::vector<char>> m_data;
 };
+
+class VulkanAttachmentBarriers
+{
+public:
+    static void addColorAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
+    {
+        VkImageSubresourceRange range;
+        range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        range.baseMipLevel = 0;
+        range.levelCount = 1;
+        range.baseArrayLayer = 0;
+        range.layerCount = 1;
+
+        VkImageMemoryBarrier barrier;
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.pNext = nullptr;
+        barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.srcQueueFamilyIndex = queueFamilyIndex;
+        barrier.dstQueueFamilyIndex = queueFamilyIndex;
+        barrier.image = *image;
+        barrier.subresourceRange = range;
+
+        vkCmdPipelineBarrier(*commandBuffer,
+            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            0,
+            0, nullptr, // general memory barriers
+            0, nullptr, // buffer barriers
+            1, &barrier); // image barriers
+    };
+
+    static void addDepthAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
+    {
+        VkImageSubresourceRange range;
+        range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        range.baseMipLevel = 0;
+        range.levelCount = 1;
+        range.baseArrayLayer = 0;
+        range.layerCount = 1;
+
+        VkImageMemoryBarrier barrier;
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.pNext = nullptr;
+        barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        barrier.srcQueueFamilyIndex = queueFamilyIndex;
+        barrier.dstQueueFamilyIndex = queueFamilyIndex;
+        barrier.image = *image;
+        barrier.subresourceRange = range;
+
+        vkCmdPipelineBarrier(*commandBuffer,
+            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            0,
+            0, nullptr, // general memory barriers
+            0, nullptr, // buffer barriers
+            1, &barrier); // image barriers
+    };
+
+    static void addShadowAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
+    {
+        VkImageSubresourceRange range;
+        range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+        range.baseMipLevel = 0;
+        range.levelCount = 1;
+        range.baseArrayLayer = 0;
+        range.layerCount = 1;
+
+        VkImageMemoryBarrier barrier;
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.pNext = nullptr;
+        barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.srcQueueFamilyIndex = queueFamilyIndex;
+        barrier.dstQueueFamilyIndex = queueFamilyIndex;
+        barrier.image = *image;
+        barrier.subresourceRange = range;
+
+        vkCmdPipelineBarrier(*commandBuffer,
+            VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            0,
+            0, nullptr, // general memory barriers
+            0, nullptr, // buffer barriers
+            1, &barrier); // image barriers
+    };
+};
+
 }
 
 #endif

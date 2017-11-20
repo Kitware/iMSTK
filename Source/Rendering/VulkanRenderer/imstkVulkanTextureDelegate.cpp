@@ -457,9 +457,30 @@ VulkanTextureDelegate::changeImageLayout(VkCommandBuffer& commandBuffer,
     layoutChange.image = image;
     layoutChange.subresourceRange = range;
 
+    auto sourceStageFlags = VK_PIPELINE_STAGE_HOST_BIT;
+    auto destinationStageFlags = VK_PIPELINE_STAGE_HOST_BIT;
+
+    if (sourceFlags & (VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT))
+    {
+        sourceStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (sourceFlags & (VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT))
+    {
+        sourceStageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+
+    if (destinationFlags & (VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT))
+    {
+        destinationStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (destinationFlags & (VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT))
+    {
+        destinationStageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+
     vkCmdPipelineBarrier(commandBuffer,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        sourceStageFlags,
+        destinationStageFlags,
         0,
         0,
         nullptr,

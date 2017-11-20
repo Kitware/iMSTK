@@ -184,6 +184,18 @@ RenderMaterial::setRoughness(const float roughness)
     m_roughness = roughness;
 }
 
+const float&
+RenderMaterial::getEmissivity() const
+{
+    return m_emissivity;
+}
+
+void
+RenderMaterial::setEmissivity(const float emissivity)
+{
+    m_emissivity = emissivity;
+}
+
 const double&
 RenderMaterial::getSphereGlyphSize() const
 {
@@ -248,6 +260,29 @@ bool
 RenderMaterial::getVisibility() const
 {
     return m_isVisible;
+}
+
+void
+RenderMaterial::setReceivesShadows(const bool receivesShadows)
+{
+    m_receivesShadows = receivesShadows;
+}
+
+bool
+RenderMaterial::getReceivesShadows() const
+{
+    return m_receivesShadows;
+}
+
+void
+RenderMaterial::setCastsShadows(const bool castsShadows)
+{
+    m_castsShadows = castsShadows;
+}
+
+bool RenderMaterial::getCastsShadows() const
+{
+    return m_castsShadows;
 }
 
 bool

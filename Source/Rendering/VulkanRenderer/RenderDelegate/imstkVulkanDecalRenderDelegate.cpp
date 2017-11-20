@@ -98,9 +98,18 @@ VulkanDecalRenderDelegate::update(std::shared_ptr<Camera> camera)
         index++;
     }
 
-    m_vertexUniformBuffer->updateUniforms(sizeof(glm::mat4) * m_geometry->getMaxNumDecals(),
+    auto mat = m_geometry->getRenderMaterial();
+
+    auto color = mat->getDiffuseColor();
+    m_decalFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
+    m_decalFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
+    m_decalFragmentUniforms.emissivity = mat->getEmissivity();
+    m_decalFragmentUniforms.roughness = mat->getRoughness();
+    m_decalFragmentUniforms.metalness = mat->getMetalness();
+
+    m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalVertexUniforms),
         (void *)&m_decalVertexUniforms);
-    m_fragmentUniformBuffer->updateUniforms(sizeof(glm::mat4) * m_geometry->getMaxNumDecals(),
+    m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalFragmentUniforms),
         (void *)&m_decalFragmentUniforms);
 }
 

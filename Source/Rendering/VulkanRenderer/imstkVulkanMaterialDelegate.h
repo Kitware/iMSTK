@@ -85,7 +85,8 @@ public:
         std::shared_ptr<VulkanUniformBuffer> vertexUniformBuffer,
         std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
         std::shared_ptr<RenderMaterial> material,
-        VulkanMemoryManager& memoryManager);
+        VulkanMemoryManager& memoryManager,
+        bool shadowPass = false);
 
 protected:
     friend class VulkanRenderer;
@@ -107,6 +108,7 @@ protected:
     VulkanMaterialConstants m_constants;
 
     uint32_t m_numTextures = 0;
+    bool m_shadowPass = false;
 
     void createDescriptors(VulkanRenderer * renderer);
     void createDescriptorSetLayouts(VulkanRenderer * renderer);

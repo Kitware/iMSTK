@@ -88,6 +88,7 @@ VulkanRenderer::initialize()
     this->setupSynchronization();
     this->setupMemoryManager();
     this->createGlobalUniformBuffers();
+    this->createShadowMaps(m_shadowMapResolution);
 
     std::vector<VkPipeline> graphicsPipelines;
     std::vector<VkGraphicsPipelineCreateInfo> graphicsPipelinesInfo;
@@ -654,10 +655,60 @@ VulkanRenderer::renderFrame()
         buffers->uploadBuffers(m_renderCommandBuffer);
     }
 
-    vkCmdBeginRenderPass(m_renderCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
     VkDeviceSize deviceSize = { 0 };
 
+    // Pass 0: Render opaque shadows
+    for (size_t i = 0; i < m_shadowPasses.size(); i++)
+    {
+        VkRect2D shadowRenderArea = { {0, 0}, {m_shadowMapResolution, m_shadowMapResolution} };
+
+        VkRenderPassBeginInfo shadowPassBeginInfo;
+        shadowPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        shadowPassBeginInfo.pNext = nullptr;
+        shadowPassBeginInfo.renderPass = m_shadowPasses[i];
+        shadowPassBeginInfo.framebuffer = m_shadowFramebuffers[i]->m_framebuffer;
+        shadowPassBeginInfo.renderArea = shadowRenderArea;
+        shadowPassBeginInfo.clearValueCount = 1;
+        shadowPassBeginInfo.pClearValues = &clearValues[1]; // depth buffer
+
+        vkCmdBeginRenderPass(m_renderCommandBuffer, &shadowPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
+        {
+            if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+            {
+                continue;
+            }
+
+            auto material = m_renderDelegates[renderDelegateIndex]->m_shadowMaterial;
+
+            if (!m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows())
+            {
+                continue;
+            }
+
+            vkCmdBindPipeline(m_renderCommandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
+
+            vkCmdBindDescriptorSets(m_renderCommandBuffer,
+                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                material->m_pipelineLayout, 0, (uint32_t)material->m_descriptorSets.size(),
+                &material->m_descriptorSets[0], 0, &m_dynamicOffsets);
+
+            auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
+
+
+            vkCmdPushConstants(m_renderCommandBuffer, material->m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, 64, (void*)&m_lightMatrices[i]);
+            vkCmdBindVertexBuffers(m_renderCommandBuffer, 0, 1, &buffers->m_vertexBuffer, &deviceSize);
+            vkCmdBindIndexBuffer(m_renderCommandBuffer, buffers->m_indexBuffer, deviceSize, VK_INDEX_TYPE_UINT32);
+            vkCmdDrawIndexed(m_renderCommandBuffer, buffers->m_numIndices, 1, 0, 0, 0);
+        }
+        vkCmdEndRenderPass(m_renderCommandBuffer);
+        VulkanAttachmentBarriers::addDepthAttachmentBarrier(&m_renderCommandBuffer, m_renderQueueFamily, &m_shadowMaps);
+    }
+
     // Pass 1: Render opaque geometry
+    vkCmdBeginRenderPass(m_renderCommandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
         if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
@@ -680,6 +731,7 @@ VulkanRenderer::renderFrame()
         vkCmdDrawIndexed(m_renderCommandBuffer, buffers->m_numIndices, 1, 0, 0, 0);
     }
     vkCmdEndRenderPass(m_renderCommandBuffer);
+    //VulkanAttachmentBarriers::addDepthAttachmentBarrier(&m_renderCommandBuffer, m_renderQueueFamily, &m_depthImage[0]);
 
     // Pass 2: Render decals
     VkRenderPassBeginInfo decalRenderPassBeginInfo;
@@ -874,6 +926,11 @@ VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry)
         m_renderDelegates.push_back(renderDelegate);
         renderDelegate->getBuffer()->initializeBuffers(m_memoryManager);
         renderDelegate->m_material->initialize(this);
+
+        if (!renderDelegate->getGeometry()->getRenderMaterial()->isDecal())
+        {
+            renderDelegate->m_shadowMaterial->initialize(this);
+        }
     }
     return renderDelegate;
 }
@@ -972,6 +1029,7 @@ VulkanRenderer::updateGlobalUniforms()
             auto focalPoint = lights[i]->getFocalPoint();
             auto position = Vec3d(0,0,0);
             int type = 1;
+            int shadowMapIndex = -1;
 
             if (lights[i]->getType() == LightType::POINT_LIGHT || lights[i]->getType() == LightType::SPOT_LIGHT)
             {
@@ -979,7 +1037,7 @@ VulkanRenderer::updateGlobalUniforms()
                 type = 2;
             }
 
-            m_globalFragmentUniforms.lights[i].position = glm::vec3(position.x(), position.y(), position.z());
+            m_globalFragmentUniforms.lights[i].position = glm::vec4(position.x(), position.y(), position.z(), 1);
 
             m_globalFragmentUniforms.lights[i].direction.x = focalPoint.x() - position.x();
             m_globalFragmentUniforms.lights[i].direction.y = focalPoint.y() - position.y();
@@ -997,20 +1055,156 @@ VulkanRenderer::updateGlobalUniforms()
                 type = 3;
             }
 
+            if (lights[i]->getType() == LightType::DIRECTIONAL_LIGHT)
+            {
+                shadowMapIndex = std::static_pointer_cast<DirectionalLight>(lights[i])->m_shadowMapIndex;
+            }
+
             m_globalFragmentUniforms.lights[i].color.a = lights[i]->getIntensity();
 
-            m_globalFragmentUniforms.lights[i].type = type;
+            m_globalFragmentUniforms.lights[i].state.x = type;
+            m_globalFragmentUniforms.lights[i].state.y = shadowMapIndex;
         }
 
         memcpy(&m_globalVertexUniforms.lights, &m_globalFragmentUniforms.lights, sizeof(m_globalFragmentUniforms.lights));
 
         m_globalFragmentUniforms.inverseViewMatrix = glm::inverse(m_globalVertexUniforms.viewMatrix);
         m_globalFragmentUniforms.inverseProjectionMatrix = glm::inverse(m_globalVertexUniforms.projectionMatrix);
-        m_globalFragmentUniforms.resolution = glm::vec4(m_width, m_height, 0, 0);
+        m_globalFragmentUniforms.resolution = glm::vec4(m_width, m_height, m_shadowMapResolution, 0);
+
+        for (size_t i = 0; i < m_shadowLights.size(); i++)
+        {
+            auto light = m_shadowLights[i];
+            auto camera = m_scene->getCamera();
+
+            auto shadowRange = light->m_shadowRange;
+            auto shadowCenter = light->m_shadowCenter;
+
+            m_lightMatrices[i] = glm::ortho(-shadowRange, shadowRange, -shadowRange, shadowRange, -shadowRange, shadowRange);
+            glm::mat4 correctionMatrix; // for Vulkan rendering
+            correctionMatrix[1][1] = -1;
+            correctionMatrix[2][2] = 0.5;
+            correctionMatrix[3][2] = 0.5;
+            m_lightMatrices[i] *= correctionMatrix;
+            auto eye = glm::tvec3<float>(shadowCenter.x(), shadowCenter.y(), shadowCenter.z());
+            auto center = glm::tvec3<float>(light->getFocalPoint().x(), light->getFocalPoint().y(), light->getFocalPoint().z()) + eye;
+            auto offset = glm::normalize(eye - center) * shadowRange;
+            center += offset;
+            eye += offset;
+            auto up = glm::tvec3<float>(0, 1, 0);
+            m_lightMatrices[i] *= glm::lookAt(eye, center, up);
+            m_globalFragmentUniforms.lightMatrices[i] = m_lightMatrices[i];
+        }
+
     }
 
     m_globalVertexUniformBuffer->updateUniforms(sizeof(VulkanGlobalVertexUniforms), &m_globalVertexUniforms);
     m_globalFragmentUniformBuffer->updateUniforms(sizeof(VulkanGlobalFragmentUniforms), &m_globalFragmentUniforms);
+}
+
+void
+VulkanRenderer::createShadowMaps(uint32_t resolution)
+{
+    // shadow maps image
+    uint32_t numShadows = 0;
+    for (auto light : m_scene->getLights())
+    {
+        if (light->getType() == LightType::DIRECTIONAL_LIGHT)
+        {
+            numShadows++;
+        }
+    }
+
+    VkImageCreateInfo shadowMapsInfo;
+    shadowMapsInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    shadowMapsInfo.pNext = nullptr;
+    shadowMapsInfo.flags = 0;
+    shadowMapsInfo.imageType = VK_IMAGE_TYPE_2D;
+    shadowMapsInfo.format = VK_FORMAT_D32_SFLOAT;
+    shadowMapsInfo.extent = { resolution, resolution, 1 };
+    shadowMapsInfo.mipLevels = 1;
+    shadowMapsInfo.arrayLayers = std::max(numShadows, (uint32_t)1);
+    shadowMapsInfo.samples = m_samples;
+    shadowMapsInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+    shadowMapsInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT
+                           | VK_IMAGE_USAGE_SAMPLED_BIT;
+    shadowMapsInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    shadowMapsInfo.queueFamilyIndexCount = 0;
+    shadowMapsInfo.pQueueFamilyIndices = nullptr;
+    shadowMapsInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+    vkCreateImage(m_renderDevice, &shadowMapsInfo, nullptr, &m_shadowMaps);
+
+    VkMemoryRequirements memReqs;
+    vkGetImageMemoryRequirements(m_renderDevice, m_shadowMaps, &memReqs);
+
+    m_shadowMapsMemory = m_memoryManager.allocateMemory(memReqs, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    vkBindImageMemory(m_renderDevice, m_shadowMaps, *m_shadowMapsMemory, 0);
+
+    VkComponentMapping componentMap;
+    componentMap.r = VK_COMPONENT_SWIZZLE_R;
+    componentMap.g = VK_COMPONENT_SWIZZLE_G;
+    componentMap.b = VK_COMPONENT_SWIZZLE_B;
+    componentMap.a = VK_COMPONENT_SWIZZLE_A;
+
+    VkImageSubresourceRange subresourceRange;
+    subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+    subresourceRange.baseMipLevel = 0;
+    subresourceRange.levelCount = 1;
+    subresourceRange.baseArrayLayer = 0;
+    subresourceRange.layerCount = std::max(numShadows, (uint32_t)1);
+
+    VkImageViewCreateInfo imageViewInfo;
+    imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    imageViewInfo.pNext = nullptr;
+    imageViewInfo.flags = 0;
+    imageViewInfo.image = m_shadowMaps;
+    imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+    imageViewInfo.format = VK_FORMAT_D32_SFLOAT;
+    imageViewInfo.components = componentMap;
+    imageViewInfo.subresourceRange = subresourceRange;
+
+    vkCreateImageView(m_renderDevice, &imageViewInfo, nullptr, &m_shadowMapsView);
+
+    m_shadowFramebuffers.clear();
+    m_shadowMapsViews.resize((size_t)numShadows);
+    m_shadowPasses.resize((size_t)numShadows);
+    uint32_t currentLight = 0;
+    auto shadowSamples = VK_SAMPLE_COUNT_1_BIT;
+
+    for (auto light : m_scene->getLights())
+    {
+        if (light->getType() == LightType::DIRECTIONAL_LIGHT && currentLight < 16)
+        {
+            imageViewInfo.subresourceRange.baseArrayLayer = currentLight;
+            imageViewInfo.subresourceRange.layerCount = 1;
+            imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+
+            vkCreateImageView(m_renderDevice, &imageViewInfo, nullptr, &m_shadowMapsViews[currentLight]);
+
+            VulkanRenderPassGenerator::generateShadowRenderPass(m_renderDevice, m_shadowPasses[currentLight], shadowSamples);
+
+            m_shadowFramebuffers.push_back(
+                std::make_shared<VulkanFramebuffer>(m_memoryManager, resolution, resolution, false, shadowSamples));
+            m_shadowFramebuffers[currentLight]->setDepth(&m_shadowMapsViews[currentLight], VK_FORMAT_D32_SFLOAT);
+            m_shadowFramebuffers[currentLight]->initializeFramebuffer(&m_shadowPasses[currentLight]);
+
+
+            auto directionalLight = std::dynamic_pointer_cast<DirectionalLight>(light);
+            directionalLight->m_shadowMapIndex = currentLight;
+            m_shadowLights.push_back(directionalLight);
+            currentLight++;
+        }
+    }
+
+    m_lightMatrices.resize(currentLight);
+}
+
+void
+VulkanRenderer::setShadowMapResolution(uint32_t resolution)
+{
+    m_shadowMapResolution = resolution;
 }
 
 VulkanRenderer::~VulkanRenderer()

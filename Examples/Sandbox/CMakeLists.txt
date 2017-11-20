@@ -83,6 +83,8 @@ if( iMSTK_USE_Vulkan )
   compileShaders(Mesh/mesh_frag.frag Mesh/mesh_frag.spv)
   compileShaders(Mesh/decal_vert.vert Mesh/decal_vert.spv)
   compileShaders(Mesh/decal_frag.frag Mesh/decal_frag.spv)
+  compileShaders(Mesh/shadow_vert.vert Mesh/shadow_vert.spv)
+  compileShaders(Mesh/shadow_frag.frag Mesh/shadow_frag.spv)
 
   # Post processing shaders
   compileShaders(PostProcessing/HDR_tonemap_frag.frag PostProcessing/HDR_tonemap_frag.spv)

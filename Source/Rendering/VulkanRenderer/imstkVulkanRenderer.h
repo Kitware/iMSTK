@@ -61,6 +61,14 @@ public:
     VulkanRenderer(std::shared_ptr<Scene> scene);
     ~VulkanRenderer();
 
+    void setShadowMapResolution(uint32_t resolution);
+
+protected:
+    friend class VulkanViewer;
+    friend class VulkanMaterialDelegate;
+    friend class VulkanPostProcess;
+    friend class VulkanPostProcessingChain;
+
     ///
     /// \brief Populates the device fields for the rendering class (both physical and logical devices)
     ///
@@ -136,11 +144,10 @@ public:
     ///
     void updateGlobalUniforms();
 
-protected:
-    friend class VulkanViewer;
-    friend class VulkanMaterialDelegate;
-    friend class VulkanPostProcess;
-    friend class VulkanPostProcessingChain;
+    ///
+    /// \brief Create shadow maps
+    ///
+    void createShadowMaps(uint32_t resolution);
 
     void initialize();
     void loadAllGeometry();
@@ -236,6 +243,16 @@ protected:
     VkFence m_commandBufferSubmit;
 
     glm::mat4 m_projectionMatrix;
+
+    VkImage m_shadowMaps; ///< a single texture array (hence why it's one image)
+    VkImageView m_shadowMapsView; ///< for binding to the shaders (so shaders can access all layers)
+    std::vector<VkImageView> m_shadowMapsViews; ///< for framebuffers
+    VkDeviceMemory * m_shadowMapsMemory;
+    std::vector<std::shared_ptr<DirectionalLight>> m_shadowLights;
+    std::vector<std::shared_ptr<VulkanFramebuffer>> m_shadowFramebuffers;
+    std::vector<VkRenderPass> m_shadowPasses;
+    uint32_t m_shadowMapResolution = 2048;
+    std::vector<glm::mat4> m_lightMatrices;
 
     std::vector<std::shared_ptr<VulkanRenderDelegate>> m_renderDelegates;
 

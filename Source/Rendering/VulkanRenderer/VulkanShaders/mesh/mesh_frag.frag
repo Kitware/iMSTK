@@ -15,10 +15,10 @@ layout (constant_id = 7) const bool hasSubsurfaceScatteringTexture = false;
 
 struct light
 {
-    vec3 position;
-    int type;
+    vec4 position;
     vec4 color;
     vec4 direction;
+    ivec4 state; // 1 type, shadow map index
 };
 
 layout (set = 1, binding = 0) uniform globalUniforms
@@ -27,12 +27,17 @@ layout (set = 1, binding = 0) uniform globalUniforms
     mat4 inverseProjectionMatrix;
     vec4 resolution;
     light lights[16];
+    mat4 lightMatrices[16];
 } globals;
 
 layout (set = 1, binding = 1) uniform localUniforms
 {
-    vec4 color;
     mat4 transform;
+    vec4 color;
+    uint receivesShadows;
+    float emissivity;
+    float roughness;
+    float metalness;
 } locals;
 
 layout (location = 0) in vertexData{
@@ -49,6 +54,7 @@ layout (set = 1, binding = 4) uniform sampler2D roughnessTexture;
 layout (set = 1, binding = 5) uniform sampler2D metalnessTexture;
 layout (set = 1, binding = 6) uniform sampler2D subsurfaceScatteringTexture;
 //layout (set = 1, binding = 6) uniform samplerCube irradianceCubemapTexture;
+layout (set = 1, binding = 7) uniform sampler2DArray shadowArray;
 
 // Constants
 const float PI = 3.1415;
@@ -73,6 +79,7 @@ void calculateIndirectLighting();
 void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightIntensity);
 float geometryTerm(vec3 vector);
 float squared(float x);
+float calculateShadow(int index);
 
 void main(void)
 {
@@ -90,7 +97,7 @@ void main(void)
 
     for (int i = 0; i < numLights; i++)
     {
-        int type = globals.lights[i].type;
+        int type = globals.lights[i].state.x;
         if (type > 1)
         {
             lightRay = vertex.position.xyz - globals.lights[i].position.xyz;
@@ -107,7 +114,7 @@ void main(void)
         }
         else
         {
-            lightIntensity = globals.lights[i].color.a;
+            lightIntensity = globals.lights[i].color.a * calculateShadow(i);
             lightRay = globals.lights[i].direction.xyz;
         }
 
@@ -115,7 +122,7 @@ void main(void)
     }
 
     finalDiffuse *= diffuseColor;
-    outputColor = vec4(finalDiffuse, 1);
+    outputColor = vec4(finalDiffuse + (diffuseColor * locals.emissivity), 1);
     outputSpecular = vec4(finalSpecular, 1);
 
     outputNormal = vec4(normal, subsurfaceScattering);
@@ -123,20 +130,15 @@ void main(void)
 
 void readTextures()
 {
-    float mipLevel = textureQueryLod(diffuseTexture, vertex.uv).x;
-
+    diffuseColor = locals.color.rgb;
     if (hasDiffuseTexture)
     {
-        diffuseColor = texture(diffuseTexture, vertex.uv, mipLevel).rgb;
-    }
-    else
-    {
-        diffuseColor = locals.color.rgb;
+        diffuseColor *= texture(diffuseTexture, vertex.uv).rgb;
     }
 
     if (hasNormalTexture)
     {
-        normal = vertex.TBN * normalize((2.0 * texture(normalTexture, vertex.uv, mipLevel).rgb) - 1.0);
+        normal = vertex.TBN * normalize((2.0 * texture(normalTexture, vertex.uv).rgb) - 1.0);
     }
     else
     {
@@ -145,17 +147,25 @@ void readTextures()
 
     if (hasRoughnessTexture)
     {
-        roughness = texture(roughnessTexture, vertex.uv, mipLevel).r;
+        roughness *= texture(roughnessTexture, vertex.uv).r;
+    }
+    else
+    {
+        roughness = locals.roughness;
     }
 
     if (hasMetalnessTexture)
     {
-        metalness = texture(metalnessTexture, vertex.uv, mipLevel).r;
+        metalness *= texture(metalnessTexture, vertex.uv).r;
+    }
+    else
+    {
+        metalness = locals.metalness;
     }
 
     if (hasSubsurfaceScatteringTexture)
     {
-        subsurfaceScattering = texture(subsurfaceScatteringTexture, vertex.uv, mipLevel).r;
+        subsurfaceScattering = texture(subsurfaceScatteringTexture, vertex.uv).r;
     }
 }
 
@@ -185,7 +195,7 @@ void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightInten
 
     // Distribution term: Trowbridge-Reitz
     float roughness_squared = roughness * roughness;
-    float D = roughness_squared / (PI * squared(squared(max(dot(halfway, normal), 0)) * (roughness_squared - 1) + 1));
+    float D = roughness_squared / (PI * squared(squared(max(dot(halfway, normal), 0)) * (roughness_squared - 1) + 1.001));
 
     // Fresnel term: Schlick's approximation
     vec3 F_0 = mix(vec3(0.04), diffuseColor, metalness);
@@ -195,7 +205,7 @@ void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightInten
     float G = geometryTerm(cameraDirection) * geometryTerm(lightDirection);
 
     vec3 specularPow = (D * F * G) /
-        (4 * max(dot(normal, cameraDirection), 0.01) * max(dot(normal, lightDirection), 0.01));
+        (4 * max(dot(normal, cameraDirection), 0.001) * max(dot(normal, lightDirection), 0.001));
 
     // Energy conservation
     vec3 k_s = F;
@@ -215,4 +225,40 @@ float geometryTerm(vec3 vector)
 float squared(float x)
 {
     return x * x;
+}
+
+float calculateShadow(int index)
+{
+    int shadowMapIndex = globals.lights[index].state.y;
+    if (locals.receivesShadows == 0 || shadowMapIndex == -1)
+    {
+        return 1;
+    }
+
+    float coverage = 0;
+    vec4 position = globals.lightMatrices[shadowMapIndex] * vec4(vertex.position, 1);
+
+    if (abs(position.x) >= 1.0 || abs(position.y) >= 1.0 || abs(position.z) >= 1.0)
+    {
+        return 1;
+    }
+
+    position.xy = 0.5 * position.xy + 0.5;
+
+    float resolution = globals.resolution.z;
+
+    for (int x = -2; x < 3; x++)
+    {
+        for (int y = -2; y < 3; y++)
+        {
+            float depth = texture(shadowArray, vec3(position.x + x / resolution, position.y + y / resolution, shadowMapIndex)).r;
+
+            if (position.z > depth + 0.002)
+            {                
+                coverage += 1.0 / 25.0;
+            }
+        }
+    }
+
+    return (1 - coverage);
 }

@@ -115,6 +115,7 @@ protected:
     std::shared_ptr<VulkanUniformBuffer> m_fragmentUniformBuffer;
 
     std::shared_ptr<VulkanMaterialDelegate> m_material;
+    std::shared_ptr<VulkanMaterialDelegate> m_shadowMaterial;
 
     VulkanLocalVertexUniforms m_localVertexUniforms;
     VulkanLocalFragmentUniforms m_localFragmentUniforms;

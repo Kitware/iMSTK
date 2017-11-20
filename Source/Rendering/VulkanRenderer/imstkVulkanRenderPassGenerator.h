@@ -31,6 +31,7 @@ class VulkanRenderPassGenerator
 public:
     static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
     static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
+    static void generateShadowRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
 };
 }
 

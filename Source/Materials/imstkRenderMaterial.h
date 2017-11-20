@@ -106,6 +106,12 @@ public:
     void setRoughness(const float roughness);
 
     ///
+    /// \brief Get/Set emissivity
+    ///
+    const float& getEmissivity() const;
+    void setEmissivity(const float emissivity);
+
+    ///
     /// \brief Get/Set the roughness
     ///
     const double& getSphereGlyphSize() const;
@@ -130,6 +136,21 @@ public:
     void setVisibilityOn();
     bool getVisibility() const;
 
+    ///
+    /// \brief Get/Set shadow receiving ability
+    ///
+    void setReceivesShadows(const bool receivesShadows);
+    bool getReceivesShadows() const;
+
+    ///
+    /// \brief Get/Set shadow cast status
+    ///
+    void setCastsShadows(const bool castsShadows);
+    bool getCastsShadows() const;
+
+    ///
+    /// \brief Checks if the material belongs to a decal
+    ///
     bool isDecal();
 
 protected:
@@ -155,9 +176,14 @@ protected:
     // Classical values
     float m_metalness = 0.0; ///< Value for metalness with range: [0.0, 1.0]
     float m_roughness = 0.0; ///< Value for roughness with range: [0.0, 1.0]
+    float m_emissivity = 0.0;
 
     // Textures
     std::vector<std::shared_ptr<Texture>> m_textures; ///< Ordered by Texture::Type
+
+    // Shadows
+    bool m_receivesShadows = true;
+    bool m_castsShadows = true;
 
     // Visibility
     bool m_isVisible = true;

@@ -126,6 +126,12 @@ VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::sh
         material,
         memoryManager);
 
+    m_shadowMaterial = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
+        m_fragmentUniformBuffer,
+        material,
+        memoryManager,
+        true);
+
     m_vertexBuffer = std::make_shared<VulkanVertexBuffer>(memoryManager,
         m_numVertices,
         m_vertexSize,
@@ -158,9 +164,13 @@ VulkanRenderDelegate::updateUniforms()
     auto mat = geometry->getRenderMaterial();
 
     auto color = mat->getDiffuseColor();
-    m_localFragmentUniforms.colorUniform = glm::vec4(color.r, color.g, color.b, color.a);
+    m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
+    m_localFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
+    m_localFragmentUniforms.emissivity = mat->getEmissivity();
+    m_localFragmentUniforms.roughness = mat->getRoughness();
+    m_localFragmentUniforms.metalness = mat->getMetalness();
 
-    m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
+    m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalFragmentUniforms),
         (void*)&m_localFragmentUniforms);
 }
 }

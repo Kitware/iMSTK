@@ -27,7 +27,7 @@ namespace imstk
 {
 VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
 {
-    bool bloom = false;
+    bool bloom = true;
     bool sss = true;
 
     // Subsurface scattering pass

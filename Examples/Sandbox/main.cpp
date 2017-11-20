@@ -891,6 +891,7 @@ void testDecals()
     auto light = std::make_shared<DirectionalLight>("Light");
     light->setIntensity(7);
     light->setColor(Color(1.0, 0.95, 0.8));
+    light->setFocalPoint(Vec3d(-1, -1, 0));
     scene->addLight(light);
 
     // Run
@@ -921,6 +922,8 @@ void testRendering()
     headMaterial->addTexture(headNormalTexture);
     headMaterial->addTexture(headRoughnessTexture);
     headMaterial->addTexture(headSSSTexture);
+    headMaterial->setReceivesShadows(true);
+    headMaterial->setCastsShadows(true);
     headMesh->setRenderMaterial(headMaterial);
 
     // Position camera
@@ -928,11 +931,33 @@ void testRendering()
     cam->setPosition(0, 0.25, 2);
     cam->setFocalPoint(0, 0.25, 0);
 
-    // Light
-    auto light = std::make_shared<DirectionalLight>("Light");
-    light->setIntensity(7);
-    light->setColor(Color(1.0, 0.95, 0.8));
-    scene->addLight(light);
+    // Lights
+    auto directionalLight = std::make_shared<DirectionalLight>("DirectionalLight");
+    directionalLight->setIntensity(7);
+    directionalLight->setColor(Color(1.0, 0.95, 0.8));
+    directionalLight->setCastsShadow(true);
+    directionalLight->setShadowRange(1.5);
+    scene->addLight(directionalLight);
+
+    auto pointLight = std::make_shared<PointLight>("PointLight");
+    pointLight->setIntensity(0.1);
+    pointLight->setPosition(0.1, 0.2, 0.5);
+    scene->addLight(pointLight);
+
+    // Sphere
+    auto sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
+    auto sphereMaterial = std::make_shared<RenderMaterial>();
+    auto sphereMesh = sphereObj->getVisualGeometry();
+    sphereMesh->translate(0.1, 0.2, 0.5);
+    sphereMaterial->setEmissivity(10);
+    sphereMaterial->setCastsShadows(false);
+    sphereObj->getVisualGeometry()->setRenderMaterial(sphereMaterial);
+
+    // Plane
+    auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
+    auto planeMaterial = std::make_shared<RenderMaterial>();
+    planeMaterial->setDiffuseColor(Color::DarkGray);
+    planeObj->getVisualGeometry()->setRenderMaterial(planeMaterial);
 
     // Run
     sdk->setActiveScene(scene);
@@ -3618,8 +3643,8 @@ int main()
     ------------------*/
     //testMultiObjectWithTextures();
     //testViewer();
-    testDecals();
-    //testRendering();
+    //testDecals();
+    testRendering();
     //testScreenShotUtility();
     //testCapsule();
 

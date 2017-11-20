@@ -49,7 +49,7 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
     attachments[1].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[1].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    attachments[1].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     // Normal attachment
     attachments[2].flags = 0;
@@ -116,7 +116,7 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
     dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
     dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
-    dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+    dependencies[0].dependencyFlags = 0;
 
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
@@ -124,7 +124,7 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
     dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
     dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
     dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-    dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+    dependencies[1].dependencyFlags = 0;
 
     VkRenderPassCreateInfo renderPassInfo[2];
     renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -187,7 +187,7 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     // Depth attachment
     VkAttachmentReference depthReference;
     depthReference.attachment = 1;
-    depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 
     // Specular attachment
     VkAttachmentReference specularReference;
@@ -217,7 +217,7 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
     dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
-    dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+    dependencies[0].dependencyFlags = 0;
 
     dependencies[1].srcSubpass = 0;
     dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
@@ -225,13 +225,81 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
     dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
     dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
-    dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+    dependencies[1].dependencyFlags = 0;
 
     VkRenderPassCreateInfo renderPassInfo[2];
     renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassInfo[0].pNext = nullptr;
     renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 3;
+    renderPassInfo[0].pAttachments = attachments;
+    renderPassInfo[0].subpassCount = 1;
+    renderPassInfo[0].pSubpasses = &subpassInfo[0];
+    renderPassInfo[0].dependencyCount = 2;
+    renderPassInfo[0].pDependencies = dependencies;
+
+    vkCreateRenderPass(device, &renderPassInfo[0], nullptr, &renderPass);
+}
+
+void
+VulkanRenderPassGenerator::generateShadowRenderPass(
+    VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples)
+{
+    VkAttachmentDescription attachments[1];
+
+    // Depth attachment
+    attachments[0].flags = 0;
+    attachments[0].format = VK_FORMAT_D32_SFLOAT;
+    attachments[0].samples = samples;
+    attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[0].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    // Depth attachment
+    VkAttachmentReference depthReference;
+    depthReference.attachment = 0;
+    depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    // Render subpasses
+    VkSubpassDescription subpassInfo[2];
+
+    // First pass: geometry
+    subpassInfo[0].flags = 0;
+    subpassInfo[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpassInfo[0].inputAttachmentCount = 0;
+    subpassInfo[0].pInputAttachments = nullptr;
+    subpassInfo[0].colorAttachmentCount = 0;
+    subpassInfo[0].pColorAttachments = nullptr;
+    subpassInfo[0].pResolveAttachments = nullptr;
+    subpassInfo[0].pDepthStencilAttachment = &depthReference;
+    subpassInfo[0].preserveAttachmentCount = 0;
+    subpassInfo[0].pPreserveAttachments = nullptr;
+
+    VkSubpassDependency dependencies[2];
+    dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[0].dstSubpass = 0;
+    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+    dependencies[0].dependencyFlags = 0;
+
+    dependencies[1].srcSubpass = 0;
+    dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+    dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    dependencies[1].dependencyFlags = 0;
+
+    VkRenderPassCreateInfo renderPassInfo[2];
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = nullptr;
+    renderPassInfo[0].flags = 0;
+    renderPassInfo[0].attachmentCount = 1;
     renderPassInfo[0].pAttachments = attachments;
     renderPassInfo[0].subpassCount = 1;
     renderPassInfo[0].pSubpasses = &subpassInfo[0];
