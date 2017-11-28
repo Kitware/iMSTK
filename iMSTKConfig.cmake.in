@@ -13,9 +13,15 @@ set(iMSTK_USE_OMNI @iMSTK_USE_OMNI@)
 set(VegaFEM_DIR @VegaFEM_DIR@)
 set(VTK_DIR @VTK_DIR@)
 
+# Assimp
+find_package( Assimp REQUIRED )
+
 # g3log
 find_package( g3log REQUIRED )
 include_directories( ${g3log_INCLUDE_DIR} )
+
+# glm
+find_package( glm REQUIRED )
 
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
