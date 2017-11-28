@@ -72,6 +72,11 @@ if(MSVC)
 endif()
 
 #-----------------------------------------------------------------------------
+# Options
+#-----------------------------------------------------------------------------
+option(BUILD_EXAMPLES "Build iMSTK examples" ON)
+
+#-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
@@ -299,7 +304,7 @@ if(BUILD_TESTING)
 endif()
 
 # External data
-if(BUILD_TESTING OR BUILD_EXAMPLES )
+if(BUILD_TESTING OR BUILD_EXAMPLES)
   include(imstkExternalData)
 endif()
 
@@ -363,7 +368,9 @@ install(
 #--------------------------------------------------------------------------
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Examples)
+if(BUILD_EXAMPLES)
+  add_subdirectory(Examples)
+endif()
 
 #--------------------------------------------------------------------------
 # Innerbuild dummy test
