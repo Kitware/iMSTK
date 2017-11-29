@@ -100,6 +100,7 @@ struct Color
     static Color Green;
     static Color Red;
     static Color Pink;
+    static Color Orange;
     static Color Yellow;
 };
 }
