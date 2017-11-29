@@ -10,6 +10,7 @@ list(INSERT CMAKE_MODULE_PATH 0 "${iMSTK_SOURCE_DIR}/CMake")
 
 # iMSTK settings
 set(iMSTK_USE_OMNI @iMSTK_USE_OMNI@)
+set(iMSTK_USE_Vulkan @iMSTK_USE_Vulkan@)
 set(VegaFEM_DIR @VegaFEM_DIR@)
 set(VTK_DIR @VTK_DIR@)
 
@@ -22,6 +23,14 @@ include_directories( ${g3log_INCLUDE_DIR} )
 
 # glm
 find_package( glm REQUIRED )
+
+if(iMSTK_USE_Vulkan)
+  # glfw
+  find_package( glfw REQUIRED )
+
+  # gli
+  find_package( gli REQUIRED )
+endif()
 
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
