@@ -40,7 +40,6 @@ public:
     {
         DIFFUSE = 0, // Also used for albedo
         NORMAL,
-        SPECULAR,
         ROUGHNESS,
         METALNESS,
         SUBSURFACE_SCATTERING,
@@ -49,6 +48,7 @@ public:
         CUBEMAP,
         IRRADIANCE_CUBEMAP,
         RADIANCE_CUBEMAP,
+        BRDF_LUT,
         NONE
     };
 

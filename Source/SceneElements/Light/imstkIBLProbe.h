@@ -19,21 +19,39 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
+#ifndef imstkIBLProbe_h
+#define imstkIBLProbe_h
 
-#include "vulkan/vulkan.h"
+#include <string>
+
+#include "imstkTexture.h"
 
 namespace imstk
 {
-class VulkanRenderPassGenerator
+
+class IBLProbe
 {
 public:
-    static void generateDepthRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateShadowRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
+    IBLProbe() {};
+
+    void initialize(std::string irradianceCubemapPath,
+        std::string radianceCubemapPath,
+        std::string brdfLUTPath);
+
+    std::shared_ptr<Texture> getIrradianceCubemapTexture();
+    std::shared_ptr<Texture> getRadianceCubemapTexture();
+    std::shared_ptr<Texture> getBrdfLUTTexture();
+
+protected:
+    std::string m_irradianceCubemapPath;
+    std::string m_radianceCubemapPath;
+    std::string m_brdfLUTPath;
+
+    std::shared_ptr<Texture> m_irradianceCubemapTexture = nullptr;
+    std::shared_ptr<Texture> m_radianceCubemapTexture = nullptr;
+    std::shared_ptr<Texture> m_brdfLUTTexture = nullptr;
 };
+
 }
 
 #endif

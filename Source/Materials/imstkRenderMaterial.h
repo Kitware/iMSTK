@@ -175,7 +175,7 @@ protected:
 
     // Classical values
     float m_metalness = 0.0; ///< Value for metalness with range: [0.0, 1.0]
-    float m_roughness = 0.0; ///< Value for roughness with range: [0.0, 1.0]
+    float m_roughness = 1.0; ///< Value for roughness with range: [0.0, 1.0]
     float m_emissivity = 0.0;
 
     // Textures

@@ -28,9 +28,21 @@ layout (set = 1, binding = 0) uniform globalUniforms
 
 layout (set = 1, binding = 1) uniform localUniforms
 {
-    vec4 color;
     mat4 transform;
+    vec4 color;
+    uint receivesShadows;
+    float emissivity;
+    float roughness;
+    float metalness;
 } locals;
+
+layout (location = 0) in vertexData{
+    vec3 position;
+    vec3 normal;
+    vec2 uv;
+    mat3 TBN;
+    vec3 cameraPosition;
+}vertex;
 
 void main(void)
 {

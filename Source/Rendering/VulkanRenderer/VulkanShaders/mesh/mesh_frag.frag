@@ -8,10 +8,13 @@ layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
 layout (constant_id = 2) const bool hasDiffuseTexture = false;
 layout (constant_id = 3) const bool hasNormalTexture = false;
-layout (constant_id = 4) const bool hasSpecularTexture = false;
-layout (constant_id = 5) const bool hasRoughnessTexture = false;
-layout (constant_id = 6) const bool hasMetalnessTexture = false;
+layout (constant_id = 4) const bool hasRoughnessTexture = false;
+layout (constant_id = 5) const bool hasMetalnessTexture = false;
+layout (constant_id = 6) const bool hasAmbientOcclusionTexture = false;
 layout (constant_id = 7) const bool hasSubsurfaceScatteringTexture = false;
+layout (constant_id = 8) const bool hasIrradianceCubemapTexture = false;
+layout (constant_id = 9) const bool hasRadianceCubemapTexture = false;
+layout (constant_id = 10) const bool hasBrdfLUTTexture = false;
 
 struct light
 {
@@ -52,9 +55,13 @@ layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
 layout (set = 1, binding = 3) uniform sampler2D normalTexture;
 layout (set = 1, binding = 4) uniform sampler2D roughnessTexture;
 layout (set = 1, binding = 5) uniform sampler2D metalnessTexture;
-layout (set = 1, binding = 6) uniform sampler2D subsurfaceScatteringTexture;
-//layout (set = 1, binding = 6) uniform samplerCube irradianceCubemapTexture;
-layout (set = 1, binding = 7) uniform sampler2DArray shadowArray;
+layout (set = 1, binding = 6) uniform sampler2D ambientOcclusionTexture;
+layout (set = 1, binding = 7) uniform sampler2D subsurfaceScatteringTexture;
+layout (set = 1, binding = 8) uniform sampler2DArray shadowArray;
+layout (set = 1, binding = 9) uniform samplerCube irradianceCubemapTexture;
+layout (set = 1, binding = 10) uniform samplerCube radianceCubemapTexture;
+layout (set = 1, binding = 11) uniform sampler2D brdfLUTTexture;
+layout (set = 1, binding = 12) uniform sampler2D aoBuffer;
 
 // Constants
 const float PI = 3.1415;
@@ -70,8 +77,10 @@ float specularPow = 0;
 vec3 specularColor = vec3(1, 1, 1);
 float roughness = 1.0;
 float metalness = 0.0;
+float ambientOcclusion = 1.0;
 float subsurfaceScattering = 0.0;
-vec3 diffuseIndirect = vec3(0, 0, 0);
+vec3 indirectDiffuse = vec3(0, 0, 0);
+vec3 indirectSpecular = vec3(0, 0, 0);
 
 // Functions
 void readTextures();
@@ -87,10 +96,9 @@ void main(void)
 
     // If it's 0, then there's a divide by zero error
     roughness = max(roughness * roughness, 0.0001);
+    specularColor = mix(vec3(1.0), diffuseColor, metalness);
 
     cameraDirection = normalize(vertex.cameraPosition - vertex.position);
-
-    //calculateIndirectLighting();
 
     vec3 lightRay = vec3(0);
     float lightIntensity = 0;
@@ -121,6 +129,8 @@ void main(void)
         calculatePBRLighting(normalize(lightRay), globals.lights[i].color.rgb, lightIntensity);
     }
 
+    calculateIndirectLighting();
+
     finalDiffuse *= diffuseColor;
     outputColor = vec4(finalDiffuse + (diffuseColor * locals.emissivity), 1);
     outputSpecular = vec4(finalSpecular, 1);
@@ -147,7 +157,7 @@ void readTextures()
 
     if (hasRoughnessTexture)
     {
-        roughness *= texture(roughnessTexture, vertex.uv).r;
+        roughness = texture(roughnessTexture, vertex.uv).r;
     }
     else
     {
@@ -156,11 +166,16 @@ void readTextures()
 
     if (hasMetalnessTexture)
     {
-        metalness *= texture(metalnessTexture, vertex.uv).r;
+        metalness = texture(metalnessTexture, vertex.uv).r;
     }
     else
     {
         metalness = locals.metalness;
+    }
+
+    if (hasAmbientOcclusionTexture)
+    {
+        ambientOcclusion = texture(ambientOcclusionTexture, vertex.uv).r;
     }
 
     if (hasSubsurfaceScatteringTexture)
@@ -173,13 +188,34 @@ void calculateIndirectLighting()
 {
     // Fresnel term: Schlick's approximation
     vec3 F_0 = mix(vec3(0.04), diffuseColor, metalness);
-    vec3 F = (F_0) + (1.0 - F_0) * pow(1.0 - max(dot(cameraDirection, normal), 0), 5);
+    vec3 F = max((F_0) + (max(vec3(1.0 - roughness), F_0) - F_0) * pow(1.0 - max(dot(cameraDirection, normal), 0), 5), 0);
+
+    vec3 reflection = reflect(-cameraDirection, normal);
 
     // Energy conservation
     vec3 k_s = F;
     vec3 k_d = (1 - k_s) * (1.0 - metalness);
 
-    finalDiffuse += diffuseIndirect * k_d;
+    if (hasIrradianceCubemapTexture)
+    {
+        indirectDiffuse = texture(irradianceCubemapTexture, normal).rgb;
+    }
+
+    if (hasBrdfLUTTexture)
+    {
+        vec2 brdfValue = texture(brdfLUTTexture, vec2(max(dot(cameraDirection, normal), 0.0), roughness)).rg;
+
+        if (hasRadianceCubemapTexture)
+        {
+            int numMipLevels = textureQueryLevels(radianceCubemapTexture);
+            indirectSpecular = textureLod(radianceCubemapTexture, reflection, roughness * numMipLevels).rgb;
+            indirectSpecular = indirectSpecular * (k_s * brdfValue.r + brdfValue.g);
+        }
+    }
+
+    float ao = min(texture(aoBuffer, gl_FragCoord.xy / (textureSize(aoBuffer, 0) * 2)).r, ambientOcclusion);
+    finalDiffuse += indirectDiffuse * k_d * ao;
+    finalSpecular += indirectSpecular * specularColor * ao;
 }
 
 void calculatePBRLighting(vec3 lightDirection, vec3 lightColor, float lightIntensity)

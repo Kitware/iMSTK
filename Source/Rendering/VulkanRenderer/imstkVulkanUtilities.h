@@ -155,6 +155,20 @@ public:
     };
 };
 
+class VulkanDefaults
+{
+public:
+    static const VkComponentMapping getDefaultComponentMapping()
+    {
+        VkComponentMapping componentMapping;
+        componentMapping.r = VK_COMPONENT_SWIZZLE_R;
+        componentMapping.g = VK_COMPONENT_SWIZZLE_G;
+        componentMapping.b = VK_COMPONENT_SWIZZLE_B;
+        componentMapping.a = VK_COMPONENT_SWIZZLE_A;
+        return componentMapping;
+    }
+};
+
 }
 
 #endif

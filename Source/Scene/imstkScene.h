@@ -27,6 +27,7 @@
 
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
+#include "imstkIBLProbe.h"
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkSolverBase.h"
@@ -112,6 +113,12 @@ public:
     void removeLight(const std::string& lightName);
 
     ///
+    /// \brief Add/remove lights from the scene
+    ///
+    void setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe);
+    std::shared_ptr<IBLProbe> getGlobalIBLProbe();
+
+    ///
     /// \brief Get the name of the scene
     ///
     const std::string& getName() const;
@@ -156,6 +163,7 @@ protected:
     std::string m_name; ///> Name of the scene
     NamedMap<SceneObject> m_sceneObjectsMap;
     NamedMap<Light> m_lightsMap;
+    std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
     std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers

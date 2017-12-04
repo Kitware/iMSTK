@@ -47,7 +47,8 @@ public:
 
     void addInputImage(
         VkSampler * sampler,
-        VkImageView * imageView);
+        VkImageView * imageView,
+        VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     void generateMipmaps(VkCommandBuffer& commandBuffer,
                          unsigned int levels,
@@ -95,6 +96,8 @@ protected:
     // Resources
     std::vector<VkSampler *> m_samplers;
     std::vector<VkImageView *> m_imageViews;
+    std::vector<VkImageLayout> m_layouts;
+
     unsigned int m_downsampleLevels = 0;
     unsigned int m_outputIndex = 0;
     bool m_lastPass = false;

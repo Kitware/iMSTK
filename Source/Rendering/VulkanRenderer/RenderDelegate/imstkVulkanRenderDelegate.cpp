@@ -132,6 +132,13 @@ VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::sh
         memoryManager,
         true);
 
+    m_depthMaterial = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
+        m_fragmentUniformBuffer,
+        material,
+        memoryManager,
+        false,
+        true);
+
     m_vertexBuffer = std::make_shared<VulkanVertexBuffer>(memoryManager,
         m_numVertices,
         m_vertexSize,

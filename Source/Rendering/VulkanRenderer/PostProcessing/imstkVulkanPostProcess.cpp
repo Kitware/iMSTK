@@ -417,7 +417,7 @@ VulkanPostProcess::createDescriptorSets(VulkanRenderer * renderer)
         VkDescriptorImageInfo textureInfo;
         textureInfo.sampler = *m_samplers[i];
         textureInfo.imageView = *m_imageViews[i];
-        textureInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        textureInfo.imageLayout = m_layouts[i];
         fragmentTextureInfo.push_back(textureInfo);
     }
 
@@ -563,9 +563,11 @@ VulkanPostProcess::createFramebuffer(VulkanRenderer * renderer,
 void
 VulkanPostProcess::addInputImage(
     VkSampler * sampler,
-    VkImageView * imageView)
+    VkImageView * imageView,
+    VkImageLayout layout)
 {
     m_samplers.push_back(sampler);
     m_imageViews.push_back(imageView);
+    m_layouts.push_back(layout);
 }
 }

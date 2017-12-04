@@ -31,25 +31,27 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     m_type = texture->getType();
 
     // Load textures and get texture information
-    if ((texture->getType() != Texture::Type::IRRADIANCE_CUBEMAP)
-        && (texture->getType() != Texture::Type::RADIANCE_CUBEMAP))
-    {
-        m_arrayLayers = 1;
-        this->loadTexture(memoryManager);
-        m_imageInfo.flags = 0;
-    }
-    else
+    if ((m_type == Texture::Type::IRRADIANCE_CUBEMAP)
+        || (m_type == Texture::Type::RADIANCE_CUBEMAP))
     {
         m_arrayLayers = 6;
         this->loadCubemapTexture(memoryManager);
         m_imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
         m_isCubemap = true;
     }
+    else
+    {
+        m_arrayLayers = 1;
+        this->loadTexture(memoryManager);
+        m_imageInfo.flags = 0;
+    }
 
     // Determine number of mipmaps
     if (m_mipLevels < 1)
     {
-        if (!texture->getMipmapsEnabled())
+        if (!texture->getMipmapsEnabled()
+            || (m_type == Texture::Type::BRDF_LUT)
+            || (m_path == "noise"))
         {
             m_mipLevels = 1;
         }
@@ -67,6 +69,11 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     if (m_type == Texture::Type::DIFFUSE)
     {
         m_imageInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
+    }
+    else if (m_type == Texture::Type::IRRADIANCE_CUBEMAP
+        || m_type == Texture::Type::RADIANCE_CUBEMAP)
+    {
+        m_imageInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
     else
     {
@@ -145,7 +152,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     samplerInfo.compareEnable = VK_FALSE;
     samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
     samplerInfo.minLod = 0;
-    samplerInfo.maxLod = 0;
+    samplerInfo.maxLod = m_mipLevels - 1;
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
@@ -155,7 +162,38 @@ VulkanTextureDelegate::VulkanTextureDelegate(
 void
 VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
 {
-    if (m_path != "")
+    if (m_path == "")
+    {
+        auto data = new std::vector<unsigned char>(4);
+        (*data)[0] = '\255';
+        (*data)[1] = '\255';
+        (*data)[2] = '\255';
+        (*data)[3] = '\255';
+        m_width = 1;
+        m_height = 1;
+        m_data = &(*data)[0];
+    }
+    else if (m_path == "noise")
+    {
+        auto data = new std::vector<unsigned char>(128 * 128 * 4);
+        m_width = 128;
+        m_height = 128;
+        m_channels = 4;
+        for (int x = 0; x < 128; x++)
+        {
+            for (int y = 0; y < 128; y++)
+            {
+                for (int z = 0; z < 4; z++)
+                {
+                    int seed = x * m_width * 4 + y * 4 + z;
+                    (*data)[seed] = glm::linearRand(0, 255);
+                }
+            }
+        }
+
+        m_data = &(*data)[0];
+    }
+    else
     {
         auto readerGenerator = vtkSmartPointer<vtkImageReader2Factory>::New();
         auto reader = readerGenerator->CreateImageReader2(m_path.c_str());
@@ -168,17 +206,6 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         m_height = data->GetDimensions()[1];
         m_channels = reader->GetNumberOfScalarComponents();
         m_data = (unsigned char *)data->GetScalarPointer();
-    }
-    else
-    {
-        std::vector<unsigned char> data(4);
-        data[0] = '\255';
-        data[1] = '\255';
-        data[2] = '\255';
-        data[3] = '\255';
-        m_width = 1;
-        m_height = 1;
-        m_data = &data[0];
     }
 }
 
@@ -195,7 +222,7 @@ VulkanTextureDelegate::loadCubemapTexture(VulkanMemoryManager& memoryManager)
     }
     else
     {
-        m_cubemap = gli::texture_cube(gli::format::FORMAT_BGRA8_UNORM_PACK8, gli::extent2d(1,1), 1);
+        m_cubemap = gli::texture_cube(gli::format::FORMAT_RGBA32_SFLOAT_PACK32, gli::extent2d(1,1), 1);
         m_width = 1;
         m_height = 1;
         m_mipLevels = 1;

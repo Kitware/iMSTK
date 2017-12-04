@@ -30,12 +30,15 @@ VulkanMaterialDelegate::VulkanMaterialDelegate(
     std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
     std::shared_ptr<RenderMaterial> material,
     VulkanMemoryManager& memoryManager,
-    bool shadowPass)
+    bool shadowPass,
+    bool depthPrePass)
 {
     m_vertexUniformBuffer = vertexUniformBuffer;
     m_fragmentUniformBuffer = fragmentUniformBuffer;
 
     m_shadowPass = shadowPass;
+    m_depthPrePass = depthPrePass;
+    m_depthOnlyPass = m_shadowPass || m_depthPrePass;
     m_memoryManager = &memoryManager;
 
     if (material)
@@ -109,6 +112,12 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
+    else if (m_depthPrePass)
+    {
+        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/depth_frag.spv",
+                                                renderer->m_renderDevice,
+                                                m_pipelineComponents.fragmentShader);
+    }
     else
     {
         VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_frag.spv",
@@ -127,13 +136,21 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     m_constants.numLights = renderer->m_constants.numLights;
     m_constants.tessellation = m_material->getTessellated();
-    m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_shadowPass;
-    m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_shadowPass;
-    m_constants.specularTexture = (m_material->getTexture(Texture::Type::SPECULAR)->getPath() != "") && !m_shadowPass;
-    m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_shadowPass;
-    m_constants.metalnessTexture = (m_material->getTexture(Texture::Type::METALNESS)->getPath() != "") && !m_shadowPass;
-    m_constants.subsurfaceScatteringTexture = (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING)->getPath() != "") && !m_shadowPass;
-    m_constants.irradianceCubemapTexture = (m_material->getTexture(Texture::Type::IRRADIANCE_CUBEMAP)->getPath() != "") && !m_shadowPass;
+    m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.metalnessTexture = (m_material->getTexture(Texture::Type::METALNESS)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.ambientOcclusionTexture = (m_material->getTexture(Texture::Type::AMBIENT_OCCLUSION)->getPath() != "") && !m_depthOnlyPass;    
+    m_constants.subsurfaceScatteringTexture = (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.irradianceCubemapTexture = (m_material->getTexture(Texture::Type::IRRADIANCE_CUBEMAP)->getPath() != ""
+        || renderer->m_scene->getGlobalIBLProbe())
+        && !m_depthOnlyPass;
+    m_constants.radianceCubemapTexture = (m_material->getTexture(Texture::Type::RADIANCE_CUBEMAP)->getPath() != ""
+        || renderer->m_scene->getGlobalIBLProbe())
+        && !m_depthOnlyPass;
+    m_constants.brdfLUTTexture = (m_material->getTexture(Texture::Type::BRDF_LUT)->getPath() != ""
+        || renderer->m_scene->getGlobalIBLProbe())
+        && !m_depthOnlyPass;
 
     this->addSpecializationConstant(sizeof(m_constants.numLights),
         offsetof(VulkanMaterialConstants, numLights));
@@ -143,16 +160,20 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
         offsetof(VulkanMaterialConstants, diffuseTexture));
     this->addSpecializationConstant(sizeof(m_constants.normalTexture),
         offsetof(VulkanMaterialConstants, normalTexture));
-    this->addSpecializationConstant(sizeof(m_constants.specularTexture),
-        offsetof(VulkanMaterialConstants, specularTexture));
     this->addSpecializationConstant(sizeof(m_constants.roughnessTexture),
         offsetof(VulkanMaterialConstants, roughnessTexture));
     this->addSpecializationConstant(sizeof(m_constants.metalnessTexture),
         offsetof(VulkanMaterialConstants, metalnessTexture));
+    this->addSpecializationConstant(sizeof(m_constants.ambientOcclusionTexture),
+        offsetof(VulkanMaterialConstants, ambientOcclusionTexture));
     this->addSpecializationConstant(sizeof(m_constants.subsurfaceScatteringTexture),
         offsetof(VulkanMaterialConstants, subsurfaceScatteringTexture));
     this->addSpecializationConstant(sizeof(m_constants.irradianceCubemapTexture),
         offsetof(VulkanMaterialConstants, irradianceCubemapTexture));
+    this->addSpecializationConstant(sizeof(m_constants.radianceCubemapTexture),
+        offsetof(VulkanMaterialConstants, radianceCubemapTexture));
+    this->addSpecializationConstant(sizeof(m_constants.brdfLUTTexture),
+        offsetof(VulkanMaterialConstants, brdfLUTTexture));
 
     m_pipelineComponents.fragmentSpecializationInfo.mapEntryCount = m_numConstants;
     m_pipelineComponents.fragmentSpecializationInfo.pMapEntries = &m_pipelineComponents.fragmentMapEntries[0];
@@ -355,14 +376,14 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     states[1].writeMask = 0;
     states[1].reference = 0;
 
-    bool depthWrite = !m_material->isDecal();
+    bool depthWrite = m_depthOnlyPass;
 
     m_pipelineComponents.depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     m_pipelineComponents.depthStencilInfo.pNext = nullptr;
     m_pipelineComponents.depthStencilInfo.flags = 0;
     m_pipelineComponents.depthStencilInfo.depthTestEnable = VK_TRUE;
     m_pipelineComponents.depthStencilInfo.depthWriteEnable = depthWrite;
-    m_pipelineComponents.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS;
+    m_pipelineComponents.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
     m_pipelineComponents.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.stencilTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.front = states[0];
@@ -375,7 +396,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     if (m_material->isDecal())
     {
-        renderPass = renderer->m_renderPasses[1];
+        renderPass = renderer->m_decalRenderPass;
         numAttachments = 2;
     }
     else if (m_shadowPass)
@@ -384,9 +405,14 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
         renderPass = renderer->m_shadowPasses[0];
         numAttachments = 0;
     }
+    else if (m_depthPrePass)
+    {
+        renderPass = renderer->m_depthRenderPass;
+        numAttachments = 0;
+    }
     else
     {
-        renderPass = renderer->m_renderPasses[0];
+        renderPass = renderer->m_opaqueRenderPass;
         numAttachments = 3;
     }
 
@@ -473,60 +499,65 @@ VulkanMaterialDelegate::initializeTextures(VulkanRenderer * renderer)
     auto defaultTexture = std::make_shared<Texture>("");
     auto defaultCubemap = std::make_shared<Texture>("", Texture::Type::IRRADIANCE_CUBEMAP);
 
-    if (m_material->getTexture(Texture::Type::DIFFUSE))
+    m_diffuseTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::DIFFUSE);
+    m_normalTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::NORMAL);
+    m_roughnessTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::ROUGHNESS);
+    m_metalnessTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::METALNESS);
+    m_subsurfaceScatteringTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::SUBSURFACE_SCATTERING);
+    m_ambientOcclusionTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::AMBIENT_OCCLUSION);
+
+    auto globalIBLProbe = renderer->m_scene->getGlobalIBLProbe();
+
+    if (globalIBLProbe)
     {
-        m_diffuseTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::DIFFUSE));
-    }
-    else
-    {
-        m_diffuseTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
+        m_material->addTexture(globalIBLProbe->getIrradianceCubemapTexture());
+        m_material->addTexture(globalIBLProbe->getRadianceCubemapTexture());
+        m_material->addTexture(globalIBLProbe->getBrdfLUTTexture());
     }
 
-    if (m_material->getTexture(Texture::Type::NORMAL))
+    m_irradianceCubemapTexture = this->initializeTexture(renderer, defaultCubemap, Texture::Type::IRRADIANCE_CUBEMAP);
+    m_radianceCubemapTexture = this->initializeTexture(renderer, defaultCubemap, Texture::Type::RADIANCE_CUBEMAP);
+    m_brdfLUTTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::BRDF_LUT);
+}
+
+std::shared_ptr<VulkanTextureDelegate>
+VulkanMaterialDelegate::initializeTexture(VulkanRenderer * renderer,
+        std::shared_ptr<Texture> backupTexture,
+        Texture::Type type)
+{
+    auto texture = m_material->getTexture(type);
+
+    // Texture is already loaded
+    if (renderer->m_textureMap.count(texture) > 0)
     {
-        m_normalTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::NORMAL));
-    }
-    else
-    {
-        m_normalTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
+        return renderer->m_textureMap[texture];
     }
 
-    if (m_material->getTexture(Texture::Type::ROUGHNESS))
+    std::shared_ptr<VulkanTextureDelegate> textureDelegate;
+
+    // Texture has a real path
+    if (texture->getPath() != "")
     {
-        m_roughnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::ROUGHNESS));
+        textureDelegate =
+            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, texture);
+        renderer->m_textureMap[texture] = textureDelegate;
     }
     else
     {
-        m_roughnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
+        // Use backup texture
+        if (renderer->m_textureMap.count(backupTexture) > 0)
+        {
+            return renderer->m_textureMap[backupTexture];
+        }
+        else
+        {
+            textureDelegate =
+                std::make_shared<VulkanTextureDelegate>(*m_memoryManager, backupTexture);
+            renderer->m_textureMap[backupTexture] = textureDelegate;
+        }
     }
 
-    if (m_material->getTexture(Texture::Type::METALNESS))
-    {
-        m_metalnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::METALNESS));
-    }
-    else
-    {
-        m_metalnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
-    }
-
-    if (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING))
-    {
-        m_subsurfaceScatteringTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING));
-    }
-    else
-    {
-        m_subsurfaceScatteringTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultCubemap);
-    }
+    return textureDelegate;
 }
 
 void
@@ -598,7 +629,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
     }
 
-    if (!m_shadowPass)
+    if (!m_depthOnlyPass)
     {
         // Diffuse texture
         {
@@ -648,7 +679,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
             m_numTextures++;
         }
 
-        // Subsurface scattering texture
+        // Ambient occlusion texture
         {
             VkDescriptorSetLayoutBinding fragmentLayoutBinding;
             fragmentLayoutBinding.binding = 6;
@@ -660,10 +691,70 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
             m_numTextures++;
         }
 
-        // Shadow maps
+        // Subsurface scattering texture
         {
             VkDescriptorSetLayoutBinding fragmentLayoutBinding;
             fragmentLayoutBinding.binding = 7;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Shadow maps
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 8;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Irradiance cubemap texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 9;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Radiance cubemap texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 10;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // BRDF lookup table texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 11;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // AO buffer texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 12;
             fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             fragmentLayoutBinding.descriptorCount = 1;
             fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -676,7 +767,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         if (m_material->isDecal())
         {
             VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-            fragmentLayoutBinding.binding = 8;
+            fragmentLayoutBinding.binding = 13;
             fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             fragmentLayoutBinding.descriptorCount = 1;
             fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -689,7 +780,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         if (m_material->isDecal())
         {
             VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-            fragmentLayoutBinding.binding = 9;
+            fragmentLayoutBinding.binding = 14;
             fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             fragmentLayoutBinding.descriptorCount = 1;
             fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
@@ -698,7 +789,6 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
             m_numTextures++;
         }
     }
-
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo[2];
     descriptorSetLayoutInfo[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -831,6 +921,14 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
 
         {
             VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_ambientOcclusionTexture->m_sampler;
+            textureInfo.imageView = m_ambientOcclusionTexture->m_imageView;
+            textureInfo.imageLayout = m_ambientOcclusionTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
             textureInfo.sampler = m_subsurfaceScatteringTexture->m_sampler;
             textureInfo.imageView = m_subsurfaceScatteringTexture->m_imageView;
             textureInfo.imageLayout = m_subsurfaceScatteringTexture->m_layout;
@@ -842,6 +940,38 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
             textureInfo.sampler = renderer->m_HDRImageSampler;
             textureInfo.imageView = renderer->m_shadowMapsView;
             textureInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_irradianceCubemapTexture->m_sampler;
+            textureInfo.imageView = m_irradianceCubemapTexture->m_imageView;
+            textureInfo.imageLayout = m_irradianceCubemapTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_radianceCubemapTexture->m_sampler;
+            textureInfo.imageView = m_radianceCubemapTexture->m_imageView;
+            textureInfo.imageLayout = m_radianceCubemapTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_brdfLUTTexture->m_sampler;
+            textureInfo.imageView = m_brdfLUTTexture->m_imageView;
+            textureInfo.imageLayout = m_brdfLUTTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = renderer->m_HDRImageSampler;
+            textureInfo.imageView = renderer->m_halfAOImageView[0];
+            textureInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             fragmentTextureInfo.push_back(textureInfo);
         }
 
@@ -866,7 +996,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
 
     vkAllocateDescriptorSets(renderer->m_renderDevice, descriptorSetAllocationInfo, &m_descriptorSets[0]);
 
-    uint32_t numWriteSets = m_shadowPass ? 2 : 3;
+    uint32_t numWriteSets = m_depthOnlyPass ? 2 : 3;
     m_writeDescriptorSets.resize(numWriteSets);
 
     for (int i = 0; i < m_writeDescriptorSets.size(); i++)
@@ -893,7 +1023,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
     m_writeDescriptorSets[1].pBufferInfo = &fragmentBufferInfo[0];
 
     // Fragment texture descriptor set
-    if (!m_shadowPass)
+    if (!m_depthOnlyPass)
     {
         m_writeDescriptorSets[2].descriptorCount = (uint32_t)fragmentTextureInfo.size();
         m_writeDescriptorSets[2].dstBinding = 2;

@@ -116,6 +116,7 @@ protected:
 
     std::shared_ptr<VulkanMaterialDelegate> m_material;
     std::shared_ptr<VulkanMaterialDelegate> m_shadowMaterial;
+    std::shared_ptr<VulkanMaterialDelegate> m_depthMaterial;
 
     VulkanLocalVertexUniforms m_localVertexUniforms;
     VulkanLocalFragmentUniforms m_localFragmentUniforms;

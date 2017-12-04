@@ -27,18 +27,16 @@ namespace imstk
 {
 VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
 {
-    bool bloom = true;
-    bool sss = true;
-
     // Subsurface scattering pass
     // The buffer indices are hardcoded because it's before the accumulation composition pass
-    if (sss)
+    if (m_sss)
     {
         int sssSamples = 5;
 
         auto sssHorizontalBlurPass = std::make_shared<VulkanPostProcess>(renderer, 0);
         sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[0][0]);
-        sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0]);
+        sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0],
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
         sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_normalImageView);
         sssHorizontalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[2][0], VK_FORMAT_R16G16B16A16_SFLOAT);
         sssHorizontalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/sss_frag.spv");
@@ -49,17 +47,18 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         sssHorizontalBlurPass->m_pushConstantData[4] = renderer->m_nearPlane;
         sssHorizontalBlurPass->m_pushConstantData[5] = renderer->m_farPlane;
         sssHorizontalBlurPass->m_pushConstantData[6] = sssSamples;
-        this->calculateBlurValues(sssSamples,
+        VulkanPostProcessingChain::calculateBlurValues(sssSamples,
             &sssHorizontalBlurPass->m_pushConstantData[7],
             renderer->m_nearPlane);
-        this->calculateBlurValues(sssSamples,
+        VulkanPostProcessingChain::calculateBlurValues(sssSamples,
             &sssHorizontalBlurPass->m_pushConstantData[17],
             renderer->m_farPlane);
         m_postProcesses.push_back(sssHorizontalBlurPass);
 
         auto sssVerticalBlurPass = std::make_shared<VulkanPostProcess>(renderer, 0);
         sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[2][0]);
-        sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0]);
+        sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0],
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
         sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_normalImageView);
         sssVerticalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[0][0], VK_FORMAT_R16G16B16A16_SFLOAT);
         sssVerticalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/sss_frag.spv");
@@ -70,10 +69,10 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         sssVerticalBlurPass->m_pushConstantData[4] = renderer->m_nearPlane;
         sssVerticalBlurPass->m_pushConstantData[5] = renderer->m_farPlane;
         sssVerticalBlurPass->m_pushConstantData[6] = sssSamples;
-        this->calculateBlurValues(sssSamples,
+        VulkanPostProcessingChain::calculateBlurValues(sssSamples,
             &sssVerticalBlurPass->m_pushConstantData[7],
             renderer->m_nearPlane);
-        this->calculateBlurValues(sssSamples,
+        VulkanPostProcessingChain::calculateBlurValues(sssSamples,
             &sssVerticalBlurPass->m_pushConstantData[17],
             renderer->m_farPlane);
         m_postProcesses.push_back(sssVerticalBlurPass);
@@ -88,7 +87,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
     m_postProcesses.push_back(accumulationCompositePass);
 
     // Bloom pass
-    if (bloom)
+    if (m_bloom)
     {
         int level = 1;
         int bloomSamples = 5;
@@ -106,7 +105,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         bloomHorizontalBlurPass->m_pushConstantData[0] = std::max(renderer->m_width >> level, 1u);
         bloomHorizontalBlurPass->m_pushConstantData[1] = std::max(renderer->m_height >> level, 1u);
         bloomHorizontalBlurPass->m_pushConstantData[2] = bloomSamples;
-        this->calculateBlurValuesLinear(bloomSamples,
+        VulkanPostProcessingChain::calculateBlurValuesLinear(bloomSamples,
             &bloomHorizontalBlurPass->m_pushConstantData[3],
             &bloomHorizontalBlurPass->m_pushConstantData[13]);
         m_postProcesses.push_back(bloomHorizontalBlurPass);
@@ -118,7 +117,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         bloomVerticalBlurPass->m_pushConstantData[0] = std::max(renderer->m_width >> level, 1u);
         bloomVerticalBlurPass->m_pushConstantData[1] = std::max(renderer->m_height >> level, 1u);
         bloomVerticalBlurPass->m_pushConstantData[2] = bloomSamples;
-        this->calculateBlurValuesLinear(bloomSamples,
+        VulkanPostProcessingChain::calculateBlurValuesLinear(bloomSamples,
             &bloomVerticalBlurPass->m_pushConstantData[3],
             &bloomVerticalBlurPass->m_pushConstantData[13]);
         m_postProcesses.push_back(bloomVerticalBlurPass);

@@ -28,6 +28,8 @@
 #include "vulkan/vulkan.h"
 
 #include "gli/gli.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/random.hpp"
 
 #include <vtkImageReader2.h>
 #include <vtkSmartPointer.h>
@@ -71,6 +73,8 @@ public:
     void generateMipmaps(VkCommandBuffer& commandBuffer);
 protected:
     friend class VulkanMaterialDelegate;
+    friend class VulkanPostProcessingChain;
+    friend class VulkanRenderer;
 
     VkImage m_image;
 

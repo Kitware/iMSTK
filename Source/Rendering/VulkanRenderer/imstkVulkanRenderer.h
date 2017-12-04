@@ -36,6 +36,7 @@
 #include "imstkScene.h"
 #include "imstkRenderer.h"
 #include "imstkDecalPool.h"
+#include "imstkTextureManager.h"
 
 #include "imstkVulkanValidation.h"
 #include "imstkVulkanVertexBuffer.h"
@@ -62,6 +63,11 @@ public:
     ~VulkanRenderer();
 
     void setShadowMapResolution(uint32_t resolution);
+
+    void setResolution(unsigned int width, unsigned int height);
+
+    void setBloomOn();
+    void setBloomOff();
 
 protected:
     friend class VulkanViewer;
@@ -201,7 +207,9 @@ protected:
     std::vector<VkDescriptorSetLayout> m_globalDescriptorSetLayouts;
     std::vector<VkWriteDescriptorSet> m_globalWriteDescriptorSets;
 
-    std::vector<VkRenderPass> m_renderPasses;
+    VkRenderPass m_depthRenderPass;
+    VkRenderPass m_opaqueRenderPass;
+    VkRenderPass m_decalRenderPass;
 
     // Framebuffers
     VkSwapchainKHR * m_swapchain = nullptr;
@@ -220,6 +228,11 @@ protected:
     VkImageView m_normalImageView;
     VkDeviceMemory * m_normalImageMemory;
 
+    // AO buffers
+    VkImage m_halfAOImage[2];
+    VkImageView m_halfAOImageView[2];
+    VkDeviceMemory m_halfAOMemory[2];
+
     // Color buffers
     std::vector<VkImage> m_HDRImage[3];
     VkSampler m_HDRImageSampler;
@@ -227,8 +240,16 @@ protected:
     std::vector<VkDeviceMemory*> m_HDRImageMemory[3];
     uint32_t m_mipLevels = 1;
 
-    std::vector<std::shared_ptr<VulkanFramebuffer>> m_drawingFramebuffers;
+    std::shared_ptr<Texture> m_noiseTexture = nullptr;
+    std::shared_ptr<VulkanTextureDelegate> m_noiseTextureDelegate = nullptr;
+
+    std::shared_ptr<VulkanFramebuffer> m_opaqueFramebuffer;
+    std::shared_ptr<VulkanFramebuffer> m_decalFramebuffer;
+    std::shared_ptr<VulkanFramebuffer> m_depthFramebuffer;
+
     std::vector<std::shared_ptr<VulkanPostProcess>> m_HDRTonemaps;
+    std::vector<std::shared_ptr<VulkanPostProcess>> m_ssao;
+
     std::shared_ptr<VulkanPostProcessingChain> m_postProcessingChain;
 
     VkSemaphore m_readyToRender;
@@ -258,6 +279,8 @@ protected:
 
     uint32_t m_renderQueueFamily = 0;
     Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
+
+    std::map<std::shared_ptr<Texture>, std::shared_ptr<VulkanTextureDelegate>> m_textureMap;
 };
 }
 
