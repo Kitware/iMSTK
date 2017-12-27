@@ -32,9 +32,10 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
 {
     m_mode = mode;
     m_renderDevice = memoryManager.m_device;
-    m_vertexBufferSize = (uint32_t)(numVertices * vertexSize * loadFactor);
-    m_numIndices = numTriangles;
-    m_indexBufferSize = (uint32_t)(m_numIndices * 3 * sizeof(uint32_t) * loadFactor);
+    m_buffering = (m_mode == VulkanVertexBufferMode::VERTEX_BUFFER_STATIC) ? 1 : memoryManager.m_buffering;
+    m_vertexBufferSize = (uint32_t)(numVertices * vertexSize * loadFactor) * m_buffering;
+    m_numIndices = numTriangles * 3;
+    m_indexBufferSize = (uint32_t)(m_numIndices * sizeof(uint32_t) * loadFactor) * m_buffering;
 
     // Vertex buffer
     {
@@ -51,8 +52,13 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         auto vertexStagingBufferInfo = vertexBufferInfo;
         vertexStagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-        vkCreateBuffer(m_renderDevice, &vertexBufferInfo, nullptr, &m_vertexBuffer);
-        vkCreateBuffer(m_renderDevice, &vertexStagingBufferInfo, nullptr, &m_vertexStagingBuffer);
+        m_vertexBuffer = memoryManager.requestBuffer(m_renderDevice,
+                        vertexBufferInfo,
+                        VulkanMemoryType::VERTEX);
+
+        m_vertexStagingBuffer = memoryManager.requestBuffer(m_renderDevice,
+                        vertexStagingBufferInfo,
+                        VulkanMemoryType::STAGING_VERTEX);
     }
 
     // Index buffer
@@ -70,74 +76,37 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         auto indexStagingBufferInfo = indexBufferInfo;
         indexStagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-        vkCreateBuffer(m_renderDevice, &indexBufferInfo, nullptr, &m_indexBuffer);
-        vkCreateBuffer(m_renderDevice, &indexStagingBufferInfo, nullptr, &m_indexStagingBuffer);
-    }
+        m_indexBuffer = memoryManager.requestBuffer(m_renderDevice,
+                        indexBufferInfo,
+                        VulkanMemoryType::INDEX);
 
-    // Allocate vertex memory
-    {
-        VkMemoryRequirements memoryRequirements;
-        vkGetBufferMemoryRequirements(m_renderDevice, m_vertexStagingBuffer, &memoryRequirements);
-        m_vertexStagingMemory = *memoryManager.allocateMemory(memoryRequirements, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-        vkGetBufferMemoryRequirements(m_renderDevice, m_vertexBuffer, &memoryRequirements);
-        m_vertexMemory = *memoryManager.allocateMemory(memoryRequirements, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    }
-
-    // Allocate index memory
-    {
-        VkMemoryRequirements memoryRequirements;
-        m_numIndices = numTriangles * 3;
-        vkGetBufferMemoryRequirements(m_renderDevice, m_indexStagingBuffer, &memoryRequirements);
-        m_indexStagingMemory = *memoryManager.allocateMemory(memoryRequirements, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-
-        vkGetBufferMemoryRequirements(m_renderDevice, m_indexBuffer, &memoryRequirements);
-        m_indexMemory = *memoryManager.allocateMemory(memoryRequirements, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        m_indexStagingBuffer = memoryManager.requestBuffer(m_renderDevice,
+                        indexStagingBufferInfo,
+                        VulkanMemoryType::STAGING_INDEX);
     }
 }
 
 void *
-VulkanVertexBuffer::mapVertices()
+VulkanVertexBuffer::getVertexMemory(uint32_t frameIndex)
 {
-    void * vertexData;
-    vkMapMemory(m_renderDevice, m_vertexStagingMemory, 0, m_vertexBufferSize, 0, &vertexData);
-
-    return vertexData;
-}
-
-void
-VulkanVertexBuffer::unmapVertices()
-{
-    m_vertexBufferModified = true;
-    vkUnmapMemory(m_renderDevice, m_vertexStagingMemory);
+    auto memory = (char*)m_vertexStagingBuffer->getMemoryData(m_renderDevice);
+    auto offset = frameIndex * m_vertexStagingBuffer->getSize() / m_buffering;
+    return (void*)&memory[offset];
 }
 
 void *
-VulkanVertexBuffer::mapTriangles()
+VulkanVertexBuffer::getIndexMemory(uint32_t frameIndex)
 {
-    void * indexData;
-    vkMapMemory(m_renderDevice, m_indexStagingMemory, 0, m_indexBufferSize, 0, &indexData);
-    return indexData;
-}
-
-void
-VulkanVertexBuffer::unmapTriangles()
-{
-    m_indexBufferModified = true;
-    vkUnmapMemory(m_renderDevice, m_indexStagingMemory);
-}
-
-void
-VulkanVertexBuffer::bind()
-{
-    // Testing
+    auto memory = (char*)m_indexStagingBuffer->getMemoryData(m_renderDevice);
+    auto offset = frameIndex * m_indexStagingBuffer->getSize() / m_buffering;
+    return (void*)&memory[offset];
 }
 
 void
 VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices,
                                        std::vector<std::array<uint32_t, 3>> * triangles)
 {
-    auto local_vertices = (VulkanBasicVertex *)this->mapVertices();
+    auto local_vertices = (VulkanBasicVertex *)this->getVertexMemory();
 
     for (unsigned i = 0; i < vertices->size(); i++)
     {
@@ -152,11 +121,9 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices
             (*vertices)[i].normal.z);
     }
 
-    this->unmapVertices();
-
     if (triangles != nullptr)
     {
-        auto local_triangles = (std::array<uint32_t, 3> *) this->mapTriangles();
+        auto local_triangles = (std::array<uint32_t, 3> *) this->getIndexMemory();
 
         for (unsigned i = 0; i < triangles->size(); i++)
         {
@@ -164,8 +131,6 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices
             local_triangles[i][1] = (*triangles)[i][1];
             local_triangles[i][2] = (*triangles)[i][2];
         }
-
-        this->unmapTriangles();
     }
 }
 
@@ -176,30 +141,33 @@ VulkanVertexBuffer::uploadBuffers(VkCommandBuffer& commandBuffer)
     {
         VkBufferCopy copyInfo;
         copyInfo.size = m_vertexBufferSize;
-        copyInfo.srcOffset = 0;
-        copyInfo.dstOffset = 0;
+        copyInfo.srcOffset = m_vertexStagingBuffer->getOffset();
+        copyInfo.dstOffset = m_vertexBuffer->getOffset();
 
-        vkCmdCopyBuffer(commandBuffer, m_vertexStagingBuffer, m_vertexBuffer, 1, &copyInfo);
+        vkCmdCopyBuffer(commandBuffer,
+                        *m_vertexStagingBuffer->getBuffer(),
+                        *m_vertexBuffer->getBuffer(),
+                        1,
+                        &copyInfo);
     }
     if (m_indexBufferModified)
     {
         VkBufferCopy copyInfo;
         copyInfo.size = m_indexBufferSize;
-        copyInfo.srcOffset = 0;
-        copyInfo.dstOffset = 0;
+        copyInfo.srcOffset = m_indexStagingBuffer->getOffset();
+        copyInfo.dstOffset = m_indexBuffer->getOffset();
 
-        vkCmdCopyBuffer(commandBuffer, m_indexStagingBuffer, m_indexBuffer, 1, &copyInfo);
+        vkCmdCopyBuffer(commandBuffer,
+                        *m_indexStagingBuffer->getBuffer(),
+                        *m_indexBuffer->getBuffer(),
+                        1,
+                        &copyInfo);
     }
 }
 
 void
 VulkanVertexBuffer::initializeBuffers(VulkanMemoryManager& memoryManager)
 {
-    vkBindBufferMemory(m_renderDevice, m_vertexBuffer, m_vertexMemory, 0);
-    vkBindBufferMemory(m_renderDevice, m_indexBuffer, m_indexMemory, 0);
-    vkBindBufferMemory(m_renderDevice, m_vertexStagingBuffer, m_vertexStagingMemory, 0);
-    vkBindBufferMemory(m_renderDevice, m_indexStagingBuffer, m_indexStagingMemory, 0);
-
     // Start transfer commands
     VkCommandBufferBeginInfo commandBufferBeginInfo;
     commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -233,5 +201,15 @@ void
 VulkanVertexBuffer::setNumIndices(uint32_t numIndices)
 {
     m_numIndices = numIndices;
+}
+
+void
+VulkanVertexBuffer::bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameIndex)
+{
+    auto index = (m_mode == VulkanVertexBufferMode::VERTEX_BUFFER_STATIC) ? 0 : frameIndex;
+    auto vertexOffset = m_vertexBuffer->getOffset() + (index * m_vertexBuffer->getSize() / m_buffering);
+    auto indexOffset = m_indexBuffer->getOffset() + (index * m_indexBuffer->getSize() / m_buffering);
+    vkCmdBindVertexBuffers(*commandBuffer, 0, 1, m_vertexBuffer->getBuffer(), &vertexOffset);
+    vkCmdBindIndexBuffer(*commandBuffer, *m_indexBuffer->getBuffer(), indexOffset, VK_INDEX_TYPE_UINT32);
 }
 }

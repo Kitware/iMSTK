@@ -94,26 +94,19 @@ class VulkanUniformBuffer : public VulkanBuffer
 public:
     VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uint32_t uniformSize);
 
-    void updateUniforms(uint32_t uniformSize, void * uniformData);
+    void updateUniforms(uint32_t uniformSize, void * uniformData, uint32_t frameIndex);
 
     ~VulkanUniformBuffer() = default;
-
-    ///
-    /// \brief Binds the vertex buffer to memory
-    ///
-    void Bind();
 
 protected:
     friend class VulkanRenderer;
     friend class VulkanMaterialDelegate;
 
-    VkBuffer * getUniformBuffer();
+    VulkanInternalBuffer * getUniformBuffer();
 
-    void * mapUniforms();
-    void unmapUniforms();
+    void * getUniformMemory();
 
-    VkBuffer m_uniformBuffer;
-    VkDeviceMemory m_uniformMemory;
+    VulkanInternalBuffer * m_uniformBuffer;
 
     VkDevice m_renderDevice;
     uint32_t m_bufferMemoryIndex;

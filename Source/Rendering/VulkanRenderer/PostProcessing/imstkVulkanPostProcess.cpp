@@ -265,6 +265,15 @@ VulkanPostProcess::createPipeline(VulkanRenderer * renderer, std::string fragmen
 
     vkCreatePipelineLayout(renderer->m_renderDevice, &layoutInfo, nullptr, &m_pipelineLayout);
 
+    m_pipelineComponents.dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+    m_pipelineComponents.dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+
+    m_pipelineComponents.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    m_pipelineComponents.dynamicStateInfo.pNext = nullptr;
+    m_pipelineComponents.dynamicStateInfo.flags = 0;
+    m_pipelineComponents.dynamicStateInfo.dynamicStateCount = (uint32_t)m_pipelineComponents.dynamicStates.size();
+    m_pipelineComponents.dynamicStateInfo.pDynamicStates = &m_pipelineComponents.dynamicStates[0];
+
     m_graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     m_graphicsPipelineInfo.pNext = nullptr;
     m_graphicsPipelineInfo.flags = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
@@ -278,7 +287,7 @@ VulkanPostProcess::createPipeline(VulkanRenderer * renderer, std::string fragmen
     m_graphicsPipelineInfo.pMultisampleState = &m_pipelineComponents.multisampleInfo;
     m_graphicsPipelineInfo.pDepthStencilState = &m_pipelineComponents.depthStencilInfo;
     m_graphicsPipelineInfo.pColorBlendState = &m_pipelineComponents.colorBlendInfo;
-    m_graphicsPipelineInfo.pDynamicState = nullptr;
+    m_graphicsPipelineInfo.pDynamicState = &m_pipelineComponents.dynamicStateInfo;
     m_graphicsPipelineInfo.layout = m_pipelineLayout;
     m_graphicsPipelineInfo.renderPass = m_renderPass;
     m_graphicsPipelineInfo.subpass = 0;
@@ -289,10 +298,11 @@ VulkanPostProcess::createPipeline(VulkanRenderer * renderer, std::string fragmen
 void
 VulkanPostProcess::createFullscreenQuad(VulkanRenderer * renderer)
 {
-    m_vertexBuffer = std::make_shared<VulkanVertexBuffer>(renderer->m_memoryManager, 4, 4 * 5, 2);
+    m_vertexBuffer = std::make_shared<VulkanVertexBuffer>
+                     (renderer->m_memoryManager, 4, (unsigned int)(sizeof(float) * 5), 2);
 
     {
-        auto data = (float*)m_vertexBuffer->mapVertices();
+        auto data = (float*)m_vertexBuffer->getVertexMemory();
         data[0] = -1;
         data[1] = -1;
         data[2] = 0;
@@ -316,19 +326,16 @@ VulkanPostProcess::createFullscreenQuad(VulkanRenderer * renderer)
         data[17] = 0;
         data[18] = 1;
         data[19] = 1;
-
-        m_vertexBuffer->unmapVertices();
     }
 
     {
-        auto data = (uint32_t*)m_vertexBuffer->mapTriangles();
+        auto data = (uint32_t*)m_vertexBuffer->getIndexMemory();
         data[0] = 0;
         data[1] = 1;
         data[2] = 2;
         data[3] = 1;
         data[4] = 2;
         data[5] = 3;
-        m_vertexBuffer->unmapTriangles();
     }
 
     m_vertexBuffer->initializeBuffers(renderer->m_memoryManager);
@@ -569,5 +576,22 @@ VulkanPostProcess::addInputImage(
     m_samplers.push_back(sampler);
     m_imageViews.push_back(imageView);
     m_layouts.push_back(layout);
+}
+
+void
+VulkanPostProcess::clear(VkDevice * device)
+{
+    vkDestroyShaderModule(*device, m_pipelineComponents.vertexShader, nullptr);
+    vkDestroyShaderModule(*device, m_pipelineComponents.fragmentShader, nullptr);
+    vkDestroyPipelineLayout(*device, m_pipelineLayout, nullptr);
+    vkDestroyPipeline(*device, m_pipeline, nullptr);
+    vkDestroyRenderPass(*device, m_renderPass, nullptr);
+
+    for (auto layout : m_descriptorSetLayouts)
+    {
+        vkDestroyDescriptorSetLayout(*device, layout, nullptr);
+    }
+
+    vkDestroyDescriptorPool(*device, m_descriptorPool, nullptr);
 }
 }

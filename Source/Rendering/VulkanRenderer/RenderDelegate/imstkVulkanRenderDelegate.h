@@ -64,12 +64,15 @@ public:
     ///        in that memory is directly mapped from the Geometry to the
     ///        RenderDelegate.
     ///
-    virtual void update(){};
+    virtual void update(uint32_t frameIndex){};
 
     ///
     /// \brief Initialize memory backing
     ///
-    void initialize(VkDevice &device, uint32_t memoryIndex, std::shared_ptr<Geometry> geometry);
+    void initialize(
+        VkDevice &device,
+        uint32_t memoryIndex,
+        std::shared_ptr<Geometry> geometry);
 
     ///
     /// \brief Get vertex buffer
@@ -84,15 +87,17 @@ public:
     ///
     /// \brief Initialize data
     ///
-    void initializeData(VulkanMemoryManager& memoryManager,
-                        std::shared_ptr<RenderMaterial> material);
+    void initializeData(
+        VulkanMemoryManager& memoryManager,
+        std::shared_ptr<RenderMaterial> material,
+        VulkanVertexBufferMode mode = VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
 
     ///
     /// \brief Initialize data
     ///
     void updateTransform();
 
-    void updateUniforms();
+    void updateUniforms(uint32_t frameIndex);
 
 protected:
     friend class VulkanVertexBuffer;

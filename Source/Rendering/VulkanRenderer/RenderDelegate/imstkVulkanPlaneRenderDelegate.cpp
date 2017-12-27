@@ -91,13 +91,16 @@ VulkanPlaneRenderDelegate::VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plan
 
     m_vertexBuffer->updateVertexBuffer(&m_planeVertices, &m_planeTriangles);
 
-    this->update();
+    for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
+    {
+        this->update(i);
+    }
 }
 
 void
-VulkanPlaneRenderDelegate::update()
+VulkanPlaneRenderDelegate::update(uint32_t frameIndex)
 {
-    this->updateUniforms();
+    this->updateUniforms(frameIndex);
 }
 
 std::shared_ptr<Geometry>

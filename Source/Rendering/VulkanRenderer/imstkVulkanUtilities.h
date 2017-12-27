@@ -168,7 +168,6 @@ public:
         return componentMapping;
     }
 };
-
 }
 
 #endif

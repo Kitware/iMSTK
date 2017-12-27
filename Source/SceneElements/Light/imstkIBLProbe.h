@@ -28,15 +28,14 @@
 
 namespace imstk
 {
-
 class IBLProbe
 {
 public:
     IBLProbe() {};
 
     void initialize(std::string irradianceCubemapPath,
-        std::string radianceCubemapPath,
-        std::string brdfLUTPath);
+                    std::string radianceCubemapPath,
+                    std::string brdfLUTPath);
 
     std::shared_ptr<Texture> getIrradianceCubemapTexture();
     std::shared_ptr<Texture> getRadianceCubemapTexture();
@@ -51,7 +50,6 @@ protected:
     std::shared_ptr<Texture> m_radianceCubemapTexture = nullptr;
     std::shared_ptr<Texture> m_brdfLUTTexture = nullptr;
 };
-
 }
 
 #endif

@@ -60,6 +60,8 @@ struct VulkanMaterialPipelineComponents
     VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
     std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
     VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+    VkPipelineDynamicStateCreateInfo dynamicStateInfo;
+    std::vector<VkDynamicState> dynamicStates;
 };
 
 struct VulkanMaterialConstants
@@ -92,6 +94,11 @@ public:
         bool shadowPass = false,
         bool depthPass = false);
 
+    ///
+    /// \brief Clears the material
+    ///
+    void clear(VkDevice * device);
+
 protected:
     friend class VulkanRenderer;
 
@@ -114,8 +121,8 @@ protected:
     /// \brief Helper function that loads a single texture and checks if it already exits. Uses a backup texture if the path is blank.
     ///
     std::shared_ptr<VulkanTextureDelegate> initializeTexture(VulkanRenderer * renderer,
-        std::shared_ptr<Texture> backupTextureDelegate,
-        Texture::Type type);
+                                                             std::shared_ptr<Texture> backupTextureDelegate,
+                                                             Texture::Type type);
 
     ///
     /// \brief Initializes all the steps to build the material

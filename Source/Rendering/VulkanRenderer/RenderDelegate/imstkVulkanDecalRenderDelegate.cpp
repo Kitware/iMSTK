@@ -45,7 +45,7 @@ VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> 
 void
 VulkanDecalRenderDelegate::updateVertexBuffer()
 {
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->mapVertices();
+    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory();
 
     for (unsigned i = 0; i < m_numVertices; i++)
     {
@@ -53,9 +53,7 @@ VulkanDecalRenderDelegate::updateVertexBuffer()
             m_geometry->m_vertexPositions[i];
     }
 
-    m_vertexBuffer->unmapVertices();
-
-    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->mapTriangles();
+    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory();
 
     for (unsigned i = 0; i < m_numTriangles; i++)
     {
@@ -63,7 +61,6 @@ VulkanDecalRenderDelegate::updateVertexBuffer()
         triangles[i][1] = (uint32_t)m_geometry->m_triangles[i].y;
         triangles[i][2] = (uint32_t)m_geometry->m_triangles[i].z;
     }
-    m_vertexBuffer->unmapTriangles();
 }
 
 void
@@ -81,7 +78,7 @@ VulkanDecalRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, st
 }
 
 void
-VulkanDecalRenderDelegate::update(std::shared_ptr<Camera> camera)
+VulkanDecalRenderDelegate::update(uint32_t frameIndex, std::shared_ptr<Camera> camera)
 {
     unsigned int index = 0;
 
@@ -108,9 +105,9 @@ VulkanDecalRenderDelegate::update(std::shared_ptr<Camera> camera)
     m_decalFragmentUniforms.metalness = mat->getMetalness();
 
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalVertexUniforms),
-        (void *)&m_decalVertexUniforms);
+        (void *)&m_decalVertexUniforms, frameIndex);
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalFragmentUniforms),
-        (void *)&m_decalFragmentUniforms);
+        (void *)&m_decalFragmentUniforms, frameIndex);
 }
 
 std::shared_ptr<Geometry>

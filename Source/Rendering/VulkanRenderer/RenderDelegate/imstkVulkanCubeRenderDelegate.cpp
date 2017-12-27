@@ -93,13 +93,13 @@ VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, V
 
     m_vertexBuffer->updateVertexBuffer(&m_cubeVertices, &m_cubeTriangles);
 
-    this->update();
+    this->update(0);
 }
 
 void
-VulkanCubeRenderDelegate::update()
+VulkanCubeRenderDelegate::update(uint32_t frameIndex)
 {
-    this->updateUniforms();
+    this->updateUniforms(frameIndex);
 }
 
 std::shared_ptr<Geometry>

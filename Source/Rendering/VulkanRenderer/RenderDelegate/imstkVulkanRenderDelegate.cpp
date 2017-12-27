@@ -116,7 +116,9 @@ VulkanRenderDelegate::getBuffer()
 }
 
 void
-VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::shared_ptr<RenderMaterial> material)
+VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager,
+                                     std::shared_ptr<RenderMaterial> material,
+                                     VulkanVertexBufferMode mode)
 {
     m_vertexUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalVertexUniforms));
     m_fragmentUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalFragmentUniforms));
@@ -143,7 +145,8 @@ VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::sh
         m_numVertices,
         m_vertexSize,
         m_numTriangles,
-        m_loadFactor);
+        m_loadFactor,
+        mode);
 }
 
 void
@@ -161,12 +164,13 @@ VulkanRenderDelegate::updateTransform()
 }
 
 void
-VulkanRenderDelegate::updateUniforms()
+VulkanRenderDelegate::updateUniforms(uint32_t frameIndex)
 {
     auto geometry = this->getGeometry();
     this->updateTransform();
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
-        (void *)&m_localVertexUniforms);
+        (void *)&m_localVertexUniforms,
+        frameIndex);
 
     auto mat = geometry->getRenderMaterial();
 
@@ -178,6 +182,6 @@ VulkanRenderDelegate::updateUniforms()
     m_localFragmentUniforms.metalness = mat->getMetalness();
 
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalFragmentUniforms),
-        (void*)&m_localFragmentUniforms);
+        (void*)&m_localFragmentUniforms, frameIndex);
 }
 }

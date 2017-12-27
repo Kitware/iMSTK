@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Update render geometry
     ///
-    void update(std::shared_ptr<Camera> camera);
+    void update(uint32_t frameIndex, std::shared_ptr<Camera> camera);
 
     ///
     /// \brief Get source geometry

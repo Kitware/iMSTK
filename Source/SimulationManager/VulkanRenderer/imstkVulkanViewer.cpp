@@ -53,14 +53,46 @@ VulkanViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2, const 
 }
 
 void
+VulkanViewer::enableVSync()
+{
+    m_VSync = true;
+}
+
+void
+VulkanViewer::disableVSync()
+{
+    m_VSync = false;
+}
+
+void
+VulkanViewer::enableFullscreen()
+{
+    m_fullscreen = true;
+}
+
+void
+VulkanViewer::disableFullscreen()
+{
+    m_fullscreen = false;
+}
+
+void
+VulkanViewer::setResolution(unsigned int width, unsigned int height)
+{
+    m_width = width;
+    m_height = height;
+}
+
+void
 VulkanViewer::startRenderingLoop()
 {
     m_running = true;
     this->setupWindow();
-    m_renderer->initialize();
+    m_renderer->initialize(m_width, m_height);
     this->createWindow();
 
     this->setupSwapchain();
+    m_renderer->initializeFramebufferImages(&m_swapchain);
     m_renderer->initializeFramebuffers(&m_swapchain);
 
     m_renderer->loadAllGeometry();
@@ -72,6 +104,7 @@ VulkanViewer::startRenderingLoop()
         std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
     }
 
+    glfwTerminate();
     m_running = false;
 }
 
@@ -101,13 +134,54 @@ VulkanViewer::setupWindow()
     {
         m_renderer->m_extensions.push_back((char*)tempExtensions[i]);
     }
+
+    // find appropriate resolution
+    int numMonitors;
+    auto monitors = glfwGetMonitors(&numMonitors);
+
+    int numVideoModes;
+    auto videoModes = glfwGetVideoModes(monitors[0], &numVideoModes);
+
+    unsigned int tempWidth;
+    unsigned int tempHeight;
+    unsigned int lastDifference = UINT_MAX;
+
+    for (int i = 0; i < numVideoModes; i++)
+    {
+        auto dw = m_width - videoModes[i].width;
+        auto dh = m_height - videoModes[i].height;
+
+        if (dh * dw < lastDifference)
+        {
+            lastDifference = dh * dw;
+            tempWidth = videoModes[i].width;
+            tempHeight = videoModes[i].height;
+        }
+    }
+
+    m_width = tempWidth;
+    m_height = tempHeight;
 }
 
 void
 VulkanViewer::createWindow()
 {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    m_window = glfwCreateWindow(m_width, m_height, "iMSTK", nullptr, nullptr);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+    int numMonitors;
+    auto monitors = glfwGetMonitors(&numMonitors);
+
+    if (!m_fullscreen || numMonitors == 0)
+    {
+        m_window = glfwCreateWindow(m_width, m_height, "iMSTK", nullptr, nullptr);
+    }
+    else
+    {
+        glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
+        m_window = glfwCreateWindow(m_width, m_height, "iMSTK", monitors[0], nullptr);
+    }
+
     VkResult status = glfwCreateWindowSurface(*m_renderer->m_instance, m_window, nullptr, &m_surface);
     std::cout << status << std::endl;
 
@@ -140,6 +214,10 @@ VulkanViewer::setupSwapchain()
     m_physicalFormats = new VkSurfaceFormatKHR[(int)m_physicalFormatsCount]();
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalFormatsCount, m_physicalFormats);
 
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_presentModesCount, nullptr);
+    m_presentModes = new VkPresentModeKHR[(int)m_presentModesCount]();
+    vkGetPhysicalDeviceSurfacePresentModesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_presentModesCount, m_presentModes);
+
     VkBool32 supported;
     vkGetPhysicalDeviceSurfaceSupportKHR(m_renderer->m_physicalDevices[0], 0, m_surface, &supported);
 
@@ -159,12 +237,25 @@ VulkanViewer::setupSwapchain()
         LOG(FATAL) << "Linear color space not supported";
     }
 
+    VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR;
+
+    if (!m_VSync)
+    {
+        for (uint32_t i = 0; i < m_presentModesCount; i++)
+        {
+            if (m_presentModes[i] == VK_PRESENT_MODE_IMMEDIATE_KHR)
+            {
+                presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+            }
+        }
+    }
+
     VkSwapchainCreateInfoKHR swapchainInfo;
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapchainInfo.pNext = nullptr;
     swapchainInfo.flags = 0;
     swapchainInfo.surface = m_surface;
-    swapchainInfo.minImageCount = 3; // triple buffering
+    swapchainInfo.minImageCount = m_renderer->m_buffering; // triple buffering
     swapchainInfo.imageFormat = VK_FORMAT_B8G8R8A8_SRGB;
     swapchainInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     swapchainInfo.imageExtent = extent;
@@ -175,7 +266,7 @@ VulkanViewer::setupSwapchain()
     swapchainInfo.pQueueFamilyIndices = nullptr;
     swapchainInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
     swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    swapchainInfo.presentMode = VK_PRESENT_MODE_FIFO_KHR;
+    swapchainInfo.presentMode = presentMode;
     swapchainInfo.clipped = VK_TRUE;
     swapchainInfo.oldSwapchain = VK_NULL_HANDLE;
 

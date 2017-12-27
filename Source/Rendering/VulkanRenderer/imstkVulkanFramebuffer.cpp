@@ -153,4 +153,10 @@ VulkanFramebuffer::setSpecular(VkImageView * specular, VkFormat format)
     m_specularImageView = specular;
     m_specularFormat = format;
 }
+
+void
+VulkanFramebuffer::clear(VkDevice * device)
+{
+    vkDestroyFramebuffer(*device, m_framebuffer, nullptr);
+}
 }

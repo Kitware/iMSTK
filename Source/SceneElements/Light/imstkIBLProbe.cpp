@@ -23,11 +23,10 @@
 
 namespace imstk
 {
-
 void
 IBLProbe::initialize(std::string irradianceCubemapPath,
-        std::string radianceCubemapPath,
-        std::string brdfLUTPath)
+                     std::string radianceCubemapPath,
+                     std::string brdfLUTPath)
 {
     m_irradianceCubemapPath = irradianceCubemapPath;
     m_radianceCubemapPath = radianceCubemapPath;
@@ -58,5 +57,4 @@ IBLProbe::getBrdfLUTTexture()
 {
     return m_brdfLUTTexture;
 }
-
 }

@@ -962,6 +962,50 @@ void testRendering()
     // Run
     sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
+
+#ifdef iMSTK_USE_Vulkan
+    auto viewer = std::dynamic_pointer_cast<VulkanViewer>(sdk->getViewer());
+    viewer->setResolution(1920, 1080);
+    viewer->disableVSync();
+    viewer->enableFullscreen();
+#endif
+    sdk->startSimulation(true);
+}
+
+void testRenderMaterials()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("RenderMaterials");
+
+    // Position camera
+    auto cam = scene->getCamera();
+    cam->setPosition(0.2, 0.2, 2.5);
+    cam->setFocalPoint(0.2, 0.2, 0);
+
+    // IBL probe
+    auto probe = std::make_shared<IBLProbe>();
+    probe->initialize(iMSTK_DATA_ROOT "/IBL/roomIrradiance.dds", iMSTK_DATA_ROOT "/IBL/roomRadiance.dds", iMSTK_DATA_ROOT "/IBL/roomBRDF.png");
+    scene->setGlobalIBLProbe(probe);
+
+    // Sphere
+    for (int i = 0; i < 25; i++)
+    {
+        auto sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere,
+            scene,
+            "VisualSphere" + std::to_string(i),
+            0.05);
+        auto sphereMaterial = std::make_shared<RenderMaterial>();
+        auto sphereMesh = sphereObj->getVisualGeometry();
+        sphereMesh->translate((i / 5) * 0.1, (i % 5) * 0.1, 0.5);
+        sphereMaterial->setCastsShadows(false);
+        sphereMaterial->setRoughness((i / 5) / 4.0);
+        sphereMaterial->setMetalness((i % 5) / 4.0);
+        sphereObj->getVisualGeometry()->setRenderMaterial(sphereMaterial);
+    }
+
+    // Run
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -3644,7 +3688,8 @@ int main()
     //testMultiObjectWithTextures();
     //testViewer();
     //testDecals();
-    testRendering();
+    //testRendering();
+    testRenderMaterials();
     //testScreenShotUtility();
     //testCapsule();
 
@@ -3672,11 +3717,11 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    //testPbdCloth();
+    testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
-    testDeformableBody();
+    //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();
@@ -3709,7 +3754,7 @@ int main()
     //testBoneDrilling();
     //testVirtualCouplingCylinder();
     //testRigidBody();
-    testGraph();
+    //testGraph();
 
     return 0;
 }

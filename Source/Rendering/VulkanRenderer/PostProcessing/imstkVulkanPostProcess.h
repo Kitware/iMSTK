@@ -53,7 +53,6 @@ public:
     void generateMipmaps(VkCommandBuffer& commandBuffer,
                          unsigned int levels,
                          VkImage& image);
-
 protected:
     friend class VulkanRenderer;
     friend class VulkanPostProcessingChain;
@@ -78,6 +77,8 @@ protected:
     void createDescriptorSetLayouts(VulkanRenderer * renderer);
     void createDescriptorPool(VulkanRenderer * renderer);
     void createDescriptorSets(VulkanRenderer * renderer);
+
+    void clear(VkDevice * device);
 
     VkPipeline m_pipeline;
     VkGraphicsPipelineCreateInfo m_graphicsPipelineInfo;

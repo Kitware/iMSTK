@@ -140,17 +140,17 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
     m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_depthOnlyPass;
     m_constants.metalnessTexture = (m_material->getTexture(Texture::Type::METALNESS)->getPath() != "") && !m_depthOnlyPass;
-    m_constants.ambientOcclusionTexture = (m_material->getTexture(Texture::Type::AMBIENT_OCCLUSION)->getPath() != "") && !m_depthOnlyPass;    
+    m_constants.ambientOcclusionTexture = (m_material->getTexture(Texture::Type::AMBIENT_OCCLUSION)->getPath() != "") && !m_depthOnlyPass;
     m_constants.subsurfaceScatteringTexture = (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING)->getPath() != "") && !m_depthOnlyPass;
     m_constants.irradianceCubemapTexture = (m_material->getTexture(Texture::Type::IRRADIANCE_CUBEMAP)->getPath() != ""
-        || renderer->m_scene->getGlobalIBLProbe())
-        && !m_depthOnlyPass;
+                                            || renderer->m_scene->getGlobalIBLProbe())
+                                           && !m_depthOnlyPass;
     m_constants.radianceCubemapTexture = (m_material->getTexture(Texture::Type::RADIANCE_CUBEMAP)->getPath() != ""
-        || renderer->m_scene->getGlobalIBLProbe())
-        && !m_depthOnlyPass;
+                                          || renderer->m_scene->getGlobalIBLProbe())
+                                         && !m_depthOnlyPass;
     m_constants.brdfLUTTexture = (m_material->getTexture(Texture::Type::BRDF_LUT)->getPath() != ""
-        || renderer->m_scene->getGlobalIBLProbe())
-        && !m_depthOnlyPass;
+                                  || renderer->m_scene->getGlobalIBLProbe())
+                                 && !m_depthOnlyPass;
 
     this->addSpecializationConstant(sizeof(m_constants.numLights),
         offsetof(VulkanMaterialConstants, numLights));
@@ -314,8 +314,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.scissors.resize(1);
 
     m_pipelineComponents.scissors[0].offset = { 0, 0 };
-    m_pipelineComponents.scissors[0].extent = { m_pipelineComponents.viewports[0].width,
-        m_pipelineComponents.viewports[0].height };
+    m_pipelineComponents.scissors[0].extent = { (uint32_t)m_pipelineComponents.viewports[0].width,
+                                                (uint32_t)m_pipelineComponents.viewports[0].height };
 
     m_pipelineComponents.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     m_pipelineComponents.viewportInfo.pNext = nullptr;
@@ -442,7 +442,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.colorBlendInfo.logicOp = VK_LOGIC_OP_SET;
     m_pipelineComponents.colorBlendInfo.attachmentCount = (uint32_t)m_pipelineComponents.colorBlendAttachments.size();
     m_pipelineComponents.colorBlendInfo.pAttachments = (uint32_t)m_pipelineComponents.colorBlendAttachments.size() == 0 ?
-        nullptr : &m_pipelineComponents.colorBlendAttachments[0];
+                                                       nullptr : &m_pipelineComponents.colorBlendAttachments[0];
     m_pipelineComponents.colorBlendInfo.blendConstants[0] = 1.0;
     m_pipelineComponents.colorBlendInfo.blendConstants[1] = 1.0;
     m_pipelineComponents.colorBlendInfo.blendConstants[2] = 1.0;
@@ -465,6 +465,15 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     vkCreatePipelineLayout(renderer->m_renderDevice, &layoutInfo, nullptr, &m_pipelineLayout);
 
+    m_pipelineComponents.dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+    m_pipelineComponents.dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+
+    m_pipelineComponents.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    m_pipelineComponents.dynamicStateInfo.pNext = nullptr;
+    m_pipelineComponents.dynamicStateInfo.flags = 0;
+    m_pipelineComponents.dynamicStateInfo.dynamicStateCount = (uint32_t)m_pipelineComponents.dynamicStates.size();
+    m_pipelineComponents.dynamicStateInfo.pDynamicStates = &m_pipelineComponents.dynamicStates[0];
+
     m_graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     m_graphicsPipelineInfo.pNext = nullptr;
     m_graphicsPipelineInfo.flags = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
@@ -478,7 +487,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_graphicsPipelineInfo.pMultisampleState = &m_pipelineComponents.multisampleInfo;
     m_graphicsPipelineInfo.pDepthStencilState = &m_pipelineComponents.depthStencilInfo;
     m_graphicsPipelineInfo.pColorBlendState = &m_pipelineComponents.colorBlendInfo;
-    m_graphicsPipelineInfo.pDynamicState = nullptr;
+    m_graphicsPipelineInfo.pDynamicState = m_shadowPass ? nullptr : &m_pipelineComponents.dynamicStateInfo;
     m_graphicsPipelineInfo.layout = m_pipelineLayout;
     m_graphicsPipelineInfo.renderPass = renderPass;
     m_graphicsPipelineInfo.subpass = 0;
@@ -522,8 +531,8 @@ VulkanMaterialDelegate::initializeTextures(VulkanRenderer * renderer)
 
 std::shared_ptr<VulkanTextureDelegate>
 VulkanMaterialDelegate::initializeTexture(VulkanRenderer * renderer,
-        std::shared_ptr<Texture> backupTexture,
-        Texture::Type type)
+                                          std::shared_ptr<Texture> backupTexture,
+                                          Texture::Type type)
 {
     auto texture = m_material->getTexture(type);
 
@@ -864,23 +873,23 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
 
     // Global Buffers
     std::vector<VkDescriptorBufferInfo> vertexBufferInfo(2);
-    vertexBufferInfo[0].offset = 0;
-    vertexBufferInfo[0].range = size;
-    vertexBufferInfo[0].buffer = *(renderer->m_globalVertexUniformBuffer->getUniformBuffer());
+    vertexBufferInfo[0].offset = renderer->m_globalVertexUniformBuffer->getUniformBuffer()->getOffset();
+    vertexBufferInfo[0].range = renderer->m_globalVertexUniformBuffer->getUniformBuffer()->getSize();
+    vertexBufferInfo[0].buffer = *(renderer->m_globalVertexUniformBuffer->getUniformBuffer()->getBuffer());
 
-    vertexBufferInfo[1].offset = 0;
-    vertexBufferInfo[1].range = size;
-    vertexBufferInfo[1].buffer = *(m_vertexUniformBuffer->getUniformBuffer());
+    vertexBufferInfo[1].offset = m_vertexUniformBuffer->getUniformBuffer()->getOffset();
+    vertexBufferInfo[1].range = m_vertexUniformBuffer->getUniformBuffer()->getSize();
+    vertexBufferInfo[1].buffer = *(m_vertexUniformBuffer->getUniformBuffer()->getBuffer());
 
     // Global buffers
     std::vector<VkDescriptorBufferInfo> fragmentBufferInfo(2);
-    fragmentBufferInfo[0].offset = 0;
-    fragmentBufferInfo[0].range = size;
-    fragmentBufferInfo[0].buffer = *(renderer->m_globalFragmentUniformBuffer->getUniformBuffer());
+    fragmentBufferInfo[0].offset = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getOffset();;
+    fragmentBufferInfo[0].range = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getSize();
+    fragmentBufferInfo[0].buffer = *(renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getBuffer());
 
-    fragmentBufferInfo[1].offset = 0;
-    fragmentBufferInfo[1].range = size;
-    fragmentBufferInfo[1].buffer = *(m_fragmentUniformBuffer->getUniformBuffer());
+    fragmentBufferInfo[1].offset = m_fragmentUniformBuffer->getUniformBuffer()->getOffset();
+    fragmentBufferInfo[1].range = m_fragmentUniformBuffer->getUniformBuffer()->getSize();
+    fragmentBufferInfo[1].buffer = *(m_fragmentUniformBuffer->getUniformBuffer()->getBuffer());
 
     std::vector<VkDescriptorImageInfo> fragmentTextureInfo;
 
@@ -1033,5 +1042,29 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
     }
 
     vkUpdateDescriptorSets(renderer->m_renderDevice, (uint32_t)m_writeDescriptorSets.size(), &m_writeDescriptorSets[0], 0, nullptr);
+}
+
+void
+VulkanMaterialDelegate::clear(VkDevice * device)
+{
+    vkDestroyShaderModule(*device, m_pipelineComponents.vertexShader, nullptr);
+
+    if (m_material->getTessellated())
+    {
+        vkDestroyShaderModule(*device, m_pipelineComponents.tessellationControlShader, nullptr);
+        vkDestroyShaderModule(*device, m_pipelineComponents.tessellationEvaluationShader, nullptr);
+    }
+
+    vkDestroyShaderModule(*device, m_pipelineComponents.fragmentShader, nullptr);
+
+    vkDestroyPipelineLayout(*device, m_pipelineLayout, nullptr);
+    vkDestroyPipeline(*device, m_pipeline, nullptr);
+
+    for (auto layout : m_descriptorSetLayouts)
+    {
+        vkDestroyDescriptorSetLayout(*device, layout, nullptr);
+    }
+
+    vkDestroyDescriptorPool(*device, m_descriptorPool, nullptr);
 }
 }
