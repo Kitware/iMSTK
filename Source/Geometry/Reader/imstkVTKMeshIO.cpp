@@ -28,7 +28,7 @@
 #include "vtkPLYReader.h"
 #include "vtkOBJReader.h"
 #include "vtkSTLReader.h"
-#include "vtkUnstructuredGridWriter.h"
+#include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkPLYWriter.h"
 #include "vtkSTLWriter.h"
@@ -208,7 +208,7 @@ VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkM
         return false;
     }
 
-    auto writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
+    auto writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
     writer->SetInputData(vtkMesh);
     writer->SetFileName(filePath.c_str());
     writer->Update();
