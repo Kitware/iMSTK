@@ -44,6 +44,7 @@ imstk_add_library( SimulationManager
     imstkViewer.h
     imstkScreenCaptureUtility.h
     imstkInteractorStyle.h
+    imstkOpenVRCommand.h
     ${SIMULATIONMANAGER_H_FILES}
   CPP_FILES
     imstkSceneManager.cpp
@@ -51,6 +52,7 @@ imstk_add_library( SimulationManager
     imstkViewer.cpp
     imstkScreenCaptureUtility.cpp
     imstkInteractorStyle.cpp
+    imstkOpenVRCommand.cpp
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}

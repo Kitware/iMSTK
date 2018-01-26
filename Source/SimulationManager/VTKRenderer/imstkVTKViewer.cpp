@@ -51,7 +51,7 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene>scene)
     // Create renderer if it doesn't exist
     if (!m_rendererMap.count(m_activeScene))
     {
-        m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene);
+        m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene, m_enableVR);
     }
 
     // Cast to VTK renderer
@@ -60,11 +60,14 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene>scene)
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
 
-    // Set renderer to interactorStyle
-    std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->SetCurrentRenderer(vtkRenderer);
+    if (!m_enableVR)
+    {
+        // Set renderer to interactorStyle
+        std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->SetCurrentRenderer(vtkRenderer);
 
-    // Set name to renderWindow
-    m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
+        // Set name to renderWindow
+        m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
+    }
 }
 
 void
@@ -78,7 +81,7 @@ VTKViewer::setRenderingMode(Renderer::Mode mode)
     }
 
     // Setup renderer
-    this->getActiveRenderer()->setMode(mode);
+    this->getActiveRenderer()->setMode(mode, m_enableVR);
     if (!m_running)
     {
         return;
@@ -87,6 +90,10 @@ VTKViewer::setRenderingMode(Renderer::Mode mode)
     // Render to update displayed actors
     m_vtkRenderWindow->Render();
 
+    if (m_enableVR)
+    {
+        return;
+    }
     // Setup render window
     if (mode == Renderer::Mode::SIMULATION)
     {
@@ -113,10 +120,18 @@ void
 VTKViewer::startRenderingLoop()
 {
     m_running = true;
-    m_vtkRenderWindow->GetInteractor()->Initialize();
-    m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
-    m_vtkRenderWindow->GetInteractor()->Start();
-    m_vtkRenderWindow->GetInteractor()->DestroyTimer();
+    if (!m_enableVR)
+    {
+        m_vtkRenderWindow->GetInteractor()->Initialize();
+        m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
+        m_vtkRenderWindow->GetInteractor()->Start();
+        m_vtkRenderWindow->GetInteractor()->DestroyTimer();
+    }
+    else
+    {
+        m_vtkRenderWindow->GetInteractor()->Start();
+    }
+
     m_running = false;
 }
 
@@ -165,8 +180,8 @@ VTKViewer::setTargetFrameRate(const double& fps)
         vtkInteractorStyle->m_targetMS = 0;
         return;
     }
-    vtkInteractorStyle->m_targetMS = 1000.0/fps;
-    std::cout << "Target framerate: " << fps << " (" << vtkInteractorStyle->m_targetMS << " ms)"<< std::endl;
+    vtkInteractorStyle->m_targetMS = 1000.0 / fps;
+    std::cout << "Target framerate: " << fps << " (" << vtkInteractorStyle->m_targetMS << " ms)" << std::endl;
 }
 
 

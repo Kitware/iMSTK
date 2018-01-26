@@ -27,7 +27,7 @@
 
 namespace imstk
 {
-SimulationManager::SimulationManager()
+SimulationManager::SimulationManager(bool enableVR)
 {
     // Init g3logger
     m_logUtil->createLogger("simulation", "./");
@@ -35,7 +35,15 @@ SimulationManager::SimulationManager()
 #ifdef iMSTK_USE_Vulkan
     m_viewer = std::make_shared<VulkanViewer>(this);
 #else
-    m_viewer = std::make_shared<VTKViewer>(this);
+#ifdef iMSTK_ENABLE_VR
+    m_viewer = std::make_shared<VTKViewer>(this, enableVR);
+#else
+    if (enableVR)
+    {
+        LOG(FATAL) << "Can not run VR simulation without iMSTK_ENABLE_VR";
+    }
+    m_viewer = std::make_shared<VTKViewer>(this, false);
+#endif
 #endif
 }
 

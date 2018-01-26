@@ -40,6 +40,12 @@
 //Screenshot utility
 #include "imstkVTKScreenCaptureUtility.h"
 
+#ifdef iMSTK_ENABLE_VR
+#include "imstkOpenVRCommand.h"
+#include "vtkOpenVRRenderWindow.h"
+#include "vtkOpenVRRenderWindowInteractor.h"
+#endif
+
 namespace imstk
 {
 class SimulationManager;
@@ -55,15 +61,47 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKViewer(SimulationManager* manager = nullptr)
+    VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false)
     {
-        m_interactorStyle = std::make_shared<VTKInteractorStyle>();
-        auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
-        vtkInteractorStyle->m_simManager = manager;
-        m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
-        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( vtkInteractorStyle.get() );
-        m_vtkRenderWindow->SetSize(1000,800);
-        m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
+        m_enableVR = enableVR;
+        // init render window / interactor / command based
+        // depending on if we enable VR or not
+        if (!m_enableVR)
+        {
+            // Interactor style / commands
+            m_interactorStyle = std::make_shared<VTKInteractorStyle>();
+            auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
+            vtkInteractorStyle->m_simManager = manager;
+
+            // Interactor
+            auto vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+            vtkInteractor->SetInteractorStyle(vtkInteractorStyle.get());
+
+            // Render window
+            m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+            m_vtkRenderWindow->SetInteractor(vtkInteractor);
+            m_vtkRenderWindow->SetSize(1000, 800);
+
+            // Screen capture
+            m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
+        }
+#ifdef iMSTK_ENABLE_VR
+        else
+        {
+            // Interactor style / commands
+            m_openVRCommand = vtkSmartPointer<OpenVRCommand>::New();
+            m_openVRCommand->SetSimulationManager(manager);
+
+            // Interactor
+            auto vtkOpenVRinteractor = vtkSmartPointer<vtkOpenVRRenderWindowInteractor>::New();
+
+            // Add observer openVR command
+            m_vtkRenderWindow = vtkSmartPointer<vtkOpenVRRenderWindow>::New();
+            m_vtkRenderWindow->SetInteractor(vtkOpenVRinteractor);
+            vtkOpenVRinteractor->SetRenderWindow(m_vtkRenderWindow);
+            m_vtkRenderWindow->AddObserver(vtkCommand::StartEvent, m_openVRCommand, 1.0);
+        }
+#endif
     }
 
     ///
@@ -124,7 +162,12 @@ public:
 
 protected:
 
-    vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow;
+    bool m_enableVR;
+
+#ifdef iMSTK_ENABLE_VR
+    vtkSmartPointer<OpenVRCommand> m_openVRCommand;
+#endif
 };
 } // imstk
 

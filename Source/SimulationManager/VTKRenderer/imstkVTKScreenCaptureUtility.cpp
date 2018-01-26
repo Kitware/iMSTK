@@ -49,7 +49,7 @@ VTKScreenCaptureUtility::saveScreenShot()
     {
         m_windowToImageFilter->SetInput(m_renderWindow);
 
-        m_windowToImageFilter->SetMagnification(1);
+        m_windowToImageFilter->SetScale(1);
         m_windowToImageFilter->SetInputBufferTypeToRGB();
         m_windowToImageFilter->ReadFrontBufferOff();
         m_windowToImageFilter->Update();

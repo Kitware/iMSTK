@@ -106,6 +106,12 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(gli)
   endif()
 
+  option(${PROJECT_NAME}_ENABLE_VR "Allow the usage of VR rendering." OFF)
+
+  if(${PROJECT_NAME}_ENABLE_VR)
+    imstk_define_dependency(openvr)
+  endif()
+
   if(WIN32)
     imstk_define_dependency(PThreads)
     imstk_define_dependency(Libusb) #for VRPN
@@ -234,6 +240,12 @@ if( ${PROJECT_NAME}_USE_Vulkan )
   # gli
   find_package(gli)
   include_directories( ${gli_INCLUDE_DIR} )
+endif()
+
+if(${PROJECT_NAME}_ENABLE_VR)
+  add_definitions( -DiMSTK_ENABLE_VR )
+else()
+  remove_definitions( -DiMSTK_ENABLE_VR )
 endif()
 
 # g3log

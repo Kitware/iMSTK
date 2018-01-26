@@ -35,9 +35,22 @@
 
 namespace imstk
 {
-VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
+VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, bool enableVR)
 {
     m_scene = scene;
+
+    // create m_vtkRenderer depending on enableVR
+    if (!enableVR)
+    {
+        m_vtkRenderer = vtkSmartPointer<vtkRenderer>::New();
+    }
+#ifdef iMSTK_ENABLE_VR
+    else
+    {
+        m_vtkRenderer = vtkSmartPointer<vtkOpenVRRenderer>::New();
+    }
+
+#endif
     this->updateRenderDelegates();
 
     // Initialize textures for surface mesh render delegates
@@ -70,15 +83,37 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
     m_debugVtkActors.push_back( axes );
 
     // Camera and camera actor
-    m_sceneVtkCamera = vtkSmartPointer<vtkCamera>::New();
+    if (!enableVR)
+    {
+        m_sceneVtkCamera = vtkSmartPointer<vtkCamera>::New();
+    }
+#ifdef iMSTK_ENABLE_VR
+    else
+    {
+        m_sceneVtkCamera = vtkSmartPointer<vtkOpenVRCamera>::New();
+    }
+#endif
     this->updateSceneCamera(scene->getCamera());
     auto camActor = vtkSmartPointer<vtkCameraActor>::New();
     camActor->SetCamera(  m_sceneVtkCamera );
     m_debugVtkActors.push_back( camActor );
 
     // Debug camera
-    m_defaultVtkCamera = m_vtkRenderer->GetActiveCamera();
+    if (!enableVR)
+    {
+        m_defaultVtkCamera = m_vtkRenderer->GetActiveCamera();
+        m_vtkRenderer->ResetCamera();
+    }
+#ifdef iMSTK_ENABLE_VR
+    else
+    {
+        // in VR mode, we keep m_defaultVtkCamera as the HMD camera
+        // => Do not change the active Camera
+        m_defaultVtkCamera = vtkSmartPointer<vtkOpenVRCamera>::New();
+        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
+    }
 
+#endif
     ///TODO : based on scene properties
     // Customize background colors
     m_vtkRenderer->SetBackground(0.66,0.66,0.66);
@@ -92,7 +127,49 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
         m_vtkRenderer->RemoveCuller(culler);
     }
 
-    this->setMode(Mode::SIMULATION);
+    // set camera pos
+#ifdef iMSTK_ENABLE_VR
+    if (enableVR)
+    {
+        m_camPos.resize(2);
+
+        // save debug camera m_camPos[0]
+        m_defaultVtkCamera->GetPosition(m_camPos[0].Position);
+        m_defaultVtkCamera->GetDirectionOfProjection(m_camPos[0].ViewDirection);
+
+        m_camPos[0].PhysicalViewUp[0] = 0.0;
+        m_camPos[0].PhysicalViewUp[1] = 1.0;
+        m_camPos[0].PhysicalViewUp[2] = 0.0;
+
+        m_camPos[0].PhysicalViewDirection[0] = 1.0;
+        m_camPos[0].PhysicalViewDirection[1] = 0.0;
+        m_camPos[0].PhysicalViewDirection[2] = 0.0;
+
+        m_camPos[0].Distance = 10; // room scale factor
+
+        m_camPos[0].Translation[0] = 0.0;
+        m_camPos[0].Translation[1] = 0.0;
+        m_camPos[0].Translation[2] = 0.0;
+
+        // save scene camera m_camPos[1]
+        m_sceneVtkCamera->GetPosition(m_camPos[1].Position);
+        m_sceneVtkCamera->GetDirectionOfProjection(m_camPos[1].ViewDirection);
+
+        m_camPos[1].PhysicalViewUp[0] = 0.0;
+        m_camPos[1].PhysicalViewUp[1] = 1.0;
+        m_camPos[1].PhysicalViewUp[2] = 0.0;
+
+        m_camPos[1].PhysicalViewDirection[0] = 1.0;
+        m_camPos[1].PhysicalViewDirection[1] = 0.0;
+        m_camPos[1].PhysicalViewDirection[2] = 0.0;
+
+        m_camPos[1].Distance = 1.0; // room scale factor of 1 meter
+
+        m_camPos[1].Translation[0] = 0.0;
+        m_camPos[1].Translation[1] = 0.0;
+        m_camPos[1].Translation[2] = 0.0;
+    }
+#endif
 }
 
 vtkSmartPointer<vtkRenderer>
@@ -102,8 +179,19 @@ VTKRenderer::getVtkRenderer() const
 }
 
 void
-VTKRenderer::setMode(Renderer::Mode mode)
+VTKRenderer::setMode(Renderer::Mode mode, bool enableVR)
 {
+#ifdef iMSTK_ENABLE_VR
+    vtkOpenVRRenderWindow* renWin = nullptr;
+    if (enableVR)
+    {
+        renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderer->GetRenderWindow());
+        if (!renWin || !m_vtkRenderer)
+        {
+            return;
+        }
+    }
+#endif
     if( mode == Mode::EMPTY && m_currentMode != Mode::EMPTY )
     {
         this->removeActors(m_objectVtkActors);
@@ -113,8 +201,11 @@ VTKRenderer::setMode(Renderer::Mode mode)
         {
             this->removeActors(m_debugVtkActors);
         }
-
-        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
+        // do not change active camera in VR
+        if (!enableVR)
+        {
+            m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
+        }
     }
     else if( mode == Mode::DEBUG && m_currentMode != Mode::DEBUG )
     {
@@ -128,9 +219,20 @@ VTKRenderer::setMode(Renderer::Mode mode)
                 m_vtkRenderer->AddLight(light);
             }
         }
-
-        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
-        m_vtkRenderer->ResetCamera();
+        // do not change active camera in VR
+        if (!enableVR)
+        {
+            m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
+            m_vtkRenderer->ResetCamera();
+        }
+#ifdef iMSTK_ENABLE_VR
+        else // go to debug position camera
+        {
+            // apply debug camera
+            m_camPos[0].Apply(static_cast<vtkOpenVRCamera *>(m_vtkRenderer->GetActiveCamera()), renWin);
+            m_vtkRenderer->ResetCameraClippingRange();
+        }
+#endif
     }
     else if ( mode == Mode::SIMULATION && m_currentMode != Mode::SIMULATION )
     {
@@ -145,13 +247,33 @@ VTKRenderer::setMode(Renderer::Mode mode)
         else if( m_currentMode == Mode::DEBUG )
         {
             this->removeActors(m_debugVtkActors);
-        }
 
-        m_vtkRenderer->SetActiveCamera(m_sceneVtkCamera);
+#ifdef iMSTK_ENABLE_VR
+            // save last debug position camera
+            if (enableVR)
+            {
+                m_camPos[0].Set(
+                    static_cast<vtkOpenVRCamera *>(m_vtkRenderer->GetActiveCamera()),
+                    vtkOpenVRRenderWindow::SafeDownCast(renWin));
+            }
+#endif
+        }
+        // do not change active camera in VR
+        if (!enableVR)
+        {
+            m_vtkRenderer->SetActiveCamera(m_sceneVtkCamera);
+        }
+#ifdef iMSTK_ENABLE_VR
+        else // go to Predefined sceneVtkCamera position
+        {
+            // apply scene camera
+            m_camPos[1].Apply(static_cast<vtkOpenVRCamera *>(m_vtkRenderer->GetActiveCamera()), renWin);
+        }
+#endif
         m_vtkRenderer->ResetCameraClippingRange();
     }
 
-    m_currentMode = mode;
+    Renderer::setMode(mode, enableVR);
 }
 
 void
