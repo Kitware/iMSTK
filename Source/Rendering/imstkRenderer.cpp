@@ -30,7 +30,7 @@ Renderer::getRenderer()
 }
 
 void
-Renderer::setMode(Renderer::Mode mode)
+Renderer::setMode(Renderer::Mode mode, bool enableVR)
 {
     m_currentMode = mode;
 }

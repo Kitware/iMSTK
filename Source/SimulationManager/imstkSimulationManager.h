@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SimulationManager();
+    SimulationManager(bool enableVR = false);
 
     ///
     /// \brief Default destructor

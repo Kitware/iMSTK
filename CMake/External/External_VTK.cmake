@@ -1,10 +1,18 @@
 #-----------------------------------------------------------------------------
+# Dependencies
+#-----------------------------------------------------------------------------
+set(VTK_DEPENDENCIES "")
+if(${${PROJECT_NAME}_ENABLE_VR})
+  list(APPEND VTK_DEPENDENCIES "openvr")
+endif(${${PROJECT_NAME}_ENABLE_VR})
+
+#-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
   GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git
-  GIT_TAG 7b563776b89f829b382ba080d8963a04d7a47ecc
+  GIT_TAG 1258310c753261146771f1e5fbc5c23f90ec7341
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
       -DBUILD_EXAMPLES:BOOL=OFF
@@ -18,12 +26,14 @@ imstk_add_external_project( VTK
       -DModule_vtkIOGeometry:BOOL=ON
       -DModule_vtkInteractionStyle:BOOL=ON
       -DModule_vtkRenderingAnnotation:BOOL=ON
+      -DModule_vtkRenderingOpenVR:BOOL=${${PROJECT_NAME}_ENABLE_VR}
       -DModule_vtkInteractionWidgets:BOOL=ON
       -DModule_vtkglew:BOOL=ON
       -DModule_vtkRenderingContext2D:BOOL=ON
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
+      -DVTK_OPENVR_OBJECT_FACTORY:BOOL=OFF
+  DEPENDENCIES ${VTK_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
-  DEPENDENCIES ""
   #VERBOSE
   )

@@ -36,6 +36,15 @@
 #include "vtkCamera.h"
 #include "vtkLight.h"
 
+#ifdef iMSTK_ENABLE_VR
+#include "vtkOpenVRRenderer.h"
+#include "vtkOpenVRCamera.h"
+#include "vtkOpenVRRenderWindow.h"
+#include "vtkOpenVRRenderWindowInteractor.h"
+#include "vtkInteractorStyle3D.h"
+#include "vtkOpenVROverlayInternal.h"
+#endif
+
 namespace imstk
 {
 class Scene;
@@ -53,7 +62,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKRenderer(std::shared_ptr<Scene> scene);
+    VTKRenderer(std::shared_ptr<Scene> scene, bool enableVR);
 
     ///
     /// \brief Default destructor
@@ -64,7 +73,7 @@ public:
     /// \brief Set/Get the rendering mode which defined the
     /// visibility of the renderer actors and the default camera
     ///
-    virtual void setMode(Mode mode);
+    void setMode(Mode mode, bool enableVR) override;
 
     ///
     /// \brief
@@ -97,7 +106,7 @@ protected:
     ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
-    vtkSmartPointer<vtkRenderer> m_vtkRenderer = vtkSmartPointer<vtkRenderer>::New();
+    vtkSmartPointer<vtkRenderer> m_vtkRenderer;
     vtkSmartPointer<vtkCamera> m_defaultVtkCamera;
     vtkSmartPointer<vtkCamera> m_sceneVtkCamera;
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
@@ -109,6 +118,9 @@ protected:
     std::shared_ptr<Scene> m_scene;
 
     TextureManager<VTKTextureDelegate> m_textureManager;
+#ifdef iMSTK_ENABLE_VR
+    std::vector<vtkOpenVRCameraPose> m_camPos;
+#endif
 };
 }
 

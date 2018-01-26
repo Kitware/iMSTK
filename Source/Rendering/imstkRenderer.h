@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Set rendering mode
     ///
-    virtual void setMode(Renderer::Mode mode);
+    virtual void setMode(Renderer::Mode mode, bool enableVR);
 
     ///
     /// \brief Get rendering mode
