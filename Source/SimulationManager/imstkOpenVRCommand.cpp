@@ -126,7 +126,9 @@ OpenVRCommand::Execute(
     {
         SimulationStatus status = m_simManager->getStatus();
 
+#ifndef iMSTK_USE_Vulkan
         std::dynamic_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer())->updateRenderDelegates();
+#endif
     }
     else
     {
