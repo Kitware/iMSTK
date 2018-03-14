@@ -93,13 +93,13 @@ VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule
 
     m_vertexBuffer->updateVertexBuffer(&m_capsuleVertices, &m_capsuleTriangles);
 
-    this->update();
+    this->update(0);
 }
 
 void
-VulkanCapsuleRenderDelegate::update()
+VulkanCapsuleRenderDelegate::update(uint32_t frameIndex)
 {
-    this->updateUniforms();
+    this->updateUniforms(frameIndex);
 }
 
 std::shared_ptr<Geometry>

@@ -28,6 +28,8 @@
 #include "vulkan/vulkan.h"
 
 #include "gli/gli.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/random.hpp"
 
 #include <vtkImageReader2.h>
 #include <vtkSmartPointer.h>
@@ -69,21 +71,23 @@ public:
                                   VkImageSubresourceRange range);
 
     void generateMipmaps(VkCommandBuffer& commandBuffer);
+    void clear(VkDevice * device);
+
 protected:
     friend class VulkanMaterialDelegate;
+    friend class VulkanPostProcessingChain;
+    friend class VulkanRenderer;
 
-    VkImage m_image;
+    VulkanInternalImage * m_image;
 
     VkImageView m_imageView;
     VkSampler m_sampler;
     VkImageLayout m_layout;
     VkImageCreateInfo m_imageInfo;
-    VkDeviceMemory m_imageMemory;
 
     VkImageSubresourceRange m_range;
 
-    VkBuffer m_stagingBuffer;
-    VkDeviceMemory m_stagingBufferMemory;
+    VulkanInternalBuffer * m_stagingBuffer;
 
     std::string m_path;
     Texture::Type m_type;
@@ -98,6 +102,7 @@ protected:
     gli::texture_cube m_cubemap; ///> Only used for cubemaps
     bool m_isCubemap = false;
 
+    VkDeviceSize m_imageOffsetAlignment;
     VulkanMemoryManager * m_memoryManager;
 };
 }

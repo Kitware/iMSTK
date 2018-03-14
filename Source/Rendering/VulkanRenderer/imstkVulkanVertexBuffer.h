@@ -34,9 +34,8 @@ namespace imstk
 {
 enum VulkanVertexBufferMode
 {
-    VERTEX_BUFFER_STATIC = 0,
-    VERTEX_BUFFER_DYNAMIC,
-    VERTEX_BUFFER_DYNAMIC_RESIZEABLE
+    VERTEX_BUFFER_STATIC,
+    VERTEX_BUFFER_DYNAMIC
 };
 
 struct VulkanBasicVertex
@@ -57,11 +56,9 @@ public:
                        double loadFactor = 1.0,
                        VulkanVertexBufferMode mode = VERTEX_BUFFER_STATIC);
 
-    void * mapVertices();
-    void unmapVertices();
+    void * getVertexMemory(uint32_t frameIndex = 0);
 
-    void * mapTriangles();
-    void unmapTriangles();
+    void * getIndexMemory(uint32_t frameIndex = 0);
 
     ~VulkanVertexBuffer() = default;
 
@@ -71,41 +68,33 @@ public:
     void updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices,
                             std::vector<std::array<uint32_t, 3>> * triangles);
 
-    ///
-    /// \brief Binds the vertex buffer to memory
-    ///
-    void bind();
-
     void uploadBuffers(VkCommandBuffer& commandBuffer);
 
     void initializeBuffers(VulkanMemoryManager& memoryManager);
 
     void setNumIndices(uint32_t numIndices);
 
+    void bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameIndex);
+
 private:
     friend class VulkanRenderer;
 
-    VkBuffer m_vertexBuffer;
-    VkBuffer m_vertexStagingBuffer;
-    VkDeviceMemory m_vertexMemory;
-    VkDeviceMemory m_vertexStagingMemory;
+    VulkanInternalBuffer * m_vertexBuffer;
+    VulkanInternalBuffer * m_vertexStagingBuffer;
 
     uint32_t m_numIndices;
 
-    VkBuffer m_indexBuffer;
-    VkBuffer m_indexStagingBuffer;
-    VkDeviceMemory m_indexMemory;
-    VkDeviceMemory m_indexStagingMemory;
+    VulkanInternalBuffer * m_indexBuffer;
+    VulkanInternalBuffer * m_indexStagingBuffer;
 
     VkDevice m_renderDevice;
     uint32_t m_bufferMemoryIndex;
-
-    VulkanVertexBufferMode m_mode;
 
     uint32_t m_vertexBufferSize = 0;
     uint32_t m_indexBufferSize = 0;
     bool m_vertexBufferModified = true;
     bool m_indexBufferModified = true;
+    VulkanVertexBufferMode m_mode = VulkanVertexBufferMode::VERTEX_BUFFER_STATIC;
 
     static const uint32_t maxBufferSize = 1024 * 1024;
 };

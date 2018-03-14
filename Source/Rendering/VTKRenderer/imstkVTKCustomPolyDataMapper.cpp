@@ -197,6 +197,7 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
 
     helper.AttributeUpdateTime.Modified();
 
+    helper.Program->SetUniformf("emissivity", material->getEmissivity());
     helper.Program->SetUniformf("metalness", material->getMetalness());
     helper.Program->SetUniformf("roughness", material->getRoughness());
 

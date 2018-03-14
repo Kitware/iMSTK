@@ -61,6 +61,8 @@ public:
                            VkAccessFlags destinationFlags,
                            VkImageSubresourceRange range);
 
+    void clear(VkDevice * device);
+
 private:
     friend class VulkanRenderer;
     friend class VulkanPostProcess;

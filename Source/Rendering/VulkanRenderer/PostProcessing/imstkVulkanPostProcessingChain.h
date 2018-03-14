@@ -47,10 +47,13 @@ public:
 protected:
     friend class VulkanRenderer;
 
+    bool m_bloom = true;
+    bool m_sss = true;
+
     std::vector<std::shared_ptr<VulkanPostProcess>> m_postProcesses;
     void incrementBufferNumbers();
-    void calculateBlurValuesLinear(int samples, float * values, float * offsets);
-    void calculateBlurValues(int samples, float * values, float stdDev = 0.0);
+    static void calculateBlurValuesLinear(int samples, float * values, float * offsets);
+    static void calculateBlurValues(int samples, float * values, float stdDev = 0.0);
 
     unsigned int m_lastOutput = 2; ///< 2 by default because of accumulation composition
     unsigned int m_lastInput = 0; ///< 0 by default because of accumulation composition

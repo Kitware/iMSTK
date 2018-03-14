@@ -47,6 +47,7 @@ list(APPEND FILE_LIST
     decals/,REGEX:.*
     head/,REGEX:.*
     human/,REGEX:.*
+    IBL/,REGEX:.*
     laptool/,REGEX:.*
     liver/,REGEX:.*
     nidus/,REGEX:.*
@@ -83,6 +84,9 @@ if( iMSTK_USE_Vulkan )
   compileShaders(Mesh/mesh_frag.frag Mesh/mesh_frag.spv)
   compileShaders(Mesh/decal_vert.vert Mesh/decal_vert.spv)
   compileShaders(Mesh/decal_frag.frag Mesh/decal_frag.spv)
+  compileShaders(Mesh/shadow_vert.vert Mesh/shadow_vert.spv)
+  compileShaders(Mesh/shadow_frag.frag Mesh/shadow_frag.spv)
+  compileShaders(Mesh/depth_frag.frag Mesh/depth_frag.spv)
 
   # Post processing shaders
   compileShaders(PostProcessing/HDR_tonemap_frag.frag PostProcessing/HDR_tonemap_frag.spv)
@@ -94,6 +98,10 @@ if( iMSTK_USE_Vulkan )
   compileShaders(PostProcessing/blur_horizontal_frag.frag PostProcessing/blur_horizontal_frag.spv)
   compileShaders(PostProcessing/blur_vertical_frag.frag PostProcessing/blur_vertical_frag.spv)
   compileShaders(PostProcessing/bloom_threshold_frag.frag PostProcessing/bloom_threshold_frag.spv)
+  compileShaders(PostProcessing/ao_frag.frag PostProcessing/ao_frag.spv)
+  compileShaders(PostProcessing/bilateral_blur_horizontal_frag.frag PostProcessing/bilateral_blur_horizontal_frag.spv)
+  compileShaders(PostProcessing/bilateral_blur_vertical_frag.frag PostProcessing/bilateral_blur_vertical_frag.spv)
+  compileShaders(PostProcessing/depth_downscale_frag.frag PostProcessing/depth_downscale_frag.spv)
 
   file(COPY ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders
     DESTINATION ${CMAKE_PROGRAM_PATH}/Shaders)

@@ -11,5 +11,5 @@ layout (location = 3) in vertexData{
 void main(void)
 {
     vec3 inputColor = texture(colorTexture, vertex.uv).rgb;
-    finalColor = vec4(inputColor.rgb * vec3(0.1), 1);
+    finalColor = vec4(inputColor.rgb * vec3(0.05), 1);
 }

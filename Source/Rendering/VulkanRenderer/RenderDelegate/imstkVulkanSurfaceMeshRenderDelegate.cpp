@@ -30,23 +30,26 @@ VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr
     m_numTriangles = (uint32_t)m_geometry->getNumTriangles();
     m_loadFactor = m_geometry->getLoadFactor();
     m_vertexSize = sizeof(VulkanBasicVertex);
+    m_modified.resize(memoryManager.m_buffering, true);
 
     if (!m_geometry->getRenderMaterial())
     {
         m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
+    this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
 
-    this->updateVertexBuffer();
-
-    this->update();
+    for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
+    {
+        this->updateVertexBuffer(i);
+        this->update(i);
+    }
 }
 
 void
-VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
+VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
 {
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->mapVertices();
+    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frameIndex);
 
     auto normals = m_geometry->getVertexNormals();
     auto tangents = m_geometry->getVertexTangents();
@@ -93,9 +96,7 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
         }
     }
 
-    m_vertexBuffer->unmapVertices();
-
-    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->mapTriangles();
+    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory(frameIndex);
 
     m_vertexBuffer->setNumIndices((uint32_t)m_geometry->getNumTriangles() * 3);
     for (unsigned i = 0; i < m_geometry->getNumTriangles(); i++)
@@ -104,19 +105,24 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer()
         triangles[i][1] = (uint32_t)m_geometry->getTrianglesVertices()[i][1];
         triangles[i][2] = (uint32_t)m_geometry->getTrianglesVertices()[i][2];
     }
-    m_vertexBuffer->unmapTriangles();
 }
 
 void
-VulkanSurfaceMeshRenderDelegate::update()
+VulkanSurfaceMeshRenderDelegate::update(uint32_t frameIndex)
 {
-    this->updateUniforms();
+    this->updateUniforms(frameIndex);
 
     if (m_geometry->m_dataModified)
     {
         m_geometry->computeVertexNormals();
-        this->updateVertexBuffer();
+        std::fill(m_modified.begin(), m_modified.end(), true);
         m_geometry->m_dataModified = false;
+    }
+
+    if (m_modified[frameIndex])
+    {
+        this->updateVertexBuffer(frameIndex);
+        m_modified[frameIndex] = false;
     }
 }
 

@@ -93,13 +93,13 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> s
 
     m_vertexBuffer->updateVertexBuffer(&m_sphereVertices, &m_sphereTriangles);
 
-    this->update();
+    this->update(0);
 }
 
 void
-VulkanSphereRenderDelegate::update()
+VulkanSphereRenderDelegate::update(uint32_t frameIndex)
 {
-    this->updateUniforms();
+    this->updateUniforms(frameIndex);
 }
 
 std::shared_ptr<Geometry>

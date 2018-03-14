@@ -177,6 +177,18 @@ Scene::removeLight(const std::string& lightName)
     LOG(INFO) << lightName << " light removed from " << m_name;
 }
 
+void
+Scene::setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe)
+{
+    m_globalIBLProbe = newIBLProbe;
+}
+
+std::shared_ptr<IBLProbe>
+Scene::getGlobalIBLProbe()
+{
+    return m_globalIBLProbe;
+}
+
 const std::string&
 Scene::getName() const
 {

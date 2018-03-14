@@ -29,11 +29,16 @@ VulkanMaterialDelegate::VulkanMaterialDelegate(
     std::shared_ptr<VulkanUniformBuffer> vertexUniformBuffer,
     std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
     std::shared_ptr<RenderMaterial> material,
-    VulkanMemoryManager& memoryManager)
+    VulkanMemoryManager& memoryManager,
+    bool shadowPass,
+    bool depthPrePass)
 {
     m_vertexUniformBuffer = vertexUniformBuffer;
     m_fragmentUniformBuffer = fragmentUniformBuffer;
 
+    m_shadowPass = shadowPass;
+    m_depthPrePass = depthPrePass;
+    m_depthOnlyPass = m_shadowPass || m_depthPrePass;
     m_memoryManager = &memoryManager;
 
     if (material)
@@ -49,10 +54,14 @@ VulkanMaterialDelegate::VulkanMaterialDelegate(
 void
 VulkanMaterialDelegate::initialize(VulkanRenderer * renderer)
 {
-    this->createDescriptorSetLayouts(renderer);
-    this->createPipeline(renderer);
-    this->initializeTextures(renderer);
-    this->createDescriptors(renderer);
+    // Prevent pipeline creation for shadow materials if there aren't shadow passes
+    if (!(m_shadowPass && renderer->m_shadowPasses.size() == 0))
+    {
+        this->createDescriptorSetLayouts(renderer);
+        this->createPipeline(renderer);
+        this->initializeTextures(renderer);
+        this->createDescriptors(renderer);
+    }
 }
 
 void
@@ -66,6 +75,12 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
         VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/decal_vert.spv",
                                               renderer->m_renderDevice,
                                               m_pipelineComponents.vertexShader);
+    }
+    else if (m_shadowPass)
+    {
+        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/shadow_vert.spv",
+                                                renderer->m_renderDevice,
+                                                m_pipelineComponents.vertexShader);
     }
     else
     {
@@ -91,6 +106,18 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
+    else if (m_shadowPass)
+    {
+        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/shadow_frag.spv",
+                                                renderer->m_renderDevice,
+                                                m_pipelineComponents.fragmentShader);
+    }
+    else if (m_depthPrePass)
+    {
+        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/depth_frag.spv",
+                                                renderer->m_renderDevice,
+                                                m_pipelineComponents.fragmentShader);
+    }
     else
     {
         VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_frag.spv",
@@ -109,13 +136,21 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     m_constants.numLights = renderer->m_constants.numLights;
     m_constants.tessellation = m_material->getTessellated();
-    m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "");
-    m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "");
-    m_constants.specularTexture = (m_material->getTexture(Texture::Type::SPECULAR)->getPath() != "");
-    m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "");
-    m_constants.metalnessTexture = (m_material->getTexture(Texture::Type::METALNESS)->getPath() != "");
-    m_constants.subsurfaceScatteringTexture = (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING)->getPath() != "");
-    m_constants.irradianceCubemapTexture = (m_material->getTexture(Texture::Type::IRRADIANCE_CUBEMAP)->getPath() != "");
+    m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.metalnessTexture = (m_material->getTexture(Texture::Type::METALNESS)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.ambientOcclusionTexture = (m_material->getTexture(Texture::Type::AMBIENT_OCCLUSION)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.subsurfaceScatteringTexture = (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.irradianceCubemapTexture = (m_material->getTexture(Texture::Type::IRRADIANCE_CUBEMAP)->getPath() != ""
+                                            || renderer->m_scene->getGlobalIBLProbe())
+                                           && !m_depthOnlyPass;
+    m_constants.radianceCubemapTexture = (m_material->getTexture(Texture::Type::RADIANCE_CUBEMAP)->getPath() != ""
+                                          || renderer->m_scene->getGlobalIBLProbe())
+                                         && !m_depthOnlyPass;
+    m_constants.brdfLUTTexture = (m_material->getTexture(Texture::Type::BRDF_LUT)->getPath() != ""
+                                  || renderer->m_scene->getGlobalIBLProbe())
+                                 && !m_depthOnlyPass;
 
     this->addSpecializationConstant(sizeof(m_constants.numLights),
         offsetof(VulkanMaterialConstants, numLights));
@@ -125,16 +160,20 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
         offsetof(VulkanMaterialConstants, diffuseTexture));
     this->addSpecializationConstant(sizeof(m_constants.normalTexture),
         offsetof(VulkanMaterialConstants, normalTexture));
-    this->addSpecializationConstant(sizeof(m_constants.specularTexture),
-        offsetof(VulkanMaterialConstants, specularTexture));
     this->addSpecializationConstant(sizeof(m_constants.roughnessTexture),
         offsetof(VulkanMaterialConstants, roughnessTexture));
     this->addSpecializationConstant(sizeof(m_constants.metalnessTexture),
         offsetof(VulkanMaterialConstants, metalnessTexture));
+    this->addSpecializationConstant(sizeof(m_constants.ambientOcclusionTexture),
+        offsetof(VulkanMaterialConstants, ambientOcclusionTexture));
     this->addSpecializationConstant(sizeof(m_constants.subsurfaceScatteringTexture),
         offsetof(VulkanMaterialConstants, subsurfaceScatteringTexture));
     this->addSpecializationConstant(sizeof(m_constants.irradianceCubemapTexture),
         offsetof(VulkanMaterialConstants, irradianceCubemapTexture));
+    this->addSpecializationConstant(sizeof(m_constants.radianceCubemapTexture),
+        offsetof(VulkanMaterialConstants, radianceCubemapTexture));
+    this->addSpecializationConstant(sizeof(m_constants.brdfLUTTexture),
+        offsetof(VulkanMaterialConstants, brdfLUTTexture));
 
     m_pipelineComponents.fragmentSpecializationInfo.mapEntryCount = m_numConstants;
     m_pipelineComponents.fragmentSpecializationInfo.pMapEntries = &m_pipelineComponents.fragmentMapEntries[0];
@@ -267,15 +306,16 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     m_pipelineComponents.viewports[0].x = 0;
     m_pipelineComponents.viewports[0].y = 0;
-    m_pipelineComponents.viewports[0].height = renderer->m_height;
-    m_pipelineComponents.viewports[0].width = renderer->m_width;
+    m_pipelineComponents.viewports[0].height = m_shadowPass ? renderer->m_shadowMapResolution : renderer->m_height;
+    m_pipelineComponents.viewports[0].width = m_shadowPass ? renderer->m_shadowMapResolution : renderer->m_width;
     m_pipelineComponents.viewports[0].minDepth = 0.0;
     m_pipelineComponents.viewports[0].maxDepth = 1.0;
 
     m_pipelineComponents.scissors.resize(1);
 
     m_pipelineComponents.scissors[0].offset = { 0, 0 };
-    m_pipelineComponents.scissors[0].extent = { renderer->m_width, renderer->m_height };
+    m_pipelineComponents.scissors[0].extent = { (uint32_t)m_pipelineComponents.viewports[0].width,
+                                                (uint32_t)m_pipelineComponents.viewports[0].height };
 
     m_pipelineComponents.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     m_pipelineComponents.viewportInfo.pNext = nullptr;
@@ -336,14 +376,14 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     states[1].writeMask = 0;
     states[1].reference = 0;
 
-    bool depthWrite = !m_material->isDecal();
+    bool depthWrite = m_depthOnlyPass;
 
     m_pipelineComponents.depthStencilInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     m_pipelineComponents.depthStencilInfo.pNext = nullptr;
     m_pipelineComponents.depthStencilInfo.flags = 0;
     m_pipelineComponents.depthStencilInfo.depthTestEnable = VK_TRUE;
     m_pipelineComponents.depthStencilInfo.depthWriteEnable = depthWrite;
-    m_pipelineComponents.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS;
+    m_pipelineComponents.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
     m_pipelineComponents.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.stencilTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.front = states[0];
@@ -351,7 +391,31 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.depthStencilInfo.minDepthBounds = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.maxDepthBounds = VK_FALSE;
 
-    size_t numAttachments = m_material->isDecal() ? 2 : 3;
+    size_t numAttachments;
+    VkRenderPass renderPass;
+
+    if (m_material->isDecal())
+    {
+        renderPass = renderer->m_decalRenderPass;
+        numAttachments = 2;
+    }
+    else if (m_shadowPass)
+    {
+        // all shadow passes should be compatible, so we choose the first one
+        renderPass = renderer->m_shadowPasses[0];
+        numAttachments = 0;
+    }
+    else if (m_depthPrePass)
+    {
+        renderPass = renderer->m_depthRenderPass;
+        numAttachments = 0;
+    }
+    else
+    {
+        renderPass = renderer->m_opaqueRenderPass;
+        numAttachments = 3;
+    }
+
     m_pipelineComponents.colorBlendAttachments.resize(numAttachments);
 
     int blendMode = m_material->isDecal() ? VK_TRUE : VK_FALSE;
@@ -377,11 +441,18 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.colorBlendInfo.logicOpEnable = VK_FALSE;
     m_pipelineComponents.colorBlendInfo.logicOp = VK_LOGIC_OP_SET;
     m_pipelineComponents.colorBlendInfo.attachmentCount = (uint32_t)m_pipelineComponents.colorBlendAttachments.size();
-    m_pipelineComponents.colorBlendInfo.pAttachments = &m_pipelineComponents.colorBlendAttachments[0];
+    m_pipelineComponents.colorBlendInfo.pAttachments = (uint32_t)m_pipelineComponents.colorBlendAttachments.size() == 0 ?
+                                                       nullptr : &m_pipelineComponents.colorBlendAttachments[0];
     m_pipelineComponents.colorBlendInfo.blendConstants[0] = 1.0;
     m_pipelineComponents.colorBlendInfo.blendConstants[1] = 1.0;
     m_pipelineComponents.colorBlendInfo.blendConstants[2] = 1.0;
     m_pipelineComponents.colorBlendInfo.blendConstants[3] = 1.0;
+
+    // For use with shadows
+    VkPushConstantRange constantRange;
+    constantRange.offset = 0;
+    constantRange.size = 128; // Minimum on all devices
+    constantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
     VkPipelineLayoutCreateInfo layoutInfo;
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -389,12 +460,19 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     layoutInfo.flags = 0;
     layoutInfo.setLayoutCount = (uint32_t)m_descriptorSetLayouts.size();
     layoutInfo.pSetLayouts = &m_descriptorSetLayouts[0];
-    layoutInfo.pushConstantRangeCount = 0;
-    layoutInfo.pPushConstantRanges = nullptr;
+    layoutInfo.pushConstantRangeCount = m_shadowPass ? 1 : 0;
+    layoutInfo.pPushConstantRanges = m_shadowPass ? &constantRange : nullptr;
 
     vkCreatePipelineLayout(renderer->m_renderDevice, &layoutInfo, nullptr, &m_pipelineLayout);
 
-    VkRenderPass renderPass = m_material->isDecal() ? renderer->m_renderPasses[1] : renderer->m_renderPasses[0];
+    m_pipelineComponents.dynamicStates.push_back(VK_DYNAMIC_STATE_VIEWPORT);
+    m_pipelineComponents.dynamicStates.push_back(VK_DYNAMIC_STATE_SCISSOR);
+
+    m_pipelineComponents.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    m_pipelineComponents.dynamicStateInfo.pNext = nullptr;
+    m_pipelineComponents.dynamicStateInfo.flags = 0;
+    m_pipelineComponents.dynamicStateInfo.dynamicStateCount = (uint32_t)m_pipelineComponents.dynamicStates.size();
+    m_pipelineComponents.dynamicStateInfo.pDynamicStates = &m_pipelineComponents.dynamicStates[0];
 
     m_graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     m_graphicsPipelineInfo.pNext = nullptr;
@@ -409,7 +487,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_graphicsPipelineInfo.pMultisampleState = &m_pipelineComponents.multisampleInfo;
     m_graphicsPipelineInfo.pDepthStencilState = &m_pipelineComponents.depthStencilInfo;
     m_graphicsPipelineInfo.pColorBlendState = &m_pipelineComponents.colorBlendInfo;
-    m_graphicsPipelineInfo.pDynamicState = nullptr;
+    m_graphicsPipelineInfo.pDynamicState = m_shadowPass ? nullptr : &m_pipelineComponents.dynamicStateInfo;
     m_graphicsPipelineInfo.layout = m_pipelineLayout;
     m_graphicsPipelineInfo.renderPass = renderPass;
     m_graphicsPipelineInfo.subpass = 0;
@@ -430,60 +508,65 @@ VulkanMaterialDelegate::initializeTextures(VulkanRenderer * renderer)
     auto defaultTexture = std::make_shared<Texture>("");
     auto defaultCubemap = std::make_shared<Texture>("", Texture::Type::IRRADIANCE_CUBEMAP);
 
-    if (m_material->getTexture(Texture::Type::DIFFUSE))
+    m_diffuseTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::DIFFUSE);
+    m_normalTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::NORMAL);
+    m_roughnessTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::ROUGHNESS);
+    m_metalnessTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::METALNESS);
+    m_subsurfaceScatteringTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::SUBSURFACE_SCATTERING);
+    m_ambientOcclusionTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::AMBIENT_OCCLUSION);
+
+    auto globalIBLProbe = renderer->m_scene->getGlobalIBLProbe();
+
+    if (globalIBLProbe)
     {
-        m_diffuseTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::DIFFUSE));
-    }
-    else
-    {
-        m_diffuseTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
+        m_material->addTexture(globalIBLProbe->getIrradianceCubemapTexture());
+        m_material->addTexture(globalIBLProbe->getRadianceCubemapTexture());
+        m_material->addTexture(globalIBLProbe->getBrdfLUTTexture());
     }
 
-    if (m_material->getTexture(Texture::Type::NORMAL))
+    m_irradianceCubemapTexture = this->initializeTexture(renderer, defaultCubemap, Texture::Type::IRRADIANCE_CUBEMAP);
+    m_radianceCubemapTexture = this->initializeTexture(renderer, defaultCubemap, Texture::Type::RADIANCE_CUBEMAP);
+    m_brdfLUTTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::BRDF_LUT);
+}
+
+std::shared_ptr<VulkanTextureDelegate>
+VulkanMaterialDelegate::initializeTexture(VulkanRenderer * renderer,
+                                          std::shared_ptr<Texture> backupTexture,
+                                          Texture::Type type)
+{
+    auto texture = m_material->getTexture(type);
+
+    // Texture is already loaded
+    if (renderer->m_textureMap.count(texture) > 0)
     {
-        m_normalTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::NORMAL));
-    }
-    else
-    {
-        m_normalTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
+        return renderer->m_textureMap[texture];
     }
 
-    if (m_material->getTexture(Texture::Type::ROUGHNESS))
+    std::shared_ptr<VulkanTextureDelegate> textureDelegate;
+
+    // Texture has a real path
+    if (texture->getPath() != "")
     {
-        m_roughnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::ROUGHNESS));
+        textureDelegate =
+            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, texture);
+        renderer->m_textureMap[texture] = textureDelegate;
     }
     else
     {
-        m_roughnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
+        // Use backup texture
+        if (renderer->m_textureMap.count(backupTexture) > 0)
+        {
+            return renderer->m_textureMap[backupTexture];
+        }
+        else
+        {
+            textureDelegate =
+                std::make_shared<VulkanTextureDelegate>(*m_memoryManager, backupTexture);
+            renderer->m_textureMap[backupTexture] = textureDelegate;
+        }
     }
 
-    if (m_material->getTexture(Texture::Type::METALNESS))
-    {
-        m_metalnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::METALNESS));
-    }
-    else
-    {
-        m_metalnessTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultTexture);
-    }
-
-    if (m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING))
-    {
-        m_subsurfaceScatteringTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, m_material->getTexture(Texture::Type::SUBSURFACE_SCATTERING));
-    }
-    else
-    {
-        m_subsurfaceScatteringTexture =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, defaultCubemap);
-    }
+    return textureDelegate;
 }
 
 void
@@ -555,90 +638,165 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
     }
 
-    // Diffuse texture
+    if (!m_depthOnlyPass)
     {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 2;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
-    }
+        // Diffuse texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 2;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
 
-    // Normal texture
-    {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 3;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
-    }
+        // Normal texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 3;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
 
-    // Roughness texture
-    {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 4;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
-    }
+        // Roughness texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 4;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
 
-    // Metalness texture
-    {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 5;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
-    }
+        // Metalness texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 5;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
 
-    // Subsurface scattering texture
-    {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 6;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
-    }
+        // Ambient occlusion texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 6;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
 
-    // Depth buffer texture
-    if (m_material->isDecal())
-    {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 7;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
-    }
+        // Subsurface scattering texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 7;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
 
-    // Normal buffer texture
-    if (m_material->isDecal())
-    {
-        VkDescriptorSetLayoutBinding fragmentLayoutBinding;
-        fragmentLayoutBinding.binding = 8;
-        fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        fragmentLayoutBinding.descriptorCount = 1;
-        fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentLayoutBinding.pImmutableSamplers = nullptr;
-        fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
-        m_numTextures++;
+        // Shadow maps
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 8;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Irradiance cubemap texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 9;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Radiance cubemap texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 10;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // BRDF lookup table texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 11;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // AO buffer texture
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 12;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Depth buffer texture
+        if (m_material->isDecal())
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 13;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
+
+        // Normal buffer texture
+        if (m_material->isDecal())
+        {
+            VkDescriptorSetLayoutBinding fragmentLayoutBinding;
+            fragmentLayoutBinding.binding = 14;
+            fragmentLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            fragmentLayoutBinding.descriptorCount = 1;
+            fragmentLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+            fragmentLayoutBinding.pImmutableSamplers = nullptr;
+            fragmentDescriptorSetLayoutBindings.push_back(fragmentLayoutBinding);
+            m_numTextures++;
+        }
     }
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo[2];
@@ -682,6 +840,7 @@ VulkanMaterialDelegate::createDescriptorPool(VulkanRenderer * renderer)
     }
 
     // Fragment shader textures
+    if (m_numTextures > 0)
     {
         VkDescriptorPoolSize poolSize;
         poolSize.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -714,90 +873,140 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
 
     // Global Buffers
     std::vector<VkDescriptorBufferInfo> vertexBufferInfo(2);
-    vertexBufferInfo[0].offset = 0;
-    vertexBufferInfo[0].range = size;
-    vertexBufferInfo[0].buffer = *(renderer->m_globalVertexUniformBuffer->getUniformBuffer());
+    vertexBufferInfo[0].offset = renderer->m_globalVertexUniformBuffer->getUniformBuffer()->getOffset();
+    vertexBufferInfo[0].range = renderer->m_globalVertexUniformBuffer->getUniformBuffer()->getSize();
+    vertexBufferInfo[0].buffer = *(renderer->m_globalVertexUniformBuffer->getUniformBuffer()->getBuffer());
 
-    vertexBufferInfo[1].offset = 0;
-    vertexBufferInfo[1].range = size;
-    vertexBufferInfo[1].buffer = *(m_vertexUniformBuffer->getUniformBuffer());
+    vertexBufferInfo[1].offset = m_vertexUniformBuffer->getUniformBuffer()->getOffset();
+    vertexBufferInfo[1].range = m_vertexUniformBuffer->getUniformBuffer()->getSize();
+    vertexBufferInfo[1].buffer = *(m_vertexUniformBuffer->getUniformBuffer()->getBuffer());
 
     // Global buffers
     std::vector<VkDescriptorBufferInfo> fragmentBufferInfo(2);
-    fragmentBufferInfo[0].offset = 0;
-    fragmentBufferInfo[0].range = size;
-    fragmentBufferInfo[0].buffer = *(renderer->m_globalFragmentUniformBuffer->getUniformBuffer());
+    fragmentBufferInfo[0].offset = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getOffset();;
+    fragmentBufferInfo[0].range = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getSize();
+    fragmentBufferInfo[0].buffer = *(renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getBuffer());
 
-    fragmentBufferInfo[1].offset = 0;
-    fragmentBufferInfo[1].range = size;
-    fragmentBufferInfo[1].buffer = *(m_fragmentUniformBuffer->getUniformBuffer());
+    fragmentBufferInfo[1].offset = m_fragmentUniformBuffer->getUniformBuffer()->getOffset();
+    fragmentBufferInfo[1].range = m_fragmentUniformBuffer->getUniformBuffer()->getSize();
+    fragmentBufferInfo[1].buffer = *(m_fragmentUniformBuffer->getUniformBuffer()->getBuffer());
 
     std::vector<VkDescriptorImageInfo> fragmentTextureInfo;
 
-    // Textures
+    if (m_numTextures > 0)
     {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = m_diffuseTexture->m_sampler;
-        textureInfo.imageView = m_diffuseTexture->m_imageView;
-        textureInfo.imageLayout = m_diffuseTexture->m_layout;
-        fragmentTextureInfo.push_back(textureInfo);
-    }
+        // Textures
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_diffuseTexture->m_sampler;
+            textureInfo.imageView = m_diffuseTexture->m_imageView;
+            textureInfo.imageLayout = m_diffuseTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
 
-    {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = m_normalTexture->m_sampler;
-        textureInfo.imageView = m_normalTexture->m_imageView;
-        textureInfo.imageLayout = m_normalTexture->m_layout;
-        fragmentTextureInfo.push_back(textureInfo);
-    }
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_normalTexture->m_sampler;
+            textureInfo.imageView = m_normalTexture->m_imageView;
+            textureInfo.imageLayout = m_normalTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
 
-    {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = m_roughnessTexture->m_sampler;
-        textureInfo.imageView = m_roughnessTexture->m_imageView;
-        textureInfo.imageLayout = m_roughnessTexture->m_layout;
-        fragmentTextureInfo.push_back(textureInfo);
-    }
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_roughnessTexture->m_sampler;
+            textureInfo.imageView = m_roughnessTexture->m_imageView;
+            textureInfo.imageLayout = m_roughnessTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
 
-    {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = m_metalnessTexture->m_sampler;
-        textureInfo.imageView = m_metalnessTexture->m_imageView;
-        textureInfo.imageLayout = m_metalnessTexture->m_layout;
-        fragmentTextureInfo.push_back(textureInfo);
-    }
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_metalnessTexture->m_sampler;
+            textureInfo.imageView = m_metalnessTexture->m_imageView;
+            textureInfo.imageLayout = m_metalnessTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
 
-    {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = m_subsurfaceScatteringTexture->m_sampler;
-        textureInfo.imageView = m_subsurfaceScatteringTexture->m_imageView;
-        textureInfo.imageLayout = m_subsurfaceScatteringTexture->m_layout;
-        fragmentTextureInfo.push_back(textureInfo);
-    }
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_ambientOcclusionTexture->m_sampler;
+            textureInfo.imageView = m_ambientOcclusionTexture->m_imageView;
+            textureInfo.imageLayout = m_ambientOcclusionTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
 
-    if (m_material->isDecal())
-    {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = renderer->m_HDRImageSampler;
-        textureInfo.imageView = renderer->m_depthImageView[0];
-        textureInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-        fragmentTextureInfo.push_back(textureInfo);
-    }
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_subsurfaceScatteringTexture->m_sampler;
+            textureInfo.imageView = m_subsurfaceScatteringTexture->m_imageView;
+            textureInfo.imageLayout = m_subsurfaceScatteringTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
 
-    if (m_material->isDecal())
-    {
-        VkDescriptorImageInfo textureInfo;
-        textureInfo.sampler = renderer->m_HDRImageSampler;
-        textureInfo.imageView = renderer->m_normalImageView;
-        textureInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        fragmentTextureInfo.push_back(textureInfo);
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = renderer->m_HDRImageSampler;
+            textureInfo.imageView = renderer->m_shadowMapsView;
+            textureInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_irradianceCubemapTexture->m_sampler;
+            textureInfo.imageView = m_irradianceCubemapTexture->m_imageView;
+            textureInfo.imageLayout = m_irradianceCubemapTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_radianceCubemapTexture->m_sampler;
+            textureInfo.imageView = m_radianceCubemapTexture->m_imageView;
+            textureInfo.imageLayout = m_radianceCubemapTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = m_brdfLUTTexture->m_sampler;
+            textureInfo.imageView = m_brdfLUTTexture->m_imageView;
+            textureInfo.imageLayout = m_brdfLUTTexture->m_layout;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = renderer->m_HDRImageSampler;
+            textureInfo.imageView = renderer->m_halfAOImageView[0];
+            textureInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        if (m_material->isDecal())
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = renderer->m_HDRImageSampler;
+            textureInfo.imageView = renderer->m_depthImageView[0];
+            textureInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
+
+        if (m_material->isDecal())
+        {
+            VkDescriptorImageInfo textureInfo;
+            textureInfo.sampler = renderer->m_HDRImageSampler;
+            textureInfo.imageView = renderer->m_normalImageView;
+            textureInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            fragmentTextureInfo.push_back(textureInfo);
+        }
     }
 
     vkAllocateDescriptorSets(renderer->m_renderDevice, descriptorSetAllocationInfo, &m_descriptorSets[0]);
 
-    m_writeDescriptorSets.resize(2);
-    VkWriteDescriptorSet set;
-    m_writeDescriptorSets.push_back(set);
+    uint32_t numWriteSets = m_depthOnlyPass ? 2 : 3;
+    m_writeDescriptorSets.resize(numWriteSets);
 
     for (int i = 0; i < m_writeDescriptorSets.size(); i++)
     {
@@ -823,12 +1032,39 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
     m_writeDescriptorSets[1].pBufferInfo = &fragmentBufferInfo[0];
 
     // Fragment texture descriptor set
-    m_writeDescriptorSets[2].descriptorCount = (uint32_t)fragmentTextureInfo.size();
-    m_writeDescriptorSets[2].dstBinding = 2;
-    m_writeDescriptorSets[2].dstSet = m_descriptorSets[1];
-    m_writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    m_writeDescriptorSets[2].pImageInfo = &fragmentTextureInfo[0];
+    if (!m_depthOnlyPass)
+    {
+        m_writeDescriptorSets[2].descriptorCount = (uint32_t)fragmentTextureInfo.size();
+        m_writeDescriptorSets[2].dstBinding = 2;
+        m_writeDescriptorSets[2].dstSet = m_descriptorSets[1];
+        m_writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        m_writeDescriptorSets[2].pImageInfo = &fragmentTextureInfo[0];
+    }
 
     vkUpdateDescriptorSets(renderer->m_renderDevice, (uint32_t)m_writeDescriptorSets.size(), &m_writeDescriptorSets[0], 0, nullptr);
+}
+
+void
+VulkanMaterialDelegate::clear(VkDevice * device)
+{
+    vkDestroyShaderModule(*device, m_pipelineComponents.vertexShader, nullptr);
+
+    if (m_material->getTessellated())
+    {
+        vkDestroyShaderModule(*device, m_pipelineComponents.tessellationControlShader, nullptr);
+        vkDestroyShaderModule(*device, m_pipelineComponents.tessellationEvaluationShader, nullptr);
+    }
+
+    vkDestroyShaderModule(*device, m_pipelineComponents.fragmentShader, nullptr);
+
+    vkDestroyPipelineLayout(*device, m_pipelineLayout, nullptr);
+    vkDestroyPipeline(*device, m_pipeline, nullptr);
+
+    for (auto layout : m_descriptorSetLayouts)
+    {
+        vkDestroyDescriptorSetLayout(*device, layout, nullptr);
+    }
+
+    vkDestroyDescriptorPool(*device, m_descriptorPool, nullptr);
 }
 }

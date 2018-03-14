@@ -172,6 +172,31 @@ public:
     virtual void setFocalPoint(const double& x,
                                const double& y,
                                const double& z);
+
+    ///
+    /// \brief Turn shadows on
+    ///
+    void setCastsShadow(bool shadow);
+
+    ///
+    /// \brief Center point for shadow projection
+    /// Sets the shadow map center to this position
+    ///
+    void setShadowCenter(Vec3f position);
+
+    ///
+    /// \brief Range for shadows
+    /// A smaller range results in a denser shadow map
+    ///
+    void setShadowRange(float range);
+
+protected:
+    friend class VulkanRenderer;
+
+    bool m_castShadow = true;
+    Vec3f m_shadowCenter = Vec3f(0, 0, 0);
+    float m_shadowRange = 2.0;
+    int m_shadowMapIndex = -1;
 };
 
 ///

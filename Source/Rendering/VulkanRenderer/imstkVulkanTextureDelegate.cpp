@@ -31,25 +31,27 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     m_type = texture->getType();
 
     // Load textures and get texture information
-    if ((texture->getType() != Texture::Type::IRRADIANCE_CUBEMAP)
-        && (texture->getType() != Texture::Type::RADIANCE_CUBEMAP))
-    {
-        m_arrayLayers = 1;
-        this->loadTexture(memoryManager);
-        m_imageInfo.flags = 0;
-    }
-    else
+    if ((m_type == Texture::Type::IRRADIANCE_CUBEMAP)
+        || (m_type == Texture::Type::RADIANCE_CUBEMAP))
     {
         m_arrayLayers = 6;
         this->loadCubemapTexture(memoryManager);
         m_imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
         m_isCubemap = true;
     }
+    else
+    {
+        m_arrayLayers = 1;
+        this->loadTexture(memoryManager);
+        m_imageInfo.flags = 0;
+    }
 
     // Determine number of mipmaps
     if (m_mipLevels < 1)
     {
-        if (!texture->getMipmapsEnabled())
+        if (!texture->getMipmapsEnabled()
+            || (m_type == Texture::Type::BRDF_LUT)
+            || (m_path == "noise"))
         {
             m_mipLevels = 1;
         }
@@ -67,10 +69,18 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     if (m_type == Texture::Type::DIFFUSE)
     {
         m_imageInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
+        m_imageOffsetAlignment = 4;
+    }
+    else if (m_type == Texture::Type::IRRADIANCE_CUBEMAP
+             || m_type == Texture::Type::RADIANCE_CUBEMAP)
+    {
+        m_imageInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        m_imageOffsetAlignment = 16;
     }
     else
     {
         m_imageInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
+        m_imageOffsetAlignment = 4;
     }
 
     m_imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -85,7 +95,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     m_imageInfo.pQueueFamilyIndices = &memoryManager.m_queueFamilyIndex;
     m_imageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
 
-    vkCreateImage(memoryManager.m_device, &m_imageInfo, nullptr, &m_image);
+    m_image = memoryManager.requestImage(memoryManager.m_device, m_imageInfo, VulkanMemoryType::TEXTURE);
 
     m_range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     m_range.baseMipLevel = 0;
@@ -112,7 +122,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     imageViewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     imageViewInfo.pNext = nullptr;
     imageViewInfo.flags = 0;
-    imageViewInfo.image = m_image;
+    imageViewInfo.image = *m_image->getImage();
 
     if (!m_isCubemap)
     {
@@ -145,7 +155,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     samplerInfo.compareEnable = VK_FALSE;
     samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
     samplerInfo.minLod = 0;
-    samplerInfo.maxLod = 0;
+    samplerInfo.maxLod = m_mipLevels - 1;
     samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
@@ -155,7 +165,38 @@ VulkanTextureDelegate::VulkanTextureDelegate(
 void
 VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
 {
-    if (m_path != "")
+    if (m_path == "")
+    {
+        auto data = new std::vector<unsigned char>(4);
+        (*data)[0] = '\255';
+        (*data)[1] = '\255';
+        (*data)[2] = '\255';
+        (*data)[3] = '\255';
+        m_width = 1;
+        m_height = 1;
+        m_data = &(*data)[0];
+    }
+    else if (m_path == "noise")
+    {
+        auto data = new std::vector<unsigned char>(128 * 128 * 4);
+        m_width = 128;
+        m_height = 128;
+        m_channels = 4;
+        for (int x = 0; x < 128; x++)
+        {
+            for (int y = 0; y < 128; y++)
+            {
+                for (int z = 0; z < 4; z++)
+                {
+                    int seed = x * m_width * 4 + y * 4 + z;
+                    (*data)[seed] = glm::linearRand(0, 255);
+                }
+            }
+        }
+
+        m_data = &(*data)[0];
+    }
+    else
     {
         auto readerGenerator = vtkSmartPointer<vtkImageReader2Factory>::New();
         auto reader = readerGenerator->CreateImageReader2(m_path.c_str());
@@ -168,17 +209,6 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         m_height = data->GetDimensions()[1];
         m_channels = reader->GetNumberOfScalarComponents();
         m_data = (unsigned char *)data->GetScalarPointer();
-    }
-    else
-    {
-        std::vector<unsigned char> data(4);
-        data[0] = '\255';
-        data[1] = '\255';
-        data[2] = '\255';
-        data[3] = '\255';
-        m_width = 1;
-        m_height = 1;
-        m_data = &data[0];
     }
 }
 
@@ -195,7 +225,7 @@ VulkanTextureDelegate::loadCubemapTexture(VulkanMemoryManager& memoryManager)
     }
     else
     {
-        m_cubemap = gli::texture_cube(gli::format::FORMAT_BGRA8_UNORM_PACK8, gli::extent2d(1,1), 1);
+        m_cubemap = gli::texture_cube(gli::format::FORMAT_RGBA32_SFLOAT_PACK32, gli::extent2d(1,1), 1);
         m_width = 1;
         m_height = 1;
         m_mipLevels = 1;
@@ -218,23 +248,12 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     stagingBufferInfo.queueFamilyIndexCount = 0;
     stagingBufferInfo.pQueueFamilyIndices = nullptr;
 
-    vkCreateBuffer(memoryManager.m_device, &stagingBufferInfo, nullptr, &m_stagingBuffer);
+    m_stagingBuffer = memoryManager.requestBuffer(memoryManager.m_device,
+        stagingBufferInfo,
+        VulkanMemoryType::STAGING_TEXTURE,
+        m_imageOffsetAlignment);
 
-    VkMemoryRequirements memoryRequirementsStagingBuffer;
-    vkGetBufferMemoryRequirements(memoryManager.m_device, m_stagingBuffer, &memoryRequirementsStagingBuffer);
-    m_stagingBufferMemory = *memoryManager.allocateMemory(memoryRequirementsStagingBuffer,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
-
-    VkMemoryRequirements memoryRequirementsImage;
-    vkGetImageMemoryRequirements(memoryManager.m_device, m_image, &memoryRequirementsImage);
-    m_imageMemory = *memoryManager.allocateMemory(memoryRequirementsImage,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    void * imageData;
-    vkMapMemory(memoryManager.m_device, m_stagingBufferMemory, 0, imageSize, 0, &imageData);
-
-    auto imageEditData = (unsigned char*)imageData;
+    auto imageEditData = (unsigned char*)m_stagingBuffer->getMemoryData(memoryManager.m_device);
 
     unsigned int y_offset = 0;
     unsigned int colorChannels = std::min(m_channels, 3u);
@@ -264,7 +283,6 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
         }
     }
 
-    vkUnmapMemory(memoryManager.m_device, m_stagingBufferMemory);
 
     // Start transfer commands
     VkCommandBufferBeginInfo commandBufferBeginInfo;
@@ -274,8 +292,6 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     commandBufferBeginInfo.pInheritanceInfo = nullptr;
 
     vkBeginCommandBuffer(*memoryManager.m_transferCommandBuffer, &commandBufferBeginInfo);
-    vkBindBufferMemory(memoryManager.m_device, m_stagingBuffer, m_stagingBufferMemory, 0);
-    vkBindImageMemory(memoryManager.m_device, m_image, m_imageMemory, 0);
 
     VkImageSubresourceLayers layersDestination;
     layersDestination.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -284,7 +300,7 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     layersDestination.layerCount = 1;
 
     VkBufferImageCopy copyInfo;
-    copyInfo.bufferOffset = 0;
+    copyInfo.bufferOffset = m_stagingBuffer->getOffset();
     copyInfo.bufferRowLength = m_width;
     copyInfo.bufferImageHeight = m_height;
     copyInfo.imageSubresource = layersDestination;
@@ -294,18 +310,18 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     VkImageSubresourceRange baseRange = m_range;
     baseRange.levelCount = 1;
 
-    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, m_image,
+    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
         VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
-    vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, m_stagingBuffer,
-        m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
+    vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, *m_stagingBuffer->getBuffer(),
+        *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
 
     if (m_mipLevels != 1)
     {
         this->generateMipmaps(*memoryManager.m_transferCommandBuffer);
     }
 
-    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, m_image,
+    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT, m_range);
 
@@ -345,25 +361,14 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
     stagingBufferInfo.queueFamilyIndexCount = 0;
     stagingBufferInfo.pQueueFamilyIndices = nullptr;
 
-    vkCreateBuffer(memoryManager.m_device, &stagingBufferInfo, nullptr, &m_stagingBuffer);
+    m_stagingBuffer = memoryManager.requestBuffer(memoryManager.m_device,
+        stagingBufferInfo,
+        VulkanMemoryType::STAGING_TEXTURE,
+        m_imageOffsetAlignment);
 
-    VkMemoryRequirements memoryRequirementsStagingBuffer;
-    vkGetBufferMemoryRequirements(memoryManager.m_device, m_stagingBuffer, &memoryRequirementsStagingBuffer);
-    m_stagingBufferMemory = *memoryManager.allocateMemory(memoryRequirementsStagingBuffer,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+    memcpy(m_stagingBuffer->getMemoryData(memoryManager.m_device), m_cubemap.data(), m_cubemap.size());
 
-    VkMemoryRequirements memoryRequirementsImage;
-    vkGetImageMemoryRequirements(memoryManager.m_device, m_image, &memoryRequirementsImage);
-    m_imageMemory = *memoryManager.allocateMemory(memoryRequirementsImage,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-
-    void * imageData;
-    vkMapMemory(memoryManager.m_device, m_stagingBufferMemory, 0, imageSize, 0, &imageData);
-
-    memcpy(imageData, m_cubemap.data(), m_cubemap.size());
-
-    vkUnmapMemory(memoryManager.m_device, m_stagingBufferMemory);
+    m_stagingBuffer->unmapMemory(memoryManager.m_device);
 
     // Start transfer commands
     VkCommandBufferBeginInfo commandBufferBeginInfo;
@@ -373,8 +378,6 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
     commandBufferBeginInfo.pInheritanceInfo = nullptr;
 
     vkBeginCommandBuffer(*memoryManager.m_transferCommandBuffer, &commandBufferBeginInfo);
-    vkBindBufferMemory(memoryManager.m_device, m_stagingBuffer, m_stagingBufferMemory, 0);
-    vkBindImageMemory(memoryManager.m_device, m_image, m_imageMemory, 0);
 
     std::vector<VkBufferImageCopy> copyInfos(m_mipLevels * m_arrayLayers);
 
@@ -391,7 +394,7 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
 
             unsigned int currentRegion = layer * m_mipLevels + level;
 
-            copyInfos[currentRegion].bufferOffset = currentOffset;
+            copyInfos[currentRegion].bufferOffset = currentOffset + m_stagingBuffer->getOffset();
             copyInfos[currentRegion].bufferRowLength = m_cubemap[layer][level].extent().x;
             copyInfos[currentRegion].bufferImageHeight = m_cubemap[layer][level].extent().y;
             copyInfos[currentRegion].imageSubresource = layersDestination;
@@ -405,14 +408,14 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
         }
     }
 
-    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, m_image,
+    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
         VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
 
-    vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, m_stagingBuffer,
-        m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, (uint32_t)copyInfos.size(), &copyInfos[0]);
+    vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, *m_stagingBuffer->getBuffer(),
+        *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, (uint32_t)copyInfos.size(), &copyInfos[0]);
 
-    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, m_image,
+    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT, m_range);
 
@@ -457,9 +460,30 @@ VulkanTextureDelegate::changeImageLayout(VkCommandBuffer& commandBuffer,
     layoutChange.image = image;
     layoutChange.subresourceRange = range;
 
+    auto sourceStageFlags = VK_PIPELINE_STAGE_HOST_BIT;
+    auto destinationStageFlags = VK_PIPELINE_STAGE_HOST_BIT;
+
+    if (sourceFlags & (VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT))
+    {
+        sourceStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (sourceFlags & (VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT))
+    {
+        sourceStageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+
+    if (destinationFlags & (VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT))
+    {
+        destinationStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (destinationFlags & (VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_SHADER_WRITE_BIT))
+    {
+        destinationStageFlags = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+
     vkCmdPipelineBarrier(commandBuffer,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        sourceStageFlags,
+        destinationStageFlags,
         0,
         0,
         nullptr,
@@ -520,18 +544,25 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
         mipLowRange.baseMipLevel = i + 1;
         mipLowRange.levelCount = 1;
 
-        this->changeImageLayout(commandBuffer, m_image,
+        this->changeImageLayout(commandBuffer, *m_image->getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT, m_range);
 
         vkCmdBlitImage(commandBuffer,
-            m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+            *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1, &mipFormat, VK_FILTER_LINEAR);
 
-        this->changeImageLayout(commandBuffer, m_image,
+        this->changeImageLayout(commandBuffer, *m_image->getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_ACCESS_TRANSFER_READ_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
     }
+}
+
+void
+VulkanTextureDelegate::clear(VkDevice * device)
+{
+    vkDestroyImageView(*device, m_imageView, nullptr);
+    vkDestroySampler(*device, m_sampler, nullptr);
 }
 }

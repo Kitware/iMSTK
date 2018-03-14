@@ -32,8 +32,8 @@ bool isColorRangeCorrect( double c )
 
 Color Color::White(1.0, 1.0, 1.0, 1.0);
 Color Color::Black(0.0, 0.0, 0.0, 1.0);
-Color Color::DarkGray(0.8, 0.8, 0.8, 1.0);
-Color Color::LightGray(0.3, 0.3, 0.3, 1.0);
+Color Color::DarkGray(0.3, 0.3, 0.3, 1.0);
+Color Color::LightGray(0.8, 0.8, 0.8, 1.0);
 Color Color::Blue(0.0, 0.0, 1.0, 1.0);
 Color Color::Green(0.0, 1.0, 0.0, 1.0);
 Color Color::Red(1.0, 0.0, 0.0, 1.0);

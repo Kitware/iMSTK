@@ -36,6 +36,7 @@
 #include "imstkScene.h"
 #include "imstkRenderer.h"
 #include "imstkDecalPool.h"
+#include "imstkTextureManager.h"
 
 #include "imstkVulkanValidation.h"
 #include "imstkVulkanVertexBuffer.h"
@@ -60,6 +61,19 @@ class VulkanRenderer : public Renderer {
 public:
     VulkanRenderer(std::shared_ptr<Scene> scene);
     ~VulkanRenderer();
+
+    void setShadowMapResolution(uint32_t resolution);
+
+    void setResolution(unsigned int width, unsigned int height);
+
+    void setBloomOn();
+    void setBloomOff();
+
+protected:
+    friend class VulkanViewer;
+    friend class VulkanMaterialDelegate;
+    friend class VulkanPostProcess;
+    friend class VulkanPostProcessingChain;
 
     ///
     /// \brief Populates the device fields for the rendering class (both physical and logical devices)
@@ -95,6 +109,11 @@ public:
     /// \brief Initializes the framebuffer
     ///
     void initializeFramebuffers(VkSwapchainKHR * swapchain);
+
+    ///
+    /// \brief Initializes framebuffer images
+    ///
+    void initializeFramebufferImages(VkSwapchainKHR * swapchain);
 
     ///
     /// \brief Deletes the framebuffer
@@ -134,17 +153,21 @@ public:
     ///
     /// \brief Update global uniforms
     ///
-    void updateGlobalUniforms();
+    void updateGlobalUniforms(uint32_t frameIndex);
 
-protected:
-    friend class VulkanViewer;
-    friend class VulkanMaterialDelegate;
-    friend class VulkanPostProcess;
-    friend class VulkanPostProcessingChain;
+    ///
+    /// \brief Create shadow maps
+    ///
+    void createShadowMaps(uint32_t resolution);
 
-    void initialize();
+    void initialize(unsigned int width, unsigned int height);
     void loadAllGeometry();
     std::shared_ptr<VulkanRenderDelegate> loadGeometry(std::shared_ptr<Geometry> geometry);
+
+    ///
+    /// \brief Sets some command buffer state
+    ///
+    void setCommandBufferState(VkCommandBuffer * commandBuffer, uint32_t width, uint32_t height);
 
     unsigned int m_width = 1000;
     unsigned int m_height = 800;
@@ -160,6 +183,7 @@ protected:
     std::shared_ptr<Scene> m_scene = nullptr;
 
     VkInstance * m_instance = nullptr;
+    VkDebugReportCallbackEXT m_debugReportCallback;
 
     uint32_t m_physicalDeviceCount = 0;
     VkPhysicalDevice * m_physicalDevices = nullptr;
@@ -177,8 +201,9 @@ protected:
     VkQueue m_renderQueue;
 
     VkCommandPool m_renderCommandPool;
-    VkCommandBuffer m_renderCommandBuffer;
-    VkCommandBuffer m_postProcessingCommandBuffer;
+    VkCommandPool m_postProcessingCommandPool;
+    std::vector<VkCommandBuffer> m_renderCommandBuffer;
+    std::vector<VkCommandBuffer> m_postProcessingCommandBuffer;
 
     uint32_t m_dynamicOffsets = {0};
 
@@ -194,9 +219,11 @@ protected:
     std::vector<VkDescriptorSetLayout> m_globalDescriptorSetLayouts;
     std::vector<VkWriteDescriptorSet> m_globalWriteDescriptorSets;
 
-    std::vector<VkRenderPass> m_renderPasses;
+    VkRenderPass m_depthRenderPass;
+    VkRenderPass m_opaqueRenderPass;
+    VkRenderPass m_decalRenderPass;
 
-    // Framebuffers
+    // Swapchain
     VkSwapchainKHR * m_swapchain = nullptr;
     uint32_t m_swapchainImageCount = 0;
     std::vector<VkImage> m_swapchainImages;
@@ -204,43 +231,63 @@ protected:
     std::vector<VkSampler> m_swapchainImageSamplers;
 
     // Depth buffer
-    std::vector<VkImage> m_depthImage;
+    std::vector<VulkanInternalImage *> m_depthImage;
     std::vector<VkImageView> m_depthImageView;
-    std::vector<VkDeviceMemory*> m_depthImageMemory;
 
     // Normal buffer
-    VkImage m_normalImage;
+    VulkanInternalImage * m_normalImage;
     VkImageView m_normalImageView;
-    VkDeviceMemory * m_normalImageMemory;
+
+    // AO buffers
+    VulkanInternalImage * m_halfAOImage[2];
+    VkImageView m_halfAOImageView[2];
 
     // Color buffers
-    std::vector<VkImage> m_HDRImage[3];
+    std::vector<VulkanInternalImage *> m_HDRImage[3];
     VkSampler m_HDRImageSampler;
     std::vector<VkImageView> m_HDRImageView[3];
-    std::vector<VkDeviceMemory*> m_HDRImageMemory[3];
     uint32_t m_mipLevels = 1;
 
-    std::vector<std::shared_ptr<VulkanFramebuffer>> m_drawingFramebuffers;
+    std::shared_ptr<Texture> m_noiseTexture = nullptr;
+    std::shared_ptr<VulkanTextureDelegate> m_noiseTextureDelegate = nullptr;
+
+    std::shared_ptr<VulkanFramebuffer> m_opaqueFramebuffer;
+    std::shared_ptr<VulkanFramebuffer> m_decalFramebuffer;
+    std::shared_ptr<VulkanFramebuffer> m_depthFramebuffer;
+
     std::vector<std::shared_ptr<VulkanPostProcess>> m_HDRTonemaps;
+    std::vector<std::shared_ptr<VulkanPostProcess>> m_ssao;
+
     std::shared_ptr<VulkanPostProcessingChain> m_postProcessingChain;
 
     VkSemaphore m_readyToRender;
     VkSemaphore m_drawingComplete;
     VkSemaphore m_presentImages;
 
-    unsigned int m_buffering = 3;
+    uint32_t m_buffering = 2;
 
     int m_frameNumber = 0;
     VkSampleCountFlagBits m_samples = VK_SAMPLE_COUNT_1_BIT;
 
-    VkFence m_commandBufferSubmit;
+    std::vector<VkFence> m_commandBufferSubmit;
 
     glm::mat4 m_projectionMatrix;
+
+    VulkanInternalImage * m_shadowMaps; ///< a single texture array (hence why it's one image)
+    VkImageView m_shadowMapsView; ///< for binding to the shaders (so shaders can access all layers)
+    std::vector<VkImageView> m_shadowMapsViews; ///< for framebuffers
+    std::vector<std::shared_ptr<DirectionalLight>> m_shadowLights;
+    std::vector<std::shared_ptr<VulkanFramebuffer>> m_shadowFramebuffers;
+    std::vector<VkRenderPass> m_shadowPasses;
+    uint32_t m_shadowMapResolution = 2048;
+    std::vector<glm::mat4> m_lightMatrices;
 
     std::vector<std::shared_ptr<VulkanRenderDelegate>> m_renderDelegates;
 
     uint32_t m_renderQueueFamily = 0;
     Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
+
+    std::map<std::shared_ptr<Texture>, std::shared_ptr<VulkanTextureDelegate>> m_textureMap;
 };
 }
 

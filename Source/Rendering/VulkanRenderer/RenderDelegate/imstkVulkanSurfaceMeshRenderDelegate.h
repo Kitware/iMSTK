@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Update render geometry
     ///
-    void update() override;
+    void update(uint32_t frameIndex) override;
 
     ///
     /// \brief Get source geometry
@@ -55,12 +55,13 @@ public:
     ///
     /// \brief Fill vertex buffer
     ///
-    void updateVertexBuffer();
+    void updateVertexBuffer(uint32_t frameIndex);
 
 protected:
     std::shared_ptr<SurfaceMesh> m_geometry;
 
     VulkanLocalVertexUniforms m_localVertexUniforms;
+    std::vector<bool> m_modified;
 };
 }
 

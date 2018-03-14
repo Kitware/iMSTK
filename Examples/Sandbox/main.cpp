@@ -891,6 +891,7 @@ void testDecals()
     auto light = std::make_shared<DirectionalLight>("Light");
     light->setIntensity(7);
     light->setColor(Color(1.0, 0.95, 0.8));
+    light->setFocalPoint(Vec3d(-1, -1, 0));
     scene->addLight(light);
 
     // Run
@@ -921,6 +922,8 @@ void testRendering()
     headMaterial->addTexture(headNormalTexture);
     headMaterial->addTexture(headRoughnessTexture);
     headMaterial->addTexture(headSSSTexture);
+    headMaterial->setReceivesShadows(true);
+    headMaterial->setCastsShadows(true);
     headMesh->setRenderMaterial(headMaterial);
 
     // Position camera
@@ -928,15 +931,83 @@ void testRendering()
     cam->setPosition(0, 0.25, 2);
     cam->setFocalPoint(0, 0.25, 0);
 
-    // Light
-    auto light = std::make_shared<DirectionalLight>("Light");
-    light->setIntensity(7);
-    light->setColor(Color(1.0, 0.95, 0.8));
-    scene->addLight(light);
+    // Lights
+    auto directionalLight = std::make_shared<DirectionalLight>("DirectionalLight");
+    directionalLight->setIntensity(7);
+    directionalLight->setColor(Color(1.0, 0.95, 0.8));
+    directionalLight->setCastsShadow(true);
+    directionalLight->setShadowRange(1.5);
+    scene->addLight(directionalLight);
+
+    auto pointLight = std::make_shared<PointLight>("PointLight");
+    pointLight->setIntensity(0.1);
+    pointLight->setPosition(0.1, 0.2, 0.5);
+    scene->addLight(pointLight);
+
+    // Sphere
+    auto sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
+    auto sphereMaterial = std::make_shared<RenderMaterial>();
+    auto sphereMesh = sphereObj->getVisualGeometry();
+    sphereMesh->translate(0.1, 0.2, 0.5);
+    sphereMaterial->setEmissivity(10);
+    sphereMaterial->setCastsShadows(false);
+    sphereObj->getVisualGeometry()->setRenderMaterial(sphereMaterial);
+
+    // Plane
+    auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
+    auto planeMaterial = std::make_shared<RenderMaterial>();
+    planeMaterial->setDiffuseColor(Color::DarkGray);
+    planeObj->getVisualGeometry()->setRenderMaterial(planeMaterial);
 
     // Run
     sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
+
+#ifdef iMSTK_USE_Vulkan
+    auto viewer = std::dynamic_pointer_cast<VulkanViewer>(sdk->getViewer());
+    viewer->setResolution(1920, 1080);
+    viewer->disableVSync();
+    viewer->enableFullscreen();
+#endif
+    sdk->startSimulation(true);
+}
+
+void testRenderMaterials()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("RenderMaterials");
+
+    // Position camera
+    auto cam = scene->getCamera();
+    cam->setPosition(0.2, 0.2, 2.5);
+    cam->setFocalPoint(0.2, 0.2, 0);
+
+    // IBL probe
+    auto probe = std::make_shared<IBLProbe>(
+        iMSTK_DATA_ROOT "/IBL/roomIrradiance.dds",
+        iMSTK_DATA_ROOT "/IBL/roomRadiance.dds",
+        iMSTK_DATA_ROOT "/IBL/roomBRDF.png");
+    scene->setGlobalIBLProbe(probe);
+
+    // Sphere
+    for (int i = 0; i < 25; i++)
+    {
+        auto sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere,
+            scene,
+            "VisualSphere" + std::to_string(i),
+            0.05);
+        auto sphereMaterial = std::make_shared<RenderMaterial>();
+        auto sphereMesh = sphereObj->getVisualGeometry();
+        sphereMesh->translate((i / 5) * 0.1, (i % 5) * 0.1, 0.5);
+        sphereMaterial->setCastsShadows(false);
+        sphereMaterial->setRoughness((i / 5) / 4.0);
+        sphereMaterial->setMetalness((i % 5) / 4.0);
+        sphereObj->getVisualGeometry()->setRenderMaterial(sphereMaterial);
+    }
+
+    // Run
+    sdk->setActiveScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -3618,8 +3689,9 @@ int main()
     ------------------*/
     //testMultiObjectWithTextures();
     //testViewer();
-    testDecals();
+    //testDecals();
     //testRendering();
+    testRenderMaterials();
     //testScreenShotUtility();
     //testCapsule();
 
@@ -3647,11 +3719,11 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    //testPbdCloth();
+    testPbdCloth();
     //testPbdCollision();
     //testPbdFluidBenchmarking();
     //testPbdFluid();
-    testDeformableBody();
+    //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
     //testPicking();
@@ -3684,7 +3756,7 @@ int main()
     //testBoneDrilling();
     //testVirtualCouplingCylinder();
     //testRigidBody();
-    testGraph();
+    //testGraph();
 
     return 0;
 }

@@ -26,6 +26,7 @@ uniform vec3 debugColor = vec3(0);
 #endif
 
 // Material properties
+uniform float emissivity = 1.0;
 uniform float metalness = 0;
 uniform float roughness = 1.0;
 
@@ -51,7 +52,7 @@ void main()
     cameraDirection = normalize(vertex.position - cameraPosition);
 
 #ifdef DIFFUSE_TEXTURE
-    diffuseColor = pow(texture(diffuseTexture, vertex.uv).rgb, vec3(2.2));
+    diffuseColor = pow(texture(diffuseTexture, vertex.uv).rgb, vec3(2.2)) * diffuseColorUniform;
 #else
     diffuseColor = diffuseColorUniform;
 #endif
@@ -91,7 +92,7 @@ void main()
     }
 
     // Sum components and apply gamma correction
-    finalColor = mix(0.5, 1.0, roughness) * finalDiffuse + mix(0.5, 0.0, roughness) * finalSpecular;
+    finalColor = mix(0.5, 1.0, roughness) * finalDiffuse + mix(0.5, 0.0, roughness) * finalSpecular + emissivity * diffuseColor;
 
     // Apply tone mapping
     finalColor = toneMap(finalColor);

@@ -25,6 +25,7 @@
 #include "vulkan/vulkan.h"
 #include "GLFW/glfw3.h"
 #include "g3log/g3log.hpp"
+#include <climits>
 
 #include "imstkVulkanRenderer.h"
 #include "imstkViewer.h"
@@ -58,6 +59,23 @@ public:
     ///
     virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) override;
 
+    ///
+    /// \brief Enable/disable fullscreen
+    ///
+    void enableFullscreen();
+    void disableFullscreen();
+
+    ///
+    /// \brief Enable/disable V-Sync
+    ///
+    void enableVSync();
+    void disableVSync();
+
+    ///
+    /// \brief Sets the resolution
+    ///
+    void setResolution(unsigned int width, unsigned int height);
+
 protected:
     friend class VulkanInteractorStyle;
     friend class VulkanInteractorStyleTrackballCamera;
@@ -69,6 +87,8 @@ protected:
     unsigned int m_width = 1000;
     unsigned int m_height = 800;
 
+    bool m_VSync = true;
+
     std::shared_ptr<VulkanRenderer> m_renderer;
     VkSurfaceKHR m_surface;
     GLFWwindow * m_window;
@@ -77,8 +97,12 @@ protected:
 
     VkSurfaceCapabilitiesKHR m_physicalCapabilities;
 
+    uint32_t m_presentModesCount;
+    VkPresentModeKHR * m_presentModes;
+
     uint32_t m_physicalFormatsCount;
     VkSurfaceFormatKHR * m_physicalFormats;
+    bool m_fullscreen = false;
 
     Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
 };

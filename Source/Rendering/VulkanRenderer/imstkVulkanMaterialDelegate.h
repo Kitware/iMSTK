@@ -60,6 +60,8 @@ struct VulkanMaterialPipelineComponents
     VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
     std::vector<VkPipelineColorBlendAttachmentState> colorBlendAttachments;
     VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+    VkPipelineDynamicStateCreateInfo dynamicStateInfo;
+    std::vector<VkDynamicState> dynamicStates;
 };
 
 struct VulkanMaterialConstants
@@ -71,8 +73,11 @@ struct VulkanMaterialConstants
     bool specularTexture;
     bool roughnessTexture;
     bool metalnessTexture;
+    bool ambientOcclusionTexture;
     bool subsurfaceScatteringTexture;
     bool irradianceCubemapTexture;
+    bool radianceCubemapTexture;
+    bool brdfLUTTexture;
 };
 
 class VulkanMaterialDelegate
@@ -85,7 +90,14 @@ public:
         std::shared_ptr<VulkanUniformBuffer> vertexUniformBuffer,
         std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
         std::shared_ptr<RenderMaterial> material,
-        VulkanMemoryManager& memoryManager);
+        VulkanMemoryManager& memoryManager,
+        bool shadowPass = false,
+        bool depthPass = false);
+
+    ///
+    /// \brief Clears the material
+    ///
+    void clear(VkDevice * device);
 
 protected:
     friend class VulkanRenderer;
@@ -95,18 +107,40 @@ protected:
     ///
     void createPipeline(VulkanRenderer * renderer);
 
+    ///
+    /// \brief Creates the pipeline object
+    ///
     void buildMaterial(VulkanRenderer * renderer);
 
+    ///
+    /// \brief Initializes all the textures for the material
+    ///
     void initializeTextures(VulkanRenderer * renderer);
 
+    ///
+    /// \brief Helper function that loads a single texture and checks if it already exits. Uses a backup texture if the path is blank.
+    ///
+    std::shared_ptr<VulkanTextureDelegate> initializeTexture(VulkanRenderer * renderer,
+                                                             std::shared_ptr<Texture> backupTextureDelegate,
+                                                             Texture::Type type);
+
+    ///
+    /// \brief Initializes all the steps to build the material
+    ///
     void initialize(VulkanRenderer * renderer);
 
+    ///
+    /// \brief Helper function to add a specialization constants. These are used to customize the shader.
+    ///
     void addSpecializationConstant(uint32_t size, uint32_t offset);
 
     uint32_t m_numConstants = 0;
     VulkanMaterialConstants m_constants;
 
     uint32_t m_numTextures = 0;
+    bool m_shadowPass = false;
+    bool m_depthPrePass = false;
+    bool m_depthOnlyPass = false;
 
     void createDescriptors(VulkanRenderer * renderer);
     void createDescriptorSetLayouts(VulkanRenderer * renderer);
@@ -132,9 +166,11 @@ protected:
     std::shared_ptr<VulkanTextureDelegate> m_normalTexture;
     std::shared_ptr<VulkanTextureDelegate> m_roughnessTexture;
     std::shared_ptr<VulkanTextureDelegate> m_metalnessTexture;
+    std::shared_ptr<VulkanTextureDelegate> m_ambientOcclusionTexture;
     std::shared_ptr<VulkanTextureDelegate> m_subsurfaceScatteringTexture;
     std::shared_ptr<VulkanTextureDelegate> m_irradianceCubemapTexture;
     std::shared_ptr<VulkanTextureDelegate> m_radianceCubemapTexture;
+    std::shared_ptr<VulkanTextureDelegate> m_brdfLUTTexture;
 
     VulkanMemoryManager * m_memoryManager;
 };
