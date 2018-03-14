@@ -28,14 +28,29 @@
 
 namespace imstk
 {
+///
+/// \class IBLProbe
+///
+/// \brief Image-based lighting probe
+///
+/// Image-based lighting (IBL) probes are used to provide global illumination
+/// using special cubemaps. The cubemaps are prefiltered and evaluated using a
+/// lookup table (LUT) texture. The cubemaps should be preintegrated using
+/// split-sum approximation.
+///
 class IBLProbe
 {
 public:
-    IBLProbe() {};
-
-    void initialize(std::string irradianceCubemapPath,
-                    std::string radianceCubemapPath,
-                    std::string brdfLUTPath);
+    ///
+    /// Constructor
+    ///
+    /// \param irradianceCubemapPath path to .dds irradiance (diffuse) cubemap
+    /// \param radianceCubemapPath path to .dds radiance (specular) cubemap
+    /// \param brdfLUTPath path to BRDF LUT (shouldn't be .dds)
+    ///
+    IBLProbe(std::string irradianceCubemapPath,
+             std::string radianceCubemapPath,
+             std::string brdfLUTPath);
 
     std::shared_ptr<Texture> getIrradianceCubemapTexture();
     std::shared_ptr<Texture> getRadianceCubemapTexture();

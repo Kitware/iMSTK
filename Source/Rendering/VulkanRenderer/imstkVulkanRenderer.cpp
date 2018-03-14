@@ -1455,7 +1455,10 @@ VulkanRenderer::~VulkanRenderer()
         {
             renderDelegate->m_material->clear(&m_renderDevice);
             renderDelegate->m_depthMaterial->clear(&m_renderDevice);
-            renderDelegate->m_shadowMaterial->clear(&m_renderDevice);
+            if (m_shadowPasses.size() > 0)
+            {
+                renderDelegate->m_shadowMaterial->clear(&m_renderDevice);
+            }
         }
 
         for (auto postProcess : m_postProcessingChain->m_postProcesses)

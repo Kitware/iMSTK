@@ -984,8 +984,10 @@ void testRenderMaterials()
     cam->setFocalPoint(0.2, 0.2, 0);
 
     // IBL probe
-    auto probe = std::make_shared<IBLProbe>();
-    probe->initialize(iMSTK_DATA_ROOT "/IBL/roomIrradiance.dds", iMSTK_DATA_ROOT "/IBL/roomRadiance.dds", iMSTK_DATA_ROOT "/IBL/roomBRDF.png");
+    auto probe = std::make_shared<IBLProbe>(
+        iMSTK_DATA_ROOT "/IBL/roomIrradiance.dds",
+        iMSTK_DATA_ROOT "/IBL/roomRadiance.dds",
+        iMSTK_DATA_ROOT "/IBL/roomBRDF.png");
     scene->setGlobalIBLProbe(probe);
 
     // Sphere

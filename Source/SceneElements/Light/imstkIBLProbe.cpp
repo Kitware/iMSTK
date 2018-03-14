@@ -23,10 +23,9 @@
 
 namespace imstk
 {
-void
-IBLProbe::initialize(std::string irradianceCubemapPath,
-                     std::string radianceCubemapPath,
-                     std::string brdfLUTPath)
+IBLProbe::IBLProbe(std::string irradianceCubemapPath,
+                   std::string radianceCubemapPath,
+                   std::string brdfLUTPath)
 {
     m_irradianceCubemapPath = irradianceCubemapPath;
     m_radianceCubemapPath = radianceCubemapPath;
