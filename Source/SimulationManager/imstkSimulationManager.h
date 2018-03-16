@@ -156,13 +156,6 @@ public:
     void printUserControlsInfo();
 
     ///
-    /// \brief Launch simulation for the first time.
-    /// 1. Initialize the active scene if not initialized already.
-    /// 2. Launches separate threads for each module.
-    ///
-    void launchSimulation();
-
-    ///
     /// \brief Start the simulation by initializing the active scene
     ///
     void startSimulation(const bool startSimulationPaused = true,
@@ -189,6 +182,13 @@ public:
     void endSimulation();
 
 private:
+
+    ///
+    /// \brief Launch simulation for the first time.
+    /// 1. Initialize the active scene if not initialized already.
+    /// 2. Launches separate threads for each module.
+    ///
+    void launchSimulation();
 
     void startModuleInNewThread(std::shared_ptr<Module> module);
 
