@@ -49,23 +49,23 @@ public:
     ///
     /// \brief Set scene to be rendered
     ///
-    virtual void setActiveScene(std::shared_ptr<Scene>scene){};
+    virtual void setActiveScene(std::shared_ptr<Scene> scene)=0;
 
     ///
     /// \brief Start rendering
     ///
-    virtual void startRenderingLoop(){};
+    virtual void startRenderingLoop()=0;
 
     ///
     /// \brief Terminate rendering
     ///
-    virtual void endRenderingLoop(){};
+    virtual void endRenderingLoop()=0;
 
     ///
     /// \brief Setup the current renderer to render what's needed
     /// based on the mode chosen
     ///
-    virtual void setRenderingMode(Renderer::Mode mode){};
+    virtual void setRenderingMode(Renderer::Mode mode)=0;
 
     ///
     /// \brief Get the current renderer's mode
@@ -91,7 +91,7 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false){};
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false)=0;
 
     ///
     /// \brief Set custom event handlers on interactor style

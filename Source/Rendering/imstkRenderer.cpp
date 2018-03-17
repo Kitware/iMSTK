@@ -23,12 +23,6 @@
 
 namespace imstk
 {
-std::shared_ptr<Renderer>
-Renderer::getRenderer()
-{
-    return nullptr;
-}
-
 void
 Renderer::setMode(Renderer::Mode mode, bool enableVR)
 {
