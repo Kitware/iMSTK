@@ -338,8 +338,8 @@ SimulationManager::launchSimulation()
 }
 
 void
-SimulationManager::startSimulation(const bool startSimulationPaused /*= true*/,
-                                   const bool viewerInDebugMode /*= false*/)
+SimulationManager::startSimulation(const SimulationStatus simStatus /*= SimulationStatus::PAUSED*/,
+                                   const Renderer::Mode renderMode /*= Renderer::Mode::SIMULATION*/)
 {
     if (!this->getActiveScene())
     {
@@ -371,19 +371,19 @@ SimulationManager::startSimulation(const bool startSimulationPaused /*= true*/,
     }
 
     // Launch simulation right away if the simulator starts in running mode
-    if (!startSimulationPaused)
+    if (simStatus == SimulationStatus::RUNNING)
     {
         this->launchSimulation();
     }
 
     // start the viewer
-    this->startViewer(viewerInDebugMode);
+    this->startViewer(renderMode);
 }
 
 void
-SimulationManager::startViewer(const bool debug /*= true*/)
+SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mode::DEBUG*/)
 {
-    m_viewer->setRenderingMode(debug ? Renderer::Mode::DEBUG : Renderer::Mode::SIMULATION);
+    m_viewer->setRenderingMode(renderMode);
 
     // Start Rendering
     if (!m_viewer->isRendering())

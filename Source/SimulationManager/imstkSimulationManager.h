@@ -148,7 +148,7 @@ public:
     ///
     /// \brief Start the viewer
     ///
-    void startViewer(const bool debug = true);
+    void startViewer(const Renderer::Mode renderMode = Renderer::Mode::DEBUG);
 
     ///
     /// \brief Print user keyboard controls
@@ -158,8 +158,8 @@ public:
     ///
     /// \brief Start the simulation by initializing the active scene
     ///
-    void startSimulation(const bool startSimulationPaused = true,
-                         const bool viewerInDebugMode = false);
+    void startSimulation(const SimulationStatus simStatus = SimulationStatus::PAUSED,
+                         const Renderer::Mode renderMode = Renderer::Mode::SIMULATION);
 
     ///
     /// \brief Run the simulation from a paused state
