@@ -146,16 +146,6 @@ public:
                         const bool unloadCurrentScene = false);
 
     ///
-    /// \brief Start the viewer
-    ///
-    void startViewer(const Renderer::Mode renderMode = Renderer::Mode::DEBUG);
-
-    ///
-    /// \brief Print user keyboard controls
-    ///
-    void printUserControlsInfo();
-
-    ///
     /// \brief Start the simulation by initializing the active scene
     ///
     void startSimulation(const SimulationStatus simStatus = SimulationStatus::PAUSED,
@@ -189,6 +179,16 @@ private:
     /// 2. Launches separate threads for each module.
     ///
     void launchSimulation();
+
+    ///
+    /// \brief Start the viewer
+    ///
+    void startViewer(const Renderer::Mode renderMode = Renderer::Mode::DEBUG);
+
+    ///
+    /// \brief Print user keyboard controls
+    ///
+    void printUserControlsInfo();
 
     void startModuleInNewThread(std::shared_ptr<Module> module);
 
