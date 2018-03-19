@@ -33,6 +33,11 @@ namespace imstk
 {
 class SimulationManager;
 
+///
+/// \class Viewer
+///
+/// \brief Rendering window manager and contains user API to configure the rendering with various backends
+///
 class Viewer
 {
 public:
@@ -65,7 +70,7 @@ public:
     /// \brief Setup the current renderer to render what's needed
     /// based on the mode chosen
     ///
-    virtual void setRenderingMode(Renderer::Mode mode)=0;
+    virtual void setRenderingMode(const Renderer::Mode mode)=0;
 
     ///
     /// \brief Get the current renderer's mode
@@ -117,10 +122,12 @@ protected:
     std::shared_ptr<Scene> m_activeScene;
 
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
-    bool m_running = false;
+    
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
     std::shared_ptr<InteractorStyle> m_interactorStyle;
+
+    bool m_running = false;
 };
 }
 
