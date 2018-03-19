@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Update background colors
     ///
-    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false)=0;
+    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
 protected:
     Renderer::Mode m_currentMode = Renderer::Mode::EMPTY;

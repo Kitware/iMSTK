@@ -164,7 +164,7 @@ void testLapToolController()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-    
+
 #endif
 }
 
@@ -704,7 +704,7 @@ void testObjectController()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene); 
+    sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
 #endif
 }

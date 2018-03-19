@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*= false*/)
 {
     m_enableVR = enableVR;

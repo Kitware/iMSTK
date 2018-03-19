@@ -76,33 +76,33 @@ public:
     void setMode(const Mode mode, const bool enableVR) override;
 
     ///
-    /// \brief
+    /// \brief Updates the scene camera's position and orientation
     ///
     void updateSceneCamera(std::shared_ptr<Camera> imstkCam);
 
     ///
-    /// \brief
+    /// \brief Updates the render delegates
     ///
     void updateRenderDelegates();
 
     ///
-    /// \brief
+    /// \brief Returns VTK renderer
     ///
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
 
     ///
     /// \brief Update background colors
     ///
-    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
+    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
 protected:
     ///
-    /// \brief
+    /// \brief Remove actors (also called props) from the scene
     ///
     void removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
     ///
-    /// \brief
+    /// \brief Add actors (also called props) from the scene
     ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
@@ -124,4 +124,4 @@ protected:
 };
 }
 
-#endif // ifndef imstkRenderer_h
+#endif // ifndef imstkVTKRenderer_h

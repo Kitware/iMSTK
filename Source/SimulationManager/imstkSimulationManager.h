@@ -162,12 +162,12 @@ public:
     void pauseSimulation();
 
     ///
-    /// \brief End the simulation
+    /// \brief Reset the simulation to initial state
     ///
     void resetSimulation();
 
     ///
-    /// \brief
+    /// \brief End the simulation
     ///
     void endSimulation();
 
