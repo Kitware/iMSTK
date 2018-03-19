@@ -35,7 +35,7 @@
 
 namespace imstk
 {
-VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, bool enableVR)
+VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
 {
     m_scene = scene;
 
@@ -179,7 +179,7 @@ VTKRenderer::getVtkRenderer() const
 }
 
 void
-VTKRenderer::setMode(Renderer::Mode mode, bool enableVR)
+VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
 {
 #ifdef iMSTK_ENABLE_VR
     vtkOpenVRRenderWindow* renWin = nullptr;

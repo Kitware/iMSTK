@@ -24,7 +24,7 @@
 namespace imstk
 {
 void
-Renderer::setMode(Renderer::Mode mode, bool enableVR)
+Renderer::setMode(const Renderer::Mode mode, const bool enableVR)
 {
     m_currentMode = mode;
 }

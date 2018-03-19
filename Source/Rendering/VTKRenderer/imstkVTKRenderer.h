@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKRenderer(std::shared_ptr<Scene> scene, bool enableVR);
+    VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR);
 
     ///
     /// \brief Default destructor
@@ -73,7 +73,7 @@ public:
     /// \brief Set/Get the rendering mode which defined the
     /// visibility of the renderer actors and the default camera
     ///
-    void setMode(Mode mode, bool enableVR) override;
+    void setMode(const Mode mode, const bool enableVR) override;
 
     ///
     /// \brief
