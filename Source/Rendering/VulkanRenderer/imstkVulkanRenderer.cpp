@@ -21,7 +21,8 @@
 
 #include "imstkVulkanRenderer.h"
 
-namespace imstk {
+namespace imstk
+{
 VulkanRenderer::VulkanRenderer(std::shared_ptr<Scene> scene)
 {
     m_scene = scene;

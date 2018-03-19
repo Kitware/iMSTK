@@ -3692,7 +3692,7 @@ int main()
     //testViewer();
     //testDecals();
     //testRendering();
-    testRenderMaterials();
+    //testRenderMaterials();
     //testScreenShotUtility();
     //testCapsule();
 

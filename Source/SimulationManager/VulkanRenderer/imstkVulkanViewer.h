@@ -50,7 +50,7 @@ public:
     /// \brief Setup the current renderer to render what's needed
     /// based on the mode chosen
     ///
-    void setRenderingMode(Renderer::Mode mode) {};
+    void setRenderingMode(const Renderer::Mode mode) {};
 
     ///
     /// \brief Setups up the swapchain

@@ -57,7 +57,8 @@ struct VulkanRendererConstants
     unsigned int numLights;
 };
 
-class VulkanRenderer : public Renderer {
+class VulkanRenderer : public Renderer
+{
 public:
     VulkanRenderer(std::shared_ptr<Scene> scene);
     ~VulkanRenderer();
@@ -159,6 +160,16 @@ protected:
     /// \brief Create shadow maps
     ///
     void createShadowMaps(uint32_t resolution);
+
+    /// \brief Update background colors
+    ///
+    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) {};
+
+protected:
+    friend class VulkanViewer;
+    friend class VulkanMaterialDelegate;
+    friend class VulkanPostProcess;
+    friend class VulkanPostProcessingChain;
 
     void initialize(unsigned int width, unsigned int height);
     void loadAllGeometry();
