@@ -163,7 +163,8 @@ void testLapToolController()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
+
 #endif
 }
 
@@ -229,7 +230,7 @@ void testMshAndVegaIO()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testVTKTexture()
@@ -367,7 +368,7 @@ void testMultiObjectWithTextures()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testMeshCCD()
@@ -430,7 +431,7 @@ void testMeshCCD()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testPenaltyRigidCollision()
@@ -497,7 +498,7 @@ void testPenaltyRigidCollision()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testTwoFalcons()
@@ -601,7 +602,7 @@ void testTwoFalcons()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testTwoOmnis()
@@ -657,7 +658,7 @@ void testTwoOmnis()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 #endif
 }
 
@@ -704,7 +705,7 @@ void testObjectController()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 #endif
 }
 
@@ -757,7 +758,7 @@ void testCameraController()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testReadMesh()
@@ -795,7 +796,7 @@ void testReadMesh()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testViewer()
@@ -841,7 +842,7 @@ void testViewer()
 
     // Run
     sdk->setActiveScene(sceneTest);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testDecals()
@@ -896,7 +897,7 @@ void testDecals()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testRendering()
@@ -969,7 +970,7 @@ void testRendering()
     viewer->disableVSync();
     viewer->enableFullscreen();
 #endif
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testRenderMaterials()
@@ -1008,7 +1009,7 @@ void testRenderMaterials()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testCapsule()
@@ -1059,7 +1060,7 @@ void testCapsule()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testAnalyticalGeometry()
@@ -1194,7 +1195,7 @@ void testIsometricMap()
 
     // Start simulation
     sdk->setActiveScene(geometryMapTest);
-    sdk->startSimulation(imstk::Renderer::Mode::DEBUG);
+    sdk->startSimulation(SimulationStatus::PAUSED, Renderer::Mode::DEBUG);
 }
 
 void testTetraTriangleMap()
@@ -1538,7 +1539,7 @@ void testDeformableBody()
 
     // Run the simulation
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testVectorPlotters()
@@ -1742,7 +1743,7 @@ void testPbdCloth()
 
     // Start
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testGraph()
@@ -2115,7 +2116,7 @@ void testPbdCollision()
     scene->addLight(light);
 
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testPbdFluidBenchmarking()
@@ -2279,7 +2280,7 @@ void testPbdFluidBenchmarking()
     scene->getCamera()->setPosition(0, 10.0, 10.0);
 
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testPbdFluid()
@@ -2498,7 +2499,7 @@ void testPbdFluid()
     apiutils::printUPS(sdk->getSceneManager(scene), ups);
 
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testLineMesh()
@@ -2762,7 +2763,7 @@ void testLineMesh()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 #endif
 }
 
@@ -2836,7 +2837,7 @@ void testScreenShotUtility()
 
     // Run
     sdk->setActiveScene(sceneTest);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testDeformableBodyCollision()
@@ -2937,7 +2938,7 @@ void testDeformableBodyCollision()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void liverToolInteraction()
@@ -3084,7 +3085,7 @@ void liverToolInteraction()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 void testVirtualCoupling()
@@ -3163,7 +3164,7 @@ void testVirtualCoupling()
 
     //Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 }
 
 void testGeometryTransforms()
@@ -3229,7 +3230,7 @@ void testGeometryTransforms()
 
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 }
 
 
@@ -3359,7 +3360,7 @@ void testPicking()
     cam->setFocalPoint(Vec3d(0, 0, 0));
     // Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(true);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 }
 
 
@@ -3431,7 +3432,7 @@ void testBoneDrilling()
     cam->setPosition(Vec3d(0, 0, 15));
 
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 }
 
 // test virtual coupling for cylinder to sphere collision
@@ -3515,7 +3516,7 @@ void testVirtualCouplingCylinder()
 
     //Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 }
 
 void testRigidBody()
@@ -3579,7 +3580,7 @@ void testRigidBody()
 
     //Run
     sdk->setActiveScene(scene);
-    sdk->startSimulation(false);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 }
 
 // Example modified from SFML/Examples
@@ -3691,7 +3692,7 @@ int main()
     //testViewer();
     //testDecals();
     //testRendering();
-    testRenderMaterials();
+    //testRenderMaterials();
     //testScreenShotUtility();
     //testCapsule();
 

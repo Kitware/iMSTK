@@ -25,8 +25,51 @@
 
 namespace imstk
 {
+VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*= false*/)
+{
+    m_enableVR = enableVR;
+    // init render window / interactor / command based
+    // depending on if we enable VR or not
+    if (!m_enableVR)
+    {
+        // Interactor style / commands
+        m_interactorStyle = std::make_shared<VTKInteractorStyle>();
+        auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
+        vtkInteractorStyle->m_simManager = manager;
+
+        // Interactor
+        auto vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+        vtkInteractor->SetInteractorStyle(vtkInteractorStyle.get());
+
+        // Render window
+        m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+        m_vtkRenderWindow->SetInteractor(vtkInteractor);
+        m_vtkRenderWindow->SetSize(1000, 800);
+
+        // Screen capture
+        m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
+    }
+#ifdef iMSTK_ENABLE_VR
+    else
+    {
+        // Interactor style / commands
+        m_openVRCommand = vtkSmartPointer<OpenVRCommand>::New();
+        m_openVRCommand->SetSimulationManager(manager);
+
+        // Interactor
+        auto vtkOpenVRinteractor = vtkSmartPointer<vtkOpenVRRenderWindowInteractor>::New();
+
+        // Add observer openVR command
+        m_vtkRenderWindow = vtkSmartPointer<vtkOpenVRRenderWindow>::New();
+        m_vtkRenderWindow->SetInteractor(vtkOpenVRinteractor);
+        vtkOpenVRinteractor->SetRenderWindow(m_vtkRenderWindow);
+        m_vtkRenderWindow->AddObserver(vtkCommand::StartEvent, m_openVRCommand, 1.0);
+    }
+#endif
+}
+
 void
-VTKViewer::setActiveScene(std::shared_ptr<Scene>scene)
+VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
 {
     // If already current scene
     if (scene == m_activeScene)
@@ -70,8 +113,9 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene>scene)
     }
 }
 
+
 void
-VTKViewer::setRenderingMode(Renderer::Mode mode)
+VTKViewer::setRenderingMode(const Renderer::Mode mode)
 {
     if (!m_activeScene)
     {
@@ -150,40 +194,6 @@ VTKViewer::getVtkRenderWindow() const
 {
     return m_vtkRenderWindow;
 }
-
-double
-VTKViewer::getTargetFrameRate() const
-{
-    auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
-    if(vtkInteractorStyle->m_targetMS == 0)
-    {
-        LOG(WARNING) << "VTKViewer::getTargetFrameRate warning: render target period is set to 0ms, "
-                     << "therefore not regulated by a framerate. Returning 0.";
-        return 0;
-    }
-    return 1000.0/vtkInteractorStyle->m_targetMS;
-}
-
-void
-VTKViewer::setTargetFrameRate(const double& fps)
-{
-    auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
-
-    if(fps < 0)
-    {
-        LOG(WARNING) << "VTKViewer::setTargetFrameRate error: framerate must be positive, "
-                     << "or equal to 0 to render as fast as possible.";
-        return;
-    }
-    if(fps == 0)
-    {
-        vtkInteractorStyle->m_targetMS = 0;
-        return;
-    }
-    vtkInteractorStyle->m_targetMS = 1000.0 / fps;
-    std::cout << "Target framerate: " << fps << " (" << vtkInteractorStyle->m_targetMS << " ms)" << std::endl;
-}
-
 
 std::shared_ptr<VTKScreenCaptureUtility>
 VTKViewer::getScreenCaptureUtility() const

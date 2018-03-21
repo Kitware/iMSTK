@@ -43,14 +43,9 @@ public:
     };
 
     ///
-    /// \brief Get renderer
-    ///
-    virtual std::shared_ptr<Renderer> getRenderer();
-
-    ///
     /// \brief Set rendering mode
     ///
-    virtual void setMode(Renderer::Mode mode, bool enableVR);
+    virtual void setMode(const Renderer::Mode mode, const bool enableVR);
 
     ///
     /// \brief Get rendering mode
@@ -60,7 +55,7 @@ public:
     ///
     /// \brief Update background colors
     ///
-    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false){};
+    virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
 protected:
     Renderer::Mode m_currentMode = Renderer::Mode::EMPTY;

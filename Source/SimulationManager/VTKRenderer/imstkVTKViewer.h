@@ -51,9 +51,9 @@ namespace imstk
 class SimulationManager;
 
 ///
-/// \class Viewer
+/// \class VTKViewer
 ///
-/// \brief Viewer
+/// \brief Subclasses viewer for the VTK rendering back-end
 ///
 class VTKViewer : public Viewer
 {
@@ -61,53 +61,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false)
-    {
-        m_enableVR = enableVR;
-        // init render window / interactor / command based
-        // depending on if we enable VR or not
-        if (!m_enableVR)
-        {
-            // Interactor style / commands
-            m_interactorStyle = std::make_shared<VTKInteractorStyle>();
-            auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
-            vtkInteractorStyle->m_simManager = manager;
-
-            // Interactor
-            auto vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-            vtkInteractor->SetInteractorStyle(vtkInteractorStyle.get());
-
-            // Render window
-            m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-            m_vtkRenderWindow->SetInteractor(vtkInteractor);
-            m_vtkRenderWindow->SetSize(1000, 800);
-
-            // Screen capture
-            m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
-        }
-#ifdef iMSTK_ENABLE_VR
-        else
-        {
-            // Interactor style / commands
-            m_openVRCommand = vtkSmartPointer<OpenVRCommand>::New();
-            m_openVRCommand->SetSimulationManager(manager);
-
-            // Interactor
-            auto vtkOpenVRinteractor = vtkSmartPointer<vtkOpenVRRenderWindowInteractor>::New();
-
-            // Add observer openVR command
-            m_vtkRenderWindow = vtkSmartPointer<vtkOpenVRRenderWindow>::New();
-            m_vtkRenderWindow->SetInteractor(vtkOpenVRinteractor);
-            vtkOpenVRinteractor->SetRenderWindow(m_vtkRenderWindow);
-            m_vtkRenderWindow->AddObserver(vtkCommand::StartEvent, m_openVRCommand, 1.0);
-        }
-#endif
-    }
+    VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false);
 
     ///
     /// \brief Destructor
     ///
-    virtual void setRenderingMode(Renderer::Mode mode);
+    void setRenderingMode(const Renderer::Mode mode);
 
     ///
     /// \brief Destructor
@@ -117,37 +76,27 @@ public:
     ///
     /// \brief Set scene to be rendered
     ///
-    virtual void setActiveScene(std::shared_ptr<Scene>scene);
+    void setActiveScene(std::shared_ptr<Scene> scene);
 
     ///
     /// \brief Get the current renderer mode
     ///
-    virtual const Renderer::Mode getRenderingMode();
+    const Renderer::Mode getRenderingMode();
 
     ///
     /// \brief Start rendering
     ///
-    virtual void startRenderingLoop();
+    void startRenderingLoop();
 
     ///
     /// \brief Terminate rendering
     ///
-    virtual void endRenderingLoop();
+    void endRenderingLoop();
 
     ///
     /// \brief Get pointer to the vtkRenderWindow rendering
     ///
-    vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
-
-    ///
-    /// \brief Get the target FPS for rendering
-    ///
-    double getTargetFrameRate() const;
-
-    ///
-    /// \brief Set the target FPS for rendering
-    ///
-    void setTargetFrameRate(const double& fps);
+    vtkSmartPointer<vtkRenderWindow> getVtkRenderWindow() const;
 
     ///
     /// \brief Access screen shot utility
@@ -158,7 +107,7 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
+    void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
 protected:
 
@@ -171,4 +120,4 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkViewer_h
+#endif // ifndef imstkVTKViewer_h

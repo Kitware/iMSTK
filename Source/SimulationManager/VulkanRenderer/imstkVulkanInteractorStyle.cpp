@@ -78,7 +78,7 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
         // Launch simulation if inactive
         if (status == SimulationStatus::INACTIVE)
         {
-            m_simManager->launchSimulation();
+            m_simManager->startSimulation(SimulationStatus::RUNNING);
         }
     }
     else if (status != SimulationStatus::INACTIVE &&
