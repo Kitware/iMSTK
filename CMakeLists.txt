@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.9)
 project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
