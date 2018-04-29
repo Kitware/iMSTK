@@ -17,6 +17,8 @@ find_library(GoogleMock_LIBRARY
   NAMES
     libgmock
     gmock
+    libgmockd
+    gmockd
   )
 mark_as_advanced(GoogleMock_LIBRARY)
 list(APPEND GoogleMock_LIBRARIES ${GoogleMock_LIBRARY})
@@ -25,6 +27,8 @@ find_library(GoogleMock_main_LIBRARY
   NAMES
     libgmock_main
     gmock_main
+    libgmock_maind
+    gmock_maind
   )
 mark_as_advanced(GoogleMock_main_LIBRARY)
 list(APPEND GoogleMock_LIBRARIES ${GoogleMock_main_LIBRARY})
