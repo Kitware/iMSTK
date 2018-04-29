@@ -17,6 +17,8 @@ find_library(GoogleTest_LIBRARY
   NAMES
     libgtest
     gtest
+    libgtestd
+    gtestd
   )
 mark_as_advanced(GoogleTest_LIBRARY)
 list(APPEND GoogleTest_LIBRARIES ${GoogleTest_LIBRARY})
@@ -25,6 +27,8 @@ find_library(GoogleTest_main_LIBRARY
   NAMES
     libgtest_main
     gtest_main
+    libgtest_maind
+    gtest_maind
   )
 mark_as_advanced(GoogleTest_main_LIBRARY)
 list(APPEND GoogleTest_LIBRARIES ${GoogleTest_main_LIBRARY})
