@@ -218,6 +218,17 @@ PointSet::getPointDataArray(const std::string& arrayName) const
     return &(it->second);
 }
 
+bool
+PointSet::hasPointDataArray(const std::string& arrayName) const
+{
+    auto it = m_pointDataMap.find(arrayName);
+    if (it == m_pointDataMap.end())
+    {
+        return false;
+    }
+    return true;
+}
+
 size_t
 PointSet::getNumVertices() const
 {

@@ -47,6 +47,7 @@ void main(void)
     vec4 tangent = normalize(locals.transform * vec4(normalize(vertexTangent), 0.0));
 
     vec4 bitangent = vec4(cross(normal.xyz, tangent.xyz), 0.0);
+    tangent = vec4(cross(bitangent.xyz, normal.xyz), 0.0);
 
     vertex.TBN = mat3(tangent.xyz, bitangent.xyz, normal.xyz);
 
