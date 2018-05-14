@@ -39,6 +39,8 @@ LineMesh::initialize(const StdVectorOfVec3d& vertices,
 void
 LineMesh::clear()
 {
+    m_lines.clear();
+    m_vertexColors.clear();
 }
 
 void

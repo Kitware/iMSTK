@@ -82,7 +82,8 @@ public:
     void backfaceCullingOff();
 
     ///
-    /// \brief Get/Set the diffuse color
+    /// \brief Get/Set the color. This affects the diffuse color directly, but
+    /// it affects the specular color in the case of metals.
     ///
     const Color& getColor() const;
     void setColor(const Color color);
