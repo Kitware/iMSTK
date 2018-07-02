@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Sandbox)
+project(Example-ScreenshotTest)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} ScreenshotTest.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

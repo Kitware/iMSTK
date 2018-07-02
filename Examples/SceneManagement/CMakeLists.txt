@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Sandbox)
+project(Example-SceneManagement)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} SceneManagement.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

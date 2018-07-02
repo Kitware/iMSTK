@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Sandbox)
+project(Example-PBDFluidsBenchmarking)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} PBDFluidsBenchmarkingExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

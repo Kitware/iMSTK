@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Sandbox)
+project(Example-ObjectController)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} ObjectController.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
