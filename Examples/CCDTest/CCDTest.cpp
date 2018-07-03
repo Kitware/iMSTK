@@ -91,6 +91,6 @@ void testMeshCCD()
 int main()
 {
     testMeshCCD();
-    
+
     return 0;
 }

@@ -70,8 +70,7 @@ void testExtractSurfaceMesh()
 
 int main()
 {
-    
     testExtractSurfaceMesh();
-    
+
     return 0;
 }

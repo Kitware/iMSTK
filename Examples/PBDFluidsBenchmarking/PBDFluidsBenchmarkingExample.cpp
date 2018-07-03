@@ -194,8 +194,7 @@ void testPbdFluidBenchmarking()
 
 int main()
 {
-    
     testPbdFluidBenchmarking();
-    
+
     return 0;
 }

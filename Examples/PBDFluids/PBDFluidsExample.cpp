@@ -248,7 +248,7 @@ void testPbdFluid()
 }
 
 int main()
-{    
+{
     testPbdFluid();
     return 0;
 }

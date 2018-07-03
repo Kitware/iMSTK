@@ -89,6 +89,6 @@ void testCameraController()
 int main()
 {
     testCameraController();
-    
+
     return 0;
 }

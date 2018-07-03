@@ -113,7 +113,7 @@ void testVirtualCoupling()
 
 int main()
 {
-   testVirtualCoupling();
-    
+    testVirtualCoupling();
+
     return 0;
 }

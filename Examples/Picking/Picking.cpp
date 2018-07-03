@@ -168,7 +168,7 @@ void testPicking()
 }
 
 int main()
-{   
+{
     testPicking();
     return 0;
 }

@@ -78,7 +78,7 @@ void testObjectController()
 }
 
 int main()
-{    
+{
     testObjectController();
     return 0;
 }

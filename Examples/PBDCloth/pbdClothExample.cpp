@@ -128,7 +128,6 @@ void testPbdCloth()
 
 int main()
 {
-
     testPbdCloth();
 
     return 0;

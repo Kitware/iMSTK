@@ -64,7 +64,7 @@ void testReadMesh()
 }
 
 int main()
-{    
+{
     testReadMesh();
     return 0;
 }

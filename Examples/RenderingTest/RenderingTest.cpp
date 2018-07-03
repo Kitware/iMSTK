@@ -100,5 +100,5 @@ void testRendering()
 int main()
 {
     testRendering();
-     return 0;
+    return 0;
 }

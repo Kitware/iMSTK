@@ -80,8 +80,7 @@ void testLapToolController()
 
 int main()
 {
-    
     testLapToolController();
-   
+
     return 0;
 }

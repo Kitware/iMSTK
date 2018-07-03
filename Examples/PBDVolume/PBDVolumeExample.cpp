@@ -76,7 +76,7 @@ void testPbdVolume()
         /*TimeStep*/ 0.01,
         /*FixedPoint*/ "51 127 178",
         /*NumberOfIterationInConstraintSolver*/ 5
-    );
+        );
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);

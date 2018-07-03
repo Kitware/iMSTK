@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkMath.h"
-#include "imstkLogUtility.h"=
+#include "imstkLogUtility.h"
 
 #ifdef iMSTK_AUDIO_ENABLED
 

@@ -103,6 +103,6 @@ void testScreenShotUtility()
 int main()
 {
     testScreenShotUtility();
-    
+
     return 0;
 }

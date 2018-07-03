@@ -123,6 +123,6 @@ void testBoneDrilling()
 
 int main()
 {
-    testBoneDrilling();   
+    testBoneDrilling();
     return 0;
 }
