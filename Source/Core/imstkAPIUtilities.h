@@ -39,6 +39,7 @@
 
 // logger
 #include "g3log/g3log.hpp"
+#include "imstkTimer.h"
 
 namespace imstk
 {

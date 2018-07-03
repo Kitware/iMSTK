@@ -19,56 +19,11 @@
 
 =========================================================================*/
 
-#include "imstkMath.h"
-#include "imstkTimer.h"
 #include "imstkSimulationManager.h"
-
-// Objects
-#include "imstkForceModelConfig.h"
-#include "imstkFEMDeformableBodyModel.h"
-#include "imstkVirtualCouplingPBDObject.h"
-#include "imstkDynamicObject.h"
-#include "imstkDeformableObject.h"
-#include "imstkPbdObject.h"
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkCamera.h"
-
-// Solvers
-#include "imstkNonlinearSystem.h"
-#include "imstkNewtonSolver.h"
-#include "imstkConjugateGradient.h"
-#include "imstkPbdSolver.h"
-#include "imstkGaussSeidel.h"
-#include "imstkJacobi.h"
-#include "imstkSOR.h"
-
-// Geometry
-#include "imstkPlane.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
-#include "imstkLineMesh.h"
-
-// Maps
-#include "imstkTetraTriangleMap.h"
-#include "imstkIsometricMap.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdSolver.h"
 #include "imstkOneToOneMap.h"
-
-// Collisions
-#include "imstkInteractionPair.h"
-#include "imstkPointSetToPlaneCD.h"
-#include "imstkPointSetToSphereCD.h"
-#include "imstkVirtualCouplingCH.h"
-#include "imstkPointSetToSpherePickingCD.h"
-#include "imstkPickingCH.h"
-#include "imstkBoneDrillingCH.h"
-
-// logger
-#include "g3log/g3log.hpp"
-#include "imstkLogger.h"
-
-// imstk utilities
 #include "imstkAPIUtilities.h"
 
 using namespace imstk;

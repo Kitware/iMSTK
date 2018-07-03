@@ -19,30 +19,9 @@
 
 =========================================================================*/
 
-#include "imstkMath.h"
-#include "imstkTimer.h"
 #include "imstkSimulationManager.h"
-
-// Objects
 #include "imstkPbdObject.h"
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkCamera.h"
-
-// Solvers
 #include "imstkPbdSolver.h"
-
-// Geometry
-#include "imstkSurfaceMesh.h"
-
-// Maps
-#include "imstkOneToOneMap.h"
-
-// logger
-#include "g3log/g3log.hpp"
-#include "imstkLogger.h"
-
-// imstk utilities
 #include "imstkAPIUtilities.h"
 
 using namespace imstk;
