@@ -34,14 +34,6 @@ else()
   SimulationManager
   SFML) 
 endif()
-
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST    
-    asianDragon/,REGEX:.*)
-
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
   
 #-----------------------------------------------------------------------------
 # Shaders

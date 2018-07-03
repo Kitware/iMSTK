@@ -39,28 +39,7 @@ endif()
 # Associate external data
 #-----------------------------------------------------------------------------
 list(APPEND FILE_LIST
-    artery/,REGEX:.*
-    asianDragon/,REGEX:.*
-    biceps_zones/,REGEX:.*
-    cube/,REGEX:*
-    cylinder/,REGEX:.*
-    decals/,REGEX:.*
-    head/,REGEX:.*
-    human/,REGEX:.*
-    IBL/,REGEX:.*
-    laptool/,REGEX:.*
-    liver/,REGEX:.*
-    nidus/,REGEX:.*
-    octopus/,REGEX:.*
-    oneTet/,REGEX:.*
-    spheres/,REGEX:.*
-    spring/,REGEX:.*
-    tetBeads/,REGEX:.*
-    sound/,REGEX:.*
-    textured_organs/,REGEX:.*
-    textured_organs/texture_set_1/,REGEX:.*
-    textured_organs/texture_set_2/,REGEX:.*
-    textures/cubemaps/,REGEX:.*)
+    head/,REGEX:.*)
 
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
