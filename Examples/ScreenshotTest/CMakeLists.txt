@@ -31,8 +31,7 @@ if(UNIX)
   SimulationManager)     
 else()
   target_link_libraries(${PROJECT_NAME}
-  SimulationManager
-  SFML) 
+  SimulationManager) 
 endif()
 
 #-----------------------------------------------------------------------------
