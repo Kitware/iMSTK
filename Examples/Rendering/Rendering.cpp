@@ -24,7 +24,7 @@
 
 using namespace imstk;
 
-void sampleRendering()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -95,10 +95,5 @@ void sampleRendering()
     viewer->enableFullscreen();
 #endif
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    sampleRendering();
     return 0;
 }

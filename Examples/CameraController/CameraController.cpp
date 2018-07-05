@@ -34,7 +34,7 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void doCameraController()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -72,7 +72,7 @@ void doCameraController()
     //camController->setTranslationScaling(100);
     //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
     camController->setInversionFlags(CameraController::InvertFlag::rotY |
-                                     CameraController::InvertFlag::rotZ);
+        CameraController::InvertFlag::rotZ);
 #endif
 
     // Light
@@ -84,11 +84,6 @@ void doCameraController()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    doCameraController();
 
     return 0;
 }

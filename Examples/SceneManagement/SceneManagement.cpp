@@ -23,7 +23,7 @@
 
 using namespace imstk;
 
-void sampleScenesManagement()
+int main()
 {
     // THIS TESTS NEEDS TO DISABLE STANDALONE VIEWER RENDERING
 
@@ -67,10 +67,6 @@ void sampleScenesManagement()
 
     // Quit
     while (sdk->getStatus() != SimulationStatus::INACTIVE) {}
-}
 
-int main()
-{
-    sampleScenesManagement();
     return 0;
 }

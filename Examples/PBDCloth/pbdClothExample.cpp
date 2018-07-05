@@ -26,8 +26,10 @@
 
 using namespace imstk;
 
-void pbdCloth()
+int main()
 {
+
+    
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDCloth");
 
@@ -124,11 +126,7 @@ void pbdCloth()
     // Start
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    pbdCloth();
+    
 
     return 0;
 }

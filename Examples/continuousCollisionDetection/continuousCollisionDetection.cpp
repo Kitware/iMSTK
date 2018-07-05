@@ -25,7 +25,7 @@
 
 using namespace imstk;
 
-void doMeshCCD()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -69,9 +69,9 @@ void doMeshCCD()
 
     // Rotate the obj1 every frame
     auto rotateFunc = [&](Module* module)
-                      {
-                          mesh1->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
-                      };
+    {
+        mesh1->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+    };
     sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Light
@@ -86,11 +86,6 @@ void doMeshCCD()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    doMeshCCD();
 
     return 0;
 }

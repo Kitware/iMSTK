@@ -35,7 +35,7 @@
 
 using namespace imstk;
 
-void testDeformableBody()
+int main()
 {
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -50,7 +50,7 @@ void testDeformableBody()
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
-        return;
+        return 1;
     }
 
     // c. Extract the surface mesh
@@ -59,7 +59,7 @@ void testDeformableBody()
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-        return;
+        return 1;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
@@ -164,10 +164,5 @@ void testDeformableBody()
     // Run the simulation
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    testDeformableBody();
     return 0;
 }

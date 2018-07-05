@@ -25,7 +25,7 @@
 
 using namespace imstk;
 
-void sampleGraph()
+int main()
 {
     Graph g1(5);
     g1.addEdge(0, 1);
@@ -53,7 +53,7 @@ void sampleGraph()
     if (!tetMesh)
     {
         std::cout << "Could not read mesh from file." << std::endl;
-        return;
+        return 1;
     }
     else
     {
@@ -61,7 +61,7 @@ void sampleGraph()
         if (!volMesh)
         {
             LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-            return;
+            return 1;
         }
         auto colorsGVMesh = volMesh->getMeshGraph().doGreedyColoring(true);
 
@@ -73,10 +73,5 @@ void sampleGraph()
 
     std::cout << "Press any key to exit!" << std::endl;
     getchar();
-}
-
-int main()
-{
-    sampleGraph();
     return 0;
 }

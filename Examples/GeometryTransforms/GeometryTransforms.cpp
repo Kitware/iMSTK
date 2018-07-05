@@ -28,7 +28,7 @@
 
 using namespace imstk;
 
-void geometryTransforms()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -43,7 +43,7 @@ void geometryTransforms()
     auto planeGeom = std::make_shared<Plane>();
     planeGeom->scale(80, Geometry::TransformType::ConcatenateToTransform);
     planeGeom->translate(0, -20, 0, Geometry::TransformType::ConcatenateToTransform);
-    planeGeom->rotate(Vec3d(0, 1., 0), PI/4, Geometry::TransformType::ConcatenateToTransform);
+    planeGeom->rotate(Vec3d(0, 1., 0), PI / 4, Geometry::TransformType::ConcatenateToTransform);
 
     auto planeObj = std::make_shared<VisualObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
@@ -73,9 +73,9 @@ void geometryTransforms()
     // Rotate the dragon every frame
     auto rotateFunc =
         [&surfaceMesh](Module* module)
-        {
-            surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
-        };
+    {
+        surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+    };
     sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration
@@ -92,10 +92,5 @@ void geometryTransforms()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
-}
-
-int main()
-{
-    geometryTransforms();
     return 0;
 }

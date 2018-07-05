@@ -32,7 +32,7 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void sampleVirtualCoupling()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -84,9 +84,9 @@ void sampleVirtualCoupling()
     // Create a collision graph
     auto graph = scene->getCollisionGraph();
     auto pair = graph->addInteractionPair(planeObj, obj,
-                                          CollisionDetection::Type::UnidirectionalPlaneToSphere,
-                                          CollisionHandling::Type::None,
-                                          CollisionHandling::Type::VirtualCoupling);
+        CollisionDetection::Type::UnidirectionalPlaneToSphere,
+        CollisionHandling::Type::None,
+        CollisionHandling::Type::VirtualCoupling);
 
     // Customize collision handling algorithm
     auto colHandlingAlgo = std::dynamic_pointer_cast<VirtualCouplingCH>(pair->getCollisionHandlingB());
@@ -109,11 +109,6 @@ void sampleVirtualCoupling()
     //Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
-}
-
-int main()
-{
-    sampleVirtualCoupling();
 
     return 0;
 }

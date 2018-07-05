@@ -25,7 +25,7 @@
 
 using namespace imstk;
 
-void renderDecals()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -78,11 +78,6 @@ void renderDecals()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    renderDecals();
 
     return 0;
 }

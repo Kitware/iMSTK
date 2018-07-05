@@ -23,7 +23,7 @@
 
 using namespace imstk;
 
-void doVectorPlotting()
+int main()
 {
     Vectord a;
     a.resize(100);
@@ -40,10 +40,5 @@ void doVectorPlotting()
     plotterutils::writePlotterVecVsVecMatPlotlib(a, b, "plotXvsY.py");
 
     getchar();
-}
-
-int main()
-{
-    doVectorPlotting();
     return 0;
 }

@@ -28,7 +28,7 @@
 
 using namespace imstk;
 
-void pbdFluid()
+int main()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDFluid");
@@ -40,7 +40,7 @@ void pbdFluid()
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
-        return;
+        return 1;
     }
 
     auto fluidMesh = std::make_shared<PointSet>();
@@ -124,7 +124,7 @@ void pbdFluid()
             const double z = (double)dz*j;
             const double x = (double)dx1*i;
             vertList[(nPointPerSide)+i*nCols + j] = Vec3d(x - 20, z - 10.0, 20);
-            vertList[(nPointPerSide*2)+i*nCols + j] = Vec3d(x - 20, z - 10.0, -20);
+            vertList[(nPointPerSide * 2) + i*nCols + j] = Vec3d(x - 20, z - 10.0, -20);
         }
     }
 
@@ -138,8 +138,8 @@ void pbdFluid()
             tri[1] = { { (nPointPerSide)+(i + 1)*nCols + j + 1, (nPointPerSide)+(i + 1)*nCols + j, (nPointPerSide)+i*nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
-            tri[0] = { { (nPointPerSide*2)+i*nCols + j, (nPointPerSide*2)+i*nCols + j + 1, (nPointPerSide*2)+(i + 1)*nCols + j } };
-            tri[1] = { { (nPointPerSide*2)+(i + 1)*nCols + j + 1, (nPointPerSide*2)+(i + 1)*nCols + j, (nPointPerSide*2)+i*nCols + j + 1 } };
+            tri[0] = { { (nPointPerSide * 2) + i*nCols + j, (nPointPerSide * 2) + i*nCols + j + 1, (nPointPerSide * 2) + (i + 1)*nCols + j } };
+            tri[1] = { { (nPointPerSide * 2) + (i + 1)*nCols + j + 1, (nPointPerSide * 2) + (i + 1)*nCols + j, (nPointPerSide * 2) + i*nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -158,8 +158,8 @@ void pbdFluid()
         {
             const double z = (double)dz1*j;
             const double y = (double)dy1*i;
-            vertList[(nPointPerSide * 3)+i*nCols + j] = Vec3d(20, z - 10.0, y-20);
-            vertList[(nPointPerSide * 4) + i*nCols + j] = Vec3d(-20, z - 10.0, y-20);
+            vertList[(nPointPerSide * 3) + i*nCols + j] = Vec3d(20, z - 10.0, y - 20);
+            vertList[(nPointPerSide * 4) + i*nCols + j] = Vec3d(-20, z - 10.0, y - 20);
         }
     }
 
@@ -169,8 +169,8 @@ void pbdFluid()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { (nPointPerSide * 3)+i*nCols + j, (nPointPerSide * 3)+i*nCols + j + 1, (nPointPerSide * 3)+(i + 1)*nCols + j } };
-            tri[1] = { { (nPointPerSide * 3)+(i + 1)*nCols + j + 1, (nPointPerSide * 3)+(i + 1)*nCols + j, (nPointPerSide * 3)+i*nCols + j + 1 } };
+            tri[0] = { { (nPointPerSide * 3) + i*nCols + j, (nPointPerSide * 3) + i*nCols + j + 1, (nPointPerSide * 3) + (i + 1)*nCols + j } };
+            tri[1] = { { (nPointPerSide * 3) + (i + 1)*nCols + j + 1, (nPointPerSide * 3) + (i + 1)*nCols + j, (nPointPerSide * 3) + i*nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
             tri[0] = { { (nPointPerSide * 4) + i*nCols + j, (nPointPerSide * 4) + i*nCols + j + 1, (nPointPerSide * 4) + (i + 1)*nCols + j } };
@@ -245,10 +245,5 @@ void pbdFluid()
 
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    pbdFluid();
     return 0;
 }

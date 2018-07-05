@@ -38,7 +38,7 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void pickingSoftObject()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -59,14 +59,14 @@ void pickingSoftObject()
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
-        return;
+        return 1;
     }
     // Extract the surface mesh
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-        return;
+        return 1;
     }
     auto surfMesh = std::make_shared<SurfaceMesh>();
     volTetMesh->extractSurfaceMesh(surfMesh);
@@ -165,10 +165,5 @@ void pickingSoftObject()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    pickingSoftObject();
     return 0;
 }

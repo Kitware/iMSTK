@@ -28,7 +28,7 @@
 
 using namespace imstk;
 
-void pbdCollision()
+int main()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PbdCollision");
@@ -40,7 +40,7 @@ void pbdCollision()
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
-        return;
+        return 1;
     }
 
     auto surfMesh = std::make_shared<SurfaceMesh>();
@@ -49,7 +49,7 @@ void pbdCollision()
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-        return;
+        return 1;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
@@ -188,7 +188,7 @@ void pbdCollision()
         if (!tetMesh1)
         {
             LOG(WARNING) << "Could not read mesh from file.";
-            return;
+            return 1;
         }
 
         auto surfMesh1 = std::make_shared<SurfaceMesh>();
@@ -197,7 +197,7 @@ void pbdCollision()
         if (!volTetMesh1)
         {
             LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-            return;
+            return 1;
         }
 
         auto vs = volTetMesh1->getInitialVertexPositions();
@@ -349,10 +349,6 @@ void pbdCollision()
 
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
 
-int main()
-{
-    pbdCollision();
     return 0;
 }

@@ -30,7 +30,7 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void objectController()
+int main()
 {
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
@@ -75,10 +75,5 @@ void objectController()
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
 #endif
-}
-
-int main()
-{
-    objectController();
     return 0;
 }

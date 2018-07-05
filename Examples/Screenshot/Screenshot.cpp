@@ -26,8 +26,7 @@
 
 using namespace imstk;
 
-
-void screenShotUtility()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -98,11 +97,5 @@ void screenShotUtility()
     // Run
     sdk->setActiveScene(sceneTest);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    screenShotUtility();
-
     return 0;
 }

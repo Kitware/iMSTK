@@ -28,7 +28,7 @@
 
 using namespace imstk;
 
-void pbdVolume()
+int main()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDVolume");
@@ -39,7 +39,7 @@ void pbdVolume()
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
-        return;
+        return 1;
     }
 
     // c. Extract the surface mesh
@@ -48,7 +48,7 @@ void pbdVolume()
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-        return;
+        return 1 ;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
@@ -76,7 +76,7 @@ void pbdVolume()
         /*TimeStep*/ 0.01,
         /*FixedPoint*/ "51 127 178",
         /*NumberOfIterationInConstraintSolver*/ 5
-        );
+    );
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
@@ -111,11 +111,5 @@ void pbdVolume()
     sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
     sdk->startSimulation();
-}
-
-
-int main()
-{
-    pbdVolume();
     return 0;
 }

@@ -24,7 +24,7 @@
 
 using namespace imstk;
 
-void sampleViewer()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -68,10 +68,5 @@ void sampleViewer()
     // Run
     sdk->setActiveScene(sceneTest);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    sampleViewer();
     return 0;
 }

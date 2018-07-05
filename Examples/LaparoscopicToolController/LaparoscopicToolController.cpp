@@ -31,6 +31,11 @@ using namespace imstk;
 
 void lapToolController()
 {
+
+}
+
+int main()
+{
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -76,11 +81,6 @@ void lapToolController()
     sdk->startSimulation(SimulationStatus::PAUSED);
 
 #endif
-}
-
-int main()
-{
-    lapToolController();
 
     return 0;
 }

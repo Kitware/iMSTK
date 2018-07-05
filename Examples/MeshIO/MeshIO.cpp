@@ -25,7 +25,7 @@
 
 using namespace imstk;
 
-void readMesh()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -61,10 +61,5 @@ void readMesh()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
-
-int main()
-{
-    readMesh();
     return 0;
 }
