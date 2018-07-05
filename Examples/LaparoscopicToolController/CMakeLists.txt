@@ -15,28 +15,31 @@
 #  limitations under the License.
 #
 ###########################################################################
+if(iMSTK_USE_OMNI)
 
-project(Example-LapToolController)
+    project(Example-LapToolController)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} LaparoscopicToolController.cpp)
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    add_executable(${PROJECT_NAME} LaparoscopicToolController.cpp)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-if(UNIX)
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager)     
-else()
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager) 
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    if(UNIX)
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager)     
+    else()
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager) 
+    endif()
+      
+    #-----------------------------------------------------------------------------
+    # Associate external data
+    #-----------------------------------------------------------------------------
+    list(APPEND FILE_LIST
+        laptool/,REGEX:.*)
+    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
 endif()
-  
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    laptool/,REGEX:.*)
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})

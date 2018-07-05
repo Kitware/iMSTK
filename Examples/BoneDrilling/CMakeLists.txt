@@ -16,28 +16,32 @@
 #
 ###########################################################################
 
-project(Example-BoneDrilling)
+if(iMSTK_USE_OMNI)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} BoneDrilling.cpp)
+    project(Example-BoneDrilling)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-if(UNIX)
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager)     
-else()
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager
-  SFML) 
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    add_executable(${PROJECT_NAME} BoneDrilling.cpp)
+
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    if(UNIX)
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager)     
+    else()
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager
+      SFML) 
+    endif()
+      
+    #-----------------------------------------------------------------------------
+    # Associate external data
+    #-----------------------------------------------------------------------------
+    list(APPEND FILE_LIST
+        asianDragon/,REGEX:.*)
+    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
 endif()
-  
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    asianDragon/,REGEX:.*)
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})

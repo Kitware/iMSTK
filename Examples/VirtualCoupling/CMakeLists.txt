@@ -15,21 +15,24 @@
 #  limitations under the License.
 #
 ###########################################################################
+if(iMSTK_USE_OMNI)
 
-project(Example-VirtualCoupling)
+    project(Example-VirtualCoupling)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} VirtualCoupling.cpp)
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    add_executable(${PROJECT_NAME} VirtualCoupling.cpp)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-if(UNIX)
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager)     
-else()
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager) 
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    if(UNIX)
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager)     
+    else()
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager) 
+    endif()
+
 endif()

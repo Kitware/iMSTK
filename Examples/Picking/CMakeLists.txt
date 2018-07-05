@@ -16,27 +16,31 @@
 #
 ###########################################################################
 
-project(Example-Picking)
+if(iMSTK_USE_OMNI)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} Picking.cpp)
+    project(Example-Picking)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-if(UNIX)
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager)     
-else()
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager) 
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    add_executable(${PROJECT_NAME} Picking.cpp)
+
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    if(UNIX)
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager)     
+    else()
+      target_link_libraries(${PROJECT_NAME}
+      SimulationManager) 
+    endif()
+      
+    #-----------------------------------------------------------------------------
+    # Associate external data
+    #-----------------------------------------------------------------------------
+    list(APPEND FILE_LIST
+        oneTet/,REGEX:.*)
+    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
 endif()
-  
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    oneTet/,REGEX:.*)
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
