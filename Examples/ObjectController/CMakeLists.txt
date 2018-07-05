@@ -27,12 +27,6 @@ if(iMSTK_USE_OMNI)
     #-----------------------------------------------------------------------------
     # Link libraries to executable
     #-----------------------------------------------------------------------------
-    if(UNIX)
-      target_link_libraries(${PROJECT_NAME}
-      SimulationManager)     
-    else()
-      target_link_libraries(${PROJECT_NAME}
-      SimulationManager) 
-    endif()
+    target_link_libraries(${PROJECT_NAME} SimulationManager)
 
 endif()

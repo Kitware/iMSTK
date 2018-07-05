@@ -26,10 +26,4 @@ add_executable(${PROJECT_NAME} Viewer.cpp)
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
-if(UNIX)
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager)     
-else()
-  target_link_libraries(${PROJECT_NAME}
-  SimulationManager) 
-endif()
+target_link_libraries(${PROJECT_NAME} SimulationManager)
