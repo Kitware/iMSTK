@@ -48,3 +48,10 @@ listOfSubDir(subDirs ${CMAKE_CURRENT_SOURCE_DIR})
 foreach(subdir ${subDirs})
   add_subdirectory(${subdir})
 endforeach()
+
+#-----------------------------------------------------------------------------
+# Shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
+imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
