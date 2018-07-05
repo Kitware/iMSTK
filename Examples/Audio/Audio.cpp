@@ -31,7 +31,6 @@
 
 using namespace imstk;
 
-// Example modified from SFML/Examples
 void playSound(const std::string& filename)
 {
 #ifdef iMSTK_AUDIO_ENABLED
@@ -78,7 +77,6 @@ void playSound(const std::string& filename)
 #endif
 }
 
-// Example modified from SFML/Examples
 void playMusic(const std::string& filename)
 {
 #ifdef iMSTK_AUDIO_ENABLED
@@ -115,6 +113,10 @@ void playMusic(const std::string& filename)
 #endif
 }
 
+///
+/// \brief This example demonstrates the audio feature in imstk.
+/// NOTE: Example modified from SFML/Examples
+///
 void main()
 {
     // Initialize g3logger

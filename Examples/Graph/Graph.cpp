@@ -25,6 +25,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the imstk graph usage
+///
 int main()
 {
     Graph g1(5);

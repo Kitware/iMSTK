@@ -25,6 +25,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example shows how to read .msh and .veg files
+///
 void MshAndVegaIO()
 {
     // SDK and Scene

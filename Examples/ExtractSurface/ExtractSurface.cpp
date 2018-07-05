@@ -25,6 +25,10 @@
 
 using namespace imstk;
 
+///
+/// \brief This example shows how to extract the triangular surface
+/// mesh from a volumetric tetrahedral mesh
+///
 void extractSurfaceMesh()
 {
     auto sdk = std::make_shared<SimulationManager>();

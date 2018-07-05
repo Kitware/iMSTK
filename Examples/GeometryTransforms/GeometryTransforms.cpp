@@ -28,6 +28,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the geometry transforms in imstk
+///
 int main()
 {
     // SDK and Scene
@@ -73,9 +76,9 @@ int main()
     // Rotate the dragon every frame
     auto rotateFunc =
         [&surfaceMesh](Module* module)
-    {
-        surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
-    };
+        {
+            surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+        };
     sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration

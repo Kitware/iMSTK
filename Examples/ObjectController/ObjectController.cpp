@@ -30,6 +30,10 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates controlling the object
+/// using external device. NOTE: Requires GeoMagic Touch device
+///
 int main()
 {
 #ifdef iMSTK_USE_OPENHAPTICS

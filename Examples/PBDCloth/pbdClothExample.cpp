@@ -26,10 +26,12 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the cloth simulation
+/// using Position based dynamics
+///
 int main()
 {
-
-    
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDCloth");
 
@@ -126,7 +128,7 @@ int main()
     // Start
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-    
+
 
     return 0;
 }

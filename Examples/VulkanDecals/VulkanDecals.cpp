@@ -25,6 +25,10 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates decal rendering feature.
+/// NOTE: Requires enabling Vulkan rendeing backend
+///
 int main()
 {
     // SDK and Scene

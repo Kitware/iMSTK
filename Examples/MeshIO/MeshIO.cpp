@@ -25,6 +25,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates I/O of the mesh
+///
 int main()
 {
     // SDK and Scene

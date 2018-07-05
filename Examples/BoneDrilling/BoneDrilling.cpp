@@ -50,6 +50,10 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates bone drilling.
+/// NOTE: Requires GeoMagic Touch device
+///
 int main()
 {
     // SDK and Scene

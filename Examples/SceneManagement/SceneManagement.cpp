@@ -23,6 +23,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates scene management features in imstk
+///
 int main()
 {
     // THIS TESTS NEEDS TO DISABLE STANDALONE VIEWER RENDERING

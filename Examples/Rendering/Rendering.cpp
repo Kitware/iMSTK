@@ -24,6 +24,10 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates configuring the rendered
+/// objects, lights etc.
+///
 int main()
 {
     // SDK and Scene

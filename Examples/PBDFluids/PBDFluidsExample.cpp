@@ -28,6 +28,10 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the fluids simulation
+/// using Position based dynamics
+///
 int main()
 {
     auto sdk = std::make_shared<SimulationManager>();

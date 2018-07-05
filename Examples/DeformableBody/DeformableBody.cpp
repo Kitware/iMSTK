@@ -35,6 +35,10 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the soft body simulation
+/// using FEM
+///
 int main()
 {
     // a. SDK and Scene

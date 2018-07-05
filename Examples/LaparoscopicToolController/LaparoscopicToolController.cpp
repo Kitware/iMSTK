@@ -29,11 +29,11 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void lapToolController()
-{
-
-}
-
+///
+/// \brief This example demonstrates controlling laparoscopic
+/// tool with two jaws with an external device.
+/// NOTE: Requires GeoMagic Touch device
+///
 int main()
 {
 #ifdef iMSTK_USE_OPENHAPTICS

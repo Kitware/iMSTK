@@ -28,6 +28,10 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the soft body simulation
+/// using Position based dynamics
+///
 int main()
 {
     auto sdk = std::make_shared<SimulationManager>();
@@ -48,7 +52,7 @@ int main()
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-        return 1 ;
+        return 1;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
@@ -76,7 +80,7 @@ int main()
         /*TimeStep*/ 0.01,
         /*FixedPoint*/ "51 127 178",
         /*NumberOfIterationInConstraintSolver*/ 5
-    );
+        );
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);

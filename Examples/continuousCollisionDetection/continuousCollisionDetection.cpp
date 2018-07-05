@@ -25,6 +25,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates the continuous collision detection feature
+///
 int main()
 {
     // SDK and Scene
@@ -69,9 +72,9 @@ int main()
 
     // Rotate the obj1 every frame
     auto rotateFunc = [&](Module* module)
-    {
-        mesh1->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
-    };
+                      {
+                          mesh1->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+                      };
     sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Light

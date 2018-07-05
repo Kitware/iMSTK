@@ -26,6 +26,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example demonstrates how to capture the screenshot
+///
 int main()
 {
     // SDK and Scene

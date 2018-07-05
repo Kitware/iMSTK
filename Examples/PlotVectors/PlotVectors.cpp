@@ -23,6 +23,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example show how to write plotting code for matlab and python
+///
 int main()
 {
     Vectord a;
