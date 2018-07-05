@@ -23,7 +23,7 @@
 
 using namespace imstk;
 
-void testScenesManagement()
+void sampleScenesManagement()
 {
     // THIS TESTS NEEDS TO DISABLE STANDALONE VIEWER RENDERING
 
@@ -71,6 +71,6 @@ void testScenesManagement()
 
 int main()
 {
-    testScenesManagement();
+    sampleScenesManagement();
     return 0;
 }

@@ -50,11 +50,11 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void testBoneDrilling()
+void doBoneDrilling()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("BoneDrillingTest");
+    auto scene = sdk->createNewScene("BoneDrilling");
 
     // Add virtual coupling object in the scene.
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -123,6 +123,6 @@ void testBoneDrilling()
 
 int main()
 {
-    testBoneDrilling();
+    doBoneDrilling();
     return 0;
 }

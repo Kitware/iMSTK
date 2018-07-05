@@ -34,11 +34,11 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void testCameraController()
+void doCameraController()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("CameraControllerTest");
+    auto scene = sdk->createNewScene("CameraController");
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
@@ -88,7 +88,7 @@ void testCameraController()
 
 int main()
 {
-    testCameraController();
+    doCameraController();
 
     return 0;
 }

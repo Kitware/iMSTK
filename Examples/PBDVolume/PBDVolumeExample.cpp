@@ -28,10 +28,10 @@
 
 using namespace imstk;
 
-void testPbdVolume()
+void pbdVolume()
 {
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDVolumeTest");
+    auto scene = sdk->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
@@ -116,6 +116,6 @@ void testPbdVolume()
 
 int main()
 {
-    testPbdVolume();
+    pbdVolume();
     return 0;
 }

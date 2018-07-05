@@ -26,10 +26,10 @@
 
 using namespace imstk;
 
-void testPbdCloth()
+void pbdCloth()
 {
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDClothTest");
+    auto scene = sdk->createNewScene("PBDCloth");
 
     // a. Construct a sample triangular mesh
 
@@ -128,7 +128,7 @@ void testPbdCloth()
 
 int main()
 {
-    testPbdCloth();
+    pbdCloth();
 
     return 0;
 }

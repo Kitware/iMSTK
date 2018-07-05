@@ -32,11 +32,11 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void testVirtualCoupling()
+void sampleVirtualCoupling()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("VirtualCouplingTest");
+    auto scene = sdk->createNewScene("VirtualCoupling");
 
     // Create a plane in the scene
     auto planeGeom = std::make_shared<Plane>();
@@ -113,7 +113,7 @@ void testVirtualCoupling()
 
 int main()
 {
-    testVirtualCoupling();
+    sampleVirtualCoupling();
 
     return 0;
 }

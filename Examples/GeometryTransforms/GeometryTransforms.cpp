@@ -28,11 +28,11 @@
 
 using namespace imstk;
 
-void testGeometryTransforms()
+void geometryTransforms()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("testGeometryTransforms");
+    auto scene = sdk->createNewScene("GeometryTransforms");
 
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
@@ -96,6 +96,6 @@ void testGeometryTransforms()
 
 int main()
 {
-    testGeometryTransforms();
+    geometryTransforms();
     return 0;
 }

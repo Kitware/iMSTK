@@ -25,11 +25,11 @@
 
 using namespace imstk;
 
-void testReadMesh()
+void readMesh()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("testReadMesh");
+    auto scene = sdk->createNewScene("ReadMesh");
 
     // Read surface mesh
     /*auto objMesh = MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj");
@@ -65,6 +65,6 @@ void testReadMesh()
 
 int main()
 {
-    testReadMesh();
+    readMesh();
     return 0;
 }

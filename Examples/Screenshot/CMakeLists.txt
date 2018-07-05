@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-ViewerTest)
+project(Example-Screenshot)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ViewerTest.cpp)
+add_executable(${PROJECT_NAME} Screenshot.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

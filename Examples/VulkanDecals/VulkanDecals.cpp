@@ -25,11 +25,11 @@
 
 using namespace imstk;
 
-void testDecals()
+void renderDecals()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("DecalsTest");
+    auto scene = sdk->createNewScene("Decals");
 
     // Position camera
     auto cam = scene->getCamera();
@@ -82,7 +82,7 @@ void testDecals()
 
 int main()
 {
-    testDecals();
+    renderDecals();
 
     return 0;
 }

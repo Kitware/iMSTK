@@ -30,12 +30,12 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void testObjectController()
+void objectController()
 {
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("ObjectControllerTest");
+    auto scene = sdk->createNewScene("ObjectController");
 
     // Device Client
     auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
@@ -79,6 +79,6 @@ void testObjectController()
 
 int main()
 {
-    testObjectController();
+    objectController();
     return 0;
 }

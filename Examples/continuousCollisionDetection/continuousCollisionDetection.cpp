@@ -25,11 +25,11 @@
 
 using namespace imstk;
 
-void testMeshCCD()
+void doMeshCCD()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("MeshCCDTest");
+    auto scene = sdk->createNewScene("CCD");
 
     auto mesh1 = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto mesh2 = MeshIO::read(iMSTK_DATA_ROOT "/textured_organs/heart.obj");
@@ -90,7 +90,7 @@ void testMeshCCD()
 
 int main()
 {
-    testMeshCCD();
+    doMeshCCD();
 
     return 0;
 }

@@ -38,11 +38,11 @@ const std::string phantomOmni1Name = "Phantom1";
 
 using namespace imstk;
 
-void testPicking()
+void pickingSoftObject()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PickingTest");
+    auto scene = sdk->createNewScene("Picking");
 
     //----------------------------------------------------------
     // Create plane visual scene object
@@ -169,6 +169,6 @@ void testPicking()
 
 int main()
 {
-    testPicking();
+    pickingSoftObject();
     return 0;
 }

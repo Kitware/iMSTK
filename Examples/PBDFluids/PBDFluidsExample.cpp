@@ -28,10 +28,10 @@
 
 using namespace imstk;
 
-void testPbdFluid()
+void pbdFluid()
 {
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDFluidTest");
+    auto scene = sdk->createNewScene("PBDFluid");
 
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 
@@ -249,6 +249,6 @@ void testPbdFluid()
 
 int main()
 {
-    testPbdFluid();
+    pbdFluid();
     return 0;
 }

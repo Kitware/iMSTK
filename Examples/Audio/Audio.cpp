@@ -32,7 +32,7 @@
 using namespace imstk;
 
 // Example modified from SFML/Examples
-void testSound(const std::string& filename)
+void playSound(const std::string& filename)
 {
 #ifdef iMSTK_AUDIO_ENABLED
     // Load a sound buffer from a .wav file
@@ -124,7 +124,7 @@ void main()
     LOG(INFO) << "--Testing audio--\n";
 
     // Test a sound
-    testSound(iMSTK_DATA_ROOT "/sound/canary.wav");
+    playSound(iMSTK_DATA_ROOT "/sound/canary.wav");
 
     // Test music from an .ogg file
     playMusic(iMSTK_DATA_ROOT "/sound/orchestral.ogg");

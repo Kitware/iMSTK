@@ -24,11 +24,11 @@
 
 using namespace imstk;
 
-void testRendering()
+void sampleRendering()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("RenderingTest");
+    auto scene = sdk->createNewScene("Rendering");
 
     // Head mesh
     auto head = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
@@ -99,6 +99,6 @@ void testRendering()
 
 int main()
 {
-    testRendering();
+    sampleRendering();
     return 0;
 }

@@ -39,7 +39,7 @@ void testDeformableBody()
 {
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("DeformableBodyTest");
+    auto scene = sdk->createNewScene("DeformableBody");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh

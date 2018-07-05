@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-ScreenshotTest)
+project(Example-Rendering)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ScreenshotTest.cpp)
+add_executable(${PROJECT_NAME} Rendering.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
@@ -33,6 +33,14 @@ else()
   target_link_libraries(${PROJECT_NAME}
   SimulationManager) 
 endif()
+  
+#-----------------------------------------------------------------------------
+# Associate external data
+#-----------------------------------------------------------------------------
+list(APPEND FILE_LIST
+    head/,REGEX:.*)
+
+imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
 #-----------------------------------------------------------------------------
 # Shaders

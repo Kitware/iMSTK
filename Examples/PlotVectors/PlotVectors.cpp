@@ -23,7 +23,7 @@
 
 using namespace imstk;
 
-void testVectorPlotters()
+void doVectorPlotting()
 {
     Vectord a;
     a.resize(100);
@@ -44,6 +44,6 @@ void testVectorPlotters()
 
 int main()
 {
-    testVectorPlotters();
+    doVectorPlotting();
     return 0;
 }

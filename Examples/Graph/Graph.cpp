@@ -25,7 +25,7 @@
 
 using namespace imstk;
 
-void testGraph()
+void sampleGraph()
 {
     Graph g1(5);
     g1.addEdge(0, 1);
@@ -77,6 +77,6 @@ void testGraph()
 
 int main()
 {
-    testGraph();
+    sampleGraph();
     return 0;
 }

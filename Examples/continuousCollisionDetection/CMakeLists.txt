@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-CCDTest)
+project(Example-CCD)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} CCDTest.cpp)
+add_executable(${PROJECT_NAME} continuousCollisionDetection.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

@@ -24,11 +24,11 @@
 
 using namespace imstk;
 
-void testViewer()
+void sampleViewer()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto sceneTest = sdk->createNewScene("ViewerTest");
+    auto sceneTest = sdk->createNewScene("Viewer");
 
     // Plane
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, sceneTest, "VisualPlane", 10);
@@ -72,6 +72,6 @@ void testViewer()
 
 int main()
 {
-    testViewer();
+    sampleViewer();
     return 0;
 }

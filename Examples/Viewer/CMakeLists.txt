@@ -16,12 +16,12 @@
 #
 ###########################################################################
 
-project(Example-GraphTest)
+project(Example-Viewer)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} GraphTest.cpp)
+add_executable(${PROJECT_NAME} Viewer.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
@@ -33,14 +33,6 @@ else()
   target_link_libraries(${PROJECT_NAME}
   SimulationManager) 
 endif()
-  
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    asianDragon/,REGEX:.*)
-
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
 #-----------------------------------------------------------------------------
 # Shaders

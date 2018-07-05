@@ -25,11 +25,11 @@
 
 using namespace imstk;
 
-void testMshAndVegaIO()
+void MshAndVegaIO()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("testMshAndVegaIO");
+    auto scene = sdk->createNewScene("MshAndVegaIO");
 
     // Load a volumetric mesh (from .msh file)
     std::string ifile = iMSTK_DATA_ROOT "/liver/liver.msh";
@@ -92,6 +92,6 @@ void testMshAndVegaIO()
 
 int main()
 {
-    testMshAndVegaIO();
+    MshAndVegaIO();
     return 0;
 }

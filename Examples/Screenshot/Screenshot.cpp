@@ -27,11 +27,11 @@
 using namespace imstk;
 
 
-void testScreenShotUtility()
+void screenShotUtility()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto sceneTest = sdk->createNewScene("ScreenShotUtilityTest");
+    auto sceneTest = sdk->createNewScene("ScreenShotUtility");
 
     // Plane
     auto planeGeom = std::make_shared<Plane>();
@@ -102,7 +102,7 @@ void testScreenShotUtility()
 
 int main()
 {
-    testScreenShotUtility();
+    screenShotUtility();
 
     return 0;
 }

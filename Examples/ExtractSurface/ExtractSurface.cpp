@@ -25,7 +25,7 @@
 
 using namespace imstk;
 
-void testExtractSurfaceMesh()
+void extractSurfaceMesh()
 {
     auto sdk = std::make_shared<SimulationManager>();
 
@@ -70,7 +70,7 @@ void testExtractSurfaceMesh()
 
 int main()
 {
-    testExtractSurfaceMesh();
+    extractSurfaceMesh();
 
     return 0;
 }

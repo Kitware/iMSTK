@@ -28,10 +28,10 @@
 
 using namespace imstk;
 
-void testPbdCollision()
+void pbdCollision()
 {
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PbdCollisionTest");
+    auto scene = sdk->createNewScene("PbdCollision");
 
     scene->getCamera()->setPosition(0, 10.0, 10.0);
 
@@ -353,6 +353,6 @@ void testPbdCollision()
 
 int main()
 {
-    testPbdCollision();
+    pbdCollision();
     return 0;
 }
