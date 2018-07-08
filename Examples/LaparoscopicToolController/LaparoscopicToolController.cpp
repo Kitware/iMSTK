@@ -80,7 +80,9 @@ int main()
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
 
-#endif
-
     return 0;
+#else if
+    std::cout << "LaparoscopicToolController example needs haptic device to be enabled at build time" << std::endl;
+    return 1;
+#endif
 }

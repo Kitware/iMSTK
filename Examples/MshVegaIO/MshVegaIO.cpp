@@ -28,7 +28,7 @@ using namespace imstk;
 ///
 /// \brief This example shows how to read .msh and .veg files
 ///
-void MshAndVegaIO()
+int main()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -40,7 +40,7 @@ void MshAndVegaIO()
     if (!volMeshA)
     {
         LOG(WARNING) << "Failed to read msh file : " << ifile;
-        return;
+        return 1;
     }
 
     // Extract surface mesh
@@ -65,7 +65,7 @@ void MshAndVegaIO()
     if (!volMeshB)
     {
         LOG(WARNING) << "Failed to extract topology/geometry from the veg file : " << ofile;
-        return;
+        return 1;
     }
 
     // Extract surface mesh
@@ -91,10 +91,6 @@ void MshAndVegaIO()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
-}
 
-int main()
-{
-    MshAndVegaIO();
     return 0;
 }

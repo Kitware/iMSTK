@@ -72,7 +72,7 @@ void playSound(const std::string& filename)
         std::cout << std::flush;
     }
     std::cout << "\n" << std::endl;
-#else
+#else if
     LOG(INFO) << "testSound: Audio is supported only on windows!";
 #endif
 }
@@ -117,12 +117,17 @@ void playMusic(const std::string& filename)
 /// \brief This example demonstrates the audio feature in imstk.
 /// NOTE: Example modified from SFML/Examples
 ///
-void main()
+int main()
 {
     // Initialize g3logger
     auto logger = std::make_shared<LogUtility>();
     logger->createLogger("audio-Example", "./");
 
+    #ifndef iMSTK_AUDIO_ENABLED
+        LOG(INFO) << "Audio not enabled at build time\n";        
+        return 1;
+    #endif
+    
     LOG(INFO) << "--Testing audio--\n";
 
     // Test a sound
@@ -130,4 +135,6 @@ void main()
 
     // Test music from an .ogg file
     playMusic(iMSTK_DATA_ROOT "/sound/orchestral.ogg");
+
+    return 0;
 }

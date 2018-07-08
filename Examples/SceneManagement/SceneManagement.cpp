@@ -28,8 +28,6 @@ using namespace imstk;
 ///
 int main()
 {
-    // THIS TESTS NEEDS TO DISABLE STANDALONE VIEWER RENDERING
-
     auto sdk = std::make_shared<SimulationManager>();
 
     // Scenes

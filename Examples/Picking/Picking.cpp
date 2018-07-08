@@ -44,6 +44,10 @@ using namespace imstk;
 ///
 int main()
 {
+#ifndef iMSTK_USE_OPENHAPTICS
+    std::cout << "LaparoscopicToolController example needs haptic device to be enabled at build time" << std::endl;
+    return 1;
+#else if
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("Picking");
@@ -126,7 +130,6 @@ int main()
     //----------------------------------------------------------
     // Create object controller
     //----------------------------------------------------------
-#ifdef iMSTK_USE_OPENHAPTICS
 
     // Device clients
     auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
@@ -159,7 +162,6 @@ int main()
 
     // Create collision pair
     scene->getCollisionGraph()->addInteractionPair(physicsObj, sphereForPickObj, pickingCD, pickingCH, nullptr);
-#endif
 
     // Set Camera configuration
     auto cam = scene->getCamera();
@@ -169,5 +171,7 @@ int main()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
+
     return 0;
+#endif
 }

@@ -47,10 +47,7 @@ int main()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/liver/liver.veg");
-    //auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -90,10 +87,8 @@ int main()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    //dynaModel->configure(iMSTK_DATA_ROOT "/oneTet/oneTet.config");
     dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
     dynaModel->setTimeStepSizeType(TimeSteppingType::realTime);
-    //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
     dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
@@ -105,7 +100,6 @@ int main()
     // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");
     deformableObj->setVisualGeometry(surfMesh);
-    //deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
@@ -143,10 +137,7 @@ int main()
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     // create a linear solver
-    //auto linSolver = std::make_shared<ConjugateGradient>();
     auto linSolver = std::make_shared<GaussSeidel>();
-    //auto linSolver = std::make_shared<Jacobi>();
-    //auto linSolver = std::make_shared<SOR>(0.4);
 
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
@@ -168,5 +159,6 @@ int main()
     // Run the simulation
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);
+    
     return 0;
 }

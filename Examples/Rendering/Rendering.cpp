@@ -98,6 +98,8 @@ int main()
     viewer->disableVSync();
     viewer->enableFullscreen();
 #endif
+
     sdk->startSimulation(SimulationStatus::PAUSED);
+
     return 0;
 }

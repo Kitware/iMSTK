@@ -43,5 +43,6 @@ int main()
     plotterutils::writePlotterVecVsVecMatPlotlib(a, b, "plotXvsY.py");
 
     getchar();
+
     return 0;
 }

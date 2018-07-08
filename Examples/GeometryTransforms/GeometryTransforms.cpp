@@ -39,6 +39,12 @@ int main()
 
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
+    if (!sceneObj)
+    {
+        LOG(WARNING) << "ERROR: Unable to create scene object";
+        return 1;
+    }
+
     auto surfaceMesh = sceneObj->getVisualGeometry();
     surfaceMesh->scale(5., Geometry::TransformType::ConcatenateToTransform);
 
@@ -95,5 +101,6 @@ int main()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
+
     return 0;
 }

@@ -40,7 +40,12 @@ using namespace imstk;
 ///
 int main()
 {
-    // SDK and Scene
+    #ifndef iMSTK_USE_OPENHAPTICS
+        std::cout << "Audio not enabled at build time" << std::endl;        
+        return 1;
+    #endif
+
+    // Create SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("CameraController");
 
@@ -57,7 +62,7 @@ int main()
 #endif
 
 
-    // Mesh
+    // Load Mesh
     auto mesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<VisualObject>("meshObject");
     meshObject->setVisualGeometry(mesh);
@@ -68,7 +73,7 @@ int main()
     cam->setPosition(Vec3d(0, 0, 10));
 
 #ifdef iMSTK_USE_OPENHAPTICS
-
+    
     auto camControllerInput = std::make_shared<CameraController>(*cam, client);
 
     // Set camera controller

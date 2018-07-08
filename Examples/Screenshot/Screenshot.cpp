@@ -100,5 +100,6 @@ int main()
     // Run
     sdk->setActiveScene(sceneTest);
     sdk->startSimulation(SimulationStatus::PAUSED);
+
     return 0;
 }
