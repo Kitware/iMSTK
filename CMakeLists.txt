@@ -380,9 +380,8 @@ install(
 #--------------------------------------------------------------------------
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
-if(BUILD_EXAMPLES)
-  add_subdirectory(Examples)
-endif()
+add_subdirectory(Examples)
+
 
 #--------------------------------------------------------------------------
 # Innerbuild dummy test

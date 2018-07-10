@@ -37,23 +37,24 @@ list(APPEND FILE_LIST
 #-----------------------------------------------------------------------------
 # Add Example subdirectories
 #-----------------------------------------------------------------------------
+if(BUILD_EXAMPLES)
+    macro(listOfSubDir result curdir)
+      file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+      set(dirlist "")
+      foreach(child ${children})
+        if(IS_DIRECTORY ${curdir}/${child})
+          list(APPEND dirlist ${child})
+        endif()
+      endforeach()
+      set(${result} ${dirlist})
+    endmacro()
 
-macro(listOfSubDir result curdir)
-  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
-  set(dirlist "")
-  foreach(child ${children})
-    if(IS_DIRECTORY ${curdir}/${child})
-      list(APPEND dirlist ${child})
-    endif()
-  endforeach()
-  set(${result} ${dirlist})
-endmacro()
+    listOfSubDir(subDirs ${CMAKE_CURRENT_SOURCE_DIR})
 
-listOfSubDir(subDirs ${CMAKE_CURRENT_SOURCE_DIR})
-
-foreach(subdir ${subDirs})
-  add_subdirectory(${subdir})
-endforeach()
+    foreach(subdir ${subDirs})
+      add_subdirectory(${subdir})
+    endforeach()
+endif()
 
 #-----------------------------------------------------------------------------
 # Add external data
