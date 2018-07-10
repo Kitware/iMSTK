@@ -28,6 +28,12 @@ add_test(
   -P ${CMAKE_SOURCE_DIR}/CMake/Utilities/imstkCheckFileExists.cmake
 )
 
+# Associate external data needed for testing
+list(APPEND FILE_LIST
+    asianDragon/,REGEX:.*,
+    human/,REGEX:.*,
+    oneTet/,REGEX:.*)
+
 #-----------------------------------------------------------------------------
 # Add Example subdirectories
 #-----------------------------------------------------------------------------
