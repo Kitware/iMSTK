@@ -22,6 +22,12 @@ project(Example-Screenshot)
 # Create executable
 #-----------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} Screenshot.cpp)
+    
+#-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

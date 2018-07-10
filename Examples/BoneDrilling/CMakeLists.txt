@@ -36,6 +36,12 @@ if(iMSTK_USE_OMNI)
       SimulationManager
       SFML) 
     endif()
+    
+    #-----------------------------------------------------------------------------
+    # Add shaders
+    #-----------------------------------------------------------------------------
+    include(imstkCopyAndCompileShaders)
+    CopyAndCompileShaders()
       
     #-----------------------------------------------------------------------------
     # Associate external data

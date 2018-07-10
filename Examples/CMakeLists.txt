@@ -56,8 +56,6 @@ foreach(subdir ${subDirs})
 endforeach()
 
 #-----------------------------------------------------------------------------
-# Shaders
+# Add external data
 #-----------------------------------------------------------------------------
-include(imstkCopyAndCompileShaders)
-CopyAndCompileShaders()
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})

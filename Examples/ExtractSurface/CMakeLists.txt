@@ -22,6 +22,12 @@ project(Example-ExtractSurface)
 # Create executable
 #-----------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} ExtractSurface.cpp)
+    
+#-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

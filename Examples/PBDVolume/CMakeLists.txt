@@ -27,6 +27,12 @@ add_executable(${PROJECT_NAME} PBDVolumeExample.cpp)
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME} SimulationManager)
+    
+#-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
   
 #-----------------------------------------------------------------------------
 # Associate external data
