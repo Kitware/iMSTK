@@ -381,15 +381,7 @@ install(
 # Test data download
 #--------------------------------------------------------------------------
 include(imstkExternalDataDownloadTest)
-
-#--------------------------------------------------------------------------
-# Append external data needed for testing to be downloaded later
-#--------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    asianDragon/,REGEX:.*
-    human/,REGEX:.*
-    oneTet/,REGEX:.*)
-    
+ 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
@@ -400,7 +392,9 @@ endif()
 #-----------------------------------------------------------------------------
 # Download the external data needed for both testing and examples
 #-----------------------------------------------------------------------------
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+if(BUILD_TESTING OR BUILD_EXAMPLES)
+    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+endif()
 
 #--------------------------------------------------------------------------
 # Innerbuild dummy test

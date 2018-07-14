@@ -15,6 +15,14 @@ imstk_add_library( Collision
 # Testing
 #-----------------------------------------------------------------------------
 if( BUILD_TESTING )
-  include(imstkAddTest)
-  imstk_add_test( Collision )
+        
+    include(imstkAddTest)
+
+    list(APPEND FILE_LIST_COL_TEST
+        asianDragon/,REGEX:.*
+        human/,REGEX:.*
+        oneTet/,REGEX:.*)
+    
+    imstk_add_test(Collision)
+    imstk_add_data(Collision ${FILE_LIST_COL_TEST})
 endif()
