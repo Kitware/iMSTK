@@ -97,7 +97,7 @@ VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, V
 }
 
 void
-VulkanCubeRenderDelegate::update(uint32_t frameIndex)
+VulkanCubeRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
 }

@@ -68,6 +68,7 @@ struct VulkanMaterialConstants
 {
     unsigned int numLights;
     bool tessellation;
+    bool shaded;
     bool diffuseTexture;
     bool normalTexture;
     bool specularTexture;

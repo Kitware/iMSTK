@@ -85,7 +85,7 @@ int main()
     // Plane
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
     auto planeMaterial = std::make_shared<RenderMaterial>();
-    planeMaterial->setDiffuseColor(Color::DarkGray);
+    planeMaterial->setColor(Color::DarkGray);
     planeObj->getVisualGeometry()->setRenderMaterial(planeMaterial);
 
     // Run

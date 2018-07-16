@@ -236,6 +236,7 @@ protected:
     std::vector<NeighborsType> m_vertexNeighborVertices; ///> Neighbor vertices to vertices
 
     StdVectorOfVec3d m_triangleNormals; ///> Normals to the triangles
+    StdVectorOfVec3d m_triangleTangents; ///> Tangents to the triangles
     StdVectorOfVec3d m_vertexNormals; ///> Normals of the vertices
     StdVectorOfVec3d m_vertexTangents; ///> Tangents of the vertices
 

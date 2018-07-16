@@ -107,7 +107,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
 
         for (int k = 0; k < nL1; ++k)
         {
-            auto nodes = mesh1->getLine(k);
+            auto nodes = mesh1->getLinesVertices()[k];
             unsigned int i1 = nodes[0];
             unsigned int i2 = nodes[1];
 

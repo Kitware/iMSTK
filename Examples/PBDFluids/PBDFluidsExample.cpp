@@ -51,7 +51,7 @@ int main()
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());
 
     auto material1 = std::make_shared<RenderMaterial>();
-    material1->setDiffuseColor(Color::Blue);
+    material1->setColor(Color::Blue);
     material1->setSphereGlyphSize(.15);
     fluidMesh->setRenderMaterial(material1);
 

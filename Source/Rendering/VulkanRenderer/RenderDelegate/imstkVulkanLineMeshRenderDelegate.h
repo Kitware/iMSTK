@@ -19,32 +19,30 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanSphereRenderDelegate_h
-#define imstkVulkanSphereRenderDelegate_h
+#ifndef imstkVulkanLineMeshRenderDelegate_h
+#define imstkVulkanLineMeshRenderDelegate_h
 
-#include "imstkSphere.h"
+#include <memory>
 
 #include "imstkVulkanRenderDelegate.h"
-
-#include "vtkSphereSource.h"
-#include "vtkPointData.h"
-#include "vtkTriangleFilter.h"
+#include "imstkLineMesh.h"
+#include "imstkVulkanMemoryManager.h"
 
 namespace imstk
 {
-class VulkanSphereRenderDelegate : public VulkanRenderDelegate
+class VulkanLineMeshRenderDelegate : public VulkanRenderDelegate
 {
 public:
 
     ///
     /// \brief Default destructor
     ///
-    ~VulkanSphereRenderDelegate() = default;
+    ~VulkanLineMeshRenderDelegate() = default;
 
     ///
     /// \brief Default constructor
     ///
-    VulkanSphereRenderDelegate(std::shared_ptr<Sphere> sphere, VulkanMemoryManager& memoryManager);
+    VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> LineMesh, VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry
@@ -56,11 +54,14 @@ public:
     ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
-protected:
-    std::shared_ptr<Sphere> m_geometry;
 
-    std::vector<std::array<uint32_t, 3>> m_sphereTriangles;
-    std::vector<VulkanBasicVertex> m_sphereVertices;
+    ///
+    /// \brief Fill vertex buffer
+    ///
+    void updateVertexBuffer();
+
+protected:
+    std::shared_ptr<LineMesh> m_geometry;
 
     VulkanLocalVertexUniforms m_localVertexUniforms;
 };

@@ -108,7 +108,7 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
 }
 
 void
-VulkanSurfaceMeshRenderDelegate::update(uint32_t frameIndex)
+VulkanSurfaceMeshRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
 

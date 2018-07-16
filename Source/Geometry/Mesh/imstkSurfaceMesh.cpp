@@ -62,6 +62,7 @@ SurfaceMesh::clear()
     m_vertexNeighborVertices.clear();
     m_triangleNormals.clear();
     m_vertexNormals.clear();
+    m_triangleTangents.clear();
 }
 
 void
@@ -135,6 +136,7 @@ void
 SurfaceMesh::computeTrianglesNormals()
 {
     m_triangleNormals.resize(m_trianglesVertices.size());
+    m_triangleTangents.resize(m_trianglesVertices.size());
 
     for (size_t triangleId = 0; triangleId < m_triangleNormals.size(); ++triangleId)
     {
@@ -144,6 +146,35 @@ SurfaceMesh::computeTrianglesNormals()
         const auto& p2 = m_vertexPositions.at(t.at(2));
 
         m_triangleNormals.at(triangleId) = ((p1 - p0).cross(p2 - p0)).normalized();
+    }
+
+    bool hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    const StdVectorOfVectorf* UVs;
+
+    if (hasUVs)
+    {
+        UVs = this->getPointDataArray(m_defaultTCoords);
+    }
+
+    if (hasUVs)
+    {
+        for (size_t triangleId = 0; triangleId < m_triangleNormals.size(); ++triangleId)
+        {
+            const auto& t  = m_trianglesVertices.at(triangleId);
+            const auto& p0 = m_vertexPositions.at(t.at(0));
+            const auto& p1 = m_vertexPositions.at(t.at(1));
+            const auto& p2 = m_vertexPositions.at(t.at(2));
+            const auto& uv0 = (*UVs)[t.at(0)];
+            const auto& uv1 = (*UVs)[t.at(1)];
+            const auto& uv2 = (*UVs)[t.at(2)];
+
+            auto diffPos1 = p1 - p0;
+            auto diffPos2 = p2 - p0;
+            float diffUV1[2] = { uv1[0] - uv0[0], uv1[1] - uv0[1] };
+            float diffUV2[2] = { uv2[0] - uv0[0], uv2[1] - uv0[1] };
+
+            m_triangleTangents.at(triangleId) = (diffPos1 * diffUV2[1] - diffPos2 * diffUV1[0]) / (diffUV1[0] * diffUV2[1] - diffUV1[1] * diffUV2[0]);
+        }
     }
 }
 
@@ -158,21 +189,33 @@ SurfaceMesh::computeVertexNormals()
     }
 
     m_vertexNormals.resize(m_vertexPositions.size());
+    m_vertexTangents.resize(m_vertexPositions.size());
 
     this->computeTrianglesNormals();
 
     StdVectorOfVec3d temp_normals(m_vertexNormals.size());
+    StdVectorOfVec3d temp_tangents(m_vertexTangents.size());
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
     {
         temp_normals[vertexId] = Vec3d(0, 0, 0);
+        temp_tangents[vertexId] = Vec3d(0, 0, 0);
         for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
         {
             temp_normals[vertexId] += m_triangleNormals[triangleId];
+            temp_tangents[vertexId] += m_triangleTangents[triangleId];
         }
     }
 
     // Correct for UV seams
-    Vec3d normal;
+    Vec3d normal, tangent;
+    bool hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    const StdVectorOfVectorf* UVs;
+
+    if (hasUVs)
+    {
+        UVs = this->getPointDataArray(m_defaultTCoords);
+    }
+
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
     {
         NormalGroup group = {m_vertexPositions[vertexId], m_vertexNormals[vertexId]};
@@ -195,6 +238,13 @@ SurfaceMesh::computeVertexNormals()
 
         normal.normalize();
         m_vertexNormals[vertexId] = normal;
+
+        if (hasUVs)
+        {
+            tangent = temp_tangents[vertexId];
+            tangent.normalize();
+            m_vertexTangents[vertexId] = tangent;
+        }
     }
 }
 

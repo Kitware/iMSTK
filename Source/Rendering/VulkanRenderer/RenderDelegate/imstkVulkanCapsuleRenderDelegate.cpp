@@ -97,7 +97,7 @@ VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule
 }
 
 void
-VulkanCapsuleRenderDelegate::update(uint32_t frameIndex)
+VulkanCapsuleRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
 }

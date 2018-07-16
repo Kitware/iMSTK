@@ -145,6 +145,11 @@ public:
     const StdVectorOfVectorf* getPointDataArray(const std::string& arrayName) const;
 
     ///
+    /// \brief Check if a specific data array exists.
+    ///
+    bool hasPointDataArray(const std::string& arrayName) const;
+
+    ///
     /// \brief Returns the number of total vertices in the mesh
     ///
     size_t getNumVertices() const;

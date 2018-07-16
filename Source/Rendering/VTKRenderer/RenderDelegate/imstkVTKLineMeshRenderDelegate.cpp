@@ -27,6 +27,9 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkPoints.h>
 #include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
+#include <vtkLine.h>
+#include <vtkTrivialProducer.h>
 
 namespace imstk
 {
@@ -45,16 +48,50 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     points->SetNumberOfPoints(m_geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
-    // Create line
-    auto lines = vtkSmartPointer<vtkLineSource>::New();
-    lines->SetPoints(points);
-    m_geometry->m_dataModified = false;
+    // Create index
+    auto lineIndices = vtkSmartPointer<vtkCellArray>::New();
 
-    // Setup Mapper & Actor
-    this->setUpMapper(lines->GetOutputPort(), true, m_geometry);
+    for (auto line : m_geometry->getLinesVertices())
+    {
+        auto l = vtkSmartPointer<vtkLine>::New();
+        l->GetPointIds()->SetId(0, line[0]);
+        l->GetPointIds()->SetId(1, line[1]);
+        lineIndices->InsertNextCell(l);
+    }
+
+    // Create line
+    auto lines = vtkSmartPointer<vtkPolyData>::New();
+    lines->SetPoints(points);
+    lines->SetLines(lineIndices);
+
+    // Add colors
+    if (m_geometry->getVertexColors().size() == m_geometry->getNumVertices())
+    {
+        auto colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
+        colors->SetNumberOfComponents(3);
+        colors->SetName("Colors");
+
+        for (auto color : m_geometry->getVertexColors())
+        {
+            unsigned char c[3] = { (unsigned char)(color.r * 255),
+                                   (unsigned char)(color.g * 255),
+                                   (unsigned char)(color.b * 255) };
+            colors->InsertNextTypedTuple(c);
+        }
+
+        lines->GetPointData()->SetScalars(colors);
+    }
+
+    // Create connection source
+    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
+    source->SetOutput(lines);
+    m_geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
+
+    // Setup Mapper & Actor
+    this->setUpMapper(source->GetOutputPort(), true, m_geometry);
 }
 
 void

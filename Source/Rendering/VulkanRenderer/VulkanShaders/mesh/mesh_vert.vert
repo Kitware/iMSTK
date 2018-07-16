@@ -8,6 +8,7 @@ layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 vertexNormal;
 layout (location = 2) in vec3 vertexTangent;
 layout (location = 3) in vec2 vertexUV;
+layout (location = 4) in vec3 vertexColor;
 
 struct light
 {
@@ -36,6 +37,7 @@ layout (location = 0) out vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
+    vec3 color;
 }vertex;
 
 void main(void)
@@ -45,6 +47,7 @@ void main(void)
     vec4 tangent = normalize(locals.transform * vec4(normalize(vertexTangent), 0.0));
 
     vec4 bitangent = vec4(cross(normal.xyz, tangent.xyz), 0.0);
+    tangent = vec4(cross(bitangent.xyz, normal.xyz), 0.0);
 
     vertex.TBN = mat3(tangent.xyz, bitangent.xyz, normal.xyz);
 
@@ -52,6 +55,7 @@ void main(void)
     vertex.position = position.xyz;
     vertex.normal = normalize(normal.xyz);
     vertex.uv = vertexUV;
+    vertex.color = vertexColor;
 
     gl_Position = globals.projectionMatrix * globals.viewMatrix * position;
 }

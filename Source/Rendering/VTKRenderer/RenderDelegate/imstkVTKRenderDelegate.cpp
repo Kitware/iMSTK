@@ -193,7 +193,7 @@ VTKRenderDelegate::updateActorProperties()
     auto actorProperty = m_actor->GetProperty();
 
     // Colors & Light
-    auto diffuseColor = material->m_diffuseColor;
+    auto diffuseColor = material->m_color;
     actorProperty->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b);
 
     // Material state is now up to date

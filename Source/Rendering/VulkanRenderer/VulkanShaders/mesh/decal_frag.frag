@@ -5,15 +5,16 @@ layout (location = 1) out vec4 outputSpecular;
 
 layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
-layout (constant_id = 2) const bool hasDiffuseTexture = false;
-layout (constant_id = 3) const bool hasNormalTexture = false;
-layout (constant_id = 4) const bool hasRoughnessTexture = false;
-layout (constant_id = 5) const bool hasMetalnessTexture = false;
-layout (constant_id = 6) const bool hasAmbientOcclusionTexture = false;
-layout (constant_id = 7) const bool hasSubsurfaceScatteringTexture = false;
-layout (constant_id = 8) const bool hasIrradianceCubemapTexture = false;
-layout (constant_id = 9) const bool hasRadianceCubemapTexture = false;
-layout (constant_id = 10) const bool hasBrdfLUTTexture = false;
+layout (constant_id = 2) const bool shaded = true;
+layout (constant_id = 3) const bool hasDiffuseTexture = false;
+layout (constant_id = 4) const bool hasNormalTexture = false;
+layout (constant_id = 5) const bool hasRoughnessTexture = false;
+layout (constant_id = 6) const bool hasMetalnessTexture = false;
+layout (constant_id = 7) const bool hasAmbientOcclusionTexture = false;
+layout (constant_id = 8) const bool hasSubsurfaceScatteringTexture = false;
+layout (constant_id = 9) const bool hasIrradianceCubemapTexture = false;
+layout (constant_id = 10) const bool hasRadianceCubemapTexture = false;
+layout (constant_id = 11) const bool hasBrdfLUTTexture = false;
 
 struct light
 {

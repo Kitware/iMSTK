@@ -6,15 +6,16 @@ layout (location = 2) out vec4 outputSpecular;
 
 layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
-layout (constant_id = 2) const bool hasDiffuseTexture = false;
-layout (constant_id = 3) const bool hasNormalTexture = false;
-layout (constant_id = 4) const bool hasRoughnessTexture = false;
-layout (constant_id = 5) const bool hasMetalnessTexture = false;
-layout (constant_id = 6) const bool hasAmbientOcclusionTexture = false;
-layout (constant_id = 7) const bool hasSubsurfaceScatteringTexture = false;
-layout (constant_id = 8) const bool hasIrradianceCubemapTexture = false;
-layout (constant_id = 9) const bool hasRadianceCubemapTexture = false;
-layout (constant_id = 10) const bool hasBrdfLUTTexture = false;
+layout (constant_id = 2) const bool shaded = true;
+layout (constant_id = 3) const bool hasDiffuseTexture = false;
+layout (constant_id = 4) const bool hasNormalTexture = false;
+layout (constant_id = 5) const bool hasRoughnessTexture = false;
+layout (constant_id = 6) const bool hasMetalnessTexture = false;
+layout (constant_id = 7) const bool hasAmbientOcclusionTexture = false;
+layout (constant_id = 8) const bool hasSubsurfaceScatteringTexture = false;
+layout (constant_id = 9) const bool hasIrradianceCubemapTexture = false;
+layout (constant_id = 10) const bool hasRadianceCubemapTexture = false;
+layout (constant_id = 11) const bool hasBrdfLUTTexture = false;
 
 struct light
 {
@@ -41,6 +42,7 @@ layout (set = 1, binding = 1) uniform localUniforms
     float emissivity;
     float roughness;
     float metalness;
+    vec4 debugColor;
 } locals;
 
 layout (location = 0) in vertexData{
@@ -49,6 +51,7 @@ layout (location = 0) in vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
+    vec3 color;
 }vertex;
 
 layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
@@ -92,6 +95,8 @@ float calculateShadow(int index);
 
 void main(void)
 {
+if (shaded)
+{
     readTextures();
 
     // If it's 0, then there's a divide by zero error
@@ -134,8 +139,12 @@ void main(void)
     finalDiffuse *= diffuseColor;
     outputColor = vec4(finalDiffuse + (diffuseColor * locals.emissivity), 1);
     outputSpecular = vec4(finalSpecular, 1);
-
     outputNormal = vec4(normal, subsurfaceScattering);
+}
+else
+{
+    outputColor = vec4((locals.debugColor.rgb + vertex.color), 1);
+}
 }
 
 void readTextures()
