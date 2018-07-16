@@ -44,7 +44,9 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanSphereRenderDelegate(std::shared_ptr<Sphere> sphere, VulkanMemoryManager& memoryManager);
+    VulkanSphereRenderDelegate(std::shared_ptr<Sphere> sphere,
+        SceneObject::Type type,
+        VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry

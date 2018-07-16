@@ -45,7 +45,9 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plane, VulkanMemoryManager& memoryManager);
+    VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plane,
+        SceneObject::Type type,
+        VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry

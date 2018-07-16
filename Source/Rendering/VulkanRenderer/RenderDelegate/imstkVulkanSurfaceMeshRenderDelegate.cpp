@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager)
+VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(surfaceMesh)
 {
     m_numVertices = (uint32_t)m_geometry->getNumVertices();
@@ -37,7 +39,14 @@ VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr
         m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
+    if (type == SceneObject::Type::FEMDeformable || type == SceneObject::Type::Pbd)
+    {
+        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
+    }
+    else
+    {
+        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
+    }
 
     for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
     {

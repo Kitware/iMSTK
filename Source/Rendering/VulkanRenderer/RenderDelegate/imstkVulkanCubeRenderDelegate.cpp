@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, VulkanMemoryManager& memoryManager)
+VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(cube)
 {
     auto width = m_geometry->getWidth();

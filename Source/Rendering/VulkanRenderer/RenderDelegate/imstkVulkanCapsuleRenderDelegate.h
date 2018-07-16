@@ -44,7 +44,9 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule, VulkanMemoryManager& memoryManager);
+    VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule,
+        SceneObject::Type type,
+        VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry

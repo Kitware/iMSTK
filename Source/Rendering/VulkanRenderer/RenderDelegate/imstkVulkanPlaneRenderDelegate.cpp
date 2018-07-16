@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanPlaneRenderDelegate::VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plane, VulkanMemoryManager& memoryManager)
+VulkanPlaneRenderDelegate::VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plane,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(plane)
 {
     auto width = m_geometry->getWidth();

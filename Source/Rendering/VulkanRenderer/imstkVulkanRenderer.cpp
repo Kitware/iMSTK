@@ -153,7 +153,7 @@ VulkanRenderer::setupGPUs()
     queueInfo.pNext = nullptr;
     queueInfo.flags = 0;
     queueInfo.queueFamilyIndex = m_renderQueueFamily;
-    queueInfo.queueCount = m_queueFamilyProperties[m_renderQueueFamily].queueCount;
+    queueInfo.queueCount = 1;// m_queueFamilyProperties[m_renderQueueFamily].queueCount;
     queueInfo.pQueuePriorities = &priorities[0];
 
     // The display system isn't part of the Vulkan core
@@ -1026,19 +1026,20 @@ VulkanRenderer::loadAllGeometry()
     // Add new objects
     for (auto sceneObject : m_scene->getSceneObjects())
     {
+        auto type = sceneObject->getType();
         auto geometry = sceneObject->getVisualGeometry();
 
         if (geometry && !geometry->m_renderDelegateCreated)
         {
-            auto renderDelegate = this->loadGeometry(geometry);
+            auto renderDelegate = this->loadGeometry(geometry, type);
         }
     }
 }
 
 std::shared_ptr<VulkanRenderDelegate>
-VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry)
+VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry, SceneObject::Type type)
 {
-    auto renderDelegate = VulkanRenderDelegate::make_delegate(geometry, m_memoryManager);
+    auto renderDelegate = VulkanRenderDelegate::make_delegate(geometry, type, m_memoryManager);
     if (renderDelegate != nullptr)
     {
         m_renderDelegates.push_back(renderDelegate);

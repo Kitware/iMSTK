@@ -43,7 +43,9 @@
 namespace imstk
 {
 std::shared_ptr<VulkanRenderDelegate>
-VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemoryManager& memoryManager)
+VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
 {
     geom->m_renderDelegateCreated = true;
     switch (geom->getType())
@@ -51,27 +53,27 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemory
     case Geometry::Type::Plane:
     {
         auto plane = std::dynamic_pointer_cast<Plane>(geom);
-        return std::make_shared<VulkanPlaneRenderDelegate>(plane, memoryManager);
+        return std::make_shared<VulkanPlaneRenderDelegate>(plane, type, memoryManager);
     }
     case Geometry::Type::Sphere:
     {
         auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
-        return std::make_shared<VulkanSphereRenderDelegate>(sphere, memoryManager);
+        return std::make_shared<VulkanSphereRenderDelegate>(sphere, type, memoryManager);
     }
     case Geometry::Type::Cube:
     {
         auto cube = std::dynamic_pointer_cast<Cube>(geom);
-        return std::make_shared<VulkanCubeRenderDelegate>(cube, memoryManager);
+        return std::make_shared<VulkanCubeRenderDelegate>(cube, type, memoryManager);
     }
     case Geometry::Type::Capsule:
     {
         auto capsule = std::dynamic_pointer_cast<Capsule>(geom);
-        return std::make_shared<VulkanCapsuleRenderDelegate>(capsule, memoryManager);
+        return std::make_shared<VulkanCapsuleRenderDelegate>(capsule, type, memoryManager);
     }
     case Geometry::Type::SurfaceMesh:
     {
         auto surfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(geom);
-        return std::make_shared<VulkanSurfaceMeshRenderDelegate>(surfaceMesh, memoryManager);
+        return std::make_shared<VulkanSurfaceMeshRenderDelegate>(surfaceMesh, type, memoryManager);
     }
     /*case Geometry::Type::TetrahedralMesh:
     {
@@ -91,7 +93,7 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom, VulkanMemory
     case Geometry::Type::DecalPool:
     {
         auto decalPool = std::dynamic_pointer_cast<DecalPool>(geom);
-        return std::make_shared<VulkanDecalRenderDelegate>(decalPool, memoryManager);
+        return std::make_shared<VulkanDecalRenderDelegate>(decalPool, type, memoryManager);
     }
     default:
     {

@@ -44,7 +44,9 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube, VulkanMemoryManager& memoryManager);
+    VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube,
+        SceneObject::Type type,
+        VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry
