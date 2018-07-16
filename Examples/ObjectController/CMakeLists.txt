@@ -25,6 +25,12 @@ if(iMSTK_USE_OMNI)
     add_executable(${PROJECT_NAME} ObjectController.cpp)
 
     #-----------------------------------------------------------------------------
+    # Add shaders
+    #-----------------------------------------------------------------------------
+    include(imstkCopyAndCompileShaders)
+    CopyAndCompileShaders()
+
+    #-----------------------------------------------------------------------------
     # Link libraries to executable
     #-----------------------------------------------------------------------------
     target_link_libraries(${PROJECT_NAME} SimulationManager)

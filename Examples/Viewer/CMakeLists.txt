@@ -22,6 +22,12 @@ project(Example-Viewer)
 # Create executable
 #-----------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} Viewer.cpp)
+    
+#-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

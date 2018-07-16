@@ -29,6 +29,12 @@ add_executable(${PROJECT_NAME} MshVegaIO.cpp)
 target_link_libraries(${PROJECT_NAME} SimulationManager)
   
 #-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
+
+#-----------------------------------------------------------------------------
 # Associate external data
 #-----------------------------------------------------------------------------
 list(APPEND FILE_LIST

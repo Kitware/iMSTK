@@ -24,6 +24,12 @@ project(Example-PBDCollision)
 add_executable(${PROJECT_NAME} PBDCollisionExample.cpp)
 
 #-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
+
+#-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME} SimulationManager)

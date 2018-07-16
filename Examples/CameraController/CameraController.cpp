@@ -41,8 +41,8 @@ using namespace imstk;
 int main()
 {
     #ifndef iMSTK_USE_OPENHAPTICS
-        std::cout << "Audio not enabled at build time" << std::endl;        
-        return 1;
+    std::cout << "Audio not enabled at build time" << std::endl;
+    return 1;
     #endif
 
     // Create SDK and Scene
@@ -73,7 +73,7 @@ int main()
     cam->setPosition(Vec3d(0, 0, 10));
 
 #ifdef iMSTK_USE_OPENHAPTICS
-    
+
     auto camControllerInput = std::make_shared<CameraController>(*cam, client);
 
     // Set camera controller

@@ -378,10 +378,22 @@ install(
   )
 
 #--------------------------------------------------------------------------
+# Test data download
+#--------------------------------------------------------------------------
+include(imstkExternalDataDownloadTest)
+ 
+#--------------------------------------------------------------------------
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
 if(BUILD_EXAMPLES)
-  add_subdirectory(Examples)
+    add_subdirectory(Examples)
+endif()
+
+#-----------------------------------------------------------------------------
+# Download the external data needed for both testing and examples
+#-----------------------------------------------------------------------------
+if(BUILD_TESTING OR BUILD_EXAMPLES)
+    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 endif()
 
 #--------------------------------------------------------------------------

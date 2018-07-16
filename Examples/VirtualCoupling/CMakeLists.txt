@@ -23,6 +23,12 @@ if(iMSTK_USE_OMNI)
     # Create executable
     #-----------------------------------------------------------------------------
     add_executable(${PROJECT_NAME} VirtualCoupling.cpp)
+    
+    #-----------------------------------------------------------------------------
+    # Add shaders
+    #-----------------------------------------------------------------------------
+    include(imstkCopyAndCompileShaders)
+    CopyAndCompileShaders()
 
     #-----------------------------------------------------------------------------
     # Link libraries to executable

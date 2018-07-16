@@ -34,10 +34,18 @@ else()
   SimulationManager
   SFML) 
 endif()
+    
+#-----------------------------------------------------------------------------
+# Add shaders
+#-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
   
 #-----------------------------------------------------------------------------
 # Associate external data
 #-----------------------------------------------------------------------------
+include(imstkCopyAndCompileShaders)
+CopyAndCompileShaders()
 list(APPEND FILE_LIST
     sound/,REGEX:.*)
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})

@@ -124,10 +124,10 @@ int main()
     logger->createLogger("audio-Example", "./");
 
     #ifndef iMSTK_AUDIO_ENABLED
-        LOG(INFO) << "Audio not enabled at build time\n";        
-        return 1;
+    LOG(INFO) << "Audio not enabled at build time\n";
+    return 1;
     #endif
-    
+
     LOG(INFO) << "--Testing audio--\n";
 
     // Test a sound
