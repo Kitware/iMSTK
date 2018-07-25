@@ -28,7 +28,7 @@ using namespace imstk;
 
 ///
 /// \brief This example demonstrates controlling the object
-/// using external device. NOTE: Requires GeoMagic Touch device
+/// using a simulated tracker: dummy client
 ///
 int main()
 {

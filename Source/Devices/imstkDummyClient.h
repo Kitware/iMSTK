@@ -28,7 +28,8 @@ namespace imstk
 {
 ///
 /// \class Dummy client
-/// \brief Allows setting the pose of the device from external caller
+/// \brief Allows setting the pose of the device from external caller without a
+///  real device connected
 ///
 class DummyClient : public DeviceClient
 {
