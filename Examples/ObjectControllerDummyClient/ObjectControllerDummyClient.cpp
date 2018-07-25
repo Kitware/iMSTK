@@ -57,14 +57,14 @@ int main()
     // Supply translation to dummy client frame
     auto translateFunc =
         [&client](Module* module)
-    {
-        Vec3d p = client->getPosition() + Vec3d(1.0e-4, 0, 0);
-        if (p.x() > 50.)
         {
-            p = Vec3d(0, 0, 0);
-        }
-        client->setPosition(p);
-    };
+            Vec3d p = client->getPosition() + Vec3d(1.0e-4, 0, 0);
+            if (p.x() > 50.)
+            {
+                p = Vec3d(0, 0, 0);
+            }
+            client->setPosition(p);
+        };
     sdk->getSceneManager(scene)->setPostUpdateCallback(translateFunc);
 
     // Update Camera position
@@ -81,6 +81,6 @@ int main()
     // Run
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
-    
+
     return 0;
 }

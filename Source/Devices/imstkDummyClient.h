@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class Dummy client
 /// \brief Allows setting the pose of the device from external caller
@@ -60,7 +59,7 @@ protected:
 public:
     ///
     /// \brief Set position
-    ///    
+    ///
     void setPosition(const Vec3d& pos) { m_position = pos; };
 
     ///
@@ -76,8 +75,8 @@ public:
     ///
     /// \brief Set orientation from 4x4 transform
     ///
-    void setOrientation(double* transform) 
-    { 
+    void setOrientation(double* transform)
+    {
         m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(transform))).rotation();
     };
 
@@ -85,9 +84,7 @@ public:
     /// \brief Set the button status if it exists
     ///
     void setButton(const unsigned int buttonId, const bool buttonStatus);
-
 };
 }
 
 #endif // ifndef imstkDummyClient_h
-

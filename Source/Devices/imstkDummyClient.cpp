@@ -27,7 +27,7 @@
 
 namespace imstk
 {
-void 
+void
 DummyClient::setButton(const unsigned int buttonId, const bool buttonStatus)
 {
     auto x = m_buttons.find(buttonId);
