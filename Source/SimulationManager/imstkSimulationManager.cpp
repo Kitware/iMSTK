@@ -27,28 +27,33 @@
 
 namespace imstk
 {
-SimulationManager::SimulationManager(bool enableVR)
+SimulationManager::SimulationManager(const bool disableRendering, const bool enableVR)
 {
     // Init g3logger
     m_logUtil->createLogger("simulation", "./");
 
-#ifdef iMSTK_USE_Vulkan
-    m_viewer = std::make_shared<VulkanViewer>(this);
-#else
-#ifdef iMSTK_ENABLE_VR
-    m_viewer = std::make_shared<VTKViewer>(this, enableVR);
-#else
-    if (enableVR)
+    if (!disableRendering)
     {
-        LOG(FATAL) << "Can not run VR simulation without iMSTK_ENABLE_VR";
+#ifdef iMSTK_USE_Vulkan
+        m_viewer = std::make_shared<VulkanViewer>(this);
+#else
+
+#ifdef iMSTK_ENABLE_VR
+        m_viewer = std::make_shared<VTKViewer>(this, enableVR);
+#else
+
+        if (enableVR)
+        {
+            LOG(FATAL) << "Can not run VR simulation without iMSTK_ENABLE_VR";
+        }
+        m_viewer = std::make_shared<VTKViewer>(this, false);
+#endif
+#endif
     }
-    m_viewer = std::make_shared<VTKViewer>(this, false);
-#endif
-#endif
 }
 
-const
-SimulationStatus& SimulationManager::getStatus() const
+const SimulationStatus&
+SimulationManager::getStatus() const
 {
     return m_status;
 }
@@ -250,28 +255,36 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
         return;
     }
 
-    // Update viewer scene
-    m_viewer->setActiveScene(newScene);
-
-    // If not yet rendering: update current scene and return
-    if(!m_viewer->isRendering())
+    if (m_viewer)
     {
-        m_activeSceneName = newSceneName;
-        return;
-    }
+        // Update viewer scene
+        m_viewer->setActiveScene(newScene);
 
+        // If not yet rendering: update current scene and return
+        if (!m_viewer->isRendering())
+        {
+            m_activeSceneName = newSceneName;
+            return;
+        }
+    }
     // If rendering and simulation not active:
     // render scene in debug, update current scene, and return
     if (m_status == SimulationStatus::INACTIVE)
     {
-        m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+        if (m_viewer)
+        {
+            m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+        }
         m_activeSceneName = newSceneName;
         return;
     }
 
-    // If rendering and simulation active:
-    // render scene in simulation mode, and update simulation
-    m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
+    if (m_viewer)
+    {
+        // If rendering and simulation active:
+        // render scene in simulation mode, and update simulation
+        m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
+    }
 
     // Stop/Pause running scene
     auto oldSceneManager = m_sceneManagerMap.at(m_activeSceneName);
@@ -376,8 +389,11 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
         this->launchSimulation();
     }
 
-    // start the viewer
-    this->startViewer(renderMode);
+    if (m_viewer)
+    {
+        // start the viewer
+        this->startViewer(renderMode);
+    }
 }
 
 void
@@ -495,8 +511,11 @@ SimulationManager::endSimulation()
         LOG(INFO) << "Ending simulation";
     }
 
-    // Update Renderer
-    m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+    if (m_viewer)
+    {
+        // Update Renderer
+        m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+    }
 
     // End modules
     for(const auto& pair : m_modulesMap)
