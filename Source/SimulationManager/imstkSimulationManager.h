@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SimulationManager(bool enableVR = false);
+    SimulationManager(const bool disableRendering = false, const bool enableVR = false);
 
     ///
     /// \brief Default destructor
@@ -201,7 +201,7 @@ private:
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
-    std::shared_ptr<Viewer> m_viewer;
+    std::shared_ptr<Viewer> m_viewer = nullptr;
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
 } // imstk
