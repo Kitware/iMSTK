@@ -348,6 +348,8 @@ SimulationManager::launchSimulation()
     this->startModuleInNewThread(m_sceneManagerMap.at(m_activeSceneName));
 
     m_status = SimulationStatus::RUNNING;
+
+    m_simThreadLaunched = true;
 }
 
 void
@@ -384,9 +386,10 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
     }
 
     // Launch simulation right away if the simulator starts in running mode
-    if (simStatus == SimulationStatus::RUNNING)
+    this->launchSimulation();
+    if (simStatus == SimulationStatus::PAUSED)
     {
-        this->launchSimulation();
+        this->pauseSimulation();
     }
 
     if (m_viewer)

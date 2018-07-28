@@ -203,6 +203,8 @@ private:
 
     std::shared_ptr<Viewer> m_viewer = nullptr;
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
+
+    bool m_simThreadLaunched = false;
 };
 } // imstk
 
