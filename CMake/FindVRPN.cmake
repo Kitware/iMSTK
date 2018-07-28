@@ -134,6 +134,9 @@ if(WIN32)
     NAMES
       setupapi
     )
+  if(NOT HIDAPI_LIBRARY)
+    message(FATAL_ERROR "hidapi library not found")
+  endif()
 elseif(APPLE)
   find_library(MACHID_CoreFoundation_LIBRARY CoreFoundation)
   find_library(MACHID_IOKit_LIBRARY IOKit)

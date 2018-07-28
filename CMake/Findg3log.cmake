@@ -5,6 +5,11 @@ if(WIN32)
   find_library(DbgHelp_LIBRARY NAMES DbgHelp)
 endif()
 
+if(NOT DbgHelp_LIBRARY)
+  message(FATAL_ERROR "DbgHelp library not found")
+endif()
+
+
 #-----------------------------------------------------------------------------
 # Find path
 #-----------------------------------------------------------------------------
@@ -14,7 +19,6 @@ find_path(g3log_INCLUDE_DIR
     g3log/logworker.hpp
     )
 mark_as_advanced(g3log_INCLUDE_DIR)
-#message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Find library
@@ -25,7 +29,6 @@ find_library(g3log_LIBRARY
     g3logger
   )
 mark_as_advanced(g3log_LIBRARY)
-#message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
 
 set(g3log_LIBRARIES ${g3log_LIBRARY} ${DbgHelp_LIBRARY})
 
