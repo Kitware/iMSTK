@@ -33,6 +33,7 @@ namespace imstk
 FEMDeformableBodyModel::FEMDeformableBodyModel() :
     DynamicalModel(DynamicalModelType::elastoDynamics)
 {
+    m_fixedNodeIds.reserve(1000);
 }
 
 void
@@ -165,7 +166,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
             auto maxAllowed = m_vegaPhysicsMesh->getNumVertices();
             while (!file.eof())
             {
-                file >> index;
+                file >> index;         
                 if (index < maxAllowed)
                 {
                     m_fixedNodeIds.emplace_back(index);
