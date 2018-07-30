@@ -44,7 +44,7 @@ ConjugateGradient::applyLinearProjectionFilter(Vectord& x, const std::vector<Lin
     {
         const auto threeI = 3 * localProjector.getNodeId();
         Vec3d p = localProjector.getProjector()*Vec3d(x(threeI), x(threeI + 1), x(threeI + 2));
-        
+
         if (setVal)
         {
             p += (Mat3d::Identity() - localProjector.getProjector())*localProjector.getValue();
@@ -87,7 +87,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
     {
         applyLinearProjectionFilter(x, *m_DynamicLinearProjConstraints, true);
     }
-    
+
     if (m_FixedLinearProjConstraints)
     {
         applyLinearProjectionFilter(x, *m_FixedLinearProjConstraints, true);
