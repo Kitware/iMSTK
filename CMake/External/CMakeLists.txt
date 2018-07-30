@@ -12,7 +12,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Output Directories
 #-----------------------------------------------------------------------------
-if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIB_DIR})
 endif()
 if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)

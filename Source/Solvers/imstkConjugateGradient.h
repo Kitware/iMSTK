@@ -98,6 +98,7 @@ public:
     ///
     void applyLinearProjectionFilter(Vectord& x, const std::vector<LinearProjectionConstraint>& linProj, const bool setVal);
 
+    ///
     /// \brief Get the vector denoting the filter
     ///
     void setLinearProjectors(std::vector<LinearProjectionConstraint>* f)

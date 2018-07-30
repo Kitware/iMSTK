@@ -16,6 +16,6 @@ macro(listOfSubDir result curdir)
 
     foreach(subdir ${subDirs})
       add_subdirectory(${subdir})
-endforeach()
+endforeach() 
 
 

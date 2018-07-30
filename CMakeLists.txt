@@ -18,7 +18,7 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
     ${CMAKE_MODULE_PATH}
     )
-set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake) 
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified

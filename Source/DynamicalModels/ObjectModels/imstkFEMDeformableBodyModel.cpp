@@ -33,6 +33,7 @@ namespace imstk
 FEMDeformableBodyModel::FEMDeformableBodyModel() :
     DynamicalModel(DynamicalModelType::elastoDynamics)
 {
+    m_fixedNodeIds.reserve(1000);
 }
 
 void

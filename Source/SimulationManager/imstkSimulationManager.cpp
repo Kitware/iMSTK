@@ -450,6 +450,11 @@ SimulationManager::runSimulation()
         LOG(INFO) << "Running simulation";
     }
 
+    if (!m_simThreadLaunched)
+    {
+        this->launchSimulation();
+    }
+
     // Run scene
     m_sceneManagerMap.at(m_activeSceneName)->run();
 

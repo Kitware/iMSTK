@@ -51,6 +51,11 @@ public:
     void setProjection(const size_t& nodeId, const Vec3d& p, const Vec3d& q = Vec3d::Zero());
 
     ///
+    /// \brief Form the projection
+    ///
+    void setProjectionToLine(const size_t& nodeId, const Vec3d& p);
+
+    ///
     /// \brief Set the projector to simulate Dirichlet conditions
     ///
     void setProjectorToDirichlet(const size_t& nodeId);
