@@ -42,6 +42,14 @@ LinearProjectionConstraint::setProjection(const size_t& nodeId, const Vec3d& p, 
 }
 
 void
+LinearProjectionConstraint::setProjectionToLine(const size_t& nodeId, const Vec3d& p)
+{
+    m_nodeId = nodeId;
+    auto v = p/p.norm();
+    m_projection = v*v.transpose();
+}
+
+void
 LinearProjectionConstraint::setProjectorToDirichlet(const unsigned int& nodeId, const Vec3d z)
 {
     m_nodeId = nodeId;
