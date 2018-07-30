@@ -69,6 +69,7 @@ int main()
         LOG(WARNING) << "Could not read mesh from file.";
         return 1;
     }
+    tetMesh->scale(10., Geometry::TransformType::ApplyToData);
     // Extract the surface mesh
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
@@ -109,10 +110,9 @@ int main()
     //----------------------------------------------------------
     auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
     std::vector<LinearProjectionConstraint> linProj;
-    for (auto id : dynaModel->getFixNodeIds())
-    {
-        linProj.push_back(LinearProjectionConstraint(id, true));
-    }
+    linProj.push_back(LinearProjectionConstraint(0, true));
+    linProj.push_back(LinearProjectionConstraint(2, true));
+
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
@@ -141,7 +141,7 @@ int main()
 
     // Sphere0
     auto sphereForPickObj = apiutils::createCollidingAnalyticalSceneObject(
-        Geometry::Type::Sphere, scene, "Sphere0", 1, Vec3d(0., 0., 0.));
+        Geometry::Type::Sphere, scene, "Sphere0", 0.5, Vec3d(0., 0., 0.));
 
     auto pickTrackingCtrl = std::make_shared<DeviceTracker>(client);
     //pickTrackingCtrl->setTranslationOffset(Vec3d(0., 0., 24.));
