@@ -21,7 +21,7 @@ project(Example-Graph)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} Graph.cpp)
+add_executable(${PROJECT_NAME} GraphExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

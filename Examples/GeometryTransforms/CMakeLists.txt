@@ -21,7 +21,7 @@ project(Example-GeometryTransforms)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} GeometryTransforms.cpp)
+add_executable(${PROJECT_NAME} GeometryTransformsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

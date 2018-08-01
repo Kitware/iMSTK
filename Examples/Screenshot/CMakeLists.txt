@@ -21,7 +21,7 @@ project(Example-Screenshot)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} Screenshot.cpp)
+add_executable(${PROJECT_NAME} ScreenshotExample.cpp)
     
 #-----------------------------------------------------------------------------
 # Add shaders

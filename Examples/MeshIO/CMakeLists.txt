@@ -21,7 +21,7 @@ project(Example-MeshIO)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} MeshIO.cpp)
+add_executable(${PROJECT_NAME} MeshIOExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

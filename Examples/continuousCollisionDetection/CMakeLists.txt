@@ -21,7 +21,7 @@ project(Example-CCD)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} continuousCollisionDetection.cpp)
+add_executable(${PROJECT_NAME} ccdExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
