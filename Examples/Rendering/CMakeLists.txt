@@ -21,7 +21,7 @@ project(Example-Rendering)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} Rendering.cpp)
+add_executable(${PROJECT_NAME} RenderingExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

@@ -21,7 +21,7 @@ project(Example-ObjectControllerDummyClient)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ObjectControllerDummyClient.cpp)
+add_executable(${PROJECT_NAME} ObjectCtrlDummyClientExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add shaders

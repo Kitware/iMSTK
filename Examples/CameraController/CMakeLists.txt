@@ -22,7 +22,7 @@ if(iMSTK_USE_OMNI)
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
-    add_executable(${PROJECT_NAME} CameraController.cpp)
+    add_executable(${PROJECT_NAME} CameraControllerExample.cpp)
 
     #-----------------------------------------------------------------------------
     # Link libraries to executable

@@ -21,7 +21,7 @@ project(Example-PlotVectors)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} PlotVectors.cpp)
+add_executable(${PROJECT_NAME} PlotVectorsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

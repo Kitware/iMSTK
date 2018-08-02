@@ -21,7 +21,7 @@ project(Example-SceneManagement)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} SceneManagement.cpp)
+add_executable(${PROJECT_NAME} SceneManagementExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

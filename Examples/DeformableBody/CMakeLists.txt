@@ -21,7 +21,7 @@ project(Example-DeformableBody)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} DeformableBody.cpp)
+add_executable(${PROJECT_NAME} DeformableBodyExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

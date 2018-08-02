@@ -21,7 +21,7 @@ project(Example-LineMesh)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} LineMesh.cpp)
+add_executable(${PROJECT_NAME} LineMeshExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add shaders

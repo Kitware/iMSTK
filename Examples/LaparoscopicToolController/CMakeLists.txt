@@ -22,7 +22,7 @@ if(iMSTK_USE_OMNI)
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
-    add_executable(${PROJECT_NAME} LaparoscopicToolController.cpp)
+    add_executable(${PROJECT_NAME} lapToolControllerExample.cpp)
 
     #-----------------------------------------------------------------------------
     # Link libraries to executable

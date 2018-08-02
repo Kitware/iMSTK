@@ -21,7 +21,7 @@ project(Example-Audio)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} Audio.cpp)
+add_executable(${PROJECT_NAME} AudioExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

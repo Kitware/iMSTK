@@ -21,7 +21,7 @@ project(Example-VulkanDecals)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} VulkanDecals.cpp)
+add_executable(${PROJECT_NAME} VulkanDecalsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

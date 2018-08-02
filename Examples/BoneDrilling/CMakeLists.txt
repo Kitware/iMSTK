@@ -23,7 +23,7 @@ if(iMSTK_USE_OMNI)
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
-    add_executable(${PROJECT_NAME} BoneDrilling.cpp)
+    add_executable(${PROJECT_NAME} BoneDrillingExample.cpp)
 
     #-----------------------------------------------------------------------------
     # Link libraries to executable

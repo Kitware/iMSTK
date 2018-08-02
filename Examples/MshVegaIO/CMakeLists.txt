@@ -21,7 +21,7 @@ project(Example-MshVegaIO)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} MshVegaIO.cpp)
+add_executable(${PROJECT_NAME} MshVegaIOExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

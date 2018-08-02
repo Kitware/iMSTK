@@ -22,7 +22,7 @@ if(iMSTK_USE_OMNI)
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
-    add_executable(${PROJECT_NAME} ObjectController.cpp)
+    add_executable(${PROJECT_NAME} ObjectControllerExample.cpp)
 
     #-----------------------------------------------------------------------------
     # Add shaders
