@@ -56,7 +56,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
                         vertexStagingBufferInfo,
                         VulkanMemoryType::STAGING_VERTEX);
 
-        if (m_mode = VERTEX_BUFFER_STATIC)
+        if (m_mode == VERTEX_BUFFER_STATIC)
         {
             m_vertexBuffer = memoryManager.requestBuffer(m_renderDevice,
                             vertexBufferInfo,
@@ -88,7 +88,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
                         indexStagingBufferInfo,
                         VulkanMemoryType::STAGING_INDEX);
 
-        if (m_mode = VERTEX_BUFFER_STATIC)
+        if (m_mode == VERTEX_BUFFER_STATIC)
         {
             m_indexBuffer = memoryManager.requestBuffer(m_renderDevice,
                             indexBufferInfo,
@@ -153,7 +153,7 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices
 void
 VulkanVertexBuffer::uploadBuffers(VkCommandBuffer& commandBuffer)
 {
-    if (m_mode == VERTEX_BUFFER_STATIC)
+    if (m_mode != VERTEX_BUFFER_STATIC)
     {
         return;
     }
@@ -233,4 +233,11 @@ VulkanVertexBuffer::bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameI
     vkCmdBindVertexBuffers(*commandBuffer, 0, 1, m_vertexBuffer->getBuffer(), &vertexOffset);
     vkCmdBindIndexBuffer(*commandBuffer, *m_indexBuffer->getBuffer(), indexOffset, VK_INDEX_TYPE_UINT32);
 }
+
+VulkanVertexBufferMode
+VulkanVertexBuffer::getMode()
+{
+    return m_mode;
+}
+
 }

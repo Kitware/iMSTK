@@ -115,7 +115,7 @@ VulkanMemoryManager::requestMemoryAllocation(
 
     if (vkAllocateMemory(m_device, &memoryInfo, nullptr, internalMemory->m_memory) != VK_SUCCESS)
     {
-        LOG(INFO) << "test";
+        LOG(INFO) << "Cannot allocate memory";
     }
 
     m_memoryAllocations[type].push_back(internalMemory);

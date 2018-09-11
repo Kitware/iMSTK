@@ -687,6 +687,22 @@ VulkanRenderer::renderFrame()
         auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
         buffers->uploadBuffers(m_renderCommandBuffer[nextImageIndex]);
     }
+    VkMemoryBarrier barrier;
+    barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+    barrier.pNext = nullptr;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_INDEX_READ_BIT;
+
+    vkCmdPipelineBarrier(m_renderCommandBuffer[nextImageIndex],
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        0,
+        1,
+        &barrier,
+        0,
+        nullptr,
+        0,
+        nullptr);
 
     VkDeviceSize deviceSize = { 0 };
 

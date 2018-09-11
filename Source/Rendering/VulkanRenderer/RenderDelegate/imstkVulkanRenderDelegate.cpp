@@ -83,7 +83,7 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom,
     case Geometry::Type::LineMesh:
     {
         auto lineMesh = std::dynamic_pointer_cast<LineMesh>(geom);
-        return std::make_shared<VulkanLineMeshRenderDelegate>(lineMesh, memoryManager);
+        return std::make_shared<VulkanLineMeshRenderDelegate>(lineMesh, type, memoryManager);
     }
     /*case Geometry::Type::HexahedralMesh:
     {
