@@ -124,6 +124,19 @@ VulkanViewer::startRenderingLoop()
 void
 VulkanViewer::endRenderingLoop()
 {
+    glfwSetWindowShouldClose(m_window, GL_TRUE);
+}
+
+void
+VulkanViewer::setRenderingMode(const Renderer::Mode mode)
+{
+    m_renderer->setMode(mode, false);
+}
+
+const Renderer::Mode
+VulkanViewer::getRenderingMode()
+{
+    return m_renderer->getMode();
 }
 
 void
