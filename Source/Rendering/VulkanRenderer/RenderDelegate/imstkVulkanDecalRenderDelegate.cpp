@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool, VulkanMemoryManager& memoryManager)
+VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(decalPool)
 {
     m_numVertices = 8;

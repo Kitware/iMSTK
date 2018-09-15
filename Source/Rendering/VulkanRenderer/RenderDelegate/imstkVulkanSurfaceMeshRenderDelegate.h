@@ -39,7 +39,9 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager);
+    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh,
+        SceneObject::Type type,
+        VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry

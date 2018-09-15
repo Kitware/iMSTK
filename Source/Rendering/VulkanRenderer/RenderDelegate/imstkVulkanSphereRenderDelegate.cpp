@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> sphere, VulkanMemoryManager& memoryManager)
+VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> sphere,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(sphere)
 {
     auto radius = m_geometry->getRadius();

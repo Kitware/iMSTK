@@ -30,6 +30,7 @@
 #include <array>
 
 #include "imstkGeometry.h"
+#include "imstkSceneObject.h"
 #include "imstkVulkanVertexBuffer.h"
 #include "imstkVulkanUniformBuffer.h"
 #include "imstkVulkanMaterialDelegate.h"
@@ -52,6 +53,7 @@ public:
     ///
     static std::shared_ptr<VulkanRenderDelegate> make_delegate(
         std::shared_ptr<Geometry> geom,
+        SceneObject::Type type,
         VulkanMemoryManager& details);
 
     ///

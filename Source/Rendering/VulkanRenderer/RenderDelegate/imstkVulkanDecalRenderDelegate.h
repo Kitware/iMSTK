@@ -39,7 +39,9 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool, VulkanMemoryManager& memoryManager);
+    VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool,
+        SceneObject::Type type,
+        VulkanMemoryManager& memoryManager);
 
     ///
     /// \brief Update render geometry

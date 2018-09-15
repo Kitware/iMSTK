@@ -94,9 +94,9 @@ int main()
 
 #ifdef iMSTK_USE_Vulkan
     auto viewer = std::dynamic_pointer_cast<VulkanViewer>(sdk->getViewer());
-    viewer->setResolution(1920, 1080);
+    viewer->setResolution(800, 600);
     viewer->disableVSync();
-    viewer->enableFullscreen();
+    //viewer->enableFullscreen();
 #endif
 
     sdk->startSimulation(SimulationStatus::PAUSED);

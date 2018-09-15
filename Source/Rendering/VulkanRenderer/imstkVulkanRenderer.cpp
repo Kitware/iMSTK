@@ -153,7 +153,7 @@ VulkanRenderer::setupGPUs()
     queueInfo.pNext = nullptr;
     queueInfo.flags = 0;
     queueInfo.queueFamilyIndex = m_renderQueueFamily;
-    queueInfo.queueCount = m_queueFamilyProperties[m_renderQueueFamily].queueCount;
+    queueInfo.queueCount = 1;// m_queueFamilyProperties[m_renderQueueFamily].queueCount;
     queueInfo.pQueuePriorities = &priorities[0];
 
     // The display system isn't part of the Vulkan core
@@ -687,6 +687,22 @@ VulkanRenderer::renderFrame()
         auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
         buffers->uploadBuffers(m_renderCommandBuffer[nextImageIndex]);
     }
+    VkMemoryBarrier barrier;
+    barrier.sType = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
+    barrier.pNext = nullptr;
+    barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+    barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_INDEX_READ_BIT;
+
+    vkCmdPipelineBarrier(m_renderCommandBuffer[nextImageIndex],
+        VK_PIPELINE_STAGE_TRANSFER_BIT,
+        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        0,
+        1,
+        &barrier,
+        0,
+        nullptr,
+        0,
+        nullptr);
 
     VkDeviceSize deviceSize = { 0 };
 
@@ -1026,19 +1042,20 @@ VulkanRenderer::loadAllGeometry()
     // Add new objects
     for (auto sceneObject : m_scene->getSceneObjects())
     {
+        auto type = sceneObject->getType();
         auto geometry = sceneObject->getVisualGeometry();
 
         if (geometry && !geometry->m_renderDelegateCreated)
         {
-            auto renderDelegate = this->loadGeometry(geometry);
+            auto renderDelegate = this->loadGeometry(geometry, type);
         }
     }
 }
 
 std::shared_ptr<VulkanRenderDelegate>
-VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry)
+VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry, SceneObject::Type type)
 {
-    auto renderDelegate = VulkanRenderDelegate::make_delegate(geometry, m_memoryManager);
+    auto renderDelegate = VulkanRenderDelegate::make_delegate(geometry, type, m_memoryManager);
     if (renderDelegate != nullptr)
     {
         m_renderDelegates.push_back(renderDelegate);

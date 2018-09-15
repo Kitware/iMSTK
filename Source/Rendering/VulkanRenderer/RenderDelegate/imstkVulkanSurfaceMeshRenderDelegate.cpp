@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh, VulkanMemoryManager& memoryManager)
+VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(surfaceMesh)
 {
     m_numVertices = (uint32_t)m_geometry->getNumVertices();
@@ -37,19 +39,35 @@ VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr
         m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
-
-    for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
+    if (type == SceneObject::Type::FEMDeformable || type == SceneObject::Type::Pbd)
     {
-        this->updateVertexBuffer(i);
-        this->update(i);
+        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
+
+        for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
+        {
+            this->updateVertexBuffer(i);
+            this->update(i);
+        }
+    }
+    else
+    {
+        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
+
+        this->updateVertexBuffer(0);
+        this->update(0);
     }
 }
 
 void
 VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
 {
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frameIndex);
+    int frame = 0;
+    if (m_vertexBuffer->getMode() != VERTEX_BUFFER_STATIC)
+    {
+        frame = frameIndex;
+    }
+
+    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frame);
 
     auto normals = m_geometry->getVertexNormals();
     auto tangents = m_geometry->getVertexTangents();
@@ -80,23 +98,23 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
                 normals[i][2]);
         }
 
-        if (tangents.size() == m_geometry->getNumVertices())
-        {
-            vertices[i].tangent = glm::vec3(
-                tangents[i][0],
-                tangents[i][1],
-                tangents[i][2]);
-        }
-
         if (UVs && UVs->size() == m_geometry->getNumVertices())
         {
+            if (tangents.size() == m_geometry->getNumVertices())
+            {
+                vertices[i].tangent = glm::vec3(
+                    tangents[i][0],
+                    tangents[i][1],
+                    tangents[i][2]);
+            }
+
             vertices[i].uv = glm::vec2(
                 (*UVs)[i][0],
                 (*UVs)[i][1]);
         }
     }
 
-    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory(frameIndex);
+    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory(frame);
 
     m_vertexBuffer->setNumIndices((uint32_t)m_geometry->getNumTriangles() * 3);
     for (unsigned i = 0; i < m_geometry->getNumTriangles(); i++)

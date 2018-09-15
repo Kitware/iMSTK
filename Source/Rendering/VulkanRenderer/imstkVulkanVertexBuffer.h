@@ -77,6 +77,8 @@ public:
 
     void bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameIndex);
 
+    VulkanVertexBufferMode getMode();
+
 private:
     friend class VulkanRenderer;
 

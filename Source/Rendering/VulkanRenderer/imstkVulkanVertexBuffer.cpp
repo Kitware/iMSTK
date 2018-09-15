@@ -52,13 +52,21 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         auto vertexStagingBufferInfo = vertexBufferInfo;
         vertexStagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-        m_vertexBuffer = memoryManager.requestBuffer(m_renderDevice,
-                        vertexBufferInfo,
-                        VulkanMemoryType::VERTEX);
-
         m_vertexStagingBuffer = memoryManager.requestBuffer(m_renderDevice,
                         vertexStagingBufferInfo,
                         VulkanMemoryType::STAGING_VERTEX);
+
+        if (m_mode == VERTEX_BUFFER_STATIC)
+        {
+            m_vertexBuffer = memoryManager.requestBuffer(m_renderDevice,
+                            vertexBufferInfo,
+                            VulkanMemoryType::VERTEX);
+        }
+        else
+        {
+            m_vertexBuffer = m_vertexStagingBuffer;
+        }
+
     }
 
     // Index buffer
@@ -76,13 +84,21 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         auto indexStagingBufferInfo = indexBufferInfo;
         indexStagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-        m_indexBuffer = memoryManager.requestBuffer(m_renderDevice,
-                        indexBufferInfo,
-                        VulkanMemoryType::INDEX);
-
         m_indexStagingBuffer = memoryManager.requestBuffer(m_renderDevice,
                         indexStagingBufferInfo,
                         VulkanMemoryType::STAGING_INDEX);
+
+        if (m_mode == VERTEX_BUFFER_STATIC)
+        {
+            m_indexBuffer = memoryManager.requestBuffer(m_renderDevice,
+                            indexBufferInfo,
+                            VulkanMemoryType::INDEX);
+        }
+        else
+        {
+            m_indexBuffer = m_indexStagingBuffer;
+        }
+
     }
 }
 
@@ -108,7 +124,7 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices
 {
     auto local_vertices = (VulkanBasicVertex *)this->getVertexMemory();
 
-    for (unsigned i = 0; i < vertices->size(); i++)
+    for (unsigned int i = 0; i < vertices->size(); i++)
     {
         local_vertices[i].position = glm::vec3(
             (*vertices)[i].position.x,
@@ -125,7 +141,7 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices
     {
         auto local_triangles = (std::array<uint32_t, 3> *) this->getIndexMemory();
 
-        for (unsigned i = 0; i < triangles->size(); i++)
+        for (unsigned int i = 0; i < triangles->size(); i++)
         {
             local_triangles[i][0] = (*triangles)[i][0];
             local_triangles[i][1] = (*triangles)[i][1];
@@ -137,6 +153,11 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices
 void
 VulkanVertexBuffer::uploadBuffers(VkCommandBuffer& commandBuffer)
 {
+    if (m_mode != VERTEX_BUFFER_STATIC)
+    {
+        return;
+    }
+
     if (m_vertexBufferModified)
     {
         VkBufferCopy copyInfo;
@@ -212,4 +233,11 @@ VulkanVertexBuffer::bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameI
     vkCmdBindVertexBuffers(*commandBuffer, 0, 1, m_vertexBuffer->getBuffer(), &vertexOffset);
     vkCmdBindIndexBuffer(*commandBuffer, *m_indexBuffer->getBuffer(), indexOffset, VK_INDEX_TYPE_UINT32);
 }
+
+VulkanVertexBufferMode
+VulkanVertexBuffer::getMode()
+{
+    return m_mode;
+}
+
 }

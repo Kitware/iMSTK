@@ -23,7 +23,9 @@
 
 namespace imstk
 {
-VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh, VulkanMemoryManager& memoryManager)
+VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh,
+    SceneObject::Type type,
+    VulkanMemoryManager& memoryManager)
     : m_geometry(lineMesh)
 {
     m_numVertices = (uint32_t)m_geometry->getNumVertices();
@@ -38,17 +40,35 @@ VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<LineM
 
     m_geometry->getRenderMaterial()->m_isLineMesh = true;
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
+    if (type == SceneObject::Type::FEMDeformable || type == SceneObject::Type::Pbd)
+    {
+        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
 
-    this->updateVertexBuffer();
+        for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
+        {
+            this->updateVertexBuffer(i);
+            this->update(i);
+        }
+    }
+    else
+    {
+        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
 
-    this->update(0);
+        this->updateVertexBuffer(0);
+        this->update(0);
+    }
 }
 
 void
-VulkanLineMeshRenderDelegate::updateVertexBuffer()
+VulkanLineMeshRenderDelegate::updateVertexBuffer(const uint32_t frameIndex)
 {
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory();
+    int frame = 0;
+    if (m_vertexBuffer->getMode() != VERTEX_BUFFER_STATIC)
+    {
+        frame = frameIndex;
+    }
+
+    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frame);
 
     auto colors = m_geometry->getVertexColors();
 
@@ -73,7 +93,7 @@ VulkanLineMeshRenderDelegate::updateVertexBuffer()
         }
     }
 
-    auto lines = (std::array<uint32_t, 2> *)m_vertexBuffer->getIndexMemory();
+    auto lines = (std::array<uint32_t, 2> *)m_vertexBuffer->getIndexMemory(frame);
 
     m_vertexBuffer->setNumIndices((uint32_t)m_geometry->getNumLines() * 2);
 
@@ -92,7 +112,7 @@ VulkanLineMeshRenderDelegate::update(const uint32_t frameIndex)
 
     if (m_geometry->m_dataModified)
     {
-        this->updateVertexBuffer();
+        this->updateVertexBuffer(frameIndex);
     }
 }
 
