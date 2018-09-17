@@ -99,6 +99,8 @@ VulkanRenderer::initialize(unsigned int width, unsigned int height)
     vkGetPhysicalDeviceProperties(m_renderPhysicalDevice, &deviceProperties);
     m_deviceLimits = deviceProperties.limits;
 
+    m_anisotropyAmount = m_deviceLimits.maxSamplerAnisotropy;
+
     VkPipelineCacheCreateInfo pipelineCacheCreateInfo;
     pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     pipelineCacheCreateInfo.pNext = nullptr;
@@ -169,6 +171,7 @@ VulkanRenderer::setupGPUs()
     VkPhysicalDeviceFeatures features = {VK_FALSE};
     features.fillModeNonSolid = VK_TRUE;
     features.tessellationShader = VK_TRUE;
+    features.samplerAnisotropy = VK_TRUE;
     features.wideLines = deviceFeatures.wideLines;
 
     if (features.wideLines == VK_TRUE)
@@ -1129,7 +1132,7 @@ VulkanRenderer::initializePostProcesses()
     if (!m_noiseTexture)
     {
         m_noiseTexture = std::make_shared<Texture>("noise", Texture::Type::NONE);
-        m_noiseTextureDelegate = std::make_shared<VulkanTextureDelegate>(m_memoryManager, m_noiseTexture);
+        m_noiseTextureDelegate = std::make_shared<VulkanTextureDelegate>(m_memoryManager, m_noiseTexture, 0.0f);
     }
 
     m_ssao[0] = std::make_shared<VulkanPostProcess>(this, 1);

@@ -562,7 +562,7 @@ VulkanMaterialDelegate::initializeTexture(VulkanRenderer * renderer,
     if (texture->getPath() != "")
     {
         textureDelegate =
-            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, texture);
+            std::make_shared<VulkanTextureDelegate>(*m_memoryManager, texture, renderer->m_anisotropyAmount);
         renderer->m_textureMap[texture] = textureDelegate;
     }
     else

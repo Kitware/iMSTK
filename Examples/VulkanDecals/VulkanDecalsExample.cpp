@@ -27,7 +27,7 @@ using namespace imstk;
 
 ///
 /// \brief This example demonstrates decal rendering feature.
-/// NOTE: Requires enabling Vulkan rendeing backend
+/// NOTE: Requires enabling Vulkan rendering backend
 ///
 int main()
 {
@@ -42,7 +42,7 @@ int main()
 
     // Decals
     auto decalMaterial = std::make_shared<RenderMaterial>();
-    auto decalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/decals/blood_decal.png", Texture::DIFFUSE);
+    auto decalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/decals/blood_decal.png", Texture::Type::DIFFUSE);
     decalMaterial->addTexture(decalTexture);
 
     auto decalPool = std::make_shared<DecalPool>();

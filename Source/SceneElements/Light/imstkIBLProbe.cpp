@@ -32,11 +32,11 @@ IBLProbe::IBLProbe(std::string irradianceCubemapPath,
     m_brdfLUTPath = brdfLUTPath;
 
     m_irradianceCubemapTexture
-        = std::make_shared<Texture>(irradianceCubemapPath, Texture::IRRADIANCE_CUBEMAP);
+        = std::make_shared<Texture>(irradianceCubemapPath, Texture::Type::IRRADIANCE_CUBEMAP);
     m_radianceCubemapTexture
-        = std::make_shared<Texture>(radianceCubemapPath, Texture::RADIANCE_CUBEMAP);
+        = std::make_shared<Texture>(radianceCubemapPath, Texture::Type::RADIANCE_CUBEMAP);
     m_brdfLUTTexture
-        = std::make_shared<Texture>(brdfLUTPath, Texture::BRDF_LUT);
+        = std::make_shared<Texture>(brdfLUTPath, Texture::Type::BRDF_LUT);
 }
 
 std::shared_ptr<Texture>

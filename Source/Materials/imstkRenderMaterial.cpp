@@ -216,7 +216,7 @@ RenderMaterial::getTexture(Texture::Type type)
         LOG(WARNING) << "RenderMaterial::getTexture error: Invalid texture format";
         return nullptr;
     }
-    return m_textures[type];
+    return m_textures[(unsigned int)type];
 }
 
 void
@@ -227,7 +227,7 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
         LOG(WARNING) << "RenderMaterial::addTexture: Invalid texture format";
         return;
     }
-    m_textures[texture->getType()] = texture;
+    m_textures[(unsigned int)texture->getType()] = texture;
 }
 
 void

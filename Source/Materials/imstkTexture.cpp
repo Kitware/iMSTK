@@ -46,4 +46,17 @@ Texture::getMipmapsEnabled()
 {
     return m_mipmapsEnabled;
 }
+
+bool
+Texture::isAnisotropyEnabled()
+{
+    return m_anisotropyEnabled;
+}
+
+float
+Texture::getAnisotropyFactor()
+{
+    return m_anisotropyFactor;
+}
+
 }

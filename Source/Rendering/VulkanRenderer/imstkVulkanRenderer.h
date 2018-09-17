@@ -211,6 +211,7 @@ protected:
     uint32_t m_deviceCount = 0;
     VkDevice * m_devices = nullptr;
     VkPhysicalDeviceLimits m_deviceLimits;
+    float m_anisotropyAmount;
     VkDevice m_renderDevice;
 
     VkPipelineCache m_pipelineCache;
