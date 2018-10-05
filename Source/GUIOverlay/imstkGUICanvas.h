@@ -19,54 +19,82 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanLineMeshRenderDelegate_h
-#define imstkVulkanLineMeshRenderDelegate_h
+#ifndef imstkCanvas_h
+#define imstkCanvas_h
 
+#include "imgui.h"
+
+#include <map>
+#include <string>
 #include <memory>
 
-#include "imstkVulkanRenderDelegate.h"
-#include "imstkLineMesh.h"
-#include "imstkVulkanMemoryManager.h"
+#include "imstkGUIWidget.h"
+#include "imstkGUIWidgetList.h"
 
 namespace imstk
 {
-class VulkanLineMeshRenderDelegate : public VulkanRenderDelegate
+namespace GUIOverlay
+{
+///
+/// \class Canvas
+///
+/// \brief Base class for GUI
+///
+class Canvas
 {
 public:
 
     ///
-    /// \brief Default destructor
+    /// \brief Protected constructor
     ///
-    ~VulkanLineMeshRenderDelegate() = default;
+    Canvas() {};
 
     ///
-    /// \brief Default constructor
+    /// \brief Destructor
     ///
-    VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> LineMesh,
-                                 SceneObject::Type type,
-                                 VulkanMemoryManager& memoryManager);
+    ~Canvas();
 
     ///
-    /// \brief Update render geometry
+    /// \brief Clears all the widgets
     ///
-    void update(const uint32_t frameIndex) override;
+    void clear();
 
     ///
-    /// \brief Get source geometry
+    /// \brief Render the widgets
     ///
-    std::shared_ptr<Geometry> getGeometry() const override;
+    void render();
 
+    ///
+    /// \brief Add widget
+    ///
+    void addWidget(std::shared_ptr<Widget> widget);
 
     ///
-    /// \brief Fill vertex buffer
+    /// \brief Remove widget
     ///
-    void updateVertexBuffer(const uint32_t frameIndex);
+    void removeWidget(std::string name);
+
+    ///
+    /// \brief Get widget
+    ///
+    std::shared_ptr<Widget> getWidget(std::string name);
+
+    ///
+    /// \brief Show canvas
+    ///
+    void show();
+
+    ///
+    /// \brief Hide canvas
+    ///
+    void hide();
 
 protected:
-    std::shared_ptr<LineMesh> m_geometry;
 
-    VulkanLocalVertexUniforms m_localVertexUniforms;
+    WidgetList m_widgets;
+    bool m_visible = true;
 };
-}
+} // GUI
+} // imstk
 
-#endif
+#endif // ifndef imstkCanvas_h

@@ -19,22 +19,77 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
-
-#include "vulkan/vulkan.h"
+#include "imstkGUIWidget.h"
 
 namespace imstk
 {
-class VulkanRenderPassGenerator
+namespace GUIOverlay
 {
-public:
-    static void generateDepthRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateShadowRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateGUIRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-};
+Widget::Widget(std::string name, float x, float y)
+{
+    m_name = name;
+    m_position[0] = x;
+    m_position[1] = y;
 }
 
-#endif
+Widget::~Widget()
+{
+}
+
+std::string
+Widget::getName()
+{
+    return m_name;
+}
+
+Widget::Type
+Widget::getType()
+{
+    return m_type;
+}
+
+
+const Vec2f&
+Widget::getPosition()
+{
+    return m_position;
+}
+
+void
+Widget::setPosition(const float x, const float y)
+{
+    m_position[0] = x;
+    m_position[1] = y;
+}
+
+void
+Widget::setPosition(const Vec2f& position)
+{
+    m_position[0] = position[0];
+    m_position[1] = position[1];
+}
+
+void
+Widget::hide()
+{
+    m_visible = false;
+}
+
+void
+Widget::show()
+{
+    m_visible = true;
+}
+
+const bool
+Widget::isVisible()
+{
+    return m_visible;
+}
+
+void
+Widget::render(const bool inWindow)
+{
+}
+} // GUI
+} // imstk

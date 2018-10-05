@@ -47,6 +47,12 @@ Viewer::getScreenCaptureUtility() const
     return m_screenCapturer;
 }
 
+std::shared_ptr<GUIOverlay::Canvas>
+Viewer::getCanvas()
+{
+    return m_canvas;
+}
+
 void
 Viewer::setOnCharFunction(char c, EventHandlerFunction func)
 {

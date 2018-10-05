@@ -19,22 +19,40 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
+#ifndef imstkGUIUtilities_h
+#define imstkGUIUtilities_h
 
-#include "vulkan/vulkan.h"
+#include "imgui.h"
 
 namespace imstk
 {
-class VulkanRenderPassGenerator
+namespace GUIOverlay
+{
+///
+/// \class GUIUtilities
+///
+/// \brief Utility functions for GUI management
+///
+class Utilities
 {
 public:
-    static void generateDepthRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateShadowRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateGUIRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-};
-}
+    ///
+    /// \brief Initializes the GUI system with a theme
+    ///
+    static void
+    initializeGUISystem()
+    {
+        auto io = ImGui::GetIO();
+        io.IniFilename = nullptr; // resets the GUI layout on application restart
+    }
 
-#endif
+    static ImU32
+    convertToGUIColor(const Color& color)
+    {
+        return ImGui::ColorConvertFloat4ToU32(ImVec4(color.r, color.g, color.b, color.a));
+    }
+}; // GUIUtilities
+} // GUI
+} // imstk
+
+#endif // ifndef imstkGUIUtilities_h

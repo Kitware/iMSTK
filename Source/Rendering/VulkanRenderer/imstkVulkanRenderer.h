@@ -33,6 +33,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui.h"
+#include "examples/imgui_impl_vulkan.h"
+
 #include "imstkScene.h"
 #include "imstkRenderer.h"
 #include "imstkDecalPool.h"
@@ -180,6 +183,11 @@ protected:
     ///
     void setCommandBufferState(VkCommandBuffer * commandBuffer, uint32_t width, uint32_t height);
 
+    ///
+    /// \brief Sets up GUI
+    ///
+    void setupGUI();
+
     unsigned int m_width = 1000;
     unsigned int m_height = 800;
     float m_fov = PI;
@@ -230,9 +238,12 @@ protected:
     std::vector<VkDescriptorSetLayout> m_globalDescriptorSetLayouts;
     std::vector<VkWriteDescriptorSet> m_globalWriteDescriptorSets;
 
+    VkDescriptorPool m_GUIDescriptorPool;
+
     VkRenderPass m_depthRenderPass;
     VkRenderPass m_opaqueRenderPass;
     VkRenderPass m_decalRenderPass;
+    VkRenderPass m_GUIRenderPass;
 
     // Swapchain
     VkSwapchainKHR * m_swapchain = nullptr;

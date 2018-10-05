@@ -126,6 +126,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(VTK)
   imstk_define_dependency(VRPN)
   imstk_define_dependency(LibNiFalcon)
+  imstk_define_dependency(imgui)
 
   if(APPLE OR LINUX)
    message("Warning: Building iMSTK WITHOUT audio support!")
@@ -229,16 +230,16 @@ find_package( Assimp REQUIRED )
 include_directories( ${Assimp_INCLUDE_DIRS} )
 
 # glm
-find_package(glm)
+find_package( glm )
 include_directories( ${glm_INCLUDE_DIR} )
 
 if( ${PROJECT_NAME}_USE_Vulkan )
   # glfw
-  find_package(glfw)
+  find_package( glfw )
   include_directories( ${glfw_INCLUDE_DIR} )
 
   # gli
-  find_package(gli)
+  find_package( gli )
   include_directories( ${gli_INCLUDE_DIR} )
 endif()
 
@@ -255,6 +256,10 @@ include_directories( ${g3log_INCLUDE_DIR} )
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
+
+# imgui
+find_package( imgui REQUIRED )
+include_directories( ${imgui_INCLUDE_DIR} )
 
 # SCCD
 find_package( SCCD REQUIRED )
@@ -337,6 +342,7 @@ add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Materials)
+add_subdirectory(Source/GUIOverlay)
 
 #--------------------------------------------------------------------------
 # Export Targets

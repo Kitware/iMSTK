@@ -19,54 +19,69 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanLineMeshRenderDelegate_h
-#define imstkVulkanLineMeshRenderDelegate_h
+#ifndef imstkWidgetList_h
+#define imstkWidgetList_h
 
+#include "g3log/g3log.hpp"
+
+#include <vector>
+#include <map>
 #include <memory>
 
-#include "imstkVulkanRenderDelegate.h"
-#include "imstkLineMesh.h"
-#include "imstkVulkanMemoryManager.h"
+#include "imstkGUIWidget.h"
 
 namespace imstk
 {
-class VulkanLineMeshRenderDelegate : public VulkanRenderDelegate
+namespace GUIOverlay
+{
+///
+/// \class WidgetList
+///
+/// \brief Ordered list for Widget objects
+///        The ordering matters, but we also want to have uniquely named
+///        widgets.
+///
+class WidgetList
 {
 public:
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~VulkanLineMeshRenderDelegate() = default;
-
     ///
     /// \brief Default constructor
     ///
-    VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> LineMesh,
-                                 SceneObject::Type type,
-                                 VulkanMemoryManager& memoryManager);
+    WidgetList();
 
     ///
-    /// \brief Update render geometry
+    /// \brief Add widget
     ///
-    void update(const uint32_t frameIndex) override;
+    void addWidget(std::shared_ptr<Widget> widget);
 
     ///
-    /// \brief Get source geometry
+    /// \brief Remove widget
     ///
-    std::shared_ptr<Geometry> getGeometry() const override;
+    bool removeWidget(std::string name);
 
+    ///
+    /// \brief Get widget
+    ///
+    std::shared_ptr<Widget> getWidget(std::string name);
 
     ///
-    /// \brief Fill vertex buffer
+    /// \brief Get number of widgets
     ///
-    void updateVertexBuffer(const uint32_t frameIndex);
+    size_t getSize();
+
+    ///
+    /// \brief Clear widgets
+    ///
+    void clear();
+
+    ///
+    /// \brief Access operator
+    ///
+    std::shared_ptr<Widget> operator[] (size_t index);
 
 protected:
-    std::shared_ptr<LineMesh> m_geometry;
-
-    VulkanLocalVertexUniforms m_localVertexUniforms;
+    std::vector<std::shared_ptr<Widget>> m_widgets;
 };
-}
-
+} // GUI
+} // imstk
 #endif

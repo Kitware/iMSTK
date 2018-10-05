@@ -376,4 +376,74 @@ VulkanRenderPassGenerator::generateShadowRenderPass(
 
     vkCreateRenderPass(device, &renderPassInfo[0], nullptr, &renderPass);
 }
+
+
+void
+VulkanRenderPassGenerator::generateGUIRenderPass(
+    VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples)
+{
+    VkAttachmentDescription attachments[1];
+
+    // Color attachment
+    attachments[0].flags = 0;
+    attachments[0].format = VK_FORMAT_B8G8R8A8_SRGB;
+    attachments[0].samples = samples;
+    attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+    attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+    // Color attachment
+    VkAttachmentReference diffuseReference;
+    diffuseReference.attachment = 0;
+    diffuseReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    // Render subpasses
+    VkSubpassDescription subpassInfo[2];
+
+    // First pass: geometry
+    VkAttachmentReference colorAttachments[] = { diffuseReference };
+    subpassInfo[0].flags = 0;
+    subpassInfo[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpassInfo[0].inputAttachmentCount = 0;
+    subpassInfo[0].pInputAttachments = nullptr;
+    subpassInfo[0].colorAttachmentCount = 1;
+    subpassInfo[0].pColorAttachments = colorAttachments;
+    subpassInfo[0].pResolveAttachments = nullptr;
+    subpassInfo[0].pDepthStencilAttachment = nullptr;
+    subpassInfo[0].preserveAttachmentCount = 0;
+    subpassInfo[0].pPreserveAttachments = nullptr;
+
+    VkSubpassDependency dependencies[2];
+    dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[0].dstSubpass = 0;
+    dependencies[0].srcStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[0].dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[0].srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    dependencies[0].dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+    dependencies[0].dependencyFlags = 0;
+
+    dependencies[1].srcSubpass = 0;
+    dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
+    dependencies[1].srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependencies[1].dstStageMask = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    dependencies[1].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
+    dependencies[1].dstAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    dependencies[1].dependencyFlags = 0;
+
+    VkRenderPassCreateInfo renderPassInfo[1];
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = nullptr;
+    renderPassInfo[0].flags = 0;
+    renderPassInfo[0].attachmentCount = 1;
+    renderPassInfo[0].pAttachments = attachments;
+    renderPassInfo[0].subpassCount = 1;
+    renderPassInfo[0].pSubpasses = &subpassInfo[0];
+    renderPassInfo[0].dependencyCount = 2;
+    renderPassInfo[0].pDependencies = dependencies;
+
+    vkCreateRenderPass(device, &renderPassInfo[0], nullptr, &renderPass);
+}
 }

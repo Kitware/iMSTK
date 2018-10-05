@@ -24,8 +24,8 @@
 namespace imstk
 {
 VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh,
-    SceneObject::Type type,
-    VulkanMemoryManager& memoryManager)
+                                                           SceneObject::Type type,
+                                                           VulkanMemoryManager& memoryManager)
     : m_geometry(lineMesh)
 {
     m_numVertices = (uint32_t)m_geometry->getNumVertices();

@@ -28,6 +28,7 @@
 #include "imstkRenderer.h"
 #include "imstkScreenCaptureUtility.h"
 #include "imstkInteractorStyle.h"
+#include "imstkGUICanvas.h"
 
 namespace imstk
 {
@@ -42,7 +43,7 @@ class Viewer
 {
 public:
 
-    Viewer(){};
+    Viewer() {};
 
     Viewer(SimulationManager * manager){};
 
@@ -99,6 +100,11 @@ public:
     virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
     ///
+    /// \brief Get canvas
+    ///
+    std::shared_ptr<GUIOverlay::Canvas> getCanvas();
+
+    ///
     /// \brief Set custom event handlers on interactor style
     ///
     void setOnCharFunction(char c, EventHandlerFunction func);
@@ -128,6 +134,7 @@ protected:
     std::shared_ptr<InteractorStyle> m_interactorStyle;
 
     bool m_running = false;
+    std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();;
 };
 }
 

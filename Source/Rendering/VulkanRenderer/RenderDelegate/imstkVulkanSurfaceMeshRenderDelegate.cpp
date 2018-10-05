@@ -24,8 +24,8 @@
 namespace imstk
 {
 VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh,
-    SceneObject::Type type,
-    VulkanMemoryManager& memoryManager)
+                                                                 SceneObject::Type type,
+                                                                 VulkanMemoryManager& memoryManager)
     : m_geometry(surfaceMesh)
 {
     m_numVertices = (uint32_t)m_geometry->getNumVertices();
