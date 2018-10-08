@@ -300,6 +300,8 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 
     this->initializeEigenMatrixFromVegaMatrix(*matrix, m_C);
 
+    m_damped = true;
+
     return true;
 }
 
