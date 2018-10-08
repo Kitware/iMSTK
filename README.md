@@ -24,15 +24,15 @@ Supported by:
 - [NIH-NIBIB] SBIR award [1R44EB019802-01A1](https://www.sbir.gov/sbirsearch/detail/1047037)
 
 Developed at:
-- [Kitware, Inc.] (http://www.kitware.com/)
-- [Rensselaer Polytechnic Institute] (http://rpi.edu/)
+- [Kitware, Inc.](http://www.kitware.com/)
+- [Rensselaer Polytechnic Institute](http://rpi.edu/)
 
 ### Licensing
-*Coming soon*
+iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ## Resources
 ### Documentation
-*Coming soon*
+Click [here](http://www.imstk.org/documentation/) for documentation
 
 ### Mailing Lists
 The **iMSTK Users** mailing list is the principal means of communication among developers and users: <imstk-users@imstk.org>
