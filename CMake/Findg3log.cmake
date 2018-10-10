@@ -3,12 +3,11 @@
 #-----------------------------------------------------------------------------
 if(WIN32)
   find_library(DbgHelp_LIBRARY NAMES DbgHelp)
+  
+  if(NOT DbgHelp_LIBRARY)
+    message(FATAL_ERROR "DbgHelp library not found")
+  endif()
 endif()
-
-if(NOT DbgHelp_LIBRARY)
-  message(FATAL_ERROR "DbgHelp library not found")
-endif()
-
 
 #-----------------------------------------------------------------------------
 # Find path
