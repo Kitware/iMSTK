@@ -90,6 +90,7 @@ This will checkout, build and link all iMSTK dependencies. When making changes t
 
 * ##### On Windows
 Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
+If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
 
 * ##### Phantom Omni Support
 To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geomagic.com/en/products/phantom-omni/overview) haptic device, follow the steps below:
