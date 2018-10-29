@@ -83,7 +83,8 @@ if( NOT iMSTK_USE_Vulkan )
   set(RENDERING_SUBDIR
     VTKRenderer
     VTKRenderer/RenderDelegate)
-  set(RENDERING_DEPENDENCIES)
+  set(RENDERING_DEPENDENCIES
+    GUIOverlay)
 else()
   set(RENDERING_H_FILES ${VULKAN_H_FILES})
   set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
@@ -94,7 +95,8 @@ else()
   set(RENDERING_DEPENDENCIES
     ${VulkanSDK_LIBRARIES}
     glfw
-    gli)
+    gli
+    GUIOverlay)
 endif()
 
 include(imstkAddLibrary)

@@ -107,6 +107,8 @@ VulkanRenderer::initialize(unsigned int width, unsigned int height)
     pipelineCacheCreateInfo.pInitialData = nullptr;
 
     vkCreatePipelineCache(m_renderDevice, &pipelineCacheCreateInfo, nullptr, &m_pipelineCache);
+
+    this->setupGUI();
 }
 
 void
@@ -267,6 +269,7 @@ VulkanRenderer::setupRenderPasses()
     VulkanRenderPassGenerator::generateOpaqueRenderPass(m_renderDevice, m_opaqueRenderPass, m_samples);
     VulkanRenderPassGenerator::generateDecalRenderPass(m_renderDevice, m_decalRenderPass, m_samples);
     VulkanRenderPassGenerator::generateDepthRenderPass(m_renderDevice, m_depthRenderPass, m_samples);
+    VulkanRenderPassGenerator::generateGUIRenderPass(m_renderDevice, m_GUIRenderPass, m_samples);
 }
 
 void
@@ -969,6 +972,18 @@ VulkanRenderer::renderFrame()
         vkCmdEndRenderPass(m_postProcessingCommandBuffer[nextImageIndex]);
     }
 
+    // GUI renderpass
+    {
+        auto postProcessRenderPassBeginInfo = opaqueRenderPassBeginInfo;
+        postProcessRenderPassBeginInfo.renderPass = m_GUIRenderPass;
+        postProcessRenderPassBeginInfo.framebuffer = m_HDRTonemaps[nextImageIndex]->m_framebuffer->m_framebuffer;
+        postProcessRenderPassBeginInfo.clearValueCount = (uint32_t)m_HDRTonemaps[nextImageIndex]->m_framebuffer->m_attachments.size();
+
+        vkCmdBeginRenderPass(m_postProcessingCommandBuffer[nextImageIndex], &postProcessRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), m_postProcessingCommandBuffer[nextImageIndex]);
+        vkCmdEndRenderPass(m_postProcessingCommandBuffer[nextImageIndex]);
+    }
+
     vkEndCommandBuffer(m_postProcessingCommandBuffer[nextImageIndex]);
 
     VkCommandBuffer commandBuffers[2];
@@ -1441,6 +1456,73 @@ VulkanRenderer::setCommandBufferState(VkCommandBuffer * commandBuffer, uint32_t 
     vkCmdSetScissor(*commandBuffer, 0, 1, &scissor);
 }
 
+void
+VulkanRenderer::setupGUI()
+{
+    std::array<VkDescriptorPoolSize, 11> descriptorPoolSizes;
+    descriptorPoolSizes[0] = { VK_DESCRIPTOR_TYPE_SAMPLER, 1024 };
+    descriptorPoolSizes[1] = { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024 };
+    descriptorPoolSizes[2] = { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1024 };
+    descriptorPoolSizes[3] = { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1024 };
+    descriptorPoolSizes[4] = { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1024 };
+    descriptorPoolSizes[5] = { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1024 };
+    descriptorPoolSizes[6] = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024 };
+    descriptorPoolSizes[7] = { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1024 };
+    descriptorPoolSizes[8] = { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1024 };
+    descriptorPoolSizes[9] = { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1024 };
+    descriptorPoolSizes[10] = { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1024 };
+
+    VkDescriptorPoolCreateInfo info;
+    info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    info.pNext = nullptr;
+    info.flags = 0;
+    info.poolSizeCount = (uint32_t)descriptorPoolSizes.size();
+    info.pPoolSizes = &descriptorPoolSizes[0];
+    info.maxSets = 1024;
+    vkCreateDescriptorPool(m_renderDevice, &info, nullptr, &m_GUIDescriptorPool);
+
+    ImGui_ImplVulkan_InitInfo GUIInfo;
+    GUIInfo.Allocator = nullptr;
+    GUIInfo.CheckVkResultFn = nullptr;
+    GUIInfo.DescriptorPool = m_GUIDescriptorPool;
+    GUIInfo.Device = m_renderDevice;
+    GUIInfo.Instance = *m_instance;
+    GUIInfo.PhysicalDevice = m_physicalDevices[0];
+    GUIInfo.PipelineCache = m_pipelineCache;
+    GUIInfo.Queue = m_renderQueue;
+    GUIInfo.QueueFamily = m_renderQueueFamily;
+    ImGui_ImplVulkan_Init(&GUIInfo, m_GUIRenderPass);
+
+    VkCommandBufferBeginInfo commandBufferBeginInfo;
+    commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    commandBufferBeginInfo.pNext = nullptr;
+    commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    commandBufferBeginInfo.pInheritanceInfo = nullptr;
+
+    vkBeginCommandBuffer(*m_memoryManager.m_transferCommandBuffer, &commandBufferBeginInfo);
+    ImGui_ImplVulkan_CreateFontsTexture(*m_memoryManager.m_transferCommandBuffer);
+    vkEndCommandBuffer(*m_memoryManager.m_transferCommandBuffer);
+
+    VkCommandBuffer commandBuffers[] = { *m_memoryManager.m_transferCommandBuffer };
+
+    VkPipelineStageFlags stageWaitFlags = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    VkSubmitInfo submitInfo[1];
+    submitInfo[0].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo[0].pNext = nullptr;
+    submitInfo[0].waitSemaphoreCount = 0;
+    submitInfo[0].pWaitSemaphores = nullptr;
+    submitInfo[0].pWaitDstStageMask = &stageWaitFlags;
+    submitInfo[0].commandBufferCount = 1;
+    submitInfo[0].pCommandBuffers = commandBuffers;
+    submitInfo[0].signalSemaphoreCount = 0;
+    submitInfo[0].pSignalSemaphores = nullptr;
+
+    vkQueueSubmit(m_renderQueue, 1, submitInfo, nullptr);
+
+    vkQueueWaitIdle(m_renderQueue);
+    ImGui_ImplVulkan_InvalidateFontUploadObjects();
+}
+
 VulkanRenderer::~VulkanRenderer()
 {
     // Delete devices
@@ -1463,6 +1545,8 @@ VulkanRenderer::~VulkanRenderer()
 
         // Delete framebuffers
         this->deleteFramebuffers();
+
+        vkDestroyDescriptorPool(m_renderDevice, m_GUIDescriptorPool, nullptr);
 
         // Delete shadows
         for (auto imageView : m_shadowMapsViews)

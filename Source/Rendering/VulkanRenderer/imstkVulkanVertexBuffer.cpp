@@ -66,7 +66,6 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         {
             m_vertexBuffer = m_vertexStagingBuffer;
         }
-
     }
 
     // Index buffer
@@ -98,7 +97,6 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         {
             m_indexBuffer = m_indexStagingBuffer;
         }
-
     }
 }
 
@@ -239,5 +237,4 @@ VulkanVertexBuffer::getMode()
 {
     return m_mode;
 }
-
 }

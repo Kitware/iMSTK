@@ -44,8 +44,8 @@ namespace imstk
 {
 std::shared_ptr<VulkanRenderDelegate>
 VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom,
-    SceneObject::Type type,
-    VulkanMemoryManager& memoryManager)
+                                    SceneObject::Type type,
+                                    VulkanMemoryManager& memoryManager)
 {
     geom->m_renderDelegateCreated = true;
     switch (geom->getType())

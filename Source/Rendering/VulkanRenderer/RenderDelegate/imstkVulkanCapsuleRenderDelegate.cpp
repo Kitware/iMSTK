@@ -24,8 +24,8 @@
 namespace imstk
 {
 VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule,
-    SceneObject::Type type,
-    VulkanMemoryManager& memoryManager)
+                                                         SceneObject::Type type,
+                                                         VulkanMemoryManager& memoryManager)
     : m_geometry(capsule)
 {
     auto source = vtkSmartPointer<vtkCapsuleSource>::New();

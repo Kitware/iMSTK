@@ -32,10 +32,13 @@ VulkanViewer::VulkanViewer(SimulationManager * manager)
     interactor->m_simManager = m_simManager;
 
     m_interactorStyle = interactor;
+
+    // Create GUI
+    ImGui::CreateContext();
 }
 
 void
-VulkanViewer::setActiveScene(std::shared_ptr<Scene>scene)
+VulkanViewer::setActiveScene(std::shared_ptr<Scene> scene)
 {
     m_renderer = std::make_shared<VulkanRenderer>(scene);
     m_renderer->m_backgroundColor = m_backgroundColor;
@@ -97,10 +100,20 @@ VulkanViewer::startRenderingLoop()
 
     m_renderer->loadAllGeometry();
 
+    GUIOverlay::Utilities::initializeGUISystem();
+
     while (!glfwWindowShouldClose(m_window))
     {
-        m_renderer->renderFrame();
         glfwPollEvents();
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        m_canvas->render();
+
+        ImGui::Render();
+
+        m_renderer->renderFrame();
         std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
     }
 
@@ -133,6 +146,12 @@ VulkanViewer::setupWindow()
     for (int i = 0; i < (int)tempCount; i++)
     {
         m_renderer->m_extensions.push_back((char*)tempExtensions[i]);
+    }
+
+    // Keep resolution if not fullscreen
+    if (!m_fullscreen)
+    {
+        return;
     }
 
     // find appropriate resolution
@@ -182,8 +201,10 @@ VulkanViewer::createWindow()
         m_window = glfwCreateWindow(m_width, m_height, "iMSTK", monitors[0], nullptr);
     }
 
+    // Wire window into GUI
+    ImGui_ImplGlfw_InitForVulkan(m_window, false);
+
     VkResult status = glfwCreateWindowSurface(*m_renderer->m_instance, m_window, nullptr, &m_surface);
-    std::cout << status << std::endl;
 
     std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->setWindow(m_window, this);
 }

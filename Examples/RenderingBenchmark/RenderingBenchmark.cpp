@@ -91,7 +91,6 @@ int main()
             object->setVisualGeometry(mesh);
             scene->addSceneObject(object);
         }
-
     }
 
     int frame = 0;
@@ -102,41 +101,41 @@ int main()
     int startupFrame = -1;
 
     sdk->getViewer()->setOnTimerFunction([&](InteractorStyle* c) -> bool
+    {
+        if (dynamicMesh)
         {
-            if (dynamicMesh)
+            for (int j = 0; j < numMeshes; j++)
             {
-                for (int j = 0; j < numMeshes; j++)
-                {
-                    auto object = scene->getSceneObject(std::string("mesh") + std::to_string(j));
-                    auto mesh = std::dynamic_pointer_cast<LineMesh>(object->getVisualGeometry());
+                auto object = scene->getSceneObject(std::string("mesh") + std::to_string(j));
+                auto mesh = std::dynamic_pointer_cast<LineMesh>(object->getVisualGeometry());
 
-                    mesh->setVertexPositions(vertices);
-                    mesh->setLinesVertices(lines);
-                }
+                mesh->setVertexPositions(vertices);
+                mesh->setLinesVertices(lines);
             }
-
-            if (scene->getSceneObject("mesh" + std::to_string(numMeshes - 1)) && startupFrame == -1)
-            {
-                startupFrame = frame;
-                LOG(INFO) << "Start time: " << startWatch->getTimeElapsed();
-            }
-            if (frame == startupFrame + 100)
-            {
-                startFrame = frame;
-                watch->start();
-                watch->reset();
-                LOG(INFO) << "Starting time";
-            }
-            else if (frame == startFrame + 100 && startFrame != -1)
-            {
-                endTime = watch->getTimeElapsed();
-                LOG(INFO) << "Total time: " << endTime;
-                LOG(INFO) << "Frame time: " << endTime / (frame - startFrame);
-            }
-            frame++;
-            return true;
         }
-    );
+
+        if (scene->getSceneObject("mesh" + std::to_string(numMeshes - 1)) && startupFrame == -1)
+        {
+            startupFrame = frame;
+            LOG(INFO) << "Start time: " << startWatch->getTimeElapsed();
+        }
+        if (frame == startupFrame + 100)
+        {
+            startFrame = frame;
+            watch->start();
+            watch->reset();
+            LOG(INFO) << "Starting time";
+        }
+        else if (frame == startFrame + 100 && startFrame != -1)
+        {
+            endTime = watch->getTimeElapsed();
+            LOG(INFO) << "Total time: " << endTime;
+            LOG(INFO) << "Frame time: " << endTime / (frame - startFrame);
+        }
+        frame++;
+        return true;
+        }
+        );
 
     // Start simulation
     startWatch->start();
