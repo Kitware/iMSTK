@@ -231,18 +231,6 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
 }
 
 void
-RenderMaterial::flatShadingOn()
-{
-    m_flatShading = true;
-}
-
-void
-RenderMaterial::flatShadingOff()
-{
-    m_flatShading = false;
-}
-
-void
 RenderMaterial::setReceivesShadows(const bool receivesShadows)
 {
     m_receivesShadows = receivesShadows;
