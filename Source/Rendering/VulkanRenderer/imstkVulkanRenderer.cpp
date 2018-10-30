@@ -730,14 +730,11 @@ VulkanRenderer::renderFrame()
 
         for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
         {
-            if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
-            {
-                continue;
-            }
-
             auto material = m_renderDelegates[renderDelegateIndex]->m_shadowMaterial;
 
-            if (!m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows())
+            if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
+                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows()
+                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible()) 
             {
                 continue;
             }
@@ -775,7 +772,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
         {
             continue;
         }
@@ -852,7 +850,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
         {
             continue;
         }
@@ -886,7 +885,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
         {
             continue;
         }

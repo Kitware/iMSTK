@@ -67,4 +67,5 @@ SceneObject::setName(const std::string& name)
 {
     m_name = name;
 }
+
 } // imstk

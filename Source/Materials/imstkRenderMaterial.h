@@ -131,13 +131,6 @@ public:
     void flatShadingOff();
 
     ///
-    /// \brief Turn on/off visibility
-    ///
-    void setVisibilityOff();
-    void setVisibilityOn();
-    bool getVisibility() const;
-
-    ///
     /// \brief Get/Set shadow receiving ability
     ///
     void setReceivesShadows(const bool receivesShadows);

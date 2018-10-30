@@ -64,6 +64,21 @@ int main()
     colorLight->setSpotAngle(1);
     sceneTest->addLight(colorLight);
 
+    // Hide/show function
+    auto viewer = sdk->getViewer();
+    viewer->setOnCharFunction('v', [&](InteractorStyle* c) -> bool
+    {
+        if (cubeGeom->isVisible())
+        {
+            cubeGeom->hide();
+        }
+        else
+        {
+            cubeGeom->show();
+        }
+        return false;
+    });
+
     // Update Camera
     auto cam1 = sceneTest->getCamera();
     cam1->setPosition(Vec3d(-5.5, 2.5, 32));

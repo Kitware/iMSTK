@@ -243,26 +243,6 @@ RenderMaterial::flatShadingOff()
 }
 
 void
-RenderMaterial::setVisibilityOff()
-{
-    m_isVisible = false;
-    m_modified = true;
-}
-
-void
-RenderMaterial::setVisibilityOn()
-{
-    m_isVisible = true;
-    m_modified = true;
-}
-
-bool
-RenderMaterial::getVisibility() const
-{
-    return m_isVisible;
-}
-
-void
 RenderMaterial::setReceivesShadows(const bool receivesShadows)
 {
     m_receivesShadows = receivesShadows;

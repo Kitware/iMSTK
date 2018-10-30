@@ -252,4 +252,23 @@ Geometry::getRenderMaterial() const
 {
     return m_renderMaterial;
 }
+
+void
+Geometry::show()
+{
+    m_isVisible = true;
+}
+
+void
+Geometry::hide()
+{
+    m_isVisible = false;
+}
+
+bool
+Geometry::isVisible() const
+{
+    return m_isVisible;
+}
+
 } // imstk
