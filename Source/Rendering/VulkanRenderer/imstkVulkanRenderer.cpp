@@ -1232,8 +1232,6 @@ VulkanRenderer::updateGlobalUniforms(uint32_t frameIndex)
         m_globalVertexUniforms.projectionMatrix = glm::perspective(m_fov, (float)(m_width) / (float)(m_height), m_nearPlane, m_farPlane);
         glm::mat4 correctionMatrix; // for Vulkan rendering
         correctionMatrix[1][1] = -1;
-        correctionMatrix[2][2] = 0.5;
-        correctionMatrix[3][2] = 0.5;
         m_globalVertexUniforms.projectionMatrix *= correctionMatrix;
 
         // View matrix
