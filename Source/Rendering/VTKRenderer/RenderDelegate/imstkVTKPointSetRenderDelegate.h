@@ -61,6 +61,11 @@ public:
     ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
+    ///
+    /// \brief Return the render material
+    ///
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
+
 protected:
 
     std::shared_ptr<PointSet> m_geometry;                   ///> Geometry to render

@@ -19,59 +19,52 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKTetrahedralMeshRenderDelegate_h
-#define imstkVTKTetrahedralMeshRenderDelegate_h
+#ifndef imstkVTKdbgTrianglesRenderDelegate_h
+#define imstkVTKdbgTrianglesRenderDelegate_h
 
 #include <memory>
 
 #include "imstkVTKRenderDelegate.h"
 
 class vtkDoubleArray;
-class vtkUnstructuredGrid;
 
 namespace imstk
 {
-class TetrahedralMesh;
+class SurfaceMesh;
 
 ///
-/// \class TetrahedralMeshRenderDelegate
+/// \class SurfaceMeshRenderDelegate
 ///
 /// \brief
 ///
-class VTKTetrahedralMeshRenderDelegate : public VTKRenderDelegate
+class VTKdbgTrianglesRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh);
+    VTKdbgTrianglesRenderDelegate(std::shared_ptr<DebugRenderTriangles> renderTriangles);
 
     ///
-    /// \brief Destructor
-    ///
-    ~VTKTetrahedralMeshRenderDelegate() = default;
-
-    ///
-    /// \brief Update unstructured grid source based on the tetrahedral mesh
+    /// \brief Update polydata source based on the surface mesh geometry
     ///
     void updateDataSource() override;
 
     ///
-    /// \brief Returns the tetrahedral mesh
+    /// \brief Return geometry to render
     ///
-    std::shared_ptr<Geometry> getGeometry() const override;
+    std::shared_ptr<Geometry> getGeometry() const { return nullptr; };
 
     ///
     /// \brief Return the render material
     ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;;
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_triangles->getRenderMaterial(); };
 
 protected:
 
-    std::shared_ptr<TetrahedralMesh> m_geometry; ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
-    vtkSmartPointer<vtkUnstructuredGrid> m_mesh; ///> Mapped tetrahedral mesh
+    std::shared_ptr<DebugRenderTriangles> m_triangles;        ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices    
 };
-} // imstk
+}
 
-#endif // ifndef imstkTetrahedralMeshRenderDelegate_h
+#endif // ifndef imstkSurfaceMeshRenderDelegate_h

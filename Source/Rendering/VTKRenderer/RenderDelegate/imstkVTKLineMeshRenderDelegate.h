@@ -46,11 +46,6 @@ public:
     VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh);
 
     ///
-    /// \brief Destructor
-    ///
-    ~VTKLineMeshRenderDelegate() = default;
-
-    ///
     /// \brief Update line source based on the line mesh
     ///
     void updateDataSource() override;
@@ -59,6 +54,11 @@ public:
     /// \brief Returns the line mesh
     ///
     std::shared_ptr<Geometry>getGeometry() const override;
+
+    ///
+    /// \brief Return the render material
+    ///
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
 
 protected:
 

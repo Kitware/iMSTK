@@ -29,6 +29,7 @@
 #include "imstkVTKTextureDelegate.h"
 #include "imstkTextureManager.h"
 #include "imstkVTKCustomPolyDataMapper.h"
+#include "imstkDebugGeometry.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
@@ -59,6 +60,11 @@ public:
     static std::shared_ptr<VTKRenderDelegate> make_delegate(std::shared_ptr<Geometry> geom);
 
     ///
+    /// \brief Instantiate proper debug render delegate
+    ///
+    static std::shared_ptr<VTKRenderDelegate> make_Debugdelegate(std::shared_ptr<DebugRenderGeometry> geom);
+   
+    ///
     /// \brief Set up normals and mapper
     /// \param source input data object
     /// \param notSurfaceMesh if the mesh isn't a surface Mesh
@@ -66,12 +72,13 @@ public:
     ///
     void setUpMapper(vtkAlgorithmOutput *source,
                      const bool notSurfaceMesh,
-                     std::shared_ptr<Geometry> geometry);
+                     std::shared_ptr<RenderMaterial> renderMat);
 
     ///
     /// \brief Return geometry to render
     ///
     virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+    virtual std::shared_ptr<RenderMaterial> getRenderMaterial() const = 0;
 
     ///
     /// \brief Get VTK renderered object

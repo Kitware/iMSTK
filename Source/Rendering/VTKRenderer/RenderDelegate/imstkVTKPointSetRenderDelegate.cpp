@@ -74,7 +74,7 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<PointSet> m
     }
     sphere->SetRadius(mesh->getRenderMaterial()->getSphereGlyphSize());
 
-    mapper->setGeometry(mesh);
+    mapper->setRenderMaterial(mesh->getRenderMaterial());
 }
 
 void
@@ -92,4 +92,11 @@ VTKPointSetRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
+
+std::shared_ptr<imstk::RenderMaterial> 
+VTKPointSetRenderDelegate::getRenderMaterial() const
+{
+    return m_geometry->getRenderMaterial();
+}
+
 } // imstk

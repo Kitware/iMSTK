@@ -22,6 +22,7 @@
 #include "imstkScene.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
+#include "imstkDebugGeometry.h"
 
 #include <g3log/g3log.hpp>
 
@@ -83,6 +84,21 @@ Scene::getSceneObject(const std::string& sceneObjectName) const
     return m_sceneObjectsMap.at(sceneObjectName);
 }
 
+const std::vector<std::shared_ptr<DebugRenderGeometry>>
+Scene::getDebugRenderObjects() const
+{
+    std::vector<std::shared_ptr<DebugRenderGeometry>> v;
+
+    for (auto it = m_DebugRenderGeometryMap.begin();
+        it != m_DebugRenderGeometryMap.end();
+        ++it)
+    {
+        v.push_back(it->second);
+    }
+
+    return v;
+}
+
 void
 Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {
@@ -97,6 +113,22 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 
     m_sceneObjectsMap[newSceneObjectName] = newSceneObject;
     LOG(INFO) << newSceneObjectName << " object added to " << m_name;
+}
+
+void
+Scene::addDebugGeometry(std::shared_ptr<DebugRenderGeometry> newDebugRenderObject)
+{
+    std::string name = newDebugRenderObject->getName();
+
+    if (m_sceneObjectsMap.find(name) != m_sceneObjectsMap.end())
+    {
+        LOG(WARNING) << "Can not add debug render object: '" << name
+            << "' is already registered in this scene.";
+        return;
+    }
+
+    m_DebugRenderGeometryMap[name] = newDebugRenderObject;
+    LOG(INFO) << name << " object added to " << m_name;
 }
 
 void

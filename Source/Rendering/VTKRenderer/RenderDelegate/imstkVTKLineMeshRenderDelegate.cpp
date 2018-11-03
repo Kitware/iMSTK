@@ -91,7 +91,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     this->update();
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), true, m_geometry);
+    this->setUpMapper(source->GetOutputPort(), true, m_geometry->getRenderMaterial());
 }
 
 void
@@ -112,4 +112,11 @@ VTKLineMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
+
+std::shared_ptr<imstk::RenderMaterial> 
+VTKLineMeshRenderDelegate::getRenderMaterial() const
+{
+    return m_geometry->getRenderMaterial();
+}
+
 } // imstk

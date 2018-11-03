@@ -131,7 +131,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
 
     // Update Transform, Render Properties
     this->update();
-    this->setUpMapper(source->GetOutputPort(), false, m_geometry);
+    this->setUpMapper(source->GetOutputPort(), false, m_geometry->getRenderMaterial());
 }
 
 void

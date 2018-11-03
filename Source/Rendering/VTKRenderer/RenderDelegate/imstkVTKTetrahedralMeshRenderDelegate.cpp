@@ -124,4 +124,11 @@ VTKTetrahedralMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
+
+std::shared_ptr<imstk::RenderMaterial> 
+VTKTetrahedralMeshRenderDelegate::getRenderMaterial() const
+{
+    return m_geometry->getRenderMaterial();
+}
+
 } // imstk

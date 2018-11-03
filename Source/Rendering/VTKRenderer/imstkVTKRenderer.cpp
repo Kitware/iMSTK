@@ -81,7 +81,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
     axes->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
     axes->SetAxisLabels(false);
     axes->SetTotalLength(40, 40, 40);
-    m_debugVtkActors.push_back(axes);
+    //m_debugVtkActors.push_back(axes);
 
     // Camera and camera actor
     if (!enableVR)
@@ -311,6 +311,26 @@ VTKRenderer::updateRenderDelegates()
 
             m_renderDelegates.push_back( delegate );
             m_objectVtkActors.push_back( delegate->getVtkActor() );
+            m_vtkRenderer->AddActor(delegate->getVtkActor());
+            geom->m_renderDelegateCreated = true;
+        }
+    }
+
+    // Debug render actors
+    for (const auto& geom : m_scene->getDebugRenderObjects())
+    {
+        if (geom && !geom->m_renderDelegateCreated)
+        {
+            auto delegate = VTKRenderDelegate::make_Debugdelegate(geom);
+            if (delegate == nullptr)
+            {
+                LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                    << geom->getName() << "'.";
+                continue;
+            }
+
+            m_debugRenderDelegates.push_back(delegate);
+            m_objectVtkActors.push_back(delegate->getVtkActor());
             m_vtkRenderer->AddActor(delegate->getVtkActor());
             geom->m_renderDelegateCreated = true;
         }

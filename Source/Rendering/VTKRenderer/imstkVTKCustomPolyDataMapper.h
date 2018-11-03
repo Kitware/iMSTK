@@ -69,7 +69,10 @@ public:
 
     static VTKCustomPolyDataMapper * New();
 
-    void setGeometry(std::shared_ptr<Geometry> geometry);
+    ///
+    /// \brief Set the render material
+    ///
+    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMat);
 
 protected:
     ///
@@ -137,7 +140,7 @@ protected:
     ///
     void loadShader(const std::string filename, std::string& source);
 
-    std::shared_ptr<Geometry> m_geometry; ///< Geometry reference
+    std::shared_ptr<RenderMaterial> m_renderMaterial; ///< Geometry reference
 
     std::string m_vertexShaderSource = ""; ///< Source for vertex shader
     std::string m_fragmentShaderSource = ""; ///< Source for fragment shader

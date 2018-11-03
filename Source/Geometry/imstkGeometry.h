@@ -81,7 +81,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Geometry(Type type) : m_type(type) {}
+    Geometry(Type type) : m_type(type), m_renderMaterial(std::make_shared<RenderMaterial>()){}
 
     ///
     /// \brief Destructor
