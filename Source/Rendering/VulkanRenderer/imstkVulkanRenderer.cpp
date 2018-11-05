@@ -734,7 +734,7 @@ VulkanRenderer::renderFrame()
 
             if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
                 || !m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows()
-                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible()) 
+                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
             {
                 continue;
             }

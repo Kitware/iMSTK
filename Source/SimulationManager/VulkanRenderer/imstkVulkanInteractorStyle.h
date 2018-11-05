@@ -24,7 +24,7 @@
 
 #include "GLFW/glfw3.h"
 
-#include "imstkVulkanInteractorStyleTrackballCamera.h"
+#include "imstkVulkanInteractorStyleFreeCamera.h"
 #include "imstkInteractorStyle.h"
 
 #include <iostream>
@@ -37,7 +37,7 @@ namespace imstk
 class VulkanInteractorStyle;
 class VulkanViewer;
 
-using VulkanBaseInteractorStyle = VulkanInteractorStyleTrackballCamera;
+using VulkanBaseInteractorStyle = VulkanInteractorStyleFreeCamera;
 
 class VulkanInteractorStyle : public VulkanBaseInteractorStyle, public InteractorStyle
 {

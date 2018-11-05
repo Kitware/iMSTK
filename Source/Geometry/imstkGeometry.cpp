@@ -270,5 +270,4 @@ Geometry::isVisible() const
 {
     return m_isVisible;
 }
-
 } // imstk

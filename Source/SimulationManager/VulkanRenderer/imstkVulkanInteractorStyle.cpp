@@ -40,6 +40,8 @@ VulkanInteractorStyle::OnTimer()
     {
         return;
     }
+
+    VulkanBaseInteractorStyle::OnTimer();
 }
 
 void
@@ -82,11 +84,11 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
         }
     }
     else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
+             (key == 'q' || key == 'Q'))// || key == 'e' || key == 'E')) // end Simulation
     {
         m_simManager->endSimulation();
     }
-    else if (key == 'd' || key == 'D') // switch rendering mode
+    else if (key == 'f' || key == 'F')//(key == 'd' || key == 'D') // switch rendering mode
     {
         if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::SIMULATION)
         {

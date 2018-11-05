@@ -90,7 +90,7 @@ public:
 
 protected:
     friend class VulkanInteractorStyle;
-    friend class VulkanInteractorStyleTrackballCamera;
+    friend class VulkanInteractorStyleFreeCamera;
 
     void setupWindow();
     void createWindow();

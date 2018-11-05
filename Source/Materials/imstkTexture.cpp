@@ -58,5 +58,4 @@ Texture::getAnisotropyFactor()
 {
     return m_anisotropyFactor;
 }
-
 }
