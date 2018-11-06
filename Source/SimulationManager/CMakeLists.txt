@@ -5,12 +5,14 @@
 set(VTK_H_FILES
     VTKRenderer/imstkVTKInteractorStyle.h
     VTKRenderer/imstkVTKScreenCaptureUtility.h
-    VTKRenderer/imstkVTKViewer.h)
+    VTKRenderer/imstkVTKViewer.h
+    VTKRenderer/imstkOpenVRCommand.h)
 
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKInteractorStyle.cpp
     VTKRenderer/imstkVTKScreenCaptureUtility.cpp
-    VTKRenderer/imstkVTKViewer.cpp)
+    VTKRenderer/imstkVTKViewer.cpp
+    VTKRenderer/imstkOpenVRCommand.cpp)
 
 set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanInteractorStyle.h
@@ -44,7 +46,6 @@ imstk_add_library( SimulationManager
     imstkViewer.h
     imstkScreenCaptureUtility.h
     imstkInteractorStyle.h
-    imstkOpenVRCommand.h
     ${SIMULATIONMANAGER_H_FILES}
   CPP_FILES
     imstkSceneManager.cpp
@@ -52,7 +53,6 @@ imstk_add_library( SimulationManager
     imstkViewer.cpp
     imstkScreenCaptureUtility.cpp
     imstkInteractorStyle.cpp
-    imstkOpenVRCommand.cpp
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}
