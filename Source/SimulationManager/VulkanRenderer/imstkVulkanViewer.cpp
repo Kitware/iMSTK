@@ -82,6 +82,8 @@ VulkanViewer::disableFullscreen()
 void
 VulkanViewer::setResolution(unsigned int width, unsigned int height)
 {
+    m_windowWidth = width;
+    m_windowHeight = height;
     m_width = width;
     m_height = height;
 }
@@ -96,9 +98,34 @@ void
 VulkanViewer::startRenderingLoop()
 {
     m_running = true;
+
+#ifdef iMSTK_ENABLE_VR
+    if (m_renderer->m_VRMode)
+    {
+        if (vr::VR_IsHmdPresent())
+        {
+            vr::EVRInitError error;
+            m_renderer->m_VRSystem = vr::VR_Init(&error, vr::EVRApplicationType::VRApplication_Scene);
+            if (error != vr::EVRInitError::VRInitError_None)
+            {
+                LOG(WARNING) << "VR initialization error: " << error;
+            }
+            m_renderer->m_VRSystem->GetRecommendedRenderTargetSize(&m_width, &m_height);
+            m_windowWidth = m_width;
+            m_windowHeight = m_height;
+        }
+        else
+        {
+            m_renderer->m_VRMode = false;
+        }
+    }
+#endif
+
     this->setupWindow();
-    m_renderer->initialize(m_width, m_height);
+    m_renderer->createInstance();
+
     this->createWindow();
+    m_renderer->initialize(m_width, m_height, m_windowWidth, m_windowHeight);
 
     this->setupSwapchain();
     m_renderer->initializeFramebufferImages(&m_swapchain);
@@ -212,12 +239,12 @@ VulkanViewer::createWindow()
 
     if (!m_fullscreen || numMonitors == 0)
     {
-        m_window = glfwCreateWindow(m_width, m_height, "iMSTK", nullptr, nullptr);
+        m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "iMSTK", nullptr, nullptr);
     }
     else
     {
         glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
-        m_window = glfwCreateWindow(m_width, m_height, "iMSTK", monitors[0], nullptr);
+        m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "iMSTK", monitors[0], nullptr);
     }
 
     // Wire window into GUI
@@ -226,10 +253,14 @@ VulkanViewer::createWindow()
     VkResult status = glfwCreateWindowSurface(*m_renderer->m_instance, m_window, nullptr, &m_surface);
 
     std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->setWindow(m_window, this);
+
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalCapabilities);
+    m_windowWidth = m_physicalCapabilities.currentExtent.width;
+    m_windowHeight = m_physicalCapabilities.currentExtent.height;
 }
 
 void
-VulkanViewer::resizeWindow(int width, int height)
+VulkanViewer::resizeWindow(unsigned int width, unsigned int height)
 {
     m_width = width;
     m_height = height;
@@ -243,13 +274,6 @@ VulkanViewer::resizeWindow(int width, int height)
 void
 VulkanViewer::setupSwapchain()
 {
-    // Build swapchain
-    VkExtent2D extent;
-    extent.height = m_height;
-    extent.width = m_width;
-
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalCapabilities);
-
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalFormatsCount, nullptr);
     m_physicalFormats = new VkSurfaceFormatKHR[(int)m_physicalFormatsCount]();
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalFormatsCount, m_physicalFormats);
@@ -260,6 +284,12 @@ VulkanViewer::setupSwapchain()
 
     VkBool32 supported;
     vkGetPhysicalDeviceSurfaceSupportKHR(m_renderer->m_physicalDevices[0], 0, m_surface, &supported);
+
+    // Build swapchain
+    VkExtent2D extent;
+
+    extent.height = m_windowHeight;
+    extent.width = m_windowWidth;
 
     bool linearColorSpaceSupported = false;
 
@@ -295,8 +325,8 @@ VulkanViewer::setupSwapchain()
     swapchainInfo.pNext = nullptr;
     swapchainInfo.flags = 0;
     swapchainInfo.surface = m_surface;
-    swapchainInfo.minImageCount = m_renderer->m_buffering; // triple buffering
-    swapchainInfo.imageFormat = VK_FORMAT_B8G8R8A8_SRGB;
+    swapchainInfo.minImageCount = m_renderer->m_buffering; // buffering
+    swapchainInfo.imageFormat = VulkanFormats::FINAL_FORMAT;
     swapchainInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     swapchainInfo.imageExtent = extent;
     swapchainInfo.imageArrayLayers = 1;

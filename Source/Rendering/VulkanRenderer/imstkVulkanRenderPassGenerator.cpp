@@ -31,13 +31,13 @@ VulkanRenderPassGenerator::generateDepthRenderPass(
 
     // Depth attachment
     attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_D32_SFLOAT;
+    attachments[0].format = VulkanFormats::DEPTH_FORMAT;
     attachments[0].samples = samples;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[0].initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
     attachments[0].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     // Depth attachment
@@ -99,18 +99,18 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
 
     // Color attachment
     attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    attachments[0].format = VulkanFormats::HDR_FORMAT;
     attachments[0].samples = samples;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[0].initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     attachments[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Depth attachment
     attachments[1].flags = 0;
-    attachments[1].format = VK_FORMAT_D32_SFLOAT;
+    attachments[1].format = VulkanFormats::DEPTH_FORMAT;
     attachments[1].samples = samples;
     attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -121,24 +121,24 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
 
     // Normal attachment
     attachments[2].flags = 0;
-    attachments[2].format = VK_FORMAT_R8G8B8A8_SNORM;
+    attachments[2].format = VulkanFormats::NORMAL_SSS_FORMAT;
     attachments[2].samples = samples;
     attachments[2].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[2].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    attachments[2].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    attachments[2].initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    attachments[2].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Specular attachment
     attachments[3].flags = 0;
-    attachments[3].format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    attachments[3].format = VulkanFormats::HDR_FORMAT;
     attachments[3].samples = samples;
     attachments[3].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[3].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[3].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[3].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    attachments[3].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachments[3].initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     attachments[3].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Color attachment
@@ -216,7 +216,7 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
 
     // Color attachment
     attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    attachments[0].format = VulkanFormats::HDR_FORMAT;
     attachments[0].samples = samples;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -317,18 +317,18 @@ VulkanRenderPassGenerator::generateParticleRenderPass(
 
     // Color attachment
     attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    attachments[0].format = VulkanFormats::HDR_FORMAT;
     attachments[0].samples = samples;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[0].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    attachments[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    attachments[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Depth attachment
     attachments[1].flags = 0;
-    attachments[1].format = VK_FORMAT_D32_SFLOAT;
+    attachments[1].format = VulkanFormats::DEPTH_FORMAT;
     attachments[1].samples = samples;
     attachments[1].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[1].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -339,14 +339,14 @@ VulkanRenderPassGenerator::generateParticleRenderPass(
 
     // Specular attachment
     attachments[2].flags = 0;
-    attachments[2].format = VK_FORMAT_R16G16B16A16_SFLOAT;
+    attachments[2].format = VulkanFormats::HDR_FORMAT;
     attachments[2].samples = samples;
     attachments[2].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[2].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[2].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[2].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[2].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    attachments[2].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    attachments[2].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Color attachment
     VkAttachmentReference diffuseReference;
@@ -418,7 +418,7 @@ VulkanRenderPassGenerator::generateShadowRenderPass(
 
     // Depth attachment
     attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_D32_SFLOAT;
+    attachments[0].format = VulkanFormats::SHADOW_FORMAT;
     attachments[0].samples = samples;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -478,7 +478,6 @@ VulkanRenderPassGenerator::generateShadowRenderPass(
     vkCreateRenderPass(device, &renderPassInfo[0], nullptr, &renderPass);
 }
 
-
 void
 VulkanRenderPassGenerator::generateGUIRenderPass(
     VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples)
@@ -487,14 +486,14 @@ VulkanRenderPassGenerator::generateGUIRenderPass(
 
     // Color attachment
     attachments[0].flags = 0;
-    attachments[0].format = VK_FORMAT_B8G8R8A8_SRGB;
+    attachments[0].format = VulkanFormats::FINAL_FORMAT;
     attachments[0].samples = samples;
     attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
     attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     attachments[0].initialLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    attachments[0].finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Color attachment
     VkAttachmentReference diffuseReference;

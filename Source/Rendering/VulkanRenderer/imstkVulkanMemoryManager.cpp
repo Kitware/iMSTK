@@ -194,6 +194,7 @@ VulkanMemoryManager::requestImage(VkDevice& device,
     // Always allocate a new image
     auto newImage = new VulkanInternalImage();
     vkCreateImage(device, &info, nullptr, newImage->getImage());
+    newImage->setImageLayout(info.initialLayout);
 
     m_images.push_back(newImage);
 

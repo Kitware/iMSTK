@@ -34,6 +34,7 @@
 #include "imstkViewer.h"
 #include "imstkTimer.h"
 #include "imstkVulkanInteractorStyle.h"
+#include "imstkVulkanUtilities.h"
 #include "imstkGUIUtilities.h"
 
 namespace imstk
@@ -102,10 +103,12 @@ protected:
 
     void setupWindow();
     void createWindow();
-    void resizeWindow(int width, int height);
+    void resizeWindow(unsigned int width, unsigned int height);
 
     unsigned int m_width = 1000;
     unsigned int m_height = 800;
+    unsigned int m_windowWidth = 1000;
+    unsigned int m_windowHeight = 800;
 
     bool m_VSync = true;
 

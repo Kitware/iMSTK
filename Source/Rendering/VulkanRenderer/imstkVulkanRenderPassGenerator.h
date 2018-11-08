@@ -23,6 +23,7 @@
 #define imstkVulkanRenderPassGenerator_h
 
 #include "vulkan/vulkan.h"
+#include "imstkVulkanUtilities.h"
 
 namespace imstk
 {

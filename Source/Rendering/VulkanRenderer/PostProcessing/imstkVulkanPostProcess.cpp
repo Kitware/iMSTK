@@ -25,11 +25,18 @@
 
 namespace imstk
 {
-VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, unsigned int level, bool lastPass)
+VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, unsigned int level)
 {
-    m_lastPass = lastPass;
     m_downsampleLevels = level;
-    this->createFramebuffer(renderer, level, lastPass);
+    auto width = renderer->m_width >> level;
+    auto height = renderer->m_height >> level;
+    this->createFramebuffer(renderer, width, height);
+}
+
+VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, unsigned int width, unsigned int height)
+{
+    m_downsampleLevels = 0;
+    this->createFramebuffer(renderer, width, height);
 }
 
 void
@@ -463,8 +470,7 @@ VulkanPostProcess::createRenderPass(VulkanRenderer * renderer)
         attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout =
-            m_lastPass ? VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL : VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        attachment.finalLayout = m_framebuffer->m_colorLayout;
         attachments.push_back(attachment);
     }
 
@@ -481,25 +487,25 @@ VulkanPostProcess::createRenderPass(VulkanRenderer * renderer)
         attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachment.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        attachment.finalLayout = m_framebuffer->m_depthLayout;
         attachments.push_back(attachment);
     }
 
     // Color attachment
     VkAttachmentReference colorReference;
     colorReference.attachment = 0;
-    colorReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    colorReference.layout = m_framebuffer->m_colorLayout;
 
     // Depth attachment
     VkAttachmentReference depthReference;
     depthReference.attachment = 1;
-    depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    depthReference.layout = m_framebuffer->m_depthLayout;
 
     // Normal attachment
     VkAttachmentReference normalReference;
     normalReference.attachment = 2;
-    normalReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    normalReference.layout = m_framebuffer->m_normalLayout;
 
     // First pass: geometry
     m_colorAttachments.push_back(colorReference);
@@ -557,14 +563,13 @@ VulkanPostProcess::initializeFramebuffer(VulkanRenderer * renderer)
 
 void
 VulkanPostProcess::createFramebuffer(VulkanRenderer * renderer,
-                                     unsigned int level,
-                                     bool lastPass)
+                                     unsigned int width,
+                                     unsigned int height)
 {
     m_framebuffer = std::make_shared<VulkanFramebuffer>(
         renderer->m_memoryManager,
-        renderer->m_width >> level,
-        renderer->m_height >> level,
-        lastPass);
+        width,
+        height);
 }
 
 void
@@ -576,6 +581,70 @@ VulkanPostProcess::addInputImage(
     m_samplers.push_back(sampler);
     m_imageViews.push_back(imageView);
     m_layouts.push_back(layout);
+}
+
+void
+VulkanPostProcess::updateImageLayouts()
+{
+    if (m_framebuffer->m_colorFormat != VK_FORMAT_UNDEFINED)
+    {
+        m_framebuffer->m_colorImage->setImageLayout(m_framebuffer->m_colorLayout);
+    }
+
+    if (m_framebuffer->m_depthFormat != VK_FORMAT_UNDEFINED)
+    {
+        m_framebuffer->m_depthImage->setImageLayout(m_framebuffer->m_depthLayout);
+    }
+
+    if (m_framebuffer->m_normalFormat != VK_FORMAT_UNDEFINED)
+    {
+        m_framebuffer->m_normalImage->setImageLayout(m_framebuffer->m_normalLayout);
+    }
+
+    if (m_framebuffer->m_specularFormat != VK_FORMAT_UNDEFINED)
+    {
+        m_framebuffer->m_specularImage->setImageLayout(m_framebuffer->m_specularLayout);
+    }
+}
+
+void
+VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, uint32_t queueFamily)
+{
+    if (m_framebuffer->m_colorFormat != VK_FORMAT_UNDEFINED)
+    {
+        VulkanAttachmentBarriers::changeImageLayout(commandBuffer,
+            queueFamily,
+            m_framebuffer->m_colorImage,
+            VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
+
+    if (m_framebuffer->m_depthFormat != VK_FORMAT_UNDEFINED)
+    {
+        VulkanAttachmentBarriers::changeImageLayout(commandBuffer,
+            queueFamily,
+            m_framebuffer->m_depthImage,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+    }
+
+    if (m_framebuffer->m_normalFormat != VK_FORMAT_UNDEFINED)
+    {
+        VulkanAttachmentBarriers::changeImageLayout(commandBuffer,
+            queueFamily,
+            m_framebuffer->m_normalImage,
+            VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
+
+    if (m_framebuffer->m_specularFormat != VK_FORMAT_UNDEFINED)
+    {
+        VulkanAttachmentBarriers::changeImageLayout(commandBuffer,
+            queueFamily,
+            m_framebuffer->m_specularImage,
+            VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    }
 }
 
 void

@@ -54,6 +54,7 @@ set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanMaterialDelegate.h
     VulkanRenderer/imstkVulkanTextureDelegate.h
     VulkanRenderer/imstkVulkanMemoryManager.h
+    VulkanRenderer/imstkVulkanResources.h
     VulkanRenderer/imstkVulkanValidation.h
     VulkanRenderer/imstkVulkanBuffer.h
     VulkanRenderer/imstkVulkanUniformBuffer.h
@@ -105,6 +106,9 @@ else()
     glfw
     gli
     GUIOverlay)
+  if (iMSTK_ENABLE_VR)
+    list(APPEND RENDERING_DEPENDENCIES openvr)
+  endif()
 endif()
 
 include(imstkAddLibrary)

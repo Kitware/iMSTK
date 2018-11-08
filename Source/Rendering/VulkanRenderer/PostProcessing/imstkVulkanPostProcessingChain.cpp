@@ -35,10 +35,9 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
 
         auto sssHorizontalBlurPass = std::make_shared<VulkanPostProcess>(renderer, 0);
         sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[0][0]);
-        sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0],
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+        sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0], VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
         sssHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_normalImageView);
-        sssHorizontalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[2][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+        sssHorizontalBlurPass->m_framebuffer->setColor(renderer->m_HDRImage[2][0], &renderer->m_HDRImageView[2][0], VK_FORMAT_R16G16B16A16_SFLOAT);
         sssHorizontalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/sss_frag.spv");
         sssHorizontalBlurPass->m_pushConstantData[0] = 1.0;
         sssHorizontalBlurPass->m_pushConstantData[1] = 0.0;
@@ -57,10 +56,9 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
 
         auto sssVerticalBlurPass = std::make_shared<VulkanPostProcess>(renderer, 0);
         sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[2][0]);
-        sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0],
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+        sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_depthImageView[0], VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
         sssVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_normalImageView);
-        sssVerticalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[0][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+        sssVerticalBlurPass->m_framebuffer->setColor(renderer->m_HDRImage[0][0], &renderer->m_HDRImageView[0][0], VK_FORMAT_R16G16B16A16_SFLOAT);
         sssVerticalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/sss_frag.spv");
         sssVerticalBlurPass->m_pushConstantData[0] = 0.0;
         sssVerticalBlurPass->m_pushConstantData[1] = 1.0;
@@ -82,7 +80,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
     auto accumulationCompositePass = std::make_shared<VulkanPostProcess>(renderer);
     accumulationCompositePass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[0][0]);
     accumulationCompositePass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[1][0]);
-    accumulationCompositePass->m_framebuffer->setColor(&renderer->m_HDRImageView[2][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+    accumulationCompositePass->m_framebuffer->setColor(renderer->m_HDRImage[2][0], &renderer->m_HDRImageView[2][0], VK_FORMAT_R16G16B16A16_SFLOAT);
     accumulationCompositePass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/composite_frag.spv");
     m_postProcesses.push_back(accumulationCompositePass);
 
@@ -94,13 +92,15 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
 
         auto bloomThresholdPass = std::make_shared<VulkanPostProcess>(renderer, level);
         bloomThresholdPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastOutput][0]);
-        bloomThresholdPass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastInput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
+        bloomThresholdPass->m_framebuffer->setColor(renderer->m_HDRImage[m_lastInput][level],
+            &renderer->m_HDRImageView[m_lastInput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
         bloomThresholdPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/bloom_threshold_frag.spv");
         m_postProcesses.push_back(bloomThresholdPass);
 
         auto bloomHorizontalBlurPass = std::make_shared<VulkanPostProcess>(renderer, level);
         bloomHorizontalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastInput][level]);
-        bloomHorizontalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastOutput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
+        bloomHorizontalBlurPass->m_framebuffer->setColor(renderer->m_HDRImage[m_lastOutput][level],
+            &renderer->m_HDRImageView[m_lastOutput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
         bloomHorizontalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/blur_horizontal_frag.spv");
         bloomHorizontalBlurPass->m_pushConstantData[0] = std::max(renderer->m_width >> level, 1u);
         bloomHorizontalBlurPass->m_pushConstantData[1] = std::max(renderer->m_height >> level, 1u);
@@ -112,7 +112,8 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
 
         auto bloomVerticalBlurPass = std::make_shared<VulkanPostProcess>(renderer, level);
         bloomVerticalBlurPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastOutput][level]);
-        bloomVerticalBlurPass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastInput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
+        bloomVerticalBlurPass->m_framebuffer->setColor(renderer->m_HDRImage[m_lastInput][level],
+            &renderer->m_HDRImageView[m_lastInput][level], VK_FORMAT_R16G16B16A16_SFLOAT);
         bloomVerticalBlurPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/blur_vertical_frag.spv");
         bloomVerticalBlurPass->m_pushConstantData[0] = std::max(renderer->m_width >> level, 1u);
         bloomVerticalBlurPass->m_pushConstantData[1] = std::max(renderer->m_height >> level, 1u);
@@ -125,7 +126,8 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         auto bloomCompositePass = std::make_shared<VulkanPostProcess>(renderer);
         bloomCompositePass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastOutput][0]);
         bloomCompositePass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastInput][level]);
-        bloomCompositePass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastInput][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+        bloomCompositePass->m_framebuffer->setColor(renderer->m_HDRImage[m_lastInput][0],
+            &renderer->m_HDRImageView[m_lastInput][0], VK_FORMAT_R16G16B16A16_SFLOAT);
         bloomCompositePass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/composite_frag.spv");
         m_postProcesses.push_back(bloomCompositePass);
         this->incrementBufferNumbers();
@@ -137,7 +139,8 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         auto lensDistortionPass = std::make_shared<VulkanPostProcess>(renderer);
         lensDistortionPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastOutput][0]);
         lensDistortionPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastInput][0]);
-        lensDistortionPass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastInput][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+        lensDistortionPass->m_framebuffer->setColor(renderer->m_HDRImage[m_lastInput][0],
+            &renderer->m_HDRImageView[m_lastInput][0], VK_FORMAT_R16G16B16A16_SFLOAT);
         lensDistortionPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/lens_distortion_frag.spv");
         lensDistortionPass->m_pushConstantData[0] = renderer->m_lensDistortionFactor;
         m_postProcesses.push_back(lensDistortionPass);
