@@ -36,6 +36,7 @@ VTKCustomPolyDataMapper::BuildBufferObjects(vtkRenderer * renderer, vtkActor * a
     this->VBOs->CacheDataArray("inputPosition", polyData->GetPoints()->GetData(), VBOCache, VTK_FLOAT);
     this->VBOs->CacheDataArray("inputNormal", polyData->GetPointData()->GetNormals(), VBOCache, VTK_FLOAT);
     this->VBOs->CacheDataArray("inputUV", polyData->GetPointData()->GetTCoords(), VBOCache, VTK_FLOAT);
+    this->VBOs->CacheDataArray("inputColor", polyData->GetPointData()->GetScalars(), VBOCache, VTK_UNSIGNED_CHAR);
 
     if (polyData->GetPointData()->GetArray("tangents"))
     {

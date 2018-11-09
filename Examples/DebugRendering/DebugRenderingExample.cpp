@@ -57,7 +57,7 @@ int main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(Color::Red);
+    material->setDebugColor(Color::Red);
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     debugTriangleGeo->setRenderMaterial(material);
 
@@ -74,7 +74,7 @@ int main()
 
     auto materialLines = std::make_shared<RenderMaterial>();
     materialLines->setBackFaceCulling(false);
-    materialLines->setColor(Color::Green);
+    materialLines->setDebugColor(Color::Green);
     materialLines->setLineWidth(2.0);
     debugLinesGeo->setRenderMaterial(materialLines);
 
@@ -91,7 +91,7 @@ int main()
 
     auto materialPoints = std::make_shared<RenderMaterial>();
     materialPoints->setBackFaceCulling(false);
-    materialPoints->setColor(Color::Pink);
+    materialPoints->setDebugColor(Color::Pink);
     debugPointsGeo->setRenderMaterial(materialPoints);
 
     scene->addDebugGeometry(debugPointsGeo);

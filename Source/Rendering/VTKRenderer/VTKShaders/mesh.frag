@@ -8,6 +8,7 @@ in Vertex
     vec3 position;
     vec3 normal;
     vec2 uv;
+    vec3 color;
 } vertex;
 
 // Lights
@@ -99,7 +100,7 @@ void main()
 
     gl_FragData[0] = vec4(pow(finalColor, vec3(1.0 / 2.2)), 1);
 #else
-    gl_FragData[0] = vec4(debugColor, 1);
+    gl_FragData[0] = vec4(debugColor + vertex.color, 1);
 #endif
 }
 
