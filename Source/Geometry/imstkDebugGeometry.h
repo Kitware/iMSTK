@@ -93,7 +93,7 @@ protected:
     /// \brief Constructor
     ///
     DebugRenderGeometry(const std::string& name, Type type, const unsigned int size = 300) :
-        m_name(name), m_type(type), m_dataSize(size) 
+        m_name(name), m_type(type), m_dataSize(size)
     {
         allocate(size);
         m_renderMaterial = std::make_shared<RenderMaterial>();
@@ -110,7 +110,7 @@ protected:
     Type m_type;                 ///> Debug geometry type
     StdVectorOfVec3d m_vertices; ///> Vertex data
     size_t m_dataSize = 0;       ///> Count for data size
-    
+
     std::string m_name; ///> Custom name of the scene object
     bool m_renderDelegateCreated = false;
     bool m_isModified = false;
@@ -175,7 +175,6 @@ protected:
         }
     }
 };
-
 }
 
 #endif // ifndef imstkTetrahedralMesh_h

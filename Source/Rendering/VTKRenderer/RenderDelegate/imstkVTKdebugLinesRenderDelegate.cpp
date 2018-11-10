@@ -88,5 +88,4 @@ VTKdbgLinesRenderDelegate::updateDataSource()
         m_mappedVertexArray->Modified();
     }
 }
-
 } // imstk

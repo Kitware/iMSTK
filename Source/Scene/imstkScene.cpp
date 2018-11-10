@@ -90,8 +90,8 @@ Scene::getDebugRenderObjects() const
     std::vector<std::shared_ptr<DebugRenderGeometry>> v;
 
     for (auto it = m_DebugRenderGeometryMap.begin();
-        it != m_DebugRenderGeometryMap.end();
-        ++it)
+         it != m_DebugRenderGeometryMap.end();
+         ++it)
     {
         v.push_back(it->second);
     }
@@ -123,7 +123,7 @@ Scene::addDebugGeometry(std::shared_ptr<DebugRenderGeometry> newDebugRenderObjec
     if (m_sceneObjectsMap.find(name) != m_sceneObjectsMap.end())
     {
         LOG(WARNING) << "Can not add debug render object: '" << name
-            << "' is already registered in this scene.";
+                     << "' is already registered in this scene.";
         return;
     }
 

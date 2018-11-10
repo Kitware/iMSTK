@@ -63,7 +63,7 @@ public:
 protected:
 
     std::shared_ptr<DebugRenderTriangles> m_triangles;        ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices    
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }
 

@@ -36,10 +36,10 @@ int main()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("DebugRendering");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);    
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Create debug triangles
-    auto debugTriangleGeo = std::make_shared<DebugRenderTriangles>("debugtriangles", 9);    
+    auto debugTriangleGeo = std::make_shared<DebugRenderTriangles>("debugtriangles", 9);
     StdVectorOfVec3d triVerts;
     triVerts.push_back(Vec3d(0., 0., 0.));
     triVerts.push_back(Vec3d(0., 10., 0.));
@@ -81,7 +81,7 @@ int main()
     scene->addDebugGeometry(debugLinesGeo);
 
     // Create debug points
-    auto debugPointsGeo = std::make_shared<DebugRenderPoints>("debugPoints", 50);    
+    auto debugPointsGeo = std::make_shared<DebugRenderPoints>("debugPoints", 50);
     StdVectorOfVec3d points;
     for (unsigned int i = 0; i < 50; ++i)
     {
@@ -95,7 +95,7 @@ int main()
     debugPointsGeo->setRenderMaterial(materialPoints);
 
     scene->addDebugGeometry(debugPointsGeo);
-    
+
     // Add light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));

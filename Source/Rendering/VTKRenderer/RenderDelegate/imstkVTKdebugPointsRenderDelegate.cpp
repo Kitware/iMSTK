@@ -58,13 +58,13 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<DebugRend
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
 
-    auto glyph = vtkSmartPointer<vtkPolyData>::New();    
+    auto glyph = vtkSmartPointer<vtkPolyData>::New();
     auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
 
     auto glyph3D = vtkSmartPointer<vtkGlyph3D>::New();
     glyph3D->SetSourceConnection(sphereSource->GetOutputPort());
     glyph3D->SetInputData(polydata);
-    glyph3D->Update();    
+    glyph3D->Update();
 
     m_points->setDataModifiedFlag(false);
 

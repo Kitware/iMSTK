@@ -325,7 +325,7 @@ VTKRenderer::updateRenderDelegates()
             if (delegate == nullptr)
             {
                 LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
-                    << geom->getName() << "'.";
+                             << geom->getName() << "'.";
                 continue;
             }
 

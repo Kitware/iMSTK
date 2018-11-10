@@ -125,7 +125,6 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom)
 {
     switch (geom->getType())
     {
-
     case DebugRenderGeometry::Type::Points:
     {
         auto points = std::dynamic_pointer_cast<DebugRenderPoints>(geom);

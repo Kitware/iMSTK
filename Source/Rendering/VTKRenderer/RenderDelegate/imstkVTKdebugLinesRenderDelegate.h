@@ -30,7 +30,6 @@ class vtkDoubleArray;
 
 namespace imstk
 {
-
 ///
 /// \class LinesRenderDelegate
 ///
@@ -48,7 +47,7 @@ public:
     /// \brief Update polydata source based on the surface mesh geometry
     ///
     void updateDataSource() override;
-    
+
     ///
     /// \brief Return geometry to render
     ///
@@ -57,7 +56,7 @@ public:
     ///
     /// \brief Return the render material
     ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_Lines->getRenderMaterial(); };    
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_Lines->getRenderMaterial(); };
 
 protected:
 

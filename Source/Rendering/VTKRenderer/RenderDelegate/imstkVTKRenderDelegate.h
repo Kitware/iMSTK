@@ -58,7 +58,7 @@ public:
     /// \brief Instantiate proper debug render delegate
     ///
     static std::shared_ptr<VTKRenderDelegate> makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom);
-   
+
     ///
     /// \brief Set up normals and mapper
     /// \param source input data object
