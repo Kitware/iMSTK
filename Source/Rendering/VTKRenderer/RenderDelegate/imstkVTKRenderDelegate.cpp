@@ -58,7 +58,7 @@
 namespace imstk
 {
 std::shared_ptr<VTKRenderDelegate>
-VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
+VTKRenderDelegate::makeDelegate(std::shared_ptr<Geometry> geom)
 {
     switch (geom->getType())
     {
@@ -114,14 +114,14 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
+        LOG(WARNING) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
         return nullptr;
     }
     }
 }
 
 std::shared_ptr<imstk::VTKRenderDelegate>
-VTKRenderDelegate::make_Debugdelegate(std::shared_ptr<DebugRenderGeometry> geom)
+VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom)
 {
     switch (geom->getType())
     {
@@ -143,7 +143,7 @@ VTKRenderDelegate::make_Debugdelegate(std::shared_ptr<DebugRenderGeometry> geom)
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
+        LOG(WARNING) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
         return nullptr;
     }
     }

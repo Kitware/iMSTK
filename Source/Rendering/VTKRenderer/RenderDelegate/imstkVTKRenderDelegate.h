@@ -50,19 +50,14 @@ class VTKRenderDelegate
 public:
 
     ///
-    /// \brief Default destructor
-    ///
-    ~VTKRenderDelegate() = default;
-
-    ///
     /// \brief Instantiate proper render delegate
     ///
-    static std::shared_ptr<VTKRenderDelegate> make_delegate(std::shared_ptr<Geometry> geom);
+    static std::shared_ptr<VTKRenderDelegate> makeDelegate(std::shared_ptr<Geometry> geom);
 
     ///
     /// \brief Instantiate proper debug render delegate
     ///
-    static std::shared_ptr<VTKRenderDelegate> make_Debugdelegate(std::shared_ptr<DebugRenderGeometry> geom);
+    static std::shared_ptr<VTKRenderDelegate> makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom);
    
     ///
     /// \brief Set up normals and mapper
@@ -91,7 +86,7 @@ public:
     void update();
 
     ///
-    /// \brief Update rendere delegate transform based on the geometry shallow transform
+    /// \brief Update renderer delegate transform based on the geometry shallow transform
     ///
     void updateActorTransform();
 

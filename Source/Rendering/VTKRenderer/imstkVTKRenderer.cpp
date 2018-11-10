@@ -301,7 +301,7 @@ VTKRenderer::updateRenderDelegates()
         auto geom = obj->getVisualGeometry();
         if (geom && !geom->m_renderDelegateCreated)
         {
-            auto delegate = VTKRenderDelegate::make_delegate( geom );
+            auto delegate = VTKRenderDelegate::makeDelegate( geom );
             if (delegate == nullptr)
             {
                 LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
@@ -321,7 +321,7 @@ VTKRenderer::updateRenderDelegates()
     {
         if (geom && !geom->m_renderDelegateCreated)
         {
-            auto delegate = VTKRenderDelegate::make_Debugdelegate(geom);
+            auto delegate = VTKRenderDelegate::makeDebugDelegate(geom);
             if (delegate == nullptr)
             {
                 LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"

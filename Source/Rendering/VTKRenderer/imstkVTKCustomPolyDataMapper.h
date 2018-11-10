@@ -74,6 +74,11 @@ public:
     ///
     void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMat);
 
+    ///
+    /// \brief Let the polydata mapper know if it is for the surface mesh
+    ///
+    void setIsSurfaceMapper(const bool val) { m_isSurfaceMapper = val; };
+
 protected:
     ///
     /// \brief Sets up the VBO and VAO
@@ -142,12 +147,14 @@ protected:
 
     std::shared_ptr<RenderMaterial> m_renderMaterial; ///< Geometry reference
 
-    std::string m_vertexShaderSource = ""; ///< Source for vertex shader
+    std::string m_vertexShaderSource = "";   ///< Source for vertex shader
     std::string m_fragmentShaderSource = ""; ///< Source for fragment shader
 
     vtkOpenGLBufferObject * m_positionsVBO; ///< Vertex positions VBO
-    vtkOpenGLBufferObject * m_normalsVBO; ///< Vertex normals VBO
-    vtkOpenGLBufferObject * m_uvVBO; ///< Vertex UVs VBO
+    vtkOpenGLBufferObject * m_normalsVBO;   ///< Vertex normals VBO
+    vtkOpenGLBufferObject * m_uvVBO;        ///< Vertex UVs VBO
+
+    bool m_isSurfaceMapper = false;
 };
 }
 

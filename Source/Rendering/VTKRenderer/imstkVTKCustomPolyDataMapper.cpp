@@ -78,11 +78,11 @@ VTKCustomPolyDataMapper::GetShaderTemplate(
         m_fragmentShaderSource = "#define SHADED\n" + m_fragmentShaderSource;
     }
 
-    if (diffuseTexture->getPath() != "")
+    if (diffuseTexture->getPath() != "" && m_isSurfaceMapper)
     {
         m_fragmentShaderSource = "#define DIFFUSE_TEXTURE\n" + m_fragmentShaderSource;
     }
-    if (cubemapTexture->getPath() != "")
+    if (cubemapTexture->getPath() != "" && m_isSurfaceMapper)
     {
         m_fragmentShaderSource = "#define CUBEMAP_TEXTURE\n" + m_fragmentShaderSource;
     }
