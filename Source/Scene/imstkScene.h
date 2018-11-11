@@ -35,6 +35,7 @@
 namespace imstk
 {
 class SceneObjectControllerBase;
+class DebugRenderGeometry;
 
 ///
 /// \class Scene
@@ -76,6 +77,12 @@ public:
     const std::vector<std::shared_ptr<SceneObject>> getSceneObjects() const;
 
     ///
+    /// \brief Return a vector of shared pointers to the scene objects
+    /// NOTE: A separate list might be efficient as this is called runtime
+    ///
+    const std::vector<std::shared_ptr<DebugRenderGeometry>> getDebugRenderObjects() const;
+
+    ///
     /// \brief Get the scene object controllers
     ///
     const std::vector <std::shared_ptr<SceneObjectControllerBase>> getSceneObjectControllers() const;
@@ -89,6 +96,7 @@ public:
     /// \brief Add/remove a scene object
     ///
     void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
+    void addDebugGeometry(std::shared_ptr<DebugRenderGeometry> newSceneObject);
     void removeSceneObject(const std::string& sceneObjectName);
 
     ///
@@ -162,6 +170,7 @@ protected:
 
     std::string m_name; ///> Name of the scene
     NamedMap<SceneObject> m_sceneObjectsMap;
+    NamedMap<DebugRenderGeometry> m_DebugRenderGeometryMap;
     NamedMap<Light> m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
     std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();

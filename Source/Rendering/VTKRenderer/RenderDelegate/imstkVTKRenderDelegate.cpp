@@ -33,6 +33,9 @@
 #include "imstkLineMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
+#include "imstkVTKdebugTrianglesRenderDelegate.h"
+#include "imstkVTKdebugLinesRenderDelegate.h"
+#include "imstkVTKdebugPointsRenderDelegate.h"
 
 // VTK render delegates
 #include "imstkVTKPlaneRenderDelegate.h"
@@ -55,7 +58,7 @@
 namespace imstk
 {
 std::shared_ptr<VTKRenderDelegate>
-VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
+VTKRenderDelegate::makeDelegate(std::shared_ptr<Geometry> geom)
 {
     switch (geom->getType())
     {
@@ -111,7 +114,35 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
+        LOG(WARNING) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
+        return nullptr;
+    }
+    }
+}
+
+std::shared_ptr<imstk::VTKRenderDelegate>
+VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom)
+{
+    switch (geom->getType())
+    {
+    case DebugRenderGeometry::Type::Points:
+    {
+        auto points = std::dynamic_pointer_cast<DebugRenderPoints>(geom);
+        return std::make_shared<VTKdbgPointsRenderDelegate>(points);
+    }
+    case DebugRenderGeometry::Type::Lines:
+    {
+        auto lines = std::dynamic_pointer_cast<DebugRenderLines>(geom);
+        return std::make_shared<VTKdbgLinesRenderDelegate>(lines);
+    }
+    case DebugRenderGeometry::Type::Triangles:
+    {
+        auto triangles = std::dynamic_pointer_cast<DebugRenderTriangles>(geom);
+        return std::make_shared<VTKdbgTrianglesRenderDelegate>(triangles);
+    }
+    default:
+    {
+        LOG(WARNING) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
         return nullptr;
     }
     }
@@ -120,7 +151,7 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom)
 void
 VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source,
                                const bool notSurfaceMesh,
-                               std::shared_ptr<Geometry> geometry)
+                               std::shared_ptr<RenderMaterial> renderMat)
 {
     // Add normals
     if (notSurfaceMesh)
@@ -142,12 +173,12 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source,
     {
         mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
 
-        if (!geometry->getRenderMaterial())
+        /*if (!renderMat)
         {
             geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
-        }
+        }*/
 
-        mapper->setGeometry(geometry);
+        mapper->setRenderMaterial(renderMat);
     }
 }
 
@@ -169,7 +200,7 @@ void
 VTKRenderDelegate::updateActorTransform()
 {
     auto geom = this->getGeometry();
-    if (!geom->m_transformModified)
+    if (!geom || !geom->m_transformModified)
     {
         return;
     }
@@ -183,7 +214,7 @@ VTKRenderDelegate::updateActorTransform()
 void
 VTKRenderDelegate::updateActorProperties()
 {
-    auto material = this->getGeometry()->getRenderMaterial();
+    auto material = this->getRenderMaterial();
 
     if (!material || !material->m_modified)
     {

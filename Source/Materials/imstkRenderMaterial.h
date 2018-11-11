@@ -161,6 +161,7 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VulkanDecalRenderDelegate;
     friend class VulkanLineMeshRenderDelegate;
+    friend class VTKdbgLinesRenderDelegate;
 
     // State
     DisplayMode m_displayMode = DisplayMode::SURFACE;

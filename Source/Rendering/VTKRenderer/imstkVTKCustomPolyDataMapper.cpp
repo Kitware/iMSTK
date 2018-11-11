@@ -36,6 +36,7 @@ VTKCustomPolyDataMapper::BuildBufferObjects(vtkRenderer * renderer, vtkActor * a
     this->VBOs->CacheDataArray("inputPosition", polyData->GetPoints()->GetData(), VBOCache, VTK_FLOAT);
     this->VBOs->CacheDataArray("inputNormal", polyData->GetPointData()->GetNormals(), VBOCache, VTK_FLOAT);
     this->VBOs->CacheDataArray("inputUV", polyData->GetPointData()->GetTCoords(), VBOCache, VTK_FLOAT);
+    this->VBOs->CacheDataArray("inputColor", polyData->GetPointData()->GetScalars(), VBOCache, VTK_UNSIGNED_CHAR);
 
     if (polyData->GetPointData()->GetArray("tangents"))
     {
@@ -65,23 +66,23 @@ VTKCustomPolyDataMapper::GetShaderTemplate(
     this->loadShader("./Shaders/VTKShaders/mesh.vert", m_vertexShaderSource);
     this->loadShader("./Shaders/VTKShaders/mesh.frag", m_fragmentShaderSource);
 
-    auto renderMaterial = m_geometry->getRenderMaterial();
+    //auto renderMaterial = m_geometry->getRenderMaterial();
 
-    auto diffuseTexture = renderMaterial->getTexture(Texture::DIFFUSE);
-    auto cubemapTexture = renderMaterial->getTexture(Texture::CUBEMAP);
+    auto diffuseTexture = m_renderMaterial->getTexture(Texture::DIFFUSE);
+    auto cubemapTexture = m_renderMaterial->getTexture(Texture::CUBEMAP);
 
-    auto surfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geometry);
+    //auto surfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geometry);
 
     if (this->GetOpenGLMode(actor->GetProperty()->GetRepresentation(), this->LastBoundBO->PrimitiveType) == GL_TRIANGLES)
     {
         m_fragmentShaderSource = "#define SHADED\n" + m_fragmentShaderSource;
     }
 
-    if (diffuseTexture->getPath() != "" && surfaceMesh)
+    if (diffuseTexture->getPath() != "" && m_isSurfaceMapper)
     {
         m_fragmentShaderSource = "#define DIFFUSE_TEXTURE\n" + m_fragmentShaderSource;
     }
-    if (cubemapTexture->getPath() != "" && surfaceMesh)
+    if (cubemapTexture->getPath() != "" && m_isSurfaceMapper)
     {
         m_fragmentShaderSource = "#define CUBEMAP_TEXTURE\n" + m_fragmentShaderSource;
     }
@@ -99,7 +100,7 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     vtkActor * actor)
 {
     auto textures = this->GetTextures(actor);
-    auto material = m_geometry->getRenderMaterial();
+    auto material = m_renderMaterial;
 
     helper.VAO->Bind();
 
@@ -286,8 +287,8 @@ VTKCustomPolyDataMapper::loadShader(const std::string filename, std::string& sou
 }
 
 void
-VTKCustomPolyDataMapper::setGeometry(std::shared_ptr<Geometry> geometry)
+VTKCustomPolyDataMapper::setRenderMaterial(std::shared_ptr<RenderMaterial> renderMat)
 {
-    m_geometry = geometry;
+    m_renderMaterial = renderMat;
 }
 }

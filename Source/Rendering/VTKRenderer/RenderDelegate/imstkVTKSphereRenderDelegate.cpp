@@ -39,7 +39,7 @@ VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) 
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry);
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry->getRenderMaterial());
 }
 
 void

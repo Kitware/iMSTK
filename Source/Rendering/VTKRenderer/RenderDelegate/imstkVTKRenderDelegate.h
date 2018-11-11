@@ -29,6 +29,7 @@
 #include "imstkVTKTextureDelegate.h"
 #include "imstkTextureManager.h"
 #include "imstkVTKCustomPolyDataMapper.h"
+#include "imstkDebugGeometry.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
@@ -49,14 +50,14 @@ class VTKRenderDelegate
 public:
 
     ///
-    /// \brief Default destructor
-    ///
-    ~VTKRenderDelegate() = default;
-
-    ///
     /// \brief Instantiate proper render delegate
     ///
-    static std::shared_ptr<VTKRenderDelegate> make_delegate(std::shared_ptr<Geometry> geom);
+    static std::shared_ptr<VTKRenderDelegate> makeDelegate(std::shared_ptr<Geometry> geom);
+
+    ///
+    /// \brief Instantiate proper debug render delegate
+    ///
+    static std::shared_ptr<VTKRenderDelegate> makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom);
 
     ///
     /// \brief Set up normals and mapper
@@ -66,12 +67,13 @@ public:
     ///
     void setUpMapper(vtkAlgorithmOutput *source,
                      const bool notSurfaceMesh,
-                     std::shared_ptr<Geometry> geometry);
+                     std::shared_ptr<RenderMaterial> renderMat);
 
     ///
     /// \brief Return geometry to render
     ///
     virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+    virtual std::shared_ptr<RenderMaterial> getRenderMaterial() const = 0;
 
     ///
     /// \brief Get VTK renderered object
@@ -84,7 +86,7 @@ public:
     void update();
 
     ///
-    /// \brief Update rendere delegate transform based on the geometry shallow transform
+    /// \brief Update renderer delegate transform based on the geometry shallow transform
     ///
     void updateActorTransform();
 

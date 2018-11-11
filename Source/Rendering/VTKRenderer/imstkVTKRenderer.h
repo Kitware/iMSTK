@@ -114,6 +114,7 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
 
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
+    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
 
     std::shared_ptr<Scene> m_scene;
 

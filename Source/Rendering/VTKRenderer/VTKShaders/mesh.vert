@@ -8,12 +8,14 @@ in vec3 inputPosition;
 in vec3 inputNormal;
 in vec3 inputTangent;
 in vec2 inputUV;
+in vec3 inputColor;
 
 out Vertex
 {
     vec3 position;
     vec3 normal;
     vec2 uv;
+    vec3 color;
 } vertex;
 
 void main()
@@ -25,5 +27,6 @@ void main()
 
     vertex.uv = inputUV;
     vertex.position = position;
+    vertex.color = inputColor;
     gl_Position = projectionMatrix * viewMatrix * vec4(position, 1);
 }
