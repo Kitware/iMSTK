@@ -166,7 +166,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     unsigned int currentUnit = 0;
 
     // Go through all of the textures
-    for (int unit = 0; unit < Texture::Type::NONE; unit++)
+    for (int unit = 0; unit < (int)Texture::Type::NONE; unit++)
     {
         // Get imstk texture
         auto texture = material->getTexture((Texture::Type)unit);

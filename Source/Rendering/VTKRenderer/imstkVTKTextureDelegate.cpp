@@ -39,7 +39,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 
     m_sourceTexture = vtkSmartPointer<vtkTexture>::New();
 
-    if (texture->getType() == Texture::CUBEMAP)
+    if (texture->getType() == Texture::Type::CUBEMAP)
     {
         std::string sideNames[6] = {"posx", "negx", "posy", "negy", "posz", "negz"};
         m_sourceTexture->SetCubeMap(true);

@@ -40,6 +40,8 @@ VulkanInteractorStyle::OnTimer()
     {
         return;
     }
+
+    VulkanBaseInteractorStyle::OnTimer();
 }
 
 void
@@ -82,11 +84,11 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
         }
     }
     else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
+             (key == 'q' || key == 'Q'))// || key == 'e' || key == 'E')) // end Simulation
     {
         m_simManager->endSimulation();
     }
-    else if (key == 'd' || key == 'D') // switch rendering mode
+    else if (key == 'f' || key == 'F')//(key == 'd' || key == 'D') // switch rendering mode
     {
         if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::SIMULATION)
         {
@@ -97,7 +99,7 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
             m_simManager->getViewer()->setRenderingMode(Renderer::Mode::DEBUG);
         }
     }
-    else if (key == '\u001B') // quit viewer
+    else if (keyID == GLFW_KEY_ESCAPE) // quit viewer
     {
         m_simManager->getViewer()->endRenderingLoop();
     }
@@ -118,7 +120,7 @@ VulkanInteractorStyle::OnMouseMove(double x, double y)
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -134,7 +136,7 @@ VulkanInteractorStyle::OnLeftButtonDown()
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -150,7 +152,7 @@ VulkanInteractorStyle::OnLeftButtonUp()
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -166,7 +168,7 @@ VulkanInteractorStyle::OnMiddleButtonDown()
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -181,7 +183,7 @@ void VulkanInteractorStyle::OnMiddleButtonUp()
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -197,7 +199,7 @@ VulkanInteractorStyle::OnRightButtonDown()
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -213,7 +215,7 @@ VulkanInteractorStyle::OnRightButtonUp()
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -229,7 +231,7 @@ VulkanInteractorStyle::OnMouseWheelForward(double y)
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }
@@ -245,7 +247,7 @@ VulkanInteractorStyle::OnMouseWheelBackward(double y)
         return;
     }
 
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
     {
         return;
     }

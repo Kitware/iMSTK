@@ -216,7 +216,7 @@ RenderMaterial::getTexture(Texture::Type type)
         LOG(WARNING) << "RenderMaterial::getTexture error: Invalid texture format";
         return nullptr;
     }
-    return m_textures[type];
+    return m_textures[(unsigned int)type];
 }
 
 void
@@ -227,39 +227,7 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
         LOG(WARNING) << "RenderMaterial::addTexture: Invalid texture format";
         return;
     }
-    m_textures[texture->getType()] = texture;
-}
-
-void
-RenderMaterial::flatShadingOn()
-{
-    m_flatShading = true;
-}
-
-void
-RenderMaterial::flatShadingOff()
-{
-    m_flatShading = false;
-}
-
-void
-RenderMaterial::setVisibilityOff()
-{
-    m_isVisible = false;
-    m_modified = true;
-}
-
-void
-RenderMaterial::setVisibilityOn()
-{
-    m_isVisible = true;
-    m_modified = true;
-}
-
-bool
-RenderMaterial::getVisibility() const
-{
-    return m_isVisible;
+    m_textures[(unsigned int)texture->getType()] = texture;
 }
 
 void

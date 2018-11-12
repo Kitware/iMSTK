@@ -56,7 +56,8 @@ public:
     /// \param type Type of texture
     ///
     VulkanTextureDelegate(VulkanMemoryManager& memoryManager,
-                          std::shared_ptr<Texture> texture);
+                          std::shared_ptr<Texture> texture,
+                          float anisotropyAmount = 0.0f);
 
     void loadTexture(VulkanMemoryManager& memoryManager);
     void loadCubemapTexture(VulkanMemoryManager& memoryManager);
@@ -93,6 +94,7 @@ protected:
     Texture::Type m_type;
     unsigned int m_mipLevels = 0;
     unsigned int m_arrayLayers = 1;
+    float anisotropyAmount = 1.0f;
 
     unsigned int m_width = 0;
     unsigned int m_height = 0;

@@ -25,7 +25,8 @@ namespace imstk
 {
 VulkanTextureDelegate::VulkanTextureDelegate(
     VulkanMemoryManager& memoryManager,
-    std::shared_ptr<Texture> texture)
+    std::shared_ptr<Texture> texture,
+    float anisotropyAmount)
 {
     m_path = texture->getPath();
     m_type = texture->getType();
@@ -150,8 +151,8 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.mipLodBias = 0.0;
-    samplerInfo.anisotropyEnable = VK_FALSE; // TODO:: add option to enable
-    samplerInfo.maxAnisotropy = 1.0;
+    samplerInfo.anisotropyEnable = anisotropyAmount == 0.0f ? VK_FALSE : VK_TRUE; // TODO:: add option to enable
+    samplerInfo.maxAnisotropy = anisotropyAmount;
     samplerInfo.compareEnable = VK_FALSE;
     samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
     samplerInfo.minLod = 0;

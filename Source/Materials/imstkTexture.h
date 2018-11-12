@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Texture type - determines filtering
     ///
-    enum Type
+    enum class Type
     {
         DIFFUSE = 0, // Also used for albedo
         NORMAL,
@@ -57,7 +57,7 @@ public:
     /// \param path Path to the texture source file
     /// \param type Type of texture
     ///
-    Texture(std::string path = "", Type type = DIFFUSE);
+    Texture(std::string path = "", Type type = Type::DIFFUSE);
 
     ///
     /// \brief Destructor
@@ -75,9 +75,19 @@ public:
     const std::string getPath() const;
 
     ///
-    /// \brief Get type
+    /// \brief Get if mipmaps are enabled
     ///
     bool getMipmapsEnabled();
+
+    ///
+    /// \brief Get if anisotropic filtering is enabled
+    ///
+    bool isAnisotropyEnabled();
+
+    ///
+    /// brief Get anisotropy factor
+    ///
+    float getAnisotropyFactor();
 
 protected:
     Type m_type;            ///< Texture type
@@ -85,6 +95,10 @@ protected:
 
     // Helps with texture aliasing (and a little with performance)
     bool m_mipmapsEnabled = true;
+
+    // Helps sharpen mipmapped textures at more extreme angles
+    bool m_anisotropyEnabled = true;
+    float m_anisotropyFactor = 1.0;
 };
 }
 
@@ -104,6 +118,21 @@ template<> struct less<std::shared_ptr<imstk::Texture>>
         if (texture1->getPath() != texture2->getPath())
         {
             return (texture1->getPath() < texture2->getPath());
+        }
+
+        if (texture1->getMipmapsEnabled() != texture2->getMipmapsEnabled())
+        {
+            return (texture1->getMipmapsEnabled() < texture2->getMipmapsEnabled());
+        }
+
+        if (texture1->isAnisotropyEnabled() != texture2->isAnisotropyEnabled())
+        {
+            return (texture1->isAnisotropyEnabled() < texture2->isAnisotropyEnabled());
+        }
+
+        if (texture1->getAnisotropyFactor() != texture2->getAnisotropyFactor())
+        {
+            return (texture1->getAnisotropyFactor() < texture2->getAnisotropyFactor());
         }
 
         return false;

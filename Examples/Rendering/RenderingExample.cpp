@@ -43,10 +43,10 @@ int main()
 
     // Head material
     auto headMaterial = std::make_shared<RenderMaterial>();
-    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/diffuse.jpg", Texture::DIFFUSE);
-    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/normal.png", Texture::NORMAL);
-    auto headRoughnessTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/roughness.jpg", Texture::ROUGHNESS);
-    auto headSSSTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/sss.jpg", Texture::SUBSURFACE_SCATTERING);
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/diffuse.jpg", Texture::Type::DIFFUSE);
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/normal.png", Texture::Type::NORMAL);
+    auto headRoughnessTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/roughness.jpg", Texture::Type::ROUGHNESS);
+    auto headSSSTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/sss.jpg", Texture::Type::SUBSURFACE_SCATTERING);
     headMaterial->addTexture(headDiffuseTexture);
     headMaterial->addTexture(headNormalTexture);
     headMaterial->addTexture(headRoughnessTexture);

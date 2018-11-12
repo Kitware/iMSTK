@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanInteractorStyleTrackballCamera_h
-#define imstkVulkanInteractorStyleTrackballCamera_h
+#ifndef imstkVulkanInteractorStyleFreeCamera_h
+#define imstkVulkanInteractorStyleFreeCamera_h
 
 #include "GLFW/glfw3.h"
 
@@ -28,16 +28,28 @@
 #include <unordered_map>
 #include <functional>
 
+#include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
+
+#include "imstkMath.h"
+#include "imstkTimer.h"
+#include "imstkRenderer.h"
+
 namespace imstk
 {
 class VulkanViewer;
 class SimulationManager;
 
-class VulkanInteractorStyleTrackballCamera
+///
+/// \class VulkanInteractorStyleFreeCamera
+///
+/// \brief Default camera movement class
+///
+class VulkanInteractorStyleFreeCamera
 {
 public:
-    VulkanInteractorStyleTrackballCamera();
-    ~VulkanInteractorStyleTrackballCamera(){};
+    VulkanInteractorStyleFreeCamera();
+    ~VulkanInteractorStyleFreeCamera(){};
 
     void setWindow(GLFWwindow * window, VulkanViewer * viewer);
 
@@ -67,11 +79,14 @@ public:
 protected:
     friend class VulkanViewer;
 
+    ///
+    /// \brief Normalized coordinates in the context of the screen
+    ///
+    void normalizeCoordinate(double &x, double &y);
+
     GLFWwindow * m_window;
     SimulationManager * m_simManager;
     VulkanViewer * m_viewer;
-
-    double distance(double x, double y);
 
     // States
     enum
@@ -81,11 +96,18 @@ protected:
         RIGHT_MOUSE_DOWN = 0x4
     };
 
-    double m_lastMouseX = 0;
-    double m_lastMouseY = 0;
+    double m_mousePos[2]; ///< Mouse position
+    double m_mousePosNormalized[2]; ///< Mouse position normalized
+    double m_mousePosLastNormalized[2]; ///< Last frame mouse position normalized
 
-    double m_mouseX = 0;
-    double m_mouseY = 0;
+    StopWatch m_stopWatch;
+    double m_lastTime = 0; ///< Last frame time
+    Vec3d m_simCameraPosition; ///< Saved simulation mode camera position
+    Vec3d m_simCameraFocalPoint; ///< Saved simulation mode camera focal point
+    float m_cameraAngle = 0; ///< Angle created by changes in vertical cursor position
+    Renderer::Mode m_lastFrameMode = Renderer::Mode::EMPTY; ///< Last frame mode
+
+    bool m_started = false; ///< Used to initialized variables
 
     unsigned int m_state = 0;
 };

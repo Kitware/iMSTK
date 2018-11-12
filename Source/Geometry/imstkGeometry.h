@@ -170,6 +170,13 @@ public:
     void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
     std::shared_ptr<RenderMaterial> getRenderMaterial() const;
 
+    ///
+    /// \brief Visibility functions
+    ///
+    void show();
+    void hide();
+    bool isVisible() const;
+
 protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
@@ -195,6 +202,8 @@ protected:
     double m_scaling = 1.0;
 
     std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; ///> Render material
+
+    bool m_isVisible = true;
 };
 } //imstk
 

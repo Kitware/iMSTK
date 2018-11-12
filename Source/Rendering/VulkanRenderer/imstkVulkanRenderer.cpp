@@ -99,6 +99,8 @@ VulkanRenderer::initialize(unsigned int width, unsigned int height)
     vkGetPhysicalDeviceProperties(m_renderPhysicalDevice, &deviceProperties);
     m_deviceLimits = deviceProperties.limits;
 
+    m_anisotropyAmount = m_deviceLimits.maxSamplerAnisotropy;
+
     VkPipelineCacheCreateInfo pipelineCacheCreateInfo;
     pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     pipelineCacheCreateInfo.pNext = nullptr;
@@ -169,6 +171,7 @@ VulkanRenderer::setupGPUs()
     VkPhysicalDeviceFeatures features = {VK_FALSE};
     features.fillModeNonSolid = VK_TRUE;
     features.tessellationShader = VK_TRUE;
+    features.samplerAnisotropy = VK_TRUE;
     features.wideLines = deviceFeatures.wideLines;
 
     if (features.wideLines == VK_TRUE)
@@ -727,14 +730,11 @@ VulkanRenderer::renderFrame()
 
         for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
         {
-            if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
-            {
-                continue;
-            }
-
             auto material = m_renderDelegates[renderDelegateIndex]->m_shadowMaterial;
 
-            if (!m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows())
+            if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
+                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows()
+                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
             {
                 continue;
             }
@@ -772,7 +772,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
         {
             continue;
         }
@@ -849,7 +850,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
         {
             continue;
         }
@@ -883,7 +885,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
         {
             continue;
         }
@@ -1129,7 +1132,7 @@ VulkanRenderer::initializePostProcesses()
     if (!m_noiseTexture)
     {
         m_noiseTexture = std::make_shared<Texture>("noise", Texture::Type::NONE);
-        m_noiseTextureDelegate = std::make_shared<VulkanTextureDelegate>(m_memoryManager, m_noiseTexture);
+        m_noiseTextureDelegate = std::make_shared<VulkanTextureDelegate>(m_memoryManager, m_noiseTexture, 0.0f);
     }
 
     m_ssao[0] = std::make_shared<VulkanPostProcess>(this, 1);
@@ -1229,8 +1232,6 @@ VulkanRenderer::updateGlobalUniforms(uint32_t frameIndex)
         m_globalVertexUniforms.projectionMatrix = glm::perspective(m_fov, (float)(m_width) / (float)(m_height), m_nearPlane, m_farPlane);
         glm::mat4 correctionMatrix; // for Vulkan rendering
         correctionMatrix[1][1] = -1;
-        correctionMatrix[2][2] = 0.5;
-        correctionMatrix[3][2] = 0.5;
         m_globalVertexUniforms.projectionMatrix *= correctionMatrix;
 
         // View matrix

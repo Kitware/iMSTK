@@ -125,19 +125,6 @@ public:
     std::shared_ptr<Texture> getTexture(Texture::Type type);
 
     ///
-    /// \brief Turn on/off flat shading
-    ///
-    void flatShadingOn();
-    void flatShadingOff();
-
-    ///
-    /// \brief Turn on/off visibility
-    ///
-    void setVisibilityOff();
-    void setVisibilityOn();
-    bool getVisibility() const;
-
-    ///
     /// \brief Get/Set shadow receiving ability
     ///
     void setReceivesShadows(const bool receivesShadows);
