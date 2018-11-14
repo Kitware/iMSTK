@@ -95,12 +95,12 @@ public:
     ///
     /// \brief
     ///
-    const double& getViewAngle() const;
+    const double& getFieldOfView() const;
 
     ///
     /// \brief
     ///
-    void setViewAngle(const double& angle);
+    void setFieldOfView(const double& fov);
 
     ///
     /// \brief
@@ -118,7 +118,7 @@ protected:
     Vec3d m_position = Vec3d(0,2,5);    ///>
     Vec3d m_focalPoint = WORLD_ORIGIN;  ///>
     Vec3d m_viewUp = UP_VECTOR;         ///>
-    double m_viewAngle = 60;            ///>
+    double m_fieldOfView = 60;            ///>
 };
 } // imstk
 

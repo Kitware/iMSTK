@@ -77,7 +77,7 @@ VulkanRenderer::initialize(unsigned int width, unsigned int height)
 #endif
 
     auto camera = m_scene->getCamera();
-    m_fov = (float)glm::radians(camera->getViewAngle());
+    m_fov = (float)glm::radians(camera->getFieldOfView());
 
     // Setup logical devices
     this->setupGPUs();
@@ -1228,7 +1228,7 @@ VulkanRenderer::updateGlobalUniforms(uint32_t frameIndex)
     {
         // Projection matrix
         auto camera = m_scene->getCamera();
-        m_fov = (float)glm::radians(camera->getViewAngle());
+        m_fov = (float)glm::radians(camera->getFieldOfView());
         m_globalVertexUniforms.projectionMatrix = glm::perspective(m_fov, (float)(m_width) / (float)(m_height), m_nearPlane, m_farPlane);
         glm::mat4 correctionMatrix; // for Vulkan rendering
         correctionMatrix[1][1] = -1;

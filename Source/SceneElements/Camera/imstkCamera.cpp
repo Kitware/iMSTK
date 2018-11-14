@@ -88,15 +88,15 @@ Camera::setViewUp(const double& x,
     m_viewUp = Vec3d(x,y,z).normalized();
 }
 
-const double& Camera::getViewAngle() const
+const double& Camera::getFieldOfView() const
 {
-    return m_viewAngle;
+    return m_fieldOfView;
 }
 
 void
-Camera::setViewAngle(const double& angle)
+Camera::setFieldOfView(const double& fov)
 {
-    m_viewAngle = angle;
+    m_fieldOfView = fov;
 }
 
 std::shared_ptr<CameraController>

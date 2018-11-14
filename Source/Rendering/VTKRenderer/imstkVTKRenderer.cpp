@@ -289,7 +289,7 @@ VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
     m_sceneVtkCamera->SetPosition(p[0], p[1], p[2]);
     m_sceneVtkCamera->SetFocalPoint(f[0], f[1], f[2]);
     m_sceneVtkCamera->SetViewUp(v[0], v[1], v[2]);
-    m_sceneVtkCamera->SetViewAngle(imstkCam->getViewAngle());
+    m_sceneVtkCamera->SetViewAngle(imstkCam->getFieldOfView());
 }
 
 void
