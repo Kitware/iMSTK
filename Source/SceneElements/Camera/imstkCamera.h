@@ -41,22 +41,23 @@ class Camera
 {
 public:
     ///
-    /// \brief
+    /// \brief Default contructor
     ///
     Camera() {}
 
     ///
-    /// \brief
+    /// \brief Default destructor
     ///
     ~Camera() = default;
 
     ///
-    /// \brief
+    /// \brief Gets the camera position
+    /// \returns camera position
     ///
     const Vec3d& getPosition() const;
 
     ///
-    /// \brief
+    /// \brief Sets the camera position
     ///
     void setPosition(const Vec3d& p);
     void setPosition(const double& x,
@@ -64,12 +65,14 @@ public:
                      const double& z);
 
     ///
-    /// \brief
+    /// \brief Returns the focal point
+    ///        The focal point is the point that the camera points to
+    /// \returns Focal point position
     ///
     const Vec3d& getFocalPoint() const;
 
     ///
-    /// \brief
+    /// \brief Sets the focal point
     ///
     void setFocalPoint(const Vec3d& p);
     void setFocalPoint(const double& x,
@@ -77,28 +80,27 @@ public:
                        const double& z);
 
     ///
-    /// \brief
+    /// \brief Get the up vector
+    /// \returns up vector of camera
     ///
     const Vec3d& getViewUp() const;
 
     ///
-    /// \brief
+    /// \brief Set the up vector
     ///
     void setViewUp(const Vec3d& v);
-
-    ///
-    /// \brief
-    ///
     void setViewUp(const double& x,
                    const double& y,
                    const double& z);
     ///
-    /// \brief
+    /// \brief Gets the field of view
+    /// \returns vertical field of view in degrees
     ///
     const double& getFieldOfView() const;
 
     ///
-    /// \brief
+    /// \brief Sets the field of view
+    /// params fov vertical field of view in degrees
     ///
     void setFieldOfView(const double& fov);
 
@@ -115,10 +117,10 @@ public:
 protected:
     std::shared_ptr<CameraController> m_controller;   ///>
 
-    Vec3d m_position = Vec3d(0,2,5);    ///>
-    Vec3d m_focalPoint = WORLD_ORIGIN;  ///>
-    Vec3d m_viewUp = UP_VECTOR;         ///>
-    double m_fieldOfView = 60;            ///>
+    Vec3d m_position = Vec3d(0,2,5);    ///> camera position
+    Vec3d m_focalPoint = WORLD_ORIGIN;  ///> camera focal point
+    Vec3d m_viewUp = UP_VECTOR;         ///> camera up vector
+    double m_fieldOfView = 60;          ///> field of view in degrees
 };
 } // imstk
 
