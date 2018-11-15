@@ -93,7 +93,7 @@ public:
     ///
     /// \brief Compute forces based on collision data (pure virtual)
     ///
-    virtual void computeContactForces() = 0;
+    virtual void processCollisionData() = 0;
 
     ///
     /// \brief Returns collision handling type

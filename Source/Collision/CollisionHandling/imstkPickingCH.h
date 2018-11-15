@@ -63,7 +63,7 @@ public:
     ///
     /// \brief Compute forces based on collision data
     ///
-    void computeContactForces() override;
+    void processCollisionData() override;
 
     ///
     /// \brief Add LPC constraints for the node that is picked

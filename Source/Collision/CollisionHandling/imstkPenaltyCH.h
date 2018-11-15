@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Compute forces based on collision data
     ///
-    void computeContactForces() override;
+    void processCollisionData() override;
     void computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> analyticObj);
     void computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObject> deformableObj);
 

@@ -73,7 +73,7 @@ public:
     ///
     /// \brief Call collision handling algorithm to compute contact forces for an object
     ///
-    void computeContactForces();
+    void processCollisionData();
 
     ///
     /// \brief Call collision handling algorithm to compute contact forces for an object

@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Compute forces based on collision data
     ///
-    void computeContactForces() override;
+    void processCollisionData() override;
 
     ///
     /// \brief Get/Set Stiffness coefficient

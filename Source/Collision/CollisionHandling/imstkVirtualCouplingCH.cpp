@@ -30,7 +30,7 @@
 namespace imstk
 {
 void
-VirtualCouplingCH::computeContactForces()
+VirtualCouplingCH::processCollisionData()
 {
     m_offset.setZero();
 

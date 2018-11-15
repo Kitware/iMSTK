@@ -30,7 +30,7 @@
 namespace imstk
 {
 void
-PenaltyCH::computeContactForces()
+PenaltyCH::processCollisionData()
 {
     if (auto deformableObj = std::dynamic_pointer_cast<DeformableObject>(m_object))
     {

@@ -104,7 +104,7 @@ BoneDrillingCH::erodeBone()
 }
 
 void
-BoneDrillingCH::computeContactForces()
+BoneDrillingCH::processCollisionData()
 {
     // Check if any collisions
     const auto devicePosition = m_drill->getCollidingGeometry()->getTranslation();

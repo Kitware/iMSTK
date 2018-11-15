@@ -48,7 +48,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Collision Detection
-    std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B, m_colData);
+    std::shared_ptr<CollisionDetection> CD = CollisionDetection::makeCollisionDetectionObject(CDType, A, B, m_colData);
     if (CD == nullptr)
     {
         LOG(WARNING) << "InteractionPair error: can not instantiate collision detection algorithm.";
@@ -131,7 +131,7 @@ InteractionPair::computeCollisionData()
 }
 
 void
-InteractionPair::computeContactForces()
+InteractionPair::processCollisionData()
 {
     if (!m_valid)
     {
@@ -141,11 +141,11 @@ InteractionPair::computeContactForces()
 
     if(m_colHandlingA)
     {
-        m_colHandlingA->computeContactForces();
+        m_colHandlingA->processCollisionData();
     }
     if(m_colHandlingB)
     {
-        m_colHandlingB->computeContactForces();
+        m_colHandlingB->processCollisionData();
     }
 }
 

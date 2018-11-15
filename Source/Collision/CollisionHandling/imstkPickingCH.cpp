@@ -25,7 +25,7 @@ limitations under the License.
 namespace imstk
 {
 void
-PickingCH::computeContactForces()
+PickingCH::processCollisionData()
 {
     if (m_object)
     {

@@ -64,7 +64,6 @@ void
 SceneManager::runModule()
 {
     StopWatch wwt;
-
     wwt.start();
 
     // Reset Contact forces to 0
@@ -96,7 +95,7 @@ SceneManager::runModule()
     for (auto intPair : m_scene->getCollisionGraph()->getInteractionPairList())
     {
         intPair->computeCollisionData();
-        intPair->computeContactForces();
+        intPair->processCollisionData();
     }
 
     // Apply forces on device
@@ -109,8 +108,6 @@ SceneManager::runModule()
     for (auto solvers : m_scene->getSolvers())
     {
         solvers->solve();
-
-        auto xx = std::dynamic_pointer_cast<PbdSolver>(solvers);
     }
 
     // Apply the geometry and apply maps to all the objects
@@ -156,7 +153,7 @@ SceneManager::runModule()
 
     auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
 
-    // Update time step size of the dynamic objects
+    // Update time step size of the dynamic objects    
     for (auto obj : m_scene->getSceneObjects())
     {
         if (obj->getType() == SceneObject::Type::Pbd)
