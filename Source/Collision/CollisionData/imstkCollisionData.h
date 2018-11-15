@@ -83,7 +83,7 @@ struct TriangleVertexCollisionData
     size_t vertexIdB;
     float time;
 
-    TriangleVertexCollisionData(size_t fIdA, size_t vIdB, float t = -1)
+    TriangleVertexCollisionData(const size_t fIdA, const size_t vIdB, const float t = -1)
     {
         triIdA = fIdA;
         vertexIdB = vIdB;
@@ -102,7 +102,7 @@ struct EdgeEdgeCollisionData
     std::pair<size_t, size_t> edgeIdB;
     float time;
 
-    EdgeEdgeCollisionData(size_t eA_v1, size_t eA_v2, size_t eB_v1, size_t eB_v2, float t = -1)
+    EdgeEdgeCollisionData(const size_t eA_v1, const size_t eA_v2, const size_t eB_v1, const size_t eB_v2, const float t = -1)
     {
         edgeIdA = std::pair<size_t, size_t>(eA_v1, eA_v2);
         edgeIdB = std::pair<size_t, size_t>(eB_v1, eB_v2);
@@ -136,6 +136,26 @@ struct PickingCollisionData
     Vec3d ptPos;
     size_t nodeId;
     bool touchStatus;
+};
+
+///
+/// \struct PointTetrahedronCollisionData
+///
+/// \brief Point-tetrahedron collision data
+///
+struct
+{
+    enum CollisionType
+    {
+        aPenetratingA = 0, // A self-penetration
+        aPenetratingB = 1, // vertex is from mesh A, tetrahedron is from mesh B
+        bPenetratingA = 2, // vertex is from mesh B, tetrahedron is from mesh A
+        bPenetratingB = 3  // B self-penetration
+    } collisionType;
+    size_t vertexId;
+    size_t tetreahedronId;
+    using WeightsArray = std::array<double, 4>;
+    WeightsArray BarycentricCoordinates;
 };
 
 ///

@@ -40,10 +40,10 @@
 namespace imstk
 {
 std::shared_ptr<CollisionDetection>
-CollisionDetection::make_collision_detection(const Type& type,
-                                             std::shared_ptr<CollidingObject> objA,
-                                             std::shared_ptr<CollidingObject> objB,
-                                             CollisionData &colData)
+CollisionDetection::makeCollisionDetectionObject(const Type& type,
+                                                 std::shared_ptr<CollidingObject> objA,
+                                                 std::shared_ptr<CollidingObject> objB,
+                                                 CollisionData &colData)
 {
     switch (type)
     {
