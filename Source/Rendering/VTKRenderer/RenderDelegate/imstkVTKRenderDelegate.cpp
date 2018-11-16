@@ -185,23 +185,16 @@ VTKRenderDelegate::update()
     this->updateActorTransform();
     this->updateActorProperties();
 
-<<<<<<< HEAD
     if (m_visualModel->isVisible())
-=======
-    if (this->getGeometry())
->>>>>>> BUG: Check if the actor is for scene objects before turning ON/OFF visibility
     {
-        if (this->getGeometry()->isVisible())
-        {
-            m_actor->VisibilityOn();
-            return;
-        }
-        else
-        {
-            m_actor->VisibilityOff();
-            return;
-        }
-    }    
+        m_actor->VisibilityOn();
+        return;
+    }
+    else
+    {
+        m_actor->VisibilityOff();
+        return;
+    }
 }
 
 void
