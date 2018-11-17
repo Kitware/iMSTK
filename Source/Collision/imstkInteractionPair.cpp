@@ -41,11 +41,11 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Check if objects are different
-    if (A == B)
+    /*if (A == B)
     {
         LOG(WARNING) << "InteractionPair error: object cannot interact with itself.";
         return;
-    }
+    }*/
 
     // Collision Detection
     std::shared_ptr<CollisionDetection> CD = CollisionDetection::makeCollisionDetectionObject(CDType, A, B, m_colData);
@@ -105,11 +105,11 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Check if objects are different
-    if (A == B)
+    /*if (A == B)
     {
         LOG(WARNING) << "InteractionPair error: object cannot interact with itself.";
         return;
-    }
+    }*/
 
     m_objects = ObjectsPair(A, B);
     m_colDetect = CD;

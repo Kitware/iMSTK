@@ -29,6 +29,7 @@
 #include "imstkMeshToMeshCD.h"
 #include "imstkSphereCylinderCD.h"
 #include "imstkPointSetToSpherePickingCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkPlane.h"
@@ -165,6 +166,21 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
             return nullptr;
         }
         return std::make_shared<PointSetToSpherePickingCD>(mesh, sphere, colData);
+    }
+    break;
+    case Type::MeshToMeshBruteForce:
+    {
+        auto geometry1 = std::dynamic_pointer_cast<Geometry>(objA->getCollidingGeometry());
+        auto surfaceGeo = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+
+        // Geometries check
+        if (geometry1 == nullptr || surfaceGeo == nullptr)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                << "invalid object geometries for MeshToMeshBruteForce collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<MeshToMeshBruteForceCD>(geometry1, surfaceGeo, colData);
     }
     break;
     default:

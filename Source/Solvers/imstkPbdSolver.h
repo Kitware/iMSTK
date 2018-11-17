@@ -31,7 +31,7 @@ namespace imstk
 ///
 /// \class PbdSolver
 ///
-/// \brief Pbd solver
+/// \brief Position Based Dynamics solver
 ///
 class PbdSolver : public SolverBase
 {
@@ -76,6 +76,7 @@ public:
     {
         m_pbdObject->integratePosition();
         m_pbdObject->solveConstraints();
+        m_pbdObject->updateVelocity();
     }
 
     ///

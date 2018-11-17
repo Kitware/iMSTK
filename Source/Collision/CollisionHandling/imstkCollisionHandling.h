@@ -51,7 +51,8 @@ public:
         VirtualCoupling,
         NodalPicking,
         BoneDrilling,
-        SPH
+        SPH,
+        PBD
     };
 
     ///

@@ -23,6 +23,7 @@
 #define imstkMeshToMeshBruteforceCD_h
 
 #include <memory>
+#include <iostream>
 
 #include "imstkCollisionDetection.h"
 
@@ -50,7 +51,8 @@ public:
         CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce,
                            colData),
         m_object1(obj1),
-        m_object2(obj2){}
+        m_object2(obj2)
+    {}
 
     ///
     /// \brief Destructor

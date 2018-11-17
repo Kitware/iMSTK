@@ -49,11 +49,15 @@ PBDCollisionHandling::processCollisionData()
                      << "no penalty collision handling available for " << m_object->getName()
                      << " (rigid mesh not yet supported).";
     }*/
+    this->generatePBDConstraints();
 }
 
 void 
 PBDCollisionHandling::generatePBDConstraints()
 {
+    // clear the constraints before populating wit new ones
+    m_PBDConstraints.clear();
+
     const auto dynaModel1 = std::static_pointer_cast<PbdModel>(m_pbdObject1->getDynamicalModel());
     const auto dynaModel2 = std::static_pointer_cast<PbdModel>(m_pbdObject2->getDynamicalModel());
 
@@ -61,6 +65,8 @@ PBDCollisionHandling::generatePBDConstraints()
 
     const auto map1 = m_pbdObject1->getPhysicsToCollidingMap();
     const auto map2 = m_pbdObject2->getPhysicsToCollidingMap();
+
+    std::cout << "EE: " << m_colData.EEColData.size() << "TV: " << m_colData.TVColData.size() << std::endl;
 
     // Generate edge-edge pbd constraints
     for (auto& colData : m_colData.EEColData)
