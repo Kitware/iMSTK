@@ -42,16 +42,16 @@ class PbdCollisionConstraint;
 ///
 class PBDCollisionHandling : public CollisionHandling
 {
-    typedef std::vector<std::shared_ptr<PbdCollisionConstraint>> PBDConstraintVector;
+typedef std::vector<std::shared_ptr<PbdCollisionConstraint>> PBDConstraintVector;
 public:
 
     ///
     /// \brief Constructor
     ///
     PBDCollisionHandling(const Side& side,
-              const CollisionData& colData,
-              std::shared_ptr<PbdObject> obj1, 
-              std::shared_ptr<PbdObject> obj2) :
+                         const CollisionData& colData,
+                         std::shared_ptr<PbdObject> obj1,
+                         std::shared_ptr<PbdObject> obj2) :
         CollisionHandling(Type::Penalty, side, colData),
         m_pbdObject1(obj1),
         m_pbdObject2(obj2){}
@@ -67,7 +67,7 @@ public:
     /// \brief Compute forces based on collision data
     ///
     void processCollisionData() override;
-    
+
     ///
     /// \brief Generate appropriate PBD constraints based on the collision data
     ///

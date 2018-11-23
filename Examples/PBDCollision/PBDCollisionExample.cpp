@@ -330,16 +330,16 @@ int main()
         scene->addSceneObject(floor);
 
         auto colData = std::make_shared<CollisionData>();
-        auto CD = std::make_shared<MeshToMeshBruteForceCD>(floor->getCollidingGeometry(), 
+        auto CD = std::make_shared<MeshToMeshBruteForceCD>(floor->getCollidingGeometry(),
                                                            surfMesh,
                                                            *colData.get());
 
-        auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::B,
+        auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
             CD->getCollisionData(),
             floor,
             deformableObj);
 
-        //scene->getCollisionGraph()->addInteractionPair(floor, deformableObj, CD, CH, nullptr);
+        scene->getCollisionGraph()->addInteractionPair(floor, deformableObj, CD, CH, nullptr);
     }
 >>>>>>> WIP: Change SceneManager to straighten PBD pipeline
 
@@ -350,7 +350,7 @@ int main()
     scene->addLight(light);
 
     sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    sdk->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

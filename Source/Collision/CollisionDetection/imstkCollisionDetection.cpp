@@ -177,7 +177,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
         if (geometry1 == nullptr || surfaceGeo == nullptr)
         {
             LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
-                << "invalid object geometries for MeshToMeshBruteForce collision detection.";
+                         << "invalid object geometries for MeshToMeshBruteForce collision detection.";
             return nullptr;
         }
         return std::make_shared<MeshToMeshBruteForceCD>(geometry1, surfaceGeo, colData);

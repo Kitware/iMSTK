@@ -38,7 +38,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData.clearAll();
-    
+
     // Broad phase collision
     doBroadPhaseCollisionCheck();
 
@@ -50,7 +50,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
         auto mesh1 = std::static_pointer_cast<LineMesh>(m_object1);
 
         // brute force, use BVH or spatial grid would be much better
-        
+
         // point
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
@@ -67,8 +67,8 @@ MeshToMeshBruteForceCD::computeCollisionData()
                 if (testPointToTriAABB(p[0], p[1], p[2],
                                        p0[0], p0[1], p0[2],
                                        p1[0], p1[1], p1[2],
-                                       p2[0], p2[1], p2[2], 
-                                       m_proximityTolerance, 
+                                       p2[0], p2[1], p2[2],
+                                       m_proximityTolerance,
                                        m_proximityTolerance))
                 {
                     TriangleVertexCollisionData d(j, i);
@@ -223,7 +223,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     const Vec3d p0 = mesh2->getVertexPosition(e[0]);
                     const Vec3d p1 = mesh2->getVertexPosition(e[1]);
                     const Vec3d p2 = mesh2->getVertexPosition(e[2]);
-                    
+
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],
@@ -237,7 +237,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             E2[e[0]][e[1]] = 0;
                         }
                     }
-                    
+
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],
@@ -356,7 +356,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             E2[e[0]][e[1]] = 0;
                         }
                     }
-                    
+
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],
@@ -370,7 +370,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             E2[e[1]][e[2]] = 0;
                         }
                     }
-                    
+
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],
@@ -416,5 +416,4 @@ MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck() const
                           min2[2] - m_proximityTolerance,
                           max2[2] + m_proximityTolerance);
 }
-
 } // imstk

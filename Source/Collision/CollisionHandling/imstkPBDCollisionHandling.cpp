@@ -31,14 +31,13 @@
 
 namespace imstk
 {
-
 void
 PBDCollisionHandling::processCollisionData()
 {
     /*if (auto deformableObj = std::dynamic_pointer_cast<DeformableObject>(m_object))
     {
         this->computeContactForcesDiscreteDeformable(deformableObj);
-    }    
+    }
     else if (auto analyticObj = std::dynamic_pointer_cast<CollidingObject>(m_object))
     {
         this->computeContactForcesAnalyticRigid(analyticObj);
@@ -52,7 +51,7 @@ PBDCollisionHandling::processCollisionData()
     this->generatePBDConstraints();
 }
 
-void 
+void
 PBDCollisionHandling::generatePBDConstraints()
 {
     // clear the constraints before populating wit new ones
@@ -75,7 +74,7 @@ PBDCollisionHandling::generatePBDConstraints()
 
         c->initConstraint(dynaModel1, map1->getMapIdx(colData.edgeIdA.first), map1->getMapIdx(colData.edgeIdA.second),
                           dynaModel2, map2->getMapIdx(colData.edgeIdB.first), map1->getMapIdx(colData.edgeIdB.second));
-        
+
         m_PBDConstraints.push_back(c);
     }
 
@@ -85,10 +84,10 @@ PBDCollisionHandling::generatePBDConstraints()
         const auto triVerts = colGeo2->getTrianglesVertices()[colData.triIdA];
 
         const auto c = std::make_shared<PbdPointTriangleConstraint>();
-        
-        c->initConstraint(dynaModel1, 
+
+        c->initConstraint(dynaModel1,
                           colData.vertexIdB,
-                          dynaModel2, 
+                          dynaModel2,
                           map2->getMapIdx(triVerts[0]),
                           map2->getMapIdx(triVerts[1]),
                           map2->getMapIdx(triVerts[2]));
@@ -96,5 +95,4 @@ PBDCollisionHandling::generatePBDConstraints()
         m_PBDConstraints.push_back(c);
     }
 }
-
 }

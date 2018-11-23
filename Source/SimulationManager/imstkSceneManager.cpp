@@ -66,7 +66,7 @@ SceneManager::runModule()
         else if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
         {
             collidingObj->resetForce();
-        }        
+        }
     }
 
     // Update objects controlled by the device controllers
@@ -78,12 +78,12 @@ SceneManager::runModule()
     // Compute collision data per interaction pair
     for (auto intPair : m_scene->getCollisionGraph()->getInteractionPairList())
     {
-        intPair->computeCollisionData();     
+        intPair->computeCollisionData();
     }
 
     // Process collision data per interaction pair
     for (auto intPair : m_scene->getCollisionGraph()->getInteractionPairList())
-    {    
+    {
         intPair->processCollisionData();
     }
 
@@ -113,7 +113,7 @@ SceneManager::runModule()
 
     auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
 
-    // Update time step size of the dynamic objects    
+    // Update time step size of the dynamic objects
     for (auto obj : m_scene->getSceneObjects())
     {
         if (obj->getType() == SceneObject::Type::Pbd)
