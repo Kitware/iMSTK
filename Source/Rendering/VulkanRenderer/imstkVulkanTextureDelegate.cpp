@@ -62,7 +62,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
         }
     }
 
-    m_layout = VK_IMAGE_LAYOUT_GENERAL;
+    m_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
     m_imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     m_imageInfo.pNext = nullptr;
@@ -547,7 +547,7 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
 
         this->changeImageLayout(commandBuffer, *m_image->getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-            VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT, m_range);
+            VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT, mipHighRange);
 
         vkCmdBlitImage(commandBuffer,
             *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -556,7 +556,7 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
 
         this->changeImageLayout(commandBuffer, *m_image->getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-            VK_ACCESS_TRANSFER_READ_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
+            VK_ACCESS_TRANSFER_READ_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, mipHighRange);
     }
 }
 

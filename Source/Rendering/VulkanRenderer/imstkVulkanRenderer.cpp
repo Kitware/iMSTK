@@ -701,7 +701,7 @@ VulkanRenderer::renderFrame()
 
     vkCmdPipelineBarrier(m_renderCommandBuffer[nextImageIndex],
         VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT,
+        VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
         0,
         1,
         &barrier,
