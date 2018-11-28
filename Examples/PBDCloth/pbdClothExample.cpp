@@ -95,7 +95,8 @@ int main()
     material->setBackFaceCulling(false);
     material->setColor(Color::LightGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    surfMesh->setRenderMaterial(material);
+    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    surfMeshModel->setRenderMaterial(material);
 
     // Solver
     auto pbdSolver = std::make_shared<PbdSolver>();

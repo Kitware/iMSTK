@@ -50,13 +50,15 @@ int main()
     auto fluidMesh = std::make_shared<PointSet>();
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());
 
+    auto fluidVisualModel = std::make_shared<VisualModel>(fluidMesh);
+
     auto material1 = std::make_shared<RenderMaterial>();
     material1->setColor(Color::Blue);
     material1->setSphereGlyphSize(.15);
-    fluidMesh->setRenderMaterial(material1);
+    fluidVisualModel->setRenderMaterial(material1);
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
-    deformableObj->setVisualGeometry(fluidMesh);
+    deformableObj->addVisualModel(fluidVisualModel);
     deformableObj->setCollidingGeometry(fluidMesh);
     deformableObj->setPhysicsGeometry(fluidMesh);
 

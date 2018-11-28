@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKHexahedralMeshRenderDelegate(std::shared_ptr<HexahedralMesh> hexahedralMesh);
+    VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -55,19 +55,8 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the hexahedral mesh
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
-
 protected:
 
-    std::shared_ptr<HexahedralMesh> m_geometry;             ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 } // imstk

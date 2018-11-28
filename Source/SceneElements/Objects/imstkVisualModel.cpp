@@ -19,42 +19,60 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKdbgTrianglesRenderDelegate_h
-#define imstkVTKdbgTrianglesRenderDelegate_h
-
-#include <memory>
-
-#include "imstkVTKRenderDelegate.h"
-
-class vtkDoubleArray;
+#include "imstkVisualModel.h"
 
 namespace imstk
 {
-class SurfaceMesh;
-
-///
-/// \class SurfaceMeshRenderDelegate
-///
-/// \brief
-///
-class VTKdbgTrianglesRenderDelegate : public VTKRenderDelegate
+VisualModel::VisualModel(std::shared_ptr<Geometry> geometry)
 {
-public:
-    ///
-    /// \brief Constructor
-    ///
-    VTKdbgTrianglesRenderDelegate(std::shared_ptr<DebugRenderTriangles> renderTriangles);
-
-    ///
-    /// \brief Update polydata source based on the surface mesh geometry
-    ///
-    void updateDataSource() override;
-
-protected:
-
-    std::shared_ptr<DebugRenderTriangles> m_triangles;        ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
-};
+    m_geometry = geometry;
 }
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+std::shared_ptr<Geometry>
+VisualModel::getGeometry()
+{
+    return m_geometry;
+}
+
+void
+VisualModel::setGeometry(std::shared_ptr<Geometry> geometry)
+{
+    m_geometry = geometry;
+}
+
+void
+VisualModel::setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
+{
+    m_renderMaterial = renderMaterial;
+}
+
+std::shared_ptr<RenderMaterial>
+VisualModel::getRenderMaterial() const
+{
+    return m_renderMaterial;
+}
+
+void
+VisualModel::show()
+{
+    m_isVisible = true;
+}
+
+void
+VisualModel::hide()
+{
+    m_isVisible = false;
+}
+
+bool
+VisualModel::isVisible() const
+{
+    return m_isVisible;
+}
+
+bool
+VisualModel::isRenderDelegateCreated()
+{
+    return m_renderDelegateCreated;
+}
+}

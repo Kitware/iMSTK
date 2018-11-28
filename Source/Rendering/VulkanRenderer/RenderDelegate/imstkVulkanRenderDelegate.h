@@ -29,7 +29,6 @@
 
 #include <array>
 
-#include "imstkGeometry.h"
 #include "imstkSceneObject.h"
 #include "imstkVulkanVertexBuffer.h"
 #include "imstkVulkanUniformBuffer.h"
@@ -49,42 +48,34 @@ public:
     ~VulkanRenderDelegate() = default;
 
     ///
-    /// \brief Creates a render delegate from geometry
+    /// \brief Initialize class
+    ///
+    void initialize(std::shared_ptr<VisualModel> visualModel);
+
+    ///
+    /// \brief Creates a render delegate from visual model
     ///
     static std::shared_ptr<VulkanRenderDelegate> make_delegate(
-        std::shared_ptr<Geometry> geom,
+        std::shared_ptr<VisualModel> visualModel,
         SceneObject::Type type,
         VulkanMemoryManager& details);
 
     ///
     /// \brief Get source geometry
     ///
-    virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+    std::shared_ptr<VisualModel> getVisualModel() const;
 
     ///
     /// \brief Update render geometry. This is implemented a little differently
-    ///        in that memory is directly mapped from the Geometry to the
+    ///        in that memory is directly mapped from the VisualModel to the
     ///        RenderDelegate.
     ///
     virtual void update(const uint32_t frameIndex){};
 
     ///
-    /// \brief Initialize memory backing
-    ///
-    void initialize(
-        VkDevice &device,
-        uint32_t memoryIndex,
-        std::shared_ptr<Geometry> geometry);
-
-    ///
     /// \brief Get vertex buffer
     ///
     std::shared_ptr<VulkanVertexBuffer> getBuffer();
-
-    ///
-    /// \brief Get vertex buffer
-    ///
-    vtkSmartPointer<vtkPolyDataMapper> setUpMapper(vtkAlgorithmOutput * source);
 
     ///
     /// \brief Initialize data
@@ -110,6 +101,7 @@ protected:
     unsigned int m_numVertices;
     unsigned int m_vertexSize;
     double m_loadFactor = 1.0;
+    std::shared_ptr<VisualModel> m_visualModel;
 
     ///
     /// \brief Default constructor (protected)

@@ -30,19 +30,22 @@
 
 namespace imstk
 {
-VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<PointSet> mesh) :
-    m_geometry(mesh),
+VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<PointSet>(visualModel->getGeometry());
+
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
+    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(m_geometry->getNumVertices());
+    points->SetNumberOfPoints(geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
     // Create PolyData
@@ -60,7 +63,7 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<PointSet> m
     glyph->SetSourceConnection(sphere->GetOutputPort());
     glyph->SetInputData(pointsPolydata);
 #endif
-    m_geometry->m_dataModified = false;
+    geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
@@ -68,34 +71,24 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<PointSet> m
     // Setup custom mapper
     m_mapper->SetInputConnection(glyph->GetOutputPort());
     auto mapper = VTKCustomPolyDataMapper::SafeDownCast(m_mapper.GetPointer());
-    if (!mesh->getRenderMaterial())
+    if (!m_visualModel->getRenderMaterial())
     {
-        mesh->setRenderMaterial(std::make_shared<RenderMaterial>());
+        m_visualModel->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
-    sphere->SetRadius(mesh->getRenderMaterial()->getSphereGlyphSize());
+    sphere->SetRadius(m_visualModel->getRenderMaterial()->getSphereGlyphSize());
 
-    mapper->setRenderMaterial(mesh->getRenderMaterial());
+    mapper->setRenderMaterial(m_visualModel->getRenderMaterial());
 }
 
 void
 VTKPointSetRenderDelegate::updateDataSource()
 {
-    if (m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<PointSet>(m_visualModel->getGeometry());
+
+    if (geometry->m_dataModified)
     {
         m_mappedVertexArray->Modified();
-        m_geometry->m_dataModified = false;
+        geometry->m_dataModified = false;
     }
-}
-
-std::shared_ptr<Geometry>
-VTKPointSetRenderDelegate::getGeometry() const
-{
-    return m_geometry;
-}
-
-std::shared_ptr<imstk::RenderMaterial>
-VTKPointSetRenderDelegate::getRenderMaterial() const
-{
-    return m_geometry->getRenderMaterial();
 }
 } // imstk

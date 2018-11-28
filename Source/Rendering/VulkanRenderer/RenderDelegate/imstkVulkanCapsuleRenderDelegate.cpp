@@ -23,15 +23,18 @@
 
 namespace imstk
 {
-VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule,
+VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                                                          SceneObject::Type type,
                                                          VulkanMemoryManager& memoryManager)
-    : m_geometry(capsule)
 {
+    this->initialize(visualModel);
+
+    auto geometry = std::static_pointer_cast<Capsule>(m_visualModel->getGeometry());
+
     auto source = vtkSmartPointer<vtkCapsuleSource>::New();
     source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
-    source->SetRadius(m_geometry->getRadius());
-    source->SetCylinderLength(m_geometry->getLength());
+    source->SetRadius(geometry->getRadius());
+    source->SetCylinderLength(geometry->getLength());
     source->SetLatLongTessellation(20);
     source->SetPhiResolution(20);
     source->SetThetaResolution(20);
@@ -86,12 +89,7 @@ VulkanCapsuleRenderDelegate::VulkanCapsuleRenderDelegate(std::shared_ptr<Capsule
     m_numTriangles = (uint32_t)m_capsuleTriangles.size();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    if (!m_geometry->getRenderMaterial())
-    {
-        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
-    }
-
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
+    this->initializeData(memoryManager, this->getVisualModel()->getRenderMaterial());
 
     m_vertexBuffer->updateVertexBuffer(&m_capsuleVertices, &m_capsuleTriangles);
 
@@ -102,11 +100,5 @@ void
 VulkanCapsuleRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
-}
-
-std::shared_ptr<Geometry>
-VulkanCapsuleRenderDelegate::getGeometry() const
-{
-    return m_geometry;
 }
 }

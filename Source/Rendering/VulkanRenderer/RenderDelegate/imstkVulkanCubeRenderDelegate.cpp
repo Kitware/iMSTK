@@ -23,12 +23,15 @@
 
 namespace imstk
 {
-VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube,
+VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                                                    SceneObject::Type type,
                                                    VulkanMemoryManager& memoryManager)
-    : m_geometry(cube)
 {
-    auto width = m_geometry->getWidth();
+    this->initialize(visualModel);
+
+    auto geometry = std::static_pointer_cast<Cube>(m_visualModel->getGeometry());
+
+    auto width = geometry->getWidth();
 
     auto source = vtkSmartPointer<vtkCubeSource>::New();
     source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
@@ -86,12 +89,12 @@ VulkanCubeRenderDelegate::VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube,
     m_numTriangles = (uint32_t)m_cubeTriangles.size();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    if (!m_geometry->getRenderMaterial())
+    if (!m_visualModel->getRenderMaterial())
     {
-        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+        m_visualModel->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
+    this->initializeData(memoryManager, m_visualModel->getRenderMaterial());
 
     m_vertexBuffer->updateVertexBuffer(&m_cubeVertices, &m_cubeTriangles);
 
@@ -102,11 +105,5 @@ void
 VulkanCubeRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
-}
-
-std::shared_ptr<Geometry>
-VulkanCubeRenderDelegate::getGeometry() const
-{
-    return m_geometry;
 }
 }

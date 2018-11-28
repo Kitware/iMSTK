@@ -25,10 +25,13 @@
 
 namespace imstk
 {
-VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube> cube) :
-    m_geometry(cube),
+VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<Cube>(visualModel->getGeometry());
+
     auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
     cubeSource->SetCenter(0, 0, 0);
     cubeSource->SetXLength(1.0);
@@ -39,13 +42,15 @@ VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube> cube) :
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
 }
 
 void
 VTKCubeRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<Cube>(m_visualModel->getGeometry());
+
+    if (!geometry->m_dataModified)
     {
         return;
     }
@@ -53,20 +58,14 @@ VTKCubeRenderDelegate::updateDataSource()
     Geometry::DataType type = Geometry::DataType::PreTransform;
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(m_geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
-    T.scale(m_geometry->getWidth(type));
+    T.translate(geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
+    T.scale(geometry->getWidth(type));
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
     vtkT->SetMatrix(T.data());
 
-    m_geometry->m_dataModified = false;
-}
-
-std::shared_ptr<Geometry>
-VTKCubeRenderDelegate::getGeometry() const
-{
-    return m_geometry;
+    geometry->m_dataModified = false;
 }
 } // imstk

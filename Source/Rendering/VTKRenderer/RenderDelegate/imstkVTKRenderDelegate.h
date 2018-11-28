@@ -30,6 +30,7 @@
 #include "imstkTextureManager.h"
 #include "imstkVTKCustomPolyDataMapper.h"
 #include "imstkDebugGeometry.h"
+#include "imstkVisualModel.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
@@ -52,7 +53,7 @@ public:
     ///
     /// \brief Instantiate proper render delegate
     ///
-    static std::shared_ptr<VTKRenderDelegate> makeDelegate(std::shared_ptr<Geometry> geom);
+    static std::shared_ptr<VTKRenderDelegate> makeDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Instantiate proper debug render delegate
@@ -72,8 +73,7 @@ public:
     ///
     /// \brief Return geometry to render
     ///
-    virtual std::shared_ptr<Geometry> getGeometry() const = 0;
-    virtual std::shared_ptr<RenderMaterial> getRenderMaterial() const = 0;
+    std::shared_ptr<VisualModel> getVisualModel() const;
 
     ///
     /// \brief Get VTK renderered object
@@ -113,6 +113,7 @@ protected:
         m_actor->SetUserTransform(m_transform);
     }
 
+    std::shared_ptr<VisualModel> m_visualModel;
     vtkSmartPointer<vtkActor> m_actor;
     vtkSmartPointer<VTKCustomPolyDataMapper> m_mapper;
     vtkSmartPointer<vtkTransform> m_transform;

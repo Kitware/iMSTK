@@ -52,8 +52,8 @@ VirtualCouplingPBDObject::updateFromDevice()
     Quatd r = Quatd(getRotation());
 
     // Update colliding geometry
-    m_visualGeometry->setTranslation(p);
-    m_visualGeometry->setRotation(r);
+    this->getVisualGeometry()->setTranslation(p);
+    this->getVisualGeometry()->setRotation(r);
 
     computeTransform(p, r, transform);
 

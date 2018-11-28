@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKPointSetRenderDelegate(std::shared_ptr<PointSet> mesh);
+    VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -56,19 +56,8 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the surface mesh
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
-
 protected:
 
-    std::shared_ptr<PointSet> m_geometry;                   ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }

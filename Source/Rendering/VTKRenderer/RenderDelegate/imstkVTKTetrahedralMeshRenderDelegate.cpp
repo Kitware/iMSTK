@@ -36,25 +36,28 @@
 
 namespace imstk
 {
-VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
-    m_geometry(tetrahedralMesh),
+VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<TetrahedralMesh>(visualModel->getGeometry());
+
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
+    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(m_geometry->getNumVertices());
+    points->SetNumberOfPoints(geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[4];
-    for(const auto &t : m_geometry->getTetrahedraVertices())
+    for(const auto &t : geometry->getTetrahedraVertices())
     {
         for(size_t i = 0; i < 4; ++i)
         {
@@ -82,25 +85,27 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
 void
 VTKTetrahedralMeshRenderDelegate::updateDataSource()
 {
-    if (m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
+
+    if (geometry->m_dataModified)
     {
         m_mappedVertexArray->Modified();
-        m_geometry->m_dataModified = false;
+        geometry->m_dataModified = false;
     }
 
-    if (m_geometry->getTopologyChangedFlag())
+    if (geometry->getTopologyChangedFlag())
     {
         m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
 
         // Copy cells
-        auto& maskedTets = std::dynamic_pointer_cast<TetrahedralMesh>(m_geometry)->getRemovedTetrahedra();
+        auto& maskedTets = std::dynamic_pointer_cast<TetrahedralMesh>(geometry)->getRemovedTetrahedra();
 
         auto cells = vtkSmartPointer<vtkCellArray>::New();
         vtkIdType cell[4];
         size_t tetId = 0;
 
         // Assign new cells
-        for (const auto &t : m_geometry->getTetrahedraVertices())
+        for (const auto &t : geometry->getTetrahedraVertices())
         {
             if (!maskedTets[tetId])
             {
@@ -114,20 +119,7 @@ VTKTetrahedralMeshRenderDelegate::updateDataSource()
             tetId++;
         }
         m_mesh->SetCells(VTK_TETRA, cells);
-        m_geometry->setTopologyChangedFlag(false);
+        geometry->setTopologyChangedFlag(false);
     }
-}
-
-
-std::shared_ptr<Geometry>
-VTKTetrahedralMeshRenderDelegate::getGeometry() const
-{
-    return m_geometry;
-}
-
-std::shared_ptr<imstk::RenderMaterial>
-VTKTetrahedralMeshRenderDelegate::getRenderMaterial() const
-{
-    return m_geometry->getRenderMaterial();
 }
 } // imstk

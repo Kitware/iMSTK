@@ -40,26 +40,29 @@
 
 namespace imstk
 {
-VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
-    m_geometry(surfaceMesh),
+VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
     m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
+    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(m_geometry->getNumVertices());
+    points->SetNumberOfPoints(geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[3];
-    for(const auto &t : m_geometry->getTrianglesVertices())
+    for(const auto &t : geometry->getTrianglesVertices())
     {
         for(size_t i = 0; i < 3; ++i)
         {
@@ -74,9 +77,9 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     polydata->SetPolys(cells);
 
     // Map normals
-    m_geometry->computeVertexNormals();
+    geometry->computeVertexNormals();
 
-    StdVectorOfVec3d& normals = m_geometry->getVertexNormalsNotConst();
+    StdVectorOfVec3d& normals = geometry->getVertexNormalsNotConst();
     double* normalData = reinterpret_cast<double*>(normals.data());
     m_mappedNormalArray->SetNumberOfComponents(3);
     m_mappedNormalArray->SetArray(normalData, normals.size()*3, 1);
@@ -85,22 +88,22 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
-    m_geometry->m_dataModified = false;
+    geometry->m_dataModified = false;
 
     // Setup texture coordinates
-    if (m_geometry->getDefaultTCoords() != "")
+    if (geometry->getDefaultTCoords() != "")
     {
         // Convert texture coordinates
-        auto tcoords = m_geometry->getPointDataArray(m_geometry->getDefaultTCoords());
+        auto tcoords = geometry->getPointDataArray(geometry->getDefaultTCoords());
         if (tcoords == nullptr)
         {
-            LOG(WARNING) << "No default texture coordinates array for geometry " << m_geometry;
+            LOG(WARNING) << "No default texture coordinates array for geometry " << geometry;
         }
         else
         {
             auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
             vtkTCoords->SetNumberOfComponents(2);
-            vtkTCoords->SetName(m_geometry->getDefaultTCoords().c_str());
+            vtkTCoords->SetName(geometry->getDefaultTCoords().c_str());
 
             for (auto const tcoord : *tcoords)
             {
@@ -113,13 +116,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     }
 
     // Update tangents
-    if (m_geometry->getVertexTangents().size() > 0)
+    if (geometry->getVertexTangents().size() > 0)
     {
         auto tangents = vtkSmartPointer<vtkFloatArray>::New();
         tangents->SetName("tangents");
         tangents->SetNumberOfComponents(3);
 
-        for (auto const tangent : m_geometry->getVertexTangents())
+        for (auto const tangent : geometry->getVertexTangents())
         {
             float tempTangent[3] = {(float)tangent[0],
                                     (float)tangent[1],
@@ -131,18 +134,20 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
 
     // Update Transform, Render Properties
     this->update();
-    this->setUpMapper(source->GetOutputPort(), false, m_geometry->getRenderMaterial());
+    this->setUpMapper(source->GetOutputPort(), false, m_visualModel->getRenderMaterial());
     m_mapper->setIsSurfaceMapper(true);
 }
 
 void
 VTKSurfaceMeshRenderDelegate::updateDataSource()
 {
-    if (m_geometry->m_dataModified)
-    {
-        m_geometry->computeVertexNormals();
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
 
-        StdVectorOfVec3d& normals = m_geometry->getVertexNormalsNotConst();
+    if (geometry->m_dataModified)
+    {
+        geometry->computeVertexNormals();
+
+        StdVectorOfVec3d& normals = geometry->getVertexNormalsNotConst();
         double* normalData = reinterpret_cast<double*>(normals.data());
         m_mappedNormalArray->SetNumberOfComponents(3);
         m_mappedNormalArray->SetArray(normalData, normals.size()*3, 1);
@@ -150,14 +155,14 @@ VTKSurfaceMeshRenderDelegate::updateDataSource()
 
         m_mappedVertexArray->Modified();
         m_mappedNormalArray->Modified();
-        m_geometry->m_dataModified = false;
+        geometry->m_dataModified = false;
     }
 }
 
 void
 VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelegate>& textureManager)
 {
-    auto material = m_geometry->getRenderMaterial();
+    auto material = m_visualModel->getRenderMaterial();
     if (material == nullptr)
     {
         return;
@@ -197,11 +202,5 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         m_actor->GetProperty()->SetTexture(currentUnit, textureDelegate->getTexture());
         currentUnit++;
     }
-}
-
-std::shared_ptr<Geometry>
-VTKSurfaceMeshRenderDelegate::getGeometry() const
-{
-    return m_geometry;
 }
 } // imstk

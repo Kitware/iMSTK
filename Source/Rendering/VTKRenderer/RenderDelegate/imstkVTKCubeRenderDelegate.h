@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKCubeRenderDelegate(std::shared_ptr<Cube> cube);
+    VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -54,19 +54,7 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the cube geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_geometry->getRenderMaterial(); };
-
 protected:
-    std::shared_ptr<Cube> m_geometry;   ///> Geometry
-
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 } // imstk

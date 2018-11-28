@@ -23,23 +23,21 @@
 
 namespace imstk
 {
-VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool,
+VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                                                      SceneObject::Type type,
                                                      VulkanMemoryManager& memoryManager)
-    : m_geometry(decalPool)
 {
+    this->initialize(visualModel);
+
+    auto geometry = std::static_pointer_cast<DecalPool>(visualModel->getGeometry());
+
     m_numVertices = 8;
     m_numTriangles = 12;
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    if (!m_geometry->getRenderMaterial())
-    {
-        auto material = std::make_shared<RenderMaterial>();
-        m_geometry->setRenderMaterial(material);
-    }
-    m_geometry->getRenderMaterial()->m_isDecal = true;
+    m_visualModel->getRenderMaterial()->m_isDecal = true;
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
+    this->initializeData(memoryManager, this->getVisualModel()->getRenderMaterial());
 
     this->updateVertexBuffer();
 }
@@ -48,20 +46,21 @@ void
 VulkanDecalRenderDelegate::updateVertexBuffer()
 {
     auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory();
+    auto geometry = std::static_pointer_cast<DecalPool>(m_visualModel->getGeometry());
 
     for (unsigned i = 0; i < m_numVertices; i++)
     {
         vertices[i].position =
-            m_geometry->m_vertexPositions[i];
+            geometry->m_vertexPositions[i];
     }
 
     auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory();
 
     for (unsigned i = 0; i < m_numTriangles; i++)
     {
-        triangles[i][0] = (uint32_t)m_geometry->m_triangles[i].x;
-        triangles[i][1] = (uint32_t)m_geometry->m_triangles[i].y;
-        triangles[i][2] = (uint32_t)m_geometry->m_triangles[i].z;
+        triangles[i][0] = (uint32_t)geometry->m_triangles[i].x;
+        triangles[i][1] = (uint32_t)geometry->m_triangles[i].y;
+        triangles[i][2] = (uint32_t)geometry->m_triangles[i].z;
     }
 }
 
@@ -89,7 +88,9 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
     auto up = glm::tvec3<float>(camera->getViewUp().x(), camera->getViewUp().y(), camera->getViewUp().z());
     auto viewMatrix = glm::lookAt(eye, center, up);
 
-    for (auto decal : m_geometry->getDecals())
+    auto geometry = std::static_pointer_cast<DecalPool>(m_visualModel->getGeometry());
+
+    for (auto decal : geometry->getDecals())
     {
         decal->updateDecal(viewMatrix);
         m_decalVertexUniforms.transform[index] = decal->m_transform;
@@ -97,7 +98,7 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
         index++;
     }
 
-    auto mat = m_geometry->getRenderMaterial();
+    auto mat = this->getVisualModel()->getRenderMaterial();
 
     auto color = mat->getColor();
     m_decalFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
@@ -110,11 +111,5 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
         (void *)&m_decalVertexUniforms, frameIndex);
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalFragmentUniforms),
         (void *)&m_decalFragmentUniforms, frameIndex);
-}
-
-std::shared_ptr<Geometry>
-VulkanDecalRenderDelegate::getGeometry() const
-{
-    return m_geometry;
 }
 }

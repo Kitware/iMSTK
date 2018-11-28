@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule);
+    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief destructor
@@ -54,18 +54,7 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the capsule geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_geometry->getRenderMaterial(); };
-
 protected:
-    std::shared_ptr<Capsule> m_geometry; ///> Geometry
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 } // imstk

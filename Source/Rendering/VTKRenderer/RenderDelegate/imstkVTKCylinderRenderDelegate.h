@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKCylinderRenderDelegate(std::shared_ptr<Cylinder> cylinder);
+    VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -55,20 +55,8 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the cylinder geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_geometry->getRenderMaterial(); };
-
 protected:
     vtkSmartPointer<vtkCylinderSource> cylinderSource;
-
-    std::shared_ptr<Cylinder> m_geometry;   ///> Geometry
 
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };

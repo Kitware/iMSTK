@@ -43,26 +43,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh);
+    VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Update line source based on the line mesh
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the line mesh
-    ///
-    std::shared_ptr<Geometry>getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
-
 protected:
 
-    std::shared_ptr<LineMesh>  m_geometry;                  ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }

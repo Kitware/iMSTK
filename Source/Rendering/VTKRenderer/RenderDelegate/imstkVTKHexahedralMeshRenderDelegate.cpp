@@ -32,25 +32,27 @@
 
 namespace imstk
 {
-VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr<HexahedralMesh> hexahedralMesh) :
-    m_geometry(hexahedralMesh),
+VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+    auto geometry = std::static_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
+
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
+    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(m_geometry->getNumVertices());
+    points->SetNumberOfPoints(geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[8];
-    for(const auto &t : m_geometry->getHexahedraVertices())
+    for(const auto &t : geometry->getHexahedraVertices())
     {
         for(size_t i = 0; i < 8; ++i)
         {
@@ -63,7 +65,7 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     auto unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     unstructuredGrid->SetPoints(points);
     unstructuredGrid->SetCells(VTK_HEXAHEDRON, cells);
-    m_geometry->m_dataModified = false;
+    geometry->m_dataModified = false;
 
     // Mapper & Actor
     auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
@@ -77,26 +79,15 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
 void
 VTKHexahedralMeshRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
+
+    if (!geometry->m_dataModified)
     {
         return;
     }
 
     m_mappedVertexArray->Modified();
 
-    m_geometry->m_dataModified = false;
-}
-
-
-std::shared_ptr<Geometry>
-VTKHexahedralMeshRenderDelegate::getGeometry() const
-{
-    return m_geometry;
-}
-
-std::shared_ptr<imstk::RenderMaterial>
-VTKHexahedralMeshRenderDelegate::getRenderMaterial() const
-{
-    return m_geometry->getRenderMaterial();
+    geometry->m_dataModified = false;
 }
 } // imstk

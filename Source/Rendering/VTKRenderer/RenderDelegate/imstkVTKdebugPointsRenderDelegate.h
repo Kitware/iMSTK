@@ -48,16 +48,6 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Return geometry to render
-    ///
-    std::shared_ptr<Geometry> getGeometry() const { return nullptr; };
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_points->getRenderMaterial(); };
-
 protected:
 
     std::shared_ptr<DebugRenderPoints> m_points;                ///> Geometry to render

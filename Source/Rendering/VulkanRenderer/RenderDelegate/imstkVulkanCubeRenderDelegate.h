@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanCubeRenderDelegate(std::shared_ptr<Cube> cube,
+    VulkanCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                              SceneObject::Type type,
                              VulkanMemoryManager& memoryManager);
 
@@ -53,14 +53,7 @@ public:
     ///
     void update(const uint32_t frameIndex) override;
 
-    ///
-    /// \brief Get source geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
 protected:
-    std::shared_ptr<Cube> m_geometry;
-
     std::vector<std::array<uint32_t, 3>> m_cubeTriangles;
     std::vector<VulkanBasicVertex> m_cubeVertices;
 };

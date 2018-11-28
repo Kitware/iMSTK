@@ -23,52 +23,51 @@
 
 namespace imstk
 {
-VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<Cylinder> cylinder) :
-    m_geometry(cylinder),
+VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<Cylinder>(visualModel->getGeometry());
+
     Geometry::DataType type = Geometry::DataType::PreTransform;
     cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
     cylinderSource->SetCenter(0., 0., 0.);
     cylinderSource->SetRadius(1.);
-    cylinderSource->SetHeight(m_geometry->getLength());
+    cylinderSource->SetHeight(geometry->getLength());
     cylinderSource->SetResolution(100);
 
     m_transformFilter->SetInputConnection(cylinderSource->GetOutputPort());
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
 }
 
 void
 VTKCylinderRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<Cylinder>(m_visualModel->getGeometry());
+
+    if (!geometry->m_dataModified)
     {
         return;
     }
 
     Geometry::DataType type = Geometry::DataType::PreTransform;
 
-    cylinderSource->SetRadius(m_geometry->getRadius());
-    cylinderSource->SetHeight(m_geometry->getLength());
+    cylinderSource->SetRadius(geometry->getRadius());
+    cylinderSource->SetHeight(geometry->getLength());
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(m_geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
+    T.translate(geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
     T.scale(1.0);
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
     vtkT->SetMatrix(T.data());
 
-    m_geometry->m_dataModified = false;
-}
-
-std::shared_ptr<Geometry>
-VTKCylinderRenderDelegate::getGeometry() const
-{
-    return m_geometry;
+    geometry->m_dataModified = false;
 }
 } // imstk

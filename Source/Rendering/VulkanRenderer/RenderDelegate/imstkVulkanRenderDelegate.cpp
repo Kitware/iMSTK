@@ -42,38 +42,45 @@
 
 namespace imstk
 {
+void
+VulkanRenderDelegate::initialize(std::shared_ptr<VisualModel> visualModel)
+{
+    m_visualModel = visualModel;
+
+    if (!m_visualModel->getRenderMaterial())
+    {
+        auto material = std::make_shared<RenderMaterial>();
+        m_visualModel->setRenderMaterial(material);
+    }
+}
+
 std::shared_ptr<VulkanRenderDelegate>
-VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom,
+VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
                                     SceneObject::Type type,
                                     VulkanMemoryManager& memoryManager)
 {
-    geom->m_renderDelegateCreated = true;
-    switch (geom->getType())
+    visualModel->m_renderDelegateCreated = true;
+    switch (visualModel->getGeometry()->getType())
     {
     case Geometry::Type::Plane:
     {
-        auto plane = std::dynamic_pointer_cast<Plane>(geom);
-        return std::make_shared<VulkanPlaneRenderDelegate>(plane, type, memoryManager);
+        return std::make_shared<VulkanPlaneRenderDelegate>(visualModel, type, memoryManager);
     }
     case Geometry::Type::Sphere:
     {
-        auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
-        return std::make_shared<VulkanSphereRenderDelegate>(sphere, type, memoryManager);
+        return std::make_shared<VulkanSphereRenderDelegate>(visualModel, type, memoryManager);
     }
     case Geometry::Type::Cube:
     {
-        auto cube = std::dynamic_pointer_cast<Cube>(geom);
-        return std::make_shared<VulkanCubeRenderDelegate>(cube, type, memoryManager);
+        return std::make_shared<VulkanCubeRenderDelegate>(visualModel, type, memoryManager);
     }
     case Geometry::Type::Capsule:
     {
-        auto capsule = std::dynamic_pointer_cast<Capsule>(geom);
-        return std::make_shared<VulkanCapsuleRenderDelegate>(capsule, type, memoryManager);
+        return std::make_shared<VulkanCapsuleRenderDelegate>(visualModel, type, memoryManager);
     }
     case Geometry::Type::SurfaceMesh:
     {
-        auto surfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(geom);
-        return std::make_shared<VulkanSurfaceMeshRenderDelegate>(surfaceMesh, type, memoryManager);
+        return std::make_shared<VulkanSurfaceMeshRenderDelegate>(visualModel, type, memoryManager);
     }
     /*case Geometry::Type::TetrahedralMesh:
     {
@@ -82,8 +89,7 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom,
     }*/
     case Geometry::Type::LineMesh:
     {
-        auto lineMesh = std::dynamic_pointer_cast<LineMesh>(geom);
-        return std::make_shared<VulkanLineMeshRenderDelegate>(lineMesh, type, memoryManager);
+        return std::make_shared<VulkanLineMeshRenderDelegate>(visualModel, type, memoryManager);
     }
     /*case Geometry::Type::HexahedralMesh:
     {
@@ -92,25 +98,21 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<Geometry> geom,
     }*/
     case Geometry::Type::DecalPool:
     {
-        auto decalPool = std::dynamic_pointer_cast<DecalPool>(geom);
-        return std::make_shared<VulkanDecalRenderDelegate>(decalPool, type, memoryManager);
+        return std::make_shared<VulkanDecalRenderDelegate>(visualModel, type, memoryManager);
     }
     default:
     {
         LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
-        geom->m_renderDelegateCreated = false;
+        visualModel->m_renderDelegateCreated = false;
         return nullptr;
     }
     }
 }
 
-vtkSmartPointer<vtkPolyDataMapper>
-VulkanRenderDelegate::setUpMapper(vtkAlgorithmOutput * source)
+std::shared_ptr<VisualModel>
+VulkanRenderDelegate::getVisualModel() const
 {
-    vtkSmartPointer<vtkPolyDataMapper> mapper;
-    mapper->SetInputConnection(source);
-    mapper->Update();
-    return mapper;
+    return m_visualModel;
 }
 
 std::shared_ptr<VulkanVertexBuffer>
@@ -156,7 +158,7 @@ VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager,
 void
 VulkanRenderDelegate::updateTransform()
 {
-    auto geometry = this->getGeometry();
+    auto geometry = this->getVisualModel()->getGeometry();
     if (!geometry->m_transformModified)
     {
         return;
@@ -170,13 +172,13 @@ VulkanRenderDelegate::updateTransform()
 void
 VulkanRenderDelegate::updateUniforms(uint32_t frameIndex)
 {
-    auto geometry = this->getGeometry();
+    auto geometry = this->getVisualModel()->getGeometry();
     this->updateTransform();
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
         (void *)&m_localVertexUniforms,
         frameIndex);
 
-    auto mat = geometry->getRenderMaterial();
+    auto mat = this->getVisualModel()->getRenderMaterial();
 
     auto color = mat->getColor();
     m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);

@@ -649,7 +649,7 @@ VulkanRenderer::renderFrame()
     uint32_t nextImageIndex;
     vkAcquireNextImageKHR(m_renderDevice, *m_swapchain, UINT64_MAX, m_readyToRender, VK_NULL_HANDLE, &nextImageIndex);
 
-    this->loadAllGeometry();
+    this->loadAllVisualModels();
 
     // Update global uniforms
     this->updateGlobalUniforms(nextImageIndex);
@@ -657,7 +657,7 @@ VulkanRenderer::renderFrame()
     // Update local uniforms
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool)
+        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool)
         {
             auto decalPool = std::dynamic_pointer_cast<VulkanDecalRenderDelegate>(m_renderDelegates[renderDelegateIndex]);
             decalPool->update(nextImageIndex, m_scene->getCamera());
@@ -732,9 +732,9 @@ VulkanRenderer::renderFrame()
         {
             auto material = m_renderDelegates[renderDelegateIndex]->m_shadowMaterial;
 
-            if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
-                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->getRenderMaterial()->getCastsShadows()
-                || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
+            if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
+                || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->getRenderMaterial()->getCastsShadows()
+                || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
             {
                 continue;
             }
@@ -772,8 +772,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
-            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
+        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
         }
@@ -850,8 +850,8 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() == Geometry::Type::DecalPool
-            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
+        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
         }
@@ -885,13 +885,13 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getGeometry()->getType() != Geometry::Type::DecalPool
-            || !m_renderDelegates[renderDelegateIndex]->getGeometry()->isVisible())
+        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() != Geometry::Type::DecalPool
+            || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
         }
 
-        auto geometry = std::dynamic_pointer_cast<DecalPool>(m_renderDelegates[renderDelegateIndex]->getGeometry());
+        auto geometry = std::dynamic_pointer_cast<DecalPool>(m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry());
         auto material = m_renderDelegates[renderDelegateIndex]->m_material;
         vkCmdBindPipeline(m_renderCommandBuffer[nextImageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
         this->setCommandBufferState(&m_renderCommandBuffer[nextImageIndex], m_width, m_height);
@@ -1055,32 +1055,34 @@ VulkanRenderer::setupSynchronization()
 }
 
 void
-VulkanRenderer::loadAllGeometry()
+VulkanRenderer::loadAllVisualModels()
 {
     // Add new objects
     for (auto sceneObject : m_scene->getSceneObjects())
     {
         auto type = sceneObject->getType();
-        auto geometry = sceneObject->getVisualGeometry();
 
-        if (geometry && !geometry->m_renderDelegateCreated)
+        for (auto visualModel : sceneObject->getVisualModels())
         {
-            auto renderDelegate = this->loadGeometry(geometry, type);
+            if (visualModel && !visualModel->isRenderDelegateCreated())
+            {
+                auto renderDelegate = this->loadVisualModel(visualModel, type);
+            }
         }
     }
 }
 
 std::shared_ptr<VulkanRenderDelegate>
-VulkanRenderer::loadGeometry(std::shared_ptr<Geometry> geometry, SceneObject::Type type)
+VulkanRenderer::loadVisualModel(std::shared_ptr<VisualModel> visualModel, SceneObject::Type type)
 {
-    auto renderDelegate = VulkanRenderDelegate::make_delegate(geometry, type, m_memoryManager);
+    auto renderDelegate = VulkanRenderDelegate::make_delegate(visualModel, type, m_memoryManager);
     if (renderDelegate != nullptr)
     {
         m_renderDelegates.push_back(renderDelegate);
         renderDelegate->getBuffer()->initializeBuffers(m_memoryManager);
         renderDelegate->m_material->initialize(this);
 
-        if (!renderDelegate->getGeometry()->getRenderMaterial()->isDecal())
+        if (!renderDelegate->getVisualModel()->getRenderMaterial()->isDecal())
         {
             renderDelegate->m_shadowMaterial->initialize(this);
             renderDelegate->m_depthMaterial->initialize(this);

@@ -298,21 +298,24 @@ VTKRenderer::updateRenderDelegates()
     // Object actors
     for ( const auto& obj : m_scene->getSceneObjects() )
     {
-        auto geom = obj->getVisualGeometry();
-        if (geom && !geom->m_renderDelegateCreated)
+        for (auto visualModel : obj->getVisualModels())
         {
-            auto delegate = VTKRenderDelegate::makeDelegate( geom );
-            if (delegate == nullptr)
+            auto geom = visualModel->getGeometry();
+            if (visualModel && !visualModel->isRenderDelegateCreated())
             {
-                LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
-                             << obj->getName() << "'.";
-                continue;
-            }
+                auto delegate = VTKRenderDelegate::makeDelegate( visualModel );
+                if (delegate == nullptr)
+                {
+                    LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                                 << obj->getName() << "'.";
+                    continue;
+                }
 
-            m_renderDelegates.push_back( delegate );
-            m_objectVtkActors.push_back( delegate->getVtkActor() );
-            m_vtkRenderer->AddActor(delegate->getVtkActor());
-            geom->m_renderDelegateCreated = true;
+                m_renderDelegates.push_back( delegate );
+                m_objectVtkActors.push_back( delegate->getVtkActor() );
+                m_vtkRenderer->AddActor(delegate->getVtkActor());
+                visualModel->m_renderDelegateCreated = true;
+            }
         }
     }
 

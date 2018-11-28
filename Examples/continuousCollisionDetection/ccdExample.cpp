@@ -39,7 +39,8 @@ int main()
 
     // Obj1
     auto obj1 = std::make_shared<CollidingObject>("obj1");
-    obj1->setVisualGeometry(mesh1);
+    auto objModel1 = std::make_shared<VisualModel>(mesh1);
+    obj1->addVisualModel(objModel1);
     obj1->setCollidingGeometry(mesh1);
     scene->addSceneObject(obj1);
 
@@ -48,10 +49,11 @@ int main()
     matObj1->setBackFaceCulling(false);
     matObj1->setColor(Color::Green);
     matObj1->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    mesh1->setRenderMaterial(matObj1);
+    objModel1->setRenderMaterial(matObj1);
 
     // Obj2
     auto obj2 = std::make_shared<CollidingObject>("obj2");
+    auto objModel2 = std::make_shared<VisualModel>(mesh2);
     obj2->setVisualGeometry(mesh2);
     obj2->setCollidingGeometry(mesh2);
     scene->addSceneObject(obj2);
@@ -61,7 +63,7 @@ int main()
     matObj2->setBackFaceCulling(false);
     matObj2->setColor(Color::Green);
     matObj2->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    mesh2->setRenderMaterial(matObj2);
+    objModel2->setRenderMaterial(matObj2);
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();

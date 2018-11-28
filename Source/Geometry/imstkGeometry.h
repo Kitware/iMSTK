@@ -81,7 +81,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Geometry(Type type) : m_type(type), m_renderMaterial(std::make_shared<RenderMaterial>()){}
+    Geometry(Type type) : m_type(type){}
 
     ///
     /// \brief Destructor
@@ -164,19 +164,6 @@ public:
     ///
     bool isMesh() const;
 
-    ///
-    /// \brief Set/Get render material
-    ///
-    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
-
-    ///
-    /// \brief Visibility functions
-    ///
-    void show();
-    void hide();
-    bool isVisible() const;
-
 protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
@@ -196,14 +183,9 @@ protected:
     bool m_dataModified = false;
     bool m_transformModified = false;
     bool m_transformApplied = true;
-    bool m_renderDelegateCreated = false;
 
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transform
     double m_scaling = 1.0;
-
-    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; ///> Render material
-
-    bool m_isVisible = true;
 };
 } //imstk
 

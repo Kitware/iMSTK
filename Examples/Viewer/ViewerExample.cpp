@@ -68,13 +68,13 @@ int main()
     auto viewer = sdk->getViewer();
     viewer->setOnCharFunction('v', [&](InteractorStyle* c) -> bool
     {
-        if (cubeGeom->isVisible())
+        if (cubeObj->getVisualModel(0)->isVisible())
         {
-            cubeGeom->hide();
+            cubeObj->getVisualModel(0)->hide();
         }
         else
         {
-            cubeGeom->show();
+            cubeObj->getVisualModel(0)->show();
         }
         return false;
     });
