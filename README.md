@@ -5,43 +5,35 @@
  * [Licensing](#licensing)
 * [Resources](#resources)
  * [Documentation](#documentation)
- * [Mailing-lists](#mailing-lists)
+ * [Discourse](#discourse)
  * [Issue tracker](#issue-tracker)
 * [Getting started with iMSTK](#getting-started-with-imstk)
  * [Getting the source code](#1-getting-the-source-code)
  * [Setting up your SSH key](#2-setting-up-your-ssh-key)
  * [Building iMSTK](#3-building-imstk)
-* [Using iMSTK in your application](#using-imstk-in-your-application)
-
 
 ## About
 ### Overview
 iMSTK is a C++ based free & open-source toolkit that aids rapid prototyping of real-time multi-modal surgical simulation scenarios. Surgical simulation scenarios involve algorithms from diverse areas such as haptics, advanced rendering, computational geometry, computational mechanics, virtual reality and parallel computing. iMSTK employs a highly modular and extensible design to enable the use of libraries and codes from these areas in a given application thereby reducing the development time.
 
 ### Participants
-Supported by:
+- [Kitware, Inc.](http://www.kitware.com/)
+- [CeMSIM-Rensselaer Polytechnic Institute](http://cemsim.rpi.edu/)
+- [University of Central Arkansas](http://sun0.cs.uca.edu/~thalic/virasim.html)
+
+Funding support:
 - [NIH-OD] SBIR award [9R44OD018334](https://www.sbir.gov/sbirsearch/detail/1032259)
 - [NIH-NIBIB] SBIR award [1R44EB019802-01A1](https://www.sbir.gov/sbirsearch/detail/1047037)
-
-Developed at:
-- [Kitware, Inc.](http://www.kitware.com/)
-- [Rensselaer Polytechnic Institute](http://rpi.edu/)
 
 ### Licensing
 iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 ## Resources
 ### Documentation
-Click [here](http://www.imstk.org/documentation/) for documentation
+Click [here](http://www.imstk.org/documentation/) for detailed documentation.
 
-### Mailing Lists
-The **iMSTK Users** mailing list is the principal means of communication among developers and users: <imstk-users@imstk.org>
-- subscribe [HERE](http://public.kitware.com/mailman/listinfo/imstk-users)
-- find mailman archive [HERE](http://public.kitware.com/pipermail/imstk-users/)
-
-The **iMSTK Developers**  mailing list is for developers where design and implementation issues are discussed: <imstk-developers@imstk.org>
-- subscribe [HERE](http://public.kitware.com/mailman/listinfo/imstk-developers)
-- find mailman archive [HERE](http://public.kitware.com/pipermail/imstk-developers/)
+### Discourse
+The iMSTK Users and Developers can post questions and discuss relevant topics at the [Discourse](https://discourse.kitware.com/c/smtk).
 
 ### Issue-tracker
 Designed more specifically for developers, the issue tracker allows developers to list and discuss issues & enhancements:
@@ -107,8 +99,6 @@ To use the Vulkan renderer, follow these steps:
   * Download your GPU vendor's latest drivers.
   * Enable the `iMSTK_USE_Vulkan` option in CMake.
 
-## Using iMSTK in your application
-*Coming soon*
 
 ---
 [NIH-OD]: <https://www.nih.gov/about-nih/what-we-do/nih-almanac/office-director-nih>
