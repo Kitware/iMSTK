@@ -29,7 +29,7 @@ To contribute your changes to iMSTK, you will need to follow the [Gitlab forking
 
 2. Add the forked remote repository to your git source directory.
 ```sh
-git remote add myremote git@gitlab.kitware.com:{mynamespace}/iMSTK.git
+git remote add myremote git@gitlab.kitware.com:<mynamespace>/iMSTK.git
 ```
 
 3. Create a new branch where you will commit your changes, and name it based on the feature or fix you are implementing.
@@ -37,9 +37,9 @@ git remote add myremote git@gitlab.kitware.com:{mynamespace}/iMSTK.git
 git checkout -b new-feature
 ```
 
-4. Implement your changes: follow the [coding guidelines](#coding-guidelines).
+4. Implement your changes: please follow the [coding guidelines](#coding-guidelines) below.
 
-5. Commit your changes: follow the [commit guidelines](#commit-guidelines).
+5. Commit your changes: please follow the [commit guidelines](#commit-guidelines) below.
 
 5. Push your development branch to your namespace.
 ```sh
@@ -52,7 +52,7 @@ git push myremote new-feature
 
 7. Once your changes have been reviewed and the associated builds and tests pass on [iMSTK dashboards](#dashboards), your branch will be merged into `master`.
 
-8. At that point, you can if you desire get rid of your development branch and pull the latest commits from the master branch, then repeat from step 3 for further development
+8. At that point, you may decide to get rid of your development branch and pull the latest commits from the master branch, then repeat from step 3 for further development
 ```sh
 git branch -d new-feature
 git checkout master
@@ -67,9 +67,8 @@ git pull origin master
 
 #### Layout
 1. Do not use tabs. Set up your editor to insert spaces. Indentation size should be set to 4.
-
-2. Braces must be used to delimit the scope of an if, for, while, switch or other control structure.
-3. Curly braces should go on a seperate line.
+2. Braces must be used to delimit the scope of an if, for, while, switch or other control structure (even for single line bodies).
+3. Curly braces should go on a seperate line as shown below.
 ```sh
 for (unsigned int i=0; i < 3; i++)
    {
@@ -97,7 +96,7 @@ for (unsigned int i=0; i < 3; i++)
    }
 ```
 4. Each line of code should take no more than 200 characters
-4. Use lots of whitespace to separate logical blocks of code
+4. Use blank line to separate logical blocks of code
 5. Declaration of variables within classes, methods, and functions should be one declaration per line
 ```sh
 int i;
@@ -107,20 +106,26 @@ char* stringname;
 
 #### Naming convention
 1. General
-  * Names are constructed by using case change to indicate seperate words. For example TimeStamp
+  * Variable names are constructed in [lower camel case](http://wiki.c2.com/?LowerCamelCase). For example timeStamp
   * Underscores are not used
 2. Classes
   * Classes are named beginning with a capital letter
   * Classes are placed in the appropriate namespace
-3. Class member variables: Class data members are prepended with m as in m_Time.
-4. Local variables: Use lowercase
-5. Files: The filename should be the same as the class
+3. Class member variables: Class data members are prefixed with m_ as in m_time.
+4. The filenames of the files that are part of the imstk source are prefixed with imstk (eg: imstkSolver.h) and follow upper camel case
 
 
 ### Documenting your code
 1. General: When you document your code make sure you use correct English and complete, grammatically correct sentences. Finish your sentences with a period.
-2. Documenting a method. Add a brief comment describing your method in your class implementation files.
-3. Documenting a class. Classes should be documented using the class and brief Doxygen commands,followed by the detailed class description.
+2. Documenting a function: Add a brief comment describing your method in your class implementation files.
+```   
+///
+/// \brief Returns true if the object with a given name is registered, else false
+///
+bool isObjectRegistered(const std::string& sceneObjectName) const; 
+```
+
+3. Documenting a class: Classes should be documented using the class and brief Doxygen commands,followed by the detailed class description.
 
 ```sh
 /** \class SpatialHashTable
@@ -134,7 +139,7 @@ The SpatialHashtable class implements a 2D data structure that can map keys to v
 ```
 
 #### Code style check
-You can and should use the `uncrustify` tool to check and/or adjust code style of your files. It is run as part of git's pre-commit hook, as part of test suite invoked by CTest or by building *RUN_TESTS* target in Visual Studio. You can also run it manually by building *uncrustifyRun* target, but in that mode your files will be overwritten so make sure you commit your work beforehand to easily see the style changes automatically made by `uncrustify`.
+You should use the `uncrustify` tool to check and/or adjust code style of your files. It is run as part of git's pre-commit hook, as part of test suite invoked by CTest or by building *RUN_TESTS* target in Visual Studio. You can also run it manually by building *uncrustifyRun* target, but in that mode your files will be overwritten so make sure you commit your work beforehand to easily see the style changes automatically made by `uncrustify`.
 
 To temporarily disable style checking as part of a commit hook, run:
 ```sh
@@ -169,9 +174,9 @@ git config uncrustify.skip false
 
 3. **Push often**
 
-    The first main reason to push often is to have your work somewhere else than just on your computer if something happens to your source code or your machine. Another reason is to facilitate code sharing: even if your branch is not at maturity, creating a pull request as [WIP] will allow you to discuss your progress, ask questions, and get feedbacks during the development process and not just at the end.
+    A good reason to push often is to have your work somewhere else than just on your computer in the event of something were to happen to local computer. Another reason is to facilitate code sharing: even if your branch is not at maturity, creating a pull request as [WIP] will allow you to discuss your progress, ask questions, and get feedbacks during the development process and not just at the end.
 
-4. **Merge to master often...**
+4. **Merge often...**
 
     The whole idea behind continuous integration (or CI) is to integrate your own code with the main repository as often as you can. If you make small changes and put them into single commits you may integrate them often (and probably should). Doing so minimizes merge conflicts with your team members. You can read more about CI in a Git context in Martin Fowler’s excellent [FeatureBranch article].
 
@@ -195,7 +200,7 @@ Proper commit messages are important as they allow to speed up the review proces
 
 3. Be specific
 
-    When making changes to multiple classes or refering to other classes than the one being modified, be specific about class methods and members by properly specifying the namespace: `Class:method()` or `Class::m_member`.
+    When making changes to multiple classes or refering to other classes than the one being modified, be specific about class functions and member variables by properly specifying the namespace: `Class:function()` or `Class::m_member`.
 
 4. List changes
 
@@ -205,14 +210,14 @@ Proper commit messages are important as they allow to speed up the review proces
 
     Describe the topic in a couple words while being as specific as possible. "Improve rendering" or "Fix controllers" would be considered too broad.
 
-6. Use the appropriate title prefix
+6. Use the appropriate title prefix to help quickly understand broad context
   * **ENH:** For enhancement, new features, etc.
-  * **PERF:** For improved performance, optimisations.
-  * **BUG:** For runtime error fix.
+  * **PERF:** For improved compile and runtime performance and algorithmic optimizations.
+  * **BUG:** For fixing bugs of all kinds.
   * **COMP:** For compilation error fix.
   * **TEST:** For new or improved testing.
   * **DOC:** For documentation improvements.
-  * **STYLE:** For changes which do not impact the way the code is executed nor the user experience.
+  * **STYLE:** For changes which do not impact the code output but rather the way the code is presented or organized.
 
 ### Editing previous commits
 
