@@ -221,7 +221,7 @@ Proper commit messages are important as they allow to speed up the review proces
 
 ### Editing previous commits
 
-While implementing your topic that would be holding multiple commits, you might end up making changes which should be coupled with or which revert changes from previous commits. The same thing can happen when your merge request has been reviewed and you need to make changes that should be applied in existing commit.
+While implementing your topic that would be holding multiple commits, you might end up making changes which should be coupled with or which revert changes from previous commits. The same can happen when your merge request has been reviewed and you need to make changes that should be applied in an existing commit.
 
 It is possible to change previous commits in order to keep your topic clean and make the reviewing process easier, a couple options are listed below.
 
@@ -367,7 +367,7 @@ This process consists of rewriting the branch history, therefore re-syncing it w
 
 * ### Add Data
 The proper way to add data to iMSTK, is to:
-    - Contact a project manager to upload your data in the [Girder iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
+    - Contact a project manager to upload your data in the [Girder's iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
     - Add the key file to `iMSTK-Source/Data` (Download the key file from girder as shown on the following picture).
       ![Download Key File](https://data.kitware.com/api/v1/item/58acc5588d777f0aef5cff96/download?contentDisposition=inline)
 
@@ -390,7 +390,7 @@ imstk::MeshIO::read(iMSTK_DATA_ROOT"/relative/path/to/mesh.vtk");
 ```
 
 * ### Update your Data
-    - Contact a project manager to update your data in the [Girder iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
+    - Contact the project manager to update your data in the [Girder iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
     - Update the key file to `iMSTK-Source/Data` as described in the [Add Data section](#add-data).
 
 
