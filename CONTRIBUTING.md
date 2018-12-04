@@ -1,28 +1,27 @@
-# iMSTK - Contributing
+# iMSTK contributing guide
 
 * [Forking workflow](#forking-workflow)
 * [Coding guidelines](#coding-guidelines)
- * [Coding style](#coding-style)
- * [Documenting your code](#documenting-your-code)
- * [Testing your code](#testing-your-code)
+  * [Coding style](#coding-style)
+  * [Documenting your code](#documenting-your-code)
+  <!--- * [Testing your code](#testing-your-code) -->
 * [Commit guidelines](#commit-guidelines)
- * [Commit 101](#commit-101)
- * [Commit messages](#commit-messages)
- * [Editing previous commits](#editing-previous-commits)
+  * [Commit 101](#commit-101)
+  * [Commit messages](#commit-messages)
+  * [Editing previous commits](#editing-previous-commits)
   * [Amending changes to last commit](#amending-changes-to-last-commit)
   * [Removing previous commit changes](#removing-previous-commit-changes)
   * [Editing older commits](#editing-older-commits)
   * [Syncing repositories](#syncing-repositories)
 * [Data Management](#data-management)
- * [Add Data](#add-data)
- * [Fetch Data for your examples](#fetch-data-for-your-examples)
- * [Use external data in your examples](#use-external-data-in-your-examples)
- * [Update your Data](#update-your-data)
+  * [Add Data](#add-data)
+  * [Fetch Data for your examples](#fetch-data-for-your-examples)
+  * [Use external data in your examples](#use-external-data-in-your-examples)
+  * [Update your Data](#update-your-data)
 * [Dashboards](#dashboards)
 
 
 ## Forking workflow
-------
 To contribute your changes to iMSTK, you will need to follow the [Gitlab forking workflow].
 
 1. [Fork] the iMSTK project to your own namespace.
@@ -61,7 +60,6 @@ git pull origin master
 
 
 ## Coding guidelines
-------
 
 ### Coding style
 
@@ -154,12 +152,13 @@ You can view the changes by running `git diff`. If the changes are minor, add th
 git config uncrustify.skip false
 ```
 
+<!---
 ### Testing your code
 *Coming soon - Please refer to the rest of the code in the meantime*
+-->
 
 
 ## Commit guidelines
-------
 
 ### Commit 101
 
@@ -363,7 +362,6 @@ This process consists of rewriting the branch history, therefore re-syncing it w
 
 
 ## Data Management
-------
 
 * ### Add Data
 The proper way to add data to iMSTK, is to:
@@ -386,7 +384,7 @@ To fetch the external data before building your example, you will need to list i
 * ### Use external data in your examples
 The path to the data directory is defined by iMSTK_DATA_ROOT which can be used in your C++ code as shown below :
 ```c++
-imstk::MeshIO::read(iMSTK_DATA_ROOT"/relative/path/to/mesh.vtk");
+imstk::MeshIO::read(iMSTK\_DATA\_ROOT"/relative/path/to/mesh.vtk");
 ```
 
 * ### Update your Data
@@ -395,7 +393,6 @@ imstk::MeshIO::read(iMSTK_DATA_ROOT"/relative/path/to/mesh.vtk");
 
 
 ## Dashboards
-------
 
 Dashboards - powered by [CDash] - helps visualizing the latest state of iMSTK builds on Windows, MacOSx, and Linux, to avoid introducing regressions when offering changes to the toolkit:
 >http://open.cdash.org/index.php?project=iMSTK
@@ -404,7 +401,7 @@ Dashboards - powered by [CDash] - helps visualizing the latest state of iMSTK bu
 --- | ---
 **Nightly** | Builds running every night
 **Continuous** | Builds running every time there is a change to the master branch
-**Experimental** | Builds running after calling `@buildbot test` in the comment section of a Merge Request
+**Experimental** | Builds running after calling `do: test` in the comment section of a Merge Request
 
 ---
 [Gitlab forking workflow]: <https://docs.gitlab.com/ce/workflow/forking_workflow.html>
