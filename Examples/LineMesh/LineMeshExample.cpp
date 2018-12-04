@@ -119,7 +119,9 @@ int main()
 
     lineMesh->initialize(points, lines);
     lineMesh->setVertexColors(colors);
-    lineMesh->setRenderMaterial(lineMeshMaterial);
+    auto lineModel = std::make_shared<VisualModel>(lineMesh);
+    lineModel->setRenderMaterial(lineMeshMaterial);
+    lineObject->addVisualModel(lineModel);
 
     auto camera = scene->getCamera();
     camera->setPosition(resolution / 2.0, resolution / 2.0, resolution * 4.0);

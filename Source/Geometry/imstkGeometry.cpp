@@ -240,34 +240,4 @@ Geometry::isMesh() const
             this->m_type == Type::LineMesh
             ) ? true : false;
 }
-
-void
-Geometry::setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
-{
-    m_renderMaterial = renderMaterial;
-}
-
-std::shared_ptr<RenderMaterial>
-Geometry::getRenderMaterial() const
-{
-    return m_renderMaterial;
-}
-
-void
-Geometry::show()
-{
-    m_isVisible = true;
-}
-
-void
-Geometry::hide()
-{
-    m_isVisible = false;
-}
-
-bool
-Geometry::isVisible() const
-{
-    return m_isVisible;
-}
 } // imstk

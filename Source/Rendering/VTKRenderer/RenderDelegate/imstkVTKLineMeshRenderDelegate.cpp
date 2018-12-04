@@ -33,25 +33,28 @@
 
 namespace imstk
 {
-VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh) :
-    m_geometry(lineMesh),
+VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<LineMesh>(visualModel->getGeometry());
+
     // Map vertices
-    StdVectorOfVec3d& vertices = m_geometry->getVertexPositionsNotConst();
+    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(m_geometry->getNumVertices());
+    points->SetNumberOfPoints(geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
     // Create index
     auto lineIndices = vtkSmartPointer<vtkCellArray>::New();
 
-    for (auto line : m_geometry->getLinesVertices())
+    for (auto line : geometry->getLinesVertices())
     {
         auto l = vtkSmartPointer<vtkLine>::New();
         l->GetPointIds()->SetId(0, line[0]);
@@ -65,13 +68,13 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     lines->SetLines(lineIndices);
 
     // Add colors
-    if (m_geometry->getVertexColors().size() == m_geometry->getNumVertices())
+    if (geometry->getVertexColors().size() == geometry->getNumVertices())
     {
         auto colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
         colors->SetNumberOfComponents(3);
         colors->SetName("Colors");
 
-        for (auto color : m_geometry->getVertexColors())
+        for (auto color : geometry->getVertexColors())
         {
             unsigned char c[3] = { (unsigned char)(color.r * 255),
                                    (unsigned char)(color.g * 255),
@@ -85,37 +88,27 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(lines);
-    m_geometry->m_dataModified = false;
+    geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), true, m_geometry->getRenderMaterial());
+    this->setUpMapper(source->GetOutputPort(), true, m_visualModel->getRenderMaterial());
 }
 
 void
 VTKLineMeshRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
+
+    if (!geometry->m_dataModified)
     {
         return;
     }
 
     m_mappedVertexArray->Modified();
 
-    m_geometry->m_dataModified = false;
-}
-
-std::shared_ptr<Geometry>
-VTKLineMeshRenderDelegate::getGeometry() const
-{
-    return m_geometry;
-}
-
-std::shared_ptr<imstk::RenderMaterial>
-VTKLineMeshRenderDelegate::getRenderMaterial() const
-{
-    return m_geometry->getRenderMaterial();
+    geometry->m_dataModified = false;
 }
 } // imstk

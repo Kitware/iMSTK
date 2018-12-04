@@ -23,12 +23,15 @@
 
 namespace imstk
 {
-VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> sphere,
+VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                                                        SceneObject::Type type,
                                                        VulkanMemoryManager& memoryManager)
-    : m_geometry(sphere)
 {
-    auto radius = m_geometry->getRadius();
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<Sphere>(visualModel->getGeometry());
+
+    auto radius = geometry->getRadius();
 
     auto source = vtkSmartPointer<vtkSphereSource>::New();
     source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
@@ -86,12 +89,12 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<Sphere> s
     m_numTriangles = (uint32_t)m_sphereTriangles.size();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    if (!m_geometry->getRenderMaterial())
+    if (!m_visualModel->getRenderMaterial())
     {
-        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
+        m_visualModel->setRenderMaterial(std::make_shared<RenderMaterial>());
     }
 
-    this->initializeData(memoryManager, m_geometry->getRenderMaterial());
+    this->initializeData(memoryManager, this->getVisualModel()->getRenderMaterial());
 
     m_vertexBuffer->updateVertexBuffer(&m_sphereVertices, &m_sphereTriangles);
 
@@ -102,11 +105,5 @@ void
 VulkanSphereRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
-}
-
-std::shared_ptr<Geometry>
-VulkanSphereRenderDelegate::getGeometry() const
-{
-    return m_geometry;
 }
 }

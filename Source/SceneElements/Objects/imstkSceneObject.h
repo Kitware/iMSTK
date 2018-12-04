@@ -25,6 +25,8 @@
 #include <memory>
 #include <string>
 
+#include "imstkVisualModel.h"
+
 namespace imstk
 {
 class Geometry;
@@ -77,10 +79,28 @@ public:
     void setName(const std::string& name);
 
     ///
-    /// \brief Get/Set geometry used for viewing
+    /// \brief DEPRECATED: Get/Set geometry used for viewing
+    ///
+    /// Use getVisualModel() and addVisualModel() instead
     ///
     std::shared_ptr<Geometry> getVisualGeometry() const;
     void setVisualGeometry(std::shared_ptr<Geometry> geometry);
+
+    ///
+    /// \brief Get/add visual model
+    ///
+    std::shared_ptr<VisualModel> getVisualModel(unsigned int index);
+    void addVisualModel(std::shared_ptr<VisualModel> visualModel);
+
+    ///
+    /// \brief Get all visual models
+    ///
+    const std::vector<std::shared_ptr<VisualModel>>& getVisualModels();
+
+    ///
+    /// \brief Get number of visual models
+    ///
+    const size_t getNumVisualModels();
 
     ///
     /// \brief Get the master geometry
@@ -110,7 +130,7 @@ protected:
 
     Type m_type; ///> Type of the scene object
     std::string m_name; ///> Custom name of the scene object
-    std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
+    std::vector<std::shared_ptr<VisualModel>> m_visualModels; ///> Visual objects for rendering
 };
 
 using VisualObject = SceneObject;

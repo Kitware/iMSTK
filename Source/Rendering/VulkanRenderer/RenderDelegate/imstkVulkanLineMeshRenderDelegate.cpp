@@ -23,26 +23,24 @@
 
 namespace imstk
 {
-VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh,
+VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                                                            SceneObject::Type type,
                                                            VulkanMemoryManager& memoryManager)
-    : m_geometry(lineMesh)
 {
-    m_numVertices = (uint32_t)m_geometry->getNumVertices();
-    m_numTriangles = (uint32_t)m_geometry->getNumLines();
-    m_loadFactor = m_geometry->getLoadFactor();
+    this->initialize(visualModel);
+
+    auto geometry = std::static_pointer_cast<LineMesh>(visualModel->getGeometry());
+
+    m_numVertices = (uint32_t)geometry->getNumVertices();
+    m_numTriangles = (uint32_t)geometry->getNumLines();
+    m_loadFactor = geometry->getLoadFactor();
     m_vertexSize = sizeof(VulkanBasicVertex);
 
-    if (!m_geometry->getRenderMaterial())
-    {
-        m_geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
-    }
-
-    m_geometry->getRenderMaterial()->m_isLineMesh = true;
+    this->getVisualModel()->getRenderMaterial()->m_isLineMesh = true;
 
     if (type == SceneObject::Type::FEMDeformable || type == SceneObject::Type::Pbd)
     {
-        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
+        this->initializeData(memoryManager, this->getVisualModel()->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_DYNAMIC);
 
         for (uint32_t i = 0; i < memoryManager.m_buffering; i++)
         {
@@ -52,7 +50,7 @@ VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<LineM
     }
     else
     {
-        this->initializeData(memoryManager, m_geometry->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
+        this->initializeData(memoryManager, this->getVisualModel()->getRenderMaterial(), VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
 
         this->updateVertexBuffer(0);
         this->update(0);
@@ -69,18 +67,19 @@ VulkanLineMeshRenderDelegate::updateVertexBuffer(const uint32_t frameIndex)
     }
 
     auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frame);
+    auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
 
-    auto colors = m_geometry->getVertexColors();
+    auto colors = geometry->getVertexColors();
 
-    auto vertexPositions = m_geometry->getVertexPositions(Geometry::DataType::PreTransform);
-    for (unsigned i = 0; i < m_geometry->getNumVertices(); i++)
+    auto vertexPositions = geometry->getVertexPositions(Geometry::DataType::PreTransform);
+    for (unsigned i = 0; i < geometry->getNumVertices(); i++)
     {
         vertices[i].position = glm::vec3(
             vertexPositions[i][0],
             vertexPositions[i][1],
             vertexPositions[i][2]);
 
-        if (colors.size() == m_geometry->getNumVertices())
+        if (colors.size() == geometry->getNumVertices())
         {
             vertices[i].color = glm::vec3(
                 colors[i].r,
@@ -95,10 +94,10 @@ VulkanLineMeshRenderDelegate::updateVertexBuffer(const uint32_t frameIndex)
 
     auto lines = (std::array<uint32_t, 2> *)m_vertexBuffer->getIndexMemory(frame);
 
-    m_vertexBuffer->setNumIndices((uint32_t)m_geometry->getNumLines() * 2);
+    m_vertexBuffer->setNumIndices((uint32_t)geometry->getNumLines() * 2);
 
-    auto lineVertices = m_geometry->getLinesVertices();
-    for (unsigned i = 0; i < m_geometry->getNumLines(); i++)
+    auto lineVertices = geometry->getLinesVertices();
+    for (unsigned i = 0; i < geometry->getNumLines(); i++)
     {
         lines[i][0] = (uint32_t)lineVertices[i][0];
         lines[i][1] = (uint32_t)lineVertices[i][1];
@@ -110,15 +109,11 @@ VulkanLineMeshRenderDelegate::update(const uint32_t frameIndex)
 {
     this->updateUniforms(frameIndex);
 
-    if (m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
+
+    if (geometry->m_dataModified)
     {
         this->updateVertexBuffer(frameIndex);
     }
-}
-
-std::shared_ptr<Geometry>
-VulkanLineMeshRenderDelegate::getGeometry() const
-{
-    return m_geometry;
 }
 }

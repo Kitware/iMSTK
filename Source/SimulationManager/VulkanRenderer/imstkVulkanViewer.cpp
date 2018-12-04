@@ -98,7 +98,7 @@ VulkanViewer::startRenderingLoop()
     m_renderer->initializeFramebufferImages(&m_swapchain);
     m_renderer->initializeFramebuffers(&m_swapchain);
 
-    m_renderer->loadAllGeometry();
+    m_renderer->loadAllVisualModels();
 
     GUIOverlay::Utilities::initializeGUISystem();
 

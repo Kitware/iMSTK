@@ -59,7 +59,8 @@ int main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    surfMesh->setRenderMaterial(material);
+    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    surfMeshModel->setRenderMaterial(material);
 
     auto deformMapP2V = std::make_shared<OneToOneMap>();
     deformMapP2V->setMaster(tetMesh);
@@ -77,7 +78,7 @@ int main()
     deformMapP2C->compute();
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
-    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
@@ -298,7 +299,8 @@ int main()
 
         auto materialFloor = std::make_shared<RenderMaterial>();
         materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-        floorMesh->setRenderMaterial(materialFloor);
+        auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
+        floorMeshModel->setRenderMaterial(materialFloor);
 
         auto floorMapP2V = std::make_shared<OneToOneMap>();
         floorMapP2V->setMaster(floorMesh);

@@ -29,19 +29,54 @@ namespace imstk
 std::shared_ptr<Geometry>
 SceneObject::getVisualGeometry() const
 {
-    return m_visualGeometry;
+    if (!m_visualModels.empty())
+    {
+        return m_visualModels[0]->getGeometry();
+    }
+    return nullptr;
 }
 
 void
 SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 {
-    m_visualGeometry = geometry;
+    if (m_visualModels.empty())
+    {
+        m_visualModels.push_back(std::make_shared<VisualModel>(geometry));
+    }
+    else
+    {
+        m_visualModels[0]->setGeometry(geometry);
+    }
 }
 
 std::shared_ptr<Geometry>
 SceneObject::getMasterGeometry() const
 {
-    return m_visualGeometry;
+    return this->getVisualGeometry();
+}
+
+std::shared_ptr<VisualModel>
+SceneObject::getVisualModel(unsigned int index)
+{
+    return m_visualModels[index];
+}
+
+void
+SceneObject::addVisualModel(std::shared_ptr<VisualModel> visualModel)
+{
+    m_visualModels.push_back(visualModel);
+}
+
+const std::vector<std::shared_ptr<VisualModel>>&
+SceneObject::getVisualModels()
+{
+    return m_visualModels;
+}
+
+const size_t
+SceneObject::getNumVisualModels()
+{
+    return m_visualModels.size();
 }
 
 const SceneObject::Type&

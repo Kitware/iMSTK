@@ -41,8 +41,9 @@ int main()
 
     // Cube
     auto cube = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.5);
-    cube->getVisualGeometry()->translate(0, 0, 0);
-    cube->getVisualGeometry()->rotate(UP_VECTOR, PI_4);
+    auto sphere = std::make_shared<Sphere>();
+    cube->getVisualModel(0)->getGeometry()->translate(0, 0, 0);
+    cube->getVisualModel(0)->getGeometry()->rotate(UP_VECTOR, PI_4);
 
     // Plane
     auto plane = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "plane", 10);

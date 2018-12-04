@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanPlaneRenderDelegate(std::shared_ptr<Plane> plane,
+    VulkanPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                               SceneObject::Type type,
                               VulkanMemoryManager& memoryManager);
 
@@ -54,14 +54,7 @@ public:
     ///
     void update(const uint32_t frameIndex) override;
 
-    ///
-    /// \brief Get source geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
 protected:
-    std::shared_ptr<Plane> m_geometry;
-
     std::vector<std::array<uint32_t, 3>> m_planeTriangles;
     std::vector<VulkanBasicVertex> m_planeVertices;
 };

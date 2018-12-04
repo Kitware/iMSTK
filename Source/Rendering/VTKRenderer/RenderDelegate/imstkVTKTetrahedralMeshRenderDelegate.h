@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh);
+    VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -56,19 +56,8 @@ public:
     ///
     void updateDataSource() override;
 
-    ///
-    /// \brief Returns the tetrahedral mesh
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;;
-
 protected:
 
-    std::shared_ptr<TetrahedralMesh> m_geometry; ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
     vtkSmartPointer<vtkUnstructuredGrid> m_mesh; ///> Mapped tetrahedral mesh
 };

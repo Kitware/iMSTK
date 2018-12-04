@@ -58,59 +58,49 @@
 namespace imstk
 {
 std::shared_ptr<VTKRenderDelegate>
-VTKRenderDelegate::makeDelegate(std::shared_ptr<Geometry> geom)
+VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
-    switch (geom->getType())
+    switch (visualModel->getGeometry()->getType())
     {
     case Geometry::Type::Plane:
     {
-        auto plane = std::dynamic_pointer_cast<Plane>(geom);
-        return std::make_shared<VTKPlaneRenderDelegate>(plane);
+        return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
     }
     case Geometry::Type::Sphere:
     {
-        auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
-        return std::make_shared<VTKSphereRenderDelegate>(sphere);
+        return std::make_shared<VTKSphereRenderDelegate>(visualModel);
     }
     case Geometry::Type::Capsule:
     {
-        auto capsule = std::dynamic_pointer_cast<Capsule>(geom);
-        return std::make_shared<VTKCapsuleRenderDelegate>(capsule);
+        return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
     }
     case Geometry::Type::Cube:
     {
-        auto cube = std::dynamic_pointer_cast<Cube>(geom);
-        return std::make_shared<VTKCubeRenderDelegate>(cube);
+        return std::make_shared<VTKCubeRenderDelegate>(visualModel);
     }
     case Geometry::Type::Cylinder:
     {
-        auto cylinder = std::dynamic_pointer_cast<Cylinder>(geom);
-        return std::make_shared<VTKCylinderRenderDelegate>(cylinder);
+        return std::make_shared<VTKCylinderRenderDelegate>(visualModel);
     }
     case Geometry::Type::PointSet:
     {
-        auto pointSet = std::dynamic_pointer_cast<PointSet>(geom);
-        return std::make_shared<VTKPointSetRenderDelegate>(pointSet);
+        return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
     }
     case Geometry::Type::SurfaceMesh:
     {
-        auto surface = std::dynamic_pointer_cast<SurfaceMesh>(geom);
-        return std::make_shared<VTKSurfaceMeshRenderDelegate>(surface);
+        return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
     }
     case Geometry::Type::TetrahedralMesh:
     {
-        auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
-        return std::make_shared<VTKTetrahedralMeshRenderDelegate>(mesh);
+        return std::make_shared<VTKTetrahedralMeshRenderDelegate>(visualModel);
     }
     case Geometry::Type::LineMesh:
     {
-        auto mesh = std::dynamic_pointer_cast<LineMesh>(geom);
-        return std::make_shared<VTKLineMeshRenderDelegate>(mesh);
+        return std::make_shared<VTKLineMeshRenderDelegate>(visualModel);
     }
     case Geometry::Type::HexahedralMesh:
     {
-        auto mesh = std::dynamic_pointer_cast<HexahedralMesh>(geom);
-        return std::make_shared<VTKHexahedralMeshRenderDelegate>(mesh);
+        return std::make_shared<VTKHexahedralMeshRenderDelegate>(visualModel);
     }
     default:
     {
@@ -195,7 +185,7 @@ VTKRenderDelegate::update()
     this->updateActorTransform();
     this->updateActorProperties();
 
-    if (this->getGeometry()->isVisible())
+    if (m_visualModel->isVisible())
     {
         m_actor->VisibilityOn();
         return;
@@ -210,7 +200,7 @@ VTKRenderDelegate::update()
 void
 VTKRenderDelegate::updateActorTransform()
 {
-    auto geom = this->getGeometry();
+    auto geom = m_visualModel->getGeometry();
     if (!geom || !geom->m_transformModified)
     {
         return;
@@ -225,7 +215,7 @@ VTKRenderDelegate::updateActorTransform()
 void
 VTKRenderDelegate::updateActorProperties()
 {
-    auto material = this->getRenderMaterial();
+    auto material = m_visualModel->getRenderMaterial();
 
     if (!material || !material->m_modified)
     {

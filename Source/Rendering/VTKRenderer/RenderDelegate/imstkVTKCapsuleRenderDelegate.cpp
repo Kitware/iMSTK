@@ -25,14 +25,16 @@
 
 namespace imstk
 {
-VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<Capsule> capsule) :
-    m_geometry(capsule),
+VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
+    m_visualModel = visualModel;
+    auto geometry = std::static_pointer_cast<Capsule>(visualModel->getGeometry());
+
     Geometry::DataType type = Geometry::DataType::PreTransform;
     auto capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
-    capsuleSource->SetRadius(m_geometry->getRadius(type));
-    capsuleSource->SetCylinderLength(m_geometry->getLength(type));
+    capsuleSource->SetRadius(geometry->getRadius(type));
+    capsuleSource->SetCylinderLength(geometry->getLength(type));
     capsuleSource->SetLatLongTessellation(20);
     capsuleSource->SetPhiResolution(20);
     capsuleSource->SetThetaResolution(20);
@@ -41,13 +43,14 @@ VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<Capsule> caps
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
 }
 
 void
 VTKCapsuleRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<Capsule>(m_visualModel->getGeometry());
+    if (!geometry->m_dataModified)
     {
         return;
     }
@@ -55,19 +58,13 @@ VTKCapsuleRenderDelegate::updateDataSource()
     Geometry::DataType type = Geometry::DataType::PreTransform;
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(m_geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
+    T.translate(geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
     vtkT->SetMatrix(T.data());
 
-    m_geometry->m_dataModified = false;
-}
-
-std::shared_ptr<Geometry>
-VTKCapsuleRenderDelegate::getGeometry() const
-{
-    return m_geometry;
+    geometry->m_dataModified = false;
 }
 } // imstk

@@ -25,10 +25,11 @@
 
 namespace imstk
 {
-VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
-    m_geometry(sphere),
+VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
+    m_visualModel = visualModel;
+
     auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
     sphereSource->SetCenter(0, 0, 0);
     sphereSource->SetRadius(1.0);
@@ -39,13 +40,15 @@ VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) 
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
 }
 
 void
 VTKSphereRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<Sphere>(m_visualModel->getGeometry());
+
+    if (!geometry->m_dataModified)
     {
         return;
     }
@@ -53,19 +56,13 @@ VTKSphereRenderDelegate::updateDataSource()
     Geometry::DataType type = Geometry::DataType::PreTransform;
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(m_geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getOrientationAxis(type)));
-    T.scale(m_geometry->getRadius(type));
+    T.translate(geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
+    T.scale(geometry->getRadius(type));
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
     vtkT->SetMatrix(T.data());
-    m_geometry->m_dataModified = false;
-}
-
-std::shared_ptr<Geometry>
-VTKSphereRenderDelegate::getGeometry() const
-{
-    return m_geometry;
+    geometry->m_dataModified = false;
 }
 } // imstk

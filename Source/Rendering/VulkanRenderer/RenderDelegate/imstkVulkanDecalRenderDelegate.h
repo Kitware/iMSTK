@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanDecalRenderDelegate(std::shared_ptr<DecalPool> decalPool,
+    VulkanDecalRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                               SceneObject::Type type,
                               VulkanMemoryManager& memoryManager);
 
@@ -47,11 +47,6 @@ public:
     /// \brief Update render geometry
     ///
     void update(uint32_t frameIndex, std::shared_ptr<Camera> camera);
-
-    ///
-    /// \brief Get source geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
 
     ///
     /// \brief Fill vertex buffer
@@ -65,8 +60,6 @@ public:
                         std::shared_ptr<RenderMaterial> material = nullptr);
 
 protected:
-    std::shared_ptr<DecalPool> m_geometry;
-
     VulkanLocalDecalVertexUniforms m_decalVertexUniforms;
     VulkanLocalDecalFragmentUniforms m_decalFragmentUniforms;
 };

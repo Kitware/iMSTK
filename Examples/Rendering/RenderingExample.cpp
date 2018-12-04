@@ -38,8 +38,6 @@ int main()
     auto head = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
     auto headMesh = std::dynamic_pointer_cast<SurfaceMesh>(head);
     auto headObject = std::make_shared<VisualObject>("Head");
-    headObject->setVisualGeometry(headMesh);
-    scene->addSceneObject(headObject);
 
     // Head material
     auto headMaterial = std::make_shared<RenderMaterial>();
@@ -53,7 +51,12 @@ int main()
     headMaterial->addTexture(headSSSTexture);
     headMaterial->setReceivesShadows(true);
     headMaterial->setCastsShadows(true);
-    headMesh->setRenderMaterial(headMaterial);
+
+    auto headModel = std::make_shared<VisualModel>(headMesh);
+    headModel->setRenderMaterial(headMaterial);
+    headObject->addVisualModel(headModel);
+
+    scene->addSceneObject(headObject);
 
     // Position camera
     auto cam = scene->getCamera();
@@ -80,13 +83,13 @@ int main()
     sphereMesh->translate(0.1, 0.2, 0.5);
     sphereMaterial->setEmissivity(10);
     sphereMaterial->setCastsShadows(false);
-    sphereObj->getVisualGeometry()->setRenderMaterial(sphereMaterial);
+    sphereObj->getVisualModel(0)->setRenderMaterial(sphereMaterial);
 
     // Plane
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
     auto planeMaterial = std::make_shared<RenderMaterial>();
     planeMaterial->setColor(Color::DarkGray);
-    planeObj->getVisualGeometry()->setRenderMaterial(planeMaterial);
+    planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
 
     // Run
     sdk->setActiveScene(scene);

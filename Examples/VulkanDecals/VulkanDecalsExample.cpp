@@ -47,8 +47,9 @@ int main()
 
     auto decalPool = std::make_shared<DecalPool>();
     auto decalObject = std::make_shared<VisualObject>("Decals");
-    decalPool->setRenderMaterial(decalMaterial);
-    decalObject->setVisualGeometry(decalPool);
+    auto decalModel = std::make_shared<VisualModel>(decalPool);
+    decalModel->setRenderMaterial(decalMaterial);
+    decalObject->addVisualModel(decalModel);
 
     for (int i = -1; i < 2; i++)
     {

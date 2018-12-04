@@ -289,7 +289,7 @@ VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
     m_sceneVtkCamera->SetPosition(p[0], p[1], p[2]);
     m_sceneVtkCamera->SetFocalPoint(f[0], f[1], f[2]);
     m_sceneVtkCamera->SetViewUp(v[0], v[1], v[2]);
-    m_sceneVtkCamera->SetViewAngle(imstkCam->getViewAngle());
+    m_sceneVtkCamera->SetViewAngle(imstkCam->getFieldOfView());
 }
 
 void
@@ -298,21 +298,24 @@ VTKRenderer::updateRenderDelegates()
     // Object actors
     for ( const auto& obj : m_scene->getSceneObjects() )
     {
-        auto geom = obj->getVisualGeometry();
-        if (geom && !geom->m_renderDelegateCreated)
+        for (auto visualModel : obj->getVisualModels())
         {
-            auto delegate = VTKRenderDelegate::makeDelegate( geom );
-            if (delegate == nullptr)
+            auto geom = visualModel->getGeometry();
+            if (visualModel && !visualModel->isRenderDelegateCreated())
             {
-                LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
-                             << obj->getName() << "'.";
-                continue;
-            }
+                auto delegate = VTKRenderDelegate::makeDelegate( visualModel );
+                if (delegate == nullptr)
+                {
+                    LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                                 << obj->getName() << "'.";
+                    continue;
+                }
 
-            m_renderDelegates.push_back( delegate );
-            m_objectVtkActors.push_back( delegate->getVtkActor() );
-            m_vtkRenderer->AddActor(delegate->getVtkActor());
-            geom->m_renderDelegateCreated = true;
+                m_renderDelegates.push_back( delegate );
+                m_objectVtkActors.push_back( delegate->getVtkActor() );
+                m_vtkRenderer->AddActor(delegate->getVtkActor());
+                visualModel->m_renderDelegateCreated = true;
+            }
         }
     }
 

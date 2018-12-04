@@ -95,7 +95,8 @@ int main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    surfMesh->setRenderMaterial(material);
+    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    surfMeshModel->setRenderMaterial(material);
 
     // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");

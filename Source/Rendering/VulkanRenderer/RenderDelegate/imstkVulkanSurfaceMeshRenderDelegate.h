@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh,
+    VulkanSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel,
                                     SceneObject::Type type,
                                     VulkanMemoryManager& memoryManager);
 
@@ -49,19 +49,11 @@ public:
     void update(const uint32_t frameIndex) override;
 
     ///
-    /// \brief Get source geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-
-    ///
     /// \brief Fill vertex buffer
     ///
     void updateVertexBuffer(uint32_t frameIndex);
 
 protected:
-    std::shared_ptr<SurfaceMesh> m_geometry;
-
     VulkanLocalVertexUniforms m_localVertexUniforms;
     std::vector<bool> m_modified;
 };

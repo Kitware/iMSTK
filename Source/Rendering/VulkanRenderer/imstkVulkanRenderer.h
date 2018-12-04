@@ -175,8 +175,8 @@ protected:
     friend class VulkanPostProcessingChain;
 
     void initialize(unsigned int width, unsigned int height);
-    void loadAllGeometry();
-    std::shared_ptr<VulkanRenderDelegate> loadGeometry(std::shared_ptr<Geometry> geometry, SceneObject::Type type);
+    void loadAllVisualModels();
+    std::shared_ptr<VulkanRenderDelegate> loadVisualModel(std::shared_ptr<VisualModel> visualModel, SceneObject::Type type);
 
     ///
     /// \brief Sets some command buffer state

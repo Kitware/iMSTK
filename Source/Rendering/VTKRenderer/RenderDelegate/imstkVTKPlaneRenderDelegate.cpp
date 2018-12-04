@@ -25,10 +25,13 @@
 
 namespace imstk
 {
-VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane) :
-    m_geometry(plane),
+VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
 {
+    m_visualModel = visualModel;
+
+    auto geometry = std::static_pointer_cast<Plane>(m_visualModel->getGeometry());
+
     auto planeSource = vtkSmartPointer<vtkPlaneSource>::New();
     planeSource->SetCenter(0, 0, 0);
     planeSource->SetNormal(0, 1, 0);
@@ -37,13 +40,15 @@ VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_geometry->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
 }
 
 void
 VTKPlaneRenderDelegate::updateDataSource()
 {
-    if (!m_geometry->m_dataModified)
+    auto geometry = std::static_pointer_cast<Plane>(m_visualModel->getGeometry());
+
+    if (!geometry->m_dataModified)
     {
         return;
     }
@@ -51,20 +56,14 @@ VTKPlaneRenderDelegate::updateDataSource()
     Geometry::DataType type = Geometry::DataType::PreTransform;
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(m_geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, m_geometry->getNormal(type)));
-    T.scale(m_geometry->getWidth(type));
+    T.translate(geometry->getPosition(type));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getNormal(type)));
+    T.scale(geometry->getWidth(type));
     T.matrix().transposeInPlace();
 
     auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
     vtkT->SetMatrix(T.data());
 
-    m_geometry->m_dataModified = false;
-}
-
-std::shared_ptr<Geometry>
-VTKPlaneRenderDelegate::getGeometry() const
-{
-    return m_geometry;
+    geometry->m_dataModified = false;
 }
 } // imstk

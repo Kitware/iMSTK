@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh);
+    VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -62,19 +62,8 @@ public:
     ///
     void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
 
-    ///
-    /// \brief Returns the surface mesh
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-    ///
-    /// \brief Return the render material
-    ///
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_geometry->getRenderMaterial(); };
-
 protected:
 
-    std::shared_ptr<SurfaceMesh> m_geometry;                ///> Geometry to render
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
 };

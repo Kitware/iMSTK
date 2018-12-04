@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Default constructor
     ///
-    VulkanLineMeshRenderDelegate(std::shared_ptr<LineMesh> LineMesh,
+    VulkanLineMeshRenderDelegate(std::shared_ptr<VisualModel> VisualModel,
                                  SceneObject::Type type,
                                  VulkanMemoryManager& memoryManager);
 
@@ -52,19 +52,11 @@ public:
     void update(const uint32_t frameIndex) override;
 
     ///
-    /// \brief Get source geometry
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
-
-
-    ///
     /// \brief Fill vertex buffer
     ///
     void updateVertexBuffer(const uint32_t frameIndex);
 
 protected:
-    std::shared_ptr<LineMesh> m_geometry;
-
     VulkanLocalVertexUniforms m_localVertexUniforms;
 };
 }

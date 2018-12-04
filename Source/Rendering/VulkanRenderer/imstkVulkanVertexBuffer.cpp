@@ -44,13 +44,18 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         vertexBufferInfo.pNext = nullptr;
         vertexBufferInfo.flags = 0;
         vertexBufferInfo.size = m_vertexBufferSize;
-        vertexBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         vertexBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         vertexBufferInfo.queueFamilyIndexCount = 0;
         vertexBufferInfo.pQueueFamilyIndices = nullptr;
 
         auto vertexStagingBufferInfo = vertexBufferInfo;
-        vertexStagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        vertexStagingBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+
+        if (m_mode == VERTEX_BUFFER_STATIC)
+        {
+            vertexStagingBufferInfo.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        }
 
         m_vertexStagingBuffer = memoryManager.requestBuffer(m_renderDevice,
                         vertexStagingBufferInfo,
@@ -58,6 +63,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
 
         if (m_mode == VERTEX_BUFFER_STATIC)
         {
+            vertexBufferInfo.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
             m_vertexBuffer = memoryManager.requestBuffer(m_renderDevice,
                             vertexBufferInfo,
                             VulkanMemoryType::VERTEX);
@@ -75,13 +81,18 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
         indexBufferInfo.pNext = nullptr;
         indexBufferInfo.flags = 0;
         indexBufferInfo.size = m_indexBufferSize;
-        indexBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        indexBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         indexBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
         indexBufferInfo.queueFamilyIndexCount = 0;
         indexBufferInfo.pQueueFamilyIndices = nullptr;
 
         auto indexStagingBufferInfo = indexBufferInfo;
-        indexStagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        indexStagingBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+
+        if (m_mode == VERTEX_BUFFER_STATIC)
+        {
+            indexStagingBufferInfo.usage |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+        }
 
         m_indexStagingBuffer = memoryManager.requestBuffer(m_renderDevice,
                         indexStagingBufferInfo,
@@ -89,6 +100,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
 
         if (m_mode == VERTEX_BUFFER_STATIC)
         {
+            indexBufferInfo.usage |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
             m_indexBuffer = memoryManager.requestBuffer(m_renderDevice,
                             indexBufferInfo,
                             VulkanMemoryType::INDEX);
