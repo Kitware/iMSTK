@@ -33,7 +33,7 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 Click [here](http://www.imstk.org/documentation/) for detailed documentation.
 
 ### Discourse
-The iMSTK Users and Developers can post questions and discuss relevant topics at the [Discourse](https://discourse.kitware.com/c/smtk).
+The iMSTK Users and Developers can post questions and discuss relevant topics at the [Discourse](https://discourse.kitware.com/c/imstk).
 
 ### Issue-tracker
 Designed more specifically for developers, the issue tracker allows developers to list and discuss issues & enhancements:
