@@ -88,7 +88,6 @@ int main()
         /*FixedPoint*/ "1 2 3 4 5 6 7 8 9 10 11",
         /*NumberOfIterationInConstraintSolver*/ 5);
     deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
@@ -97,6 +96,7 @@ int main()
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
+    deformableObj->addVisualModel(surfMeshModel);
 
     // Solver
     auto pbdSolver = std::make_shared<PbdSolver>();
