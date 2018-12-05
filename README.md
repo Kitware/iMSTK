@@ -1,16 +1,17 @@
 # iMSTK - Interactive Medical Simulation Toolkit
 * [About](#about)
- * [Overview](#overview)
- * [Participants](#participants)
- * [Licensing](#licensing)
+  * [Overview](#overview)
+  * [Participants](#participants)
+  * [Licensing](#licensing)
 * [Resources](#resources)
- * [Documentation](#documentation)
- * [Discourse](#discourse)
- * [Issue tracker](#issue-tracker)
+  * [Documentation](#documentation)
+  * [Discourse](#discourse)
+  * [Issue tracker](#issue-tracker)
+* [Prerequisites](#prerequisites)
 * [Getting started with iMSTK](#getting-started-with-imstk)
- * [Getting the source code](#1-getting-the-source-code)
- * [Setting up your SSH key](#2-setting-up-your-ssh-key)
- * [Building iMSTK](#3-building-imstk)
+  * [Getting the source code](#1-getting-the-source-code)
+  * [Setting up your SSH key](#2-setting-up-your-ssh-key)
+  * [Building iMSTK](#3-building-imstk)
 
 ## About
 ### Overview
