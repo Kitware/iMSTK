@@ -75,11 +75,12 @@ int main()
     collidingGeom->setRadius(20);
     auto obj = std::make_shared<CollidingObject>("VirtualCouplingObject");
     obj->setCollidingGeometry(collidingGeom);
-    obj->setVisualGeometry(visualGeom);
 
     auto material = std::make_shared<RenderMaterial>();
     //material->setVisibilityOff();
-    visualGeom->setRenderMaterial(material);
+    auto visualModel = std::make_shared<VisualModel>(visualGeom);
+    visualModel->setRenderMaterial(material);
+    obj->addVisualModel(visualModel);
 
     // Add virtual coupling object (with visual, colliding, and physics geometry) in the scene.
     scene->addSceneObject(obj);
