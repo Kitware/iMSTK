@@ -80,22 +80,6 @@ int main()
 
     scene->addDebugGeometry(debugLinesGeo);
 
-    // Create debug points
-    auto debugPointsGeo = std::make_shared<DebugRenderPoints>("debugPoints", 50);
-    StdVectorOfVec3d points;
-    for (unsigned int i = 0; i < 50; ++i)
-    {
-        points.push_back(Vec3d(i, i, i));
-    }
-    debugPointsGeo->setVertexData(points);
-
-    auto materialPoints = std::make_shared<RenderMaterial>();
-    materialPoints->setBackFaceCulling(false);
-    materialPoints->setDebugColor(Color::Pink);
-    debugPointsGeo->setRenderMaterial(materialPoints);
-
-    scene->addDebugGeometry(debugPointsGeo);
-
     // Add light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));

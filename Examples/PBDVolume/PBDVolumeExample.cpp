@@ -38,7 +38,7 @@ int main()
     auto scene = sdk->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
-    // b. Load a tetrahedral mesh
+    // Load a sample mesh
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
@@ -46,7 +46,7 @@ int main()
         return 1;
     }
 
-    // c. Extract the surface mesh
+    // Extract the surface mesh
     auto surfMesh = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
@@ -61,14 +61,14 @@ int main()
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    // d. Construct a map
+    // Construct a map
 
-    // d.1 Construct one to one nodal map based on the above meshes
+    // Construct one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>();
     oneToOneNodalMap->setMaster(tetMesh);
     oneToOneNodalMap->setSlave(surfMesh);
 
-    // d.2 Compute the map
+    // Compute the map
     oneToOneNodalMap->compute();
 
     auto deformableObj = std::make_shared<PbdObject>("Beam");
@@ -84,7 +84,7 @@ int main()
         );
 
     deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
 

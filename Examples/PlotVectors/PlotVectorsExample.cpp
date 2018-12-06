@@ -24,7 +24,7 @@
 using namespace imstk;
 
 ///
-/// \brief This example show how to write plotting code for matlab and python
+/// \brief This example shows how to write plotting code for matlab and python
 ///
 int main()
 {
@@ -36,12 +36,15 @@ int main()
     b.resize(100);
     b.setConstant(2.0);
 
+    // Write matlab plot files
     plotterutils::writePlotterVectorMatlab(a, "plotX.m");
     plotterutils::writePlotterVecVsVecMatlab(a, b, "plotXvsY.m");
 
+    // Write python (matplotlib) plot files
     plotterutils::writePlotterVectorMatPlotlib(a, "plotX.py");
     plotterutils::writePlotterVecVsVecMatPlotlib(a, b, "plotXvsY.py");
 
+    std::cout << "Press any key to exit" << std::endl;
     getchar();
 
     return 0;

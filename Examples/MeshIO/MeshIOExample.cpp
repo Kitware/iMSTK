@@ -55,6 +55,7 @@ int main()
     auto volumeMesh = std::dynamic_pointer_cast<VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
     volumeMesh->computeAttachedSurfaceMesh();
     auto surfaceMesh = volumeMesh->getAttachedSurfaceMesh();
+    surfaceMesh->correctWindingOrder();
 
     // Create object and add to scene
     auto object = std::make_shared<VisualObject>("meshObject");
