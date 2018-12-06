@@ -97,6 +97,8 @@ int main()
     });
 #endif
 
+    std::cout << "PRESS 'b' for taking screenshot" << std::endl;
+
     // Run
     sdk->setActiveScene(sceneTest);
     sdk->startSimulation(SimulationStatus::PAUSED);

@@ -215,6 +215,10 @@ VTKRenderDelegate::updateActorTransform()
 void
 VTKRenderDelegate::updateActorProperties()
 {
+    if (!m_visualModel)
+    {
+        return;
+    }
     auto material = m_visualModel->getRenderMaterial();
 
     if (!material || !material->m_modified)

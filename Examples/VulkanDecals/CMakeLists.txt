@@ -15,28 +15,31 @@
 #  limitations under the License.
 #
 ###########################################################################
+if(iMSTK_USE_Vulkan)
 
-project(Example-VulkanDecals)
+    project(Example-VulkanDecals)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} VulkanDecalsExample.cpp)
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    add_executable(${PROJECT_NAME} VulkanDecalsExample.cpp)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager)
-    
-#-----------------------------------------------------------------------------
-# Add shaders
-#-----------------------------------------------------------------------------
-include(imstkCopyAndCompileShaders)
-CopyAndCompileShaders()
-  
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    decals/,REGEX:.*)
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    target_link_libraries(${PROJECT_NAME} SimulationManager)
+        
+    #-----------------------------------------------------------------------------
+    # Add shaders
+    #-----------------------------------------------------------------------------
+    include(imstkCopyAndCompileShaders)
+    CopyAndCompileShaders()
+      
+    #-----------------------------------------------------------------------------
+    # Associate external data
+    #-----------------------------------------------------------------------------
+    list(APPEND FILE_LIST
+        decals/,REGEX:.*)
+    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
+endif()

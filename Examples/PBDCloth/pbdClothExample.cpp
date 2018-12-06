@@ -37,9 +37,7 @@ int main()
     auto sdk = std::make_shared<SimulationManager>(runSimWithoutRendering);
     auto scene = sdk->createNewScene("PBDCloth");
 
-    // a. Construct a sample triangular mesh
-
-    // b. Add nodal data
+    // Create surface mesh
     auto surfMesh = std::make_shared<SurfaceMesh>();
     StdVectorOfVec3d vertList;
     const double width = 10.0;
@@ -59,7 +57,7 @@ int main()
     surfMesh->setInitialVertexPositions(vertList);
     surfMesh->setVertexPositions(vertList);
 
-    // c. Add connectivity data
+    // Add connectivity data
     std::vector<SurfaceMesh::TriangleArray> triangles;
     for (std::size_t i = 0; i < nRows - 1; ++i)
     {
@@ -75,7 +73,7 @@ int main()
 
     surfMesh->setTrianglesVertices(triangles);
 
-    // Object & Model
+    // Create Object & Model
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(surfMesh);

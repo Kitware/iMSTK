@@ -37,16 +37,16 @@ using namespace imstk;
 
 ///
 /// \brief This example demonstrates the soft body simulation
-/// using FEM
+/// using Finite elements
 ///
 int main()
 {
-    // a. SDK and Scene
+    // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("DeformableBody");
+    auto scene = sdk->createNewScene("DeformableBodyFEM");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
-    // b. Load a tetrahedral mesh
+    // Load a tetrahedral mesh
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
@@ -54,7 +54,7 @@ int main()
         return 1;
     }
 
-    // c. Extract the surface mesh
+    // Extract the surface mesh
     auto surfMesh = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
@@ -70,20 +70,20 @@ int main()
     wct.start();
     cput.start();
 
-    // d. Construct a map
+    // Construct a map
 
-    // d.1 Construct one to one nodal map based on the above meshes
+    // Construct one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>();
     oneToOneNodalMap->setMaster(tetMesh);
     oneToOneNodalMap->setSlave(surfMesh);
 
-    // d.2 Compute the map
+    // Compute the map
     oneToOneNodalMap->compute();
 
     LOG(INFO) << "wall clock time: " << wct.getTimeElapsed() << " ms.";
     LOG(INFO) << "CPU time: " << cput.getTimeElapsed() << " ms.";
 
-    // e. Scene object 1: Dragon
+    // Scene object 1: Dragon
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
@@ -100,13 +100,13 @@ int main()
 
     // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");
-    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
     scene->addSceneObject(deformableObj);
 
-    // f. Scene object 2: Plane
+    // Scene object 2: Plane
     auto planeGeom = std::make_shared<Plane>();
     planeGeom->setWidth(40);
     planeGeom->setPosition(0, -6, 0);
@@ -114,11 +114,6 @@ int main()
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
-
-    // g. Add collision detection
-    //auto collisioDet = std::make_shared<CollisionDetection>();
-
-    // h. Add collision handling
 
     // create a nonlinear system
     auto nlSystem = std::make_shared<NonLinearSystem>(

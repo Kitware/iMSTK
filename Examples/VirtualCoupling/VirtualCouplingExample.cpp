@@ -77,7 +77,6 @@ int main()
     obj->setCollidingGeometry(collidingGeom);
 
     auto material = std::make_shared<RenderMaterial>();
-    //material->setVisibilityOff();
     auto visualModel = std::make_shared<VisualModel>(visualGeom);
     visualModel->setRenderMaterial(material);
     obj->addVisualModel(visualModel);
@@ -101,7 +100,7 @@ int main()
     colHandlingAlgo->setStiffness(5e-01);
     colHandlingAlgo->setDamping(0.005);
 
-    // Move Camera
+    // Camera
     auto cam = scene->getCamera();
     cam->setPosition(Vec3d(200, 200, 200));
     cam->setFocalPoint(Vec3d(0, 0, 0));

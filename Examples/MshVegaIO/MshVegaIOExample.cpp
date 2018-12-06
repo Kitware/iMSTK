@@ -47,6 +47,8 @@ int main()
     auto volumeMeshA = std::dynamic_pointer_cast<VolumetricMesh>(volMeshA); // change to any volumetric mesh above
     volumeMeshA->computeAttachedSurfaceMesh();
     auto surfaceMeshA = volumeMeshA->getAttachedSurfaceMesh();
+    surfaceMeshA->correctWindingOrder();
+    surfaceMeshA->flipNormals();
 
     // Create object A
     auto objectA = std::make_shared<VisualObject>("meshObjectMSH");
@@ -72,10 +74,12 @@ int main()
     auto volumeMeshB = std::dynamic_pointer_cast<VolumetricMesh>(volMeshB); // change to any volumetric mesh above
     volumeMeshB->computeAttachedSurfaceMesh();
     auto surfaceMeshB = volumeMeshB->getAttachedSurfaceMesh();
+    surfaceMeshB->correctWindingOrder();
+    surfaceMeshB->flipNormals();
 
     // Create object B
     auto objectB = std::make_shared<VisualObject>("meshObjectVEGA");
-    surfaceMeshB->translate(Vec3d(3, 0, 0), Geometry::TransformType::ApplyToData);
+    surfaceMeshB->translate(Vec3d(10, 0, 0), Geometry::TransformType::ApplyToData);
     objectB->setVisualGeometry(surfaceMeshB);
 
     // Add objects to the scene

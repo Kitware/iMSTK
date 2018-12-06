@@ -39,7 +39,7 @@ int main()
 
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 
-    // dragon
+    // Load a sample mesh
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
@@ -81,7 +81,7 @@ int main()
 
     scene->addSceneObject(deformableObj);
 
-    // box
+    // Create a box to hold the fluid
     StdVectorOfVec3d vertList;
     int nSides = 5;
     double width = 40.0;
