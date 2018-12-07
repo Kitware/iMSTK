@@ -5,7 +5,7 @@ Welcome to iMSTK documentation!
    :maxdepth: 2
    :caption: User Guide
 
-   userDoc
+   documentation
 
 .. toctree:: 
    :maxdepth: 0

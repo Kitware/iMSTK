@@ -7,9 +7,7 @@
 Introduction
 ============
 
-Starting in early 2015 Kitware and RPI’s CeMSIM center start
-collaboration to build the *Interactive Medical Simulation Toolkit*
-(iMSTK). iMSTK is a free & open source software toolkit written in C++
+iMSTK is a free & open source software toolkit written in C++
 that aids rapid prototyping of interactive multi-modal surgical
 simulations. It provides a highly modular and easy to use framework that
 can be extended and be interfaced with other third-party libraries for
@@ -23,7 +21,7 @@ linear and nonlinear FEM and PBD (including fluids), (e) standard
 numerical solvers such as Newton, CG, Gauss-Seidel, and (e) continuous
 collision detection.
 
-This documentation is designed to provide overview of iMSTK,
+This documentation is designed to provide an overview of iMSTK,
 introductory concepts needed to comprehend the framework, its component
 modules and how they interact to help build simulations. For
 implementational level details of the modules and their classes, please
@@ -1094,6 +1092,6 @@ Bibliography
    :width: 513px
    :height: 438px
    
-.. |image5| image:: media/decals.png
+.. |image5| image:: media/decalsDemo.png
    :width: 570px
    :height: 188px
