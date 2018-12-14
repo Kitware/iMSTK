@@ -15,7 +15,7 @@
 
 ## About
 ### Overview
-iMSTK is a C++ based free & open-source toolkit that aids rapid prototyping of real-time multi-modal surgical simulation scenarios. Surgical simulation scenarios involve algorithms from diverse areas such as haptics, advanced rendering, computational geometry, computational mechanics, virtual reality and parallel computing. iMSTK employs a highly modular and extensible design to enable the use of libraries and codes from these areas in a given application thereby reducing the development time.
+[iMSTK](https://www.imstk.org/) is a C++ based free & open-source toolkit that aids rapid prototyping of real-time multi-modal surgical simulation scenarios. Surgical simulation scenarios involve algorithms from diverse areas such as haptics, advanced rendering, computational geometry, computational mechanics, virtual reality and parallel computing. iMSTK employs a highly modular and extensible design to enable the use of libraries and codes from these areas in a given application thereby reducing the development time.
 
 ### Participants
 - [Kitware, Inc.](http://www.kitware.com/)
@@ -31,7 +31,7 @@ iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.
 
 ## Resources
 ### Documentation
-Click [here](http://www.imstk.org/documentation/) for detailed documentation.
+Click [here](https://imstk.readthedocs.io/en/latest/) for detailed documentation.
 
 ### Discourse
 The iMSTK Users and Developers can post questions and discuss relevant topics at the [Discourse](https://discourse.kitware.com/c/imstk).
