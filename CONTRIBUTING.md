@@ -40,18 +40,18 @@ git checkout -b new-feature
 
 5. Commit your changes: please follow the [commit guidelines](#commit-guidelines) below.
 
-5. Push your development branch to your namespace.
+6. Push your development branch to your namespace.
 ```sh
 git push myremote new-feature
 ```
 
-5. [Create a merge request] once your branch is ready for merging, or earlier as [WIP] if this is a long merge request and need other developpers to discuss it.
+7. [Create a merge request] once your branch is ready for merging, or earlier as [WIP] if this is a long merge request and need other developpers to discuss it.
 
-6. Stay available for the review process: you might need to address some issues and push new changes.
+8. Stay available for the review process: you might need to address some issues and push new changes.
 
-7. Once your changes have been reviewed and the associated builds and tests pass on [iMSTK dashboards](#dashboards), your branch will be merged into `master`.
+9. Once your changes have been reviewed and the associated builds and tests pass on [iMSTK dashboards](#dashboards), your branch will be merged into `master`.
 
-8. At that point, you may decide to get rid of your development branch and pull the latest commits from the master branch, then repeat from step 3 for further development
+10. At that point, you may decide to get rid of your development branch and pull the latest commits from the master branch, then repeat from step 3 for further development
 ```sh
 git branch -d new-feature
 git checkout master
@@ -85,7 +85,7 @@ else
        ...   
    }
 ``` 
-3. Source code in the body of the brackets must be indented
+4. Source code in the body of the brackets must be indented
 ```sh
 for (unsigned int i=0; i < 3; i++)
    {
@@ -93,9 +93,9 @@ for (unsigned int i=0; i < 3; i++)
        z = i + 4;
    }
 ```
-4. Each line of code should take no more than 200 characters
-4. Use blank line to separate logical blocks of code
-5. Declaration of variables within classes, methods, and functions should be one declaration per line
+5. Each line of code should take no more than 200 characters
+6. Use blank line to separate logical blocks of code
+7. Declaration of variables within classes, methods, and functions should be one declaration per line
 ```sh
 int i;
 int j;
