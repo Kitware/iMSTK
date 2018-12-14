@@ -1,0 +1,26 @@
+image: alpine
+
+before_script:
+- apk update
+- apk add doxygen
+## Uncomment the following line if you use graphviz dot graphs
+- apk add ttf-freefont graphviz
+
+test:
+  script:
+  - doxygen Doxyfile
+  except:
+  - master
+  
+pages:
+  script:
+  - cd Docs
+  - mkdir html
+  - cd ..
+  - doxygen Doxyfile
+  - mv Docs/html/ public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
