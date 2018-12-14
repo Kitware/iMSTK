@@ -15,7 +15,7 @@
 
 ## About
 ### Overview
-[iMSTK](https://www.imstk.org/) is a C++ based free & open-source toolkit that aids rapid prototyping of real-time multi-modal surgical simulation scenarios. Surgical simulation scenarios involve algorithms from diverse areas such as haptics, advanced rendering, computational geometry, computational mechanics, virtual reality and parallel computing. iMSTK employs a highly modular and extensible design to enable the use of libraries and codes from these areas in a given application thereby reducing the development time.
+[iMSTK](https://www.imstk.org/) is a C++ based free & open-source toolkit that aids rapid prototyping of real-time multi-modal surgical simulation scenarios. Surgical simulation scenarios involve algorithms from areas such as haptics, advanced rendering, computational geometry, computational mechanics, virtual reality and parallel computing. iMSTK employs a highly modular and extensible design to enable the use of libraries and codes from these areas in a given application thereby reducing the development time.
 
 ### Participants
 - [Kitware, Inc.](http://www.kitware.com/)
@@ -56,7 +56,7 @@ sudo apt-get install build-essentials libgl1-mesa-dev libxt-dev libusb-1.0-0-dev
 
 ## Getting started with iMSTK
 ### 1. Getting the source code
-To be able to contribute back to the iMSTK project, the preferred way is to use [Git] for code version control. You can use the following command in the terminal for Linux/MacOSx, or in [Git Bash] for Windows.
+To be able to contribute back to the iMSTK project, the preferred way is to use [Git] for code version control. You can use the following command in the terminal for Linux/macOS, or in [Git Bash] for Windows.
 ```sh
 git clone git@gitlab.kitware.com:iMSTK/iMSTK.git
 ```
@@ -66,7 +66,7 @@ The build process will check out external dependency sources with the SSH protoc
 
 ### 3. Building iMSTK
 We use [CMake] to configure the project on every platform. See how to run it [HERE](https://cmake.org/runningcmake/).
-* ##### On Linux/MacOSx
+* ##### On Linux/macOS
 Type the following commands from the same location you cloned the code. This will configure the build in a directory adjacent to the source directory. To easily change some configuration variables like `CMAKE_BUILD_TYPE`, use `ccmake` instead of `cmake`.
 ```sh
 mkdir iMSTK-build
