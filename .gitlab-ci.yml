@@ -4,7 +4,7 @@ before_script:
 - apk update
 - apk add doxygen
 ## Uncomment the following line if you use graphviz dot graphs
-# - apk add ttf-freefont graphviz
+- apk add ttf-freefont graphviz
 
 test:
   script:
