@@ -53,7 +53,8 @@ public:
         LineMesh,
         Capsule,
         Decal,
-        DecalPool
+        DecalPool,
+        RenderParticleEmitter
     };
 
     ///

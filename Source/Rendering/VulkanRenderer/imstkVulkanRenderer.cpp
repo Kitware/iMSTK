@@ -271,6 +271,7 @@ VulkanRenderer::setupRenderPasses()
     // Number of geometry passes
     VulkanRenderPassGenerator::generateOpaqueRenderPass(m_renderDevice, m_opaqueRenderPass, m_samples);
     VulkanRenderPassGenerator::generateDecalRenderPass(m_renderDevice, m_decalRenderPass, m_samples);
+    VulkanRenderPassGenerator::generateParticleRenderPass(m_renderDevice, m_particleRenderPass, m_samples);
     VulkanRenderPassGenerator::generateDepthRenderPass(m_renderDevice, m_depthRenderPass, m_samples);
     VulkanRenderPassGenerator::generateGUIRenderPass(m_renderDevice, m_GUIRenderPass, m_samples);
 }
@@ -577,6 +578,13 @@ VulkanRenderer::initializeFramebuffers(VkSwapchainKHR * swapchain)
     m_decalFramebuffer->setDepth(&m_depthImageView[0], VK_FORMAT_D32_SFLOAT);
     m_decalFramebuffer->initializeFramebuffer(&m_decalRenderPass);
 
+    m_particleFramebuffer =
+        std::make_shared<VulkanFramebuffer>(m_memoryManager, m_width, m_height, false, m_samples);
+    m_particleFramebuffer->setColor(&m_HDRImageView[0][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+    m_particleFramebuffer->setSpecular(&m_HDRImageView[1][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+    m_particleFramebuffer->setDepth(&m_depthImageView[0], VK_FORMAT_D32_SFLOAT);
+    m_particleFramebuffer->initializeFramebuffer(&m_particleRenderPass);
+
     m_depthFramebuffer =
         std::make_shared<VulkanFramebuffer>(m_memoryManager, m_width, m_height, false, m_samples);
     m_depthFramebuffer->setDepth(&m_depthImageView[0], VK_FORMAT_D32_SFLOAT);
@@ -662,6 +670,11 @@ VulkanRenderer::renderFrame()
             auto decalPool = std::dynamic_pointer_cast<VulkanDecalRenderDelegate>(m_renderDelegates[renderDelegateIndex]);
             decalPool->update(nextImageIndex, m_scene->getCamera());
         }
+        else if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter)
+        {
+            auto particleEmitter = std::dynamic_pointer_cast<VulkanParticleRenderDelegate>(m_renderDelegates[renderDelegateIndex]);
+            particleEmitter->update(nextImageIndex, m_scene->getCamera());
+        }
         m_renderDelegates[renderDelegateIndex]->update(nextImageIndex);
     }
 
@@ -733,6 +746,7 @@ VulkanRenderer::renderFrame()
             auto material = m_renderDelegates[renderDelegateIndex]->m_shadowMaterial;
 
             if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
+                || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter
                 || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->getRenderMaterial()->getCastsShadows()
                 || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
             {
@@ -773,6 +787,7 @@ VulkanRenderer::renderFrame()
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
         if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
+            || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter
             || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
@@ -851,6 +866,7 @@ VulkanRenderer::renderFrame()
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
         if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
+            || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter
             || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
@@ -908,11 +924,48 @@ VulkanRenderer::renderFrame()
     }
 
     vkCmdEndRenderPass(m_renderCommandBuffer[nextImageIndex]);
+
+    // Pass 3: Render particles
+    VkRenderPassBeginInfo particleRenderPassBeginInfo;
+    particleRenderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    particleRenderPassBeginInfo.pNext = nullptr;
+    particleRenderPassBeginInfo.renderPass = m_particleRenderPass;
+    particleRenderPassBeginInfo.framebuffer = m_particleFramebuffer->m_framebuffer;
+    particleRenderPassBeginInfo.renderArea = renderArea;
+    particleRenderPassBeginInfo.clearValueCount = 0;
+    particleRenderPassBeginInfo.pClearValues = &clearValues[0];
+    vkCmdBeginRenderPass(m_renderCommandBuffer[nextImageIndex], &particleRenderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
+    {
+        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() != Geometry::Type::RenderParticleEmitter
+            || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
+        {
+            continue;
+        }
+
+        auto geometry = std::dynamic_pointer_cast<RenderParticleEmitter>(m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry());
+        auto material = m_renderDelegates[renderDelegateIndex]->m_material;
+        vkCmdBindPipeline(m_renderCommandBuffer[nextImageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
+        this->setCommandBufferState(&m_renderCommandBuffer[nextImageIndex], m_width, m_height);
+
+        vkCmdBindDescriptorSets(m_renderCommandBuffer[nextImageIndex],
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            material->m_pipelineLayout, 0, (uint32_t)material->m_descriptorSets.size(),
+            &material->m_descriptorSets[0], 0, &m_dynamicOffsets);
+
+        auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
+
+        buffers->bindBuffers(&m_renderCommandBuffer[nextImageIndex], nextImageIndex);
+        vkCmdDrawIndexed(m_renderCommandBuffer[nextImageIndex], buffers->m_numIndices, geometry->getNumParticles(), 0, 0, 0);
+    }
+
+    vkCmdEndRenderPass(m_renderCommandBuffer[nextImageIndex]);
     vkEndCommandBuffer(m_renderCommandBuffer[nextImageIndex]);
 
     vkBeginCommandBuffer(m_postProcessingCommandBuffer[nextImageIndex], &commandBufferBeginInfo);
 
-    // Pass 3 to N - 1: Post processing
+    // Pass 4 to N - 1: Post processing
     for (unsigned int postProcessIndex = 0; postProcessIndex < m_postProcessingChain->m_postProcesses.size(); postProcessIndex++)
     {
         clearValues[0].color = { { 1.0, 0.0, 0.0, 1 } }; // Color
@@ -1082,7 +1135,8 @@ VulkanRenderer::loadVisualModel(std::shared_ptr<VisualModel> visualModel, SceneO
         renderDelegate->getBuffer()->initializeBuffers(m_memoryManager);
         renderDelegate->m_material->initialize(this);
 
-        if (!renderDelegate->getVisualModel()->getRenderMaterial()->isDecal())
+        if (!renderDelegate->getVisualModel()->getRenderMaterial()->isDecal()
+            && !renderDelegate->getVisualModel()->getRenderMaterial()->isParticle())
         {
             renderDelegate->m_shadowMaterial->initialize(this);
             renderDelegate->m_depthMaterial->initialize(this);
@@ -1568,8 +1622,12 @@ VulkanRenderer::~VulkanRenderer()
         for (auto renderDelegate : m_renderDelegates)
         {
             renderDelegate->m_material->clear(&m_renderDevice);
-            renderDelegate->m_depthMaterial->clear(&m_renderDevice);
-            if (m_shadowPasses.size() > 0)
+            if (renderDelegate->m_depthMaterial)
+            {
+                renderDelegate->m_depthMaterial->clear(&m_renderDevice);
+            }
+            if (m_shadowPasses.size() > 0 &&
+                renderDelegate->m_shadowMaterial != nullptr)
             {
                 renderDelegate->m_shadowMaterial->clear(&m_renderDevice);
             }
@@ -1594,6 +1652,7 @@ VulkanRenderer::~VulkanRenderer()
 
         vkDestroyRenderPass(m_renderDevice, m_opaqueRenderPass, nullptr);
         vkDestroyRenderPass(m_renderDevice, m_decalRenderPass, nullptr);
+        vkDestroyRenderPass(m_renderDevice, m_particleRenderPass, nullptr);
         vkDestroyRenderPass(m_renderDevice, m_depthRenderPass, nullptr);
 
         for (auto pass : m_shadowPasses)

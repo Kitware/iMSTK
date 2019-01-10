@@ -76,6 +76,12 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
                                               renderer->m_renderDevice,
                                               m_pipelineComponents.vertexShader);
     }
+    else if(m_material->isParticle())
+    {
+        VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/particle_vert.spv",
+                                              renderer->m_renderDevice,
+                                              m_pipelineComponents.vertexShader);
+    }
     else if (m_shadowPass)
     {
         VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/shadow_vert.spv",
@@ -103,6 +109,12 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
     if (m_material->isDecal())
     {
         VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/decal_frag.spv",
+                                                renderer->m_renderDevice,
+                                                m_pipelineComponents.fragmentShader);
+    }
+    else if (m_material->isParticle())
+    {
+        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/particle_frag.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
@@ -138,7 +150,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_constants.tessellation = m_material->getTessellated();
     m_constants.shaded = m_material->getDisplayMode() == RenderMaterial::DisplayMode::SURFACE
                          && !m_material->isLineMesh()
-                         && !m_depthPrePass;
+                         && !m_depthPrePass
+                         && !m_material->isParticle();
     m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_depthOnlyPass;
     m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
     m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_depthOnlyPass;
@@ -413,6 +426,11 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
         renderPass = renderer->m_decalRenderPass;
         numAttachments = 2;
     }
+    else if (m_material->isParticle())
+    {
+        renderPass = renderer->m_particleRenderPass;
+        numAttachments = 2;
+    }
     else if (m_shadowPass)
     {
         // all shadow passes should be compatible, so we choose the first one
@@ -432,16 +450,28 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     m_pipelineComponents.colorBlendAttachments.resize(numAttachments);
 
-    int blendMode = m_material->isDecal() ? VK_TRUE : VK_FALSE;
+    int blendModeEnabled = (m_material->isDecal() || m_material->isParticle()) ? VK_TRUE : VK_FALSE;
+    auto blendMode = m_material->getBlendMode();
 
     for (int i = 0; i < m_pipelineComponents.colorBlendAttachments.size(); i++)
     {
-        m_pipelineComponents.colorBlendAttachments[i].blendEnable = blendMode;
-        m_pipelineComponents.colorBlendAttachments[i].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-        m_pipelineComponents.colorBlendAttachments[i].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        m_pipelineComponents.colorBlendAttachments[i].blendEnable = blendModeEnabled;
+        switch (blendMode)
+        {
+        case RenderMaterial::BlendMode::ALPHA:
+            m_pipelineComponents.colorBlendAttachments[i].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+            m_pipelineComponents.colorBlendAttachments[i].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+            break;
+        case RenderMaterial::BlendMode::ADDITIVE:
+            m_pipelineComponents.colorBlendAttachments[i].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+            m_pipelineComponents.colorBlendAttachments[i].dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+
+            break;
+        }
         m_pipelineComponents.colorBlendAttachments[i].colorBlendOp = VK_BLEND_OP_ADD;
         m_pipelineComponents.colorBlendAttachments[i].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         m_pipelineComponents.colorBlendAttachments[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+
         m_pipelineComponents.colorBlendAttachments[i].alphaBlendOp = VK_BLEND_OP_ADD;
         m_pipelineComponents.colorBlendAttachments[i].colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
                                                                        VK_COLOR_COMPONENT_G_BIT |
@@ -787,7 +817,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer * renderer)
         }
 
         // Depth buffer texture
-        if (m_material->isDecal())
+        if (m_material->isDecal() || m_material->isParticle())
         {
             VkDescriptorSetLayoutBinding fragmentLayoutBinding;
             fragmentLayoutBinding.binding = 13;
@@ -998,7 +1028,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer * renderer)
             fragmentTextureInfo.push_back(textureInfo);
         }
 
-        if (m_material->isDecal())
+        if (m_material->isDecal() || m_material->isParticle())
         {
             VkDescriptorImageInfo textureInfo;
             textureInfo.sampler = renderer->m_HDRImageSampler;

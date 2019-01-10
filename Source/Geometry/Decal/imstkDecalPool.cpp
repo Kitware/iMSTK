@@ -33,7 +33,7 @@ DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/)
     else
     {
         m_maxNumDecals = 128;
-        LOG(WARNING) << "The maximum number of decals is 256";
+        LOG(WARNING) << "The maximum number of decals is 128";
     }
 
     m_vertexPositions[0] = glm::vec3(0.5, 0.5, 0.5);

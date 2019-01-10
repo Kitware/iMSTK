@@ -44,6 +44,12 @@ public:
         WIREFRAME_SURFACE
     };
 
+    enum class BlendMode
+    {
+        ALPHA,
+        ADDITIVE
+    };
+
     ///
     /// \brief Constructor
     ///
@@ -137,10 +143,17 @@ public:
     bool getCastsShadows() const;
 
     ///
-    /// \brief Checks if the material belongs to a decal
+    /// \brief Get/Set blend mode
+    /// This function only works for particles and decals currently
+    ///
+    void setBlendMode(const BlendMode blendMode);
+    const BlendMode getBlendMode();
+
+    ///
+    /// \brief Checks if the material must be handled uniquely
     ///
     bool isDecal();
-
+    bool isParticle();
     bool isLineMesh();
 
 protected:
@@ -148,6 +161,7 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VulkanDecalRenderDelegate;
     friend class VulkanLineMeshRenderDelegate;
+    friend class VulkanParticleRenderDelegate;
     friend class VTKdbgLinesRenderDelegate;
 
     // State
@@ -158,6 +172,7 @@ protected:
     bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
     bool m_isDecal = false;
     bool m_isLineMesh = false;
+    bool m_isParticle = false;
 
     // Sphere size used for glyph in rendering (valid only for point set)
     double m_sphereGlyphSize = 0.05;
@@ -184,6 +199,8 @@ protected:
     bool m_stateModified = true; ///< Flag for expensive state changes
     bool m_modified = true;      ///< Flag for any material property changes
     bool m_flatShading = false;
+
+    BlendMode m_blendMode = BlendMode::ALPHA;
 };
 }
 

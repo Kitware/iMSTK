@@ -46,6 +46,7 @@ set(VULKAN_H_FILES
     VulkanRenderer/RenderDelegate/imstkVulkanCubeRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanDecalRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanLineMeshRenderDelegate.h
+    VulkanRenderer/RenderDelegate/imstkVulkanParticleRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanPlaneRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanRenderDelegate.h
     VulkanRenderer/RenderDelegate/imstkVulkanSphereRenderDelegate.h
@@ -69,6 +70,7 @@ set(VULKAN_CPP_FILES
     VulkanRenderer/RenderDelegate/imstkVulkanCubeRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanDecalRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanLineMeshRenderDelegate.cpp
+    VulkanRenderer/RenderDelegate/imstkVulkanParticleRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanPlaneRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanRenderDelegate.cpp
     VulkanRenderer/RenderDelegate/imstkVulkanSphereRenderDelegate.cpp
