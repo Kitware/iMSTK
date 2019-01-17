@@ -659,6 +659,15 @@ VulkanRenderer::renderFrame()
 
     this->loadAllVisualModels();
 
+    for (auto sceneObject : m_scene->getSceneObjects())
+    {
+        if (sceneObject->getType() == SceneObject::Type::Animation)
+        {
+            auto animatedObject = std::static_pointer_cast<AnimationObject>(sceneObject);
+            animatedObject->getAnimationModel()->update();
+        }
+    }
+
     // Update global uniforms
     this->updateGlobalUniforms(nextImageIndex);
 
@@ -670,7 +679,7 @@ VulkanRenderer::renderFrame()
             auto decalPool = std::dynamic_pointer_cast<VulkanDecalRenderDelegate>(m_renderDelegates[renderDelegateIndex]);
             decalPool->update(nextImageIndex, m_scene->getCamera());
         }
-        else if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter)
+        else if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticles)
         {
             auto particleEmitter = std::dynamic_pointer_cast<VulkanParticleRenderDelegate>(m_renderDelegates[renderDelegateIndex]);
             particleEmitter->update(nextImageIndex, m_scene->getCamera());
@@ -746,7 +755,7 @@ VulkanRenderer::renderFrame()
             auto material = m_renderDelegates[renderDelegateIndex]->m_shadowMaterial;
 
             if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
-                || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter
+                || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticles
                 || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->getRenderMaterial()->getCastsShadows()
                 || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
             {
@@ -787,7 +796,7 @@ VulkanRenderer::renderFrame()
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
         if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
-            || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter
+            || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticles
             || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
@@ -866,7 +875,7 @@ VulkanRenderer::renderFrame()
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
         if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::DecalPool
-            || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticleEmitter
+            || m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() == Geometry::Type::RenderParticles
             || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
@@ -938,13 +947,13 @@ VulkanRenderer::renderFrame()
 
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
     {
-        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() != Geometry::Type::RenderParticleEmitter
+        if (m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry()->getType() != Geometry::Type::RenderParticles
             || !m_renderDelegates[renderDelegateIndex]->getVisualModel()->isVisible())
         {
             continue;
         }
 
-        auto geometry = std::dynamic_pointer_cast<RenderParticleEmitter>(m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry());
+        auto geometry = std::dynamic_pointer_cast<RenderParticles>(m_renderDelegates[renderDelegateIndex]->getVisualModel()->getGeometry());
         auto material = m_renderDelegates[renderDelegateIndex]->m_material;
         vkCmdBindPipeline(m_renderCommandBuffer[nextImageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
         this->setCommandBufferState(&m_renderCommandBuffer[nextImageIndex], m_width, m_height);

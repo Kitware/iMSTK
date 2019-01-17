@@ -54,7 +54,7 @@ public:
         Capsule,
         Decal,
         DecalPool,
-        RenderParticleEmitter
+        RenderParticles
     };
 
     ///

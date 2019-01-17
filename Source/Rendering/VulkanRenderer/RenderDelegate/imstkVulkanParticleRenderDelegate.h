@@ -28,6 +28,11 @@
 
 namespace imstk
 {
+///
+/// \class VulkanParticleRenderDelegate
+///
+/// \brief Billboard render delegate for RenderParticles
+///
 class VulkanParticleRenderDelegate : public VulkanRenderDelegate {
 public:
 

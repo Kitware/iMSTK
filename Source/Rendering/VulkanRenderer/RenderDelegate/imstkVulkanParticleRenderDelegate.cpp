@@ -29,7 +29,7 @@ VulkanParticleRenderDelegate::VulkanParticleRenderDelegate(std::shared_ptr<Visua
 {
     this->initialize(visualModel);
 
-    auto geometry = std::static_pointer_cast<RenderParticleEmitter>(visualModel->getGeometry());
+    auto geometry = std::static_pointer_cast<RenderParticles>(visualModel->getGeometry());
 
     m_numVertices = 4;
     m_numTriangles = 2;
@@ -49,7 +49,7 @@ void
 VulkanParticleRenderDelegate::updateVertexBuffer()
 {
     auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory();
-    auto geometry = std::static_pointer_cast<RenderParticleEmitter>(m_visualModel->getGeometry());
+    auto geometry = std::static_pointer_cast<RenderParticles>(m_visualModel->getGeometry());
 
     for (unsigned i = 0; i < m_numVertices; i++)
     {
@@ -87,9 +87,7 @@ VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<
 {
     unsigned int index = 0;
 
-    auto geometry = std::static_pointer_cast<RenderParticleEmitter>(m_visualModel->getGeometry());
-
-    geometry->updateParticleEmitter(camera->getPosition());
+    auto particles = std::static_pointer_cast<RenderParticles>(m_visualModel->getGeometry());
 
     auto mat = this->getVisualModel()->getRenderMaterial();
     auto cameraPosition = glm::vec3(camera->getPosition()[0],
@@ -101,9 +99,9 @@ VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<
 
     auto matColor = mat->getColor();
 
-    this->sortParticles(geometry->getParticles(), geometry->getNumParticles(), cameraPosition);
+    this->sortParticles(particles->getParticles(), particles->getNumParticles(), cameraPosition);
 
-    for (unsigned int i = 0; i < geometry->getNumParticles(); i++)
+    for (unsigned int i = 0; i < particles->getNumParticles(); i++)
     {
         auto particlePosition = glm::vec3(m_particles[i]->m_position[0],
             m_particles[i]->m_position[1],
@@ -117,7 +115,7 @@ VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<
         transformation = transformation * billboardTransformation;
         transformation = glm::rotate(transformation, m_particles[i]->m_rotation, glm::vec3(0, 0, 1.0f));
         transformation = glm::scale(transformation,
-            glm::vec3(geometry->m_particleSize) * m_particles[i]->m_scale);
+            glm::vec3(particles->m_particleSize) * m_particles[i]->m_scale);
         m_particleVertexUniforms.transform[i] = transformation;
 
         m_particleFragmentUniforms.receivesShadows[i] = mat->getReceivesShadows() ? 1 : 0;

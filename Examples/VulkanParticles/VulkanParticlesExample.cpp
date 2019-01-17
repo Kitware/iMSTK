@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkAnimationObject.h"
+#include "imstkRenderParticles.h"
 #include "imstkRenderParticleEmitter.h"
 #include "imstkAPIUtilities.h"
 
@@ -42,28 +44,36 @@ int main()
 
     // Smoke
     {
+        // Create sparks material
         auto particleMaterial = std::make_shared<RenderMaterial>();
         auto particleTexture = std::make_shared<Texture>
                                (iMSTK_DATA_ROOT "/particles/smoke_01.png", Texture::Type::DIFFUSE);
         particleMaterial->addTexture(particleTexture);
         particleMaterial->setBlendMode(RenderMaterial::BlendMode::ALPHA);
 
-        auto particleEmitter = std::make_shared<RenderParticleEmitter>(128, 2000.0f);
+        // Create particle geometry (for visual and animation)
+        auto particles = std::make_shared<RenderParticles>(128);
+        particles->setParticleSize(0.4f);
+
+        // Create particle animation model
+        auto particleEmitter = std::make_shared<RenderParticleEmitter>(particles, 2000.0f);
         particleEmitter->setInitialVelocityRange(Vec3f(-1, 5, -1), Vec3f(1, 5, 1),
             0.5, 1.0,
             -1.0, 1.0);
         particleEmitter->setEmitterSize(0.3f);
-        particleEmitter->setParticleSize(0.4f);
 
+        // Modify the first keyframe
         auto startKeyFrame = particleEmitter->getStartKeyFrame();
         startKeyFrame->m_color = Color(1.0, 0.7, 0.0, 1.0);
 
+        // Add another keyframe
         RenderParticleKeyFrame midFrame0;
         midFrame0.m_time = 700.0f;
         midFrame0.m_color = Color::Red;
         midFrame0.m_scale = 1.5f;
         particleEmitter->addKeyFrame(midFrame0);
 
+        // Add another keyframe
         RenderParticleKeyFrame midFrame1;
         midFrame1.m_time = 1300.0f;
         midFrame1.m_color = Color::DarkGray;
@@ -71,48 +81,58 @@ int main()
         midFrame1.m_scale = 2.0f;
         particleEmitter->addKeyFrame(midFrame1);
 
+        // Modify the last keyframe
         auto endKeyFrame = particleEmitter->getEndKeyFrame();
         endKeyFrame->m_color = Color::Black;
         endKeyFrame->m_color.a = 0.0;
         endKeyFrame->m_scale = 4.0;
 
-        auto particleObject = std::make_shared<VisualObject>("Smoke");
-        auto particleModel = std::make_shared<VisualModel>(particleEmitter);
+        // Create and add animation scene object
+        auto particleObject = std::make_shared<AnimationObject>("Smoke");
+        auto particleModel = std::make_shared<VisualModel>(particles);
         particleModel->setRenderMaterial(particleMaterial);
         particleObject->addVisualModel(particleModel);
-
+        particleObject->setAnimationModel(particleEmitter);
         scene->addSceneObject(particleObject);
     }
 
     // Sparks
     {
+        // Create sparks material
         auto particleMaterial = std::make_shared<RenderMaterial>();
         auto particleTexture = std::make_shared<Texture>
                                (iMSTK_DATA_ROOT "/particles/flare_01.png", Texture::Type::DIFFUSE);
         particleMaterial->addTexture(particleTexture);
         particleMaterial->setBlendMode(RenderMaterial::BlendMode::ALPHA);
 
-        auto particleEmitter = std::make_shared<RenderParticleEmitter>(128,
+        // Create particle geometry (for visual and animation)
+        auto particles = std::make_shared<RenderParticles>(128);
+        particles->setTranslation(2, 0.1, 0);
+        particles->setParticleSize(0.3f);
+
+        // Create animation model
+        auto particleEmitter = std::make_shared<RenderParticleEmitter>(particles,
             850.0f, RenderParticleEmitter::Mode::BURST);
-        particleEmitter->setTranslation(2, 0.1, 0);
         particleEmitter->setInitialVelocityRange(Vec3f(-1, 5, -1), Vec3f(1, 5, 1),
             4.0, 5.0,
             -1.0, 1.0);
         particleEmitter->setEmitterSize(0.1f);
-        particleEmitter->setParticleSize(0.3f);
 
+        // Modifying the first keyframe
         auto startKeyFrame = particleEmitter->getStartKeyFrame();
         startKeyFrame->m_acceleration = Vec3f(0, -9.8, 0);
         startKeyFrame->m_color = Color::Yellow;
 
+        // Modifying the last keyframe
         auto endKeyFrame = particleEmitter->getEndKeyFrame();
         endKeyFrame->m_color = Color::Orange;
 
-        auto particleObject = std::make_shared<VisualObject>("Sparks");
-        auto particleModel = std::make_shared<VisualModel>(particleEmitter);
+        // Create and add animation object
+        auto particleObject = std::make_shared<AnimationObject>("Sparks");
+        auto particleModel = std::make_shared<VisualModel>(particles);
         particleModel->setRenderMaterial(particleMaterial);
         particleObject->addVisualModel(particleModel);
-
+        particleObject->setAnimationModel(particleEmitter);
         scene->addSceneObject(particleObject);
     }
 
@@ -131,9 +151,9 @@ int main()
     // Create a call back on key press of 'b' to trigger the sparks emitter
     viewer->setOnCharFunction('b', [&](InteractorStyle* c) -> bool
     {
-        auto geometry = scene->getSceneObject("Sparks")->getVisualModel(0)->getGeometry();
-        auto sparks = std::static_pointer_cast<RenderParticleEmitter>(geometry);
-        sparks->reset();
+        auto sparks = std::static_pointer_cast<AnimationObject>(
+            scene->getSceneObject("Sparks"));
+        sparks->getAnimationModel()->reset();
         return false;
     });
 

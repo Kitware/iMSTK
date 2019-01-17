@@ -23,20 +23,12 @@
 
 namespace imstk
 {
-RenderParticleEmitter::RenderParticleEmitter(unsigned int maxNumParticles /*=128*/,
-                                             float time /*= 3000*/,
-                                             RenderParticleEmitter::Mode mode /*= Mode::BURST*/)
-    : Geometry(Geometry::Type::RenderParticleEmitter)
+RenderParticleEmitter::RenderParticleEmitter(std::shared_ptr<Geometry> geometry,
+                                             const float time /*= 3000*/,
+                                             RenderParticleEmitter::Mode mode /*= Mode::CONTINUOUS*/)
+    : AnimationModel(geometry)
 {
-    if (maxNumParticles <= 128)
-    {
-        m_maxNumParticles = maxNumParticles;
-    }
-    else
-    {
-        m_maxNumParticles = 128;
-        LOG(WARNING) << "The maximum number of decals is 128";
-    }
+    this->setGeometry(geometry);
 
     m_time = time;
     m_emitTime = m_time;
@@ -57,25 +49,51 @@ RenderParticleEmitter::RenderParticleEmitter(unsigned int maxNumParticles /*=128
     m_keyFrames.push_back(startFrame);
     m_keyFrames.push_back(endFrame);
 
-    m_vertexPositions[0] = glm::vec3(0.5, 0.5, 0);
-    m_vertexPositions[1] = glm::vec3(0.5, -0.5, 0);
-    m_vertexPositions[2] = glm::vec3(-0.5, 0.5, 0);
-    m_vertexPositions[3] = glm::vec3(-0.5, -0.5, 0);
-
-    m_vertexNormals[0] = glm::vec3(0.0, 0.0, 1.0);
-    m_vertexNormals[1] = glm::vec3(0.0, 0.0, 1.0);
-    m_vertexNormals[2] = glm::vec3(0.0, 0.0, 1.0);
-    m_vertexNormals[3] = glm::vec3(0.0, 0.0, 1.0);
-
-    m_vertexUVs[0] = glm::vec2(1.0, 1.0);
-    m_vertexUVs[1] = glm::vec2(1.0, 0);
-    m_vertexUVs[2] = glm::vec2(0, 1.0);
-    m_vertexUVs[3] = glm::vec2(0, 0);
-
-    m_triangles[0] = glm::ivec3(1, 0, 3);
-    m_triangles[1] = glm::ivec3(0, 2, 3);
-
     this->initializeParticles();
+}
+
+void
+RenderParticleEmitter::setGeometry(
+    std::shared_ptr<Geometry> geometry)
+{
+    if (geometry->getType() != Geometry::Type::RenderParticles)
+    {
+        LOG(FATAL) << "Geometry must be RenderParticles";
+        return;
+    }
+
+    m_animationGeometry = geometry;
+    m_particles = &std::static_pointer_cast<RenderParticles>(m_animationGeometry)->getParticles();
+}
+
+RenderParticleEmitter::Mode
+RenderParticleEmitter::getEmitterMode() const
+{
+    return m_mode;
+}
+
+void
+RenderParticleEmitter::setEmitterSize(const float size)
+{
+    m_emitterSize = size;
+}
+
+void
+RenderParticleEmitter::setInitialVelocityRange(const Vec3f minDirection,
+                                               const Vec3f maxDirection,
+                                               const float minSpeed,
+                                               const float maxSpeed,
+                                               const float minRotationSpeed,
+                                               const float maxRotationSpeed)
+{
+    m_minDirection = minDirection;
+    m_maxDirection = maxDirection;
+    m_minDirection.normalize();
+    m_maxDirection.normalize();
+    m_minSpeed = minSpeed;
+    m_maxSpeed = maxSpeed;
+    m_minRotationSpeed = minRotationSpeed;
+    m_maxRotationSpeed = maxRotationSpeed;
 }
 
 bool
@@ -90,27 +108,63 @@ RenderParticleEmitter::addKeyFrame(RenderParticleKeyFrame keyFrame)
     return true;
 }
 
-RenderParticleEmitter::Mode
-RenderParticleEmitter::getEmitterMode()
+RenderParticleKeyFrame *
+RenderParticleEmitter::getStartKeyFrame()
 {
-    return m_mode;
+    unsigned int index = 0;
+
+    for (unsigned int i = 0; i < m_keyFrames.size(); i++)
+    {
+        if (m_keyFrames[i].m_time < m_keyFrames[index].m_time)
+        {
+            index = i;
+        }
+    }
+
+    return &m_keyFrames[index];
+}
+
+RenderParticleKeyFrame *
+RenderParticleEmitter::getEndKeyFrame()
+{
+    unsigned int index = 0;
+
+    for (unsigned int i = 0; i < m_keyFrames.size(); i++)
+    {
+        if (m_keyFrames[i].m_time > m_keyFrames[index].m_time)
+        {
+            index = i;
+        }
+    }
+
+    return &m_keyFrames[index];
+}
+
+std::vector<RenderParticleKeyFrame>&
+RenderParticleEmitter::getKeyFrames()
+{
+    return m_keyFrames;
 }
 
 void
-RenderParticleEmitter::setEmitterSize(float size)
+RenderParticleEmitter::reset()
 {
-    m_emitterSize = size;
+    if (m_mode != Mode::BURST)
+    {
+        return;
+    }
+
+    auto renderParticles = std::static_pointer_cast<RenderParticles>(m_geometry);
+    renderParticles->reset();
+
+    this->initializeParticles();
 }
 
 void
-RenderParticleEmitter::setParticleSize(float size)
+RenderParticleEmitter::update()
 {
-    m_particleSize = size;
-}
+    auto renderParticles = std::static_pointer_cast<RenderParticles>(m_geometry);
 
-void
-RenderParticleEmitter::updateParticleEmitter(Vec3d cameraPosition)
-{
     if (!m_started)
     {
         m_stopWatch.start();
@@ -121,7 +175,7 @@ RenderParticleEmitter::updateParticleEmitter(Vec3d cameraPosition)
     float dt = (float)(time - m_lastUpdateTime);
     m_lastUpdateTime = time;
 
-    for (auto&& particle : m_particles)
+    for (auto&& particle : (*m_particles))
     {
         auto startKeyFrameTemp = *this->getStartKeyFrame();
         auto startKeyFrame = &startKeyFrameTemp;
@@ -134,7 +188,7 @@ RenderParticleEmitter::updateParticleEmitter(Vec3d cameraPosition)
         {
             particle->m_created = true;
             this->emitParticle(particle);
-            m_numParticles++;
+            renderParticles->incrementNumOfParticles();
         }
         else if (particle->m_age < 0)
         {
@@ -179,7 +233,7 @@ RenderParticleEmitter::updateParticleEmitter(Vec3d cameraPosition)
         particle->m_scale = (alpha * endKeyFrame->m_scale)
                             + ((1.0f - alpha) * startKeyFrame->m_scale);
 
-        interpolateColor(particle->m_color,
+        this->interpolateColor(particle->m_color,
             endKeyFrame->m_color,
             startKeyFrame->m_color,
             alpha);
@@ -187,9 +241,24 @@ RenderParticleEmitter::updateParticleEmitter(Vec3d cameraPosition)
 }
 
 void
+RenderParticleEmitter::initializeParticles()
+{
+    m_particles->clear();
+
+    auto particles = std::static_pointer_cast<RenderParticles>(m_animationGeometry);
+
+    for (unsigned int i = 0; i < particles->getMaxNumParticles(); i++)
+    {
+        m_particles->push_back(std::unique_ptr<RenderParticle>(new RenderParticle()));
+        (*m_particles)[i]->m_age = -(i / (float)(particles->getMaxNumParticles())) * m_emitTime;
+        (*m_particles)[i]->m_created = false;
+    }
+}
+
+void
 RenderParticleEmitter::emitParticle(std::unique_ptr<RenderParticle>& particle)
 {
-    auto position = this->getTranslation();
+    auto position = m_animationGeometry->getTranslation();
 
     if (m_shape == Shape::CUBE)
     {
@@ -226,9 +295,9 @@ RenderParticleEmitter::emitParticle(std::unique_ptr<RenderParticle>& particle)
 
 void
 RenderParticleEmitter::interpolateColor(Color& destination,
-                                        Color& sourceA,
-                                        Color& sourceB,
-                                        float alpha)
+                                        const Color& sourceA,
+                                        const Color& sourceB,
+                                        const float alpha)
 {
     destination.r = (sourceA.r * alpha) + (sourceB.r * (1.0f - alpha));
     destination.g = (sourceA.g * alpha) + (sourceB.g * (1.0f - alpha));
@@ -236,103 +305,9 @@ RenderParticleEmitter::interpolateColor(Color& destination,
     destination.a = (sourceA.a * alpha) + (sourceB.a * (1.0f - alpha));
 }
 
-unsigned int
-RenderParticleEmitter::getNumParticles()
-{
-    return m_numParticles;
-}
-
-std::vector<std::unique_ptr<RenderParticle>>&
-RenderParticleEmitter::getParticles()
-{
-    return m_particles;
-}
-
-std::vector<RenderParticleKeyFrame>&
-RenderParticleEmitter::getKeyFrames()
-{
-    return m_keyFrames;
-}
-
-RenderParticleKeyFrame *
-RenderParticleEmitter::getStartKeyFrame()
-{
-    unsigned int index = 0;
-
-    for (unsigned int i = 0; i < m_keyFrames.size(); i++)
-    {
-        if (m_keyFrames[i].m_time < m_keyFrames[index].m_time)
-        {
-            index = i;
-        }
-    }
-
-    return &m_keyFrames[index];
-}
-
-RenderParticleKeyFrame *
-RenderParticleEmitter::getEndKeyFrame()
-{
-    unsigned int index = 0;
-
-    for (unsigned int i = 0; i < m_keyFrames.size(); i++)
-    {
-        if (m_keyFrames[i].m_time > m_keyFrames[index].m_time)
-        {
-            index = i;
-        }
-    }
-
-    return &m_keyFrames[index];
-}
-
-void
-RenderParticleEmitter::setInitialVelocityRange(Vec3f minDirection,
-                                               Vec3f maxDirection,
-                                               float minSpeed,
-                                               float maxSpeed,
-                                               float minRotationSpeed,
-                                               float maxRotationSpeed)
-{
-    m_minDirection = minDirection;
-    m_maxDirection = maxDirection;
-    m_minDirection.normalize();
-    m_maxDirection.normalize();
-    m_minSpeed = minSpeed;
-    m_maxSpeed = maxSpeed;
-    m_minRotationSpeed = minRotationSpeed;
-    m_maxRotationSpeed = maxRotationSpeed;
-}
-
 float
 RenderParticleEmitter::getRandomNormalizedFloat()
 {
     return (float)std::rand() / RAND_MAX;
-}
-
-void
-RenderParticleEmitter::initializeParticles()
-{
-    m_particles.clear();
-
-    for (unsigned int i = 0; i < m_maxNumParticles; i++)
-    {
-        m_particles.push_back(std::make_unique<RenderParticle>());
-        m_particles[i]->m_age = -(i / (float)(m_maxNumParticles)) * m_emitTime;
-        m_particles[i]->m_created = false;
-    }
-}
-
-void
-RenderParticleEmitter::reset()
-{
-    if (m_mode != Mode::BURST)
-    {
-        return;
-    }
-
-    m_numParticles = 0;
-
-    this->initializeParticles();
 }
 }

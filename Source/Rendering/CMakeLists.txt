@@ -123,6 +123,7 @@ imstk_add_library( Rendering
     ${VTK_LIBRARIES}
     ${RENDERING_DEPENDENCIES}
     Scene
+    Animation
     glm
   #VERBOSE
   )

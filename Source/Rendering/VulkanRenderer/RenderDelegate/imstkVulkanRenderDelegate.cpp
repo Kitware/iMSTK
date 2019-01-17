@@ -101,7 +101,7 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
     {
         return std::make_shared<VulkanDecalRenderDelegate>(visualModel, type, memoryManager);
     }
-    case Geometry::Type::RenderParticleEmitter:
+    case Geometry::Type::RenderParticles:
     {
         return std::make_shared<VulkanParticleRenderDelegate>(visualModel, type, memoryManager);
     }

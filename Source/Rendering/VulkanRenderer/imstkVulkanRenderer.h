@@ -41,6 +41,7 @@
 #include "imstkDecalPool.h"
 #include "imstkRenderParticleEmitter.h"
 #include "imstkTextureManager.h"
+#include "imstkAnimationObject.h"
 
 #include "imstkVulkanValidation.h"
 #include "imstkVulkanVertexBuffer.h"
