@@ -43,8 +43,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    VulkanPostProcess(VulkanRenderer * renderer, unsigned int level = 0);
-    VulkanPostProcess(VulkanRenderer * renderer, unsigned int width, unsigned int height);
+    VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int level = 0);
+    VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int width, unsigned int height);
 
     void addInputImage(
         VkSampler * sampler,
@@ -81,7 +81,9 @@ protected:
     ///
     /// \brief Set image attachments to a readable layout
     ///
-    void setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, uint32_t queueFamily);
+    void setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer,
+        uint32_t queueFamily,
+        const uint32_t numViews);
 
     void createDescriptors(VulkanRenderer * renderer);
     void createDescriptorSetLayouts(VulkanRenderer * renderer);
@@ -111,6 +113,7 @@ protected:
 
     unsigned int m_downsampleLevels = 0;
     unsigned int m_outputIndex = 0;
+    uint32_t m_numViews;
 
     std::vector<VkAttachmentReference> m_colorAttachments;
     VkRenderPass m_renderPass;

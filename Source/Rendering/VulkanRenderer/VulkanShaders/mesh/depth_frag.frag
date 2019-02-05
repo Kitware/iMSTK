@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
@@ -19,8 +19,8 @@ struct light
 
 layout (set = 1, binding = 0) uniform globalUniforms
 {
-    mat4 inverseViewMatrix;
-    mat4 inverseProjectionMatrix;
+    mat4 inverseViewMatrices[2];
+    mat4 inverseProjectionMatrices[2];
     vec4 resolution;
     light lights[16];
     mat4 lightMatrices[16];
@@ -42,6 +42,7 @@ layout (location = 0) in vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
+    flat uint view;
 }vertex;
 
 void main(void)

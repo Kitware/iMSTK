@@ -33,7 +33,8 @@
 #include "imstkVulkanRenderer.h"
 #include "imstkViewer.h"
 #include "imstkTimer.h"
-#include "imstkVulkanInteractorStyle.h"
+#include "imstkVulkanInteractorStyleFreeCamera.h"
+#include "imstkVulkanInteractorStyleVR.h"
 #include "imstkVulkanUtilities.h"
 #include "imstkGUIUtilities.h"
 
@@ -43,7 +44,7 @@ class VulkanInteractorStyle;
 
 class VulkanViewer : public Viewer {
 public:
-    VulkanViewer(SimulationManager * manager = nullptr);
+    VulkanViewer(SimulationManager * manager = nullptr, bool enableVR = false);
 
     virtual void setActiveScene(std::shared_ptr<Scene> scene);
 
@@ -100,6 +101,8 @@ public:
 protected:
     friend class VulkanInteractorStyle;
     friend class VulkanInteractorStyleFreeCamera;
+    friend class VulkanInteractorStyleGeneral;
+    friend class VulkanInteractorStyleVR;
 
     void setupWindow();
     void createWindow();
@@ -126,6 +129,8 @@ protected:
     uint32_t m_physicalFormatsCount;
     VkSurfaceFormatKHR * m_physicalFormats;
     bool m_fullscreen = false;
+
+    bool m_VRMode = false;
 
     Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
 };

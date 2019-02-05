@@ -21,30 +21,13 @@
 
 #include "imstkVulkanInteractorStyleFreeCamera.h"
 
-#include "imstkVulkanViewer.h"
 #include "imstkSimulationManager.h"
+#include "imstkVulkanViewer.h"
 
 namespace imstk
 {
 VulkanInteractorStyleFreeCamera::VulkanInteractorStyleFreeCamera()
 {
-}
-
-void
-VulkanInteractorStyleFreeCamera::setWindow(GLFWwindow * window, VulkanViewer * viewer)
-{
-    m_window = window;
-    m_viewer = viewer;
-
-    m_stopWatch.start();
-    glfwSetWindowUserPointer(window, (void *)this);
-
-    glfwSetKeyCallback(m_window, VulkanInteractorStyleFreeCamera::OnCharInterface);
-    glfwSetMouseButtonCallback(m_window, VulkanInteractorStyleFreeCamera::OnMouseButtonInterface);
-    glfwSetCursorPosCallback(m_window, VulkanInteractorStyleFreeCamera::OnMouseMoveInterface);
-    glfwSetScrollCallback(m_window, VulkanInteractorStyleFreeCamera::OnMouseWheelInterface);
-    glfwSetWindowSizeCallback(m_window, VulkanInteractorStyleFreeCamera::OnWindowResizeInterface);
-    glfwSetFramebufferSizeCallback(m_window, VulkanInteractorStyleFreeCamera::OnFramebuffersResizeInterface);
 }
 
 void
@@ -164,157 +147,4 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     camera->setFocalPoint(fp);
 }
 
-void
-VulkanInteractorStyleFreeCamera::OnCharInterface(GLFWwindow * window, int keyID, int code, int type, int extra)
-{
-    VulkanInteractorStyleFreeCamera * style = (VulkanInteractorStyleFreeCamera *)glfwGetWindowUserPointer(window);
-    style->OnChar(keyID, type);
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMouseButtonInterface(GLFWwindow * window, int buttonID, int type, int extra)
-{
-    VulkanInteractorStyleFreeCamera * style = (VulkanInteractorStyleFreeCamera *)glfwGetWindowUserPointer(window);
-
-    switch (buttonID)
-    {
-    case GLFW_MOUSE_BUTTON_LEFT:
-        if (type == GLFW_PRESS)
-        {
-            style->OnLeftButtonDown();
-        }
-        else if (type == GLFW_RELEASE)
-        {
-            style->OnLeftButtonUp();
-        }
-        break;
-    case GLFW_MOUSE_BUTTON_RIGHT:
-        if (type == GLFW_PRESS)
-        {
-            style->OnRightButtonDown();
-        }
-        else if (type == GLFW_RELEASE)
-        {
-            style->OnRightButtonUp();
-        }
-        break;
-    case GLFW_MOUSE_BUTTON_MIDDLE:
-        if (type == GLFW_PRESS)
-        {
-            style->OnMiddleButtonDown();
-        }
-        else if (type == GLFW_RELEASE)
-        {
-            style->OnMiddleButtonUp();
-        }
-        break;
-    }
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMouseMoveInterface(GLFWwindow * window, double x, double y)
-{
-    VulkanInteractorStyleFreeCamera * style = (VulkanInteractorStyleFreeCamera *)glfwGetWindowUserPointer(window);
-    style->OnMouseMove(x, y);
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMouseWheelInterface(GLFWwindow * window, double x, double y)
-{
-    VulkanInteractorStyleFreeCamera * style = (VulkanInteractorStyleFreeCamera *)glfwGetWindowUserPointer(window);
-    if (y < 0)
-    {
-        style->OnMouseWheelBackward(y);
-    }
-    else
-    {
-        style->OnMouseWheelForward(y);
-    }
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnChar(int keyID, int type)
-{
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMouseMove(double x, double y)
-{
-    m_mousePos[0] = x;
-    m_mousePos[1] = y;
-    m_mousePosNormalized[0] = x;
-    m_mousePosNormalized[1] = y;
-    this->normalizeCoordinate(m_mousePosNormalized[0], m_mousePosNormalized[1]);
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnLeftButtonDown()
-{
-    m_state |= VulkanInteractorStyleFreeCamera::LEFT_MOUSE_DOWN;
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnLeftButtonUp()
-{
-    m_state &= ~VulkanInteractorStyleFreeCamera::LEFT_MOUSE_DOWN;
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMiddleButtonDown()
-{
-    m_state |= VulkanInteractorStyleFreeCamera::MIDDLE_MOUSE_DOWN;
-}
-
-void VulkanInteractorStyleFreeCamera::OnMiddleButtonUp()
-{
-    m_state &= ~VulkanInteractorStyleFreeCamera::MIDDLE_MOUSE_DOWN;
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnRightButtonDown()
-{
-    m_state |= VulkanInteractorStyleFreeCamera::RIGHT_MOUSE_DOWN;
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnRightButtonUp()
-{
-    m_state &= ~VulkanInteractorStyleFreeCamera::RIGHT_MOUSE_DOWN;
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMouseWheelForward(double y)
-{
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnMouseWheelBackward(double y)
-{
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnWindowResizeInterface(GLFWwindow * window, int width, int height)
-{
-    VulkanInteractorStyleFreeCamera * style = (VulkanInteractorStyleFreeCamera *)glfwGetWindowUserPointer(window);
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnFramebuffersResizeInterface(GLFWwindow * window, int width, int height)
-{
-    VulkanInteractorStyleFreeCamera * style = (VulkanInteractorStyleFreeCamera *)glfwGetWindowUserPointer(window);
-    style->OnWindowResize(width, height);
-}
-
-void
-VulkanInteractorStyleFreeCamera::OnWindowResize(int width, int height)
-{
-    m_viewer->resizeWindow(width, height);
-}
-
-void
-VulkanInteractorStyleFreeCamera::normalizeCoordinate(double &x, double &y)
-{
-    x = (x - m_viewer->m_width / 2) / m_viewer->m_width;
-    y = (y - m_viewer->m_height / 2) / m_viewer->m_height;
-}
 }

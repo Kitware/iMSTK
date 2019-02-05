@@ -89,7 +89,8 @@ protected:
         VkDeviceSize maxAllocationSize,
         VkDeviceSize offsetAlignment = 0);
 
-    static const VkDeviceSize c_allocationSize = 16 * 1024 * 1024; // ~16 MB
+    static const VkDeviceSize c_bufferAllocationSize = 16 * 1024 * 1024; // 16 MiB
+    static const VkDeviceSize c_imageAllocationSize = 128 * 1024 * 1024; // 128 MiB
     static VkDeviceSize getAlignedSize(VkDeviceSize size, VkDeviceSize alignment);
 
     std::map<VulkanMemoryType, std::vector<VulkanInternalMemory*>> m_memoryAllocations;

@@ -25,17 +25,19 @@
 
 namespace imstk
 {
-VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, unsigned int level)
+VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int level)
 {
     m_downsampleLevels = level;
+    m_numViews = numViews;
     auto width = renderer->m_width >> level;
     auto height = renderer->m_height >> level;
     this->createFramebuffer(renderer, width, height);
 }
 
-VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, unsigned int width, unsigned int height)
+VulkanPostProcess::VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int width, unsigned int height)
 {
     m_downsampleLevels = 0;
+    m_numViews = numViews;
     this->createFramebuffer(renderer, width, height);
 }
 
@@ -540,9 +542,15 @@ VulkanPostProcess::createRenderPass(VulkanRenderer * renderer)
     dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
+    uint32_t viewMask = m_numViews == 2 ? 3 : 1;
+    uint32_t correlationMask = m_numViews == 2 ? 3 : 1;
+
+    VkRenderPassMultiviewCreateInfo multiviewInfo;
+    VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
+
     VkRenderPassCreateInfo renderPassInfo;
     renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.pNext = nullptr;
+    renderPassInfo.pNext = &multiviewInfo;
     renderPassInfo.flags = 0;
     renderPassInfo.attachmentCount = (uint32_t)attachments.size();
     renderPassInfo.pAttachments = &attachments[0];
@@ -608,7 +616,9 @@ VulkanPostProcess::updateImageLayouts()
 }
 
 void
-VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, uint32_t queueFamily)
+VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer,
+    uint32_t queueFamily,
+    const uint32_t numViews)
 {
     if (m_framebuffer->m_colorFormat != VK_FORMAT_UNDEFINED)
     {
@@ -616,7 +626,8 @@ VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, u
             queueFamily,
             m_framebuffer->m_colorImage,
             VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            numViews);
     }
 
     if (m_framebuffer->m_depthFormat != VK_FORMAT_UNDEFINED)
@@ -625,7 +636,8 @@ VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, u
             queueFamily,
             m_framebuffer->m_depthImage,
             VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
-            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
+            VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+            numViews);
     }
 
     if (m_framebuffer->m_normalFormat != VK_FORMAT_UNDEFINED)
@@ -634,7 +646,8 @@ VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, u
             queueFamily,
             m_framebuffer->m_normalImage,
             VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            numViews);
     }
 
     if (m_framebuffer->m_specularFormat != VK_FORMAT_UNDEFINED)
@@ -643,7 +656,8 @@ VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer, u
             queueFamily,
             m_framebuffer->m_specularImage,
             VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            numViews);
     }
 }
 

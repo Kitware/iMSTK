@@ -68,11 +68,13 @@ protected:
 class VulkanAttachmentBarriers
 {
 public:
-    static void changeImageLayout(VkCommandBuffer * commandBuffer,
-                                  uint32_t queueFamilyIndex,
-                                  VulkanInternalImage * image,
-                                  VkImageLayout oldLayout,
-                                  VkImageLayout newLayout)
+    static void changeImageLayout(
+        VkCommandBuffer * commandBuffer,
+        uint32_t queueFamilyIndex,
+        VulkanInternalImage * image,
+        VkImageLayout oldLayout,
+        VkImageLayout newLayout,
+        const uint32_t numViews)
     {
         // Don't change layout if already there
         if (image->getImageLayout() == newLayout)
@@ -93,7 +95,7 @@ public:
         range.baseMipLevel = 0;
         range.levelCount = 1;
         range.baseArrayLayer = 0;
-        range.layerCount = 1;
+        range.layerCount = numViews;
 
         VkImageMemoryBarrier barrier;
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -129,8 +131,10 @@ public:
             return VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
             return VK_ACCESS_SHADER_READ_BIT;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+            return VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
         case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:
-            return VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+            return VK_ACCESS_SHADER_READ_BIT;
         case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
             return VK_ACCESS_TRANSFER_READ_BIT;
         default:
@@ -150,8 +154,10 @@ public:
             return VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
             return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
             return VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:
+            return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
         case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
             return VK_PIPELINE_STAGE_TRANSFER_BIT;
         default:

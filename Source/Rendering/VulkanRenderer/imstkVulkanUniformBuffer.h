@@ -40,7 +40,7 @@ struct VulkanLocalVertexUniforms
 
 struct VulkanLocalDecalVertexUniforms
 {
-    glm::mat4 transform[128];
+    glm::mat4 transforms[128];
 };
 
 struct VulkanLocalParticleVertexUniforms
@@ -61,7 +61,7 @@ struct VulkanLocalFragmentUniforms
 
 struct VulkanLocalDecalFragmentUniforms
 {
-    glm::mat4 inverse[128];
+    glm::mat4 inverses[128];
     glm::vec4 color;
     unsigned int receivesShadows;
     float emissivity;
@@ -88,16 +88,16 @@ struct VulkanLight
 
 struct VulkanGlobalVertexUniforms
 {
-    glm::mat4 projectionMatrix;
-    glm::mat4 viewMatrix;
-    glm::vec4 cameraPosition;
+    glm::mat4 projectionMatrices[2];
+    glm::mat4 viewMatrices[2];
+    glm::vec4 cameraPositions[2];
     VulkanLight lights[16];
 };
 
 struct VulkanGlobalFragmentUniforms
 {
-    glm::mat4 inverseViewMatrix;
-    glm::mat4 inverseProjectionMatrix;
+    glm::mat4 inverseViewMatrices[2];
+    glm::mat4 inverseProjectionMatrices[2];
     glm::vec4 resolution; // 2 resolution, 1 shadow map resolution
     VulkanLight lights[16];
     glm::mat4 lightMatrices[16];

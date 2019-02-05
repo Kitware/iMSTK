@@ -23,15 +23,32 @@
 
 namespace imstk
 {
-VulkanViewer::VulkanViewer(SimulationManager * manager)
+VulkanViewer::VulkanViewer(SimulationManager * manager, bool enableVR)
 {
     m_simManager = manager;
+    m_VRMode = false;
 
-    auto interactor = std::make_shared<VulkanInteractorStyle>();
+#ifdef iMSTK_ENABLE_VR
+    if (vr::VR_IsHmdPresent() && enableVR)
+    {
+        m_VRMode = enableVR;
+    }
+#endif
 
-    interactor->m_simManager = m_simManager;
-
-    m_interactorStyle = interactor;
+    if (m_VRMode)
+    {
+#ifdef iMSTK_ENABLE_VR
+        auto style = std::make_shared<VulkanInteractorStyleVR>();
+        style->m_simManager = m_simManager;
+        m_interactorStyle = style;
+#endif
+    }
+    else
+    {
+        auto style = std::make_shared<VulkanInteractorStyleFreeCamera>();
+        style->m_simManager = m_simManager;
+        m_interactorStyle = style;
+    }
 
     // Create GUI
     ImGui::CreateContext();
@@ -100,24 +117,23 @@ VulkanViewer::startRenderingLoop()
     m_running = true;
 
 #ifdef iMSTK_ENABLE_VR
-    if (m_renderer->m_VRMode)
+    if (m_VRMode)
     {
-        if (vr::VR_IsHmdPresent())
+        m_renderer->m_VRMode = true;
+
+        vr::EVRInitError error;
+        m_renderer->m_VRSystem = vr::VR_Init(&error, vr::EVRApplicationType::VRApplication_Scene);
+
+        if (error != vr::EVRInitError::VRInitError_None)
         {
-            vr::EVRInitError error;
-            m_renderer->m_VRSystem = vr::VR_Init(&error, vr::EVRApplicationType::VRApplication_Scene);
-            if (error != vr::EVRInitError::VRInitError_None)
-            {
-                LOG(WARNING) << "VR initialization error: " << error;
-            }
-            m_renderer->m_VRSystem->GetRecommendedRenderTargetSize(&m_width, &m_height);
-            m_windowWidth = m_width;
-            m_windowHeight = m_height;
+            LOG(FATAL) << "VR initialization error: " << error;
         }
-        else
-        {
-            m_renderer->m_VRMode = false;
-        }
+        auto interactor = std::dynamic_pointer_cast<VulkanInteractorStyleVR>(m_interactorStyle);
+        interactor->m_renderer = m_renderer;
+
+        m_renderer->m_VRSystem->GetRecommendedRenderTargetSize(&m_width, &m_height);
+        m_windowWidth = m_width;
+        m_windowHeight = m_height;
     }
 #endif
 

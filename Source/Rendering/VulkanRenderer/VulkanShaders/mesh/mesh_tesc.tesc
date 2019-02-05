@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 // PN triangles implementation
 
@@ -17,9 +17,9 @@ struct light
 
 layout (set = 0, binding = 0) uniform globalUniforms
 {
-    mat4 projectionMatrix;
-    mat4 viewMatrix;
-    vec4 cameraPosition;
+    mat4 projectionMatrices[2];
+    mat4 viewMatrices[2];
+    vec4 cameraPositions[2];
     light lights[16];
 } globals;
 
@@ -34,6 +34,7 @@ layout(location = 0) in vertexData{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
+    flat uint view;
 }vertex[];
 
 layout (location = 0) out vertexDataTessellation{
@@ -42,9 +43,10 @@ layout (location = 0) out vertexDataTessellation{
     vec2 uv;
     mat3 TBN;
     vec3 cameraPosition;
+    flat uint view;
 }vertexTessellation[];
 
-layout (location = 7) patch out TrianglePatch
+layout (location = 8) patch out TrianglePatch
 {
     vec3 b300;
     vec3 b030;
@@ -100,6 +102,7 @@ void main(void)
     vertexTessellation[gl_InvocationID].uv = vertex[gl_InvocationID].uv;
     vertexTessellation[gl_InvocationID].TBN = vertex[gl_InvocationID].TBN;
     vertexTessellation[gl_InvocationID].cameraPosition = vertex[gl_InvocationID].cameraPosition;
+    vertexTessellation[gl_InvocationID].view = vertex[gl_InvocationID].view;
 
     // Calculate patch control point positions
     trianglePatch.b300 = vertex[0].position;

@@ -86,6 +86,7 @@ public:
 
 protected:
     friend class VulkanViewer;
+    friend class VulkanInteractorStyleVR;
     friend class VulkanMaterialDelegate;
     friend class VulkanPostProcess;
     friend class VulkanPostProcessingChain;
@@ -300,6 +301,7 @@ protected:
     std::vector<VkImageView> m_HDRImageView[3];
     uint32_t m_mipLevels = 1;
 
+    // For noise-post processing
     std::shared_ptr<Texture> m_noiseTexture = nullptr;
     std::shared_ptr<VulkanTextureDelegate> m_noiseTextureDelegate = nullptr;
 
@@ -308,7 +310,7 @@ protected:
     std::shared_ptr<VulkanFramebuffer> m_particleFramebuffer;
     std::shared_ptr<VulkanFramebuffer> m_depthFramebuffer;
 
-    std::shared_ptr<VulkanPostProcess> m_HDRTonemaps;
+    std::vector<std::shared_ptr<VulkanPostProcess>> m_HDRTonemaps; // One for each eye
     std::vector<std::shared_ptr<VulkanPostProcess>> m_ssao;
     std::vector<std::shared_ptr<VulkanPostProcess>> m_downSample;
 
@@ -349,10 +351,15 @@ protected:
 
     std::map<std::shared_ptr<Texture>, std::shared_ptr<VulkanTextureDelegate>> m_textureMap;
 
+    uint32_t m_numViews = 1; ///< for multiview functionality
+
+    glm::mat4 m_viewMatrices[2];
+    glm::mat4 m_projectionMatrices[2];
+    glm::vec4 m_cameraPositions[2];
+    bool m_VRMode = false;
+
 #ifdef iMSTK_ENABLE_VR
     vr::IVRSystem *m_VRSystem;
-    bool m_VRMode;
-    vr::TrackedDevicePose_t m_devicePose;
 #endif
 };
 }

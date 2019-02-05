@@ -142,7 +142,7 @@ VulkanMemoryManager::requestBuffer(VkDevice& device,
         info.size = getAlignedSize(info.size, m_deviceProperties.limits.minUniformBufferOffsetAlignment);
         break;
     default:
-        allocationSize = c_allocationSize;
+        allocationSize = c_bufferAllocationSize;
         break;
     }
 
@@ -204,7 +204,7 @@ VulkanMemoryManager::requestImage(VkDevice& device,
     newImage->m_memoryOffset = 0;
     newImage->m_size = requirements.size;
 
-    auto memoryAllocation = this->requestMemoryAllocation(requirements, type, c_allocationSize, requirements.alignment);
+    auto memoryAllocation = this->requestMemoryAllocation(requirements, type, c_imageAllocationSize, requirements.alignment);
     newImage->m_memoryOffset = this->getAlignedSize(memoryAllocation->m_lastOffset, requirements.alignment);
     vkBindImageMemory(device, *newImage->getImage(), *memoryAllocation->getMemory(), newImage->m_memoryOffset);
 

@@ -17,12 +17,14 @@ set(VTK_CPP_FILES
 set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanInteractorStyle.h
     VulkanRenderer/imstkVulkanInteractorStyleFreeCamera.h
+    VulkanRenderer/imstkVulkanInteractorStyleVR.h
     VulkanRenderer/imstkVulkanScreenCaptureUtility.h
     VulkanRenderer/imstkVulkanViewer.h)
 
 set(VULKAN_CPP_FILES
     VulkanRenderer/imstkVulkanInteractorStyle.cpp
     VulkanRenderer/imstkVulkanInteractorStyleFreeCamera.cpp
+    VulkanRenderer/imstkVulkanInteractorStyleVR.cpp
     VulkanRenderer/imstkVulkanScreenCaptureUtility.cpp
     VulkanRenderer/imstkVulkanViewer.cpp)
 

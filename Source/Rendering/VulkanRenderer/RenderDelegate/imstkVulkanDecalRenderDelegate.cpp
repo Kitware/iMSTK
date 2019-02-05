@@ -93,8 +93,8 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
     for (auto decal : geometry->getDecals())
     {
         decal->updateDecal(viewMatrix);
-        m_decalVertexUniforms.transform[index] = decal->m_transform;
-        m_decalFragmentUniforms.inverse[index] = decal->m_inverse;
+        m_decalVertexUniforms.transforms[index] = decal->m_transform;
+        m_decalFragmentUniforms.inverses[index] = decal->m_inverse;
         index++;
     }
 

@@ -1,13 +1,14 @@
-#version 450
+#version 460
 
-layout (set = 0, binding = 0) uniform sampler2D colorTexture;
-layout (set = 0, binding = 1) uniform sampler2D depthTexture;
-layout (set = 0, binding = 2) uniform sampler2D normalTexture;
+layout (set = 0, binding = 0) uniform sampler2DArray colorTexture;
+layout (set = 0, binding = 1) uniform sampler2DArray depthTexture;
+layout (set = 0, binding = 2) uniform sampler2DArray normalTexture;
 
 layout (location = 0) out vec4 finalColor;
 
 layout (location = 3) in vertexData{
     vec2 uv;
+    flat uint view;
 }vertex;
 
 layout (push_constant) uniform pushConstants
@@ -39,13 +40,13 @@ void main(void)
 {
     vec3 inputColor = vec3(0);
 
-    vec4 normal = texture(normalTexture, vertex.uv);
+    vec4 normal = texture(normalTexture, vec3(vertex.uv, vertex.view));
     float sss = normal.a;
 
 
     if (sss >= 0.001)
     {
-        float depth = getLinearDepth(texture(depthTexture, vertex.uv).r);
+        float depth = getLinearDepth(texture(depthTexture, vec3(vertex.uv, vertex.view)).r);
         float dx = 0.001 / (tan(constants.fov / 2.0) * depth);
         dx = dx * normal.a / (constants.kernelWidth);
 
@@ -54,37 +55,37 @@ void main(void)
         for (int i = 1; i < constants.numSamples; i++)
         {
             vec2 offset = vec2(i * dx) * constants.direction;
-            float partOfMeshPos = texture(normalTexture, vertex.uv + offset).a;
-            float partOfMeshNeg = texture(normalTexture, vertex.uv - offset).a;
+            float partOfMeshPos = texture(normalTexture, vec3(vertex.uv + offset, vertex.view)).a;
+            float partOfMeshNeg = texture(normalTexture, vec3(vertex.uv - offset, vertex.view)).a;
 
-            depth = getLinearDepth(texture(depthTexture, vertex.uv + offset).r);
+            depth = getLinearDepth(texture(depthTexture, vec3(vertex.uv + offset, vertex.view)).r);
             maxValue += separableKernel(i/(constants.numSamples), w, near, far, depth) * partOfMeshPos;
 
-            depth = getLinearDepth(texture(depthTexture, vertex.uv - offset).r);
+            depth = getLinearDepth(texture(depthTexture, vec3(vertex.uv - offset, vertex.view)).r);
             maxValue += separableKernel(-i/(constants.numSamples), w, near, far, depth) * partOfMeshNeg;
         }
 
-        inputColor += texture(colorTexture, vertex.uv).rgb * separableKernel(0, w, near, far, depth) * sss;
+        inputColor += texture(colorTexture, vec3(vertex.uv, vertex.view)).rgb * separableKernel(0, w, near, far, depth) * sss;
 
         for (int i = 1; i < constants.numSamples; i++)
         {
             vec2 offset = vec2(i * dx) * constants.direction;
-            float partOfMeshPos = texture(normalTexture, vertex.uv + offset).a;
-            float partOfMeshNeg = texture(normalTexture, vertex.uv - offset).a;
+            float partOfMeshPos = texture(normalTexture, vec3(vertex.uv + offset, vertex.view)).a;
+            float partOfMeshNeg = texture(normalTexture, vec3(vertex.uv - offset, vertex.view)).a;
 
-            vec3 color = texture(colorTexture, vertex.uv + offset).rgb;
-            depth = getLinearDepth(texture(depthTexture, vertex.uv + offset).r);
+            vec3 color = texture(colorTexture, vec3(vertex.uv + offset, vertex.view)).rgb;
+            depth = getLinearDepth(texture(depthTexture, vec3(vertex.uv + offset, vertex.view)).r);
             inputColor += color * separableKernel(i/(constants.numSamples), w, near, far, depth) * partOfMeshPos;
 
-            color = texture(colorTexture, vertex.uv - offset).rgb;
-            depth = getLinearDepth(texture(depthTexture, vertex.uv - offset).r);
+            color = texture(colorTexture, vec3(vertex.uv - offset, vertex.view)).rgb;
+            depth = getLinearDepth(texture(depthTexture, vec3(vertex.uv - offset, vertex.view)).r);
             inputColor += color * separableKernel(-i/(constants.numSamples), w, near, far, depth) * partOfMeshNeg;
         }
         inputColor = inputColor / maxValue;
     }
     else
     {
-        inputColor = texture(colorTexture, vertex.uv).rgb;
+        inputColor = texture(colorTexture, vec3(vertex.uv, vertex.view)).rgb;
     }
 
     finalColor = vec4(inputColor, 1);

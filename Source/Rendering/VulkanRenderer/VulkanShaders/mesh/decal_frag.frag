@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 layout (location = 0) out vec4 outputColor;
 layout (location = 1) out vec4 outputSpecular;
@@ -26,8 +26,8 @@ struct light
 
 layout (set = 1, binding = 0) uniform globalUniforms
 {
-    mat4 inverseViewMatrix;
-    mat4 inverseProjectionMatrix;
+    mat4 inverseViewMatrices[2];
+    mat4 inverseProjectionMatrices[2];
     vec4 resolution;
     light lights[16];
     mat4 lightMatrices[16];
@@ -50,6 +50,7 @@ layout (location = 0) in vertexData{
     mat3 TBN;
     vec3 cameraPosition;
     flat int index;
+    flat uint view;
 }vertex;
 
 layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
@@ -62,9 +63,9 @@ layout (set = 1, binding = 8) uniform sampler2DArray shadowArray;
 layout (set = 1, binding = 9) uniform samplerCube irradianceCubemapTexture;
 layout (set = 1, binding = 10) uniform samplerCube radianceCubemapTexture;
 layout (set = 1, binding = 11) uniform sampler2D brdfLUTTexture;
-layout (set = 1, binding = 12) uniform sampler2D aoBuffer;
-layout (set = 1, binding = 13) uniform sampler2D depthAttachment;
-layout (set = 1, binding = 14) uniform sampler2D normalAttachment;
+layout (set = 1, binding = 12) uniform sampler2DArray aoBuffer;
+layout (set = 1, binding = 13) uniform sampler2DArray depthAttachment;
+layout (set = 1, binding = 14) uniform sampler2DArray normalAttachment;
 
 // Constants
 const float PI = 3.1415;
@@ -99,7 +100,7 @@ vec3 reconstructPosition(float depth);
 
 void main(void)
 {
-    position = vec4(reconstructPosition(texture(depthAttachment, gl_FragCoord.xy/globals.resolution.xy).x), 1);
+    position = vec4(reconstructPosition(texture(depthAttachment, vec3(gl_FragCoord.xy/globals.resolution.xy, vertex.view)).x), 1);
 
     vec4 decalSpacePosition = locals.inverse[vertex.index] * position;
     uv = decalSpacePosition.xy + 0.5;
@@ -110,7 +111,7 @@ void main(void)
 
     readTextures();
 
-    normal = texture(normalAttachment, gl_FragCoord.xy/globals.resolution.xy).rgb;
+    normal = texture(normalAttachment, vec3(gl_FragCoord.xy/globals.resolution.xy, vertex.view)).rgb;
 
     // If it's 0, then there's a divide by zero error
     roughness = max(roughness * roughness, 0.0001);
@@ -226,7 +227,7 @@ void calculateIndirectLighting()
         }
     }
 
-    float ao = min(texture(aoBuffer, gl_FragCoord.xy / (textureSize(aoBuffer, 0) * 2)).r, ambientOcclusion);
+    float ao = min(texture(aoBuffer, vec3(gl_FragCoord.xy / (textureSize(aoBuffer, 0) * 2).xy, vertex.view)).r, ambientOcclusion);
     finalDiffuse += indirectDiffuse * k_d * ao;
     finalSpecular += indirectSpecular * specularColor * ao;
 }
@@ -320,10 +321,10 @@ vec3 reconstructPosition(float depth)
     coords.z = depth;
 
     vec4 pos = vec4(coords, 1);
-    pos = globals.inverseProjectionMatrix * pos;
+    pos = globals.inverseProjectionMatrices[vertex.view] * pos;
     pos /= pos.w;
 
-    pos = globals.inverseViewMatrix * pos;
+    pos = globals.inverseViewMatrices[vertex.view] * pos;
 
     return pos.xyz;
 }

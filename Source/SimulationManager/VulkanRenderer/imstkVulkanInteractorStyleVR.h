@@ -19,54 +19,45 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanInteractorStyleFreeCamera_h
-#define imstkVulkanInteractorStyleFreeCamera_h
+#ifndef imstkVulkanInteractorStyleVR_h
+#define imstkVulkanInteractorStyleVR_h
 
-#include "GLFW/glfw3.h"
+#ifdef iMSTK_ENABLE_VR
 
-#include <iostream>
-#include <unordered_map>
-#include <functional>
+#include "openvr.h"
 
-#include "glm/glm.hpp"
-#include "glm/gtx/transform.hpp"
-
-#include "imstkMath.h"
 #include "imstkTimer.h"
-#include "imstkRenderer.h"
+#include "imstkInteractorStyle.h"
+#include "imstkVulkanRenderer.h"
 #include "imstkVulkanInteractorStyle.h"
 
 namespace imstk
 {
-class VulkanViewer;
-class SimulationManager;
 
 ///
-/// \class VulkanInteractorStyleFreeCamera
+/// \class VulkanInteractorStyleVR
 ///
-/// \brief Default camera movement class
+/// \brief Interactor for VR
 ///
-class VulkanInteractorStyleFreeCamera : public VulkanInteractorStyle
+class VulkanInteractorStyleVR : public VulkanInteractorStyle
 {
 public:
-    VulkanInteractorStyleFreeCamera();
-    ~VulkanInteractorStyleFreeCamera(){};
+    ///
+    /// \brief Default constructor
+    ///
+    VulkanInteractorStyleVR();
 
-    ///
-    /// \brief Controls camera movement
-    ///
     virtual void OnTimer();
 
 protected:
-    friend class VulkanViewer;
-
-    double m_lastTime = 0; ///< Last frame time
-    Vec3d m_simCameraPosition; ///< Saved simulation mode camera position
-    Vec3d m_simCameraFocalPoint; ///< Saved simulation mode camera focal point
-    float m_cameraAngle = 0; ///< Angle created by changes in vertical cursor position
-
-    bool m_started = false; ///< Used to initialized variables
+    friend VulkanViewer;
+    vr::TrackedDevicePose_t m_devicePoses[vr::k_unMaxTrackedDeviceCount];
+    vr::TrackedDeviceClass m_deviceClasses[vr::k_unMaxTrackedDeviceCount];
+    std::shared_ptr<VulkanRenderer> m_renderer;
 };
+
 }
+
+#endif
 
 #endif
