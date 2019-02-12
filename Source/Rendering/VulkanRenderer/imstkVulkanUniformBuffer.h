@@ -43,6 +43,11 @@ struct VulkanLocalDecalVertexUniforms
     glm::mat4 transform[128];
 };
 
+struct VulkanLocalParticleVertexUniforms
+{
+    glm::mat4 transform[128];
+};
+
 struct VulkanLocalFragmentUniforms
 {
     glm::mat4 transform;
@@ -62,6 +67,15 @@ struct VulkanLocalDecalFragmentUniforms
     float emissivity;
     float roughness;
     float metalness;
+};
+
+struct VulkanLocalParticleFragmentUniforms
+{
+    glm::vec4 color[128];
+    unsigned int receivesShadows[128];
+    float emissivity[128];
+    float roughness[128];
+    float metalness[128];
 };
 
 struct VulkanLight

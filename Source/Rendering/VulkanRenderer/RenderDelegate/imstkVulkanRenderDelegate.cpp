@@ -39,6 +39,7 @@
 #include "imstkVulkanSurfaceMeshRenderDelegate.h"
 #include "imstkVulkanDecalRenderDelegate.h"
 #include "imstkVulkanLineMeshRenderDelegate.h"
+#include "imstkVulkanParticleRenderDelegate.h"
 
 namespace imstk
 {
@@ -99,6 +100,10 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
     case Geometry::Type::DecalPool:
     {
         return std::make_shared<VulkanDecalRenderDelegate>(visualModel, type, memoryManager);
+    }
+    case Geometry::Type::RenderParticles:
+    {
+        return std::make_shared<VulkanParticleRenderDelegate>(visualModel, type, memoryManager);
     }
     default:
     {

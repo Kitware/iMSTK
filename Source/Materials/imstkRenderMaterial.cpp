@@ -248,15 +248,34 @@ RenderMaterial::setCastsShadows(const bool castsShadows)
     m_castsShadows = castsShadows;
 }
 
-bool RenderMaterial::getCastsShadows() const
+bool
+RenderMaterial::getCastsShadows() const
 {
     return m_castsShadows;
+}
+
+void
+RenderMaterial::setBlendMode(const RenderMaterial::BlendMode blendMode)
+{
+    m_blendMode = blendMode;
+}
+
+const RenderMaterial::BlendMode
+RenderMaterial::getBlendMode()
+{
+    return m_blendMode;
 }
 
 bool
 RenderMaterial::isDecal()
 {
     return m_isDecal;
+}
+
+bool
+RenderMaterial::isParticle()
+{
+    return m_isParticle;
 }
 
 bool

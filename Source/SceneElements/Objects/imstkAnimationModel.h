@@ -19,23 +19,52 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
+#ifndef imstkAnimationModel_h
+#define imstkAnimationModel_h
 
-#include "vulkan/vulkan.h"
+#include <memory>
+
+#include "imstkGeometry.h"
 
 namespace imstk
 {
-class VulkanRenderPassGenerator
+///
+/// \class AnimationModel
+///
+/// \brief Contains geometric and animation render information
+///
+class AnimationModel
 {
 public:
-    static void generateDepthRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateParticleRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateShadowRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateGUIRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-};
-}
+    ///
+    /// \brief Constructor
+    ///
+    AnimationModel(std::shared_ptr<Geometry> geometry);
 
-#endif
+    AnimationModel() = delete;
+
+    ///
+    /// \brief Get/set geometry
+    ///
+    std::shared_ptr<Geometry> getGeometry();
+    virtual void setGeometry(std::shared_ptr<Geometry> geometry);
+
+    ///
+    /// \brief Update animation
+    ///
+    virtual void update() {};
+
+    ///
+    /// \brief Reset animation
+    ///
+    virtual void reset() {};
+
+protected:
+    friend class VulkanRenderer;
+    friend class VTKRenderer;
+
+    std::shared_ptr<Geometry> m_geometry = nullptr;
+};
+} // imstk
+
+#endif // ifndef imstkAnimationModel_h

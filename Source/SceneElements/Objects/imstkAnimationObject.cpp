@@ -19,23 +19,19 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
-
-#include "vulkan/vulkan.h"
+#include "imstkAnimationObject.h"
 
 namespace imstk
 {
-class VulkanRenderPassGenerator
+std::shared_ptr<AnimationModel>
+AnimationObject::getAnimationModel() const
 {
-public:
-    static void generateDepthRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateOpaqueRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateDecalRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateParticleRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateShadowRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-    static void generateGUIRenderPass(VkDevice& device, VkRenderPass& renderPass, VkSampleCountFlagBits& samples);
-};
+    return m_animationModel;
 }
 
-#endif
+void
+AnimationObject::setAnimationModel(std::shared_ptr<AnimationModel> model)
+{
+    m_animationModel = model;
+}
+} // imstk

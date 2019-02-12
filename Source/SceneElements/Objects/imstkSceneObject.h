@@ -44,6 +44,7 @@ public:
     enum class Type
     {
         Visual,
+        Animation,
         Colliding,
         Rigid,
         FEMDeformable,

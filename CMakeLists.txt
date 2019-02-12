@@ -343,6 +343,7 @@ add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Materials)
 add_subdirectory(Source/GUIOverlay)
+add_subdirectory(Source/Animation)
 
 #--------------------------------------------------------------------------
 # Export Targets

@@ -39,7 +39,9 @@
 #include "imstkScene.h"
 #include "imstkRenderer.h"
 #include "imstkDecalPool.h"
+#include "imstkRenderParticleEmitter.h"
 #include "imstkTextureManager.h"
+#include "imstkAnimationObject.h"
 
 #include "imstkVulkanValidation.h"
 #include "imstkVulkanVertexBuffer.h"
@@ -47,6 +49,7 @@
 #include "imstkVulkanRenderDelegate.h"
 #include "imstkVulkanMaterialDelegate.h"
 #include "imstkVulkanDecalRenderDelegate.h"
+#include "imstkVulkanParticleRenderDelegate.h"
 #include "imstkVulkanPostProcess.h"
 #include "imstkVulkanPostProcessingChain.h"
 #include "imstkVulkanMemoryManager.h"
@@ -244,6 +247,7 @@ protected:
     VkRenderPass m_depthRenderPass;
     VkRenderPass m_opaqueRenderPass;
     VkRenderPass m_decalRenderPass;
+    VkRenderPass m_particleRenderPass;
     VkRenderPass m_GUIRenderPass;
 
     // Swapchain
@@ -276,6 +280,7 @@ protected:
 
     std::shared_ptr<VulkanFramebuffer> m_opaqueFramebuffer;
     std::shared_ptr<VulkanFramebuffer> m_decalFramebuffer;
+    std::shared_ptr<VulkanFramebuffer> m_particleFramebuffer;
     std::shared_ptr<VulkanFramebuffer> m_depthFramebuffer;
 
     std::vector<std::shared_ptr<VulkanPostProcess>> m_HDRTonemaps;
