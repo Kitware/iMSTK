@@ -617,8 +617,8 @@ VulkanPostProcess::updateImageLayouts()
 
 void
 VulkanPostProcess::setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer,
-    uint32_t queueFamily,
-    const uint32_t numViews)
+                                              uint32_t queueFamily,
+                                              const uint32_t numViews)
 {
     if (m_framebuffer->m_colorFormat != VK_FORMAT_UNDEFINED)
     {

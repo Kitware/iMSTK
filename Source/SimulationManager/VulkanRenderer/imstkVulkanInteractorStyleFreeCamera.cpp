@@ -146,5 +146,4 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     fp = angleTempOffset + camera->getPosition();
     camera->setFocalPoint(fp);
 }
-
 }

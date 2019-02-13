@@ -770,8 +770,6 @@ VulkanRenderer::deleteFramebuffers()
 void
 VulkanRenderer::renderFrame()
 {
-    vkDeviceWaitIdle(m_renderDevice);
-
     m_frameNumber++;
 
     // The swapchain contains multiple buffers, so get one that is available (i.e., not currently being written to)
@@ -1181,7 +1179,8 @@ VulkanRenderer::renderFrame()
     }
 
     // Render pass: HDR tonemap
-    for (unsigned int i = 0; i < m_HDRTonemaps.size(); i++) {
+    for (unsigned int i = 0; i < m_HDRTonemaps.size(); i++)
+    {
         auto postProcessRenderPassBeginInfo = opaqueRenderPassBeginInfo;
         postProcessRenderPassBeginInfo.renderArea.extent = {m_HDRTonemaps[i]->m_framebuffer->m_width, m_HDRTonemaps[i]->m_framebuffer->m_height};
         postProcessRenderPassBeginInfo.renderPass = m_HDRTonemaps[i]->m_renderPass;
@@ -1591,7 +1590,8 @@ VulkanRenderer::updateGlobalUniforms(uint32_t frameIndex)
             m_globalVertexUniforms.cameraPositions[0] = m_cameraPositions[0];
             m_globalVertexUniforms.cameraPositions[1] = m_cameraPositions[1];
         }
-        else {
+        else
+        {
             // Projection matrix
             auto camera = m_scene->getCamera();
             m_fov = (float)glm::radians(camera->getFieldOfView());
@@ -1610,7 +1610,6 @@ VulkanRenderer::updateGlobalUniforms(uint32_t frameIndex)
             m_globalVertexUniforms.viewMatrices[0] = glm::lookAt(eye, center, up);
             m_globalVertexUniforms.viewMatrices[1] = m_globalVertexUniforms.viewMatrices[0];
         }
-
     }
 
     // Lights uniforms

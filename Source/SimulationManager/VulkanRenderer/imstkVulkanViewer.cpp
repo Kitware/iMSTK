@@ -129,7 +129,7 @@ VulkanViewer::startRenderingLoop()
             LOG(FATAL) << "VR initialization error: " << error;
         }
         auto interactor = std::dynamic_pointer_cast<VulkanInteractorStyleVR>(m_interactorStyle);
-        interactor->m_renderer = m_renderer;
+        interactor->initialize(m_renderer);
 
         m_renderer->m_VRSystem->GetRecommendedRenderTargetSize(&m_width, &m_height);
         m_windowWidth = m_width;
@@ -153,6 +153,7 @@ VulkanViewer::startRenderingLoop()
 
     while (!glfwWindowShouldClose(m_window))
     {
+        std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
         glfwPollEvents();
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -163,7 +164,6 @@ VulkanViewer::startRenderingLoop()
         ImGui::Render();
 
         m_renderer->renderFrame();
-        std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
     }
 
     glfwTerminate();

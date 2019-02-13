@@ -364,5 +364,4 @@ VulkanInteractorStyle::OnMouseWheelInterface(GLFWwindow * window, double x, doub
         style->OnMouseWheelForward(y);
     }
 }
-
 }

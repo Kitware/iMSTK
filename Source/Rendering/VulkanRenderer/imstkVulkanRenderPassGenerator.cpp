@@ -614,5 +614,4 @@ VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(
     multiviewInfo.correlationMaskCount = 1;
     multiviewInfo.pCorrelationMasks = &correlationMask;
 }
-
 }

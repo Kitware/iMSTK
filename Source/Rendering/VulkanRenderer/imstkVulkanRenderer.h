@@ -193,7 +193,16 @@ protected:
                     unsigned int windowWidth,
                     unsigned int windowHeight);
     void loadAllVisualModels();
-    std::shared_ptr<VulkanRenderDelegate> loadVisualModel(std::shared_ptr<VisualModel> visualModel, SceneObject::Type type);
+
+    ///
+    /// \brief Load visual model
+    /// \param visualModel visual model to use to create render delegate
+    /// \param type type of scene object (determines renderer implemetation)
+    /// \returns Render delegate
+    ///
+    std::shared_ptr<VulkanRenderDelegate> loadVisualModel(
+        std::shared_ptr<VisualModel> visualModel,
+        SceneObject::Type type);
 
     ///
     /// \brief Sets some command buffer state

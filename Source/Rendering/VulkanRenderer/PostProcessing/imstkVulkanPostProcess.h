@@ -82,8 +82,8 @@ protected:
     /// \brief Set image attachments to a readable layout
     ///
     void setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer,
-        uint32_t queueFamily,
-        const uint32_t numViews);
+                                    uint32_t queueFamily,
+                                    const uint32_t numViews);
 
     void createDescriptors(VulkanRenderer * renderer);
     void createDescriptorSetLayouts(VulkanRenderer * renderer);
