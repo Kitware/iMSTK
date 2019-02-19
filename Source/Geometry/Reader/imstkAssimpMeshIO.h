@@ -44,15 +44,32 @@ public:
     /// \brief Ensures file can be read and reads it if possible
     /// \param filePath path to file
     /// \param type mesh file type
+    /// \returns iMSTK surface mesh
     ///
-    static std::shared_ptr<SurfaceMesh> read(const std::string& filePath, MeshFileType type);
+    static std::shared_ptr<SurfaceMesh> read(
+        const std::string& filePath,
+        MeshFileType type);
 
-protected:
     ///
     /// \brief Reads mesh data and returns mesh
     /// \param filePath
+    /// \returns iMSTK surface mesh
     ///
     static std::shared_ptr<SurfaceMesh> readMeshData(const std::string& filePath);
+
+    ///
+    /// \brief Convert from Assimp mesh to iMSTK surface mesh
+    /// \param importedMesh Assimp mesh to covert
+    /// \returns iMSTK surface mesh
+    ///
+    static std::shared_ptr<SurfaceMesh> convertAssimpMesh(aiMesh * importedMesh);
+
+    ///
+    /// \brief Helper function for getting default post processing flags
+    /// \returns Bit mask of default flags
+    /// This function should be used to ensure consistency among different loaders
+    ///
+    static unsigned int getDefaultPostProcessSteps();
 };
 }
 

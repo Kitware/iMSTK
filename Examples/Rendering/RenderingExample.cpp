@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkAPIUtilities.h"
+#include "imstkVisualObjectImporter.h"
 
 using namespace imstk;
 
@@ -33,6 +34,13 @@ int main()
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("Rendering");
+
+    // Add IBL Probe
+    auto globalIBLProbe = std::make_shared<IBLProbe>(
+        iMSTK_DATA_ROOT "/IBL/roomIrradiance.dds",
+        iMSTK_DATA_ROOT "/IBL/roomRadiance.dds",
+        iMSTK_DATA_ROOT "/IBL/roomBRDF.png");
+    scene->setGlobalIBLProbe(globalIBLProbe);
 
     // Head mesh
     auto head = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
@@ -55,7 +63,6 @@ int main()
     auto headModel = std::make_shared<VisualModel>(headMesh);
     headModel->setRenderMaterial(headMaterial);
     headObject->addVisualModel(headModel);
-
     scene->addSceneObject(headObject);
 
     // Position camera
@@ -97,7 +104,7 @@ int main()
 
 #ifdef iMSTK_USE_Vulkan
     auto viewer = std::dynamic_pointer_cast<VulkanViewer>(sdk->getViewer());
-    viewer->setResolution(800, 600);
+    viewer->setResolution(1000, 800);
     viewer->disableVSync();
     //viewer->enableFullscreen();
 #endif

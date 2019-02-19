@@ -85,8 +85,6 @@ public:
     ///
     static bool fileExists(const std::string& file);
 
-protected:
-
     ///
     /// \brief Returns the type of the file
     ///
