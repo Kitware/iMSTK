@@ -26,7 +26,6 @@ namespace imstk
 VulkanViewer::VulkanViewer(SimulationManager * manager, bool enableVR)
 {
     m_simManager = manager;
-    m_VRMode = false;
 
 #ifdef iMSTK_ENABLE_VR
     if (vr::VR_IsHmdPresent() && enableVR)
@@ -187,6 +186,14 @@ VulkanViewer::getRenderingMode()
 {
     return m_renderer->getMode();
 }
+
+#ifdef iMSTK_ENABLE_VR
+vr::IVRSystem *
+VulkanViewer::getVRSystem()
+{
+    return m_renderer->m_VRSystem;
+}
+#endif
 
 void
 VulkanViewer::setupWindow()

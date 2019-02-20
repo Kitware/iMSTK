@@ -98,6 +98,14 @@ public:
     ///
     void enableLensDistortion(const float distortion);
 
+#ifdef iMSTK_ENABLE_VR
+    ///
+    /// \brief Utility function to get VR system
+    /// \returns OpenVR system
+    ///
+    vr::IVRSystem * getVRSystem();
+#endif
+
 protected:
     friend class VulkanInteractorStyle;
     friend class VulkanInteractorStyleFreeCamera;
