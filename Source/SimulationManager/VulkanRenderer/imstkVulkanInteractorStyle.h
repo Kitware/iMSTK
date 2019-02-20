@@ -108,20 +108,6 @@ private:
 
     Renderer::Mode m_lastFrameMode = Renderer::Mode::EMPTY; ///< Last frame mode
     unsigned int m_state = 0;
-
-    /// Custom event handlers
-    /// Return true to override default event slot
-    std::unordered_map<char, EventHandlerFunction> m_onCharFunctionMap;
-    EventHandlerFunction m_onMouseMoveFunction;
-    EventHandlerFunction m_onLeftButtonDownFunction;
-    EventHandlerFunction m_onLeftButtonUpFunction;
-    EventHandlerFunction m_onMiddleButtonDownFunction;
-    EventHandlerFunction m_onMiddleButtonUpFunction;
-    EventHandlerFunction m_onRightButtonDownFunction;
-    EventHandlerFunction m_onRightButtonUpFunction;
-    EventHandlerFunction m_onMouseWheelForwardFunction;
-    EventHandlerFunction m_onMouseWheelBackwardFunction;
-    EventHandlerFunction m_onTimerFunction;
 };
 }
 
