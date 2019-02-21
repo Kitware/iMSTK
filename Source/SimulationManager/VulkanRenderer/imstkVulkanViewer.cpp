@@ -87,6 +87,12 @@ VulkanViewer::setResolution(unsigned int width, unsigned int height)
 }
 
 void
+VulkanViewer::enableLensDistortion(const float distortion)
+{
+    m_renderer->enableLensDistortion(distortion);
+}
+
+void
 VulkanViewer::startRenderingLoop()
 {
     m_running = true;
