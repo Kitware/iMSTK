@@ -25,6 +25,8 @@
 #include <string>
 #include <memory>
 
+#include "g3log/g3log.hpp"
+
 namespace imstk
 {
 ///
@@ -52,6 +54,15 @@ public:
         NONE
     };
 
+    enum class FileType
+    {
+        UNKNOWN,
+        BMP,
+        PNG,
+        JPG,
+        DDS
+    };
+
     ///
     /// \brief Constructor
     /// \param path Path to the texture source file
@@ -73,6 +84,11 @@ public:
     /// \brief Get path
     ///
     const std::string getPath() const;
+
+    ///
+    /// \brief Get file extension
+    ///
+    const FileType getFileType();
 
     ///
     /// \brief Get if mipmaps are enabled

@@ -39,17 +39,19 @@ VulkanInternalMemory *
 VulkanMemoryManager::requestMemoryAllocation(
     const VkMemoryRequirements& memoryRequirements,
     VulkanMemoryType type,
-    VkDeviceSize maxAllocationSize)
+    VkDeviceSize maxAllocationSize,
+    VkDeviceSize offsetAlignment)
 {
     VkDeviceSize resourceSize = getAlignedSize(memoryRequirements.size, memoryRequirements.alignment);
 
     // If allocation with space exists, return that
     for (auto memoryAllocation : m_memoryAllocations[type])
     {
-        if (memoryAllocation->m_capacity - memoryAllocation->m_size >= resourceSize)
+        auto alignedSize = this->getAlignedSize(memoryAllocation->m_size, offsetAlignment);
+        if (memoryAllocation->m_capacity - alignedSize >= resourceSize)
         {
-            memoryAllocation->m_lastOffset = memoryAllocation->m_size;
-            memoryAllocation->m_size += resourceSize;
+            memoryAllocation->m_lastOffset = alignedSize;
+            memoryAllocation->m_size = alignedSize + resourceSize;
             return memoryAllocation;
         }
     }
@@ -172,7 +174,7 @@ VulkanMemoryManager::requestBuffer(VkDevice& device,
 
     VkMemoryRequirements requirements;
     vkGetBufferMemoryRequirements(device, *bufferGroup->getBuffer(), &requirements);
-    auto memoryAllocation = requestMemoryAllocation(requirements, type, allocationSize);
+    auto memoryAllocation = this->requestMemoryAllocation(requirements, type, allocationSize);
     vkBindBufferMemory(device, *bufferGroup->getBuffer(), *memoryAllocation->getMemory(), 0);
     bufferGroup->m_memory = memoryAllocation;
 
@@ -201,7 +203,7 @@ VulkanMemoryManager::requestImage(VkDevice& device,
     newImage->m_memoryOffset = 0;
     newImage->m_size = requirements.size;
 
-    auto memoryAllocation = requestMemoryAllocation(requirements, type, c_allocationSize);
+    auto memoryAllocation = this->requestMemoryAllocation(requirements, type, c_allocationSize, requirements.alignment);
     newImage->m_memoryOffset = this->getAlignedSize(memoryAllocation->m_lastOffset, requirements.alignment);
     vkBindImageMemory(device, *newImage->getImage(), *memoryAllocation->getMemory(), newImage->m_memoryOffset);
 

@@ -30,6 +30,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
 {
     m_path = texture->getPath();
     m_type = texture->getType();
+    m_fileType = texture->getFileType();
 
     // Load textures and get texture information
     if ((m_type == Texture::Type::IRRADIANCE_CUBEMAP)
@@ -64,26 +65,11 @@ VulkanTextureDelegate::VulkanTextureDelegate(
 
     m_layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
+    m_imageOffsetAlignment = this->getStride(m_format);
+
     m_imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     m_imageInfo.pNext = nullptr;
-
-    if (m_type == Texture::Type::DIFFUSE)
-    {
-        m_imageInfo.format = VK_FORMAT_B8G8R8A8_SRGB;
-        m_imageOffsetAlignment = 4;
-    }
-    else if (m_type == Texture::Type::IRRADIANCE_CUBEMAP
-             || m_type == Texture::Type::RADIANCE_CUBEMAP)
-    {
-        m_imageInfo.format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        m_imageOffsetAlignment = 16;
-    }
-    else
-    {
-        m_imageInfo.format = VK_FORMAT_B8G8R8A8_UNORM;
-        m_imageOffsetAlignment = 4;
-    }
-
+    m_imageInfo.format = m_format;
     m_imageInfo.imageType = VK_IMAGE_TYPE_2D;
     m_imageInfo.extent = { m_width, m_height, 1 };
     m_imageInfo.mipLevels = m_mipLevels;
@@ -175,7 +161,9 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         (*data)[3] = '\255';
         m_width = 1;
         m_height = 1;
+        m_channels = 1;
         m_data = &(*data)[0];
+        m_format = VK_FORMAT_B8G8R8A8_UNORM;
     }
     else if (m_path == "noise")
     {
@@ -196,20 +184,89 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         }
 
         m_data = &(*data)[0];
+        m_format = VK_FORMAT_B8G8R8A8_UNORM;
     }
     else
     {
-        auto readerGenerator = vtkSmartPointer<vtkImageReader2Factory>::New();
-        auto reader = readerGenerator->CreateImageReader2(m_path.c_str());
+        switch (m_fileType)
+        {
+        case Texture::FileType::DDS:
+        {
+            m_compressedTexture = gli::load(m_path);
+            m_compressedTexture = gli::flip(m_compressedTexture);
+            m_format = (VkFormat)(m_compressedTexture.format());
+            m_isDataFormatted = true;
 
-        reader->SetFileName(m_path.c_str());
-        reader->Update();
+            // Convert to SRGB for linear color space conversion
+            if (m_type == Texture::Type::DIFFUSE)
+            {
+                switch(m_format)
+                {
+                case VK_FORMAT_B8G8R8A8_UNORM:
+                    m_format = VK_FORMAT_B8G8R8A8_SRGB;
+                    break;
+                case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+                    m_format = VK_FORMAT_BC1_RGB_SRGB_BLOCK;
+                    break;
+                case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+                    m_format = VK_FORMAT_BC1_RGBA_SRGB_BLOCK;
+                    break;
+                case VK_FORMAT_BC2_UNORM_BLOCK:
+                    m_format = VK_FORMAT_BC2_SRGB_BLOCK;
+                    break;
+                case VK_FORMAT_BC3_UNORM_BLOCK:
+                    m_format = VK_FORMAT_BC3_SRGB_BLOCK;
+                    break;
+                default:
+                    LOG(WARNING) << "Texture format is not supported";
+                }
+            }
 
-        auto data = reader->GetOutput();
-        m_width = data->GetDimensions()[0];
-        m_height = data->GetDimensions()[1];
-        m_channels = reader->GetNumberOfScalarComponents();
-        m_data = (unsigned char *)data->GetScalarPointer();
+            m_channels = this->getNumChannels(m_format);
+            m_data = (unsigned char *)m_compressedTexture.data();
+
+            m_width = m_compressedTexture.extent().x;
+            m_height = m_compressedTexture.extent().y;
+            m_mipLevels = (uint32_t)m_compressedTexture.levels();     // Load mip levels
+            m_loadMipMaps = m_mipLevels != 1 ? true : false;
+            m_isCompressed = gli::is_compressed(m_compressedTexture.format());
+        }
+        break;
+        case Texture::FileType::PNG:
+        case Texture::FileType::JPG:
+        case Texture::FileType::BMP:
+        {
+            auto readerGenerator = vtkSmartPointer<vtkImageReader2Factory>::New();
+            auto reader = readerGenerator->CreateImageReader2(m_path.c_str());
+
+            reader->SetFileName(m_path.c_str());
+            reader->Update();
+
+            auto data = reader->GetOutput();
+            m_width = data->GetDimensions()[0];
+            m_height = data->GetDimensions()[1];
+            m_channels = reader->GetNumberOfScalarComponents();
+            m_data = (unsigned char *)data->GetScalarPointer();
+
+            // Format determines optimizations
+            switch (m_type)
+            {
+            case Texture::Type::DIFFUSE:
+                m_format = VK_FORMAT_B8G8R8A8_SRGB;
+                break;
+            case Texture::Type::AMBIENT_OCCLUSION:
+            case Texture::Type::METALNESS:
+            case Texture::Type::ROUGHNESS:
+                m_format = VK_FORMAT_R8_UNORM;
+                break;
+            default:
+                m_format = VK_FORMAT_B8G8R8A8_UNORM;
+            }
+        }
+        break;
+        default:
+            LOG(WARNING) << "Unknown file type";
+        }
     }
 }
 
@@ -223,6 +280,7 @@ VulkanTextureDelegate::loadCubemapTexture(VulkanMemoryManager& memoryManager)
         m_width = m_cubemap.extent().x;
         m_height = m_cubemap.extent().y;
         m_mipLevels = (uint32_t)m_cubemap.levels();
+        m_format = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
     else
     {
@@ -230,13 +288,22 @@ VulkanTextureDelegate::loadCubemapTexture(VulkanMemoryManager& memoryManager)
         m_width = 1;
         m_height = 1;
         m_mipLevels = 1;
+        m_format = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
 }
 
 void
 VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
 {
-    uint32_t imageSize = m_width * m_height * 4;
+    uint32_t imageSize;
+    if (m_isCompressed || m_loadMipMaps)
+    {
+        imageSize = (uint32_t)m_compressedTexture.size();
+    }
+    else
+    {
+        imageSize = m_width * m_height * m_imageOffsetAlignment;
+    }
 
     // Staging image
     VkBufferCreateInfo stagingBufferInfo;
@@ -257,33 +324,40 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     auto imageEditData = (unsigned char*)m_stagingBuffer->getMemoryData(memoryManager.m_device);
 
     unsigned int y_offset = 0;
-    unsigned int colorChannels = std::min(m_channels, 3u);
+    unsigned int totalChannels = this->getNumChannels(m_format);
+    unsigned int colorChannels = std::min(std::min(m_channels, 3u), totalChannels);
 
-    for (unsigned int y = 0; y < m_height; y++)
+    if (!m_isDataFormatted)
     {
-        y_offset = y * m_width;
-        for (unsigned int x = 0; x < m_width; x++)
+        for (unsigned int y = 0; y < m_height; y++)
         {
-            // Fill in image data
-            for (unsigned int z = 0; z < colorChannels; z++)
+            y_offset = y * m_width;
+            for (unsigned int x = 0; x < m_width; x++)
             {
-                imageEditData[4 * (y_offset + x) + z] =
-                    m_data[m_channels * (y_offset + x) + (colorChannels - z - 1)];
-            }
+                // Fill in image data
+                for (unsigned int z = 0; z < colorChannels; z++)
+                {
+                    imageEditData[totalChannels * (y_offset + x) + z] =
+                        m_data[m_channels * (y_offset + x) + (colorChannels - z - 1)];
+                }
 
-            // Fill in the rest of the memory
-            memset(&imageEditData[4 * (y_offset + x) + colorChannels],
-                (unsigned char)255,
-                (4 - colorChannels) * sizeof(unsigned char));
+                // Fill in the rest of the memory
+                memset(&imageEditData[totalChannels * (y_offset + x) + colorChannels],
+                    (unsigned char)255,
+                    (totalChannels - colorChannels) * sizeof(unsigned char));
 
-            // For alpha channel
-            if (m_channels == 4)
-            {
-                imageEditData[4 * (y_offset + x) + 3] = m_data[m_channels * (y_offset + x) + 3];
+                // For alpha channel
+                if (m_channels == 4)
+                {
+                    imageEditData[4 * (y_offset + x) + 3] = m_data[m_channels * (y_offset + x) + 3];
+                }
             }
         }
     }
-
+    else
+    {
+        memcpy(&imageEditData[0], m_compressedTexture.data(), imageSize);
+    }
 
     // Start transfer commands
     VkCommandBufferBeginInfo commandBufferBeginInfo;
@@ -308,23 +382,58 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     copyInfo.imageOffset = { 0, 0, 0 };
     copyInfo.imageExtent = { m_width, m_height, 1 };
 
-    VkImageSubresourceRange baseRange = m_range;
-    baseRange.levelCount = 1;
-
-    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
-        VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-        VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
-    vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, *m_stagingBuffer->getBuffer(),
-        *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
-
-    if (m_mipLevels != 1)
+    if (m_isCompressed || m_loadMipMaps)
     {
-        this->generateMipmaps(*memoryManager.m_transferCommandBuffer);
-    }
+        std::vector<VkBufferImageCopy> copyInfos(m_mipLevels);
+        VkDeviceSize currentOffset = m_stagingBuffer->getOffset();
+        glm::ivec3 blockSize = gli::block_extent(m_compressedTexture.format());
 
-    this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT, m_range);
+        for (uint32_t i = 0; i < m_mipLevels; i++)
+        {
+            glm::ivec3 dimensions = m_compressedTexture.extent(i);
+
+            if (m_isCompressed)
+            {
+                dimensions = this->getDimensionsAlignedToBlockSize(
+                    m_compressedTexture.extent(i),
+                    blockSize);
+            }
+
+            copyInfos[i] = copyInfo;
+            copyInfos[i].bufferRowLength = dimensions.x;
+            copyInfos[i].bufferImageHeight = dimensions.y;
+            copyInfos[i].imageSubresource.mipLevel = i;
+            copyInfos[i].bufferOffset = currentOffset;
+            copyInfos[i].imageExtent = { (uint32_t)dimensions.x, (uint32_t)dimensions.y, 1 };
+            currentOffset += m_compressedTexture.size(i);
+        }
+
+        this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
+            VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
+        vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, *m_stagingBuffer->getBuffer(),
+            *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, m_mipLevels, &copyInfos[0]);
+        this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT, m_range);
+    }
+    else
+    {
+        this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
+            VK_IMAGE_LAYOUT_PREINITIALIZED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            VK_ACCESS_HOST_WRITE_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, m_range);
+        vkCmdCopyBufferToImage(*memoryManager.m_transferCommandBuffer, *m_stagingBuffer->getBuffer(),
+            *m_image->getImage(), VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyInfo);
+
+        if (m_mipLevels != 1)
+        {
+            this->generateMipmaps(*memoryManager.m_transferCommandBuffer);
+        }
+
+        this->changeImageLayout(*memoryManager.m_transferCommandBuffer, *m_image->getImage(),
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_SHADER_READ_BIT, m_range);
+    }
 
     vkEndCommandBuffer(*memoryManager.m_transferCommandBuffer);
 
@@ -541,10 +650,6 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
         mipHighRange.baseMipLevel = i;
         mipHighRange.levelCount = 1;
 
-        VkImageSubresourceRange mipLowRange = m_range;
-        mipLowRange.baseMipLevel = i + 1;
-        mipLowRange.levelCount = 1;
-
         this->changeImageLayout(commandBuffer, *m_image->getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
             VK_ACCESS_TRANSFER_WRITE_BIT, VK_ACCESS_TRANSFER_READ_BIT, mipHighRange);
@@ -558,6 +663,86 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
             VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             VK_ACCESS_TRANSFER_READ_BIT, VK_ACCESS_TRANSFER_WRITE_BIT, mipHighRange);
     }
+}
+
+unsigned int
+VulkanTextureDelegate::getNumChannels(const VkFormat& format)
+{
+    unsigned int numChannels = 0;
+
+    switch(format)
+    {
+    case VK_FORMAT_B8G8R8A8_SRGB:
+    case VK_FORMAT_B8G8R8A8_UNORM:
+    case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+    case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+    case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+    case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+    case VK_FORMAT_BC3_UNORM_BLOCK:
+    case VK_FORMAT_BC3_SRGB_BLOCK:
+    case VK_FORMAT_R32G32B32A32_SFLOAT:
+        numChannels = 4;
+        break;
+    case VK_FORMAT_R8_UNORM:
+        numChannels = 1;
+        break;
+    default:
+        LOG(WARNING) << "Stride unknown";
+    }
+
+    return numChannels;
+}
+
+VkDeviceSize
+VulkanTextureDelegate::getStride(const VkFormat& format)
+{
+    VkDeviceSize stride = 4;
+
+    switch(format)
+    {
+    case VK_FORMAT_B8G8R8A8_SRGB:
+    case VK_FORMAT_B8G8R8A8_UNORM:
+        stride = 4;
+        break;
+    case VK_FORMAT_R32G32B32A32_SFLOAT:
+        stride = 16;
+        break;
+    case VK_FORMAT_R8_UNORM:
+        stride = 1;
+    case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
+    case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
+    case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:
+    case VK_FORMAT_BC1_RGBA_SRGB_BLOCK:
+    case VK_FORMAT_BC3_UNORM_BLOCK:
+    case VK_FORMAT_BC3_SRGB_BLOCK:
+        stride = 16; // The compressed formats work in blocks
+        break;
+    default:
+        LOG(WARNING) << "Stride unknown";
+    }
+
+    return stride;
+}
+
+const glm::ivec3
+VulkanTextureDelegate::getDimensionsAlignedToBlockSize(
+    const glm::ivec3& imageSize,
+    const glm::ivec3& blockSize)
+{
+    glm::ivec3 dimensions;
+
+    for (unsigned int i = 0; i < 3; i++)
+    {
+        auto remainder = imageSize[i] % blockSize[i];
+        auto division = imageSize[i] / blockSize[i];
+        dimensions[i] = division * blockSize[i];
+
+        if (remainder != 0)
+        {
+            dimensions[i] += blockSize[i];
+        }
+    }
+    return dimensions;
 }
 
 void
