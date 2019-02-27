@@ -1501,6 +1501,26 @@ VulkanRenderer::setBloomOff()
 }
 
 void
+VulkanRenderer::enableLensDistortion(const float distortion)
+{
+    float d = distortion;
+    if (distortion >= 1.0f)
+    {
+        d = 0.99f;
+        LOG(WARNING) << "Distortion invalid (>= 1.0f), clamped to 0.99f";
+    }
+
+    if (distortion <= -1.0f)
+    {
+        d = -0.99f;
+        LOG(WARNING) << "Distortion invalid (<= -1.0f), clamped to -0.99f";
+    }
+
+    m_enableLensDistortion = true;
+    m_lensDistortionFactor = d;
+}
+
+void
 VulkanRenderer::setCommandBufferState(VkCommandBuffer * commandBuffer, uint32_t width, uint32_t height)
 {
     VkViewport viewport;

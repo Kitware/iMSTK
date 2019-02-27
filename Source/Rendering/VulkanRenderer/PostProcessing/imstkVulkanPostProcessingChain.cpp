@@ -130,6 +130,19 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
         m_postProcesses.push_back(bloomCompositePass);
         this->incrementBufferNumbers();
     }
+
+    // Lens distortion
+    if (renderer->m_enableLensDistortion)
+    {
+        auto lensDistortionPass = std::make_shared<VulkanPostProcess>(renderer);
+        lensDistortionPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastOutput][0]);
+        lensDistortionPass->addInputImage(&renderer->m_HDRImageSampler, &renderer->m_HDRImageView[m_lastInput][0]);
+        lensDistortionPass->m_framebuffer->setColor(&renderer->m_HDRImageView[m_lastInput][0], VK_FORMAT_R16G16B16A16_SFLOAT);
+        lensDistortionPass->initialize(renderer, "./Shaders/VulkanShaders/PostProcessing/lens_distortion_frag.spv");
+        lensDistortionPass->m_pushConstantData[0] = renderer->m_lensDistortionFactor;
+        m_postProcesses.push_back(lensDistortionPass);
+        this->incrementBufferNumbers();
+    }
 }
 
 std::vector<std::shared_ptr<VulkanPostProcess>>&

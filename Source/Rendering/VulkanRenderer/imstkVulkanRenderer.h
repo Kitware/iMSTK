@@ -76,6 +76,8 @@ public:
     void setBloomOn();
     void setBloomOff();
 
+    void enableLensDistortion(const float distortion);
+
 protected:
     friend class VulkanViewer;
     friend class VulkanMaterialDelegate;
@@ -312,6 +314,9 @@ protected:
     std::vector<VkRenderPass> m_shadowPasses;
     uint32_t m_shadowMapResolution = 2048;
     std::vector<glm::mat4> m_lightMatrices;
+
+    bool m_enableLensDistortion = false;
+    float m_lensDistortionFactor = 0.0f;
 
     std::vector<std::shared_ptr<VulkanRenderDelegate>> m_renderDelegates;
 

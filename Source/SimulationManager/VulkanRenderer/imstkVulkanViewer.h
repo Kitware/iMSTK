@@ -88,6 +88,14 @@ public:
     ///
     void setResolution(unsigned int width, unsigned int height);
 
+    ///
+    /// \brief Enable lens distortion
+    /// \param distortion Distortion factor to apply: range is (-1.0, 1.0)
+    /// A negative distortion value will cause pincushion distortion. A
+    /// positive value will cause barrel distortion.
+    ///
+    void enableLensDistortion(const float distortion);
+
 protected:
     friend class VulkanInteractorStyle;
     friend class VulkanInteractorStyleFreeCamera;
