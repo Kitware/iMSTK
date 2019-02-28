@@ -66,9 +66,13 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
+# Prevents a compiler error for Visual Studio 15.8
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+  if(${MSVC_VERSION} GREATER_EQUAL 1915)
+    add_definitions(-D_DISABLE_EXTENDED_ALIGNED_STORAGE)
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

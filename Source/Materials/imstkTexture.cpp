@@ -41,6 +41,39 @@ Texture::getPath() const
     return m_path;
 }
 
+const Texture::FileType
+Texture::getFileType()
+{
+    FileType textureType = FileType::UNKNOWN;
+
+    std::string extString = m_path.substr(m_path.find_last_of(".") + 1);
+
+    if (extString.empty() || m_path.find(".") == std::string::npos)
+    {
+        return textureType;
+    }
+
+    if (extString == "bmp" || extString == "BMP")
+    {
+        textureType = FileType::BMP;
+    }
+    else if (extString == "png" || extString == "PNG")
+    {
+        textureType = FileType::PNG;
+    }
+    else if (extString == "jpg" || extString == "JPG"
+             || extString == "jpeg" || extString == "JPEG")
+    {
+        textureType = FileType::JPG;
+    }
+    else if (extString == "dds" || extString == "DDS")
+    {
+        textureType = FileType::DDS;
+    }
+
+    return textureType;
+}
+
 bool
 Texture::getMipmapsEnabled()
 {

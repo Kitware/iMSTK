@@ -207,11 +207,26 @@ public:
     void setup(VkPhysicalDevice * device);
     void clear();
 
+    ///
+    /// \brief Request a Vulkan buffer object
+    /// \param device Vulkan device
+    /// \param info Buffer information struct
+    /// \param type Memory type needed
+    /// \param offsetAlignment Alignment information
+    /// \returns Vulkan buffer object
+    ///
     VulkanInternalBuffer * requestBuffer(VkDevice& device,
                                          VkBufferCreateInfo& info,
                                          VulkanMemoryType type,
                                          VkDeviceSize offsetAlignment = 0);
 
+    ///
+    /// \brief Request a Vulkan image object
+    /// \param device Vulkan device
+    /// \param info Image information struct
+    /// \param type Memory type needed
+    /// \returns Vulkan image object
+    ///
     VulkanInternalImage * requestImage(VkDevice& device,
                                        VkImageCreateInfo& info,
                                        VulkanMemoryType type);
@@ -229,12 +244,18 @@ public:
 
 protected:
     ///
-    /// \brief request a memory allocation. If none exist, then a new allocation is created.
+    /// \brief Request a Vulkan memory allocation. If none exist, then a new allocation is created.
+    /// \param memoryRequirements Memory requirements struct
+    /// \param type Memory type
+    /// \param maxAllocationSize Maximum allocation size
+    /// \param offsetAlignment Alignment information for the offset
+    /// \returns Vulkan memory allocation
     ///
     VulkanInternalMemory * requestMemoryAllocation(
         const VkMemoryRequirements& memoryRequirements,
         VulkanMemoryType type,
-        VkDeviceSize maxAllocationSize);
+        VkDeviceSize maxAllocationSize,
+        VkDeviceSize offsetAlignment = 0);
 
     static const VkDeviceSize c_allocationSize = 16 * 1024 * 1024; // ~16 MB
     static VkDeviceSize getAlignedSize(VkDeviceSize size, VkDeviceSize alignment);
