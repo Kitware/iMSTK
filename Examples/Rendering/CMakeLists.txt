@@ -38,5 +38,6 @@ CopyAndCompileShaders()
 # Associate external data
 #-----------------------------------------------------------------------------
 list(APPEND FILE_LIST
-    head/,REGEX:.*)
+    head/,REGEX:.*
+    IBL/,REGEX:.*)
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})

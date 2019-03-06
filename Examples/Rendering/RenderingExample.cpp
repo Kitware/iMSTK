@@ -43,31 +43,26 @@ int main()
     scene->setGlobalIBLProbe(globalIBLProbe);
 
     // Head mesh
-    auto head = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
-    auto headMesh = std::dynamic_pointer_cast<SurfaceMesh>(head);
-    auto headObject = std::make_shared<VisualObject>("Head");
+#ifdef iMSTK_USE_Vulkan
+    auto headObject = VisualObjectImporter::importVisualObject(
+        "head", iMSTK_DATA_ROOT "/head/head_revised.obj",
+        iMSTK_DATA_ROOT "/head/", 1, Vec3d(0, 0, 0), "dds");
+#else
+    auto headObject = VisualObjectImporter::importVisualObject(
+        "head", iMSTK_DATA_ROOT "/head/head_revised.obj",
+        iMSTK_DATA_ROOT "/head/");
 
     // Head material
-    auto headMaterial = std::make_shared<RenderMaterial>();
-    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/diffuse.jpg", Texture::Type::DIFFUSE);
-    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/normal.png", Texture::Type::NORMAL);
-    auto headRoughnessTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/roughness.jpg", Texture::Type::ROUGHNESS);
-    auto headSSSTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/sss.jpg", Texture::Type::SUBSURFACE_SCATTERING);
-    headMaterial->addTexture(headDiffuseTexture);
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_Normal.png", Texture::Type::NORMAL);
+    auto headMaterial = headObject->getVisualModel(0)->getRenderMaterial();
     headMaterial->addTexture(headNormalTexture);
-    headMaterial->addTexture(headRoughnessTexture);
-    headMaterial->addTexture(headSSSTexture);
-    headMaterial->setReceivesShadows(true);
-    headMaterial->setCastsShadows(true);
+#endif
 
-    auto headModel = std::make_shared<VisualModel>(headMesh);
-    headModel->setRenderMaterial(headMaterial);
-    headObject->addVisualModel(headModel);
     scene->addSceneObject(headObject);
 
     // Position camera
     auto cam = scene->getCamera();
-    cam->setPosition(0, 0.25, 2);
+    cam->setPosition(0, 0.25, 1);
     cam->setFocalPoint(0, 0.25, 0);
 
     // Lights
