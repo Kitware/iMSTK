@@ -37,6 +37,7 @@
 #include <vtkTexture.h>
 #include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkVersion.h>
 
 namespace imstk
 {
@@ -199,7 +200,13 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         */
 
         // Set texture
-        m_actor->GetProperty()->SetTexture(currentUnit, textureDelegate->getTexture());
+        vtkSmartPointer<vtkTexture> currentTexture = textureDelegate->getTexture();
+#if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION <= 1)
+        m_actor->GetProperty()->SetTexture(currentUnit, currentTexture);
+#else
+        m_actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
+#endif
+
         currentUnit++;
     }
 }

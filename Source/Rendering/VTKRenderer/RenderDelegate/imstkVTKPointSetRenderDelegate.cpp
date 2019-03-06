@@ -27,6 +27,7 @@
 #include <vtkVertexGlyphFilter.h>
 #include <vtkSphereSource.h>
 #include <vtkGlyph3D.h>
+#include <vtkVersion.h>
 
 namespace imstk
 {
