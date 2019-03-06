@@ -21,6 +21,8 @@
 
 #include "imstkVTKCustomPolyDataMapper.h"
 
+#include "vtkVersion.h"
+
 namespace imstk
 {
 vtkStandardNewMacro(VTKCustomPolyDataMapper);
@@ -218,7 +220,11 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
         auto diffuseTexture = material->getTexture(Texture::Type::DIFFUSE);
         if (diffuseTexture->getPath() != "" && textureCount < textures.size())
         {
+#if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION <= 1)
             auto texture = (vtkOpenGLTexture*)textures[currentTexture];
+#else
+            auto texture = (vtkOpenGLTexture*)textures[currentTexture].first;
+#endif
             helper.Program->SetUniformi("diffuseTexture", texture->GetTextureUnit());
             renderWindow->DeactivateTexture(texture->GetTextureObject());
             currentTexture++;
@@ -227,7 +233,11 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
         auto cubemapTexture = material->getTexture(Texture::Type::CUBEMAP);
         if (cubemapTexture->getPath() != "" && textureCount < textures.size())
         {
+#if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION < 2)
             auto texture = (vtkOpenGLTexture*)textures[currentTexture];
+#else
+            auto texture = (vtkOpenGLTexture*)textures[currentTexture].first;
+#endif
             helper.Program->SetUniformi("cubemapTexture", texture->GetTextureUnit());
             renderWindow->DeactivateTexture(texture->GetTextureObject());
             currentTexture++;

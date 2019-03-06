@@ -12,7 +12,7 @@ endif(${${PROJECT_NAME}_ENABLE_VR})
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
   GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git
-  GIT_TAG v8.1.1
+  GIT_TAG v8.2.0
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
       -DBUILD_EXAMPLES:BOOL=OFF
@@ -33,6 +33,7 @@ imstk_add_external_project( VTK
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
       -DVTK_OPENVR_OBJECT_FACTORY:BOOL=OFF
+      -DVTK_LEGACY_REMOVE:BOOL=ON
   DEPENDENCIES ${VTK_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE

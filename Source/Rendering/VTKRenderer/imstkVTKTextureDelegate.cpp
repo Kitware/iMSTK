@@ -30,6 +30,12 @@ VTKTextureDelegate::getTexture() const
     return m_sourceTexture;
 }
 
+const std::string&
+VTKTextureDelegate::getTextureName() const
+{
+    return m_textureName;
+}
+
 void
 VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 {
@@ -38,6 +44,10 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     auto readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
 
     m_sourceTexture = vtkSmartPointer<vtkTexture>::New();
+
+    // Mangle an unique texture name from the texture type and texture path
+    std::string manglingSymbol = "::";
+    m_textureName = texture->getTypeAsString() + manglingSymbol + texture->getPath();
 
     if (texture->getType() == Texture::Type::CUBEMAP)
     {
