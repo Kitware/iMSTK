@@ -746,7 +746,7 @@ VulkanRenderer::deleteFramebuffers()
     // Delete all HDR resources
     for (auto postProcess : m_HDRTonemaps)
     {
-        postProcess->clear(&m_renderDevice);
+        postProcess->m_framebuffer->clear(&m_renderDevice);
     }
 
     // Delete all downsample resources
@@ -765,6 +765,7 @@ VulkanRenderer::deleteFramebuffers()
     vkDestroyFramebuffer(m_renderDevice, m_opaqueFramebuffer->m_framebuffer, nullptr);
     vkDestroyFramebuffer(m_renderDevice, m_depthFramebuffer->m_framebuffer, nullptr);
     vkDestroyFramebuffer(m_renderDevice, m_decalFramebuffer->m_framebuffer, nullptr);
+    vkDestroyFramebuffer(m_renderDevice, m_particleFramebuffer->m_framebuffer, nullptr);
 }
 
 void
@@ -2029,6 +2030,7 @@ VulkanRenderer::~VulkanRenderer()
         vkDestroyRenderPass(m_renderDevice, m_decalRenderPass, nullptr);
         vkDestroyRenderPass(m_renderDevice, m_particleRenderPass, nullptr);
         vkDestroyRenderPass(m_renderDevice, m_depthRenderPass, nullptr);
+        vkDestroyRenderPass(m_renderDevice, m_GUIRenderPass, nullptr);
 
         for (auto pass : m_shadowPasses)
         {
@@ -2042,6 +2044,8 @@ VulkanRenderer::~VulkanRenderer()
         {
             framebuffer->clear(&m_renderDevice);
         }
+
+        ImGui_ImplVulkan_Shutdown();
 
         vkDestroySwapchainKHR(m_renderDevice, *m_swapchain, nullptr);
 
