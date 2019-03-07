@@ -26,7 +26,9 @@
 namespace imstk
 {
 std::shared_ptr<SurfaceMesh>
-AssimpMeshIO::read(const std::string& filePath, MeshFileType type)
+AssimpMeshIO::read(
+    const std::string& filePath,
+    MeshFileType type)
 {
     switch (type)
     {
@@ -46,14 +48,9 @@ AssimpMeshIO::read(const std::string& filePath, MeshFileType type)
 std::shared_ptr<SurfaceMesh>
 AssimpMeshIO::readMeshData(const std::string& filePath)
 {
-    // Importer mesh(es) and apply some clean-up operations
+    // Import mesh(es) and apply some clean-up operations
     Assimp::Importer importer;
-    auto scene = importer.ReadFile(filePath,
-        aiPostProcessSteps::aiProcess_GenSmoothNormals |
-        aiPostProcessSteps::aiProcess_CalcTangentSpace |
-        aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
-        aiPostProcessSteps::aiProcess_Triangulate |
-        aiPostProcessSteps::aiProcess_ImproveCacheLocality);
+    auto scene = importer.ReadFile(filePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
     if (!scene || !scene->HasMeshes())
@@ -65,6 +62,12 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
     // Get first mesh
     auto importedMesh = scene->mMeshes[0];
 
+    return AssimpMeshIO::convertAssimpMesh(importedMesh);
+}
+
+std::shared_ptr<SurfaceMesh>
+AssimpMeshIO::convertAssimpMesh(aiMesh * importedMesh)
+{
     // Build SurfaceMesh
     auto mesh = std::make_shared<SurfaceMesh>();
 
@@ -154,5 +157,18 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
         mesh->setPointDataArray("tCoords",UVs);
     }
     return mesh;
+}
+
+unsigned int
+AssimpMeshIO::getDefaultPostProcessSteps()
+{
+    unsigned int postProcessSteps =
+        aiPostProcessSteps::aiProcess_GenSmoothNormals |
+        aiPostProcessSteps::aiProcess_CalcTangentSpace |
+        aiPostProcessSteps::aiProcess_JoinIdenticalVertices |
+        aiPostProcessSteps::aiProcess_Triangulate |
+        aiPostProcessSteps::aiProcess_ImproveCacheLocality;
+
+    return postProcessSteps;
 }
 }

@@ -625,8 +625,8 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
         sourceOffsets[0].y = 0;
         sourceOffsets[0].z = 0;
 
-        sourceOffsets[1].x = m_width / (1 << i);
-        sourceOffsets[1].y = m_height / (1 << i);
+        sourceOffsets[1].x = std::max(m_width / (1 << i), 1u);
+        sourceOffsets[1].y = std::max(m_height / (1 << i), 1u);
         sourceOffsets[1].z = 1;
 
         VkOffset3D destinationOffsets[2];
@@ -634,8 +634,8 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
         destinationOffsets[0].y = 0;
         destinationOffsets[0].z = 0;
 
-        destinationOffsets[1].x = m_width / (1 << (i + 1));
-        destinationOffsets[1].y = m_height / (1 << (i + 1));
+        destinationOffsets[1].x = std::max(m_width / (1 << (i + 1)), 1u);
+        destinationOffsets[1].y = std::max(m_height / (1 << (i + 1)), 1u);
         destinationOffsets[1].z = 1;
 
         VkImageBlit mipFormat;
