@@ -34,6 +34,7 @@ SimulationManager::SimulationManager(const bool disableRendering, const bool ena
 
     if (!disableRendering)
     {
+#ifdef iMSTK_WITH_RENDERING
 #ifdef iMSTK_USE_Vulkan
         m_viewer = std::make_shared<VulkanViewer>(this);
 #else
@@ -47,6 +48,7 @@ SimulationManager::SimulationManager(const bool disableRendering, const bool ena
             LOG(FATAL) << "Can not run VR simulation without iMSTK_ENABLE_VR";
         }
         m_viewer = std::make_shared<VTKViewer>(this, false);
+#endif
 #endif
 #endif
     }
