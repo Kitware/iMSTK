@@ -288,8 +288,16 @@ VulkanInteractorStyleVR::OnTimer()
     m_renderer->m_projectionMatrices[0] = projectionMatrixLeft;
     m_renderer->m_projectionMatrices[1] = projectionMatrixRight;
 
-    m_renderer->m_cameraPositions[0] = glm::vec4(eyeMatrixLeft[0][3]);
-    m_renderer->m_cameraPositions[1] = glm::vec4(eyeMatrixRight[1][3]);
+    m_renderer->m_cameraPositions[0] = glm::vec4(
+        eyeMatrixLeft[3][0],
+        eyeMatrixLeft[3][1],
+        eyeMatrixLeft[3][2],
+        eyeMatrixLeft[3][3]);
+    m_renderer->m_cameraPositions[1] = glm::vec4(
+        eyeMatrixRight[3][0],
+        eyeMatrixRight[3][1],
+        eyeMatrixRight[3][2],
+        eyeMatrixRight[3][3]);
 
     auto cameraPosition = glm::vec4(HMDMatrix[3]);
     m_renderer->m_scene->getCamera()->setPosition(cameraPosition.x, cameraPosition.y, cameraPosition.z);
