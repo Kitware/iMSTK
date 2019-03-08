@@ -180,6 +180,8 @@ VulkanVertexBuffer::uploadBuffers(VkCommandBuffer& commandBuffer)
                         *m_vertexBuffer->getBuffer(),
                         1,
                         &copyInfo);
+
+        m_vertexBufferModified = false;
     }
     if (m_indexBufferModified)
     {
@@ -193,6 +195,8 @@ VulkanVertexBuffer::uploadBuffers(VkCommandBuffer& commandBuffer)
                         *m_indexBuffer->getBuffer(),
                         1,
                         &copyInfo);
+
+        m_indexBufferModified = false;
     }
 }
 
@@ -242,6 +246,13 @@ VulkanVertexBuffer::bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameI
     auto indexOffset = m_indexBuffer->getOffset() + (index * m_indexBuffer->getSize() / m_buffering);
     vkCmdBindVertexBuffers(*commandBuffer, 0, 1, m_vertexBuffer->getBuffer(), &vertexOffset);
     vkCmdBindIndexBuffer(*commandBuffer, *m_indexBuffer->getBuffer(), indexOffset, VK_INDEX_TYPE_UINT32);
+}
+
+void
+VulkanVertexBuffer::setModified()
+{
+    m_vertexBufferModified = true;
+    m_indexBufferModified = true;
 }
 
 VulkanVertexBufferMode
