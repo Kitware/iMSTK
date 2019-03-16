@@ -55,7 +55,7 @@ void
 VulkanPostProcess::createPipeline(VulkanRenderer * renderer, std::string fragmentSource)
 {
     // The vertex shader should be the same for every postprocess
-    std::string vertexShaderPath = "./Shaders/VulkanShaders/PostProcessing/postprocess_vert.spv";
+    std::string vertexShaderPath = VulkanShaderPath::PostProcessing + "postprocess_vert.spv";
     std::ifstream vertexShaderDataStream(vertexShaderPath, std::ios_base::binary);
     char vertexShaderData[16000];
     vertexShaderDataStream.read(vertexShaderData, 15999);

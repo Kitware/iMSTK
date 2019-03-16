@@ -72,67 +72,67 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
 
     if (m_material->isDecal())
     {
-        VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/decal_vert.spv",
+        VulkanShaderLoader vertexShaderLoader(VulkanShaderPath::Mesh + "decal_vert.spv",
                                               renderer->m_renderDevice,
                                               m_pipelineComponents.vertexShader);
     }
     else if(m_material->isParticle())
     {
-        VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/particle_vert.spv",
+        VulkanShaderLoader vertexShaderLoader(VulkanShaderPath::Mesh + "particle_vert.spv",
                                               renderer->m_renderDevice,
                                               m_pipelineComponents.vertexShader);
     }
     else if (m_shadowPass)
     {
-        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/shadow_vert.spv",
+        VulkanShaderLoader fragmentShaderLoader(VulkanShaderPath::Mesh + "shadow_vert.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.vertexShader);
     }
     else
     {
-        VulkanShaderLoader vertexShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_vert.spv",
+        VulkanShaderLoader vertexShaderLoader(VulkanShaderPath::Mesh + "mesh_vert.spv",
                                               renderer->m_renderDevice,
                                               m_pipelineComponents.vertexShader);
     }
 
     if (m_material->getTessellated())
     {
-        VulkanShaderLoader tessellationControlShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_tesc.spv",
+        VulkanShaderLoader tessellationControlShaderLoader(VulkanShaderPath::Mesh + "mesh_tesc.spv",
                                                            renderer->m_renderDevice,
                                                            m_pipelineComponents.tessellationControlShader);
 
-        VulkanShaderLoader tessellationEvaluationShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_tese.spv",
+        VulkanShaderLoader tessellationEvaluationShaderLoader(VulkanShaderPath::Mesh + "mesh_tese.spv",
                                                               renderer->m_renderDevice,
                                                               m_pipelineComponents.tessellationEvaluationShader);
     }
 
     if (m_material->isDecal())
     {
-        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/decal_frag.spv",
+        VulkanShaderLoader fragmentShaderLoader(VulkanShaderPath::Mesh + "decal_frag.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
     else if (m_material->isParticle())
     {
-        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/particle_frag.spv",
+        VulkanShaderLoader fragmentShaderLoader(VulkanShaderPath::Mesh + "particle_frag.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
     else if (m_shadowPass)
     {
-        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/shadow_frag.spv",
+        VulkanShaderLoader fragmentShaderLoader(VulkanShaderPath::Mesh + "shadow_frag.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
     else if (m_depthPrePass)
     {
-        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/depth_frag.spv",
+        VulkanShaderLoader fragmentShaderLoader(VulkanShaderPath::Mesh + "depth_frag.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }
     else
     {
-        VulkanShaderLoader fragmentShaderLoader("./Shaders/VulkanShaders/Mesh/mesh_frag.spv",
+        VulkanShaderLoader fragmentShaderLoader(VulkanShaderPath::Mesh + "mesh_frag.spv",
                                                 renderer->m_renderDevice,
                                                 m_pipelineComponents.fragmentShader);
     }

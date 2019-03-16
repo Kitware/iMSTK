@@ -25,6 +25,7 @@
 #include <vector>
 #include <memory>
 #include <fstream>
+#include <string>
 
 #include "vulkan/vulkan.h"
 
@@ -34,6 +35,13 @@
 
 namespace imstk
 {
+
+namespace VulkanShaderPath
+{
+const std::string Mesh("./Shaders/VulkanShaders/Mesh/");
+const std::string PostProcessing("./Shaders/VulkanShaders/PostProcessing/");
+}
+
 class VulkanShaderLoader
 {
 public:

@@ -70,7 +70,7 @@ protected:
     void createFullscreenQuad(VulkanRenderer * renderer);
 
     virtual void initialize(VulkanRenderer * renderer,
-                            std::string = "./Shaders/VulkanShaders/PostProcessing/postprocess_frag.spv");
+                            std::string = VulkanShaderPath::PostProcessing + "postprocess_frag.spv");
     void initializeFramebuffer(VulkanRenderer * renderer);
 
     ///

@@ -1443,7 +1443,7 @@ VulkanRenderer::initializePostProcesses()
         m_HDRTonemaps[i] = std::make_shared<VulkanPostProcess>(this, m_numViews, m_width, m_height);
         m_HDRTonemaps[i]->addInputImage(&m_HDRImageSampler, &m_HDRImageView[m_postProcessingChain->m_lastOutput][0]);
         m_HDRTonemaps[i]->m_framebuffer->setColor(m_LDRImage[i], &m_LDRImageView[i], VulkanFormats::FINAL_FORMAT);
-        m_HDRTonemaps[i]->initialize(this, "./Shaders/VulkanShaders/PostProcessing/HDR_tonemap_frag.spv");
+        m_HDRTonemaps[i]->initialize(this, VulkanShaderPath::PostProcessing + "HDR_tonemap_frag.spv");
         m_HDRTonemaps[i]->m_pushConstantData[0] = (float)i;
 
         graphicsPipelines.push_back(m_HDRTonemaps[i]->m_pipeline);
@@ -1459,7 +1459,7 @@ VulkanRenderer::initializePostProcesses()
         m_downSample[i]->m_framebuffer->setColor(m_swapchainImages[i],
             &m_swapchainImageViews[i],
             VulkanFormats::FINAL_FORMAT);
-        m_downSample[i]->initialize(this, "./Shaders/VulkanShaders/PostProcessing/vr_composite_frag.spv");
+        m_downSample[i]->initialize(this, VulkanShaderPath::PostProcessing + "vr_composite_frag.spv");
         m_downSample[i]->m_pushConstantData[0] = (float)m_numViews;
 
         graphicsPipelines.push_back(m_downSample[i]->m_pipeline);
@@ -1479,7 +1479,7 @@ VulkanRenderer::initializePostProcesses()
     m_ssao[0] = std::make_shared<VulkanPostProcess>(this, m_numViews, 1);
     m_ssao[0]->addInputImage(&m_HDRImageSampler, &m_depthImageView[0], VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL);
     m_ssao[0]->m_framebuffer->setColor(m_depthImage[1], &m_depthImageView[1], VulkanFormats::DEPTH_MIP_FORMAT);
-    m_ssao[0]->initialize(this, "./Shaders/VulkanShaders/PostProcessing/depth_downscale_frag.spv");
+    m_ssao[0]->initialize(this, VulkanShaderPath::PostProcessing + "depth_downscale_frag.spv");
 
     m_ssao[1] = std::make_shared<VulkanPostProcess>(this, m_numViews, 1);
     m_ssao[1]->addInputImage(&m_HDRImageSampler, &m_depthImageView[1]);
@@ -1492,7 +1492,7 @@ VulkanRenderer::initializePostProcesses()
     m_ssao[1]->m_pushConstantData[4] = 6;
     m_ssao[1]->m_pushConstantData[5] = m_width / 2;
     m_ssao[1]->m_pushConstantData[6] = m_height / 2;
-    m_ssao[1]->initialize(this, "./Shaders/VulkanShaders/PostProcessing/ao_frag.spv");
+    m_ssao[1]->initialize(this, VulkanShaderPath::PostProcessing + "ao_frag.spv");
 
     m_ssao[2] = std::make_shared<VulkanPostProcess>(this, m_numViews, 1);
     m_ssao[2]->addInputImage(&m_HDRImageSampler, &m_halfAOImageView[0]);
@@ -1506,7 +1506,7 @@ VulkanRenderer::initializePostProcesses()
     VulkanPostProcessingChain::calculateBlurValuesLinear(2,
         &m_ssao[2]->m_pushConstantData[5],
         &m_ssao[2]->m_pushConstantData[10]);
-    m_ssao[2]->initialize(this, "./Shaders/VulkanShaders/PostProcessing/bilateral_blur_horizontal_frag.spv");
+    m_ssao[2]->initialize(this, VulkanShaderPath::PostProcessing + "bilateral_blur_horizontal_frag.spv");
 
     m_ssao[3] = std::make_shared<VulkanPostProcess>(this, m_numViews, 1);
     m_ssao[3]->addInputImage(&m_HDRImageSampler, &m_halfAOImageView[1]);
@@ -1520,7 +1520,7 @@ VulkanRenderer::initializePostProcesses()
     VulkanPostProcessingChain::calculateBlurValuesLinear(2,
         &m_ssao[3]->m_pushConstantData[5],
         &m_ssao[3]->m_pushConstantData[10]);
-    m_ssao[3]->initialize(this, "./Shaders/VulkanShaders/PostProcessing/bilateral_blur_vertical_frag.spv");
+    m_ssao[3]->initialize(this, VulkanShaderPath::PostProcessing + "bilateral_blur_vertical_frag.spv");
 
     for (int i = 0; i < 4; i++)
     {
