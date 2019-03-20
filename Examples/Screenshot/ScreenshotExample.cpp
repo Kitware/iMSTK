@@ -83,6 +83,7 @@ int main()
     cam1->setPosition(Vec3d(-5.5, 2.5, 32));
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
+#ifdef iMSTK_WITH_RENDERING
 #ifndef iMSTK_USE_Vulkan
     auto viewer = sdk->getViewer();
     auto screenShotUtility
@@ -95,6 +96,7 @@ int main()
         screenShotUtility->saveScreenShot();
         return false;
     });
+#endif
 #endif
 
     std::cout << "PRESS 'b' for taking screenshot" << std::endl;

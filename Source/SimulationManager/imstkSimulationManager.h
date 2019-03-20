@@ -33,10 +33,12 @@
 #include "imstkLogUtility.h"
 #include "imstkViewer.h"
 
+#ifdef iMSTK_WITH_RENDERING
 #ifdef iMSTK_USE_Vulkan
 #include "imstkVulkanViewer.h"
 #else
 #include "imstkVTKViewer.h"
+#endif
 #endif
 
 namespace imstk
