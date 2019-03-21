@@ -85,27 +85,26 @@ set(VULKAN_CPP_FILES
     VulkanRenderer/PostProcessing/imstkVulkanPostProcess.cpp
     VulkanRenderer/PostProcessing/imstkVulkanPostProcessingChain.cpp)
 
-if(${iMSTK_WITH_RENDERING})
-    if( NOT iMSTK_USE_Vulkan )
-      set(RENDERING_H_FILES ${VTK_H_FILES})
-      set(RENDERING_CPP_FILES ${VTK_CPP_FILES})
-      set(RENDERING_SUBDIR
-        VTKRenderer
-        VTKRenderer/RenderDelegate)
-      set(RENDERING_DEPENDENCIES)
-    else()
-      set(RENDERING_H_FILES ${VULKAN_H_FILES})
-      set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
-      set(RENDERING_SUBDIR
-        VulkanRenderer
-        VulkanRenderer/RenderDelegate
-        VulkanRenderer/PostProcessing)
-      set(RENDERING_DEPENDENCIES
-        ${VulkanSDK_LIBRARIES}
-        glfw
-        gli
-        )
-    endif()
+if( NOT iMSTK_USE_Vulkan )
+  set(RENDERING_H_FILES ${VTK_H_FILES})
+  set(RENDERING_CPP_FILES ${VTK_CPP_FILES})
+  set(RENDERING_SUBDIR
+    VTKRenderer
+    VTKRenderer/RenderDelegate)
+  set(RENDERING_DEPENDENCIES
+    GUIOverlay)
+else()
+  set(RENDERING_H_FILES ${VULKAN_H_FILES})
+  set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
+  set(RENDERING_SUBDIR
+    VulkanRenderer
+    VulkanRenderer/RenderDelegate
+    VulkanRenderer/PostProcessing)
+  set(RENDERING_DEPENDENCIES
+    ${VulkanSDK_LIBRARIES}
+    glfw
+    gli
+    GUIOverlay)
 endif()
 
 include(imstkAddLibrary)
@@ -126,7 +125,6 @@ imstk_add_library( Rendering
     Scene
     Animation
     glm
-    GUIOverlay
   #VERBOSE
   )
 

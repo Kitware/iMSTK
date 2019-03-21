@@ -18,8 +18,7 @@ set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
     ${CMAKE_MODULE_PATH}
     )
-set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
-include(CMakeDependentOption)
+set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake) 
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
@@ -80,7 +79,6 @@ endif()
 # Options
 #-----------------------------------------------------------------------------
 option(BUILD_EXAMPLES "Build iMSTK examples" ON)
-option(${PROJECT_NAME}_WITH_RENDERING "Build ${PROJECT_NAME} with rendering." ON)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -103,15 +101,17 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(Uncrustify)
   endif()
 
+  option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
+
   imstk_define_dependency(glm)
 
-  cmake_dependent_option(${PROJECT_NAME}_ENABLE_VR "Allow the usage of VR rendering." OFF "${PROJECT_NAME}_WITH_RENDERING" OFF)
   if(${PROJECT_NAME}_USE_Vulkan)
     imstk_define_dependency(glfw)  
     imstk_define_dependency(gli)
   endif()
 
-  cmake_dependent_option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF "${PROJECT_NAME}_WITH_RENDERING" OFF)
+  option(${PROJECT_NAME}_ENABLE_VR "Allow the usage of VR rendering." OFF)
+
   if(${PROJECT_NAME}_ENABLE_VR)
     imstk_define_dependency(openvr)
   endif()
@@ -322,13 +322,6 @@ if(BUILD_TESTING)
   include_directories(${GoogleTest_INCLUDE_DIRS})
   find_package( GoogleMock REQUIRED )
   include_directories(${GoogleMock_INCLUDE_DIRS})
-endif()
-
-# Rendering definition
-if(${PROJECT_NAME}_WITH_RENDERING)
-    add_definitions( -DiMSTK_WITH_RENDERING )
-else()
-    remove_definitions( -DiMSTK_WITH_RENDERING )
 endif()
 
 # External data
