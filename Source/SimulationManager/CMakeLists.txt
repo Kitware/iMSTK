@@ -24,18 +24,16 @@ set(VULKAN_CPP_FILES
     VulkanRenderer/imstkVulkanScreenCaptureUtility.cpp
     VulkanRenderer/imstkVulkanViewer.cpp)
 
-if(${iMSTK_WITH_RENDERING})
-  if( NOT iMSTK_USE_Vulkan )
-    set(SIMULATIONMANAGER_H_FILES ${VTK_H_FILES})
-    set(SIMULATIONMANAGER_CPP_FILES ${VTK_CPP_FILES})
-    set(SIMULATIONMANAGER_SUBDIR
-      VTKRenderer)
-  else()
-    set(SIMULATIONMANAGER_H_FILES ${VULKAN_H_FILES})
-    set(SIMULATIONMANAGER_CPP_FILES ${VULKAN_CPP_FILES})
-    set(SIMULATIONMANAGER_SUBDIR
-      VulkanRenderer)
-  endif()
+if( NOT iMSTK_USE_Vulkan )
+  set(SIMULATIONMANAGER_H_FILES ${VTK_H_FILES})
+  set(SIMULATIONMANAGER_CPP_FILES ${VTK_CPP_FILES})
+  set(SIMULATIONMANAGER_SUBDIR
+    VTKRenderer)
+else()
+  set(SIMULATIONMANAGER_H_FILES ${VULKAN_H_FILES})
+  set(SIMULATIONMANAGER_CPP_FILES ${VULKAN_CPP_FILES})
+  set(SIMULATIONMANAGER_SUBDIR
+    VulkanRenderer)
 endif()
 
 include(imstkAddLibrary)
@@ -62,7 +60,6 @@ imstk_add_library( SimulationManager
     Rendering
     Devices
     Collision
-    GUIOverlay
   )
   
 #-----------------------------------------------------------------------------
