@@ -107,10 +107,10 @@ VulkanRenderer::createInstance()
 }
 
 void
-VulkanRenderer::initialize(unsigned int width,
-                           unsigned int height,
-                           unsigned int windowWidth,
-                           unsigned int windowHeight)
+VulkanRenderer::initialize(const unsigned int width,
+                           const unsigned int height,
+                           const unsigned int windowWidth,
+                           const unsigned int windowHeight)
 {
     m_windowWidth = windowWidth;
     m_windowHeight = windowHeight;

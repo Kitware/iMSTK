@@ -188,10 +188,10 @@ protected:
 
     void createInstance();
 
-    void initialize(unsigned int width,
-                    unsigned int height,
-                    unsigned int windowWidth,
-                    unsigned int windowHeight);
+    void initialize(const unsigned int width,
+                    const unsigned int height,
+                    const unsigned int windowWidth,
+                    const unsigned int windowHeight);
     void loadAllVisualModels();
 
     ///

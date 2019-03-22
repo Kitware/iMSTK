@@ -571,8 +571,8 @@ VulkanPostProcess::initializeFramebuffer(VulkanRenderer * renderer)
 
 void
 VulkanPostProcess::createFramebuffer(VulkanRenderer * renderer,
-                                     unsigned int width,
-                                     unsigned int height)
+                                     const unsigned int width,
+                                     const unsigned int height)
 {
     m_framebuffer = std::make_shared<VulkanFramebuffer>(
         renderer->m_memoryManager,

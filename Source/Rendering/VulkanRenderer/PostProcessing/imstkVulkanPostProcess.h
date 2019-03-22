@@ -64,8 +64,8 @@ protected:
     void createPipeline(VulkanRenderer * renderer, std::string fragmentSource);
     void createRenderPass(VulkanRenderer * renderer);
     void createFramebuffer(VulkanRenderer * renderer,
-                           unsigned int width,
-                           unsigned int height);
+                           const unsigned int width,
+                           const unsigned int height);
 
     void createFullscreenQuad(VulkanRenderer * renderer);
 
