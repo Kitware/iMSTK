@@ -90,7 +90,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     m_mousePosLastNormalized[1] = m_mousePosNormalized[1];
 
     // The following is only for movement mode
-    if (!(m_state & VulkanInteractorStyleFreeCamera::RIGHT_MOUSE_DOWN))
+    if (!(m_state & (unsigned int)VulkanInteractorStyleFreeCamera::MouseState::RIGHT_MOUSE_DOWN))
     {
         return;
     }

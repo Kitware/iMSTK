@@ -95,7 +95,7 @@ private:
     StopWatch m_stopWatch;
 
     // States
-    enum
+    enum class MouseState
     {
         LEFT_MOUSE_DOWN = 0x1,
         MIDDLE_MOUSE_DOWN = 0x2,

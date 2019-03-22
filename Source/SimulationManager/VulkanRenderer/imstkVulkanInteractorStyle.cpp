@@ -197,7 +197,7 @@ VulkanInteractorStyle::OnMouseMove(double x, double y)
 void
 VulkanInteractorStyle::OnLeftButtonDown()
 {
-    m_state |= VulkanInteractorStyle::LEFT_MOUSE_DOWN;
+    m_state |= (unsigned int)VulkanInteractorStyle::MouseState::LEFT_MOUSE_DOWN;
 
     if (m_onLeftButtonDownFunction && m_onLeftButtonDownFunction(this))
     {
@@ -213,7 +213,7 @@ VulkanInteractorStyle::OnLeftButtonDown()
 void
 VulkanInteractorStyle::OnLeftButtonUp()
 {
-    m_state &= ~VulkanInteractorStyle::LEFT_MOUSE_DOWN;
+    m_state &= ~(unsigned int)VulkanInteractorStyle::MouseState::LEFT_MOUSE_DOWN;
 
     if (m_onLeftButtonUpFunction && m_onLeftButtonUpFunction(this))
     {
@@ -229,7 +229,7 @@ VulkanInteractorStyle::OnLeftButtonUp()
 void
 VulkanInteractorStyle::OnMiddleButtonDown()
 {
-    m_state |= VulkanInteractorStyle::MIDDLE_MOUSE_DOWN;
+    m_state |= (unsigned int)VulkanInteractorStyle::MouseState::MIDDLE_MOUSE_DOWN;
 
     if (m_onMiddleButtonDownFunction && m_onMiddleButtonDownFunction(this))
     {
@@ -245,7 +245,7 @@ VulkanInteractorStyle::OnMiddleButtonDown()
 void
 VulkanInteractorStyle::OnMiddleButtonUp()
 {
-    m_state &= ~VulkanInteractorStyle::MIDDLE_MOUSE_DOWN;
+    m_state &= ~(unsigned int)VulkanInteractorStyle::MouseState::MIDDLE_MOUSE_DOWN;
 
     if (m_onMiddleButtonUpFunction && m_onMiddleButtonUpFunction(this))
     {
@@ -261,7 +261,7 @@ VulkanInteractorStyle::OnMiddleButtonUp()
 void
 VulkanInteractorStyle::OnRightButtonDown()
 {
-    m_state |= VulkanInteractorStyle::RIGHT_MOUSE_DOWN;
+    m_state |= (unsigned int)VulkanInteractorStyle::MouseState::RIGHT_MOUSE_DOWN;
 
     if (m_onRightButtonDownFunction && m_onRightButtonDownFunction(this))
     {
@@ -277,7 +277,7 @@ VulkanInteractorStyle::OnRightButtonDown()
 void
 VulkanInteractorStyle::OnRightButtonUp()
 {
-    m_state &= ~VulkanInteractorStyle::RIGHT_MOUSE_DOWN;
+    m_state &= ~(unsigned int)VulkanInteractorStyle::MouseState::RIGHT_MOUSE_DOWN;
 
     if (m_onRightButtonUpFunction && m_onRightButtonUpFunction(this))
     {
