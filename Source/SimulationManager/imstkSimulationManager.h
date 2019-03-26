@@ -152,7 +152,7 @@ public:
     ///
     void startSimulation(const SimulationStatus simStatus = SimulationStatus::PAUSED,
                          const Renderer::Mode renderMode = Renderer::Mode::SIMULATION);
-
+    
     ///
     /// \brief Run the simulation from a paused state
     ///
@@ -190,9 +190,15 @@ private:
     ///
     /// \brief Print user keyboard controls
     ///
-    void printUserControlsInfo();
+    void printUserControlsInfo(bool isRendering = true);
 
     void startModuleInNewThread(std::shared_ptr<Module> module);
+
+    ///
+    /// \brief Keeps things in an infinite loop if rendering is disabled 
+    /// The same keys can be used to trigger PAUSE, RUNNING, RESET of the simulation
+    ///
+    void infiniteLoopNoRenderingMode();
 
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 

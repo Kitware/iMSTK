@@ -399,6 +399,47 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
         // start the viewer
         this->startViewer(renderMode);
     }
+    else
+    {        
+        this->printUserControlsInfo(false);
+        this->infiniteLoopNoRenderingMode();
+        this->endSimulation();
+    }
+}
+
+void
+SimulationManager::infiniteLoopNoRenderingMode()
+{
+    while (this->getStatus() == SimulationStatus::RUNNING || this->getStatus() == SimulationStatus::PAUSED)
+    {
+        auto c = getchar();
+        if (c == 'e' || c == 'E')
+        {
+            break;
+        }
+        
+        if (c == 'r' || c == 'R')
+        {
+            this->resetSimulation();
+            continue;
+        }
+
+        
+        if (c == ' ')
+        {
+            if (this->getStatus() == SimulationStatus::RUNNING)
+            {
+                this->pauseSimulation();
+                continue;
+            }
+
+            if (this->getStatus() == SimulationStatus::PAUSED)
+            {                
+                this->runSimulation();
+                continue;
+            }
+        }
+    }
 }
 
 void
@@ -426,17 +467,31 @@ SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mod
 }
 
 void
-SimulationManager::printUserControlsInfo()
+SimulationManager::printUserControlsInfo(bool isRendering)
 {
-    LOG(INFO) <<
-        "\n------------------------\n" <<
-        "     User controls\n" <<
-        "------------------------\n" <<
-        "<space> - pause or unpause simulation\n" <<
-        "  R/r   - reset simulation\n" <<
-        "  D/d   - toggle between debug and simulation rendering modes\n" <<
-        "  P/p   - Display render frame rate on the screen\n" <<
-        "------------------------\n\n";
+    if (isRendering)
+    {
+        LOG(INFO) <<
+            "\n------------------------\n" <<
+            "     User controls\n" <<
+            "------------------------\n" <<
+            "<space> - pause or unpause simulation\n" <<
+            "  R/r   - reset simulation\n" <<
+            "  D/d   - toggle between debug and simulation rendering modes\n" <<
+            "  P/p   - Display render frame rate on the screen\n" <<
+            "------------------------\n\n";
+    }
+    else
+    {
+        LOG(INFO) <<
+            "\n------------------------\n" <<
+            "     User controls\n" <<
+            "------------------------\n" <<
+            "<space> - pause or unpause simulation\n" <<
+            "  R/r   - reset simulation\n" <<
+            "  E/e   - end simulatino\n" <<            
+            "------------------------\n\n";
+    }
 }
 
 void

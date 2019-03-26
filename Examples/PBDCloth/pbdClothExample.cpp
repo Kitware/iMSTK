@@ -26,7 +26,7 @@
 
 using namespace imstk;
 
-const bool runSimWithoutRendering = false;
+const bool runSimWithoutRendering = true;
 
 ///
 /// \brief This example demonstrates the cloth simulation
@@ -128,15 +128,7 @@ int main()
 
     // Start
     sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
-
-    // Perform an infinite loop if there is no rendering enabled
-    if (runSimWithoutRendering)
-    {
-        LOG(INFO) << "simulation is starting. PRESS any key to exit";
-        while (sdk->getStatus() == SimulationStatus::RUNNING && !getchar()) {}
-        sdk->endSimulation();
-    }
+    sdk->startSimulation(SimulationStatus::RUNNING);   
 
     return 0;
 }
