@@ -130,13 +130,7 @@ endif()
 
 #check vrpn/submodules/hidapi.cmake
 if(WIN32)
-  find_library(HIDAPI_LIBRARY
-    NAMES
-      setupapi
-    )
-  if(NOT HIDAPI_LIBRARY)
-    message(FATAL_ERROR "hidapi library not found")
-  endif()
+  set(HIDAPI_LIBRARY setupapi)
 elseif(APPLE)
   find_library(MACHID_CoreFoundation_LIBRARY CoreFoundation)
   find_library(MACHID_IOKit_LIBRARY IOKit)
