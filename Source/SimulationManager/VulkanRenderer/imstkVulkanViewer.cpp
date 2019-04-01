@@ -23,15 +23,31 @@
 
 namespace imstk
 {
-VulkanViewer::VulkanViewer(SimulationManager * manager)
+VulkanViewer::VulkanViewer(SimulationManager * manager, bool enableVR)
 {
     m_simManager = manager;
 
-    auto interactor = std::make_shared<VulkanInteractorStyle>();
+#ifdef iMSTK_ENABLE_VR
+    if (vr::VR_IsHmdPresent() && enableVR)
+    {
+        m_VRMode = enableVR;
+    }
+#endif
 
-    interactor->m_simManager = m_simManager;
-
-    m_interactorStyle = interactor;
+    if (m_VRMode)
+    {
+#ifdef iMSTK_ENABLE_VR
+        auto style = std::make_shared<VulkanInteractorStyleVR>();
+        style->m_simManager = m_simManager;
+        m_interactorStyle = style;
+#endif
+    }
+    else
+    {
+        auto style = std::make_shared<VulkanInteractorStyleFreeCamera>();
+        style->m_simManager = m_simManager;
+        m_interactorStyle = style;
+    }
 
     // Create GUI
     ImGui::CreateContext();
@@ -82,6 +98,8 @@ VulkanViewer::disableFullscreen()
 void
 VulkanViewer::setResolution(unsigned int width, unsigned int height)
 {
+    m_windowWidth = width;
+    m_windowHeight = height;
     m_width = width;
     m_height = height;
 }
@@ -96,9 +114,33 @@ void
 VulkanViewer::startRenderingLoop()
 {
     m_running = true;
+
+#ifdef iMSTK_ENABLE_VR
+    if (m_VRMode)
+    {
+        m_renderer->m_VRMode = true;
+
+        vr::EVRInitError error;
+        m_renderer->m_VRSystem = vr::VR_Init(&error, vr::EVRApplicationType::VRApplication_Scene);
+
+        if (error != vr::EVRInitError::VRInitError_None)
+        {
+            LOG(FATAL) << "VR initialization error: " << error;
+        }
+        auto interactor = std::dynamic_pointer_cast<VulkanInteractorStyleVR>(m_interactorStyle);
+        interactor->initialize(m_renderer);
+
+        m_renderer->m_VRSystem->GetRecommendedRenderTargetSize(&m_width, &m_height);
+        m_windowWidth = m_width;
+        m_windowHeight = m_height;
+    }
+#endif
+
     this->setupWindow();
-    m_renderer->initialize(m_width, m_height);
+    m_renderer->createInstance();
+
     this->createWindow();
+    m_renderer->initialize(m_width, m_height, m_windowWidth, m_windowHeight);
 
     this->setupSwapchain();
     m_renderer->initializeFramebufferImages(&m_swapchain);
@@ -110,6 +152,7 @@ VulkanViewer::startRenderingLoop()
 
     while (!glfwWindowShouldClose(m_window))
     {
+        std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
         glfwPollEvents();
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -120,7 +163,6 @@ VulkanViewer::startRenderingLoop()
         ImGui::Render();
 
         m_renderer->renderFrame();
-        std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->OnTimer();
     }
 
     glfwTerminate();
@@ -144,6 +186,14 @@ VulkanViewer::getRenderingMode()
 {
     return m_renderer->getMode();
 }
+
+#ifdef iMSTK_ENABLE_VR
+vr::IVRSystem *
+VulkanViewer::getVRSystem()
+{
+    return m_renderer->m_VRSystem;
+}
+#endif
 
 void
 VulkanViewer::setupWindow()
@@ -212,12 +262,12 @@ VulkanViewer::createWindow()
 
     if (!m_fullscreen || numMonitors == 0)
     {
-        m_window = glfwCreateWindow(m_width, m_height, "iMSTK", nullptr, nullptr);
+        m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "iMSTK", nullptr, nullptr);
     }
     else
     {
         glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_FALSE);
-        m_window = glfwCreateWindow(m_width, m_height, "iMSTK", monitors[0], nullptr);
+        m_window = glfwCreateWindow(m_windowWidth, m_windowHeight, "iMSTK", monitors[0], nullptr);
     }
 
     // Wire window into GUI
@@ -226,10 +276,14 @@ VulkanViewer::createWindow()
     VkResult status = glfwCreateWindowSurface(*m_renderer->m_instance, m_window, nullptr, &m_surface);
 
     std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->setWindow(m_window, this);
+
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalCapabilities);
+    m_windowWidth = m_physicalCapabilities.currentExtent.width;
+    m_windowHeight = m_physicalCapabilities.currentExtent.height;
 }
 
 void
-VulkanViewer::resizeWindow(int width, int height)
+VulkanViewer::resizeWindow(unsigned int width, unsigned int height)
 {
     m_width = width;
     m_height = height;
@@ -243,13 +297,6 @@ VulkanViewer::resizeWindow(int width, int height)
 void
 VulkanViewer::setupSwapchain()
 {
-    // Build swapchain
-    VkExtent2D extent;
-    extent.height = m_height;
-    extent.width = m_width;
-
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalCapabilities);
-
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalFormatsCount, nullptr);
     m_physicalFormats = new VkSurfaceFormatKHR[(int)m_physicalFormatsCount]();
     vkGetPhysicalDeviceSurfaceFormatsKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalFormatsCount, m_physicalFormats);
@@ -260,6 +307,12 @@ VulkanViewer::setupSwapchain()
 
     VkBool32 supported;
     vkGetPhysicalDeviceSurfaceSupportKHR(m_renderer->m_physicalDevices[0], 0, m_surface, &supported);
+
+    // Build swapchain
+    VkExtent2D extent;
+
+    extent.height = m_windowHeight;
+    extent.width = m_windowWidth;
 
     bool linearColorSpaceSupported = false;
 
@@ -295,8 +348,8 @@ VulkanViewer::setupSwapchain()
     swapchainInfo.pNext = nullptr;
     swapchainInfo.flags = 0;
     swapchainInfo.surface = m_surface;
-    swapchainInfo.minImageCount = m_renderer->m_buffering; // triple buffering
-    swapchainInfo.imageFormat = VK_FORMAT_B8G8R8A8_SRGB;
+    swapchainInfo.minImageCount = m_renderer->m_buffering; // buffering
+    swapchainInfo.imageFormat = VulkanFormats::FINAL_FORMAT;
     swapchainInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     swapchainInfo.imageExtent = extent;
     swapchainInfo.imageArrayLayers = 1;

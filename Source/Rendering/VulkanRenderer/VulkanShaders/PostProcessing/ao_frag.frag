@@ -1,12 +1,13 @@
-#version 450
+#version 460
 
-layout (set = 0, binding = 0) uniform sampler2D depthTexture;
+layout (set = 0, binding = 0) uniform sampler2DArray depthTexture;
 layout (set = 0, binding = 1) uniform sampler2D noiseTexture;
 
 layout (location = 0) out vec4 finalColor;
 
 layout (location = 3) in vertexData{
     vec2 uv;
+    flat uint view;
 }vertex;
 
 layout (push_constant) uniform pushConstants
@@ -30,7 +31,7 @@ void main(void)
     float ambientValue = 0.0;
     float samples = constants.numSamples;
     float width = constants.kernelWidth;
-    float depth = getLinearDepth(texture(depthTexture, vertex.uv).r);
+    float depth = getLinearDepth(texture(depthTexture, vec3(vertex.uv, vertex.view)).r);
     float fragmentSize = 1.0 / (tan(constants.fov / 2.0) * depth);
     float fragmentStepSize = fragmentSize * (constants.kernelWidth / samples);
     float realStepSize = constants.kernelWidth / samples;
@@ -38,10 +39,10 @@ void main(void)
     vec4 noise = texelFetch(noiseTexture, sampleLocation, 0);
 
     vec2 neighborOffset = vec2(1.0) / constants.resolution;
-    float x_up = getLinearDepth(texture(depthTexture, vertex.uv + vec2(neighborOffset.x, 0)).r);
-    float x_down = getLinearDepth(texture(depthTexture, vertex.uv + vec2(-neighborOffset.x, 0)).r);
-    float y_up = getLinearDepth(texture(depthTexture, vertex.uv + vec2(0, neighborOffset.y)).r);
-    float y_down = getLinearDepth(texture(depthTexture, vertex.uv + vec2(0, -neighborOffset.y)).r);
+    float x_up = getLinearDepth(texture(depthTexture, vec3(vertex.uv + vec2(neighborOffset.x, 0), vertex.view)).r);
+    float x_down = getLinearDepth(texture(depthTexture, vec3(vertex.uv + vec2(-neighborOffset.x, 0), vertex.view)).r);
+    float y_up = getLinearDepth(texture(depthTexture, vec3(vertex.uv + vec2(0, neighborOffset.y), vertex.view)).r);
+    float y_down = getLinearDepth(texture(depthTexture, vec3(vertex.uv + vec2(0, -neighborOffset.y), vertex.view)).r);
 
     float dx, dy;
 
@@ -106,7 +107,7 @@ float computeAO(vec2 direction, float fragmentStepSize, float realStepSize, floa
         realOffset += realStepSize;
 
         vec2 textureOffset = direction * fragmentOffset;
-        float depthSample = getLinearDepth(texture(depthTexture, vertex.uv + textureOffset).r);
+        float depthSample = getLinearDepth(texture(depthTexture, vec3(vertex.uv + textureOffset, vertex.view)).r);
         float depthDifference = depthSample - depth;
 
         float horizonAngle = atan(-depthDifference, -realOffset);

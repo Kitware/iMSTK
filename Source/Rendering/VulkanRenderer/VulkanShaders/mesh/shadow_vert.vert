@@ -19,9 +19,9 @@ struct light
 
 layout (set = 0, binding = 0) uniform globalUniforms
 {
-    mat4 projectionMatrix;
-    mat4 viewMatrix;
-    vec4 cameraPosition;
+    mat4 projectionMatrices[2];
+    mat4 viewMatrices[2];
+    vec4 cameraPositions[2];
     light lights[16];
 } globals;
 

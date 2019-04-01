@@ -26,8 +26,8 @@ struct light
 
 layout (set = 1, binding = 0) uniform globalUniforms
 {
-    mat4 inverseViewMatrix;
-    mat4 inverseProjectionMatrix;
+    mat4 inverseViewMatrices[2];
+    mat4 inverseProjectionMatrices[2];
     vec4 resolution;
     light lights[16];
     mat4 lightMatrices[16];
@@ -49,7 +49,7 @@ layout (location = 0) in vertexData{
     mat3 TBN;
     vec3 cameraPosition;
     flat int index;
-    flat vec3 particlePosition;
+    flat uint view;
 }vertex;
 
 layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
@@ -62,7 +62,7 @@ layout (set = 1, binding = 8) uniform sampler2DArray shadowArray;
 layout (set = 1, binding = 9) uniform samplerCube irradianceCubemapTexture;
 layout (set = 1, binding = 10) uniform samplerCube radianceCubemapTexture;
 layout (set = 1, binding = 11) uniform sampler2D brdfLUTTexture;
-layout (set = 1, binding = 12) uniform sampler2D aoBuffer;
+layout (set = 1, binding = 12) uniform sampler2DArray aoBuffer;
 layout (set = 1, binding = 13) uniform sampler2D depthAttachment;
 
 // Constants
@@ -215,7 +215,7 @@ void calculateIndirectLighting()
         }
     }
 
-    float ao = min(texture(aoBuffer, gl_FragCoord.xy / (textureSize(aoBuffer, 0) * 2)).r, ambientOcclusion);
+    float ao = min(texture(aoBuffer, vec3(gl_FragCoord.xy / (textureSize(aoBuffer, 0) * 2).xy, vertex.view)).r, ambientOcclusion);
     finalDiffuse += indirectDiffuse * k_d * ao;
     finalSpecular += indirectSpecular * specularColor * ao;
 }
@@ -309,10 +309,10 @@ vec3 reconstructPosition(float depth)
     coords.z = depth;
 
     vec4 pos = vec4(coords, 1);
-    pos = globals.inverseProjectionMatrix * pos;
+    pos = globals.inverseProjectionMatrices[vertex.view] * pos;
     pos /= pos.w;
 
-    pos = globals.inverseViewMatrix * pos;
+    pos = globals.inverseViewMatrices[vertex.view] * pos;
 
     return pos.xyz;
 }

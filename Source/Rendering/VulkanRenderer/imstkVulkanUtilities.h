@@ -25,11 +25,23 @@
 #include <vector>
 #include <memory>
 #include <fstream>
+#include <string>
 
 #include "vulkan/vulkan.h"
 
+#include "imstkVulkanResources.h"
+
+#include "g3log/g3log.hpp"
+
 namespace imstk
 {
+
+namespace VulkanShaderPath
+{
+const std::string Mesh("./Shaders/VulkanShaders/Mesh/");
+const std::string PostProcessing("./Shaders/VulkanShaders/PostProcessing/");
+}
+
 class VulkanShaderLoader
 {
 public:
@@ -64,35 +76,104 @@ protected:
 class VulkanAttachmentBarriers
 {
 public:
-    static void addColorAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
+    static void changeImageLayout(
+        VkCommandBuffer * commandBuffer,
+        uint32_t queueFamilyIndex,
+        VulkanInternalImage * image,
+        VkImageLayout oldLayout,
+        VkImageLayout newLayout,
+        const uint32_t numViews)
     {
+        // Don't change layout if already there
+        if (image->getImageLayout() == newLayout)
+        {
+            return;
+        }
+
+        // Get corresponding access and stage flags
+        VkAccessFlags srcAccess = getAccessFlags(oldLayout);
+        VkAccessFlags dstAccess = getAccessFlags(newLayout);
+        VkPipelineStageFlags srcPipelineStage = getPipelineStageFlags(oldLayout);
+        VkPipelineStageFlags dstPipelineStage = getPipelineStageFlags(newLayout);
+
         VkImageSubresourceRange range;
-        range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        range.aspectMask = ((oldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL)
+                            || (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL)) ?
+                           VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
         range.baseMipLevel = 0;
         range.levelCount = 1;
         range.baseArrayLayer = 0;
-        range.layerCount = 1;
+        range.layerCount = numViews;
 
         VkImageMemoryBarrier barrier;
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.pNext = nullptr;
-        barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.srcAccessMask = srcAccess;
+        barrier.dstAccessMask = dstAccess;
+        barrier.oldLayout = oldLayout;
+        barrier.newLayout = newLayout;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image = *image;
+        barrier.image = *image->getImage();
         barrier.subresourceRange = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
-            VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-            VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+            srcPipelineStage,
+            dstPipelineStage,
             0,
             0, nullptr, // general memory barriers
             0, nullptr, // buffer barriers
             1, &barrier); // image barriers
+
+        // For keeping track
+        image->setImageLayout(newLayout);
     };
+
+    static const VkAccessFlags getAccessFlags(VkImageLayout imageLayout)
+    {
+        switch(imageLayout)
+        {
+        case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+        case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+        case VK_IMAGE_LAYOUT_UNDEFINED:
+            return VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+            return VK_ACCESS_SHADER_READ_BIT;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+            return VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:
+            return VK_ACCESS_SHADER_READ_BIT;
+        case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+            return VK_ACCESS_TRANSFER_READ_BIT;
+        default:
+            LOG(WARNING) << "Unsupported image layout";
+            return VK_ACCESS_SHADER_READ_BIT; // This might not be a great default
+        }
+        ;
+    }
+
+    static const VkPipelineStageFlags getPipelineStageFlags(VkImageLayout imageLayout)
+    {
+        switch(imageLayout)
+        {
+        case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+        case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+        case VK_IMAGE_LAYOUT_UNDEFINED:
+            return VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+            return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+            return VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        case VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL:
+            return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+            return VK_PIPELINE_STAGE_TRANSFER_BIT;
+        default:
+            LOG(WARNING) << "Unsupported image layout";
+            return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; // This might not be a great default
+        }
+        ;
+    }
 
     static void addDepthAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
     {
@@ -167,6 +248,17 @@ public:
         componentMapping.a = VK_COMPONENT_SWIZZLE_A;
         return componentMapping;
     }
+};
+
+namespace VulkanFormats
+{
+static const VkFormat FINAL_FORMAT = VK_FORMAT_B8G8R8A8_SRGB;     /// Linear color space
+static const VkFormat HDR_FORMAT = VK_FORMAT_R16G16B16A16_SFLOAT;     // HDR internal format
+static const VkFormat NORMAL_SSS_FORMAT = VK_FORMAT_R8G8B8A8_SNORM;     // Normal/SSS format
+static const VkFormat AO_FORMAT = VK_FORMAT_R8_UNORM;     // AO format
+static const VkFormat DEPTH_FORMAT = VK_FORMAT_D32_SFLOAT;     // Depth buffer
+static const VkFormat SHADOW_FORMAT = VK_FORMAT_D32_SFLOAT;     // Format for shadow maps
+static const VkFormat DEPTH_MIP_FORMAT = VK_FORMAT_R32_SFLOAT;     // Depth mip buffer
 };
 }
 

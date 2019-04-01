@@ -1,4 +1,6 @@
-#version 450
+#version 460
+
+#extension GL_OVR_multiview : enable
 
 layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
@@ -20,15 +22,15 @@ struct light
 
 layout (set = 0, binding = 0) uniform globalUniforms
 {
-    mat4 projectionMatrix;
-    mat4 viewMatrix;
-    vec4 cameraPosition;
+    mat4 projectionMatrices[2];
+    mat4 viewMatrices[2];
+    vec4 cameraPositions[2];
     light lights[16];
 } globals;
 
 layout (set = 0, binding = 1) uniform localUniforms
 {
-    mat4 transform[128];
+    mat4 transforms[128];
 } locals;
 
 layout (location = 0) out vertexData{
@@ -38,23 +40,25 @@ layout (location = 0) out vertexData{
     mat3 TBN;
     vec3 cameraPosition;
     flat int index;
+    flat uint view;
 }vertex;
 
 void main(void)
 {
-    vec4 position = locals.transform[gl_InstanceIndex] * vec4(vertexPosition, 1.0);
-    vec4 normal = normalize(locals.transform[gl_InstanceIndex] * vec4(normalize(vertexNormal), 0.0));
-    vec4 tangent = normalize(locals.transform[gl_InstanceIndex] * vec4(normalize(vertexTangent), 0.0));
+    vec4 position = locals.transforms[gl_InstanceIndex] * vec4(vertexPosition, 1.0);
+    vec4 normal = normalize(locals.transforms[gl_InstanceIndex] * vec4(normalize(vertexNormal), 0.0));
+    vec4 tangent = normalize(locals.transforms[gl_InstanceIndex] * vec4(normalize(vertexTangent), 0.0));
 
     vec4 bitangent = vec4(cross(normal.xyz, tangent.xyz), 0.0);
 
     vertex.TBN = mat3(tangent.xyz, bitangent.xyz, normal.xyz);
 
-    vertex.cameraPosition = globals.cameraPosition.xyz;
+    vertex.cameraPosition = globals.cameraPositions[gl_ViewID_OVR].xyz;
     vertex.position = position.xyz;
     vertex.normal = normalize(normal.xyz);
     vertex.uv = vertexUV;
     vertex.index = gl_InstanceIndex;
+    vertex.view = gl_ViewID_OVR;
 
-    gl_Position = globals.projectionMatrix * globals.viewMatrix * position;
+    gl_Position = globals.projectionMatrices[gl_ViewID_OVR] * globals.viewMatrices[gl_ViewID_OVR] * position;
 }

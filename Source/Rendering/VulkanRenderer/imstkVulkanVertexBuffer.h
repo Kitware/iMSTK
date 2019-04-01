@@ -77,6 +77,12 @@ public:
 
     void bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameIndex);
 
+    ///
+    /// \brief Sets buffer states to modified
+    /// Triggers updates to vertex and index buffers
+    ///
+    void setModified();
+
     VulkanVertexBufferMode getMode();
 
 private:

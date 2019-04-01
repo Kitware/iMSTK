@@ -61,13 +61,23 @@ void
 VulkanLineMeshRenderDelegate::updateVertexBuffer(const uint32_t frameIndex)
 {
     int frame = 0;
-    if (m_vertexBuffer->getMode() != VERTEX_BUFFER_STATIC)
+
+    auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
+
+    if (m_vertexBuffer->getMode() == VERTEX_BUFFER_STATIC)
+    {
+        if (!geometry->m_dataModified)
+        {
+            return;
+        }
+        m_vertexBuffer->setModified();
+    }
+    else
     {
         frame = frameIndex;
     }
 
     auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frame);
-    auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
 
     auto colors = geometry->getVertexColors();
 

@@ -26,13 +26,13 @@
 using namespace imstk;
 
 ///
-/// \brief This example demonstrates configuring the rendered
+/// \brief This example demonstrates configuring the renderer
 /// objects, lights etc.
 ///
 int main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk = std::make_shared<SimulationManager>(false, true);
     auto scene = sdk->createNewScene("Rendering");
 
     // Add IBL Probe

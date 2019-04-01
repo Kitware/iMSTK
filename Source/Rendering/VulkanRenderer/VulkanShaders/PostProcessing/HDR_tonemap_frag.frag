@@ -1,12 +1,19 @@
-#version 450
+#version 460
 
-layout (set = 0, binding = 0) uniform sampler2D colorTexture;
+layout (set = 0, binding = 0) uniform sampler2DArray colorTexture;
 
 layout (location = 0) out vec4 finalColor;
 
 layout (location = 3) in vertexData{
     vec2 uv;
+    flat uint view;
 }vertex;
+
+layout(push_constant) uniform pushConstants
+{
+    float index;
+}
+constants;
 
 // Reinhard tonemapping
 vec3 tonemap(vec3 color)
@@ -43,6 +50,6 @@ vec3 tonemapTwo(vec3 color)
 
 void main(void)
 {
-    vec4 inputColor = texture(colorTexture, vertex.uv);
+    vec4 inputColor = texture(colorTexture, vec3(vertex.uv, constants.index));
     finalColor = vec4(tonemapTwo(inputColor.rgb), inputColor.a);
 }

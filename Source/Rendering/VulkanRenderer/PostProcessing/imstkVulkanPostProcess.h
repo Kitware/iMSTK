@@ -43,7 +43,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    VulkanPostProcess(VulkanRenderer * renderer, unsigned int level = 0, bool lastPass = false);
+    VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int level = 0);
+    VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int width, unsigned int height);
 
     void addInputImage(
         VkSampler * sampler,
@@ -63,15 +64,26 @@ protected:
     void createPipeline(VulkanRenderer * renderer, std::string fragmentSource);
     void createRenderPass(VulkanRenderer * renderer);
     void createFramebuffer(VulkanRenderer * renderer,
-                           unsigned int level = 0,
-                           bool lastPass = false);
+                           const unsigned int width,
+                           const unsigned int height);
 
     void createFullscreenQuad(VulkanRenderer * renderer);
 
     virtual void initialize(VulkanRenderer * renderer,
-                            std::string = "./Shaders/VulkanShaders/PostProcessing/postprocess_frag.spv");
+                            std::string = VulkanShaderPath::PostProcessing + "postprocess_frag.spv");
     void initializeFramebuffer(VulkanRenderer * renderer);
 
+    ///
+    /// \brief Updates image information to current layout after renderpass
+    ///
+    void updateImageLayouts();
+
+    ///
+    /// \brief Set image attachments to a readable layout
+    ///
+    void setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer,
+                                    uint32_t queueFamily,
+                                    const uint32_t numViews);
 
     void createDescriptors(VulkanRenderer * renderer);
     void createDescriptorSetLayouts(VulkanRenderer * renderer);
@@ -101,7 +113,7 @@ protected:
 
     unsigned int m_downsampleLevels = 0;
     unsigned int m_outputIndex = 0;
-    bool m_lastPass = false;
+    uint32_t m_numViews;
 
     std::vector<VkAttachmentReference> m_colorAttachments;
     VkRenderPass m_renderPass;

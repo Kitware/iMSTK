@@ -38,16 +38,27 @@ public:
         VulkanMemoryManager& memoryManager,
         unsigned int width,
         unsigned int height,
-        bool lastPass = false,
         VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 
-    void setColor(VkImageView * imageView, VkFormat format);
+    void setColor(VulkanInternalImage * image,
+                  VkImageView * imageView,
+                  VkFormat format,
+                  VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    void setSpecular(VkImageView * imageView, VkFormat format);
+    void setSpecular(VulkanInternalImage * image,
+                     VkImageView * imageView,
+                     VkFormat format,
+                     VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    void setDepth(VkImageView * depthImage, VkFormat format);
+    void setDepth(VulkanInternalImage * image,
+                  VkImageView * imageView,
+                  VkFormat format,
+                  VkImageLayout layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
-    void setNormal(VkImageView * normalImage, VkFormat format);
+    void setNormal(VulkanInternalImage * image,
+                   VkImageView * imageView,
+                   VkFormat format,
+                   VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
     void initializeFramebuffer(VkRenderPass * renderPass);
 
@@ -75,20 +86,28 @@ private:
     VkDevice m_renderDevice;
 
     // Depth buffer
+    VulkanInternalImage * m_depthImage;
     VkImageView * m_depthImageView;
     VkFormat m_depthFormat = VK_FORMAT_UNDEFINED;
+    VkImageLayout m_depthLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     // Normal buffer
+    VulkanInternalImage * m_normalImage;
     VkImageView * m_normalImageView;
     VkFormat m_normalFormat = VK_FORMAT_UNDEFINED;
+    VkImageLayout m_normalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Color accumulation buffer
+    VulkanInternalImage * m_colorImage;
     VkImageView * m_colorImageView;
     VkFormat m_colorFormat = VK_FORMAT_UNDEFINED;
+    VkImageLayout m_colorLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Specular accumulation buffer
+    VulkanInternalImage * m_specularImage;
     VkImageView * m_specularImageView;
     VkFormat m_specularFormat = VK_FORMAT_UNDEFINED;
+    VkImageLayout m_specularLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Attachments
     std::vector<VkAttachmentDescription> m_attachments;

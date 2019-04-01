@@ -31,6 +31,70 @@ VulkanInteractorStyle::VulkanInteractorStyle()
 }
 
 void
+VulkanInteractorStyle::setWindow(GLFWwindow * window, VulkanViewer * viewer)
+{
+    m_window = window;
+    m_viewer = viewer;
+
+    m_stopWatch.start();
+    glfwSetWindowUserPointer(window, (void *)this);
+
+    glfwSetKeyCallback(m_window, VulkanInteractorStyle::OnCharInterface);
+    glfwSetMouseButtonCallback(m_window, VulkanInteractorStyle::OnMouseButtonInterface);
+    glfwSetCursorPosCallback(m_window, VulkanInteractorStyle::OnMouseMoveInterface);
+    glfwSetScrollCallback(m_window, VulkanInteractorStyle::OnMouseWheelInterface);
+    glfwSetWindowSizeCallback(m_window, VulkanInteractorStyle::OnWindowResizeInterface);
+    glfwSetFramebufferSizeCallback(m_window, VulkanInteractorStyle::OnFramebuffersResizeInterface);
+}
+
+void
+VulkanInteractorStyle::OnCharInterface(GLFWwindow * window, int keyID, int code, int type, int extra)
+{
+    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    style->OnChar(keyID, type);
+}
+
+void
+VulkanInteractorStyle::OnMouseButtonInterface(GLFWwindow * window, int buttonID, int type, int extra)
+{
+    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+
+    switch (buttonID)
+    {
+    case GLFW_MOUSE_BUTTON_LEFT:
+        if (type == GLFW_PRESS)
+        {
+            style->OnLeftButtonDown();
+        }
+        else if (type == GLFW_RELEASE)
+        {
+            style->OnLeftButtonUp();
+        }
+        break;
+    case GLFW_MOUSE_BUTTON_RIGHT:
+        if (type == GLFW_PRESS)
+        {
+            style->OnRightButtonDown();
+        }
+        else if (type == GLFW_RELEASE)
+        {
+            style->OnRightButtonUp();
+        }
+        break;
+    case GLFW_MOUSE_BUTTON_MIDDLE:
+        if (type == GLFW_PRESS)
+        {
+            style->OnMiddleButtonDown();
+        }
+        else if (type == GLFW_RELEASE)
+        {
+            style->OnMiddleButtonUp();
+        }
+        break;
+    }
+}
+
+void
 VulkanInteractorStyle::OnTimer()
 {
     // Call custom function if exists, and return
@@ -40,8 +104,6 @@ VulkanInteractorStyle::OnTimer()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnTimer();
 }
 
 void
@@ -115,6 +177,12 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
 void
 VulkanInteractorStyle::OnMouseMove(double x, double y)
 {
+    m_mousePos[0] = x;
+    m_mousePos[1] = y;
+    m_mousePosNormalized[0] = x;
+    m_mousePosNormalized[1] = y;
+    this->normalizeCoordinate(m_mousePosNormalized[0], m_mousePosNormalized[1]);
+
     if (m_onMouseMoveFunction && m_onMouseMoveFunction(this))
     {
         return;
@@ -124,13 +192,13 @@ VulkanInteractorStyle::OnMouseMove(double x, double y)
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnMouseMove(x, y);
 }
 
 void
 VulkanInteractorStyle::OnLeftButtonDown()
 {
+    m_state |= (unsigned int)VulkanInteractorStyle::MouseState::LEFT_MOUSE_DOWN;
+
     if (m_onLeftButtonDownFunction && m_onLeftButtonDownFunction(this))
     {
         return;
@@ -140,13 +208,13 @@ VulkanInteractorStyle::OnLeftButtonDown()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnLeftButtonDown();
 }
 
 void
 VulkanInteractorStyle::OnLeftButtonUp()
 {
+    m_state &= ~(unsigned int)VulkanInteractorStyle::MouseState::LEFT_MOUSE_DOWN;
+
     if (m_onLeftButtonUpFunction && m_onLeftButtonUpFunction(this))
     {
         return;
@@ -156,13 +224,13 @@ VulkanInteractorStyle::OnLeftButtonUp()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnLeftButtonUp();
 }
 
 void
 VulkanInteractorStyle::OnMiddleButtonDown()
 {
+    m_state |= (unsigned int)VulkanInteractorStyle::MouseState::MIDDLE_MOUSE_DOWN;
+
     if (m_onMiddleButtonDownFunction && m_onMiddleButtonDownFunction(this))
     {
         return;
@@ -172,12 +240,13 @@ VulkanInteractorStyle::OnMiddleButtonDown()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnMiddleButtonDown();
 }
 
-void VulkanInteractorStyle::OnMiddleButtonUp()
+void
+VulkanInteractorStyle::OnMiddleButtonUp()
 {
+    m_state &= ~(unsigned int)VulkanInteractorStyle::MouseState::MIDDLE_MOUSE_DOWN;
+
     if (m_onMiddleButtonUpFunction && m_onMiddleButtonUpFunction(this))
     {
         return;
@@ -187,13 +256,13 @@ void VulkanInteractorStyle::OnMiddleButtonUp()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnMiddleButtonUp();
 }
 
 void
 VulkanInteractorStyle::OnRightButtonDown()
 {
+    m_state |= (unsigned int)VulkanInteractorStyle::MouseState::RIGHT_MOUSE_DOWN;
+
     if (m_onRightButtonDownFunction && m_onRightButtonDownFunction(this))
     {
         return;
@@ -203,13 +272,13 @@ VulkanInteractorStyle::OnRightButtonDown()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnRightButtonDown();
 }
 
 void
 VulkanInteractorStyle::OnRightButtonUp()
 {
+    m_state &= ~(unsigned int)VulkanInteractorStyle::MouseState::RIGHT_MOUSE_DOWN;
+
     if (m_onRightButtonUpFunction && m_onRightButtonUpFunction(this))
     {
         return;
@@ -219,8 +288,6 @@ VulkanInteractorStyle::OnRightButtonUp()
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnRightButtonUp();
 }
 
 void
@@ -235,8 +302,6 @@ VulkanInteractorStyle::OnMouseWheelForward(double y)
     {
         return;
     }
-
-    VulkanBaseInteractorStyle::OnMouseWheelForward(y);
 }
 
 void
@@ -251,7 +316,52 @@ VulkanInteractorStyle::OnMouseWheelBackward(double y)
     {
         return;
     }
+}
 
-    VulkanBaseInteractorStyle::OnMouseWheelBackward(y);
+void
+VulkanInteractorStyle::OnWindowResizeInterface(GLFWwindow * window, int width, int height)
+{
+    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+}
+
+void
+VulkanInteractorStyle::OnFramebuffersResizeInterface(GLFWwindow * window, int width, int height)
+{
+    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    style->OnWindowResize(width, height);
+}
+
+void
+VulkanInteractorStyle::normalizeCoordinate(double &x, double &y)
+{
+    x = (x - m_viewer->m_width / 2) / m_viewer->m_width;
+    y = (y - m_viewer->m_height / 2) / m_viewer->m_height;
+}
+
+void
+VulkanInteractorStyle::OnWindowResize(int width, int height)
+{
+    m_viewer->resizeWindow(width, height);
+}
+
+void
+VulkanInteractorStyle::OnMouseMoveInterface(GLFWwindow * window, double x, double y)
+{
+    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    style->OnMouseMove(x, y);
+}
+
+void
+VulkanInteractorStyle::OnMouseWheelInterface(GLFWwindow * window, double x, double y)
+{
+    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    if (y < 0)
+    {
+        style->OnMouseWheelBackward(y);
+    }
+    else
+    {
+        style->OnMouseWheelForward(y);
+    }
 }
 }

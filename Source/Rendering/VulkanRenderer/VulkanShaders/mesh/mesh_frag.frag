@@ -1,4 +1,4 @@
-#version 450
+#version 460
 
 layout (location = 0) out vec4 outputColor;
 layout (location = 1) out vec4 outputNormal;
@@ -27,8 +27,8 @@ struct light
 
 layout (set = 1, binding = 0) uniform globalUniforms
 {
-    mat4 inverseViewMatrix;
-    mat4 inverseProjectionMatrix;
+    mat4 inverseViewMatrices[2];
+    mat4 inverseProjectionMatrices[2];
     vec4 resolution;
     light lights[16];
     mat4 lightMatrices[16];
@@ -52,6 +52,7 @@ layout (location = 0) in vertexData{
     mat3 TBN;
     vec3 cameraPosition;
     vec3 color;
+    flat uint view;
 }vertex;
 
 layout (set = 1, binding = 2) uniform sampler2D diffuseTexture;
@@ -64,7 +65,7 @@ layout (set = 1, binding = 8) uniform sampler2DArray shadowArray;
 layout (set = 1, binding = 9) uniform samplerCube irradianceCubemapTexture;
 layout (set = 1, binding = 10) uniform samplerCube radianceCubemapTexture;
 layout (set = 1, binding = 11) uniform sampler2D brdfLUTTexture;
-layout (set = 1, binding = 12) uniform sampler2D aoBuffer;
+layout (set = 1, binding = 12) uniform sampler2DArray aoBuffer;
 
 // Constants
 const float PI = 3.1415;
@@ -222,7 +223,7 @@ void calculateIndirectLighting()
         }
     }
 
-    float ao = min(texture(aoBuffer, gl_FragCoord.xy / (textureSize(aoBuffer, 0) * 2)).r, ambientOcclusion);
+    float ao = min(texture(aoBuffer, vec3(gl_FragCoord.xy / (textureSize(aoBuffer, 0).xy * 2), vertex.view)).r, ambientOcclusion);
     finalDiffuse += indirectDiffuse * k_d * ao;
     finalSpecular += indirectSpecular * specularColor * ao;
 }

@@ -26,7 +26,12 @@
 #include <memory>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include <algorithm>
+
+#ifdef iMSTK_ENABLE_VR
+#include "openvr.h"
+#endif
 
 #include "vulkan/vulkan.h"
 
@@ -54,6 +59,7 @@
 #include "imstkVulkanPostProcessingChain.h"
 #include "imstkVulkanMemoryManager.h"
 #include "imstkVulkanFramebuffer.h"
+#include "imstkVulkanUtilities.h"
 #include "imstkVulkanRenderPassGenerator.h"
 
 namespace imstk
@@ -80,6 +86,7 @@ public:
 
 protected:
     friend class VulkanViewer;
+    friend class VulkanInteractorStyleVR;
     friend class VulkanMaterialDelegate;
     friend class VulkanPostProcess;
     friend class VulkanPostProcessingChain;
@@ -179,9 +186,23 @@ protected:
     friend class VulkanPostProcess;
     friend class VulkanPostProcessingChain;
 
-    void initialize(unsigned int width, unsigned int height);
+    void createInstance();
+
+    void initialize(const unsigned int width,
+                    const unsigned int height,
+                    const unsigned int windowWidth,
+                    const unsigned int windowHeight);
     void loadAllVisualModels();
-    std::shared_ptr<VulkanRenderDelegate> loadVisualModel(std::shared_ptr<VisualModel> visualModel, SceneObject::Type type);
+
+    ///
+    /// \brief Load visual model
+    /// \param visualModel visual model to use to create render delegate
+    /// \param type type of scene object (determines renderer implemetation)
+    /// \returns Render delegate
+    ///
+    std::shared_ptr<VulkanRenderDelegate> loadVisualModel(
+        std::shared_ptr<VisualModel> visualModel,
+        SceneObject::Type type);
 
     ///
     /// \brief Sets some command buffer state
@@ -193,16 +214,23 @@ protected:
     ///
     void setupGUI();
 
-    unsigned int m_width = 1000;
-    unsigned int m_height = 800;
+    ///
+    /// \brief Initialize images to correct layout
+    ///
+    void initializeFramebufferAttachments(VkCommandBuffer * commandBuffer);
+
+    unsigned int m_width = 2000;
+    unsigned int m_height = 1600;
+    unsigned int m_windowWidth = 1000;
+    unsigned int m_windowHeight = 800;
     float m_fov = PI;
     float m_nearPlane = 0.01;
     float m_farPlane = 1000;
 
     VulkanRendererConstants m_constants;
 
-    std::vector<char *> m_extensions;
-    std::vector<char *> m_layers;
+    std::vector<std::string> m_extensions;
+    std::vector<const char *> m_layers;
 
     std::shared_ptr<Scene> m_scene = nullptr;
 
@@ -255,9 +283,14 @@ protected:
     // Swapchain
     VkSwapchainKHR * m_swapchain = nullptr;
     uint32_t m_swapchainImageCount = 0;
-    std::vector<VkImage> m_swapchainImages;
+    std::vector<VulkanInternalImage *> m_swapchainImages;
+    std::vector<VkImage> m_swapchainNativeImages;
     std::vector<VkImageView> m_swapchainImageViews;
-    std::vector<VkSampler> m_swapchainImageSamplers;
+    VkSampler m_swapchainImageSampler;
+
+    // Final image buffers (used before image gets copied to swapchain images)
+    VulkanInternalImage * m_LDRImage[2];
+    VkImageView m_LDRImageView[2];
 
     // Depth buffer
     std::vector<VulkanInternalImage *> m_depthImage;
@@ -277,6 +310,7 @@ protected:
     std::vector<VkImageView> m_HDRImageView[3];
     uint32_t m_mipLevels = 1;
 
+    // For noise-post processing
     std::shared_ptr<Texture> m_noiseTexture = nullptr;
     std::shared_ptr<VulkanTextureDelegate> m_noiseTextureDelegate = nullptr;
 
@@ -285,8 +319,9 @@ protected:
     std::shared_ptr<VulkanFramebuffer> m_particleFramebuffer;
     std::shared_ptr<VulkanFramebuffer> m_depthFramebuffer;
 
-    std::vector<std::shared_ptr<VulkanPostProcess>> m_HDRTonemaps;
+    std::vector<std::shared_ptr<VulkanPostProcess>> m_HDRTonemaps; // One for each eye
     std::vector<std::shared_ptr<VulkanPostProcess>> m_ssao;
+    std::vector<std::shared_ptr<VulkanPostProcess>> m_downSample;
 
     std::shared_ptr<VulkanPostProcessingChain> m_postProcessingChain;
 
@@ -324,6 +359,17 @@ protected:
     Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
 
     std::map<std::shared_ptr<Texture>, std::shared_ptr<VulkanTextureDelegate>> m_textureMap;
+
+    uint32_t m_numViews = 1; ///< for multiview functionality
+
+    glm::mat4 m_viewMatrices[2];
+    glm::mat4 m_projectionMatrices[2];
+    glm::vec4 m_cameraPositions[2];
+    bool m_VRMode = false;
+
+#ifdef iMSTK_ENABLE_VR
+    vr::IVRSystem *m_VRSystem;
+#endif
 };
 }
 

@@ -27,13 +27,11 @@ VulkanFramebuffer::VulkanFramebuffer(
     VulkanMemoryManager& memoryManager,
     uint32_t width,
     uint32_t height,
-    bool lastPass,
     VkSampleCountFlagBits samples)
 {
     m_renderDevice = memoryManager.m_device;
     m_width = width;
     m_height = height;
-    m_lastPass = lastPass;
     m_samples = samples;
 }
 
@@ -55,8 +53,7 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
         attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout =
-            m_lastPass ? VK_IMAGE_LAYOUT_PRESENT_SRC_KHR : VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachment.finalLayout = m_colorLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_colorImageView);
     }
@@ -73,7 +70,7 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
         attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        attachment.finalLayout = m_depthLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_depthImageView);
     }
@@ -90,7 +87,7 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
         attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachment.finalLayout = m_normalLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_normalImageView);
     }
@@ -107,7 +104,7 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
         attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        attachment.finalLayout = m_specularLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_specularImageView);
     }
@@ -127,31 +124,51 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
 }
 
 void
-VulkanFramebuffer::setColor(VkImageView * color, VkFormat format)
+VulkanFramebuffer::setColor(VulkanInternalImage * image,
+                            VkImageView * imageView,
+                            VkFormat format,
+                            VkImageLayout layout)
 {
-    m_colorImageView = color;
+    m_colorImage = image;
+    m_colorImageView = imageView;
     m_colorFormat = format;
+    m_colorLayout = layout;
 }
 
 void
-VulkanFramebuffer::setDepth(VkImageView * depth, VkFormat format)
+VulkanFramebuffer::setDepth(VulkanInternalImage * image,
+                            VkImageView * imageView,
+                            VkFormat format,
+                            VkImageLayout layout)
 {
-    m_depthImageView = depth;
+    m_depthImage = image;
+    m_depthImageView = imageView;
     m_depthFormat = format;
+    m_depthLayout = layout;
 }
 
 void
-VulkanFramebuffer::setNormal(VkImageView * normal, VkFormat format)
+VulkanFramebuffer::setNormal(VulkanInternalImage * image,
+                             VkImageView * imageView,
+                             VkFormat format,
+                             VkImageLayout layout)
 {
-    m_normalImageView = normal;
+    m_normalImage = image;
+    m_normalImageView = imageView;
     m_normalFormat = format;
+    m_normalLayout = layout;
 }
 
 void
-VulkanFramebuffer::setSpecular(VkImageView * specular, VkFormat format)
+VulkanFramebuffer::setSpecular(VulkanInternalImage * image,
+                               VkImageView * imageView,
+                               VkFormat format,
+                               VkImageLayout layout)
 {
-    m_specularImageView = specular;
+    m_specularImage = image;
+    m_specularImageView = imageView;
     m_specularFormat = format;
+    m_specularLayout = layout;
 }
 
 void

@@ -249,6 +249,7 @@ endif()
 
 if(${PROJECT_NAME}_ENABLE_VR)
   add_definitions( -DiMSTK_ENABLE_VR )
+  find_package( openvr REQUIRED )
 else()
   remove_definitions( -DiMSTK_ENABLE_VR )
 endif()

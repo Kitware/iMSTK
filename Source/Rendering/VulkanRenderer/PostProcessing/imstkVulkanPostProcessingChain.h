@@ -47,8 +47,8 @@ public:
 protected:
     friend class VulkanRenderer;
 
-    bool m_bloom = true;
-    bool m_sss = true;
+    bool m_bloom = true; ///< bloom pass
+    bool m_sss = true; ///< subsurface scattering pass
 
     std::vector<std::shared_ptr<VulkanPostProcess>> m_postProcesses;
     void incrementBufferNumbers();

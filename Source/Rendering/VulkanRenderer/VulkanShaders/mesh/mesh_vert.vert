@@ -1,4 +1,6 @@
-#version 450
+#version 460
+
+#extension GL_OVR_multiview : enable
 
 layout (constant_id = 0) const uint numLights = 0;
 layout (constant_id = 1) const bool tessellation = false;
@@ -20,9 +22,9 @@ struct light
 
 layout (set = 0, binding = 0) uniform globalUniforms
 {
-    mat4 projectionMatrix;
-    mat4 viewMatrix;
-    vec4 cameraPosition;
+    mat4 projectionMatrices[2];
+    mat4 viewMatrices[2];
+    vec4 cameraPositions[2];
     light lights[16];
 } globals;
 
@@ -38,6 +40,7 @@ layout (location = 0) out vertexData{
     mat3 TBN;
     vec3 cameraPosition;
     vec3 color;
+    flat uint view;
 }vertex;
 
 void main(void)
@@ -51,11 +54,12 @@ void main(void)
 
     vertex.TBN = mat3(tangent.xyz, bitangent.xyz, normal.xyz);
 
-    vertex.cameraPosition = globals.cameraPosition.xyz;
+    vertex.cameraPosition = globals.cameraPositions[gl_ViewID_OVR].xyz;
     vertex.position = position.xyz;
     vertex.normal = normalize(normal.xyz);
     vertex.uv = vertexUV;
     vertex.color = vertexColor;
+    vertex.view = gl_ViewID_OVR;
 
-    gl_Position = globals.projectionMatrix * globals.viewMatrix * position;
+    gl_Position = globals.projectionMatrices[gl_ViewID_OVR] * globals.viewMatrices[gl_ViewID_OVR] * position;
 }
