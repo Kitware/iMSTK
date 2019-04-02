@@ -36,6 +36,10 @@ endif()
 find_package( Eigen 3.1.2 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
 
+# imgui
+find_package( imgui REQUIRED )
+include_directories( ${imgui_INCLUDE_DIR} )
+
 # SCCD
 find_package( SCCD REQUIRED )
 include_directories( ${SCCD_INCLUDE_DIR} )

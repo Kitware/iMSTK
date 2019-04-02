@@ -1,12 +1,9 @@
 #-----------------------------------------------------------------------------
 # Find dependencies
 #-----------------------------------------------------------------------------
+set(g3log_PLATFORM_LINK_LIBRARIES)
 if(WIN32)
-  find_library(DbgHelp_LIBRARY NAMES DbgHelp)
-  
-  if(NOT DbgHelp_LIBRARY)
-    message(FATAL_ERROR "DbgHelp library not found")
-  endif()
+  set(g3log_PLATFORM_LINK_LIBRARIES dbghelp)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -29,7 +26,7 @@ find_library(g3log_LIBRARY
   )
 mark_as_advanced(g3log_LIBRARY)
 
-set(g3log_LIBRARIES ${g3log_LIBRARY} ${DbgHelp_LIBRARY})
+set(g3log_LIBRARIES ${g3log_LIBRARY} ${g3log_PLATFORM_LINK_LIBRARIES})
 
 #-----------------------------------------------------------------------------
 # Find package
