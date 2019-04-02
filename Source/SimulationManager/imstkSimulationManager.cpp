@@ -400,7 +400,7 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
         this->startViewer(renderMode);
     }
     else
-    {        
+    {
         this->printUserControlsInfo(false);
         this->infiniteLoopNoRenderingMode();
         this->endSimulation();
@@ -417,14 +417,14 @@ SimulationManager::infiniteLoopNoRenderingMode()
         {
             break;
         }
-        
+
         if (c == 'r' || c == 'R')
         {
             this->resetSimulation();
             continue;
         }
 
-        
+
         if (c == ' ')
         {
             if (this->getStatus() == SimulationStatus::RUNNING)
@@ -434,7 +434,7 @@ SimulationManager::infiniteLoopNoRenderingMode()
             }
 
             if (this->getStatus() == SimulationStatus::PAUSED)
-            {                
+            {
                 this->runSimulation();
                 continue;
             }
@@ -489,7 +489,7 @@ SimulationManager::printUserControlsInfo(bool isRendering)
             "------------------------\n" <<
             "<space> - pause or unpause simulation\n" <<
             "  R/r   - reset simulation\n" <<
-            "  E/e   - end simulatino\n" <<            
+            "  E/e   - end simulatino\n" <<
             "------------------------\n\n";
     }
 }

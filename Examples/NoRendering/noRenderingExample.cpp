@@ -58,8 +58,8 @@ int main()
         {
             vertList[i*nCols + j] = Vec3d((double)dx*i, 1.0, (double)dy*j);
             std::cout << vertList[i*nCols + j][0] << ", "
-              << vertList[i*nCols + j][1] << ", "
-              << vertList[i*nCols + j][2] << ",    ";
+                      << vertList[i*nCols + j][1] << ", "
+                      << vertList[i*nCols + j][2] << ",    ";
         }
         std::cout << std::endl;
     }
@@ -125,19 +125,18 @@ int main()
     beforeLastPositions.resize(nRows*nCols);
 
     auto func =
-      [&surfMesh](Module* module)
-    {
-        auto newPositions = surfMesh->getVertexPositions();
-        for (int i = 0; i < nRows; ++i)
+        [&surfMesh](Module* module)
         {
-            for (int j = 0; j < nCols; j++)
+            auto newPositions = surfMesh->getVertexPositions();
+            for (int i = 0; i < nRows; ++i)
             {
-                beforeLastPositions[i*nCols + j] = lastPositions[i*nCols + j];
-                lastPositions[i*nCols + j] = newPositions[i*nCols + j];
+                for (int j = 0; j < nCols; j++)
+                {
+                    beforeLastPositions[i*nCols + j] = lastPositions[i*nCols + j];
+                    lastPositions[i*nCols + j] = newPositions[i*nCols + j];
+                }
             }
-        }
-
-    };
+        };
     sdk->getSceneManager(scene)->setPostUpdateCallback(func);
 
     // Start
@@ -182,31 +181,30 @@ int main()
     bool expectedLastStateSuccess = true;
     for (int i = 0; i < nRows; ++i)
     {
-      for (int j = 0; j < nCols; j++)
-      {
-        std::cout << lastPositions[i*nCols + j][0] << ", " << lastPositions[i*nCols + j][1] << ", " << lastPositions[i*nCols + j][2] << ", " << std::endl;
-      }
+        for (int j = 0; j < nCols; j++)
+        {
+            std::cout << lastPositions[i*nCols + j][0] << ", " << lastPositions[i*nCols + j][1] << ", " << lastPositions[i*nCols + j][2] << ", " << std::endl;
+        }
     }
 
     for (int i = 0; i < nRows; ++i)
     {
-      for (int j = 0; j < nCols; j++)
-      {
-          for (int k = 0; k < 3; ++k)
-          {
-              sameLastStateSuccess &= vtkMathUtilities::FuzzyCompare(
+        for (int j = 0; j < nCols; j++)
+        {
+            for (int k = 0; k < 3; ++k)
+            {
+                sameLastStateSuccess &= vtkMathUtilities::FuzzyCompare(
                   beforeLastPositions[i*nCols + j][k], lastPositions[i*nCols + j][k], epsilon);
 
-              expectedLastStateSuccess &= vtkMathUtilities::FuzzyCompare(
+                expectedLastStateSuccess &= vtkMathUtilities::FuzzyCompare(
                   lastPositions[i*nCols + j][k], expectedFinalPositions[i*nCols + j][k]);
-              if (!expectedLastStateSuccess)
-              {
-                std::cout << lastPositions[i*nCols + j][k] << "  " << expectedFinalPositions[i*nCols + j][k]<< std::endl;
-                expectedLastStateSuccess = true;
-              }
-          }
-          
-      }
+                if (!expectedLastStateSuccess)
+                {
+                    std::cout << lastPositions[i*nCols + j][k] << "  " << expectedFinalPositions[i*nCols + j][k]<< std::endl;
+                    expectedLastStateSuccess = true;
+                }
+            }
+        }
     }
 
     if (!sameLastStateSuccess)
@@ -216,8 +214,8 @@ int main()
     }
     if (!expectedLastStateSuccess)
     {
-      std::cerr << "Error: last state positions are wrong" << std::endl;
-      return EXIT_FAILURE;
+        std::cerr << "Error: last state positions are wrong" << std::endl;
+        return EXIT_FAILURE;
     }
 
     return 0;

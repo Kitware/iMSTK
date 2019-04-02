@@ -92,7 +92,7 @@ Graph::doGreedyColoring(bool print /*= false*/) const
         int cr;
         for (cr = 0; cr < numNodes; cr++)
         {
-            if (available[cr] == false)
+            if (!available[cr])
             {
                 break;
             }

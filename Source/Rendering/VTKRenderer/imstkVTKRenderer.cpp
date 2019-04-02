@@ -64,15 +64,70 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
     }
 
     // Lights and light actors
-    for ( const auto& light : scene->getLights() )
+    for (const auto& light : scene->getLights())
     {
-        m_vtkLights.push_back( light->getVtkLight() );
-        if (light->getType() == LightType::POINT_LIGHT ||
-            light->getType() == LightType::SPOT_LIGHT)
+        // Create lights specified in the scene
+        switch (light->getType())
         {
-            auto lightActor = vtkSmartPointer<vtkLightActor>::New();
-            lightActor->SetLight( light->getVtkLight() );
-            m_debugVtkActors.push_back( lightActor );
+        case imstk::LightType::DIRECTIONAL_LIGHT:
+        {
+            auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
+            m_vtkLight->SetPositional(false);
+            auto color = light->getColor();
+            m_vtkLight->SetColor(color.r, color.g, color.b);
+            m_vtkLight->SetIntensity(light->getIntensity());
+            m_vtkLight->SetFocalPoint(light->getFocalPoint().data());
+
+            m_vtkLights.push_back(m_vtkLight);
+        }
+        break;
+
+        case imstk::LightType::SPOT_LIGHT:
+        {
+            auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
+            m_vtkLight->SetPositional(true);
+            auto color = light->getColor();
+            m_vtkLight->SetColor(color.r, color.g, color.b);
+            m_vtkLight->SetIntensity(light->getIntensity());
+            m_vtkLight->SetFocalPoint(light->getFocalPoint().data());
+
+            auto spotLight = std::dynamic_pointer_cast<SpotLight>(light);
+            m_vtkLight->SetConeAngle(spotLight->getConeAngle());
+            m_vtkLight->SetPosition(spotLight->getPosition().data());
+            m_vtkLight->SetConeAngle(spotLight->getSpotAngle());
+
+            m_vtkLights.push_back(m_vtkLight);
+
+            auto lightActorSpot = vtkSmartPointer<vtkLightActor>::New();
+            lightActorSpot->SetLight(m_vtkLight);
+            m_debugVtkActors.push_back(lightActorSpot);
+        }
+        break;
+
+        case imstk::LightType::POINT_LIGHT:
+        {
+            auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
+            m_vtkLight->SetPositional(true);
+            auto color = light->getColor();
+            m_vtkLight->SetColor(color.r, color.g, color.b);
+            m_vtkLight->SetIntensity(light->getIntensity());
+            m_vtkLight->SetFocalPoint(light->getFocalPoint().data());
+
+            auto pointLight = std::dynamic_pointer_cast<PointLight>(light);
+            m_vtkLight->SetConeAngle(pointLight->getConeAngle());
+            m_vtkLight->SetPosition(pointLight->getPosition().data());
+
+            m_vtkLights.push_back(m_vtkLight);
+
+            auto lightActorPoint = vtkSmartPointer<vtkLightActor>::New();
+            lightActorPoint->SetLight(m_vtkLight);
+            m_debugVtkActors.push_back(lightActorPoint);
+        }
+        break;
+
+        default:
+
+            LOG(WARNING) << "Light type undefined!";
         }
     }
 
