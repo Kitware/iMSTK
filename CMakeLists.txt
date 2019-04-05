@@ -390,11 +390,6 @@ install(
   )
 
 #--------------------------------------------------------------------------
-# Test data download
-#--------------------------------------------------------------------------
-include(imstkExternalDataDownloadTest)
- 
-#--------------------------------------------------------------------------
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
 if(BUILD_EXAMPLES)
@@ -405,6 +400,7 @@ endif()
 # Download the external data needed for both testing and examples
 #-----------------------------------------------------------------------------
 if(BUILD_TESTING OR BUILD_EXAMPLES)
+    include(imstkExternalDataDownloadTest)
     imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 endif()
 
