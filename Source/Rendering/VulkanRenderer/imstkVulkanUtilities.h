@@ -35,7 +35,6 @@
 
 namespace imstk
 {
-
 namespace VulkanShaderPath
 {
 const std::string Mesh("./Shaders/VulkanShaders/Mesh/");
