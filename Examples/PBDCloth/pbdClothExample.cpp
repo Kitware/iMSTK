@@ -130,13 +130,5 @@ int main()
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::RUNNING);
 
-    // Perform an infinite loop if there is no rendering enabled
-    if (runSimWithoutRendering)
-    {
-        LOG(INFO) << "simulation is starting. PRESS any key to exit";
-        while (sdk->getStatus() == SimulationStatus::RUNNING && !getchar()) {}
-        sdk->endSimulation();
-    }
-
     return 0;
 }
