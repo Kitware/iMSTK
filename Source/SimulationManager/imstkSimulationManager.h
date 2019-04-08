@@ -190,7 +190,7 @@ private:
     ///
     /// \brief Print user keyboard controls
     ///
-    void printUserControlsInfo(bool isRendering = true);
+    void printUserControlsInfo(const bool isRendering = true) const;
 
     void startModuleInNewThread(std::shared_ptr<Module> module);
 

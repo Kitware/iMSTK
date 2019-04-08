@@ -467,7 +467,7 @@ SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mod
 }
 
 void
-SimulationManager::printUserControlsInfo(bool isRendering)
+SimulationManager::printUserControlsInfo(const bool isRendering) const
 {
     if (isRendering)
     {
@@ -484,13 +484,13 @@ SimulationManager::printUserControlsInfo(bool isRendering)
     else
     {
         LOG(INFO) <<
-            "\n------------------------\n" <<
-            "     User controls\n" <<
-            "------------------------\n" <<
-            "<space> - pause or unpause simulation\n" <<
-            "  R/r   - reset simulation\n" <<
-            "  E/e   - end simulatino\n" <<
-            "------------------------\n\n";
+            "\n------------------------------------------------\n" <<
+            "     No-rendering mode user controls\n" <<
+            "------------------------------------------------\n" <<
+            "<space> + <return> - pause or unpause simulation\n" <<
+            "  R/r + <return>   - reset simulation\n" <<
+            "  E/e + <return>   - end simulation\n" <<
+            "------------------------------------------------\n\n";
     }
 }
 
