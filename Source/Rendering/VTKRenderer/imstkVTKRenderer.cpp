@@ -172,7 +172,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
 #endif
     ///TODO : based on scene properties
     // Customize background colors
-    
+
     //m_vtkRenderer->SetBackground(0.66,0.66,0.66);
     //m_vtkRenderer->SetBackground2(0.406, 0.481, 0.497);
 

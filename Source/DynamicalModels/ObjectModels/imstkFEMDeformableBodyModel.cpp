@@ -165,7 +165,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
             size_t index;
             auto maxAllowed = m_vegaPhysicsMesh->getNumVertices();
             while (!file.eof())
-            {                
+            {
                 file >> index;
                 if (index < maxAllowed)
                 {
@@ -533,7 +533,7 @@ FEMDeformableBodyModel::applyBoundaryConditions(SparseMatrixd &M, const bool wit
                     }
                 }
             }
-        }        
+        }
     }
 }
 
@@ -628,12 +628,12 @@ FEMDeformableBodyModel::getFunctionGradient()
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord &q)->const SparseMatrixd &
            {
-                this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+               this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
-                if(this->m_implementFixedBC)
-                {
-                    applyBoundaryConditions(m_Keff);
-                }               
+               if(this->m_implementFixedBC)
+               {
+                   applyBoundaryConditions(m_Keff);
+               }
                return m_Keff;
            };
 }

@@ -55,7 +55,7 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     vegaConfigFileOptions.addOptionOptional(optNameList.compressionResistanceName.c_str(), &optList.compressionResistance, optList.compressionResistance);
     vegaConfigFileOptions.addOptionOptional(optNameList.inversionThresholdName.c_str(), &optList.inversionThreshold, optList.inversionThreshold);
     vegaConfigFileOptions.addOptionOptional(optNameList.numberOfThreadsName.c_str(), &optList.numberOfThreads, optList.numberOfThreads);
-    
+
     // Parse the configuration file
     if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
     {
@@ -76,7 +76,7 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     const size_t last_slash_idx = configFileName.rfind('/');
     if (std::string::npos != last_slash_idx)
     {
-        rootDir = configFileName.substr(0, last_slash_idx); 
+        rootDir = configFileName.substr(0, last_slash_idx);
     }
 
     // Store parsed string values

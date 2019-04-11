@@ -119,7 +119,7 @@ int main()
     // create a nonlinear system
     auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),
-        dynaModel->getFunctionGradient());    
+        dynaModel->getFunctionGradient());
 
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
@@ -128,7 +128,7 @@ int main()
     // create a linear solver
     auto linSolver = std::make_shared<ConjugateGradient>();
 
-    if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel && 
+    if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel &&
         dynaModel->isFixedBCImplemented())
     {
         LOG(WARNING) << "The GS solver may not be viable!";
