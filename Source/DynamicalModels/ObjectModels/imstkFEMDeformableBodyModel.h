@@ -248,6 +248,13 @@ public:
     ///
     void setFixedSizeTimeStepping();
 
+    ///
+    /// \brief Set the fixed BC implementation state
+    ///
+    void enableFixedBC() { m_implementFixedBC = true; };
+    void disableFixedBC() { m_implementFixedBC = false; };
+    bool isFixedBCImplemented() const { return m_implementFixedBC; };
+
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
@@ -278,6 +285,10 @@ protected:
     stateUpdateType m_updateType = stateUpdateType::deltaVelocity;        ///> Update type of the model
 
     bool m_damped = false;                                                ///> Viscous or structurally damped system
+
+    // If this is true, the tangent stiffness and force vector will be modified to
+    // accommodate (the rows and columns will be nullified) the fixed boundary conditions
+    bool m_implementFixedBC = true;
 };
 } // imstk
 
