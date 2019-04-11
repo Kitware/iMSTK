@@ -32,6 +32,7 @@
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
+#include "imstkConjugateGradient.h"
 
 using namespace imstk;
 
@@ -118,26 +119,23 @@ int main()
     // create a nonlinear system
     auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),
-        dynaModel->getFunctionGradient());
-
-    std::vector<LinearProjectionConstraint> projList;
-    for (auto i : dynaModel->getFixNodeIds())
-    {
-        auto s = LinearProjectionConstraint(i, false);
-        s.setProjectorToDirichlet(i, Vec3d(0.001, 0, 0));
-        projList.push_back(s);
-    }
+        dynaModel->getFunctionGradient());    
 
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     // create a linear solver
-    auto linSolver = std::make_shared<GaussSeidel>();
+    auto linSolver = std::make_shared<ConjugateGradient>();
+
+    if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel && 
+        dynaModel->isFixedBCImplemented())
+    {
+        LOG(WARNING) << "The GS solver may not be viable!";
+    }
 
     // create a non-linear solver and add to the scene
     auto nlSolver = std::make_shared<NewtonSolver>();
-    linSolver->setLinearProjectors(&projList);
     nlSolver->setLinearSolver(linSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
@@ -154,7 +152,8 @@ int main()
 
     // Run the simulation
     sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+    sdk->startSimulation();
 
     return 0;
 }
