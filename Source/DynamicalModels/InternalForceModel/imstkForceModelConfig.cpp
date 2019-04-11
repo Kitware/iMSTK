@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkForceModelConfig.h"
+#include <iostream>
 
 namespace imstk
 {
@@ -54,7 +55,7 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     vegaConfigFileOptions.addOptionOptional(optNameList.compressionResistanceName.c_str(), &optList.compressionResistance, optList.compressionResistance);
     vegaConfigFileOptions.addOptionOptional(optNameList.inversionThresholdName.c_str(), &optList.inversionThreshold, optList.inversionThreshold);
     vegaConfigFileOptions.addOptionOptional(optNameList.numberOfThreadsName.c_str(), &optList.numberOfThreads, optList.numberOfThreads);
-
+    
     // Parse the configuration file
     if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
     {
@@ -70,10 +71,18 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
         vegaConfigFileOptions.printOptions();
     }
 
+    // get the root directory
+    std::string rootDir;
+    const size_t last_slash_idx = configFileName.rfind('/');
+    if (std::string::npos != last_slash_idx)
+    {
+        rootDir = configFileName.substr(0, last_slash_idx); 
+    }
+
     // Store parsed string values
     m_stringsOptionMap.emplace(optNameList.femMethodName, optList.femMethod);
     m_stringsOptionMap.emplace(optNameList.invertibleMaterialName, optList.invertibleMaterial);
-    m_stringsOptionMap.emplace(optNameList.fixedDOFFilenameName, optList.fixedDOFFilename);
+    m_stringsOptionMap.emplace(optNameList.fixedDOFFilenameName, rootDir + std::string("/") + optList.fixedDOFFilename);
 
     // Store parsed floating point values
     m_floatsOptionMap.emplace(optNameList.dampingMassCoefficientName, optList.dampingMassCoefficient);
