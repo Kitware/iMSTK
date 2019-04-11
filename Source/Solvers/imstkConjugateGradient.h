@@ -136,8 +136,8 @@ private:
     ///> Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<SparseMatrixd> m_cgSolver;
 
-    std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints;
-    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
+    std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints = nullptr;
+    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk
 
