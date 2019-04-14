@@ -32,7 +32,7 @@ using namespace imstk;
 int main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>(false, true);
+    auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("Rendering");
 
     // Add IBL Probe

@@ -514,20 +514,23 @@ FEMDeformableBodyModel::applyBoundaryConditions(SparseMatrixd &M, const bool wit
     // Set column and row to zero.
     for (auto & index : m_fixedNodeIds)
     {
-        auto idx = static_cast<SparseMatrixd::Index>(index);
+        auto nodeIdx = static_cast<SparseMatrixd::Index>(index)*3;
 
-        for (int k = 0; k < M.outerSize(); ++k)
+        for (auto idx = nodeIdx; idx < nodeIdx + 3; idx++)
         {
-            for (SparseMatrixd::InnerIterator i(M, k); i; ++i)
+            for (long long k = 0; k < M.outerSize(); ++k)
             {
-                if (i.row() == idx || i.col() == idx)
+                for (SparseMatrixd::InnerIterator i(M, k); i; ++i)
                 {
-                    i.valueRef() = 0.0;
-                }
+                    if (i.row() == idx || i.col() == idx)
+                    {
+                        i.valueRef() = 0.0;
+                    }
 
-                if (i.row() == idx && i.col() == idx)
-                {
-                    i.valueRef() = compliance;
+                    if (i.row() == idx && i.col() == idx)
+                    {
+                        i.valueRef() = compliance;
+                    }
                 }
             }
         }
@@ -539,7 +542,8 @@ FEMDeformableBodyModel::applyBoundaryConditions(Vectord &x) const
 {
     for (auto & index : m_fixedNodeIds)
     {
-        x(index) = 0.0;
+        const auto _3Index = 3 * index;
+        x(_3Index) = x(_3Index + 1) = x(_3Index + 2) = 0.0;
     }
 }
 
@@ -610,7 +614,10 @@ FEMDeformableBodyModel::getFunction()
                (semiImplicit) ?
                this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
                this->computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
-
+               if (this->m_implementFixedBC)
+               {
+                   applyBoundaryConditions(m_Feff);
+               }
                return m_Feff;
            };
 }
@@ -623,6 +630,10 @@ FEMDeformableBodyModel::getFunctionGradient()
            {
                this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
+               if(this->m_implementFixedBC)
+               {
+                   applyBoundaryConditions(m_Keff);
+               }
                return m_Keff;
            };
 }

@@ -31,7 +31,7 @@ using namespace imstk;
 int main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>(1);
+    auto sdk = std::make_shared<SimulationManager>();
     auto sceneTest = sdk->createNewScene("HelloWorld");
 
     // Add Plane

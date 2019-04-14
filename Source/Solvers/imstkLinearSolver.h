@@ -106,6 +106,11 @@ public:
     ///
     virtual bool isIterative() const = 0;
 
+    ///
+    /// \brief Return the type of the solver
+    ///
+    Type getType() { return m_type; };
+
 protected:
     Type m_type = Type::none;                                 ///> Type of the scene object
     double m_tolerance = 1.0e-4;                        ///> default tolerance

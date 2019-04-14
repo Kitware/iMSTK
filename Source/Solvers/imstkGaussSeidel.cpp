@@ -37,7 +37,7 @@ GaussSeidel::solve(Vectord& x)
         return;
     }
 
-    if (m_FixedLinearProjConstraints->size() == 0)
+    if (!m_FixedLinearProjConstraints)
     {
         this->gaussSeidelSolve(x);
     }
