@@ -1621,7 +1621,7 @@ VulkanRenderer::updateGlobalUniforms(uint32_t frameIndex)
         {
             // Only supports directional lights right now
             auto focalPoint = lights[i]->getFocalPoint();
-            auto position = Vec3d(0,0,0);
+            auto position = Vec3f(0,0,0);
             int type = 1;
             int shadowMapIndex = -1;
 
