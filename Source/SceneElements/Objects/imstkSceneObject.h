@@ -26,6 +26,7 @@
 #include <string>
 
 #include "imstkVisualModel.h"
+#include "imstkEntity.h"
 
 namespace imstk
 {
@@ -38,7 +39,7 @@ class DeviceClient;
 /// \brief Base class for all scene objects. A scene object can optionally be visible and
 /// collide with other scene objects. A object of the class is static.
 ///
-class SceneObject
+class SceneObject : public Entity
 {
 public:
     enum class Type
@@ -54,14 +55,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    SceneObject(const std::string& name) : m_name(name)
-    {
-        m_type = Type::Visual;
-    }
-    SceneObject(std::string&& name) : m_name(std::move(name))
-    {
-        m_type = Type::Visual;
-    }
+    SceneObject(const std::string& name);
+    SceneObject(std::string&& name);
 
     ///
     /// \brief Destructor
