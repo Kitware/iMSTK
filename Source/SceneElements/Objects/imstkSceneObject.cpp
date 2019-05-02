@@ -26,6 +26,16 @@
 
 namespace imstk
 {
+SceneObject::SceneObject(const std::string& name) : m_name(name), Entity()
+{
+    m_type = Type::Visual;
+}
+
+SceneObject::SceneObject(std::string&& name) : m_name(std::move(name)), Entity()
+{
+    m_type = Type::Visual;
+}
+
 std::shared_ptr<Geometry>
 SceneObject::getVisualGeometry() const
 {
