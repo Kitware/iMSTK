@@ -30,7 +30,7 @@ void
 PointSetToSpherePickingCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     if (!m_deviceTracker || !m_deviceTracker->getDeviceClient()->getButton(m_buttonId))
     {
@@ -47,7 +47,7 @@ PointSetToSpherePickingCD::computeCollisionData()
         auto dist = (spherePos - p).norm();
         if (dist <= radius)
         {
-            m_colData.NodePickData.push_back({ spherePos - p, nodeId, 0 });
+            m_colData->NodePickData.push_back({ spherePos - p, nodeId, 0 });
         }
         nodeId++;
     }

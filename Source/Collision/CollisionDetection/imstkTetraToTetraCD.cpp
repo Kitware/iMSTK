@@ -29,7 +29,7 @@
 namespace imstk {
 TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                                std::shared_ptr<TetrahedralMesh> meshB,
-                               CollisionData& colData) :
+	std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::MeshToMesh, colData), //is TetrahedralMeshToTetrahedralMesh type needed?
     m_meshA(meshA),
     m_meshB(meshB)
@@ -95,7 +95,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                         assert(coordSum <= 1 + eps2 && coordSum >= 1 - eps2);
 
                         PointTetrahedronCollisionData ptColl = { cType, vId, tId, bCoord };
-                        m_colData.PTColData.push_back(ptColl);
+                        m_colData->PTColData.push_back(ptColl);
                     }
                 } //if not this tetrahedron
             } //for vertices
@@ -110,7 +110,7 @@ TetraToTetraCD::computeCollisionData()
     m_hashTable.insertPoints(m_meshA->getVertexPositions());
     m_hashTable.insertPoints(m_meshB->getVertexPositions());
 
-    m_colData.clearAll();
+    m_colData->clearAll();
     this->findCollisionsForMeshWithinHashTable(m_meshA, 0);
     this->findCollisionsForMeshWithinHashTable(m_meshB, m_meshA->getNumVertices());
 }

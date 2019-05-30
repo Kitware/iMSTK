@@ -65,10 +65,10 @@ PBDCollisionHandling::generatePBDConstraints()
     const auto map1 = m_pbdObject1->getPhysicsToCollidingMap();
     const auto map2 = m_pbdObject2->getPhysicsToCollidingMap();
 
-    std::cout << "EE: " << m_colData.EEColData.size() << "TV: " << m_colData.TVColData.size() << std::endl;
+    std::cout << "EE: " << m_colData->EEColData.size() << "TV: " << m_colData->TVColData.size() << std::endl;
 
     // Generate edge-edge pbd constraints
-    for (auto& colData : m_colData.EEColData)
+    for (auto& colData : m_colData->EEColData)
     {
         auto c = std::make_shared<PbdEdgeEdgeConstraint>();
 
@@ -79,7 +79,7 @@ PBDCollisionHandling::generatePBDConstraints()
     }
 
     // Generate triangle-vertex pbd constraints
-    for (auto& colData : m_colData.TVColData)
+    for (auto& colData : m_colData->TVColData)
     {
         const auto triVerts = colGeo2->getTrianglesVertices()[colData.triIdA];
 

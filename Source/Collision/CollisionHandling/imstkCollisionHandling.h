@@ -71,7 +71,7 @@ public:
     static std::shared_ptr<CollisionHandling> make_collision_handling(
         const Type& type,
         const Side& side,
-        const CollisionData& colData,
+        const std::shared_ptr<CollisionData> colData,
         std::shared_ptr<CollidingObject> objA,
         std::shared_ptr<CollidingObject> objB = nullptr);
 
@@ -80,7 +80,7 @@ public:
     ///
     CollisionHandling(const Type& type,
                       const Side& side,
-                      const CollisionData& colData) :
+                      const std::shared_ptr<CollisionData> colData) :
         m_type(type),
         m_side(side),
         m_colData(colData){}
@@ -105,7 +105,7 @@ protected:
 
     Type m_type;                    ///< Collision handling algorithm type
     Side m_side;                    ///< Direction of the collisionData
-    const CollisionData& m_colData; ///< Collision data
+    const std::shared_ptr<CollisionData> m_colData; ///< Collision data
 };
 }
 

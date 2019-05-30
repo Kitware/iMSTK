@@ -22,12 +22,15 @@
 #ifndef imstkCollisionDetection_h
 #define imstkCollisionDetection_h
 
+#include "imstkCollisionData.h"
+
 #include <memory>
 
 namespace imstk
 {
 class CollidingObject;
-class CollisionData;
+//class CollisionData;
+//class CollisionData::CollisionData;
 
 ///
 /// \class CollisionDetection
@@ -62,15 +65,17 @@ public:
     static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(const Type& type,
                                                                             std::shared_ptr<CollidingObject> objA,
                                                                             std::shared_ptr<CollidingObject> objB,
-                                                                            CollisionData& colData);
+																			std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Constructor
     ///
-    CollisionDetection(const Type& type, CollisionData& colData) :
-        m_type(type),
-        m_colData(colData)
-    {}
+    CollisionDetection(const Type& type, std::shared_ptr<CollisionData> colData) :
+        m_type(type)//,
+        //m_colData(colData)
+    {
+		m_colData = std::make_shared<CollisionData>();
+	}
     CollisionDetection() = delete;
 
     ///
@@ -91,12 +96,12 @@ public:
     ///
     /// \brief Returns collision data
     ///
-    const CollisionData& getCollisionData() const;
+    const std::shared_ptr<CollisionData> getCollisionData() const;
 
 protected:
 
     Type m_type = Type::Custom;  ///< Collision detection algorithm type
-    CollisionData& m_colData;    ///< Collision data
+    std::shared_ptr<CollisionData> m_colData;    ///< Collision data
 };
 }
 

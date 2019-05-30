@@ -45,7 +45,7 @@ public:
     ///
     SphereToSphereCD(std::shared_ptr<Sphere> sphereA,
                      std::shared_ptr<Sphere> sphereB,
-                     CollisionData& colData) :
+		std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::SphereToSphere, colData),
         m_sphereA(sphereA),
         m_sphereB(sphereB)

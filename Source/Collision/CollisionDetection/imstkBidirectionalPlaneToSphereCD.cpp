@@ -33,7 +33,7 @@ void
 BidirectionalPlaneToSphere::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Get geometry properties
     Vec3d sphereBPos = m_sphereB->getPosition();
@@ -64,6 +64,6 @@ BidirectionalPlaneToSphere::computeCollisionData()
     Vec3d sphereBColPt = sphereBPos - dirAToB*r;
 
     // Set collisionData
-    m_colData.PDColData.push_back({planeAColPt, sphereBColPt, dirAToB, penetrationDepth});
+    m_colData->PDColData.push_back({planeAColPt, sphereBColPt, dirAToB, penetrationDepth});
 }
 }

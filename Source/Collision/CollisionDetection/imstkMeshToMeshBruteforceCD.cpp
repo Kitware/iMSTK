@@ -37,7 +37,7 @@ void
 MeshToMeshBruteForceCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Broad phase collision
     doBroadPhaseCollisionCheck();
@@ -72,7 +72,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                                        m_proximityTolerance))
                 {
                     TriangleVertexCollisionData d(j, i);
-                    m_colData.TVColData.push_back(d);
+                    m_colData->TVColData.push_back(d);
                 }
             }
         }
@@ -106,7 +106,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                         p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                     {
                         EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                        m_colData.EEColData.push_back(d);
+                        m_colData->EEColData.push_back(d);
                     }
                     E2[e[0]][e[1]] = 0;
                 }
@@ -119,7 +119,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                         p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                     {
                         EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                        m_colData.EEColData.push_back(d);
+                        m_colData->EEColData.push_back(d);
                     }
                     E2[e[1]][e[2]] = 0;
                 }
@@ -132,7 +132,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                         p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                     {
                         EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                        m_colData.EEColData.push_back(d);
+                        m_colData->EEColData.push_back(d);
                     }
                     E2[e[2]][e[0]] = 0;
                 }
@@ -163,7 +163,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
                     TriangleVertexCollisionData d(i, j);
-                    m_colData.TVColData.push_back(d);
+                    m_colData->TVColData.push_back(d);
                 }
             }
         }
@@ -192,7 +192,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
                     TriangleVertexCollisionData d(i, j);
-                    m_colData.TVColData.push_back(d);
+                    m_colData->TVColData.push_back(d);
                 }
             }
         }
@@ -232,7 +232,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[0]][e[1]] = 0;
                         }
@@ -246,7 +246,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[1]][e[2]] = 0;
                         }
@@ -260,7 +260,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[2]][e[0]] = 0;
                         }
@@ -292,7 +292,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[0]][e[1]] = 0;
                         }
@@ -306,7 +306,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[1]][e[2]] = 0;
                         }
@@ -320,7 +320,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[2]][e[0]] = 0;
                         }
@@ -351,7 +351,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[0]][e[1]] = 0;
                         }
@@ -365,7 +365,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[1]][e[2]] = 0;
                         }
@@ -379,7 +379,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
                             EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                            m_colData.EEColData.push_back(d);
+                            m_colData->EEColData.push_back(d);
 
                             E2[e[2]][e[0]] = 0;
                         }

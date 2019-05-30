@@ -32,7 +32,7 @@ void
 SphereCylinderCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Get geometry properties
     const Vec3d spherePos = m_sphere->getPosition();
@@ -58,6 +58,6 @@ SphereCylinderCD::computeCollisionData()
     Vec3d cylinderColPt = cylinderPos + cylinderAxis*(spherePos - cylinderPos).dot(cylinderAxis) + n * rCylinder;
 
     // Set collisionData
-    m_colData.PDColData.push_back({ sphereColPt, cylinderColPt, n, penetrationDepth });
+    m_colData->PDColData.push_back({ sphereColPt, cylinderColPt, n, penetrationDepth });
 }
 } //imstk

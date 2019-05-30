@@ -48,7 +48,7 @@ public:
     /// \brief Constructor
     ///
     PickingCH(const Side& side,
-              const CollisionData& colData,
+              const std::shared_ptr<CollisionData> colData,
               std::shared_ptr<DeformableObject> obj) :
         CollisionHandling(Type::NodalPicking, side, colData),
         m_object(obj){}

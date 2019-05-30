@@ -49,7 +49,7 @@ public:
     /// \brief Constructor
     ///
     PBDCollisionHandling(const Side& side,
-                         const CollisionData& colData,
+                         const std::shared_ptr<CollisionData> colData,
                          std::shared_ptr<PbdObject> obj1,
                          std::shared_ptr<PbdObject> obj2) :
         CollisionHandling(Type::Penalty, side, colData),

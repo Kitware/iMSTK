@@ -47,7 +47,7 @@ public:
     /// \brief Constructor
     ///
     PenaltyCH(const Side& side,
-              const CollisionData& colData,
+              const std::shared_ptr<CollisionData> colData,
               std::shared_ptr<CollidingObject> obj) :
         CollisionHandling(Type::Penalty, side, colData),
         m_object(obj){}

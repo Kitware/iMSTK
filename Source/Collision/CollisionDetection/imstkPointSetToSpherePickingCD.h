@@ -47,7 +47,7 @@ public:
     ///
     PointSetToSpherePickingCD(std::shared_ptr<PointSet> pointSet,
                               std::shared_ptr<Sphere> sphere,
-                              CollisionData& colData) :
+		std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::PointSetToSphere,
                            colData),
         m_pointSet(pointSet),

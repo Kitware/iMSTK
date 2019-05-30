@@ -178,6 +178,8 @@ public:
         NodePickData.clear();
     }
 
+	CollisionData() {}
+
     std::vector<PositionDirectionCollisionData> PDColData; ///< Position Direction collision data
     std::vector<VertexTriangleCollisionData> VTColData;    ///< Vertex Triangle collision data
     std::vector<TriangleVertexCollisionData> TVColData;    ///< Triangle Vertex collision data

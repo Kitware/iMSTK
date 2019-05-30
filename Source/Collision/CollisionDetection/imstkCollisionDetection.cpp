@@ -44,7 +44,7 @@ std::shared_ptr<CollisionDetection>
 CollisionDetection::makeCollisionDetectionObject(const Type& type,
                                                  std::shared_ptr<CollidingObject> objA,
                                                  std::shared_ptr<CollidingObject> objB,
-                                                 CollisionData &colData)
+												 std::shared_ptr<CollisionData> colData)
 {
     switch (type)
     {
@@ -197,7 +197,7 @@ CollisionDetection::getType() const
     return m_type;
 }
 
-const CollisionData&
+const std::shared_ptr<CollisionData>
 CollisionDetection::getCollisionData() const
 {
     return m_colData;
