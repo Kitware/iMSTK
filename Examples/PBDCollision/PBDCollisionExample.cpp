@@ -42,14 +42,14 @@ int main()
 	scene->getCamera()->setPosition(0, 10.0, 10.0);
 
 	// dragon
-	auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/oneTet/oneTet.veg");
+	auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 	if (!tetMesh)
 	{
 		LOG(WARNING) << "Could not read mesh from file.";
 		return 1;
 	}
-	tetMesh->scale(5., Geometry::TransformType::ApplyToData);
-	tetMesh->translate(Vec3d(0., -5., 0.) , Geometry::TransformType::ApplyToData);
+	//tetMesh->scale(5., Geometry::TransformType::ApplyToData);
+	//tetMesh->translate(Vec3d(0., -5., -5.) , Geometry::TransformType::ApplyToData);
 
 
 	auto surfMesh = std::make_shared<SurfaceMesh>();
@@ -64,7 +64,8 @@ int main()
 
 	auto material = std::make_shared<RenderMaterial>();
 	material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-	//surfMesh->setRenderMaterial(material);
+	auto surfMeshVisualModel = std::make_shared<VisualModel>(surfMesh);
+	surfMeshVisualModel->setRenderMaterial(material);
 
 	auto deformMapP2V = std::make_shared<OneToOneMap>();
 	deformMapP2V->setMaster(tetMesh);
@@ -82,7 +83,8 @@ int main()
 	deformMapP2C->compute();
 
 	auto deformableObj = std::make_shared<PbdObject>("Dragon");
-	deformableObj->setVisualGeometry(surfMesh);
+	//deformableObj->setVisualGeometry(surfMesh);
+	deformableObj->addVisualModel(surfMeshVisualModel);
 	deformableObj->setCollidingGeometry(surfMesh);
 	deformableObj->setPhysicsGeometry(volTetMesh);
 	deformableObj->setPhysicsToCollidingMap(deformMapP2C);
@@ -303,7 +305,8 @@ int main()
 
 		auto materialFloor = std::make_shared<RenderMaterial>();
 		materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-		//floorMesh->setRenderMaterial(materialFloor);
+		auto floorMeshVisual = std::make_shared<VisualModel>(floorMesh);
+		floorMeshVisual->setRenderMaterial(materialFloor);
 
 		auto floorMapP2V = std::make_shared<OneToOneMap>();
 		floorMapP2V->setMaster(floorMesh);
@@ -323,6 +326,7 @@ int main()
 		auto floor = std::make_shared<PbdObject>("Floor");
 		floor->setCollidingGeometry(floorMesh);
 		floor->setVisualGeometry(floorMesh);
+		floor->addVisualModel(floorMeshVisual);
 		floor->setPhysicsGeometry(floorMesh);
 		floor->setPhysicsToCollidingMap(floorMapP2C);
 		floor->setPhysicsToVisualMap(floorMapP2V);
@@ -343,16 +347,12 @@ int main()
 		scene->addSceneObject(floor);
 
 		auto colData = std::make_shared<CollisionData>();
-		auto CD = std::make_shared<MeshToMeshBruteForceCD>(floor->getCollidingGeometry(),
-			surfMesh,
-			colData);
+		auto CD = std::make_shared<MeshToMeshBruteForceCD>(surfMesh, floorMesh, colData);
 
 		auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-			CD->getCollisionData(),
-			floor,
-			deformableObj);
+			CD->getCollisionData(), deformableObj, floor, pbdSolver);
 
-		scene->getCollisionGraph()->addInteractionPair(floor, deformableObj, CD, CH, nullptr);
+		scene->getCollisionGraph()->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
 	}
 
 	// Light
