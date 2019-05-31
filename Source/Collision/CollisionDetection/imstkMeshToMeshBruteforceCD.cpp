@@ -191,7 +191,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    TriangleVertexCollisionData d(i, j);
+                    TriangleVertexCollisionData d(j, i);
                     m_colData->TVColData.push_back(d);
                 }
             }
