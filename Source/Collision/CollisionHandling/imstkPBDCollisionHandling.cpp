@@ -26,6 +26,7 @@
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
 #include "imstkPbdPointTriCollisionConstraint.h"
 
+#include "imstkPbdSolver.h"
 #include <memory>
 #include <g3log/g3log.hpp>
 
@@ -49,6 +50,10 @@ PBDCollisionHandling::processCollisionData()
                      << " (rigid mesh not yet supported).";
     }*/
     this->generatePBDConstraints();
+	if(m_PBDSolver)
+		m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
+	else
+		LOG(WARNING) << "Error: PBDCollisionHandling: no PbdSolver found to handle the Collision constraints...";
 }
 
 void
@@ -65,7 +70,7 @@ PBDCollisionHandling::generatePBDConstraints()
     const auto map1 = m_pbdObject1->getPhysicsToCollidingMap();
     const auto map2 = m_pbdObject2->getPhysicsToCollidingMap();
 
-    std::cout << "EE: " << m_colData->EEColData.size() << "TV: " << m_colData->TVColData.size() << std::endl;
+    //std::cout << "EE: " << m_colData->EEColData.size() << "TV: " << m_colData->TVColData.size() << std::endl;
 
     // Generate edge-edge pbd constraints
     for (auto& colData : m_colData->EEColData)
@@ -81,7 +86,7 @@ PBDCollisionHandling::generatePBDConstraints()
     // Generate triangle-vertex pbd constraints
     for (auto& colData : m_colData->TVColData)
     {
-        const auto triVerts = colGeo2->getTrianglesVertices()[colData.triIdA];
+        const auto& triVerts = colGeo2->getTrianglesVertices()[colData.triIdA];
 
         const auto c = std::make_shared<PbdPointTriangleConstraint>();
 
@@ -94,5 +99,6 @@ PBDCollisionHandling::generatePBDConstraints()
 
         m_PBDConstraints.push_back(c);
     }
+	//TODO: generating PbdPointTriangleConstraint from the VTColData should be added
 }
 }

@@ -74,7 +74,10 @@ public:
         m_type(type)//,
         //m_colData(colData)
     {
-		m_colData = std::make_shared<CollisionData>();
+		if (colData == nullptr)
+			m_colData = std::make_shared<CollisionData>();
+		else
+			m_colData = colData;
 	}
     CollisionDetection() = delete;
 

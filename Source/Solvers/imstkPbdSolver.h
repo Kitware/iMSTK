@@ -28,6 +28,7 @@
 
 namespace imstk
 {
+class PbdCollisionConstraint;
 ///
 /// \class PbdSolver
 ///
@@ -35,6 +36,7 @@ namespace imstk
 ///
 class PbdSolver : public SolverBase
 {
+	typedef std::vector<std::shared_ptr<PbdCollisionConstraint>> PBDConstraintVector;
 public:
     ///
     /// \brief Constructors/Destructor
@@ -76,6 +78,7 @@ public:
     {
         m_pbdObject->integratePosition();
         m_pbdObject->solveConstraints();
+		this->resolveCollisionConstraints();
         m_pbdObject->updateVelocity();
     }
 
@@ -155,9 +158,40 @@ public:
         return partitions;
     }
 
+	///
+	/// \brief Add the global collision contraints to this solver
+	///
+	void addCollisionConstraints(PBDConstraintVector* collisionConstraints)
+	{
+		m_PBDConstraints = collisionConstraints;
+	}
+
+	///
+	/// \brief Solve the global collision contraints charged to this solver
+	///
+	void resolveCollisionConstraints()
+	{
+		if (m_PBDConstraints != nullptr) 
+		{
+			unsigned int maxIter = 2;
+			if (!m_PBDConstraints->empty())
+			{
+				unsigned int i = 0;
+				while (++i < maxIter)
+				{
+					for (size_t k = 0; k < m_PBDConstraints->size(); ++k)
+					{
+						m_PBDConstraints->at(k)->solvePositionConstraint();
+					}
+				}
+			}
+		}
+		
+	}
+
 private:
     size_t m_maxIterations = 20;    ///< Maximum number of NL Gauss-Seidel iterations
-
+	PBDConstraintVector* m_PBDConstraints = nullptr; /// collision contraints charged to this solver
     std::shared_ptr<PbdObject> m_pbdObject;
 };
 } // imstk

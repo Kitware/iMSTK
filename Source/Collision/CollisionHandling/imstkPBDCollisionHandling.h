@@ -34,6 +34,7 @@ class CollidingObject;
 class CollisionData;
 class PbdObject;
 class PbdCollisionConstraint;
+class PbdSolver;
 
 ///
 /// \class PBDCollisionHandling
@@ -51,10 +52,12 @@ public:
     PBDCollisionHandling(const Side& side,
                          const std::shared_ptr<CollisionData> colData,
                          std::shared_ptr<PbdObject> obj1,
-                         std::shared_ptr<PbdObject> obj2) :
+                         std::shared_ptr<PbdObject> obj2,
+						 std::shared_ptr<PbdSolver> PBDSolver = nullptr) :
         CollisionHandling(Type::Penalty, side, colData),
         m_pbdObject1(obj1),
-        m_pbdObject2(obj2){}
+        m_pbdObject2(obj2),
+		m_PBDSolver(PBDSolver){}
 
     PBDCollisionHandling() = delete;
 
@@ -78,6 +81,7 @@ private:
     std::shared_ptr<PbdObject> m_pbdObject1;   ///> PBD object
     std::shared_ptr<PbdObject> m_pbdObject2;   ///> PBD object
     PBDConstraintVector m_PBDConstraints;      ///> List of PBD constraints
+	std::shared_ptr<PbdSolver> m_PBDSolver;	   /// The Solver for the collision constraints
 };
 }
 
