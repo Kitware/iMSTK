@@ -65,7 +65,7 @@ public:
     static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(const Type& type,
                                                                             std::shared_ptr<CollidingObject> objA,
                                                                             std::shared_ptr<CollidingObject> objB,
-																			std::shared_ptr<CollisionData> colData);
+                                                                            std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Constructor
@@ -74,11 +74,15 @@ public:
         m_type(type)//,
         //m_colData(colData)
     {
-		if (colData == nullptr)
-			m_colData = std::make_shared<CollisionData>();
-		else
-			m_colData = colData;
-	}
+        if (colData == nullptr)
+        {
+            m_colData = std::make_shared<CollisionData>();
+        }
+        else
+        {
+            m_colData = colData;
+        }
+    }
     CollisionDetection() = delete;
 
     ///

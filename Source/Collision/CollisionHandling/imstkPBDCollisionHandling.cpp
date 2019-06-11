@@ -50,10 +50,14 @@ PBDCollisionHandling::processCollisionData()
                      << " (rigid mesh not yet supported).";
     }*/
     this->generatePBDConstraints();
-	if(m_PBDSolver)
-		m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
-	else
-		LOG(WARNING) << "Error: PBDCollisionHandling: no PbdSolver found to handle the Collision constraints...";
+    if(m_PBDSolver)
+    {
+        m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
+    }
+    else
+    {
+        LOG(WARNING) << "Error: PBDCollisionHandling: no PbdSolver found to handle the Collision constraints...";
+    }
 }
 
 void
@@ -99,6 +103,6 @@ PBDCollisionHandling::generatePBDConstraints()
 
         m_PBDConstraints.push_back(c);
     }
-	//TODO: generating PbdPointTriangleConstraint from the VTColData should be added
+    //TODO: generating PbdPointTriangleConstraint from the VTColData should be added
 }
 }

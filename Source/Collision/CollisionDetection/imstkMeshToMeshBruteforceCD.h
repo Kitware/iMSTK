@@ -47,7 +47,7 @@ public:
     ///
     MeshToMeshBruteForceCD(std::shared_ptr<Geometry> obj1,
                            std::shared_ptr<SurfaceMesh> obj2,
-		std::shared_ptr<CollisionData> colData) :
+                           std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce,
                            colData),
         m_object1(obj1),

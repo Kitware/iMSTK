@@ -236,10 +236,10 @@ int main()
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
-	auto CD = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
-	auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-		CD->getCollisionData(), deformableObj, floor, pbdSolver);
-	colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
+    auto CD = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
+    auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
+                CD->getCollisionData(), deformableObj, floor, pbdSolver);
+    colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");

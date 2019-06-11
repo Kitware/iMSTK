@@ -44,7 +44,7 @@ std::shared_ptr<CollisionDetection>
 CollisionDetection::makeCollisionDetectionObject(const Type& type,
                                                  std::shared_ptr<CollidingObject> objA,
                                                  std::shared_ptr<CollidingObject> objB,
-												 std::shared_ptr<CollisionData> colData)
+                                                 std::shared_ptr<CollisionData> colData)
 {
     switch (type)
     {

@@ -29,7 +29,7 @@
 namespace imstk {
 TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                                std::shared_ptr<TetrahedralMesh> meshB,
-	std::shared_ptr<CollisionData> colData) :
+                               std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::MeshToMesh, colData), //is TetrahedralMeshToTetrahedralMesh type needed?
     m_meshA(meshA),
     m_meshB(meshB)

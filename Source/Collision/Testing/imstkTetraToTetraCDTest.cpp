@@ -59,7 +59,7 @@ TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
     auto b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
 
-	auto cd = std::make_shared<CollisionData>();
+    auto cd = std::make_shared<CollisionData>();
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
@@ -77,7 +77,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 
     b->translateVertices(imstk::Vec3d(0.0, 1.0, 2.5));
 
-	auto cd = std::make_shared<CollisionData>();
+    auto cd = std::make_shared<CollisionData>();
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
     EXPECT_EQ(cd->PTColData.size(), 1);
@@ -111,7 +111,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
 
     b->translateVertices(imstk::Vec3d(16.0, 0.0, 1.0));
 
-	auto cd = std::make_shared<CollisionData>();
+    auto cd = std::make_shared<CollisionData>();
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
@@ -150,7 +150,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
     std::shared_ptr<TetrahedralMesh> b = loadMesh("/human/human.veg");
 
-	auto cd = std::make_shared<CollisionData>();
+    auto cd = std::make_shared<CollisionData>();
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
     EXPECT_EQ(cd->PTColData.size(), 595);
