@@ -19,38 +19,6 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToPlaneCD.h"
+#include "imstkSPHSolver.h"
 
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkPointSet.h"
-
-#include <g3log/g3log.hpp>
-
-namespace imstk
-{
-void
-PointSetToPlaneCD::computeCollisionData()
-{
-    // Clear collisionData
-    m_colData.clearAll();
-
-    // Get plane properties
-    auto planePos = m_plane->getPosition();
-
-    // TODO: Fix this issue of extra computation in future
-    auto planeNormal = m_plane->getNormal();
-
-    size_t nodeId = 0;
-    for (const auto& p : m_pointSet->getVertexPositions())
-    {
-        auto peneDistance = (p - planePos).dot(planeNormal);
-        if (peneDistance <= 0.0)
-        {
-            m_colData.MAColData.push_back({ nodeId, planeNormal * peneDistance });
-        }
-        nodeId++;
-    }
-}
-} // imstk
+template class imstk::SPHSolver<double>;
