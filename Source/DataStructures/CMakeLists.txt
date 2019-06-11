@@ -4,12 +4,13 @@
 include(imstkAddLibrary)
 imstk_add_library( Datastructures
   DEPENDS
-    Core 
+    Core
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
+if( BUILD_TESTING )
+  include(imstkAddTest)
+  imstk_add_test( Datastructures )
 endif()

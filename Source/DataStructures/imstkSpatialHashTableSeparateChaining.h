@@ -112,6 +112,29 @@ public:
     std::vector<size_t> getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2);
 
     ///
+    /// \brief Finds IDs of all points in an AABB
+    /// \param result The list to contain search result
+    /// \param corner1 One corner to the box
+    /// \param corner2 The other corner to the box
+    ///
+    void getPointsInAABB(std::vector<size_t>& result, const Vec3d& corner1, const Vec3d& corner2);
+
+    ///
+    /// \brief Find IDs of all points in a sphere centered at ppos and having given radius
+    /// \param pos Postision of the given point
+    /// \param radius The search radius
+    ///
+    std::vector<size_t> getPointsInSphere(const Vec3d& ppos, double radius);
+
+    ///
+    /// \brief Find IDs of all points in a sphere centered at ppos and having given radius
+    /// \param result The list to contain search result
+    /// \param pos Postision of the given point
+    /// \param radius The search radius
+    ///
+    void getPointsInSphere(std::vector<size_t>& result, const Vec3d& ppos, const double radius);
+
+    ///
     /// \brief Clears the table
     ///
     void clear();
@@ -122,16 +145,20 @@ public:
     ///
     virtual void setCellSize(double x, double y, double z) override;
 
+    ///
+    /// \brief Update cell size for all points and rehash. This is called after changing the cell dimensions.
+    ///
+    void recomputePointHash();
+
 protected:
     ///
     /// \brief Rehash the hash table
     ///
     virtual void rehash() override;
 
+
     float m_loadFactorMax = 10.0f;
-
     unsigned long m_currentID = 0;
-
     std::shared_ptr<std::unordered_set<PointEntry>> m_table;
 };
 }

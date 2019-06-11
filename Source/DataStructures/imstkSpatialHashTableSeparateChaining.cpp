@@ -63,6 +63,14 @@ SpatialHashTableSeparateChaining::clear()
 std::vector<size_t>
 SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2)
 {
+    std::vector<size_t> result;
+    getPointsInAABB(result, corner1, corner2);
+    return result;
+}
+
+void
+SpatialHashTableSeparateChaining::getPointsInAABB(std::vector<size_t>& result, const Vec3d& corner1, const Vec3d& corner2)
+{
     auto min_x = std::fmin(corner1.x(), corner2.x());
     auto max_x = std::fmax(corner1.x(), corner2.x());
     auto min_y = std::fmin(corner1.y(), corner2.y());
@@ -96,9 +104,9 @@ SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Ve
         }
     }
 
-    // Allocate beforehand
-    std::vector<size_t> points(0);
-    points.reserve(tempPoints.size());
+    // clear old data (if applicable) and allocate memory beforehand
+    result.resize(0);
+    result.reserve(tempPoints.size());
 
     // Fine iteration
     for (auto p = tempPoints.begin(); p != tempPoints.end(); ++p)
@@ -108,11 +116,74 @@ SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Ve
             point.y() >= min_y && point.y() <= max_y &&
             point.z() >= min_z && point.z() <= max_z)
         {
-            points.push_back(p->ID);
+            result.push_back(p->ID);
         }
     }
+}
 
-    return points;
+
+std::vector<size_t>
+SpatialHashTableSeparateChaining::getPointsInSphere(const Vec3d& ppos, double radius)
+{
+    std::vector<size_t> result;
+    getPointsInSphere(result, ppos, radius);
+    return result;
+}
+
+void
+SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result, const Vec3d& ppos, const double radius)
+{
+    int cellSpan[3];
+    for(int d = 0; d < 3; ++d)
+    {
+        cellSpan[d] = static_cast<int>(std::ceil(radius / m_cellSize[d]));
+    }
+
+    double radiusSqr = radius * radius;
+    std::unordered_set<size_t> visited;
+    visited.reserve(cellSpan[0] * cellSpan[1] * cellSpan[2]);
+
+    // clear the old result (if applicable)
+    result.resize(0);
+    result.reserve(32);
+
+    for(int i = -cellSpan[0]; i <= cellSpan[0]; ++i)
+    {
+        for(int j = -cellSpan[1]; j <= cellSpan[1]; ++j)
+        {
+            for(int k = -cellSpan[2]; k <= cellSpan[2]; ++k)
+            {
+                PointEntry point;
+                point.point = Vec3d(ppos[0] + m_cellSize[0] * i,
+                                    ppos[1] + m_cellSize[1] * j,
+                                    ppos[2] + m_cellSize[2] * k);
+                point.cellSize = m_cellSize;
+
+                auto bucket = m_table->bucket(point);
+
+                // avoid visiting a bucket more than once
+                // (that happens due to numerical round-off)
+                if(visited.find(bucket) != visited.end())
+                {
+                    continue;
+                }
+                visited.insert(bucket);
+
+                auto first = m_table->begin(bucket);
+                auto last  = m_table->end(bucket);
+
+                for(auto it = first; it != last; ++it)
+                {
+                    const Vec3d& qpos = it->point;
+                    const auto d2    = (ppos - qpos).squaredNorm();
+                    if(d2 < radiusSqr)
+                    {
+                        result.push_back(it->ID);
+                    }
+                }
+            }
+        }
+    }
 }
 
 void
@@ -130,7 +201,28 @@ SpatialHashTableSeparateChaining::setCellSize(double x, double y, double z)
     m_cellSize[1] = y;
     m_cellSize[2] = z;
 
-    this->rehash();
+    recomputePointHash();
+}
+
+void
+SpatialHashTableSeparateChaining::recomputePointHash()
+{
+    // copy points from the hash table to a vector, then clear the table
+    std::vector<PointEntry> points;
+    points.reserve(m_table->size());
+    points.insert(points.end(), m_table->begin(), m_table->end());
+    m_table->clear();
+
+    for(auto& point : points)
+    {
+        point.cellSize = m_cellSize;
+    }
+
+    // insert points back to the table
+    for(auto& point : points)
+    {
+        m_table->insert(point);
+    }
 }
 
 void
