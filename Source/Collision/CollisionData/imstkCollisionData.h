@@ -139,26 +139,6 @@ struct PickingCollisionData
 };
 
 ///
-/// \struct PointTetrahedronCollisionData
-///
-/// \brief Point-tetrahedron collision data
-///
-struct
-{
-    enum CollisionType
-    {
-        aPenetratingA = 0, // A self-penetration
-        aPenetratingB = 1, // vertex is from mesh A, tetrahedron is from mesh B
-        bPenetratingA = 2, // vertex is from mesh B, tetrahedron is from mesh A
-        bPenetratingB = 3  // B self-penetration
-    } collisionType;
-    size_t vertexId;
-    size_t tetreahedronId;
-    using WeightsArray = std::array<double, 4>;
-    WeightsArray BarycentricCoordinates;
-};
-
-///
 /// \struct CollisionData
 ///
 /// \brief Class that is the holder of all types of collision data
