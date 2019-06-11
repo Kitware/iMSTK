@@ -83,17 +83,28 @@ VTKInteractorStyle::OnTimer()
 
     // Update framerate value display
     auto now = std::chrono::high_resolution_clock::now();
-    double fps = 1e6/(double)std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count();
+    double fps = 1e6 / (double)std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count();
     fps = 0.1 * fps + 0.9 * m_lastFps;
     m_lastFps = fps;
     int t = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastFpsUpdate).count();
-    if (t > 100) //wait 100ms before updating displayed value
+    if (t > 250) //wait 250ms before updating displayed value
     {
-        std::string fpsStr = std::to_string((int)fps) + " fps";
-        m_fpsActor->SetInput(fpsStr.c_str());
+        std::string fpsVisualStr = "V: " + std::to_string((int)fps);
+
+        std::string fpsPhysicalStr;
+        if (m_simManager->getStatus() != SimulationStatus::PAUSED)
+        {
+            fpsPhysicalStr = "P: " + std::to_string((int)m_simManager->getActiveScene()->getFPS());
+        }
+        else
+        {
+            fpsPhysicalStr = "P: PAUSED";
+        }
+        m_fpsActor->SetInput((fpsVisualStr + std::string(" | ") + fpsPhysicalStr).c_str());
         m_lastFpsUpdate = now;
     }
     m_pre = now;
+
 
     // Render
     this->Interactor->Render();

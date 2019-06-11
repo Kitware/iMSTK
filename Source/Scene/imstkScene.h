@@ -166,6 +166,12 @@ public:
     ///
     void reset();
 
+    ///
+    /// \brief Set/Get the FPS
+    ///
+    void setFPS(const size_t fps) { m_fps = fps; }
+    size_t getFPS() { return m_fps; }
+
 protected:
 
     std::string m_name; ///> Name of the scene
@@ -177,6 +183,8 @@ protected:
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
+
+    size_t m_fps = 0;
 
     bool m_isInitialized = false;
 };
