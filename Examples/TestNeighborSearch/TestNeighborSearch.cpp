@@ -339,7 +339,7 @@ void neighborSearch_GridBased(Data& verts, std::vector<std::vector<size_t>>& nei
     }
 
     const double radius = 4.000000000000001 * PARTICLE_RADIUS;
-    static GridBasedNeighborSearch<double> gridSearch;
+    static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, verts);
 

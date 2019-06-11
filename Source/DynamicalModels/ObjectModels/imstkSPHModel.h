@@ -43,10 +43,9 @@ enum class NeighborSearchMethod
 ///
 /// \brief The NeighborSearch struct
 ///
-template<class Real>
 struct NeighborSearch
 {
-    GridBasedNeighborSearch<Real> gridSearch;
+    GridBasedNeighborSearch gridSearch;
     SpatialHashTableSeparateChaining spatialHashSearch;
 };
 
@@ -54,11 +53,9 @@ struct NeighborSearch
 /// \class SPHModelConfig
 /// \brief Parameters for SPH simulation
 ///
-template<class Real>
 class SPHModelConfig
 {
 private:
-    using Vec3r = Eigen::Matrix<Real, 3, 1>;
     void initialize();
 
 public:
@@ -119,34 +116,27 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
 };
 
-//////////////////////////////////////////////////////////////////////////////////////////
 ///
 /// \class SPHModel
 /// \brief SPH simulation model
 ///
-template<class Real>
-class SPHModel : public DynamicalModel<SPHKinematicState<Real>>
+class SPHModel : public DynamicalModel<SPHKinematicState>
 {
-using Vec3r       = Eigen::Matrix<Real, 3, 1>;
-using Vec4r       = Eigen::Matrix<Real, 4, 1>;
-using StdVT_Vec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
-using StdVT_Real  = std::vector<Real>;
-
 public:
     ///
     /// \brief Constructor
     ///
-    SPHModel() : DynamicalModel<SPHKinematicState<Real>>(DynamicalModelType::SPH) {}
+    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SPH) {}
 
     ///
     /// \brief Destructor
     ///
-    ~SPHModel() = default;
+    virtual ~SPHModel() = default;
 
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(const std::shared_ptr<SPHModelConfig<Real>>& params) { m_Parameters = params; }
+    void configure(const std::shared_ptr<SPHModelConfig>& params) { m_Parameters = params; }
 
     ///
     /// \brief Set the geometry (particle positions)
@@ -161,8 +151,7 @@ public:
     ///
     /// \brief Update states
     ///
-    virtual void updateBodyStates(const Vectord& q, const typename DynamicalModel<SPHKinematicState<Real>>::stateUpdateType updateType =
-                                      DynamicalModel<SPHKinematicState<Real>>::stateUpdateType::displacement) override {}
+    virtual void updateBodyStates(const Vectord&, const typename DynamicalModel<SPHKinematicState>::stateUpdateType) override {}
 
     ///
     /// \brief Update positions of point set geometry
@@ -285,19 +274,13 @@ private:
     void advect(Real timestep);
 
     std::shared_ptr<PointSet> m_Geometry;
-    SPHSimulationState<Real>  m_SimulationState;
+    SPHSimulationState m_SimulationState;
 
-    Real m_dt;         ///> time step size
+    Real m_dt;        ///> time step size
     Real m_DefaultDt; ///> default time step size
 
-    std::shared_ptr<SPHModelConfig<Real>> m_Parameters; // must be set before simulation
-    SPHSimulationKernels<Real>            m_Kernels;    // must be initialized during model initialization
-    NeighborSearch<Real> m_NeighborSearch;              // must be initialized during model initialization
+    std::shared_ptr<SPHModelConfig> m_Parameters; // must be set before simulation
+    SPHSimulationKernels m_Kernels;               // must be initialized during model initialization
+    NeighborSearch m_NeighborSearch;              // must be initialized during model initialization
 };
-
-using SPHParametersD = SPHModelConfig<double>;
-using SPHParametersF = SPHModelConfig<float>;
-
-using SPHModelD = SPHModel<double>;
-using SPHModelF = SPHModel<float>;
 } // end namespace imstk

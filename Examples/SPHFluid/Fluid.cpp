@@ -105,7 +105,7 @@ StdVectorOfVec3d generateBunnyShapeFluid(double particleRadius)
 }
 
 
-std::shared_ptr<SPHObjectD> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, double particleRadius)
+std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, double particleRadius)
 {
     StdVectorOfVec3d particles;
     switch(sceneIdx)
@@ -130,7 +130,7 @@ std::shared_ptr<SPHObjectD> generateFluid(const std::shared_ptr<Scene>&scene, in
     fluidGeometry->initialize(particles);
 
     // Create a fluids object
-    auto fluidObj = std::make_shared<SPHObjectD>("Sphere");
+    auto fluidObj = std::make_shared<SPHObject>("Sphere");
 
     // Create a visiual model
     auto fluidVisualModel = std::make_shared<VisualModel>(fluidGeometry);
@@ -140,11 +140,11 @@ std::shared_ptr<SPHObjectD> generateFluid(const std::shared_ptr<Scene>&scene, in
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Create a physics model
-    auto sphModel = std::make_shared<SPHModelD>();
+    auto sphModel = std::make_shared<SPHModel>();
     sphModel->setModelGeometry(fluidGeometry);
 
     // configure model
-    auto sphParams = std::make_shared<SPHParametersD>(particleRadius);
+    auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     if(sceneIdx == 2)   // highly viscous fluid
     {
@@ -164,7 +164,7 @@ std::shared_ptr<SPHObjectD> generateFluid(const std::shared_ptr<Scene>&scene, in
     scene->addSceneObject(fluidObj);
 
     // Configure the solver
-    auto sphSolver = std::make_shared<SPHSolverD>();
+    auto sphSolver = std::make_shared<SPHSolver>();
     sphSolver->setSPHObject(fluidObj);
     scene->addNonlinearSolver(sphSolver);
 

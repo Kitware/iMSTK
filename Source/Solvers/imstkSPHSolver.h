@@ -30,7 +30,6 @@ namespace imstk
 /// \class SPHSolver
 /// \brief SPH solver
 ///
-template<class Real>
 class SPHSolver : public SolverBase
 {
 public:
@@ -43,7 +42,7 @@ public:
     ///
     /// \brief Set the simulation object
     ///
-    void setSPHObject(const std::shared_ptr<SPHObject<Real>>& obj) { assert(obj); m_SPHObject = obj; }
+    void setSPHObject(const std::shared_ptr<SPHObject>& obj) { assert(obj); m_SPHObject = obj; }
 
     ///
     /// \brief Advance one time step
@@ -56,9 +55,6 @@ public:
     }
 
 private:
-    std::shared_ptr<SPHObject<Real>> m_SPHObject;
+    std::shared_ptr<SPHObject> m_SPHObject;
 };
-
-using SPHSolverF = SPHSolver<float>;
-using SPHSolverD = SPHSolver<double>;
 } // end namespace imstk

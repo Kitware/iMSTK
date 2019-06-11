@@ -29,7 +29,7 @@ namespace imstk
 {
 namespace SPH
 {
-template<int N, class Real>
+template<int N>
 class CubicKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
@@ -109,7 +109,7 @@ protected:
 };
 
 
-template<int N, class Real>
+template<int N>
 class Poly6Kernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
@@ -197,7 +197,7 @@ protected:
 };
 
 
-template<int N, class Real>
+template<int N>
 class SpikyKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
@@ -263,7 +263,7 @@ protected:
 };
 
 
-template<int N, class Real>
+template<int N>
 class CohesionKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
@@ -340,8 +340,7 @@ protected:
     Real m_W_zero;
 };
 
-
-template<int N, class Real>
+template<int N>
 class AdhesionKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
@@ -404,7 +403,7 @@ protected:
     Real m_W_zero;
 };
 
-template<int N, class Real>
+template<int N>
 class ViscosityKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
@@ -438,11 +437,9 @@ protected:
 ///
 /// \brief Struct contains SPH kernels for time integration, using different kernel for different purposes
 ///
-template<class Real>
+
 class SPHSimulationKernels
 {
-using Vec3r = Eigen::Matrix<Real, 3, 1>;
-
 public:
     void initialize(const Real kernelRadius)
     {
@@ -459,9 +456,9 @@ public:
     auto cohesionW(const Vec3r& r) const { return m_cohesion.W(r); }
 
 protected:
-    SPH::Poly6Kernel<3, Real>     m_poly6;
-    SPH::SpikyKernel<3, Real>     m_spiky;
-    SPH::ViscosityKernel<3, Real> m_viscosity;
-    SPH::CohesionKernel<3, Real>  m_cohesion;
+    SPH::Poly6Kernel<3>     m_poly6;
+    SPH::SpikyKernel<3>     m_spiky;
+    SPH::ViscosityKernel<3> m_viscosity;
+    SPH::CohesionKernel<3>  m_cohesion;
 };
 } // end namespace imstk

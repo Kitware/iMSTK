@@ -28,12 +28,8 @@ namespace imstk
 ///
 /// \brief Class for searching neighbors using regular grid
 ///
-template<class Real>
 class GridBasedNeighborSearch
 {
-using Vec3r       = Eigen::Matrix<Real, 3, 1>;
-using StdVT_Vec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
-
 public:
     GridBasedNeighborSearch() = default;
 
@@ -54,14 +50,14 @@ public:
     /// \param points The given points to search for neighbors
     /// \return List of list of neighbor indices for each point
     ///
-    std::vector<std::vector<size_t>> getNeighbors(const StdVT_Vec3r& points);
+    std::vector<std::vector<size_t>> getNeighbors(const StdVectorOfVec3r& points);
 
     ///
     /// \brief Search neighbors for each point within the search radius
     /// \param result The list of lists of neighbor indices for each point
     /// \param points The given points to search for neighbors
     ///
-    void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVT_Vec3r& points);
+    void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points);
 
     ///
     /// \brief Search neighbors from setB for each point in setA within the search radius. SetA and setB can be different.
@@ -69,11 +65,11 @@ public:
     /// \param setA The point set for which performing neighbor search
     /// \param setB The point set where neighbor indices will be collected
     ///
-    void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVT_Vec3r& setA, const StdVT_Vec3r& setB);
+    void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB);
 
 private:
     Real m_SearchRadius    = Real(0);
     Real m_SearchRadiusSqr = Real(0);
-    UniformSpatialGrid<Real, std::vector<size_t>> m_Grid;
+    UniformSpatialGrid<std::vector<size_t>> m_Grid;
 };
 } // end namespace imstk

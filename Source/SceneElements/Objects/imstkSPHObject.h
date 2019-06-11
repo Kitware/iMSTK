@@ -33,8 +33,7 @@ namespace imstk
 /// \brief Base class for scene objects that move and/or deform under position
 /// based dynamics formulation
 ///
-template<class Real>
-class SPHObject : public DynamicObject<SPHKinematicState<Real>>
+class SPHObject : public DynamicObject<SPHKinematicState>
 {
 public:
     ///
@@ -58,9 +57,6 @@ public:
     const auto& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
 
 protected:
-    std::shared_ptr<SPHModel<Real>> m_SPHModel;
+    std::shared_ptr<SPHModel> m_SPHModel;
 };
-
-using SPHObjectF = SPHObject<float>;
-using SPHObjectD = SPHObject<double>;
 } // end namespace imstk

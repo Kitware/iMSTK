@@ -83,8 +83,7 @@ CollisionHandling::make_collision_handling(const Type& type,
         return std::make_shared<BoneDrillingCH>(side, colData, objA, objB);
 
     case Type::SPH:
-        return std::make_shared<SPHCollisionHandling<double>>(side, colData, objA);
-    // TODO: instead of using <double>, use SPHCollisionHandling<Real>
+        return std::make_shared<SPHCollisionHandling>(side, colData, objA);
 
     default:
         LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";

@@ -25,15 +25,15 @@
 namespace imstk
 {
 // SPHModelConfig implementation ===>
-template<class Real>
-SPHModelConfig<Real>::SPHModelConfig(const Real particleRadius)
+
+SPHModelConfig::SPHModelConfig(const Real particleRadius)
 {
     m_ParticleRadius = particleRadius;
     initialize();
 }
 
-template<class Real>
-void SPHModelConfig<Real>::initialize()
+
+void SPHModelConfig::initialize()
 {
     if(std::abs(m_ParticleRadius) < Real(1e-6) )
     {
@@ -50,8 +50,8 @@ void SPHModelConfig<Real>::initialize()
 }
 
 // SPHModel implementation ===>
-template<class Real>
-bool SPHModel<Real>::initialize()
+
+bool SPHModel::initialize()
 {
     if(!m_Geometry)
     {
@@ -59,8 +59,8 @@ bool SPHModel<Real>::initialize()
     }
 
     // initialize positions and velocity of the particles
-    this->m_initialState = std::make_shared<SPHKinematicState<Real>>();
-    this->m_currentState = std::make_shared<SPHKinematicState<Real>>();
+    this->m_initialState = std::make_shared<SPHKinematicState>();
+    this->m_currentState = std::make_shared<SPHKinematicState>();
 
     // Set particle positions and zero default velocities
     // TODO: set particle data with given (non-zero) velocities
@@ -91,8 +91,8 @@ bool SPHModel<Real>::initialize()
     return true;
 }
 
-template<class Real>
-void SPHModel<Real>::simulationTimeStep()
+
+void SPHModel::simulationTimeStep()
 {
     findParticleNeighbors();
     computeNeighborRelativePositions();
@@ -107,14 +107,14 @@ void SPHModel<Real>::simulationTimeStep()
     advect(getTimeStep());
 }
 
-template<class Real>
-void SPHModel<Real>::computeTimeStepSize()
+
+void SPHModel::computeTimeStepSize()
 {
     m_dt = (this->m_timeStepSizeType == TimeSteppingType::fixed) ? m_DefaultDt : computeCFLTimeStepSize();
 }
 
-template<class Real>
-Real SPHModel<Real>::computeCFLTimeStepSize()
+
+Real SPHModel::computeCFLTimeStepSize()
 {
     Real maxVel = 0;
     for(const auto& vel : getState().getVelocities())
@@ -143,8 +143,8 @@ Real SPHModel<Real>::computeCFLTimeStepSize()
     return timestep;
 }
 
-template<class Real>
-void SPHModel<Real>::findParticleNeighbors()
+
+void SPHModel::findParticleNeighbors()
 {
     if(m_Parameters->m_NeighborSearchMethod == NeighborSearchMethod::GridBased)
     {
@@ -182,8 +182,8 @@ void SPHModel<Real>::findParticleNeighbors()
     }
 }
 
-template<class Real>
-void SPHModel<Real>::computeNeighborRelativePositions()
+
+void SPHModel::computeNeighborRelativePositions()
 {
     auto computeRelativePositions = [&](const auto& ppos, const auto& neighborList, const auto& allPositions, auto& neighborInfo) {
                                         for(size_t q : neighborList)
@@ -210,8 +210,8 @@ void SPHModel<Real>::computeNeighborRelativePositions()
         });
 }
 
-template<class Real>
-void SPHModel<Real>::collectNeighborDensity()
+
+void SPHModel::collectNeighborDensity()
 {
     // after computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is usefull because relative positions and densities are accessed together multiple times
@@ -234,8 +234,8 @@ void SPHModel<Real>::collectNeighborDensity()
         });
 }
 
-template<class Real>
-void SPHModel<Real>::computeDensity()
+
+void SPHModel::computeDensity()
 {
     runLoop(getState().size(),
         [&](size_t p) {
@@ -256,8 +256,8 @@ void SPHModel<Real>::computeDensity()
         });
 }
 
-template<class Real>
-void SPHModel<Real>::normalizeDensity()
+
+void SPHModel::normalizeDensity()
 {
     if(!m_Parameters->m_bNormalizeDensity)
     {
@@ -305,8 +305,8 @@ void SPHModel<Real>::normalizeDensity()
     std::swap(getState().getDensities(), getState().getNormalizedDensities());
 }
 
-template<class Real>
-void SPHModel<Real>::computePressureAcceleration()
+
+void SPHModel::computePressureAcceleration()
 {
     auto particlePressure = [&](auto density) {
                                 Real error = std::pow(density / m_Parameters->m_RestDensity, 7) - Real(1);
@@ -344,8 +344,8 @@ void SPHModel<Real>::computePressureAcceleration()
         });
 }
 
-template<class Real>
-void SPHModel<Real>::updateVelocity(Real timestep)
+
+void SPHModel::updateVelocity(Real timestep)
 {
     runLoop(getState().size(),
         [&](size_t p) {
@@ -353,8 +353,8 @@ void SPHModel<Real>::updateVelocity(Real timestep)
         });
 }
 
-template<class Real>
-void SPHModel<Real>::computeViscosity()
+
+void SPHModel::computeViscosity()
 {
     runLoop(getState().size(),
         [&](size_t p) {
@@ -402,8 +402,8 @@ void SPHModel<Real>::computeViscosity()
     });
 }
 
-template<class Real>
-void SPHModel<Real>::computeNormal()
+
+void SPHModel::computeNormal()
 {
     runLoop(getState().size(),
         [&](size_t p) {
@@ -429,8 +429,8 @@ void SPHModel<Real>::computeNormal()
         });
 }
 
-template<class Real>
-void SPHModel<Real>::computeSurfaceTension()
+
+void SPHModel::computeSurfaceTension()
 {
     // Firstly compute surface normal for all particles
     computeNormal();
@@ -481,8 +481,8 @@ void SPHModel<Real>::computeSurfaceTension()
         });
 }
 
-template<class Real>
-void SPHModel<Real>::advect(Real timestep)
+
+void SPHModel::advect(Real timestep)
 {
     runLoop(getState().size(),
         [&](size_t p) {
@@ -490,6 +490,3 @@ void SPHModel<Real>::advect(Real timestep)
     });
 }
 } // end namespace imstk
-
-template class imstk::SPHModelConfig<double>;
-template class imstk::SPHModel<double>;

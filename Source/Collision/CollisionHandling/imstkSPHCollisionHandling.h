@@ -25,12 +25,11 @@
 
 namespace imstk
 {
-template<class Real>
 class SPHCollisionHandling : public CollisionHandling
 {
 public:
     SPHCollisionHandling(const Side& side, const CollisionData& colData, const std::shared_ptr<CollidingObject>& obj) :
-        CollisionHandling(Type::SPH, side, colData), m_SPHObject(std::dynamic_pointer_cast<SPHObject<Real>>(obj)) {}
+        CollisionHandling(Type::SPH, side, colData), m_SPHObject(std::dynamic_pointer_cast<SPHObject>(obj)) {}
 
     SPHCollisionHandling() = delete;
     virtual ~SPHCollisionHandling() = default;
@@ -51,7 +50,7 @@ public:
     Real getBoundaryFriction() const { return m_BoundaryFriction; }
 
 private:
-    std::shared_ptr<SPHObject<Real>> m_SPHObject;
+    std::shared_ptr<SPHObject> m_SPHObject;
     Real m_BoundaryFriction = 0.1;
 };
 } // end namespace imstk

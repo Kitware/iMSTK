@@ -24,30 +24,26 @@
 
 namespace imstk
 {
-template<class Real>
-void GridBasedNeighborSearch<Real>::setSearchRadius(const Real radius)
+void GridBasedNeighborSearch::setSearchRadius(const Real radius)
 {
     m_SearchRadius    = radius;
     m_SearchRadiusSqr = radius * radius;
 }
 
-template<class Real>
 std::vector<std::vector<size_t>>
-GridBasedNeighborSearch<Real>::getNeighbors(const StdVT_Vec3r& points)
+GridBasedNeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
 {
     std::vector<std::vector<size_t>> result;
     getNeighbors(result, points, points);
     return result;
 }
 
-template<class Real>
-void GridBasedNeighborSearch<Real>::getNeighbors(std::vector<std::vector<size_t>>&result, const StdVT_Vec3r& points)
+void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&result, const StdVectorOfVec3r& points)
 {
     getNeighbors(result, points, points);
 }
 
-template<class Real>
-void GridBasedNeighborSearch<Real>::getNeighbors(std::vector<std::vector<size_t>>&result, const StdVT_Vec3r& setA, const StdVT_Vec3r& setB)
+void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
 {
     if(std::abs(m_SearchRadius) < Real(1e-8))
     {
@@ -55,9 +51,8 @@ void GridBasedNeighborSearch<Real>::getNeighbors(std::vector<std::vector<size_t>
     }
 
     // firstly compute the bounding box of points in setB
-    const auto hugeNumber = std::numeric_limits<Real>::max();
-    Vec3r lowerCorner(hugeNumber, hugeNumber, hugeNumber);
-    Vec3r upperCorner(-hugeNumber, -hugeNumber, -hugeNumber);
+    Vec3r lowerCorner(MAX_REAL, MAX_REAL, MAX_REAL);
+    Vec3r upperCorner(-MAX_REAL, -MAX_REAL, -MAX_REAL);
 
     for(auto& ppos : setB)
     {
@@ -133,6 +128,3 @@ void GridBasedNeighborSearch<Real>::getNeighbors(std::vector<std::vector<size_t>
     }
 }
 } // end namespace imstk
-
-// Explicit instantiate class GridBasedNeighborSearch
-template class imstk::GridBasedNeighborSearch<double>;

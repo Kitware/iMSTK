@@ -34,11 +34,9 @@ namespace imstk
 /// \param Real The floating point type for computation (must be float or double
 /// \param CellData The data type that each cell will hold an instance of it
 ///
-template<class Real, class CellData>
+template<class CellData>
 class UniformSpatialGrid
 {
-using Vec3r = Eigen::Matrix<Real, 3, 1>;
-
 public:
     UniformSpatialGrid() = default;
     UniformSpatialGrid(const Vec3r& lowerCorner, const Vec3r& upperCorner, Real cellSize) { initialize(lowerCorner, upperCorner, cellSize); }
@@ -49,11 +47,37 @@ public:
     /// \param upperCorner The upper corner of the grid
     /// \param cellSize the edge length of grid cell
     ///
-    void initialize(const Vec3r& lowerCorner, const Vec3r& upperCorner, const Real cellSize);
+    void initialize(const Vec3r& lowerCorner, const Vec3r& upperCorner, const Real cellSize)
+    {
+        assert(cellSize > 0);
+        m_LowerCorner = lowerCorner;
+        m_UpperCorner = upperCorner;
+
+        m_CellSize    = cellSize;
+        m_InvCellSize = Real(1.0) / m_CellSize;
+
+        m_NTotalCells = 1u;
+        for(int i = 0; i < 3; ++i)
+        {
+            m_Resolution[i] = static_cast<unsigned int>(std::ceil((m_UpperCorner[i] - m_LowerCorner[i]) / m_CellSize));
+            m_NTotalCells *= m_Resolution[i];
+        }
+
+        if(m_NTotalCells == 0)
+        {
+            LOG(FATAL) << "Invalid grid size: [" +
+                std::to_string(m_LowerCorner[0]) + ", " + std::to_string(m_LowerCorner[1]) + ", " + std::to_string(m_LowerCorner[2]) + "] => " +
+                std::to_string(m_UpperCorner[0]) + ", " + std::to_string(m_UpperCorner[1]) + ", " + std::to_string(m_UpperCorner[2]) + "], " +
+                "cellSize = " + std::to_string(m_CellSize);
+        }
+
+        // cell data must be resized to equal to number of cells
+        m_CellData.resize(m_NTotalCells);
+    }
 
     ///
     /// \brief Get number of grid cell in 3 dimensions: (num_cell_x, num_cell_y, num_cell_z)
-    //
+    ///
     auto getResolution() const { return m_Resolution; }
 
     ///

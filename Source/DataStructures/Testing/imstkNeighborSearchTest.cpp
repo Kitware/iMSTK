@@ -28,9 +28,6 @@
 
 using namespace imstk;
 
-using Real = double;
-using Vec3r  = Vec3d;
-
 #define SPHERE_RADIUS   Real(1)
 #define SPHERE_CENTER   Vec3r(0, 0, 0)
 #define PARTICLE_RADIUS Real(0.05)
@@ -91,7 +88,7 @@ void neighborSearch_GridBased(Data& verts, std::vector<std::vector<size_t>>& nei
 {
     neighbors.resize(verts.size());
     const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
-    static GridBasedNeighborSearch<Real> gridSearch;
+    static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, verts);
 }
@@ -157,7 +154,7 @@ void neighborSearch_GridBased(Data& setA, Data& setB, std::vector<std::vector<si
 {
     neighbors.resize(setA.size());
     const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
-    static GridBasedNeighborSearch<Real> gridSearch;
+    static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, setA, setB);
 }

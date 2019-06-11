@@ -23,16 +23,15 @@
 
 namespace imstk
 {
-template<class Real>
-SPHObject<Real>::SPHObject(const std::string& name) : DynamicObject<SPHKinematicState<Real>>(name)
+SPHObject::SPHObject(const std::string& name) : DynamicObject<SPHKinematicState>(name)
 {
     this->m_type = SceneObject::Type::SPH;
 }
 
-template<class Real>
-bool SPHObject<Real>::initialize()
+
+bool SPHObject::initialize()
 {
-    m_SPHModel = std::dynamic_pointer_cast<SPHModel<Real>>(this->m_dynamicalModel);
+    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(this->m_dynamicalModel);
     if (m_SPHModel)
     {
         return m_SPHModel->initialize();
@@ -44,5 +43,3 @@ bool SPHObject<Real>::initialize()
     }
 }
 } // end namespace imstk
-
-template class imstk::SPHObject<double>;

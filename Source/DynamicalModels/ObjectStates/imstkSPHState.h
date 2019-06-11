@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <vector>
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -49,15 +48,10 @@ void runLoop(IndexType size, Function&& func)
 
 ///
 /// \class SPHKinematicState
-///
 /// \brief State of the SPH fluid particles
 ///
-template<class Real>
 class SPHKinematicState
 {
-using Vec3r = Eigen::Matrix<Real, 3, 1>;
-using StdVT_Vec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
-
 public:
     ///
     /// \brief Default constructor/destructor
@@ -68,7 +62,7 @@ public:
     ///
     /// \brief Set particle data with given positions and velocities
     ///
-    void setParticleData(const StdVT_Vec3r& positions, const StdVT_Vec3r& velocities = {});
+    void setParticleData(const StdVectorOfVec3r& positions, const StdVectorOfVec3r& velocities = {});
 
     ///
     /// \brief Get number of particles
@@ -90,28 +84,20 @@ public:
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(const std::shared_ptr<SPHKinematicState<Real>>& rhs);
+    void setState(const std::shared_ptr<SPHKinematicState>& rhs);
 
 private:
-    StdVT_Vec3r m_Positions;   // Particle positions
-    StdVT_Vec3r m_Velocities;  // Particle velocities
+    StdVectorOfVec3r m_Positions;   // Particle positions
+    StdVectorOfVec3r m_Velocities;  // Particle velocities
 };
 
 
 ///
 /// \class SPHSimulationState
-///
 /// \brief Simulation states of SPH particles
 ///
-template<class Real>
 class SPHSimulationState
 {
-using Vec3r = Eigen::Matrix<Real, 3, 1>;
-using Vec4r = Eigen::Matrix<Real, 4, 1>;
-
-using StdVT_Vec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
-using StdVT_Real  = std::vector<Real>;
-
 public:
     ///
     /// \brief Default constructor/destructor
@@ -122,12 +108,12 @@ public:
     ///
     /// \brief Set the kinematic state: positions and velocities
     ///
-    void setKinematicState(const std::shared_ptr<SPHKinematicState<Real>>& state) { m_KinematicState = state; }
+    void setKinematicState(const std::shared_ptr<SPHKinematicState>& state) { m_KinematicState = state; }
 
     ///
     /// \brief Set positions of the boundary (solid) particles
     ///
-    void setBoundaryParticlePositions(const StdVT_Vec3r& positions) { m_BDPositions = positions; }
+    void setBoundaryParticlePositions(const StdVectorOfVec3r& positions) { m_BDPositions = positions; }
 
     ///
     /// \brief Initialize simulation variables, must be called after setKinematicState and (if applicable) after setBoundaryParticlePositions
@@ -206,14 +192,14 @@ public:
     const auto& getNeighborInfo() const { return m_NeighborInfo; }
 
 private:
-    std::shared_ptr<SPHKinematicState<Real>> m_KinematicState; // basic state: positions + velocities
-    StdVT_Vec3r m_BDPositions; // positions of boundary particles, if generated
+    std::shared_ptr<SPHKinematicState> m_KinematicState; // basic state: positions + velocities
+    StdVectorOfVec3r m_BDPositions; // positions of boundary particles, if generated
 
-    StdVT_Real m_Densities;           // particle densities
-    StdVT_Real m_NormalizedDensities; // variable for normalizing densities
-    StdVT_Vec3r m_Normals;            // surface normals
-    StdVT_Vec3r m_Accels;             // acceleration
-    StdVT_Vec3r m_DiffuseVelocities;             // velocity diffusion, used for computing viscosity
+    StdVectorOfReal m_Densities;            // particle densities
+    StdVectorOfReal m_NormalizedDensities;  // variable for normalizing densities
+    StdVectorOfVec3r m_Normals;             // surface normals
+    StdVectorOfVec3r m_Accels;              // acceleration
+    StdVectorOfVec3r m_DiffuseVelocities;               // velocity diffusion, used for computing viscosity
     std::vector<std::vector<size_t>> m_NeighborLists;   // store a list of neighbors for each particle, updated each time step
     std::vector<std::vector<size_t>> m_BDNeighborLists; // store a list of boundary particle neighbors for each particle, updated each time step
 

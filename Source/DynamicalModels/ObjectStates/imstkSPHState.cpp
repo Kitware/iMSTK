@@ -25,8 +25,8 @@
 namespace imstk
 {
 // SPHKinematicState implementation ===>
-template<class Real>
-void SPHKinematicState<Real>::setParticleData(const StdVT_Vec3r& positions, const StdVT_Vec3r& velocities)
+
+void SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const StdVectorOfVec3r& velocities)
 {
     if((positions.size() != velocities.size()) && (velocities.size() != 0))
     {
@@ -43,8 +43,7 @@ void SPHKinematicState<Real>::setParticleData(const StdVT_Vec3r& positions, cons
 }
 
 
-template<class Real>
-void SPHKinematicState<Real>::setState(const std::shared_ptr<SPHKinematicState<Real>>& rhs)
+void SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
 {
     m_Positions = rhs->m_Positions;
     m_Velocities = rhs->m_Velocities;
@@ -52,8 +51,8 @@ void SPHKinematicState<Real>::setState(const std::shared_ptr<SPHKinematicState<R
 
 
 // SPHSimulationState implementation ===>
-template<class Real>
-void SPHSimulationState<Real>::initializeData()
+
+void SPHSimulationState::initializeData()
 {
     if(!m_KinematicState)
     {
@@ -68,7 +67,3 @@ void SPHSimulationState<Real>::initializeData()
     m_NeighborLists.resize(numParticles);
 }
 } // end namespace imstk
-
-// explicit instantiate classes
-template class imstk::SPHKinematicState<double>;
-template class imstk::SPHSimulationState<double>;

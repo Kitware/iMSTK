@@ -23,8 +23,7 @@
 
 namespace imstk
 {
-template<class Real>
-void SPHCollisionHandling<Real>::setBoundaryFriction(Real frictionLength)
+void SPHCollisionHandling::setBoundaryFriction(Real frictionLength)
 {
     if(frictionLength < 0.0 || frictionLength > 1.0)
     {
@@ -41,14 +40,11 @@ void SPHCollisionHandling<Real>::setBoundaryFriction(Real frictionLength)
     m_BoundaryFriction = frictionLength;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-template<class Real>
-void SPHCollisionHandling<Real>::computeContactForces()
+void SPHCollisionHandling::computeContactForces()
 {
     const auto& SPHModel = m_SPHObject->getSPHModel();
     assert(SPHModel);
     auto& state = SPHModel->getState();
-    using Vec3r = Eigen::Matrix<Real, 3, 1>;
 
     for(const auto& cd : m_colData.MAColData)
     {
@@ -84,5 +80,3 @@ void SPHCollisionHandling<Real>::computeContactForces()
     }
 }
 } // end namespace imstk
-
-template class imstk::SPHCollisionHandling<double>;

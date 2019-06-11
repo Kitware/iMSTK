@@ -26,7 +26,7 @@
 
 using namespace imstk;
 
-std::shared_ptr<SPHObjectD> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, double particleRadius);
+std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, double particleRadius);
 std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_ptr<Scene>& scene, int sceneIdx);
 
 ///
