@@ -76,12 +76,12 @@ public:
     ///
     /// \brief Get number of grid cell in 3 dimensions: (num_cell_x, num_cell_y, num_cell_z)
     ///
-    auto getResolution() const { return m_Resolution; }
+    std::array<unsigned int, 3> getResolution() const { return m_Resolution; }
 
     ///
     /// \brief Get number of total cells in the grid
     ///
-    auto getNumTotalCells() const { return m_NTotalCells; }
+    unsigned int getNumTotalCells() const { return m_NTotalCells; }
 
     ///
     /// \brief Check if cell index in dimension d is valid (d = 0/1/2 => x/y/z dimension)
@@ -187,7 +187,7 @@ private:
     Real m_CellSize {1.0};
     Real m_InvCellSize {1.0};
 
-    unsigned int m_Resolution[3] { 0u, 0u, 0u };
+    std::array<unsigned int, 3> m_Resolution { 0u, 0u, 0u };
     unsigned int m_NTotalCells { 1u };
 
     std::vector<CellData> m_CellData;

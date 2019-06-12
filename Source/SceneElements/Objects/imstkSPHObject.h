@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Get the SPH model of the object
     ///
-    const auto& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
 
 protected:
     std::shared_ptr<SPHModel> m_SPHModel;

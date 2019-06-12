@@ -169,20 +169,20 @@ public:
     ///
     /// \brief Get the parameters
     ///
-    auto& getParameters() { assert(m_Parameters); return m_Parameters; }
-    const auto& getParameters() const { assert(m_Parameters); return m_Parameters; }
+    std::shared_ptr<SPHModelConfig>& getParameters() { assert(m_Parameters); return m_Parameters; }
+    const std::shared_ptr<SPHModelConfig>& getParameters() const { assert(m_Parameters); return m_Parameters; }
 
     ///
     /// \brief Get the kinematics particle data (positions + velocities)
     ///
-    auto& getKinematicsState() { assert(this->m_currentState); return *this->m_currentState; }
-    const auto& getKinematicsState() const { assert(this->m_currentState); return *this->m_currentState; }
+    SPHKinematicState& getKinematicsState() { assert(this->m_currentState); return *this->m_currentState; }
+    const SPHKinematicState& getKinematicsState() const { assert(this->m_currentState); return *this->m_currentState; }
 
     ///
     /// \brief Get particle simulation data
     ///
-    auto& getState() { return m_SimulationState; }
-    const auto& getState() const { return m_SimulationState; }
+    SPHSimulationState& getState() { return m_SimulationState; }
+    const SPHSimulationState& getState() const { return m_SimulationState; }
 
     ///
     /// \brief Set the default time step size, valid only if using a fixed time step for integration

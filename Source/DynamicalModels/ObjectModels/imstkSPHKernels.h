@@ -199,7 +199,7 @@ protected:
 
 
 template<int N>
-class SPIkyKernel {
+class SpikyKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -446,20 +446,20 @@ public:
     void initialize(const Real kernelRadius)
     {
         m_poly6.setRadius(kernelRadius);
-        m_sPIky.setRadius(kernelRadius);
+        m_spiky.setRadius(kernelRadius);
         m_viscosity.setRadius(kernelRadius);
         m_cohesion.setRadius(kernelRadius);
     }
 
-    auto W_zero() const { return m_poly6.W_zero(); }
-    auto W(const Vec3r& r) const { return m_poly6.W(r); }
-    auto gradW(const Vec3r& r) const { return m_sPIky.gradW(r); }
-    auto laplace(const Vec3r& r) const { return m_viscosity.laplace(r); }
-    auto cohesionW(const Vec3r& r) const { return m_cohesion.W(r); }
+    Real W_zero() const { return m_poly6.W_zero(); }
+    Real W(const Vec3r& r) const { return m_poly6.W(r); }
+    Vec3r gradW(const Vec3r& r) const { return m_spiky.gradW(r); }
+    Real laplace(const Vec3r& r) const { return m_viscosity.laplace(r); }
+    Real cohesionW(const Vec3r& r) const { return m_cohesion.W(r); }
 
 protected:
     SPH::Poly6Kernel<3>     m_poly6;
-    SPH::SPIkyKernel<3>     m_sPIky;
+    SPH::SpikyKernel<3>     m_spiky;
     SPH::ViscosityKernel<3> m_viscosity;
     SPH::CohesionKernel<3>  m_cohesion;
 };

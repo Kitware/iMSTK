@@ -70,7 +70,7 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&resu
     m_Grid.initialize(lowerCorner, upperCorner, m_SearchRadius);
 
     // clear all particle lists in each grid cell
-    m_Grid.loopAllCellData([](auto& list) { list.resize(0); });
+    m_Grid.loopAllCellData([](std::vector<size_t>& list) { list.resize(0); });
 
     // collect particle indices of points in setB into their corresponding cells
     for(size_t p = 0; p < setB.size(); ++p)

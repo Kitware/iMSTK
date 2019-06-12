@@ -180,7 +180,8 @@ void SPHModel::findParticleNeighbors()
 
 void SPHModel::computeNeighborRelativePositions()
 {
-    auto computeRelativePositions = [&](const auto& ppos, const auto& neighborList, const auto& allPositions, auto& neighborInfo) {
+    auto computeRelativePositions = [&](const Vec3r& ppos, const std::vector<size_t>& neighborList,
+                                        const StdVectorOfVec3r& allPositions, std::vector<NeighborInfo>& neighborInfo) {
                                         for(size_t q : neighborList)
                                         {
                                             const Vec3r& qpos = allPositions[q];
@@ -303,7 +304,7 @@ void SPHModel::normalizeDensity()
 
 void SPHModel::computePressureAcceleration()
 {
-    auto particlePressure = [&](auto density) {
+    auto particlePressure = [&](Real density) {
                                 Real error = std::pow(density / m_Parameters->m_RestDensity, 7) - Real(1);
 
                                 // clamp pressure error to zero to maintain stability

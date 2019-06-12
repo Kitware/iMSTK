@@ -47,6 +47,15 @@ void runLoop(IndexType size, Function&& func)
 }
 
 ///
+/// \brief The helper struct to store relative positions and densities of neighbor particlcles
+///
+struct NeighborInfo
+{
+    Vec3r xpq;     // relative position: xpq = x_p - x_q
+    Real density;  // density of neighbor particle q
+};
+
+///
 /// \class SPHKinematicState
 /// \brief State of the SPH fluid particles
 ///
@@ -72,14 +81,14 @@ public:
     ///
     /// \brief Returns the vector of all particle positions
     ///
-    auto& getPositions() { return m_Positions; }
-    const auto& getPositions() const { return m_Positions; }
+    StdVectorOfVec3r& getPositions() { return m_Positions; }
+    const StdVectorOfVec3r& getPositions() const { return m_Positions; }
 
     ///
     /// \brief Returns the vector of all particle velocities
     ///
-    auto& getVelocities() { return m_Velocities; }
-    const auto& getVelocities() const { return m_Velocities; }
+    StdVectorOfVec3r& getVelocities() { return m_Velocities; }
+    const StdVectorOfVec3r& getVelocities() const { return m_Velocities; }
 
     ///
     /// \brief Set the state to a given one
@@ -128,68 +137,68 @@ public:
     ///
     /// \brief Returns the vector of all particle positions
     ///
-    auto& getPositions() { assert(m_KinematicState); return m_KinematicState->getPositions(); }
-    const auto& getPositions() const { assert(m_KinematicState); return m_KinematicState->getPositions(); }
+    StdVectorOfVec3r& getPositions() { assert(m_KinematicState); return m_KinematicState->getPositions(); }
+    const StdVectorOfVec3r& getPositions() const { assert(m_KinematicState); return m_KinematicState->getPositions(); }
 
     ///
     /// \brief Returns the vector of all particle velocities
     ///
-    auto& getVelocities() { assert(m_KinematicState); return m_KinematicState->getVelocities(); }
-    const auto& getVelocities() const { assert(m_KinematicState); return m_KinematicState->getVelocities(); }
+    StdVectorOfVec3r& getVelocities() { assert(m_KinematicState); return m_KinematicState->getVelocities(); }
+    const StdVectorOfVec3r& getVelocities() const { assert(m_KinematicState); return m_KinematicState->getVelocities(); }
 
     ///
     /// \brief Returns the vector of all particle positions
     ///
-    auto& getBoundaryParticlePositions() { return m_BDPositions; }
-    const auto& getBoundaryParticlePositions() const { return m_BDPositions; }
+    StdVectorOfVec3r& getBoundaryParticlePositions() { return m_BDPositions; }
+    const StdVectorOfVec3r& getBoundaryParticlePositions() const { return m_BDPositions; }
 
     ///
     /// \brief Returns the vector of all particle surface normals
     ///
-    auto& getNormals() { return m_Normals; }
-    const auto& getNormals() const { return m_Normals; }
+    StdVectorOfVec3r& getNormals() { return m_Normals; }
+    const StdVectorOfVec3r& getNormals() const { return m_Normals; }
 
     ///
     /// \brief Returns the vector of all particle densities
     ///
-    auto& getDensities() { return m_Densities; }
-    const auto& getDensities() const { return m_Densities; }
+    StdVectorOfReal& getDensities() { return m_Densities; }
+    const StdVectorOfReal& getDensities() const { return m_Densities; }
 
     ///
     /// \brief Returns the vector of all particle densities
     ///
-    auto& getNormalizedDensities() { return m_NormalizedDensities; }
-    const auto& getNormalizedDensities() const { return m_NormalizedDensities; }
+    StdVectorOfReal& getNormalizedDensities() { return m_NormalizedDensities; }
+    const StdVectorOfReal& getNormalizedDensities() const { return m_NormalizedDensities; }
 
     ///
     /// \brief Returns the vector of all particle accelerations
     ///
-    auto& getAccelerations() { return m_Accels; }
-    const auto& getAccelerations() const { return m_Accels; }
+    StdVectorOfVec3r& getAccelerations() { return m_Accels; }
+    const StdVectorOfVec3r& getAccelerations() const { return m_Accels; }
 
     ///
     /// \brief Returns the vector of all velocity diffusion
     ///
-    auto& getDiffuseVelocities() { return m_DiffuseVelocities; }
-    const auto& getDiffuseVelocities() const { return m_DiffuseVelocities; }
+    StdVectorOfVec3r& getDiffuseVelocities() { return m_DiffuseVelocities; }
+    const StdVectorOfVec3r& getDiffuseVelocities() const { return m_DiffuseVelocities; }
 
     ///
     /// \brief Returns the vector of neighbor fluid particles
     ///
-    auto& getFluidNeighborLists() { return m_NeighborLists; }
-    const auto& getFluidNeighborLists() const { return m_NeighborLists; }
+    std::vector<std::vector<size_t>>& getFluidNeighborLists() { return m_NeighborLists; }
+    const std::vector<std::vector<size_t>>& getFluidNeighborLists() const { return m_NeighborLists; }
 
     ///
     /// \brief Returns the vector of neighbor of boundary particles
     ///
-    auto& getBoundaryNeighborLists() { return m_BDNeighborLists; }
-    const auto& getBoundaryNeighborLists() const { return m_BDNeighborLists; }
+    std::vector<std::vector<size_t>>& getBoundaryNeighborLists() { return m_BDNeighborLists; }
+    const std::vector<std::vector<size_t>>& getBoundaryNeighborLists() const { return m_BDNeighborLists; }
 
     ///
     /// \brief Returns the vector of neighbor information ( {relative position, density} ), which is cached for other computation
     ///
-    auto& getNeighborInfo() { return m_NeighborInfo; }
-    const auto& getNeighborInfo() const { return m_NeighborInfo; }
+    std::vector<std::vector<NeighborInfo>>& getNeighborInfo() { return m_NeighborInfo; }
+    const std::vector<std::vector<NeighborInfo>>& getNeighborInfo() const { return m_NeighborInfo; }
 
 private:
     std::shared_ptr<SPHKinematicState> m_KinematicState; // basic state: positions + velocities
@@ -202,12 +211,6 @@ private:
     StdVectorOfVec3r m_DiffuseVelocities;               // velocity diffusion, used for computing viscosity
     std::vector<std::vector<size_t>> m_NeighborLists;   // store a list of neighbors for each particle, updated each time step
     std::vector<std::vector<size_t>> m_BDNeighborLists; // store a list of boundary particle neighbors for each particle, updated each time step
-
-    struct NeighborInfo
-    {
-        Vec3r xpq; // relative position: xpq = x_p - x_q
-        Real density; // density of neighbor particle q
-    };
-    std::vector<std::vector<NeighborInfo>>  m_NeighborInfo;    // store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
+    std::vector<std::vector<NeighborInfo>>  m_NeighborInfo;   // store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
 };
 } // end namespace imstk
