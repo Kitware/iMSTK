@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
@@ -37,40 +37,39 @@ using namespace imstk;
 ///
 /// \brief Advance particle positions
 ///
-template<class Data>
-void advancePositions(Data& verts)
+void advancePositions(StdVectorOfVec3r& particles)
 {
-    for(auto& v: verts)
+    for(auto& pos: particles)
     {
-        Vec3r vc  = v - SPHERE_CENTER;
-        Real mag = vc.norm() * STEP;
-        v = SPHERE_CENTER + vc.normalized() * mag;
+        Vec3r pc  = pos - SPHERE_CENTER;
+        Real mag = pc.norm() * STEP;
+        pos = SPHERE_CENTER + pc.normalized() * mag;
     }
 }
 
 ///
 /// \brief Search neighbors using brute-force approach
 ///
-template<class Data>
-void neighborSearch_BruteForce(Data& verts, std::vector<std::vector<size_t>>& neighbors)
+void neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
-    neighbors.resize(verts.size());
+    neighbors.resize(particles.size());
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
     const Real radiusSqr = radius * radius;
-    for(size_t p = 0; p < verts.size(); ++p)
+
+    for(size_t p = 0; p < particles.size(); ++p)
     {
-        const auto ppos       = verts[p];
+        const auto ppos       = particles[p];
         auto&      pneighbors = neighbors[p];
         pneighbors.resize(0);
 
-        for(auto q = 0; q < verts.size(); ++q)
+        for(size_t q = 0; q < particles.size(); ++q)
         {
             if(p == q)
             {
                 continue;
             }
 
-            const auto qpos = verts[q];
+            const auto qpos = particles[q];
             const auto d2   = (ppos - qpos).squaredNorm();
             if(d2 < radiusSqr)
             {
@@ -83,23 +82,21 @@ void neighborSearch_BruteForce(Data& verts, std::vector<std::vector<size_t>>& ne
 ///
 /// \brief Search neighbors using grid-based approach
 ///
-template<class Data>
-void neighborSearch_GridBased(Data& verts, std::vector<std::vector<size_t>>& neighbors)
+void neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
-    neighbors.resize(verts.size());
+    neighbors.resize(particles.size());
     const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
     static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
-    gridSearch.getNeighbors(neighbors, verts);
+    gridSearch.getNeighbors(neighbors, particles);
 }
 
 ///
 /// \brief Search neighbors using spatial hashing approach
 ///
-template<class Data>
-void neighborSearch_SpatialHashing(Data& verts, std::vector<std::vector<size_t>>& neighbors)
+void neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
-    neighbors.resize(verts.size());
+    neighbors.resize(particles.size());
     for(auto& list : neighbors)
     {
         list.resize(0);
@@ -110,11 +107,11 @@ void neighborSearch_SpatialHashing(Data& verts, std::vector<std::vector<size_t>>
 
     hashTable.clear();
     hashTable.setCellSize(radius, radius, radius);
-    hashTable.insertPoints(verts);
+    hashTable.insertPoints(particles);
 
-    for(size_t p = 0; p < verts.size(); ++p)
+    for(size_t p = 0; p < particles.size(); ++p)
     {
-        auto& v = verts[p];
+        auto& v = particles[p];
         hashTable.getPointsInSphere(neighbors[p], v, radius);
     }
 }
@@ -122,19 +119,19 @@ void neighborSearch_SpatialHashing(Data& verts, std::vector<std::vector<size_t>>
 ///
 /// \brief For each particle in setA, search neighbors in setB using brute-force approach
 ///
-template<class Data>
-void neighborSearch_BruteForce(Data& setA, Data& setB, std::vector<std::vector<size_t>>& neighbors)
+void neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
     const Real radiusSqr = radius * radius;
+
     for(size_t p = 0; p < setA.size(); ++p)
     {
         const auto ppos       = setA[p];
         auto&      pneighbors = neighbors[p];
         pneighbors.resize(0);
 
-        for(auto q = 0; q < setB.size(); ++q)
+        for(size_t q = 0; q < setB.size(); ++q)
         {
             const auto qpos = setB[q];
             const auto d2   = (ppos - qpos).squaredNorm();
@@ -149,8 +146,7 @@ void neighborSearch_BruteForce(Data& setA, Data& setB, std::vector<std::vector<s
 ///
 /// \brief For each particle in setA, search neighbors in setB using grid-based approach
 ///
-template<class Data>
-void neighborSearch_GridBased(Data& setA, Data& setB, std::vector<std::vector<size_t>>& neighbors)
+void neighborSearchGridBased(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
     const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -168,6 +164,7 @@ bool verify(std::vector<std::vector<size_t>>& neighbors1,  std::vector<std::vect
     {
         return false;
     }
+
     for(size_t p = 0; p < neighbors1.size(); ++p)
     {
         auto& list1 = neighbors1[p];
@@ -191,10 +188,10 @@ bool verify(std::vector<std::vector<size_t>>& neighbors1,  std::vector<std::vect
             }
         }
     }
+
     return true;
 }
 
-//-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
 class dummyClass : public ::testing::Test {};
 
 ///
@@ -202,14 +199,13 @@ class dummyClass : public ::testing::Test {};
 ///
 TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
 {
-    StdVectorOfVec3d verts;
-
-    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const Vec3r sphereCenter   = SPHERE_CENTER;
     const auto sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
     const auto spacing         = Real(2) * PARTICLE_RADIUS;
-    const int N = int(2 * SPHERE_RADIUS / spacing);
+    const int N                = int(2 * SPHERE_RADIUS / spacing);
 
-    verts.reserve(N * N * N);
+    StdVectorOfVec3r particles;
+    particles.reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
     for(int i = 0; i < N; ++i)
@@ -222,24 +218,25 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
                 const Vec3r d    = ppos - sphereCenter;
                 if(d.squaredNorm() < sphereRadiusSqr)
                 {
-                    verts.push_back(ppos);
+                    particles.push_back(ppos);
                 }
             }
         }
     }
-    //////////////////////////////////////////////////////////////////////////////////////////
+
     std::vector<std::vector<size_t>> neighbors0;
     std::vector<std::vector<size_t>> neighbors1;
     std::vector<std::vector<size_t>> neighbors2;
+
     for(int iter = 0; iter < ITERATIONS; ++iter)
     {
-        neighborSearch_BruteForce(verts, neighbors0);
-        neighborSearch_GridBased(verts, neighbors1);
-        neighborSearch_SpatialHashing(verts, neighbors2);
-        //////////////////////////////////////////////////////////////////////////////////////////
+        neighborSearchBruteForce(particles, neighbors0);
+        neighborSearchGridBased(particles, neighbors1);
+        neighborSearchSpatialHashing(particles, neighbors2);
+
         EXPECT_EQ(verify(neighbors1, neighbors0), true);
         EXPECT_EQ(verify(neighbors2, neighbors0), true);
-        advancePositions(verts);
+        advancePositions(particles);
     }
 }
 
@@ -248,14 +245,13 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
 ///
 TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
 {
-    StdVectorOfVec3d verts;
-
-    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const Vec3r sphereCenter   = SPHERE_CENTER;
     const auto sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
     const auto spacing         = Real(2) * PARTICLE_RADIUS;
-    const int N = int(2 * SPHERE_RADIUS / spacing);
+    const int N                = int(2 * SPHERE_RADIUS / spacing);
 
-    verts.reserve(N * N * N);
+    StdVectorOfVec3r particles;
+    particles.reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
     for(int i = 0; i < N; ++i)
@@ -268,15 +264,14 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
                 const Vec3r d    = ppos - sphereCenter;
                 if(d.squaredNorm() < sphereRadiusSqr)
                 {
-                    verts.push_back(ppos);
+                    particles.push_back(ppos);
                 }
             }
         }
     }
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-    StdVectorOfVec3d setA;
-    StdVectorOfVec3d setB;
+    StdVectorOfVec3r setA;
+    StdVectorOfVec3r setB;
     std::vector<std::vector<size_t>> neighbors0;
     std::vector<std::vector<size_t>> neighbors1;
 
@@ -285,26 +280,26 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         // separate verts into setA and setB randomly
         setA.resize(0);
         setB.resize(0);
-        setA.reserve(verts.size());
-        setB.reserve(verts.size());
+        setA.reserve(particles.size());
+        setB.reserve(particles.size());
 
-        for(size_t i = 0; i < verts.size(); ++i)
+        for(size_t i = 0; i < particles.size(); ++i)
         {
             if(rand() % 2)
             {
-                setA.push_back(verts[i]);
+                setA.push_back(particles[i]);
             }
             else
             {
-                setB.push_back(verts[i]);
+                setB.push_back(particles[i]);
             }
         }
+
         // search for neighbors and compare
-        neighborSearch_BruteForce(setA, setB, neighbors0);
-        neighborSearch_GridBased(setA, setB, neighbors1);
+        neighborSearchBruteForce(setA, setB, neighbors0);
+        neighborSearchGridBased(setA, setB, neighbors1);
         EXPECT_EQ(verify(neighbors1, neighbors0), true);
     }
-    //////////////////////////////////////////////////////////////////////////////////////////
 }
 
 
