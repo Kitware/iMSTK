@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Set the friction coefficient
     ///
-    void setBoundaryFriction(Real friction);
+    void setBoundaryFriction(const Real friction);
 
     ///
     /// \brief Get the friction coefficient

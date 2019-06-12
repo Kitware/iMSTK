@@ -23,29 +23,32 @@
 
 namespace imstk
 {
-void SPHCollisionHandling::setBoundaryFriction(Real frictionLength)
+void SPHCollisionHandling::setBoundaryFriction(const Real friction)
 {
-    if(frictionLength < 0.0 || frictionLength > 1.0)
+    m_BoundaryFriction = friction;
+
+    if(m_BoundaryFriction < 0.0 || m_BoundaryFriction > 1.0)
     {
         LOG(WARNING) << "Invalid frictionLength coefficient (it must be in [0, 1])";
-        if(frictionLength < 0)
+        if(m_BoundaryFriction < 0)
         {
-            frictionLength = 0;
+            m_BoundaryFriction = 0;
         }
-        else if(frictionLength > 1.0)
+        else if(m_BoundaryFriction > static_cast<Real>(1.0))
         {
-            frictionLength = 1.0;
+            m_BoundaryFriction = static_cast<Real>(1.0);
         }
     }
-    m_BoundaryFriction = frictionLength;
 }
 
 void SPHCollisionHandling::computeContactForces()
 {
     const auto& SPHModel = m_SPHObject->getSPHModel();
-    assert(SPHModel);
-    auto& state = SPHModel->getState();
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, !SPHModel) << "SPH model was not initialized";
+#endif
 
+    auto& state = SPHModel->getState();
     for(const auto& cd : m_colData.MAColData)
     {
         const auto pidx = cd.nodeId; // Fluid particle index

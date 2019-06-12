@@ -23,6 +23,7 @@
 #pragma once
 
 #include <cmath>
+#include <g3log/g3log.hpp>
 #include "imstkMath.h"
 
 namespace imstk
@@ -37,26 +38,26 @@ public:
     void setRadius(const Real radius)
     {
         m_radius = radius;
-        const auto pi = static_cast<Real>(PI);
         const auto h2 = m_radius * m_radius;
         const auto h3 = h2 * m_radius;
+
         // if constexpr (N == 2) {
         if(N == 2)
         {
-            m_k = Real(40.0 / 7.0) / (pi * h2);
-            m_l = Real(240.0 / 7.0) / (pi * h2);
+            m_k = Real(40.0 / 7.0) / (PI * h2);
+            m_l = Real(240.0 / 7.0) / (PI * h2);
         }
         else
         {
-            m_k = Real(8.0) / (pi * h3);
-            m_l = Real(48.0) / (pi * h3);
+            m_k = Real(8.0) / (PI * h3);
+            m_l = Real(48.0) / (PI * h3);
         }
         m_W_zero = W(VecXr::Zero());
     }
 
-    Real W(Real r) const
+    Real W(const Real r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto q   = r / m_radius;
         if(q <= Real(1.0))
         {
@@ -118,27 +119,27 @@ public:
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
-        const auto pi = static_cast<Real>(PI);
+
         // if constexpr (N == 2) {
         if(N == 2)
         {
-            m_k = Real(4.0) / (pi * std::pow(m_radius, 8));
-            m_l = -Real(24.0) / (pi * std::pow(m_radius, 8));
+            m_k = Real(4.0) / (PI * std::pow(m_radius, 8));
+            m_l = -Real(24.0) / (PI * std::pow(m_radius, 8));
         }
         else
         {
-            m_k = Real(315.0) / (Real(64.0) * pi * std::pow(m_radius, 9));
-            m_l = -Real(945.0) / (Real(32.0) * pi * std::pow(m_radius, 9));
+            m_k = Real(315.0) / (Real(64.0) * PI * std::pow(m_radius, 9));
+            m_l = -Real(945.0) / (Real(32.0) * PI * std::pow(m_radius, 9));
         }
         m_m      = m_l;
         m_W_zero = W(VecXr::Zero());
     }
 
     /**
-     * W(r,h) = (315/(64 pi h^9))(h^2-|r|^2)^3
-     *        = (315/(64 pi h^9))(h^2-r*r)^3
+     * W(r,h) = (315/(64 PI h^9))(h^2-|r|^2)^3
+     *        = (315/(64 PI h^9))(h^2-r*r)^3
      */
-    Real W(Real r) const
+    Real W(const Real r) const
     {
         const auto r2 = r * r;
         return (r2 <= m_radius2) ? std::pow(m_radius2 - r2, 3) * m_k : Real(0);
@@ -151,8 +152,8 @@ public:
     }
 
     /**
-     * grad(W(r,h)) = r(-945/(32 pi h^9))(h^2-|r|^2)^2
-     *              = r(-945/(32 pi h^9))(h^2-r*r)^2
+     * grad(W(r,h)) = r(-945/(32 PI h^9))(h^2-|r|^2)^2
+     *              = r(-945/(32 PI h^9))(h^2-r*r)^2
      */
     VecXr gradW(const VecXr& r) const
     {
@@ -168,12 +169,12 @@ public:
     }
 
     /**
-     * laplacian(W(r,h)) = (-945/(32 pi h^9))(h^2-|r|^2)(-7|r|^2+3h^2)
-     *                   = (-945/(32 pi h^9))(h^2-r*r)(3 h^2-7 r*r)
+     * laplacian(W(r,h)) = (-945/(32 PI h^9))(h^2-|r|^2)(-7|r|^2+3h^2)
+     *                   = (-945/(32 PI h^9))(h^2-r*r)(3 h^2-7 r*r)
      */
     Real laplacianW(const VecXr& r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto r2  = r.squaredNorm();
         if(r2 <= m_radius2)
         {
@@ -198,7 +199,7 @@ protected:
 
 
 template<int N>
-class SpikyKernel {
+class SPIkyKernel {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -206,27 +207,27 @@ public:
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
-        const auto pi = Real(PI);
+
         // if constexpr (N == 2) {
         if(N == 2)
         {
             const auto radius5 = std::pow(m_radius, 5);
-            m_k = Real(10.0) / (pi * radius5);
-            m_l = -Real(30.0) / (pi * radius5);
+            m_k = Real(10.0) / (PI * radius5);
+            m_l = -Real(30.0) / (PI * radius5);
         }
         else
         {
             const auto radius6 = std::pow(m_radius, 6);
-            m_k = Real(15.0) / (pi * radius6);
-            m_l = -Real(45.0) / (pi * radius6);
+            m_k = Real(15.0) / (PI * radius6);
+            m_l = -Real(45.0) / (PI * radius6);
         }
         m_W_zero = W(VecXr::Zero());
     }
 
     /**
-     * W(r,h) = 15/(pi*h^6) * (h-r)^3
+     * W(r,h) = 15/(PI*h^6) * (h-r)^3
      */
-    Real W(Real r) const { return (r <= m_radius) ? std::pow(m_radius - r, 3) * m_k : Real(0); }
+    Real W(const Real r) const { return (r <= m_radius) ? std::pow(m_radius - r, 3) * m_k : Real(0); }
 
     Real W(const VecXr& r) const
     {
@@ -235,7 +236,7 @@ public:
     }
 
     /**
-     * grad(W(r,h)) = -r(45/(pi*h^6) * (h-r)^2)
+     * grad(W(r,h)) = -r(45/(PI*h^6) * (h-r)^2)
      */
     VecXr gradW(const VecXr& r) const
     {
@@ -272,27 +273,27 @@ public:
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
-        const auto pi = static_cast<Real>(PI);
+
         // if constexpr (N == 2) {
         if(N == 2)
         {
-            throw std::runtime_error("Error: unimplemented!");
+            LOG(FATAL) << "Unimplemented function";
         }
         else
         {
-            m_k = Real(32.0) / (pi * std::pow(m_radius, 9));
+            m_k = Real(32.0) / (PI * std::pow(m_radius, 9));
             m_c = std::pow(m_radius, 6) / Real(64.0);
         }
         m_W_zero = W(VecXr::Zero());
     }
 
     /**
-     * W(r,h) = (32/(pi h^9))(h-r)^3*r^3					if h/2 < r <= h
-     *          (32/(pi h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
+     * W(r,h) = (32/(PI h^9))(h-r)^3*r^3					if h/2 < r <= h
+     *          (32/(PI h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
      */
-    Real W(Real r) const
+    Real W(const Real r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto r2  = r * r;
         if(r2 <= m_radius2)
         {
@@ -312,7 +313,7 @@ public:
 
     Real W(const VecXr& r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto r2  = r.squaredNorm();
         if(r2 <= m_radius2)
         {
@@ -349,10 +350,11 @@ public:
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
+
         // if constexpr (N == 2) {
         if(N == 2)
         {
-            throw std::runtime_error("Error: unimplemented!");
+            LOG(FATAL) << "Unimplemented function";
         }
         else
         {
@@ -364,9 +366,9 @@ public:
     /**
      * W(r,h) = (0.007/h^3.25)(-4r^2/h + 6r -2h)^0.25					if h/2 < r <= h
      */
-    Real W(Real r) const
+    Real W(const Real r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto r2  = r * r;
         if(r2 <= m_radius2)
         {
@@ -381,7 +383,7 @@ public:
 
     Real W(const VecXr& r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto r2  = r.squaredNorm();
         if(r2 <= m_radius2)
         {
@@ -417,7 +419,7 @@ public:
 
     Real laplace(const VecXr& r) const
     {
-        auto res = Real(0);
+        Real res = 0.;
         const auto r2  = r.squaredNorm();
         if(r2 <= m_radius2)
         {
@@ -444,20 +446,20 @@ public:
     void initialize(const Real kernelRadius)
     {
         m_poly6.setRadius(kernelRadius);
-        m_spiky.setRadius(kernelRadius);
+        m_sPIky.setRadius(kernelRadius);
         m_viscosity.setRadius(kernelRadius);
         m_cohesion.setRadius(kernelRadius);
     }
 
     auto W_zero() const { return m_poly6.W_zero(); }
     auto W(const Vec3r& r) const { return m_poly6.W(r); }
-    auto gradW(const Vec3r& r) const { return m_spiky.gradW(r); }
+    auto gradW(const Vec3r& r) const { return m_sPIky.gradW(r); }
     auto laplace(const Vec3r& r) const { return m_viscosity.laplace(r); }
     auto cohesionW(const Vec3r& r) const { return m_cohesion.W(r); }
 
 protected:
     SPH::Poly6Kernel<3>     m_poly6;
-    SPH::SpikyKernel<3>     m_spiky;
+    SPH::SPIkyKernel<3>     m_sPIky;
     SPH::ViscosityKernel<3> m_viscosity;
     SPH::CohesionKernel<3>  m_cohesion;
 };

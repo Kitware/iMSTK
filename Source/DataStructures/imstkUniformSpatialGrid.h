@@ -49,7 +49,8 @@ public:
     ///
     void initialize(const Vec3r& lowerCorner, const Vec3r& upperCorner, const Real cellSize)
     {
-        assert(cellSize > 0);
+        LOG_IF(FATAL, (cellSize <= 0)) << "Invalid cell size";
+
         m_LowerCorner = lowerCorner;
         m_UpperCorner = upperCorner;
 
@@ -63,13 +64,10 @@ public:
             m_NTotalCells *= m_Resolution[i];
         }
 
-        if(m_NTotalCells == 0)
-        {
-            LOG(FATAL) << "Invalid grid size: [" +
-                std::to_string(m_LowerCorner[0]) + ", " + std::to_string(m_LowerCorner[1]) + ", " + std::to_string(m_LowerCorner[2]) + "] => " +
-                std::to_string(m_UpperCorner[0]) + ", " + std::to_string(m_UpperCorner[1]) + ", " + std::to_string(m_UpperCorner[2]) + "], " +
-                "cellSize = " + std::to_string(m_CellSize);
-        }
+        LOG_IF(FATAL, (m_NTotalCells == 0)) << "Invalid grid size: [" +
+            std::to_string(m_LowerCorner[0]) + ", " + std::to_string(m_LowerCorner[1]) + ", " + std::to_string(m_LowerCorner[2]) + "] => " +
+            std::to_string(m_UpperCorner[0]) + ", " + std::to_string(m_UpperCorner[1]) + ", " + std::to_string(m_UpperCorner[2]) + "], " +
+            "cellSize = " + std::to_string(m_CellSize);
 
         // cell data must be resized to equal to number of cells
         m_CellData.resize(m_NTotalCells);
@@ -175,13 +173,11 @@ private:
     {
         auto cellIdx = getCellIndexFromCoordinate<IndexType>(ppos);
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-        if(!isValidCellIndices(cellIdx[0], cellIdx[1], cellIdx[2]))
-        {
-            LOG(FATAL) << "Invalid cell indices: " +
-                std::to_string(cellIdx[0]) + "/" + std::to_string(m_Resolution[0]) + ", " +
-                std::to_string(cellIdx[1]) + "/" + std::to_string(m_Resolution[1]) + ", " +
-                std::to_string(cellIdx[2]) + "/" + std::to_string(m_Resolution[2]);
-        }
+        LOG_IF(FATAL, !isValidCellIndices(cellIdx[0], cellIdx[1], cellIdx[2])) <<
+            "Invalid cell indices: " +
+            std::to_string(cellIdx[0]) + "/" + std::to_string(m_Resolution[0]) + ", " +
+            std::to_string(cellIdx[1]) + "/" + std::to_string(m_Resolution[1]) + ", " +
+            std::to_string(cellIdx[2]) + "/" + std::to_string(m_Resolution[2]);
 #endif
         return getCellFlatIndexFrom3DIndices<IndexType>(cellIdx[0], cellIdx[1], cellIdx[2]);
     }

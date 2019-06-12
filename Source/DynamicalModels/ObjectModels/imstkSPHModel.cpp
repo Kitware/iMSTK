@@ -35,10 +35,8 @@ SPHModelConfig::SPHModelConfig(const Real particleRadius)
 
 void SPHModelConfig::initialize()
 {
-    if(std::abs(m_ParticleRadius) < Real(1e-6) )
-    {
-        LOG(FATAL) << "Particle radius was not set properly";
-    }
+    LOG_IF(FATAL, (std::abs(m_ParticleRadius) < Real(1e-6))) << "Particle radius was not set properly";
+
     m_ParticleRadiusSqr = m_ParticleRadius * m_ParticleRadius;
 
     m_ParticleMass   = Real(std::pow(Real(2.0) * m_ParticleRadius, 3)) * m_RestDensity * m_ParticleMassScale;
@@ -53,10 +51,7 @@ void SPHModelConfig::initialize()
 
 bool SPHModel::initialize()
 {
-    if(!m_Geometry)
-    {
-        LOG(FATAL) << "Model geometry is not yet set! Cannot initialize without model geometry.";
-    }
+    LOG_IF(FATAL, !m_Geometry) << "Model geometry is not yet set! Cannot initialize without model geometry.";
 
     // initialize positions and velocity of the particles
     this->m_initialState = std::make_shared<SPHKinematicState>();
@@ -163,7 +158,7 @@ void SPHModel::findParticleNeighbors()
         searcher.insertPoints(getState().getPositions());
 
         runLoop(getState().size(),
-            [&] (size_t p) {
+            [&] (const size_t p) {
                 const auto& ppos = getState().getPositions()[p];
                 searcher.getPointsInSphere(getState().getFluidNeighborLists()[p], ppos, m_Parameters->m_KernelRadius);
             });
@@ -174,7 +169,7 @@ void SPHModel::findParticleNeighbors()
             searcher.insertPoints(getState().getBoundaryParticlePositions());
 
             runLoop(getState().size(),
-                [&] (size_t p) {
+                [&] (const size_t p) {
                     const auto& ppos = getState().getPositions()[p];
                     searcher.getPointsInSphere(getState().getBoundaryNeighborLists()[p], ppos, m_Parameters->m_KernelRadius);
                 });
@@ -195,7 +190,7 @@ void SPHModel::computeNeighborRelativePositions()
                                     };
     ////////////////////////////////////////////////////////////////////////////////
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             const auto& ppos   = getState().getPositions()[p];
             auto& neighborInfo = getState().getNeighborInfo()[p];
             neighborInfo.resize(0);
@@ -217,7 +212,7 @@ void SPHModel::collectNeighborDensity()
     // this is usefull because relative positions and densities are accessed together multiple times
     // caching relative positions and densities therefore can reduce computation time significantly (tested)
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
@@ -238,7 +233,7 @@ void SPHModel::collectNeighborDensity()
 void SPHModel::computeDensity()
 {
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
@@ -266,7 +261,7 @@ void SPHModel::normalizeDensity()
     getState().getNormalizedDensities().resize(getState().size());
     ////////////////////////////////////////////////////////////////////////////////
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
@@ -316,7 +311,7 @@ void SPHModel::computePressureAcceleration()
                             };
 
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             Vec3r accel(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
@@ -345,10 +340,10 @@ void SPHModel::computePressureAcceleration()
 }
 
 
-void SPHModel::updateVelocity(Real timestep)
+void SPHModel::updateVelocity(const Real timestep)
 {
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             getState().getVelocities()[p] += (m_Parameters->m_Gravity + getState().getAccelerations()[p]) * timestep;
         });
 }
@@ -357,7 +352,7 @@ void SPHModel::updateVelocity(Real timestep)
 void SPHModel::computeViscosity()
 {
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
@@ -397,7 +392,7 @@ void SPHModel::computeViscosity()
 
     // add diffused velocity back to velocity, causing viscosity
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             getState().getVelocities()[p] += getState().getDiffuseVelocities()[p];
     });
 }
@@ -406,7 +401,7 @@ void SPHModel::computeViscosity()
 void SPHModel::computeNormal()
 {
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             Vec3r n(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
@@ -437,7 +432,7 @@ void SPHModel::computeSurfaceTension()
 
     // Compute surface tension for each particle, using Akinci et at. 2013 model
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
             assert(fluidNeighborList.size() >= 1);     // Neighbor of particle p should contain at least p index
             if(fluidNeighborList.size() <= 1)
@@ -482,10 +477,10 @@ void SPHModel::computeSurfaceTension()
 }
 
 
-void SPHModel::advect(Real timestep)
+void SPHModel::advect(const Real timestep)
 {
     runLoop(getState().size(),
-        [&](size_t p) {
+        [&] (const size_t p) {
             getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
     });
 }

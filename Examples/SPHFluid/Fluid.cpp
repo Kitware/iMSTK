@@ -28,7 +28,7 @@ using namespace imstk;
 ///
 /// \brief Generate a sphere-shape fluid object
 ///
-StdVectorOfVec3d generateSphereShapeFluid(double particleRadius)
+StdVectorOfVec3d generateSphereShapeFluid(const double particleRadius)
 {
     const double sphereRadius = 2.0;
     const Vec3d sphereCenter(0, 1, 0);
@@ -63,7 +63,7 @@ StdVectorOfVec3d generateSphereShapeFluid(double particleRadius)
 ///
 /// \brief Generate a box-shape fluid object
 ///
-StdVectorOfVec3d generateBoxShapeFluid(double particleRadius)
+StdVectorOfVec3d generateBoxShapeFluid(const double particleRadius)
 {
     const double boxWidth = 4.0;
     const Vec3d boxLowerCorner(-2, -3, -2);
@@ -93,19 +93,15 @@ StdVectorOfVec3d getBunny(); // Defined in Bunny.cpp
 ///
 /// \brief Generate a bunny-shape fluid object
 ///
-StdVectorOfVec3d generateBunnyShapeFluid(double particleRadius)
+StdVectorOfVec3d generateBunnyShapeFluid(const double particleRadius)
 {
-    if(std::abs(particleRadius - 0.08) > 1e-6)
-    {
-        LOG(FATAL) << "Particle radius for this scene must be 0.08";
-    }
-
+    LOG_IF(FATAL, (std::abs(particleRadius - 0.08) > 1e-6)) << "Particle radius for this scene must be 0.08";
     StdVectorOfVec3d particles = getBunny();
     return particles;
 }
 
 
-std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, double particleRadius)
+std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, const double particleRadius)
 {
     StdVectorOfVec3d particles;
     switch(sceneIdx)

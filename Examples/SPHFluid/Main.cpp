@@ -26,11 +26,13 @@
 
 using namespace imstk;
 
-std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, double particleRadius);
+std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, const double particleRadius);
 std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_ptr<Scene>& scene, int sceneIdx);
 
 ///
 /// \brief This example demonstrates the fluid simulation using SPH
+/// \brief Usage: ./SPHFluid [scene=<scene_id>] [threads=<num_threads>] [radius=<particle_radius>], where scene_id is in [1..3]
+/// \brief Example: ./SPHFluid scene=1 threads=8 radius=0.01
 ///
 int main(int argc, char* argv[])
 {
@@ -116,10 +118,6 @@ int main(int argc, char* argv[])
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
-
-    // print UPS
-    auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);
 
     sdk->setActiveScene(scene);
     sdk->startSimulation(SimulationStatus::PAUSED);

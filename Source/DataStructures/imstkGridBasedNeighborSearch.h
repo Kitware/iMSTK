@@ -68,8 +68,8 @@ public:
     void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB);
 
 private:
-    Real m_SearchRadius    = Real(0);
-    Real m_SearchRadiusSqr = Real(0);
+    Real m_SearchRadius    = 0.;
+    Real m_SearchRadiusSqr = 0.;
     UniformSpatialGrid<std::vector<size_t>> m_Grid;
 };
 } // end namespace imstk

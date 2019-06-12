@@ -251,7 +251,7 @@ private:
     ///
     /// \brief Update particle velocities due to pressure
     ///
-    void updateVelocity(Real timestep);
+    void updateVelocity(const Real timestep);
 
     ///
     /// \brief Compute viscosity
@@ -271,7 +271,7 @@ private:
     ///
     /// \brief Advect particles
     ///
-    void advect(Real timestep);
+    void advect(const Real timestep);
 
     std::shared_ptr<PointSet> m_Geometry;
     SPHSimulationState m_SimulationState;
