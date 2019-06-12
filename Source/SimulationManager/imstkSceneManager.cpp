@@ -181,7 +181,7 @@ SceneManager::runModule()
         }
     }
 
-    m_scene->setFPS((size_t)(1./wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds)));
+    m_scene->setFPS(1./wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
 }
 
 void

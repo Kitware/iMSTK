@@ -67,6 +67,13 @@ VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
     this->CurrentRenderer->AddActor2D(m_fpsActor);
 }
 
+// Cross-platform sprintf
+#if defined(_WIN32) || defined(_WIN64)
+#   define IMSTK_SPRINT sprintf_s
+#else
+#   define IMSTK_SPRINT sprintf
+#endif
+
 void
 VTKInteractorStyle::OnTimer()
 {
@@ -94,12 +101,24 @@ VTKInteractorStyle::OnTimer()
         std::string fpsPhysicalStr;
         if (m_simManager->getStatus() != SimulationStatus::PAUSED)
         {
-            fpsPhysicalStr = "P: " + std::to_string((int)m_simManager->getActiveScene()->getFPS());
+            char buff[32];
+            auto fps = m_simManager->getActiveScene()->getFPS();
+            if(fps < 4.0)
+            {
+                IMSTK_SPRINT(buff, "%.2f", fps);
+            }
+            else
+            {
+                IMSTK_SPRINT(buff, "%d", static_cast<int>(fps));
+            }
+
+            fpsPhysicalStr = "P: " + std::string(buff);
         }
         else
         {
             fpsPhysicalStr = "P: PAUSED";
         }
+
         m_fpsActor->SetInput((fpsVisualStr + std::string(" | ") + fpsPhysicalStr).c_str());
         m_lastFpsUpdate = now;
     }
