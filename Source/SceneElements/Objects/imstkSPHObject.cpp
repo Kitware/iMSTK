@@ -19,38 +19,27 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToPlaneCD.h"
-
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkPointSet.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkSPHObject.h"
 
 namespace imstk
 {
-void
-PointSetToPlaneCD::computeCollisionData()
+SPHObject::SPHObject(const std::string& name) : DynamicObject<SPHKinematicState>(name)
 {
-    // Clear collisionData
-    m_colData.clearAll();
+    this->m_type = SceneObject::Type::SPH;
+}
 
-    // Get plane properties
-    auto planePos = m_plane->getPosition();
 
-    // TODO: Fix this issue of extra computation in future
-    auto planeNormal = m_plane->getNormal();
-
-    size_t nodeId = 0;
-    for (const auto& p : m_pointSet->getVertexPositions())
+bool SPHObject::initialize()
+{
+    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(this->m_dynamicalModel);
+    if (m_SPHModel)
     {
-        auto peneDistance = (p - planePos).dot(planeNormal);
-        if (peneDistance <= 0.0)
-        {
-            m_colData.MAColData.push_back({ nodeId, planeNormal * peneDistance });
-        }
-        nodeId++;
+        return m_SPHModel->initialize();
+    }
+    else
+    {
+        LOG(WARNING) << "Dynamics pointer cast failure in SPHObject::initialize()";
+        return false;
     }
 }
-} // imstk
+} // end namespace imstk

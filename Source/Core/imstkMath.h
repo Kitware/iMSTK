@@ -30,6 +30,16 @@
 
 namespace imstk
 {
+// Define Real type and dependent types
+using Real = double;
+using Vec2r = Eigen::Matrix<Real, 2, 1>;
+using Vec3r = Eigen::Matrix<Real, 3, 1>;
+using Vec4r = Eigen::Matrix<Real, 4, 1>;
+using StdVectorOfReal  = std::vector<Real>;
+using StdVectorOfVec2r = std::vector<Vec2r, Eigen::aligned_allocator<Vec2r>>;
+using StdVectorOfVec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
+using StdVectorOfVec4r = std::vector<Vec4r, Eigen::aligned_allocator<Vec4r>>;
+
 // 2D vector
 using Vec2f = Eigen::Vector2f;
 using Vec2d = Eigen::Vector2d;
@@ -100,25 +110,29 @@ using AffineTransform3d = Eigen::Affine3d;
 #define WORLD_ORIGIN Vec3d::Zero()
 
 /// Some commonly used math constants
-const double PI = 3.14159265358979323846;
-const double PI_2 = 1.57079632679489661923;
-const double PI_4 = 0.785398163397448309616;
-const double INV_1_PI = 0.318309886183790671538;
-const double INV_2_PI = 0.636619772367581343076;
-const double TWO_OVER_SQRTPI = 1.12837916709551257390;
-const double SQRT2 = 1.41421356237309504880;
-const double SQRT1_2 = 0.707106781186547524401;
-const double NLOG_E = 2.71828182845904523536;
-const double LOG2E = 1.44269504088896340736;
-const double LOG10E = 0.434294481903251827651;
-const double LN2 = 0.693147180559945309417;
-const double LN10 = 2.30258509299404568402;
+static constexpr Real PI = 3.14159265358979323846;
+static constexpr Real PI_2 = 1.57079632679489661923;
+static constexpr Real PI_4 = 0.785398163397448309616;
+static constexpr Real INV_1_PI = 0.318309886183790671538;
+static constexpr Real INV_2_PI = 0.636619772367581343076;
+static constexpr Real TWO_OVER_SQRTPI = 1.12837916709551257390;
+static constexpr Real SQRT2 = 1.41421356237309504880;
+static constexpr Real SQRT1_2 = 0.707106781186547524401;
+static constexpr Real NLOG_E = 2.71828182845904523536;
+static constexpr Real LOG2E = 1.44269504088896340736;
+static constexpr Real LOG10E = 0.434294481903251827651;
+static constexpr Real LN2 = 0.693147180559945309417;
+static constexpr Real LN10 = 2.30258509299404568402;
 
-const double MAX_D = std::numeric_limits<double>::max();
-const double MIN_D = std::numeric_limits<double>::min();
-const double MAX_F = std::numeric_limits<float>::max();
-const double MIN_F = std::numeric_limits<float>::min();
+static constexpr double MAX_REAL = std::numeric_limits<Real>::max();
+static constexpr double MIN_REAL = std::numeric_limits<Real>::min();
+static constexpr double MAX_D = std::numeric_limits<double>::max();
+static constexpr double MIN_D = std::numeric_limits<double>::min();
+static constexpr float MAX_F = std::numeric_limits<float>::max();
+static constexpr float MIN_F = std::numeric_limits<float>::min();
 
-const double MACHINE_PRECISION = std::numeric_limits<double>::denorm_min();
+static constexpr Real MACHINE_PRECISION = std::numeric_limits<Real>::denorm_min();
+static constexpr double MACHINE_PRECISION_D = std::numeric_limits<double>::denorm_min();
+static constexpr double MACHINE_PRECISION_F = std::numeric_limits<double>::denorm_min();
 }
 #endif // ifndef imstkMath_h

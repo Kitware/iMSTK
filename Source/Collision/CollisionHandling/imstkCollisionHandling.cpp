@@ -26,6 +26,7 @@
 #include "imstkPickingCH.h"
 #include "imstkDeformableObject.h"
 #include "imstkBoneDrillingCH.h"
+#include "imstkSPHCollisionHandling.h"
 
 #include <g3log/g3log.hpp>
 
@@ -80,6 +81,9 @@ CollisionHandling::make_collision_handling(const Type& type,
 
     case Type::BoneDrilling:
         return std::make_shared<BoneDrillingCH>(side, colData, objA, objB);
+
+    case Type::SPH:
+        return std::make_shared<SPHCollisionHandling>(side, colData, objA);
 
     default:
         LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";

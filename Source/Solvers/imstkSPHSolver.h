@@ -19,38 +19,42 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToPlaneCD.h"
+#pragma once
 
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkPointSet.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkSolverBase.h"
+#include "imstkSPHObject.h"
 
 namespace imstk
 {
-void
-PointSetToPlaneCD::computeCollisionData()
+///
+/// \class SPHSolver
+/// \brief SPH solver
+///
+class SPHSolver : public SolverBase
 {
-    // Clear collisionData
-    m_colData.clearAll();
+public:
+    SPHSolver() = default;
+    ~SPHSolver() = default;
 
-    // Get plane properties
-    auto planePos = m_plane->getPosition();
+    SPHSolver(const SPHSolver &other) = delete;
+    SPHSolver &operator=(const SPHSolver &other) = delete;
 
-    // TODO: Fix this issue of extra computation in future
-    auto planeNormal = m_plane->getNormal();
+    ///
+    /// \brief Set the simulation object
+    ///
+    void setSPHObject(const std::shared_ptr<SPHObject>& obj) { assert(obj); m_SPHObject = obj; }
 
-    size_t nodeId = 0;
-    for (const auto& p : m_pointSet->getVertexPositions())
+    ///
+    /// \brief Advance one time step
+    ///
+    virtual void solve() override
     {
-        auto peneDistance = (p - planePos).dot(planeNormal);
-        if (peneDistance <= 0.0)
-        {
-            m_colData.MAColData.push_back({ nodeId, planeNormal * peneDistance });
-        }
-        nodeId++;
+        const auto& SPHModel = m_SPHObject->getSPHModel();
+        assert(SPHModel);
+        SPHModel->simulationTimeStep();
     }
-}
-} // imstk
+
+private:
+    std::shared_ptr<SPHObject> m_SPHObject;
+};
+} // end namespace imstk

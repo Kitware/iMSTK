@@ -49,7 +49,8 @@ public:
         Colliding,
         Rigid,
         FEMDeformable,
-        Pbd
+        Pbd,
+        SPH
     };
 
     ///

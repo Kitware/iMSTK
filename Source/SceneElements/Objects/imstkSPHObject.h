@@ -19,38 +19,44 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToPlaneCD.h"
+#pragma once
 
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkPointSet.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkDynamicObject.h"
+#include "imstkDynamicalModel.h"
+#include "imstkSPHModel.h"
 
 namespace imstk
 {
-void
-PointSetToPlaneCD::computeCollisionData()
+///
+/// \class SPHObject
+///
+/// \brief Base class for scene objects that move and/or deform under position
+/// based dynamics formulation
+///
+class SPHObject : public DynamicObject<SPHKinematicState>
 {
-    // Clear collisionData
-    m_colData.clearAll();
+public:
+    ///
+    /// \brief Constructor
+    ///
+    SPHObject(const std::string& name);
 
-    // Get plane properties
-    auto planePos = m_plane->getPosition();
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~SPHObject() = default;
 
-    // TODO: Fix this issue of extra computation in future
-    auto planeNormal = m_plane->getNormal();
+    ///
+    /// \brief Initialize the SPH scene object
+    ///
+    bool initialize() override;
 
-    size_t nodeId = 0;
-    for (const auto& p : m_pointSet->getVertexPositions())
-    {
-        auto peneDistance = (p - planePos).dot(planeNormal);
-        if (peneDistance <= 0.0)
-        {
-            m_colData.MAColData.push_back({ nodeId, planeNormal * peneDistance });
-        }
-        nodeId++;
-    }
-}
-} // imstk
+    ///
+    /// \brief Get the SPH model of the object
+    ///
+    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+
+protected:
+    std::shared_ptr<SPHModel> m_SPHModel;
+};
+} // end namespace imstk
