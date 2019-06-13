@@ -114,13 +114,13 @@ public:
     /// \brief Get data in cell
     /// \param A position in space
     ///
-    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellFlatIndexFromCoordinate<unsigned int>(ppos)]; }
+    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellFlatIndexFromCoordinate < unsigned int > (ppos)]; }
 
     ///
     /// \brief Get data in cell
     /// \param A position in space
     ///
-    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellFlatIndexFromCoordinate<unsigned int>(ppos)]; }
+    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellFlatIndexFromCoordinate < unsigned int > (ppos)]; }
 
     ///
     /// \brief Get data in cell
@@ -187,7 +187,7 @@ private:
     Real m_CellSize {1.0};
     Real m_InvCellSize {1.0};
 
-    std::array<unsigned int, 3> m_Resolution { 0u, 0u, 0u };
+    std::array<unsigned int, 3> m_Resolution {{ 0u, 0u, 0u }};
     unsigned int m_NTotalCells { 1u };
 
     std::vector<CellData> m_CellData;

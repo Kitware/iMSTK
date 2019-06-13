@@ -31,8 +31,8 @@ using namespace imstk;
 #define SPHERE_RADIUS   Real(1)
 #define SPHERE_CENTER   Vec3r(0, 0, 0)
 #define PARTICLE_RADIUS Real(0.05)
-#define ITERATIONS      100
-#define STEP            Real(1.02)
+#define ITERATIONS      5
+#define STEP            Real(1.1)
 
 ///
 /// \brief Advance particle positions
