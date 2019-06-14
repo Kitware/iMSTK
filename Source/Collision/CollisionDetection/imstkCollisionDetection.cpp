@@ -29,7 +29,7 @@
 #include "imstkMeshToMeshCD.h"
 #include "imstkSphereCylinderCD.h"
 #include "imstkPointSetToSpherePickingCD.h"
-#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkMeshToMeshBruteforceCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkPlane.h"
