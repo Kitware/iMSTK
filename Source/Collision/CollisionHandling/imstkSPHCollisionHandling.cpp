@@ -41,7 +41,7 @@ void SPHCollisionHandling::setBoundaryFriction(const Real friction)
     }
 }
 
-void SPHCollisionHandling::computeContactForces()
+void SPHCollisionHandling::processCollisionData()
 {
     const auto& SPHModel = m_SPHObject->getSPHModel();
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
@@ -49,7 +49,7 @@ void SPHCollisionHandling::computeContactForces()
 #endif
 
     auto& state = SPHModel->getState();
-    for(const auto& cd : m_colData.MAColData)
+    for(const auto& cd : m_colData->MAColData)
     {
         const auto pidx = cd.nodeId; // Fluid particle index
         auto n = cd.penetrationVector;  // This vector should point into solid object

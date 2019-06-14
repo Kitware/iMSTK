@@ -31,6 +31,8 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
                                  CollisionHandling::Type CHAType,
                                  CollisionHandling::Type CHBType)
 {
+    m_colData = std::make_shared<CollisionData>();
+
     m_valid = false;
 
     // Check that objects exist

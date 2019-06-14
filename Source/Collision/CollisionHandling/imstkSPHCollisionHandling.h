@@ -28,7 +28,7 @@ namespace imstk
 class SPHCollisionHandling : public CollisionHandling
 {
 public:
-    SPHCollisionHandling(const Side& side, const CollisionData& colData, const std::shared_ptr<CollidingObject>& obj) :
+    SPHCollisionHandling(const Side& side, const std::shared_ptr < CollisionData>& colData, const std::shared_ptr<CollidingObject>& obj) :
         CollisionHandling(Type::SPH, side, colData), m_SPHObject(std::dynamic_pointer_cast<SPHObject>(obj)) {}
 
     SPHCollisionHandling() = delete;
@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Compute forces based on collision data
     ///
-    virtual void computeContactForces() override;
+    virtual void processCollisionData() override;
 
     ///
     /// \brief Set the friction coefficient

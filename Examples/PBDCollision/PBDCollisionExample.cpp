@@ -25,7 +25,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"
-#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkMeshToMeshBruteforceCD.h"
 #include "imstkPBDCollisionHandling.h"
 
 using namespace imstk;

@@ -25,7 +25,7 @@
 #include "imstkPbdSolver.h"
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
-#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkMeshToMeshBruteforceCD.h"
 #include "imstkPBDCollisionHandling.h"
 
 using namespace imstk;
