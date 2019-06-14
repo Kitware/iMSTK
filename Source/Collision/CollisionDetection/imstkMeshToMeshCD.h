@@ -48,7 +48,7 @@ public:
     ///
     MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
                  std::shared_ptr<SurfaceMesh> meshB,
-                 CollisionData& colData);
+                 std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Destructor

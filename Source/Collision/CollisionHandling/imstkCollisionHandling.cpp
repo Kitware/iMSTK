@@ -35,7 +35,7 @@ namespace imstk
 std::shared_ptr<CollisionHandling>
 CollisionHandling::make_collision_handling(const Type& type,
                                            const Side& side,
-                                           const CollisionData &colData,
+                                           const std::shared_ptr<CollisionData> colData,
                                            std::shared_ptr<CollidingObject> objA,
                                            std::shared_ptr<CollidingObject> objB)
 {

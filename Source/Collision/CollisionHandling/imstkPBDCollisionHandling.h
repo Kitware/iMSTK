@@ -31,64 +31,58 @@
 namespace imstk
 {
 class CollidingObject;
-class DeformableObject;
 class CollisionData;
+class PbdObject;
+class PbdCollisionConstraint;
+class PbdSolver;
 
 ///
-/// \class PenaltyCH
+/// \class PBDCollisionHandling
 ///
-/// \brief Implements penalty collision handling
+/// \brief Implements PBD based collision handling
 ///
-class PenaltyCH : public CollisionHandling
+class PBDCollisionHandling : public CollisionHandling
 {
+typedef std::vector<std::shared_ptr<PbdCollisionConstraint>> PBDConstraintVector;
 public:
 
     ///
     /// \brief Constructor
     ///
-    PenaltyCH(const Side& side,
-              const std::shared_ptr<CollisionData> colData,
-              std::shared_ptr<CollidingObject> obj) :
+    PBDCollisionHandling(const Side& side,
+                         const std::shared_ptr<CollisionData> colData,
+                         std::shared_ptr<PbdObject> obj1,
+                         std::shared_ptr<PbdObject> obj2,
+                         std::shared_ptr<PbdSolver> PBDSolver = nullptr) :
         CollisionHandling(Type::Penalty, side, colData),
-        m_object(obj){}
+        m_pbdObject1(obj1),
+        m_pbdObject2(obj2),
+        m_PBDSolver(PBDSolver){}
 
-    PenaltyCH() = delete;
+    PBDCollisionHandling() = delete;
 
     ///
     /// \brief Destructor
     ///
-    ~PenaltyCH() = default;
+    ~PBDCollisionHandling() = default;
 
     ///
     /// \brief Compute forces based on collision data
     ///
     void processCollisionData() override;
-    void computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> analyticObj);
-    void computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObject> deformableObj);
 
     ///
-    /// \brief Set the contact stiffness
+    /// \brief Generate appropriate PBD constraints based on the collision data
     ///
-    void setContactStiffness(const double stiffness)
-    {
-        m_stiffness = stiffness;
-    }
-
-    ///
-    /// \brief Set the contact velocity damping
-    ///
-    void setContactVelocityDamping(const double damping)
-    {
-        m_damping = damping;
-    }
+    void generatePBDConstraints();
 
 private:
 
-    std::shared_ptr<CollidingObject> m_object;    ///>
-
-    double m_stiffness = 5.0e5; ///> Stiffness of contact
-    double m_damping = 0.5;     ///> Damping of the contact
+    std::shared_ptr<PbdObject> m_pbdObject1;   ///> PBD object
+    std::shared_ptr<PbdObject> m_pbdObject2;   ///> PBD object
+    PBDConstraintVector m_PBDConstraints;      ///> List of PBD constraints
+    std::shared_ptr<PbdSolver> m_PBDSolver;        /// The Solver for the collision constraints
 };
 }
 
-#endif // ifndef imstkPenaltyCH_h
+#endif // ifndef imstkPBDCollisionHandling_h

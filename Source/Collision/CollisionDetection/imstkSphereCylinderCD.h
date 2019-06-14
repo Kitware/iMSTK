@@ -46,7 +46,7 @@ public:
     ///
     SphereCylinderCD(std::shared_ptr<Sphere> sphere,
                      std::shared_ptr<Cylinder> cylinder,
-                     CollisionData& colData) :
+                     std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::SphereToCylinder, colData),
         m_cylinder(cylinder),
         m_sphere(sphere)

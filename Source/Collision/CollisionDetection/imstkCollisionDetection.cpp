@@ -29,6 +29,7 @@
 #include "imstkMeshToMeshCD.h"
 #include "imstkSphereCylinderCD.h"
 #include "imstkPointSetToSpherePickingCD.h"
+#include "imstkMeshToMeshBruteforceCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkPlane.h"
@@ -40,10 +41,10 @@
 namespace imstk
 {
 std::shared_ptr<CollisionDetection>
-CollisionDetection::make_collision_detection(const Type& type,
-                                             std::shared_ptr<CollidingObject> objA,
-                                             std::shared_ptr<CollidingObject> objB,
-                                             CollisionData &colData)
+CollisionDetection::makeCollisionDetectionObject(const Type& type,
+                                                 std::shared_ptr<CollidingObject> objA,
+                                                 std::shared_ptr<CollidingObject> objB,
+                                                 std::shared_ptr<CollisionData> colData)
 {
     switch (type)
     {
@@ -167,6 +168,21 @@ CollisionDetection::make_collision_detection(const Type& type,
         return std::make_shared<PointSetToSpherePickingCD>(mesh, sphere, colData);
     }
     break;
+    case Type::MeshToMeshBruteForce:
+    {
+        auto geometry1 = std::dynamic_pointer_cast<Geometry>(objA->getCollidingGeometry());
+        auto surfaceGeo = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+
+        // Geometries check
+        if (geometry1 == nullptr || surfaceGeo == nullptr)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                         << "invalid object geometries for MeshToMeshBruteForce collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<MeshToMeshBruteForceCD>(geometry1, surfaceGeo, colData);
+    }
+    break;
     default:
     {
         LOG(WARNING) << "CollisionDetection::make_collision_detection error: type not implemented.";
@@ -181,7 +197,7 @@ CollisionDetection::getType() const
     return m_type;
 }
 
-const CollisionData&
+const std::shared_ptr<CollisionData>
 CollisionDetection::getCollisionData() const
 {
     return m_colData;

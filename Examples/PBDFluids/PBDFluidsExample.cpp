@@ -25,6 +25,8 @@
 #include "imstkPbdSolver.h"
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
+#include "imstkMeshToMeshBruteforceCD.h"
+#include "imstkPBDCollisionHandling.h"
 
 using namespace imstk;
 
@@ -234,10 +236,10 @@ int main()
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
-    auto pair = std::make_shared<PbdInteractionPair>(PbdInteractionPair(deformableObj, floor));
-    pair->setNumberOfInterations(2);
-
-    colGraph->addInteractionPair(pair);
+    auto CD = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
+    auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
+                CD->getCollisionData(), deformableObj, floor, pbdSolver);
+    colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");

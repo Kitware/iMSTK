@@ -32,7 +32,7 @@
 namespace imstk
 {
 BoneDrillingCH::BoneDrillingCH(const Side& side,
-                               const CollisionData& colData,
+                               const std::shared_ptr<CollisionData> colData,
                                std::shared_ptr<CollidingObject> bone,
                                std::shared_ptr<CollidingObject> drill) :
     CollisionHandling(Type::BoneDrilling, side, colData),
@@ -79,7 +79,7 @@ BoneDrillingCH::erodeBone()
 {
     auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
-    for (auto& cd : m_colData.MAColData)
+    for (auto& cd : m_colData->MAColData)
     {
         if (m_nodeRemovalStatus[cd.nodeId])
         {
@@ -104,11 +104,11 @@ BoneDrillingCH::erodeBone()
 }
 
 void
-BoneDrillingCH::computeContactForces()
+BoneDrillingCH::processCollisionData()
 {
     // Check if any collisions
     const auto devicePosition = m_drill->getCollidingGeometry()->getTranslation();
-    if (m_colData.MAColData.empty())
+    if (m_colData->MAColData.empty())
     {
         // Set the visual object position same as the colliding object position
         m_drill->getVisualGeometry()->setTranslation(devicePosition);
@@ -120,7 +120,7 @@ BoneDrillingCH::computeContactForces()
     // Aggregate collision data
     Vec3d t = Vec3d::Zero();
     double maxDepth = MIN_D;
-    for (const auto& cd : m_colData.MAColData)
+    for (const auto& cd : m_colData->MAColData)
     {
         if (m_nodeRemovalStatus[cd.nodeId])
         {

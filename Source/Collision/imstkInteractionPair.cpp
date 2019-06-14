@@ -31,6 +31,8 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
                                  CollisionHandling::Type CHAType,
                                  CollisionHandling::Type CHBType)
 {
+    m_colData = std::make_shared<CollisionData>();
+
     m_valid = false;
 
     // Check that objects exist
@@ -41,14 +43,14 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Check if objects are different
-    if (A == B)
+    /*if (A == B)
     {
         LOG(WARNING) << "InteractionPair error: object cannot interact with itself.";
         return;
-    }
+    }*/
 
     // Collision Detection
-    std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B, m_colData);
+    std::shared_ptr<CollisionDetection> CD = CollisionDetection::makeCollisionDetectionObject(CDType, A, B, m_colData);
     if (CD == nullptr)
     {
         LOG(WARNING) << "InteractionPair error: can not instantiate collision detection algorithm.";
@@ -105,11 +107,11 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Check if objects are different
-    if (A == B)
+    /*if (A == B)
     {
         LOG(WARNING) << "InteractionPair error: object cannot interact with itself.";
         return;
-    }
+    }*/
 
     m_objects = ObjectsPair(A, B);
     m_colDetect = CD;
@@ -131,7 +133,7 @@ InteractionPair::computeCollisionData()
 }
 
 void
-InteractionPair::computeContactForces()
+InteractionPair::processCollisionData()
 {
     if (!m_valid)
     {
@@ -141,11 +143,11 @@ InteractionPair::computeContactForces()
 
     if(m_colHandlingA)
     {
-        m_colHandlingA->computeContactForces();
+        m_colHandlingA->processCollisionData();
     }
     if(m_colHandlingB)
     {
-        m_colHandlingB->computeContactForces();
+        m_colHandlingB->processCollisionData();
     }
 }
 

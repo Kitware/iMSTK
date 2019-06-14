@@ -46,7 +46,7 @@ public:
     ///
     PointSetToCapsuleCD(std::shared_ptr<PointSet> pointSet,
                         std::shared_ptr<Capsule> capsule,
-                        CollisionData& colData) :
+                        std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::PointSetToCapsule,
                            colData),
         m_pointSet(pointSet),

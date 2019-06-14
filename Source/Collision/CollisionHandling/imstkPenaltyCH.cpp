@@ -30,7 +30,7 @@
 namespace imstk
 {
 void
-PenaltyCH::computeContactForces()
+PenaltyCH::processCollisionData()
 {
     if (auto deformableObj = std::dynamic_pointer_cast<DeformableObject>(m_object))
     {
@@ -52,7 +52,7 @@ PenaltyCH::computeContactForces()
 void
 PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> analyticObj)
 {
-    if (m_colData.PDColData.empty())
+    if (m_colData->PDColData.empty())
     {
         return;
     }
@@ -67,7 +67,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> an
 
     // If collision data is valid, append forces
     Vec3d force(0., 0., 0.);
-    for(const auto& cd : m_colData.PDColData)
+    for(const auto& cd : m_colData->PDColData)
     {
         if (m_side == CollisionHandling::Side::A)
         {
@@ -86,7 +86,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> an
 void
 PenaltyCH::computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObject> deformableObj)
 {
-    if (m_colData.MAColData.empty())
+    if (m_colData->MAColData.empty())
     {
         return;
     }
@@ -107,7 +107,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObje
     size_t nodeDofID;
 
     // If collision data, append forces
-    for (const auto& cd : m_colData.MAColData)
+    for (const auto& cd : m_colData->MAColData)
     {
         nodeDofID = 3 * cd.nodeId;
         velocityProjection = Vec3d(velVector(nodeDofID), velVector(nodeDofID + 1), velVector(nodeDofID + 2));

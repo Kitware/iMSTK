@@ -34,7 +34,7 @@ void
 PointSetToPlaneCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Get plane properties
     auto planePos = m_plane->getPosition();
@@ -48,7 +48,7 @@ PointSetToPlaneCD::computeCollisionData()
         auto peneDistance = (p - planePos).dot(planeNormal);
         if (peneDistance <= 0.0)
         {
-            m_colData.MAColData.push_back({ nodeId, planeNormal * peneDistance });
+            m_colData->MAColData.push_back({ nodeId, planeNormal * peneDistance });
         }
         nodeId++;
     }

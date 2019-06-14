@@ -32,7 +32,7 @@ void
 SphereToSphereCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Get geometry properties
     Vec3d sphereAPos = m_sphereA->getPosition();
@@ -59,6 +59,6 @@ SphereToSphereCD::computeCollisionData()
     Vec3d sphereBColPt = sphereBPos - dirAToB*rB;
 
     // Set collisionData
-    m_colData.PDColData.push_back({sphereAColPt, sphereBColPt, dirAToB, penetrationDepth});
+    m_colData->PDColData.push_back({sphereAColPt, sphereBColPt, dirAToB, penetrationDepth});
 }
 }

@@ -25,7 +25,7 @@ limitations under the License.
 namespace imstk
 {
 void
-PickingCH::computeContactForces()
+PickingCH::processCollisionData()
 {
     if (m_object)
     {
@@ -43,7 +43,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
 {
     m_DynamicLinearProjConstraints->clear();
 
-    if (m_colData.NodePickData.empty())
+    if (m_colData->NodePickData.empty())
     {
         return;
     }
@@ -62,7 +62,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
 
     // If collision data, append LPC constraints
-    for (const auto& CD : m_colData.NodePickData)
+    for (const auto& CD : m_colData->NodePickData)
     {
         auto nodeDof = 3 * CD.nodeId;
         auto vprev = Vec3d(Vprev(nodeDof), Vprev(nodeDof + 1), Vprev(nodeDof + 2));

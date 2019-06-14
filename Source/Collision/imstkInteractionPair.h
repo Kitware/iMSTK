@@ -73,7 +73,7 @@ public:
     ///
     /// \brief Call collision handling algorithm to compute contact forces for an object
     ///
-    void computeContactForces();
+    void processCollisionData();
 
     ///
     /// \brief Call collision handling algorithm to compute contact forces for an object
@@ -104,7 +104,7 @@ protected:
 
     ObjectsPair m_objects;                             ///< Colliding objects
     std::shared_ptr<CollisionDetection> m_colDetect;   ///< Collision detection algorithm
-    CollisionData m_colData;                           ///< Common Collision Data
+    std::shared_ptr<CollisionData> m_colData;                               ///< Common Collision Data
     std::shared_ptr<CollisionHandling> m_colHandlingA; ///< Collision handling algorithm for A
     std::shared_ptr<CollisionHandling> m_colHandlingB; ///< Collision handling algorithm for B
 

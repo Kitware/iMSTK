@@ -29,7 +29,7 @@
 namespace imstk {
 MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
                            std::shared_ptr<SurfaceMesh> meshB,
-                           CollisionData& colData) :
+                           std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::MeshToMesh, colData),
     m_meshA(meshA),
     m_meshB(meshB)
@@ -51,7 +51,7 @@ void
 MeshToMeshCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Update model
     m_modelA->UpdateVert(m_meshA->getVertexPositions());
@@ -83,7 +83,7 @@ MeshToMeshCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
     }
 
     auto colData = CD->getCollisionData();
-    colData.EEColData.push_back(EdgeEdgeCollisionData(eA_v1, eA_v2, eB_v1, eB_v2, t));
+    colData->EEColData.push_back(EdgeEdgeCollisionData(eA_v1, eA_v2, eB_v1, eB_v2, t));
     //LOG(INFO) <<"EE: eA("<<eA_v1<<", "<<eA_v2<<"), eB("<<eB_v1<<", "<<eB_v2<<") \t@ t="<<t;
 }
 
@@ -98,7 +98,7 @@ MeshToMeshCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
     }
 
     auto colData = CD->getCollisionData();
-    colData.TVColData.push_back(TriangleVertexCollisionData(fidA, vidB, t));
+    colData->TVColData.push_back(TriangleVertexCollisionData((size_t)fidA, (size_t)vidB, t));
     //LOG(INFO) <<"VF: fA("<<fidA<<"), vB("<<vidB<<") \t\t@ t="<<t;
 }
 
@@ -112,7 +112,7 @@ MeshToMeshCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
         return;
     }
     auto colData = CD->getCollisionData();
-    colData.VTColData.push_back(VertexTriangleCollisionData(vidA, fidB, t));
+    colData->VTColData.push_back(VertexTriangleCollisionData(vidA, fidB, t));
     //LOG(INFO) <<"VF: vA("<<vidA<<"), fB("<<fidB<<") \t\t@ t="<<t;
 }
 }

@@ -45,7 +45,7 @@ public:
     /// \brief Constructor
     ///
     BoneDrillingCH(const Side& side,
-                   const CollisionData& colData,
+                   const std::shared_ptr<CollisionData> colData,
                    std::shared_ptr<CollidingObject> bone,
                    std::shared_ptr<CollidingObject> drill);
 
@@ -64,7 +64,7 @@ public:
     ///
     /// \brief Compute forces based on collision data
     ///
-    void computeContactForces() override;
+    void processCollisionData() override;
 
     ///
     /// \brief Get stiffness

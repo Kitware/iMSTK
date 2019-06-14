@@ -46,7 +46,7 @@ public:
     ///
     BidirectionalPlaneToSphere(std::shared_ptr<Plane> planeA,
                                std::shared_ptr<Sphere> sphereB,
-                               CollisionData& colData) :
+                               std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::BidirectionalPlaneToSphere, colData),
         m_planeA(planeA),
         m_sphereB(sphereB)

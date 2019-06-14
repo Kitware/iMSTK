@@ -19,42 +19,45 @@
 
 =========================================================================*/
 
-#ifndef imstkSphereToSphereCD_h
-#define imstkSphereToSphereCD_h
+#ifndef imstkMeshToMeshBruteforceCD_h
+#define imstkMeshToMeshBruteforceCD_h
 
 #include <memory>
+#include <iostream>
 
 #include "imstkCollisionDetection.h"
 
 namespace imstk
 {
-class Sphere;
+class Geometry;
+class SurfaceMesh;
 class CollisionData;
 
 ///
-/// \class SphereToSphereCD
+/// \class MeshToMeshBruteForceCD
 ///
-/// \brief Sphere to sphere collision detection
+/// \brief Mesh to mesh collision with brute force strategy
 ///
-class SphereToSphereCD : public CollisionDetection
+class MeshToMeshBruteForceCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    SphereToSphereCD(std::shared_ptr<Sphere> sphereA,
-                     std::shared_ptr<Sphere> sphereB,
-                     std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::SphereToSphere, colData),
-        m_sphereA(sphereA),
-        m_sphereB(sphereB)
+    MeshToMeshBruteForceCD(std::shared_ptr<Geometry> obj1,
+                           std::shared_ptr<SurfaceMesh> obj2,
+                           std::shared_ptr<CollisionData> colData) :
+        CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce,
+                           colData),
+        m_object1(obj1),
+        m_object2(obj2)
     {}
 
     ///
     /// \brief Destructor
     ///
-    ~SphereToSphereCD() = default;
+    ~MeshToMeshBruteForceCD() = default;
 
     ///
     /// \brief Detect collision and compute collision data
@@ -62,10 +65,15 @@ public:
     void computeCollisionData() override;
 
 private:
+    ///
+    /// \brief Do a broad phase collision check using AABB
+    ///
+    bool doBroadPhaseCollisionCheck() const;
 
-    std::shared_ptr<Sphere> m_sphereA;  ///>
-    std::shared_ptr<Sphere> m_sphereB;  ///>
+    double m_proximityTolerance = 0.1;        ///> proximity tolerance used for collision
+    std::shared_ptr<Geometry> m_object1;      ///> object 1
+    std::shared_ptr<SurfaceMesh> m_object2;   ///> object 2
 };
 }
 
-#endif // ifndef imstkSphereToSphereCD_h
+#endif // ifndef imstkMeshToMeshBruteForceCD_h

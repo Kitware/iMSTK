@@ -34,7 +34,7 @@ void
 PointSetToCapsuleCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     auto capsulePos = m_capsule->getPosition();
     auto length = m_capsule->getLength();
@@ -70,7 +70,7 @@ PointSetToCapsuleCD::computeCollisionData()
         {
             auto direction = (closestPoint - q) / dist;
             auto pointOnCapsule = closestPoint - radius*direction;
-            m_colData.MAColData.push_back({ nodeId, p - pointOnCapsule });
+            m_colData->MAColData.push_back({ nodeId, p - pointOnCapsule });
         }
         nodeId++;
     }

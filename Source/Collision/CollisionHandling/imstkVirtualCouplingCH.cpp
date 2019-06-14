@@ -30,7 +30,7 @@
 namespace imstk
 {
 void
-VirtualCouplingCH::computeContactForces()
+VirtualCouplingCH::processCollisionData()
 {
     m_offset.setZero();
 
@@ -39,7 +39,7 @@ VirtualCouplingCH::computeContactForces()
 
     // Check if any collisions
     const auto collidingObjPos = collidingGeometry->getPosition();
-    if (m_colData.PDColData.empty())
+    if (m_colData->PDColData.empty())
     {
         // Set the visual object position same as the colliding object position
         visualGeometry->setPosition(collidingObjPos);
@@ -48,7 +48,7 @@ VirtualCouplingCH::computeContactForces()
 
     // Aggregate collision data
     Vec3d t = Vec3d::Zero();
-    for (const auto& cd : m_colData.PDColData)
+    for (const auto& cd : m_colData->PDColData)
     {
         t += cd.dirAtoB * cd.penetrationDepth;
     }

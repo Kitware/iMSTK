@@ -43,9 +43,9 @@ namespace imstk
 class CollisionGraph
 {
 public:
-    using CollidingObjectPtr = std::shared_ptr < CollidingObject >;
-    using CollisionHandlingPtr = std::shared_ptr < CollisionHandling >;
-    using CollisionDetectionPtr = std::shared_ptr < CollisionDetection >;
+    using CollidingObjectPtr = std::shared_ptr<CollidingObject>;
+    using CollisionHandlingPtr = std::shared_ptr<CollisionHandling>;
+    using CollisionDetectionPtr = std::shared_ptr<CollisionDetection>;
     using InteractionPairPtr = std::shared_ptr<InteractionPair>;
 
     ///

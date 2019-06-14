@@ -33,7 +33,7 @@ void
 UnidirectionalPlaneToSphereCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Get geometry properties
     const Vec3d sphereBPos = m_sphereB->getPosition();
@@ -57,6 +57,6 @@ UnidirectionalPlaneToSphereCD::computeCollisionData()
     Vec3d sphereBColPt = sphereBPos - n*r;
 
     // Set collisionData
-    m_colData.PDColData.push_back({planeAColPt, sphereBColPt, n, penetrationDepth});
+    m_colData->PDColData.push_back({planeAColPt, sphereBColPt, n, penetrationDepth});
 }
 } //iMSTK

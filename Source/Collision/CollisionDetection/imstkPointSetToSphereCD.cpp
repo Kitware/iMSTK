@@ -34,7 +34,7 @@ void
 PointSetToSphereCD::computeCollisionData()
 {
     // Clear collisionData
-    m_colData.clearAll();
+    m_colData->clearAll();
 
     // Get sphere properties
     auto spherePos = m_sphere->getPosition();
@@ -48,7 +48,7 @@ PointSetToSphereCD::computeCollisionData()
         {
             auto direction = (spherePos - p)/dist;
             auto pointOnSphere = spherePos - radius*direction;
-            m_colData.MAColData.push_back({ nodeId, p - pointOnSphere });
+            m_colData->MAColData.push_back({ nodeId, p - pointOnSphere });
         }
         nodeId++;
     }
