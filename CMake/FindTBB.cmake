@@ -1,3 +1,11 @@
+#
+# Modified by Sreekanth Arikatla from the original at OGRE source
+# https://github.com/justusc/FindTBB based on the issue
+# https://github.com/justusc/FindTBB/issues/8
+# Change: (line 282 below)
+# 		add_library(tbb SHARED IMPORTED) --> add_library(tbb STATIC IMPORTED)
+#
+#--------------------------------------------------------------------
 # The MIT License (MIT)
 #
 # Copyright (c) 2015 Justus Calvin
@@ -271,7 +279,7 @@ if(NOT TBB_FOUND)
   ##################################
 
   if(NOT CMAKE_VERSION VERSION_LESS 3.0 AND TBB_FOUND)
-    add_library(tbb SHARED IMPORTED)
+    add_library(tbb STATIC IMPORTED)
     set_target_properties(tbb PROPERTIES
           INTERFACE_INCLUDE_DIRECTORIES  ${TBB_INCLUDE_DIRS}
           IMPORTED_LOCATION              ${TBB_LIBRARIES})
