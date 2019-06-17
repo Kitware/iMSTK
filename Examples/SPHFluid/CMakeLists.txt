@@ -21,12 +21,16 @@ project(Example-SPHFluid)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} Main.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-BallDrop Main1.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-HighViscous Main2.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-BunnyShape Main3.cpp Fluid.cpp Solid.cpp Bunny.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager)
+target_link_libraries(${PROJECT_NAME}-BallDrop SimulationManager)
+target_link_libraries(${PROJECT_NAME}-HighViscous SimulationManager)
+target_link_libraries(${PROJECT_NAME}-BunnyShape SimulationManager)
 
 #-----------------------------------------------------------------------------
 # Add shaders

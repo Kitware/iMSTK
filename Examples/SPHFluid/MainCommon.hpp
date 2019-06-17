@@ -19,10 +19,14 @@
 
 =========================================================================*/
 
+#include <string>
+
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
+#include "imstkParallelHelpers.h"
 #include "imstkAPIUtilities.h"
-
+#include "imstkPlane.h"
+#include "imstkSphere.h"
 
 using namespace imstk;
 
@@ -30,60 +34,58 @@ std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int
 std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_ptr<Scene>& scene, int sceneIdx);
 
 ///
-/// \brief This example demonstrates the fluid simulation using SPH
-/// \brief Usage: ./SPHFluid [scene=<scene_id>] [threads=<num_threads>] [radius=<particle_radius>], where scene_id is in [1..3]
-/// \brief Example: ./SPHFluid scene=1 threads=8 radius=0.01
+/// \brief Usage: ./SPHFluid [threads=<num_threads>] [radius=<particle_radius>]
+/// \brief Example: ./SPHFluid threads=8 radius=0.01
 ///
 int main(int argc, char* argv[])
 {
     // SimulationManager must be created first
     auto sdk   = std::make_shared<SimulationManager>(0);
+
     int threads = -1;
-    int sceneIdx = 1;
     double particleRadius = 0.1;
 
     // Parse command line arguments
     for(int i = 1; i < argc; ++i)
     {
         auto param = std::string(argv[i]);
-        if(param.find("threads") != std::string::npos &&
+        if(param.find("threads") == 0 &&
            param.find_first_of("=") != std::string::npos)
         {
             threads = std::stoi(param.substr(param.find_first_of("=") + 1));
         }
-        else if(param.find("scene") != std::string::npos &&
-                param.find_first_of("=") != std::string::npos)
-        {
-            sceneIdx = std::stoi(param.substr(param.find_first_of("=") + 1));
-            if(sceneIdx < 1 )
-            {
-                sceneIdx = 1;
-            }
-            else if(sceneIdx > 3)
-            {
-                sceneIdx = 3;
-            }
-            LOG(INFO) << "Scene ID: " << sceneIdx;
-        }
-        else if(param.find("radius") != std::string::npos &&
+        else if(param.find("radius") == 0 &&
                 param.find_first_of("=") != std::string::npos)
         {
             particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
             LOG(INFO) << "Particle radius: " << particleRadius;
         }
+        else
+        {
+            LOG(FATAL) << "Invalid argument";
+        }
     }
 
-    // Particle in this scene is pre-generated using particle radius 0.08
-    if(sceneIdx == 3)
+    // Override particle radius for scene3 because particles in this scene were pre-generated using particle radius 0.08
+    if(SCENE_ID == 3)
     {
         particleRadius = 0.08;
+    }
+
+    if(threads <= 0)
+    {
+        ThreadManager::setMaximumParallelism();
+    }
+    else
+    {
+        ThreadManager::setNumberThreads(threads);
     }
 
     auto scene = sdk->createNewScene("SPH Fluid");
 
     // Generate fluid and solid objects
-    auto fluidObj = generateFluid(scene, sceneIdx, particleRadius);
-    auto solids = generateSolids(scene, sceneIdx);
+    auto fluidObj = generateFluid(scene, SCENE_ID, particleRadius);
+    auto solids = generateSolids(scene, SCENE_ID);
 
     // Collision between fluid and solid objects
     auto colGraph = scene->getCollisionGraph();
