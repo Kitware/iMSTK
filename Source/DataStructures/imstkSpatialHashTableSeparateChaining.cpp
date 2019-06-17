@@ -141,11 +141,10 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
 
     double radiusSqr = radius * radius;
     std::unordered_set<size_t> visited;
-    visited.reserve(cellSpan[0] * cellSpan[1] * cellSpan[2]);
+    visited.reserve(static_cast<size_t>(cellSpan[0] * cellSpan[1] * cellSpan[2]));
 
     // clear the old result (if applicable)
     result.resize(0);
-    result.reserve(32);
 
     for(int i = -cellSpan[0]; i <= cellSpan[0]; ++i)
     {
@@ -175,7 +174,7 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
                 for(auto it = first; it != last; ++it)
                 {
                     const Vec3d& qpos = it->point;
-                    const auto d2    = (ppos - qpos).squaredNorm();
+                    const auto d2     = (ppos - qpos).squaredNorm();
                     if(d2 < radiusSqr)
                     {
                         result.push_back(it->ID);

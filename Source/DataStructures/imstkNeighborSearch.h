@@ -21,33 +21,40 @@
 
 #pragma once
 
-#include "imstkUniformSpatialGrid.h"
-#include "imstkParallelSpinLock.h"
+#include <memory>
+#include "imstkMath.h"
 
 namespace imstk
 {
+class GridBasedNeighborSearch;
+class SpatialHashTableSeparateChaining;
+
 ///
-/// \brief Class for searching neighbors using regular grid
+/// \class NeighborSearch
+/// \brief A wrapper class for Grid-based and spatial-hashing neighbor search
 ///
-class GridBasedNeighborSearch
+class NeighborSearch
 {
 public:
-    GridBasedNeighborSearch() = default;
+    enum class Method
+    {
+        UniformGridBasedSearch,
+        SpatialHashing
+    };
 
     ///
-    /// \brief Construct class with search radius
-    /// \param radius The search radius
+    /// \brief Constructor
+    /// \param The selected search method
     ///
-    GridBasedNeighborSearch(const Real radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
+    NeighborSearch(Method searchMethod, Real searchRadius = 0);
 
     ///
     /// \brief Set the search radius
-    /// \param radius The search radius
     ///
-    void setSearchRadius(const Real radius);
+    void setSearchRadius(const Real searchRadius);
 
     ///
-    /// \brief Get the search radius
+    /// \brief Get the current search radius
     ///
     Real getSearchRadius() const { return m_SearchRadius; }
 
@@ -74,16 +81,10 @@ public:
     void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB);
 
 private:
-    Real m_SearchRadius    = 0.;
-    Real m_SearchRadiusSqr = 0.;
+    Method m_Method;
+    Real m_SearchRadius = 0;
 
-    // Data store in each grid cell
-    // This entire struct can be replaced by tbb::concurrent_vector<size_t>, however, with lower performance
-    struct CellData
-    {
-        std::vector<size_t> particleIndices; // Store list of particles
-        ParallelSpinLock lock; // An atomic lock for thread-safe writing
-    };
-    UniformSpatialGrid<CellData> m_Grid;
+    std::shared_ptr<GridBasedNeighborSearch>          m_GridBasedSearcher;
+    std::shared_ptr<SpatialHashTableSeparateChaining> m_SpatialHashSearcher;
 };
 } // end namespace imstk

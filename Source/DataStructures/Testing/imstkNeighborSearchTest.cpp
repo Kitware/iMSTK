@@ -302,7 +302,6 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
     }
 }
 
-
 int imstkNeighborSearchTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
