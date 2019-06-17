@@ -131,6 +131,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(VRPN)
   imstk_define_dependency(LibNiFalcon)
   imstk_define_dependency(imgui)
+  imstk_define_dependency(tbb)
 
   if(APPLE OR LINUX)
    message("Warning: Building iMSTK WITHOUT audio support!")
@@ -324,6 +325,11 @@ if(BUILD_TESTING)
   find_package( GoogleMock REQUIRED )
   include_directories(${GoogleMock_INCLUDE_DIRS})
 endif()
+
+# TBB
+find_package(tbb REQUIRED)
+add_definitions(${TBB_DEFINITIONS})
+include_directories( ${TBB_INCLUDE_DIRS} )
 
 # External data
 if(BUILD_TESTING OR BUILD_EXAMPLES)
