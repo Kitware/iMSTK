@@ -28,18 +28,11 @@ SPHObject::SPHObject(const std::string& name) : DynamicObject<SPHKinematicState>
     this->m_type = SceneObject::Type::SPH;
 }
 
-
 bool SPHObject::initialize()
 {
     m_SPHModel = std::dynamic_pointer_cast<SPHModel>(this->m_dynamicalModel);
-    if (m_SPHModel)
-    {
-        return m_SPHModel->initialize();
-    }
-    else
-    {
-        LOG(WARNING) << "Dynamics pointer cast failure in SPHObject::initialize()";
-        return false;
-    }
+    LOG_IF(FATAL, (!m_SPHModel)) << "Invalid SPH model";
+
+    return m_SPHModel->initialize();
 }
 } // end namespace imstk

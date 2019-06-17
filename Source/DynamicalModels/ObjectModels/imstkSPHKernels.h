@@ -31,7 +31,8 @@ namespace imstk
 namespace SPH
 {
 template<int N>
-class CubicKernel {
+class CubicKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -111,7 +112,8 @@ protected:
 
 
 template<int N>
-class Poly6Kernel {
+class Poly6Kernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -199,7 +201,8 @@ protected:
 
 
 template<int N>
-class SpikyKernel {
+class SpikyKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -265,7 +268,8 @@ protected:
 
 
 template<int N>
-class CohesionKernel {
+class CohesionKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -342,7 +346,8 @@ protected:
 };
 
 template<int N>
-class AdhesionKernel {
+class AdhesionKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -406,7 +411,8 @@ protected:
 };
 
 template<int N>
-class ViscosityKernel {
+class ViscosityKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -439,7 +445,6 @@ protected:
 ///
 /// \brief Struct contains SPH kernels for time integration, using different kernel for different purposes
 ///
-
 class SPHSimulationKernels
 {
 public:

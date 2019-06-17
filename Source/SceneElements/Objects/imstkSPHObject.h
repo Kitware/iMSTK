@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~SPHObject() = default;
+    virtual ~SPHObject() override = default;
 
     ///
     /// \brief Initialize the SPH scene object

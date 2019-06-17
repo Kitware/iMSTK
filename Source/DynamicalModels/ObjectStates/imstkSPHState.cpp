@@ -42,13 +42,11 @@ void SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const
     }
 }
 
-
 void SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
 {
     m_Positions = rhs->m_Positions;
     m_Velocities = rhs->m_Velocities;
 }
-
 
 // SPHSimulationState implementation ===>
 
@@ -58,7 +56,7 @@ void SPHSimulationState::initializeData()
     {
         LOG(FATAL) << "SPH basic state has not been initialized";
     }
-    size_t numParticles = m_KinematicState->size();
+    size_t numParticles = m_KinematicState->getNumParticles();
     m_Normals.resize(numParticles);
     m_Densities.resize(numParticles);
     m_Accels.resize(numParticles);

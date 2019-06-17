@@ -27,36 +27,6 @@
 namespace imstk
 {
 ///
-/// \brief This function is for later refactoring, we can replace the regular for loop with a parallel_for loop
-///
-template<class IndexType, class Function>
-void runLoop(IndexType start, IndexType end, Function&& func)
-{
-    for(IndexType i = start; i < end; ++i)
-    {
-        func(i);
-    }
-}
-
-///
-/// \brief This function is for later refactoring, we can replace the regular for loop with a parallel_for loop
-///
-template<class IndexType, class Function>
-void runLoop(IndexType size, Function&& func)
-{
-    runLoop<IndexType, Function>(0, size, std::forward<Function>(func));
-}
-
-///
-/// \brief The helper struct to store relative positions and densities of neighbor particlcles
-///
-struct NeighborInfo
-{
-    Vec3r xpq;     // relative position: xpq = x_p - x_q
-    Real density;  // density of neighbor particle q
-};
-
-///
 /// \class SPHKinematicState
 /// \brief State of the SPH fluid particles
 ///
@@ -77,7 +47,7 @@ public:
     ///
     /// \brief Get number of particles
     ///
-    size_t size() const { return m_Positions.size(); }
+    size_t getNumParticles() const { return m_Positions.size(); }
 
     ///
     /// \brief Returns the vector of all particle positions
@@ -97,10 +67,19 @@ public:
     void setState(const std::shared_ptr<SPHKinematicState>& rhs);
 
 private:
-    StdVectorOfVec3r m_Positions;   // Particle positions
-    StdVectorOfVec3r m_Velocities;  // Particle velocities
+    StdVectorOfVec3r m_Positions;   ///> Particle positions
+    StdVectorOfVec3r m_Velocities;  ///> Particle velocities
 };
 
+///
+/// \struct NeighborInfo
+/// \brief The helper struct to store relative positions and densities of neighbor particlcles
+///
+struct NeighborInfo
+{
+    Vec3r xpq;     ///> relative position: xpq = x_p - x_q
+    Real density;  ///> density of neighbor particle q
+};
 
 ///
 /// \class SPHSimulationState
@@ -133,7 +112,7 @@ public:
     ///
     /// \brief Get number of particles
     ///
-    size_t size() const { assert(m_KinematicState); return m_KinematicState->size(); }
+    size_t getNumParticles() const { assert(m_KinematicState); return m_KinematicState->getNumParticles(); }
 
     ///
     /// \brief Returns the vector of all particle positions
@@ -202,16 +181,16 @@ public:
     const std::vector<std::vector<NeighborInfo>>& getNeighborInfo() const { return m_NeighborInfo; }
 
 private:
-    std::shared_ptr<SPHKinematicState> m_KinematicState; // basic state: positions + velocities
-    StdVectorOfVec3r m_BDPositions; // positions of boundary particles, if generated
+    std::shared_ptr<SPHKinematicState> m_KinematicState; ///> basic state: positions + velocities
+    StdVectorOfVec3r m_BDPositions; ///> positions of boundary particles, if generated
 
-    StdVectorOfReal m_Densities;            // particle densities
-    StdVectorOfReal m_NormalizedDensities;  // variable for normalizing densities
-    StdVectorOfVec3r m_Normals;             // surface normals
-    StdVectorOfVec3r m_Accels;              // acceleration
-    StdVectorOfVec3r m_DiffuseVelocities;               // velocity diffusion, used for computing viscosity
-    std::vector<std::vector<size_t>> m_NeighborLists;   // store a list of neighbors for each particle, updated each time step
-    std::vector<std::vector<size_t>> m_BDNeighborLists; // store a list of boundary particle neighbors for each particle, updated each time step
-    std::vector<std::vector<NeighborInfo>>  m_NeighborInfo;   // store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
+    StdVectorOfReal m_Densities;            ///>  particle densities
+    StdVectorOfReal m_NormalizedDensities;  ///>  variable for normalizing densities
+    StdVectorOfVec3r m_Normals;             ///>  surface normals
+    StdVectorOfVec3r m_Accels;              ///>  acceleration
+    StdVectorOfVec3r m_DiffuseVelocities;                     ///>  velocity diffusion, used for computing viscosity
+    std::vector<std::vector<size_t>> m_NeighborLists;         ///>  store a list of neighbors for each particle, updated each time step
+    std::vector<std::vector<size_t>> m_BDNeighborLists;       ///>  store a list of boundary particle neighbors for each particle, updated each time step
+    std::vector<std::vector<NeighborInfo>>  m_NeighborInfo;   ///>  store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
 };
 } // end namespace imstk

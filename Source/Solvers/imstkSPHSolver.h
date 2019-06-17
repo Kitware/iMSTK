@@ -34,7 +34,7 @@ class SPHSolver : public SolverBase
 {
 public:
     SPHSolver() = default;
-    ~SPHSolver() = default;
+    virtual ~SPHSolver() override = default;
 
     SPHSolver(const SPHSolver &other) = delete;
     SPHSolver &operator=(const SPHSolver &other) = delete;

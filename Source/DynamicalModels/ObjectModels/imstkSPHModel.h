@@ -25,30 +25,10 @@
 #include "imstkDynamicalModel.h"
 #include "imstkSPHState.h"
 #include "imstkSPHKernels.h"
-
-#include "imstkGridBasedNeighborSearch.h"
-#include "imstkSpatialHashTableSeparateChaining.h"
+#include "imstkNeighborSearch.h"
 
 namespace imstk
 {
-///
-/// \brief The NeighborSearchMethod enum
-///
-enum class NeighborSearchMethod
-{
-    GridBased,
-    SpatialHashing
-};
-
-///
-/// \brief The NeighborSearch struct
-///
-struct NeighborSearch
-{
-    GridBasedNeighborSearch gridSearch;
-    SpatialHashTableSeparateChaining spatialHashSearch;
-};
-
 ///
 /// \class SPHModelConfig
 /// \brief Parameters for SPH simulation
@@ -70,8 +50,8 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     // particle parameters
-    Real m_ParticleRadius      = Real(0);
-    Real m_ParticleRadiusSqr   = Real(0);
+    Real m_ParticleRadius    = Real(0);
+    Real m_ParticleRadiusSqr = Real(0);
     ////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -79,8 +59,8 @@ public:
     Real m_RestDensity    = Real(1000.0);
     Real m_RestDensitySqr = Real(1000000.0);
     Real m_RestDensityInv = Real(1.0 / 1000.0);
-    Real m_ParticleMass       = Real(1);
-    Real m_ParticleMassScale  = Real(0.9);    // scale particle mass to a smaller value to maintain stability
+    Real m_ParticleMass      = Real(1);
+    Real m_ParticleMassScale = Real(0.95);    // scale particle mass to a smaller value to maintain stability
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -112,7 +92,7 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     // neighbor search
-    NeighborSearchMethod m_NeighborSearchMethod = NeighborSearchMethod::GridBased;
+    NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
     ////////////////////////////////////////////////////////////////////////////////
 };
 
@@ -131,7 +111,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~SPHModel() = default;
+    virtual ~SPHModel() override = default;
 
     ///
     /// \brief Set simulation parameters
@@ -161,15 +141,11 @@ public:
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState() override
-    {
-        this->m_currentState->setState(this->m_initialState);
-    }
+    virtual void resetToInitialState() override { this->m_currentState->setState(this->m_initialState); }
 
     ///
-    /// \brief Get the parameters
+    /// \brief Get the simulation parameters
     ///
-    std::shared_ptr<SPHModelConfig>& getParameters() { assert(m_Parameters); return m_Parameters; }
     const std::shared_ptr<SPHModelConfig>& getParameters() const { assert(m_Parameters); return m_Parameters; }
 
     ///
@@ -203,7 +179,6 @@ public:
     /// \brief Do one time step simulation
     ///
     void simulationTimeStep();
-
 
 private:
     // time integration functions ===>
@@ -259,11 +234,6 @@ private:
     void computeViscosity();
 
     ///
-    /// \brief Compute surface normal for each particle
-    ///
-    void computeNormal();
-
-    ///
     /// \brief Compute surface tension and update velocities
     ///
     void computeSurfaceTension();
@@ -279,8 +249,8 @@ private:
     Real m_dt;        ///> time step size
     Real m_DefaultDt; ///> default time step size
 
-    std::shared_ptr<SPHModelConfig> m_Parameters; // must be set before simulation
-    SPHSimulationKernels m_Kernels;               // must be initialized during model initialization
-    NeighborSearch m_NeighborSearch;              // must be initialized during model initialization
+    SPHSimulationKernels m_Kernels;                     // must be initialized during model initialization
+    std::shared_ptr<SPHModelConfig> m_Parameters;       // must be set before simulation
+    std::shared_ptr<NeighborSearch> m_NeighborSearcher; // must be initialized during model initialization
 };
 } // end namespace imstk
