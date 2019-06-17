@@ -37,8 +37,9 @@ void ThreadManager::setNumberThreads(int nThreads)
     {
         s_tbbGlobalControl.reset();
     }
-    s_tbbGlobalControl = std::make_unique<tbb::global_control>(tbb::global_control::max_allowed_parallelism,
-                                                               nThreads);
+    s_tbbGlobalControl = std::unique_ptr<tbb::global_control>(
+                new tbb::global_control(tbb::global_control::max_allowed_parallelism,
+                                        static_cast<size_t>(nThreads)));
 
     LOG(INFO) << "Set number of worker threads: " << nThreads;
 }
