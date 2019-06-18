@@ -34,226 +34,106 @@
 
 namespace imstk
 {
-PbdModel::PbdModel() :
-    DynamicalModel(DynamicalModelType::positionBasedDynamics)
-{
-}
-
 void
-PbdModel::setModelGeometry(std::shared_ptr<PointSet> m)
+PbdModel::configure(const std::shared_ptr<PBDModelConfig>& params)
 {
-    m_mesh = m;
-}
+    LOG_IF(FATAL, (!getModelGeometry())) << "PbdModel::configure - Set PBD Model geometry before configuration!";
 
-bool
-PbdModel::configure(const int nCons, ...)
-{
-    if (!this->getModelGeometry())
-    {
-        LOG(WARNING) << "PbdModel::configure - Set PBD Model geometry before configuration!";
-        return false;
-    }
-
-    va_list args;
-    va_start(args, nCons);
-    for (int i = 0; i < nCons; ++i)
-    {
-        m_constraintConfig.push_back(std::string(va_arg(args, char*)));
-    }
-
-    m_uniformMassValue = va_arg(args, double);
-
-    if (nCons > 0)
-    {
-        char *sgrav = va_arg(args, char*);
-        std::stringstream gStream(sgrav);
-        float x, y, z;
-        gStream >> x;
-        gStream >> y;
-        gStream >> z;
-        Vec3d g(x,y,z);
-        this->setGravity(g);
-
-        this->setTimeStep(va_arg(args, double));
-        this->setDefaultTimeStep(m_dt);
-
-        char *s = va_arg(args, char*);
-        if (strlen(s) > 0)
-        {
-            std::stringstream stream(s);
-            size_t n;
-            while (stream >> n)
-            {
-                m_fixedNodeIds.push_back(n-1);
-            }
-        }
-        this->setMaxNumIterations(va_arg(args, int));
-    }
-    this->setProximity(va_arg(args, double));
-    this->setContactStiffness(va_arg(args, double));
-    this->setNumDegreeOfFreedom(this->getModelGeometry()->getNumVertices() * 3);
-
-    va_end(args);
-
-    return true;
+    m_Parameters = params;
+    setNumDegreeOfFreedom(getModelGeometry()->getNumVertices() * 3);
 }
 
 bool
 PbdModel::initialize()
 {
-    if (m_mesh)
+    LOG_IF(FATAL, (!m_Parameters)) << "PBDModel parameter has not been configured.";
+
+    m_initialState  = std::make_shared<PbdState>();
+    m_previousState = std::make_shared<PbdState>();
+    m_currentState  = std::make_shared<PbdState>();
+
+    bool option[3] = { 1, 0, 0 };
+    m_initialState->initialize(m_mesh, option);
+    m_previousState->initialize(m_mesh, option);
+
+    option[1] = option[2] = 1;
+    m_currentState->initialize(m_mesh, option);
+
+    m_initialState->setPositions(m_mesh->getVertexPositions());
+    m_currentState->setPositions(m_mesh->getVertexPositions());
+
+    auto numParticles = m_mesh->getNumVertices();
+
+    m_mass.resize(numParticles, 0);
+    m_invMass.resize(numParticles, 0);
+    setUniformMass(m_Parameters->m_uniformMassValue);
+
+    for (auto i : m_Parameters->m_fixedNodeIds)
     {
-        m_initialState = std::make_shared<PbdState>();
-        m_previousState = std::make_shared<PbdState>();
-        m_currentState = std::make_shared<PbdState>();
-
-        bool option[3] = { 1, 0, 0 };
-        m_initialState->initialize(m_mesh, option);
-        m_previousState->initialize(m_mesh, option);
-
-        option[1] = option[2] = 1;
-        m_currentState->initialize(m_mesh, option);
-
-        m_initialState->setPositions(m_mesh->getVertexPositions());
-        m_currentState->setPositions(m_mesh->getVertexPositions());
-
-        auto nP = m_mesh->getNumVertices();
-
-        m_mass.resize(nP, 0);
-        m_invMass.resize(nP, 0);
-        this->setUniformMass(m_uniformMassValue);
-
-        for (auto i :m_fixedNodeIds)
-        {
-            setFixedPoint(i);
-        }
-    }
-    else
-    {
-        LOG(WARNING) << "Model geometry is not yet set! Cannot initialize without model geometry.";
-        return false;
+        setFixedPoint(i);
     }
 
-    auto nCons = m_constraintConfig.size();
-    for (int i = 0; i < nCons; ++i)
+    bool bOK = true;
+    for(auto& constraint: m_Parameters->m_constraints)
     {
-        auto s = m_constraintConfig.at(i).c_str();
-        int len = 0;
-        while (s[len] != ' ' && s[len] != '\0')
+        if(!bOK)
         {
-            ++len;
-        }
-
-        if (strncmp("FEM", &s[0], len) == 0)
-        {
-            int pos = len + 1;
-            len = 0;
-            while (s[pos + len] != ' ' && s[pos + len] != '\0')
-            {
-                ++len;
-            }
-
-            if (strncmp("Corotation", &s[pos], len) == 0)
-            {
-                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation))
-                {
-                    return false;
-                }
-                ;
-            }
-            else if (strncmp("NeoHookean", &s[pos], len) == 0)
-            {
-                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean))
-                {
-                    return false;
-                }
-                ;
-            }
-            else if (strncmp("Stvk", &s[pos], len) == 0)
-            {
-                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK))
-                {
-                    return false;
-                }
-                ;
-            }
-            else
-            { // default
-                if (!this->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK))
-                {
-                    return false;
-                }
-                ;
-            }
-
-            float YoungModulus, PoissonRatio;
-            sscanf(&s[pos + len + 1], "%f %f", &YoungModulus, &PoissonRatio);
-            this->computeLameConstants(YoungModulus, PoissonRatio);
-        }
-        else if (strncmp("Volume", &s[0], len) == 0)
-        {
-            float stiffness;
-            sscanf(&s[len + 1], "%f", &stiffness);
-            if (!this->initializeVolumeConstraints(stiffness))
-            {
-                return false;
-            }
-            ;
-        }
-        else if (strncmp("Distance", &s[0], len) == 0)
-        {
-            float stiffness;
-            sscanf(&s[len + 1], "%f", &stiffness);
-            if (!this->initializeDistanceConstraints(stiffness))
-            {
-                return false;
-            }
-            ;
-        }
-        else if (strncmp("Area", &s[0], len) == 0)
-        {
-            float stiffness;
-            sscanf(&s[len + 1], "%f", &stiffness);
-            if (!this->initializeAreaConstraints(stiffness))
-            {
-                return false;
-            }
-            ;
-        }
-        else if (strncmp("Dihedral", &s[0], len) == 0)
-        {
-            float stiffness;
-            sscanf(&s[len + 1], "%f", &stiffness);
-            if (!this->initializeDihedralConstraints(stiffness))
-            {
-                return false;
-            }
-            ;
-        }
-        else if (strncmp("ConstantDensity", &s[0], len) == 0)
-        {
-            float stiffness;
-            sscanf(&s[len + 1], "%f", &stiffness);
-            if (!this->initializeConstantDensityConstraint(stiffness))
-            {
-                return false;
-            }
-            ;
-        }
-        else
-        {
-            LOG(WARNING) << "PbdModel::initialize() - Type of PBD constraints not identified!";
             return false;
         }
+        switch(constraint.m_type)
+        {
+        case PbdConstraint::Type::FEMTet:
+        case PbdConstraint::Type::FEMHex:
+            computeElasticConstants();
+            bOK = initializeFEMConstraints(constraint.m_FEMMaterial);
+            break;
+
+        case PbdConstraint::Type::Volume:
+            bOK = initializeVolumeConstraints(constraint.m_stiffness);
+            break;
+
+        case PbdConstraint::Type::Distance:
+            bOK = initializeDistanceConstraints(constraint.m_stiffness);
+            break;
+
+        case PbdConstraint::Type::Area:
+            bOK = initializeAreaConstraints(constraint.m_stiffness);
+            break;
+
+        case PbdConstraint::Type::Dihedral:
+            bOK = initializeDihedralConstraints(constraint.m_stiffness);
+            break;
+
+        case PbdConstraint::Type::ConstantDensity:
+            bOK = initializeConstantDensityConstraint(constraint.m_stiffness);
+            break;
+
+        default:
+            LOG(FATAL) << "Invalid constraint type";
+        }
     }
-    return true;
+
+    return bOK;
 }
 
 void
-PbdModel::computeLameConstants(const double E, const double nu)
+PbdModel::computeElasticConstants()
 {
-    m_mu = E/(2*(1+nu));
-    m_lambda = E*nu/((1-2*nu)*(1+nu));
+    if(std::abs(m_Parameters->m_mu) < MIN_REAL &&
+       std::abs(m_Parameters->m_lambda) < MIN_REAL)
+    {
+        const auto E  = m_Parameters->m_YoungModulus;
+        const auto nu = m_Parameters->m_PoissonRatio;
+        m_Parameters->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
+        m_Parameters->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
+    }
+    else
+    {
+        const auto mu     = m_Parameters->m_mu;
+        const auto lambda = m_Parameters->m_lambda;
+        m_Parameters->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
+        m_Parameters->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
+    }
 }
 
 bool
@@ -309,123 +189,56 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
 bool
 PbdModel::initializeDistanceConstraints(const double stiffness)
 {
-    if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
+    auto addConstraint =
+        [&](std::vector<std::vector<bool>>& E, size_t i1, size_t i2)
+        {
+            if(i1 > i2) // Make sure i1 is always smaller than i2
+            {
+                std::swap(i1, i2);
+            }
+            if(E[i1][i2])
+            {
+                E[i1][i2] = 0;
+                auto c = std::make_shared<PbdDistanceConstraint>();
+                c->initConstraint(*this, i1, i2, stiffness);
+                m_constraints.push_back(std::move(c));
+            }
+        };
+
+    if(m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
-        auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-        auto nV = tetMesh->getNumVertices();
+        const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+        const auto& elements = tetMesh->getTetrahedraVertices();
+        const auto nV = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-        auto elements = tetMesh->getTetrahedraVertices();
 
         for (size_t k = 0; k < elements.size(); ++k)
         {
             auto& tet = elements[k];
-
-            auto i1 = tet[0];
-            auto i2 = tet[1];
-
-            // check if added or not
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tet[1];
-            i2 = tet[2];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tet[2];
-            i2 = tet[0];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tet[0];
-            i2 = tet[3];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tet[1];
-            i2 = tet[3];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tet[2];
-            i2 = tet[3];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
+            addConstraint(E, tet[0], tet[1]);
+            addConstraint(E, tet[0], tet[2]);
+            addConstraint(E, tet[0], tet[3]);
+            addConstraint(E, tet[1], tet[2]);
+            addConstraint(E, tet[1], tet[3]);
+            addConstraint(E, tet[2], tet[3]);
         }
     }
-    else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
+    else if(m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
-        auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-        auto nV = triMesh->getNumVertices();
+        const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+        const auto& elements = triMesh->getTrianglesVertices();
+        const auto nV = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-        auto elements = triMesh->getTrianglesVertices();
 
         for (size_t k = 0; k < elements.size(); ++k)
         {
             auto& tri = elements[k];
-
-            auto i1 = tri[0];
-            auto i2 = tri[1];
-
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tri[1];
-            i2 = tri[2];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
-
-            i1 = tri[2];
-            i2 = tri[0];
-            if (E[i1][i2] && E[i2][i1])
-            {
-                auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(c);
-                E[i1][i2] = 0;
-            }
+            addConstraint(E, tri[0], tri[1]);
+            addConstraint(E, tri[0], tri[2]);
+            addConstraint(E, tri[1], tri[2]);
         }
     }
+
     return true;
 }
 
@@ -457,17 +270,18 @@ PbdModel::initializeAreaConstraints(const double stiffness)
 bool
 PbdModel::initializeDihedralConstraints(const double stiffness)
 {
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
+    if(m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
         LOG(WARNING) << "Dihedral constraint should come with a triangular mesh";
         return false;
     }
 
     // Create constraints
-    auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    auto elements = triMesh->getTrianglesVertices();
-    // following algorithm is terrible, should use half-edge instead
-    std::vector<std::vector<size_t>> onering(triMesh->getNumVertices());
+    const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const auto& elements = triMesh->getTrianglesVertices();
+    const auto nV = triMesh->getNumVertices();
+    std::vector<std::vector<size_t>> onering(nV);
+
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
@@ -477,98 +291,57 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
         onering[tri[2]].push_back(k);
     }
 
-    std::vector<std::vector<bool>> E(triMesh->getNumVertices(),
-                                     std::vector<bool>(triMesh->getNumVertices(),
-                                     1));
+    std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
+
+    auto addConstraint =
+        [&](std::vector<size_t>& r1, std::vector<size_t>& r2,
+            const size_t k, size_t i1, size_t i2)
+        {
+            if(i1 > i2) // Make sure i1 is always smaller than i2
+            {
+                std::swap(i1, i2);
+            }
+            if(E[i1][i2])
+            {
+                E[i1][i2] = 0;
+
+                std::vector<size_t> rs(2);
+                auto it = std::set_intersection(r1.begin(), r1.end(), r2.begin(), r2.end(), rs.begin());
+                rs.resize(static_cast<size_t>(it - rs.begin()));
+                if(rs.size() > 1)
+                {
+                    size_t idx = (rs[0] == k) ? 1 : 0;
+                    const auto& tri = elements[rs[idx]];
+                    for (size_t i = 0; i < 3; ++i)
+                    {
+                        if(tri[i] != tri[0] && tri[i] != tri[1])
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+                    auto c = std::make_shared<PbdDihedralConstraint>();
+                    c->initConstraint(*this, tri[2], tri[idx], tri[0], tri[1], stiffness);
+                    m_constraints.push_back(std::move(c));
+                }
+            }
+        };
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
         auto& tri = elements[k];
 
-        auto& r1 = onering[tri[0]];
-        auto& r2 = onering[tri[1]];
-        auto& r3 = onering[tri[2]];
+        auto& r0 = onering[tri[0]];
+        auto& r1 = onering[tri[1]];
+        auto& r2 = onering[tri[2]];
 
+        std::sort(r0.begin(), r0.end());
         std::sort(r1.begin(), r1.end());
         std::sort(r2.begin(), r2.end());
-        std::sort(r3.begin(), r3.end());
 
-        std::vector<size_t> rs;
-        std::vector<size_t>::iterator it;
-        // check if processed or not
-        if (E[tri[0]][tri[1]] && E[tri[1]][tri[0]])
-        {
-            rs.resize(2);
-            it = std::set_intersection(r1.begin(), r1.end(), r2.begin(), r2.end(), rs.begin());
-            rs.resize(it - rs.begin());
-            if (rs.size() > 1)
-            {
-                int idx = (rs[0] == k) ? 1 : 0;
-                SurfaceMesh::TriangleArray& t = elements[rs[idx]];
-                for (int i = 0; i < 3; ++i)
-                {
-                    if (t[i] != tri[0] && t[i] != tri[1])
-                    {
-                        idx = i;
-                        break;
-                    }
-                }
-                auto c = std::make_shared<PbdDihedralConstraint>();
-                c->initConstraint(*this, tri[2], t[idx], tri[0], tri[1], stiffness);
-                m_constraints.push_back(c);
-            }
-            E[tri[0]][tri[1]] = 0;
-        }
-
-        if (E[tri[1]][tri[2]] && E[tri[2]][tri[1]])
-        {
-            rs.resize(2);
-            it = std::set_intersection(r2.begin(), r2.end(), r3.begin(), r3.end(), rs.begin());
-            rs.resize(it - rs.begin());
-            if (rs.size() > 1)
-            {
-                int idx = (rs[0] == k) ? 1 : 0;
-                auto& t = elements[rs[idx]];
-                for (int i = 0; i < 3; ++i)
-                {
-                    if (t[i] != tri[1] && t[i] != tri[2])
-                    {
-                        idx = i;
-                        break;
-                    }
-                }
-
-                auto c = std::make_shared<PbdDihedralConstraint>();
-                c->initConstraint(*this, tri[0], t[idx], tri[1], tri[2], stiffness);
-                m_constraints.push_back(c);
-            }
-            E[tri[1]][tri[2]] = 0;
-        }
-
-        if (E[tri[2]][tri[0]] && E[tri[0]][tri[2]])
-        {
-            rs.resize(2);
-            it = std::set_intersection(r3.begin(), r3.end(), r1.begin(), r1.end(), rs.begin());
-            rs.resize(it - rs.begin());
-            if (rs.size() > 1)
-            {
-                int idx = (rs[0] == k) ? 1 : 0;
-                auto& t = elements[rs[idx]];
-                for (int i = 0; i < 3; ++i)
-                {
-                    if (t[i] != tri[2] && t[i] != tri[0])
-                    {
-                        idx = i;
-                        break;
-                    }
-                }
-
-                auto c = std::make_shared<PbdDihedralConstraint>();
-                c->initConstraint(*this, tri[1], t[idx], tri[2], tri[0], stiffness);
-                m_constraints.push_back(c);
-            }
-            E[tri[2]][tri[0]] = 0;
-        }
+        addConstraint(r0, r1, k, tri[0], tri[1]);
+        addConstraint(r0, r2, k, tri[0], tri[2]);
+        addConstraint(r1, r2, k, tri[1], tri[2]);
     }
     return true;
 }
@@ -577,11 +350,11 @@ bool
 PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh &&
-        m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
-        m_mesh->getType() != Geometry::Type::LineMesh &&
-        m_mesh->getType() != Geometry::Type::HexahedralMesh &&
-        m_mesh->getType() != Geometry::Type::PointSet)
+    if(m_mesh->getType() != Geometry::Type::SurfaceMesh &&
+       m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
+       m_mesh->getType() != Geometry::Type::LineMesh &&
+       m_mesh->getType() != Geometry::Type::HexahedralMesh &&
+       m_mesh->getType() != Geometry::Type::PointSet)
     {
         LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
         return false;
@@ -589,7 +362,7 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
 
     auto c = std::make_shared<PbdConstantDensityConstraint>();
     c->initConstraint(*this, stiffness);
-    m_constraints.push_back(c);
+    m_constraints.push_back(std::move(c));
 
     return true;
 }
@@ -598,8 +371,9 @@ void
 PbdModel::projectConstraints()
 {
     unsigned int i = 0;
-    while (++i < m_maxIter)
+    while (++i < m_Parameters->m_maxIter)
     {
+        // Cannot run in parallel: concurrently updating constraints can lead to race condition
         for (auto c: m_constraints)
         {
             c->solvePositionConstraint(*this);
@@ -623,30 +397,16 @@ void
 PbdModel::setTimeStepSizeType(const TimeSteppingType type)
 {
     m_timeStepSizeType = type;
-    if (type == TimeSteppingType::fixed)
+    if(type == TimeSteppingType::fixed)
     {
-        m_dt = m_DefaultDt;
-    }
-}
-
-void
-PbdModel::setViscousDamping(const double damping)
-{
-    if (damping >= 0 && damping <= 1)
-    {
-        m_viscousDampingCoeff = damping;
-    }
-    else
-    {
-        LOG(WARNING) << "WARNING - PbdModel::setViscousDamping:  " <<
-            "Viscous damping coefficients is out of bounds [0, 1]";
+        m_Parameters->m_dt = m_Parameters->m_DefaultDt;
     }
 }
 
 void
 PbdModel::setUniformMass(const double val)
 {
-    if (val != 0.0)
+    if(val != 0.0)
     {
         std::fill(m_mass.begin(), m_mass.end(), val);
         std::fill(m_invMass.begin(), m_invMass.end(), 1 / val);
@@ -661,17 +421,17 @@ PbdModel::setUniformMass(const double val)
 void
 PbdModel::setParticleMass(const double val, const size_t idx)
 {
-    if (idx < m_mesh->getNumVertices())
+    if(idx < m_mesh->getNumVertices())
     {
         m_mass[idx] = val;
-        m_invMass[idx] = 1 / val;
+        m_invMass[idx] = 1.0 / val;
     }
 }
 
 void
 PbdModel::setFixedPoint(const size_t idx)
 {
-    if (idx < m_mesh->getNumVertices())
+    if(idx < m_mesh->getNumVertices())
     {
         m_invMass[idx] = 0;
     }
@@ -695,9 +455,9 @@ PbdModel::integratePosition()
     {
         if (m_invMass[i] != 0.0)
         {
-            vel[i] += (accn[i] + m_gravity)*m_dt;
+            vel[i] += (accn[i] + m_Parameters->m_gravity)*m_Parameters->m_dt;
             prevPos[i] = pos[i];
-            pos[i] += (1.0 - m_viscousDampingCoeff)*vel[i] * m_dt;
+            pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff)*vel[i] * m_Parameters->m_dt;
         }
     }
 }
@@ -713,7 +473,7 @@ PbdModel::updateVelocity()
     {
         if (m_invMass[i] != 0.0)
         {
-            vel[i] = (pos[i] - prevPos[i]) / m_dt;
+            vel[i] = (pos[i] - prevPos[i]) / m_Parameters->m_dt;
         }
     }
 }
