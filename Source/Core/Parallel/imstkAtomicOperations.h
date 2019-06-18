@@ -28,7 +28,7 @@
 namespace imstk
 {
 ///
-/// \brief Perform an atomic operation: target = f(operand)
+/// \brief Perform an atomic operation: target = f(target, operand)
 ///
 template<class T, class Function>
 void imstk_atomic_op(T& target, const T operand, Function&& f)
@@ -45,7 +45,7 @@ void imstk_atomic_op(T& target, const T operand, Function&& f)
 }
 
 ///
-/// \brief Atomic addition for scalar numbers
+/// \brief Atomic addition for scalar numbers: target = target + operand
 ///
 template<class T>
 void imstk_atomic_add(T& target, const T operand)
@@ -54,7 +54,7 @@ void imstk_atomic_add(T& target, const T operand)
 }
 
 ///
-/// \brief Atomic subtraction for scalar numbers
+/// \brief Atomic subtraction for scalar numbers: target = target - operand
 ///
 template<class T>
 void imstk_atomic_subtract(T& target, const T operand)
@@ -64,7 +64,7 @@ void imstk_atomic_subtract(T& target, const T operand)
 
 
 ///
-/// \brief Atomic multiplication for scalar numbers
+/// \brief Atomic multiplication for scalar numbers: target = target * operand
 ///
 template<class T>
 void imstk_atomic_multiply(T& target, const T operand)
@@ -73,7 +73,7 @@ void imstk_atomic_multiply(T& target, const T operand)
 }
 
 ///
-/// \brief Atomic division for scalar numbers
+/// \brief Atomic division for scalar numbers: target = target / operand
 ///
 template<class T>
 void imstk_atomic_divide(T& target, T operand)
@@ -82,7 +82,7 @@ void imstk_atomic_divide(T& target, T operand)
 }
 
 ///
-/// \brief Atomic addition for two vectors
+/// \brief Atomic addition for two vectors: target = target + operand
 ///
 template<class T, int N>
 void imstk_atomic_add(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
@@ -94,7 +94,7 @@ void imstk_atomic_add(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 
 }
 
 ///
-/// \brief Atomic subtraction for two vectors
+/// \brief Atomic subtraction for two vectors: target = target - operand
 ///
 template<class T, int N>
 void imstk_atomic_subtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
@@ -106,7 +106,7 @@ void imstk_atomic_subtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T
 }
 
 ///
-/// \brief Atomic multiplication for two vectors
+/// \brief Atomic multiplication for a vector and a scalar number: target = target * operand
 ///
 template<class T, int N>
 void imstk_atomic_multiply(Eigen::Matrix<T, N, 1>& target, const T operand)
@@ -118,7 +118,7 @@ void imstk_atomic_multiply(Eigen::Matrix<T, N, 1>& target, const T operand)
 }
 
 ///
-/// \brief Atomic division for two vectors
+/// \brief Atomic division for a vector and a scalar number: target = target / operand
 ///
 template<class T, int N>
 void imstk_atomic_divide(Eigen::Matrix<T, N, 1>& target, const T operand)
