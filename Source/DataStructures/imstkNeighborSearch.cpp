@@ -79,7 +79,7 @@ void NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, cons
         m_SpatialHashSearcher->clear();
         m_SpatialHashSearcher->insertPoints(setB);
 
-        ParallelFor::run(setA.size(),
+        imstk_parallel_for(setA.size(),
             [&](const size_t p) {
                 // For each point in setA, find neighbors in setB
                 m_SpatialHashSearcher->getPointsInSphere(result[p], setA[p], m_SearchRadius);

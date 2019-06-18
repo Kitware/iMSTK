@@ -60,14 +60,14 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& res
     m_Grid.initialize(lowerCorner, upperCorner, m_SearchRadius);
 
     // clear all particle lists in each grid cell
-    ParallelFor::run(m_Grid.getAllCellData().size(),
+    imstk_parallel_for(m_Grid.getAllCellData().size(),
         [&](const size_t cellIdx)
         {
             m_Grid.getCellData(cellIdx).particleIndices.resize(0);
         });
 
     // collect particle indices of points in setB into their corresponding cells
-    ParallelFor::run(setB.size(),
+    imstk_parallel_for(setB.size(),
         [&](const size_t p)
         {
             auto& cellData = m_Grid.getCellData(setB[p]);
@@ -78,7 +78,7 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& res
 
     // for each point in setA, collect setB neighbors within the search radius
     result.resize(setA.size());
-    ParallelFor::run(setA.size(),
+    imstk_parallel_for(setA.size(),
         [&](const size_t p)
         {
             auto& pneighbors = result[p];

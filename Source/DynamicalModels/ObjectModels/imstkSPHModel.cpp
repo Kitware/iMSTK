@@ -140,7 +140,7 @@ void SPHModel::computeNeighborRelativePositions()
                                         }
                                     };
 
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& ppos   = getState().getPositions()[p];
             auto& neighborInfo = getState().getNeighborInfo()[p];
@@ -161,7 +161,7 @@ void SPHModel::collectNeighborDensity()
     // after computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is usefull because relative positions and densities are accessed together multiple times
     // caching relative positions and densities therefore can reduce computation time significantly (tested)
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
@@ -181,7 +181,7 @@ void SPHModel::collectNeighborDensity()
 
 void SPHModel::computeDensity()
 {
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
@@ -208,7 +208,7 @@ void SPHModel::normalizeDensity()
     }
 
     getState().getNormalizedDensities().resize(getState().getNumParticles());
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
@@ -256,7 +256,7 @@ void SPHModel::computePressureAcceleration()
                                 return error > Real(0) ? error : Real(0);
                             };
 
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             Vec3r accel(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
@@ -288,7 +288,7 @@ void SPHModel::computePressureAcceleration()
 
 void SPHModel::updateVelocity(Real timestep)
 {
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getVelocities()[p] += (m_Parameters->m_Gravity + getState().getAccelerations()[p]) * timestep;
         });
@@ -296,7 +296,7 @@ void SPHModel::updateVelocity(Real timestep)
 
 void SPHModel::computeViscosity()
 {
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
             assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
@@ -337,7 +337,7 @@ void SPHModel::computeViscosity()
         });
 
     // add diffused velocity back to velocity, causing viscosity
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getVelocities()[p] += getState().getDiffuseVelocities()[p];
     });
@@ -347,7 +347,7 @@ void SPHModel::computeViscosity()
 void SPHModel::computeSurfaceTension()
 {
     // Firstly compute surface normal for all particles
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             Vec3r n(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
@@ -371,7 +371,7 @@ void SPHModel::computeSurfaceTension()
         });
 
     // Compute surface tension acceleration
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
             assert(fluidNeighborList.size() >= 1);     // Neighbor of particle p should contain at least p index
@@ -418,7 +418,7 @@ void SPHModel::computeSurfaceTension()
 
 void SPHModel::advect(Real timestep)
 {
-    ParallelFor::run(getState().getNumParticles(),
+    imstk_parallel_for(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
     });
