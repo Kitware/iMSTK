@@ -19,5 +19,6 @@
 
 =========================================================================*/
 
-#define SCENE_ID 2
-#include "MainCommon.hpp"
+// Generate a fluid simulation example in with a bunny-shape fluid dropping onto a box
+#define SCENE_ID 3
+#include "SPHExample.hpp"

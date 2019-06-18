@@ -19,5 +19,6 @@
 
 =========================================================================*/
 
-#define SCENE_ID 3
-#include "MainCommon.hpp"
+// Generate a fluid simulation example in with a box-shape of highly viscous fluid dropping onto the ground
+#define SCENE_ID 2
+#include "SPHExample.hpp"

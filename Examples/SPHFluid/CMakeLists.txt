@@ -21,15 +21,15 @@ project(Example-SPHFluid)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME}-BallDrop Main1.cpp Fluid.cpp Solid.cpp Bunny.cpp)
-add_executable(${PROJECT_NAME}-HighViscous Main2.cpp Fluid.cpp Solid.cpp Bunny.cpp)
-add_executable(${PROJECT_NAME}-BunnyShape Main3.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-BallDrop SPHSphere.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-HighViscousity SPHBox.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-BunnyShape SPHBunny.cpp Fluid.cpp Solid.cpp Bunny.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME}-BallDrop SimulationManager)
-target_link_libraries(${PROJECT_NAME}-HighViscous SimulationManager)
+target_link_libraries(${PROJECT_NAME}-HighViscousity SimulationManager)
 target_link_libraries(${PROJECT_NAME}-BunnyShape SimulationManager)
 
 #-----------------------------------------------------------------------------
