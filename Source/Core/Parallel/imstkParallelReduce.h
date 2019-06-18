@@ -22,8 +22,7 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <vector>
+#include "imstkMath.h"
 #include <tbb/tbb.h>
 
 #undef min
@@ -31,7 +30,10 @@
 
 namespace imstk
 {
-template<class Real>
+///
+/// \brief The ParallelReduce class
+/// \brief A class for executing reduce operations in parallel
+///
 class ParallelReduce
 {
 using Vec3r = Eigen::Matrix<Real, 3, 1>;
@@ -40,7 +42,8 @@ using StdVT_Vec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
 ///
 /// \brief Private helper class for finding max norm
 ///
-class ParallelMaxNorm {
+class ParallelMaxNorm
+{
 public:
     ParallelMaxNorm(const StdVT_Vec3r& data) : m_Data(data) {}
     ParallelMaxNorm(ParallelMaxNorm& pObj, tbb::split) : m_Data(pObj.m_Data) {}
@@ -65,7 +68,8 @@ private:
 ///
 /// \brief Private helper class for finding AABB of a point set
 ///
-class ParallelAABB {
+class ParallelAABB
+{
 public:
     ParallelAABB(const StdVT_Vec3r& data) : m_Data(data) { if(data.size() > 0) { m_UpperCorner = data[0]; } }
     ParallelAABB(ParallelAABB& pObj, tbb::split) : m_Data(pObj.m_Data) {}
@@ -107,7 +111,7 @@ private:
 
 public:
     ///
-    /// \brief Find the maximum value of || v || for each v in the input data array
+    /// \brief Find the maximum value of vector magnitude (|| v ||) for each vector v in the input data array
     ///
     static Real getMaxNorm(const StdVT_Vec3r& data)
     {
