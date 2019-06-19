@@ -112,7 +112,7 @@ private:
 
 public:
     ///
-    /// \brief Find the maximum value of L2 norm for each vector v of type Vec3r in the input data array
+    /// \brief Find the maximum value of L2 norm from the input data array
     ///
     static Real getMaxL2Norm(const StdVectorOfVec3r& data)
     {

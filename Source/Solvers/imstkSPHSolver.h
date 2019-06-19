@@ -50,8 +50,8 @@ public:
     virtual void solve() override
     {
         const auto& SPHModel = m_SPHObject->getSPHModel();
-        assert(SPHModel);
-        SPHModel->simulationTimeStep();
+        LOG_IF(FATAL, (!SPHModel)) << "SPH model has not been initialized";
+        SPHModel->advanceTimeStep();
     }
 
 private:

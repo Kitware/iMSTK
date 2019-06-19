@@ -24,6 +24,8 @@
 #include <memory>
 #include "imstkMath.h"
 
+#include <g3log/g3log.hpp>
+
 namespace imstk
 {
 ///
@@ -112,19 +114,57 @@ public:
     ///
     /// \brief Get number of particles
     ///
-    size_t getNumParticles() const { assert(m_KinematicState); return m_KinematicState->getNumParticles(); }
+    size_t getNumParticles() const
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+        return m_KinematicState->getNumParticles();
+    }
 
     ///
     /// \brief Returns the vector of all particle positions
     ///
-    StdVectorOfVec3r& getPositions() { assert(m_KinematicState); return m_KinematicState->getPositions(); }
-    const StdVectorOfVec3r& getPositions() const { assert(m_KinematicState); return m_KinematicState->getPositions(); }
+    StdVectorOfVec3r& getPositions()
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+        return m_KinematicState->getPositions();
+    }
+
+    ///
+    /// \brief Returns the vector of all particle positions
+    ///
+    const StdVectorOfVec3r& getPositions() const
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+        return m_KinematicState->getPositions();
+    }
 
     ///
     /// \brief Returns the vector of all particle velocities
     ///
-    StdVectorOfVec3r& getVelocities() { assert(m_KinematicState); return m_KinematicState->getVelocities(); }
-    const StdVectorOfVec3r& getVelocities() const { assert(m_KinematicState); return m_KinematicState->getVelocities(); }
+    StdVectorOfVec3r& getVelocities()
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+        return m_KinematicState->getVelocities();
+    }
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    const StdVectorOfVec3r& getVelocities() const
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+        return m_KinematicState->getVelocities();
+    }
 
     ///
     /// \brief Returns the vector of all particle positions

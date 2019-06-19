@@ -23,106 +23,34 @@
 #pragma once
 
 #include <cmath>
-#include <g3log/g3log.hpp>
+#include <cassert>
+
 #include "imstkMath.h"
+#include <g3log/g3log.hpp>
 
 namespace imstk
 {
 namespace SPH
 {
 template<int N>
-class CubicKernel
-{
-using VecXr = Eigen::Matrix<Real, N, 1>;
-
-public:
-    void setRadius(const Real radius)
-    {
-        m_radius = radius;
-        const auto h2 = m_radius * m_radius;
-        const auto h3 = h2 * m_radius;
-
-        // if constexpr (N == 2) {
-        if(N == 2)
-        {
-            m_k = Real(40.0 / 7.0) / (PI * h2);
-            m_l = Real(240.0 / 7.0) / (PI * h2);
-        }
-        else
-        {
-            m_k = Real(8.0) / (PI * h3);
-            m_l = Real(48.0) / (PI * h3);
-        }
-        m_W_zero = W(VecXr::Zero());
-    }
-
-    Real W(const Real r) const
-    {
-        Real res = 0.;
-        const auto q   = r / m_radius;
-        if(q <= Real(1.0))
-        {
-            if(q <= Real(0.5))
-            {
-                const auto q2 = q * q;
-                const auto q3 = q2 * q;
-                res = m_k * (Real(6.0) * q3 - Real(6.0) * q2 + Real(1.0));
-            }
-            else
-            {
-                res = m_k * (Real(2.0) * std::pow(Real(1.0) - q, 3));
-            }
-        }
-        return res;
-    }
-
-    Real W(const VecXr& r) const { return W(r.norm()); }
-
-    VecXr gradW(const VecXr& r) const
-    {
-        VecXr res = VecXr::Zero();
-        const auto r2  = r.squaredNorm();
-
-        if(r2 <= Real(1.0) && r2 > Real(1e-12))
-        {
-            const auto rl    = Real(sqrt(r2));
-            const auto q     = rl / m_radius;
-            const auto gradq = r * (Real(1.0) / (rl * m_radius));
-            if(q <= Real(0.5))
-            {
-                res = m_l * q * (Real(3.0) * q - Real(2.0)) * gradq;
-            }
-            else
-            {
-                const auto factor = Real(1.0) - q;
-                res = m_l * (-factor * factor) * gradq;
-            }
-        }
-        return res;
-    }
-
-    Real W_zero() const { return m_W_zero; }
-
-protected:
-    Real m_radius;
-    Real m_k;
-    Real m_l;
-    Real m_W_zero;
-};
-
-
-template<int N>
 class Poly6Kernel
 {
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
+    Poly6Kernel()
+    {
+        static_assert(N == 2 || N == 3, "Invalid kernel dimension");
+    }
+
+    ///
+    /// \brief Set the kernel radius
+    ///
     void setRadius(const Real radius)
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        // if constexpr (N == 2) {
         if(N == 2)
         {
             m_k = Real(4.0) / (PI * std::pow(m_radius, 8));
@@ -134,29 +62,38 @@ public:
             m_l = -Real(945.0) / (Real(32.0) * PI * std::pow(m_radius, 9));
         }
         m_m      = m_l;
-        m_W_zero = W(VecXr::Zero());
+        m_W0 = W(VecXr::Zero());
     }
 
-    /**
-     * W(r,h) = (315/(64 PI h^9))(h^2-|r|^2)^3
-     *        = (315/(64 PI h^9))(h^2-r*r)^3
-     */
+    ///
+    /// \brief Compute weight value
+    /// W(r,h) = (315/(64 PI h^9))(h^2-|r|^2)^3
+    ///
     Real W(const Real r) const
     {
         const auto r2 = r * r;
         return (r2 <= m_radius2) ? std::pow(m_radius2 - r2, 3) * m_k : Real(0);
     }
 
+    ///
+    /// \brief Compute weight value
+    /// W(r,h) = (315/(64 PI h^9))(h^2-|r|^2)^3
+    ///
     Real W(const VecXr& r) const
     {
         const auto r2 = r.squaredNorm();
         return (r2 <= m_radius2) ? std::pow(m_radius2 - r2, 3) * m_k : Real(0);
     }
 
-    /**
-     * grad(W(r,h)) = r(-945/(32 PI h^9))(h^2-|r|^2)^2
-     *              = r(-945/(32 PI h^9))(h^2-r*r)^2
-     */
+    ///
+    /// \brief Get W(0)
+    ///
+    Real W0() const { return m_W0; }
+
+    ///
+    /// \brief Compute weight gradient
+    /// grad(W(r,h)) = r(-945/(32 PI h^9))(h^2-|r|^2)^2
+    ///
     VecXr gradW(const VecXr& r) const
     {
         VecXr res = VecXr::Zero();
@@ -170,11 +107,11 @@ public:
         return res;
     }
 
-    /**
-     * laplacian(W(r,h)) = (-945/(32 PI h^9))(h^2-|r|^2)(-7|r|^2+3h^2)
-     *                   = (-945/(32 PI h^9))(h^2-r*r)(3 h^2-7 r*r)
-     */
-    Real laplacianW(const VecXr& r) const
+    ///
+    /// \brief Compute laplacian
+    /// laplacian(W(r,h)) = (-945/(32 PI h^9))(h^2-|r|^2)(-7|r|^2+3h^2)
+    ///
+    Real laplacian(const VecXr& r) const
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
@@ -188,17 +125,14 @@ public:
         return res;
     }
 
-    Real W_zero() const { return m_W_zero; }
-
 protected:
-    Real m_radius;
-    Real m_radius2;
-    Real m_k;
-    Real m_l;
-    Real m_m;
-    Real m_W_zero;
+    Real m_radius;  ///> Kernel radius
+    Real m_radius2; ///> Kernel radius squared
+    Real m_k;       ///> Kernel coefficient for W()
+    Real m_l;       ///> Kernel coefficient for gradW()
+    Real m_m;       ///> Kernel coefficient for laplacian()
+    Real m_W0;      ///> Precomputed W(0)
 };
-
 
 template<int N>
 class SpikyKernel
@@ -206,12 +140,19 @@ class SpikyKernel
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
+    SpikyKernel()
+    {
+        static_assert(N == 2 || N == 3, "Invalid kernel dimension");
+    }
+
+    ///
+    /// \brief Set the kernel radius
+    ///
     void setRadius(const Real radius)
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        // if constexpr (N == 2) {
         if(N == 2)
         {
             const auto radius5 = std::pow(m_radius, 5);
@@ -224,23 +165,34 @@ public:
             m_k = Real(15.0) / (PI * radius6);
             m_l = -Real(45.0) / (PI * radius6);
         }
-        m_W_zero = W(VecXr::Zero());
+        m_W0 = W(VecXr::Zero());
     }
 
-    /**
-     * W(r,h) = 15/(PI*h^6) * (h-r)^3
-     */
+    ///
+    /// \brief Compute weight value
+    /// W(r,h) = 15/(PI*h^6) * (h-r)^3
+    ///
     Real W(const Real r) const { return (r <= m_radius) ? std::pow(m_radius - r, 3) * m_k : Real(0); }
 
+    ///
+    /// \brief Compute weight value
+    /// W(r,h) = 15/(PI*h^6) * (h-r)^3
+    ///
     Real W(const VecXr& r) const
     {
         const auto r2 = r.squaredNorm();
         return (r2 <= m_radius2) ? std::pow(m_radius - std::sqrt(r2), 3) * m_k : Real(0);
     }
 
-    /**
-     * grad(W(r,h)) = -r(45/(PI*h^6) * (h-r)^2)
-     */
+    ///
+    /// \brief Get W(0)
+    ///
+    Real W0() const { return m_W0; }
+
+    ///
+    /// \brief Compute weight gradient
+    /// grad(W(r,h)) = -r(45/(PI*h^6) * (h-r)^2)
+    ///
     VecXr gradW(const VecXr& r) const
     {
         VecXr res = VecXr::Zero();
@@ -256,14 +208,12 @@ public:
         return res;
     }
 
-    Real W_zero() const { return m_W_zero; }
-
 protected:
-    Real m_radius;
-    Real m_radius2;
-    Real m_k;
-    Real m_l;
-    Real m_W_zero;
+    Real m_radius;  ///> Kernel radius
+    Real m_radius2; ///> Kernel radius squared
+    Real m_k;       ///> Kernel coefficient for W()
+    Real m_l;       ///> Kernel coefficient for gradW()
+    Real m_W0;      ///> Precomputed W(0)
 };
 
 
@@ -273,12 +223,19 @@ class CohesionKernel
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
+    CohesionKernel()
+    {
+        static_assert(N == 3, "Invalid kernel dimension");
+    }
+
+    ///
+    /// \brief Set the kernel radius
+    ///
     void setRadius(const Real radius)
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        // if constexpr (N == 2) {
         if(N == 2)
         {
             LOG(FATAL) << "Unimplemented function";
@@ -288,13 +245,13 @@ public:
             m_k = Real(32.0) / (PI * std::pow(m_radius, 9));
             m_c = std::pow(m_radius, 6) / Real(64.0);
         }
-        m_W_zero = W(VecXr::Zero());
+        m_W0 = W(VecXr::Zero());
     }
 
-    /**
-     * W(r,h) = (32/(PI h^9))(h-r)^3*r^3					if h/2 < r <= h
-     *          (32/(PI h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
-     */
+    ///
+    /// \brief Compute weight value
+    /// W(r,h) = (32/(PI h^9))(h-r)^3*r^3					if h/2 < r <= h,
+    ///          (32/(PI h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
     Real W(const Real r) const
     {
         Real res = 0.;
@@ -315,6 +272,10 @@ public:
         return res;
     }
 
+    ///
+    /// \brief Compute weight value
+    /// W(r,h) = (32/(PI h^9))(h-r)^3*r^3					if h/2 < r <= h,
+    ///          (32/(PI h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
     Real W(const VecXr& r) const
     {
         Real res = 0.;
@@ -335,14 +296,17 @@ public:
         return res;
     }
 
-    Real W_zero() const { return m_W_zero; }
+    ///
+    /// \brief Get W(0)
+    ///
+    Real W0() const { return m_W0; }
 
 protected:
-    Real m_radius;
-    Real m_radius2;
-    Real m_k;
-    Real m_c;
-    Real m_W_zero;
+    Real m_radius;  ///> Kernel radius
+    Real m_radius2; ///> Kernel radius squared
+    Real m_k;       ///> Kernel coefficient for W()
+    Real m_c;       ///> Kernel coefficient for W()
+    Real m_W0;      ///> Precomputed W(0)
 };
 
 template<int N>
@@ -351,12 +315,19 @@ class AdhesionKernel
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
+    AdhesionKernel()
+    {
+        static_assert(N == 3, "Invalid kernel dimension");
+    }
+
+    ///
+    /// \brief Set the kernel radius
+    ///
     void setRadius(const Real radius)
     {
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        // if constexpr (N == 2) {
         if(N == 2)
         {
             LOG(FATAL) << "Unimplemented function";
@@ -365,12 +336,13 @@ public:
         {
             m_k = Real(0.007 / std::pow(m_radius, 3.25));
         }
-        m_W_zero = W(VecXr::Zero());
+        m_W0 = W(VecXr::Zero());
     }
 
-    /**
-     * W(r,h) = (0.007/h^3.25)(-4r^2/h + 6r -2h)^0.25					if h/2 < r <= h
-     */
+    ///
+    /// \brief Compute weight value
+    ///  W(r,h) = (0.007/h^3.25)(-4r^2/h + 6r -2h)^0.25					if h/2 < r <= h
+    ///
     Real W(const Real r) const
     {
         Real res = 0.;
@@ -386,6 +358,10 @@ public:
         return res;
     }
 
+    ///
+    /// \brief Compute weight value
+    ///  W(r,h) = (0.007/h^3.25)(-4r^2/h + 6r -2h)^0.25					if h/2 < r <= h
+    ///
     Real W(const VecXr& r) const
     {
         Real res = 0.;
@@ -401,13 +377,16 @@ public:
         return res;
     }
 
-    Real W_zero() { return m_W_zero; }
+    ///
+    /// \brief Get W(0)
+    ///
+    Real W0() const { return m_W0; }
 
 protected:
-    Real m_radius;
-    Real m_radius2;
-    Real m_k;
-    Real m_W_zero;
+    Real m_radius;  ///> Kernel radius
+    Real m_radius2; ///> Kernel radius squared
+    Real m_k;       ///> Kernel coefficient for W()
+    Real m_W0;      ///> Precomputed W(0)
 };
 
 template<int N>
@@ -416,6 +395,14 @@ class ViscosityKernel
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
+    ViscosityKernel()
+    {
+        static_assert(N == 2 || N == 3, "Invalid kernel dimension");
+    }
+
+    ///
+    /// \brief Set the kernel radius
+    ///
     void setRadius(const Real radius)
     {
         m_radius  = radius;
@@ -423,6 +410,10 @@ public:
         m_k       = Real(45.0 / PI) / (m_radius2 * m_radius2 * m_radius);
     }
 
+    ///
+    /// \brief Compute laplacian
+    /// Laplace(r) = (45/PI/r^5) * (1 - |r| / h)
+    ///
     Real laplace(const VecXr& r) const
     {
         Real res = 0.;
@@ -436,9 +427,9 @@ public:
     }
 
 protected:
-    Real m_radius;
-    Real m_radius2;
-    Real m_k;
+    Real m_radius;  ///> Kernel radius
+    Real m_radius2; ///> Kernel radius squared
+    Real m_k;       ///> Kernel coefficient for laplacian()
 };
 } // end namespace SPH
 
@@ -456,10 +447,29 @@ public:
         m_cohesion.setRadius(kernelRadius);
     }
 
-    Real W_zero() const { return m_poly6.W_zero(); }
+    ///
+    /// \brief Compute weight W(0) using poly6 kernel
+    ///
+    Real W0() const { return m_poly6.W0(); }
+
+    ///
+    /// \brief Compute weight W using poly6 kernel
+    ///
     Real W(const Vec3r& r) const { return m_poly6.W(r); }
+
+    ///
+    /// \brief Compute gradW using spiky kernel
+    ///
     Vec3r gradW(const Vec3r& r) const { return m_spiky.gradW(r); }
+
+    ///
+    /// \brief Compute laplacian using viscosity kernel
+    ///
     Real laplace(const Vec3r& r) const { return m_viscosity.laplace(r); }
+
+    ///
+    /// \brief Compute cohesion W using cohesion kernel
+    ///
     Real cohesionW(const Vec3r& r) const { return m_cohesion.W(r); }
 
 protected:

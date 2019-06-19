@@ -178,11 +178,9 @@ public:
     ///
     /// \brief Do one time step simulation
     ///
-    void simulationTimeStep();
+    void advanceTimeStep();
 
 private:
-    // time integration functions ===>
-
     ///
     /// \brief Compute time step size, do nothing if using a fixed time step size for integration
     ///
@@ -239,9 +237,9 @@ private:
     void computeSurfaceTension();
 
     ///
-    /// \brief Advect particles
+    /// \brief Move particles
     ///
-    void advect(const Real timestep);
+    void moveParticles(const Real timestep);
 
     std::shared_ptr<PointSet> m_Geometry;
     SPHSimulationState m_SimulationState;

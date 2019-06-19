@@ -20,13 +20,11 @@
 =========================================================================*/
 
 #include "imstkSPHModel.h"
-#include "imstkParallelHelpers.h"
+#include "imstkParallelUtils.h"
 #include <g3log/g3log.hpp>
 
 namespace imstk
 {
-// SPHModelConfig implementation ===>
-
 SPHModelConfig::SPHModelConfig(const Real particleRadius)
 {
     m_ParticleRadius = particleRadius;
@@ -46,8 +44,6 @@ void SPHModelConfig::initialize()
     m_KernelRadius    = m_ParticleRadius * m_RatioKernelOverParticleRadius;
     m_KernelRadiusSqr = m_KernelRadius * m_KernelRadius;
 }
-
-// SPHModel implementation ===>
 
 bool SPHModel::initialize()
 {
@@ -78,7 +74,7 @@ bool SPHModel::initialize()
     return true;
 }
 
-void SPHModel::simulationTimeStep()
+void SPHModel::advanceTimeStep()
 {
     findParticleNeighbors();
     computeNeighborRelativePositions();
@@ -90,7 +86,7 @@ void SPHModel::simulationTimeStep()
     computeTimeStepSize();
     updateVelocity(getTimeStep());
     computeViscosity();
-    advect(getTimeStep());
+    moveParticles(getTimeStep());
 }
 
 void SPHModel::computeTimeStepSize()
@@ -100,7 +96,7 @@ void SPHModel::computeTimeStepSize()
 
 Real SPHModel::computeCFLTimeStepSize()
 {
-    auto maxVel = ParallelReduce::getMaxNorm(getState().getVelocities());
+    auto maxVel = ParallelUtils::ParallelReduce::getMaxL2Norm(getState().getVelocities());
 
     // dt = CFL * 2r / max{|| v ||}
     Real timestep = maxVel > Real(1e-6) ? m_Parameters->m_CFLFactor * (Real(2.0) * m_Parameters->m_ParticleRadius / maxVel) : m_Parameters->m_MaxTimestep;
@@ -140,7 +136,7 @@ void SPHModel::computeNeighborRelativePositions()
                                         }
                                     };
 
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& ppos   = getState().getPositions()[p];
             auto& neighborInfo = getState().getNeighborInfo()[p];
@@ -161,10 +157,9 @@ void SPHModel::collectNeighborDensity()
     // after computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is usefull because relative positions and densities are accessed together multiple times
     // caching relative positions and densities therefore can reduce computation time significantly (tested)
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
-            assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
             {
                 return; // the particle has no neighbor
@@ -181,10 +176,9 @@ void SPHModel::collectNeighborDensity()
 
 void SPHModel::computeDensity()
 {
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
             {
                 return; // the particle has no neighbor
@@ -208,10 +202,9 @@ void SPHModel::normalizeDensity()
     }
 
     getState().getNormalizedDensities().resize(getState().getNumParticles());
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
-            assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
             {
                 return; // the particle has no neighbor
@@ -233,7 +226,10 @@ void SPHModel::normalizeDensity()
             if(m_Parameters->m_bDensityWithBoundary)
             {
                 const auto& BDNeighborList = getState().getBoundaryNeighborLists()[p];
-                assert(fluidNeighborList.size() + BDNeighborList.size() == neighborInfo.size());
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+                LOG_IF(FATAL, (fluidNeighborList.size() + BDNeighborList.size() != neighborInfo.size()))
+                << "Invalid neighborInfo computation";
+#endif
                 for(size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
                 {
                     const auto& qInfo = neighborInfo[i];
@@ -256,11 +252,10 @@ void SPHModel::computePressureAcceleration()
                                 return error > Real(0) ? error : Real(0);
                             };
 
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             Vec3r accel(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
             {
                 getState().getAccelerations()[p] = accel;
@@ -288,7 +283,7 @@ void SPHModel::computePressureAcceleration()
 
 void SPHModel::updateVelocity(Real timestep)
 {
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getVelocities()[p] += (m_Parameters->m_Gravity + getState().getAccelerations()[p]) * timestep;
         });
@@ -296,10 +291,9 @@ void SPHModel::updateVelocity(Real timestep)
 
 void SPHModel::computeViscosity()
 {
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
             {
                 getState().getDiffuseVelocities()[p] = Vec3r(0, 0, 0);
@@ -337,7 +331,7 @@ void SPHModel::computeViscosity()
         });
 
     // add diffused velocity back to velocity, causing viscosity
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getVelocities()[p] += getState().getDiffuseVelocities()[p];
     });
@@ -347,11 +341,10 @@ void SPHModel::computeViscosity()
 void SPHModel::computeSurfaceTension()
 {
     // Firstly compute surface normal for all particles
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             Vec3r n(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            assert(neighborInfo.size() >= 1);     // neighbor of particle p should contain at least p index
             if(neighborInfo.size() <= 1)
             {
                 getState().getNormals()[p] = n;
@@ -371,10 +364,9 @@ void SPHModel::computeSurfaceTension()
         });
 
     // Compute surface tension acceleration
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
-            assert(fluidNeighborList.size() >= 1);     // Neighbor of particle p should contain at least p index
             if(fluidNeighborList.size() <= 1)
             {
                 return; // the particle has no neighbor
@@ -416,9 +408,9 @@ void SPHModel::computeSurfaceTension()
         });
 }
 
-void SPHModel::advect(Real timestep)
+void SPHModel::moveParticles(Real timestep)
 {
-    imstk_parallel_for(getState().getNumParticles(),
+    ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
     });
