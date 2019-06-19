@@ -21,9 +21,9 @@ project(Example-SPHFluid)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME}-BallDrop SPHSphere.cpp Fluid.cpp Solid.cpp Bunny.cpp)
-add_executable(${PROJECT_NAME}-HighViscousity SPHBox.cpp Fluid.cpp Solid.cpp Bunny.cpp)
-add_executable(${PROJECT_NAME}-BunnyShape SPHBunny.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-BallDrop SPHFluid-BallDrop.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-HighViscousity SPHFluid-HighViscousity.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+add_executable(${PROJECT_NAME}-BunnyShape SPHFluid-BunnyShape.cpp Fluid.cpp Solid.cpp Bunny.cpp)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

@@ -23,7 +23,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
-#include "imstkParallelHelpers.h"
+#include "imstkParallelUtils.h"
 #include "imstkAPIUtilities.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -74,11 +74,11 @@ int main(int argc, char* argv[])
 
     if(threads <= 0)
     {
-        ThreadManager::setMaximumParallelism();
+        ParallelUtils::ThreadManager::setMaximumParallelism();
     }
     else
     {
-        ThreadManager::setNumberThreads(threads);
+        ParallelUtils::ThreadManager::setThreadPoolSize(threads);
     }
 
     auto scene = sdk->createNewScene("SPH Fluid");
