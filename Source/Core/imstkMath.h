@@ -110,29 +110,27 @@ using AffineTransform3d = Eigen::Affine3d;
 #define WORLD_ORIGIN Vec3d::Zero()
 
 /// Some commonly used math constants
-static constexpr Real PI = 3.14159265358979323846;
-static constexpr Real PI_2 = 1.57079632679489661923;
-static constexpr Real PI_4 = 0.785398163397448309616;
-static constexpr Real INV_1_PI = 0.318309886183790671538;
-static constexpr Real INV_2_PI = 0.636619772367581343076;
-static constexpr Real TWO_OVER_SQRTPI = 1.12837916709551257390;
-static constexpr Real SQRT2 = 1.41421356237309504880;
-static constexpr Real SQRT1_2 = 0.707106781186547524401;
-static constexpr Real NLOG_E = 2.71828182845904523536;
-static constexpr Real LOG2E = 1.44269504088896340736;
-static constexpr Real LOG10E = 0.434294481903251827651;
-static constexpr Real LN2 = 0.693147180559945309417;
-static constexpr Real LN10 = 2.30258509299404568402;
-
-static constexpr double MAX_REAL = std::numeric_limits<Real>::max();
-static constexpr double MIN_REAL = std::numeric_limits<Real>::min();
-static constexpr double MAX_D = std::numeric_limits<double>::max();
-static constexpr double MIN_D = std::numeric_limits<double>::min();
-static constexpr float MAX_F = std::numeric_limits<float>::max();
-static constexpr float MIN_F = std::numeric_limits<float>::min();
-
-static constexpr Real MACHINE_PRECISION = std::numeric_limits<Real>::denorm_min();
-static constexpr double MACHINE_PRECISION_D = std::numeric_limits<double>::denorm_min();
-static constexpr double MACHINE_PRECISION_F = std::numeric_limits<double>::denorm_min();
+static const Real PI = 3.14159265358979323846;
+static const Real PI_2 = 1.57079632679489661923;
+static const Real PI_4 = 0.785398163397448309616;
+static const Real INV_1_PI = 0.318309886183790671538;
+static const Real INV_2_PI = 0.636619772367581343076;
+static const Real TWO_OVER_SQRTPI = 1.12837916709551257390;
+static const Real SQRT2 = 1.41421356237309504880;
+static const Real SQRT1_2 = 0.707106781186547524401;
+static const Real NLOG_E = 2.71828182845904523536;
+static const Real LOG2E = 1.44269504088896340736;
+static const Real LOG10E = 0.434294481903251827651;
+static const Real LN2 = 0.693147180559945309417;
+static const Real LN10 = 2.30258509299404568402;
+static const double MAX_REAL = std::numeric_limits<Real>::max();
+static const double MIN_REAL = std::numeric_limits<Real>::min();
+static const double MAX_D = std::numeric_limits<double>::max();
+static const double MIN_D = std::numeric_limits<double>::min();
+static const float MAX_F = std::numeric_limits<float>::max();
+static const float MIN_F = std::numeric_limits<float>::min();
+static const Real MACHINE_PRECISION = std::numeric_limits<Real>::denorm_min();
+static const double MACHINE_PRECISION_D = std::numeric_limits<double>::denorm_min();
+static const double MACHINE_PRECISION_F = std::numeric_limits<double>::denorm_min();
 }
 #endif // ifndef imstkMath_h
