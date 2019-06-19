@@ -37,14 +37,14 @@ class ThreadManager
 public:
 
     ///
-    /// \brief Set system-wide number of threads for parallel computation
+    /// \brief Set system-wide thread pool size for parallel computation
     ///
     static void setThreadPoolSize(const size_t nThreads);
 
     ///
-    /// \brief Set system-wide number of threads to system default (use all logical cores)
+    /// \brief Set system-wide thread pool size to the optimal value (use all logical cores)
     ///
-    static void setMaximumParallelism();
+    static void setOptimalParallelism();
 
 private:
     ///

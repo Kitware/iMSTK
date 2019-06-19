@@ -66,6 +66,19 @@ public:
     ///
     const SimulationStatus& getStatus() const;
 
+    ///
+    /// \brief Set number of worker threads in thread pool for parallel computation
+    /// \param nThreads Size of the thread pool to set,
+    /// if nThreads <= 0 then the optimal value (which typically equals to number of logical cores) will be used
+    ///
+    void setThreadPoolSize(const int nThreads);
+
+    ///
+    /// \brief Set number of worker threads in thread pool for parallel computation to be the optimal value,
+    /// which typically equals to the number of logical cores of the machine
+    ///
+    void setOptimalThreadPoolSize();
+
     // Scene
 
     ///

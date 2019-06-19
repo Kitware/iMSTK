@@ -39,10 +39,10 @@ void ThreadManager::setThreadPoolSize(const size_t nThreads)
     }
     s_tbbGlobalControl = std::unique_ptr<tbb::global_control>(
                 new tbb::global_control(tbb::global_control::max_allowed_parallelism,
-                                        static_cast<size_t>(nThreads)));
+                                        nThreads));
 }
 
-void ThreadManager::setMaximumParallelism()
+void ThreadManager::setOptimalParallelism()
 {
     setThreadPoolSize(static_cast<size_t>(tbb::task_scheduler_init::default_num_threads()));
 }

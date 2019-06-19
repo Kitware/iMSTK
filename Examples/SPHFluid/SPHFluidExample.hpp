@@ -23,7 +23,6 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
-#include "imstkParallelUtils.h"
 #include "imstkAPIUtilities.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -40,7 +39,7 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_p
 int main(int argc, char* argv[])
 {
     // SimulationManager must be created first
-    auto sdk   = std::make_shared<SimulationManager>(0);
+    auto sdk = std::make_shared<SimulationManager>(0);
 
     int threads = -1;
     double particleRadius = 0.1;
@@ -72,14 +71,8 @@ int main(int argc, char* argv[])
         particleRadius = 0.08;
     }
 
-    if(threads <= 0)
-    {
-        ParallelUtils::ThreadManager::setMaximumParallelism();
-    }
-    else
-    {
-        ParallelUtils::ThreadManager::setThreadPoolSize(threads);
-    }
+    // Set thread pool size (nthreads <= 0 means using all logical cores)
+    sdk->setThreadPoolSize(threads);
 
     auto scene = sdk->createNewScene("SPH Fluid");
 
