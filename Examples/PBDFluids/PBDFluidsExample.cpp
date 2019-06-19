@@ -90,16 +90,16 @@ int main()
     double height = 40.0;
     int nRows = 2;
     int nCols = 2;
-    vertList.resize(nRows*nCols*nSides);
+    vertList.resize(nRows * nCols * nSides);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double y = (double)dy*j;
-            const double x = (double)dx*i;
-            vertList[i*nCols + j] = Vec3d(x - 20, -10.0, y - 20);
+            const double y = (double)dy * j;
+            const double x = (double)dx * i;
+            vertList[i * nCols + j] = Vec3d(x - 20, -10.0, y - 20);
         }
     }
 
@@ -110,8 +110,8 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
-            tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -129,10 +129,10 @@ int main()
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double z = (double)dz*j;
-            const double x = (double)dx1*i;
-            vertList[(nPointPerSide)+i*nCols + j] = Vec3d(x - 20, z - 10.0, 20);
-            vertList[(nPointPerSide * 2) + i*nCols + j] = Vec3d(x - 20, z - 10.0, -20);
+            const double z = (double)dz * j;
+            const double x = (double)dx1 * i;
+            vertList[(nPointPerSide) + i * nCols + j] = Vec3d(x - 20, z - 10.0, 20);
+            vertList[(nPointPerSide * 2) + i * nCols + j] = Vec3d(x - 20, z - 10.0, -20);
         }
     }
 
@@ -142,12 +142,12 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { (nPointPerSide)+i*nCols + j, (nPointPerSide)+i*nCols + j + 1, (nPointPerSide)+(i + 1)*nCols + j } };
-            tri[1] = { { (nPointPerSide)+(i + 1)*nCols + j + 1, (nPointPerSide)+(i + 1)*nCols + j, (nPointPerSide)+i*nCols + j + 1 } };
+            tri[0] = { { (nPointPerSide) + i * nCols + j, (nPointPerSide) + i * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j } };
+            tri[1] = { { (nPointPerSide) + (i + 1) * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j, (nPointPerSide) + i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
-            tri[0] = { { (nPointPerSide * 2) + i*nCols + j, (nPointPerSide * 2) + i*nCols + j + 1, (nPointPerSide * 2) + (i + 1)*nCols + j } };
-            tri[1] = { { (nPointPerSide * 2) + (i + 1)*nCols + j + 1, (nPointPerSide * 2) + (i + 1)*nCols + j, (nPointPerSide * 2) + i*nCols + j + 1 } };
+            tri[0] = { { (nPointPerSide * 2) + i * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j } };
+            tri[1] = { { (nPointPerSide * 2) + (i + 1) * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -164,10 +164,10 @@ int main()
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double z = (double)dz1*j;
-            const double y = (double)dy1*i;
-            vertList[(nPointPerSide * 3) + i*nCols + j] = Vec3d(20, z - 10.0, y - 20);
-            vertList[(nPointPerSide * 4) + i*nCols + j] = Vec3d(-20, z - 10.0, y - 20);
+            const double z = (double)dz1 * j;
+            const double y = (double)dy1 * i;
+            vertList[(nPointPerSide * 3) + i * nCols + j] = Vec3d(20, z - 10.0, y - 20);
+            vertList[(nPointPerSide * 4) + i * nCols + j] = Vec3d(-20, z - 10.0, y - 20);
         }
     }
 
@@ -177,12 +177,12 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { (nPointPerSide * 3) + i*nCols + j, (nPointPerSide * 3) + i*nCols + j + 1, (nPointPerSide * 3) + (i + 1)*nCols + j } };
-            tri[1] = { { (nPointPerSide * 3) + (i + 1)*nCols + j + 1, (nPointPerSide * 3) + (i + 1)*nCols + j, (nPointPerSide * 3) + i*nCols + j + 1 } };
+            tri[0] = { { (nPointPerSide * 3) + i * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j } };
+            tri[1] = { { (nPointPerSide * 3) + (i + 1) * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
-            tri[0] = { { (nPointPerSide * 4) + i*nCols + j, (nPointPerSide * 4) + i*nCols + j + 1, (nPointPerSide * 4) + (i + 1)*nCols + j } };
-            tri[1] = { { (nPointPerSide * 4) + (i + 1)*nCols + j + 1, (nPointPerSide * 4) + (i + 1)*nCols + j, (nPointPerSide * 4) + i*nCols + j + 1 } };
+            tri[0] = { { (nPointPerSide * 4) + i * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j } };
+            tri[1] = { { (nPointPerSide * 4) + (i + 1) * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -195,12 +195,10 @@ int main()
     auto floorMeshPhysics = std::make_shared<SurfaceMesh>();
     floorMeshPhysics->initialize(vertList, triangles);
 
-
     auto floorMapP2V = std::make_shared<OneToOneMap>();
     floorMapP2V->setMaster(floorMeshPhysics);
     floorMapP2V->setSlave(floorMeshVisual);
     floorMapP2V->compute();
-
 
     auto floorMapP2C = std::make_shared<OneToOneMap>();
     floorMapP2C->setMaster(floorMeshPhysics);

@@ -27,8 +27,8 @@ const double
 StopWatch::wcTimerConstants[] = {
     1.0,
     1 / 1000.0,
-    1 / (1000.0*60.0),
-    1 / (1000.0*60.0 * 60)
+    1 / (1000.0 * 60.0),
+    1 / (1000.0 * 60.0 * 60)
 };
 
 const double
@@ -146,19 +146,18 @@ StopWatch::printTimeElapsed(std::string const& name /* = std::string("noName")*/
     }
 }
 
-
 double
 StopWatch::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
     return std::chrono::duration<double, std::milli>
-           (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
+           (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count() *
            wcTimerConstants[(int)unitType];
 }
 
 double
 CpuTimer::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
-    return (std::clock() - cpuTimeKeeper)*cpuTimerConstants[(int)unitType];
+    return (std::clock() - cpuTimeKeeper) * cpuTimerConstants[(int)unitType];
 }
 
 void

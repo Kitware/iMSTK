@@ -86,7 +86,7 @@ BoneDrillingCH::erodeBone()
             continue;
         }
 
-        m_nodalDensity[cd.nodeId] -= 0.001*(m_angularSpeed / m_BoneHardness)*m_stiffness*cd.penetrationVector.norm()*0.001;
+        m_nodalDensity[cd.nodeId] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * cd.penetrationVector.norm() * 0.001;
 
         if (m_nodalDensity[cd.nodeId] <= 0.)
         {

@@ -53,7 +53,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
+    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
@@ -63,13 +63,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[3];
-    for(const auto &t : geometry->getTrianglesVertices())
+    for (const auto &t : geometry->getTrianglesVertices())
     {
-        for(size_t i = 0; i < 3; ++i)
+        for (size_t i = 0; i < 3; ++i)
         {
             cell[i] = t[i];
         }
-        cells->InsertNextCell(3,cell);
+        cells->InsertNextCell(3, cell);
     }
 
     // Create PolyData
@@ -83,7 +83,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     StdVectorOfVec3d& normals = geometry->getVertexNormalsNotConst();
     double* normalData = reinterpret_cast<double*>(normals.data());
     m_mappedNormalArray->SetNumberOfComponents(3);
-    m_mappedNormalArray->SetArray(normalData, normals.size()*3, 1);
+    m_mappedNormalArray->SetArray(normalData, normals.size() * 3, 1);
     polydata->GetPointData()->SetNormals(m_mappedNormalArray);
 
     // Create connection source
@@ -151,7 +151,7 @@ VTKSurfaceMeshRenderDelegate::updateDataSource()
         StdVectorOfVec3d& normals = geometry->getVertexNormalsNotConst();
         double* normalData = reinterpret_cast<double*>(normals.data());
         m_mappedNormalArray->SetNumberOfComponents(3);
-        m_mappedNormalArray->SetArray(normalData, normals.size()*3, 1);
+        m_mappedNormalArray->SetArray(normalData, normals.size() * 3, 1);
         this->m_mapper->GetInput()->GetPointData()->SetNormals(m_mappedNormalArray);
 
         m_mappedVertexArray->Modified();

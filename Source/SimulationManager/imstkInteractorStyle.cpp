@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #include "imstkInteractorStyle.h"
 
 namespace imstk

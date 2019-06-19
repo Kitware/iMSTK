@@ -204,7 +204,6 @@ public:
     ///
     void simulationTimeStep();
 
-
 private:
     // time integration functions ===>
 

@@ -32,7 +32,7 @@ namespace imstk
 class PbdEdgeEdgeConstraint : public PbdCollisionConstraint
 {
 public:
-    PbdEdgeEdgeConstraint() : PbdCollisionConstraint(2,2) {}
+    PbdEdgeEdgeConstraint() : PbdCollisionConstraint(2, 2) {}
 
     ///
     /// \brief Get the type of pbd constraint

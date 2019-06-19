@@ -129,6 +129,7 @@ public:
     {
         return *m_DynamicLinearProjConstraints;
     }
+
 private:
 
     std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints;

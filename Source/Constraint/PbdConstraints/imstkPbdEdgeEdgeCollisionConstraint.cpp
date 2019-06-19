@@ -54,20 +54,20 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     Vec3d& x2 = state2->getVertexPosition(i2);
     Vec3d& x3 = state2->getVertexPosition(i3);
 
-    auto a = (x3-x2).dot(x1-x0);
+    auto a = (x3 - x2).dot(x1 - x0);
     auto b = (x1 - x0).dot(x1 - x0);
     auto c = (x0 - x2).dot(x1 - x0);
     auto d = (x3 - x2).dot(x3 - x2);
     auto e = a;
     auto f = (x0 - x2).dot(x3 - x2);
 
-    auto det = a*e - d*b;
+    auto det = a * e - d * b;
     double s = 0.5;
     double t = 0.5;
-    if ( fabs(det) > 1e-12 )
+    if (fabs(det) > 1e-12)
     {
-        s = (c*e - b*f)/det;
-        t = (c*d - a*f)/det;
+        s = (c * e - b * f) / det;
+        t = (c * d - a * f) / det;
         if (s < 0 || s > 1.0 || t < 0 || t > 1.0)
         {
             return false;
@@ -78,8 +78,8 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
         //LOG(WARNING) << "det is null";
     }
 
-    Vec3d P = x0 + t*(x1-x0);
-    Vec3d Q = x2 + s*(x3-x2);
+    Vec3d P = x0 + t * (x1 - x0);
+    Vec3d Q = x2 + s * (x3 - x2);
 
     Vec3d n = Q - P;
     auto l = n.norm();
@@ -92,22 +92,22 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
         return false;
     }
 
-    Vec3d grad0 = -(1-t)*n;
-    Vec3d grad1 = -(t)*n;
-    Vec3d grad2 = (1-s)*n;
-    Vec3d grad3 = (s)*n;
+    Vec3d grad0 = -(1 - t) * n;
+    Vec3d grad1 = -(t) * n;
+    Vec3d grad2 = (1 - s) * n;
+    Vec3d grad3 = (s) * n;
 
     const auto im0 = m_model1->getInvMass(i0);
     const auto im1 = m_model1->getInvMass(i1);
     const auto im2 = m_model2->getInvMass(i2);
     const auto im3 = m_model2->getInvMass(i3);
 
-    auto lambda = im0*grad0.squaredNorm() +
-                  im1*grad1.squaredNorm() +
-                  im2*grad2.squaredNorm() +
-                  im3*grad3.squaredNorm();
+    auto lambda = im0 * grad0.squaredNorm() +
+                  im1 * grad1.squaredNorm() +
+                  im2 * grad2.squaredNorm() +
+                  im3 * grad3.squaredNorm();
 
-    lambda = (l - dist)/lambda;
+    lambda = (l - dist) / lambda;
 
 //    LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
 

@@ -59,7 +59,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
 
     // Collision Handling A
     std::shared_ptr<CollisionHandling> CHA;
-    if(CHAType != CollisionHandling::Type::None)
+    if (CHAType != CollisionHandling::Type::None)
     {
         CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
         if (CHA == nullptr)
@@ -72,7 +72,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
 
     // Collision Handling B
     std::shared_ptr<CollisionHandling> CHB;
-    if(CHBType != CollisionHandling::Type::None)
+    if (CHBType != CollisionHandling::Type::None)
     {
         CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
         if (CHB == nullptr)
@@ -141,11 +141,11 @@ InteractionPair::processCollisionData()
         return;
     }
 
-    if(m_colHandlingA)
+    if (m_colHandlingA)
     {
         m_colHandlingA->processCollisionData();
     }
-    if(m_colHandlingB)
+    if (m_colHandlingB)
     {
         m_colHandlingB->processCollisionData();
     }

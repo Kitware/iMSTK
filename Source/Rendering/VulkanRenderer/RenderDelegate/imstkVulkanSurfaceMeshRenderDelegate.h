@@ -28,7 +28,8 @@
 
 namespace imstk
 {
-class VulkanSurfaceMeshRenderDelegate : public VulkanRenderDelegate {
+class VulkanSurfaceMeshRenderDelegate : public VulkanRenderDelegate
+{
 public:
 
     ///

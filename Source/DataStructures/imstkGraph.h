@@ -39,7 +39,6 @@ struct Edge
     size_t src, dest;
 };
 
-
 ///
 /// \brief class to represent a graph object
 ///

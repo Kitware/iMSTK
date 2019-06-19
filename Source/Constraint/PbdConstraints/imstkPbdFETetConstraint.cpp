@@ -81,7 +81,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     m.col(2) = p2 - p3;
 
     // deformation gradient
-    const Mat3d F = m*m_invRestMat;
+    const Mat3d F = m * m_invRestMat;
     // First Piola-Kirchhoff tensor
     Mat3d P;
     // energy constraint
@@ -97,28 +97,28 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     case MaterialType::StVK:
     {
         Mat3d E;
-        E(0, 0) = 0.5*(F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);    // xx
-        E(1, 1) = 0.5*(F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);    // yy
-        E(2, 2) = 0.5*(F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);    // zz
-        E(0, 1) = 0.5*(F(0, 0) * F(0, 1) + F(1, 0) * F(1, 1) + F(2, 0) * F(2, 1));          // xy
-        E(0, 2) = 0.5*(F(0, 0) * F(0, 2) + F(1, 0) * F(1, 2) + F(2, 0) * F(2, 2));          // xz
-        E(1, 2) = 0.5*(F(0, 1) * F(0, 2) + F(1, 1) * F(1, 2) + F(2, 1) * F(2, 2));          // yz
+        E(0, 0) = 0.5 * (F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);    // xx
+        E(1, 1) = 0.5 * (F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);    // yy
+        E(2, 2) = 0.5 * (F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);    // zz
+        E(0, 1) = 0.5 * (F(0, 0) * F(0, 1) + F(1, 0) * F(1, 1) + F(2, 0) * F(2, 1));          // xy
+        E(0, 2) = 0.5 * (F(0, 0) * F(0, 2) + F(1, 0) * F(1, 2) + F(2, 0) * F(2, 2));          // xz
+        E(1, 2) = 0.5 * (F(0, 1) * F(0, 2) + F(1, 1) * F(1, 2) + F(2, 1) * F(2, 2));          // yz
         E(1, 0) = E(0, 1);
         E(2, 0) = E(0, 2);
         E(2, 1) = E(1, 2);
 
-        P = 2 * mu*E;
+        P = 2 * mu * E;
         double tr = E.trace();
-        double lt = lambda*tr;
+        double lt = lambda * tr;
         P(0, 0) += lt;
         P(1, 1) += lt;
         P(2, 2) += lt;
-        P = F*P;
+        P = F * P;
 
-        C = E(0, 0)*E(0, 0) + E(0, 1)*E(0, 1) + E(0, 2)*E(0, 2)
-            + E(1, 0)*E(1, 0) + E(1, 1)*E(1, 1) + E(1, 2)*E(1, 2)
-            + E(2, 0)*E(2, 0) + E(2, 1)*E(2, 1) + E(2, 2)*E(2, 2);
-        C = mu*C + 0.5*lambda*tr*tr;
+        C = E(0, 0) * E(0, 0) + E(0, 1) * E(0, 1) + E(0, 2) * E(0, 2)
+            + E(1, 0) * E(1, 0) + E(1, 1) * E(1, 1) + E(1, 2) * E(1, 2)
+            + E(2, 0) * E(2, 0) + E(2, 1) * E(2, 1) + E(2, 2) * E(2, 2);
+        C = mu * C + 0.5 * lambda * tr * tr;
 
         break;
     }
@@ -127,22 +127,22 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     case MaterialType::Corotation:
     {
         Eigen::JacobiSVD<Mat3d> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
-        Mat3d R = svd.matrixU()*svd.matrixV().adjoint();
+        Mat3d R = svd.matrixU() * svd.matrixV().adjoint();
         Vec3d Sigma(svd.singularValues());
         Mat3d invFT = svd.matrixU();
         invFT.col(0) /= Sigma(0);
         invFT.col(1) /= Sigma(1);
         invFT.col(2) /= Sigma(2);
         invFT *= svd.matrixV().adjoint();
-        double J = Sigma(0)*Sigma(1)*Sigma(2);
+        double J = Sigma(0) * Sigma(1) * Sigma(2);
         Mat3d FR = F - R;
 
-        P = 2 * mu*FR + lambda*(J - 1)*J*invFT;
+        P = 2 * mu * FR + lambda * (J - 1) * J * invFT;
 
-        C = FR(0, 0)*FR(0, 0) + FR(0, 1)*FR(0, 1) + FR(0, 2)*FR(0, 2)
-            + FR(1, 0)*FR(1, 0) + FR(1, 1)*FR(1, 1) + FR(1, 2)*FR(1, 2)
-            + FR(2, 0)*FR(2, 0) + FR(2, 1)*FR(2, 1) + FR(2, 2)*FR(2, 2);
-        C = mu*C + 0.5*lambda*(J - 1)*(J - 1);
+        C = FR(0, 0) * FR(0, 0) + FR(0, 1) * FR(0, 1) + FR(0, 2) * FR(0, 2)
+            + FR(1, 0) * FR(1, 0) + FR(1, 1) * FR(1, 1) + FR(1, 2) * FR(1, 2)
+            + FR(2, 0) * FR(2, 0) + FR(2, 1) * FR(2, 1) + FR(2, 2) * FR(2, 2);
+        C = mu * C + 0.5 * lambda * (J - 1) * (J - 1);
 
         break;
     }
@@ -151,13 +151,13 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     {
         Mat3d invFT = F.inverse().transpose();
         double logJ = log(F.determinant());
-        P = mu*(F - invFT) + lambda*logJ*invFT;
+        P = mu * (F - invFT) + lambda * logJ * invFT;
 
-        C = F(0, 0)*F(0, 0) + F(0, 1)*F(0, 1) + F(0, 2)*F(0, 2)
-            + F(1, 0)*F(1, 0) + F(1, 1)*F(1, 1) + F(1, 2)*F(1, 2)
-            + F(2, 0)*F(2, 0) + F(2, 1)*F(2, 1) + F(2, 2)*F(2, 2);
+        C = F(0, 0) * F(0, 0) + F(0, 1) * F(0, 1) + F(0, 2) * F(0, 2)
+            + F(1, 0) * F(1, 0) + F(1, 1) * F(1, 1) + F(1, 2) * F(1, 2)
+            + F(2, 0) * F(2, 0) + F(2, 1) * F(2, 1) + F(2, 2) * F(2, 2);
 
-        C = 0.5*mu*(C - 3) - mu*logJ + 0.5*lambda*logJ*logJ;
+        C = 0.5 * mu * (C - 3) - mu * logJ + 0.5 * lambda * logJ * logJ;
 
         break;
     }
@@ -179,19 +179,19 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     const double im3 = model.getInvMass(i3);
     const double im4 = model.getInvMass(i4);
 
-    Mat3d gradC = m_elementVolume*P*m_invRestMat.transpose();
+    Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();
 
-    double sum = im1*gradC.col(0).squaredNorm()
-                 + im2*gradC.col(1).squaredNorm()
-                 + im3*gradC.col(2).squaredNorm()
-                 + im4*(gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
+    double sum = im1 * gradC.col(0).squaredNorm()
+                 + im2 * gradC.col(1).squaredNorm()
+                 + im3 * gradC.col(2).squaredNorm()
+                 + im4 * (gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
 
     if (sum < m_epsilon)
     {
         return false;
     }
 
-    C = C*m_elementVolume;
+    C = C * m_elementVolume;
 
     const double s = C / sum;
 
@@ -212,7 +212,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
 
     if (im4 > 0)
     {
-        p3 += s*im4*(gradC.col(0) + gradC.col(1) + gradC.col(2));
+        p3 += s * im4 * (gradC.col(0) + gradC.col(1) + gradC.col(2));
     }
 
     return true;

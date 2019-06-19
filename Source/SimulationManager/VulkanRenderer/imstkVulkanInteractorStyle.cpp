@@ -99,8 +99,8 @@ VulkanInteractorStyle::OnTimer()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if(m_onTimerFunction &&
-       m_onTimerFunction(this))
+    if (m_onTimerFunction &&
+        m_onTimerFunction(this))
     {
         return;
     }
@@ -118,9 +118,9 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
 
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if(m_onCharFunctionMap.count(key) &&
-       m_onCharFunctionMap.at(key) &&
-       m_onCharFunctionMap.at(key)(this))
+    if (m_onCharFunctionMap.count(key) &&
+        m_onCharFunctionMap.at(key) &&
+        m_onCharFunctionMap.at(key)(this))
     {
         return;
     }
@@ -146,11 +146,11 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
         }
     }
     else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q'))// || key == 'e' || key == 'E')) // end Simulation
+             (key == 'q' || key == 'Q')) // || key == 'e' || key == 'E')) // end Simulation
     {
         m_simManager->endSimulation();
     }
-    else if (key == 'f' || key == 'F')//(key == 'd' || key == 'D') // switch rendering mode
+    else if (key == 'f' || key == 'F') //(key == 'd' || key == 'D') // switch rendering mode
     {
         if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::SIMULATION)
         {
@@ -161,11 +161,11 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
             m_simManager->getViewer()->setRenderingMode(Renderer::Mode::DEBUG);
         }
     }
-    else if (keyID == GLFW_KEY_ESCAPE) // quit viewer
+    else if (keyID == GLFW_KEY_ESCAPE)  // quit viewer
     {
         m_simManager->getViewer()->endRenderingLoop();
     }
-    else if (key == 'p' || key == 'P') // switch framerate display
+    else if (key == 'p' || key == 'P')  // switch framerate display
     {
     }
     else if (key == 'r' || key == 'R')

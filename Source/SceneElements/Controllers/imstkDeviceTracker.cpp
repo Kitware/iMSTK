@@ -68,7 +68,7 @@ DeviceTracker::updateTrackingData()
 
     // Apply Offsets
     m_currentPos = m_rotationOffset * m_currentPos * m_scaling + m_translationOffset;
-    m_currentRot = m_rotationOffset*m_currentRot;
+    m_currentRot = m_rotationOffset * m_currentRot;
 
     m_trackingDataUptoDate = true;
 

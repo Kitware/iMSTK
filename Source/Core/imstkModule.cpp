@@ -55,7 +55,7 @@ Module::start()
     std::chrono::steady_clock::time_point previous_t = std::chrono::steady_clock::now() - std::chrono::minutes(1);
     std::chrono::steady_clock::time_point current_t;
     long long elapsed;
-    while (m_status !=  ModuleStatus::TERMINATING)
+    while (m_status != ModuleStatus::TERMINATING)
     {
         if (m_status == ModuleStatus::PAUSING)
         {
@@ -65,7 +65,7 @@ Module::start()
         {
             // Short path to run module if loop delay = 0
             // (updating as fast as possible)
-            if(m_loopDelay == 0)
+            if (m_loopDelay == 0)
             {
                 if (m_preUpdateCallback)
                 {
@@ -82,7 +82,7 @@ Module::start()
             // If forcing a frequency, wait until enough time elapsed
             current_t = std::chrono::steady_clock::now();
             elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_t - previous_t).count();
-            if(elapsed >= m_loopDelay)
+            if (elapsed >= m_loopDelay)
             {
                 if (m_preUpdateCallback)
                 {
@@ -177,7 +177,7 @@ double Module::getLoopDelay() const
 void
 Module::setLoopDelay(const double milliseconds)
 {
-    if(milliseconds < 0)
+    if (milliseconds < 0)
     {
         LOG(WARNING) << "Module::setLoopDelay error: delay must be positive.";
         return;
@@ -187,29 +187,29 @@ Module::setLoopDelay(const double milliseconds)
 
 double Module::getFrequency() const
 {
-    if(m_loopDelay == 0)
+    if (m_loopDelay == 0)
     {
         LOG(WARNING) << "Module::getFrequency warning: loop delay is set to 0ms, "
                      << "therefore not regulated by a frequency. Returning 0.";
         return 0;
     }
-    return 1000.0/m_loopDelay;
+    return 1000.0 / m_loopDelay;
 }
 
 void
 Module::setFrequency(const double f)
 {
-    if(f < 0)
+    if (f < 0)
     {
         LOG(WARNING) << "Module::setFrequency error: f must be positive, "
                      << "or equal to 0 to run the module in a closed loop.";
         return;
     }
-    if(f == 0)
+    if (f == 0)
     {
         m_loopDelay = 0;
         return;
     }
-    m_loopDelay = 1000.0/f;
+    m_loopDelay = 1000.0 / f;
 }
 }

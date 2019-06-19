@@ -31,7 +31,7 @@ Jacobi::Jacobi(const SparseMatrixd& A, const Vectord& rhs) : Jacobi()
 void
 Jacobi::solve(Vectord& x)
 {
-    if(!m_linearSystem)
+    if (!m_linearSystem)
     {
         LOG(WARNING) << "Jacobi::solve: Linear system is not supplied for Gauss-Seidel solver!";
         return;
@@ -76,7 +76,7 @@ Jacobi::JacobiSolve(Vectord& x)
                 auto col = it.col();
                 if (k != col)
                 {
-                    aggregate += it.value()*xOld[col];
+                    aggregate += it.value() * xOld[col];
                 }
                 else
                 {

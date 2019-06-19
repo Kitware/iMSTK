@@ -42,7 +42,7 @@ NewtonSolver::NewtonSolver() :
 void
 NewtonSolver::solveGivenState(Vectord& x)
 {
-    if(!m_nonLinearSystem)
+    if (!m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
         return;
@@ -56,21 +56,21 @@ NewtonSolver::solveGivenState(Vectord& x)
 
     Vectord dx = x;
 
-    for(size_t i = 0; i < m_maxIterations; ++i)
+    for (size_t i = 0; i < m_maxIterations; ++i)
     {
-        if(fnorm < stopTolerance)
+        if (fnorm < stopTolerance)
         {
             return;
         }
         this->updateJacobian(x);
         m_linearSolver->solve(dx);
-        m_updateIterate(-dx,x);
+        m_updateIterate(-dx, x);
 
         double newNorm = fnorm;
 
         newNorm = this->armijo(dx, x, fnorm);
 
-        if(m_forcingTerm > 0.0 && newNorm > stopTolerance)
+        if (m_forcingTerm > 0.0 && newNorm > stopTolerance)
         {
             double ratio = newNorm / fnorm; // Ratio of successive residual norms
             this->updateForcingTerm(ratio, stopTolerance, fnorm);
@@ -98,7 +98,7 @@ NewtonSolver::solve()
     Vectord du = u; // make this a class member in future
 
     double error0, error;
-    double epsilon = m_relativeTolerance*m_relativeTolerance;
+    double epsilon = m_relativeTolerance * m_relativeTolerance;
     for (iterNum = 0; iterNum < m_maxIterations; ++iterNum)
     {
         error = updateJacobian(u);
@@ -158,7 +158,7 @@ NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, 
     double forcingTermSqr = m_forcingTerm * m_forcingTerm;
 
     // Save guard to prevent the forcing term to become too small for far away iterates
-    if(m_gamma * forcingTermSqr > 0.1)
+    if (m_gamma * forcingTermSqr > 0.1)
     {
         // TODO: Log this
         eta = std::max(eta, m_gamma * forcingTermSqr);

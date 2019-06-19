@@ -58,7 +58,7 @@ public:
         m_InvCellSize = Real(1.0) / m_CellSize;
 
         m_NTotalCells = 1u;
-        for(int i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             m_Resolution[i] = static_cast<unsigned int>(std::ceil((m_UpperCorner[i] - m_LowerCorner[i]) / m_CellSize));
             m_NTotalCells *= m_Resolution[i];
@@ -103,7 +103,7 @@ public:
     // Otherwise, the function must be explicitly instantiated with various IndexType
     {
         std::array<IndexType, 3> cellIdx;
-        for(int d = 0; d < 3; ++d)
+        for (int d = 0; d < 3; ++d)
         {
             cellIdx[d] = static_cast<IndexType>((ppos[d] - m_LowerCorner[d]) * m_InvCellSize);
         }
@@ -142,7 +142,7 @@ public:
     template<class Function>
     void loopAllCellData(Function&& func)
     {
-        for(auto& cellData: m_CellData)
+        for (auto& cellData: m_CellData)
         {
             func(cellData);
         }
@@ -161,7 +161,6 @@ private:
         assert(flatIndex < static_cast<IndexType>(m_NTotalCells));
         return flatIndex;
     }
-
 
     ///
     /// \brief Get linearized index of cell containing the positions ppos

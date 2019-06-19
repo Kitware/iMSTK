@@ -193,6 +193,7 @@ VulkanViewer::getVRSystem()
 {
     return m_renderer->m_VRSystem;
 }
+
 #endif
 
 void

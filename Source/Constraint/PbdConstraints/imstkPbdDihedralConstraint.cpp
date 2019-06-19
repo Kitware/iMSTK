@@ -46,7 +46,7 @@ PbdDihedralConstraint::initConstraint(PbdModel &model,
     const Vec3d n1 = (p2 - p0).cross(p3 - p0).normalized();
     const Vec3d n2 = (p3 - p1).cross(p2 - p1).normalized();
 
-    m_restAngle = atan2(n1.cross(n2).dot(p3 - p2), (p3 - p2).norm()*n1.dot(n2));
+    m_restAngle = atan2(n1.cross(n2).dot(p3 - p2), (p3 - p2).norm() * n1.dot(n2));
 }
 
 bool
@@ -93,37 +93,37 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
         return false;
     }
 
-    const auto grad0 = -(l / A1)*n1;
-    const auto grad1 = -(l / A2)*n2;
-    const auto grad2 = (e.dot(e1) / (A1*l))*n1 + (e.dot(e3) / (A2*l))*n2;
-    const auto grad3 = (e.dot(e2) / (A1*l))*n1 + (e.dot(e4) / (A2*l))*n2;
+    const auto grad0 = -(l / A1) * n1;
+    const auto grad1 = -(l / A2) * n2;
+    const auto grad2 = (e.dot(e1) / (A1 * l)) * n1 + (e.dot(e3) / (A2 * l)) * n2;
+    const auto grad3 = (e.dot(e2) / (A1 * l)) * n1 + (e.dot(e4) / (A2 * l)) * n2;
 
-    auto lambda = im0*grad0.squaredNorm() +
-                  im1*grad1.squaredNorm() +
-                  im2*grad2.squaredNorm() +
-                  im3*grad3.squaredNorm();
+    auto lambda = im0 * grad0.squaredNorm() +
+                  im1 * grad1.squaredNorm() +
+                  im2 * grad2.squaredNorm() +
+                  im3 * grad3.squaredNorm();
 
     // huge difference if use acos instead of atan2
-    lambda = (atan2(n1.cross(n2).dot(e), l*n1.dot(n2)) - m_restAngle) / lambda * m_stiffness;
+    lambda = (atan2(n1.cross(n2).dot(e), l * n1.dot(n2)) - m_restAngle) / lambda * m_stiffness;
 
     if (im0 > 0)
     {
-        p0 += -im0*lambda*grad0;
+        p0 += -im0 * lambda * grad0;
     }
 
     if (im1 > 0)
     {
-        p1 += -im1*lambda*grad1;
+        p1 += -im1 * lambda * grad1;
     }
 
     if (im2 > 0)
     {
-        p2 += -im2*lambda*grad2;
+        p2 += -im2 * lambda * grad2;
     }
 
     if (im3 > 0)
     {
-        p3 += -im3*lambda*grad3;
+        p3 += -im3 * lambda * grad3;
     }
 
     return true;

@@ -41,7 +41,7 @@ PbdAreaConstraint::initConstraint(PbdModel &model, const size_t& pIdx1,
     const Vec3d &p1 = state->getVertexPosition(pIdx2);
     const Vec3d &p2 = state->getVertexPosition(pIdx3);
 
-    m_restArea = 0.5*(p1 - p0).cross(p2 - p0).norm();
+    m_restArea = 0.5 * (p1 - p0).cross(p2 - p0).norm();
 }
 
 bool
@@ -66,7 +66,7 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
     const auto e3 = p2 - p0;
 
     auto n = e1.cross(e2);
-    const auto A = 0.5*n.norm();
+    const auto A = 0.5 * n.norm();
 
     if (A < m_epsilon)
     {
@@ -79,23 +79,23 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
     const auto grad1 = e3.cross(n);
     const auto grad2 = e1.cross(n);
 
-    auto lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm();
+    auto lambda = im0 * grad0.squaredNorm() + im1 * grad1.squaredNorm() + im2 * grad2.squaredNorm();
 
     lambda = (A - m_restArea) / lambda * m_stiffness;
 
     if (im0 > 0)
     {
-        p0 += -im0*lambda*grad0;
+        p0 += -im0 * lambda * grad0;
     }
 
     if (im1 > 0)
     {
-        p1 += -im1*lambda*grad1;
+        p1 += -im1 * lambda * grad1;
     }
 
     if (im2 > 0)
     {
-        p2 += -im2*lambda*grad2;
+        p2 += -im2 * lambda * grad2;
     }
 
     return true;

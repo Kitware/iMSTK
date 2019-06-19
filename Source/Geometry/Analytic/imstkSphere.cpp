@@ -52,7 +52,7 @@ Sphere::getRadius(DataType type /* = DataType::PostTransform */)
 void
 Sphere::setRadius(const double r)
 {
-    if(r <= 0)
+    if (r <= 0)
     {
         LOG(WARNING) << "Sphere::setRadius error: radius should be positive.";
         return;

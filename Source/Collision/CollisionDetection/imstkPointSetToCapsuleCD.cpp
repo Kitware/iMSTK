@@ -44,7 +44,7 @@ PointSetToCapsuleCD::computeCollisionData()
     // TODO: Fix this issue of extra computation in future
     auto p0 = capsulePos;
     auto p1 = p0 + m_capsule->getOrientationAxis() * length;
-    auto mid = 0.5*(p0 + p1);
+    auto mid = 0.5 * (p0 + p1);
     auto p = p1 - p0;
     auto pDotp = p.dot(p);
     auto pDotp0 = p.dot(p0);
@@ -53,7 +53,7 @@ PointSetToCapsuleCD::computeCollisionData()
     for (const auto& q : m_pointSet->getVertexPositions())
     {
         // First, check collision with bounding sphere
-        if ((mid - q).norm() > (radius + length*0.5))
+        if ((mid - q).norm() > (radius + length * 0.5))
         {
             nodeId++;
             continue;
@@ -61,7 +61,7 @@ PointSetToCapsuleCD::computeCollisionData()
 
         // Do the actual check
         auto alpha = (q.dot(p) - pDotp0) / pDotp;
-        auto closestPoint = p0 + p*alpha;
+        auto closestPoint = p0 + p * alpha;
 
         // If the point is inside the bounding sphere then the closest point
         // should be inside the capsule
@@ -69,7 +69,7 @@ PointSetToCapsuleCD::computeCollisionData()
         if (dist <= radius)
         {
             auto direction = (closestPoint - q) / dist;
-            auto pointOnCapsule = closestPoint - radius*direction;
+            auto pointOnCapsule = closestPoint - radius * direction;
             m_colData->MAColData.push_back({ nodeId, p - pointOnCapsule });
         }
         nodeId++;

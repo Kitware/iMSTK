@@ -312,7 +312,6 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
     m_activeSceneName = newSceneName;
 }
 
-
 void
 SimulationManager::launchSimulation()
 {
@@ -422,7 +421,6 @@ SimulationManager::infiniteLoopNoRenderingMode()
             continue;
         }
 
-
         if (c == ' ')
         {
             if (this->getStatus() == SimulationStatus::RUNNING)
@@ -514,7 +512,7 @@ SimulationManager::runSimulation()
     m_sceneManagerMap.at(m_activeSceneName)->run();
 
     // Run modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         (pair.second)->run();
     }
@@ -542,7 +540,7 @@ SimulationManager::pauseSimulation()
     m_sceneManagerMap.at(m_activeSceneName)->pause();
 
     // Pause other modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         (pair.second)->pause();
     }
@@ -581,7 +579,7 @@ SimulationManager::endSimulation()
     }
 
     // End modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         (pair.second)->end();
         m_threadMap.at(pair.first).join();

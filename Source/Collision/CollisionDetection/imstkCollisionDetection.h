@@ -83,6 +83,7 @@ public:
             m_colData = colData;
         }
     }
+
     CollisionDetection() = delete;
 
     ///

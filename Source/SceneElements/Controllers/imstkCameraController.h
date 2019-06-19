@@ -70,7 +70,6 @@ public:
     const Quatd& getCameraRotationOffset() const;
     void setCameraRotationOffset(const Quatd& r);
 
-
 protected:
     ///
     /// \brief

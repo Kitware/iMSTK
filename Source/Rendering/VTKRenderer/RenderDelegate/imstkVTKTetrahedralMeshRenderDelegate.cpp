@@ -47,7 +47,7 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
+    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
@@ -57,13 +57,13 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[4];
-    for(const auto &t : geometry->getTetrahedraVertices())
+    for (const auto &t : geometry->getTetrahedraVertices())
     {
-        for(size_t i = 0; i < 4; ++i)
+        for (size_t i = 0; i < 4; ++i)
         {
             cell[i] = t[i];
         }
-        cells->InsertNextCell(4,cell);
+        cells->InsertNextCell(4, cell);
     }
 
     // Create Unstructured Grid

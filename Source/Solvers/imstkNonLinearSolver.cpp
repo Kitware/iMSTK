@@ -41,10 +41,10 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 {
     /// Temporaries used in the line search
     std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
-    std::array<double, 3> lambda    = {m_sigma[0]*m_sigma[1], 1.0, 1.0};
+    std::array<double, 3> lambda    = {m_sigma[0] * m_sigma[1], 1.0, 1.0};
 
     /// Initialize temporaries
-    if(!m_nonLinearSystem)
+    if (!m_nonLinearSystem)
     {
         // TODO: log this
         return previousFnorm;
@@ -53,7 +53,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
     double currentFnorm = m_nonLinearSystem->m_F(x, !m_isSemiImplicit).norm();
 
     // Exit if the function norm satisfies the Armijo-Goldstein condition
-    if(currentFnorm < (1.0 - m_alpha * lambda[0])*previousFnorm)
+    if (currentFnorm < (1.0 - m_alpha * lambda[0]) * previousFnorm)
     {
         // TODO: Log this
         return currentFnorm;
@@ -64,17 +64,17 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 
     // Starts Armijo line search loop
     size_t i;
-    for(i = 0; i < m_armijoMax; ++i)
+    for (i = 0; i < m_armijoMax; ++i)
     {
         /// Update x and keep books on lambda
-        m_updateIterate(-lambda[0]*dx,x);
+        m_updateIterate(-lambda[0] * dx, x);
         lambda[2] = lambda[1];
         lambda[1] = lambda[0];
 
         currentFnorm = m_nonLinearSystem->m_F(x, !m_isSemiImplicit).norm();
 
         // Exit if the function norm satisfies the Armijo-Goldstein condition
-        if(currentFnorm < (1.0 - m_alpha * lambda[0])*previousFnorm)
+        if (currentFnorm < (1.0 - m_alpha * lambda[0]) * previousFnorm)
         {
             // TODO: Log this
             return currentFnorm;
@@ -88,7 +88,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
         this->parabolicModel(fnormSqr, lambda);
     }
 
-    if(i == m_armijoMax)
+    if (i == m_armijoMax)
     {
         // TODO: Add to logger
 //         std::cout << "Maximum number of Armijo iterations reached." << std::endl;
@@ -97,7 +97,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 }
 
 void
-NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm, std::array<double,3> &lambda)
+NonLinearSolver::parabolicModel(const std::array<double, 3> &fnorm, std::array<double, 3> &lambda)
 {
     /// Compute the coefficients for the interpolation polynomial:
     ///     p(lambda) = fnorm[0] + (b*lambda + a*lambda^2)/d1, where
@@ -108,7 +108,7 @@ NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm, std::array<do
     double a2 = lambda[1] * (fnorm[2] - fnorm[0]);
     double a = a1 - a2;
 
-    if(a >= 0)
+    if (a >= 0)
     {
         lambda[0] = m_sigma[0] * lambda[1];
         return;
@@ -117,12 +117,12 @@ NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm, std::array<do
     double b = lambda[1] * a2 - lambda[2] * a1;
     double newLambda = -.5 * b / a;
 
-    if(newLambda < m_sigma[0] * lambda[1])
+    if (newLambda < m_sigma[0] * lambda[1])
     {
         newLambda = m_sigma[0] * lambda[1];
     }
 
-    if(newLambda > m_sigma[1] * lambda[1])
+    if (newLambda > m_sigma[1] * lambda[1])
     {
         newLambda = m_sigma[1] * lambda[1];
     }
@@ -131,12 +131,12 @@ NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm, std::array<do
 }
 
 void
-NonLinearSolver::setSigma(const std::array<double,2> &newSigma)
+NonLinearSolver::setSigma(const std::array<double, 2> &newSigma)
 {
     m_sigma = newSigma;
 }
 
-const std::array<double,2> &
+const std::array<double, 2> &
 NonLinearSolver::getSigma() const
 {
     return m_sigma;

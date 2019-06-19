@@ -61,7 +61,6 @@ int main()
     LOG(WARNING) << "Phantom device option not enabled during build!";
 #endif
 
-
     // Load Mesh
     auto mesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<VisualObject>("meshObject");

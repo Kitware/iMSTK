@@ -84,7 +84,7 @@ int main()
             if (time - lastTime > 1000)
             {
                 auto seconds = (int)((lastTime - startTime) / 1000);
-                windowText->setText("Elapsed Time: " + std::to_string(seconds)+ "s");
+                windowText->setText("Elapsed Time: " + std::to_string(seconds) + "s");
                 lastTime = time;
             }
 
