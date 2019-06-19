@@ -71,7 +71,7 @@ int main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // Constant density constraint with stiffness
-    pbdParams->m_constraints.push_back({ PbdConstraint::Type::ConstantDensity, 1.0 });
+    pbdParams->enableConstraint(PbdConstraint::Type::ConstantDensity, 1.0);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;

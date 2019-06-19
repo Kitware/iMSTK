@@ -34,6 +34,20 @@
 
 namespace imstk
 {
+void PBDModelConfig::enableConstraint(PbdConstraint::Type type, double stiffness)
+{
+    LOG_IF(FATAL, (type == PbdConstraint::Type::FEMTet || type == PbdConstraint::Type::FEMHex))
+        << "FEM constraint should be enabled by the enableFEMConstraint function";
+    m_RegularConstraints.push_back({type, stiffness});
+}
+
+void PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material)
+{
+    LOG_IF(FATAL, (type != PbdConstraint::Type::FEMTet && type != PbdConstraint::Type::FEMHex))
+        << "Non-FEM constraint should be enabled by the enableConstraint function";
+    m_FEMConstraints.push_back({type, material});
+}
+
 void
 PbdModel::configure(const std::shared_ptr<PBDModelConfig>& params)
 {
@@ -73,39 +87,46 @@ PbdModel::initialize()
         setFixedPoint(i);
     }
 
-    bool bOK = true;
-    for(auto& constraint: m_Parameters->m_constraints)
+    bool bOK = true; // Return immediately if some constraint failed to initialize
+
+    // Initialize FEM constraints
+    for(auto& constraint: m_Parameters->m_FEMConstraints)
     {
         if(!bOK)
         {
             return false;
         }
-        switch(constraint.m_type)
-        {
-        case PbdConstraint::Type::FEMTet:
-        case PbdConstraint::Type::FEMHex:
-            computeElasticConstants();
-            bOK = initializeFEMConstraints(constraint.m_FEMMaterial);
-            break;
+        computeElasticConstants();
+        bOK = initializeFEMConstraints(constraint.second);
+    }
 
+    // Initialize other constraints
+    for(auto& constraint: m_Parameters->m_RegularConstraints)
+    {
+        if(!bOK)
+        {
+            return false;
+        }
+        switch(constraint.first)
+        {
         case PbdConstraint::Type::Volume:
-            bOK = initializeVolumeConstraints(constraint.m_stiffness);
+            bOK = initializeVolumeConstraints(constraint.second);
             break;
 
         case PbdConstraint::Type::Distance:
-            bOK = initializeDistanceConstraints(constraint.m_stiffness);
+            bOK = initializeDistanceConstraints(constraint.second);
             break;
 
         case PbdConstraint::Type::Area:
-            bOK = initializeAreaConstraints(constraint.m_stiffness);
+            bOK = initializeAreaConstraints(constraint.second);
             break;
 
         case PbdConstraint::Type::Dihedral:
-            bOK = initializeDihedralConstraints(constraint.m_stiffness);
+            bOK = initializeDihedralConstraints(constraint.second);
             break;
 
         case PbdConstraint::Type::ConstantDensity:
-            bOK = initializeConstantDensityConstraint(constraint.m_stiffness);
+            bOK = initializeConstantDensityConstraint(constraint.second);
             break;
 
         default:

@@ -97,8 +97,7 @@ int main()
     // FEM constraint
     pbdParams->m_YoungModulus = 1.0;
     pbdParams->m_PoissonRatio = 0.3;
-    pbdParams->m_constraints.push_back({ PbdConstraint::Type::FEMTet,
-                                         PbdFEMConstraint::MaterialType::NeoHookean });
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::NeoHookean);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;

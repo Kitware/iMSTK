@@ -82,8 +82,8 @@ int main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // Constraints
-    pbdParams->m_constraints.push_back({ PbdConstraint::Type::Distance, 0.1 });
-    pbdParams->m_constraints.push_back({ PbdConstraint::Type::Dihedral, 0.001 });
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
     pbdParams->m_fixedNodeIds = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
     // Other parameters

@@ -81,9 +81,8 @@ int main()
     // FEM constraint
     pbdParams->m_YoungModulus = 100.0;
     pbdParams->m_PoissonRatio = 0.3;
-    pbdParams->m_constraints.push_back({ PbdConstraint::Type::FEMTet,
-                                         PbdFEMConstraint::MaterialType::StVK });
     pbdParams->m_fixedNodeIds = {51, 127, 178};
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;

@@ -50,30 +50,28 @@ struct PBDModelConfig
     double m_DefaultDt;                     ///> Default Time step size
 
     std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
+    Vec3r m_gravity;                         ///> Gravity
 
-    Vec3r m_gravity;                        ///> Gravity
+    double m_mu;           ///> Lame constant, if constraint type is FEM
+    double m_lambda;       ///> Lame constant, if constraint type is FEM
 
-    ////////////////////////////////////////////////////////////////////////////////
-    struct Constraint
-    {
-        Constraint(PbdConstraint::Type type, double stiffness) :
-            m_type(type), m_stiffness(stiffness) {}
+    double m_YoungModulus; ///> FEM parameter, if constraint type is FEM
+    double m_PoissonRatio; ///> FEM parameter, if constraint type is FEM
 
-        Constraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType FEMMaterial) :
-            m_type(type), m_FEMMaterial(FEMMaterial) {}
+    std::vector<std::pair<PbdConstraint::Type, double>>    m_RegularConstraints; ///> Constraints except FEM
+    std::vector<std::pair<PbdConstraint::Type,
+                          PbdFEMConstraint::MaterialType>> m_FEMConstraints;     ///> FEM constraints
 
-        PbdConstraint::Type m_type;                   ///> Type of constraint
-        double m_stiffness;                           ///> Constraint stiffness, if applicable
-        PbdFEMConstraint::MaterialType m_FEMMaterial; ///> FEM material if constraint type is FEM
-    };
+    ///
+    /// \brief Enable a regular constraint (constraint that is not FEM constraint)
+    /// with a given constraint stiffness
+    ///
+    void enableConstraint(PbdConstraint::Type type, double stiffness);
 
-    double m_mu;                                    ///> Lame constant, if constraint type is FEM
-    double m_lambda;                                ///> Lame constant, if constraint type is FEM
-
-    double m_YoungModulus;                          ///> FEM parameter, if constraint type is FEM
-    double m_PoissonRatio;                          ///> FEM parameter, if constraint type is FEM
-
-    std::vector<Constraint> m_constraints;
+    ///
+    /// \brief Enable a FEM constraint with a given FEM material
+    ///
+    void enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material);
 };
 
 ///
