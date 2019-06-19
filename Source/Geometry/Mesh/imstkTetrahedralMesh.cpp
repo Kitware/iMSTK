@@ -91,7 +91,7 @@ TetrahedralMesh::getVolume() const
             LOG(WARNING) << "Tetrahedron is inverted, has negative volume!";
         }
 
-        volume += std::abs(det)/6;
+        volume += std::abs(det) / 6;
     }
 
     return volume;
@@ -284,6 +284,7 @@ TetrahedralMesh::setTetrahedraVertices(const std::vector<TetraArray>& tetrahedra
 {
     m_tetrahedraVertices = tetrahedra;
 }
+
 const std::vector<TetrahedralMesh::TetraArray>&
 TetrahedralMesh::getTetrahedraVertices() const
 {

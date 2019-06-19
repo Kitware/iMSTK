@@ -73,7 +73,6 @@ public:
         none
     };
 
-
 public:
     ///
     /// \brief Constructor

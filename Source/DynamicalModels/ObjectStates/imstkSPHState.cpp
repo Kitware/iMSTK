@@ -28,7 +28,7 @@ namespace imstk
 
 void SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const StdVectorOfVec3r& velocities)
 {
-    if((positions.size() != velocities.size()) && (velocities.size() != 0))
+    if ((positions.size() != velocities.size()) && (velocities.size() != 0))
     {
         LOG(FATAL) << "Invalid input";
     }
@@ -36,12 +36,11 @@ void SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const
     m_Positions = positions;
     m_Velocities = velocities;
 
-    if(m_Velocities.size() != m_Positions.size())
+    if (m_Velocities.size() != m_Positions.size())
     {
         m_Velocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
     }
 }
-
 
 void SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
 {
@@ -49,12 +48,11 @@ void SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
     m_Velocities = rhs->m_Velocities;
 }
 
-
 // SPHSimulationState implementation ===>
 
 void SPHSimulationState::initializeData()
 {
-    if(!m_KinematicState)
+    if (!m_KinematicState)
     {
         LOG(FATAL) << "SPH basic state has not been initialized";
     }

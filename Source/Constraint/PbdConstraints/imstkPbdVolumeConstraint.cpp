@@ -43,7 +43,7 @@ PbdVolumeConstraint::initConstraint(PbdModel &model, const size_t &pIdx1,
     const Vec3d &p2 = state->getVertexPosition(pIdx3);
     const Vec3d &p3 = state->getVertexPosition(pIdx4);
 
-    m_restVolume = (1.0 / 6.0)*((p1 - p0).cross(p2 - p0)).dot(p3 - p0);
+    m_restVolume = (1.0 / 6.0) * ((p1 - p0).cross(p2 - p0)).dot(p3 - p0);
 }
 
 bool
@@ -68,38 +68,38 @@ PbdVolumeConstraint::solvePositionConstraint(PbdModel &model)
 
     const double onesixth = 1.0 / 6.0;
 
-    const Vec3d grad1 = onesixth*(x2 - x3).cross(x4 - x2);
-    const Vec3d grad2 = onesixth*(x3 - x1).cross(x4 - x1);
-    const Vec3d grad3 = onesixth*(x4 - x1).cross(x2 - x1);
-    const Vec3d grad4 = onesixth*(x2 - x1).cross(x3 - x1);
+    const Vec3d grad1 = onesixth * (x2 - x3).cross(x4 - x2);
+    const Vec3d grad2 = onesixth * (x3 - x1).cross(x4 - x1);
+    const Vec3d grad3 = onesixth * (x4 - x1).cross(x2 - x1);
+    const Vec3d grad4 = onesixth * (x2 - x1).cross(x3 - x1);
 
     const auto V = grad4.dot(x4 - x1);
 
-    double lambda = im1*grad1.squaredNorm() +
-                    im2*grad2.squaredNorm() +
-                    im3*grad3.squaredNorm() +
-                    im4*grad4.squaredNorm();
+    double lambda = im1 * grad1.squaredNorm() +
+                    im2 * grad2.squaredNorm() +
+                    im3 * grad3.squaredNorm() +
+                    im4 * grad4.squaredNorm();
 
     lambda = (V - m_restVolume) / lambda * m_stiffness;
 
     if (im1 > 0)
     {
-        x1 += -im1*lambda*grad1;
+        x1 += -im1 * lambda * grad1;
     }
 
     if (im2 > 0)
     {
-        x2 += -im2*lambda*grad2;
+        x2 += -im2 * lambda * grad2;
     }
 
     if (im3 > 0)
     {
-        x3 += -im3*lambda*grad3;
+        x3 += -im3 * lambda * grad3;
     }
 
     if (im4 > 0)
     {
-        x4 += -im4*lambda*grad4;
+        x4 += -im4 * lambda * grad4;
     }
 
     return true;

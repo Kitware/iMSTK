@@ -35,7 +35,7 @@ void Capsule::print() const
 double
 Capsule::getVolume() const
 {
-    return PI * m_radius * m_radius *(m_length + 4.0 / 3.0 * m_radius);
+    return PI * m_radius * m_radius * (m_length + 4.0 / 3.0 * m_radius);
 }
 
 double
@@ -52,7 +52,7 @@ Capsule::getRadius(DataType type /* = DataType::PostTransform */)
 void
 Capsule::setRadius(const double r)
 {
-    if(r <= 0)
+    if (r <= 0)
     {
         LOG(WARNING) << "Capsule::setRadius error: radius should be positive.";
         return;
@@ -72,6 +72,7 @@ Capsule::getLength(DataType type /* = DataType::PostTransform */)
     }
     return m_radius;
 }
+
 void
 Capsule::setLength(const double l)
 {

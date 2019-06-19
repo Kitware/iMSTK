@@ -52,7 +52,6 @@ public:
 
     virtual ~NonLinearSystem(){};
 
-
     ///
     /// \brief Set nonlinear method that evaluates the nonlinear function.
     ///

@@ -26,7 +26,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
                            std::shared_ptr<SurfaceMesh> meshB,
                            std::shared_ptr<CollisionData> colData) :
@@ -77,7 +78,7 @@ MeshToMeshCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
                          float t, void *userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
-    if(CD == nullptr)
+    if (CD == nullptr)
     {
         return;
     }
@@ -92,7 +93,7 @@ MeshToMeshCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
                           float t, void *userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
-    if(CD == nullptr)
+    if (CD == nullptr)
     {
         return;
     }
@@ -107,7 +108,7 @@ MeshToMeshCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
                           float t, void *userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
-    if(CD == nullptr)
+    if (CD == nullptr)
     {
         return;
     }

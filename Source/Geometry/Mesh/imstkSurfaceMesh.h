@@ -67,7 +67,8 @@ template<> struct less<imstk::NormalGroup>
 };
 }
 
-namespace imstk {
+namespace imstk
+{
 ///
 /// \class SurfaceMesh
 ///

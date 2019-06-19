@@ -83,13 +83,13 @@ TEST_F(imstkModuleTest, GetSetLoopDelay)
 TEST_F(imstkModuleTest, SetFrequency)
 {
     m_module.setFrequency(60);
-    EXPECT_EQ(m_module.getLoopDelay(), 1000.0/60.0);
+    EXPECT_EQ(m_module.getLoopDelay(), 1000.0 / 60.0);
 
     m_module.setFrequency(0.003);
-    EXPECT_EQ(m_module.getLoopDelay(), 1000.0/0.003);
+    EXPECT_EQ(m_module.getLoopDelay(), 1000.0 / 0.003);
 
     m_module.setFrequency(400000000);
-    EXPECT_EQ(m_module.getLoopDelay(), 1000.0/400000000);
+    EXPECT_EQ(m_module.getLoopDelay(), 1000.0 / 400000000);
 
     m_module.setFrequency(0);
     EXPECT_EQ(m_module.getLoopDelay(), 0);
@@ -101,13 +101,13 @@ TEST_F(imstkModuleTest, SetFrequency)
 TEST_F(imstkModuleTest, GetFrequency)
 {
     m_module.setLoopDelay(2);
-    EXPECT_EQ(m_module.getFrequency(), 1000.0/2);
+    EXPECT_EQ(m_module.getFrequency(), 1000.0 / 2);
 
     m_module.setLoopDelay(0.003);
-    EXPECT_EQ(m_module.getFrequency(), 1000.0/0.003);
+    EXPECT_EQ(m_module.getFrequency(), 1000.0 / 0.003);
 
     m_module.setLoopDelay(400000000);
-    EXPECT_EQ(m_module.getFrequency(), 1000.0/400000000);
+    EXPECT_EQ(m_module.getFrequency(), 1000.0 / 400000000);
 
     m_module.setLoopDelay(0);
     EXPECT_EQ(m_module.getFrequency(), 0);

@@ -42,7 +42,7 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
+    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();

@@ -25,7 +25,6 @@
 // imstk
 #include "imstkCollisionHandling.h"
 
-
 namespace imstk
 {
 class CollidingObject;
@@ -85,7 +84,7 @@ private:
     double m_stiffness = 10e-01;                ///> Stiffness coefficient associated with virtual coupling object
     double m_damping = 0.005;                   ///> Damping coefficient associated with virtual coupling object
 
-    double m_angularSpeed = 10*PI;              ///> Angular speed of the drill (rad per sec)
+    double m_angularSpeed = 10 * PI;              ///> Angular speed of the drill (rad per sec)
     double m_BoneHardness = 10;                 ///> Angular speed of the drill (rad per sec)
 
     std::vector<double> m_nodalDensity;         ///> Density of the bone

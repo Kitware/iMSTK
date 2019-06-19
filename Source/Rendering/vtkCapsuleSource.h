@@ -42,7 +42,7 @@
 class vtkCapsuleSource : public vtkPolyDataAlgorithm
 {
 public:
-    vtkTypeMacro(vtkCapsuleSource,vtkPolyDataAlgorithm);
+    vtkTypeMacro(vtkCapsuleSource, vtkPolyDataAlgorithm);
     void PrintSelf(ostream& os, vtkIndent indent);
 
     // Description:
@@ -52,30 +52,30 @@ public:
 
     // Description:
     // Set radius of sphere. Default is 0.5.
-    vtkSetClampMacro(Radius,double,0.0,VTK_DOUBLE_MAX);
-    vtkGetMacro(Radius,double);
+    vtkSetClampMacro(Radius, double, 0.0, VTK_DOUBLE_MAX);
+    vtkGetMacro(Radius, double);
 
     // Description:
     // Set the center of the sphere. Default is 0,0,0.
-    vtkSetVector3Macro(Center,double);
-    vtkGetVectorMacro(Center,double,3);
+    vtkSetVector3Macro(Center, double);
+    vtkGetVectorMacro(Center, double, 3);
 
     // Description:
     // Set the length of the cylinder. Default is 1.0.
-    vtkSetClampMacro(CylinderLength,double, 0.0, VTK_DOUBLE_MAX);
-    vtkGetMacro(CylinderLength,double);
+    vtkSetClampMacro(CylinderLength, double, 0.0, VTK_DOUBLE_MAX);
+    vtkGetMacro(CylinderLength, double);
 
     // Description:
     // Set the number of points used in the longitude direction
     // for the capsule extremities.
-    vtkSetClampMacro(ThetaResolution,int,3,VTK_MAX_SPHERE_RESOLUTION);
-    vtkGetMacro(ThetaResolution,int);
+    vtkSetClampMacro(ThetaResolution, int, 3, VTK_MAX_SPHERE_RESOLUTION);
+    vtkGetMacro(ThetaResolution, int);
 
     // Description:
     // Set the number of points used in the lattitude direction
     // for the capsule extremities.
-    vtkSetClampMacro(PhiResolution,int,3,VTK_MAX_SPHERE_RESOLUTION);
-    vtkGetMacro(PhiResolution,int);
+    vtkSetClampMacro(PhiResolution, int, 3, VTK_MAX_SPHERE_RESOLUTION);
+    vtkGetMacro(PhiResolution, int);
 
     // Description:
     // Cause the sphere to be tessellated with edges along the latitude
@@ -84,9 +84,9 @@ public:
     // longitude lines. If on, quadrilaterals are generated everywhere
     // except at the poles. This can be useful for generating a wireframe
     // sphere with natural latitude and longitude lines.
-    vtkSetMacro(LatLongTessellation,int);
-    vtkGetMacro(LatLongTessellation,int);
-    vtkBooleanMacro(LatLongTessellation,int);
+    vtkSetMacro(LatLongTessellation, int);
+    vtkGetMacro(LatLongTessellation, int);
+    vtkBooleanMacro(LatLongTessellation, int);
 
 protected:
     vtkCapsuleSource(int res = 8);

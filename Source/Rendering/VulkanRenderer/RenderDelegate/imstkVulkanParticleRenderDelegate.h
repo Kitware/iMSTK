@@ -33,7 +33,8 @@ namespace imstk
 ///
 /// \brief Billboard render delegate for RenderParticles
 ///
-class VulkanParticleRenderDelegate : public VulkanRenderDelegate {
+class VulkanParticleRenderDelegate : public VulkanRenderDelegate
+{
 public:
 
     ///
@@ -63,7 +64,6 @@ public:
     ///
     void initializeData(VulkanMemoryManager& memoryManager,
                         std::shared_ptr<RenderMaterial> material = nullptr);
-
 
 protected:
     VulkanLocalParticleVertexUniforms m_particleVertexUniforms;

@@ -71,7 +71,7 @@ PbdModel::configure(const int nCons, ...)
         gStream >> x;
         gStream >> y;
         gStream >> z;
-        Vec3d g(x,y,z);
+        Vec3d g(x, y, z);
         this->setGravity(g);
 
         this->setTimeStep(va_arg(args, double));
@@ -84,7 +84,7 @@ PbdModel::configure(const int nCons, ...)
             size_t n;
             while (stream >> n)
             {
-                m_fixedNodeIds.push_back(n-1);
+                m_fixedNodeIds.push_back(n - 1);
             }
         }
         this->setMaxNumIterations(va_arg(args, int));
@@ -252,8 +252,8 @@ PbdModel::initialize()
 void
 PbdModel::computeLameConstants(const double E, const double nu)
 {
-    m_mu = E/(2*(1+nu));
-    m_lambda = E*nu/((1-2*nu)*(1+nu));
+    m_mu = E / (2 * (1 + nu));
+    m_lambda = E * nu / ((1 - 2 * nu) * (1 + nu));
 }
 
 bool
@@ -695,9 +695,9 @@ PbdModel::integratePosition()
     {
         if (m_invMass[i] != 0.0)
         {
-            vel[i] += (accn[i] + m_gravity)*m_dt;
+            vel[i] += (accn[i] + m_gravity) * m_dt;
             prevPos[i] = pos[i];
-            pos[i] += (1.0 - m_viscousDampingCoeff)*vel[i] * m_dt;
+            pos[i] += (1.0 - m_viscousDampingCoeff) * vel[i] * m_dt;
         }
     }
 }

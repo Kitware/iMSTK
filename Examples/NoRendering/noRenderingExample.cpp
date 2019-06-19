@@ -48,7 +48,7 @@ int main()
     static const int nRows = 5;
     static const int nCols = 5;
     const double epsilon = 1e-5;
-    vertList.resize(nRows*nCols);
+    vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
     std::cout << " initialPositions = {" << std::endl;
@@ -56,10 +56,10 @@ int main()
     {
         for (int j = 0; j < nCols; j++)
         {
-            vertList[i*nCols + j] = Vec3d((double)dx*i, 1.0, (double)dy*j);
-            std::cout << vertList[i*nCols + j][0] << ", "
-                      << vertList[i*nCols + j][1] << ", "
-                      << vertList[i*nCols + j][2] << ",    ";
+            vertList[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
+            std::cout << vertList[i * nCols + j][0] << ", "
+                      << vertList[i * nCols + j][1] << ", "
+                      << vertList[i * nCols + j][2] << ",    ";
         }
         std::cout << std::endl;
     }
@@ -74,8 +74,8 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, (i + 1)*nCols + j, i*nCols + j + 1 } };
-            tri[1] = { { (i + 1)*nCols + j + 1, i*nCols + j + 1, (i + 1)*nCols + j } };
+            tri[0] = { { i*nCols + j, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, i * nCols + j + 1, (i + 1) * nCols + j } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -120,9 +120,9 @@ int main()
 
     // Method to call after the simulation is done running
     static StdVectorOfVec3d lastPositions; // Vertex positions at the last iteration
-    lastPositions.resize(nRows*nCols);
+    lastPositions.resize(nRows * nCols);
     static StdVectorOfVec3d beforeLastPositions; // Vertex positions at the (N-1) iteration
-    beforeLastPositions.resize(nRows*nCols);
+    beforeLastPositions.resize(nRows * nCols);
 
     auto func =
         [&surfMesh](Module* module)
@@ -132,8 +132,8 @@ int main()
             {
                 for (int j = 0; j < nCols; j++)
                 {
-                    beforeLastPositions[i*nCols + j] = lastPositions[i*nCols + j];
-                    lastPositions[i*nCols + j] = newPositions[i*nCols + j];
+                    beforeLastPositions[i * nCols + j] = lastPositions[i * nCols + j];
+                    lastPositions[i * nCols + j] = newPositions[i * nCols + j];
                 }
             }
         };
@@ -183,7 +183,7 @@ int main()
     {
         for (int j = 0; j < nCols; j++)
         {
-            std::cout << lastPositions[i*nCols + j][0] << ", " << lastPositions[i*nCols + j][1] << ", " << lastPositions[i*nCols + j][2] << ", " << std::endl;
+            std::cout << lastPositions[i * nCols + j][0] << ", " << lastPositions[i * nCols + j][1] << ", " << lastPositions[i * nCols + j][2] << ", " << std::endl;
         }
     }
 
@@ -194,13 +194,13 @@ int main()
             for (int k = 0; k < 3; ++k)
             {
                 sameLastStateSuccess &= vtkMathUtilities::FuzzyCompare(
-                  beforeLastPositions[i*nCols + j][k], lastPositions[i*nCols + j][k], epsilon);
+                  beforeLastPositions[i * nCols + j][k], lastPositions[i * nCols + j][k], epsilon);
 
                 expectedLastStateSuccess &= vtkMathUtilities::FuzzyCompare(
-                  lastPositions[i*nCols + j][k], expectedFinalPositions[i*nCols + j][k]);
+                  lastPositions[i * nCols + j][k], expectedFinalPositions[i * nCols + j][k]);
                 if (!expectedLastStateSuccess)
                 {
-                    std::cout << lastPositions[i*nCols + j][k] << "  " << expectedFinalPositions[i*nCols + j][k]<< std::endl;
+                    std::cout << lastPositions[i * nCols + j][k] << "  " << expectedFinalPositions[i * nCols + j][k] << std::endl;
                     expectedLastStateSuccess = true;
                 }
             }

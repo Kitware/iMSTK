@@ -27,7 +27,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 void
 SphereToSphereCD::computeCollisionData()
 {
@@ -47,16 +48,16 @@ SphereToSphereCD::computeCollisionData()
     double d = dirAToB.norm();
 
     // Return if no penetration
-    double penetrationDepth = rA+rB-d;
-    if ( penetrationDepth <= 0)
+    double penetrationDepth = rA + rB - d;
+    if (penetrationDepth <= 0)
     {
         return;
     }
 
     // Compute collision points
     dirAToB.normalize();
-    Vec3d sphereAColPt = sphereAPos + dirAToB*rA;
-    Vec3d sphereBColPt = sphereBPos - dirAToB*rB;
+    Vec3d sphereAColPt = sphereAPos + dirAToB * rA;
+    Vec3d sphereBColPt = sphereBPos - dirAToB * rB;
 
     // Set collisionData
     m_colData->PDColData.push_back({sphereAColPt, sphereBColPt, dirAToB, penetrationDepth});

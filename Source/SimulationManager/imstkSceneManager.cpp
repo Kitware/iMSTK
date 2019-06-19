@@ -138,7 +138,7 @@ SceneManager::runModule()
         }
     }
 
-    m_scene->setFPS(1./wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
+    m_scene->setFPS(1. / wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
 }
 
 void
@@ -151,6 +151,7 @@ SceneManager::cleanUpModule()
         m_threadMap.at(camController->getName()).join();
     }
 }
+
 void
 SceneManager::startModuleInNewThread(std::shared_ptr<Module> module)
 {

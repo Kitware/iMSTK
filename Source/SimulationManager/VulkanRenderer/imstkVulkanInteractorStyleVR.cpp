@@ -87,8 +87,8 @@ VulkanInteractorStyleVR::updateVRDevices()
 
             // Display device only if controller
             auto deviceClass = m_renderer->m_VRSystem->GetTrackedDeviceClass(i);
-            if(i != vr::k_unTrackedDeviceIndex_Hmd
-               && deviceClass == vr::TrackedDeviceClass::TrackedDeviceClass_Controller)
+            if (i != vr::k_unTrackedDeviceIndex_Hmd
+                && deviceClass == vr::TrackedDeviceClass::TrackedDeviceClass_Controller)
             {
                 m_devices[name]->m_rendered = true;
                 this->addVisualVRObject(m_devices[name]);

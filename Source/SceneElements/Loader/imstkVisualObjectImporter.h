@@ -68,7 +68,7 @@ public:
         const std::string& modelFilePath,
         const std::string& textureFolderPath,
         const double scale = 1.0,
-        const Vec3d& translation = Vec3d(0,0,0),
+        const Vec3d& translation = Vec3d(0, 0, 0),
         const std::string& fileExtension = "");
 
 private:

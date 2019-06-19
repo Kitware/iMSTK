@@ -57,7 +57,7 @@ Canvas::render()
 
         if (needsWindow)
         {
-            ImGui::SetNextWindowPos(ImVec2(0,0));
+            ImGui::SetNextWindowPos(ImVec2(0, 0));
             ImGui::SetNextWindowBgAlpha(0.0);
             ImGui::Begin("", nullptr, ImGuiWindowFlags_NoInputs
                 | ImGuiWindowFlags_NoTitleBar

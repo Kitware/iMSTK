@@ -24,7 +24,8 @@
 
 #include "imstkAnalyticalGeometry.h"
 
-namespace imstk {
+namespace imstk
+{
 ///
 /// \class Cube
 ///

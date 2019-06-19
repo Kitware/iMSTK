@@ -156,7 +156,7 @@ bool
 VTKMeshIO::writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const std::string & filePath)
 {
     vtkPolyData* vtkMesh = convertSurfaceMeshToVtkPolyData(imstkMesh);
-    if (!vtkMesh) //conversion unsuccessful
+    if (!vtkMesh)  //conversion unsuccessful
     {
         return false;
     }
@@ -220,7 +220,7 @@ VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkM
 std::shared_ptr<SurfaceMesh>
 VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
 {
-    if(!vtkMesh)
+    if (!vtkMesh)
     {
         LOG(WARNING) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
         return nullptr;
@@ -303,7 +303,7 @@ VTKMeshIO::convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<Hexahedral
 std::shared_ptr<VolumetricMesh>
 VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh)
 {
-    if(!vtkMesh)
+    if (!vtkMesh)
     {
         LOG(WARNING) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
         return nullptr;
@@ -312,8 +312,8 @@ VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMe
     StdVectorOfVec3d vertices;
     VTKMeshIO::copyVerticesFromVtk(vtkMesh->GetPoints(), vertices);
 
-    int cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells()-1);
-    if( cellType == VTK_TETRA )
+    int cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells() - 1);
+    if (cellType == VTK_TETRA)
     {
         std::vector<TetrahedralMesh::TetraArray> cells;
         VTKMeshIO::copyCellsFromVtk<4>(vtkMesh->GetCells(), cells);
@@ -322,7 +322,7 @@ VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMe
         mesh->initialize(vertices, cells, false);
         return mesh;
     }
-    else if( cellType == VTK_HEXAHEDRON )
+    else if (cellType == VTK_HEXAHEDRON)
     {
         std::vector<HexahedralMesh::HexaArray> cells;
         VTKMeshIO::copyCellsFromVtk<8>(vtkMesh->GetCells(), cells);
@@ -342,14 +342,14 @@ VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMe
 void
 VTKMeshIO::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
 {
-    if(!points)
+    if (!points)
     {
         LOG(WARNING) << "VTKMeshIO::copyVerticesFromVtk error: No points found.";
         return;
     }
 
     vertices.reserve(points->GetNumberOfPoints());
-    for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
+    for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
     {
         double pos[3];
         points->GetPoint(i, pos);
@@ -393,9 +393,9 @@ void VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells
 
 template<size_t dim>
 void
-VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t,dim>>& cells)
+VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells)
 {
-    if(!vtkCells)
+    if (!vtkCells)
     {
         LOG(WARNING) << "VTKMeshIO::copyCellsFromVtk error: No cells found.";
         return;
@@ -405,13 +405,13 @@ VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_
     vtkCells->InitTraversal();
     auto vtkCell = vtkSmartPointer<vtkIdList>::New();
     std::array<size_t, dim> cell;
-    while(vtkCells->GetNextCell(vtkCell))
+    while (vtkCells->GetNextCell(vtkCell))
     {
         if (vtkCell->GetNumberOfIds() != dim)
         {
             continue;
         }
-        for(size_t i = 0; i < dim; ++i)
+        for (size_t i = 0; i < dim; ++i)
         {
             cell[i] = vtkCell->GetId(i);
         }
@@ -422,7 +422,7 @@ VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_
 void
 VTKMeshIO::copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap)
 {
-    if(!pointData)
+    if (!pointData)
     {
         return;
     }
@@ -434,7 +434,7 @@ VTKMeshIO::copyPointData(vtkPointData* pointData, std::map<std::string, StdVecto
         int nbrOfComp = array->GetNumberOfComponents();
         vtkIdType nbrOfTuples = array->GetNumberOfTuples();
         StdVectorOfVectorf data;
-        for(vtkIdType j = 0; j < nbrOfTuples; ++j)
+        for (vtkIdType j = 0; j < nbrOfTuples; ++j)
         {
             double* tupleData = new double [nbrOfComp];
             array->GetTuple(j, tupleData);

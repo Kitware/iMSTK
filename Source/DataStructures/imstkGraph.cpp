@@ -53,7 +53,7 @@ Graph::addEdge(const size_t v, const size_t w)
 void
 Graph::print() const
 {
-    cout << "Graph: " << "\nTotal nodes: " << m_adjList.size() << "\nAdjacency:"<< endl;
+    cout << "Graph: " << "\nTotal nodes: " << m_adjList.size() << "\nAdjacency:" << endl;
     for (size_t i = 0; i < m_adjList.size(); i++)
     {
         cout << "\t[" << i << "] : ";

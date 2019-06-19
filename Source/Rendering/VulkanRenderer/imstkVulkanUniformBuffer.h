@@ -103,7 +103,6 @@ struct VulkanGlobalFragmentUniforms
     glm::mat4 lightMatrices[16];
 };
 
-
 class VulkanUniformBuffer : public VulkanBuffer
 {
 public:

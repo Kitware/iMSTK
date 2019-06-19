@@ -44,7 +44,6 @@ VTKScreenCaptureUtility::saveScreenShot()
         return;
     }
 
-
     if (m_windowToImageFilter->GetInput() == nullptr)
     {
         m_windowToImageFilter->SetInput(m_renderWindow);

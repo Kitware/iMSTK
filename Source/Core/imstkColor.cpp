@@ -55,7 +55,7 @@ Color::Color( double r, double g, double b, double a )
     bool greenGood = isColorRangeCorrect(g);
     bool blueGood = isColorRangeCorrect(b);
     bool alphaGood = isColorRangeCorrect(a);
-    if(!redGood || !greenGood || !blueGood || !alphaGood)
+    if (!redGood || !greenGood || !blueGood || !alphaGood)
     {
         LOG(WARNING) << "Can not set Color: value outside of [0.0, 1.0] range.";
         return;
@@ -80,7 +80,7 @@ Color::operator=(const Color &p_color )
 double
 Color::operator()( int p_i ) const
 {
-    if ( p_i < 0 || p_i > 3 )
+    if (p_i < 0 || p_i > 3)
     {
         return -1;
     }
@@ -127,7 +127,7 @@ Color::setValue( double p_red, double p_green, double p_blue, double p_alpha )
     bool greenGood = isColorRangeCorrect(p_green);
     bool blueGood = isColorRangeCorrect(p_blue);
     bool alphaGood = isColorRangeCorrect(p_alpha);
-    if(!redGood || !greenGood || !blueGood || !alphaGood)
+    if (!redGood || !greenGood || !blueGood || !alphaGood)
     {
         LOG(WARNING) << "Can not set Color: value outside of [0.0, 1.0] range.";
         return;

@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #pragma once
 
 #include <cmath>
@@ -31,7 +30,8 @@ namespace imstk
 namespace SPH
 {
 template<int N>
-class CubicKernel {
+class CubicKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -42,7 +42,7 @@ public:
         const auto h3 = h2 * m_radius;
 
         // if constexpr (N == 2) {
-        if(N == 2)
+        if (N == 2)
         {
             m_k = Real(40.0 / 7.0) / (PI * h2);
             m_l = Real(240.0 / 7.0) / (PI * h2);
@@ -59,9 +59,9 @@ public:
     {
         Real res = 0.;
         const auto q   = r / m_radius;
-        if(q <= Real(1.0))
+        if (q <= Real(1.0))
         {
-            if(q <= Real(0.5))
+            if (q <= Real(0.5))
             {
                 const auto q2 = q * q;
                 const auto q3 = q2 * q;
@@ -82,12 +82,12 @@ public:
         VecXr res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
 
-        if(r2 <= Real(1.0) && r2 > Real(1e-12))
+        if (r2 <= Real(1.0) && r2 > Real(1e-12))
         {
             const auto rl    = Real(sqrt(r2));
             const auto q     = rl / m_radius;
             const auto gradq = r * (Real(1.0) / (rl * m_radius));
-            if(q <= Real(0.5))
+            if (q <= Real(0.5))
             {
                 res = m_l * q * (Real(3.0) * q - Real(2.0)) * gradq;
             }
@@ -109,9 +109,9 @@ protected:
     Real m_W_zero;
 };
 
-
 template<int N>
-class Poly6Kernel {
+class Poly6Kernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -121,7 +121,7 @@ public:
         m_radius2 = m_radius * m_radius;
 
         // if constexpr (N == 2) {
-        if(N == 2)
+        if (N == 2)
         {
             m_k = Real(4.0) / (PI * std::pow(m_radius, 8));
             m_l = -Real(24.0) / (PI * std::pow(m_radius, 8));
@@ -159,7 +159,7 @@ public:
     {
         VecXr res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2 && r2 > Real(1e-12))
+        if (r2 <= m_radius2 && r2 > Real(1e-12))
         {
             Real tmp = m_radius2 - r2;
             res = m_l * tmp * tmp * r;
@@ -176,7 +176,7 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             Real tmp  = m_radius2 - r2;
             Real tmp2 = Real(3.0) * m_radius2 - Real(7.0) * r2;
@@ -197,9 +197,9 @@ protected:
     Real m_W_zero;
 };
 
-
 template<int N>
-class SpikyKernel {
+class SpikyKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -209,7 +209,7 @@ public:
         m_radius2 = m_radius * m_radius;
 
         // if constexpr (N == 2) {
-        if(N == 2)
+        if (N == 2)
         {
             const auto radius5 = std::pow(m_radius, 5);
             m_k = Real(10.0) / (PI * radius5);
@@ -242,7 +242,7 @@ public:
     {
         VecXr res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2 && r2 > Real(1e-12))
+        if (r2 <= m_radius2 && r2 > Real(1e-12))
         {
             const auto rl  = std::sqrt(r2);
             const auto hr  = m_radius - rl;
@@ -263,9 +263,9 @@ protected:
     Real m_W_zero;
 };
 
-
 template<int N>
-class CohesionKernel {
+class CohesionKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -275,7 +275,7 @@ public:
         m_radius2 = m_radius * m_radius;
 
         // if constexpr (N == 2) {
-        if(N == 2)
+        if (N == 2)
         {
             LOG(FATAL) << "Unimplemented function";
         }
@@ -295,11 +295,11 @@ public:
     {
         Real res = 0.;
         const auto r2  = r * r;
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r1 = std::sqrt(r2);
             const auto r3 = r2 * r1;
-            if(r1 > Real(0.5) * m_radius)
+            if (r1 > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(m_radius - r1, 3) * r3;
             }
@@ -315,11 +315,11 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r1 = std::sqrt(r2);
             const auto r3 = r2 * r1;
-            if(r1 > Real(0.5) * m_radius)
+            if (r1 > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(m_radius - r1, 3) * r3;
             }
@@ -342,7 +342,8 @@ protected:
 };
 
 template<int N>
-class AdhesionKernel {
+class AdhesionKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -352,7 +353,7 @@ public:
         m_radius2 = m_radius * m_radius;
 
         // if constexpr (N == 2) {
-        if(N == 2)
+        if (N == 2)
         {
             LOG(FATAL) << "Unimplemented function";
         }
@@ -370,10 +371,10 @@ public:
     {
         Real res = 0.;
         const auto r2  = r * r;
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r = std::sqrt(r2);
-            if(r > Real(0.5) * m_radius)
+            if (r > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(-4.0 * r2 / m_radius + Real(6.0) * r - Real(2.0) * m_radius, 0.25);
             }
@@ -385,10 +386,10 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r = std::sqrt(r2);
-            if(r > Real(0.5) * m_radius)
+            if (r > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(-4.0 * r2 / m_radius + Real(6.0) * r - Real(2.0) * m_radius, 0.25);
             }
@@ -406,7 +407,8 @@ protected:
 };
 
 template<int N>
-class ViscosityKernel {
+class ViscosityKernel
+{
 using VecXr = Eigen::Matrix<Real, N, 1>;
 
 public:
@@ -421,7 +423,7 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto d = std::sqrt(r2);
             res = m_k * (Real(1) - d / m_radius);

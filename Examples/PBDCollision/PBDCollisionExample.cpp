@@ -51,7 +51,6 @@ int main()
     //tetMesh->scale(5., Geometry::TransformType::ApplyToData);
     //tetMesh->translate(Vec3d(0., -5., -5.) , Geometry::TransformType::ApplyToData);
 
-
     auto surfMesh = std::make_shared<SurfaceMesh>();
     auto surfMeshVisual = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
@@ -120,7 +119,7 @@ int main()
         double height = 60.0;
         int nRows = 10;
         int nCols = 10;
-        int corner[4] = { 1, nRows, nRows*nCols - nCols + 1, nRows*nCols };
+        int corner[4] = { 1, nRows, nRows * nCols - nCols + 1, nRows * nCols };
         char intStr[33];
         std::string fixed_corner;
         for (unsigned int i = 0; i < 4; ++i)
@@ -128,16 +127,16 @@ int main()
             std::sprintf(intStr, "%d", corner[i]);
             fixed_corner += std::string(intStr) + ' ';
         }
-        vertList.resize(nRows*nCols);
+        vertList.resize(nRows * nCols);
         const double dy = width / (double)(nCols - 1);
         const double dx = height / (double)(nRows - 1);
         for (int i = 0; i < nRows; ++i)
         {
             for (int j = 0; j < nCols; j++)
             {
-                const double y = (double)dy*j;
-                const double x = (double)dx*i;
-                vertList[i*nCols + j] = Vec3d(x - 30, -10, y - 30);
+                const double y = (double)dy * j;
+                const double x = (double)dx * i;
+                vertList[i * nCols + j] = Vec3d(x - 30, -10, y - 30);
             }
         }
         clothMesh->setInitialVertexPositions(vertList);
@@ -150,8 +149,8 @@ int main()
             for (std::size_t j = 0; j < nCols - 1; j++)
             {
                 SurfaceMesh::TriangleArray tri[2];
-                tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
-                tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+                tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
+                tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
                 triangles.push_back(tri[0]);
                 triangles.push_back(tri[1]);
             }
@@ -224,7 +223,6 @@ int main()
         volTetMesh1->extractSurfaceMesh(surfMesh1);
         volTetMesh1->extractSurfaceMesh(surfMeshVisual1);
 
-
         auto deformMapP2V1 = std::make_shared<OneToOneMap>();
         deformMapP2V1->setMaster(volTetMesh1);
         deformMapP2V1->setSlave(surfMeshVisual1);
@@ -274,16 +272,16 @@ int main()
         const double height = 100.0;
         const int nRows = 2;
         const int nCols = 2;
-        vertList.resize(nRows*nCols);
+        vertList.resize(nRows * nCols);
         const double dy = width / (double)(nCols - 1);
         const double dx = height / (double)(nRows - 1);
         for (int i = 0; i < nRows; ++i)
         {
             for (int j = 0; j < nCols; j++)
             {
-                const double y = (double)dy*j;
-                const double x = (double)dx*i;
-                vertList[i*nCols + j] = Vec3d(x - 50, -10.0, y - 50);
+                const double y = (double)dy * j;
+                const double x = (double)dx * i;
+                vertList[i * nCols + j] = Vec3d(x - 50, -10.0, y - 50);
             }
         }
 
@@ -294,8 +292,8 @@ int main()
             for (std::size_t j = 0; j < nCols - 1; j++)
             {
                 SurfaceMesh::TriangleArray tri[2];
-                tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
-                tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+                tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
+                tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
                 triangles.push_back(tri[0]);
                 triangles.push_back(tri[1]);
             }

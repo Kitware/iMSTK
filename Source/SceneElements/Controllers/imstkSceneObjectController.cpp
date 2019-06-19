@@ -55,7 +55,7 @@ SceneObjectController::updateControlledObjects()
 void
 SceneObjectController::applyForces()
 {
-    if(auto collidingObject = dynamic_cast<CollidingObject*>(m_sceneObject.get()))
+    if (auto collidingObject = dynamic_cast<CollidingObject*>(m_sceneObject.get()))
     {
         m_trackingController->getDeviceClient()->setForce(collidingObject->getForce());
     }

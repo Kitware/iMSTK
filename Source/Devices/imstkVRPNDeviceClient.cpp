@@ -41,8 +41,8 @@ VRPNDeviceClient::initModule()
     m_vrpnButton->register_change_handler(this, buttonChangeHandler);
     m_vrpnForceDevice->register_force_change_handler(this, forceChangeHandler);
 
-    m_vrpnForceDevice->setFF_Origin(0,0,0);
-    m_vrpnForceDevice->setFF_Jacobian(0,0,0,0,0,0,0,0,0);
+    m_vrpnForceDevice->setFF_Origin(0, 0, 0);
+    m_vrpnForceDevice->setFF_Jacobian(0, 0, 0, 0, 0, 0, 0, 0, 0);
     m_vrpnForceDevice->setFF_Radius(2);
 }
 
@@ -116,9 +116,9 @@ VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
     if (a.num_channel >= 6)
     {
         deviceClient->m_orientation =
-            Rotd(a.channel[3]*PI,Vec3d::UnitX())*
-            Rotd(a.channel[4]*PI,Vec3d::UnitY())*
-            Rotd(a.channel[5]*PI,Vec3d::UnitZ());
+            Rotd(a.channel[3] * PI, Vec3d::UnitX()) *
+            Rotd(a.channel[4] * PI, Vec3d::UnitY()) *
+            Rotd(a.channel[5] * PI, Vec3d::UnitZ());
         //LOG(DEBUG) << "analog: orientation = " << deviceClient->m_orientation.matrix();
     }
 }
