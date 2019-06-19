@@ -24,14 +24,14 @@
 
 namespace imstk
 {
+namespace ParallelUtils
+{
 std::unique_ptr<tbb::global_control> ThreadManager::s_tbbGlobalControl;
 
-void ThreadManager::setNumberThreads(int nThreads)
+void ThreadManager::setThreadPoolSize(const size_t nThreads)
 {
-    if(nThreads <= 0)
-    {
-        LOG(FATAL) << "Invalid number of threads";
-    }
+    LOG_IF(FATAL, (nThreads == 0)) << "Invalid number of threads";
+    LOG(INFO) << "Set number of worker threads to " << nThreads;
 
     if(s_tbbGlobalControl)
     {
@@ -40,12 +40,11 @@ void ThreadManager::setNumberThreads(int nThreads)
     s_tbbGlobalControl = std::unique_ptr<tbb::global_control>(
                 new tbb::global_control(tbb::global_control::max_allowed_parallelism,
                                         static_cast<size_t>(nThreads)));
-
-    LOG(INFO) << "Set number of worker threads: " << nThreads;
 }
 
 void ThreadManager::setMaximumParallelism()
 {
-    setNumberThreads(tbb::task_scheduler_init::default_num_threads());
+    setThreadPoolSize(static_cast<size_t>(tbb::task_scheduler_init::default_num_threads()));
 }
+}  // end namespace ParallelUtils
 }  // end namespace imstk

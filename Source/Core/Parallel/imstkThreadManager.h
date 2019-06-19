@@ -30,6 +30,8 @@
 
 namespace imstk
 {
+namespace ParallelUtils
+{
 class ThreadManager
 {
 public:
@@ -37,7 +39,7 @@ public:
     ///
     /// \brief Set system-wide number of threads for parallel computation
     ///
-    static void setNumberThreads(int nThreads);
+    static void setThreadPoolSize(const size_t nThreads);
 
     ///
     /// \brief Set system-wide number of threads to system default (use all logical cores)
@@ -50,4 +52,5 @@ private:
     ///
     static std::unique_ptr<tbb::global_control> s_tbbGlobalControl;
 };
+}  // end namespace ParallelUtils
 }  // end namespace imstk

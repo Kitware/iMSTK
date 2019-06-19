@@ -82,7 +82,7 @@ private:
     struct CellData
     {
         std::vector<size_t> particleIndices; // Store list of particles
-        ParallelSpinLock lock; // An atomic lock for thread-safe writing
+        ParallelUtils::ParallelSpinLock lock; // An atomic lock for thread-safe writing
     };
     UniformSpatialGrid<CellData> m_Grid;
 };

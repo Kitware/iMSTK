@@ -27,6 +27,8 @@
 
 namespace imstk
 {
+namespace ParallelUtils
+{
 ///
 /// \brief Perform an atomic operation: target = f(target, operand)
 ///
@@ -76,7 +78,7 @@ void imstk_atomic_multiply(T& target, const T operand)
 /// \brief Atomic division for scalar numbers: target = target / operand
 ///
 template<class T>
-void imstk_atomic_divide(T& target, T operand)
+void imstk_atomic_divide(T& target, const T operand)
 {
     imstk_atomic_op(target, operand, [](T a, T b) { return a / b; });
 }
@@ -128,4 +130,5 @@ void imstk_atomic_divide(Eigen::Matrix<T, N, 1>& target, const T operand)
         imstk_atomic_divide(target[i], operand);
     }
 }
+}// end namespace namespace ParallelUtils
 }// end namespace imstk

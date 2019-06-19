@@ -26,17 +26,39 @@
 
 namespace imstk
 {
-class ParallelSpinLock {
+namespace ParallelUtils
+{
+///
+/// \brief The ParallelSpinLock class
+/// \brief A SpinLock is a light weight mutex,
+/// which can be safely locked and unlocked exclusively by only one thread at a time
+///
+class ParallelSpinLock
+{
 public:
+    ///
+    /// \brief Constructor
+    ///
     ParallelSpinLock() = default;
-    ParallelSpinLock(const ParallelSpinLock&) {}
-    ParallelSpinLock& operator=(const ParallelSpinLock&) { return *this; }
 
+    ///
+    /// \brief Copy constructor, must be implemented as an empty function
+    /// because the member variable of type std::atomic_flag has copy constructor deleted
+    ///
+    ParallelSpinLock(const ParallelSpinLock&) {}
+
+    ///
+    /// \brief Start a thread-safe region, where only one thread can execute at a time until
+    /// a call to the unlock function
+    ///
     void lock()
     {
         while(m_Lock.test_and_set(std::memory_order_acquire)) {}
     }
 
+    ///
+    /// \brief End a thread-safe region
+    ///
     void unlock()
     {
         m_Lock.clear(std::memory_order_release);
@@ -45,4 +67,5 @@ public:
 private:
     std::atomic_flag m_Lock = ATOMIC_FLAG_INIT;
 };
+} // end namespace ParallelUtils
 } // end namespace imstk

@@ -30,22 +30,22 @@
 
 namespace imstk
 {
+namespace ParallelUtils
+{
 ///
 /// \brief The ParallelReduce class
 /// \brief A class for executing reduce operations in parallel
 ///
 class ParallelReduce
 {
-using Vec3r = Eigen::Matrix<Real, 3, 1>;
-using StdVT_Vec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
-
 ///
-/// \brief Private helper class for finding max norm
+/// \brief Private helper class, providing operator() using in std::parallel_reduce
+///  for finding max L2 norm of an array of Vec3r
 ///
 class ParallelMaxNorm
 {
 public:
-    ParallelMaxNorm(const StdVT_Vec3r& data) : m_Data(data) {}
+    ParallelMaxNorm(const StdVectorOfVec3r& data) : m_Data(data) {}
     ParallelMaxNorm(ParallelMaxNorm& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     void operator()(const tbb::blocked_range<size_t>& r)
@@ -62,16 +62,17 @@ public:
 
 private:
     Real m_Result = 0;
-    const StdVT_Vec3r& m_Data;
+    const StdVectorOfVec3r& m_Data;
 };
 
 ///
-/// \brief Private helper class for finding AABB of a point set
+/// \brief Private helper class, providing operator() using in std::parallel_reduce
+///  for finding axis-aligned bounding box of a point set
 ///
 class ParallelAABB
 {
 public:
-    ParallelAABB(const StdVT_Vec3r& data) : m_Data(data) { if(data.size() > 0) { m_UpperCorner = data[0]; } }
+    ParallelAABB(const StdVectorOfVec3r& data) : m_Data(data) { if(data.size() > 0) { m_UpperCorner = data[0]; } }
     ParallelAABB(ParallelAABB& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     void operator()(const tbb::blocked_range<size_t>& r)
@@ -106,14 +107,14 @@ private:
     Vec3r m_UpperCorner = Vec3r(-std::numeric_limits<Real>::max(),
                                 -std::numeric_limits<Real>::max(),
                                 -std::numeric_limits<Real>::max());
-    const StdVT_Vec3r& m_Data;
+    const StdVectorOfVec3r& m_Data;
 };
 
 public:
     ///
-    /// \brief Find the maximum value of vector magnitude (|| v ||) for each vector v in the input data array
+    /// \brief Find the maximum value of L2 norm for each vector v of type Vec3r in the input data array
     ///
-    static Real getMaxNorm(const StdVT_Vec3r& data)
+    static Real getMaxL2Norm(const StdVectorOfVec3r& data)
     {
         ParallelMaxNorm pObj(data);
         tbb::parallel_reduce(tbb::blocked_range<size_t>(0, data.size()), pObj);
@@ -123,7 +124,7 @@ public:
     ///
     /// \brief Find the bounding box of a point set
     ///
-    static void getAABB(const StdVT_Vec3r& points, Vec3r& lowerCorner, Vec3r& upperCorner)
+    static void findAABB(const StdVectorOfVec3r& points, Vec3r& lowerCorner, Vec3r& upperCorner)
     {
         ParallelAABB pObj(points);
         tbb::parallel_reduce(tbb::blocked_range<size_t>(0, points.size()), pObj);
@@ -131,4 +132,5 @@ public:
         upperCorner = pObj.getUpperCorner();
     }
 };
+} // end namespace ParallelUtils
 } // end namespace imstk

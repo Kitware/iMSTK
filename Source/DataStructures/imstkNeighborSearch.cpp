@@ -23,7 +23,7 @@
 #include "imstkGridBasedNeighborSearch.h"
 #include "imstkSpatialHashTableSeparateChaining.h"
 #include "imstkNeighborSearch.h"
-#include "imstkParallelHelpers.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
@@ -79,7 +79,7 @@ void NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, cons
         m_SpatialHashSearcher->clear();
         m_SpatialHashSearcher->insertPoints(setB);
 
-        imstk_parallel_for(setA.size(),
+        ParallelUtils::parallelFor(setA.size(),
             [&](const size_t p) {
                 // For each point in setA, find neighbors in setB
                 m_SpatialHashSearcher->getPointsInSphere(result[p], setA[p], m_SearchRadius);

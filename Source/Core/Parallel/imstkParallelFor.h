@@ -25,18 +25,20 @@
 
 namespace imstk
 {
+namespace ParallelUtils
+{
 ///
 /// \brief Execute a function in parallel over a range [beginIdx, endIdx) of indices
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for(IndexType beginIdx, IndexType endIdx, Function&& function)
+void parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& function)
 {
     tbb::parallel_for(tbb::blocked_range<IndexType>(beginIdx, endIdx),
         [&](const tbb::blocked_range<IndexType>& r) {
-            for(IndexType i = r.begin(), iEnd = r.end(); i < iEnd; ++i)
-            {
-                function(i);
-            }
+                for(IndexType i = r.begin(), iEnd = r.end(); i < iEnd; ++i)
+                {
+                    function(i);
+                }
         });
 }
 
@@ -44,110 +46,111 @@ void imstk_parallel_for(IndexType beginIdx, IndexType endIdx, Function&& functio
 /// \brief Execute a function in parallel over a range [0, endIdx) of indices
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for(IndexType endIdx, Function&& function)
+void parallelFor(const IndexType endIdx, Function&& function)
 {
-    imstk_parallel_for(IndexType(0), endIdx, std::forward<Function>(function));
+    parallelFor(IndexType(0), endIdx, std::forward<Function>(function));
 }
 
 ///
 /// \brief Execute a 2D function in parallel over a range of indices in the x dimension,
-/// while indices in the y dimension are scanned sequentially
+/// indices in the y dimension are scanned sequentially
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for_2Dx(IndexType beginX, IndexType endX,
-                            IndexType beginY, IndexType endY,
-                            Function&& function)
+void parallelFor2Dx(const IndexType beginX, const IndexType endX,
+                    const IndexType beginY, const IndexType endY,
+                    Function&& function)
 {
-    imstk_parallel_for(beginX, endX,
+    parallelFor(beginX, endX,
         [&](IndexType i) {
-            for(IndexType j = beginY; j < endY; ++j)
-            {
-                function(i, j);
-            }
+                for(IndexType j = beginY; j < endY; ++j)
+                {
+                    function(i, j);
+                }
         });
 }
 
 ///
 /// \brief Execute a 2D function in parallel over a range of indices in the y dimension,
-/// while indices in the x dimension are scanned sequentially
+/// indices in the x dimension are scanned sequentially
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for_2Dy(IndexType beginX, IndexType endX,
-                            IndexType beginY, IndexType endY,
-                            Function&& function)
+void parallelFor2Dy(const IndexType beginX, const IndexType endX,
+                    const IndexType beginY, const IndexType endY,
+                    Function&& function)
 {
-    imstk_parallel_for(beginY, endY,
+    parallelFor(beginY, endY,
         [&](IndexType j) {
-            for(IndexType i = beginX; i < endX; ++i)
-            {
-                function(i, j);
-            }
+                for(IndexType i = beginX; i < endX; ++i)
+                {
+                    function(i, j);
+                }
         });
 }
 
 ///
 /// \brief Execute a 3D function in parallel over a range of indices in the x dimension,
-/// while indices in the y and z dimensions are scanned sequentially
+/// indices in the y and z dimensions are scanned sequentially
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for_3Dx(IndexType beginX, IndexType endX,
-                            IndexType beginY, IndexType endY,
-                            IndexType beginZ, IndexType endZ,
-                            Function&& function)
+void parallelFor3Dx(const IndexType beginX, const IndexType endX,
+                    const IndexType beginY, const IndexType endY,
+                    const IndexType beginZ, const IndexType endZ,
+                    Function&& function)
 {
-    imstk_parallel_for(beginX, endX,
+    parallelFor(beginX, endX,
         [&](IndexType i) {
-            for(IndexType j = beginY; j < endY; ++j)
-            {
-                for(IndexType k = beginZ; k < endZ; ++k)
+                for(IndexType j = beginY; j < endY; ++j)
                 {
-                    function(i, j, k);
+                    for(IndexType k = beginZ; k < endZ; ++k)
+                    {
+                        function(i, j, k);
+                    }
                 }
-            }
         });
 }
 
 ///
 /// \brief Execute a 3D function in parallel over a range of indices in the y dimension,
-/// while indices in the x and z dimensions are scanned sequentially
+/// indices in the x and z dimensions are scanned sequentially
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for_3Dy(IndexType beginX, IndexType endX,
-                            IndexType beginY, IndexType endY,
-                            IndexType beginZ, IndexType endZ,
-                            Function&& function)
+void parallelFor3Dy(const IndexType beginX, const IndexType endX,
+                    const IndexType beginY, const IndexType endY,
+                    const IndexType beginZ, const IndexType endZ,
+                    Function&& function)
 {
-    imstk_parallel_for(beginY, endY,
+    parallelFor(beginY, endY,
         [&](IndexType j) {
-            for(IndexType i = beginX; i < endX; ++i)
-            {
-                for(IndexType k = beginZ; k < endZ; ++k)
+                for(IndexType i = beginX; i < endX; ++i)
                 {
-                    function(i, j, k);
+                    for(IndexType k = beginZ; k < endZ; ++k)
+                    {
+                        function(i, j, k);
+                    }
                 }
-            }
     });
 }
 
 ///
 /// \brief Execute a 3D function in parallel over a range of indices in the z dimension,
-/// while indices in the x and y dimensions are scanned sequentially
+/// indices in the x and y dimensions are scanned sequentially
 ///
 template<class IndexType, class Function>
-void imstk_parallel_for_3Dz(IndexType beginX, IndexType endX,
-                            IndexType beginY, IndexType endY,
-                            IndexType beginZ, IndexType endZ,
-                            Function&& function)
+void parallelFor3Dz(const IndexType beginX, const IndexType endX,
+                    const IndexType beginY, const IndexType endY,
+                    const IndexType beginZ, const IndexType endZ,
+                    Function&& function)
 {
-    imstk_parallel_for(beginX, endX,
+    parallelFor(beginX, endX,
         [&](IndexType i) {
-            for(IndexType j = beginY; j < endY; ++j)
-            {
-                for(IndexType k = beginZ; k < endZ; ++k)
+                for(IndexType j = beginY; j < endY; ++j)
                 {
-                    function(i, j, k);
+                    for(IndexType k = beginZ; k < endZ; ++k)
+                    {
+                        function(i, j, k);
+                    }
                 }
-            }
     });
 }
+} // end namespace ParallelUtils
 } // end namespace imstk
