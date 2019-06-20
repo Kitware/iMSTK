@@ -34,7 +34,7 @@ class SPHSolver : public SolverBase
 {
 public:
     SPHSolver() = default;
-    ~SPHSolver() = default;
+    virtual ~SPHSolver() override = default;
 
     SPHSolver(const SPHSolver &other) = delete;
     SPHSolver &operator=(const SPHSolver &other) = delete;
@@ -50,8 +50,8 @@ public:
     virtual void solve() override
     {
         const auto& SPHModel = m_SPHObject->getSPHModel();
-        assert(SPHModel);
-        SPHModel->simulationTimeStep();
+        LOG_IF(FATAL, (!SPHModel)) << "SPH model has not been initialized";
+        SPHModel->advanceTimeStep();
     }
 
 private:

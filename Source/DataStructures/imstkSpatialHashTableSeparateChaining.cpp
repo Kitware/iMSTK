@@ -33,8 +33,7 @@ SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining()
 void
 SpatialHashTableSeparateChaining::insertPoints(const StdVectorOfVec3d& points)
 {
-    // TODO: make more efficient
-    for (auto i = 0; i < points.size(); i++)
+    for (size_t i = 0; i < points.size(); i++)
     {
         this->insertPoint(points[i]);
     }
@@ -49,7 +48,6 @@ SpatialHashTableSeparateChaining::insertPoint(const Vec3d& point)
     entry.cellSize = m_cellSize;
 
     m_table->insert(entry);
-
     m_currentID++;
 }
 
@@ -140,11 +138,10 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
 
     double radiusSqr = radius * radius;
     std::unordered_set<size_t> visited;
-    visited.reserve(cellSpan[0] * cellSpan[1] * cellSpan[2]);
+    visited.reserve(static_cast<size_t>(cellSpan[0] * cellSpan[1] * cellSpan[2]));
 
     // clear the old result (if applicable)
     result.resize(0);
-    result.reserve(32);
 
     for (int i = -cellSpan[0]; i <= cellSpan[0]; ++i)
     {
@@ -154,8 +151,8 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
             {
                 PointEntry point;
                 point.point = Vec3d(ppos[0] + m_cellSize[0] * i,
-                                    ppos[1] + m_cellSize[1] * j,
-                                    ppos[2] + m_cellSize[2] * k);
+                        ppos[1] + m_cellSize[1] * j,
+                        ppos[2] + m_cellSize[2] * k);
                 point.cellSize = m_cellSize;
 
                 auto bucket = m_table->bucket(point);
@@ -169,12 +166,12 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
                 visited.insert(bucket);
 
                 auto first = m_table->begin(bucket);
-                auto last  = m_table->end(bucket);
+                auto last = m_table->end(bucket);
 
                 for (auto it = first; it != last; ++it)
                 {
                     const Vec3d& qpos = it->point;
-                    const auto d2    = (ppos - qpos).squaredNorm();
+                    const auto d2 = (ppos - qpos).squaredNorm();
                     if (d2 < radiusSqr)
                     {
                         result.push_back(it->ID);

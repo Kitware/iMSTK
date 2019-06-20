@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkThreadManager.h"
 
 #include <string>
 
@@ -56,6 +57,25 @@ const SimulationStatus&
 SimulationManager::getStatus() const
 {
     return m_status;
+}
+
+void
+SimulationManager::setThreadPoolSize(const int nThreads)
+{
+    if (nThreads <= 0)
+    {
+        setOptimalThreadPoolSize();
+    }
+    else
+    {
+        ParallelUtils::ThreadManager::setThreadPoolSize(static_cast<size_t>(nThreads));
+    }
+}
+
+void
+SimulationManager::setOptimalThreadPoolSize()
+{
+    ParallelUtils::ThreadManager::setOptimalParallelism();
 }
 
 bool

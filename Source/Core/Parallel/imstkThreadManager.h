@@ -21,42 +21,35 @@
 
 #pragma once
 
-#include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
-#include "imstkSPHModel.h"
+// TODO: Remove this in TBB 2019 Update 4: https://github.com/intel/tbb/blob/tbb_2019/CHANGES#L117
+#define TBB_PREVIEW_GLOBAL_CONTROL 1
+
+#include <tbb/tbb.h>
+#include <tbb/global_control.h>
 
 namespace imstk
 {
-///
-/// \class SPHObject
-///
-/// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation
-///
-class SPHObject : public DynamicObject<SPHKinematicState>
+namespace ParallelUtils
+{
+class ThreadManager
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    SPHObject(const std::string& name);
 
     ///
-    /// \brief Destructor
+    /// \brief Set system-wide thread pool size for parallel computation
     ///
-    virtual ~SPHObject() override = default;
+    static void setThreadPoolSize(const size_t nThreads);
 
     ///
-    /// \brief Initialize the SPH scene object
+    /// \brief Set system-wide thread pool size to the optimal value (use all logical cores)
     ///
-    bool initialize() override;
+    static void setOptimalParallelism();
 
+private:
     ///
-    /// \brief Get the SPH model of the object
+    /// \brief Global variable for controlling maximum number of worker threads
     ///
-    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
-
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel;
+    static std::unique_ptr<tbb::global_control> s_tbbGlobalControl;
 };
-} // end namespace imstk
+}  // end namespace ParallelUtils
+}  // end namespace imstk

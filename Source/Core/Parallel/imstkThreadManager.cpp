@@ -19,44 +19,32 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
-#include "imstkSPHModel.h"
+#include "imstkThreadManager.h"
+#include <g3log/g3log.hpp>
 
 namespace imstk
 {
-///
-/// \class SPHObject
-///
-/// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation
-///
-class SPHObject : public DynamicObject<SPHKinematicState>
+namespace ParallelUtils
 {
-public:
-    ///
-    /// \brief Constructor
-    ///
-    SPHObject(const std::string& name);
+std::unique_ptr<tbb::global_control> ThreadManager::s_tbbGlobalControl;
 
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~SPHObject() override = default;
+void ThreadManager::setThreadPoolSize(const size_t nThreads)
+{
+    LOG_IF(FATAL, (nThreads == 0)) << "Invalid number of threads";
+    LOG(INFO) << "Set number of worker threads to " << nThreads;
 
-    ///
-    /// \brief Initialize the SPH scene object
-    ///
-    bool initialize() override;
+    if (s_tbbGlobalControl)
+    {
+        s_tbbGlobalControl.reset();
+    }
+    s_tbbGlobalControl = std::unique_ptr<tbb::global_control>(
+                new tbb::global_control(tbb::global_control::max_allowed_parallelism,
+                                        nThreads));
+}
 
-    ///
-    /// \brief Get the SPH model of the object
-    ///
-    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
-
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel;
-};
-} // end namespace imstk
+void ThreadManager::setOptimalParallelism()
+{
+    setThreadPoolSize(static_cast<size_t>(tbb::task_scheduler_init::default_num_threads()));
+}
+}  // end namespace ParallelUtils
+}  // end namespace imstk

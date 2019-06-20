@@ -21,42 +21,50 @@
 
 #pragma once
 
-#include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
-#include "imstkSPHModel.h"
+#include <atomic>
 
 namespace imstk
 {
+namespace ParallelUtils
+{
 ///
-/// \class SPHObject
+/// \brief The ParallelSpinLock class
+/// \brief A SpinLock is a light weight mutex,
+/// which can be safely locked and unlocked exclusively by only one thread at a time
 ///
-/// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation
-///
-class SPHObject : public DynamicObject<SPHKinematicState>
+class ParallelSpinLock
 {
 public:
     ///
     /// \brief Constructor
     ///
-    SPHObject(const std::string& name);
+    ParallelSpinLock() = default;
 
     ///
-    /// \brief Destructor
+    /// \brief Copy constructor, must be implemented as an empty function
+    /// because the member variable of type std::atomic_flag has copy constructor deleted
     ///
-    virtual ~SPHObject() override = default;
+    ParallelSpinLock(const ParallelSpinLock&) {}
 
     ///
-    /// \brief Initialize the SPH scene object
+    /// \brief Start a thread-safe region, where only one thread can execute at a time until
+    /// a call to the unlock function
     ///
-    bool initialize() override;
+    void lock()
+    {
+        while (m_Lock.test_and_set(std::memory_order_acquire)) {}
+    }
 
     ///
-    /// \brief Get the SPH model of the object
+    /// \brief End a thread-safe region
     ///
-    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+    void unlock()
+    {
+        m_Lock.clear(std::memory_order_release);
+    }
 
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel;
+private:
+    std::atomic_flag m_Lock;
 };
+} // end namespace ParallelUtils
 } // end namespace imstk

@@ -19,44 +19,6 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
-#include "imstkSPHModel.h"
-
-namespace imstk
-{
-///
-/// \class SPHObject
-///
-/// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation
-///
-class SPHObject : public DynamicObject<SPHKinematicState>
-{
-public:
-    ///
-    /// \brief Constructor
-    ///
-    SPHObject(const std::string& name);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~SPHObject() override = default;
-
-    ///
-    /// \brief Initialize the SPH scene object
-    ///
-    bool initialize() override;
-
-    ///
-    /// \brief Get the SPH model of the object
-    ///
-    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
-
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel;
-};
-} // end namespace imstk
+// Generate a fluid simulation example in with a box-shape of highly viscous fluid dropping onto the ground
+#define SCENE_ID 2
+#include "SPHFluidExample.hpp"
