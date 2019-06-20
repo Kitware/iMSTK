@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #pragma once
 
 #include "imstkMath.h"
@@ -42,11 +41,11 @@ class ParallelReduce
 /// \brief Private helper class, providing operator() using in std::parallel_reduce
 ///  for finding max L2 norm of an array of Vec3r
 ///
-class ParallelMaxNorm
+class MaxL2NormFunctor
 {
 public:
-    ParallelMaxNorm(const StdVectorOfVec3r& data) : m_Data(data) {}
-    ParallelMaxNorm(ParallelMaxNorm& pObj, tbb::split) : m_Data(pObj.m_Data) {}
+    MaxL2NormFunctor(const StdVectorOfVec3r& data) : m_Data(data) {}
+    MaxL2NormFunctor(MaxL2NormFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     void operator()(const tbb::blocked_range<size_t>& r)
     {
@@ -57,7 +56,7 @@ public:
         }
     }
 
-    void join(ParallelMaxNorm& pObj) { m_Result = m_Result > pObj.m_Result ? m_Result : pObj.m_Result; }
+    void join(MaxL2NormFunctor& pObj) { m_Result = m_Result > pObj.m_Result ? m_Result : pObj.m_Result; }
     Real getResult() const noexcept { return std::sqrt(m_Result); }
 
 private:
@@ -69,11 +68,11 @@ private:
 /// \brief Private helper class, providing operator() using in std::parallel_reduce
 ///  for finding axis-aligned bounding box of a point set
 ///
-class ParallelAABB
+class AABBFunctor
 {
 public:
-    ParallelAABB(const StdVectorOfVec3r& data) : m_Data(data) { if(data.size() > 0) { m_UpperCorner = data[0]; } }
-    ParallelAABB(ParallelAABB& pObj, tbb::split) : m_Data(pObj.m_Data) {}
+    AABBFunctor(const StdVectorOfVec3r& data) : m_Data(data) { if(data.size() > 0) { m_UpperCorner = data[0]; } }
+    AABBFunctor(AABBFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     void operator()(const tbb::blocked_range<size_t>& r)
     {
@@ -88,7 +87,7 @@ public:
         }
     }
 
-    void join(ParallelAABB& pObj)
+    void join(AABBFunctor& pObj)
     {
         for(int j = 0; j < 3; ++j)
         {
@@ -114,9 +113,9 @@ public:
     ///
     /// \brief Find the maximum value of L2 norm from the input data array
     ///
-    static Real getMaxL2Norm(const StdVectorOfVec3r& data)
+    static Real findMaxL2Norm(const StdVectorOfVec3r& data)
     {
-        ParallelMaxNorm pObj(data);
+        MaxL2NormFunctor pObj(data);
         tbb::parallel_reduce(tbb::blocked_range<size_t>(0, data.size()), pObj);
         return pObj.getResult();
     }
@@ -126,7 +125,7 @@ public:
     ///
     static void findAABB(const StdVectorOfVec3r& points, Vec3r& lowerCorner, Vec3r& upperCorner)
     {
-        ParallelAABB pObj(points);
+        AABBFunctor pObj(points);
         tbb::parallel_reduce(tbb::blocked_range<size_t>(0, points.size()), pObj);
         lowerCorner = pObj.getLowerCorner();
         upperCorner = pObj.getUpperCorner();

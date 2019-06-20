@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #pragma once
 #include <atomic>
 
@@ -33,7 +32,7 @@ namespace ParallelUtils
 /// \brief Perform an atomic operation: target = f(target, operand)
 ///
 template<class T, class Function>
-void imstk_atomic_op(T& target, const T operand, Function&& f)
+void atomicOp(T& target, const T operand, Function&& f)
 {
     std::atomic<T>& tgt = *(static_cast<std::atomic<T>*>(&target));
 
@@ -50,48 +49,47 @@ void imstk_atomic_op(T& target, const T operand, Function&& f)
 /// \brief Atomic addition for scalar numbers: target = target + operand
 ///
 template<class T>
-void imstk_atomic_add(T& target, const T operand)
+void atomicAdd(T& target, const T operand)
 {
-    imstk_atomic_op(target, operand, [](T a, T b) { return a + b; });
+    atomicOp(target, operand, [](T a, T b) { return a + b; });
 }
 
 ///
 /// \brief Atomic subtraction for scalar numbers: target = target - operand
 ///
 template<class T>
-void imstk_atomic_subtract(T& target, const T operand)
+void atomicSubtract(T& target, const T operand)
 {
-    imstk_atomic_op(target, operand, [](T a, T b) { return a - b; });
+    atomicOp(target, operand, [](T a, T b) { return a - b; });
 }
-
 
 ///
 /// \brief Atomic multiplication for scalar numbers: target = target * operand
 ///
 template<class T>
-void imstk_atomic_multiply(T& target, const T operand)
+void atomicMultiply(T& target, const T operand)
 {
-    imstk_atomic_op(target, operand, [](T a, T b) { return a * b; });
+    atomicOp(target, operand, [](T a, T b) { return a * b; });
 }
 
 ///
 /// \brief Atomic division for scalar numbers: target = target / operand
 ///
 template<class T>
-void imstk_atomic_divide(T& target, const T operand)
+void atomicDivide(T& target, const T operand)
 {
-    imstk_atomic_op(target, operand, [](T a, T b) { return a / b; });
+    atomicOp(target, operand, [](T a, T b) { return a / b; });
 }
 
 ///
 /// \brief Atomic addition for two vectors: target = target + operand
 ///
 template<class T, int N>
-void imstk_atomic_add(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
+void atomicAdd(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
 {
     for(int i = 0; i < N; ++i)
     {
-        imstk_atomic_add(target[i], operand[i]);
+        atomicAdd(target[i], operand[i]);
     }
 }
 
@@ -99,11 +97,11 @@ void imstk_atomic_add(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 
 /// \brief Atomic subtraction for two vectors: target = target - operand
 ///
 template<class T, int N>
-void imstk_atomic_subtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
+void atomicSubtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
 {
     for(int i = 0; i < N; ++i)
     {
-        imstk_atomic_subtract(target[i], operand[i]);
+        atomicSubtract(target[i], operand[i]);
     }
 }
 
@@ -111,11 +109,11 @@ void imstk_atomic_subtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T
 /// \brief Atomic multiplication for a vector and a scalar number: target = target * operand
 ///
 template<class T, int N>
-void imstk_atomic_multiply(Eigen::Matrix<T, N, 1>& target, const T operand)
+void atomicMultiply(Eigen::Matrix<T, N, 1>& target, const T operand)
 {
     for(int i = 0; i < N; ++i)
     {
-        imstk_atomic_multiply(target[i], operand);
+        atomicMultiply(target[i], operand);
     }
 }
 
@@ -123,11 +121,11 @@ void imstk_atomic_multiply(Eigen::Matrix<T, N, 1>& target, const T operand)
 /// \brief Atomic division for a vector and a scalar number: target = target / operand
 ///
 template<class T, int N>
-void imstk_atomic_divide(Eigen::Matrix<T, N, 1>& target, const T operand)
+void atomicDivide(Eigen::Matrix<T, N, 1>& target, const T operand)
 {
     for(int i = 0; i < N; ++i)
     {
-        imstk_atomic_divide(target[i], operand);
+        atomicDivide(target[i], operand);
     }
 }
 }// end namespace namespace ParallelUtils
