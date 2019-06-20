@@ -148,15 +148,13 @@ public:
     /// \brief Get data in a cell
     /// \param A linearized index of cell
     ///
-    template<class IndexType>
-    CellData& getCellData(IndexType linearizedIdx) { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
+    CellData& getCellData(size_t linearizedIdx) { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
 
     ///
     /// \brief Get data in a cell
     /// \param A linearized index of cell
     ///
-    template<class IndexType>
-    const CellData& getCellData(IndexType linearizedIdx) const { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
+    const CellData& getCellData(size_t linearizedIdx) const { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
 
     ///
     /// \brief Get data in a cell

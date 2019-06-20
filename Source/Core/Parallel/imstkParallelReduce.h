@@ -57,7 +57,7 @@ public:
     }
 
     void join(MaxL2NormFunctor& pObj) { m_Result = m_Result > pObj.m_Result ? m_Result : pObj.m_Result; }
-    Real getResult() const noexcept { return std::sqrt(m_Result); }
+    Real getResult() const { return std::sqrt(m_Result); }
 
 private:
     Real m_Result = 0;

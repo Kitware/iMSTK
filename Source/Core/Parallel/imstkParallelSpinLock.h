@@ -64,7 +64,7 @@ public:
     }
 
 private:
-    std::atomic_flag m_Lock = ATOMIC_FLAG_INIT;
+    std::atomic_flag m_Lock;
 };
 } // end namespace ParallelUtils
 } // end namespace imstk
