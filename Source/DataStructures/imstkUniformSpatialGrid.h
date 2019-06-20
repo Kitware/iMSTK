@@ -38,7 +38,6 @@ template<class CellData>
 class UniformSpatialGrid
 {
 public:
-
     ///
     /// \brief Construct a default grid ([0, 1]^3) with cell size of 1
     ///
@@ -84,7 +83,7 @@ public:
             std::to_string(m_UpperCorner[0]) + ", " + std::to_string(m_UpperCorner[1]) + ", " + std::to_string(m_UpperCorner[2]) + "], " +
             "cellSize = " + std::to_string(m_CellSize);
 
-        // cell data must be resized to match with the number of cells
+        // cell data must be resized to equal to number of cells
         m_CellData.resize(m_NTotalCells);
     }
 
@@ -113,7 +112,9 @@ public:
     /// \brief Get the 3D index (cell_x, cell_y, cell_z) of the cell containing the given positions
     ///
     template<class IndexType>
-    std::array<IndexType, 3> getCell3DIndices(const Vec3r& ppos) const
+    std::array<IndexType, 3> getCellIndexFromCoordinate(const Vec3r& ppos) const
+    // Implementation of templated function of templated class should not be put in .cpp file
+    // Otherwise, the function must be explicitly instantiated with various IndexType
     {
         std::array<IndexType, 3> cellIdx;
         for(int d = 0; d < 3; ++d)
@@ -124,68 +125,30 @@ public:
     }
 
     ///
-    /// \brief Get all cell data
-    ///
-    std::vector<CellData>& getAllCellData() { return m_CellData; }
-
-    ///
-    /// \brief Get all cell data
-    ///
-    const std::vector<CellData>& getAllCellData() const { return m_CellData; }
-
-    ///
-    /// \brief Get data in a cell
+    /// \brief Get data in cell
     /// \param A position in space
     ///
-    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)]; }
+    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellFlatIndexFromCoordinate < unsigned int > (ppos)]; }
 
     ///
-    /// \brief Get data in a cell
+    /// \brief Get data in cell
     /// \param A position in space
     ///
-    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)]; }
+    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellFlatIndexFromCoordinate < unsigned int > (ppos)]; }
 
     ///
-    /// \brief Get data in a cell
-    /// \param A linearized index of cell
-    ///
-    template<class IndexType>
-    CellData& getCellData(IndexType linearizedIdx) { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
-
-    ///
-    /// \brief Get data in a cell
-    /// \param A linearized index of cell
-    ///
-    template<class IndexType>
-    const CellData& getCellData(IndexType linearizedIdx) const { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
-
-    ///
-    /// \brief Get data in a cell
+    /// \brief Get data in cell
     /// \param 3D index of a cell
     ///
     template<class IndexType>
-    CellData& getCellData(const std::array<IndexType, 3>& cellIdx) { return m_CellData[getCellLinearizedIndex(cellIdx[0], cellIdx[1], cellIdx[2])]; }
+    CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) { return m_CellData[getCellFlatIndexFrom3DIndices(i, j, k)]; }
 
     ///
-    /// \brief Get data in a cell
+    /// \brief Get data in cell
     /// \param 3D index of a cell
     ///
     template<class IndexType>
-    const CellData& getCellData(const std::array<IndexType, 3>& cellIdx) const { return m_CellData[getCellLinearizedIndex(cellIdx[0], cellIdx[1], cellIdx[2])]; }
-
-    ///
-    /// \brief Get data in a cell
-    /// \param 3D index of a cell
-    ///
-    template<class IndexType>
-    CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) { return m_CellData[getCellLinearizedIndex(i, j, k)]; }
-
-    ///
-    /// \brief Get data in a cell
-    /// \param 3D index of a cell
-    ///
-    template<class IndexType>
-    const CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) const { return m_CellData[getCellLinearizedIndex(i, j, k)]; }
+    const CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) const { return m_CellData[getCellFlatIndexFrom3DIndices(i, j, k)]; }
 
     ///
     /// \brief Apply a function to all cell data
@@ -199,12 +162,14 @@ public:
         }
     }
 
+private:
     ///
     /// \brief Get linearized index from cell 3D indices: index in 3D (cell_x, cell_y, cell_z) => index in 1D
-    /// \param 3D index of a cell
     ///
     template<class IndexType>
-    IndexType getCellLinearizedIndex(const IndexType i, const IndexType j, const IndexType k) const
+    IndexType getCellFlatIndexFrom3DIndices(const IndexType i, const IndexType j, const IndexType k) const
+    // Implementation of templated function of templated class should not be put in .cpp file
+    // Otherwise, the function must be explicitly instantiated with various IndexType
     {
         auto flatIndex = (k * static_cast<IndexType>(m_Resolution[1]) + j) * static_cast<IndexType>(m_Resolution[0]) + i;
         assert(flatIndex < static_cast<IndexType>(m_NTotalCells));
@@ -212,24 +177,24 @@ public:
     }
 
     ///
-    /// \brief Get linearized index of cell containing the given position
-    /// \param A position in space
+    /// \brief Get linearized index of cell containing the positions ppos
     ///
     template<class IndexType>
-    IndexType getCellLinearizedIndex(const Vec3r& ppos) const
+    IndexType getCellFlatIndexFromCoordinate(const Vec3r& ppos) const
+    // Implementation of templated function of templated class should not be put in .cpp file
+    // Otherwise, the function must be explicitly instantiated with various IndexType
     {
-        auto cellIdx = getCell3DIndices<IndexType>(ppos);
+        auto cellIdx = getCellIndexFromCoordinate<IndexType>(ppos);
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-        LOG_IF(FATAL, (!isValidCellIndices(cellIdx[0], cellIdx[1], cellIdx[2]))) <<
+        LOG_IF(FATAL, !isValidCellIndices(cellIdx[0], cellIdx[1], cellIdx[2])) <<
             "Invalid cell indices: " +
             std::to_string(cellIdx[0]) + "/" + std::to_string(m_Resolution[0]) + ", " +
             std::to_string(cellIdx[1]) + "/" + std::to_string(m_Resolution[1]) + ", " +
             std::to_string(cellIdx[2]) + "/" + std::to_string(m_Resolution[2]);
 #endif
-        return getCellLinearizedIndex<IndexType>(cellIdx[0], cellIdx[1], cellIdx[2]);
+        return getCellFlatIndexFrom3DIndices<IndexType>(cellIdx[0], cellIdx[1], cellIdx[2]);
     }
 
-private:
     Vec3r m_LowerCorner; ///> Lower corner of the grid
     Vec3r m_UpperCorner; ///> Upper corner of the grid
     Real m_CellSize;     ///> Length of grid cell
