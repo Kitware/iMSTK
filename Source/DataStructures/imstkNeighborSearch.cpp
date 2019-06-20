@@ -30,7 +30,7 @@ namespace imstk
 NeighborSearch::NeighborSearch(NeighborSearch::Method searchMethod, Real searchRadius /*= 0*/) :
     m_Method(searchMethod), m_SearchRadius(searchRadius)
 {
-    if(m_Method == Method::UniformGridBasedSearch)
+    if (m_Method == Method::UniformGridBasedSearch)
     {
         m_GridBasedSearcher = std::make_shared<GridBasedNeighborSearch>();
         m_GridBasedSearcher->setSearchRadius(m_SearchRadius);
@@ -45,7 +45,7 @@ NeighborSearch::NeighborSearch(NeighborSearch::Method searchMethod, Real searchR
 void NeighborSearch::setSearchRadius(const Real searchRadius)
 {
     m_SearchRadius = searchRadius;
-    if(m_Method == Method::UniformGridBasedSearch)
+    if (m_Method == Method::UniformGridBasedSearch)
     {
         m_GridBasedSearcher->setSearchRadius(m_SearchRadius);
     }
@@ -70,7 +70,7 @@ void NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&result, const
 
 void NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
 {
-    if(m_Method == Method::UniformGridBasedSearch)
+    if (m_Method == Method::UniformGridBasedSearch)
     {
         m_GridBasedSearcher->getNeighbors(result, setA, setB);
     }

@@ -42,7 +42,7 @@ void atomicOp(T& target, const T operand, Function&& f)
     {
         new_val = f(cur_val, operand);
     }
-    while(!tgt.compare_exchange_weak(cur_val, new_val));
+    while (!tgt.compare_exchange_weak(cur_val, new_val));
 }
 
 ///
@@ -87,7 +87,7 @@ void atomicDivide(T& target, const T operand)
 template<class T, int N>
 void atomicAdd(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
 {
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
         atomicAdd(target[i], operand[i]);
     }
@@ -99,7 +99,7 @@ void atomicAdd(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& ope
 template<class T, int N>
 void atomicSubtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>& operand)
 {
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
         atomicSubtract(target[i], operand[i]);
     }
@@ -111,7 +111,7 @@ void atomicSubtract(Eigen::Matrix<T, N, 1>& target, const Eigen::Matrix<T, N, 1>
 template<class T, int N>
 void atomicMultiply(Eigen::Matrix<T, N, 1>& target, const T operand)
 {
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
         atomicMultiply(target[i], operand);
     }
@@ -123,7 +123,7 @@ void atomicMultiply(Eigen::Matrix<T, N, 1>& target, const T operand)
 template<class T, int N>
 void atomicDivide(Eigen::Matrix<T, N, 1>& target, const T operand)
 {
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
         atomicDivide(target[i], operand);
     }

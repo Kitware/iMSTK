@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #pragma once
 
 // TODO: Remove this in TBB 2019 Update 4: https://github.com/intel/tbb/blob/tbb_2019/CHANGES#L117

@@ -49,7 +49,7 @@ public:
 
     void operator()(const tbb::blocked_range<size_t>& r)
     {
-        for(size_t i = r.begin(); i != r.end(); ++i)
+        for (size_t i = r.begin(); i != r.end(); ++i)
         {
             Real mag2 = m_Data[i].squaredNorm();
             m_Result = m_Result > mag2 ? m_Result : mag2;
@@ -71,15 +71,15 @@ private:
 class AABBFunctor
 {
 public:
-    AABBFunctor(const StdVectorOfVec3r& data) : m_Data(data) { if(data.size() > 0) { m_UpperCorner = data[0]; } }
+    AABBFunctor(const StdVectorOfVec3r& data) : m_Data(data) { if (data.size() > 0) { m_UpperCorner = data[0]; } }
     AABBFunctor(AABBFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     void operator()(const tbb::blocked_range<size_t>& r)
     {
-        for(size_t i = r.begin(); i != r.end(); ++i)
+        for (size_t i = r.begin(); i != r.end(); ++i)
         {
             const auto& vec = m_Data[i];
-            for(int j = 0; j < 3; ++j)
+            for (int j = 0; j < 3; ++j)
             {
                 m_LowerCorner[j] = (m_LowerCorner[j] < vec[j]) ? m_LowerCorner[j] : vec[j];
                 m_UpperCorner[j] = (m_UpperCorner[j] > vec[j]) ? m_UpperCorner[j] : vec[j];
@@ -89,7 +89,7 @@ public:
 
     void join(AABBFunctor& pObj)
     {
-        for(int j = 0; j < 3; ++j)
+        for (int j = 0; j < 3; ++j)
         {
             m_LowerCorner[j] = (m_LowerCorner[j] < pObj.m_LowerCorner[j]) ? m_LowerCorner[j] : pObj.m_LowerCorner[j];
             m_UpperCorner[j] = (m_UpperCorner[j] > pObj.m_UpperCorner[j]) ? m_UpperCorner[j] : pObj.m_UpperCorner[j];

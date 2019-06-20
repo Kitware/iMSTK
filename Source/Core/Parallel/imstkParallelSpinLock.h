@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #pragma once
 
 #include <atomic>
@@ -53,7 +52,7 @@ public:
     ///
     void lock()
     {
-        while(m_Lock.test_and_set(std::memory_order_acquire)) {}
+        while (m_Lock.test_and_set(std::memory_order_acquire)) {}
     }
 
     ///

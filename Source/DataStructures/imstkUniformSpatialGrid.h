@@ -136,13 +136,13 @@ public:
     /// \brief Get data in a cell
     /// \param A position in space
     ///
-    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)]; }
+    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)]; }
 
     ///
     /// \brief Get data in a cell
     /// \param A position in space
     ///
-    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)]; }
+    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)]; }
 
     ///
     /// \brief Get data in a cell

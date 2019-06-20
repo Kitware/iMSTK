@@ -33,7 +33,7 @@ void ThreadManager::setThreadPoolSize(const size_t nThreads)
     LOG_IF(FATAL, (nThreads == 0)) << "Invalid number of threads";
     LOG(INFO) << "Set number of worker threads to " << nThreads;
 
-    if(s_tbbGlobalControl)
+    if (s_tbbGlobalControl)
     {
         s_tbbGlobalControl.reset();
     }
