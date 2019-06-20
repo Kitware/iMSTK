@@ -19,14 +19,12 @@
 
 =========================================================================*/
 
-#ifndef imstkMath_h
-#define imstkMath_h
-
-#include <vector>
+#pragma once
 
 #include <Eigen/Geometry>
 #include <Eigen/Sparse>
 #include <Eigen/StdVector>
+#include <vector>
 
 namespace imstk
 {
@@ -101,38 +99,38 @@ using AffineTransform3f = Eigen::Affine3f;
 using AffineTransform3d = Eigen::Affine3d;
 
 // Handy Cartesian vectors in 3d
-#define UP_VECTOR Vec3d(0.0, 1.0, 0.0)
-#define DOWN_VECTOR Vec3d(0, -1, 0)
-#define RIGHT_VECTOR Vec3d(1, 0, 0)
-#define LEFT_VECTOR Vec3d(-1, 0, 0)
-#define FORWARD_VECTOR Vec3d(0, 0, -1)
+#define UP_VECTOR       Vec3d(0.0, 1.0, 0.0)
+#define DOWN_VECTOR     Vec3d(0, -1, 0)
+#define RIGHT_VECTOR    Vec3d(1, 0, 0)
+#define LEFT_VECTOR     Vec3d(-1, 0, 0)
+#define FORWARD_VECTOR  Vec3d(0, 0, -1)
 #define BACKWARD_VECTOR Vec3d(0, 0, 1)
-#define WORLD_ORIGIN Vec3d::Zero()
+#define WORLD_ORIGIN    Vec3d::Zero()
 
 /// Some commonly used math constants
-static constexpr Real PI = 3.14159265358979323846;
-static constexpr Real PI_2 = 1.57079632679489661923;
-static constexpr Real PI_4 = 0.785398163397448309616;
-static constexpr Real INV_1_PI = 0.318309886183790671538;
-static constexpr Real INV_2_PI = 0.636619772367581343076;
-static constexpr Real TWO_OVER_SQRTPI = 1.12837916709551257390;
-static constexpr Real SQRT2 = 1.41421356237309504880;
-static constexpr Real SQRT1_2 = 0.707106781186547524401;
-static constexpr Real NLOG_E = 2.71828182845904523536;
-static constexpr Real LOG2E = 1.44269504088896340736;
-static constexpr Real LOG10E = 0.434294481903251827651;
-static constexpr Real LN2 = 0.693147180559945309417;
-static constexpr Real LN10 = 2.30258509299404568402;
+#define PI               Real(3.14159265358979323846)
+#define PI_2             Real(1.57079632679489661923)
+#define PI_4             Real(0.785398163397448309616)
+#define INV_1_PI         Real(0.318309886183790671538)
+#define INV_2_PI         Real(0.636619772367581343076)
+#define TWO_OVER_SQRT_PI Real(1.12837916709551257390)
+#define SQRT2            Real(1.41421356237309504880)
+#define SQRT1_2          Real(0.707106781186547524401)
+#define NLOG_E           Real(2.71828182845904523536)
+#define LOG2E            Real(1.44269504088896340736)
+#define LOG10E           Real(0.434294481903251827651)
+#define LN2              Real(0.693147180559945309417)
+#define LN10             Real(2.30258509299404568402)
 
-static constexpr double MAX_REAL = std::numeric_limits<Real>::max();
-static constexpr double MIN_REAL = std::numeric_limits<Real>::min();
-static constexpr double MAX_D = std::numeric_limits<double>::max();
-static constexpr double MIN_D = std::numeric_limits<double>::min();
-static constexpr float MAX_F = std::numeric_limits<float>::max();
-static constexpr float MIN_F = std::numeric_limits<float>::min();
+#define MAX_REAL          std::numeric_limits<Real>::max()
+#define MIN_REAL          std::numeric_limits<Real>::min()
+#define MACHINE_PRECISION std::numeric_limits<Real>::epsilon()
 
-static constexpr Real MACHINE_PRECISION = std::numeric_limits<Real>::denorm_min();
-static constexpr double MACHINE_PRECISION_D = std::numeric_limits<double>::denorm_min();
-static constexpr double MACHINE_PRECISION_F = std::numeric_limits<double>::denorm_min();
-}
-#endif // ifndef imstkMath_h
+#define MAX_D               std::numeric_limits<double>::max()
+#define MIN_D               std::numeric_limits<double>::min()
+#define MACHINE_PRECISION_D std::numeric_limits<double>::epsilon()
+
+#define MAX_F               std::numeric_limits<float>::max()
+#define MIN_F               std::numeric_limits<float>::min()
+#define MACHINE_PRECISION_F std::numeric_limits<float>::epsilon()
+} // end namespace imstk
