@@ -38,7 +38,6 @@ template<class CellData>
 class UniformSpatialGrid
 {
 public:
-
     ///
     /// \brief Construct a default grid ([0, 1]^3) with cell size of 1
     ///

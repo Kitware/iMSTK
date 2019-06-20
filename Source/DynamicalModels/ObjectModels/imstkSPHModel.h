@@ -131,7 +131,7 @@ public:
     ///
     /// \brief Update states
     ///
-    virtual void updateBodyStates(const Vectord&, const typename DynamicalModel<SPHKinematicState>::stateUpdateType) override {}
+    virtual void updateBodyStates(const Vectord&, const stateUpdateType) override {}
 
     ///
     /// \brief Update positions of point set geometry

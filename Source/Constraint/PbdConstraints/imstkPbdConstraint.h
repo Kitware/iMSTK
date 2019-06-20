@@ -55,6 +55,11 @@ public:
     PbdConstraint() = default;
 
     ///
+    /// \brief Destructor
+    ///
+    virtual ~PbdConstraint() = default;
+
+    ///
     /// \brief abstract interface to know the type of constraint
     /// \return particular type
     ///

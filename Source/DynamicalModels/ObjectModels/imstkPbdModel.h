@@ -34,6 +34,47 @@
 namespace imstk
 {
 ///
+/// \class PBDModelConfig
+/// \brief Parameters for PBD simulation
+///
+struct PBDModelConfig
+{
+    double m_uniformMassValue = 1.0;         ///> Mass properties
+    double m_viscousDampingCoeff = 0.01;     ///> Viscous damping coefficient [0, 1]
+
+    double m_contactStiffness = 1.0;         ///> Contact stiffness for collisions
+    double m_proximity;                      ///> Proximity for collisions
+
+    unsigned int m_maxIter;                 ///> Max. pbd iterations
+    double m_dt;                            ///> Time step size
+    double m_DefaultDt;                     ///> Default Time step size
+
+    std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
+    Vec3r m_gravity;                         ///> Gravity
+
+    double m_mu;           ///> Lame constant, if constraint type is FEM
+    double m_lambda;       ///> Lame constant, if constraint type is FEM
+
+    double m_YoungModulus; ///> FEM parameter, if constraint type is FEM
+    double m_PoissonRatio; ///> FEM parameter, if constraint type is FEM
+
+    std::vector<std::pair<PbdConstraint::Type, double>>    m_RegularConstraints; ///> Constraints except FEM
+    std::vector<std::pair<PbdConstraint::Type,
+                          PbdFEMConstraint::MaterialType>> m_FEMConstraints;     ///> FEM constraints
+
+    ///
+    /// \brief Enable a regular constraint (constraint that is not FEM constraint)
+    /// with a given constraint stiffness
+    ///
+    void enableConstraint(PbdConstraint::Type type, double stiffness);
+
+    ///
+    /// \brief Enable a FEM constraint with a given FEM material
+    ///
+    void enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material);
+};
+
+///
 /// \class PbdModel
 ///
 /// \brief This class implements position based dynamics mathematical model
@@ -44,66 +85,35 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdModel();
+    PbdModel() : DynamicalModel(DynamicalModelType::positionBasedDynamics) {}
 
     ///
     /// \brief Destructor
     ///
-    ~PbdModel() = default;
+    virtual ~PbdModel() override = default;
 
     ///
     /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
     ///
-    void setModelGeometry(std::shared_ptr<PointSet> m);
-    std::shared_ptr<PointSet> getModelGeometry() const { return m_mesh; }
+    void setModelGeometry(const std::shared_ptr<PointSet>& m) { m_mesh = m; }
+    const std::shared_ptr<PointSet>& getModelGeometry() const { return m_mesh; }
 
     ///
-    /// \brief Configure the PBD model. Arguments should be in the following order
-    /// 1. Number of Constraints (eg: 1)
-    /// 2. Constraint configuration (eg: "FEM NeoHookean 1.0 0.3")
-    /// 3. Mass (eg: 1.0)
-    /// 4. Gravity (eg: "0 -9.8 0")
-    /// 5. TimeStep (eg: 0.001)
-    /// 6. FixedPoint (eg: "10, 21")
-    /// 7. NumberOfIterationInConstraintSolver (eg: 2)
-    /// 8. Proximity (eg: 0.1)
-    /// 9. Contact stiffness (eg: 0.01)
+    /// \brief Set simulation parameters
     ///
-    bool configure(const int nCons, ...);
+    void configure(const std::shared_ptr<PBDModelConfig>& params);
 
     ///
-    /// \brief setElasticModulus
-    /// \param E  Young's modulus
-    /// \param nu Poisson's ratio
+    /// \brief Get the simulation parameters
     ///
-    void computeLameConstants(const double E, const double nu);
+    const std::shared_ptr<PBDModelConfig>& getParameters() const { assert(m_Parameters); return m_Parameters; }
 
     ///
-    /// \brief Returns the first Lame constant
+    /// \brief Compute elastic constants: Young Modulus, Poisson Ratio, first and second Lame
+    /// \brief If both Young Modulus or Poisson Ratio are zero, then compute them from the Lame coefficients
+    /// \brief And vice versas, if both Lame coefficients are zero, compute them from Young Modulus and Poisson Ratio
     ///
-    const double getFirstLame() const { return m_mu; }
-
-    ///
-    /// \brief Returns the second Lame constant
-    ///
-    const double getSecondLame() const { return m_lambda; }
-
-    ///
-    /// \brief Set the maximum number of iterations for the pbd solver
-    ///
-    void setMaxNumIterations(const unsigned int n) { m_maxIter = n; }
-
-    ///
-    /// \brief Get/Set proximity used for collision
-    ///
-    void setProximity(const double prox) { m_proximity = prox; }
-    double getProximity() const { return m_proximity; }
-
-    ///
-    /// \brief Get/Set contact stiffness that is used for collision constraints
-    ///
-    void setContactStiffness(const double stiffness) { m_contactStiffness = stiffness;}
-    double getContactStiffness() const { return m_contactStiffness; }
+    void computeElasticConstants();
 
     ///
     /// \brief Initialize FEM constraints
@@ -166,30 +176,19 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    void setTimeStep(const double timeStep) { m_dt = timeStep; };
-    void setDefaultTimeStep(const double timeStep) { m_DefaultDt = timeStep; };
+    virtual void setTimeStep(const Real timeStep) override { m_Parameters->m_dt = timeStep; }
+    void setDefaultTimeStep(const Real timeStep) { m_Parameters->m_DefaultDt = static_cast<Real>(timeStep); }
 
     ///
     /// \brief Set the time step size to fixed size
     ///
-    void setTimeStepSizeType(const TimeSteppingType type) override;
+    virtual void setTimeStepSizeType(const TimeSteppingType type) override;
 
     ///
     /// \brief Returns the time step size
     ///
-    double getTimeStep() const { return m_dt; };
-    double getDefaultTimeStep() const { return m_DefaultDt; };
-
-    ///
-    /// \brief Set the gravity
-    ///
-    void setGravity(const Vec3d& g) { m_gravity = g; };
-
-    ///
-    /// \brief Set/get viscous damping coefficient. Will be applied globally
-    ///
-    void setViscousDamping(const double damping);
-    double getViscousDamping() {return m_viscousDampingCoeff; }
+    virtual double getTimeStep() const override { return m_Parameters->m_dt; }
+    double getDefaultTimeStep() const { return m_Parameters->m_DefaultDt; }
 
     ///
     /// \brief Set uniform mass to all the nodes
@@ -224,8 +223,8 @@ public:
     ///
     /// \brief Update body states given the newest update and the type of update
     ///
-    void updateBodyStates(const Vectord& q,
-                          const stateUpdateType updateType = stateUpdateType::displacement) override {};
+    virtual void updateBodyStates(const Vectord& /*q*/,
+                                  const stateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
 
     ///
     /// \brief Initialize the PBD model
@@ -235,34 +234,15 @@ public:
     ///
     /// \brief Return Constraints
     ///
-    const std::vector<std::shared_ptr<PbdConstraint>> getConstraints() const { return m_constraints; };
+    const std::vector<std::shared_ptr<PbdConstraint>> getConstraints() const { return m_constraints; }
 
 protected:
-    std::shared_ptr<PointSet> m_mesh;                           ///> PointSet on which the pbd model operates on
-    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;  ///> List of pbd constraints
+    std::shared_ptr<PointSet> m_mesh;    ///> PointSet on which the pbd model operates on
+    std::vector<double>       m_mass;    ///> Mass of nodes
+    std::vector<double>       m_invMass; ///> Inverse of mass of nodes
 
-    std::vector<std::size_t> m_fixedNodeIds;                    ///> Nodal IDs of the nodes that are fixed
-    std::vector<std::string> m_constraintConfig;
-
-    // Lame's constants
-    double m_mu;                            ///> Lame constant
-    double m_lambda;                        ///> Lame constant
-
-    // Mass properties
-    double m_uniformMassValue = 1.0;
-    std::vector<double> m_mass;             ///> Mass of nodes
-    std::vector<double> m_invMass;          ///> Inverse of mass of nodes
-
-    double m_contactStiffness = 1.;         ///> Contact stiffness for collisions
-    Vec3d m_gravity;                        ///> Gravity
-
-    double m_viscousDampingCoeff = 0.01;    ///> Viscous damping coefficient [0, 1]
-
-    unsigned int m_maxIter;                 ///> Max. pbd iterations
-    double m_proximity;                     ///> Proximity for collisions
-
-    double m_dt;                            ///> Time step size
-    double m_DefaultDt;                     ///> Default Time step size
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
+    std::shared_ptr<PBDModelConfig>             m_Parameters;  ///> Model parameters, must be set before simulation
 };
 } // imstk
 

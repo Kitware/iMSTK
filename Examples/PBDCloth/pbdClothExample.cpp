@@ -77,14 +77,23 @@ int main()
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(surfMesh);
-    pbdModel->configure(/*Number of constraints*/ 2,
-        /*Constraint configuration*/ "Distance 0.1",
-        /*Constraint configuration*/ "Dihedral 0.001",
-        /*Mass*/ 1.0,
-        /*Gravity*/ "0 -9.8 0",
-        /*TimeStep*/ 0.03,
-        /*FixedPoint*/ "1 2 3 4 5 6 7 8 9 10 11",
-        /*NumberOfIterationInConstraintSolver*/ 5);
+
+    // configure model
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+
+    // Constraints
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
+    pbdParams->m_fixedNodeIds = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt = 0.03;
+    pbdParams->m_maxIter = 5;
+
+    // Set the parameters
+    pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setPhysicsGeometry(surfMesh);
 

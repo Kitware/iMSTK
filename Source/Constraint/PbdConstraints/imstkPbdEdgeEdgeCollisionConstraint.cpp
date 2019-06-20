@@ -85,7 +85,7 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     auto l = n.norm();
     n /= l;
 
-    const auto dist = m_model1->getProximity() + m_model2->getProximity();
+    const auto dist = m_model1->getParameters()->m_proximity + m_model2->getParameters()->m_proximity;
 
     if (l > dist)
     {
@@ -113,22 +113,22 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
 
     if (im0 > 0)
     {
-        x0 += -im0*lambda*grad0*m_model1->getContactStiffness();
+        x0 += -im0*lambda*grad0*m_model1->getParameters()->m_contactStiffness;
     }
 
     if (im1 > 0)
     {
-        x1 += -im1*lambda*grad1*m_model1->getContactStiffness();
+        x1 += -im1*lambda*grad1*m_model1->getParameters()->m_contactStiffness;
     }
 
     if (im2 > 0)
     {
-        x2 += -im2*lambda*grad2*m_model2->getContactStiffness();
+        x2 += -im2*lambda*grad2*m_model2->getParameters()->m_contactStiffness;
     }
 
     if (im3 > 0)
     {
-        x3 += -im3*lambda*grad3*m_model2->getContactStiffness();
+        x3 += -im3*lambda*grad3*m_model2->getParameters()->m_contactStiffness;
     }
 
     return true;
