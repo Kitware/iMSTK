@@ -68,7 +68,6 @@ int main()
         }
         auto colorsGVMesh = volMesh->getMeshGraph().doGreedyColoring(true);
 
-
         auto surfMesh = std::make_shared<SurfaceMesh>();
         volMesh->extractSurfaceMesh(surfMesh, true);
         auto colorsGSMesh = surfMesh->getMeshGraph().doGreedyColoring(true);

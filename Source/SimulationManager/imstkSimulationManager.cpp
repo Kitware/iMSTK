@@ -33,7 +33,7 @@ SimulationManager::SimulationManager(const bool disableRendering, const bool ena
     // Init g3logger
     m_logUtil->createLogger("simulation", "./");
 
-    if(!disableRendering)
+    if (!disableRendering)
     {
 #ifdef iMSTK_USE_Vulkan
         m_viewer = std::make_shared<VulkanViewer>(this, enableVR);
@@ -43,7 +43,7 @@ SimulationManager::SimulationManager(const bool disableRendering, const bool ena
         m_viewer = std::make_shared<VTKViewer>(this, enableVR);
 #else
 
-        if(enableVR)
+        if (enableVR)
         {
             LOG(FATAL) << "Can not run VR simulation without iMSTK_ENABLE_VR";
         }
@@ -62,7 +62,7 @@ SimulationManager::getStatus() const
 void
 SimulationManager::setThreadPoolSize(const int nThreads)
 {
-    if(nThreads <= 0)
+    if (nThreads <= 0)
     {
         setOptimalThreadPoolSize();
     }
@@ -87,7 +87,7 @@ SimulationManager::isSceneRegistered(const std::string& sceneName) const
 std::shared_ptr<SceneManager>
 SimulationManager::getSceneManager(const std::string& sceneName) const
 {
-    if(!this->isSceneRegistered(sceneName))
+    if (!this->isSceneRegistered(sceneName))
     {
         LOG(WARNING) << "No scene named '" << sceneName
                      << "' was registered in this simulation";
@@ -100,7 +100,7 @@ SimulationManager::getSceneManager(const std::string& sceneName) const
 std::shared_ptr<imstk::SceneManager>
 SimulationManager::getSceneManager(std::shared_ptr<Scene> scene) const
 {
-    if(!scene)
+    if (!scene)
     {
         LOG(WARNING) << "SimulationManager::getSceneManager - Scene supplied is not valid!";
     }
@@ -123,7 +123,7 @@ SimulationManager::getActiveScene() const
 std::shared_ptr<Scene>
 SimulationManager::createNewScene(const std::string& newSceneName)
 {
-    if(this->isSceneRegistered(newSceneName))
+    if (this->isSceneRegistered(newSceneName))
     {
         LOG(WARNING) << "Can not create new scene: '" << newSceneName
                      << "' is already registered in this simulation\n"
@@ -140,7 +140,7 @@ SimulationManager::createNewScene(const std::string& newSceneName)
 std::shared_ptr<Scene>
 SimulationManager::createNewScene(std::string&& newSceneName)
 {
-    if(this->isSceneRegistered(newSceneName))
+    if (this->isSceneRegistered(newSceneName))
     {
         LOG(WARNING) << "Can not create new scene: '" << newSceneName
                      << "' is already registered in this simulation\n"
@@ -168,7 +168,7 @@ SimulationManager::addScene(std::shared_ptr<Scene> newScene)
 {
     std::string newSceneName = newScene->getName();
 
-    if(this->isSceneRegistered(newSceneName))
+    if (this->isSceneRegistered(newSceneName))
     {
         LOG(WARNING) << "Can not add scene: '" << newSceneName
                      << "' is already registered in this simulation\n"
@@ -183,7 +183,7 @@ SimulationManager::addScene(std::shared_ptr<Scene> newScene)
 void
 SimulationManager::removeScene(const std::string& sceneName)
 {
-    if(!this->isSceneRegistered(sceneName))
+    if (!this->isSceneRegistered(sceneName))
     {
         LOG(WARNING) << "No scene named '" << sceneName
                      << "' was registered in this simulation";
@@ -203,7 +203,7 @@ SimulationManager::isModuleRegistered(const std::string& moduleName) const
 std::shared_ptr<Module>
 SimulationManager::getModule(const std::string& moduleName) const
 {
-    if(!this->isModuleRegistered(moduleName))
+    if (!this->isModuleRegistered(moduleName))
     {
         LOG(WARNING) << "No module named '" << moduleName
                      << "' was registered in this simulation";
@@ -218,7 +218,7 @@ SimulationManager::addModule(std::shared_ptr<Module> newModule)
 {
     std::string newModuleName = newModule->getName();
 
-    if(this->isModuleRegistered(newModuleName))
+    if (this->isModuleRegistered(newModuleName))
     {
         LOG(WARNING) << "Can not add module: '" << newModuleName
                      << "' is already registered in this simulation\n";
@@ -232,7 +232,7 @@ SimulationManager::addModule(std::shared_ptr<Module> newModule)
 void
 SimulationManager::removeModule(const std::string& moduleName)
 {
-    if(!this->isModuleRegistered(moduleName))
+    if (!this->isModuleRegistered(moduleName))
     {
         LOG(WARNING) << "No module named '" << moduleName
                      << "' was registered in this simulation";
@@ -262,26 +262,26 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
 {
     LOG(INFO) << "SimulationManager::setActiveScene - Setting " << newSceneName << " as active";
 
-    if(newSceneName == m_activeSceneName)
+    if (newSceneName == m_activeSceneName)
     {
         LOG(WARNING) << "\tScene '" << newSceneName << "' is already active";
         return;
     }
 
     auto newScene = this->getScene(newSceneName);
-    if(!newScene)
+    if (!newScene)
     {
         LOG(WARNING) << "\tCan not find scene";
         return;
     }
 
-    if(m_viewer)
+    if (m_viewer)
     {
         // Update viewer scene
         m_viewer->setActiveScene(newScene);
 
         // If not yet rendering: update current scene and return
-        if(!m_viewer->isRendering())
+        if (!m_viewer->isRendering())
         {
             m_activeSceneName = newSceneName;
             return;
@@ -289,9 +289,9 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
     }
     // If rendering and simulation not active:
     // render scene in debug, update current scene, and return
-    if(m_status == SimulationStatus::INACTIVE)
+    if (m_status == SimulationStatus::INACTIVE)
     {
-        if(m_viewer)
+        if (m_viewer)
         {
             m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
         }
@@ -299,7 +299,7 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
         return;
     }
 
-    if(m_viewer)
+    if (m_viewer)
     {
         // If rendering and simulation active:
         // render scene in simulation mode, and update simulation
@@ -308,7 +308,7 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
 
     // Stop/Pause running scene
     auto oldSceneManager = m_sceneManagerMap.at(m_activeSceneName);
-    if(unloadCurrentScene)
+    if (unloadCurrentScene)
     {
         LOG(INFO) << "\tUnloading '" << m_activeSceneName << "'";
         oldSceneManager->end();
@@ -321,11 +321,11 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
 
     // Start/Run new scene
     auto newSceneManager = m_sceneManagerMap.at(newSceneName);
-    if(newSceneManager->getStatus() == ModuleStatus::INACTIVE)
+    if (newSceneManager->getStatus() == ModuleStatus::INACTIVE)
     {
         this->startModuleInNewThread(newSceneManager);
     }
-    else if(newSceneManager->getStatus() == ModuleStatus::PAUSED)
+    else if (newSceneManager->getStatus() == ModuleStatus::PAUSED)
     {
         newSceneManager->run();
     }
@@ -335,21 +335,21 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
 void
 SimulationManager::launchSimulation()
 {
-    if(m_status == SimulationStatus::RUNNING)
+    if (m_status == SimulationStatus::RUNNING)
     {
         LOG(WARNING) << "SimulationManager::launchSimulation() - Simulation already running!";
         return;
     }
 
-    if(!this->getActiveScene())
+    if (!this->getActiveScene())
     {
         LOG(WARNING) << "SimulationManager::launchSimulation - No valid active scene! Simulation canceled";
         return;
     }
 
-    if(!this->getActiveScene()->isInitialized())
+    if (!this->getActiveScene()->isInitialized())
     {
-        if(!this->getActiveScene()->initialize())
+        if (!this->getActiveScene()->initialize())
         {
             LOG(WARNING) << "SimulationManager::startSimulation - Unable to initialize the active scene - "
                          << this->getActiveScene()->getName() << std::endl;
@@ -358,7 +358,7 @@ SimulationManager::launchSimulation()
     }
 
     // Start modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         this->startModuleInNewThread(pair.second);
     }
@@ -375,15 +375,15 @@ void
 SimulationManager::startSimulation(const SimulationStatus simStatus /*= SimulationStatus::PAUSED*/,
                                    const Renderer::Mode renderMode /*= Renderer::Mode::SIMULATION*/)
 {
-    if(!this->getActiveScene())
+    if (!this->getActiveScene())
     {
         LOG(WARNING) << "SimulationManager::startSimulation - No valid active scene! Simulation canceled";
         return;
     }
 
-    if(!this->getActiveScene()->isInitialized())
+    if (!this->getActiveScene()->isInitialized())
     {
-        if(!this->getActiveScene()->initialize())
+        if (!this->getActiveScene()->initialize())
         {
             LOG(WARNING) << "SimulationManager::startSimulation - Unable to initialize the active scene - "
                          << this->getActiveScene()->getName() << std::endl;
@@ -391,14 +391,14 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
         }
     }
 
-    if(m_status != SimulationStatus::INACTIVE)
+    if (m_status != SimulationStatus::INACTIVE)
     {
         LOG(WARNING) << "Simulation already active";
         return;
     }
 
     auto startingSceneManager = m_sceneManagerMap.at(m_activeSceneName);
-    if(startingSceneManager->getStatus() != ModuleStatus::INACTIVE)
+    if (startingSceneManager->getStatus() != ModuleStatus::INACTIVE)
     {
         LOG(WARNING) << "Scene '" << m_activeSceneName << "' is already active";
         return;
@@ -406,12 +406,12 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
 
     // Launch simulation right away if the simulator starts in running mode
     this->launchSimulation();
-    if(simStatus == SimulationStatus::PAUSED)
+    if (simStatus == SimulationStatus::PAUSED)
     {
         this->pauseSimulation();
     }
 
-    if(m_viewer)
+    if (m_viewer)
     {
         // start the viewer
         this->startViewer(renderMode);
@@ -427,29 +427,29 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
 void
 SimulationManager::infiniteLoopNoRenderingMode()
 {
-    while(this->getStatus() == SimulationStatus::RUNNING || this->getStatus() == SimulationStatus::PAUSED)
+    while (this->getStatus() == SimulationStatus::RUNNING || this->getStatus() == SimulationStatus::PAUSED)
     {
         auto c = getchar();
-        if(c == 'e' || c == 'E')
+        if (c == 'e' || c == 'E')
         {
             break;
         }
 
-        if(c == 'r' || c == 'R')
+        if (c == 'r' || c == 'R')
         {
             this->resetSimulation();
             continue;
         }
 
-        if(c == ' ')
+        if (c == ' ')
         {
-            if(this->getStatus() == SimulationStatus::RUNNING)
+            if (this->getStatus() == SimulationStatus::RUNNING)
             {
                 this->pauseSimulation();
                 continue;
             }
 
-            if(this->getStatus() == SimulationStatus::PAUSED)
+            if (this->getStatus() == SimulationStatus::PAUSED)
             {
                 this->runSimulation();
                 continue;
@@ -464,7 +464,7 @@ SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mod
     m_viewer->setRenderingMode(renderMode);
 
     // Start Rendering
-    if(!m_viewer->isRendering())
+    if (!m_viewer->isRendering())
     {
         this->printUserControlsInfo();
 
@@ -475,7 +475,7 @@ SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mod
         LOG(INFO) << "Closing viewer";
 
         // End simulation if active when loop exits
-        if(m_status != SimulationStatus::INACTIVE)
+        if (m_status != SimulationStatus::INACTIVE)
         {
             this->endSimulation();
         }
@@ -485,7 +485,7 @@ SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mod
 void
 SimulationManager::printUserControlsInfo(const bool isRendering) const
 {
-    if(isRendering)
+    if (isRendering)
     {
         LOG(INFO) <<
             "\n------------------------\n" <<
@@ -513,7 +513,7 @@ SimulationManager::printUserControlsInfo(const bool isRendering) const
 void
 SimulationManager::runSimulation()
 {
-    if(m_status != SimulationStatus::PAUSED)
+    if (m_status != SimulationStatus::PAUSED)
     {
         LOG(WARNING) << "SimulationManager::runSimulation() - Simulation is not paused! cannot run (un-pause) simulation";
         return;
@@ -523,7 +523,7 @@ SimulationManager::runSimulation()
         LOG(INFO) << "Running simulation";
     }
 
-    if(!m_simThreadLaunched)
+    if (!m_simThreadLaunched)
     {
         this->launchSimulation();
     }
@@ -532,7 +532,7 @@ SimulationManager::runSimulation()
     m_sceneManagerMap.at(m_activeSceneName)->run();
 
     // Run modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         (pair.second)->run();
     }
@@ -544,7 +544,7 @@ SimulationManager::runSimulation()
 void
 SimulationManager::pauseSimulation()
 {
-    if(m_status != SimulationStatus::RUNNING)
+    if (m_status != SimulationStatus::RUNNING)
     {
         LOG(WARNING) << "SimulationManager::pauseSimulation(): - Simulation not running, can not pause";
         return;
@@ -560,7 +560,7 @@ SimulationManager::pauseSimulation()
     m_sceneManagerMap.at(m_activeSceneName)->pause();
 
     // Pause other modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         (pair.second)->pause();
     }
@@ -581,8 +581,8 @@ SimulationManager::resetSimulation()
 void
 SimulationManager::endSimulation()
 {
-    if((m_status != SimulationStatus::RUNNING) &&
-       (m_status != SimulationStatus::PAUSED))
+    if ((m_status != SimulationStatus::RUNNING) &&
+        (m_status != SimulationStatus::PAUSED))
     {
         LOG(WARNING) << "SimulationManager::endSimulation() - Simulation already terminated!";
         return;
@@ -592,26 +592,26 @@ SimulationManager::endSimulation()
         LOG(INFO) << "Ending simulation";
     }
 
-    if(m_viewer)
+    if (m_viewer)
     {
         // Update Renderer
         m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
     }
 
     // End modules
-    for(const auto& pair : m_modulesMap)
+    for (const auto& pair : m_modulesMap)
     {
         (pair.second)->end();
         m_threadMap.at(pair.first).join();
     }
 
     // End all scenes
-    for(auto pair : m_sceneManagerMap)
+    for (auto pair : m_sceneManagerMap)
     {
         std::string sceneName   = pair.first;
         ModuleStatus sceneStatus = pair.second->getStatus();
 
-        if(sceneStatus != ModuleStatus::INACTIVE)
+        if (sceneStatus != ModuleStatus::INACTIVE)
         {
             m_sceneManagerMap.at(sceneName)->end();
             m_threadMap.at(sceneName).join();

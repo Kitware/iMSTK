@@ -38,15 +38,15 @@ void
 LinearProjectionConstraint::setProjection(const size_t& nodeId, const Vec3d& p, const Vec3d& q /*= Vec3d::Zero()*/)
 {
     m_nodeId = nodeId;
-    m_projection = Mat3d::Identity() - p*p.transpose() - q*q.transpose();
+    m_projection = Mat3d::Identity() - p * p.transpose() - q * q.transpose();
 }
 
 void
 LinearProjectionConstraint::setProjectionToLine(const size_t& nodeId, const Vec3d& p)
 {
     m_nodeId = nodeId;
-    auto v = p/p.norm();
-    m_projection = v*v.transpose();
+    auto v = p / p.norm();
+    m_projection = v * v.transpose();
 }
 
 void

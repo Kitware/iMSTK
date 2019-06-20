@@ -154,7 +154,7 @@ AssimpMeshIO::convertAssimpMesh(aiMesh * importedMesh)
             UVs[i] = UV;
         }
         mesh->setDefaultTCoords("tCoords");
-        mesh->setPointDataArray("tCoords",UVs);
+        mesh->setPointDataArray("tCoords", UVs);
     }
     return mesh;
 }

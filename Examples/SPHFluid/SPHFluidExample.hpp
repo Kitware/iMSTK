@@ -45,16 +45,16 @@ int main(int argc, char* argv[])
     double particleRadius = 0.1;
 
     // Parse command line arguments
-    for(int i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
         auto param = std::string(argv[i]);
-        if(param.find("threads") == 0 &&
-           param.find_first_of("=") != std::string::npos)
+        if (param.find("threads") == 0 &&
+            param.find_first_of("=") != std::string::npos)
         {
             threads = std::stoi(param.substr(param.find_first_of("=") + 1));
         }
-        else if(param.find("radius") == 0 &&
-                param.find_first_of("=") != std::string::npos)
+        else if (param.find("radius") == 0 &&
+                 param.find_first_of("=") != std::string::npos)
         {
             particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
             LOG(INFO) << "Particle radius: " << particleRadius;
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     }
 
     // Override particle radius for scene3 because particles in this scene were pre-generated using particle radius 0.08
-    if(SCENE_ID == 3)
+    if (SCENE_ID == 3)
     {
         particleRadius = 0.08;
     }
@@ -83,16 +83,16 @@ int main(int argc, char* argv[])
     // Collision between fluid and solid objects
     auto colGraph = scene->getCollisionGraph();
 
-    for(auto& solid: solids)
+    for (auto& solid: solids)
     {
-        if(std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
+        if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
         {
             colGraph->addInteractionPair(fluidObj, solid,
                                  CollisionDetection::Type::PointSetToPlane,
                                  CollisionHandling::Type::SPH,
                                  CollisionHandling::Type::None);
         }
-        else if(std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
+        else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
         {
             colGraph->addInteractionPair(fluidObj, solid,
                                          CollisionDetection::Type::PointSetToSphere,

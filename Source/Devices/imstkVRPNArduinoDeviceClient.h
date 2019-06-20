@@ -47,7 +47,7 @@ public:
     ///
     VRPNArduinoDeviceClient(std::string deviceName, std::string ip) :
         DeviceClient(deviceName, ip),
-        Module(deviceName+"@"+ip)
+        Module(deviceName + "@" + ip)
     {}
 
     ///
@@ -79,7 +79,6 @@ protected:
 
 private:
 
-
     ///
     /// \brief VRPN call back for position and orientation data
     /// \param userData Pointer to this to allow updating
@@ -88,7 +87,6 @@ private:
     /// orientation data
     ///
     static void VRPN_CALLBACK analogChangeHandler(void *userData, const _vrpn_ANALOGCB a);
-
 
     std::shared_ptr<vrpn_Analog_Remote> m_vrpnAnalog;           //!< VRPN position/orientation interface
     Vec3d m_ypr = Vec3d::Zero();

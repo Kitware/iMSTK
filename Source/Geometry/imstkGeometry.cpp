@@ -98,7 +98,7 @@ Geometry::rotate(const Vec3d& axis, double angle, TransformType type)
 void
 Geometry::scale(double s, TransformType type)
 {
-    if(s <= 0)
+    if (s <= 0)
     {
         LOG(WARNING) << "Geometry::scale error: scaling should be positive.";
         return;
@@ -193,7 +193,7 @@ Geometry::getScaling() const
 void
 Geometry::setScaling(double s)
 {
-    if(s <= 0)
+    if (s <= 0)
     {
         LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
         return;

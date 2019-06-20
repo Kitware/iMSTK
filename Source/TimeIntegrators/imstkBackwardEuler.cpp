@@ -29,7 +29,7 @@ BackwardEuler::updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
                                   Vectord& dV)
 {
     currentState->getQDot() = prevState->getQDot() + dV;
-    currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
+    currentState->getQ() = prevState->getQ() + m_dT * currentState->getQDot();
 }
 
 void
@@ -47,7 +47,7 @@ BackwardEuler::updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
                                  Vectord& v)
 {
     currentState->getQDot() = v;
-    currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
+    currentState->getQ() = prevState->getQ() + m_dT * currentState->getQDot();
 }
 
 void

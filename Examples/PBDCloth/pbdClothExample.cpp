@@ -44,14 +44,14 @@ int main()
     const double height = 10.0;
     const int nRows = 11;
     const int nCols = 11;
-    vertList.resize(nRows*nCols);
+    vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
-            vertList[i*nCols + j] = Vec3d((double)dx*i, 1.0, (double)dy*j);
+            vertList[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
         }
     }
     surfMesh->setInitialVertexPositions(vertList);
@@ -64,8 +64,8 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, (i + 1)*nCols + j, i*nCols + j + 1 } };
-            tri[1] = { { (i + 1)*nCols + j + 1, i*nCols + j + 1, (i + 1)*nCols + j } };
+            tri[0] = { { i*nCols + j, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, i * nCols + j + 1, (i + 1) * nCols + j } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }

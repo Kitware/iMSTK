@@ -27,7 +27,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 void
 SphereCylinderCD::computeCollisionData()
 {
@@ -43,7 +44,7 @@ SphereCylinderCD::computeCollisionData()
     const double rCylinder = m_cylinder->getRadius();
 
     // Compute shortest distance
-    Vec3d distVec = (spherePos - cylinderPos) - cylinderAxis*(spherePos - cylinderPos).dot(cylinderAxis);
+    Vec3d distVec = (spherePos - cylinderPos) - cylinderAxis * (spherePos - cylinderPos).dot(cylinderAxis);
     Vec3d n = -distVec / distVec.norm();
 
     // Compute penetration depth
@@ -54,8 +55,8 @@ SphereCylinderCD::computeCollisionData()
     }
 
     // Compute collision points
-    Vec3d sphereColPt = spherePos + rSphere*n;
-    Vec3d cylinderColPt = cylinderPos + cylinderAxis*(spherePos - cylinderPos).dot(cylinderAxis) + n * rCylinder;
+    Vec3d sphereColPt = spherePos + rSphere * n;
+    Vec3d cylinderColPt = cylinderPos + cylinderAxis * (spherePos - cylinderPos).dot(cylinderAxis) + n * rCylinder;
 
     // Set collisionData
     m_colData->PDColData.push_back({ sphereColPt, cylinderColPt, n, penetrationDepth });

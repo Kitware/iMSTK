@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #pragma once
 
 #include <cmath>
@@ -51,7 +50,7 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        if(N == 2)
+        if (N == 2)
         {
             m_k = Real(4.0) / (PI * std::pow(m_radius, 8));
             m_l = -Real(24.0) / (PI * std::pow(m_radius, 8));
@@ -98,7 +97,7 @@ public:
     {
         VecXr res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2 && r2 > Real(1e-12))
+        if (r2 <= m_radius2 && r2 > Real(1e-12))
         {
             Real tmp = m_radius2 - r2;
             res = m_l * tmp * tmp * r;
@@ -115,7 +114,7 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             Real tmp  = m_radius2 - r2;
             Real tmp2 = Real(3.0) * m_radius2 - Real(7.0) * r2;
@@ -153,7 +152,7 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        if(N == 2)
+        if (N == 2)
         {
             const auto radius5 = std::pow(m_radius, 5);
             m_k = Real(10.0) / (PI * radius5);
@@ -197,7 +196,7 @@ public:
     {
         VecXr res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2 && r2 > Real(1e-12))
+        if (r2 <= m_radius2 && r2 > Real(1e-12))
         {
             const auto rl  = std::sqrt(r2);
             const auto hr  = m_radius - rl;
@@ -215,7 +214,6 @@ protected:
     Real m_l;       ///> Kernel coefficient for gradW()
     Real m_W0;      ///> Precomputed W(0)
 };
-
 
 template<int N>
 class CohesionKernel
@@ -236,7 +234,7 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        if(N == 2)
+        if (N == 2)
         {
             LOG(FATAL) << "Unimplemented function";
         }
@@ -256,11 +254,11 @@ public:
     {
         Real res = 0.;
         const auto r2  = r * r;
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r1 = std::sqrt(r2);
             const auto r3 = r2 * r1;
-            if(r1 > Real(0.5) * m_radius)
+            if (r1 > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(m_radius - r1, 3) * r3;
             }
@@ -280,11 +278,11 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r1 = std::sqrt(r2);
             const auto r3 = r2 * r1;
-            if(r1 > Real(0.5) * m_radius)
+            if (r1 > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(m_radius - r1, 3) * r3;
             }
@@ -328,7 +326,7 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        if(N == 2)
+        if (N == 2)
         {
             LOG(FATAL) << "Unimplemented function";
         }
@@ -347,10 +345,10 @@ public:
     {
         Real res = 0.;
         const auto r2  = r * r;
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r = std::sqrt(r2);
-            if(r > Real(0.5) * m_radius)
+            if (r > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(-4.0 * r2 / m_radius + Real(6.0) * r - Real(2.0) * m_radius, 0.25);
             }
@@ -366,10 +364,10 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto r = std::sqrt(r2);
-            if(r > Real(0.5) * m_radius)
+            if (r > Real(0.5) * m_radius)
             {
                 res = m_k * std::pow(-4.0 * r2 / m_radius + Real(6.0) * r - Real(2.0) * m_radius, 0.25);
             }
@@ -418,7 +416,7 @@ public:
     {
         Real res = 0.;
         const auto r2  = r.squaredNorm();
-        if(r2 <= m_radius2)
+        if (r2 <= m_radius2)
         {
             const auto d = std::sqrt(r2);
             res = m_k * (Real(1) - d / m_radius);

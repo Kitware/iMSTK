@@ -134,6 +134,7 @@ public:
     {
         return *m_DynamicLinearProjConstraints;
     }
+
 private:
     double m_relaxationFactor = 0.5;
 

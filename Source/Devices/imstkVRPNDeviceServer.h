@@ -76,7 +76,6 @@ public:
     ///
     void addDevice(std::string deviceName, DeviceType deviceType, int id = 0);
 
-
     ///
     /// \brief Add serial device
     ///

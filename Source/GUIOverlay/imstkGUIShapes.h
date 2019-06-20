@@ -183,7 +183,7 @@ public:
         else
         {
             drawList->AddRect(ImVec2(m_position[0], m_position[1]),
-                ImVec2(m_width + m_position[0], m_height +m_position[1]),
+                ImVec2(m_width + m_position[0], m_height + m_position[1]),
                 GUIOverlay::Utilities::convertToGUIColor(m_color),
                 0);
         }

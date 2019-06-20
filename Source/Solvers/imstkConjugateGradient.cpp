@@ -43,11 +43,11 @@ ConjugateGradient::applyLinearProjectionFilter(Vectord& x, const std::vector<Lin
     for (auto &localProjector : linProj)
     {
         const auto threeI = 3 * localProjector.getNodeId();
-        Vec3d p = localProjector.getProjector()*Vec3d(x(threeI), x(threeI + 1), x(threeI + 2));
+        Vec3d p = localProjector.getProjector() * Vec3d(x(threeI), x(threeI + 1), x(threeI + 2));
 
         if (setVal)
         {
-            p += (Mat3d::Identity() - localProjector.getProjector())*localProjector.getValue();
+            p += (Mat3d::Identity() - localProjector.getProjector()) * localProjector.getValue();
         }
 
         x(threeI) = p.x();
@@ -59,7 +59,7 @@ ConjugateGradient::applyLinearProjectionFilter(Vectord& x, const std::vector<Lin
 void
 ConjugateGradient::solve(Vectord& x)
 {
-    if(!m_linearSystem)
+    if (!m_linearSystem)
     {
         LOG(WARNING) << "ConjugateGradient::solve: Linear system is not supplied for CG solver!";
         return;
@@ -105,7 +105,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
     auto c = res;
     auto delta = res.dot(res);
     auto deltaPrev = delta;
-    const auto eps = m_tolerance*m_tolerance*delta;
+    const auto eps = m_tolerance * m_tolerance * delta;
     double alpha = 0.0;
     double dotval;
     auto q = Vectord(b.size()).setZero();

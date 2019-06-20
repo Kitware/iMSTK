@@ -45,7 +45,7 @@ Camera::setPosition(const double& x,
                     const double& y,
                     const double& z)
 {
-    m_position = Vec3d(x,y,z);
+    m_position = Vec3d(x, y, z);
 }
 
 const Vec3d&
@@ -65,7 +65,7 @@ Camera::setFocalPoint(const double& x,
                       const double& y,
                       const double& z)
 {
-    m_focalPoint = Vec3d(x,y,z);
+    m_focalPoint = Vec3d(x, y, z);
 }
 
 const Vec3d&
@@ -85,7 +85,7 @@ Camera::setViewUp(const double& x,
                   const double& y,
                   const double& z)
 {
-    m_viewUp = Vec3d(x,y,z).normalized();
+    m_viewUp = Vec3d(x, y, z).normalized();
 }
 
 const double& Camera::getFieldOfView() const

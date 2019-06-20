@@ -113,7 +113,6 @@ VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
     }
 }
 
-
 void
 VTKViewer::setRenderingMode(const Renderer::Mode mode)
 {

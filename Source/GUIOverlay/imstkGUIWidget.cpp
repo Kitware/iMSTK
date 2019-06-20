@@ -48,7 +48,6 @@ Widget::getType()
     return m_type;
 }
 
-
 const Vec2f&
 Widget::getPosition()
 {

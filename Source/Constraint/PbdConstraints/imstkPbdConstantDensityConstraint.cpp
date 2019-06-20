@@ -134,7 +134,6 @@ PbdConstantDensityConstraint::updateNeighborsBruteForce(const Vec3d &pi,
     m_numNeighbors[index] = neighborCount;
 }
 
-
 inline void
 PbdConstantDensityConstraint::calculateDensityEstimate(const Vec3d &pi,
                                                        const size_t index,

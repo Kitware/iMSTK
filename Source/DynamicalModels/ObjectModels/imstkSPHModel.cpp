@@ -102,11 +102,11 @@ Real SPHModel::computeCFLTimeStepSize()
     Real timestep = maxVel > Real(1e-6) ? m_Parameters->m_CFLFactor * (Real(2.0) * m_Parameters->m_ParticleRadius / maxVel) : m_Parameters->m_MaxTimestep;
 
     // clamp the time step size to be within a given range
-    if(timestep > m_Parameters->m_MaxTimestep)
+    if (timestep > m_Parameters->m_MaxTimestep)
     {
         timestep = m_Parameters->m_MaxTimestep;
     }
-    else if(timestep < m_Parameters->m_MinTimestep)
+    else if (timestep < m_Parameters->m_MinTimestep)
     {
         timestep = m_Parameters->m_MinTimestep;
     }
@@ -117,7 +117,7 @@ Real SPHModel::computeCFLTimeStepSize()
 void SPHModel::findParticleNeighbors()
 {
     m_NeighborSearcher->getNeighbors(getState().getFluidNeighborLists(), getState().getPositions());
-    if(m_Parameters->m_bDensityWithBoundary)   // if considering boundary particles for computing fluid density
+    if (m_Parameters->m_bDensityWithBoundary)   // if considering boundary particles for computing fluid density
     {
         m_NeighborSearcher->getNeighbors(getState().getBoundaryNeighborLists(), getState().getPositions(),
                                          getState().getBoundaryParticlePositions());
@@ -128,7 +128,7 @@ void SPHModel::computeNeighborRelativePositions()
 {
     auto computeRelativePositions = [&](const Vec3r& ppos, const std::vector<size_t>& neighborList,
                                         const StdVectorOfVec3r& allPositions, std::vector<NeighborInfo>& neighborInfo) {
-                                        for(const size_t q : neighborList)
+                                        for (const size_t q : neighborList)
                                         {
                                             const Vec3r& qpos = allPositions[q];
                                             const Vec3r r     = ppos - qpos;
@@ -145,7 +145,7 @@ void SPHModel::computeNeighborRelativePositions()
 
             computeRelativePositions(ppos, getState().getFluidNeighborLists()[p], getState().getPositions(), neighborInfo);
             // if considering boundary particles then also cache relative positions with them
-            if(m_Parameters->m_bDensityWithBoundary)
+            if (m_Parameters->m_bDensityWithBoundary)
             {
                 computeRelativePositions(ppos, getState().getBoundaryNeighborLists()[p], getState().getBoundaryParticlePositions(), neighborInfo);
             }
@@ -160,13 +160,13 @@ void SPHModel::collectNeighborDensity()
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
-            if(neighborInfo.size() <= 1)
+            if (neighborInfo.size() <= 1)
             {
                 return; // the particle has no neighbor
             }
 
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
-            for(size_t i = 0; i < fluidNeighborList.size(); ++i)
+            for (size_t i = 0; i < fluidNeighborList.size(); ++i)
             {
                 auto q = fluidNeighborList[i];
                 neighborInfo[i].density = getState().getDensities()[q];
@@ -179,13 +179,13 @@ void SPHModel::computeDensity()
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            if(neighborInfo.size() <= 1)
+            if (neighborInfo.size() <= 1)
             {
                 return; // the particle has no neighbor
             }
 
             Real pdensity = 0;
-            for(const auto& qInfo : neighborInfo)
+            for (const auto& qInfo : neighborInfo)
             {
                 pdensity += m_Kernels.W(qInfo.xpq);
             }
@@ -196,7 +196,7 @@ void SPHModel::computeDensity()
 
 void SPHModel::normalizeDensity()
 {
-    if(!m_Parameters->m_bNormalizeDensity)
+    if (!m_Parameters->m_bNormalizeDensity)
     {
         return;
     }
@@ -205,7 +205,7 @@ void SPHModel::normalizeDensity()
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             auto& neighborInfo = getState().getNeighborInfo()[p];
-            if(neighborInfo.size() <= 1)
+            if (neighborInfo.size() <= 1)
             {
                 return; // the particle has no neighbor
             }
@@ -213,7 +213,7 @@ void SPHModel::normalizeDensity()
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
             Real tmp = 0;
 
-            for(size_t i = 0; i < fluidNeighborList.size(); ++i)
+            for (size_t i = 0; i < fluidNeighborList.size(); ++i)
             {
                 const auto& qInfo = neighborInfo[i];
 
@@ -223,14 +223,14 @@ void SPHModel::normalizeDensity()
                 tmp += m_Kernels.W(qInfo.xpq) / qdensity;
             }
 
-            if(m_Parameters->m_bDensityWithBoundary)
+            if (m_Parameters->m_bDensityWithBoundary)
             {
                 const auto& BDNeighborList = getState().getBoundaryNeighborLists()[p];
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
                 LOG_IF(FATAL, (fluidNeighborList.size() + BDNeighborList.size() != neighborInfo.size()))
                 << "Invalid neighborInfo computation";
 #endif
-                for(size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
+                for (size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
                 {
                     const auto& qInfo = neighborInfo[i];
                     tmp += m_Kernels.W(qInfo.xpq) / m_Parameters->m_RestDensity;     // density of boundary particle is set to rest density
@@ -256,7 +256,7 @@ void SPHModel::computePressureAcceleration()
         [&](const size_t p) {
             Vec3r accel(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            if(neighborInfo.size() <= 1)
+            if (neighborInfo.size() <= 1)
             {
                 getState().getAccelerations()[p] = accel;
                 return;
@@ -265,7 +265,7 @@ void SPHModel::computePressureAcceleration()
             const auto pdensity  = getState().getDensities()[p];
             const auto ppressure = particlePressure(pdensity);
 
-            for(size_t idx = 0; idx < neighborInfo.size(); ++idx)
+            for (size_t idx = 0; idx < neighborInfo.size(); ++idx)
             {
                 const auto& qInfo    = neighborInfo[idx];
                 const auto r         = qInfo.xpq;
@@ -294,7 +294,7 @@ void SPHModel::computeViscosity()
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            if(neighborInfo.size() <= 1)
+            if (neighborInfo.size() <= 1)
             {
                 getState().getDiffuseVelocities()[p] = Vec3r(0, 0, 0);
                 return;
@@ -304,7 +304,7 @@ void SPHModel::computeViscosity()
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
 
             Vec3r diffuseFluid(0, 0, 0);
-            for(size_t i = 0; i < fluidNeighborList.size(); ++i)
+            for (size_t i = 0; i < fluidNeighborList.size(); ++i)
             {
                 const auto q        = fluidNeighborList[i];
                 const auto& qvel    = getState().getVelocities()[q];
@@ -316,9 +316,9 @@ void SPHModel::computeViscosity()
             diffuseFluid *= m_Parameters->m_ViscosityFluid;
 
             Vec3r diffuseBoundary(0, 0, 0);
-            if(m_Parameters->m_bDensityWithBoundary)
+            if (m_Parameters->m_bDensityWithBoundary)
             {
-                for(size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
+                for (size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
                 {
                     const auto& qInfo   = neighborInfo[i];
                     const auto r        = qInfo.xpq;
@@ -345,13 +345,13 @@ void SPHModel::computeSurfaceTension()
         [&](const size_t p) {
             Vec3r n(0, 0, 0);
             const auto& neighborInfo = getState().getNeighborInfo()[p];
-            if(neighborInfo.size() <= 1)
+            if (neighborInfo.size() <= 1)
             {
                 getState().getNormals()[p] = n;
                 return;
             }
 
-            for(size_t i = 0; i < neighborInfo.size(); ++i)
+            for (size_t i = 0; i < neighborInfo.size(); ++i)
             {
                 const auto& qInfo   = neighborInfo[i];
                 const auto r        = qInfo.xpq;
@@ -367,7 +367,7 @@ void SPHModel::computeSurfaceTension()
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
-            if(fluidNeighborList.size() <= 1)
+            if (fluidNeighborList.size() <= 1)
             {
                 return; // the particle has no neighbor
             }
@@ -377,10 +377,10 @@ void SPHModel::computeSurfaceTension()
             const auto& neighborInfo = getState().getNeighborInfo()[p];
 
             Vec3r accel(0, 0, 0);
-            for(size_t i = 0; i < fluidNeighborList.size(); ++i)
+            for (size_t i = 0; i < fluidNeighborList.size(); ++i)
             {
                 const auto q  = fluidNeighborList[i];
-                if(p == q)
+                if (p == q)
                 {
                     continue;
                 }
@@ -393,7 +393,7 @@ void SPHModel::computeSurfaceTension()
                 // Cohesion acc
                 auto r = qInfo.xpq;
                 const auto d2 = r.squaredNorm();
-                if(d2 > Real(1e-20))
+                if (d2 > Real(1e-20))
                 {
                     accel -= K_ij * m_Parameters->m_ParticleMass * (r / std::sqrt(d2)) * m_Kernels.cohesionW(r);
                 }

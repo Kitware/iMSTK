@@ -153,7 +153,6 @@ protected:
     bool m_mapped = false;
 };
 
-
 class VulkanInternalBuffer
 {
 public:
@@ -195,7 +194,6 @@ public:
     {
         vkUnmapMemory(device, *m_bufferGroup->getMemory()->m_memory);
     }
-
 
     VkDeviceSize getSize()
     {

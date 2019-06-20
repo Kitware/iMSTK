@@ -89,34 +89,34 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& res
             const auto ppos    = setA[p];
             const auto cellIdx = m_Grid.template getCell3DIndices<int>(ppos);
 
-            for(int k = -1; k <= 1; ++k)
+            for (int k = -1; k <= 1; ++k)
             {
                 int cellZ = cellIdx[2] + k;
-                if(!m_Grid.template isValidCellIndex<2>(cellZ))
+                if (!m_Grid.template isValidCellIndex<2>(cellZ))
                 {
                     continue;
                 }
-                for(int j = -1; j <= 1; ++j)
+                for (int j = -1; j <= 1; ++j)
                 {
                     int cellY = cellIdx[1] + j;
-                    if(!m_Grid.template isValidCellIndex<1>(cellY))
+                    if (!m_Grid.template isValidCellIndex<1>(cellY))
                     {
                         continue;
                     }
-                    for(int i = -1; i <= 1; ++i)
+                    for (int i = -1; i <= 1; ++i)
                     {
                         int cellX = cellIdx[0] + i;
-                        if(!m_Grid.template isValidCellIndex<0>(cellX))
+                        if (!m_Grid.template isValidCellIndex<0>(cellX))
                         {
                             continue;
                         }
 
                         // get index q of point in setB
-                        for(auto q : m_Grid.getCellData(cellX, cellY, cellZ).particleIndices)
+                        for (auto q : m_Grid.getCellData(cellX, cellY, cellZ).particleIndices)
                         {
                             const auto qpos = setB[q];
                             const auto d2   = (ppos - qpos).squaredNorm();
-                            if(d2 < m_SearchRadiusSqr)
+                            if (d2 < m_SearchRadiusSqr)
                             {
                                 pneighbors.push_back(q);
                             }

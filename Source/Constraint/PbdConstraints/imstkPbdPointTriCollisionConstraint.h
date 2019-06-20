@@ -32,7 +32,7 @@ namespace imstk
 class PbdPointTriangleConstraint : public PbdCollisionConstraint
 {
 public:
-    PbdPointTriangleConstraint() : PbdCollisionConstraint(1,3)
+    PbdPointTriangleConstraint() : PbdCollisionConstraint(1, 3)
     {}
 
     ///

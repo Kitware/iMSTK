@@ -49,6 +49,7 @@ public:
     {
         m_type = SceneObject::Type::Pbd;
     }
+
     PbdObject(std::string&& name) : DynamicObject(std::move(name))
     {
         m_type = SceneObject::Type::Pbd;

@@ -33,7 +33,7 @@ Cube::print() const
 double
 Cube::getVolume() const
 {
-    return m_width*m_width*m_width;
+    return m_width * m_width * m_width;
 }
 
 double

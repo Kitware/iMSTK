@@ -130,7 +130,7 @@ public:
 
     static const VkAccessFlags getAccessFlags(VkImageLayout imageLayout)
     {
-        switch(imageLayout)
+        switch (imageLayout)
         {
         case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
         case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
@@ -153,7 +153,7 @@ public:
 
     static const VkPipelineStageFlags getPipelineStageFlags(VkImageLayout imageLayout)
     {
-        switch(imageLayout)
+        switch (imageLayout)
         {
         case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
         case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:

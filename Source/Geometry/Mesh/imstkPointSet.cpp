@@ -72,8 +72,8 @@ PointSet::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
     else
     {
         Vec3d range = max - min;
-        min = min - range*(percent / 100);
-        max = max + range*(percent / 100);
+        min = min - range * (percent / 100);
+        max = max + range * (percent / 100);
     }
 }
 
@@ -197,7 +197,7 @@ PointSet::getPointDataMap() const
 void
 PointSet::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData)
 {
-    if ( arrayData.size() != this->getNumVertices())
+    if (arrayData.size() != this->getNumVertices())
     {
         LOG(WARNING) << "Specified array should have " << this->getNumVertices()
                      << " tuples, has " << arrayData.size();
@@ -234,7 +234,6 @@ PointSet::getNumVertices() const
 {
     return m_vertexPositions.size();
 }
-
 
 void
 PointSet::applyTranslation(const Vec3d t)
@@ -290,7 +289,7 @@ PointSet::updatePostTransformData()
         // NOTE: Right now scaling is appended on top of the rigid transform
         // for scaling around the mesh center, and not concatenated within
         // the transform, for ease of use.
-        m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i]* m_scaling);
+        m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i] * m_scaling);
     }
     m_transformApplied = true;
 }

@@ -38,7 +38,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
 {
     if (meshType != MeshFileType::MSH)
     {
-        LOG(WARNING) <<"MSHMeshIO::read error: file type not supported";
+        LOG(WARNING) << "MSHMeshIO::read error: file type not supported";
         return nullptr;
     }
 

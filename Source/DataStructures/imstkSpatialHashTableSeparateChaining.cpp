@@ -121,7 +121,6 @@ SpatialHashTableSeparateChaining::getPointsInAABB(std::vector<size_t>& result, c
     }
 }
 
-
 std::vector<size_t>
 SpatialHashTableSeparateChaining::getPointsInSphere(const Vec3d& ppos, double radius)
 {
@@ -134,7 +133,7 @@ void
 SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result, const Vec3d& ppos, const double radius)
 {
     int cellSpan[3];
-    for(int d = 0; d < 3; ++d)
+    for (int d = 0; d < 3; ++d)
     {
         cellSpan[d] = static_cast<int>(std::ceil(radius / m_cellSize[d]));
     }
@@ -146,11 +145,11 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
     // clear the old result (if applicable)
     result.resize(0);
 
-    for(int i = -cellSpan[0]; i <= cellSpan[0]; ++i)
+    for (int i = -cellSpan[0]; i <= cellSpan[0]; ++i)
     {
-        for(int j = -cellSpan[1]; j <= cellSpan[1]; ++j)
+        for (int j = -cellSpan[1]; j <= cellSpan[1]; ++j)
         {
-            for(int k = -cellSpan[2]; k <= cellSpan[2]; ++k)
+            for (int k = -cellSpan[2]; k <= cellSpan[2]; ++k)
             {
                 PointEntry point;
                 point.point = Vec3d(ppos[0] + m_cellSize[0] * i,
@@ -162,7 +161,7 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
 
                 // avoid visiting a bucket more than once
                 // (that happens due to numerical round-off)
-                if(visited.find(bucket) != visited.end())
+                if (visited.find(bucket) != visited.end())
                 {
                     continue;
                 }
@@ -171,7 +170,7 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
                 auto first = m_table->begin(bucket);
                 auto last  = m_table->end(bucket);
 
-                for(auto it = first; it != last; ++it)
+                for (auto it = first; it != last; ++it)
                 {
                     const Vec3d& qpos = it->point;
                     const auto d2     = (ppos - qpos).squaredNorm();
@@ -212,13 +211,13 @@ SpatialHashTableSeparateChaining::recomputePointHash()
     points.insert(points.end(), m_table->begin(), m_table->end());
     m_table->clear();
 
-    for(auto& point : points)
+    for (auto& point : points)
     {
         point.cellSize = m_cellSize;
     }
 
     // insert points back to the table
-    for(auto& point : points)
+    for (auto& point : points)
     {
         m_table->insert(point);
     }

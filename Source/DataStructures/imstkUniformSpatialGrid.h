@@ -72,7 +72,7 @@ public:
         m_InvCellSize = Real(1.0) / m_CellSize;
 
         m_NTotalCells = 1u;
-        for(int i = 0; i < 3; ++i)
+        for (int i = 0; i < 3; ++i)
         {
             m_Resolution[i] = static_cast<unsigned int>(std::ceil((m_UpperCorner[i] - m_LowerCorner[i]) / m_CellSize));
             m_NTotalCells *= m_Resolution[i];
@@ -115,7 +115,7 @@ public:
     std::array<IndexType, 3> getCell3DIndices(const Vec3r& ppos) const
     {
         std::array<IndexType, 3> cellIdx;
-        for(int d = 0; d < 3; ++d)
+        for (int d = 0; d < 3; ++d)
         {
             cellIdx[d] = static_cast<IndexType>((ppos[d] - m_LowerCorner[d]) * m_InvCellSize);
         }
@@ -192,7 +192,7 @@ public:
     template<class Function>
     void loopAllCellData(Function&& func)
     {
-        for(auto& cellData: m_CellData)
+        for (auto& cellData: m_CellData)
         {
             func(cellData);
         }

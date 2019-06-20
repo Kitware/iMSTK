@@ -200,7 +200,7 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
             // Convert to SRGB for linear color space conversion
             if (m_type == Texture::Type::DIFFUSE)
             {
-                switch(m_format)
+                switch (m_format)
                 {
                 case VK_FORMAT_B8G8R8A8_UNORM:
                     m_format = VK_FORMAT_B8G8R8A8_SRGB;
@@ -284,7 +284,7 @@ VulkanTextureDelegate::loadCubemapTexture(VulkanMemoryManager& memoryManager)
     }
     else
     {
-        m_cubemap = gli::texture_cube(gli::format::FORMAT_RGBA32_SFLOAT_PACK32, gli::extent2d(1,1), 1);
+        m_cubemap = gli::texture_cube(gli::format::FORMAT_RGBA32_SFLOAT_PACK32, gli::extent2d(1, 1), 1);
         m_width = 1;
         m_height = 1;
         m_mipLevels = 1;
@@ -670,7 +670,7 @@ VulkanTextureDelegate::getNumChannels(const VkFormat& format)
 {
     unsigned int numChannels = 0;
 
-    switch(format)
+    switch (format)
     {
     case VK_FORMAT_B8G8R8A8_SRGB:
     case VK_FORMAT_B8G8R8A8_UNORM:
@@ -698,7 +698,7 @@ VulkanTextureDelegate::getStride(const VkFormat& format)
 {
     VkDeviceSize stride = 4;
 
-    switch(format)
+    switch (format)
     {
     case VK_FORMAT_B8G8R8A8_SRGB:
     case VK_FORMAT_B8G8R8A8_UNORM:

@@ -57,7 +57,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> an
         return;
     }
 
-    if(analyticObj == nullptr)
+    if (analyticObj == nullptr)
     {
         LOG(WARNING) << "PenaltyRigidCH::computeContactForcesAnalyticRigid error: "
                      << m_object->getName() << " is not a colliding object";
@@ -67,15 +67,15 @@ PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> an
 
     // If collision data is valid, append forces
     Vec3d force(0., 0., 0.);
-    for(const auto& cd : m_colData->PDColData)
+    for (const auto& cd : m_colData->PDColData)
     {
         if (m_side == CollisionHandling::Side::A)
         {
-            force -= cd.dirAtoB * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*10;
+            force -= cd.dirAtoB * ((cd.penetrationDepth + 1) * (cd.penetrationDepth + 1) - 1) * 10;
         }
         else if (m_side == CollisionHandling::Side::B)
         {
-            force += cd.dirAtoB * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*10;
+            force += cd.dirAtoB * ((cd.penetrationDepth + 1) * (cd.penetrationDepth + 1) - 1) * 10;
         }
     }
 

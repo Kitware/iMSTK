@@ -76,7 +76,6 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<DebugRender
     this->updateDataSource();
     this->updateActorProperties();
 
-
     this->setUpMapper(source->GetOutputPort(), false, m_Lines->getRenderMaterial());
 }
 

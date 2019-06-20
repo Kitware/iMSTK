@@ -33,7 +33,7 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
                                    CollisionHandling::Type CHBType)
 {
     // Check that interaction pair does not exist
-    if (this->getInteractionPair(A,B) != nullptr)
+    if (this->getInteractionPair(A, B) != nullptr)
     {
         LOG(WARNING) << "CollisionGraph::addInteractionPair error: interaction already defined for "
                      << A->getName() << " & " << B->getName() << ".";
@@ -60,7 +60,6 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
     // Return interaction pair
     return intPair;
 }
-
 
 //TODO: Refactor -> PBD only
 void
@@ -108,7 +107,7 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
 bool
 CollisionGraph::removeInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B)
 {
-    std::shared_ptr<InteractionPair> intPair = this->getInteractionPair(A,B);
+    std::shared_ptr<InteractionPair> intPair = this->getInteractionPair(A, B);
 
     // Check that interaction pair exists
     if (intPair == nullptr)
@@ -166,8 +165,8 @@ CollisionGraph::getInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B)
 {
     for (const auto& intPair : m_interactionPairList)
     {
-        if (intPair->getObjectsPair() == std::pair<CollidingObjectPtr,CollidingObjectPtr>(A,B) ||
-            intPair->getObjectsPair() == std::pair<CollidingObjectPtr,CollidingObjectPtr>(B,A))
+        if (intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(A, B) ||
+            intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(B, A))
         {
             return intPair;
         }

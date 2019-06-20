@@ -54,7 +54,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
     this->updateRenderDelegates();
 
     // Initialize textures for surface mesh render delegates
-    for ( const auto& renderDelegate : m_renderDelegates )
+    for (const auto& renderDelegate : m_renderDelegates)
     {
         auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate);
         if (smRenderDelegate)
@@ -253,12 +253,12 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
         }
     }
 #endif
-    if( mode == Mode::EMPTY && m_currentMode != Mode::EMPTY )
+    if (mode == Mode::EMPTY && m_currentMode != Mode::EMPTY)
     {
         this->removeActors(m_objectVtkActors);
         m_vtkRenderer->RemoveAllLights();
 
-        if( m_currentMode == Mode::DEBUG )
+        if (m_currentMode == Mode::DEBUG)
         {
             this->removeActors(m_debugVtkActors);
         }
@@ -268,14 +268,14 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
         }
     }
-    else if( mode == Mode::DEBUG && m_currentMode != Mode::DEBUG )
+    else if (mode == Mode::DEBUG && m_currentMode != Mode::DEBUG)
     {
         this->addActors(m_debugVtkActors);
 
-        if( m_currentMode == Mode::EMPTY )
+        if (m_currentMode == Mode::EMPTY)
         {
             this->addActors(m_objectVtkActors);
-            for ( const auto& light : m_vtkLights )
+            for (const auto& light : m_vtkLights)
             {
                 m_vtkRenderer->AddLight(light);
             }
@@ -295,17 +295,17 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
         }
 #endif
     }
-    else if ( mode == Mode::SIMULATION && m_currentMode != Mode::SIMULATION )
+    else if (mode == Mode::SIMULATION && m_currentMode != Mode::SIMULATION)
     {
-        if( m_currentMode == Mode::EMPTY )
+        if (m_currentMode == Mode::EMPTY)
         {
             this->addActors(m_objectVtkActors);
-            for ( const auto& light : m_vtkLights )
+            for (const auto& light : m_vtkLights)
             {
                 m_vtkRenderer->AddLight(light);
             }
         }
-        else if( m_currentMode == Mode::DEBUG )
+        else if (m_currentMode == Mode::DEBUG)
         {
             this->removeActors(m_debugVtkActors);
 
@@ -356,7 +356,7 @@ void
 VTKRenderer::updateRenderDelegates()
 {
     // Object actors
-    for ( const auto& obj : m_scene->getSceneObjects() )
+    for (const auto& obj : m_scene->getSceneObjects() )
     {
         for (auto visualModel : obj->getVisualModels())
         {
@@ -408,7 +408,7 @@ VTKRenderer::updateRenderDelegates()
 void
 VTKRenderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 {
-    for ( const auto& actor : actorList )
+    for (const auto& actor : actorList)
     {
         m_vtkRenderer->RemoveActor(actor);
     }
@@ -417,7 +417,7 @@ VTKRenderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList
 void
 VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 {
-    for ( const auto& actor : actorList )
+    for (const auto& actor : actorList)
     {
         m_vtkRenderer->AddActor(actor);
     }

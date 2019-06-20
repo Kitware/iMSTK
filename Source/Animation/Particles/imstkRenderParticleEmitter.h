@@ -22,7 +22,6 @@
 #ifndef imstkRenderParticleEmitter_h
 #define imstkRenderParticleEmitter_h
 
-
 #include <memory>
 #include <vector>
 

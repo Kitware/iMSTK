@@ -42,7 +42,8 @@ namespace imstk
 {
 class VulkanInteractorStyle;
 
-class VulkanViewer : public Viewer {
+class VulkanViewer : public Viewer
+{
 public:
     VulkanViewer(SimulationManager * manager = nullptr, bool enableVR = false);
 

@@ -75,7 +75,6 @@ protected:
     ///
     virtual void loadTexture(std::shared_ptr<Texture> texture);
 
-
     vtkSmartPointer<vtkTexture> m_sourceTexture;    ///< VTK texture
     std::string m_textureName;    ///< VTK texture unique name
 };

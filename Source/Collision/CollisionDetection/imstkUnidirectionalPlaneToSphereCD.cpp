@@ -28,7 +28,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 void
 UnidirectionalPlaneToSphereCD::computeCollisionData()
 {
@@ -42,19 +43,19 @@ UnidirectionalPlaneToSphereCD::computeCollisionData()
     const Vec3d n = m_planeA->getNormal();
 
     // Compute shortest distance
-    double d = (sphereBPos-planeAPos).dot(n);
+    double d = (sphereBPos - planeAPos).dot(n);
 
     // Compute penetration depth
     // Half-space defined by the normal of the plane is considered as "outside".
-    double penetrationDepth = r-d;
+    double penetrationDepth = r - d;
     if (penetrationDepth <= 0.0)
     {
         return;
     }
 
     // Compute collision points
-    Vec3d planeAColPt = sphereBPos - n*d;
-    Vec3d sphereBColPt = sphereBPos - n*r;
+    Vec3d planeAColPt = sphereBPos - n * d;
+    Vec3d sphereBColPt = sphereBPos - n * r;
 
     // Set collisionData
     m_colData->PDColData.push_back({planeAColPt, sphereBColPt, n, penetrationDepth});

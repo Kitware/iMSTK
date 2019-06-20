@@ -346,7 +346,7 @@ FEMDeformableBodyModel::initializeTangentStiffness()
         const auto &dampingMassCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
 
         // Initialize the Raleigh damping matrix
-        m_C = dampingMassCoefficient*m_M + dampingStiffnessCoefficient*m_K;
+        m_C = dampingMassCoefficient * m_M + dampingStiffnessCoefficient * m_K;
     }
 
     m_internalForceModel->setTangentStiffness(m_vegaTangentStiffnessMatrix);
@@ -384,11 +384,11 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
     {
     case stateUpdateType::deltaVelocity:
 
-        m_Feff = m_K * -(uPrev - u + v* dT);
+        m_Feff = m_K * -(uPrev - u + v * dT);
 
         if (m_damped)
         {
-            m_Feff -= m_C*v;
+            m_Feff -= m_C * v;
         }
 
         m_internalForceModel->getInternalForce(u, m_Finternal);
@@ -427,7 +427,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
 
         if (m_damped)
         {
-            m_Feff -= m_C*vPrev;
+            m_Feff -= m_C * vPrev;
         }
 
         m_internalForceModel->getInternalForce(u, m_Finternal);
@@ -462,9 +462,9 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
         m_Keff = m_M;
         if (m_damped)
         {
-            m_Keff += dT*m_C;
+            m_Keff += dT * m_C;
         }
-        m_Keff += (dT*dT) * m_K;
+        m_Keff += (dT * dT) * m_K;
 
         break;
 
@@ -492,16 +492,16 @@ FEMDeformableBodyModel::updateDampingMatrix()
 
         if (dampingMassCoefficient > 0)
         {
-            m_C = dampingMassCoefficient*m_M;
+            m_C = dampingMassCoefficient * m_M;
 
             if (dampingStiffnessCoefficient > 0)
             {
-                m_C += m_K*dampingStiffnessCoefficient;
+                m_C += m_K * dampingStiffnessCoefficient;
             }
         }
-        else if(dampingStiffnessCoefficient > 0)
+        else if (dampingStiffnessCoefficient > 0)
         {
-            m_C = m_K*dampingStiffnessCoefficient;
+            m_C = m_K * dampingStiffnessCoefficient;
         }
     }
 }
@@ -514,7 +514,7 @@ FEMDeformableBodyModel::applyBoundaryConditions(SparseMatrixd &M, const bool wit
     // Set column and row to zero.
     for (auto & index : m_fixedNodeIds)
     {
-        auto nodeIdx = static_cast<SparseMatrixd::Index>(index)*3;
+        auto nodeIdx = static_cast<SparseMatrixd::Index>(index) * 3;
 
         for (auto idx = nodeIdx; idx < nodeIdx + 3; idx++)
         {
@@ -589,13 +589,13 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
     {
     case stateUpdateType::deltaVelocity:
         m_currentState->setV(v + solution);
-        m_currentState->setU(uPrev + dT*v);
+        m_currentState->setU(uPrev + dT * v);
 
         break;
 
     case stateUpdateType::velocity:
         m_currentState->setV(solution);
-        m_currentState->setU(uPrev + dT*v);
+        m_currentState->setU(uPrev + dT * v);
 
         break;
 
@@ -630,7 +630,7 @@ FEMDeformableBodyModel::getFunctionGradient()
            {
                this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
-               if(this->m_implementFixedBC)
+               if (this->m_implementFixedBC)
                {
                    applyBoundaryConditions(m_Keff);
                }

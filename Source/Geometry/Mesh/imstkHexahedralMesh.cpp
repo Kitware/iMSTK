@@ -31,7 +31,7 @@ HexahedralMesh::initialize(const StdVectorOfVec3d& vertices,
     PointSet::initialize(vertices);
     this->setHexahedraVertices(hexahedra);
 
-    if(computeAttachedSurfaceMesh)
+    if (computeAttachedSurfaceMesh)
     {
         this->computeAttachedSurfaceMesh();
     }
@@ -103,7 +103,7 @@ HexahedralMesh::getVolume() const
         volume += A.determinant();
     }
 
-    return volume/6;
+    return volume / 6;
 }
 
 void

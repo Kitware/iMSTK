@@ -28,7 +28,8 @@
 
 namespace imstk
 {
-class VulkanDecalRenderDelegate : public VulkanRenderDelegate {
+class VulkanDecalRenderDelegate : public VulkanRenderDelegate
+{
 public:
 
     ///
