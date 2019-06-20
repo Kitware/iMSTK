@@ -67,13 +67,13 @@ int main()
                 Color color = Color((float)x / resolution, (float)y / resolution, (float)z / resolution);
 
                 points[index + 0] = Vec3d(x, y, z);
-                points[index + 1] = Vec3d(x, y, z+1);
-                points[index + 2] = Vec3d(x, y+1, z);
-                points[index + 3] = Vec3d(x, y+1, z+1);
-                points[index + 4] = Vec3d(x+1, y, z);
-                points[index + 5] = Vec3d(x+1, y, z+1);
-                points[index + 6] = Vec3d(x+1, y+1, z);
-                points[index + 7] = Vec3d(x+1, y+1, z+1);
+                points[index + 1] = Vec3d(x, y, z + 1);
+                points[index + 2] = Vec3d(x, y + 1, z);
+                points[index + 3] = Vec3d(x, y + 1, z + 1);
+                points[index + 4] = Vec3d(x + 1, y, z);
+                points[index + 5] = Vec3d(x + 1, y, z + 1);
+                points[index + 6] = Vec3d(x + 1, y + 1, z);
+                points[index + 7] = Vec3d(x + 1, y + 1, z + 1);
 
                 colors[index + 0] = color;
                 colors[index + 1] = color;

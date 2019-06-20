@@ -58,10 +58,10 @@ PbdPointTriangleConstraint::solvePositionConstraint()
     Vec3d n = x12.cross(x13);
     Vec3d x01 = x0 - x1;
 
-    double alpha = n.dot(x12.cross(x01))/ (n.dot(n));
-    double beta  = n.dot(x01.cross(x13))/ (n.dot(n));
+    double alpha = n.dot(x12.cross(x01)) / (n.dot(n));
+    double beta  = n.dot(x01.cross(x13)) / (n.dot(n));
 
-    if (alpha < 0 || beta < 0 || alpha + beta > 1 )
+    if (alpha < 0 || beta < 0 || alpha + beta > 1)
     {
         //LOG(WARNING) << "Projection point not inside the triangle";
         return false;
@@ -80,21 +80,21 @@ PbdPointTriangleConstraint::solvePositionConstraint()
 
     double gamma = 1.0 - alpha - beta;
     Vec3d grad0 = n;
-    Vec3d grad1 = -alpha*n;
-    Vec3d grad2 = -beta*n;
-    Vec3d grad3 = -gamma*n;
+    Vec3d grad1 = -alpha * n;
+    Vec3d grad2 = -beta * n;
+    Vec3d grad3 = -gamma * n;
 
     const auto im0 = m_model1->getInvMass(i0);
     const auto im1 = m_model2->getInvMass(i1);
     const auto im2 = m_model2->getInvMass(i2);
     const auto im3 = m_model2->getInvMass(i3);
 
-    double lambda = im0*grad0.squaredNorm() +
-                    im1*grad1.squaredNorm() +
-                    im2*grad2.squaredNorm() +
-                    im3*grad3.squaredNorm();
+    double lambda = im0 * grad0.squaredNorm() +
+                    im1 * grad1.squaredNorm() +
+                    im2 * grad2.squaredNorm() +
+                    im3 * grad3.squaredNorm();
 
-    lambda = (l - dist)/lambda;
+    lambda = (l - dist) / lambda;
 
     //LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
 

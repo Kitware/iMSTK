@@ -60,11 +60,11 @@ LaparoscopicToolController::updateControlledObjects()
 
     // Update orientation of parts
     Quatd jawRotUpper;
-    jawRotUpper = r*Rotd(m_jawAngle, m_jawRotationAxis);
+    jawRotUpper = r * Rotd(m_jawAngle, m_jawRotationAxis);
     m_upperJaw->getMasterGeometry()->setRotation(jawRotUpper);
 
     Quatd jawRotLower;
-    jawRotLower = r*Rotd(-m_jawAngle, m_jawRotationAxis);
+    jawRotLower = r * Rotd(-m_jawAngle, m_jawRotationAxis);
     m_lowerJaw->getMasterGeometry()->setRotation(jawRotLower);
 
     m_shaft->getMasterGeometry()->setRotation(r);

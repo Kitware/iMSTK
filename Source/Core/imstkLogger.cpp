@@ -129,6 +129,7 @@ Logger::log(std::string message, bool prependTime /* = false */)
     m_condition.wait(ul, [this] {return !m_changed; });
     ul.unlock();
 }
+
 bool
 Logger::readyForLoggingWithFrequency()
 {

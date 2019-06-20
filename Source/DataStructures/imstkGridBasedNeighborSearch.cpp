@@ -45,7 +45,7 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&resu
 
 void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
 {
-    if(std::abs(m_SearchRadius) < Real(1e-8))
+    if (std::abs(m_SearchRadius) < Real(1e-8))
     {
         LOG(FATAL) << "Neighbor search radius is zero";
     }
@@ -54,9 +54,9 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&resu
     Vec3r lowerCorner(MAX_REAL, MAX_REAL, MAX_REAL);
     Vec3r upperCorner(-MAX_REAL, -MAX_REAL, -MAX_REAL);
 
-    for(auto& ppos : setB)
+    for (auto& ppos : setB)
     {
-        for(int d = 0; d < 3; ++d)
+        for (int d = 0; d < 3; ++d)
         {
             lowerCorner[d] = (ppos[d] < lowerCorner[d]) ? ppos[d] : lowerCorner[d];
             upperCorner[d] = (ppos[d] > upperCorner[d]) ? ppos[d] : upperCorner[d];
@@ -73,14 +73,14 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&resu
     m_Grid.loopAllCellData([](std::vector<size_t>& list) { list.resize(0); });
 
     // collect particle indices of points in setB into their corresponding cells
-    for(size_t p = 0; p < setB.size(); ++p)
+    for (size_t p = 0; p < setB.size(); ++p)
     {
         m_Grid.getCellData(setB[p]).push_back(p);
     }
 
     // for each point in setA, collect setB neighbors within the search radius
     result.resize(setA.size());
-    for(size_t p = 0; p < setA.size(); ++p)
+    for (size_t p = 0; p < setA.size(); ++p)
     {
         auto& pneighbors = result[p];
 
@@ -90,34 +90,34 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&resu
         const auto ppos    = setA[p];
         const auto cellIdx = m_Grid.template getCellIndexFromCoordinate<int>(ppos);
 
-        for(int k = -1; k <= 1; ++k)
+        for (int k = -1; k <= 1; ++k)
         {
             int cellZ = cellIdx[2] + k;
-            if(!m_Grid.template isValidCellIndex<2>(cellZ))
+            if (!m_Grid.template isValidCellIndex<2>(cellZ))
             {
                 continue;
             }
-            for(int j = -1; j <= 1; ++j)
+            for (int j = -1; j <= 1; ++j)
             {
                 int cellY = cellIdx[1] + j;
-                if(!m_Grid.template isValidCellIndex<1>(cellY))
+                if (!m_Grid.template isValidCellIndex<1>(cellY))
                 {
                     continue;
                 }
-                for(int i = -1; i <= 1; ++i)
+                for (int i = -1; i <= 1; ++i)
                 {
                     int cellX = cellIdx[0] + i;
-                    if(!m_Grid.template isValidCellIndex<0>(cellX))
+                    if (!m_Grid.template isValidCellIndex<0>(cellX))
                     {
                         continue;
                     }
 
                     // get index q of point in setB
-                    for(auto q : m_Grid.getCellData(cellX, cellY, cellZ))
+                    for (auto q : m_Grid.getCellData(cellX, cellY, cellZ))
                     {
                         const auto qpos = setB[q];
                         const auto d2   = (ppos - qpos).squaredNorm();
-                        if(d2 < m_SearchRadiusSqr)
+                        if (d2 < m_SearchRadiusSqr)
                         {
                             pneighbors.push_back(q);
                         }

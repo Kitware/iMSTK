@@ -173,7 +173,6 @@ public:
     ///
     void setStartPointOfUpdate() { m_timer->start(); }
 
-
     ///
     /// \brief Set the end point to the update
     ///

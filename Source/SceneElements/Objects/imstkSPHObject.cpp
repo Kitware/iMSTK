@@ -28,7 +28,6 @@ SPHObject::SPHObject(const std::string& name) : DynamicObject<SPHKinematicState>
     this->m_type = SceneObject::Type::SPH;
 }
 
-
 bool SPHObject::initialize()
 {
     m_SPHModel = std::dynamic_pointer_cast<SPHModel>(this->m_dynamicalModel);

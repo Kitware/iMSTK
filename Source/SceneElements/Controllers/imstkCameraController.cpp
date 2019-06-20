@@ -53,8 +53,8 @@ CameraController::runModule()
 
     // Set camera info
     m_camera.setPosition(p);
-    m_camera.setFocalPoint((r*FORWARD_VECTOR)+p);
-    m_camera.setViewUp(r*UP_VECTOR);
+    m_camera.setFocalPoint((r * FORWARD_VECTOR) + p);
+    m_camera.setViewUp(r * UP_VECTOR);
 
     m_trackingDataUptoDate = false;
 }

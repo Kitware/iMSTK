@@ -142,7 +142,7 @@ protected:
     /// \brief
     ///
     template<size_t dim>
-    static void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t,dim>>& cells);
+    static void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells);
 
     ///
     /// \brief

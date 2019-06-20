@@ -27,14 +27,14 @@ void SPHCollisionHandling::setBoundaryFriction(const Real friction)
 {
     m_BoundaryFriction = friction;
 
-    if(m_BoundaryFriction < 0.0 || m_BoundaryFriction > 1.0)
+    if (m_BoundaryFriction < 0.0 || m_BoundaryFriction > 1.0)
     {
         LOG(WARNING) << "Invalid frictionLength coefficient (it must be in [0, 1])";
-        if(m_BoundaryFriction < 0)
+        if (m_BoundaryFriction < 0)
         {
             m_BoundaryFriction = 0;
         }
-        else if(m_BoundaryFriction > static_cast<Real>(1.0))
+        else if (m_BoundaryFriction > static_cast<Real>(1.0))
         {
             m_BoundaryFriction = static_cast<Real>(1.0);
         }
@@ -49,7 +49,7 @@ void SPHCollisionHandling::processCollisionData()
 #endif
 
     auto& state = SPHModel->getState();
-    for(const auto& cd : m_colData->MAColData)
+    for (const auto& cd : m_colData->MAColData)
     {
         const auto pidx = cd.nodeId; // Fluid particle index
         auto n = cd.penetrationVector;  // This vector should point into solid object
@@ -60,18 +60,18 @@ void SPHCollisionHandling::processCollisionData()
         // Correct particle velocity: slip boundary condition with friction
         auto& vel = state.getVelocities()[pidx];
         const auto nLengthSqr = n.squaredNorm();
-        if(nLengthSqr > Real(1e-20))     // Normalize n
+        if (nLengthSqr > Real(1e-20))     // Normalize n
         {
             n /= std::sqrt(nLengthSqr);
         }
         const auto vn = vel.dot(n);
         vel -= n * vn;     // From now, vel is parallel with the solid surface
 
-        if(m_BoundaryFriction > Real(1e-20))
+        if (m_BoundaryFriction > Real(1e-20))
         {
             const auto velLength  = vel.norm();
             const auto frictionLength = -vn * m_BoundaryFriction;
-            if(frictionLength < velLength && velLength > Real(1e-10))
+            if (frictionLength < velLength && velLength > Real(1e-10))
             {
                 vel -= (vel / velLength) * frictionLength;     // Subtract a friction from velocity, which is proportional to the amount of penetration
             }

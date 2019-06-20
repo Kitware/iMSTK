@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #include "imstkMassSpringForceModel.h"
 
 namespace imstk

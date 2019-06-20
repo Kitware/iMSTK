@@ -65,8 +65,8 @@ using StdVectorOfVectorf = std::vector<Vectorf, Eigen::aligned_allocator<Vectorf
 using StdVectorOfVectord = std::vector<Vectord, Eigen::aligned_allocator<Vectord>>;
 
 // Quaternion
-using Quatf = Eigen::Quaternion<float,Eigen::DontAlign>;
-using Quatd = Eigen::Quaternion<double,Eigen::DontAlign>;
+using Quatf = Eigen::Quaternion<float, Eigen::DontAlign>;
+using Quatd = Eigen::Quaternion<double, Eigen::DontAlign>;
 
 // Angle-Axis
 using Rotf = Eigen::AngleAxisf;

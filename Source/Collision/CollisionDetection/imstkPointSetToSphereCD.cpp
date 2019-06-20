@@ -46,8 +46,8 @@ PointSetToSphereCD::computeCollisionData()
         auto dist = (spherePos - p).norm();
         if (dist <= radius)
         {
-            auto direction = (spherePos - p)/dist;
-            auto pointOnSphere = spherePos - radius*direction;
+            auto direction = (spherePos - p) / dist;
+            auto pointOnSphere = spherePos - radius * direction;
             m_colData->MAColData.push_back({ nodeId, p - pointOnSphere });
         }
         nodeId++;

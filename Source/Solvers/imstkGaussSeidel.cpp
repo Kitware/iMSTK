@@ -31,7 +31,7 @@ GaussSeidel::GaussSeidel(const SparseMatrixd& A, const Vectord& rhs) : GaussSeid
 void
 GaussSeidel::solve(Vectord& x)
 {
-    if(!m_linearSystem)
+    if (!m_linearSystem)
     {
         LOG(WARNING) << "Gauss-Seidel::solve: Linear system is not supplied for Gauss-Seidel solver!";
         return;
@@ -76,7 +76,7 @@ GaussSeidel::gaussSeidelSolve(Vectord& x)
                 auto col = it.col();
                 if (k != col)
                 {
-                    aggregate += it.value()*x[col];
+                    aggregate += it.value() * x[col];
                 }
                 else
                 {

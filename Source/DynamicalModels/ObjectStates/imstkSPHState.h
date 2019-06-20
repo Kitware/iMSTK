@@ -32,7 +32,7 @@ namespace imstk
 template<class IndexType, class Function>
 void runLoop(IndexType start, IndexType end, Function&& func)
 {
-    for(IndexType i = start; i < end; ++i)
+    for (IndexType i = start; i < end; ++i)
     {
         func(i);
     }
@@ -100,7 +100,6 @@ private:
     StdVectorOfVec3r m_Positions;   // Particle positions
     StdVectorOfVec3r m_Velocities;  // Particle velocities
 };
-
 
 ///
 /// \class SPHSimulationState

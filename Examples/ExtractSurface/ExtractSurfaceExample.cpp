@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-
 #include "imstkSimulationManager.h"
 #include "imstkTetrahedralMesh.h"
 

@@ -42,7 +42,7 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
     double* vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
+    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
@@ -52,13 +52,13 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[8];
-    for(const auto &t : geometry->getHexahedraVertices())
+    for (const auto &t : geometry->getHexahedraVertices())
     {
-        for(size_t i = 0; i < 8; ++i)
+        for (size_t i = 0; i < 8; ++i)
         {
             cell[i] = t[i];
         }
-        cells->InsertNextCell(8,cell);
+        cells->InsertNextCell(8, cell);
     }
 
     // Create Unstructured Grid

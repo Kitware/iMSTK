@@ -126,28 +126,28 @@ int main()
     double height = 100.0;
     size_t nRows = 2;
     size_t nCols = 2;
-    vertList.resize(nRows*nCols);
+    vertList.resize(nRows * nCols);
     const double dy = width / static_cast<double>(nCols - 1);
     const double dx = height / static_cast<double>(nRows - 1);
-    for(size_t i = 0; i < nRows; ++i)
+    for (size_t i = 0; i < nRows; ++i)
     {
-        for(size_t j = 0; j < nCols; j++)
+        for (size_t j = 0; j < nCols; j++)
         {
-            const double y = static_cast<double>(dy*j);
-            const double x = static_cast<double>(dx*i);
-            vertList[i*nCols + j] = Vec3d(x - 50, -10.0, y - 50);
+            const double y = static_cast<double>(dy * j);
+            const double x = static_cast<double>(dx * i);
+            vertList[i * nCols + j] = Vec3d(x - 50, -10.0, y - 50);
         }
     }
 
     // c. Add connectivity data
     std::vector<SurfaceMesh::TriangleArray> triangles;
-    for(std::size_t i = 0; i < nRows - 1; ++i)
+    for (std::size_t i = 0; i < nRows - 1; ++i)
     {
-        for(std::size_t j = 0; j < nCols - 1; j++)
+        for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
-            tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i*nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }

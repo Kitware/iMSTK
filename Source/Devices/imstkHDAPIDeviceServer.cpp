@@ -38,7 +38,7 @@ HDAPIDeviceServer::addDeviceClient(std::shared_ptr<HDAPIDeviceClient> client)
 void
 HDAPIDeviceServer::initModule()
 {
-    for(const auto& client : m_deviceClients)
+    for (const auto& client : m_deviceClients)
     {
         client->init();
     }
@@ -48,7 +48,7 @@ HDAPIDeviceServer::initModule()
 void
 HDAPIDeviceServer::runModule()
 {
-    for(const auto& client : m_deviceClients)
+    for (const auto& client : m_deviceClients)
     {
         client->run();
     }
@@ -58,7 +58,7 @@ void
 HDAPIDeviceServer::cleanUpModule()
 {
     hdStopScheduler();
-    for(const auto& client : m_deviceClients)
+    for (const auto& client : m_deviceClients)
     {
         client->cleanUp();
     }

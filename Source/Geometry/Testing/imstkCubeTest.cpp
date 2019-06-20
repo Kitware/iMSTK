@@ -56,11 +56,11 @@ TEST_F(imstkCubeTest, GetVolume)
     EXPECT_EQ(m_cube.getVolume(), 8);
 
     m_cube.setWidth(0.003);
-    EXPECT_EQ(m_cube.getVolume(), 0.003*0.003*0.003);
+    EXPECT_EQ(m_cube.getVolume(), 0.003 * 0.003 * 0.003);
 
     double w = 400000000;
     m_cube.setWidth(400000000);
-    EXPECT_EQ(m_cube.getVolume(), w*w*w);
+    EXPECT_EQ(m_cube.getVolume(), w * w * w);
 }
 
 int imstkCubeTest(int argc, char* argv[])

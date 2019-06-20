@@ -26,7 +26,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                                std::shared_ptr<TetrahedralMesh> meshB,
                                std::shared_ptr<CollisionData> colData) :
@@ -50,10 +51,10 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     auto nodesMeshA = m_meshA->getVertexPositions();
     auto nodesMeshB = m_meshB->getVertexPositions();
 
-    for (size_t tId = 0; tId < mesh->getNumTetrahedra(); ++tId) //TODO: parallelize!
+    for (size_t tId = 0; tId < mesh->getNumTetrahedra(); ++tId)  //TODO: parallelize!
     {
         TetrahedralMesh::TetraArray vInd = mesh->getTetrahedronVertices(tId);
-        for (int i = 0; i < 4; i++) //if idOffset!=0 ?
+        for (int i = 0; i < 4; i++)  //if idOffset!=0 ?
         {
             vInd[i] += idOffset;
         }

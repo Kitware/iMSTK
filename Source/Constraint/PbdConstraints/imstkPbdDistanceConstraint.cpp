@@ -64,16 +64,16 @@ PbdDistanceConstraint::solvePositionConstraint(PbdModel &model)
     const auto len = n.norm();
     n /= len;
 
-    auto gradC = n*m_stiffness*(len - m_restLength) / wsum;
+    auto gradC = n * m_stiffness * (len - m_restLength) / wsum;
 
     if (im1 > 0)
     {
-        p0 += im1*gradC;
+        p0 += im1 * gradC;
     }
 
     if (im2 > 0)
     {
-        p1 += -im2*gradC;
+        p1 += -im2 * gradC;
     }
     return true;
 }

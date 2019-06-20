@@ -105,7 +105,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
     // Copy cells
     auto cellType = vegaMesh->getElementType();
     std::shared_ptr<imstk::VolumetricMesh> mesh;
-    if(cellType == vega::VolumetricMesh::TET)
+    if (cellType == vega::VolumetricMesh::TET)
     {
         std::vector<TetrahedralMesh::TetraArray> cells;
         VegaMeshIO::copyCells<4>(vegaMesh, cells);
@@ -114,7 +114,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
         tetMesh->initialize(vertices, cells, false);
         mesh = tetMesh;
     }
-    else if(cellType == vega::VolumetricMesh::CUBIC)
+    else if (cellType == vega::VolumetricMesh::CUBIC)
     {
         std::vector<HexahedralMesh::HexaArray> cells;
         VegaMeshIO::copyCells<8>(vegaMesh, cells);
@@ -139,7 +139,7 @@ void
 VegaMeshIO::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
                          StdVectorOfVec3d& vertices)
 {
-    for(int i = 0; i < vegaMesh->getNumVertices(); ++i)
+    for (int i = 0; i < vegaMesh->getNumVertices(); ++i)
     {
         auto pos = *vegaMesh->getVertex(i);
         vertices.emplace_back(pos[0], pos[1], pos[2]);
@@ -149,14 +149,14 @@ VegaMeshIO::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
 template<size_t dim>
 void
 VegaMeshIO::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
-                      std::vector<std::array<size_t,dim>>& cells)
+                      std::vector<std::array<size_t, dim>>& cells)
 {
-    std::array<size_t,dim> cell;
-    for(size_t cellId = 0; cellId < vegaMesh->getNumElements(); ++cellId)
+    std::array<size_t, dim> cell;
+    for (size_t cellId = 0; cellId < vegaMesh->getNumElements(); ++cellId)
     {
         for (int i = 0; i < vegaMesh->getNumElementVertices(); ++i)
         {
-            cell[i] = vegaMesh->getVertexIndex(int(cellId),i);
+            cell[i] = vegaMesh->getVertexIndex(int(cellId), i);
         }
         cells.emplace_back(cell);
     }

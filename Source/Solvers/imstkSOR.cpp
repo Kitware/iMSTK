@@ -31,7 +31,7 @@ SOR::SOR(const SparseMatrixd& A, const Vectord& rhs) : SOR()
 void
 SOR::solve(Vectord& x)
 {
-    if(!m_linearSystem)
+    if (!m_linearSystem)
     {
         LOG(WARNING) << "SOR::solve: Linear system is not supplied for Gauss-Seidel solver!";
         return;
@@ -76,7 +76,7 @@ SOR::SORSolve(Vectord& x)
                 auto col = it.col();
                 if (k != col)
                 {
-                    aggregate += it.value()*x[col];
+                    aggregate += it.value() * x[col];
                 }
                 else
                 {
@@ -86,7 +86,7 @@ SOR::SORSolve(Vectord& x)
             x[k] = (b[k] - aggregate) / diagEle; // div by zero is possible!
         }
         x *= m_relaxationFactor;
-        x += (1. - m_relaxationFactor)*xOld;
+        x += (1. - m_relaxationFactor) * xOld;
 
         if ((x - xOld).norm() < 1.0e-4)
         {

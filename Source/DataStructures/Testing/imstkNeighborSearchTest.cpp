@@ -39,7 +39,7 @@ using namespace imstk;
 ///
 void advancePositions(StdVectorOfVec3r& particles)
 {
-    for(auto& pos: particles)
+    for (auto& pos: particles)
     {
         Vec3r pc  = pos - SPHERE_CENTER;
         Real mag = pc.norm() * STEP;
@@ -56,22 +56,22 @@ void neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vect
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
     const Real radiusSqr = radius * radius;
 
-    for(size_t p = 0; p < particles.size(); ++p)
+    for (size_t p = 0; p < particles.size(); ++p)
     {
         const auto ppos       = particles[p];
         auto&      pneighbors = neighbors[p];
         pneighbors.resize(0);
 
-        for(size_t q = 0; q < particles.size(); ++q)
+        for (size_t q = 0; q < particles.size(); ++q)
         {
-            if(p == q)
+            if (p == q)
             {
                 continue;
             }
 
             const auto qpos = particles[q];
             const auto d2   = (ppos - qpos).squaredNorm();
-            if(d2 < radiusSqr)
+            if (d2 < radiusSqr)
             {
                 pneighbors.push_back(q);
             }
@@ -97,7 +97,7 @@ void neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vecto
 void neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
-    for(auto& list : neighbors)
+    for (auto& list : neighbors)
     {
         list.resize(0);
     }
@@ -109,7 +109,7 @@ void neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::
     hashTable.setCellSize(radius, radius, radius);
     hashTable.insertPoints(particles);
 
-    for(size_t p = 0; p < particles.size(); ++p)
+    for (size_t p = 0; p < particles.size(); ++p)
     {
         auto& v = particles[p];
         hashTable.getPointsInSphere(neighbors[p], v, radius);
@@ -125,17 +125,17 @@ void neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, st
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
     const Real radiusSqr = radius * radius;
 
-    for(size_t p = 0; p < setA.size(); ++p)
+    for (size_t p = 0; p < setA.size(); ++p)
     {
         const auto ppos       = setA[p];
         auto&      pneighbors = neighbors[p];
         pneighbors.resize(0);
 
-        for(size_t q = 0; q < setB.size(); ++q)
+        for (size_t q = 0; q < setB.size(); ++q)
         {
             const auto qpos = setB[q];
             const auto d2   = (ppos - qpos).squaredNorm();
-            if(d2 < radiusSqr)
+            if (d2 < radiusSqr)
             {
                 pneighbors.push_back(q);
             }
@@ -158,14 +158,14 @@ void neighborSearchGridBased(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std
 ///
 /// \brief Verify if two neighbor search results are identical
 ///
-bool verify(std::vector<std::vector<size_t>>& neighbors1,  std::vector<std::vector<size_t>>& neighbors2)
+bool verify(std::vector<std::vector<size_t>>& neighbors1, std::vector<std::vector<size_t>>& neighbors2)
 {
-    if(neighbors1.size() != neighbors2.size())
+    if (neighbors1.size() != neighbors2.size())
     {
         return false;
     }
 
-    for(size_t p = 0; p < neighbors1.size(); ++p)
+    for (size_t p = 0; p < neighbors1.size(); ++p)
     {
         auto& list1 = neighbors1[p];
         auto& list2 = neighbors2[p];
@@ -175,14 +175,14 @@ bool verify(std::vector<std::vector<size_t>>& neighbors1,  std::vector<std::vect
         std::sort(list1.begin(), list1.end());
         std::sort(list2.begin(), list2.end());
 
-        if(list1.size() != list2.size())
+        if (list1.size() != list2.size())
         {
             return false;
         }
 
-        for(size_t idx = 0; idx < list1.size(); ++idx)
+        for (size_t idx = 0; idx < list1.size(); ++idx)
         {
-            if(list1[idx] != list2[idx])
+            if (list1[idx] != list2[idx])
             {
                 return false;
             }
@@ -192,7 +192,9 @@ bool verify(std::vector<std::vector<size_t>>& neighbors1,  std::vector<std::vect
     return true;
 }
 
-class dummyClass : public ::testing::Test {};
+class dummyClass : public ::testing::Test
+{
+};
 
 ///
 /// \brief Generate a sphere-shape particles and search neighbors for each particle
@@ -208,15 +210,15 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
     particles.reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        for(int j = 0; j < N; ++j)
+        for (int j = 0; j < N; ++j)
         {
-            for(int k = 0; k < N; ++k)
+            for (int k = 0; k < N; ++k)
             {
                 const Vec3r ppos = corner + Vec3r(spacing * Real(i), spacing * Real(j), spacing * Real(k));
                 const Vec3r d    = ppos - sphereCenter;
-                if(d.squaredNorm() < sphereRadiusSqr)
+                if (d.squaredNorm() < sphereRadiusSqr)
                 {
                     particles.push_back(ppos);
                 }
@@ -228,7 +230,7 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
     std::vector<std::vector<size_t>> neighbors1;
     std::vector<std::vector<size_t>> neighbors2;
 
-    for(int iter = 0; iter < ITERATIONS; ++iter)
+    for (int iter = 0; iter < ITERATIONS; ++iter)
     {
         neighborSearchBruteForce(particles, neighbors0);
         neighborSearchGridBased(particles, neighbors1);
@@ -254,15 +256,15 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
     particles.reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
-    for(int i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        for(int j = 0; j < N; ++j)
+        for (int j = 0; j < N; ++j)
         {
-            for(int k = 0; k < N; ++k)
+            for (int k = 0; k < N; ++k)
             {
                 const Vec3r ppos = corner + Vec3r(spacing * Real(i), spacing * Real(j), spacing * Real(k));
                 const Vec3r d    = ppos - sphereCenter;
-                if(d.squaredNorm() < sphereRadiusSqr)
+                if (d.squaredNorm() < sphereRadiusSqr)
                 {
                     particles.push_back(ppos);
                 }
@@ -275,7 +277,7 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
     std::vector<std::vector<size_t>> neighbors0;
     std::vector<std::vector<size_t>> neighbors1;
 
-    for(int iter = 0; iter < ITERATIONS; ++iter)
+    for (int iter = 0; iter < ITERATIONS; ++iter)
     {
         // separate verts into setA and setB randomly
         setA.resize(0);
@@ -283,9 +285,9 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         setA.reserve(particles.size());
         setB.reserve(particles.size());
 
-        for(size_t i = 0; i < particles.size(); ++i)
+        for (size_t i = 0; i < particles.size(); ++i)
         {
-            if(rand() % 2)
+            if (rand() % 2)
             {
                 setA.push_back(particles[i]);
             }
@@ -301,7 +303,6 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         EXPECT_EQ(verify(neighbors1, neighbors0), true);
     }
 }
-
 
 int imstkNeighborSearchTest(int argc, char* argv[])
 {

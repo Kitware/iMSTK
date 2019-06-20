@@ -28,7 +28,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 void
 BidirectionalPlaneToSphere::computeCollisionData()
 {
@@ -42,26 +43,26 @@ BidirectionalPlaneToSphere::computeCollisionData()
     Vec3d n = m_planeA->getNormal();
 
     // Compute shortest distance
-    double d = (sphereBPos-planeAPos).dot(n);
+    double d = (sphereBPos - planeAPos).dot(n);
 
     // Define sphere to plane direction
     Vec3d dirAToB = n;
-    if( d < 0 )
+    if (d < 0)
     {
         d = -d;
         dirAToB = -n;
     }
 
     // Return if no penetration
-    double penetrationDepth = r-d;
-    if ( penetrationDepth <= 0)
+    double penetrationDepth = r - d;
+    if (penetrationDepth <= 0)
     {
         return;
     }
 
     // Compute collision points
-    Vec3d planeAColPt = sphereBPos - dirAToB*d;
-    Vec3d sphereBColPt = sphereBPos - dirAToB*r;
+    Vec3d planeAColPt = sphereBPos - dirAToB * d;
+    Vec3d sphereBColPt = sphereBPos - dirAToB * r;
 
     // Set collisionData
     m_colData->PDColData.push_back({planeAColPt, sphereBColPt, dirAToB, penetrationDepth});

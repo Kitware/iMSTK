@@ -350,7 +350,6 @@ VulkanPostProcess::createFullscreenQuad(VulkanRenderer * renderer)
     m_vertexBuffer->initializeBuffers(renderer->m_memoryManager);
 }
 
-
 void
 VulkanPostProcess::createDescriptors(VulkanRenderer * renderer)
 {

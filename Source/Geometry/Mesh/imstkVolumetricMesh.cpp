@@ -28,7 +28,7 @@ namespace imstk
 std::shared_ptr<SurfaceMesh>
 VolumetricMesh::getAttachedSurfaceMesh()
 {
-    if(m_attachedSurfaceMesh == nullptr)
+    if (m_attachedSurfaceMesh == nullptr)
     {
         LOG(WARNING) << "VolumetricMesh::getAttachedSurfaceMesh warning: attachedSurfaceMesh not set.\n"
                      << "Extract a surface mesh to attach using computeAttachedSurfaceMesh().";
@@ -45,7 +45,7 @@ VolumetricMesh::setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh>surfaceMesh)
 std::shared_ptr<vega::VolumetricMesh>
 VolumetricMesh::getAttachedVegaMesh()
 {
-    if(m_attachedVegaMesh == nullptr)
+    if (m_attachedVegaMesh == nullptr)
     {
         LOG(WARNING) << "VolumetricMesh::getAttachedVEgaMesh warning: attachedVegaMesh not set.\n";
     }

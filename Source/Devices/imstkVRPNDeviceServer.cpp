@@ -34,7 +34,7 @@ namespace imstk
 void
 VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, int id)
 {
-    m_deviceInfoMap[deviceName] = std::make_pair(deviceType,id);
+    m_deviceInfoMap[deviceName] = std::make_pair(deviceType, id);
 
     if (deviceType == DeviceType::PHANTOM_OMNI)
     {
@@ -50,7 +50,7 @@ VRPNDeviceServer::addSerialDevice(std::string deviceName, DeviceType deviceType,
     SerialInfo serialSettings;
     serialSettings.baudRate = baudRate;
     serialSettings.port = port;
-    m_deviceInfoMap[deviceName] = std::make_pair(deviceType,id);
+    m_deviceInfoMap[deviceName] = std::make_pair(deviceType, id);
     m_SerialInfoMap[deviceName] = serialSettings;
 }
 
@@ -111,7 +111,7 @@ VRPNDeviceServer::initModule()
         default:
         {
             LOG(WARNING) << "VRPNDeviceServer::initModule error: can not connect to "
-                         << name<< ", device type unknown.";
+                         << name << ", device type unknown.";
         } break;
         }
     }

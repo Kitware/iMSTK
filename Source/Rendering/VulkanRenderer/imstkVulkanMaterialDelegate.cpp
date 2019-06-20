@@ -76,7 +76,7 @@ VulkanMaterialDelegate::createPipeline(VulkanRenderer * renderer)
                                               renderer->m_renderDevice,
                                               m_pipelineComponents.vertexShader);
     }
-    else if(m_material->isParticle())
+    else if (m_material->isParticle())
     {
         VulkanShaderLoader vertexShaderLoader(VulkanShaderPath::Mesh + "particle_vert.spv",
                                               renderer->m_renderDevice,

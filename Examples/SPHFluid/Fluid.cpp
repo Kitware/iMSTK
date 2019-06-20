@@ -41,15 +41,15 @@ StdVectorOfVec3d generateSphereShapeFluid(const double particleRadius)
     StdVectorOfVec3d particles;
     particles.reserve(N * N * N);
 
-    for(size_t i = 0; i < N; ++i)
+    for (size_t i = 0; i < N; ++i)
     {
-        for(size_t j = 0; j < N; ++j)
+        for (size_t j = 0; j < N; ++j)
         {
-            for(size_t k = 0; k < N; ++k)
+            for (size_t k = 0; k < N; ++k)
             {
                 Vec3d ppos = lcorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
                 Vec3d cx   = ppos - sphereCenter;
-                if(cx.squaredNorm() < sphereRadiusSqr)
+                if (cx.squaredNorm() < sphereRadiusSqr)
                 {
                     particles.push_back(ppos);
                 }
@@ -74,11 +74,11 @@ StdVectorOfVec3d generateBoxShapeFluid(const double particleRadius)
     StdVectorOfVec3d particles;
     particles.reserve(N * N * N);
 
-    for(size_t i = 0; i < N; ++i)
+    for (size_t i = 0; i < N; ++i)
     {
-        for(size_t j = 0; j < N; ++j)
+        for (size_t j = 0; j < N; ++j)
         {
-            for(size_t k = 0; k < N; ++k)
+            for (size_t k = 0; k < N; ++k)
             {
                 Vec3d ppos = boxLowerCorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
                 particles.push_back(ppos);
@@ -100,11 +100,10 @@ StdVectorOfVec3d generateBunnyShapeFluid(const double particleRadius)
     return particles;
 }
 
-
 std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, const double particleRadius)
 {
     StdVectorOfVec3d particles;
-    switch(sceneIdx)
+    switch (sceneIdx)
     {
     case 1:
         particles = generateSphereShapeFluid(particleRadius);
@@ -142,7 +141,7 @@ std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int
     // configure model
     auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
     sphParams->m_bNormalizeDensity = true;
-    if(sceneIdx == 2)   // highly viscous fluid
+    if (sceneIdx == 2)   // highly viscous fluid
     {
         sphParams->m_RatioKernelOverParticleRadius = 6.0;
         sphParams->m_ViscosityFluid = 0.5;

@@ -49,7 +49,6 @@ VRPNArduinoDeviceClient::cleanUpModule()
     //m_vrpnAnalog.reset();
 }
 
-
 void VRPN_CALLBACK
 VRPNArduinoDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
 {

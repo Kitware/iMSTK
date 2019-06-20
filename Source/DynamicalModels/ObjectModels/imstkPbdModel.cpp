@@ -90,9 +90,9 @@ PbdModel::initialize()
     bool bOK = true; // Return immediately if some constraint failed to initialize
 
     // Initialize FEM constraints
-    for(auto& constraint: m_Parameters->m_FEMConstraints)
+    for (auto& constraint: m_Parameters->m_FEMConstraints)
     {
-        if(!bOK)
+        if (!bOK)
         {
             return false;
         }
@@ -101,13 +101,13 @@ PbdModel::initialize()
     }
 
     // Initialize other constraints
-    for(auto& constraint: m_Parameters->m_RegularConstraints)
+    for (auto& constraint: m_Parameters->m_RegularConstraints)
     {
-        if(!bOK)
+        if (!bOK)
         {
             return false;
         }
-        switch(constraint.first)
+        switch (constraint.first)
         {
         case PbdConstraint::Type::Volume:
             bOK = initializeVolumeConstraints(constraint.second);
@@ -140,8 +140,8 @@ PbdModel::initialize()
 void
 PbdModel::computeElasticConstants()
 {
-    if(std::abs(m_Parameters->m_mu) < MIN_REAL &&
-       std::abs(m_Parameters->m_lambda) < MIN_REAL)
+    if (std::abs(m_Parameters->m_mu) < MIN_REAL &&
+        std::abs(m_Parameters->m_lambda) < MIN_REAL)
     {
         const auto E  = m_Parameters->m_YoungModulus;
         const auto nu = m_Parameters->m_PoissonRatio;
@@ -213,11 +213,11 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     auto addConstraint =
         [&](std::vector<std::vector<bool>>& E, size_t i1, size_t i2)
         {
-            if(i1 > i2) // Make sure i1 is always smaller than i2
+            if (i1 > i2) // Make sure i1 is always smaller than i2
             {
                 std::swap(i1, i2);
             }
-            if(E[i1][i2])
+            if (E[i1][i2])
             {
                 E[i1][i2] = 0;
                 auto c = std::make_shared<PbdDistanceConstraint>();
@@ -226,7 +226,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             }
         };
 
-    if(m_mesh->getType() == Geometry::Type::TetrahedralMesh)
+    if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
         const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
         const auto& elements = tetMesh->getTetrahedraVertices();
@@ -244,7 +244,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             addConstraint(E, tet[2], tet[3]);
         }
     }
-    else if(m_mesh->getType() == Geometry::Type::SurfaceMesh)
+    else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
         const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
         const auto& elements = triMesh->getTrianglesVertices();
@@ -291,7 +291,7 @@ PbdModel::initializeAreaConstraints(const double stiffness)
 bool
 PbdModel::initializeDihedralConstraints(const double stiffness)
 {
-    if(m_mesh->getType() != Geometry::Type::SurfaceMesh)
+    if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
         LOG(WARNING) << "Dihedral constraint should come with a triangular mesh";
         return false;
@@ -302,7 +302,6 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
     const auto& elements = triMesh->getTrianglesVertices();
     const auto nV = triMesh->getNumVertices();
     std::vector<std::vector<size_t>> onering(nV);
-
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
@@ -318,24 +317,24 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
         [&](std::vector<size_t>& r1, std::vector<size_t>& r2,
             const size_t k, size_t i1, size_t i2)
         {
-            if(i1 > i2) // Make sure i1 is always smaller than i2
+            if (i1 > i2) // Make sure i1 is always smaller than i2
             {
                 std::swap(i1, i2);
             }
-            if(E[i1][i2])
+            if (E[i1][i2])
             {
                 E[i1][i2] = 0;
 
                 std::vector<size_t> rs(2);
                 auto it = std::set_intersection(r1.begin(), r1.end(), r2.begin(), r2.end(), rs.begin());
                 rs.resize(static_cast<size_t>(it - rs.begin()));
-                if(rs.size() > 1)
+                if (rs.size() > 1)
                 {
                     size_t idx = (rs[0] == k) ? 1 : 0;
                     const auto& tri = elements[rs[idx]];
                     for (size_t i = 0; i < 3; ++i)
                     {
-                        if(tri[i] != tri[0] && tri[i] != tri[1])
+                        if (tri[i] != tri[0] && tri[i] != tri[1])
                         {
                             idx = i;
                             break;
@@ -371,11 +370,11 @@ bool
 PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if(m_mesh->getType() != Geometry::Type::SurfaceMesh &&
-       m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
-       m_mesh->getType() != Geometry::Type::LineMesh &&
-       m_mesh->getType() != Geometry::Type::HexahedralMesh &&
-       m_mesh->getType() != Geometry::Type::PointSet)
+    if (m_mesh->getType() != Geometry::Type::SurfaceMesh &&
+        m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
+        m_mesh->getType() != Geometry::Type::LineMesh &&
+        m_mesh->getType() != Geometry::Type::HexahedralMesh &&
+        m_mesh->getType() != Geometry::Type::PointSet)
     {
         LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
         return false;
@@ -418,7 +417,7 @@ void
 PbdModel::setTimeStepSizeType(const TimeSteppingType type)
 {
     m_timeStepSizeType = type;
-    if(type == TimeSteppingType::fixed)
+    if (type == TimeSteppingType::fixed)
     {
         m_Parameters->m_dt = m_Parameters->m_DefaultDt;
     }
@@ -427,7 +426,7 @@ PbdModel::setTimeStepSizeType(const TimeSteppingType type)
 void
 PbdModel::setUniformMass(const double val)
 {
-    if(val != 0.0)
+    if (val != 0.0)
     {
         std::fill(m_mass.begin(), m_mass.end(), val);
         std::fill(m_invMass.begin(), m_invMass.end(), 1 / val);
@@ -442,7 +441,7 @@ PbdModel::setUniformMass(const double val)
 void
 PbdModel::setParticleMass(const double val, const size_t idx)
 {
-    if(idx < m_mesh->getNumVertices())
+    if (idx < m_mesh->getNumVertices())
     {
         m_mass[idx] = val;
         m_invMass[idx] = 1.0 / val;
@@ -452,7 +451,7 @@ PbdModel::setParticleMass(const double val, const size_t idx)
 void
 PbdModel::setFixedPoint(const size_t idx)
 {
-    if(idx < m_mesh->getNumVertices())
+    if (idx < m_mesh->getNumVertices())
     {
         m_invMass[idx] = 0;
     }
@@ -476,9 +475,9 @@ PbdModel::integratePosition()
     {
         if (m_invMass[i] != 0.0)
         {
-            vel[i] += (accn[i] + m_Parameters->m_gravity)*m_Parameters->m_dt;
+            vel[i] += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
             prevPos[i] = pos[i];
-            pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff)*vel[i] * m_Parameters->m_dt;
+            pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
         }
     }
 }
