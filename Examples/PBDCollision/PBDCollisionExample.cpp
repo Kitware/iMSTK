@@ -147,7 +147,7 @@ int main()
         {
             SurfaceMesh::TriangleArray tri[2];
             tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i*nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
