@@ -74,15 +74,24 @@ int main()
     auto deformableObj = std::make_shared<PbdObject>("Beam");
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(volTetMesh);
-    pbdModel->configure(/*Number of Constraints*/ 1,
-        /*Constraint configuration*/ "FEM StVk 100.0 0.3",
-        /*Mass*/ 1.0,
-        /*Gravity*/ "0 -9.8 0",
-        /*TimeStep*/ 0.01,
-        /*FixedPoint*/ "51 127 178",
-        /*NumberOfIterationInConstraintSolver*/ 5
-        );
 
+    // configure model
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+
+    // FEM constraint
+    pbdParams->m_YoungModulus = 100.0;
+    pbdParams->m_PoissonRatio = 0.3;
+    pbdParams->m_fixedNodeIds = {51, 127, 178};
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt = 0.01;
+    pbdParams->m_maxIter = 5;
+
+    // Set the parameters
+    pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);

@@ -66,15 +66,23 @@ int main()
 
     auto pbdModel = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(fluidMesh);
-    pbdModel->configure(/*Number of Constraints*/ 1,
-        /*Constraint configuration*/ "ConstantDensity 1.0 0.3",
-        /*Mass*/ 1.0,
-        /*Gravity*/ "0 -9.8 0",
-        /*TimeStep*/ 0.005,
-        /*FixedPoint*/ "",
-        /*NumberOfIterationInConstraintSolver*/ 2,
-        /*Proximity*/ 0.1,
-        /*Contact stiffness*/ 1.0);
+
+    // Configure model
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+
+    // Constant density constraint with stiffness
+    pbdParams->enableConstraint(PbdConstraint::Type::ConstantDensity, 1.0);
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt = 0.005;
+    pbdParams->m_maxIter = 2;
+    pbdParams->m_proximity = 0.1;
+    pbdParams->m_contactStiffness = 1.0;
+
+    // Set the parameters
+    pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
 
     auto pbdSolver = std::make_shared<PbdSolver>();
@@ -220,10 +228,14 @@ int main()
 
     auto pbdModel2 = std::make_shared<PbdModel>();
     pbdModel2->setModelGeometry(floorMeshPhysics);
-    pbdModel2->configure(/*Number of Constraints*/ 0,
-        /*Mass*/ 0.0,
-        /*Proximity*/ 0.1,
-        /*Contact stiffness*/ 1.0);
+
+    // Configure model
+    auto pbdParams2 = std::make_shared<PBDModelConfig>();
+    pbdParams2->m_uniformMassValue = 0.0;
+    pbdParams2->m_proximity = 0.1;
+    pbdParams2->m_contactStiffness = 1.0;
+
+    pbdModel2->configure(pbdParams2);
     floor->setDynamicalModel(pbdModel2);
 
     auto pbdSolverfloor = std::make_shared<PbdSolver>();

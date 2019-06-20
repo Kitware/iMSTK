@@ -38,8 +38,22 @@ template<class CellData>
 class UniformSpatialGrid
 {
 public:
-    UniformSpatialGrid() = default;
-    UniformSpatialGrid(const Vec3r& lowerCorner, const Vec3r& upperCorner, Real cellSize) { initialize(lowerCorner, upperCorner, cellSize); }
+    ///
+    /// \brief Construct a default grid ([0, 1]^3) with cell size of 1
+    ///
+    UniformSpatialGrid() : UniformSpatialGrid(Vec3r(0, 0, 0), Vec3r(1, 1, 1), Real(1.0))
+    {}
+
+    ///
+    /// \brief Construct a grid with given corners and cell size
+    /// \param lowerCorner The lower corner of the grid
+    /// \param upperCorner The upper corner of the grid
+    /// \param cellSize The length of grid cell
+    ///
+    UniformSpatialGrid(const Vec3r& lowerCorner, const Vec3r& upperCorner, Real cellSize)
+    {
+        initialize(lowerCorner, upperCorner, cellSize);
+    }
 
     ///
     /// \brief Initialize the grid data
@@ -181,14 +195,14 @@ private:
         return getCellFlatIndexFrom3DIndices<IndexType>(cellIdx[0], cellIdx[1], cellIdx[2]);
     }
 
-    Vec3r m_LowerCorner {0.0, 0.0, 0.0};
-    Vec3r m_UpperCorner {1.0, 1.0, 1.0};
-    Real m_CellSize {1.0};
-    Real m_InvCellSize {1.0};
+    Vec3r m_LowerCorner; ///> Lower corner of the grid
+    Vec3r m_UpperCorner; ///> Upper corner of the grid
+    Real m_CellSize;     ///> Length of grid cell
+    Real m_InvCellSize;  ///> Inverse length of grid cell
 
-    std::array<unsigned int, 3> m_Resolution {{ 0u, 0u, 0u }};
-    unsigned int m_NTotalCells { 1u };
+    unsigned int m_NTotalCells;               ///> Number of total cells
+    std::array<unsigned int, 3> m_Resolution; ///> Grid resolution (number of cells in x/y/z dimensions)
 
-    std::vector<CellData> m_CellData;
+    std::vector<CellData> m_CellData; ///> Data stored for each cell
 };
 } // end namespace imstk

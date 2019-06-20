@@ -44,8 +44,8 @@ PbdInteractionPair::doBroadPhaseCollision()
     auto dynaModel1 = std::static_pointer_cast<PbdModel>(first->getDynamicalModel());
     auto dynaModel2 = std::static_pointer_cast<PbdModel>(second->getDynamicalModel());
 
-    auto prox1 = dynaModel1->getProximity();
-    auto prox2 = dynaModel2->getProximity();
+    auto prox1 = dynaModel1->getParameters()->m_proximity;
+    auto prox2 = dynaModel2->getParameters()->m_proximity;
 
     return testAABBToAABB(min1[0] - prox1, max1[0] + prox1, min1[1] - prox1, max1[1] + prox1,
                           min1[2] - prox1, max1[2] + prox1, min2[0] - prox2, max2[0] + prox2,
@@ -64,8 +64,8 @@ PbdInteractionPair::doNarrowPhaseCollision()
     auto dynaModel1 = std::static_pointer_cast<PbdModel>(first->getDynamicalModel());
     auto dynaModel2 = std::static_pointer_cast<PbdModel>(second->getDynamicalModel());
 
-    auto prox1 = dynaModel1->getProximity();
-    auto prox2 = dynaModel2->getProximity();
+    auto prox1 = dynaModel1->getParameters()->m_proximity;
+    auto prox2 = dynaModel2->getParameters()->m_proximity;
 
     auto mesh2 = std::static_pointer_cast<SurfaceMesh>(g2);
 

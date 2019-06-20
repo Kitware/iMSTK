@@ -87,8 +87,8 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     // energy constraint
     double C = 0;
 
-    const auto mu = model.getFirstLame();
-    const auto lambda = model.getSecondLame();
+    const auto mu = model.getParameters()->m_mu;
+    const auto lambda = model.getParameters()->m_lambda;
 
     switch (m_material)
     {
