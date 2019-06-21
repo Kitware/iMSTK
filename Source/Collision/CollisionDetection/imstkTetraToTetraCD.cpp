@@ -39,8 +39,6 @@ TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
 void
 TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<TetrahedralMesh> mesh, size_t idOffset)
 {
-    Vec3d min, max; //bounding box of a tetrahedron
-    Vec3d vPos;
     const auto eps = MACHINE_PRECISION;
     const double eps2 = 1e-10;
 
@@ -59,9 +57,12 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
             {
                 vInd[i] += idOffset;
             }
+
+            Vec3d min, max; //bounding box of a tetrahedron
             mesh->computeTetrahedronBoundingBox(tId, min, max);
             std::vector<size_t> collP = m_hashTable.getPointsInAABB(min, max);
             assert(collP.size() >= 4);
+
             if (collP.size() > 4)
             {
                 for (size_t vId : collP)
@@ -72,8 +73,8 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                         vId != vInd[2] &&
                         vId != vInd[3])
                     {
-                        //this determines vertex belonging part of the penetration type
-                        //and gets vertex position
+                        //this determines vertex belonging part of the penetration type and gets vertex position
+                        Vec3d vPos;
                         if (vId < m_meshA->getNumVertices())
                         {
                             vPos = nodesMeshA[vId];
