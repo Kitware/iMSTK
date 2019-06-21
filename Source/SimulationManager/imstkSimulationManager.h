@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Default destructor
     ///
-    ~SimulationManager() = default;
+    ~SimulationManager() { this->endSimulation(); };
 
     ///
     /// \brief Returns the simulation status
