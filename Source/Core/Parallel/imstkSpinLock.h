@@ -36,15 +36,22 @@ class SpinLock
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Default constructor, initializes the atomic_flag member to memory_order_release state
     ///
-    SpinLock() = default;
+    SpinLock()
+    {
+        unlock();
+    }
 
     ///
     /// \brief Copy constructor, must be implemented as an empty function
-    /// because the member variable of type std::atomic_flag has copy constructor deleted
+    /// because the member variable of type std::atomic_flag has copy constructor deleted.
+    /// In addition, the constructor initializes the atomic_flag member to memory_order_release state
     ///
-    SpinLock(const SpinLock&) {}
+    SpinLock(const SpinLock&)
+    {
+        unlock();
+    }
 
     ///
     /// \brief Start a thread-safe region, where only one thread can execute at a time until
