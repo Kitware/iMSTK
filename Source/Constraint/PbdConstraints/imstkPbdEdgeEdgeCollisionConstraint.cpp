@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
+#include "imstkPbdModel.h"
+
 #include "g3log/g3log.hpp"
 
 namespace imstk

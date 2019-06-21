@@ -24,7 +24,7 @@
 
 #include "imstkDynamicObject.h"
 #include "imstkDynamicalModel.h"
-#include "imstkPbdModel.h"
+#include "imstkPbdState.h"
 
 #include <stdarg.h>
 
@@ -32,6 +32,7 @@ namespace imstk
 {
 class Geometry;
 class GeometryMap;
+class PbdModel;
 
 ///
 /// \class PbdObject
@@ -58,7 +59,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~PbdObject() = default;
+    virtual ~PbdObject() override = default;
 
     ///
     /// \brief Initialize the pbd scene object
@@ -85,10 +86,9 @@ public:
     ///
     void reset() override;
 
-    void setPbdModel(std::shared_ptr<PbdModel> model) { m_pbdModel = model; }
+    void setPbdModel(const std::shared_ptr<PbdModel>& model) { m_pbdModel = model; }
 
 protected:
-
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };
 } // imstk
