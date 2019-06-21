@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~TetraTriangleMap() = default;
+    virtual ~TetraTriangleMap() override = default;
 
     ///
     /// \brief Compute the tetra-triangle mesh map

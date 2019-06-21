@@ -20,6 +20,11 @@
 =========================================================================*/
 
 #include "imstkOneToOneMap.h"
+#include "imstkParallelUtils.h"
+
+#undef min
+#undef max
+#include <climits>
 
 namespace imstk
 {
@@ -33,36 +38,53 @@ OneToOneMap::compute()
     }
 
     // returns the first matching vertex
-    auto findMatchingVertex = [](std::shared_ptr<PointSet> masterMesh, const Vec3d& p) -> size_t
+    auto findMatchingVertex = [](const std::shared_ptr<PointSet>& masterMesh, const Vec3d& p, size_t& nodeId)
                               {
-                                  for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
+                                  for (size_t idx = 0; idx < masterMesh->getNumVertices(); ++idx)
                                   {
-                                      if (masterMesh->getInitialVertexPosition(nodeId) == p)
+                                      if (masterMesh->getInitialVertexPosition(idx) == p)
                                       {
-                                          return nodeId;
+                                          nodeId = idx;
+                                          return true;
                                       }
                                   }
-                                  return -1;
+                                  return false;
                               };
 
     auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
     auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
 
     m_oneToOneMap.clear();
-    for (size_t nodeId = 0; nodeId < meshSlave->getNumVertices(); ++nodeId)
-    {
-        // Find the enclosing or closest tetrahedron
-        size_t matchingNodeId = findMatchingVertex(meshMaster, meshSlave->getVertexPosition(nodeId));
+    bool bValid = true;
 
-        if (matchingNodeId < 0)
+    ParallelUtils::parallelFor(meshSlave->getNumVertices(),
+        [&](const size_t nodeId)
         {
-            LOG(WARNING) << "Could not find matching node for the node " << nodeId;
-            continue;
-        }
+            // Find the enclosing or closest tetrahedron
+            size_t matchingNodeId;
+            if (!findMatchingVertex(meshMaster, meshSlave->getVertexPosition(nodeId), matchingNodeId))
+            {
+                LOG(WARNING) << "Could not find matching node for the node " << nodeId;
+                bValid = false;
+                return;
+            }
 
-        // add to the map
-        // Note: This replaces the map if one with <nodeId> already exists
-        m_oneToOneMap[nodeId] = matchingNodeId;
+            // add to the map
+            // Note: This replaces the map if one with <nodeId> already exists
+            m_oneToOneMap[nodeId] = matchingNodeId;
+        });
+
+    if (!bValid)
+    {
+        m_oneToOneMap.clear();
+        return;
+    }
+
+    // Copy data from map to vector for parallel processing
+    m_oneToOneMapVector.resize(0);
+    for (auto kv: m_oneToOneMap)
+    {
+        m_oneToOneMapVector.push_back({kv.first, kv.second});
     }
 }
 
@@ -77,8 +99,8 @@ OneToOneMap::isValid() const
 
     for (auto const& mapValue : m_oneToOneMap)
     {
-        if (mapValue.first >= 0 && mapValue.first < numVertSlave &&
-            mapValue.second >= 0 && mapValue.second < numVertMaster)
+        if (mapValue.first < numVertSlave &&
+            mapValue.second < numVertMaster)
         {
             continue;
         }
@@ -94,7 +116,14 @@ OneToOneMap::isValid() const
 void
 OneToOneMap::setMap(const std::map<size_t, size_t>& sourceMap)
 {
-    this->m_oneToOneMap = sourceMap;
+    m_oneToOneMap = sourceMap;
+
+    // Copy data from map to vector for parallel processing
+    m_oneToOneMapVector.resize(0);
+    for (auto kv: m_oneToOneMap)
+    {
+        m_oneToOneMapVector.push_back({kv.first, kv.second});
+    }
 }
 
 void
@@ -114,13 +143,16 @@ OneToOneMap::apply()
         return;
     }
 
+    LOG_IF(FATAL, (m_oneToOneMap.size() != m_oneToOneMapVector.size())) << "Internal data is corrupted";
+
     auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
     auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
 
-    for (auto const& mapValue : m_oneToOneMap)
-    {
-        meshSlave->setVertexPosition(mapValue.first, meshMaster->getVertexPosition(mapValue.second));
-    }
+    ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
+        [&](const size_t idx){
+            const auto& mapValue = m_oneToOneMapVector[idx];
+            meshSlave->setVertexPosition(mapValue.first, meshMaster->getVertexPosition(mapValue.second));
+        });
 }
 
 void
@@ -131,7 +163,7 @@ OneToOneMap::print() const
 
     // Print the one-to-one map
     LOG(INFO) << "[slaveVertId, masterVertexId]\n";
-    for (auto const& mapValue : this->m_oneToOneMap)
+    for (auto const& mapValue : m_oneToOneMap)
     {
         LOG(INFO) << "[" << mapValue.first << ", " << mapValue.second << "]\n";
     }
