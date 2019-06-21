@@ -74,7 +74,7 @@ protected:
     ///
     /// \brief
     ///
-    virtual void initModule() override;
+    virtual void initModule() override {};
 
     ///
     /// \brief
