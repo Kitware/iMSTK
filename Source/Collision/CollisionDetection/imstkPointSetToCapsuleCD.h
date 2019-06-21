@@ -46,16 +46,12 @@ public:
     ///
     PointSetToCapsuleCD(std::shared_ptr<PointSet> pointSet,
                         std::shared_ptr<Capsule> capsule,
-                        std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::PointSetToCapsule,
-                           colData),
-        m_pointSet(pointSet),
-        m_capsule(capsule){}
+                        std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Destructor
     ///
-    ~PointSetToCapsuleCD() = default;
+    virtual ~PointSetToCapsuleCD() override = default;
 
     ///
     /// \brief Detect collision and compute collision data

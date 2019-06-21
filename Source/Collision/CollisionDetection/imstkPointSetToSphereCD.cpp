@@ -25,11 +25,19 @@
 #include "imstkCollisionData.h"
 #include "imstkSphere.h"
 #include "imstkPointSet.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
+PointSetToSphereCD::PointSetToSphereCD(std::shared_ptr<PointSet> pointSet,
+                                       std::shared_ptr<Sphere> sphere,
+                                       std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
+    m_pointSet(pointSet),
+    m_sphere(sphere)
+{
+}
+
 void
 PointSetToSphereCD::computeCollisionData()
 {
@@ -37,20 +45,27 @@ PointSetToSphereCD::computeCollisionData()
     m_colData->clearAll();
 
     // Get sphere properties
-    auto spherePos = m_sphere->getPosition();
-    auto radius = m_sphere->getRadius();
+    const auto sphereCenter = m_sphere->getPosition();
+    const auto sphereRadius = m_sphere->getRadius();
+    const auto sphereRadiusSqr = sphereRadius * sphereRadius;
 
-    size_t nodeId = 0;
-    for (const auto& p : m_pointSet->getVertexPositions())
-    {
-        auto dist = (spherePos - p).norm();
-        if (dist <= radius)
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
+        [&](const size_t idx)
         {
-            auto direction = (spherePos - p) / dist;
-            auto pointOnSphere = spherePos - radius * direction;
-            m_colData->MAColData.push_back({ nodeId, p - pointOnSphere });
-        }
-        nodeId++;
-    }
+            const auto p = m_pointSet->getVertexPosition(idx);
+            const auto pc = sphereCenter - p;
+            const auto distSqr = pc.squaredNorm();
+            if (distSqr <= sphereRadiusSqr && distSqr > Real(1e-12))
+            {
+                const auto direction = pc / std::sqrt(distSqr);
+                const auto pointOnSphere = sphereCenter - sphereRadius * direction;
+                const auto penetrationDir = p - pointOnSphere;
+
+                lock.lock();
+                m_colData->MAColData.push_back({ idx, penetrationDir });
+                lock.unlock();
+            }
+       });
 }
 } // imstk

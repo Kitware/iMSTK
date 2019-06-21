@@ -47,16 +47,12 @@ public:
     ///
     PointSetToSpherePickingCD(std::shared_ptr<PointSet> pointSet,
                               std::shared_ptr<Sphere> sphere,
-                              std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::PointSetToSphere,
-                           colData),
-        m_pointSet(pointSet),
-        m_sphere(sphere){}
+                              std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Destructor
     ///
-    ~PointSetToSpherePickingCD() = default;
+    virtual ~PointSetToSpherePickingCD() override = default;
 
     ///
     /// \brief Detect collision and compute collision data
@@ -67,7 +63,7 @@ public:
     /// \brief Set device tracker and the id of the button
     ///
     void setDeviceTrackerAndButton(const std::shared_ptr<imstk::DeviceTracker> devTracker,
-                                   const unsigned int buttonId = 0){ m_deviceTracker = devTracker; }
+                                   const unsigned int buttonId = 0);
 private:
 
     std::shared_ptr<PointSet> m_pointSet;  ///> PointSet

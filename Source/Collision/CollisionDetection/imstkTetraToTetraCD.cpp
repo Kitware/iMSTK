@@ -23,8 +23,7 @@
 
 #include "imstkCollisionData.h"
 #include "imstkMath.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
@@ -40,8 +39,6 @@ TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
 void
 TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<TetrahedralMesh> mesh, size_t idOffset)
 {
-    Vec3d min, max; //bounding box of a tetrahedron
-    Vec3d vPos;
     const auto eps = MACHINE_PRECISION;
     const double eps2 = 1e-10;
 
@@ -51,57 +48,63 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     auto nodesMeshA = m_meshA->getVertexPositions();
     auto nodesMeshB = m_meshB->getVertexPositions();
 
-    for (size_t tId = 0; tId < mesh->getNumTetrahedra(); ++tId)  //TODO: parallelize!
-    {
-        TetrahedralMesh::TetraArray vInd = mesh->getTetrahedronVertices(tId);
-        for (int i = 0; i < 4; i++)  //if idOffset!=0 ?
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(mesh->getNumTetrahedra(),
+        [&](const size_t tId)
         {
-            vInd[i] += idOffset;
-        }
-        mesh->computeTetrahedronBoundingBox(tId, min, max);
-        std::vector<size_t> collP = m_hashTable.getPointsInAABB(min, max);
-        assert(collP.size() >= 4);
-        if (collP.size() > 4)
-        {
-            for (size_t vId : collP)
+            TetrahedralMesh::TetraArray vInd = mesh->getTetrahedronVertices(tId);
+            for (size_t i = 0; i < 4; ++i)  //if idOffset!=0 ?
             {
-                //vertex does not belong to this tetrahedron
-                if (vId != vInd[0] &&
-                    vId != vInd[1] &&
-                    vId != vInd[2] &&
-                    vId != vInd[3])
+                vInd[i] += idOffset;
+            }
+
+            Vec3d min, max; //bounding box of a tetrahedron
+            mesh->computeTetrahedronBoundingBox(tId, min, max);
+            std::vector<size_t> collP = m_hashTable.getPointsInAABB(min, max);
+            assert(collP.size() >= 4);
+
+            if (collP.size() > 4)
+            {
+                for (size_t vId : collP)
                 {
-                    //this determines vertex belonging part of the penetration type
-                    //and gets vertex position
-                    if (vId < m_meshA->getNumVertices())
+                    //vertex does not belong to this tetrahedron
+                    if (vId != vInd[0] &&
+                        vId != vInd[1] &&
+                        vId != vInd[2] &&
+                        vId != vInd[3])
                     {
-                        vPos = nodesMeshA[vId];
-                        cType = static_cast<PointTetrahedronCollisionData::CollisionType>((cType & 1) + 0);
-                    }
-                    else
-                    {
-                        vId -= m_meshA->getNumVertices();
-                        vPos = nodesMeshB[vId];
-                        cType = static_cast<PointTetrahedronCollisionData::CollisionType>((cType & 1) + 2);
-                    }
+                        //this determines vertex belonging part of the penetration type and gets vertex position
+                        Vec3d vPos;
+                        if (vId < m_meshA->getNumVertices())
+                        {
+                            vPos = nodesMeshA[vId];
+                            cType = static_cast<PointTetrahedronCollisionData::CollisionType>((cType & 1) + 0);
+                        }
+                        else
+                        {
+                            vId -= m_meshA->getNumVertices();
+                            vPos = nodesMeshB[vId];
+                            cType = static_cast<PointTetrahedronCollisionData::CollisionType>((cType & 1) + 2);
+                        }
 
-                    TetrahedralMesh::WeightsArray bCoord; //barycentric coordinates of the vertex in tetrahedron
-                    mesh->computeBarycentricWeights(tId, vPos, bCoord);
-                    if (bCoord[0] >= -eps &&
-                        bCoord[1] >= -eps &&
-                        bCoord[2] >= -eps &&
-                        bCoord[3] >= -eps)
-                    {
-                        auto coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
-                        assert(coordSum <= 1 + eps2 && coordSum >= 1 - eps2);
+                        TetrahedralMesh::WeightsArray bCoord; //barycentric coordinates of the vertex in tetrahedron
+                        mesh->computeBarycentricWeights(tId, vPos, bCoord);
+                        if (bCoord[0] >= -eps &&
+                            bCoord[1] >= -eps &&
+                            bCoord[2] >= -eps &&
+                            bCoord[3] >= -eps)
+                        {
+                            auto coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
+                            assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
 
-                        PointTetrahedronCollisionData ptColl = { cType, vId, tId, bCoord };
-                        m_colData->PTColData.push_back(ptColl);
-                    }
-                } //if not this tetrahedron
-            } //for vertices
-        }
-    } //for tetrahedra
+                            lock.lock();
+                            m_colData->PTColData.push_back({ cType, vId, tId, bCoord });
+                            lock.unlock();
+                        }
+                    } //if not this tetrahedron
+                } //for vertices
+            }
+    }); //for tetrahedra
 }
 
 void

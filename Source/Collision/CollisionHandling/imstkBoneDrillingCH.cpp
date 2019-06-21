@@ -26,6 +26,7 @@
 #include "imstkCollisionData.h"
 #include "imstkDeviceTracker.h"
 #include "imstkMath.h"
+#include "imstkParallelUtils.h"
 
 #include <g3log/g3log.hpp>
 
@@ -47,29 +48,31 @@ BoneDrillingCH::BoneDrillingCH(const Side& side,
     }
 
     // Initialize bone density values
+    m_nodalDensity.reserve(boneMesh->getNumVertices());
     for (int i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         m_nodalDensity.push_back(m_initialBoneDensity);
     }
 
+    m_nodeRemovalStatus.reserve(boneMesh->getNumVertices());
     for (int i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         m_nodeRemovalStatus.push_back(false);
     }
 
-    m_nodalCardinalSet.resize(boneMesh->getNumVertices());
+    m_nodalCardinalSet.reserve(boneMesh->getNumVertices());
     for (int i = 0; i < boneMesh->getNumVertices(); ++i)
     {
-        std::vector<int> row;
+        std::vector<size_t> row;
         m_nodalCardinalSet.push_back(row);
     }
 
     // Pre-compute the nodal cardinality set
-    for (int i = 0; i < boneMesh->getNumTetrahedra(); ++i)
+    for (size_t tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
     {
-        for (auto& vert : boneMesh->getTetrahedronVertices(i))
+        for (auto& vert : boneMesh->getTetrahedronVertices(tetId))
         {
-            m_nodalCardinalSet[vert].push_back(i);
+            m_nodalCardinalSet[vert].push_back(tetId);
         }
     }
 }
@@ -79,28 +82,33 @@ BoneDrillingCH::erodeBone()
 {
     auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
-    for (auto& cd : m_colData->MAColData)
-    {
-        if (m_nodeRemovalStatus[cd.nodeId])
+    ParallelUtils::parallelFor(m_colData->MAColData.size(),
+        [&](const size_t idx)
         {
-            continue;
-        }
-
-        m_nodalDensity[cd.nodeId] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * cd.penetrationVector.norm() * 0.001;
-
-        if (m_nodalDensity[cd.nodeId] <= 0.)
-        {
-            m_erodedNodes.push_back(cd.nodeId);
-            m_nodeRemovalStatus[cd.nodeId] = true;
-
-            // tag the tetra that will be removed
-            for (auto& tetId : m_nodalCardinalSet[cd.nodeId])
+            auto& cd = m_colData->MAColData[idx];
+            if (m_nodeRemovalStatus[cd.nodeId])
             {
-                boneTetMesh->setTetrahedraAsRemoved(tetId);
-                boneTetMesh->setTopologyChangedFlag(true);
+                return;
             }
-        }
-    }
+
+            m_nodalDensity[cd.nodeId] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * cd.penetrationVector.norm() * 0.001;
+
+            if (m_nodalDensity[cd.nodeId] <= 0.)
+            {
+                // TODO: Unused variable, maybe used in furture?
+                // lock.lock();
+                // m_erodedNodes.push_back(cd.nodeId);
+                // lock.unlock();
+                m_nodeRemovalStatus[cd.nodeId] = true;
+
+                // tag the tetra that will be removed
+                for (auto& tetId : m_nodalCardinalSet[cd.nodeId])
+                {
+                    boneTetMesh->setTetrahedraAsRemoved(static_cast<unsigned int>(tetId));
+                    boneTetMesh->setTopologyChangedFlag(true);
+                }
+            }
+        });
 }
 
 void
@@ -119,7 +127,7 @@ BoneDrillingCH::processCollisionData()
 
     // Aggregate collision data
     Vec3d t = Vec3d::Zero();
-    double maxDepth = MIN_D;
+    double maxDepthSqr = MIN_D;
     for (const auto& cd : m_colData->MAColData)
     {
         if (m_nodeRemovalStatus[cd.nodeId])
@@ -127,9 +135,10 @@ BoneDrillingCH::processCollisionData()
             continue;
         }
 
-        if (cd.penetrationVector.norm() > maxDepth)
+        const auto dSqr = cd.penetrationVector.squaredNorm();
+        if (dSqr > maxDepthSqr)
         {
-            maxDepth = cd.penetrationVector.norm();
+            maxDepthSqr = dSqr;
             t = cd.penetrationVector;
         }
     }

@@ -22,6 +22,7 @@
 #include "imstkPBDCollisionHandling.h"
 #include "imstkCollisionData.h"
 #include "imstkDeformableObject.h"
+#include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
 #include "imstkPbdPointTriCollisionConstraint.h"

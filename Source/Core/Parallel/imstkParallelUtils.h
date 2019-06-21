@@ -24,5 +24,5 @@
 #include "imstkThreadManager.h"
 #include "imstkParallelFor.h"
 #include "imstkParallelReduce.h"
-#include "imstkParallelSpinLock.h"
+#include "imstkSpinLock.h"
 #include "imstkAtomicOperations.h"

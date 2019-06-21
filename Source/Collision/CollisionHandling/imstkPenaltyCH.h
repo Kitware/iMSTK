@@ -46,25 +46,24 @@ public:
     ///
     /// \brief Constructor
     ///
-    PenaltyCH(const Side& side,
-              const std::shared_ptr<CollisionData> colData,
-              std::shared_ptr<CollidingObject> obj) :
-        CollisionHandling(Type::Penalty, side, colData),
-        m_object(obj){}
+    PenaltyCH(const Side& side, const std::shared_ptr<CollisionData>& colData, const std::shared_ptr<CollidingObject>& obj);
 
+    ///
+    /// \brief Constructor
+    ///
     PenaltyCH() = delete;
 
     ///
     /// \brief Destructor
     ///
-    ~PenaltyCH() = default;
+    virtual ~PenaltyCH() override = default;
 
     ///
     /// \brief Compute forces based on collision data
     ///
     void processCollisionData() override;
-    void computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> analyticObj);
-    void computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObject> deformableObj);
+    void computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj);
+    void computeContactForcesDiscreteDeformable(const std::shared_ptr<DeformableObject>& deformableObj);
 
     ///
     /// \brief Set the contact stiffness

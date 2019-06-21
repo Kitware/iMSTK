@@ -30,7 +30,7 @@ using namespace imstk;
 
 #define SPHERE_RADIUS   Real(1)
 #define SPHERE_CENTER   Vec3r(0, 0, 0)
-#define PARTICLE_RADIUS Real(0.05)
+#define PARTICLE_RADIUS Real(0.08)
 #define ITERATIONS      5
 #define STEP            Real(1.1)
 

@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~TetraToTetraCD() = default;
+    virtual ~TetraToTetraCD() override = default;
 
     ///
     /// \brief Detect collision and compute collision data

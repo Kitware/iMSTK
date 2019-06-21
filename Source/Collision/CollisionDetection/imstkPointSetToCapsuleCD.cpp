@@ -25,11 +25,19 @@
 #include "imstkCapsule.h"
 #include "imstkPointSet.h"
 #include "imstkMath.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
+PointSetToCapsuleCD::PointSetToCapsuleCD(std::shared_ptr<PointSet> pointSet,
+                                         std::shared_ptr<Capsule> capsule,
+                                         std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToCapsule, colData),
+    m_pointSet(pointSet),
+    m_capsule(capsule)
+{
+}
+
 void
 PointSetToCapsuleCD::computeCollisionData()
 {
@@ -49,30 +57,33 @@ PointSetToCapsuleCD::computeCollisionData()
     auto pDotp = p.dot(p);
     auto pDotp0 = p.dot(p0);
 
-    size_t nodeId = 0;
-    for (const auto& q : m_pointSet->getVertexPositions())
-    {
-        // First, check collision with bounding sphere
-        if ((mid - q).norm() > (radius + length * 0.5))
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
+        [&](const size_t idx)
         {
-            nodeId++;
-            continue;
-        }
+            const auto q = m_pointSet->getVertexPosition(idx);
 
-        // Do the actual check
-        auto alpha = (q.dot(p) - pDotp0) / pDotp;
-        auto closestPoint = p0 + p * alpha;
+            // First, check collision with bounding sphere
+            if ((mid - q).norm() > (radius + length * 0.5))
+            {
+                return;
+            }
 
-        // If the point is inside the bounding sphere then the closest point
-        // should be inside the capsule
-        auto dist = (closestPoint - q).norm();
-        if (dist <= radius)
-        {
-            auto direction = (closestPoint - q) / dist;
-            auto pointOnCapsule = closestPoint - radius * direction;
-            m_colData->MAColData.push_back({ nodeId, p - pointOnCapsule });
-        }
-        nodeId++;
-    }
+            // Do the actual check
+            auto alpha = (q.dot(p) - pDotp0) / pDotp;
+            auto closestPoint = p0 + p * alpha;
+
+            // If the point is inside the bounding sphere then the closest point
+            // should be inside the capsule
+            auto dist = (closestPoint - q).norm();
+            if (dist <= radius)
+            {
+                auto direction = (closestPoint - q) / dist;
+                auto pointOnCapsule = closestPoint - radius * direction;
+                lock.lock();
+                m_colData->MAColData.push_back({ idx, p - pointOnCapsule });
+                lock.unlock();
+            }
+        });
 }
 } // imstk
