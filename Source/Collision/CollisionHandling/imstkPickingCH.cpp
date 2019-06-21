@@ -71,7 +71,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
 
     // If collision data, append LPC constraints
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_colData->NodePickData.size(),
         [&](const size_t idx) {
             const auto& cd = m_colData->NodePickData[idx];

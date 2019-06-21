@@ -57,7 +57,7 @@ PointSetToCapsuleCD::computeCollisionData()
     auto pDotp = p.dot(p);
     auto pDotp0 = p.dot(p0);
 
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
         [&](const size_t idx)
         {

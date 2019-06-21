@@ -47,7 +47,7 @@ void PointSetToPlaneCD::computeCollisionData()
     auto planePos = m_plane->getPosition();
     auto planeNormal = m_plane->getNormal();
 
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
         [&](const size_t idx)
         {

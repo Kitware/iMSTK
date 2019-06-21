@@ -112,7 +112,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
     const auto& velVector = deformableObj->getVelocities();
 
     // If collision data, append forces
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_colData->MAColData.size(),
         [&](const size_t idx) {
             const auto& cd = m_colData->MAColData[idx];

@@ -49,7 +49,7 @@ PointSetToSphereCD::computeCollisionData()
     const auto sphereRadius = m_sphere->getRadius();
     const auto sphereRadiusSqr = sphereRadius * sphereRadius;
 
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
         [&](const size_t idx)
         {

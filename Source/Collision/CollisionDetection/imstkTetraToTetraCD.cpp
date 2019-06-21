@@ -50,7 +50,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     auto nodesMeshA = m_meshA->getVertexPositions();
     auto nodesMeshB = m_meshB->getVertexPositions();
 
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(mesh->getNumTetrahedra(),
         [&](const size_t tId)
         {

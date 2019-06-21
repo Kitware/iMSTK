@@ -51,7 +51,7 @@ PointSetToSpherePickingCD::computeCollisionData()
     auto spherePos = m_sphere->getPosition();
     auto radius = m_sphere->getRadius() * m_sphere->getScaling();
 
-    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
         [&](const size_t idx)
         {
