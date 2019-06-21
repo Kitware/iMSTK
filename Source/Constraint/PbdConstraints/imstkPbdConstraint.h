@@ -73,11 +73,16 @@ public:
     virtual bool solvePositionConstraint(PbdModel& model) = 0;
 
     ///
+    /// \brief Get the vertex indices of the constraint
+    ///
+    const std::vector<size_t>& getVertexIds() const { return m_vertexIds; }
+
+    ///
     /// \brief Set the tolerance used for pbd constraints
     ///
     void setTolerance(const double eps) { m_epsilon = eps; }
 
-public:
+protected:
     std::vector<size_t> m_vertexIds;   ///> index of points for the constraint
     double m_epsilon = 1.0e-6;         ///> Tolerance used for the costraints
 };
