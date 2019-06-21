@@ -23,10 +23,11 @@
 #define imstkPointSet_h
 
 #include "imstkGeometry.h"
-#include "imstkGraph.h"
 
 namespace imstk
 {
+class Graph;
+
 ///
 /// \class PointSet
 ///
@@ -44,7 +45,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~PointSet() = default;
+    virtual ~PointSet() override = default;
 
     ///
     /// \brief Initializes the data structure given vertex positions
@@ -175,7 +176,7 @@ public:
     ///
     /// \brief Returns the mesh graph
     ///
-    virtual Graph getMeshGraph();
+    virtual std::shared_ptr<Graph> getMeshGraph();
 
 protected:
 

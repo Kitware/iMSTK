@@ -220,7 +220,7 @@ public:
     ///
     /// \brief Returns the mesh graph
     ///
-    Graph getMeshGraph() override;
+    std::shared_ptr<Graph> getMeshGraph() override;
 
 protected:
 

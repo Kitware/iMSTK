@@ -19,52 +19,37 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdCollisionConstraint_h
-#define imstkPbdCollisionConstraint_h
-
-#include <vector>
-#include <memory>
+#include "imstkPbdObject.h"
+#include "imstkPbdSolver.h"
+#include "imstkPbdCollisionConstraint.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
-class PbdModel;
-
-///
-/// \class PbdCollisionConstraint
-///
-/// \brief
-///
-class PbdCollisionConstraint
+void PbdSolver::solve()
 {
-public:
-    enum class Type
-    {
-        EdgeEdge,
-        PointTriangle
-    };
-
-    ///
-    /// \brief
-    ///
-    PbdCollisionConstraint(const unsigned int& n1, const unsigned int& n2);
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~PbdCollisionConstraint() = default;
-
-    ///
-    /// \brief
-    ///
-    virtual bool solvePositionConstraint() = 0;
-
-public:
-    std::vector<size_t> m_bodiesFirst;    ///> index of points for the first object
-    std::vector<size_t> m_bodiesSecond;   ///> index of points for the second object
-
-    std::shared_ptr<PbdModel> m_model1;
-    std::shared_ptr<PbdModel> m_model2;
-};
+    m_pbdObject->integratePosition();
+    m_pbdObject->solveConstraints();
+    resolveCollisionConstraints();
+    m_pbdObject->updateVelocity();
 }
 
-#endif // imstkPbdCollisionConstraint_h
+void PbdSolver::resolveCollisionConstraints()
+{
+    if (m_PBDConstraints != nullptr)
+    {
+        unsigned int maxIter = 2;
+        if (!m_PBDConstraints->empty())
+        {
+            unsigned int i = 0;
+            while (++i < maxIter)
+            {
+                for (size_t k = 0; k < m_PBDConstraints->size(); ++k)
+                {
+                    (*m_PBDConstraints)[k]->solvePositionConstraint();
+                }
+            }
+        }
+    }
+}
+} // end namespace imstk

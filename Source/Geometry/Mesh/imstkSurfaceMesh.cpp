@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSurfaceMesh.h"
+#include "imstkGraph.h"
 
 namespace imstk
 {
@@ -613,17 +614,17 @@ SurfaceMesh::getMaxNumTriangles()
     return m_maxNumTriangles;
 }
 
-Graph
+std::shared_ptr<Graph>
 SurfaceMesh::getMeshGraph()
 {
-    Graph gMesh(this->getNumVertices());
+    auto gMesh = std::make_shared<Graph>(this->getNumVertices());
     for (auto tri : this->getTrianglesVertices())
     {
-        gMesh.addEdge(tri[0], tri[1]);
-        gMesh.addEdge(tri[0], tri[2]);
-        gMesh.addEdge(tri[1], tri[2]);
+        gMesh->addEdge(tri[0], tri[1]);
+        gMesh->addEdge(tri[0], tri[2]);
+        gMesh->addEdge(tri[1], tri[2]);
     }
 
-    return std::move(gMesh);
+    return gMesh;
 }
 } // imstk
