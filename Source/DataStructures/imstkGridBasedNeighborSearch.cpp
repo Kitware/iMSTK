@@ -64,9 +64,6 @@ void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& res
         [&](const size_t cellIdx)
         {
             m_Grid.getCellData(cellIdx).particleIndices.resize(0);
-
-            // This line is not logically necessary, but it is needed due to a bug in MSVC
-            m_Grid.getCellData(cellIdx).lock.unlock();
         });
 
     // collect particle indices of points in setB into their corresponding cells
