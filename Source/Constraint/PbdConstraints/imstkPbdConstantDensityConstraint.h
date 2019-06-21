@@ -23,6 +23,7 @@ limitations under the License.
 #define imstkPbdConstantDensityConstraint_h
 
 #include "imstkPbdConstraint.h"
+#include "imstkNeighborSearch.h"
 
 namespace imstk
 {
@@ -71,24 +72,14 @@ private:
     Vec3d gradSpiky(const Vec3d &pi, const Vec3d &pj);
 
     ///
-    /// \brief Update the neighbors of each node using burte force search O(n*n)
+    /// \brief
     ///
-    void updateNeighborsBruteForce(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
-
-    ///
-    /// \brief Clear the list of neighbors
-    ///
-    void clearNeighbors(const size_t np);
+    void computeDensity(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
 
     ///
     /// \brief
     ///
-    void calculateDensityEstimate(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
-
-    ///
-    /// \brief
-    ///
-    void calculateLambdaScalingFactor(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
+    void computeLambdaScalingFactor(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
 
     ///
     /// \brief
@@ -104,23 +95,32 @@ private:
     ///
     /// \brief Set/Get max. neighbor distance
     ///
-    void setMaxNeighborDistance(const double dist) { m_maxDist = dist; }
-    double getMaxNeighborDistance() { return m_restDensity; }
+    void setMaxNeighborDistance(const double dist);
+    double getMaxNeighborDistance() { return m_maxDist; }
+
+    ///
+    /// \brief Set/Get neighbor search method
+    ///
+    void setNeighborSearchMethod(NeighborSearch::Method method) { m_NeighborSearchMethod = method; }
+    NeighborSearch::Method getNeighborSearchMethod() { return m_NeighborSearchMethod; }
 
 private:
+
     double m_wPoly6Coeff;
     double m_wSpikyCoeff;
 
     double m_maxDist = 0.2;                 ///> Max. neighbor distance
+    double m_maxDistSqr = 0.04;             ///> Max. neighbor squared distance
     double m_relaxationParameter = 600.0;   ///> Relaxation parameter
     double m_restDensity = 6378.0;          ///> Fluid density
-    int m_maxNumNeighbors = 50;             ///> Max. number of neighbors
 
-    std::vector<double> m_lambdas;          ///> lambdas
-    std::vector<double> m_densities;        ///> densities
-    std::vector<Vec3d> m_deltaPositions;    ///> delta positions
-    std::vector<int> m_neighbors;           ///> index of neighbors
-    std::vector<int> m_numNeighbors;        ///> number of neighbors
+    std::vector<double> m_lambdas;                     ///> lambdas
+    std::vector<double> m_densities;                   ///> densities
+    std::vector<Vec3d>  m_deltaPositions;              ///> delta positions
+    std::vector<std::vector<size_t>> m_neighborList;   ///> indices of neighbor particles
+
+    NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
+    std::shared_ptr<NeighborSearch> m_NeighborSearcher;  ///> neighbor searcher, must be initialized during model initialization
 };
 }
 
