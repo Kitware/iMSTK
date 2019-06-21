@@ -98,18 +98,6 @@ Module::start()
         }
     }
 
-    // Cleanup
-    if (m_preCleanUpCallback)
-    {
-        m_preCleanUpCallback(this);
-    }
-
-    this->cleanUpModule();
-
-    if (m_postCleanUpCallback)
-    {
-        m_postCleanUpCallback(this);
-    }
     m_status = ModuleStatus::INACTIVE;
 }
 
@@ -144,6 +132,19 @@ Module::pause()
 void
 Module::end()
 {
+    // Cleanup
+    if (m_preCleanUpCallback)
+    {
+        m_preCleanUpCallback(this);
+    }
+
+    this->cleanUpModule();
+
+    if (m_postCleanUpCallback)
+    {
+        m_postCleanUpCallback(this);
+    }
+
     if ((m_status == ModuleStatus::INACTIVE) ||
         (m_status == ModuleStatus::TERMINATING))
     {
