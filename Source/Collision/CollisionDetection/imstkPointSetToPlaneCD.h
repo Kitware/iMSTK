@@ -46,16 +46,12 @@ public:
     ///
     PointSetToPlaneCD(std::shared_ptr<PointSet> pointSet,
                       std::shared_ptr<Plane> plane,
-                      std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::PointSetToSphere,
-                           colData),
-        m_pointSet(pointSet),
-        m_plane(plane){}
+                      std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Destructor
     ///
-    ~PointSetToPlaneCD() = default;
+    virtual ~PointSetToPlaneCD() override = default;
 
     ///
     /// \brief Detect collision and compute collision data

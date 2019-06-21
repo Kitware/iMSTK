@@ -89,7 +89,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~CollisionDetection() = default;
+    virtual ~CollisionDetection() = default;
 
     ///
     /// \brief Detect collision and compute collision data (pure virtual)

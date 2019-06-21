@@ -53,7 +53,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~BoneDrillingCH() = default;
+    virtual ~BoneDrillingCH() override = default;
 
     ///
     /// \brief Decrease the density at the nodal points and remove if the density goes below 0
@@ -68,14 +68,14 @@ public:
     ///
     /// \brief Get stiffness
     ///
-    inline const double getStiffness() const { return m_stiffness; }
-    inline void setStiffness(const double k) { m_stiffness = k; }
+    double getStiffness() const { return m_stiffness; }
+    void setStiffness(const double k) { m_stiffness = k; }
 
     ///
     /// \brief Get damping coefficient
     ///
-    inline const double getDamping() const { return m_damping; }
-    inline void setDamping(const double d) { m_damping = d; }
+    double getDamping() const { return m_damping; }
+    void setDamping(const double d) { m_damping = d; }
 
 private:
     std::shared_ptr<CollidingObject> m_bone;    ///> bone object
@@ -90,9 +90,9 @@ private:
     std::vector<double> m_nodalDensity;         ///> Density of the bone
     double m_initialBoneDensity = 1.0;          ///> Density of the bone before the start of the drilling process
 
-    std::vector<int> m_erodedNodes;
+//    std::vector<size_t> m_erodedNodes; // TODO: Unused variable
     std::vector<bool> m_nodeRemovalStatus;              ///> Keeps track of the removal status of the node
-    std::vector<std::vector<int>> m_nodalCardinalSet;   ///> Keeps track of the removal status of the node
+    std::vector<std::vector<size_t>> m_nodalCardinalSet;   ///> Keeps track of the removal status of the node
 
     bool m_initialStep = true;                  ///> Number of times steps
     Vec3d m_prevPos;                            ///> Previous position of the colliding object

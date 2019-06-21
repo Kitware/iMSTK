@@ -21,9 +21,18 @@ limitations under the License.
 
 #include "imstkPickingCH.h"
 #include "imstkDeformableObject.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
+PickingCH::PickingCH(const CollisionHandling::Side &side,
+                     const std::shared_ptr<CollisionData> colData,
+                     std::shared_ptr<DeformableObject> obj) :
+    CollisionHandling(Type::NodalPicking, side, colData),
+    m_object(obj)
+{
+}
+
 void
 PickingCH::processCollisionData()
 {
@@ -62,18 +71,22 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
 
     // If collision data, append LPC constraints
-    for (const auto& CD : m_colData->NodePickData)
-    {
-        auto nodeDof = 3 * CD.nodeId;
-        auto vprev = Vec3d(Vprev(nodeDof), Vprev(nodeDof + 1), Vprev(nodeDof + 2));
-        auto uprev = Vec3d(Uprev(nodeDof), Uprev(nodeDof + 1), Uprev(nodeDof + 2));
-        auto x = (CD.ptPos + PhysTetMesh->getVertexPosition(CD.nodeId) -
-                  PhysTetMesh->getInitialVertexPosition(CD.nodeId) - uprev) / dT - vprev;
+    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::parallelFor(m_colData->NodePickData.size(),
+        [&](const size_t idx) {
+            const auto& cd = m_colData->NodePickData[idx];
+            const auto nodeDof = static_cast<Eigen::Index>(3 * cd.nodeId);
+            const auto vprev = Vec3d(Vprev(nodeDof), Vprev(nodeDof + 1), Vprev(nodeDof + 2));
+            const auto uprev = Vec3d(Uprev(nodeDof), Uprev(nodeDof + 1), Uprev(nodeDof + 2));
+            const auto x = (cd.ptPos + PhysTetMesh->getVertexPosition(cd.nodeId) -
+                            PhysTetMesh->getInitialVertexPosition(cd.nodeId) - uprev) / dT - vprev;
 
-        auto pickProjector = LinearProjectionConstraint(CD.nodeId, true);
-        pickProjector.setProjectorToDirichlet(CD.nodeId, x);
+            auto pickProjector = LinearProjectionConstraint(cd.nodeId, true);
+            pickProjector.setProjectorToDirichlet(static_cast<unsigned int>(cd.nodeId), x);
 
-        m_DynamicLinearProjConstraints->push_back(pickProjector);
-    }
+            lock.lock();
+            m_DynamicLinearProjConstraints->push_back(std::move(pickProjector));
+            lock.unlock();
+    });
 }
 }

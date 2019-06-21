@@ -24,11 +24,20 @@
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkDeformableObject.h"
+#include "imstkParallelUtils.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk
 {
+PenaltyCH::PenaltyCH(const Side& side,
+                     const std::shared_ptr<CollisionData>& colData,
+                     const std::shared_ptr<CollidingObject>& obj) :
+    CollisionHandling(Type::Penalty, side, colData), m_object(obj)
+{
+    LOG_IF(FATAL, (!obj)) << "Empty colliding object";
+}
+
 void
 PenaltyCH::processCollisionData()
 {
@@ -36,7 +45,7 @@ PenaltyCH::processCollisionData()
     {
         this->computeContactForcesDiscreteDeformable(deformableObj);
     }
-    //else if (auto obj = std::dynamic_pointer_cast<RigidObject>(m_object)) computeContactForcesDiscreteRigid
+    //else if(auto obj = std::dynamic_pointer_cast<RigidObject>(m_object)) computeContactForcesDiscreteRigid
     else if (auto analyticObj = std::dynamic_pointer_cast<CollidingObject>(m_object))
     {
         this->computeContactForcesAnalyticRigid(analyticObj);
@@ -50,7 +59,7 @@ PenaltyCH::processCollisionData()
 }
 
 void
-PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> analyticObj)
+PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj)
 {
     if (m_colData->PDColData.empty())
     {
@@ -84,7 +93,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> an
 }
 
 void
-PenaltyCH::computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObject> deformableObj)
+PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<DeformableObject>& deformableObj)
 {
     if (m_colData->MAColData.empty())
     {
@@ -102,24 +111,26 @@ PenaltyCH::computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObje
     auto& force = deformableObj->getContactForce();
     const auto& velVector = deformableObj->getVelocities();
 
-    Vec3d nodalForce;
-    Vec3d velocityProjection;
-    size_t nodeDofID;
-
     // If collision data, append forces
-    for (const auto& cd : m_colData->MAColData)
-    {
-        nodeDofID = 3 * cd.nodeId;
-        velocityProjection = Vec3d(velVector(nodeDofID), velVector(nodeDofID + 1), velVector(nodeDofID + 2));
+    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::parallelFor(m_colData->MAColData.size(),
+        [&](const size_t idx) {
+            const auto& cd = m_colData->MAColData[idx];
+            const auto nodeDofID = static_cast<Eigen::Index>(3 * cd.nodeId);
+            const auto unit = cd.penetrationVector / cd.penetrationVector.norm();
 
-        auto unit = cd.penetrationVector / cd.penetrationVector.norm();
-        velocityProjection = cd.penetrationVector.dot(unit) * cd.penetrationVector;
+            auto velocityProjection = Vec3d(velVector(nodeDofID),
+                                            velVector(nodeDofID + 1),
+                                            velVector(nodeDofID + 2));
+            velocityProjection = velocityProjection.dot(unit) * cd.penetrationVector;
 
-        nodalForce = -m_stiffness * cd.penetrationVector - m_damping * velocityProjection;
+            const auto nodalForce = -m_stiffness * cd.penetrationVector - m_damping * velocityProjection;
 
-        force(nodeDofID) += nodalForce.x();
-        force(nodeDofID + 1) += nodalForce.y();
-        force(nodeDofID + 2) += nodalForce.z();
-    }
+            lock.lock();
+            force(nodeDofID) += nodalForce.x();
+            force(nodeDofID + 1) += nodalForce.y();
+            force(nodeDofID + 2) += nodalForce.z();
+            lock.unlock();
+    });
 }
-}
+} // end namespace imstk

@@ -24,6 +24,7 @@
 #include "imstkLineMesh.h"
 #include "imstkGeometryMap.h"
 #include "imstkIntersectionTestUtils.h"
+#include "imstkPbdModel.h"
 
 namespace imstk
 {

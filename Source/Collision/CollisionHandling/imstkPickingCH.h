@@ -49,16 +49,14 @@ public:
     ///
     PickingCH(const Side& side,
               const std::shared_ptr<CollisionData> colData,
-              std::shared_ptr<DeformableObject> obj) :
-        CollisionHandling(Type::NodalPicking, side, colData),
-        m_object(obj){}
+              std::shared_ptr<DeformableObject> obj);
 
     PickingCH() = delete;
 
     ///
     /// \brief Destructor
     ///
-    ~PickingCH() = default;
+    virtual ~PickingCH() override = default;
 
     ///
     /// \brief Compute forces based on collision data

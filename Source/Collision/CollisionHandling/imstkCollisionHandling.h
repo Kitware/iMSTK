@@ -89,7 +89,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~CollisionHandling() = default;
+    virtual ~CollisionHandling() = default;
 
     ///
     /// \brief Compute forces based on collision data (pure virtual)

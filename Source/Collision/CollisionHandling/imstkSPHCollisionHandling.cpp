@@ -20,9 +20,20 @@
 =========================================================================*/
 
 #include "imstkSPHCollisionHandling.h"
+#include "imstkParallelUtils.h"
+
+#include <g3log/g3log.hpp>
 
 namespace imstk
 {
+SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side &side,
+                                           const std::shared_ptr<CollisionData>& colData,
+                                           const std::shared_ptr<CollidingObject> &obj) :
+    CollisionHandling(Type::SPH, side, colData), m_SPHObject(std::dynamic_pointer_cast<SPHObject>(obj))
+{
+    LOG_IF(FATAL, (!m_SPHObject)) << "Invalid SPH object";
+}
+
 void SPHCollisionHandling::setBoundaryFriction(const Real friction)
 {
     m_BoundaryFriction = friction;
@@ -49,37 +60,42 @@ void SPHCollisionHandling::processCollisionData()
 #endif
 
     auto& state = SPHModel->getState();
-    for (const auto& cd : m_colData->MAColData)
-    {
-        const auto pidx = cd.nodeId; // Fluid particle index
-        auto n = cd.penetrationVector;  // This vector should point into solid object
 
-        // Correct particle position:
-        state.getPositions()[pidx] -= n;
-
-        // Correct particle velocity: slip boundary condition with friction
-        auto& vel = state.getVelocities()[pidx];
-        const auto nLengthSqr = n.squaredNorm();
-        if (nLengthSqr > Real(1e-20))     // Normalize n
+    ParallelUtils::parallelFor(m_colData->MAColData.size(),
+        [&](const size_t idx)
         {
+            const auto& cd = m_colData->MAColData[idx];
+            const auto pidx = cd.nodeId; // Fluid particle index
+            auto n = cd.penetrationVector; // This vector should point into solid object
+
+            // Correct particle position:
+            state.getPositions()[pidx] -= n; // This should not cause race condition, since pidx is distinct
+
+            // Correct particle velocity: slip boundary condition with friction
+            auto& vel = state.getVelocities()[pidx];
+            const auto nLengthSqr = n.squaredNorm();
+            if (nLengthSqr < Real(1e-20)) // Normalize n
+            {
+                return; // Too little penetration: ignore
+            }
+
             n /= std::sqrt(nLengthSqr);
-        }
-        const auto vn = vel.dot(n);
-        vel -= n * vn;     // From now, vel is parallel with the solid surface
+            const auto vn = vel.dot(n);
+            vel -= n * vn; // From now, vel is parallel with the solid surface
 
-        if (m_BoundaryFriction > Real(1e-20))
-        {
-            const auto velLength  = vel.norm();
-            const auto frictionLength = -vn * m_BoundaryFriction;
-            if (frictionLength < velLength && velLength > Real(1e-10))
+            if (m_BoundaryFriction > Real(1e-20))
             {
-                vel -= (vel / velLength) * frictionLength;     // Subtract a friction from velocity, which is proportional to the amount of penetration
+                const auto velLength  = vel.norm();
+                const auto frictionLength = -vn * m_BoundaryFriction;
+                if (frictionLength < velLength && velLength > Real(1e-10))
+                {
+                    vel -= (vel / velLength) * frictionLength; // Subtract a friction from velocity, which is proportional to the amount of penetration
+                }
+                else
+                {
+                    vel = Vec3r::Zero();
+                }
             }
-            else
-            {
-                vel = Vec3r::Zero();
-            }
-        }
-    }
+        });
 }
 } // end namespace imstk

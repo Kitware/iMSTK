@@ -53,7 +53,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VirtualCouplingCH() = default;
+    virtual ~VirtualCouplingCH() override = default;
 
     ///
     /// \brief Compute forces based on collision data
@@ -78,7 +78,6 @@ public:
     Vec3d getOffset();
 
 private:
-
     std::shared_ptr<CollidingObject> m_object;  ///> colliding object
     bool m_initialStep = true;                  ///> Number of times steps
     Vec3d m_prevPos;                            ///> Previous position of the colliding object

@@ -25,32 +25,42 @@
 #include "imstkCollisionData.h"
 #include "imstkPlane.h"
 #include "imstkPointSet.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
-void
-PointSetToPlaneCD::computeCollisionData()
+PointSetToPlaneCD::PointSetToPlaneCD(std::shared_ptr<PointSet> pointSet,
+                                     std::shared_ptr<Plane> plane,
+                                     std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
+    m_pointSet(pointSet),
+    m_plane(plane)
+{
+}
+
+void PointSetToPlaneCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData->clearAll();
 
     // Get plane properties
     auto planePos = m_plane->getPosition();
-
-    // TODO: Fix this issue of extra computation in future
     auto planeNormal = m_plane->getNormal();
 
-    size_t nodeId = 0;
-    for (const auto& p : m_pointSet->getVertexPositions())
-    {
-        auto peneDistance = (p - planePos).dot(planeNormal);
-        if (peneDistance <= 0.0)
+    ParallelUtils::ParallelSpinLock lock;
+    ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
+        [&](const size_t idx)
         {
-            m_colData->MAColData.push_back({ nodeId, planeNormal * peneDistance });
-        }
-        nodeId++;
-    }
+            const auto p = m_pointSet->getVertexPosition(idx);
+            const auto penetrationDist = (p - planePos).dot(planeNormal);
+
+            if (penetrationDist <= 0.0)
+            {
+                const auto penetrationDir = planeNormal * penetrationDist;
+                lock.lock();
+                m_colData->MAColData.push_back({ idx, penetrationDir });
+                lock.unlock();
+            }
+        });
 }
 } // imstk
