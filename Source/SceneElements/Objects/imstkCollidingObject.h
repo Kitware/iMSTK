@@ -51,7 +51,7 @@ public:
     ///
     /// \brief
     ///
-    virtual ~CollidingObject() = default;
+    virtual ~CollidingObject() override = default;
 
     ///
     /// \brief
@@ -86,7 +86,7 @@ public:
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize()
+    virtual bool initialize() override
     {
         if (SceneObject::initialize())
         {

@@ -48,7 +48,7 @@ enum class ModuleStatus
 ///
 class Module
 {
-using CallbackFunction = std::function<void(Module* module)>;
+using CallbackFunction = std::function<void (Module* module)>;
 
 public:
     ///
@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~Module() = default;
+    virtual ~Module() = default;
 
     ///
     /// \brief Start the module

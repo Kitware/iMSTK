@@ -41,7 +41,7 @@ public:
     /// \brief Constructor
     ///
     VectorizedState() = default;
-    VectorizedState(const size_t size){ initialize(size); };
+    VectorizedState(const size_t size){ initialize(size); }
     //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
