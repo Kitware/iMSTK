@@ -25,7 +25,6 @@
 #include "imstkDebugGeometry.h"
 #include "imstkPbdObject.h"
 #include "imstkDeformableObject.h"
-#include "imstkVirtualCouplingPBDObject.h"
 #include "imstkTimer.h"
 #include "imstkPbdSolver.h"
 
@@ -66,15 +65,6 @@ Scene::launchModules()
     if (auto camController = this->getCamera()->getController())
     {
         m_threadMap[camController->getName()] = std::thread([camController] { camController->start(); });
-    }
-
-    // Init virtual coupling objects offsets
-    for (auto obj : this->getSceneObjects())
-    {
-        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
-        {
-            virtualCouplingPBD->initOffsets();
-        }
     }
 }
 
@@ -325,12 +315,6 @@ Scene::advance()
         {
             collidingObj->resetForce();
         }
-        // todo: refactor pbd
-        // description: so that the transform obtained from device can be applied
-        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
-        {
-            virtualCouplingPBD->resetCollidingGeometry();
-        }
     }
 
     // Update objects controlled by the device controllers
@@ -343,56 +327,30 @@ Scene::advance()
     for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
     {
         intPair->computeCollisionData();
-        intPair->computeContactForces();
     }
 
-    // Apply forces on device
-    for (auto controller : this->getSceneObjectControllers())
+    // Process collision data per interaction pair
+    for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
     {
-        controller->applyForces();
+        intPair->processCollisionData();
     }
 
-    // Update the solvers
+    // Run the solvers
     for (auto solvers : this->getSolvers())
     {
         solvers->solve();
+    }
 
-        auto xx = std::dynamic_pointer_cast<PbdSolver>(solvers);
+    // Apply updated forces on device
+    for (auto controller : this->getSceneObjectControllers())
+    {
+        controller->applyForces();
     }
 
     // Apply the geometry and apply maps to all the objects
     for (auto obj : this->getSceneObjects())
     {
         obj->updateGeometries();
-    }
-
-    // Do collision detection and response for pbd objects
-    for (auto intPair : this->getCollisionGraph()->getPbdPairList())
-    {
-        intPair->resetConstraints();
-        if (intPair->doBroadPhaseCollision())
-        {
-            intPair->doNarrowPhaseCollision();
-        }
-        intPair->resolveCollision();
-    }
-
-    // Update velocity of PBD objects
-    for (auto obj : this->getSceneObjects())
-    {
-        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
-        {
-            pbdObj->updateVelocity();
-        }
-    }
-
-    // Set the trackers of virtual coupling PBD objects to out-of-date
-    for (auto obj : this->getSceneObjects())
-    {
-        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
-        {
-            virtualCouplingPBD->setTrackerToOutOfDate();
-        }
     }
 
     // Set the trackers of the scene object controllers to out-of-date
@@ -428,6 +386,6 @@ Scene::advance()
         }
     }
 
-    this->setFPS((size_t)(1. / wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds)));
+    this->setFPS(1. / wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
 }
 } // imstk

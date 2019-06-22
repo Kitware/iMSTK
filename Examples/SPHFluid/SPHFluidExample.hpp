@@ -39,7 +39,7 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_p
 int main(int argc, char* argv[])
 {
     // SimulationManager must be created first
-    auto sdk = std::make_shared<SimulationManager>(0);
+    auto sdk = std::make_shared<SimulationManager>();
 
     int threads = -1;
     double particleRadius = 0.1;

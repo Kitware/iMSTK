@@ -55,12 +55,6 @@ SimulationManager::SimulationManager(const SimulationManager::Mode mode, const b
     }
 }
 
-const SimulationStatus&
-SimulationManager::getStatus() const
-{
-    return m_status;
-}
-
 void
 SimulationManager::setThreadPoolSize(const int nThreads)
 {

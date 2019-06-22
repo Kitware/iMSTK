@@ -43,7 +43,6 @@ namespace imstk
 {
 using SimulationStatus = ModuleStatus;
 
-
 ///
 /// \class SimulationManager
 ///

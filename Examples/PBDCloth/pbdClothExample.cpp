@@ -26,15 +26,13 @@
 
 using namespace imstk;
 
-const bool runSimWithoutRendering = false;
-
 ///
 /// \brief This example demonstrates the cloth simulation
 /// using Position based dynamics
 ///
 int main()
 {
-    auto sdk = std::make_shared<SimulationManager>(runSimWithoutRendering);
+    auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDCloth");
 
     // Create surface mesh

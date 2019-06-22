@@ -38,7 +38,7 @@ using namespace imstk;
 ///
 int main()
 {
-    auto sdk = std::make_shared<SimulationManager>(false);
+    auto sdk = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackground);
     auto scene = sdk->createNewScene("NoRendering");
 
     // Create surface mesh
