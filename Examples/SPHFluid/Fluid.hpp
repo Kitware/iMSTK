@@ -89,21 +89,26 @@ StdVectorOfVec3d generateBoxShapeFluid(const double particleRadius)
     return particles;
 }
 
+#if SCENE_ID == 3
 StdVectorOfVec3d getBunny(); // Defined in Bunny.cpp
+#endif
 ///
 /// \brief Generate a bunny-shape fluid object
 ///
 StdVectorOfVec3d generateBunnyShapeFluid(const double particleRadius)
 {
     LOG_IF(FATAL, (std::abs(particleRadius - 0.08) > 1e-6)) << "Particle radius for this scene must be 0.08";
-    StdVectorOfVec3d particles = getBunny();
+    StdVectorOfVec3d particles;
+#if SCENE_ID == 3
+    particles = getBunny();
+#endif
     return particles;
 }
 
-std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, const double particleRadius)
+std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, const double particleRadius)
 {
     StdVectorOfVec3d particles;
-    switch (sceneIdx)
+    switch (SCENE_ID)
     {
     case 1:
         particles = generateSphereShapeFluid(particleRadius);
@@ -141,7 +146,7 @@ std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int
     // configure model
     auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
     sphParams->m_bNormalizeDensity = true;
-    if (sceneIdx == 2)   // highly viscous fluid
+    if (SCENE_ID == 2)   // highly viscous fluid
     {
         sphParams->m_RatioKernelOverParticleRadius = 6.0;
         sphParams->m_ViscosityFluid = 0.5;

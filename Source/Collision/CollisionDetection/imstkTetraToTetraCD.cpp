@@ -39,7 +39,7 @@ TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
 void
 TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<TetrahedralMesh> mesh, size_t idOffset)
 {
-    const auto eps = MACHINE_PRECISION;
+    const auto eps = VERY_SMALL_EPSILON;
     const double eps2 = 1e-10;
 
     //tetrahedron belonging part of penetration type does not change

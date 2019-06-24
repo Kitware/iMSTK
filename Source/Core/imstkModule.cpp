@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkModule.h"
-
+#include "imstkMath.h"
 #include "g3log/g3log.hpp"
 
 namespace imstk
@@ -65,7 +65,7 @@ Module::start()
         {
             // Short path to run module if loop delay = 0
             // (updating as fast as possible)
-            if (m_loopDelay == 0)
+            if (m_loopDelay < VERY_SMALL_EPSILON_D)
             {
                 if (m_preUpdateCallback)
                 {
@@ -158,7 +158,7 @@ Module::end()
     while (m_status != ModuleStatus::INACTIVE) {}
 }
 
-const ModuleStatus
+ModuleStatus
 Module::getStatus() const
 {
     return m_status.load();
@@ -188,7 +188,7 @@ Module::setLoopDelay(const double milliseconds)
 
 double Module::getFrequency() const
 {
-    if (m_loopDelay == 0)
+    if (m_loopDelay < VERY_SMALL_EPSILON_D)
     {
         LOG(WARNING) << "Module::getFrequency warning: loop delay is set to 0ms, "
                      << "therefore not regulated by a frequency. Returning 0.";
@@ -206,7 +206,7 @@ Module::setFrequency(const double f)
                      << "or equal to 0 to run the module in a closed loop.";
         return;
     }
-    if (f == 0)
+    if (f < VERY_SMALL_EPSILON_D)
     {
         m_loopDelay = 0;
         return;

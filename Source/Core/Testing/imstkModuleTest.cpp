@@ -135,14 +135,13 @@ TEST_F(imstkModuleTest, ControlModule)
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::INACTIVE);
     ASSERT_FALSE(m_module.m_init);
     ASSERT_FALSE(m_module.m_run);
-    ASSERT_FALSE(m_module.m_cleanup);
+    ASSERT_TRUE(m_module.m_cleanup);
 
     auto t = std::thread([this] { m_module.start(); });
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::RUNNING);
     ASSERT_TRUE(m_module.m_init);
     ASSERT_TRUE(m_module.m_run);
-    ASSERT_FALSE(m_module.m_cleanup);
 
     m_module.pause();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::PAUSED);
@@ -150,14 +149,12 @@ TEST_F(imstkModuleTest, ControlModule)
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_FALSE(m_module.m_run);
-    ASSERT_FALSE(m_module.m_cleanup);
 
     m_module.run();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::RUNNING);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_TRUE(m_module.m_run);
-    ASSERT_FALSE(m_module.m_cleanup);
 
     m_module.end();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::INACTIVE);
