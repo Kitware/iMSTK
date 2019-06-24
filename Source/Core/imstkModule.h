@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~Module() = default;
+    virtual ~Module() = default;
 
     ///
     /// \brief Start the module
@@ -94,7 +94,7 @@ public:
     ///
     /// \brief Get the status of the module
     ///
-    const ModuleStatus getStatus() const;
+    ModuleStatus getStatus() const;
 
     ///
     /// \brief Get the name of the module
@@ -148,7 +148,7 @@ protected:
     std::atomic<ModuleStatus> m_status {ModuleStatus::INACTIVE}; ///> Module status
 
     std::string m_name;     ///> Name of the module
-    double m_loopDelay;     ///> Loop delay
+    double m_loopDelay = 0; ///> Loop delay
 };
 }
 
