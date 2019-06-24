@@ -11,6 +11,7 @@ Usage: In Linux/Mac Terminal (not Windows), go to the Source folder then execute
 
 find . -iname "*.h" -exec python3 ~/Programming/include-guard-convert.py {} \;
 
+Note: After the conversion for the header files, uncrustify need to be run to re-format them
 
 """
 
