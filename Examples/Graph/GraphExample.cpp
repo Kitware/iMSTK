@@ -23,14 +23,20 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 
+#include <iostream>
+
 using namespace imstk;
 
 ///
 /// \brief This example demonstrates the imstk graph usage
+/// Usage: Example-Graph.exe [method=greedy/welsh-powell]
+/// (if no method was specified, WelshPowell method will be used)
 ///
 int main(int argc, char** argv)
 {
+    // Using WelshPowell method by default
     Graph::ColoringMethod method = Graph::ColoringMethod::WelshPowell;
+
     if (argc > 1)
     {
         auto param = std::string(argv[1]);
@@ -41,9 +47,16 @@ int main(int argc, char** argv)
             {
                 method = Graph::ColoringMethod::Greedy;
             }
-            // else: no need to set
+            else if (param.substr(param.find_first_of("=") + 1) == "welsh-powell")
+            {
+                method = Graph::ColoringMethod::WelshPowell;
+            }
         }
     }
+
+    std::cout << (method == Graph::ColoringMethod::Greedy ?
+                  "Graph coloring method: Greedy" :
+                  "Graph coloring method: WelshPowell" ) << std::endl << std::endl;
 
     Graph g1(5);
     g1.addEdge(0, 1);
