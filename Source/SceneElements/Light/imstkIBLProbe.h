@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIBLProbe_h
-#define imstkIBLProbe_h
+#pragma once
 
 #include <string>
 
@@ -67,4 +66,3 @@ protected:
 };
 }
 
-#endif

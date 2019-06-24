@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanPostProcessingChain_h
-#define imstkVulkanPostProcessingChain_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 #include "glm/glm.hpp"
@@ -60,4 +59,3 @@ protected:
 };
 }
 
-#endif

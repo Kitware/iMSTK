@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkScreenCaptureUtility_h
-#define imstkScreenCaptureUtility_h
+#pragma once
 
 #include <string>
 
@@ -68,4 +67,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkScreenCaptureUtility_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTetrahedralMesh_h
-#define imstkTetrahedralMesh_h
+#pragma once
 
 #include <set>
 #include <list>
@@ -142,4 +141,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkTetrahedralMesh_h

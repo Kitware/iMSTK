@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSpatialHashTableSeparateChaining_h
-#define imstkSpatialHashTableSeparateChaining_h
+#pragma once
 
 #include <memory>
 #include <unordered_set>
@@ -162,4 +161,3 @@ protected:
 };
 }
 
-#endif

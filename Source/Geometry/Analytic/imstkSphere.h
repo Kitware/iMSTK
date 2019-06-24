@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSphere_h
-#define imstkSphere_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -76,4 +75,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkSphere_h

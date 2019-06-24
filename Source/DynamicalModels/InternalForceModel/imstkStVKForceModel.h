@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkStVKForceModel_h
-#define imstkStVKForceModel_h
+#pragma once
 
 #include <memory>
 #include "g3log/g3log.hpp"
@@ -111,4 +110,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkStVKForceModel_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderDelegate_h
-#define imstkVulkanRenderDelegate_h
+#pragma once
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -122,4 +121,3 @@ protected:
 };
 }
 
-#endif

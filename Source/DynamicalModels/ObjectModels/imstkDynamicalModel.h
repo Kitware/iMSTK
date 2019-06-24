@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDynamicalModel_h
-#define imstkDynamicalModel_h
+#pragma once
 
 #include <string>
 
@@ -165,4 +164,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkDynamicalModel_h

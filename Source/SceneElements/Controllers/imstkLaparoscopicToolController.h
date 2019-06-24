@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLaparoscopicToolController_h
-#define imstkLaparoscopicToolController_h
+#pragma once
 
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDeviceTracker.h"
@@ -127,4 +126,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkLaparoscopicToolController_h

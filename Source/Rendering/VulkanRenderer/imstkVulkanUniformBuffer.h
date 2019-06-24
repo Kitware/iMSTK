@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanUniformBuffer_h
-#define imstkVulkanUniformBuffer_h
+#pragma once
 
 #include "imstkVulkanBuffer.h"
 #include "imstkVulkanMemoryManager.h"
@@ -134,4 +133,3 @@ private:
 };
 }
 
-#endif

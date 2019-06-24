@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGraph_h
-#define imstkGraph_h
+#pragma once
 
 #include <iostream>
 #include <algorithm>
@@ -74,4 +73,3 @@ protected:
 };
 }
 
-#endif //imstkGraph_h

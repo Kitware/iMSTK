@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdConstraint_h
-#define imstkPbdConstraint_h
+#pragma once
 
 #include "imstkMath.h"
 
@@ -83,4 +82,3 @@ public:
 };
 }
 
-#endif // imstkPbdConstraint_h

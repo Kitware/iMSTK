@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkFeElasticityForceModel_h
-#define imstkFeElasticityForceModel_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -75,4 +74,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkTimeIntegrator_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanCubeRenderDelegate_h
-#define imstkVulkanCubeRenderDelegate_h
+#pragma once
 
 #include "imstkCube.h"
 
@@ -59,4 +58,3 @@ protected:
 };
 }
 
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGaussSeidel_h
-#define imstkGaussSeidel_h
+#pragma once
 
 #include <memory>
 
@@ -137,4 +136,3 @@ private:
 };
 } // imstk
 
-#endif // imstkGaussSeidel_h

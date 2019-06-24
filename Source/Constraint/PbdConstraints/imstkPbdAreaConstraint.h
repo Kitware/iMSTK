@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdAreaConstraint_h
-#define imstkPbdAreaConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -62,4 +61,3 @@ public:
 };
 } // imstk
 
-#endif // imstkPbdAreaConstraint_h

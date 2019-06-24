@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkFEMDeformableBodyModel_h
-#define imstkFEMDeformableBodyModel_h
+#pragma once
 
 #include <memory>
 
@@ -292,4 +291,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkFEMDeformableBodyModel_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkInteractionPair_h
-#define imstkInteractionPair_h
+#pragma once
 
 // std library
 #include <map>
@@ -112,4 +111,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkInteractionPair_h

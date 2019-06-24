@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionHandling_h
-#define imstkCollisionHandling_h
+#pragma once
 
 // Std library
 #include <memory>
@@ -109,4 +108,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkCollisionHandling_h

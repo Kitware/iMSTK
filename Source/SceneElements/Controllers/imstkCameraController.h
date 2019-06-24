@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCameraController_h
-#define imstkCameraController_h
+#pragma once
 
 #include "imstkModule.h"
 #include "imstkDeviceTracker.h"
@@ -93,4 +92,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCameraController_h

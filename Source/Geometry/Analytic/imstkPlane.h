@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPlane_h
-#define imstkPlane_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -87,4 +86,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkPlane_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkViewer_h
-#define imstkViewer_h
+#pragma once
 
 #include <memory>
 
@@ -138,4 +137,3 @@ protected:
 };
 }
 
-#endif

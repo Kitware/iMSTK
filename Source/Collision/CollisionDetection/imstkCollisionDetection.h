@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionDetection_h
-#define imstkCollisionDetection_h
+#pragma once
 
 #include "imstkCollisionData.h"
 
@@ -113,4 +112,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkCollisionDetection_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdSolver_h
-#define imstkPbdSolver_h
+#pragma once
 
 #include "imstkSolverBase.h"
 #include "imstkPbdObject.h"
@@ -195,4 +194,3 @@ private:
 };
 } // imstk
 
-#endif // imstkPbdSolver_h

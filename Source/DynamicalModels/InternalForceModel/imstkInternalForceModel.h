@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkInternalForceModel_h
-#define imstkInternalForceModel_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -82,4 +81,3 @@ public:
 };
 } //imstk
 
-#endif // ifndef imstkTimeIntegrator_h

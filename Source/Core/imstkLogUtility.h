@@ -18,8 +18,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 =========================================================================*/
-#ifndef imstkLogUtility_h
-#define imstkLogUtility_h
+#pragma once
 
 #include "g3log/logmessage.hpp"
 #include "g3log/logworker.hpp"
@@ -72,4 +71,3 @@ struct LogUtility
     std::unique_ptr<g3::SinkHandle<stdSink>>     m_stdSinkHandle;
 };
 }
-#endif

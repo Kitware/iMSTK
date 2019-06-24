@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKPlaneRenderDelegate_h
-#define imstkVTKPlaneRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -60,4 +59,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkPlaneRenderDelegate_h

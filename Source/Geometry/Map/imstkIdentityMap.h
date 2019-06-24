@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIdentityMap_h
-#define imstkIdentityMap_h
+#pragma once
 
 #include "imstkGeometryMap.h"
 
@@ -68,4 +67,3 @@ public:
 };
 } // imstk
 
-#endif // imstkIdentityMap_h

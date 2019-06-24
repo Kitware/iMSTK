@@ -31,8 +31,7 @@
 
 // \author Johan Andruejol <johan.andruejol@kitware.com>
 
-#ifndef __vtkCapsuleSource_h
-#define __vtkCapsuleSource_h
+#pragma once
 
 // VTK includes
 #include <vtkPolyDataAlgorithm.h>
@@ -108,4 +107,3 @@ private:
     void operator=(const vtkCapsuleSource&); // Not implemented.
 };
 
-#endif

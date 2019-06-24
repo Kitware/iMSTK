@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanUtilities_h
-#define imstkVulkanUtilities_h
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -261,4 +260,3 @@ static const VkFormat DEPTH_MIP_FORMAT = VK_FORMAT_R32_SFLOAT;     // Depth mip 
 };
 }
 
-#endif

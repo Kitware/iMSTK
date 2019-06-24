@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanVertexBuffer_h
-#define imstkVulkanVertexBuffer_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 
@@ -109,4 +108,3 @@ private:
 };
 }
 
-#endif

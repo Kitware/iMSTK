@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSimulationManager_h
-#define imstkSimulationManager_h
+#pragma once
 
 #include <unordered_map>
 #include <vector>
@@ -270,4 +269,3 @@ private:
 };
 } // imstk
 
-#endif // ifndef imstkSimulationManager_h

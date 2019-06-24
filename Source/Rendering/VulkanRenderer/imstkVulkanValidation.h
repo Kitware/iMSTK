@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanValidation_h
-#define imstkVulkanValidation_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -54,4 +53,3 @@ public:
 };
 }
 
-#endif

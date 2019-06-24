@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPlotterUtils_h
-#define imstkPlotterUtils_h
+#pragma once
 
 // STL includes
 #include <iostream>
@@ -183,4 +182,3 @@ static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* f
 } // plotters
 } // imstk
 
-#endif // ifndef imstkPlotterUtils_h

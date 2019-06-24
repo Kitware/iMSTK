@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkText_h
-#define imstkText_h
+#pragma once
 
 #include "imgui.h"
 
@@ -106,4 +105,3 @@ protected:
 } // GUI
 } // imstk
 
-#endif // ifndef imstkWidget_h

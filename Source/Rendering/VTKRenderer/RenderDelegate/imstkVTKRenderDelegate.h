@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKRenderDelegate_h
-#define imstkVTKRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -120,4 +119,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkRenderDelegate_h

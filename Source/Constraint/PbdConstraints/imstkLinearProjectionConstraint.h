@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearProjectionConstraint_h
-#define imstkLinearProjectionConstraint_h
+#pragma once
 
 #include "imstkMath.h"
 
@@ -99,4 +98,3 @@ private:
 };
 } // imstk
 
-#endif // imstkLinearProjectionConstraint_h

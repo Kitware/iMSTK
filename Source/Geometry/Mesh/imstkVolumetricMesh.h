@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVolumetricMesh_h
-#define imstkVolumetricMesh_h
+#pragma once
 
 #include <memory>
 
@@ -80,4 +79,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkVolumetricMesh_h

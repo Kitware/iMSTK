@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVirtualCouplingCH_h
-#define imstkVirtualCouplingCH_h
+#pragma once
 
 // imstk
 #include "imstkCollisionHandling.h"
@@ -88,4 +87,3 @@ private:
 };
 }
 
-#endif // ifndef imstkVirtualCouplingCH_h

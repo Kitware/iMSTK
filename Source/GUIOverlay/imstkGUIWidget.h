@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkWidget_h
-#define imstkWidget_h
+#pragma once
 
 #include <string>
 #include "imstkMath.h"
@@ -112,4 +111,3 @@ protected:
 } // GUI
 } // imstk
 
-#endif // ifndef imstkWidget_h

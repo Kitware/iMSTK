@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdFeConstraint_h
-#define imstkPbdFeConstraint_h
+#pragma once
 
 #include "imstkPbdFEMConstraint.h"
 
@@ -60,4 +59,3 @@ public:
 };
 } // imstk
 
-#endif // imstkPbdFeConstraint_h

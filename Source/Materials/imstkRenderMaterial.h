@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRenderMaterial_h
-#define imstkRenderMaterial_h
+#pragma once
 
 #include "imstkTexture.h"
 #include "imstkColor.h"
@@ -204,4 +203,3 @@ protected:
 };
 }
 
-#endif

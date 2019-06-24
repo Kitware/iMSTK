@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkJacobi_h
-#define imstkJacobi_h
+#pragma once
 
 #include <memory>
 
@@ -137,4 +136,3 @@ private:
 };
 } // imstk
 
-#endif // imstkJacobi_h

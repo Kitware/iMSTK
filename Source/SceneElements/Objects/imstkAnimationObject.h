@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkAnimationObject_h
-#define imstkAnimationObject_h
+#pragma once
 
 #include <memory>
 
@@ -83,4 +82,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkAnimationObject_h

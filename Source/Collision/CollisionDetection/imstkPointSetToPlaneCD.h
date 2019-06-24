@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPointSetToPlaneCD_h
-#define imstkPointSetToPlaneCD_h
+#pragma once
 
 #include <memory>
 
@@ -65,4 +64,3 @@ private:
 };
 }
 
-#endif // ifndef imstkPointSetToPlaneCD_h

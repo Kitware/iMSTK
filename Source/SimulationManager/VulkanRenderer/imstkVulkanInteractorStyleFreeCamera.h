@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanInteractorStyleFreeCamera_h
-#define imstkVulkanInteractorStyleFreeCamera_h
+#pragma once
 
 #include "GLFW/glfw3.h"
 
@@ -69,4 +68,3 @@ protected:
 };
 }
 
-#endif

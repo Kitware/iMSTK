@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkAPIUtilities_h
-#define imstkAPIUtilities_h
+#pragma once
 
 // Objects
 #include "imstkFEMDeformableBodyModel.h"
@@ -245,4 +244,3 @@ printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>
 } //apiutils
 } // imstk
 
-#endif // imstkAPIUtilities_h

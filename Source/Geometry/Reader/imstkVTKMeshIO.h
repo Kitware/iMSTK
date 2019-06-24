@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKMeshIO_h
-#define imstkVTKMeshIO_h
+#pragma once
 
 #include <memory>
 
@@ -151,4 +150,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkVTKMeshIO_h

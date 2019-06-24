@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCylinder_h
-#define imstkCylinder_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -88,4 +87,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCylinder_h

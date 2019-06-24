@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef SOLVERS_NONLINEARSOLVER_H
-#define SOLVERS_NONLINEARSOLVER_H
+#pragma once
 
 // STL includes
 #include <array>
@@ -143,4 +142,3 @@ protected:
 };
 } // imstk
 
-#endif // SOLVERS_NONLINEARSOLVER_H

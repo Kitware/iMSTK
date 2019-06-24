@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDummyClient_h
-#define imstkDummyClient_h
+#pragma once
 
 #include "imstkDeviceClient.h"
 
@@ -88,4 +87,3 @@ public:
 };
 }
 
-#endif // ifndef imstkDummyClient_h

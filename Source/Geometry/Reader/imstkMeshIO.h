@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshIO_h
-#define imstkMeshIO_h
+#pragma once
 
 // std library
 #include <memory>
@@ -92,4 +91,3 @@ public:
 };
 } // imstk
 
-#endif // ifndef imstkMeshIO_h

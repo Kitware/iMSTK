@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTimeIntegrator_h
-#define imstkTimeIntegrator_h
+#pragma once
 
 #include <array>
 #include "g3log/g3log.hpp"
@@ -96,4 +95,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkTimeIntegrator_h

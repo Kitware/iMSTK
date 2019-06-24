@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTetraTriangleMap_h
-#define imstkTetraTriangleMap_h
+#pragma once
 
 #include <limits>
 
@@ -98,4 +97,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkTetraTriangleMap_h

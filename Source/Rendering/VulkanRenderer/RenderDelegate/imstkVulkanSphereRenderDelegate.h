@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanSphereRenderDelegate_h
-#define imstkVulkanSphereRenderDelegate_h
+#pragma once
 
 #include "imstkSphere.h"
 
@@ -59,4 +58,3 @@ protected:
 };
 }
 
-#endif

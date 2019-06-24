@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSurfaceMesh_h
-#define imstkSurfaceMesh_h
+#pragma once
 
 // std library
 #include <array>
@@ -250,4 +249,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkSurfaceMesh_h

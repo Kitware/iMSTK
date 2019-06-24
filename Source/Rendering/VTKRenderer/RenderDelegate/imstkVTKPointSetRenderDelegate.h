@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKPointSetRenderDelegate_h
-#define imstkVTKPointSetRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -62,4 +61,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h

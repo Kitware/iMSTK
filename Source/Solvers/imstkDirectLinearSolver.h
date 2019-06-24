@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDirectLinearSolver_h
-#define imstkDirectLinearSolver_h
+#pragma once
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
@@ -118,4 +117,3 @@ private:
 };
 } // imstk
 
-#endif // imstkDirectLinearSolver_h

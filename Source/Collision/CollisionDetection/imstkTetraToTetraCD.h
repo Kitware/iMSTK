@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTetrahedralMeshCD_h
-#define imstkTetrahedralMeshCD_h
+#pragma once
 
 // std library
 #include <memory>
@@ -84,4 +83,3 @@ private:
 };
 }
 
-#endif // ifndef imstkTetrahedralMeshCD_h

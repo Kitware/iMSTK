@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkOneToOneMap_h
-#define imstkOneToOneMap_h
+#pragma once
 
 #include <limits>
 
@@ -98,4 +97,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkOneToOneMap_h

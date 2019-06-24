@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTextureManager_h
-#define imstkTextureManager_h
+#pragma once
 
 #include "imstkTexture.h"
 #include "imstkTextureDelegate.h"
@@ -66,4 +65,3 @@ TextureManager<T>::getTextureDelegate(std::shared_ptr<Texture> texture)
 }
 }
 
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVectorizedState_h
-#define imstkVectorizedState_h
+#pragma once
 
 #include <memory>
 
@@ -110,4 +109,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkVectorizedState_h

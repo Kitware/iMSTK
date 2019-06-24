@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkHexahedralMesh_h
-#define imstkHexahedralMesh_h
+#pragma once
 
 #include <set>
 
@@ -107,4 +106,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkHexahedralMesh_h

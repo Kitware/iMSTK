@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkBidirectionalPlaneToSphereCD_h
-#define imstkBidirectionalPlaneToSphereCD_h
+#pragma once
 
 #include <memory>
 
@@ -69,4 +68,3 @@ private:
 };
 }
 
-#endif // ifndef imstkBidirectionalPlaneToSphereCD_h

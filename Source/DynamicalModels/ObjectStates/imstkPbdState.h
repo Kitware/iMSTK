@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdState_h
-#define imstkPbdState_h
+#pragma once
 
 #include <Eigen/Dense>
 #include <vector>
@@ -84,4 +83,3 @@ private:
 };
 } // imstk
 
-#endif // imstkPbdState_h

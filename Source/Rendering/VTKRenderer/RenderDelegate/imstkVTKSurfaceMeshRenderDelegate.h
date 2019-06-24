@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKSurfaceMeshRenderDelegate_h
-#define imstkVTKSurfaceMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -69,4 +68,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h

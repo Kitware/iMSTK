@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSphereToSphereCD_h
-#define imstkSphereToSphereCD_h
+#pragma once
 
 #include <memory>
 
@@ -68,4 +67,3 @@ private:
 };
 }
 
-#endif // ifndef imstkSphereToSphereCD_h

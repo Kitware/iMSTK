@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdModel_h
-#define imstkPbdModel_h
+#pragma once
 
 #include <vector>
 #include <Eigen/Dense>
@@ -246,4 +245,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkPbdModel_h

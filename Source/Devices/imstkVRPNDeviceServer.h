@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVRPNDeviceServer_h
-#define imstkVRPNDeviceServer_h
+#pragma once
 
 #include <vector>
 #include <map>
@@ -116,4 +115,3 @@ private:
 };
 } // imstk
 
-#endif // ifndef imstkVRPNDeviceServer_h

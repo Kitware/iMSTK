@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCylinderRenderDelegate_h
-#define imstkVTKCylinderRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -62,4 +61,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCylinderRenderDelegate_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLineMesh_h
-#define imstkLineMesh_h
+#pragma once
 
 #include <memory>
 #include <array>
@@ -109,4 +108,3 @@ private:
 };
 } // imstk
 
-#endif // ifndef imstkLineMesh_h

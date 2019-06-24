@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionData_h
-#define imstkCollisionData_h
+#pragma once
 
 #include <array>
 
@@ -170,4 +169,3 @@ public:
 };
 }
 
-#endif // ifndef imstkCollisionData_h

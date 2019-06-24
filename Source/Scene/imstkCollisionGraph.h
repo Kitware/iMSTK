@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionGraph_h
-#define imstkCollisionGraph_h
+#pragma once
 
 #include <vector>
 #include <unordered_map>
@@ -106,4 +105,3 @@ protected:
     std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
 };
 }
-#endif // ifndef imstkCollisionGraph_h

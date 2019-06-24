@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDeformableObject_h
-#define imstkDeformableObject_h
+#pragma once
 
 #include <memory>
 #include <string>
@@ -112,4 +111,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkDeformableObject_h

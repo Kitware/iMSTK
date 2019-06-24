@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLight_h
-#define imstkLight_h
+#pragma once
 
 #include <string>
 
@@ -280,4 +279,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkLight_h

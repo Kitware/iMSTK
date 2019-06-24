@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRenderer_h
-#define imstkRenderer_h
+#pragma once
 
 #include "imstkTextureManager.h"
 #include "imstkMath.h"
@@ -62,4 +61,3 @@ protected:
 };
 }
 
-#endif

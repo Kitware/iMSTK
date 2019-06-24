@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkEntity_h
-#define imstkEntity_h
+#pragma once
 
 #include <atomic>
 
@@ -54,4 +53,3 @@ protected:
 };
 }
 
-#endif

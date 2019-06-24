@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkModule_h
-#define imstkModule_h
+#pragma once
 
 #include <iostream>
 #include <atomic>
@@ -152,4 +151,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkModule_h

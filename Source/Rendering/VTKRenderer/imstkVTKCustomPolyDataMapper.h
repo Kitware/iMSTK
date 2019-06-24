@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCustomPolyDataMapper_h
-#define imstkVTKCustomPolyDataMapper_h
+#pragma once
 
 #include <fstream>
 #include <sstream>
@@ -158,4 +157,3 @@ protected:
 };
 }
 
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIsometricMap_h
-#define imstkIsometricMap_h
+#pragma once
 
 #include "imstkGeometryMap.h"
 
@@ -83,4 +82,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkIsometricMap_h

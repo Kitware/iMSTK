@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkShapes_h
-#define imstkShapes_h
+#pragma once
 
 #include "imgui.h"
 
@@ -229,4 +228,3 @@ protected:
 }
 } // imstk
 
-#endif // ifndef imstkWidget_h

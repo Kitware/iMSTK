@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanPlaneRenderDelegate_h
-#define imstkVulkanPlaneRenderDelegate_h
+#pragma once
 
 #include "imstkPlane.h"
 
@@ -60,4 +59,3 @@ protected:
 };
 }
 
-#endif

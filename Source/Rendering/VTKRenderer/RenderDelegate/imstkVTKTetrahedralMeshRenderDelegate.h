@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKTetrahedralMeshRenderDelegate_h
-#define imstkVTKTetrahedralMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -63,4 +62,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkTetrahedralMeshRenderDelegate_h

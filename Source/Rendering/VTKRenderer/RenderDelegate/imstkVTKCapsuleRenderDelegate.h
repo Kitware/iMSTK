@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCapsuleRenderDelegate_h
-#define imstkVTKCapsuleRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -59,4 +58,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCapsuleRenderDelegate_h

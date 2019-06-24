@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdVolumeConstraint_h
-#define imstkPbdVolumeConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -62,4 +61,3 @@ public:
 };
 }
 
-#endif // imstkPbdVolumeConstraint_h

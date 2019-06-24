@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVRPNDeviceClient_h
-#define imstkVRPNDeviceClient_h
+#pragma once
 
 #include <map>
 
@@ -127,4 +126,3 @@ private:
 };
 }
 
-#endif // ifndef imstkVRPNDeviceClient_h

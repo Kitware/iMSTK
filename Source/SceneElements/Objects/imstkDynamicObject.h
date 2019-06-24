@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDynamicObject_h
-#define imstkDynamicObject_h
+#pragma once
 
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
@@ -156,4 +155,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkDynamicObject_h

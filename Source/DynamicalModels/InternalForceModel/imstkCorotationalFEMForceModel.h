@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCorotationalFEMForceModel_h
-#define imstkCorotationalFEMForceModel_h
+#pragma once
 
 #include <memory>
 
@@ -90,4 +89,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkCorotationalFEMForceModel_h

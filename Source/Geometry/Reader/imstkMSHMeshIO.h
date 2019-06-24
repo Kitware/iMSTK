@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMSHMeshIO_h
-#define imstkMSHMeshIO_h
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -101,4 +100,3 @@ protected:
 };
 }
 
-#endif// imstkMSHMeshIO_h

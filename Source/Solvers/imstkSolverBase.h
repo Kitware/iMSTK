@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef IMSTK_SOLVER_BASE_H
-#define IMSTK_SOLVER_BASE_H
+#pragma once
 
 namespace imstk
 {
@@ -40,4 +39,3 @@ public:
 };
 } // imstk
 
-#endif // SOLVERS_NONLINEARSOLVER_H

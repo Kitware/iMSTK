@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVRPNArduinoDeviceClient_h
-#define imstkVRPNArduinoDeviceClient_h
+#pragma once
 
 #include <map>
 
@@ -95,4 +94,3 @@ private:
 };
 }
 
-#endif // ifndef imstkVRPNArduinoDeviceClient_h

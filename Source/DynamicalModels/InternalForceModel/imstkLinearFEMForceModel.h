@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearFEMForceModel_h
-#define imstkLinearFEMForceModel_h
+#pragma once
 
 #include <memory>
 
@@ -131,4 +130,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkLinearFEMForceModel_h

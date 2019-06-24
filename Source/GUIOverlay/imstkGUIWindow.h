@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkWindow_h
-#define imstkWindow_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 #include "imgui.h"
@@ -91,4 +90,3 @@ protected:
 } // GUI
 } // imstk
 
-#endif // ifndef imstkWindow_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkScene_h
-#define imstkScene_h
+#pragma once
 
 #include <unordered_map>
 #include <memory>
@@ -201,4 +200,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkScene_h

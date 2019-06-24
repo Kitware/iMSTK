@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToMeshCD_h
-#define imstkMeshToMeshCD_h
+#pragma once
 
 // std library
 #include <memory>
@@ -86,4 +85,3 @@ private:
 };
 }
 
-#endif // ifndef imstkMeshToMeshCD_h

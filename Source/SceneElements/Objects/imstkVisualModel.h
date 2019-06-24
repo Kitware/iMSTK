@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVisualModel_h
-#define imstkVisualModel_h
+#pragma once
 
 #include <memory>
 
@@ -76,4 +75,3 @@ protected:
 };
 }
 
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdInteractionPair_h
-#define imstkPbdInteractionPair_h
+#pragma once
 
 #include "imstkInteractionPair.h"
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
@@ -82,4 +81,3 @@ private:
 };
 }
 
-#endif // imstkPbdInteractionPair_h

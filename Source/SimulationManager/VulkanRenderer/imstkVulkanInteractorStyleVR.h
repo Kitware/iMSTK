@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanInteractorStyleVR_h
-#define imstkVulkanInteractorStyleVR_h
+#pragma once
 
 #ifdef iMSTK_ENABLE_VR
 #include <vector>
@@ -119,4 +118,3 @@ protected:
 
 #endif
 
-#endif

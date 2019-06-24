@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVegaMeshIO_h
-#define imstkVegaMeshIO_h
+#pragma once
 
 #include <memory>
 
@@ -91,4 +90,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkVegaMeshIO_h

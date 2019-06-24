@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkConjugateGradient_h
-#define imstkConjugateGradient_h
+#pragma once
 
 #include <memory>
 
@@ -142,4 +141,3 @@ private:
 };
 } // imstk
 
-#endif // imstkConjugateGradient_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkForceModelConfig_h
-#define imstkForceModelConfig_h
+#pragma once
 
 #include <string.h>
 
@@ -191,4 +190,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkForceModelConfig_h

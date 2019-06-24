@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSOR_h
-#define imstkSOR_h
+#pragma once
 
 #include <memory>
 
@@ -143,4 +142,3 @@ private:
 };
 } // imstk
 
-#endif // imstkSOR_h

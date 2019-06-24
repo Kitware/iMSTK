@@ -19,8 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#ifndef imstkPbdConstantDensityConstraint_h
-#define imstkPbdConstantDensityConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -124,4 +123,3 @@ private:
 };
 }
 
-#endif // imstkPbdConstantDensityConstraint_h

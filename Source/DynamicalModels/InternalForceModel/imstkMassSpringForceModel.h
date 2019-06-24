@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMassSpringForceModel_h
-#define imstkMassSpringForceModel_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -71,4 +70,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkMassSpringForceModel_h

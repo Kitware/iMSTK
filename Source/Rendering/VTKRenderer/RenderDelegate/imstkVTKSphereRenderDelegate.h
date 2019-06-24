@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKSphereRenderDelegate_h
-#define imstkVTKSphereRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -59,4 +58,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkSphereRenderDelegate_h

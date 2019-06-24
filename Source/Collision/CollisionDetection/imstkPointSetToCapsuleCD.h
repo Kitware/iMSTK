@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPointSetToCapsuleCD_h
-#define imstkPointSetToCapsuleCD_h
+#pragma once
 
 #include <memory>
 
@@ -65,4 +64,3 @@ private:
 };
 }
 
-#endif // ifndef imstkPointSetToCapsuleCD_h

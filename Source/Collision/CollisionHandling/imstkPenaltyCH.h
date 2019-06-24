@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPenaltyCH_h
-#define imstkPenaltyCH_h
+#pragma once
 
 // std library
 #include <memory>
@@ -90,4 +89,3 @@ private:
 };
 }
 
-#endif // ifndef imstkPenaltyCH_h

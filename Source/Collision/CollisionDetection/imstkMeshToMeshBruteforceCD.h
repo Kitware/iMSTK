@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToMeshBruteforceCD_h
-#define imstkMeshToMeshBruteforceCD_h
+#pragma once
 
 #include <memory>
 #include <iostream>
@@ -76,4 +75,3 @@ private:
 };
 }
 
-#endif // ifndef imstkMeshToMeshBruteForceCD_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdPointTriangleCollConstraint_h
-#define imstkPbdPointTriangleCollConstraint_h
+#pragma once
 
 #include "imstkPbdCollisionConstraint.h"
 
@@ -62,4 +61,3 @@ public:
 };
 }
 
-#endif // imstkPbdPointTriangleCollConstraint_h

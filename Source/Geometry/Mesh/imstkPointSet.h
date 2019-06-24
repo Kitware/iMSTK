@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPointSet_h
-#define imstkPointSet_h
+#pragma once
 
 #include "imstkGeometry.h"
 #include "imstkGraph.h"
@@ -208,4 +207,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkPointSet_h

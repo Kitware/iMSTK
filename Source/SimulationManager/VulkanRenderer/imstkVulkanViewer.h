@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanViewer_h
-#define imstkVulkanViewer_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 #include "GLFW/glfw3.h"
@@ -144,4 +143,3 @@ protected:
     Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
 };
 }
-#endif

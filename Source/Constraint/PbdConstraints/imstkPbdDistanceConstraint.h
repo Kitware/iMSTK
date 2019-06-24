@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdDistanceConstraint_h
-#define imstkPbdDistanceConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -61,4 +60,3 @@ public:
 };
 } // imstk
 
-#endif // imstkPbdDistanceConstraint_h

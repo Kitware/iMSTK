@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKdbgLinesRenderDelegate_h
-#define imstkVTKdbgLinesRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -55,4 +54,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkVTKdbgLinesRenderDelegate_h

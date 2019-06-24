@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCapsule_h
-#define imstkCapsule_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -88,4 +87,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCapsule_h

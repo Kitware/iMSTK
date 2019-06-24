@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdDihedralConstraint_h
-#define imstkPbdDihedralConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -76,4 +75,3 @@ public:
 };
 } //imstk
 
-#endif // imstkPbdDihedralConstraint_h

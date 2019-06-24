@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearSystem_h
-#define imstkLinearSystem_h
+#pragma once
 
 #include "imstkNonlinearSystem.h"
 
@@ -147,4 +146,3 @@ private:
 };
 } // imstk
 
-#endif // imstkLinearSystem_h

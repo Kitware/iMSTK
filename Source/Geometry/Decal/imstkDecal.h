@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDecal_h
-#define imstkDecal_h
+#pragma once
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -65,4 +64,3 @@ protected:
 };
 }
 
-#endif

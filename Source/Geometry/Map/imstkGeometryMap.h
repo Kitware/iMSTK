@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGeometryMap_h
-#define imstkGeometryMap_h
+#pragma once
 
 #include <memory>
 #include <iostream>
@@ -134,4 +133,3 @@ protected:
 };
 }
 
-#endif // imstkGeometryMap_h

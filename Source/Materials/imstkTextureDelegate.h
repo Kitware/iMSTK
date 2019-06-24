@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTextureDelegate_h
-#define imstkTextureDelegate_h
+#pragma once
 
 #include <string>
 #include <memory>
@@ -51,4 +50,3 @@ protected:
 };
 }
 
-#endif

@@ -19,8 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#ifndef imstkOpenVRCommand_h
-#define imstkOpenVRCommand_h
+#pragma once
 
 #include <functional>
 #include <vtkCommand.h>
@@ -63,4 +62,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkOpenVRCommand_h

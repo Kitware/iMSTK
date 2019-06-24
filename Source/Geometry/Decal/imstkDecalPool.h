@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDecalPool_h
-#define imstkDecalPool_h
+#pragma once
 
 #include <queue>
 #include <array>
@@ -73,4 +72,3 @@ protected:
 };
 }
 
-#endif

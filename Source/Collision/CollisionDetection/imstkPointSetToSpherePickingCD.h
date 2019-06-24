@@ -19,8 +19,7 @@
 
    =========================================================================*/
 
-#ifndef imstkPointSetToSpherePickingCD_h
-#define imstkPointSetToSpherePickingCD_h
+#pragma once
 
 #include <memory>
 
@@ -74,4 +73,3 @@ private:
 };
 }
 
-#endif // ifndef imstkPointSetToSphereCD_h

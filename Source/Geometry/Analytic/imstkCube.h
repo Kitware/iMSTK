@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCube_h
-#define imstkCube_h
+#pragma once
 
 #include "imstkAnalyticalGeometry.h"
 
@@ -70,4 +69,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkCube_h

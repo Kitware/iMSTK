@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkHyperElasticFEMForceModel_h
-#define imstkHyperElasticFEMForceModel_h
+#pragma once
 
 #include <g3log/g3log.hpp>
 
@@ -154,4 +153,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkHyperElasticFEMForceModel_h

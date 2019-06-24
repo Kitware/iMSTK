@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSpatialHashTable_h
-#define imstkSpatialHashTable_h
+#pragma once
 
 #include "imstkMath.h"
 
@@ -55,4 +54,3 @@ protected:
 };
 }
 
-#endif

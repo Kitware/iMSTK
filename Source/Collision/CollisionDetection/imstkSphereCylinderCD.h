@@ -19,8 +19,7 @@
 
    =========================================================================*/
 
-#ifndef imstkSphereCylinderCD_h
-#define imstkSphereCylinderCD_h
+#pragma once
 
 #include <memory>
 
@@ -69,4 +68,3 @@ private:
 };
 }
 
-#endif // ifndef imstkSphereCylinderCD_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSceneObjectControllerBase_h
-#define imstkSceneObjectControllerBase_h
+#pragma once
 
 namespace imstk
 {
@@ -55,4 +54,3 @@ public:
 };
 } // imstk
 
-#endif // ifndef imstkSceneObjectControllerBase_h

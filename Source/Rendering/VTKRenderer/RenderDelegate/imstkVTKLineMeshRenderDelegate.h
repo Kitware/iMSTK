@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKLineMeshRenderDelegate_h
-#define imstkVTKLineMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -56,4 +55,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkLineMeshRenderDelegate_h

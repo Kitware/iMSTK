@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdCollisionConstraint_h
-#define imstkPbdCollisionConstraint_h
+#pragma once
 
 #include "imstkPbdModel.h"
 
@@ -68,4 +67,3 @@ public:
 };
 }
 
-#endif // imstkPbdCollisionConstraint_h

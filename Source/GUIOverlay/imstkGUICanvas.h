@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCanvas_h
-#define imstkCanvas_h
+#pragma once
 
 #include "imgui.h"
 
@@ -97,4 +96,3 @@ protected:
 } // GUI
 } // imstk
 
-#endif // ifndef imstkCanvas_h

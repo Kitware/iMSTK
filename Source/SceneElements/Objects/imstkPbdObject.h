@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdObject_h
-#define imstkPbdObject_h
+#pragma once
 
 #include "imstkDynamicObject.h"
 #include "imstkDynamicalModel.h"
@@ -93,4 +92,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkPbdObject_h

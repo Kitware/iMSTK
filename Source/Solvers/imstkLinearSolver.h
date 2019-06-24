@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearSolver_h
-#define imstkLinearSolver_h
+#pragma once
 
 // imstk includes
 #include "imstkLinearSystem.h"
@@ -118,4 +117,3 @@ protected:
 };
 } // imstk
 
-#endif // imstkLinearSolver_h

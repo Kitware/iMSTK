@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSceneObject_h
-#define imstkSceneObject_h
+#pragma once
 
 #include <memory>
 #include <string>
@@ -133,4 +132,3 @@ protected:
 using VisualObject = SceneObject;
 } // imstk
 
-#endif // ifndef imstkSceneObject_h

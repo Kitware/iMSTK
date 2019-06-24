@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkNonlinearSystem_h
-#define imstkNonlinearSystem_h
+#pragma once
 
 #include <memory>
 #include <stdio.h>
@@ -144,4 +143,3 @@ public:
 };
 } // imstk
 
-#endif // imstkNonlinearSystem_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkBackwardEuler_h
-#define imstkBackwardEuler_h
+#pragma once
 
 #include "imstkTimeIntegrator.h"
 
@@ -82,4 +81,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkBackwardEuler_h

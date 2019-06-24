@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkInteractorStyle_h
-#define imstkInteractorStyle_h
+#pragma once
 
 #include <unordered_map>
 #include <functional>
@@ -60,4 +59,3 @@ protected:
 };
 }
 
-#endif

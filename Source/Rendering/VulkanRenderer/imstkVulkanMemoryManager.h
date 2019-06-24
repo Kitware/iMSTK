@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanMemoryManager_h
-#define imstkVulkanMemoryManager_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 
@@ -99,4 +98,3 @@ protected:
 };
 };
 
-#endif

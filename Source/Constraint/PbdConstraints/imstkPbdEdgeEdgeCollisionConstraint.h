@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdEdgeEdgeCollConstraint_h
-#define imstkPbdEdgeEdgeCollConstraint_h
+#pragma once
 
 #include "imstkPbdCollisionConstraint.h"
 
@@ -59,4 +58,3 @@ public:
 };
 }
 
-#endif // imstkPbdEdgeEdgeCollConstraint_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDeviceClient_h
-#define imstkDeviceClient_h
+#pragma once
 
 #include <map>
 
@@ -122,4 +121,3 @@ protected:
 };
 }
 
-#endif // ifndef imstkDeviceClient_h

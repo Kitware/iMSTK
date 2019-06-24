@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCubeRenderDelegate_h
-#define imstkVTKCubeRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -59,4 +58,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCubeRenderDelegate_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkNewmarkBeta_h
-#define imstkNewmarkBeta_h
+#pragma once
 
 #include "imstkTimeIntegrator.h"
 
@@ -79,4 +78,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkBackwardEuler_h

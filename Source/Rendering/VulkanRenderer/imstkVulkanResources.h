@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanResources_h
-#define imstkVulkanResources_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 
@@ -214,4 +213,3 @@ protected:
 };
 } // imstk
 
-#endif // #define imstkVulkanResources_h

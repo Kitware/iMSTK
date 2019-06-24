@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKInteractorStyle_h
-#define imstkVTKInteractorStyle_h
+#pragma once
 
 #include <memory>
 #include <chrono>
@@ -134,4 +133,3 @@ private:
 };
 } // imstk
 
-#endif // ifndef imstkInteractorStyle_h

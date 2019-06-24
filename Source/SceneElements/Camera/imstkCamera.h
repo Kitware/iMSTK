@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCamera_h
-#define imstkCamera_h
+#pragma once
 
 #include <string>
 #include <memory>
@@ -124,4 +123,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkCamera_h

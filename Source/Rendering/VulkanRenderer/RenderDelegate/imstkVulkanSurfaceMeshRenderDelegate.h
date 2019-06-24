@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanSurfaceMeshRenderDelegate_h
-#define imstkVulkanSurfaceMeshRenderDelegate_h
+#pragma once
 
 #include "imstkSurfaceMesh.h"
 
@@ -60,4 +59,3 @@ protected:
 };
 }
 
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTexture_h
-#define imstkTexture_h
+#pragma once
 
 #include <string>
 #include <memory>
@@ -166,4 +165,3 @@ template<> struct less<std::shared_ptr<imstk::Texture>>
 };
 }
 
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGeometry_h
-#define imstkGeometry_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -190,4 +189,3 @@ protected:
 };
 } //imstk
 
-#endif // ifndef imstkGeometry_h

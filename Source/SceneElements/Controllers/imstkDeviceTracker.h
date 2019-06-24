@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDeviceTracker_h
-#define imstkDeviceTracker_h
+#pragma once
 
 #include <memory>
 
@@ -130,4 +129,3 @@ protected:
 };
 } // imstk
 
-#endif // ifndef imstkDeviceTracker_h
