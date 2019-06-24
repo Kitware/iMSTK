@@ -83,20 +83,28 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
     {
         return std::make_shared<VulkanSurfaceMeshRenderDelegate>(visualModel, type, memoryManager);
     }
-    /*case Geometry::Type::TetrahedralMesh:
+    case Geometry::Type::PointSet:
     {
-        auto tetrahedralMesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
-        return std::make_shared<VulkanTetrahedralMeshRenderDelegate>(tetrahedralMesh);
-    }*/
+        LOG(FATAL) << "No support for PointSet rendering with Vulkan backend!";
+    }
+    case Geometry::Type::TetrahedralMesh:
+    {
+        /*auto tetrahedralMesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
+        return std::make_shared<VulkanTetrahedralMeshRenderDelegate>(tetrahedralMesh);*/
+
+        LOG(FATAL) << "No support for TetrahedralMesh rendering with Vulkan backend!";
+    }
     case Geometry::Type::LineMesh:
     {
         return std::make_shared<VulkanLineMeshRenderDelegate>(visualModel, type, memoryManager);
     }
-    /*case Geometry::Type::HexahedralMesh:
+    case Geometry::Type::HexahedralMesh:
     {
-        LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
-        return nullptr;
-    }*/
+        /*LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
+        return nullptr;*/
+
+        LOG(FATAL) << "No support for HexahedralMesh rendering with Vulkan backend!";
+    }
     case Geometry::Type::DecalPool:
     {
         return std::make_shared<VulkanDecalRenderDelegate>(visualModel, type, memoryManager);
