@@ -58,12 +58,27 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~Scene() = default;
+    ~Scene();
 
     ///
     /// \brief Initialize the scene
     ///
     bool initialize();
+
+    ///
+    /// \brief Launch camera controller and other scene specific modules that need to run independently
+    ///
+    void launchModules();
+
+    ///
+    /// \brief Reset the scene
+    ///
+    void reset();
+
+    ///
+    /// \brief Advance the scene from current to next frame
+    ///
+    void advance();
 
     ///
     /// \brief Returns true if the object with a given name is registered, else false
@@ -162,11 +177,6 @@ public:
     bool isInitialized() const { return m_isInitialized; }
 
     ///
-    /// \brief Reset the scene
-    ///
-    void reset();
-
-    ///
     /// \brief Set/Get the FPS
     ///
     void setFPS(const double fps) { m_fps = fps; }
@@ -183,6 +193,7 @@ protected:
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
+    std::unordered_map<std::string, std::thread> m_threadMap;   ///>
 
     double m_fps = 0.0;
 

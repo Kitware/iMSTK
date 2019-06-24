@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Get the scene that the scene manager is managing
     ///
-    std::shared_ptr<Scene> getScene();
+    std::shared_ptr<Scene> getScene() { return m_scene; };
 
 protected:
     ///
@@ -65,7 +65,7 @@ protected:
     ///
     /// \brief Run the module
     ///
-    void runModule() override;
+    void runModule() override { m_scene->advance(); };
 
     ///
     /// \brief Clean up the module

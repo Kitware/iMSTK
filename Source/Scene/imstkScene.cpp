@@ -23,11 +23,25 @@
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDebugGeometry.h"
+#include "imstkPbdObject.h"
+#include "imstkDeformableObject.h"
+#include "imstkTimer.h"
+#include "imstkPbdSolver.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk
 {
+Scene::~Scene()
+{
+    // End Camera Controller
+    if (auto camController = this->getCamera()->getController())
+    {
+        camController->end();
+        m_threadMap.at(camController->getName()).join();
+    }
+}
+
 bool
 Scene::initialize()
 {
@@ -42,6 +56,16 @@ Scene::initialize()
     }
     m_isInitialized = true;
     return true;
+}
+
+void
+Scene::launchModules()
+{
+    // Start Camera Controller (asynchronous)
+    if (auto camController = this->getCamera()->getController())
+    {
+        m_threadMap[camController->getName()] = std::thread([camController] { camController->start(); });
+    }
 }
 
 bool
@@ -272,5 +296,96 @@ Scene::reset()
             obj->reset();
         }
     }
+}
+
+void
+Scene::advance()
+{
+    StopWatch wwt;
+    wwt.start();
+
+    // Reset Contact forces to 0
+    for (auto obj : this->getSceneObjects())
+    {
+        if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+        {
+            defObj->getContactForce().setConstant(0.0);
+        }
+        else if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
+        {
+            collidingObj->resetForce();
+        }
+    }
+
+    // Update objects controlled by the device controllers
+    for (auto controller : this->getSceneObjectControllers())
+    {
+        controller->updateControlledObjects();
+    }
+
+    // Compute collision data per interaction pair
+    for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
+    {
+        intPair->computeCollisionData();
+    }
+
+    // Process collision data per interaction pair
+    for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
+    {
+        intPair->processCollisionData();
+    }
+
+    // Run the solvers
+    for (auto solvers : this->getSolvers())
+    {
+        solvers->solve();
+    }
+
+    // Apply updated forces on device
+    for (auto controller : this->getSceneObjectControllers())
+    {
+        controller->applyForces();
+    }
+
+    // Apply the geometry and apply maps to all the objects
+    for (auto obj : this->getSceneObjects())
+    {
+        obj->updateGeometries();
+    }
+
+    // Set the trackers of the scene object controllers to out-of-date
+    for (auto controller : this->getSceneObjectControllers())
+    {
+        controller->setTrackerToOutOfDate();
+    }
+
+    auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+
+    // Update time step size of the dynamic objects
+    for (auto obj : this->getSceneObjects())
+    {
+        if (obj->getType() == SceneObject::Type::Pbd)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                }
+            }
+        }
+        else if (obj->getType() == SceneObject::Type::FEMDeformable)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                }
+            }
+        }
+    }
+
+    this->setFPS(1. / wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
 }
 } // imstk

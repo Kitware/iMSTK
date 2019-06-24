@@ -26,15 +26,13 @@
 
 using namespace imstk;
 
-const bool runSimWithoutRendering = false;
-
 ///
 /// \brief This example demonstrates the cloth simulation
 /// using Position based dynamics
 ///
 int main()
 {
-    auto sdk = std::make_shared<SimulationManager>(runSimWithoutRendering);
+    auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDCloth");
 
     // Create surface mesh
@@ -129,8 +127,8 @@ int main()
     scene->addSceneObject(deformableObj);
 
     // print UPS
-    auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);
+    /*auto ups = std::make_shared<UPSCounter>();
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);*/
 
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);

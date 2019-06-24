@@ -46,25 +46,45 @@ using SimulationStatus = ModuleStatus;
 ///
 /// \class SimulationManager
 ///
-/// \brief This class manages the overall simulation. The simulation can contain multiple scenes.
+/// \brief This class is the manager of the simulation at the top level.
+/// The simulation can contain multiple scenes. It can be launched in three
+///  modes: rendering (default), runInBackground and backend
 ///
 class SimulationManager
 {
 public:
     ///
+    /// \brief Type of the collision detection
+    ///
+    enum class Mode
+    {
+        /// Simulation manager launches the simulation with a
+        /// render window
+        rendering = 0,
+
+        /// Simulation manager launches the simulation without a
+        /// render window but keeps looping the simulation
+        runInBackground,
+
+        /// Simulation manager launches the simulation without a
+        /// render window and returns the control
+        backend
+    };
+
+    ///
     /// \brief Constructor
     ///
-    SimulationManager(const bool disableRendering = false, const bool enableVR = false);
+    SimulationManager(const SimulationManager::Mode mode = Mode::rendering, const bool enableVR = false);
 
     ///
     /// \brief Default destructor
     ///
-    ~SimulationManager() = default;
+    ~SimulationManager() { this->endSimulation(); };
 
     ///
     /// \brief Returns the simulation status
     ///
-    const SimulationStatus& getStatus() const;
+    const SimulationStatus& getStatus() const { return m_status; };
 
     ///
     /// \brief Set number of worker threads in thread pool for parallel computation
@@ -106,7 +126,6 @@ public:
     /// \brief Create a new scene with a given name
     ///
     std::shared_ptr<Scene> createNewScene(const std::string& newSceneName);
-    std::shared_ptr<Scene> createNewScene(std::string&& newSceneName);
 
     ///
     /// \brief Create a new scene with default name
@@ -160,12 +179,22 @@ public:
 
     ///
     /// \brief Start the simulation by initializing the active scene
+    /// In Mode::backend mode, the simulation manager is initialized and
+    /// the modules except the scene manager are launched in new threads
+    /// and returned. In rendering and runInBackground modes the simulation manager
+    /// module gets launched and an never returns
     ///
     void startSimulation(const SimulationStatus simStatus = SimulationStatus::PAUSED,
                          const Renderer::Mode renderMode = Renderer::Mode::SIMULATION);
 
     ///
+    /// \brief Initialize the modules and the active scene
+    ///
+    void initialize();
+
+    ///
     /// \brief Run the simulation from a paused state
+    /// In Mode::backend mode, the simulation manager is initialized if not and retrned
     ///
     void runSimulation();
 
@@ -183,6 +212,16 @@ public:
     /// \brief End the simulation
     ///
     void endSimulation();
+
+    ///
+    /// \brief Advance to next frame
+    ///
+    void advanceFrame();
+
+    ///
+    /// \brief Return the mode of the simulation manager
+    ///
+    SimulationManager::Mode getMode() const { return m_simulationMode; }
 
 private:
 
@@ -215,6 +254,7 @@ private:
 
     std::string m_activeSceneName = "";
     std::unordered_map<std::string, std::shared_ptr<SceneManager>> m_sceneManagerMap;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
 
     std::unordered_map<std::string, std::shared_ptr<Module>> m_modulesMap;
 
@@ -224,6 +264,9 @@ private:
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 
     bool m_simThreadLaunched = false;
+
+    Mode m_simulationMode = Mode::rendering;
+    bool m_initialized = false;
 };
 } // imstk
 
