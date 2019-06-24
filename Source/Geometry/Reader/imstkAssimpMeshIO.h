@@ -71,4 +71,3 @@ public:
     static unsigned int getDefaultPostProcessSteps();
 };
 }
-

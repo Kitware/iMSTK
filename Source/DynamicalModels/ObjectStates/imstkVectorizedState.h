@@ -108,4 +108,3 @@ protected:
     Vectord m_qDotDot;   // Double derivative of state w.r.t time
 };
 } // imstk
-

@@ -117,4 +117,3 @@ private:
     VkRenderPass * m_renderPass;
 };
 }
-

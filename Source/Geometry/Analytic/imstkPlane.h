@@ -85,4 +85,3 @@ protected:
     double m_widthPostTransform = 1.0;  ///> Width of the plane once transform applied
 };
 } // imstk
-

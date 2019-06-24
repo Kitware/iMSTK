@@ -75,4 +75,3 @@ protected:
     Vec3d m_orientationAxisPostTransform = UP_VECTOR;  ///> orientation once transform applied
 };
 } //imstk
-

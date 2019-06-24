@@ -64,4 +64,3 @@ protected:
     VulkanLocalDecalFragmentUniforms m_decalFragmentUniforms;
 };
 }
-

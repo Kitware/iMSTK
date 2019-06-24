@@ -78,4 +78,3 @@ protected:
     std::string m_textureName;    ///< VTK texture unique name
 };
 }
-

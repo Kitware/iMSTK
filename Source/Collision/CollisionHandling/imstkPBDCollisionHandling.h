@@ -83,4 +83,3 @@ private:
     std::shared_ptr<PbdSolver> m_PBDSolver;        /// The Solver for the collision constraints
 };
 }
-

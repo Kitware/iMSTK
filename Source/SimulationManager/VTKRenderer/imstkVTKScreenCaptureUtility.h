@@ -67,4 +67,3 @@ protected:
     vtkRenderWindow* m_renderWindow; //> render window whose screen shot will be taken
 };
 } // imstk
-

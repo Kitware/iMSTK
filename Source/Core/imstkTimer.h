@@ -191,4 +191,3 @@ protected:
     unsigned int m_updateCount = 0; ///> Current update count
 };
 }
-

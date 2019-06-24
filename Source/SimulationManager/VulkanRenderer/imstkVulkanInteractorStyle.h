@@ -109,4 +109,3 @@ private:
     unsigned int m_state = 0;
 };
 }
-

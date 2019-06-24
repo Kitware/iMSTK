@@ -60,4 +60,3 @@ public:
     double m_stiffness;  ///> Stiffness of the volume constraint
 };
 }
-

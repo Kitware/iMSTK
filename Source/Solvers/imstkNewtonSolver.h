@@ -218,4 +218,3 @@ private:
     std::vector<double> m_fnorms;                     ///> Consecutive function norms
 };
 } // imstk
-

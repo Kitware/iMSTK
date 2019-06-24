@@ -290,4 +290,3 @@ protected:
     bool m_implementFixedBC = true;
 };
 } // imstk
-

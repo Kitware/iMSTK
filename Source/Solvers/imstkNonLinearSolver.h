@@ -141,4 +141,3 @@ protected:
     bool m_isSemiImplicit = true;                       ///> Semi-Implicit solver
 };
 } // imstk
-

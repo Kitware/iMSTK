@@ -88,4 +88,3 @@ protected:
     int m_warp;
 };
 } // imstk
-

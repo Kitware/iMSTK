@@ -107,4 +107,3 @@ private:
     static const uint32_t maxBufferSize = 1024 * 1024;
 };
 }
-

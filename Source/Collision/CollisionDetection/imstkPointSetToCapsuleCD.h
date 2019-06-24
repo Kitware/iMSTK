@@ -63,4 +63,3 @@ private:
     std::shared_ptr<Capsule> m_capsule;         ///> Capsule
 };
 }
-

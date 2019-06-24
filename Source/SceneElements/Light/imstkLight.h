@@ -278,4 +278,3 @@ protected:
     float m_spotAngle = 45.;
 };
 } // imstk
-

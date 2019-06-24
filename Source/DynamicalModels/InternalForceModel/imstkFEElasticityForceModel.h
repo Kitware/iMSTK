@@ -73,4 +73,3 @@ protected:
     std::shared_ptr<FEElasticForceModel> m_feElasticForceModel;
 };
 }
-

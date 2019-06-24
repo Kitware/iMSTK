@@ -80,4 +80,3 @@ public:
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) = 0;
 };
 } //imstk
-

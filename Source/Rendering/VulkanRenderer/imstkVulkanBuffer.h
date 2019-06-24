@@ -46,4 +46,3 @@ protected:
     uint32_t m_buffering = 1;
 };
 }
-

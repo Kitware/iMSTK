@@ -163,4 +163,3 @@ protected:
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
 };
 } // imstk
-

@@ -107,4 +107,3 @@ private:
     std::vector<Color> m_vertexColors;
 };
 } // imstk
-

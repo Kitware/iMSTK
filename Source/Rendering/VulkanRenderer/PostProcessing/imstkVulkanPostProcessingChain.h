@@ -58,4 +58,3 @@ protected:
     unsigned int m_lastInput = 0; ///< 0 by default because of accumulation composition
 };
 }
-

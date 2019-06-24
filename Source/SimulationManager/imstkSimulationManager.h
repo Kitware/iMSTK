@@ -268,4 +268,3 @@ private:
     bool m_initialized = false;
 };
 } // imstk
-

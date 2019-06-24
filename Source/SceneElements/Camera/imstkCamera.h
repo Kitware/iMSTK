@@ -122,4 +122,3 @@ protected:
     double m_fieldOfView = 60;          ///> field of view in degrees
 };
 } // imstk
-

@@ -67,4 +67,3 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
 };
 }
-

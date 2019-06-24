@@ -91,4 +91,3 @@ protected:
     Quatd m_cameraRotationalOffset = Quatd::Identity(); ///< camera head angle offset (in deg)
 };
 } // imstk
-

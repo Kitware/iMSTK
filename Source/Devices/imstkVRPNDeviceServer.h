@@ -114,4 +114,3 @@ private:
     vrpn_MainloopContainer* m_deviceConnections;                      ///< VRPN device connections
 };
 } // imstk
-

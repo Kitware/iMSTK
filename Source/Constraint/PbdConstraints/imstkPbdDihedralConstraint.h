@@ -74,4 +74,3 @@ public:
     double m_stiffness; ///> Angular stiffness
 };
 } //imstk
-

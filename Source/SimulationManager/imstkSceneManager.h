@@ -80,4 +80,3 @@ protected:
     std::unordered_map<std::string, std::thread> m_threadMap;   ///>
 };
 } // imstk
-

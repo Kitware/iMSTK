@@ -168,4 +168,3 @@ public:
     std::vector<PickingCollisionData> NodePickData;        ///< List of points that are picked
 };
 }
-

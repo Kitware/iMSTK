@@ -150,4 +150,3 @@ protected:
     double m_loopDelay = 0; ///> Loop delay
 };
 }
-

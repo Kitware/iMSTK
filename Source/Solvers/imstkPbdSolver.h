@@ -193,4 +193,3 @@ private:
     std::shared_ptr<PbdObject> m_pbdObject;
 };
 } // imstk
-

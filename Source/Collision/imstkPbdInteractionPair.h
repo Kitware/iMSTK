@@ -80,4 +80,3 @@ private:
     unsigned int maxIter;
 };
 }
-

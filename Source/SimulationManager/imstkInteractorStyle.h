@@ -58,4 +58,3 @@ protected:
     EventHandlerFunction m_onTimerFunction;
 };
 }
-

@@ -206,4 +206,3 @@ protected:
     size_t m_originalNumVertices = 0;
 };
 } // imstk
-

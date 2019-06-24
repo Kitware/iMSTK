@@ -81,4 +81,3 @@ protected:
     RigidTransform3d m_rigidTransform; ///> Rigid transform
 };
 } // imstk
-

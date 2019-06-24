@@ -58,4 +58,3 @@ protected:
     std::vector<VulkanBasicVertex> m_planeVertices;
 };
 }
-

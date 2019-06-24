@@ -38,4 +38,3 @@ public:
     virtual void solve() = 0;
 };
 } // imstk
-

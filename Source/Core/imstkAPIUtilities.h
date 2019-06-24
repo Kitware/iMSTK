@@ -243,4 +243,3 @@ printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>
 }
 } //apiutils
 } // imstk
-

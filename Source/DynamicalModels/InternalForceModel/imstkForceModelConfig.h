@@ -189,4 +189,3 @@ protected:
     bool m_loadSuccessful; ///> Configuration loading is successful
 };
 } // imstk
-

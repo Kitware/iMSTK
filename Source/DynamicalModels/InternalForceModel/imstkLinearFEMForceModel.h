@@ -129,4 +129,3 @@ protected:
     vega::SparseMatrix *m_stiffnessMatrixRawPtr;
 };
 } // imstk
-

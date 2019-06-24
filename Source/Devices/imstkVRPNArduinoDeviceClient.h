@@ -93,4 +93,3 @@ private:
     float m_roll = 0;
 };
 }
-

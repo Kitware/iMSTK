@@ -86,4 +86,3 @@ public:
     void setButton(const unsigned int buttonId, const bool buttonStatus);
 };
 }
-

@@ -60,4 +60,3 @@ public:
     Mat3d m_invRestMat;         ///>
 };
 }
-

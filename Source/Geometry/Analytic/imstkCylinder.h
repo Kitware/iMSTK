@@ -86,4 +86,3 @@ protected:
     double m_lengthPostTransform = 1.; ///> Length of the cylinder onc transform applied
 };
 } // imstk
-

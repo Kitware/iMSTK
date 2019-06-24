@@ -97,4 +97,3 @@ protected:
     std::vector<VulkanInternalImage*> m_images;
 };
 };
-

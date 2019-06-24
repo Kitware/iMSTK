@@ -181,4 +181,3 @@ static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* f
 }
 } // plotters
 } // imstk
-

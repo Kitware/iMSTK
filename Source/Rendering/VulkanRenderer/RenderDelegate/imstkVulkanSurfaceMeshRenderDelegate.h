@@ -58,4 +58,3 @@ protected:
     std::vector<bool> m_modified;
 };
 }
-

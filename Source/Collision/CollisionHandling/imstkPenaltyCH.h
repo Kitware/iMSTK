@@ -88,4 +88,3 @@ private:
     double m_damping = 0.5;     ///> Damping of the contact
 };
 }
-

@@ -61,4 +61,3 @@ protected:
     vtkSmartPointer<vtkUnstructuredGrid> m_mesh; ///> Mapped tetrahedral mesh
 };
 } // imstk
-

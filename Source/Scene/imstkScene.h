@@ -199,4 +199,3 @@ protected:
     bool m_isInitialized = false;
 };
 } // imstk
-

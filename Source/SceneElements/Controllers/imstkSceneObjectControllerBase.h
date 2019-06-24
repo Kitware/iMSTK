@@ -53,4 +53,3 @@ public:
     virtual void setTrackerToOutOfDate() = 0;
 };
 } // imstk
-

@@ -132,4 +132,3 @@ protected:
     std::shared_ptr<Geometry> m_slave;  ///> the geometry which follows the master
 };
 }
-

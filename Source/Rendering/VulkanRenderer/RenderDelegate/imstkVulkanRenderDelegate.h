@@ -120,4 +120,3 @@ protected:
     VulkanLocalFragmentUniforms m_localFragmentUniforms;
 };
 }
-

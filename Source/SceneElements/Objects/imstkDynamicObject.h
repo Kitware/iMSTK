@@ -154,4 +154,3 @@ protected:
     bool m_updateVisualFromPhysicsGeometry = true;                      ///> Defines if visual is updated from colliding mapping or physics mapping
 };
 } // imstk
-

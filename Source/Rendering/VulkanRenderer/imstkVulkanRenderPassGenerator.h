@@ -71,4 +71,3 @@ public:
         const uint32_t& correlationMask);
 };
 }
-

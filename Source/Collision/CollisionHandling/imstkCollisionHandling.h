@@ -107,4 +107,3 @@ protected:
     const std::shared_ptr<CollisionData> m_colData; ///< Collision data
 };
 }
-

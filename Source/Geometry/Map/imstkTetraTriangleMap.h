@@ -96,4 +96,3 @@ protected:
     std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
 };
 } // imstk
-

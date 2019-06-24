@@ -82,4 +82,3 @@ private:
     SpatialHashTableSeparateChaining m_hashTable; ///> Spatial hash table
 };
 }
-

@@ -120,4 +120,3 @@ protected:
     Vec3d m_force = Vec3d::Zero();           ///< Force vector
 };
 }
-

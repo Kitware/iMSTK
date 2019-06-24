@@ -202,4 +202,3 @@ protected:
     BlendMode m_blendMode = BlendMode::ALPHA;
 };
 }
-

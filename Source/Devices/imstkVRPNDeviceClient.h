@@ -125,4 +125,3 @@ private:
     std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
 };
 }
-

@@ -119,4 +119,3 @@ private:
         std::initializer_list<const char *> extensionList);
 }; // VisualObjectImporter
 } // imstk
-

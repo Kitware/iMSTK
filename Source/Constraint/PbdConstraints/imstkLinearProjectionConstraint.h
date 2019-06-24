@@ -97,4 +97,3 @@ private:
     Vec3d m_value = Vec3d(0., 0., 0.);      ///> Value in the subspace: range(I-m_projector)
 };
 } // imstk
-

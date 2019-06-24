@@ -131,4 +131,3 @@ protected:
 
 using VisualObject = SceneObject;
 } // imstk
-

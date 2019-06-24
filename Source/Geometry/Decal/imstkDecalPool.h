@@ -71,4 +71,3 @@ protected:
     glm::ivec3 m_triangles[12];
 };
 }
-

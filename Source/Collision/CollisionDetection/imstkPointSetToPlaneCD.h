@@ -63,4 +63,3 @@ private:
     std::shared_ptr<Plane> m_plane;            ///> Plane
 };
 }
-

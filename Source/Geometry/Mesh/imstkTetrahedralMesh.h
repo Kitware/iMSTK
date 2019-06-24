@@ -140,4 +140,3 @@ protected:
     std::vector<bool> m_removedMeshElems;
 };
 }
-

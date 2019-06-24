@@ -122,4 +122,3 @@ private:
     std::vector<int> m_numNeighbors;        ///> number of neighbors
 };
 }
-

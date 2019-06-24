@@ -119,4 +119,3 @@ protected:
     float m_pushConstantData[32];
 };
 }
-

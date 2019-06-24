@@ -248,4 +248,3 @@ protected:
     size_t m_maxNumTriangles = 0;
 };
 } // imstk
-

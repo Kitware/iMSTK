@@ -136,4 +136,3 @@ protected:
     std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();;
 };
 }
-

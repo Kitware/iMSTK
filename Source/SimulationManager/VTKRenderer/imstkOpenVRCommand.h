@@ -61,4 +61,3 @@ protected:
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
 };
 } // imstk
-

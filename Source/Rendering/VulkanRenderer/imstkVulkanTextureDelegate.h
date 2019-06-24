@@ -180,4 +180,3 @@ protected:
     VulkanMemoryManager * m_memoryManager;
 };
 }
-

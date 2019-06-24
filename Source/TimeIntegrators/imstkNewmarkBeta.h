@@ -77,4 +77,3 @@ protected:
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
 } // imstk
-

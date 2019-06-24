@@ -91,4 +91,3 @@ protected:
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };
 } // imstk
-

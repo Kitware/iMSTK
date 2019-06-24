@@ -59,4 +59,3 @@ protected:
     VulkanLocalVertexUniforms m_localVertexUniforms;
 };
 }
-

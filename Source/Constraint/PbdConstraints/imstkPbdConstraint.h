@@ -81,4 +81,3 @@ public:
     double m_epsilon = 1.0e-6;         ///> Tolerance used for the costraints
 };
 }
-

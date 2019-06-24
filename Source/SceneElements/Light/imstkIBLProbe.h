@@ -65,4 +65,3 @@ protected:
     std::shared_ptr<Texture> m_brdfLUTTexture = nullptr;
 };
 }
-

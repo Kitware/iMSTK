@@ -188,4 +188,3 @@ protected:
     double m_scaling = 1.0;
 };
 } //imstk
-

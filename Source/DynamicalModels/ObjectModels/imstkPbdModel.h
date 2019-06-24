@@ -244,4 +244,3 @@ protected:
     std::shared_ptr<PBDModelConfig>             m_Parameters;  ///> Model parameters, must be set before simulation
 };
 } // imstk
-

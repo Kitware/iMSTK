@@ -57,4 +57,3 @@ protected:
     std::vector<VulkanBasicVertex> m_cubeVertices;
 };
 }
-

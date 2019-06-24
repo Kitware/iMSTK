@@ -156,4 +156,3 @@ protected:
     bool m_isSurfaceMapper = false;
 };
 }
-

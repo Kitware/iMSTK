@@ -160,4 +160,3 @@ protected:
     std::shared_ptr<std::unordered_set<PointEntry>> m_table;
 };
 }
-

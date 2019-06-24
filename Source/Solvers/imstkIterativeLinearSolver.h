@@ -83,4 +83,3 @@ protected:
     Vectord m_residual;             ///> Storage for residual vector.
 };
 } //imstk
-

@@ -74,4 +74,3 @@ protected:
     bool m_renderDelegateCreated = false; ///< true if RenderDelegate has been created
 };
 }
-

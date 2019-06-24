@@ -99,4 +99,3 @@ protected:
     static size_t numElemNodes(const ElemType& elType);
 };
 }
-

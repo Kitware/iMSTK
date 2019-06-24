@@ -207,4 +207,3 @@ protected:
     std::vector<std::unique_ptr<RenderParticle>> * m_particles;
 };
 } // imstk
-

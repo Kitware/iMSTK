@@ -66,4 +66,3 @@ public:
     std::shared_ptr<PbdModel> m_model2;
 };
 }
-

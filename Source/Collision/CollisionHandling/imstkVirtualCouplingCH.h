@@ -86,4 +86,3 @@ private:
     double m_damping = 0.005;                   ///> Damping coefficient used to compute damping force
 };
 }
-

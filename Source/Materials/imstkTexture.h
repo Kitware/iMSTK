@@ -164,4 +164,3 @@ template<> struct less<std::shared_ptr<imstk::Texture>>
     }
 };
 }
-

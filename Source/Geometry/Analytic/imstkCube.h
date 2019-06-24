@@ -68,4 +68,3 @@ protected:
     double m_widthPostTransform = 1.0;  ///> Width of the cube once transform applied
 };
 }
-

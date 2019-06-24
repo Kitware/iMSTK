@@ -128,4 +128,3 @@ protected:
     bool m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
 };
 } // imstk
-

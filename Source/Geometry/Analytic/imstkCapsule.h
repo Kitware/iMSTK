@@ -86,4 +86,3 @@ protected:
     double m_lengthPostTransform = 1.0; ///> Length after transform
 };
 } // imstk
-

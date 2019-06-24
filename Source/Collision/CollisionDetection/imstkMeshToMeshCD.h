@@ -84,4 +84,3 @@ private:
     std::shared_ptr<DeformModel> m_modelB;  ///>
 };
 }
-

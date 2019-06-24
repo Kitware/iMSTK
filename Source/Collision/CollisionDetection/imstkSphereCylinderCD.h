@@ -67,4 +67,3 @@ private:
     std::shared_ptr<Sphere> m_sphere;        ///> colliding sphere
 };
 }
-

@@ -60,4 +60,3 @@ protected:
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 } // imstk
-

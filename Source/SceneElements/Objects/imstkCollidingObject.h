@@ -106,4 +106,3 @@ protected:
 
 using StaticObject = CollidingObject;
 }// imstk
-

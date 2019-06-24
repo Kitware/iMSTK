@@ -90,4 +90,3 @@ public:
     static const MeshFileType getFileType(const std::string& filePath);
 };
 } // imstk
-

@@ -72,4 +72,3 @@ protected:
     vector<vector<size_t>> m_adjList;    ///< A array of vectors to represent adjacency list
 };
 }
-

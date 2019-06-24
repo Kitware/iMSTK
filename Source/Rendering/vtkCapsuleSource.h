@@ -106,4 +106,3 @@ private:
     vtkCapsuleSource(const vtkCapsuleSource&); // Not implemented.
     void operator=(const vtkCapsuleSource&); // Not implemented.
 };
-

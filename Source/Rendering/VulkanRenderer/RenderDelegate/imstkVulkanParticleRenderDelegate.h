@@ -88,4 +88,3 @@ protected:
     std::vector<float> m_particleDistances;
 };
 }
-

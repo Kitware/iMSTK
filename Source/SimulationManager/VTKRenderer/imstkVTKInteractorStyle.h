@@ -132,4 +132,3 @@ private:
     double m_lastFps; ///> last framerate value used for moving average estimate
 };
 } // imstk
-

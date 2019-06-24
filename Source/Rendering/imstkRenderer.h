@@ -60,4 +60,3 @@ protected:
     Renderer::Mode m_currentMode = Renderer::Mode::EMPTY;
 };
 }
-

@@ -110,4 +110,3 @@ protected:
     bool m_valid;
 };
 }
-

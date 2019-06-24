@@ -67,4 +67,3 @@ protected:
     bool m_started = false; ///< Used to initialized variables
 };
 }
-

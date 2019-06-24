@@ -74,4 +74,3 @@ protected:
     double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
 };
 } // imstk
-

@@ -72,4 +72,3 @@ private:
     unsigned int m_buttonId = 0;                            ///> button id
 };
 }
-

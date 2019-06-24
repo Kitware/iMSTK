@@ -110,4 +110,3 @@ protected:
     std::shared_ptr<FEMDeformableBodyModel> m_defModel;
 };
 } // imstk
-

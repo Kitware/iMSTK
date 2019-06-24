@@ -149,4 +149,3 @@ protected:
     static void copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 };
 } // imstk
-

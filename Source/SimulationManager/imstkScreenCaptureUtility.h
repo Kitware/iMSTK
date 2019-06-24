@@ -66,4 +66,3 @@ protected:
     std::string m_screenShotPrefix; //> the prefix for the screenshots to be saved
 };
 } // imstk
-

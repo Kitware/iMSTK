@@ -58,4 +58,3 @@ public:
     bool solvePositionConstraint(PbdModel& model) override;
 };
 } // imstk
-

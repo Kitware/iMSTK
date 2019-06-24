@@ -94,4 +94,3 @@ protected:
     double m_defaultDt;
 };
 } // imstk
-

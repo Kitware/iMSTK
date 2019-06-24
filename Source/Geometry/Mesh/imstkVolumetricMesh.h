@@ -78,4 +78,3 @@ protected:
     std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh = nullptr; ///> Attached vega mesh
 };
 } // imstk
-

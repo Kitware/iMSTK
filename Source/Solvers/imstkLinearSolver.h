@@ -116,4 +116,3 @@ protected:
     std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };
 } // imstk
-

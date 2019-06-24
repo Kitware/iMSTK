@@ -65,4 +65,3 @@ protected:
     std::shared_ptr<Geometry> m_geometry = nullptr;
 };
 } // imstk
-

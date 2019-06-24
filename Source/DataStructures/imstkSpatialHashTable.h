@@ -53,4 +53,3 @@ protected:
     double m_cellSize[3];
 };
 }
-

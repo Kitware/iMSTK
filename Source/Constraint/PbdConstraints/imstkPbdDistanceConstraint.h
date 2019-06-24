@@ -59,4 +59,3 @@ public:
     double m_stiffness;  ///> Stiffness of the constaint
 };
 } // imstk
-

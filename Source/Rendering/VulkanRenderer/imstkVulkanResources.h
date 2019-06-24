@@ -212,4 +212,3 @@ protected:
     VkDeviceSize m_offset;
 };
 } // imstk
-

@@ -118,4 +118,3 @@ protected:
     vtkSmartPointer<vtkTransform> m_transform;
 };
 }
-

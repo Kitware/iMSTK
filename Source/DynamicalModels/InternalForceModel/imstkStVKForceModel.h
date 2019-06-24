@@ -109,4 +109,3 @@ protected:
     bool ownStiffnessMatrix;
 };
 } // imstk
-

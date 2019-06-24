@@ -82,4 +82,3 @@ private:
     StdVectorOfVec3d m_acc; ///> Nodal acelerations
 };
 } // imstk
-
