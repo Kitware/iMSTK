@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSOR_h
-#define imstkSOR_h
+#pragma once
 
 #include <memory>
 
@@ -142,5 +141,3 @@ private:
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
 };
 } // imstk
-
-#endif // imstkSOR_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDeviceTracker_h
-#define imstkDeviceTracker_h
+#pragma once
 
 #include <memory>
 
@@ -129,5 +128,3 @@ protected:
     bool m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
 };
 } // imstk
-
-#endif // ifndef imstkDeviceTracker_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCylinder_h
-#define imstkCylinder_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -87,5 +86,3 @@ protected:
     double m_lengthPostTransform = 1.; ///> Length of the cylinder onc transform applied
 };
 } // imstk
-
-#endif // ifndef imstkCylinder_h

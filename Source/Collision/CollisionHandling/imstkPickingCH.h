@@ -17,10 +17,9 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
-#ifndef imstkPickingCH_h
-#define imstkPenaltyCH_h
+#pragma once
 
 // std library
 #include <memory>
@@ -90,5 +89,3 @@ private:
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
 };
 }
-
-#endif // ifndef imstkPenaltyCH_h

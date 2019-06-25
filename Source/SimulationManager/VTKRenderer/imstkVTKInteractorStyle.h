@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKInteractorStyle_h
-#define imstkVTKInteractorStyle_h
+#pragma once
 
 #include <memory>
 #include <chrono>
@@ -133,5 +132,3 @@ private:
     double m_lastFps; ///> last framerate value used for moving average estimate
 };
 } // imstk
-
-#endif // ifndef imstkInteractorStyle_h

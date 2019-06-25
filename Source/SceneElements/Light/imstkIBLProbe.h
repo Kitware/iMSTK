@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIBLProbe_h
-#define imstkIBLProbe_h
+#pragma once
 
 #include <string>
 
@@ -66,5 +65,3 @@ protected:
     std::shared_ptr<Texture> m_brdfLUTTexture = nullptr;
 };
 }
-
-#endif

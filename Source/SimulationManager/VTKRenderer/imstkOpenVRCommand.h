@@ -19,8 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#ifndef imstkOpenVRCommand_h
-#define imstkOpenVRCommand_h
+#pragma once
 
 #include <functional>
 #include <vtkCommand.h>
@@ -62,5 +61,3 @@ protected:
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
 };
 } // imstk
-
-#endif // ifndef imstkOpenVRCommand_h

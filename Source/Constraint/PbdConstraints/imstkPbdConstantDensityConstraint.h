@@ -19,8 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#ifndef imstkPbdConstantDensityConstraint_h
-#define imstkPbdConstantDensityConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -123,5 +122,3 @@ private:
     std::vector<int> m_numNeighbors;        ///> number of neighbors
 };
 }
-
-#endif // imstkPbdConstantDensityConstraint_h

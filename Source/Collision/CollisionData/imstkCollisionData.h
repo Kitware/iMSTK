@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionData_h
-#define imstkCollisionData_h
+#pragma once
 
 #include <array>
 
@@ -169,5 +168,3 @@ public:
     std::vector<PickingCollisionData> NodePickData;        ///< List of points that are picked
 };
 }
-
-#endif // ifndef imstkCollisionData_h

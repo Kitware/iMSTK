@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdConstraint_h
-#define imstkPbdConstraint_h
+#pragma once
 
 #include "imstkMath.h"
 
@@ -82,5 +81,3 @@ public:
     double m_epsilon = 1.0e-6;         ///> Tolerance used for the costraints
 };
 }
-
-#endif // imstkPbdConstraint_h

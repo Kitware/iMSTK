@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanDecalRenderDelegate_h
-#define imstkVulkanDecalRenderDelegate_h
+#pragma once
 
 #include "imstkDecalPool.h"
 #include "imstkCamera.h"
@@ -65,5 +64,3 @@ protected:
     VulkanLocalDecalFragmentUniforms m_decalFragmentUniforms;
 };
 }
-
-#endif

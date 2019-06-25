@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkInternalForceModel_h
-#define imstkInternalForceModel_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -81,5 +80,3 @@ public:
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) = 0;
 };
 } //imstk
-
-#endif // ifndef imstkTimeIntegrator_h

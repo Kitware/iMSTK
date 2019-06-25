@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearProjectionConstraint_h
-#define imstkLinearProjectionConstraint_h
+#pragma once
 
 #include "imstkMath.h"
 
@@ -98,5 +97,3 @@ private:
     Vec3d m_value = Vec3d(0., 0., 0.);      ///> Value in the subspace: range(I-m_projector)
 };
 } // imstk
-
-#endif // imstkLinearProjectionConstraint_h

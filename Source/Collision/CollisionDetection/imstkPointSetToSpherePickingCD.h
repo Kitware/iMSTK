@@ -19,8 +19,7 @@
 
    =========================================================================*/
 
-#ifndef imstkPointSetToSpherePickingCD_h
-#define imstkPointSetToSpherePickingCD_h
+#pragma once
 
 #include <memory>
 
@@ -73,5 +72,3 @@ private:
     unsigned int m_buttonId = 0;                            ///> button id
 };
 }
-
-#endif // ifndef imstkPointSetToSphereCD_h

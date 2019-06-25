@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkHexahedralMesh_h
-#define imstkHexahedralMesh_h
+#pragma once
 
 #include <set>
 
@@ -106,5 +105,3 @@ protected:
     std::vector<HexaArray> m_hexahedraVertices; ///< vertices of the hexahedra
 };
 } // imstk
-
-#endif // ifndef imstkHexahedralMesh_h

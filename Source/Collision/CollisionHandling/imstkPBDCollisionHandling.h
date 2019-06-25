@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPenaltyCH_h
-#define imstkPenaltyCH_h
+#pragma once
 
 // std library
 #include <memory>
@@ -84,5 +83,3 @@ private:
     std::shared_ptr<PbdSolver> m_PBDSolver;        /// The Solver for the collision constraints
 };
 }
-
-#endif // ifndef imstkPBDCollisionHandling_h

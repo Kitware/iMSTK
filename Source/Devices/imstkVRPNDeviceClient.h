@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVRPNDeviceClient_h
-#define imstkVRPNDeviceClient_h
+#pragma once
 
 #include <map>
 
@@ -126,5 +125,3 @@ private:
     std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
 };
 }
-
-#endif // ifndef imstkVRPNDeviceClient_h

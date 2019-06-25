@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDecal_h
-#define imstkDecal_h
+#pragma once
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -64,5 +63,3 @@ protected:
     glm::mat4 m_inverse;
 };
 }
-
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkFeElasticityForceModel_h
-#define imstkFeElasticityForceModel_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -74,5 +73,3 @@ protected:
     std::shared_ptr<FEElasticForceModel> m_feElasticForceModel;
 };
 }
-
-#endif // ifndef imstkTimeIntegrator_h

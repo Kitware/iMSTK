@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKdbgTrianglesRenderDelegate_h
-#define imstkVTKdbgTrianglesRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -56,5 +55,3 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }
-
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h

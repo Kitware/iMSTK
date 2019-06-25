@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSceneManager_h
-#define imstkSceneManager_h
+#pragma once
 
 #include <unordered_map>
 #include <memory>
@@ -81,5 +80,3 @@ protected:
     std::unordered_map<std::string, std::thread> m_threadMap;   ///>
 };
 } // imstk
-
-#endif // ifndef imstkSceneManager_h

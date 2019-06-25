@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPointSetToCapsuleCD_h
-#define imstkPointSetToCapsuleCD_h
+#pragma once
 
 #include <memory>
 
@@ -64,5 +63,3 @@ private:
     std::shared_ptr<Capsule> m_capsule;         ///> Capsule
 };
 }
-
-#endif // ifndef imstkPointSetToCapsuleCD_h

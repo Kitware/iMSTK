@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanLineMeshRenderDelegate_h
-#define imstkVulkanLineMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -60,5 +59,3 @@ protected:
     VulkanLocalVertexUniforms m_localVertexUniforms;
 };
 }
-
-#endif

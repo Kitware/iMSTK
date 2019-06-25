@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDeformableObject_h
-#define imstkDeformableObject_h
+#pragma once
 
 #include <memory>
 #include <string>
@@ -111,5 +110,3 @@ protected:
     std::shared_ptr<FEMDeformableBodyModel> m_defModel;
 };
 } // imstk
-
-#endif // ifndef imstkDeformableObject_h

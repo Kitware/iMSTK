@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearFEMForceModel_h
-#define imstkLinearFEMForceModel_h
+#pragma once
 
 #include <memory>
 
@@ -130,5 +129,3 @@ protected:
     vega::SparseMatrix *m_stiffnessMatrixRawPtr;
 };
 } // imstk
-
-#endif // imstkLinearFEMForceModel_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMSHMeshIO_h
-#define imstkMSHMeshIO_h
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -100,5 +99,3 @@ protected:
     static size_t numElemNodes(const ElemType& elType);
 };
 }
-
-#endif// imstkMSHMeshIO_h

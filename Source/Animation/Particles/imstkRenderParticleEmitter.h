@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRenderParticleEmitter_h
-#define imstkRenderParticleEmitter_h
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -208,5 +207,3 @@ protected:
     std::vector<std::unique_ptr<RenderParticle>> * m_particles;
 };
 } // imstk
-
-#endif // ifndef imstkRenderParticleEmitter_h

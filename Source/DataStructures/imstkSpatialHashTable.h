@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSpatialHashTable_h
-#define imstkSpatialHashTable_h
+#pragma once
 
 #include "imstkMath.h"
 
@@ -54,5 +53,3 @@ protected:
     double m_cellSize[3];
 };
 }
-
-#endif

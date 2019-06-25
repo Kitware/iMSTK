@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdDihedralConstraint_h
-#define imstkPbdDihedralConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -75,5 +74,3 @@ public:
     double m_stiffness; ///> Angular stiffness
 };
 } //imstk
-
-#endif // imstkPbdDihedralConstraint_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVisualObjectImporter_h
-#define imstkVisualObjectImporter_h
+#pragma once
 
 #include "assimp/Importer.hpp"
 #include "assimp/mesh.h"
@@ -120,5 +119,3 @@ private:
         std::initializer_list<const char *> extensionList);
 }; // VisualObjectImporter
 } // imstk
-
-#endif

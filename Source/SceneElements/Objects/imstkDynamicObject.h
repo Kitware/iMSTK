@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDynamicObject_h
-#define imstkDynamicObject_h
+#pragma once
 
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
@@ -155,5 +154,3 @@ protected:
     bool m_updateVisualFromPhysicsGeometry = true;                      ///> Defines if visual is updated from colliding mapping or physics mapping
 };
 } // imstk
-
-#endif // ifndef imstkDynamicObject_h

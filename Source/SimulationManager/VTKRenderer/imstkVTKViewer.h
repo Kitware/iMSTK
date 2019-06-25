@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKViewer_h
-#define imstkVTKViewer_h
+#pragma once
 
 #include <memory>
 #include <unordered_map>
@@ -119,5 +118,3 @@ protected:
 #endif
 };
 } // imstk
-
-#endif // ifndef imstkVTKViewer_h

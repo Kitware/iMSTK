@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef IMSTK_SOLVER_BASE_H
-#define IMSTK_SOLVER_BASE_H
+#pragma once
 
 namespace imstk
 {
@@ -39,5 +38,3 @@ public:
     virtual void solve() = 0;
 };
 } // imstk
-
-#endif // SOLVERS_NONLINEARSOLVER_H

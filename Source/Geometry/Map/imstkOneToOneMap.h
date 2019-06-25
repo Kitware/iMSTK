@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkOneToOneMap_h
-#define imstkOneToOneMap_h
+#pragma once
 
 #include <limits>
 
@@ -97,5 +96,3 @@ protected:
     std::map<size_t, size_t> m_oneToOneMap; ///> One to one mapping data
 };
 } // imstk
-
-#endif // imstkOneToOneMap_h

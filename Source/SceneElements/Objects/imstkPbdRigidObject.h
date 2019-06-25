@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdRigidObject_h
-#define imstkPbdRigidObject_h
+#pragma once
 
 #include "imstkPbdObject.h"
 namespace imstk
@@ -67,5 +66,3 @@ public:
 protected:
 };
 } // imstk
-
-#endif // ifndef imstkPbdRigidObject_h

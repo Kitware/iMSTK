@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIntersectionTestUtils_h
-#define imstkIntersectionTestUtils_h
+#pragma once
 
 #include <algorithm>
 
@@ -158,5 +157,3 @@ testPointToTriAABB(const double& x1, const double& y1, const double& z1,
                           min_y - prox2, max_y + prox2, min_z - prox2, max_z + prox2);
 }
 }
-
-#endif // ifndef imstkIntersectionTestUtils_h

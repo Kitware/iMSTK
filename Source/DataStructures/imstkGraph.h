@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGraph_h
-#define imstkGraph_h
+#pragma once
 
 #include <iostream>
 #include <algorithm>
@@ -73,5 +72,3 @@ protected:
     vector<vector<size_t>> m_adjList;    ///< A array of vectors to represent adjacency list
 };
 }
-
-#endif //imstkGraph_h

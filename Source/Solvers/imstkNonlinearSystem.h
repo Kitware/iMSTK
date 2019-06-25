@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkNonlinearSystem_h
-#define imstkNonlinearSystem_h
+#pragma once
 
 #include <memory>
 #include <stdio.h>
@@ -143,5 +142,3 @@ public:
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;*/
 };
 } // imstk
-
-#endif // imstkNonlinearSystem_h

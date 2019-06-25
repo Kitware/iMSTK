@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCube_h
-#define imstkCube_h
+#pragma once
 
 #include "imstkAnalyticalGeometry.h"
 
@@ -69,5 +68,3 @@ protected:
     double m_widthPostTransform = 1.0;  ///> Width of the cube once transform applied
 };
 }
-
-#endif // ifndef imstkCube_h

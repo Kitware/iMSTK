@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKLineMeshRenderDelegate_h
-#define imstkVTKLineMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -55,5 +54,3 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }
-
-#endif // ifndef imstkLineMeshRenderDelegate_h

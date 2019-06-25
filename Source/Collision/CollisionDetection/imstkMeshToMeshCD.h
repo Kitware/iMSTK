@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToMeshCD_h
-#define imstkMeshToMeshCD_h
+#pragma once
 
 // std library
 #include <memory>
@@ -85,5 +84,3 @@ private:
     std::shared_ptr<DeformModel> m_modelB;  ///>
 };
 }
-
-#endif // ifndef imstkMeshToMeshCD_h

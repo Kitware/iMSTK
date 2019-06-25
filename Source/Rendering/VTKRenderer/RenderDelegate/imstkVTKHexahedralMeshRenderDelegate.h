@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKHexahederalMeshRenderDelegate_h
-#define imstkVTKHexahederalMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -60,5 +59,3 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 } // imstk
-
-#endif // ifndef imstkTetrahedralMeshRenderDelegate_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdSolver_h
-#define imstkPbdSolver_h
+#pragma once
 
 #include "imstkSolverBase.h"
 #include "imstkPbdObject.h"
@@ -194,5 +193,3 @@ private:
     std::shared_ptr<PbdObject> m_pbdObject;
 };
 } // imstk
-
-#endif // imstkPbdSolver_h

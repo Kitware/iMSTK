@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdEdgeEdgeCollConstraint_h
-#define imstkPbdEdgeEdgeCollConstraint_h
+#pragma once
 
 #include "imstkPbdCollisionConstraint.h"
 
@@ -58,5 +57,3 @@ public:
     bool solvePositionConstraint();
 };
 }
-
-#endif // imstkPbdEdgeEdgeCollConstraint_h

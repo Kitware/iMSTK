@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkConjugateGradient_h
-#define imstkConjugateGradient_h
+#pragma once
 
 #include <memory>
 
@@ -141,5 +140,3 @@ private:
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk
-
-#endif // imstkConjugateGradient_h

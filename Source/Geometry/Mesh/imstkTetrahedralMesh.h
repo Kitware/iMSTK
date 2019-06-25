@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTetrahedralMesh_h
-#define imstkTetrahedralMesh_h
+#pragma once
 
 #include <set>
 #include <list>
@@ -141,5 +140,3 @@ protected:
     std::vector<bool> m_removedMeshElems;
 };
 }
-
-#endif // ifndef imstkTetrahedralMesh_h

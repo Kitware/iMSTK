@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDummyClient_h
-#define imstkDummyClient_h
+#pragma once
 
 #include "imstkDeviceClient.h"
 
@@ -87,5 +86,3 @@ public:
     void setButton(const unsigned int buttonId, const bool buttonStatus);
 };
 }
-
-#endif // ifndef imstkDummyClient_h

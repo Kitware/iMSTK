@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIterativeLinearSystem_h
-#define imstkIterativeLinearSystem_h
+#pragma once
 
 // iMSTK includes
 #include "imstkLinearSolver.h"
@@ -84,5 +83,3 @@ protected:
     Vectord m_residual;             ///> Storage for residual vector.
 };
 } //imstk
-
-#endif // imstkIterativeLinearSystem_h

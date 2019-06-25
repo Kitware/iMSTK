@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdState_h
-#define imstkPbdState_h
+#pragma once
 
 #include <Eigen/Dense>
 #include <vector>
@@ -83,5 +82,3 @@ private:
     StdVectorOfVec3d m_acc; ///> Nodal acelerations
 };
 } // imstk
-
-#endif // imstkPbdState_h

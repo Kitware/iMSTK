@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkAnalyticalGeometry_h
-#define imstkAnalyticalGeometry_h
+#pragma once
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
@@ -76,5 +75,3 @@ protected:
     Vec3d m_orientationAxisPostTransform = UP_VECTOR;  ///> orientation once transform applied
 };
 } //imstk
-
-#endif // ifndef imstkGeometry_h

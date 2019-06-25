@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSphereToSphereCD_h
-#define imstkSphereToSphereCD_h
+#pragma once
 
 #include <memory>
 
@@ -67,5 +66,3 @@ private:
     std::shared_ptr<Sphere> m_sphereB;  ///>
 };
 }
-
-#endif // ifndef imstkSphereToSphereCD_h

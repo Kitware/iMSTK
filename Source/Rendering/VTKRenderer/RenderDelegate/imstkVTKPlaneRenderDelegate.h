@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKPlaneRenderDelegate_h
-#define imstkVTKPlaneRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -59,5 +58,3 @@ protected:
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
 };
 } // imstk
-
-#endif // ifndef imstkPlaneRenderDelegate_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderPassGenerator_h
-#define imstkVulkanRenderPassGenerator_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 #include "imstkVulkanUtilities.h"
@@ -72,5 +71,3 @@ public:
         const uint32_t& correlationMask);
 };
 }
-
-#endif

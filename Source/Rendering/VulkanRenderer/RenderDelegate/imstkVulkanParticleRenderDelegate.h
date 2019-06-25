@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanParticleRenderDelegate_h
-#define imstkVulkanParticleRenderDelegate_h
+#pragma once
 
 #include "imstkRenderParticleEmitter.h"
 #include "imstkCamera.h"
@@ -89,5 +88,3 @@ protected:
     std::vector<float> m_particleDistances;
 };
 }
-
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionHandling_h
-#define imstkCollisionHandling_h
+#pragma once
 
 // Std library
 #include <memory>
@@ -108,5 +107,3 @@ protected:
     const std::shared_ptr<CollisionData> m_colData; ///< Collision data
 };
 }
-
-#endif // ifndef imstkCollisionHandling_h

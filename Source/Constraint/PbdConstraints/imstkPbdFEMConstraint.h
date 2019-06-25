@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdFEMConstraint_h
-#define imstkPbdFEMConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -61,5 +60,3 @@ public:
     Mat3d m_invRestMat;         ///>
 };
 }
-
-#endif // imstkPbdFEMConstraint_h

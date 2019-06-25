@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSceneObjectController_h
-#define imstkSceneObjectController_h
+#pragma once
 
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDeviceTracker.h"
@@ -91,4 +90,3 @@ protected:
     ControllerCallbackFunction m_updateCallback;   ///> function callback preceding module update
 };
 } // imstk
-#endif // ifndef imstkSceneObjectController_h

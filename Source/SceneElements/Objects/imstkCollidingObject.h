@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCollidingObject_h
-#define imstkCollidingObject_h
+#pragma once
 
 #include <memory>
 
@@ -107,5 +106,3 @@ protected:
 
 using StaticObject = CollidingObject;
 }// imstk
-
-#endif // ifndef imstkCollidingObject_h

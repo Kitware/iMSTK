@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSphere_h
-#define imstkSphere_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -75,5 +74,3 @@ protected:
     double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
 };
 } // imstk
-
-#endif // ifndef imstkSphere_h

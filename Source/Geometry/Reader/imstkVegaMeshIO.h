@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVegaMeshIO_h
-#define imstkVegaMeshIO_h
+#pragma once
 
 #include <memory>
 
@@ -90,5 +89,3 @@ protected:
     static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, std::vector<std::array<size_t, dim>>& cells);
 };
 } // imstk
-
-#endif // ifndef imstkVegaMeshIO_h

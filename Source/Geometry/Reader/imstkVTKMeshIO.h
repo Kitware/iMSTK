@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKMeshIO_h
-#define imstkVTKMeshIO_h
+#pragma once
 
 #include <memory>
 
@@ -150,5 +149,3 @@ protected:
     static void copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 };
 } // imstk
-
-#endif // ifndef imstkVTKMeshIO_h

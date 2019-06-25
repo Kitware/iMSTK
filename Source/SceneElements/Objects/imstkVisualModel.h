@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVisualModel_h
-#define imstkVisualModel_h
+#pragma once
 
 #include <memory>
 
@@ -75,5 +74,3 @@ protected:
     bool m_renderDelegateCreated = false; ///< true if RenderDelegate has been created
 };
 }
-
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshToMeshBruteforceCD_h
-#define imstkMeshToMeshBruteforceCD_h
+#pragma once
 
 #include <memory>
 #include <iostream>
@@ -75,5 +74,3 @@ private:
     std::shared_ptr<SurfaceMesh> m_object2;   ///> object 2
 };
 }
-
-#endif // ifndef imstkMeshToMeshBruteForceCD_h

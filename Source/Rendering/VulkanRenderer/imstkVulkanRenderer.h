@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanRenderer_h
-#define imstkVulkanRenderer_h
+#pragma once
 
 #include <iostream>
 #include <memory>
@@ -372,5 +371,3 @@ protected:
 #endif
 };
 }
-
-#endif

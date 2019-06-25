@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVRPNDeviceServer_h
-#define imstkVRPNDeviceServer_h
+#pragma once
 
 #include <vector>
 #include <map>
@@ -115,5 +114,3 @@ private:
     vrpn_MainloopContainer* m_deviceConnections;                      ///< VRPN device connections
 };
 } // imstk
-
-#endif // ifndef imstkVRPNDeviceServer_h

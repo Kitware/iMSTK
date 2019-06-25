@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVRPNArduinoDeviceClient_h
-#define imstkVRPNArduinoDeviceClient_h
+#pragma once
 
 #include <map>
 
@@ -94,5 +93,3 @@ private:
     float m_roll = 0;
 };
 }
-
-#endif // ifndef imstkVRPNArduinoDeviceClient_h

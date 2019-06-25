@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanInteractorStyle_h
-#define imstkVulkanInteractorStyle_h
+#pragma once
 
 #include "GLFW/glfw3.h"
 
@@ -110,5 +109,3 @@ private:
     unsigned int m_state = 0;
 };
 }
-
-#endif

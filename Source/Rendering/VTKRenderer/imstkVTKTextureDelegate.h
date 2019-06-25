@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKTexture_h
-#define imstkVTKTexture_h
+#pragma once
 
 #include "imstkTexture.h"
 #include "imstkTextureDelegate.h"
@@ -79,5 +78,3 @@ protected:
     std::string m_textureName;    ///< VTK texture unique name
 };
 }
-
-#endif

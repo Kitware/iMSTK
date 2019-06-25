@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKdbgPointsRenderDelegate_h
-#define imstkVTKdbgPointsRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -54,5 +53,3 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
 }
-
-#endif // ifndef imstkVTKdbgLinesRenderDelegate_h

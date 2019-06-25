@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSurfaceMesh_h
-#define imstkSurfaceMesh_h
+#pragma once
 
 // std library
 #include <array>
@@ -249,5 +248,3 @@ protected:
     size_t m_maxNumTriangles = 0;
 };
 } // imstk
-
-#endif // ifndef imstkSurfaceMesh_h

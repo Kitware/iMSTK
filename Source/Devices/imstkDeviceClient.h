@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDeviceClient_h
-#define imstkDeviceClient_h
+#pragma once
 
 #include <map>
 
@@ -121,5 +120,3 @@ protected:
     Vec3d m_force = Vec3d::Zero();           ///< Force vector
 };
 }
-
-#endif // ifndef imstkDeviceClient_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkAnimationObject_h
-#define imstkAnimationObject_h
+#pragma once
 
 #include <memory>
 
@@ -82,5 +81,3 @@ protected:
     std::shared_ptr<AnimationModel> m_animationModel;
 };
 } // imstk
-
-#endif // ifndef imstkAnimationObject_h

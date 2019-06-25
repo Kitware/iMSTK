@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCustomPolyDataMapper_h
-#define imstkVTKCustomPolyDataMapper_h
+#pragma once
 
 #include <fstream>
 #include <sstream>
@@ -157,5 +156,3 @@ protected:
     bool m_isSurfaceMapper = false;
 };
 }
-
-#endif

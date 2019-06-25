@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDirectLinearSolver_h
-#define imstkDirectLinearSolver_h
+#pragma once
 
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
@@ -117,5 +116,3 @@ private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;//?
 };
 } // imstk
-
-#endif // imstkDirectLinearSolver_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGeometryMap_h
-#define imstkGeometryMap_h
+#pragma once
 
 #include <memory>
 #include <iostream>
@@ -133,5 +132,3 @@ protected:
     std::shared_ptr<Geometry> m_slave;  ///> the geometry which follows the master
 };
 }
-
-#endif // imstkGeometryMap_h

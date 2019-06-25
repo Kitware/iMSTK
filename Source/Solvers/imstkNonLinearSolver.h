@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef SOLVERS_NONLINEARSOLVER_H
-#define SOLVERS_NONLINEARSOLVER_H
+#pragma once
 
 // STL includes
 #include <array>
@@ -142,5 +141,3 @@ protected:
     bool m_isSemiImplicit = true;                       ///> Semi-Implicit solver
 };
 } // imstk
-
-#endif // SOLVERS_NONLINEARSOLVER_H

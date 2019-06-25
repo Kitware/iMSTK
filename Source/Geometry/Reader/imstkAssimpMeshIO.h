@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkAssimpMeshIO_h
-#define imstkAssimpMeshIO_h
+#pragma once
 
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
@@ -72,5 +71,3 @@ public:
     static unsigned int getDefaultPostProcessSteps();
 };
 }
-
-#endif

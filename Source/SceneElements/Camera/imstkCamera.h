@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCamera_h
-#define imstkCamera_h
+#pragma once
 
 #include <string>
 #include <memory>
@@ -123,5 +122,3 @@ protected:
     double m_fieldOfView = 60;          ///> field of view in degrees
 };
 } // imstk
-
-#endif // ifndef imstkCamera_h

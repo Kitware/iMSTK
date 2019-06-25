@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDynamicalModel_h
-#define imstkDynamicalModel_h
+#pragma once
 
 #include <string>
 
@@ -164,5 +163,3 @@ protected:
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
 };
 } // imstk
-
-#endif // ifndef imstkDynamicalModel_h

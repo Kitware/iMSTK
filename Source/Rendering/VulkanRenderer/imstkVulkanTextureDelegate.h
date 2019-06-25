@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanTexture_h
-#define imstkVulkanTexture_h
+#pragma once
 
 #include "imstkTexture.h"
 #include "imstkVulkanMemoryManager.h"
@@ -181,5 +180,3 @@ protected:
     VulkanMemoryManager * m_memoryManager;
 };
 }
-
-#endif
