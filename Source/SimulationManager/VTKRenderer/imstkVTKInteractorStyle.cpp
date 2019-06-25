@@ -186,7 +186,7 @@ VTKInteractorStyle::OnChar()
              (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
     {
         m_fpsActor->VisibilityOff();
-        m_simManager->endSimulation();
+        //m_simManager->endSimulation();
     }
     else if (key == 'd' || key == 'D')  // switch rendering mode
     {

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTetrahedralMeshCD_h
-#define imstkTetrahedralMeshCD_h
+#pragma once
 
 // std library
 #include <memory>
@@ -83,5 +82,3 @@ private:
     SpatialHashTableSeparateChaining m_hashTable; ///> Spatial hash table
 };
 }
-
-#endif // ifndef imstkTetrahedralMeshCD_h

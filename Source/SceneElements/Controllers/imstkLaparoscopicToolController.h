@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLaparoscopicToolController_h
-#define imstkLaparoscopicToolController_h
+#pragma once
 
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDeviceTracker.h"
@@ -126,5 +125,3 @@ protected:
     Vec3d m_jawRotationAxis = Vec3d(0, 1., 0);  ///< Angle of the jaws
 };
 } // imstk
-
-#endif // ifndef imstkLaparoscopicToolController_h

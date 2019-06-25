@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSceneObjectControllerBase_h
-#define imstkSceneObjectControllerBase_h
+#pragma once
 
 namespace imstk
 {
@@ -54,5 +53,3 @@ public:
     virtual void setTrackerToOutOfDate() = 0;
 };
 } // imstk
-
-#endif // ifndef imstkSceneObjectControllerBase_h

@@ -227,9 +227,9 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene3(const std::sh
     return solids;
 }
 
-std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_ptr<Scene>& scene, int sceneIdx)
+std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_ptr<Scene>& scene)
 {
-    switch (sceneIdx)
+    switch (SCENE_ID)
     {
     case 1:
         return generateSolidsScene1(scene);

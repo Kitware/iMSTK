@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef ismtkBoneDrillingCH_h
-#define imstkBoneDrillingCH_h
+#pragma once
 
 // imstk
 #include "imstkCollisionHandling.h"
@@ -98,5 +97,3 @@ private:
     Vec3d m_prevPos;                            ///> Previous position of the colliding object
 };
 }
-
-#endif // ifndef imstkBoneDrillingCH_h

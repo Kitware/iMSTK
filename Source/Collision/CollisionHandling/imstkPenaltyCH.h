@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPenaltyCH_h
-#define imstkPenaltyCH_h
+#pragma once
 
 // std library
 #include <memory>
@@ -89,5 +88,3 @@ private:
     double m_damping = 0.5;     ///> Damping of the contact
 };
 }
-
-#endif // ifndef imstkPenaltyCH_h

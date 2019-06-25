@@ -1,43 +1,21 @@
-###########################################################################
-#
-# Copyright (c) Kitware, Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0.txt
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
-###########################################################################
+#-----------------------------------------------------------------------------
+# Add Example subdirectories
+#-----------------------------------------------------------------------------
+macro(listOfSubDir result curdir)
+      file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+      set(dirlist "")
+      foreach(child ${children})
+        if(IS_DIRECTORY ${curdir}/${child})
+          list(APPEND dirlist ${child})
+        endif()
+      endforeach()
+      set(${result} ${dirlist})
+    endmacro()
 
-project(Example-SPHFluid)
+    listOfSubDir(subDirs ${CMAKE_CURRENT_SOURCE_DIR})
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME}-BallDrop SPHFluid-BallDrop.cpp Fluid.cpp Solid.cpp Bunny.cpp)
-add_executable(${PROJECT_NAME}-HighViscousity SPHFluid-HighViscousity.cpp Fluid.cpp Solid.cpp Bunny.cpp)
-add_executable(${PROJECT_NAME}-BunnyShape SPHFluid-BunnyShape.cpp Fluid.cpp Solid.cpp Bunny.cpp)
+    foreach(subdir ${subDirs})
+      add_subdirectory(${subdir})
+endforeach() 
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME}-BallDrop SimulationManager)
-target_link_libraries(${PROJECT_NAME}-HighViscousity SimulationManager)
-target_link_libraries(${PROJECT_NAME}-BunnyShape SimulationManager)
 
-#-----------------------------------------------------------------------------
-# Add shaders
-#-----------------------------------------------------------------------------
-include(imstkCopyAndCompileShaders)
-CopyAndCompileShaders()
-
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------

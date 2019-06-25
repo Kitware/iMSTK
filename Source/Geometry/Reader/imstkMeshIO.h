@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMeshIO_h
-#define imstkMeshIO_h
+#pragma once
 
 // std library
 #include <memory>
@@ -91,5 +90,3 @@ public:
     static const MeshFileType getFileType(const std::string& filePath);
 };
 } // imstk
-
-#endif // ifndef imstkMeshIO_h

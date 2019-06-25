@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkViewer_h
-#define imstkViewer_h
+#pragma once
 
 #include <memory>
 
@@ -137,5 +136,3 @@ protected:
     std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();;
 };
 }
-
-#endif

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearSolver_h
-#define imstkLinearSolver_h
+#pragma once
 
 // imstk includes
 #include "imstkLinearSystem.h"
@@ -117,5 +116,3 @@ protected:
     std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };
 } // imstk
-
-#endif // imstkLinearSolver_h

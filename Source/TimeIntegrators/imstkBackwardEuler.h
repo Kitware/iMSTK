@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkBackwardEuler_h
-#define imstkBackwardEuler_h
+#pragma once
 
 #include "imstkTimeIntegrator.h"
 
@@ -81,5 +80,3 @@ protected:
 //    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
 } // imstk
-
-#endif // ifndef imstkBackwardEuler_h

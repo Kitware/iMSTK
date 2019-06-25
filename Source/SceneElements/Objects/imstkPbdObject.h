@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdObject_h
-#define imstkPbdObject_h
+#pragma once
 
 #include "imstkDynamicObject.h"
 #include "imstkDynamicalModel.h"
@@ -92,5 +91,3 @@ protected:
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };
 } // imstk
-
-#endif // imstkPbdObject_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLight_h
-#define imstkLight_h
+#pragma once
 
 #include <string>
 
@@ -279,5 +278,3 @@ protected:
     float m_spotAngle = 45.;
 };
 } // imstk
-
-#endif // ifndef imstkLight_h

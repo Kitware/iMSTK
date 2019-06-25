@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPlane_h
-#define imstkPlane_h
+#pragma once
 
 // imstk
 #include "imstkAnalyticalGeometry.h"
@@ -86,5 +85,3 @@ protected:
     double m_widthPostTransform = 1.0;  ///> Width of the plane once transform applied
 };
 } // imstk
-
-#endif // ifndef imstkPlane_h

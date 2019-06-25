@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCameraController_h
-#define imstkCameraController_h
+#pragma once
 
 #include "imstkModule.h"
 #include "imstkDeviceTracker.h"
@@ -74,7 +73,7 @@ protected:
     ///
     /// \brief
     ///
-    virtual void initModule() override;
+    virtual void initModule() override {};
 
     ///
     /// \brief
@@ -92,5 +91,3 @@ protected:
     Quatd m_cameraRotationalOffset = Quatd::Identity(); ///< camera head angle offset (in deg)
 };
 } // imstk
-
-#endif // ifndef imstkCameraController_h

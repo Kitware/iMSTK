@@ -122,15 +122,15 @@ using AffineTransform3d = Eigen::Affine3d;
 #define LN2              Real(0.693147180559945309417)
 #define LN10             Real(2.30258509299404568402)
 
-#define MAX_REAL          std::numeric_limits<Real>::max()
-#define MIN_REAL          std::numeric_limits<Real>::min()
-#define MACHINE_PRECISION std::numeric_limits<Real>::epsilon()
+#define MAX_REAL           std::numeric_limits<Real>::max()
+#define MIN_REAL           std::numeric_limits<Real>::min()
+#define VERY_SMALL_EPSILON std::numeric_limits<Real>::epsilon()
 
-#define MAX_D               std::numeric_limits<double>::max()
-#define MIN_D               std::numeric_limits<double>::min()
-#define MACHINE_PRECISION_D std::numeric_limits<double>::epsilon()
+#define MAX_D                std::numeric_limits<double>::max()
+#define MIN_D                std::numeric_limits<double>::min()
+#define VERY_SMALL_EPSILON_D std::numeric_limits<double>::epsilon()
 
-#define MAX_F               std::numeric_limits<float>::max()
-#define MIN_F               std::numeric_limits<float>::min()
-#define MACHINE_PRECISION_F std::numeric_limits<float>::epsilon()
+#define MAX_F                std::numeric_limits<float>::max()
+#define MIN_F                std::numeric_limits<float>::min()
+#define VERY_SMALL_EPSILON_F std::numeric_limits<float>::epsilon()
 } // end namespace imstk

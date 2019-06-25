@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLinearSystem_h
-#define imstkLinearSystem_h
+#pragma once
 
 #include "imstkNonlinearSystem.h"
 
@@ -146,5 +145,3 @@ private:
     Vectord m_f; ///> Scratch storage for matrix-vector operations
 };
 } // imstk
-
-#endif // imstkLinearSystem_h

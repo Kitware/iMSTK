@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanResources_h
-#define imstkVulkanResources_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 
@@ -213,5 +212,3 @@ protected:
     VkDeviceSize m_offset;
 };
 } // imstk
-
-#endif // #define imstkVulkanResources_h

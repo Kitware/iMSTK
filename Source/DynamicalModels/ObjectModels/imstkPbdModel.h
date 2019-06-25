@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdModel_h
-#define imstkPbdModel_h
+#pragma once
 
 #include <vector>
 #include <Eigen/Dense>
@@ -247,5 +246,3 @@ protected:
     std::shared_ptr<PBDModelConfig>  m_Parameters;             ///> Model parameters, must be set before simulation
 };
 } // imstk
-
-#endif // imstkPbdModel_h

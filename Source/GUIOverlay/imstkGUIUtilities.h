@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGUIUtilities_h
-#define imstkGUIUtilities_h
+#pragma once
 
 #include "imgui.h"
 
@@ -54,5 +53,3 @@ public:
 }; // GUIUtilities
 } // GUI
 } // imstk
-
-#endif // ifndef imstkGUIUtilities_h

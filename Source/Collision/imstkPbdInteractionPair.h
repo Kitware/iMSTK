@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdInteractionPair_h
-#define imstkPbdInteractionPair_h
+#pragma once
 
 #include "imstkInteractionPair.h"
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
@@ -81,5 +80,3 @@ private:
     unsigned int maxIter;
 };
 }
-
-#endif // imstkPbdInteractionPair_h

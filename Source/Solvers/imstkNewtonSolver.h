@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef SOLVERS_INEXACTNEWTON_H
-#define SOLVERS_INEXACTNEWTON_H
+#pragma once
 
 #include "imstkNonLinearSolver.h"
 #include "imstkLinearSolver.h"
@@ -219,5 +218,3 @@ private:
     std::vector<double> m_fnorms;                     ///> Consecutive function norms
 };
 } // imstk
-
-#endif // SOLVERS_INEXACTNEWTON_H

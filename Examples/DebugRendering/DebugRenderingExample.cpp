@@ -64,11 +64,17 @@ int main()
     scene->addDebugGeometry(debugTriangleGeo);
 
     // Create debug Lines
-    auto debugLinesGeo = std::make_shared<DebugRenderLines>("debugLines", 2);
+    auto debugLinesGeo = std::make_shared<DebugRenderLines>("debugLines");
 
     StdVectorOfVec3d linesVerts;
-    linesVerts.push_back(Vec3d(0, 0, 0));
-    linesVerts.push_back(Vec3d(100, 100, 100));
+    linesVerts.push_back(Vec3d(15, 0, 0));
+    linesVerts.push_back(Vec3d(100, 0, 0));
+
+    linesVerts.push_back(Vec3d(0, 15, 0));
+    linesVerts.push_back(Vec3d(0, 100, 0));
+
+    linesVerts.push_back(Vec3d(0, 0, 15));
+    linesVerts.push_back(Vec3d(0, 0, 100));
 
     debugLinesGeo->setVertexData(linesVerts);
 

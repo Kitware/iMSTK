@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanBuffer_h
-#define imstkVulkanBuffer_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 
@@ -47,5 +46,3 @@ protected:
     uint32_t m_buffering = 1;
 };
 }
-
-#endif

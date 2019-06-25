@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdState_h
-#define imstkPbdState_h
+#pragma once
 
 #include <Eigen/Dense>
 #include <vector>
@@ -48,7 +47,7 @@ public:
     /// \brief Initialize the pbd state
     ///
     void initialize(const size_t numNodes, const bool (&options)[3]);
-    void initialize(const std::shared_ptr<PointSet>& m, const bool (&options)[3]);
+    void initialize(const std::shared_ptr<PointSet>& m, const bool(&options)[3]);
 
     ///
     /// \brief Get/Set nodal position given the index
@@ -83,5 +82,3 @@ private:
     StdVectorOfVec3d m_acc; ///> Nodal acelerations
 };
 } // imstk
-
-#endif // imstkPbdState_h

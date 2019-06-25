@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkSpatialHashTableSeparateChaining_h
-#define imstkSpatialHashTableSeparateChaining_h
+#pragma once
 
 #include <memory>
 #include <unordered_set>
@@ -161,5 +160,3 @@ protected:
     std::shared_ptr<std::unordered_set<PointEntry>> m_table;
 };
 }
-
-#endif

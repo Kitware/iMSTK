@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKRenderDelegate_h
-#define imstkVTKRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -119,5 +118,3 @@ protected:
     vtkSmartPointer<vtkTransform> m_transform;
 };
 }
-
-#endif // ifndef imstkRenderDelegate_h

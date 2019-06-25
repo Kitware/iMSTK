@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVectorizedState_h
-#define imstkVectorizedState_h
+#pragma once
 
 #include <memory>
 
@@ -109,5 +108,3 @@ protected:
     Vectord m_qDotDot;   // Double derivative of state w.r.t time
 };
 } // imstk
-
-#endif // ifndef imstkVectorizedState_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGaussSeidel_h
-#define imstkGaussSeidel_h
+#pragma once
 
 #include <memory>
 
@@ -136,5 +135,3 @@ private:
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk
-
-#endif // imstkGaussSeidel_h

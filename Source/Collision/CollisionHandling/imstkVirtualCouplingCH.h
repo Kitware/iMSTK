@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVirtualCouplingCH_h
-#define imstkVirtualCouplingCH_h
+#pragma once
 
 // imstk
 #include "imstkCollisionHandling.h"
@@ -87,5 +86,3 @@ private:
     double m_damping = 0.005;                   ///> Damping coefficient used to compute damping force
 };
 }
-
-#endif // ifndef imstkVirtualCouplingCH_h

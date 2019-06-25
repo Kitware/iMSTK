@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKSphereRenderDelegate_h
-#define imstkVTKSphereRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -58,5 +57,3 @@ protected:
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
 };
 } // imstk
-
-#endif // ifndef imstkSphereRenderDelegate_h

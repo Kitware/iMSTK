@@ -19,8 +19,7 @@
 
    =========================================================================*/
 
-#ifndef imstkUnidirectionalPlaneToSphereCD_h
-#define imstkUnidirectionalPlaneToSphereCD_h
+#pragma once
 
 #include <memory>
 
@@ -68,5 +67,3 @@ private:
     std::shared_ptr<Sphere> m_sphereB;  ///>
 };
 }
-
-#endif // ifndef imstkUnidirectionalToSphereCD_h

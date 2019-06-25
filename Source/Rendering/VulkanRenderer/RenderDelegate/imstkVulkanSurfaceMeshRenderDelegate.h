@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanSurfaceMeshRenderDelegate_h
-#define imstkVulkanSurfaceMeshRenderDelegate_h
+#pragma once
 
 #include "imstkSurfaceMesh.h"
 
@@ -59,5 +58,3 @@ protected:
     std::vector<bool> m_modified;
 };
 }
-
-#endif

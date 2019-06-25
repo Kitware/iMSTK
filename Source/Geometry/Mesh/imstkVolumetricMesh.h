@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVolumetricMesh_h
-#define imstkVolumetricMesh_h
+#pragma once
 
 #include <memory>
 
@@ -79,5 +78,3 @@ protected:
     std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh = nullptr; ///> Attached vega mesh
 };
 } // imstk
-
-#endif // ifndef imstkVolumetricMesh_h

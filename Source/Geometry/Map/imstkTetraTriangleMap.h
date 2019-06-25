@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTetraTriangleMap_h
-#define imstkTetraTriangleMap_h
+#pragma once
 
 #include <limits>
 
@@ -97,5 +96,3 @@ protected:
     std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
 };
 } // imstk
-
-#endif // imstkTetraTriangleMap_h

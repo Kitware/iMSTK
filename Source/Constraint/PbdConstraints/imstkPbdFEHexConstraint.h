@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdFeHexConstraint_h
-#define imstkPbdFeHexConstraint_h
+#pragma once
 
 #include "imstkPbdFEMConstraint.h"
 
@@ -61,5 +60,3 @@ public:
     bool solvePositionConstraint(PbdModel &model) override;
 };
 } // imstk
-
-#endif // imstkPbdFeHexConstraint_h

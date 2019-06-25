@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanCapsuleRenderDelegate_h
-#define imstkVulkanCapsuleRenderDelegate_h
+#pragma once
 
 #include "imstkCapsule.h"
 
@@ -58,5 +57,3 @@ protected:
     std::vector<VulkanBasicVertex> m_capsuleVertices;
 };
 }
-
-#endif

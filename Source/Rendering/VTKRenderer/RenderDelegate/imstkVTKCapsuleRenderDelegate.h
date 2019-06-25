@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCapsuleRenderDelegate_h
-#define imstkVTKCapsuleRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -58,5 +57,3 @@ protected:
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 } // imstk
-
-#endif // ifndef imstkCapsuleRenderDelegate_h

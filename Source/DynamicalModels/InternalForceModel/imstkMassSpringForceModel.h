@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkMassSpringForceModel_h
-#define imstkMassSpringForceModel_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -70,5 +69,3 @@ protected:
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
 };
 } // imstk
-
-#endif // imstkMassSpringForceModel_h

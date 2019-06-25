@@ -27,10 +27,10 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 
-using namespace imstk;
+#include "Fluid.hpp"
+#include "Solid.hpp"
 
-std::shared_ptr<SPHObject> generateFluid(const std::shared_ptr<Scene>&scene, int sceneIdx, const double particleRadius);
-std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_ptr<Scene>& scene, int sceneIdx);
+using namespace imstk;
 
 ///
 /// \brief Usage: ./SPHFluid [threads=<num_threads>] [radius=<particle_radius>]
@@ -39,7 +39,7 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_p
 int main(int argc, char* argv[])
 {
     // SimulationManager must be created first
-    auto sdk = std::make_shared<SimulationManager>(0);
+    auto sdk = std::make_shared<SimulationManager>();
 
     int threads = -1;
     double particleRadius = 0.1;
@@ -77,8 +77,8 @@ int main(int argc, char* argv[])
     auto scene = sdk->createNewScene("SPH Fluid");
 
     // Generate fluid and solid objects
-    auto fluidObj = generateFluid(scene, SCENE_ID, particleRadius);
-    auto solids = generateSolids(scene, SCENE_ID);
+    auto fluidObj = generateFluid(scene, particleRadius);
+    auto solids = generateSolids(scene);
 
     // Collision between fluid and solid objects
     auto colGraph = scene->getCollisionGraph();

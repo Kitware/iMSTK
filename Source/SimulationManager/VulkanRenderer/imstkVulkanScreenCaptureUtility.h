@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanScreenCaptureUtility_h
-#define imstkVulkanScreenCaptureUtility_h
+#pragma once
 
 #include "imstkScreenCaptureUtility.h"
 
@@ -54,5 +53,3 @@ public:
 protected:
 };
 } // imstk
-
-#endif // ifndef imstkScreenCaptureUtility_h

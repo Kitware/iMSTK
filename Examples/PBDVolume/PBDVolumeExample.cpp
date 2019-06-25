@@ -120,8 +120,8 @@ int main()
     scene->addLight(light);
 
     // print UPS
-    auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);
+    /*auto ups = std::make_shared<UPSCounter>();
+    apiutils::printUPS(sdk->getSceneManager(scene), ups);*/
 
     sdk->setActiveScene(scene);
     sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);

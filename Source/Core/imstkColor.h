@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkColor_h
-#define imstkColor_h
+#pragma once
 
 #include <iostream>
 
@@ -104,4 +103,3 @@ struct Color
     static Color Yellow;
 };
 }
-#endif // ifndef imstkColor_h

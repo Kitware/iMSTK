@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRigidObject_h
-#define imstkRigidObject_h
+#pragma once
 
 #ifdef iMSTK_USE_ODE
 // imstk
@@ -87,4 +86,3 @@ protected:
 };
 } // imstk
 #endif //imstk_USE_ODE
-#endif // ifndef imstkRigidObject_h

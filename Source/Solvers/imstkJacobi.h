@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkJacobi_h
-#define imstkJacobi_h
+#pragma once
 
 #include <memory>
 
@@ -136,5 +135,3 @@ private:
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
 };
 } // imstk
-
-#endif // imstkJacobi_h

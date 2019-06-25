@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRenderMaterial_h
-#define imstkRenderMaterial_h
+#pragma once
 
 #include "imstkTexture.h"
 #include "imstkColor.h"
@@ -203,5 +202,3 @@ protected:
     BlendMode m_blendMode = BlendMode::ALPHA;
 };
 }
-
-#endif

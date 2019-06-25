@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLineMesh_h
-#define imstkLineMesh_h
+#pragma once
 
 #include <memory>
 #include <array>
@@ -108,5 +107,3 @@ private:
     std::vector<Color> m_vertexColors;
 };
 } // imstk
-
-#endif // ifndef imstkLineMesh_h

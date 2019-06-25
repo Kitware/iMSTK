@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRenderParticles_h
-#define imstkRenderParticles_h
+#pragma once
 
 #include <vector>
 #include <climits>
@@ -132,5 +131,3 @@ protected:
     virtual void updatePostTransformData() override {};
 };
 }
-
-#endif

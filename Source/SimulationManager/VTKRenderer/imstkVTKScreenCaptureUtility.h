@@ -19,8 +19,7 @@
 
    =========================================================================*/
 
-#ifndef imstkVTKScreenCaptureUtility_h
-#define imstkVTKScreenCaptureUtility_h
+#pragma once
 
 #include "imstkScreenCaptureUtility.h"
 
@@ -68,5 +67,3 @@ protected:
     vtkRenderWindow* m_renderWindow; //> render window whose screen shot will be taken
 };
 } // imstk
-
-#endif // ifndef imstkScreenCaptureUtility_h

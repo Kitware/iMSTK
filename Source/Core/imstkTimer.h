@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTimer_h
-#define imstkTimer_h
+#pragma once
 
 #include "g3log/g3log.hpp"
 
@@ -192,5 +191,3 @@ protected:
     unsigned int m_updateCount = 0; ///> Current update count
 };
 }
-
-#endif // ifndef imstkTimer_h

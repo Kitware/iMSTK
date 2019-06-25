@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkScreenCaptureUtility_h
-#define imstkScreenCaptureUtility_h
+#pragma once
 
 #include <string>
 
@@ -67,5 +66,3 @@ protected:
     std::string m_screenShotPrefix; //> the prefix for the screenshots to be saved
 };
 } // imstk
-
-#endif // ifndef imstkScreenCaptureUtility_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkAnimationModel_h
-#define imstkAnimationModel_h
+#pragma once
 
 #include <memory>
 
@@ -66,5 +65,3 @@ protected:
     std::shared_ptr<Geometry> m_geometry = nullptr;
 };
 } // imstk
-
-#endif // ifndef imstkAnimationModel_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkGraph_h
-#define imstkGraph_h
+#pragma once
 
 #include <unordered_set>
 #include <iostream>
@@ -101,5 +100,3 @@ protected:
     ColoringMethod m_ColoringMethod = ColoringMethod::WelshPowell;
 };
 }
-
-#endif //imstkGraph_h

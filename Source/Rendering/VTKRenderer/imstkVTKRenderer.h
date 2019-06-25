@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKRenderer_h
-#define imstkVTKRenderer_h
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -124,5 +123,3 @@ protected:
 #endif
 };
 }
-
-#endif // ifndef imstkVTKRenderer_h

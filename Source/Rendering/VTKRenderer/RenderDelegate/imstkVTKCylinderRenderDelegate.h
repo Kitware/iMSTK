@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKCylinderRenderDelegate_h
-#define imstkVTKCylinderRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -61,5 +60,3 @@ protected:
     vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 } // imstk
-
-#endif // ifndef imstkCylinderRenderDelegate_h

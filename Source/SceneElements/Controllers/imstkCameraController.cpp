@@ -28,11 +28,6 @@
 namespace imstk
 {
 void
-CameraController::initModule()
-{
-}
-
-void
 CameraController::runModule()
 {
     if (!m_trackingDataUptoDate)

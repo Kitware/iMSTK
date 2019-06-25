@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdVolumeConstraint_h
-#define imstkPbdVolumeConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -61,5 +60,3 @@ public:
     double m_stiffness;  ///> Stiffness of the volume constraint
 };
 }
-
-#endif // imstkPbdVolumeConstraint_h

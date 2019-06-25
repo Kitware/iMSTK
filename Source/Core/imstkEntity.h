@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkEntity_h
-#define imstkEntity_h
+#pragma once
 
 #include <atomic>
 
@@ -53,5 +52,3 @@ protected:
     EntityID m_ID; ///< unique ID of entity
 };
 }
-
-#endif

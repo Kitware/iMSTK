@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKTetrahedralMeshRenderDelegate_h
-#define imstkVTKTetrahedralMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -62,5 +61,3 @@ protected:
     vtkSmartPointer<vtkUnstructuredGrid> m_mesh; ///> Mapped tetrahedral mesh
 };
 } // imstk
-
-#endif // ifndef imstkTetrahedralMeshRenderDelegate_h

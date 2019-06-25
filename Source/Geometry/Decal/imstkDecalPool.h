@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDecalPool_h
-#define imstkDecalPool_h
+#pragma once
 
 #include <queue>
 #include <array>
@@ -72,5 +71,3 @@ protected:
     glm::ivec3 m_triangles[12];
 };
 }
-
-#endif

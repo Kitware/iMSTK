@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkDbgGeometry_h
-#define imstkDbgGeometry_h
+#pragma once
 
 #include "imstkMath.h"
 #include "imstkRenderMaterial.h"
@@ -176,5 +175,3 @@ protected:
     }
 };
 }
-
-#endif // ifndef imstkTetrahedralMesh_h

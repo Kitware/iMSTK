@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkTextureDelegate_h
-#define imstkTextureDelegate_h
+#pragma once
 
 #include <string>
 #include <memory>
@@ -50,5 +49,3 @@ protected:
     virtual void loadTexture(std::shared_ptr<Texture> texture) = 0;
 };
 }
-
-#endif

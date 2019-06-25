@@ -30,10 +30,10 @@ limitations under the License.
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
 #include <vtkPointData.h>
-#include <vtkPolyLine.h>
 #include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkTrivialProducer.h>
+#include <vtkLine.h>
 
 namespace imstk
 {
@@ -47,29 +47,30 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<DebugRender
     double* vertData = reinterpret_cast<double*>(triVertData.data());
     m_mappedVertexArray->SetArray(vertData, triVertData.size() * 3, 1);
 
+    // Create lines polydata
+    auto linesPolyData = vtkSmartPointer<vtkPolyData>::New();
+
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(triVertData.size());
     points->SetData(m_mappedVertexArray);
+    linesPolyData->SetPoints(points);
 
     // Create cells
-    auto polyLine = vtkSmartPointer<vtkPolyLine>::New();
-    polyLine->GetPointIds()->SetNumberOfIds(triVertData.size());
-    for (unsigned int i = 0; i < triVertData.size(); ++i)
+    auto lines = vtkSmartPointer<vtkCellArray>::New();
+    for (unsigned int i = 0; i < triVertData.size() - 1; i += 2)
     {
-        polyLine->GetPointIds()->SetId(i, i);
-    }
-    auto cells = vtkSmartPointer<vtkCellArray>::New();
-    cells->InsertNextCell(polyLine);
+        auto l = vtkSmartPointer<vtkLine>::New();
+        l->GetPointIds()->SetId(0, i);
+        l->GetPointIds()->SetId(1, i + 1);
 
-    // Create PolyData
-    auto polydata = vtkSmartPointer<vtkPolyData>::New();
-    polydata->SetPoints(points);
-    polydata->SetLines(cells);
+        lines->InsertNextCell(l);
+    }
+    linesPolyData->SetLines(lines);
 
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(polydata);
+    source->SetOutput(linesPolyData);
     m_Lines->setDataModifiedFlag(false);
 
     // Update Transform, Render Properties

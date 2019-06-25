@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdCollisionConstraint_h
-#define imstkPbdCollisionConstraint_h
+#pragma once
 
 #include <vector>
 #include <memory>
@@ -66,5 +65,3 @@ public:
     std::shared_ptr<PbdModel> m_model2;
 };
 }
-
-#endif // imstkPbdCollisionConstraint_h

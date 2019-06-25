@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkForceModelConfig_h
-#define imstkForceModelConfig_h
+#pragma once
 
 #include <string.h>
 
@@ -190,5 +189,3 @@ protected:
     bool m_loadSuccessful; ///> Configuration loading is successful
 };
 } // imstk
-
-#endif // imstkForceModelConfig_h

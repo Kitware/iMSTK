@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPointSetToSphereCD_h
-#define imstkPointSetToSphereCD_h
+#pragma once
 
 #include <memory>
 
@@ -64,5 +63,3 @@ private:
     std::shared_ptr<Sphere> m_sphere;           ///> Sphere
 };
 }
-
-#endif // ifndef imstkPointSetToSphereCD_h

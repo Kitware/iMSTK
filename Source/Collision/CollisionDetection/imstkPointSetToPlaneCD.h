@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPointSetToPlaneCD_h
-#define imstkPointSetToPlaneCD_h
+#pragma once
 
 #include <memory>
 
@@ -64,5 +63,3 @@ private:
     std::shared_ptr<Plane> m_plane;            ///> Plane
 };
 }
-
-#endif // ifndef imstkPointSetToPlaneCD_h

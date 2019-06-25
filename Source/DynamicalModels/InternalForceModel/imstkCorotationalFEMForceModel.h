@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkCorotationalFEMForceModel_h
-#define imstkCorotationalFEMForceModel_h
+#pragma once
 
 #include <memory>
 
@@ -89,5 +88,3 @@ protected:
     int m_warp;
 };
 } // imstk
-
-#endif // imstkCorotationalFEMForceModel_h

@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanInteractorStyleVR_h
-#define imstkVulkanInteractorStyleVR_h
+#pragma once
 
 #ifdef iMSTK_ENABLE_VR
 #include <vector>
@@ -116,7 +115,5 @@ protected:
     std::map<vr::TextureID_t, vr::RenderModel_TextureMap_t*> m_VRTextures;
 };
 }
-
-#endif
 
 #endif

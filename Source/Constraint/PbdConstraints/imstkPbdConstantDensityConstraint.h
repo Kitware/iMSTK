@@ -19,8 +19,7 @@ limitations under the License.
 
 =========================================================================*/
 
-#ifndef imstkPbdConstantDensityConstraint_h
-#define imstkPbdConstantDensityConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 #include "imstkNeighborSearch.h"
@@ -123,5 +122,3 @@ private:
     std::shared_ptr<NeighborSearch> m_NeighborSearcher;  ///> neighbor searcher, must be initialized during model initialization
 };
 }
-
-#endif // imstkPbdConstantDensityConstraint_h

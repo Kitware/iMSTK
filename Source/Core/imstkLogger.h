@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkLogger_h
-#define imstkLogger_h
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -117,4 +116,3 @@ private:
     std::condition_variable m_condition;
 };
 }
-#endif // ifndef imstkLogUtility_h

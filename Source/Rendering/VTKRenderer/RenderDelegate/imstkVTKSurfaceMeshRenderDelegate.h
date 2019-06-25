@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVTKSurfaceMeshRenderDelegate_h
-#define imstkVTKSurfaceMeshRenderDelegate_h
+#pragma once
 
 #include <memory>
 
@@ -68,5 +67,3 @@ protected:
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
 };
 }
-
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h

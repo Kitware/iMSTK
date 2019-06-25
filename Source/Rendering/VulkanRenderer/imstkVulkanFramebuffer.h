@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkVulkanFramebuffer_h
-#define imstkVulkanFramebuffer_h
+#pragma once
 
 #include "vulkan/vulkan.h"
 
@@ -118,5 +117,3 @@ private:
     VkRenderPass * m_renderPass;
 };
 }
-
-#endif

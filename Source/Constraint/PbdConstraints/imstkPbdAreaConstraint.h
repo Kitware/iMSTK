@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkPbdAreaConstraint_h
-#define imstkPbdAreaConstraint_h
+#pragma once
 
 #include "imstkPbdConstraint.h"
 
@@ -61,5 +60,3 @@ public:
     double m_stiffness; ///> Stiffness of the area constraint
 };
 } // imstk
-
-#endif // imstkPbdAreaConstraint_h

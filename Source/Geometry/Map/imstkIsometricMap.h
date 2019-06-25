@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkIsometricMap_h
-#define imstkIsometricMap_h
+#pragma once
 
 #include "imstkGeometryMap.h"
 
@@ -82,5 +81,3 @@ protected:
     RigidTransform3d m_rigidTransform; ///> Rigid transform
 };
 } // imstk
-
-#endif // imstkIsometricMap_h
