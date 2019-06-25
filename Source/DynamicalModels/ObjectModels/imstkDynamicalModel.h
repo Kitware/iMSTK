@@ -126,7 +126,7 @@ public:
     ///
     /// \brief
     ///
-    virtual void updatePhysicsGeometry(){};
+    virtual void updatePhysicsGeometry(){}
 
     ///
     /// \brief Set the time step size

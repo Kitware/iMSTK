@@ -37,6 +37,7 @@ void ThreadManager::setThreadPoolSize(const size_t nThreads)
     {
         s_tbbGlobalControl.reset();
     }
+
     s_tbbGlobalControl = std::unique_ptr<tbb::global_control>(
                 new tbb::global_control(tbb::global_control::max_allowed_parallelism,
                                         nThreads));

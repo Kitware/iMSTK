@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <unordered_set>
 #include <iostream>
 #include <algorithm>
 
@@ -28,27 +29,22 @@
 
 namespace imstk
 {
-using namespace std;
-
-///
-/// \brief data structure to store graph edges
-///
-struct Edge
-{
-    size_t src, dest;
-};
-
 ///
 /// \brief class to represent a graph object
 ///
 class Graph
 {
 public:
+    enum class ColoringMethod
+    {
+        Greedy,
+        WelshPowell
+    };
+
     ///
     /// \brief Constructor/destructor
     ///
-    Graph(const size_t size){ m_adjList.resize(size); };
-    Graph(vector<Edge> edges);
+    Graph(const size_t size){ m_adjList.resize(size); }
     ~Graph() = default;
 
     ///
@@ -57,18 +53,50 @@ public:
     void addEdge(const size_t v, const size_t w);
 
     ///
+    /// \brief Get size of the graph
+    ///
+    size_t size() const { return m_adjList.size(); }
+
+    ///
     /// \brief print adjacency list representation of graph
     ///
     void print() const;
 
     ///
-    /// \brief Assigns colors (starting from 0) to all vertices and prints
-    /// the assignment of colors
+    /// \brief Set the default colorizing method
     ///
-    vector<size_t> doGreedyColoring(bool print = false) const;
+    void setDefaultColoringMethod(ColoringMethod method) { m_ColoringMethod = method; }
+
+    ///
+    /// \brief Colorize using the default method and prints the assignment of colors
+    /// \return Vertex colors and number of colors
+    ///
+    std::pair<std::vector<unsigned short>, unsigned short>
+    doColoring(bool print = false) const { return doColoring(m_ColoringMethod, print); }
+
+    ///
+    /// \brief Colorize using the given method and prints the assignment of colors
+    /// \return Vertex colors and number of colors
+    ///
+    std::pair<std::vector<unsigned short>, unsigned short>
+    doColoring(ColoringMethod method, bool print = false) const;
 
 protected:
+    ///
+    /// \brief Colorize using greedy algorithm and print the assignment of colors
+    /// \return Vertex colors and number of colors
+    ///
+    std::pair<std::vector<unsigned short>, unsigned short>
+    doColoringGreedy(bool print = false) const;
 
-    vector<vector<size_t>> m_adjList;    ///< A array of vectors to represent adjacency list
+    ///
+    /// \brief Colorize using Welsh-Powell algorithm and print the assignment of colors
+    /// \return Vertex colors and number of colors
+    ///
+    std::pair<std::vector<unsigned short>, unsigned short>
+    doColoringWelshPowell(bool print = false) const;
+
+    std::vector<std::unordered_set<size_t>> m_adjList;    ///< A array of std::vectors to represent adjacency list
+    ColoringMethod m_ColoringMethod = ColoringMethod::WelshPowell;
 };
 }

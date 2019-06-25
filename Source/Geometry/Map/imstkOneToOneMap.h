@@ -47,7 +47,7 @@ public:
     ///
     /// \brief Default destructor
     ///
-    ~OneToOneMap() = default;
+    virtual ~OneToOneMap() override = default;
 
     ///
     /// \brief Compute the tetra-triangle mesh map
@@ -87,12 +87,12 @@ public:
     ///
     /// \brief
     ///
-    inline size_t getMapIdx(const size_t& idx) override
-    {
-        return m_oneToOneMap[idx];
-    }
+    size_t getMapIdx(const size_t& idx) override { return m_oneToOneMap[idx]; }
 
 protected:
     std::map<size_t, size_t> m_oneToOneMap; ///> One to one mapping data
+
+    // This vector is for parallel processing, it should contain identical data as m_oneToOneMap
+    std::vector<std::pair<size_t, size_t>> m_oneToOneMapVector; ///> One to one mapping data
 };
 } // imstk

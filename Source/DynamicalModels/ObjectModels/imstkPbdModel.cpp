@@ -19,6 +19,7 @@
 
 =========================================================================*/
 
+#include "imstkGraph.h"
 #include "imstkPbdModel.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
@@ -29,8 +30,11 @@
 #include "imstkPbdFETetConstraint.h"
 #include "imstkPbdFEHexConstraint.h"
 #include "imstkPbdConstantDensityConstraint.h"
+#include "imstkParallelUtils.h"
 
 #include <g3log/g3log.hpp>
+
+#include <unordered_map>
 
 namespace imstk
 {
@@ -51,16 +55,16 @@ void PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstra
 void
 PbdModel::configure(const std::shared_ptr<PBDModelConfig>& params)
 {
-    LOG_IF(FATAL, (!getModelGeometry())) << "PbdModel::configure - Set PBD Model geometry before configuration!";
+    LOG_IF(FATAL, (!this->getModelGeometry())) << "PbdModel::configure - Set PBD Model geometry before configuration!";
 
     m_Parameters = params;
-    setNumDegreeOfFreedom(getModelGeometry()->getNumVertices() * 3);
+    this->setNumDegreeOfFreedom(this->getModelGeometry()->getNumVertices() * 3);
 }
 
 bool
 PbdModel::initialize()
 {
-    LOG_IF(FATAL, (!m_Parameters)) << "PBDModel parameter has not been configured.";
+    LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
 
     m_initialState  = std::make_shared<PbdState>();
     m_previousState = std::make_shared<PbdState>();
@@ -92,12 +96,11 @@ PbdModel::initialize()
     // Initialize FEM constraints
     for (auto& constraint: m_Parameters->m_FEMConstraints)
     {
-        if (!bOK)
+        computeElasticConstants();
+        if (!initializeFEMConstraints(constraint.second))
         {
             return false;
         }
-        computeElasticConstants();
-        bOK = initializeFEMConstraints(constraint.second);
     }
 
     // Initialize other constraints
@@ -134,6 +137,9 @@ PbdModel::initialize()
         }
     }
 
+    // Partition constraints for parallel computation
+    partitionCostraints();
+
     return bOK;
 }
 
@@ -143,14 +149,14 @@ PbdModel::computeElasticConstants()
     if (std::abs(m_Parameters->m_mu) < MIN_REAL &&
         std::abs(m_Parameters->m_lambda) < MIN_REAL)
     {
-        const auto E  = m_Parameters->m_YoungModulus;
+        const auto E = m_Parameters->m_YoungModulus;
         const auto nu = m_Parameters->m_PoissonRatio;
-        m_Parameters->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
+        m_Parameters->m_mu = E / Real(2.0) / (Real(1.0) + nu);
         m_Parameters->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
     }
     else
     {
-        const auto mu     = m_Parameters->m_mu;
+        const auto mu = m_Parameters->m_mu;
         const auto lambda = m_Parameters->m_lambda;
         m_Parameters->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
         m_Parameters->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
@@ -168,17 +174,20 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
     }
 
     // Create constraints
-    auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-    auto elements = tetMesh->getTetrahedraVertices();
+    const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+    const auto& elements = tetMesh->getTetrahedraVertices();
 
-    for (size_t k = 0; k < elements.size(); ++k)
-    {
-        auto& tet = elements[k];
-
-        auto c = std::make_shared<PbdFEMTetConstraint>(type);
-        c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
-        m_constraints.push_back(c);
-    }
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(elements.size(),
+        [&](const size_t k)
+        {
+            auto& tet = elements[k];
+            auto c = std::make_shared<PbdFEMTetConstraint>(type);
+            c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
+            lock.lock();
+            m_constraints.push_back(std::move(c));
+            lock.unlock();
+        });
     return true;
 }
 
@@ -193,17 +202,20 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
     }
 
     // Create constraints
-    auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-    auto elements = tetMesh->getTetrahedraVertices();
+    const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+    const auto& elements = tetMesh->getTetrahedraVertices();
 
-    for (size_t k = 0; k < elements.size(); ++k)
-    {
-        auto& tet = elements[k];
-
-        auto c = std::make_shared<PbdVolumeConstraint>();
-        c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
-        m_constraints.push_back(c);
-    }
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(elements.size(),
+        [&](const size_t k)
+        {
+            auto& tet = elements[k];
+            auto c = std::make_shared<PbdVolumeConstraint>();
+            c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
+            lock.lock();
+            m_constraints.push_back(std::move(c));
+            lock.unlock();
+        });
     return true;
 }
 
@@ -213,7 +225,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     auto addConstraint =
         [&](std::vector<std::vector<bool>>& E, size_t i1, size_t i2)
         {
-            if (i1 > i2) // Make sure i1 is always smaller than i2
+            if (i1 > i2)     // Make sure i1 is always smaller than i2
             {
                 std::swap(i1, i2);
             }
@@ -274,17 +286,20 @@ PbdModel::initializeAreaConstraints(const double stiffness)
     }
 
     // ok, now create constraints
-    auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
+    const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const auto& elements = triMesh->getTrianglesVertices();
 
-    for (size_t k = 0; k < elements.size(); ++k)
-    {
-        auto& tri = elements[k];
-
-        auto c = std::make_shared<PbdAreaConstraint>();
-        c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
-        m_constraints.push_back(c);
-    }
+    ParallelUtils::SpinLock lock;
+    ParallelUtils::parallelFor(elements.size(),
+        [&](const size_t k)
+        {
+            auto& tri = elements[k];
+            auto c = std::make_shared<PbdAreaConstraint>();
+            c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
+            lock.lock();
+            m_constraints.push_back(std::move(c));
+            lock.unlock();
+        });
     return true;
 }
 
@@ -388,15 +403,111 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
 }
 
 void
+PbdModel::partitionCostraints(const bool print)
+{
+    // Form the map { vertex : list_of_constraints_involve_vertex }
+    std::unordered_map<size_t, std::vector<size_t>> vertexConstraints;
+    for (size_t constrIdx = 0; constrIdx < m_constraints.size(); ++constrIdx)
+    {
+        const auto& constr = m_constraints[constrIdx];
+        for (const auto& vIds : constr->getVertexIds())
+        {
+            vertexConstraints[vIds].push_back(constrIdx);
+        }
+    }
+
+    // Add edges to the constraint graph
+    // Each edge represent a shared vertex between two constraints
+    Graph constraintGraph(m_constraints.size());
+    for (const auto& kv : vertexConstraints)
+    {
+        const auto& constraints = kv.second;     // the list of constraints for a vertex
+        for (size_t i = 0; i < constraints.size(); ++i)
+        {
+            for (size_t j = i + 1; j < constraints.size(); ++j)
+            {
+                constraintGraph.addEdge(constraints[i], constraints[j]);
+            }
+        }
+    }
+    vertexConstraints.clear();
+
+    // do graph coloring for the constraint graph
+    const auto coloring = constraintGraph.doColoring();
+    const auto& partitionIndices = coloring.first;
+    const auto numPartitions = coloring.second;
+    assert(partitionIndices.size() == m_constraints.size());
+
+    m_partitionedConstraints.resize(0);
+    m_partitionedConstraints.resize(static_cast<size_t>(numPartitions));
+
+    for (size_t constrIdx = 0; constrIdx < partitionIndices.size(); ++constrIdx)
+    {
+        const auto partitionIdx = partitionIndices[constrIdx];
+        m_partitionedConstraints[partitionIdx].push_back(std::move(m_constraints[constrIdx]));
+    }
+
+    // If a partition has size smaller than the partition threshold, then move its constraints back
+    // These constraints will be processed sequentially
+    // Because small size partitions yield bad performance upon running in parallel
+    m_constraints.resize(0);
+    for (const auto& constraints : m_partitionedConstraints)
+    {
+        if (constraints.size() < m_partitionThreshold)
+        {
+            for (size_t constrIdx = 0; constrIdx < constraints.size(); ++constrIdx)
+            {
+                m_constraints.push_back(std::move(constraints[constrIdx]));
+            }
+        }
+    }
+
+    // Remove all empty partitions
+    size_t writeIdx = 0;
+    for (size_t readIdx = 0; readIdx < m_partitionedConstraints.size(); ++readIdx)
+    {
+        if (m_partitionedConstraints[readIdx].size() >= m_partitionThreshold)
+        {
+            m_partitionedConstraints[writeIdx++] = std::move(m_partitionedConstraints[readIdx]);
+        }
+    }
+    m_partitionedConstraints.resize(writeIdx);
+
+    // Print
+    if (print)
+    {
+        size_t numConstraints = 0;
+        int idx = 0;
+        for (const auto& constraints : m_partitionedConstraints)
+        {
+            std::cout << "Partition # " << idx++ << " | # nodes: " << constraints.size() << std::endl;
+            numConstraints += constraints.size();
+        }
+        std::cout << "Sequential processing # nodes: " << m_constraints.size() << std::endl;
+        numConstraints += m_constraints.size();
+        std::cout << "Total constraints: " << numConstraints << " | Graph size: "
+                  << constraintGraph.size() << std::endl;
+    }
+}
+
+void
 PbdModel::projectConstraints()
 {
     unsigned int i = 0;
     while (++i < m_Parameters->m_maxIter)
     {
-        // Cannot run in parallel: concurrently updating constraints can lead to race condition
         for (auto c: m_constraints)
         {
             c->solvePositionConstraint(*this);
+        }
+
+        for (auto& partitionConstraints : m_partitionedConstraints)
+        {
+            ParallelUtils::parallelFor(partitionConstraints.size(),
+                [&](const size_t idx)
+                {
+                    partitionConstraints[idx]->solvePositionConstraint(*this);
+                });
         }
     }
 }
@@ -466,35 +577,37 @@ PbdModel::getInvMass(const size_t idx) const
 void
 PbdModel::integratePosition()
 {
+    const auto& accn = m_currentState->getAccelerations();
     auto& prevPos = m_previousState->getPositions();
     auto& pos = m_currentState->getPositions();
     auto& vel = m_currentState->getVelocities();
-    auto& accn = m_currentState->getAccelerations();
 
-    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
-    {
-        if (m_invMass[i] != 0.0)
+    ParallelUtils::parallelFor(m_mesh->getNumVertices(),
+        [&](const size_t i)
         {
-            vel[i] += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
-            prevPos[i] = pos[i];
-            pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
-        }
-    }
+            if (std::abs(m_invMass[i]) > MIN_REAL)
+            {
+                vel[i] += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
+                prevPos[i] = pos[i];
+                pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
+            }
+        });
 }
 
 void
 PbdModel::updateVelocity()
 {
-    auto& prevPos = m_previousState->getPositions();
-    auto& pos = m_currentState->getPositions();
+    const auto& prevPos = m_previousState->getPositions();
+    const auto& pos = m_currentState->getPositions();
     auto& vel = m_currentState->getVelocities();
 
-    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
-    {
-        if (m_invMass[i] != 0.0)
+    ParallelUtils::parallelFor(m_mesh->getNumVertices(),
+        [&](const size_t i)
         {
-            vel[i] = (pos[i] - prevPos[i]) / m_Parameters->m_dt;
-        }
-    }
+            if (std::abs(m_invMass[i]) > MIN_REAL)
+            {
+                vel[i] = (pos[i] - prevPos[i]) / m_Parameters->m_dt;
+            }
+        });
 }
 } // imstk

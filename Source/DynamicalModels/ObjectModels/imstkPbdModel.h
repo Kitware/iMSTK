@@ -140,17 +140,9 @@ public:
     bool initializeDihedralConstraints(const double stiffness);
 
     ///
-    /// \brief addConstraint add elastic constraint
-    /// \param constraint
+    /// \brief Initialize constant density constraints for PBD fluid
     ///
     bool initializeConstantDensityConstraint(const double stiffness);
-
-    ///
-    /// \todo: add the initialization parameters for the constraint
-    /// \param...
-    ///
-
-    inline void addConstraint(std::shared_ptr<PbdConstraint> constraint) { m_constraints.push_back(constraint); }
 
     ///
     /// \brief compute delta x (position) and update position
@@ -170,7 +162,7 @@ public:
     ///
     /// \brief Returns true if there is at least one constraint
     ///
-    inline bool hasConstraints() const { return !m_constraints.empty(); }
+    bool hasConstraints() const { return !m_constraints.empty() || !m_partitionedConstraints.empty(); }
 
     ///
     /// \brief Set the time step size
@@ -228,19 +220,29 @@ public:
     ///
     /// \brief Initialize the PBD model
     ///
-    bool initialize() override;
+    virtual bool initialize() override;
 
     ///
-    /// \brief Return Constraints
+    /// \brief Set the threshold for constraint partitioning
     ///
-    const std::vector<std::shared_ptr<PbdConstraint>> getConstraints() const { return m_constraints; }
+    void setConstraintPartitionThreshold(size_t threshold) { m_partitionThreshold = threshold; }
 
 protected:
+    ///
+    /// \brief Partition constraints for parallelization
+    ///
+    void partitionCostraints(const bool print = false);
+
+    size_t m_partitionThreshold = 16;    ///> Threshold for constraint partitioning
+
     std::shared_ptr<PointSet> m_mesh;    ///> PointSet on which the pbd model operates on
     std::vector<double>       m_mass;    ///> Mass of nodes
     std::vector<double>       m_invMass; ///> Inverse of mass of nodes
 
-    std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
-    std::shared_ptr<PBDModelConfig>             m_Parameters;  ///> Model parameters, must be set before simulation
+    using PBDConstraintVector = std::vector<std::shared_ptr<PbdConstraint>>;
+
+    PBDConstraintVector m_constraints;                         ///> List of pbd constraints
+    std::vector<PBDConstraintVector> m_partitionedConstraints; ///> List of pbd constraints
+    std::shared_ptr<PBDModelConfig>  m_Parameters;             ///> Model parameters, must be set before simulation
 };
 } // imstk

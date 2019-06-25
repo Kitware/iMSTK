@@ -24,6 +24,7 @@
 #include "imstkPbdRigidObject.h"
 #include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
+#include "imstkPbdModel.h"
 
 #include <g3log/g3log.hpp>
 

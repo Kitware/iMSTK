@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkTetraTriangleMap.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
@@ -37,26 +38,46 @@ TetraTriangleMap::compute()
 
     m_verticesEnclosingTetraId.clear();
     m_verticesWeights.clear();
-    for (const Vec3d& surfVertPos : triMesh->getVertexPositions())
+    ParallelUtils::SpinLock lock;
+    bool bValid = true;
+
+    ParallelUtils::parallelFor(triMesh->getNumVertices(),
+        [&](const size_t vertexIdx)
+        {
+            if (!bValid)
+            {
+                return;
+            }
+            const Vec3d& surfVertPos = triMesh->getVertexPositions()[vertexIdx];
+
+            // Find the enclosing or closest tetrahedron
+            size_t closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);
+            if (closestTetId == std::numeric_limits<size_t>::max())
+            {
+                closestTetId = findClosestTetrahedron(tetMesh, surfVertPos);
+            }
+            if (closestTetId == std::numeric_limits<size_t>::max())
+            {
+                LOG(WARNING) << "Could not find closest tetrahedron";
+                bValid = false;
+                return;
+            }
+
+            // Compute the weights
+            TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
+            tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
+
+            lock.lock();
+            m_verticesEnclosingTetraId.push_back(closestTetId); // store nearest tetrahedron
+            m_verticesWeights.push_back(weights); // store weights
+            lock.unlock();
+    });
+
+    // Clear result if could not find closest tet
+    if (!bValid)
     {
-        // Find the enclosing or closest tetrahedron
-        size_t closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);
-        if (closestTetId == std::numeric_limits<size_t>::max())
-        {
-            closestTetId = findClosestTetrahedron(tetMesh, surfVertPos);
-        }
-        if (closestTetId == std::numeric_limits<size_t>::max())
-        {
-            LOG(WARNING) << "Could not find closest tetrahedron";
-            return;
-        }
-
-        // Compute the weights
-        TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
-        tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
-
-        m_verticesEnclosingTetraId.push_back(closestTetId); // store nearest tetrahedron
-        m_verticesWeights.push_back(weights); // store weights
+        m_verticesEnclosingTetraId.clear();
+        m_verticesWeights.clear();
     }
 }
 
@@ -80,19 +101,21 @@ TetraTriangleMap::apply()
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh> (m_master);
     auto triMesh = std::dynamic_pointer_cast<SurfaceMesh> (m_slave);
 
-    Vec3d newPos;
-    for (size_t vertexId = 0; vertexId < triMesh->getNumVertices(); ++vertexId)
-    {
-        newPos.setZero();
-        size_t tetId = m_verticesEnclosingTetraId.at(vertexId);
-        auto tetVerts = tetMesh->getTetrahedronVertices(tetId);
-        auto weights = m_verticesWeights.at(vertexId);
-        for (size_t i = 0; i < 4; ++i)
+    ParallelUtils::parallelFor(triMesh->getNumVertices(),
+        [&](const size_t vertexId)
         {
-            newPos += tetMesh->getVertexPosition(tetVerts[i]) * weights[i];
-        }
-        triMesh->setVertexPosition(vertexId, newPos);
-    }
+            Vec3d newPos(0, 0, 0);
+            size_t tetId = m_verticesEnclosingTetraId[vertexId];
+            auto tetVerts = tetMesh->getTetrahedronVertices(tetId);
+            auto weights = m_verticesWeights[vertexId];
+            for (size_t i = 0; i < 4; ++i)
+            {
+                newPos += tetMesh->getVertexPosition(tetVerts[i]) * weights[i];
+            }
+
+            // This writes newPos to position array at individual vertexId, thus should not cause race condition
+            triMesh->setVertexPosition(vertexId, newPos);
+        });
 }
 
 void
@@ -123,8 +146,7 @@ TetraTriangleMap::isValid() const
 
     for (size_t tetId = 0; tetId < m_verticesEnclosingTetraId.size(); ++tetId)
     {
-        if (!(m_verticesEnclosingTetraId.at(tetId) < totalElementsMaster &&
-              m_verticesEnclosingTetraId.at(tetId) >= 0))
+        if (!(m_verticesEnclosingTetraId[tetId] < totalElementsMaster))
         {
             return false;
         }
@@ -155,10 +177,9 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 }
 
 size_t
-TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
-                                         const Vec3d& pos)
+TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh, const Vec3d& pos)
 {
-    double closestDistance = MAX_D;
+    double closestDistanceSqr = MAX_D;
     size_t closestTetrahedron = std::numeric_limits<size_t>::max();
     for (size_t tetId = 0; tetId < tetraMesh->getNumTetrahedra(); ++tetId)
     {
@@ -168,11 +189,11 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
         {
             center += tetraMesh->getInitialVertexPosition(vert[i]);
         }
-        center = center / 4;
-        double dist = (pos - center).norm();
-        if (dist < closestDistance)
+        center = center / 4.0;
+        double distSqr = (pos - center).squaredNorm();
+        if (distSqr < closestDistanceSqr)
         {
-            closestDistance = dist;
+            closestDistanceSqr = distSqr;
             closestTetrahedron = tetId;
         }
     }
@@ -180,8 +201,7 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
 }
 
 size_t
-TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
-                                           const Vec3d& pos)
+TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh, const Vec3d& pos)
 {
     Vec3d boundingBoxMin;
     Vec3d boundingBoxMax;

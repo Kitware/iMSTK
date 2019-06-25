@@ -20,59 +20,36 @@
 =========================================================================*/
 
 #include "imstkPbdObject.h"
-#include "imstkGeometryMap.h"
-#include "imstkPbdModel.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkPbdSolver.h"
+#include "imstkPbdCollisionConstraint.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
-bool
-PbdObject::initialize()
+void PbdSolver::solve()
 {
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-    if (m_pbdModel)
-    {
-        return DynamicObject::initialize();
-    }
-    else
-    {
-        LOG(WARNING) << "Dynamics pointer cast failure in PbdObject::initialize()";
-        return false;
-    }
+    m_pbdObject->integratePosition();
+    m_pbdObject->solveConstraints();
+    resolveCollisionConstraints();
+    m_pbdObject->updateVelocity();
 }
 
-void
-PbdObject::integratePosition()
+void PbdSolver::resolveCollisionConstraints()
 {
-    if (m_pbdModel && m_pbdModel->hasConstraints())
+    if (m_PBDConstraints != nullptr)
     {
-        m_pbdModel->integratePosition();
+        unsigned int maxIter = 2;
+        if (!m_PBDConstraints->empty())
+        {
+            unsigned int i = 0;
+            while (++i < maxIter)
+            {
+                for (size_t k = 0; k < m_PBDConstraints->size(); ++k)
+                {
+                    (*m_PBDConstraints)[k]->solvePositionConstraint();
+                }
+            }
+        }
     }
 }
-
-void
-PbdObject::updateVelocity()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
-    {
-        m_pbdModel->updateVelocity();
-    }
-}
-
-void
-PbdObject::solveConstraints()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
-    {
-        m_pbdModel->projectConstraints();
-    }
-}
-
-void
-PbdObject::reset()
-{
-    DynamicObject<PbdState>::reset();
-    this->updateVelocity();
-}
-} //imstk
+} // end namespace imstk

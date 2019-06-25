@@ -96,7 +96,7 @@ public:
     ///
     /// \brief Get number of visual models
     ///
-    const size_t getNumVisualModels();
+    size_t getNumVisualModels();
 
     ///
     /// \brief Get the master geometry
@@ -106,17 +106,17 @@ public:
     ///
     /// \brief
     ///
-    virtual void updateGeometries() {};
+    virtual void updateGeometries() {}
 
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize(){ return true; };
+    virtual bool initialize(){ return true; }
 
     ///
     /// \brief
     ///
-    virtual void reset(){};
+    virtual void reset(){}
 
 protected:
     ///

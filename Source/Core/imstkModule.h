@@ -47,7 +47,7 @@ enum class ModuleStatus
 ///
 class Module
 {
-using CallbackFunction = std::function<void(Module* module)>;
+using CallbackFunction = std::function<void (Module* module)>;
 
 public:
     ///

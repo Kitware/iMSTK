@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~TetrahedralMesh() = default;
+    virtual ~TetrahedralMesh() override = default;
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -129,7 +129,7 @@ public:
     ///
     /// \brief Returns the mesh graph
     ///
-    Graph getMeshGraph() override;
+    std::shared_ptr<Graph> getMeshGraph() override;
 
 protected:
 

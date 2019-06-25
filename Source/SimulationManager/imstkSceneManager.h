@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~SceneManager() = default;
+    virtual ~SceneManager() override = default;
 
     ///
     /// \brief Get the scene that the scene manager is managing

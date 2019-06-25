@@ -23,13 +23,41 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 
+#include <iostream>
+
 using namespace imstk;
 
 ///
 /// \brief This example demonstrates the imstk graph usage
+/// Usage: Example-Graph.exe [method=greedy/welsh-powell]
+/// (if no method was specified, WelshPowell method will be used)
 ///
-int main()
+int main(int argc, char** argv)
 {
+    // Using WelshPowell method by default
+    Graph::ColoringMethod method = Graph::ColoringMethod::WelshPowell;
+
+    if (argc > 1)
+    {
+        auto param = std::string(argv[1]);
+        if (param.find("method") == 0 &&
+            param.find_first_of("=") != std::string::npos)
+        {
+            if (param.substr(param.find_first_of("=") + 1) == "greedy")
+            {
+                method = Graph::ColoringMethod::Greedy;
+            }
+            else if (param.substr(param.find_first_of("=") + 1) == "welsh-powell")
+            {
+                method = Graph::ColoringMethod::WelshPowell;
+            }
+        }
+    }
+
+    std::cout << (method == Graph::ColoringMethod::Greedy ?
+                  "Graph coloring method: Greedy" :
+                  "Graph coloring method: WelshPowell" ) << std::endl << std::endl;
+
     Graph g1(5);
     g1.addEdge(0, 1);
     g1.addEdge(0, 2);
@@ -39,7 +67,7 @@ int main()
     g1.addEdge(3, 4);
 
     g1.print();
-    auto colorsG1 = g1.doGreedyColoring(0);
+    auto colorsG1 = g1.doColoring(method, true);
 
     Graph g2(5);
     g2.addEdge(0, 1);
@@ -50,7 +78,7 @@ int main()
     g2.addEdge(4, 3);
 
     g2.print();
-    auto colorsG2 = g2.doGreedyColoring(1);
+    auto colorsG2 = g2.doColoring(method, true);
 
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
@@ -66,11 +94,11 @@ int main()
             LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
             return 1;
         }
-        auto colorsGVMesh = volMesh->getMeshGraph().doGreedyColoring(true);
+        auto colorsGVMesh = volMesh->getMeshGraph()->doColoring(method, true);
 
         auto surfMesh = std::make_shared<SurfaceMesh>();
         volMesh->extractSurfaceMesh(surfMesh, true);
-        auto colorsGSMesh = surfMesh->getMeshGraph().doGreedyColoring(true);
+        auto colorsGSMesh = surfMesh->getMeshGraph()->doColoring(method, true);
     }
 
     std::cout << "Press any key to exit!" << std::endl;

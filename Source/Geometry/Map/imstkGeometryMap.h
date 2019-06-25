@@ -51,7 +51,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~GeometryMap() = default;
+    virtual ~GeometryMap() = default;
 
     ///
     /// \brief Compute the map
@@ -117,7 +117,7 @@ public:
     /// \param idx
     /// \return index of Master corresponding to the idx of Slave
     ///
-    virtual size_t getMapIdx(const size_t& idx) { return 0; }
+    virtual size_t getMapIdx(const size_t&) { return 0; }
 protected:
 
     ///

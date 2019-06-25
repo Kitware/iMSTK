@@ -52,24 +52,24 @@ public:
     ///
     /// \brief Get/Set nodal position given the index
     ///
-    void setVertexPosition(const size_t& idx, const Vec3d& pos) { m_pos.at(idx) = pos; };
-    Vec3d& getVertexPosition(const size_t& idx) { return m_pos.at(idx); };
+    void setVertexPosition(const size_t& idx, const Vec3d& pos) { m_pos.at(idx) = pos; }
+    Vec3d& getVertexPosition(const size_t& idx) { return m_pos.at(idx); }
 
     ///
     /// \brief Returns the vector of current nodal positions
     ///
-    StdVectorOfVec3d& getPositions() { return m_pos; };
-    void setPositions(const StdVectorOfVec3d& p) { m_pos = p; };
+    StdVectorOfVec3d& getPositions() { return m_pos; }
+    void setPositions(const StdVectorOfVec3d& p) { m_pos = p; }
 
     ///
     /// \brief Returns the vector of current nodal velocities
     ///
-    StdVectorOfVec3d& getVelocities() { return m_vel; };
+    StdVectorOfVec3d& getVelocities() { return m_vel; }
 
     ///
     /// \brief Returns the vector of current nodal accelerations
     ///
-    StdVectorOfVec3d& getAccelerations() { return m_acc; };
+    StdVectorOfVec3d& getAccelerations() { return m_acc; }
 
     ///
     /// \brief Set the state to a given one

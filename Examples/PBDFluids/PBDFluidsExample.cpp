@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkMeshIO.h"
+#include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkOneToOneMap.h"

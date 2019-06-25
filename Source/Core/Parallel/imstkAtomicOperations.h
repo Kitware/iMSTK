@@ -20,8 +20,8 @@
 =========================================================================*/
 
 #pragma once
-#include <atomic>
 
+#include <atomic>
 #include "imstkMath.h"
 
 namespace imstk

@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include "imstkPbdModel.h"
-
 #include <vector>
+#include <memory>
 
 namespace imstk
 {
