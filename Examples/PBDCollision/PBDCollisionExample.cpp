@@ -96,17 +96,17 @@ int main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_YoungModulus = 1.0;
+    pbdParams->m_YoungModulus = 1000.0;
     pbdParams->m_PoissonRatio = 0.3;
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::NeoHookean);
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::Corotation);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -100.0, 0);
-    pbdParams->m_dt = 0.001;
-    pbdParams->m_maxIter = 2;
-    pbdParams->m_proximity = 0.1;
-    pbdParams->m_contactStiffness = 0.01;
+    pbdParams->m_gravity = Vec3d(0, -10.0, 0);
+    pbdParams->m_dt = 0.01;
+    pbdParams->m_maxIter = 5;
+    pbdParams->m_proximity = 0.3;
+    pbdParams->m_contactStiffness = 0.1;
 
     pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
