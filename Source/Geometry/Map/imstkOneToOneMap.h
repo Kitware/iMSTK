@@ -87,7 +87,13 @@ public:
     ///
     /// \brief
     ///
-    size_t getMapIdx(const size_t& idx) override { return m_oneToOneMap[idx]; }
+    size_t getMapIdx(const size_t& idx) override
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (m_oneToOneMap.find(idx) == m_oneToOneMap.end())) << "Invalid source index";
+#endif
+        return m_oneToOneMap[idx];
+    }
 
 protected:
     std::map<size_t, size_t> m_oneToOneMap; ///> One to one mapping data
