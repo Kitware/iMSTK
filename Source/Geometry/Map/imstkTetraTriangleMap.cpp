@@ -33,22 +33,24 @@ TetraTriangleMap::compute()
         return;
     }
 
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh> (m_master);
-    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh> (m_slave);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_slave);
+    LOG_IF(FATAL, (!tetMesh || !triMesh)) << "Fail to cast from geometry to meshes";
 
     m_verticesEnclosingTetraId.clear();
     m_verticesWeights.clear();
-    ParallelUtils::SpinLock lock;
+    m_verticesEnclosingTetraId.resize(triMesh->getNumVertices());
+    m_verticesWeights.resize(triMesh->getNumVertices());
     bool bValid = true;
 
     ParallelUtils::parallelFor(triMesh->getNumVertices(),
         [&](const size_t vertexIdx)
         {
-            if (!bValid)
+            if (!bValid) // If map is invalid, no need to check further
             {
                 return;
             }
-            const Vec3d& surfVertPos = triMesh->getVertexPositions()[vertexIdx];
+            const Vec3d& surfVertPos = triMesh->getVertexPosition(vertexIdx);
 
             // Find the enclosing or closest tetrahedron
             size_t closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);
@@ -67,10 +69,8 @@ TetraTriangleMap::compute()
             TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
             tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
 
-            lock.lock();
-            m_verticesEnclosingTetraId.push_back(closestTetId); // store nearest tetrahedron
-            m_verticesWeights.push_back(weights); // store weights
-            lock.unlock();
+            m_verticesEnclosingTetraId[vertexIdx] = closestTetId; // store nearest tetrahedron
+            m_verticesWeights[vertexIdx] = weights; // store weights
     });
 
     // Clear result if could not find closest tet
@@ -98,8 +98,13 @@ TetraTriangleMap::apply()
         return;
     }
 
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh> (m_master);
-    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh> (m_slave);
+    auto tetMesh = static_cast<TetrahedralMesh*>(m_master.get());
+    auto triMesh = static_cast<SurfaceMesh*>(m_slave.get());
+
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!dynamic_cast<TetrahedralMesh*>(m_master.get()) ||
+                   !dynamic_cast<SurfaceMesh*>(m_slave.get()))) << "Fail to cast from geometry to meshes";
+#endif
 
     ParallelUtils::parallelFor(triMesh->getNumVertices(),
         [&](const size_t vertexId)
@@ -141,17 +146,27 @@ TetraTriangleMap::print() const
 bool
 TetraTriangleMap::isValid() const
 {
-    auto meshMaster = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
-    auto totalElementsMaster = meshMaster->getNumTetrahedra();
+    auto meshMaster = static_cast<TetrahedralMesh*>(m_master.get());
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!dynamic_cast<TetrahedralMesh*>(m_master.get()))) << "Fail to cast from geometry to mesh";
+#endif
 
-    for (size_t tetId = 0; tetId < m_verticesEnclosingTetraId.size(); ++tetId)
-    {
-        if (!(m_verticesEnclosingTetraId[tetId] < totalElementsMaster))
-        {
-            return false;
-        }
-    }
-    return true;
+    auto totalElementsMaster = meshMaster->getNumTetrahedra();
+    bool bOK = true;
+
+    ParallelUtils::parallelFor(m_verticesEnclosingTetraId.size(),
+        [&](const size_t tetId){
+            if (!bOK) // If map is invalid, no need to check further
+            {
+                return;
+            }
+            if (!(m_verticesEnclosingTetraId[tetId] < totalElementsMaster))
+            {
+                bOK = false;
+            }
+        });
+
+    return bOK;
 }
 
 void
