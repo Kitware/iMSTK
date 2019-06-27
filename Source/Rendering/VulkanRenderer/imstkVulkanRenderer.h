@@ -26,6 +26,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <string>
 #include <algorithm>
 
 #ifdef iMSTK_ENABLE_VR
