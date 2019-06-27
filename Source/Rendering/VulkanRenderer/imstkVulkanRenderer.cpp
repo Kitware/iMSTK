@@ -198,7 +198,7 @@ VulkanRenderer::setupGPUs()
     queueInfo.pQueuePriorities = &priorities[0];
 
     // The display system isn't part of the Vulkan core
-    std::vector<string> deviceExtensions;
+    std::vector<std::string> deviceExtensions;
     deviceExtensions.push_back(std::string(VK_KHR_SWAPCHAIN_EXTENSION_NAME));
     m_extensions.push_back(std::string(VK_KHR_MULTIVIEW_EXTENSION_NAME));
     m_extensions.push_back(std::string(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME));
@@ -1440,7 +1440,7 @@ VulkanRenderer::initializePostProcesses()
     m_HDRTonemaps.resize(m_numViews);
     for (uint32_t i = 0; i < m_numViews; i++)
     {
-        m_HDRTonemaps[i] = std::make_shared<VulkanPostProcess>(this, m_numViews, m_width, m_height);
+        m_HDRTonemaps[i] = std::make_shared<VulkanPostProcess>(this, 1, m_width, m_height);
         m_HDRTonemaps[i]->addInputImage(&m_HDRImageSampler, &m_HDRImageView[m_postProcessingChain->m_lastOutput][0]);
         m_HDRTonemaps[i]->m_framebuffer->setColor(m_LDRImage[i], &m_LDRImageView[i], VulkanFormats::FINAL_FORMAT);
         m_HDRTonemaps[i]->initialize(this, VulkanShaderPath::PostProcessing + "HDR_tonemap_frag.spv");
