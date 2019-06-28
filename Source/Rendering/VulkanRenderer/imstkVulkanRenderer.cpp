@@ -1914,7 +1914,7 @@ VulkanRenderer::setupGUI()
     submitInfo[0].signalSemaphoreCount = 0;
     submitInfo[0].pSignalSemaphores = nullptr;
 
-    vkQueueSubmit(m_renderQueue, 1, submitInfo, nullptr);
+    vkQueueSubmit(m_renderQueue, 1, submitInfo, VK_NULL_HANDLE);
 
     vkQueueWaitIdle(m_renderQueue);
     ImGui_ImplVulkan_InvalidateFontUploadObjects();

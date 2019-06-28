@@ -451,7 +451,7 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     submitInfo[0].signalSemaphoreCount = 0;
     submitInfo[0].pSignalSemaphores = nullptr;
 
-    vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, nullptr);
+    vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, VK_NULL_HANDLE);
     vkDeviceWaitIdle(memoryManager.m_device);
 }
 
@@ -545,7 +545,7 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
     submitInfo[0].signalSemaphoreCount = 0;
     submitInfo[0].pSignalSemaphores = nullptr;
 
-    vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, nullptr);
+    vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, VK_NULL_HANDLE);
     vkDeviceWaitIdle(memoryManager.m_device);
 }
 
