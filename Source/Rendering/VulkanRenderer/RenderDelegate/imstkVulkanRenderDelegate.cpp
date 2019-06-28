@@ -142,23 +142,35 @@ VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager,
     m_vertexUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalVertexUniforms));
     m_fragmentUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalFragmentUniforms));
 
-    m_material = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
-        m_fragmentUniformBuffer,
-        material,
-        memoryManager);
+    if (material->getDisplayMode() == RenderMaterial::DisplayMode::SURFACE
+        || material->getDisplayMode() == RenderMaterial::DisplayMode::WIREFRAME_SURFACE)
+    {
+        m_material = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
+            m_fragmentUniformBuffer,
+            material,
+            memoryManager);
+    }
 
     m_shadowMaterial = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
         m_fragmentUniformBuffer,
         material,
         memoryManager,
-        true);
+        VulkanMaterialType::Shadow);
 
     m_depthMaterial = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
         m_fragmentUniformBuffer,
         material,
         memoryManager,
-        false,
-        true);
+        VulkanMaterialType::Depth);
+
+    if (material->getDisplayMode() != RenderMaterial::DisplayMode::SURFACE)
+    {
+        m_wireframeMaterial = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
+            m_fragmentUniformBuffer,
+            material,
+            memoryManager,
+            VulkanMaterialType::Wireframe);
+    }
 
     m_vertexBuffer = std::make_shared<VulkanVertexBuffer>(memoryManager,
         m_numVertices,

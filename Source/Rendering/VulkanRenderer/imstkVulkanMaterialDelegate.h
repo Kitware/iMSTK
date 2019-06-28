@@ -34,6 +34,14 @@
 
 namespace imstk
 {
+enum class VulkanMaterialType
+{
+    Material = 0,
+    Shadow,
+    Depth,
+    Wireframe
+};
+
 class VulkanRenderer;
 
 // Large struct to contain pipeline components for later pipeline creation
@@ -91,8 +99,7 @@ public:
         std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
         std::shared_ptr<RenderMaterial> material,
         VulkanMemoryManager& memoryManager,
-        bool shadowPass = false,
-        bool depthPass = false);
+        VulkanMaterialType type = VulkanMaterialType::Material);
 
     ///
     /// \brief Clears the material
@@ -140,6 +147,7 @@ protected:
     uint32_t m_numTextures = 0;
     bool m_shadowPass = false;
     bool m_depthPrePass = false;
+    bool m_wireframe = true;
     bool m_depthOnlyPass = false;
 
     void createDescriptors(VulkanRenderer * renderer);

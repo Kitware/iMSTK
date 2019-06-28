@@ -1019,19 +1019,35 @@ VulkanRenderer::renderFrame()
             continue;
         }
 
-        auto material = m_renderDelegates[renderDelegateIndex]->m_material;
-        vkCmdBindPipeline(m_renderCommandBuffer[nextImageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
+        auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
+        buffers->bindBuffers(&m_renderCommandBuffer[nextImageIndex], nextImageIndex);
         this->setCommandBufferState(&m_renderCommandBuffer[nextImageIndex], m_width, m_height);
 
-        vkCmdBindDescriptorSets(m_renderCommandBuffer[nextImageIndex],
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
-            material->m_pipelineLayout, 0, (uint32_t)material->m_descriptorSets.size(),
-            &material->m_descriptorSets[0], 0, &m_dynamicOffsets);
+        // Render opaque
+        auto material = m_renderDelegates[renderDelegateIndex]->m_material;
+        if (material)
+        {
+            vkCmdBindPipeline(m_renderCommandBuffer[nextImageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, material->m_pipeline);
+            vkCmdBindDescriptorSets(m_renderCommandBuffer[nextImageIndex],
+                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                material->m_pipelineLayout, 0, (uint32_t)material->m_descriptorSets.size(),
+                &material->m_descriptorSets[0], 0, &m_dynamicOffsets);
 
-        auto buffers = m_renderDelegates[renderDelegateIndex]->getBuffer().get();
+            vkCmdDrawIndexed(m_renderCommandBuffer[nextImageIndex], buffers->m_numIndices, 1, 0, 0, 0);
+        }
 
-        buffers->bindBuffers(&m_renderCommandBuffer[nextImageIndex], nextImageIndex);
-        vkCmdDrawIndexed(m_renderCommandBuffer[nextImageIndex], buffers->m_numIndices, 1, 0, 0, 0);
+        // Render wireframe
+        auto wireframeMaterial = m_renderDelegates[renderDelegateIndex]->m_wireframeMaterial;
+        if (wireframeMaterial)
+        {
+            vkCmdBindPipeline(m_renderCommandBuffer[nextImageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, wireframeMaterial->m_pipeline);
+            vkCmdBindDescriptorSets(m_renderCommandBuffer[nextImageIndex],
+                VK_PIPELINE_BIND_POINT_GRAPHICS,
+                wireframeMaterial->m_pipelineLayout, 0, (uint32_t)wireframeMaterial->m_descriptorSets.size(),
+                &wireframeMaterial->m_descriptorSets[0], 0, &m_dynamicOffsets);
+
+            vkCmdDrawIndexed(m_renderCommandBuffer[nextImageIndex], buffers->m_numIndices, 1, 0, 0, 0);
+        }
     }
     vkCmdEndRenderPass(m_renderCommandBuffer[nextImageIndex]);
 
@@ -1400,7 +1416,16 @@ VulkanRenderer::loadVisualModel(std::shared_ptr<VisualModel> visualModel, SceneO
     {
         m_renderDelegates.push_back(renderDelegate);
         renderDelegate->getBuffer()->initializeBuffers(m_memoryManager);
-        renderDelegate->m_material->initialize(this);
+
+        if (renderDelegate->m_material)
+        {
+            renderDelegate->m_material->initialize(this);
+        }
+
+        if (renderDelegate->m_wireframeMaterial)
+        {
+            renderDelegate->m_wireframeMaterial->initialize(this);
+        }
 
         if (!renderDelegate->getVisualModel()->getRenderMaterial()->isDecal()
             && !renderDelegate->getVisualModel()->getRenderMaterial()->isParticle())
