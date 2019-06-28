@@ -362,6 +362,10 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     {
         m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
     }
+    else if (m_material->getDisplayMode() == RenderMaterial::DisplayMode::POINTS)
+    {
+        m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_POINT;
+    }
     else
     {
         m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
@@ -374,6 +378,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.rasterizationInfo.depthBiasConstantFactor = 0.0;
     m_pipelineComponents.rasterizationInfo.depthBiasClamp = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor = 0.0;
+
     m_pipelineComponents.rasterizationInfo.lineWidth = renderer->m_supportsWideLines ? m_material->getLineWidth() : 1.0;
 
     m_pipelineComponents.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
