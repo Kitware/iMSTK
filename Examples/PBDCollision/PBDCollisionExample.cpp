@@ -107,18 +107,16 @@ int main()
 
     scene->addSceneObject(deformableObj);
 
-    bool clothTest = 0;
-    bool volumetric = !clothTest;
-
     // Build floor geometry
-    StdVectorOfVec3d vertList;
-    double width = 100.0;
-    double height = 100.0;
-    size_t nRows = 2;
-    size_t nCols = 2;
-    vertList.resize(nRows * nCols);
+    const double width = 100.0;
+	const double height = 100.0;
+    const size_t nRows = 2;
+	const size_t nCols = 2;
     const double dy = width / static_cast<double>(nCols - 1);
     const double dx = height / static_cast<double>(nRows - 1);
+
+    StdVectorOfVec3d vertList;
+    vertList.resize(nRows * nCols);
     for (size_t i = 0; i < nRows; ++i)
     {
         for (size_t j = 0; j < nCols; j++)
@@ -151,28 +149,10 @@ int main()
     auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
     floorMeshModel->setRenderMaterial(materialFloor);
 
-    auto floorMapP2V = std::make_shared<OneToOneMap>();
-    floorMapP2V->setMaster(floorMesh);
-    floorMapP2V->setSlave(floorMesh);
-    floorMapP2V->compute();
-
-    auto floorMapP2C = std::make_shared<OneToOneMap>();
-    floorMapP2C->setMaster(floorMesh);
-    floorMapP2C->setSlave(floorMesh);
-    floorMapP2C->compute();
-
-    auto floorMapC2V = std::make_shared<OneToOneMap>();
-    floorMapC2V->setMaster(floorMesh);
-    floorMapC2V->setSlave(floorMesh);
-    floorMapC2V->compute();
-
     auto floor = std::make_shared<PbdObject>("Floor");
     floor->setCollidingGeometry(floorMesh);
     floor->setVisualGeometry(floorMesh);
     floor->setPhysicsGeometry(floorMesh);
-    floor->setPhysicsToCollidingMap(floorMapP2C);
-    floor->setPhysicsToVisualMap(floorMapP2V);
-    floor->setCollidingToVisualMap(floorMapC2V);
 
     auto pbdModel2 = std::make_shared<PbdModel>();
     pbdModel2->setModelGeometry(floorMesh);
