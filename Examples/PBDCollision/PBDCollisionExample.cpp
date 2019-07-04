@@ -109,9 +109,9 @@ int main()
 
     // Build floor geometry
     const double width = 100.0;
-	const double height = 100.0;
+    const double height = 100.0;
     const size_t nRows = 2;
-	const size_t nCols = 2;
+    const size_t nCols = 2;
     const double dy = width / static_cast<double>(nCols - 1);
     const double dx = height / static_cast<double>(nRows - 1);
 

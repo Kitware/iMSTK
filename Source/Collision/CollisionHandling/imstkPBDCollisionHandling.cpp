@@ -78,34 +78,34 @@ PBDCollisionHandling::generatePBDConstraints()
     //std::cout << "EE: " << m_colData->EEColData.size() << "TV: " << m_colData->TVColData.size() << std::endl;
 
     // Generate edge-edge pbd constraints
-	for (auto& colData : m_colData->EEColData)
-	{
-		auto c = std::make_shared<PbdEdgeEdgeConstraint>();
+    for (auto& colData : m_colData->EEColData)
+    {
+        auto c = std::make_shared<PbdEdgeEdgeConstraint>();
 
-		size_t edgeA1, edgeA2;
-		if (map1)
-		{
-			edgeA1 = map1->getMapIdx(colData.edgeIdA.first);
-			edgeA2 = map1->getMapIdx(colData.edgeIdA.second);
-		}
-		else
-		{
-			edgeA1 = colData.edgeIdA.first;
-			edgeA2 = colData.edgeIdA.second;
-		}
+        size_t edgeA1, edgeA2;
+        if (map1)
+        {
+            edgeA1 = map1->getMapIdx(colData.edgeIdA.first);
+            edgeA2 = map1->getMapIdx(colData.edgeIdA.second);
+        }
+        else
+        {
+            edgeA1 = colData.edgeIdA.first;
+            edgeA2 = colData.edgeIdA.second;
+        }
 
-		size_t edgeB1, edgeB2;
-		if (map2)
-		{
-			edgeB1 = map2->getMapIdx(colData.edgeIdB.first);
-			edgeB2 = map2->getMapIdx(colData.edgeIdB.second);
-		}
-		else
-		{
-			edgeB1 = colData.edgeIdB.first;
-			edgeB2 = colData.edgeIdB.second;
-		}
-		
+        size_t edgeB1, edgeB2;
+        if (map2)
+        {
+            edgeB1 = map2->getMapIdx(colData.edgeIdB.first);
+            edgeB2 = map2->getMapIdx(colData.edgeIdB.second);
+        }
+        else
+        {
+            edgeB1 = colData.edgeIdB.first;
+            edgeB2 = colData.edgeIdB.second;
+        }
+
         c->initConstraint(dynaModel1, edgeA1, edgeA2,
                           dynaModel2, edgeB1, edgeB2);
 
@@ -119,19 +119,19 @@ PBDCollisionHandling::generatePBDConstraints()
 
         const auto c = std::make_shared<PbdPointTriangleConstraint>();
 
-		size_t v1, v2, v3;
-		if (map2)
-		{
-			v1 = map2->getMapIdx(triVerts[0]);
-			v2 = map2->getMapIdx(triVerts[1]);
-			v3 = map2->getMapIdx(triVerts[2]);
-		}
-		else
-		{
-			v1 = triVerts[0];
-			v2 = triVerts[1];
-			v3 = triVerts[2];
-		}
+        size_t v1, v2, v3;
+        if (map2)
+        {
+            v1 = map2->getMapIdx(triVerts[0]);
+            v2 = map2->getMapIdx(triVerts[1]);
+            v3 = map2->getMapIdx(triVerts[2]);
+        }
+        else
+        {
+            v1 = triVerts[0];
+            v2 = triVerts[1];
+            v3 = triVerts[2];
+        }
 
         c->initConstraint(dynaModel1,
                           colData.vertexIdB,

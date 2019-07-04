@@ -44,15 +44,15 @@ public:
     ///
     TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle){}
 
-	///
-	/// \brief Constructor
-	///
-	TetraTriangleMap(std::shared_ptr<Geometry> master,
-		std::shared_ptr<Geometry> slave) : GeometryMap(GeometryMap::Type::TetraTriangle)
-	{
-		this->setMaster(master);
-		this->setSlave(slave);
-	}
+    ///
+    /// \brief Constructor
+    ///
+    TetraTriangleMap(std::shared_ptr<Geometry> master,
+                     std::shared_ptr<Geometry> slave) : GeometryMap(GeometryMap::Type::TetraTriangle)
+    {
+        this->setMaster(master);
+        this->setSlave(slave);
+    }
 
     ///
     /// \brief Destructor

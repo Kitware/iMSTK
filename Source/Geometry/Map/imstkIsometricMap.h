@@ -43,13 +43,13 @@ public:
         m_rigidTransform(RigidTransform3d::Identity())
     {}
 
-	///
-	/// \brief Constructor
-	///
-	IsometricMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave) :
-		GeometryMap(GeometryMap::Type::Isometric),
-		m_rigidTransform(RigidTransform3d::Identity())
-	{}
+    ///
+    /// \brief Constructor
+    ///
+    IsometricMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave) :
+        GeometryMap(GeometryMap::Type::Isometric),
+        m_rigidTransform(RigidTransform3d::Identity())
+    {}
 
     ///
     /// \brief Destructor
