@@ -135,6 +135,17 @@ protected:
     ///
     GeometryMap(Type type) : m_type(type), m_isActive(true) {}
 
+	///
+	/// \brief Protected constructor
+	///
+	GeometryMap(std::shared_ptr<Geometry> master, 
+				std::shared_ptr<Geometry> slave, 
+				Type type) : m_type(type), m_isActive(true)
+	{
+		this->setMaster(master);
+		this->setSlave(slave);
+	}
+
     Type m_type;     ///> type of the map
     bool m_isActive; ///> true if the map us active at runtime
 

@@ -44,6 +44,16 @@ public:
     ///
     OneToOneMap() : GeometryMap(GeometryMap::Type::OneToOne){}
 
+	///
+	/// \brief Constructor
+	///
+	OneToOneMap(std::shared_ptr<Geometry> master, 
+		std::shared_ptr<Geometry> slave) : GeometryMap(GeometryMap::Type::OneToOne) 
+	{
+		this->setMaster(master);
+		this->setSlave(slave);
+	}
+
     ///
     /// \brief Default destructor
     ///
