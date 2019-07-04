@@ -74,12 +74,7 @@ int main()
     // Construct a map
 
     // Construct one to one nodal map based on the above meshes
-    auto oneToOneNodalMap = std::make_shared<OneToOneMap>();
-    oneToOneNodalMap->setMaster(tetMesh);
-    oneToOneNodalMap->setSlave(surfMesh);
-
-    // Compute the map
-    oneToOneNodalMap->compute();
+    auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
 
     LOG(INFO) << "wall clock time: " << wct.getTimeElapsed() << " ms.";
     LOG(INFO) << "CPU time: " << cput.getTimeElapsed() << " ms.";

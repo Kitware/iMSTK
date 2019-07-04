@@ -65,20 +65,9 @@ int main()
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    auto deformMapP2V = std::make_shared<OneToOneMap>();
-    deformMapP2V->setMaster(tetMesh);
-    deformMapP2V->setSlave(surfMesh);
-    deformMapP2V->compute();
-
-    auto deformMapC2V = std::make_shared<OneToOneMap>();
-    deformMapC2V->setMaster(surfMesh);
-    deformMapC2V->setSlave(surfMesh);
-    deformMapC2V->compute();
-
-    auto deformMapP2C = std::make_shared<OneToOneMap>();
-    deformMapP2C->setMaster(tetMesh);
-    deformMapP2C->setSlave(surfMesh);
-    deformMapP2C->compute();
+    auto deformMapP2V = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
+    auto deformMapC2V = std::make_shared<OneToOneMap>(surfMesh, surfMesh);
+    auto deformMapP2C = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
