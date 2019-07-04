@@ -120,6 +120,16 @@ public:
     {
         if (CollidingObject::initialize())
         {
+			if (m_physicsToCollidingGeomMap)
+			{
+				m_physicsToCollidingGeomMap->initialize();
+			}
+
+			if (m_physicsToVisualGeomMap)
+			{
+				m_physicsToVisualGeomMap->initialize();
+			}
+
             return m_dynamicalModel->initialize();
         }
         else

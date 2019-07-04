@@ -118,6 +118,16 @@ public:
     /// \return index of Master corresponding to the idx of Slave
     ///
     virtual size_t getMapIdx(const size_t&) { return 0; }
+	
+	///
+	/// \brief Initialize the map
+	///
+	virtual void initialize()
+	{
+		LOG_IF(FATAL, !this->isValid()) << "Map is invalid!";
+
+		this->compute();
+	}
 protected:
 
     ///
