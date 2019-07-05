@@ -113,6 +113,7 @@ protected:
     std::shared_ptr<VulkanUniformBuffer> m_fragmentUniformBuffer;
 
     std::shared_ptr<VulkanMaterialDelegate> m_material = nullptr;
+    std::shared_ptr<VulkanMaterialDelegate> m_wireframeMaterial = nullptr;
     std::shared_ptr<VulkanMaterialDelegate> m_shadowMaterial = nullptr;
     std::shared_ptr<VulkanMaterialDelegate> m_depthMaterial = nullptr;
 

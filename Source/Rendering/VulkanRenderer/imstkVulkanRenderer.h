@@ -368,7 +368,7 @@ protected:
     bool m_VRMode = false;
 
 #ifdef iMSTK_ENABLE_VR
-    vr::IVRSystem *m_VRSystem;
+    vr::IVRSystem *m_VRSystem = nullptr;
 #endif
 };
 }

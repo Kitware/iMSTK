@@ -30,14 +30,14 @@ VulkanMaterialDelegate::VulkanMaterialDelegate(
     std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
     std::shared_ptr<RenderMaterial> material,
     VulkanMemoryManager& memoryManager,
-    bool shadowPass,
-    bool depthPrePass)
+    VulkanMaterialType type)
 {
     m_vertexUniformBuffer = vertexUniformBuffer;
     m_fragmentUniformBuffer = fragmentUniformBuffer;
 
-    m_shadowPass = shadowPass;
-    m_depthPrePass = depthPrePass;
+    m_shadowPass = (type == VulkanMaterialType::Shadow);
+    m_depthPrePass = (type == VulkanMaterialType::Depth);
+    m_wireframe = (type == VulkanMaterialType::Wireframe);
     m_depthOnlyPass = m_shadowPass || m_depthPrePass;
     m_memoryManager = &memoryManager;
 
@@ -148,7 +148,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
 
     m_constants.numLights = renderer->m_constants.numLights;
     m_constants.tessellation = m_material->getTessellated();
-    m_constants.shaded = m_material->getDisplayMode() == RenderMaterial::DisplayMode::SURFACE
+    m_constants.shaded = !m_wireframe
                          && !m_material->isLineMesh()
                          && !m_depthPrePass
                          && !m_material->isParticle();
@@ -358,13 +358,21 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.rasterizationInfo.depthClampEnable = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.rasterizerDiscardEnable = VK_FALSE; // Might be enabled later
 
-    if (m_material->getDisplayMode() == RenderMaterial::DisplayMode::WIREFRAME)
+    m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
+    switch (m_material->getDisplayMode())
     {
+    case RenderMaterial::DisplayMode::WIREFRAME:
         m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
-    }
-    else
-    {
-        m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
+        break;
+    case RenderMaterial::DisplayMode::POINTS:
+        m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_POINT;
+        break;
+    case RenderMaterial::DisplayMode::WIREFRAME_SURFACE:
+        if (m_wireframe)
+        {
+            m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_LINE;
+        }
+        break;
     }
 
     m_pipelineComponents.rasterizationInfo.cullMode =
@@ -374,6 +382,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer * renderer)
     m_pipelineComponents.rasterizationInfo.depthBiasConstantFactor = 0.0;
     m_pipelineComponents.rasterizationInfo.depthBiasClamp = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor = 0.0;
+
     m_pipelineComponents.rasterizationInfo.lineWidth = renderer->m_supportsWideLines ? m_material->getLineWidth() : 1.0;
 
     m_pipelineComponents.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
