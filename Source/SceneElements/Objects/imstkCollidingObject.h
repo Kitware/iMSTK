@@ -89,6 +89,11 @@ public:
     {
         if (SceneObject::initialize())
         {
+            if (m_collidingToVisualMap)
+            {
+                m_collidingToVisualMap->initialize();
+            }
+
             return true;
         }
         else

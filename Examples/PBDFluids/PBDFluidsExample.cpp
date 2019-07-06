@@ -24,7 +24,6 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
-#include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
 #include "imstkMeshToMeshBruteforceCD.h"
 #include "imstkPBDCollisionHandling.h"
@@ -204,28 +203,10 @@ int main()
     auto floorMeshPhysics = std::make_shared<SurfaceMesh>();
     floorMeshPhysics->initialize(vertList, triangles);
 
-    auto floorMapP2V = std::make_shared<OneToOneMap>();
-    floorMapP2V->setMaster(floorMeshPhysics);
-    floorMapP2V->setSlave(floorMeshVisual);
-    floorMapP2V->compute();
-
-    auto floorMapP2C = std::make_shared<OneToOneMap>();
-    floorMapP2C->setMaster(floorMeshPhysics);
-    floorMapP2C->setSlave(floorMeshColliding);
-    floorMapP2C->compute();
-
-    auto floorMapC2V = std::make_shared<OneToOneMap>();
-    floorMapC2V->setMaster(floorMeshColliding);
-    floorMapC2V->setSlave(floorMeshVisual);
-    floorMapC2V->compute();
-
     auto floor = std::make_shared<PbdObject>("Floor");
     floor->setCollidingGeometry(floorMeshColliding);
     floor->setVisualGeometry(floorMeshVisual);
     floor->setPhysicsGeometry(floorMeshPhysics);
-    floor->setPhysicsToCollidingMap(floorMapP2C);
-    floor->setPhysicsToVisualMap(floorMapP2V);
-    floor->setCollidingToVisualMap(floorMapC2V);
 
     auto pbdModel2 = std::make_shared<PbdModel>();
     pbdModel2->setModelGeometry(floorMeshPhysics);

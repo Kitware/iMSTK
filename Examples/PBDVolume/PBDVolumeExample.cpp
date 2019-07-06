@@ -65,12 +65,7 @@ int main()
     // Construct a map
 
     // Construct one to one nodal map based on the above meshes
-    auto oneToOneNodalMap = std::make_shared<OneToOneMap>();
-    oneToOneNodalMap->setMaster(tetMesh);
-    oneToOneNodalMap->setSlave(surfMesh);
-
-    // Compute the map
-    oneToOneNodalMap->compute();
+    auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
 
     auto deformableObj = std::make_shared<PbdObject>("Beam");
     auto pbdModel = std::make_shared<PbdModel>();
