@@ -112,6 +112,8 @@ protected:
         m_actor->SetUserTransform(m_transform);
     }
 
+    virtual ~VTKRenderDelegate() = default;
+
     std::shared_ptr<VisualModel> m_visualModel;
     vtkSmartPointer<vtkActor> m_actor;
     vtkSmartPointer<VTKCustomPolyDataMapper> m_mapper;

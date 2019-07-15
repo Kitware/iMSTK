@@ -26,6 +26,9 @@
 #include "imstkVTKRenderDelegate.h"
 
 class vtkDoubleArray;
+class vtkPoints;
+class vtkPolyData;
+class vtkGlyph3D;
 
 namespace imstk
 {
@@ -40,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKdbgPointsRenderDelegate(std::shared_ptr<DebugRenderPoints> vertices);
+    VTKdbgPointsRenderDelegate(const std::shared_ptr<DebugRenderPoints>& pointData);
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry
@@ -49,7 +52,12 @@ public:
 
 protected:
 
-    std::shared_ptr<DebugRenderPoints> m_points;                ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    std::shared_ptr<DebugRenderPoints> m_RenderGeoData; ///> Geometry to render
+
+    // Auxiliary variables for rendering
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
+    vtkSmartPointer<vtkPoints>      m_points;
+    vtkSmartPointer<vtkPolyData>    m_polyData;
+    vtkSmartPointer<vtkGlyph3D>     m_glyph;
 };
 }

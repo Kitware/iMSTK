@@ -1,26 +1,25 @@
 /*=========================================================================
 
-Library: iMSTK
+   Library: iMSTK
 
-Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-& Imaging in Medicine, Rensselaer Polytechnic Institute.
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
 =========================================================================*/
 
 #include "imstkVTKdebugLinesRenderDelegate.h"
-
 #include "imstkSurfaceMesh.h"
 
 #include <vtkPolyData.h>
@@ -37,55 +36,70 @@ limitations under the License.
 
 namespace imstk
 {
-VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<DebugRenderLines> renderLines) :
-    m_Lines(renderLines),
+VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(const std::shared_ptr<DebugRenderLines>& lineData) :
+    m_RenderGeoData(lineData),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
-    StdVectorOfVec3d& triVertData = renderLines->getVertexPositionsNonConst();
     m_mappedVertexArray->SetNumberOfComponents(3);
-    double* vertData = reinterpret_cast<double*>(triVertData.data());
-    m_mappedVertexArray->SetArray(vertData, triVertData.size() * 3, 1);
-
-    // Create lines polydata
-    auto linesPolyData = vtkSmartPointer<vtkPolyData>::New();
 
     // Create points
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(triVertData.size());
-    points->SetData(m_mappedVertexArray);
-    linesPolyData->SetPoints(points);
+    m_points = vtkSmartPointer<vtkPoints>::New();
+    m_points->SetData(m_mappedVertexArray);
 
     // Create cells
-    auto lines = vtkSmartPointer<vtkCellArray>::New();
-    for (unsigned int i = 0; i < triVertData.size() - 1; i += 2)
-    {
-        auto l = vtkSmartPointer<vtkLine>::New();
-        l->GetPointIds()->SetId(0, i);
-        l->GetPointIds()->SetId(1, i + 1);
+    m_cellArray = vtkSmartPointer<vtkCellArray>::New();
 
-        lines->InsertNextCell(l);
-    }
-    linesPolyData->SetLines(lines);
+    // Create lines polydata
+    m_polyData = vtkSmartPointer<vtkPolyData>::New();
+    m_polyData->SetPoints(m_points);
+    m_polyData->SetLines(m_cellArray);
 
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(linesPolyData);
-    m_Lines->setDataModifiedFlag(false);
+    source->SetOutput(m_polyData);
 
     // Update Transform, Render Properties
-    this->updateDataSource();
-    this->updateActorProperties();
+    updateActorProperties();
+    setUpMapper(source->GetOutputPort(), false, m_RenderGeoData->getRenderMaterial());
 
-    this->setUpMapper(source->GetOutputPort(), false, m_Lines->getRenderMaterial());
+    updateDataSource();
 }
 
 void
 VTKdbgLinesRenderDelegate::updateDataSource()
 {
-    if (m_Lines->isModified())
+    if (m_RenderGeoData->isModified())
     {
+        m_RenderGeoData->turnDataModifiedFlagOFF();
+        m_mappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
+                                      m_RenderGeoData->getNumVertices() * 3, 1);
+
+        m_points->SetNumberOfPoints(m_RenderGeoData->getNumVertices());
+
+        // Set line data
+        int numCurrentLines = m_cellArray->GetNumberOfCells();
+        if (numCurrentLines > static_cast<int>(m_RenderGeoData->getNumVertices() / 2))
+        {
+            // There should is a better way to modify the existing data,
+            // instead of discarding everything and add from the beginning
+            m_cellArray->Reset();
+            numCurrentLines = 0;
+        }
+
+        vtkIdType cell[2];
+        for (int i = numCurrentLines; i < static_cast<int>(m_RenderGeoData->getNumVertices() / 2); ++i)
+        {
+            cell[0] = 2 * i;
+            cell[1] = cell[0] + 1;
+            m_cellArray->InsertNextCell(2, cell);
+        }
+
         m_mappedVertexArray->Modified();
+
+        // Sleep for a while, wating for the data to propagate.
+        // This is necessary to avoid access violation error during CPU/GPU data transfer
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 } // imstk
