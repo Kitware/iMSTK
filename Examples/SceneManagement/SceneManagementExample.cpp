@@ -26,7 +26,8 @@ using namespace imstk;
 ///
 /// \brief This example demonstrates scene management features in imstk
 ///
-int main()
+int
+main()
 {
     auto sdk = std::make_shared<SimulationManager>();
 

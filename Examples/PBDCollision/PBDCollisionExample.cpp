@@ -35,9 +35,10 @@ using namespace imstk;
 /// \brief This example demonstrates the collision interaction
 /// using Position based dynamics
 ///
-int main()
+int
+main()
 {
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PbdCollision");
 
     scene->getCamera()->setPosition(0, 10.0, 10.0);
@@ -50,9 +51,9 @@ int main()
         return 1;
     }
 
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    auto surfMesh       = std::make_shared<SurfaceMesh>();
     auto surfMeshVisual = std::make_shared<SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
+    auto volTetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
@@ -91,10 +92,10 @@ int main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -10.0, 0);
-    pbdParams->m_dt = 0.01;
-    pbdParams->m_maxIter = 5;
-    pbdParams->m_proximity = 0.3;
+    pbdParams->m_gravity          = Vec3d(0, -10.0, 0);
+    pbdParams->m_dt               = 0.01;
+    pbdParams->m_maxIter          = 5;
+    pbdParams->m_proximity        = 0.3;
     pbdParams->m_contactStiffness = 0.1;
 
     pbdModel->configure(pbdParams);
@@ -108,12 +109,12 @@ int main()
     scene->addSceneObject(deformableObj);
 
     // Build floor geometry
-    const double width = 100.0;
+    const double width  = 100.0;
     const double height = 100.0;
-    const size_t nRows = 2;
-    const size_t nCols = 2;
-    const double dy = width / static_cast<double>(nCols - 1);
-    const double dx = height / static_cast<double>(nRows - 1);
+    const size_t nRows  = 2;
+    const size_t nCols  = 2;
+    const double dy     = width / static_cast<double>(nCols - 1);
+    const double dx     = height / static_cast<double>(nRows - 1);
 
     StdVectorOfVec3d vertList;
     vertList.resize(nRows * nCols);
@@ -134,7 +135,7 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
+            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
             tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
@@ -160,7 +161,7 @@ int main()
     // configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity = 0.1;
+    pbdParams2->m_proximity        = 0.1;
     pbdParams2->m_contactStiffness = 1.0;
 
     // Set the parameters
@@ -175,7 +176,7 @@ int main()
 
     // Collision
     auto colData = std::make_shared<CollisionData>();
-    auto CD = std::make_shared<MeshToMeshBruteForceCD>(surfMesh, floorMesh, colData);
+    auto CD      = std::make_shared<MeshToMeshBruteForceCD>(surfMesh, floorMesh, colData);
 
     auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
                     CD->getCollisionData(), deformableObj, floor, pbdSolver);

@@ -115,15 +115,15 @@ public:
     float getAnisotropyFactor();
 
 protected:
-    Type m_type;            ///< Texture type
+    Type        m_type;     ///< Texture type
     std::string m_path;     ///< Texture file path
 
     // Helps with texture aliasing (and a little with performance)
     bool m_mipmapsEnabled = true;
 
     // Helps sharpen mipmapped textures at more extreme angles
-    bool m_anisotropyEnabled = true;
-    float m_anisotropyFactor = 1.0;
+    bool  m_anisotropyEnabled = true;
+    float m_anisotropyFactor  = 1.0;
 };
 }
 
@@ -132,8 +132,8 @@ namespace std
 {
 template<> struct less<std::shared_ptr<imstk::Texture>>
 {
-    bool operator() (const std::shared_ptr<imstk::Texture>& texture1,
-                     const std::shared_ptr<imstk::Texture>& texture2) const
+    bool operator()(const std::shared_ptr<imstk::Texture>& texture1,
+                    const std::shared_ptr<imstk::Texture>& texture2) const
     {
         if (texture1->getType() != texture2->getType())
         {

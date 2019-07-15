@@ -43,8 +43,8 @@ void
 SpatialHashTableSeparateChaining::insertPoint(const Vec3d& point)
 {
     PointEntry entry;
-    entry.point = point;
-    entry.ID = m_currentID;
+    entry.point    = point;
+    entry.ID       = m_currentID;
     entry.cellSize = m_cellSize;
 
     m_table->insert(entry);
@@ -86,13 +86,13 @@ SpatialHashTableSeparateChaining::getPointsInAABB(std::vector<size_t>& result, c
             for (double z = min_z; z < max_z + m_cellSize[2]; z += m_cellSize[2])
             {
                 PointEntry point;
-                point.point = Vec3d(x, y, z);
+                point.point    = Vec3d(x, y, z);
                 point.cellSize = m_cellSize;
 
                 auto bucket = m_table->bucket(point);
 
                 auto first = m_table->begin(bucket);
-                auto last = m_table->end(bucket);
+                auto last  = m_table->end(bucket);
 
                 for (auto p = first; p != last; ++p)
                 {
@@ -110,9 +110,9 @@ SpatialHashTableSeparateChaining::getPointsInAABB(std::vector<size_t>& result, c
     for (auto p = tempPoints.begin(); p != tempPoints.end(); ++p)
     {
         Vec3d point = p->point;
-        if (point.x() >= min_x && point.x() <= max_x &&
-            point.y() >= min_y && point.y() <= max_y &&
-            point.z() >= min_z && point.z() <= max_z)
+        if (point.x() >= min_x && point.x() <= max_x
+            && point.y() >= min_y && point.y() <= max_y
+            && point.z() >= min_z && point.z() <= max_z)
         {
             result.push_back(p->ID);
         }
@@ -136,7 +136,7 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
         cellSpan[d] = static_cast<int>(std::ceil(radius / m_cellSize[d]));
     }
 
-    double radiusSqr = radius * radius;
+    double                     radiusSqr = radius * radius;
     std::unordered_set<size_t> visited;
     visited.reserve(static_cast<size_t>(cellSpan[0] * cellSpan[1] * cellSpan[2]));
 
@@ -166,12 +166,12 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
                 visited.insert(bucket);
 
                 auto first = m_table->begin(bucket);
-                auto last = m_table->end(bucket);
+                auto last  = m_table->end(bucket);
 
                 for (auto it = first; it != last; ++it)
                 {
                     const Vec3d& qpos = it->point;
-                    const auto d2 = (ppos - qpos).squaredNorm();
+                    const auto   d2   = (ppos - qpos).squaredNorm();
                     if (d2 < radiusSqr)
                     {
                         result.push_back(it->ID);

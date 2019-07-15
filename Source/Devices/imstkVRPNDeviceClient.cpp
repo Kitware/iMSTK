@@ -30,9 +30,9 @@ VRPNDeviceClient::initModule()
 {
     auto fullDeviceIp = this->getName().c_str();
 
-    m_vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp);
-    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
-    m_vrpnButton = std::make_shared<vrpn_Button_Remote>(fullDeviceIp);
+    m_vrpnTracker     = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp);
+    m_vrpnAnalog      = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
+    m_vrpnButton      = std::make_shared<vrpn_Button_Remote>(fullDeviceIp);
     m_vrpnForceDevice = std::make_shared<vrpn_ForceDevice_Remote>(fullDeviceIp);
 
     m_vrpnTracker->register_change_handler(this, trackerChangeHandler);
@@ -87,7 +87,7 @@ VRPNDeviceClient::cleanUpModule()
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::trackerChangeHandler(void *userData, const _vrpn_TRACKERCB t)
+VRPNDeviceClient::trackerChangeHandler(void* userData, const _vrpn_TRACKERCB t)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_position << t.pos[0], t.pos[1], t.pos[2];
@@ -104,7 +104,7 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const _vrpn_TRACKERCB t)
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
+VRPNDeviceClient::analogChangeHandler(void* userData, const _vrpn_ANALOGCB a)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
 
@@ -124,7 +124,7 @@ VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::velocityChangeHandler(void *userData, const _vrpn_TRACKERVELCB v)
+VRPNDeviceClient::velocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_velocity << v.vel[0], v.vel[1], v.vel[2];
@@ -132,7 +132,7 @@ VRPNDeviceClient::velocityChangeHandler(void *userData, const _vrpn_TRACKERVELCB
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::buttonChangeHandler(void *userData, const _vrpn_BUTTONCB b)
+VRPNDeviceClient::buttonChangeHandler(void* userData, const _vrpn_BUTTONCB b)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_buttons[b.button] = (b.state == 1);
@@ -140,7 +140,7 @@ VRPNDeviceClient::buttonChangeHandler(void *userData, const _vrpn_BUTTONCB b)
 }
 
 void VRPN_CALLBACK
-VRPNDeviceClient::forceChangeHandler(void *userData, const _vrpn_FORCECB f)
+VRPNDeviceClient::forceChangeHandler(void* userData, const _vrpn_FORCECB f)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_force << f.force[0], f.force[1], f.force[2];

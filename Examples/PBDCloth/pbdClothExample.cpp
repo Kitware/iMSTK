@@ -31,18 +31,19 @@ using namespace imstk;
 /// \brief This example demonstrates the cloth simulation
 /// using Position based dynamics
 ///
-int main()
+int
+main()
 {
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDCloth");
 
     // Create surface mesh
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    auto             surfMesh = std::make_shared<SurfaceMesh>();
     StdVectorOfVec3d vertList;
-    const double width = 10.0;
-    const double height = 10.0;
-    const int nRows = 11;
-    const int nCols = 11;
+    const double     width  = 10.0;
+    const double     height = 10.0;
+    const int        nRows  = 11;
+    const int        nCols  = 11;
     vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -63,7 +64,7 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[0] = { { i* nCols + j, (i + 1) * nCols + j, i * nCols + j + 1 } };
             tri[1] = { { (i + 1) * nCols + j + 1, i * nCols + j + 1, (i + 1) * nCols + j } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
@@ -74,7 +75,7 @@ int main()
 
     // Create Object & Model
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
-    auto pbdModel = std::make_shared<PbdModel>();
+    auto pbdModel      = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(surfMesh);
 
     // configure model
@@ -83,13 +84,13 @@ int main()
     // Constraints
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
-    pbdParams->m_fixedNodeIds = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    pbdParams->m_fixedNodeIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt = 0.03;
-    pbdParams->m_maxIter = 5;
+    pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt               = 0.03;
+    pbdParams->m_maxIter          = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

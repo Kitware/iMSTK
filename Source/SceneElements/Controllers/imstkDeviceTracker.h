@@ -43,9 +43,9 @@ public:
         transX = 0x01,
         transY = 0x02,
         transZ = 0x04,
-        rotX = 0x08,
-        rotY = 0x10,
-        rotZ = 0x20
+        rotX   = 0x08,
+        rotY   = 0x10,
+        rotZ   = 0x20
     };
 
     ///
@@ -108,23 +108,23 @@ public:
     ///
     /// \brief Get the latest position
     ///
-    const Vec3d& getPosition(){ return m_currentPos; };
+    const Vec3d& getPosition() { return m_currentPos; }
 
     ///
     /// \brief Get the latest rotation
     ///
-    const Quatd& getRotation() { return m_currentRot; };
+    const Quatd& getRotation() { return m_currentRot; }
 
 protected:
 
-    std::shared_ptr<DeviceClient> m_deviceClient; ///< Reports device tracking information
-    double m_scaling = 1.0;                       ///< Scaling factor for physical to virtual translations
-    Vec3d m_translationOffset = WORLD_ORIGIN;     ///< Translation concatenated to the device translation
-    Quatd m_rotationOffset = Quatd::Identity();   ///< Rotation concatenated to the device rotation
-    unsigned char m_invertFlags = 0x00;           ///< Invert flags to be masked with DeviceTracker::InvertFlag
+    std::shared_ptr<DeviceClient> m_deviceClient;          ///< Reports device tracking information
+    double        m_scaling           = 1.0;               ///< Scaling factor for physical to virtual translations
+    Vec3d         m_translationOffset = WORLD_ORIGIN;      ///< Translation concatenated to the device translation
+    Quatd         m_rotationOffset    = Quatd::Identity(); ///< Rotation concatenated to the device rotation
+    unsigned char m_invertFlags       = 0x00;              ///< Invert flags to be masked with DeviceTracker::InvertFlag
 
     Vec3d m_currentPos;
     Quatd m_currentRot;
-    bool m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
+    bool  m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
 };
 } // imstk

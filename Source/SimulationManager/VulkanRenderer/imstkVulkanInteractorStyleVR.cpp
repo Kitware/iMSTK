@@ -40,7 +40,7 @@ VulkanInteractorStyleVR::initialize(std::shared_ptr<VulkanRenderer> renderer)
     for (uint32_t i = 0; i < vr::VRRenderModels()->GetRenderModelCount(); i++)
     {
         // Extract model name
-        auto nameLength = vr::VRRenderModels()->GetRenderModelName(i, nullptr, 0);
+        auto              nameLength = vr::VRRenderModels()->GetRenderModelName(i, nullptr, 0);
         std::vector<char> name(nameLength);
         vr::VRRenderModels()->GetRenderModelName(i, &name[0], nameLength);
         auto nameString = std::string(name.begin(), std::prev(name.end()));
@@ -77,8 +77,8 @@ VulkanInteractorStyleVR::updateVRDevices()
         // If device hasn't been created, then create it
         if (m_devices.find(name) == m_devices.end())
         {
-            m_devices[name] = std::unique_ptr<VulkanVRDevice>(new VulkanVRDevice());
-            m_devices[name]->m_ID = name;
+            m_devices[name]         = std::unique_ptr<VulkanVRDevice>(new VulkanVRDevice());
+            m_devices[name]->m_ID   = name;
             m_devices[name]->m_type = m_renderer->m_VRSystem->GetTrackedDeviceClass(i);
             m_devices[name]->m_pose = m_devicePoses[i];
             m_devices[name]->m_renderModelName
@@ -113,7 +113,7 @@ VulkanInteractorStyleVR::updateVRDevices()
         glm::vec3 scale;
         glm::quat orientation;
         glm::vec3 translation;
-        glm::vec3 skew; // ignore
+        glm::vec3 skew;        // ignore
         glm::vec4 perspective; // ignore
 
         glm::decompose(matrix, scale, orientation, translation, skew, perspective);
@@ -131,26 +131,26 @@ VulkanInteractorStyleVR::updateVRDevices()
 void
 VulkanInteractorStyleVR::addVisualVRObject(std::unique_ptr<VulkanVRDevice>& device)
 {
-    auto surfaceMesh = std::make_shared<SurfaceMesh>();
-    auto visualModel = std::make_shared<VisualModel>(surfaceMesh);
-    auto renderModel = device->m_renderModel;
-    auto vertexData = renderModel->rVertexData;
+    auto surfaceMesh  = std::make_shared<SurfaceMesh>();
+    auto visualModel  = std::make_shared<VisualModel>(surfaceMesh);
+    auto renderModel  = device->m_renderModel;
+    auto vertexData   = renderModel->rVertexData;
     auto triangleData = renderModel->rIndexData;
-    auto numVertices = renderModel->unVertexCount;
+    auto numVertices  = renderModel->unVertexCount;
     auto numTriangles = renderModel->unTriangleCount;
 
-    StdVectorOfVec3d vertices(numVertices);
-    StdVectorOfVec3d normals(numVertices);
+    StdVectorOfVec3d                        vertices(numVertices);
+    StdVectorOfVec3d                        normals(numVertices);
     std::vector<SurfaceMesh::TriangleArray> triangles(numTriangles);
 
     // Extract positions and vertices
     for (unsigned int i = 0; i < numVertices; i++)
     {
         auto position = vertexData[i].vPosition.v;
-        auto normal = vertexData[i].vNormal.v;
+        auto normal   = vertexData[i].vNormal.v;
 
         vertices[i] = Vec3d(position[0], position[1], position[2]);
-        normals[i] = Vec3d(normal[0], normal[1], normal[2]);
+        normals[i]  = Vec3d(normal[0], normal[1], normal[2]);
     }
 
     // Extract triangles
@@ -170,8 +170,8 @@ VulkanInteractorStyleVR::addVisualVRObject(std::unique_ptr<VulkanVRDevice>& devi
         auto texCoord = vertexData[i].rfTextureCoord;
 
         Vectorf UV(2);
-        UV[0] = texCoord[0];
-        UV[1] = texCoord[1];
+        UV[0]  = texCoord[0];
+        UV[1]  = texCoord[1];
         UVs[i] = UV;
     }
     surfaceMesh->setDefaultTCoords("tCoords");
@@ -189,7 +189,7 @@ VulkanInteractorStyleVR::addVisualVRObject(std::unique_ptr<VulkanVRDevice>& devi
 const std::string
 VulkanInteractorStyleVR::getDeviceID(const uint32_t index)
 {
-    auto modelNumber = this->getDeviceStringProperty(index, vr::Prop_ModelNumber_String);
+    auto modelNumber  = this->getDeviceStringProperty(index, vr::Prop_ModelNumber_String);
     auto serialNumber = this->getDeviceStringProperty(index, vr::Prop_SerialNumber_String);
 
     if (modelNumber.length() == 0 && serialNumber.length() == 0)
@@ -202,7 +202,7 @@ VulkanInteractorStyleVR::getDeviceID(const uint32_t index)
 
 const std::string
 VulkanInteractorStyleVR::getDeviceStringProperty(
-    const uint32_t index,
+    const uint32_t             index,
     vr::ETrackedDeviceProperty stringProperty)
 {
     // Get length of returned string value
@@ -234,9 +234,9 @@ void
 VulkanInteractorStyleVR::OnTimer()
 {
     vr::VRCompositor()->WaitGetPoses(m_devicePoses, vr::k_unMaxTrackedDeviceCount, nullptr, 0);
-    auto scene = m_simManager->getActiveScene();
+    auto scene    = m_simManager->getActiveScene();
     auto indexHMD = vr::k_unTrackedDeviceIndex_Hmd;
-    auto nameHMD = this->getDeviceID(indexHMD);
+    auto nameHMD  = this->getDeviceID(indexHMD);
 
     this->updateVRDevices();
 
@@ -249,7 +249,7 @@ VulkanInteractorStyleVR::OnTimer()
         HMDMatrixNative[0][2], HMDMatrixNative[1][2], HMDMatrixNative[2][2], 0.0f,
         HMDMatrixNative[0][3], HMDMatrixNative[1][3], HMDMatrixNative[2][3], 1.0f);
 
-    auto projectionMatrixLeftNative = m_renderer->m_VRSystem->GetProjectionMatrix(vr::Eye_Left, m_renderer->m_nearPlane, m_renderer->m_farPlane).m;
+    auto projectionMatrixLeftNative  = m_renderer->m_VRSystem->GetProjectionMatrix(vr::Eye_Left, m_renderer->m_nearPlane, m_renderer->m_farPlane).m;
     auto projectionMatrixRightNative = m_renderer->m_VRSystem->GetProjectionMatrix(vr::Eye_Right, m_renderer->m_nearPlane, m_renderer->m_farPlane).m;
 
     glm::mat4 projectionMatrixLeft(
@@ -264,7 +264,7 @@ VulkanInteractorStyleVR::OnTimer()
         projectionMatrixRightNative[0][2], projectionMatrixRightNative[1][2], projectionMatrixRightNative[2][2], projectionMatrixRightNative[3][2],
         projectionMatrixRightNative[0][3], projectionMatrixRightNative[1][3], projectionMatrixRightNative[2][3], projectionMatrixRightNative[3][3]);
 
-    auto eyeMatrixLeftNative = m_renderer->m_VRSystem->GetEyeToHeadTransform(vr::Eye_Left).m;
+    auto eyeMatrixLeftNative  = m_renderer->m_VRSystem->GetEyeToHeadTransform(vr::Eye_Left).m;
     auto eyeMatrixRightNative = m_renderer->m_VRSystem->GetEyeToHeadTransform(vr::Eye_Right).m;
 
     glm::mat4 eyeMatrixLeftOffset(
@@ -279,7 +279,7 @@ VulkanInteractorStyleVR::OnTimer()
         eyeMatrixRightNative[0][2], eyeMatrixRightNative[1][2], eyeMatrixRightNative[2][2], 0.0f,
         eyeMatrixRightNative[0][3], eyeMatrixRightNative[1][3], eyeMatrixRightNative[2][3], 1.0f);
 
-    auto eyeMatrixLeft = HMDMatrix * eyeMatrixLeftOffset;
+    auto eyeMatrixLeft  = HMDMatrix * eyeMatrixLeftOffset;
     auto eyeMatrixRight = HMDMatrix * eyeMatrixRightOffset;
 
     m_renderer->m_viewMatrices[0] = glm::inverse(eyeMatrixLeft);

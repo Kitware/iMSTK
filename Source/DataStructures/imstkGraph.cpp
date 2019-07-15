@@ -92,7 +92,7 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
     std::iota(coloringOrder.begin(), coloringOrder.end(), static_cast<unsigned short>(0));
 
     std::vector<bool> coloredNodes;
-    unsigned short color = 0;
+    unsigned short    color = 0;
     while (coloringOrder.size() > 0)
     {
         coloredNodes.resize(coloringOrder.size());
@@ -109,8 +109,8 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
         // Cannot run in parallel
         for (size_t i = 1; i < coloringOrder.size(); ++i)
         {
-            const auto u = coloringOrder[i];
-            bool bOK = true;
+            const auto u   = coloringOrder[i];
+            bool       bOK = true;
             for (const auto v : m_adjList[u])
             {
                 // Check if any neighbor node has the same color as the first processing node
@@ -122,7 +122,7 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
             }
             if (bOK)
             {
-                colors[u] = color;
+                colors[u]       = color;
                 coloredNodes[i] = true;
             }
         }
@@ -167,9 +167,9 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
 std::pair<std::vector<unsigned short>, unsigned short>
 Graph::doColoringGreedy(bool print /*= false*/) const
 {
-    const auto numNodes = m_adjList.size();
+    const auto                  numNodes = m_adjList.size();
     std::vector<unsigned short> colors(numNodes, std::numeric_limits<unsigned short>::max());
-    std::vector<bool> available(numNodes, false);
+    std::vector<bool>           available(numNodes, false);
 
     colors[0] = 0;
     unsigned short numColors = 0;

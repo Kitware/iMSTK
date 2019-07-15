@@ -35,13 +35,13 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    IterativeLinearSolver() {};
-    virtual ~IterativeLinearSolver() {};
+    IterativeLinearSolver() {}
+    virtual ~IterativeLinearSolver() {}
 
     ///
     /// \brief Do one iteration of the method.
     ///
-    virtual void iterate(Vectord &x, bool updateResidual = true) = 0;
+    virtual void iterate(Vectord& x, bool updateResidual = true) = 0;
 
     ///
     /// \brief set/get the maximum number of iterations for the iterative solver.
@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Return residue in 2-norm
     ///
-    virtual double getResidual(const Vectord &x);
+    virtual double getResidual(const Vectord& x);
 
     ///
     /// \brief Print solver information.
@@ -68,7 +68,7 @@ public:
     ///
     /// \brief Solve the linear system using Gauss-Seidel iterations.
     ///
-    virtual void solve(Vectord &x) override;
+    virtual void solve(Vectord& x) override;
 
     ///
     /// \brief Returns true if the solver is iterative
@@ -76,10 +76,10 @@ public:
     bool isIterative() const override
     {
         return true;
-    };
+    }
 
 protected:
-    size_t m_maxIterations = 100;   ///> Maximum number of iterations to be performed.
+    size_t  m_maxIterations = 100;  ///> Maximum number of iterations to be performed.
     Vectord m_residual;             ///> Storage for residual vector.
 };
 } //imstk

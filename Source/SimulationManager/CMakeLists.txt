@@ -3,12 +3,14 @@
 #-----------------------------------------------------------------------------
 
 set(VTK_H_FILES
+    VTKRenderer/imstkVTKTextStatusManager.h
     VTKRenderer/imstkVTKInteractorStyle.h
     VTKRenderer/imstkVTKScreenCaptureUtility.h
     VTKRenderer/imstkVTKViewer.h
     VTKRenderer/imstkOpenVRCommand.h)
 
 set(VTK_CPP_FILES
+    VTKRenderer/imstkVTKTextStatusManager.cpp
     VTKRenderer/imstkVTKInteractorStyle.cpp
     VTKRenderer/imstkVTKScreenCaptureUtility.cpp
     VTKRenderer/imstkVTKViewer.cpp
@@ -63,7 +65,7 @@ imstk_add_library( SimulationManager
     Devices
     Collision
   )
-  
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------

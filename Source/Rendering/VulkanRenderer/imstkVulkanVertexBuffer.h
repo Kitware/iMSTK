@@ -49,24 +49,24 @@ struct VulkanBasicVertex
 class VulkanVertexBuffer : public VulkanBuffer
 {
 public:
-    VulkanVertexBuffer(VulkanMemoryManager& memoryManager,
-                       unsigned int numVertices,
-                       unsigned int vertexSize,
-                       unsigned int numTriangles,
-                       double loadFactor = 1.0,
+    VulkanVertexBuffer(VulkanMemoryManager&   memoryManager,
+                       unsigned int           numVertices,
+                       unsigned int           vertexSize,
+                       unsigned int           numTriangles,
+                       double                 loadFactor = 1.0,
                        VulkanVertexBufferMode mode = VERTEX_BUFFER_STATIC);
 
-    void * getVertexMemory(uint32_t frameIndex = 0);
+    void* getVertexMemory(uint32_t frameIndex = 0);
 
-    void * getIndexMemory(uint32_t frameIndex = 0);
+    void* getIndexMemory(uint32_t frameIndex = 0);
 
     ~VulkanVertexBuffer() = default;
 
     ///
     /// \brief Utility function to update buffers
     ///
-    void updateVertexBuffer(std::vector<VulkanBasicVertex> * vertices,
-                            std::vector<std::array<uint32_t, 3>> * triangles);
+    void updateVertexBuffer(std::vector<VulkanBasicVertex>* vertices,
+                            std::vector<std::array<uint32_t, 3>>* triangles);
 
     void uploadBuffers(VkCommandBuffer& commandBuffer);
 
@@ -74,7 +74,7 @@ public:
 
     void setNumIndices(uint32_t numIndices);
 
-    void bindBuffers(VkCommandBuffer * commandBuffer, uint32_t frameIndex);
+    void bindBuffers(VkCommandBuffer* commandBuffer, uint32_t frameIndex);
 
     ///
     /// \brief Sets buffer states to modified
@@ -87,22 +87,22 @@ public:
 private:
     friend class VulkanRenderer;
 
-    VulkanInternalBuffer * m_vertexBuffer;
-    VulkanInternalBuffer * m_vertexStagingBuffer;
+    VulkanInternalBuffer* m_vertexBuffer;
+    VulkanInternalBuffer* m_vertexStagingBuffer;
 
     uint32_t m_numIndices;
 
-    VulkanInternalBuffer * m_indexBuffer;
-    VulkanInternalBuffer * m_indexStagingBuffer;
+    VulkanInternalBuffer* m_indexBuffer;
+    VulkanInternalBuffer* m_indexStagingBuffer;
 
     VkDevice m_renderDevice;
     uint32_t m_bufferMemoryIndex;
 
-    uint32_t m_vertexBufferSize = 0;
-    uint32_t m_indexBufferSize = 0;
-    bool m_vertexBufferModified = true;
-    bool m_indexBufferModified = true;
-    VulkanVertexBufferMode m_mode = VulkanVertexBufferMode::VERTEX_BUFFER_STATIC;
+    uint32_t m_vertexBufferSize     = 0;
+    uint32_t m_indexBufferSize      = 0;
+    bool     m_vertexBufferModified = true;
+    bool     m_indexBufferModified  = true;
+    VulkanVertexBufferMode m_mode   = VulkanVertexBufferMode::VERTEX_BUFFER_STATIC;
 
     static const uint32_t maxBufferSize = 1024 * 1024;
 };

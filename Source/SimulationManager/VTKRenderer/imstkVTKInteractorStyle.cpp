@@ -22,6 +22,7 @@
 // imstk
 #include "imstkVTKInteractorStyle.h"
 #include "imstkSimulationManager.h"
+#include "imstkVTKTextStatusManager.h"
 
 // vtk
 #include "vtkObjectFactory.h"
@@ -30,24 +31,18 @@
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkTextActor.h"
-#include "vtkTextProperty.h"
 
 namespace imstk
 {
 VTKInteractorStyle::VTKInteractorStyle()
 {
-    m_targetMS = 0.0; // 0 for no wait time
-    m_displayFps = false;
-    m_lastFpsUpdate = std::chrono::high_resolution_clock::now();
-    m_lastFps = 60.0;
-    m_fpsActor = vtkTextActor::New();
-    m_fpsActor->GetTextProperty()->SetFontSize(60);
-    m_fpsActor->SetVisibility(m_displayFps);
+    m_textStatusManager = std::make_shared<VTKTextStatusManager>(this);
+    m_lastFpsUpdate     = std::chrono::high_resolution_clock::now();
+    m_lastFps           = 60.0;
 }
 
 VTKInteractorStyle::~VTKInteractorStyle()
 {
-    m_fpsActor->Delete();
     this->SetReferenceCount(0);
 }
 
@@ -57,22 +52,21 @@ VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
     // Remove actor if previous renderer
     if (this->CurrentRenderer)
     {
-        this->CurrentRenderer->RemoveActor2D(m_fpsActor);
+        for (int i = 0; i < VTKTextStatusManager::NumStatusTypes; ++i)
+        {
+            this->CurrentRenderer->RemoveActor2D(m_textStatusManager->getTextActor(i));
+        }
     }
 
     // Set new current renderer
     vtkBaseInteractorStyle::SetCurrentRenderer(ren);
 
     // Add actor to current renderer
-    this->CurrentRenderer->AddActor2D(m_fpsActor);
+    for (int i = 0; i < VTKTextStatusManager::NumStatusTypes; ++i)
+    {
+        this->CurrentRenderer->AddActor2D(m_textStatusManager->getTextActor(i));
+    }
 }
-
-// Cross-platform sprintf
-#if defined(_WIN32) || defined(_WIN64)
-#   define IMSTK_SPRINT sprintf_s
-#else
-#   define IMSTK_SPRINT sprintf
-#endif
 
 void
 VTKInteractorStyle::OnTimer()
@@ -88,56 +82,39 @@ VTKInteractorStyle::OnTimer()
     // Reset camera clipping range
     this->CurrentRenderer->ResetCameraClippingRange();
 
-    // Update framerate value display
-    auto now = std::chrono::high_resolution_clock::now();
-    double fps = 1e6 / (double)std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count();
-    fps = 0.1 * fps + 0.9 * m_lastFps;
-    m_lastFps = fps;
-    int t = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastFpsUpdate).count();
-    if (t > 250)  //wait 250ms before updating displayed value
+    if (m_displayFps)
     {
-        std::string fpsVisualStr = "V: " + std::to_string((int)fps);
+        // Update framerate value display
+        auto   now       = std::chrono::high_resolution_clock::now();
+        double visualFPS = 1e6 / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count());
+        visualFPS = 0.1 * visualFPS + 0.9 * m_lastFps;
+        m_lastFps = visualFPS;
 
-        std::string fpsPhysicalStr;
-        if (m_simManager->getStatus() != SimulationStatus::PAUSED)
+        int t = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastFpsUpdate).count());
+        if (t > 250) //wait 250ms before updating displayed value
         {
-            char buff[32];
-            auto fps = m_simManager->getActiveScene()->getFPS();
-            if (fps < 4.0)
+            double physicalFPS;
+            if (m_simManager->getStatus() != SimulationStatus::PAUSED)
             {
-                IMSTK_SPRINT(buff, "%.2f", fps);
+                physicalFPS = m_simManager->getActiveScene()->getFPS();
             }
             else
             {
-                IMSTK_SPRINT(buff, "%d", static_cast<int>(fps));
+                physicalFPS = -1.0; // negative value means paused
             }
 
-            fpsPhysicalStr = "P: " + std::string(buff);
+            m_textStatusManager->setFPS(visualFPS, physicalFPS);
+            m_lastFpsUpdate = now;
         }
-        else
-        {
-            fpsPhysicalStr = "P: PAUSED";
-        }
-
-        m_fpsActor->SetInput((fpsVisualStr + std::string(" | ") + fpsPhysicalStr).c_str());
-        m_lastFpsUpdate = now;
+        m_pre = now;
     }
-    m_pre = now;
 
     // Render
     this->Interactor->Render();
     m_post = std::chrono::high_resolution_clock::now();
 
     // Plan next render
-    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(m_post - m_pre).count();
-    if (dt < m_targetMS)
-    {
-        this->Interactor->CreateOneShotTimer(m_targetMS - dt);
-    }
-    else
-    {
-        this->Interactor->CreateOneShotTimer(1);
-    }
+    this->Interactor->CreateOneShotTimer(0);
 
     // Call custom behavior
     if (m_onTimerFunction)
@@ -154,9 +131,9 @@ VTKInteractorStyle::OnChar()
 
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onCharFunctionMap.count(key) &&
-        m_onCharFunctionMap.at(key) &&
-        m_onCharFunctionMap.at(key)(this))
+    if (m_onCharFunctionMap.count(key)
+        && m_onCharFunctionMap.at(key)
+        && m_onCharFunctionMap.at(key)(this))
     {
         return;
     }
@@ -178,14 +155,14 @@ VTKInteractorStyle::OnChar()
         // Launch simulation if inactive
         if (status == SimulationStatus::INACTIVE)
         {
-            m_fpsActor->SetVisibility(m_displayFps);
+            m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
             m_simManager->startSimulation(SimulationStatus::RUNNING);
         }
     }
-    else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
+    else if (status != SimulationStatus::INACTIVE
+             && (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
     {
-        m_fpsActor->VisibilityOff();
+        m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, false);
         //m_simManager->endSimulation();
     }
     else if (key == 'd' || key == 'D')  // switch rendering mode
@@ -206,7 +183,7 @@ VTKInteractorStyle::OnChar()
     else if (key == 'p' || key == 'P')  // switch framerate display
     {
         m_displayFps = !m_displayFps;
-        m_fpsActor->SetVisibility(m_displayFps);
+        m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
         this->Interactor->Render();
     }
     else if (key == 'r' || key == 'R')
@@ -220,8 +197,8 @@ VTKInteractorStyle::OnMouseMove()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMouseMoveFunction &&
-        m_onMouseMoveFunction(this))
+    if (m_onMouseMoveFunction
+        && m_onMouseMoveFunction(this))
     {
         return;
     }
@@ -241,8 +218,8 @@ VTKInteractorStyle::OnLeftButtonDown()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onLeftButtonDownFunction &&
-        m_onLeftButtonDownFunction(this))
+    if (m_onLeftButtonDownFunction
+        && m_onLeftButtonDownFunction(this))
     {
         return;
     }
@@ -262,8 +239,8 @@ VTKInteractorStyle::OnLeftButtonUp()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onLeftButtonUpFunction &&
-        m_onLeftButtonUpFunction(this))
+    if (m_onLeftButtonUpFunction
+        && m_onLeftButtonUpFunction(this))
     {
         return;
     }
@@ -283,8 +260,8 @@ VTKInteractorStyle::OnMiddleButtonDown()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMiddleButtonDownFunction &&
-        m_onMiddleButtonDownFunction(this))
+    if (m_onMiddleButtonDownFunction
+        && m_onMiddleButtonDownFunction(this))
     {
         return;
     }
@@ -304,8 +281,8 @@ VTKInteractorStyle::OnMiddleButtonUp()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMiddleButtonUpFunction &&
-        m_onMiddleButtonUpFunction(this))
+    if (m_onMiddleButtonUpFunction
+        && m_onMiddleButtonUpFunction(this))
     {
         return;
     }
@@ -325,8 +302,8 @@ VTKInteractorStyle::OnRightButtonDown()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onRightButtonDownFunction &&
-        m_onRightButtonDownFunction(this))
+    if (m_onRightButtonDownFunction
+        && m_onRightButtonDownFunction(this))
     {
         return;
     }
@@ -346,8 +323,8 @@ VTKInteractorStyle::OnRightButtonUp()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onRightButtonUpFunction &&
-        m_onRightButtonUpFunction(this))
+    if (m_onRightButtonUpFunction
+        && m_onRightButtonUpFunction(this))
     {
         return;
     }
@@ -367,8 +344,8 @@ VTKInteractorStyle::OnMouseWheelForward()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMouseWheelForwardFunction &&
-        m_onMouseWheelForwardFunction(this))
+    if (m_onMouseWheelForwardFunction
+        && m_onMouseWheelForwardFunction(this))
     {
         return;
     }
@@ -388,8 +365,8 @@ VTKInteractorStyle::OnMouseWheelBackward()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMouseWheelBackwardFunction &&
-        m_onMouseWheelBackwardFunction(this))
+    if (m_onMouseWheelBackwardFunction
+        && m_onMouseWheelBackwardFunction(this))
     {
         return;
     }

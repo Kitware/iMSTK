@@ -30,7 +30,10 @@ namespace imstk
 ///
 /// \class imstkDbgRenderGeometry
 ///
-/// \brief debug render geometry base class
+/// \brief Debug render geometry base class
+/// During rendering, firstly call to clear() to clear the vertex buffer then iteratively call to appendVertex()
+/// Another way to modify rendering data is to call resizeBuffer(), then fill data by calling to setVertex() function
+/// In both ways, after finishing data modification, triggerDataModified() must be called to notify the render backend
 ///
 class DebugRenderGeometry
 {
@@ -47,42 +50,71 @@ public:
     };
 
     ///
-    /// \brief Clear the memory and set the count to zero
+    /// \brief Clear the vertex buffer
     ///
-    void clear();
+    void clear() { resizeBuffer(0); }
 
     ///
-    /// \brief Returns the vertex positions that are used for debug line rendering
+    /// \brief Reserve memory for fast push_back
     ///
-    const StdVectorOfVec3d& getVertexPositions() { return m_vertices; };
-    StdVectorOfVec3d& getVertexPositionsNonConst() { return m_vertices; };
+    virtual void reserve(const size_t size) { m_VertexBuffer.reserve(size); }
 
     ///
-    /// \brief Set the vertex data
+    /// \brief Returns the vertex position buffer that is used for debug rendering
     ///
-    void setVertexData(const StdVectorOfVec3d& verts);
+    const StdVectorOfVec3d& getVertexBuffer() const { return m_VertexBuffer; }
+    double* getVertexBufferPtr() { return reinterpret_cast<double*>(m_VertexBuffer.data()); }
+    const double* getVertexBufferPtr() const { return reinterpret_cast<const double*>(m_VertexBuffer.data()); }
 
     ///
-    /// \brief Get the name
+    /// \brief Returns the number of the vertices in the buffer
     ///
-    const std::string& getName() const { return m_name; };
+    size_t getNumVertices() const { return m_VertexBuffer.size(); }
 
     ///
-    /// \brief Get type
+    /// \brief Resize the vertex buffer
     ///
-    const Type& getType() const { return m_type; };
+    void resizeBuffer(const size_t newSize) { m_VertexBuffer.resize(newSize); }
 
     ///
-    /// \brief
+    /// \brief Return the vertex at the given idx
     ///
-    bool isModified() { return m_isModified; }
-    void setDataModifiedFlag(const bool flag) { m_isModified = flag; };
+    const Vec3d& getVertex(const size_t idx) const;
+
+    ///
+    /// \brief Set the vertex at index idx
+    ///
+    void setVertex(const size_t idx, const Vec3d& vert);
+
+    ///
+    /// \brief Append a vertex
+    ///
+    void appendVertex(const Vec3d& vert) { m_VertexBuffer.push_back(vert); }
+
+    ///
+    /// \brief Get the name of debug geometry
+    ///
+    const std::string& getName() const { return m_name; }
+
+    ///
+    /// \brief Get rendering geometry type
+    ///
+    const Type& getType() const { return m_type; }
+
+    ///
+    /// \brief Return m_isModified flag, used to communicate with the render engine
+    /// For performance reason, the only way to change this flag is to manually call to turnDataModifiedFlagON() or turnDataModifiedFlagOFF
+    /// Thus, we must call turnDataModifiedFlagON() explicity after finished data manipulation
+    ///
+    bool isModified() const { return m_isModified; }
+    void turnDataModifiedFlagON() { m_isModified = true; }
+    void turnDataModifiedFlagOFF() { m_isModified = false; }
 
     ///
     /// \brief Set/Get render material
     ///
-    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMat);
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
+    void                                   setRenderMaterial(const std::shared_ptr<RenderMaterial>& renderMat);
+    const std::shared_ptr<RenderMaterial>& getRenderMaterial() const;
 
 protected:
     friend class VTKRenderer;
@@ -91,48 +123,38 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DebugRenderGeometry(const std::string& name, Type type, const unsigned int size = 300) :
-        m_name(name), m_type(type), m_dataSize(size)
+    DebugRenderGeometry(const std::string& name, const Type type) :
+        m_name(name), m_type(type), m_renderMaterial(std::make_shared<RenderMaterial>())
     {
-        allocate(size);
-        m_renderMaterial = std::make_shared<RenderMaterial>();
     }
 
-    ///
-    /// \brief Preallocate a fixed size for the debug rendering data
-    ///
-    virtual void allocate(const unsigned int size)
-    {
-        m_vertices.resize(size);
-    };
+    virtual ~DebugRenderGeometry() = default;
 
-    Type m_type;                 ///> Debug geometry type
-    StdVectorOfVec3d m_vertices; ///> Vertex data
-    size_t m_dataSize = 0;       ///> Count for data size
+    std::string      m_name;              ///> Custom name of the scene object
+    Type             m_type;              ///> Debug geometry type
+    StdVectorOfVec3d m_VertexBuffer;      ///> Vertex buffer
 
-    std::string m_name; ///> Custom name of the scene object
-    bool m_renderDelegateCreated = false;
+    bool m_renderDelegateCreated = false; ///> This variable is used in Renderer
     bool m_isModified = false;
-
-    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr; ///> Render material
+    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr;
 };
 
 ///
-/// \class imstkDbgRenderPoints
+/// \class DebugRenderPoints
 ///
-/// \brief debug points to render
+/// \brief Debug points to render
 ///
 class DebugRenderPoints : public DebugRenderGeometry
 {
 public:
     ///
-    /// \brief Constructor/destructor
+    /// \brief Constructor
     ///
-    DebugRenderPoints(const std::string& name, const unsigned int size) : DebugRenderGeometry(name, Type::Points, size){}
+    DebugRenderPoints(const std::string& name) : DebugRenderGeometry(name, Type::Points) {}
 };
 
 ///
-/// \class DbgRenderLines
+/// \class DebugRenderLines
 ///
 /// \brief List of disjoint lines to render
 ///
@@ -140,38 +162,32 @@ class DebugRenderLines : public DebugRenderGeometry
 {
 public:
     ///
-    /// \brief Constructor/destructor
+    /// \brief Constructor
     ///
-    DebugRenderLines(const std::string& name, const unsigned int size = 300) : DebugRenderGeometry(name, Type::Lines, size){}
+    DebugRenderLines(const std::string& name) : DebugRenderGeometry(name, Type::Lines) {}
+
+    ///
+    /// \brief Reserve memory for fast push_back
+    ///
+    virtual void reserve(const size_t size) override { m_VertexBuffer.reserve(size * 2); }
 };
 
 ///
-/// \class imstkDbgRenderTriangles
+/// \class DebugRenderTriangles
 ///
-/// \brief debug triangles to render
+/// \brief Debug triangles to render
 ///
 class DebugRenderTriangles : public DebugRenderGeometry
 {
 public:
     ///
-    /// \brief Constructor/destructor
+    /// \brief Constructor
     ///
-    DebugRenderTriangles(const std::string& name, const unsigned int size = 3*100) : DebugRenderGeometry(name, Type::Triangles, size){}
+    DebugRenderTriangles(const std::string& name) : DebugRenderGeometry(name, Type::Triangles) {}
 
-protected:
     ///
-    /// \brief Preallocate a fixed size for the debug rendering data
+    /// \brief Reserve memory for fast push_back
     ///
-    void allocate(const unsigned int size) override
-    {
-        if (size % 3 == 0)
-        {
-            m_vertices.reserve(size);
-        }
-        else
-        {
-            LOG(WARNING) << "WARNING: The size of the triangle array should be multiples of three!";
-        }
-    }
+    virtual void reserve(const size_t size) override { m_VertexBuffer.reserve(size * 3); }
 };
 }

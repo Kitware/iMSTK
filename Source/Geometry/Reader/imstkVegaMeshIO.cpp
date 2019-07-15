@@ -72,8 +72,8 @@ VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::s
             LOG(WARNING) << "VegaMeshIO::write error: failed to convert volumetric mesh to vega mesh";
             return false;
         }
-        const auto fileName = const_cast<char *>(filePath.c_str());
-        const int write_status = vegaMesh->save(fileName);
+        const auto fileName     = const_cast<char*>(filePath.c_str());
+        const int  write_status = vegaMesh->save(fileName);
         if (write_status != 0)
         {
             LOG(WARNING) << "VegaMeshIO::write error: failed to write .veg file";
@@ -90,7 +90,7 @@ VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::s
 std::shared_ptr<vega::VolumetricMesh>
 VegaMeshIO::readVegaMesh(const std::string& filePath)
 {
-    auto fileName = const_cast<char*>(filePath.c_str());
+    auto                                  fileName = const_cast<char*>(filePath.c_str());
     std::shared_ptr<vega::VolumetricMesh> vegaMesh(vega::VolumetricMeshLoader::load(fileName));
     return vegaMesh;
 }
@@ -103,7 +103,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
     VegaMeshIO::copyVertices(vegaMesh, vertices);
 
     // Copy cells
-    auto cellType = vegaMesh->getElementType();
+    auto                                   cellType = vegaMesh->getElementType();
     std::shared_ptr<imstk::VolumetricMesh> mesh;
     if (cellType == vega::VolumetricMesh::TET)
     {
@@ -137,7 +137,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
 
 void
 VegaMeshIO::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
-                         StdVectorOfVec3d& vertices)
+                         StdVectorOfVec3d&                     vertices)
 {
     for (int i = 0; i < vegaMesh->getNumVertices(); ++i)
     {
@@ -169,24 +169,24 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
     if (imstkVolMesh->getType() == Geometry::Type::TetrahedralMesh)
     {
         // Using default material properties to append to the .veg file
-        const double E = 1E6;
-        const double nu = 0.45;
+        const double E       = 1E6;
+        const double nu      = 0.45;
         const double density = 1000.0;
 
         auto imstkVolTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(imstkVolMesh);
 
-        auto vertexArray = imstkVolMesh->getVertexPositions();
+        auto                vertexArray = imstkVolMesh->getVertexPositions();
         std::vector<double> vertices;
-        for (const auto & node : vertexArray)
+        for (const auto& node : vertexArray)
         {
             vertices.emplace_back(node(0));
             vertices.emplace_back(node(1));
             vertices.emplace_back(node(2));
         }
 
-        auto tetArray = imstkVolTetMesh->getTetrahedraVertices();
+        auto             tetArray = imstkVolTetMesh->getTetrahedraVertices();
         std::vector<int> elements;
-        for (const auto & tet : tetArray)
+        for (const auto& tet : tetArray)
         {
             elements.emplace_back(int(tet[0]));
             elements.emplace_back(int(tet[1]));

@@ -38,18 +38,20 @@
 
 namespace imstk
 {
-void PBDModelConfig::enableConstraint(PbdConstraint::Type type, double stiffness)
+void
+PBDModelConfig::enableConstraint(PbdConstraint::Type type, double stiffness)
 {
     LOG_IF(FATAL, (type == PbdConstraint::Type::FEMTet || type == PbdConstraint::Type::FEMHex))
         << "FEM constraint should be enabled by the enableFEMConstraint function";
-    m_RegularConstraints.push_back({type, stiffness});
+    m_RegularConstraints.push_back({ type, stiffness });
 }
 
-void PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material)
+void
+PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material)
 {
     LOG_IF(FATAL, (type != PbdConstraint::Type::FEMTet && type != PbdConstraint::Type::FEMHex))
         << "Non-FEM constraint should be enabled by the enableConstraint function";
-    m_FEMConstraints.push_back({type, material});
+    m_FEMConstraints.push_back({ type, material });
 }
 
 void
@@ -146,17 +148,17 @@ PbdModel::initialize()
 void
 PbdModel::computeElasticConstants()
 {
-    if (std::abs(m_Parameters->m_mu) < MIN_REAL &&
-        std::abs(m_Parameters->m_lambda) < MIN_REAL)
+    if (std::abs(m_Parameters->m_mu) < MIN_REAL
+        && std::abs(m_Parameters->m_lambda) < MIN_REAL)
     {
-        const auto E = m_Parameters->m_YoungModulus;
+        const auto E  = m_Parameters->m_YoungModulus;
         const auto nu = m_Parameters->m_PoissonRatio;
-        m_Parameters->m_mu = E / Real(2.0) / (Real(1.0) + nu);
+        m_Parameters->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
         m_Parameters->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
     }
     else
     {
-        const auto mu = m_Parameters->m_mu;
+        const auto mu     = m_Parameters->m_mu;
         const auto lambda = m_Parameters->m_lambda;
         m_Parameters->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
         m_Parameters->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
@@ -174,7 +176,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
     }
 
     // Create constraints
-    const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+    const auto& tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
     const auto& elements = tetMesh->getTetrahedraVertices();
 
     ParallelUtils::SpinLock lock;
@@ -202,7 +204,7 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
     }
 
     // Create constraints
-    const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+    const auto& tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
     const auto& elements = tetMesh->getTetrahedraVertices();
 
     ParallelUtils::SpinLock lock;
@@ -240,9 +242,9 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
 
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
-        const auto& tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-        const auto& elements = tetMesh->getTetrahedraVertices();
-        const auto nV = tetMesh->getNumVertices();
+        const auto&                    tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+        const auto&                    elements = tetMesh->getTetrahedraVertices();
+        const auto                     nV       = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
         for (size_t k = 0; k < elements.size(); ++k)
@@ -258,9 +260,9 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     }
     else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
-        const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-        const auto& elements = triMesh->getTrianglesVertices();
-        const auto nV = triMesh->getNumVertices();
+        const auto&                    triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+        const auto&                    elements = triMesh->getTrianglesVertices();
+        const auto                     nV       = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
         for (size_t k = 0; k < elements.size(); ++k)
@@ -286,7 +288,7 @@ PbdModel::initializeAreaConstraints(const double stiffness)
     }
 
     // ok, now create constraints
-    const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const auto& triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
     const auto& elements = triMesh->getTrianglesVertices();
 
     ParallelUtils::SpinLock lock;
@@ -313,9 +315,9 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
     }
 
     // Create constraints
-    const auto& triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    const auto& elements = triMesh->getTrianglesVertices();
-    const auto nV = triMesh->getNumVertices();
+    const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const auto&                      elements = triMesh->getTrianglesVertices();
+    const auto                       nV       = triMesh->getNumVertices();
     std::vector<std::vector<size_t>> onering(nV);
 
     for (size_t k = 0; k < elements.size(); ++k)
@@ -341,11 +343,11 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
                 E[i1][i2] = 0;
 
                 std::vector<size_t> rs(2);
-                auto it = std::set_intersection(r1.begin(), r1.end(), r2.begin(), r2.end(), rs.begin());
+                auto                it = std::set_intersection(r1.begin(), r1.end(), r2.begin(), r2.end(), rs.begin());
                 rs.resize(static_cast<size_t>(it - rs.begin()));
                 if (rs.size() > 1)
                 {
-                    size_t idx = (rs[0] == k) ? 1 : 0;
+                    size_t      idx = (rs[0] == k) ? 1 : 0;
                     const auto& tri = elements[rs[idx]];
                     for (size_t i = 0; i < 3; ++i)
                     {
@@ -385,11 +387,11 @@ bool
 PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh &&
-        m_mesh->getType() != Geometry::Type::TetrahedralMesh &&
-        m_mesh->getType() != Geometry::Type::LineMesh &&
-        m_mesh->getType() != Geometry::Type::HexahedralMesh &&
-        m_mesh->getType() != Geometry::Type::PointSet)
+    if (m_mesh->getType() != Geometry::Type::SurfaceMesh
+        && m_mesh->getType() != Geometry::Type::TetrahedralMesh
+        && m_mesh->getType() != Geometry::Type::LineMesh
+        && m_mesh->getType() != Geometry::Type::HexahedralMesh
+        && m_mesh->getType() != Geometry::Type::PointSet)
     {
         LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
         return false;
@@ -433,9 +435,9 @@ PbdModel::partitionCostraints(const bool print)
     vertexConstraints.clear();
 
     // do graph coloring for the constraint graph
-    const auto coloring = constraintGraph.doColoring();
+    const auto  coloring         = constraintGraph.doColoring();
     const auto& partitionIndices = coloring.first;
-    const auto numPartitions = coloring.second;
+    const auto  numPartitions    = coloring.second;
     assert(partitionIndices.size() == m_constraints.size());
 
     m_partitionedConstraints.resize(0);
@@ -477,7 +479,7 @@ PbdModel::partitionCostraints(const bool print)
     if (print)
     {
         size_t numConstraints = 0;
-        int idx = 0;
+        int    idx = 0;
         for (const auto& constraints : m_partitionedConstraints)
         {
             std::cout << "Partition # " << idx++ << " | # nodes: " << constraints.size() << std::endl;
@@ -554,7 +556,7 @@ PbdModel::setParticleMass(const double val, const size_t idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
-        m_mass[idx] = val;
+        m_mass[idx]    = val;
         m_invMass[idx] = 1.0 / val;
     }
 }
@@ -577,10 +579,10 @@ PbdModel::getInvMass(const size_t idx) const
 void
 PbdModel::integratePosition()
 {
-    const auto& accn = m_currentState->getAccelerations();
-    auto& prevPos = m_previousState->getPositions();
-    auto& pos = m_currentState->getPositions();
-    auto& vel = m_currentState->getVelocities();
+    const auto& accn    = m_currentState->getAccelerations();
+    auto&       prevPos = m_previousState->getPositions();
+    auto&       pos     = m_currentState->getPositions();
+    auto&       vel     = m_currentState->getVelocities();
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)
@@ -598,8 +600,8 @@ void
 PbdModel::updateVelocity()
 {
     const auto& prevPos = m_previousState->getPositions();
-    const auto& pos = m_currentState->getPositions();
-    auto& vel = m_currentState->getVelocities();
+    const auto& pos     = m_currentState->getPositions();
+    auto&       vel     = m_currentState->getVelocities();
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)

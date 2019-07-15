@@ -61,10 +61,10 @@ public:
     ///
     /// \brief Static factory for collision detection sub classes
     ///
-    static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(const Type& type,
+    static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(const Type&                      type,
                                                                             std::shared_ptr<CollidingObject> objA,
                                                                             std::shared_ptr<CollidingObject> objB,
-                                                                            std::shared_ptr<CollisionData> colData);
+                                                                            std::shared_ptr<CollisionData>   colData);
 
     ///
     /// \brief Constructor
@@ -107,7 +107,7 @@ public:
 
 protected:
 
-    Type m_type = Type::Custom;  ///< Collision detection algorithm type
-    std::shared_ptr<CollisionData> m_colData;    ///< Collision data
+    Type m_type = Type::Custom;               ///< Collision detection algorithm type
+    std::shared_ptr<CollisionData> m_colData; ///< Collision data
 };
 }

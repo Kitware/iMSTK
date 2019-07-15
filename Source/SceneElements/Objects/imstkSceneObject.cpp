@@ -83,7 +83,8 @@ SceneObject::getVisualModels()
     return m_visualModels;
 }
 
-size_t SceneObject::getNumVisualModels()
+size_t
+SceneObject::getNumVisualModels()
 {
     return m_visualModels.size();
 }

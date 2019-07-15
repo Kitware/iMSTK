@@ -66,7 +66,7 @@ class VTKCustomPolyDataMapper : public vtkOpenGLPolyDataMapper
 public:
     vtkTypeMacro(VTKCustomPolyDataMapper, vtkOpenGLPolyDataMapper);
 
-    static VTKCustomPolyDataMapper * New();
+    static VTKCustomPolyDataMapper* New();
 
     ///
     /// \brief Set the render material
@@ -76,68 +76,68 @@ public:
     ///
     /// \brief Let the polydata mapper know if it is for the surface mesh
     ///
-    void setIsSurfaceMapper(const bool val) { m_isSurfaceMapper = val; };
+    void setIsSurfaceMapper(const bool val) { m_isSurfaceMapper = val; }
 
 protected:
     ///
     /// \brief Sets up the VBO and VAO
     ///
-    void BuildBufferObjects(vtkRenderer * renderer, vtkActor * actor) override;
+    void BuildBufferObjects(vtkRenderer* renderer, vtkActor* actor) override;
 
     ///
     /// \brief Overridden method to prevent shader overwriting
     ///
     virtual void ReplaceShaderValues(
         std::map<vtkShader::Type, vtkShader*> shaders,
-        vtkRenderer * renderer,
-        vtkActor * actor) override;
+        vtkRenderer* renderer,
+        vtkActor* actor) override;
 
     ///
     /// \brief Loads the shader and injects preprocessor commands
     ///
     virtual void GetShaderTemplate(
         std::map<vtkShader::Type, vtkShader*> shaders,
-        vtkRenderer * renderer,
-        vtkActor * actor) override;
+        vtkRenderer* renderer,
+        vtkActor* actor) override;
 
     ///
     /// \brief Does all of the uniform/texture setting
     ///
     virtual void SetMapperShaderParameters(
         vtkOpenGLHelper& helper,
-        vtkRenderer * renderer,
-        vtkActor * actor) override;
+        vtkRenderer*     renderer,
+        vtkActor*        actor) override;
 
     ///
     /// \brief Overwritten to prevent extra uniform assignment
     ///
     virtual void SetCameraShaderParameters(
         vtkOpenGLHelper& helper,
-        vtkRenderer * renderer,
-        vtkActor * actor) override;
+        vtkRenderer*     renderer,
+        vtkActor*        actor) override;
 
     ///
     /// \brief Overwritten to prevent extra uniform assignment
     ///
     virtual void SetLightingShaderParameters(
         vtkOpenGLHelper& helper,
-        vtkRenderer * renderer,
-        vtkActor * actor) override;
+        vtkRenderer*     renderer,
+        vtkActor*        actor) override;
 
     ///
     /// \brief Overwritten to prevent extra uniform assignment
     ///
     virtual void SetPropertyShaderParameters(
         vtkOpenGLHelper& helper,
-        vtkRenderer * renderer,
-        vtkActor * actor) override;
+        vtkRenderer*     renderer,
+        vtkActor*        actor) override;
 
     ///
     /// \brief Allows for debugging interaction with VTK
     ///
     virtual void UpdateShaders(vtkOpenGLHelper& helper,
-                               vtkRenderer * renderer,
-                               vtkActor * actor) override;
+                               vtkRenderer*     renderer,
+                               vtkActor*        actor) override;
 
     ///
     /// \brief Loads a shader
@@ -146,12 +146,12 @@ protected:
 
     std::shared_ptr<RenderMaterial> m_renderMaterial; ///< Geometry reference
 
-    std::string m_vertexShaderSource = "";   ///< Source for vertex shader
-    std::string m_fragmentShaderSource = ""; ///< Source for fragment shader
+    std::string m_vertexShaderSource   = "";          ///< Source for vertex shader
+    std::string m_fragmentShaderSource = "";          ///< Source for fragment shader
 
-    vtkOpenGLBufferObject * m_positionsVBO; ///< Vertex positions VBO
-    vtkOpenGLBufferObject * m_normalsVBO;   ///< Vertex normals VBO
-    vtkOpenGLBufferObject * m_uvVBO;        ///< Vertex UVs VBO
+    vtkOpenGLBufferObject* m_positionsVBO;            ///< Vertex positions VBO
+    vtkOpenGLBufferObject* m_normalsVBO;              ///< Vertex normals VBO
+    vtkOpenGLBufferObject* m_uvVBO;                   ///< Vertex UVs VBO
 
     bool m_isSurfaceMapper = false;
 };

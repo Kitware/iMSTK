@@ -28,8 +28,8 @@
 
 namespace imstk
 {
-MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
-                           std::shared_ptr<SurfaceMesh> meshB,
+MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
+                           std::shared_ptr<SurfaceMesh>   meshB,
                            std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::MeshToMesh, colData),
     m_meshA(meshA),
@@ -75,7 +75,7 @@ MeshToMeshCD::computeCollisionData()
 void
 MeshToMeshCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
                          unsigned int eB_v1, unsigned int eB_v2,
-                         float t, void *userdata)
+                         float t, void* userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
     if (CD == nullptr)
@@ -90,7 +90,7 @@ MeshToMeshCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
 
 void
 MeshToMeshCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
-                          float t, void *userdata)
+                          float t, void* userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
     if (CD == nullptr)
@@ -105,7 +105,7 @@ MeshToMeshCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
 
 void
 MeshToMeshCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
-                          float t, void *userdata)
+                          float t, void* userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
     if (CD == nullptr)

@@ -158,8 +158,8 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
 ///
 std::shared_ptr<imstk::SceneObject>
 createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
-                              const std::string fileName,
-                              const std::string objectName)
+                              const std::string             fileName,
+                              const std::string             objectName)
 {
     if (!scene)
     {
@@ -173,7 +173,7 @@ createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
         return nullptr;
     }
 
-    auto mesh = imstk::MeshIO::read(fileName);
+    auto mesh        = imstk::MeshIO::read(fileName);
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
 
     // Create object and add to scene

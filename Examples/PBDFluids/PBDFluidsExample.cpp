@@ -34,9 +34,10 @@ using namespace imstk;
 /// \brief This example demonstrates the fluids simulation
 /// using Position based dynamics
 ///
-int main()
+int
+main()
 {
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDFluid");
 
     scene->getCamera()->setPosition(0, 10.0, 15.0);
@@ -75,10 +76,10 @@ int main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt = 0.005;
-    pbdParams->m_maxIter = 2;
-    pbdParams->m_proximity = 0.1;
+    pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt               = 0.005;
+    pbdParams->m_maxIter          = 2;
+    pbdParams->m_proximity        = 0.1;
     pbdParams->m_contactStiffness = 1.0;
 
     // Set the parameters
@@ -93,11 +94,11 @@ int main()
 
     // Create a box to hold the fluid
     StdVectorOfVec3d vertList;
-    int nSides = 5;
-    double width = 40.0;
-    double height = 40.0;
-    int nRows = 2;
-    int nCols = 2;
+    int              nSides = 5;
+    double           width  = 40.0;
+    double           height = 40.0;
+    int              nRows  = 2;
+    int              nCols  = 2;
     vertList.resize(nRows * nCols * nSides);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -118,7 +119,7 @@ int main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1) * nCols + j } };
+            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
             tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
@@ -127,11 +128,11 @@ int main()
 
     int nPointPerSide = nRows * nCols;
     //sidewalls 1 and 2 of box
-    width = 10.0;
+    width  = 10.0;
     height = 40.0;
-    nRows = 2;
-    nCols = 2;
-    const double dz = width / (double)(nCols - 1);
+    nRows  = 2;
+    nCols  = 2;
+    const double dz  = width / (double)(nCols - 1);
     const double dx1 = height / (double)(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
@@ -139,7 +140,7 @@ int main()
         {
             const double z = (double)dz * j;
             const double x = (double)dx1 * i;
-            vertList[(nPointPerSide) + i * nCols + j] = Vec3d(x - 20, z - 10.0, 20);
+            vertList[(nPointPerSide) + i * nCols + j]     = Vec3d(x - 20, z - 10.0, 20);
             vertList[(nPointPerSide * 2) + i * nCols + j] = Vec3d(x - 20, z - 10.0, -20);
         }
     }
@@ -162,10 +163,10 @@ int main()
     }
 
     //sidewalls 3 and 4 of box
-    width = 10.0;
+    width  = 10.0;
     height = 40.0;
-    nRows = 2;
-    nCols = 2;
+    nRows  = 2;
+    nCols  = 2;
     const double dz1 = width / (double)(nCols - 1);
     const double dy1 = height / (double)(nRows - 1);
     for (int i = 0; i < nRows; ++i)
@@ -214,7 +215,7 @@ int main()
     // Configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity = 0.1;
+    pbdParams2->m_proximity        = 0.1;
     pbdParams2->m_contactStiffness = 1.0;
 
     pbdModel2->configure(pbdParams2);
@@ -228,8 +229,8 @@ int main()
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
-    auto CD = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
-    auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
+    auto CD       = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
+    auto CH       = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
                 CD->getCollisionData(), deformableObj, floor, pbdSolver);
     colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
 

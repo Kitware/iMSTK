@@ -30,8 +30,8 @@
 
 namespace imstk
 {
-PenaltyCH::PenaltyCH(const Side& side,
-                     const std::shared_ptr<CollisionData>& colData,
+PenaltyCH::PenaltyCH(const Side&                             side,
+                     const std::shared_ptr<CollisionData>&   colData,
                      const std::shared_ptr<CollidingObject>& obj) :
     CollisionHandling(Type::Penalty, side, colData), m_object(obj)
 {
@@ -108,7 +108,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
     }
 
     // Get current force vector
-    auto& force = deformableObj->getContactForce();
+    auto&       force     = deformableObj->getContactForce();
     const auto& velVector = deformableObj->getVelocities();
 
     // If collision data, append forces

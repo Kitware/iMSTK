@@ -114,7 +114,7 @@ protected:
     ///
     /// \brief Converts imstk hexahedral mesh into a vtk unstructured grid suitable for writing to file
     ///
-    static vtkUnstructuredGrid * convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
+    static vtkUnstructuredGrid* convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
 
     ///
     /// \brief

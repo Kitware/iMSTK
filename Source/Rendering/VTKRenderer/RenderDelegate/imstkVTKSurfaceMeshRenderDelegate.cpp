@@ -51,7 +51,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
 
     // Map vertices
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double* vertData = reinterpret_cast<double*>(vertices.data());
+    double*           vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
@@ -61,9 +61,9 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     points->SetData(m_mappedVertexArray);
 
     // Copy cells
-    auto cells = vtkSmartPointer<vtkCellArray>::New();
+    auto      cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[3];
-    for (const auto &t : geometry->getTrianglesVertices())
+    for (const auto& t : geometry->getTrianglesVertices())
     {
         for (size_t i = 0; i < 3; ++i)
         {
@@ -80,8 +80,8 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // Map normals
     geometry->computeVertexNormals();
 
-    StdVectorOfVec3d& normals = geometry->getVertexNormalsNotConst();
-    double* normalData = reinterpret_cast<double*>(normals.data());
+    StdVectorOfVec3d& normals    = geometry->getVertexNormalsNotConst();
+    double*           normalData = reinterpret_cast<double*>(normals.data());
     m_mappedNormalArray->SetNumberOfComponents(3);
     m_mappedNormalArray->SetArray(normalData, normals.size() * 3, 1);
     polydata->GetPointData()->SetNormals(m_mappedNormalArray);
@@ -125,9 +125,9 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
 
         for (auto const tangent : geometry->getVertexTangents())
         {
-            float tempTangent[3] = {(float)tangent[0],
-                                    (float)tangent[1],
-                                    (float)tangent[2]};
+            float tempTangent[3] = { (float)tangent[0],
+                                     (float)tangent[1],
+                                     (float)tangent[2] };
             tangents->InsertNextTuple(tempTangent);
         }
         polydata->GetPointData()->AddArray(tangents);
@@ -148,8 +148,8 @@ VTKSurfaceMeshRenderDelegate::updateDataSource()
     {
         geometry->computeVertexNormals();
 
-        StdVectorOfVec3d& normals = geometry->getVertexNormalsNotConst();
-        double* normalData = reinterpret_cast<double*>(normals.data());
+        StdVectorOfVec3d& normals    = geometry->getVertexNormalsNotConst();
+        double*           normalData = reinterpret_cast<double*>(normals.data());
         m_mappedNormalArray->SetNumberOfComponents(3);
         m_mappedNormalArray->SetArray(normalData, normals.size() * 3, 1);
         this->m_mapper->GetInput()->GetPointData()->SetNormals(m_mappedNormalArray);

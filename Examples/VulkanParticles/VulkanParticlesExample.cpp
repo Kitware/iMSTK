@@ -31,10 +31,11 @@ using namespace imstk;
 /// \brief This example demonstrates particle rendering feature.
 /// NOTE: Requires enabling Vulkan rendering backend
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("RenderParticles");
 
     // Position camera
@@ -46,8 +47,8 @@ int main()
     {
         // Create sparks material
         auto particleMaterial = std::make_shared<RenderMaterial>();
-        auto particleTexture = std::make_shared<Texture>
-                               (iMSTK_DATA_ROOT "/particles/smoke_01.png", Texture::Type::DIFFUSE);
+        auto particleTexture  = std::make_shared<Texture>
+                                (iMSTK_DATA_ROOT "/particles/smoke_01.png", Texture::Type::DIFFUSE);
         particleMaterial->addTexture(particleTexture);
         particleMaterial->setBlendMode(RenderMaterial::BlendMode::ALPHA);
 
@@ -68,28 +69,28 @@ int main()
 
         // Add another keyframe
         RenderParticleKeyFrame midFrame0;
-        midFrame0.m_time = 700.0f;
+        midFrame0.m_time  = 700.0f;
         midFrame0.m_color = Color::Red;
         midFrame0.m_scale = 1.5f;
         particleEmitter->addKeyFrame(midFrame0);
 
         // Add another keyframe
         RenderParticleKeyFrame midFrame1;
-        midFrame1.m_time = 1300.0f;
-        midFrame1.m_color = Color::DarkGray;
+        midFrame1.m_time    = 1300.0f;
+        midFrame1.m_color   = Color::DarkGray;
         midFrame1.m_color.a = 0.7f;
-        midFrame1.m_scale = 2.0f;
+        midFrame1.m_scale   = 2.0f;
         particleEmitter->addKeyFrame(midFrame1);
 
         // Modify the last keyframe
         auto endKeyFrame = particleEmitter->getEndKeyFrame();
-        endKeyFrame->m_color = Color::Black;
+        endKeyFrame->m_color   = Color::Black;
         endKeyFrame->m_color.a = 0.0;
-        endKeyFrame->m_scale = 4.0;
+        endKeyFrame->m_scale   = 4.0;
 
         // Create and add animation scene object
         auto particleObject = std::make_shared<AnimationObject>("Smoke");
-        auto particleModel = std::make_shared<VisualModel>(particles);
+        auto particleModel  = std::make_shared<VisualModel>(particles);
         particleModel->setRenderMaterial(particleMaterial);
         particleObject->addVisualModel(particleModel);
         particleObject->setAnimationModel(particleEmitter);
@@ -100,8 +101,8 @@ int main()
     {
         // Create sparks material
         auto particleMaterial = std::make_shared<RenderMaterial>();
-        auto particleTexture = std::make_shared<Texture>
-                               (iMSTK_DATA_ROOT "/particles/flare_01.png", Texture::Type::DIFFUSE);
+        auto particleTexture  = std::make_shared<Texture>
+                                (iMSTK_DATA_ROOT "/particles/flare_01.png", Texture::Type::DIFFUSE);
         particleMaterial->addTexture(particleTexture);
         particleMaterial->setBlendMode(RenderMaterial::BlendMode::ALPHA);
 
@@ -121,7 +122,7 @@ int main()
         // Modifying the first keyframe
         auto startKeyFrame = particleEmitter->getStartKeyFrame();
         startKeyFrame->m_acceleration = Vec3f(0, -9.8, 0);
-        startKeyFrame->m_color = Color::Yellow;
+        startKeyFrame->m_color        = Color::Yellow;
 
         // Modifying the last keyframe
         auto endKeyFrame = particleEmitter->getEndKeyFrame();
@@ -129,7 +130,7 @@ int main()
 
         // Create and add animation object
         auto particleObject = std::make_shared<AnimationObject>("Sparks");
-        auto particleModel = std::make_shared<VisualModel>(particles);
+        auto particleModel  = std::make_shared<VisualModel>(particles);
         particleModel->setRenderMaterial(particleMaterial);
         particleObject->addVisualModel(particleModel);
         particleObject->setAnimationModel(particleEmitter);

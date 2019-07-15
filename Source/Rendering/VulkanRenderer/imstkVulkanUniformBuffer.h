@@ -79,10 +79,10 @@ struct VulkanLocalParticleFragmentUniforms
 
 struct VulkanLight
 {
-    glm::vec4 position; // 3 position
-    glm::vec4 color; // 3 color, 1 intensity
+    glm::vec4 position;  // 3 position
+    glm::vec4 color;     // 3 color, 1 intensity
     glm::vec4 direction; // 3 direction, 1 angle
-    glm::ivec4 state; // 1 type, 1 shadow map index
+    glm::ivec4 state;    // 1 type, 1 shadow map index
 };
 
 struct VulkanGlobalVertexUniforms
@@ -107,7 +107,7 @@ class VulkanUniformBuffer : public VulkanBuffer
 public:
     VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uint32_t uniformSize);
 
-    void updateUniforms(uint32_t uniformSize, void * uniformData, uint32_t frameIndex);
+    void updateUniforms(uint32_t uniformSize, void* uniformData, uint32_t frameIndex);
 
     ~VulkanUniformBuffer() = default;
 
@@ -115,11 +115,11 @@ protected:
     friend class VulkanRenderer;
     friend class VulkanMaterialDelegate;
 
-    VulkanInternalBuffer * getUniformBuffer();
+    VulkanInternalBuffer* getUniformBuffer();
 
-    void * getUniformMemory();
+    void* getUniformMemory();
 
-    VulkanInternalBuffer * m_uniformBuffer;
+    VulkanInternalBuffer* m_uniformBuffer;
 
     VkDevice m_renderDevice;
     uint32_t m_bufferMemoryIndex;

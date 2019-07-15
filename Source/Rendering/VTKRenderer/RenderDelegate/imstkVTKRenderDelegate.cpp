@@ -139,8 +139,8 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom)
 }
 
 void
-VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source,
-                               const bool notSurfaceMesh,
+VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
+                               const bool                      notSurfaceMesh,
                                std::shared_ptr<RenderMaterial> renderMat)
 {
     // Add normals

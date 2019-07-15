@@ -54,7 +54,7 @@ Module::start()
     // Keep active, wait for terminating call
     std::chrono::steady_clock::time_point previous_t = std::chrono::steady_clock::now() - std::chrono::minutes(1);
     std::chrono::steady_clock::time_point current_t;
-    long long elapsed;
+    long long                             elapsed;
     while (m_status != ModuleStatus::TERMINATING)
     {
         if (m_status == ModuleStatus::PAUSING)
@@ -81,7 +81,7 @@ Module::start()
 
             // If forcing a frequency, wait until enough time elapsed
             current_t = std::chrono::steady_clock::now();
-            elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_t - previous_t).count();
+            elapsed   = std::chrono::duration_cast<std::chrono::milliseconds>(current_t - previous_t).count();
             if (elapsed >= m_loopDelay)
             {
                 if (m_preUpdateCallback)
@@ -145,8 +145,8 @@ Module::end()
         m_postCleanUpCallback(this);
     }
 
-    if ((m_status == ModuleStatus::INACTIVE) ||
-        (m_status == ModuleStatus::TERMINATING))
+    if ((m_status == ModuleStatus::INACTIVE)
+        || (m_status == ModuleStatus::TERMINATING))
     {
         LOG(WARNING) << "Can not end '" << m_name << "'.\n"
                      << "Module already inactive or terminating.";
@@ -170,7 +170,8 @@ Module::getName() const
     return m_name;
 }
 
-double Module::getLoopDelay() const
+double
+Module::getLoopDelay() const
 {
     return m_loopDelay;
 }
@@ -186,7 +187,8 @@ Module::setLoopDelay(const double milliseconds)
     m_loopDelay = milliseconds;
 }
 
-double Module::getFrequency() const
+double
+Module::getFrequency() const
 {
     if (m_loopDelay < VERY_SMALL_EPSILON_D)
     {

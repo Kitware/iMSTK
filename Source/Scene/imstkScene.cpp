@@ -288,10 +288,10 @@ Scene::reset()
     for (auto obj : this->getSceneObjects())
     {
         const auto objType = obj->getType();
-        if (objType == SceneObject::Type::Rigid ||
-            objType == SceneObject::Type::FEMDeformable ||
-            objType == SceneObject::Type::Pbd ||
-            objType == SceneObject::Type::SPH)
+        if (objType == SceneObject::Type::Rigid
+            || objType == SceneObject::Type::FEMDeformable
+            || objType == SceneObject::Type::Pbd
+            || objType == SceneObject::Type::SPH)
         {
             obj->reset();
         }

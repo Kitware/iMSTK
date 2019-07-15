@@ -45,9 +45,9 @@ RenderMaterial::setDisplayMode(const DisplayMode displayMode)
     {
         return;
     }
-    m_displayMode = displayMode;
+    m_displayMode   = displayMode;
     m_stateModified = true;
-    m_modified = true;
+    m_modified      = true;
 }
 
 bool
@@ -63,9 +63,9 @@ RenderMaterial::setTessellated(const bool tessellated)
     {
         return;
     }
-    m_tessellated = tessellated;
+    m_tessellated   = tessellated;
     m_stateModified = true;
-    m_modified = true;
+    m_modified      = true;
 }
 
 float
@@ -81,9 +81,9 @@ RenderMaterial::setLineWidth(const float width)
     {
         return;
     }
-    m_lineWidth = width;
+    m_lineWidth     = width;
     m_stateModified = true;
-    m_modified = true;
+    m_modified      = true;
 }
 
 float
@@ -99,9 +99,9 @@ RenderMaterial::setPointSize(const float size)
     {
         return;
     }
-    m_pointSize = size;
+    m_pointSize     = size;
     m_stateModified = true;
-    m_modified = true;
+    m_modified      = true;
 }
 
 bool
@@ -118,8 +118,8 @@ RenderMaterial::setBackFaceCulling(const bool culling)
         return;
     }
     m_backfaceCulling = culling;
-    m_stateModified = true;
-    m_modified = true;
+    m_stateModified   = true;
+    m_modified        = true;
 }
 
 void
@@ -143,7 +143,7 @@ RenderMaterial::getColor() const
 void
 RenderMaterial::setColor(const Color color)
 {
-    m_color = color;
+    m_color    = color;
     m_modified = true;
 }
 
@@ -157,7 +157,7 @@ void
 RenderMaterial::setDebugColor(const Color color)
 {
     m_debugColor = color;
-    m_modified = true;
+    m_modified   = true;
 }
 
 const float&

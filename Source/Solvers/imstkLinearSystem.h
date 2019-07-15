@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~LinearSystem(){};
+    virtual ~LinearSystem() {}
 
     ///
     ///  \brief Returns a reference to local right hand side vector.
@@ -107,26 +107,22 @@ public:
     ///
     /// \brief Returns template expression for the lower triangular part of A.
     ///
-    Eigen::TriangularView < SystemMatrixType, Eigen::Lower >
-    getLowerTriangular() const;
+    Eigen::TriangularView<SystemMatrixType, Eigen::Lower> getLowerTriangular() const;
 
     ///
     /// \brief Returns template expression for the strict lower triangular part of A.
     ///
-    Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyLower >
-    getStrictLowerTriangular() const;
+    Eigen::TriangularView<SystemMatrixType, Eigen::StrictlyLower> getStrictLowerTriangular() const;
 
     ///
     /// \brief Returns template expression for the upper triangular part of A.
     ///
-    Eigen::TriangularView < SystemMatrixType, Eigen::Upper >
-    getUpperTrianglular() const;
+    Eigen::TriangularView<SystemMatrixType, Eigen::Upper> getUpperTrianglular() const;
 
     ///
     /// \brief Returns template expression for the strict upper triangular part of A.
     ///
-    Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyUpper >
-    getStrictUpperTriangular() const;
+    Eigen::TriangularView<SystemMatrixType, Eigen::StrictlyUpper> getStrictUpperTriangular() const;
 
     ///
     /// \brief Get the value of the function F
@@ -140,7 +136,7 @@ public:
 
 private:
     const SystemMatrixType& m_A;
-    const Vectord& m_b;
+    const Vectord&          m_b;
 
     Vectord m_f; ///> Scratch storage for matrix-vector operations
 };

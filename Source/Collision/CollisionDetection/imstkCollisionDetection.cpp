@@ -41,16 +41,16 @@
 namespace imstk
 {
 std::shared_ptr<CollisionDetection>
-CollisionDetection::makeCollisionDetectionObject(const Type& type,
+CollisionDetection::makeCollisionDetectionObject(const Type&                      type,
                                                  std::shared_ptr<CollidingObject> objA,
                                                  std::shared_ptr<CollidingObject> objB,
-                                                 std::shared_ptr<CollisionData> colData)
+                                                 std::shared_ptr<CollisionData>   colData)
 {
     switch (type)
     {
     case Type::UnidirectionalPlaneToSphere:
     {
-        auto plane = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
+        auto plane  = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -65,7 +65,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
     break;
     case Type::BidirectionalPlaneToSphere:
     {
-        auto plane = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
+        auto plane  = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -95,7 +95,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
     break;
     case Type::SphereToCylinder:
     {
-        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+        auto sphere   = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
         auto cylinder = std::dynamic_pointer_cast<Cylinder>(objA->getCollidingGeometry());
 
         // Geometries check
@@ -110,7 +110,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
     break;
     case Type::PointSetToSphere:
     {
-        auto mesh = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
+        auto mesh   = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -125,7 +125,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
     break;
     case Type::PointSetToPlane:
     {
-        auto mesh = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
+        auto mesh  = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto plane = std::dynamic_pointer_cast<Plane>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -155,7 +155,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
     break;
     case Type::PointSetToSpherePicking:
     {
-        auto mesh = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
+        auto mesh   = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
 
         // Geometries check
@@ -170,7 +170,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type& type,
     break;
     case Type::MeshToMeshBruteForce:
     {
-        auto geometry1 = std::dynamic_pointer_cast<Geometry>(objA->getCollidingGeometry());
+        auto geometry1  = std::dynamic_pointer_cast<Geometry>(objA->getCollidingGeometry());
         auto surfaceGeo = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
 
         // Geometries check

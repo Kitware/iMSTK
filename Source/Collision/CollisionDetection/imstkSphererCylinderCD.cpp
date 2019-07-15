@@ -36,16 +36,16 @@ SphereCylinderCD::computeCollisionData()
     m_colData->clearAll();
 
     // Get geometry properties
-    const Vec3d spherePos = m_sphere->getPosition();
-    const double rSphere = m_sphere->getRadius();
+    const Vec3d  spherePos = m_sphere->getPosition();
+    const double rSphere   = m_sphere->getRadius();
 
-    const Vec3d cylinderPos = m_cylinder->getPosition();
-    const Vec3d cylinderAxis = m_cylinder->getOrientationAxis();
-    const double rCylinder = m_cylinder->getRadius();
+    const Vec3d  cylinderPos  = m_cylinder->getPosition();
+    const Vec3d  cylinderAxis = m_cylinder->getOrientationAxis();
+    const double rCylinder    = m_cylinder->getRadius();
 
     // Compute shortest distance
     Vec3d distVec = (spherePos - cylinderPos) - cylinderAxis * (spherePos - cylinderPos).dot(cylinderAxis);
-    Vec3d n = -distVec / distVec.norm();
+    Vec3d n       = -distVec / distVec.norm();
 
     // Compute penetration depth
     double penetrationDepth = distVec.norm() - rSphere - rCylinder;
@@ -55,7 +55,7 @@ SphereCylinderCD::computeCollisionData()
     }
 
     // Compute collision points
-    Vec3d sphereColPt = spherePos + rSphere * n;
+    Vec3d sphereColPt   = spherePos + rSphere * n;
     Vec3d cylinderColPt = cylinderPos + cylinderAxis * (spherePos - cylinderPos).dot(cylinderAxis) + n * rCylinder;
 
     // Set collisionData

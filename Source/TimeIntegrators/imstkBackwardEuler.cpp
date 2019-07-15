@@ -26,36 +26,36 @@ namespace imstk
 void
 BackwardEuler::updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
                                   std::shared_ptr<VectorizedState> currentState,
-                                  Vectord& dV)
+                                  Vectord&                         dV)
 {
     currentState->getQDot() = prevState->getQDot() + dV;
-    currentState->getQ() = prevState->getQ() + m_dT * currentState->getQDot();
+    currentState->getQ()    = prevState->getQ() + m_dT * currentState->getQDot();
 }
 
 void
 BackwardEuler::updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
                                   std::shared_ptr<VectorizedState> currentState,
-                                  Vectord& dU)
+                                  Vectord&                         dU)
 {
-    currentState->getQ() = prevState->getQ() + dU;
+    currentState->getQ()    = prevState->getQ() + dU;
     currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
 }
 
 void
 BackwardEuler::updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
                                  std::shared_ptr<VectorizedState> currentState,
-                                 Vectord& v)
+                                 Vectord&                         v)
 {
     currentState->getQDot() = v;
-    currentState->getQ() = prevState->getQ() + m_dT * currentState->getQDot();
+    currentState->getQ()    = prevState->getQ() + m_dT * currentState->getQDot();
 }
 
 void
 BackwardEuler::updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
                                  std::shared_ptr<VectorizedState> currentState,
-                                 Vectord& u)
+                                 Vectord&                         u)
 {
-    currentState->getQ() = u;
+    currentState->getQ()    = u;
     currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
 }
 } // imstk

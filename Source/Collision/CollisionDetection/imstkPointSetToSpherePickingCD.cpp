@@ -27,8 +27,8 @@ limitations under the License.
 
 namespace imstk
 {
-PointSetToSpherePickingCD::PointSetToSpherePickingCD(std::shared_ptr<PointSet> pointSet,
-                                                     std::shared_ptr<Sphere> sphere,
+PointSetToSpherePickingCD::PointSetToSpherePickingCD(std::shared_ptr<PointSet>      pointSet,
+                                                     std::shared_ptr<Sphere>        sphere,
                                                      std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
     m_pointSet(pointSet),
@@ -49,7 +49,7 @@ PointSetToSpherePickingCD::computeCollisionData()
 
     // Get sphere properties
     auto spherePos = m_sphere->getPosition();
-    auto radius = m_sphere->getRadius() * m_sphere->getScaling();
+    auto radius    = m_sphere->getRadius() * m_sphere->getScaling();
 
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
@@ -66,8 +66,9 @@ PointSetToSpherePickingCD::computeCollisionData()
         });
 }
 
-void PointSetToSpherePickingCD::setDeviceTrackerAndButton(const std::shared_ptr<DeviceTracker> devTracker,
-                                                          const unsigned int )
+void
+PointSetToSpherePickingCD::setDeviceTrackerAndButton(const std::shared_ptr<DeviceTracker> devTracker,
+                                                     const unsigned int)
 {
     m_deviceTracker = devTracker;
 }

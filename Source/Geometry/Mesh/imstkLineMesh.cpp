@@ -26,7 +26,7 @@
 namespace imstk
 {
 void
-LineMesh::initialize(const StdVectorOfVec3d& vertices,
+LineMesh::initialize(const StdVectorOfVec3d&       vertices,
                      const std::vector<LineArray>& lines)
 {
     this->clear();
@@ -74,14 +74,14 @@ LineMesh::setLinesVertices(const std::vector<LineArray>& lines)
     if (m_originalNumLines == 0)
     {
         m_originalNumLines = lines.size();
-        m_maxNumLines = (size_t)(m_originalNumLines * m_loadFactor);
+        m_maxNumLines      = (size_t)(m_originalNumLines * m_loadFactor);
         m_lines.reserve(m_maxNumLines);
     }
 
     if (lines.size() <= m_maxNumLines)
     {
         m_topologyChanged = true;
-        m_lines = lines;
+        m_lines           = lines;
     }
     else
     {

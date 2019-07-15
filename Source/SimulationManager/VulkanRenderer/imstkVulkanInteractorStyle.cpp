@@ -31,13 +31,13 @@ VulkanInteractorStyle::VulkanInteractorStyle()
 }
 
 void
-VulkanInteractorStyle::setWindow(GLFWwindow * window, VulkanViewer * viewer)
+VulkanInteractorStyle::setWindow(GLFWwindow* window, VulkanViewer* viewer)
 {
     m_window = window;
     m_viewer = viewer;
 
     m_stopWatch.start();
-    glfwSetWindowUserPointer(window, (void *)this);
+    glfwSetWindowUserPointer(window, (void*)this);
 
     glfwSetKeyCallback(m_window, VulkanInteractorStyle::OnCharInterface);
     glfwSetMouseButtonCallback(m_window, VulkanInteractorStyle::OnMouseButtonInterface);
@@ -48,16 +48,16 @@ VulkanInteractorStyle::setWindow(GLFWwindow * window, VulkanViewer * viewer)
 }
 
 void
-VulkanInteractorStyle::OnCharInterface(GLFWwindow * window, int keyID, int code, int type, int extra)
+VulkanInteractorStyle::OnCharInterface(GLFWwindow* window, int keyID, int code, int type, int extra)
 {
-    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    auto style = (VulkanInteractorStyle*)glfwGetWindowUserPointer(window);
     style->OnChar(keyID, type);
 }
 
 void
-VulkanInteractorStyle::OnMouseButtonInterface(GLFWwindow * window, int buttonID, int type, int extra)
+VulkanInteractorStyle::OnMouseButtonInterface(GLFWwindow* window, int buttonID, int type, int extra)
 {
-    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    auto style = (VulkanInteractorStyle*)glfwGetWindowUserPointer(window);
 
     switch (buttonID)
     {
@@ -99,8 +99,8 @@ VulkanInteractorStyle::OnTimer()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onTimerFunction &&
-        m_onTimerFunction(this))
+    if (m_onTimerFunction
+        && m_onTimerFunction(this))
     {
         return;
     }
@@ -118,9 +118,9 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
 
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onCharFunctionMap.count(key) &&
-        m_onCharFunctionMap.at(key) &&
-        m_onCharFunctionMap.at(key)(this))
+    if (m_onCharFunctionMap.count(key)
+        && m_onCharFunctionMap.at(key)
+        && m_onCharFunctionMap.at(key)(this))
     {
         return;
     }
@@ -145,8 +145,8 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
             m_simManager->startSimulation(SimulationStatus::RUNNING);
         }
     }
-    else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q')) // || key == 'e' || key == 'E')) // end Simulation
+    else if (status != SimulationStatus::INACTIVE
+             && (key == 'q' || key == 'Q')) // || key == 'e' || key == 'E')) // end Simulation
     {
         m_simManager->endSimulation();
     }
@@ -177,8 +177,8 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
 void
 VulkanInteractorStyle::OnMouseMove(double x, double y)
 {
-    m_mousePos[0] = x;
-    m_mousePos[1] = y;
+    m_mousePos[0]           = x;
+    m_mousePos[1]           = y;
     m_mousePosNormalized[0] = x;
     m_mousePosNormalized[1] = y;
     this->normalizeCoordinate(m_mousePosNormalized[0], m_mousePosNormalized[1]);
@@ -319,20 +319,20 @@ VulkanInteractorStyle::OnMouseWheelBackward(double y)
 }
 
 void
-VulkanInteractorStyle::OnWindowResizeInterface(GLFWwindow * window, int width, int height)
+VulkanInteractorStyle::OnWindowResizeInterface(GLFWwindow* window, int width, int height)
 {
-    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    auto style = (VulkanInteractorStyle*)glfwGetWindowUserPointer(window);
 }
 
 void
-VulkanInteractorStyle::OnFramebuffersResizeInterface(GLFWwindow * window, int width, int height)
+VulkanInteractorStyle::OnFramebuffersResizeInterface(GLFWwindow* window, int width, int height)
 {
-    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    auto style = (VulkanInteractorStyle*)glfwGetWindowUserPointer(window);
     style->OnWindowResize(width, height);
 }
 
 void
-VulkanInteractorStyle::normalizeCoordinate(double &x, double &y)
+VulkanInteractorStyle::normalizeCoordinate(double& x, double& y)
 {
     x = (x - m_viewer->m_width / 2) / m_viewer->m_width;
     y = (y - m_viewer->m_height / 2) / m_viewer->m_height;
@@ -345,16 +345,16 @@ VulkanInteractorStyle::OnWindowResize(int width, int height)
 }
 
 void
-VulkanInteractorStyle::OnMouseMoveInterface(GLFWwindow * window, double x, double y)
+VulkanInteractorStyle::OnMouseMoveInterface(GLFWwindow* window, double x, double y)
 {
-    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    auto style = (VulkanInteractorStyle*)glfwGetWindowUserPointer(window);
     style->OnMouseMove(x, y);
 }
 
 void
-VulkanInteractorStyle::OnMouseWheelInterface(GLFWwindow * window, double x, double y)
+VulkanInteractorStyle::OnMouseWheelInterface(GLFWwindow* window, double x, double y)
 {
-    auto style = (VulkanInteractorStyle *)glfwGetWindowUserPointer(window);
+    auto style = (VulkanInteractorStyle*)glfwGetWindowUserPointer(window);
     if (y < 0)
     {
         style->OnMouseWheelBackward(y);

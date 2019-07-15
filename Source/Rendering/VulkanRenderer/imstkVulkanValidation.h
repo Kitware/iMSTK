@@ -28,27 +28,27 @@ namespace imstk
 class VulkanValidation
 {
 public:
-    static char * getValidationLayer()
+    static char* getValidationLayer()
     {
         return "VK_LAYER_LUNARG_standard_validation";
-    };
+    }
 
-    static char * getValidationExtension()
+    static char* getValidationExtension()
     {
         return "VK_EXT_debug_report";
-    };
+    }
 
-    static VKAPI_ATTR VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT debugReportFlags,
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT      debugReportFlags,
                                                               VkDebugReportObjectTypeEXT debugReportObjectType,
-                                                              uint64_t callbackObject,
-                                                              size_t level,
-                                                              int32_t code,
-                                                              const char * prefix,
-                                                              const char * message,
-                                                              void * data)
+                                                              uint64_t                   callbackObject,
+                                                              size_t                     level,
+                                                              int32_t                    code,
+                                                              const char*                prefix,
+                                                              const char*                message,
+                                                              void*                      data)
     {
         LOG(WARNING) << prefix << ": " << message;
         return VK_FALSE;
-    };
+    }
 };
 }

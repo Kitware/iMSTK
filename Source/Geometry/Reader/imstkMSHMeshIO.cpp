@@ -34,7 +34,7 @@
 namespace imstk
 {
 std::shared_ptr<imstk::VolumetricMesh>
-MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
+MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
 {
     if (meshType != MeshFileType::MSH)
     {
@@ -45,18 +45,18 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
     // based on the format provided on
     // http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
 
-    size_t nNodes;                                                            // number-of-nodes
-    size_t nElements;                                                         // number-of-elements
-    std::vector<size_t> nodeIDs;                                              // number assigned to each node (node number)
-    StdVectorOfVec3d nodesCoords;                                             // nodes coordinates
-    std::vector<size_t> tetrahedronIDs;                                       // tet elements IDs
-    std::vector<size_t> hexahedronIDs;                                        // hex elements IDs
+    size_t                                   nNodes;                          // number-of-nodes
+    size_t                                   nElements;                       // number-of-elements
+    std::vector<size_t>                      nodeIDs;                         // number assigned to each node (node number)
+    StdVectorOfVec3d                         nodesCoords;                     // nodes coordinates
+    std::vector<size_t>                      tetrahedronIDs;                  // tet elements IDs
+    std::vector<size_t>                      hexahedronIDs;                   // hex elements IDs
     std::vector<TetrahedralMesh::TetraArray> tetrahedronConnectivity;         // tet element connectivity
-    std::vector<HexahedralMesh::HexaArray> hexahedronConnectivity;            // hex element connectivity
-    std::map<ElemType, size_t> elemCountMap;                                  // map of the element types to their number of counts
-    std::string subString;                                                    // to store space separated strings in a line
-    std::string mshLine;                                                      // a msh file line
-    std::stringstream mshLineStream;                                          // sting stream object which represent a line in the .msh file
+    std::vector<HexahedralMesh::HexaArray>   hexahedronConnectivity;          // hex element connectivity
+    std::map<ElemType, size_t>               elemCountMap;                    // map of the element types to their number of counts
+    std::string                              subString;                       // to store space separated strings in a line
+    std::string                              mshLine;                         // a msh file line
+    std::stringstream                        mshLineStream;                   // sting stream object which represent a line in the .msh file
 
     // Open the file
     std::ifstream mshStream(filePath);
@@ -130,7 +130,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
     std::string node_xC;
     std::string node_yC;
     std::string node_zC;
-    size_t nodes_count = 0;
+    size_t      nodes_count = 0;
     while (getline(mshStream, mshLine))
     {
         mshLineStream.str(std::string());
@@ -201,7 +201,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
     }
 
     // Get the total number of elements of each type
-    int elemType;                               // Store an element type
+    int    elemType;                            // Store an element type
     size_t elemID;                              // Stores an element ID
     while (getline(mshStream, mshLine))
     {
@@ -215,7 +215,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
             {
                 break;
             }
-            elemID = stoul(subString); // Read the element ID
+            elemID = stoul(subString);  // Read the element ID
             subString.clear();
             mshLineStream >> subString; // Read the element type
             elemType = stoul(subString);
@@ -257,10 +257,10 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
     hexahedronIDs.resize(elemCountMap[ElemType::hexahedron]);
     tetrahedronConnectivity.resize(elemCountMap[ElemType::tetrahedron]);
     hexahedronConnectivity.resize(elemCountMap[ElemType::hexahedron]);
-    size_t tetElemCount = 0;
-    size_t hexElemCount = 0;
+    size_t                      tetElemCount = 0;
+    size_t                      hexElemCount = 0;
     TetrahedralMesh::TetraArray tmp_4arr;       // Temp array to store the connectivity of a tet element (if any)
-    HexahedralMesh::HexaArray tmp_8arr;         // Temp array to store the connectivity of a hex element (if any)
+    HexahedralMesh::HexaArray   tmp_8arr;       // Temp array to store the connectivity of a hex element (if any)
     // Look for "$Elements" field
     mshStream.clear();
     mshStream.seekg(0, std::ios::beg);
@@ -291,7 +291,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
             {
                 break;
             }
-            elemID = stoul(subString); // Read the element ID
+            elemID = stoul(subString);  // Read the element ID
             subString.clear();
             mshLineStream >> subString; // Read the element type
             elemType = stoul(subString);
@@ -380,7 +380,7 @@ MSHMeshIO::read(const std::string & filePath, const MeshFileType meshType)
 }
 
 size_t
-MSHMeshIO::numElemNodes(const ElemType & elType)
+MSHMeshIO::numElemNodes(const ElemType& elType)
 {
     switch (elType)
     {

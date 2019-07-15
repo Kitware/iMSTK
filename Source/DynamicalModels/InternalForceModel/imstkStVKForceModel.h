@@ -43,12 +43,12 @@ public:
     /// \brief Constructor
     ///
     StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
-                   const bool withGravity = true,
-                   const double gravity = 10.0) : InternalForceModel()
+                   const bool                            withGravity = true,
+                   const double                          gravity = 10.0) : InternalForceModel()
     {
-        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
-        vega::StVKElementABCD *precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
+        auto                   tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
+        vega::StVKElementABCD* precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
+        m_stVKInternalForces      = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
         m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
     }
 
@@ -62,7 +62,7 @@ public:
     ///
     inline void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {
-        double *data = const_cast<double*>(u.data());
+        double* data = const_cast<double*>(u.data());
         m_stVKInternalForces->ComputeForces(data, internalForce.data());
     }
 
@@ -79,7 +79,7 @@ public:
     ///
     inline void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
-        double *data = const_cast<double*>(u.data());
+        double* data = const_cast<double*>(u.data());
         m_vegaStVKStiffnessMatrix->ComputeStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
@@ -103,8 +103,8 @@ public:
 
 protected:
 
-    std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;
-    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
+    std::shared_ptr<vega::StVKInternalForces>  m_stVKInternalForces;
+    std::shared_ptr<vega::SparseMatrix>        m_vegaTangentStiffnessMatrix;
     std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaStVKStiffnessMatrix;
     bool ownStiffnessMatrix;
 };

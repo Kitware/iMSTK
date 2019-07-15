@@ -47,12 +47,12 @@ public:
     /// \brief Constructor
     ///
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
-                        const bool withGravity = true,
-                        const double gravity = -9.81) : InternalForceModel()
+                        const bool                            withGravity = true,
+                        const double                          gravity = -9.81) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
-        vega::StVKElementABCD *precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
+        vega::StVKElementABCD* precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
         m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
 
         auto stVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
@@ -63,10 +63,10 @@ public:
 
         auto K = m_stiffnessMatrix.get();
         stVKStiffnessMatrix->GetStiffnessMatrixTopology(&K);
-        double *zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
+        double* zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
         stVKStiffnessMatrix->ComputeStiffnessMatrix(zero, m_stiffnessMatrix.get());
         free(zero);
-    };
+    }
 
     ///
     /// \brief Destructor
@@ -77,14 +77,14 @@ public:
         {
             delete m_stiffnessMatrixRawPtr;
         }
-    };
+    }
 
     ///
     /// \brief Get the internal force
     ///
     inline void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {
-        double *data = const_cast<double*>(u.data());
+        double* data = const_cast<double*>(u.data());
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
@@ -122,10 +122,10 @@ public:
     }
 
 protected:
-    std::shared_ptr<vega::SparseMatrix> m_stiffnessMatrix;
+    std::shared_ptr<vega::SparseMatrix>       m_stiffnessMatrix;
     std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;
 
     // tmp
-    vega::SparseMatrix *m_stiffnessMatrixRawPtr;
+    vega::SparseMatrix* m_stiffnessMatrixRawPtr;
 };
 } // imstk

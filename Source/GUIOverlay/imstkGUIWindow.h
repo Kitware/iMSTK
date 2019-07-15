@@ -49,10 +49,10 @@ public:
     ///
     Window(std::string name,
            std::string title = "",
-           float width = 100,
-           float height = 50,
-           float x = 0,
-           float y = 0);
+           float       width = 100,
+           float       height = 50,
+           float       x = 0,
+           float       y = 0);
 
     ///
     /// \brief Destructor
@@ -83,9 +83,9 @@ protected:
     Window() = delete;
 
     std::string m_title = "";
-    float m_width;
-    float m_height;
-    WidgetList m_widgets;
+    float       m_width;
+    float       m_height;
+    WidgetList  m_widgets;
 };
 } // GUI
 } // imstk

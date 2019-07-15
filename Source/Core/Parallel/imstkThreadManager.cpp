@@ -28,7 +28,8 @@ namespace ParallelUtils
 {
 std::unique_ptr<tbb::global_control> ThreadManager::s_tbbGlobalControl;
 
-void ThreadManager::setThreadPoolSize(const size_t nThreads)
+void
+ThreadManager::setThreadPoolSize(const size_t nThreads)
 {
     LOG_IF(FATAL, (nThreads == 0)) << "Invalid number of threads";
     LOG(INFO) << "Set number of worker threads to " << nThreads;
@@ -43,7 +44,8 @@ void ThreadManager::setThreadPoolSize(const size_t nThreads)
                                         nThreads));
 }
 
-void ThreadManager::setOptimalParallelism()
+void
+ThreadManager::setOptimalParallelism()
 {
     setThreadPoolSize(static_cast<size_t>(tbb::task_scheduler_init::default_num_threads()));
 }

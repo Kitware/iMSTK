@@ -25,19 +25,19 @@
 
 namespace imstk
 {
-static dWorldID odeWorld;
+static dWorldID      odeWorld;
 static dJointGroupID odeContactgroup;
 // dynamics and collision objects
 static dSpaceID odeSpace;
-static dBodyID odeBody;
-static dGeomID odeGeom;
-static dMass odeMass;
+static dBodyID  odeBody;
+static dGeomID  odeGeom;
+static dMass    odeMass;
 
 void
-RigidObject::odeNearCallback(void *data, dGeomID o1, dGeomID o2)
+RigidObject::odeNearCallback(void* data, dGeomID o1, dGeomID o2)
 {
-    dBodyID b1 = dGeomGetBody(o1);
-    dBodyID b2 = dGeomGetBody(o2);
+    dBodyID  b1 = dGeomGetBody(o1);
+    dBodyID  b2 = dGeomGetBody(o2);
     dContact contact;
     contact.surface.mode = dContactBounce | dContactSoftCFM;
     // friction parameter
@@ -67,13 +67,13 @@ RigidObject::simulationStep()
 }
 
 void
-RigidObject::getGeometryConfig(imstk::Vec3d &p, imstk::Mat3d &orientation)
+RigidObject::getGeometryConfig(imstk::Vec3d& p, imstk::Mat3d& orientation)
 {
-    const dReal *pos;
-    const dReal *R;
+    const dReal* pos;
+    const dReal* R;
 
     pos = dGeomGetPosition(odeGeom);
-    R = dGeomGetRotation(odeGeom);
+    R   = dGeomGetRotation(odeGeom);
 
     p[0] = (double)pos[0];
     p[1] = (double)pos[2];

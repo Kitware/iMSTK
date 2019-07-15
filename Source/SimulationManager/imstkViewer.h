@@ -42,19 +42,19 @@ class Viewer
 {
 public:
 
-    Viewer() {};
-
-    Viewer(SimulationManager * manager){};
+    Viewer() {}
+    Viewer(SimulationManager*) {}
+    virtual ~Viewer() = default;
 
     ///
     /// \brief Get scene currently being rendered
     ///
-    std::shared_ptr<Scene> getActiveScene() const;
+    const std::shared_ptr<Scene>& getActiveScene() const;
 
     ///
     /// \brief Set scene to be rendered
     ///
-    virtual void setActiveScene(std::shared_ptr<Scene> scene) = 0;
+    virtual void setActiveScene(const std::shared_ptr<Scene>& scene) = 0;
 
     ///
     /// \brief Start rendering
@@ -75,7 +75,7 @@ public:
     ///
     /// \brief Get the current renderer's mode
     ///
-    virtual const Renderer::Mode getRenderingMode(){ return Renderer::Mode::EMPTY; };
+    virtual Renderer::Mode getRenderingMode() { return Renderer::Mode::EMPTY; }
 
     ///
     /// \brief Returns true if the Viewer is rendering
@@ -85,12 +85,12 @@ public:
     ///
     /// \brief Retrieve the renderer associated with the current scene
     ///
-    std::shared_ptr<Renderer> getActiveRenderer() const;
+    const std::shared_ptr<Renderer>& getActiveRenderer() const;
 
     ///
     /// \brief access screen shot utility
     ///
-    std::shared_ptr<ScreenCaptureUtility> getScreenCaptureUtility() const;
+    const std::shared_ptr<ScreenCaptureUtility>& getScreenCaptureUtility() const;
 
     ///
     /// \brief Set the coloring of the screen background
@@ -101,7 +101,7 @@ public:
     ///
     /// \brief Get canvas
     ///
-    std::shared_ptr<GUIOverlay::Canvas> getCanvas();
+    const std::shared_ptr<GUIOverlay::Canvas>& getCanvas();
 
     ///
     /// \brief Set custom event handlers on interactor style
@@ -124,15 +124,13 @@ public:
     void setOnTimerFunction(EventHandlerFunction func);
 
 protected:
-    std::shared_ptr<Scene> m_activeScene;
-
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
+    std::shared_ptr<Scene>                m_activeScene;
+    std::shared_ptr<InteractorStyle>      m_interactorStyle;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
-    std::shared_ptr<InteractorStyle> m_interactorStyle;
-
     bool m_running = false;
-    std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();;
+    std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();
 };
 }

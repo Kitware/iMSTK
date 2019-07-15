@@ -97,14 +97,14 @@ public:
     VulkanMaterialDelegate(
         std::shared_ptr<VulkanUniformBuffer> vertexUniformBuffer,
         std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
-        std::shared_ptr<RenderMaterial> material,
-        VulkanMemoryManager& memoryManager,
-        VulkanMaterialType type = VulkanMaterialType::Material);
+        std::shared_ptr<RenderMaterial>      material,
+        VulkanMemoryManager&                 memoryManager,
+        VulkanMaterialType                   type = VulkanMaterialType::Material);
 
     ///
     /// \brief Clears the material
     ///
-    void clear(VkDevice * device);
+    void clear(VkDevice* device);
 
 protected:
     friend class VulkanRenderer;
@@ -112,29 +112,29 @@ protected:
     ///
     /// \brief Creates a parent pipeline object that gets inherited by other materials
     ///
-    void createPipeline(VulkanRenderer * renderer);
+    void createPipeline(VulkanRenderer* renderer);
 
     ///
     /// \brief Creates the pipeline object
     ///
-    void buildMaterial(VulkanRenderer * renderer);
+    void buildMaterial(VulkanRenderer* renderer);
 
     ///
     /// \brief Initializes all the textures for the material
     ///
-    void initializeTextures(VulkanRenderer * renderer);
+    void initializeTextures(VulkanRenderer* renderer);
 
     ///
     /// \brief Helper function that loads a single texture and checks if it already exits. Uses a backup texture if the path is blank.
     ///
-    std::shared_ptr<VulkanTextureDelegate> initializeTexture(VulkanRenderer * renderer,
+    std::shared_ptr<VulkanTextureDelegate> initializeTexture(VulkanRenderer*          renderer,
                                                              std::shared_ptr<Texture> backupTextureDelegate,
-                                                             Texture::Type type);
+                                                             Texture::Type            type);
 
     ///
     /// \brief Initializes all the steps to build the material
     ///
-    void initialize(VulkanRenderer * renderer);
+    void initialize(VulkanRenderer* renderer);
 
     ///
     /// \brief Helper function to add a specialization constants. These are used to customize the shader.
@@ -144,16 +144,16 @@ protected:
     uint32_t m_numConstants = 0;
     VulkanMaterialConstants m_constants;
 
-    uint32_t m_numTextures = 0;
-    bool m_shadowPass = false;
-    bool m_depthPrePass = false;
-    bool m_wireframe = true;
-    bool m_depthOnlyPass = false;
+    uint32_t m_numTextures   = 0;
+    bool     m_shadowPass    = false;
+    bool     m_depthPrePass  = false;
+    bool     m_wireframe     = true;
+    bool     m_depthOnlyPass = false;
 
-    void createDescriptors(VulkanRenderer * renderer);
-    void createDescriptorSetLayouts(VulkanRenderer * renderer);
-    void createDescriptorPool(VulkanRenderer * renderer);
-    void createDescriptorSets(VulkanRenderer * renderer);
+    void createDescriptors(VulkanRenderer* renderer);
+    void createDescriptorSetLayouts(VulkanRenderer* renderer);
+    void createDescriptorPool(VulkanRenderer* renderer);
+    void createDescriptorSets(VulkanRenderer* renderer);
 
     std::shared_ptr<RenderMaterial> m_material;
 
@@ -163,9 +163,9 @@ protected:
     VulkanMaterialPipelineComponents m_pipelineComponents;
 
     VkDescriptorPool m_descriptorPool;
-    std::vector<VkDescriptorSet> m_descriptorSets;
+    std::vector<VkDescriptorSet>       m_descriptorSets;
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;
-    std::vector<VkWriteDescriptorSet> m_writeDescriptorSets;
+    std::vector<VkWriteDescriptorSet>  m_writeDescriptorSets;
 
     std::shared_ptr<VulkanUniformBuffer> m_vertexUniformBuffer;
     std::shared_ptr<VulkanUniformBuffer> m_fragmentUniformBuffer;
@@ -180,6 +180,6 @@ protected:
     std::shared_ptr<VulkanTextureDelegate> m_radianceCubemapTexture;
     std::shared_ptr<VulkanTextureDelegate> m_brdfLUTTexture;
 
-    VulkanMemoryManager * m_memoryManager;
+    VulkanMemoryManager* m_memoryManager;
 };
 }

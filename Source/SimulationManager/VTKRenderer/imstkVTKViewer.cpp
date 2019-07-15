@@ -34,12 +34,13 @@ VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*=
     {
         // Interactor style / commands
         m_interactorStyle = std::make_shared<VTKInteractorStyle>();
-        auto vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
-        vtkInteractorStyle->m_simManager = manager;
+
+        m_vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
+        m_vtkInteractorStyle->m_simManager = manager;
 
         // Interactor
         auto vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-        vtkInteractor->SetInteractorStyle(vtkInteractorStyle.get());
+        vtkInteractor->SetInteractorStyle(m_vtkInteractorStyle.get());
 
         // Render window
         m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
@@ -69,7 +70,7 @@ VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*=
 }
 
 void
-VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
+VTKViewer::setActiveScene(const std::shared_ptr<Scene>& scene)
 {
     // If already current scene
     if (scene == m_activeScene)
@@ -153,7 +154,7 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     }
 }
 
-const Renderer::Mode
+Renderer::Mode
 VTKViewer::getRenderingMode()
 {
     return this->getActiveRenderer()->getMode();
@@ -204,5 +205,11 @@ void
 VTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
 {
     this->getActiveRenderer()->updateBackground(color1, color2, gradientBackground);
+}
+
+const std::shared_ptr<VTKTextStatusManager>&
+VTKViewer::getTextStatusManager()
+{
+    return m_vtkInteractorStyle->getTextStatusManager();
 }
 } // imstk

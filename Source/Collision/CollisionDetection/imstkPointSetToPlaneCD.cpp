@@ -29,8 +29,8 @@
 
 namespace imstk
 {
-PointSetToPlaneCD::PointSetToPlaneCD(std::shared_ptr<PointSet> pointSet,
-                                     std::shared_ptr<Plane> plane,
+PointSetToPlaneCD::PointSetToPlaneCD(std::shared_ptr<PointSet>      pointSet,
+                                     std::shared_ptr<Plane>         plane,
                                      std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
     m_pointSet(pointSet),
@@ -38,13 +38,14 @@ PointSetToPlaneCD::PointSetToPlaneCD(std::shared_ptr<PointSet> pointSet,
 {
 }
 
-void PointSetToPlaneCD::computeCollisionData()
+void
+PointSetToPlaneCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData->clearAll();
 
     // Get plane properties
-    auto planePos = m_plane->getPosition();
+    auto planePos    = m_plane->getPosition();
     auto planeNormal = m_plane->getNormal();
 
     ParallelUtils::SpinLock lock;

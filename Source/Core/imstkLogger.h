@@ -86,7 +86,7 @@ public:
     /// \brief Logger thread loop
     /// \params logger a handle for the logger
     ///
-    static void eventLoop(Logger * logger);
+    static void eventLoop(Logger* logger);
 
     ///
     /// \brief Shuts down and cleans up logger safely
@@ -104,14 +104,14 @@ private:
     // Mutex for performance reasons
     std::mutex* m_mutex;
     std::string m_message;
-    bool m_changed = false;
-    bool m_running = true;
+    bool        m_changed = false;
+    bool        m_running = true;
 
-    int m_frequency = 30;
-    int m_period = 1000 / 30;
+    int       m_frequency   = 30;
+    int       m_period      = 1000 / 30;
     long long m_lastLogTime = 0;
 
-    std::string m_filename;
+    std::string  m_filename;
     std::thread* m_thread;
     std::condition_variable m_condition;
 };

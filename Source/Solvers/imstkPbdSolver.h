@@ -45,8 +45,8 @@ public:
     PbdSolver() = default;
     virtual ~PbdSolver() override = default;
 
-    PbdSolver(const PbdSolver &other) = delete;
-    PbdSolver &operator=(const PbdSolver &other) = delete;
+    PbdSolver(const PbdSolver& other) = delete;
+    PbdSolver& operator=(const PbdSolver& other) = delete;
 
     ///
     /// \brief Set MaxIterations. The maximum number of nonlinear iterations.

@@ -28,10 +28,11 @@ using namespace imstk;
 /// \brief Hello world example
 ///  Adds basic scene objects, lights, camera and renders
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk       = std::make_shared<SimulationManager>();
     auto sceneTest = sdk->createNewScene("HelloWorld");
 
     // Add Plane

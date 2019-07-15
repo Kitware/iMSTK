@@ -45,8 +45,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
-                 std::shared_ptr<SurfaceMesh> meshB,
+    MeshToMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
+                 std::shared_ptr<SurfaceMesh>   meshB,
                  std::shared_ptr<CollisionData> colData);
 
     ///
@@ -66,17 +66,17 @@ private:
     ///
     static void EECallback(unsigned int eA_v1, unsigned int eA_v2,
                            unsigned int eB_v1, unsigned int eB_v2,
-                           float t, void *userdata);
+                           float t, void* userdata);
     ///
     /// \brief Callback defining vertex to triangle collision (A - B)
     ///
     static void VFCallbackA(unsigned int fidA, unsigned int vidB,
-                            float t, void *userdata);
+                            float t, void* userdata);
     ///
     /// \brief Callback defining vertex to triangle collision (B - A)
     ///
     static void VFCallbackB(unsigned int fidB, unsigned int vidA,
-                            float t, void *userdata);
+                            float t, void* userdata);
 
     std::shared_ptr<SurfaceMesh> m_meshA;   ///> Mesh A
     std::shared_ptr<SurfaceMesh> m_meshB;   ///> Mesh B

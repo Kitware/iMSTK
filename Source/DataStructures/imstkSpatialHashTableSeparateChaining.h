@@ -33,7 +33,7 @@ struct PointEntry
 {
     Vec3d point;
     unsigned long ID;
-    double * cellSize;
+    double* cellSize;
 };
 }
 
@@ -155,8 +155,8 @@ protected:
     ///
     virtual void rehash() override;
 
-    float m_loadFactorMax = 10.0f;
-    unsigned long m_currentID = 0;
+    float         m_loadFactorMax = 10.0f;
+    unsigned long m_currentID     = 0;
     std::shared_ptr<std::unordered_set<PointEntry>> m_table;
 };
 }

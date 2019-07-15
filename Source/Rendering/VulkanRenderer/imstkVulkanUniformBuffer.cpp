@@ -32,11 +32,11 @@ VulkanUniformBuffer::VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uin
     uniformBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     uniformBufferInfo.pNext = nullptr;
     uniformBufferInfo.flags = 0;
-    uniformBufferInfo.size = uniformSize * memoryManager.m_buffering;
+    uniformBufferInfo.size  = uniformSize * memoryManager.m_buffering;
     uniformBufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-    uniformBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    uniformBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
     uniformBufferInfo.queueFamilyIndexCount = 0;
-    uniformBufferInfo.pQueueFamilyIndices = nullptr;
+    uniformBufferInfo.pQueueFamilyIndices   = nullptr;
 
     m_uniformBuffer = memoryManager.requestBuffer(m_renderDevice, uniformBufferInfo, VulkanMemoryType::STAGING_UNIFORM);
 
@@ -45,20 +45,20 @@ VulkanUniformBuffer::VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uin
 }
 
 void
-VulkanUniformBuffer::updateUniforms(uint32_t uniformSize, void * uniformData, uint32_t frameIndex)
+VulkanUniformBuffer::updateUniforms(uint32_t uniformSize, void* uniformData, uint32_t frameIndex)
 {
     auto uniformMemory = this->getUniformMemory();
 
     memcpy(uniformMemory, uniformData, uniformSize);
 }
 
-VulkanInternalBuffer *
+VulkanInternalBuffer*
 VulkanUniformBuffer::getUniformBuffer()
 {
     return m_uniformBuffer;
 }
 
-void *
+void*
 VulkanUniformBuffer::getUniformMemory()
 {
     return m_uniformBuffer->getMemoryData(m_renderDevice);

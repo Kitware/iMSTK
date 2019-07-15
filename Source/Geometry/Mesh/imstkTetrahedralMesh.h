@@ -39,7 +39,7 @@ class TetrahedralMesh : public VolumetricMesh
 {
 public:
 
-    using TetraArray = std::array<size_t, 4>;
+    using TetraArray   = std::array<size_t, 4>;
     using WeightsArray = std::array<double, 4>;
 
     ///
@@ -56,9 +56,9 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  tetrahedra connectivity
     ///
-    void initialize(const StdVectorOfVec3d& vertices,
+    void initialize(const StdVectorOfVec3d&        vertices,
                     const std::vector<TetraArray>& tetrahedra,
-                    bool computeAttachedSurfaceMesh = false);
+                    bool                           computeAttachedSurfaceMesh = false);
 
     ///
     /// \brief Clear all the mesh data
@@ -123,7 +123,7 @@ public:
     ///
     /// \brief Get/set method for removed elements from the mesh
     ///
-    void setTetrahedraAsRemoved(const unsigned int tetId){ m_removedMeshElems[tetId] = true; }
+    void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
 
     ///

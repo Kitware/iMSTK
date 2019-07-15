@@ -43,8 +43,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    BidirectionalPlaneToSphere(std::shared_ptr<Plane> planeA,
-                               std::shared_ptr<Sphere> sphereB,
+    BidirectionalPlaneToSphere(std::shared_ptr<Plane>         planeA,
+                               std::shared_ptr<Sphere>        sphereB,
                                std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::BidirectionalPlaneToSphere, colData),
         m_planeA(planeA),
@@ -63,7 +63,7 @@ public:
 
 private:
 
-    std::shared_ptr<Plane> m_planeA;    ///>
+    std::shared_ptr<Plane>  m_planeA;   ///>
     std::shared_ptr<Sphere> m_sphereB;  ///>
 };
 }

@@ -46,14 +46,14 @@ public:
     ///
     Text(std::string name,
          std::string value,
-         float x,
-         float y,
-         float fontSize = 14.0f)
+         float       x,
+         float       y,
+         float       fontSize = 14.0f)
         : Widget(name, x, y)
     {
-        m_value = value;
+        m_value    = value;
         m_fontSize = fontSize;
-        m_type = Widget::Type::Text;
+        m_type     = Widget::Type::Text;
     }
 
     ///
@@ -99,8 +99,8 @@ protected:
     Text() = delete;
 
     std::string m_value;
-    float m_fontSize = 10;
-    Color m_color = Color::White;
+    float       m_fontSize = 10;
+    Color       m_color    = Color::White;
 };
 } // GUI
 } // imstk

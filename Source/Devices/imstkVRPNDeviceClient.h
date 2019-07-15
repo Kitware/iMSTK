@@ -83,7 +83,7 @@ private:
     /// \param b VRPN callback structure containing new position and
     /// orientation data
     ///
-    static void VRPN_CALLBACK trackerChangeHandler(void *userData, const _vrpn_TRACKERCB t);
+    static void VRPN_CALLBACK trackerChangeHandler(void* userData, const _vrpn_TRACKERCB t);
 
     ///
     /// \brief VRPN call back for position and orientation data
@@ -92,7 +92,7 @@ private:
     /// \param b VRPN callback structure containing new position and
     /// orientation data
     ///
-    static void VRPN_CALLBACK analogChangeHandler(void *userData, const _vrpn_ANALOGCB a);
+    static void VRPN_CALLBACK analogChangeHandler(void* userData, const _vrpn_ANALOGCB a);
 
     ///
     /// \brief VRPN call back for velocity data
@@ -101,7 +101,7 @@ private:
     /// \param v VRPN callback structure containing new position and
     /// orientation data
     ///
-    static void VRPN_CALLBACK velocityChangeHandler(void *userData, const _vrpn_TRACKERVELCB v);
+    static void VRPN_CALLBACK velocityChangeHandler(void* userData, const _vrpn_TRACKERVELCB v);
 
     ///
     /// \brief VRPN call back for button changed (pressed or released)
@@ -109,7 +109,7 @@ private:
     /// internal data
     /// \param b VRPN callback structure containing new button data
     ///
-    static void VRPN_CALLBACK buttonChangeHandler(void *userData, const _vrpn_BUTTONCB b);
+    static void VRPN_CALLBACK buttonChangeHandler(void* userData, const _vrpn_BUTTONCB b);
 
     ///
     /// \brief VRPN call back for force data
@@ -117,11 +117,11 @@ private:
     /// internal data
     /// \param f VRPN callback structure containing new force data
     ///
-    static void VRPN_CALLBACK forceChangeHandler(void *userData, const _vrpn_FORCECB f);
+    static void VRPN_CALLBACK forceChangeHandler(void* userData, const _vrpn_FORCECB f);
 
-    std::shared_ptr<vrpn_Tracker_Remote> m_vrpnTracker;         //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Analog_Remote> m_vrpnAnalog;           //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Button_Remote> m_vrpnButton;           //!< VRPN button interface
+    std::shared_ptr<vrpn_Tracker_Remote>     m_vrpnTracker;     //!< VRPN position/orientation interface
+    std::shared_ptr<vrpn_Analog_Remote>      m_vrpnAnalog;      //!< VRPN position/orientation interface
+    std::shared_ptr<vrpn_Button_Remote>      m_vrpnButton;      //!< VRPN button interface
     std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
 };
 }

@@ -30,17 +30,17 @@ VisualObjectImporter::importVisualObject(
     const std::string& objName,
     const std::string& modelFilePath,
     const std::string& textureFolderPath,
-    const double scale /*= 1.0*/,
-    const Vec3d& translation /*= Vec3d(0, 0, 0)*/,
+    const double       scale /*= 1.0*/,
+    const Vec3d&       translation /*= Vec3d(0, 0, 0)*/,
     const std::string& fileExtension /*= fileExtension*/)
 {
     auto type = MeshIO::getFileType(modelFilePath);
 
     // Check if mesh is supported by Assimp
-    if (type != MeshFileType::_3DS &&
-        type != MeshFileType::OBJ &&
-        type != MeshFileType::FBX &&
-        type != MeshFileType::DAE)
+    if (type != MeshFileType::_3DS
+        && type != MeshFileType::OBJ
+        && type != MeshFileType::FBX
+        && type != MeshFileType::DAE)
     {
         LOG(WARNING) << "File type not supported";
         return nullptr;
@@ -50,7 +50,7 @@ VisualObjectImporter::importVisualObject(
 
     // Import mesh(es) and apply some clean-up operations
     Assimp::Importer importer;
-    auto scene = importer.ReadFile(modelFilePath, AssimpMeshIO::getDefaultPostProcessSteps());
+    auto             scene = importer.ReadFile(modelFilePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
     if (!scene || !scene->HasMeshes())
@@ -106,7 +106,7 @@ VisualObjectImporter::importVisualObject(
         mesh->setTranslation(translation);
         mesh->setScaling(scale);
 
-        auto visualModel = std::make_shared<VisualModel>(mesh);
+        auto visualModel    = std::make_shared<VisualModel>(mesh);
         auto renderMaterial = std::make_shared<RenderMaterial>();
 
         auto index = importedMesh->mMaterialIndex;
@@ -133,10 +133,10 @@ VisualObjectImporter::importVisualObject(
 void
 VisualObjectImporter::findAndAddTexture(
     std::shared_ptr<RenderMaterial> renderMaterial,
-    const std::string& textureFolderPath,
-    const std::string& textureCoreFileName,
-    const std::string& textureFileExtension,
-    Texture::Type textureType)
+    const std::string&              textureFolderPath,
+    const std::string&              textureCoreFileName,
+    const std::string&              textureFileExtension,
+    Texture::Type                   textureType)
 {
     // To support other texture naming conventions, simply add to each list.
     // Right now, only extensions that don't contain an underscore in the
@@ -152,7 +152,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureCoreFileName,
                 textureFileExtension,
                 textureType,
-            {"_BaseColor", "_Diffuse", "_Albedo"});
+            { "_BaseColor", "_Diffuse", "_Albedo" });
         break;
     case Texture::Type::NORMAL:
         VisualObjectImporter::findAndAddTextureWithExtensions(
@@ -161,7 +161,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureCoreFileName,
                 textureFileExtension,
                 textureType,
-            {"_Normal"});
+            { "_Normal" });
         break;
     case Texture::Type::ROUGHNESS:
         VisualObjectImporter::findAndAddTextureWithExtensions(
@@ -170,7 +170,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureCoreFileName,
                 textureFileExtension,
                 textureType,
-            {"_Roughness"});
+            { "_Roughness" });
         break;
     case Texture::Type::METALNESS:
         VisualObjectImporter::findAndAddTextureWithExtensions(
@@ -179,7 +179,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureCoreFileName,
                 textureFileExtension,
                 textureType,
-            {"_Metalness", "_Metallic"});
+            { "_Metalness", "_Metallic" });
         break;
     case Texture::Type::AMBIENT_OCCLUSION:
         VisualObjectImporter::findAndAddTextureWithExtensions(
@@ -188,7 +188,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureCoreFileName,
                 textureFileExtension,
                 textureType,
-            {"_AO", "_AmbientOcclusion"});
+            { "_AO", "_AmbientOcclusion" });
         break;
     case Texture::Type::SUBSURFACE_SCATTERING:
         VisualObjectImporter::findAndAddTextureWithExtensions(
@@ -197,7 +197,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureCoreFileName,
                 textureFileExtension,
                 textureType,
-            {"_SSS", "_SubsurfaceScattering"});
+            { "_SSS", "_SubsurfaceScattering" });
         break;
     default:
         break;
@@ -208,11 +208,11 @@ std::string
 VisualObjectImporter::getSubstringGivenString(
     const std::string& input,
     const std::string& delimiter,
-    const bool lastInstance /*= false*/)
+    const bool         lastInstance /*= false*/)
 {
     unsigned long long index = 0;
     unsigned long long tempIndex;
-    std::string output;
+    std::string        output;
 
     if (lastInstance)
     {
@@ -246,12 +246,12 @@ VisualObjectImporter::getSubstringGivenString(
 
 void
 VisualObjectImporter::findAndAddTextureWithExtensions(
-    std::shared_ptr<RenderMaterial> renderMaterial,
-    const std::string& textureFolderPath,
-    const std::string& textureCoreFileName,
-    const std::string& textureFileExtension,
-    Texture::Type textureType,
-    std::initializer_list<const char *> extensions)
+    std::shared_ptr<RenderMaterial>    renderMaterial,
+    const std::string&                 textureFolderPath,
+    const std::string&                 textureCoreFileName,
+    const std::string&                 textureFileExtension,
+    Texture::Type                      textureType,
+    std::initializer_list<const char*> extensions)
 {
     for (auto extension : extensions)
     {

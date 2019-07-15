@@ -54,10 +54,11 @@ using namespace imstk;
 /// \brief This example demonstrates bone drilling.
 /// NOTE: Requires GeoMagic Touch device
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("BoneDrilling");
 
     // Add virtual coupling object in the scene.
@@ -103,7 +104,7 @@ int main()
 
     // Create a collision graph
     auto graph = scene->getCollisionGraph();
-    auto pair = graph->addInteractionPair(bone,
+    auto pair  = graph->addInteractionPair(bone,
         drill,
         CollisionDetection::Type::PointSetToSphere,
         CollisionHandling::Type::BoneDrilling,

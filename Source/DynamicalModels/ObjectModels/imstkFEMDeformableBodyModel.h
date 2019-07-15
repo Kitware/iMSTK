@@ -169,8 +169,8 @@ public:
     ///
     /// \brief Applies boundary conditions to matrix and a vector
     ///
-    void applyBoundaryConditions(SparseMatrixd &M, const bool withCompliance = false) const;
-    void applyBoundaryConditions(Vectord &x) const;
+    void applyBoundaryConditions(SparseMatrixd& M, const bool withCompliance = false) const;
+    void applyBoundaryConditions(Vectord& x) const;
 
     ///
     /// \brief Update mass matrix
@@ -235,12 +235,12 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    virtual void setTimeStep(const double timeStep) { m_timeIntegrator->setTimestepSize(timeStep); };
+    virtual void setTimeStep(const double timeStep) { m_timeIntegrator->setTimestepSize(timeStep); }
 
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const { return m_timeIntegrator->getTimestepSize(); };
+    virtual double getTimeStep() const { return m_timeIntegrator->getTimestepSize(); }
 
     ///
     /// \brief Set the time step size to fixed size
@@ -250,9 +250,9 @@ public:
     ///
     /// \brief Set the fixed BC implementation state
     ///
-    void enableFixedBC() { m_implementFixedBC = true; };
-    void disableFixedBC() { m_implementFixedBC = false; };
-    bool isFixedBCImplemented() const { return m_implementFixedBC; };
+    void enableFixedBC() { m_implementFixedBC = true; }
+    void disableFixedBC() { m_implementFixedBC = false; }
+    bool isFixedBCImplemented() const { return m_implementFixedBC; }
 
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
@@ -262,28 +262,28 @@ protected:
     std::shared_ptr<NonLinearSystem>    m_nonLinearSystem;          ///> Nonlinear system resulting from TI and force model
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
-    SparseMatrixd m_M;      ///> Mass matrix
-    SparseMatrixd m_C;      ///> Damping coefficient matrix
-    SparseMatrixd m_K;      ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
-    SparseMatrixd m_Keff;   ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+    SparseMatrixd m_M;                                                  ///> Mass matrix
+    SparseMatrixd m_C;                                                  ///> Damping coefficient matrix
+    SparseMatrixd m_K;                                                  ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+    SparseMatrixd m_Keff;                                               ///> Effective stiffness matrix (dependent on internal force model and time integrator)
 
-    Vectord m_Finternal;            ///> Vector of internal forces
-    Vectord m_Feff;                 ///> Vector of effective forces
-    Vectord m_Fcontact;             ///> Vector of contact forces
-    Vectord m_Fgravity;             ///> Vector of gravity forces
-    Vectord m_FexplicitExternal;    ///> Vector of explicitly defined external forces
-    Vectord m_qSol;                 ///> Vector to maintain solution at each iteration of nonlinear solver
+    Vectord m_Finternal;                                                ///> Vector of internal forces
+    Vectord m_Feff;                                                     ///> Vector of effective forces
+    Vectord m_Fcontact;                                                 ///> Vector of contact forces
+    Vectord m_Fgravity;                                                 ///> Vector of gravity forces
+    Vectord m_FexplicitExternal;                                        ///> Vector of explicitly defined external forces
+    Vectord m_qSol;                                                     ///> Vector to maintain solution at each iteration of nonlinear solver
 
-    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;              ///> Mesh used for Physics
-    std::shared_ptr<vega::SparseMatrix>   m_vegaMassMatrix;               ///> Vega mass matrix
-    std::shared_ptr<vega::SparseMatrix>   m_vegaTangentStiffnessMatrix;   ///> Vega Tangent stiffness matrix
-    std::shared_ptr<vega::SparseMatrix>   m_vegaDampingMatrix;            ///> Vega Laplacian damping matrix
+    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;            ///> Mesh used for Physics
+    std::shared_ptr<vega::SparseMatrix>   m_vegaMassMatrix;             ///> Vega mass matrix
+    std::shared_ptr<vega::SparseMatrix>   m_vegaTangentStiffnessMatrix; ///> Vega Tangent stiffness matrix
+    std::shared_ptr<vega::SparseMatrix>   m_vegaDampingMatrix;          ///> Vega Laplacian damping matrix
 
-    std::vector<std::size_t> m_fixedNodeIds;                              ///> Nodal IDs of the nodes that are fixed
+    std::vector<std::size_t> m_fixedNodeIds;                            ///> Nodal IDs of the nodes that are fixed
 
-    stateUpdateType m_updateType = stateUpdateType::deltaVelocity;        ///> Update type of the model
+    stateUpdateType m_updateType = stateUpdateType::deltaVelocity;      ///> Update type of the model
 
-    bool m_damped = false;                                                ///> Viscous or structurally damped system
+    bool m_damped = false;                                              ///> Viscous or structurally damped system
 
     // If this is true, the tangent stiffness and force vector will be modified to
     // accommodate (the rows and columns will be nullified) the fixed boundary conditions

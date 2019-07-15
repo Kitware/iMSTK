@@ -47,7 +47,7 @@ Geometry::translate(const Vec3d& t, TransformType type)
     {
         m_transform.translate(t);
         m_transformModified = true;
-        m_transformApplied = false;
+        m_transformApplied  = false;
     }
     else
     {
@@ -74,7 +74,7 @@ Geometry::rotate(const Mat3d& r, TransformType type)
     {
         m_transform.rotate(r);
         m_transformModified = true;
-        m_transformApplied = false;
+        m_transformApplied  = false;
     }
     else
     {
@@ -110,9 +110,9 @@ Geometry::scale(double s, TransformType type)
 
     if (type == TransformType::ConcatenateToTransform)
     {
-        m_scaling *= s;
+        m_scaling          *= s;
         m_transformModified = true;
-        m_transformApplied = false;
+        m_transformApplied  = false;
     }
     else
     {
@@ -126,9 +126,9 @@ Geometry::transform(RigidTransform3d T, TransformType type)
 {
     if (type == TransformType::ConcatenateToTransform)
     {
-        m_transform = T * m_transform;
+        m_transform         = T * m_transform;
         m_transformModified = true;
-        m_transformApplied = false;
+        m_transformApplied  = false;
     }
     else
     {
@@ -148,8 +148,8 @@ void
 Geometry::setTranslation(const Vec3d t)
 {
     m_transform.translation() = t;
-    m_transformModified = true;
-    m_transformApplied = false;
+    m_transformModified       = true;
+    m_transformApplied        = false;
 }
 
 void
@@ -168,8 +168,8 @@ void
 Geometry::setRotation(const Mat3d m)
 {
     m_transform.linear() = m;
-    m_transformModified = true;
-    m_transformApplied = false;
+    m_transformModified  = true;
+    m_transformApplied   = false;
 }
 
 void
@@ -198,9 +198,9 @@ Geometry::setScaling(double s)
         LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
         return;
     }
-    m_scaling = s;
+    m_scaling           = s;
     m_transformModified = true;
-    m_transformApplied = false;
+    m_transformApplied  = false;
 }
 
 Geometry::Type
@@ -234,10 +234,10 @@ Geometry::getTypeName() const
 bool
 Geometry::isMesh() const
 {
-    return (this->m_type == Type::HexahedralMesh ||
-            this->m_type == Type::SurfaceMesh ||
-            this->m_type == Type::TetrahedralMesh ||
-            this->m_type == Type::LineMesh
+    return (this->m_type == Type::HexahedralMesh
+            || this->m_type == Type::SurfaceMesh
+            || this->m_type == Type::TetrahedralMesh
+            || this->m_type == Type::LineMesh
             ) ? true : false;
 }
 } // imstk

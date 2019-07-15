@@ -40,10 +40,11 @@ using namespace imstk;
 /// \brief This example demonstrates the soft body simulation
 /// using Finite elements
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("DeformableBodyFEM");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
@@ -56,7 +57,7 @@ int main()
     }
 
     // Extract the surface mesh
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    auto surfMesh   = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
@@ -66,7 +67,7 @@ int main()
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
     StopWatch wct;
-    CpuTimer cput;
+    CpuTimer  cput;
 
     wct.start();
     cput.start();
@@ -123,8 +124,8 @@ int main()
     // create a linear solver
     auto linSolver = std::make_shared<ConjugateGradient>();
 
-    if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel &&
-        dynaModel->isFixedBCImplemented())
+    if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel
+        && dynaModel->isFixedBCImplemented())
     {
         LOG(WARNING) << "The GS solver may not be viable!";
     }

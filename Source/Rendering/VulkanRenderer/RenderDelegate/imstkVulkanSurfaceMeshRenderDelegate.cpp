@@ -24,17 +24,17 @@
 namespace imstk
 {
 VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                                                 SceneObject::Type type,
-                                                                 VulkanMemoryManager& memoryManager)
+                                                                 SceneObject::Type            type,
+                                                                 VulkanMemoryManager&         memoryManager)
 {
     this->initialize(visualModel);
 
     auto geometry = std::static_pointer_cast<SurfaceMesh>(visualModel->getGeometry());
 
-    m_numVertices = (uint32_t)geometry->getNumVertices();
+    m_numVertices  = (uint32_t)geometry->getNumVertices();
     m_numTriangles = (uint32_t)geometry->getNumTriangles();
-    m_loadFactor = geometry->getLoadFactor();
-    m_vertexSize = sizeof(VulkanBasicVertex);
+    m_loadFactor   = geometry->getLoadFactor();
+    m_vertexSize   = sizeof(VulkanBasicVertex);
     m_modified.resize(memoryManager.m_buffering, true);
 
     if (!this->getVisualModel()->getRenderMaterial())
@@ -64,7 +64,7 @@ VulkanSurfaceMeshRenderDelegate::VulkanSurfaceMeshRenderDelegate(std::shared_ptr
 void
 VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
 {
-    int frame = 0;
+    int  frame    = 0;
     auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
 
     if (m_vertexBuffer->getMode() == VERTEX_BUFFER_STATIC)
@@ -80,10 +80,10 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
         frame = frameIndex;
     }
 
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frame);
+    auto vertices = (VulkanBasicVertex*)m_vertexBuffer->getVertexMemory(frame);
 
-    auto normals = geometry->getVertexNormals();
-    auto tangents = geometry->getVertexTangents();
+    auto                      normals  = geometry->getVertexNormals();
+    auto                      tangents = geometry->getVertexTangents();
     const StdVectorOfVectorf* UVs;
 
     if (geometry->getDefaultTCoords() != "")
@@ -127,7 +127,7 @@ VulkanSurfaceMeshRenderDelegate::updateVertexBuffer(uint32_t frameIndex)
         }
     }
 
-    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory(frame);
+    auto triangles = (std::array<uint32_t, 3>*)m_vertexBuffer->getIndexMemory(frame);
 
     m_vertexBuffer->setNumIndices((uint32_t)geometry->getNumTriangles() * 3);
     for (unsigned i = 0; i < geometry->getNumTriangles(); i++)

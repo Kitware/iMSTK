@@ -45,8 +45,8 @@ public:
     /// \brief Default constructor
     ///
     VulkanPlaneRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                              SceneObject::Type type,
-                              VulkanMemoryManager& memoryManager);
+                              SceneObject::Type            type,
+                              VulkanMemoryManager&         memoryManager);
 
     ///
     /// \brief Update render geometry
@@ -55,6 +55,6 @@ public:
 
 protected:
     std::vector<std::array<uint32_t, 3>> m_planeTriangles;
-    std::vector<VulkanBasicVertex> m_planeVertices;
+    std::vector<VulkanBasicVertex>       m_planeVertices;
 };
 }

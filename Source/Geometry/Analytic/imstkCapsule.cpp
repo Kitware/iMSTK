@@ -25,7 +25,8 @@
 
 namespace imstk
 {
-void Capsule::print() const
+void
+Capsule::print() const
 {
     Geometry::print();
     LOG(INFO) << "Radius: " << m_radius;
@@ -57,8 +58,8 @@ Capsule::setRadius(const double r)
         LOG(WARNING) << "Capsule::setRadius error: radius should be positive.";
         return;
     }
-    m_radius = r;
-    m_dataModified = true;
+    m_radius           = r;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -81,8 +82,8 @@ Capsule::setLength(const double l)
         LOG(WARNING) << "Capsule::setHeight error: height should be positive.";
         return;
     }
-    m_length = l;
-    m_dataModified = true;
+    m_length           = l;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -103,6 +104,6 @@ Capsule::updatePostTransformData()
     AnalyticalGeometry::updatePostTransformData();
     m_radiusPostTransform = m_scaling * m_radius;
     m_lengthPostTransform = m_scaling * m_length;
-    m_transformApplied = true;
+    m_transformApplied    = true;
 }
 } // imstk

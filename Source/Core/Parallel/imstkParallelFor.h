@@ -31,7 +31,8 @@ namespace ParallelUtils
 /// \brief Execute a function in parallel over a range [beginIdx, endIdx) of indices
 ///
 template<class IndexType, class Function>
-void parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& function)
+void
+parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& function)
 {
     tbb::parallel_for(tbb::blocked_range<IndexType>(beginIdx, endIdx),
         [&](const tbb::blocked_range<IndexType>& r) {
@@ -46,7 +47,8 @@ void parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& fu
 /// \brief Execute a function in parallel over a range [0, endIdx) of indices
 ///
 template<class IndexType, class Function>
-void parallelFor(const IndexType endIdx, Function&& function)
+void
+parallelFor(const IndexType endIdx, Function&& function)
 {
     parallelFor(IndexType(0), endIdx, std::forward<Function>(function));
 }
@@ -56,9 +58,10 @@ void parallelFor(const IndexType endIdx, Function&& function)
 /// indices in the y dimension are scanned sequentially
 ///
 template<class IndexType, class Function>
-void parallelFor2Dx(const IndexType beginX, const IndexType endX,
-                    const IndexType beginY, const IndexType endY,
-                    Function&& function)
+void
+parallelFor2Dx(const IndexType beginX, const IndexType endX,
+               const IndexType beginY, const IndexType endY,
+               Function&& function)
 {
     parallelFor(beginX, endX,
         [&](IndexType i) {
@@ -74,9 +77,10 @@ void parallelFor2Dx(const IndexType beginX, const IndexType endX,
 /// indices in the x dimension are scanned sequentially
 ///
 template<class IndexType, class Function>
-void parallelFor2Dy(const IndexType beginX, const IndexType endX,
-                    const IndexType beginY, const IndexType endY,
-                    Function&& function)
+void
+parallelFor2Dy(const IndexType beginX, const IndexType endX,
+               const IndexType beginY, const IndexType endY,
+               Function&& function)
 {
     parallelFor(beginY, endY,
         [&](IndexType j) {
@@ -92,10 +96,11 @@ void parallelFor2Dy(const IndexType beginX, const IndexType endX,
 /// indices in the y and z dimensions are scanned sequentially
 ///
 template<class IndexType, class Function>
-void parallelFor3Dx(const IndexType beginX, const IndexType endX,
-                    const IndexType beginY, const IndexType endY,
-                    const IndexType beginZ, const IndexType endZ,
-                    Function&& function)
+void
+parallelFor3Dx(const IndexType beginX, const IndexType endX,
+               const IndexType beginY, const IndexType endY,
+               const IndexType beginZ, const IndexType endZ,
+               Function&& function)
 {
     parallelFor(beginX, endX,
         [&](IndexType i) {
@@ -114,10 +119,11 @@ void parallelFor3Dx(const IndexType beginX, const IndexType endX,
 /// indices in the x and z dimensions are scanned sequentially
 ///
 template<class IndexType, class Function>
-void parallelFor3Dy(const IndexType beginX, const IndexType endX,
-                    const IndexType beginY, const IndexType endY,
-                    const IndexType beginZ, const IndexType endZ,
-                    Function&& function)
+void
+parallelFor3Dy(const IndexType beginX, const IndexType endX,
+               const IndexType beginY, const IndexType endY,
+               const IndexType beginZ, const IndexType endZ,
+               Function&& function)
 {
     parallelFor(beginY, endY,
         [&](IndexType j) {
@@ -136,10 +142,11 @@ void parallelFor3Dy(const IndexType beginX, const IndexType endX,
 /// indices in the x and y dimensions are scanned sequentially
 ///
 template<class IndexType, class Function>
-void parallelFor3Dz(const IndexType beginX, const IndexType endX,
-                    const IndexType beginY, const IndexType endY,
-                    const IndexType beginZ, const IndexType endZ,
-                    Function&& function)
+void
+parallelFor3Dz(const IndexType beginX, const IndexType endX,
+               const IndexType beginY, const IndexType endY,
+               const IndexType beginZ, const IndexType endZ,
+               Function&& function)
 {
     parallelFor(beginX, endX,
         [&](IndexType i) {

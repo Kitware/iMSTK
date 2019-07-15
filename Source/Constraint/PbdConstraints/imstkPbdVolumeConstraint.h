@@ -46,14 +46,14 @@ public:
     ///
     /// \brief Initializes the volume constraint
     ///
-    void initConstraint(PbdModel &model, const size_t &pIdx1,
-                        const size_t &pIdx2, const size_t &pIdx3,
-                        const size_t &pIdx4, const double k = 2.0);
+    void initConstraint(PbdModel& model, const size_t& pIdx1,
+                        const size_t& pIdx2, const size_t& pIdx3,
+                        const size_t& pIdx4, const double k = 2.0);
 
     ///
     /// \brief Solves the volume constraint
     ///
-    bool solvePositionConstraint(PbdModel &model) override;
+    bool solvePositionConstraint(PbdModel& model) override;
 
 public:
     double m_restVolume; ///> Rest volume

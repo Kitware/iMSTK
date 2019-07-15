@@ -42,17 +42,17 @@ public:
     ///
     /// \brief Constructor
     ///
-    VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int level = 0);
-    VulkanPostProcess(VulkanRenderer * renderer, uint32_t numViews, unsigned int width, unsigned int height);
+    VulkanPostProcess(VulkanRenderer* renderer, uint32_t numViews, unsigned int level = 0);
+    VulkanPostProcess(VulkanRenderer* renderer, uint32_t numViews, unsigned int width, unsigned int height);
 
     void addInputImage(
-        VkSampler * sampler,
-        VkImageView * imageView,
+        VkSampler*    sampler,
+        VkImageView*  imageView,
         VkImageLayout layout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     void generateMipmaps(VkCommandBuffer& commandBuffer,
-                         unsigned int levels,
-                         VkImage& image);
+                         unsigned int     levels,
+                         VkImage&         image);
 protected:
     friend class VulkanRenderer;
     friend class VulkanPostProcessingChain;
@@ -60,17 +60,17 @@ protected:
     ///
     /// \brief Creates a parent pipeline object that gets inherited by other materials
     ///
-    void createPipeline(VulkanRenderer * renderer, std::string fragmentSource);
-    void createRenderPass(VulkanRenderer * renderer);
-    void createFramebuffer(VulkanRenderer * renderer,
+    void createPipeline(VulkanRenderer* renderer, std::string fragmentSource);
+    void createRenderPass(VulkanRenderer* renderer);
+    void createFramebuffer(VulkanRenderer*    renderer,
                            const unsigned int width,
                            const unsigned int height);
 
-    void createFullscreenQuad(VulkanRenderer * renderer);
+    void createFullscreenQuad(VulkanRenderer* renderer);
 
-    virtual void initialize(VulkanRenderer * renderer,
+    virtual void initialize(VulkanRenderer* renderer,
                             std::string = VulkanShaderPath::PostProcessing + "postprocess_frag.spv");
-    void initializeFramebuffer(VulkanRenderer * renderer);
+    void initializeFramebuffer(VulkanRenderer* renderer);
 
     ///
     /// \brief Updates image information to current layout after renderpass
@@ -80,16 +80,16 @@ protected:
     ///
     /// \brief Set image attachments to a readable layout
     ///
-    void setAttachmentsToReadLayout(VkCommandBuffer * commandBuffer,
-                                    uint32_t queueFamily,
-                                    const uint32_t numViews);
+    void setAttachmentsToReadLayout(VkCommandBuffer* commandBuffer,
+                                    uint32_t         queueFamily,
+                                    const uint32_t   numViews);
 
-    void createDescriptors(VulkanRenderer * renderer);
-    void createDescriptorSetLayouts(VulkanRenderer * renderer);
-    void createDescriptorPool(VulkanRenderer * renderer);
-    void createDescriptorSets(VulkanRenderer * renderer);
+    void createDescriptors(VulkanRenderer* renderer);
+    void createDescriptorSetLayouts(VulkanRenderer* renderer);
+    void createDescriptorPool(VulkanRenderer* renderer);
+    void createDescriptorSets(VulkanRenderer* renderer);
 
-    void clear(VkDevice * device);
+    void clear(VkDevice* device);
 
     VkPipeline m_pipeline;
     VkGraphicsPipelineCreateInfo m_graphicsPipelineInfo;
@@ -97,25 +97,25 @@ protected:
     VulkanMaterialPipelineComponents m_pipelineComponents;
 
     VkDescriptorPool m_descriptorPool;
-    std::vector<VkDescriptorSet> m_descriptorSets;
+    std::vector<VkDescriptorSet>       m_descriptorSets;
     std::vector<VkDescriptorSetLayout> m_descriptorSetLayouts;
-    std::vector<VkWriteDescriptorSet> m_writeDescriptorSets;
+    std::vector<VkWriteDescriptorSet>  m_writeDescriptorSets;
 
     std::shared_ptr<VulkanVertexBuffer> m_vertexBuffer;
 
     std::shared_ptr<VulkanFramebuffer> m_framebuffer;
 
     // Resources
-    std::vector<VkSampler *> m_samplers;
-    std::vector<VkImageView *> m_imageViews;
+    std::vector<VkSampler*>    m_samplers;
+    std::vector<VkImageView*>  m_imageViews;
     std::vector<VkImageLayout> m_layouts;
 
     unsigned int m_downsampleLevels = 0;
-    unsigned int m_outputIndex = 0;
-    uint32_t m_numViews;
+    unsigned int m_outputIndex      = 0;
+    uint32_t     m_numViews;
 
     std::vector<VkAttachmentReference> m_colorAttachments;
     VkRenderPass m_renderPass;
-    float m_pushConstantData[32];
+    float        m_pushConstantData[32];
 };
 }

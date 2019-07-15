@@ -44,21 +44,21 @@ class VulkanInteractorStyle;
 class VulkanViewer : public Viewer
 {
 public:
-    VulkanViewer(SimulationManager * manager = nullptr, bool enableVR = false);
+    VulkanViewer(SimulationManager* manager = nullptr, bool enableVR = false);
 
-    virtual void setActiveScene(std::shared_ptr<Scene> scene);
+    virtual void setActiveScene(const std::shared_ptr<Scene>& scene) override;
 
-    virtual void startRenderingLoop();
+    virtual void startRenderingLoop() override;
 
-    virtual void endRenderingLoop();
+    virtual void endRenderingLoop() override;
 
     ///
     /// \brief Setup the current renderer to render what's needed
     /// based on the mode chosen
     ///
-    void setRenderingMode(const Renderer::Mode mode);
+    virtual void setRenderingMode(const Renderer::Mode mode) override;
 
-    virtual const Renderer::Mode getRenderingMode();
+    virtual Renderer::Mode getRenderingMode() override;
 
     ///
     /// \brief Setups up the swapchain
@@ -71,7 +71,8 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) override;
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
+                                     const bool gradientBackground = false) override;
 
     ///
     /// \brief Enable/disable fullscreen
@@ -103,7 +104,7 @@ public:
     /// \brief Utility function to get VR system
     /// \returns OpenVR system
     ///
-    vr::IVRSystem * getVRSystem();
+    vr::IVRSystem* getVRSystem();
 #endif
 
 protected:
@@ -116,26 +117,26 @@ protected:
     void createWindow();
     void resizeWindow(unsigned int width, unsigned int height);
 
-    unsigned int m_width = 1000;
-    unsigned int m_height = 800;
-    unsigned int m_windowWidth = 1000;
+    unsigned int m_width        = 1000;
+    unsigned int m_height       = 800;
+    unsigned int m_windowWidth  = 1000;
     unsigned int m_windowHeight = 800;
 
     bool m_VSync = true;
 
     std::shared_ptr<VulkanRenderer> m_renderer;
-    VkSurfaceKHR m_surface;
-    GLFWwindow * m_window;
-    SimulationManager * m_simManager;
-    VkSwapchainKHR m_swapchain;
+    VkSurfaceKHR       m_surface;
+    GLFWwindow*        m_window;
+    SimulationManager* m_simManager;
+    VkSwapchainKHR     m_swapchain;
 
     VkSurfaceCapabilitiesKHR m_physicalCapabilities;
 
-    uint32_t m_presentModesCount;
-    VkPresentModeKHR * m_presentModes;
+    uint32_t          m_presentModesCount;
+    VkPresentModeKHR* m_presentModes;
 
     uint32_t m_physicalFormatsCount;
-    VkSurfaceFormatKHR * m_physicalFormats;
+    VkSurfaceFormatKHR* m_physicalFormats;
     bool m_fullscreen = false;
 
     bool m_VRMode = false;

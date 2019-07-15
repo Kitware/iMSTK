@@ -45,7 +45,7 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
 
     // Map vertices
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double* vertData = reinterpret_cast<double*>(vertices.data());
+    double*           vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
@@ -55,9 +55,9 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     points->SetData(m_mappedVertexArray);
 
     // Copy cells
-    auto cells = vtkSmartPointer<vtkCellArray>::New();
+    auto      cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[4];
-    for (const auto &t : geometry->getTetrahedraVertices())
+    for (const auto& t : geometry->getTetrahedraVertices())
     {
         for (size_t i = 0; i < 4; ++i)
         {
@@ -100,12 +100,12 @@ VTKTetrahedralMeshRenderDelegate::updateDataSource()
         // Copy cells
         auto& maskedTets = std::dynamic_pointer_cast<TetrahedralMesh>(geometry)->getRemovedTetrahedra();
 
-        auto cells = vtkSmartPointer<vtkCellArray>::New();
+        auto      cells = vtkSmartPointer<vtkCellArray>::New();
         vtkIdType cell[4];
-        size_t tetId = 0;
+        size_t    tetId = 0;
 
         // Assign new cells
-        for (const auto &t : geometry->getTetrahedraVertices())
+        for (const auto& t : geometry->getTetrahedraVertices())
         {
             if (!maskedTets[tetId])
             {

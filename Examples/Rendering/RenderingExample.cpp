@@ -29,10 +29,11 @@ using namespace imstk;
 /// \brief This example demonstrates configuring the renderer
 /// objects, lights etc.
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("Rendering");
 
     // Add IBL Probe
@@ -54,7 +55,7 @@ int main()
 
     // Head material
     auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_Normal.png", Texture::Type::NORMAL);
-    auto headMaterial = headObject->getVisualModel(0)->getRenderMaterial();
+    auto headMaterial      = headObject->getVisualModel(0)->getRenderMaterial();
     headMaterial->addTexture(headNormalTexture);
 #endif
 
@@ -79,16 +80,16 @@ int main()
     scene->addLight(pointLight);
 
     // Sphere
-    auto sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
+    auto sphereObj      = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
     auto sphereMaterial = std::make_shared<RenderMaterial>();
-    auto sphereMesh = sphereObj->getVisualGeometry();
+    auto sphereMesh     = sphereObj->getVisualGeometry();
     sphereMesh->translate(0.1, 0.2, 0.5);
     sphereMaterial->setEmissivity(10);
     sphereMaterial->setCastsShadows(false);
     sphereObj->getVisualModel(0)->setRenderMaterial(sphereMaterial);
 
     // Plane
-    auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
+    auto planeObj      = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
     auto planeMaterial = std::make_shared<RenderMaterial>();
     planeMaterial->setColor(Color::DarkGray);
     planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);

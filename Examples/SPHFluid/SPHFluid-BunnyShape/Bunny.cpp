@@ -24,7 +24,8 @@ using namespace imstk;
 
 // Hard-code a point set of particles sampled inside a Stanford bunny
 // Num. particles: 8834
-StdVectorOfVec3d getBunny()
+StdVectorOfVec3d
+getBunny()
 {
     StdVectorOfVec3d bunny;
     bunny.resize(8834);

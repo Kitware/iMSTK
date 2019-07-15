@@ -47,7 +47,7 @@ public:
     // Description:
     // Construct sphere with radius=0.5 and default resolution 8 in both Phi
     // and Theta directions.
-    static vtkCapsuleSource *New();
+    static vtkCapsuleSource* New();
 
     // Description:
     // Set radius of sphere. Default is 0.5.
@@ -91,18 +91,18 @@ protected:
     vtkCapsuleSource(int res = 8);
     ~vtkCapsuleSource() {}
 
-    int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-    int RequestInformation(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+    int RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
+    int RequestInformation(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
 
     double Radius;
     double Center[3];
-    int ThetaResolution;
-    int PhiResolution;
-    int LatLongTessellation;
-    int FillPoles;
+    int    ThetaResolution;
+    int    PhiResolution;
+    int    LatLongTessellation;
+    int    FillPoles;
     double CylinderLength;
 
 private:
     vtkCapsuleSource(const vtkCapsuleSource&); // Not implemented.
-    void operator=(const vtkCapsuleSource&); // Not implemented.
+    void operator=(const vtkCapsuleSource&);   // Not implemented.
 };

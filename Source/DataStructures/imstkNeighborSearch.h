@@ -82,7 +82,7 @@ public:
 
 private:
     Method m_Method;
-    Real m_SearchRadius = 0;
+    Real   m_SearchRadius = 0;
 
     std::shared_ptr<GridBasedNeighborSearch>          m_GridBasedSearcher;
     std::shared_ptr<SpatialHashTableSeparateChaining> m_SpatialHashSearcher;

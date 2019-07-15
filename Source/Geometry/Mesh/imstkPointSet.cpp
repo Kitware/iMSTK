@@ -45,7 +45,7 @@ PointSet::print() const
     Geometry::print();
     LOG(INFO) << "Number of vertices: " << this->getNumVertices();
     LOG(INFO) << "Vertex positions:";
-    for (auto &verts : m_vertexPositions)
+    for (auto& verts : m_vertexPositions)
     {
         LOG(INFO) << verts.x() << ", " << verts.y() << ", " << verts.z();
     }
@@ -84,8 +84,8 @@ PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
     if (m_originalNumVertices == 0)
     {
         m_initialVertexPositions = vertices;
-        m_originalNumVertices = vertices.size();
-        m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+        m_originalNumVertices    = vertices.size();
+        m_maxNumVertices         = (size_t)(m_originalNumVertices * m_loadFactor);
         m_vertexPositions.reserve(m_maxNumVertices);
     }
     else
@@ -111,8 +111,8 @@ PointSet::setVertexPositions(const StdVectorOfVec3d& vertices)
 {
     if (vertices.size() <= m_maxNumVertices)
     {
-        m_vertexPositions = vertices;
-        m_dataModified = true;
+        m_vertexPositions  = vertices;
+        m_dataModified     = true;
         m_transformApplied = false;
     }
     else
@@ -136,7 +136,7 @@ void
 PointSet::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
 {
     m_vertexPositions.at(vertNum) = pos;
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -154,7 +154,7 @@ PointSet::setVertexDisplacements(const StdVectorOfVec3d& diff)
     {
         m_vertexPositions[i] = m_initialVertexPositions[i] + diff[i];
     }
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -168,7 +168,7 @@ PointSet::setVertexDisplacements(const Vectord& u)
         m_vertexPositions[i] = m_initialVertexPositions[i] + Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
         dofId += 3;
     }
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -179,7 +179,7 @@ PointSet::translateVertices(const Vec3d& t)
     {
         m_vertexPositions[i] += t;
     }
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -241,10 +241,10 @@ PointSet::applyTranslation(const Vec3d t)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
-        m_vertexPositions[i] += t;
+        m_vertexPositions[i]        += t;
         m_initialVertexPositions[i] += t;
     }
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -253,10 +253,10 @@ PointSet::applyRotation(const Mat3d r)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
-        m_vertexPositions[i] = r * m_vertexPositions[i];
+        m_vertexPositions[i]        = r * m_vertexPositions[i];
         m_initialVertexPositions[i] = r * m_initialVertexPositions[i];
     }
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -265,10 +265,10 @@ PointSet::applyScaling(const double s)
 {
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
-        m_vertexPositions[i] = s * m_vertexPositions[i];
+        m_vertexPositions[i]        = s * m_vertexPositions[i];
         m_initialVertexPositions[i] = s * m_initialVertexPositions[i];
     }
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -298,7 +298,7 @@ PointSet::updatePostTransformData()
 void
 PointSet::setLoadFactor(double loadFactor)
 {
-    m_loadFactor = loadFactor;
+    m_loadFactor     = loadFactor;
     m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
     m_vertexPositions.reserve(m_maxNumVertices);
 }

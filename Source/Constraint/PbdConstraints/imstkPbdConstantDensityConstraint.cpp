@@ -28,8 +28,8 @@ namespace imstk
 void
 PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double)
 {
-    const auto& state = model.getCurrentState();
-    const auto numParticles = state->getPositions().size();
+    const auto& state        = model.getCurrentState();
+    const auto  numParticles = state->getPositions().size();
 
     // constraint parameters
     // Refer: Miller, et al 2003 "Particle-Based Fluid Simulation for Interactive Applications."
@@ -49,25 +49,25 @@ PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double)
 bool
 PbdConstantDensityConstraint::solvePositionConstraint(PbdModel& model)
 {
-    const auto& state = model.getCurrentState();
-    auto& positions = state->getPositions();
-    const auto numParticles = positions.size();
+    const auto& state        = model.getCurrentState();
+    auto&       positions    = state->getPositions();
+    const auto  numParticles = positions.size();
 
     // Search neighbor for each particle
     m_NeighborSearcher->getNeighbors(m_neighborList, positions);
 
     ParallelUtils::parallelFor(numParticles,
-        [&](const size_t idx){
+        [&](const size_t idx) {
             computeDensity(positions[idx], idx, positions);
     });
 
     ParallelUtils::parallelFor(numParticles,
-        [&](const size_t idx){
+        [&](const size_t idx) {
             computeLambdaScalingFactor(positions[idx], idx, positions);
     });
 
     ParallelUtils::parallelFor(numParticles,
-        [&](const size_t idx){
+        [&](const size_t idx) {
             updatePositions(positions[idx], idx, positions);
     });
 
@@ -75,19 +75,19 @@ PbdConstantDensityConstraint::solvePositionConstraint(PbdModel& model)
 }
 
 double
-PbdConstantDensityConstraint::wPoly6(const Vec3d &pi, const Vec3d &pj)
+PbdConstantDensityConstraint::wPoly6(const Vec3d& pi, const Vec3d& pj)
 {
     double rLengthSqr = (pi - pj).squaredNorm();
 
     return (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20) ?
            0 :
-           m_wPoly6Coeff * pow(m_maxDistSqr - rLengthSqr, 3);
+           m_wPoly6Coeff* pow(m_maxDistSqr - rLengthSqr, 3);
 }
 
 Vec3d
-PbdConstantDensityConstraint::gradSpiky(const Vec3d &pi, const Vec3d &pj)
+PbdConstantDensityConstraint::gradSpiky(const Vec3d& pi, const Vec3d& pj)
 {
-    Vec3d r = pi - pj;
+    Vec3d        r          = pi - pj;
     const double rLengthSqr = r.squaredNorm();
 
     if (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20)
@@ -100,9 +100,9 @@ PbdConstantDensityConstraint::gradSpiky(const Vec3d &pi, const Vec3d &pj)
 }
 
 void
-PbdConstantDensityConstraint::computeDensity(const Vec3d &pi,
-                                             const size_t index,
-                                             const StdVectorOfVec3d &positions)
+PbdConstantDensityConstraint::computeDensity(const Vec3d&            pi,
+                                             const size_t            index,
+                                             const StdVectorOfVec3d& positions)
 {
     double densitySum = 0.0;
     for (auto q : m_neighborList[index])
@@ -114,12 +114,12 @@ PbdConstantDensityConstraint::computeDensity(const Vec3d &pi,
 }
 
 void
-PbdConstantDensityConstraint::computeLambdaScalingFactor(const Vec3d &pi,
-                                                         const size_t index,
-                                                         const StdVectorOfVec3d &positions)
+PbdConstantDensityConstraint::computeLambdaScalingFactor(const Vec3d&            pi,
+                                                         const size_t            index,
+                                                         const StdVectorOfVec3d& positions)
 {
     const double densityConstraint = (m_densities[index] / m_restDensity) - 1;
-    double gradientSum = 0.0;
+    double       gradientSum       = 0.0;
     for (auto q : m_neighborList[index])
     {
         gradientSum += gradSpiky(pi, positions[q]).squaredNorm() / m_restDensity;
@@ -129,26 +129,27 @@ PbdConstantDensityConstraint::computeLambdaScalingFactor(const Vec3d &pi,
 }
 
 void
-PbdConstantDensityConstraint::updatePositions(const Vec3d &pi,
-                                              const size_t index,
-                                              StdVectorOfVec3d &positions)
+PbdConstantDensityConstraint::updatePositions(const Vec3d&      pi,
+                                              const size_t      index,
+                                              StdVectorOfVec3d& positions)
 {
     //Make sure the point is valid
     Vec3d gradientLambdaSum(0., 0., 0.);
     for (auto q : m_neighborList[index])
     {
         double lambdasDiff = (m_lambdas[index] + m_lambdas[q]);
-        Vec3d gradKernal = gradSpiky(pi, positions[q]);
+        Vec3d  gradKernal  = gradSpiky(pi, positions[q]);
         gradientLambdaSum += (gradKernal * lambdasDiff);
     }
 
     m_deltaPositions[index] = gradientLambdaSum / m_restDensity;
-    positions[index] += m_deltaPositions[index];
+    positions[index]       += m_deltaPositions[index];
 }
 
-void PbdConstantDensityConstraint::setMaxNeighborDistance(const double dist)
+void
+PbdConstantDensityConstraint::setMaxNeighborDistance(const double dist)
 {
-    m_maxDist = dist;
+    m_maxDist    = dist;
     m_maxDistSqr = dist * dist;
     if (m_NeighborSearcher)
     {

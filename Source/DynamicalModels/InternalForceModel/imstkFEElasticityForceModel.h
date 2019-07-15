@@ -54,7 +54,7 @@ public:
 
     void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {
-        double *data = const_cast<double*>(u.data());
+        double* data = const_cast<double*>(u.data());
         m_feElasticForceModel->GetInternalForce(data, internalForce.data());
     }
 
@@ -65,7 +65,7 @@ public:
 
     void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
-        double *data = const_cast<double*>(u.data());
+        double* data = const_cast<double*>(u.data());
         m_feElasticForceModel->GetTangentStiffnessMatrixTopology(data, );
     }
 

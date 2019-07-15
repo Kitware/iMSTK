@@ -57,8 +57,8 @@ VulkanRenderDelegate::initialize(std::shared_ptr<VisualModel> visualModel)
 
 std::shared_ptr<VulkanRenderDelegate>
 VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
-                                    SceneObject::Type type,
-                                    VulkanMemoryManager& memoryManager)
+                                    SceneObject::Type            type,
+                                    VulkanMemoryManager&         memoryManager)
 {
     visualModel->m_renderDelegateCreated = true;
     switch (visualModel->getGeometry()->getType())
@@ -135,11 +135,11 @@ VulkanRenderDelegate::getBuffer()
 }
 
 void
-VulkanRenderDelegate::initializeData(VulkanMemoryManager& memoryManager,
+VulkanRenderDelegate::initializeData(VulkanMemoryManager&            memoryManager,
                                      std::shared_ptr<RenderMaterial> material,
-                                     VulkanVertexBufferMode mode)
+                                     VulkanVertexBufferMode          mode)
 {
-    m_vertexUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalVertexUniforms));
+    m_vertexUniformBuffer   = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalVertexUniforms));
     m_fragmentUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalFragmentUniforms));
 
     if (material->getDisplayMode() == RenderMaterial::DisplayMode::SURFACE
@@ -191,7 +191,7 @@ VulkanRenderDelegate::updateTransform()
     AffineTransform3d T(geometry->m_transform.matrix());
     T.scale(geometry->getScaling());
     m_localVertexUniforms.transform = glm::make_mat4(T.data());
-    geometry->m_transformModified = false;
+    geometry->m_transformModified   = false;
 }
 
 void
@@ -200,20 +200,20 @@ VulkanRenderDelegate::updateUniforms(uint32_t frameIndex)
     auto geometry = this->getVisualModel()->getGeometry();
     this->updateTransform();
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
-        (void *)&m_localVertexUniforms,
+        (void*)&m_localVertexUniforms,
         frameIndex);
 
     auto mat = this->getVisualModel()->getRenderMaterial();
 
     auto color = mat->getColor();
-    m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
+    m_localFragmentUniforms.color           = glm::vec4(color.r, color.g, color.b, color.a);
     m_localFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
-    m_localFragmentUniforms.emissivity = mat->getEmissivity();
-    m_localFragmentUniforms.roughness = mat->getRoughness();
-    m_localFragmentUniforms.metalness = mat->getMetalness();
+    m_localFragmentUniforms.emissivity      = mat->getEmissivity();
+    m_localFragmentUniforms.roughness       = mat->getRoughness();
+    m_localFragmentUniforms.metalness       = mat->getMetalness();
 
     auto debugColor = mat->getDebugColor();
-    m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
+    m_localFragmentUniforms.color      = glm::vec4(color.r, color.g, color.b, color.a);
     m_localFragmentUniforms.debugColor = glm::vec4(debugColor.r, debugColor.g, debugColor.b, debugColor.a);
 
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalFragmentUniforms),

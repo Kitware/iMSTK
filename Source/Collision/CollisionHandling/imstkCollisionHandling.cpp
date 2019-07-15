@@ -33,14 +33,14 @@
 namespace imstk
 {
 std::shared_ptr<CollisionHandling>
-CollisionHandling::make_collision_handling(const Type& type,
-                                           const Side& side,
+CollisionHandling::make_collision_handling(const Type&                          type,
+                                           const Side&                          side,
                                            const std::shared_ptr<CollisionData> colData,
-                                           std::shared_ptr<CollidingObject> objA,
-                                           std::shared_ptr<CollidingObject> objB)
+                                           std::shared_ptr<CollidingObject>     objA,
+                                           std::shared_ptr<CollidingObject>     objB)
 {
-    if (type != Type::None &&
-        objA->getType() == SceneObject::Type::Visual)
+    if (type != Type::None
+        && objA->getType() == SceneObject::Type::Visual)
     {
         LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
                      << "penalty collision handling only implemented for colliding objects.";
@@ -64,7 +64,7 @@ CollisionHandling::make_collision_handling(const Type& type,
 
     case Type::VirtualCoupling:
 
-        return std::make_shared<VirtualCouplingCH>(side, colData, objA );
+        return std::make_shared<VirtualCouplingCH>(side, colData, objA);
 
     case Type::NodalPicking:
 

@@ -64,7 +64,7 @@ public:
     ///
     /// \brief Returns the volume of the geometry (if valid)
     ///
-    virtual double getVolume() const { return 0; };
+    virtual double getVolume() const { return 0; }
 
     ///
     /// \brief Compute the bounding box for the entire mesh
@@ -107,7 +107,7 @@ public:
     /// \brief Returns the position of a vertex given its index
     ///
     const Vec3d& getVertexPosition(const size_t& vertNum,
-                                   DataType type = DataType::PostTransform);
+                                   DataType      type = DataType::PostTransform);
 
     ///
     /// \brief Sets the displacements of mesh vertices from an array
@@ -158,7 +158,7 @@ public:
     /// \brief Set the topologyChanged flag
     ///
     void setTopologyChangedFlag(const bool flag) { m_topologyChanged = flag; }
-    bool getTopologyChangedFlag() const { return m_topologyChanged; };
+    bool getTopologyChangedFlag() const { return m_topologyChanged; }
 
     ///
     /// \brief Set load factor
@@ -194,16 +194,16 @@ protected:
     void applyScaling(const double s) override;
     void updatePostTransformData() override;
 
-    StdVectorOfVec3d m_initialVertexPositions;       ///> Initial positions of vertices
-    StdVectorOfVec3d m_vertexPositions;              ///> Current positions of vertices
-    StdVectorOfVec3d m_vertexPositionsPostTransform; ///> Positions of vertices after transform
+    StdVectorOfVec3d m_initialVertexPositions;                ///> Initial positions of vertices
+    StdVectorOfVec3d m_vertexPositions;                       ///> Current positions of vertices
+    StdVectorOfVec3d m_vertexPositionsPostTransform;          ///> Positions of vertices after transform
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 
     bool m_topologyChanged = false;
 
-    double m_loadFactor = 2.0;
-    size_t m_maxNumVertices = 0;
+    double m_loadFactor          = 2.0;
+    size_t m_maxNumVertices      = 0;
     size_t m_originalNumVertices = 0;
 };
 } // imstk

@@ -51,10 +51,10 @@ protected:
         m_memory = new VkDeviceMemory();
     }
 
-    VkDeviceSize m_size;
-    VkDeviceSize m_capacity;
-    VkDeviceSize m_lastOffset;
-    VkDeviceMemory * m_memory;
+    VkDeviceSize    m_size;
+    VkDeviceSize    m_capacity;
+    VkDeviceSize    m_lastOffset;
+    VkDeviceMemory* m_memory;
 
     VkDeviceMemory* getMemory()
     {
@@ -76,14 +76,14 @@ public:
     }
 
 protected:
-    VulkanInternalMemory * m_memory;
-    VkDeviceSize m_size;
+    VulkanInternalMemory* m_memory;
+    VkDeviceSize          m_size;
 };
 
 class VulkanInternalImage : public VulkanInternalResource
 {
 public:
-    VulkanInternalImage(VkImage * image = nullptr)
+    VulkanInternalImage(VkImage* image = nullptr)
     {
         if (image)
         {
@@ -93,14 +93,14 @@ public:
         {
             m_image = new VkImage();
         }
-    };
+    }
 
     VkImage* getImage()
     {
         return m_image;
     }
 
-    void mapMemory(VkDevice& device, void ** data)
+    void mapMemory(VkDevice& device, void** data)
     {
         vkMapMemory(device, *m_memory->m_memory, m_memoryOffset, m_size, 0, data);
     }
@@ -118,8 +118,8 @@ public:
 protected:
     friend class VulkanMemoryManager;
 
-    VkImage * m_image;
-    VkDeviceSize m_memoryOffset;
+    VkImage*      m_image;
+    VkDeviceSize  m_memoryOffset;
     VkImageLayout m_imageLayout;
 };
 
@@ -128,9 +128,9 @@ class VulkanInternalBufferGroup : public VulkanInternalResource
 public:
     VulkanInternalBufferGroup(VulkanMemoryType type)
     {
-        m_type = type;
+        m_type   = type;
         m_buffer = new VkBuffer();
-    };
+    }
 
     VkBuffer* getBuffer()
     {
@@ -146,8 +146,8 @@ protected:
     friend class VulkanMemoryManager;
     friend class VulkanInternalBuffer;
 
-    VkBuffer * m_buffer;
-    char * m_data;
+    VkBuffer*        m_buffer;
+    char*            m_data;
     VulkanMemoryType m_type;
     bool m_mapped = false;
 };
@@ -155,10 +155,10 @@ protected:
 class VulkanInternalBuffer
 {
 public:
-    VulkanInternalBuffer(VulkanInternalBufferGroup * bufferGroup)
+    VulkanInternalBuffer(VulkanInternalBufferGroup* bufferGroup)
     {
         m_bufferGroup = bufferGroup;
-    };
+    }
 
     VkBuffer* getBuffer()
     {
@@ -170,9 +170,9 @@ public:
         return m_bufferGroup->getMemory();
     }
 
-    void * getMemoryData(VkDevice& device)
+    void* getMemoryData(VkDevice& device)
     {
-        void * data;
+        void* data;
 
         if (!m_bufferGroup->m_mapped)
         {
@@ -182,7 +182,7 @@ public:
                                 m_bufferGroup->getMemory()->m_capacity,
                                 0,
                                 &data);
-            m_bufferGroup->m_data = (char*)data;
+            m_bufferGroup->m_data   = (char*)data;
             m_bufferGroup->m_mapped = true;
         }
 
@@ -207,7 +207,7 @@ public:
 protected:
     friend class VulkanMemoryManager;
 
-    VulkanInternalBufferGroup * m_bufferGroup;
+    VulkanInternalBufferGroup* m_bufferGroup;
     VkDeviceSize m_size;
     VkDeviceSize m_offset;
 };

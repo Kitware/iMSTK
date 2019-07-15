@@ -24,9 +24,9 @@
 namespace imstk
 {
 void
-InternalForceModel::updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double *values)
+InternalForceModel::updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double* values)
 {
-    auto rowLengths = vegaMatrix->GetRowLengths();
+    auto rowLengths    = vegaMatrix->GetRowLengths();
     auto nonZeroValues = vegaMatrix->GetEntries();
 
     // Flatten the internal non-zeros value array and store it in values.

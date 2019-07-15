@@ -46,9 +46,9 @@ public:
     ///
     /// \brief Constructor
     ///
-    PickingCH(const Side& side,
+    PickingCH(const Side&                          side,
               const std::shared_ptr<CollisionData> colData,
-              std::shared_ptr<DeformableObject> obj);
+              std::shared_ptr<DeformableObject>    obj);
 
     PickingCH() = delete;
 
@@ -85,7 +85,7 @@ public:
 
 private:
 
-    std::shared_ptr<DeformableObject> m_object;     ///> Deformable object
-    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
+    std::shared_ptr<DeformableObject>        m_object; ///> Deformable object
+    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints;
 };
 }

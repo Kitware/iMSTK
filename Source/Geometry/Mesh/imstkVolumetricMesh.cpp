@@ -37,7 +37,7 @@ VolumetricMesh::getAttachedSurfaceMesh()
 }
 
 void
-VolumetricMesh::setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh>surfaceMesh)
+VolumetricMesh::setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
     m_attachedSurfaceMesh = surfaceMesh;
 }

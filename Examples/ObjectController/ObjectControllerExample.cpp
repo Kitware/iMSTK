@@ -34,11 +34,12 @@ using namespace imstk;
 /// \brief This example demonstrates controlling the object
 /// using external device. NOTE: Requires GeoMagic Touch device
 ///
-int main()
+int
+main()
 {
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("ObjectController");
 
     // Device Client

@@ -42,19 +42,19 @@ public:
     /// \brief Constructors/Destructor
     ///
     ConjugateGradient();
-    ConjugateGradient(const SparseMatrixd &A, const Vectord& rhs);
+    ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs);
     ~ConjugateGradient() = default;
 
     ///
     /// \brief Remove specific constructor signatures
     ///
-    ConjugateGradient(const ConjugateGradient &) = delete;
-    ConjugateGradient &operator=(const ConjugateGradient &) = delete;
+    ConjugateGradient(const ConjugateGradient&) = delete;
+    ConjugateGradient& operator=(const ConjugateGradient&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override {};
+    void iterate(Vectord& x, bool updateResidual = true) override {}
 
     ///
     /// \brief Solve the system of equations.
@@ -136,7 +136,7 @@ private:
     ///> Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<SparseMatrixd> m_cgSolver;
 
-    std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints = nullptr;
-    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints = nullptr;
+    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
+    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk

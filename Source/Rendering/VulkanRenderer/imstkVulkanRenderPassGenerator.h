@@ -30,44 +30,44 @@ class VulkanRenderPassGenerator
 {
 public:
     static void generateDepthRenderPass(
-        VkDevice& device,
-        VkRenderPass& renderPass,
+        VkDevice&              device,
+        VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
-        const uint32_t numViews);
+        const uint32_t         numViews);
 
     static void generateOpaqueRenderPass(
-        VkDevice& device,
-        VkRenderPass& renderPass,
+        VkDevice&              device,
+        VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
-        const uint32_t numViews);
+        const uint32_t         numViews);
 
     static void generateDecalRenderPass(
-        VkDevice& device,
-        VkRenderPass& renderPass,
+        VkDevice&              device,
+        VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
-        const uint32_t numViews);
+        const uint32_t         numViews);
 
     static void generateParticleRenderPass(
-        VkDevice& device,
-        VkRenderPass& renderPass,
+        VkDevice&              device,
+        VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
-        const uint32_t numViews);
+        const uint32_t         numViews);
 
     static void generateShadowRenderPass(
-        VkDevice& device,
-        VkRenderPass& renderPass,
+        VkDevice&              device,
+        VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
-        const uint32_t numViews);
+        const uint32_t         numViews);
 
     static void generateGUIRenderPass(
-        VkDevice& device,
-        VkRenderPass& renderPass,
+        VkDevice&              device,
+        VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
-        const uint32_t numViews);
+        const uint32_t         numViews);
 
     static void generateRenderPassMultiviewCreateInfo(
         VkRenderPassMultiviewCreateInfo& multiviewInfo,
-        const uint32_t& viewMask,
-        const uint32_t& correlationMask);
+        const uint32_t&                  viewMask,
+        const uint32_t&                  correlationMask);
 };
 }
