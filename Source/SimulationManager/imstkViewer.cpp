@@ -23,13 +23,13 @@
 
 namespace imstk
 {
-std::shared_ptr<Scene>
+const std::shared_ptr<Scene>&
 Viewer::getActiveScene() const
 {
     return m_activeScene;
 }
 
-std::shared_ptr<Renderer>
+const std::shared_ptr<Renderer>&
 Viewer::getActiveRenderer() const
 {
     return m_rendererMap.at(m_activeScene);
@@ -41,13 +41,13 @@ Viewer::isRendering() const
     return m_running;
 }
 
-std::shared_ptr<ScreenCaptureUtility>
+const std::shared_ptr<ScreenCaptureUtility>&
 Viewer::getScreenCaptureUtility() const
 {
     return m_screenCapturer;
 }
 
-std::shared_ptr<GUIOverlay::Canvas>
+const std::shared_ptr<GUIOverlay::Canvas>&
 Viewer::getCanvas()
 {
     return m_canvas;

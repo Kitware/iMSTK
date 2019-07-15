@@ -151,8 +151,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
 #endif
     this->updateSceneCamera(scene->getCamera());
     auto camActor = vtkSmartPointer<vtkCameraActor>::New();
-    camActor->SetCamera(  m_sceneVtkCamera );
-    m_debugVtkActors.push_back( camActor );
+    camActor->SetCamera(m_sceneVtkCamera);
+    m_debugVtkActors.push_back(camActor);
 
     // Debug camera
     if (!enableVR)
@@ -287,10 +287,9 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             m_vtkRenderer->ResetCamera();
         }
 #ifdef iMSTK_ENABLE_VR
-        else // go to debug position camera
-        {
-            // apply debug camera
-            m_camPos[0].Apply(static_cast<vtkOpenVRCamera *>(m_vtkRenderer->GetActiveCamera()), renWin);
+        else   // go to debug position camera
+        {   // apply debug camera
+            m_camPos[0].Apply(static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()), renWin);
             m_vtkRenderer->ResetCameraClippingRange();
         }
 #endif
@@ -314,7 +313,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             if (enableVR)
             {
                 m_camPos[0].Set(
-                    static_cast<vtkOpenVRCamera *>(m_vtkRenderer->GetActiveCamera()),
+                    static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()),
                     vtkOpenVRRenderWindow::SafeDownCast(renWin));
             }
 #endif
@@ -325,10 +324,9 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             m_vtkRenderer->SetActiveCamera(m_sceneVtkCamera);
         }
 #ifdef iMSTK_ENABLE_VR
-        else // go to Predefined sceneVtkCamera position
-        {
-            // apply scene camera
-            m_camPos[1].Apply(static_cast<vtkOpenVRCamera *>(m_vtkRenderer->GetActiveCamera()), renWin);
+        else   // go to Predefined sceneVtkCamera position
+        {   // apply scene camera
+            m_camPos[1].Apply(static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()), renWin);
         }
 #endif
         m_vtkRenderer->ResetCameraClippingRange();
@@ -356,14 +354,14 @@ void
 VTKRenderer::updateRenderDelegates()
 {
     // Object actors
-    for (const auto& obj : m_scene->getSceneObjects() )
+    for (const auto& obj : m_scene->getSceneObjects())
     {
         for (auto visualModel : obj->getVisualModels())
         {
             auto geom = visualModel->getGeometry();
             if (visualModel && !visualModel->isRenderDelegateCreated())
             {
-                auto delegate = VTKRenderDelegate::makeDelegate( visualModel );
+                auto delegate = VTKRenderDelegate::makeDelegate(visualModel);
                 if (delegate == nullptr)
                 {
                     LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
@@ -371,8 +369,8 @@ VTKRenderer::updateRenderDelegates()
                     continue;
                 }
 
-                m_renderDelegates.push_back( delegate );
-                m_objectVtkActors.push_back( delegate->getVtkActor() );
+                m_renderDelegates.push_back(delegate);
+                m_objectVtkActors.push_back(delegate->getVtkActor());
                 m_vtkRenderer->AddActor(delegate->getVtkActor());
                 visualModel->m_renderDelegateCreated = true;
             }

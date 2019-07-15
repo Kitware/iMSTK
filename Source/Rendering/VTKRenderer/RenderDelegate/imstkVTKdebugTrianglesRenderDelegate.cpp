@@ -1,21 +1,21 @@
 /*=========================================================================
 
-Library: iMSTK
+   Library: iMSTK
 
-Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-& Imaging in Medicine, Rensselaer Polytechnic Institute.
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
 =========================================================================*/
 
@@ -32,56 +32,72 @@ limitations under the License.
 
 namespace imstk
 {
-VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<DebugRenderTriangles> renderTriangles) :
-    m_triangles(renderTriangles),
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    VTKRenderDelegate()
+VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(const std::shared_ptr<DebugRenderTriangles>& renderTriangles) :
+    m_RenderGeoData(renderTriangles),
+    m_pappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices in memory
-    StdVectorOfVec3d& triVertData = renderTriangles->getVertexPositionsNonConst();
-    m_mappedVertexArray->SetNumberOfComponents(3);
-    double* vertData = reinterpret_cast<double*>(triVertData.data());
-    m_mappedVertexArray->SetArray(vertData, triVertData.size() * 3, 1);
+    m_pappedVertexArray->SetNumberOfComponents(3);
 
     // Create points
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(triVertData.size());
-    points->SetData(m_mappedVertexArray);
+    m_points = vtkSmartPointer<vtkPoints>::New();
+    m_points->SetData(m_pappedVertexArray);
 
-    // Copy cells
-    auto cells = vtkSmartPointer<vtkCellArray>::New();
-    vtkIdType cell[3];
-    for (int i = 0; i < triVertData.size() / 3; ++i)
-    {
-        cell[0] = 3 * i;
-        cell[1] = cell[0] + 1;
-        cell[2] = cell[0] + 2;
-        cells->InsertNextCell(3, cell);
-    }
+    // Create cells
+    m_cellArray = vtkSmartPointer<vtkCellArray>::New();
 
     // Create PolyData
-    auto polydata = vtkSmartPointer<vtkPolyData>::New();
-    polydata->SetPoints(points);
-    polydata->SetPolys(cells);
+    m_polyData = vtkSmartPointer<vtkPolyData>::New();
+    m_polyData->SetPoints(m_points);
+    m_polyData->SetPolys(m_cellArray);
 
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(polydata);
-    m_triangles->setDataModifiedFlag(false);
+    source->SetOutput(m_polyData);
 
     // Update Transform, Render Properties
-    //this->update();
-    this->updateDataSource();
-    this->updateActorProperties();
-    this->setUpMapper(source->GetOutputPort(), false, m_triangles->getRenderMaterial());
+    updateDataSource();
+    updateActorProperties();
+
+    setUpMapper(source->GetOutputPort(), true, m_RenderGeoData->getRenderMaterial());
 }
 
 void
 VTKdbgTrianglesRenderDelegate::updateDataSource()
 {
-    if (m_triangles->isModified())
+    if (m_RenderGeoData->isModified())
     {
-        m_mappedVertexArray->Modified();
+        m_RenderGeoData->turnDataModifiedFlagOFF();
+        m_pappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
+                                      m_RenderGeoData->getNumVertices() * 3, 1);
+
+        // Set point data
+        m_points->SetNumberOfPoints(m_RenderGeoData->getNumVertices());
+
+        // Set tri data
+        int numCurrentTriangles = m_cellArray->GetNumberOfCells();
+        if (numCurrentTriangles > static_cast<int>(m_RenderGeoData->getNumVertices() / 3))
+        {
+            // There should is a better way to modify the existing data,
+            // instead of discarding everything and add from the beginning
+            m_cellArray->Reset();
+            numCurrentTriangles = 0;
+        }
+
+        vtkIdType cell[3];
+        for (int i = numCurrentTriangles; i < static_cast<int>(m_RenderGeoData->getNumVertices() / 3); ++i)
+        {
+            cell[0] = 3 * i;
+            cell[1] = cell[0] + 1;
+            cell[2] = cell[0] + 2;
+            m_cellArray->InsertNextCell(3, cell);
+        }
+
+        m_pappedVertexArray->Modified();
+
+        // Sleep for a while, wating for the data to propagate.
+        // This is necessary to avoid access violation error during CPU/GPU data transfer
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 } // imstk

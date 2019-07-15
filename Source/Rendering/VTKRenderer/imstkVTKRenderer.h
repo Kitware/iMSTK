@@ -85,6 +85,11 @@ public:
     void updateRenderDelegates();
 
     ///
+    /// \brief Get the render delegates
+    ///
+    const std::vector<std::shared_ptr<VTKRenderDelegate>>& getDebugRenderDelegates() const { return m_debugRenderDelegates; }
+
+    ///
     /// \brief Returns VTK renderer
     ///
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
@@ -105,12 +110,12 @@ protected:
     ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
-    vtkSmartPointer<vtkRenderer> m_vtkRenderer;
-    vtkSmartPointer<vtkCamera> m_defaultVtkCamera;
-    vtkSmartPointer<vtkCamera> m_sceneVtkCamera;
+    vtkSmartPointer<vtkRenderer>           m_vtkRenderer;
+    vtkSmartPointer<vtkCamera>             m_defaultVtkCamera;
+    vtkSmartPointer<vtkCamera>             m_sceneVtkCamera;
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
-    std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
-    std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
+    std::vector<vtkSmartPointer<vtkProp>>  m_objectVtkActors;
+    std::vector<vtkSmartPointer<vtkProp>>  m_debugVtkActors;
 
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;

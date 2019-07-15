@@ -26,6 +26,7 @@
 #include "imstkAPIUtilities.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
+#include "imstkVTKTextStatusManager.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"
@@ -36,25 +37,26 @@ using namespace imstk;
 /// \brief Usage: ./SPHFluid [threads=<num_threads>] [radius=<particle_radius>]
 /// \brief Example: ./SPHFluid threads=8 radius=0.01
 ///
-int main(int argc, char* argv[])
+int
+main(int argc, char* argv[])
 {
     // SimulationManager must be created first
     auto sdk = std::make_shared<SimulationManager>();
 
-    int threads = -1;
+    int    threads        = -1;
     double particleRadius = 0.1;
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i)
     {
         auto param = std::string(argv[i]);
-        if (param.find("threads") == 0 &&
-            param.find_first_of("=") != std::string::npos)
+        if (param.find("threads") == 0
+            && param.find_first_of("=") != std::string::npos)
         {
             threads = std::stoi(param.substr(param.find_first_of("=") + 1));
         }
-        else if (param.find("radius") == 0 &&
-                 param.find_first_of("=") != std::string::npos)
+        else if (param.find("radius") == 0
+                 && param.find_first_of("=") != std::string::npos)
         {
             particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
             LOG(INFO) << "Particle radius: " << particleRadius;
@@ -76,9 +78,23 @@ int main(int argc, char* argv[])
 
     auto scene = sdk->createNewScene("SPH Fluid");
 
+    // Get the VTKViewer
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    viewer->getVtkRenderWindow()->SetSize(1920, 1080);
+
+    auto statusManager = viewer->getTextStatusManager();
+    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Red);
+
     // Generate fluid and solid objects
     auto fluidObj = generateFluid(scene, particleRadius);
-    auto solids = generateSolids(scene);
+    auto solids   = generateSolids(scene);
+
+    sdk->getSceneManager(scene)->setPostUpdateCallback([&](Module*) {
+        statusManager->setCustomStatus("Number of particles: " +
+                                   std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
+                                        "\nNumber of solids: " + std::to_string(solids.size()));
+    });
 
     // Collision between fluid and solid objects
     auto colGraph = scene->getCollisionGraph();

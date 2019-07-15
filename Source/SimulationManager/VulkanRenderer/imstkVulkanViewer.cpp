@@ -54,7 +54,7 @@ VulkanViewer::VulkanViewer(SimulationManager * manager, bool enableVR)
 }
 
 void
-VulkanViewer::setActiveScene(std::shared_ptr<Scene> scene)
+VulkanViewer::setActiveScene(const std::shared_ptr<Scene>& scene)
 {
     m_renderer = std::make_shared<VulkanRenderer>(scene);
     m_renderer->m_backgroundColor = m_backgroundColor;
@@ -181,7 +181,7 @@ VulkanViewer::setRenderingMode(const Renderer::Mode mode)
     m_renderer->setMode(mode, false);
 }
 
-const Renderer::Mode
+Renderer::Mode
 VulkanViewer::getRenderingMode()
 {
     return m_renderer->getMode();

@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKdbgTrianglesRenderDelegate(std::shared_ptr<DebugRenderTriangles> renderTriangles);
+    VTKdbgTrianglesRenderDelegate(const std::shared_ptr<DebugRenderTriangles>& renderTriangles);
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry
@@ -50,8 +50,12 @@ public:
     void updateDataSource() override;
 
 protected:
+    std::shared_ptr<DebugRenderTriangles> m_RenderGeoData; ///> Geometry to render
 
-    std::shared_ptr<DebugRenderTriangles> m_triangles;        ///> Geometry to render
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    // Auxiliary variables for rendering
+    vtkSmartPointer<vtkDoubleArray> m_pappedVertexArray;
+    vtkSmartPointer<vtkPoints>      m_points;
+    vtkSmartPointer<vtkCellArray>   m_cellArray;
+    vtkSmartPointer<vtkPolyData>    m_polyData;
 };
 }

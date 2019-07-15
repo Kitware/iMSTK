@@ -1,21 +1,21 @@
 /*=========================================================================
 
-Library: iMSTK
+   Library: iMSTK
 
-Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-& Imaging in Medicine, Rensselaer Polytechnic Institute.
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
 
 =========================================================================*/
 
@@ -39,46 +39,54 @@ limitations under the License.
 
 namespace imstk
 {
-VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<DebugRenderPoints> vertices) :
-    m_points(vertices),
+VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(const std::shared_ptr<DebugRenderPoints>& pointRenderData) :
+    m_RenderGeoData(pointRenderData),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     // Map vertices
-    StdVectorOfVec3d& triVertData = vertices->getVertexPositionsNonConst();
     m_mappedVertexArray->SetNumberOfComponents(3);
-    double* vertData = reinterpret_cast<double*>(triVertData.data());
-    m_mappedVertexArray->SetArray(vertData, triVertData.size() * 3, 1);
 
     // Create points
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(triVertData.size());
-    points->SetData(m_mappedVertexArray);
+    m_points = vtkSmartPointer<vtkPoints>::New();
+    m_points->SetData(m_mappedVertexArray);
 
     // Create PolyData
-    auto polydata = vtkSmartPointer<vtkPolyData>::New();
-    polydata->SetPoints(points);
+    m_polyData = vtkSmartPointer<vtkPolyData>::New();
+    m_polyData->SetPoints(m_points);
 
-    auto glyph = vtkSmartPointer<vtkPolyData>::New();
     auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
-
-    auto glyph3D = vtkSmartPointer<vtkGlyph3D>::New();
-    glyph3D->SetSourceConnection(sphereSource->GetOutputPort());
-    glyph3D->SetInputData(polydata);
-    glyph3D->Update();
-
-    m_points->setDataModifiedFlag(false);
+    m_glyph = vtkSmartPointer<vtkGlyph3D>::New();
+    m_glyph->SetSourceConnection(sphereSource->GetOutputPort());
+    m_glyph->SetInputData(m_polyData);
 
     // Update Transform, Render Properties
-    this->update();
-    this->setUpMapper(glyph3D->GetOutputPort(), false, m_points->getRenderMaterial());
+    updateActorProperties();
+    setUpMapper(m_glyph->GetOutputPort(), false, m_RenderGeoData->getRenderMaterial());
+
+    updateDataSource();
 }
 
 void
 VTKdbgPointsRenderDelegate::updateDataSource()
 {
-    if (m_points->isModified())
+    if (m_RenderGeoData->isModified())
     {
+        m_RenderGeoData->turnDataModifiedFlagOFF();
+        m_mappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
+                                      m_RenderGeoData->getNumVertices() * 3, 1);
+
+        // Update points geometry
+        // m_Points need to be created from scrach, otherwise program will crash
+        m_points = vtkSmartPointer<vtkPoints>::New();
+        m_points->SetNumberOfPoints(m_RenderGeoData->getNumVertices());
+        m_points->SetData(m_mappedVertexArray);
+        m_polyData->SetPoints(m_points);
+
         m_mappedVertexArray->Modified();
+
+        // Sleep for a while, wating for the data to propagate
+        // This is necessary to avoid access violation error during CPU/GPU data transfer
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
 } // imstk
