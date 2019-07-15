@@ -78,12 +78,12 @@ public:
     ///
     /// \brief Default destructor
     ///
-    ~SimulationManager() { this->endSimulation(); }
+    ~SimulationManager() { this->endSimulation(); };
 
     ///
     /// \brief Returns the simulation status
     ///
-    const SimulationStatus& getStatus() const { return m_status; }
+    const SimulationStatus& getStatus() const { return m_status; };
 
     ///
     /// \brief Set number of worker threads in thread pool for parallel computation

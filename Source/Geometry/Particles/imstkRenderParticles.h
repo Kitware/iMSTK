@@ -107,7 +107,7 @@ public:
     /// \brief Get volume
     /// As these are particles, the volume is 0
     ///
-    double getVolume() const override { return 0; }
+    double getVolume() const override { return 0; };
 
 protected:
     friend class VulkanParticleRenderDelegate;
@@ -125,9 +125,9 @@ protected:
 
     unsigned int m_numParticles = 0;
 
-    void applyTranslation(const Vec3d t) override {}
-    void applyRotation(const Mat3d r) override {}
-    void applyScaling(const double s) override {}
-    virtual void updatePostTransformData() override {}
+    void applyTranslation(const Vec3d t) override {};
+    void applyRotation(const Mat3d r) override {};
+    void applyScaling(const double s) override {};
+    virtual void updatePostTransformData() override {};
 };
 }

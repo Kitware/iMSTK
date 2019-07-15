@@ -235,12 +235,12 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    virtual void setTimeStep(const double timeStep) { m_timeIntegrator->setTimestepSize(timeStep); }
+    virtual void setTimeStep(const double timeStep) { m_timeIntegrator->setTimestepSize(timeStep); };
 
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const { return m_timeIntegrator->getTimestepSize(); }
+    virtual double getTimeStep() const { return m_timeIntegrator->getTimestepSize(); };
 
     ///
     /// \brief Set the time step size to fixed size
@@ -250,9 +250,9 @@ public:
     ///
     /// \brief Set the fixed BC implementation state
     ///
-    void enableFixedBC() { m_implementFixedBC = true; }
-    void disableFixedBC() { m_implementFixedBC = false; }
-    bool isFixedBCImplemented() const { return m_implementFixedBC; }
+    void enableFixedBC() { m_implementFixedBC = true; };
+    void disableFixedBC() { m_implementFixedBC = false; };
+    bool isFixedBCImplemented() const { return m_implementFixedBC; };
 
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces

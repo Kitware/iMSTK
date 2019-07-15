@@ -936,7 +936,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer* renderer)
 
     // Global buffers
     std::vector<VkDescriptorBufferInfo> fragmentBufferInfo(2);
-    fragmentBufferInfo[0].offset = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getOffset();
+    fragmentBufferInfo[0].offset = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getOffset();;
     fragmentBufferInfo[0].range  = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getSize();
     fragmentBufferInfo[0].buffer = *(renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getBuffer());
 

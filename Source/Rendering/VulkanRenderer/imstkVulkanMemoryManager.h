@@ -96,4 +96,4 @@ protected:
     std::vector<VulkanInternalBufferGroup*> m_buffers;
     std::vector<VulkanInternalImage*>       m_images;
 };
-}
+};

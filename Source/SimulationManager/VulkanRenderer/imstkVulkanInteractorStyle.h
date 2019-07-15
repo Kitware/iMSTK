@@ -48,7 +48,7 @@ class VulkanInteractorStyle : public InteractorStyle
 {
 public:
     VulkanInteractorStyle();
-    virtual ~VulkanInteractorStyle() {}
+    virtual ~VulkanInteractorStyle() {};
 
     ///
     /// \brief Set window

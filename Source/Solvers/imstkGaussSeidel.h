@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Constructors/Destructor
     ///
-    GaussSeidel() { m_type = Type::GaussSeidel; }
+    GaussSeidel() { m_type = Type::GaussSeidel; };
     GaussSeidel(const SparseMatrixd& A, const Vectord& rhs);
     ~GaussSeidel() = default;
 
@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override {}
+    void iterate(Vectord& x, bool updateResidual = true) override {};
 
     ///
     /// \brief Gauss-Seidel solver

@@ -35,8 +35,8 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    IterativeLinearSolver() {}
-    virtual ~IterativeLinearSolver() {}
+    IterativeLinearSolver() {};
+    virtual ~IterativeLinearSolver() {};
 
     ///
     /// \brief Do one iteration of the method.
@@ -76,7 +76,7 @@ public:
     bool isIterative() const override
     {
         return true;
-    }
+    };
 
 protected:
     size_t  m_maxIterations = 100;  ///> Maximum number of iterations to be performed.

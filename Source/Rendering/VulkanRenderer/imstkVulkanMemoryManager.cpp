@@ -250,4 +250,4 @@ VulkanMemoryManager::getAlignedSize(VkDeviceSize size, VkDeviceSize alignment)
 
     return newSize;
 }
-}
+};

@@ -108,12 +108,12 @@ public:
     ///
     /// \brief Get the latest position
     ///
-    const Vec3d& getPosition() { return m_currentPos; }
+    const Vec3d& getPosition() { return m_currentPos; };
 
     ///
     /// \brief Get the latest rotation
     ///
-    const Quatd& getRotation() { return m_currentRot; }
+    const Quatd& getRotation() { return m_currentRot; };
 
 protected:
 

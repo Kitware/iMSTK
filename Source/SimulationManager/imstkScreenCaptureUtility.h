@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Saves the screenshot as a png file
     ///
-    virtual void saveScreenShot() {}
+    virtual void saveScreenShot() {};
 
     ///
     /// \brief Returns the number of the screenshot
@@ -55,7 +55,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    ScreenCaptureUtility() {}
+    ScreenCaptureUtility() {};
 
     ///
     /// \brief Destructor

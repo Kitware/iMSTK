@@ -145,7 +145,7 @@ public:
     {
         m_dynamicalModel->resetToInitialState();
         this->updateGeometries();
-    }
+    };
 
 protected:
 

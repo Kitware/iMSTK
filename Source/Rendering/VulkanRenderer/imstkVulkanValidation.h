@@ -31,12 +31,12 @@ public:
     static char* getValidationLayer()
     {
         return "VK_LAYER_LUNARG_standard_validation";
-    }
+    };
 
     static char* getValidationExtension()
     {
         return "VK_EXT_debug_report";
-    }
+    };
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT      debugReportFlags,
                                                               VkDebugReportObjectTypeEXT debugReportObjectType,
@@ -49,6 +49,6 @@ public:
     {
         LOG(WARNING) << prefix << ": " << message;
         return VK_FALSE;
-    }
+    };
 };
 }

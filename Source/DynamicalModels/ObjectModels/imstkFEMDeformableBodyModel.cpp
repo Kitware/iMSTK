@@ -609,35 +609,33 @@ NonLinearSystem::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    const auto func =  [&, this](const Vectord& q, const bool semiImplicit) -> const Vectord&
-                      {
-                          (semiImplicit) ?
-                          this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
-                          this->computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
-                          if (this->m_implementFixedBC)
-                          {
-                              applyBoundaryConditions(m_Feff);
-                          }
-                          return m_Feff;
-                      };
-    return func;
+    return [&, this](const Vectord &q, const bool semiImplicit)->const Vectord &
+           {
+               (semiImplicit) ?
+               this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
+               this->computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+               if (this->m_implementFixedBC)
+               {
+                   applyBoundaryConditions(m_Feff);
+               }
+               return m_Feff;
+           };
 }
 
 NonLinearSystem::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
     // Gradient of the nonlinear objective function given the current state
-    const auto func =  [&, this](const Vectord& q) -> const SparseMatrixd&
-                      {
-                          this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+    return [&, this](const Vectord &q)->const SparseMatrixd &
+           {
+               this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
-                          if (this->m_implementFixedBC)
-                          {
-                              applyBoundaryConditions(m_Keff);
-                          }
-                          return m_Keff;
-                      };
-    return func;
+               if (this->m_implementFixedBC)
+               {
+                   applyBoundaryConditions(m_Keff);
+               }
+               return m_Keff;
+           };
 }
 
 NonLinearSystem::UpdateFunctionType
