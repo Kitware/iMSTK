@@ -34,7 +34,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    SceneObjectControllerBase() = default;
+    SceneObjectControllerBase()  = default;
     ~SceneObjectControllerBase() = default;
 
     ///

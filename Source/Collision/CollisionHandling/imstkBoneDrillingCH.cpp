@@ -32,10 +32,10 @@
 
 namespace imstk
 {
-BoneDrillingCH::BoneDrillingCH(const Side& side,
+BoneDrillingCH::BoneDrillingCH(const Side&                          side,
                                const std::shared_ptr<CollisionData> colData,
-                               std::shared_ptr<CollidingObject> bone,
-                               std::shared_ptr<CollidingObject> drill) :
+                               std::shared_ptr<CollidingObject>     bone,
+                               std::shared_ptr<CollidingObject>     drill) :
     CollisionHandling(Type::BoneDrilling, side, colData),
     m_drill(drill),
     m_bone(bone)
@@ -126,7 +126,7 @@ BoneDrillingCH::processCollisionData()
     // Update visual object position
 
     // Aggregate collision data
-    Vec3d t = Vec3d::Zero();
+    Vec3d  t           = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
     for (const auto& cd : m_colData->MAColData)
     {
@@ -139,7 +139,7 @@ BoneDrillingCH::processCollisionData()
         if (dSqr > maxDepthSqr)
         {
             maxDepthSqr = dSqr;
-            t = cd.penetrationVector;
+            t           = cd.penetrationVector;
         }
     }
     m_drill->getVisualGeometry()->setTranslation(devicePosition + t);
@@ -159,6 +159,6 @@ BoneDrillingCH::processCollisionData()
 
     // Housekeeping
     m_initialStep = false;
-    m_prevPos = devicePosition;
+    m_prevPos     = devicePosition;
 }
 }// iMSTK

@@ -51,12 +51,12 @@ public:
     ///
     /// \brief
     ///
-    virtual void integratePosition(){ return; }
+    virtual void integratePosition() { return; }
 
     ///
     /// \brief
     ///
-    virtual void integrateVelocity(){ return; }
+    virtual void integrateVelocity() { return; }
 
     ///
     /// \brief

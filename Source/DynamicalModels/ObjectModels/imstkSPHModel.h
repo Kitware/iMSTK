@@ -56,9 +56,9 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     // material parameters
-    Real m_RestDensity    = Real(1000.0);
-    Real m_RestDensitySqr = Real(1000000.0);
-    Real m_RestDensityInv = Real(1.0 / 1000.0);
+    Real m_RestDensity       = Real(1000.0);
+    Real m_RestDensitySqr    = Real(1000000.0);
+    Real m_RestDensityInv    = Real(1.0 / 1000.0);
     Real m_ParticleMass      = Real(1);
     Real m_ParticleMassScale = Real(0.95);    // scale particle mass to a smaller value to maintain stability
 
@@ -242,10 +242,10 @@ private:
     void moveParticles(const Real timestep);
 
     std::shared_ptr<PointSet> m_Geometry;
-    SPHSimulationState m_SimulationState;
+    SPHSimulationState        m_SimulationState;
 
-    Real m_dt;        ///> time step size
-    Real m_DefaultDt; ///> default time step size
+    Real m_dt;                                          ///> time step size
+    Real m_DefaultDt;                                   ///> default time step size
 
     SPHSimulationKernels m_Kernels;                     // must be initialized during model initialization
     std::shared_ptr<SPHModelConfig> m_Parameters;       // must be set before simulation

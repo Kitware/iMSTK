@@ -287,8 +287,8 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             m_vtkRenderer->ResetCamera();
         }
 #ifdef iMSTK_ENABLE_VR
-        else   // go to debug position camera
-        {   // apply debug camera
+        else // go to debug position camera
+        {    // apply debug camera
             m_camPos[0].Apply(static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()), renWin);
             m_vtkRenderer->ResetCameraClippingRange();
         }
@@ -324,8 +324,8 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             m_vtkRenderer->SetActiveCamera(m_sceneVtkCamera);
         }
 #ifdef iMSTK_ENABLE_VR
-        else   // go to Predefined sceneVtkCamera position
-        {   // apply scene camera
+        else // go to Predefined sceneVtkCamera position
+        {    // apply scene camera
             m_camPos[1].Apply(static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()), renWin);
         }
 #endif

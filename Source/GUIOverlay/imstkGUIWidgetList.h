@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Access operator
     ///
-    std::shared_ptr<Widget> operator[] (size_t index);
+    std::shared_ptr<Widget> operator[](size_t index);
 
 protected:
     std::vector<std::shared_ptr<Widget>> m_widgets;

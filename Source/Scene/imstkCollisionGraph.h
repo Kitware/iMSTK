@@ -42,10 +42,10 @@ namespace imstk
 class CollisionGraph
 {
 public:
-    using CollidingObjectPtr = std::shared_ptr<CollidingObject>;
-    using CollisionHandlingPtr = std::shared_ptr<CollisionHandling>;
+    using CollidingObjectPtr    = std::shared_ptr<CollidingObject>;
+    using CollisionHandlingPtr  = std::shared_ptr<CollisionHandling>;
     using CollisionDetectionPtr = std::shared_ptr<CollisionDetection>;
-    using InteractionPairPtr = std::shared_ptr<InteractionPair>;
+    using InteractionPairPtr    = std::shared_ptr<InteractionPair>;
 
     ///
     /// \brief Default constructor
@@ -60,18 +60,18 @@ public:
     ///
     /// \brief Add interaction pair in collision graph
     ///
-    InteractionPairPtr addInteractionPair(CollidingObjectPtr A,
-                                          CollidingObjectPtr B,
+    InteractionPairPtr addInteractionPair(CollidingObjectPtr       A,
+                                          CollidingObjectPtr       B,
                                           CollisionDetection::Type CDType,
-                                          CollisionHandling::Type CHAType,
-                                          CollisionHandling::Type CHBType);
+                                          CollisionHandling::Type  CHAType,
+                                          CollisionHandling::Type  CHBType);
 
     //TODO: Refactor -> PBD only
-    InteractionPairPtr addInteractionPair(CollidingObjectPtr A,
-                                          CollidingObjectPtr B,
+    InteractionPairPtr addInteractionPair(CollidingObjectPtr    A,
+                                          CollidingObjectPtr    B,
                                           CollisionDetectionPtr CD,
-                                          CollisionHandlingPtr CHA,
-                                          CollisionHandlingPtr CHB);
+                                          CollisionHandlingPtr  CHA,
+                                          CollisionHandlingPtr  CHB);
 
     void addInteractionPair(std::shared_ptr<PbdInteractionPair> pair);
 
@@ -91,7 +91,7 @@ public:
     ///
     const std::vector<InteractionPairPtr>& getInteractionPairList() const;
 
-    const std::vector<std::shared_ptr<PbdInteractionPair>> &getPbdPairList() const;
+    const std::vector<std::shared_ptr<PbdInteractionPair>>& getPbdPairList() const;
 
     ///
     /// \brief Returns a map of all interaction pairs per object
@@ -99,9 +99,9 @@ public:
     const std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
 
 protected:
-    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList; //TODO: Refactor -> PBD only
+    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList;                    //TODO: Refactor -> PBD only
 
-    std::vector<InteractionPairPtr> m_interactionPairList; ///< All interaction pairs in the collision graph
+    std::vector<InteractionPairPtr> m_interactionPairList;                                        ///< All interaction pairs in the collision graph
     std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
 };
 }

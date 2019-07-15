@@ -111,12 +111,12 @@ public:
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize(){ return true; }
+    virtual bool initialize() { return true; }
 
     ///
     /// \brief
     ///
-    virtual void reset(){}
+    virtual void reset() {}
 
 protected:
     ///
@@ -124,8 +124,8 @@ protected:
     ///
     void setType(Type type);
 
-    Type m_type; ///> Type of the scene object
-    std::string m_name; ///> Custom name of the scene object
+    Type        m_type;                                       ///> Type of the scene object
+    std::string m_name;                                       ///> Custom name of the scene object
     std::vector<std::shared_ptr<VisualModel>> m_visualModels; ///> Visual objects for rendering
 };
 

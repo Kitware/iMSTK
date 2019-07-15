@@ -25,9 +25,9 @@ limitations under the License.
 
 namespace imstk
 {
-PickingCH::PickingCH(const CollisionHandling::Side &side,
+PickingCH::PickingCH(const CollisionHandling::Side&       side,
                      const std::shared_ptr<CollisionData> colData,
-                     std::shared_ptr<DeformableObject> obj) :
+                     std::shared_ptr<DeformableObject>    obj) :
     CollisionHandling(Type::NodalPicking, side, colData),
     m_object(obj)
 {
@@ -68,7 +68,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     const auto& Vprev = deformableObj->getVelocities();
 
     auto PhysTetMesh = std::dynamic_pointer_cast<PointSet>(deformableObj->getPhysicsGeometry());
-    auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
+    auto dT          = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
 
     // If collision data, append LPC constraints
     ParallelUtils::SpinLock lock;

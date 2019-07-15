@@ -38,9 +38,9 @@ namespace imstk
 class NonLinearSolver : public SolverBase
 {
 public:
-    using JacobianType = std::function < const SparseMatrixd& (const Vectord&) >;
-    using UpdateIterateType = std::function < void(const Vectord&, Vectord&) >;
-    using FunctionType = NonLinearSystem::VectorFunctionType;
+    using JacobianType      = std::function<const SparseMatrixd& (const Vectord&)>;
+    using UpdateIterateType = std::function<void(const Vectord&, Vectord&)>;
+    using FunctionType      = NonLinearSystem::VectorFunctionType;
 
 public:
     ///
@@ -132,9 +132,9 @@ public:
     }
 
 protected:
-    std::array<double, 2> m_sigma;      ///< Safeguarding bounds for the line search
-    double m_alpha;                     ///< Parameter to measure decrease
-    size_t m_armijoMax;                 ///< Maximum number of step length reductions
+    std::array<double, 2> m_sigma;                      ///< Safeguarding bounds for the line search
+    double m_alpha;                                     ///< Parameter to measure decrease
+    size_t m_armijoMax;                                 ///< Maximum number of step length reductions
 
     std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType m_updateIterate;                  ///< Update iteration function

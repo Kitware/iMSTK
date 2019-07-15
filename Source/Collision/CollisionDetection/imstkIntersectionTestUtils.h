@@ -45,9 +45,9 @@ testAABBToAABB(const double& min1_x, const double& max1_x,
                const double& min2_y, const double& max2_y,
                const double& min2_z, const double& max2_z)
 {
-    return (isIntersect(min1_x, max1_x, min2_x, max2_x) &&
-            isIntersect(min1_y, max1_y, min2_y, max2_y) &&
-            isIntersect(min1_z, max1_z, min2_z, max2_z));
+    return (isIntersect(min1_x, max1_x, min2_x, max2_x)
+            && isIntersect(min1_y, max1_y, min2_y, max2_y)
+            && isIntersect(min1_z, max1_z, min2_z, max2_z));
 }
 
 ///

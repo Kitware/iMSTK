@@ -61,7 +61,7 @@ protected:
     std::string m_brdfLUTPath;
 
     std::shared_ptr<Texture> m_irradianceCubemapTexture = nullptr;
-    std::shared_ptr<Texture> m_radianceCubemapTexture = nullptr;
-    std::shared_ptr<Texture> m_brdfLUTTexture = nullptr;
+    std::shared_ptr<Texture> m_radianceCubemapTexture   = nullptr;
+    std::shared_ptr<Texture> m_brdfLUTTexture           = nullptr;
 };
 }

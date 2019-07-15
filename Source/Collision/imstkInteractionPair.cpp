@@ -27,9 +27,9 @@ namespace imstk
 {
 InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
                                  std::shared_ptr<CollidingObject> B,
-                                 CollisionDetection::Type CDType,
-                                 CollisionHandling::Type CHAType,
-                                 CollisionHandling::Type CHBType)
+                                 CollisionDetection::Type         CDType,
+                                 CollisionHandling::Type          CHAType,
+                                 CollisionHandling::Type          CHBType)
 {
     m_colData = std::make_shared<CollisionData>();
 
@@ -84,18 +84,18 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Init interactionPair
-    m_objects = ObjectsPair(A, B);
-    m_colDetect = CD;
+    m_objects      = ObjectsPair(A, B);
+    m_colDetect    = CD;
     m_colHandlingA = CHA;
     m_colHandlingB = CHB;
-    m_valid = true;
+    m_valid        = true;
 }
 
-InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
-                                 std::shared_ptr<CollidingObject> B,
+InteractionPair::InteractionPair(std::shared_ptr<CollidingObject>    A,
+                                 std::shared_ptr<CollidingObject>    B,
                                  std::shared_ptr<CollisionDetection> CD,
-                                 std::shared_ptr<CollisionHandling> CHA,
-                                 std::shared_ptr<CollisionHandling> CHB)
+                                 std::shared_ptr<CollisionHandling>  CHA,
+                                 std::shared_ptr<CollisionHandling>  CHB)
 {
     m_valid = false;
 
@@ -113,12 +113,12 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
         return;
     }*/
 
-    m_objects = ObjectsPair(A, B);
-    m_colDetect = CD;
+    m_objects      = ObjectsPair(A, B);
+    m_colDetect    = CD;
     m_colHandlingA = CHA;
     m_colHandlingB = CHB;
-    m_colData = CD->getCollisionData();
-    m_valid = true;
+    m_colData      = CD->getCollisionData();
+    m_valid        = true;
 }
 
 void

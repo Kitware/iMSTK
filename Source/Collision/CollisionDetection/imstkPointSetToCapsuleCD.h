@@ -43,8 +43,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    PointSetToCapsuleCD(std::shared_ptr<PointSet> pointSet,
-                        std::shared_ptr<Capsule> capsule,
+    PointSetToCapsuleCD(std::shared_ptr<PointSet>      pointSet,
+                        std::shared_ptr<Capsule>       capsule,
                         std::shared_ptr<CollisionData> colData);
 
     ///
@@ -60,6 +60,6 @@ public:
 private:
 
     std::shared_ptr<PointSet> m_pointSet;       ///> PointSet
-    std::shared_ptr<Capsule> m_capsule;         ///> Capsule
+    std::shared_ptr<Capsule>  m_capsule;        ///> Capsule
 };
 }

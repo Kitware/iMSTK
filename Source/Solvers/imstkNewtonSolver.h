@@ -44,16 +44,16 @@ public:
     ///
     NewtonSolver();
     ~NewtonSolver() = default;
-    NewtonSolver(const NewtonSolver &other) = delete;
+    NewtonSolver(const NewtonSolver& other) = delete;
 
-    NewtonSolver &operator=(const NewtonSolver &other) = delete;
+    NewtonSolver& operator=(const NewtonSolver& other) = delete;
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method
     ///
     /// \param x Current iterate
     ///
-    void solveGivenState(Vectord &x) override;
+    void solveGivenState(Vectord& x) override;
     void solve() override;
 
     ///
@@ -85,12 +85,12 @@ public:
     ///
     /// \param x Current iterate
     ///
-    double updateJacobian(const Vectord &x);
+    double updateJacobian(const Vectord& x);
 
     ///
     /// \brief Get JacobianMatrix. Returns jacobian matrix
     ///
-    SparseMatrixd &getJacobianMatrix();
+    SparseMatrixd& getJacobianMatrix();
 
     ///
     /// \brief Set AbsoluteTolerance
@@ -168,7 +168,7 @@ public:
     ///
     void setUseArmijo(const bool value)
     {
-        m_useArmijo = value;
+        m_useArmijo           = value;
         (value) ? m_armijoMax = 30 : m_armijoMax = 0;
     }
 
@@ -194,7 +194,7 @@ public:
     virtual void setToFullyImplicit(const int maxNumIter = 50) override
     {
         m_isSemiImplicit = false;
-        m_maxIterations = maxNumIter;
+        m_maxIterations  = maxNumIter;
     }
 
     ///
@@ -203,7 +203,7 @@ public:
     virtual void setToSemiImplicit() override
     {
         m_isSemiImplicit = true;
-        m_maxIterations = 1;
+        m_maxIterations  = 1;
     }
 
 private:
@@ -214,7 +214,7 @@ private:
     double m_gamma;                                   ///> Internal parameter used to update the forcing term
     double m_etaMax;                                  ///> Maximum tolerance for the linear solver
     size_t m_maxIterations;                           ///> Maximum number of nonlinear iterations
-    bool m_useArmijo;                                 ///> True if Armijo liner search is desired
+    bool   m_useArmijo;                               ///> True if Armijo liner search is desired
     std::vector<double> m_fnorms;                     ///> Consecutive function norms
 };
 } // imstk

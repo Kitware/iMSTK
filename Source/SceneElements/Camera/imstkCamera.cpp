@@ -88,7 +88,8 @@ Camera::setViewUp(const double& x,
     m_viewUp = Vec3d(x, y, z).normalized();
 }
 
-const double& Camera::getFieldOfView() const
+const double&
+Camera::getFieldOfView() const
 {
     return m_fieldOfView;
 }

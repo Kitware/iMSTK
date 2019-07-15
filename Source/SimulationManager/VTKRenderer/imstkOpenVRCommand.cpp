@@ -31,9 +31,9 @@ namespace imstk
 {
 void
 OpenVRCommand::Execute(
-    vtkObject* caller,
+    vtkObject*    caller,
     unsigned long eventId,
-    void* callData)
+    void*         callData)
 {
     if (!m_simManager)
     {

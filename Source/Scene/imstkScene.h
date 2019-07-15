@@ -99,7 +99,7 @@ public:
     ///
     /// \brief Get the scene object controllers
     ///
-    const std::vector <std::shared_ptr<SceneObjectControllerBase>> getSceneObjectControllers() const;
+    const std::vector<std::shared_ptr<SceneObjectControllerBase>> getSceneObjectControllers() const;
 
     ///
     /// \brief Get a scene object of a specific name
@@ -183,16 +183,16 @@ public:
 
 protected:
 
-    std::string m_name; ///> Name of the scene
-    NamedMap<SceneObject> m_sceneObjectsMap;
-    NamedMap<DebugRenderGeometry> m_DebugRenderGeometryMap;
-    NamedMap<Light> m_lightsMap;
-    std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
-    std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
-    std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
-    std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
+    std::string                              m_name; ///> Name of the scene
+    NamedMap<SceneObject>                    m_sceneObjectsMap;
+    NamedMap<DebugRenderGeometry>            m_DebugRenderGeometryMap;
+    NamedMap<Light>                          m_lightsMap;
+    std::shared_ptr<IBLProbe>                m_globalIBLProbe = nullptr;
+    std::shared_ptr<Camera>                  m_camera         = std::make_shared<Camera>();
+    std::shared_ptr<CollisionGraph>          m_collisionGraph = std::make_shared<CollisionGraph>();
+    std::vector<std::shared_ptr<SolverBase>> m_solvers;                          ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
-    std::unordered_map<std::string, std::thread> m_threadMap;   ///>
+    std::unordered_map<std::string, std::thread> m_threadMap;                    ///>
 
     double m_fps = 0.0;
 

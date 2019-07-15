@@ -43,9 +43,9 @@ struct RenderParticleKeyFrame
 {
     float m_time = 0;
     Color m_color = Color::White;
-    Vec3f m_acceleration = Vec3f(0, 0, 0);
+    Vec3f m_acceleration           = Vec3f(0, 0, 0);
     float m_rotationalAcceleration = 0;
-    float m_scale = 1.0f;
+    float m_scale                  = 1.0f;
 };
 
 ///
@@ -78,8 +78,8 @@ public:
     /// \brief Constructor
     ///
     RenderParticleEmitter(std::shared_ptr<Geometry> geometry,
-                          const float time = 3000.0f,
-                          Mode mode = Mode::CONTINUOUS);
+                          const float               time = 3000.0f,
+                          Mode                      mode = Mode::CONTINUOUS);
 
     ///
     /// \brief Set animation geometry
@@ -130,8 +130,8 @@ public:
     ///
     /// \brief Get start and end frames
     ///
-    RenderParticleKeyFrame * getStartKeyFrame();
-    RenderParticleKeyFrame * getEndKeyFrame();
+    RenderParticleKeyFrame* getStartKeyFrame();
+    RenderParticleKeyFrame* getEndKeyFrame();
 
     ///
     /// \brief Get key frames
@@ -161,10 +161,10 @@ protected:
     ///
     /// \brief Interpolate color
     ///
-    void interpolateColor(Color& destination,
+    void interpolateColor(Color&       destination,
                           const Color& sourceA,
                           const Color& sourceB,
-                          const float alpha);
+                          const float  alpha);
 
     ///
     /// \brief Emit particle
@@ -197,13 +197,13 @@ protected:
     imstk::StopWatch m_stopWatch;
 
     double m_lastUpdateTime = 0.0;
-    bool m_started = false;
+    bool   m_started        = false;
 
     float m_emitterSize = 1.0f;
 
     const int c_maxNumKeyFrames = 16; ///< Maximum key frames
 
     std::shared_ptr<Geometry> m_animationGeometry = nullptr;
-    std::vector<std::unique_ptr<RenderParticle>> * m_particles;
+    std::vector<std::unique_ptr<RenderParticle>>* m_particles;
 };
 } // imstk

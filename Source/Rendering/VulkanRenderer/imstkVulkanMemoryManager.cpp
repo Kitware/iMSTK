@@ -28,19 +28,19 @@ VulkanMemoryManager::VulkanMemoryManager()
 }
 
 void
-VulkanMemoryManager::setup(VkPhysicalDevice * device)
+VulkanMemoryManager::setup(VkPhysicalDevice* device)
 {
     m_physicalDevice = device;
     vkGetPhysicalDeviceProperties(*device, &m_deviceProperties);
     vkGetPhysicalDeviceMemoryProperties(*device, &m_deviceMemoryProperties);
 }
 
-VulkanInternalMemory *
+VulkanInternalMemory*
 VulkanMemoryManager::requestMemoryAllocation(
     const VkMemoryRequirements& memoryRequirements,
-    VulkanMemoryType type,
-    VkDeviceSize maxAllocationSize,
-    VkDeviceSize offsetAlignment)
+    VulkanMemoryType            type,
+    VkDeviceSize                maxAllocationSize,
+    VkDeviceSize                offsetAlignment)
 {
     VkDeviceSize resourceSize = getAlignedSize(memoryRequirements.size, memoryRequirements.alignment);
 
@@ -51,14 +51,14 @@ VulkanMemoryManager::requestMemoryAllocation(
         if (memoryAllocation->m_capacity - alignedSize >= resourceSize)
         {
             memoryAllocation->m_lastOffset = alignedSize;
-            memoryAllocation->m_size = alignedSize + resourceSize;
+            memoryAllocation->m_size       = alignedSize + resourceSize;
             return memoryAllocation;
         }
     }
 
     // Get device memory types
     uint32_t memoryIndex = 0;
-    bool foundIndex = false;
+    bool     foundIndex  = false;
 
     uint32_t location;
 
@@ -91,7 +91,7 @@ VulkanMemoryManager::requestMemoryAllocation(
             if (m_deviceMemoryProperties.memoryTypes[i].propertyFlags & location)
             {
                 memoryIndex = i;
-                foundIndex = true;
+                foundIndex  = true;
                 break;
             }
         }
@@ -105,14 +105,14 @@ VulkanMemoryManager::requestMemoryAllocation(
     VkDeviceSize allocationSize = std::max(resourceSize, maxAllocationSize);
 
     VkMemoryAllocateInfo memoryInfo;
-    memoryInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryInfo.pNext = nullptr;
-    memoryInfo.allocationSize = allocationSize;
+    memoryInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryInfo.pNext           = nullptr;
+    memoryInfo.allocationSize  = allocationSize;
     memoryInfo.memoryTypeIndex = memoryIndex;
 
-    VulkanInternalMemory * internalMemory = new VulkanInternalMemory();
-    internalMemory->m_capacity = memoryInfo.allocationSize;
-    internalMemory->m_size = resourceSize;
+    VulkanInternalMemory* internalMemory = new VulkanInternalMemory();
+    internalMemory->m_capacity   = memoryInfo.allocationSize;
+    internalMemory->m_size       = resourceSize;
     internalMemory->m_lastOffset = 0;
 
     if (vkAllocateMemory(m_device, &memoryInfo, nullptr, internalMemory->m_memory) != VK_SUCCESS)
@@ -125,13 +125,13 @@ VulkanMemoryManager::requestMemoryAllocation(
     return internalMemory;
 }
 
-VulkanInternalBuffer *
-VulkanMemoryManager::requestBuffer(VkDevice& device,
+VulkanInternalBuffer*
+VulkanMemoryManager::requestBuffer(VkDevice&           device,
                                    VkBufferCreateInfo& info,
-                                   VulkanMemoryType type,
-                                   VkDeviceSize offsetAlignment)
+                                   VulkanMemoryType    type,
+                                   VkDeviceSize        offsetAlignment)
 {
-    VulkanInternalBuffer * newBuffer;
+    VulkanInternalBuffer* newBuffer;
 
     VkDeviceSize allocationSize;
     switch (type)
@@ -139,7 +139,7 @@ VulkanMemoryManager::requestBuffer(VkDevice& device,
     case UNIFORM:
     case STAGING_UNIFORM:
         allocationSize = 64 * 1024;
-        info.size = getAlignedSize(info.size, m_deviceProperties.limits.minUniformBufferOffsetAlignment);
+        info.size      = getAlignedSize(info.size, m_deviceProperties.limits.minUniformBufferOffsetAlignment);
         break;
     default:
         allocationSize = c_bufferAllocationSize;
@@ -153,10 +153,10 @@ VulkanMemoryManager::requestBuffer(VkDevice& device,
         if (buffer->m_type == type
             && info.size <= buffer->m_memory->m_capacity - tempSize)
         {
-            newBuffer = new VulkanInternalBuffer(buffer);
+            newBuffer           = new VulkanInternalBuffer(buffer);
             newBuffer->m_offset = tempSize;
-            newBuffer->m_size = info.size;
-            buffer->m_size = tempSize + info.size;
+            newBuffer->m_size   = info.size;
+            buffer->m_size      = tempSize + info.size;
 
             return newBuffer;
         }
@@ -178,18 +178,18 @@ VulkanMemoryManager::requestBuffer(VkDevice& device,
     vkBindBufferMemory(device, *bufferGroup->getBuffer(), *memoryAllocation->getMemory(), 0);
     bufferGroup->m_memory = memoryAllocation;
 
-    newBuffer = new VulkanInternalBuffer(bufferGroup);
-    newBuffer->m_size = bufferSize;
+    newBuffer           = new VulkanInternalBuffer(bufferGroup);
+    newBuffer->m_size   = bufferSize;
     newBuffer->m_offset = 0;
 
     return newBuffer;
 }
 
 // Needs work
-VulkanInternalImage *
-VulkanMemoryManager::requestImage(VkDevice& device,
+VulkanInternalImage*
+VulkanMemoryManager::requestImage(VkDevice&          device,
                                   VkImageCreateInfo& info,
-                                  VulkanMemoryType type)
+                                  VulkanMemoryType   type)
 {
     // Always allocate a new image
     auto newImage = new VulkanInternalImage();
@@ -202,7 +202,7 @@ VulkanMemoryManager::requestImage(VkDevice& device,
     vkGetImageMemoryRequirements(device, *newImage->getImage(), &requirements);
 
     newImage->m_memoryOffset = 0;
-    newImage->m_size = requirements.size;
+    newImage->m_size         = requirements.size;
 
     auto memoryAllocation = this->requestMemoryAllocation(requirements, type, c_imageAllocationSize, requirements.alignment);
     newImage->m_memoryOffset = this->getAlignedSize(memoryAllocation->m_lastOffset, requirements.alignment);
@@ -250,4 +250,4 @@ VulkanMemoryManager::getAlignedSize(VkDeviceSize size, VkDeviceSize alignment)
 
     return newSize;
 }
-};
+}

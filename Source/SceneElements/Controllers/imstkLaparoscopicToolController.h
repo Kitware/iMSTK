@@ -45,9 +45,9 @@ public:
     /// \brief Constructor
     ///
     LaparoscopicToolController(
-        std::shared_ptr<SceneObject> shaft,
-        std::shared_ptr<SceneObject> upperJaw,
-        std::shared_ptr<SceneObject> lowerJaw,
+        std::shared_ptr<SceneObject>   shaft,
+        std::shared_ptr<SceneObject>   upperJaw,
+        std::shared_ptr<SceneObject>   lowerJaw,
         std::shared_ptr<DeviceTracker> trackingController) :
         m_trackingController(trackingController),
         m_shaft(shaft),
@@ -114,14 +114,14 @@ protected:
 
     std::shared_ptr<DeviceTracker> m_trackingController; ///< Device tracker
 
-    std::shared_ptr<SceneObject> m_shaft;    ///< Tool shaft
-    std::shared_ptr<SceneObject> m_upperJaw; ///< Tool upper jaw
-    std::shared_ptr<SceneObject> m_lowerJaw; ///< Tool lower jaw
+    std::shared_ptr<SceneObject> m_shaft;                ///< Tool shaft
+    std::shared_ptr<SceneObject> m_upperJaw;             ///< Tool upper jaw
+    std::shared_ptr<SceneObject> m_lowerJaw;             ///< Tool lower jaw
 
-    double m_jawAngle = PI / 6.0;       ///< Angle of the jaws
-    double m_change = 6.0e-5;           ///< Amount of change in jaw angle per frame
-    double m_maxJawAngle = PI / 6.0;    ///< Maximum angle of the jaws
+    double m_jawAngle    = PI / 6.0;                     ///< Angle of the jaws
+    double m_change      = 6.0e-5;                       ///< Amount of change in jaw angle per frame
+    double m_maxJawAngle = PI / 6.0;                     ///< Maximum angle of the jaws
 
-    Vec3d m_jawRotationAxis = Vec3d(0, 1., 0);  ///< Angle of the jaws
+    Vec3d m_jawRotationAxis = Vec3d(0, 1., 0);           ///< Angle of the jaws
 };
 } // imstk

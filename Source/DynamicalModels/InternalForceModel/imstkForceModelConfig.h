@@ -100,28 +100,28 @@ struct customOptionsList
     char femMethod[256];
     char invertibleMaterial[256];
     char fixedDOFFilename[256];
-    double dampingMassCoefficient = 0.1;
+    double dampingMassCoefficient      = 0.1;
     double dampingStiffnessCoefficient = 0.01;
     double dampingLaplacianCoefficient = 0.0;
-    double deformationCompliance = 1.0;
+    double deformationCompliance       = 1.0;
     double gravity = -9.81;
     double compressionResistance = 500.0;
-    double inversionThreshold = -std::numeric_limits< double >::max();
-    int numberOfThreads = 0;
+    double inversionThreshold    = -std::numeric_limits<double>::max();
+    int numberOfThreads          = 0;
 };
 
 struct customOptionsNameList
 {
     std::string femMethodName = "femMethod";
-    std::string invertibleMaterialName = "invertibleMaterial";
-    std::string fixedDOFFilenameName = "fixedDOFFilename";
-    std::string dampingMassCoefficientName = "dampingMassCoefficient";
+    std::string invertibleMaterialName          = "invertibleMaterial";
+    std::string fixedDOFFilenameName            = "fixedDOFFilename";
+    std::string dampingMassCoefficientName      = "dampingMassCoefficient";
     std::string dampingLaplacianCoefficientName = "dampingLaplacianCoefficient";
     std::string dampingStiffnessCoefficientName = "dampingStiffnessCoefficient";
-    std::string deformationComplianceName = "deformationCompliance";
-    std::string compressionResistanceName = "compressionResistance";
-    std::string inversionThresholdName = "inversionThreshold";
-    std::string numberOfThreadsName = "numberOfThreads";
+    std::string deformationComplianceName       = "deformationCompliance";
+    std::string compressionResistanceName       = "compressionResistance";
+    std::string inversionThresholdName          = "inversionThreshold";
+    std::string numberOfThreadsName             = "numberOfThreads";
     std::string gravityName = "gravity";
 };
 public:
@@ -129,7 +129,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    ForceModelConfig(const std::string &configurationFileName);
+    ForceModelConfig(const std::string& configurationFileName);
 
     ///
     /// \brief Destructor
@@ -139,7 +139,7 @@ public:
     ///
     /// \brief Parse the deformable object config file
     ///
-    bool parseConfig(const std::string &configFileName);
+    bool parseConfig(const std::string& configFileName);
 
     ///
     /// \brief Get the options set that are floating points types
@@ -182,10 +182,10 @@ public:
 
 protected:
     std::string m_vegaConfigFileName;                      ///> Store configuration file.
-    std::map<std::string, double> m_floatsOptionMap;       ///> Map for floating point
-    std::map<std::string, int> m_intsOptionMap;            ///> Map for int configuration variables
+    std::map<std::string, double>      m_floatsOptionMap;  ///> Map for floating point
+    std::map<std::string, int>         m_intsOptionMap;    ///> Map for int configuration variables
     std::map<std::string, std::string> m_stringsOptionMap; ///> Map for string
 
-    bool m_loadSuccessful; ///> Configuration loading is successful
+    bool m_loadSuccessful;                                 ///> Configuration loading is successful
 };
 } // imstk

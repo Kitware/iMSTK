@@ -43,7 +43,7 @@ const std::string PostProcessing("./Shaders/VulkanShaders/PostProcessing/");
 class VulkanShaderLoader
 {
 public:
-    VulkanShaderLoader(std::string filename, VkDevice &device, VkShaderModule &module)
+    VulkanShaderLoader(std::string filename, VkDevice& device, VkShaderModule& module)
     {
         std::ifstream file(filename, std::ios_base::binary);
         m_data = std::make_shared<std::vector<char>>(
@@ -52,20 +52,20 @@ public:
         file.close();
 
         VkShaderModuleCreateInfo vertexShaderInfo;
-        vertexShaderInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-        vertexShaderInfo.pNext = nullptr;
-        vertexShaderInfo.flags = 0;
+        vertexShaderInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+        vertexShaderInfo.pNext    = nullptr;
+        vertexShaderInfo.flags    = 0;
         vertexShaderInfo.codeSize = this->getShaderLength();
-        vertexShaderInfo.pCode = this->getShaderData();
+        vertexShaderInfo.pCode    = this->getShaderData();
         if (vkCreateShaderModule(device, &vertexShaderInfo, nullptr, &module) != VK_SUCCESS)
         {
             LOG(FATAL) << "Unable to build vertex shader : " << filename;
         }
-    };
+    }
 
-    uint32_t getShaderLength() { return (uint32_t)m_data->size(); };
+    uint32_t getShaderLength() { return (uint32_t)m_data->size(); }
 
-    uint32_t * getShaderData() { return (uint32_t*)m_data->data(); };
+    uint32_t* getShaderData() { return (uint32_t*)m_data->data(); }
 
 protected:
     std::shared_ptr<std::vector<char>> m_data;
@@ -75,12 +75,12 @@ class VulkanAttachmentBarriers
 {
 public:
     static void changeImageLayout(
-        VkCommandBuffer * commandBuffer,
-        uint32_t queueFamilyIndex,
-        VulkanInternalImage * image,
-        VkImageLayout oldLayout,
-        VkImageLayout newLayout,
-        const uint32_t numViews)
+        VkCommandBuffer*     commandBuffer,
+        uint32_t             queueFamilyIndex,
+        VulkanInternalImage* image,
+        VkImageLayout        oldLayout,
+        VkImageLayout        newLayout,
+        const uint32_t       numViews)
     {
         // Don't change layout if already there
         if (image->getImageLayout() == newLayout)
@@ -89,8 +89,8 @@ public:
         }
 
         // Get corresponding access and stage flags
-        VkAccessFlags srcAccess = getAccessFlags(oldLayout);
-        VkAccessFlags dstAccess = getAccessFlags(newLayout);
+        VkAccessFlags        srcAccess        = getAccessFlags(oldLayout);
+        VkAccessFlags        dstAccess        = getAccessFlags(newLayout);
         VkPipelineStageFlags srcPipelineStage = getPipelineStageFlags(oldLayout);
         VkPipelineStageFlags dstPipelineStage = getPipelineStageFlags(newLayout);
 
@@ -98,34 +98,34 @@ public:
         range.aspectMask = ((oldLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL)
                             || (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL)) ?
                            VK_IMAGE_ASPECT_DEPTH_BIT : VK_IMAGE_ASPECT_COLOR_BIT;
-        range.baseMipLevel = 0;
-        range.levelCount = 1;
+        range.baseMipLevel   = 0;
+        range.levelCount     = 1;
         range.baseArrayLayer = 0;
-        range.layerCount = numViews;
+        range.layerCount     = numViews;
 
         VkImageMemoryBarrier barrier;
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.pNext = nullptr;
-        barrier.srcAccessMask = srcAccess;
-        barrier.dstAccessMask = dstAccess;
-        barrier.oldLayout = oldLayout;
-        barrier.newLayout = newLayout;
+        barrier.srcAccessMask       = srcAccess;
+        barrier.dstAccessMask       = dstAccess;
+        barrier.oldLayout           = oldLayout;
+        barrier.newLayout           = newLayout;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image = *image->getImage();
-        barrier.subresourceRange = range;
+        barrier.image               = *image->getImage();
+        barrier.subresourceRange    = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
             srcPipelineStage,
             dstPipelineStage,
             0,
-            0, nullptr, // general memory barriers
-            0, nullptr, // buffer barriers
+            0, nullptr,   // general memory barriers
+            0, nullptr,   // buffer barriers
             1, &barrier); // image barriers
 
         // For keeping track
         image->setImageLayout(newLayout);
-    };
+    }
 
     static const VkAccessFlags getAccessFlags(VkImageLayout imageLayout)
     {
@@ -147,7 +147,6 @@ public:
             LOG(WARNING) << "Unsupported image layout";
             return VK_ACCESS_SHADER_READ_BIT; // This might not be a great default
         }
-        ;
     }
 
     static const VkPipelineStageFlags getPipelineStageFlags(VkImageLayout imageLayout)
@@ -170,68 +169,67 @@ public:
             LOG(WARNING) << "Unsupported image layout";
             return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; // This might not be a great default
         }
-        ;
     }
 
-    static void addDepthAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
+    static void addDepthAttachmentBarrier(VkCommandBuffer* commandBuffer, uint32_t queueFamilyIndex, VkImage* image)
     {
         VkImageSubresourceRange range;
-        range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        range.baseMipLevel = 0;
-        range.levelCount = 1;
+        range.aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT;
+        range.baseMipLevel   = 0;
+        range.levelCount     = 1;
         range.baseArrayLayer = 0;
-        range.layerCount = 1;
+        range.layerCount     = 1;
 
         VkImageMemoryBarrier barrier;
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.pNext = nullptr;
-        barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+        barrier.srcAccessMask       = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+        barrier.dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
+        barrier.oldLayout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        barrier.newLayout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image = *image;
-        barrier.subresourceRange = range;
+        barrier.image               = *image;
+        barrier.subresourceRange    = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
             VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
-            0, nullptr, // general memory barriers
-            0, nullptr, // buffer barriers
+            0, nullptr,   // general memory barriers
+            0, nullptr,   // buffer barriers
             1, &barrier); // image barriers
-    };
+    }
 
-    static void addShadowAttachmentBarrier(VkCommandBuffer * commandBuffer, uint32_t queueFamilyIndex, VkImage * image)
+    static void addShadowAttachmentBarrier(VkCommandBuffer* commandBuffer, uint32_t queueFamilyIndex, VkImage* image)
     {
         VkImageSubresourceRange range;
-        range.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-        range.baseMipLevel = 0;
-        range.levelCount = 1;
+        range.aspectMask     = VK_IMAGE_ASPECT_DEPTH_BIT;
+        range.baseMipLevel   = 0;
+        range.levelCount     = 1;
         range.baseArrayLayer = 0;
-        range.layerCount = 1;
+        range.layerCount     = 1;
 
         VkImageMemoryBarrier barrier;
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
         barrier.pNext = nullptr;
-        barrier.srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
-        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        barrier.oldLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.srcAccessMask       = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT;
+        barrier.dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
+        barrier.oldLayout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+        barrier.newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image = *image;
-        barrier.subresourceRange = range;
+        barrier.image               = *image;
+        barrier.subresourceRange    = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
             VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
-            0, nullptr, // general memory barriers
-            0, nullptr, // buffer barriers
+            0, nullptr,   // general memory barriers
+            0, nullptr,   // buffer barriers
             1, &barrier); // image barriers
-    };
+    }
 };
 
 class VulkanDefaults
@@ -250,12 +248,12 @@ public:
 
 namespace VulkanFormats
 {
-static const VkFormat FINAL_FORMAT = VK_FORMAT_B8G8R8A8_SRGB;     /// Linear color space
-static const VkFormat HDR_FORMAT = VK_FORMAT_R16G16B16A16_SFLOAT;     // HDR internal format
-static const VkFormat NORMAL_SSS_FORMAT = VK_FORMAT_R8G8B8A8_SNORM;     // Normal/SSS format
-static const VkFormat AO_FORMAT = VK_FORMAT_R8_UNORM;     // AO format
-static const VkFormat DEPTH_FORMAT = VK_FORMAT_D32_SFLOAT;     // Depth buffer
-static const VkFormat SHADOW_FORMAT = VK_FORMAT_D32_SFLOAT;     // Format for shadow maps
-static const VkFormat DEPTH_MIP_FORMAT = VK_FORMAT_R32_SFLOAT;     // Depth mip buffer
-};
+static const VkFormat FINAL_FORMAT      = VK_FORMAT_B8G8R8A8_SRGB;       /// Linear color space
+static const VkFormat HDR_FORMAT        = VK_FORMAT_R16G16B16A16_SFLOAT; // HDR internal format
+static const VkFormat NORMAL_SSS_FORMAT = VK_FORMAT_R8G8B8A8_SNORM;      // Normal/SSS format
+static const VkFormat AO_FORMAT         = VK_FORMAT_R8_UNORM;            // AO format
+static const VkFormat DEPTH_FORMAT      = VK_FORMAT_D32_SFLOAT;          // Depth buffer
+static const VkFormat SHADOW_FORMAT     = VK_FORMAT_D32_SFLOAT;          // Format for shadow maps
+static const VkFormat DEPTH_MIP_FORMAT  = VK_FORMAT_R32_SFLOAT;          // Depth mip buffer
+}
 }

@@ -24,17 +24,17 @@
 namespace imstk
 {
 VulkanLineMeshRenderDelegate::VulkanLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                                           SceneObject::Type type,
-                                                           VulkanMemoryManager& memoryManager)
+                                                           SceneObject::Type            type,
+                                                           VulkanMemoryManager&         memoryManager)
 {
     this->initialize(visualModel);
 
     auto geometry = std::static_pointer_cast<LineMesh>(visualModel->getGeometry());
 
-    m_numVertices = (uint32_t)geometry->getNumVertices();
+    m_numVertices  = (uint32_t)geometry->getNumVertices();
     m_numTriangles = (uint32_t)geometry->getNumLines();
-    m_loadFactor = geometry->getLoadFactor();
-    m_vertexSize = sizeof(VulkanBasicVertex);
+    m_loadFactor   = geometry->getLoadFactor();
+    m_vertexSize   = sizeof(VulkanBasicVertex);
 
     this->getVisualModel()->getRenderMaterial()->m_isLineMesh = true;
 
@@ -77,7 +77,7 @@ VulkanLineMeshRenderDelegate::updateVertexBuffer(const uint32_t frameIndex)
         frame = frameIndex;
     }
 
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory(frame);
+    auto vertices = (VulkanBasicVertex*)m_vertexBuffer->getVertexMemory(frame);
 
     auto colors = geometry->getVertexColors();
 
@@ -102,7 +102,7 @@ VulkanLineMeshRenderDelegate::updateVertexBuffer(const uint32_t frameIndex)
         }
     }
 
-    auto lines = (std::array<uint32_t, 2> *)m_vertexBuffer->getIndexMemory(frame);
+    auto lines = (std::array<uint32_t, 2>*)m_vertexBuffer->getIndexMemory(frame);
 
     m_vertexBuffer->setNumIndices((uint32_t)geometry->getNumLines() * 2);
 

@@ -93,7 +93,7 @@ public:
     ///
     /// \brief Returns the type of the map
     ///
-    const Type &getType() const;
+    const Type& getType() const;
 
     ///
     /// \brief Returns the string representing the type name of the map
@@ -141,14 +141,14 @@ protected:
     ///
     GeometryMap(const std::shared_ptr<Geometry> master,
                 const std::shared_ptr<Geometry> slave,
-                Type type) : m_type(type), m_isActive(true)
+                Type                            type) : m_type(type), m_isActive(true)
     {
         this->setMaster(master);
         this->setSlave(slave);
     }
 
-    Type m_type;     ///> type of the map
-    bool m_isActive; ///> true if the map us active at runtime
+    Type m_type;                        ///> type of the map
+    bool m_isActive;                    ///> true if the map us active at runtime
 
     std::shared_ptr<Geometry> m_master; ///> the geometry which dictates the configuration
     std::shared_ptr<Geometry> m_slave;  ///> the geometry which follows the master

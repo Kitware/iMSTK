@@ -47,7 +47,7 @@ public:
     ///
     static std::shared_ptr<SurfaceMesh> read(
         const std::string& filePath,
-        MeshFileType type);
+        MeshFileType       type);
 
     ///
     /// \brief Reads mesh data and returns mesh
@@ -61,7 +61,7 @@ public:
     /// \param importedMesh Assimp mesh to covert
     /// \returns iMSTK surface mesh
     ///
-    static std::shared_ptr<SurfaceMesh> convertAssimpMesh(aiMesh * importedMesh);
+    static std::shared_ptr<SurfaceMesh> convertAssimpMesh(aiMesh* importedMesh);
 
     ///
     /// \brief Helper function for getting default post processing flags

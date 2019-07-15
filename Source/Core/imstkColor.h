@@ -53,7 +53,7 @@ struct Color
     ///
     /// \brief Equality operator
     ///
-    Color &operator=(const Color &p_color);
+    Color& operator=(const Color& p_color);
 
     ///
     /// \brief Bitwise operator
@@ -88,7 +88,7 @@ struct Color
     ///
     /// \brief get RGB color
     ///
-    const double *getValue() const;
+    const double* getValue() const;
 
     /// Various commonly used colors
     static Color White;

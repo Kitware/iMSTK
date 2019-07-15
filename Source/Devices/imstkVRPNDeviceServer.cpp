@@ -48,8 +48,8 @@ void
 VRPNDeviceServer::addSerialDevice(std::string deviceName, DeviceType deviceType, std::string port, int baudRate, int id)
 {
     SerialInfo serialSettings;
-    serialSettings.baudRate = baudRate;
-    serialSettings.port = port;
+    serialSettings.baudRate     = baudRate;
+    serialSettings.port         = port;
     m_deviceInfoMap[deviceName] = std::make_pair(deviceType, id);
     m_SerialInfoMap[deviceName] = serialSettings;
 }
@@ -65,8 +65,8 @@ VRPNDeviceServer::initModule()
     for (const auto& device : m_deviceInfoMap)
     {
         std::string name = device.first;
-        DeviceType type = device.second.first;
-        auto id = device.second.second;
+        DeviceType  type = device.second.first;
+        auto        id   = device.second.second;
 
         switch (type)
         {
@@ -91,7 +91,7 @@ VRPNDeviceServer::initModule()
         case DeviceType::PHANTOM_OMNI:
         {
 #ifdef VRPN_USE_PHANTOM_SERVER
-            char * deviceName = const_cast<char*>(name.c_str());
+            char* deviceName = const_cast<char*>(name.c_str());
             m_deviceConnections->add(new vrpn_Phantom(deviceName, m_serverConnection, 90.0f, deviceName));
 #else
             LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Phantom Omni in VRPN. "

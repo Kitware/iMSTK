@@ -25,7 +25,8 @@
 
 namespace imstk
 {
-bool isColorRangeCorrect( double c )
+bool
+isColorRangeCorrect(double c)
 {
     return (c >= 0 && c <= 1.0);
 }
@@ -49,11 +50,11 @@ Color::Color()
     rgba[3] = 1.0f;
 }
 
-Color::Color( double r, double g, double b, double a )
+Color::Color(double r, double g, double b, double a)
 {
-    bool redGood = isColorRangeCorrect(r);
+    bool redGood   = isColorRangeCorrect(r);
     bool greenGood = isColorRangeCorrect(g);
-    bool blueGood = isColorRangeCorrect(b);
+    bool blueGood  = isColorRangeCorrect(b);
     bool alphaGood = isColorRangeCorrect(a);
     if (!redGood || !greenGood || !blueGood || !alphaGood)
     {
@@ -67,8 +68,8 @@ Color::Color( double r, double g, double b, double a )
     rgba[3] = a;
 }
 
-Color &
-Color::operator=(const Color &p_color )
+Color&
+Color::operator=(const Color& p_color)
 {
     rgba[0] = p_color.rgba[0];
     rgba[1] = p_color.rgba[1];
@@ -78,7 +79,7 @@ Color::operator=(const Color &p_color )
 }
 
 double
-Color::operator()( int p_i ) const
+Color::operator()(int p_i) const
 {
     if (p_i < 0 || p_i > 3)
     {
@@ -88,7 +89,8 @@ Color::operator()( int p_i ) const
     return rgba[p_i];
 }
 
-std::ostream& operator<<(std::ostream& os, const Color& c)
+std::ostream&
+operator<<(std::ostream& os, const Color& c)
 {
     os << "R = " << c.r << '\n'
        << "G = " << c.g << '\n'
@@ -98,34 +100,34 @@ std::ostream& operator<<(std::ostream& os, const Color& c)
 }
 
 void
-Color::darken( double p_darkFactor )
+Color::darken(double p_darkFactor)
 {
-    rgba[0] = ( rgba[1] - rgba[1] * ( p_darkFactor ) );
-    rgba[1] = ( rgba[2] - rgba[2] * ( p_darkFactor ) );
-    rgba[2] = ( rgba[3] - rgba[3] * ( p_darkFactor ) );
-    rgba[0] = ( rgba[0] < 0 ? 0 : rgba[0] );
-    rgba[1] = ( rgba[1] < 0 ? 0 : rgba[1] );
-    rgba[2] = ( rgba[2] < 0 ? 0 : rgba[2] );
+    rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor) );
+    rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor) );
+    rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor) );
+    rgba[0] = (rgba[0] < 0 ? 0 : rgba[0]);
+    rgba[1] = (rgba[1] < 0 ? 0 : rgba[1]);
+    rgba[2] = (rgba[2] < 0 ? 0 : rgba[2]);
 }
 
 void
-Color::lighten( double p_darkFactor )
+Color::lighten(double p_darkFactor)
 {
-    rgba[0] = rgba[1] + rgba[1] * ( p_darkFactor );
-    rgba[1] = rgba[2] + rgba[2] * ( p_darkFactor );
-    rgba[2] = rgba[3] + rgba[3] * ( p_darkFactor );
+    rgba[0] = rgba[1] + rgba[1] * (p_darkFactor);
+    rgba[1] = rgba[2] + rgba[2] * (p_darkFactor);
+    rgba[2] = rgba[3] + rgba[3] * (p_darkFactor);
 
-    rgba[0] = ( rgba[0] > 1.0 ? 1.0 : rgba[0] );
-    rgba[1] = ( rgba[1] < 1.0 ? 1.0 : rgba[1] );
-    rgba[2] = ( rgba[2] < 1.0 ? 1.0 : rgba[2] );
+    rgba[0] = (rgba[0] > 1.0 ? 1.0 : rgba[0]);
+    rgba[1] = (rgba[1] < 1.0 ? 1.0 : rgba[1]);
+    rgba[2] = (rgba[2] < 1.0 ? 1.0 : rgba[2]);
 }
 
 void
-Color::setValue( double p_red, double p_green, double p_blue, double p_alpha )
+Color::setValue(double p_red, double p_green, double p_blue, double p_alpha)
 {
-    bool redGood = isColorRangeCorrect(p_red);
+    bool redGood   = isColorRangeCorrect(p_red);
     bool greenGood = isColorRangeCorrect(p_green);
-    bool blueGood = isColorRangeCorrect(p_blue);
+    bool blueGood  = isColorRangeCorrect(p_blue);
     bool alphaGood = isColorRangeCorrect(p_alpha);
     if (!redGood || !greenGood || !blueGood || !alphaGood)
     {
@@ -148,7 +150,7 @@ Color::getValue(double color[4])
     color[3] = rgba[3];
 }
 
-const double *
+const double*
 Color::getValue() const
 {
     return rgba;

@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor/destructor
     ///
-    Graph(const size_t size){ m_adjList.resize(size); }
+    Graph(const size_t size) { m_adjList.resize(size); }
     ~Graph() = default;
 
     ///
@@ -71,30 +71,26 @@ public:
     /// \brief Colorize using the default method and prints the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short>
-    doColoring(bool print = false) const { return doColoring(m_ColoringMethod, print); }
+    std::pair<std::vector<unsigned short>, unsigned short> doColoring(bool print = false) const { return doColoring(m_ColoringMethod, print); }
 
     ///
     /// \brief Colorize using the given method and prints the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short>
-    doColoring(ColoringMethod method, bool print = false) const;
+    std::pair<std::vector<unsigned short>, unsigned short> doColoring(ColoringMethod method, bool print = false) const;
 
 protected:
     ///
     /// \brief Colorize using greedy algorithm and print the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short>
-    doColoringGreedy(bool print = false) const;
+    std::pair<std::vector<unsigned short>, unsigned short> doColoringGreedy(bool print = false) const;
 
     ///
     /// \brief Colorize using Welsh-Powell algorithm and print the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short>
-    doColoringWelshPowell(bool print = false) const;
+    std::pair<std::vector<unsigned short>, unsigned short> doColoringWelshPowell(bool print = false) const;
 
     std::vector<std::unordered_set<size_t>> m_adjList;    ///< A array of std::vectors to represent adjacency list
     ColoringMethod m_ColoringMethod = ColoringMethod::WelshPowell;

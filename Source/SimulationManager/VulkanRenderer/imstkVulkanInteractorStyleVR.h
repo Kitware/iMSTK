@@ -47,7 +47,7 @@ struct VulkanVRDevice
     std::string m_ID; ///< combination of serial number and model number
 
     bool m_rendered = false;
-    vr::RenderModel_t * m_renderModel;
+    vr::RenderModel_t* m_renderModel;
     std::string m_renderModelName;
     vr::TextureID_t m_textureID;
     std::shared_ptr<VisualModel> m_visualModel;
@@ -93,7 +93,7 @@ public:
     ///
     ///
     const std::string getDeviceStringProperty(
-        const uint32_t index,
+        const uint32_t             index,
         vr::ETrackedDeviceProperty stringProperty);
 
     ///

@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    StopWatch(){};
+    StopWatch() {}
 
     ///
     /// \brief Destructor
@@ -108,8 +108,8 @@ public:
     ///
     void printTimeElapsed(std::string const& name = std::string("noName"), const TimeUnitType unitType = TimeUnitType::milliSeconds);
 private:
-    TimerState state;
-    std::vector<double> lapTimes;
+    TimerState               state;
+    std::vector<double>      lapTimes;
     std::vector<std::string> lapNames;
     std::chrono::high_resolution_clock::time_point wallClockTimeKeeper; ///> time keeper for wall clock time
 };
@@ -125,7 +125,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    CpuTimer() : StopWatch(){};
+    CpuTimer() : StopWatch() {}
 
     ///
     /// \brief Destructor
@@ -135,7 +135,7 @@ public:
     ///
     /// \brief Start the appropriate timer
     ///
-    virtual void start() override {cpuTimeKeeper = std::clock();};
+    virtual void start() override { cpuTimeKeeper = std::clock(); }
 
     ///
     /// \brief Returns the CPU time elapsed since calling start
@@ -159,7 +159,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    UPSCounter() = default;
+    UPSCounter()  = default;
     ~UPSCounter() = default;
 
     ///
@@ -186,8 +186,8 @@ protected:
 
     std::shared_ptr<StopWatch> m_timer = std::make_shared<StopWatch>(); ///> Timer
 
-    double m_accumulatedTimer = 0.; ///> Accumulated time (always < 1 sec)
-    unsigned int m_ups = 0;         ///> Most up-to-date ups
-    unsigned int m_updateCount = 0; ///> Current update count
+    double       m_accumulatedTimer = 0.;                               ///> Accumulated time (always < 1 sec)
+    unsigned int m_ups              = 0;                                ///> Most up-to-date ups
+    unsigned int m_updateCount      = 0;                                ///> Current update count
 };
 }

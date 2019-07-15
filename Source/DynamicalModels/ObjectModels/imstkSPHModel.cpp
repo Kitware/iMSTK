@@ -31,7 +31,8 @@ SPHModelConfig::SPHModelConfig(const Real particleRadius)
     initialize();
 }
 
-void SPHModelConfig::initialize()
+void
+SPHModelConfig::initialize()
 {
     LOG_IF(FATAL, (std::abs(m_ParticleRadius) < Real(1e-6))) << "Particle radius was not set properly";
 
@@ -45,7 +46,8 @@ void SPHModelConfig::initialize()
     m_KernelRadiusSqr = m_KernelRadius * m_KernelRadius;
 }
 
-bool SPHModel::initialize()
+bool
+SPHModel::initialize()
 {
     LOG_IF(FATAL, (!m_Geometry)) << "Model geometry is not yet set! Cannot initialize without model geometry.";
 
@@ -74,7 +76,8 @@ bool SPHModel::initialize()
     return true;
 }
 
-void SPHModel::advanceTimeStep()
+void
+SPHModel::advanceTimeStep()
 {
     findParticleNeighbors();
     computeNeighborRelativePositions();
@@ -89,12 +92,14 @@ void SPHModel::advanceTimeStep()
     moveParticles(getTimeStep());
 }
 
-void SPHModel::computeTimeStepSize()
+void
+SPHModel::computeTimeStepSize()
 {
     m_dt = (this->m_timeStepSizeType == TimeSteppingType::fixed) ? m_DefaultDt : computeCFLTimeStepSize();
 }
 
-Real SPHModel::computeCFLTimeStepSize()
+Real
+SPHModel::computeCFLTimeStepSize()
 {
     auto maxVel = ParallelUtils::ParallelReduce::findMaxL2Norm(getState().getVelocities());
 
@@ -114,7 +119,8 @@ Real SPHModel::computeCFLTimeStepSize()
     return timestep;
 }
 
-void SPHModel::findParticleNeighbors()
+void
+SPHModel::findParticleNeighbors()
 {
     m_NeighborSearcher->getNeighbors(getState().getFluidNeighborLists(), getState().getPositions());
     if (m_Parameters->m_bDensityWithBoundary)   // if considering boundary particles for computing fluid density
@@ -124,14 +130,15 @@ void SPHModel::findParticleNeighbors()
     }
 }
 
-void SPHModel::computeNeighborRelativePositions()
+void
+SPHModel::computeNeighborRelativePositions()
 {
     auto computeRelativePositions = [&](const Vec3r& ppos, const std::vector<size_t>& neighborList,
                                         const StdVectorOfVec3r& allPositions, std::vector<NeighborInfo>& neighborInfo) {
                                         for (const size_t q : neighborList)
                                         {
                                             const Vec3r& qpos = allPositions[q];
-                                            const Vec3r r     = ppos - qpos;
+                                            const Vec3r  r    = ppos - qpos;
                                             neighborInfo.push_back({ r, m_Parameters->m_RestDensity });
                                         }
                                     };
@@ -152,7 +159,8 @@ void SPHModel::computeNeighborRelativePositions()
         });
 }
 
-void SPHModel::collectNeighborDensity()
+void
+SPHModel::collectNeighborDensity()
 {
     // after computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is usefull because relative positions and densities are accessed together multiple times
@@ -174,7 +182,8 @@ void SPHModel::collectNeighborDensity()
         });
 }
 
-void SPHModel::computeDensity()
+void
+SPHModel::computeDensity()
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
@@ -194,7 +203,8 @@ void SPHModel::computeDensity()
         });
 }
 
-void SPHModel::normalizeDensity()
+void
+SPHModel::normalizeDensity()
 {
     if (!m_Parameters->m_bNormalizeDensity)
     {
@@ -244,7 +254,8 @@ void SPHModel::normalizeDensity()
     std::swap(getState().getDensities(), getState().getNormalizedDensities());
 }
 
-void SPHModel::computePressureAcceleration()
+void
+SPHModel::computePressureAcceleration()
 {
     auto particlePressure = [&](const Real density) {
                                 const Real error = std::pow(density / m_Parameters->m_RestDensity, 7) - Real(1);
@@ -281,7 +292,8 @@ void SPHModel::computePressureAcceleration()
         });
 }
 
-void SPHModel::updateVelocity(Real timestep)
+void
+SPHModel::updateVelocity(Real timestep)
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
@@ -289,7 +301,8 @@ void SPHModel::updateVelocity(Real timestep)
         });
 }
 
-void SPHModel::computeViscosity()
+void
+SPHModel::computeViscosity()
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
@@ -338,7 +351,8 @@ void SPHModel::computeViscosity()
 }
 
 // Compute surface tension Akinci et at. 2013 model (Versatile Surface Tension and Adhesion for SPH Fluids)
-void SPHModel::computeSurfaceTension()
+void
+SPHModel::computeSurfaceTension()
 {
     // Firstly compute surface normal for all particles
     ParallelUtils::parallelFor(getState().getNumParticles(),
@@ -408,7 +422,8 @@ void SPHModel::computeSurfaceTension()
         });
 }
 
-void SPHModel::moveParticles(Real timestep)
+void
+SPHModel::moveParticles(Real timestep)
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {

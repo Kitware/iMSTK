@@ -33,13 +33,13 @@ VectorizedState::initialize(const size_t numDof)
     m_q.setZero();
     m_qDot.setZero();
     m_qDotDot.setZero();
-};
+}
 
 void
 VectorizedState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
 {
-    m_q = u;
-    m_qDot = v;
+    m_q       = u;
+    m_qDot    = v;
     m_qDotDot = a;
 }
 
@@ -64,8 +64,8 @@ VectorizedState::setA(const Vectord& a)
 void
 VectorizedState::setState(std::shared_ptr<VectorizedState> rhs)
 {
-    m_q = rhs->getQ();
-    m_qDot = rhs->getQDot();
+    m_q       = rhs->getQ();
+    m_qDot    = rhs->getQDot();
     m_qDotDot = rhs->getQDotDot();
 }
 } // imstk

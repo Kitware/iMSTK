@@ -40,7 +40,7 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
 
     // Map vertices
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double* vertData = reinterpret_cast<double*>(vertices.data());
+    double*           vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 

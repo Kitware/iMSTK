@@ -30,14 +30,14 @@ class InteractorStyle;
 
 /// Signature of custom function called in each even callback.
 /// Return true to override base class behavior, or false to maintain it.
-using EventHandlerFunction = std::function< bool(InteractorStyle* iStyle) >;
+using EventHandlerFunction = std::function<bool(InteractorStyle* iStyle)>;
 
 class InteractorStyle
 {
 public:
-    InteractorStyle() {};
+    InteractorStyle() {}
 
-    virtual ~InteractorStyle(){};
+    virtual ~InteractorStyle() {}
 
 protected:
     friend class Viewer;

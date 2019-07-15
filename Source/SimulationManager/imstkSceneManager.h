@@ -43,7 +43,7 @@ public:
     ///
     SceneManager(std::shared_ptr<Scene> scene) :
         Module(scene->getName()),
-        m_scene(scene){}
+        m_scene(scene) {}
 
     ///
     /// \brief Destructor
@@ -53,7 +53,7 @@ public:
     ///
     /// \brief Get the scene that the scene manager is managing
     ///
-    std::shared_ptr<Scene> getScene() { return m_scene; };
+    std::shared_ptr<Scene> getScene() { return m_scene; }
 
 protected:
     ///
@@ -64,7 +64,7 @@ protected:
     ///
     /// \brief Run the module
     ///
-    void runModule() override { m_scene->advance(); };
+    void runModule() override { m_scene->advance(); }
 
     ///
     /// \brief Clean up the module
@@ -76,7 +76,7 @@ protected:
     ///
     void startModuleInNewThread(std::shared_ptr<Module> module);
 
-    std::shared_ptr<Scene> m_scene; ///> Scene that is being managed
-    std::unordered_map<std::string, std::thread> m_threadMap;   ///>
+    std::shared_ptr<Scene> m_scene;                           ///> Scene that is being managed
+    std::unordered_map<std::string, std::thread> m_threadMap; ///>
 };
 } // imstk

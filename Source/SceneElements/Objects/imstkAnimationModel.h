@@ -51,12 +51,12 @@ public:
     ///
     /// \brief Update animation
     ///
-    virtual void update() {};
+    virtual void update() {}
 
     ///
     /// \brief Reset animation
     ///
-    virtual void reset() {};
+    virtual void reset() {}
 
 protected:
     friend class VulkanRenderer;

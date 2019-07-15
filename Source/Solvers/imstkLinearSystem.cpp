@@ -46,28 +46,28 @@ namespace imstk
 //}
 
 template<typename SystemMatrixType>
-Eigen::TriangularView < SystemMatrixType, Eigen::Lower >
+Eigen::TriangularView<SystemMatrixType, Eigen::Lower>
 LinearSystem<SystemMatrixType>::getLowerTriangular() const
 {
     return m_A.template triangularView<Eigen::Lower>();
 }
 
 template<typename SystemMatrixType>
-Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyLower >
+Eigen::TriangularView<SystemMatrixType, Eigen::StrictlyLower>
 LinearSystem<SystemMatrixType>::getStrictLowerTriangular() const
 {
     return m_A.template triangularView<Eigen::StrictlyLower>();
 }
 
 template<typename SystemMatrixType>
-Eigen::TriangularView < SystemMatrixType, Eigen::Upper >
+Eigen::TriangularView<SystemMatrixType, Eigen::Upper>
 LinearSystem<SystemMatrixType>::getUpperTrianglular() const
 {
     return m_A.template triangularView<Eigen::Upper>();
 }
 
 template<typename SystemMatrixType>
-Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyUpper >
+Eigen::TriangularView<SystemMatrixType, Eigen::StrictlyUpper>
 LinearSystem<SystemMatrixType>::getStrictUpperTriangular() const
 {
     return m_A.template triangularView<Eigen::StrictlyUpper>();

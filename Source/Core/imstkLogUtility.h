@@ -53,8 +53,8 @@ extern void Log(std::string name, std::string message);
 
 struct LogManager
 {
-    std::map<std::string, Logger *> loggers;
-    std::map<std::string, std::thread *> loggerThreads;
+    std::map<std::string, Logger*> loggers;
+    std::map<std::string, std::thread*> loggerThreads;
 };
 
 ///
@@ -66,8 +66,8 @@ struct LogUtility
 {
     void createLogger(std::string name, std::string path);
 
-    std::unique_ptr<g3::LogWorker>                m_g3logWorker;
-    std::unique_ptr<g3::SinkHandle<g3::FileSink>>m_fileSinkHandle;
-    std::unique_ptr<g3::SinkHandle<stdSink>>     m_stdSinkHandle;
+    std::unique_ptr<g3::LogWorker> m_g3logWorker;
+    std::unique_ptr<g3::SinkHandle<g3::FileSink>> m_fileSinkHandle;
+    std::unique_ptr<g3::SinkHandle<stdSink>> m_stdSinkHandle;
 };
 }

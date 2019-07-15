@@ -45,9 +45,7 @@ using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 class VTKInteractorStyle : public vtkBaseInteractorStyle, public InteractorStyle
 {
 public:
-    vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle)
-
-    VTKInteractorStyle();
+    vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle) VTKInteractorStyle();
     virtual ~VTKInteractorStyle() override;
 
     ///
@@ -132,13 +130,13 @@ private:
 
     friend class VTKViewer;
 
-    SimulationManager* m_simManager;             ///> SimulationManager owning the current simulation being interacted with
-    std::chrono::high_resolution_clock::time_point m_pre;                 ///> time point pre-rendering
-    std::chrono::high_resolution_clock::time_point m_post;             ///> time point post-rendering
-    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate;             ///> time point for last framerate display update
+    SimulationManager* m_simManager;                                ///> SimulationManager owning the current simulation being interacted with
+    std::chrono::high_resolution_clock::time_point m_pre;           ///> time point pre-rendering
+    std::chrono::high_resolution_clock::time_point m_post;          ///> time point post-rendering
+    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
 
-    std::shared_ptr<VTKTextStatusManager> m_textStatusManager; ///> Handle text statuses, including fps status and custom text status
-    bool m_displayFps = false;             ///> hide or display framerate
-    double m_lastFps;             ///> last framerate value used for moving average estimate
+    std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///> Handle text statuses, including fps status and custom text status
+    bool   m_displayFps = false;                                    ///> hide or display framerate
+    double m_lastFps;                                               ///> last framerate value used for moving average estimate
 };
 } // imstk

@@ -63,7 +63,7 @@ public:
 
 protected:
     vtkNew<vtkWindowToImageFilter> m_windowToImageFilter;
-    vtkNew<vtkPNGWriter> m_pngWriter; //> using vtk's png writer to save the screenshots
-    vtkRenderWindow* m_renderWindow; //> render window whose screen shot will be taken
+    vtkNew<vtkPNGWriter>           m_pngWriter; //> using vtk's png writer to save the screenshots
+    vtkRenderWindow* m_renderWindow;            //> render window whose screen shot will be taken
 };
 } // imstk

@@ -26,15 +26,16 @@
 
 namespace imstk
 {
-SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side &side,
-                                           const std::shared_ptr<CollisionData>& colData,
-                                           const std::shared_ptr<CollidingObject> &obj) :
+SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side&          side,
+                                           const std::shared_ptr<CollisionData>&   colData,
+                                           const std::shared_ptr<CollidingObject>& obj) :
     CollisionHandling(Type::SPH, side, colData), m_SPHObject(std::dynamic_pointer_cast<SPHObject>(obj))
 {
     LOG_IF(FATAL, (!m_SPHObject)) << "Invalid SPH object";
 }
 
-void SPHCollisionHandling::setBoundaryFriction(const Real friction)
+void
+SPHCollisionHandling::setBoundaryFriction(const Real friction)
 {
     m_BoundaryFriction = friction;
 
@@ -52,7 +53,8 @@ void SPHCollisionHandling::setBoundaryFriction(const Real friction)
     }
 }
 
-void SPHCollisionHandling::processCollisionData()
+void
+SPHCollisionHandling::processCollisionData()
 {
     const auto& SPHModel = m_SPHObject->getSPHModel();
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
@@ -65,7 +67,7 @@ void SPHCollisionHandling::processCollisionData()
         [&](const size_t idx)
         {
             const auto& cd = m_colData->MAColData[idx];
-            const auto pidx = cd.nodeId; // Fluid particle index
+            const auto pidx = cd.nodeId;   // Fluid particle index
             auto n = cd.penetrationVector; // This vector should point into solid object
 
             // Correct particle position:
@@ -76,7 +78,7 @@ void SPHCollisionHandling::processCollisionData()
             const auto nLengthSqr = n.squaredNorm();
             if (nLengthSqr < Real(1e-20)) // Normalize n
             {
-                return; // Too little penetration: ignore
+                return;                   // Too little penetration: ignore
             }
 
             n /= std::sqrt(nLengthSqr);

@@ -49,7 +49,7 @@ class VulkanInteractorStyleFreeCamera : public VulkanInteractorStyle
 {
 public:
     VulkanInteractorStyleFreeCamera();
-    ~VulkanInteractorStyleFreeCamera(){};
+    ~VulkanInteractorStyleFreeCamera() {}
 
     ///
     /// \brief Controls camera movement
@@ -59,11 +59,11 @@ public:
 protected:
     friend class VulkanViewer;
 
-    double m_lastTime = 0; ///< Last frame time
-    Vec3d m_simCameraPosition; ///< Saved simulation mode camera position
-    Vec3d m_simCameraFocalPoint; ///< Saved simulation mode camera focal point
-    float m_cameraAngle = 0; ///< Angle created by changes in vertical cursor position
+    double m_lastTime = 0;        ///< Last frame time
+    Vec3d  m_simCameraPosition;   ///< Saved simulation mode camera position
+    Vec3d  m_simCameraFocalPoint; ///< Saved simulation mode camera focal point
+    float  m_cameraAngle = 0;     ///< Angle created by changes in vertical cursor position
 
-    bool m_started = false; ///< Used to initialized variables
+    bool m_started = false;       ///< Used to initialized variables
 };
 }

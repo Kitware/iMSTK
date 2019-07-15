@@ -34,44 +34,44 @@ class VulkanFramebuffer
 {
 public:
     VulkanFramebuffer(
-        VulkanMemoryManager& memoryManager,
-        unsigned int width,
-        unsigned int height,
+        VulkanMemoryManager&  memoryManager,
+        unsigned int          width,
+        unsigned int          height,
         VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 
-    void setColor(VulkanInternalImage * image,
-                  VkImageView * imageView,
-                  VkFormat format,
-                  VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    void setColor(VulkanInternalImage* image,
+                  VkImageView*         imageView,
+                  VkFormat             format,
+                  VkImageLayout        layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    void setSpecular(VulkanInternalImage * image,
-                     VkImageView * imageView,
-                     VkFormat format,
-                     VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    void setSpecular(VulkanInternalImage* image,
+                     VkImageView*         imageView,
+                     VkFormat             format,
+                     VkImageLayout        layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    void setDepth(VulkanInternalImage * image,
-                  VkImageView * imageView,
-                  VkFormat format,
-                  VkImageLayout layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+    void setDepth(VulkanInternalImage* image,
+                  VkImageView*         imageView,
+                  VkFormat             format,
+                  VkImageLayout        layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
-    void setNormal(VulkanInternalImage * image,
-                   VkImageView * imageView,
-                   VkFormat format,
-                   VkImageLayout layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+    void setNormal(VulkanInternalImage* image,
+                   VkImageView*         imageView,
+                   VkFormat             format,
+                   VkImageLayout        layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
-    void initializeFramebuffer(VkRenderPass * renderPass);
+    void initializeFramebuffer(VkRenderPass* renderPass);
 
-    ~VulkanFramebuffer(){};
+    ~VulkanFramebuffer() {}
 
-    void changeImageLayout(VkCommandBuffer& commandBuffer,
-                           VkImage& image,
-                           VkImageLayout layout1,
-                           VkImageLayout layout2,
-                           VkAccessFlags sourceFlags,
-                           VkAccessFlags destinationFlags,
+    void changeImageLayout(VkCommandBuffer&        commandBuffer,
+                           VkImage&                image,
+                           VkImageLayout           layout1,
+                           VkImageLayout           layout2,
+                           VkAccessFlags           sourceFlags,
+                           VkAccessFlags           destinationFlags,
                            VkImageSubresourceRange range);
 
-    void clear(VkDevice * device);
+    void clear(VkDevice* device);
 
 private:
     friend class VulkanRenderer;
@@ -80,32 +80,32 @@ private:
 
     uint32_t m_width;
     uint32_t m_height;
-    bool m_lastPass = false;
+    bool     m_lastPass = false;
     VkSampleCountFlagBits m_samples;
     VkDevice m_renderDevice;
 
     // Depth buffer
-    VulkanInternalImage * m_depthImage;
-    VkImageView * m_depthImageView;
-    VkFormat m_depthFormat = VK_FORMAT_UNDEFINED;
+    VulkanInternalImage* m_depthImage;
+    VkImageView*         m_depthImageView;
+    VkFormat      m_depthFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_depthLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     // Normal buffer
-    VulkanInternalImage * m_normalImage;
-    VkImageView * m_normalImageView;
-    VkFormat m_normalFormat = VK_FORMAT_UNDEFINED;
+    VulkanInternalImage* m_normalImage;
+    VkImageView*         m_normalImageView;
+    VkFormat      m_normalFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_normalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Color accumulation buffer
-    VulkanInternalImage * m_colorImage;
-    VkImageView * m_colorImageView;
-    VkFormat m_colorFormat = VK_FORMAT_UNDEFINED;
+    VulkanInternalImage* m_colorImage;
+    VkImageView*         m_colorImageView;
+    VkFormat      m_colorFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_colorLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Specular accumulation buffer
-    VulkanInternalImage * m_specularImage;
-    VkImageView * m_specularImageView;
-    VkFormat m_specularFormat = VK_FORMAT_UNDEFINED;
+    VulkanInternalImage* m_specularImage;
+    VkImageView*         m_specularImageView;
+    VkFormat      m_specularFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_specularLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Attachments
@@ -114,6 +114,6 @@ private:
     VkFramebuffer m_framebuffer;
 
     // Renderpass
-    VkRenderPass * m_renderPass;
+    VkRenderPass* m_renderPass;
 };
 }

@@ -55,7 +55,7 @@ enum class TimeSteppingType
 ///
 /// \brief Base class for mathematical model of the physics governing the dynamic object
 ///
-template <class StateType>
+template<class StateType>
 class DynamicalModel
 {
 public:
@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type){}
+    DynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type) {}
 
     ///
     /// \brief Destructor
@@ -126,7 +126,7 @@ public:
     ///
     /// \brief
     ///
-    virtual void updatePhysicsGeometry(){}
+    virtual void updatePhysicsGeometry() {}
 
     ///
     /// \brief Set the time step size
@@ -146,19 +146,19 @@ public:
     ///
     /// \brief Set the type of approach used to update the time step size after every frame
     ///
-    virtual void setTimeStepSizeType(const TimeSteppingType type){ m_timeStepSizeType = type; }
-    TimeSteppingType getTimeStepSizeType(){ return m_timeStepSizeType; }
+    virtual void setTimeStepSizeType(const TimeSteppingType type) { m_timeStepSizeType = type; }
+    TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
 
 protected:
 
     DynamicalModelType m_type; ///> Mathematical model type
 
     // Body states
-    std::shared_ptr<StateType> m_initialState;      ///> Initial state
-    std::shared_ptr<StateType> m_currentState;      ///> Current state
-    std::shared_ptr<StateType> m_previousState;     ///> Previous state
+    std::shared_ptr<StateType> m_initialState;  ///> Initial state
+    std::shared_ptr<StateType> m_currentState;  ///> Current state
+    std::shared_ptr<StateType> m_previousState; ///> Previous state
 
-    std::size_t m_numDOF; ///> Total number of degree of freedom
+    std::size_t m_numDOF;                       ///> Total number of degree of freedom
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
 };

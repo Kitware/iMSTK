@@ -40,8 +40,8 @@ public:
     /// \brief Default constructor
     ///
     VulkanDecalRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                              SceneObject::Type type,
-                              VulkanMemoryManager& memoryManager);
+                              SceneObject::Type            type,
+                              VulkanMemoryManager&         memoryManager);
 
     ///
     /// \brief Update render geometry
@@ -56,11 +56,11 @@ public:
     ///
     /// \brief Initialize data
     ///
-    void initializeData(VulkanMemoryManager& memoryManager,
+    void initializeData(VulkanMemoryManager&            memoryManager,
                         std::shared_ptr<RenderMaterial> material = nullptr);
 
 protected:
-    VulkanLocalDecalVertexUniforms m_decalVertexUniforms;
+    VulkanLocalDecalVertexUniforms   m_decalVertexUniforms;
     VulkanLocalDecalFragmentUniforms m_decalFragmentUniforms;
 };
 }

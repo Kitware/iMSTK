@@ -49,13 +49,13 @@ LaparoscopicToolController::updateControlledObjects()
     if (m_trackingController->getDeviceClient()->getButton(0))
     {
         m_jawAngle += m_change;
-        m_jawAngle = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
+        m_jawAngle  = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
     }
 
     if (m_trackingController->getDeviceClient()->getButton(1))
     {
         m_jawAngle -= m_change;
-        m_jawAngle = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
+        m_jawAngle  = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
     }
 
     // Update orientation of parts

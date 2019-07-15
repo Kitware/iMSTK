@@ -60,7 +60,7 @@ public:
             m_k = Real(315.0) / (Real(64.0) * PI * std::pow(m_radius, 9));
             m_l = -Real(945.0) / (Real(32.0) * PI * std::pow(m_radius, 9));
         }
-        m_m      = m_l;
+        m_m  = m_l;
         m_W0 = W(VecXr::Zero());
     }
 
@@ -95,7 +95,7 @@ public:
     ///
     VecXr gradW(const VecXr& r) const
     {
-        VecXr res = VecXr::Zero();
+        VecXr      res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
         if (r2 <= m_radius2 && r2 > Real(1e-12))
         {
@@ -112,7 +112,7 @@ public:
     ///
     Real laplacian(const VecXr& r) const
     {
-        Real res = 0.;
+        Real       res = 0.;
         const auto r2  = r.squaredNorm();
         if (r2 <= m_radius2)
         {
@@ -194,7 +194,7 @@ public:
     ///
     VecXr gradW(const VecXr& r) const
     {
-        VecXr res = VecXr::Zero();
+        VecXr      res = VecXr::Zero();
         const auto r2  = r.squaredNorm();
         if (r2 <= m_radius2 && r2 > Real(1e-12))
         {
@@ -252,7 +252,7 @@ public:
     ///          (32/(PI h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
     Real W(const Real r) const
     {
-        Real res = 0.;
+        Real       res = 0.;
         const auto r2  = r * r;
         if (r2 <= m_radius2)
         {
@@ -276,7 +276,7 @@ public:
     ///          (32/(PI h^9))(2*(h-r)^3*r^3 - h^6/64		if 0 < r <= h/2
     Real W(const VecXr& r) const
     {
-        Real res = 0.;
+        Real       res = 0.;
         const auto r2  = r.squaredNorm();
         if (r2 <= m_radius2)
         {
@@ -343,7 +343,7 @@ public:
     ///
     Real W(const Real r) const
     {
-        Real res = 0.;
+        Real       res = 0.;
         const auto r2  = r * r;
         if (r2 <= m_radius2)
         {
@@ -362,7 +362,7 @@ public:
     ///
     Real W(const VecXr& r) const
     {
-        Real res = 0.;
+        Real       res = 0.;
         const auto r2  = r.squaredNorm();
         if (r2 <= m_radius2)
         {
@@ -414,7 +414,7 @@ public:
     ///
     Real laplace(const VecXr& r) const
     {
-        Real res = 0.;
+        Real       res = 0.;
         const auto r2  = r.squaredNorm();
         if (r2 <= m_radius2)
         {

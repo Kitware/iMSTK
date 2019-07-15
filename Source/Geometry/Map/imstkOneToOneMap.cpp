@@ -52,13 +52,13 @@ OneToOneMap::compute()
                               };
 
     auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
-    auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
+    auto meshSlave  = std::dynamic_pointer_cast<PointSet>(m_slave);
 
     LOG_IF(FATAL, (!meshMaster || !meshSlave)) << "Fail to cast from geometry to pointset";
 
     m_oneToOneMap.clear();
     ParallelUtils::SpinLock lock;
-    bool bValid = true;
+    bool                    bValid = true;
 
     ParallelUtils::parallelFor(meshSlave->getNumVertices(),
         [&](const size_t nodeId)
@@ -93,7 +93,7 @@ OneToOneMap::compute()
     m_oneToOneMapVector.resize(0);
     for (auto kv: m_oneToOneMap)
     {
-        m_oneToOneMapVector.push_back({kv.first, kv.second});
+        m_oneToOneMapVector.push_back({ kv.first, kv.second });
     }
 }
 
@@ -101,26 +101,26 @@ bool
 OneToOneMap::isValid() const
 {
     auto meshMaster = static_cast<PointSet*>(m_master.get());
-    auto meshSlave = static_cast<PointSet*>(m_slave.get());
+    auto meshSlave  = static_cast<PointSet*>(m_slave.get());
 
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (!dynamic_cast<PointSet*>(m_master.get()) ||
-                   !dynamic_cast<PointSet*>(m_slave.get()))) << "Fail to cast from geometry to pointset";
+    LOG_IF(FATAL, (!dynamic_cast<PointSet*>(m_master.get())
+                   || !dynamic_cast<PointSet*>(m_slave.get()))) << "Fail to cast from geometry to pointset";
 #endif
 
     auto numVertMaster = meshMaster->getNumVertices();
-    auto numVertSlave = meshSlave->getNumVertices();
-    bool bOK = true;
+    auto numVertSlave  = meshSlave->getNumVertices();
+    bool bOK           = true;
 
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
-        [&](const size_t idx){
+        [&](const size_t idx) {
             if (!bOK) // If map is invalid, no need to check further
             {
                 return;
             }
             const auto& mapValue = m_oneToOneMapVector[idx];
-            if (mapValue.first >= numVertSlave &&
-                mapValue.second >= numVertMaster)
+            if (mapValue.first >= numVertSlave
+                && mapValue.second >= numVertMaster)
             {
                 LOG(WARNING) << "OneToOneMap map is not valid! Vertex indices out of bounds.";
                 bOK = false;
@@ -139,7 +139,7 @@ OneToOneMap::setMap(const std::map<size_t, size_t>& sourceMap)
     m_oneToOneMapVector.resize(0);
     for (auto kv: m_oneToOneMap)
     {
-        m_oneToOneMapVector.push_back({kv.first, kv.second});
+        m_oneToOneMapVector.push_back({ kv.first, kv.second });
     }
 }
 
@@ -164,15 +164,15 @@ OneToOneMap::apply()
     LOG_IF(FATAL, (m_oneToOneMap.size() != m_oneToOneMapVector.size())) << "Internal data is corrupted";
 
     auto meshMaster = static_cast<PointSet*>(m_master.get());
-    auto meshSlave = static_cast<PointSet*>(m_slave.get());
+    auto meshSlave  = static_cast<PointSet*>(m_slave.get());
 
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (!dynamic_cast<PointSet*>(m_master.get()) ||
-                   !dynamic_cast<PointSet*>(m_slave.get()))) << "Fail to cast from geometry to pointset";
+    LOG_IF(FATAL, (!dynamic_cast<PointSet*>(m_master.get())
+                   || !dynamic_cast<PointSet*>(m_slave.get()))) << "Fail to cast from geometry to pointset";
 #endif
 
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
-        [&](const size_t idx){
+        [&](const size_t idx) {
             const auto& mapValue = m_oneToOneMapVector[idx];
             meshSlave->setVertexPosition(mapValue.first, meshMaster->getVertexPosition(mapValue.second));
         });

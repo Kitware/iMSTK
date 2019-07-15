@@ -79,10 +79,10 @@ private:
     ///
     static void findAndAddTexture(
         std::shared_ptr<RenderMaterial> renderMaterial,
-        const std::string& textureFolderPath,
-        const std::string& textureCoreFileName,
-        const std::string& textureFileExtension,
-        Texture::Type textureType);
+        const std::string&              textureFolderPath,
+        const std::string&              textureCoreFileName,
+        const std::string&              textureFileExtension,
+        Texture::Type                   textureType);
 
     ///
     /// \brief Helper function for getting substring
@@ -94,7 +94,7 @@ private:
     static std::string getSubstringGivenString(
         const std::string& input,
         const std::string& delimiter,
-        const bool lastInstance = false);
+        const bool         lastInstance = false);
 
     ///
     /// \brief Find and add texture to material
@@ -111,11 +111,11 @@ private:
     /// "texture.png" will be expanded to "texture_Normal.png".
     ///
     static void findAndAddTextureWithExtensions(
-        std::shared_ptr<RenderMaterial> renderMaterial,
-        const std::string& textureFolderPath,
-        const std::string& textureCoreFileName,
-        const std::string& textureFileExtension,
-        Texture::Type textureType,
-        std::initializer_list<const char *> extensionList);
-}; // VisualObjectImporter
+        std::shared_ptr<RenderMaterial>    renderMaterial,
+        const std::string&                 textureFolderPath,
+        const std::string&                 textureCoreFileName,
+        const std::string&                 textureFileExtension,
+        Texture::Type                      textureType,
+        std::initializer_list<const char*> extensionList);
+};  // VisualObjectImporter
 } // imstk

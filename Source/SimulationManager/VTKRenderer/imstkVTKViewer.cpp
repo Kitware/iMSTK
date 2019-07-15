@@ -154,7 +154,8 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     }
 }
 
-Renderer::Mode VTKViewer::getRenderingMode()
+Renderer::Mode
+VTKViewer::getRenderingMode()
 {
     return this->getActiveRenderer()->getMode();
 }

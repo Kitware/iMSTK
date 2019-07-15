@@ -56,8 +56,8 @@ public:
     ///
     static std::shared_ptr<VulkanRenderDelegate> make_delegate(
         std::shared_ptr<VisualModel> visualModel,
-        SceneObject::Type type,
-        VulkanMemoryManager& details);
+        SceneObject::Type            type,
+        VulkanMemoryManager&         details);
 
     ///
     /// \brief Get source geometry
@@ -69,7 +69,7 @@ public:
     ///        in that memory is directly mapped from the VisualModel to the
     ///        RenderDelegate.
     ///
-    virtual void update(const uint32_t frameIndex){};
+    virtual void update(const uint32_t frameIndex) {}
 
     ///
     /// \brief Get vertex buffer
@@ -80,9 +80,9 @@ public:
     /// \brief Initialize data
     ///
     void initializeData(
-        VulkanMemoryManager& memoryManager,
+        VulkanMemoryManager&            memoryManager,
         std::shared_ptr<RenderMaterial> material,
-        VulkanVertexBufferMode mode = VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
+        VulkanVertexBufferMode          mode = VulkanVertexBufferMode::VERTEX_BUFFER_STATIC);
 
     ///
     /// \brief Initialize data
@@ -99,25 +99,25 @@ protected:
     unsigned int m_numTriangles;
     unsigned int m_numVertices;
     unsigned int m_vertexSize;
-    double m_loadFactor = 1.0;
+    double       m_loadFactor = 1.0;
     std::shared_ptr<VisualModel> m_visualModel;
 
     ///
     /// \brief Default constructor (protected)
     ///
-    VulkanRenderDelegate(){};
+    VulkanRenderDelegate() {}
 
     std::shared_ptr<VulkanVertexBuffer> m_vertexBuffer;
 
     std::shared_ptr<VulkanUniformBuffer> m_vertexUniformBuffer;
     std::shared_ptr<VulkanUniformBuffer> m_fragmentUniformBuffer;
 
-    std::shared_ptr<VulkanMaterialDelegate> m_material = nullptr;
+    std::shared_ptr<VulkanMaterialDelegate> m_material          = nullptr;
     std::shared_ptr<VulkanMaterialDelegate> m_wireframeMaterial = nullptr;
-    std::shared_ptr<VulkanMaterialDelegate> m_shadowMaterial = nullptr;
-    std::shared_ptr<VulkanMaterialDelegate> m_depthMaterial = nullptr;
+    std::shared_ptr<VulkanMaterialDelegate> m_shadowMaterial    = nullptr;
+    std::shared_ptr<VulkanMaterialDelegate> m_depthMaterial     = nullptr;
 
-    VulkanLocalVertexUniforms m_localVertexUniforms;
+    VulkanLocalVertexUniforms   m_localVertexUniforms;
     VulkanLocalFragmentUniforms m_localFragmentUniforms;
 };
 }

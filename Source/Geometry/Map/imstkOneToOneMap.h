@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    OneToOneMap() : GeometryMap(GeometryMap::Type::OneToOne){}
+    OneToOneMap() : GeometryMap(GeometryMap::Type::OneToOne) {}
 
     ///
     /// \brief Constructor

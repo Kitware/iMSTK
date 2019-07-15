@@ -28,12 +28,12 @@ namespace imstk
 vtkStandardNewMacro(VTKCustomPolyDataMapper);
 
 void
-VTKCustomPolyDataMapper::BuildBufferObjects(vtkRenderer * renderer, vtkActor * actor)
+VTKCustomPolyDataMapper::BuildBufferObjects(vtkRenderer* renderer, vtkActor* actor)
 {
     auto polyData = this->GetInput();
 
     auto renderWindow = (vtkOpenGLRenderWindow*)renderer->GetRenderWindow();
-    auto VBOCache = renderWindow->GetVBOCache();
+    auto VBOCache     = renderWindow->GetVBOCache();
 
     this->VBOs->CacheDataArray("inputPosition", polyData->GetPoints()->GetData(), VBOCache, VTK_FLOAT);
     this->VBOs->CacheDataArray("inputNormal", polyData->GetPointData()->GetNormals(), VBOCache, VTK_FLOAT);
@@ -54,16 +54,16 @@ VTKCustomPolyDataMapper::BuildBufferObjects(vtkRenderer * renderer, vtkActor * a
 void
 VTKCustomPolyDataMapper::ReplaceShaderValues(
     std::map<vtkShader::Type, vtkShader*> vtkNotUsed(shaders),
-    vtkRenderer * vtkNotUsed(renderer),
-    vtkActor * vtkNotUsed(actor))
+    vtkRenderer* vtkNotUsed(renderer),
+    vtkActor* vtkNotUsed(actor))
 {
 }
 
 void
 VTKCustomPolyDataMapper::GetShaderTemplate(
     std::map<vtkShader::Type, vtkShader*> shaders,
-    vtkRenderer * vtkNotUsed(renderer),
-    vtkActor * actor)
+    vtkRenderer* vtkNotUsed(renderer),
+    vtkActor* actor)
 {
     this->loadShader("./Shaders/VTKShaders/mesh.vert", m_vertexShaderSource);
     this->loadShader("./Shaders/VTKShaders/mesh.frag", m_fragmentShaderSource);
@@ -89,7 +89,7 @@ VTKCustomPolyDataMapper::GetShaderTemplate(
         m_fragmentShaderSource = "#define CUBEMAP_TEXTURE\n" + m_fragmentShaderSource;
     }
 
-    m_vertexShaderSource = "#version 330\n" + m_vertexShaderSource;
+    m_vertexShaderSource   = "#version 330\n" + m_vertexShaderSource;
     m_fragmentShaderSource = "#version 330\n" + m_fragmentShaderSource;
     shaders[vtkShader::Vertex]->SetSource(m_vertexShaderSource.c_str());
     shaders[vtkShader::Fragment]->SetSource(m_fragmentShaderSource.c_str());
@@ -98,8 +98,8 @@ VTKCustomPolyDataMapper::GetShaderTemplate(
 void
 VTKCustomPolyDataMapper::SetMapperShaderParameters(
     vtkOpenGLHelper& helper,
-    vtkRenderer * renderer,
-    vtkActor * actor)
+    vtkRenderer*     renderer,
+    vtkActor*        actor)
 {
     auto textures = this->GetTextures(actor);
     auto material = m_renderMaterial;
@@ -109,20 +109,20 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     this->VBOs->AddAllAttributesToVAO(helper.Program, helper.VAO);
     auto camera = renderer->GetActiveCamera();
 
-    vtkMatrix4x4 * viewMatrix;
-    vtkMatrix4x4 * projectionMatrix;
-    vtkMatrix3x3 * rotationMatrix;
-    vtkMatrix4x4 * viewProjectionMatrix;
-    vtkMatrix3x3 * modelRotationMatrix;
-    vtkMatrix4x4 * modelMatrix;
+    vtkMatrix4x4* viewMatrix;
+    vtkMatrix4x4* projectionMatrix;
+    vtkMatrix3x3* rotationMatrix;
+    vtkMatrix4x4* viewProjectionMatrix;
+    vtkMatrix3x3* modelRotationMatrix;
+    vtkMatrix4x4* modelMatrix;
 
     ((vtkOpenGLCamera*)camera)->GetKeyMatrices(renderer, viewMatrix, rotationMatrix, projectionMatrix, viewProjectionMatrix);
     ((vtkOpenGLActor*)actor)->GetKeyMatrices(modelMatrix, modelRotationMatrix);
 
     // Per renderer: 16 light limit for iMSTK, VTK supports 6
-    float lightPosition[16][3]; // 3 float position
-    int lightType[16]; // 1 bool directional vs. point light
-    float lightColor[16][4]; // 3 float color, 1 float intensity
+    float lightPosition[16][3];  // 3 float position
+    int   lightType[16];         // 1 bool directional vs. point light
+    float lightColor[16][4];     // 3 float color, 1 float intensity
     float lightDirection[16][4]; // 3 float direction, 1 float angle
 
     auto lights = renderer->GetLights();
@@ -183,10 +183,10 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     helper.Program->SetUniformMatrix("viewMatrix",
         viewMatrix);
 
-    auto cameraPosition = camera->GetPosition();
-    float cameraPos[3] = { (float)cameraPosition[0],
-                           (float)cameraPosition[1],
-                           (float)cameraPosition[2] };
+    auto  cameraPosition = camera->GetPosition();
+    float cameraPos[3]   = { (float)cameraPosition[0],
+                             (float)cameraPosition[1],
+                             (float)cameraPosition[2] };
 
     helper.Program->SetUniform3f("cameraPosition",
         cameraPos);
@@ -204,17 +204,17 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     helper.Program->SetUniformf("metalness", material->getMetalness());
     helper.Program->SetUniformf("roughness", material->getRoughness());
 
-    unsigned int textureCount = 0;
+    unsigned int textureCount   = 0;
     unsigned int currentTexture = 0;
 
     auto renderWindow = (vtkOpenGLRenderWindow*)(renderer->GetRenderWindow());
 
     if (this->GetOpenGLMode(actor->GetProperty()->GetRepresentation(), helper.PrimitiveType) == GL_TRIANGLES)
     {
-        auto diffuseColorTemp = material->getColor();
-        float diffuseColor[3] = {(float)diffuseColorTemp.r,
-                                 (float)diffuseColorTemp.g,
-                                 (float)diffuseColorTemp.b};
+        auto  diffuseColorTemp = material->getColor();
+        float diffuseColor[3]  = { (float)diffuseColorTemp.r,
+                                   (float)diffuseColorTemp.g,
+                                   (float)diffuseColorTemp.b };
         helper.Program->SetUniform3f("diffuseColorUniform", diffuseColor);
 
         auto diffuseTexture = material->getTexture(Texture::Type::DIFFUSE);
@@ -245,10 +245,10 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     }
     else
     {
-        auto debugColorTemp = material->getDebugColor();
-        float debugColor[3] = {(float)debugColorTemp.r,
-                               (float)debugColorTemp.g,
-                               (float)debugColorTemp.b};
+        auto  debugColorTemp = material->getDebugColor();
+        float debugColor[3]  = { (float)debugColorTemp.r,
+                                 (float)debugColorTemp.g,
+                                 (float)debugColorTemp.b };
         helper.Program->SetUniform3f("debugColor", debugColor);
     }
 }
@@ -256,32 +256,32 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
 void
 VTKCustomPolyDataMapper::SetPropertyShaderParameters(
     vtkOpenGLHelper& vtkNotUsed(helper),
-    vtkRenderer * vtkNotUsed(renderer),
-    vtkActor * vtkNotUsed(actor))
+    vtkRenderer*     vtkNotUsed(renderer),
+    vtkActor*        vtkNotUsed(actor))
 {
 }
 
 void
 VTKCustomPolyDataMapper::SetLightingShaderParameters(
     vtkOpenGLHelper& vtkNotUsed(helper),
-    vtkRenderer * vtkNotUsed(renderer),
-    vtkActor * vtkNotUsed(actor))
+    vtkRenderer*     vtkNotUsed(renderer),
+    vtkActor*        vtkNotUsed(actor))
 {
 }
 
 void
 VTKCustomPolyDataMapper::SetCameraShaderParameters(
     vtkOpenGLHelper& vtkNotUsed(helper),
-    vtkRenderer * vtkNotUsed(renderer),
-    vtkActor * vtkNotUsed(actor))
+    vtkRenderer*     vtkNotUsed(renderer),
+    vtkActor*        vtkNotUsed(actor))
 {
 }
 
 void
 VTKCustomPolyDataMapper::UpdateShaders(
     vtkOpenGLHelper& helper,
-    vtkRenderer * renderer,
-    vtkActor * actor)
+    vtkRenderer*     renderer,
+    vtkActor*        actor)
 {
     vtkOpenGLPolyDataMapper::UpdateShaders(helper, renderer, actor);
 }
@@ -290,7 +290,7 @@ void
 VTKCustomPolyDataMapper::loadShader(const std::string filename, std::string& source)
 {
     std::stringstream stream;
-    std::ifstream file(filename);
+    std::ifstream     file(filename);
     stream << file.rdbuf();
     source = stream.str();
     file.close();

@@ -33,9 +33,10 @@ using namespace imstk;
 /// \brief This example demonstrates the soft body simulation
 /// using Position based dynamics
 ///
-int main()
+int
+main()
 {
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
@@ -48,7 +49,7 @@ int main()
     }
 
     // Extract the surface mesh
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    auto surfMesh   = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
@@ -68,7 +69,7 @@ int main()
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
 
     auto deformableObj = std::make_shared<PbdObject>("Beam");
-    auto pbdModel = std::make_shared<PbdModel>();
+    auto pbdModel      = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(volTetMesh);
 
     // configure model
@@ -77,14 +78,14 @@ int main()
     // FEM constraint
     pbdParams->m_YoungModulus = 100.0;
     pbdParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = {51, 127, 178};
+    pbdParams->m_fixedNodeIds = { 51, 127, 178 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt = 0.01;
-    pbdParams->m_maxIter = 5;
+    pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt               = 0.01;
+    pbdParams->m_maxIter          = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

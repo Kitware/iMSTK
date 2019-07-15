@@ -70,7 +70,7 @@ TetraTriangleMap::compute()
             tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
 
             m_verticesEnclosingTetraId[vertexIdx] = closestTetId; // store nearest tetrahedron
-            m_verticesWeights[vertexIdx] = weights; // store weights
+            m_verticesWeights[vertexIdx] = weights;               // store weights
     });
 
     // Clear result if could not find closest tet
@@ -102,8 +102,8 @@ TetraTriangleMap::apply()
     auto triMesh = static_cast<SurfaceMesh*>(m_slave.get());
 
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (!dynamic_cast<TetrahedralMesh*>(m_master.get()) ||
-                   !dynamic_cast<SurfaceMesh*>(m_slave.get()))) << "Fail to cast from geometry to meshes";
+    LOG_IF(FATAL, (!dynamic_cast<TetrahedralMesh*>(m_master.get())
+                   || !dynamic_cast<SurfaceMesh*>(m_slave.get()))) << "Fail to cast from geometry to meshes";
 #endif
 
     ParallelUtils::parallelFor(triMesh->getNumVertices(),
@@ -155,7 +155,7 @@ TetraTriangleMap::isValid() const
     bool bOK = true;
 
     ParallelUtils::parallelFor(m_verticesEnclosingTetraId.size(),
-        [&](const size_t tetId){
+        [&](const size_t tetId) {
             if (!bOK) // If map is invalid, no need to check further
             {
                 return;
@@ -199,7 +199,7 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
     for (size_t tetId = 0; tetId < tetraMesh->getNumTetrahedra(); ++tetId)
     {
         Vec3d center(0, 0, 0);
-        auto vert = tetraMesh->getTetrahedronVertices(tetId);
+        auto  vert = tetraMesh->getTetrahedronVertices(tetId);
         for (size_t i = 0; i < 4; ++i)
         {
             center += tetraMesh->getInitialVertexPosition(vert[i]);
@@ -218,8 +218,8 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh, const Vec3d& pos)
 {
-    Vec3d boundingBoxMin;
-    Vec3d boundingBoxMax;
+    Vec3d               boundingBoxMin;
+    Vec3d               boundingBoxMax;
     std::vector<size_t> probablesTetId;
 
     // Eliminate the improbables based in bounding box test
@@ -227,17 +227,17 @@ TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetr
     {
         tetraMesh->computeTetrahedronBoundingBox(tetId, boundingBoxMin, boundingBoxMax);
 
-        if ((pos[0] >= boundingBoxMin[0] && pos[0] <= boundingBoxMax[0]) &&
-            (pos[1] >= boundingBoxMin[1] && pos[1] <= boundingBoxMax[1]) &&
-            (pos[2] >= boundingBoxMin[2] && pos[2] <= boundingBoxMax[2]))
+        if ((pos[0] >= boundingBoxMin[0] && pos[0] <= boundingBoxMax[0])
+            && (pos[1] >= boundingBoxMin[1] && pos[1] <= boundingBoxMax[1])
+            && (pos[2] >= boundingBoxMin[2] && pos[2] <= boundingBoxMax[2]))
         {
             probablesTetId.push_back(tetId);
         }
     }
 
     // Check which probable tetrahedron the point belongs to
-    size_t enclosingTetrahedron = std::numeric_limits<size_t>::max();
-    TetrahedralMesh::WeightsArray weights = {0.0, 0.0, 0.0, 0.0};
+    size_t                        enclosingTetrahedron = std::numeric_limits<size_t>::max();
+    TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
     for (const size_t& tetId : probablesTetId)
     {
         tetraMesh->computeBarycentricWeights(tetId, pos, weights);

@@ -77,7 +77,7 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
 }
 
 bool
-VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string & filePath, const MeshFileType meshType)
+VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType)
 {
     if (auto vMesh = std::dynamic_pointer_cast<VolumetricMesh>(imstkMesh))
     {
@@ -153,7 +153,7 @@ VTKMeshIO::readVtkPolyData(const std::string& filePath)
 
 template<typename WriterType>
 bool
-VTKMeshIO::writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const std::string & filePath)
+VTKMeshIO::writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const std::string& filePath)
 {
     vtkPolyData* vtkMesh = convertSurfaceMeshToVtkPolyData(imstkMesh);
     if (!vtkMesh)  //conversion unsuccessful
@@ -183,10 +183,10 @@ VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
 }
 
 bool
-VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkMesh, const std::string & filePath)
+VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkMesh, const std::string& filePath)
 {
-    auto tMesh = std::dynamic_pointer_cast<TetrahedralMesh>(imstkMesh);
-    auto hMesh = std::dynamic_pointer_cast<HexahedralMesh>(imstkMesh);
+    auto                 tMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(imstkMesh);
+    auto                 hMesh   = std::dynamic_pointer_cast<HexahedralMesh>(imstkMesh);
     vtkUnstructuredGrid* vtkMesh = nullptr;
     if (tMesh)
     {
@@ -264,7 +264,7 @@ VTKMeshIO::convertSurfaceMeshToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMes
     vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
     VTKMeshIO::copyCellsToVtk<3>(imstkMesh->getTrianglesVertices(), polys.Get());
 
-    vtkPolyData *polydata = vtkPolyData::New();
+    vtkPolyData* polydata = vtkPolyData::New();
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
     return polydata;
@@ -279,7 +279,7 @@ VTKMeshIO::convertTetrahedralMeshToVtkUnstructuredGrid(std::shared_ptr<Tetrahedr
     vtkSmartPointer<vtkCellArray> tetras = vtkSmartPointer<vtkCellArray>::New();
     VTKMeshIO::copyCellsToVtk<4>(imstkMesh->getTetrahedraVertices(), tetras.Get());
 
-    vtkUnstructuredGrid *ug = vtkUnstructuredGrid::New();
+    vtkUnstructuredGrid* ug = vtkUnstructuredGrid::New();
     ug->SetPoints(points);
     ug->SetCells(VTK_TETRA, tetras);
     return ug;
@@ -294,7 +294,7 @@ VTKMeshIO::convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<Hexahedral
     vtkSmartPointer<vtkCellArray> bricks = vtkSmartPointer<vtkCellArray>::New();
     VTKMeshIO::copyCellsToVtk<8>(imstkMesh->getHexahedraVertices(), bricks.Get());
 
-    vtkUnstructuredGrid *ug = vtkUnstructuredGrid::New();
+    vtkUnstructuredGrid* ug = vtkUnstructuredGrid::New();
     ug->SetPoints(points);
     ug->SetCells(VTK_HEXAHEDRON, bricks);
     return ug;
@@ -357,7 +357,8 @@ VTKMeshIO::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
     }
 }
 
-void VTKMeshIO::copyVerticesToVtk(const StdVectorOfVec3d & vertices, vtkPoints * points)
+void
+VTKMeshIO::copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points)
 {
     if (!points)
     {
@@ -373,7 +374,8 @@ void VTKMeshIO::copyVerticesToVtk(const StdVectorOfVec3d & vertices, vtkPoints *
 }
 
 template<size_t dim>
-void VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray * vtkCells)
+void
+VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells)
 {
     if (!vtkCells)
     {
@@ -403,7 +405,7 @@ VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_
 
     cells.reserve(vtkCells->GetNumberOfCells());
     vtkCells->InitTraversal();
-    auto vtkCell = vtkSmartPointer<vtkIdList>::New();
+    auto                    vtkCell = vtkSmartPointer<vtkIdList>::New();
     std::array<size_t, dim> cell;
     while (vtkCells->GetNextCell(vtkCell))
     {
@@ -429,14 +431,14 @@ VTKMeshIO::copyPointData(vtkPointData* pointData, std::map<std::string, StdVecto
 
     for (int i = 0; i < pointData->GetNumberOfArrays(); ++i)
     {
-        vtkDataArray* array = pointData->GetArray(i);
-        std::string name = array->GetName();
-        int nbrOfComp = array->GetNumberOfComponents();
-        vtkIdType nbrOfTuples = array->GetNumberOfTuples();
+        vtkDataArray*      array       = pointData->GetArray(i);
+        std::string        name        = array->GetName();
+        int                nbrOfComp   = array->GetNumberOfComponents();
+        vtkIdType          nbrOfTuples = array->GetNumberOfTuples();
         StdVectorOfVectorf data;
         for (vtkIdType j = 0; j < nbrOfTuples; ++j)
         {
-            double* tupleData = new double [nbrOfComp];
+            double* tupleData = new double[nbrOfComp];
             array->GetTuple(j, tupleData);
             Vectorf tuple(nbrOfComp);
             for (int k = 0; k < nbrOfComp; k++)

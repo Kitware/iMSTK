@@ -44,23 +44,24 @@ vtkStandardNewMacro(vtkCapsuleSource);
 vtkCapsuleSource::vtkCapsuleSource(int res)
 {
     res = res < 8 ? 8 : res;
-    this->Radius = 0.5;
+    this->Radius    = 0.5;
     this->Center[0] = 0.0;
     this->Center[1] = 0.0;
     this->Center[2] = 0.0;
 
-    this->ThetaResolution = res;
-    this->PhiResolution = res;
+    this->ThetaResolution     = res;
+    this->PhiResolution       = res;
     this->LatLongTessellation = 0;
-    this->CylinderLength = 1.0;
+    this->CylinderLength      = 1.0;
 
     this->SetNumberOfInputPorts(0);
 }
 
 namespace
 {
-void InsertPole(vtkPoints* points, vtkFloatArray *normals,
-                double center[3], double radius, double halfHeight)
+void
+InsertPole(vtkPoints* points, vtkFloatArray* normals,
+           double center[3], double radius, double halfHeight)
 {
     double x[3];
     x[0] = center[0];
@@ -73,15 +74,16 @@ void InsertPole(vtkPoints* points, vtkFloatArray *normals,
     normals->InsertNextTuple(x);
 }
 
-void FillHalfSphere(vtkPoints* points, vtkFloatArray *normals,
-                    double thetaResolution, double phiResolution,
-                    double startAngle /* In radians*/, double sign,
-                    double center[3], double radius, double halfHeight)
+void
+FillHalfSphere(vtkPoints* points, vtkFloatArray* normals,
+               double thetaResolution, double phiResolution,
+               double startAngle /* In radians*/, double sign,
+               double center[3], double radius, double halfHeight)
 {
     double n[3], x[3], norm;
 
     double deltaTheta = 3.1415926535897932384626 / (thetaResolution - 1);
-    double deltaPhi = 3.1415926535897932384626 / (phiResolution - 1);
+    double deltaPhi   = 3.1415926535897932384626 / (phiResolution - 1);
     for (int i = 0; i < thetaResolution; ++i)
     {
         double theta = startAngle + sign * i * deltaTheta;
@@ -89,7 +91,7 @@ void FillHalfSphere(vtkPoints* points, vtkFloatArray *normals,
         for (int j = 1; j < phiResolution - 1; ++j)
         {
             double phi = j * deltaPhi;
-            double r = radius * sin(phi);
+            double r   = radius * sin(phi);
             n[0] = r * cos(theta);
             n[1] = r * sin(theta);
             n[2] = radius * cos(phi);
@@ -110,9 +112,10 @@ void FillHalfSphere(vtkPoints* points, vtkFloatArray *normals,
     }
 }
 
-void ConnectCylinderSide(vtkCellArray* faces,
-                         int minusPoleId, int plusPoleId,
-                         int clockwise, int increment, bool quadrangle)
+void
+ConnectCylinderSide(vtkCellArray* faces,
+                    int minusPoleId, int plusPoleId,
+                    int clockwise, int increment, bool quadrangle)
 {
     vtkIdType pts[4];
     for (int i = 0; i < increment; ++i)
@@ -140,31 +143,32 @@ void ConnectCylinderSide(vtkCellArray* faces,
 } // end namespace
 
 //----------------------------------------------------------------------------
-int vtkCapsuleSource::RequestData(
-    vtkInformation *vtkNotUsed(request),
-    vtkInformationVector **vtkNotUsed(inputVector),
-    vtkInformationVector *outputVector)
+int
+vtkCapsuleSource::RequestData(
+    vtkInformation*        vtkNotUsed(request),
+    vtkInformationVector** vtkNotUsed(inputVector),
+    vtkInformationVector*  outputVector)
 {
     // get the info object
-    vtkInformation *outInfo = outputVector->GetInformationObject(0);
+    vtkInformation* outInfo = outputVector->GetInformationObject(0);
 
     // get the ouptut
-    vtkPolyData *output = vtkPolyData::SafeDownCast(
+    vtkPolyData* output = vtkPolyData::SafeDownCast(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-    vtkPoints *newPoints;
-    vtkFloatArray *newNormals;
-    vtkCellArray *newPolys;
+    vtkPoints*     newPoints;
+    vtkFloatArray* newNormals;
+    vtkCellArray*  newPolys;
 
     // Set number of points.;
     int halfSphereNumPts = (this->PhiResolution - 2) * this->ThetaResolution + 2;
-    int numPts = halfSphereNumPts * 2;
+    int numPts           = halfSphereNumPts * 2;
 
     // Set number of faces
-    int halfSpheresNumsPolys = (this->ThetaResolution - 1) * 2 //top and bottom
+    int halfSpheresNumsPolys = (this->ThetaResolution - 1) * 2                                //top and bottom
                                + (this->PhiResolution - 3) * (this->ThetaResolution - 1) * 2; //middle
     int cylinderNumPolys = (this->PhiResolution - 1) * 4;
-    int numPolys = halfSpheresNumsPolys * 2 + cylinderNumPolys;
+    int numPolys         = halfSpheresNumsPolys * 2 + cylinderNumPolys;
 
     // Allocate !
     newPoints = vtkPoints::New();
@@ -191,7 +195,7 @@ int vtkCapsuleSource::RequestData(
     this->ThetaResolution, this->PhiResolution,
     0.0, 1.0,
     this->Center, this->Radius, halfHeight);
-    this->UpdateProgress (0.255);
+    this->UpdateProgress(0.255);
 
     // South pole
     InsertPole(newPoints, newNormals, this->Center, -1 * this->Radius, halfHeight);
@@ -210,12 +214,12 @@ int vtkCapsuleSource::RequestData(
     this->ThetaResolution, this->PhiResolution,
     6.283185307179586, -1,
     this->Center, this->Radius, -1.0 * halfHeight);
-    this->UpdateProgress (0.555);
+    this->UpdateProgress(0.555);
 
     // South pole
     InsertPole(newPoints, newNormals,
     this->Center, -1 * this->Radius, -1 * halfHeight);
-    this->UpdateProgress (0.60); // Second half sphere done !
+    this->UpdateProgress(0.60);  // Second half sphere done !
 
     //
     // Generate mesh connectivity
@@ -228,8 +232,8 @@ int vtkCapsuleSource::RequestData(
     // Ids of the poles
     int northPoleMinusId = 0;
     int southPoleMinusId = halfSphereNumPts - 1;
-    int northPolePlusId = halfSphereNumPts;
-    int southPolePlusId = numPts - 1;
+    int northPolePlusId  = halfSphereNumPts;
+    int southPolePlusId  = numPts - 1;
 
     //First half sphere
     // Connect the minus side half sphere north pole.
@@ -240,7 +244,7 @@ int vtkCapsuleSource::RequestData(
         pts[2] = pts[1] + increment;
         newPolys->InsertNextCell(3, pts);
     }
-    this->UpdateProgress (0.605);
+    this->UpdateProgress(0.605);
 
     // South pole connectivity
     for (int i = 1; i < this->ThetaResolution; ++i)
@@ -250,7 +254,7 @@ int vtkCapsuleSource::RequestData(
         pts[2] = pts[0] + increment;
         newPolys->InsertNextCell(3, pts);
     }
-    this->UpdateProgress (0.75); //First half-sphere done !
+    this->UpdateProgress(0.75);  //First half-sphere done !
 
     // Seconde half sphere
     // North pole connectivity
@@ -261,7 +265,7 @@ int vtkCapsuleSource::RequestData(
         pts[0] = pts[1] + increment;
         newPolys->InsertNextCell(3, pts);
     }
-    this->UpdateProgress (0.755);
+    this->UpdateProgress(0.755);
 
     // South pole connectivity
     for (int i = 1; i < this->ThetaResolution; i++)
@@ -271,7 +275,7 @@ int vtkCapsuleSource::RequestData(
         pts[1] = pts[0] + increment;
         newPolys->InsertNextCell(3, pts);
     }
-    this->UpdateProgress (0.9);
+    this->UpdateProgress(0.9);
 
     // Both half sphere at the same time, connectivity of the band.
     vtkIdType ptsOtherSide[4];
@@ -324,7 +328,7 @@ int vtkCapsuleSource::RequestData(
     ConnectCylinderSide(newPolys,
     southPoleMinusId, southPolePlusId, -1,
     increment, this->LatLongTessellation);
-    this->UpdateProgress (0.99);
+    this->UpdateProgress(0.99);
 
     // Weird south pole minus face case
     pts[0] = northPoleMinusId + increment;
@@ -382,7 +386,8 @@ int vtkCapsuleSource::RequestData(
 }
 
 //----------------------------------------------------------------------------
-void vtkCapsuleSource::PrintSelf(ostream& os, vtkIndent indent)
+void
+vtkCapsuleSource::PrintSelf(ostream& os, vtkIndent indent)
 {
     this->Superclass::PrintSelf(os, indent);
 
@@ -397,10 +402,11 @@ void vtkCapsuleSource::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-int vtkCapsuleSource::RequestInformation(
-    vtkInformation *vtkNotUsed(request),
-    vtkInformationVector **vtkNotUsed(inputVector),
-    vtkInformationVector *outputVector)
+int
+vtkCapsuleSource::RequestInformation(
+    vtkInformation*        vtkNotUsed(request),
+    vtkInformationVector** vtkNotUsed(inputVector),
+    vtkInformationVector*  outputVector)
 {
     // get the info object
     /*vtkInformation *outInfo = outputVector->GetInformationObject(0);

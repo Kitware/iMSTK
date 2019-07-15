@@ -43,7 +43,7 @@ stdSink::GetColor(const LEVELS level) const
 void
 stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 {
-    auto level = logEntry.get()._level;
+    auto level   = logEntry.get()._level;
     auto message = logEntry.get().message();
 
 #ifndef WIN32
@@ -66,9 +66,9 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 void
 LogUtility::createLogger(std::string name, std::string path)
 {
-    m_g3logWorker = g3::LogWorker::createLogWorker();
+    m_g3logWorker    = g3::LogWorker::createLogWorker();
     m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path);
-    m_stdSinkHandle = m_g3logWorker->addSink(
+    m_stdSinkHandle  = m_g3logWorker->addSink(
         std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage);
     g3::initializeLogging(m_g3logWorker.get());
 }

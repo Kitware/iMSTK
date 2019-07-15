@@ -73,8 +73,8 @@ Cylinder::setRadius(const double r)
     {
         return;
     }
-    m_radius = r;
-    m_dataModified = true;
+    m_radius           = r;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -90,8 +90,8 @@ Cylinder::setLength(const double l)
     {
         return;
     }
-    m_length = l;
-    m_dataModified = true;
+    m_length           = l;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -112,6 +112,6 @@ Cylinder::updatePostTransformData()
     AnalyticalGeometry::updatePostTransformData();
     m_radiusPostTransform = m_scaling * m_radius;
     m_lengthPostTransform = m_scaling * m_length;
-    m_transformApplied = true;
+    m_transformApplied    = true;
 }
 } // imstk

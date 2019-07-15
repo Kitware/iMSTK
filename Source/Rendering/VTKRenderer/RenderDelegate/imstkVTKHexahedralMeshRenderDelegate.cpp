@@ -40,7 +40,7 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
 
     // Map vertices
     StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double* vertData = reinterpret_cast<double*>(vertices.data());
+    double*           vertData = reinterpret_cast<double*>(vertices.data());
     m_mappedVertexArray->SetNumberOfComponents(3);
     m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
 
@@ -50,9 +50,9 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     points->SetData(m_mappedVertexArray);
 
     // Copy cells
-    auto cells = vtkSmartPointer<vtkCellArray>::New();
+    auto      cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[8];
-    for (const auto &t : geometry->getHexahedraVertices())
+    for (const auto& t : geometry->getHexahedraVertices())
     {
         for (size_t i = 0; i < 8; ++i)
         {

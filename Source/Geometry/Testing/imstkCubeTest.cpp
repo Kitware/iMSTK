@@ -63,7 +63,8 @@ TEST_F(imstkCubeTest, GetVolume)
     EXPECT_EQ(m_cube.getVolume(), w * w * w);
 }
 
-int imstkCubeTest(int argc, char* argv[])
+int
+imstkCubeTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

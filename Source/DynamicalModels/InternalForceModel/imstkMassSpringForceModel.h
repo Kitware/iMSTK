@@ -66,6 +66,6 @@ public:
 
 protected:
     std::shared_ptr<vega::MassSpringSystem> m_massSpringSystem;// Need to be initialized
-    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
+    std::shared_ptr<vega::SparseMatrix>     m_vegaTangentStiffnessMatrix;
 };
 } // imstk

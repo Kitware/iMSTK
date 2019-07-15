@@ -81,7 +81,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Geometry(Type type) : m_type(type){}
+    Geometry(Type type) : m_type(type) {}
 
     ///
     /// \brief Destructor
@@ -101,7 +101,7 @@ public:
     ///
     /// \brief Translate the geometry in Cartesian space
     ///
-    void translate(const Vec3d& t,
+    void translate(const Vec3d&  t,
                    TransformType type = TransformType::ConcatenateToTransform);
     void translate(double x, double y, double z,
                    TransformType type = TransformType::ConcatenateToTransform);
@@ -109,9 +109,9 @@ public:
     ///
     /// \brief Rotate the geometry in Cartesian space
     ///
-    void rotate(const Quatd& q,
+    void rotate(const Quatd&  q,
                 TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Mat3d& m,
+    void rotate(const Mat3d&  m,
                 TransformType type = TransformType::ConcatenateToTransform);
     void rotate(const Vec3d& axis, double angle,
                 TransformType type = TransformType::ConcatenateToTransform);
@@ -119,14 +119,14 @@ public:
     ///
     /// \brief Scale in Cartesian directions
     ///
-    void scale(double scaling,
+    void scale(double        scaling,
                TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Applies a rigid transform to the geometry
     ///
     void transform(RigidTransform3d T,
-                   TransformType type = TransformType::ConcatenateToTransform);
+                   TransformType    type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Get/Set translation
@@ -174,17 +174,17 @@ protected:
     friend class VulkanRenderer;
 
     virtual void applyTranslation(const Vec3d t) = 0;
-    virtual void applyRotation(const Mat3d r) = 0;
-    virtual void applyScaling(const double s) = 0;
-    virtual void updatePostTransformData() = 0;
+    virtual void applyRotation(const Mat3d r)    = 0;
+    virtual void applyScaling(const double s)    = 0;
+    virtual void updatePostTransformData()       = 0;
 
     Type m_type; ///> Geometry type
 
-    bool m_dataModified = false;
+    bool m_dataModified      = false;
     bool m_transformModified = false;
-    bool m_transformApplied = true;
+    bool m_transformApplied  = true;
 
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transform
-    double m_scaling = 1.0;
+    double           m_scaling   = 1.0;
 };
 } //imstk

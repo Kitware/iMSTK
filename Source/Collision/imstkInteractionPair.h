@@ -49,15 +49,15 @@ public:
     ///
     InteractionPair(std::shared_ptr<CollidingObject> A,
                     std::shared_ptr<CollidingObject> B,
-                    CollisionDetection::Type CDType,
-                    CollisionHandling::Type CHAType,
-                    CollisionHandling::Type CHBType);
+                    CollisionDetection::Type         CDType,
+                    CollisionHandling::Type          CHAType,
+                    CollisionHandling::Type          CHBType);
 
-    InteractionPair(std::shared_ptr<CollidingObject> A,
-                    std::shared_ptr<CollidingObject> B,
+    InteractionPair(std::shared_ptr<CollidingObject>    A,
+                    std::shared_ptr<CollidingObject>    B,
                     std::shared_ptr<CollisionDetection> CD,
-                    std::shared_ptr<CollisionHandling> CHA,
-                    std::shared_ptr<CollisionHandling> CHB);
+                    std::shared_ptr<CollisionHandling>  CHA,
+                    std::shared_ptr<CollisionHandling>  CHB);
 
     ///
     /// \brief Destructor
@@ -101,11 +101,11 @@ public:
 
 protected:
 
-    ObjectsPair m_objects;                             ///< Colliding objects
-    std::shared_ptr<CollisionDetection> m_colDetect;   ///< Collision detection algorithm
-    std::shared_ptr<CollisionData> m_colData;                               ///< Common Collision Data
-    std::shared_ptr<CollisionHandling> m_colHandlingA; ///< Collision handling algorithm for A
-    std::shared_ptr<CollisionHandling> m_colHandlingB; ///< Collision handling algorithm for B
+    ObjectsPair m_objects;                              ///< Colliding objects
+    std::shared_ptr<CollisionDetection> m_colDetect;    ///< Collision detection algorithm
+    std::shared_ptr<CollisionData>      m_colData;      ///< Common Collision Data
+    std::shared_ptr<CollisionHandling>  m_colHandlingA; ///< Collision handling algorithm for A
+    std::shared_ptr<CollisionHandling>  m_colHandlingB; ///< Collision handling algorithm for B
 
     bool m_valid;
 };

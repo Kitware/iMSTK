@@ -26,13 +26,14 @@
 namespace imstk
 {
 DirectLinearSolver<Matrixd>::
-DirectLinearSolver(const Matrixd &matrix, const Vectord &b)
+DirectLinearSolver(const Matrixd& matrix, const Vectord& b)
 {
     m_linearSystem = std::make_shared<LinearSystem<Matrixd>>(matrix, b);
     m_solver.compute(matrix);
 }
 
-void DirectLinearSolver<Matrixd>::
+void
+DirectLinearSolver<Matrixd>::
 setSystem(std::shared_ptr<LinearSystem<Matrixd>> newSystem)
 {
     LinearSolver<Matrixd>::setSystem(newSystem);
@@ -40,13 +41,14 @@ setSystem(std::shared_ptr<LinearSystem<Matrixd>> newSystem)
 }
 
 DirectLinearSolver<SparseMatrixd>::
-DirectLinearSolver(const SparseMatrixd &matrix, const Vectord &b)
+DirectLinearSolver(const SparseMatrixd& matrix, const Vectord& b)
 {
     m_linearSystem = std::make_shared<LinearSystem<SparseMatrixd>>(matrix, b);
     m_solver.compute(matrix);
 }
 
-void DirectLinearSolver<SparseMatrixd>::
+void
+DirectLinearSolver<SparseMatrixd>::
 setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 {
     LinearSolver<SparseMatrixd>::setSystem(newSystem);
@@ -54,13 +56,13 @@ setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 }
 
 void
-DirectLinearSolver<SparseMatrixd>::solve(const Vectord &rhs, Vectord &x)
+DirectLinearSolver<SparseMatrixd>::solve(const Vectord& rhs, Vectord& x)
 {
     x = m_solver.solve(rhs);
 }
 
 void
-DirectLinearSolver<SparseMatrixd>::solve(Vectord &x)
+DirectLinearSolver<SparseMatrixd>::solve(Vectord& x)
 {
     if (!m_linearSystem)
     {
@@ -74,13 +76,13 @@ DirectLinearSolver<SparseMatrixd>::solve(Vectord &x)
 }
 
 void
-DirectLinearSolver<Matrixd>::solve(const Vectord &rhs, Vectord &x)
+DirectLinearSolver<Matrixd>::solve(const Vectord& rhs, Vectord& x)
 {
     x = m_solver.solve(rhs);
 }
 
 void
-DirectLinearSolver<Matrixd>::solve(Vectord &x)
+DirectLinearSolver<Matrixd>::solve(Vectord& x)
 {
     if (!m_linearSystem)
     {

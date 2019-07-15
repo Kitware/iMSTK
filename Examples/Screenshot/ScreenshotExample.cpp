@@ -29,10 +29,11 @@ using namespace imstk;
 ///
 /// \brief This example demonstrates how to capture the screenshot
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk       = std::make_shared<SimulationManager>();
     auto sceneTest = sdk->createNewScene("ScreenShotUtility");
 
     // Plane

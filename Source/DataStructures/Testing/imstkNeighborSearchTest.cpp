@@ -37,12 +37,13 @@ using namespace imstk;
 ///
 /// \brief Advance particle positions
 ///
-void advancePositions(StdVectorOfVec3r& particles)
+void
+advancePositions(StdVectorOfVec3r& particles)
 {
     for (auto& pos: particles)
     {
         Vec3r pc  = pos - SPHERE_CENTER;
-        Real mag = pc.norm() * STEP;
+        Real  mag = pc.norm() * STEP;
         pos = SPHERE_CENTER + pc.normalized() * mag;
     }
 }
@@ -50,7 +51,8 @@ void advancePositions(StdVectorOfVec3r& particles)
 ///
 /// \brief Search neighbors using brute-force approach
 ///
-void neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
+void
+neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -82,10 +84,11 @@ void neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vect
 ///
 /// \brief Search neighbors using grid-based approach
 ///
-void neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
+void
+neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
-    const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
+    const Real                     radius = Real(4.000000000000001) * PARTICLE_RADIUS;
     static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, particles);
@@ -94,7 +97,8 @@ void neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vecto
 ///
 /// \brief Search neighbors using spatial hashing approach
 ///
-void neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
+void
+neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
     for (auto& list : neighbors)
@@ -102,7 +106,7 @@ void neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::
         list.resize(0);
     }
 
-    const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
+    const Real                              radius = Real(4.000000000000001) * PARTICLE_RADIUS;
     static SpatialHashTableSeparateChaining hashTable;
 
     hashTable.clear();
@@ -119,7 +123,8 @@ void neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::
 ///
 /// \brief For each particle in setA, search neighbors in setB using brute-force approach
 ///
-void neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
+void
+neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -146,10 +151,11 @@ void neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, st
 ///
 /// \brief For each particle in setA, search neighbors in setB using grid-based approach
 ///
-void neighborSearchGridBased(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
+void
+neighborSearchGridBased(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
-    const Real radius = Real(4.000000000000001) * PARTICLE_RADIUS;
+    const Real                     radius = Real(4.000000000000001) * PARTICLE_RADIUS;
     static GridBasedNeighborSearch gridSearch;
     gridSearch.setSearchRadius(radius);
     gridSearch.getNeighbors(neighbors, setA, setB);
@@ -158,7 +164,8 @@ void neighborSearchGridBased(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std
 ///
 /// \brief Verify if two neighbor search results are identical
 ///
-bool verify(std::vector<std::vector<size_t>>& neighbors1, std::vector<std::vector<size_t>>& neighbors2)
+bool
+verify(std::vector<std::vector<size_t>>& neighbors1, std::vector<std::vector<size_t>>& neighbors2)
 {
     if (neighbors1.size() != neighbors2.size())
     {
@@ -201,10 +208,10 @@ class dummyClass : public ::testing::Test
 ///
 TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
 {
-    const Vec3r sphereCenter   = SPHERE_CENTER;
-    const auto sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto spacing         = Real(2) * PARTICLE_RADIUS;
-    const int N                = int(2 * SPHERE_RADIUS / spacing);
+    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
+    const auto  spacing         = Real(2) * PARTICLE_RADIUS;
+    const int   N               = int(2 * SPHERE_RADIUS / spacing);
 
     StdVectorOfVec3r particles;
     particles.reserve(N * N * N);
@@ -247,10 +254,10 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
 ///
 TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
 {
-    const Vec3r sphereCenter   = SPHERE_CENTER;
-    const auto sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto spacing         = Real(2) * PARTICLE_RADIUS;
-    const int N                = int(2 * SPHERE_RADIUS / spacing);
+    const Vec3r sphereCenter    = SPHERE_CENTER;
+    const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
+    const auto  spacing         = Real(2) * PARTICLE_RADIUS;
+    const int   N               = int(2 * SPHERE_RADIUS / spacing);
 
     StdVectorOfVec3r particles;
     particles.reserve(N * N * N);
@@ -272,8 +279,8 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         }
     }
 
-    StdVectorOfVec3r setA;
-    StdVectorOfVec3r setB;
+    StdVectorOfVec3r                 setA;
+    StdVectorOfVec3r                 setB;
     std::vector<std::vector<size_t>> neighbors0;
     std::vector<std::vector<size_t>> neighbors1;
 
@@ -304,7 +311,8 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
     }
 }
 
-int imstkNeighborSearchTest(int argc, char* argv[])
+int
+imstkNeighborSearchTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

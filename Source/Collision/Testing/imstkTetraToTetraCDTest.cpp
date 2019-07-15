@@ -34,12 +34,13 @@ using namespace imstk;
 class imstkTetraToTetraCDTest : public ::testing::Test
 {
 protected:
-    TetraToTetraCD *m_CD;
+    TetraToTetraCD* m_CD;
 };
 
-std::shared_ptr<TetrahedralMesh> loadMesh(std::string externalDataSuffix)
+std::shared_ptr<TetrahedralMesh>
+loadMesh(std::string externalDataSuffix)
 {
-    std::string file = iMSTK_DATA_ROOT + externalDataSuffix;
+    std::string                      file = iMSTK_DATA_ROOT + externalDataSuffix;
     std::shared_ptr<TetrahedralMesh> volMesh
         = std::static_pointer_cast<TetrahedralMesh>(imstk::MeshIO::read(file));
     if (!volMesh)
@@ -49,7 +50,8 @@ std::shared_ptr<TetrahedralMesh> loadMesh(std::string externalDataSuffix)
     return volMesh;
 }
 
-std::shared_ptr<TetrahedralMesh> duplicate(std::shared_ptr<TetrahedralMesh> mesh)
+std::shared_ptr<TetrahedralMesh>
+duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 {
     return std::make_shared<TetrahedralMesh>(*mesh.get());
 }
@@ -57,7 +59,7 @@ std::shared_ptr<TetrahedralMesh> duplicate(std::shared_ptr<TetrahedralMesh> mesh
 TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
-    auto b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
+    auto                             b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
 
     auto cd = std::make_shared<CollisionData>();
 
@@ -73,7 +75,7 @@ TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/oneTet/oneTet.veg");
-    auto b = duplicate(a);
+    auto                             b = duplicate(a);
 
     b->translateVertices(imstk::Vec3d(0.0, 1.0, 2.5));
 
@@ -107,7 +109,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
-    auto b = duplicate(a);
+    auto                             b = duplicate(a);
 
     b->translateVertices(imstk::Vec3d(16.0, 0.0, 1.0));
 
@@ -156,7 +158,8 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
     EXPECT_EQ(cd->PTColData.size(), 595);
 }
 
-int imstkTetraToTetraCDTest(int argc, char* argv[])
+int
+imstkTetraToTetraCDTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

@@ -61,8 +61,8 @@ Sphere::setRadius(const double r)
     {
         return;
     }
-    m_radius = r;
-    m_dataModified = true;
+    m_radius           = r;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -81,6 +81,6 @@ Sphere::updatePostTransformData()
     }
     AnalyticalGeometry::updatePostTransformData();
     m_radiusPostTransform = m_scaling * m_radius;
-    m_transformApplied = true;
+    m_transformApplied    = true;
 }
 } // imstk

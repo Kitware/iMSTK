@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Initialize the tetrahedral FEM constraint
     ///
-    bool initConstraint(PbdModel &model,
+    bool initConstraint(PbdModel& model,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4);
 

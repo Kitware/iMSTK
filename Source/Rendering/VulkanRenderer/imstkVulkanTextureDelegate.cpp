@@ -24,12 +24,12 @@
 namespace imstk
 {
 VulkanTextureDelegate::VulkanTextureDelegate(
-    VulkanMemoryManager& memoryManager,
+    VulkanMemoryManager&     memoryManager,
     std::shared_ptr<Texture> texture,
-    float anisotropyAmount)
+    float                    anisotropyAmount)
 {
-    m_path = texture->getPath();
-    m_type = texture->getType();
+    m_path     = texture->getPath();
+    m_type     = texture->getType();
     m_fileType = texture->getFileType();
 
     // Load textures and get texture information
@@ -39,7 +39,7 @@ VulkanTextureDelegate::VulkanTextureDelegate(
         m_arrayLayers = 6;
         this->loadCubemapTexture(memoryManager);
         m_imageInfo.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
-        m_isCubemap = true;
+        m_isCubemap       = true;
     }
     else
     {
@@ -73,22 +73,22 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     m_imageInfo.imageType = VK_IMAGE_TYPE_2D;
     m_imageInfo.extent = { m_width, m_height, 1 };
     m_imageInfo.mipLevels = m_mipLevels;
-    m_imageInfo.arrayLayers = m_arrayLayers;
-    m_imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    m_imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    m_imageInfo.usage = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    m_imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    m_imageInfo.arrayLayers           = m_arrayLayers;
+    m_imageInfo.samples               = VK_SAMPLE_COUNT_1_BIT;
+    m_imageInfo.tiling                = VK_IMAGE_TILING_OPTIMAL;
+    m_imageInfo.usage                 = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    m_imageInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
     m_imageInfo.queueFamilyIndexCount = 1;
-    m_imageInfo.pQueueFamilyIndices = &memoryManager.m_queueFamilyIndex;
-    m_imageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
+    m_imageInfo.pQueueFamilyIndices   = &memoryManager.m_queueFamilyIndex;
+    m_imageInfo.initialLayout         = VK_IMAGE_LAYOUT_PREINITIALIZED;
 
     m_image = memoryManager.requestImage(memoryManager.m_device, m_imageInfo, VulkanMemoryType::TEXTURE);
 
-    m_range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    m_range.baseMipLevel = 0;
-    m_range.levelCount = m_mipLevels;
+    m_range.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+    m_range.baseMipLevel   = 0;
+    m_range.levelCount     = m_mipLevels;
     m_range.baseArrayLayer = 0;
-    m_range.layerCount = m_arrayLayers;
+    m_range.layerCount     = m_arrayLayers;
 
     if (m_isCubemap)
     {
@@ -120,8 +120,8 @@ VulkanTextureDelegate::VulkanTextureDelegate(
         imageViewInfo.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
     }
 
-    imageViewInfo.format = m_imageInfo.format;
-    imageViewInfo.components = mapping;
+    imageViewInfo.format           = m_imageInfo.format;
+    imageViewInfo.components       = mapping;
     imageViewInfo.subresourceRange = m_range;
 
     vkCreateImageView(memoryManager.m_device, &imageViewInfo, nullptr, &m_imageView);
@@ -132,18 +132,18 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     samplerInfo.flags = 0;
     samplerInfo.magFilter = VK_FILTER_LINEAR;
     samplerInfo.minFilter = VK_FILTER_LINEAR;
-    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR; // Trilinear interpolation
+    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;              // Trilinear interpolation
     samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.mipLodBias = 0.0;
-    samplerInfo.anisotropyEnable = anisotropyAmount == 0.0f ? VK_FALSE : VK_TRUE; // TODO:: add option to enable
-    samplerInfo.maxAnisotropy = anisotropyAmount;
-    samplerInfo.compareEnable = VK_FALSE;
-    samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-    samplerInfo.minLod = 0;
-    samplerInfo.maxLod = m_mipLevels - 1;
-    samplerInfo.borderColor = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+    samplerInfo.anisotropyEnable        = anisotropyAmount == 0.0f ? VK_FALSE : VK_TRUE; // TODO:: add option to enable
+    samplerInfo.maxAnisotropy           = anisotropyAmount;
+    samplerInfo.compareEnable           = VK_FALSE;
+    samplerInfo.compareOp               = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.minLod                  = 0;
+    samplerInfo.maxLod                  = m_mipLevels - 1;
+    samplerInfo.borderColor             = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
     vkCreateSampler(memoryManager.m_device, &samplerInfo, nullptr, &m_sampler);
@@ -159,17 +159,17 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         (*data)[1] = '\255';
         (*data)[2] = '\255';
         (*data)[3] = '\255';
-        m_width = 1;
-        m_height = 1;
+        m_width    = 1;
+        m_height   = 1;
         m_channels = 1;
-        m_data = &(*data)[0];
-        m_format = VK_FORMAT_B8G8R8A8_UNORM;
+        m_data     = &(*data)[0];
+        m_format   = VK_FORMAT_B8G8R8A8_UNORM;
     }
     else if (m_path == "noise")
     {
         auto data = new std::vector<unsigned char>(128 * 128 * 4);
-        m_width = 128;
-        m_height = 128;
+        m_width    = 128;
+        m_height   = 128;
         m_channels = 4;
         for (int x = 0; x < 128; x++)
         {
@@ -183,7 +183,7 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
             }
         }
 
-        m_data = &(*data)[0];
+        m_data   = &(*data)[0];
         m_format = VK_FORMAT_B8G8R8A8_UNORM;
     }
     else
@@ -194,8 +194,8 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         {
             m_compressedTexture = gli::load(m_path);
             m_compressedTexture = gli::flip(m_compressedTexture);
-            m_format = (VkFormat)(m_compressedTexture.format());
-            m_isDataFormatted = true;
+            m_format            = (VkFormat)(m_compressedTexture.format());
+            m_isDataFormatted   = true;
 
             // Convert to SRGB for linear color space conversion
             if (m_type == Texture::Type::DIFFUSE)
@@ -223,12 +223,12 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
             }
 
             m_channels = this->getNumChannels(m_format);
-            m_data = (unsigned char *)m_compressedTexture.data();
+            m_data     = (unsigned char*)m_compressedTexture.data();
 
-            m_width = m_compressedTexture.extent().x;
-            m_height = m_compressedTexture.extent().y;
-            m_mipLevels = (uint32_t)m_compressedTexture.levels();     // Load mip levels
-            m_loadMipMaps = m_mipLevels != 1 ? true : false;
+            m_width        = m_compressedTexture.extent().x;
+            m_height       = m_compressedTexture.extent().y;
+            m_mipLevels    = (uint32_t)m_compressedTexture.levels();  // Load mip levels
+            m_loadMipMaps  = m_mipLevels != 1 ? true : false;
             m_isCompressed = gli::is_compressed(m_compressedTexture.format());
         }
         break;
@@ -237,16 +237,16 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         case Texture::FileType::BMP:
         {
             auto readerGenerator = vtkSmartPointer<vtkImageReader2Factory>::New();
-            auto reader = readerGenerator->CreateImageReader2(m_path.c_str());
+            auto reader          = readerGenerator->CreateImageReader2(m_path.c_str());
 
             reader->SetFileName(m_path.c_str());
             reader->Update();
 
             auto data = reader->GetOutput();
-            m_width = data->GetDimensions()[0];
-            m_height = data->GetDimensions()[1];
+            m_width    = data->GetDimensions()[0];
+            m_height   = data->GetDimensions()[1];
             m_channels = reader->GetNumberOfScalarComponents();
-            m_data = (unsigned char *)data->GetScalarPointer();
+            m_data     = (unsigned char*)data->GetScalarPointer();
 
             // Format determines optimizations
             switch (m_type)
@@ -277,18 +277,18 @@ VulkanTextureDelegate::loadCubemapTexture(VulkanMemoryManager& memoryManager)
     {
         m_cubemap = gli::texture_cube(gli::load(m_path));
 
-        m_width = m_cubemap.extent().x;
-        m_height = m_cubemap.extent().y;
+        m_width     = m_cubemap.extent().x;
+        m_height    = m_cubemap.extent().y;
         m_mipLevels = (uint32_t)m_cubemap.levels();
-        m_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        m_format    = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
     else
     {
-        m_cubemap = gli::texture_cube(gli::format::FORMAT_RGBA32_SFLOAT_PACK32, gli::extent2d(1, 1), 1);
-        m_width = 1;
-        m_height = 1;
+        m_cubemap   = gli::texture_cube(gli::format::FORMAT_RGBA32_SFLOAT_PACK32, gli::extent2d(1, 1), 1);
+        m_width     = 1;
+        m_height    = 1;
         m_mipLevels = 1;
-        m_format = VK_FORMAT_R32G32B32A32_SFLOAT;
+        m_format    = VK_FORMAT_R32G32B32A32_SFLOAT;
     }
 }
 
@@ -312,9 +312,9 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     stagingBufferInfo.flags = 0;
     stagingBufferInfo.size = imageSize;
     stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    stagingBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
     stagingBufferInfo.queueFamilyIndexCount = 0;
-    stagingBufferInfo.pQueueFamilyIndices = nullptr;
+    stagingBufferInfo.pQueueFamilyIndices   = nullptr;
 
     m_stagingBuffer = memoryManager.requestBuffer(memoryManager.m_device,
         stagingBufferInfo,
@@ -323,7 +323,7 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
 
     auto imageEditData = (unsigned char*)m_stagingBuffer->getMemoryData(memoryManager.m_device);
 
-    unsigned int y_offset = 0;
+    unsigned int y_offset      = 0;
     unsigned int totalChannels = this->getNumChannels(m_format);
     unsigned int colorChannels = std::min(std::min(m_channels, 3u), totalChannels);
 
@@ -369,24 +369,24 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     vkBeginCommandBuffer(*memoryManager.m_transferCommandBuffer, &commandBufferBeginInfo);
 
     VkImageSubresourceLayers layersDestination;
-    layersDestination.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    layersDestination.mipLevel = 0;
+    layersDestination.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+    layersDestination.mipLevel       = 0;
     layersDestination.baseArrayLayer = 0;
-    layersDestination.layerCount = 1;
+    layersDestination.layerCount     = 1;
 
     VkBufferImageCopy copyInfo;
-    copyInfo.bufferOffset = m_stagingBuffer->getOffset();
-    copyInfo.bufferRowLength = m_width;
+    copyInfo.bufferOffset      = m_stagingBuffer->getOffset();
+    copyInfo.bufferRowLength   = m_width;
     copyInfo.bufferImageHeight = m_height;
-    copyInfo.imageSubresource = layersDestination;
-    copyInfo.imageOffset = { 0, 0, 0 };
-    copyInfo.imageExtent = { m_width, m_height, 1 };
+    copyInfo.imageSubresource  = layersDestination;
+    copyInfo.imageOffset       = { 0, 0, 0 };
+    copyInfo.imageExtent       = { m_width, m_height, 1 };
 
     if (m_isCompressed || m_loadMipMaps)
     {
         std::vector<VkBufferImageCopy> copyInfos(m_mipLevels);
-        VkDeviceSize currentOffset = m_stagingBuffer->getOffset();
-        glm::ivec3 blockSize = gli::block_extent(m_compressedTexture.format());
+        VkDeviceSize                   currentOffset = m_stagingBuffer->getOffset();
+        glm::ivec3                     blockSize     = gli::block_extent(m_compressedTexture.format());
 
         for (uint32_t i = 0; i < m_mipLevels; i++)
         {
@@ -400,11 +400,11 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
             }
 
             copyInfos[i] = copyInfo;
-            copyInfos[i].bufferRowLength = dimensions.x;
-            copyInfos[i].bufferImageHeight = dimensions.y;
+            copyInfos[i].bufferRowLength           = dimensions.x;
+            copyInfos[i].bufferImageHeight         = dimensions.y;
             copyInfos[i].imageSubresource.mipLevel = i;
             copyInfos[i].bufferOffset = currentOffset;
-            copyInfos[i].imageExtent = { (uint32_t)dimensions.x, (uint32_t)dimensions.y, 1 };
+            copyInfos[i].imageExtent  = { (uint32_t)dimensions.x, (uint32_t)dimensions.y, 1 };
             currentOffset += m_compressedTexture.size(i);
         }
 
@@ -440,16 +440,16 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     VkCommandBuffer commandBuffers[] = { *memoryManager.m_transferCommandBuffer };
 
     VkPipelineStageFlags stageWaitFlags = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-    VkSubmitInfo submitInfo[1];
+    VkSubmitInfo         submitInfo[1];
     submitInfo[0].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo[0].pNext = nullptr;
-    submitInfo[0].waitSemaphoreCount = 0;
-    submitInfo[0].pWaitSemaphores = nullptr;
-    submitInfo[0].pWaitDstStageMask = &stageWaitFlags;
-    submitInfo[0].commandBufferCount = 1;
-    submitInfo[0].pCommandBuffers = commandBuffers;
+    submitInfo[0].waitSemaphoreCount   = 0;
+    submitInfo[0].pWaitSemaphores      = nullptr;
+    submitInfo[0].pWaitDstStageMask    = &stageWaitFlags;
+    submitInfo[0].commandBufferCount   = 1;
+    submitInfo[0].pCommandBuffers      = commandBuffers;
     submitInfo[0].signalSemaphoreCount = 0;
-    submitInfo[0].pSignalSemaphores = nullptr;
+    submitInfo[0].pSignalSemaphores    = nullptr;
 
     vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, VK_NULL_HANDLE);
     vkDeviceWaitIdle(memoryManager.m_device);
@@ -467,9 +467,9 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
     stagingBufferInfo.flags = 0;
     stagingBufferInfo.size = imageSize;
     stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    stagingBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
     stagingBufferInfo.queueFamilyIndexCount = 0;
-    stagingBufferInfo.pQueueFamilyIndices = nullptr;
+    stagingBufferInfo.pQueueFamilyIndices   = nullptr;
 
     m_stagingBuffer = memoryManager.requestBuffer(memoryManager.m_device,
         stagingBufferInfo,
@@ -489,7 +489,7 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
 
     vkBeginCommandBuffer(*memoryManager.m_transferCommandBuffer, &commandBufferBeginInfo);
 
-    std::vector<VkBufferImageCopy> copyInfos(m_mipLevels * m_arrayLayers);
+    std::vector<VkBufferImageCopy> copyInfos(m_mipLevels* m_arrayLayers);
 
     unsigned int currentOffset = 0;
     for (unsigned int layer = 0; layer < m_arrayLayers; layer++)
@@ -497,19 +497,19 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
         for (unsigned int level = 0; level < m_mipLevels; level++)
         {
             VkImageSubresourceLayers layersDestination;
-            layersDestination.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            layersDestination.mipLevel = level;
+            layersDestination.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+            layersDestination.mipLevel       = level;
             layersDestination.baseArrayLayer = layer;
-            layersDestination.layerCount = 1;
+            layersDestination.layerCount     = 1;
 
             unsigned int currentRegion = layer * m_mipLevels + level;
 
-            copyInfos[currentRegion].bufferOffset = currentOffset + m_stagingBuffer->getOffset();
-            copyInfos[currentRegion].bufferRowLength = m_cubemap[layer][level].extent().x;
+            copyInfos[currentRegion].bufferOffset      = currentOffset + m_stagingBuffer->getOffset();
+            copyInfos[currentRegion].bufferRowLength   = m_cubemap[layer][level].extent().x;
             copyInfos[currentRegion].bufferImageHeight = m_cubemap[layer][level].extent().y;
-            copyInfos[currentRegion].imageSubresource = layersDestination;
-            copyInfos[currentRegion].imageOffset = { 0, 0, 0 };
-            copyInfos[currentRegion].imageExtent = {
+            copyInfos[currentRegion].imageSubresource  = layersDestination;
+            copyInfos[currentRegion].imageOffset       = { 0, 0, 0 };
+            copyInfos[currentRegion].imageExtent       = {
                 (uint32_t)m_cubemap[layer][level].extent().x,
                 (uint32_t)m_cubemap[layer][level].extent().y,
                 1
@@ -534,43 +534,43 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
     VkCommandBuffer commandBuffers[] = { *memoryManager.m_transferCommandBuffer };
 
     VkPipelineStageFlags stageWaitFlags = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
-    VkSubmitInfo submitInfo[1];
+    VkSubmitInfo         submitInfo[1];
     submitInfo[0].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo[0].pNext = nullptr;
-    submitInfo[0].waitSemaphoreCount = 0;
-    submitInfo[0].pWaitSemaphores = nullptr;
-    submitInfo[0].pWaitDstStageMask = &stageWaitFlags;
-    submitInfo[0].commandBufferCount = 1;
-    submitInfo[0].pCommandBuffers = commandBuffers;
+    submitInfo[0].waitSemaphoreCount   = 0;
+    submitInfo[0].pWaitSemaphores      = nullptr;
+    submitInfo[0].pWaitDstStageMask    = &stageWaitFlags;
+    submitInfo[0].commandBufferCount   = 1;
+    submitInfo[0].pCommandBuffers      = commandBuffers;
     submitInfo[0].signalSemaphoreCount = 0;
-    submitInfo[0].pSignalSemaphores = nullptr;
+    submitInfo[0].pSignalSemaphores    = nullptr;
 
     vkQueueSubmit(*memoryManager.m_transferQueue, 1, submitInfo, VK_NULL_HANDLE);
     vkDeviceWaitIdle(memoryManager.m_device);
 }
 
 void
-VulkanTextureDelegate::changeImageLayout(VkCommandBuffer& commandBuffer,
-                                         VkImage& image,
-                                         VkImageLayout layout1,
-                                         VkImageLayout layout2,
-                                         VkAccessFlags sourceFlags,
-                                         VkAccessFlags destinationFlags,
+VulkanTextureDelegate::changeImageLayout(VkCommandBuffer&        commandBuffer,
+                                         VkImage&                image,
+                                         VkImageLayout           layout1,
+                                         VkImageLayout           layout2,
+                                         VkAccessFlags           sourceFlags,
+                                         VkAccessFlags           destinationFlags,
                                          VkImageSubresourceRange range)
 {
     VkImageMemoryBarrier layoutChange;
     layoutChange.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
     layoutChange.pNext = nullptr;
-    layoutChange.srcAccessMask = sourceFlags;
-    layoutChange.dstAccessMask = destinationFlags;
-    layoutChange.oldLayout = layout1;
-    layoutChange.newLayout = layout2;
+    layoutChange.srcAccessMask       = sourceFlags;
+    layoutChange.dstAccessMask       = destinationFlags;
+    layoutChange.oldLayout           = layout1;
+    layoutChange.newLayout           = layout2;
     layoutChange.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     layoutChange.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    layoutChange.image = image;
-    layoutChange.subresourceRange = range;
+    layoutChange.image               = image;
+    layoutChange.subresourceRange    = range;
 
-    auto sourceStageFlags = VK_PIPELINE_STAGE_HOST_BIT;
+    auto sourceStageFlags      = VK_PIPELINE_STAGE_HOST_BIT;
     auto destinationStageFlags = VK_PIPELINE_STAGE_HOST_BIT;
 
     if (sourceFlags & (VK_ACCESS_TRANSFER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT))
@@ -609,16 +609,16 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
     for (uint32_t i = 0; i < m_mipLevels - 1; i++)
     {
         VkImageSubresourceLayers sourceLayers;
-        sourceLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        sourceLayers.mipLevel = i;
+        sourceLayers.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        sourceLayers.mipLevel       = i;
         sourceLayers.baseArrayLayer = 0;
-        sourceLayers.layerCount = 1;
+        sourceLayers.layerCount     = 1;
 
         VkImageSubresourceLayers destinationLayers;
-        destinationLayers.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-        destinationLayers.mipLevel = i + 1;
+        destinationLayers.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+        destinationLayers.mipLevel       = i + 1;
         destinationLayers.baseArrayLayer = 0;
-        destinationLayers.layerCount = 1;
+        destinationLayers.layerCount     = 1;
 
         VkOffset3D sourceOffsets[2];
         sourceOffsets[0].x = 0;
@@ -640,15 +640,15 @@ VulkanTextureDelegate::generateMipmaps(VkCommandBuffer& commandBuffer)
 
         VkImageBlit mipFormat;
         mipFormat.srcSubresource = sourceLayers;
-        mipFormat.srcOffsets[0] = sourceOffsets[0];
-        mipFormat.srcOffsets[1] = sourceOffsets[1];
+        mipFormat.srcOffsets[0]  = sourceOffsets[0];
+        mipFormat.srcOffsets[1]  = sourceOffsets[1];
         mipFormat.dstSubresource = destinationLayers;
-        mipFormat.dstOffsets[0] = destinationOffsets[0];
-        mipFormat.dstOffsets[1] = destinationOffsets[1];
+        mipFormat.dstOffsets[0]  = destinationOffsets[0];
+        mipFormat.dstOffsets[1]  = destinationOffsets[1];
 
         VkImageSubresourceRange mipHighRange = m_range;
         mipHighRange.baseMipLevel = i;
-        mipHighRange.levelCount = 1;
+        mipHighRange.levelCount   = 1;
 
         this->changeImageLayout(commandBuffer, *m_image->getImage(),
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
@@ -734,7 +734,7 @@ VulkanTextureDelegate::getDimensionsAlignedToBlockSize(
     for (unsigned int i = 0; i < 3; i++)
     {
         auto remainder = imageSize[i] % blockSize[i];
-        auto division = imageSize[i] / blockSize[i];
+        auto division  = imageSize[i] / blockSize[i];
         dimensions[i] = division * blockSize[i];
 
         if (remainder != 0)
@@ -746,7 +746,7 @@ VulkanTextureDelegate::getDimensionsAlignedToBlockSize(
 }
 
 void
-VulkanTextureDelegate::clear(VkDevice * device)
+VulkanTextureDelegate::clear(VkDevice* device)
 {
     vkDestroyImageView(*device, m_imageView, nullptr);
     vkDestroySampler(*device, m_sampler, nullptr);

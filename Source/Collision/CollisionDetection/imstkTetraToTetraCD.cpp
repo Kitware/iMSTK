@@ -29,7 +29,7 @@ namespace imstk
 {
 TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                                std::shared_ptr<TetrahedralMesh> meshB,
-                               std::shared_ptr<CollisionData> colData) :
+                               std::shared_ptr<CollisionData>   colData) :
     CollisionDetection(CollisionDetection::Type::MeshToMesh, colData), //is TetrahedralMeshToTetrahedralMesh type needed?
     m_meshA(meshA),
     m_meshB(meshB)
@@ -39,7 +39,7 @@ TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
 void
 TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<TetrahedralMesh> mesh, size_t idOffset)
 {
-    const auto eps = VERY_SMALL_EPSILON;
+    const auto   eps  = VERY_SMALL_EPSILON;
     const double eps2 = 1e-10;
 
     //tetrahedron belonging part of penetration type does not change
@@ -68,10 +68,10 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                 for (size_t vId : collP)
                 {
                     //vertex does not belong to this tetrahedron
-                    if (vId != vInd[0] &&
-                        vId != vInd[1] &&
-                        vId != vInd[2] &&
-                        vId != vInd[3])
+                    if (vId != vInd[0]
+                        && vId != vInd[1]
+                        && vId != vInd[2]
+                        && vId != vInd[3])
                     {
                         //this determines vertex belonging part of the penetration type and gets vertex position
                         Vec3d vPos;
@@ -89,10 +89,10 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
 
                         TetrahedralMesh::WeightsArray bCoord; //barycentric coordinates of the vertex in tetrahedron
                         mesh->computeBarycentricWeights(tId, vPos, bCoord);
-                        if (bCoord[0] >= -eps &&
-                            bCoord[1] >= -eps &&
-                            bCoord[2] >= -eps &&
-                            bCoord[3] >= -eps)
+                        if (bCoord[0] >= -eps
+                            && bCoord[1] >= -eps
+                            && bCoord[2] >= -eps
+                            && bCoord[3] >= -eps)
                         {
                             auto coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
                             assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
@@ -102,7 +102,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                             lock.unlock();
                         }
                     } //if not this tetrahedron
-                } //for vertices
+                }     //for vertices
             }
     }); //for tetrahedra
 }

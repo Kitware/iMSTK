@@ -124,12 +124,12 @@ protected:
     ///
     /// \brief Initializes the framebuffer
     ///
-    void initializeFramebuffers(VkSwapchainKHR * swapchain);
+    void initializeFramebuffers(VkSwapchainKHR* swapchain);
 
     ///
     /// \brief Initializes framebuffer images
     ///
-    void initializeFramebufferImages(VkSwapchainKHR * swapchain);
+    void initializeFramebufferImages(VkSwapchainKHR* swapchain);
 
     ///
     /// \brief Deletes the framebuffer
@@ -139,7 +139,7 @@ protected:
     ///
     /// \brief Initializes the framebuffer
     ///
-    void resizeFramebuffers(VkSwapchainKHR * swapchain, int width, int height);
+    void resizeFramebuffers(VkSwapchainKHR* swapchain, int width, int height);
 
     ///
     /// \brief Renders the frame
@@ -178,7 +178,7 @@ protected:
 
     /// \brief Update background colors
     ///
-    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) {};
+    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) {}
 
 protected:
     friend class VulkanViewer;
@@ -202,12 +202,12 @@ protected:
     ///
     std::shared_ptr<VulkanRenderDelegate> loadVisualModel(
         std::shared_ptr<VisualModel> visualModel,
-        SceneObject::Type type);
+        SceneObject::Type            type);
 
     ///
     /// \brief Sets some command buffer state
     ///
-    void setCommandBufferState(VkCommandBuffer * commandBuffer, uint32_t width, uint32_t height);
+    void setCommandBufferState(VkCommandBuffer* commandBuffer, uint32_t width, uint32_t height);
 
     ///
     /// \brief Sets up GUI
@@ -217,40 +217,40 @@ protected:
     ///
     /// \brief Initialize images to correct layout
     ///
-    void initializeFramebufferAttachments(VkCommandBuffer * commandBuffer);
+    void initializeFramebufferAttachments(VkCommandBuffer* commandBuffer);
 
-    unsigned int m_width = 2000;
-    unsigned int m_height = 1600;
-    unsigned int m_windowWidth = 1000;
+    unsigned int m_width        = 2000;
+    unsigned int m_height       = 1600;
+    unsigned int m_windowWidth  = 1000;
     unsigned int m_windowHeight = 800;
-    float m_fov = PI;
-    float m_nearPlane = 0.01;
-    float m_farPlane = 1000;
+    float        m_fov          = PI;
+    float        m_nearPlane    = 0.01;
+    float        m_farPlane     = 1000;
 
     VulkanRendererConstants m_constants;
 
     std::vector<std::string> m_extensions;
-    std::vector<const char *> m_layers;
+    std::vector<const char*> m_layers;
 
     std::shared_ptr<Scene> m_scene = nullptr;
 
-    VkInstance * m_instance = nullptr;
+    VkInstance* m_instance = nullptr;
     VkDebugReportCallbackEXT m_debugReportCallback;
 
-    uint32_t m_physicalDeviceCount = 0;
-    VkPhysicalDevice * m_physicalDevices = nullptr;
-    VkPhysicalDevice m_renderPhysicalDevice;
+    uint32_t          m_physicalDeviceCount = 0;
+    VkPhysicalDevice* m_physicalDevices     = nullptr;
+    VkPhysicalDevice  m_renderPhysicalDevice;
 
-    uint32_t m_deviceCount = 0;
-    VkDevice * m_devices = nullptr;
+    uint32_t  m_deviceCount = 0;
+    VkDevice* m_devices     = nullptr;
     VkPhysicalDeviceLimits m_deviceLimits;
-    float m_anisotropyAmount;
+    float    m_anisotropyAmount;
     VkDevice m_renderDevice;
 
     VkPipelineCache m_pipelineCache;
 
     uint32_t m_queueFamilyPropertiesCount = 0;
-    VkQueueFamilyProperties * m_queueFamilyProperties = nullptr;
+    VkQueueFamilyProperties* m_queueFamilyProperties = nullptr;
     VkQueue m_renderQueue;
 
     VkCommandPool m_renderCommandPool;
@@ -258,19 +258,19 @@ protected:
     std::vector<VkCommandBuffer> m_renderCommandBuffer;
     std::vector<VkCommandBuffer> m_postProcessingCommandBuffer;
 
-    uint32_t m_dynamicOffsets = {0};
+    uint32_t m_dynamicOffsets = { 0 };
 
     VulkanMemoryManager m_memoryManager;
 
     std::shared_ptr<VulkanUniformBuffer> m_globalVertexUniformBuffer;
     std::shared_ptr<VulkanUniformBuffer> m_globalFragmentUniformBuffer;
-    VulkanGlobalVertexUniforms m_globalVertexUniforms;
-    VulkanGlobalFragmentUniforms m_globalFragmentUniforms;
+    VulkanGlobalVertexUniforms           m_globalVertexUniforms;
+    VulkanGlobalFragmentUniforms         m_globalFragmentUniforms;
 
     VkDescriptorPool m_globalDescriptorPool;
-    std::vector<VkDescriptorSet> m_globalDescriptorSets;
+    std::vector<VkDescriptorSet>       m_globalDescriptorSets;
     std::vector<VkDescriptorSetLayout> m_globalDescriptorSetLayouts;
-    std::vector<VkWriteDescriptorSet> m_globalWriteDescriptorSets;
+    std::vector<VkWriteDescriptorSet>  m_globalWriteDescriptorSets;
 
     VkDescriptorPool m_GUIDescriptorPool;
 
@@ -281,31 +281,31 @@ protected:
     VkRenderPass m_GUIRenderPass;
 
     // Swapchain
-    VkSwapchainKHR * m_swapchain = nullptr;
-    uint32_t m_swapchainImageCount = 0;
-    std::vector<VulkanInternalImage *> m_swapchainImages;
-    std::vector<VkImage> m_swapchainNativeImages;
+    VkSwapchainKHR* m_swapchain           = nullptr;
+    uint32_t        m_swapchainImageCount = 0;
+    std::vector<VulkanInternalImage*> m_swapchainImages;
+    std::vector<VkImage>     m_swapchainNativeImages;
     std::vector<VkImageView> m_swapchainImageViews;
     VkSampler m_swapchainImageSampler;
 
     // Final image buffers (used before image gets copied to swapchain images)
-    VulkanInternalImage * m_LDRImage[2];
-    VkImageView m_LDRImageView[2];
+    VulkanInternalImage* m_LDRImage[2];
+    VkImageView          m_LDRImageView[2];
 
     // Depth buffer
-    std::vector<VulkanInternalImage *> m_depthImage;
-    std::vector<VkImageView> m_depthImageView;
+    std::vector<VulkanInternalImage*> m_depthImage;
+    std::vector<VkImageView>          m_depthImageView;
 
     // Normal buffer
-    VulkanInternalImage * m_normalImage;
-    VkImageView m_normalImageView;
+    VulkanInternalImage* m_normalImage;
+    VkImageView          m_normalImageView;
 
     // AO buffers
-    VulkanInternalImage * m_halfAOImage[2];
-    VkImageView m_halfAOImageView[2];
+    VulkanInternalImage* m_halfAOImage[2];
+    VkImageView          m_halfAOImageView[2];
 
     // Color buffers
-    std::vector<VulkanInternalImage *> m_HDRImage[3];
+    std::vector<VulkanInternalImage*> m_HDRImage[3];
     VkSampler m_HDRImageSampler;
     std::vector<VkImageView> m_HDRImageView[3];
     uint32_t m_mipLevels = 1;
@@ -341,22 +341,22 @@ protected:
 
     glm::mat4 m_projectionMatrix;
 
-    VulkanInternalImage * m_shadowMaps; ///< a single texture array (hence why it's one image)
-    VkImageView m_shadowMapsView; ///< for binding to the shaders (so shaders can access all layers)
+    VulkanInternalImage*     m_shadowMaps;      ///< a single texture array (hence why it's one image)
+    VkImageView              m_shadowMapsView;  ///< for binding to the shaders (so shaders can access all layers)
     std::vector<VkImageView> m_shadowMapsViews; ///< for framebuffers
-    std::vector<std::shared_ptr<DirectionalLight>> m_shadowLights;
+    std::vector<std::shared_ptr<DirectionalLight>>  m_shadowLights;
     std::vector<std::shared_ptr<VulkanFramebuffer>> m_shadowFramebuffers;
     std::vector<VkRenderPass> m_shadowPasses;
     uint32_t m_shadowMapResolution = 2048;
     std::vector<glm::mat4> m_lightMatrices;
 
-    bool m_enableLensDistortion = false;
+    bool  m_enableLensDistortion = false;
     float m_lensDistortionFactor = 0.0f;
 
     std::vector<std::shared_ptr<VulkanRenderDelegate>> m_renderDelegates;
 
     uint32_t m_renderQueueFamily = 0;
-    Vec3d m_backgroundColor = Vec3d(0.5, 0.5, 0.5);
+    Vec3d    m_backgroundColor   = Vec3d(0.5, 0.5, 0.5);
 
     std::map<std::shared_ptr<Texture>, std::shared_ptr<VulkanTextureDelegate>> m_textureMap;
 
@@ -365,10 +365,10 @@ protected:
     glm::mat4 m_viewMatrices[2];
     glm::mat4 m_projectionMatrices[2];
     glm::vec4 m_cameraPositions[2];
-    bool m_VRMode = false;
+    bool      m_VRMode = false;
 
 #ifdef iMSTK_ENABLE_VR
-    vr::IVRSystem *m_VRSystem = nullptr;
+    vr::IVRSystem* m_VRSystem = nullptr;
 #endif
 };
 }

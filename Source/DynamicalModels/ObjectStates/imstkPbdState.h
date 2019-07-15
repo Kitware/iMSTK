@@ -40,7 +40,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    PbdState() = default;
+    PbdState()  = default;
     ~PbdState() = default;
 
     ///

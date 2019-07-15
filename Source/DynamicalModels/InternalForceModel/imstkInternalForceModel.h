@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    InternalForceModel(){};
+    InternalForceModel() {}
 
     ///
     /// \brief Destructor
@@ -72,7 +72,7 @@ public:
     ///
     /// \brief Update the values of the Eigen sparse matrix given the linearized array of data from the Vega matrix
     ///
-    static void updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double *values);
+    static void updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double* values);
 
     ///
     /// \brief

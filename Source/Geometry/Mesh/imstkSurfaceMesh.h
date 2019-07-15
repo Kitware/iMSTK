@@ -48,8 +48,8 @@ namespace std
 {
 template<> struct less<imstk::NormalGroup>
 {
-    bool operator() (const imstk::NormalGroup& group1,
-                     const imstk::NormalGroup& group2) const
+    bool operator()(const imstk::NormalGroup& group1,
+                    const imstk::NormalGroup& group2) const
     {
         if (group1.position != group2.position)
         {
@@ -94,18 +94,18 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  triangle connectivity
     ///
-    void initialize(const StdVectorOfVec3d& vertices,
+    void initialize(const StdVectorOfVec3d&           vertices,
                     const std::vector<TriangleArray>& triangles,
-                    const bool computeDerivedData = false);
+                    const bool                        computeDerivedData = false);
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions,
     ///  triangle connectivity, and normals
     ///
-    void initialize(const StdVectorOfVec3d& vertices,
+    void initialize(const StdVectorOfVec3d&           vertices,
                     const std::vector<TriangleArray>& triangles,
-                    const StdVectorOfVec3d& normals,
-                    const bool computeDerivedData = false);
+                    const StdVectorOfVec3d&           normals,
+                    const bool                        computeDerivedData = false);
 
     ///
     /// \brief Clear all the mesh data
@@ -230,21 +230,21 @@ protected:
     ///
     StdVectorOfVec3d& getVertexNormalsNotConst();
 
-    std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
+    std::vector<TriangleArray> m_trianglesVertices;       ///> Triangle connectivity
 
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
-    std::vector<NeighborsType> m_vertexNeighborVertices; ///> Neighbor vertices to vertices
+    std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices
 
-    StdVectorOfVec3d m_triangleNormals; ///> Normals to the triangles
-    StdVectorOfVec3d m_triangleTangents; ///> Tangents to the triangles
-    StdVectorOfVec3d m_vertexNormals; ///> Normals of the vertices
-    StdVectorOfVec3d m_vertexTangents; ///> Tangents of the vertices
+    StdVectorOfVec3d m_triangleNormals;                   ///> Normals to the triangles
+    StdVectorOfVec3d m_triangleTangents;                  ///> Tangents to the triangles
+    StdVectorOfVec3d m_vertexNormals;                     ///> Normals of the vertices
+    StdVectorOfVec3d m_vertexTangents;                    ///> Tangents of the vertices
 
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default material coordinates
 
     size_t m_originalNumTriangles = 0;
-    size_t m_maxNumTriangles = 0;
+    size_t m_maxNumTriangles      = 0;
 };
 } // imstk

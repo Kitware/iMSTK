@@ -24,16 +24,16 @@
 namespace imstk
 {
 VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                                     SceneObject::Type type,
-                                                     VulkanMemoryManager& memoryManager)
+                                                     SceneObject::Type            type,
+                                                     VulkanMemoryManager&         memoryManager)
 {
     this->initialize(visualModel);
 
     auto geometry = std::static_pointer_cast<DecalPool>(visualModel->getGeometry());
 
-    m_numVertices = 8;
+    m_numVertices  = 8;
     m_numTriangles = 12;
-    m_vertexSize = sizeof(VulkanBasicVertex);
+    m_vertexSize   = sizeof(VulkanBasicVertex);
 
     m_visualModel->getRenderMaterial()->m_isDecal = true;
 
@@ -45,7 +45,7 @@ VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<VisualModel
 void
 VulkanDecalRenderDelegate::updateVertexBuffer()
 {
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory();
+    auto vertices = (VulkanBasicVertex*)m_vertexBuffer->getVertexMemory();
     auto geometry = std::static_pointer_cast<DecalPool>(m_visualModel->getGeometry());
 
     for (unsigned i = 0; i < m_numVertices; i++)
@@ -54,7 +54,7 @@ VulkanDecalRenderDelegate::updateVertexBuffer()
             geometry->m_vertexPositions[i];
     }
 
-    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory();
+    auto triangles = (std::array<uint32_t, 3>*)m_vertexBuffer->getIndexMemory();
 
     for (unsigned i = 0; i < m_numTriangles; i++)
     {
@@ -67,7 +67,7 @@ VulkanDecalRenderDelegate::updateVertexBuffer()
 void
 VulkanDecalRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::shared_ptr<RenderMaterial> material)
 {
-    m_vertexUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalDecalVertexUniforms));
+    m_vertexUniformBuffer   = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalDecalVertexUniforms));
     m_fragmentUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalDecalFragmentUniforms));
 
     m_material = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
@@ -83,9 +83,9 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
 {
     unsigned int index = 0;
 
-    auto eye = glm::tvec3<float>(camera->getPosition().x(), camera->getPosition().y(), camera->getPosition().z());
-    auto center = glm::tvec3<float>(camera->getFocalPoint().x(), camera->getFocalPoint().y(), camera->getFocalPoint().z());
-    auto up = glm::tvec3<float>(camera->getViewUp().x(), camera->getViewUp().y(), camera->getViewUp().z());
+    auto eye        = glm::tvec3<float>(camera->getPosition().x(), camera->getPosition().y(), camera->getPosition().z());
+    auto center     = glm::tvec3<float>(camera->getFocalPoint().x(), camera->getFocalPoint().y(), camera->getFocalPoint().z());
+    auto up         = glm::tvec3<float>(camera->getViewUp().x(), camera->getViewUp().y(), camera->getViewUp().z());
     auto viewMatrix = glm::lookAt(eye, center, up);
 
     auto geometry = std::static_pointer_cast<DecalPool>(m_visualModel->getGeometry());
@@ -101,15 +101,15 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
     auto mat = this->getVisualModel()->getRenderMaterial();
 
     auto color = mat->getColor();
-    m_decalFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
+    m_decalFragmentUniforms.color           = glm::vec4(color.r, color.g, color.b, color.a);
     m_decalFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
-    m_decalFragmentUniforms.emissivity = mat->getEmissivity();
-    m_decalFragmentUniforms.roughness = mat->getRoughness();
-    m_decalFragmentUniforms.metalness = mat->getMetalness();
+    m_decalFragmentUniforms.emissivity      = mat->getEmissivity();
+    m_decalFragmentUniforms.roughness       = mat->getRoughness();
+    m_decalFragmentUniforms.metalness       = mat->getMetalness();
 
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalVertexUniforms),
-        (void *)&m_decalVertexUniforms, frameIndex);
+        (void*)&m_decalVertexUniforms, frameIndex);
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalDecalFragmentUniforms),
-        (void *)&m_decalFragmentUniforms, frameIndex);
+        (void*)&m_decalFragmentUniforms, frameIndex);
 }
 }

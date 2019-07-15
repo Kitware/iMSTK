@@ -35,7 +35,7 @@ class VulkanMemoryManager
 {
 public:
     VulkanMemoryManager();
-    void setup(VkPhysicalDevice * device);
+    void setup(VkPhysicalDevice* device);
     void clear();
 
     ///
@@ -46,10 +46,10 @@ public:
     /// \param offsetAlignment Alignment information
     /// \returns Vulkan buffer object
     ///
-    VulkanInternalBuffer * requestBuffer(VkDevice& device,
-                                         VkBufferCreateInfo& info,
-                                         VulkanMemoryType type,
-                                         VkDeviceSize offsetAlignment = 0);
+    VulkanInternalBuffer* requestBuffer(VkDevice&           device,
+                                        VkBufferCreateInfo& info,
+                                        VulkanMemoryType    type,
+                                        VkDeviceSize        offsetAlignment = 0);
 
     ///
     /// \brief Request a Vulkan image object
@@ -58,20 +58,20 @@ public:
     /// \param type Memory type needed
     /// \returns Vulkan image object
     ///
-    VulkanInternalImage * requestImage(VkDevice& device,
-                                       VkImageCreateInfo& info,
-                                       VulkanMemoryType type);
+    VulkanInternalImage* requestImage(VkDevice&          device,
+                                      VkImageCreateInfo& info,
+                                      VulkanMemoryType   type);
 
-    VkPhysicalDevice * m_physicalDevice;
-    VkDevice m_device;
+    VkPhysicalDevice* m_physicalDevice;
+    VkDevice          m_device;
 
-    VkPhysicalDeviceProperties m_deviceProperties;
+    VkPhysicalDeviceProperties       m_deviceProperties;
     VkPhysicalDeviceMemoryProperties m_deviceMemoryProperties;
 
-    uint32_t m_queueFamilyIndex;
-    VkCommandBuffer * m_transferCommandBuffer;
-    VkQueue * m_transferQueue;
-    uint32_t m_buffering = 3;
+    uint32_t         m_queueFamilyIndex;
+    VkCommandBuffer* m_transferCommandBuffer;
+    VkQueue*         m_transferQueue;
+    uint32_t         m_buffering = 3;
 
 protected:
     ///
@@ -82,18 +82,18 @@ protected:
     /// \param offsetAlignment Alignment information for the offset
     /// \returns Vulkan memory allocation
     ///
-    VulkanInternalMemory * requestMemoryAllocation(
+    VulkanInternalMemory* requestMemoryAllocation(
         const VkMemoryRequirements& memoryRequirements,
-        VulkanMemoryType type,
-        VkDeviceSize maxAllocationSize,
-        VkDeviceSize offsetAlignment = 0);
+        VulkanMemoryType            type,
+        VkDeviceSize                maxAllocationSize,
+        VkDeviceSize                offsetAlignment = 0);
 
-    static const VkDeviceSize c_bufferAllocationSize = 16 * 1024 * 1024; // 16 MiB
-    static const VkDeviceSize c_imageAllocationSize = 128 * 1024 * 1024; // 128 MiB
+    static const VkDeviceSize c_bufferAllocationSize = 16 * 1024 * 1024;  // 16 MiB
+    static const VkDeviceSize c_imageAllocationSize  = 128 * 1024 * 1024; // 128 MiB
     static VkDeviceSize getAlignedSize(VkDeviceSize size, VkDeviceSize alignment);
 
     std::map<VulkanMemoryType, std::vector<VulkanInternalMemory*>> m_memoryAllocations;
     std::vector<VulkanInternalBufferGroup*> m_buffers;
-    std::vector<VulkanInternalImage*> m_images;
+    std::vector<VulkanInternalImage*>       m_images;
 };
-};
+}

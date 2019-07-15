@@ -55,9 +55,9 @@ public:
     /// \param type Type of texture
     /// \param anisotropyAmount Amount of anisotropic filtering to apply
     ///
-    VulkanTextureDelegate(VulkanMemoryManager& memoryManager,
+    VulkanTextureDelegate(VulkanMemoryManager&     memoryManager,
                           std::shared_ptr<Texture> texture,
-                          float anisotropyAmount = 0.0f);
+                          float                    anisotropyAmount = 0.0f);
 
     ///
     /// \brief File reader for a 2D texture
@@ -94,12 +94,12 @@ public:
     /// \param destinationFlags New access flags
     /// \param range Image range
     ///
-    static void changeImageLayout(VkCommandBuffer& commandBuffer,
-                                  VkImage& image,
-                                  VkImageLayout layout1,
-                                  VkImageLayout layout2,
-                                  VkAccessFlags sourceFlags,
-                                  VkAccessFlags destinationFlags,
+    static void changeImageLayout(VkCommandBuffer&        commandBuffer,
+                                  VkImage&                image,
+                                  VkImageLayout           layout1,
+                                  VkImageLayout           layout2,
+                                  VkAccessFlags           sourceFlags,
+                                  VkAccessFlags           destinationFlags,
                                   VkImageSubresourceRange range);
 
     ///
@@ -138,45 +138,45 @@ public:
     /// \brief Destroy the image
     /// \param device Device on which the image is located (e.g., GPU)
     ///
-    void clear(VkDevice * device);
+    void clear(VkDevice* device);
 
 protected:
     friend class VulkanMaterialDelegate;
     friend class VulkanPostProcessingChain;
     friend class VulkanRenderer;
 
-    VulkanInternalImage * m_image;
+    VulkanInternalImage* m_image;
 
-    VkImageView m_imageView;
-    VkSampler m_sampler;
-    VkImageLayout m_layout;
+    VkImageView       m_imageView;
+    VkSampler         m_sampler;
+    VkImageLayout     m_layout;
     VkImageCreateInfo m_imageInfo;
 
     VkImageSubresourceRange m_range;
 
-    VulkanInternalBuffer * m_stagingBuffer;
+    VulkanInternalBuffer* m_stagingBuffer;
 
-    std::string m_path;
-    Texture::Type m_type;
+    std::string       m_path;
+    Texture::Type     m_type;
     Texture::FileType m_fileType;
-    VkFormat m_format = VK_FORMAT_UNDEFINED;
-    bool m_isDataFormatted = false;
-    unsigned int m_mipLevels = 0;
-    bool m_loadMipMaps = false;
-    unsigned int m_arrayLayers = 1;
-    float anisotropyAmount = 1.0f;
+    VkFormat          m_format     = VK_FORMAT_UNDEFINED;
+    bool         m_isDataFormatted = false;
+    unsigned int m_mipLevels       = 0;
+    bool         m_loadMipMaps     = false;
+    unsigned int m_arrayLayers     = 1;
+    float        anisotropyAmount  = 1.0f;
 
-    unsigned int m_width = 0;
-    unsigned int m_height = 0;
+    unsigned int m_width    = 0;
+    unsigned int m_height   = 0;
     unsigned int m_channels = 0;
 
-    bool m_isCompressed = false;
-    unsigned char * m_data;
-    gli::texture_cube m_cubemap; ///> Only used for cubemaps
-    gli::texture m_compressedTexture; ///> only used for DDS files
-    bool m_isCubemap = false;
+    bool              m_isCompressed = false;
+    unsigned char*    m_data;
+    gli::texture_cube m_cubemap;           ///> Only used for cubemaps
+    gli::texture      m_compressedTexture; ///> only used for DDS files
+    bool              m_isCubemap = false;
 
-    VkDeviceSize m_imageOffsetAlignment;
-    VulkanMemoryManager * m_memoryManager;
+    VkDeviceSize         m_imageOffsetAlignment;
+    VulkanMemoryManager* m_memoryManager;
 };
 }
