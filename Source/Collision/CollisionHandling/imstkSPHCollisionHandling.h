@@ -33,25 +33,12 @@ public:
 
     SPHCollisionHandling() = delete;
 
-    virtual ~SPHCollisionHandling() override = default;
-
     ///
     /// \brief Compute forces based on collision data
     ///
     virtual void processCollisionData() override;
 
-    ///
-    /// \brief Set the friction coefficient
-    ///
-    void setBoundaryFriction(const Real friction);
-
-    ///
-    /// \brief Get the friction coefficient
-    ///
-    Real getBoundaryFriction() const { return m_BoundaryFriction; }
-
 private:
     std::shared_ptr<SPHObject> m_SPHObject;
-    Real m_BoundaryFriction = Real(0.1);
 };
 } // end namespace imstk

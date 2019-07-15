@@ -35,34 +35,20 @@ SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side&       
 }
 
 void
-SPHCollisionHandling::setBoundaryFriction(const Real friction)
-{
-    m_BoundaryFriction = friction;
-
-    if (m_BoundaryFriction < 0.0 || m_BoundaryFriction > 1.0)
-    {
-        LOG(WARNING) << "Invalid frictionLength coefficient (it must be in [0, 1])";
-        if (m_BoundaryFriction < 0)
-        {
-            m_BoundaryFriction = 0;
-        }
-        else if (m_BoundaryFriction > static_cast<Real>(1.0))
-        {
-            m_BoundaryFriction = static_cast<Real>(1.0);
-        }
-    }
-}
-
-void
 SPHCollisionHandling::processCollisionData()
 {
     const auto& SPHModel = m_SPHObject->getSPHModel();
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, !SPHModel) << "SPH model was not initialized";
+    LOG_IF(FATAL, (!SPHModel)) << "SPH model was not initialized";
+#endif
+
+    const auto boundaryFriction = m_SPHObject->getSPHModel()->getParameters()->m_BoundaryFriction;
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (boundaryFriction<0.0 || boundaryFriction>1.0))
+        << "Invalid boundary friction coefficient (value must be in [0, 1])";
 #endif
 
     auto& state = SPHModel->getState();
-
     ParallelUtils::parallelFor(m_colData->MAColData.size(),
         [&](const size_t idx)
         {
@@ -70,33 +56,40 @@ SPHCollisionHandling::processCollisionData()
             const auto pidx = cd.nodeId;   // Fluid particle index
             auto n = cd.penetrationVector; // This vector should point into solid object
 
-            // Correct particle position:
-            state.getPositions()[pidx] -= n; // This should not cause race condition, since pidx is distinct
+            // Correct particle position
+            state.getPositions()[pidx] -= n;
 
-            // Correct particle velocity: slip boundary condition with friction
-            auto& vel = state.getVelocities()[pidx];
             const auto nLengthSqr = n.squaredNorm();
             if (nLengthSqr < Real(1e-20)) // Normalize n
             {
                 return;                   // Too little penetration: ignore
             }
-
             n /= std::sqrt(nLengthSqr);
-            const auto vn = vel.dot(n);
-            vel -= n * vn; // From now, vel is parallel with the solid surface
 
-            if (m_BoundaryFriction > Real(1e-20))
+            // Correct particle velocity: slip boundary condition with friction
+            const auto oldVel = state.getVelocities()[pidx];
+            const auto vn = oldVel.dot(n);
+
+            // If particle is escaping the boundary, ignore it
+            if (vn > 0)
             {
-                const auto velLength  = vel.norm();
-                const auto frictionLength = -vn * m_BoundaryFriction;
-                if (frictionLength < velLength && velLength > Real(1e-10))
+                Vec3r correctedVel = oldVel - vn * n; // From now, vel is parallel with the solid surface
+
+                if (boundaryFriction > Real(1e-20))
                 {
-                    vel -= (vel / velLength) * frictionLength; // Subtract a friction from velocity, which is proportional to the amount of penetration
+                    const auto velLength  = correctedVel.norm();
+                    const auto frictionLength = vn * boundaryFriction; // This is always positive
+                    if (frictionLength < velLength && velLength > Real(1e-10))
+                    {
+                        correctedVel -= (correctedVel / velLength) * frictionLength; // Subtract a friction from velocity, which is proportional to the amount of penetration
+                    }
+                    else
+                    {
+                        correctedVel = Vec3r::Zero();
+                    }
                 }
-                else
-                {
-                    vel = Vec3r::Zero();
-                }
+
+                state.getVelocities()[pidx] = correctedVel;
             }
         });
 }
