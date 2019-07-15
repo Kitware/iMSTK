@@ -43,7 +43,7 @@ CameraController::runModule()
     Quatd r = getRotation();
 
     // Apply Offsets over the device pose
-    p = p + m_cameraTranslationOffset;      // Offset the device position
+    p  = p + m_cameraTranslationOffset;     // Offset the device position
     r *= m_cameraRotationalOffset;          // Apply camera head rotation offset
 
     // Set camera info
@@ -57,19 +57,19 @@ CameraController::runModule()
 void
 CameraController::setOffsetUsingCurrentCameraPose()
 {
-    auto pos = m_camera.getPosition();
+    auto pos    = m_camera.getPosition();
     auto viewUp = m_camera.getViewUp();
-    auto focus = m_camera.getFocalPoint();
+    auto focus  = m_camera.getFocalPoint();
 
     m_translationOffset = pos;
 
     auto viewNormal = (pos - focus).normalized();
-    auto viewSide = viewUp.cross(viewNormal).normalized();
+    auto viewSide   = viewUp.cross(viewNormal).normalized();
     viewUp = viewNormal.cross(viewSide);
     Mat3d rot;
-    rot.col(0) = viewSide;
-    rot.col(1) = viewUp;
-    rot.col(2) = viewNormal;
+    rot.col(0)       = viewSide;
+    rot.col(1)       = viewUp;
+    rot.col(2)       = viewNormal;
     m_rotationOffset = Quatd(rot);
 }
 

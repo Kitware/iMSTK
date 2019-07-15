@@ -53,7 +53,7 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  line connectivity
     ///
-    void initialize(const StdVectorOfVec3d& vertices,
+    void initialize(const StdVectorOfVec3d&       vertices,
                     const std::vector<LineArray>& lines);
 
     ///
@@ -101,9 +101,9 @@ private:
     friend class VTKLineMeshRenderDelegate;
 
     size_t m_originalNumLines = 0;
-    size_t m_maxNumLines = 0;
+    size_t m_maxNumLines      = 0;
 
     std::vector<LineArray> m_lines;  ///> line connectivity
-    std::vector<Color> m_vertexColors;
+    std::vector<Color>     m_vertexColors;
 };
 } // imstk

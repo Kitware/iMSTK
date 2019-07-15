@@ -114,11 +114,11 @@ public:
     std::shared_ptr<CameraController> setController(std::shared_ptr<CameraController> controller);
 
 protected:
-    std::shared_ptr<CameraController> m_controller;   ///>
+    std::shared_ptr<CameraController> m_controller; ///>
 
-    Vec3d m_position = Vec3d(0, 2, 5);    ///> camera position
-    Vec3d m_focalPoint = WORLD_ORIGIN;  ///> camera focal point
-    Vec3d m_viewUp = UP_VECTOR;         ///> camera up vector
-    double m_fieldOfView = 60;          ///> field of view in degrees
+    Vec3d  m_position    = Vec3d(0, 2, 5);          ///> camera position
+    Vec3d  m_focalPoint  = WORLD_ORIGIN;            ///> camera focal point
+    Vec3d  m_viewUp      = UP_VECTOR;               ///> camera up vector
+    double m_fieldOfView = 60;                      ///> field of view in degrees
 };
 } // imstk

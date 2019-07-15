@@ -49,8 +49,8 @@ AnalyticalGeometry::setPosition(const Vec3d p)
         return;
     }
 
-    m_position = p;
-    m_dataModified = true;
+    m_position         = p;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -84,8 +84,8 @@ AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
     {
         return;
     }
-    m_orientationAxis = orientation.normalized();
-    m_dataModified = true;
+    m_orientationAxis  = orientation.normalized();
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 

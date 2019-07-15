@@ -130,8 +130,8 @@ protected:
 
     virtual ~DebugRenderGeometry() = default;
 
-    std::string m_name;                   ///> Custom name of the scene object
-    Type m_type;                          ///> Debug geometry type
+    std::string      m_name;              ///> Custom name of the scene object
+    Type             m_type;              ///> Debug geometry type
     StdVectorOfVec3d m_VertexBuffer;      ///> Vertex buffer
 
     bool m_renderDelegateCreated = false; ///> This variable is used in Renderer

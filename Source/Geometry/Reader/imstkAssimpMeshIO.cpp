@@ -28,7 +28,7 @@ namespace imstk
 std::shared_ptr<SurfaceMesh>
 AssimpMeshIO::read(
     const std::string& filePath,
-    MeshFileType type)
+    MeshFileType       type)
 {
     switch (type)
     {
@@ -50,7 +50,7 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
 {
     // Import mesh(es) and apply some clean-up operations
     Assimp::Importer importer;
-    auto scene = importer.ReadFile(filePath, AssimpMeshIO::getDefaultPostProcessSteps());
+    auto             scene = importer.ReadFile(filePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
     if (!scene || !scene->HasMeshes())
@@ -66,13 +66,13 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
 }
 
 std::shared_ptr<SurfaceMesh>
-AssimpMeshIO::convertAssimpMesh(aiMesh * importedMesh)
+AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
 {
     // Build SurfaceMesh
     auto mesh = std::make_shared<SurfaceMesh>();
 
     // Get mesh information
-    auto numVertices = importedMesh->mNumVertices;
+    auto numVertices  = importedMesh->mNumVertices;
     auto numTriangles = importedMesh->mNumFaces;
 
     if (numVertices == 0)
@@ -98,7 +98,7 @@ AssimpMeshIO::convertAssimpMesh(aiMesh * importedMesh)
     for (unsigned int i = 0; i < numTriangles; i++)
     {
         auto triangle = importedMesh->mFaces[i];
-        auto indices = triangle.mIndices;
+        auto indices  = triangle.mIndices;
         triangles[i][0] = indices[0];
         triangles[i][1] = indices[1];
         triangles[i][2] = indices[2];
@@ -149,8 +149,8 @@ AssimpMeshIO::convertAssimpMesh(aiMesh * importedMesh)
         for (unsigned int i = 0; i < numVertices; i++)
         {
             Vectorf UV(2);
-            UV[0] = texcoords[i].x;
-            UV[1] = texcoords[i].y;
+            UV[0]  = texcoords[i].x;
+            UV[1]  = texcoords[i].y;
             UVs[i] = UV;
         }
         mesh->setDefaultTCoords("tCoords");

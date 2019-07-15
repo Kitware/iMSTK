@@ -44,7 +44,7 @@ class VulkanInteractorStyle;
 class VulkanViewer : public Viewer
 {
 public:
-    VulkanViewer(SimulationManager * manager = nullptr, bool enableVR = false);
+    VulkanViewer(SimulationManager* manager = nullptr, bool enableVR = false);
 
     virtual void setActiveScene(const std::shared_ptr<Scene>& scene) override;
 
@@ -104,7 +104,7 @@ public:
     /// \brief Utility function to get VR system
     /// \returns OpenVR system
     ///
-    vr::IVRSystem * getVRSystem();
+    vr::IVRSystem* getVRSystem();
 #endif
 
 protected:
@@ -117,26 +117,26 @@ protected:
     void createWindow();
     void resizeWindow(unsigned int width, unsigned int height);
 
-    unsigned int m_width = 1000;
-    unsigned int m_height = 800;
-    unsigned int m_windowWidth = 1000;
+    unsigned int m_width        = 1000;
+    unsigned int m_height       = 800;
+    unsigned int m_windowWidth  = 1000;
     unsigned int m_windowHeight = 800;
 
     bool m_VSync = true;
 
     std::shared_ptr<VulkanRenderer> m_renderer;
-    VkSurfaceKHR m_surface;
-    GLFWwindow * m_window;
-    SimulationManager * m_simManager;
-    VkSwapchainKHR m_swapchain;
+    VkSurfaceKHR       m_surface;
+    GLFWwindow*        m_window;
+    SimulationManager* m_simManager;
+    VkSwapchainKHR     m_swapchain;
 
     VkSurfaceCapabilitiesKHR m_physicalCapabilities;
 
-    uint32_t m_presentModesCount;
-    VkPresentModeKHR * m_presentModes;
+    uint32_t          m_presentModesCount;
+    VkPresentModeKHR* m_presentModes;
 
     uint32_t m_physicalFormatsCount;
-    VkSurfaceFormatKHR * m_physicalFormats;
+    VkSurfaceFormatKHR* m_physicalFormats;
     bool m_fullscreen = false;
 
     bool m_VRMode = false;

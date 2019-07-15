@@ -32,7 +32,7 @@ public:
     ///
     /// \brief Default Constructor/Destructor
     ///
-    SolverBase() = default;
+    SolverBase()          = default;
     virtual ~SolverBase() = default;
 
     virtual void solve() = 0;

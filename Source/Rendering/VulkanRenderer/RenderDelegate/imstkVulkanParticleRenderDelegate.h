@@ -45,8 +45,8 @@ public:
     /// \brief Default constructor
     ///
     VulkanParticleRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                 SceneObject::Type type,
-                                 VulkanMemoryManager& memoryManager);
+                                 SceneObject::Type            type,
+                                 VulkanMemoryManager&         memoryManager);
 
     ///
     /// \brief Update render geometry
@@ -61,11 +61,11 @@ public:
     ///
     /// \brief Initialize data
     ///
-    void initializeData(VulkanMemoryManager& memoryManager,
+    void initializeData(VulkanMemoryManager&            memoryManager,
                         std::shared_ptr<RenderMaterial> material = nullptr);
 
 protected:
-    VulkanLocalParticleVertexUniforms m_particleVertexUniforms;
+    VulkanLocalParticleVertexUniforms   m_particleVertexUniforms;
     VulkanLocalParticleFragmentUniforms m_particleFragmentUniforms;
 
     ///
@@ -74,17 +74,17 @@ protected:
     void generateBillboardMatrix(const glm::vec3& objectPosition,
                                  const glm::vec3& cameraPosition,
                                  const glm::vec3& cameraUp,
-                                 glm::mat4& transformation);
+                                 glm::mat4&       transformation);
 
     ///
     /// \brief Sort particles
     ///
     void sortParticles(const std::vector<std::unique_ptr<RenderParticle>>& renderParticles,
-                       unsigned int numParticles,
-                       const glm::vec3& cameraPosition);
+                       unsigned int                                        numParticles,
+                       const glm::vec3&                                    cameraPosition);
 
     std::vector<RenderParticle*> m_particles;
-    std::vector<unsigned int> m_particleIndices;
-    std::vector<float> m_particleDistances;
+    std::vector<unsigned int>    m_particleIndices;
+    std::vector<float>           m_particleDistances;
 };
 }

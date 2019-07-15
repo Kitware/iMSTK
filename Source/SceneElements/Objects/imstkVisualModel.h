@@ -67,10 +67,10 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VTKRenderer;
 
-    std::shared_ptr<Geometry> m_geometry = nullptr;
+    std::shared_ptr<Geometry>       m_geometry       = nullptr;
     std::shared_ptr<RenderMaterial> m_renderMaterial = std::make_shared<RenderMaterial>();
 
-    bool m_isVisible = true; ///< true if mesh is shown, false if mesh is hidden
+    bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
     bool m_renderDelegateCreated = false; ///< true if RenderDelegate has been created
 };
 }

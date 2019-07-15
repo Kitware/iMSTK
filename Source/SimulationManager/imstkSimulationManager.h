@@ -78,12 +78,12 @@ public:
     ///
     /// \brief Default destructor
     ///
-    ~SimulationManager() { this->endSimulation(); };
+    ~SimulationManager() { this->endSimulation(); }
 
     ///
     /// \brief Returns the simulation status
     ///
-    const SimulationStatus& getStatus() const { return m_status; };
+    const SimulationStatus& getStatus() const { return m_status; }
 
     ///
     /// \brief Set number of worker threads in thread pool for parallel computation
@@ -172,9 +172,9 @@ public:
     /// \brief Set the current scene to the one with the supplied name
     ///
     void setActiveScene(const std::string& newSceneName,
-                        const bool unloadCurrentScene = false);
+                        const bool         unloadCurrentScene = false);
     void setActiveScene(std::shared_ptr<Scene> scene,
-                        const bool unloadCurrentScene = false);
+                        const bool             unloadCurrentScene = false);
 
     ///
     /// \brief Start the simulation by initializing the active scene
@@ -184,7 +184,7 @@ public:
     /// module gets launched and an never returns
     ///
     void startSimulation(const SimulationStatus simStatus = SimulationStatus::PAUSED,
-                         const Renderer::Mode renderMode = Renderer::Mode::SIMULATION);
+                         const Renderer::Mode   renderMode = Renderer::Mode::SIMULATION);
 
     ///
     /// \brief Initialize the modules and the active scene
@@ -253,18 +253,18 @@ private:
 
     std::string m_activeSceneName = "";
     std::unordered_map<std::string, std::shared_ptr<SceneManager>> m_sceneManagerMap;
-    std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
+    std::unordered_map<std::string, std::shared_ptr<Scene>>        m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
 
     std::unordered_map<std::string, std::shared_ptr<Module>> m_modulesMap;
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
-    std::shared_ptr<Viewer> m_viewer = nullptr;
+    std::shared_ptr<Viewer>     m_viewer  = nullptr;
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 
     bool m_simThreadLaunched = false;
 
     Mode m_simulationMode = Mode::rendering;
-    bool m_initialized = false;
+    bool m_initialized    = false;
 };
 } // imstk

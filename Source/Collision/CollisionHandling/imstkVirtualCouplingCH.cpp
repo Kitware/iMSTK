@@ -35,7 +35,7 @@ VirtualCouplingCH::processCollisionData()
     m_offset.setZero();
 
     const auto collidingGeometry = std::static_pointer_cast<AnalyticalGeometry>(m_object->getCollidingGeometry());
-    const auto visualGeometry =  std::static_pointer_cast<AnalyticalGeometry>(m_object->getVisualGeometry());
+    const auto visualGeometry    =  std::static_pointer_cast<AnalyticalGeometry>(m_object->getVisualGeometry());
 
     // Check if any collisions
     const auto collidingObjPos = collidingGeometry->getPosition();
@@ -70,7 +70,7 @@ VirtualCouplingCH::processCollisionData()
 
     // Housekeeping
     m_initialStep = false;
-    m_prevPos = collidingObjPos;
+    m_prevPos     = collidingObjPos;
 }
 
 imstk::Vec3d

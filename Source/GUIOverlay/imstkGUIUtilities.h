@@ -38,18 +38,16 @@ public:
     ///
     /// \brief Initializes the GUI system with a theme
     ///
-    static void
-    initializeGUISystem()
+    static void initializeGUISystem()
     {
         auto io = ImGui::GetIO();
         io.IniFilename = nullptr; // resets the GUI layout on application restart
     }
 
-    static ImU32
-    convertToGUIColor(const Color& color)
+    static ImU32 convertToGUIColor(const Color& color)
     {
         return ImGui::ColorConvertFloat4ToU32(ImVec4(color.r, color.g, color.b, color.a));
     }
-}; // GUIUtilities
+};      // GUIUtilities
 } // GUI
 } // imstk

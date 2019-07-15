@@ -28,14 +28,15 @@ using namespace imstk;
 /// \brief This example shows how to extract the triangular surface
 /// mesh from a volumetric tetrahedral mesh
 ///
-void extractSurfaceMesh()
+void
+extractSurfaceMesh()
 {
     auto sdk = std::make_shared<SimulationManager>();
 
     // a. Construct a sample tetrahedral mesh
 
     // a.1 add vertex positions
-    auto tetMesh = std::make_shared<TetrahedralMesh>();
+    auto             tetMesh = std::make_shared<TetrahedralMesh>();
     StdVectorOfVec3d vertList;
     vertList.push_back(Vec3d(0, 0, 0));
     vertList.push_back(Vec3d(1.0, 0, 0));
@@ -47,8 +48,8 @@ void extractSurfaceMesh()
 
     // a.2 add connectivity
     std::vector<TetrahedralMesh::TetraArray> tetConnectivity;
-    TetrahedralMesh::TetraArray tet1 = { 0, 1, 2, 3 };
-    TetrahedralMesh::TetraArray tet2 = { 1, 2, 3, 4 };
+    TetrahedralMesh::TetraArray              tet1 = { 0, 1, 2, 3 };
+    TetrahedralMesh::TetraArray              tet2 = { 1, 2, 3, 4 };
     tetConnectivity.push_back(tet1);
     tetConnectivity.push_back(tet2);
     tetMesh->setTetrahedraVertices(tetConnectivity);
@@ -71,7 +72,8 @@ void extractSurfaceMesh()
     getchar();
 }
 
-int main()
+int
+main()
 {
     extractSurfaceMesh();
 

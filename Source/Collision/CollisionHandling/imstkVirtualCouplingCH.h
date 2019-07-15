@@ -41,9 +41,9 @@ public:
     ///
     /// \brief Constructor
     ///
-    VirtualCouplingCH(const Side& side,
+    VirtualCouplingCH(const Side&                          side,
                       const std::shared_ptr<CollisionData> colData,
-                      std::shared_ptr<CollidingObject> obj) :
+                      std::shared_ptr<CollidingObject>     obj) :
         CollisionHandling(Type::VirtualCoupling, side, colData),
         m_object(obj) {}
 
@@ -78,11 +78,11 @@ public:
 
 private:
     std::shared_ptr<CollidingObject> m_object;  ///> colliding object
-    bool m_initialStep = true;                  ///> Number of times steps
+    bool  m_initialStep = true;                 ///> Number of times steps
     Vec3d m_prevPos;                            ///> Previous position of the colliding object
     Vec3d m_offset;
 
     double m_stiffness = 5e-01;                 ///> Stiffness coefficient use to compute spring force
-    double m_damping = 0.005;                   ///> Damping coefficient used to compute damping force
+    double m_damping   = 0.005;                 ///> Damping coefficient used to compute damping force
 };
 }

@@ -37,29 +37,29 @@ template<typename MatrixType> class DirectLinearSolver;
 ///     decomposition.
 ///
 template<>
-class DirectLinearSolver<Matrixd> : public LinearSolver<Matrixd>
+class DirectLinearSolver<Matrixd>: public LinearSolver<Matrixd>
 {
 public:
     ///
     /// \brief Default constructor/destructor.
     ///
     DirectLinearSolver() = delete;
-    ~DirectLinearSolver(){};
+    ~DirectLinearSolver() {}
 
     ///
     /// \brief Constructor
     ///
-    DirectLinearSolver(const Matrixd &A, const Vectord &b);
+    DirectLinearSolver(const Matrixd& A, const Vectord& b);
 
     ///
     /// \brief Solve the system of equations.
     ///
-    void solve(Vectord &x) override;
+    void solve(Vectord& x) override;
 
     ///
     /// \brief Solve the system of equations for arbitrary right hand side vector.
     ///
-    void solve(const Vectord &rhs, Vectord &x);
+    void solve(const Vectord& rhs, Vectord& x);
 
     ///
     /// \brief Sets the system. System of linear equations.
@@ -72,7 +72,7 @@ public:
     bool isIterative() const
     {
         return false;
-    };
+    }
 
 private:
     Eigen::LDLT<Matrixd> m_solver;
@@ -83,19 +83,19 @@ private:
 ///     decomposition.
 ///
 template<>
-class DirectLinearSolver<SparseMatrixd> : public LinearSolver<SparseMatrixd>
+class DirectLinearSolver<SparseMatrixd>: public LinearSolver<SparseMatrixd>
 {
 public:
     ///
     /// \brief Default constructor/destructor
     ///
-    DirectLinearSolver() = default;
+    DirectLinearSolver()  = default;
     ~DirectLinearSolver() = default;
 
     ///
     /// \brief Constructor
     ///
-    DirectLinearSolver(const SparseMatrixd &matrix, const Vectord &b);
+    DirectLinearSolver(const SparseMatrixd& matrix, const Vectord& b);
 
     ///
     /// \brief Sets the system. System of linear equations.
@@ -105,12 +105,12 @@ public:
     ///
     /// \brief Solve the system of equations
     ///
-    void solve(Vectord &x) override;
+    void solve(Vectord& x) override;
 
     ///
     /// \brief Solve the system of equations for arbitrary right hand side vector.
     ///
-    void solve(const Vectord &rhs, Vectord &x);
+    void solve(const Vectord& rhs, Vectord& x);
 
 private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;//?

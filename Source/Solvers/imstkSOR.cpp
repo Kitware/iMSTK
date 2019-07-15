@@ -57,19 +57,19 @@ SOR::solve(Vectord& x, const double tolerance)
 void
 SOR::SORSolve(Vectord& x)
 {
-    const auto &b = m_linearSystem->getRHSVector();
-    const auto &A = m_linearSystem->getMatrix();
+    const auto& b = m_linearSystem->getRHSVector();
+    const auto& A = m_linearSystem->getMatrix();
 
     // Set the initial guess to zero
     x.setZero();
 
-    auto xOld = x;
+    auto   xOld    = x;
     size_t iterNum = 0;
     while (iterNum < this->getMaxNumIterations())
     {
         for (auto k = 0; k < A.outerSize(); ++k)
         {
-            double diagEle = 0.;
+            double diagEle   = 0.;
             double aggregate = 0.;
             for (SparseMatrixd::InnerIterator it(A, k); it; ++it)
             {
@@ -98,7 +98,7 @@ SOR::SORSolve(Vectord& x)
 }
 
 double
-SOR::getResidual(const Vectord& )
+SOR::getResidual(const Vectord&)
 {
     return 0;
 }

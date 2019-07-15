@@ -41,20 +41,20 @@ public:
     ///
     /// \brief Constructors/Destructor
     ///
-    GaussSeidel() { m_type = Type::GaussSeidel; };
-    GaussSeidel(const SparseMatrixd &A, const Vectord& rhs);
+    GaussSeidel() { m_type = Type::GaussSeidel; }
+    GaussSeidel(const SparseMatrixd& A, const Vectord& rhs);
     ~GaussSeidel() = default;
 
     ///
     /// \brief Remove specific constructor signatures
     ///
-    GaussSeidel(const GaussSeidel &) = delete;
-    GaussSeidel &operator=(const GaussSeidel &) = delete;
+    GaussSeidel(const GaussSeidel&) = delete;
+    GaussSeidel& operator=(const GaussSeidel&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override {};
+    void iterate(Vectord& x, bool updateResidual = true) override {}
 
     ///
     /// \brief Gauss-Seidel solver
@@ -131,7 +131,7 @@ public:
 
 private:
 
-    std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints = nullptr;
-    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints = nullptr;
+    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
+    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk

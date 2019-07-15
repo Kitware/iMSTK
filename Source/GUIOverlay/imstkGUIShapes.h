@@ -47,14 +47,14 @@ protected:
     Shape(std::string name, float x, float y, Color color, bool filled)
         : Widget(name, x, y)
     {
-        m_color = color;
+        m_color  = color;
         m_filled = filled;
-        m_type = Widget::Type::Shape;
+        m_type   = Widget::Type::Shape;
     }
 
     Shape() = delete;
     Color m_color;
-    bool m_filled;
+    bool  m_filled;
 };
 
 ///
@@ -69,11 +69,11 @@ public:
     /// \brief Protected constructor
     ///
     Circle(std::string name,
-           float x,
-           float y,
-           float radius,
-           Color color,
-           bool filled = false)
+           float       x,
+           float       y,
+           float       radius,
+           Color       color,
+           bool        filled = false)
         : Shape(name, x, y, color, filled)
     {
         m_radius = radius;
@@ -84,7 +84,7 @@ public:
     ///
     virtual void render(const bool inWindow)
     {
-        ImDrawList * drawList;
+        ImDrawList* drawList;
 
         if (inWindow)
         {
@@ -144,16 +144,16 @@ public:
     /// \brief Protected constructor
     ///
     Rectangle(std::string name,
-              float x,
-              float y,
-              float width,
-              float height,
-              Color color,
-              bool filled = false)
+              float       x,
+              float       y,
+              float       width,
+              float       height,
+              Color       color,
+              bool        filled = false)
         : Shape(name, x, y, color, filled)
     {
         m_height = height;
-        m_width = width;
+        m_width  = width;
     }
 
     ///
@@ -161,7 +161,7 @@ public:
     ///
     virtual void render(const bool inWindow)
     {
-        ImDrawList * drawList;
+        ImDrawList* drawList;
 
         if (inWindow)
         {

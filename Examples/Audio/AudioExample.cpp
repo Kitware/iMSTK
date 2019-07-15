@@ -31,7 +31,8 @@
 
 using namespace imstk;
 
-void playSound(const std::string& filename)
+void
+playSound(const std::string& filename)
 {
 #ifdef iMSTK_AUDIO_ENABLED
     // Load a sound buffer from a .wav file
@@ -77,7 +78,8 @@ void playSound(const std::string& filename)
 #endif
 }
 
-void playMusic(const std::string& filename)
+void
+playMusic(const std::string& filename)
 {
 #ifdef iMSTK_AUDIO_ENABLED
     // Load an ogg music file
@@ -117,7 +119,8 @@ void playMusic(const std::string& filename)
 /// \brief This example demonstrates the audio feature in imstk.
 /// NOTE: Example modified from SFML/Examples
 ///
-int main()
+int
+main()
 {
     // Initialize g3logger
     auto logger = std::make_shared<LogUtility>();

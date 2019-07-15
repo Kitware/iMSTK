@@ -28,15 +28,16 @@ using namespace imstk;
 ///
 /// \brief This example shows how to read .msh and .veg files
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("MshAndVegaIO");
 
     // Load a volumetric mesh (from .msh file)
-    std::string ifile = iMSTK_DATA_ROOT "/liver/liver.msh";
-    auto volMeshA = MeshIO::read(ifile);
+    std::string ifile    = iMSTK_DATA_ROOT "/liver/liver.msh";
+    auto        volMeshA = MeshIO::read(ifile);
     if (!volMeshA)
     {
         LOG(WARNING) << "Failed to read msh file : " << ifile;
@@ -55,8 +56,8 @@ int main()
     objectA->setVisualGeometry(surfaceMeshA);
 
     // Write a .veg file
-    std::string ofile = iMSTK_DATA_ROOT "/liver/liver.veg";
-    auto writeStatus = MeshIO::write(volMeshA, ofile);
+    std::string ofile       = iMSTK_DATA_ROOT "/liver/liver.veg";
+    auto        writeStatus = MeshIO::write(volMeshA, ofile);
     std::cout << "------------------------------Summary----------------------------------------------------\n";
     std::cout << "Following file conversion: " << ((writeStatus) ? "Success \n" : "Failure \n");
     std::cout << "\n Input mesh file : \n" << ifile << std::endl;

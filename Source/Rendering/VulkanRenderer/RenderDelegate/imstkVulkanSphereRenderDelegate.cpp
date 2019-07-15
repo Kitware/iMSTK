@@ -24,8 +24,8 @@
 namespace imstk
 {
 VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                                       SceneObject::Type type,
-                                                       VulkanMemoryManager& memoryManager)
+                                                       SceneObject::Type            type,
+                                                       VulkanMemoryManager&         memoryManager)
 {
     m_visualModel = visualModel;
 
@@ -48,13 +48,13 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<VisualMod
     auto sourceData = triangulate->GetOutput();
 
     auto positions = sourceData->GetPoints();
-    auto normals = sourceData->GetPointData()->GetNormals();
+    auto normals   = sourceData->GetPointData()->GetNormals();
     auto triangles = sourceData->GetPolys();
 
     for (int i = 0; i < sourceData->GetNumberOfPoints(); i++)
     {
         auto position = positions->GetPoint(i);
-        auto normal = normals->GetTuple(i);
+        auto normal   = normals->GetTuple(i);
 
         VulkanBasicVertex sphereVertex;
 
@@ -73,7 +73,7 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<VisualMod
 
     for (int i = 0; i < triangles->GetNumberOfCells(); i++)
     {
-        auto points = vtkSmartPointer<vtkIdList>::New();
+        auto points   = vtkSmartPointer<vtkIdList>::New();
         auto triangle = triangles->GetNextCell(points);
 
         std::array<uint32_t, 3> trianglePoints = {
@@ -85,9 +85,9 @@ VulkanSphereRenderDelegate::VulkanSphereRenderDelegate(std::shared_ptr<VisualMod
         m_sphereTriangles.push_back(trianglePoints);
     }
 
-    m_numVertices = (uint32_t)m_sphereVertices.size();
+    m_numVertices  = (uint32_t)m_sphereVertices.size();
     m_numTriangles = (uint32_t)m_sphereTriangles.size();
-    m_vertexSize = sizeof(VulkanBasicVertex);
+    m_vertexSize   = sizeof(VulkanBasicVertex);
 
     if (!m_visualModel->getRenderMaterial())
     {

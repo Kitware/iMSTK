@@ -40,17 +40,17 @@ ConjugateGradient::ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs)
 void
 ConjugateGradient::applyLinearProjectionFilter(Vectord& x, const std::vector<LinearProjectionConstraint>& linProj, const bool setVal)
 {
-    for (auto &localProjector : linProj)
+    for (auto& localProjector : linProj)
     {
         const auto threeI = 3 * localProjector.getNodeId();
-        Vec3d p = localProjector.getProjector() * Vec3d(x(threeI), x(threeI + 1), x(threeI + 2));
+        Vec3d      p      = localProjector.getProjector() * Vec3d(x(threeI), x(threeI + 1), x(threeI + 2));
 
         if (setVal)
         {
             p += (Mat3d::Identity() - localProjector.getProjector()) * localProjector.getValue();
         }
 
-        x(threeI) = p.x();
+        x(threeI)     = p.x();
         x(threeI + 1) = p.y();
         x(threeI + 2) = p.z();
     }
@@ -78,8 +78,8 @@ ConjugateGradient::solve(Vectord& x)
 void
 ConjugateGradient::modifiedCGSolve(Vectord& x)
 {
-    const auto &b = m_linearSystem->getRHSVector();
-    const auto &A = m_linearSystem->getMatrix();
+    const auto& b = m_linearSystem->getRHSVector();
+    const auto& A = m_linearSystem->getMatrix();
 
     // Set the initial guess to zero
     x.setZero();
@@ -102,14 +102,14 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
     {
         applyLinearProjectionFilter(res, *m_FixedLinearProjConstraints, false);
     }
-    auto c = res;
-    auto delta = res.dot(res);
-    auto deltaPrev = delta;
-    const auto eps = m_tolerance * m_tolerance * delta;
-    double alpha = 0.0;
-    double dotval;
-    auto q = Vectord(b.size()).setZero();
-    size_t iterNum = 0;
+    auto       c         = res;
+    auto       delta     = res.dot(res);
+    auto       deltaPrev = delta;
+    const auto eps       = m_tolerance * m_tolerance * delta;
+    double     alpha     = 0.0;
+    double     dotval;
+    auto       q       = Vectord(b.size()).setZero();
+    size_t     iterNum = 0;
 
     while (delta > eps)
     {
@@ -132,12 +132,12 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
             LOG(WARNING) << "ConjugateGradient::modifiedCGSolve: deniminator zero. Terminating MCG iteation!";
             return;
         }
-        x += alpha * c;
-        res -= alpha * q;
+        x        += alpha * c;
+        res      -= alpha * q;
         deltaPrev = delta;
-        delta = res.dot(res);
-        c *= delta / deltaPrev;
-        c += res;
+        delta     = res.dot(res);
+        c        *= delta / deltaPrev;
+        c        += res;
         if (m_DynamicLinearProjConstraints)
         {
             applyLinearProjectionFilter(c, *m_DynamicLinearProjConstraints, false);
@@ -156,7 +156,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
 }
 
 double
-ConjugateGradient::getResidual(const Vectord& )
+ConjugateGradient::getResidual(const Vectord&)
 {
     return m_cgSolver.error();
 }

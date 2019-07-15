@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdDihedralConstraint() : PbdConstraint()  { m_vertexIds.resize(4); }
+    PbdDihedralConstraint() : PbdConstraint() { m_vertexIds.resize(4); }
 
     ///
     /// \brief Returns PBD constraint of type Type::Dihedral
@@ -59,7 +59,7 @@ public:
       \param pIdx4 index of p3
       \param k stiffness
     */
-    void initConstraint(PbdModel &model,
+    void initConstraint(PbdModel& model,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
                         const double k);
@@ -67,7 +67,7 @@ public:
     ///
     /// \brief Solves the dihedral angular constraint
     ///
-    bool solvePositionConstraint(PbdModel &model) override;
+    bool solvePositionConstraint(PbdModel& model) override;
 
 public:
     double m_restAngle; ///> Rest angle

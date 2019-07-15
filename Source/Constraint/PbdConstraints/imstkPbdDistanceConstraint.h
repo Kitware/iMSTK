@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdDistanceConstraint() : PbdConstraint()  { m_vertexIds.resize(2); }
+    PbdDistanceConstraint() : PbdConstraint() { m_vertexIds.resize(2); }
 
     ///
     /// \brief Returns PBD constraint of type Type::Distance
@@ -52,7 +52,7 @@ public:
     ///
     /// \brief Solves the Distance constraint
     ///
-    bool solvePositionConstraint(PbdModel &model) override;
+    bool solvePositionConstraint(PbdModel& model) override;
 
 public:
     double m_restLength; ///> Rest length between the nodes

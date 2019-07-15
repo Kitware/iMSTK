@@ -25,9 +25,9 @@
 namespace imstk
 {
 void
-TetrahedralMesh::initialize(const StdVectorOfVec3d& vertices,
+TetrahedralMesh::initialize(const StdVectorOfVec3d&        vertices,
                             const std::vector<TetraArray>& tetrahedra,
-                            bool computeAttachedSurfaceMesh)
+                            bool                           computeAttachedSurfaceMesh)
 {
     PointSet::initialize(vertices);
     this->setTetrahedraVertices(tetrahedra);
@@ -59,7 +59,7 @@ TetrahedralMesh::print() const
 
     LOG(INFO) << "Number of tetrahedra: " << this->getNumTetrahedra();
     LOG(INFO) << "Tetrahedra:";
-    for (auto &tet : m_tetrahedraVertices)
+    for (auto& tet : m_tetrahedraVertices)
     {
         LOG(INFO) << tet.at(0) << ", "
                   << tet.at(1) << ", "
@@ -71,8 +71,8 @@ TetrahedralMesh::print() const
 double
 TetrahedralMesh::getVolume() const
 {
-    Vec3d v[4];
-    Mat4d A;
+    Vec3d  v[4];
+    Mat4d  A;
     double volume = 0.0;
     for (const TetraArray& tetVertices : m_tetrahedraVertices)
     {
@@ -121,34 +121,34 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, co
     const std::vector<triArray> facePattern = { triArray { { 0, 1, 2 } }, triArray { { 0, 1, 3 } }, triArray { { 0, 2, 3 } }, triArray { { 1, 2, 3 } } };
 
     // Find and store the tetrahedral faces that are unique
-    auto vertArray = this->getTetrahedraVertices();
+    auto                  vertArray = this->getTetrahedraVertices();
     std::vector<triArray> surfaceTri;
-    std::vector<size_t> surfaceTriTet;
-    std::vector<size_t> tetRemainingVert;
-    bool unique = true;
-    size_t foundAt = 0, tetId = 0;
-    size_t a, b, c;
+    std::vector<size_t>   surfaceTriTet;
+    std::vector<size_t>   tetRemainingVert;
+    bool                  unique = true;
+    size_t                foundAt = 0, tetId = 0;
+    size_t                a, b, c;
 
-    for (auto &tetVertArray : vertArray)
+    for (auto& tetVertArray : vertArray)
     {
         //std::cout << "tet: " << tetId << std::endl;
 
         for (int t = 0; t < 4; ++t)
         {
-            unique = true;
+            unique  = true;
             foundAt = 0;
-            a = tetVertArray[facePattern[t][0]];
-            b = tetVertArray[facePattern[t][1]];
-            c = tetVertArray[facePattern[t][2]];
+            a       = tetVertArray[facePattern[t][0]];
+            b       = tetVertArray[facePattern[t][1]];
+            c       = tetVertArray[facePattern[t][2]];
 
             // search in reverse
             for (auto it = surfaceTri.rbegin(); it != surfaceTri.rend(); ++it)
             {
-                if ((((*it)[0] == a) && (((*it)[1] == b && (*it)[2] == c) || ((*it)[1] == c && (*it)[2] == b))) ||
-                    (((*it)[1] == a) && (((*it)[0] == b && (*it)[2] == c) || ((*it)[0] == c && (*it)[2] == b))) ||
-                    (((*it)[2] == a) && (((*it)[1] == b && (*it)[0] == c) || ((*it)[1] == c && (*it)[0] == b))))
+                if ((((*it)[0] == a) && (((*it)[1] == b && (*it)[2] == c) || ((*it)[1] == c && (*it)[2] == b)))
+                    || (((*it)[1] == a) && (((*it)[0] == b && (*it)[2] == c) || ((*it)[0] == c && (*it)[2] == b)))
+                    || (((*it)[2] == a) && (((*it)[1] == b && (*it)[0] == c) || ((*it)[1] == c && (*it)[0] == b))))
                 {
-                    unique = false;
+                    unique  = false;
                     foundAt = surfaceTri.size() - 1 - (it - surfaceTri.rbegin());
                     break;
                 }
@@ -190,7 +190,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, co
 
     // Renumber the vertices
     std::list<size_t> uniqueVertIdList;
-    for (const auto &face : surfaceTri)
+    for (const auto& face : surfaceTri)
     {
         uniqueVertIdList.push_back(face[0]);
         uniqueVertIdList.push_back(face[1]);
@@ -199,13 +199,13 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, co
     uniqueVertIdList.sort();
     uniqueVertIdList.unique();
 
-    size_t vertId;
+    size_t                      vertId;
     std::list<size_t>::iterator it;
-    StdVectorOfVec3d vertPositions;
+    StdVectorOfVec3d            vertPositions;
     for (vertId = 0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
     {
         vertPositions.push_back(this->getVertexPosition(*it));
-        for (auto &face : surfaceTri)
+        for (auto& face : surfaceTri)
         {
             for (size_t i = 0; i < 3; ++i)
             {
@@ -233,8 +233,8 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
                                            WeightsArray& weights) const
 {
     const TetraArray& tetVertices = m_tetrahedraVertices.at(tetId);
-    Vec3d v[4];
-    double det;
+    Vec3d             v[4];
+    double            det;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -252,9 +252,9 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
     for (int i = 0; i < 4; ++i)
     {
         Mat4d B = A;
-        B(i, 0) = pos[0];
-        B(i, 1) = pos[1];
-        B(i, 2) = pos[2];
+        B(i, 0)    = pos[0];
+        B(i, 1)    = pos[1];
+        B(i, 2)    = pos[2];
         weights[i] = B.determinant() / det;
     }
 }

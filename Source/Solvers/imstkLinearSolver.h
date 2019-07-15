@@ -36,8 +36,8 @@ template<typename SystemMatrixType>
 class LinearSolver
 {
 public:
-    using MatrixType = SystemMatrixType;
-    using LinearSystemType = LinearSystem < MatrixType >;
+    using MatrixType       = SystemMatrixType;
+    using LinearSystemType = LinearSystem<MatrixType>;
 
     enum class Type
     {
@@ -54,8 +54,8 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() {};
-    virtual ~LinearSolver() {};
+    LinearSolver() {}
+    virtual ~LinearSolver() {}
 
     ///
     /// \brief Main solve routine
@@ -98,7 +98,7 @@ public:
     virtual void print() const
     {
         LOG(INFO) << "Solver type (broad): Linear";
-    };
+    }
 
     ///
     /// \brief Returns true if the solver is iterative
@@ -108,10 +108,10 @@ public:
     ///
     /// \brief Return the type of the solver
     ///
-    Type getType() { return m_type; };
+    Type getType() { return m_type; }
 
 protected:
-    Type m_type = Type::none;                                 ///> Type of the scene object
+    Type   m_type      = Type::none;                    ///> Type of the scene object
     double m_tolerance = 1.0e-4;                        ///> default tolerance
     std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };

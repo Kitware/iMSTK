@@ -32,30 +32,31 @@ using namespace imstk;
 ///
 /// \brief This example demonstrates line mesh rendering
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("LineMeshRenderingTest");
 
     // Construct line mesh
-    auto lineMesh = std::make_shared<LineMesh>();
+    auto lineMesh         = std::make_shared<LineMesh>();
     auto lineMeshMaterial = std::make_shared<RenderMaterial>();
     lineMeshMaterial->setLineWidth(3);
     auto lineObject = std::make_shared<VisualObject>("lineMesh");
 
     std::vector<LineMesh::LineArray> lines;
-    StdVectorOfVec3d points;
-    std::vector<Color> colors;
+    StdVectorOfVec3d                 points;
+    std::vector<Color>               colors;
 
     size_t resolution = 16;
-    size_t numVoxels = resolution * resolution * resolution;
+    size_t numVoxels  = resolution * resolution * resolution;
 
     points.resize(numVoxels * 8);
     colors.resize(numVoxels * 8);
     lines.resize(numVoxels * 12);
 
-    size_t index = 0;
+    size_t index     = 0;
     size_t lineIndex = 0;
 
     for (int z = 0; z < resolution; z++)
@@ -102,16 +103,16 @@ int main()
                 lines[lineIndex + 7][0] = index + 5;
                 lines[lineIndex + 7][1] = index + 7;
 
-                lines[lineIndex + 8][0] = index + 0;
-                lines[lineIndex + 8][1] = index + 4;
-                lines[lineIndex + 9][0] = index + 1;
-                lines[lineIndex + 9][1] = index + 5;
+                lines[lineIndex + 8][0]  = index + 0;
+                lines[lineIndex + 8][1]  = index + 4;
+                lines[lineIndex + 9][0]  = index + 1;
+                lines[lineIndex + 9][1]  = index + 5;
                 lines[lineIndex + 10][0] = index + 2;
                 lines[lineIndex + 10][1] = index + 6;
                 lines[lineIndex + 11][0] = index + 3;
                 lines[lineIndex + 11][1] = index + 7;
 
-                index += 8;
+                index     += 8;
                 lineIndex += 12;
             }
         }

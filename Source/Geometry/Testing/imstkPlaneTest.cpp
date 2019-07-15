@@ -74,7 +74,8 @@ TEST_F(imstkPlaneTest, GetVolume)
     EXPECT_EQ(m_plane.getVolume(), 0);
 }
 
-int imstkPlaneTest(int argc, char* argv[])
+int
+imstkPlaneTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

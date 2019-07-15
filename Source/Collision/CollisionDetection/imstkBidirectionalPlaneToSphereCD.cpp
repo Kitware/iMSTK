@@ -37,10 +37,10 @@ BidirectionalPlaneToSphere::computeCollisionData()
     m_colData->clearAll();
 
     // Get geometry properties
-    Vec3d sphereBPos = m_sphereB->getPosition();
-    double r = m_sphereB->getRadius() * m_sphereB->getScaling();
-    Vec3d planeAPos = m_planeA->getPosition();
-    Vec3d n = m_planeA->getNormal();
+    Vec3d  sphereBPos = m_sphereB->getPosition();
+    double r          = m_sphereB->getRadius() * m_sphereB->getScaling();
+    Vec3d  planeAPos  = m_planeA->getPosition();
+    Vec3d  n          = m_planeA->getNormal();
 
     // Compute shortest distance
     double d = (sphereBPos - planeAPos).dot(n);
@@ -49,7 +49,7 @@ BidirectionalPlaneToSphere::computeCollisionData()
     Vec3d dirAToB = n;
     if (d < 0)
     {
-        d = -d;
+        d       = -d;
         dirAToB = -n;
     }
 
@@ -61,10 +61,10 @@ BidirectionalPlaneToSphere::computeCollisionData()
     }
 
     // Compute collision points
-    Vec3d planeAColPt = sphereBPos - dirAToB * d;
+    Vec3d planeAColPt  = sphereBPos - dirAToB * d;
     Vec3d sphereBColPt = sphereBPos - dirAToB * r;
 
     // Set collisionData
-    m_colData->PDColData.push_back({planeAColPt, sphereBColPt, dirAToB, penetrationDepth});
+    m_colData->PDColData.push_back({ planeAColPt, sphereBColPt, dirAToB, penetrationDepth });
 }
 }

@@ -29,8 +29,8 @@
 
 namespace imstk
 {
-PointSetToSphereCD::PointSetToSphereCD(std::shared_ptr<PointSet> pointSet,
-                                       std::shared_ptr<Sphere> sphere,
+PointSetToSphereCD::PointSetToSphereCD(std::shared_ptr<PointSet>      pointSet,
+                                       std::shared_ptr<Sphere>        sphere,
                                        std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
     m_pointSet(pointSet),
@@ -45,8 +45,8 @@ PointSetToSphereCD::computeCollisionData()
     m_colData->clearAll();
 
     // Get sphere properties
-    const auto sphereCenter = m_sphere->getPosition();
-    const auto sphereRadius = m_sphere->getRadius();
+    const auto sphereCenter    = m_sphere->getPosition();
+    const auto sphereRadius    = m_sphere->getRadius();
     const auto sphereRadiusSqr = sphereRadius * sphereRadius;
 
     ParallelUtils::SpinLock lock;

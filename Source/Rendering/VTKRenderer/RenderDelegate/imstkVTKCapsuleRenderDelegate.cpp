@@ -31,8 +31,8 @@ VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> 
     m_visualModel = visualModel;
     auto geometry = std::static_pointer_cast<Capsule>(visualModel->getGeometry());
 
-    Geometry::DataType type = Geometry::DataType::PreTransform;
-    auto capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
+    Geometry::DataType type          = Geometry::DataType::PreTransform;
+    auto               capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
     capsuleSource->SetRadius(geometry->getRadius(type));
     capsuleSource->SetCylinderLength(geometry->getLength(type));
     capsuleSource->SetLatLongTessellation(20);

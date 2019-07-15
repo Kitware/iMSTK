@@ -31,8 +31,8 @@ namespace imstk
 bool
 PbdInteractionPair::doBroadPhaseCollision()
 {
-    auto g1 = first->getCollidingGeometry();
-    auto g2 = second->getCollidingGeometry();
+    auto g1    = first->getCollidingGeometry();
+    auto g2    = second->getCollidingGeometry();
     auto mesh1 = std::static_pointer_cast<PointSet>(g1);
     auto mesh2 = std::static_pointer_cast<PointSet>(g2);
 
@@ -78,15 +78,15 @@ PbdInteractionPair::doNarrowPhaseCollision()
         // point
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
-            Vec3d p = mesh1->getVertexPosition(i);
+            Vec3d                                   p        = mesh1->getVertexPosition(i);
             std::vector<SurfaceMesh::TriangleArray> elements = mesh2->getTrianglesVertices();
 
             for (size_t j = 0; j < elements.size(); ++j)
             {
-                SurfaceMesh::TriangleArray& e = elements[j];
-                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                SurfaceMesh::TriangleArray& e  = elements[j];
+                const Vec3d                 p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
 
                 if (testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
@@ -101,26 +101,26 @@ PbdInteractionPair::doNarrowPhaseCollision()
             }
         }
 
-        const auto nL1 = mesh1->getNumLines();
-        const auto nV2 = mesh2->getNumVertices();
-        std::vector<std::vector<bool>> E2(nV2, std::vector<bool>(nV2, 1));
+        const auto                              nL1 = mesh1->getNumLines();
+        const auto                              nV2 = mesh2->getNumVertices();
+        std::vector<std::vector<bool>>          E2(nV2, std::vector<bool>(nV2, 1));
         std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
 
         for (int k = 0; k < nL1; ++k)
         {
-            auto nodes = mesh1->getLinesVertices()[k];
-            unsigned int i1 = nodes[0];
-            unsigned int i2 = nodes[1];
+            auto         nodes = mesh1->getLinesVertices()[k];
+            unsigned int i1    = nodes[0];
+            unsigned int i2    = nodes[1];
 
             const Vec3d P = mesh1->getVertexPosition(i1);
             const Vec3d Q = mesh1->getVertexPosition(i2);
 
             for (size_t j = 0; j < elements2.size(); ++j)
             {
-                SurfaceMesh::TriangleArray& e = elements2[j];
-                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                SurfaceMesh::TriangleArray& e  = elements2[j];
+                const Vec3d                 p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
 
                 if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                 {
@@ -175,12 +175,12 @@ PbdInteractionPair::doNarrowPhaseCollision()
         // point
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
-            const auto p = mesh1->getVertexPosition(i);
-            auto elements = mesh2->getTrianglesVertices();
+            const auto p        = mesh1->getVertexPosition(i);
+            auto       elements = mesh2->getTrianglesVertices();
 
             for (size_t j = 0; j < elements.size(); ++j)
             {
-                auto& e = elements[j];
+                auto&       e  = elements[j];
                 const Vec3d p0 = mesh2->getVertexPosition(e[0]);
                 const Vec3d p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d p2 = mesh2->getVertexPosition(e[2]);
@@ -207,15 +207,15 @@ PbdInteractionPair::doNarrowPhaseCollision()
         // point
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
-            const Vec3d p = mesh1->getVertexPosition(i);
-            auto elements = mesh2->getTrianglesVertices();
+            const Vec3d p        = mesh1->getVertexPosition(i);
+            auto        elements = mesh2->getTrianglesVertices();
 
             for (size_t j = 0; j < elements.size(); ++j)
             {
-                SurfaceMesh::TriangleArray& e = elements[j];
-                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                SurfaceMesh::TriangleArray& e  = elements[j];
+                const Vec3d                 p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
 
                 if (testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
@@ -232,30 +232,30 @@ PbdInteractionPair::doNarrowPhaseCollision()
 
         // edge
         // since we don't have edge structure, the following is not good
-        const auto nV = mesh1->getNumVertices();
+        const auto                     nV = mesh1->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
-        const auto nV2 = mesh2->getNumVertices();
+        const auto                     nV2 = mesh2->getNumVertices();
         std::vector<std::vector<bool>> E2(nV2, std::vector<bool>(nV2, 1));
 
         std::vector<SurfaceMesh::TriangleArray> elements = mesh1->getTrianglesVertices();
         for (size_t k = 0; k < elements.size(); ++k)
         {
             SurfaceMesh::TriangleArray& tri = elements[k];
-            size_t i1 = tri[0];
-            size_t i2 = tri[1];
+            size_t                      i1  = tri[0];
+            size_t                      i2  = tri[1];
 
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d                             P         = mesh1->getVertexPosition(i1);
+                const Vec3d                             Q         = mesh1->getVertexPosition(i2);
                 std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
-                    SurfaceMesh::TriangleArray& e = elements2[j];
-                    const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                    const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                    const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                    SurfaceMesh::TriangleArray& e  = elements2[j];
+                    const Vec3d                 p0 = mesh2->getVertexPosition(e[0]);
+                    const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
+                    const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],
@@ -306,16 +306,16 @@ PbdInteractionPair::doNarrowPhaseCollision()
             i2 = tri[2];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d                             P         = mesh1->getVertexPosition(i1);
+                const Vec3d                             Q         = mesh1->getVertexPosition(i2);
                 std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
 
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
-                    SurfaceMesh::TriangleArray& e = elements2[j];
-                    const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                    const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                    const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                    SurfaceMesh::TriangleArray& e  = elements2[j];
+                    const Vec3d                 p0 = mesh2->getVertexPosition(e[0]);
+                    const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
+                    const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],
@@ -366,15 +366,15 @@ PbdInteractionPair::doNarrowPhaseCollision()
             i2 = tri[0];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d                             P         = mesh1->getVertexPosition(i1);
+                const Vec3d                             Q         = mesh1->getVertexPosition(i2);
                 std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
-                    SurfaceMesh::TriangleArray& e = elements2[j];
-                    const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                    const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                    const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                    SurfaceMesh::TriangleArray& e  = elements2[j];
+                    const Vec3d                 p0 = mesh2->getVertexPosition(e[0]);
+                    const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
+                    const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
                         if (testLineToLineAABB(P[0], P[1], P[2],

@@ -44,8 +44,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    MeshToMeshBruteForceCD(std::shared_ptr<Geometry> obj1,
-                           std::shared_ptr<SurfaceMesh> obj2,
+    MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      obj1,
+                           std::shared_ptr<SurfaceMesh>   obj2,
                            std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce,
                            colData),
@@ -70,7 +70,7 @@ private:
     bool doBroadPhaseCollisionCheck() const;
 
     double m_proximityTolerance = 0.1;        ///> proximity tolerance used for collision
-    std::shared_ptr<Geometry> m_object1;      ///> object 1
+    std::shared_ptr<Geometry>    m_object1;   ///> object 1
     std::shared_ptr<SurfaceMesh> m_object2;   ///> object 2
 };
 }

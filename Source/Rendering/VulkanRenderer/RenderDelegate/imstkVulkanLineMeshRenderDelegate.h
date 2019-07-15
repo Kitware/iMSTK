@@ -42,8 +42,8 @@ public:
     /// \brief Default constructor
     ///
     VulkanLineMeshRenderDelegate(std::shared_ptr<VisualModel> VisualModel,
-                                 SceneObject::Type type,
-                                 VulkanMemoryManager& memoryManager);
+                                 SceneObject::Type            type,
+                                 VulkanMemoryManager&         memoryManager);
 
     ///
     /// \brief Update render geometry

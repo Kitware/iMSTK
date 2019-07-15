@@ -66,8 +66,8 @@ struct VertexTriangleCollisionData
     VertexTriangleCollisionData(size_t vIdA, size_t fIdB, float t = -1)
     {
         vertexIdA = vIdA;
-        triIdB = fIdB;
-        time = t;
+        triIdB    = fIdB;
+        time      = t;
     }
 };
 
@@ -84,9 +84,9 @@ struct TriangleVertexCollisionData
 
     TriangleVertexCollisionData(const size_t fIdA, const size_t vIdB, const float t = -1)
     {
-        triIdA = fIdA;
+        triIdA    = fIdA;
         vertexIdB = vIdB;
-        time = t;
+        time      = t;
     }
 };
 
@@ -105,7 +105,7 @@ struct EdgeEdgeCollisionData
     {
         edgeIdA = std::pair<size_t, size_t>(eA_v1, eA_v2);
         edgeIdB = std::pair<size_t, size_t>(eB_v1, eB_v2);
-        time = t;
+        time    = t;
     }
 };
 
@@ -159,12 +159,12 @@ public:
 
     CollisionData() {}
 
-    std::vector<PositionDirectionCollisionData> PDColData; ///< Position Direction collision data
-    std::vector<VertexTriangleCollisionData> VTColData;    ///< Vertex Triangle collision data
-    std::vector<TriangleVertexCollisionData> TVColData;    ///< Triangle Vertex collision data
-    std::vector<EdgeEdgeCollisionData> EEColData;          ///< Edge Edge collision data
-    std::vector<MeshToAnalyticalCollisionData> MAColData;  ///< Mesh to analytical collision data
-    std::vector<PointTetrahedronCollisionData> PTColData;  ///< Point Tetrahedron collision data
-    std::vector<PickingCollisionData> NodePickData;        ///< List of points that are picked
+    std::vector<PositionDirectionCollisionData> PDColData;    ///< Position Direction collision data
+    std::vector<VertexTriangleCollisionData>    VTColData;    ///< Vertex Triangle collision data
+    std::vector<TriangleVertexCollisionData>    TVColData;    ///< Triangle Vertex collision data
+    std::vector<EdgeEdgeCollisionData>          EEColData;    ///< Edge Edge collision data
+    std::vector<MeshToAnalyticalCollisionData>  MAColData;    ///< Mesh to analytical collision data
+    std::vector<PointTetrahedronCollisionData>  PTColData;    ///< Point Tetrahedron collision data
+    std::vector<PickingCollisionData>           NodePickData; ///< List of points that are picked
 };
 }

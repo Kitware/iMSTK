@@ -52,38 +52,38 @@ public:
     ///
     /// \brief Solves the constant density constraint
     ///
-    bool solvePositionConstraint(PbdModel &model);
+    bool solvePositionConstraint(PbdModel& model);
 
 private:
     ///
     /// \brief Smoothing kernel WPoly6 for density estimation
     ///
-    double wPoly6(const Vec3d &pi, const Vec3d &pj);
+    double wPoly6(const Vec3d& pi, const Vec3d& pj);
 
     ///
     /// \brief Smoothing kernel Spiky for gradient calculation
     ///
-    double wSpiky(const Vec3d &pi, const Vec3d &pj);
+    double wSpiky(const Vec3d& pi, const Vec3d& pj);
 
     ///
     /// \brief
     ///
-    Vec3d gradSpiky(const Vec3d &pi, const Vec3d &pj);
+    Vec3d gradSpiky(const Vec3d& pi, const Vec3d& pj);
 
     ///
     /// \brief
     ///
-    void computeDensity(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
+    void computeDensity(const Vec3d& pi, const size_t index, const StdVectorOfVec3d& positions);
 
     ///
     /// \brief
     ///
-    void computeLambdaScalingFactor(const Vec3d &pi, const size_t index, const StdVectorOfVec3d &positions);
+    void computeLambdaScalingFactor(const Vec3d& pi, const size_t index, const StdVectorOfVec3d& positions);
 
     ///
     /// \brief
     ///
-    void updatePositions(const Vec3d &pi, const size_t index, StdVectorOfVec3d &positions);
+    void updatePositions(const Vec3d& pi, const size_t index, StdVectorOfVec3d& positions);
 
     ///
     /// \brief Set/Get rest density
@@ -108,17 +108,17 @@ private:
     double m_wPoly6Coeff;
     double m_wSpikyCoeff;
 
-    double m_maxDist = 0.2;                 ///> Max. neighbor distance
-    double m_maxDistSqr = 0.04;             ///> Max. neighbor squared distance
-    double m_relaxationParameter = 600.0;   ///> Relaxation parameter
-    double m_restDensity = 6378.0;          ///> Fluid density
+    double m_maxDist = 0.2;                          ///> Max. neighbor distance
+    double m_maxDistSqr          = 0.04;             ///> Max. neighbor squared distance
+    double m_relaxationParameter = 600.0;            ///> Relaxation parameter
+    double m_restDensity         = 6378.0;           ///> Fluid density
 
-    std::vector<double> m_lambdas;                     ///> lambdas
-    std::vector<double> m_densities;                   ///> densities
-    std::vector<Vec3d>  m_deltaPositions;              ///> delta positions
-    std::vector<std::vector<size_t>> m_neighborList;   ///> indices of neighbor particles
+    std::vector<double> m_lambdas;                   ///> lambdas
+    std::vector<double> m_densities;                 ///> densities
+    std::vector<Vec3d>  m_deltaPositions;            ///> delta positions
+    std::vector<std::vector<size_t>> m_neighborList; ///> indices of neighbor particles
 
-    NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
+    NeighborSearch::Method          m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
     std::shared_ptr<NeighborSearch> m_NeighborSearcher;  ///> neighbor searcher, must be initialized during model initialization
 };
 }

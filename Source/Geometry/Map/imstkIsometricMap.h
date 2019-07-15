@@ -72,7 +72,7 @@ public:
     inline bool isValid() const override
     {
         return true;
-    };
+    }
 
     ///
     /// \brief Set the transform

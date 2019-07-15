@@ -137,16 +137,16 @@ protected:
     ///
     virtual void cleanUpModule() = 0;
 
-    CallbackFunction m_preInitCallback;     ///> function callback preceding module initialization
-    CallbackFunction m_postInitCallback;    ///> function callback following module initialization
-    CallbackFunction m_preUpdateCallback;   ///> function callback preceding module update
-    CallbackFunction m_postUpdateCallback;  ///> function callback following module update
-    CallbackFunction m_preCleanUpCallback;  ///> function callback preceding module cleanup
-    CallbackFunction m_postCleanUpCallback; ///> function callback following module cleanup
+    CallbackFunction m_preInitCallback;                            ///> function callback preceding module initialization
+    CallbackFunction m_postInitCallback;                           ///> function callback following module initialization
+    CallbackFunction m_preUpdateCallback;                          ///> function callback preceding module update
+    CallbackFunction m_postUpdateCallback;                         ///> function callback following module update
+    CallbackFunction m_preCleanUpCallback;                         ///> function callback preceding module cleanup
+    CallbackFunction m_postCleanUpCallback;                        ///> function callback following module cleanup
 
-    std::atomic<ModuleStatus> m_status {ModuleStatus::INACTIVE}; ///> Module status
+    std::atomic<ModuleStatus> m_status { ModuleStatus::INACTIVE }; ///> Module status
 
-    std::string m_name;     ///> Name of the module
-    double m_loopDelay = 0; ///> Loop delay
+    std::string m_name;                                            ///> Name of the module
+    double      m_loopDelay = 0;                                   ///> Loop delay
 };
 }

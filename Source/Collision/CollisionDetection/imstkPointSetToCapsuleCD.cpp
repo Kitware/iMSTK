@@ -29,8 +29,8 @@
 
 namespace imstk
 {
-PointSetToCapsuleCD::PointSetToCapsuleCD(std::shared_ptr<PointSet> pointSet,
-                                         std::shared_ptr<Capsule> capsule,
+PointSetToCapsuleCD::PointSetToCapsuleCD(std::shared_ptr<PointSet>      pointSet,
+                                         std::shared_ptr<Capsule>       capsule,
                                          std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::PointSetToCapsule, colData),
     m_pointSet(pointSet),
@@ -45,16 +45,16 @@ PointSetToCapsuleCD::computeCollisionData()
     m_colData->clearAll();
 
     auto capsulePos = m_capsule->getPosition();
-    auto length = m_capsule->getLength();
-    auto radius = m_capsule->getRadius();
+    auto length     = m_capsule->getLength();
+    auto radius     = m_capsule->getRadius();
 
     // Get position of end points of the capsule
     // TODO: Fix this issue of extra computation in future
-    auto p0 = capsulePos;
-    auto p1 = p0 + m_capsule->getOrientationAxis() * length;
-    auto mid = 0.5 * (p0 + p1);
-    auto p = p1 - p0;
-    auto pDotp = p.dot(p);
+    auto p0     = capsulePos;
+    auto p1     = p0 + m_capsule->getOrientationAxis() * length;
+    auto mid    = 0.5 * (p0 + p1);
+    auto p      = p1 - p0;
+    auto pDotp  = p.dot(p);
     auto pDotp0 = p.dot(p0);
 
     ParallelUtils::SpinLock lock;

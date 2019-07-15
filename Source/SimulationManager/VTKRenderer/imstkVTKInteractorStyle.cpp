@@ -37,8 +37,8 @@ namespace imstk
 VTKInteractorStyle::VTKInteractorStyle()
 {
     m_textStatusManager = std::make_shared<VTKTextStatusManager>(this);
-    m_lastFpsUpdate = std::chrono::high_resolution_clock::now();
-    m_lastFps = 60.0;
+    m_lastFpsUpdate     = std::chrono::high_resolution_clock::now();
+    m_lastFps           = 60.0;
 }
 
 VTKInteractorStyle::~VTKInteractorStyle()
@@ -85,7 +85,7 @@ VTKInteractorStyle::OnTimer()
     if (m_displayFps)
     {
         // Update framerate value display
-        auto now = std::chrono::high_resolution_clock::now();
+        auto   now       = std::chrono::high_resolution_clock::now();
         double visualFPS = 1e6 / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count());
         visualFPS = 0.1 * visualFPS + 0.9 * m_lastFps;
         m_lastFps = visualFPS;
@@ -131,9 +131,9 @@ VTKInteractorStyle::OnChar()
 
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onCharFunctionMap.count(key) &&
-        m_onCharFunctionMap.at(key) &&
-        m_onCharFunctionMap.at(key)(this))
+    if (m_onCharFunctionMap.count(key)
+        && m_onCharFunctionMap.at(key)
+        && m_onCharFunctionMap.at(key)(this))
     {
         return;
     }
@@ -159,8 +159,8 @@ VTKInteractorStyle::OnChar()
             m_simManager->startSimulation(SimulationStatus::RUNNING);
         }
     }
-    else if (status != SimulationStatus::INACTIVE &&
-             (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
+    else if (status != SimulationStatus::INACTIVE
+             && (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
     {
         m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, false);
         //m_simManager->endSimulation();
@@ -197,8 +197,8 @@ VTKInteractorStyle::OnMouseMove()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMouseMoveFunction &&
-        m_onMouseMoveFunction(this))
+    if (m_onMouseMoveFunction
+        && m_onMouseMoveFunction(this))
     {
         return;
     }
@@ -218,8 +218,8 @@ VTKInteractorStyle::OnLeftButtonDown()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onLeftButtonDownFunction &&
-        m_onLeftButtonDownFunction(this))
+    if (m_onLeftButtonDownFunction
+        && m_onLeftButtonDownFunction(this))
     {
         return;
     }
@@ -239,8 +239,8 @@ VTKInteractorStyle::OnLeftButtonUp()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onLeftButtonUpFunction &&
-        m_onLeftButtonUpFunction(this))
+    if (m_onLeftButtonUpFunction
+        && m_onLeftButtonUpFunction(this))
     {
         return;
     }
@@ -260,8 +260,8 @@ VTKInteractorStyle::OnMiddleButtonDown()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMiddleButtonDownFunction &&
-        m_onMiddleButtonDownFunction(this))
+    if (m_onMiddleButtonDownFunction
+        && m_onMiddleButtonDownFunction(this))
     {
         return;
     }
@@ -281,8 +281,8 @@ VTKInteractorStyle::OnMiddleButtonUp()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMiddleButtonUpFunction &&
-        m_onMiddleButtonUpFunction(this))
+    if (m_onMiddleButtonUpFunction
+        && m_onMiddleButtonUpFunction(this))
     {
         return;
     }
@@ -302,8 +302,8 @@ VTKInteractorStyle::OnRightButtonDown()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onRightButtonDownFunction &&
-        m_onRightButtonDownFunction(this))
+    if (m_onRightButtonDownFunction
+        && m_onRightButtonDownFunction(this))
     {
         return;
     }
@@ -323,8 +323,8 @@ VTKInteractorStyle::OnRightButtonUp()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onRightButtonUpFunction &&
-        m_onRightButtonUpFunction(this))
+    if (m_onRightButtonUpFunction
+        && m_onRightButtonUpFunction(this))
     {
         return;
     }
@@ -344,8 +344,8 @@ VTKInteractorStyle::OnMouseWheelForward()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMouseWheelForwardFunction &&
-        m_onMouseWheelForwardFunction(this))
+    if (m_onMouseWheelForwardFunction
+        && m_onMouseWheelForwardFunction(this))
     {
         return;
     }
@@ -365,8 +365,8 @@ VTKInteractorStyle::OnMouseWheelBackward()
 {
     // Call custom function if exists, and return
     // if it returned `override=true`
-    if (m_onMouseWheelBackwardFunction &&
-        m_onMouseWheelBackwardFunction(this))
+    if (m_onMouseWheelBackwardFunction
+        && m_onMouseWheelBackwardFunction(this))
     {
         return;
     }

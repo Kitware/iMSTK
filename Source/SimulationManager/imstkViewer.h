@@ -43,7 +43,7 @@ class Viewer
 public:
 
     Viewer() {}
-    Viewer(SimulationManager *){}
+    Viewer(SimulationManager*) {}
     virtual ~Viewer() = default;
 
     ///
@@ -75,7 +75,7 @@ public:
     ///
     /// \brief Get the current renderer's mode
     ///
-    virtual Renderer::Mode getRenderingMode(){ return Renderer::Mode::EMPTY; }
+    virtual Renderer::Mode getRenderingMode() { return Renderer::Mode::EMPTY; }
 
     ///
     /// \brief Returns true if the Viewer is rendering

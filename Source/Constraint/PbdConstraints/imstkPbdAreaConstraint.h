@@ -53,10 +53,10 @@ public:
     ///
     /// \brief Solves the area constraint
     ///
-    bool solvePositionConstraint(PbdModel &model);
+    bool solvePositionConstraint(PbdModel& model);
 
 public:
-    double m_restArea; ///> Area at the rest position
+    double m_restArea;  ///> Area at the rest position
     double m_stiffness; ///> Stiffness of the area constraint
 };
 } // imstk

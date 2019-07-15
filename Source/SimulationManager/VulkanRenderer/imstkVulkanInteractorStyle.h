@@ -48,12 +48,12 @@ class VulkanInteractorStyle : public InteractorStyle
 {
 public:
     VulkanInteractorStyle();
-    virtual ~VulkanInteractorStyle(){};
+    virtual ~VulkanInteractorStyle() {}
 
     ///
     /// \brief Set window
     ///
-    virtual void setWindow(GLFWwindow * window, VulkanViewer * viewer);
+    virtual void setWindow(GLFWwindow* window, VulkanViewer* viewer);
 
     virtual void OnTimer();
     virtual void OnChar(int keyID, int type);
@@ -68,13 +68,13 @@ public:
     virtual void OnMouseWheelBackward(double y);
     void OnWindowResize(int width, int height);
 
-    static void OnCharInterface(GLFWwindow * window, int a, int b, int c, int d);
-    static void OnMouseButtonInterface(GLFWwindow * window, int a, int b, int c);
-    static void OnMouseMoveInterface(GLFWwindow * window, double x, double y);
-    static void OnMouseWheelInterface(GLFWwindow * window, double x, double y);
+    static void OnCharInterface(GLFWwindow* window, int a, int b, int c, int d);
+    static void OnMouseButtonInterface(GLFWwindow* window, int a, int b, int c);
+    static void OnMouseMoveInterface(GLFWwindow* window, double x, double y);
+    static void OnMouseWheelInterface(GLFWwindow* window, double x, double y);
 
-    static void OnWindowResizeInterface(GLFWwindow * window, int width, int height);
-    static void OnFramebuffersResizeInterface(GLFWwindow * window, int width, int height);
+    static void OnWindowResizeInterface(GLFWwindow* window, int width, int height);
+    static void OnFramebuffersResizeInterface(GLFWwindow* window, int width, int height);
     static void OnFrame();
 
 private:
@@ -85,27 +85,27 @@ private:
     ///
     /// \brief Normalized coordinates in the context of the screen
     ///
-    void normalizeCoordinate(double &x, double &y);
+    void normalizeCoordinate(double& x, double& y);
 
-    GLFWwindow * m_window;
-    SimulationManager * m_simManager;
-    VulkanViewer * m_viewer;
+    GLFWwindow*        m_window;
+    SimulationManager* m_simManager;
+    VulkanViewer*      m_viewer;
 
     StopWatch m_stopWatch;
 
     // States
     enum class MouseState
     {
-        LEFT_MOUSE_DOWN = 0x1,
+        LEFT_MOUSE_DOWN   = 0x1,
         MIDDLE_MOUSE_DOWN = 0x2,
-        RIGHT_MOUSE_DOWN = 0x4
+        RIGHT_MOUSE_DOWN  = 0x4
     };
 
-    double m_mousePos[2]; ///< Mouse position
-    double m_mousePosNormalized[2]; ///< Mouse position normalized
-    double m_mousePosLastNormalized[2]; ///< Last frame mouse position normalized
+    double m_mousePos[2];                                   ///< Mouse position
+    double m_mousePosNormalized[2];                         ///< Mouse position normalized
+    double m_mousePosLastNormalized[2];                     ///< Last frame mouse position normalized
 
     Renderer::Mode m_lastFrameMode = Renderer::Mode::EMPTY; ///< Last frame mode
-    unsigned int m_state = 0;
+    unsigned int   m_state         = 0;
 };
 }

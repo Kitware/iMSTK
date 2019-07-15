@@ -29,10 +29,11 @@ using namespace imstk;
 /// \brief This example demonstrates decal rendering feature.
 /// NOTE: Requires enabling Vulkan rendering backend
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("Decals");
 
     // Position camera
@@ -42,12 +43,12 @@ int main()
 
     // Decals
     auto decalMaterial = std::make_shared<RenderMaterial>();
-    auto decalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/decals/blood_decal.png", Texture::Type::DIFFUSE);
+    auto decalTexture  = std::make_shared<Texture>(iMSTK_DATA_ROOT "/decals/blood_decal.png", Texture::Type::DIFFUSE);
     decalMaterial->addTexture(decalTexture);
 
-    auto decalPool = std::make_shared<DecalPool>();
+    auto decalPool   = std::make_shared<DecalPool>();
     auto decalObject = std::make_shared<VisualObject>("Decals");
-    auto decalModel = std::make_shared<VisualModel>(decalPool);
+    auto decalModel  = std::make_shared<VisualModel>(decalPool);
     decalModel->setRenderMaterial(decalMaterial);
     decalObject->addVisualModel(decalModel);
 

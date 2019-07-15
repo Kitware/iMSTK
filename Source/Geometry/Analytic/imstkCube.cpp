@@ -60,7 +60,7 @@ Cube::setWidth(const double w)
         return;
     }
     m_width = w;
-    m_dataModified = true;
+    m_dataModified     = true;
     m_transformApplied = false;
 }
 
@@ -79,6 +79,6 @@ Cube::updatePostTransformData()
     }
     AnalyticalGeometry::updatePostTransformData();
     m_widthPostTransform = m_scaling * m_width;
-    m_transformApplied = true;
+    m_transformApplied   = true;
 }
 } // imstk

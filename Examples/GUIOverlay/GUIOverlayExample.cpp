@@ -32,15 +32,16 @@ using namespace imstk;
 /// \brief This example demonstrates the GUI feature.
 /// NOTE: Requires enabling Vulkan rendering backend
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("GraphicalUserInterface");
+    auto sdk    = std::make_shared<SimulationManager>();
+    auto scene  = sdk->createNewScene("GraphicalUserInterface");
     auto canvas = sdk->getViewer()->getCanvas();
 
     // Cube
-    auto cube = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.5);
+    auto cube   = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.5);
     auto sphere = std::make_shared<Sphere>();
     cube->getVisualModel(0)->getGeometry()->translate(0, 0, 0);
     cube->getVisualModel(0)->getGeometry()->rotate(UP_VECTOR, PI_4);
@@ -49,16 +50,16 @@ int main()
     auto plane = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "plane", 10);
 
     // Window logic
-    auto window = std::make_shared<GUIOverlay::Window>("Test Window", "Test Window", 200.0f, 100.0f, 200.0f, 0.0f);
+    auto window     = std::make_shared<GUIOverlay::Window>("Test Window", "Test Window", 200.0f, 100.0f, 200.0f, 0.0f);
     auto windowText = std::make_shared<GUIOverlay::Text>("Window Text", "Window Text", 0.0f, 0.0f);
     window->addWidget(windowText);
 
-    auto circle = std::make_shared<GUIOverlay::Circle>("Circle", 100.0f, 100.0f, 25.0f, Color::Red, true);
+    auto circle        = std::make_shared<GUIOverlay::Circle>("Circle", 100.0f, 100.0f, 25.0f, Color::Red, true);
     auto circleOutline = std::make_shared<GUIOverlay::Circle>("CircleOutline", 100.0f, 100.0f, 25.0f, Color::Black, false);
 
     // These two rectangles show that the ordering matters
     auto underRectangle = std::make_shared<GUIOverlay::Rectangle>("UnderRectangle", 100.0f, 100.0f, 100.0f, 100.0f, Color(0.0f, 0.0f, 1.0f, 0.7f), true);
-    auto overRectangle = std::make_shared<GUIOverlay::Rectangle>("OverRectangle", 0.0f, 0.0f, 100.0f, 100.0f, Color(0.7f, 0.0f, 1.0f, 0.7f), true);
+    auto overRectangle  = std::make_shared<GUIOverlay::Rectangle>("OverRectangle", 0.0f, 0.0f, 100.0f, 100.0f, Color(0.7f, 0.0f, 1.0f, 0.7f), true);
 
     canvas->addWidget(underRectangle);
     canvas->addWidget(circle);
@@ -69,13 +70,13 @@ int main()
     StopWatch watch;
     watch.start();
     auto startTime = watch.getTimeElapsed();
-    auto lastTime = startTime;
+    auto lastTime  = startTime;
 
     // Update function
     auto GUIUpdateFunction =
         [&](InteractorStyle* style) -> bool
         {
-            auto time = watch.getTimeElapsed();
+            auto  time  = watch.getTimeElapsed();
             float angle = time / 1000.0f;
             circle->setPosition(std::sin(angle) * 50.0f + 100.0f, std::cos(angle) * 50.0f + 100.0f);
             circle->setRadius(std::abs(std::sin(angle)) * 25.0f);
@@ -92,7 +93,7 @@ int main()
         };
     sdk->getViewer()->setOnTimerFunction(GUIUpdateFunction);
 
-    bool canvasVisible = true;
+    bool canvasVisible          = true;
     auto hideShowCanvasFunction =
         [&](InteractorStyle* style) -> bool
         {

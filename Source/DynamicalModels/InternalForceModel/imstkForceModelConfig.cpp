@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSuccessful(false)
+ForceModelConfig::ForceModelConfig(const std::string& configFileName) : m_loadSuccessful(false)
 {
     if (configFileName.empty())
     {
@@ -35,13 +35,13 @@ ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSu
     {
         this->parseConfig(configFileName);
     }
-};
+}
 
 bool
-ForceModelConfig::parseConfig(const std::string &configFileName)
+ForceModelConfig::parseConfig(const std::string& configFileName)
 {
-    vega::ConfigFile vegaConfigFileOptions;
-    ForceModelConfig::customOptionsList optList;
+    vega::ConfigFile                        vegaConfigFileOptions;
+    ForceModelConfig::customOptionsList     optList;
     ForceModelConfig::customOptionsNameList optNameList;
 
     vegaConfigFileOptions.addOptionOptional(optNameList.femMethodName.c_str(), optList.femMethod, "StVK");
@@ -65,14 +65,14 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     else
     {
         this->m_vegaConfigFileName = configFileName;
-        m_loadSuccessful = true;
+        m_loadSuccessful           = true;
 
         // Print option variables
         vegaConfigFileOptions.printOptions();
     }
 
     // get the root directory
-    std::string rootDir;
+    std::string  rootDir;
     const size_t last_slash_idx = configFileName.rfind('/');
     if (std::string::npos != last_slash_idx)
     {
@@ -153,7 +153,7 @@ void
 ForceModelConfig::print()
 {
     LOG(INFO) << "Floating point type options:\n";
-    for (auto const &fo : m_floatsOptionMap)
+    for (auto const& fo : m_floatsOptionMap)
     {
         LOG(INFO) << fo.first << ": " << fo.second;
     }

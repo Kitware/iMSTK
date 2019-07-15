@@ -23,27 +23,27 @@
 
 namespace imstk
 {
-RenderParticleEmitter::RenderParticleEmitter(std::shared_ptr<Geometry> geometry,
-                                             const float time /*= 3000*/,
+RenderParticleEmitter::RenderParticleEmitter(std::shared_ptr<Geometry>   geometry,
+                                             const float                 time /*= 3000*/,
                                              RenderParticleEmitter::Mode mode /*= Mode::CONTINUOUS*/)
     : AnimationModel(geometry)
 {
     this->setGeometry(geometry);
 
-    m_time = time;
+    m_time     = time;
     m_emitTime = m_time;
-    m_mode = mode;
+    m_mode     = mode;
 
     RenderParticleKeyFrame startFrame;
     startFrame.m_color = Color::White;
     startFrame.m_time = 0.0f;
-    startFrame.m_acceleration = Vec3f(0, 0, 0);
+    startFrame.m_acceleration           = Vec3f(0, 0, 0);
     startFrame.m_rotationalAcceleration = 0.0f;
 
     RenderParticleKeyFrame endFrame;
     endFrame.m_color = startFrame.m_color;
     endFrame.m_time = m_time;
-    endFrame.m_acceleration = Vec3f(0, 0, 0);
+    endFrame.m_acceleration           = Vec3f(0, 0, 0);
     endFrame.m_rotationalAcceleration = 0.0f;
 
     m_keyFrames.push_back(startFrame);
@@ -63,7 +63,7 @@ RenderParticleEmitter::setGeometry(
     }
 
     m_animationGeometry = geometry;
-    m_particles = &std::static_pointer_cast<RenderParticles>(m_animationGeometry)->getParticles();
+    m_particles         = &std::static_pointer_cast<RenderParticles>(m_animationGeometry)->getParticles();
 }
 
 RenderParticleEmitter::Mode
@@ -90,8 +90,8 @@ RenderParticleEmitter::setInitialVelocityRange(const Vec3f minDirection,
     m_maxDirection = maxDirection;
     m_minDirection.normalize();
     m_maxDirection.normalize();
-    m_minSpeed = minSpeed;
-    m_maxSpeed = maxSpeed;
+    m_minSpeed         = minSpeed;
+    m_maxSpeed         = maxSpeed;
     m_minRotationSpeed = minRotationSpeed;
     m_maxRotationSpeed = maxRotationSpeed;
 }
@@ -108,7 +108,7 @@ RenderParticleEmitter::addKeyFrame(RenderParticleKeyFrame keyFrame)
     return true;
 }
 
-RenderParticleKeyFrame *
+RenderParticleKeyFrame*
 RenderParticleEmitter::getStartKeyFrame()
 {
     unsigned int index = 0;
@@ -124,7 +124,7 @@ RenderParticleEmitter::getStartKeyFrame()
     return &m_keyFrames[index];
 }
 
-RenderParticleKeyFrame *
+RenderParticleKeyFrame*
 RenderParticleEmitter::getEndKeyFrame()
 {
     unsigned int index = 0;
@@ -171,16 +171,16 @@ RenderParticleEmitter::update()
         m_started = true;
     }
 
-    auto time = m_stopWatch.getTimeElapsed();
-    float dt = (float)(time - m_lastUpdateTime);
+    auto  time = m_stopWatch.getTimeElapsed();
+    float dt   = (float)(time - m_lastUpdateTime);
     m_lastUpdateTime = time;
 
     for (auto&& particle : (*m_particles))
     {
         auto startKeyFrameTemp = *this->getStartKeyFrame();
-        auto startKeyFrame = &startKeyFrameTemp;
-        auto endKeyFrameTemp = *this->getEndKeyFrame();
-        auto endKeyFrame = &endKeyFrameTemp;
+        auto startKeyFrame     = &startKeyFrameTemp;
+        auto endKeyFrameTemp   = *this->getEndKeyFrame();
+        auto endKeyFrame       = &endKeyFrameTemp;
 
         particle->m_age += dt;
 
@@ -220,15 +220,15 @@ RenderParticleEmitter::update()
 
         // Update velocity and position
         particle->m_rotationalAcceleration = startKeyFrame->m_rotationalAcceleration;
-        particle->m_rotationalVelocity += particle->m_rotationalAcceleration * (dt / 1000.0f);
+        particle->m_rotationalVelocity    += particle->m_rotationalAcceleration * (dt / 1000.0f);
         particle->m_rotation += particle->m_rotationalVelocity * (dt / 1000.0f);
 
         particle->m_acceleration = startKeyFrame->m_acceleration;
-        particle->m_velocity += particle->m_acceleration * (dt / 1000.0);
-        particle->m_position += particle->m_velocity * (dt / 1000.0);
+        particle->m_velocity    += particle->m_acceleration * (dt / 1000.0);
+        particle->m_position    += particle->m_velocity * (dt / 1000.0);
 
         float timeDifference = endKeyFrame->m_time - startKeyFrame->m_time;
-        float alpha = (particle->m_age - startKeyFrame->m_time) / timeDifference;
+        float alpha          = (particle->m_age - startKeyFrame->m_time) / timeDifference;
 
         particle->m_scale = (alpha * endKeyFrame->m_scale)
                             + ((1.0f - alpha) * startKeyFrame->m_scale);
@@ -250,7 +250,7 @@ RenderParticleEmitter::initializeParticles()
     for (unsigned int i = 0; i < particles->getMaxNumParticles(); i++)
     {
         m_particles->push_back(std::unique_ptr<RenderParticle>(new RenderParticle()));
-        (*m_particles)[i]->m_age = -(i / (float)(particles->getMaxNumParticles())) * m_emitTime;
+        (*m_particles)[i]->m_age     = -(i / (float)(particles->getMaxNumParticles())) * m_emitTime;
         (*m_particles)[i]->m_created = false;
     }
 }
@@ -271,18 +271,18 @@ RenderParticleEmitter::emitParticle(std::unique_ptr<RenderParticle>& particle)
         particle->m_position[2] = (float)position[2] + z;
     }
 
-    float randomRotation = getRandomNormalizedFloat() * (float)imstk::PI * 2.0f;
+    float randomRotation           = getRandomNormalizedFloat() * (float)imstk::PI * 2.0f;
     float randomRotationalVelocity = getRandomNormalizedFloat();
-    particle->m_rotation = randomRotation;
+    particle->m_rotation           = randomRotation;
     particle->m_rotationalVelocity = (randomRotationalVelocity * m_minRotationSpeed) +
                                      ((1.0f - randomRotationalVelocity) * m_maxRotationSpeed);
 
     float randomDirectionX = getRandomNormalizedFloat();
     float randomDirectionY = getRandomNormalizedFloat();
     float randomDirectionZ = getRandomNormalizedFloat();
-    float randomSpeed = getRandomNormalizedFloat();
+    float randomSpeed      = getRandomNormalizedFloat();
 
-    float speed = (randomSpeed * m_minSpeed) + ((1.0f - randomSpeed) * m_maxSpeed);
+    float speed      = (randomSpeed * m_minSpeed) + ((1.0f - randomSpeed) * m_maxSpeed);
     float directionX = (randomDirectionX * m_minDirection[0]) + ((1.0f - randomDirectionX) * m_maxDirection[0]);
     float directionY = (randomDirectionY * m_minDirection[1]) + ((1.0f - randomDirectionY) * m_maxDirection[1]);
     float directionZ = (randomDirectionZ * m_minDirection[2]) + ((1.0f - randomDirectionZ) * m_maxDirection[2]);
@@ -294,10 +294,10 @@ RenderParticleEmitter::emitParticle(std::unique_ptr<RenderParticle>& particle)
 }
 
 void
-RenderParticleEmitter::interpolateColor(Color& destination,
+RenderParticleEmitter::interpolateColor(Color&       destination,
                                         const Color& sourceA,
                                         const Color& sourceB,
-                                        const float alpha)
+                                        const float  alpha)
 {
     destination.r = (sourceA.r * alpha) + (sourceB.r * (1.0f - alpha));
     destination.g = (sourceA.g * alpha) + (sourceB.g * (1.0f - alpha));

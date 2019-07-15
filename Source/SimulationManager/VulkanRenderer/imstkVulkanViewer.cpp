@@ -23,7 +23,7 @@
 
 namespace imstk
 {
-VulkanViewer::VulkanViewer(SimulationManager * manager, bool enableVR)
+VulkanViewer::VulkanViewer(SimulationManager* manager, bool enableVR)
 {
     m_simManager = manager;
 
@@ -39,14 +39,14 @@ VulkanViewer::VulkanViewer(SimulationManager * manager, bool enableVR)
 #ifdef iMSTK_ENABLE_VR
         auto style = std::make_shared<VulkanInteractorStyleVR>();
         style->m_simManager = m_simManager;
-        m_interactorStyle = style;
+        m_interactorStyle   = style;
 #endif
     }
     else
     {
         auto style = std::make_shared<VulkanInteractorStyleFreeCamera>();
         style->m_simManager = m_simManager;
-        m_interactorStyle = style;
+        m_interactorStyle   = style;
     }
 
     // Create GUI
@@ -98,10 +98,10 @@ VulkanViewer::disableFullscreen()
 void
 VulkanViewer::setResolution(unsigned int width, unsigned int height)
 {
-    m_windowWidth = width;
+    m_windowWidth  = width;
     m_windowHeight = height;
-    m_width = width;
-    m_height = height;
+    m_width        = width;
+    m_height       = height;
 }
 
 void
@@ -131,7 +131,7 @@ VulkanViewer::startRenderingLoop()
         interactor->initialize(m_renderer);
 
         m_renderer->m_VRSystem->GetRecommendedRenderTargetSize(&m_width, &m_height);
-        m_windowWidth = m_width;
+        m_windowWidth  = m_width;
         m_windowHeight = m_height;
     }
 #endif
@@ -188,7 +188,7 @@ VulkanViewer::getRenderingMode()
 }
 
 #ifdef iMSTK_ENABLE_VR
-vr::IVRSystem *
+vr::IVRSystem*
 VulkanViewer::getVRSystem()
 {
     return m_renderer->m_VRSystem;
@@ -211,8 +211,8 @@ VulkanViewer::setupWindow()
         return;
     }
 
-    uint32_t tempCount;
-    const char ** tempExtensions = glfwGetRequiredInstanceExtensions(&tempCount);
+    uint32_t     tempCount;
+    const char** tempExtensions = glfwGetRequiredInstanceExtensions(&tempCount);
     for (int i = 0; i < (int)tempCount; i++)
     {
         m_renderer->m_extensions.push_back((char*)tempExtensions[i]);
@@ -225,10 +225,10 @@ VulkanViewer::setupWindow()
     }
 
     // find appropriate resolution
-    int numMonitors;
+    int  numMonitors;
     auto monitors = glfwGetMonitors(&numMonitors);
 
-    int numVideoModes;
+    int  numVideoModes;
     auto videoModes = glfwGetVideoModes(monitors[0], &numVideoModes);
 
     unsigned int tempWidth;
@@ -243,12 +243,12 @@ VulkanViewer::setupWindow()
         if (dh * dw < lastDifference)
         {
             lastDifference = dh * dw;
-            tempWidth = videoModes[i].width;
-            tempHeight = videoModes[i].height;
+            tempWidth      = videoModes[i].width;
+            tempHeight     = videoModes[i].height;
         }
     }
 
-    m_width = tempWidth;
+    m_width  = tempWidth;
     m_height = tempHeight;
 }
 
@@ -258,7 +258,7 @@ VulkanViewer::createWindow()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    int numMonitors;
+    int  numMonitors;
     auto monitors = glfwGetMonitors(&numMonitors);
 
     if (!m_fullscreen || numMonitors == 0)
@@ -279,14 +279,14 @@ VulkanViewer::createWindow()
     std::dynamic_pointer_cast<VulkanInteractorStyle>(m_interactorStyle)->setWindow(m_window, this);
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(m_renderer->m_physicalDevices[0], m_surface, &m_physicalCapabilities);
-    m_windowWidth = m_physicalCapabilities.currentExtent.width;
+    m_windowWidth  = m_physicalCapabilities.currentExtent.width;
     m_windowHeight = m_physicalCapabilities.currentExtent.height;
 }
 
 void
 VulkanViewer::resizeWindow(unsigned int width, unsigned int height)
 {
-    m_width = width;
+    m_width  = width;
     m_height = height;
     vkDeviceWaitIdle(m_renderer->m_renderDevice);
     vkDestroySwapchainKHR(m_renderer->m_renderDevice, m_swapchain, nullptr);
@@ -313,7 +313,7 @@ VulkanViewer::setupSwapchain()
     VkExtent2D extent;
 
     extent.height = m_windowHeight;
-    extent.width = m_windowWidth;
+    extent.width  = m_windowWidth;
 
     bool linearColorSpaceSupported = false;
 
@@ -349,20 +349,20 @@ VulkanViewer::setupSwapchain()
     swapchainInfo.pNext = nullptr;
     swapchainInfo.flags = 0;
     swapchainInfo.surface = m_surface;
-    swapchainInfo.minImageCount = m_renderer->m_buffering; // buffering
-    swapchainInfo.imageFormat = VulkanFormats::FINAL_FORMAT;
-    swapchainInfo.imageColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-    swapchainInfo.imageExtent = extent;
-    swapchainInfo.imageArrayLayers = 1;
-    swapchainInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-    swapchainInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    swapchainInfo.minImageCount         = m_renderer->m_buffering; // buffering
+    swapchainInfo.imageFormat           = VulkanFormats::FINAL_FORMAT;
+    swapchainInfo.imageColorSpace       = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
+    swapchainInfo.imageExtent           = extent;
+    swapchainInfo.imageArrayLayers      = 1;
+    swapchainInfo.imageUsage            = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchainInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
     swapchainInfo.queueFamilyIndexCount = 0;
-    swapchainInfo.pQueueFamilyIndices = nullptr;
-    swapchainInfo.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
-    swapchainInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    swapchainInfo.presentMode = presentMode;
-    swapchainInfo.clipped = VK_TRUE;
-    swapchainInfo.oldSwapchain = VK_NULL_HANDLE;
+    swapchainInfo.pQueueFamilyIndices   = nullptr;
+    swapchainInfo.preTransform          = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    swapchainInfo.compositeAlpha        = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainInfo.presentMode           = presentMode;
+    swapchainInfo.clipped               = VK_TRUE;
+    swapchainInfo.oldSwapchain          = VK_NULL_HANDLE;
 
     vkCreateSwapchainKHR(m_renderer->m_renderDevice, &swapchainInfo, nullptr, &m_swapchain);
 }

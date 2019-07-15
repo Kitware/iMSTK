@@ -25,7 +25,7 @@
 namespace  imstk
 {
 void
-PbdDihedralConstraint::initConstraint(PbdModel &model,
+PbdDihedralConstraint::initConstraint(PbdModel& model,
                                       const size_t& pIdx1, const size_t& pIdx2,
                                       const size_t& pIdx3, const size_t& pIdx4,
                                       const double k)
@@ -38,10 +38,10 @@ PbdDihedralConstraint::initConstraint(PbdModel &model,
     m_stiffness = k;
     auto state = model.getInitialState();
 
-    const Vec3d &p0 = state->getVertexPosition(pIdx1);
-    const Vec3d &p1 = state->getVertexPosition(pIdx2);
-    const Vec3d &p2 = state->getVertexPosition(pIdx3);
-    const Vec3d &p3 = state->getVertexPosition(pIdx4);
+    const Vec3d& p0 = state->getVertexPosition(pIdx1);
+    const Vec3d& p1 = state->getVertexPosition(pIdx2);
+    const Vec3d& p2 = state->getVertexPosition(pIdx3);
+    const Vec3d& p3 = state->getVertexPosition(pIdx4);
 
     const Vec3d n1 = (p2 - p0).cross(p3 - p0).normalized();
     const Vec3d n2 = (p3 - p1).cross(p2 - p1).normalized();
@@ -59,10 +59,10 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
 
     auto state = model.getCurrentState();
 
-    Vec3d &p0 = state->getVertexPosition(i1);
-    Vec3d &p1 = state->getVertexPosition(i2);
-    Vec3d &p2 = state->getVertexPosition(i3);
-    Vec3d &p3 = state->getVertexPosition(i4);
+    Vec3d& p0 = state->getVertexPosition(i1);
+    Vec3d& p1 = state->getVertexPosition(i2);
+    Vec3d& p2 = state->getVertexPosition(i3);
+    Vec3d& p3 = state->getVertexPosition(i4);
 
     const auto im0 = model.getInvMass(i1);
     const auto im1 = model.getInvMass(i2);
@@ -74,14 +74,14 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
         return false;
     }
 
-    const auto e = p3 - p2;
+    const auto e  = p3 - p2;
     const auto e1 = p3 - p0;
     const auto e2 = p0 - p2;
     const auto e3 = p3 - p1;
     const auto e4 = p1 - p2;
     // To accelerate, all normal (area) vectors and edge length should be precomputed in parallel
-    auto n1 = e1.cross(e);
-    auto n2 = e.cross(e3);
+    auto       n1 = e1.cross(e);
+    auto       n2 = e.cross(e3);
     const auto A1 = n1.norm();
     const auto A2 = n2.norm();
     n1 /= A1;

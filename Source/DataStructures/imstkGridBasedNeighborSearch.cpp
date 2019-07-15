@@ -25,7 +25,8 @@
 
 namespace imstk
 {
-void GridBasedNeighborSearch::setSearchRadius(const Real radius)
+void
+GridBasedNeighborSearch::setSearchRadius(const Real radius)
 {
     m_SearchRadius    = radius;
     m_SearchRadiusSqr = radius * radius;
@@ -39,12 +40,14 @@ GridBasedNeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
     return result;
 }
 
-void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points)
+void
+GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points)
 {
     getNeighbors(result, points, points);
 }
 
-void GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
+void
+GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
 {
     LOG_IF(FATAL, (std::abs(m_SearchRadius) < Real(1e-8))) << "Neighbor search radius is zero";
 

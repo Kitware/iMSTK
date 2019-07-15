@@ -51,17 +51,17 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 
     if (texture->getType() == Texture::Type::CUBEMAP)
     {
-        std::string sideNames[6] = {"posx", "negx", "posy", "negy", "posz", "negz"};
+        std::string sideNames[6] = { "posx", "negx", "posy", "negy", "posz", "negz" };
         m_sourceTexture->SetCubeMap(true);
 
         for (int i = 0; i < 6; i++)
         {
-            vtkImageReader2 * imgReader;
+            vtkImageReader2* imgReader;
 
-            auto index = tFileName.find(".");
-            auto tempName = tFileName.substr(0, index);
+            auto index     = tFileName.find(".");
+            auto tempName  = tFileName.substr(0, index);
             auto extension = tFileName.substr(index);
-            auto sideName = tempName + sideNames[i] + extension;
+            auto sideName  = tempName + sideNames[i] + extension;
 
             imgReader = readerFactory->CreateImageReader2(sideName.c_str());
 
@@ -82,7 +82,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     }
     else
     {
-        vtkImageReader2 * imgReader;
+        vtkImageReader2* imgReader;
         imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
 
         if (!imgReader)

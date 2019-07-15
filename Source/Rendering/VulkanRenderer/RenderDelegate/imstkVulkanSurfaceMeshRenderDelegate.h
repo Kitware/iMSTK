@@ -40,8 +40,8 @@ public:
     /// \brief Default constructor
     ///
     VulkanSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                    SceneObject::Type type,
-                                    VulkanMemoryManager& memoryManager);
+                                    SceneObject::Type            type,
+                                    VulkanMemoryManager&         memoryManager);
 
     ///
     /// \brief Update render geometry
@@ -55,6 +55,6 @@ public:
 
 protected:
     VulkanLocalVertexUniforms m_localVertexUniforms;
-    std::vector<bool> m_modified;
+    std::vector<bool>         m_modified;
 };
 }

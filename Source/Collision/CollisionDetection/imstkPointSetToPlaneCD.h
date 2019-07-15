@@ -43,8 +43,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    PointSetToPlaneCD(std::shared_ptr<PointSet> pointSet,
-                      std::shared_ptr<Plane> plane,
+    PointSetToPlaneCD(std::shared_ptr<PointSet>      pointSet,
+                      std::shared_ptr<Plane>         plane,
                       std::shared_ptr<CollisionData> colData);
 
     ///
@@ -60,6 +60,6 @@ public:
 private:
 
     std::shared_ptr<PointSet> m_pointSet;      ///> PointSet
-    std::shared_ptr<Plane> m_plane;            ///> Plane
+    std::shared_ptr<Plane>    m_plane;         ///> Plane
 };
 }

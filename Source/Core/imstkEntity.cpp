@@ -23,7 +23,7 @@
 
 namespace imstk
 {
-std::atomic<EntityID> Entity::s_count {0};
+std::atomic<EntityID> Entity::s_count { 0 };
 
 Entity::Entity()
 {

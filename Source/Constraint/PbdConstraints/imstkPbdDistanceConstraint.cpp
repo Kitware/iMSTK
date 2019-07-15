@@ -30,25 +30,25 @@ PbdDistanceConstraint::initConstraint(PbdModel& model, const size_t& pIdx1,
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
-    m_stiffness = k;
+    m_stiffness    = k;
 
-    auto state = model.getInitialState();
-    const Vec3d &p1 = state->getVertexPosition(pIdx1);
-    const Vec3d &p2 = state->getVertexPosition(pIdx2);
+    auto         state = model.getInitialState();
+    const Vec3d& p1    = state->getVertexPosition(pIdx1);
+    const Vec3d& p2    = state->getVertexPosition(pIdx2);
 
     m_restLength = (p1 - p2).norm();
 }
 
 bool
-PbdDistanceConstraint::solvePositionConstraint(PbdModel &model)
+PbdDistanceConstraint::solvePositionConstraint(PbdModel& model)
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];
 
     auto state = model.getCurrentState();
 
-    Vec3d &p0 = state->getVertexPosition(i1);
-    Vec3d &p1 = state->getVertexPosition(i2);
+    Vec3d& p0 = state->getVertexPosition(i1);
+    Vec3d& p1 = state->getVertexPosition(i2);
 
     const auto im1 = model.getInvMass(i1);
     const auto im2 = model.getInvMass(i2);
@@ -60,7 +60,7 @@ PbdDistanceConstraint::solvePositionConstraint(PbdModel &model)
         return false;
     }
 
-    Vec3d n = p1 - p0;
+    Vec3d      n   = p1 - p0;
     const auto len = n.norm();
     n /= len;
 

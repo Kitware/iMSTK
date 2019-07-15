@@ -24,9 +24,9 @@
 namespace imstk
 {
 void
-HexahedralMesh::initialize(const StdVectorOfVec3d& vertices,
+HexahedralMesh::initialize(const StdVectorOfVec3d&       vertices,
                            const std::vector<HexaArray>& hexahedra,
-                           bool computeAttachedSurfaceMesh)
+                           bool                          computeAttachedSurfaceMesh)
 {
     PointSet::initialize(vertices);
     this->setHexahedraVertices(hexahedra);
@@ -51,7 +51,7 @@ HexahedralMesh::print() const
 
     LOG(INFO) << "Number of Hexahedra: " << this->getNumHexahedra();
     LOG(INFO) << "Hexahedra:";
-    for (auto &hex : m_hexahedraVertices)
+    for (auto& hex : m_hexahedraVertices)
     {
         LOG(INFO) << hex.at(0) << ", " << hex.at(1) << ", "
                   << hex.at(2) << ", " << hex.at(3) << ", "
@@ -63,9 +63,9 @@ HexahedralMesh::print() const
 double
 HexahedralMesh::getVolume() const
 {
-    Vec3d v[8];
-    Mat3d A;
-    Vec3d a, b, c;
+    Vec3d  v[8];
+    Mat3d  A;
+    Vec3d  a, b, c;
     double volume = 0.0;
     for (const HexaArray& hexArray : m_hexahedraVertices)
     {

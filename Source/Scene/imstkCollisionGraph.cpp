@@ -26,11 +26,11 @@
 namespace imstk
 {
 std::shared_ptr<InteractionPair>
-CollisionGraph::addInteractionPair(CollidingObjectPtr A,
-                                   CollidingObjectPtr B,
+CollisionGraph::addInteractionPair(CollidingObjectPtr       A,
+                                   CollidingObjectPtr       B,
                                    CollisionDetection::Type CDType,
-                                   CollisionHandling::Type CHAType,
-                                   CollisionHandling::Type CHBType)
+                                   CollisionHandling::Type  CHAType,
+                                   CollisionHandling::Type  CHBType)
 {
     // Check that interaction pair does not exist
     if (this->getInteractionPair(A, B) != nullptr)
@@ -69,11 +69,11 @@ CollisionGraph::addInteractionPair(std::shared_ptr<PbdInteractionPair> pair)
 }
 
 std::shared_ptr<InteractionPair>
-CollisionGraph::addInteractionPair(CollidingObjectPtr A,
-                                   CollidingObjectPtr B,
+CollisionGraph::addInteractionPair(CollidingObjectPtr    A,
+                                   CollidingObjectPtr    B,
                                    CollisionDetectionPtr CD,
-                                   CollisionHandlingPtr CHA,
-                                   CollisionHandlingPtr CHB)
+                                   CollisionHandlingPtr  CHA,
+                                   CollisionHandlingPtr  CHB)
 {
     // Check that interaction pair does not exist
     if (this->getInteractionPair(A, B) != nullptr)
@@ -154,7 +154,7 @@ CollisionGraph::removeInteractionPair(InteractionPairPtr intPair)
                                        intPair->getObjectsPair().second);
 }
 
-const std::vector<std::shared_ptr<PbdInteractionPair>> &
+const std::vector<std::shared_ptr<PbdInteractionPair>>&
 CollisionGraph::getPbdPairList() const
 {
     return m_interactionPbdPairList;
@@ -165,8 +165,8 @@ CollisionGraph::getInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B)
 {
     for (const auto& intPair : m_interactionPairList)
     {
-        if (intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(A, B) ||
-            intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(B, A))
+        if (intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(A, B)
+            || intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(B, A))
         {
             return intPair;
         }

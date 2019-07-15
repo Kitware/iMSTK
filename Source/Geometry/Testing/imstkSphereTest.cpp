@@ -63,7 +63,8 @@ TEST_F(imstkSphereTest, GetVolume)
     EXPECT_EQ(m_sphere.getVolume(), 4.0 / 3.0 * PI * r * r * r);
 }
 
-int imstkSphereTest(int argc, char* argv[])
+int
+imstkSphereTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

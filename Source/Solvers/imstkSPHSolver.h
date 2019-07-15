@@ -36,8 +36,8 @@ public:
     SPHSolver() = default;
     virtual ~SPHSolver() override = default;
 
-    SPHSolver(const SPHSolver &other) = delete;
-    SPHSolver &operator=(const SPHSolver &other) = delete;
+    SPHSolver(const SPHSolver& other) = delete;
+    SPHSolver& operator=(const SPHSolver& other) = delete;
 
     ///
     /// \brief Set the simulation object

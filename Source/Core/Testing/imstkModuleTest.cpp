@@ -37,8 +37,8 @@ public:
     ModuleMock() : Module("modulemock") {}
     ~ModuleMock() = default;
 
-    bool m_init = false;
-    bool m_run = false;
+    bool m_init    = false;
+    bool m_run     = false;
     bool m_cleanup = false;
 
 protected:
@@ -191,7 +191,8 @@ TEST_F(imstkModuleTest, ControlModule)
     t.join();
 }
 
-int imstkModuleTest(int argc, char* argv[])
+int
+imstkModuleTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

@@ -50,7 +50,7 @@ VRPNArduinoDeviceClient::cleanUpModule()
 }
 
 void VRPN_CALLBACK
-VRPNArduinoDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
+VRPNArduinoDeviceClient::analogChangeHandler(void* userData, const _vrpn_ANALOGCB a)
 {
     auto deviceClient = reinterpret_cast<VRPNArduinoDeviceClient*>(userData);
 

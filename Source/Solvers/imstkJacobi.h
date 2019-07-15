@@ -41,20 +41,20 @@ public:
     ///
     /// \brief Constructors/Destructor
     ///
-    Jacobi() { m_type = Type::Jacobi; };
-    Jacobi(const SparseMatrixd &A, const Vectord& rhs);
+    Jacobi() { m_type = Type::Jacobi; }
+    Jacobi(const SparseMatrixd& A, const Vectord& rhs);
     ~Jacobi() = default;
 
     ///
     /// \brief Remove specific constructor signatures
     ///
-    Jacobi(const Jacobi &) = delete;
-    Jacobi &operator=(const Jacobi &) = delete;
+    Jacobi(const Jacobi&) = delete;
+    Jacobi& operator=(const Jacobi&) = delete;
 
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override {};
+    void iterate(Vectord& x, bool updateResidual = true) override {}
 
     ///
     /// \brief Jacobi solver
@@ -131,7 +131,7 @@ public:
 
 private:
 
-    std::vector<LinearProjectionConstraint>  *m_FixedLinearProjConstraints;
-    std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;
+    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints;
+    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints;
 };
 } // imstk

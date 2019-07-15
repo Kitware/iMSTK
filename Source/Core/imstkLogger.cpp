@@ -27,8 +27,8 @@ namespace imstk
 Logger::Logger(std::string filename)
 {
     m_filename = filename + "_" + this->getCurrentTimeFormatted() + ".log";
-    m_mutex = new std::mutex();
-    m_thread = new std::thread(Logger::eventLoop, this);
+    m_mutex    = new std::mutex();
+    m_thread   = new std::thread(Logger::eventLoop, this);
 }
 
 Logger::~Logger()
@@ -41,16 +41,16 @@ Logger::~Logger()
 std::string
 Logger::getCurrentTimeFormatted()
 {
-    time_t now = time(0);
-    int year = gmtime(&now)->tm_year + 1900;
-    int day = gmtime(&now)->tm_mday;
-    int month = gmtime(&now)->tm_mon;
-    int hour = gmtime(&now)->tm_hour;
-    int min = gmtime(&now)->tm_min;
-    int sec = gmtime(&now)->tm_sec;
+    time_t now   = time(0);
+    int    year  = gmtime(&now)->tm_year + 1900;
+    int    day   = gmtime(&now)->tm_mday;
+    int    month = gmtime(&now)->tm_mon;
+    int    hour  = gmtime(&now)->tm_hour;
+    int    min   = gmtime(&now)->tm_min;
+    int    sec   = gmtime(&now)->tm_sec;
 
     std::string year_string = std::to_string(year);
-    std::string day_string = std::to_string(day);
+    std::string day_string  = std::to_string(day);
     if (day < 10)
     {
         day_string = "0" + day_string;
@@ -80,14 +80,14 @@ Logger::getCurrentTimeFormatted()
 }
 
 void
-Logger::eventLoop(Logger * logger)
+Logger::eventLoop(Logger* logger)
 {
     std::ofstream file(logger->m_filename);
-    std::string buffer;
+    std::string   buffer;
 
     while (logger->m_running) {
         std::unique_lock<std::mutex> ul(*logger->m_mutex);
-        logger->m_condition.wait(ul, [logger] {return logger->m_changed; });
+        logger->m_condition.wait(ul, [logger] { return logger->m_changed; });
 
         if (!logger->m_running)
         {
@@ -126,7 +126,7 @@ Logger::log(std::string message, bool prependTime /* = false */)
 
     m_condition.notify_one();
     std::unique_lock<std::mutex> ul(*m_mutex);
-    m_condition.wait(ul, [this] {return !m_changed; });
+    m_condition.wait(ul, [this] { return !m_changed; });
     ul.unlock();
 }
 
@@ -151,7 +151,7 @@ void
 Logger::setFrequency(int frequency)
 {
     m_frequency = frequency;
-    m_period = 1000 / m_frequency;
+    m_period    = 1000 / m_frequency;
 }
 
 int
@@ -172,7 +172,7 @@ Logger::shutdown()
 
     m_condition.notify_one();
     std::unique_lock<std::mutex> ul(*m_mutex);
-    m_condition.wait(ul, [this] {return !m_changed; });
+    m_condition.wait(ul, [this] { return !m_changed; });
     ul.unlock();
 }
 }

@@ -48,7 +48,7 @@ public:
     ///
     TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                    std::shared_ptr<TetrahedralMesh> meshB,
-                   std::shared_ptr<CollisionData> colData);
+                   std::shared_ptr<CollisionData>   colData);
 
     ///
     /// \brief Destructor

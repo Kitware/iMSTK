@@ -38,7 +38,8 @@ using namespace imstk;
 /// \brief This example demonstrates controlling the camera
 /// using external device. NOTE: Requires GeoMagic Touch device
 ///
-int main()
+int
+main()
 {
     #ifndef iMSTK_USE_OPENHAPTICS
     std::cout << "Audio not enabled at build time" << std::endl;
@@ -46,7 +47,7 @@ int main()
     #endif
 
     // Create SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("CameraController");
 
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -62,7 +63,7 @@ int main()
 #endif
 
     // Load Mesh
-    auto mesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    auto mesh       = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<VisualObject>("meshObject");
     meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);

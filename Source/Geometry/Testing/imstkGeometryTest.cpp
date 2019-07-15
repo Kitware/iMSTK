@@ -72,19 +72,19 @@ TEST_F(imstkGeometryTest, GetSetTranslation)
 TEST_F(imstkGeometryTest, GetSetRotation)
 {
     auto angle1 = 15;
-    auto axis1 = Vec3d(12, 0, -0.5);
-    auto aa1 = Rotd(angle1, axis1);
-    auto q1 = Quatd(aa1);
+    auto axis1  = Vec3d(12, 0, -0.5);
+    auto aa1    = Rotd(angle1, axis1);
+    auto q1     = Quatd(aa1);
 
     auto angle2 = 0.43;
-    auto axis2 = Vec3d(4000, -1, 0);
-    auto aa2 = Rotd(angle2, axis2);
-    auto mat2 = Mat3d(aa2);
+    auto axis2  = Vec3d(4000, -1, 0);
+    auto aa2    = Rotd(angle2, axis2);
+    auto mat2   = Mat3d(aa2);
 
     auto angle3 = 800;
-    auto axis3 = Vec3d(-0, 100, 2000000);
-    auto aa3 = Rotd(angle3, axis3);
-    auto mat3 = Mat3d(aa3);
+    auto axis3  = Vec3d(-0, 100, 2000000);
+    auto aa3    = Rotd(angle3, axis3);
+    auto mat3   = Mat3d(aa3);
 
     // NOTE: '==' not defined for Eigen::Quaternion, using 'isApprox'.
     // See https://forum.kde.org/viewtopic.php?f=74&t=118598
@@ -99,7 +99,8 @@ TEST_F(imstkGeometryTest, GetSetRotation)
     EXPECT_TRUE(m_geometry.getRotation().isApprox(mat3));
 }
 
-int imstkGeometryTest(int argc, char* argv[])
+int
+imstkGeometryTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);

@@ -57,7 +57,7 @@ public:
 
 protected:
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
-    vtkSmartPointer<vtkUnstructuredGrid> m_mesh; ///> Mapped tetrahedral mesh
+    vtkSmartPointer<vtkDoubleArray>      m_mappedVertexArray; ///> Mapped array of vertices
+    vtkSmartPointer<vtkUnstructuredGrid> m_mesh;              ///> Mapped tetrahedral mesh
 };
 } // imstk

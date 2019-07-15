@@ -53,8 +53,8 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    HDAPIDeviceClient(std::string name) : DeviceClient(name, "localhost"){}
-    virtual ~HDAPIDeviceClient(){}
+    HDAPIDeviceClient(std::string name) : DeviceClient(name, "localhost") {}
+    virtual ~HDAPIDeviceClient() {}
 
 protected:
 
@@ -81,8 +81,8 @@ private:
     ///
     static HDCallbackCode HDCALLBACK hapticCallback(void* pData);
 
-    HHD m_handle;     ///< device handle
-    HD_state m_state; ///< device reading state
+    HHD      m_handle; ///< device handle
+    HD_state m_state;  ///< device reading state
 };
 }
 

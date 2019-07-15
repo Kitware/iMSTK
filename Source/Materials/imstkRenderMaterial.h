@@ -164,25 +164,25 @@ protected:
     friend class VTKdbgLinesRenderDelegate;
 
     // State
-    DisplayMode m_displayMode = DisplayMode::SURFACE;
-    bool m_tessellated = false;
-    float m_lineWidth = 1.0;
-    float m_pointSize = 1.0;
-    bool m_backfaceCulling = true; ///< For performance, uncommon for this to be false
-    bool m_isDecal = false;
-    bool m_isLineMesh = false;
-    bool m_isParticle = false;
+    DisplayMode m_displayMode     = DisplayMode::SURFACE;
+    bool        m_tessellated     = false;
+    float       m_lineWidth       = 1.0;
+    float       m_pointSize       = 1.0;
+    bool        m_backfaceCulling = true; ///< For performance, uncommon for this to be false
+    bool        m_isDecal         = false;
+    bool        m_isLineMesh      = false;
+    bool        m_isParticle      = false;
 
     // Sphere size used for glyph in rendering (valid only for point set)
     double m_sphereGlyphSize = 0.05;
 
     // Colors
-    Color m_color = Color::White;
+    Color m_color      = Color::White;
     Color m_debugColor = Color::Black;
 
     // Classical values
-    float m_metalness = 0.0; ///< Value for metalness with range: [0.0, 1.0]
-    float m_roughness = 1.0; ///< Value for roughness with range: [0.0, 1.0]
+    float m_metalness  = 0.0; ///< Value for metalness with range: [0.0, 1.0]
+    float m_roughness  = 1.0; ///< Value for roughness with range: [0.0, 1.0]
     float m_emissivity = 0.0;
 
     // Textures
@@ -190,14 +190,14 @@ protected:
 
     // Shadows
     bool m_receivesShadows = true;
-    bool m_castsShadows = true;
+    bool m_castsShadows    = true;
 
     // Visibility
     bool m_isVisible = true;
 
     bool m_stateModified = true; ///< Flag for expensive state changes
-    bool m_modified = true;      ///< Flag for any material property changes
-    bool m_flatShading = false;
+    bool m_modified      = true; ///< Flag for any material property changes
+    bool m_flatShading   = false;
 
     BlendMode m_blendMode = BlendMode::ALPHA;
 };

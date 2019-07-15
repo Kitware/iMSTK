@@ -24,19 +24,19 @@
 namespace imstk
 {
 VulkanFramebuffer::VulkanFramebuffer(
-    VulkanMemoryManager& memoryManager,
-    uint32_t width,
-    uint32_t height,
+    VulkanMemoryManager&  memoryManager,
+    uint32_t              width,
+    uint32_t              height,
     VkSampleCountFlagBits samples)
 {
     m_renderDevice = memoryManager.m_device;
-    m_width = width;
-    m_height = height;
-    m_samples = samples;
+    m_width        = width;
+    m_height       = height;
+    m_samples      = samples;
 }
 
 void
-VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
+VulkanFramebuffer::initializeFramebuffer(VkRenderPass* renderPass)
 {
     m_renderPass = renderPass;
     std::vector<VkImageView> framebufferAttachments;
@@ -45,15 +45,15 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
     if (m_colorFormat != VK_FORMAT_UNDEFINED)
     {
         VkAttachmentDescription attachment;
-        attachment.flags = 0;
-        attachment.format = m_colorFormat;
-        attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachment.flags          = 0;
+        attachment.format         = m_colorFormat;
+        attachment.samples        = VK_SAMPLE_COUNT_1_BIT;
+        attachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+        attachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = m_colorLayout;
+        attachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachment.finalLayout    = m_colorLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_colorImageView);
     }
@@ -62,15 +62,15 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
     if (m_depthFormat != VK_FORMAT_UNDEFINED)
     {
         VkAttachmentDescription attachment;
-        attachment.flags = 0;
-        attachment.format = m_depthFormat;
-        attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachment.flags          = 0;
+        attachment.format         = m_depthFormat;
+        attachment.samples        = VK_SAMPLE_COUNT_1_BIT;
+        attachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+        attachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = m_depthLayout;
+        attachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachment.finalLayout    = m_depthLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_depthImageView);
     }
@@ -79,15 +79,15 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
     if (m_normalFormat != VK_FORMAT_UNDEFINED)
     {
         VkAttachmentDescription attachment;
-        attachment.flags = 0;
-        attachment.format = m_normalFormat;
-        attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachment.flags          = 0;
+        attachment.format         = m_normalFormat;
+        attachment.samples        = VK_SAMPLE_COUNT_1_BIT;
+        attachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+        attachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = m_normalLayout;
+        attachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachment.finalLayout    = m_normalLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_normalImageView);
     }
@@ -96,83 +96,83 @@ VulkanFramebuffer::initializeFramebuffer(VkRenderPass * renderPass)
     if (m_specularFormat != VK_FORMAT_UNDEFINED)
     {
         VkAttachmentDescription attachment;
-        attachment.flags = 0;
-        attachment.format = m_specularFormat;
-        attachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachment.flags          = 0;
+        attachment.format         = m_specularFormat;
+        attachment.samples        = VK_SAMPLE_COUNT_1_BIT;
+        attachment.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachment.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+        attachment.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachment.finalLayout = m_specularLayout;
+        attachment.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+        attachment.finalLayout    = m_specularLayout;
         m_attachments.push_back(attachment);
         framebufferAttachments.push_back(*m_specularImageView);
     }
 
     VkFramebufferCreateInfo framebufferInfo;
-    framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    framebufferInfo.pNext = nullptr;
-    framebufferInfo.flags = 0;
-    framebufferInfo.renderPass = *m_renderPass;
+    framebufferInfo.sType           = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebufferInfo.pNext           = nullptr;
+    framebufferInfo.flags           = 0;
+    framebufferInfo.renderPass      = *m_renderPass;
     framebufferInfo.attachmentCount = (uint32_t)framebufferAttachments.size();
-    framebufferInfo.pAttachments = &framebufferAttachments[0];
-    framebufferInfo.height = m_height;
-    framebufferInfo.width = m_width;
-    framebufferInfo.layers = 1;
+    framebufferInfo.pAttachments    = &framebufferAttachments[0];
+    framebufferInfo.height          = m_height;
+    framebufferInfo.width           = m_width;
+    framebufferInfo.layers          = 1;
 
     vkCreateFramebuffer(m_renderDevice, &framebufferInfo, nullptr, &m_framebuffer);
 }
 
 void
-VulkanFramebuffer::setColor(VulkanInternalImage * image,
-                            VkImageView * imageView,
-                            VkFormat format,
-                            VkImageLayout layout)
+VulkanFramebuffer::setColor(VulkanInternalImage* image,
+                            VkImageView*         imageView,
+                            VkFormat             format,
+                            VkImageLayout        layout)
 {
-    m_colorImage = image;
+    m_colorImage     = image;
     m_colorImageView = imageView;
-    m_colorFormat = format;
-    m_colorLayout = layout;
+    m_colorFormat    = format;
+    m_colorLayout    = layout;
 }
 
 void
-VulkanFramebuffer::setDepth(VulkanInternalImage * image,
-                            VkImageView * imageView,
-                            VkFormat format,
-                            VkImageLayout layout)
+VulkanFramebuffer::setDepth(VulkanInternalImage* image,
+                            VkImageView*         imageView,
+                            VkFormat             format,
+                            VkImageLayout        layout)
 {
-    m_depthImage = image;
+    m_depthImage     = image;
     m_depthImageView = imageView;
-    m_depthFormat = format;
-    m_depthLayout = layout;
+    m_depthFormat    = format;
+    m_depthLayout    = layout;
 }
 
 void
-VulkanFramebuffer::setNormal(VulkanInternalImage * image,
-                             VkImageView * imageView,
-                             VkFormat format,
-                             VkImageLayout layout)
+VulkanFramebuffer::setNormal(VulkanInternalImage* image,
+                             VkImageView*         imageView,
+                             VkFormat             format,
+                             VkImageLayout        layout)
 {
-    m_normalImage = image;
+    m_normalImage     = image;
     m_normalImageView = imageView;
-    m_normalFormat = format;
-    m_normalLayout = layout;
+    m_normalFormat    = format;
+    m_normalLayout    = layout;
 }
 
 void
-VulkanFramebuffer::setSpecular(VulkanInternalImage * image,
-                               VkImageView * imageView,
-                               VkFormat format,
-                               VkImageLayout layout)
+VulkanFramebuffer::setSpecular(VulkanInternalImage* image,
+                               VkImageView*         imageView,
+                               VkFormat             format,
+                               VkImageLayout        layout)
 {
-    m_specularImage = image;
+    m_specularImage     = image;
     m_specularImageView = imageView;
-    m_specularFormat = format;
-    m_specularLayout = layout;
+    m_specularFormat    = format;
+    m_specularLayout    = layout;
 }
 
 void
-VulkanFramebuffer::clear(VkDevice * device)
+VulkanFramebuffer::clear(VkDevice* device)
 {
     vkDestroyFramebuffer(*device, m_framebuffer, nullptr);
 }

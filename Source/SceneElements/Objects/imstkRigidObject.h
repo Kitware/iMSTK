@@ -35,7 +35,7 @@ public:
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<RigidBodyState> rhs){};
+    void setState(std::shared_ptr<RigidBodyState> rhs) {}
 };
 
 ///
@@ -60,7 +60,7 @@ public:
     //
     // callback called at every loop
     //
-    static void odeNearCallback(void *data, dGeomID o1, dGeomID o2);
+    static void odeNearCallback(void* data, dGeomID o1, dGeomID o2);
 
     // initialize ode
     static void initOde();
@@ -72,7 +72,7 @@ public:
     static void simulationStep();
 
     //
-    static void getGeometryConfig(imstk::Vec3d &p, imstk::Mat3d &orientation);
+    static void getGeometryConfig(imstk::Vec3d& p, imstk::Mat3d& orientation);
 
     // This is just a simple function to test ODE
     static void setup();

@@ -44,8 +44,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    PointSetToSpherePickingCD(std::shared_ptr<PointSet> pointSet,
-                              std::shared_ptr<Sphere> sphere,
+    PointSetToSpherePickingCD(std::shared_ptr<PointSet>      pointSet,
+                              std::shared_ptr<Sphere>        sphere,
                               std::shared_ptr<CollisionData> colData);
 
     ///
@@ -62,13 +62,13 @@ public:
     /// \brief Set device tracker and the id of the button
     ///
     void setDeviceTrackerAndButton(const std::shared_ptr<imstk::DeviceTracker> devTracker,
-                                   const unsigned int buttonId = 0);
+                                   const unsigned int                          buttonId = 0);
 private:
 
-    std::shared_ptr<PointSet> m_pointSet;  ///> PointSet
-    std::shared_ptr<Sphere> m_sphere;      ///> Sphere
+    std::shared_ptr<PointSet> m_pointSet;                  ///> PointSet
+    std::shared_ptr<Sphere>   m_sphere;                    ///> Sphere
 
-    std::shared_ptr<imstk::DeviceTracker> m_deviceTracker;  ///> Device tracker to get the button status
-    unsigned int m_buttonId = 0;                            ///> button id
+    std::shared_ptr<imstk::DeviceTracker> m_deviceTracker; ///> Device tracker to get the button status
+    unsigned int m_buttonId = 0;                           ///> button id
 };
 }

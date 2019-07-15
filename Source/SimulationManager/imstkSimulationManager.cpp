@@ -285,14 +285,14 @@ SimulationManager::getViewer() const
 
 void
 SimulationManager::setActiveScene(std::shared_ptr<Scene> scene,
-                                  const bool unloadCurrentScene /*= false*/)
+                                  const bool             unloadCurrentScene /*= false*/)
 {
     this->setActiveScene(scene->getName(), unloadCurrentScene);
 }
 
 void
 SimulationManager::setActiveScene(const std::string& newSceneName,
-                                  const bool unloadCurrentScene /*= false*/)
+                                  const bool         unloadCurrentScene /*= false*/)
 {
     LOG(INFO) << "SimulationManager::setActiveScene - Setting " << newSceneName << " as active";
 
@@ -438,7 +438,7 @@ SimulationManager::launchSimulation()
 
 void
 SimulationManager::startSimulation(const SimulationStatus simStatus /*= SimulationStatus::PAUSED*/,
-                                   const Renderer::Mode renderMode /*= Renderer::Mode::SIMULATION*/)
+                                   const Renderer::Mode   renderMode /*= Renderer::Mode::SIMULATION*/)
 {
     if (!m_initialized)
     {
@@ -492,8 +492,8 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
 void
 SimulationManager::infiniteLoopNoRenderingMode()
 {
-    while (this->getStatus() == SimulationStatus::RUNNING ||
-           this->getStatus() == SimulationStatus::PAUSED)
+    while (this->getStatus() == SimulationStatus::RUNNING
+           || this->getStatus() == SimulationStatus::PAUSED)
     {
         auto c = getchar();
         if (c == 'e' || c == 'E')
@@ -662,8 +662,8 @@ SimulationManager::resetSimulation()
 void
 SimulationManager::endSimulation()
 {
-    if ((m_status != SimulationStatus::RUNNING) &&
-        (m_status != SimulationStatus::PAUSED))
+    if ((m_status != SimulationStatus::RUNNING)
+        && (m_status != SimulationStatus::PAUSED))
     {
         LOG(WARNING) << "SimulationManager::endSimulation() - Simulation already terminated!";
         return;
@@ -691,7 +691,7 @@ SimulationManager::endSimulation()
     {
         for (auto pair : m_sceneManagerMap)
         {
-            std::string sceneName = pair.first;
+            std::string  sceneName   = pair.first;
             ModuleStatus sceneStatus = pair.second->getStatus();
 
             if (sceneStatus != ModuleStatus::INACTIVE)

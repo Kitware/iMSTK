@@ -24,16 +24,16 @@
 namespace imstk
 {
 VulkanParticleRenderDelegate::VulkanParticleRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                                                           SceneObject::Type type,
-                                                           VulkanMemoryManager& memoryManager)
+                                                           SceneObject::Type            type,
+                                                           VulkanMemoryManager&         memoryManager)
 {
     this->initialize(visualModel);
 
     auto geometry = std::static_pointer_cast<RenderParticles>(visualModel->getGeometry());
 
-    m_numVertices = 4;
+    m_numVertices  = 4;
     m_numTriangles = 2;
-    m_vertexSize = sizeof(VulkanBasicVertex);
+    m_vertexSize   = sizeof(VulkanBasicVertex);
 
     m_visualModel->getRenderMaterial()->m_isParticle = true;
 
@@ -48,17 +48,17 @@ VulkanParticleRenderDelegate::VulkanParticleRenderDelegate(std::shared_ptr<Visua
 void
 VulkanParticleRenderDelegate::updateVertexBuffer()
 {
-    auto vertices = (VulkanBasicVertex *)m_vertexBuffer->getVertexMemory();
+    auto vertices = (VulkanBasicVertex*)m_vertexBuffer->getVertexMemory();
     auto geometry = std::static_pointer_cast<RenderParticles>(m_visualModel->getGeometry());
 
     for (unsigned i = 0; i < m_numVertices; i++)
     {
         vertices[i].position = geometry->m_vertexPositions[i];
-        vertices[i].uv = geometry->m_vertexUVs[i];
-        vertices[i].normal = geometry->m_vertexNormals[i];
+        vertices[i].uv       = geometry->m_vertexUVs[i];
+        vertices[i].normal   = geometry->m_vertexNormals[i];
     }
 
-    auto triangles = (std::array<uint32_t, 3> *)m_vertexBuffer->getIndexMemory();
+    auto triangles = (std::array<uint32_t, 3>*)m_vertexBuffer->getIndexMemory();
 
     for (unsigned i = 0; i < m_numTriangles; i++)
     {
@@ -71,7 +71,7 @@ VulkanParticleRenderDelegate::updateVertexBuffer()
 void
 VulkanParticleRenderDelegate::initializeData(VulkanMemoryManager& memoryManager, std::shared_ptr<RenderMaterial> material)
 {
-    m_vertexUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalDecalVertexUniforms));
+    m_vertexUniformBuffer   = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalDecalVertexUniforms));
     m_fragmentUniformBuffer = std::make_shared<VulkanUniformBuffer>(memoryManager, (uint32_t)sizeof(VulkanLocalDecalFragmentUniforms));
 
     m_material = std::make_shared<VulkanMaterialDelegate>(m_vertexUniformBuffer,
@@ -119,30 +119,30 @@ VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<
         m_particleVertexUniforms.transform[i] = transformation;
 
         m_particleFragmentUniforms.receivesShadows[i] = mat->getReceivesShadows() ? 1 : 0;
-        m_particleFragmentUniforms.emissivity[i] = mat->getEmissivity();
-        m_particleFragmentUniforms.roughness[i] = mat->getRoughness();
-        m_particleFragmentUniforms.metalness[i] = mat->getMetalness();
-        m_particleFragmentUniforms.color[i][0] = m_particles[i]->m_color.r;
-        m_particleFragmentUniforms.color[i][1] = m_particles[i]->m_color.g;
-        m_particleFragmentUniforms.color[i][2] = m_particles[i]->m_color.b;
-        m_particleFragmentUniforms.color[i][3] = m_particles[i]->m_color.a;
+        m_particleFragmentUniforms.emissivity[i]      = mat->getEmissivity();
+        m_particleFragmentUniforms.roughness[i]       = mat->getRoughness();
+        m_particleFragmentUniforms.metalness[i]       = mat->getMetalness();
+        m_particleFragmentUniforms.color[i][0]        = m_particles[i]->m_color.r;
+        m_particleFragmentUniforms.color[i][1]        = m_particles[i]->m_color.g;
+        m_particleFragmentUniforms.color[i][2]        = m_particles[i]->m_color.b;
+        m_particleFragmentUniforms.color[i][3]        = m_particles[i]->m_color.a;
     }
 
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalParticleVertexUniforms),
-        (void *)&m_particleVertexUniforms, frameIndex);
+        (void*)&m_particleVertexUniforms, frameIndex);
     m_fragmentUniformBuffer->updateUniforms(sizeof(VulkanLocalParticleFragmentUniforms),
-        (void *)&m_particleFragmentUniforms, frameIndex);
+        (void*)&m_particleFragmentUniforms, frameIndex);
 }
 
 void
 VulkanParticleRenderDelegate::generateBillboardMatrix(const glm::vec3& objectPosition,
                                                       const glm::vec3& cameraPosition,
                                                       const glm::vec3& cameraUp,
-                                                      glm::mat4& transformation)
+                                                      glm::mat4&       transformation)
 {
     auto forwardVector = glm::normalize(cameraPosition - objectPosition);
-    auto rightVector = glm::cross(cameraUp, forwardVector);
-    auto upVector = glm::cross(forwardVector, rightVector);
+    auto rightVector   = glm::cross(cameraUp, forwardVector);
+    auto upVector      = glm::cross(forwardVector, rightVector);
     transformation[0][0] = rightVector[0];
     transformation[0][1] = rightVector[1];
     transformation[0][2] = rightVector[2];
@@ -156,8 +156,8 @@ VulkanParticleRenderDelegate::generateBillboardMatrix(const glm::vec3& objectPos
 
 void
 VulkanParticleRenderDelegate::sortParticles(const std::vector<std::unique_ptr<RenderParticle>>& renderParticles,
-                                            unsigned int numParticles,
-                                            const glm::vec3& cameraPosition)
+                                            unsigned int                                        numParticles,
+                                            const glm::vec3&                                    cameraPosition)
 {
     m_particles.resize(numParticles);
     m_particleIndices.resize(numParticles);
@@ -171,7 +171,7 @@ VulkanParticleRenderDelegate::sortParticles(const std::vector<std::unique_ptr<Re
 
         // Avoid square root
         m_particleDistances[i] = (dx * dx) + (dy * dy) + (dz * dz);
-        m_particleIndices[i] = i;
+        m_particleIndices[i]   = i;
     }
 
     // Sort particles

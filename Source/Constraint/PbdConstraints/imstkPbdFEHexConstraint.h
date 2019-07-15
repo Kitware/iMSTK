@@ -57,6 +57,6 @@ public:
     ///
     /// \brief Solves the FEM hexahedral element constraint
     ///
-    bool solvePositionConstraint(PbdModel &model) override;
+    bool solvePositionConstraint(PbdModel& model) override;
 };
 } // imstk

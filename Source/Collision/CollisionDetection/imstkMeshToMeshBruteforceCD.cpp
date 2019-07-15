@@ -54,15 +54,15 @@ MeshToMeshBruteForceCD::computeCollisionData()
         // point
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
-            const Vec3d p = mesh1->getVertexPosition(i);
-            const auto elements = mesh2->getTrianglesVertices();
+            const Vec3d p        = mesh1->getVertexPosition(i);
+            const auto  elements = mesh2->getTrianglesVertices();
 
             for (size_t j = 0; j < elements.size(); ++j)
             {
-                const SurfaceMesh::TriangleArray& e = elements[j];
-                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                const SurfaceMesh::TriangleArray& e  = elements[j];
+                const Vec3d                       p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
                 if (testPointToTriAABB(p[0], p[1], p[2],
                                        p0[0], p0[1], p0[2],
@@ -77,26 +77,26 @@ MeshToMeshBruteForceCD::computeCollisionData()
             }
         }
 
-        const auto numLines = mesh1->getNumLines();
-        const auto numVertices = mesh2->getNumVertices();
+        const auto                     numLines    = mesh1->getNumLines();
+        const auto                     numVertices = mesh2->getNumVertices();
         std::vector<std::vector<bool>> E2(numVertices, std::vector<bool>(numVertices, 1));
-        const auto triangleVertices = mesh2->getTrianglesVertices();
+        const auto                     triangleVertices = mesh2->getTrianglesVertices();
 
         for (int k = 0; k < numLines; ++k)
         {
-            const auto nodes = mesh1->getLinesVertices()[k];
-            const size_t i1 = nodes[0];
-            const size_t i2 = nodes[1];
+            const auto   nodes = mesh1->getLinesVertices()[k];
+            const size_t i1    = nodes[0];
+            const size_t i2    = nodes[1];
 
             const Vec3d P = mesh1->getVertexPosition(i1);
             const Vec3d Q = mesh1->getVertexPosition(i2);
 
             for (size_t j = 0; j < triangleVertices.size(); ++j)
             {
-                const SurfaceMesh::TriangleArray& e = triangleVertices[j];
-                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                const SurfaceMesh::TriangleArray& e  = triangleVertices[j];
+                const Vec3d                       p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
                 if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                 {
@@ -152,7 +152,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
             for (size_t j = 0; j < triangleVerts.size(); ++j)
             {
-                const auto& e = triangleVerts[j];
+                const auto& e  = triangleVerts[j];
                 const Vec3d p0 = mesh2->getVertexPosition(e[0]);
                 const Vec3d p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d p2 = mesh2->getVertexPosition(e[2]);
@@ -181,10 +181,10 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
             for (size_t j = 0; j < triangleVerts.size(); ++j)
             {
-                const SurfaceMesh::TriangleArray& e = triangleVerts[j];
-                const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                const SurfaceMesh::TriangleArray& e  = triangleVerts[j];
+                const Vec3d                       p0 = mesh2->getVertexPosition(e[0]);
+                const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
+                const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
                 if (testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
@@ -199,30 +199,30 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
         // edge
         // since we don't have edge structure, the following is not good
-        const auto nV = mesh1->getNumVertices();
+        const auto                     nV = mesh1->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
-        const auto nV2 = mesh2->getNumVertices();
+        const auto                     nV2 = mesh2->getNumVertices();
         std::vector<std::vector<bool>> E2(nV2, std::vector<bool>(nV2, 1));
 
         const auto& elements = mesh1->getTrianglesVertices();
         for (size_t k = 0; k < elements.size(); ++k)
         {
             const SurfaceMesh::TriangleArray& tri = elements[k];
-            size_t i1 = tri[0];
-            size_t i2 = tri[1];
+            size_t                            i1  = tri[0];
+            size_t                            i2  = tri[1];
 
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d P         = mesh1->getVertexPosition(i1);
+                const Vec3d Q         = mesh1->getVertexPosition(i2);
                 const auto& elements2 = mesh2->getTrianglesVertices();
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
-                    const SurfaceMesh::TriangleArray& e = elements2[j];
-                    const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                    const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                    const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                    const SurfaceMesh::TriangleArray& e  = elements2[j];
+                    const Vec3d                       p0 = mesh2->getVertexPosition(e[0]);
+                    const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
+                    const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
@@ -273,16 +273,16 @@ MeshToMeshBruteForceCD::computeCollisionData()
             i2 = tri[2];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d P         = mesh1->getVertexPosition(i1);
+                const Vec3d Q         = mesh1->getVertexPosition(i2);
                 const auto& elements2 = mesh2->getTrianglesVertices();
 
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
-                    const SurfaceMesh::TriangleArray& e = elements2[j];
-                    const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                    const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                    const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                    const SurfaceMesh::TriangleArray& e  = elements2[j];
+                    const Vec3d                       p0 = mesh2->getVertexPosition(e[0]);
+                    const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
+                    const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
@@ -333,15 +333,15 @@ MeshToMeshBruteForceCD::computeCollisionData()
             i2 = tri[0];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d P         = mesh1->getVertexPosition(i1);
+                const Vec3d Q         = mesh1->getVertexPosition(i2);
                 const auto& elements2 = mesh2->getTrianglesVertices();
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
-                    const SurfaceMesh::TriangleArray& e = elements2[j];
-                    const Vec3d p0 = mesh2->getVertexPosition(e[0]);
-                    const Vec3d p1 = mesh2->getVertexPosition(e[1]);
-                    const Vec3d p2 = mesh2->getVertexPosition(e[2]);
+                    const SurfaceMesh::TriangleArray& e  = elements2[j];
+                    const Vec3d                       p0 = mesh2->getVertexPosition(e[0]);
+                    const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
+                    const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {

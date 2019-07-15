@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Saves the screenshot as a png file
     ///
-    virtual void saveScreenShot(){};
+    virtual void saveScreenShot() {}
 
     ///
     /// \brief Returns the number of the screenshot
@@ -55,7 +55,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    ScreenCaptureUtility(){};
+    ScreenCaptureUtility() {}
 
     ///
     /// \brief Destructor
@@ -63,6 +63,6 @@ protected:
     ~ScreenCaptureUtility() = default;
 
     unsigned int m_screenShotNumber; //> screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
-    std::string m_screenShotPrefix; //> the prefix for the screenshots to be saved
+    std::string  m_screenShotPrefix; //> the prefix for the screenshots to be saved
 };
 } // imstk

@@ -44,8 +44,8 @@ public:
     /// \brief Default constructor
     ///
     VulkanCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel,
-                             SceneObject::Type type,
-                             VulkanMemoryManager& memoryManager);
+                             SceneObject::Type            type,
+                             VulkanMemoryManager&         memoryManager);
 
     ///
     /// \brief Update render geometry
@@ -54,6 +54,6 @@ public:
 
 protected:
     std::vector<std::array<uint32_t, 3>> m_cubeTriangles;
-    std::vector<VulkanBasicVertex> m_cubeVertices;
+    std::vector<VulkanBasicVertex>       m_cubeVertices;
 };
 }

@@ -75,7 +75,7 @@ public:
         for (int i = 0; i < 3; ++i)
         {
             m_Resolution[i] = static_cast<unsigned int>(std::ceil((m_UpperCorner[i] - m_LowerCorner[i]) / m_CellSize));
-            m_NTotalCells *= m_Resolution[i];
+            m_NTotalCells  *= m_Resolution[i];
         }
 
         LOG_IF(FATAL, (m_NTotalCells == 0)) << "Invalid grid size: [" +
@@ -227,14 +227,14 @@ public:
     }
 
 private:
-    Vec3r m_LowerCorner; ///> Lower corner of the grid
-    Vec3r m_UpperCorner; ///> Upper corner of the grid
-    Real m_CellSize;     ///> Length of grid cell
-    Real m_InvCellSize;  ///> Inverse length of grid cell
+    Vec3r m_LowerCorner;                      ///> Lower corner of the grid
+    Vec3r m_UpperCorner;                      ///> Upper corner of the grid
+    Real  m_CellSize;                         ///> Length of grid cell
+    Real  m_InvCellSize;                      ///> Inverse length of grid cell
 
     unsigned int m_NTotalCells;               ///> Number of total cells
     std::array<unsigned int, 3> m_Resolution; ///> Grid resolution (number of cells in x/y/z dimensions)
 
-    std::vector<CellData> m_CellData; ///> Data stored for each cell
+    std::vector<CellData> m_CellData;         ///> Data stored for each cell
 };
 } // end namespace imstk

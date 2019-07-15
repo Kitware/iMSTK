@@ -42,7 +42,8 @@ NeighborSearch::NeighborSearch(NeighborSearch::Method searchMethod, Real searchR
     }
 }
 
-void NeighborSearch::setSearchRadius(const Real searchRadius)
+void
+NeighborSearch::setSearchRadius(const Real searchRadius)
 {
     m_SearchRadius = searchRadius;
     if (m_Method == Method::UniformGridBasedSearch)
@@ -63,12 +64,14 @@ NeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
     return result;
 }
 
-void NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>&result, const StdVectorOfVec3r& points)
+void
+NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points)
 {
     getNeighbors(result, points, points);
 }
 
-void NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
+void
+NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
 {
     if (m_Method == Method::UniformGridBasedSearch)
     {

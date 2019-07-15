@@ -43,13 +43,13 @@ struct RenderParticle
 {
     Vec3f m_position = Vec3f(0, 0, 0);
     Vec3f m_velocity = Vec3f(0, 0, 0);
-    Vec3f m_acceleration = Vec3f(0, 0, 0);
-    Color m_color = Color::White;
-    float m_age = 0;
-    bool m_created = false;
-    float m_scale = 1.0f;
-    float m_rotation = 0;
-    float m_rotationalVelocity = 0;
+    Vec3f m_acceleration           = Vec3f(0, 0, 0);
+    Color m_color                  = Color::White;
+    float m_age                    = 0;
+    bool m_created                 = false;
+    float m_scale                  = 1.0f;
+    float m_rotation               = 0;
+    float m_rotationalVelocity     = 0;
     float m_rotationalAcceleration = 0;
 };
 
@@ -107,27 +107,27 @@ public:
     /// \brief Get volume
     /// As these are particles, the volume is 0
     ///
-    double getVolume() const override { return 0; };
+    double getVolume() const override { return 0; }
 
 protected:
     friend class VulkanParticleRenderDelegate;
     friend class RenderParticles;
 
     unsigned int m_maxNumParticles = 128; ///< Maximum particles
-    float m_particleSize = 0.1f;
+    float        m_particleSize    = 0.1f;
 
     std::vector<std::unique_ptr<RenderParticle>> m_particles; ///< Particle objects
-    glm::vec3 m_vertexPositions[4];
-    glm::vec3 m_vertexNormals[4];
-    glm::vec3 m_vertexTangents[4];
-    glm::vec2 m_vertexUVs[4];
+    glm::vec3  m_vertexPositions[4];
+    glm::vec3  m_vertexNormals[4];
+    glm::vec3  m_vertexTangents[4];
+    glm::vec2  m_vertexUVs[4];
     glm::ivec3 m_triangles[2];
 
     unsigned int m_numParticles = 0;
 
-    void applyTranslation(const Vec3d t) override {};
-    void applyRotation(const Mat3d r) override {};
-    void applyScaling(const double s) override {};
-    virtual void updatePostTransformData() override {};
+    void applyTranslation(const Vec3d t) override {}
+    void applyRotation(const Mat3d r) override {}
+    void applyScaling(const double s) override {}
+    virtual void updatePostTransformData() override {}
 };
 }

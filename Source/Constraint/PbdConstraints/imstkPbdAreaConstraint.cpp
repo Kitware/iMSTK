@@ -25,7 +25,7 @@
 namespace  imstk
 {
 void
-PbdAreaConstraint::initConstraint(PbdModel &model, const size_t& pIdx1,
+PbdAreaConstraint::initConstraint(PbdModel& model, const size_t& pIdx1,
                                   const size_t& pIdx2, const size_t& pIdx3,
                                   const double k)
 {
@@ -37,9 +37,9 @@ PbdAreaConstraint::initConstraint(PbdModel &model, const size_t& pIdx1,
 
     auto state = model.getInitialState();
 
-    const Vec3d &p0 = state->getVertexPosition(pIdx1);
-    const Vec3d &p1 = state->getVertexPosition(pIdx2);
-    const Vec3d &p2 = state->getVertexPosition(pIdx3);
+    const Vec3d& p0 = state->getVertexPosition(pIdx1);
+    const Vec3d& p1 = state->getVertexPosition(pIdx2);
+    const Vec3d& p2 = state->getVertexPosition(pIdx3);
 
     m_restArea = 0.5 * (p1 - p0).cross(p2 - p0).norm();
 }
@@ -53,9 +53,9 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
 
     auto state = model.getCurrentState();
 
-    Vec3d &p0 = state->getVertexPosition(i1);
-    Vec3d &p1 = state->getVertexPosition(i2);
-    Vec3d &p2 = state->getVertexPosition(i3);
+    Vec3d& p0 = state->getVertexPosition(i1);
+    Vec3d& p1 = state->getVertexPosition(i2);
+    Vec3d& p2 = state->getVertexPosition(i3);
 
     const auto im0 = model.getInvMass(i1);
     const auto im1 = model.getInvMass(i2);
@@ -65,7 +65,7 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
     const auto e2 = p1 - p2;
     const auto e3 = p2 - p0;
 
-    auto n = e1.cross(e2);
+    auto       n = e1.cross(e2);
     const auto A = 0.5 * n.norm();
 
     if (A < m_epsilon)

@@ -25,7 +25,7 @@
 namespace  imstk
 {
 bool
-PbdFEMTetConstraint::initConstraint(PbdModel &model,
+PbdFEMTetConstraint::initConstraint(PbdModel& model,
                                     const size_t& pIdx1, const size_t& pIdx2,
                                     const size_t& pIdx3, const size_t& pIdx4)
 {
@@ -36,10 +36,10 @@ PbdFEMTetConstraint::initConstraint(PbdModel &model,
 
     auto state = model.getInitialState();
 
-    const Vec3d &p0 = state->getVertexPosition(pIdx1);
-    const Vec3d &p1 = state->getVertexPosition(pIdx2);
-    const Vec3d &p2 = state->getVertexPosition(pIdx3);
-    const Vec3d &p3 = state->getVertexPosition(pIdx4);
+    const Vec3d& p0 = state->getVertexPosition(pIdx1);
+    const Vec3d& p1 = state->getVertexPosition(pIdx2);
+    const Vec3d& p2 = state->getVertexPosition(pIdx3);
+    const Vec3d& p3 = state->getVertexPosition(pIdx4);
 
     m_elementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
 
@@ -68,10 +68,10 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
 
     auto state = model.getCurrentState();
 
-    Vec3d &p0 = state->getVertexPosition(i1);
-    Vec3d &p1 = state->getVertexPosition(i2);
-    Vec3d &p2 = state->getVertexPosition(i3);
-    Vec3d &p3 = state->getVertexPosition(i4);
+    Vec3d& p0 = state->getVertexPosition(i1);
+    Vec3d& p1 = state->getVertexPosition(i2);
+    Vec3d& p2 = state->getVertexPosition(i3);
+    Vec3d& p3 = state->getVertexPosition(i4);
 
     //double currentVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
 
@@ -87,7 +87,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     // energy constraint
     double C = 0;
 
-    const auto mu = model.getParameters()->m_mu;
+    const auto mu     = model.getParameters()->m_mu;
     const auto lambda = model.getParameters()->m_lambda;
 
     switch (m_material)
@@ -113,7 +113,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
         P(0, 0) += lt;
         P(1, 1) += lt;
         P(2, 2) += lt;
-        P = F * P;
+        P        = F * P;
 
         C = E(0, 0) * E(0, 0) + E(0, 1) * E(0, 1) + E(0, 2) * E(0, 2)
             + E(1, 0) * E(1, 0) + E(1, 1) * E(1, 1) + E(1, 2) * E(1, 2)
@@ -127,15 +127,15 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     case MaterialType::Corotation:
     {
         Eigen::JacobiSVD<Mat3d> svd(F, Eigen::ComputeFullU | Eigen::ComputeFullV);
-        Mat3d R = svd.matrixU() * svd.matrixV().adjoint();
-        Vec3d Sigma(svd.singularValues());
-        Mat3d invFT = svd.matrixU();
+        Mat3d                   R = svd.matrixU() * svd.matrixV().adjoint();
+        Vec3d                   Sigma(svd.singularValues());
+        Mat3d                   invFT = svd.matrixU();
         invFT.col(0) /= Sigma(0);
         invFT.col(1) /= Sigma(1);
         invFT.col(2) /= Sigma(2);
-        invFT *= svd.matrixV().adjoint();
-        double J = Sigma(0) * Sigma(1) * Sigma(2);
-        Mat3d FR = F - R;
+        invFT        *= svd.matrixV().adjoint();
+        double J  = Sigma(0) * Sigma(1) * Sigma(2);
+        Mat3d  FR = F - R;
 
         P = 2 * mu * FR + lambda * (J - 1) * J * invFT;
 
@@ -149,8 +149,8 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     // P(F) = mu*(F - mu*F^-T) + lambda*log(J)F^-T;
     case MaterialType::NeoHookean:
     {
-        Mat3d invFT = F.inverse().transpose();
-        double logJ = log(F.determinant());
+        Mat3d  invFT = F.inverse().transpose();
+        double logJ  = log(F.determinant());
         P = mu * (F - invFT) + lambda * logJ * invFT;
 
         C = F(0, 0) * F(0, 0) + F(0, 1) * F(0, 1) + F(0, 2) * F(0, 2)
@@ -197,17 +197,17 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
 
     if (im1 > 0)
     {
-        p0 += -s*im1*gradC.col(0);
+        p0 += -s* im1* gradC.col(0);
     }
 
     if (im2 > 0)
     {
-        p1 += -s*im2*gradC.col(1);
+        p1 += -s* im2* gradC.col(1);
     }
 
     if (im3 > 0)
     {
-        p2 += -s*im3*gradC.col(2);
+        p2 += -s* im3* gradC.col(2);
     }
 
     if (im4 > 0)

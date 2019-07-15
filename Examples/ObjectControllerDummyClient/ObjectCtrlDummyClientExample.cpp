@@ -30,10 +30,11 @@ using namespace imstk;
 /// \brief This example demonstrates controlling the object
 /// using a simulated tracker: dummy client
 ///
-int main()
+int
+main()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("ObjectControllerDummyClient");
 
     // Device Client

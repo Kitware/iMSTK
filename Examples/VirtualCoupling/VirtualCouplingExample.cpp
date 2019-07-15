@@ -36,14 +36,15 @@ using namespace imstk;
 /// \brief This example demonstrates the concept of virtual coupling
 /// for haptic interaction. NOTE: Requires GeoMagic Touch device
 ///
-int main()
+int
+main()
 {
 #ifndef iMSTK_USE_OPENHAPTICS
     std::cout << "LaparoscopicToolController example needs haptic device to be enabled at build time" << std::endl;
     return 1;
 #else if
     // SDK and Scene
-    auto sdk = std::make_shared<SimulationManager>();
+    auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("VirtualCoupling");
 
     // Create a plane in the scene
@@ -76,7 +77,7 @@ int main()
     auto obj = std::make_shared<CollidingObject>("VirtualCouplingObject");
     obj->setCollidingGeometry(collidingGeom);
 
-    auto material = std::make_shared<RenderMaterial>();
+    auto material    = std::make_shared<RenderMaterial>();
     auto visualModel = std::make_shared<VisualModel>(visualGeom);
     visualModel->setRenderMaterial(material);
     obj->addVisualModel(visualModel);
@@ -90,7 +91,7 @@ int main()
 
     // Create a collision graph
     auto graph = scene->getCollisionGraph();
-    auto pair = graph->addInteractionPair(planeObj, obj,
+    auto pair  = graph->addInteractionPair(planeObj, obj,
         CollisionDetection::Type::UnidirectionalPlaneToSphere,
         CollisionHandling::Type::None,
         CollisionHandling::Type::VirtualCoupling);

@@ -23,9 +23,9 @@
 
 namespace imstk
 {
-NonLinearSolver::NonLinearSolver() : m_sigma(std::array < double, 2 >
+NonLinearSolver::NonLinearSolver() : m_sigma(std::array<double, 2>
     {
-        {0.1, 0.5}
+        { 0.1, 0.5 }
     }),
     m_alpha(1e-4),
     m_armijoMax(30)
@@ -40,8 +40,8 @@ double
 NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnorm)
 {
     /// Temporaries used in the line search
-    std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
-    std::array<double, 3> lambda    = {m_sigma[0] * m_sigma[1], 1.0, 1.0};
+    std::array<double, 3> fnormSqr = { previousFnorm* previousFnorm, 0.0, 0.0 };
+    std::array<double, 3> lambda   = { m_sigma[0] * m_sigma[1], 1.0, 1.0 };
 
     /// Initialize temporaries
     if (!m_nonLinearSystem)
@@ -97,7 +97,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 }
 
 void
-NonLinearSolver::parabolicModel(const std::array<double, 3> &fnorm, std::array<double, 3> &lambda)
+NonLinearSolver::parabolicModel(const std::array<double, 3>& fnorm, std::array<double, 3>& lambda)
 {
     /// Compute the coefficients for the interpolation polynomial:
     ///     p(lambda) = fnorm[0] + (b*lambda + a*lambda^2)/d1, where
@@ -106,7 +106,7 @@ NonLinearSolver::parabolicModel(const std::array<double, 3> &fnorm, std::array<d
     ///         lambda = sigma[0]*lambda
     double a1 = lambda[2] * (fnorm[1] - fnorm[0]);
     double a2 = lambda[1] * (fnorm[2] - fnorm[0]);
-    double a = a1 - a2;
+    double a  = a1 - a2;
 
     if (a >= 0)
     {
@@ -114,7 +114,7 @@ NonLinearSolver::parabolicModel(const std::array<double, 3> &fnorm, std::array<d
         return;
     }
 
-    double b = lambda[1] * a2 - lambda[2] * a1;
+    double b         = lambda[1] * a2 - lambda[2] * a1;
     double newLambda = -.5 * b / a;
 
     if (newLambda < m_sigma[0] * lambda[1])
@@ -131,12 +131,12 @@ NonLinearSolver::parabolicModel(const std::array<double, 3> &fnorm, std::array<d
 }
 
 void
-NonLinearSolver::setSigma(const std::array<double, 2> &newSigma)
+NonLinearSolver::setSigma(const std::array<double, 2>& newSigma)
 {
     m_sigma = newSigma;
 }
 
-const std::array<double, 2> &
+const std::array<double, 2>&
 NonLinearSolver::getSigma() const
 {
     return m_sigma;

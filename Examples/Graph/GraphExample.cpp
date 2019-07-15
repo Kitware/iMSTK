@@ -32,7 +32,8 @@ using namespace imstk;
 /// Usage: Example-Graph.exe [method=greedy/welsh-powell]
 /// (if no method was specified, WelshPowell method will be used)
 ///
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
     // Using WelshPowell method by default
     Graph::ColoringMethod method = Graph::ColoringMethod::WelshPowell;
@@ -40,8 +41,8 @@ int main(int argc, char** argv)
     if (argc > 1)
     {
         auto param = std::string(argv[1]);
-        if (param.find("method") == 0 &&
-            param.find_first_of("=") != std::string::npos)
+        if (param.find("method") == 0
+            && param.find_first_of("=") != std::string::npos)
         {
             if (param.substr(param.find_first_of("=") + 1) == "greedy")
             {
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
 
     std::cout << (method == Graph::ColoringMethod::Greedy ?
                   "Graph coloring method: Greedy" :
-                  "Graph coloring method: WelshPowell" ) << std::endl << std::endl;
+                  "Graph coloring method: WelshPowell") << std::endl << std::endl;
 
     Graph g1(5);
     g1.addEdge(0, 1);

@@ -29,7 +29,7 @@ LinearProjectionConstraint(const size_t& nodeId, const bool isFixed /*= false*/)
     m_nodeId = nodeId;
     if (isFixed)
     {
-        m_projection = Mat3d::Zero();
+        m_projection        = Mat3d::Zero();
         m_isFixedConstraint = true;
     }
 }
@@ -37,7 +37,7 @@ LinearProjectionConstraint(const size_t& nodeId, const bool isFixed /*= false*/)
 void
 LinearProjectionConstraint::setProjection(const size_t& nodeId, const Vec3d& p, const Vec3d& q /*= Vec3d::Zero()*/)
 {
-    m_nodeId = nodeId;
+    m_nodeId     = nodeId;
     m_projection = Mat3d::Identity() - p * p.transpose() - q * q.transpose();
 }
 
@@ -53,7 +53,7 @@ void
 LinearProjectionConstraint::setProjectorToDirichlet(const unsigned int& nodeId, const Vec3d z)
 {
     m_nodeId = nodeId;
-    m_projection = Mat3d::Zero();
+    m_projection        = Mat3d::Zero();
     m_isFixedConstraint = true;
     m_value = z;
 }
@@ -62,6 +62,6 @@ void
 LinearProjectionConstraint::reset()
 {
     m_projection = Mat3d::Identity();
-    m_value = Vec3d(0., 0., 0.);
+    m_value      = Vec3d(0., 0., 0.);
 }
 } // imstk

@@ -26,7 +26,8 @@
 
 namespace imstk
 {
-void PbdSolver::solve()
+void
+PbdSolver::solve()
 {
     m_pbdObject->integratePosition();
     m_pbdObject->solveConstraints();
@@ -34,7 +35,8 @@ void PbdSolver::solve()
     m_pbdObject->updateVelocity();
 }
 
-void PbdSolver::resolveCollisionConstraints()
+void
+PbdSolver::resolveCollisionConstraints()
 {
     if (m_PBDConstraints != nullptr)
     {

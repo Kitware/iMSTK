@@ -25,9 +25,9 @@
 namespace imstk
 {
 void
-SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
+SurfaceMesh::initialize(const StdVectorOfVec3d&           vertices,
                         const std::vector<TriangleArray>& triangles,
-                        const bool computeDerivedData)
+                        const bool                        computeDerivedData)
 {
     this->clear();
 
@@ -41,10 +41,10 @@ SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
 }
 
 void
-SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
+SurfaceMesh::initialize(const StdVectorOfVec3d&           vertices,
                         const std::vector<TriangleArray>& triangles,
-                        const StdVectorOfVec3d& normals,
-                        const bool computeDerivedData)
+                        const StdVectorOfVec3d&           normals,
+                        const bool                        computeDerivedData)
 {
     this->initialize(vertices, triangles, computeDerivedData);
 
@@ -73,7 +73,7 @@ SurfaceMesh::print() const
 
     LOG(INFO) << "Number of triangles: " << this->getNumTriangles();
     LOG(INFO) << "Triangles:";
-    for (auto &tri : m_trianglesVertices)
+    for (auto& tri : m_trianglesVertices)
     {
         LOG(INFO) << tri.at(0) << ", " << tri.at(1) << ", " << tri.at(2);
     }
@@ -149,7 +149,7 @@ SurfaceMesh::computeTrianglesNormals()
         m_triangleNormals.at(triangleId) = ((p1 - p0).cross(p2 - p0)).normalized();
     }
 
-    bool hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    bool                      hasUVs = this->hasPointDataArray(m_defaultTCoords);
     const StdVectorOfVectorf* UVs;
 
     if (hasUVs)
@@ -161,16 +161,16 @@ SurfaceMesh::computeTrianglesNormals()
     {
         for (size_t triangleId = 0; triangleId < m_triangleNormals.size(); ++triangleId)
         {
-            const auto& t  = m_trianglesVertices.at(triangleId);
-            const auto& p0 = m_vertexPositions.at(t.at(0));
-            const auto& p1 = m_vertexPositions.at(t.at(1));
-            const auto& p2 = m_vertexPositions.at(t.at(2));
+            const auto& t   = m_trianglesVertices.at(triangleId);
+            const auto& p0  = m_vertexPositions.at(t.at(0));
+            const auto& p1  = m_vertexPositions.at(t.at(1));
+            const auto& p2  = m_vertexPositions.at(t.at(2));
             const auto& uv0 = (*UVs)[t.at(0)];
             const auto& uv1 = (*UVs)[t.at(1)];
             const auto& uv2 = (*UVs)[t.at(2)];
 
-            auto diffPos1 = p1 - p0;
-            auto diffPos2 = p2 - p0;
+            auto  diffPos1   = p1 - p0;
+            auto  diffPos2   = p2 - p0;
             float diffUV1[2] = { uv1[0] - uv0[0], uv1[1] - uv0[1] };
             float diffUV2[2] = { uv2[0] - uv0[0], uv2[1] - uv0[1] };
 
@@ -198,18 +198,18 @@ SurfaceMesh::computeVertexNormals()
     StdVectorOfVec3d temp_tangents(m_vertexTangents.size());
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
     {
-        temp_normals[vertexId] = Vec3d(0, 0, 0);
+        temp_normals[vertexId]  = Vec3d(0, 0, 0);
         temp_tangents[vertexId] = Vec3d(0, 0, 0);
         for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
         {
-            temp_normals[vertexId] += m_triangleNormals[triangleId];
+            temp_normals[vertexId]  += m_triangleNormals[triangleId];
             temp_tangents[vertexId] += m_triangleTangents[triangleId];
         }
     }
 
     // Correct for UV seams
-    Vec3d normal, tangent;
-    bool hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    Vec3d                     normal, tangent;
+    bool                      hasUVs = this->hasPointDataArray(m_defaultTCoords);
     const StdVectorOfVectorf* UVs;
 
     if (hasUVs)
@@ -219,7 +219,7 @@ SurfaceMesh::computeVertexNormals()
 
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
     {
-        NormalGroup group = {m_vertexPositions[vertexId], m_vertexNormals[vertexId]};
+        NormalGroup group = { m_vertexPositions[vertexId], m_vertexNormals[vertexId] };
 
         normal = temp_normals[vertexId];
 
@@ -252,14 +252,14 @@ SurfaceMesh::computeVertexNormals()
 void
 SurfaceMesh::optimizeForDataLocality()
 {
-    const size_t numVertices = this->getNumVertices();
+    const size_t numVertices  = this->getNumVertices();
     const size_t numTriangles = this->getNumTriangles();
 
     // First find the list of triangles a given vertex is part of
     std::vector<std::vector<size_t>> vertexNeighbors;
     vertexNeighbors.resize(this->getNumVertices());
     size_t triId = 0;
-    for (const auto &tri : this->getTrianglesVertices())
+    for (const auto& tri : this->getTrianglesVertices())
     {
         vertexNeighbors[tri[0]].push_back(triId);
         vertexNeighbors[tri[1]].push_back(triId);
@@ -269,27 +269,27 @@ SurfaceMesh::optimizeForDataLocality()
     }
 
     std::vector<TriangleArray> optimizedConnectivity;
-    std::vector<size_t> optimallyOrderedNodes;
-    std::list<size_t> triUnderConsideration;
-    std::vector<bool> isNodeAdded(numVertices, false);
-    std::vector<bool> isTriangleAdded(numTriangles, false);
-    std::list<size_t> newlyAddedNodes;
+    std::vector<size_t>        optimallyOrderedNodes;
+    std::list<size_t>          triUnderConsideration;
+    std::vector<bool>          isNodeAdded(numVertices, false);
+    std::vector<bool>          isTriangleAdded(numTriangles, false);
+    std::list<size_t>          newlyAddedNodes;
 
     // A. Initialize
     optimallyOrderedNodes.push_back(0);
     isNodeAdded.at(0) = true;
-    for (const auto &neighTriId : vertexNeighbors[0])
+    for (const auto& neighTriId : vertexNeighbors[0])
     {
         triUnderConsideration.push_back(neighTriId);
     }
 
     // B. Iterate till all the nodes are added to optimized mesh
     size_t vertId[3];
-    auto connectivity = this->getTrianglesVertices();
+    auto   connectivity = this->getTrianglesVertices();
     while (triUnderConsideration.size() != 0)
     {
         // B.1 Add new nodes and triangles
-        for (const auto &triId : triUnderConsideration)
+        for (const auto& triId : triUnderConsideration)
         {
             for (int i = 0; i < 3; ++i)
             {
@@ -310,9 +310,9 @@ SurfaceMesh::optimizeForDataLocality()
 
         // B.2 Setup triangles to be considered for next iteration
         triUnderConsideration.clear();
-        for (const auto &newNodes : newlyAddedNodes)
+        for (const auto& newNodes : newlyAddedNodes)
         {
-            for (const auto &neighTriId : vertexNeighbors[newNodes])
+            for (const auto& neighTriId : vertexNeighbors[newNodes])
             {
                 if (!isTriangleAdded[neighTriId])
                 {
@@ -327,11 +327,11 @@ SurfaceMesh::optimizeForDataLocality()
     }
 
     // C. Initialize this mesh with the newly computed ones
-    StdVectorOfVec3d optimallyOrderedNodalPos;
+    StdVectorOfVec3d           optimallyOrderedNodalPos;
     std::vector<TriangleArray> optConnectivityRenumbered;
 
     // C.1 Get the positions
-    for (const auto &nodalId : optimallyOrderedNodes)
+    for (const auto& nodalId : optimallyOrderedNodes)
     {
         optimallyOrderedNodalPos.push_back(this->getInitialVertexPosition(nodalId));
     }
@@ -367,7 +367,7 @@ SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
     if (m_originalNumTriangles == 0)
     {
         m_originalNumTriangles = triangles.size();
-        m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+        m_maxNumTriangles      = (size_t)(m_originalNumTriangles * m_loadFactor);
         m_trianglesVertices.reserve(m_maxNumTriangles);
         m_vertexNormals.reserve(m_maxNumVertices);
         m_vertexTangents.reserve(m_maxNumVertices);
@@ -376,7 +376,7 @@ SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
 
     if (triangles.size() <= m_maxNumTriangles)
     {
-        m_topologyChanged = true;
+        m_topologyChanged   = true;
         m_trianglesVertices = triangles;
     }
     else
@@ -478,7 +478,7 @@ SurfaceMesh::correctWindingOrder()
         [this](const size_t masterTriId, const size_t neighTriId)
         {
             const auto& masterTri = m_trianglesVertices[masterTriId];
-            auto& neighTri = m_trianglesVertices[neighTriId];
+            auto&       neighTri  = m_trianglesVertices[neighTriId];
 
             for (unsigned int l = 0; l < 3; ++l)
             {
@@ -501,8 +501,8 @@ SurfaceMesh::correctWindingOrder()
         [this](const size_t triID, int* neig)
         {
             const auto& currentTri = m_trianglesVertices[triID];
-            size_t currentId = 0;
-            int numNeigh = 0;
+            size_t      currentId  = 0;
+            int         numNeigh   = 0;
             for (auto& tri : m_trianglesVertices)
             {
                 if (triID == currentId)
@@ -541,7 +541,7 @@ SurfaceMesh::correctWindingOrder()
     // Keep track of those neighbor triangles whose order is enforced but its neighbors not
     // necessarily enforced (trianglesCorrected). Continue this until there is no
     // triangle left in the list
-    std::vector<bool> trianglesCorrected(this->getNumTriangles(), false);
+    std::vector<bool>   trianglesCorrected(this->getNumTriangles(), false);
     std::vector<size_t> correctedTriangles;
 
     size_t currentTriangle = 0; // Start with triangle 0
@@ -550,7 +550,7 @@ SurfaceMesh::correctWindingOrder()
     do
     {
         currentTriangle = correctedTriangles[0];
-        int neighborTri[3] = {-1, -1, -1};
+        int neighborTri[3] = { -1, -1, -1 };
         getTriangleNeighbors(currentTriangle, &neighborTri[0]);
 
         for (int i = 0; i < 3; ++i)
@@ -586,7 +586,7 @@ SurfaceMesh::computeUVSeamVertexGroups()
     // Initial pass to bin vertices based on positions
     for (size_t i = 0; i < m_vertexPositions.size(); i++)
     {
-        NormalGroup group = {m_vertexPositions[i], m_vertexNormals[i]};
+        NormalGroup group = { m_vertexPositions[i], m_vertexNormals[i] };
 
         if (m_UVSeamVertexGroups.find(group) == m_UVSeamVertexGroups.end())
         {
@@ -600,8 +600,8 @@ SurfaceMesh::computeUVSeamVertexGroups()
 void
 SurfaceMesh::setLoadFactor(double loadFactor)
 {
-    m_loadFactor = loadFactor;
-    m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
+    m_loadFactor      = loadFactor;
+    m_maxNumVertices  = (size_t)(m_originalNumVertices * m_loadFactor);
     m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
     m_trianglesVertices.reserve(m_maxNumTriangles);
     m_vertexNormals.reserve(m_maxNumVertices);

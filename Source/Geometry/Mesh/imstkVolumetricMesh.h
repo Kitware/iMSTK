@@ -74,7 +74,7 @@ protected:
 
     VolumetricMesh(Geometry::Type type) : PointSet(type) {}
 
-    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh = nullptr; ///> Attached surface mesh
-    std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh = nullptr; ///> Attached vega mesh
+    std::shared_ptr<SurfaceMesh>          m_attachedSurfaceMesh = nullptr; ///> Attached surface mesh
+    std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh    = nullptr; ///> Attached vega mesh
 };
 } // imstk

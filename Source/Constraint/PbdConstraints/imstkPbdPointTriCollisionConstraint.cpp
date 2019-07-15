@@ -31,9 +31,9 @@ PbdPointTriangleConstraint::initConstraint(std::shared_ptr<PbdModel> model1, con
                                            std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
                                            const size_t& pIdx3, const size_t& pIdx4)
 {
-    m_model1 = model1;
-    m_model2 = model2;
-    m_bodiesFirst[0] = pIdx1;
+    m_model1          = model1;
+    m_model2          = model2;
+    m_bodiesFirst[0]  = pIdx1;
     m_bodiesSecond[0] = pIdx2;
     m_bodiesSecond[1] = pIdx3;
     m_bodiesSecond[2] = pIdx4;
@@ -57,7 +57,7 @@ PbdPointTriangleConstraint::solvePositionConstraint()
 
     Vec3d x12 = x2 - x1;
     Vec3d x13 = x3 - x1;
-    Vec3d n = x12.cross(x13);
+    Vec3d n   = x12.cross(x13);
     Vec3d x01 = x0 - x1;
 
     double alpha = n.dot(x12.cross(x01)) / (n.dot(n));
@@ -81,10 +81,10 @@ PbdPointTriangleConstraint::solvePositionConstraint()
     }
 
     double gamma = 1.0 - alpha - beta;
-    Vec3d grad0 = n;
-    Vec3d grad1 = -alpha * n;
-    Vec3d grad2 = -beta * n;
-    Vec3d grad3 = -gamma * n;
+    Vec3d  grad0 = n;
+    Vec3d  grad1 = -alpha * n;
+    Vec3d  grad2 = -beta * n;
+    Vec3d  grad3 = -gamma * n;
 
     const auto im0 = m_model1->getInvMass(i0);
     const auto im1 = m_model2->getInvMass(i1);
@@ -102,22 +102,22 @@ PbdPointTriangleConstraint::solvePositionConstraint()
 
     if (im0 > 0)
     {
-        x0 += -im0*lambda*grad0*m_model1->getParameters()->m_contactStiffness;
+        x0 += -im0* lambda* grad0* m_model1->getParameters()->m_contactStiffness;
     }
 
     if (im1 > 0)
     {
-        x1 += -im1*lambda*grad1*m_model2->getParameters()->m_contactStiffness;
+        x1 += -im1* lambda* grad1* m_model2->getParameters()->m_contactStiffness;
     }
 
     if (im2 > 0)
     {
-        x2 += -im2*lambda*grad2*m_model2->getParameters()->m_contactStiffness;
+        x2 += -im2* lambda* grad2* m_model2->getParameters()->m_contactStiffness;
     }
 
     if (im3 > 0)
     {
-        x3 += -im3*lambda*grad3*m_model2->getParameters()->m_contactStiffness;
+        x3 += -im3* lambda* grad3* m_model2->getParameters()->m_contactStiffness;
     }
 
     return true;

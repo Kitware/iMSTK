@@ -65,8 +65,8 @@ public:
     /// \param notSurfaceMesh if the mesh isn't a surface Mesh
     /// \param geometry the geometry object
     ///
-    void setUpMapper(vtkAlgorithmOutput *source,
-                     const bool notSurfaceMesh,
+    void setUpMapper(vtkAlgorithmOutput*             source,
+                     const bool                      notSurfaceMesh,
                      std::shared_ptr<RenderMaterial> renderMat);
 
     ///
@@ -105,8 +105,8 @@ protected:
     ///
     VTKRenderDelegate()
     {
-        m_actor = vtkSmartPointer<vtkActor>::New();
-        m_mapper = vtkSmartPointer<VTKCustomPolyDataMapper>::New();
+        m_actor     = vtkSmartPointer<vtkActor>::New();
+        m_mapper    = vtkSmartPointer<VTKCustomPolyDataMapper>::New();
         m_transform = vtkSmartPointer<vtkTransform>::New();
         m_actor->SetMapper(m_mapper);
         m_actor->SetUserTransform(m_transform);
@@ -115,7 +115,7 @@ protected:
     virtual ~VTKRenderDelegate() = default;
 
     std::shared_ptr<VisualModel> m_visualModel;
-    vtkSmartPointer<vtkActor> m_actor;
+    vtkSmartPointer<vtkActor>    m_actor;
     vtkSmartPointer<VTKCustomPolyDataMapper> m_mapper;
     vtkSmartPointer<vtkTransform> m_transform;
 };

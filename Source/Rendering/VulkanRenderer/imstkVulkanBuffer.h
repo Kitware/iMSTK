@@ -40,7 +40,7 @@ public:
     ///
     /// \brief Binds the buffer to memory
     ///
-    virtual void bind(){};
+    virtual void bind() {}
 
 protected:
     uint32_t m_buffering = 1;

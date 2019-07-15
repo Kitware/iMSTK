@@ -49,7 +49,7 @@ NewtonSolver::solveGivenState(Vectord& x)
     }
 
     // Compute norms, set tolerances and other temporaries
-    double fnorm = m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
+    double fnorm         = m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
     double stopTolerance = m_absoluteTolerance + m_relativeTolerance * fnorm;
 
     m_linearSolver->setTolerance(stopTolerance);
@@ -93,8 +93,8 @@ NewtonSolver::solve()
         return;
     }
 
-    size_t iterNum;
-    auto &u = m_nonLinearSystem->getUnknownVector();
+    size_t  iterNum;
+    auto&   u  = m_nonLinearSystem->getUnknownVector();
     Vectord du = u; // make this a class member in future
 
     double error0, error;
@@ -135,14 +135,14 @@ NewtonSolver::updateJacobian(const Vectord& x)
         return -1;
     }
 
-    auto &A = m_nonLinearSystem->m_dF(x);
+    auto& A = m_nonLinearSystem->m_dF(x);
     if (A.innerSize() == 0)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - Size of matrix is 0!";
         return -1;
     }
 
-    auto &b = m_nonLinearSystem->m_F(x, m_isSemiImplicit);
+    auto& b = m_nonLinearSystem->m_F(x, m_isSemiImplicit);
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
     //linearSystem->setLinearProjectors(m_nonLinearSystem->getLinearProjectors()); // TODO: Left for near future reference. Clear in future.
@@ -168,7 +168,7 @@ NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, 
 }
 
 void
-NewtonSolver::setLinearSolver(std::shared_ptr< NewtonSolver::LinearSolverType > newLinearSolver)
+NewtonSolver::setLinearSolver(std::shared_ptr<NewtonSolver::LinearSolverType> newLinearSolver)
 {
     m_linearSolver = newLinearSolver;
 }

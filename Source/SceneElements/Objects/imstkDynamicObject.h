@@ -35,7 +35,7 @@ class Geometry;
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
-template <class StateType>
+template<class StateType>
 class DynamicObject : public CollidingObject
 {
 public:
@@ -60,7 +60,7 @@ public:
     /// \brief Set/Get the Physics-to-Collision map
     ///
     std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const { return m_physicsToCollidingGeomMap; }
-    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map) {m_physicsToCollidingGeomMap = map; }
+    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map) { m_physicsToCollidingGeomMap = map; }
 
     ///
     /// \brief Set/Get the Physics-to-Visual map
@@ -145,15 +145,15 @@ public:
     {
         m_dynamicalModel->resetToInitialState();
         this->updateGeometries();
-    };
+    }
 
 protected:
 
     ///
     /// \brief Constructor
     ///
-    DynamicObject(const std::string& name) : CollidingObject(name){}
-    DynamicObject(std::string&& name) : CollidingObject(std::move(name)){}
+    DynamicObject(const std::string& name) : CollidingObject(name) {}
+    DynamicObject(std::string&& name) : CollidingObject(std::move(name)) {}
 
     std::shared_ptr<DynamicalModel<StateType>> m_dynamicalModel;        ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry;                        ///> Geometry used for Physics

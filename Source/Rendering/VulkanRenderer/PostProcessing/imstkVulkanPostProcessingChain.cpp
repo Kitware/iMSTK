@@ -25,7 +25,7 @@
 
 namespace imstk
 {
-VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
+VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer* renderer)
 {
     // Subsurface scattering pass
     // The buffer indices are hardcoded because it's before the accumulation composition pass
@@ -87,7 +87,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer * renderer)
     // Bloom pass
     if (m_bloom)
     {
-        int level = 1;
+        int level        = 1;
         int bloomSamples = 5;
 
         auto bloomThresholdPass = std::make_shared<VulkanPostProcess>(renderer, renderer->m_numViews, level);
@@ -157,15 +157,15 @@ VulkanPostProcessingChain::getPostProcesses()
 void
 VulkanPostProcessingChain::incrementBufferNumbers()
 {
-    m_lastInput = (m_lastInput + 1) % 3;
+    m_lastInput  = (m_lastInput + 1) % 3;
     m_lastOutput = (m_lastOutput + 1) % 3;
 }
 
 void
-VulkanPostProcessingChain::calculateBlurValuesLinear(int samples, float * values, float * offsets)
+VulkanPostProcessingChain::calculateBlurValuesLinear(int samples, float* values, float* offsets)
 {
     std::vector<float> intermediateValues(samples * 2 - 1);
-    float total = 0;
+    float              total = 0;
 
     // Calculate normal distribution
     for (int i = 0; i < intermediateValues.size(); i++)
@@ -181,20 +181,20 @@ VulkanPostProcessingChain::calculateBlurValuesLinear(int samples, float * values
         intermediateValues[i] /= total;
     }
 
-    values[0] = intermediateValues[0];
+    values[0]  = intermediateValues[0];
     offsets[0] = 0.0;
 
     // Linear sampling optimization
     for (int i = 1; i < samples; i++)
     {
-        values[i] = intermediateValues[2 * i - 1] + intermediateValues[2 * i];
+        values[i]  = intermediateValues[2 * i - 1] + intermediateValues[2 * i];
         offsets[i] = (((2 * i - 1) * intermediateValues[2 * i - 1]) +
                       ((2 * i) * intermediateValues[2 * i])) / values[i];
     }
 }
 
 void
-VulkanPostProcessingChain::calculateBlurValues(int samples, float * values, float stdDev)
+VulkanPostProcessingChain::calculateBlurValues(int samples, float* values, float stdDev)
 {
     float total = 0;
 

@@ -33,7 +33,7 @@ namespace imstk
 void
 HDAPIDeviceClient::init()
 {
-    m_buttons = std::map < size_t, bool > { { 0, false }, { 1, false }, { 2, false }, { 3, false }};
+    m_buttons = std::map<size_t, bool>{ { 0, false }, { 1, false }, { 2, false }, { 3, false } }
 
     //flush error stack
     HDErrorInfo errorFlush;
@@ -76,7 +76,7 @@ HDAPIDeviceClient::hapticCallback(void* pData)
 {
     auto client = reinterpret_cast<HDAPIDeviceClient*>(pData);
     auto handle = client->m_handle;
-    auto state = client->m_state;
+    auto state  = client->m_state;
 
     hdBeginFrame(handle);
     hdMakeCurrentDevice(handle);
@@ -90,10 +90,10 @@ HDAPIDeviceClient::hapticCallback(void* pData)
     client->m_position << state.pos[0], state.pos[1], state.pos[2];
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
     client->m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(state.trans))).rotation();
-    client->m_buttons[0] = state.buttons & HD_DEVICE_BUTTON_1;
-    client->m_buttons[1] = state.buttons & HD_DEVICE_BUTTON_2;
-    client->m_buttons[2] = state.buttons & HD_DEVICE_BUTTON_3;
-    client->m_buttons[3] = state.buttons & HD_DEVICE_BUTTON_4;
+    client->m_buttons[0]  = state.buttons & HD_DEVICE_BUTTON_1;
+    client->m_buttons[1]  = state.buttons & HD_DEVICE_BUTTON_2;
+    client->m_buttons[2]  = state.buttons & HD_DEVICE_BUTTON_3;
+    client->m_buttons[3]  = state.buttons & HD_DEVICE_BUTTON_4;
 
     return HD_CALLBACK_DONE;
 }

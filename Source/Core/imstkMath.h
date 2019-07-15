@@ -29,7 +29,7 @@
 namespace imstk
 {
 // Define Real type and dependent types
-using Real = double;
+using Real  = double;
 using Vec2r = Eigen::Matrix<Real, 2, 1>;
 using Vec3r = Eigen::Matrix<Real, 3, 1>;
 using Vec4r = Eigen::Matrix<Real, 4, 1>;
@@ -85,10 +85,10 @@ using Matrixf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
 using Matrixd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
 
 // A dynamic size sparse matrix of doubles
-using SparseMatrixf = Eigen::SparseMatrix < float, Eigen::RowMajor >;
+using SparseMatrixf = Eigen::SparseMatrix<float, Eigen::RowMajor>;
 
 // A dynamic size sparse matrix of doubles
-using SparseMatrixd = Eigen::SparseMatrix < double, Eigen::RowMajor >;
+using SparseMatrixd = Eigen::SparseMatrix<double, Eigen::RowMajor>;
 
 // Rigid transform (translation and rotation)
 using RigidTransform3f = Eigen::Isometry3f;

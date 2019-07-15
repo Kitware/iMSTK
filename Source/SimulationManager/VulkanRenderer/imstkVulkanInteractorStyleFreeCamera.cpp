@@ -41,7 +41,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     if (!m_started)
     {
         m_lastFrameMode = m_viewer->getRenderingMode();
-        m_lastTime = m_stopWatch.getTimeElapsed();
+        m_lastTime      = m_stopWatch.getTimeElapsed();
         m_mousePosLastNormalized[0] = m_mousePosNormalized[0];
         m_mousePosLastNormalized[1] = m_mousePosNormalized[1];
         m_started = true;
@@ -54,7 +54,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     {
         if (currentMode == Renderer::Mode::DEBUG)
         {
-            m_simCameraPosition = camera->getPosition();
+            m_simCameraPosition   = camera->getPosition();
             m_simCameraFocalPoint = camera->getFocalPoint();
             camera->setPosition(m_simCameraPosition[0], m_simCameraFocalPoint[1], m_simCameraPosition[2]);
             m_cameraAngle = 0;
@@ -72,17 +72,17 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     m_lastFrameMode = m_viewer->getRenderingMode();
 
     // Extract variables/calculate derivatives
-    auto pos = camera->getPosition();
-    auto fp = camera->getFocalPoint();
-    auto dx = m_mousePosNormalized[0] - m_mousePosLastNormalized[0];
-    auto dy = m_mousePosNormalized[1] - m_mousePosLastNormalized[1];
+    auto pos       = camera->getPosition();
+    auto fp        = camera->getFocalPoint();
+    auto dx        = m_mousePosNormalized[0] - m_mousePosLastNormalized[0];
+    auto dy        = m_mousePosNormalized[1] - m_mousePosLastNormalized[1];
     auto direction = Vec3d(pos - fp);
     direction.normalize();
-    auto yaw = atan2(pos[0] - fp[0], pos[2] - fp[2]);
+    auto yaw        = atan2(pos[0] - fp[0], pos[2] - fp[2]);
     auto xDirection = Vec3d(cos(yaw), 0, -sin(yaw));
 
-    auto currentTime = m_stopWatch.getTimeElapsed();
-    float dt = currentTime - m_lastTime; // For variable time-step
+    auto  currentTime = m_stopWatch.getTimeElapsed();
+    float dt          = currentTime - m_lastTime; // For variable time-step
 
     // Update for next frame
     m_lastTime = currentTime;
@@ -96,7 +96,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     }
 
     auto angleTempOffset = Vec3d(fp - pos);
-    auto angleOffset = glm::vec4(angleTempOffset[0], angleTempOffset[1], angleTempOffset[2], 1);
+    auto angleOffset     = glm::vec4(angleTempOffset[0], angleTempOffset[1], angleTempOffset[2], 1);
 
     // Prevents flipping camera at up and down view
     float dCameraAngle = -4 * dy;
@@ -113,7 +113,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     // Rotational offset
     auto xRotation = glm::rotate<float>(-4 * dx, glm::tvec3<float>(0.0f, 1.0f, 0.0f));
     auto yRotation = glm::rotate<float>(dCameraAngle, glm::tvec3<float>(xDirection[0], 0, xDirection[2]));
-    angleOffset = xRotation * yRotation * angleOffset;
+    angleOffset        = xRotation * yRotation * angleOffset;
     angleTempOffset[0] = angleOffset.x;
     angleTempOffset[1] = angleOffset.y;
     angleTempOffset[2] = angleOffset.z;

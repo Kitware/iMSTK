@@ -46,7 +46,7 @@ public:
     ///
     /// \brief Protected constructor
     ///
-    Canvas() {};
+    Canvas() {}
 
     ///
     /// \brief Destructor
@@ -91,7 +91,7 @@ public:
 protected:
 
     WidgetList m_widgets;
-    bool m_visible = true;
+    bool       m_visible = true;
 };
 } // GUI
 } // imstk

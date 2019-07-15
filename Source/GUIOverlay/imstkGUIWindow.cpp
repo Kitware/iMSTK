@@ -27,14 +27,14 @@ namespace GUIOverlay
 {
 Window::Window(std::string name,
                std::string title,
-               float width,
-               float height,
-               float x,
-               float y) : Widget(name, x, y)
+               float       width,
+               float       height,
+               float       x,
+               float       y) : Widget(name, x, y)
 {
-    m_type = Widget::Type::Window;
-    m_title = title;
-    m_width = width;
+    m_type   = Widget::Type::Window;
+    m_title  = title;
+    m_width  = width;
     m_height = height;
 }
 

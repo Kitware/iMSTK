@@ -38,28 +38,28 @@ namespace imstk
 ///
 struct PBDModelConfig
 {
-    double m_uniformMassValue = 1.0;         ///> Mass properties
-    double m_viscousDampingCoeff = 0.01;     ///> Viscous damping coefficient [0, 1]
+    double m_uniformMassValue    = 1.0;                                       ///> Mass properties
+    double m_viscousDampingCoeff = 0.01;                                      ///> Viscous damping coefficient [0, 1]
 
-    double m_contactStiffness = 1.0;         ///> Contact stiffness for collisions
-    double m_proximity = 0.1;                ///> Proximity for collisions
+    double m_contactStiffness = 1.0;                                          ///> Contact stiffness for collisions
+    double m_proximity        = 0.1;                                          ///> Proximity for collisions
 
-    unsigned int m_maxIter = 10;                 ///> Max. pbd iterations
-    double m_dt = 0.01;                          ///> Time step size
-    double m_DefaultDt = 0.01;                   ///> Default Time step size
+    unsigned int m_maxIter = 10;                                              ///> Max. pbd iterations
+    double m_dt            = 0.01;                                            ///> Time step size
+    double m_DefaultDt     = 0.01;                                            ///> Default Time step size
 
-    std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
-    Vec3r m_gravity = Vec3r(0, -9.81, 0);                         ///> Gravity
+    std::vector<std::size_t> m_fixedNodeIds;                                  ///> Nodal IDs of the nodes that are fixed
+    Vec3r m_gravity = Vec3r(0, -9.81, 0);                                     ///> Gravity
 
-    double m_mu = 0;           ///> Lame constant, if constraint type is FEM
-    double m_lambda = 0;       ///> Lame constant, if constraint type is FEM
+    double m_mu     = 0;                                                      ///> Lame constant, if constraint type is FEM
+    double m_lambda = 0;                                                      ///> Lame constant, if constraint type is FEM
 
-    double m_YoungModulus = 1000; ///> FEM parameter, if constraint type is FEM
-    double m_PoissonRatio = 0.2;  ///> FEM parameter, if constraint type is FEM
+    double m_YoungModulus = 1000;                                             ///> FEM parameter, if constraint type is FEM
+    double m_PoissonRatio = 0.2;                                              ///> FEM parameter, if constraint type is FEM
 
-    std::vector<std::pair<PbdConstraint::Type, double>>    m_RegularConstraints; ///> Constraints except FEM
+    std::vector<std::pair<PbdConstraint::Type, double>> m_RegularConstraints; ///> Constraints except FEM
     std::vector<std::pair<PbdConstraint::Type,
-                          PbdFEMConstraint::MaterialType>> m_FEMConstraints;     ///> FEM constraints
+                          PbdFEMConstraint::MaterialType>> m_FEMConstraints;  ///> FEM constraints
 
     ///
     /// \brief Enable a regular constraint (constraint that is not FEM constraint)

@@ -32,10 +32,10 @@ PbdEdgeEdgeConstraint::initConstraint(std::shared_ptr<PbdModel> model1,
                                       std::shared_ptr<PbdModel> model2,
                                       const size_t& pIdx3, const size_t& pIdx4)
 {
-    m_model1 = model1;
-    m_model2 = model2;
-    m_bodiesFirst[0] = pIdx1;
-    m_bodiesFirst[1] = pIdx2;
+    m_model1          = model1;
+    m_model2          = model2;
+    m_bodiesFirst[0]  = pIdx1;
+    m_bodiesFirst[1]  = pIdx2;
     m_bodiesSecond[0] = pIdx3;
     m_bodiesSecond[1] = pIdx4;
 }
@@ -63,9 +63,9 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     auto e = a;
     auto f = (x0 - x2).dot(x3 - x2);
 
-    auto det = a * e - d * b;
-    double s = 0.5;
-    double t = 0.5;
+    auto   det = a * e - d * b;
+    double s   = 0.5;
+    double t   = 0.5;
     if (fabs(det) > 1e-12)
     {
         s = (c * e - b * f) / det;
@@ -84,7 +84,7 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     Vec3d Q = x2 + s * (x3 - x2);
 
     Vec3d n = Q - P;
-    auto l = n.norm();
+    auto  l = n.norm();
     n /= l;
 
     const auto dist = m_model1->getParameters()->m_proximity + m_model2->getParameters()->m_proximity;
@@ -115,22 +115,22 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
 
     if (im0 > 0)
     {
-        x0 += -im0*lambda*grad0*m_model1->getParameters()->m_contactStiffness;
+        x0 += -im0* lambda* grad0* m_model1->getParameters()->m_contactStiffness;
     }
 
     if (im1 > 0)
     {
-        x1 += -im1*lambda*grad1*m_model1->getParameters()->m_contactStiffness;
+        x1 += -im1* lambda* grad1* m_model1->getParameters()->m_contactStiffness;
     }
 
     if (im2 > 0)
     {
-        x2 += -im2*lambda*grad2*m_model2->getParameters()->m_contactStiffness;
+        x2 += -im2* lambda* grad2* m_model2->getParameters()->m_contactStiffness;
     }
 
     if (im3 > 0)
     {
-        x3 += -im3*lambda*grad3*m_model2->getParameters()->m_contactStiffness;
+        x3 += -im3* lambda* grad3* m_model2->getParameters()->m_contactStiffness;
     }
 
     return true;

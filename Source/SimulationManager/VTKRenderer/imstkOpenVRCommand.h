@@ -41,9 +41,9 @@ public:
     }
 
     virtual void Execute(
-        vtkObject* caller,
+        vtkObject*    caller,
         unsigned long eventId,
-        void* callData) override;
+        void*         callData) override;
 
 protected:
 

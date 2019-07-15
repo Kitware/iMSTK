@@ -42,8 +42,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    SphereToSphereCD(std::shared_ptr<Sphere> sphereA,
-                     std::shared_ptr<Sphere> sphereB,
+    SphereToSphereCD(std::shared_ptr<Sphere>        sphereA,
+                     std::shared_ptr<Sphere>        sphereB,
                      std::shared_ptr<CollisionData> colData) :
         CollisionDetection(CollisionDetection::Type::SphereToSphere, colData),
         m_sphereA(sphereA),
