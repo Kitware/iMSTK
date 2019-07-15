@@ -67,11 +67,11 @@ VulkanTextureDelegate::VulkanTextureDelegate(
 
     m_imageOffsetAlignment = this->getStride(m_format);
 
-    m_imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    m_imageInfo.pNext = nullptr;
-    m_imageInfo.format = m_format;
+    m_imageInfo.sType     = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    m_imageInfo.pNext     = nullptr;
+    m_imageInfo.format    = m_format;
     m_imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    m_imageInfo.extent = { m_width, m_height, 1 };
+    m_imageInfo.extent    = { m_width, m_height, 1 };
     m_imageInfo.mipLevels = m_mipLevels;
     m_imageInfo.arrayLayers           = m_arrayLayers;
     m_imageInfo.samples               = VK_SAMPLE_COUNT_1_BIT;
@@ -127,16 +127,16 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     vkCreateImageView(memoryManager.m_device, &imageViewInfo, nullptr, &m_imageView);
 
     VkSamplerCreateInfo samplerInfo;
-    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.pNext = nullptr;
-    samplerInfo.flags = 0;
-    samplerInfo.magFilter = VK_FILTER_LINEAR;
-    samplerInfo.minFilter = VK_FILTER_LINEAR;
-    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;              // Trilinear interpolation
+    samplerInfo.sType        = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext        = nullptr;
+    samplerInfo.flags        = 0;
+    samplerInfo.magFilter    = VK_FILTER_LINEAR;
+    samplerInfo.minFilter    = VK_FILTER_LINEAR;
+    samplerInfo.mipmapMode   = VK_SAMPLER_MIPMAP_MODE_LINEAR;            // Trilinear interpolation
     samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.mipLodBias = 0.0;
+    samplerInfo.mipLodBias   = 0.0;
     samplerInfo.anisotropyEnable        = anisotropyAmount == 0.0f ? VK_FALSE : VK_TRUE; // TODO:: add option to enable
     samplerInfo.maxAnisotropy           = anisotropyAmount;
     samplerInfo.compareEnable           = VK_FALSE;
@@ -310,7 +310,7 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     stagingBufferInfo.pNext = nullptr;
     stagingBufferInfo.flags = 0;
-    stagingBufferInfo.size = imageSize;
+    stagingBufferInfo.size  = imageSize;
     stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     stagingBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
     stagingBufferInfo.queueFamilyIndexCount = 0;
@@ -465,7 +465,7 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
     stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     stagingBufferInfo.pNext = nullptr;
     stagingBufferInfo.flags = 0;
-    stagingBufferInfo.size = imageSize;
+    stagingBufferInfo.size  = imageSize;
     stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
     stagingBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
     stagingBufferInfo.queueFamilyIndexCount = 0;

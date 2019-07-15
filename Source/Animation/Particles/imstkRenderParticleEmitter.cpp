@@ -36,13 +36,13 @@ RenderParticleEmitter::RenderParticleEmitter(std::shared_ptr<Geometry>   geometr
 
     RenderParticleKeyFrame startFrame;
     startFrame.m_color = Color::White;
-    startFrame.m_time = 0.0f;
+    startFrame.m_time  = 0.0f;
     startFrame.m_acceleration           = Vec3f(0, 0, 0);
     startFrame.m_rotationalAcceleration = 0.0f;
 
     RenderParticleKeyFrame endFrame;
     endFrame.m_color = startFrame.m_color;
-    endFrame.m_time = m_time;
+    endFrame.m_time  = m_time;
     endFrame.m_acceleration           = Vec3f(0, 0, 0);
     endFrame.m_rotationalAcceleration = 0.0f;
 

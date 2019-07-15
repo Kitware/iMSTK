@@ -69,7 +69,7 @@ public:
     ///        in that memory is directly mapped from the VisualModel to the
     ///        RenderDelegate.
     ///
-    virtual void update(const uint32_t frameIndex) {}
+    virtual void update(const uint32_t frameIndex) {};
 
     ///
     /// \brief Get vertex buffer
@@ -105,7 +105,7 @@ protected:
     ///
     /// \brief Default constructor (protected)
     ///
-    VulkanRenderDelegate() {}
+    VulkanRenderDelegate() {};
 
     std::shared_ptr<VulkanVertexBuffer> m_vertexBuffer;
 

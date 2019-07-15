@@ -43,7 +43,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager&   memoryManager,
         vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         vertexBufferInfo.pNext = nullptr;
         vertexBufferInfo.flags = 0;
-        vertexBufferInfo.size = m_vertexBufferSize;
+        vertexBufferInfo.size  = m_vertexBufferSize;
         vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
         vertexBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
         vertexBufferInfo.queueFamilyIndexCount = 0;
@@ -80,7 +80,7 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager&   memoryManager,
         indexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
         indexBufferInfo.pNext = nullptr;
         indexBufferInfo.flags = 0;
-        indexBufferInfo.size = m_indexBufferSize;
+        indexBufferInfo.size  = m_indexBufferSize;
         indexBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         indexBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
         indexBufferInfo.queueFamilyIndexCount = 0;

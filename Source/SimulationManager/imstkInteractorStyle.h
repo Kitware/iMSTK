@@ -35,9 +35,9 @@ using EventHandlerFunction = std::function<bool(InteractorStyle* iStyle)>;
 class InteractorStyle
 {
 public:
-    InteractorStyle() {}
+    InteractorStyle() {};
 
-    virtual ~InteractorStyle() {}
+    virtual ~InteractorStyle() {};
 
 protected:
     friend class Viewer;

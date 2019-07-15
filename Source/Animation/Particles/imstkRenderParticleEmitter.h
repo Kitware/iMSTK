@@ -41,7 +41,7 @@ namespace imstk
 ///
 struct RenderParticleKeyFrame
 {
-    float m_time = 0;
+    float m_time  = 0;
     Color m_color = Color::White;
     Vec3f m_acceleration           = Vec3f(0, 0, 0);
     float m_rotationalAcceleration = 0;

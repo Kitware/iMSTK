@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Let the polydata mapper know if it is for the surface mesh
     ///
-    void setIsSurfaceMapper(const bool val) { m_isSurfaceMapper = val; }
+    void setIsSurfaceMapper(const bool val) { m_isSurfaceMapper = val; };
 
 protected:
     ///

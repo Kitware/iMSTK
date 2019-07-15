@@ -560,16 +560,16 @@ VulkanRenderer::initializeFramebufferImages(VkSwapchainKHR* swapchain)
     }
 
     VkSamplerCreateInfo samplerInfo;
-    samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.pNext = nullptr;
-    samplerInfo.flags = 0;
-    samplerInfo.magFilter = VK_FILTER_LINEAR;
-    samplerInfo.minFilter = VK_FILTER_LINEAR;
-    samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;              // Trilinear interpolation
+    samplerInfo.sType        = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext        = nullptr;
+    samplerInfo.flags        = 0;
+    samplerInfo.magFilter    = VK_FILTER_LINEAR;
+    samplerInfo.minFilter    = VK_FILTER_LINEAR;
+    samplerInfo.mipmapMode   = VK_SAMPLER_MIPMAP_MODE_LINEAR;            // Trilinear interpolation
     samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
     samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
     samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_BORDER;
-    samplerInfo.mipLodBias = 0.0;
+    samplerInfo.mipLodBias   = 0.0;
     samplerInfo.anisotropyEnable        = VK_FALSE;
     samplerInfo.maxAnisotropy           = 1.0;
     samplerInfo.compareEnable           = VK_FALSE;
@@ -646,16 +646,16 @@ VulkanRenderer::initializeFramebuffers(VkSwapchainKHR* swapchain)
 
     {
         VkSamplerCreateInfo samplerInfo;
-        samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-        samplerInfo.pNext = nullptr;
-        samplerInfo.flags = 0;
-        samplerInfo.magFilter = VK_FILTER_LINEAR;
-        samplerInfo.minFilter = VK_FILTER_LINEAR;
-        samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;              // Trilinear interpolation
+        samplerInfo.sType        = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        samplerInfo.pNext        = nullptr;
+        samplerInfo.flags        = 0;
+        samplerInfo.magFilter    = VK_FILTER_LINEAR;
+        samplerInfo.minFilter    = VK_FILTER_LINEAR;
+        samplerInfo.mipmapMode   = VK_SAMPLER_MIPMAP_MODE_LINEAR;            // Trilinear interpolation
         samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
         samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-        samplerInfo.mipLodBias = 0.0;
+        samplerInfo.mipLodBias   = 0.0;
         samplerInfo.anisotropyEnable        = VK_FALSE; // TODO:: add option to enable
         samplerInfo.maxAnisotropy           = 1.0;
         samplerInfo.compareEnable           = VK_FALSE;

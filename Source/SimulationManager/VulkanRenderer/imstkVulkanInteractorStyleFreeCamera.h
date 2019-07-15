@@ -49,7 +49,7 @@ class VulkanInteractorStyleFreeCamera : public VulkanInteractorStyle
 {
 public:
     VulkanInteractorStyleFreeCamera();
-    ~VulkanInteractorStyleFreeCamera() {}
+    ~VulkanInteractorStyleFreeCamera() {};
 
     ///
     /// \brief Controls camera movement

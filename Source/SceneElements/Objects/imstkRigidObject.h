@@ -35,7 +35,7 @@ public:
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<RigidBodyState> rhs) {}
+    void setState(std::shared_ptr<RigidBodyState> rhs) {};
 };
 
 ///

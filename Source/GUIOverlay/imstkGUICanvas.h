@@ -46,7 +46,7 @@ public:
     ///
     /// \brief Protected constructor
     ///
-    Canvas() {}
+    Canvas() {};
 
     ///
     /// \brief Destructor

@@ -152,8 +152,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
                                && !m_material->isLineMesh()
                                && !m_depthPrePass
                                && !m_material->isParticle();
-    m_constants.diffuseTexture = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_depthOnlyPass;
-    m_constants.normalTexture = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.diffuseTexture   = (m_material->getTexture(Texture::Type::DIFFUSE)->getPath() != "") && !m_depthOnlyPass;
+    m_constants.normalTexture    = (m_material->getTexture(Texture::Type::NORMAL)->getPath() != "") && !m_depthOnlyPass;
     m_constants.roughnessTexture = (m_material->getTexture(Texture::Type::ROUGHNESS)->getPath() != "") && !m_depthOnlyPass;
     m_constants.metalnessTexture = (m_material->getTexture(Texture::Type::METALNESS)->getPath() != "") && !m_depthOnlyPass;
     m_constants.ambientOcclusionTexture     = (m_material->getTexture(Texture::Type::AMBIENT_OCCLUSION)->getPath() != "") && !m_depthOnlyPass;
@@ -936,7 +936,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer* renderer)
 
     // Global buffers
     std::vector<VkDescriptorBufferInfo> fragmentBufferInfo(2);
-    fragmentBufferInfo[0].offset = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getOffset();
+    fragmentBufferInfo[0].offset = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getOffset();;
     fragmentBufferInfo[0].range  = renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getSize();
     fragmentBufferInfo[0].buffer = *(renderer->m_globalFragmentUniformBuffer->getUniformBuffer()->getBuffer());
 

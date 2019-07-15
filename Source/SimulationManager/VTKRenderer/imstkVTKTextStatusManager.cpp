@@ -33,7 +33,7 @@
 
 namespace imstk
 {
-VTKTextStatusManager::VTKTextStatusManager(VTKInteractorStyle * const vtkInteractorStyle) :
+VTKTextStatusManager::VTKTextStatusManager(VTKInteractorStyle* const vtkInteractorStyle) :
     m_vtkInteractorStyle(vtkInteractorStyle)
 {
     LOG_IF(FATAL, (!vtkInteractorStyle)) << "Invalid vtkInteractorStyle";
@@ -84,12 +84,14 @@ VTKTextStatusManager::setStatusFontColor(const StatusType type, const Color colo
     m_StatusActors[type]->GetTextProperty()->SetColor(color.r, color.g, color.b);
 }
 
-void VTKTextStatusManager::setStatusDisplayCorner(const StatusType type, const DisplayCorner corner)
+void
+VTKTextStatusManager::setStatusDisplayCorner(const StatusType type, const DisplayCorner corner)
 {
     m_StatusDisplayCorners[type] = corner;
 }
 
-void VTKTextStatusManager::setFPS(const double visualFPS, const double physicsFPS)
+void
+VTKTextStatusManager::setFPS(const double visualFPS, const double physicsFPS)
 {
     std::string fpsVisualStr = "V: " + std::to_string(static_cast<int>(visualFPS));
     std::string fpsPhysicalStr;
@@ -110,8 +112,8 @@ void VTKTextStatusManager::setFPS(const double visualFPS, const double physicsFP
         fpsPhysicalStr = "P: " + std::string(buff);
     }
 
-    std::string fpsString = fpsVisualStr + std::string(" | ") + fpsPhysicalStr;
-    auto fpsStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[StatusType::FPS],
+    std::string fpsString           = fpsVisualStr + std::string(" | ") + fpsPhysicalStr;
+    auto        fpsStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[StatusType::FPS],
                                                      m_StatusFontSizes[StatusType::FPS],
                                                      fpsString);
     m_StatusActors[StatusType::FPS]->SetDisplayPosition(fpsStatusCoordinate[0], fpsStatusCoordinate[1]);
@@ -142,12 +144,12 @@ VTKTextStatusManager::computeStatusLocation(const DisplayCorner corner, const in
     auto simManager = m_vtkInteractorStyle->getSimulationManager();
     LOG_IF(FATAL, (!simManager)) << "Invalid simulation manager";
 
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
-    const int* windowSize = viewer->getVtkRenderWindow()->GetSize();
-    const auto wWidth = windowSize[0];
-    const auto wHeight = windowSize[1];
-    const int numLines = static_cast<int>(std::count(text.begin(), text.end(), '\n')) + 1;
-    int maxLineWidth = 0;
+    auto       viewer       = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    const int* windowSize   = viewer->getVtkRenderWindow()->GetSize();
+    const auto wWidth       = windowSize[0];
+    const auto wHeight      = windowSize[1];
+    const int  numLines     = static_cast<int>(std::count(text.begin(), text.end(), '\n')) + 1;
+    int        maxLineWidth = 0;
 
     if (numLines <= 1)
     {
@@ -156,7 +158,7 @@ VTKTextStatusManager::computeStatusLocation(const DisplayCorner corner, const in
     else
     {
         std::stringstream ss(text);
-        std::string line;
+        std::string       line;
         while (std::getline(ss, line, '\n'))
         {
             int lineWidth = static_cast<int>(line.length());
@@ -167,8 +169,8 @@ VTKTextStatusManager::computeStatusLocation(const DisplayCorner corner, const in
         }
     }
 
-    static const int padding = 10; // Add an extra space to the corner
-    std::array<int, 2> location; // x, y
+    static const int   padding = 10; // Add an extra space to the corner
+    std::array<int, 2> location;     // x, y
     location[0] = padding;
     location[1] = padding;
 

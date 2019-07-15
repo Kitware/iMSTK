@@ -35,7 +35,7 @@ ForceModelConfig::ForceModelConfig(const std::string& configFileName) : m_loadSu
     {
         this->parseConfig(configFileName);
     }
-}
+};
 
 bool
 ForceModelConfig::parseConfig(const std::string& configFileName)

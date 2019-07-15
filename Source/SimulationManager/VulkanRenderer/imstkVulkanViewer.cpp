@@ -345,9 +345,9 @@ VulkanViewer::setupSwapchain()
     }
 
     VkSwapchainCreateInfoKHR swapchainInfo;
-    swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    swapchainInfo.pNext = nullptr;
-    swapchainInfo.flags = 0;
+    swapchainInfo.sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainInfo.pNext   = nullptr;
+    swapchainInfo.flags   = 0;
     swapchainInfo.surface = m_surface;
     swapchainInfo.minImageCount         = m_renderer->m_buffering; // buffering
     swapchainInfo.imageFormat           = VulkanFormats::FINAL_FORMAT;

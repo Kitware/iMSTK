@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Constructors/Destructor
     ///
-    SOR(const double relaxationFactor = 0.5) { m_type = Type::SuccessiveOverRelaxation; }
+    SOR(const double relaxationFactor = 0.5) { m_type = Type::SuccessiveOverRelaxation; };
     SOR(const SparseMatrixd& A, const Vectord& rhs);
     ~SOR() = default;
 
@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override {}
+    void iterate(Vectord& x, bool updateResidual = true) override {};
 
     ///
     /// \brief Gauss-Seidel solver
@@ -100,7 +100,7 @@ public:
     ///
     /// \brief Return the relaxation factor
     ///
-    double getRelaxationFactor() const { return m_relaxationFactor; }
+    double getRelaxationFactor() const { return m_relaxationFactor; };
 
     ///
     /// \brief Get the vector denoting the filter

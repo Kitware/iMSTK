@@ -33,7 +33,7 @@ VectorizedState::initialize(const size_t numDof)
     m_q.setZero();
     m_qDot.setZero();
     m_qDotDot.setZero();
-}
+};
 
 void
 VectorizedState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
