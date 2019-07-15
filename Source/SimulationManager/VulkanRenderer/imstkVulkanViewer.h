@@ -46,19 +46,19 @@ class VulkanViewer : public Viewer
 public:
     VulkanViewer(SimulationManager * manager = nullptr, bool enableVR = false);
 
-    virtual void setActiveScene(std::shared_ptr<Scene> scene);
+    virtual void setActiveScene(const std::shared_ptr<Scene>& scene) override;
 
-    virtual void startRenderingLoop();
+    virtual void startRenderingLoop() override;
 
-    virtual void endRenderingLoop();
+    virtual void endRenderingLoop() override;
 
     ///
     /// \brief Setup the current renderer to render what's needed
     /// based on the mode chosen
     ///
-    void setRenderingMode(const Renderer::Mode mode);
+    virtual void setRenderingMode(const Renderer::Mode mode) override;
 
-    virtual const Renderer::Mode getRenderingMode();
+    virtual Renderer::Mode getRenderingMode() override;
 
     ///
     /// \brief Setups up the swapchain
@@ -71,7 +71,8 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) override;
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
+                                     const bool gradientBackground = false) override;
 
     ///
     /// \brief Enable/disable fullscreen
