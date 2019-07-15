@@ -29,12 +29,11 @@
 #include "imstkInteractorStyle.h"
 
 #include "vtkInteractorStyleTrackballCamera.h"
-class vtkTextActor;
 
 namespace imstk
 {
 class SimulationManager;
-
+class VTKTextStatusManager;
 /// Base class of the vtk interactor style used
 using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 
@@ -46,10 +45,10 @@ using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 class VTKInteractorStyle : public vtkBaseInteractorStyle, public InteractorStyle
 {
 public:
-    vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle);
+    vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle)
 
     VTKInteractorStyle();
-    virtual ~VTKInteractorStyle();
+    virtual ~VTKInteractorStyle() override;
 
     ///
     /// \brief Set current renderer
@@ -114,21 +113,32 @@ public:
     ///
     /// \brief Not implemented
     ///
-    virtual void OnFourthButtonDown(){};
-    virtual void OnFifthButtonDown(){};
-    virtual void OnFourthButtonUp(){};
-    virtual void OnFifthButtonUp(){};
+    virtual void OnFourthButtonDown() override {}
+    virtual void OnFifthButtonDown() override {}
+    virtual void OnFourthButtonUp() override {}
+    virtual void OnFifthButtonUp() override {}
+
+    ///
+    /// \brief Return the pointer to simulation manager
+    ///
+    SimulationManager* getSimulationManager() { return m_simManager; }
+
+    ///
+    /// \brief Return the window status handler
+    ///
+    const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager() { return m_textStatusManager; }
 
 private:
+
     friend class VTKViewer;
 
-    SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
-    double m_targetMS; ///> expected time between each render frame (in ms)
-    std::chrono::high_resolution_clock::time_point m_pre; ///> time point pre-rendering
-    std::chrono::high_resolution_clock::time_point m_post; ///> time point post-rendering
-    bool m_displayFps; ///> hide or display framerate
-    vtkTextActor* m_fpsActor; ///> text holding framerate to display
-    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
-    double m_lastFps; ///> last framerate value used for moving average estimate
+    SimulationManager* m_simManager;             ///> SimulationManager owning the current simulation being interacted with
+    std::chrono::high_resolution_clock::time_point m_pre;                 ///> time point pre-rendering
+    std::chrono::high_resolution_clock::time_point m_post;             ///> time point post-rendering
+    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate;             ///> time point for last framerate display update
+
+    std::shared_ptr<VTKTextStatusManager> m_textStatusManager; ///> Handle text statuses, including fps status and custom text status
+    bool m_displayFps = false;             ///> hide or display framerate
+    double m_lastFps;             ///> last framerate value used for moving average estimate
 };
 } // imstk

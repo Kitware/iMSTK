@@ -20,81 +20,169 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
+#include "imstkSceneObject.h"
 #include "imstkDebugGeometry.h"
 #include "imstkAPIUtilities.h"
-#include "imstkSurfaceMesh.h"
-#include <memory>
+#include "imstkVTKViewer.h"
+#include "imstkVTKTextStatusManager.h"
+
+#include <thread>
+#include <chrono>
 
 using namespace imstk;
 
-///
-/// \brief This example demonstrates the debug rendering
-///
-int main()
+std::shared_ptr<DebugRenderGeometry>
+addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
-    auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("DebugRendering");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
+    auto material    = std::make_shared<RenderMaterial>();
+    material->setDebugColor(Color::Blue);
+    debugPoints->setRenderMaterial(material);
+    scene->addDebugGeometry(debugPoints);
 
-    // Create debug triangles
-    auto debugTriangleGeo = std::make_shared<DebugRenderTriangles>("debugtriangles", 9);
-    StdVectorOfVec3d triVerts;
-    triVerts.push_back(Vec3d(0., 0., 0.));
-    triVerts.push_back(Vec3d(0., 10., 0.));
-    triVerts.push_back(Vec3d(0., 0., 10.));
+    return std::dynamic_pointer_cast<DebugRenderGeometry>(debugPoints);
+}
 
-    triVerts.push_back(Vec3d(0., 0., 0.));
-    triVerts.push_back(Vec3d(10., 0., 0.));
-    triVerts.push_back(Vec3d(0., 0., 10.));
+std::shared_ptr<DebugRenderGeometry>
+addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
+{
+    auto debugLines = std::make_shared<DebugRenderLines>("Debug Lines");
+    auto material   = std::make_shared<RenderMaterial>();
+    material->setBackFaceCulling(false);
+    material->setDebugColor(Color::Green);
+    material->setLineWidth(2.0);
+    debugLines->setRenderMaterial(material);
+    scene->addDebugGeometry(debugLines);
 
-    triVerts.push_back(Vec3d(0., 0., 0.));
-    triVerts.push_back(Vec3d(10., 0., 0.));
-    triVerts.push_back(Vec3d(0., 10., 0.));
+    return std::dynamic_pointer_cast<DebugRenderGeometry>(debugLines);
+}
 
-    debugTriangleGeo->setVertexData(triVerts);
-
-    auto material = std::make_shared<RenderMaterial>();
+std::shared_ptr<DebugRenderGeometry>
+addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
+{
+    auto debugTriangles = std::make_shared<DebugRenderTriangles>("Debug Triangles");
+    auto material       = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Red);
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    debugTriangleGeo->setRenderMaterial(material);
+    debugTriangles->setRenderMaterial(material);
+    scene->addDebugGeometry(debugTriangles);
 
-    scene->addDebugGeometry(debugTriangleGeo);
+    return std::dynamic_pointer_cast<DebugRenderGeometry>(debugTriangles);
+}
 
-    // Create debug Lines
-    auto debugLinesGeo = std::make_shared<DebugRenderLines>("debugLines");
+Vec3d
+getRandomPositions(double radius)
+{
+    return radius * Vec3d(2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
+                          2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
+                          2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0);
+}
 
-    StdVectorOfVec3d linesVerts;
-    linesVerts.push_back(Vec3d(15, 0, 0));
-    linesVerts.push_back(Vec3d(100, 0, 0));
-
-    linesVerts.push_back(Vec3d(0, 15, 0));
-    linesVerts.push_back(Vec3d(0, 100, 0));
-
-    linesVerts.push_back(Vec3d(0, 0, 15));
-    linesVerts.push_back(Vec3d(0, 0, 100));
-
-    debugLinesGeo->setVertexData(linesVerts);
-
-    auto materialLines = std::make_shared<RenderMaterial>();
-    materialLines->setBackFaceCulling(false);
-    materialLines->setDebugColor(Color::Green);
-    materialLines->setLineWidth(2.0);
-    debugLinesGeo->setRenderMaterial(materialLines);
-
-    scene->addDebugGeometry(debugLinesGeo);
-
-    // Add light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
-    scene->addLight(light);
-
-    // Run the simulation
+///
+/// \brief This example demonstrates debug rendering in iMSTK
+///
+int
+main()
+{
+    // SDK and Scene
+    auto sdk   = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("Debug rendering example");
     sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+
+    // Get the VTKViewer
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    viewer->getVtkRenderWindow()->SetSize(1920, 1080);
+
+    auto statusManager = viewer->getTextStatusManager();
+    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+
+    // Get VTK Renderer
+    auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
+    LOG_IF(FATAL, (!renderer)) << "Invalid renderer: Only VTKRenderer is supported for debug rendering";
+
+    auto debugPoints    = addPointsDebugRendering(scene);
+    auto debugLines     = addLinesDebugRendering(scene);
+    auto debugTriangles = addTrianglesDebugRendering(scene);
+
+    int mode  = 0; // 0: add point, 1: add line, 2: add triangle
+    int count = 0; // The number of times cycling between modes
+
+    auto updateFunc =
+        [&](Module*) {
+            if (count > 5)
+            {
+                count = 0;
+                debugPoints->clear();
+                debugLines->clear();
+                debugTriangles->clear();
+            }
+
+            if (mode % 3 == 0)
+            {
+                debugPoints->appendVertex(getRandomPositions(15.0));
+            }
+            else if (mode % 3 == 1)
+            {
+                auto p     = getRandomPositions(50.0);
+                auto shift = getRandomPositions(1.0);
+                debugLines->appendVertex(p + shift);
+                debugLines->appendVertex(-p + shift);
+            }
+            else
+            {
+                auto shift = getRandomPositions(10.0);
+                debugTriangles->appendVertex(getRandomPositions(5.0) + shift);
+                debugTriangles->appendVertex(getRandomPositions(5.0) + shift);
+                debugTriangles->appendVertex(getRandomPositions(5.0) + shift);
+
+                mode = -1;
+                ++count;
+            }
+            ++mode;
+
+            debugPoints->turnDataModifiedFlagON();
+            debugLines->turnDataModifiedFlagON();
+            debugTriangles->turnDataModifiedFlagON();
+
+            // Must call to update render data
+            for (auto& delegate : renderer->getDebugRenderDelegates())
+            {
+                delegate->updateDataSource();
+            }
+
+            statusManager->setCustomStatus("Primatives: " +
+                           std::to_string(debugPoints->getNumVertices()) + " (points) | " +
+                           std::to_string(debugLines->getNumVertices() / 2) + " (lines) | " +
+                           std::to_string(debugTriangles->getNumVertices() / 3) + " (triangles)"
+                );
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        };
+    sdk->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
+
+    // Set Camera configuration
+    auto cam = scene->getCamera();
+    cam->setPosition(Vec3d(0, 0, 50));
+    cam->setFocalPoint(Vec3d(0, 0, 0));
+
+    // Light
+    {
+        auto light = std::make_shared<DirectionalLight>("Light 1");
+        light->setFocalPoint(Vec3d(-1, -1, -1));
+        light->setIntensity(1);
+        scene->addLight(light);
+    }
+    {
+        auto light = std::make_shared<DirectionalLight>("Light 2");
+        light->setFocalPoint(Vec3d(1, -1, -1));
+        light->setIntensity(1);
+        scene->addLight(light);
+    }
+
+    // Run
+    sdk->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

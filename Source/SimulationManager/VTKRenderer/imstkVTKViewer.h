@@ -48,6 +48,7 @@
 namespace imstk
 {
 class SimulationManager;
+class VTKTextStatusManager;
 
 ///
 /// \class VTKViewer
@@ -65,32 +66,27 @@ public:
     ///
     /// \brief Destructor
     ///
-    void setRenderingMode(const Renderer::Mode mode);
-
-    ///
-    /// \brief Destructor
-    ///
-    ~VTKViewer() = default;
+    virtual void setRenderingMode(const Renderer::Mode mode) override;
 
     ///
     /// \brief Set scene to be rendered
     ///
-    void setActiveScene(std::shared_ptr<Scene> scene);
+    virtual void setActiveScene(const std::shared_ptr<Scene>& scene) override;
 
     ///
     /// \brief Get the current renderer mode
     ///
-    const Renderer::Mode getRenderingMode();
+    virtual Renderer::Mode getRenderingMode() override;
 
     ///
     /// \brief Start rendering
     ///
-    void startRenderingLoop();
+    virtual void startRenderingLoop() override;
 
     ///
     /// \brief Terminate rendering
     ///
-    void endRenderingLoop();
+    virtual void endRenderingLoop() override;
 
     ///
     /// \brief Get pointer to the vtkRenderWindow rendering
@@ -106,11 +102,17 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
+    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
+                                     const bool gradientBackground = false) override;
+
+    ///
+    /// \brief Return the window status handler
+    ///
+    const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
 
 protected:
-
-    vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow;
+    vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
+    std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
     bool m_enableVR;
 
 #ifdef iMSTK_ENABLE_VR
