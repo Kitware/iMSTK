@@ -93,7 +93,7 @@ public:
         {
             m_image = new VkImage();
         }
-    }
+    };
 
     VkImage* getImage()
     {
@@ -130,7 +130,7 @@ public:
     {
         m_type   = type;
         m_buffer = new VkBuffer();
-    }
+    };
 
     VkBuffer* getBuffer()
     {
@@ -158,7 +158,7 @@ public:
     VulkanInternalBuffer(VulkanInternalBufferGroup* bufferGroup)
     {
         m_bufferGroup = bufferGroup;
-    }
+    };
 
     VkBuffer* getBuffer()
     {

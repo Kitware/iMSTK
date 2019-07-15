@@ -66,7 +66,7 @@ public:
         double* zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
         stVKStiffnessMatrix->ComputeStiffnessMatrix(zero, m_stiffnessMatrix.get());
         free(zero);
-    }
+    };
 
     ///
     /// \brief Destructor
@@ -77,7 +77,7 @@ public:
         {
             delete m_stiffnessMatrixRawPtr;
         }
-    }
+    };
 
     ///
     /// \brief Get the internal force

@@ -178,7 +178,7 @@ protected:
 
     /// \brief Update background colors
     ///
-    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) {}
+    void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) {};
 
 protected:
     friend class VulkanViewer;

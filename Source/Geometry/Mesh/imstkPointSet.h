@@ -64,7 +64,7 @@ public:
     ///
     /// \brief Returns the volume of the geometry (if valid)
     ///
-    virtual double getVolume() const { return 0; }
+    virtual double getVolume() const { return 0; };
 
     ///
     /// \brief Compute the bounding box for the entire mesh
@@ -158,7 +158,7 @@ public:
     /// \brief Set the topologyChanged flag
     ///
     void setTopologyChangedFlag(const bool flag) { m_topologyChanged = flag; }
-    bool getTopologyChangedFlag() const { return m_topologyChanged; }
+    bool getTopologyChangedFlag() const { return m_topologyChanged; };
 
     ///
     /// \brief Set load factor

@@ -61,11 +61,11 @@ public:
         {
             LOG(FATAL) << "Unable to build vertex shader : " << filename;
         }
-    }
+    };
 
-    uint32_t getShaderLength() { return (uint32_t)m_data->size(); }
+    uint32_t getShaderLength() { return (uint32_t)m_data->size(); };
 
-    uint32_t* getShaderData() { return (uint32_t*)m_data->data(); }
+    uint32_t* getShaderData() { return (uint32_t*)m_data->data(); };
 
 protected:
     std::shared_ptr<std::vector<char>> m_data;
@@ -125,7 +125,7 @@ public:
 
         // For keeping track
         image->setImageLayout(newLayout);
-    }
+    };
 
     static const VkAccessFlags getAccessFlags(VkImageLayout imageLayout)
     {
@@ -147,6 +147,7 @@ public:
             LOG(WARNING) << "Unsupported image layout";
             return VK_ACCESS_SHADER_READ_BIT; // This might not be a great default
         }
+        ;
     }
 
     static const VkPipelineStageFlags getPipelineStageFlags(VkImageLayout imageLayout)
@@ -169,6 +170,7 @@ public:
             LOG(WARNING) << "Unsupported image layout";
             return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT; // This might not be a great default
         }
+        ;
     }
 
     static void addDepthAttachmentBarrier(VkCommandBuffer* commandBuffer, uint32_t queueFamilyIndex, VkImage* image)
@@ -199,7 +201,7 @@ public:
             0, nullptr,   // general memory barriers
             0, nullptr,   // buffer barriers
             1, &barrier); // image barriers
-    }
+    };
 
     static void addShadowAttachmentBarrier(VkCommandBuffer* commandBuffer, uint32_t queueFamilyIndex, VkImage* image)
     {
@@ -229,7 +231,7 @@ public:
             0, nullptr,   // general memory barriers
             0, nullptr,   // buffer barriers
             1, &barrier); // image barriers
-    }
+    };
 };
 
 class VulkanDefaults
@@ -255,5 +257,5 @@ static const VkFormat AO_FORMAT         = VK_FORMAT_R8_UNORM;            // AO f
 static const VkFormat DEPTH_FORMAT      = VK_FORMAT_D32_SFLOAT;          // Depth buffer
 static const VkFormat SHADOW_FORMAT     = VK_FORMAT_D32_SFLOAT;          // Format for shadow maps
 static const VkFormat DEPTH_MIP_FORMAT  = VK_FORMAT_R32_SFLOAT;          // Depth mip buffer
-}
+};
 }

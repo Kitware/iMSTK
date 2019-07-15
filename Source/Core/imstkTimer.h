@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    StopWatch() {}
+    StopWatch() {};
 
     ///
     /// \brief Destructor
@@ -125,7 +125,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    CpuTimer() : StopWatch() {}
+    CpuTimer() : StopWatch() {};
 
     ///
     /// \brief Destructor
@@ -135,7 +135,7 @@ public:
     ///
     /// \brief Start the appropriate timer
     ///
-    virtual void start() override { cpuTimeKeeper = std::clock(); }
+    virtual void start() override { cpuTimeKeeper = std::clock(); };
 
     ///
     /// \brief Returns the CPU time elapsed since calling start

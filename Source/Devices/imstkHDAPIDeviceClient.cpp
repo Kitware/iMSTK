@@ -33,7 +33,7 @@ namespace imstk
 void
 HDAPIDeviceClient::init()
 {
-    m_buttons = std::map<size_t, bool>{ { 0, false }, { 1, false }, { 2, false }, { 3, false } }
+    m_buttons = std::map<size_t, bool>{ { 0, false }, { 1, false }, { 2, false }, { 3, false } };
 
     //flush error stack
     HDErrorInfo errorFlush;

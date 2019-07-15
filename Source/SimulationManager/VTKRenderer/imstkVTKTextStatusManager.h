@@ -114,12 +114,12 @@ private:
     ///
     /// \brief Compute the location for text, based on the current TextLocation enum and the length of the given text
     ///
-    std::array<int, 2> computeStatusLocation(const DisplayCorner corner, const int fontSize, const std::string & text);
+    std::array<int, 2> computeStatusLocation(const DisplayCorner corner, const int fontSize, const std::string& text);
 
-    vtkTextActor* m_StatusActors[StatusType::NumStatusTypes]; ///> Statuses to display
+    vtkTextActor* m_StatusActors[StatusType::NumStatusTypes];         ///> Statuses to display
     DisplayCorner m_StatusDisplayCorners[StatusType::NumStatusTypes]; ///> Location (corner) of the statuses
-    int m_StatusFontSizes[StatusType::NumStatusTypes]; ///> Size of the statuses
+    int           m_StatusFontSizes[StatusType::NumStatusTypes];      ///> Size of the statuses
 
-    VTKInteractorStyle* m_vtkInteractorStyle;  ///> vtkInteractorStyle
+    VTKInteractorStyle* m_vtkInteractorStyle;                         ///> vtkInteractorStyle
 };
 } // end namespace imstk

@@ -61,7 +61,7 @@ public:
 
     void initializeFramebuffer(VkRenderPass* renderPass);
 
-    ~VulkanFramebuffer() {}
+    ~VulkanFramebuffer() {};
 
     void changeImageLayout(VkCommandBuffer&        commandBuffer,
                            VkImage&                image,

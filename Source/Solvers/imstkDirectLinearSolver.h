@@ -44,7 +44,7 @@ public:
     /// \brief Default constructor/destructor.
     ///
     DirectLinearSolver() = delete;
-    ~DirectLinearSolver() {}
+    ~DirectLinearSolver() {};
 
     ///
     /// \brief Constructor
@@ -72,7 +72,7 @@ public:
     bool isIterative() const
     {
         return false;
-    }
+    };
 
 private:
     Eigen::LDLT<Matrixd> m_solver;
