@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkGeometry.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -33,6 +34,12 @@ Geometry::print() const
     LOG(INFO) << "Scaling: " << m_scaling;
     LOG(INFO) << "Translation: " << "(" << t.x() << ", " << t.y() << ", " << t.z() << ")";
     LOG(INFO) << "Rotation:\n" << r;
+}
+
+void
+Geometry::computeBoundingBox(Vec3d& /*min*/, Vec3d& /*max*/, const double /* paddingPercent = 0.0*/) const
+{
+    LOG(FATAL) << "Call to unimplemented function";
 }
 
 void
@@ -239,5 +246,23 @@ Geometry::isMesh() const
             || this->m_type == Type::TetrahedralMesh
             || this->m_type == Type::LineMesh
             ) ? true : false;
+}
+
+// Static counter
+unsigned int
+Geometry::s_NumGeneratedGegometries;
+
+// Static counter mutex lock
+ParallelUtils::SpinLock
+Geometry::s_RegistryLock;
+
+unsigned int
+Geometry::getUniqueID()
+{
+    s_RegistryLock.lock();
+    const auto idx = s_NumGeneratedGegometries;
+    ++s_NumGeneratedGegometries;
+    s_RegistryLock.unlock();
+    return idx;
 }
 } // imstk

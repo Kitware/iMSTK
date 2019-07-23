@@ -114,6 +114,7 @@ PointSet::setVertexPositions(const StdVectorOfVec3d& vertices)
         m_vertexPositions  = vertices;
         m_dataModified     = true;
         m_transformApplied = false;
+        this->updatePostTransformData();
     }
     else
     {
@@ -282,7 +283,6 @@ PointSet::updatePostTransformData()
 
     if (m_vertexPositionsPostTransform.size() != m_vertexPositions.size())
     {
-        m_vertexPositionsPostTransform.clear();
         m_vertexPositionsPostTransform.resize(m_vertexPositions.size());
     }
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)

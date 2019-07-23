@@ -103,12 +103,11 @@ public:
 
     ///
     /// \brief Return m_isModified flag, used to communicate with the render engine
-    /// For performance reason, the only way to change this flag is to manually call to turnDataModifiedFlagON() or turnDataModifiedFlagOFF
-    /// Thus, we must call turnDataModifiedFlagON() explicity after finished data manipulation
+    /// For performance reason, the only way to change this flag is to manually call to setDataModified(true)
+    /// Thus, we must call setDataModified(true) explicity after finished data manipulation
     ///
     bool isModified() const { return m_isModified; }
-    void turnDataModifiedFlagON() { m_isModified = true; }
-    void turnDataModifiedFlagOFF() { m_isModified = false; }
+    void setDataModified(const bool bState) { m_isModified = bState; }
 
     ///
     /// \brief Set/Get render material

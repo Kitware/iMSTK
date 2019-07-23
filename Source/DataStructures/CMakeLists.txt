@@ -5,6 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( Datastructures
   DEPENDS
     Core
+	Geometry
   )
 
 #-----------------------------------------------------------------------------
