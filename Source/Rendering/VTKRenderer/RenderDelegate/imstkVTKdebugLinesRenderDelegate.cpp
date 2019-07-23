@@ -71,7 +71,7 @@ VTKdbgLinesRenderDelegate::updateDataSource()
 {
     if (m_RenderGeoData->isModified())
     {
-        m_RenderGeoData->turnDataModifiedFlagOFF();
+        m_RenderGeoData->setDataModified(false);
         m_mappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
                                       m_RenderGeoData->getNumVertices() * 3, 1);
 

@@ -142,9 +142,9 @@ main()
             }
             ++mode;
 
-            debugPoints->turnDataModifiedFlagON();
-            debugLines->turnDataModifiedFlagON();
-            debugTriangles->turnDataModifiedFlagON();
+            debugPoints->setDataModified(true);
+            debugLines->setDataModified(true);
+            debugTriangles->setDataModified(true);
 
             // Must call to update render data
             for (auto& delegate : renderer->getDebugRenderDelegates())
