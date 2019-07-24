@@ -28,6 +28,7 @@
 #include "imstkIsometricMap.h"
 #include "imstkMeshIO.h"
 #include "imstkTetraToTetraCD.h"
+#include "imstkTetrahedralMesh.h"
 
 using namespace imstk;
 
@@ -65,11 +66,11 @@ TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 0);
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
@@ -82,28 +83,28 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
     auto cd = std::make_shared<CollisionData>();
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 1);
-    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionData::bPenetratingA);
-    EXPECT_EQ(cd->PTColData[0].vertexId, 0);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronId, 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 1);
+    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::bPenetratingA);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 0);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0);
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 1);
-    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionData::aPenetratingB);
-    EXPECT_EQ(cd->PTColData[0].vertexId, 0);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronId, 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 1);
+    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::aPenetratingB);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 0);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0);
 
     //now translate b more so there is no intersection
     b->translateVertices(imstk::Vec3d(0.0, 2.0, 0.0));
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 0);
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
@@ -117,34 +118,34 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 4);
+    EXPECT_EQ(cd->PTColData.getSize(), 4);
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 4);
+    EXPECT_EQ(cd->PTColData.getSize(), 4);
 
     //this additional translation produces a different intersection
     b->translateVertices(imstk::Vec3d(0.0, 0.0, 0.5));
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 1);
-    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionData::aPenetratingB);
-    EXPECT_EQ(cd->PTColData[0].vertexId, 81);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronId, 367);
+    EXPECT_EQ(cd->PTColData.getSize(), 1);
+    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::aPenetratingB);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 81);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367);
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 1);
-    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionData::bPenetratingA);
-    EXPECT_EQ(cd->PTColData[0].vertexId, 81);
-    EXPECT_EQ(cd->PTColData[0].tetreahedronId, 367);
+    EXPECT_EQ(cd->PTColData.getSize(), 1);
+    EXPECT_EQ(cd->PTColData[0].collisionType, PointTetrahedronCollisionDataElement::bPenetratingA);
+    EXPECT_EQ(cd->PTColData[0].vertexIdx, 81);
+    EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367);
 
     //now translate b more so there is no intersection
     b->translateVertices(imstk::Vec3d(0.0, 0.0, 1.0));
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 0);
+    EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
 TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
@@ -155,7 +156,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
     auto cd = std::make_shared<CollisionData>();
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
-    EXPECT_EQ(cd->PTColData.size(), 595);
+    EXPECT_EQ(cd->PTColData.getSize(), 595);
 }
 
 int

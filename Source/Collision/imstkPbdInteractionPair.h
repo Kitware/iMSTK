@@ -39,8 +39,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdInteractionPair(std::shared_ptr<PbdObject> A, std::shared_ptr<PbdObject> B) :
-        first(A), second(B) {}
+    PbdInteractionPair(const std::shared_ptr<PbdObject>& A, const std::shared_ptr<PbdObject>& B);
 
     ///
     /// \brief Clear the collisions from previous step
@@ -75,8 +74,12 @@ public:
 
 private:
     std::vector<std::shared_ptr<PbdCollisionConstraint>> m_collisionConstraints;
-    std::shared_ptr<PbdObject> first;
-    std::shared_ptr<PbdObject> second;
+
+    std::shared_ptr<PbdObject> m_firstObj;
+    std::shared_ptr<PbdObject> m_secondObj;
+
+    double       m_firstObjProximity;
+    double       m_secondObjProximity;
     unsigned int maxIter;
 };
 }

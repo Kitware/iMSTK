@@ -21,38 +21,31 @@
 
 #pragma once
 
-// std library
+#include "imstkCollisionDetection.h"
 #include <memory>
 
-// imstk
-#include "imstkCollisionDetection.h"
-#include "DeformModel.h"
+class DeformModel;
 
 namespace imstk
 {
 class SurfaceMesh;
-class CollisionData;
+struct CollisionData;
 
 ///
-/// \class MeshToMeshCD
+/// \class MeshToMeshCCD
 ///
-/// \brief Base class for mesh-to-mesh collision detection
+/// \brief Continuous collision detection for surface meshes
 ///
-class MeshToMeshCD : public CollisionDetection
+class SurfaceMeshToSurfaceMeshCCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    MeshToMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
-                 std::shared_ptr<SurfaceMesh>   meshB,
-                 std::shared_ptr<CollisionData> colData);
-
-    ///
-    /// \brief Destructor
-    ///
-    ~MeshToMeshCD() = default;
+    SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<SurfaceMesh>   meshA,
+                                std::shared_ptr<SurfaceMesh>   meshB,
+                                std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Detect collision and compute collision data

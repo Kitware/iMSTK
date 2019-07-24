@@ -21,10 +21,9 @@
 
 #pragma once
 
+#include "imstkCollisionDetection.h"
 #include <memory>
 #include <iostream>
-
-#include "imstkCollisionDetection.h"
 
 namespace imstk
 {
@@ -46,17 +45,7 @@ public:
     ///
     MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      obj1,
                            std::shared_ptr<SurfaceMesh>   obj2,
-                           std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce,
-                           colData),
-        m_object1(obj1),
-        m_object2(obj2)
-    {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~MeshToMeshBruteForceCD() = default;
+                           std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Detect collision and compute collision data

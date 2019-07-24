@@ -23,47 +23,43 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
 #include "imstkGeometryMap.h"
-#include "imstkIntersectionTestUtils.h"
+#include "imstkCollisionUtils.h"
 #include "imstkPbdModel.h"
 
 namespace imstk
 {
+PbdInteractionPair::PbdInteractionPair(const std::shared_ptr<PbdObject>& A, const std::shared_ptr<PbdObject>& B) : m_firstObj(A), m_secondObj(B)
+{
+}
+
 bool
 PbdInteractionPair::doBroadPhaseCollision()
 {
-    auto g1    = first->getCollidingGeometry();
-    auto g2    = second->getCollidingGeometry();
-    auto mesh1 = std::static_pointer_cast<PointSet>(g1);
-    auto mesh2 = std::static_pointer_cast<PointSet>(g2);
-
     Vec3d min1, max1;
-    mesh1->computeBoundingBox(min1, max1);
+    m_firstObj->getCollidingGeometry()->computeBoundingBox(min1, max1);
 
     Vec3d min2, max2;
-    mesh2->computeBoundingBox(min2, max2);
+    m_secondObj->getCollidingGeometry()->computeBoundingBox(min2, max2);
 
-    auto dynaModel1 = std::static_pointer_cast<PbdModel>(first->getDynamicalModel());
-    auto dynaModel2 = std::static_pointer_cast<PbdModel>(second->getDynamicalModel());
+    auto prox1 = m_firstObjProximity;
+    auto prox2 = m_secondObjProximity;
 
-    auto prox1 = dynaModel1->getParameters()->m_proximity;
-    auto prox2 = dynaModel2->getParameters()->m_proximity;
-
-    return testAABBToAABB(min1[0] - prox1, max1[0] + prox1, min1[1] - prox1, max1[1] + prox1,
-                          min1[2] - prox1, max1[2] + prox1, min2[0] - prox2, max2[0] + prox2,
-                          min2[1] - prox2, max2[1] + prox2, min2[2] - prox2, max2[2] + prox2);
+    return CollisionUtils::testAABBToAABB(min1[0] - prox1, max1[0] + prox1, min1[1] - prox1, max1[1] + prox1,
+            min1[2] - prox1, max1[2] + prox1, min2[0] - prox2, max2[0] + prox2,
+            min2[1] - prox2, max2[1] + prox2, min2[2] - prox2, max2[2] + prox2);
 }
 
 void
 PbdInteractionPair::doNarrowPhaseCollision()
 {
-    auto g1 = first->getCollidingGeometry();
-    auto g2 = second->getCollidingGeometry();
+    auto g1 = m_firstObj->getCollidingGeometry();
+    auto g2 = m_secondObj->getCollidingGeometry();
 
-    auto map1 = first->getPhysicsToCollidingMap();
-    auto map2 = second->getPhysicsToCollidingMap();
+    auto map1 = m_firstObj->getPhysicsToCollidingMap();
+    auto map2 = m_secondObj->getPhysicsToCollidingMap();
 
-    auto dynaModel1 = std::static_pointer_cast<PbdModel>(first->getDynamicalModel());
-    auto dynaModel2 = std::static_pointer_cast<PbdModel>(second->getDynamicalModel());
+    auto dynaModel1 = std::static_pointer_cast<PbdModel>(m_firstObj->getDynamicalModel());
+    auto dynaModel2 = std::static_pointer_cast<PbdModel>(m_secondObj->getDynamicalModel());
 
     auto prox1 = dynaModel1->getParameters()->m_proximity;
     auto prox2 = dynaModel2->getParameters()->m_proximity;
@@ -88,7 +84,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                 const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
 
-                if (testPointToTriAABB(p[0], p[1], p[2],
+                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], prox1, prox2))
@@ -124,7 +120,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
 
                 if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                 {
-                    if (testLineToLineAABB(P[0], P[1], P[2],
+                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                         Q[0], Q[1], Q[2],
                         p0[0], p0[1], p0[2],
                         p1[0], p1[1], p1[2], prox1, prox2))
@@ -138,7 +134,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                 }
                 if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                 {
-                    if (testLineToLineAABB(P[0], P[1], P[2],
+                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                         Q[0], Q[1], Q[2],
                         p1[0], p1[1], p1[2],
                         p2[0], p2[1], p2[2], prox1, prox2))
@@ -152,7 +148,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                 }
                 if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                 {
-                    if (testLineToLineAABB(P[0], P[1], P[2],
+                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                         Q[0], Q[1], Q[2],
                         p2[0], p2[1], p2[2],
                         p0[0], p0[1], p0[2], prox1, prox2))
@@ -185,7 +181,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                 const Vec3d p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d p2 = mesh2->getVertexPosition(e[2]);
 
-                if (testPointToTriAABB(p[0], p[1], p[2],
+                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], prox1, prox2))
@@ -217,7 +213,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                 const Vec3d                 p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
 
-                if (testPointToTriAABB(p[0], p[1], p[2],
+                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], prox1, prox2))
@@ -258,7 +254,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], prox1, prox2))
@@ -272,7 +268,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     }
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], prox1, prox2))
@@ -286,7 +282,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     }
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], prox1, prox2))
@@ -318,7 +314,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], prox1, prox2))
@@ -332,7 +328,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     }
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], prox1, prox2))
@@ -346,7 +342,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     }
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], prox1, prox2))
@@ -377,7 +373,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     const Vec3d                 p2 = mesh2->getVertexPosition(e[2]);
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], prox1, prox2))
@@ -391,7 +387,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     }
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], prox1, prox2))
@@ -405,7 +401,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     }
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], prox1, prox2))

@@ -19,19 +19,20 @@
 
 =========================================================================*/
 
-#include "imstkMeshToMeshCD.h"
+#include "imstkSurfaceMeshToSurfaceMeshCCD.h"
 
 #include "imstkCollisionData.h"
 #include "imstkSurfaceMesh.h"
+#include "DeformModel.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk
 {
-MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
-                           std::shared_ptr<SurfaceMesh>   meshB,
-                           std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::MeshToMesh, colData),
+SurfaceMeshToSurfaceMeshCCD::SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<SurfaceMesh>   meshA,
+                                                         std::shared_ptr<SurfaceMesh>   meshB,
+                                                         std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::SurfaceMeshToSurfaceMeshCCD, colData),
     m_meshA(meshA),
     m_meshB(meshB)
 {
@@ -39,9 +40,9 @@ MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
     m_modelB = std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices());
 
     // Setup Callbacks
-    m_modelA->SetEECallBack(MeshToMeshCD::EECallback, this);
-    m_modelA->SetVFCallBack(MeshToMeshCD::VFCallbackA, this);
-    m_modelB->SetVFCallBack(MeshToMeshCD::VFCallbackB, this);
+    m_modelA->SetEECallBack(SurfaceMeshToSurfaceMeshCCD::EECallback, this);
+    m_modelA->SetVFCallBack(SurfaceMeshToSurfaceMeshCCD::VFCallbackA, this);
+    m_modelB->SetVFCallBack(SurfaceMeshToSurfaceMeshCCD::VFCallbackB, this);
 
     // Build BVH
     m_modelA->BuildBVH(false);
@@ -49,7 +50,7 @@ MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
 }
 
 void
-MeshToMeshCD::computeCollisionData()
+SurfaceMeshToSurfaceMeshCCD::computeCollisionData()
 {
     // Clear collisionData
     m_colData->clearAll();
@@ -73,47 +74,47 @@ MeshToMeshCD::computeCollisionData()
 }
 
 void
-MeshToMeshCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
-                         unsigned int eB_v1, unsigned int eB_v2,
-                         float t, void* userdata)
+SurfaceMeshToSurfaceMeshCCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
+                                        unsigned int eB_v1, unsigned int eB_v2,
+                                        float t, void* userdata)
 {
-    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    auto CD = reinterpret_cast<SurfaceMeshToSurfaceMeshCCD*>(userdata);
     if (CD == nullptr)
     {
         return;
     }
 
     auto colData = CD->getCollisionData();
-    colData->EEColData.push_back(EdgeEdgeCollisionData(eA_v1, eA_v2, eB_v1, eB_v2, t));
+    colData->EEColData.safeAppend(EdgeEdgeCollisionDataElement { { eA_v1, eA_v2 }, { eB_v1, eB_v2 }, t });
     //LOG(INFO) <<"EE: eA("<<eA_v1<<", "<<eA_v2<<"), eB("<<eB_v1<<", "<<eB_v2<<") \t@ t="<<t;
 }
 
 void
-MeshToMeshCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
-                          float t, void* userdata)
+SurfaceMeshToSurfaceMeshCCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
+                                         float t, void* userdata)
 {
-    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    auto CD = reinterpret_cast<SurfaceMeshToSurfaceMeshCCD*>(userdata);
     if (CD == nullptr)
     {
         return;
     }
 
     auto colData = CD->getCollisionData();
-    colData->TVColData.push_back(TriangleVertexCollisionData((size_t)fidA, (size_t)vidB, t));
+    colData->TVColData.safeAppend(TriangleVertexCollisionDataElement { fidA, vidB, (double)t });
     //LOG(INFO) <<"VF: fA("<<fidA<<"), vB("<<vidB<<") \t\t@ t="<<t;
 }
 
 void
-MeshToMeshCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
-                          float t, void* userdata)
+SurfaceMeshToSurfaceMeshCCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
+                                         float t, void* userdata)
 {
-    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    auto CD = reinterpret_cast<SurfaceMeshToSurfaceMeshCCD*>(userdata);
     if (CD == nullptr)
     {
         return;
     }
     auto colData = CD->getCollisionData();
-    colData->VTColData.push_back(VertexTriangleCollisionData(vidA, fidB, t));
+    colData->VTColData.safeAppend(VertexTriangleCollisionDataElement { vidA, fidB, (double)t });
     //LOG(INFO) <<"VF: vA("<<vidA<<"), fB("<<fidB<<") \t\t@ t="<<t;
 }
 }

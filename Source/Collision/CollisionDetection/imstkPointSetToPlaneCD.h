@@ -21,15 +21,15 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkCollisionDetection.h"
+#include <memory>
 
 namespace imstk
 {
 class PointSet;
 class Plane;
-class CollisionData;
+class Geometry;
+struct CollisionData;
 
 ///
 /// \class PointSetToPlaneCD
@@ -48,18 +48,12 @@ public:
                       std::shared_ptr<CollisionData> colData);
 
     ///
-    /// \brief Destructor
-    ///
-    virtual ~PointSetToPlaneCD() override = default;
-
-    ///
     /// \brief Detect collision and compute collision data
     ///
     void computeCollisionData() override;
 
 private:
-
-    std::shared_ptr<PointSet> m_pointSet;      ///> PointSet
-    std::shared_ptr<Plane>    m_plane;         ///> Plane
+    std::shared_ptr<PointSet> m_pointSet;
+    std::shared_ptr<Plane>    m_plane;
 };
 }

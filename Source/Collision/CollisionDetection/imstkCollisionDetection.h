@@ -21,15 +21,12 @@
 
 #pragma once
 
-#include "imstkCollisionData.h"
-
 #include <memory>
 
 namespace imstk
 {
 class CollidingObject;
-//class CollisionData;
-//class CollisionData::CollisionData;
+struct CollisionData;
 
 ///
 /// \class CollisionDetection
@@ -45,48 +42,45 @@ public:
     ///
     enum class Type
     {
+        // Points to objects
+        PointSetToSphere,
+        PointSetToPlane,
+        PointSetToCapsule,
+        PointSetToSpherePicking,
+        PointSetToVolumeMesh,
+
+        // Mesh to mesh (mesh to analytical object = mesh vertices to analytical object)
+        SurfaceMeshToSurfaceMesh,
+        SurfaceMeshToSurfaceMeshCCD,
+        VolumeMeshToVolumeMesh,
+        MeshToMeshBruteForce,
+
+        // Analytical object to analytical object
         UnidirectionalPlaneToSphere,
         BidirectionalPlaneToSphere,
         SphereToCylinder,
         SphereToSphere,
-        PointSetToSphere,
-        PointSetToPlane,
-        MeshToMesh,
-        PointSetToCapsule,
-        PointSetToSpherePicking,
-        MeshToMeshBruteForce,
+
         Custom
     };
 
     ///
     /// \brief Static factory for collision detection sub classes
     ///
-    static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(const Type&                      type,
-                                                                            std::shared_ptr<CollidingObject> objA,
-                                                                            std::shared_ptr<CollidingObject> objB,
-                                                                            std::shared_ptr<CollisionData>   colData);
+    static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(
+        const Type                       type,
+        std::shared_ptr<CollidingObject> objA,
+        std::shared_ptr<CollidingObject> objB,
+        std::shared_ptr<CollisionData>   colData);
 
     ///
     /// \brief Constructor
     ///
-    CollisionDetection(const Type& type, std::shared_ptr<CollisionData> colData) :
-        m_type(type)//,
-        //m_colData(colData)
-    {
-        if (colData == nullptr)
-        {
-            m_colData = std::make_shared<CollisionData>();
-        }
-        else
-        {
-            m_colData = colData;
-        }
-    }
-
+    CollisionDetection(const Type& type, std::shared_ptr<CollisionData> colData);
     CollisionDetection() = delete;
 
     ///
-    /// \brief Destructor
+    /// \brief Destructor for base class
     ///
     virtual ~CollisionDetection() = default;
 
@@ -98,15 +92,14 @@ public:
     ///
     /// \brief Returns collision detection type
     ///
-    const Type& getType() const;
+    const Type& getType() const { return m_type; }
 
     ///
     /// \brief Returns collision data
     ///
-    const std::shared_ptr<CollisionData> getCollisionData() const;
+    const std::shared_ptr<CollisionData> getCollisionData() const { return m_colData; }
 
 protected:
-
     Type m_type = Type::Custom;               ///< Collision detection algorithm type
     std::shared_ptr<CollisionData> m_colData; ///< Collision data
 };

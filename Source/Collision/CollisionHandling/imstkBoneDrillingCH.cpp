@@ -82,27 +82,27 @@ BoneDrillingCH::erodeBone()
 {
     auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
-    ParallelUtils::parallelFor(m_colData->MAColData.size(),
+    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx)
         {
             auto& cd = m_colData->MAColData[idx];
-            if (m_nodeRemovalStatus[cd.nodeId])
+            if (m_nodeRemovalStatus[cd.nodeIdx])
             {
                 return;
             }
 
-            m_nodalDensity[cd.nodeId] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * cd.penetrationVector.norm() * 0.001;
+            m_nodalDensity[cd.nodeIdx] -= 0.001 * (m_angularSpeed / m_BoneHardness) * m_stiffness * cd.penetrationVector.norm() * 0.001;
 
-            if (m_nodalDensity[cd.nodeId] <= 0.)
+            if (m_nodalDensity[cd.nodeIdx] <= 0.)
             {
                 // TODO: Unused variable, maybe used in furture?
                 // lock.lock();
                 // m_erodedNodes.push_back(cd.nodeId);
                 // lock.unlock();
-                m_nodeRemovalStatus[cd.nodeId] = true;
+                m_nodeRemovalStatus[cd.nodeIdx] = true;
 
                 // tag the tetra that will be removed
-                for (auto& tetId : m_nodalCardinalSet[cd.nodeId])
+                for (auto& tetId : m_nodalCardinalSet[cd.nodeIdx])
                 {
                     boneTetMesh->setTetrahedraAsRemoved(static_cast<unsigned int>(tetId));
                     boneTetMesh->setTopologyChangedFlag(true);
@@ -116,7 +116,7 @@ BoneDrillingCH::processCollisionData()
 {
     // Check if any collisions
     const auto devicePosition = m_drill->getCollidingGeometry()->getTranslation();
-    if (m_colData->MAColData.empty())
+    if (m_colData->MAColData.isEmpty())
     {
         // Set the visual object position same as the colliding object position
         m_drill->getVisualGeometry()->setTranslation(devicePosition);
@@ -128,9 +128,10 @@ BoneDrillingCH::processCollisionData()
     // Aggregate collision data
     Vec3d  t           = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
-    for (const auto& cd : m_colData->MAColData)
+    for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
     {
-        if (m_nodeRemovalStatus[cd.nodeId])
+        const auto& cd = m_colData->MAColData[i];
+        if (m_nodeRemovalStatus[cd.nodeIdx])
         {
             continue;
         }

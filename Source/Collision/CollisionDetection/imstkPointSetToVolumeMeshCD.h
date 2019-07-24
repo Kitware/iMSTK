@@ -19,25 +19,40 @@
 
 =========================================================================*/
 
-#include "imstkSphereToSphereCD.h"
-#include "imstkNarrowPhaseCD.h"
-#include "imstkCollisionData.h"
+#pragma once
+
+#include "imstkCollisionDetection.h"
+#include <memory>
 
 namespace imstk
 {
-SphereToSphereCD::SphereToSphereCD(std::shared_ptr<Sphere>        sphereA,
-                                   std::shared_ptr<Sphere>        sphereB,
-                                   std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::SphereToSphere, colData),
-    m_sphereA(sphereA),
-    m_sphereB(sphereB)
-{
-}
+class Geometry;
+class PointSet;
+class SurfaceMesh;
+struct CollisionData;
 
-void
-SphereToSphereCD::computeCollisionData()
+///
+/// \class PointSetToTriMeshCD
+///
+/// \brief PointSet to sphere collision detection
+///
+class PointSetToVolumeMeshCD : public CollisionDetection
 {
-    m_colData->clearAll();
-    NarrowPhaseCD::sphereToSphere(m_sphereA.get(), m_sphereB.get(), m_colData);
-}
+public:
+    ///
+    /// \brief Constructor
+    ///
+    PointSetToVolumeMeshCD(std::shared_ptr<PointSet>      pointset,
+                           std::shared_ptr<SurfaceMesh>   triMesh,
+                           std::shared_ptr<CollisionData> colData);
+
+    ///
+    /// \brief Detect collision and compute collision data
+    ///
+    void computeCollisionData() override;
+
+private:
+    std::shared_ptr<PointSet>    m_pointset;
+    std::shared_ptr<SurfaceMesh> m_triMesh;
+};
 }

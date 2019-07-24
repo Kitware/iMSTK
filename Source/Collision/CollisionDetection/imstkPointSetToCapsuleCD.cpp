@@ -20,12 +20,10 @@
 =========================================================================*/
 
 #include "imstkPointSetToCapsuleCD.h"
-
+#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkCapsule.h"
-#include "imstkPointSet.h"
-#include "imstkMath.h"
 #include "imstkParallelUtils.h"
+#include "imstkPointSet.h"
 
 namespace imstk
 {
@@ -41,49 +39,12 @@ PointSetToCapsuleCD::PointSetToCapsuleCD(std::shared_ptr<PointSet>      pointSet
 void
 PointSetToCapsuleCD::computeCollisionData()
 {
-    // Clear collisionData
     m_colData->clearAll();
-
-    auto capsulePos = m_capsule->getPosition();
-    auto length     = m_capsule->getLength();
-    auto radius     = m_capsule->getRadius();
-
-    // Get position of end points of the capsule
-    // TODO: Fix this issue of extra computation in future
-    auto p0     = capsulePos;
-    auto p1     = p0 + m_capsule->getOrientationAxis() * length;
-    auto mid    = 0.5 * (p0 + p1);
-    auto p      = p1 - p0;
-    auto pDotp  = p.dot(p);
-    auto pDotp0 = p.dot(p0);
-
-    ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
-        [&](const size_t idx)
+    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+        [&](const unsigned int idx)
         {
-            const auto q = m_pointSet->getVertexPosition(idx);
-
-            // First, check collision with bounding sphere
-            if ((mid - q).norm() > (radius + length * 0.5))
-            {
-                return;
-            }
-
-            // Do the actual check
-            auto alpha = (q.dot(p) - pDotp0) / pDotp;
-            auto closestPoint = p0 + p * alpha;
-
-            // If the point is inside the bounding sphere then the closest point
-            // should be inside the capsule
-            auto dist = (closestPoint - q).norm();
-            if (dist <= radius)
-            {
-                auto direction = (closestPoint - q) / dist;
-                auto pointOnCapsule = closestPoint - radius * direction;
-                lock.lock();
-                m_colData->MAColData.push_back({ idx, p - pointOnCapsule });
-                lock.unlock();
-            }
+            const auto& point = m_pointSet->getVertexPosition(idx);
+            NarrowPhaseCD::pointToCapsule(point, idx, m_capsule.get(), m_colData);
         });
 }
 } // imstk

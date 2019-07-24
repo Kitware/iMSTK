@@ -23,22 +23,92 @@
 
 #include <array>
 
-// imstk
 #include "imstkMath.h"
+#include "imstkLogUtility.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
+template<class DataElement>
+class CollisionDataBase
+{
+public:
+    ///
+    /// \brief operator [] (const accessor)
+    ///
+    const DataElement& operator[](const size_t idx) const
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (idx >= m_Data.size())) << "Invalid index";
+#endif
+        return m_Data[idx];
+    }
+
+    ///
+    /// \brief Thread-safe append a data element
+    ///
+    void safeAppend(const DataElement& data)
+    {
+        m_Lock.lock();
+        m_Data.push_back(data);
+        m_Lock.unlock();
+    }
+
+    ///
+    /// \brief Append a data element, this is a non thread-safe operation
+    ///
+    void unsafeAppend(const DataElement& data) { m_Data.push_back(data); }
+
+    ///
+    /// \brief Overwrite a data element, this is a non thread-safe operation
+    ///
+    void setElement(size_t idx, const DataElement& data)
+    {
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+        LOG_IF(FATAL, (idx >= m_Data.size())) << "Invalid index";
+#endif
+        m_Data[idx] = data;
+    }
+
+    ///
+    /// \brief Check if the data array is emtpy
+    ///
+    bool isEmpty() const { return m_Data.empty(); }
+
+    ///
+    /// \brief Get the size of the data
+    ///
+    size_t getSize() const { return m_Data.size(); }
+
+    ///
+    /// \brief Resize the data array
+    ///
+    void resize(size_t newSize) { m_Data.resize(newSize); }
+
+    ///
+    /// \brief Clear all data
+    ///
+    void clear() { m_Data.resize(0); }
+
+private:
+    std::vector<DataElement> m_Data;
+    ParallelUtils::SpinLock  m_Lock;
+};
+
 ///
 /// \struct PositionDirectionCollisionData
 ///
 /// \brief Point-penetration depth collision data
 ///
-struct PositionDirectionCollisionData
+struct PositionDirectionCollisionDataElement
 {
     Vec3d posA;
     Vec3d posB;
     Vec3d dirAtoB;
     double penetrationDepth;
+};
+class PositionDirectionCollisionData : public CollisionDataBase<PositionDirectionCollisionDataElement>
+{
 };
 
 ///
@@ -46,10 +116,13 @@ struct PositionDirectionCollisionData
 ///
 /// \brief Mesh to analytical point-penetration depth collision data
 ///
-struct MeshToAnalyticalCollisionData
+struct MeshToAnalyticalCollisionDataElement
 {
-    size_t nodeId;
+    uint32_t nodeIdx;
     Vec3d penetrationVector;
+};
+class MeshToAnalyticalCollisionData : public CollisionDataBase<MeshToAnalyticalCollisionDataElement>
+{
 };
 
 ///
@@ -57,18 +130,14 @@ struct MeshToAnalyticalCollisionData
 ///
 /// \brief Vertex-triangle collision data
 ///
-struct VertexTriangleCollisionData
+struct VertexTriangleCollisionDataElement
 {
-    size_t vertexIdA;
-    size_t triIdB;
-    float time;
-
-    VertexTriangleCollisionData(size_t vIdA, size_t fIdB, float t = -1)
-    {
-        vertexIdA = vIdA;
-        triIdB    = fIdB;
-        time      = t;
-    }
+    uint32_t vertexIdx;
+    uint32_t triIdx;
+    double closestDistance;
+};
+class VertexTriangleCollisionData : public CollisionDataBase<VertexTriangleCollisionDataElement>
+{
 };
 
 ///
@@ -76,18 +145,14 @@ struct VertexTriangleCollisionData
 ///
 /// \brief Triangle-vertex collision data
 ///
-struct TriangleVertexCollisionData
+struct TriangleVertexCollisionDataElement
 {
-    size_t triIdA;
-    size_t vertexIdB;
-    float time;
-
-    TriangleVertexCollisionData(const size_t fIdA, const size_t vIdB, const float t = -1)
-    {
-        triIdA    = fIdA;
-        vertexIdB = vIdB;
-        time      = t;
-    }
+    uint32_t triIdx;
+    uint32_t vertexIdx;
+    double closestDistance;
+};
+class TriangleVertexCollisionData : public CollisionDataBase<TriangleVertexCollisionDataElement>
+{
 };
 
 ///
@@ -95,18 +160,14 @@ struct TriangleVertexCollisionData
 ///
 /// \brief Edge-Edge collision data
 ///
-struct EdgeEdgeCollisionData
+struct EdgeEdgeCollisionDataElement
 {
-    std::pair<size_t, size_t> edgeIdA;
-    std::pair<size_t, size_t> edgeIdB;
+    std::pair<uint32_t, uint32_t> edgeIdA;
+    std::pair<uint32_t, uint32_t> edgeIdB;
     float time;
-
-    EdgeEdgeCollisionData(const size_t eA_v1, const size_t eA_v2, const size_t eB_v1, const size_t eB_v2, const float t = -1)
-    {
-        edgeIdA = std::pair<size_t, size_t>(eA_v1, eA_v2);
-        edgeIdB = std::pair<size_t, size_t>(eB_v1, eB_v2);
-        time    = t;
-    }
+};
+class EdgeEdgeCollisionData : public CollisionDataBase<EdgeEdgeCollisionDataElement>
+{
 };
 
 ///
@@ -114,7 +175,7 @@ struct EdgeEdgeCollisionData
 ///
 /// \brief Point-tetrahedron collision data
 ///
-struct PointTetrahedronCollisionData
+struct PointTetrahedronCollisionDataElement
 {
     enum CollisionType
     {
@@ -123,18 +184,28 @@ struct PointTetrahedronCollisionData
         bPenetratingA = 2, // vertex is from mesh B, tetrahedron is from mesh A
         bPenetratingB = 3  // B self-penetration
     } collisionType;
-    size_t vertexId;
-    size_t tetreahedronId;
+
+    uint32_t vertexIdx;
+    uint32_t tetreahedronIdx;
     using WeightsArray = std::array<double, 4>;
     WeightsArray BarycentricCoordinates;
 };
+class PointTetrahedronCollisionData : public CollisionDataBase<PointTetrahedronCollisionDataElement>
+{
+};
 
-struct PickingCollisionData
+///
+/// \brief The PickingCollisionData struct
+///
+struct PickingCollisionDataElement
 {
     // map of node and point position
     Vec3d ptPos;
-    size_t nodeId;
+    uint32_t nodeIdx;
     bool touchStatus;
+};
+class PickingCollisionData : public CollisionDataBase<PickingCollisionDataElement>
+{
 };
 
 ///
@@ -142,10 +213,8 @@ struct PickingCollisionData
 ///
 /// \brief Class that is the holder of all types of collision data
 ///
-class CollisionData
+struct CollisionData
 {
-public:
-
     void clearAll()
     {
         PDColData.clear();
@@ -157,14 +226,12 @@ public:
         NodePickData.clear();
     }
 
-    CollisionData() {}
-
-    std::vector<PositionDirectionCollisionData> PDColData;    ///< Position Direction collision data
-    std::vector<VertexTriangleCollisionData>    VTColData;    ///< Vertex Triangle collision data
-    std::vector<TriangleVertexCollisionData>    TVColData;    ///< Triangle Vertex collision data
-    std::vector<EdgeEdgeCollisionData>          EEColData;    ///< Edge Edge collision data
-    std::vector<MeshToAnalyticalCollisionData>  MAColData;    ///< Mesh to analytical collision data
-    std::vector<PointTetrahedronCollisionData>  PTColData;    ///< Point Tetrahedron collision data
-    std::vector<PickingCollisionData>           NodePickData; ///< List of points that are picked
+    PositionDirectionCollisionData PDColData;           ///< Position Direction collision data
+    VertexTriangleCollisionData VTColData;              ///< Vertex Triangle collision data
+    TriangleVertexCollisionData TVColData;              ///< Triangle Vertex collision data
+    EdgeEdgeCollisionData EEColData;                    ///< Edge Edge collision data
+    MeshToAnalyticalCollisionData MAColData;            ///< Mesh to analytical collision data
+    PointTetrahedronCollisionData PTColData;            ///< Point Tetrahedron collision data
+    PickingCollisionData NodePickData;                  ///< List of points that are picked
 };
 }

@@ -129,7 +129,7 @@ main()
     // Compute the scale factor to scale meshes such that meshes with different sizes are still visualized consistently
     Vec3d      lowerCorner, upperCorner;
     const auto pointset = std::dynamic_pointer_cast<PointSet>(triMeshes.front());
-    ParallelUtils::ParallelReduce::findAABB(pointset->getVertexPositions(), lowerCorner, upperCorner);
+    ParallelUtils::findAABB(pointset->getVertexPositions(), lowerCorner, upperCorner);
     const auto scaleFactor = 20.0 / (upperCorner - lowerCorner).norm();
     for (const auto& mesh: triMeshes)
     {
@@ -197,7 +197,7 @@ main()
             }
 
             Vec3d lowerCorners, upperCorner;
-            ParallelUtils::ParallelReduce::findAABB(centers, lowerCorners, upperCorner);
+            ParallelUtils::findAABB(centers, lowerCorners, upperCorner);
             if ((lowerCorners - upperCorner).norm() > 70.0)
             {
                 for (size_t i = 0; i < dirs.size(); ++i)

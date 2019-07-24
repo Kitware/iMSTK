@@ -54,7 +54,7 @@ GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, 
     // firstly compute the bounding box of points in setB
     Vec3r lowerCorner;
     Vec3r upperCorner;
-    ParallelUtils::ParallelReduce::findAABB(setB, lowerCorner, upperCorner);
+    ParallelUtils::findAABB(setB, lowerCorner, upperCorner);
 
     // the upper corner need to be expanded a bit, to avoid round-off error during computation
     upperCorner += Vec3d(m_SearchRadius, m_SearchRadius, m_SearchRadius) * Real(0.1);

@@ -39,7 +39,7 @@ VirtualCouplingCH::processCollisionData()
 
     // Check if any collisions
     const auto collidingObjPos = collidingGeometry->getPosition();
-    if (m_colData->PDColData.empty())
+    if (m_colData->PDColData.isEmpty())
     {
         // Set the visual object position same as the colliding object position
         visualGeometry->setPosition(collidingObjPos);
@@ -48,8 +48,9 @@ VirtualCouplingCH::processCollisionData()
 
     // Aggregate collision data
     Vec3d t = Vec3d::Zero();
-    for (const auto& cd : m_colData->PDColData)
+    for (size_t i = 0; i < m_colData->PDColData.getSize(); ++i)
     {
+        const auto& cd = m_colData->PDColData[i];
         t += cd.dirAtoB * cd.penetrationDepth;
     }
 

@@ -52,7 +52,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
 {
     m_DynamicLinearProjConstraints->clear();
 
-    if (m_colData->NodePickData.empty())
+    if (m_colData->NodePickData.isEmpty())
     {
         return;
     }
@@ -72,17 +72,17 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
 
     // If collision data, append LPC constraints
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->NodePickData.size(),
+    ParallelUtils::parallelFor(m_colData->NodePickData.getSize(),
         [&](const size_t idx) {
-            const auto& cd = m_colData->NodePickData[idx];
-            const auto nodeDof = static_cast<Eigen::Index>(3 * cd.nodeId);
-            const auto vprev = Vec3d(Vprev(nodeDof), Vprev(nodeDof + 1), Vprev(nodeDof + 2));
-            const auto uprev = Vec3d(Uprev(nodeDof), Uprev(nodeDof + 1), Uprev(nodeDof + 2));
-            const auto x = (cd.ptPos + PhysTetMesh->getVertexPosition(cd.nodeId) -
-                            PhysTetMesh->getInitialVertexPosition(cd.nodeId) - uprev) / dT - vprev;
+            const auto& cd     = m_colData->NodePickData[idx];
+            const auto nodeDof = static_cast<Eigen::Index>(3 * cd.nodeIdx);
+            const auto vprev   = Vec3d(Vprev(nodeDof), Vprev(nodeDof + 1), Vprev(nodeDof + 2));
+            const auto uprev   = Vec3d(Uprev(nodeDof), Uprev(nodeDof + 1), Uprev(nodeDof + 2));
+            const auto x       = (cd.ptPos + PhysTetMesh->getVertexPosition(cd.nodeIdx) -
+                                  PhysTetMesh->getInitialVertexPosition(cd.nodeIdx) - uprev) / dT - vprev;
 
-            auto pickProjector = LinearProjectionConstraint(cd.nodeId, true);
-            pickProjector.setProjectorToDirichlet(static_cast<unsigned int>(cd.nodeId), x);
+            auto pickProjector = LinearProjectionConstraint(cd.nodeIdx, true);
+            pickProjector.setProjectorToDirichlet(static_cast<unsigned int>(cd.nodeIdx), x);
 
             lock.lock();
             m_DynamicLinearProjConstraints->push_back(std::move(pickProjector));

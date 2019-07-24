@@ -30,10 +30,10 @@
 namespace imstk
 {
 class CollidingObject;
-class CollisionData;
 class PbdObject;
 class PbdCollisionConstraint;
 class PbdSolver;
+struct CollisionData;
 
 ///
 /// \class PBDCollisionHandling
