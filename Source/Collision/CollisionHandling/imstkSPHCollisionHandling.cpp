@@ -53,7 +53,7 @@ SPHCollisionHandling::processCollisionData()
         [&](const size_t idx)
         {
             const auto& cd = m_colData->MAColData[idx];
-            const auto pidx = cd.nodeId;   // Fluid particle index
+            const auto pidx = cd.nodeIdx;  // Fluid particle index
             auto n = cd.penetrationVector; // This vector should point into solid object
 
             // Correct particle position

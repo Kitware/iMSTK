@@ -47,6 +47,10 @@ public:
     MaxL2NormFunctor(const StdVectorOfVec3r& data) : m_Data(data) {}
     MaxL2NormFunctor(MaxL2NormFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
+    // Prohibit copying
+    MaxL2NormFunctor() = delete;
+    MaxL2NormFunctor& operator=(const MaxL2NormFunctor&) = delete;
+
     void operator()(const tbb::blocked_range<size_t>& r)
     {
         for (size_t i = r.begin(); i != r.end(); ++i)
@@ -73,6 +77,10 @@ class AABBFunctor
 public:
     AABBFunctor(const StdVectorOfVec3r& data) : m_Data(data) { if (data.size() > 0) { m_UpperCorner = data[0]; } }
     AABBFunctor(AABBFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
+
+    // Prohibit copying
+    AABBFunctor() = delete;
+    AABBFunctor& operator=(const AABBFunctor&) = delete;
 
     void operator()(const tbb::blocked_range<size_t>& r)
     {

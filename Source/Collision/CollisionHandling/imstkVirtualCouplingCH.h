@@ -27,7 +27,7 @@
 namespace imstk
 {
 class CollidingObject;
-class CollisionData;
+struct CollisionData;
 
 ///
 /// \class VirtualCouplingCH

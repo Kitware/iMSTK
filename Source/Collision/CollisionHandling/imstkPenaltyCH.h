@@ -31,7 +31,7 @@ namespace imstk
 {
 class CollidingObject;
 class DeformableObject;
-class CollisionData;
+struct CollisionData;
 
 ///
 /// \class PenaltyCH

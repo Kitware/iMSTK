@@ -116,9 +116,9 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx) {
-            const auto& cd = m_colData->MAColData[idx];
-            const auto nodeDofID = static_cast<Eigen::Index>(3 * cd.nodeId);
-            const auto unit = cd.penetrationVector / cd.penetrationVector.norm();
+            const auto& cd       = m_colData->MAColData[idx];
+            const auto nodeDofID = static_cast<Eigen::Index>(3 * cd.nodeIdx);
+            const auto unit      = cd.penetrationVector / cd.penetrationVector.norm();
 
             auto velocityProjection = Vec3d(velVector(nodeDofID),
                                             velVector(nodeDofID + 1),
@@ -128,7 +128,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
             const auto nodalForce = -m_stiffness * cd.penetrationVector - m_damping * velocityProjection;
 
             lock.lock();
-            force(nodeDofID) += nodalForce.x();
+            force(nodeDofID)     += nodalForce.x();
             force(nodeDofID + 1) += nodalForce.y();
             force(nodeDofID + 2) += nodalForce.z();
             lock.unlock();

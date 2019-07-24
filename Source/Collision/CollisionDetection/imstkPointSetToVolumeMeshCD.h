@@ -38,11 +38,7 @@ struct CollisionData;
 ///
 class PointSetToVolumeMeshCD : public CollisionDetection
 {
-friend class SurfaceMeshToSurfaceMeshCD;
-friend class SurfaceMeshToVolumeMeshCD;
-friend class VolumeMeshToVolumeMeshCD;
 public:
-
     ///
     /// \brief Constructor
     ///

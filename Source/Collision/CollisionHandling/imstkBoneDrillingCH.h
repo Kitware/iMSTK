@@ -27,8 +27,8 @@
 namespace imstk
 {
 class CollidingObject;
-class CollisionData;
 class DeviceTracker;
+struct CollisionData;
 
 ///
 /// \class BoneDrillingCH

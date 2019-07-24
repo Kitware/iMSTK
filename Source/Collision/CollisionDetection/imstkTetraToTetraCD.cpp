@@ -52,7 +52,6 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     auto nodesMeshA = m_meshA->getVertexPositions();
     auto nodesMeshB = m_meshB->getVertexPositions();
 
-    ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(mesh->getNumTetrahedra(),
         [&](const size_t tId)
         {
@@ -100,12 +99,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                         {
                             auto coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
                             assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
-
-                            lock.lock();
-                            LOG(FATAL) << "UNIMPLEMENTED";
-                            //todo
-//                            m_colData->PTColData.safeAppend({ cType, vId, tId, bCoord });
-                            lock.unlock();
+                            m_colData->PTColData.safeAppend({ cType, static_cast<uint32_t>(vId), static_cast<uint32_t>(tId), bCoord });
                         }
                     } //if not this tetrahedron
                 }     //for vertices
