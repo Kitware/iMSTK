@@ -17,27 +17,42 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=========================================================================*/
+   =========================================================================*/
 
-#include "imstkSphereToSphereCD.h"
-#include "imstkNarrowPhaseCD.h"
-#include "imstkCollisionData.h"
+#pragma once
+
+#include "imstkCollisionDetection.h"
+#include <memory>
 
 namespace imstk
 {
-SphereToSphereCD::SphereToSphereCD(std::shared_ptr<Sphere>        sphereA,
-                                   std::shared_ptr<Sphere>        sphereB,
-                                   std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::SphereToSphere, colData),
-    m_sphereA(sphereA),
-    m_sphereB(sphereB)
-{
-}
+class Sphere;
+class Cylinder;
+struct CollisionData;
 
-void
-SphereToSphereCD::computeCollisionData()
+///
+/// \class SphereCylinderCD
+///
+/// \brief Sphere-Cylinder collision detection
+///
+class SphereToCylinderCD : public CollisionDetection
 {
-    m_colData->clearAll();
-    NarrowPhaseCD::sphereToSphere(m_sphereA.get(), m_sphereB.get(), m_colData);
-}
+public:
+
+    ///
+    /// \brief Constructor
+    ///
+    SphereToCylinderCD(std::shared_ptr<Sphere>        sphere,
+                       std::shared_ptr<Cylinder>      cylinder,
+                       std::shared_ptr<CollisionData> colData);
+
+    ///
+    /// \brief Detect collision and compute collision data
+    ///
+    void computeCollisionData() override;
+
+private:
+    std::shared_ptr<Cylinder> m_cylinder;
+    std::shared_ptr<Sphere>   m_sphere;
+};
 }

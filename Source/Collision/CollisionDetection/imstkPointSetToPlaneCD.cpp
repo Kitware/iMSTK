@@ -20,12 +20,10 @@
 =========================================================================*/
 
 #include "imstkPointSetToPlaneCD.h"
-
-#include "imstkCollidingObject.h"
+#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkPointSet.h"
 #include "imstkParallelUtils.h"
+#include "imstkPointSet.h"
 
 namespace imstk
 {
@@ -41,27 +39,12 @@ PointSetToPlaneCD::PointSetToPlaneCD(std::shared_ptr<PointSet>      pointSet,
 void
 PointSetToPlaneCD::computeCollisionData()
 {
-    // Clear collisionData
     m_colData->clearAll();
-
-    // Get plane properties
-    auto planePos    = m_plane->getPosition();
-    auto planeNormal = m_plane->getNormal();
-
-    ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
-        [&](const size_t idx)
+    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+        [&](const unsigned int idx)
         {
-            const auto p = m_pointSet->getVertexPosition(idx);
-            const auto penetrationDist = (p - planePos).dot(planeNormal);
-
-            if (penetrationDist <= 0.0)
-            {
-                const auto penetrationDir = planeNormal * penetrationDist;
-                lock.lock();
-                m_colData->MAColData.push_back({ idx, penetrationDir });
-                lock.unlock();
-            }
+            const auto& point = m_pointSet->getVertexPosition(idx);
+            NarrowPhaseCD::pointToPlane(point, idx, m_plane.get(), m_colData);
         });
 }
 } // imstk

@@ -21,16 +21,16 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkCollisionDetection.h"
-#include "imstkDeviceTracker.h"
+#include <memory>
 
 namespace imstk
 {
 class PointSet;
 class Sphere;
-class CollisionData;
+class Geometry;
+class DeviceTracker;
+struct CollisionData;
 
 ///
 /// \class PointSetToSpherePickingCD
@@ -49,11 +49,6 @@ public:
                               std::shared_ptr<CollisionData> colData);
 
     ///
-    /// \brief Destructor
-    ///
-    virtual ~PointSetToSpherePickingCD() override = default;
-
-    ///
     /// \brief Detect collision and compute collision data
     ///
     void computeCollisionData() override;
@@ -61,12 +56,11 @@ public:
     ///
     /// \brief Set device tracker and the id of the button
     ///
-    void setDeviceTrackerAndButton(const std::shared_ptr<imstk::DeviceTracker> devTracker,
-                                   const unsigned int                          buttonId = 0);
-private:
+    void setDeviceTrackerAndButton(const std::shared_ptr<DeviceTracker> devTracker, const unsigned int buttonId = 0);
 
-    std::shared_ptr<PointSet> m_pointSet;                  ///> PointSet
-    std::shared_ptr<Sphere>   m_sphere;                    ///> Sphere
+private:
+    std::shared_ptr<PointSet> m_pointSet;
+    std::shared_ptr<Sphere>   m_sphere;
 
     std::shared_ptr<imstk::DeviceTracker> m_deviceTracker; ///> Device tracker to get the button status
     unsigned int m_buttonId = 0;                           ///> button id

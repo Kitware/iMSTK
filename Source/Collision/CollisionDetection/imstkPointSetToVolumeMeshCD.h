@@ -23,28 +23,31 @@
 
 #include "imstkCollisionDetection.h"
 #include <memory>
-#include <iostream>
 
 namespace imstk
 {
 class Geometry;
+class PointSet;
 class SurfaceMesh;
-class CollisionData;
+struct CollisionData;
 
 ///
-/// \class MeshToMeshBruteForceCD
+/// \class PointSetToTriMeshCD
 ///
-/// \brief Mesh to mesh collision with brute force strategy
+/// \brief PointSet to sphere collision detection
 ///
-class MeshToMeshBruteForceCD : public CollisionDetection
+class PointSetToVolumeMeshCD : public CollisionDetection
 {
+friend class SurfaceMeshToSurfaceMeshCD;
+friend class SurfaceMeshToVolumeMeshCD;
+friend class VolumeMeshToVolumeMeshCD;
 public:
 
     ///
     /// \brief Constructor
     ///
-    MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      obj1,
-                           std::shared_ptr<SurfaceMesh>   obj2,
+    PointSetToVolumeMeshCD(std::shared_ptr<PointSet>      pointset,
+                           std::shared_ptr<SurfaceMesh>   triMesh,
                            std::shared_ptr<CollisionData> colData);
 
     ///
@@ -53,13 +56,7 @@ public:
     void computeCollisionData() override;
 
 private:
-    ///
-    /// \brief Do a broad phase collision check using AABB
-    ///
-    bool doBroadPhaseCollisionCheck() const;
-
-    double m_proximityTolerance = 0.1;        ///> proximity tolerance used for collision
-    std::shared_ptr<Geometry>    m_object1;   ///> object 1
-    std::shared_ptr<SurfaceMesh> m_object2;   ///> object 2
+    std::shared_ptr<PointSet>    m_pointset;
+    std::shared_ptr<SurfaceMesh> m_triMesh;
 };
 }

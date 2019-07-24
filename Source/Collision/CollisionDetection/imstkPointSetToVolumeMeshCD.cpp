@@ -19,32 +19,38 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToSphereCD.h"
+#include "imstkPointSetToVolumeMeshCD.h"
 #include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {
-PointSetToSphereCD::PointSetToSphereCD(std::shared_ptr<PointSet>      pointSet,
-                                       std::shared_ptr<Sphere>        sphere,
-                                       std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
-    m_pointSet(pointSet),
-    m_sphere(sphere)
+PointSetToVolumeMeshCD::PointSetToVolumeMeshCD(std::shared_ptr<PointSet>      pointset,
+                                               std::shared_ptr<SurfaceMesh>   triMesh,
+                                               std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToVolumeMesh, colData),
+    m_pointset(pointset), m_triMesh(triMesh)
 {
 }
 
 void
-PointSetToSphereCD::computeCollisionData()
+PointSetToVolumeMeshCD::computeCollisionData()
 {
     m_colData->clearAll();
-    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+
+    // This is brute force collision detection
+    // TODO: replace by octree
+    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointset->getVertexPositions().size()),
         [&](const unsigned int idx)
         {
-            const auto& point = m_pointSet->getVertexPosition(idx);
-            NarrowPhaseCD::pointToSphere(point, idx, m_sphere.get(), m_colData);
+            const auto& point = m_pointset->getVertexPosition(idx);
+            for (unsigned int idx2 = 0; idx2 < static_cast<unsigned int>(m_triMesh->getNumVertices()); ++idx2)
+            {
+                NarrowPhaseCD::pointToTriangle(point, idx, idx2, m_triMesh.get(), m_colData);
+            }
        });
 }
 } // imstk

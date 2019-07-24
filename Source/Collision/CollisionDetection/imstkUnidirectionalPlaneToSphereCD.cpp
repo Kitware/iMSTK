@@ -20,44 +20,24 @@
    =========================================================================*/
 
 #include "imstkUnidirectionalPlaneToSphereCD.h"
-
-#include "imstkCollidingObject.h"
+#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {
+UnidirectionalPlaneToSphereCD::UnidirectionalPlaneToSphereCD(std::shared_ptr<Plane>         planeA,
+                                                             std::shared_ptr<Sphere>        sphereB,
+                                                             std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::UnidirectionalPlaneToSphere, colData),
+    m_planeA(planeA),
+    m_sphereB(sphereB)
+{
+}
+
 void
 UnidirectionalPlaneToSphereCD::computeCollisionData()
 {
-    // Clear collisionData
     m_colData->clearAll();
-
-    // Get geometry properties
-    const Vec3d  sphereBPos = m_sphereB->getPosition();
-    const double r          = m_sphereB->getRadius();
-    const Vec3d  planeAPos  = m_planeA->getPosition();
-    const Vec3d  n          = m_planeA->getNormal();
-
-    // Compute shortest distance
-    double d = (sphereBPos - planeAPos).dot(n);
-
-    // Compute penetration depth
-    // Half-space defined by the normal of the plane is considered as "outside".
-    double penetrationDepth = r - d;
-    if (penetrationDepth <= 0.0)
-    {
-        return;
-    }
-
-    // Compute collision points
-    Vec3d planeAColPt  = sphereBPos - n * d;
-    Vec3d sphereBColPt = sphereBPos - n * r;
-
-    // Set collisionData
-    m_colData->PDColData.push_back({ planeAColPt, sphereBColPt, n, penetrationDepth });
+    NarrowPhaseCD::unidirectionalPlaneToSphere(m_planeA.get(), m_sphereB.get(), m_colData);
 }
 } //iMSTK

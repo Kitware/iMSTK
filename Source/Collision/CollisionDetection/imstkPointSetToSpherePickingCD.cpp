@@ -20,10 +20,11 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPointSetToSpherePickingCD.h"
+#include "imstkDeviceTracker.h"
+#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkPointSet.h"
-#include "imstkSphere.h"
 #include "imstkParallelUtils.h"
+#include "imstkPointSet.h"
 
 namespace imstk
 {
@@ -39,36 +40,21 @@ PointSetToSpherePickingCD::PointSetToSpherePickingCD(std::shared_ptr<PointSet>  
 void
 PointSetToSpherePickingCD::computeCollisionData()
 {
-    // Clear collisionData
     m_colData->clearAll();
-
     if (!m_deviceTracker || !m_deviceTracker->getDeviceClient()->getButton(m_buttonId))
     {
         return;
     }
-
-    // Get sphere properties
-    auto spherePos = m_sphere->getPosition();
-    auto radius    = m_sphere->getRadius() * m_sphere->getScaling();
-
-    ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_pointSet->getVertexPositions().size(),
-        [&](const size_t idx)
+    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+        [&](const unsigned int idx)
         {
-            const auto p = m_pointSet->getVertexPosition(idx);
-            auto dist = (spherePos - p).norm();
-            if (dist <= radius)
-            {
-                lock.lock();
-                m_colData->NodePickData.push_back({ spherePos - p, idx, 0 });
-                lock.unlock();
-            }
-        });
+            const auto& point = m_pointSet->getVertexPosition(idx);
+            NarrowPhaseCD::pointToSpherePicking(point, idx, m_sphere.get(), m_colData);
+       });
 }
 
 void
-PointSetToSpherePickingCD::setDeviceTrackerAndButton(const std::shared_ptr<DeviceTracker> devTracker,
-                                                     const unsigned int)
+PointSetToSpherePickingCD::setDeviceTrackerAndButton(const std::shared_ptr<DeviceTracker> devTracker, const unsigned int)
 {
     m_deviceTracker = devTracker;
 }

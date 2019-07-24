@@ -21,15 +21,14 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkCollisionDetection.h"
+#include <memory>
 
 namespace imstk
 {
 class Plane;
 class Sphere;
-class CollisionData;
+struct CollisionData;
 
 ///
 /// \class PlaneToSphereCD
@@ -45,16 +44,7 @@ public:
     ///
     UnidirectionalPlaneToSphereCD(std::shared_ptr<Plane>         planeA,
                                   std::shared_ptr<Sphere>        sphereB,
-                                  std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::UnidirectionalPlaneToSphere, colData),
-        m_planeA(planeA),
-        m_sphereB(sphereB)
-    {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~UnidirectionalPlaneToSphereCD() = default;
+                                  std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Detect collision and compute collision data
@@ -62,8 +52,7 @@ public:
     void computeCollisionData() override;
 
 private:
-
-    std::shared_ptr<Plane>  m_planeA;   ///>
-    std::shared_ptr<Sphere> m_sphereB;  ///>
+    std::shared_ptr<Plane>  m_planeA;
+    std::shared_ptr<Sphere> m_sphereB;
 };
 }

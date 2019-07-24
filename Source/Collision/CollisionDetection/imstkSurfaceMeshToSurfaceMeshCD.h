@@ -17,44 +17,33 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #pragma once
 
-#include <memory>
-
 #include "imstkCollisionDetection.h"
-#include "imstkCylinder.h"
+#include <memory>
 
 namespace imstk
 {
-class Sphere;
-class CollisionData;
+class Geometry;
+class SurfaceMesh;
+struct CollisionData;
 
 ///
-/// \class SphereCylinderCD
+/// \class SurfaceMeshToSurfaceMeshCD
 ///
-/// \brief Sphere-Cylinder collision detection
 ///
-class SphereCylinderCD : public CollisionDetection
+class SurfaceMeshToSurfaceMeshCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    SphereCylinderCD(std::shared_ptr<Sphere>        sphere,
-                     std::shared_ptr<Cylinder>      cylinder,
-                     std::shared_ptr<CollisionData> colData) :
-        CollisionDetection(CollisionDetection::Type::SphereToCylinder, colData),
-        m_cylinder(cylinder),
-        m_sphere(sphere)
-    {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~SphereCylinderCD() = default;
+    SurfaceMeshToSurfaceMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
+                               std::shared_ptr<SurfaceMesh>   meshB,
+                               std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Detect collision and compute collision data
@@ -62,8 +51,7 @@ public:
     void computeCollisionData() override;
 
 private:
-
-    std::shared_ptr<Cylinder> m_cylinder;    ///> colliding cylinder
-    std::shared_ptr<Sphere>   m_sphere;      ///> colliding sphere
+    std::shared_ptr<SurfaceMesh> m_meshA;
+    std::shared_ptr<SurfaceMesh> m_meshB;
 };
 }

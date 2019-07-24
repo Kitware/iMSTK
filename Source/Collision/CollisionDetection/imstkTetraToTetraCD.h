@@ -26,13 +26,12 @@
 
 // imstk
 #include "imstkCollisionDetection.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkSpatialHashTableSeparateChaining.h"
-#include "DeformModel.h"
 
 namespace imstk
 {
-class CollisionData;
+class TetrahedralMesh;
+struct CollisionData;
 
 ///
 /// \class TetraToTetraCD

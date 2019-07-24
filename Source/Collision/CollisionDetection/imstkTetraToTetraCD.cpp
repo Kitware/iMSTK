@@ -24,13 +24,17 @@
 #include "imstkCollisionData.h"
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+
+//#include "DeformModel.h"
 
 namespace imstk
 {
 TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
                                std::shared_ptr<TetrahedralMesh> meshB,
                                std::shared_ptr<CollisionData>   colData) :
-    CollisionDetection(CollisionDetection::Type::MeshToMesh, colData), //is TetrahedralMeshToTetrahedralMesh type needed?
+    CollisionDetection(CollisionDetection::Type::VolumeMeshToVolumeMesh, colData), //is TetrahedralMeshToTetrahedralMesh type needed?
     m_meshA(meshA),
     m_meshB(meshB)
 {
@@ -43,7 +47,7 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     const double eps2 = 1e-10;
 
     //tetrahedron belonging part of penetration type does not change
-    auto cType = static_cast<PointTetrahedronCollisionData::CollisionType>(idOffset > 0);
+    auto cType = static_cast<PointTetrahedronCollisionDataElement::CollisionType>(idOffset > 0);
 
     auto nodesMeshA = m_meshA->getVertexPositions();
     auto nodesMeshB = m_meshB->getVertexPositions();
@@ -77,14 +81,14 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                         Vec3d vPos;
                         if (vId < m_meshA->getNumVertices())
                         {
-                            vPos = nodesMeshA[vId];
-                            cType = static_cast<PointTetrahedronCollisionData::CollisionType>((cType & 1) + 0);
+                            vPos  = nodesMeshA[vId];
+                            cType = static_cast<PointTetrahedronCollisionDataElement::CollisionType>((cType & 1) + 0);
                         }
                         else
                         {
-                            vId -= m_meshA->getNumVertices();
-                            vPos = nodesMeshB[vId];
-                            cType = static_cast<PointTetrahedronCollisionData::CollisionType>((cType & 1) + 2);
+                            vId  -= m_meshA->getNumVertices();
+                            vPos  = nodesMeshB[vId];
+                            cType = static_cast<PointTetrahedronCollisionDataElement::CollisionType>((cType & 1) + 2);
                         }
 
                         TetrahedralMesh::WeightsArray bCoord; //barycentric coordinates of the vertex in tetrahedron
@@ -98,7 +102,9 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                             assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
 
                             lock.lock();
-                            m_colData->PTColData.push_back({ cType, vId, tId, bCoord });
+                            LOG(FATAL) << "UNIMPLEMENTED";
+                            //todo
+//                            m_colData->PTColData.safeAppend({ cType, vId, tId, bCoord });
                             lock.unlock();
                         }
                     } //if not this tetrahedron

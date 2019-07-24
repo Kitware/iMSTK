@@ -19,32 +19,35 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToSphereCD.h"
+#include "imstkSurfaceMeshToSurfaceMeshCD.h"
 #include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkParallelUtils.h"
-#include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {
-PointSetToSphereCD::PointSetToSphereCD(std::shared_ptr<PointSet>      pointSet,
-                                       std::shared_ptr<Sphere>        sphere,
-                                       std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToSphere, colData),
-    m_pointSet(pointSet),
-    m_sphere(sphere)
+SurfaceMeshToSurfaceMeshCD::SurfaceMeshToSurfaceMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
+                                                       std::shared_ptr<SurfaceMesh>   meshB,
+                                                       std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::SurfaceMeshToSurfaceMesh, colData),
+    m_meshA(meshA), m_meshB(meshB)
 {
 }
 
 void
-PointSetToSphereCD::computeCollisionData()
+SurfaceMeshToSurfaceMeshCD::computeCollisionData()
 {
     m_colData->clearAll();
-    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
-        [&](const unsigned int idx)
+
+    // This is brute force collision detection
+    // TODO: use octree
+    ParallelUtils::parallelFor(static_cast<unsigned int>(m_meshA->getNumTriangles()),
+        [&](const unsigned int idx1)
         {
-            const auto& point = m_pointSet->getVertexPosition(idx);
-            NarrowPhaseCD::pointToSphere(point, idx, m_sphere.get(), m_colData);
+            for (unsigned int idx2 = 0; idx2 < static_cast<unsigned int>(m_meshA->getNumTriangles()); ++idx2)
+            {
+                NarrowPhaseCD::triangleToTriangle(idx1, m_meshA.get(), idx2, m_meshB.get(), m_colData);
+            }
        });
 }
 } // imstk
