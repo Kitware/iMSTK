@@ -27,12 +27,21 @@
 #include "imstkPointSet.h"
 #include "imstkLineMesh.h"
 #include "imstkGeometry.h"
-#include "imstkIntersectionTestUtils.h"
+#include "imstkCollisionUtils.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk
 {
+MeshToMeshBruteForceCD::MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      obj1,
+                                               std::shared_ptr<SurfaceMesh>   obj2,
+                                               std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::MeshToMeshBruteForce, colData),
+    m_object1(obj1),
+    m_object2(obj2)
+{
+}
+
 void
 MeshToMeshBruteForceCD::computeCollisionData()
 {
@@ -64,15 +73,14 @@ MeshToMeshBruteForceCD::computeCollisionData()
                 const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
-                if (testPointToTriAABB(p[0], p[1], p[2],
+                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
                                        p0[0], p0[1], p0[2],
                                        p1[0], p1[1], p1[2],
                                        p2[0], p2[1], p2[2],
                                        m_proximityTolerance,
                                        m_proximityTolerance))
                 {
-                    TriangleVertexCollisionData d(j, i);
-                    m_colData->TVColData.push_back(d);
+                    m_colData->TVColData.safeAppend({ static_cast<unsigned int>(j), static_cast<unsigned int>(i), 0.0 });
                 }
             }
         }
@@ -100,39 +108,36 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
                 if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                 {
-                    if (testLineToLineAABB(P[0], P[1], P[2],
+                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                         Q[0], Q[1], Q[2],
                         p0[0], p0[1], p0[2],
                         p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                     {
-                        EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                        m_colData->EEColData.push_back(d);
+                        m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
                     }
                     E2[e[0]][e[1]] = 0;
                 }
 
                 if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                 {
-                    if (testLineToLineAABB(P[0], P[1], P[2],
+                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                         Q[0], Q[1], Q[2],
                         p1[0], p1[1], p1[2],
                         p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                     {
-                        EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                        m_colData->EEColData.push_back(d);
+                        m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
                     }
                     E2[e[1]][e[2]] = 0;
                 }
 
                 if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                 {
-                    if (testLineToLineAABB(P[0], P[1], P[2],
+                    if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                         Q[0], Q[1], Q[2],
                         p2[0], p2[1], p2[2],
                         p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                     {
-                        EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                        m_colData->EEColData.push_back(d);
+                        m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
                     }
                     E2[e[2]][e[0]] = 0;
                 }
@@ -157,13 +162,12 @@ MeshToMeshBruteForceCD::computeCollisionData()
                 const Vec3d p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d p2 = mesh2->getVertexPosition(e[2]);
 
-                if (testPointToTriAABB(p[0], p[1], p[2],
+                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    TriangleVertexCollisionData d(j, i);
-                    m_colData->TVColData.push_back(d);
+                    m_colData->TVColData.safeAppend({ static_cast<unsigned int>(j), static_cast<unsigned int>(i), 0.0 });
                 }
             }
         }
@@ -186,13 +190,12 @@ MeshToMeshBruteForceCD::computeCollisionData()
                 const Vec3d                       p1 = mesh2->getVertexPosition(e[1]);
                 const Vec3d                       p2 = mesh2->getVertexPosition(e[2]);
 
-                if (testPointToTriAABB(p[0], p[1], p[2],
+                if (CollisionUtils::testPointToTriAABB(p[0], p[1], p[2],
                     p0[0], p0[1], p0[2],
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    TriangleVertexCollisionData d(j, i);
-                    m_colData->TVColData.push_back(d);
+                    m_colData->TVColData.safeAppend({ static_cast<unsigned int>(j), static_cast<unsigned int>(i), 0.0 });
                 }
             }
         }
@@ -226,42 +229,36 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
                             E2[e[0]][e[1]] = 0;
                         }
                     }
 
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
                             E2[e[1]][e[2]] = 0;
                         }
                     }
 
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
                             E2[e[2]][e[0]] = 0;
                         }
                     }
@@ -286,42 +283,36 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
                             E2[e[0]][e[1]] = 0;
                         }
                     }
 
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
                             E2[e[1]][e[2]] = 0;
                         }
                     }
 
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
                             E2[e[2]][e[0]] = 0;
                         }
                     }
@@ -345,42 +336,36 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
                     if (E2[e[0]][e[1]] && E2[e[1]][e[0]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[0], e[1]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
                             E2[e[0]][e[1]] = 0;
                         }
                     }
 
                     if (E2[e[1]][e[2]] && E2[e[2]][e[1]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[1], e[2]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
                             E2[e[1]][e[2]] = 0;
                         }
                     }
 
                     if (E2[e[2]][e[0]] && E2[e[0]][e[2]])
                     {
-                        if (testLineToLineAABB(P[0], P[1], P[2],
+                        if (CollisionUtils::testLineToLineAABB(P[0], P[1], P[2],
                             Q[0], Q[1], Q[2],
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            EdgeEdgeCollisionData d(i1, i2, e[2], e[0]);
-                            m_colData->EEColData.push_back(d);
-
+                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
                             E2[e[2]][e[0]] = 0;
                         }
                     }
@@ -403,7 +388,7 @@ MeshToMeshBruteForceCD::doBroadPhaseCollisionCheck() const
     Vec3d min2, max2;
     mesh2->computeBoundingBox(min2, max2);
 
-    return testAABBToAABB(min1[0] - m_proximityTolerance,
+    return CollisionUtils::testAABBToAABB(min1[0] - m_proximityTolerance,
                           max1[0] + m_proximityTolerance,
                           min1[1] - m_proximityTolerance,
                           max1[1] + m_proximityTolerance,
