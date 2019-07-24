@@ -75,12 +75,13 @@ PBDCollisionHandling::generatePBDConstraints()
     const auto map1 = m_pbdObject1->getPhysicsToCollidingMap();
     const auto map2 = m_pbdObject2->getPhysicsToCollidingMap();
 
-    //std::cout << "EE: " << m_colData->EEColData.size() << "TV: " << m_colData->TVColData.size() << std::endl;
+//    std::cout << "EE: " << m_colData->EEColData.getSize() << "TV: " << m_colData->VTColData.getSize() << std::endl;
 
     // Generate edge-edge pbd constraints
-    for (auto& colData : m_colData->EEColData)
+    for (size_t i = 0; i < m_colData->EEColData.getSize(); ++i)
     {
-        auto c = std::make_shared<PbdEdgeEdgeConstraint>();
+        const auto& colData = m_colData->EEColData[i];
+        auto        c       = std::make_shared<PbdEdgeEdgeConstraint>();
 
         size_t edgeA1, edgeA2;
         if (map1)
@@ -113,9 +114,10 @@ PBDCollisionHandling::generatePBDConstraints()
     }
 
     // Generate triangle-vertex pbd constraints
-    for (auto& colData : m_colData->TVColData)
+    for (size_t i = 0; i < m_colData->TVColData.getSize(); ++i)
     {
-        const auto& triVerts = colGeo2->getTrianglesVertices()[colData.triIdA];
+        const auto& colData  = m_colData->TVColData[i];
+        const auto& triVerts = colGeo2->getTrianglesVertices()[colData.triIdx];
 
         const auto c = std::make_shared<PbdPointTriangleConstraint>();
 
@@ -134,7 +136,7 @@ PBDCollisionHandling::generatePBDConstraints()
         }
 
         c->initConstraint(dynaModel1,
-                          colData.vertexIdB,
+                          colData.vertexIdx,
                           dynaModel2,
                           v1,
                           v2,

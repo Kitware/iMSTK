@@ -61,7 +61,7 @@ PenaltyCH::processCollisionData()
 void
 PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj)
 {
-    if (m_colData->PDColData.empty())
+    if (m_colData->PDColData.isEmpty())
     {
         return;
     }
@@ -76,8 +76,9 @@ PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObje
 
     // If collision data is valid, append forces
     Vec3d force(0., 0., 0.);
-    for (const auto& cd : m_colData->PDColData)
+    for (size_t i = 0; i < m_colData->PDColData.getSize(); ++i)
     {
+        const auto& cd = m_colData->PDColData[i];
         if (m_side == CollisionHandling::Side::A)
         {
             force -= cd.dirAtoB * ((cd.penetrationDepth + 1) * (cd.penetrationDepth + 1) - 1) * 10;
@@ -95,7 +96,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObje
 void
 PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<DeformableObject>& deformableObj)
 {
-    if (m_colData->MAColData.empty())
+    if (m_colData->MAColData.isEmpty())
     {
         return;
     }
@@ -113,7 +114,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
 
     // If collision data, append forces
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->MAColData.size(),
+    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx) {
             const auto& cd = m_colData->MAColData[idx];
             const auto nodeDofID = static_cast<Eigen::Index>(3 * cd.nodeId);

@@ -49,7 +49,7 @@ SPHCollisionHandling::processCollisionData()
 #endif
 
     auto& state = SPHModel->getState();
-    ParallelUtils::parallelFor(m_colData->MAColData.size(),
+    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx)
         {
             const auto& cd = m_colData->MAColData[idx];

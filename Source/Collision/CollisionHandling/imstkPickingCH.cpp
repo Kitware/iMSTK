@@ -52,7 +52,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
 {
     m_DynamicLinearProjConstraints->clear();
 
-    if (m_colData->NodePickData.empty())
+    if (m_colData->NodePickData.isEmpty())
     {
         return;
     }
@@ -72,7 +72,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
 
     // If collision data, append LPC constraints
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->NodePickData.size(),
+    ParallelUtils::parallelFor(m_colData->NodePickData.getSize(),
         [&](const size_t idx) {
             const auto& cd = m_colData->NodePickData[idx];
             const auto nodeDof = static_cast<Eigen::Index>(3 * cd.nodeId);
