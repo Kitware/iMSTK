@@ -28,7 +28,7 @@
 #include "imstkVTKTextureDelegate.h"
 #include "imstkTextureManager.h"
 #include "imstkVTKCustomPolyDataMapper.h"
-#include "imstkDebugGeometry.h"
+#include "imstkDebugRenderGeometry.h"
 #include "imstkVisualModel.h"
 
 #include "vtkSmartPointer.h"

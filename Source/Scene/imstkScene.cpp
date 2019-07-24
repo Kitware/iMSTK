@@ -22,7 +22,7 @@
 #include "imstkScene.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
-#include "imstkDebugGeometry.h"
+#include "imstkDebugRenderGeometry.h"
 #include "imstkPbdObject.h"
 #include "imstkDeformableObject.h"
 #include "imstkTimer.h"

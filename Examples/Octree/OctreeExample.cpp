@@ -21,7 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
-#include "imstkDebugGeometry.h"
+#include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"
 #include "imstkLooseOctree.h"
 #include "imstkVTKViewer.h"

@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkDebugGeometry.h"
+#include "imstkDebugRenderGeometry.h"
 
 namespace imstk
 {
