@@ -68,7 +68,7 @@ public:
     /// \param time Lifespan of each particle (in milliseconds)
     /// \param mode Mode for emitter
     ///
-    RenderParticles(const unsigned int maxNumParticles = 128);
+    RenderParticles(const unsigned int maxNumParticles = 128, const std::string name = std::string(""));
 
     ///
     /// \brief Set size of particle
@@ -107,12 +107,13 @@ public:
     /// \brief Get volume
     /// As these are particles, the volume is 0
     ///
-    double getVolume() const override { return 0; };
+    double getVolume() const override { return 0; }
 
 protected:
     friend class VulkanParticleRenderDelegate;
     friend class RenderParticles;
 
+    unsigned int m_numParticles    = 0;
     unsigned int m_maxNumParticles = 128; ///< Maximum particles
     float        m_particleSize    = 0.1f;
 
@@ -123,11 +124,9 @@ protected:
     glm::vec2  m_vertexUVs[4];
     glm::ivec3 m_triangles[2];
 
-    unsigned int m_numParticles = 0;
-
-    void applyTranslation(const Vec3d t) override {};
-    void applyRotation(const Mat3d r) override {};
-    void applyScaling(const double s) override {};
-    virtual void updatePostTransformData() override {};
+    void applyTranslation(const Vec3d t) override {}
+    void applyRotation(const Mat3d r) override {}
+    void applyScaling(const double s) override {}
+    virtual void updatePostTransformData() override {}
 };
 }

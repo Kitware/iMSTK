@@ -37,12 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Sphere() : AnalyticalGeometry(Type::Sphere) {}
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~Sphere() = default;
+    Sphere(const std::string name = std::string("")) : AnalyticalGeometry(Type::Sphere, name) {}
 
     ///
     /// \brief Print the sphere info

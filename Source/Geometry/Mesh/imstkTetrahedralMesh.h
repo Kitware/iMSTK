@@ -45,12 +45,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    TetrahedralMesh() : VolumetricMesh(Geometry::Type::TetrahedralMesh) {}
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~TetrahedralMesh() override = default;
+    TetrahedralMesh(const std::string name = std::string("")) : VolumetricMesh(Geometry::Type::TetrahedralMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and

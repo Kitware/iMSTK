@@ -21,6 +21,7 @@
 
 #include "imstkPointSet.h"
 #include "imstkGraph.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {
@@ -52,29 +53,14 @@ PointSet::print() const
 }
 
 void
-PointSet::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
+PointSet::computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent) const
 {
-    min = Vec3d(MAX_D, MAX_D, MAX_D);
-    max = Vec3d(-MAX_D, -MAX_D, -MAX_D);
-
-    for (auto& pos : m_vertexPositions)
-    {
-        for (int i = 0; i < 3; ++i)
-        {
-            min[i] = std::min(min[i], pos[i]);
-            max[i] = std::max(max[i], pos[i]);
-        }
-    }
-
-    if (percent == 0.0)
-    {
-        return;
-    }
-    else
+    ParallelUtils::findAABB(m_vertexPositions, min, max);
+    if (paddingPercent > 0.0)
     {
         Vec3d range = max - min;
-        min = min - range * (percent / 100);
-        max = max + range * (percent / 100);
+        min = min - range * (paddingPercent / 100.0);
+        max = max + range * (paddingPercent / 100.0);
     }
 }
 
@@ -85,7 +71,7 @@ PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
     {
         m_initialVertexPositions = vertices;
         m_originalNumVertices    = vertices.size();
-        m_maxNumVertices         = (size_t)(m_originalNumVertices * m_loadFactor);
+        m_maxNumVertices         = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
         m_vertexPositions.reserve(m_maxNumVertices);
     }
     else
@@ -101,9 +87,12 @@ PointSet::getInitialVertexPositions() const
 }
 
 const Vec3d&
-PointSet::getInitialVertexPosition(const size_t& vertNum) const
+PointSet::getInitialVertexPosition(const size_t vertNum) const
 {
-    return m_initialVertexPositions.at(vertNum);
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (vertNum >= m_initialVertexPositions.size())) << "Invalid index";
+#endif
+    return m_initialVertexPositions[vertNum];
 }
 
 void
@@ -134,27 +123,35 @@ PointSet::getVertexPositions(DataType type /* = DataType::PostTransform */)
 }
 
 void
-PointSet::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
+PointSet::setVertexPosition(const size_t vertNum, const Vec3d& pos)
 {
-    m_vertexPositions.at(vertNum) = pos;
-    m_dataModified     = true;
-    m_transformApplied = false;
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (vertNum >= m_vertexPositions.size())) << "Invalid index";
+#endif
+    m_vertexPositions[vertNum] = pos;
+    m_dataModified             = true;
+    m_transformApplied         = false;
+    this->updatePostTransformData();
 }
 
 const Vec3d&
-PointSet::getVertexPosition(const size_t& vertNum, DataType type)
+PointSet::getVertexPosition(const size_t vertNum, DataType type)
 {
-    return this->getVertexPositions(type).at(vertNum);
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (vertNum >= getVertexPositions().size())) << "Invalid index";
+#endif
+    return this->getVertexPositions(type)[vertNum];
 }
 
 void
 PointSet::setVertexDisplacements(const StdVectorOfVec3d& diff)
 {
     assert(diff.size() == m_vertexPositions.size());
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        m_vertexPositions[i] = m_initialVertexPositions[i] + diff[i];
-    }
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            m_vertexPositions[i] = m_initialVertexPositions[i] + diff[i];
+        });
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -163,12 +160,11 @@ void
 PointSet::setVertexDisplacements(const Vectord& u)
 {
     assert(u.size() == 3 * m_vertexPositions.size());
-    size_t dofId = 0;
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        m_vertexPositions[i] = m_initialVertexPositions[i] + Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
-        dofId += 3;
-    }
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            m_vertexPositions[i] = m_initialVertexPositions[i] + Vec3d(u(i * 3), u(i * 3 + 1), u(i * 3 + 2));
+        });
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -176,10 +172,11 @@ PointSet::setVertexDisplacements(const Vectord& u)
 void
 PointSet::translateVertices(const Vec3d& t)
 {
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        m_vertexPositions[i] += t;
-    }
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            m_vertexPositions[i] += t;
+        });
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -240,11 +237,12 @@ PointSet::getNumVertices() const
 void
 PointSet::applyTranslation(const Vec3d t)
 {
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        m_vertexPositions[i]        += t;
-        m_initialVertexPositions[i] += t;
-    }
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            m_vertexPositions[i]        += t;
+            m_initialVertexPositions[i] += t;
+        });
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -252,11 +250,12 @@ PointSet::applyTranslation(const Vec3d t)
 void
 PointSet::applyRotation(const Mat3d r)
 {
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        m_vertexPositions[i]        = r * m_vertexPositions[i];
-        m_initialVertexPositions[i] = r * m_initialVertexPositions[i];
-    }
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            m_vertexPositions[i]        = r * m_vertexPositions[i];
+            m_initialVertexPositions[i] = r * m_initialVertexPositions[i];
+        });
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -264,11 +263,12 @@ PointSet::applyRotation(const Mat3d r)
 void
 PointSet::applyScaling(const double s)
 {
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        m_vertexPositions[i]        = s * m_vertexPositions[i];
-        m_initialVertexPositions[i] = s * m_initialVertexPositions[i];
-    }
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            m_vertexPositions[i]        = s * m_vertexPositions[i];
+            m_initialVertexPositions[i] = s * m_initialVertexPositions[i];
+        });
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -285,13 +285,15 @@ PointSet::updatePostTransformData()
     {
         m_vertexPositionsPostTransform.resize(m_vertexPositions.size());
     }
-    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
-    {
-        // NOTE: Right now scaling is appended on top of the rigid transform
-        // for scaling around the mesh center, and not concatenated within
-        // the transform, for ease of use.
-        m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i] * m_scaling);
-    }
+
+    ParallelUtils::parallelFor(m_vertexPositions.size(),
+        [&](const size_t i)
+        {
+            // NOTE: Right now scaling is appended on top of the rigid transform
+            // for scaling around the mesh center, and not concatenated within
+            // the transform, for ease of use.
+            m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i] * m_scaling);
+        });
     m_transformApplied = true;
 }
 

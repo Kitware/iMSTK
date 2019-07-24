@@ -33,9 +33,7 @@ namespace imstk
 class Decal : public AnalyticalGeometry
 {
 public:
-    Decal();
-
-    ~Decal() = default;
+    Decal(const std::string name = std::string(""));
 
     ///
     /// \brief Print the cube info

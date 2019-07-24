@@ -37,12 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule() : AnalyticalGeometry(Type::Capsule) {}
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~Capsule() = default;
+    Capsule(const std::string name = std::string("")) : AnalyticalGeometry(Type::Capsule, name) {}
 
     ///
     /// \brief Print the capsule info

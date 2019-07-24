@@ -42,19 +42,13 @@ public:
     ///
     /// \brief Constructor
     ///
-    LineMesh() : PointSet(Geometry::Type::LineMesh) {}
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~LineMesh() = default;
+    LineMesh(const std::string name = std::string("")) : PointSet(Geometry::Type::LineMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  line connectivity
     ///
-    void initialize(const StdVectorOfVec3d&       vertices,
-                    const std::vector<LineArray>& lines);
+    void initialize(const StdVectorOfVec3d& vertices, const std::vector<LineArray>& lines);
 
     ///
     /// \brief
@@ -97,7 +91,6 @@ public:
     std::vector<Color> getVertexColors() const;
 
 private:
-
     friend class VTKLineMeshRenderDelegate;
 
     size_t m_originalNumLines = 0;

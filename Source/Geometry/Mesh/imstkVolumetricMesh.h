@@ -41,11 +41,6 @@ class VolumetricMesh : public PointSet
 public:
 
     ///
-    /// \brief Default destructor
-    ///
-    ~VolumetricMesh() = default;
-
-    ///
     /// \brief Computes the attached surface mesh
     ///
     virtual void computeAttachedSurfaceMesh() = 0;
@@ -72,7 +67,7 @@ public:
 
 protected:
 
-    VolumetricMesh(Geometry::Type type) : PointSet(type) {}
+    VolumetricMesh(Geometry::Type type, const std::string name = std::string("")) : PointSet(type, name) {}
 
     std::shared_ptr<SurfaceMesh>          m_attachedSurfaceMesh = nullptr; ///> Attached surface mesh
     std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh    = nullptr; ///> Attached vega mesh
