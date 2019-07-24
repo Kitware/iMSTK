@@ -101,7 +101,7 @@ SPHModel::computeTimeStepSize()
 Real
 SPHModel::computeCFLTimeStepSize()
 {
-    auto maxVel = ParallelUtils::ParallelReduce::findMaxL2Norm(getState().getVelocities());
+    auto maxVel = ParallelUtils::findMaxL2Norm(getState().getVelocities());
 
     // dt = CFL * 2r / max{|| v ||}
     Real timestep = maxVel > Real(1e-6) ? m_Parameters->m_CFLFactor * (Real(2.0) * m_Parameters->m_ParticleRadius / maxVel) : m_Parameters->m_MaxTimestep;

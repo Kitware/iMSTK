@@ -32,12 +32,6 @@ namespace imstk
 namespace ParallelUtils
 {
 ///
-/// \brief The ParallelReduce class
-/// \brief A class for executing reduce operations in parallel
-///
-class ParallelReduce
-{
-///
 /// \brief Private helper class, providing operator() using in std::parallel_reduce
 ///  for finding max L2 norm of an array of Vec3r
 ///
@@ -117,27 +111,27 @@ private:
     const StdVectorOfVec3r& m_Data;
 };
 
-public:
-    ///
-    /// \brief Find the maximum value of L2 norm from the input data array
-    ///
-    static Real findMaxL2Norm(const StdVectorOfVec3r& data)
-    {
-        MaxL2NormFunctor pObj(data);
-        tbb::parallel_reduce(tbb::blocked_range<size_t>(0, data.size()), pObj);
-        return pObj.getResult();
-    }
+///
+/// \brief Find the maximum value of L2 norm from the input data array
+///
+inline Real
+findMaxL2Norm(const StdVectorOfVec3r& data)
+{
+    MaxL2NormFunctor pObj(data);
+    tbb::parallel_reduce(tbb::blocked_range<size_t>(0, data.size()), pObj);
+    return pObj.getResult();
+}
 
-    ///
-    /// \brief Find the bounding box of a point set
-    ///
-    static void findAABB(const StdVectorOfVec3r& points, Vec3r& lowerCorner, Vec3r& upperCorner)
-    {
-        AABBFunctor pObj(points);
-        tbb::parallel_reduce(tbb::blocked_range<size_t>(0, points.size()), pObj);
-        lowerCorner = pObj.getLowerCorner();
-        upperCorner = pObj.getUpperCorner();
-    }
-};
+///
+/// \brief Find the bounding box of a point set
+///
+inline void
+findAABB(const StdVectorOfVec3r& points, Vec3r& lowerCorner, Vec3r& upperCorner)
+{
+    AABBFunctor pObj(points);
+    tbb::parallel_reduce(tbb::blocked_range<size_t>(0, points.size()), pObj);
+    lowerCorner = pObj.getLowerCorner();
+    upperCorner = pObj.getUpperCorner();
+}
 } // end namespace ParallelUtils
 } // end namespace imstk
