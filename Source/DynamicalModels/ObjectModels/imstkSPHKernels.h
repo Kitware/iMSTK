@@ -432,7 +432,8 @@ protected:
 } // end namespace SPH
 
 ///
-/// \brief Struct contains SPH kernels for time integration, using different kernel for different purposes
+/// \brief Class contains SPH kernels for time integration,
+/// using different kernel for different purposes
 ///
 class SPHSimulationKernels
 {
