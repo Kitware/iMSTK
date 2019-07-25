@@ -41,12 +41,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    HexahedralMesh() : VolumetricMesh(Geometry::Type::HexahedralMesh) {}
-
-    ///
-    /// \brief Destructor
-    ///
-    ~HexahedralMesh() = default;
+    HexahedralMesh(const std::string name = std::string("")) : VolumetricMesh(Geometry::Type::HexahedralMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -99,7 +94,6 @@ public:
     size_t getNumHexahedra() const;
 
 protected:
-
     friend class VTKHexahedralMeshRenderDelegate;
 
     std::vector<HexaArray> m_hexahedraVertices; ///< vertices of the hexahedra

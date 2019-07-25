@@ -23,8 +23,8 @@
 
 namespace imstk
 {
-DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/)
-    : Geometry(Geometry::Type::DecalPool)
+DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/, const std::string name)
+    : Geometry(Geometry::Type::DecalPool, name)
 {
     if (maxNumDecals <= 128)
     {
@@ -60,7 +60,7 @@ DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/)
 
     for (unsigned int i = 0; i < maxNumDecals; i++)
     {
-        m_freeDecals.push_back(std::make_shared<Decal>());
+        m_freeDecals.push_back(std::make_shared<Decal>("Decal-" + std::to_string(i)));
     }
 }
 

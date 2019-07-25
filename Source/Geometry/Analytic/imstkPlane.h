@@ -37,12 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Plane() : AnalyticalGeometry(Type::Plane) {}
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~Plane() = default;
+    Plane(const std::string name = std::string("")) : AnalyticalGeometry(Type::Plane, name) {}
 
     ///
     /// \brief Print the plane info

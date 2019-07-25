@@ -27,11 +27,12 @@
 #include "imstkRenderMaterial.h"
 #include "imstkParallelUtils.h"
 
+#include <string>
+
 namespace imstk
 {
 ///
 /// \class Geometry
-///
 /// \brief Base class for any geometrical representation
 ///
 class Geometry
@@ -46,12 +47,12 @@ public:
         Sphere,
         Cylinder,
         Cube,
+        Capsule,
         PointSet,
         SurfaceMesh,
         TetrahedralMesh,
         HexahedralMesh,
         LineMesh,
-        Capsule,
         Decal,
         DecalPool,
         RenderParticles
@@ -82,12 +83,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    Geometry(const Type type) : m_geometryIdx(Geometry::getUniqueID()), m_type(type) {}
+    Geometry(const Type type, const std::string name = std::string(""));
 
     ///
     /// \brief Destructor
     ///
-    virtual ~Geometry() = default;
+    virtual ~Geometry();
 
     ///
     /// \brief Print
@@ -107,32 +108,25 @@ public:
     ///
     /// \brief Translate the geometry in Cartesian space
     ///
-    void translate(const Vec3d&  t,
-                   TransformType type = TransformType::ConcatenateToTransform);
-    void translate(double x, double y, double z,
-                   TransformType type = TransformType::ConcatenateToTransform);
+    void translate(const Vec3d& t, TransformType type = TransformType::ConcatenateToTransform);
+    void translate(double x, double y, double z, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Rotate the geometry in Cartesian space
     ///
-    void rotate(const Quatd&  q,
-                TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Mat3d&  m,
-                TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Vec3d& axis, double angle,
-                TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Quatd& q, TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Mat3d& m, TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Vec3d& axis, double angle, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Scale in Cartesian directions
     ///
-    void scale(double        scaling,
-               TransformType type = TransformType::ConcatenateToTransform);
+    void scale(double scaling, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Applies a rigid transform to the geometry
     ///
-    void transform(RigidTransform3d T,
-                   TransformType    type = TransformType::ConcatenateToTransform);
+    void transform(RigidTransform3d T, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Get/Set translation
@@ -161,6 +155,11 @@ public:
     Type getType() const;
 
     ///
+    /// \brief Get name of the geometry
+    ///
+    const std::string& getName() const { return m_name; }
+
+    ///
     /// \brief Returns the string representing the type name of the geometry
     ///
     const std::string getTypeName() const;
@@ -173,21 +172,27 @@ public:
     ///
     /// \brief Get the global (unique) index of the geometry
     ///
-    unsigned int getGlobalIndex() const { return m_geometryIdx; }
+    uint32_t getGlobalIndex() const { return m_geometryIndex; }
 
     ///
     /// \brief Get a pointer to geometry that has been registered globally
     ///
-    static unsigned int getTotalNumberGeometries() { return s_NumGeneratedGegometries; }
+    static uint32_t getTotalNumberGeometries() { return s_NumGeneratedGegometries; }
 
 protected:
     ///
-    /// \brief Get a unique ID for the object
+    /// \brief Get a unique ID for the new generated geometry object
     ///
-    static unsigned int getUniqueID();
+    static uint32_t getUniqueID();
 
-    static ParallelUtils::SpinLock s_RegistryLock; ///> Mutex lock for thread-safe registry modification
-    static unsigned int s_NumGeneratedGegometries; ///> Total number of geometries that have been created in this program
+    /// Mutex lock for thread-safe counter update and name set update
+    static ParallelUtils::SpinLock s_GeomGlobalLock;
+
+    /// Total number of geometries that have been created in this program
+    static uint32_t s_NumGeneratedGegometries;
+
+    /// Set of string names of all generated geometries, used to check for name duplication
+    static tbb::concurrent_unordered_set<std::string> s_sGegometryNames;
 
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
@@ -202,16 +207,15 @@ protected:
     virtual void applyScaling(const double s)    = 0;
     virtual void updatePostTransformData()       = 0;
 
-    const unsigned int m_geometryIdx = 0; ///> Unique ID assigned to each geometry upon construction
-    const Type         m_type;            ///> Type of geometry
+    Type        m_type;          ///> Type of geometry
+    std::string m_name;          ///> Unique name for each geometry
+    uint32_t    m_geometryIndex; ///> Unique ID assigned to each geometry upon construction
 
-    ParallelUtils::SpinLock m_dataLock;
-    ParallelUtils::SpinLock m_transformLock;
     bool m_dataModified      = false;
     bool m_transformModified = false;
     bool m_transformApplied  = true;
 
-    RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transform
+    RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transformation matrix
     double           m_scaling   = 1.0;
 };
 } //imstk

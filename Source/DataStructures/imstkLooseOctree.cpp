@@ -24,7 +24,7 @@
 #include "imstkGeometry.h"
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkDebugGeometry.h"
+#include "imstkDebugRenderGeometry.h"
 
 namespace imstk
 {

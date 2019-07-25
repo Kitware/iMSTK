@@ -33,7 +33,7 @@ namespace imstk
 /// \brief Debug render geometry base class
 /// During rendering, firstly call to clear() to clear the vertex buffer then iteratively call to appendVertex()
 /// Another way to modify rendering data is to call resizeBuffer(), then fill data by calling to setVertex() function
-/// In both ways, after finishing data modification, triggerDataModified() must be called to notify the render backend
+/// In both ways, after finishing data modification, setDataModified(true) must be called to notify the render backend
 ///
 class DebugRenderGeometry
 {

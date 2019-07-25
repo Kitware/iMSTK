@@ -33,7 +33,7 @@ namespace imstk
 class DecalPool : public Geometry
 {
 public:
-    DecalPool(unsigned int maxNumDecals = 128);
+    DecalPool(unsigned int maxNumDecals = 128, const std::string name = std::string(""));
 
     std::shared_ptr<Decal> addDecal();
 
@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Returns the volume of the cube
     ///
-    double getVolume() const override { return 0; };
+    double getVolume() const override { return 0; }
 
 protected:
     friend class VulkanDecalRenderDelegate;
@@ -58,10 +58,10 @@ protected:
     std::deque<std::shared_ptr<Decal>> m_orderedDecals;
     std::deque<std::shared_ptr<Decal>> m_freeDecals;
 
-    void applyTranslation(const Vec3d t) override {};
-    void applyRotation(const Mat3d r) override {};
-    void applyScaling(const double s) override {};
-    virtual void updatePostTransformData() override {};
+    void applyTranslation(const Vec3d t) override {}
+    void applyRotation(const Mat3d r) override {}
+    void applyScaling(const double s) override {}
+    virtual void updatePostTransformData() override {}
 
     unsigned int m_maxNumDecals;
     unsigned int m_numDecals = 0;

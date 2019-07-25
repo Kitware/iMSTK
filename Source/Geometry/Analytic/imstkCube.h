@@ -34,9 +34,7 @@ class Cube : public AnalyticalGeometry
 {
 public:
 
-    Cube() : AnalyticalGeometry(Type::Cube) {}
-
-    ~Cube() = default;
+    Cube(const std::string name = std::string("")) : AnalyticalGeometry(Type::Cube, name) {}
 
     ///
     /// \brief Print the cube info

@@ -83,12 +83,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SurfaceMesh() : PointSet(Geometry::Type::SurfaceMesh) {}
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~SurfaceMesh() = default;
+    SurfaceMesh(const std::string name = std::string("")) : PointSet(Geometry::Type::SurfaceMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -209,7 +204,7 @@ public:
     /// \brief Set load factor
     /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
     ///
-    virtual void setLoadFactor(double loadFactor);
+    virtual void setLoadFactor(double loadFactor) override;
 
     ///
     /// \brief Get the maximum number of triangles
@@ -231,7 +226,6 @@ protected:
     StdVectorOfVec3d& getVertexNormalsNotConst();
 
     std::vector<TriangleArray> m_trianglesVertices;       ///> Triangle connectivity
-
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices
 
@@ -242,9 +236,8 @@ protected:
 
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 
-    std::string m_defaultTCoords = ""; ///> Name of the array used as default material coordinates
-
-    size_t m_originalNumTriangles = 0;
-    size_t m_maxNumTriangles      = 0;
+    std::string m_defaultTCoords       = ""; ///> Name of the array used as default material coordinates
+    size_t      m_originalNumTriangles = 0;
+    size_t      m_maxNumTriangles      = 0;
 };
 } // imstk

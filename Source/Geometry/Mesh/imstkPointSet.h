@@ -35,16 +35,11 @@ class Graph;
 class PointSet : public Geometry
 {
 public:
-
     ///
     /// \brief Protected constructor
     ///
-    PointSet(Geometry::Type type = Geometry::Type::PointSet) : Geometry(type) {}
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~PointSet() override = default;
+    PointSet(const Type type = Geometry::Type::PointSet, const std::string name = std::string("")) :
+        Geometry(type, name) {}
 
     ///
     /// \brief Initializes the data structure given vertex positions
@@ -64,12 +59,12 @@ public:
     ///
     /// \brief Returns the volume of the geometry (if valid)
     ///
-    virtual double getVolume() const { return 0; };
+    virtual double getVolume() const override { return 0; }
 
     ///
     /// \brief Compute the bounding box for the entire mesh
     ///
-    void computeBoundingBox(Vec3d& min, Vec3d& max, const double percent = 0.0) const;
+    virtual void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) const override;
 
     // Accessors
 
@@ -86,7 +81,7 @@ public:
     ///
     /// \brief Returns the initial position of a vertex given its index
     ///
-    const Vec3d& getInitialVertexPosition(const size_t& vertNum) const;
+    const Vec3d& getInitialVertexPosition(const size_t vertNum) const;
 
     ///
     /// \brief Sets current vertex positions of the mesh from an array
@@ -99,15 +94,14 @@ public:
     const StdVectorOfVec3d& getVertexPositions(DataType type = DataType::PostTransform);
 
     ///
-    /// \brief Set the current position of a vertex given its index to certain position
+    /// \brief Set the current position of a vertex given its index to certain position (this is not a thread-safe method)
     ///
-    void setVertexPosition(const size_t& vertNum, const Vec3d& pos);
+    void setVertexPosition(const size_t vertNum, const Vec3d& pos);
 
     ///
     /// \brief Returns the position of a vertex given its index
     ///
-    const Vec3d& getVertexPosition(const size_t& vertNum,
-                                   DataType      type = DataType::PostTransform);
+    const Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform);
 
     ///
     /// \brief Sets the displacements of mesh vertices from an array
@@ -158,7 +152,7 @@ public:
     /// \brief Set the topologyChanged flag
     ///
     void setTopologyChangedFlag(const bool flag) { m_topologyChanged = flag; }
-    bool getTopologyChangedFlag() const { return m_topologyChanged; };
+    bool getTopologyChangedFlag() const { return m_topologyChanged; }
 
     ///
     /// \brief Set load factor
@@ -178,16 +172,12 @@ public:
     virtual std::shared_ptr<Graph> getMeshGraph();
 
 protected:
-
     friend class VTKPointSetRenderDelegate;
 
     ///
     /// \brief Get vertices positions
     ///
-    StdVectorOfVec3d& getVertexPositionsNotConst()
-    {
-        return m_vertexPositions;
-    }
+    StdVectorOfVec3d& getVertexPositionsNotConst() { return m_vertexPositions; }
 
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;
@@ -200,8 +190,7 @@ protected:
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 
-    bool m_topologyChanged = false;
-
+    bool   m_topologyChanged     = false;
     double m_loadFactor          = 2.0;
     size_t m_maxNumVertices      = 0;
     size_t m_originalNumVertices = 0;

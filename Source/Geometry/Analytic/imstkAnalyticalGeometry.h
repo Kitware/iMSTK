@@ -36,11 +36,6 @@ class AnalyticalGeometry : public Geometry
 public:
 
     ///
-    /// \brief Destructor
-    ///
-    virtual ~AnalyticalGeometry() = default;
-
-    ///
     /// \brief Print
     ///
     virtual void print() const override;
@@ -62,7 +57,7 @@ public:
 
 protected:
 
-    AnalyticalGeometry(Type type) : Geometry(type) {}
+    AnalyticalGeometry(Type type, const std::string name = std::string("")) : Geometry(type, name) {}
 
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;

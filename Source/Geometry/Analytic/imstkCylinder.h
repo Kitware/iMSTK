@@ -37,12 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Cylinder() : AnalyticalGeometry(Type::Cylinder) {}
-
-    ///
-    /// \brief Default destructor
-    ///
-    ~Cylinder() = default;
+    Cylinder(const std::string name = std::string("")) : AnalyticalGeometry(Type::Cylinder, name) {}
 
     ///
     /// \brief Print the cylinder info
