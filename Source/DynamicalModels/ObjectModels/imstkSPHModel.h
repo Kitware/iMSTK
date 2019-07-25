@@ -127,7 +127,7 @@ public:
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState() override 
+    virtual void resetToInitialState() override
     { this->m_currentState->setState(this->m_initialState); }
 
     ///

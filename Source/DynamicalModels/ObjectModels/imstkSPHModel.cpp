@@ -34,7 +34,7 @@ SPHModelConfig::SPHModelConfig(const Real particleRadius)
     }
     else
     {
-        LOG(WARNING, "Particle radius too small! Setting to 1.e-6");
+        LOG(WARNING) << "Particle radius too small! Setting to 1.e-6";
         m_particleRadius = 1.e-6;
     }
     initialize();
