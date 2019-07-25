@@ -55,9 +55,10 @@ public:
     static std::shared_ptr<imstk::VolumetricMesh> read(const std::string& filePath, const MeshFileType meshType);
 
 protected:
-    //
-    // \brief Possible element types in a MSH file format as mentioned at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
-    //
+    ///
+    /// \brief Possible element types in a MSH file format
+    /// as mentioned at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
+    ///
     enum ElemType
     {
         line=1,

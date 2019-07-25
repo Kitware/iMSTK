@@ -101,12 +101,14 @@ public:
     /// \brief Check if cell index in dimension d is valid (d = 0/1/2 => x/y/z dimension)
     ///
     template<int d>
-    bool isValidCellIndex(const int idx) const { return idx >= 0 && static_cast<unsigned int>(idx) < m_Resolution[d]; }
+    bool isValidCellIndex(const int idx) const
+    { return idx >= 0 && static_cast<unsigned int>(idx) < m_Resolution[d]; }
 
     ///
     /// \brief Check if 3D cell indices are valid
     ///
-    bool isValidCellIndices(const int i, const int j, const int k) const { return isValidCellIndex<0>(i) && isValidCellIndex<1>(j) && isValidCellIndex<2>(k); }
+    bool isValidCellIndices(const int i, const int j, const int k) const
+    { return isValidCellIndex<0>(i) && isValidCellIndex<1>(j) && isValidCellIndex<2>(k); }
 
     ///
     /// \brief Get the 3D index (cell_x, cell_y, cell_z) of the cell containing the given positions
@@ -136,53 +138,77 @@ public:
     /// \brief Get data in a cell
     /// \param A position in space
     ///
-    CellData& getCellData(const Vec3r& ppos) { return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)]; }
+    CellData& getCellData(const Vec3r& ppos)
+    {
+        return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)];
+    }
 
     ///
     /// \brief Get data in a cell
     /// \param A position in space
     ///
-    const CellData& getCellData(const Vec3r& ppos) const { return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)]; }
+    const CellData& getCellData(const Vec3r& ppos) const
+    { return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)]; }
 
     ///
     /// \brief Get data in a cell
     /// \param A linearized index of cell
     ///
-    CellData& getCellData(size_t linearizedIdx) { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
+    CellData& getCellData(size_t linearizedIdx)
+    {
+        assert(linearizedIdx < m_CellData.size());
+        return m_CellData[linearizedIdx];
+    }
 
     ///
     /// \brief Get data in a cell
     /// \param A linearized index of cell
     ///
-    const CellData& getCellData(size_t linearizedIdx) const { assert(linearizedIdx < m_CellData.size()); return m_CellData[linearizedIdx]; }
+    const CellData& getCellData(size_t linearizedIdx) const
+    {
+        assert(linearizedIdx < m_CellData.size());
+        return m_CellData[linearizedIdx];
+    }
 
     ///
     /// \brief Get data in a cell
     /// \param 3D index of a cell
     ///
     template<class IndexType>
-    CellData& getCellData(const std::array<IndexType, 3>& cellIdx) { return m_CellData[getCellLinearizedIndex(cellIdx[0], cellIdx[1], cellIdx[2])]; }
+    CellData& getCellData(const std::array<IndexType, 3>& cellIdx)
+    {
+        return m_CellData[getCellLinearizedIndex(cellIdx[0], cellIdx[1], cellIdx[2])];
+    }
 
     ///
     /// \brief Get data in a cell
     /// \param 3D index of a cell
     ///
     template<class IndexType>
-    const CellData& getCellData(const std::array<IndexType, 3>& cellIdx) const { return m_CellData[getCellLinearizedIndex(cellIdx[0], cellIdx[1], cellIdx[2])]; }
+    const CellData& getCellData(const std::array<IndexType, 3>& cellIdx) const
+    {
+        return m_CellData[getCellLinearizedIndex(cellIdx[0], cellIdx[1], cellIdx[2])];
+    }
 
     ///
     /// \brief Get data in a cell
     /// \param 3D index of a cell
     ///
     template<class IndexType>
-    CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) { return m_CellData[getCellLinearizedIndex(i, j, k)]; }
+    CellData& getCellData(const IndexType i, const IndexType j, const IndexType k)
+    {
+        return m_CellData[getCellLinearizedIndex(i, j, k)];
+    }
 
     ///
     /// \brief Get data in a cell
     /// \param 3D index of a cell
     ///
     template<class IndexType>
-    const CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) const { return m_CellData[getCellLinearizedIndex(i, j, k)]; }
+    const CellData& getCellData(const IndexType i, const IndexType j, const IndexType k) const
+    {
+        return m_CellData[getCellLinearizedIndex(i, j, k)];
+    }
 
     ///
     /// \brief Apply a function to all cell data

@@ -42,7 +42,8 @@ public:
     ///
     /// \brief Set the simulation object
     ///
-    void setSPHObject(const std::shared_ptr<SPHObject>& obj) { assert(obj); m_SPHObject = obj; }
+    void setSPHObject(const std::shared_ptr<SPHObject>& obj)
+    { assert(obj); m_SPHObject = obj; }
 
     ///
     /// \brief Advance one time step

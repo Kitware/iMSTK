@@ -95,7 +95,7 @@ VTKTetrahedralMeshRenderDelegate::updateDataSource()
 
     if (geometry->getTopologyChangedFlag())
     {
-        m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
+        m_mappedVertexArray->Modified(); /// \todo only modify if vertices change
 
         // Copy cells
         auto& maskedTets = std::dynamic_pointer_cast<TetrahedralMesh>(geometry)->getRemovedTetrahedra();
