@@ -31,7 +31,7 @@
 
 namespace imstk
 {
-// TODO: Move to appropriate place
+/// \todo Move to appropriate place
 enum class ForceModelType
 {
     StVK,
@@ -45,7 +45,7 @@ enum class ForceModelType
     none
 };
 
-// TODO: Move to appropriate place
+/// \todo Move to appropriate place
 enum class HyperElasticMaterialType
 {
     StVK,
@@ -91,10 +91,10 @@ enum class HyperElasticMaterialType
 ///     numberOfThreads             Number of threads spawned by the force model
 ///                                     [default = 0]
 ///
-///   TODO: Convert this to input through JSON format
+///   \todo Convert this to input through JSON format
 class ForceModelConfig
 {
-// TODO: Do this in a better way
+/// \todo Do this in a better way
 struct customOptionsList
 {
     char femMethod[256];

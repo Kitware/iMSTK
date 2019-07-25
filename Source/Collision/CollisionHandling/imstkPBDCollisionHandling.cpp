@@ -144,6 +144,6 @@ PBDCollisionHandling::generatePBDConstraints()
 
         m_PBDConstraints.push_back(c);
     }
-    //TODO: generating PbdPointTriangleConstraint from the VTColData should be added
+    //\todo generating PbdPointTriangleConstraint from the VTColData should be added
 }
 }

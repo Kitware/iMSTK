@@ -115,7 +115,7 @@ OpenVRCommand::Execute(
     // grip button
     if (eventId == vtkCommand::MiddleButtonPressEvent)
     {
-        // TODO: Take a screenshot
+        /// \todo Take a screenshot
 
         this->AbortFlagOn();
     }
