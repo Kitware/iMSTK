@@ -145,7 +145,7 @@ NewtonSolver::updateJacobian(const Vectord& x)
     auto& b = m_nonLinearSystem->m_F(x, m_isSemiImplicit);
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
-    //linearSystem->setLinearProjectors(m_nonLinearSystem->getLinearProjectors()); // TODO: Left for near future reference. Clear in future.
+    //linearSystem->setLinearProjectors(m_nonLinearSystem->getLinearProjectors()); /// \todo Left for near future reference. Clear in future.
     m_linearSolver->setSystem(linearSystem);
 
     return b.dot(b);
@@ -160,7 +160,7 @@ NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, 
     // Save guard to prevent the forcing term to become too small for far away iterates
     if (m_gamma * forcingTermSqr > 0.1)
     {
-        // TODO: Log this
+        /// \todo Log this
         eta = std::max(eta, m_gamma * forcingTermSqr);
     }
 

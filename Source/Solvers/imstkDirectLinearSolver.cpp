@@ -86,7 +86,7 @@ DirectLinearSolver<Matrixd>::solve(Vectord& x)
 {
     if (!m_linearSystem)
     {
-        // TODO: Log this
+        /// \todo Log this
         return;
     }
 

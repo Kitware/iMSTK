@@ -128,10 +128,6 @@ main()
     scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
 
-    // print UPS
-    /*auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);*/
-
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 

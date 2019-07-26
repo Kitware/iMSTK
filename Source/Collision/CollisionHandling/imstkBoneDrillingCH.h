@@ -89,7 +89,7 @@ private:
     std::vector<double> m_nodalDensity;         ///> Density of the bone
     double m_initialBoneDensity = 1.0;          ///> Density of the bone before the start of the drilling process
 
-//    std::vector<size_t> m_erodedNodes; // TODO: Unused variable
+//    std::vector<size_t> m_erodedNodes; /// \todo Unused variable
     std::vector<bool> m_nodeRemovalStatus;               ///> Keeps track of the removal status of the node
     std::vector<std::vector<size_t>> m_nodalCardinalSet; ///> Keeps track of the removal status of the node
 

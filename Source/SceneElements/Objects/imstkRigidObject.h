@@ -28,7 +28,7 @@
 
 namespace imstk
 {
-// TODO: Complete this
+/// \todo Complete this
 class RigidBodyState
 {
 public:

@@ -31,7 +31,7 @@ namespace imstk
 {
 ///
 /// \class SPHModelConfig
-/// \brief Parameters for SPH simulation
+/// \brief Class that holds the SPH model parameters
 ///
 class SPHModelConfig
 {
@@ -41,65 +41,49 @@ private:
 public:
     SPHModelConfig(const Real particleRadius);
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // TODO: Move this to solver or time integrator in the future
-    Real m_MinTimestep = Real(1e-6);
-    Real m_MaxTimestep = Real(1e-3);
+    /// \todo Move this to solver or time integrator in the future
+    Real m_minTimestep = Real(1e-6);
+    Real m_maxTimestep = Real(1e-3);
     Real m_CFLFactor   = Real(1.0);
-    ////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////
     // particle parameters
-    Real m_ParticleRadius    = Real(0);
-    Real m_ParticleRadiusSqr = Real(0);
-    ////////////////////////////////////////////////////////////////////////////////
+    Real m_particleRadius    = Real(0);
+    Real m_particleRadiusSqr = Real(0); ///> \note derived quantity
 
-    ////////////////////////////////////////////////////////////////////////////////
     // material parameters
-    Real m_RestDensity       = Real(1000.0);
-    Real m_RestDensitySqr    = Real(1000000.0);
-    Real m_RestDensityInv    = Real(1.0 / 1000.0);
-    Real m_ParticleMass      = Real(1);
-    Real m_ParticleMassScale = Real(0.95);    // scale particle mass to a smaller value to maintain stability
+    Real m_restDensity       = Real(1000.0);
+    Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
+    Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
+    Real m_particleMass      = Real(1);
+    Real m_particleMassScale = Real(0.95);         ///> scale particle mass to a smaller value to maintain stability
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
-    ////////////////////////////////////////////////////////////////////////////////
 
-    ////////////////////////////////////////////////////////////////////////////////
     // pressure
-    Real m_PressureStiffness = Real(50000.0);
-    ////////////////////////////////////////////////////////////////////////////////
+    Real m_pressureStiffness = Real(50000.0);
 
-    ////////////////////////////////////////////////////////////////////////////////
     // viscosity and surface tension/cohesion
-    Real m_ViscosityFluid          = Real(1e-2);
-    Real m_ViscosityBoundary       = Real(1e-5);
-    Real m_SurfaceTensionStiffness = Real(1);
-    Real m_BoundaryFriction        = Real(0.1);
-    ////////////////////////////////////////////////////////////////////////////////
+    Real m_viscosityCoeff          = Real(1e-2);
+    Real m_viscosityBoundary       = Real(1e-5);
+    Real m_surfaceTensionStiffness = Real(1);
+    Real m_frictionBoundary        = Real(0.1);
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // kernel data
-    Real m_RatioKernelOverParticleRadius = Real(4.0);
-    Real m_KernelRadius;
-    Real m_KernelRadiusSqr;
-    ////////////////////////////////////////////////////////////////////////////////
+    // kernel properties
+    Real m_kernelOverParticleRadiusRatio = Real(4.0);
+    Real m_kernelRadius;    ///> \note derived quantity
+    Real m_kernelRadiusSqr; ///> \note derived quantity
 
-    ////////////////////////////////////////////////////////////////////////////////
     // gravity
-    Vec3r m_Gravity = Vec3r(0, -9.81, 0);
-    ////////////////////////////////////////////////////////////////////////////////
+    Vec3r m_gravity = Vec3r(0, -9.81, 0);
 
-    ////////////////////////////////////////////////////////////////////////////////
     // neighbor search
     NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
-    ////////////////////////////////////////////////////////////////////////////////
 };
 
 ///
 /// \class SPHModel
-/// \brief SPH simulation model
+/// \brief SPH fluid model
 ///
 class SPHModel : public DynamicalModel<SPHKinematicState>
 {
@@ -117,12 +101,12 @@ public:
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(const std::shared_ptr<SPHModelConfig>& params) { m_Parameters = params; }
+    void configure(const std::shared_ptr<SPHModelConfig>& params) { m_modelParameters = params; }
 
     ///
     /// \brief Set the geometry (particle positions)
     ///
-    void setModelGeometry(const std::shared_ptr<PointSet>& geo) { m_Geometry = geo; }
+    void setModelGeometry(const std::shared_ptr<PointSet>& geo) { m_geometry = geo; }
 
     ///
     /// \brief Initialize the dynamical model
@@ -137,44 +121,61 @@ public:
     ///
     /// \brief Update positions of point set geometry
     ///
-    virtual void updatePhysicsGeometry() override { assert(m_Geometry); m_Geometry->setVertexPositions(this->m_currentState->getPositions()); }
+    virtual void updatePhysicsGeometry() override
+    { assert(m_geometry); m_geometry->setVertexPositions(this->m_currentState->getPositions()); }
 
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState() override { this->m_currentState->setState(this->m_initialState); }
+    virtual void resetToInitialState() override
+    { this->m_currentState->setState(this->m_initialState); }
 
     ///
     /// \brief Get the simulation parameters
     ///
-    const std::shared_ptr<SPHModelConfig>& getParameters() const { assert(m_Parameters); return m_Parameters; }
+    const std::shared_ptr<SPHModelConfig>& getParameters() const
+    { assert(m_modelParameters); return m_modelParameters; }
 
     ///
     /// \brief Get the kinematics particle data (positions + velocities)
     ///
-    SPHKinematicState& getKinematicsState() { assert(this->m_currentState); return *this->m_currentState; }
-    const SPHKinematicState& getKinematicsState() const { assert(this->m_currentState); return *this->m_currentState; }
+    SPHKinematicState& getKinematicsState()
+    {
+        assert(this->m_currentState);
+        return *this->m_currentState;
+    }
+
+    const SPHKinematicState& getKinematicsState() const
+    {
+        assert(this->m_currentState);
+        return *this->m_currentState;
+    }
 
     ///
     /// \brief Get particle simulation data
     ///
-    SPHSimulationState& getState() { return m_SimulationState; }
-    const SPHSimulationState& getState() const { return m_SimulationState; }
+    SPHSimulationState& getState() { return m_simulationState; }
+    const SPHSimulationState& getState() const { return m_simulationState; }
 
     ///
-    /// \brief Set the default time step size, valid only if using a fixed time step for integration
+    /// \brief Set the default time step size,
+    /// valid only if using a fixed time step for integration
     ///
-    virtual void setTimeStep(const double timeStep) override { setDefaultTimeStep(static_cast<Real>(timeStep)); }
+    virtual void setTimeStep(const double timeStep) override
+    { setDefaultTimeStep(static_cast<Real>(timeStep)); }
 
     ///
-    /// \brief Set the default time step size, valid only if using a fixed time step for integration
+    /// \brief Set the default time step size,
+    /// valid only if using a fixed time step for integration
     ///
-    void setDefaultTimeStep(const Real timeStep) { m_DefaultDt = static_cast<Real>(timeStep); }
+    void setDefaultTimeStep(const Real timeStep)
+    { m_defaultDt = static_cast<Real>(timeStep); }
 
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const override { return static_cast<double>(m_dt); }
+    virtual double getTimeStep() const override
+    { return static_cast<double>(m_dt); }
 
     ///
     /// \brief Do one time step simulation
@@ -203,7 +204,8 @@ private:
     void computeNeighborRelativePositions();
 
     ///
-    /// \brief Collect the densities of neighbor particles, called after all density computation (after density normalizaton, if applicable)
+    /// \brief Collect the densities of neighbor particles,
+    /// called after all density computation (after density normalization, if applicable)
     ///
     void collectNeighborDensity();
 
@@ -234,6 +236,8 @@ private:
 
     ///
     /// \brief Compute surface tension and update velocities
+    /// Compute surface tension using Akinci et at. 2013 model
+    /// (Versatile Surface Tension and Adhesion for SPH Fluids)
     ///
     void computeSurfaceTension();
 
@@ -242,14 +246,14 @@ private:
     ///
     void moveParticles(const Real timestep);
 
-    std::shared_ptr<PointSet> m_Geometry;
-    SPHSimulationState        m_SimulationState;
+    std::shared_ptr<PointSet> m_geometry;
+    SPHSimulationState        m_simulationState;
 
     Real m_dt;                                          ///> time step size
-    Real m_DefaultDt;                                   ///> default time step size
+    Real m_defaultDt;                                   ///> default time step size
 
-    SPHSimulationKernels m_Kernels;                     // must be initialized during model initialization
-    std::shared_ptr<SPHModelConfig> m_Parameters;       // must be set before simulation
-    std::shared_ptr<NeighborSearch> m_NeighborSearcher; // must be initialized during model initialization
+    SPHSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
+    std::shared_ptr<SPHModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)
+    std::shared_ptr<NeighborSearch> m_neighborSearcher; ///> Neighbor Search (must be initialized during model initialization)
 };
 } // end namespace imstk

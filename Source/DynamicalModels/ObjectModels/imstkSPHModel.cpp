@@ -27,51 +27,59 @@ namespace imstk
 {
 SPHModelConfig::SPHModelConfig(const Real particleRadius)
 {
-    m_ParticleRadius = particleRadius;
+    if (std::abs(particleRadius) > Real(1.e-6))
+    {
+        LOG_IF(WARNING, (particleRadius < 0)) << "Particle radius supplied is negative! Using absolute value of the supplied radius.";
+        m_particleRadius = std::abs(particleRadius);
+    }
+    else
+    {
+        LOG(WARNING) << "Particle radius too small! Setting to 1.e-6";
+        m_particleRadius = 1.e-6;
+    }
     initialize();
 }
 
 void
 SPHModelConfig::initialize()
 {
-    LOG_IF(FATAL, (std::abs(m_ParticleRadius) < Real(1e-6))) << "Particle radius was not set properly";
+    // Compute the derived quantities
+    m_particleRadiusSqr = m_particleRadius * m_particleRadius;
 
-    m_ParticleRadiusSqr = m_ParticleRadius * m_ParticleRadius;
+    m_particleMass   = Real(std::pow(Real(2.0) * m_particleRadius, 3)) * m_restDensity * m_particleMassScale;
+    m_restDensitySqr = m_restDensity * m_restDensity;
+    m_restDensityInv = Real(1) / m_restDensity;
 
-    m_ParticleMass   = Real(std::pow(Real(2.0) * m_ParticleRadius, 3)) * m_RestDensity * m_ParticleMassScale;
-    m_RestDensitySqr = m_RestDensity * m_RestDensity;
-    m_RestDensityInv = Real(1) / m_RestDensity;
-
-    m_KernelRadius    = m_ParticleRadius * m_RatioKernelOverParticleRadius;
-    m_KernelRadiusSqr = m_KernelRadius * m_KernelRadius;
+    m_kernelRadius    = m_particleRadius * m_kernelOverParticleRadiusRatio;
+    m_kernelRadiusSqr = m_kernelRadius * m_kernelRadius;
 }
 
 bool
 SPHModel::initialize()
 {
-    LOG_IF(FATAL, (!m_Geometry)) << "Model geometry is not yet set! Cannot initialize without model geometry.";
+    LOG_IF(FATAL, (!m_geometry)) << "Model geometry is not yet set! Cannot initialize without model geometry.";
 
     // Initialize  positions and velocity of the particles
     this->m_initialState = std::make_shared<SPHKinematicState>();
     this->m_currentState = std::make_shared<SPHKinematicState>();
 
     // Set particle positions and zero default velocities
-    // TODO: set particle data with given (non-zero) velocities
-    this->m_initialState->setParticleData(m_Geometry->getVertexPositions());
+    /// \todo set particle data with given (non-zero) velocities
+    this->m_initialState->setParticleData(m_geometry->getVertexPositions());
     this->m_currentState->setState(this->m_initialState);
 
     // Attach current state to simulation state
-    m_SimulationState.setKinematicState(this->m_currentState);
+    m_simulationState.setKinematicState(this->m_currentState);
 
     // Initialize (allocate memory for) simulation data such as density, acceleration etc.
-    m_SimulationState.initializeData();
+    m_simulationState.initializeData();
 
     // Initialize simulation dependent parameters and kernel data
-    m_Kernels.initialize(m_Parameters->m_KernelRadius);
+    m_kernels.initialize(m_modelParameters->m_kernelRadius);
 
     // Initialize neighbor searcher
-    m_NeighborSearcher = std::make_shared<NeighborSearch>(m_Parameters->m_NeighborSearchMethod,
-                                                          m_Parameters->m_KernelRadius);
+    m_neighborSearcher = std::make_shared<NeighborSearch>(m_modelParameters->m_NeighborSearchMethod,
+                                                          m_modelParameters->m_kernelRadius);
 
     return true;
 }
@@ -95,7 +103,7 @@ SPHModel::advanceTimeStep()
 void
 SPHModel::computeTimeStepSize()
 {
-    m_dt = (this->m_timeStepSizeType == TimeSteppingType::fixed) ? m_DefaultDt : computeCFLTimeStepSize();
+    m_dt = (this->m_timeStepSizeType == TimeSteppingType::fixed) ? m_defaultDt : computeCFLTimeStepSize();
 }
 
 Real
@@ -104,16 +112,18 @@ SPHModel::computeCFLTimeStepSize()
     auto maxVel = ParallelUtils::findMaxL2Norm(getState().getVelocities());
 
     // dt = CFL * 2r / max{|| v ||}
-    Real timestep = maxVel > Real(1e-6) ? m_Parameters->m_CFLFactor * (Real(2.0) * m_Parameters->m_ParticleRadius / maxVel) : m_Parameters->m_MaxTimestep;
+    Real timestep = maxVel > Real(1e-6) ?
+                    m_modelParameters->m_CFLFactor * (Real(2.0) * m_modelParameters->m_particleRadius / maxVel) :
+                    m_modelParameters->m_maxTimestep;
 
     // clamp the time step size to be within a given range
-    if (timestep > m_Parameters->m_MaxTimestep)
+    if (timestep > m_modelParameters->m_maxTimestep)
     {
-        timestep = m_Parameters->m_MaxTimestep;
+        timestep = m_modelParameters->m_maxTimestep;
     }
-    else if (timestep < m_Parameters->m_MinTimestep)
+    else if (timestep < m_modelParameters->m_minTimestep)
     {
-        timestep = m_Parameters->m_MinTimestep;
+        timestep = m_modelParameters->m_minTimestep;
     }
 
     return timestep;
@@ -122,11 +132,12 @@ SPHModel::computeCFLTimeStepSize()
 void
 SPHModel::findParticleNeighbors()
 {
-    m_NeighborSearcher->getNeighbors(getState().getFluidNeighborLists(), getState().getPositions());
-    if (m_Parameters->m_bDensityWithBoundary)   // if considering boundary particles for computing fluid density
+    m_neighborSearcher->getNeighbors(getState().getFluidNeighborLists(), getState().getPositions());
+    if (m_modelParameters->m_bDensityWithBoundary)   // if considering boundary particles for computing fluid density
     {
-        m_NeighborSearcher->getNeighbors(getState().getBoundaryNeighborLists(), getState().getPositions(),
-                                         getState().getBoundaryParticlePositions());
+        m_neighborSearcher->getNeighbors(getState().getBoundaryNeighborLists(),
+            getState().getPositions(),
+            getState().getBoundaryParticlePositions());
     }
 }
 
@@ -139,7 +150,7 @@ SPHModel::computeNeighborRelativePositions()
                                         {
                                             const Vec3r& qpos = allPositions[q];
                                             const Vec3r  r    = ppos - qpos;
-                                            neighborInfo.push_back({ r, m_Parameters->m_RestDensity });
+                                            neighborInfo.push_back({ r, m_modelParameters->m_restDensity });
                                         }
                                     };
 
@@ -152,7 +163,7 @@ SPHModel::computeNeighborRelativePositions()
 
             computeRelativePositions(ppos, getState().getFluidNeighborLists()[p], getState().getPositions(), neighborInfo);
             // if considering boundary particles then also cache relative positions with them
-            if (m_Parameters->m_bDensityWithBoundary)
+            if (m_modelParameters->m_bDensityWithBoundary)
             {
                 computeRelativePositions(ppos, getState().getBoundaryNeighborLists()[p], getState().getBoundaryParticlePositions(), neighborInfo);
             }
@@ -163,7 +174,7 @@ void
 SPHModel::collectNeighborDensity()
 {
     // after computing particle densities, cache them into neighborInfo variable, next to relative positions
-    // this is usefull because relative positions and densities are accessed together multiple times
+    // this is useful because relative positions and densities are accessed together multiple times
     // caching relative positions and densities therefore can reduce computation time significantly (tested)
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
@@ -196,9 +207,9 @@ SPHModel::computeDensity()
             Real pdensity = 0;
             for (const auto& qInfo : neighborInfo)
             {
-                pdensity += m_Kernels.W(qInfo.xpq);
+                pdensity += m_kernels.W(qInfo.xpq);
             }
-            pdensity *= m_Parameters->m_ParticleMass;
+            pdensity *= m_modelParameters->m_particleMass;
             getState().getDensities()[p] = pdensity;
         });
 }
@@ -206,7 +217,7 @@ SPHModel::computeDensity()
 void
 SPHModel::normalizeDensity()
 {
-    if (!m_Parameters->m_bNormalizeDensity)
+    if (!m_modelParameters->m_bNormalizeDensity)
     {
         return;
     }
@@ -230,10 +241,10 @@ SPHModel::normalizeDensity()
                 // because we're not done with density computation, qInfo does not contain desity of particle q yet
                 const auto q        = fluidNeighborList[i];
                 const auto qdensity = getState().getDensities()[q];
-                tmp += m_Kernels.W(qInfo.xpq) / qdensity;
+                tmp += m_kernels.W(qInfo.xpq) / qdensity;
             }
 
-            if (m_Parameters->m_bDensityWithBoundary)
+            if (m_modelParameters->m_bDensityWithBoundary)
             {
                 const auto& BDNeighborList = getState().getBoundaryNeighborLists()[p];
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
@@ -243,11 +254,11 @@ SPHModel::normalizeDensity()
                 for (size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
                 {
                     const auto& qInfo = neighborInfo[i];
-                    tmp += m_Kernels.W(qInfo.xpq) / m_Parameters->m_RestDensity;     // density of boundary particle is set to rest density
+                    tmp += m_kernels.W(qInfo.xpq) / m_modelParameters->m_restDensity;     // density of boundary particle is set to rest density
                 }
             }
 
-            getState().getNormalizedDensities()[p] = getState().getDensities()[p] / (tmp * m_Parameters->m_ParticleMass);
+            getState().getNormalizedDensities()[p] = getState().getDensities()[p] / (tmp * m_modelParameters->m_particleMass);
         });
 
     // put normalized densities to densities
@@ -258,7 +269,7 @@ void
 SPHModel::computePressureAcceleration()
 {
     auto particlePressure = [&](const Real density) {
-                                const Real error = std::pow(density / m_Parameters->m_RestDensity, 7) - Real(1);
+                                const Real error = std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1);
                                 // clamp pressure error to zero to maintain stability
                                 return error > Real(0) ? error : Real(0);
                             };
@@ -284,10 +295,10 @@ SPHModel::computePressureAcceleration()
                 const auto qpressure = particlePressure(qdensity);
 
                 // pressure forces
-                accel += -(ppressure / (pdensity * pdensity) + qpressure / (qdensity * qdensity)) * m_Kernels.gradW(r);
+                accel += -(ppressure / (pdensity * pdensity) + qpressure / (qdensity * qdensity)) * m_kernels.gradW(r);
             }
 
-            accel *= m_Parameters->m_PressureStiffness * m_Parameters->m_ParticleMass;
+            accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass;
             getState().getAccelerations()[p] = accel;
         });
 }
@@ -297,7 +308,7 @@ SPHModel::updateVelocity(Real timestep)
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
-            getState().getVelocities()[p] += (m_Parameters->m_Gravity + getState().getAccelerations()[p]) * timestep;
+            getState().getVelocities()[p] += (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep;
         });
 }
 
@@ -324,23 +335,23 @@ SPHModel::computeViscosity()
                 const auto& qInfo   = neighborInfo[i];
                 const auto r        = qInfo.xpq;
                 const auto qdensity = qInfo.density;
-                diffuseFluid       += (Real(1.0) / qdensity) * m_Kernels.W(r) * (qvel - pvel);
+                diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.W(r) * (qvel - pvel);
             }
-            diffuseFluid *= m_Parameters->m_ViscosityFluid;
+            diffuseFluid *= m_modelParameters->m_viscosityCoeff;
 
             Vec3r diffuseBoundary(0, 0, 0);
-            if (m_Parameters->m_bDensityWithBoundary)
+            if (m_modelParameters->m_bDensityWithBoundary)
             {
                 for (size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
                 {
                     const auto& qInfo   = neighborInfo[i];
                     const auto r        = qInfo.xpq;
-                    diffuseBoundary    -= m_Parameters->m_RestDensityInv * m_Kernels.W(r) * pvel;
+                    diffuseBoundary    -= m_modelParameters->m_restDensityInv * m_kernels.W(r) * pvel;
                 }
-                diffuseBoundary *= m_Parameters->m_ViscosityBoundary;
+                diffuseBoundary *= m_modelParameters->m_viscosityBoundary;
             }
 
-            getState().getDiffuseVelocities()[p] = (diffuseFluid + diffuseBoundary) * m_Parameters->m_ParticleMass;
+            getState().getDiffuseVelocities()[p] = (diffuseFluid + diffuseBoundary) * m_modelParameters->m_particleMass;
         });
 
     // add diffused velocity back to velocity, causing viscosity
@@ -350,11 +361,10 @@ SPHModel::computeViscosity()
     });
 }
 
-// Compute surface tension Akinci et at. 2013 model (Versatile Surface Tension and Adhesion for SPH Fluids)
 void
 SPHModel::computeSurfaceTension()
 {
-    // Firstly compute surface normal for all particles
+    // First, compute surface normal for all particles
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             Vec3r n(0, 0, 0);
@@ -370,14 +380,14 @@ SPHModel::computeSurfaceTension()
                 const auto& qInfo   = neighborInfo[i];
                 const auto r        = qInfo.xpq;
                 const auto qdensity = qInfo.density;
-                n += (Real(1.0) / qdensity) * m_Kernels.gradW(r);
+                n += (Real(1.0) / qdensity) * m_kernels.gradW(r);
             }
 
-            n *= m_Parameters->m_KernelRadius * m_Parameters->m_ParticleMass;
+            n *= m_modelParameters->m_kernelRadius * m_modelParameters->m_particleMass;
             getState().getNormals()[p] = n;
         });
 
-    // Compute surface tension acceleration
+    // Second, compute surface tension acceleration
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
@@ -402,14 +412,14 @@ SPHModel::computeSurfaceTension()
                 const auto qdensity = qInfo.density;
 
                 // Correction factor
-                const auto K_ij = Real(2) * m_Parameters->m_RestDensity / (pdensity + qdensity);
+                const auto K_ij = Real(2) * m_modelParameters->m_restDensity / (pdensity + qdensity);
 
                 // Cohesion acc
                 auto r = qInfo.xpq;
                 const auto d2 = r.squaredNorm();
                 if (d2 > Real(1e-20))
                 {
-                    accel -= K_ij * m_Parameters->m_ParticleMass * (r / std::sqrt(d2)) * m_Kernels.cohesionW(r);
+                    accel -= K_ij * m_modelParameters->m_particleMass * (r / std::sqrt(d2)) * m_kernels.cohesionW(r);
                 }
 
                 // Curvature acc
@@ -417,7 +427,7 @@ SPHModel::computeSurfaceTension()
                 accel -= K_ij * (ni - nj);
             }
 
-            accel *= m_Parameters->m_SurfaceTensionStiffness;
+            accel *= m_modelParameters->m_surfaceTensionStiffness;
             getState().getAccelerations()[p] += accel;
         });
 }

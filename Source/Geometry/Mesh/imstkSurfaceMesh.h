@@ -140,7 +140,7 @@ public:
     ///
     /// \brief Rewire the node order and triangle connectivity to optimize for memory layout
     ///  The intended use is for large meshes that doesn't fit into CPU/GPU memory.
-    ///  TODO: Further optimization to find a 1-d uninterrupted sub-graph at each iteration.
+    ///  \todo Further optimization to find a 1-d uninterrupted sub-graph at each iteration.
     ///
     void optimizeForDataLocality();
 
@@ -202,7 +202,8 @@ public:
 
     ///
     /// \brief Set load factor
-    /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
+    /// \param loadFactor the maximum number of vertices
+    /// a multiple of the original vertex count
     ///
     virtual void setLoadFactor(double loadFactor) override;
 
