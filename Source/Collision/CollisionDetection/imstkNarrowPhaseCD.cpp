@@ -320,12 +320,11 @@ pointToSphere(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere,
 
     const auto pc      = sphereCenter - point;
     const auto distSqr = pc.squaredNorm();
-    if (distSqr < sphereRadiusSqr && distSqr > Real(1e-12))
+    if (distSqr < sphereRadiusSqr)
     {
-        const auto direction      = pc / std::sqrt(distSqr);
-        const auto pointOnSphere  = sphereCenter - sphereRadius * direction;
-        const auto penetrationDir = point - pointOnSphere;
-
+        const Vec3r direction      = distSqr > Real(1e-12) ? pc / std::sqrt(distSqr) : Vec3r(0, 0, 0);
+        const Vec3r pointOnSphere  = sphereCenter - sphereRadius * direction;
+        const Vec3r penetrationDir = point - pointOnSphere;
         colData->MAColData.safeAppend({ pointIdx, penetrationDir });
     }
 }
