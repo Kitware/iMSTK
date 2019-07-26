@@ -177,7 +177,7 @@ OctreeNode::removeEmptyDescendants()
 }
 
 void
-OctreeNode::keepPrimitive(OctreePrimitiveData* const pPrimitive, const OctreePrimitiveType type)
+OctreeNode::keepPrimitive(OctreePrimitive* const pPrimitive, const OctreePrimitiveType type)
 {
     pPrimitive->m_pNode  = this;
     pPrimitive->m_bValid = true;
@@ -190,7 +190,7 @@ OctreeNode::keepPrimitive(OctreePrimitiveData* const pPrimitive, const OctreePri
 }
 
 void
-OctreeNode::insertPoint(OctreePrimitiveData* const pPrimitive)
+OctreeNode::insertPoint(OctreePrimitive* const pPrimitive)
 {
     // Type alias, to reduce copy/past errors
     static const auto type = OctreePrimitiveType::Point;
@@ -218,7 +218,7 @@ OctreeNode::insertPoint(OctreePrimitiveData* const pPrimitive)
 }
 
 void
-OctreeNode::insertNonPointPrimitive(OctreePrimitiveData* const pPrimitive, const OctreePrimitiveType type)
+OctreeNode::insertNonPointPrimitive(OctreePrimitive* const pPrimitive, const OctreePrimitiveType type)
 {
     const auto  lowerCorner = pPrimitive->m_LowerCorner;
     const auto  upperCorner = pPrimitive->m_UpperCorner;
@@ -482,7 +482,7 @@ LooseOctree::addPointSet(const std::shared_ptr<PointSet>& pointset)
     addGeometry(geomIdx);
 
     const auto numNewPrimitives = static_cast<uint32_t>(pointset->getNumVertices());
-    const auto pPrimitiveBlock  = new OctreePrimitiveData[numNewPrimitives];
+    const auto pPrimitiveBlock  = new OctreePrimitive[numNewPrimitives];
     m_pPrimitiveBlocks[type].push_back(pPrimitiveBlock);
 
     auto& vPrimitivePtrs = m_vPrimitivePtrs[type];
@@ -490,7 +490,7 @@ LooseOctree::addPointSet(const std::shared_ptr<PointSet>& pointset)
     for (uint32_t idx = 0; idx < numNewPrimitives; ++idx)
     {
         const auto pPrimitive = &pPrimitiveBlock[idx];
-        new(pPrimitive) OctreePrimitiveData(pGeometry, geomIdx, idx); // Placement new
+        new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, idx); // Placement new
         vPrimitivePtrs.push_back(pPrimitive);
     }
 
@@ -509,7 +509,7 @@ LooseOctree::addTriangleMesh(const std::shared_ptr<SurfaceMesh>& surfMesh)
     addGeometry(geomIdx);
 
     const auto numNewPrimitives = static_cast<uint32_t>(surfMesh->getNumTriangles());
-    const auto pPrimitiveBlock  = new OctreePrimitiveData[numNewPrimitives];
+    const auto pPrimitiveBlock  = new OctreePrimitive[numNewPrimitives];
     m_pPrimitiveBlocks[type].push_back(pPrimitiveBlock);
 
     auto& vPrimitivePtrs = m_vPrimitivePtrs[type];
@@ -517,7 +517,7 @@ LooseOctree::addTriangleMesh(const std::shared_ptr<SurfaceMesh>& surfMesh)
     for (uint32_t triIdx = 0; triIdx < numNewPrimitives; ++triIdx)
     {
         const auto pPrimitive = &pPrimitiveBlock[triIdx];
-        new(pPrimitive) OctreePrimitiveData(pGeometry, geomIdx, triIdx); // Placement new
+        new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, triIdx); // Placement new
         vPrimitivePtrs.push_back(pPrimitive);
     }
 
@@ -535,11 +535,11 @@ LooseOctree::addAnalyticalGeometry(const std::shared_ptr<Geometry>& geometry)
     const auto geomIdx   = pGeometry->getGlobalIndex();
     addGeometry(geomIdx);
 
-    const auto pPrimitiveBlock = new OctreePrimitiveData[1];
+    const auto pPrimitiveBlock = new OctreePrimitive[1];
     m_pPrimitiveBlocks[type].push_back(pPrimitiveBlock);
 
     const auto pPrimitive = &pPrimitiveBlock[0];
-    new(pPrimitive) OctreePrimitiveData(pGeometry, geomIdx, 0); // Placement new
+    new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, 0); // Placement new
     m_vPrimitivePtrs[type].push_back(pPrimitive);
 
     LOG(INFO) << "Added a new analytical geometry to " << m_Name;
@@ -867,8 +867,8 @@ LooseOctree::removeInvalidPrimitivesFromNodes()
                             continue;
                         }
 
-                        OctreePrimitiveData* pIter    = pOldHead;
-                        OctreePrimitiveData* pNewHead = nullptr;
+                        OctreePrimitive* pIter    = pOldHead;
+                        OctreePrimitive* pNewHead = nullptr;
                         uint32_t count = 0;
                         while (pIter) {
                             const auto pNext = pIter->m_pNext;
@@ -910,7 +910,7 @@ LooseOctree::reinsertInvalidPrimitives(const OctreePrimitiveType type)
 }
 
 void
-LooseOctree::computePrimitiveBoundingBox(OctreePrimitiveData* const pPrimitive, const OctreePrimitiveType type)
+LooseOctree::computePrimitiveBoundingBox(OctreePrimitive* const pPrimitive, const OctreePrimitiveType type)
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     LOG_IF(FATAL, (type == OctreePrimitiveType::Point))
