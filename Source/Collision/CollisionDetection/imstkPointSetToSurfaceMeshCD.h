@@ -26,25 +26,25 @@
 
 namespace imstk
 {
-class Geometry;
 class PointSet;
 class SurfaceMesh;
 struct CollisionData;
 
 ///
-/// \class PointSetToTriMeshCD
+/// \class PointSetToSurfaceMeshCD
 ///
-/// \brief PointSet to sphere collision detection
+/// \brief PointSet to surface mesh collision detection
 ///
-class PointSetToVolumeMeshCD : public CollisionDetection
+class PointSetToSurfaceMeshCD : public CollisionDetection
 {
 public:
+
     ///
     /// \brief Constructor
     ///
-    PointSetToVolumeMeshCD(std::shared_ptr<PointSet>      pointset,
-                           std::shared_ptr<SurfaceMesh>   triMesh,
-                           std::shared_ptr<CollisionData> colData);
+    PointSetToSurfaceMeshCD(std::shared_ptr<PointSet>      pointset,
+                            std::shared_ptr<SurfaceMesh>   triMesh,
+                            std::shared_ptr<CollisionData> colData);
 
     ///
     /// \brief Detect collision and compute collision data

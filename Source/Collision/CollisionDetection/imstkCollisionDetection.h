@@ -47,7 +47,7 @@ public:
         PointSetToPlane,
         PointSetToCapsule,
         PointSetToSpherePicking,
-        PointSetToVolumeMesh,
+        PointSetToSurfaceMesh,
 
         // Mesh to mesh (mesh to analytical object = mesh vertices to analytical object)
         SurfaceMeshToSurfaceMesh,

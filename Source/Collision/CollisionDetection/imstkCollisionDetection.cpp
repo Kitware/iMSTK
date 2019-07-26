@@ -26,7 +26,7 @@
 #include "imstkPointSetToCapsuleCD.h"
 #include "imstkPointSetToSphereCD.h"
 #include "imstkPointSetToPlaneCD.h"
-#include "imstkPointSetToVolumeMeshCD.h"
+#include "imstkPointSetToSurfaceMeshCD.h"
 #include "imstkPointSetToSpherePickingCD.h"
 
 // Mesh to mesh
@@ -95,12 +95,12 @@ CollisionDetection::makeCollisionDetectionObject(const Type                     
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, sphere)
         return std::make_shared<PointSetToSpherePickingCD>(pointset, sphere, colData);
     }
-    case Type::PointSetToVolumeMesh:
+    case Type::PointSetToSurfaceMesh:
     {
         auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
         auto triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, triMesh)
-        return std::make_shared<PointSetToVolumeMeshCD>(pointset, triMesh, colData);
+        return std::make_shared<PointSetToSurfaceMeshCD>(pointset, triMesh, colData);
     }
     // Mesh to mesh
     case Type::SurfaceMeshToSurfaceMesh:

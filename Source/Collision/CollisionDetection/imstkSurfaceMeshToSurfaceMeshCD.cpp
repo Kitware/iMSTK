@@ -40,7 +40,7 @@ SurfaceMeshToSurfaceMeshCD::computeCollisionData()
     m_colData->clearAll();
 
     // This is brute force collision detection
-    // TODO: use octree
+    // \todo use octree
     ParallelUtils::parallelFor(static_cast<unsigned int>(m_meshA->getNumTriangles()),
         [&](const unsigned int idx1)
         {

@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkPointSetToVolumeMeshCD.h"
+#include "imstkPointSetToSurfaceMeshCD.h"
 #include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
 #include "imstkParallelUtils.h"
@@ -28,21 +28,21 @@
 
 namespace imstk
 {
-PointSetToVolumeMeshCD::PointSetToVolumeMeshCD(std::shared_ptr<PointSet>      pointset,
-                                               std::shared_ptr<SurfaceMesh>   triMesh,
-                                               std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToVolumeMesh, colData),
+PointSetToSurfaceMeshCD::PointSetToSurfaceMeshCD(std::shared_ptr<PointSet>      pointset,
+                                                 std::shared_ptr<SurfaceMesh>   triMesh,
+                                                 std::shared_ptr<CollisionData> colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToSurfaceMesh, colData),
     m_pointset(pointset), m_triMesh(triMesh)
 {
 }
 
 void
-PointSetToVolumeMeshCD::computeCollisionData()
+PointSetToSurfaceMeshCD::computeCollisionData()
 {
     m_colData->clearAll();
 
     // This is brute force collision detection
-    // TODO: replace by octree
+    // \todo replace by octree
     ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointset->getVertexPositions().size()),
         [&](const unsigned int idx)
         {
