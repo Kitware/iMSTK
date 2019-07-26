@@ -20,6 +20,10 @@ limitations under the License.
 =========================================================================*/
 #include "imstkLogUtility.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 namespace imstk
 {
 stdSink::FG_Color
@@ -40,6 +44,21 @@ stdSink::GetColor(const LEVELS level) const
     return WHITE;
 }
 
+#ifdef WIN32
+
+#define WIN_CONSOLE_RED 4
+#define WIN_CONSOLE_LIGHT_GRAY 7
+#define WIN_CONSOLE_YELLOW 14
+
+void
+setColorWin(const int colCode)
+{
+    WORD wColor = ((0 & 0x0F) << 4) + (colCode & 0x0F); // black background
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), wColor);
+}
+
+#endif
+
 void
 stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 {
@@ -52,9 +71,18 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
               << message
               << "\033[m" << std::endl;
 #else
-    if (level.value == WARNING.value || level.value == FATAL.value)
+
+    if (level.value == WARNING.value)
     {
+        setColorWin(WIN_CONSOLE_YELLOW);
         std::cerr << message << std::endl;
+        setColorWin(WIN_CONSOLE_LIGHT_GRAY);
+    }
+    else if (level.value == FATAL.value)
+    {
+        setColorWin(WIN_CONSOLE_RED);
+        std::cerr << message << std::endl;
+        setColorWin(WIN_CONSOLE_LIGHT_GRAY);
     }
     else
     {
