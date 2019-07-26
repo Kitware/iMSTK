@@ -55,8 +55,8 @@ public:
     ///
     /// \brief
     ///
-    std::shared_ptr<Geometry> getCollidingGeometry() const;
-    void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
+    const std::shared_ptr<Geometry>& getCollidingGeometry() const;
+    void setCollidingGeometry(const std::shared_ptr<Geometry>& geometry);
 
     ///
     /// \brief Get the master geometry
