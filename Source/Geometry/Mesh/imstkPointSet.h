@@ -64,7 +64,7 @@ public:
     ///
     /// \brief Compute the bounding box for the entire mesh
     ///
-    virtual void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) const override;
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
     // Accessors
 

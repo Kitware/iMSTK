@@ -63,7 +63,7 @@ Geometry::print() const
 }
 
 void
-Geometry::computeBoundingBox(Vec3d& /*min*/, Vec3d& /*max*/, const double /* paddingPercent = 0.0*/) const
+Geometry::computeBoundingBox(Vec3d&, Vec3d&, const double)
 {
     LOG(FATAL) << "computeBoundingBox() must be called from an instance of a specific geometry class";
 }

@@ -57,13 +57,28 @@ Sphere::setRadius(const double r)
         LOG(WARNING) << "Sphere::setRadius error: radius should be positive.";
         return;
     }
-    if (m_radius == r)
+    if (std::abs(m_radius - r) < 1e-20)
     {
         return;
     }
     m_radius           = r;
     m_dataModified     = true;
     m_transformApplied = false;
+}
+
+void
+Sphere::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
+{
+    updatePostTransformData();
+    const Vec3d span = Vec3d(1, 1, 1) * m_radiusPostTransform;
+    lowerCorner = m_positionPostTransform - span;
+    upperCorner = m_positionPostTransform + span;
+    if (paddingPercent > 0.0)
+    {
+        const Vec3d range = upperCorner - lowerCorner;
+        lowerCorner = lowerCorner - range * (paddingPercent / 100.0);
+        upperCorner = upperCorner + range * (paddingPercent / 100.0);
+    }
 }
 
 void
