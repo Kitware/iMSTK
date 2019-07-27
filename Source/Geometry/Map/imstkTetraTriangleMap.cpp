@@ -205,7 +205,7 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
             center += tetraMesh->getInitialVertexPosition(vert[i]);
         }
         center = center / 4.0;
-        double distSqr = (pos - center).squaredNorm();
+        double distSqr = (Vec3d(pos - center)).squaredNorm();
         if (distSqr < closestDistanceSqr)
         {
             closestDistanceSqr = distSqr;

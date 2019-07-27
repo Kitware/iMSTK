@@ -171,7 +171,8 @@ SpatialHashTableSeparateChaining::getPointsInSphere(std::vector<size_t>& result,
                 for (auto it = first; it != last; ++it)
                 {
                     const Vec3d& qpos = it->point;
-                    const auto   d2   = (ppos - qpos).squaredNorm();
+                    const Vec3d  diff = ppos - qpos;
+                    const auto   d2   = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
                     if (d2 < radiusSqr)
                     {
                         result.push_back(it->ID);

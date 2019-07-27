@@ -314,12 +314,12 @@ void
 pointToSphere(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere,
               const std::shared_ptr<CollisionData>& colData)
 {
-    const auto sphereCenter    = sphere->getPosition();
-    const auto sphereRadius    = sphere->getRadius();
-    const auto sphereRadiusSqr = sphereRadius * sphereRadius;
+    const Vec3r sphereCenter    = sphere->getPosition();
+    const auto  sphereRadius    = sphere->getRadius();
+    const auto  sphereRadiusSqr = sphereRadius * sphereRadius;
 
-    const auto pc      = sphereCenter - point;
-    const auto distSqr = pc.squaredNorm();
+    const Vec3r pc      = sphereCenter - point;
+    const auto  distSqr = pc.squaredNorm();
     if (distSqr < sphereRadiusSqr)
     {
         const Vec3r direction      = distSqr > Real(1e-12) ? pc / std::sqrt(distSqr) : Vec3r(0, 0, 0);
@@ -344,12 +344,12 @@ void
 pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere,
                      const std::shared_ptr<CollisionData>& colData)
 {
-    const auto sphereCenter    = sphere->getPosition();
-    const auto sphereRadius    = sphere->getRadius();
-    const auto sphereRadiusSqr = sphereRadius * sphereRadius;
+    const Vec3r sphereCenter    = sphere->getPosition();
+    const auto  sphereRadius    = sphere->getRadius();
+    const auto  sphereRadiusSqr = sphereRadius * sphereRadius;
 
-    const auto pc      = sphereCenter - point;
-    const auto distSqr = pc.squaredNorm();
+    const Vec3r pc      = sphereCenter - point;
+    const auto  distSqr = pc.squaredNorm();
     if (distSqr < sphereRadiusSqr)
     {
         colData->NodePickData.safeAppend({ pc, pointIdx, 0 });

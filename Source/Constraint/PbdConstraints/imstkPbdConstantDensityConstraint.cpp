@@ -77,7 +77,7 @@ PbdConstantDensityConstraint::solvePositionConstraint(PbdModel& model)
 double
 PbdConstantDensityConstraint::wPoly6(const Vec3d& pi, const Vec3d& pj)
 {
-    double rLengthSqr = (pi - pj).squaredNorm();
+    double rLengthSqr = (Vec3d(pi - pj)).squaredNorm();
 
     return (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20) ?
            0 :
