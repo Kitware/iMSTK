@@ -113,10 +113,10 @@ PBDCollisionHandling::generatePBDConstraints()
         m_PBDConstraints.push_back(c);
     }
 
-    // Generate triangle-vertex pbd constraints
-    for (size_t i = 0; i < m_colData->TVColData.getSize(); ++i)
+    // Generate vertex-triangle pbd constraints
+    for (size_t i = 0; i < m_colData->VTColData.getSize(); ++i)
     {
-        const auto& colData  = m_colData->TVColData[i];
+        const auto& colData  = m_colData->VTColData[i];
         const auto& triVerts = colGeo2->getTrianglesVertices()[colData.triIdx];
 
         const auto c = std::make_shared<PbdPointTriangleConstraint>();
@@ -144,6 +144,7 @@ PBDCollisionHandling::generatePBDConstraints()
 
         m_PBDConstraints.push_back(c);
     }
+
     //TODO: generating PbdPointTriangleConstraint from the VTColData should be added
 }
 }
