@@ -41,9 +41,17 @@ OctreeBasedCD::clear()
     m_sCollidingPrimitiveTypes = 0u;
 }
 
+bool
+OctreeBasedCD::hasCollisionPair(const uint32_t geomIdx1, const uint32_t geomIdx2)
+{
+    const auto collisionPair = computeCollisionPairHash(geomIdx1, geomIdx2);
+    return m_mCollisionPair2AssociatedData.find(collisionPair) != m_mCollisionPair2AssociatedData.end();
+}
+
 void
 OctreeBasedCD::addCollisionPair(const std::shared_ptr<Geometry>& geom1, const std::shared_ptr<Geometry>& geom2,
-                                const CollisionDetection::Type collisionType)
+                                const CollisionDetection::Type collisionType,
+                                const std::shared_ptr<CollisionData>& collisionData)
 {
     // Collision pairs are encoded as 64 bit unsigned integer
     // The first 32 bit is obj1Idx, following by 32 bit of obj2Idx
@@ -54,7 +62,7 @@ OctreeBasedCD::addCollisionPair(const std::shared_ptr<Geometry>& geom1, const st
     LOG_IF(FATAL, (m_mCollisionPair2AssociatedData.find(collisionPair) != m_mCollisionPair2AssociatedData.end()))
         << "Collision pair has previously been added";
 
-    m_mCollisionPair2AssociatedData[collisionPair] = { collisionType, std::make_shared<CollisionData>() };
+    m_mCollisionPair2AssociatedData[collisionPair] = { collisionType, collisionData };
     m_vCollidingGeomPairs.push_back({ geom1.get(), geom2.get() });
 
     const auto geomType1 = geom1->getType();
@@ -141,7 +149,8 @@ OctreeBasedCD::detectCollision()
     // Remove all invalid collision between point-mesh
     for (auto& geoPair: m_vCollidingGeomPairs)
     {
-        if (geoPair.first->getType() != Geometry::Type::PointSet)
+        // Ignore the collision pair if it is not a PointSet-SurfaceMesh pair
+        if (geoPair.first->getType() != Geometry::Type::PointSet || (geoPair.second->getType() != Geometry::Type::SurfaceMesh))
         {
             continue;
         }
@@ -152,18 +161,33 @@ OctreeBasedCD::detectCollision()
             continue;
         }
 
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-        LOG_IF(FATAL, (geoPair.second->getType() != Geometry::Type::SurfaceMesh))
-            << "Incorrectly detected invalid collision between point and geometry that is not a surface mesh";
-#endif
+        // Sort the vertex-triangle collision data by verter index
+        // If one vertex collides with many triangles, sort the data of those collisions by closest distance
+        collisionData->VTColData.sort(
+            [](const VertexTriangleCollisionDataElement& x,
+               const VertexTriangleCollisionDataElement& y)
+            {
+                return (x.vertexIdx < y.vertexIdx)
+                || ((x.vertexIdx == y.vertexIdx) && x.closestDistance < y.closestDistance);
+            });
 
         const auto geomIdxPointSet = geoPair.first->getGlobalIndex();
         const auto geomIdxMesh     = geoPair.second->getGlobalIndex();
         size_t     writeIdx        = 0;
-        for (size_t readIdx = 0; readIdx < collisionData->VTColData.getSize(); ++readIdx)
+
+        // Check if the first data elemnt is valid
+        if (pointStillColliding(collisionData->VTColData[0].vertexIdx, geomIdxPointSet, geomIdxMesh))
         {
-            const auto& vt = collisionData->VTColData[readIdx];
-            if (pointStillColliding(vt.vertexIdx, geomIdxPointSet, geomIdxMesh))
+            ++writeIdx;
+        }
+
+        // From the second data element, check for valid and duplication
+        for (size_t readIdx = 1; readIdx < collisionData->VTColData.getSize(); ++readIdx)
+        {
+            const auto& vtPrevValid = collisionData->VTColData[writeIdx - 1];
+            const auto& vt          = collisionData->VTColData[readIdx];
+            if (pointStillColliding(vt.vertexIdx, geomIdxPointSet, geomIdxMesh)
+                && vt.vertexIdx != vtPrevValid.vertexIdx)
             {
                 if (readIdx != writeIdx)
                 {
@@ -289,13 +313,6 @@ OctreeBasedCD::checkNonPointWithSubtree(OctreeNode* const pNode, OctreePrimitive
                                            lowerCornerIter[2], upperCornerIter[2]))
                     {
                         checkNonPointWithPrimitive(pPrimitive, pIter, collisionAssociatedData);
-                        //
-                        //
-                        // TODO: May not check here, but collect into an array
-                        //
-                        //
-                        //
-                        //                });
                     }
                 }
             }

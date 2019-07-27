@@ -56,12 +56,22 @@ public:
     virtual void clear() override;
 
     ///
+    /// \brief Get number of collision pairs that have been added to the octree
+    ///
+    size_t getNumCollisionPairs() const { return m_vCollidingGeomPairs.size(); }
+
+    ///
+    /// \brief Check if the collision pair has previously been added to the octree
+    ///
+    bool hasCollisionPair(const uint32_t geomIdx1, const uint32_t geomIdx2);
+
+    ///
     /// \brief Define a collision pair between two geometry objects
     /// The collisionType parameter must be valid (no check), otherwise will result in undefined behaviors
     ///
-    ///
     void addCollisionPair(const std::shared_ptr<Geometry>& geom1, const std::shared_ptr<Geometry>& geom2,
-                          const CollisionDetection::Type collisionType);
+                          const CollisionDetection::Type collisionType,
+                          const std::shared_ptr<CollisionData>& collisionData = std::make_shared<CollisionData>());
 
     ///
     /// \brief Get pairs of geometries from the added collision pairs
