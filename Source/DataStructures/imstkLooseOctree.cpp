@@ -409,7 +409,6 @@ LooseOctree::clear()
     {
         clearPrimitive(static_cast<OctreePrimitiveType>(type));
     }
-
     // Remove all geometry pointers
     m_sGeometryIndices.clear();
 
@@ -549,8 +548,7 @@ LooseOctree::addAnalyticalGeometry(const std::shared_ptr<Geometry>& geometry)
 void
 LooseOctree::addGeometry(const uint32_t geomIdx)
 {
-    LOG_IF(FATAL, (m_sGeometryIndices.find(geomIdx) != m_sGeometryIndices.end()))
-        << "Geometry has previously been added";
+    LOG_IF(FATAL, (hasGeometry(geomIdx))) << "Geometry has previously been added";
     m_sGeometryIndices.insert(geomIdx);
 }
 
@@ -647,7 +645,10 @@ LooseOctree::build()
 void
 LooseOctree::update()
 {
-    LOG_IF(FATAL, (!m_bCompleteBuild)) << "Tree must be built before calling to update()";
+    if (!m_bCompleteBuild)
+    {
+        build();
+    }
     (!m_bAlwaysRebuild) ? incrementalUpdate() : rebuild();
 }
 

@@ -46,6 +46,7 @@ class DebugRenderGeometry;
 ///
 /// \brief The OctreePrimitiveType enum
 /// Type of primitive stored in the octree
+/// \todo Add line primitive to geometry
 ///
 enum OctreePrimitiveType
 {
@@ -289,8 +290,11 @@ private:
     /// Count the number of (classified) primitives stored in this node
     uint32_t m_PrimitiveCounts[OctreePrimitiveType::NumPrimitiveTypes];
 
-    ParallelUtils::SpinLock m_PrimitiveLock[OctreePrimitiveType::NumPrimitiveTypes]; ///> Mutex lock for thread-safe primitive list modification
-    ParallelUtils::SpinLock m_NodeSplitingLock;                                      ///> Mutex lock for thread-safe splitting node
+    /// Mutex lock for thread-safe primitive list modification
+    ParallelUtils::SpinLock m_PrimitiveLock[OctreePrimitiveType::NumPrimitiveTypes];
+
+    /// Mutex lock for thread-safe splitting node
+    ParallelUtils::SpinLock m_NodeSplitingLock;
 };
 
 ///
@@ -386,6 +390,16 @@ public:
     /// \brief Count the maximum number of primitives stored in a tree node
     ///
     uint32_t getMaxNumPrimitivesInNodes() const;
+
+    ///
+    /// \brief Get number of geometries that have been added to the octree
+    ///
+    size_t getNumGeometries() const { return m_sGeometryIndices.size(); }
+
+    ///
+    /// \brief Check if a geometry with the given geometry index has been added to the octree before
+    ///
+    bool hasGeometry(uint32_t geomIdx) const { return m_sGeometryIndices.find(geomIdx) != m_sGeometryIndices.end(); }
 
     ///
     /// \brief Add a PointSet geometry into the tree
