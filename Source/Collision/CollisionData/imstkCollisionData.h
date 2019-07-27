@@ -22,6 +22,7 @@
 #pragma once
 
 #include <array>
+#include <algorithm>
 
 #include "imstkMath.h"
 #include "imstkLogUtility.h"
@@ -69,6 +70,11 @@ public:
 #endif
         m_Data[idx] = data;
     }
+
+    ///
+    /// \brief Sort the collision data using the provided compare function
+    template<class Comp>
+    void sort(Comp&& comp) { std::sort(m_Data.begin(), m_Data.end(), comp); }
 
     ///
     /// \brief Check if the data array is emtpy
