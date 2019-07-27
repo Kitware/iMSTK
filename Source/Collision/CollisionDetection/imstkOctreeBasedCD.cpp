@@ -184,10 +184,9 @@ OctreeBasedCD::detectCollision()
         // From the second data element, check for valid and duplication
         for (size_t readIdx = 1; readIdx < collisionData->VTColData.getSize(); ++readIdx)
         {
-            const auto& vtPrevValid = collisionData->VTColData[writeIdx - 1];
-            const auto& vt          = collisionData->VTColData[readIdx];
+            const auto& vt = collisionData->VTColData[readIdx];
             if (pointStillColliding(vt.vertexIdx, geomIdxPointSet, geomIdxMesh)
-                && vt.vertexIdx != vtPrevValid.vertexIdx)
+                && (writeIdx == 0 || collisionData->VTColData[writeIdx - 1].vertexIdx != vt.vertexIdx))
             {
                 if (readIdx != writeIdx)
                 {

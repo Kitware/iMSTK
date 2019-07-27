@@ -21,6 +21,7 @@
 
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionData.h"
+#include "imstkOctreeBasedCD.h"
 
 // Points to objects
 #include "imstkPointSetToCapsuleCD.h"
@@ -97,17 +98,23 @@ CollisionDetection::makeCollisionDetectionObject(const Type                     
     }
     case Type::PointSetToSurfaceMesh:
     {
-        auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
-        auto triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+        const auto& geomA    = objA->getCollidingGeometry();
+        const auto& geomB    = objB->getCollidingGeometry();
+        auto        pointset = std::dynamic_pointer_cast<PointSet>(geomA);
+        auto        triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, triMesh)
+        addCollisionPairToOctree(geomA, geomB, type, colData);
         return std::make_shared<PointSetToSurfaceMeshCD>(pointset, triMesh, colData);
     }
     // Mesh to mesh
     case Type::SurfaceMeshToSurfaceMesh:
     {
-        auto meshA = std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry());
-        auto meshB = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+        const auto& geomA = objA->getCollidingGeometry();
+        const auto& geomB = objB->getCollidingGeometry();
+        auto        meshA = std::dynamic_pointer_cast<SurfaceMesh>(geomA);
+        auto        meshB = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(meshA, meshB)
+        addCollisionPairToOctree(geomA, geomB, type, colData);
         return std::make_shared<SurfaceMeshToSurfaceMeshCD>(meshA, meshB, colData);
     }
     case Type::SurfaceMeshToSurfaceMeshCCD:
@@ -168,4 +175,54 @@ CollisionDetection::CollisionDetection(const CollisionDetection::Type& type, std
 {
     m_colData = (colData == nullptr) ? std::make_shared<CollisionData>() : colData;
 }
+
+// Static functions ==>
+void
+CollisionDetection::addCollisionPairToOctree(const std::shared_ptr<Geometry>&      geomA,
+                                             const std::shared_ptr<Geometry>&      geomB,
+                                             const Type                            collisionType,
+                                             const std::shared_ptr<CollisionData>& collisionData)
+{
+    auto addToOctree =
+        [&](const std::shared_ptr<Geometry>& geom) {
+            if (!s_OctreeCD->hasGeometry(geom->getGlobalIndex()))
+            {
+                if (geom->getType() == Geometry::Type::PointSet)
+                {
+                    s_OctreeCD->addPointSet(std::dynamic_pointer_cast<PointSet>(geom));
+                }
+                else if (geom->getType() == Geometry::Type::SurfaceMesh)
+                {
+                    s_OctreeCD->addTriangleMesh(std::dynamic_pointer_cast<SurfaceMesh>(geom));
+                }
+                else
+                {
+                    s_OctreeCD->addAnalyticalGeometry(geom);
+                }
+            }
+        };
+
+    addToOctree(geomA);
+    addToOctree(geomB);
+    s_OctreeCD->addCollisionPair(geomA, geomB, collisionType, collisionData);
+}
+
+void
+CollisionDetection::updateInternalOctreeAndDetectCollision()
+{
+    if (s_OctreeCD->getNumCollisionPairs() > 0)
+    {
+        s_OctreeCD->update();
+        s_OctreeCD->detectCollision();
+    }
+}
+
+void
+CollisionDetection::clearInternalOctree()
+{
+    s_OctreeCD->clear();
+}
+
+// Static octree
+std::shared_ptr<OctreeBasedCD> CollisionDetection::s_OctreeCD = std::make_shared<OctreeBasedCD>(Vec3d(0, 0, 0), 100.0, 0.1, 1);
 }

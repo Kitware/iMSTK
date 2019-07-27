@@ -42,17 +42,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    PointSetToSurfaceMeshCD(std::shared_ptr<PointSet>      pointset,
-                            std::shared_ptr<SurfaceMesh>   triMesh,
-                            std::shared_ptr<CollisionData> colData);
+    PointSetToSurfaceMeshCD(const std::shared_ptr<PointSet>&      pointset,
+                            const std::shared_ptr<SurfaceMesh>&   surfMesh,
+                            const std::shared_ptr<CollisionData>& colData);
 
     ///
     /// \brief Detect collision and compute collision data
+    /// Do nothing here, as the collision detection is performed by a static octree,
+    /// which is a static member of CollisionDetection class
     ///
-    void computeCollisionData() override;
-
-private:
-    std::shared_ptr<PointSet>    m_pointset;
-    std::shared_ptr<SurfaceMesh> m_triMesh;
+    void computeCollisionData() override {}
 };
 }

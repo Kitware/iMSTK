@@ -20,37 +20,24 @@
 =========================================================================*/
 
 #include "imstkPointSetToSurfaceMeshCD.h"
-#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkOctreeBasedCD.h"
 
 namespace imstk
 {
-PointSetToSurfaceMeshCD::PointSetToSurfaceMeshCD(std::shared_ptr<PointSet>      pointset,
-                                                 std::shared_ptr<SurfaceMesh>   triMesh,
-                                                 std::shared_ptr<CollisionData> colData) :
-    CollisionDetection(CollisionDetection::Type::PointSetToSurfaceMesh, colData),
-    m_pointset(pointset), m_triMesh(triMesh)
+PointSetToSurfaceMeshCD::PointSetToSurfaceMeshCD(const std::shared_ptr<PointSet>&      pointset,
+                                                 const std::shared_ptr<SurfaceMesh>&   triMesh,
+                                                 const std::shared_ptr<CollisionData>& colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToSurfaceMesh, colData)
 {
-}
-
-void
-PointSetToSurfaceMeshCD::computeCollisionData()
-{
-    m_colData->clearAll();
-
-    // This is brute force collision detection
-    // \todo replace by octree
-    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointset->getVertexPositions().size()),
-        [&](const unsigned int idx)
-        {
-            const auto& point = m_pointset->getVertexPosition(idx);
-            for (unsigned int idx2 = 0; idx2 < static_cast<unsigned int>(m_triMesh->getNumVertices()); ++idx2)
-            {
-                NarrowPhaseCD::pointToTriangle(point, idx, idx2, m_triMesh.get(), m_colData);
-            }
-       });
+    if (!s_OctreeCD->hasCollisionPair(pointset->getGlobalIndex(), triMesh->getGlobalIndex()))
+    {
+        addCollisionPairToOctree(std::static_pointer_cast<Geometry>(pointset),
+                                 std::static_pointer_cast<Geometry>(triMesh),
+                                 getType(),
+                                 colData);
+    }
 }
 } // imstk
