@@ -21,7 +21,7 @@
 
 #pragma once
 
-// TODO: Remove this in TBB 2019 Update 4: https://github.com/intel/tbb/blob/tbb_2019/CHANGES#L117
+/// \todo Remove this in TBB 2019 Update 4: https://github.com/intel/tbb/blob/tbb_2019/CHANGES#L117
 #define TBB_PREVIEW_GLOBAL_CONTROL 1
 
 #include <tbb/tbb.h>

@@ -30,7 +30,7 @@ namespace imstk
 ///
 /// \struct stdSink
 ///
-/// \brief
+/// \brief A standard sink that prints the message to a standard output
 ///
 struct stdSink
 {

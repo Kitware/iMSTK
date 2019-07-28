@@ -136,7 +136,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     // Create a fluids object
     auto fluidObj = std::make_shared<SPHObject>("Sphere");
 
-    // Create a visiual model
+    // Create a visual model
     auto fluidVisualModel = std::make_shared<VisualModel>(fluidGeometry);
     auto fluidMaterial    = std::make_shared<RenderMaterial>();
     fluidMaterial->setColor(Color::Blue);
@@ -152,14 +152,14 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     sphParams->m_bNormalizeDensity = true;
     if (SCENE_ID == 2)   // highly viscous fluid
     {
-        sphParams->m_RatioKernelOverParticleRadius = 6.0;
-        sphParams->m_ViscosityFluid          = 0.5;
-        sphParams->m_SurfaceTensionStiffness = 5.0;
+        sphParams->m_kernelOverParticleRadiusRatio = 6.0;
+        sphParams->m_viscosityCoeff                = 0.5;
+        sphParams->m_surfaceTensionStiffness       = 5.0;
     }
 
     if (SCENE_ID == 3)   // bunny-shaped fluid
     {
-        sphParams->m_BoundaryFriction = 0.3;
+        sphParams->m_frictionBoundary= 0.3;
     }
 
     sphModel->configure(sphParams);

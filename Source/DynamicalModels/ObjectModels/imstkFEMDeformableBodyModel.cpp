@@ -250,7 +250,7 @@ FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 
     this->initializeEigenMatrixFromVegaMatrix(*vegaMatrix, m_M);
 
-    // TODO: Add option to save mass matrix to file
+    /// \todo Add option to save mass matrix to file
 
     return true;
 }

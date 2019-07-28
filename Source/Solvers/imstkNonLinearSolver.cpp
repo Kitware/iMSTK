@@ -46,7 +46,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
     /// Initialize temporaries
     if (!m_nonLinearSystem)
     {
-        // TODO: log this
+        /// \todo log this
         return previousFnorm;
     }
 
@@ -55,7 +55,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
     // Exit if the function norm satisfies the Armijo-Goldstein condition
     if (currentFnorm < (1.0 - m_alpha * lambda[0]) * previousFnorm)
     {
-        // TODO: Log this
+        /// \todo Log this
         return currentFnorm;
     }
 
@@ -76,7 +76,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
         // Exit if the function norm satisfies the Armijo-Goldstein condition
         if (currentFnorm < (1.0 - m_alpha * lambda[0]) * previousFnorm)
         {
-            // TODO: Log this
+            /// \todo Log this
             return currentFnorm;
         }
 
@@ -90,7 +90,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 
     if (i == m_armijoMax)
     {
-        // TODO: Add to logger
+        /// \todo Add to logger
 //         std::cout << "Maximum number of Armijo iterations reached." << std::endl;
     }
     return currentFnorm;

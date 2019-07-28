@@ -36,8 +36,6 @@ enum class DynamicalModelType
     elastoDynamics,
     positionBasedDynamics,
     SPH,
-    NavierStokes,
-    HeatEquation,
     none
 };
 

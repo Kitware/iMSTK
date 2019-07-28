@@ -23,6 +23,8 @@
 
 #include <iostream>
 
+/// \todo remove nameless union/struct in the future
+#pragma warning(disable : 4201)
 namespace imstk
 {
 ///
@@ -102,4 +104,5 @@ struct Color
     static Color Orange;
     static Color Yellow;
 };
+#pragma warning(default : 4201)
 }

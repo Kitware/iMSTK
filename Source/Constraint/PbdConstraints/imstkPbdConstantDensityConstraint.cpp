@@ -33,7 +33,7 @@ PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double)
 
     // constraint parameters
     // Refer: Miller, et al 2003 "Particle-Based Fluid Simulation for Interactive Applications."
-    // TODO: Check if these numbers can be variable
+    /// \todo Check if these numbers can be variable
     m_wPoly6Coeff = 315.0 / (64.0 * PI * pow(m_maxDist, 9));
     m_wSpikyCoeff = 15.0 / (PI * pow(m_maxDist, 6));
 

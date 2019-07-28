@@ -95,7 +95,7 @@ BoneDrillingCH::erodeBone()
 
             if (m_nodalDensity[cd.nodeIdx] <= 0.)
             {
-                // TODO: Unused variable, maybe used in furture?
+                /// \todo Unused variable, maybe used in furture?
                 // lock.lock();
                 // m_erodedNodes.push_back(cd.nodeId);
                 // lock.unlock();

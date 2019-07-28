@@ -393,7 +393,8 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
         && m_mesh->getType() != Geometry::Type::HexahedralMesh
         && m_mesh->getType() != Geometry::Type::PointSet)
     {
-        LOG(WARNING) << "Constant constraint should come with a mesh";          //TODO: Really only need a point cloud, so may need to change this.
+        //\todo Really only need a point cloud, so may need to change this.
+        LOG(WARNING) << "Constant constraint should come with a mesh!";
         return false;
     }
 

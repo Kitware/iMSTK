@@ -42,7 +42,7 @@ SPHCollisionHandling::processCollisionData()
     LOG_IF(FATAL, (!SPHModel)) << "SPH model was not initialized";
 #endif
 
-    const auto boundaryFriction = m_SPHObject->getSPHModel()->getParameters()->m_BoundaryFriction;
+    const auto boundaryFriction = m_SPHObject->getSPHModel()->getParameters()->m_frictionBoundary;
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     LOG_IF(FATAL, (boundaryFriction<0.0 || boundaryFriction>1.0))
         << "Invalid boundary friction coefficient (value must be in [0, 1])";
