@@ -7,6 +7,8 @@ imstk_add_library( Solvers
     Core
     Datastructures
     Constraints
+    DynamicalModels
+    SceneElements
   )
 
 #-----------------------------------------------------------------------------
