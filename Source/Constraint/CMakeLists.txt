@@ -6,8 +6,6 @@ imstk_add_library( Constraints
   DEPENDS
     Core
     Geometry
-    SceneElements
-    DynamicalModels
   )
 
 #-----------------------------------------------------------------------------
