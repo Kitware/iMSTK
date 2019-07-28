@@ -32,6 +32,8 @@ namespace imstk
 class CollidingObject;
 class PbdObject;
 class PbdCollisionConstraint;
+class PbdEdgeEdgeConstraint;
+class PbdPointTriangleConstraint;
 class PbdSolver;
 struct CollisionData;
 
@@ -42,7 +44,7 @@ struct CollisionData;
 ///
 class PBDCollisionHandling : public CollisionHandling
 {
-typedef std::vector<std::shared_ptr<PbdCollisionConstraint>> PBDConstraintVector;
+typedef std::vector<PbdCollisionConstraint*> PBDConstraintVector;
 public:
 
     ///
@@ -61,9 +63,9 @@ public:
     PBDCollisionHandling() = delete;
 
     ///
-    /// \brief Destructor
+    /// \brief Destructor, clear memory pool
     ///
-    ~PBDCollisionHandling() = default;
+    virtual ~PBDCollisionHandling() override;
 
     ///
     /// \brief Compute forces based on collision data
@@ -81,5 +83,8 @@ private:
     std::shared_ptr<PbdObject> m_pbdObject2;     ///> PBD object
     PBDConstraintVector        m_PBDConstraints; ///> List of PBD constraints
     std::shared_ptr<PbdSolver> m_PBDSolver;      /// The Solver for the collision constraints
+
+    std::vector<PbdEdgeEdgeConstraint*>      m_EEConstraintPool;
+    std::vector<PbdPointTriangleConstraint*> m_VTConstraintPool;
 };
 }
