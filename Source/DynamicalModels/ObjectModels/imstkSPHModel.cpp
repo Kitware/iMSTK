@@ -415,7 +415,7 @@ SPHModel::computeSurfaceTension()
                 const auto K_ij = Real(2) * m_modelParameters->m_restDensity / (pdensity + qdensity);
 
                 // Cohesion acc
-                auto r = qInfo.xpq;
+                const auto r = qInfo.xpq;
                 const auto d2 = r.squaredNorm();
                 if (d2 > Real(1e-20))
                 {

@@ -38,17 +38,17 @@ PbdSolver::solve()
 void
 PbdSolver::resolveCollisionConstraints()
 {
-    if (m_PBDConstraints != nullptr)
+    if (m_PBDConstraints.size() > 0)
     {
-        unsigned int maxIter = 2;
-        if (!m_PBDConstraints->empty())
+        uint32_t maxIter = 3u;
+        uint32_t i       = 0;
+        while (++i < maxIter)
         {
-            unsigned int i = 0;
-            while (++i < maxIter)
+            for (const auto constraintList : m_PBDConstraints)
             {
-                for (size_t k = 0; k < m_PBDConstraints->size(); ++k)
+                for (size_t k = 0; k < constraintList->size(); ++k)
                 {
-                    (*m_PBDConstraints)[k]->solvePositionConstraint();
+                    (*constraintList)[k]->solvePositionConstraint();
                 }
             }
         }

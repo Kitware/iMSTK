@@ -41,17 +41,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    SurfaceMeshToSurfaceMeshCD(std::shared_ptr<SurfaceMesh>   meshA,
-                               std::shared_ptr<SurfaceMesh>   meshB,
-                               std::shared_ptr<CollisionData> colData);
+    SurfaceMeshToSurfaceMeshCD(const std::shared_ptr<SurfaceMesh>&   meshA,
+                               const std::shared_ptr<SurfaceMesh>&   meshB,
+                               const std::shared_ptr<CollisionData>& colData);
 
     ///
     /// \brief Detect collision and compute collision data
+    /// Do nothing here, as the collision detection is performed by a static octree,
+    /// which is a static member of CollisionDetection class
     ///
-    void computeCollisionData() override;
-
-private:
-    std::shared_ptr<SurfaceMesh> m_meshA;
-    std::shared_ptr<SurfaceMesh> m_meshB;
+    void computeCollisionData() override {}
 };
 }

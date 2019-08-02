@@ -323,6 +323,9 @@ Scene::advance()
         controller->updateControlledObjects();
     }
 
+    // Update the static octree and perform collision detection for some collision pairs
+    CollisionDetection::updateInternalOctreeAndDetectCollision();
+
     // Compute collision data per interaction pair
     for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
     {

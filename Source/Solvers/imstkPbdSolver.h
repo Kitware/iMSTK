@@ -25,6 +25,8 @@
 #include "imstkPbdObject.h"
 #include "imstkGraph.h"
 
+#include <unordered_set>
+
 namespace imstk
 {
 class PbdObject;
@@ -36,7 +38,7 @@ class PbdCollisionConstraint;
 ///
 class PbdSolver : public SolverBase
 {
-typedef std::vector<std::shared_ptr<PbdCollisionConstraint>> PBDConstraintVector;
+using PBDConstraintVector = std::vector<PbdCollisionConstraint*>;
 
 public:
     ///
@@ -71,7 +73,7 @@ public:
     ///
     /// \brief Add the global collision contraints to this solver
     ///
-    void addCollisionConstraints(PBDConstraintVector* constraints) { m_PBDConstraints = constraints; }
+    void addCollisionConstraints(PBDConstraintVector* constraints) { m_PBDConstraints.insert(constraints); }
 
     ///
     /// \brief Solve the global collision contraints charged to this solver
@@ -79,8 +81,8 @@ public:
     void resolveCollisionConstraints();
 
 private:
-    size_t m_maxIterations = 20;                           ///< Maximum number of NL Gauss-Seidel iterations
-    PBDConstraintVector*       m_PBDConstraints = nullptr; /// collision contraints charged to this solver
+    size_t m_maxIterations = 20;                               ///< Maximum number of NL Gauss-Seidel iterations
+    std::unordered_set<PBDConstraintVector*> m_PBDConstraints; ///< Collision contraints charged to this solver
     std::shared_ptr<PbdObject> m_pbdObject;
 };
 } // imstk

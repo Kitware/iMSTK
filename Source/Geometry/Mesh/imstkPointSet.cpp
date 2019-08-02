@@ -53,14 +53,15 @@ PointSet::print() const
 }
 
 void
-PointSet::computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent) const
+PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
 {
-    ParallelUtils::findAABB(m_vertexPositions, min, max);
+    updatePostTransformData();
+    ParallelUtils::findAABB(m_vertexPositions, lowerCorner, upperCorner);
     if (paddingPercent > 0.0)
     {
-        Vec3d range = max - min;
-        min = min - range * (paddingPercent / 100.0);
-        max = max + range * (paddingPercent / 100.0);
+        const Vec3d range = upperCorner - lowerCorner;
+        lowerCorner = lowerCorner - range * (paddingPercent / 100.0);
+        upperCorner = upperCorner + range * (paddingPercent / 100.0);
     }
 }
 

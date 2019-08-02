@@ -23,14 +23,14 @@
 
 namespace imstk
 {
-std::shared_ptr<Geometry>
+const std::shared_ptr<Geometry>&
 CollidingObject::getCollidingGeometry() const
 {
     return m_collidingGeometry;
 }
 
 void
-CollidingObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
+CollidingObject::setCollidingGeometry(const std::shared_ptr<Geometry>& geometry)
 {
     m_collidingGeometry = geometry;
 }

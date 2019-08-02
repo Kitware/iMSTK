@@ -29,7 +29,7 @@ namespace imstk
 {
 class Geometry;
 class SurfaceMesh;
-class CollisionData;
+struct CollisionData;
 
 ///
 /// \class MeshToMeshBruteForceCD

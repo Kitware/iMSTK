@@ -19,23 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkSurfaceMeshToSurfaceMeshCD.h"
-#include "imstkNarrowPhaseCD.h"
+#include "imstkPointSetToSurfaceMeshCD.h"
 #include "imstkCollisionData.h"
+#include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkOctreeBasedCD.h"
 
 namespace imstk
 {
-SurfaceMeshToSurfaceMeshCD::SurfaceMeshToSurfaceMeshCD(const std::shared_ptr<SurfaceMesh>&   meshA,
-                                                       const std::shared_ptr<SurfaceMesh>&   meshB,
-                                                       const std::shared_ptr<CollisionData>& colData) :
-    CollisionDetection(CollisionDetection::Type::SurfaceMeshToSurfaceMesh, colData)
+PointSetToSurfaceMeshCD::PointSetToSurfaceMeshCD(const std::shared_ptr<PointSet>&      pointset,
+                                                 const std::shared_ptr<SurfaceMesh>&   triMesh,
+                                                 const std::shared_ptr<CollisionData>& colData) :
+    CollisionDetection(CollisionDetection::Type::PointSetToSurfaceMesh, colData)
 {
-    if (!s_OctreeCD->hasCollisionPair(meshA->getGlobalIndex(), meshB->getGlobalIndex()))
+    if (!s_OctreeCD->hasCollisionPair(pointset->getGlobalIndex(), triMesh->getGlobalIndex()))
     {
-        addCollisionPairToOctree(std::static_pointer_cast<Geometry>(meshA),
-                                 std::static_pointer_cast<Geometry>(meshB),
+        addCollisionPairToOctree(std::static_pointer_cast<Geometry>(pointset),
+                                 std::static_pointer_cast<Geometry>(triMesh),
                                  getType(),
                                  colData);
     }

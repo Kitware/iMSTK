@@ -75,9 +75,9 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
 
     n /= 2 * A;
 
-    const auto grad0 = e2.cross(n);
-    const auto grad1 = e3.cross(n);
-    const auto grad2 = e1.cross(n);
+    const Vec3d grad0 = e2.cross(n);
+    const Vec3d grad1 = e3.cross(n);
+    const Vec3d grad2 = e1.cross(n);
 
     auto lambda = im0 * grad0.squaredNorm() + im1 * grad1.squaredNorm() + im2 * grad2.squaredNorm();
 

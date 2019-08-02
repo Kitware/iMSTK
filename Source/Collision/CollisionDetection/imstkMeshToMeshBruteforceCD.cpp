@@ -80,7 +80,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                                        m_proximityTolerance,
                                        m_proximityTolerance))
                 {
-                    m_colData->TVColData.safeAppend({ static_cast<unsigned int>(j), static_cast<unsigned int>(i), 0.0 });
+                    m_colData->VTColData.safeAppend({ static_cast<unsigned int>(i), static_cast<unsigned int>(j), 0.0 });
                 }
             }
         }
@@ -167,7 +167,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    m_colData->TVColData.safeAppend({ static_cast<unsigned int>(j), static_cast<unsigned int>(i), 0.0 });
+                    m_colData->VTColData.safeAppend({ static_cast<unsigned int>(i), static_cast<unsigned int>(j), 0.0 });
                 }
             }
         }
@@ -195,7 +195,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    m_colData->TVColData.safeAppend({ static_cast<unsigned int>(j), static_cast<unsigned int>(i), 0.0 });
+                    m_colData->VTColData.safeAppend({ static_cast<unsigned int>(i), static_cast<unsigned int>(j), 0.0 });
                 }
             }
         }

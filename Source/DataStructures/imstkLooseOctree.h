@@ -33,6 +33,7 @@
 #include <unordered_set>
 #include <vector>
 
+#pragma warning(disable : 4201)
 namespace imstk
 {
 class OctreeNode;
@@ -45,6 +46,7 @@ class DebugRenderGeometry;
 ///
 /// \brief The OctreePrimitiveType enum
 /// Type of primitive stored in the octree
+/// \todo Add line primitive to geometry
 ///
 enum OctreePrimitiveType
 {
@@ -55,21 +57,24 @@ enum OctreePrimitiveType
 };
 
 ///
-/// \brief The OctreePrimitiveData struct
+/// \brief The OctreePrimitive struct
 /// For each octree primitive (point/triangle/analytical geometry), store its relevant data
 ///
-struct OctreePrimitiveData
+struct OctreePrimitive
 {
-    OctreePrimitiveData() : m_pGeometry(nullptr), m_GeomIdx(0), m_Idx(0) {}
-    OctreePrimitiveData(Geometry* const pGeometry, const uint32_t geomIdx, const uint32_t idx = 0) :
+    OctreePrimitive(const OctreePrimitive&) = delete;
+    OctreePrimitive& operator=(const OctreePrimitive&) = delete;
+
+    OctreePrimitive() : m_pGeometry(nullptr), m_GeomIdx(0), m_Idx(0) {}
+    OctreePrimitive(Geometry* const pGeometry, const uint32_t geomIdx, const uint32_t idx = 0) :
         m_pGeometry(pGeometry), m_GeomIdx(geomIdx), m_Idx(idx) {}
 
-    Geometry* const m_pGeometry;            ///> Pointer to the parent geometry that the primitive belong to
-    const uint32_t m_GeomIdx;               ///> Global index of the parent geometry
-    const uint32_t m_Idx;                   ///> Index of the primitive in the parent geometry (such as index of the triangle in a mesh)
+    Geometry* const m_pGeometry;        ///> Pointer to the parent geometry that the primitive belong to
+    const uint32_t m_GeomIdx;           ///> Global index of the parent geometry
+    const uint32_t m_Idx;               ///> Index of the primitive in the parent geometry (such as index of the triangle in a mesh)
 
-    OctreeNode* m_pNode          = nullptr; ///> Pointer to the octree node containing the primitive
-    OctreePrimitiveData* m_pNext = nullptr; ///> Pointer to the next node in the primitive list of the octree node
+    OctreeNode* m_pNode      = nullptr; ///> Pointer to the octree node containing the primitive
+    OctreePrimitive* m_pNext = nullptr; ///> Pointer to the next node in the primitive list of the octree node
 
     union
     {
@@ -98,8 +103,12 @@ struct OctreeNodeBlock;
 class OctreeNode
 {
 friend class LooseOctree;
+friend class OctreeBasedCD;
 friend class LooseOctreeTest;
 public:
+    OctreeNode(const OctreeNode&) = delete;
+    OctreeNode& operator=(const OctreeNode&) = delete;
+
     ///
     /// \brief Dummy constructor, called only during memory allocation in memory pool
     ///
@@ -132,7 +141,7 @@ public:
     ///
     /// \brief For the given primitive type, return the head node of the primitive list of that type
     ///
-    OctreePrimitiveData* getPrimitiveList(const OctreePrimitiveType type) const { return m_pPrimitiveListHeads[type]; }
+    OctreePrimitive* getPrimitiveList(const OctreePrimitiveType type) const { return m_pPrimitiveListHeads[type]; }
 
     ///
     /// \brief Get the number of primitives of the given type in this node
@@ -165,17 +174,17 @@ public:
     ///
     /// \brief Keep the primitive at this node as cannot pass it down further to any child node
     ///
-    void keepPrimitive(OctreePrimitiveData* const pPrimitive, const OctreePrimitiveType type);
+    void keepPrimitive(OctreePrimitive* const pPrimitive, const OctreePrimitiveType type);
 
     ///
     /// \brief Insert a point primitive into the subtree in a top-down manner
     ///
-    void insertPoint(OctreePrimitiveData* const pPrimitive);
+    void insertPoint(OctreePrimitive* const pPrimitive);
 
     ///
     /// \brief Insert a non-point primitive into the subtree in a top-down manner
     ///
-    void insertNonPointPrimitive(OctreePrimitiveData* const pPrimitive, const OctreePrimitiveType type);
+    void insertNonPointPrimitive(OctreePrimitive* const pPrimitive, const OctreePrimitiveType type);
 
     ///
     /// \brief Check if the given point is contained exactly in the node boundary (bounding box)
@@ -276,13 +285,16 @@ private:
     bool           m_bIsLeaf = true;        ///> True if this node does not have any child node (a node should have either 0 or 8 children)
 
     /// Heads of the link lists storing (Classified) primitives
-    OctreePrimitiveData* m_pPrimitiveListHeads[OctreePrimitiveType::NumPrimitiveTypes];
+    OctreePrimitive* m_pPrimitiveListHeads[OctreePrimitiveType::NumPrimitiveTypes];
 
     /// Count the number of (classified) primitives stored in this node
     uint32_t m_PrimitiveCounts[OctreePrimitiveType::NumPrimitiveTypes];
 
-    ParallelUtils::SpinLock m_PrimitiveLock[OctreePrimitiveType::NumPrimitiveTypes]; ///> Mutex lock for thread-safe primitive list modification
-    ParallelUtils::SpinLock m_NodeSplitingLock;                                      ///> Mutex lock for thread-safe splitting node
+    /// Mutex lock for thread-safe primitive list modification
+    ParallelUtils::SpinLock m_PrimitiveLock[OctreePrimitiveType::NumPrimitiveTypes];
+
+    /// Mutex lock for thread-safe splitting node
+    ParallelUtils::SpinLock m_NodeSplitingLock;
 };
 
 ///
@@ -378,6 +390,16 @@ public:
     /// \brief Count the maximum number of primitives stored in a tree node
     ///
     uint32_t getMaxNumPrimitivesInNodes() const;
+
+    ///
+    /// \brief Get number of geometries that have been added to the octree
+    ///
+    size_t getNumGeometries() const { return m_sGeometryIndices.size(); }
+
+    ///
+    /// \brief Check if a geometry with the given geometry index has been added to the octree before
+    ///
+    bool hasGeometry(uint32_t geomIdx) const { return m_sGeometryIndices.find(geomIdx) != m_sGeometryIndices.end(); }
 
     ///
     /// \brief Add a PointSet geometry into the tree
@@ -481,7 +503,7 @@ protected:
     ///
     /// \brief Compute the AABB bounding box of a non-point primitive
     ///
-    void computePrimitiveBoundingBox(OctreePrimitiveData* const pPrimitive, const OctreePrimitiveType type);
+    void computePrimitiveBoundingBox(OctreePrimitive* const pPrimitive, const OctreePrimitiveType type);
 
     ///
     /// \brief Request a block of 8 tree nodes from memory pool (this is called only during splitting node)
@@ -528,11 +550,11 @@ protected:
     std::vector<OctreeNodeBlock*> m_pNodeBigBlocks;
 
     /// Store pointers of primitives created from geometry elements, such as points, triangles, analytical geometries
-    std::vector<OctreePrimitiveData*> m_vPrimitivePtrs[OctreePrimitiveType::NumPrimitiveTypes];
+    std::vector<OctreePrimitive*> m_vPrimitivePtrs[OctreePrimitiveType::NumPrimitiveTypes];
 
     /// During memory allocation for primitives, multiple primitives are allocated at the same time from a big memory block
     /// This variable store the first address of such big memory block, used during primitive deallocation
-    std::vector<OctreePrimitiveData*> m_pPrimitiveBlocks[OctreePrimitiveType::NumPrimitiveTypes];
+    std::vector<OctreePrimitive*> m_pPrimitiveBlocks[OctreePrimitiveType::NumPrimitiveTypes];
 
     /// List of all indices of the added geometries, to check for duplication such that one geometry cannot be mistakenly added multiple times
     std::unordered_set<uint32_t> m_sGeometryIndices;
@@ -548,3 +570,4 @@ protected:
     bool m_bDrawNonEmptyParent = true;
 };
 } // end namespace imstk
+#pragma warning(default : 4201)

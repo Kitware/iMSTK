@@ -93,10 +93,10 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
         return false;
     }
 
-    const auto grad0 = -(l / A1) * n1;
-    const auto grad1 = -(l / A2) * n2;
-    const auto grad2 = (e.dot(e1) / (A1 * l)) * n1 + (e.dot(e3) / (A2 * l)) * n2;
-    const auto grad3 = (e.dot(e2) / (A1 * l)) * n1 + (e.dot(e4) / (A2 * l)) * n2;
+    const Vec3d grad0 = -(l / A1) * n1;
+    const Vec3d grad1 = -(l / A2) * n2;
+    const Vec3d grad2 = (e.dot(e1) / (A1 * l)) * n1 + (e.dot(e3) / (A2 * l)) * n2;
+    const Vec3d grad3 = (e.dot(e2) / (A1 * l)) * n1 + (e.dot(e4) / (A2 * l)) * n2;
 
     auto lambda = im0 * grad0.squaredNorm() +
                   im1 * grad1.squaredNorm() +

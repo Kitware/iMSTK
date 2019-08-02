@@ -72,7 +72,7 @@ neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vector<si
             }
 
             const auto qpos = particles[q];
-            const auto d2   = (ppos - qpos).squaredNorm();
+            const auto d2   = (Vec3r(ppos - qpos)).squaredNorm();
             if (d2 < radiusSqr)
             {
                 pneighbors.push_back(q);
@@ -139,7 +139,7 @@ neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::ve
         for (size_t q = 0; q < setB.size(); ++q)
         {
             const auto qpos = setB[q];
-            const auto d2   = (ppos - qpos).squaredNorm();
+            const auto d2   = (Vec3r(ppos - qpos)).squaredNorm();
             if (d2 < radiusSqr)
             {
                 pneighbors.push_back(q);

@@ -26,33 +26,31 @@
 
 namespace imstk
 {
-class Geometry;
 class PointSet;
 class SurfaceMesh;
 struct CollisionData;
 
 ///
-/// \class PointSetToTriMeshCD
+/// \class PointSetToSurfaceMeshCD
 ///
-/// \brief PointSet to sphere collision detection
+/// \brief PointSet to surface mesh collision detection
 ///
-class PointSetToVolumeMeshCD : public CollisionDetection
+class PointSetToSurfaceMeshCD : public CollisionDetection
 {
 public:
+
     ///
     /// \brief Constructor
     ///
-    PointSetToVolumeMeshCD(std::shared_ptr<PointSet>      pointset,
-                           std::shared_ptr<SurfaceMesh>   triMesh,
-                           std::shared_ptr<CollisionData> colData);
+    PointSetToSurfaceMeshCD(const std::shared_ptr<PointSet>&      pointset,
+                            const std::shared_ptr<SurfaceMesh>&   surfMesh,
+                            const std::shared_ptr<CollisionData>& colData);
 
     ///
     /// \brief Detect collision and compute collision data
+    /// Do nothing here, as the collision detection is performed by a static octree,
+    /// which is a static member of CollisionDetection class
     ///
-    void computeCollisionData() override;
-
-private:
-    std::shared_ptr<PointSet>    m_pointset;
-    std::shared_ptr<SurfaceMesh> m_triMesh;
+    void computeCollisionData() override {}
 };
 }

@@ -166,7 +166,8 @@ CollisionGraph::getInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B)
     for (const auto& intPair : m_interactionPairList)
     {
         if (intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(A, B)
-            || intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(B, A))
+            /*|| intPair->getObjectsPair() == std::pair<CollidingObjectPtr, CollidingObjectPtr>(B, A)*/
+            )
         {
             return intPair;
         }

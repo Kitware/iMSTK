@@ -170,7 +170,7 @@ pointSegmentClosestDistance(const Vec3r& point, const Vec3r& x1, const Vec3r& x2
         s12 = 1.0;
     }
 
-    return (point - s12 * x1 + (1.0 - s12) * x2).norm();
+    return (point - (s12 * x1 + (1.0 - s12) * x2)).eval().norm();
 }
 
 Real
@@ -190,7 +190,7 @@ pointTriangleClosestDistance(const Vec3r& point, const Vec3r& x1, const Vec3r& x
 
     if (w23 >= 0 && w31 >= 0 && w12 >= 0)  // inside the triangle
     {
-        return (point - w23 * x1 + w31 * x2 + w12 * x3).norm();
+        return (point - (w23 * x1 + w31 * x2 + w12 * x3)).eval().norm();
     }
     else
     {
