@@ -7,6 +7,11 @@
     COMMENT "Run uncrustify - overwrites source files"
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     )
+	
+	#-----------------------------------------------------------------------------
+    # Add the target to iMSTK folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (uncrustifyRun PROPERTIES FOLDER iMSTK)
 
   if(BUILD_TESTING)
     # Add test to check style using uncrustify

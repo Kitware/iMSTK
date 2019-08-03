@@ -91,6 +91,11 @@ macro(imstk_add_external_project extProj)
       DEPENDS ${${extProj}_DEPENDENCIES}  # from parsed argument
       )
       set(${extProj}_DIR ${${extProj}_BINARY_DIR})
+	  
+	#-----------------------------------------------------------------------------
+    # Add the target to ExternalDeps folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (${extProj} PROPERTIES FOLDER ExternalDeps)
 
   #-----------------------------------------------------------------------------
   # If project already built on system

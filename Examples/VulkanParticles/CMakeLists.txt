@@ -25,6 +25,11 @@ if(iMSTK_USE_Vulkan)
     add_executable(${PROJECT_NAME} VulkanParticlesExample.cpp)
 
     #-----------------------------------------------------------------------------
+    # Add the target to Examples folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+
+    #-----------------------------------------------------------------------------
     # Link libraries to executable
     #-----------------------------------------------------------------------------
     target_link_libraries(${PROJECT_NAME} SimulationManager)

@@ -22,6 +22,11 @@ project(Example-ExtractSurface)
 # Create executable
 #-----------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} ExtractSurfaceExample.cpp)
+
+#-----------------------------------------------------------------------------
+# Add the target to Examples folder
+#-----------------------------------------------------------------------------
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
     
 #-----------------------------------------------------------------------------
 # Add shaders

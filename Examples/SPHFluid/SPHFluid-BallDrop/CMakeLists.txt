@@ -24,6 +24,11 @@ project(Example-SPHFluid-BallDrop)
 add_executable(${PROJECT_NAME} SPHFluid-BallDrop.cpp)
 
 #-----------------------------------------------------------------------------
+# Add the target to Examples folder
+#-----------------------------------------------------------------------------
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+
+#-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME} SimulationManager)

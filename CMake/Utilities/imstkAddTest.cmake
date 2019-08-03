@@ -120,6 +120,11 @@ function(imstk_add_test target)
     ${GoogleTest_LIBRARIES}
     Threads::Threads
   )
+  
+  #-----------------------------------------------------------------------------
+  # Add the target to Testing folder
+  #-----------------------------------------------------------------------------
+  SET_TARGET_PROPERTIES (${test_driver_executable} PROPERTIES FOLDER Testing)
 
   #-----------------------------------------------------------------------------
   # Create tests

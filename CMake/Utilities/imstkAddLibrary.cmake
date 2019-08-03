@@ -102,5 +102,12 @@ function(imstk_add_library target)
     LIBRARY DESTINATION ${iMSTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
     ARCHIVE DESTINATION ${iMSTK_INSTALL_LIB_DIR} COMPONENT Development
     )
+	
+	
+
+  #-----------------------------------------------------------------------------
+  # Add the target to imstk folder
+  #-----------------------------------------------------------------------------
+  SET_TARGET_PROPERTIES (${target} PROPERTIES FOLDER iMSTK)
 
 endfunction()

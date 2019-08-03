@@ -24,6 +24,11 @@ project(Example-PBDCollision-OneDragon)
 add_executable(${PROJECT_NAME} PBDCollisionOneDragonExample.cpp)
 
 #-----------------------------------------------------------------------------
+# Add the target to Examples folder
+#-----------------------------------------------------------------------------
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+
+#-----------------------------------------------------------------------------
 # Add shaders
 #-----------------------------------------------------------------------------
 include(imstkCopyAndCompileShaders)
