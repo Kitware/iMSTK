@@ -22,6 +22,11 @@ project(Example-Viewer)
 # Create executable
 #-----------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} ViewerExample.cpp)
+
+#-----------------------------------------------------------------------------
+# Add the target to Examples folder
+#-----------------------------------------------------------------------------
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
     
 #-----------------------------------------------------------------------------
 # Add shaders

@@ -69,4 +69,9 @@ function(imstk_add_data target)
 
   # Add a build target to populate the real data.
   ExternalData_Add_Target(${target}ExternalData)
+  
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples/Data folder
+  #-----------------------------------------------------------------------------
+  SET_TARGET_PROPERTIES (${target}ExternalData PROPERTIES FOLDER Examples/Data)
 endfunction()

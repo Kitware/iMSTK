@@ -23,6 +23,11 @@ if(iMSTK_USE_OMNI)
     # Create executable
     #-----------------------------------------------------------------------------
     add_executable(${PROJECT_NAME} VirtualCouplingExample.cpp)
+
+    #-----------------------------------------------------------------------------
+    # Add the target to Examples folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
     
     #-----------------------------------------------------------------------------
     # Add shaders

@@ -122,3 +122,8 @@ ExternalProject_Add( ${PROJECT_NAME}
     -D${PROJECT_NAME}_ENABLE_VR:BOOL=${${PROJECT_NAME}_ENABLE_VR}
   DEPENDS ${${PROJECT_NAME}_DEPENDENCIES}
   )
+
+	#-----------------------------------------------------------------------------
+    # Add the target to Examples folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER iMSTK)
