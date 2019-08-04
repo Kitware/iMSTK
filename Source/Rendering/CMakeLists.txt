@@ -93,7 +93,8 @@ if( NOT iMSTK_USE_Vulkan )
     VTKRenderer
     VTKRenderer/RenderDelegate)
   set(RENDERING_DEPENDENCIES
-    GUIOverlay)
+    GUIOverlay
+    Materials)
 else()
   set(RENDERING_H_FILES ${VULKAN_H_FILES})
   set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
@@ -105,7 +106,8 @@ else()
     ${VulkanSDK_LIBRARIES}
     glfw
     gli
-    GUIOverlay)
+    GUIOverlay
+    Materials)
   if (iMSTK_ENABLE_VR)
     list(APPEND RENDERING_DEPENDENCIES openvr)
   endif()
