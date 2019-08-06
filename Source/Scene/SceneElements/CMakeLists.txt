@@ -17,7 +17,7 @@ imstk_add_library( SceneElements
     Devices
     TimeIntegrators
     DynamicalModels
-    Solvers
+    #Solvers
     ${iMSTK_ODE_DEPENDS}
   )
 

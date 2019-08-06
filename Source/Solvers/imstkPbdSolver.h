@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkSolverBase.h"
-#include "imstkPbdObject.h"
 #include "imstkGraph.h"
 
 #include <unordered_set>
