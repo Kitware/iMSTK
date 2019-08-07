@@ -80,7 +80,7 @@ main()
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
-        LOG(WARNING) << "Could not read mesh from file.";
+        LOG(FATAL) << "Could not read mesh from file.";
         return 1;
     }
     auto bone = std::make_shared<CollidingObject>("Bone");

@@ -50,7 +50,7 @@ Scene::initialize()
         auto sceneObject = it.second;
         if (!sceneObject->initialize())
         {
-            LOG(WARNING) << "Error initializing scene object: " << sceneObject->getName();
+            LOG(FATAL) << "Error initializing scene object: " << sceneObject->getName();
             return false;
         }
     }
@@ -100,8 +100,8 @@ Scene::getSceneObject(const std::string& sceneObjectName) const
 {
     if (!this->isObjectRegistered(sceneObjectName))
     {
-        LOG(WARNING) << "No scene object named '" << sceneObjectName
-                     << "' was registered in this scene.";
+        LOG(FATAL) << "No scene object named '" << sceneObjectName
+                   << "' was registered in this scene.";
         return nullptr;
     }
 

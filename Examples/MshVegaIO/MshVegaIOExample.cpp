@@ -38,11 +38,6 @@ main()
     // Load a volumetric mesh (from .msh file)
     std::string ifile    = iMSTK_DATA_ROOT "/liver/liver.msh";
     auto        volMeshA = MeshIO::read(ifile);
-    if (!volMeshA)
-    {
-        LOG(WARNING) << "Failed to read msh file : " << ifile;
-        return 1;
-    }
 
     // Extract surface mesh
     auto volumeMeshA = std::dynamic_pointer_cast<VolumetricMesh>(volMeshA); // change to any volumetric mesh above
@@ -65,11 +60,6 @@ main()
 
     // Read the above written veg file
     auto volMeshB = MeshIO::read(ofile);
-    if (!volMeshB)
-    {
-        LOG(WARNING) << "Failed to extract topology/geometry from the veg file : " << ofile;
-        return 1;
-    }
 
     // Extract surface mesh
     auto volumeMeshB = std::dynamic_pointer_cast<VolumetricMesh>(volMeshB); // change to any volumetric mesh above

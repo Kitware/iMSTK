@@ -28,7 +28,7 @@ DeformableObject::getContactForce()
 {
     if (!m_defModel)
     {
-        LOG(WARNING) << "deformation model pointer not valid DeformableObject::getContactForce()";
+        LOG(FATAL) << "deformation model pointer not valid DeformableObject::getContactForce()";
     }
 
     return m_defModel->getContactForce();
@@ -44,7 +44,7 @@ DeformableObject::initialize()
     }
     else
     {
-        LOG(WARNING) << "Dynamics pointer cast failure in DeformableObject::initialize()";
+        LOG(FATAL) << "Dynamics pointer cast failure in DeformableObject::initialize()";
         return false;
     }
 }

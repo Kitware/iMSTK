@@ -70,7 +70,7 @@ PBDCollisionHandling::processCollisionData()
     }
     else
     {
-        LOG(WARNING) << "Error: PBDCollisionHandling: no PbdSolver found to handle the Collision constraints...";
+        LOG(FATAL) << "No PbdSolver found to handle the Collision constraints!";
     }
 }
 

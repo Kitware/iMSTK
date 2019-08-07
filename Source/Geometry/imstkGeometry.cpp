@@ -133,7 +133,7 @@ Geometry::scale(double s, TransformType type)
 {
     if (s <= 0.0)
     {
-        LOG(WARNING) << "Geometry::scale error: invalid scaling constant.";
+        LOG(FATAL) << "Geometry::scale error: invalid scaling constant.";
         return;
     }
 

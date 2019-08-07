@@ -33,7 +33,7 @@ OneToOneMap::compute()
 {
     if (!m_master || !m_slave)
     {
-        LOG(WARNING) << "OneToOneMap map is being applied without valid geometries";
+        LOG(FATAL) << "OneToOneMap map is being applied without valid geometries";
         return;
     }
 
@@ -156,7 +156,7 @@ OneToOneMap::apply()
     // Check geometries
     if (!m_master || !m_slave)
     {
-        LOG(WARNING) << "OneToOneMap map is being applied without valid geometries";
+        LOG(FATAL) << "OneToOneMap map is being applied without valid geometries";
         return;
     }
 

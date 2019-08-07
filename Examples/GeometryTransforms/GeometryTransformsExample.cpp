@@ -42,7 +42,7 @@ main()
 
     if (!sceneObj)
     {
-        LOG(WARNING) << "ERROR: Unable to create scene object";
+        LOG(FATAL) << "ERROR: Unable to create scene object";
         return 1;
     }
 

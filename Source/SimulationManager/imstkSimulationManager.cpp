@@ -111,7 +111,7 @@ SimulationManager::getSceneManager(std::shared_ptr<Scene> scene) const
 {
     if (!scene)
     {
-        LOG(WARNING) << "SimulationManager::getSceneManager - Scene supplied is not valid!";
+        LOG(FATAL) << "SimulationManager::getSceneManager - Scene supplied is not valid!";
     }
     return this->getSceneManager(scene->getName());
 }

@@ -38,7 +38,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
 {
     if (meshType != MeshFileType::MSH)
     {
-        LOG(WARNING) << "MSHMeshIO::read error: file type not supported";
+        LOG(FATAL) << "MSHMeshIO::read error: file type not supported";
         return nullptr;
     }
 
@@ -62,7 +62,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     std::ifstream mshStream(filePath);
     if (!mshStream.is_open())
     {
-        LOG(WARNING) << "Failed to open the input .msh file";
+        LOG(FATAL) << "Failed to open the input .msh file";
         return nullptr;
     }
 
@@ -223,9 +223,9 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             // To avoid out of range casting, and to check validity of the .msh file
             if (elemType < ElemType::line || elemType > ElemType::tetrahedronFifthOrder)
             {
-                LOG(WARNING) << "MSHMeshIO::read error : elm-type ( " << elemType << " ) "
-                             << "is not in the range" << "(" << ElemType::line << " to "
-                             << ElemType::tetrahedronFifthOrder << "), so is not a valid element type.";
+                LOG(FATAL) << "MSHMeshIO::read error : elm-type ( " << elemType << " ) "
+                           << "is not in the range" << "(" << ElemType::line << " to "
+                           << ElemType::tetrahedronFifthOrder << "), so is not a valid element type.";
                 return nullptr;
             }
             ++elemCountMap[ElemType(elemType)];
@@ -374,7 +374,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     }
     else
     {
-        LOG(WARNING) << "This volume type is not supported in iMSTK";
+        LOG(FATAL) << "This volume type is not supported in iMSTK";
         return nullptr;
     }
 }
@@ -416,7 +416,7 @@ MSHMeshIO::numElemNodes(const ElemType& elType)
     case ElemType::tetrahedronFourthOrder:          return 35;
     case ElemType::tetrahedronFifthOrder:           return 56;
     default:
-        LOG(WARNING) << "MSHMeshIO::numElemNodes: Unknown element type";
+        LOG(FATAL) << "MSHMeshIO::numElemNodes: Unknown element type";
         return 0;
     }
 }

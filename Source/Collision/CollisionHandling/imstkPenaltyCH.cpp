@@ -52,9 +52,8 @@ PenaltyCH::processCollisionData()
     }
     else
     {
-        LOG(WARNING) << "PenaltyRigidCH::computeContactForces error: "
-                     << "no penalty collision handling available for " << m_object->getName()
-                     << " (rigid mesh not yet supported).";
+        LOG(FATAL) << "no penalty collision handling available for " << m_object->getName()
+                   << " (rigid mesh not yet supported).";
     }
 }
 
@@ -68,10 +67,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObje
 
     if (analyticObj == nullptr)
     {
-        LOG(WARNING) << "PenaltyRigidCH::computeContactForcesAnalyticRigid error: "
-                     << m_object->getName() << " is not a colliding object";
-
-        return;
+        LOG(FATAL) << m_object->getName() << " is not a colliding object";
     }
 
     // If collision data is valid, append forces
@@ -103,8 +99,8 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
 
     if (deformableObj == nullptr)
     {
-        LOG(WARNING) << "PenaltyRigidCH::computeContactForcesDiscreteDeformable error: "
-                     << m_object->getName() << " is not a deformable object.";
+        LOG(FATAL) << "PenaltyRigidCH::computeContactForcesDiscreteDeformable error: "
+                   << m_object->getName() << " is not a deformable object.";
         return;
     }
 

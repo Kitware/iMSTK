@@ -59,7 +59,6 @@ RenderParticleEmitter::setGeometry(
     if (geometry->getType() != Geometry::Type::RenderParticles)
     {
         LOG(FATAL) << "Geometry must be RenderParticles";
-        return;
     }
 
     m_animationGeometry = geometry;

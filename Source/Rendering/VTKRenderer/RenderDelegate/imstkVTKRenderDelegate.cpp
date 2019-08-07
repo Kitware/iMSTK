@@ -104,7 +104,7 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
+        LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
         return nullptr;
     }
     }

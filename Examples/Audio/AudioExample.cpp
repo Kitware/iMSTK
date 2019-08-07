@@ -39,7 +39,7 @@ playSound(const std::string& filename)
     sf::SoundBuffer buffer;
     if (!buffer.loadFromFile(filename))
     {
-        LOG(WARNING) << "testSound: Could not open the input sound file: " << filename;
+        LOG(FATAL) << "testSound: Could not open the input sound file: " << filename;
         return;
     }
 
@@ -86,7 +86,7 @@ playMusic(const std::string& filename)
     sf::Music music;
     if (!music.openFromFile(filename))
     {
-        LOG(WARNING) << "playMusic: Could not open the input music file: " << filename;
+        LOG(FATAL) << "playMusic: Could not open the input music file: " << filename;
         return;
     }
 

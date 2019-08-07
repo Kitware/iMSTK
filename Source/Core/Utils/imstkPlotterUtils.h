@@ -43,7 +43,7 @@ writePlotterVectorMatlab(Vectord& x, const char* fileName)
 
     if (!scriptFile.is_open())
     {
-        LOG(WARNING) << "Unable to create or open the specified file for plot script!";
+        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
         return;
     }
 
@@ -77,7 +77,7 @@ writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, const char* fileName)
 
     if (!scriptFile.is_open())
     {
-        LOG(WARNING) << "Unable to create or open the specified file for plot script!";
+        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
         return;
     }
 
@@ -112,7 +112,7 @@ writePlotterVectorMatPlotlib(Vectord& x, const char* fileName)
 
     if (!scriptFile.is_open())
     {
-        LOG(WARNING) << "Unable to create or open the specified file for plot script!";
+        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
         return;
     }
 
@@ -153,7 +153,7 @@ writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName)
 
     if (!scriptFile.is_open())
     {
-        LOG(WARNING) << "Unable to create or open the specified file for plot script!";
+        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
         return;
     }
 

@@ -104,7 +104,7 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
     this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
     if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
     {
-        LOG(WARNING) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
+        LOG(FATAL) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
     }
 }
 
@@ -113,7 +113,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, co
 {
     if (!surfaceMesh)
     {
-        LOG(WARNING) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
+        LOG(FATAL) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
         return false;
     }
 

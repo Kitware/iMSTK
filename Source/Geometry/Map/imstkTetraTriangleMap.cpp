@@ -29,7 +29,7 @@ TetraTriangleMap::compute()
 {
     if (!m_master || !m_slave)
     {
-        LOG(WARNING) << "TetraTriangle map is being applied without valid geometries";
+        LOG(FATAL) << "TetraTriangle map is being applied without valid geometries";
         return;
     }
 
@@ -94,7 +94,7 @@ TetraTriangleMap::apply()
     // Check geometries
     if (!m_master || !m_slave)
     {
-        LOG(WARNING) << "TetraTriangle map is being applied without valid geometries";
+        LOG(FATAL) << "TetraTriangle map is being applied without valid geometries";
         return;
     }
 
@@ -174,7 +174,7 @@ TetraTriangleMap::setMaster(std::shared_ptr<Geometry> master)
 {
     if (master->getType() != Geometry::Type::TetrahedralMesh)
     {
-        LOG(WARNING) << "The geometry provided as master is not of tetrahedral type";
+        LOG(FATAL) << "The geometry provided as master is not of tetrahedral type";
         return;
     }
     GeometryMap::setMaster(master);
@@ -185,7 +185,7 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 {
     if (slave->getType() != Geometry::Type::SurfaceMesh)
     {
-        LOG(WARNING) << "The geometry provided as slave is not of triangular type (surface)";
+        LOG(FATAL) << "The geometry provided as slave is not of triangular type (surface)";
         return;
     }
     GeometryMap::setSlave(slave);

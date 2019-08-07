@@ -356,7 +356,7 @@ OctreeBasedCD::checkPointWithPrimitive(OctreePrimitive* const pPrimitive1, Octre
         break;
 
     default:
-        LOG(FATAL) << "Unsupported collision type";
+        LOG(FATAL) << "Unsupported collision type!";
     }
 }
 
@@ -391,7 +391,7 @@ OctreeBasedCD::checkNonPointWithPrimitive(OctreePrimitive* const pPrimitive1, Oc
         break;
 
     default:
-        LOG(FATAL) << "Unsupported collision type";
+        LOG(FATAL) << "Unsupported collision type!";
     }
 }
 
