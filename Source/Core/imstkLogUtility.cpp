@@ -19,7 +19,6 @@ limitations under the License.
 
 =========================================================================*/
 #include "imstkLogUtility.h"
-#include <experimental/coroutine>
 
 #ifdef WIN32
 #include <windows.h>
