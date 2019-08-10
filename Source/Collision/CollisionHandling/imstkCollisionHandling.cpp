@@ -42,8 +42,8 @@ CollisionHandling::make_collision_handling(const Type&                          
     if (type != Type::None
         && objA->getType() == SceneObject::Type::Visual)
     {
-        LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                     << "penalty collision handling only implemented for colliding objects.";
+        LOG(FATAL) << "CollisionHandling::make_collision_handling error: "
+                   << "collision handling only implemented for colliding objects.";
         return nullptr;
     }
 
@@ -53,12 +53,6 @@ CollisionHandling::make_collision_handling(const Type&                          
         return nullptr;
 
     case Type::Penalty:
-        if (objA->getType() == SceneObject::Type::Visual)
-        {
-            LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                         << "penalty collision handling only implemented for colliding objects.";
-            return nullptr;
-        }
 
         return std::make_shared<PenaltyCH>(side, colData, objA);
 
@@ -67,13 +61,6 @@ CollisionHandling::make_collision_handling(const Type&                          
         return std::make_shared<VirtualCouplingCH>(side, colData, objA);
 
     case Type::NodalPicking:
-
-        if (objA->getType() == SceneObject::Type::Visual)
-        {
-            LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                         << "penalty collision handling only implemented for colliding objects.";
-            return nullptr;
-        }
         if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(objA))
         {
             return std::make_shared<PickingCH>(side, colData, defObj);
@@ -86,7 +73,7 @@ CollisionHandling::make_collision_handling(const Type&                          
         return std::make_shared<SPHCollisionHandling>(side, colData, objA);
 
     default:
-        LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";
+        LOG(FATAL) << "CollisionHandling::make_collision_handling error: type not implemented.";
         return nullptr;
     }
 }

@@ -42,8 +42,8 @@ PickingCH::processCollisionData()
     }
     else
     {
-        LOG(WARNING) << "PickingCH::handleCollision error: "
-                     << "no picking collision handling available the object";
+        LOG(FATAL) << "PickingCH::handleCollision error: "
+                   << "no picking collision handling available the object";
     }
 }
 
@@ -59,8 +59,8 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
 
     if (deformableObj == nullptr)
     {
-        LOG(WARNING) << "PenaltyRigidCH::addPickConstraints error: "
-                     << " not a deformable object.";
+        LOG(FATAL) << "PenaltyRigidCH::addPickConstraints error: "
+                   << " not a deformable object.";
         return;
     }
 

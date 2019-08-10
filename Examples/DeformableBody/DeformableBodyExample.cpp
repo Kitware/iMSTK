@@ -52,7 +52,7 @@ main()
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
-        LOG(WARNING) << "Could not read mesh from file.";
+        LOG(FATAL) << "Could not read mesh from file.";
         return 1;
     }
 
@@ -61,7 +61,7 @@ main()
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
     if (!volTetMesh)
     {
-        LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+        LOG(FATAL) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
         return 1;
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);

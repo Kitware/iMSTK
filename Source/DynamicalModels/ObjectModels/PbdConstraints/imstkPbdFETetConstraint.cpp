@@ -169,7 +169,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
 
     default:
     {
-        LOG(WARNING) << "Material type not supported ! \n";
+        LOG(FATAL) << "Material type not supported ! \n";
         break;
     }
     }

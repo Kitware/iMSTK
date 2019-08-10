@@ -36,7 +36,7 @@ IdentityMap::apply()
     // Check geometries
     if (!m_master || !m_slave)
     {
-        LOG(WARNING) << "Identity map is being applied without valid geometries";
+        LOG(FATAL) << "Identity map is being applied without valid geometries";
         return;
     }
 

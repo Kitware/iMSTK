@@ -37,7 +37,7 @@ PbdObject::initialize()
     }
     else
     {
-        LOG(WARNING) << "Dynamics pointer cast failure in PbdObject::initialize()";
+        LOG(FATAL) << "Dynamics pointer cast failure in PbdObject::initialize()";
         return false;
     }
 }

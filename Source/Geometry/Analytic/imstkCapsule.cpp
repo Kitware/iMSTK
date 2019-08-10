@@ -55,8 +55,7 @@ Capsule::setRadius(const double r)
 {
     if (r <= 0)
     {
-        LOG(WARNING) << "Capsule::setRadius error: radius should be positive.";
-        return;
+        LOG(FATAL) << "Capsule::setRadius error: radius should be positive.";
     }
     m_radius           = r;
     m_dataModified     = true;
@@ -79,8 +78,7 @@ Capsule::setLength(const double l)
 {
     if (l <= 0)
     {
-        LOG(WARNING) << "Capsule::setHeight error: height should be positive.";
-        return;
+        LOG(FATAL) << "Capsule::setHeight error: height should be positive.";
     }
     m_length           = l;
     m_dataModified     = true;

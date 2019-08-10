@@ -67,8 +67,8 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 
             if (!imgReader)
             {
-                LOG(WARNING) << "VTKTextureDelegate::loadTexture error: could not find reader for "
-                             << sideName;
+                LOG(FATAL) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+                           << sideName;
                 return;
             }
 
@@ -87,8 +87,8 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 
         if (!imgReader)
         {
-            LOG(WARNING) << "VTKTextureDelegate::loadTexture error: could not find reader for "
-                         << tFileName;
+            LOG(FATAL) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+                       << tFileName;
             return;
         }
 

@@ -96,7 +96,7 @@ FEMDeformableBodyModel::initialize()
     // prerequisite of for successfully initializing
     if (!m_forceModelGeometry || !m_forceModelConfiguration)
     {
-        LOG(WARNING) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
+        LOG(FATAL) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
         return false;
     }
 
@@ -184,7 +184,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
         }
         else
         {
-            LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: Could not open boundary conditions file!";
+            LOG(FATAL) << "DeformableBodyModel::loadBoundaryConditions: Could not open boundary conditions file!";
             return false;
         }
     }
@@ -227,7 +227,7 @@ FEMDeformableBodyModel::initializeForceModel()
         break;
 
     default:
-        LOG(WARNING) << "DeformableBodyModel::initializeForceModel: Unknown force model type";
+        LOG(FATAL) << "DeformableBodyModel::initializeForceModel: Unknown force model type";
         return false;
     }   //switch
 
@@ -239,7 +239,7 @@ FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 {
     if (!m_forceModelGeometry)
     {
-        LOG(WARNING) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
+        LOG(FATAL) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
         return false;
     }
 
@@ -310,7 +310,7 @@ FEMDeformableBodyModel::initializeTangentStiffness()
 {
     if (!m_internalForceModel)
     {
-        LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
+        LOG(FATAL) << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
         return false;
     }
 
@@ -319,13 +319,13 @@ FEMDeformableBodyModel::initializeTangentStiffness()
 
     if (!matrix)
     {
-        LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
+        LOG(FATAL) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
         return false;
     }
 
     if (!m_vegaMassMatrix)
     {
-        LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
+        LOG(FATAL) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
         return false;
     }
 
@@ -440,7 +440,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
         break;
 
     default:
-        LOG(WARNING) << "FEMDeformableBodyModel::computeSemiImplicitSystemRHS: Update type not supported";
+        LOG(FATAL) << "FEMDeformableBodyModel::computeSemiImplicitSystemRHS: Update type not supported";
     }
 }
 
@@ -469,7 +469,7 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
         break;
 
     default:
-        LOG(WARNING) << "FEMDeformableBodyModel::computeImplicitSystemLHS: Update type not supported";
+        LOG(FATAL) << "FEMDeformableBodyModel::computeImplicitSystemLHS: Update type not supported";
     }
 }
 
@@ -600,7 +600,7 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
         break;
 
     default:
-        LOG(WARNING) << "DeformableBodyModel::updateBodyIntermediateStates: Unknown state update type";
+        LOG(FATAL) << "DeformableBodyModel::updateBodyIntermediateStates: Unknown state update type";
     }
     m_qSol = m_currentState->getQ();
 }

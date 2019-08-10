@@ -44,11 +44,6 @@ main()
 
     // Load a sample mesh
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    if (!tetMesh)
-    {
-        LOG(WARNING) << "Could not read mesh from file.";
-        return 1;
-    }
 
     auto fluidMesh = std::make_shared<PointSet>();
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());

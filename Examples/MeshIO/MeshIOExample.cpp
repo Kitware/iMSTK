@@ -46,12 +46,6 @@ main()
     //auto vtkMesh2 = MeshIO::read(iMSTK_DATA_ROOT"/nidus/nidus.vtk");
     auto vegaMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
-    if (!vegaMesh)
-    {
-        LOG(WARNING) << "Unable to load mesh!";
-        return 1;
-    }
-
     // Extract surface mesh
     auto volumeMesh = std::dynamic_pointer_cast<VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
     volumeMesh->computeAttachedSurfaceMesh();

@@ -36,7 +36,7 @@ MeshIO::read(const std::string& filePath)
 {
     if (!MeshIO::fileExists(filePath))
     {
-        LOG(WARNING) << "MeshIO::read error: file not found: " << filePath;
+        LOG(FATAL) << "MeshIO::read error: file not found: " << filePath;
         return nullptr;
     }
 
@@ -64,7 +64,7 @@ MeshIO::read(const std::string& filePath)
         break;
     }
 
-    LOG(WARNING) << "MeshIO::read error: file type not supported";
+    LOG(FATAL) << "MeshIO::read error: file type not supported";
     return nullptr;
 }
 
@@ -83,7 +83,7 @@ MeshIO::getFileType(const std::string& filePath)
     std::string extString = filePath.substr(filePath.find_last_of(".") + 1);
     if (extString.empty())
     {
-        LOG(WARNING) << "MeshIO::getFileType error: invalid file name";
+        LOG(FATAL) << "MeshIO::getFileType error: invalid file name";
         return meshType;
     }
 
@@ -133,7 +133,7 @@ MeshIO::getFileType(const std::string& filePath)
     }
     else
     {
-        LOG(WARNING) << "MeshIO::getFileType error: unknown file extension";
+        LOG(FATAL) << "MeshIO::getFileType error: unknown file extension";
     }
 
     return meshType;
@@ -156,7 +156,7 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
         break;
     }
 
-    LOG(WARNING) << "MeshIO::write error: file type not supported";
+    LOG(FATAL) << "MeshIO::write error: file type not supported";
     return false;
 }
 } // imstk

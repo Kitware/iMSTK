@@ -56,13 +56,13 @@ createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
 {
     if (!scene)
     {
-        LOG(WARNING) << "createVisualAnalyticalSceneObject: Scene is not valid!";
+        LOG(FATAL) << "createVisualAnalyticalSceneObject: Scene is not valid!";
         return nullptr;
     }
 
     if (objName.empty())
     {
-        LOG(WARNING) << "createVisualAnalyticalSceneObject: Name is empty!";
+        LOG(FATAL) << "createVisualAnalyticalSceneObject: Name is empty!";
         return nullptr;
     }
 
@@ -112,13 +112,13 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
 {
     if (!scene)
     {
-        LOG(WARNING) << "createCollidingSphereSceneObject: Scene is not valid!";
+        LOG(FATAL) << "createCollidingSphereSceneObject: Scene is not valid!";
         return nullptr;
     }
 
     if (objName.empty())
     {
-        LOG(WARNING) << "createCollidingAnalyticalSceneObject: Name is empty!";
+        LOG(FATAL) << "createCollidingAnalyticalSceneObject: Name is empty!";
         return nullptr;
     }
 
@@ -163,13 +163,13 @@ createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
 {
     if (!scene)
     {
-        LOG(WARNING) << "createAndAddVisualSceneObject: Scene is not valid!";
+        LOG(FATAL) << "createAndAddVisualSceneObject: Scene is not valid!";
         return nullptr;
     }
 
     if (fileName.empty())
     {
-        LOG(WARNING) << "createAndAddVisualSceneObject: File name is empty!";
+        LOG(FATAL) << "createAndAddVisualSceneObject: File name is empty!";
         return nullptr;
     }
 
@@ -193,7 +193,7 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
 {
     if (!dynaModel)
     {
-        LOG(WARNING) << "createNonLinearSystem: Dynamic model is not valid!";
+        LOG(FATAL) << "createNonLinearSystem: Dynamic model is not valid!";
         return nullptr;
     }
 
@@ -221,7 +221,7 @@ printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>
 {
     sceneManager->setPreInitCallback([](Module* module)
             {
-                LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
+                LOG(INFO) << "Pre initialization of " << module->getName() << " module";
     });
 
     sceneManager->setPreUpdateCallback([&ups](Module* module)
@@ -232,13 +232,13 @@ printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>
     sceneManager->setPostUpdateCallback([&ups](Module* module)
             {
                 ups->setEndPointOfUpdate();
-                std::cout << "\r-- " << module->getName() << " running at "
+                std::cout << "\r" << module->getName() << " running at "
                           << ups->getUPS() << " ups   " << std::flush;
     });
 
     sceneManager->setPostCleanUpCallback([](Module* module)
             {
-                LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
+                LOG(INFO) << "\nPost cleanup of " << module->getName() << " module";
     });
 }
 } //apiutils

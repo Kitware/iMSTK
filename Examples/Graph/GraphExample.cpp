@@ -89,12 +89,7 @@ main(int argc, char** argv)
     }
     else
     {
-        auto volMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-        if (!volMesh)
-        {
-            LOG(WARNING) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-            return 1;
-        }
+        auto volMesh      = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
         auto colorsGVMesh = volMesh->getMeshGraph()->doColoring(method, true);
 
         auto surfMesh = std::make_shared<SurfaceMesh>();

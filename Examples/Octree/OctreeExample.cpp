@@ -156,7 +156,7 @@ main()
     // This is significantly slower than incremental update!
     // octree.setAlwaysRebuild(true);
 
-    // Create debug geometry for the octree (render up to 8 levels, and render all non-emtpy nodes)
+    // Create debug geometry for the octree (render up to 8 levels, and render all non-empty nodes)
     const auto debugOctree = octree.getDebugGeometry(8, true);
     scene->addDebugGeometry(debugOctree);
 

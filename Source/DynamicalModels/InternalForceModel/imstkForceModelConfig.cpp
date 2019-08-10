@@ -59,7 +59,7 @@ ForceModelConfig::parseConfig(const std::string& configFileName)
     // Parse the configuration file
     if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
     {
-        LOG(WARNING) << "ForceModelConfig::parseConfig - Unable to load the configuration file";
+        LOG(FATAL) << "ForceModelConfig::parseConfig - Unable to load the configuration file";
         return false;
     }
     else

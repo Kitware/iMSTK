@@ -70,7 +70,7 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     }
     default:
     {
-        LOG(WARNING) << "VTKMeshIO::read error: file type not supported";
+        LOG(FATAL) << "VTKMeshIO::read error: file type not supported";
         return nullptr;
     }
     }
@@ -130,7 +130,7 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
     }
     else
     {
-        LOG(WARNING) << "VTKMeshIO::readVtkGenericFormatData error: could not read with VTK reader.";
+        LOG(FATAL) << "VTKMeshIO::readVtkGenericFormatData error: could not read with VTK reader.";
         return nullptr;
     }
 }
@@ -222,7 +222,7 @@ VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
 {
     if (!vtkMesh)
     {
-        LOG(WARNING) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
+        LOG(FATAL) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
         return nullptr;
     }
 
@@ -305,7 +305,7 @@ VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMe
 {
     if (!vtkMesh)
     {
-        LOG(WARNING) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
+        LOG(FATAL) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
         return nullptr;
     }
 
@@ -333,8 +333,8 @@ VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMe
     }
     else
     {
-        LOG(WARNING) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: No support for vtkCellType="
-                     << cellType << ".";
+        LOG(FATAL) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: No support for vtkCellType="
+                   << cellType << ".";
         return nullptr;
     }
 }
@@ -344,7 +344,7 @@ VTKMeshIO::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
 {
     if (!points)
     {
-        LOG(WARNING) << "VTKMeshIO::copyVerticesFromVtk error: No points found.";
+        LOG(FATAL) << "VTKMeshIO::copyVerticesFromVtk error: No points found.";
         return;
     }
 
@@ -362,7 +362,7 @@ VTKMeshIO::copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points
 {
     if (!points)
     {
-        LOG(WARNING) << "VTKMeshIO::copyVerticesToVtk error: No points found.";
+        LOG(FATAL) << "VTKMeshIO::copyVerticesToVtk error: No points found.";
         return;
     }
 
@@ -379,7 +379,7 @@ VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtk
 {
     if (!vtkCells)
     {
-        LOG(WARNING) << "VTKMeshIO::copyCellsToVtk error: No cells found.";
+        LOG(FATAL) << "VTKMeshIO::copyCellsToVtk error: No cells found.";
         return;
     }
 
@@ -399,7 +399,7 @@ VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_
 {
     if (!vtkCells)
     {
-        LOG(WARNING) << "VTKMeshIO::copyCellsFromVtk error: No cells found.";
+        LOG(FATAL) << "VTKMeshIO::copyCellsFromVtk error: No cells found.";
         return;
     }
 

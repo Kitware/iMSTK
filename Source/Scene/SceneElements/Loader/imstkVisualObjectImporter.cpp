@@ -42,7 +42,7 @@ VisualObjectImporter::importVisualObject(
         && type != MeshFileType::FBX
         && type != MeshFileType::DAE)
     {
-        LOG(WARNING) << "File type not supported";
+        LOG(FATAL) << "File type not supported";
         return nullptr;
     }
 
@@ -55,7 +55,7 @@ VisualObjectImporter::importVisualObject(
     // Check if there is actually a mesh or if the file can be read
     if (!scene || !scene->HasMeshes())
     {
-        LOG(WARNING) << "AssimpMeshIO::readMeshData error: could not read with reader.";
+        LOG(FATAL) << "AssimpMeshIO::readMeshData error: could not read with reader.";
         return nullptr;
     }
 

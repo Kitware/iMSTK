@@ -171,7 +171,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
     // Check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
     {
-        LOG(WARNING) << "FEM Tetrahedral constraint should come with tetrahedral mesh";
+        LOG(FATAL) << "FEM Tetrahedral constraint should come with tetrahedral mesh";
         return false;
     }
 
@@ -199,7 +199,7 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
     // Check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
     {
-        LOG(WARNING) << "Volume constraint should come with volumetric mesh";
+        LOG(FATAL) << "Volume constraint should come with volumetric mesh";
         return false;
     }
 
@@ -283,7 +283,7 @@ PbdModel::initializeAreaConstraints(const double stiffness)
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
-        LOG(WARNING) << "Area constraint should come with a triangular mesh";
+        LOG(FATAL) << "Area constraint should come with a triangular mesh";
         return false;
     }
 
@@ -310,7 +310,7 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
 {
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
-        LOG(WARNING) << "Dihedral constraint should come with a triangular mesh";
+        LOG(FATAL) << "Dihedral constraint should come with a triangular mesh";
         return false;
     }
 
@@ -394,7 +394,7 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
         && m_mesh->getType() != Geometry::Type::PointSet)
     {
         //\todo Really only need a point cloud, so may need to change this.
-        LOG(WARNING) << "Constant constraint should come with a mesh!";
+        LOG(FATAL) << "Constant constraint should come with a mesh!";
         return false;
     }
 

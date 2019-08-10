@@ -44,7 +44,7 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
 
     if (!boneMesh)
     {
-        LOG(WARNING) << "BoneDrillingCH::BoneDrillingCH Error:The bone colliding geometry is not a mesh!";
+        LOG(FATAL) << "BoneDrillingCH::BoneDrillingCH Error:The bone colliding geometry is not a mesh!";
     }
 
     // Initialize bone density values

@@ -35,7 +35,7 @@ VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 {
     if (meshType != MeshFileType::VEG)
     {
-        LOG(WARNING) << "VegaMeshIO::read error: file type not supported";
+        LOG(FATAL) << "VegaMeshIO::read error: file type not supported";
         return nullptr;
     }
 
@@ -51,14 +51,14 @@ VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::s
 {
     if (meshType != MeshFileType::VEG)
     {
-        LOG(WARNING) << "VegaMeshIO::write error: file type is not veg";
+        LOG(FATAL) << "VegaMeshIO::write error: file type is not veg";
         return false;
     }
     // extract volumetric mesh
     const auto imstkVolMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(imstkMesh);
     if (!imstkVolMesh)
     {
-        LOG(WARNING) << "VegaMeshIO::write error: imstk::Mesh is not a volumetric mesh";
+        LOG(FATAL) << "VegaMeshIO::write error: imstk::Mesh is not a volumetric mesh";
         return false;
     }
 
@@ -69,14 +69,14 @@ VegaMeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::s
         auto vegaMesh = convertVolumetricMeshToVegaMesh(imstkVolMesh);
         if (vegaMesh == nullptr)
         {
-            LOG(WARNING) << "VegaMeshIO::write error: failed to convert volumetric mesh to vega mesh";
+            LOG(FATAL) << "VegaMeshIO::write error: failed to convert volumetric mesh to vega mesh";
             return false;
         }
         const auto fileName     = const_cast<char*>(filePath.c_str());
         const int  write_status = vegaMesh->save(fileName);
         if (write_status != 0)
         {
-            LOG(WARNING) << "VegaMeshIO::write error: failed to write .veg file";
+            LOG(FATAL) << "VegaMeshIO::write error: failed to write .veg file";
             return false;
         }
         return true;
@@ -197,7 +197,7 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
         std::shared_ptr<vega::VolumetricMesh> vegaMesh(new vega::TetMesh(int(imstkVolTetMesh->getNumVertices()), &vertices[0], int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density));
         if (!vegaMesh)
         {
-            LOG(WARNING) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";
+            LOG(FATAL) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";
             return nullptr;
         }
         else
