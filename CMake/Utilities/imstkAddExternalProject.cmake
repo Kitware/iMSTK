@@ -63,6 +63,15 @@ macro(imstk_add_external_project extProj)
   # If needs to download and build
   #-----------------------------------------------------------------------------
   if(NOT DEFINED ${extProj}_DIR AND NOT ${USE_SYSTEM_${extProj}})
+    
+    #-----------------------------------------------------------------------------
+    # Ensure all generator info is passed to external library build
+    #-----------------------------------------------------------------------------
+    set (COMMON_CMAKE_EP_ARGS
+      CMAKE_GENERATOR ${CMAKE_GENERATOR}
+      CMAKE_GENERATOR_PLATFORM ${CMAKE_GENERATOR_PLATFORM}
+      CMAKE_GENERATOR_TOOLSET ${CMAKE_GENERATOR_TOOLSET}
+    )
 
     #-----------------------------------------------------------------------------
     # Set project directory
@@ -86,6 +95,7 @@ macro(imstk_add_external_project extProj)
       BINARY_DIR ${${extProj}_BINARY_DIR} # from above or parsed argument
       TMP_DIR ${${extProj}_TMP_DIR}       # from above
       STAMP_DIR ${${extProj}_STAMP_DIR}   # from above
+      ${COMMON_CMAKE_EP_ARGS}             # from above
       ${${extProj}_EP_ARGS}               # from ExternalProject_Include_Dependencies
       ${${extProj}_UNPARSED_ARGUMENTS}    # from unparsed arguments of this macro
       DEPENDS ${${extProj}_DEPENDENCIES}  # from parsed argument
