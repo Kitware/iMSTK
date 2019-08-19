@@ -324,6 +324,7 @@ add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Animation)
+add_subdirectory(Source/apiUtilities)
 
 #--------------------------------------------------------------------------
 # Export Targets
