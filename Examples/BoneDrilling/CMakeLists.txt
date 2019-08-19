@@ -35,10 +35,12 @@ if(iMSTK_USE_OMNI)
     #-----------------------------------------------------------------------------
     if(UNIX)
       target_link_libraries(${PROJECT_NAME}
-      SimulationManager)     
+      SimulationManager
+      apiUtils)     
     else()
       target_link_libraries(${PROJECT_NAME}
       SimulationManager
+      apiUtils
       SFML) 
     endif()
     
