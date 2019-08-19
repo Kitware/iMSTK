@@ -24,6 +24,7 @@
 // Objects
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkSceneObject.h"
+#include "imstkSceneManager.h"
 
 // Solvers
 #include "imstkNonlinearSystem.h"
@@ -47,12 +48,12 @@ namespace apiutils
 ///
 /// \brief Create a analytical visual scene object that and add it to the scene
 ///
-std::shared_ptr<imstk::VisualObject>
-createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
-                                  std::shared_ptr<imstk::Scene> scene,
+std::shared_ptr<VisualObject>
+createVisualAnalyticalSceneObject(Geometry::Type type,
+                                  std::shared_ptr<Scene> scene,
                                   const std::string objName,
                                   const double scale = 1.,
-                                  const imstk::Vec3d t = imstk::Vec3d(0., 0., 0.))
+                                  const Vec3d t = Vec3d(0., 0., 0.))
 {
     if (!scene)
     {
@@ -66,23 +67,23 @@ createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
         return nullptr;
     }
 
-    std::shared_ptr<imstk::Geometry> geom;
+    std::shared_ptr<Geometry> geom;
     switch (type)
     {
-    case imstk::Geometry::Type::Sphere:
-        geom = std::make_shared<imstk::Sphere>();
+    case Geometry::Type::Sphere:
+        geom = std::make_shared<Sphere>();
         break;
 
-    case imstk::Geometry::Type::Plane:
-        geom = std::make_shared<imstk::Plane>();
+    case Geometry::Type::Plane:
+        geom = std::make_shared<Plane>();
         break;
 
-    case imstk::Geometry::Type::Cube:
-        geom = std::make_shared<imstk::Cube>();
+    case Geometry::Type::Cube:
+        geom = std::make_shared<Cube>();
         break;
 
-    case imstk::Geometry::Type::Capsule:
-        geom = std::make_shared<imstk::Capsule>();
+    case Geometry::Type::Capsule:
+        geom = std::make_shared<Capsule>();
         break;
 
     default:
@@ -93,7 +94,7 @@ createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
     geom->scale(scale, Geometry::TransformType::ApplyToData);
     geom->translate(t, Geometry::TransformType::ApplyToData);
 
-    auto sceneObj = std::make_shared<imstk::VisualObject>(objName);
+    auto sceneObj = std::make_shared<VisualObject>(objName);
     sceneObj->setVisualGeometry(geom);
     scene->addSceneObject(sceneObj);
 
@@ -103,12 +104,12 @@ createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
 ///
 /// \brief Create a analytical colliding scene object that and add it to the scene
 ///
-std::shared_ptr<imstk::CollidingObject>
-createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
-                                     std::shared_ptr<imstk::Scene> scene,
+std::shared_ptr<CollidingObject>
+createCollidingAnalyticalSceneObject(Geometry::Type type,
+                                     std::shared_ptr<Scene> scene,
                                      const std::string objName,
                                      const double scale = 1.,
-                                     const imstk::Vec3d t = imstk::Vec3d(0., 0., 0.))
+                                     const Vec3d t = Vec3d(0., 0., 0.))
 {
     if (!scene)
     {
@@ -122,19 +123,19 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
         return nullptr;
     }
 
-    std::shared_ptr<imstk::Geometry> geom;
+    std::shared_ptr<Geometry> geom;
     switch (type)
     {
-    case imstk::Geometry::Type::Sphere:
-        geom = std::make_shared<imstk::Sphere>();
+    case Geometry::Type::Sphere:
+        geom = std::make_shared<Sphere>();
         break;
 
-    case imstk::Geometry::Type::Plane:
-        geom = std::make_shared<imstk::Plane>();
+    case Geometry::Type::Plane:
+        geom = std::make_shared<Plane>();
         break;
 
-    case imstk::Geometry::Type::Cube:
-        geom = std::make_shared<imstk::Cube>();
+    case Geometry::Type::Cube:
+        geom = std::make_shared<Cube>();
         break;
 
     default:
@@ -145,7 +146,7 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
     geom->scale(scale, Geometry::TransformType::ApplyToData);
     geom->translate(t, Geometry::TransformType::ApplyToData);
 
-    auto sceneObj = std::make_shared<imstk::CollidingObject>(objName);
+    auto sceneObj = std::make_shared<CollidingObject>(objName);
     sceneObj->setVisualGeometry(geom);
     sceneObj->setCollidingGeometry(geom);
     scene->addSceneObject(sceneObj);
@@ -156,10 +157,10 @@ createCollidingAnalyticalSceneObject(imstk::Geometry::Type type,
 ///
 /// \brief Read a mesh, create a visual scene object and add to the scene
 ///
-std::shared_ptr<imstk::SceneObject>
-createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
-                              const std::string             fileName,
-                              const std::string             objectName)
+std::shared_ptr<SceneObject>
+createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
+                              const std::string      fileName,
+                              const std::string      objectName)
 {
     if (!scene)
     {
@@ -173,11 +174,11 @@ createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
         return nullptr;
     }
 
-    auto mesh        = imstk::MeshIO::read(fileName);
+    auto mesh        = MeshIO::read(fileName);
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
 
     // Create object and add to scene
-    auto meshSceneObject = std::make_shared<imstk::VisualObject>("meshObject");
+    auto meshSceneObject = std::make_shared<VisualObject>("meshObject");
     meshSceneObject->setVisualGeometry(SurfaceMesh);
     meshSceneObject->setName(objectName);
     scene->addSceneObject(meshSceneObject);
@@ -188,8 +189,8 @@ createAndAddVisualSceneObject(std::shared_ptr<imstk::Scene> scene,
 ///
 /// \brief Create a non-linear system using FEM dynamic model
 ///
-std::shared_ptr<imstk::NonLinearSystem>
-createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
+std::shared_ptr<NonLinearSystem>
+createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 {
     if (!dynaModel)
     {
@@ -197,7 +198,7 @@ createNonLinearSystem(std::shared_ptr<imstk::FEMDeformableBodyModel> dynaModel)
         return nullptr;
     }
 
-    auto nlSystem = std::make_shared<imstk::NonLinearSystem>(
+    auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),
         dynaModel->getFunctionGradient());
 
