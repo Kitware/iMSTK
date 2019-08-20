@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location")
 project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
@@ -52,9 +53,9 @@ endif()
 # Project install directories
 #-----------------------------------------------------------------------------
 if(APPLE)
-  set(${PROJECT_NAME}_INSTALL_ROOT "${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents") # Set to create Bundle
+  set(${PROJECT_NAME}_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents") # Set to create Bundle
 else()
-  set(${PROJECT_NAME}_INSTALL_ROOT ".")
+  set(${PROJECT_NAME}_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}")
 endif()
 set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_BIN_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
 set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
