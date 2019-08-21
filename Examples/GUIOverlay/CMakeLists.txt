@@ -33,7 +33,7 @@ if(iMSTK_USE_Vulkan)
     #-----------------------------------------------------------------------------
     # Link libraries to executable
     #-----------------------------------------------------------------------------
-    target_link_libraries(${PROJECT_NAME} SimulationManager apiUtils)
+    target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
         
     #-----------------------------------------------------------------------------
     # Add shaders
