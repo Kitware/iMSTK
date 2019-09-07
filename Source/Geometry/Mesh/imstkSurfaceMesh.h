@@ -212,11 +212,6 @@ public:
     ///
     size_t getMaxNumTriangles();
 
-    ///
-    /// \brief Returns the mesh graph
-    ///
-    std::shared_ptr<Graph> getMeshGraph() override;
-
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;

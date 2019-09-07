@@ -166,11 +166,6 @@ public:
     ///
     size_t getMaxNumVertices();
 
-    ///
-    /// \brief Returns the mesh graph
-    ///
-    virtual std::shared_ptr<Graph> getMeshGraph();
-
 protected:
     friend class VTKPointSetRenderDelegate;
 

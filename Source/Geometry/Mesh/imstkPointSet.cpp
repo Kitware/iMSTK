@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkPointSet.h"
-#include "imstkGraph.h"
+//#include "imstkGraph.h"
 #include "imstkParallelUtils.h"
 
 namespace imstk
@@ -316,13 +316,5 @@ size_t
 PointSet::getMaxNumVertices()
 {
     return m_maxNumVertices;
-}
-
-std::shared_ptr<Graph>
-PointSet::getMeshGraph()
-{
-    LOG(WARNING) << "The graph of a point set has no edges";
-
-    return std::make_shared<Graph>(this->getNumVertices());
 }
 } // imstk
