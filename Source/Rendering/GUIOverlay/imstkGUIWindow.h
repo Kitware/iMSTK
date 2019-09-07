@@ -22,7 +22,6 @@
 #pragma once
 
 #include "g3log/g3log.hpp"
-#include "imgui.h"
 
 #include <string>
 #include <map>

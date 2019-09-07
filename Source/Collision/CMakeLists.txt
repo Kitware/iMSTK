@@ -4,17 +4,17 @@
 include(imstkAddLibrary)
 imstk_add_library( Collision
   DEPENDS
-    Datastructures
-    SCCD
+    DataStructures
     Geometry
     SceneElements
     DynamicalModels
+    SCCD
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
+if( ${PROJECT_NAME}_BUILD_TESTING )
         
     include(imstkAddTest)
 

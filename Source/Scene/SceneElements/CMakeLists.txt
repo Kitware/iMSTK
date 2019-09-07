@@ -17,13 +17,13 @@ imstk_add_library( SceneElements
     Devices
     TimeIntegrators
     DynamicalModels
-    #Solvers
+    Materials
     ${iMSTK_ODE_DEPENDS}
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif()
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

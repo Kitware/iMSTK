@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkGUICanvas.h"
+#include "imgui.h"
 
 namespace imstk
 {

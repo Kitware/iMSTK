@@ -4,14 +4,15 @@
 include(imstkAddLibrary)
 imstk_add_library( Core
   DEPENDS
+    Eigen
     g3log
-	tbb	
+    tbb
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
+if( ${PROJECT_NAME}_BUILD_TESTING )
   include(imstkAddTest)
   imstk_add_test( Core )
 endif()

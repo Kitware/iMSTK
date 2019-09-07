@@ -16,18 +16,17 @@ set(FTD2XX_EXTRACT_DIR ${FTD2XX_PREFIX}/ftd2xx-2.12.18)
 set(ftd2xx_libdir "i386")
 if(${CMAKE_GENERATOR} MATCHES "Win64")
   set(ftd2xx_libdir "amd64")
-  set(ftd2xx_dll_suffix "64")
 endif()
 
-set(copy_ftd2xx_dll_command
+set(copy_ftd2xx_headers_command
   ${CMAKE_COMMAND} -E copy
-  ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx${ftd2xx_dll_suffix}.dll
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/ftd2xx.dll
+  ${FTD2XX_EXTRACT_DIR}/ftd2xx.h
+  ${CMAKE_INSTALL_PREFIX}/include/ftd2xx.h
   )
 set(copy_ftd2xx_lib_command
   ${CMAKE_COMMAND} -E copy
   ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx.lib
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/ftd2xx.lib
+  ${CMAKE_INSTALL_PREFIX}/lib/ftd2xx.lib
   )
 
 #-----------------------------------------------------------------------------
@@ -44,8 +43,8 @@ imstk_add_external_project( FTD2XX
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
   INSTALL_COMMAND
-    ${copy_ftd2xx_lib_command}
-    COMMAND ${copy_ftd2xx_dll_command}
+    COMMAND ${copy_ftd2xx_headers_command}
+    COMMAND ${copy_ftd2xx_lib_command}
   RELATIVE_INCLUDE_PATH "/"
   #VERBOSE
   )

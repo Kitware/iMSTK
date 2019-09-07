@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.9)
-set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location")
 project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
@@ -12,16 +11,6 @@ endif()
 include(CTest)
 
 #-----------------------------------------------------------------------------
-# Update CMake module path & cmake dir
-#-----------------------------------------------------------------------------
-set(CMAKE_MODULE_PATH
-    ${CMAKE_CURRENT_SOURCE_DIR}/CMake
-    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
-    ${CMAKE_MODULE_PATH}
-    )
-set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
-
-#-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -31,23 +20,14 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+set(CMAKE_DEBUG_POSTFIX "d")
+
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-#-----------------------------------------------------------------------------
-# Project build directories
-#-----------------------------------------------------------------------------
-if(NOT DEFINED ${PROJECT_NAME}_BIN_DIR)
-  set(${PROJECT_NAME}_BIN_DIR "bin")
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location" FORCE)
 endif()
-if(NOT DEFINED ${PROJECT_NAME}_LIB_DIR)
-  set(${PROJECT_NAME}_LIB_DIR "lib")
-endif()
-if(NOT DEFINED ${PROJECT_NAME}_INCLUDE_DIR)
-  set(${PROJECT_NAME}_INCLUDE_DIR "include")
-endif()
-if(NOT DEFINED ${PROJECT_NAME}_SHARE_DIR)
-  set(${PROJECT_NAME}_SHARE_DIR "share")
-endif()
+set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 
 #-----------------------------------------------------------------------------
 # Project install directories
@@ -61,6 +41,16 @@ set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT
 set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
 set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
 set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_SHARE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+#-----------------------------------------------------------------------------
+# Update CMake module path & cmake dir
+#-----------------------------------------------------------------------------
+set(CMAKE_MODULE_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
+    ${CMAKE_INSTALL_PREFIX}
+    ${CMAKE_INSTALL_PREFIX}/lib/cmake # Vega and VTK
+    )
+set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 
 #-----------------------------------------------------------------------------
 # C++11 Support
@@ -81,7 +71,8 @@ endif()
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(BUILD_EXAMPLES "Build iMSTK examples" ON)
+option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
+option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -106,7 +97,28 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
 
+  imstk_define_dependency(Assimp)
+  imstk_define_dependency(Eigen)
+  imstk_define_dependency(g3log)
   imstk_define_dependency(glm)
+  imstk_define_dependency(imgui)
+  imstk_define_dependency(LibNiFalcon)
+  imstk_define_dependency(SCCD)
+  imstk_define_dependency(tbb)
+  imstk_define_dependency(VegaFEM)
+  imstk_define_dependency(VTK)
+  imstk_define_dependency(VRPN)
+
+  if(WIN32)
+    imstk_define_dependency(PThreads)
+    imstk_define_dependency(Libusb) #for VRPN
+    imstk_define_dependency(FTD2XX) #for LibNiFalcon
+    imstk_define_dependency(SFML)
+    set(${PROJECT_NAME}_AUDIO_ENABLED "Windows OS detected: Building iMSTK with AUDIO support." ON)
+  else()
+    message("Warning: Building iMSTK WITHOUT audio support!")
+    set(${PROJECT_NAME}_AUDIO_ENABLED OFF)
+  endif()
 
   if(${PROJECT_NAME}_USE_Vulkan)
     imstk_define_dependency(glfw)
@@ -119,31 +131,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(openvr)
   endif()
 
-  if(WIN32)
-    imstk_define_dependency(PThreads)
-    imstk_define_dependency(Libusb) #for VRPN
-    imstk_define_dependency(FTD2XX) #for LibNiFalcon
-  endif()
-
-  imstk_define_dependency(Assimp)
-  imstk_define_dependency(g3log)
-  imstk_define_dependency(Eigen)
-  imstk_define_dependency(SCCD)
-  imstk_define_dependency(VegaFEM)
-  imstk_define_dependency(VTK)
-  imstk_define_dependency(VRPN)
-  imstk_define_dependency(LibNiFalcon)
-  imstk_define_dependency(imgui)
-  imstk_define_dependency(tbb)
-
-  if(APPLE OR LINUX)
-   message("Warning: Building iMSTK WITHOUT audio support!")
-   set(${PROJECT_NAME}_AUDIO_ENABLED OFF)
-  else()
-   set(${PROJECT_NAME}_AUDIO_ENABLED "Windows OS detected: Building iMSTK with AUDIO support." ON)
-    imstk_define_dependency(SFML)
-  endif()
-
   option(${PROJECT_NAME}_USE_ODE "Build iMSTK with ODE support." OFF)
   if(${PROJECT_NAME}_USE_ODE)
     imstk_define_dependency(ODE)
@@ -154,7 +141,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   #----------------------------------------------------
   #include(CMake/External/External_ODE.cmake)
 
-  if(BUILD_TESTING)
+  if(${PROJECT_NAME}_BUILD_TESTING)
     imstk_define_dependency(GoogleTest)
 
     #-----------------------------------------------------------------------------
@@ -183,80 +170,33 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
 endif()
 
+
 #-----------------------------------------------------------------------------
 #                               INNERBUILD
 #-----------------------------------------------------------------------------
+
 #-----------------------------------------------------------------------------
 # Find external dependencies
 #-----------------------------------------------------------------------------
-# Uncrustify
-find_program(Uncrustify_EXECUTABLE uncrustify)
-include(SetupUncrustifyConfig)
-if(Uncrustify_EXECUTABLE)
-  include(imstkAddUncrustifyCustomTarget)
-else(Uncrustify_EXECUTABLE)
-  message(WARNING "uncrustify not found! Cannot run code-style test.")
-endif(Uncrustify_EXECUTABLE)
+include(imstkFind)
+
 
 # Assimp
 find_package( Assimp REQUIRED )
-include_directories( ${Assimp_INCLUDE_DIRS} )
-
-# glm
-find_package( glm )
-include_directories( ${glm_INCLUDE_DIR} )
-
-if( ${PROJECT_NAME}_USE_Vulkan )
-  # glfw
-  find_package( glfw )
-  include_directories( ${glfw_INCLUDE_DIR} )
-
-  # gli
-  find_package( gli )
-  include_directories( ${gli_INCLUDE_DIR} )
-endif()
-
-if(${PROJECT_NAME}_ENABLE_VR)
-  add_definitions( -DiMSTK_ENABLE_VR )
-  find_package( openvr REQUIRED )
-else()
-  remove_definitions( -DiMSTK_ENABLE_VR )
-endif()
-
-# g3log
-find_package( g3log REQUIRED )
-include_directories( ${g3log_INCLUDE_DIR} )
-
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
-include_directories( ${Eigen_INCLUDE_DIR} )
-
+# FTD2XX
+find_package( FTD2XX REQUIRED )
+# g3log
+find_package( g3log REQUIRED )
+# glm
+find_package( glm REQUIRED)
 # imgui
 find_package( imgui REQUIRED )
-include_directories( ${imgui_INCLUDE_DIR} )
-
-# SCCD
-find_package( SCCD REQUIRED )
-include_directories( ${SCCD_INCLUDE_DIR} )
-
-# VegaFEM
-find_package( VegaFEM REQUIRED CONFIG )
-
-# VTK
-find_package( VTK REQUIRED CONFIG )
-include( ${VTK_USE_FILE} )
-
-# VRPN
-find_package( VRPN REQUIRED )
-include_directories( ${VRPN_INCLUDE_DIRS} )
-add_definitions( -DVRPN_USE_LIBNIFALCON )
-if(${PROJECT_NAME}_USE_OMNI)
-  add_definitions( -DiMSTK_USE_OPENHAPTICS )
-  add_definitions( -DVRPN_USE_PHANTOM_SERVER )
-else()
-  remove_definitions( -DiMSTK_USE_OPENHAPTICS )
-  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
-endif()
+# LibNiFalcon
+find_package( LibNiFalcon REQUIRED)
+# Libusb
+find_package( Libusb REQUIRED)
 
 # ODE
 if(${PROJECT_NAME}_USE_ODE)
@@ -269,14 +209,16 @@ else()
     remove_definitions( -DiMSTK_USE_ODE )
 endif()
 
-# Vulkan
-if(${PROJECT_NAME}_USE_Vulkan)
-  find_package( VulkanSDK )
-  include_directories( ${VulkanSDK_INCLUDE_DIR} )
-  add_definitions( -DiMSTK_USE_Vulkan )
+# OpenVR
+if(${PROJECT_NAME}_ENABLE_VR)
+  add_definitions( -DiMSTK_ENABLE_VR )
+  find_package( openvr REQUIRED )
 else()
-  remove_definitions( -DiMSTK_USE_Vulkan )
+  remove_definitions( -DiMSTK_ENABLE_VR )
 endif()
+
+# SCCD
+find_package( SCCD REQUIRED )
 
 # SFML
 if(APPLE OR LINUX)
@@ -286,46 +228,110 @@ else()
   add_definitions( -DiMSTK_AUDIO_ENABLED )
 endif()
 
-# Google Test
-if(BUILD_TESTING)
-  find_package( GoogleTest REQUIRED )
-  include_directories(${GoogleTest_INCLUDE_DIRS})
-  find_package( GoogleMock REQUIRED )
-  include_directories(${GoogleMock_INCLUDE_DIRS})
-endif()
-
 # TBB
+find_package(tbb REQUIRED)
 # Define  __TBB_NO_IMPLICIT_LINKAGE so that MSVC will not always look for tbb_debug in debug mode
 add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE)
-find_package(tbb REQUIRED)
-add_definitions(${TBB_DEFINITIONS})
-include_directories( ${TBB_INCLUDE_DIRS} )
 
-# External data
-if(BUILD_TESTING OR BUILD_EXAMPLES)
+# VegaFEM
+find_package( VegaFEM REQUIRED CONFIG )
+
+# VRPN
+find_package( VRPN REQUIRED )
+if(${PROJECT_NAME}_USE_OMNI)
+  find_package( OMNI REQUIRED )
+  add_definitions( -DiMSTK_USE_OPENHAPTICS )
+  add_definitions( -DVRPN_USE_PHANTOM_SERVER )
+else()
+  remove_definitions( -DiMSTK_USE_OPENHAPTICS )
+  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
+endif()
+
+# VTK
+find_package( VTK REQUIRED CONFIG )
+
+# Vulkan
+if( ${PROJECT_NAME}_USE_Vulkan )
+
+  find_package( VulkanSDK REQUIRED)
+  add_definitions( -DiMSTK_USE_Vulkan )
+  
+  # glfw
+  find_package( glfw REQUIRED)
+
+  # gli
+  find_package( gli REQUIRED)
+
+else()
+  remove_definitions( -DiMSTK_USE_Vulkan )
+endif()
+
+
+#--------------------------------------------------------------------------
+# External Utility Packages
+#--------------------------------------------------------------------------
+
+# Uncrustify
+find_program(Uncrustify_EXECUTABLE uncrustify)
+include(SetupUncrustifyConfig)
+if(Uncrustify_EXECUTABLE)
+  include(imstkAddUncrustifyCustomTarget)
+else(Uncrustify_EXECUTABLE)
+  message(WARNING "uncrustify not found! Cannot run code-style test.")
+endif(Uncrustify_EXECUTABLE)
+
+# Google Test
+if(${PROJECT_NAME}_BUILD_TESTING)
+  find_package( GoogleTest REQUIRED )
+  include_directories(${GOOGLETEST_INCLUDE_DIRS})
+  find_package( GoogleMock REQUIRED )
+  include_directories(${GOOGLEMOCK_INCLUDE_DIRS})
+endif()
+
+#-----------------------------------------------------------------------------
+# Download the external data needed for both testing and examples
+#-----------------------------------------------------------------------------
+if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   include(imstkExternalData)
+  include(imstkExternalDataDownloadTest)
+  imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 endif()
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
 add_subdirectory(Source/Core)
-add_subdirectory(Source/DataStructures)
-add_subdirectory(Source/Geometry)
-add_subdirectory(Source/Devices)
 add_subdirectory(Source/Rendering/Materials)
-add_subdirectory(Source/Rendering/GUIOverlay)
-add_subdirectory(Source/Rendering)
-add_subdirectory(Source/Solvers)
-add_subdirectory(Source/DynamicalModels)
-add_subdirectory(Source/TimeIntegrators)
-add_subdirectory(Source/Collision)
-add_subdirectory(Source/Scene/SceneElements)
-add_subdirectory(Source/Scene)
-add_subdirectory(Source/SimulationManager)
+add_subdirectory(Source/Geometry)#Circular Dependency
+add_subdirectory(Source/DataStructures)#Circular Dependency
+add_subdirectory(Source/Devices)
 add_subdirectory(Source/Constraint)
+add_subdirectory(Source/Rendering/GUIOverlay)
+add_subdirectory(Source/Scene/SceneElements)
+add_subdirectory(Source/Solvers)#Circular Dependency
+add_subdirectory(Source/TimeIntegrators)#Circular Dependency
+add_subdirectory(Source/DynamicalModels)#Circular Dependency
+add_subdirectory(Source/Collision)
 add_subdirectory(Source/Animation)
+add_subdirectory(Source/Scene)
+add_subdirectory(Source/Rendering)
+add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
+
+#--------------------------------------------------------------------------
+# Add Examples subdirectories
+#--------------------------------------------------------------------------
+if(${PROJECT_NAME}_BUILD_EXAMPLES)
+    add_subdirectory(Examples)
+endif()
+
+#--------------------------------------------------------------------------
+# Innerbuild dummy test
+#--------------------------------------------------------------------------
+add_test(
+  NAME imstkDummyTest
+  COMMAND ${CMAKE_COMMAND} -E echo "Success"
+)
 
 #--------------------------------------------------------------------------
 # Export Targets
@@ -365,26 +371,3 @@ install(
   COMPONENT
     Devel
   )
-
-#--------------------------------------------------------------------------
-# Add Examples subdirectories
-#--------------------------------------------------------------------------
-if(BUILD_EXAMPLES)
-    add_subdirectory(Examples)
-endif()
-
-#-----------------------------------------------------------------------------
-# Download the external data needed for both testing and examples
-#-----------------------------------------------------------------------------
-if(BUILD_TESTING OR BUILD_EXAMPLES)
-    include(imstkExternalDataDownloadTest)
-    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
-endif()
-
-#--------------------------------------------------------------------------
-# Innerbuild dummy test
-#--------------------------------------------------------------------------
-add_test(
-  NAME imstkDummyTest
-  COMMAND ${CMAKE_COMMAND} -E echo "Success"
-)

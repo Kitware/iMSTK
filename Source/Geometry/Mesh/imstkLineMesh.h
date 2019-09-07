@@ -25,6 +25,7 @@
 #include <array>
 
 #include "imstkPointSet.h"
+#include "imstkColor.h"
 
 namespace imstk
 {

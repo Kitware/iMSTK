@@ -5,7 +5,6 @@ include(imstkAddExternalProject)
 imstk_add_external_project( SFML
   GIT_REPOSITORY https://github.com/SFML/SFML.git
   GIT_TAG 2.4.2
-  INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_CACHE_ARGS
     -DSFML_BUILD_AUDIO:BOOL=ON
     -DSFML_BUILD_GRAPHICS:BOOL=OFF

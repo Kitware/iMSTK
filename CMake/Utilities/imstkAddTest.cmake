@@ -117,7 +117,7 @@ function(imstk_add_test target)
   # Link test driver against current target, gtest and pthread
   target_link_libraries(${test_driver_executable}
     ${target}
-    ${GoogleTest_LIBRARIES}
+    ${GOOGLETEST_LIBRARIES}
     Threads::Threads
   )
   

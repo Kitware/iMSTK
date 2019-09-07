@@ -1,4 +1,3 @@
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH} )
 include(ExternalProject)
 include(imstkSolveDependencies)
 
@@ -10,53 +9,15 @@ if(NOT GIT_EXECUTABLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Output Directories
-#-----------------------------------------------------------------------------
-if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIB_DIR})
-endif()
-if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIB_DIR})
-endif()
-if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_BIN_DIR})
-endif()
-
-mark_as_superbuild(
-  VARS
-    CMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH
-    CMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH
-    CMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH
-  ALL_PROJECTS
-  )
-
-#-----------------------------------------------------------------------------
-# Search Directories
-#-----------------------------------------------------------------------------
-list(APPEND CMAKE_LIBRARY_PATH
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-  ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-  )
-list(APPEND CMAKE_PROGRAM_PATH
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-  )
-
-list(APPEND CMAKE_INCLUDE_PATH "") # Populated in each External_*.cmake
-
-mark_as_superbuild(
-  VARS
-    CMAKE_LIBRARY_PATH
-    CMAKE_PROGRAM_PATH
-    CMAKE_INCLUDE_PATH
-  ALL_PROJECTS
-  )
-
-#-----------------------------------------------------------------------------
 # CMake global args
 #-----------------------------------------------------------------------------
 mark_as_superbuild(
   VARS
     CMAKE_BUILD_TYPE
+    CMAKE_DEBUG_POSTFIX
+    CMAKE_INSTALL_PREFIX
+    CMAKE_MODULE_PATH
+    CMAKE_PREFIX_PATH
     CMAKE_C_COMPILER
     CMAKE_CXX_COMPILER
     CMAKE_C_FLAGS

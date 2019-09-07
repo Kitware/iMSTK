@@ -4,6 +4,7 @@
 set(VRPN_DEPENDENCIES "LibNiFalcon")
 if(WIN32)
   list(APPEND VRPN_DEPENDENCIES "Libusb")
+  list(APPEND VRPN_DEPENDENCIES "FTD2XX")
 endif(WIN32)
 
 #-----------------------------------------------------------------------------
@@ -32,14 +33,13 @@ include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
   GIT_TAG ae5672fc163d9753ac9fa559b5c862ed9e32e6ff
-  INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF
     -DVRPN_SUBPROJECT_BUILD:BOOL=ON
     -DVRPN_BUILD_CLIENTS:BOOL=OFF
     -DVRPN_BUILD_CLIENT_LIBRARY:BOOL=ON
     -DVRPN_BUILD_SERVER_LIBRARY:BOOL=ON
-    -DVRPN_INSTALL:BOOL=OFF
+    -DVRPN_INSTALL:BOOL=ON
     -DVRPN_BUILD_PYTHON:BOOL=OFF
     -DVRPN_USE_GPM_MOUSE:BOOL=OFF
     -DVRPN_USE_LIBUSB_1_0:BOOL=ON

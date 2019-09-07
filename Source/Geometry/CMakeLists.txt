@@ -5,10 +5,10 @@ include(imstkAddLibrary)
 imstk_add_library( Geometry
   DEPENDS
     Core
-    Datastructures
+    Materials
+    DataStructures
     glm
     Assimp
-    Materials
     VegaFEM::volumetricMesh
     ${VTK_LIBRARIES}
   )
@@ -16,7 +16,7 @@ imstk_add_library( Geometry
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
+if( ${PROJECT_NAME}_BUILD_TESTING )
   include(imstkAddTest)
   imstk_add_test( Geometry )
 endif()

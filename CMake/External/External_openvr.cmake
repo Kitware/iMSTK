@@ -1,10 +1,4 @@
-if(NOT WIN32)
-  message(WARNING "System not supported. For nownly Windows is supported for External_OPENVR.cmake.")
-  return()
-endif()
-
 set(_version "1.0.9")
-
 #-----------------------------------------------------------------------------
 # Set project prefix path
 #-----------------------------------------------------------------------------
@@ -36,15 +30,20 @@ elseif(UNIX)
   set(openvr_dllname "libopenvr_api.so")
 endif()
 
+set(copy_openvr_headers_command
+  ${CMAKE_COMMAND} -E copy_directory
+  ${OPENVR_EXTRACT_DIR}/headers
+  ${CMAKE_INSTALL_PREFIX}/include
+  )
 set(copy_openvr_dll_command
   ${CMAKE_COMMAND} -E copy
   ${openvr_dlldir}/${openvr_dllname}
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/${openvr_dllname}
+  ${CMAKE_INSTALL_PREFIX}/bin/${openvr_dllname}
   )
 set(copy_openvr_lib_command
   ${CMAKE_COMMAND} -E copy
   ${openvr_libdir}/${openvr_libname}
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/${openvr_libname}
+  ${CMAKE_INSTALL_PREFIX}/lib/${openvr_libname}
   )
 
 #-----------------------------------------------------------------------------
@@ -61,7 +60,8 @@ imstk_add_external_project( openvr
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
   INSTALL_COMMAND
-    ${copy_openvr_lib_command}
+    COMMAND ${copy_openvr_headers_command}
+    COMMAND ${copy_openvr_lib_command}
     COMMAND ${copy_openvr_dll_command}
   RELATIVE_INCLUDE_PATH "headers"
   #VERBOSE

@@ -1,49 +1,16 @@
+include(imstkFind)
 #-----------------------------------------------------------------------------
-# Find dependencies
+# Find All Headers and Libraries for g3log
 #-----------------------------------------------------------------------------
-set(g3log_PLATFORM_LINK_LIBRARIES)
-if(WIN32)
-  set(g3log_PLATFORM_LINK_LIBRARIES dbghelp)
-endif()
 
-#-----------------------------------------------------------------------------
-# Find path
-#-----------------------------------------------------------------------------
-find_path(g3log_INCLUDE_DIR
-  NAMES
-    g3log/g3log.hpp
-    g3log/logworker.hpp
-    )
-mark_as_advanced(g3log_INCLUDE_DIR)
+imstk_find_header(g3log g3log/g3log.hpp)
+imstk_find_libary(g3log g3logger)
+imstk_find_package(g3log)
 
-#-----------------------------------------------------------------------------
-# Find library
-#-----------------------------------------------------------------------------
-find_library(g3log_LIBRARY
-  NAMES
-    g3logger_shared
-    g3logger
-  )
-mark_as_advanced(g3log_LIBRARY)
+#message(STATUS "g3log include : ${G3LOG_INCLUDE_DIRS}")
+#message(STATUS "g3log libraries : ${G3LOG_LIBRARIES}")
 
-set(g3log_LIBRARIES ${g3log_LIBRARY} ${g3log_PLATFORM_LINK_LIBRARIES})
-
-#-----------------------------------------------------------------------------
-# Find package
-#-----------------------------------------------------------------------------
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(g3log
-  REQUIRED_VARS
-    g3log_INCLUDE_DIR
-    g3log_LIBRARIES)
-
-#-----------------------------------------------------------------------------
-# If missing target, create it
-#-----------------------------------------------------------------------------
-if(G3LOG_FOUND AND NOT TARGET g3log)
-  add_library(g3log INTERFACE IMPORTED)
-  set_target_properties(g3log PROPERTIES
-    INTERFACE_LINK_LIBRARIES "${g3log_LIBRARIES}"
-    INTERFACE_INCLUDE_DIRECTORIES "${g3log_INCLUDE_DIR}"
-  )
-endif()
+#set(g3log_PLATFORM_LINK_LIBRARIES)
+#if(WIN32)
+#  set(g3log_PLATFORM_LINK_LIBRARIES dbghelp)
+#endif()

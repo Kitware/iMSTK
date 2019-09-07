@@ -11,6 +11,6 @@ imstk_add_library( Devices
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif()
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

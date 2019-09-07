@@ -64,8 +64,13 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Link libraries to current target
   #-----------------------------------------------------------------------------
+  # Add dependent targets
+  foreach(d ${target_DEPENDS})
+    list(APPEND ${target}_LIBRARIES "${d}")
+  endforeach()
+  #message(STATUS "${target} using libraries : ${${target}_LIBRARIES}")
   target_link_libraries( ${target}
-    ${target_DEPENDS}
+    ${${target}_LIBRARIES}
     )
 
   #-----------------------------------------------------------------------------
@@ -75,7 +80,7 @@ function(imstk_add_library target)
     ${target_BUILD_INTERFACE_LIST}
     $<INSTALL_INTERFACE:${iMSTK_INSTALL_INCLUDE_DIR}>
     )
-	  
+
   #-----------------------------------------------------------------------------
   # Set compile flags for the target
   #-----------------------------------------------------------------------------  

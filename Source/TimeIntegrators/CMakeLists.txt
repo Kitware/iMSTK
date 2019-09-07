@@ -4,13 +4,13 @@
 include(imstkAddLibrary)
 imstk_add_library( TimeIntegrators
   DEPENDS
-    Core   
+    Core
     DynamicalModels
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif()
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

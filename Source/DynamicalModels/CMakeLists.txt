@@ -10,9 +10,9 @@ imstk_add_library( DynamicalModels
     InternalForceModel
   DEPENDS
     Core
+    Constraints
     Geometry
     TimeIntegrators
-    Constraints
     Solvers
     VegaFEM::massSpringSystem
     VegaFEM::corotationalLinearFEM
@@ -26,6 +26,6 @@ imstk_add_library( DynamicalModels
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif() 
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

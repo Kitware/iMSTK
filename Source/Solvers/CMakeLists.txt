@@ -5,8 +5,8 @@ include(imstkAddLibrary)
 imstk_add_library( Solvers
   DEPENDS
     Core
-    Datastructures
     Constraints
+    DataStructures
     DynamicalModels
     SceneElements
   )
@@ -14,6 +14,6 @@ imstk_add_library( Solvers
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif()
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()
