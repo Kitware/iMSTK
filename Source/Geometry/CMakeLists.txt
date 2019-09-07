@@ -5,7 +5,6 @@ include(imstkAddLibrary)
 imstk_add_library( Geometry
   DEPENDS
     Core
-    Datastructures
     glm
     Assimp
     Materials

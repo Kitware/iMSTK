@@ -121,11 +121,6 @@ public:
     void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
 
-    ///
-    /// \brief Returns the mesh graph
-    ///
-    std::shared_ptr<Graph> getMeshGraph() override;
-
 protected:
 
     friend class VTKTetrahedralMeshRenderDelegate;

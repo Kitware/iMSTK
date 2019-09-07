@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkTetrahedralMesh.h"
-#include "imstkGraph.h"
+//#include "imstkGraph.h"
 
 namespace imstk
 {
@@ -302,21 +302,5 @@ size_t
 TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraVertices.size();
-}
-
-std::shared_ptr<Graph>
-TetrahedralMesh::getMeshGraph()
-{
-    auto gMesh = std::make_shared<Graph>(this->getNumVertices());
-    for (auto tet : this->getTetrahedraVertices())
-    {
-        gMesh->addEdge(tet[0], tet[1]);
-        gMesh->addEdge(tet[0], tet[2]);
-        gMesh->addEdge(tet[0], tet[3]);
-        gMesh->addEdge(tet[1], tet[2]);
-        gMesh->addEdge(tet[1], tet[3]);
-        gMesh->addEdge(tet[2], tet[3]);
-    }
-    return gMesh;
 }
 } // imstk

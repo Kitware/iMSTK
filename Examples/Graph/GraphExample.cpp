@@ -22,6 +22,7 @@
 #include "imstkGraph.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
+#include "imstkAPIUtilities.h"
 
 #include <iostream>
 
@@ -90,11 +91,11 @@ main(int argc, char** argv)
     else
     {
         auto volMesh      = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-        auto colorsGVMesh = volMesh->getMeshGraph()->doColoring(method, true);
+        auto colorsGVMesh = apiutils::getMeshGraph(volMesh)->doColoring(method, true);
 
         auto surfMesh = std::make_shared<SurfaceMesh>();
         volMesh->extractSurfaceMesh(surfMesh, true);
-        auto colorsGSMesh = surfMesh->getMeshGraph()->doColoring(method, true);
+        auto colorsGSMesh = apiutils::getMeshGraph(surfMesh)->doColoring(method, true);
     }
 
     std::cout << "Press any key to exit!" << std::endl;

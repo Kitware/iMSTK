@@ -34,8 +34,12 @@
 #include "imstkSphere.h"
 #include "imstkCapsule.h"
 #include "imstkCube.h"
+#include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
+
+#include "imstkGraph.h"
 
 // logger
 #include "g3log/g3log.hpp"
@@ -241,6 +245,44 @@ printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>
             {
                 LOG(INFO) << "\nPost cleanup of " << module->getName() << " module";
     });
+}
+
+std::shared_ptr<Graph>
+getMeshGraph(std::shared_ptr<PointSet> m)
+{
+    LOG(WARNING) << "The graph of a point set has no edges";
+
+    return std::make_shared<Graph>(m->getNumVertices());
+}
+
+std::shared_ptr<Graph>
+getMeshGraph(std::shared_ptr<SurfaceMesh> m)
+{
+    auto gMesh = std::make_shared<Graph>(m->getNumVertices());
+    for (auto tri : m->getTrianglesVertices())
+    {
+        gMesh->addEdge(tri[0], tri[1]);
+        gMesh->addEdge(tri[0], tri[2]);
+        gMesh->addEdge(tri[1], tri[2]);
+    }
+
+    return gMesh;
+}
+
+std::shared_ptr<Graph>
+getMeshGraph(std::shared_ptr<TetrahedralMesh> m)
+{
+    auto gMesh = std::make_shared<Graph>(m->getNumVertices());
+    for (auto tet : m->getTetrahedraVertices())
+    {
+        gMesh->addEdge(tet[0], tet[1]);
+        gMesh->addEdge(tet[0], tet[2]);
+        gMesh->addEdge(tet[0], tet[3]);
+        gMesh->addEdge(tet[1], tet[2]);
+        gMesh->addEdge(tet[1], tet[3]);
+        gMesh->addEdge(tet[2], tet[3]);
+    }
+    return gMesh;
 }
 } //apiutils
 } // imstk
