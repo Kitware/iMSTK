@@ -15,9 +15,7 @@ imstk_add_library( SceneElements
     Geometry
     Constraints
     Devices
-    TimeIntegrators
     DynamicalModels
-    #Solvers
     ${iMSTK_ODE_DEPENDS}
   )
 
