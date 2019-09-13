@@ -68,7 +68,6 @@ ExternalProject_Include_Dependencies( ${PROJECT_NAME}
 ExternalProject_Add( ${PROJECT_NAME}
   ${${PROJECT_NAME}_EP_ARGS}
   DOWNLOAD_COMMAND ""
-  INSTALL_COMMAND ""
   SOURCE_DIR ${${PROJECT_NAME}_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/Innerbuild
   CMAKE_ARGS

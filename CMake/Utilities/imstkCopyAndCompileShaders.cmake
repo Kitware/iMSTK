@@ -46,9 +46,7 @@ function(CopyAndCompileShaders)
       file(COPY ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders
         DESTINATION ${CMAKE_PROGRAM_PATH}/Shaders)
     else( iMSTK_USE_Vulkan )
-      file(COPY ${CMAKE_SOURCE_DIR}/Source/Rendering/VTKRenderer/VTKShaders
-        DESTINATION ${PROJECT_BINARY_DIR}/Shaders)
-      file(COPY ${CMAKE_SOURCE_DIR}/Source/Rendering/VTKRenderer/VTKShaders
-        DESTINATION ${CMAKE_PROGRAM_PATH}/Shaders)
+      install(DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Rendering/VTKRenderer/VTKShaders
+              DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/Shaders)
     endif()
 endfunction()

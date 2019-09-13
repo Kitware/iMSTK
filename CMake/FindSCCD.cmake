@@ -7,7 +7,7 @@ imstk_find_header(SCCD ccdAPI.h)
 if(WIN32)
   imstk_find_libary(SCCD sccd)
 else()
-  imstk_find_libary(SCCD libassimp)
+  imstk_find_libary(SCCD sccd)
 endif()
 imstk_find_package(SCCD)
 

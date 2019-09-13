@@ -185,8 +185,10 @@ include(imstkFind)
 find_package( Assimp REQUIRED )
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
-# FTD2XX
-find_package( FTD2XX REQUIRED )
+if(WIN32)
+  # FTD2XX
+  find_package( FTD2XX REQUIRED )
+endif()
 # g3log
 find_package( g3log REQUIRED )
 # glm

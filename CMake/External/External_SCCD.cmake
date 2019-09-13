@@ -13,11 +13,19 @@ set(copy_sccd_headers_command
   ${SCCD_SOURCE_DIR}/inc
   ${CMAKE_INSTALL_PREFIX}/include
   )
-set(copy_sccd_lib_command
-  ${CMAKE_COMMAND} -E copy
-  ${SCCD_BINARY_DIR}/src/${config_dir}/sccd$<$<CONFIG:Debug>:d>.lib
-  ${CMAKE_INSTALL_PREFIX}/lib
-  )
+if(WIN32)
+  set(copy_sccd_lib_command
+    ${CMAKE_COMMAND} -E copy
+    ${SCCD_BINARY_DIR}/src/${config_dir}/sccd$<$<CONFIG:Debug>:d>.lib
+    ${CMAKE_INSTALL_PREFIX}/lib
+    )
+else()
+  set(copy_sccd_lib_command
+    ${CMAKE_COMMAND} -E copy
+    ${SCCD_BINARY_DIR}/src/${config_dir}/libsccd$<$<CONFIG:Debug>:d>.a
+    ${CMAKE_INSTALL_PREFIX}/lib
+    )
+endif()
 
 
 imstk_add_external_project( SCCD
