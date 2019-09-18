@@ -13,23 +13,34 @@ macro(imstk_find_header package header)
   if (${num_extra_args} GREATER 0)
     list(GET extra_macro_args 0 sub_dir)
   endif ()
-  
-  unset(_INCLUDE_DIR)
-  find_path(_INCLUDE_DIR
+
+  unset(_SEARCH_DIR)
+  if(${package}_ROOT_DIR)
+    set(_SEARCH_DIR ${${package}_ROOT_DIR})
+  else()
+    set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX})
+  endif()
+  #message(STATUS "Using search dir : ${_SEARCH_DIR}/include/${sub_dir}")
+
+  find_path(${package}_INCLUDE_DIR
   NAMES
     ${header}
   PATHS
-    ${CMAKE_INSTALL_PREFIX}/include/${sub_dir}
+    ${_SEARCH_DIR}/include/${sub_dir}
   NO_DEFAULT_PATH
     )
+  #message(STATUS "${package}_INCLUDE_DIR : ${${package}_INCLUDE_DIR}")
 
-  if(_INCLUDE_DIR AND sub_dir)
-    set(_INCLUDE_DIR ${_INCLUDE_DIR}/${sub_dir})
+  unset(${PACKAGE}_INCLUDE_DIRS)
+  if (EXISTS ${${package}_INCLUDE_DIR}/${header})
+    string(TOUPPER ${package} PACKAGE)
+    list(APPEND ${PACKAGE}_INCLUDE_DIRS ${${package}_INCLUDE_DIR})
+    mark_as_advanced(${PACKAGE}_INCLUDE_DIRS)
+  else()
+    message(FATAL_ERROR "Could not find ${${package}_INCLUDE_DIR}/${header}")
   endif()
-
-  string(TOUPPER ${package} PACKAGE)
-  list(APPEND ${PACKAGE}_INCLUDE_DIRS ${_INCLUDE_DIR})
-  mark_as_advanced(${PACKAGE}_INCLUDE_DIRS)
+  
+  unset(${package}_INCLUDE_DIR CACHE)
 endmacro()
 
 #-----------------------------------------------------------------------------
@@ -49,12 +60,20 @@ macro(imstk_find_libary package library)
     #message(STATUS "${package} changing debug_postfix to ${debug_postfix}")
   endif()
   
+  unset(_SEARCH_DIR)
+  if(${package}_ROOT_DIR)
+    set(_SEARCH_DIR ${${package}_ROOT_DIR})
+  else()
+    set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX})
+  endif()
+  
+  
   string(TOUPPER ${package} PACKAGE)
   find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}
         lib${library}
-      PATHS ${CMAKE_INSTALL_PREFIX}/lib
+      PATHS ${_SEARCH_DIR}/lib
       NO_DEFAULT_PATH
   )
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-RELEASE})
@@ -69,7 +88,7 @@ macro(imstk_find_libary package library)
       NAMES
         ${library}${debug_postfix}
         lib${library}${debug_postfix}
-      PATHS ${CMAKE_INSTALL_PREFIX}/lib
+      PATHS ${_SEARCH_DIR}/lib
       NO_DEFAULT_PATH
   )
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-DEBUG})

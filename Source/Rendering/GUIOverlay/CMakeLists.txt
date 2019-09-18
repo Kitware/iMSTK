@@ -8,11 +8,11 @@ file (GLOB_RECURSE GUI_cpp_files "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.cpp")
 
 if( iMSTK_USE_Vulkan )
   set (IMPLEMENTATION_H_FILES
-    ${IMGUI_SOURCE_DIR}/examples/imgui_impl_vulkan.h
-    ${IMGUI_SOURCE_DIR}/examples/imgui_impl_glfw.h)
+    imgui_impl_vulkan.h
+    imgui_impl_glfw.h)
   set (IMPLEMENTATION_CPP_FILES
-    ${IMGUI_SOURCE_DIR}/examples/imgui_impl_vulkan.cpp
-    ${IMGUI_SOURCE_DIR}/examples/imgui_impl_glfw.cpp)
+    imgui_impl_vulkan.cpp
+    imgui_impl_glfw.cpp)
 endif()
 
 imstk_add_library( GUIOverlay
@@ -34,6 +34,7 @@ imstk_add_library( GUIOverlay
   DEPENDS
     Core
     imgui
+    ${Vulkan}
   )
 
 #-----------------------------------------------------------------------------

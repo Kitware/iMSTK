@@ -232,7 +232,10 @@ endif()
 find_package( VTK REQUIRED CONFIG )
 
 # Vulkan
+set(Vulkan "") # Target name for dependencies
 if( ${PROJECT_NAME}_USE_Vulkan )
+
+  set(Vulkan "VulkanSDK")
 
   find_package( VulkanSDK REQUIRED)
   add_definitions( -DiMSTK_USE_Vulkan )

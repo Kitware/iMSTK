@@ -32,7 +32,7 @@ if(iMSTK_USE_Vulkan)
   #-----------------------------------------------------------------------------
   # Link libraries to executable
   #-----------------------------------------------------------------------------
-  target_link_libraries(${PROJECT_NAME} SimulationManager)
+  target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
 
   #-----------------------------------------------------------------------------
   # Associate external data

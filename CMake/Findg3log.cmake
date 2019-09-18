@@ -13,5 +13,3 @@ endif()
 
 #message(STATUS "g3log include : ${G3LOG_INCLUDE_DIRS}")
 #message(STATUS "g3log libraries : ${G3LOG_LIBRARIES}")
-
-

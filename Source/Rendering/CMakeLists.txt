@@ -106,7 +106,7 @@ else()
     GUIOverlay
     Materials)
   set(RENDERING_LIBRARIES
-    ${VulkanSDK_LIBRARIES}
+    ${Vulkan}
     glfw
     gli)
   if (iMSTK_ENABLE_VR)

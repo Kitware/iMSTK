@@ -1,31 +1,34 @@
 #-----------------------------------------------------------------------------
 # Compile Shaders
 #-----------------------------------------------------------------------------
+
+add_custom_target(VulkanShaders)
 function(compileShaders sourceShader binaryShader)
   add_custom_command(
-    TARGET ${PROJECT_NAME}
-    COMMAND glslangvalidator -V ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/${sourceShader} -o ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/${binaryShader})
+    TARGET VulkanShaders
+    COMMAND ${VulkanSDK_ROOT_DIR}/bin/glslangvalidator -V ${Vulkan_Shaders}/${sourceShader} -o ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/${binaryShader})
 endfunction()
 
 function(CopyAndCompileShaders)
   if( iMSTK_USE_Vulkan )
   
-    file(COPY ${CMAKE_SOURCE_DIR}/Source/Rendering/VulkanRenderer/VulkanShaders
-      DESTINATION ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders)
-
+    set(Vulkan_Shaders "${CMAKE_SOURCE_DIR}/Source/Rendering/VulkanRenderer/VulkanShaders")
+    
+    file(MAKE_DIRECTORY  "${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/mesh")
     # Mesh shaders
-    compileShaders(Mesh/mesh_vert.vert Mesh/mesh_vert.spv)
-    compileShaders(Mesh/mesh_tesc.tesc Mesh/mesh_tesc.spv)
-    compileShaders(Mesh/mesh_tese.tese Mesh/mesh_tese.spv)
-    compileShaders(Mesh/mesh_frag.frag Mesh/mesh_frag.spv)
-    compileShaders(Mesh/decal_vert.vert Mesh/decal_vert.spv)
-    compileShaders(Mesh/decal_frag.frag Mesh/decal_frag.spv)
-    compileShaders(Mesh/particle_vert.vert Mesh/particle_vert.spv)
-    compileShaders(Mesh/particle_frag.frag Mesh/particle_frag.spv)
-    compileShaders(Mesh/shadow_vert.vert Mesh/shadow_vert.spv)
-    compileShaders(Mesh/shadow_frag.frag Mesh/shadow_frag.spv)
-    compileShaders(Mesh/depth_frag.frag Mesh/depth_frag.spv)
+    compileShaders(mesh/mesh_vert.vert mesh/mesh_vert.spv)
+    compileShaders(mesh/mesh_tesc.tesc mesh/mesh_tesc.spv)
+    compileShaders(mesh/mesh_tese.tese mesh/mesh_tese.spv)
+    compileShaders(mesh/mesh_frag.frag mesh/mesh_frag.spv)
+    compileShaders(mesh/decal_vert.vert mesh/decal_vert.spv)
+    compileShaders(mesh/decal_frag.frag mesh/decal_frag.spv)
+    compileShaders(mesh/particle_vert.vert mesh/particle_vert.spv)
+    compileShaders(mesh/particle_frag.frag mesh/particle_frag.spv)
+    compileShaders(mesh/shadow_vert.vert mesh/shadow_vert.spv)
+    compileShaders(mesh/shadow_frag.frag mesh/shadow_frag.spv)
+    compileShaders(mesh/depth_frag.frag mesh/depth_frag.spv)
 
+    file(MAKE_DIRECTORY  "${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/PostProcessing")
     # Post processing shaders
     compileShaders(PostProcessing/HDR_tonemap_frag.frag PostProcessing/HDR_tonemap_frag.spv)
     compileShaders(PostProcessing/postprocess_vert.vert PostProcessing/postprocess_vert.spv)

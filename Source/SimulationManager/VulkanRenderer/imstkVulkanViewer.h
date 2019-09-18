@@ -25,7 +25,6 @@
 #include "GLFW/glfw3.h"
 #include "g3log/g3log.hpp"
 #include "imgui.h"
-#include "examples/imgui_impl_glfw.h"
 
 #include <climits>
 
