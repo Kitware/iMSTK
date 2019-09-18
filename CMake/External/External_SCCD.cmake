@@ -11,7 +11,7 @@ endif()
 set(copy_sccd_headers_command
   ${CMAKE_COMMAND} -E copy_directory
   ${SCCD_SOURCE_DIR}/inc
-  ${CMAKE_INSTALL_PREFIX}/include
+  ${CMAKE_INSTALL_PREFIX}/include/sccd
   )
 if(WIN32)
   set(copy_sccd_lib_command

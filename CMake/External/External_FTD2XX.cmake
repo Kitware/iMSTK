@@ -21,7 +21,7 @@ endif()
 set(copy_ftd2xx_headers_command
   ${CMAKE_COMMAND} -E copy
   ${FTD2XX_EXTRACT_DIR}/ftd2xx.h
-  ${CMAKE_INSTALL_PREFIX}/include/ftd2xx.h
+  ${CMAKE_INSTALL_PREFIX}/include/ftd2xx/ftd2xx.h
   )
 set(copy_ftd2xx_lib_command
   ${CMAKE_COMMAND} -E copy

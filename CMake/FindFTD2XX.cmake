@@ -3,7 +3,7 @@ include(imstkFind)
 # Find All Headers and Libraries for FTD2XX
 #-----------------------------------------------------------------------------
 
-imstk_find_header(FTD2XX ftd2xx.h)
+imstk_find_header(FTD2XX ftd2xx.h ftd2xx)
 imstk_find_libary(FTD2XX ftd2xx " ")#Use same library for debug)
 imstk_find_package(FTD2XX)
 

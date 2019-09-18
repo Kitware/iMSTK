@@ -33,7 +33,7 @@ endif()
 set(copy_openvr_headers_command
   ${CMAKE_COMMAND} -E copy_directory
   ${OPENVR_EXTRACT_DIR}/headers
-  ${CMAKE_INSTALL_PREFIX}/include
+  ${CMAKE_INSTALL_PREFIX}/include/openvr
   )
 set(copy_openvr_dll_command
   ${CMAKE_COMMAND} -E copy

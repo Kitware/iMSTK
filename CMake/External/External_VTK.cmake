@@ -8,8 +8,6 @@ if(${${PROJECT_NAME}_ENABLE_VR})
   set(VTK_ENABLE_OPENVR "YES")
 endif()
 
-message(STATUS "iMSTK_ENABLE_VR : ${${PROJECT_NAME}_ENABLE_VR}")
-
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
