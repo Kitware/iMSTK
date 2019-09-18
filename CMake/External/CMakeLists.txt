@@ -11,6 +11,17 @@ endif()
 #-----------------------------------------------------------------------------
 # CMake global args
 #-----------------------------------------------------------------------------
+if(MSVC)
+  # Allow the MP flag to get set externally
+  set(iMSTK_ENABLE_MULTI_PROCESS_BUILDS ON CACHE BOOL "Enable multi-process builds")
+  set(PROCESSOR_COUNT "$ENV{NUMBER_OF_PROCESSORS}")
+  set(iMSTK_NUM_BUILD_PROCESSES ${PROCESSOR_COUNT} CACHE STRING "The maximum number of processes for the /MP flag")
+  if(${PROJECT}_ENABLE_MULTI_PROCESS_BUILDS)
+    set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} /MP${iMSTK_NUM_BUILD_PROCESSES}" CACHE STRING INTERNAL FORCE)
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MP${iMSTK_NUM_BUILD_PROCESSES}" CACHE STRING INTERNAL FORCE)
+  endif()
+endif()
+message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}" )
 mark_as_superbuild(
   VARS
     CMAKE_BUILD_TYPE
@@ -75,8 +86,6 @@ ExternalProject_Add( ${PROJECT_NAME}
     -DBUILD_TESTING:BOOL=${BUILD_TESTING}
     -D${PROJECT_NAME}_SUPERBUILD:BOOL=OFF
     -D${PROJECT_NAME}_USE_OMNI:BOOL=${${PROJECT_NAME}_USE_OMNI}
-    -D${PROJECT_NAME}_USE_ODE:BOOL=${${PROJECT_NAME}_USE_ODE}
-    -DODE_ROOT_DIR:PATH=${ODE_ROOT_DIR}
     -D${PROJECT_NAME}_USE_Vulkan:BOOL=${${PROJECT_NAME}_USE_Vulkan}
     -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_ENABLE_AUDIO}
     -D${PROJECT_NAME}_ENABLE_VR:BOOL=${${PROJECT_NAME}_ENABLE_VR}

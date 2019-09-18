@@ -21,7 +21,6 @@ list(APPEND ExternalData_OBJECT_STORES
   "${CMAKE_SOURCE_DIR}/.ExternalData"
   )
 
-set(ExternalData_BINARY_ROOT ${CMAKE_BINARY_DIR}/ExternalData)
 
 # Expands %(algo:lower)
 set(ExternalData_URL_ALGO_MD5_lower md5)
@@ -49,18 +48,17 @@ set(ExternalData_SERIES_MATCH "(\\.[0-9]+)?")
 
 # Sometimes we want to download very large files.
 set(ExternalData_TIMEOUT_ABSOLUTE 900)
-
-# Configure the default  iMSTK_DATA_CONTENT_LINKS_PATH for the location of iMSTK Data content links.
-set(iMSTK_DATA_CONTENT_LINKS_PATH "${iMSTK_SOURCE_DIR}/Data")
+set(ExternalData_SOURCE_ROOT "${iMSTK_SOURCE_DIR}/Data")
+set(ExternalData_BINARY_ROOT "${CMAKE_INSTALL_PREFIX}/data/")
 
 # Define the path to the data root directory
-add_definitions( -DiMSTK_DATA_ROOT=\"${ExternalData_BINARY_ROOT}/Data\")
+add_definitions( -DiMSTK_DATA_ROOT=\"${ExternalData_BINARY_ROOT}\")
 
 # Function to upload data from list of data file
 function(imstk_add_data target)
   # Download data
   foreach(file IN LISTS ARGN)
-    set(datalist "${datalist} DATA{${iMSTK_DATA_CONTENT_LINKS_PATH}/${file}}")
+    set(datalist "${datalist} DATA{${ExternalData_SOURCE_ROOT}/${file}}")
   endforeach()
 
   ExternalData_expand_arguments(${target}ExternalData

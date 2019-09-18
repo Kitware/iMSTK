@@ -34,11 +34,9 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
 
 #-----------------------------------------------------------------------------
-# Add shaders
+# Set MSVC working directory to the install/bin directory
 #-----------------------------------------------------------------------------
-include(imstkCopyAndCompileShaders)
-CopyAndCompileShaders()
+if(MSVC) # Configure running executable out of MSVC
+  set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${iMSTK_INSTALL_BIN_DIR}")
+endif()
 
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------

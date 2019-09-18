@@ -2,9 +2,13 @@
 # Dependencies
 #-----------------------------------------------------------------------------
 set(VTK_DEPENDENCIES "")
+set(VTK_ENABLE_OPENVR "NO")
 if(${${PROJECT_NAME}_ENABLE_VR})
   list(APPEND VTK_DEPENDENCIES "openvr")
-endif(${${PROJECT_NAME}_ENABLE_VR})
+  set(VTK_ENABLE_OPENVR "YES")
+endif()
+
+message(STATUS "iMSTK_ENABLE_VR : ${${PROJECT_NAME}_ENABLE_VR}")
 
 #-----------------------------------------------------------------------------
 # Add External Project
@@ -26,6 +30,7 @@ imstk_add_external_project( VTK
       -DModule_vtkInteractionStyle:BOOL=ON
       -DModule_vtkRenderingAnnotation:BOOL=ON
       -DModule_vtkRenderingOpenVR:BOOL=${${PROJECT_NAME}_ENABLE_VR}
+      -DVTK_MODULE_ENABLE_VTK_RenderingOpenVR:STRING=${VTK_ENABLE_OPENVR}
       -DModule_vtkInteractionWidgets:BOOL=ON
       -DModule_vtkglew:BOOL=ON
       -DModule_vtkRenderingContext2D:BOOL=ON

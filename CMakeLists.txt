@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
+project(iMSTK VERSION 1.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
@@ -37,10 +37,10 @@ if(APPLE)
 else()
   set(${PROJECT_NAME}_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}")
 endif()
-set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_BIN_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_SHARE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/bin")
+set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/lib")
+set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/include/imstk-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}")
 #-----------------------------------------------------------------------------
 # Update CMake module path & cmake dir
 #-----------------------------------------------------------------------------
@@ -131,16 +131,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(openvr)
   endif()
 
-  option(${PROJECT_NAME}_USE_ODE "Build iMSTK with ODE support." OFF)
-  if(${PROJECT_NAME}_USE_ODE)
-    imstk_define_dependency(ODE)
-  endif()
-
-  #----------------------------------------------------
-  # Setting up ODE from preinstalled directories.
-  #----------------------------------------------------
-  #include(CMake/External/External_ODE.cmake)
-
   if(${PROJECT_NAME}_BUILD_TESTING)
     imstk_define_dependency(GoogleTest)
 
@@ -199,17 +189,6 @@ find_package( imgui REQUIRED )
 find_package( LibNiFalcon REQUIRED)
 # Libusb
 find_package( Libusb REQUIRED)
-
-# ODE
-if(${PROJECT_NAME}_USE_ODE)
-    find_package(ODE)
-    # Assuming that ODE was compiled with Double precision.
-    add_definitions( -DdDOUBLE ) # Needed by ODE library.
-    add_definitions( -DiMSTK_USE_ODE )
-else()
-    remove_definitions( -DdDouble )
-    remove_definitions( -DiMSTK_USE_ODE )
-endif()
 
 # OpenVR
 if(${PROJECT_NAME}_ENABLE_VR)
@@ -297,6 +276,12 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   include(imstkExternalData)
   include(imstkExternalDataDownloadTest)
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
+  #-----------------------------------------------------------------------------
+  # Add shaders
+  #-----------------------------------------------------------------------------
+  include(imstkCopyAndCompileShaders)
+  CopyAndCompileShaders()
 endif()
 
 #--------------------------------------------------------------------------
