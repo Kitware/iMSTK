@@ -25,6 +25,9 @@
 #include "vrpn_Tracker_NovintFalcon.h"
 #include "vrpn_Tracker_OSVRHackerDevKit.h"
 #include "vrpn_Streaming_Arduino.h"
+#ifdef VRPN_USE_PHANTOM_SERVER
+  #include "vrpn_Phantom.h"
+#endif
 
 #include "g3log/g3log.hpp"
 

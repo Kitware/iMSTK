@@ -6,6 +6,7 @@ imstk_add_library( Devices
   DEPENDS
     Core
     VRPN
+    OpenHapticsSDK
   )
 
 #-----------------------------------------------------------------------------

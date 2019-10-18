@@ -10,8 +10,8 @@ endif(WIN32)
 #-----------------------------------------------------------------------------
 # Phantom Omni
 #-----------------------------------------------------------------------------
-option(${PROJECT_NAME}_USE_OMNI "Build OpenHaptics to support the Phantom Omni in VRPN." OFF)
-if(${${PROJECT_NAME}_USE_OMNI})
+option(${PROJECT_NAME}_USE_OpenHaptics "Build OpenHaptics to support the Phantom Omni in VRPN." OFF)
+if(${${PROJECT_NAME}_USE_OpenHaptics})
   message(STATUS "Superbuild -   VRPN => ENABLING Phantom Omni support")
   if(NOT DEFINED OPENHAPTICS_ROOT_DIR OR NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
     set(OPENHAPTICS_ROOT_DIR "$ENV{OH_SDK_BASE}" CACHE PATH "Path to OpenHaptics install directory." FORCE)
@@ -32,7 +32,7 @@ endif()
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
-  GIT_TAG d7b36581721e0b13a9699eac6f0ea698f0a1c830
+  GIT_TAG 3c5426a28a70c8fcaf595f9e810ad548fbfc6650
   # This is the improve-openhaptics-rebase branch
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF
@@ -46,9 +46,9 @@ imstk_add_external_project( VRPN
     -DVRPN_USE_LIBUSB_1_0:BOOL=ON
     -DVRPN_USE_HID:BOOL=ON
     -DVRPN_USE_LIBNIFALCON:BOOL=ON
-    -DVRPN_BUILD_SERVERS:BOOL=${${PROJECT_NAME}_USE_OMNI}
-    -DVRPN_USE_PHANTOM_SERVER:BOOL=${${PROJECT_NAME}_USE_OMNI}
-    -DVRPN_USE_HDAPI:BOOL=${${PROJECT_NAME}_USE_OMNI}
+    -DVRPN_BUILD_SERVERS:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
+    -DVRPN_USE_PHANTOM_SERVER:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
+    -DVRPN_USE_HDAPI:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
     -DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
   DEPENDENCIES ${VRPN_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""

@@ -15,7 +15,7 @@
 #  limitations under the License.
 #
 ###########################################################################
-if(iMSTK_USE_OMNI)
+if(iMSTK_USE_OpenHaptics)
 
   project(Example-VirtualCoupling)
 

@@ -107,6 +107,9 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(tbb)
   imstk_define_dependency(VegaFEM)
   imstk_define_dependency(VTK)
+  if(${PROJECT_NAME}_USE_OpenHaptics)
+    imstk_define_dependency(OpenHaptics)
+  endif()
   imstk_define_dependency(VRPN)
 
   if(WIN32)
@@ -219,13 +222,11 @@ find_package( VegaFEM REQUIRED CONFIG )
 
 # VRPN
 find_package( VRPN REQUIRED )
-if(${PROJECT_NAME}_USE_OMNI)
-  find_package( OMNI REQUIRED )
+if(${PROJECT_NAME}_USE_OpenHaptics)
+  find_package( OpenHapticsSDK REQUIRED )
   add_definitions( -DiMSTK_USE_OPENHAPTICS )
-  add_definitions( -DVRPN_USE_PHANTOM_SERVER )
 else()
   remove_definitions( -DiMSTK_USE_OPENHAPTICS )
-  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
 endif()
 
 # VTK

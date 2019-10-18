@@ -16,7 +16,7 @@
 #
 ###########################################################################
 
-if(iMSTK_USE_OMNI)
+if(iMSTK_USE_OpenHaptics)
 
   project(Example-BoneDrilling)
 
@@ -36,12 +36,14 @@ if(iMSTK_USE_OMNI)
   if(UNIX)
     target_link_libraries(${PROJECT_NAME}
     SimulationManager
-    apiUtilities)     
+    apiUtilities
+    OpenHapticsSDK)
   else()
     target_link_libraries(${PROJECT_NAME}
     SimulationManager
     apiUtilities
-    SFML) 
+    SFML
+    OpenHapticsSDK)
   endif()
   
 

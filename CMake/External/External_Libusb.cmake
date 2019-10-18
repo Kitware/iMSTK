@@ -14,7 +14,7 @@ set(Libusb_EXTRACT_DIR ${Libusb_PREFIX}/libusb-1.0.20)
 # Set install commands
 #-----------------------------------------------------------------------------
 set(libusb_libdir "MS32")
-if(${CMAKE_GENERATOR} MATCHES "Win64")
+if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
   set(libusb_libdir "MS64")
 endif()
 
@@ -25,8 +25,13 @@ set(copy_libusb_headers_command
   )
 set(copy_libusb_lib_command
   ${CMAKE_COMMAND} -E copy
-  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/static/libusb-1.0.lib
+  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.lib
   ${CMAKE_INSTALL_PREFIX}/lib/libusb-1.0.lib
+  )
+set(copy_libusb_dll_command
+  ${CMAKE_COMMAND} -E copy
+  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.dll
+  ${CMAKE_INSTALL_PREFIX}/bin/
   )
 
 #-----------------------------------------------------------------------------
@@ -45,6 +50,7 @@ imstk_add_external_project( Libusb
   INSTALL_COMMAND
     COMMAND ${copy_libusb_headers_command}
     COMMAND ${copy_libusb_lib_command}
+    COMMAND ${copy_libusb_dll_command}
   RELATIVE_INCLUDE_PATH "include/libusb-1.0"
   #VERBOSE
   )
