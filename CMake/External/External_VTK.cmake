@@ -14,7 +14,8 @@ endif()
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
   GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git
-  GIT_TAG 9b6a039f43404053a0653f742148d123f6ada7d6
+  #GIT_TAG 9b6a039f43404053a0653f742148d123f6ada7d6 # 8.9
+  GIT_TAG v8.2.0
   CMAKE_ARGS
       -DBUILD_EXAMPLES:BOOL=OFF
       -DBUILD_TESTING:BOOL=OFF
