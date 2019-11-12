@@ -236,6 +236,7 @@ endif()
 
 # VTK
 find_package( VTK REQUIRED CONFIG )
+include( ${VTK_USE_FILE} )
 
 # Vulkan
 set(Vulkan "") # Target name for dependencies
