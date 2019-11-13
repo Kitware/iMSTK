@@ -22,6 +22,7 @@ project(Example-Rendering)
 # Create executable
 #-----------------------------------------------------------------------------
 add_executable(${PROJECT_NAME} RenderingExample.cpp)
+vtk_module_autoinit(TARGETS ${PROJECT_NAME} MODULES ${VTK_LIBRARIES})
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

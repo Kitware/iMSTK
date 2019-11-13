@@ -10,7 +10,6 @@ imstk_add_library( Geometry
     glm
     Assimp
     VegaFEM::volumetricMesh
-    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------

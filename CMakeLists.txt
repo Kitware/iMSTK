@@ -235,8 +235,31 @@ else()
 endif()
 
 # VTK
-find_package( VTK REQUIRED CONFIG )
-include( ${VTK_USE_FILE} )
+find_package(VTK CONFIG)
+if (VTK_VERSION VERSION_LESS "8.90")
+  # Modules are linked via `vtkCommonCore`
+  # VTK_DEFINITIONS has autoinit information
+  find_package(VTK REQUIRED)
+  include(${VTK_USE_FILE})
+else()
+  # modules are linked via `VTK::CommonCore`
+  # vtk_module_autoinit is needed
+  find_package(VTK COMPONENTS
+    CommonCore
+    FiltersGeneral
+    FiltersSources
+    ImagingCore
+    InteractionStyle
+    IOExport
+    IOImport
+    IOParallel
+    IOParallelXML
+    IOPLY
+    RenderingCore
+    RenderingAnnotation
+    RenderingOpenGL2
+  )
+endif()
 
 # Vulkan
 set(Vulkan "") # Target name for dependencies

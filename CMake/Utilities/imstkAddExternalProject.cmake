@@ -78,7 +78,7 @@ macro(imstk_add_external_project extProj)
   # If needs to download and build
   #-----------------------------------------------------------------------------
   if(NOT DEFINED ${extProj}_DIR AND NOT ${USE_SYSTEM_${extProj}})
-#-----------------------------------------------------------------------------
+    #-----------------------------------------------------------------------------
     # Ensure all generator info is passed to external library build
     #-----------------------------------------------------------------------------
     set (COMMON_CMAKE_EP_ARGS
