@@ -246,6 +246,7 @@ else()
   # vtk_module_autoinit is needed
   find_package(VTK COMPONENTS
     CommonCore
+    CommonDataModel
     FiltersGeneral
     FiltersSources
     ImagingCore
