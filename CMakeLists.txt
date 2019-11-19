@@ -285,7 +285,7 @@ endif()
 #--------------------------------------------------------------------------
 # External Utility Packages
 #--------------------------------------------------------------------------
-
+include(imstkAddExecutable)
 # Uncrustify
 find_program(Uncrustify_EXECUTABLE uncrustify)
 include(SetupUncrustifyConfig)

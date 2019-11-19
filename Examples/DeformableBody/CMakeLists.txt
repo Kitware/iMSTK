@@ -21,7 +21,7 @@ project(Example-DeformableBody)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} DeformableBodyExample.cpp)
+imstk_add_executable(${PROJECT_NAME} DeformableBodyExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

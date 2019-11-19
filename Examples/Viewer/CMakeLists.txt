@@ -21,8 +21,7 @@ project(Example-Viewer)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ViewerExample.cpp)
-vtk_module_autoinit(TARGETS ${PROJECT_NAME} MODULES ${VTK_LIBRARIES})
+imstk_add_executable(${PROJECT_NAME} ViewerExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

@@ -21,7 +21,7 @@ project(Example-PBDVolume)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} PBDVolumeExample.cpp)
+imstk_add_executable(${PROJECT_NAME} PBDVolumeExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

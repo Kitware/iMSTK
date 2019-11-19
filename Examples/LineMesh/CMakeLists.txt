@@ -21,7 +21,7 @@ project(Example-LineMesh)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} LineMeshExample.cpp)
+imstk_add_executable(${PROJECT_NAME} LineMeshExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

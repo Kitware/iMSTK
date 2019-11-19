@@ -21,7 +21,7 @@ project(Example-GeometryTransforms)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} GeometryTransformsExample.cpp)
+imstk_add_executable(${PROJECT_NAME} GeometryTransformsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

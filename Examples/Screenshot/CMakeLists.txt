@@ -21,7 +21,7 @@ project(Example-Screenshot)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ScreenshotExample.cpp)
+imstk_add_executable(${PROJECT_NAME} ScreenshotExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

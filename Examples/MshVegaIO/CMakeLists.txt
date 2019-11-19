@@ -21,7 +21,7 @@ project(Example-MshVegaIO)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} MshVegaIOExample.cpp)
+imstk_add_executable(${PROJECT_NAME} MshVegaIOExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

@@ -27,7 +27,7 @@ project(Example-Octree)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} OctreeExample.cpp BunnyMesh.cpp)
+imstk_add_executable(${PROJECT_NAME} OctreeExample.cpp BunnyMesh.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

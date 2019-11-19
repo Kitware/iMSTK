@@ -27,7 +27,7 @@ project(Example-DebugRendering)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} DebugRenderingExample.cpp)
+imstk_add_executable(${PROJECT_NAME} DebugRenderingExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

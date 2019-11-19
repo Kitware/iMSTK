@@ -26,7 +26,7 @@ project(Example-SPHFluid-BallDrop)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} SPHFluid-BallDrop.cpp)
+imstk_add_executable(${PROJECT_NAME} SPHFluid-BallDrop.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
