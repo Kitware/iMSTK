@@ -21,7 +21,7 @@ project(Example-NoRendering)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} noRenderingExample.cpp)
+imstk_add_executable(${PROJECT_NAME} noRenderingExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

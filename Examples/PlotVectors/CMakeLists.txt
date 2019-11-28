@@ -21,7 +21,7 @@ project(Example-PlotVectors)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} PlotVectorsExample.cpp)
+imstk_add_executable(${PROJECT_NAME} PlotVectorsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

@@ -2,11 +2,15 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
+set(HAPTIC_DEVICE_LIBS)
+if(${PROJECT_NAME}_USE_OpenHaptics)
+  set(HAPTIC_DEVICE_LIBS OpenHapticsSDK)
+endif()
 imstk_add_library( Devices
   DEPENDS
     Core
     VRPN
-    OpenHapticsSDK
+    ${HAPTIC_DEVICE_LIBS}
   )
 
 #-----------------------------------------------------------------------------

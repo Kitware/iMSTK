@@ -22,7 +22,7 @@ if(iMSTK_USE_Vulkan)
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  add_executable(${PROJECT_NAME} VulkanDecalsExample.cpp)
+  imstk_add_executable(${PROJECT_NAME} VulkanDecalsExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

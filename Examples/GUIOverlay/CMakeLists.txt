@@ -23,7 +23,7 @@ if(iMSTK_USE_Vulkan)
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  add_executable(${PROJECT_NAME} GUIOverlayExample.cpp)
+  imstk_add_executable(${PROJECT_NAME} GUIOverlayExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder

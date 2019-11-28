@@ -22,7 +22,7 @@ if(iMSTK_USE_OpenHaptics)
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
-    add_executable(${PROJECT_NAME} CameraControllerExample.cpp)
+    imstk_add_executable(${PROJECT_NAME} CameraControllerExample.cpp)
 
     #-----------------------------------------------------------------------------
     # Add the target to Examples folder

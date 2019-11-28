@@ -26,7 +26,7 @@ project(Example-PBDCollision-ManyDragons)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} PBDCollisionManyDragonsExample.cpp)
+imstk_add_executable(${PROJECT_NAME} PBDCollisionManyDragonsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

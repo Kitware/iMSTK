@@ -21,7 +21,7 @@ project(Example-SceneManagement)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} SceneManagementExample.cpp)
+imstk_add_executable(${PROJECT_NAME} SceneManagementExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

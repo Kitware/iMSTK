@@ -41,6 +41,11 @@ set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/bin")
 set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/lib")
 set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/include/imstk-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}")
+# Let's go ahead and make these directories
+file(MAKE_DIRECTORY ${${PROJECT_NAME}_INSTALL_BIN_DIR})
+file(MAKE_DIRECTORY ${${PROJECT_NAME}_INSTALL_LIB_DIR})
+file(MAKE_DIRECTORY ${${PROJECT_NAME}_INSTALL_SHARE_DIR})
+
 #-----------------------------------------------------------------------------
 # Update CMake module path & cmake dir
 #-----------------------------------------------------------------------------
@@ -234,7 +239,32 @@ else()
 endif()
 
 # VTK
-find_package( VTK REQUIRED CONFIG )
+find_package(VTK CONFIG)
+if (VTK_VERSION VERSION_LESS "8.90")
+  # Modules are linked via `vtkCommonCore`
+  # VTK_DEFINITIONS has autoinit information
+  find_package(VTK REQUIRED)
+  include(${VTK_USE_FILE})
+else()
+  # modules are linked via `VTK::CommonCore`
+  # vtk_module_autoinit is needed
+  find_package(VTK COMPONENTS
+    CommonCore
+    CommonDataModel
+    FiltersGeneral
+    FiltersSources
+    ImagingCore
+    InteractionStyle
+    IOExport
+    IOImport
+    IOParallel
+    IOParallelXML
+    IOPLY
+    RenderingCore
+    RenderingAnnotation
+    RenderingOpenGL2
+  )
+endif()
 
 # Vulkan
 set(Vulkan_Dependency)
@@ -255,7 +285,7 @@ endif()
 #--------------------------------------------------------------------------
 # External Utility Packages
 #--------------------------------------------------------------------------
-
+include(imstkAddExecutable)
 # Uncrustify
 find_program(Uncrustify_EXECUTABLE uncrustify)
 include(SetupUncrustifyConfig)

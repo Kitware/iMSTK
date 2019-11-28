@@ -21,7 +21,7 @@ project(Example-MeshIO)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} MeshIOExample.cpp)
+imstk_add_executable(${PROJECT_NAME} MeshIOExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

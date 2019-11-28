@@ -26,7 +26,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ManualCDWithOctreeExample.cpp 
+imstk_add_executable(${PROJECT_NAME} ManualCDWithOctreeExample.cpp 
 ../Sphere.cpp 
 ../Box.cpp 
 ../Triangle.cpp 

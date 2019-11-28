@@ -21,7 +21,7 @@ project(Example-Viewer)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} ViewerExample.cpp)
+imstk_add_executable(${PROJECT_NAME} ViewerExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

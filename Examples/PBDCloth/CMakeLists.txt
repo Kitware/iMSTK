@@ -21,7 +21,7 @@ project(Example-PBDCloth)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} pbdClothExample.cpp)
+imstk_add_executable(${PROJECT_NAME} pbdClothExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
