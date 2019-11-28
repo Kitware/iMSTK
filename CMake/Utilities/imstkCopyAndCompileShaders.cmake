@@ -6,7 +6,7 @@ add_custom_target(VulkanShaders)
 function(compileShaders sourceShader binaryShader)
   add_custom_command(
     TARGET VulkanShaders
-    COMMAND ${VulkanSDK_ROOT_DIR}/bin/glslangvalidator -V ${Vulkan_Shaders}/${sourceShader} -o ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/${binaryShader})
+    COMMAND ${CMAKE_INSTALL_PREFIX}/bin/glslangvalidator -V ${Vulkan_Shaders}/${sourceShader} -o ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders/${binaryShader})
 endfunction()
 
 function(CopyAndCompileShaders)
