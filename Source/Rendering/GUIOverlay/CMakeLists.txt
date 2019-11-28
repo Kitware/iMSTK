@@ -34,7 +34,7 @@ imstk_add_library( GUIOverlay
   DEPENDS
     Core
     imgui
-    ${Vulkan}
+    ${Vulkan_Dependency}
   )
 
 #-----------------------------------------------------------------------------

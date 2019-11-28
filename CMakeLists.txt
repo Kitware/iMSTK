@@ -126,6 +126,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   if(${PROJECT_NAME}_USE_Vulkan)
     imstk_define_dependency(glfw)
     imstk_define_dependency(gli)
+    imstk_define_dependency(Vulkan)
   endif()
 
   option(${PROJECT_NAME}_ENABLE_VR "Allow the usage of VR rendering." OFF)
@@ -221,34 +222,33 @@ add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE)
 find_package( VegaFEM REQUIRED CONFIG )
 
 # VRPN
+set(OpenHapticsSDK_Dependency)
 find_package( VRPN REQUIRED )
 if(${PROJECT_NAME}_USE_OpenHaptics)
   find_package( OpenHapticsSDK REQUIRED )
   add_definitions( -DiMSTK_USE_OPENHAPTICS )
+  set(OpenHapticsSDK_Dependency OpenHapticsSDK)
 else()
   remove_definitions( -DiMSTK_USE_OPENHAPTICS )
+  unset(OpenHapticsSDK_Dependency)
 endif()
 
 # VTK
 find_package( VTK REQUIRED CONFIG )
 
 # Vulkan
-set(Vulkan "") # Target name for dependencies
+set(Vulkan_Dependency)
 if( ${PROJECT_NAME}_USE_Vulkan )
-
-  set(Vulkan "VulkanSDK")
-
   find_package( VulkanSDK REQUIRED)
   add_definitions( -DiMSTK_USE_Vulkan )
-  
   # glfw
   find_package( glfw REQUIRED)
-
   # gli
   find_package( gli REQUIRED)
-
+  set(Vulkan_Dependency VulkanSDK)
 else()
   remove_definitions( -DiMSTK_USE_Vulkan )
+  unset(Vulkan_Dependency)
 endif()
 
 
