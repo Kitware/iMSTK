@@ -227,15 +227,12 @@ add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE)
 find_package( VegaFEM REQUIRED CONFIG )
 
 # VRPN
-set(OpenHapticsSDK_Dependency)
 find_package( VRPN REQUIRED )
 if(${PROJECT_NAME}_USE_OpenHaptics)
   find_package( OpenHapticsSDK REQUIRED )
   add_definitions( -DiMSTK_USE_OPENHAPTICS )
-  set(OpenHapticsSDK_Dependency OpenHapticsSDK)
 else()
   remove_definitions( -DiMSTK_USE_OPENHAPTICS )
-  unset(OpenHapticsSDK_Dependency)
 endif()
 
 # VTK

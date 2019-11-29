@@ -2,7 +2,7 @@
 # Compile Shaders
 #-----------------------------------------------------------------------------
 
-add_custom_target(VulkanShaders)
+add_custom_target(VulkanShaders ALL)
 function(compileShaders sourceShader binaryShader)
   add_custom_command(
     TARGET VulkanShaders
