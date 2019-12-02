@@ -73,6 +73,14 @@ ExternalProject_Include_Dependencies( ${PROJECT_NAME}
   SUPERBUILD_VAR ${PROJECT_NAME}_SUPERBUILD
   )
 
+set(VTK_PATCH_COMMAND)
+if(VTK_REPO_SOURCE EQUAL "8.2")
+  set(VTK_PATCH_COMMAND ${CMAKE_COMMAND}
+    -DVTK_SOURCE_DIR=${VTK_SOURCE_DIR}
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -P ${CMAKE_SOURCE_DIR}/CMake/External/Patches/vtk-8.2.cmake)
+endif()
+
 #-----------------------------------------------------------------------------
 # Inner build of the main project
 #-----------------------------------------------------------------------------
@@ -91,6 +99,7 @@ ExternalProject_Add( ${PROJECT_NAME}
     -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_ENABLE_AUDIO}
     -D${PROJECT_NAME}_ENABLE_VR:BOOL=${${PROJECT_NAME}_ENABLE_VR}
   DEPENDS ${${PROJECT_NAME}_DEPENDENCIES}
+  PATCH_COMMAND ${VTK_PATCH_COMMAND}
   )
 
 	#-----------------------------------------------------------------------------
