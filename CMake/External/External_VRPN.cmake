@@ -32,7 +32,7 @@ endif()
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vrpn.git
-  GIT_TAG 3c5426a28a70c8fcaf595f9e810ad548fbfc6650
+  GIT_TAG 021396b8770e6f14cb14427345d0b74479a32d82
   # This is the improve-openhaptics-rebase branch
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF
