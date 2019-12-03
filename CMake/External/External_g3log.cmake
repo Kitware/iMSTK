@@ -2,12 +2,10 @@
 # Add External Project
 #-----------------------------------------------------------------------------
 
-set(pre "lib")
-set(ext "a")
 if(MSVC)
-  set(pre "")
-  set(ext "lib")
-  set(config_dir "$(Configuration)")
+  set(g3log_built_library ${g3log_BINARY_DIR}/$(Configuration)/g3logger$<$<CONFIG:Debug>:d>.lib)
+else()
+  set(g3log_built_library ${g3log_BINARY_DIR}/libg3logger.a)
 endif()
 
 include(imstkAddExternalProject)
@@ -19,7 +17,7 @@ imstk_add_external_project( g3log
     -DADD_FATAL_EXAMPLE:BOOL=OFF
   INSTALL_COMMAND
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${g3log_SOURCE_DIR}/src/g3log ${CMAKE_INSTALL_PREFIX}/include/g3log
-    COMMAND ${CMAKE_COMMAND} -E copy ${g3log_BINARY_DIR}/${config_dir}/${pre}g3logger$<$<CONFIG:Debug>:d>.${ext} ${CMAKE_INSTALL_PREFIX}/lib/
+    COMMAND ${CMAKE_COMMAND} -E copy ${g3log_built_library} ${CMAKE_INSTALL_PREFIX}/lib/
   RELATIVE_INCLUDE_PATH "src"
   DEPENDENCIES ""
   #VERBOSE
