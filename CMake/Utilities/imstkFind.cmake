@@ -13,23 +13,40 @@ macro(imstk_find_header package header)
   if (${num_extra_args} GREATER 0)
     list(GET extra_macro_args 0 sub_dir)
   endif ()
+  
+  # Should I look in system locations?
+  set(use_system)
+  foreach(arg IN LISTS extra_macro_args)
+    if(arg STREQUAL "USE_SYSTEM")
+      set(use_system TRUE)
+    endif()
+  endforeach()
 
-  unset(_SEARCH_DIR)
-  if(${package}_ROOT_DIR)
-    set(_SEARCH_DIR ${${package}_ROOT_DIR}/${sub_dir})
-  else()
-    set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX}/include/${sub_dir})
-  endif()
-  #message(STATUS "Searching for : ${_SEARCH_DIR}/${header}")
+  if(NOT use_system)
+    unset(_SEARCH_DIR)
+    if(${package}_ROOT_DIR)
+      set(_SEARCH_DIR ${${package}_ROOT_DIR}/${sub_dir})
+    else()
+      set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX}/include/${sub_dir})
+    endif()
+    #message(STATUS "Searching for : ${_SEARCH_DIR}/${header}")
 
-  find_path(${package}_INCLUDE_DIR
-  NAMES
-    ${header}
-  PATHS
-    ${_SEARCH_DIR}
-  NO_DEFAULT_PATH
+    find_path(${package}_INCLUDE_DIR
+      NAMES
+        ${header}
+      PATHS
+        ${_SEARCH_DIR}
+      NO_DEFAULT_PATH
     )
+  else()
+    message(STATUS "I am looking in system for ${package}")
+    find_path(${package}_INCLUDE_DIR
+      NAMES
+        ${header}
+    )
+  endif()
   #message(STATUS "Found it : ${${package}_INCLUDE_DIR}/${header}")
+  
 
   if (EXISTS ${${package}_INCLUDE_DIR}/${header})
     string(TOUPPER ${package} PACKAGE)
@@ -59,19 +76,28 @@ macro(imstk_find_libary package library)
     #message(STATUS "${package} changing debug_postfix to ${debug_postfix}")
   endif()
   
-  unset(_SEARCH_DIR)
-  if(${package}_ROOT_DIR)
-    if(${package}_LIB_DIR)
-      set(_SEARCH_DIR ${${package}_ROOT_DIR}/${${package}_LIB_DIR})
+  # Should I look in system locations?
+  set(use_system)
+  foreach(arg IN LISTS extra_macro_args)
+    if(arg STREQUAL "USE_SYSTEM")
+      set(use_system TRUE)
     endif()
-    #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
-  else()
-    set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX}/lib)
-  endif()
+  endforeach()
   
-  
-  string(TOUPPER ${package} PACKAGE)
-  find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
+  if(NOT use_system)
+    unset(_SEARCH_DIR)
+    if(${package}_ROOT_DIR)
+      if(${package}_LIB_DIR)
+        set(_SEARCH_DIR ${${package}_ROOT_DIR}/${${package}_LIB_DIR})
+      endif()
+      #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
+    else()
+      set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+    endif()
+    
+    
+    string(TOUPPER ${package} PACKAGE)
+    find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
         ${library}
         lib${library}
@@ -79,16 +105,9 @@ macro(imstk_find_libary package library)
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Release
       NO_DEFAULT_PATH
-  )
-  if (EXISTS ${${PACKAGE}_LIBRARY_${library}-RELEASE})
-    #message(STATUS "${PACKAGE}_LIBRARY_${library}-RELEASE : ${${PACKAGE}_LIBRARY_${library}-RELEASE}")
-    list(APPEND ${PACKAGE}_LIBRARIES optimized ${${PACKAGE}_LIBRARY_${library}-RELEASE})
-    list(APPEND ${PACKAGE}_RELEASE_LIBRARIES ${${PACKAGE}_LIBRARY_${library}-RELEASE})
-  endif()
-  mark_as_advanced(${PACKAGE}_LIBRARY_${library}-RELEASE)
-  #message(STATUS "Libraries : ${${PACKAGE}_RELEASE_LIBRARIES}")
-  
-  find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
+    )
+    
+    find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
       NAMES
         ${library}${debug_postfix}
         lib${library}${debug_postfix}
@@ -96,7 +115,31 @@ macro(imstk_find_libary package library)
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Debug
       NO_DEFAULT_PATH
-  )
+    )
+    
+  else()
+    find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
+      NAMES
+        ${library}
+        lib${library}
+    )
+    
+    find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
+      NAMES
+        ${library}${debug_postfix}
+        lib${library}${debug_postfix}
+    )
+
+  endif()
+
+  if (EXISTS ${${PACKAGE}_LIBRARY_${library}-RELEASE})
+    #message(STATUS "${PACKAGE}_LIBRARY_${library}-RELEASE : ${${PACKAGE}_LIBRARY_${library}-RELEASE}")
+    list(APPEND ${PACKAGE}_LIBRARIES optimized ${${PACKAGE}_LIBRARY_${library}-RELEASE})
+    list(APPEND ${PACKAGE}_RELEASE_LIBRARIES ${${PACKAGE}_LIBRARY_${library}-RELEASE})
+  endif()
+  mark_as_advanced(${PACKAGE}_LIBRARY_${library}-RELEASE)
+  #message(STATUS "Libraries : ${${PACKAGE}_RELEASE_LIBRARIES}")
+
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-DEBUG})
     #message(STATUS "${PACKAGE}_LIBRARY_${library}-DEBUG : ${${PACKAGE}_LIBRARY_${library}-DEBUG}")
     list(APPEND ${PACKAGE}_LIBRARIES debug ${${PACKAGE}_LIBRARY_${library}-DEBUG})

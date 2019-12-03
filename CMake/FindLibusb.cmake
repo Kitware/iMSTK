@@ -3,8 +3,13 @@ include(imstkFind)
 # Find All Headers and Libraries for Libusb
 #-----------------------------------------------------------------------------
 
-imstk_find_header(Libusb libusb-1.0/libusb.h)
-imstk_find_libary(Libusb libusb-1.0 " ")#Use same library for debug
+set(USE_SYSTEM)
+if(NOT WIN32)
+  set(USE_SYSTEM "USE_SYSTEM")
+endif()
+
+imstk_find_header(Libusb libusb-1.0/libusb.h ${USE_SYSTEM})
+imstk_find_libary(Libusb libusb-1.0 " " ${USE_SYSTEM})#Use same library for debug
 imstk_find_package(Libusb)
 
 #message(STATUS "Libusb include : ${LIBUSB_INCLUDE_DIRS}")
