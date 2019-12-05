@@ -342,6 +342,18 @@ if(${PROJECT_NAME}_BUILD_EXAMPLES)
 endif()
 
 #--------------------------------------------------------------------------
+# Add setup script for *nix systems
+#--------------------------------------------------------------------------
+if(NOT WIN32)
+  # Create setup shell script to create an environment for running examples
+  configure_file(
+    ${CMAKE_SOURCE_DIR}/CMake/setup_iMSTK.sh.in
+    ${CMAKE_INSTALL_PREFIX}/setup_iMSTK.sh
+    @ONLY
+    )
+endif()
+
+#--------------------------------------------------------------------------
 # Innerbuild dummy test
 #--------------------------------------------------------------------------
 add_test(
