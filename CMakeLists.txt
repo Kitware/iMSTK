@@ -346,6 +346,10 @@ endif()
 #--------------------------------------------------------------------------
 if(NOT WIN32)
   # Create setup shell script to create an environment for running examples
+  set(LIBRARY_PATH_VAR "LD_LIBRARY_PATH")
+  if( APPLE )
+    set(LIBRARY_PATH_VAR "DYLD_FALLBACK_LIBRARY_PATH")
+  endif()
   configure_file(
     ${CMAKE_SOURCE_DIR}/CMake/setup_iMSTK.sh.in
     ${CMAKE_INSTALL_PREFIX}/setup_iMSTK.sh
