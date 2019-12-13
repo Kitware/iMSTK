@@ -13,11 +13,10 @@ imstk_add_library( SceneElements
   DEPENDS
     Core
     Geometry
+    DataStructures
     Constraints
     Devices
-    TimeIntegrators
     DynamicalModels
-    Materials
     ${iMSTK_ODE_DEPENDS}
   )
 

@@ -5,9 +5,8 @@ include(imstkAddLibrary)
 imstk_add_library( Solvers
   DEPENDS
     Core
-    Constraints
     DataStructures
-    DynamicalModels
+    Constraints
     SceneElements
   )
 

@@ -4,15 +4,16 @@
 include(imstkAddLibrary)
 imstk_add_library( DynamicalModels
   SUBDIR_LIST
+    ObjectStates
+    TimeIntegrators
     ObjectModels
     ObjectModels/PbdConstraints
-    ObjectStates
     InternalForceModel
   DEPENDS
     Core
+    DataStructures
     Constraints
     Geometry
-    TimeIntegrators
     Solvers
     VegaFEM::massSpringSystem
     VegaFEM::corotationalLinearFEM
