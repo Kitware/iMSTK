@@ -84,6 +84,11 @@ option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it dep
 
 if(${PROJECT_NAME}_SUPERBUILD)
 
+  # Select the release version of PhysX to use
+  set(${PROJECT_NAME}_PHYSX_CONFIGURATION "RELEASE" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
+  set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
+  set_property(CACHE ${PROJECT_NAME}_PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
+
   #-----------------------------------------------------------------------------
   # Define External dependencies
   #-----------------------------------------------------------------------------
@@ -106,6 +111,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(glm)
   imstk_define_dependency(imgui)
   imstk_define_dependency(LibNiFalcon)
+  imstk_define_dependency(PhysX)
   imstk_define_dependency(SCCD)
   imstk_define_dependency(tbb)
   imstk_define_dependency(VegaFEM)
@@ -204,6 +210,12 @@ if(${PROJECT_NAME}_ENABLE_VR)
 else()
   remove_definitions( -DiMSTK_ENABLE_VR )
 endif()
+
+# Select the release version of PhysX to use
+set(PHYSX_CONFIGURATION "${PHYSX_CONFIGURATION}" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
+set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
+set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
+find_package(PhysX REQUIRED)
 
 # SCCD
 find_package( SCCD REQUIRED )

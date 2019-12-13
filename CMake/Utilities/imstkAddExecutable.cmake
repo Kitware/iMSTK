@@ -9,6 +9,8 @@ macro(imstk_add_executable target)
   if (VTK_VERSION VERSION_GREATER_EQUAL  "8.90")
     vtk_module_autoinit(TARGETS ${target} MODULES ${VTK_LIBRARIES})
   endif()
+  set_target_properties(${target} PROPERTIES
+    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
   add_custom_command(TARGET ${target} POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${iMSTK_INSTALL_BIN_DIR})
 endmacro()

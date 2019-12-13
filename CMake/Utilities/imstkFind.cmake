@@ -66,14 +66,21 @@ endmacro()
 macro(imstk_find_libary package library)
 
   # Debug postfix argument is optional
+  set(release_postfix)
   set(debug_postfix ${CMAKE_DEBUG_POSTFIX})
   set (extra_macro_args ${ARGN})
   # Did we get any optional args?
   list(LENGTH extra_macro_args num_extra_args)
-  if (${num_extra_args} GREATER 0)
+  if (${num_extra_args} EQUAL 1)
     list(GET extra_macro_args 0 debug_postfix)
     string(STRIP ${debug_postfix} debug_postfix)
     #message(STATUS "${package} changing debug_postfix to ${debug_postfix}")
+  elseif(${num_extra_args} EQUAL 2)
+    list(GET extra_macro_args 0 release_postfix)
+    string(STRIP ${release_postfix} release_postfix)
+    list(GET extra_macro_args 1 debug_postfix)
+    string(STRIP ${debug_postfix} debug_postfix)
+    message(STATUS "Looking for ${package} libraries ${library}${release_postfix} and ${library}${debug_postfix}")
   endif()
   
   # Should I look in system locations?
@@ -96,17 +103,19 @@ macro(imstk_find_libary package library)
     endif()
     
     
+    unset(${PACKAGE}_LIBRARY_${library}-RELEASE CACHE)
     string(TOUPPER ${package} PACKAGE)
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
-        ${library}
-        lib${library}
+        ${library}${release_postfix}
+        lib${library}${release_postfix}
       PATHS
         ${_SEARCH_DIR}
         ${_SEARCH_DIR}/Release
       NO_DEFAULT_PATH
     )
     
+    unset(${PACKAGE}_LIBRARY_${library}-DEBUG CACHE)
     find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
       NAMES
         ${library}${debug_postfix}
@@ -118,12 +127,14 @@ macro(imstk_find_libary package library)
     )
     
   else()
+    unset(${PACKAGE}_LIBRARY_${library}-RELEASE CACHE)
     find_library(${PACKAGE}_LIBRARY_${library}-RELEASE
       NAMES
-        ${library}
-        lib${library}
+        ${library}${release_postfix}
+        lib${library}${release_postfix}
     )
     
+    unset(${PACKAGE}_LIBRARY_${library}-DEBUG CACHE)
     find_library(${PACKAGE}_LIBRARY_${library}-DEBUG
       NAMES
         ${library}${debug_postfix}

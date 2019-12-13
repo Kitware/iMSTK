@@ -9,12 +9,12 @@ if(${${PROJECT_NAME}_ENABLE_VR})
 endif()
 
 
-set(VTK_REPO_SOURCE "8.2" CACHE STRING "Select VTK Source Branch/Tag")
+set(${PROJECT_NAME}_VTK_REPO_SOURCE "8.2" CACHE STRING "Select VTK Source Branch/Tag")
 set(VTK_SOURCES "8.2;8.9;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
-set_property(CACHE VTK_REPO_SOURCE PROPERTY STRINGS ${VTK_SOURCES})
+set_property(CACHE ${PROJECT_NAME}_VTK_REPO_SOURCE PROPERTY STRINGS ${VTK_SOURCES})
 
 set(VTK_GIT_TAG)
-if(VTK_REPO_SOURCE EQUAL "8.2")
+if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.2")
   set(VTK_MODULE_SETTINGS
     -DModule_vtkRenderingOpenGL2:BOOL=ON
     -DModule_vtkIOXML:BOOL=ON
@@ -43,7 +43,7 @@ else()
     -DVTK_MODULE_ENABLE_VTK_glew:STRING=YES
     -DVTK_MODULE_ENABLE_VTK_RenderingContext2D:STRING=YES
   )
-  if(VTK_REPO_SOURCE EQUAL "8.9")
+  if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.9")
     set(VTK_GIT_TAG "9b6a039f43404053a0653f742148d123f6ada7d6")
   else()
     set(VTK_GIT_TAG "origin/${VTK_GIT_TAG}")
