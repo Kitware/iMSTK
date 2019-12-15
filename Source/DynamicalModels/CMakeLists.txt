@@ -5,14 +5,15 @@ include(imstkAddLibrary)
 imstk_add_library( DynamicalModels
   SUBDIR_LIST
     ObjectStates
-	TimeIntegrators
+    TimeIntegrators
     ObjectModels
     ObjectModels/PbdConstraints
     InternalForceModel
   DEPENDS
     Core
-    Geometry
+    DataStructures
     Constraints
+    Geometry
     Solvers
     VegaFEM::massSpringSystem
     VegaFEM::corotationalLinearFEM
@@ -26,6 +27,6 @@ imstk_add_library( DynamicalModels
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif() 
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

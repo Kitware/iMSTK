@@ -65,4 +65,4 @@ HDAPIDeviceServer::cleanUpModule()
 }
 } // imstk
 
-#endif // ifdef iMSTK_USE_OMNI
+#endif // ifdef iMSTK_USE_OpenHaptics

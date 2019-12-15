@@ -65,8 +65,8 @@ VTKCustomPolyDataMapper::GetShaderTemplate(
     vtkRenderer* vtkNotUsed(renderer),
     vtkActor* actor)
 {
-    this->loadShader("./Shaders/VTKShaders/mesh.vert", m_vertexShaderSource);
-    this->loadShader("./Shaders/VTKShaders/mesh.frag", m_fragmentShaderSource);
+    this->loadShader("../data/shaders/VTKShaders/mesh.vert", m_vertexShaderSource);
+    this->loadShader("../data/shaders/VTKShaders/mesh.frag", m_fragmentShaderSource);
 
     //auto renderMaterial = m_geometry->getRenderMaterial();
 

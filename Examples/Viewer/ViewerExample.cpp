@@ -50,7 +50,7 @@ main()
     // Add spot light (red)
     auto colorLight = std::make_shared<SpotLight>("colorLight");
     colorLight->setPosition(Vec3d(4, 3, 1));
-    colorLight->setFocalPoint(Vec3d(0, 0, 0));
+    colorLight->setFocalPoint(Vec3d(0, 0.25, 0));
     colorLight->setColor(Color::Red);
     colorLight->setIntensity(100);
     colorLight->setSpotAngle(1);

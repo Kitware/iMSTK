@@ -3,16 +3,22 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( Scene
+  H_FILES
+    imstkScene.h
+    imstkCollisionGraph.h
+  CPP_FILES
+    imstkScene.cpp
+    imstkCollisionGraph.cpp
   DEPENDS
     Core
+    Collision
     SceneElements
     DynamicalModels
-    Collision
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif()
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

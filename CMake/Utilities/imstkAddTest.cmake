@@ -112,12 +112,12 @@ function(imstk_add_test target)
   create_test_sourcelist(test_sourcelist ${test_driver_name}.cpp ${test_file_names})
 
   # Create test driver executable
-  add_executable(${test_driver_executable} ${test_driver_name}.cpp ${test_files})
+  imstk_add_executable(${test_driver_executable} ${test_driver_name}.cpp ${test_files})
 
   # Link test driver against current target, gtest and pthread
   target_link_libraries(${test_driver_executable}
     ${target}
-    ${GoogleTest_LIBRARIES}
+    ${GOOGLETEST_LIBRARIES}
     Threads::Threads
   )
   

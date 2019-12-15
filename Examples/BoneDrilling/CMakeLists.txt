@@ -16,45 +16,48 @@
 #
 ###########################################################################
 
-if(iMSTK_USE_OMNI)
+if(iMSTK_USE_OpenHaptics)
 
-    project(Example-BoneDrilling)
+  project(Example-BoneDrilling)
 
-    #-----------------------------------------------------------------------------
-    # Create executable
-    #-----------------------------------------------------------------------------
-    add_executable(${PROJECT_NAME} BoneDrillingExample.cpp)
+  #-----------------------------------------------------------------------------
+  # Create executable
+  #-----------------------------------------------------------------------------
+  imstk_add_executable(${PROJECT_NAME} BoneDrillingExample.cpp)
 
-    #-----------------------------------------------------------------------------
-    # Add the target to Examples folder
-    #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+  #-----------------------------------------------------------------------------
+  # Add the target to Examples folder
+  #-----------------------------------------------------------------------------
+  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
-    #-----------------------------------------------------------------------------
-    # Link libraries to executable
-    #-----------------------------------------------------------------------------
-    if(UNIX)
-      target_link_libraries(${PROJECT_NAME}
-      SimulationManager
-      apiUtilities)     
-    else()
-      target_link_libraries(${PROJECT_NAME}
-      SimulationManager
-      apiUtilities
-      SFML) 
-    endif()
-    
-    #-----------------------------------------------------------------------------
-    # Add shaders
-    #-----------------------------------------------------------------------------
-    include(imstkCopyAndCompileShaders)
-    CopyAndCompileShaders()
-      
-    #-----------------------------------------------------------------------------
-    # Associate external data
-    #-----------------------------------------------------------------------------
-    list(APPEND FILE_LIST
-        asianDragon/,REGEX:.*)
-    imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+  #-----------------------------------------------------------------------------
+  # Link libraries to executable
+  #-----------------------------------------------------------------------------
+  if(UNIX)
+    target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    apiUtilities
+    OpenHapticsSDK)
+  else()
+    target_link_libraries(${PROJECT_NAME}
+    SimulationManager
+    apiUtilities
+    SFML
+    OpenHapticsSDK)
+  endif()
+  
 
+  #-----------------------------------------------------------------------------
+  # Associate external data
+  #-----------------------------------------------------------------------------
+  list(APPEND FILE_LIST
+      asianDragon/,REGEX:.*)
+  imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
+  #-----------------------------------------------------------------------------
+  # Set MSVC working directory to the install/bin directory
+  #-----------------------------------------------------------------------------
+  if(MSVC) # Configure running executable out of MSVC
+    set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${iMSTK_INSTALL_BIN_DIR}")
+  endif()
 endif()

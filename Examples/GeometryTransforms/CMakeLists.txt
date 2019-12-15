@@ -21,7 +21,7 @@ project(Example-GeometryTransforms)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} GeometryTransformsExample.cpp)
+imstk_add_executable(${PROJECT_NAME} GeometryTransformsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
@@ -32,16 +32,17 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
-    
-#-----------------------------------------------------------------------------
-# Add shaders
-#-----------------------------------------------------------------------------
-include(imstkCopyAndCompileShaders)
-CopyAndCompileShaders()
-  
+
 #-----------------------------------------------------------------------------
 # Associate external data
 #-----------------------------------------------------------------------------
 list(APPEND FILE_LIST
     asianDragon/,REGEX:.*)
 imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
+
+#-----------------------------------------------------------------------------
+# Set MSVC working directory to the install/bin directory
+#-----------------------------------------------------------------------------
+if(MSVC) # Configure running executable out of MSVC
+  set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${iMSTK_INSTALL_BIN_DIR}")
+endif()

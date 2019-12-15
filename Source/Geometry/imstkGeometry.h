@@ -24,7 +24,6 @@
 #include "g3log/g3log.hpp"
 
 #include "imstkMath.h"
-#include "imstkRenderMaterial.h"
 #include "imstkParallelUtils.h"
 
 #include <string>

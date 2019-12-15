@@ -39,7 +39,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "imgui.h"
-#include "examples/imgui_impl_vulkan.h"
+#include "imgui_impl_vulkan.h"
 
 #include "imstkScene.h"
 #include "imstkRenderer.h"

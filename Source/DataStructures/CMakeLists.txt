@@ -2,16 +2,17 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Datastructures
+imstk_add_library( DataStructures
   DEPENDS
     Core
-	Geometry
+    Materials
+    Geometry
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( BUILD_TESTING )
+if( ${PROJECT_NAME}_BUILD_TESTING )
   include(imstkAddTest)
-  imstk_add_test( Datastructures )
+  imstk_add_test( DataStructures )
 endif()

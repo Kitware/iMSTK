@@ -1,54 +1,12 @@
+include(imstkFind)
 #-----------------------------------------------------------------------------
-# Find path
+# Find All Headers and Libraries for GoogleMock
 #-----------------------------------------------------------------------------
-find_path(GoogleMock_INCLUDE_DIR
-  NAMES
-    gmock/gmock.h
-  PATH_SUFFIXES
-    googlemock/include
-    )
-mark_as_advanced(GoogleMock_INCLUDE_DIR)
-list(APPEND GoogleMock_INCLUDE_DIRS ${GoogleMock_INCLUDE_DIR})
 
-#-----------------------------------------------------------------------------
-# Find library
-#-----------------------------------------------------------------------------
-find_library(GoogleMock_LIBRARY
-  NAMES
-    libgmock
-    gmock
-    libgmockd
-    gmockd
-  )
-mark_as_advanced(GoogleMock_LIBRARY)
-list(APPEND GoogleMock_LIBRARIES ${GoogleMock_LIBRARY})
+imstk_find_header(GoogleMock gmock/gmock.h)
+imstk_find_libary(GoogleMock gmock)
+imstk_find_libary(GoogleMock gmock_main)
+imstk_find_package(GoogleMock)
 
-find_library(GoogleMock_main_LIBRARY
-  NAMES
-    libgmock_main
-    gmock_main
-    libgmock_maind
-    gmock_maind
-  )
-mark_as_advanced(GoogleMock_main_LIBRARY)
-list(APPEND GoogleMock_LIBRARIES ${GoogleMock_main_LIBRARY})
-
-#-----------------------------------------------------------------------------
-# Find package
-#-----------------------------------------------------------------------------
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(GoogleMock
-  REQUIRED_VARS
-    GoogleMock_INCLUDE_DIRS
-    GoogleMock_LIBRARIES)
-
-#-----------------------------------------------------------------------------
-# If missing target, create it
-#-----------------------------------------------------------------------------
-if(GoogleMock_FOUND AND NOT TARGET GoogleMock)
-  add_library(GoogleMock INTERFACE IMPORTED)
-  set_target_properties(GoogleMock PROPERTIES
-    INTERFACE_LINK_LIBRARIES "${GoogleMock_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${GoogleMock_INCLUDE_DIR}"
-  )
-endif()
+#message(STATUS "GoogleMock include : ${GOOGLEMOCK_INCLUDE_DIRS}")
+#message(STATUS "GoogleMock libraries : ${GOOGLEMOCK_LIBRARIES}")

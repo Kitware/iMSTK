@@ -1,4 +1,3 @@
-set( CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_MODULE_PATH} )
 include(ExternalProject)
 include(imstkSolveDependencies)
 
@@ -10,53 +9,26 @@ if(NOT GIT_EXECUTABLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Output Directories
-#-----------------------------------------------------------------------------
-if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY) 
-  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIB_DIR})
-endif()
-if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_LIB_DIR})
-endif()
-if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${${PROJECT_NAME}_BIN_DIR})
-endif()
-
-mark_as_superbuild(
-  VARS
-    CMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH
-    CMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH
-    CMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH
-  ALL_PROJECTS
-  )
-
-#-----------------------------------------------------------------------------
-# Search Directories
-#-----------------------------------------------------------------------------
-list(APPEND CMAKE_LIBRARY_PATH
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-  ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-  )
-list(APPEND CMAKE_PROGRAM_PATH
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
-  )
-
-list(APPEND CMAKE_INCLUDE_PATH "") # Populated in each External_*.cmake
-
-mark_as_superbuild(
-  VARS
-    CMAKE_LIBRARY_PATH
-    CMAKE_PROGRAM_PATH
-    CMAKE_INCLUDE_PATH
-  ALL_PROJECTS
-  )
-
-#-----------------------------------------------------------------------------
 # CMake global args
 #-----------------------------------------------------------------------------
+if(MSVC)
+  # Allow the MP flag to get set externally
+  set(iMSTK_ENABLE_MULTI_PROCESS_BUILDS ON CACHE BOOL "Enable multi-process builds")
+  set(PROCESSOR_COUNT "$ENV{NUMBER_OF_PROCESSORS}")
+  set(iMSTK_NUM_BUILD_PROCESSES ${PROCESSOR_COUNT} CACHE STRING "The maximum number of processes for the /MP flag")
+  if(${PROJECT}_ENABLE_MULTI_PROCESS_BUILDS)
+    set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} /MP${iMSTK_NUM_BUILD_PROCESSES}" CACHE STRING INTERNAL FORCE)
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /MP${iMSTK_NUM_BUILD_PROCESSES}" CACHE STRING INTERNAL FORCE)
+  endif()
+endif()
+
 mark_as_superbuild(
   VARS
     CMAKE_BUILD_TYPE
+    CMAKE_DEBUG_POSTFIX
+    CMAKE_INSTALL_PREFIX
+    CMAKE_MODULE_PATH
+    CMAKE_PREFIX_PATH
     CMAKE_C_COMPILER
     CMAKE_CXX_COMPILER
     CMAKE_C_FLAGS
@@ -101,26 +73,36 @@ ExternalProject_Include_Dependencies( ${PROJECT_NAME}
   SUPERBUILD_VAR ${PROJECT_NAME}_SUPERBUILD
   )
 
+set(VTK_PATCH_COMMAND)
+if(VTK_REPO_SOURCE EQUAL "8.2")
+  set(VTK_PATCH_COMMAND ${CMAKE_COMMAND}
+    -DVTK_SOURCE_DIR=${VTK_SOURCE_DIR}
+    -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    -P ${CMAKE_SOURCE_DIR}/CMake/External/Patches/vtk-8.2.cmake)
+endif()
+
 #-----------------------------------------------------------------------------
 # Inner build of the main project
 #-----------------------------------------------------------------------------
 ExternalProject_Add( ${PROJECT_NAME}
   ${${PROJECT_NAME}_EP_ARGS}
   DOWNLOAD_COMMAND ""
-  INSTALL_COMMAND ""
   SOURCE_DIR ${${PROJECT_NAME}_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/Innerbuild
+  ${COMMON_CMAKE_EP_ARGS}
   CMAKE_ARGS
     -DBUILD_EXAMPLES:BOOL=${BUILD_EXAMPLES}
     -DBUILD_TESTING:BOOL=${BUILD_TESTING}
+    -DPHYSX_CONFIGURATION:STRING=${${PROJECT_NAME}_PHYSX_CONFIGURATION}
     -D${PROJECT_NAME}_SUPERBUILD:BOOL=OFF
-    -D${PROJECT_NAME}_USE_OMNI:BOOL=${${PROJECT_NAME}_USE_OMNI}
-    -D${PROJECT_NAME}_USE_ODE:BOOL=${${PROJECT_NAME}_USE_ODE}
-    -DODE_ROOT_DIR:PATH=${ODE_ROOT_DIR}
+    -D${PROJECT_NAME}_USE_OpenHaptics:BOOL=${${PROJECT_NAME}_USE_OpenHaptics}
     -D${PROJECT_NAME}_USE_Vulkan:BOOL=${${PROJECT_NAME}_USE_Vulkan}
     -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_ENABLE_AUDIO}
     -D${PROJECT_NAME}_ENABLE_VR:BOOL=${${PROJECT_NAME}_ENABLE_VR}
   DEPENDS ${${PROJECT_NAME}_DEPENDENCIES}
+  PATCH_COMMAND 
+    COMMAND ${VTK_PATCH_COMMAND}
+    # Always build these non standard configurations
   )
 
 	#-----------------------------------------------------------------------------

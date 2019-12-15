@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVulkanViewer.h"
+#include "imgui_impl_glfw.h"
 
 namespace imstk
 {

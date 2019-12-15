@@ -36,8 +36,8 @@ namespace imstk
 {
 namespace VulkanShaderPath
 {
-const std::string Mesh("./Shaders/VulkanShaders/Mesh/");
-const std::string PostProcessing("./Shaders/VulkanShaders/PostProcessing/");
+const std::string Mesh("../data/shaders/VulkanShaders/mesh/");
+const std::string PostProcessing("../data/shaders/VulkanShaders/PostProcessing/");
 }
 
 class VulkanShaderLoader

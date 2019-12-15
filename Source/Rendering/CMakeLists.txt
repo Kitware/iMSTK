@@ -103,11 +103,12 @@ else()
     VulkanRenderer/RenderDelegate
     VulkanRenderer/PostProcessing)
   set(RENDERING_DEPENDENCIES
-    ${VulkanSDK_LIBRARIES}
-    glfw
-    gli
     GUIOverlay
     Materials)
+  set(RENDERING_LIBRARIES
+    ${Vulkan}
+    glfw
+    gli)
   if (iMSTK_ENABLE_VR)
     list(APPEND RENDERING_DEPENDENCIES openvr)
   endif()
@@ -126,17 +127,18 @@ imstk_add_library( Rendering
   SUBDIR_LIST
     ${RENDERING_SUBDIR}
   DEPENDS
-    ${VTK_LIBRARIES}
     ${RENDERING_DEPENDENCIES}
     Scene
     Animation
     glm
+    ${VTK_LIBRARIES}
+    ${RENDERING_LIBRARIES}
   #VERBOSE
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
-endif()
+#if( ${PROJECT_NAME}_BUILD_TESTING )
+#  add_subdirectory( Testing )
+#endif()

@@ -1,12 +1,24 @@
+include(imstkFind)
 #-----------------------------------------------------------------------------
-# Find path
+# Find All Headers for imgui
 #-----------------------------------------------------------------------------
-find_path(imgui_INCLUDE_DIR
+imstk_find_header(imgui imgui.h imgui)
+imstk_find_header_package(imgui)
+#message(STATUS "imgui includes : ${IMGUI_INCLUDE_DIRS}")
+
+#-----------------------------------------------------------------------------
+# Find Source
+# Since imgui has no CMake, code is pulled into an iMSTK component directly
+#-----------------------------------------------------------------------------
+find_path(IMGUI_SOURCE_DIR
   NAMES
-    imgui.h
-    )
-mark_as_advanced(imgui_INCLUDE_DIR)
-message(STATUS "imgui_INCLUDE_DIR : ${imgui_INCLUDE_DIR}")
+    imgui.cpp
+  PATHS
+    ${CMAKE_BINARY_DIR}/../External/imgui/src
+  NO_DEFAULT_PATH
+  )
+mark_as_advanced(IMGUI_SOURCE_DIR)
+#message(STATUS "imgui source : ${IMGUI_SOURCE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Find package
@@ -14,11 +26,4 @@ message(STATUS "imgui_INCLUDE_DIR : ${imgui_INCLUDE_DIR}")
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(imgui
   REQUIRED_VARS
-    imgui_INCLUDE_DIR)
-
-#-----------------------------------------------------------------------------
-# If missing target, create it
-#-----------------------------------------------------------------------------
-if(GLM_FOUND AND NOT TARGET imgui)
-  add_library(imgui INTERFACE IMPORTED)
-endif()
+    IMGUI_SOURCE_DIR)

@@ -1,0 +1,7 @@
+#
+# Script to source to setup the iMSTK environment
+#
+this_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+export PATH=$this_dir/bin:$PATH
+export @LIBRARY_PATH_VAR@=$this_dir/lib:$@LIBRARY_PATH_VAR@

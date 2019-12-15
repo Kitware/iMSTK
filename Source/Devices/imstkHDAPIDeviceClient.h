@@ -87,4 +87,4 @@ private:
 }
 
 #endif // ifndef imstkHDAPIDeviceClient_h
-#endif // ifdef iMSTK_USE_OMNI
+#endif // ifdef iMSTK_USE_OpenHaptics

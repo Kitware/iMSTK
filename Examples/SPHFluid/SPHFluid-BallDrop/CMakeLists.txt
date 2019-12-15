@@ -16,12 +16,17 @@
 #
 ###########################################################################
 
+# Uses VTK Text Status Manager
+if(iMSTK_USE_Vulkan)
+  return()
+endif()
+
 project(Example-SPHFluid-BallDrop)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-add_executable(${PROJECT_NAME} SPHFluid-BallDrop.cpp)
+imstk_add_executable(${PROJECT_NAME} SPHFluid-BallDrop.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
@@ -34,11 +39,9 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
 
 #-----------------------------------------------------------------------------
-# Add shaders
+# Set MSVC working directory to the install/bin directory
 #-----------------------------------------------------------------------------
-include(imstkCopyAndCompileShaders)
-CopyAndCompileShaders()
+if(MSVC) # Configure running executable out of MSVC
+  set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${iMSTK_INSTALL_BIN_DIR}")
+endif()
 
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------

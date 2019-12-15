@@ -1,3 +1,8 @@
+include(imstkFind)
+imstk_find_header(Eigen Eigen/Eigen eigen3)
+imstk_find_header_package(Eigen)
+#message(STATUS "Eigen includes : ${EIGEN_INCLUDE_DIRS}")
+
 #-----------------------------------------------------------------------------
 # Set min version to find if not set
 #-----------------------------------------------------------------------------
@@ -16,20 +21,9 @@ if(NOT Eigen_FIND_VERSION)
 endif()
 
 #-----------------------------------------------------------------------------
-# Find path
-#-----------------------------------------------------------------------------
-find_path(Eigen_INCLUDE_DIR
-  NAMES
-    eigen/Eigen
-    Eigen
-    )
-mark_as_advanced(Eigen_INCLUDE_DIR)
-#message(STATUS "Eigen_INCLUDE_DIR : ${Eigen_INCLUDE_DIR}")
-
-#-----------------------------------------------------------------------------
 # Macro checking version
 #-----------------------------------------------------------------------------
-file(READ "${Eigen_INCLUDE_DIR}/Eigen/src/Core/util/Macros.h" _eigen_version_header)
+file(READ "${EIGEN_INCLUDE_DIRS}/Eigen/src/Core/util/Macros.h" _eigen_version_header)
 
 string(REGEX MATCH "define[ \t]+EIGEN_WORLD_VERSION[ \t]+([0-9]+)" _eigen_world_version_match "${_eigen_version_header}")
 set(EIGEN_WORLD_VERSION "${CMAKE_MATCH_1}")
@@ -46,26 +40,6 @@ else(${Eigen_VERSION} VERSION_LESS ${Eigen_FIND_VERSION})
 endif(${Eigen_VERSION} VERSION_LESS ${Eigen_FIND_VERSION})
 
 if(NOT Eigen_VERSION_OK)
-  message(STATUS "Eigen version ${Eigen_VERSION} found in ${Eigen_INCLUDE_DIR},"
+  message(STATUS "Eigen version ${Eigen_VERSION} found in ${EIGEN_INCLUDE_DIRS},"
     "but at least version ${Eigen_FIND_VERSION} is required")
 endif(NOT Eigen_VERSION_OK)
-
-#-----------------------------------------------------------------------------
-# Find package
-#-----------------------------------------------------------------------------
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Eigen
-  REQUIRED_VARS
-    Eigen_INCLUDE_DIR
-    Eigen_VERSION_OK)
-
-#-----------------------------------------------------------------------------
-# If missing target, create it
-#-----------------------------------------------------------------------------
-if(Eigen_FOUND AND NOT TARGET Eigen)
-  add_library(Eigen INTERFACE IMPORTED)
-  set_target_properties(Eigen PROPERTIES
-    INTERFACE_LINK_LIBRARIES "${Eigen_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${Eigen_INCLUDE_DIR}"
-  )
-endif()
