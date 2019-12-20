@@ -18,27 +18,15 @@
    limitations under the License.
 
 =========================================================================*/
-#include "imstkRigidObject.h"
+
+#include "imstkRigidBodyState.h"
 
 namespace imstk
 {
-bool
-RigidObject::initialize()
+void
+RigidBodyState::initialize(const Vec3d position, const RigidTransform3d rotationMat)
 {
-    auto m_rigidBodyModel = std::dynamic_pointer_cast<RigidBodyModel>(m_dynamicalModel);
-    if (m_rigidBodyModel)
-    {
-        /*if (!m_rigidBodyModel->getRigidBodyWorld())
-        {
-            LOG(WARNING) << "RigidObject::initialize() - Rigid body world not specified!";
-            return false;
-        }*/
-        return DynamicObject::initialize();
-    }
-    else
-    {
-        LOG(WARNING) << "RigidObject::initialize() - Dynamics pointer cast failure";
-        return false;
-    }
+    m_position    = position;
+    m_orientation = rotationMat;
 }
 } // imstk

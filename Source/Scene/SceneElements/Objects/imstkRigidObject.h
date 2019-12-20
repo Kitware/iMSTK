@@ -21,27 +21,16 @@
 
 #pragma once
 
-#ifdef iMSTK_USE_ODE
 // imstk
 #include "imstkDynamicObject.h"
-#include "ode/ode.h"
+#include "imstkRigidBodyModel.h"
 
 namespace imstk
 {
-/// \todo Complete this
-class RigidBodyState
-{
-public:
-    ///
-    /// \brief Set the state to a given one
-    ///
-    void setState(std::shared_ptr<RigidBodyState> rhs) {};
-};
-
 ///
 /// \class RigidObject
 ///
-/// \brief Base class for scene objects that is rigid and movable
+/// \brief Scene objects that are governed by rigid body dynamics
 ///
 class RigidObject : public DynamicObject<RigidBodyState>
 {
@@ -55,34 +44,37 @@ public:
         m_type = Type::Rigid;
     }
 
-    //ode related functions
-
-    //
-    // callback called at every loop
-    //
-    static void odeNearCallback(void* data, dGeomID o1, dGeomID o2);
-
-    // initialize ode
-    static void initOde();
-
-    // close ode
-    static void closeOde();
-
-    //
-    static void simulationStep();
-
-    //
-    static void getGeometryConfig(imstk::Vec3d& p, imstk::Mat3d& orientation);
-
-    // This is just a simple function to test ODE
-    static void setup();
-
     ///
     /// \brief Destructor
     ///
     ~RigidObject() = default;
 
+    ///
+    /// \brief Initialize the rigid scene object
+    ///
+    bool initialize() override;
+
+	///
+	/// \brief Add local force at a position relative to object
+	///
+	void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true)
+	{
+		getRigidBodyModel()->addForce(force, pos, wakeup);
+	}
+
+    ///
+    /// \brief Get/Set rigid body model
+    ///
+    void setRigidBodyModel(std::shared_ptr<RigidBodyModel> rbModel) { m_dynamicalModel = rbModel; };
+    std::shared_ptr<RigidBodyModel> getRigidBodyModel() const { return std::dynamic_pointer_cast<RigidBodyModel>(m_dynamicalModel); };
+
+    void reset() override
+    {
+        m_dynamicalModel->resetToInitialState();
+        this->updateGeometries();
+    }
+
 protected:
+    //std::shared_ptr<RigidBodyModel> m_rigidBodyModel; ///> PBD mathematical model
 };
 } // imstk
-#endif //imstk_USE_ODE
