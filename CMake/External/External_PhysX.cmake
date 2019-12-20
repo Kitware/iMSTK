@@ -32,7 +32,7 @@ imstk_add_external_project( PhysX
     -DTARGET_BUILD_PLATFORM:STRING=${PHYSX_TARGET_BUILD_PLATFORM}
     -DPX_OUTPUT_ARCH:STRING=x86 # Either x86 or arm, only used for naming conventions (postfix)
     -DPHYSX_ROOT_DIR:PATH=${PhysX_SOURCE_DIR}/physx
-    -DCMAKEMODULES_PATH:PATH=${PhysX_SOURCE_DIR}/externals/CMakeModules
+    -DCMAKEMODULES_PATH:PATH=${PhysX_SOURCE_DIR}/externals/cmakemodules
     -DCMAKEMODULES_VERSION:STRING=1.27 # Must be set, but does not do anything...
     -DPXSHARED_PATH:PATH=${PhysX_SOURCE_DIR}/pxshared
     -DPX_OUTPUT_LIB_DIR:PATH=${PhysX_BINARY_DIR}

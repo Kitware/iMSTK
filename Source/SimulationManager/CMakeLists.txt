@@ -62,8 +62,6 @@ imstk_add_library( SimulationManager
     ${SIMULATIONMANAGER_SUBDIR}
   DEPENDS
     Rendering
-    Devices
-    Collision
     ${Vulkan}
   )
 

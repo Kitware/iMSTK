@@ -27,6 +27,7 @@
 #include "imstkDeformableObject.h"
 #include "imstkTimer.h"
 #include "imstkPbdSolver.h"
+#include "imstkRigidBodyWorld.h"
 
 #include <g3log/g3log.hpp>
 
@@ -303,6 +304,11 @@ Scene::advance()
 {
     StopWatch wwt;
     wwt.start();
+
+    // PhysX update; move this to solver
+    auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
+    physxScene->simulate(1.0f / 300.0f); // TODO: update the time step
+	physxScene->fetchResults(true);
 
     // Reset Contact forces to 0
     for (auto obj : this->getSceneObjects())

@@ -2,6 +2,7 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
+
 imstk_add_library( DynamicalModels
   SUBDIR_LIST
     ObjectStates
@@ -22,8 +23,9 @@ imstk_add_library( DynamicalModels
     VegaFEM::stvk
     VegaFEM::graph
     VegaFEM::volumetricMesh
+    PhysX
   )
-
+  
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
