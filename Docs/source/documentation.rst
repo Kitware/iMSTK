@@ -651,6 +651,43 @@ solver can determine the eventual stiffness exhibited by the cloth.
 
 Fluids
 ------
+iMSTK provides two options to simulated fluids: Smoothed-Particle Hydrodynamics (SPH) and PBD. 
+Both of them are particle-based formulations.
+
+Smoothed Particle Hydrodynamics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Smoothed Particle Hydrodynamics (SPH) is one of the widely used methods for simulating fluid flow (and solid mechanics) in distinct areas such as computer graphics, astrophysics, and oceanography among others. SPH is a mesh-free Lagrangian method that employs a kernel function to interpolate fluid properties and spatial derivatives at discrete particle positions.
+
+.. centered:: |image6|
+
+The SPH model in iMSTK is a form of Weakly Compressible SPH (WSPH) introduced by Becker and Teschner [sph1]_, but with a number of modifications. In particular, their proposed momentum equation for acceleration update and Tait’s equation for pressure computation was employed. However, two different functions for kernel evaluation and evaluation of kernel derivatives were used, similar to Muller et al. [sph2]_. In addition, a variant of XSPH [sph3]_ is used to model viscosity that is computationally cheaper than the traditional formulation. The forces of surface tension are modeled using a robust formulation proposed by Akinci et al. [sph4]_ allowing simulation of large surface tension forces in a realistic manner.
+
+During the simulation, each of the SPH particles needs to search for its neighbors within a preset radius of influence of the kernel function (see figure 1). In iMSTK, the nearest neighbor search is achieved using a uniform spatial grid data structure or using spatial hashing based lookup [sph5]_. For fluid-solid interaction, the current implementation only supports one-way coupling in which fluid particles are repelled from solids upon collision by penalty force generation.
+
+The code snippet below show creation and configuration of the SPH model and solver.
+::
+
+    // Create and configure SPH model
+    auto sphModel = std::make_shared<SPHModel>();
+    sphModel->setModelGeometry(fluidGeometry);
+
+    auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
+    sphParams->m_bNormalizeDensity = true;
+    sphParams->m_kernelOverParticleRadiusRatio = 6.0;
+    sphParams->m_viscosityCoeff                = 0.5;
+    sphParams->m_surfaceTensionStiffness       = 5.0;
+    sphModel->configure(sphParams);
+    sphModel->setTimeStepSizeType(TimeSteppingType::realTime);
+
+    ...
+
+    // Configure SPH solver
+    auto sphSolver = std::make_shared<SPHSolver>();
+    sphSolver->setSPHObject(fluidObj);
+    scene->addNonlinearSolver(sphSolver);
+
+Position based dynamics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Fluids (in this case liquids) are supported in iMSTK via PBD. Constant
 density constraints are solved within the PBD solution framework in
@@ -1070,7 +1107,21 @@ Bibliography
 
 .. [sfml] Simple and Fast Multimedia Library: https://github.com/SFML/SFML
 
+.. [sph1] Markus Becker and Matthias Teschner, “Weakly compressible SPH for free surface flows”. 
+   In Proceedings of the ACM SIGGRAPH/Eurographics symposium on Computer Animation, 209-217 (2007).
 
+.. [sph2] Matthias Müller, David Charypar, and Markus Gross, 
+   “Particle-based fluid simulation for interactive applications”. 
+   In Proceedings of the 2003 ACM SIGGRAPH/Eurographics symposium on Computer Animation, 154-159 (2003).
+
+.. [sph3] Hagit Schechter and Robert Bridson, “Ghost SPH for animating water”. 
+   ACM Transaction on Graphics, 31, 4, Article 61 (July 2012).
+
+.. [sph4] Nadir Akinci, Gizem Akinci, and Matthias Teschner, “Versatile surface tension and adhesion for SPH fluids”. 
+   ACM Transaction on Graphics, 32, 6, Article 182 (November 2013).
+
+.. [sph5] Teschner, M., Heidelberger, B., Müller, M., Pomeranets, D., and Gross, M, 
+   “Optimized spatial hashing for collision detection of deformable objects”. Proc. VMV, 47–54.
 
 .. |image0| image:: media/logo.png
    :width: 3.5in
@@ -1095,3 +1146,7 @@ Bibliography
 .. |image5| image:: media/decalsDemo.png
    :width: 570px
    :height: 188px
+
+.. |image6| image:: media/sph.png
+   :width: 711px
+   :height: 394px
