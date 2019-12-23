@@ -226,8 +226,20 @@ include:
 4. Adding and remove modules (run in separate threads)
 5. Starting the renderer
 
-The simulation manager can be configured to run in ‘simulation backend
-mode’ where the rendering is disabled.
+The simulation manager initialized in the following modes:
+
+- **rendering**: Launch the simulation with a render window
+- **runInBackground**: Launch the simulation without a render window but keeps looping the simulation
+- **backend**: Launch the simulation without a render window and returns the control
+
+These modes are enumerated at :code:`imstk::SimulationManager::Mode`. The default mode
+is *rendering*. The usage is as follows.
+
+::
+
+    auto simManager   = std::make_shared<SimulationManager>(
+                              SimulationManager::Mode::rendering /* rendering mode*/, 
+                              false /*no VR mode*/);
 
 Scene Manager
 ~~~~~~~~~~~~~
