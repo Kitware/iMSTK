@@ -107,9 +107,9 @@ For more information, visit our website: http://www.imstk.org/
 
 **Contributors for this release**
 
-Venkata Sreekanth Arikatla
-Nghia Truong
-Nicholas Boris Milef 
-Aaron Bray
-Ruiliang Gao
+Venkata Sreekanth Arikatla,
+Nghia Truong,
+Nicholas Boris Milef,
+Aaron Bray,
+Ruiliang Gao,
 Johan Andruejol
