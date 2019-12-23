@@ -868,20 +868,45 @@ points.
 Rigid Body Dynamics
 -------------------
 
-The rigid body dynamics is made available in iMSTK through `ODE
-<https://www.ode.org/>`__. Below is the code to configure the rigid body
-dynamical model and assign it to an object described in 3D by a surface
-geometry.
+The rigid body dynamics is made available in iMSTK through `PhysX
+<https://www.geforce.com/hardware/technology/physx>`__. 
+The rigid body can either be static, kinematic or dynamic. Currently cube, sphere, 
+plane and a mesh geometry types can be assigned to the physics geometry of the 
+rigid body dynamics object. Below is the code snippet to configure the rigid body 
+dynamical model and assign it to an object described in 3D by a surface geometry.
+As can be seen the firction properties of the body can be configured through the 
+*RigidBodyPropertyDesc* object.
+
+.. centered:: |image8|
+
 ::
 
+    /* create a rigid scene object */
     auto rigidObject = std::make_shared<RigidObject>("RigidObject");
-    rigidObject->setVisualGeometry(surfaceMesh);
-    rigidObject->setCollidingGeometry(surfaceMesh);
-    rigidObject->setPhysicsGeometry(surfaceMesh);
-    auto rigidBodyModel = std::make_shared<RigidBodyModel>();
-    rigidBodyModel->configure(false, surfaceMesh, 1.0);
-    rigidObject->setDynamicalModel(rigidBodyModel);
-    scene->addSceneObject(rigidObject);
+    rigidObject->setVisualGeometry(cubeGeom);
+    rigidObject->setCollidingGeometry(cubeGeom);
+    rigidObject->setPhysicsGeometry(cubeGeom);
+    
+    /* Create and configure cube dynamic model */
+    auto rigidModel = std::make_shared<RigidBodyModel>();
+    auto rigidProp = std::make_shared<RigidBodyPropertyDesc>();
+    rigidProp->m_dynamicFriction = 0.01;
+    rigidProp->m_restitution = 0.01;
+    rigidProp->m_staticFriction = 0.005;
+
+    rigidModel->configure(cubeGeom, rigidProp, RigidBodyType::Dynamic);
+    cubeObj->setDynamicalModel(rigidModel);
+
+
+Additionally, external force can be added to each dynamic rigid object through 
+:code:`RigidBodyModel::addForce()` function.
+
+.. Note:: All the rigid bodies in the scene currently interact with every 
+          other rigid body in the rigid body world (*RigidBodyWorld*). This needs to be 
+          modified to follow the collision graph of imstk.
+
+.. Note:: For dynamic mesh objects the mesh needs to be convex and can contain a maximum of
+          256 polygons. These restrictions are placed by the PhysX library due to efficiency considerations.
 
 Computational Algebra
 =====================
@@ -1337,3 +1362,7 @@ Bibliography
 .. |image7| image:: media/dbgRendering.png
    :width: 510px
    :height: 330px
+
+.. |image8| image:: media/rbd.png
+   :width: 520px
+   :height: 462px
