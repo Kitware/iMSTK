@@ -7,7 +7,7 @@
 Introduction
 ============
 
-iMSTK is a free & open source software toolkit written in C++
+iMSTK is a free and open source software toolkit written in C++
 that aids rapid prototyping of interactive multi-modal surgical
 simulations. It provides a highly modular and easy to use framework that
 can be extended and be interfaced with other third-party libraries for
@@ -959,6 +959,34 @@ An example code on how to instantiate a haptic device is shown below
     auto server = std::make_shared<HDAPIDeviceServer>(); 
     server->addDeviceClient(client);
     sdk->addModule(server);
+
+
+Paralle Support
+===============
+
+iMSTK allows CPU based shared memory parallelization using Intel TBB library. 
+:code:`imstk::ParallelUtils` features utilities that allows users to explot loop-based
+parallelism.
+
+Below is the sample usage of the paralle for loop in the :code:`PointSetToCapsuleCD` 
+static function since collision computation can be run independently on each point in the set.
+
+::
+
+    void PointSetToCapsuleCD::computeCollisionData()
+    {
+        m_colData->clearAll();
+        ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+            [&](const unsigned int idx)
+            {
+                const auto& point = m_pointSet->getVertexPosition(idx);
+                NarrowPhaseCD::pointToCapsule(point, idx, m_capsule.get(), m_colData);
+            });
+    }
+
+Additional utility functions are available in the same namespace that allow
+parallel execution of computational kernel over nested indices in 2D and 3D with
+options to parallelize over a dimension of choice.
 
 Miscellaneous Topics
 ====================
