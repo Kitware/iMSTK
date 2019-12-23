@@ -76,16 +76,23 @@ Innerbuild directory.
 Run CMake-GUI and follow the directions described on CMake’s official
 `page <https://cmake.org/runningcmake/>`__. You need to choose which
 version of Visual Studio that you would like to use when configuring the
-project. Make sure to select Microsoft Visual Studio C++ 12 2013 or
+project. Make sure to select Microsoft Visual Studio C++ 12 2015 or
 later. CMake will generate a iMSTK.sln solution file for Visual Studio
 at the top level. Open this file and issue build on all targets, which
 will checkout, build and link all iMSTK dependencies. When making
 changes to iMSTK base source code, you can then build from the iMSTK.sln
-solution file located in the Innerbuild directory.
+solution file located in the Innerbuild directory.   
 
-.. NOTE:: MVSC 2015 is not yet supported as the dependency libusb 1.0.20 does not support it yet. We will work on supporting MVSC in the near future when libusb 1.0.21 is released.            
+Running Examples
+----------------
+The default CMake configuration builds the examples as part of the inner build.
+The executables including other targets required to run the executables are placed 
+in the :code:`<imstk build dir>/install/bin` directory. The execurables can either 
+be run through command line or double clicking.
 
-**Options at Configure Time**
+
+Options at Configure Time
+-------------------------
 
 **Phantom Omni Support**
 
@@ -145,6 +152,12 @@ iMSTK follows specific code formatting rules. This is enforced through
 iMSTK provides the option to build uncrustify as a target. To enable
 this set :code:`iMSTK_USE_UNCRUSTIFY` to ON.
 
+
+**Multithreaded build**
+
+The build will be configured to be multithreaded with 8 threads. 
+This can be changed by modifying the :code:`iMSTK_NUM_BUILD_PROCESSES` to a positive intiger.
+
 External Dependencies
 ---------------------
 
@@ -171,9 +184,15 @@ IMSTK.
 +---------------+-----------------------------------------------------------------+
 | Uncrustify    | Enforcing code formatting                                       |
 +---------------+-----------------------------------------------------------------+
-| VEGAFem       | Rendering, visualization and filters                            |
+| VEGA Fem      | Rendering, visualization and filters                            |
 +---------------+-----------------------------------------------------------------+
 | VTK           | Finite element support                                          |
++---------------+-----------------------------------------------------------------+
+| TBB           | Intel Thread building block for multithreading                  |
++---------------+-----------------------------------------------------------------+
+| Assimp        | Import/export standard 3D mesh formats                          |
++---------------+-----------------------------------------------------------------+
+| PhysX         | Rigid body dynamics                                             |
 +---------------+-----------------------------------------------------------------+
 
 Secondary external dependencies include *glfw, gli, glm, LibNiFalcon,
@@ -781,6 +800,10 @@ Currently iMSTK supports the thin elastic sheets like cloth via PBD
 formulation which are governed by *distance* and *dihedral* constraints.
 The code below demonstrates the initialization of the PbdModel and its
 configuration.
+
+
+.. centered:: |image9|
+
 ::
 
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
@@ -1366,3 +1389,7 @@ Bibliography
 .. |image8| image:: media/rbd.png
    :width: 520px
    :height: 462px
+
+.. |image9| image:: media/cloth.png
+   :width: 507px
+   :height: 407px
