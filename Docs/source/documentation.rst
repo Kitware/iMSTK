@@ -403,6 +403,27 @@ Rendering
 iMSTK rendering is powered by two rendering APIs: VTK (default) and
 Vulkan.
 
+VTK Backend
+-----------
+
+The VTK backend is provided to allow for advanced visualization features
+for debugging and visualization application behavior such as physics.
+
+Vulkan Backend
+--------------
+
+The Vulkan backend concentrates on photorealistic graphics and uses more
+much aggressive/expensive approaches to achieve this goal. Currently,
+the Vulkan backend follows concepts from physically-based rendering
+(PBR). This doesn’t have a clear definition, but the route taken by the
+Vulkan backend consists of:
+
+-  Linear color space
+-  Microfacet specular BRDF with energy conservation
+-  High dynamic range with filmic tonemapping
+-  Post processing that operates based on more physical values
+
+
 Render Material System
 ----------------------
 
@@ -451,25 +472,6 @@ using the same image for roughness and albedo). This is by design
 because different types of texture can be optimized in different image
 formats to save space.
 
-VTK Backend
------------
-
-The VTK backend is provided to allow for advanced visualization features
-for debugging and visualization application behavior such as physics.
-
-Vulkan Backend
---------------
-
-The Vulkan backend concentrates on photorealistic graphics and uses more
-much aggressive/expensive approaches to achieve this goal. Currently,
-the Vulkan backend follows concepts from physically-based rendering
-(PBR). This doesn’t have a clear definition, but the route taken by the
-Vulkan backend consists of:
-
--  Linear color space
--  Microfacet specular BRDF with energy conservation
--  High dynamic range with filmic tonemapping
--  Post processing that operates based on more physical values
 
 Lights
 ------
@@ -504,6 +506,65 @@ The object takes three textures: an irradiance cubemap, a radiance
 cubemap, and a BRDF lookup table. The two cubemap textures must be in
 DDS format, and should also use high-dynamic range for the best results.
 The radiance cubemap in particular should be mipmapped.
+
+Debug Rendering
+---------------
+
+Developers often need to visualize geometrical primitives that are not necessarily 
+part of the scene object geometry. For example, octree grid which is not part of the scene objects
+need to be optionally displayed in order to monitor accuracy. *DebugRenderGeometry* class is designed 
+for this purpose. Users can add arbitrirary number of points, lines and traingle primitives at runtime 
+to the scene that will be rendered along with the regular scene geometry. One difference 
+to be noted is that each geometric primitives should be by themselves meaning they are not connected to each other
+even though in reality they may be. While in some cases this is redundant but offers greater flexibility
+due to greatly reduced bookkeeping of the connectivity. The screenshot below shows randomly created primitives
+of the debug geometry displayed in the scene.
+
+.. centered:: |image7|
+
+Usage:
+
+::
+
+      // Create lines for debug rendering
+      auto debugLines = std::make_shared<DebugRenderLines>("Debug Lines");
+      auto material   = std::make_shared<RenderMaterial>();
+      material->setBackFaceCulling(false);
+      material->setDebugColor(Color::Green);
+      material->setLineWidth(2.0);
+      debugLines->setRenderMaterial(material);
+      scene->addDebugGeometry(debugLines);
+
+      ...
+
+      // At runtime add points that represent lines      
+      debugLines->appendVertex(p);
+      debugLines->appendVertex(q);
+
+
+Custom On-screen text
+~~~~~~~~~~~~~~~~~~~~~
+
+Often times it is useful to display additional information on the render window. iMSTK's *VTKTextStatusManager*
+class makes this possible. Below is the snippet from the *DebugRendering* example that displays the number of debug
+primitives currently dislpayed in the render window. 
+
+::
+
+    auto statusManager = viewer->getTextStatusManager();
+    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+
+    statusManager->setCustomStatus("Primatives: " +
+                           std::to_string(debugPoints->getNumVertices()) + " (points) | " +
+                           std::to_string(debugLines->getNumVertices() / 2) + " (lines) | " +
+                           std::to_string(debugTriangles->getNumVertices() / 3) + " (triangles)"
+                );
+
+The font size, color, display corner and padding spaces of the texture manager can be configured.
+
+.. NOTE:: This feature is only available with the VTK rendering backend.
+
 
 Collision Detection
 ===================
@@ -1244,3 +1305,7 @@ Bibliography
 .. |image6| image:: media/sph.png
    :width: 711px
    :height: 394px
+
+.. |image7| image:: media/dbgRendering.png
+   :width: 510px
+   :height: 330px
