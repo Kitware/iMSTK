@@ -111,7 +111,7 @@ main()
 
     auto updateFunc =
         [&](Module*) {
-            if (count > 5)
+            if (count > 15)
             {
                 count = 0;
                 debugPoints->clear();

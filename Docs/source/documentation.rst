@@ -7,7 +7,7 @@
 Introduction
 ============
 
-iMSTK is a free & open source software toolkit written in C++
+iMSTK is a free and open source software toolkit written in C++
 that aids rapid prototyping of interactive multi-modal surgical
 simulations. It provides a highly modular and easy to use framework that
 can be extended and be interfaced with other third-party libraries for
@@ -76,16 +76,23 @@ Innerbuild directory.
 Run CMake-GUI and follow the directions described on CMake’s official
 `page <https://cmake.org/runningcmake/>`__. You need to choose which
 version of Visual Studio that you would like to use when configuring the
-project. Make sure to select Microsoft Visual Studio C++ 12 2013 or
+project. Make sure to select Microsoft Visual Studio C++ 12 2015 or
 later. CMake will generate a iMSTK.sln solution file for Visual Studio
 at the top level. Open this file and issue build on all targets, which
 will checkout, build and link all iMSTK dependencies. When making
 changes to iMSTK base source code, you can then build from the iMSTK.sln
-solution file located in the Innerbuild directory.
+solution file located in the Innerbuild directory.   
 
-.. NOTE:: MVSC 2015 is not yet supported as the dependency libusb 1.0.20 does not support it yet. We will work on supporting MVSC in the near future when libusb 1.0.21 is released.            
+Running Examples
+----------------
+The default CMake configuration builds the examples as part of the inner build.
+The executables including other targets required to run the executables are placed 
+in the :code:`<imstk build dir>/install/bin` directory. The execurables can either 
+be run through command line or double clicking.
 
-**Options at Configure Time**
+
+Options at Configure Time
+-------------------------
 
 **Phantom Omni Support**
 
@@ -145,6 +152,12 @@ iMSTK follows specific code formatting rules. This is enforced through
 iMSTK provides the option to build uncrustify as a target. To enable
 this set :code:`iMSTK_USE_UNCRUSTIFY` to ON.
 
+
+**Multithreaded build**
+
+The build will be configured to be multithreaded with 8 threads. 
+This can be changed by modifying the :code:`iMSTK_NUM_BUILD_PROCESSES` to a positive intiger.
+
 External Dependencies
 ---------------------
 
@@ -171,9 +184,15 @@ IMSTK.
 +---------------+-----------------------------------------------------------------+
 | Uncrustify    | Enforcing code formatting                                       |
 +---------------+-----------------------------------------------------------------+
-| VEGAFem       | Rendering, visualization and filters                            |
+| VEGA Fem      | Rendering, visualization and filters                            |
 +---------------+-----------------------------------------------------------------+
 | VTK           | Finite element support                                          |
++---------------+-----------------------------------------------------------------+
+| TBB           | Intel Thread building block for multithreading                  |
++---------------+-----------------------------------------------------------------+
+| Assimp        | Import/export standard 3D mesh formats                          |
++---------------+-----------------------------------------------------------------+
+| PhysX         | Rigid body dynamics                                             |
 +---------------+-----------------------------------------------------------------+
 
 Secondary external dependencies include *glfw, gli, glm, LibNiFalcon,
@@ -226,8 +245,20 @@ include:
 4. Adding and remove modules (run in separate threads)
 5. Starting the renderer
 
-The simulation manager can be configured to run in ‘simulation backend
-mode’ where the rendering is disabled.
+The simulation manager initialized in the following modes:
+
+- **rendering**: Launch the simulation with a render window
+- **runInBackground**: Launch the simulation without a render window but keeps looping the simulation
+- **backend**: Launch the simulation without a render window and returns the control
+
+These modes are enumerated at :code:`imstk::SimulationManager::Mode`. The default mode
+is *rendering*. The usage is as follows.
+
+::
+
+    auto simManager   = std::make_shared<SimulationManager>(
+                              SimulationManager::Mode::rendering /* rendering mode*/, 
+                              false /*no VR mode*/);
 
 Scene Manager
 ~~~~~~~~~~~~~
@@ -391,6 +422,27 @@ Rendering
 iMSTK rendering is powered by two rendering APIs: VTK (default) and
 Vulkan.
 
+VTK Backend
+-----------
+
+The VTK backend is provided to allow for advanced visualization features
+for debugging and visualization application behavior such as physics.
+
+Vulkan Backend
+--------------
+
+The Vulkan backend concentrates on photorealistic graphics and uses more
+much aggressive/expensive approaches to achieve this goal. Currently,
+the Vulkan backend follows concepts from physically-based rendering
+(PBR). This doesn’t have a clear definition, but the route taken by the
+Vulkan backend consists of:
+
+-  Linear color space
+-  Microfacet specular BRDF with energy conservation
+-  High dynamic range with filmic tonemapping
+-  Post processing that operates based on more physical values
+
+
 Render Material System
 ----------------------
 
@@ -439,25 +491,6 @@ using the same image for roughness and albedo). This is by design
 because different types of texture can be optimized in different image
 formats to save space.
 
-VTK Backend
------------
-
-The VTK backend is provided to allow for advanced visualization features
-for debugging and visualization application behavior such as physics.
-
-Vulkan Backend
---------------
-
-The Vulkan backend concentrates on photorealistic graphics and uses more
-much aggressive/expensive approaches to achieve this goal. Currently,
-the Vulkan backend follows concepts from physically-based rendering
-(PBR). This doesn’t have a clear definition, but the route taken by the
-Vulkan backend consists of:
-
--  Linear color space
--  Microfacet specular BRDF with energy conservation
--  High dynamic range with filmic tonemapping
--  Post processing that operates based on more physical values
 
 Lights
 ------
@@ -493,29 +526,168 @@ cubemap, and a BRDF lookup table. The two cubemap textures must be in
 DDS format, and should also use high-dynamic range for the best results.
 The radiance cubemap in particular should be mipmapped.
 
+Debug Rendering
+---------------
+
+Developers often need to visualize geometrical primitives that are not necessarily 
+part of the scene object geometry. For example, octree grid which is not part of the scene objects
+need to be optionally displayed in order to monitor accuracy. *DebugRenderGeometry* class is designed 
+for this purpose. Users can add arbitrirary number of points, lines and traingle primitives at runtime 
+to the scene that will be rendered along with the regular scene geometry. One difference 
+to be noted is that each geometric primitives should be by themselves meaning they are not connected to each other
+even though in reality they may be. While in some cases this is redundant but offers greater flexibility
+due to greatly reduced bookkeeping of the connectivity. The screenshot below shows randomly created primitives
+of the debug geometry displayed in the scene.
+
+.. centered:: |image7|
+
+Usage:
+
+::
+
+      // Create lines for debug rendering
+      auto debugLines = std::make_shared<DebugRenderLines>("Debug Lines");
+      auto material   = std::make_shared<RenderMaterial>();
+      material->setBackFaceCulling(false);
+      material->setDebugColor(Color::Green);
+      material->setLineWidth(2.0);
+      debugLines->setRenderMaterial(material);
+      scene->addDebugGeometry(debugLines);
+
+      ...
+
+      // At runtime add points that represent lines      
+      debugLines->appendVertex(p);
+      debugLines->appendVertex(q);
+
+
+Custom On-screen text
+~~~~~~~~~~~~~~~~~~~~~
+
+Often times it is useful to display additional information on the render window. iMSTK's *VTKTextStatusManager*
+class makes this possible. Below is the snippet from the *DebugRendering* example that displays the number of debug
+primitives currently dislpayed in the render window. 
+
+::
+
+    auto statusManager = viewer->getTextStatusManager();
+    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+
+    statusManager->setCustomStatus("Primatives: " +
+                           std::to_string(debugPoints->getNumVertices()) + " (points) | " +
+                           std::to_string(debugLines->getNumVertices() / 2) + " (lines) | " +
+                           std::to_string(debugTriangles->getNumVertices() / 3) + " (triangles)"
+                );
+
+The font size, color, display corner and padding spaces of the texture manager can be configured.
+
+.. NOTE:: This feature is only available with the VTK rendering backend.
+
+
 Collision Detection
 ===================
 
-Collision detection (CD) is the process of detecting collision between
-two geometrical shapes. The geometrical shapes, as explained earlier,
-can be represented as a collection of one or more primitives (eg:
-points, lines and triangles). Therefore, the CD determines the collision
-between two sets of primitives. The collision data that is produced as a
-result of the collisions is passed on to the collision handling module.
-Any collision detection algorithm results in one or more of the
-following data types:
+A typical simulation scenario can feature multiple objects interacting with each other in real-time. Collision detection (CD) is the first step to resolving the physical contact between the objects that are typically represented using a collection of simpler geometric primitives such as vertices, edges, and triangles. Collision detection algorithms are tasked to not only detect and but also report the geometric details of all the points of contact. Accurately and efficiently detecting collisions between interacting objects and handling them using appropriate mechanisms can enhance the accuracy and the realism of application.
 
-    - VertexTriangleCollisionData
-    - EdgeEdgeCollisionData
-    - MeshToAnalyticalCollisionData
-    - PointTetrahedronCollisionData
-    - PickingCollisionData
+Collision detection is typically divided into two phases: (a) the broad phase where a set of candidate collision primitive pairs is identified, and (b) the narrow phase where the geometric intersection tests are performed on these candidate primitive pairs [cd1]_. The narrow phase intersection tests are computationally expensive and hence the broad phase algorithms aim to achieve smallest possible candidate set of collision pairs (with all the actual collision pairs being a subset) with a minimal computational cost.
 
-iMSTK currently supports analytical geometry to mesh and inter mesh
-collision detection. Continuous collision detection (CCD) is made
-available in imstk through selfCCD library. CCD algorithm extends the
-collision in time thereby capturing the collisions otherwise missed by
-the traditional collision detection algorithms.
+The broad phase algorithms typically employ hierarchical spatial partitioning data structures such as octrees or BVH to organize and store geometric information for efficient retrieval and processing. Collision detection has been researched extensively in the computer graphics area and its implementation can vary widely depending on the assumptions that are valid for the problem at hand and the target hardware. 
+
+Broad Phase
+-----------
+
+iMSTK's broad phase uses octree data structure to perform quick culling of the primitive collision pairs.
+
+Octree Collision
+~~~~~~~~~~~~~~~~
+
+An octree is an axis-aligned hierarchical data structure that is generated by recursively subdividing the axis-aligned bounding box (AABB) into eight equally-sized cells as necessary. Generally speaking, the choice of whether to subdivide an octree node or not depends on the density of information present at that node which in this case is the geometry of the primitives.
+
+A brute-force way to find collisions between a set of n disjointed primitives can mean testing all the possible pairs which can be computationally prohibitive requiring O(n2) work. The broad phase of the collision detection aims to efficiently eliminate a subset of primitive pairs (also called culling) that are guaranteed not to collide thus leaving only fewer combinations for which expensive geometric tests are performed. An efficient broad phase algorithm aims to minimize the size of the left out pairs while still retaining guarantees (i.e., all the colliding pairs are part of this set).
+
+The broad phase of the octree collision detection consists of two stages:
+
+**Tree update**: In this step, each primitive under consideration for collision are assigned to an octree node depending on the spatial extent, position, and orientation. For this purpose, the AABB of each primitive is recursively checked against the cells starting at the root node. A primitive will be assigned to a node if either the primitive size exceeds the extent of the cells of the child nodes or the current node cannot be further subdivided due to a preset limit on the maximum depth of the octree. 
+
+**Culling**: This step aims to take advantage of the spatial partitioning of the octree and eliminate as many non-colliding primitive pairs as possible from the list of all the possible pairs. Given a primitive, it is first checked for intersection with the boundary of the root node. If the primitive does not intersect with the node boundary, no further operation is performed with the tree node. Otherwise, it is then tested for intersection with all the primitives stored in the tree node. This process is then recursively called on the child nodes until reaching leaf nodes. With n primitives, detecting a collision between them has a time complexity O(nhk) in the worst case, where h is the height of the octree, and k is the maximum number of primitives at any octree node. In practice, h is around 10 and most primitives are stored at the leaf nodes; thus, the cost of detecting collision for each primitive is bounded and can be very cheap.
+
+In iMSTK, OctreeBasedCD class embeds the implementation of the above-described functionality. Users can both access the list of primitives at any given node in the hierarchy and collision data through public API. The code snippet below shows how an octree is built and used to detect collision between two mesh objects that contain triangle primitives:
+
+
+::
+
+    // Initialize the octree
+    OctreeBasedCD octreeCD(Vec3d(0, 0, 0), // Center of the root node
+                           100.0, // Side length of the root node
+                           0.1);  // Minimum allowed width for any octree cell
+     
+    // Add mesh objects containing triangle primitives to the octree
+    octreeCD.addTriangleMesh(triMesh_1);
+    octreeCD.addTriangleMesh(triMesh_2);
+     
+    // Build the Octree
+    octreeCD.build();
+     
+    // Add collision pairs between meshes
+    octreeCD.addCollisionPair(triMesh_1, triMesh_2, 
+                            CollisionDetection::Type::SurfaceMeshToSurfaceMesh);
+
+At any given frame during the simulation, querying the generated collision data:
+
+::
+
+    // Update octree (primitives might have moved in the prior frame)
+    octreeCD.update();
+     
+    // Access the collision data for the mesh pair
+    const auto& colData = octreeCD.getCollisionPairData(
+                               indx1,  // Global index of triMesh_1
+                               indx2); // Global index of triMesh_2
+
+Narrow Phase
+------------
+
+iMSTK provides numerous narrow phase intersection tests between primitives 
+and are implemented as static functions within the *imstk::NarrowPhaseCD* namespace. The current list of functions provide the following intersection tests:
+
+- *BidirectionalPlane-Sphere*
+- *UnidirectionalPlane-Sphere*
+- *Sphere-Cylinder*
+- *Sphere-Sphere*
+- *Point-Capsule*
+- *Point-Plane*
+- *Point-Sphere*
+- *Triangle-Triangle*
+- *Point-Triangle*
+
+
+Continuous collision detection
+------------------------------
+
+Continuous collision detection (CCD) algorithm extends the collision in time thereby capturing the 
+collisions otherwise missed by the traditional collision detection algorithms.
+CCD is typically used in cases where there are fast moving objects in the scene causing the traditional *discrete* CD fail to  detect collisions. CCD performs collision of the volumes swept by the colliding primitives
+in order to detect the exact time of intersection (if any). In iMSTK, CCD is made available 
+through selfCCD library. The class *SurfaceMeshToSurfaceMeshCCD* imlpements this feature. 
+Note that in addition to the geometry information resulting from intersection tests, CCD
+outputs a scalar 'time' that is normalized between 0-1 for the time period between the frames being considered.
+
+
+Collision data
+--------------
+
+The collision data that is produced as a
+result of the collisions and is passed on to the collision handling module for processing. Any collision detection algorithm results in one or more of the following data types:
+
+    - Vertex-Triangle
+    - Edge-Edge
+    - Mesh-AnalyticalGeometry
+    - Point-Tetrahedron
+    - Position-Direction
+
+The definitions of the above collifion data types can
+be found in *imstkCollisionData.h*.
 
 Collision Handling
 ==================
@@ -628,6 +800,10 @@ Currently iMSTK supports the thin elastic sheets like cloth via PBD
 formulation which are governed by *distance* and *dihedral* constraints.
 The code below demonstrates the initialization of the PbdModel and its
 configuration.
+
+
+.. centered:: |image9|
+
 ::
 
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
@@ -651,6 +827,43 @@ solver can determine the eventual stiffness exhibited by the cloth.
 
 Fluids
 ------
+iMSTK provides two options to simulated fluids: Smoothed-Particle Hydrodynamics (SPH) and PBD. 
+Both of them are particle-based formulations.
+
+Smoothed Particle Hydrodynamics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Smoothed Particle Hydrodynamics (SPH) is one of the widely used methods for simulating fluid flow (and solid mechanics) in distinct areas such as computer graphics, astrophysics, and oceanography among others. SPH is a mesh-free Lagrangian method that employs a kernel function to interpolate fluid properties and spatial derivatives at discrete particle positions.
+
+.. centered:: |image6|
+
+The SPH model in iMSTK is a form of Weakly Compressible SPH (WSPH) introduced by Becker and Teschner [sph1]_, but with a number of modifications. In particular, their proposed momentum equation for acceleration update and Tait’s equation for pressure computation was employed. However, two different functions for kernel evaluation and evaluation of kernel derivatives were used, similar to Muller et al. [sph2]_. In addition, a variant of XSPH [sph3]_ is used to model viscosity that is computationally cheaper than the traditional formulation. The forces of surface tension are modeled using a robust formulation proposed by Akinci et al. [sph4]_ allowing simulation of large surface tension forces in a realistic manner.
+
+During the simulation, each of the SPH particles needs to search for its neighbors within a preset radius of influence of the kernel function (see figure 1). In iMSTK, the nearest neighbor search is achieved using a uniform spatial grid data structure or using spatial hashing based lookup [sph5]_. For fluid-solid interaction, the current implementation only supports one-way coupling in which fluid particles are repelled from solids upon collision by penalty force generation.
+
+The code snippet below show creation and configuration of the SPH model and solver.
+::
+
+    // Create and configure SPH model
+    auto sphModel = std::make_shared<SPHModel>();
+    sphModel->setModelGeometry(fluidGeometry);
+
+    auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
+    sphParams->m_bNormalizeDensity = true;
+    sphParams->m_kernelOverParticleRadiusRatio = 6.0;
+    sphParams->m_viscosityCoeff                = 0.5;
+    sphParams->m_surfaceTensionStiffness       = 5.0;
+    sphModel->configure(sphParams);
+    sphModel->setTimeStepSizeType(TimeSteppingType::realTime);
+
+    ...
+
+    // Configure SPH solver
+    auto sphSolver = std::make_shared<SPHSolver>();
+    sphSolver->setSPHObject(fluidObj);
+    scene->addNonlinearSolver(sphSolver);
+
+Position based dynamics
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Fluids (in this case liquids) are supported in iMSTK via PBD. Constant
 density constraints are solved within the PBD solution framework in
@@ -678,20 +891,45 @@ points.
 Rigid Body Dynamics
 -------------------
 
-The rigid body dynamics is made available in iMSTK through `ODE
-<https://www.ode.org/>`__. Below is the code to configure the rigid body
-dynamical model and assign it to an object described in 3D by a surface
-geometry.
+The rigid body dynamics is made available in iMSTK through `PhysX
+<https://www.geforce.com/hardware/technology/physx>`__. 
+The rigid body can either be static, kinematic or dynamic. Currently cube, sphere, 
+plane and a mesh geometry types can be assigned to the physics geometry of the 
+rigid body dynamics object. Below is the code snippet to configure the rigid body 
+dynamical model and assign it to an object described in 3D by a surface geometry.
+As can be seen the firction properties of the body can be configured through the 
+*RigidBodyPropertyDesc* object.
+
+.. centered:: |image8|
+
 ::
 
+    /* create a rigid scene object */
     auto rigidObject = std::make_shared<RigidObject>("RigidObject");
-    rigidObject->setVisualGeometry(surfaceMesh);
-    rigidObject->setCollidingGeometry(surfaceMesh);
-    rigidObject->setPhysicsGeometry(surfaceMesh);
-    auto rigidBodyModel = std::make_shared<RigidBodyModel>();
-    rigidBodyModel->configure(false, surfaceMesh, 1.0);
-    rigidObject->setDynamicalModel(rigidBodyModel);
-    scene->addSceneObject(rigidObject);
+    rigidObject->setVisualGeometry(cubeGeom);
+    rigidObject->setCollidingGeometry(cubeGeom);
+    rigidObject->setPhysicsGeometry(cubeGeom);
+    
+    /* Create and configure cube dynamic model */
+    auto rigidModel = std::make_shared<RigidBodyModel>();
+    auto rigidProp = std::make_shared<RigidBodyPropertyDesc>();
+    rigidProp->m_dynamicFriction = 0.01;
+    rigidProp->m_restitution = 0.01;
+    rigidProp->m_staticFriction = 0.005;
+
+    rigidModel->configure(cubeGeom, rigidProp, RigidBodyType::Dynamic);
+    cubeObj->setDynamicalModel(rigidModel);
+
+
+Additionally, external force can be added to each dynamic rigid object through 
+:code:`RigidBodyModel::addForce()` function.
+
+.. Note:: All the rigid bodies in the scene currently interact with every 
+          other rigid body in the rigid body world (*RigidBodyWorld*). This needs to be 
+          modified to follow the collision graph of imstk.
+
+.. Note:: For dynamic mesh objects the mesh needs to be convex and can contain a maximum of
+          256 polygons. These restrictions are placed by the PhysX library due to efficiency considerations.
 
 Computational Algebra
 =====================
@@ -769,6 +1007,34 @@ An example code on how to instantiate a haptic device is shown below
     auto server = std::make_shared<HDAPIDeviceServer>(); 
     server->addDeviceClient(client);
     sdk->addModule(server);
+
+
+Paralle Support
+===============
+
+iMSTK allows CPU based shared memory parallelization using Intel TBB library. 
+:code:`imstk::ParallelUtils` features utilities that allows users to explot loop-based
+parallelism.
+
+Below is the sample usage of the paralle for loop in the :code:`PointSetToCapsuleCD` 
+static function since collision computation can be run independently on each point in the set.
+
+::
+
+    void PointSetToCapsuleCD::computeCollisionData()
+    {
+        m_colData->clearAll();
+        ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+            [&](const unsigned int idx)
+            {
+                const auto& point = m_pointSet->getVertexPosition(idx);
+                NarrowPhaseCD::pointToCapsule(point, idx, m_capsule.get(), m_colData);
+            });
+    }
+
+Additional utility functions are available in the same namespace that allow
+parallel execution of computational kernel over nested indices in 2D and 3D with
+options to parallelize over a dimension of choice.
 
 Miscellaneous Topics
 ====================
@@ -1070,7 +1336,23 @@ Bibliography
 
 .. [sfml] Simple and Fast Multimedia Library: https://github.com/SFML/SFML
 
+.. [sph1] Markus Becker and Matthias Teschner, “Weakly compressible SPH for free surface flows”. 
+   In Proceedings of the ACM SIGGRAPH/Eurographics symposium on Computer Animation, 209-217 (2007).
 
+.. [sph2] Matthias Müller, David Charypar, and Markus Gross, 
+   “Particle-based fluid simulation for interactive applications”. 
+   In Proceedings of the 2003 ACM SIGGRAPH/Eurographics symposium on Computer Animation, 154-159 (2003).
+
+.. [sph3] Hagit Schechter and Robert Bridson, “Ghost SPH for animating water”. 
+   ACM Transaction on Graphics, 31, 4, Article 61 (July 2012).
+
+.. [sph4] Nadir Akinci, Gizem Akinci, and Matthias Teschner, “Versatile surface tension and adhesion for SPH fluids”. 
+   ACM Transaction on Graphics, 32, 6, Article 182 (November 2013).
+
+.. [sph5] Teschner, M., Heidelberger, B., Müller, M., Pomeranets, D., and Gross, M, 
+   “Optimized spatial hashing for collision detection of deformable objects”. Proc. VMV, 47–54.
+
+.. [cd1] Christer Ericson. Real-Time Collision Detection. CRC Press, Inc., Boca Raton, FL, USA, 2004.
 
 .. |image0| image:: media/logo.png
    :width: 3.5in
@@ -1095,3 +1377,19 @@ Bibliography
 .. |image5| image:: media/decalsDemo.png
    :width: 570px
    :height: 188px
+
+.. |image6| image:: media/sph.png
+   :width: 711px
+   :height: 394px
+
+.. |image7| image:: media/dbgRendering.png
+   :width: 510px
+   :height: 330px
+
+.. |image8| image:: media/rbd.png
+   :width: 520px
+   :height: 462px
+
+.. |image9| image:: media/cloth.png
+   :width: 507px
+   :height: 407px
