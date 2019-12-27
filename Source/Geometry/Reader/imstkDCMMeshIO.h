@@ -19,54 +19,34 @@
 
 =========================================================================*/
 
+#pragma once
+
+#include "imstkMeshIO.h"
 #include "imstkImageData.h"
 
 namespace imstk
 {
-void
-ImageData::print() const
+///
+/// \class DCMMeshIO
+///
+/// \brief Reader for DICOM format image data.
+///
+class DCMMeshIO
 {
-    Geometry::print();
-}
+public:
+    ///
+    /// \brief Default constructor
+    ///
+    DCMMeshIO() = default;
 
-double
-ImageData::getVolume() const
-{
-    if (!this->m_data)
-    {
-        return 0.0;
-    }
+    ///
+    /// \brief Default destructor
+    ///
+    ~DCMMeshIO() = default;
 
-    double bounds[6];
-    this->m_data->GetBounds(bounds);
-    return ((bounds[1] - bounds[0]) *
-            (bounds[3] - bounds[2]) *
-            (bounds[5] - bounds[4]));
-}
-
-void
-ImageData::initialize(vtkImageData* im)
-{
-    this->clear();
-    if (im)
-    {
-        this->m_data = vtkSmartPointer<vtkImageData>::New();
-        this->m_data->DeepCopy(im);
-    }
-}
-
-void
-ImageData::clear()
-{
-    if (this->m_data)
-    {
-        this->m_data = nullptr;
-    }
-}
-
-vtkImageData*
-ImageData::getData()
-{
-    return this->m_data;
-}
-} // imstk
+    ///
+    /// \brief Read and generate an image data from a give file/directory
+    ///
+    static std::shared_ptr<imstk::ImageData> read(const std::string& filePath);
+};
+} // namespace imstk

@@ -24,6 +24,10 @@
 // imstk
 #include "imstkPointSet.h"
 
+// vtk
+#include <vtkImageData.h>
+#include <vtkSmartPointer.h>
+
 namespace imstk
 {
 ///
@@ -52,8 +56,25 @@ public:
     ///
     double getVolume() const override;
 
+    ///
+    /// \brief Initialize to an existing image data
+    ///
+    void initialize(vtkImageData* im);
+
+    ///
+    /// \brief Clear the data
+    ///
+    void clear() override;
+
+    ///
+    /// \brief Return the underlying data
+    ///
+    vtkImageData* getData();
+
 protected:
     friend class VTKImageDataRenderDelegate;
+
+    vtkSmartPointer<vtkImageData> m_data = nullptr;  ///> ImageData
 
     void applyTranslation(const Vec3d t) override
     {

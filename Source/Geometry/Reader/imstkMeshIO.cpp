@@ -34,7 +34,8 @@ namespace imstk
 std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
-    if (!MeshIO::fileExists(filePath))
+    bool isDir;
+    if (!MeshIO::fileExists(filePath, isDir))
     {
         LOG(FATAL) << "MeshIO::read error: file not found: " << filePath;
         return nullptr;
@@ -69,10 +70,25 @@ MeshIO::read(const std::string& filePath)
 }
 
 bool
-MeshIO::fileExists(const std::string& file)
+MeshIO::fileExists(const std::string& file, bool& isDirectory)
 {
     struct stat buf;
-    return (stat(file.c_str(), &buf) == 0);
+    if (stat(file.c_str(), &buf) == 0)
+    {
+        if (buf.st_mode & S_IFDIR)
+        {
+            isDirectory = true;
+        }
+        else
+        {
+            isDirectory = false;
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 const MeshFileType

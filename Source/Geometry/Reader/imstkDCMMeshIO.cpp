@@ -19,54 +19,39 @@
 
 =========================================================================*/
 
-#include "imstkImageData.h"
+#include <fstream>
+
+#include "imstkDCMMeshIO.h"
+
+#include <vtkSmartPointer.h>
+#include <vtkDICOMImageReader.h>
+#include <vtkImageData.h>
 
 namespace imstk
 {
-void
-ImageData::print() const
+std::shared_ptr<ImageData>
+DCMMeshIO::read(const std::string& filePath)
 {
-    Geometry::print();
-}
-
-double
-ImageData::getVolume() const
-{
-    if (!this->m_data)
+    bool isDirectory;
+    if (!MeshIO::fileExists(filePath, isDirectory))
     {
-        return 0.0;
+        LOG(FATAL) << "DCMMeshIO::read error: file not found: " << filePath;
+        return nullptr;
     }
 
-    double bounds[6];
-    this->m_data->GetBounds(bounds);
-    return ((bounds[1] - bounds[0]) *
-            (bounds[3] - bounds[2]) *
-            (bounds[5] - bounds[4]));
-}
-
-void
-ImageData::initialize(vtkImageData* im)
-{
-    this->clear();
-    if (im)
+    vtkNew<vtkDICOMImageReader> reader;
+    if (isDirectory)
     {
-        this->m_data = vtkSmartPointer<vtkImageData>::New();
-        this->m_data->DeepCopy(im);
+        reader->SetDirectoryName(filePath.c_str());
     }
-}
-
-void
-ImageData::clear()
-{
-    if (this->m_data)
+    else
     {
-        this->m_data = nullptr;
+        reader->SetFileName(filePath.c_str());
     }
-}
+    reader->Update();
 
-vtkImageData*
-ImageData::getData()
-{
-    return this->m_data;
+    auto imageData = std::make_shared<ImageData>();
+    imageData->initialize(reader->GetOutput());
+    return imageData;
 }
-} // imstk
+} // namespace imstk

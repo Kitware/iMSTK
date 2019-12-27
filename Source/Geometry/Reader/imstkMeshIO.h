@@ -47,7 +47,8 @@ enum MeshFileType
     FBX,
     _3DS,
     VEG,
-    MSH
+    MSH,
+    DCM
 };
 
 ///
@@ -80,9 +81,10 @@ public:
     static bool write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath);
 
     ///
-    /// \brief Returns true if the file exists, else false
+    /// \brief Returns true if the file exists, else false.
+    /// Also sets isDirectory to true if the path is a directory, else false.
     ///
-    static bool fileExists(const std::string& file);
+    static bool fileExists(const std::string& file, bool& isDirectory);
 
     ///
     /// \brief Returns the type of the file
