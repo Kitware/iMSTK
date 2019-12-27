@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
+// imstk
+#include "imstkPointSet.h"
 
 namespace imstk
 {
@@ -30,14 +31,14 @@ namespace imstk
 ///
 /// \brief Class to represent 2D and 3D image data (i.e. structured points)
 ///
-class ImageData : public Geometry
+class ImageData : public PointSet
 {
 public:
     ///
-    /// \brief Protected constructor
+    /// \brief Constructor
     ///
-    ImageData(const Type type = Geometry::Type::ImageData, const std::string name = std::string(""))
-        : Geometry(type, name)
+    ImageData(const std::string name = std::string(""))
+        : PointSet(Geometry::Type::ImageData, name)
     {
     }
 
