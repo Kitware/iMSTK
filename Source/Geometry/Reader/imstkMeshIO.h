@@ -48,6 +48,7 @@ enum MeshFileType
     _3DS,
     VEG,
     MSH,
+    NRRD,
     DCM
 };
 
