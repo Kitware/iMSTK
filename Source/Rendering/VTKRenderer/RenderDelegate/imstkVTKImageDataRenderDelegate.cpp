@@ -21,7 +21,7 @@
 
 #include "imstkVTKImageDataRenderDelegate.h"
 
-#include "vtkRTAnalyticSource.h"
+#include "vtkTrivialProducer.h"
 
 namespace imstk
 {
@@ -29,12 +29,14 @@ VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualMod
 {
     m_visualModel = visualModel;
 
-    auto waveletSource = vtkSmartPointer<vtkRTAnalyticSource>::New();
-    waveletSource->SetWholeExtent(-10, 10, -10, 10, -10, 10);
-
-    this->update();
-    this->setUpMapper(waveletSource->GetOutputPort(), false,
-                      m_visualModel->getRenderMaterial());
+    auto imageData = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
+    if (imageData->getData())
+    {
+        auto tp = vtkSmartPointer<vtkTrivialProducer>::New();
+        tp->SetOutput(imageData->getData());
+        this->setUpMapper(tp->GetOutputPort(), false,
+                          m_visualModel->getRenderMaterial());
+    }
 }
 
 void
