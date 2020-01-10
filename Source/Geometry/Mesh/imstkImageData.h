@@ -28,6 +28,9 @@
 #include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 
+// forward declarations
+class vtkTransform;
+
 namespace imstk
 {
 ///
@@ -41,10 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    ImageData(const std::string name = std::string(""))
-        : PointSet(Geometry::Type::ImageData, name)
-    {
-    }
+    ImageData(const std::string name = std::string(""));
 
     ///
     /// \brief Print the image data info
@@ -69,27 +69,20 @@ public:
     ///
     /// \brief Return the underlying data
     ///
-    vtkImageData* getData();
+    vtkImageData* getData(DataType type = DataType::PostTransform);
 
 protected:
     friend class VTKImageDataRenderDelegate;
 
-    vtkSmartPointer<vtkImageData> m_data = nullptr;  ///> ImageData
+    vtkSmartPointer<vtkImageData> m_data          = nullptr; ///> ImageData
+    vtkSmartPointer<vtkTransform> m_dataTransform = nullptr;
 
-    void applyTranslation(const Vec3d t) override
-    {
-    }
+    void applyTranslation(const Vec3d t) override;
 
-    void applyRotation(const Mat3d r) override
-    {
-    }
+    void applyRotation(const Mat3d r) override;
 
-    void applyScaling(const double s) override
-    {
-    }
+    void applyScaling(const double s) override;
 
-    void updatePostTransformData() override
-    {
-    }
+    void updatePostTransformData() override;
 };
 } // imstk
