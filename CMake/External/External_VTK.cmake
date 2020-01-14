@@ -46,7 +46,7 @@ else()
   if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.9")
     set(VTK_GIT_TAG "9b6a039f43404053a0653f742148d123f6ada7d6")
   else()
-    set(VTK_GIT_TAG "origin/${VTK_GIT_TAG}")
+    set(VTK_GIT_TAG "origin/${${PROJECT_NAME}_VTK_REPO_SOURCE}")
   endif()
 endif()
 
