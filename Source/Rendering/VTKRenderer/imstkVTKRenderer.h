@@ -44,6 +44,8 @@
 #include "vtkOpenVROverlayInternal.h"
 #endif
 
+class vtkAxesActor;
+
 namespace imstk
 {
 class Scene;
@@ -73,6 +75,26 @@ public:
     /// visibility of the renderer actors and the default camera
     ///
     void setMode(const Mode mode, const bool enableVR) override;
+
+    ///
+    /// \brief Change the debug axes length
+    ///
+    void setAxesLength(const double x, const double y, const double z);
+
+    ///
+    /// \brief Get the debug axes length
+    ///
+    double* getAxesLength();
+
+    ///
+    /// \brief Change the visibility of the debug axes
+    ///
+    void setAxesVisibility(const bool visible);
+
+    ///
+    /// \brief Returns whether the debug axes is visible or not
+    ///
+    bool getAxesVisibility() const;
 
     ///
     /// \brief Updates the scene camera's position and orientation
@@ -116,6 +138,7 @@ protected:
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
     std::vector<vtkSmartPointer<vtkProp>>  m_objectVtkActors;
     std::vector<vtkSmartPointer<vtkProp>>  m_debugVtkActors;
+    vtkSmartPointer<vtkAxesActor>          m_AxesActor;
 
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
