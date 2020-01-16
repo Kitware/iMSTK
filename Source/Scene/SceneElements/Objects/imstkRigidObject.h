@@ -54,13 +54,13 @@ public:
     ///
     bool initialize() override;
 
-	///
-	/// \brief Add local force at a position relative to object
-	///
-	void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true)
-	{
-		getRigidBodyModel()->addForce(force, pos, wakeup);
-	}
+    ///
+    /// \brief Add local force at a position relative to object
+    ///
+    void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true)
+    {
+        getRigidBodyModel()->addForce(force, pos, wakeup);
+    }
 
     ///
     /// \brief Get/Set rigid body model

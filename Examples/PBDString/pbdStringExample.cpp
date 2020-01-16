@@ -39,12 +39,12 @@ main()
     auto scene = sdk->createNewScene("PBDString");
 
     // Setup N separate string simulations with varying stiffnesses
-    const unsigned int numStrings = 8;
-    const unsigned int numVerts = 30;
-    const double stringSpacing = 2.0;              // How far each string is apart
-    const double stringLength = 10.0;              // Total length of string
-    const Vec3d startColor = Vec3d(1.0, 0.0, 0.0); // Color of first string
-    const Vec3d endColor = Vec3d(0.0, 1.0, 0.0);   // Color of last string
+    const unsigned int numStrings    = 8;
+    const unsigned int numVerts      = 30;
+    const double       stringSpacing = 2.0;                  // How far each string is apart
+    const double       stringLength  = 10.0;                 // Total length of string
+    const Vec3d        startColor    = Vec3d(1.0, 0.0, 0.0); // Color of first string
+    const Vec3d        endColor      = Vec3d(0.0, 1.0, 0.0); // Color of last string
     struct PbdSim
     {
         std::shared_ptr<LineMesh> geometry;
@@ -56,7 +56,7 @@ main()
     };
     std::vector<PbdSim> sims(numStrings);
 
-    const double size = stringSpacing * (numStrings - 1);
+    const double size          = stringSpacing * (numStrings - 1);
     const double vertexSpacing = stringLength / numVerts;
     for (unsigned int i = 0; i < numStrings; i++)
     {
@@ -84,7 +84,7 @@ main()
         sims[i].geometry->setLinesVertices(segments);
 
         sims[i].object = std::make_shared<PbdObject>("String " + std::to_string(i));
-        sims[i].model = std::make_shared<PbdModel>();
+        sims[i].model  = std::make_shared<PbdModel>();
         sims[i].model->setModelGeometry(sims[i].geometry);
 
         // Configure the parameters with stiffnesses varying from 0.1 to 1.0
@@ -95,8 +95,8 @@ main()
         sims[i].params->m_fixedNodeIds = { 0 };
         // Other parameters
         sims[i].params->m_uniformMassValue = 5.0;
-        sims[i].params->m_gravity = Vec3d(0, -9.8, 0);
-        sims[i].params->m_dt = 0.0005;
+        sims[i].params->m_gravity          = Vec3d(0, -9.8, 0);
+        sims[i].params->m_dt      = 0.0005;
         sims[i].params->m_maxIter = 5;
 
         // Set the parameters
@@ -107,8 +107,8 @@ main()
         sims[i].visualModel = std::make_shared<VisualModel>(sims[i].geometry);
         std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME);
-        const double t = static_cast<double>(i) / (numStrings - 1);
-        Vec3d color = (endColor - startColor) * t + startColor;
+        const double t     = static_cast<double>(i) / (numStrings - 1);
+        Vec3d        color = (endColor - startColor) * t + startColor;
         material->setDebugColor(Color(color.x(), color.y(), color.z()));
         material->setLineWidth(2.0f);
         sims[i].visualModel->setRenderMaterial(material);
@@ -127,27 +127,25 @@ main()
     scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
     scene->getCamera()->setPosition(0.0, 0.0, 15.0);
 
-
     // Move the points every frame
-    double t = 0.0;
-    const double dt = 0.0005;
-    const double radius = 1.5;
-    auto movePoints =
+    double       t          = 0.0;
+    const double dt         = 0.0005;
+    const double radius     = 1.5;
+    auto         movePoints =
         [&sims, &t, dt, radius](Module* module)
-    {
-        for (unsigned int i = 0; i < sims.size(); i++)
         {
-            Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
-            // Move in circle, derivatives of parametric eq of circle
-            sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
+            for (unsigned int i = 0; i < sims.size(); i++)
+            {
+                Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
+                // Move in circle, derivatives of parametric eq of circle
+                sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
                 pos.x() + -std::sin(t) * radius * dt,
                 pos.y(),
                 pos.z() + std::cos(t) * radius * dt));
-        }
-        t += dt;
-    };
+            }
+            t += dt;
+        };
     sdk->getSceneManager(scene)->setPostUpdateCallback(movePoints);
-
 
     // Start
     sdk->setActiveScene(scene);

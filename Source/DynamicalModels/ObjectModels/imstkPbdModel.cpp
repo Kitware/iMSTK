@@ -283,7 +283,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     {
         const auto&                    lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
         const auto&                    elements = lineMesh->getLinesVertices();
-        const auto&                    nV = lineMesh->getNumVertices();
+        const auto&                    nV       = lineMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
         for (size_t k = 0; k < elements.size(); k++)
@@ -335,36 +335,38 @@ PbdModel::initializeBendConstraints(const double stiffness)
 
     auto addConstraint =
         [&](const double k, size_t i1, size_t i2, size_t i3)
-    {
-        // i1 should always come first
-        if (i2 < i1)
         {
-            std::swap(i1, i2);
-        }
-        // i3 should always come last
-        if (i2 > i3)
-        {
-            std::swap(i2, i3);
-        }
+            // i1 should always come first
+            if (i2 < i1)
+            {
+                std::swap(i1, i2);
+            }
+            // i3 should always come last
+            if (i2 > i3)
+            {
+                std::swap(i2, i3);
+            }
 
-        auto c = std::make_shared<PbdBendConstraint>();
-        c->initConstraint(*this, i1, i2, i3, k);
-        m_constraints.push_back(std::move(c));
-    };
+            auto c = std::make_shared<PbdBendConstraint>();
+            c->initConstraint(*this, i1, i2, i3, k);
+            m_constraints.push_back(std::move(c));
+        };
 
     // Create constraints
     const auto& lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
     const auto& elements = lineMesh->getLinesVertices();
-    const auto             nV = lineMesh->getNumVertices();
+    const auto  nV       = lineMesh->getNumVertices();
 
     // Iterate sets of two segments
     for (size_t k = 0; k < elements.size() - 1; k++)
     {
-        auto& seg1 = elements[k];
-        auto& seg2 = elements[k + 1];
-        size_t i3 = seg2[0];
+        auto&  seg1 = elements[k];
+        auto&  seg2 = elements[k + 1];
+        size_t i3   = seg2[0];
         if (i3 == seg1[0] || i3 == seg1[1])
+        {
             i3 = seg2[1];
+        }
         addConstraint(stiffness, seg1[0], seg1[1], i3);
     }
 }

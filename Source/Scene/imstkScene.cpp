@@ -308,7 +308,7 @@ Scene::advance()
     // PhysX update; move this to solver
     auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
     physxScene->simulate(1.0f / 300.0f); // TODO: update the time step
-	physxScene->fetchResults(true);
+    physxScene->fetchResults(true);
 
     // Reset Contact forces to 0
     for (auto obj : this->getSceneObjects())

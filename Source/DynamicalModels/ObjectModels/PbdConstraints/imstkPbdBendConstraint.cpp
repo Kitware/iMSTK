@@ -65,14 +65,14 @@ PbdBendConstraint::solvePositionConstraint(PbdModel& model)
 
     // Move towards triangle center
     const Vec3d& center = (p0 + p1 + p2) / 3.0;
-    const Vec3d& diff = p1 - center;
-    const double dist = diff.norm();
+    const Vec3d& diff   = p1 - center;
+    const double dist   = diff.norm();
     if (dist < m_epsilon)
     {
         return false;
     }
     const Vec3d& dir = diff / dist;
-    const double c = (dist - m_restLength) * m_stiffness;
+    const double c   = (dist - m_restLength) * m_stiffness;
 
     // Now weight the applied movements by masses
     double w = (1.0 / im0) + (2.0 / im1) + (1.0 / im2);

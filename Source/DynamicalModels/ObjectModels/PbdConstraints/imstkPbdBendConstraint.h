@@ -59,8 +59,8 @@ public:
         \param k stiffness
     */
     void initConstraint(PbdModel& model,
-        const size_t& pIdx1, const size_t& pIdx2,
-        const size_t& pIdx3, const double k);
+                        const size_t& pIdx1, const size_t& pIdx2,
+                        const size_t& pIdx3, const double k);
 
     ///
     /// \brief Solves the bend constraint
@@ -69,6 +69,6 @@ public:
 
 public:
     double m_restLength; ///> Rest length
-    double m_stiffness; ///> Bend stiffness
+    double m_stiffness;  ///> Bend stiffness
 };
 } //imstk

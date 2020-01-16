@@ -122,8 +122,8 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
 
     // cube dynamic model
     auto rigidModel = std::make_shared<RigidBodyModel>();
-    auto rigidProp  = std::make_shared<RigidBodyPropertyDesc>();  
-   
+    auto rigidProp  = std::make_shared<RigidBodyPropertyDesc>();
+
     rigidModel->configure(cubeGeom, rigidProp, RigidBodyType::Dynamic);
     cubeObj->setDynamicalModel(rigidModel);
 
