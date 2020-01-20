@@ -38,7 +38,7 @@ main()
     auto sdk   = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PBDString");
 
-    // Setup N separate string simulations with varying stiffnesses
+    // Setup N separate string simulations with varying bend stiffnesses
     const unsigned int numStrings    = 8;
     const unsigned int numVerts      = 30;
     const double       stringSpacing = 2.0;                  // How far each string is apart
@@ -87,13 +87,11 @@ main()
         sims[i].model  = std::make_shared<PbdModel>();
         sims[i].model->setModelGeometry(sims[i].geometry);
 
-        // Configure the parameters with stiffnesses varying from 0.1 to 1.0
+        // Configure the parameters with bend stiffnesses varying from 0.001 to ~0.1
         sims[i].params = std::make_shared<PBDModelConfig>();
-        // Rigid stiffness is fixed but bend stiffness varies
         sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 0.001);
         sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
-        sims[i].params->m_fixedNodeIds = { 0 };
-        // Other parameters
+        sims[i].params->m_fixedNodeIds = { 0 }; // Fix the first node in each string
         sims[i].params->m_uniformMassValue = 5.0;
         sims[i].params->m_gravity          = Vec3d(0, -9.8, 0);
         sims[i].params->m_dt      = 0.0005;

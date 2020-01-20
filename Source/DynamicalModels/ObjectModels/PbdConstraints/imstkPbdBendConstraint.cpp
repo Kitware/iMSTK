@@ -63,6 +63,10 @@ PbdBendConstraint::solvePositionConstraint(PbdModel& model)
     const auto im1 = model.getInvMass(i2);
     const auto im2 = model.getInvMass(i3);
 
+    const auto m0 = (im0 > 0.0) ? 1.0 / im0 : 0.0;
+    const auto m1 = (im1 > 0.0) ? 1.0 / im1 : 0.0;
+    const auto m2 = (im2 > 0.0) ? 1.0 / im2 : 0.0;
+
     // Move towards triangle center
     const Vec3d& center = (p0 + p1 + p2) / 3.0;
     const Vec3d& diff   = p1 - center;
@@ -74,25 +78,20 @@ PbdBendConstraint::solvePositionConstraint(PbdModel& model)
     const Vec3d& dir = diff / dist;
     const double c   = (dist - m_restLength) * m_stiffness;
 
-    // Now weight the applied movements by masses
-    double w = (1.0 / im0) + (2.0 / im1) + (1.0 / im2);
-
-    if (im0 > 0)
+    // Now Apply movement weighted by masses
+    if (im0 > 0.0)
     {
-        double ws = (2.0 / im0) / w;
-        p0 += c * dir * ws;
+        p0 += c * dir * 2.0 * m0 / (m0 + m1 + m2);
     }
 
-    if (im1 > 0)
+    if (im1 > 0.0)
     {
-        double ws = (4.0 / im1) / w;
-        p1 -= c * dir * ws;
+        p1 -= c * dir * 4.0 * m1 / (m0 + m1 + m2);
     }
 
-    if (im2 > 0)
+    if (im2 > 0.0)
     {
-        double ws = (2.0 / im2) / w;
-        p2 += c * dir * ws;
+        p2 += c * dir * 2.0 * m2 / (m0 + m1 + m2);
     }
 
     return true;
