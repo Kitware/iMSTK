@@ -24,8 +24,8 @@ imstk_add_external_project( PhysX
   #URL_MD5 79004323c3c39152a6c0491967e0a609
   #URL_MD5 32fdaddc4ad4e7e637faa86311eb1803
   #DOWNLOAD_DIR ${PhysX_TMP_DIR}
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/PhysX.git
-  GIT_TAG 78481093a259101c2a1846370f749ea35cae80e2
+  GIT_REPOSITORY https://gitlab.kitware.com/sankhesh/PhysX.git
+  GIT_TAG arch_linux_gcc_support
   GIT_SHALLOW TRUE
   GIT_CONFIG status.showUntrackedFiles=no
   SOURCE_SUBDIR ./physx/compiler/public
