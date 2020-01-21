@@ -27,6 +27,7 @@ imstk_add_external_project( PhysX
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/PhysX.git
   GIT_TAG 78481093a259101c2a1846370f749ea35cae80e2
   GIT_SHALLOW TRUE
+  GIT_CONFIG status.showUntrackedFiles=no
   SOURCE_SUBDIR ./physx/compiler/public
   CMAKE_CACHE_ARGS
     -DCMAKE_INSTALL_PREFIX:PATH=${PhysX_BINARY_DIR}/install
