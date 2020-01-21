@@ -41,10 +41,10 @@ main()
     // Setup N separate string simulations with varying bend stiffnesses
     const unsigned int numStrings    = 8;
     const unsigned int numVerts      = 30;
-    const double       stringSpacing = 2.0;                  // How far each string is apart
-    const double       stringLength  = 10.0;                 // Total length of string
-    const Vec3d        startColor    = Vec3d(1.0, 0.0, 0.0); // Color of first string
-    const Vec3d        endColor      = Vec3d(0.0, 1.0, 0.0); // Color of last string
+    const double       stringSpacing = 2.0;          // How far each string is apart
+    const double       stringLength  = 10.0;         // Total length of string
+    const Color        startColor    = Color::Red;   // Color of first string
+    const Color        endColor      = Color::Green; // Color of last string
     struct PbdSim
     {
         std::shared_ptr<LineMesh> geometry;
@@ -91,11 +91,11 @@ main()
         sims[i].params = std::make_shared<PBDModelConfig>();
         sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 0.001);
         sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
-        sims[i].params->m_fixedNodeIds = { 0 }; // Fix the first node in each string
+        sims[i].params->m_fixedNodeIds     = { 0 }; // Fix the first node in each string
         sims[i].params->m_uniformMassValue = 5.0;
         sims[i].params->m_gravity          = Vec3d(0, -9.8, 0);
-        sims[i].params->m_dt      = 0.0005;
-        sims[i].params->m_maxIter = 5;
+        sims[i].params->m_dt               = 0.0005;
+        sims[i].params->m_maxIter          = 5;
 
         // Set the parameters
         sims[i].model->configure(sims[i].params);
@@ -105,9 +105,7 @@ main()
         sims[i].visualModel = std::make_shared<VisualModel>(sims[i].geometry);
         std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
         material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME);
-        const double t     = static_cast<double>(i) / (numStrings - 1);
-        Vec3d        color = (endColor - startColor) * t + startColor;
-        material->setDebugColor(Color(color.x(), color.y(), color.z()));
+        material->setDebugColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));
         material->setLineWidth(2.0f);
         sims[i].visualModel->setRenderMaterial(material);
         sims[i].object->addVisualModel(sims[i].visualModel);

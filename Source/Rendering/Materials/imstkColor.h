@@ -51,6 +51,12 @@ struct Color
     ///
     Color();
     Color(double r, double g, double b, double a = 1.0);
+    Color(double* rgba);
+
+    ///
+    /// \brief Constructor overwrites the alpha component
+    ///
+    Color(Color color, double a);
 
     ///
     /// \brief Equality operator
@@ -92,6 +98,12 @@ struct Color
     ///
     const double* getValue() const;
 
+    ///
+    /// \brief interpolate between two colors by ratio t
+    ///
+    static Color lerpRgba(const Color& start, const Color& end, const double t);
+    static Color lerpRgb(const Color& start, const Color& end, const double t);
+
     /// Various commonly used colors
     static Color White;
     static Color Black;
@@ -105,4 +117,28 @@ struct Color
     static Color Yellow;
 };
 #pragma warning(default : 4201)
+
+///
+/// \brief Multiply operators
+///
+Color operator*(const Color& color_lhs, const Color& color_rhs);
+Color operator*(const Color& color_lhs, const double intensity_rhs);
+Color operator*=(const Color& color_lhs, const Color& color_rhs);
+Color operator*=(const Color& color_lhs, const double intensity_rhs);
+
+///
+/// \brief Add operators
+///
+Color operator+(const Color& color_lhs, const Color& color_rhs);
+Color operator+(const Color& intensity_lhs, const double intensity_rhs);
+Color operator+=(const Color& color_lhs, const Color& color_rhs);
+Color operator+=(const Color& intensity_lhs, const double intensity_rhs);
+
+///
+/// \brief Subtract operators
+///
+Color operator-(const Color& color_lhs, const Color& color_rhs);
+Color operator-(const Color& color_rhs, const double intensity_lhs);
+Color operator-=(const Color& color_lhs, const Color& color_rhs);
+Color operator-=(const Color& color_rhs, const double intensity_lhs);
 }
