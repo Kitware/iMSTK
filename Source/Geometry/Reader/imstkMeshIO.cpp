@@ -178,6 +178,7 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
         return VegaMeshIO::write(imstkMesh, filePath, meshType);
         break;
     case MeshFileType::VTU:
+    case MeshFileType::VTK:
     case MeshFileType::VTP:
     case MeshFileType::STL:
     case MeshFileType::PLY:

@@ -23,6 +23,7 @@
 
 #include "imstkLineMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVTKMeshIO.h"
 #include <memory>
 #include <vtkAppendPolyData.h>
 #include <vtkCellArray.h>
@@ -30,179 +31,85 @@
 #include <vtkPoints.h>
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
+#include <vtkExtractEdges.h>
 
 namespace imstk
 {
 
-namespace geometryutils
+class GeometryUtils
 {
+public:
+    ///
+    /// \brief Converts vtk polydata into a imstk surface mesh
+    ///
+    static std::shared_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
-///
-/// \brief Converts vtkPolyData to imstk SurfaceMesh, vtkPolyData must be triangles only
-///
-static std::shared_ptr<SurfaceMesh>
-vtkToImstkSurfaceMesh(vtkSmartPointer<vtkPolyData> polyData)
-{
-    vtkPoints* pts = polyData->GetPoints();
-    StdVectorOfVec3d vertList;
-    vertList.resize(pts->GetNumberOfPoints());
-    for (vtkIdType i = 0; i < pts->GetNumberOfPoints(); i++)
-    {
-        double pt[3];
-        pts->GetPoint(i, pt);
-        vertList[i] = Vec3d(pt);
-    }
+    ///
+    /// \brief Converts vtk polydata into a imstk surface mesh
+    ///
+    static std::shared_ptr<LineMesh> convertVtkPolyDataToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
-    vtkCellArray* cells = polyData->GetPolys();
-    cells->InitTraversal();
-    vtkNew<vtkIdList> idList;
-    std::vector<SurfaceMesh::TriangleArray> triangles(cells->GetNumberOfCells());
-    for (vtkIdType i = 0; i < cells->GetNumberOfCells(); i++)
-    {
-        cells->GetNextCell(idList);
-        vtkIdType numIds = idList->GetNumberOfIds();
-        if (idList->GetNumberOfIds() != 3)
-        {
-            LOG(FATAL) << "vtkPolyData contains non-triangle cell";
-        }
-        else
-        {
-            triangles[i] = {
-                static_cast<unsigned int>(idList->GetId(0)),
-                static_cast<unsigned int>(idList->GetId(1)),
-                static_cast<unsigned int>(idList->GetId(2)) };
-        }
-    }
+    ///
+    /// \brief Converts imstk surface mesh into a vtk polydata
+    ///
+    static vtkSmartPointer<vtkPolyData> convertSurfaceMeshToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh);
 
-    std::shared_ptr<SurfaceMesh> surfMesh = std::make_shared<SurfaceMesh>();
-    surfMesh->setTrianglesVertices(triangles);
-    surfMesh->setInitialVertexPositions(vertList);
-    surfMesh->setVertexPositions(vertList);
+    ///
+    /// \brief Converts imstk line mesh into a vtk polydata
+    ///
+    static vtkSmartPointer<vtkPolyData> convertLineMeshToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh);
 
-    return surfMesh;
-}
+    ///
+    /// \brief Converts imstk tetrahedral mesh into a vtk unstructured grid
+    ///
+    static vtkSmartPointer<vtkUnstructuredGrid> convertTetrahedralMeshToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkMesh);
 
-///
-/// \brief Converts imstk SurfaceMesh to vtkPolyData
-///
-static vtkSmartPointer<vtkPolyData>
-imstkToVtkSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
-{
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+    ///
+    /// \brief Converts imstk hexahedral mesh into a vtk unstructured grid
+    ///
+    static vtkSmartPointer<vtkUnstructuredGrid> convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
 
-    vtkPoints* pts = vtkPoints::New();
-    pts->SetNumberOfPoints(surfaceMesh->getNumVertices());
-    for (size_t i = 0; i < surfaceMesh->getNumVertices(); i++)
-    {
-        pts->SetPoint(static_cast<vtkIdType>(i), surfaceMesh->getVertexPosition(i).data());
-    }
+    ///
+    /// \brief
+    ///
+    static std::shared_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh);
 
-    vtkCellArray* cells = vtkCellArray::New();
-    std::vector<SurfaceMesh::TriangleArray> elements = surfaceMesh->getTrianglesVertices();
-    vtkIdType tri[3];
-    for (size_t i = 0; i < elements.size(); i++)
-    {
-        tri[0] = elements[i][0];
-        tri[1] = elements[i][1];
-        tri[2] = elements[i][2];
-        cells->InsertNextCell(3, tri);
-    }
-    polyData->SetPoints(pts);
-    polyData->SetPolys(cells);
+    ///
+    /// \brief
+    ///
+    static void copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices);
 
-    pts->Delete();
-    cells->Delete();
+    ///
+    /// \brief Copies vertices from imstk structure to VTK one
+    ///
+    static void copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points);
 
-    return polyData;
-}
+    ///
+    /// \brief Copies cells of the given dimension from imstk structure to VTK one
+    ///
+    template<size_t dim>
+    static void copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells);
 
-///
-/// \brief Converts vtkPolyData to imstk LineMesh
-///
-static std::shared_ptr<LineMesh>
-vtkToImstkLineMesh(vtkSmartPointer<vtkPolyData> polyData)
-{
-    vtkPoints* pts = polyData->GetPoints();
-    StdVectorOfVec3d vertList;
-    vertList.resize(pts->GetNumberOfPoints());
-    for (vtkIdType i = 0; i < pts->GetNumberOfPoints(); i++)
-    {
-        double pt[3];
-        pts->GetPoint(i, pt);
-        vertList[i] = Vec3d(pt);
-    }
+    ///
+    /// \brief
+    ///
+    template<size_t dim>
+    static void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells);
 
-    vtkCellArray* cells = polyData->GetPolys();
-    cells->InitTraversal();
-    vtkNew<vtkIdList> idList;
-    std::vector<LineMesh::LineArray> lines(cells->GetNumberOfCells());
-    for (vtkIdType i = 0; i < cells->GetNumberOfCells(); i++)
-    {
-        cells->GetNextCell(idList);
-        vtkIdType numIds = idList->GetNumberOfIds();
-        if (idList->GetNumberOfIds() != 2)
-        {
-            LOG(FATAL) << "vtkPolyData contains a non-line cell";
-        }
-        else
-        {
-            lines[i] = {
-                static_cast<unsigned int>(idList->GetId(0)),
-                static_cast<unsigned int>(idList->GetId(1)) };
-        }
-    }
+    ///
+    /// \brief
+    ///
+    static void copyPointDataFromVtk(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 
-    std::shared_ptr<LineMesh> lineMesh = std::make_shared<LineMesh>();
-    lineMesh->setLinesVertices(lines);
-    lineMesh->setInitialVertexPositions(vertList);
-    lineMesh->setVertexPositions(vertList);
+public:
+    ///
+    /// \brief Appends two surface meshes
+    ///
+    static std::shared_ptr<SurfaceMesh> appendSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2);
 
-    return lineMesh;
-}
-
-///
-/// \brief Converts imstk LineMesh to vtkPolyData 
-///
-static vtkSmartPointer<vtkPolyData> imstktoVtkLineMesh(std::shared_ptr<LineMesh> lineMesh)
-{
-    vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-
-    vtkPoints* pts = vtkPoints::New();
-    pts->SetNumberOfPoints(lineMesh->getNumVertices());
-    for (size_t i = 0; i < lineMesh->getNumVertices(); i++)
-    {
-        pts->SetPoint(static_cast<vtkIdType>(i), lineMesh->getVertexPosition(i).data());
-    }
-
-    vtkCellArray* cells = vtkCellArray::New();
-    std::vector<LineMesh::LineArray> elements = lineMesh->getLinesVertices();
-    vtkIdType seg[2];
-    for (size_t i = 0; i < elements.size(); i++)
-    {
-        seg[0] = elements[i][0];
-        seg[1] = elements[i][1];
-        cells->InsertNextCell(2, seg);
-    }
-    polyData->SetPoints(pts);
-    polyData->SetPolys(cells);
-
-    pts->Delete();
-    cells->Delete();
-
-    return polyData;
-}
-
-///
-/// \brief Appends two surface meshes
-///
-static std::shared_ptr<SurfaceMesh>
-appendSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2)
-{
-    vtkSmartPointer<vtkAppendPolyData> filter = vtkSmartPointer<vtkAppendPolyData>::New();
-    filter->AddInputData(imstkToVtkSurfaceMesh(surfaceMesh1));
-    filter->AddInputData(imstkToVtkSurfaceMesh(surfaceMesh2));
-    filter->Update();
-    return vtkToImstkSurfaceMesh(filter->GetOutput());
-}
-}
+    ///
+    /// \brief Converts an imstk SurfaceMesh to a LineMesh, removing duplicate edges
+    ///
+    static std::shared_ptr<LineMesh> SurfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfMesh);
+};
 }

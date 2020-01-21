@@ -33,6 +33,8 @@
 #include "imstkPbdFEHexConstraint.h"
 #include "imstkPbdConstantDensityConstraint.h"
 #include "imstkParallelUtils.h"
+#include "imstkGeometryUtilities.h"
+#include "imstkMeshIO.h"
 
 #include <g3log/g3log.hpp>
 
@@ -262,9 +264,21 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     }
     else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
-        const auto&                    triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-        const auto&                    elements = triMesh->getTrianglesVertices();
-        const auto                     nV       = triMesh->getNumVertices();
+        // To remove duplicate edges convert to a line mesh (indices are then messed up)
+        std::shared_ptr<LineMesh>      lineMesh = GeometryUtils::SurfaceMeshToLineMesh(std::static_pointer_cast<SurfaceMesh>(m_mesh));
+        MeshIO::write(lineMesh, "C:/Users/andrew.wilson/Desktop/test.vtk");
+        const auto&                    elements = lineMesh->getLinesVertices();
+        const auto                     nV       = lineMesh->getNumVertices();
+        std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
+
+        for (size_t k = 0; k < elements.size(); ++k)
+        {
+            auto& seg = elements[k];
+            addConstraint(E, seg[0], seg[1]);
+        }
+        /*const auto& triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+        const auto& elements = triMesh->getTrianglesVertices();
+        const auto        nV = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
         for (size_t k = 0; k < elements.size(); ++k)
@@ -273,7 +287,8 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             addConstraint(E, tri[0], tri[1]);
             addConstraint(E, tri[0], tri[2]);
             addConstraint(E, tri[1], tri[2]);
-        }
+        }*/
+
     }
     else if (m_mesh->getType() == Geometry::Type::LineMesh)
     {
