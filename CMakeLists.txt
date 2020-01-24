@@ -316,6 +316,12 @@ endif()
 if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   include(imstkExternalData)
   include(imstkExternalDataDownloadTest)
+  # Create a target for all the data files
+  file(GLOB_RECURSE FILE_LIST
+    LIST_DIRECTORIES FALSE
+    RELATIVE "${CMAKE_SOURCE_DIR}/Data/"
+    "${CMAKE_SOURCE_DIR}/Data/*")
+  string(REGEX REPLACE "\.sha512" "" FILE_LIST "${FILE_LIST}")
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
   #-----------------------------------------------------------------------------
