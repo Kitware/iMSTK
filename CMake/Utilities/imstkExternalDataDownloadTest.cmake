@@ -24,6 +24,6 @@ imstk_add_data(ExternalDataTest "Testing/ExternalDataTest.txt")
 add_test(
   NAME imstkExternalDataTest
   COMMAND ${CMAKE_COMMAND}
-  -DFileToCheck=${ExternalData_BINARY_ROOT}/Data/Testing/ExternalDataTest.txt
+  -DFileToCheck=${ExternalData_BINARY_ROOT}/Testing/ExternalDataTest.txt
   -P ${CMAKE_SOURCE_DIR}/CMake/Utilities/imstkCheckFileExists.cmake
 )
