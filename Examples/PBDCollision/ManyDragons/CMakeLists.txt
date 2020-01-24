@@ -37,13 +37,6 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
-  
-#-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    asianDragon/,REGEX:.*)
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
 #-----------------------------------------------------------------------------
 # Set MSVC working directory to the install/bin directory
