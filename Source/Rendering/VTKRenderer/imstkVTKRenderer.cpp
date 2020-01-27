@@ -336,7 +336,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
 }
 
 void
-VTKRenderer::setAxesLength(double x, double y, double z)
+VTKRenderer::setAxesLength(const double x, const double y, const double z)
 {
     m_AxesActor->SetTotalLength(x, y, z);
 }

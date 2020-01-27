@@ -45,6 +45,7 @@ main()
     const double       stringLength  = 10.0;         // Total length of string
     const Color        startColor    = Color::Red;   // Color of first string
     const Color        endColor      = Color::Green; // Color of last string
+
     struct PbdSim
     {
         std::shared_ptr<LineMesh> geometry;

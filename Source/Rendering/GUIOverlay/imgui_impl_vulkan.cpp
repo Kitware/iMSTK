@@ -450,10 +450,10 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
     // Copy to Image:
     {
         VkImageMemoryBarrier copy_barrier[1] = {};
-        copy_barrier[0].sType                       = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        copy_barrier[0].dstAccessMask               = VK_ACCESS_TRANSFER_WRITE_BIT;
-        copy_barrier[0].oldLayout                   = VK_IMAGE_LAYOUT_UNDEFINED;
-        copy_barrier[0].newLayout                   = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        copy_barrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        copy_barrier[0].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        copy_barrier[0].oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        copy_barrier[0].newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
         copy_barrier[0].srcQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
         copy_barrier[0].dstQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
         copy_barrier[0].image                       = g_FontImage;
@@ -471,11 +471,11 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
         vkCmdCopyBufferToImage(command_buffer, g_UploadBuffer, g_FontImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
         VkImageMemoryBarrier use_barrier[1] = {};
-        use_barrier[0].sType                       = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        use_barrier[0].srcAccessMask               = VK_ACCESS_TRANSFER_WRITE_BIT;
-        use_barrier[0].dstAccessMask               = VK_ACCESS_SHADER_READ_BIT;
-        use_barrier[0].oldLayout                   = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        use_barrier[0].newLayout                   = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        use_barrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        use_barrier[0].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+        use_barrier[0].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        use_barrier[0].oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        use_barrier[0].newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         use_barrier[0].srcQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
         use_barrier[0].dstQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
         use_barrier[0].image                       = g_FontImage;
@@ -550,7 +550,7 @@ ImGui_ImplVulkan_CreateDeviceObjects()
     // Create Descriptor Set:
     {
         VkDescriptorSetAllocateInfo alloc_info = {};
-        alloc_info.sType              = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         alloc_info.descriptorPool     = g_DescriptorPool;
         alloc_info.descriptorSetCount = 1;
         alloc_info.pSetLayouts        = &g_DescriptorSetLayout;
@@ -567,7 +567,7 @@ ImGui_ImplVulkan_CreateDeviceObjects()
         push_constants[0].size       = sizeof(float) * 4;
         VkDescriptorSetLayout      set_layout[1] = { g_DescriptorSetLayout };
         VkPipelineLayoutCreateInfo layout_info   = {};
-        layout_info.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         layout_info.setLayoutCount         = 1;
         layout_info.pSetLayouts            = set_layout;
         layout_info.pushConstantRangeCount = 1;
@@ -656,8 +656,8 @@ ImGui_ImplVulkan_CreateDeviceObjects()
     dynamic_state.pDynamicStates    = dynamic_states;
 
     VkGraphicsPipelineCreateInfo info = {};
-    info.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    info.flags               = g_PipelineCreateFlags;
+    info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    info.flags = g_PipelineCreateFlags;
     info.stageCount          = 2;
     info.pStages             = stage;
     info.pVertexInputState   = &vertex_info;
@@ -931,7 +931,7 @@ ImGui_ImplVulkanH_CreateWindowDataCommandBuffers(VkPhysicalDevice physical_devic
         }
         {
             VkCommandBufferAllocateInfo info = {};
-            info.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
             info.commandPool        = fd->CommandPool;
             info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             info.commandBufferCount = 1;
@@ -1012,7 +1012,7 @@ ImGui_ImplVulkanH_CreateWindowDataSwapChainAndFramebuffer(VkPhysicalDevice physi
     // Create Swapchain
     {
         VkSwapchainCreateInfoKHR info = {};
-        info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         info.surface          = wd->Surface;
         info.minImageCount    = min_image_count;
         info.imageFormat      = wd->SurfaceFormat.format;

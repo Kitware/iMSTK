@@ -50,17 +50,17 @@ Color::Color()
     rgba[3] = 1.0f;
 }
 
-Color::Color(double r, double g, double b, double a)
+Color::Color(const double r, const double g, const double b, const double a)
 {
     setValue(r, g, b, a);
 }
 
-Color::Color(double* rgba)
+Color::Color(const double* rgba)
 {
     setValue(rgba[0], rgba[1], rgba[2], rgba[3]);
 }
 
-Color::Color(Color color, double a)
+Color::Color(const Color color, const double a)
 {
     setValue(color.r, color.g, color.b, a);
 }
@@ -97,7 +97,7 @@ operator<<(std::ostream& os, const Color& c)
 }
 
 void
-Color::darken(double p_darkFactor)
+Color::darken(const double p_darkFactor)
 {
     rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor) );
     rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor) );
@@ -108,7 +108,7 @@ Color::darken(double p_darkFactor)
 }
 
 void
-Color::lighten(double p_darkFactor)
+Color::lighten(const double p_darkFactor)
 {
     rgba[0] = rgba[1] + rgba[1] * (p_darkFactor);
     rgba[1] = rgba[2] + rgba[2] * (p_darkFactor);
@@ -120,7 +120,10 @@ Color::lighten(double p_darkFactor)
 }
 
 void
-Color::setValue(double p_red, double p_green, double p_blue, double p_alpha)
+Color::setValue(const double p_red,
+                const double p_green,
+                const double p_blue,
+                const double p_alpha)
 {
     if (!isColorRangeCorrect(p_red)
         || !isColorRangeCorrect(p_green)

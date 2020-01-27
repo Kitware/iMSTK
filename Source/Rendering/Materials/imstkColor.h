@@ -50,13 +50,13 @@ struct Color
     /// \brief Constructor
     ///
     Color();
-    Color(double r, double g, double b, double a = 1.0);
-    Color(double* rgba);
+    Color(const double r, const double g, const double b, const double a = 1.0);
+    Color(const double* rgba);
 
     ///
     /// \brief Constructor overwrites the alpha component
     ///
-    Color(Color color, double a);
+    Color(const Color color, const double a);
 
     ///
     /// \brief Equality operator
@@ -71,22 +71,25 @@ struct Color
     ///
     /// \brief returns the color value given with the index
     ///
-    double operator()(int p_i) const;
+    double operator()(const int p_i) const;
 
     ///
-    /// \brief Dark ratio. the valu is between 0 and 1.0
+    /// \brief Dark ratio. the value is between 0 and 1.0
     ///
-    void darken(double p_darkFactor);
+    void darken(const double p_darkFactor);
 
     ///
     /// \brief lighten the color
     ///
-    void lighten(double p_darkFactor);
+    void lighten(const double p_darkFactor);
 
     ///
     /// \brief set RGB color
     ///
-    void setValue(double p_red, double p_green, double p_blue, double p_alpha = 1.0);
+    void setValue(const double p_red,
+                  const double p_green,
+                  const double p_blue,
+                  const double p_alpha = 1.0);
 
     ///
     /// \brief get RGB color
@@ -119,7 +122,7 @@ struct Color
 #pragma warning(default : 4201)
 
 ///
-/// \brief Multiply operators
+/// \brief Multiplication operators
 ///
 Color operator*(const Color& color_lhs, const Color& color_rhs);
 Color operator*(const Color& color_lhs, const double intensity_rhs);
@@ -127,7 +130,7 @@ Color operator*=(const Color& color_lhs, const Color& color_rhs);
 Color operator*=(const Color& color_lhs, const double intensity_rhs);
 
 ///
-/// \brief Add operators
+/// \brief Addition operators
 ///
 Color operator+(const Color& color_lhs, const Color& color_rhs);
 Color operator+(const Color& intensity_lhs, const double intensity_rhs);
@@ -135,7 +138,7 @@ Color operator+=(const Color& color_lhs, const Color& color_rhs);
 Color operator+=(const Color& intensity_lhs, const double intensity_rhs);
 
 ///
-/// \brief Subtract operators
+/// \brief Subtraction operators
 ///
 Color operator-(const Color& color_lhs, const Color& color_rhs);
 Color operator-(const Color& color_rhs, const double intensity_lhs);
