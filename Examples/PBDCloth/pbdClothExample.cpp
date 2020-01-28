@@ -84,7 +84,12 @@ main()
     // Constraints
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
-    pbdParams->m_fixedNodeIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+    std::vector<size_t> fixedNodes(nCols);
+    for (size_t i = 0; i < fixedNodes.size(); i++)
+    {
+        fixedNodes[i] = i;
+    }
+    pbdParams->m_fixedNodeIds = fixedNodes;
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;

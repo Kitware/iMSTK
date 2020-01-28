@@ -40,6 +40,7 @@ public:
     {
         Distance,
         Dihedral,
+        Bend,
         Area,
         Volume,
         FEMTet,

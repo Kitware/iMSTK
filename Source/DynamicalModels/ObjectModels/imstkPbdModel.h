@@ -135,6 +135,11 @@ public:
     bool initializeAreaConstraints(const double stiffness);
 
     ///
+    /// \brief Initialize bend constraints
+    ///
+    bool initializeBendConstraints(const double stiffness);
+
+    ///
     /// \brief Initialize dihedral constraints
     ///
     bool initializeDihedralConstraints(const double stiffness);
@@ -231,7 +236,7 @@ protected:
     ///
     /// \brief Partition constraints for parallelization
     ///
-    void partitionCostraints(const bool print = false);
+    void partitionConstraints(const bool print = false);
 
     size_t m_partitionThreshold = 16;    ///> Threshold for constraint partitioning
 

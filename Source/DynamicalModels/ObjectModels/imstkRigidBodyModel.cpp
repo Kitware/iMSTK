@@ -314,8 +314,8 @@ RigidBodyModel::updatePhysicsGeometry()
 
         m_geometry->setRotation(Quatd(q_physx.w, q_physx.x, q_physx.y, q_physx.z));
         m_geometry->setTranslation(Vec3d(Pos_physx.x, Pos_physx.y, Pos_physx.z));
-        
-		this->addForce(m_force, m_forcePos, true);
+
+        this->addForce(m_force, m_forcePos, true);
     }
 
     m_force = Vec3d(0., 0., 0.);
