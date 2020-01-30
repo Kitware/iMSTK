@@ -21,20 +21,23 @@
 
 #pragma once
 
-#include "imstkLineMesh.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkVTKMeshIO.h"
+#include "imstkMath.h"
 #include <memory>
-#include <vtkAppendPolyData.h>
-#include <vtkCellArray.h>
-#include <vtkCleanPolyData.h>
-#include <vtkPoints.h>
-#include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
-#include <vtkExtractEdges.h>
+
+class vtkCellArray;
+class vtkPolyData;
+class vtkPointData;
+class vtkPoints;
+class vtkUnstructuredGrid;
 
 namespace imstk
 {
+class HexahedralMesh;
+class LineMesh;
+class SurfaceMesh;
+class TetrahedralMesh;
+class VolumetricMesh;
 
 class GeometryUtils
 {
@@ -108,8 +111,27 @@ public:
     static std::shared_ptr<SurfaceMesh> appendSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2);
 
     ///
-    /// \brief Converts an imstk SurfaceMesh to a LineMesh, removing duplicate edges
+    /// \brief Converts an imstk SurfaceMesh to a LineMesh, removing duplicate edges. Cell indices not preserved
     ///
-    static std::shared_ptr<LineMesh> SurfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfMesh);
+    static std::shared_ptr<LineMesh> surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+
+    ///
+    /// \brief Smooths a SurfaceMesh using laplacian smoothening
+    ///
+    static std::shared_ptr<SurfaceMesh> smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+        int numberOfIterations = 20, double relaxationFactor = 0.01,
+        double convergence = 0.0, double featureAngle = 45.0,
+        double edgeAngle = 15.0, bool featureEdgeSmoothing = false,
+        bool boundarySmoothing = true);
+
+    ///
+    /// \brief Subidivdes a SurfaceMesh using linear subdivision
+    ///
+    static std::shared_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, int numberOfSubdivisions);
+
+    ///
+    /// \brief Subidivides a SurfaceMesh using loop subdivision
+    ///
+    static std::shared_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, int numberOfSubdivisions);
 };
 }

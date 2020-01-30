@@ -35,8 +35,7 @@
 #include "vtkSTLWriter.h"
 #include "vtkFloatArray.h"
 #include "vtkTriangleFilter.h"
-#include "vtkDICOMImageReader.h"
-#include "vtkNrrdReader.h"
+#include "vtkPolyDataWriter.h"
 
 #include "g3log/g3log.hpp"
 
@@ -111,6 +110,8 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
             return VTKMeshIO::writeVtkPolyData<vtkSTLWriter>(sMesh, filePath);
         case MeshFileType::PLY:
             return VTKMeshIO::writeVtkPolyData<vtkPLYWriter>(sMesh, filePath);
+        case MeshFileType::VTK:
+            return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(sMesh, filePath);
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for surface mesh.";
             return false;
@@ -121,6 +122,8 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         switch (meshType)
         {
         case MeshFileType::VTK:
+            return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(lMesh, filePath);
+        case MeshFileType::VTP:
             return VTKMeshIO::writeVtkPolyData<vtkXMLPolyDataWriter>(lMesh, filePath);
         default:
             LOG(WARNING) << "vtkMeshIO::write error: file type not supported for line mesh.";
@@ -196,6 +199,7 @@ bool
 VTKMeshIO::writeVtkPolyData(const std::shared_ptr<LineMesh> imstkMesh, const std::string& filePath)
 {
     vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertLineMeshToVtkPolyData(imstkMesh);
+    vtkMesh->PrintSelf(std::cout, vtkIndent());
     if (!vtkMesh)  //conversion unsuccessful
     {
         return false;

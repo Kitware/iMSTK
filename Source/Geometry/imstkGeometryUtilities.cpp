@@ -1,4 +1,15 @@
 #include "imstkGeometryUtilities.h"
+#include "imstkHexahedralMesh.h"
+#include "imstkLineMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include <vtkAppendPolyData.h>
+#include <vtkExtractEdges.h>
+#include <vtkLinearSubdivisionFilter.h>
+#include <vtkLoopSubdivisionFilter.h>
+#include <vtkPointData.h>
+#include <vtkSmoothPolyDataFilter.h>
+#include <vtkTriangleFilter.h>
+#include <vtkUnstructuredGrid.h>
 
 namespace imstk
 {
@@ -7,7 +18,7 @@ GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkM
 {
     if (!vtkMesh)
     {
-        LOG(FATAL) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
+        LOG(FATAL) << "GeometryUtils::convertVtkPolyDataToSurfaceMesh error: could not convert vtkPolyData to imstkSurfaceMesh.";
         return nullptr;
     }
 
@@ -45,7 +56,7 @@ GeometryUtils::convertVtkPolyDataToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh
 {
     if (!vtkMesh)
     {
-        LOG(FATAL) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
+        LOG(FATAL) << "GeometryUtils::convertVtkPolyDataToSurfaceMesh error: could not convert vtkPolyData to imstkLineMesh.";
         return nullptr;
     }
 
@@ -79,7 +90,7 @@ GeometryUtils::convertSurfaceMeshToVtkPolyData(std::shared_ptr<SurfaceMesh> imst
     vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
     copyCellsToVtk<3>(imstkMesh->getTrianglesVertices(), polys.Get());
 
-    vtkPolyData* polydata = vtkPolyData::New();
+    vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
     return polydata;
@@ -94,7 +105,7 @@ GeometryUtils::convertLineMeshToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh)
     vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
     copyCellsToVtk<2>(imstkMesh->getLinesVertices(), polys.Get());
 
-    vtkPolyData* polydata = vtkPolyData::New();
+    vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
     return polydata;
@@ -169,6 +180,7 @@ GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
     }
 }
 
+
 void
 GeometryUtils::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
 {
@@ -235,7 +247,7 @@ GeometryUtils::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<s
 
     cells.reserve(vtkCells->GetNumberOfCells());
     vtkCells->InitTraversal();
-    auto                    vtkCell = vtkSmartPointer<vtkIdList>::New();
+    vtkNew<vtkIdList> vtkCell;
     std::array<size_t, dim> cell;
     while (vtkCells->GetNextCell(vtkCell))
     {
@@ -281,10 +293,11 @@ GeometryUtils::copyPointDataFromVtk(vtkPointData* pointData, std::map<std::strin
     }
 }
 
+
 std::shared_ptr<SurfaceMesh>
 GeometryUtils::appendSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2)
 {
-    vtkSmartPointer<vtkAppendPolyData> filter = vtkSmartPointer<vtkAppendPolyData>::New();
+    vtkNew<vtkAppendPolyData> filter;
     filter->AddInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh1));
     filter->AddInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh2));
     filter->Update();
@@ -292,11 +305,54 @@ GeometryUtils::appendSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std:
 }
 
 std::shared_ptr<LineMesh>
-GeometryUtils::SurfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfMesh)
+GeometryUtils::surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
-    vtkSmartPointer<vtkExtractEdges> filter = vtkSmartPointer<vtkExtractEdges>::New();
-    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfMesh));
+    vtkNew<vtkExtractEdges> filter;
+    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
     filter->Update();
-    return convertVtkPolyDataToLineMesh(filter->GetOutput());
+    vtkNew<vtkTriangleFilter> triangleFilter;
+    triangleFilter->SetInputData(filter->GetOutput());
+    triangleFilter->Update();
+    return convertVtkPolyDataToLineMesh(triangleFilter->GetOutput());
+}
+
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+    int numberOfIterations, double relaxationFactor,
+    double convergence, double featureAngle,
+    double edgeAngle, bool featureEdgeSmoothing,
+    bool boundarySmoothing)
+{
+    vtkNew<vtkSmoothPolyDataFilter> filter;
+    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
+    filter->SetNumberOfIterations(numberOfIterations);
+    filter->SetRelaxationFactor(relaxationFactor);
+    filter->SetConvergence(convergence);
+    filter->SetFeatureAngle(featureAngle);
+    filter->SetEdgeAngle(edgeAngle);
+    filter->SetFeatureEdgeSmoothing(featureEdgeSmoothing);
+    filter->SetBoundarySmoothing(boundarySmoothing);
+    filter->Update();
+    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
+}
+
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, int numberOfSubdivisions)
+{
+    vtkNew<vtkLinearSubdivisionFilter> filter;
+    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
+    filter->SetNumberOfSubdivisions(numberOfSubdivisions);
+    filter->Update();
+    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
+}
+
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, int numberOfSubdivisions)
+{
+    vtkNew<vtkLoopSubdivisionFilter> filter;
+    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
+    filter->SetNumberOfSubdivisions(numberOfSubdivisions);
+    filter->Update();
+    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
 }
 }
