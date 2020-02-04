@@ -34,13 +34,6 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
 
 #-----------------------------------------------------------------------------
-# Associate external data
-#-----------------------------------------------------------------------------
-list(APPEND FILE_LIST
-    liver/,REGEX:.*)
-imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
-
-#-----------------------------------------------------------------------------
 # Set MSVC working directory to the install/bin directory
 #-----------------------------------------------------------------------------
 if(MSVC) # Configure running executable out of MSVC
