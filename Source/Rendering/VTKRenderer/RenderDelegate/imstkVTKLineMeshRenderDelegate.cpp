@@ -30,6 +30,7 @@
 #include <vtkFloatArray.h>
 #include <vtkLine.h>
 #include <vtkTrivialProducer.h>
+#include <vtkUnsignedCharArray.h>
 
 namespace imstk
 {

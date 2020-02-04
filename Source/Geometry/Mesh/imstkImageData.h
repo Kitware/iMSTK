@@ -74,8 +74,8 @@ public:
 protected:
     friend class VTKImageDataRenderDelegate;
 
-    vtkSmartPointer<vtkImageData> m_data          = nullptr; ///> ImageData
-    vtkSmartPointer<vtkTransform> m_dataTransform = nullptr;
+    vtkSmartPointer<vtkImageData> m_data;            ///> ImageData
+    vtkSmartPointer<vtkTransform> m_dataTransform;
 
     void applyTranslation(const Vec3d t) override;
 
