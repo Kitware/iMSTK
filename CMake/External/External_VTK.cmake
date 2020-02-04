@@ -27,6 +27,7 @@ if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.2")
     -DModule_vtkInteractionWidgets:BOOL=ON
     -DModule_vtkglew:BOOL=ON
     -DModule_vtkRenderingContext2D:BOOL=ON
+    -DModule_vtkRenderingVolumeOpenGL2:BOOL=ON
     -DBUILD_EXAMPLES:BOOL=OFF
     -DBUILD_TESTING:BOOL=OFF
     -DVTK_Group_StandAlone:BOOL=OFF
@@ -55,6 +56,7 @@ else()
     -DVTK_MODULE_ENABLE_VTK_InteractionWidgets:STRING=YES
     -DVTK_MODULE_ENABLE_VTK_glew:STRING=YES
     -DVTK_MODULE_ENABLE_VTK_RenderingContext2D:STRING=YES
+    -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=YES
     -DVTK_BUILD_EXAMPLES:STRING=DONT_WANT
     -DVTK_BUILD_TESTING:STRING=OFF
     -DVTK_GROUP_ENABLE_StandAlone:STRING=DONT_WANT
