@@ -62,11 +62,15 @@ struct LogManager
 ///
 /// \brief
 ///
-struct LogUtility
+class LogUtility
 {
+public:
+    std::shared_ptr<g3::LogWorker> getLogWorker() { return m_g3logWorker; }
+
     void createLogger(std::string name, std::string path);
 
-    std::unique_ptr<g3::LogWorker> m_g3logWorker;
+private:
+    std::shared_ptr<g3::LogWorker> m_g3logWorker;
     std::unique_ptr<g3::SinkHandle<g3::FileSink>> m_fileSinkHandle;
     std::unique_ptr<g3::SinkHandle<stdSink>> m_stdSinkHandle;
 };
