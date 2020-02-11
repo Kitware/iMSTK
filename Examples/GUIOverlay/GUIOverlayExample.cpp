@@ -35,10 +35,10 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk    = std::make_shared<SimulationManager>();
-    auto scene  = sdk->createNewScene("GraphicalUserInterface");
-    auto canvas = sdk->getViewer()->getCanvas();
+    // simManager and Scene
+    auto simManager    = std::make_shared<SimulationManager>();
+    auto scene  = simManager->createNewScene("GraphicalUserInterface");
+    auto canvas = simManager->getViewer()->getCanvas();
 
     // Cube
     auto cube   = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.5);
@@ -91,7 +91,7 @@ main()
 
             return false;
         };
-    sdk->getViewer()->setOnTimerFunction(GUIUpdateFunction);
+    simManager->getViewer()->setOnTimerFunction(GUIUpdateFunction);
 
     bool canvasVisible          = true;
     auto hideShowCanvasFunction =
@@ -109,7 +109,7 @@ main()
             canvasVisible = !canvasVisible;
             return true;
         };
-    sdk->getViewer()->setOnCharFunction('c', hideShowCanvasFunction);
+    simManager->getViewer()->setOnCharFunction('c', hideShowCanvasFunction);
 
     // Position camera
     auto cam = scene->getCamera();
@@ -124,8 +124,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

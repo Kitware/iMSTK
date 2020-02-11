@@ -57,9 +57,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("BoneDrilling");
+    // simManager and Scene
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("BoneDrilling");
 
     // Add virtual coupling object in the scene.
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -70,7 +70,7 @@ main()
     // Device Server
     auto server = std::make_shared<HDAPIDeviceServer>();
     server->addDeviceClient(client);
-    sdk->addModule(server);
+    simManager->addModule(server);
 
     // Device tracker
     auto deviceTracker = std::make_shared<DeviceTracker>(client);
@@ -122,7 +122,7 @@ main()
     auto cam = scene->getCamera();
     cam->setPosition(Vec3d(0, 0, 15));
 
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
     return 0;
 }

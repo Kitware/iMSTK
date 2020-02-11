@@ -151,11 +151,11 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PbdCollision");
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("PbdCollision");
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
 
     auto statusManager = viewer->getTextStatusManager();
@@ -312,7 +312,7 @@ main()
                << numEECollisions << " (EE)";
             statusManager->setCustomStatus(ss.str());
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
@@ -325,8 +325,8 @@ main()
     cam->setPosition(Vec3d(0, 15, 30));
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

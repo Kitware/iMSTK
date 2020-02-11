@@ -41,7 +41,7 @@ int
 main(int argc, char* argv[])
 {
     // SimulationManager must be created first
-    auto sdk = std::make_shared<SimulationManager>();
+    auto simManager = std::make_shared<SimulationManager>();
 
     int    threads        = -1;
     double particleRadius = 0.1;
@@ -74,12 +74,12 @@ main(int argc, char* argv[])
     }
 
     // Set thread pool size (nthreads <= 0 means using all logical cores)
-    sdk->setThreadPoolSize(threads);
+    simManager->setThreadPoolSize(threads);
 
-    auto scene = sdk->createNewScene("SPH Fluid");
+    auto scene = simManager->createNewScene("SPH Fluid");
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
 
     auto statusManager = viewer->getTextStatusManager();
@@ -90,7 +90,7 @@ main(int argc, char* argv[])
     auto fluidObj = generateFluid(scene, particleRadius);
     auto solids   = generateSolids(scene);
 
-    sdk->getSceneManager(scene)->setPostUpdateCallback([&](Module*) {
+    simManager->getSceneManager(scene)->setPostUpdateCallback([&](Module*) {
         statusManager->setCustomStatus("Number of particles: " +
                                    std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
                                         "\nNumber of solids: " + std::to_string(solids.size()));
@@ -130,8 +130,8 @@ main(int argc, char* argv[])
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
 
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

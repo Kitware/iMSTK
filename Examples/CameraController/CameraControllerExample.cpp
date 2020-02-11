@@ -46,9 +46,9 @@ main()
     return 1;
     #endif
 
-    // Create SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("CameraController");
+    // Create simManager and Scene
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("CameraController");
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
@@ -57,7 +57,7 @@ main()
     // Device Server
     auto server = std::make_shared<HDAPIDeviceServer>();
     server->addDeviceClient(client);
-    sdk->addModule(server);
+    simManager->addModule(server);
 #else
     LOG(WARNING) << "Phantom device option not enabled during build!";
 #endif
@@ -91,8 +91,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

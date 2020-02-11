@@ -35,8 +35,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDString");
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("PBDString");
 
     // Setup N separate string simulations with varying bend stiffnesses
     const unsigned int numStrings    = 8;
@@ -142,11 +142,11 @@ main()
             }
             t += dt;
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(movePoints);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(movePoints);
 
     // Start
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

@@ -32,9 +32,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("Rendering");
+    // simManager and Scene
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("Rendering");
 
     // Add IBL Probe
     auto globalIBLProbe = std::make_shared<IBLProbe>(
@@ -95,17 +95,17 @@ main()
     planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
+    simManager->setActiveScene(scene);
+    simManager->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
 
 #ifdef iMSTK_USE_Vulkan
-    auto viewer = std::dynamic_pointer_cast<VulkanViewer>(sdk->getViewer());
+    auto viewer = std::dynamic_pointer_cast<VulkanViewer>(simManager->getViewer());
     viewer->setResolution(1000, 800);
     viewer->disableVSync();
     //viewer->enableFullscreen();
 #endif
 
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

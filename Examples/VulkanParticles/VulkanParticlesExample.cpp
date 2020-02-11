@@ -34,9 +34,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("RenderParticles");
+    // simManager and Scene
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("RenderParticles");
 
     // Position camera
     auto cam = scene->getCamera();
@@ -148,7 +148,7 @@ main()
     light->setFocalPoint(Vec3d(-1, -1, 0));
     scene->addLight(light);
 
-    auto viewer = sdk->getViewer();
+    auto viewer = simManager->getViewer();
     // Create a call back on key press of 'b' to trigger the sparks emitter
     viewer->setOnCharFunction('b', [&](InteractorStyle* c) -> bool
     {
@@ -159,8 +159,8 @@ main()
     });
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

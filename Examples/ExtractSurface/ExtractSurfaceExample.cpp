@@ -31,7 +31,7 @@ using namespace imstk;
 void
 extractSurfaceMesh()
 {
-    auto sdk = std::make_shared<SimulationManager>();
+    auto simManager = std::make_shared<SimulationManager>();
 
     // a. Construct a sample tetrahedral mesh
 

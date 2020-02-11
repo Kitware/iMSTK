@@ -38,8 +38,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PbdCollision");
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("PbdCollision");
 
     scene->getCamera()->setPosition(0, 10.0, 10.0);
 
@@ -178,8 +178,8 @@ main()
     light->setIntensity(1);
     scene->addLight(light);
 
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }
