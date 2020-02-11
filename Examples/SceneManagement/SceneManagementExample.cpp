@@ -29,46 +29,46 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk = std::make_shared<SimulationManager>();
+    auto simManager = std::make_shared<SimulationManager>();
 
     // Scenes
     LOG(INFO) << "-- Test add scenes";
     auto scene1 = std::make_shared<Scene>("scene1");
-    sdk->addScene(scene1);
+    simManager->addScene(scene1);
 
-    sdk->createNewScene("scene2");
-    auto scene2 = sdk->getScene("scene2");
+    simManager->createNewScene("scene2");
+    auto scene2 = simManager->getScene("scene2");
 
-    auto scene3 = sdk->createNewScene();
-    sdk->removeScene("Scene_3");
+    auto scene3 = simManager->createNewScene();
+    simManager->removeScene("Scene_3");
 
     // switch
     LOG(INFO) << "-- Test scene switch";
     int delay = 5;
-    sdk->setActiveScene(scene1);
-    sdk->startSimulation();
+    simManager->setActiveScene(scene1);
+    simManager->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setActiveScene(scene2, false);
+    simManager->setActiveScene(scene2, false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setActiveScene(scene1, true);
+    simManager->setActiveScene(scene1, true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->endSimulation();
+    simManager->endSimulation();
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
-    sdk->setActiveScene(scene2);
-    sdk->startSimulation();
+    simManager->setActiveScene(scene2);
+    simManager->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->pauseSimulation();
+    simManager->pauseSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->runSimulation();
+    simManager->runSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->pauseSimulation();
+    simManager->pauseSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->endSimulation();
+    simManager->endSimulation();
 
     // Quit
-    while (sdk->getStatus() != SimulationStatus::INACTIVE) {}
+    while (simManager->getStatus() != SimulationStatus::INACTIVE) {}
 
     return 0;
 }

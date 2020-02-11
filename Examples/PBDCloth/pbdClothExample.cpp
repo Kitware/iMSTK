@@ -34,8 +34,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDCloth");
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("PBDCloth");
 
     // Create surface mesh
     auto             surfMesh = std::make_shared<SurfaceMesh>();
@@ -137,8 +137,8 @@ main()
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 
     // Start
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

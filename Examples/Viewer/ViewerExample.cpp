@@ -31,9 +31,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk       = std::make_shared<SimulationManager>();
-    auto sceneTest = sdk->createNewScene("HelloWorld");
+    // simManager and Scene
+    auto simManager       = std::make_shared<SimulationManager>();
+    auto sceneTest = simManager->createNewScene("HelloWorld");
 
     // Add Plane
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, sceneTest, "VisualPlane", 10);
@@ -62,8 +62,8 @@ main()
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
     // Run
-    sdk->setActiveScene(sceneTest);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(sceneTest);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

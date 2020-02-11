@@ -176,9 +176,9 @@ addSphereRigidObject(std::shared_ptr<Scene> scene, Vec3d t = Vec3d(0., 0., 0.))
 int
 main()
 {
-    //SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("Rigid Body Dynamics");
+    //simManager and Scene
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("Rigid Body Dynamics");
 
     for (int i = 0; i < 10; ++i)
     {
@@ -199,8 +199,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

@@ -37,13 +37,13 @@ if(iMSTK_USE_OpenHaptics)
     target_link_libraries(${PROJECT_NAME}
     SimulationManager
     apiUtilities
-    OpenHapticsSDK)
+    OpenHapticssimManager)
   else()
     target_link_libraries(${PROJECT_NAME}
     SimulationManager
     apiUtilities
     SFML
-    OpenHapticsSDK)
+    OpenHapticssimManager)
   endif()
   
 

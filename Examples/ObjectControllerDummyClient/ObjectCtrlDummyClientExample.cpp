@@ -33,9 +33,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("ObjectControllerDummyClient");
+    // simManager and Scene
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("ObjectControllerDummyClient");
 
     // Device Client
     auto client = std::make_shared<DummyClient>("DummyClient");
@@ -66,7 +66,7 @@ main()
             }
             client->setPosition(p);
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(translateFunc);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(translateFunc);
 
     // Update Camera position
     auto cam = scene->getCamera();
@@ -80,8 +80,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

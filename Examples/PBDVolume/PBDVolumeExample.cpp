@@ -36,8 +36,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDVolume");
+    auto simManager   = std::make_shared<SimulationManager>();
+    auto scene = simManager->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Load a sample mesh
@@ -107,11 +107,11 @@ main()
 
     // print UPS
     /*auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);*/
+    apiutils::printUPS(simManager->getSceneManager(scene), ups);*/
 
-    sdk->setActiveScene(scene);
-    sdk->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    sdk->startSimulation();
+    simManager->setActiveScene(scene);
+    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+    simManager->startSimulation();
 
     return 0;
 }
