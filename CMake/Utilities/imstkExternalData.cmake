@@ -20,9 +20,6 @@ list(APPEND ExternalData_OBJECT_STORES
   "${CMAKE_SOURCE_DIR}/.ExternalData"
   )
 
-
-# Expands %(algo:lower)
-set(ExternalData_URL_ALGO_MD5_lower md5)
 set(ExternalData_URL_TEMPLATES "" CACHE STRING
   "Additional URL templates for the ExternalData CMake script to look for testing data. E.g.
 file:///var/bigharddrive/%(algo)/%(hash)")
@@ -33,7 +30,7 @@ list(APPEND ExternalData_URL_TEMPLATES
 
 # Tell ExternalData commands to transform raw files to content links.
 # TODO: Condition this feature on presence of our pre-commit hook.
-set(ExternalData_LINK_CONTENT MD5)
+set(ExternalData_LINK_CONTENT SHA512)
 
 # Emscripten currently has difficulty reading symlinks.
 if(EMSCRIPTEN)
