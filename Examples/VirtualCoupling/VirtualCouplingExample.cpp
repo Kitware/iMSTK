@@ -44,8 +44,8 @@ main()
     return 1;
 #else if
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("VirtualCoupling");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("VirtualCoupling");
 
     // Create a plane in the scene
     auto planeGeom = std::make_shared<Plane>();

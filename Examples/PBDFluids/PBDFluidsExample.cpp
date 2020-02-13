@@ -37,8 +37,8 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("PBDFluid");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PBDFluid");
 
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 

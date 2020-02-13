@@ -40,8 +40,8 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager   = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackground);
-    auto scene = simManager->createNewScene("NoRendering");
+    auto simManager = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackground);
+    auto scene      = simManager->createNewScene("NoRendering");
 
     // Create surface mesh
     auto             surfMesh = std::make_shared<SurfaceMesh>();

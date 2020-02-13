@@ -177,8 +177,8 @@ int
 main()
 {
     //simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("Rigid Body Dynamics");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Rigid Body Dynamics");
 
     for (int i = 0; i < 10; ++i)
     {

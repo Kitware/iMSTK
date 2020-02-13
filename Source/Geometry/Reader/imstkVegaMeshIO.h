@@ -66,7 +66,6 @@ public:
     ///
     static bool write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType);
 
-protected:
     ///
     /// \brief Generate volumetric mesh given a vega volume mesh
     ///
@@ -77,6 +76,7 @@ protected:
     ///
     static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> volumeMesh);
 
+protected:
     ///
     /// \brief
     ///

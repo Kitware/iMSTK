@@ -151,8 +151,8 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 int
 main()
 {
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("PbdCollision");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PbdCollision");
 
     // Get the VTKViewer
     auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());

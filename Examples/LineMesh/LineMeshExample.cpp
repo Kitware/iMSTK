@@ -36,8 +36,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("LineMeshRenderingTest");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("LineMeshRenderingTest");
 
     // Construct line mesh
     auto lineMesh         = std::make_shared<LineMesh>();

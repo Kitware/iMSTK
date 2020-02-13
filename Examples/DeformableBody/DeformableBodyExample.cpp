@@ -44,8 +44,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("DeformableBodyFEM");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("DeformableBodyFEM");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Load a tetrahedral mesh

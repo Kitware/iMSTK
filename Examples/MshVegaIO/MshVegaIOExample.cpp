@@ -32,8 +32,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("MshAndVegaIO");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("MshAndVegaIO");
 
     // Load a volumetric mesh (from .msh file)
     std::string ifile    = iMSTK_DATA_ROOT "/liver/liver.msh";

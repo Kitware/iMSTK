@@ -33,8 +33,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("Rendering");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Rendering");
 
     // Add IBL Probe
     auto globalIBLProbe = std::make_shared<IBLProbe>(

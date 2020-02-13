@@ -34,8 +34,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("ObjectControllerDummyClient");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("ObjectControllerDummyClient");
 
     // Device Client
     auto client = std::make_shared<DummyClient>("DummyClient");

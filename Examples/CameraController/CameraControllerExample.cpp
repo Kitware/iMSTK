@@ -47,8 +47,8 @@ main()
     #endif
 
     // Create simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("CameraController");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("CameraController");
 
 #ifdef iMSTK_USE_OPENHAPTICS
 

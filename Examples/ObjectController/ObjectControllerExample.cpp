@@ -39,8 +39,8 @@ main()
 {
 #ifdef iMSTK_USE_OPENHAPTICS
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("ObjectController");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("ObjectController");
 
     // Device Client
     auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);

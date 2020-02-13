@@ -35,8 +35,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("GeometryTransforms");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("GeometryTransforms");
 
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 

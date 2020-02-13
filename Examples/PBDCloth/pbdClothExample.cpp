@@ -34,8 +34,8 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("PBDCloth");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PBDCloth");
 
     // Create surface mesh
     auto             surfMesh = std::make_shared<SurfaceMesh>();

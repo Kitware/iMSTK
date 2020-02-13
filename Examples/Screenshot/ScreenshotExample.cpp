@@ -33,8 +33,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager       = std::make_shared<SimulationManager>();
-    auto sceneTest = simManager->createNewScene("ScreenShotUtility");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto sceneTest  = simManager->createNewScene("ScreenShotUtility");
 
     // Plane
     auto planeGeom = std::make_shared<Plane>();
