@@ -191,7 +191,8 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
             elements.emplace_back(int(tet[3]));
         }
 
-        std::shared_ptr<vega::TetMesh> vegaMesh = std::make_shared<vega::TetMesh>(int(imstkVolTetMesh->getNumVertices()), &vertices[0], int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density);
+        std::shared_ptr<vega::TetMesh> vegaMesh = std::make_shared<vega::TetMesh>(int(imstkVolTetMesh->getNumVertices()), &vertices[0],
+                int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density);
         if (!vegaMesh)
         {
             LOG(FATAL) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";

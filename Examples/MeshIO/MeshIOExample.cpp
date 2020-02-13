@@ -32,8 +32,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("ReadMesh");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("ReadMesh");
 
     // Read surface mesh
     /*auto objMesh = MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj");

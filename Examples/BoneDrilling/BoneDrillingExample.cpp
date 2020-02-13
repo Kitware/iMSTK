@@ -58,8 +58,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("BoneDrilling");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("BoneDrilling");
 
     // Add virtual coupling object in the scene.
 #ifdef iMSTK_USE_OPENHAPTICS

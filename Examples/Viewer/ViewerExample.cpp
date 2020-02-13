@@ -32,8 +32,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager       = std::make_shared<SimulationManager>();
-    auto sceneTest = simManager->createNewScene("HelloWorld");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto sceneTest  = simManager->createNewScene("HelloWorld");
 
     // Add Plane
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, sceneTest, "VisualPlane", 10);

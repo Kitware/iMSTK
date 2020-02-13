@@ -99,8 +99,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("Octree Example");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Octree Example");
     simManager->setActiveScene(scene);
 
     // Get the VTKViewer

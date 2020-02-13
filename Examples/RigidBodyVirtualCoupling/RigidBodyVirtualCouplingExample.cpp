@@ -187,8 +187,8 @@ int
 main()
 {
     //simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("Rigid Body Dynamics");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Rigid Body Dynamics");
 
     auto cubeObj = addCubeRigidObject(std::string("cube"), scene, Vec3d(0., 0., 0.));
 

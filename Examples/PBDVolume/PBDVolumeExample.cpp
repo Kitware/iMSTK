@@ -36,8 +36,8 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("PBDVolume");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Load a sample mesh
@@ -74,11 +74,11 @@ main()
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt               = 0.01;
-    pbdParams->m_maxIter          = 5;
+    pbdParams->m_maxIter          = 45;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
+    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::realTime);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);

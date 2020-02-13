@@ -36,9 +36,9 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager    = std::make_shared<SimulationManager>();
-    auto scene  = simManager->createNewScene("GraphicalUserInterface");
-    auto canvas = simManager->getViewer()->getCanvas();
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("GraphicalUserInterface");
+    auto canvas     = simManager->getViewer()->getCanvas();
 
     // Cube
     auto cube   = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Cube, scene, "cube", 0.5);

@@ -35,8 +35,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("RenderParticles");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("RenderParticles");
 
     // Position camera
     auto cam = scene->getCamera();

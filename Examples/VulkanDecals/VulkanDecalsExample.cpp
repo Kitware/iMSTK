@@ -33,8 +33,8 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("Decals");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Decals");
 
     // Position camera
     auto cam = scene->getCamera();

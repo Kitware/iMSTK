@@ -38,8 +38,8 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager   = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("PbdCollision");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PbdCollision");
 
     scene->getCamera()->setPosition(0, 10.0, 10.0);
 
