@@ -129,9 +129,6 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
         LOG(WARNING) << "VegaMeshIO::read error: invalid cell type.";
         return nullptr;
     }
-
-    // Keep track of the vega mesh to initialize dynamical model
-    mesh->setAttachedVegaMesh(vegaMesh);
     return mesh;
 }
 
@@ -194,7 +191,7 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
             elements.emplace_back(int(tet[3]));
         }
 
-        std::shared_ptr<vega::VolumetricMesh> vegaMesh(new vega::TetMesh(int(imstkVolTetMesh->getNumVertices()), &vertices[0], int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density));
+        std::shared_ptr<vega::TetMesh> vegaMesh = std::make_shared<vega::TetMesh>(int(imstkVolTetMesh->getNumVertices()), &vertices[0], int(imstkVolTetMesh->getNumTetrahedra()), &elements[0], E, nu, density);
         if (!vegaMesh)
         {
             LOG(FATAL) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";

@@ -65,7 +65,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~FEMDeformableBodyModel() = default;
+    ~FEMDeformableBodyModel();
 
     ///
     /// \brief Set/Get force model configuration

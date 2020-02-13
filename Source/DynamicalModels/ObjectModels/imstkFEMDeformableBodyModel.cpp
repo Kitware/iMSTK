@@ -36,6 +36,12 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
     m_fixedNodeIds.reserve(1000);
 }
 
+FEMDeformableBodyModel::~FEMDeformableBodyModel()
+{
+    // Get vega to destruct first (before the shared pointer to the vega mesh is cleaned up)
+    m_internalForceModel = nullptr;
+}
+
 void
 FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
 {
@@ -101,8 +107,8 @@ FEMDeformableBodyModel::initialize()
     }
 
     auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
-    m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
-
+    m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
+    //m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
     if (!this->initializeForceModel()
         || !this->initializeMassMatrix()
         || !this->initializeDampingMatrix()

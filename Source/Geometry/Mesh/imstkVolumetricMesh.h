@@ -55,21 +55,10 @@ public:
     ///
     void setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
-    ///
-    /// \brief Returns the attached vega mesh
-    ///
-    std::shared_ptr<vega::VolumetricMesh> getAttachedVegaMesh();
-
-    ///
-    /// \brief Sets the vega mesh that is attached
-    ///
-    void setAttachedVegaMesh(std::shared_ptr<vega::VolumetricMesh> surfaceMesh);
-
 protected:
 
     VolumetricMesh(Geometry::Type type, const std::string name = std::string("")) : PointSet(type, name) {}
 
     std::shared_ptr<SurfaceMesh>          m_attachedSurfaceMesh; ///> Attached surface mesh
-    std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh;    ///> Attached vega mesh
 };
 } // imstk
