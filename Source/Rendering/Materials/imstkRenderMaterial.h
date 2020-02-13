@@ -46,7 +46,9 @@ public:
     enum class BlendMode
     {
         ALPHA,
-        ADDITIVE
+        ADDITIVE,
+        MAXIMUM_INTENSITY,
+        MINIMUM_INTENSITY
     };
 
     ///
@@ -143,9 +145,10 @@ public:
 
     ///
     /// \brief Get/Set blend mode
-    /// This function only works for particles and decals currently
+    /// This function only works for volumes, particles and decals currently
+    /// and the MAXIMUM_INTENSITY and MINIMUM_INTENSITY blend modes are only available for volumes
     ///
-    void setBlendMode(const BlendMode blendMode);
+    virtual void setBlendMode(const BlendMode blendMode);
     const BlendMode getBlendMode();
 
     ///

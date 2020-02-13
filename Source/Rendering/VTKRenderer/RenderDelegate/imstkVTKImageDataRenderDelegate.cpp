@@ -41,40 +41,6 @@ VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualMod
         this->setUpMapper(tp->GetOutputPort(), false,
                           m_visualModel->getRenderMaterial());
     }
-
-    vtkNew<vtkVolumeProperty>        prop;
-    vtkNew<vtkColorTransferFunction> ctf;
-    ctf->AddRGBPoint(-3024, 0, 0, 0);
-    ctf->AddRGBPoint(-568.63, 203 / 255., 132 / 255., 66 / 255.);
-    ctf->AddRGBPoint(18.28, 216 / 255., 101 / 255., 79 / 255.);
-    ctf->AddRGBPoint(408.22, 192 / 255., 192 / 255., 192 / 255.);
-    ctf->AddRGBPoint(2278.94, 235 / 255., 236 / 255., 211 / 255.);
-    ctf->AddRGBPoint(2835.87, 1.0, 250 / 255., 220 / 255.);
-    ctf->AddRGBPoint(3592.73, 242 / 255., 244 / 255., 232 / 255.);
-    vtkNew<vtkPiecewiseFunction> pf;
-    pf->AddPoint(-3024, 0.0);
-    pf->AddPoint(-291.5, 0.0);
-    pf->AddPoint(-191.56, 0.11);
-    pf->AddPoint(136.89, 0.3);
-    pf->AddPoint(579.58, 0.47);
-    pf->AddPoint(1079.39, 0.68);
-    pf->AddPoint(1807.69, 0.84);
-    pf->AddPoint(2635.95, 0.91);
-    pf->AddPoint(3262.47, 0.90);
-    vtkNew<vtkPiecewiseFunction> gf;
-    gf->AddPoint(-20, 0);
-    gf->AddPoint(3592, 1);
-
-    prop->SetColor(ctf);
-    prop->SetScalarOpacity(pf);
-    prop->SetGradientOpacity(gf);
-    prop->SetShade(1);
-    prop->SetAmbient(0.2);
-    prop->SetDiffuse(1.0);
-    prop->SetSpecular(0.0);
-    prop->SetSpecularPower(1.0);
-    prop->SetInterpolationTypeToLinear();
-    this->m_volume->SetProperty(prop);
 }
 
 void

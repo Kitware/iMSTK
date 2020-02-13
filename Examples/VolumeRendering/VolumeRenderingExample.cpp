@@ -22,6 +22,8 @@
 #include "imstkAPIUtilities.h"
 #include "imstkMeshIO.h"
 #include "imstkSimulationManager.h"
+#include "imstkVolumeRenderMaterial.h"
+#include "imstkVolumeRenderMaterialPresets.h"
 
 using namespace imstk;
 
@@ -39,6 +41,9 @@ main()
         std::make_shared<imstk::VisualObject>("VisualVolume");
     auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "DB_CBCT_transform_ASCII.nrrd");
     volumeObj->setVisualGeometry(imageData);
+    volumeObj->getVisualModel(0)->setRenderMaterial(
+        imstk::VolumeRenderMaterialPresets::getPreset(
+            imstk::VolumeRenderMaterialPresets::CT_BONE));
     sceneTest->addSceneObject(volumeObj);
 
     // Update Camera
