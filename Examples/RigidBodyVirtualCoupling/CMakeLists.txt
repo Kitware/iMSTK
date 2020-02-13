@@ -35,13 +35,6 @@ if(iMSTK_USE_OpenHaptics)
   target_link_libraries(${PROJECT_NAME} SimulationManager)
          
   #-----------------------------------------------------------------------------
-  # Associate external data
-  #-----------------------------------------------------------------------------
-  list(APPEND FILE_LIST
-      asianDragon/,REGEX:.*)
-  imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
-
-  #-----------------------------------------------------------------------------
   # Set MSVC working directory to the install/bin directory
   #-----------------------------------------------------------------------------
   if(MSVC) # Configure running executable out of MSVC

@@ -40,8 +40,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackground);
-    auto scene = sdk->createNewScene("NoRendering");
+    auto simManager = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackground);
+    auto scene      = simManager->createNewScene("NoRendering");
 
     // Create surface mesh
     auto             surfMesh = std::make_shared<SurfaceMesh>();
@@ -127,7 +127,7 @@ main()
 
     // print UPS
     auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);
+    apiutils::printUPS(simManager->getSceneManager(scene), ups);
 
     // Method to call after the simulation is done running
     static StdVectorOfVec3d lastPositions;       // Vertex positions at the last iteration
@@ -148,17 +148,17 @@ main()
                 }
             }
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(func);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(func);
 
     // Start
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     // Sleep
     std::this_thread::sleep_for(std::chrono::seconds(300));
 
     // End
-    sdk->endSimulation();
+    simManager->endSimulation();
 
     const std::vector<Vec3d> expectedFinalPositions = {
         Vec3d(0, 1, 0),

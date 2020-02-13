@@ -32,9 +32,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk       = std::make_shared<SimulationManager>();
-    auto sceneTest = sdk->createNewScene("ScreenShotUtility");
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto sceneTest  = simManager->createNewScene("ScreenShotUtility");
 
     // Plane
     auto planeGeom = std::make_shared<Plane>();
@@ -85,7 +85,7 @@ main()
     cam1->setFocalPoint(Vec3d(1, 1, 0));
 
 #ifndef iMSTK_USE_Vulkan
-    auto viewer = sdk->getViewer();
+    auto viewer = simManager->getViewer();
     auto screenShotUtility
         = std::dynamic_pointer_cast<VTKScreenCaptureUtility>(viewer->getScreenCaptureUtility());
     // Set up for screen shot
@@ -101,8 +101,8 @@ main()
     std::cout << "PRESS 'b' for taking screenshot" << std::endl;
 
     // Run
-    sdk->setActiveScene(sceneTest);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(sceneTest);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

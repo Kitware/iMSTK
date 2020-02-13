@@ -41,20 +41,4 @@ VolumetricMesh::setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
     m_attachedSurfaceMesh = surfaceMesh;
 }
-
-std::shared_ptr<vega::VolumetricMesh>
-VolumetricMesh::getAttachedVegaMesh()
-{
-    if (m_attachedVegaMesh == nullptr)
-    {
-        LOG(WARNING) << "VolumetricMesh::getAttachedVEgaMesh warning: attachedVegaMesh not set.\n";
-    }
-    return m_attachedVegaMesh;
-}
-
-void
-VolumetricMesh::setAttachedVegaMesh(std::shared_ptr<vega::VolumetricMesh> surfaceMesh)
-{
-    m_attachedVegaMesh = surfaceMesh;
-}
 } // imstk

@@ -34,8 +34,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDCloth");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PBDCloth");
 
     // Create surface mesh
     auto             surfMesh = std::make_shared<SurfaceMesh>();
@@ -84,7 +84,12 @@ main()
     // Constraints
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
-    pbdParams->m_fixedNodeIds = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+    std::vector<size_t> fixedNodes(nCols);
+    for (size_t i = 0; i < fixedNodes.size(); i++)
+    {
+        fixedNodes[i] = i;
+    }
+    pbdParams->m_fixedNodeIds = fixedNodes;
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
@@ -132,8 +137,8 @@ main()
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 
     // Start
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

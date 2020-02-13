@@ -50,22 +50,19 @@ Color::Color()
     rgba[3] = 1.0f;
 }
 
-Color::Color(double r, double g, double b, double a)
+Color::Color(const double r, const double g, const double b, const double a)
 {
-    bool redGood   = isColorRangeCorrect(r);
-    bool greenGood = isColorRangeCorrect(g);
-    bool blueGood  = isColorRangeCorrect(b);
-    bool alphaGood = isColorRangeCorrect(a);
-    if (!redGood || !greenGood || !blueGood || !alphaGood)
-    {
-        LOG(WARNING) << "Can not set Color: value outside of [0.0, 1.0] range.";
-        return;
-    }
+    setValue(r, g, b, a);
+}
 
-    rgba[0] = r;
-    rgba[1] = g;
-    rgba[2] = b;
-    rgba[3] = a;
+Color::Color(const double* rgba)
+{
+    setValue(rgba[0], rgba[1], rgba[2], rgba[3]);
+}
+
+Color::Color(const Color color, const double a)
+{
+    setValue(color.r, color.g, color.b, a);
 }
 
 Color&
@@ -100,7 +97,7 @@ operator<<(std::ostream& os, const Color& c)
 }
 
 void
-Color::darken(double p_darkFactor)
+Color::darken(const double p_darkFactor)
 {
     rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor) );
     rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor) );
@@ -111,7 +108,7 @@ Color::darken(double p_darkFactor)
 }
 
 void
-Color::lighten(double p_darkFactor)
+Color::lighten(const double p_darkFactor)
 {
     rgba[0] = rgba[1] + rgba[1] * (p_darkFactor);
     rgba[1] = rgba[2] + rgba[2] * (p_darkFactor);
@@ -123,16 +120,17 @@ Color::lighten(double p_darkFactor)
 }
 
 void
-Color::setValue(double p_red, double p_green, double p_blue, double p_alpha)
+Color::setValue(const double p_red,
+                const double p_green,
+                const double p_blue,
+                const double p_alpha)
 {
-    bool redGood   = isColorRangeCorrect(p_red);
-    bool greenGood = isColorRangeCorrect(p_green);
-    bool blueGood  = isColorRangeCorrect(p_blue);
-    bool alphaGood = isColorRangeCorrect(p_alpha);
-    if (!redGood || !greenGood || !blueGood || !alphaGood)
+    if (!isColorRangeCorrect(p_red)
+        || !isColorRangeCorrect(p_green)
+        || !isColorRangeCorrect(p_blue)
+        || !isColorRangeCorrect(p_alpha))
     {
         LOG(WARNING) << "Can not set Color: value outside of [0.0, 1.0] range.";
-        return;
     }
 
     rgba[0] = p_red;
@@ -154,5 +152,149 @@ const double*
 Color::getValue() const
 {
     return rgba;
+}
+
+Color
+Color::lerpRgba(const Color& start, const Color& end, const double t)
+{
+    return start + (end - start) * t;
+}
+
+Color
+Color::lerpRgb(const Color& start, const Color& end, const double t)
+{
+    return Color(start + (end - start) * t, 1.0);
+}
+
+Color
+operator*(const Color& color_lhs, const Color& color_rhs)
+{
+    Color results;
+    results.r = color_lhs.r * color_rhs.r;
+    results.g = color_lhs.g * color_rhs.g;
+    results.b = color_lhs.b * color_rhs.b;
+    results.a = color_lhs.a * color_rhs.a;
+    return results;
+}
+
+Color
+operator*(const Color& color_lhs, const double intensity_rhs)
+{
+    Color results;
+    results.r = color_lhs.r * intensity_rhs;
+    results.g = color_lhs.g * intensity_rhs;
+    results.b = color_lhs.b * intensity_rhs;
+    results.a = color_lhs.a * intensity_rhs;
+    return results;
+}
+
+Color
+operator*=(const Color& color_lhs, const Color& color_rhs)
+{
+    Color results;
+    results.r = color_lhs.r * color_rhs.r;
+    results.g = color_lhs.g * color_rhs.g;
+    results.b = color_lhs.b * color_rhs.b;
+    results.a = color_lhs.a * color_rhs.a;
+    return results;
+}
+
+Color
+operator*=(const Color& color_lhs, const double intensity_rhs)
+{
+    Color results;
+    results.r = color_lhs.r * intensity_rhs;
+    results.g = color_lhs.g * intensity_rhs;
+    results.b = color_lhs.b * intensity_rhs;
+    results.a = color_lhs.a * intensity_rhs;
+    return results;
+}
+
+Color
+operator+(const Color& color_lhs, const Color& color_rhs)
+{
+    Color results;
+    results.r = color_lhs.r + color_rhs.r;
+    results.g = color_lhs.g + color_rhs.g;
+    results.b = color_lhs.b + color_rhs.b;
+    results.a = color_lhs.a + color_rhs.a;
+    return results;
+}
+
+Color
+operator+(const Color& color_lhs, const double intensity_rhs)
+{
+    Color results;
+    results.r = color_lhs.r + intensity_rhs;
+    results.g = color_lhs.g + intensity_rhs;
+    results.b = color_lhs.b + intensity_rhs;
+    results.a = color_lhs.a + intensity_rhs;
+    return results;
+}
+
+Color
+operator+=(const Color& color_lhs, const Color& color_rhs)
+{
+    Color results;
+    results.r = color_lhs.r + color_rhs.r;
+    results.g = color_lhs.g + color_rhs.g;
+    results.b = color_lhs.b + color_rhs.b;
+    results.a = color_lhs.a + color_rhs.a;
+    return results;
+}
+
+Color
+operator+=(const Color& color_lhs, const double intensity_rhs)
+{
+    Color results;
+    results.r = color_lhs.r + intensity_rhs;
+    results.g = color_lhs.g + intensity_rhs;
+    results.b = color_lhs.b + intensity_rhs;
+    results.a = color_lhs.a + intensity_rhs;
+    return results;
+}
+
+Color
+operator-(const Color& color_lhs, const Color& color_rhs)
+{
+    Color results;
+    results.r = color_lhs.r - color_rhs.r;
+    results.g = color_lhs.g - color_rhs.g;
+    results.b = color_lhs.b - color_rhs.b;
+    results.a = color_lhs.a - color_rhs.a;
+    return results;
+}
+
+Color
+operator-(const Color& color_lhs, const double intensity_rhs)
+{
+    Color results;
+    results.r = color_lhs.r - intensity_rhs;
+    results.g = color_lhs.g - intensity_rhs;
+    results.b = color_lhs.b - intensity_rhs;
+    results.a = color_lhs.a - intensity_rhs;
+    return results;
+}
+
+Color
+operator-=(const Color& color_lhs, const Color& color_rhs)
+{
+    Color results;
+    results.r = color_lhs.r - color_rhs.r;
+    results.g = color_lhs.g - color_rhs.g;
+    results.b = color_lhs.b - color_rhs.b;
+    results.a = color_lhs.a - color_rhs.a;
+    return results;
+}
+
+Color
+operator-=(const Color& color_lhs, const double intensity_rhs)
+{
+    Color results;
+    results.r = color_lhs.r - intensity_rhs;
+    results.g = color_lhs.g - intensity_rhs;
+    results.b = color_lhs.b - intensity_rhs;
+    results.a = color_lhs.a - intensity_rhs;
+    return results;
 }
 }

@@ -32,9 +32,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("Decals");
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Decals");
 
     // Position camera
     auto cam = scene->getCamera();
@@ -82,8 +82,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

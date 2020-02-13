@@ -31,9 +31,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("MshAndVegaIO");
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("MshAndVegaIO");
 
     // Load a volumetric mesh (from .msh file)
     std::string ifile    = iMSTK_DATA_ROOT "/liver/liver.msh";
@@ -84,8 +84,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

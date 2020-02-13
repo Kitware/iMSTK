@@ -37,8 +37,8 @@ using namespace imstk;
 int
 main()
 {
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PBDFluid");
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PBDFluid");
 
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 
@@ -237,10 +237,10 @@ main()
 
     // print UPS
     auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(sdk->getSceneManager(scene), ups);
+    apiutils::printUPS(simManager->getSceneManager(scene), ups);
 
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

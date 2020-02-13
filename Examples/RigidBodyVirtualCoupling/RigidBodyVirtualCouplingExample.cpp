@@ -122,8 +122,8 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
 
     // cube dynamic model
     auto rigidModel = std::make_shared<RigidBodyModel>();
-    auto rigidProp  = std::make_shared<RigidBodyPropertyDesc>();  
-   
+    auto rigidProp  = std::make_shared<RigidBodyPropertyDesc>();
+
     rigidModel->configure(cubeGeom, rigidProp, RigidBodyType::Dynamic);
     cubeObj->setDynamicalModel(rigidModel);
 
@@ -186,9 +186,9 @@ addSphereRigidObject(std::shared_ptr<Scene> scene, Vec3d t = Vec3d(0., 0., 0.))
 int
 main()
 {
-    //SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("Rigid Body Dynamics");
+    //simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Rigid Body Dynamics");
 
     auto cubeObj = addCubeRigidObject(std::string("cube"), scene, Vec3d(0., 0., 0.));
 
@@ -204,7 +204,7 @@ main()
     // Device Server
     auto server = std::make_shared<HDAPIDeviceServer>();
     server->addDeviceClient(client);
-    sdk->addModule(server);
+    simManager->addModule(server);
 
     // Create a virtual coupling object
     auto visualGeom = std::make_shared<Sphere>();
@@ -246,7 +246,7 @@ main()
             rbModel->addForce(force, Vec3d(0., 0., 0.));
             prevCubePos = cubePos;
         };
-    sdk->getSceneManager(scene)->setPreUpdateCallback(forceFunc);
+    simManager->getSceneManager(scene)->setPreUpdateCallback(forceFunc);
 
     //-------------------------------------------------------------------
 
@@ -260,8 +260,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

@@ -12,7 +12,8 @@ egrep-q() {
 #-----------------------------------------------------------------------------
 # - strip comment lines
 # - stop at "diff --git" (git commit -v)
-commit_msg="$GIT_DIR/COMMIT_MSG"
+git_dir=$(git rev-parse --git-dir)
+commit_msg="$git_dir/COMMIT_MSG"
 sed -n -e '/^#/d' -e '/^diff --git/q' -e 'p;d' "$1" > "$commit_msg"
 
 #-----------------------------------------------------------------------------

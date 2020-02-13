@@ -43,9 +43,9 @@ main()
     std::cout << "LaparoscopicToolController example needs haptic device to be enabled at build time" << std::endl;
     return 1;
 #else if
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("VirtualCoupling");
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("VirtualCoupling");
 
     // Create a plane in the scene
     auto planeGeom = std::make_shared<Plane>();
@@ -64,7 +64,7 @@ main()
     // Device Server
     auto server = std::make_shared<HDAPIDeviceServer>();
     server->addDeviceClient(client);
-    sdk->addModule(server);
+    simManager->addModule(server);
 
     // Device tracker
     auto deviceTracker = std::make_shared<DeviceTracker>(client);
@@ -113,8 +113,8 @@ main()
     scene->addLight(light);
 
     //Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 #endif

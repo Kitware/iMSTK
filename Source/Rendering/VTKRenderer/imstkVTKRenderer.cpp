@@ -30,6 +30,7 @@
 #include "vtkCameraActor.h"
 #include "vtkAxesActor.h"
 #include "vtkCullerCollection.h"
+#include "vtkAxesActor.h"
 
 #include "g3log/g3log.hpp"
 
@@ -132,11 +133,10 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
     }
 
     // Global Axis
-    auto axes = vtkSmartPointer<vtkAxesActor>::New();
-    axes->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
-    axes->SetAxisLabels(false);
-    axes->SetTotalLength(40, 40, 40);
-    //m_debugVtkActors.push_back(axes);
+    m_AxesActor = vtkSmartPointer<vtkAxesActor>::New();
+    m_AxesActor->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
+    m_AxesActor->SetAxisLabels(false);
+    m_debugVtkActors.push_back(m_AxesActor);
 
     // Camera and camera actor
     if (!enableVR)
@@ -333,6 +333,33 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
     }
 
     Renderer::setMode(mode, enableVR);
+}
+
+void
+VTKRenderer::setAxesLength(const double x, const double y, const double z)
+{
+    m_AxesActor->SetTotalLength(x, y, z);
+}
+
+double*
+VTKRenderer::getAxesLength()
+{
+    return m_AxesActor->GetTotalLength();
+}
+
+void
+VTKRenderer::setAxesVisibility(const bool visible)
+{
+    m_AxesActor->SetVisibility(visible);
+}
+
+///
+/// \brief Returns whether the debug axes is visible or not
+///
+bool
+VTKRenderer::getAxesVisibility() const
+{
+    return m_AxesActor->GetVisibility();
 }
 
 void

@@ -85,13 +85,13 @@ getRandomPositions(double radius)
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("Debug rendering example");
-    sdk->setActiveScene(scene);
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Debug rendering example");
+    simManager->setActiveScene(scene);
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
 
     auto statusManager = viewer->getTextStatusManager();
@@ -160,7 +160,7 @@ main()
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
 
     // Set Camera configuration
     auto cam = scene->getCamera();
@@ -182,7 +182,7 @@ main()
     }
 
     // Run
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

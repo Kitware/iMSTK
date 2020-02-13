@@ -34,9 +34,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("GeometryTransforms");
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("GeometryTransforms");
 
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
@@ -86,7 +86,7 @@ main()
         {
             surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration
     auto cam = scene->getCamera();
@@ -100,8 +100,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }

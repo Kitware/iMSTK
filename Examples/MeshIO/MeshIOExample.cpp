@@ -31,9 +31,9 @@ using namespace imstk;
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("ReadMesh");
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("ReadMesh");
 
     // Read surface mesh
     /*auto objMesh = MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj");
@@ -64,8 +64,8 @@ main()
     scene->addLight(light);
 
     // Run
-    sdk->setActiveScene(scene);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->setActiveScene(scene);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }

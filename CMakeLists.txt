@@ -6,11 +6,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# CTest/Dashboards
-#-----------------------------------------------------------------------------
-include(CTest)
-
-#-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #-----------------------------------------------------------------------------
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -76,6 +71,18 @@ endif()
 #-----------------------------------------------------------------------------
 option(${PROJECT_NAME}_BUILD_EXAMPLES "Build iMSTK examples" ON)
 option(${PROJECT_NAME}_BUILD_TESTING "Build iMSTK tests" ON)
+set(BUILD_TESTING OFF)
+if (${PROJECT_NAME}_BUILD_TESTING)
+  set(BUILD_TESTING ON)
+endif ()
+
+#-----------------------------------------------------------------------------
+# CTest/Dashboards
+#-----------------------------------------------------------------------------
+if (${PROJECT_NAME}_BUILD_TESTING)
+  include(CTest)
+  set_property(CACHE BUILD_TESTING PROPERTY TYPE INTERNAL)
+endif ()
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -316,6 +323,12 @@ endif()
 if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   include(imstkExternalData)
   include(imstkExternalDataDownloadTest)
+  # Create a target for all the data files
+  file(GLOB_RECURSE FILE_LIST
+    LIST_DIRECTORIES FALSE
+    RELATIVE "${CMAKE_SOURCE_DIR}/Data/"
+    "${CMAKE_SOURCE_DIR}/Data/*")
+  string(REGEX REPLACE "\.sha512" "" FILE_LIST "${FILE_LIST}")
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
   #-----------------------------------------------------------------------------

@@ -188,13 +188,13 @@ getRandomColor()
 int
 main()
 {
-    // SDK and Scene
-    auto sdk   = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("Collision Test");
-    sdk->setActiveScene(scene);
+    // simManager and Scene
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("Collision Test");
+    simManager->setActiveScene(scene);
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
 
     auto statusManager = viewer->getTextStatusManager();
@@ -436,7 +436,7 @@ main()
 
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         };
-    sdk->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
+    simManager->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
 
     // Press 'b' key to move objects in the reverse directions
     viewer->setOnCharFunction('b',
@@ -469,7 +469,7 @@ main()
     }
 
     // Run
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    simManager->startSimulation(SimulationStatus::PAUSED);
 
     return 0;
 }
