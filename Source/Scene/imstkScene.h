@@ -77,7 +77,7 @@ public:
     ///
     /// \brief Advance the scene from current to next frame
     ///
-    void advance();
+    void advance(double dt);
 
     ///
     /// \brief Returns true if the object with a given name is registered, else false

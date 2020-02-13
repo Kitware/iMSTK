@@ -300,10 +300,32 @@ Scene::reset()
 }
 
 void
-Scene::advance()
+Scene::advance(double dt)
 {
-    StopWatch wwt;
-    wwt.start();
+    // Update time step size of the dynamic objects
+    for (auto obj : this->getSceneObjects())
+    {
+        if (obj->getType() == SceneObject::Type::Pbd)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(dt);
+                }
+            }
+        }
+        else if (obj->getType() == SceneObject::Type::FEMDeformable)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(dt);
+                }
+            }
+        }
+    }
 
     // PhysX update; move this to solver
     auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
@@ -367,34 +389,5 @@ Scene::advance()
     {
         controller->setTrackerToOutOfDate();
     }
-
-    auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
-
-    // Update time step size of the dynamic objects
-    for (auto obj : this->getSceneObjects())
-    {
-        if (obj->getType() == SceneObject::Type::Pbd)
-        {
-            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
-            {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
-                {
-                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
-                }
-            }
-        }
-        else if (obj->getType() == SceneObject::Type::FEMDeformable)
-        {
-            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
-            {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
-                {
-                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
-                }
-            }
-        }
-    }
-
-    this->setFPS(1. / wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
 }
 } // imstk
