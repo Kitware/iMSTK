@@ -33,7 +33,7 @@ class VolumeRenderMaterialPresets
 public:
     enum Presets
     {
-        CT_AAA,
+        CT_AAA = 0,
         CT_AAA2,
         CT_BONE,
         CT_BONES,

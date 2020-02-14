@@ -36,24 +36,61 @@ main()
     // SDK and Scene
     auto sdk       = std::make_shared<SimulationManager>();
     auto sceneTest = sdk->createNewScene("VolumeRendering");
+    sdk->setActiveScene(sceneTest);
 
+    // Use MeshIO to read the image dataset
+    auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "DB_CBCT_transform_ASCII.nrrd");
+    // Create a visual object in the scene for the volume
     std::shared_ptr<imstk::VisualObject> volumeObj =
         std::make_shared<imstk::VisualObject>("VisualVolume");
-    auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "DB_CBCT_transform_ASCII.nrrd");
     volumeObj->setVisualGeometry(imageData);
-    volumeObj->getVisualModel(0)->setRenderMaterial(
-        imstk::VolumeRenderMaterialPresets::getPreset(
-            imstk::VolumeRenderMaterialPresets::CT_BONE));
     sceneTest->addSceneObject(volumeObj);
 
-    // Update Camera
+    // Update Camera to position volume close to viewer
     auto cam1 = sceneTest->getCamera();
-    cam1->setPosition(Vec3d(-5.5, 2.5, 32));
-    cam1->setFocalPoint(Vec3d(1, 1, 0));
+    cam1->setPosition(Vec3d(0, -200, -50));
+    cam1->setFocalPoint(Vec3d(0, 0, -50));
+    cam1->setViewUp(Vec3d(0.02, 0.4, 0.9));
 
+    int count = 0;
+    // Get VTK Renderer
+    auto viewer     = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto renderer   = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
+    auto updateFunc =
+        [&](Module*) {
+            if (count % 2)
+            {
+                // Change the render material every other frame
+                ++count;
+                return;
+            }
+            // Setting the renderer mode removes vtk actors
+            // renderer->setMode(VTKRenderer::SIMULATION, false);
+            if (count > 50)
+            {
+                // There are a total of 25 presets thus far.
+                count = 0;
+            }
+            // Change view background to black every other frame
+            renderer->updateBackground(Vec3d(0, 0, 0));
+            std::cout << "Displaying with volume material preset: " << count / 2 << std::endl;
+            // Query for a volume material preset
+            auto mat = imstk::VolumeRenderMaterialPresets::getPreset(count / 2);
+            // Apply the preset to the visual object
+            volumeObj->getVisualModel(0)->setRenderMaterial(mat);
+            ++count;
+        };
+    auto postUpdateFunc =
+        [&](Module*) {
+            // Delay to show the past render
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            // Change view background to gray every other frame
+            renderer->updateBackground(Vec3d(0.7, 0.7, 0.7));
+        };
+    sdk->getSceneManager(sceneTest)->setPreUpdateCallback(updateFunc);
+    sdk->getSceneManager(sceneTest)->setPostUpdateCallback(postUpdateFunc);
     // Run
-    sdk->setActiveScene(sceneTest);
-    sdk->startSimulation(SimulationStatus::PAUSED);
+    sdk->startSimulation(SimulationStatus::RUNNING);
 
     return 0;
 }
