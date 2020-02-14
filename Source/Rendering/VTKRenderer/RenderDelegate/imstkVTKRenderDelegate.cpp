@@ -154,28 +154,6 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
     if (auto imData = vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
     {
         m_volumeMapper->SetInputConnection(source);
-        if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(renderMat.get()))
-        {
-            switch (volumeMat->getBlendMode())
-            {
-            case RenderMaterial::BlendMode::ALPHA:
-                m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
-                break;
-            case RenderMaterial::BlendMode::ADDITIVE:
-                m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
-                break;
-            case RenderMaterial::BlendMode::MAXIMUM_INTENSITY:
-                m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
-                break;
-            case RenderMaterial::BlendMode::MINIMUM_INTENSITY:
-                m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
-                break;
-            default:
-                m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
-                break;
-            }
-            m_volume->SetProperty(volumeMat->getVolumeProperty());
-        }
         m_modelIsVolume = true;
         return;
     }
@@ -280,6 +258,28 @@ VTKRenderDelegate::updateActorProperties()
     if (!material || !material->m_modified)
     {
         return;
+    }
+    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
+    {
+        switch (volumeMat->getBlendMode())
+        {
+        case RenderMaterial::BlendMode::ALPHA:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
+            break;
+        case RenderMaterial::BlendMode::ADDITIVE:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
+            break;
+        case RenderMaterial::BlendMode::MAXIMUM_INTENSITY:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
+            break;
+        case RenderMaterial::BlendMode::MINIMUM_INTENSITY:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
+            break;
+        default:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
+            break;
+        }
+        m_volume->SetProperty(volumeMat->getVolumeProperty());
     }
 
     auto actorProperty = m_actor->GetProperty();
