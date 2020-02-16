@@ -25,7 +25,19 @@
 #define PhysX_RELEASE(x)        if (x) { x->release(); x = NULL; }
 
 #include "physx/PxConfig.h"
+#if !defined(NDEBUG) && !defined(_DEBUG)
+// PhysX tests for _DEBUG preprocessor definition in a debug build
+// On Windows, MSVC defines this automatically
+// ( https://docs.microsoft.com/en-us/cpp/c-runtime-library/debug?view=vs-2019)
+  # define _DEBUG 1
+  # define imstkPxPhysXAPI_DEBUG
+#endif
 #include "physx/PxPhysicsAPI.h"
+#ifdef imstkPxPhysXAPI_DEBUG
+  #undef _DEBUG
+  #undef imstkPxPhysXAPI_DEBUG
+#endif
+#include "physx/extensions/PxDefaultErrorCallback.h"
 
 #include "imstkDynamicalModel.h"
 #include "imstkRigidBodyState.h"
