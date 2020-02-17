@@ -25,7 +25,6 @@
 
 //imstk
 #include "imstkInternalForceModel.h"
-#include "imstkForceModelConfig.h"
 
 //vega
 #include "isotropicHyperelasticFEM.h"
