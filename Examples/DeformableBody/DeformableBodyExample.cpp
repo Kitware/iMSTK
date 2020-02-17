@@ -21,7 +21,6 @@
 
 #include "imstkTimer.h"
 #include "imstkSimulationManager.h"
-#include "imstkForceModelConfig.h"
 #include "imstkDeformableObject.h"
 #include "imstkBackwardEuler.h"
 #include "imstkNonlinearSystem.h"
@@ -84,7 +83,13 @@ main()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+
+    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+
+    auto config = std::make_shared<FEMModelConfig>();
+    config->m_fixedNodeIds = { 51, 127, 178 };
+    dynaModel->configure(config);
+
     dynaModel->setTimeStepSizeType(TimeSteppingType::realTime);
     dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
