@@ -27,6 +27,7 @@
 // vega
 #include "generateMassMatrix.h"
 #include "generateMeshGraph.h"
+#include "configFile.h"
 
 namespace imstk
 {
@@ -43,15 +44,106 @@ FEMDeformableBodyModel::~FEMDeformableBodyModel()
 }
 
 void
-FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
+FEMDeformableBodyModel::configure(const std::string& configFileName)
 {
-    m_forceModelConfiguration = fmConfig;
+    // Configure the FEMModelConfig
+    m_FEModelConfig = std::make_shared<FEMModelConfig>();
+
+    char femMethod[256];
+    char invertibleMaterial[256];
+    char fixedDOFFilename[256];
+
+    vega::ConfigFile vegaConfigFileOptions;
+
+    // configure the options
+    vegaConfigFileOptions.addOptionOptional("femMethod", femMethod, "StVK");
+    vegaConfigFileOptions.addOptionOptional("invertibleMaterial", invertibleMaterial, "StVK");
+    vegaConfigFileOptions.addOptionOptional("fixedDOFFilename", fixedDOFFilename, "");
+    vegaConfigFileOptions.addOptionOptional("dampingMassCoefficient", &m_FEModelConfig->m_dampingMassCoefficient, m_FEModelConfig->m_dampingMassCoefficient);
+    vegaConfigFileOptions.addOptionOptional("dampingStiffnessCoefficient", &m_FEModelConfig->m_dampingStiffnessCoefficient, m_FEModelConfig->m_dampingStiffnessCoefficient);
+    vegaConfigFileOptions.addOptionOptional("dampingLaplacianCoefficient", &m_FEModelConfig->m_dampingLaplacianCoefficient, m_FEModelConfig->m_dampingLaplacianCoefficient);
+    vegaConfigFileOptions.addOptionOptional("deformationCompliance", &m_FEModelConfig->m_deformationCompliance, m_FEModelConfig->m_deformationCompliance);
+    vegaConfigFileOptions.addOptionOptional("compressionResistance", &m_FEModelConfig->m_compressionResistance, m_FEModelConfig->m_compressionResistance);
+    vegaConfigFileOptions.addOptionOptional("inversionThreshold", &m_FEModelConfig->m_inversionThreshold, m_FEModelConfig->m_inversionThreshold);
+    vegaConfigFileOptions.addOptionOptional("numberOfThreads", &m_FEModelConfig->m_numberOfThreads, m_FEModelConfig->m_numberOfThreads);
+    vegaConfigFileOptions.addOptionOptional("gravity", &m_FEModelConfig->m_gravity, m_FEModelConfig->m_gravity);
+
+    // Parse the configuration file
+    if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
+    {
+        LOG(FATAL) << "ForceModelConfig::parseConfig - Unable to load the configuration file";
+    }
+
+    // get the root directory of the boundary file name
+    std::string  rootDir;
+    const size_t last_slash_idx = configFileName.rfind('/');
+    if (std::string::npos != last_slash_idx)
+    {
+        rootDir = configFileName.substr(0, last_slash_idx);
+    }
+
+    // Set fem method
+    if (std::strcmp(femMethod, "StVK") == 0)
+    {
+        m_FEModelConfig->m_femMethod = FEMMethodType::StVK;
+    }
+    else if (std::strcmp(femMethod, "CLFEM") == 0)
+    {
+        m_FEModelConfig->m_femMethod = FEMMethodType::Corotational;
+    }
+    else if (std::strcmp(femMethod, "Linear") == 0)
+    {
+        m_FEModelConfig->m_femMethod = FEMMethodType::Linear;
+    }
+    else if (std::strcmp(femMethod, "InvertibleFEM") == 0)
+    {
+        m_FEModelConfig->m_femMethod = FEMMethodType::Invertible;
+    }
+    else
+    {
+        LOG(WARNING) << "FE method not assigned; will default to StVK";
+        m_FEModelConfig->m_femMethod = FEMMethodType::StVK;
+    }
+
+    // Set up hyperelastic material type
+    if (std::strcmp(invertibleMaterial, "StVK") == 0)
+    {
+        m_FEModelConfig->m_hyperElasticMaterialType = HyperElasticMaterialType::StVK;
+    }
+    else if (std::strcmp(invertibleMaterial, "NeoHookean") == 0)
+    {
+        m_FEModelConfig->m_hyperElasticMaterialType = HyperElasticMaterialType::NeoHookean;
+    }
+    else if (std::strcmp(invertibleMaterial, "MooneyRivlin") == 0)
+    {
+        m_FEModelConfig->m_hyperElasticMaterialType = HyperElasticMaterialType::MooneyRivlin;
+    }
+    else
+    {
+        LOG(INFO) << "Hyperelastic material type not assigned; will default to StVK";
+        m_FEModelConfig->m_hyperElasticMaterialType = HyperElasticMaterialType::StVK;
+    }
+
+    // file names (remove from here?)
+    m_FEModelConfig->m_fixedDOFFilename = rootDir + std::string("/") + std::string(fixedDOFFilename);
 }
 
-std::shared_ptr<imstk::ForceModelConfig>
+void
+FEMDeformableBodyModel::configure(std::shared_ptr<FEMModelConfig> config)
+{
+    m_FEModelConfig = config;
+}
+
+void
+FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<FEMModelConfig> fmConfig)
+{
+    m_FEModelConfig = fmConfig;
+}
+
+std::shared_ptr<imstk::FEMModelConfig>
 FEMDeformableBodyModel::getForceModelConfiguration() const
 {
-    return m_forceModelConfiguration;
+    return m_FEModelConfig;
 }
 
 void
@@ -90,17 +182,11 @@ FEMDeformableBodyModel::getModelGeometry()
     return m_forceModelGeometry;
 }
 
-void
-FEMDeformableBodyModel::configure(const std::string& configFileName)
-{
-    m_forceModelConfiguration = std::make_shared<ForceModelConfig>(configFileName);
-}
-
 bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
-    if (!m_forceModelGeometry || !m_forceModelConfiguration)
+    if (!m_forceModelGeometry || !m_FEModelConfig)
     {
         LOG(FATAL) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
         return false;
@@ -150,12 +236,15 @@ FEMDeformableBodyModel::loadInitialStates()
 bool
 FEMDeformableBodyModel::loadBoundaryConditions()
 {
-    auto fileName = m_forceModelConfiguration->getStringOptionsMap().at("fixedDOFFilename");
+    auto fileName = m_FEModelConfig->m_fixedDOFFilename;
 
     if (fileName.empty())
     {
-        LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: The external boundary conditions file name is empty";
-        return false;
+        // if the list of fixed nodes are set, use them
+        for (auto p:m_FEModelConfig->m_fixedNodeIds)
+        {
+            m_fixedNodeIds.emplace_back(p);
+        }
     }
     else
     {
@@ -200,32 +289,32 @@ FEMDeformableBodyModel::loadBoundaryConditions()
 bool
 FEMDeformableBodyModel::initializeForceModel()
 {
-    const double g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const double g = m_FEModelConfig->m_gravity;
     const bool   isGravityPresent = (g > 0) ? true : false;
 
     m_numDOF = m_vegaPhysicsMesh->getNumVertices() * 3;
 
-    switch (m_forceModelConfiguration->getForceModelType())
+    switch (m_FEModelConfig->m_femMethod)
     {
-    case ForceModelType::StVK:
+    case FEMMethodType::StVK:
 
         m_internalForceModel = std::make_shared<StVKForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
-    case ForceModelType::Linear:
+    case FEMMethodType::Linear:
 
         m_internalForceModel = std::make_shared<LinearFEMForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
-    case ForceModelType::Corotational:
+    case FEMMethodType::Corotational:
 
         m_internalForceModel = std::make_shared<CorotationalFEMForceModel>(m_vegaPhysicsMesh);
         break;
 
-    case ForceModelType::Invertible:
+    case FEMMethodType::Invertible:
 
         m_internalForceModel = std::make_shared<IsotropicHyperelasticFEForceModel>(
-                                        m_forceModelConfiguration->getHyperelasticMaterialType(),
+                                        m_FEModelConfig->m_hyperElasticMaterialType,
                                         m_vegaPhysicsMesh,
                                         -MAX_D,
                                         isGravityPresent,
@@ -241,7 +330,7 @@ FEMDeformableBodyModel::initializeForceModel()
 }
 
 bool
-FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
+FEMDeformableBodyModel::initializeMassMatrix()
 {
     if (!m_forceModelGeometry)
     {
@@ -264,9 +353,9 @@ FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 bool
 FEMDeformableBodyModel::initializeDampingMatrix()
 {
-    auto dampingLaplacianCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
-    auto dampingMassCoefficient      = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
-    auto dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
+    auto dampingLaplacianCoefficient = m_FEModelConfig->m_dampingLaplacianCoefficient;
+    auto dampingMassCoefficient      = m_FEModelConfig->m_dampingMassCoefficient;
+    auto dampingStiffnessCoefficient = m_FEModelConfig->m_dampingStiffnessCoefficient;
 
     if (dampingStiffnessCoefficient == 0.0 && dampingLaplacianCoefficient == 0.0 && dampingMassCoefficient == 0.0)
     {
@@ -348,8 +437,8 @@ FEMDeformableBodyModel::initializeTangentStiffness()
 
     if (m_damped)
     {
-        const auto& dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
-        const auto& dampingMassCoefficient      = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+        const auto& dampingStiffnessCoefficient = m_FEModelConfig->m_dampingStiffnessCoefficient;
+        const auto& dampingMassCoefficient      = m_FEModelConfig->m_dampingMassCoefficient;
 
         // Initialize the Raleigh damping matrix
         m_C = dampingMassCoefficient * m_M + dampingStiffnessCoefficient * m_K;
@@ -365,7 +454,7 @@ FEMDeformableBodyModel::initializeGravityForce()
 {
     m_Fgravity.resize(m_numDOF);
     m_Fgravity.setZero();
-    const double gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const double gravity = m_FEModelConfig->m_gravity;
 
     m_vegaPhysicsMesh->computeGravity(m_Fgravity.data(), gravity);
 
@@ -493,8 +582,8 @@ FEMDeformableBodyModel::updateDampingMatrix()
 {
     if (m_damped)
     {
-        const auto& dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
-        const auto& dampingMassCoefficient      = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+        const auto& dampingStiffnessCoefficient = m_FEModelConfig->m_dampingStiffnessCoefficient;
+        const auto& dampingMassCoefficient      = m_FEModelConfig->m_dampingMassCoefficient;
 
         if (dampingMassCoefficient > 0)
         {
