@@ -59,8 +59,12 @@ public:
         MR_DEFAULT,
         MR_MIP,
         MR_T2_BRAIN,
+        NUM_PRESETS
     };
 
     static std::shared_ptr<VolumeRenderMaterial> getPreset(int p = CT_BONES);
+
+    // Convenience API to get preset names
+    static const char* getPresetName(int p);
 };
 }

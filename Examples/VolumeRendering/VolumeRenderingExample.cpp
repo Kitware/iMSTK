@@ -19,11 +19,17 @@
 
 =========================================================================*/
 
+// imstk
 #include "imstkAPIUtilities.h"
 #include "imstkMeshIO.h"
 #include "imstkSimulationManager.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
+#include "imstkVTKTextStatusManager.h"
+
+// STL
+#include <sstream>
+#include <string>
 
 using namespace imstk;
 
@@ -54,8 +60,14 @@ main()
 
     int count = 0;
     // Get VTK Renderer
-    auto viewer     = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
-    auto renderer   = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
+    auto viewer   = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
+    renderer->updateBackground(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+
+    auto statusManager = viewer->getTextStatusManager();
+    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+
     auto updateFunc =
         [&](Module*) {
             if (count % 2)
@@ -72,23 +84,21 @@ main()
                 count = 0;
             }
             // Change view background to black every other frame
-            renderer->updateBackground(Vec3d(0, 0, 0));
             std::cout << "Displaying with volume material preset: " << count / 2 << std::endl;
             // Query for a volume material preset
             auto mat = imstk::VolumeRenderMaterialPresets::getPreset(count / 2);
             // Apply the preset to the visual object
             volumeObj->getVisualModel(0)->setRenderMaterial(mat);
+
+            std::ostringstream ss;
+            ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(count / 2);
+            statusManager->setCustomStatus(ss.str());
+
             ++count;
-        };
-    auto postUpdateFunc =
-        [&](Module*) {
-            // Delay to show the past render
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-            // Change view background to gray every other frame
-            renderer->updateBackground(Vec3d(0.7, 0.7, 0.7));
+            // Delay to show the past frame
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         };
     sdk->getSceneManager(sceneTest)->setPreUpdateCallback(updateFunc);
-    sdk->getSceneManager(sceneTest)->setPostUpdateCallback(postUpdateFunc);
     // Run
     sdk->startSimulation(SimulationStatus::RUNNING);
 

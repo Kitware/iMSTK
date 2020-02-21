@@ -938,4 +938,42 @@ VolumeRenderMaterialPresets::getPreset(int p)
 
     return mat;
 }
+
+const char*
+VolumeRenderMaterialPresets::getPresetName(int p)
+{
+    if (p >= VolumeRenderMaterialPresets::NUM_PRESETS)
+    {
+        return "";
+    }
+    const char* presets[] = {
+        "CT_AAA",
+        "CT_AAA2",
+        "CT_BONE",
+        "CT_BONES",
+        "CT_CARDIAC",
+        "CT_CARDIAC2",
+        "CT_CARDIAC3",
+        "CT_CHEST_CONTRAST_ENHANCED",
+        "CT_CHEST_VESSELS",
+        "CT_CORONARY_ARTERIES",
+        "CT_CORONARY_ARTERIES_2",
+        "CT_CORONARY_ARTERIES_3",
+        "CT_VOLUME_BONE",
+        "CT_FAT",
+        "CT_LIVER_VASCULATURE",
+        "CT_LUNG",
+        "CT_MIP",
+        "CT_MUSCLE",
+        "CT_PULMONARY_ARTERIES",
+        "CT_SOFT_TISSUE",
+        "CT_AIR",
+        "CT_X_RAY",
+        "MR_ANGIO",
+        "MR_DEFAULT",
+        "MR_MIP",
+        "MR_T2_BRAIN",
+    };
+    return presets[p];
+}
 }
