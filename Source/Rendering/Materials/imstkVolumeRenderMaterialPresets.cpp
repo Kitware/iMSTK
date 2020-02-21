@@ -26,6 +26,7 @@
 
 // vtk
 #include <vtkVolumeProperty.h>
+#include <vtkSmartPointer.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 

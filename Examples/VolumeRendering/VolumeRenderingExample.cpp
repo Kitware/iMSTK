@@ -34,39 +34,38 @@
 using namespace imstk;
 
 ///
-/// \brief This example demonstrates configuring the volume renderer.
+/// \brief This example demonstrates the volume renderer
 ///
 int
 main()
 {
     // SDK and Scene
-    auto sdk       = std::make_shared<SimulationManager>();
-    auto sceneTest = sdk->createNewScene("VolumeRendering");
-    sdk->setActiveScene(sceneTest);
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("VolumeRendering");
+    simManager->setActiveScene(scene);
 
     // Use MeshIO to read the image dataset
     auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "DB_CBCT_transform_ASCII.nrrd");
     // Create a visual object in the scene for the volume
-    std::shared_ptr<imstk::VisualObject> volumeObj =
-        std::make_shared<imstk::VisualObject>("VisualVolume");
+    auto volumeObj = std::make_shared<imstk::VisualObject>("VisualVolume");
     volumeObj->setVisualGeometry(imageData);
-    sceneTest->addSceneObject(volumeObj);
+    scene->addSceneObject(volumeObj);
 
     // Update Camera to position volume close to viewer
-    auto cam1 = sceneTest->getCamera();
-    cam1->setPosition(Vec3d(0, -200, -50));
-    cam1->setFocalPoint(Vec3d(0, 0, -50));
-    cam1->setViewUp(Vec3d(0.02, 0.4, 0.9));
+    auto cam = scene->getCamera();
+    cam->setPosition(Vec3d(0, -200, -50));
+    cam->setFocalPoint(Vec3d(0, 0, -50));
+    cam->setViewUp(Vec3d(0.02, 0.4, 0.9));
 
     int count = 0;
     // Get VTK Renderer
-    auto viewer   = std::dynamic_pointer_cast<VTKViewer>(sdk->getViewer());
+    auto viewer   = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
     auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
     renderer->updateBackground(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
 
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
-    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+    statusManager->setStatusDisplayCorner(VTKTextStatusManager::Custom, VTKTextStatusManager::DisplayCorner::UpperLeft);
 
     auto updateFunc =
         [&](Module*) {
@@ -98,9 +97,9 @@ main()
             // Delay to show the past frame
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         };
-    sdk->getSceneManager(sceneTest)->setPreUpdateCallback(updateFunc);
+    simManager->getSceneManager(scene)->setPreUpdateCallback(updateFunc);
     // Run
-    sdk->startSimulation(SimulationStatus::RUNNING);
+    simManager->startSimulation();
 
     return 0;
 }
