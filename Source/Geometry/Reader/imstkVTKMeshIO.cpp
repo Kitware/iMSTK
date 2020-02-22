@@ -34,6 +34,8 @@
 #include "vtkSTLWriter.h"
 #include "vtkFloatArray.h"
 #include "vtkTriangleFilter.h"
+#include "vtkDICOMImageReader.h"
+#include "vtkNrrdReader.h"
 
 #include "g3log/g3log.hpp"
 
@@ -67,6 +69,14 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     case MeshFileType::OBJ:
     {
         return VTKMeshIO::readVtkPolyData<vtkOBJReader>(filePath);
+    }
+    case MeshFileType::DCM:
+    {
+        return VTKMeshIO::readVtkImageDataDICOM(filePath);
+    }
+    case MeshFileType::NRRD:
+    {
+        return VTKMeshIO::readVtkImageData<vtkNrrdReader>(filePath);
     }
     default:
     {
@@ -180,6 +190,42 @@ VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
 
     vtkUnstructuredGrid* vtkMesh = reader->GetOutput();
     return VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
+}
+
+template<typename ReaderType>
+std::shared_ptr<ImageData>
+VTKMeshIO::readVtkImageData(const std::string& filePath)
+{
+    auto reader = vtkSmartPointer<ReaderType>::New();
+    reader->SetFileName(filePath.c_str());
+    reader->Update();
+
+    auto imageData = std::make_shared<ImageData>();
+    imageData->initialize(reader->GetOutput());
+    return imageData;
+}
+
+std::shared_ptr<ImageData>
+VTKMeshIO::readVtkImageDataDICOM(const std::string& filePath)
+{
+    bool isDirectory;
+    if (!MeshIO::fileExists(filePath, isDirectory))
+    {
+        LOG(FATAL) << "VTKMeshIO::read error: file not found: " << filePath;
+        return nullptr;
+    }
+    if (!isDirectory)
+    {
+        return VTKMeshIO::readVtkImageData<vtkDICOMImageReader>(filePath);
+    }
+
+    auto reader = vtkSmartPointer<vtkDICOMImageReader>::New();
+    reader->SetDirectoryName(filePath.c_str());
+    reader->Update();
+
+    auto imageData = std::make_shared<ImageData>();
+    imageData->initialize(reader->GetOutput());
+    return imageData;
 }
 
 bool

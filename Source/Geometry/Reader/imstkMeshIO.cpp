@@ -34,10 +34,17 @@ namespace imstk
 std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
-    if (!MeshIO::fileExists(filePath))
+    bool isDir;
+    if (!MeshIO::fileExists(filePath, isDir))
     {
         LOG(FATAL) << "MeshIO::read error: file not found: " << filePath;
         return nullptr;
+    }
+
+    if (isDir)
+    {
+        // Assume that the directory is a collection of DICOM files
+        return VTKMeshIO::read(filePath, MeshFileType::DCM);
     }
 
     MeshFileType meshType = MeshIO::getFileType(filePath);
@@ -48,6 +55,8 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::VTP:
     case MeshFileType::STL:
     case MeshFileType::PLY:
+    case MeshFileType::NRRD:
+    case MeshFileType::DCM:
         return VTKMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::OBJ:
@@ -62,6 +71,9 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::MSH:
         return MSHMeshIO::read(filePath, meshType);
         break;
+    case UNKNOWN:
+    default:
+        break;
     }
 
     LOG(FATAL) << "MeshIO::read error: file type not supported";
@@ -69,10 +81,25 @@ MeshIO::read(const std::string& filePath)
 }
 
 bool
-MeshIO::fileExists(const std::string& file)
+MeshIO::fileExists(const std::string& file, bool& isDirectory)
 {
     struct stat buf;
-    return (stat(file.c_str(), &buf) == 0);
+    if (stat(file.c_str(), &buf) == 0)
+    {
+        if (buf.st_mode & S_IFDIR)
+        {
+            isDirectory = true;
+        }
+        else
+        {
+            isDirectory = false;
+        }
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 const MeshFileType
@@ -130,6 +157,14 @@ MeshIO::getFileType(const std::string& filePath)
     else if (extString == "msh" || extString == "MSH")
     {
         meshType = MeshFileType::MSH;
+    }
+    else if (extString == "dcm" || extString == "DCM")
+    {
+        meshType = MeshFileType::DCM;
+    }
+    else if (extString == "nrrd" || extString == "NRRD")
+    {
+        meshType = MeshFileType::NRRD;
     }
     else
     {

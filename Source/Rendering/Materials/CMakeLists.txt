@@ -5,6 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( Materials
   DEPENDS
     Core
+    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------

@@ -54,7 +54,8 @@ public:
         LineMesh,
         Decal,
         DecalPool,
-        RenderParticles
+        RenderParticles,
+        ImageData
     };
 
     ///

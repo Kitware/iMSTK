@@ -261,6 +261,7 @@ Geometry::getTypeName() const
     case Type::Decal: return "Decal";
     case Type::DecalPool: return "DecalPool";
     case Type::RenderParticles: return "RenderParticles";
+    case Type::ImageData: return "ImageData";
     }
     LOG(FATAL) << "Mesh type to string has not been completely implemented";
 }
