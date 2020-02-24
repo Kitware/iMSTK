@@ -30,6 +30,23 @@
 
 namespace imstk
 {
+enum class FEMMethodType
+{
+    StVK,
+    Corotational,
+    Linear,
+    Invertible
+};
+
+/// \todo Move to appropriate place
+enum class HyperElasticMaterialType
+{
+    StVK,
+    NeoHookean,
+    MooneyRivlin,
+    none
+};
+
 ///
 /// \class InternalForceModel
 ///

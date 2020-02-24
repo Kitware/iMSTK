@@ -267,16 +267,18 @@ else()
     CommonDataModel
     FiltersGeneral
     FiltersSources
-    ImagingCore
-    InteractionStyle
     IOExport
     IOImport
+    IOPLY
     IOParallel
     IOParallelXML
-    IOPLY
-    RenderingCore
+    ImagingCore
+    InteractionStyle
     RenderingAnnotation
+    RenderingCore
     RenderingOpenGL2
+    RenderingVolume
+    RenderingVolumeOpenGL2
   )
 endif()
 

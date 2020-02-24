@@ -38,6 +38,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
+#include "imstkImageData.h"
 
 #include "imstkGraph.h"
 
@@ -88,6 +89,10 @@ createVisualAnalyticalSceneObject(Geometry::Type type,
 
     case Geometry::Type::Capsule:
         geom = std::make_shared<Capsule>();
+        break;
+
+    case Geometry::Type::ImageData:
+        geom = std::make_shared<ImageData>();
         break;
 
     default:

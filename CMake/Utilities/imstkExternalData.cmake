@@ -43,7 +43,7 @@ set(ExternalData_SERIES_PARSE "()(\\.[^./]*)$")
 set(ExternalData_SERIES_MATCH "(\\.[0-9]+)?")
 
 # Sometimes we want to download very large files.
-set(ExternalData_TIMEOUT_ABSOLUTE 900)
+set(ExternalData_TIMEOUT_INACTIVITY 60)
 set(ExternalData_SOURCE_ROOT "${iMSTK_SOURCE_DIR}/Data")
 set(ExternalData_BINARY_ROOT "${CMAKE_INSTALL_PREFIX}/data/")
 

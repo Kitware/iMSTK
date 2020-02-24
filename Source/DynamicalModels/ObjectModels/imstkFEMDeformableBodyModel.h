@@ -29,7 +29,6 @@
 #include "imstkDynamicalModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
-#include "imstkForceModelConfig.h"
 #include "imstkNonlinearSystem.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkNewtonSolver.h"
@@ -46,6 +45,27 @@
 
 namespace imstk
 {
+struct FEMModelConfig
+{
+    FEMMethodType m_femMethod = FEMMethodType::StVK;
+    HyperElasticMaterialType m_hyperElasticMaterialType = HyperElasticMaterialType::StVK;
+
+    // file names (remove from here?)
+    std::string m_fixedDOFFilename;
+    std::vector<std::size_t> m_fixedNodeIds;
+
+    double m_dampingMassCoefficient      = 0.1;
+    double m_dampingStiffnessCoefficient = 0.01;
+    double m_dampingLaplacianCoefficient = 0.0;
+    double m_deformationCompliance       = 1.0;
+    double m_compressionResistance       = 500.0;
+    double m_inversionThreshold          = -std::numeric_limits<double>::max();
+    double m_gravity = 9.81;
+
+    // remove from here ?
+    int m_numberOfThreads = 4;
+};
+
 ///
 /// \class FEMDeformableBodyModel
 ///
@@ -68,10 +88,21 @@ public:
     ~FEMDeformableBodyModel();
 
     ///
+    /// \brief Configure the force model from external file
+    ///
+    void configure(const std::string& configFileName);
+    void configure(std::shared_ptr<FEMModelConfig> config = std::make_shared<FEMModelConfig>());
+
+    ///
+    /// \brief Initialize the deformable body model
+    ///
+    bool initialize() override;
+
+    ///
     /// \brief Set/Get force model configuration
     ///
-    void setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig);
-    std::shared_ptr<ForceModelConfig> getForceModelConfiguration() const;
+    void setForceModelConfiguration(std::shared_ptr<FEMModelConfig> fmConfig);
+    std::shared_ptr<FEMModelConfig> getForceModelConfiguration() const;
 
     ///
     /// \brief Set/Get internal force model
@@ -92,16 +123,6 @@ public:
     std::shared_ptr<Geometry> getModelGeometry();
 
     ///
-    /// \brief Configure the force model from external file
-    ///
-    void configure(const std::string& configFileName);
-
-    ///
-    /// \brief Initialize the deformable body model
-    ///
-    bool initialize() override;
-
-    ///
     /// \brief Load the initial conditions of the deformable object
     ///
     void loadInitialStates();
@@ -119,7 +140,7 @@ public:
     ///
     /// \brief Initialize the mass matrix from the mesh
     ///
-    bool initializeMassMatrix(const bool saveToDisk = false);
+    bool initializeMassMatrix();
 
     ///
     /// \brief Initialize the damping (combines structural and viscous damping) matrix
@@ -257,9 +278,10 @@ public:
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
-    std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
     std::shared_ptr<Geometry>           m_forceModelGeometry;       ///> Geometry used by force model
     std::shared_ptr<NonLinearSystem>    m_nonLinearSystem;          ///> Nonlinear system resulting from TI and force model
+
+    std::shared_ptr<FEMModelConfig> m_FEModelConfig;
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
     SparseMatrixd m_M;                                                  ///> Mass matrix

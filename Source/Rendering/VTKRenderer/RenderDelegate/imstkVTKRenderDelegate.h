@@ -37,6 +37,8 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkTransform.h"
 #include "vtkProperty.h"
+#include "vtkGPUVolumeRayCastMapper.h"
+#include "vtkVolume.h"
 
 namespace imstk
 {
@@ -77,7 +79,7 @@ public:
     ///
     /// \brief Get VTK renderered object
     ///
-    vtkSmartPointer<vtkActor> getVtkActor() const;
+    vtkSmartPointer<vtkProp3D> getVtkActor() const;
 
     ///
     /// \brief Update render delegate
@@ -110,6 +112,10 @@ protected:
         m_transform = vtkSmartPointer<vtkTransform>::New();
         m_actor->SetMapper(m_mapper);
         m_actor->SetUserTransform(m_transform);
+        m_volumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
+        m_volume       = vtkSmartPointer<vtkVolume>::New();
+        m_volume->SetMapper(m_volumeMapper);
+        m_modelIsVolume = false;
     }
 
     virtual ~VTKRenderDelegate() = default;
@@ -118,5 +124,8 @@ protected:
     vtkSmartPointer<vtkActor>    m_actor;
     vtkSmartPointer<VTKCustomPolyDataMapper> m_mapper;
     vtkSmartPointer<vtkTransform> m_transform;
+    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_volumeMapper;
+    vtkSmartPointer<vtkVolume> m_volume;
+    bool m_modelIsVolume;
 };
 }

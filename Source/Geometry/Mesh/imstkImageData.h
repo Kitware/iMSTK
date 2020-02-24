@@ -21,75 +21,68 @@
 
 #pragma once
 
-// std library
-#include <memory>
-#include <vector>
-#include <array>
-
 // imstk
 #include "imstkPointSet.h"
+
+// vtk
+#include <vtkImageData.h>
+#include <vtkSmartPointer.h>
+
+// forward declarations
+class vtkTransform;
 
 namespace imstk
 {
 ///
-/// \brief Enumeration the mesh file type
+/// \class ImageData
 ///
-enum MeshFileType
-{
-    UNKNOWN,
-    VTK,
-    VTU,
-    VTP,
-    STL,
-    PLY,
-    OBJ,
-    DAE,
-    FBX,
-    _3DS,
-    VEG,
-    MSH,
-    NRRD,
-    DCM
-};
-
+/// \brief Class to represent 2D and 3D image data (i.e. structured points)
 ///
-/// \class MeshIO
-///
-/// \brief Mesh data IO
-///
-class MeshIO
+class ImageData : public PointSet
 {
 public:
-
     ///
     /// \brief Constructor
     ///
-    MeshIO() = default;
+    ImageData(const std::string name = std::string(""));
 
     ///
-    /// \brief Destructor
+    /// \brief Print the image data info
     ///
-    ~MeshIO() = default;
+    void print() const override;
 
     ///
-    /// \brief Read external file
+    /// \brief Returns the volume
     ///
-    static std::shared_ptr<PointSet> read(const std::string& filePath);
+    double getVolume() const override;
 
     ///
-    /// \brief Write external file
+    /// \brief Initialize to an existing image data
     ///
-    static bool write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath);
+    void initialize(vtkImageData* im);
 
     ///
-    /// \brief Returns true if the file exists, else false.
-    /// Also sets isDirectory to true if the path is a directory, else false.
+    /// \brief Clear the data
     ///
-    static bool fileExists(const std::string& file, bool& isDirectory);
+    void clear() override;
 
     ///
-    /// \brief Returns the type of the file
+    /// \brief Return the underlying data
     ///
-    static const MeshFileType getFileType(const std::string& filePath);
+    vtkImageData* getData(DataType type = DataType::PostTransform);
+
+protected:
+    friend class VTKImageDataRenderDelegate;
+
+    vtkSmartPointer<vtkImageData> m_data;            ///> ImageData
+    vtkSmartPointer<vtkTransform> m_dataTransform;
+
+    void applyTranslation(const Vec3d t) override;
+
+    void applyRotation(const Mat3d r) override;
+
+    void applyScaling(const double s) override;
+
+    void updatePostTransformData() override;
 };
 } // imstk

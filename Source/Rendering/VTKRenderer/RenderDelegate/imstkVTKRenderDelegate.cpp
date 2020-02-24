@@ -36,6 +36,7 @@
 #include "imstkVTKdebugTrianglesRenderDelegate.h"
 #include "imstkVTKdebugLinesRenderDelegate.h"
 #include "imstkVTKdebugPointsRenderDelegate.h"
+#include "imstkVolumeRenderMaterial.h"
 
 // VTK render delegates
 #include "imstkVTKPlaneRenderDelegate.h"
@@ -48,12 +49,15 @@
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkVTKPointSetRenderDelegate.h"
+#include "imstkVTKImageDataRenderDelegate.h"
 
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLVertexBufferObject.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkTriangleMeshPointNormals.h"
 #include "vtkTransform.h"
+#include "vtkImageData.h"
+#include "vtkProp3D.h"
 
 namespace imstk
 {
@@ -102,6 +106,10 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     {
         return std::make_shared<VTKHexahedralMeshRenderDelegate>(visualModel);
     }
+    case Geometry::Type::ImageData:
+    {
+        return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
+    }
     default:
     {
         LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
@@ -143,6 +151,16 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
                                const bool                      notSurfaceMesh,
                                std::shared_ptr<RenderMaterial> renderMat)
 {
+    if (auto imData = vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
+    {
+        m_volumeMapper->SetInputConnection(source);
+        m_modelIsVolume = true;
+        return;
+    }
+    else
+    {
+        m_modelIsVolume = false;
+    }
     // Add normals
     if (notSurfaceMesh)
     {
@@ -172,10 +190,17 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
     }
 }
 
-vtkSmartPointer<vtkActor>
+vtkSmartPointer<vtkProp3D>
 VTKRenderDelegate::getVtkActor() const
 {
-    return m_actor;
+    if (m_modelIsVolume)
+    {
+        return m_volume;
+    }
+    else
+    {
+        return m_actor;
+    }
 }
 
 void
@@ -185,14 +210,23 @@ VTKRenderDelegate::update()
     this->updateActorTransform();
     this->updateActorProperties();
 
+    vtkSmartPointer<vtkProp3D> actor = nullptr;
+    if (m_modelIsVolume)
+    {
+        actor = m_volume;
+    }
+    else
+    {
+        actor = m_actor;
+    }
     if (m_visualModel->isVisible())
     {
-        m_actor->VisibilityOn();
+        actor->VisibilityOn();
         return;
     }
     else
     {
-        m_actor->VisibilityOff();
+        actor->VisibilityOff();
         return;
     }
 }
@@ -224,6 +258,28 @@ VTKRenderDelegate::updateActorProperties()
     if (!material || !material->m_modified)
     {
         return;
+    }
+    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
+    {
+        switch (volumeMat->getBlendMode())
+        {
+        case RenderMaterial::BlendMode::ALPHA:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
+            break;
+        case RenderMaterial::BlendMode::ADDITIVE:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
+            break;
+        case RenderMaterial::BlendMode::MAXIMUM_INTENSITY:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
+            break;
+        case RenderMaterial::BlendMode::MINIMUM_INTENSITY:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
+            break;
+        default:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
+            break;
+        }
+        m_volume->SetProperty(volumeMat->getVolumeProperty());
     }
 
     auto actorProperty = m_actor->GetProperty();

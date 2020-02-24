@@ -12,6 +12,8 @@ else()
   set(PHYSX_TARGET_BUILD_PLATFORM linux)
 endif()
 
+string(TOLOWER ${${PROJECT_NAME}_PHYSX_CONFIGURATION} PHYSX_CONFIGURATION)
+
 set(PHYSX_iMSTK_INSTALL "${CMAKE_COMMAND}"
   -DPhysX_INSTALL_DIR=${PhysX_BINARY_DIR}/install
   -DiMSTK_INSTALL_DIR=${CMAKE_INSTALL_PREFIX}
@@ -23,8 +25,9 @@ imstk_add_external_project( PhysX
   #URL_MD5 32fdaddc4ad4e7e637faa86311eb1803
   #DOWNLOAD_DIR ${PhysX_TMP_DIR}
   GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/PhysX.git
-  GIT_TAG 78481093a259101c2a1846370f749ea35cae80e2
+  GIT_TAG f21d30499f9bcf1f165c208bc489e624c94e413e 
   GIT_SHALLOW TRUE
+  GIT_CONFIG status.showUntrackedFiles=no
   SOURCE_SUBDIR ./physx/compiler/public
   CMAKE_CACHE_ARGS
     -DCMAKE_INSTALL_PREFIX:PATH=${PhysX_BINARY_DIR}/install
@@ -48,15 +51,9 @@ imstk_add_external_project( PhysX
     -DNV_APPEND_CONFIG_NAME:BOOL=TRUE
     #VERBOSE
   BUILD_COMMAND
-    COMMAND "${CMAKE_COMMAND}" --build . --config release
-    COMMAND "${CMAKE_COMMAND}" --build . --config profile
-    COMMAND "${CMAKE_COMMAND}" --build . --config checked
-    COMMAND "${CMAKE_COMMAND}" --build . --config debug
+    COMMAND "${CMAKE_COMMAND}" --build . --config ${PHYSX_CONFIGURATION}
   INSTALL_COMMAND
-    COMMAND "${CMAKE_COMMAND}" --build . --target install --config release
-    COMMAND "${CMAKE_COMMAND}" --build . --target install --config profile
-    COMMAND "${CMAKE_COMMAND}" --build . --target install --config checked
-    COMMAND "${CMAKE_COMMAND}" --build . --target install --config debug
+    COMMAND "${CMAKE_COMMAND}" --build . --target install --config ${PHYSX_CONFIGURATION}
     COMMAND ${PHYSX_iMSTK_INSTALL}
 )
 
