@@ -45,7 +45,7 @@ main()
     simManager->setActiveScene(scene);
 
     // Use MeshIO to read the image dataset
-    auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "DB_CBCT_transform_ASCII.nrrd");
+    auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "skullVolume.nrrd");
     // Create a visual object in the scene for the volume
     auto volumeObj = std::make_shared<imstk::VisualObject>("VisualVolume");
     volumeObj->setVisualGeometry(imageData);
