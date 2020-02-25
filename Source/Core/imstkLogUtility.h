@@ -72,6 +72,6 @@ public:
 private:
     std::shared_ptr<g3::LogWorker> m_g3logWorker;
     std::unique_ptr<g3::SinkHandle<g3::FileSink>> m_fileSinkHandle;
-    std::unique_ptr<g3::SinkHandle<stdSink>> m_stdSinkHandle;
+    std::unique_ptr<g3::SinkHandle<stdSink>>      m_stdSinkHandle;
 };
 }

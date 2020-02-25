@@ -299,7 +299,8 @@ Scene::reset()
     }
 }
 
-void Scene::advance()
+void
+Scene::advance()
 {
     StopWatch wwt;
     wwt.start();
@@ -310,7 +311,7 @@ void Scene::advance()
 }
 
 void
-Scene::advance(double dt)
+Scene::advance(const double dt)
 {
     // PhysX update; move this to solver
     auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
