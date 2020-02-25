@@ -80,6 +80,11 @@ public:
     void advance();
 
     ///
+    /// \brief Advance the scene from current to next frame with specified timestep
+    ///
+    void advance(const double dt);
+
+    ///
     /// \brief Returns true if the object with a given name is registered, else false
     ///
     bool isObjectRegistered(const std::string& sceneObjectName) const;
@@ -194,7 +199,8 @@ protected:
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
     std::unordered_map<std::string, std::thread> m_threadMap;                    ///>
 
-    double m_fps = 0.0;
+    double m_fps       = 0.0;
+    double elapsedTime = 0.0;
 
     bool m_isInitialized = false;
 };

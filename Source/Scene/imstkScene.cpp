@@ -305,6 +305,14 @@ Scene::advance()
     StopWatch wwt;
     wwt.start();
 
+    advance(elapsedTime);
+
+    elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+}
+
+void
+Scene::advance(const double dt)
+{
     // PhysX update; move this to solver
     auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
     physxScene->simulate(1.0f / 300.0f); // TODO: update the time step
@@ -368,8 +376,6 @@ Scene::advance()
         controller->setTrackerToOutOfDate();
     }
 
-    auto timeElapsed = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
-
     // Update time step size of the dynamic objects
     for (auto obj : this->getSceneObjects())
     {
@@ -379,7 +385,7 @@ Scene::advance()
             {
                 if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
                 {
-                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                    dynaObj->getDynamicalModel()->setTimeStep(dt);
                 }
             }
         }
@@ -389,12 +395,12 @@ Scene::advance()
             {
                 if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
                 {
-                    dynaObj->getDynamicalModel()->setTimeStep(timeElapsed);
+                    dynaObj->getDynamicalModel()->setTimeStep(dt);
                 }
             }
         }
     }
 
-    this->setFPS(1. / wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds));
+    this->setFPS(1.0 / dt);
 }
 } // imstk

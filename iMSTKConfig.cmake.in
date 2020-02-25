@@ -4,15 +4,30 @@ set(CMAKE_LIBRARY_PATH "@CMAKE_LIBRARY_PATH@")
 
 # Path to iMSTK source directory
 set(iMSTK_SOURCE_DIR "@CMAKE_CURRENT_SOURCE_DIR@")
+set(iMSTK_BINARY_DIR "@CMAKE_BINARY_DIR@")
+set(iMSTK_INSTALL_ROOT "@iMSTK_INSTALL_ROOT@")
 
 # Update CMake module path
 list(INSERT CMAKE_MODULE_PATH 0 "${iMSTK_SOURCE_DIR}/CMake")
+list(INSERT CMAKE_MODULE_PATH 1 "${iMSTK_SOURCE_DIR}/CMake/Utilities")
+
+# The Find scripts use cmake variables so overwrite them
+set(CMAKE_INSTALL_PREFIX_CACHE ${CMAKE_INSTALL_PREFIX})
+set(CMAKE_BINARY_DIR_CACHE ${CMAKE_BINARY_DIR})
+set(CMAKE_DEBUG_POSTFIX_CACHE ${CMAKE_DEBUG_POSTFIX})
+
+set(CMAKE_INSTALL_PREFIX ${iMSTK_INSTALL_ROOT} CACHE STRING "" FORCE)
+mark_as_advanced(CMAKE_INSTALL_PREFIX)
+set(CMAKE_BINARY_DIR ${iMSTK_BINARY_DIR} CACHE STRING "" FORCE)
+mark_as_advanced(CMAKE_BINARY_DIR)
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "" FORCE)
+mark_as_advanced(CMAKE_DEBUG_POSTFIX)
 
 # iMSTK settings
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_USE_Vulkan @iMSTK_USE_Vulkan@)
-set(VegaFEM_DIR @VegaFEM_DIR@)
-set(VTK_DIR @VTK_DIR@)
+set(VegaFEM_DIR "@VegaFEM_DIR@")
+set(VTK_DIR "@VTK_DIR@")
 
 # Assimp
 find_package( Assimp REQUIRED )
@@ -40,9 +55,17 @@ include_directories( ${Eigen_INCLUDE_DIR} )
 find_package( imgui REQUIRED )
 include_directories( ${imgui_INCLUDE_DIR} )
 
+# PhysX
+find_package(PhysX REQUIRED)
+include_directories(${PHYSX_INCLUDE_DIRS})
+
 # SCCD
 find_package( SCCD REQUIRED )
 include_directories( ${SCCD_INCLUDE_DIR} )
+
+# tbb
+find_package(tbb REQUIRED)
+include_directories(${TBB_INCLUDE_DIR})
 
 # VegaFEM
 find_package( VegaFEM REQUIRED CONFIG )
@@ -66,3 +89,7 @@ endif()
 # iMSTK
 #link_directories(@CMAKE_LIBRARY_PATH@)
 include("@CMAKE_CURRENT_BINARY_DIR@/iMSTKTargets.cmake")
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_CACHE} CACHE STRING "" FORCE)
+set(CMAKE_BINARY_DIR ${CMAKE_BINARY_DIR_CACHE} CACHE STRING "" FORCE)
+set(CMAKE_DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX_CACHE} CACHE STRING "" FORCE)
