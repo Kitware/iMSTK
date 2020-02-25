@@ -221,11 +221,6 @@ public:
     /// \brief Advance to next frame
     ///
     void advanceFrame();
-    
-    ///
-    /// \brief Advance to next frame with specified timestep
-    ///
-    void advanceFrame(double dt);
 
     ///
     /// \brief Return the mode of the simulation manager
@@ -271,8 +266,6 @@ private:
 
     std::shared_ptr<Viewer>     m_viewer  = nullptr;
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
-
-    double elapsedTime = 0.00001;
 
     bool m_simThreadLaunched = false;
 

@@ -710,35 +710,14 @@ SimulationManager::endSimulation()
 void
 SimulationManager::advanceFrame()
 {
-    StopWatch wwt;
-    wwt.start();
-
     if (m_initialized)
     {
-        this->getActiveScene()->advance(elapsedTime);
+        this->getActiveScene()->advance();
     }
     else
     {
         LOG(WARNING) << "SimulationManager::advanceFrame(): - Simulation manager not initialized! call initialize before advancing frame";
     }
-
-    elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
-
-    this->getActiveScene()->setFPS(1. / elapsedTime);
-}
-
-void SimulationManager::advanceFrame(double dt)
-{
-    if (m_initialized)
-    {
-        this->getActiveScene()->advance(dt);
-    }
-    else
-    {
-        LOG(WARNING) << "SimulationManager::advanceFrame(): - Simulation manager not initialized! call initialize before advancing frame";
-    }
-
-    this->getActiveScene()->setFPS(1. / dt);
 }
 
 void

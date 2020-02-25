@@ -299,34 +299,19 @@ Scene::reset()
     }
 }
 
+void Scene::advance()
+{
+    StopWatch wwt;
+    wwt.start();
+
+    advance(elapsedTime);
+
+    elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+}
+
 void
 Scene::advance(double dt)
 {
-    // Update time step size of the dynamic objects
-    for (auto obj : this->getSceneObjects())
-    {
-        if (obj->getType() == SceneObject::Type::Pbd)
-        {
-            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
-            {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
-                {
-                    dynaObj->getDynamicalModel()->setTimeStep(dt);
-                }
-            }
-        }
-        else if (obj->getType() == SceneObject::Type::FEMDeformable)
-        {
-            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
-            {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
-                {
-                    dynaObj->getDynamicalModel()->setTimeStep(dt);
-                }
-            }
-        }
-    }
-
     // PhysX update; move this to solver
     auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
     physxScene->simulate(1.0f / 300.0f); // TODO: update the time step
@@ -389,5 +374,32 @@ Scene::advance(double dt)
     {
         controller->setTrackerToOutOfDate();
     }
+
+    // Update time step size of the dynamic objects
+    for (auto obj : this->getSceneObjects())
+    {
+        if (obj->getType() == SceneObject::Type::Pbd)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(dt);
+                }
+            }
+        }
+        else if (obj->getType() == SceneObject::Type::FEMDeformable)
+        {
+            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            {
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                {
+                    dynaObj->getDynamicalModel()->setTimeStep(dt);
+                }
+            }
+        }
+    }
+
+    this->setFPS(1.0 / dt);
 }
 } // imstk

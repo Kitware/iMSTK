@@ -77,6 +77,11 @@ public:
     ///
     /// \brief Advance the scene from current to next frame
     ///
+    void advance();
+
+    ///
+    /// \brief Advance the scene from current to next frame with specified timestep
+    ///
     void advance(double dt);
 
     ///
@@ -195,6 +200,7 @@ protected:
     std::unordered_map<std::string, std::thread> m_threadMap;                    ///>
 
     double m_fps = 0.0;
+    double elapsedTime = 0.0;
 
     bool m_isInitialized = false;
 };

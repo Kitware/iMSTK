@@ -64,7 +64,7 @@ protected:
     ///
     /// \brief Run the module
     ///
-    void runModule() override { m_scene->advance(0.00001); };
+    void runModule() override { m_scene->advance(); };
 
     ///
     /// \brief Clean up the module
