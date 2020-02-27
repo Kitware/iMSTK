@@ -220,7 +220,7 @@ public:
     /// \brief Update body states given the newest update and the type of update
     ///
     virtual void updateBodyStates(const Vectord& /*q*/,
-                                  const stateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
+                                  const StateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
 
     ///
     /// \brief Initialize the PBD model

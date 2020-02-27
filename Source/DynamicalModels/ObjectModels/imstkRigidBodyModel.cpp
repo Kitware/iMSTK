@@ -332,7 +332,7 @@ RigidBodyModel::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
 
 //TODO updating body states as in
 void
-RigidBodyModel::updateBodyStates(const Vectord& q, const stateUpdateType updateType /* = stateUpdateType::displacement*/)
+RigidBodyModel::updateBodyStates(const Vectord& q, const StateUpdateType updateType /* = stateUpdateType::displacement*/)
 {
 }
 

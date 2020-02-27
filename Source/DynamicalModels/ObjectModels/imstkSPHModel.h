@@ -116,7 +116,7 @@ public:
     ///
     /// \brief Update states
     ///
-    virtual void updateBodyStates(const Vectord&, const stateUpdateType) override {}
+    virtual void updateBodyStates(const Vectord&, const StateUpdateType) override {}
 
     ///
     /// \brief Update positions of point set geometry

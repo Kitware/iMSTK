@@ -170,17 +170,17 @@ public:
     ///
     /// \brief Compute the RHS of the resulting linear system
     ///
-    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState, const stateUpdateType updateType);
+    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
 
     ///
     /// \brief Compute the RHS of the resulting linear system using semi-implicit scheme
     ///
-    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState, const stateUpdateType updateType);
+    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState, const StateUpdateType updateType);
 
     ///
     /// \brief Compute the LHS of the resulting linear system
     ///
-    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState, const stateUpdateType updateType);
+    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
 
     ///
     /// \brief Update damping Matrix
@@ -207,8 +207,8 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& solution, const stateUpdateType updateType) override;
-    void updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType);
+    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType) override;
+    void updateBodyIntermediateStates(const Vectord& solution, const StateUpdateType updateType);
 
     ///
     /// \brief Update the previous states given the current state
@@ -246,8 +246,8 @@ public:
     ///
     /// \brief Set/Get the update type
     ///
-    void setUpdateType(const stateUpdateType& updateType) { m_updateType = updateType; }
-    const stateUpdateType& getUpdateType() const { return m_updateType; }
+    void setUpdateType(const StateUpdateType& updateType) { m_updateType = updateType; }
+    const StateUpdateType& getUpdateType() const { return m_updateType; }
 
     /// \brief Returns the unknown vectors
     ///
@@ -303,7 +303,7 @@ protected:
 
     std::vector<std::size_t> m_fixedNodeIds;                            ///> Nodal IDs of the nodes that are fixed
 
-    stateUpdateType m_updateType = stateUpdateType::deltaVelocity;      ///> Update type of the model
+    StateUpdateType m_updateType = StateUpdateType::deltaVelocity;      ///> Update type of the model
 
     bool m_damped = false;                                              ///> Viscous or structurally damped system
 

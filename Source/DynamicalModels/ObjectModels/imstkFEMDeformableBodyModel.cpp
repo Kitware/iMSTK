@@ -464,7 +464,7 @@ FEMDeformableBodyModel::initializeGravityForce()
 void
 FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
                                                  kinematicState&       newState,
-                                                 const stateUpdateType updateType)
+                                                 const StateUpdateType updateType)
 {
     auto& uPrev = stateAtT.getQ();
     auto& vPrev = stateAtT.getQDot();
@@ -477,7 +477,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
 
         m_Feff = m_K * -(uPrev - u + v * dT);
 
@@ -503,7 +503,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
 void
 FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       stateAtT,
                                                      kinematicState&       newState,
-                                                     const stateUpdateType updateType)
+                                                     const StateUpdateType updateType)
 {
     auto& uPrev = stateAtT.getQ();
     auto& vPrev = stateAtT.getQDot();
@@ -516,7 +516,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
 
         m_Feff = m_K * (vPrev * -dT);
 
@@ -542,13 +542,13 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 void
 FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
                                                  kinematicState&       newState,
-                                                 const stateUpdateType updateType)
+                                                 const StateUpdateType updateType)
 {
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
 
         this->updateMassMatrix();
         m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
@@ -664,7 +664,7 @@ FEMDeformableBodyModel::updateBodyPreviousStates()
 }
 
 void
-FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
+FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const StateUpdateType updateType)
 {
     this->updateBodyPreviousStates();
     this->updateBodyIntermediateStates(solution, updateType);
@@ -673,7 +673,7 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
 void
 FEMDeformableBodyModel::updateBodyIntermediateStates(
     const Vectord&        solution,
-    const stateUpdateType updateType)
+    const StateUpdateType updateType)
 {
     auto&        uPrev = m_previousState->getQ();
     auto&        u     = m_currentState->getQ();
@@ -682,13 +682,13 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
         m_currentState->setV(v + solution);
         m_currentState->setU(uPrev + dT * v);
 
         break;
 
-    case stateUpdateType::velocity:
+    case StateUpdateType::velocity:
         m_currentState->setV(solution);
         m_currentState->setU(uPrev + dT * v);
 
