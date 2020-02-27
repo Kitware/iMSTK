@@ -101,7 +101,7 @@ public:
     /// \brief Update the body states given the solution
     ///
     void updateBodyStates(const Vectord&        q,
-                          const stateUpdateType updateType = stateUpdateType::displacement) override;
+                          const StateUpdateType updateType = StateUpdateType::displacement) override;
 
     ///
     /// \brief Set kinematic target of RigidBody
