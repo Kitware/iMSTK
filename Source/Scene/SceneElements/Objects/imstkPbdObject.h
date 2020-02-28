@@ -45,20 +45,22 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdObject(const std::string& name) : DynamicObject(name)
+    PbdObject(const std::string& name) : DynamicObject<PbdState>(name)
     {
         m_type = SceneObject::Type::Pbd;
     }
 
-    PbdObject(std::string&& name) : DynamicObject(std::move(name))
+    PbdObject(std::string&& name) : DynamicObject<PbdState>(std::move(name))
     {
         m_type = SceneObject::Type::Pbd;
     }
+
+    PbdObject() = delete;
 
     ///
     /// \brief Destructor
     ///
-    virtual ~PbdObject() override = default;
+    ~PbdObject() override = default;
 
     ///
     /// \brief Initialize the pbd scene object

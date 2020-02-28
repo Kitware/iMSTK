@@ -31,6 +31,7 @@
 namespace imstk
 {
 class InteractionPair;
+class PbdObject;
 
 ///
 /// \class CollisionHandling

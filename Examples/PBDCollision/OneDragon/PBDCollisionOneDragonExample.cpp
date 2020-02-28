@@ -155,13 +155,11 @@ main()
 
     scene->addSceneObject(floor);
 
-    // Collision
-    auto colData = std::make_shared<CollisionData>();
-    auto CD      = std::make_shared<MeshToMeshBruteForceCD>(surfMesh, floorMesh, colData);
-
-    auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                    CD->getCollisionData(), deformableObj, floor);
-    scene->getCollisionGraph()->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
+    // Collision    
+    scene->getCollisionGraph()->addInteractionPair(deformableObj, floor,
+        CollisionDetection::Type::MeshToMeshBruteForce,
+        CollisionHandling::Type::PBD,
+        CollisionHandling::Type::None);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
