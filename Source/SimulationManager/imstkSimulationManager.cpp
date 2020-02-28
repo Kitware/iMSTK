@@ -482,7 +482,7 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
         this->startViewer(renderMode);
     }
 
-    if (m_simulationMode == Mode::runInBackground) // never returns
+    if (m_simulationMode == Mode::runInBackgroundSync) // never returns
     {
         this->printUserControlsInfo(false);
         this->infiniteLoopNoRenderingMode();
@@ -679,6 +679,8 @@ SimulationManager::endSimulation()
         // Update Renderer
         m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
     }
+
+    m_status = SimulationStatus::TERMINATING;
 
     // End modules
     for (const auto& pair : m_modulesMap)

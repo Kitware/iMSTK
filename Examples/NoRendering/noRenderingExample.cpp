@@ -40,7 +40,7 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackground);
+    auto simManager = std::make_shared<SimulationManager>(SimulationManager::Mode::runInBackgroundSync);
     auto scene      = simManager->createNewScene("NoRendering");
 
     // Create surface mesh
@@ -153,12 +153,6 @@ main()
     // Start
     simManager->setActiveScene(scene);
     simManager->startSimulation(SimulationStatus::RUNNING);
-
-    // Sleep
-    std::this_thread::sleep_for(std::chrono::seconds(300));
-
-    // End
-    simManager->endSimulation();
 
     const std::vector<Vec3d> expectedFinalPositions = {
         Vec3d(0, 1, 0),
