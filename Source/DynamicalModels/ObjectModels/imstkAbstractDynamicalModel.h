@@ -26,111 +26,111 @@
 
 namespace imstk
 {
-    ///
-    /// \brief Type of the time dependent mathematical model
-    ///
-    enum class DynamicalModelType
-    {
-        rigidBodyDynamics,
-        elastoDynamics,
-        positionBasedDynamics,
-        SPH,
-        none
-    };
+///
+/// \brief Type of the time dependent mathematical model
+///
+enum class DynamicalModelType
+{
+    rigidBodyDynamics,
+    elastoDynamics,
+    positionBasedDynamics,
+    SPH,
+    none
+};
+
+///
+/// \brief Type of the update of the state of the body
+///
+enum class TimeSteppingType
+{
+    realTime,
+    fixed
+};
+
+///
+/// \class DynamicalModel
+///
+/// \brief Abstract class for mathematical model of the physics governing the dynamic object
+///
+class AbstractDynamicalModel
+{
+public:
 
     ///
     /// \brief Type of the update of the state of the body
     ///
-    enum class TimeSteppingType
+    enum class StateUpdateType
     {
-        realTime,
-        fixed
+        displacement,
+        velocity,
+        deltaDisplacement,
+        deltaVelocity,
+        none
     };
 
+public:
     ///
-    /// \class DynamicalModel
+    /// \brief Constructor
     ///
-    /// \brief Abstract class for mathematical model of the physics governing the dynamic object
+    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type), m_numDOF(0) { }
+
     ///
-    class AbstractDynamicalModel
-    {
-    public:
+    /// \brief Destructor
+    ///
+    virtual ~AbstractDynamicalModel() = default;
 
-        ///
-        /// \brief Type of the update of the state of the body
-        ///
-        enum class StateUpdateType
-        {
-            displacement,
-            velocity,
-            deltaDisplacement,
-            deltaVelocity,
-            none
-        };
+    ///
+    /// \brief Reset the current state to the initial state
+    ///
+    virtual void resetToInitialState() = 0;
 
-    public:
-        ///
-        /// \brief Constructor
-        ///
-        AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type), m_numDOF(0) { }
+    ///
+    /// \brief Returns the number of degrees of freedom
+    ///
+    std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
+    void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
 
-        ///
-        /// \brief Destructor
-        ///
-        virtual ~AbstractDynamicalModel() = default;
+    ///
+    /// \brief Get the type of the object
+    ///
+    const DynamicalModelType& getType() const { return m_type; }
 
-        ///
-        /// \brief Reset the current state to the initial state
-        ///
-        virtual void resetToInitialState() = 0;
+    ///
+    /// \brief Update states
+    ///
+    virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::displacement) = 0;
 
-        ///
-        /// \brief Returns the number of degrees of freedom
-        ///
-        std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
-        void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
+    ///
+    /// \brief
+    ///
+    virtual void updatePhysicsGeometry() {}
 
-        ///
-        /// \brief Get the type of the object
-        ///
-        const DynamicalModelType& getType() const { return m_type; }
+    ///
+    /// \brief Set the time step size
+    ///
+    virtual void setTimeStep(const double timeStep) = 0;
 
-        ///
-        /// \brief Update states
-        ///
-        virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::displacement) = 0;
+    ///
+    /// \brief Returns the time step size
+    ///
+    virtual double getTimeStep() const = 0;
 
-        ///
-        /// \brief
-        ///
-        virtual void updatePhysicsGeometry() {}
+    ///
+    /// \brief Initialize the dynamical model
+    ///
+    virtual bool initialize() = 0;
 
-        ///
-        /// \brief Set the time step size
-        ///
-        virtual void setTimeStep(const double timeStep) = 0;
+    ///
+    /// \brief Set the type of approach used to update the time step size after every frame
+    ///
+    virtual void setTimeStepSizeType(const TimeSteppingType type) { m_timeStepSizeType = type; }
+    TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
 
-        ///
-        /// \brief Returns the time step size
-        ///
-        virtual double getTimeStep() const = 0;
+protected:
+    DynamicalModelType m_type;     ///> Mathematical model type
 
-        ///
-        /// \brief Initialize the dynamical model
-        ///
-        virtual bool initialize() = 0;
+    std::size_t m_numDOF;          ///> Total number of degree of freedom
 
-        ///
-        /// \brief Set the type of approach used to update the time step size after every frame
-        ///
-        virtual void setTimeStepSizeType(const TimeSteppingType type) { m_timeStepSizeType = type; }
-        TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
-
-    protected:
-        DynamicalModelType m_type; ///> Mathematical model type
-
-        std::size_t m_numDOF;      ///> Total number of degree of freedom
-
-        TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
-    };
+    TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
+};
 } // imstk

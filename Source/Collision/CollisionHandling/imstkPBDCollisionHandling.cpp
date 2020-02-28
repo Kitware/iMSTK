@@ -34,6 +34,16 @@
 
 namespace imstk
 {
+PBDCollisionHandling::PBDCollisionHandling(const Side&                          side,
+                                           const std::shared_ptr<CollisionData> colData,
+                                           std::shared_ptr<CollidingObject>     obj1,
+                                           std::shared_ptr<CollidingObject>     obj2) :
+    CollisionHandling(Type::PBD, side, colData),
+    m_pbdObject1(std::dynamic_pointer_cast<PbdObject>(obj1)),
+    m_pbdObject2(std::dynamic_pointer_cast<PbdObject>(obj2))
+{
+}
+
 PBDCollisionHandling::~PBDCollisionHandling()
 {
     for (const auto ptr: m_EEConstraintPool)

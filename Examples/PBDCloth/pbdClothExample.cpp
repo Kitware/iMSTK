@@ -111,9 +111,9 @@ main()
     deformableObj->addVisualModel(surfMeshModel);
 
     // Solver
-    auto pbdSolver = std::make_shared<PbdSolver>();
+    /*auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
+    scene->addNonlinearSolver(pbdSolver);*/
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");

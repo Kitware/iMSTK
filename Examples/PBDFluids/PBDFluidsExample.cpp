@@ -81,10 +81,6 @@ main()
     pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
 
-    auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
-
     scene->addSceneObject(deformableObj);
 
     // Create a box to hold the fluid
@@ -226,7 +222,7 @@ main()
     auto colGraph = scene->getCollisionGraph();
     auto CD       = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
     auto CH       = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                CD->getCollisionData(), deformableObj, floor, pbdSolver);
+                CD->getCollisionData(), deformableObj, floor);
     colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
 
     // Light (white)
