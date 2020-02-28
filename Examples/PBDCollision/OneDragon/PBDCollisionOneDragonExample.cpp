@@ -41,7 +41,8 @@ main()
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("PbdCollision");
 
-    scene->getCamera()->setPosition(0, 10.0, 10.0);
+    scene->getCamera()->setPosition(0, 3.0, 20.0);
+    scene->getCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
     // Load a sample mesh
     auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
@@ -56,8 +57,6 @@ main()
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    auto deformMapP2V = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-    auto deformMapC2V = std::make_shared<OneToOneMap>(surfMesh, surfMesh);
     auto deformMapP2C = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
@@ -65,8 +64,6 @@ main()
     deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
-    deformableObj->setPhysicsToVisualMap(deformMapP2V);
-    deformableObj->setCollidingToVisualMap(deformMapC2V);
 
     // Create model and object
     auto pbdModel = std::make_shared<PbdModel>();
@@ -148,6 +145,7 @@ main()
     pbdParams2->m_uniformMassValue = 0.0;
     pbdParams2->m_proximity        = 0.1;
     pbdParams2->m_contactStiffness = 1.0;
+    pbdParams2->m_maxIter = 0;
 
     // Set the parameters
     pbdModel2->configure(pbdParams2);
