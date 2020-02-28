@@ -91,11 +91,6 @@ main()
     pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
 
-    // Create solver
-    auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
-
     scene->addSceneObject(deformableObj);
 
     // Build floor geometry
@@ -158,19 +153,13 @@ main()
     pbdModel2->configure(pbdParams2);
     floor->setDynamicalModel(pbdModel2);
 
-    auto pbdSolverfloor = std::make_shared<PbdSolver>();
-    pbdSolverfloor->setPbdObject(floor);
-    scene->addNonlinearSolver(pbdSolverfloor);
-
     scene->addSceneObject(floor);
 
-    // Collision
-    auto colData = std::make_shared<CollisionData>();
-    auto CD      = std::make_shared<MeshToMeshBruteForceCD>(surfMesh, floorMesh, colData);
-
-    auto CH = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                    CD->getCollisionData(), deformableObj, floor, pbdSolver);
-    scene->getCollisionGraph()->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
+    // Collision    
+    scene->getCollisionGraph()->addInteractionPair(deformableObj, floor,
+        CollisionDetection::Type::MeshToMeshBruteForce,
+        CollisionHandling::Type::PBD,
+        CollisionHandling::Type::None);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");

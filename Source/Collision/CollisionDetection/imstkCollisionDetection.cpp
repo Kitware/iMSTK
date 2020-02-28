@@ -33,6 +33,7 @@
 // Mesh to mesh
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 #include "imstkSurfaceMeshToSurfaceMeshCCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkTetraToTetraCD.h"
 
 // Analytical object to analytical object
@@ -162,7 +163,13 @@ CollisionDetection::makeCollisionDetectionObject(const Type                     
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(sphere, cylinder)
         return std::make_shared<SphereToCylinderCD>(sphere, cylinder, colData);
     }
-
+    case Type::MeshToMeshBruteForce:
+    {
+        auto meshA = std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry());
+        auto meshB = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+        IMSTK_CHECK_FOR_VALID_GEOMETRIES(meshA, meshB)
+        return std::make_shared<MeshToMeshBruteForceCD>(meshA, meshB, colData);
+    }
     default:
     {
         LOG(FATAL) << "CollisionDetection::makeCollisionDetectionObject error: type not implemented.";
