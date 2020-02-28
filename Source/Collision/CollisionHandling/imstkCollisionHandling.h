@@ -98,7 +98,7 @@ public:
     ///
     /// \brief Returns collision handling type
     ///
-    const Type& getType() const;
+    const Type& getType() const { return m_type; };
 
 protected:
 
