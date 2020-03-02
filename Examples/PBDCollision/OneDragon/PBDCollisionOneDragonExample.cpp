@@ -145,7 +145,7 @@ main()
     pbdParams2->m_uniformMassValue = 0.0;
     pbdParams2->m_proximity        = 0.1;
     pbdParams2->m_contactStiffness = 1.0;
-    pbdParams2->m_maxIter = 0;
+    pbdParams2->m_maxIter          = 0;
 
     // Set the parameters
     pbdModel2->configure(pbdParams2);
@@ -153,7 +153,7 @@ main()
 
     scene->addSceneObject(floor);
 
-    // Collision    
+    // Collision
     scene->getCollisionGraph()->addInteractionPair(deformableObj, floor,
         CollisionDetection::Type::MeshToMeshBruteForce,
         CollisionHandling::Type::PBD,
