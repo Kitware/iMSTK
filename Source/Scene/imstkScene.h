@@ -36,6 +36,25 @@ namespace imstk
 class SceneObjectControllerBase;
 class DebugRenderGeometry;
 
+enum class TimeSteppingPolicy
+{
+    asFastAsPossible,
+    fixedFrameRate,
+    realTime
+};
+
+struct SceneConfig
+{
+    // Initializes the scene only when it needs to frame
+    // Note: May cause delays to run the first frame of the scene due to scene initialization
+    bool lazyInitialization = false;
+
+    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::asFastAsPossible;
+
+    // Keep track of the fps for the scene
+    bool trackFPS = false;
+};
+
 ///
 /// \class Scene
 ///
@@ -51,8 +70,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    Scene(const std::string& name) : m_name(name) {}
-    Scene(std::string&& name) : m_name(std::move(name)) {}
+    Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(name), m_config(config) {}
+    Scene(std::string&& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(std::move(name)), m_config(config) {}
 
     ///
     /// \brief Destructor
@@ -186,7 +205,14 @@ public:
     void setFPS(const double fps) { m_fps = fps; }
     double getFPS() { return m_fps; }
 
+    ///
+    /// \brief Get the configuration
+    ///
+    std::shared_ptr<const SceneConfig> getConfig() const { return m_config; };
+    const std::shared_ptr<SceneConfig> getConfig() { return m_config; };
+
 protected:
+    std::shared_ptr<SceneConfig> m_config;
 
     std::string                              m_name; ///> Name of the scene
     NamedMap<SceneObject>                    m_sceneObjectsMap;

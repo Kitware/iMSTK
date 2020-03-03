@@ -55,7 +55,9 @@ Scene::initialize()
             return false;
         }
     }
+
     m_isInitialized = true;
+    LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
     return true;
 }
 
