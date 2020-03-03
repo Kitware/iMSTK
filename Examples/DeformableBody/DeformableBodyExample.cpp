@@ -43,7 +43,9 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
+    auto simConfig = std::make_shared<simManagerConfig>();
+    simConfig->simulationMode = SimulationMode::rendering;
+    auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene      = simManager->createNewScene("DeformableBodyFEM");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
@@ -65,19 +67,10 @@ main()
     }
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
-    StopWatch wct;
-    CpuTimer  cput;
-
-    wct.start();
-    cput.start();
-
     // Construct a map
 
     // Construct one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
-    LOG(INFO) << "wall clock time: " << wct.getTimeElapsed() << " ms.";
-    LOG(INFO) << "CPU time: " << cput.getTimeElapsed() << " ms.";
 
     // Scene object 1: Dragon
 
@@ -141,10 +134,6 @@ main()
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
 
-    // print UPS
-    auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(simManager->getSceneManager(scene), ups);
-
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
@@ -153,8 +142,7 @@ main()
 
     // Run the simulation
     simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->startSimulation();
+    simManager->start(SimulationStatus::PAUSED);
 
     return 0;
 }

@@ -180,14 +180,14 @@ main()
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("Rigid Body Dynamics");
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 1; ++i)
     {
-        addCubeRigidObject(std::string("cube_").append(std::to_string(i)), scene, Vec3d(0., 10. + i * 21, 0.));
+        addCubeRigidObject(std::string("cube_").append(std::to_string(i)), scene, Vec3d(0., 150. + i * 21, 0.));
     }
 
     addPlaneRigidObject(scene);
-    //addSphereRigidObject(scene, Vec3d(0., 200, 0.));
-    //auto rigidObj     = addMeshRigidObject(std::string("dragon"), scene, Vec3d(0., 30., 0.));
+    addSphereRigidObject(scene, Vec3d(0., 200, 0.));
+    auto rigidObj     = addMeshRigidObject(std::string("dragon"), scene, Vec3d(0., 30., 0.));
 
     // Set Camera configuration
     auto cam = scene->getCamera();
@@ -200,7 +200,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::PAUSED);
 
     return 0;
 }

@@ -326,7 +326,7 @@ main()
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::PAUSED);
 
     return 0;
 }

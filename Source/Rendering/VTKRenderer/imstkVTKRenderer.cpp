@@ -50,8 +50,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
     {
         m_vtkRenderer = vtkSmartPointer<vtkOpenVRRenderer>::New();
     }
-
 #endif
+
     this->updateRenderDelegates();
 
     // Initialize textures for surface mesh render delegates

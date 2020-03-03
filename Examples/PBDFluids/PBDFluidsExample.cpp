@@ -236,11 +236,11 @@ main()
     scene->addLight(whiteLight);
 
     // print UPS
-    auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(simManager->getSceneManager(scene), ups);
+    scene->getConfig()->trackFPS = true;
+    apiutils::printUPS(simManager->getSceneManager(scene));
 
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::PAUSED);
 
     return 0;
 }

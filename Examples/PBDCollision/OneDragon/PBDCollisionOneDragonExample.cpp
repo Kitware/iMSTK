@@ -179,7 +179,7 @@ main()
     scene->addLight(light);
 
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::RUNNING);
+    simManager->start(SimulationStatus::PAUSED);
 
     return 0;
 }

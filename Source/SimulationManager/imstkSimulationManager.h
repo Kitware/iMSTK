@@ -66,7 +66,7 @@ enum class SimulationMode
 };
 
 ///
-/// \brief Simulation manager configuraion
+/// \brief Simulation manager configuration
 ///
 struct simManagerConfig
 {

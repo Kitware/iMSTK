@@ -105,13 +105,9 @@ main()
     light->setIntensity(1);
     scene->addLight(light);
 
-    // print UPS
-    /*auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(simManager->getSceneManager(scene), ups);*/
-
     simManager->setActiveScene(scene);
     simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->startSimulation();
+    simManager->start(SimulationStatus::PAUSED);
 
     return 0;
 }

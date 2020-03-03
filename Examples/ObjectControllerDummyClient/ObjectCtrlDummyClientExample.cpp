@@ -81,7 +81,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::RUNNING);
+    simManager->start();
 
     return 0;
 }
