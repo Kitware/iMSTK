@@ -45,6 +45,12 @@ TetraTriangleMap::compute()
     m_verticesWeights.resize(triMesh->getNumVertices());
     bool bValid = true;
 
+    if (!m_bBoxAvailable)
+    {
+        // calling this function inside findEnclosingTetrahedron is not thread-safe.
+        m_updateBoundingBox();
+    }
+
     ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexIdx) {
         if (!bValid)  // If map is invalid, no need to check further
         {
@@ -196,7 +202,7 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 size_t
 TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    auto   tetMesh            = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
     double closestDistanceSqr = MAX_D;
     size_t closestTetrahedron = std::numeric_limits<size_t>::max();
     Vec3d  center(0, 0, 0);
@@ -207,10 +213,10 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
         center[1] = 0.0;
         center[2] = 0.0;
 
-        auto vert = tetraMesh->getTetrahedronVertices(tetId);
+        auto vert = tetMesh->getTetrahedronVertices(tetId);
         for (size_t i = 0; i < 4; ++i)
         {
-            center += tetraMesh->getInitialVertexPosition(vert[i]);
+            center += tetMesh->getInitialVertexPosition(vert[i]);
         }
         center         = center / 4.0;
         double distSqr = (Vec3d(pos - center)).squaredNorm();
@@ -220,14 +226,14 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
             closestTetrahedron = tetId;
         }
     }
-    
+
     return closestTetrahedron;
 }
 
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
-    bool  inBox;
+    bool inBox;
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
 
     TetrahedralMesh::WeightsArray weights = {0.0, 0.0, 0.0, 0.0};
@@ -265,6 +271,7 @@ TetraTriangleMap::m_updateBoundingBox(void)
     {
         tetMesh->computeTetrahedronBoundingBox(idx, m_bBoxMin[idx], m_bBoxMax[idx]);
     }
+    m_bBoxAvailable = true;
     return;
 }
 }  // namespace imstk

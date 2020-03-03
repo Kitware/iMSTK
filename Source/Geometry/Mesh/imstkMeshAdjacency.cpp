@@ -1,3 +1,4 @@
+#if 0
 #include "imstkMeshAdjacency.h"
 
 #include <cassert>
@@ -138,3 +139,4 @@ MeshAdjacency<Element>::m_getFaceVertices(const size_t eid, const int fid,
 }
 
 }  // namespace imstk
+#endif
