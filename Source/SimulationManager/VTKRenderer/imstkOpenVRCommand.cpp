@@ -47,19 +47,19 @@ OpenVRCommand::Execute(
 
         if (status == SimulationStatus::RUNNING)
         {
-            m_simManager->pauseSimulation();
+            m_simManager->pause();
         }
 
         // pause simulation
         if (status == SimulationStatus::INACTIVE)
         {
-            m_simManager->startSimulation();
+            m_simManager->start();
         }
 
         // continue simulation
         if (status == SimulationStatus::PAUSED)
         {
-            m_simManager->runSimulation();
+            m_simManager->run();
         }
 
         this->AbortFlagOn();
@@ -72,13 +72,13 @@ OpenVRCommand::Execute(
         // pause simulation
         if (status == SimulationStatus::RUNNING)
         {
-            m_simManager->pauseSimulation();
+            m_simManager->pause();
         }
 
         // continue simulation
         if (status == SimulationStatus::PAUSED)
         {
-            m_simManager->runSimulation();
+            m_simManager->run();
         }
 
         this->AbortFlagOn();
@@ -91,11 +91,11 @@ OpenVRCommand::Execute(
 
         if (status == SimulationStatus::INACTIVE)
         {
-            m_simManager->startSimulation();
+            m_simManager->start();
         }
         else
         {
-            m_simManager->endSimulation();
+            m_simManager->end();
         }
 
         this->AbortFlagOn();

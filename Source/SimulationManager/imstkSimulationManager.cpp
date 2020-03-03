@@ -438,8 +438,8 @@ SimulationManager::launchSimulation()
 }
 
 void
-SimulationManager::startSimulation(const SimulationStatus simStatus /*= SimulationStatus::PAUSED*/,
-                                   const Renderer::Mode   renderMode /*= Renderer::Mode::SIMULATION*/)
+SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::RUNNING*/,
+                         const Renderer::Mode   renderMode /*= Renderer::Mode::SIMULATION*/)
 {
     if (!m_initialized)
     {

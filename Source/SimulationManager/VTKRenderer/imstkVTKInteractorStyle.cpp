@@ -145,18 +145,18 @@ VTKInteractorStyle::OnChar()
         // pause simulation
         if (status == SimulationStatus::RUNNING)
         {
-            m_simManager->pauseSimulation();
+            m_simManager->pause();
         }
         // play simulation
         else if (status == SimulationStatus::PAUSED)
         {
-            m_simManager->runSimulation();
+            m_simManager->run();
         }
         // Launch simulation if inactive
         if (status == SimulationStatus::INACTIVE)
         {
             m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
-            m_simManager->startSimulation(SimulationStatus::RUNNING);
+            m_simManager->start(SimulationStatus::RUNNING);
         }
     }
     else if (status != SimulationStatus::INACTIVE
@@ -188,7 +188,7 @@ VTKInteractorStyle::OnChar()
     }
     else if (key == 'r' || key == 'R')
     {
-        m_simManager->resetSimulation();
+        m_simManager->reset();
     }
 }
 

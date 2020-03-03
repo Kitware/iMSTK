@@ -188,8 +188,8 @@ public:
     /// and returned. In rendering and runInBackground modes the simulation manager
     /// module gets launched and an never returns
     ///
-    void startSimulation(const SimulationStatus simStatus = SimulationStatus::PAUSED,
-                         const Renderer::Mode   renderMode = Renderer::Mode::SIMULATION);
+    void start(const SimulationStatus simStatus = SimulationStatus::RUNNING,
+               const Renderer::Mode   renderMode = Renderer::Mode::SIMULATION);
 
     ///
     /// \brief Initialize the modules and the active scene
@@ -198,24 +198,24 @@ public:
 
     ///
     /// \brief Run the simulation from a paused state
-    /// In Mode::backend mode, the simulation manager is initialized if not and retrned
+    /// In Mode::backend mode, the simulation manager is initialized if not and returned
     ///
-    void runSimulation();
+    void run();
 
     ///
     /// \brief Pause the simulation
     ///
-    void pauseSimulation();
+    void pause();
 
     ///
     /// \brief Reset the simulation to initial state
     ///
-    void resetSimulation();
+    void reset();
 
     ///
     /// \brief End the simulation
     ///
-    void endSimulation();
+    void end();
 
     ///
     /// \brief Advance to next frame
