@@ -21,7 +21,6 @@
 
 #include "imstkModule.h"
 #include "imstkMath.h"
-#include "g3log/g3log.hpp"
 
 namespace imstk
 {
@@ -67,6 +66,11 @@ Module::start()
             // (updating as fast as possible)
             if (m_loopDelay < VERY_SMALL_EPSILON_D)
             {
+                if (m_trackFPS)
+                {
+                    m_frameCounter->setStartPointOfUpdate();
+                }
+
                 if (m_preUpdateCallback)
                 {
                     m_preUpdateCallback(this);
@@ -75,6 +79,14 @@ Module::start()
                 if (m_postUpdateCallback)
                 {
                     m_postUpdateCallback(this);
+                }
+
+                if (m_trackFPS)
+                {
+                    m_frameCounter->setEndPointOfUpdate();
+
+                    std::cout << "\r" << this->getName() << " running at "
+                              << m_frameCounter->getUPS() << " ups   " << std::flush;
                 }
                 continue;
             }
@@ -84,6 +96,11 @@ Module::start()
             elapsed   = std::chrono::duration_cast<std::chrono::milliseconds>(current_t - previous_t).count();
             if (elapsed >= m_loopDelay)
             {
+                if (m_trackFPS)
+                {
+                    m_frameCounter->setStartPointOfUpdate();
+                }
+
                 if (m_preUpdateCallback)
                 {
                     m_preUpdateCallback(this);
@@ -93,6 +110,12 @@ Module::start()
                 {
                     m_postUpdateCallback(this);
                 }
+
+                if (m_trackFPS)
+                {
+                    m_frameCounter->setEndPointOfUpdate();
+                }
+
                 previous_t = current_t;
             }
         }
@@ -106,8 +129,6 @@ Module::run()
 {
     if (m_status != ModuleStatus::PAUSED)
     {
-        LOG(WARNING) << "Can not run '" << m_name << "'.\n"
-                     << "Module not paused.";
         return;
     }
 
@@ -117,16 +138,12 @@ Module::run()
 void
 Module::pause()
 {
-    if (m_status != ModuleStatus::RUNNING)
+    if (m_status == ModuleStatus::RUNNING)
     {
-        LOG(WARNING) << "Can not pause '" << m_name << "'.\n"
-                     << "Module not running.";
-        return;
+        m_status = ModuleStatus::PAUSING;
+
+        while (m_status != ModuleStatus::PAUSED) {}
     }
-
-    m_status = ModuleStatus::PAUSING;
-
-    while (m_status != ModuleStatus::PAUSED) {}
 }
 
 void
@@ -214,5 +231,24 @@ Module::setFrequency(const double f)
         return;
     }
     m_loopDelay = 1000.0 / f;
+}
+
+unsigned int
+Module::getUPS()
+{
+    if (m_status != ModuleStatus::RUNNING)
+    {
+        return 0;
+    }
+
+    if (m_trackFPS)
+    {
+        return m_frameCounter->getUPS();
+    }
+    else
+    {
+        LOG(WARNING) << "Frame counter is not enabled!";
+        return 0;
+    }
 }
 }

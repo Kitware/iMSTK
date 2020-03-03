@@ -24,6 +24,8 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
+#include "g3log/g3log.hpp"
+#include "imstkTimer.h"
 
 namespace imstk
 {
@@ -55,8 +57,7 @@ public:
     ///
     Module(std::string name, int loopDelay = 0) :
         m_name(name),
-        m_loopDelay(loopDelay)
-    {}
+        m_loopDelay(loopDelay) {}
 
     ///
     /// \brief Destructor
@@ -120,6 +121,12 @@ public:
     ///
     void setFrequency(const double f);
 
+    void enableFrameCount() { m_trackFPS = true; };
+    void disableFrameCount() { m_trackFPS = false; };
+    bool isFrameCountEnabled() const { return m_trackFPS; };
+
+    unsigned int getUPS();
+
 protected:
 
     ///
@@ -145,6 +152,9 @@ protected:
     CallbackFunction m_postCleanUpCallback;                        ///> function callback following module cleanup
 
     std::atomic<ModuleStatus> m_status { ModuleStatus::INACTIVE }; ///> Module status
+
+    bool m_trackFPS = false;
+    std::shared_ptr<UPSCounter> m_frameCounter = std::make_shared<UPSCounter>();
 
     std::string m_name;                                            ///> Name of the module
     double      m_loopDelay = 0;                                   ///> Loop delay
