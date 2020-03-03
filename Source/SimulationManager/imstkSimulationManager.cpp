@@ -514,8 +514,7 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
         this->startViewer(renderMode);
     }
 
-    // Note: This never returns until the user triggers exit
-    if (m_config->simulationMode == SimulationMode::runInBackground)
+    if (m_config->simulationMode == SimulationMode::runInBackgroundSync) // never returns
     {
         this->printUserControlsInfo(false);
         this->infiniteLoopNoRenderingMode();
@@ -734,8 +733,10 @@ SimulationManager::end()
 
 void
 SimulationManager::endModules()
-{
-    // End modules other than scene managers
+{    
+    m_status = SimulationStatus::TERMINATING;
+
+    // End modules
     for (const auto& pair : m_modulesMap)
     {
         (pair.second)->end();

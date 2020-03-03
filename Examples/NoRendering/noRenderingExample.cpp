@@ -41,7 +41,7 @@ int
 main()
 {
     auto simConfig = std::make_shared<simManagerConfig>();
-    simConfig->simulationMode = SimulationMode::runInBackground;
+    simConfig->simulationMode = SimulationMode::runInBackgroundSync;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene      = simManager->createNewScene("NoRendering");
 
@@ -155,12 +155,6 @@ main()
     // Start
     simManager->setActiveScene(scene);
     simManager->start();
-
-    // Sleep
-    std::this_thread::sleep_for(std::chrono::seconds(300));
-
-    // End
-    simManager->end();
 
     const std::vector<Vec3d> expectedFinalPositions = {
         Vec3d(0, 1, 0),

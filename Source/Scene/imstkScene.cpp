@@ -23,11 +23,12 @@
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkPbdObject.h"
 #include "imstkDeformableObject.h"
 #include "imstkTimer.h"
-#include "imstkPbdSolver.h"
 #include "imstkRigidBodyWorld.h"
+#include "imstkPbdSolver.h"
+#include "imstkPbdObject.h"
+#include "imstkPBDCollisionHandling.h"
 
 #include <g3log/g3log.hpp>
 
@@ -46,13 +47,51 @@ Scene::~Scene()
 bool
 Scene::initialize()
 {
+    std::unordered_map<std::shared_ptr<PbdObject>, std::shared_ptr<PbdSolver>> pbdObjSolver;
+
     for (auto const& it : m_sceneObjectsMap)
     {
+        // Add pbd solver for all the pbd scene objects
+        if (it.second->getType() == SceneObject::Type::Pbd)
+        {
+            auto pbdSolver = std::make_shared<PbdSolver>();
+            auto pbdObj    = std::dynamic_pointer_cast<PbdObject>(it.second);
+            pbdSolver->setPbdObject(pbdObj);
+            this->addNonlinearSolver(pbdSolver);
+
+            pbdObjSolver[pbdObj] = pbdSolver;
+        }
+
         auto sceneObject = it.second;
         if (!sceneObject->initialize())
         {
             LOG(FATAL) << "Error initializing scene object: " << sceneObject->getName();
             return false;
+        }
+    }
+
+    for (auto const& it : m_collisionGraph->getInteractionPairList())
+    {
+        auto chA = it->getCollisionHandlingA();
+        if (chA)
+        {
+            if (chA->getType() == CollisionHandling::Type::PBD)
+            {
+                auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chA);
+                ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast < PbdObject > (it->getObjectsPair().first)]);
+            }
+        }
+        else
+        {
+            auto chB = it->getCollisionHandlingB();
+            if (chB)
+            {
+                if (chB->getType() == CollisionHandling::Type::PBD)
+                {
+                    auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chB);
+                    ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast < PbdObject > (it->getObjectsPair().second)]);
+                }
+            }
         }
     }
 

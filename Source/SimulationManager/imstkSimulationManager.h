@@ -58,7 +58,11 @@ enum class SimulationMode
 
     /// Simulation manager launches the simulation without a
     /// render window but keeps looping the simulation
-    runInBackground,
+    runInBackgroundSync,
+
+    /// Simulation manager launches the simulation without a
+    /// render window no waiting
+    runInBackgroundAsync,
 
     /// Simulation manager launches the simulation without a
     /// render window and returns the control

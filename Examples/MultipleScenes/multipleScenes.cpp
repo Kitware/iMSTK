@@ -291,7 +291,7 @@ void
 testMultipleScenesInBackgroundMode()
 {
     auto simConfig = std::make_shared<simManagerConfig>();
-    simConfig->simulationMode = SimulationMode::runInBackground;
+    simConfig->simulationMode = SimulationMode::runInBackgroundSync;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene1     = createClothScene(simManager, "clothScene");
     auto scene2     = createSoftBodyScene(simManager, "deformableBodyScene");

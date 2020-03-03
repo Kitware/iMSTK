@@ -52,13 +52,8 @@ public:
     ///
     PBDCollisionHandling(const Side&                          side,
                          const std::shared_ptr<CollisionData> colData,
-                         std::shared_ptr<PbdObject>           obj1,
-                         std::shared_ptr<PbdObject>           obj2,
-                         std::shared_ptr<PbdSolver>           PBDSolver = nullptr) :
-        CollisionHandling(Type::Penalty, side, colData),
-        m_pbdObject1(obj1),
-        m_pbdObject2(obj2),
-        m_PBDSolver(PBDSolver) {}
+                         std::shared_ptr<CollidingObject>     obj1,
+                         std::shared_ptr<CollidingObject>     obj2);
 
     PBDCollisionHandling() = delete;
 
@@ -76,6 +71,12 @@ public:
     /// \brief Generate appropriate PBD constraints based on the collision data
     ///
     void generatePBDConstraints();
+
+    ///
+    /// \brief Get/Set pbd solver
+    ///
+    void setSolver(std::shared_ptr<PbdSolver> solver) { m_PBDSolver = solver; };
+    std::shared_ptr<PbdSolver> getSolver() { return m_PBDSolver; };
 
 private:
 

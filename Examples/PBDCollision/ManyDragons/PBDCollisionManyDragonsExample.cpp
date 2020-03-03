@@ -102,8 +102,6 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    auto deformMapP2V = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-    auto deformMapC2V = std::make_shared<OneToOneMap>(surfMesh, surfMesh);
     auto deformMapP2C = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
 
     deformableObj = std::make_shared<PbdObject>("Dragon-" + std::to_string(count));
@@ -111,8 +109,6 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
-    deformableObj->setPhysicsToVisualMap(deformMapP2V);
-    deformableObj->setCollidingToVisualMap(deformMapC2V);
 
     // Create model and object
     auto pbdModel = std::make_shared<PbdModel>();
@@ -138,9 +134,9 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     deformableObj->setDynamicalModel(pbdModel);
 
     // Create solver
-    pbdSolver = std::make_shared<PbdSolver>();
+    /*pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
+    scene->addNonlinearSolver(pbdSolver);*/
     scene->addSceneObject(deformableObj);
 }
 
@@ -217,6 +213,7 @@ main()
     pbdParams2->m_uniformMassValue = 0.0;
     pbdParams2->m_proximity        = 0.1;
     pbdParams2->m_contactStiffness = 0.1;
+    pbdParams2->m_maxIter          = 0;
 
     // Set the parameters
     pbdModel2->configure(pbdParams2);
@@ -270,7 +267,7 @@ main()
                 const auto colData = std::make_shared<CollisionData>();
                 const auto CD      = std::make_shared<SurfaceMeshToSurfaceMeshCD>(mesh, floorMesh, colData);
                 const auto CH      = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                                                                            colData, pbdObj, floor, solver);
+                                                                            colData, pbdObj, floor);
                 scene->getCollisionGraph()->addInteractionPair(pbdObj, floor, CD, CH, nullptr);
                 allCollisionData.push_back(colData);
             }
@@ -290,7 +287,7 @@ main()
             const auto colData = std::make_shared<CollisionData>();
             const auto CD      = std::make_shared<SurfaceMeshToSurfaceMeshCD>(surfaceMeshes[i], surfaceMeshes[j], colData);
             const auto CH      = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                                                                        colData, pbdObjs[i], pbdObjs[j], pbdSolvers[i]);
+                                                                        colData, pbdObjs[i], pbdObjs[j]);
             scene->getCollisionGraph()->addInteractionPair(pbdObjs[i], pbdObjs[j], CD, CH, nullptr);
         }
     }

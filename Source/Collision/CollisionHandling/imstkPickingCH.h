@@ -48,7 +48,7 @@ public:
     ///
     PickingCH(const Side&                          side,
               const std::shared_ptr<CollisionData> colData,
-              std::shared_ptr<DeformableObject>    obj);
+              std::shared_ptr<CollidingObject>     obj);
 
     PickingCH() = delete;
 
