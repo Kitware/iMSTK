@@ -95,7 +95,7 @@ void
 LogUtility::createLogger(std::string name, std::string path)
 {
     m_g3logWorker    = g3::LogWorker::createLogWorker();
-    m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path);
+    m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path, "imstk");
     m_stdSinkHandle  = m_g3logWorker->addSink(
         std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage);
     g3::initializeLogging(m_g3logWorker.get());

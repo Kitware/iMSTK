@@ -96,7 +96,9 @@ struct simManagerConfig
 ///
 class SimulationManager
 {
+using keyPressCallback = std::function<void(void)>;
 
+public:
     ///
     /// \brief Constructor
     ///    
@@ -158,7 +160,8 @@ class SimulationManager
                                           std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
 
     ///
-    /// \brief Create a new scene with default name
+    /// \brief Create a new scene
+    /// \note Scene name is automatically assigned
     ///
     std::shared_ptr<Scene> createNewScene();
 
@@ -196,8 +199,6 @@ class SimulationManager
 
     // Viewer
     std::shared_ptr<Viewer> getViewer() const;
-
-    // Simulation
 
     ///
     /// \brief Set the current scene to the one with the supplied name
@@ -253,14 +254,17 @@ class SimulationManager
     ///
     SimulationMode getMode() const { return m_config->simulationMode; }
 
-private:
+    ///
+    /// \brief Add key press callback to be used in background mode only
+    /// \todo add remove function as well
+    ///
+    void addKeyPressCallback(keyPressCallback func, const int c);
 
+private:
     ///
-    /// \brief Launch simulation for the first time.
-    /// 1. Initialize the active scene if not initialized already.
-    /// 2. Launches separate threads for each module.
+    /// \brief Create a viewer
     ///
-    void launchSimulation();
+    void createViewer(const bool enableVR);
 
     ///
     /// \brief Start the viewer
@@ -272,7 +276,30 @@ private:
     ///
     void printUserControlsInfo(const bool isRendering = true) const;
 
+    ///
+    /// \brief Start a module (refer \link  imstkModule \endlink) in new thread
+    ///
     void startModuleInNewThread(std::shared_ptr<Module> module);
+
+    ///
+    /// \brief Start modules
+    ///
+    void startNonSceneModules();
+
+    ///
+    /// \brief Launch scene manager modules
+    ///
+    void launchSceneModule(std::string sceneName);
+
+    ///
+    /// \brief Pause modules
+    ///
+    void pauseModules();
+
+    ///
+    /// \brief End modules
+    ///
+    void endModules();
 
     ///
     /// \brief Keeps things in an infinite loop if rendering is disabled
@@ -280,22 +307,28 @@ private:
     ///
     void infiniteLoopNoRenderingMode();
 
-    SimulationStatus m_status = SimulationStatus::INACTIVE;
-
     std::string m_activeSceneName = "";
-    std::unordered_map<std::string, std::shared_ptr<SceneManager>> m_sceneManagerMap;
-    std::unordered_map<std::string, std::shared_ptr<Scene>>        m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
 
-    std::unordered_map<std::string, std::shared_ptr<Module>> m_modulesMap;
+    // Maps
+    SceneNameMap<SceneManager> m_sceneManagerMap;
+    SceneNameMap<Scene>        m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
+    SceneNameMap<Module>       m_modulesMap;
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
     std::shared_ptr<Viewer>     m_viewer  = nullptr;
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 
-    bool m_simThreadLaunched = false;
+    struct callbackKeyPair { int key; keyPressCallback func; };
+    std::vector<callbackKeyPair> m_kepPressCallbacks;
 
-    Mode m_simulationMode = Mode::rendering;
-    bool m_initialized    = false;
+    // states
+    SimulationStatus m_status = SimulationStatus::INACTIVE;
+    bool m_simulationStarted  = false;
+    bool m_initialized        = false;
+
+    std::shared_ptr<simManagerConfig> m_config;
+
+    std::mutex m_mutex;
 };
 } // imstk
