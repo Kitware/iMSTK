@@ -37,12 +37,7 @@ TetrahedralMesh::initialize(const StdVectorOfVec3d&        vertices,
         this->computeAttachedSurfaceMesh();
     }
 
-    //m_removedMeshElems.resize(tetrahedra.size());
-    for (int i = 0; i < tetrahedra.size(); ++i)
-    {
-        m_removedMeshElems.push_back(false);
-    }
-    //m_removedMeshElems.assign(false, m_removedMeshElems.size());
+    m_removedMeshElems.resize(tetrahedra.size(), false);
 }
 
 void

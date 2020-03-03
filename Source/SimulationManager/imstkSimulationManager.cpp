@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkThreadManager.h"
+#include "imstkTimer.h"
 
 #include <string>
 
@@ -447,7 +448,7 @@ SimulationManager::startSimulation(const SimulationStatus simStatus /*= Simulati
 
     if (m_simulationMode == Mode::backend) // returns in backend mode
     {
-        LOG(WARNING) << "SimulationManager::startSimulation() - Simulation manager is in backend mode and hence use advanceFrame to step simulation!";
+        LOG(INFO) << "SimulationManager::startSimulation() - Simulation manager is in backend mode and hence use advanceFrame to step simulation!";
         return;
     }
 
