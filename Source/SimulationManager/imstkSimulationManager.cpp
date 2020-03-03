@@ -29,15 +29,21 @@
 
 namespace imstk
 {
-SimulationManager::SimulationManager(const SimulationManager::Mode mode, const bool enableVR)
+SimulationManager::SimulationManager(const std::shared_ptr<simManagerConfig> config)
 {
-    m_simulationMode = mode;
+    // set the configuration
+    m_config = config;
 
-    // Init g3logger
-    m_logUtil->createLogger("simulation", "./");
+    // Initialize the logger
+    m_logUtil->createLogger(m_config->logFilePrefix, m_config->logPath);
 
-    if (mode == Mode::rendering)
+    // create viewer if the selected mode is 'rendering'
+    if (m_config->simulationMode == SimulationMode::rendering)
     {
+        createViewer(m_config->VR_Enabled);
+    }
+}
+
 #ifdef iMSTK_USE_Vulkan
         m_viewer = std::make_shared<VulkanViewer>(this, enableVR);
 #else
@@ -91,9 +97,9 @@ SimulationManager::isSceneRegistered(const std::string& sceneName) const
 std::shared_ptr<SceneManager>
 SimulationManager::getSceneManager(const std::string& sceneName) const
 {
-    if (m_simulationMode == Mode::backend)
+    if (m_config->simulationMode == SimulationMode::backend)
     {
-        LOG(WARNING) << "The simulation manager is in backend mode. No scene managers are created!";
+        LOG(WARNING) << "The simulation manager is in backend mode. No scene managers were created!";
         return nullptr;
     }
 
@@ -138,7 +144,7 @@ SimulationManager::getActiveScene() const
 }
 
 std::shared_ptr<Scene>
-SimulationManager::createNewScene(const std::string& newSceneName)
+SimulationManager::createNewScene(const std::string& newSceneName, std::shared_ptr<SceneConfig> config)
 {
     if (this->isSceneRegistered(newSceneName))
     {
@@ -191,6 +197,8 @@ SimulationManager::addScene(std::shared_ptr<Scene> newScene)
         return;
     }
     if (m_simulationMode != Mode::backend)
+    // create a scene manager if not 'backend' mode
+    if (m_config->simulationMode != SimulationMode::backend)
     {
         m_sceneManagerMap[newSceneName] = std::make_shared<SceneManager>(newScene);
     }
@@ -212,9 +220,11 @@ SimulationManager::removeScene(const std::string& sceneName)
         return;
     }
 
-    if (m_simulationMode != Mode::backend)
+    // If the scene to be removed is the currently active in the rendering mode, return with warning
+    if (m_activeSceneName == sceneName && m_config->simulationMode == SimulationMode::rendering)
     {
-        m_sceneManagerMap.erase(sceneName);
+        LOG(WARNING) << "Cannot remove the active scene that is currently rendered";
+        return;
     }
     else
     {
@@ -277,10 +287,8 @@ SimulationManager::removeModule(const std::string& moduleName)
 std::shared_ptr<Viewer>
 SimulationManager::getViewer() const
 {
-    if (m_simulationMode != Mode::rendering)
-    {
-        LOG(WARNING) << "The simulation is not in rendering mode!";
-    }
+    LOG_IF(WARNING, (m_config->simulationMode != SimulationMode::rendering)) << "The simulation is not in rendering mode!";
+
     return m_viewer;
 }
 
@@ -341,8 +349,8 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
         m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
     }
 
-    // Stop/Pause running scene
-    if (m_simulationMode != Mode::backend)
+    // Stop/Pause currently running scene
+    if (m_config->simulationMode != SimulationMode::backend)
     {
         auto oldSceneManager = m_sceneManagerMap.at(m_activeSceneName);
         if (unloadCurrentScene)

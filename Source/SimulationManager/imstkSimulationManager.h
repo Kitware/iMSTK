@@ -42,6 +42,51 @@ namespace imstk
 {
 using SimulationStatus = ModuleStatus;
 
+template<class T>
+using SceneNameMap = std::unordered_map<std::string, std::shared_ptr<T>>;
+
+
+///
+/// \brief Simulation manager mode
+/// \note The mode is set at the time of initialization
+///
+enum class SimulationMode
+{
+    /// Simulation manager launches the simulation with a
+    /// render window
+    rendering = 0,
+
+    /// Simulation manager launches the simulation without a
+    /// render window but keeps looping the simulation
+    runInBackground,
+
+    /// Simulation manager launches the simulation without a
+    /// render window and returns the control
+    backend
+};
+
+///
+/// \brief Simulation manager configuraion
+///
+struct simManagerConfig
+{
+    // logger
+    std::string logPath = "./";
+    std::string logFilePrefix = "simulation";
+
+    // Name
+    std::string simulationName = "imstk";
+
+    // states
+    SimulationMode simulationMode = SimulationMode::rendering;
+    SimulationStatus startingStatus = SimulationStatus::RUNNING;
+    bool VR_Enabled = false;
+    bool startInPausedState = false;
+
+    // 0 indicates that an optimal size will be used
+    unsigned int threadPoolSize = 0;
+};
+
 ///
 /// \class SimulationManager
 ///
@@ -51,34 +96,16 @@ using SimulationStatus = ModuleStatus;
 ///
 class SimulationManager
 {
-public:
-    ///
-    /// \brief Type of the collision detection
-    ///
-    enum class Mode
-    {
-        /// Simulation manager launches the simulation with a
-        /// render window
-        rendering = 0,
-
-        /// Simulation manager launches the simulation without a
-        /// render window but keeps looping the simulation
-        runInBackground,
-
-        /// Simulation manager launches the simulation without a
-        /// render window and returns the control
-        backend
-    };
 
     ///
     /// \brief Constructor
-    ///
-    SimulationManager(const SimulationManager::Mode mode = Mode::rendering, const bool enableVR = false);
+    ///    
+    SimulationManager(const std::shared_ptr<simManagerConfig> config = std::make_shared<simManagerConfig>());
 
     ///
     /// \brief Default destructor
     ///
-    ~SimulationManager() { this->endSimulation(); };
+    ~SimulationManager() { this->end(); };
 
     ///
     /// \brief Returns the simulation status
@@ -102,8 +129,6 @@ public:
     /// which typically equals to the number of logical cores of the machine
     ///
     void setOptimalThreadPoolSize();
-
-    // Scene
 
     ///
     /// \brief Returns true if the scene is registered, else false
@@ -129,7 +154,8 @@ public:
     ///
     /// \brief Create a new scene with a given name
     ///
-    std::shared_ptr<Scene> createNewScene(const std::string& newSceneName);
+    std::shared_ptr<Scene> createNewScene(const std::string&                  newSceneName,
+                                          std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
 
     ///
     /// \brief Create a new scene with default name
@@ -225,7 +251,7 @@ public:
     ///
     /// \brief Return the mode of the simulation manager
     ///
-    SimulationManager::Mode getMode() const { return m_simulationMode; }
+    SimulationMode getMode() const { return m_config->simulationMode; }
 
 private:
 
