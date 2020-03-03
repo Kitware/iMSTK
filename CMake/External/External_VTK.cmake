@@ -13,7 +13,8 @@ set(${PROJECT_NAME}_VTK_REPO_SOURCE "8.2" CACHE STRING "Select VTK Source Branch
 set(VTK_SOURCES "8.2;8.9;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
 set_property(CACHE ${PROJECT_NAME}_VTK_REPO_SOURCE PROPERTY STRINGS ${VTK_SOURCES})
 
-set(VTK_GIT_TAG)
+set(VTK_URL)
+set(VTK_HASH)
 if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.2")
   set(VTK_MODULE_SETTINGS
     -DModule_vtkRenderingOpenGL2:BOOL=ON
@@ -33,7 +34,8 @@ if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.2")
     -DVTK_Group_StandAlone:BOOL=OFF
     -DVTK_Group_Rendering:BOOL=OFF
   )
-  set(VTK_GIT_TAG "v8.2.0")
+  set(VTK_URL https://gitlab.kitware.com/vtk/vtk/-/archive/v8.2.0/vtk-v8.2.0.tar.gz)
+  set(VTK_HASH 4115fb396f99466fe444472f412118cd)
 else()
   if (${${PROJECT_NAME}_ENABLE_OPENVR})
     set(VTK_OPENVR "WANT")
@@ -62,10 +64,13 @@ else()
     -DVTK_GROUP_ENABLE_StandAlone:STRING=DONT_WANT
     -DVTK_GROUP_ENABLE_Rendering:STRING=DONT_WANT
   )
+  # TODO When updating to 9.0, Change to URL/HASH zip pull
   if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.9")
     set(VTK_GIT_TAG "9b6a039f43404053a0653f742148d123f6ada7d6")
   else()
     set(VTK_GIT_TAG "origin/${${PROJECT_NAME}_VTK_REPO_SOURCE}")
+    #GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git
+    #GIT_TAG ${VTK_GIT_TAG}
   endif()
 endif()
 
@@ -74,8 +79,8 @@ endif()
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
-  GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git
-  GIT_TAG ${VTK_GIT_TAG}
+  URL ${VTK_URL}
+  URL_HASH MD5=${VTK_HASH}
   CMAKE_ARGS
        ${VTK_MODULE_SETTINGS}
       -DVTK_WRAP_PYTHON:BOOL=OFF

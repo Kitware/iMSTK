@@ -4,7 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Core
   DEPENDS
-    Eigen
+    Eigen3::Eigen
     g3log
     tbb
   )

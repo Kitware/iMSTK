@@ -100,10 +100,10 @@ VRPNDeviceServer::initModule()
                          << "Install OpenHaptics SDK, the omni driver, and build VRPN with VRPN_USE_PHANTOM_SERVER.";
 #endif
         } break;
-        case DeviceType::OSVR_HDK:
-        {
-            m_deviceConnections->add(new vrpn_Tracker_OSVRHackerDevKit(name.c_str(), m_serverConnection));
-        } break;
+        //case DeviceType::OSVR_HDK:
+        //{
+        //    m_deviceConnections->add(new vrpn_Tracker_OSVRHackerDevKit(name.c_str(), m_serverConnection));
+        //} break;
         case DeviceType::ARDUINO_IMU:
         {
             SerialInfo connectionSettings = m_SerialInfoMap[name];
