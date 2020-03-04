@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkMeshToMeshBruteforceCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
