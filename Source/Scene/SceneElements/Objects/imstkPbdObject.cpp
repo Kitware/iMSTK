@@ -72,7 +72,7 @@ PbdObject::solveConstraints()
 void
 PbdObject::reset()
 {
-    DynamicObject<PbdState>::reset();
+    DynamicObject::reset();
     this->updateVelocity();
 }
 } //imstk

@@ -23,7 +23,7 @@
 
 #include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
-#include "imstkDynamicalModel.h"
+#include "imstkAbstractDynamicalModel.h"
 #include "imstkGeometryMap.h"
 
 namespace imstk
@@ -35,7 +35,6 @@ class Geometry;
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
-template<class StateType>
 class DynamicObject : public CollidingObject
 {
 public:
@@ -71,8 +70,8 @@ public:
     ///
     /// \brief Set/Get dynamical model
     ///
-    virtual std::shared_ptr<DynamicalModel<StateType>> getDynamicalModel() const { return m_dynamicalModel; }
-    virtual void setDynamicalModel(std::shared_ptr<DynamicalModel<StateType>> dynaModel) { m_dynamicalModel = dynaModel; }
+    virtual std::shared_ptr<AbstractDynamicalModel> getDynamicalModel() const { return m_dynamicalModel; }
+    virtual void setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel) { m_dynamicalModel = dynaModel; }
 
     ///
     /// \brief Returns the number of degree of freedom
@@ -155,8 +154,8 @@ protected:
     DynamicObject(const std::string& name) : CollidingObject(name) {}
     DynamicObject(std::string&& name) : CollidingObject(std::move(name)) {}
 
-    std::shared_ptr<DynamicalModel<StateType>> m_dynamicalModel;        ///> Dynamical model
-    std::shared_ptr<Geometry> m_physicsGeometry;                        ///> Geometry used for Physics
+    std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel;        ///> Dynamical model
+    std::shared_ptr<Geometry> m_physicsGeometry;                     ///> Geometry used for Physics
 
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;           ///> Maps from Physics to collision geometry

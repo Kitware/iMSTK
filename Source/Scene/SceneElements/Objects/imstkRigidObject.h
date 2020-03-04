@@ -32,7 +32,7 @@ namespace imstk
 ///
 /// \brief Scene objects that are governed by rigid body dynamics
 ///
-class RigidObject : public DynamicObject<RigidBodyState>
+class RigidObject : public DynamicObject
 {
 public:
 
