@@ -26,6 +26,8 @@
 
 namespace imstk
 {
+class Geometry;
+
 ///
 /// \brief Type of the time dependent mathematical model
 ///
@@ -111,6 +113,16 @@ public:
     virtual void setTimeStep(const double timeStep) = 0;
 
     ///
+    /// \brief Sets the model geometry
+    ///
+    virtual void setModelGeometry(std::shared_ptr<Geometry> geometry) { m_geometry = geometry; }
+
+    ///
+    /// \brief Gets the model geometry
+    ///
+    std::shared_ptr<Geometry> getModelGeometry() const { return m_geometry; }
+
+    ///
     /// \brief Returns the time step size
     ///
     virtual double getTimeStep() const = 0;
@@ -127,9 +139,11 @@ public:
     TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
 
 protected:
-    DynamicalModelType m_type;     ///> Mathematical model type
+    DynamicalModelType m_type;          ///> Mathematical model type
 
-    std::size_t m_numDOF;          ///> Total number of degree of freedom
+    std::size_t m_numDOF;               ///> Total number of degree of freedom
+
+    std::shared_ptr<Geometry> m_geometry; ///> Physics geometry of the model
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
 };

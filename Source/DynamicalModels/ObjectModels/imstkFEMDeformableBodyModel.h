@@ -117,12 +117,6 @@ public:
     std::shared_ptr<TimeIntegrator> getTimeIntegrator() const;
 
     ///
-    /// \brief Set/Get the geometry used by force model
-    ///
-    void setModelGeometry(std::shared_ptr<Geometry> geometry);
-    std::shared_ptr<Geometry> getModelGeometry();
-
-    ///
     /// \brief Load the initial conditions of the deformable object
     ///
     void loadInitialStates();
@@ -278,7 +272,6 @@ public:
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
-    std::shared_ptr<Geometry>           m_forceModelGeometry;       ///> Geometry used by force model
     std::shared_ptr<NonLinearSystem>    m_nonLinearSystem;          ///> Nonlinear system resulting from TI and force model
 
     std::shared_ptr<FEMModelConfig> m_FEModelConfig;

@@ -32,6 +32,8 @@
 
 namespace imstk
 {
+class PointSet;
+
 ///
 /// \class PBDModelConfig
 /// \brief Parameters for PBD simulation
@@ -90,12 +92,6 @@ public:
     /// \brief Destructor
     ///
     virtual ~PbdModel() override = default;
-
-    ///
-    /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
-    ///
-    void setModelGeometry(const std::shared_ptr<PointSet>& m) { m_mesh = m; }
-    const std::shared_ptr<PointSet>& getModelGeometry() const { return m_mesh; }
 
     ///
     /// \brief Set simulation parameters

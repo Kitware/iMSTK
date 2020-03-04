@@ -84,7 +84,7 @@ main()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
 
-    deformableObj->setPbdModel(pbdModel);
+    deformableObj->setDynamicalModel(pbdModel);
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
     scene->addNonlinearSolver(pbdSolver);

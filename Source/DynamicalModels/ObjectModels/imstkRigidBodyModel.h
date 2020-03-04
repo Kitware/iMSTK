@@ -69,18 +69,17 @@ public:
     bool isGeometryValid(const std::shared_ptr<Geometry> g) const;
 
     ///
+    /// \brief Sets the model geometry, does check
+    ///
+    void setModelGeometry(std::shared_ptr<Geometry> geom) override;
+
+    ///
     /// \brief Configure the model
     ///
     // TODO: Setting of mass and gravity has to happen somewhere.
     void configure(const std::shared_ptr<Geometry>              geom,
                    const std::shared_ptr<RigidBodyPropertyDesc> matProperty,
                    const RigidBodyType                          type = RigidBodyType::Kinematic);
-
-    ///
-    /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
-    ///
-    void setModelGeometry(std::shared_ptr<Geometry> g);
-    std::shared_ptr<Geometry> getModelGeometry() const { return m_geometry; }
 
     ///
     /// \brief Update the model geometry from the newest rigid body state
@@ -142,7 +141,6 @@ public:
     }
 
 protected:
-    std::shared_ptr<Geometry> m_geometry;   ///> Geometry on which the rigid model operates on
     std::shared_ptr<RigidBodyPropertyDesc> m_material;
     PxRigidDynamic* m_pxDynamicActor = NULL;
     PxRigidStatic*  m_pxStaticActor  = NULL;
