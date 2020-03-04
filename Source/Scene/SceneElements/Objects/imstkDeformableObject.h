@@ -39,15 +39,15 @@ class GeometryMap;
 ///
 /// \brief Scene objects that can deform
 ///
-class DeformableObject : public DynamicObject<VectorizedState>
+class DeformableObject : public DynamicObject
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    DeformableObject(const std::string& name) : DynamicObject<VectorizedState>(name) { m_type = Type::FEMDeformable; }
-    DeformableObject(std::string&& name) : DynamicObject<VectorizedState>(std::move(name)) { m_type = Type::FEMDeformable; }
+    DeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
+    DeformableObject(std::string&& name) : DynamicObject(std::move(name)) { m_type = Type::FEMDeformable; }
     DeformableObject() = delete;
 
     ///
