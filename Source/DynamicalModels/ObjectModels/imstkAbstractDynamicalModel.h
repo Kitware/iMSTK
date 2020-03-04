@@ -139,9 +139,9 @@ public:
     TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
 
 protected:
-    DynamicalModelType m_type;          ///> Mathematical model type
+    DynamicalModelType m_type;            ///> Mathematical model type
 
-    std::size_t m_numDOF;               ///> Total number of degree of freedom
+    std::size_t m_numDOF;                 ///> Total number of degree of freedom
 
     std::shared_ptr<Geometry> m_geometry; ///> Physics geometry of the model
 
