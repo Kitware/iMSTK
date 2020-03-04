@@ -33,7 +33,7 @@ namespace imstk
 /// \brief Base class for scene objects that move and/or deform under position
 /// based dynamics formulation
 ///
-class SPHObject : public DynamicObject<SPHKinematicState>
+class SPHObject : public DynamicObject
 {
 public:
     ///

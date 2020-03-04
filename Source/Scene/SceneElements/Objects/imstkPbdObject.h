@@ -39,18 +39,18 @@ class PbdModel;
 /// \brief Base class for scene objects that move and/or deform under position
 /// based dynamics formulation
 ///
-class PbdObject : public DynamicObject<PbdState>
+class PbdObject : public DynamicObject
 {
 public:
     ///
     /// \brief Constructor
     ///
-    PbdObject(const std::string& name) : DynamicObject<PbdState>(name)
+    PbdObject(const std::string& name) : DynamicObject(name)
     {
         m_type = SceneObject::Type::Pbd;
     }
 
-    PbdObject(std::string&& name) : DynamicObject<PbdState>(std::move(name))
+    PbdObject(std::string&& name) : DynamicObject(std::move(name))
     {
         m_type = SceneObject::Type::Pbd;
     }
