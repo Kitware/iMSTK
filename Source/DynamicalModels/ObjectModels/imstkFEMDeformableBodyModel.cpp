@@ -35,6 +35,11 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
     DynamicalModel(DynamicalModelType::elastoDynamics)
 {
     m_fixedNodeIds.reserve(1000);
+
+    m_validGeometryTypes = {
+        Geometry::Type::TetrahedralMesh,
+        Geometry::Type::HexahedralMesh
+    };
 }
 
 FEMDeformableBodyModel::~FEMDeformableBodyModel()

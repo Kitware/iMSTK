@@ -55,23 +55,21 @@ public:
     ///
     /// \brief Constructor
     ///
-    RigidBodyModel() : DynamicalModel(DynamicalModelType::rigidBodyDynamics) {};
+    RigidBodyModel() : DynamicalModel(DynamicalModelType::rigidBodyDynamics)
+    {
+        m_validGeometryTypes = {
+            Geometry::Type::Plane,
+            Geometry::Type::Sphere,
+            Geometry::Type::Cube,
+            Geometry::Type::SurfaceMesh
+        };
+    };
     ~RigidBodyModel() = default;
 
     ///
     /// \brief Initialize the physx dynamic model
     ///
     bool initialize() override;
-
-    ///
-    /// \brief Check if unsupported geometries are supplied
-    ///
-    bool isGeometryValid(const std::shared_ptr<Geometry> g) const;
-
-    ///
-    /// \brief Sets the model geometry, does check
-    ///
-    void setModelGeometry(std::shared_ptr<Geometry> geom) override;
 
     ///
     /// \brief Configure the model

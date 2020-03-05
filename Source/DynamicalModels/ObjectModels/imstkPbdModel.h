@@ -86,7 +86,16 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdModel() : DynamicalModel(DynamicalModelType::positionBasedDynamics) {}
+    PbdModel() : DynamicalModel(DynamicalModelType::positionBasedDynamics)
+    {
+        m_validGeometryTypes = {
+            Geometry::Type::PointSet,
+            Geometry::Type::LineMesh,
+            Geometry::Type::SurfaceMesh,
+            Geometry::Type::TetrahedralMesh,
+            Geometry::Type::HexahedralMesh
+        };
+    }
 
     ///
     /// \brief Destructor

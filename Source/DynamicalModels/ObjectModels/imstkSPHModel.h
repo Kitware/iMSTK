@@ -91,7 +91,10 @@ public:
     ///
     /// \brief Constructor
     ///
-    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SPH) {}
+    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SPH)
+    {
+        m_validGeometryTypes = { Geometry::Type::PointSet };
+    }
 
     ///
     /// \brief Destructor

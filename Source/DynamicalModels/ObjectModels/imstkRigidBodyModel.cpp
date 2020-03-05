@@ -254,45 +254,6 @@ RigidBodyModel::createMesh()
     }
 }
 
-bool
-RigidBodyModel::isGeometryValid(const std::shared_ptr<Geometry> geom) const
-{
-    if (geom)
-    {
-        auto geoType = geom->getType();
-        if (geoType == Geometry::Type::Plane
-            || geoType == Geometry::Type::Sphere
-            || geoType == Geometry::Type::Cube
-            || geoType == Geometry::Type::SurfaceMesh)
-        {
-            return true;
-        }
-        else
-        {
-            LOG(WARNING) << "The m_geometry is not supported!!";
-        }
-    }
-    else
-    {
-        LOG(WARNING) << "The m_geometry is not a valid pointer";
-    }
-
-    return false;
-}
-
-void
-RigidBodyModel::setModelGeometry(std::shared_ptr<Geometry> geom)
-{
-    if (isGeometryValid(geom))
-    {
-        m_geometry = geom;
-    }
-    else
-    {
-        LOG(FATAL) << "Geometry type not supported for Rigid body model!";
-    }
-}
-
 //TODO: Have to implement update physics geometry
 void
 RigidBodyModel::updatePhysicsGeometry()
