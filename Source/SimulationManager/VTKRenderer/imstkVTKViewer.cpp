@@ -46,6 +46,7 @@ VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*=
         m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
         m_vtkRenderWindow->SetInteractor(vtkInteractor);
         m_vtkRenderWindow->SetSize(1000, 800);
+        m_vtkRenderWindow->SetSize(1000, 800);
 
         // Screen capture
         m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
@@ -205,6 +206,15 @@ void
 VTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
 {
     this->getActiveRenderer()->updateBackground(color1, color2, gradientBackground);
+}
+
+void
+VTKViewer::setWindowTitle(const std::string& title)
+{
+    if (m_vtkRenderWindow)
+    {
+        m_vtkRenderWindow->SetWindowName(title.c_str());
+    }
 }
 
 const std::shared_ptr<VTKTextStatusManager>&

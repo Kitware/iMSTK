@@ -227,28 +227,18 @@ createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 /// \brief Print number of updates for second for a given scene
 ///
 void
-printUPS(std::shared_ptr<SceneManager> sceneManager, std::shared_ptr<UPSCounter>& ups)
+printUPS(std::shared_ptr<SceneManager> sceneManager)
 {
-    sceneManager->setPreInitCallback([](Module* module)
-            {
-                LOG(INFO) << "Pre initialization of " << module->getName() << " module";
-    });
+    if (!sceneManager)
+    {
+        LOG(WARNING) << "APIUtilities::printUPS - scene manager is not valid! Unable to print UPS";
+        return;
+    }
 
-    sceneManager->setPreUpdateCallback([&ups](Module* module)
+    sceneManager->setPostUpdateCallback([&sceneManager](Module* module)
             {
-                ups->setStartPointOfUpdate();
-    });
-
-    sceneManager->setPostUpdateCallback([&ups](Module* module)
-            {
-                ups->setEndPointOfUpdate();
                 std::cout << "\r" << module->getName() << " running at "
-                          << ups->getUPS() << " ups   " << std::flush;
-    });
-
-    sceneManager->setPostCleanUpCallback([](Module* module)
-            {
-                LOG(INFO) << "\nPost cleanup of " << module->getName() << " module";
+                          << sceneManager->getUPS() << " ups   " << std::flush;
     });
 }
 

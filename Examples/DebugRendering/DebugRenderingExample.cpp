@@ -182,7 +182,7 @@ main()
     }
 
     // Run
-    simManager->startSimulation(SimulationStatus::RUNNING);
+    simManager->start();
 
     return 0;
 }

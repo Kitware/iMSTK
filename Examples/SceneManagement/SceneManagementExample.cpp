@@ -46,29 +46,29 @@ main()
     LOG(INFO) << "-- Test scene switch";
     int delay = 5;
     simManager->setActiveScene(scene1);
-    simManager->startSimulation();
+    simManager->start();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     simManager->setActiveScene(scene2, false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     simManager->setActiveScene(scene1, true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->endSimulation();
+    simManager->end();
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
     simManager->setActiveScene(scene2);
-    simManager->startSimulation();
+    simManager->start();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->pauseSimulation();
+    simManager->pause();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->runSimulation();
+    simManager->run();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->pauseSimulation();
+    simManager->pause();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->endSimulation();
+    simManager->end();
 
     // Quit
-    while (simManager->getStatus() != SimulationStatus::INACTIVE) {}
+    while (simManager->getStatus() != SimulationStatus::inactive) {}
 
     return 0;
 }

@@ -99,7 +99,7 @@ main()
         };
     simManager->getSceneManager(scene)->setPreUpdateCallback(updateFunc);
     // Run
-    simManager->startSimulation();
+    simManager->start();
 
     return 0;
 }
