@@ -57,8 +57,8 @@ SPHModelConfig::initialize()
 bool
 SPHModel::initialize()
 {
-    LOG_IF(FATAL, (!m_pointSetGeometry)) << "Model geometry is not yet set! Cannot initialize without model geometry.";
-    m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_pointSetGeometry);
+    LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
+    m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
 
     // Initialize  positions and velocity of the particles
     this->m_initialState = std::make_shared<SPHKinematicState>();
