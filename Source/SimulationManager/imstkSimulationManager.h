@@ -83,8 +83,8 @@ struct simManagerConfig
     // states
     SimulationMode simulationMode   = SimulationMode::rendering;
     SimulationStatus startingStatus = SimulationStatus::running;
-    bool VR_Enabled         = false;
-    bool startInPausedState = false;
+    bool VR_Enabled                 = false;
+    bool startInPausedState         = false;
 
     // 0 indicates that an optimal size will be used
     unsigned int threadPoolSize = 0;
