@@ -27,7 +27,7 @@ namespace imstk
 void
 Module::start()
 {
-    if (m_status != ModuleStatus::INACTIVE)
+    if (m_status != ModuleStatus::inactive)
     {
         LOG(WARNING) << "Can not start '" << m_name << "'.\n"
                      << "Module already/still active.";
@@ -35,7 +35,7 @@ Module::start()
     }
 
     // Init
-    m_status = ModuleStatus::STARTING;
+    m_status = ModuleStatus::starting;
     if (m_preInitCallback)
     {
         m_preInitCallback(this);
@@ -48,19 +48,19 @@ Module::start()
         m_postInitCallback(this);
     }
 
-    m_status = ModuleStatus::RUNNING;
+    m_status = ModuleStatus::running;
 
     // Keep active, wait for terminating call
     std::chrono::steady_clock::time_point previous_t = std::chrono::steady_clock::now() - std::chrono::minutes(1);
     std::chrono::steady_clock::time_point current_t;
     long long                             elapsed;
-    while (m_status != ModuleStatus::TERMINATING)
+    while (m_status != ModuleStatus::terminating)
     {
-        if (m_status == ModuleStatus::PAUSING)
+        if (m_status == ModuleStatus::pausing)
         {
-            m_status = ModuleStatus::PAUSED;
+            m_status = ModuleStatus::paused;
         }
-        else if (m_status == ModuleStatus::RUNNING)
+        else if (m_status == ModuleStatus::running)
         {
             // Short path to run module if loop delay = 0
             // (updating as fast as possible)
@@ -121,28 +121,28 @@ Module::start()
         }
     }
 
-    m_status = ModuleStatus::INACTIVE;
+    m_status = ModuleStatus::inactive;
 }
 
 void
 Module::run()
 {
-    if (m_status != ModuleStatus::PAUSED)
+    if (m_status != ModuleStatus::paused)
     {
         return;
     }
 
-    m_status = ModuleStatus::RUNNING;
+    m_status = ModuleStatus::running;
 }
 
 void
 Module::pause()
 {
-    if (m_status == ModuleStatus::RUNNING)
+    if (m_status == ModuleStatus::running)
     {
-        m_status = ModuleStatus::PAUSING;
+        m_status = ModuleStatus::pausing;
 
-        while (m_status != ModuleStatus::PAUSED) {}
+        while (m_status != ModuleStatus::paused) {}
     }
 }
 
@@ -162,17 +162,17 @@ Module::end()
         m_postCleanUpCallback(this);
     }
 
-    if ((m_status == ModuleStatus::INACTIVE)
-        || (m_status == ModuleStatus::TERMINATING))
+    if ((m_status == ModuleStatus::inactive)
+        || (m_status == ModuleStatus::terminating))
     {
         LOG(WARNING) << "Can not end '" << m_name << "'.\n"
                      << "Module already inactive or terminating.";
         return;
     }
 
-    m_status = ModuleStatus::TERMINATING;
+    m_status = ModuleStatus::terminating;
 
-    while (m_status != ModuleStatus::INACTIVE) {}
+    while (m_status != ModuleStatus::inactive) {}
 }
 
 ModuleStatus
@@ -236,7 +236,7 @@ Module::setFrequency(const double f)
 unsigned int
 Module::getUPS()
 {
-    if (m_status != ModuleStatus::RUNNING)
+    if (m_status != ModuleStatus::running)
     {
         return 0;
     }

@@ -83,7 +83,7 @@ struct simManagerConfig
 
     // states
     SimulationMode simulationMode = SimulationMode::rendering;
-    SimulationStatus startingStatus = SimulationStatus::RUNNING;
+    SimulationStatus startingStatus = SimulationStatus::running;
     bool VR_Enabled = false;
     bool startInPausedState = false;
 
@@ -219,7 +219,7 @@ public:
     /// and returned. In rendering and runInBackground modes the simulation manager
     /// module gets launched and an never returns
     ///
-    void start(const SimulationStatus simStatus = SimulationStatus::RUNNING,
+    void start(const SimulationStatus simStatus = SimulationStatus::running,
                const Renderer::Mode   renderMode = Renderer::Mode::SIMULATION);
 
     ///
@@ -327,7 +327,7 @@ private:
     std::vector<callbackKeyPair> m_kepPressCallbacks;
 
     // states
-    SimulationStatus m_status = SimulationStatus::INACTIVE;
+    SimulationStatus m_status = SimulationStatus::inactive;
     bool m_simulationStarted  = false;
     bool m_initialized        = false;
 

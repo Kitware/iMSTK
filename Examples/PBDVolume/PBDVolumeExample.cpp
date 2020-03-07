@@ -107,7 +107,7 @@ main()
 
     simManager->setActiveScene(scene);
     simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::paused);
 
     return 0;
 }

@@ -469,7 +469,7 @@ main()
     }
 
     // Run
-    simManager->start(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::paused);
 
     return 0;
 }

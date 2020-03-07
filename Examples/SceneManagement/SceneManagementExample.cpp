@@ -68,7 +68,7 @@ main()
     simManager->end();
 
     // Quit
-    while (simManager->getStatus() != SimulationStatus::INACTIVE) {}
+    while (simManager->getStatus() != SimulationStatus::inactive) {}
 
     return 0;
 }

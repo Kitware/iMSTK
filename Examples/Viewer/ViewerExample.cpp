@@ -63,7 +63,7 @@ main()
 
     // Run
     simManager->setActiveScene(sceneTest);
-    simManager->start(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::paused);
 
     return 0;
 }

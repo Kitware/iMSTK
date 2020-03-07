@@ -94,7 +94,7 @@ VTKInteractorStyle::OnTimer()
         if (t > 250) //wait 250ms before updating displayed value
         {
             double physicalFPS;
-            if (m_simManager->getStatus() != SimulationStatus::PAUSED)
+            if (m_simManager->getStatus() != SimulationStatus::paused)
             {
                 physicalFPS = m_simManager->getActiveScene()->getFPS();
             }
@@ -143,23 +143,23 @@ VTKInteractorStyle::OnChar()
     if (key == ' ')
     {
         // pause simulation
-        if (status == SimulationStatus::RUNNING)
+        if (status == SimulationStatus::running)
         {
             m_simManager->pause();
         }
         // play simulation
-        else if (status == SimulationStatus::PAUSED)
+        else if (status == SimulationStatus::paused)
         {
             m_simManager->run();
         }
         // Launch simulation if inactive
-        if (status == SimulationStatus::INACTIVE)
+        if (status == SimulationStatus::inactive)
         {
             m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
-            m_simManager->start(SimulationStatus::RUNNING);
+            m_simManager->start(SimulationStatus::running);
         }
     }
-    else if (status != SimulationStatus::INACTIVE
+    else if (status != SimulationStatus::inactive
              && (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
     {
         m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, false);
