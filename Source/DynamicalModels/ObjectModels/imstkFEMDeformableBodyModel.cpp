@@ -35,6 +35,11 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
     DynamicalModel(DynamicalModelType::elastoDynamics)
 {
     m_fixedNodeIds.reserve(1000);
+
+    m_validGeometryTypes = {
+        Geometry::Type::TetrahedralMesh,
+        Geometry::Type::HexahedralMesh
+    };
 }
 
 FEMDeformableBodyModel::~FEMDeformableBodyModel()
@@ -170,23 +175,11 @@ FEMDeformableBodyModel::getTimeIntegrator() const
     return m_timeIntegrator;
 }
 
-void
-FEMDeformableBodyModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
-{
-    m_forceModelGeometry = geometry;
-}
-
-std::shared_ptr<imstk::Geometry>
-FEMDeformableBodyModel::getModelGeometry()
-{
-    return m_forceModelGeometry;
-}
-
 bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
-    if (!m_forceModelGeometry || !m_FEModelConfig)
+    if (!m_geometry || !m_FEModelConfig)
     {
         LOG(FATAL) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
         return false;
@@ -332,7 +325,7 @@ FEMDeformableBodyModel::initializeForceModel()
 bool
 FEMDeformableBodyModel::initializeMassMatrix()
 {
-    if (!m_forceModelGeometry)
+    if (!m_geometry)
     {
         LOG(FATAL) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
         return false;
@@ -369,7 +362,7 @@ FEMDeformableBodyModel::initializeDampingMatrix()
         return false;
     }
 
-    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
+    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
     //std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
 
     auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(m_vegaPhysicsMesh.get()));
@@ -651,7 +644,7 @@ FEMDeformableBodyModel::updateMassMatrix()
 void
 FEMDeformableBodyModel::updatePhysicsGeometry()
 {
-    auto  volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
+    auto  volMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
     auto& u       = m_currentState->getQ();
     volMesh->setVertexDisplacements(u);
 }

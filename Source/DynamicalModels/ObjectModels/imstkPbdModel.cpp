@@ -62,13 +62,14 @@ PbdModel::configure(const std::shared_ptr<PBDModelConfig>& params)
     LOG_IF(FATAL, (!this->getModelGeometry())) << "PbdModel::configure - Set PBD Model geometry before configuration!";
 
     m_Parameters = params;
-    this->setNumDegreeOfFreedom(this->getModelGeometry()->getNumVertices() * 3);
+    this->setNumDegreeOfFreedom(std::dynamic_pointer_cast<PointSet>(m_geometry)->getNumVertices() * 3);
 }
 
 bool
 PbdModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
+    m_mesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
 
     m_initialState  = std::make_shared<PbdState>();
     m_previousState = std::make_shared<PbdState>();

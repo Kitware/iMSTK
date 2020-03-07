@@ -21,7 +21,9 @@
 
 #pragma once
 
+#include "imstkGeometry.h"
 #include "imstkVectorizedState.h"
+#include <set>
 #include <string>
 
 namespace imstk
@@ -72,7 +74,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type), m_numDOF(0) { }
+    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type), m_numDOF(0) {}
 
     ///
     /// \brief Destructor
@@ -111,6 +113,21 @@ public:
     virtual void setTimeStep(const double timeStep) = 0;
 
     ///
+    /// \brief Sets the model geometry
+    ///
+    void setModelGeometry(std::shared_ptr<Geometry> geometry);
+
+    ///
+    /// \brief Checks if the given geometry is a valid geometry type for the model
+    ///
+    bool isGeometryValid(const std::shared_ptr<Geometry> geometry);
+
+    ///
+    /// \brief Gets the model geometry
+    ///
+    std::shared_ptr<Geometry> getModelGeometry() const { return m_geometry; }
+
+    ///
     /// \brief Returns the time step size
     ///
     virtual double getTimeStep() const = 0;
@@ -127,9 +144,12 @@ public:
     TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
 
 protected:
-    DynamicalModelType m_type;     ///> Mathematical model type
+    DynamicalModelType m_type;                      ///> Mathematical model type
 
-    std::size_t m_numDOF;          ///> Total number of degree of freedom
+    std::size_t m_numDOF;                           ///> Total number of degree of freedom
+
+    std::shared_ptr<Geometry> m_geometry;           ///> Physics geometry of the model
+    std::set<Geometry::Type>  m_validGeometryTypes; ///> Valid geometry types of this model
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
 };

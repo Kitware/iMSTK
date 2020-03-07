@@ -87,8 +87,6 @@ public:
     ///
     void reset() override;
 
-    void setPbdModel(const std::shared_ptr<PbdModel>& model) { m_pbdModel = model; }
-
 protected:
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };

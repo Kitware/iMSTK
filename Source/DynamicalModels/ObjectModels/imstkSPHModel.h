@@ -91,7 +91,10 @@ public:
     ///
     /// \brief Constructor
     ///
-    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SPH) {}
+    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SPH)
+    {
+        m_validGeometryTypes = { Geometry::Type::PointSet };
+    }
 
     ///
     /// \brief Destructor
@@ -102,11 +105,6 @@ public:
     /// \brief Set simulation parameters
     ///
     void configure(const std::shared_ptr<SPHModelConfig>& params) { m_modelParameters = params; }
-
-    ///
-    /// \brief Set the geometry (particle positions)
-    ///
-    void setModelGeometry(const std::shared_ptr<PointSet>& geo) { m_geometry = geo; }
 
     ///
     /// \brief Initialize the dynamical model
@@ -121,8 +119,7 @@ public:
     ///
     /// \brief Update positions of point set geometry
     ///
-    virtual void updatePhysicsGeometry() override
-    { assert(m_geometry); m_geometry->setVertexPositions(this->m_currentState->getPositions()); }
+    virtual void updatePhysicsGeometry() override;
 
     ///
     /// \brief Reset the current state to the initial state
@@ -246,7 +243,7 @@ private:
     ///
     void moveParticles(const Real timestep);
 
-    std::shared_ptr<PointSet> m_geometry;
+    std::shared_ptr<PointSet> m_pointSetGeometry;
     SPHSimulationState        m_simulationState;
 
     Real m_dt;                                          ///> time step size
