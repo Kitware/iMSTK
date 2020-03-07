@@ -133,5 +133,5 @@ main()
 
     // Start simulation
     simManager->setActiveScene(scene);
-    simManager->startSimulation();
+    simManager->start();
 }

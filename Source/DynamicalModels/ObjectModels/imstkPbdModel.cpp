@@ -149,6 +149,8 @@ PbdModel::initialize()
     // Partition constraints for parallel computation
     partitionConstraints();
 
+    this->setTimeStepSizeType(m_timeStepSizeType);
+
     return bOK;
 }
 
@@ -674,7 +676,7 @@ PbdModel::updateVelocity()
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)
         {
-            if (std::abs(m_invMass[i]) > MIN_REAL)
+            if (std::abs(m_invMass[i]) > MIN_REAL && m_Parameters->m_dt > 0.)
             {
                 vel[i] = (pos[i] - prevPos[i]) / m_Parameters->m_dt;
             }

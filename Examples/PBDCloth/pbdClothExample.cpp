@@ -138,7 +138,7 @@ main()
 
     // Start
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::RUNNING);
+    simManager->start(SimulationStatus::paused);
 
     return 0;
 }

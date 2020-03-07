@@ -47,7 +47,7 @@ struct PBDModelConfig
     double m_proximity        = 0.1;                                          ///> Proximity for collisions
 
     unsigned int m_maxIter = 10;                                              ///> Max. pbd iterations
-    double m_dt            = 0.01;                                            ///> Time step size
+    double m_dt            = 0.0;                                             ///> Time step size
     double m_DefaultDt     = 0.01;                                            ///> Default Time step size
 
     std::vector<std::size_t> m_fixedNodeIds;                                  ///> Nodal IDs of the nodes that are fixed

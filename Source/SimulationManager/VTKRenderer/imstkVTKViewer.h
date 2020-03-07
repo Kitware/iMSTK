@@ -105,6 +105,8 @@ public:
     virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
                                      const bool gradientBackground = false) override;
 
+    virtual void setWindowTitle(const std::string& title);
+
     ///
     /// \brief Return the window status handler
     ///

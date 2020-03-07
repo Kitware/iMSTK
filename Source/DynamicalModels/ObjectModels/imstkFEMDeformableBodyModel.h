@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "Eigen/Sparse"
 
-#include "imstkGeometry.h"
 #include "imstkDynamicalModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
@@ -47,7 +44,7 @@ namespace imstk
 {
 struct FEMModelConfig
 {
-    FEMMethodType m_femMethod = FEMMethodType::StVK;
+    FEMMethodType m_femMethod = FEMMethodType::Invertible;
     HyperElasticMaterialType m_hyperElasticMaterialType = HyperElasticMaterialType::StVK;
 
     // file names (remove from here?)
@@ -62,7 +59,7 @@ struct FEMModelConfig
     double m_inversionThreshold          = -std::numeric_limits<double>::max();
     double m_gravity = 9.81;
 
-    // remove from here ?
+    // \todo remove from here ?
     int m_numberOfThreads = 4;
 };
 

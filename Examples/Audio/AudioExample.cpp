@@ -66,7 +66,7 @@ playSound(const std::string& filename)
 
         // Move the listener away
         listnerPos += Vec3d(.2, .2, .2);
-        sf::Listener::setPosition(listnerPos.x(), listnerPos.y(), listnerPos.z());
+        sf::Listener::setPosition((float)listnerPos.x(), (float)listnerPos.y(), (float)listnerPos.z());
 
         // Display the playing position
         std::cout << "\rPlaying... " << sound.getPlayingOffset().asSeconds() << " sec        ";
