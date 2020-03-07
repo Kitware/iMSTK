@@ -326,6 +326,12 @@ Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller
 void
 Scene::reset()
 {
+    m_resetRequested = true;
+}
+
+void
+Scene::resetSceneObjects()
+{
     // Apply the geometry and apply maps to all the objects
     for (auto obj : this->getSceneObjects())
     {
@@ -338,6 +344,14 @@ Scene::reset()
             obj->reset();
         }
     }
+
+    // Apply the geometry and apply maps to all the objects
+    for (auto obj : this->getSceneObjects())
+    {
+        obj->updateGeometries();
+    }
+
+    //\todo reset the timestep to the fixed default value when paused->run or reset
 }
 
 void
@@ -440,6 +454,13 @@ Scene::advance(const double dt)
                 }
             }
         }
+    }
+
+    if (m_resetRequested)
+    {        
+        resetSceneObjects();
+        //\note May need to reset CD, CH and other components of the scene in the future
+        m_resetRequested = false;
     }
 
     this->setFPS(1.0 / dt);

@@ -77,6 +77,6 @@ protected:
     void startModuleInNewThread(std::shared_ptr<Module> module);
 
     std::shared_ptr<Scene> m_scene;                           ///> Scene that is being managed
-    std::unordered_map<std::string, std::thread> m_threadMap; ///>
+    std::unordered_map<std::string, std::thread> m_threadMap; ///>        
 };
 } // imstk

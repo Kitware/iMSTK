@@ -718,6 +718,11 @@ SimulationManager::reset()
         if (s.second->isInitialized())
         {
             s.second->reset();
+
+            if (m_status == SimulationStatus::PAUSED)
+            {
+                s.second->resetSceneObjects();
+            }
         }
     }
 }

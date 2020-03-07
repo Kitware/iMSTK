@@ -92,6 +92,7 @@ public:
     /// \brief Reset the scene
     ///
     void reset();
+    void resetSceneObjects();
 
     ///
     /// \brief Advance the scene from current to next frame
@@ -229,5 +230,7 @@ protected:
     double elapsedTime = 0.0;
 
     bool m_isInitialized = false;
+
+    std::atomic_bool m_resetRequested = false;
 };
 } // imstk
