@@ -738,7 +738,7 @@ SimulationManager::end()
 
 void
 SimulationManager::endModules()
-{    
+{
     m_status = SimulationStatus::terminating;
 
     // End modules
@@ -748,7 +748,7 @@ SimulationManager::endModules()
         m_threadMap.at(pair.first).join();
     }
 
-    // End all scene managers (if any)   
+    // End all scene managers (if any)
     for (auto pair : m_sceneManagerMap)
     {
         std::string  sceneName   = pair.first;

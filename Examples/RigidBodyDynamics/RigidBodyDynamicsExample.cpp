@@ -187,7 +187,7 @@ main()
 
     addPlaneRigidObject(scene);
     addSphereRigidObject(scene, Vec3d(0., 200, 0.));
-    auto rigidObj     = addMeshRigidObject(std::string("dragon"), scene, Vec3d(0., 30., 0.));
+    auto rigidObj = addMeshRigidObject(std::string("dragon"), scene, Vec3d(0., 30., 0.));
 
     // Set Camera configuration
     auto cam = scene->getCamera();

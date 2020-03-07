@@ -72,7 +72,6 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
 
     // Set the parameters
     pbdModel->configure(pbdParams);
-    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::realTime);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);

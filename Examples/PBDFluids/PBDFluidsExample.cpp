@@ -72,13 +72,14 @@ main()
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt               = 0.005;
+    pbdParams->m_dt               = 0.05;
     pbdParams->m_maxIter          = 2;
-    pbdParams->m_proximity        = 0.1;
-    pbdParams->m_contactStiffness = 1.0;
+    pbdParams->m_proximity        = 0.01;
+    pbdParams->m_contactStiffness = 0.2;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
+    pbdModel->setTimeStepSizeType(TimeSteppingType::fixed);
     deformableObj->setDynamicalModel(pbdModel);
 
     scene->addSceneObject(deformableObj);

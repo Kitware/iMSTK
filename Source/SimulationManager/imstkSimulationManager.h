@@ -45,7 +45,6 @@ using SimulationStatus = ModuleStatus;
 template<class T>
 using SceneNameMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
-
 ///
 /// \brief Simulation manager mode
 /// \note The mode is set at the time of initialization
@@ -75,16 +74,16 @@ enum class SimulationMode
 struct simManagerConfig
 {
     // logger
-    std::string logPath = "./";
+    std::string logPath       = "./";
     std::string logFilePrefix = "simulation";
 
     // Name
     std::string simulationName = "imstk";
 
     // states
-    SimulationMode simulationMode = SimulationMode::rendering;
+    SimulationMode simulationMode   = SimulationMode::rendering;
     SimulationStatus startingStatus = SimulationStatus::running;
-    bool VR_Enabled = false;
+    bool VR_Enabled         = false;
     bool startInPausedState = false;
 
     // 0 indicates that an optimal size will be used
@@ -105,7 +104,7 @@ using keyPressCallback = std::function<void(void)>;
 public:
     ///
     /// \brief Constructor
-    ///    
+    ///
     SimulationManager(const std::shared_ptr<simManagerConfig> config = std::make_shared<simManagerConfig>());
 
     ///
@@ -160,7 +159,7 @@ public:
     ///
     /// \brief Create a new scene with a given name
     ///
-    std::shared_ptr<Scene> createNewScene(const std::string&                  newSceneName,
+    std::shared_ptr<Scene> createNewScene(const std::string&           newSceneName,
                                           std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
 
     ///

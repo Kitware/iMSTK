@@ -147,7 +147,7 @@ PbdModel::initialize()
 
     // Partition constraints for parallel computation
     partitionConstraints();
-    
+
     this->setTimeStepSizeType(m_timeStepSizeType);
 
     return bOK;

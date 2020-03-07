@@ -80,7 +80,7 @@ main()
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity          = Vec3d(0, -10.0, 0);
-    pbdParams->m_dt               = 0.01;
+    pbdParams->m_dt               = 0.02;
     pbdParams->m_maxIter          = 5;
     pbdParams->m_proximity        = 0.3;
     pbdParams->m_contactStiffness = 0.1;

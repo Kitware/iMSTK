@@ -83,9 +83,9 @@ main()
     config->m_fixedNodeIds = { 51, 127, 178 };
     dynaModel->configure(config);
 
-    dynaModel->setTimeStepSizeType(TimeSteppingType::realTime);
+    dynaModel->setTimeStepSizeType(TimeSteppingType::fixed);
     dynaModel->setModelGeometry(volTetMesh);
-    auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.05);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     auto material = std::make_shared<RenderMaterial>();

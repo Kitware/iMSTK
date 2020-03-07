@@ -457,7 +457,7 @@ Scene::advance(const double dt)
     }
 
     if (m_resetRequested)
-    {        
+    {
         resetSceneObjects();
         //\note May need to reset CD, CH and other components of the scene in the future
         m_resetRequested = false;

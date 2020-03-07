@@ -78,7 +78,8 @@ main()
 
     // Set the parameters
     pbdModel->configure(pbdParams);
-    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::realTime);
+    pbdModel->setDefaultTimeStep(0.02);
+    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::fixed);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
