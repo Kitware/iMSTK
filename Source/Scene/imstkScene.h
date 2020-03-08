@@ -231,6 +231,6 @@ protected:
 
     bool m_isInitialized = false;
 
-    std::atomic_bool m_resetRequested = false;
+    std::atomic<bool> m_resetRequested = false;
 };
 } // imstk
