@@ -105,6 +105,9 @@ public:
     virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
                                      const bool gradientBackground = false) override;
 
+    ///
+    /// \brief set the window title
+    ///
     virtual void setWindowTitle(const std::string& title);
 
     ///
@@ -115,7 +118,8 @@ public:
 protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
-    bool m_enableVR;
+    bool        m_enableVR;
+    std::string m_windowName = "imstk";
 
 #ifdef iMSTK_ENABLE_VR
     vtkSmartPointer<OpenVRCommand> m_openVRCommand;
