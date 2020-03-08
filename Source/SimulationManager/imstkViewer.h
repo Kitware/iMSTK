@@ -87,6 +87,9 @@ public:
     ///
     const std::shared_ptr<Renderer>& getActiveRenderer() const;
 
+    ///
+    /// \brief Set a string to be the title for the render window
+    ///
     virtual void setWindowTitle(const std::string& title) = 0;
 
     ///
