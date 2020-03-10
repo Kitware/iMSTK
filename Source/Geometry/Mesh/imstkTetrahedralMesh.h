@@ -26,6 +26,8 @@
 #include <iostream>
 
 // imstk
+#include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVolumetricMesh.h"
 
 namespace imstk
@@ -121,6 +123,22 @@ public:
     void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
 
+    ///
+    /// \brief Create a tetrahedral mesh based on a uniform Cartesian mesh
+    /// See "How to Subdivide Pyramids, Prisms and Hexahedra into Tetrahedra" by Julien Dompierre, etc.
+    //
+    /// \param aabbMin  the small conner of a box
+    /// \param aabbMax  the large conner of a box
+    /// \param nx number of elements in the x-direction
+    /// \param ny number of elements in the y-direction
+    /// \param nz number of elements in the z-direction
+    ///
+    // static std::unique_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx, const size_t ny, const size_t nz);
+    static std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx, const size_t ny, const size_t nz);
+    // NOTE: surfMesh can't be const since the non-const member function rayTracing is called inside.
+    static std::shared_ptr<TetrahedralMesh> createEnclosingMesh(SurfaceMesh& surfMesh, const size_t nx, const size_t ny, size_t nz);
+
+    void writeVTK(const std::string& fname) const;
 protected:
 
     friend class VTKTetrahedralMeshRenderDelegate;

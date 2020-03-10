@@ -48,7 +48,7 @@ TetraTriangleMap::compute()
     if (!m_bBoxAvailable)
     {
         // calling this function inside findEnclosingTetrahedron is not thread-safe.
-        m_updateBoundingBox();
+        updateBoundingBox();
     }
 
     ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexIdx) {
@@ -202,6 +202,7 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 size_t
 TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 {
+
     auto   tetMesh            = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
     double closestDistanceSqr = MAX_D;
     size_t closestTetrahedron = std::numeric_limits<size_t>::max();
@@ -233,6 +234,14 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
+    // if (!m_bBoxAvailable)
+    // {
+    //     ParallelUtils::SpinLock lock;
+    //     lock.lock();
+    //     m_updateBoundingBox();
+    //     lock.unlock();
+    // }
+
     bool inBox;
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
 
@@ -240,7 +249,7 @@ TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 
     size_t enclosingTetrahedron = std::numeric_limits<size_t>::max();
 
-    for (size_t idx = 0; idx < tetMesh->getNumVertices(); ++idx)
+    for (size_t idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {
         inBox = (pos[0] >= m_bBoxMin[idx][0] && pos[0] <= m_bBoxMax[idx][0]) &&
                 (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1]) &&
@@ -263,15 +272,20 @@ TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 }
 
 void
-TetraTriangleMap::m_updateBoundingBox(void)
+TetraTriangleMap::updateBoundingBox(void)
 {
+    // TODO: use parallelFor
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    m_bBoxMin.resize(tetMesh->getNumTetrahedra());
+    m_bBoxMax.resize(tetMesh->getNumTetrahedra());
 
-    for (size_t idx = 0; idx < tetMesh->getNumVertices(); ++idx)
+    for (size_t idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {
         tetMesh->computeTetrahedronBoundingBox(idx, m_bBoxMin[idx], m_bBoxMax[idx]);
     }
+
     m_bBoxAvailable = true;
     return;
 }
+
 }  // namespace imstk

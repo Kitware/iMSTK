@@ -98,6 +98,7 @@ public:
     /// \brief Find the tetrahedron that encloses a given point in 3D space
     ///
     size_t findEnclosingTetrahedron(const Vec3d& pos) const;
+    void updateBoundingBox(void);
 
 protected:
     std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights;  ///> weights
@@ -106,6 +107,6 @@ protected:
     std::vector<Vec3d> m_bBoxMin;
     std::vector<Vec3d> m_bBoxMax;
     bool               m_bBoxAvailable;
-    void               m_updateBoundingBox(void);
+    // void               m_updateBoundingBox(void);
 };
 }  // namespace imstk

@@ -212,6 +212,11 @@ public:
     ///
     size_t getMaxNumTriangles();
 
+    // NOTE: this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
+    // void rayTracing(const StdVectorOfVec3d& coords, std::vector<bool>& isInside) const;
+    void rayTracing(const StdVectorOfVec3d& coords, std::vector<bool>& isInside);
+
+    void writeVTK(const std::string& fname) const;
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;

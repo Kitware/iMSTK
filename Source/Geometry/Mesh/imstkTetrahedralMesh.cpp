@@ -20,6 +20,14 @@
 =========================================================================*/
 
 #include "imstkTetrahedralMesh.h"
+
+#include <cstddef>
+#include <cstdlib>
+#include <fstream>
+#include <limits>
+
+#include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
 //#include "imstkGraph.h"
 
 namespace imstk
@@ -56,10 +64,7 @@ TetrahedralMesh::print() const
     LOG(INFO) << "Tetrahedra:";
     for (auto& tet : m_tetrahedraVertices)
     {
-        LOG(INFO) << tet.at(0) << ", "
-                  << tet.at(1) << ", "
-                  << tet.at(2) << ", "
-                  << tet.at(3);
+        LOG(INFO) << tet.at(0) << ", " << tet.at(1) << ", " << tet.at(2) << ", " << tet.at(3);
     }
 }
 
@@ -76,10 +81,8 @@ TetrahedralMesh::getVolume() const
             v[i] = m_vertexPositions[tetVertices[i]];
         }
 
-        A << v[0][0], v[0][1], v[0][2], 1,
-            v[1][0], v[1][1], v[1][2], 1,
-            v[2][0], v[2][1], v[2][2], 1,
-            v[3][0], v[3][1], v[3][2], 1;
+        A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2],
+                1, v[3][0], v[3][1], v[3][2], 1;
 
         double det = A.determinant();
         if (det < 0)
@@ -99,34 +102,38 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
     this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
     if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
     {
-        LOG(FATAL) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
+        LOG(FATAL) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not "
+                      "extracted.";
     }
 }
 
 bool
-TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const bool enforceWindingConsistency /* = false*/)
+TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                                    const bool enforceWindingConsistency /* = false*/)
 {
     if (!surfaceMesh)
     {
-        LOG(FATAL) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
+        LOG(FATAL) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not "
+                      "instantiated.";
         return false;
     }
 
-    using triArray = SurfaceMesh::TriangleArray;
-    const std::vector<triArray> facePattern = { triArray { { 0, 1, 2 } }, triArray { { 0, 1, 3 } }, triArray { { 0, 2, 3 } }, triArray { { 1, 2, 3 } } };
+    using triArray                          = SurfaceMesh::TriangleArray;
+    const std::vector<triArray> facePattern = {
+            triArray{{0, 1, 2}}, triArray{{0, 1, 3}}, triArray{{0, 2, 3}}, triArray{{1, 2, 3}}};
 
     // Find and store the tetrahedral faces that are unique
     auto                  vertArray = this->getTetrahedraVertices();
     std::vector<triArray> surfaceTri;
     std::vector<size_t>   surfaceTriTet;
     std::vector<size_t>   tetRemainingVert;
-    bool                  unique = true;
+    bool                  unique  = true;
     size_t                foundAt = 0, tetId = 0;
     size_t                a, b, c;
 
     for (auto& tetVertArray : vertArray)
     {
-        //std::cout << "tet: " << tetId << std::endl;
+        // std::cout << "tet: " << tetId << std::endl;
 
         for (int t = 0; t < 4; ++t)
         {
@@ -139,9 +146,12 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, co
             // search in reverse
             for (auto it = surfaceTri.rbegin(); it != surfaceTri.rend(); ++it)
             {
-                if ((((*it)[0] == a) && (((*it)[1] == b && (*it)[2] == c) || ((*it)[1] == c && (*it)[2] == b)))
-                    || (((*it)[1] == a) && (((*it)[0] == b && (*it)[2] == c) || ((*it)[0] == c && (*it)[2] == b)))
-                    || (((*it)[2] == a) && (((*it)[1] == b && (*it)[0] == c) || ((*it)[1] == c && (*it)[0] == b))))
+                if ((((*it)[0] == a) &&
+                     (((*it)[1] == b && (*it)[2] == c) || ((*it)[1] == c && (*it)[2] == b))) ||
+                    (((*it)[1] == a) &&
+                     (((*it)[0] == b && (*it)[2] == c) || ((*it)[0] == c && (*it)[2] == b))) ||
+                    (((*it)[2] == a) &&
+                     (((*it)[1] == b && (*it)[0] == c) || ((*it)[1] == c && (*it)[0] == b))))
                 {
                     unique  = false;
                     foundAt = surfaceTri.size() - 1 - (it - surfaceTri.rbegin());
@@ -151,7 +161,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, co
 
             if (unique)
             {
-                surfaceTri.push_back(triArray { { a, b, c } });
+                surfaceTri.push_back(triArray{{a, b, c}});
                 surfaceTriTet.push_back(tetId);
                 tetRemainingVert.push_back(3 - t);
             }
@@ -237,16 +247,14 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
     }
 
     Mat4d A;
-    A << v[0][0], v[0][1], v[0][2], 1,
-        v[1][0], v[1][1], v[1][2], 1,
-        v[2][0], v[2][1], v[2][2], 1,
-        v[3][0], v[3][1], v[3][2], 1;
+    A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1,
+            v[3][0], v[3][1], v[3][2], 1;
 
     det = A.determinant();
 
     for (int i = 0; i < 4; ++i)
     {
-        Mat4d B = A;
+        Mat4d B    = A;
         B(i, 0)    = pos[0];
         B(i, 1)    = pos[1];
         B(i, 2)    = pos[2];
@@ -262,9 +270,9 @@ TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, 
     auto v3 = m_vertexPositions[m_tetrahedraVertices.at(tetId)[2]];
     auto v4 = m_vertexPositions[m_tetrahedraVertices.at(tetId)[3]];
 
-    std::array<double, 4> arrayx = { v1[0], v2[0], v3[0], v4[0] };
-    std::array<double, 4> arrayy = { v1[1], v2[1], v3[1], v4[1] };
-    std::array<double, 4> arrayz = { v1[2], v2[2], v3[2], v4[2] };
+    std::array<double, 4> arrayx = {v1[0], v2[0], v3[0], v4[0]};
+    std::array<double, 4> arrayy = {v1[1], v2[1], v3[1], v4[1]};
+    std::array<double, 4> arrayz = {v1[2], v2[2], v3[2], v4[2]};
 
     min[0] = *std::min_element(arrayx.begin(), arrayx.end());
     min[1] = *std::min_element(arrayy.begin(), arrayy.end());
@@ -298,4 +306,318 @@ TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraVertices.size();
 }
-} // imstk
+
+// std::unique_ptr<TetrahedralMesh>
+std::shared_ptr<TetrahedralMesh>
+TetrahedralMesh::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx,
+                                   const size_t ny, const size_t nz)
+{
+    Vec3d h = {(aabbMax[0] - aabbMin[0]) / nx,
+               (aabbMax[1] - aabbMin[1]) / ny,
+               (aabbMax[2] - aabbMin[2]) / nz};
+    LOG_IF(FATAL, (h[0] <= 0.0 || h[1] <= 0.0 || h[2] <= 0.0)) << "Invalid bounding box";
+
+    size_t numVertices = (nx + 1) * (ny + 1) * (nz + 1);
+
+    // std::vector<Vec3d> coords;
+    StdVectorOfVec3d coords;
+    coords.resize(numVertices);
+    size_t cnt = 0;
+
+    for (size_t k = 0; k < nz + 1; ++k)
+    {
+        double z = aabbMin[2] + k * h[2];
+        for (size_t j = 0; j < ny + 1; ++j)
+        {
+            double y = aabbMin[1] + j * h[1];
+            for (size_t i = 0; i < nx + 1; ++i)
+            {
+                double x    = aabbMin[0] + i * h[0];
+                coords[cnt] = {x, y, z};
+                ++cnt;
+            }
+        }
+    }
+
+    const size_t numDiv = 6;
+    size_t numTets = numDiv * nx * ny * nz;
+
+    std::vector<TetrahedralMesh::TetraArray> vertices;
+    vertices.resize(numTets);
+    cnt = 0;
+    std::vector<size_t> indx(8);
+
+    for (size_t k = 0; k < nz; ++k)
+    {
+        for (size_t j = 0; j < ny; ++j)
+        {
+            for (size_t i = 0; i < nx; ++i)
+            {
+                indx[3]           = i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
+                indx[2]           = indx[3] + 1;
+                indx[0]           = indx[3] + nx + 1;
+                indx[1]           = indx[0] + 1;
+                indx[4]           = indx[0] + (nx + 1) * (ny + 1);
+                indx[5]           = indx[1] + (nx + 1) * (ny + 1);
+                indx[6]           = indx[2] + (nx + 1) * (ny + 1);
+                indx[7]           = indx[3] + (nx + 1) * (ny + 1);
+                vertices[cnt + 0] = {indx[0], indx[2], indx[3], indx[6]};
+                vertices[cnt + 1] = {indx[0], indx[3], indx[7], indx[6]};
+                vertices[cnt + 2] = {indx[0], indx[7], indx[4], indx[6]};
+                vertices[cnt + 3] = {indx[0], indx[5], indx[6], indx[4]};
+                vertices[cnt + 4] = {indx[1], indx[5], indx[6], indx[0]};
+                vertices[cnt + 5] = {indx[1], indx[6], indx[2], indx[0]};
+                cnt += numDiv;
+            }
+        }
+    }
+
+    auto mesh = std::make_shared<TetrahedralMesh>();
+    // auto mesh = std::unique_ptr<TetrahedralMesh>(new TetrahedralMesh());
+
+    mesh->initialize(coords, vertices);
+    return mesh;
+}
+
+#if 0
+std::shared_ptr<TetrahedralMesh>
+TetrahedralMesh::createEnclosingMesh(const SurfaceMesh& surfMesh, const size_t nx, const size_t ny,
+                                     const size_t nz)
+{
+    // Given the index of a tet, return the corresponding index of the hex
+    auto tetIdToHexId = [](const size_t tetId) { return tetId / 5; }
+
+
+    Vec3d aabbMin, aabbMax;
+    const double paddingPerc = 10.0;
+    PointSet.computeBoundingBox(aabbMin, aabbMax, paddingPerc);
+    const Vec3d h = {(aabbMax[0] - aabbMin[0]) / nx,
+                     (aabbMax[1] - aabbMin[1]) / ny,
+                     (aabbMax[2] - aabbMin[2]) / nz};
+
+    auto findHexId = [&aabbMin, &aabbMax, &h](const Vec3d& xyz) {
+        size_t idX = (xyz[0] - aabbMin[0]) / h[0];
+        size_t idY = (xyz[1] - aabbMin[1]) / h[1];
+        size_t idZ = (xyz[2] - aabbMin[2]) / h[2];
+        return {idX, idY, idZ};
+    };
+
+    auto uniformMesh = createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
+
+    std::vector<bool> enclosePoint(uniformMesh.getNumHexahedra(), false);
+
+    // ParallelUtils::parallelFor(surfMesh.getNumVertices(), [&](const size_t vid) {
+    //     auto xyz = surfMesh.getVertexPosition(vid);
+    //     size_t idX = (xyz[0] - aabbMin[0]) / h[0];
+    //     size_t idY = (xyz[1] - aabbMin[1]) / h[1];
+    //     size_t idZ = (xyz[2] - aabbMin[2]) / h[2];
+    //     size_t hexId = idX + idY *nx + idZ * nx*ny;
+    //     size_t tetId0 = 5*hexId;
+    //     size_t tetId1 = tetId0 + 5;
+    //
+    //
+    //     static ParallelUtils::SpinLock lock;
+    //     lock.lock();
+    //     for (size_t id = tetId0; id<tetId1; ++id)
+    //     {
+    //         enclosePoint[id] = true;
+    //     }
+    //     lock.unlock();
+    // });
+
+    for (size_t vid = 0; vid<surfMesh.getNumVertices(); ++vid)
+    {
+        auto xyz = surfMesh.getVertexPosition(vid);
+        size_t idX = (xyz[0] - aabbMin[0]) / h[0];
+        size_t idY = (xyz[1] - aabbMin[1]) / h[1];
+        size_t idZ = (xyz[2] - aabbMin[2]) / h[2];
+        size_t hexId = idX + idY *nx + idZ * nx*ny;
+        size_t tetId0 = 5*hexId;
+        size_t tetId1 = tetId0 + 5;
+
+        for (size_t i = tetId0; i<tetId1; ++i)
+        {
+            enclosePoint[i] = true;
+        }
+    }
+}
+#endif
+
+std::shared_ptr<TetrahedralMesh>
+TetrahedralMesh::createEnclosingMesh(SurfaceMesh& surfMesh, const size_t nx, const size_t ny,
+                                     const size_t nz)
+{
+    Vec3d        aabbMin, aabbMax;
+    const double paddingPerc = 1.0;
+
+    // create a backgrond mesh
+    surfMesh.computeBoundingBox(aabbMin, aabbMax, paddingPerc);
+    auto uniformMesh = createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
+
+    // ray-tracing
+    std::vector<bool> insideSurfMesh(uniformMesh->getNumVertices(), false);
+    const auto&       coords = uniformMesh->getVertexPositions();
+    std::cout << "ray tracing..." << std::endl;
+    surfMesh.rayTracing(coords, insideSurfMesh);
+    std::cout << "ray tracing done" << std::endl;
+
+    // label elements
+    std::vector<bool> validTet(uniformMesh->getNumTetrahedra(), false);
+    std::vector<bool> validVtx(uniformMesh->getNumVertices(), false);
+
+    // TetrahedralMesh::WeightsArray weights = {0.0, 0.0, 0.0, 0.0};
+    const Vec3d h = {(aabbMax[0] - aabbMin[0]) / nx,
+                     (aabbMax[1] - aabbMin[1]) / ny,
+                     (aabbMax[2] - aabbMin[2]) / nz};
+
+    // TODO: can be parallelized by make NUM_THREADS copies of validTet, or use atomic op on validTet
+    auto labelEnclosingTet = [&surfMesh, &uniformMesh, &aabbMin, &h, nx, ny, nz, &validTet](const size_t i)
+    {
+        const auto& xyz = surfMesh.getVertexPosition(i);
+        // find the hex that encloses the point;
+        size_t idX = (xyz[0] - aabbMin[0]) / h[0];
+        size_t idY = (xyz[1] - aabbMin[1]) / h[1];
+        size_t idZ = (xyz[2] - aabbMin[2]) / h[2];
+        size_t hexId = idX + idY *nx + idZ * nx*ny;
+
+        // the index range of tets inside the enclosing hex
+        const int numDiv = 6;
+        size_t tetId0 = numDiv*hexId;
+        size_t tetId1 = tetId0 + numDiv;
+
+        // loop over the tets to find the enclosing tets
+        bool found = false;
+        TetrahedralMesh::WeightsArray weights = {0.0, 0.0, 0.0, 0.0};
+        for (size_t id=tetId0; id<tetId1; ++id)
+        {
+            uniformMesh->computeBarycentricWeights(id, xyz, weights);
+
+            if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
+            {
+                validTet[id] = true;
+                found = true;
+                break;
+            }
+        }
+        
+        // TODO: not sure how to do thread-safe logging
+        LOG_IF(FATAL, (!found)) << "Fail to find the enclosing tet";
+    };
+
+    // a customized apporach to find the enclosing tet for each surface points
+    for (size_t i=0; i<surfMesh.getNumVertices(); ++i)
+    {
+        labelEnclosingTet(i);
+    }
+
+    for (size_t i = 0; i < validTet.size(); ++i)
+    {
+        const auto& verts = uniformMesh->getTetrahedronVertices(i);
+        if (insideSurfMesh[verts[0]] || insideSurfMesh[verts[1]] || insideSurfMesh[verts[2]] ||
+            insideSurfMesh[verts[3]])
+        {
+            validTet[i] = true;
+        }
+    }
+
+    size_t numElems = 0;
+    for (size_t i = 0; i < validTet.size(); ++i)
+    {
+        const auto& verts = uniformMesh->getTetrahedronVertices(i);
+        if (validTet[i])
+        {
+            validVtx[verts[0]] = true;
+            validVtx[verts[1]] = true;
+            validVtx[verts[2]] = true;
+            validVtx[verts[3]] = true;
+            ++numElems;
+        }
+    }
+
+
+    // discard useless vertices, and build old-to-new index map
+    size_t numVerts = 0;
+
+    for (auto b : validVtx)
+    {
+        if (b) 
+        {
+            ++numVerts;
+        }
+    }
+
+    std::cout << "num of vertices in background mesh = " << uniformMesh->getNumVertices() << std::endl;
+    std::cout << "num of vertices = " << numVerts << std::endl;
+    std::cout << "num of elements = " << numElems << std::endl;
+
+    StdVectorOfVec3d    newCoords(numVerts);
+    std::vector<size_t> oldToNew(coords.size(), std::numeric_limits<size_t>::max());
+    size_t              cnt = 0;
+
+    for (size_t i = 0; i < validVtx.size(); ++i)
+    {
+        if (validVtx[i])
+        {
+            newCoords[cnt] = coords[i];
+            oldToNew[i]    = cnt;
+            ++cnt;
+        }
+    }
+
+    // update tet-to-vert connectivity
+    std::vector<TetraArray> newIndices(numElems);
+    cnt = 0;
+    for (size_t i = 0; i < uniformMesh->getNumTetrahedra(); ++i)
+    {
+        if (validTet[i])
+        {
+            const auto oldIndices = uniformMesh->getTetrahedronVertices(i);
+
+            newIndices[cnt][0] = oldToNew[oldIndices[0]];
+            newIndices[cnt][1] = oldToNew[oldIndices[1]];
+            newIndices[cnt][2] = oldToNew[oldIndices[2]];
+            newIndices[cnt][3] = oldToNew[oldIndices[3]];
+            ++cnt;
+        }
+    }
+
+    // ready to create the final mesh
+    auto mesh = std::make_shared<TetrahedralMesh>();
+    mesh->initialize(newCoords, newIndices);
+
+    return mesh;
+}
+
+void
+TetrahedralMesh::writeVTK(const std::string& fname) const
+{
+    std::ofstream fout(fname);
+    fout << "# vtk DataFile Version 2.0\nmesh\nASCII\nDATASET UNSTRUCTURED_GRID\n";
+    fout << "POINTS " << this->getNumVertices() << " double\n";
+    for (size_t i = 0; i < this->getNumVertices(); ++i)
+    {
+        fout << m_vertexPositions[i][0] << " " << m_vertexPositions[i][1] << " "
+             << m_vertexPositions[i][2] << std::endl;
+    }
+
+    const auto nTets          = getNumTetrahedra();
+    const int  numVertPerElem = 4;
+    fout << "CELLS " << nTets << " " << nTets * (numVertPerElem+1) << "\n";
+    for (size_t i = 0; i < nTets; ++i)
+    {
+        fout << numVertPerElem << " " << m_tetrahedraVertices[i][0] << " "
+             << m_tetrahedraVertices[i][1] << " " << m_tetrahedraVertices[i][2] << " "
+             << m_tetrahedraVertices[i][3] << std::endl;
+    }
+
+    const int cellType = 10;
+    fout << "CELL_TYPES " << nTets << "\n";
+    for (size_t i = 0; i < nTets; ++i)
+    {
+        fout << cellType << std::endl;
+    }
+    
+    fout.close();
+    return;
+}
+}  // namespace imstk
