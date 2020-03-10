@@ -32,8 +32,6 @@
 
 using namespace imstk;
 
-void translate(PointSet& mesh, const Vec3d& v);
-
 /// \brief Create a triangular surface mesh with a single triangle
 std::shared_ptr<SurfaceMesh> createSimpleSurfaceMesh(void);
 
@@ -42,7 +40,7 @@ double computeDistance(PointSet& mesh0, PointSet& mesh1);
 int
 main()
 {
-    // create a tet mesh
+    // create a tetrahedral mesh
     Vec3d  aabbMin(0.0, 0.0, 0.0);
     Vec3d  aabbMax(1.0, 1.0, 1.0);
     size_t nx      = 2;
@@ -50,7 +48,7 @@ main()
     size_t nz      = 2;
     auto   tetMesh = TetrahedralMesh::createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
 
-    // create tri mesh
+    // create triangle mesh
     auto surfaceMesh = createSimpleSurfaceMesh();
     surfaceMesh->flipNormals();
 
@@ -60,19 +58,24 @@ main()
     map->compute();
 
     Vec3d dxyz(0.1, 0.2, 0.3);
-    translate(*tetMesh.get(), dxyz);
+    tetMesh->translate(dxyz, Geometry::TransformType::ApplyToData);
 
     map->apply();
 
     auto surfaceMesh2 = createSimpleSurfaceMesh();
-    translate(*surfaceMesh2.get(), dxyz);
+    surfaceMesh2->translate(dxyz, Geometry::TransformType::ApplyToData);
 
     auto dist = computeDistance(*surfaceMesh, *surfaceMesh2);
+
+    if (dist > 10. * VERY_SMALL_EPSILON)
+    {
+        std::cerr << "The TetraTriangleMap is erroneous";
+    }
 
     std::cout << "Distance: " << dist << std::endl;
 
     auto simManager = std::make_shared<SimulationManager>();
-    auto scene = simManager->createNewScene("DeformableBodyFEM");
+    auto scene      = simManager->createNewScene("DeformableBodyFEM");
     scene->getCamera()->setPosition(5., 5., 5.);
 
     auto material = std::make_shared<RenderMaterial>();
@@ -100,6 +103,14 @@ main()
 
     //---------------
 
+    // Rotate the dragon every frame
+    auto rotateFunc = [&tetMesh, &map, &surfaceMesh2](Module* module)
+                      {
+                          tetMesh->rotate(Vec3d(1., 0, 0), PI / 10000, Geometry::TransformType::ApplyToData);
+                          map->apply();
+                      };
+    simManager->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
+
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
@@ -111,7 +122,6 @@ main()
     simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
     simManager->startSimulation();
 
-   
     return 0;
 }
 
@@ -119,12 +129,11 @@ std::shared_ptr<SurfaceMesh>
 createSimpleSurfaceMesh()
 {
     // coordinates
-    // std::vector<Vec3d> surfaceVertices(3);
     StdVectorOfVec3d surfaceVertices(3);
-    const double             w[3] = {2.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0};
-    surfaceVertices[0][0]   = w[0] * 0.0 + w[1] * 1.0 + w[2] * 0.0;
-    surfaceVertices[0][1]   = w[0] * 1.0 + w[1] * 0.0 + w[2] * 0.0;
-    surfaceVertices[0][2]   = w[0] * 0.0 + w[1] * 0.0 + w[2] * 1.0;
+    const double     w[3] = { 2.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0 };
+    surfaceVertices[0][0] = w[0] * 0.0 + w[1] * 1.0 + w[2] * 0.0;
+    surfaceVertices[0][1] = w[0] * 1.0 + w[1] * 0.0 + w[2] * 0.0;
+    surfaceVertices[0][2] = w[0] * 0.0 + w[1] * 0.0 + w[2] * 1.0;
 
     surfaceVertices[1][0] = w[2] * 0.0 + w[0] * 1.0 + w[1] * 0.0;
     surfaceVertices[1][1] = w[2] * 1.0 + w[0] * 0.0 + w[1] * 0.0;
@@ -135,48 +144,25 @@ createSimpleSurfaceMesh()
     surfaceVertices[2][2] = w[1] * 0.0 + w[2] * 0.0 + w[0] * 1.0;
 
     // connectivity
-    std::vector<SurfaceMesh::TriangleArray> surfaceIndices = {{0, 1, 2}};
-    auto surfaceMesh = std::make_shared<SurfaceMesh>();
+    std::vector<SurfaceMesh::TriangleArray> surfaceIndices = { { 0, 1, 2 } };
+    auto                                    surfaceMesh    = std::make_shared<SurfaceMesh>();
     surfaceMesh->initialize(surfaceVertices, surfaceIndices);
 
     return surfaceMesh;
 }
 
-void
-translate(PointSet& mesh, const Vec3d& dxyz)
-{
-    // mesh.translateVertices(dxyz);
-    // mesh.updatePostTransformData();
-    mesh.print();
-    std::cout << "num of points = " << mesh.getNumVertices() << std::endl; 
-
-    for (size_t i = 0; i < mesh.getNumVertices(); ++i)
-    {
-
-        Vec3d xyz(mesh.getVertexPosition(i));
-        xyz += dxyz;
-        mesh.setVertexPosition(i, xyz);
-    }
-    return;
-}
-
 double
 computeDistance(PointSet& mesh0, PointSet& mesh1)
 {
-    double s = 0.0;
-    if (mesh0.getNumVertices() != mesh1.getNumVertices()) {
-        return 1;
-    }
+    assert(mesh0.getNumVertices() == mesh1.getNumVertices());
 
+    auto   verts0 = mesh0.getVertexPositions();
+    auto   verts1 = mesh1.getVertexPositions();
+    double s      = 0.;
     for (size_t i = 0; i < mesh0.getNumVertices(); ++i)
     {
-        auto xyz0 = mesh0.getVertexPosition(i);
-        auto xyz1 = mesh1.getVertexPosition(i);
-        auto dx   = xyz0[0] - xyz1[0];
-        auto dy   = xyz0[1] - xyz1[1];
-        auto dz   = xyz0[2] - xyz1[2];
-        s += dx * dx + dy * dy + dz * dz;
+        s += (verts0[i] - verts1[i]).norm();
     }
 
-    return sqrt(s);
+    return s;
 }

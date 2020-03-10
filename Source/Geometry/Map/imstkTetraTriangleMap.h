@@ -36,7 +36,8 @@ namespace imstk
 /// \brief Computes and applies the triangle-tetrahedra map. The master mesh is the
 ///  tetrahedral mesh and the slave is the surface triangular mesh.
 ///
-class TetraTriangleMap : public GeometryMap {
+class TetraTriangleMap : public GeometryMap
+{
 public:
     ///
     /// \brief Constructor
@@ -47,7 +48,7 @@ public:
     /// \brief Constructor
     ///
     TetraTriangleMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave)
-            : GeometryMap(GeometryMap::Type::TetraTriangle), m_bBoxAvailable(false)
+        : GeometryMap(GeometryMap::Type::TetraTriangle), m_bBoxAvailable(false)
     {
         this->setMaster(master);
         this->setSlave(slave);
@@ -101,12 +102,12 @@ public:
     void updateBoundingBox(void);
 
 protected:
-    std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights;  ///> weights
+    std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
     std::vector<size_t>
-                       m_verticesEnclosingTetraId;  ///> Enclosing tetrahedra to interpolate the weights upon
+    m_verticesEnclosingTetraId;                                   ///> Enclosing tetrahedra to interpolate the weights upon
     std::vector<Vec3d> m_bBoxMin;
     std::vector<Vec3d> m_bBoxMax;
-    bool               m_bBoxAvailable;
+    bool m_bBoxAvailable;
     // void               m_updateBoundingBox(void);
 };
 }  // namespace imstk

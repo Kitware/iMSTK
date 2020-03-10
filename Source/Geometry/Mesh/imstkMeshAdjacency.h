@@ -36,48 +36,49 @@ struct InterFace
 
 struct Tetrahedron
 {
-    static constexpr int                       numVertices     = 4;
-    static constexpr int                       numFaces        = 4;
-    static constexpr std::array<int, numFaces> numFaceVertices = {3, 3, 3, 3};
+    static constexpr int numVertices = 4;
+    static constexpr int numFaces    = 4;
+    static constexpr std::array<int, numFaces> numFaceVertices = { 3, 3, 3, 3 };
     // constexpr std::vector will be available in C++20
     static std::array<std::vector<int>, 4> faceVertices;
 };
 
-std::array<std::vector<int>, 4> Tetrahedron::faceVertices = {std::vector<int>{0, 2, 1},
-                                                             {0, 1, 3},
-                                                             {0, 3, 2},
-                                                             {1, 2, 3}};
+std::array<std::vector<int>, 4> Tetrahedron::faceVertices = { std::vector<int>{ 0, 2, 1 },
+                                                              { 0, 1, 3 },
+                                                              { 0, 3, 2 },
+                                                              { 1, 2, 3 } };
 
 struct Hexhedron
 {
-    static constexpr int                          numVertices     = 8;
-    static constexpr int                          numFaces        = 6;
-    static constexpr std::array<int, numFaces>    numFaceVertices = {4, 4, 4, 4, 4, 4};
+    static constexpr int numVertices = 8;
+    static constexpr int numFaces    = 6;
+    static constexpr std::array<int, numFaces> numFaceVertices = { 4, 4, 4, 4, 4, 4 };
     static std::array<std::vector<int>, numFaces> faceVertices;
 };
 
-std::array<std::vector<int>, 6> Hexhedron::faceVertices = {std::vector<int>{0, 2, 3, 1},
-                                                           {4, 7, 6, 5},
-                                                           {0, 4, 7, 3},
-                                                           {1, 2, 6, 5},
-                                                           {0, 1, 5, 4},
-                                                           {2, 3, 7, 6}};
+std::array<std::vector<int>, 6> Hexhedron::faceVertices = { std::vector<int>{ 0, 2, 3, 1 },
+                                                            { 4, 7, 6, 5 },
+                                                            { 0, 4, 7, 3 },
+                                                            { 1, 2, 6, 5 },
+                                                            { 0, 1, 5, 4 },
+                                                            { 2, 3, 7, 6 } };
 
 ///
 /// \class MeshAdjacency
 ///
 /// \brief Adjacency of a mesh
 ///
-template <typename Element>
-class MeshAdjacency {
+template<typename Element>
+class MeshAdjacency
+{
 public:
     using ElemIndices = std::array<size_t, Element::numVertices>;
     MeshAdjacency(const std::vector<ElemIndices>& elemToVert, const size_t numVertices = 0)
-            : m_numVertices(numVertices), m_elemToVert(elemToVert)
+        : m_numVertices(numVertices), m_elemToVert(elemToVert)
     {
     }
 
-    ~MeshAdjacency()       = default;
+    ~MeshAdjacency() = default;
     MeshAdjacency& operator=(const MeshAdjacency&) = delete;
 
 private:
@@ -97,11 +98,11 @@ private:
                            std::vector<size_t>& faceVertices) const;
 
 private:
-    size_t                          m_numVertices;
+    size_t m_numVertices;
     const std::vector<ElemIndices>& m_elemToVert;
-    std::vector<size_t>             m_vertToElem;
-    std::vector<size_t>             m_vertToElem_ptr;
-    std::vector<InterFace>          interfaces;
+    std::vector<size_t>    m_vertToElem;
+    std::vector<size_t>    m_vertToElem_ptr;
+    std::vector<InterFace> interfaces;
 };
 }  // namespace imstk
 #endif
