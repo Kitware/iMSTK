@@ -39,7 +39,7 @@ class GeometryMap;
 ///
 /// \brief Scene objects that can deform
 ///
-class DeformableObject : public DynamicObject<VectorizedState>
+class DeformableObject : public DynamicObject
 {
 public:
 

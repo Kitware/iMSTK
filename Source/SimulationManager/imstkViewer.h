@@ -88,6 +88,11 @@ public:
     const std::shared_ptr<Renderer>& getActiveRenderer() const;
 
     ///
+    /// \brief Set a string to be the title for the render window
+    ///
+    virtual void setWindowTitle(const std::string& title) = 0;
+
+    ///
     /// \brief access screen shot utility
     ///
     const std::shared_ptr<ScreenCaptureUtility>& getScreenCaptureUtility() const;

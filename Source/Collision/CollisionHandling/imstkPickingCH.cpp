@@ -27,9 +27,9 @@ namespace imstk
 {
 PickingCH::PickingCH(const CollisionHandling::Side&       side,
                      const std::shared_ptr<CollisionData> colData,
-                     std::shared_ptr<DeformableObject>    obj) :
+                     std::shared_ptr<CollidingObject>     obj) :
     CollisionHandling(Type::NodalPicking, side, colData),
-    m_object(obj)
+    m_object(std::dynamic_pointer_cast<DeformableObject>(obj))
 {
 }
 

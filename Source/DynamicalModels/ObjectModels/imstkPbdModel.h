@@ -32,6 +32,8 @@
 
 namespace imstk
 {
+class PointSet;
+
 ///
 /// \class PBDModelConfig
 /// \brief Parameters for PBD simulation
@@ -45,7 +47,7 @@ struct PBDModelConfig
     double m_proximity        = 0.1;                                          ///> Proximity for collisions
 
     unsigned int m_maxIter = 10;                                              ///> Max. pbd iterations
-    double m_dt            = 0.01;                                            ///> Time step size
+    double m_dt            = 0.0;                                             ///> Time step size
     double m_DefaultDt     = 0.01;                                            ///> Default Time step size
 
     std::vector<std::size_t> m_fixedNodeIds;                                  ///> Nodal IDs of the nodes that are fixed
@@ -84,18 +86,21 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdModel() : DynamicalModel(DynamicalModelType::positionBasedDynamics) {}
+    PbdModel() : DynamicalModel(DynamicalModelType::positionBasedDynamics)
+    {
+        m_validGeometryTypes = {
+            Geometry::Type::PointSet,
+            Geometry::Type::LineMesh,
+            Geometry::Type::SurfaceMesh,
+            Geometry::Type::TetrahedralMesh,
+            Geometry::Type::HexahedralMesh
+        };
+    }
 
     ///
     /// \brief Destructor
     ///
     virtual ~PbdModel() override = default;
-
-    ///
-    /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
-    ///
-    void setModelGeometry(const std::shared_ptr<PointSet>& m) { m_mesh = m; }
-    const std::shared_ptr<PointSet>& getModelGeometry() const { return m_mesh; }
 
     ///
     /// \brief Set simulation parameters
@@ -220,7 +225,7 @@ public:
     /// \brief Update body states given the newest update and the type of update
     ///
     virtual void updateBodyStates(const Vectord& /*q*/,
-                                  const stateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
+                                  const StateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
 
     ///
     /// \brief Initialize the PBD model

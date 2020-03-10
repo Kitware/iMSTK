@@ -19,60 +19,49 @@
 
 =========================================================================*/
 
-#include "imstkPbdObject.h"
-#include "imstkGeometryMap.h"
-#include "imstkPbdModel.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkAbstractDynamicalModel.h"
 
 namespace imstk
 {
 bool
-PbdObject::initialize()
+AbstractDynamicalModel::isGeometryValid(const std::shared_ptr<Geometry> geometry)
 {
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-    if (m_pbdModel)
+    if (geometry)
     {
-        return DynamicObject::initialize();
+        // If no valid geometries specified all geometries work
+        if (m_validGeometryTypes.size() == 0)
+        {
+            return true;
+        }
+
+        // If it exists in the set then it is valid geometry
+        if (m_validGeometryTypes.count(geometry->getType()))
+        {
+            return true;
+        }
+        else
+        {
+            LOG(WARNING) << "The geometry is not supported!!";
+        }
     }
     else
     {
-        LOG(FATAL) << "Dynamics pointer cast failure in PbdObject::initialize()";
-        return false;
+        LOG(WARNING) << "The geometry is not a valid pointer";
     }
+
+    return false;
 }
 
 void
-PbdObject::integratePosition()
+AbstractDynamicalModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
 {
-    if (m_pbdModel && m_pbdModel->hasConstraints())
+    if (isGeometryValid(geometry))
     {
-        m_pbdModel->integratePosition();
+        m_geometry = geometry;
     }
-}
-
-void
-PbdObject::updateVelocity()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
+    else
     {
-        m_pbdModel->updateVelocity();
+        LOG(WARNING) << "Invalid geometry for Model";
     }
 }
-
-void
-PbdObject::solveConstraints()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
-    {
-        m_pbdModel->projectConstraints();
-    }
-}
-
-void
-PbdObject::reset()
-{
-    DynamicObject::reset();
-    this->updateVelocity();
-}
-} //imstk
+} // imstk

@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <memory>
-
 #include "Eigen/Sparse"
 
-#include "imstkGeometry.h"
 #include "imstkDynamicalModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
@@ -47,7 +44,7 @@ namespace imstk
 {
 struct FEMModelConfig
 {
-    FEMMethodType m_femMethod = FEMMethodType::StVK;
+    FEMMethodType m_femMethod = FEMMethodType::Invertible;
     HyperElasticMaterialType m_hyperElasticMaterialType = HyperElasticMaterialType::StVK;
 
     // file names (remove from here?)
@@ -62,7 +59,7 @@ struct FEMModelConfig
     double m_inversionThreshold          = -std::numeric_limits<double>::max();
     double m_gravity = 9.81;
 
-    // remove from here ?
+    // \todo remove from here ?
     int m_numberOfThreads = 4;
 };
 
@@ -117,12 +114,6 @@ public:
     std::shared_ptr<TimeIntegrator> getTimeIntegrator() const;
 
     ///
-    /// \brief Set/Get the geometry used by force model
-    ///
-    void setModelGeometry(std::shared_ptr<Geometry> geometry);
-    std::shared_ptr<Geometry> getModelGeometry();
-
-    ///
     /// \brief Load the initial conditions of the deformable object
     ///
     void loadInitialStates();
@@ -170,17 +161,17 @@ public:
     ///
     /// \brief Compute the RHS of the resulting linear system
     ///
-    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState, const stateUpdateType updateType);
+    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
 
     ///
     /// \brief Compute the RHS of the resulting linear system using semi-implicit scheme
     ///
-    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState, const stateUpdateType updateType);
+    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState, const StateUpdateType updateType);
 
     ///
     /// \brief Compute the LHS of the resulting linear system
     ///
-    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState, const stateUpdateType updateType);
+    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
 
     ///
     /// \brief Update damping Matrix
@@ -207,8 +198,8 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& solution, const stateUpdateType updateType) override;
-    void updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType);
+    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType) override;
+    void updateBodyIntermediateStates(const Vectord& solution, const StateUpdateType updateType);
 
     ///
     /// \brief Update the previous states given the current state
@@ -246,8 +237,8 @@ public:
     ///
     /// \brief Set/Get the update type
     ///
-    void setUpdateType(const stateUpdateType& updateType) { m_updateType = updateType; }
-    const stateUpdateType& getUpdateType() const { return m_updateType; }
+    void setUpdateType(const StateUpdateType& updateType) { m_updateType = updateType; }
+    const StateUpdateType& getUpdateType() const { return m_updateType; }
 
     /// \brief Returns the unknown vectors
     ///
@@ -278,7 +269,6 @@ public:
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
-    std::shared_ptr<Geometry>           m_forceModelGeometry;       ///> Geometry used by force model
     std::shared_ptr<NonLinearSystem>    m_nonLinearSystem;          ///> Nonlinear system resulting from TI and force model
 
     std::shared_ptr<FEMModelConfig> m_FEModelConfig;
@@ -303,7 +293,7 @@ protected:
 
     std::vector<std::size_t> m_fixedNodeIds;                            ///> Nodal IDs of the nodes that are fixed
 
-    stateUpdateType m_updateType = stateUpdateType::deltaVelocity;      ///> Update type of the model
+    StateUpdateType m_updateType = StateUpdateType::deltaVelocity;      ///> Update type of the model
 
     bool m_damped = false;                                              ///> Viscous or structurally damped system
 

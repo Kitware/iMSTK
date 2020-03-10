@@ -168,6 +168,7 @@ VTKViewer::startRenderingLoop()
     {
         m_vtkRenderWindow->GetInteractor()->Initialize();
         m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
+        m_vtkRenderWindow->SetWindowName(m_windowName.c_str());
         m_vtkRenderWindow->GetInteractor()->Start();
         m_vtkRenderWindow->GetInteractor()->DestroyTimer();
     }
@@ -205,6 +206,16 @@ void
 VTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
 {
     this->getActiveRenderer()->updateBackground(color1, color2, gradientBackground);
+}
+
+void
+VTKViewer::setWindowTitle(const std::string& title)
+{
+    m_windowName = title;
+    if (m_vtkRenderWindow)
+    {
+        m_vtkRenderWindow->SetWindowName(title.c_str());
+    }
 }
 
 const std::shared_ptr<VTKTextStatusManager>&

@@ -39,7 +39,7 @@ class PbdModel;
 /// \brief Base class for scene objects that move and/or deform under position
 /// based dynamics formulation
 ///
-class PbdObject : public DynamicObject<PbdState>
+class PbdObject : public DynamicObject
 {
 public:
     ///
@@ -55,10 +55,12 @@ public:
         m_type = SceneObject::Type::Pbd;
     }
 
+    PbdObject() = delete;
+
     ///
     /// \brief Destructor
     ///
-    virtual ~PbdObject() override = default;
+    ~PbdObject() override = default;
 
     ///
     /// \brief Initialize the pbd scene object
@@ -84,8 +86,6 @@ public:
     /// \brief Reset the PBD object to its initial state
     ///
     void reset() override;
-
-    void setPbdModel(const std::shared_ptr<PbdModel>& model) { m_pbdModel = model; }
 
 protected:
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model

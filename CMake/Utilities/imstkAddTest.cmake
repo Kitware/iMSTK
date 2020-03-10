@@ -37,7 +37,8 @@ function(GTEST_ADD_TESTS executable extra_args)
             message(WARNING "Could not parse GTest ${hit} for adding to CTest.")
             continue()
           endif()
-          add_test(NAME ${test_name} COMMAND ${executable} ${extra_args} --gtest_filter=${test_name}) # changed here
+          add_test(NAME ${test_name} COMMAND ${executable} ${extra_args} --gtest_filter=${test_name} WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin) # changed here
+		  
         endforeach()
     endforeach()
 endfunction()

@@ -16,5 +16,3 @@ listOfSubDir(subDirs ${CMAKE_CURRENT_SOURCE_DIR})
 foreach(subdir ${subDirs})
   add_subdirectory(${subdir})
 endforeach() 
-
-

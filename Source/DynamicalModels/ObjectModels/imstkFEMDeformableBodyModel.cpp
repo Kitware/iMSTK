@@ -35,6 +35,11 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
     DynamicalModel(DynamicalModelType::elastoDynamics)
 {
     m_fixedNodeIds.reserve(1000);
+
+    m_validGeometryTypes = {
+        Geometry::Type::TetrahedralMesh,
+        Geometry::Type::HexahedralMesh
+    };
 }
 
 FEMDeformableBodyModel::~FEMDeformableBodyModel()
@@ -170,23 +175,11 @@ FEMDeformableBodyModel::getTimeIntegrator() const
     return m_timeIntegrator;
 }
 
-void
-FEMDeformableBodyModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
-{
-    m_forceModelGeometry = geometry;
-}
-
-std::shared_ptr<imstk::Geometry>
-FEMDeformableBodyModel::getModelGeometry()
-{
-    return m_forceModelGeometry;
-}
-
 bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
-    if (!m_forceModelGeometry || !m_FEModelConfig)
+    if (!m_geometry || !m_FEModelConfig)
     {
         LOG(FATAL) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
         return false;
@@ -332,7 +325,7 @@ FEMDeformableBodyModel::initializeForceModel()
 bool
 FEMDeformableBodyModel::initializeMassMatrix()
 {
-    if (!m_forceModelGeometry)
+    if (!m_geometry)
     {
         LOG(FATAL) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
         return false;
@@ -369,7 +362,7 @@ FEMDeformableBodyModel::initializeDampingMatrix()
         return false;
     }
 
-    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
+    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
     //std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
 
     auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(m_vegaPhysicsMesh.get()));
@@ -464,7 +457,7 @@ FEMDeformableBodyModel::initializeGravityForce()
 void
 FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
                                                  kinematicState&       newState,
-                                                 const stateUpdateType updateType)
+                                                 const StateUpdateType updateType)
 {
     auto& uPrev = stateAtT.getQ();
     auto& vPrev = stateAtT.getQDot();
@@ -477,7 +470,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
 
         m_Feff = m_K * -(uPrev - u + v * dT);
 
@@ -503,7 +496,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
 void
 FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       stateAtT,
                                                      kinematicState&       newState,
-                                                     const stateUpdateType updateType)
+                                                     const StateUpdateType updateType)
 {
     auto& uPrev = stateAtT.getQ();
     auto& vPrev = stateAtT.getQDot();
@@ -516,7 +509,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
 
         m_Feff = m_K * (vPrev * -dT);
 
@@ -542,13 +535,13 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 void
 FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
                                                  kinematicState&       newState,
-                                                 const stateUpdateType updateType)
+                                                 const StateUpdateType updateType)
 {
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
 
         this->updateMassMatrix();
         m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
@@ -651,7 +644,7 @@ FEMDeformableBodyModel::updateMassMatrix()
 void
 FEMDeformableBodyModel::updatePhysicsGeometry()
 {
-    auto  volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
+    auto  volMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
     auto& u       = m_currentState->getQ();
     volMesh->setVertexDisplacements(u);
 }
@@ -664,7 +657,7 @@ FEMDeformableBodyModel::updateBodyPreviousStates()
 }
 
 void
-FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
+FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const StateUpdateType updateType)
 {
     this->updateBodyPreviousStates();
     this->updateBodyIntermediateStates(solution, updateType);
@@ -673,7 +666,7 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
 void
 FEMDeformableBodyModel::updateBodyIntermediateStates(
     const Vectord&        solution,
-    const stateUpdateType updateType)
+    const StateUpdateType updateType)
 {
     auto&        uPrev = m_previousState->getQ();
     auto&        u     = m_currentState->getQ();
@@ -682,13 +675,13 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 
     switch (updateType)
     {
-    case stateUpdateType::deltaVelocity:
+    case StateUpdateType::deltaVelocity:
         m_currentState->setV(v + solution);
         m_currentState->setU(uPrev + dT * v);
 
         break;
 
-    case stateUpdateType::velocity:
+    case StateUpdateType::velocity:
         m_currentState->setV(solution);
         m_currentState->setU(uPrev + dT * v);
 

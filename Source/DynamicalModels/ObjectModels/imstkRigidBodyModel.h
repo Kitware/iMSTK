@@ -55,7 +55,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    RigidBodyModel() : DynamicalModel(DynamicalModelType::rigidBodyDynamics) {};
+    RigidBodyModel() : DynamicalModel(DynamicalModelType::rigidBodyDynamics)
+    {
+        m_validGeometryTypes = {
+            Geometry::Type::Plane,
+            Geometry::Type::Sphere,
+            Geometry::Type::Cube,
+            Geometry::Type::SurfaceMesh
+        };
+    };
     ~RigidBodyModel() = default;
 
     ///
@@ -64,23 +72,12 @@ public:
     bool initialize() override;
 
     ///
-    /// \brief Check if unsupported geometries are supplied
-    ///
-    bool isGeometryValid(const std::shared_ptr<Geometry> g) const;
-
-    ///
     /// \brief Configure the model
     ///
     // TODO: Setting of mass and gravity has to happen somewhere.
     void configure(const std::shared_ptr<Geometry>              geom,
                    const std::shared_ptr<RigidBodyPropertyDesc> matProperty,
                    const RigidBodyType                          type = RigidBodyType::Kinematic);
-
-    ///
-    /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
-    ///
-    void setModelGeometry(std::shared_ptr<Geometry> g);
-    std::shared_ptr<Geometry> getModelGeometry() const { return m_geometry; }
 
     ///
     /// \brief Update the model geometry from the newest rigid body state
@@ -101,7 +98,7 @@ public:
     /// \brief Update the body states given the solution
     ///
     void updateBodyStates(const Vectord&        q,
-                          const stateUpdateType updateType = stateUpdateType::displacement) override;
+                          const StateUpdateType updateType = StateUpdateType::displacement) override;
 
     ///
     /// \brief Set kinematic target of RigidBody
@@ -142,7 +139,6 @@ public:
     }
 
 protected:
-    std::shared_ptr<Geometry> m_geometry;   ///> Geometry on which the rigid model operates on
     std::shared_ptr<RigidBodyPropertyDesc> m_material;
     PxRigidDynamic* m_pxDynamicActor = NULL;
     PxRigidStatic*  m_pxStaticActor  = NULL;

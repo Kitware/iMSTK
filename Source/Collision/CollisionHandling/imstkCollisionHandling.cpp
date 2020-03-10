@@ -27,6 +27,7 @@
 #include "imstkDeformableObject.h"
 #include "imstkBoneDrillingCH.h"
 #include "imstkSPHCollisionHandling.h"
+#include "imstkPBDCollisionHandling.h"
 
 #include <g3log/g3log.hpp>
 
@@ -61,13 +62,13 @@ CollisionHandling::make_collision_handling(const Type&                          
         return std::make_shared<VirtualCouplingCH>(side, colData, objA);
 
     case Type::NodalPicking:
-        if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(objA))
-        {
-            return std::make_shared<PickingCH>(side, colData, defObj);
-        }
+        return std::make_shared<PickingCH>(side, colData, objA);
 
     case Type::BoneDrilling:
         return std::make_shared<BoneDrillingCH>(side, colData, objA, objB);
+
+    case Type::PBD:
+        return std::make_shared<PBDCollisionHandling>(side, colData, objA, objB);
 
     case Type::SPH:
         return std::make_shared<SPHCollisionHandling>(side, colData, objA);

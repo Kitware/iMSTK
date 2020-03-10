@@ -23,7 +23,7 @@
 
 namespace imstk
 {
-SPHObject::SPHObject(const std::string& name) : DynamicObject<SPHKinematicState>(name)
+SPHObject::SPHObject(const std::string& name) : DynamicObject(name)
 {
     this->m_type = SceneObject::Type::SPH;
 }

@@ -72,18 +72,15 @@ main()
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt               = 0.005;
+    pbdParams->m_dt               = 0.05;
     pbdParams->m_maxIter          = 2;
-    pbdParams->m_proximity        = 0.1;
-    pbdParams->m_contactStiffness = 1.0;
+    pbdParams->m_proximity        = 0.01;
+    pbdParams->m_contactStiffness = 0.2;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
+    pbdModel->setTimeStepSizeType(TimeSteppingType::fixed);
     deformableObj->setDynamicalModel(pbdModel);
-
-    auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
 
@@ -226,7 +223,7 @@ main()
     auto colGraph = scene->getCollisionGraph();
     auto CD       = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
     auto CH       = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                CD->getCollisionData(), deformableObj, floor, pbdSolver);
+                CD->getCollisionData(), deformableObj, floor);
     colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
 
     // Light (white)
@@ -236,11 +233,11 @@ main()
     scene->addLight(whiteLight);
 
     // print UPS
-    auto ups = std::make_shared<UPSCounter>();
-    apiutils::printUPS(simManager->getSceneManager(scene), ups);
+    scene->getConfig()->trackFPS = true;
+    apiutils::printUPS(simManager->getSceneManager(scene));
 
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::paused);
 
     return 0;
 }

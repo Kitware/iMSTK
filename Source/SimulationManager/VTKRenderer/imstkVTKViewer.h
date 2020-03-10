@@ -106,6 +106,11 @@ public:
                                      const bool gradientBackground = false) override;
 
     ///
+    /// \brief set the window title
+    ///
+    virtual void setWindowTitle(const std::string& title);
+
+    ///
     /// \brief Return the window status handler
     ///
     const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
@@ -113,7 +118,8 @@ public:
 protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
-    bool m_enableVR;
+    bool        m_enableVR;
+    std::string m_windowName = "imstk";
 
 #ifdef iMSTK_ENABLE_VR
     vtkSmartPointer<OpenVRCommand> m_openVRCommand;
