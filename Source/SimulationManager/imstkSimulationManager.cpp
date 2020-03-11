@@ -68,6 +68,12 @@ SimulationManager::setThreadPoolSize(const int nThreads)
 {
     if (nThreads <= 0)
     {
+        LOG(WARNING) << "Number of thread should be greater than 0";
+    }
+
+    m_config->threadPoolSize = nThreads;
+    if (nThreads <= 0)
+    {
         setOptimalThreadPoolSize();
     }
     else
@@ -458,6 +464,7 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
     // check if there is an active scene
     LOG_IF(WARNING, !this->getActiveScene()) << "No valid active scene! Simulation canceled";
 
+    setThreadPoolSize(m_config->threadPoolSize);
     if (!m_initialized)
     {
         this->initialize();
