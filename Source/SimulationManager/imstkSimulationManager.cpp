@@ -66,11 +66,6 @@ SimulationManager::createViewer(const bool enableVR)
 void
 SimulationManager::setThreadPoolSize(const int nThreads)
 {
-    if (nThreads <= 0)
-    {
-        LOG(WARNING) << "Number of thread should be greater than 0";
-    }
-
     m_config->threadPoolSize = nThreads;
     if (nThreads <= 0)
     {

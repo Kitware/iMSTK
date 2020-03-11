@@ -42,15 +42,17 @@ main()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 20, 10, 10);
-    auto map      = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
+    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+    //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
+
+    auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    auto deformableObj = std::make_shared<PbdObject>("Beam");
+    auto deformableObj = std::make_shared<PbdObject>("DeformableObject");
     auto pbdModel      = std::make_shared<PbdModel>();
     pbdModel->setModelGeometry(tetMesh);
 
@@ -72,6 +74,7 @@ main()
     pbdModel->configure(pbdParams);
     pbdModel->setDefaultTimeStep(0.02);
     pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::fixed);
+
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(tetMesh);
@@ -84,6 +87,7 @@ main()
 
     scene->addSceneObject(deformableObj);
 
+    // Setup plane
     auto planeGeom = std::make_shared<Plane>();
     planeGeom->setWidth(40);
     planeGeom->setTranslation(0, -6, 0);
