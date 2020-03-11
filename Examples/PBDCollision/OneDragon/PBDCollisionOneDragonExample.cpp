@@ -28,6 +28,7 @@
 #include "imstkOneToOneMap.h"
 #include "imstkMeshToMeshBruteforceCD.h"
 #include "imstkPBDCollisionHandling.h"
+#include "imstkTetraTriangleMap.h"
 
 using namespace imstk;
 
@@ -44,30 +45,33 @@ main()
     scene->getCamera()->setPosition(0, 3.0, 20.0);
     scene->getCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
-    // Load a sample mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    // set up the meshes
+    auto highResSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
+    auto coarseTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+    auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
+    coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
-    auto surfMesh       = std::make_shared<SurfaceMesh>();
-    auto surfMeshVisual = std::make_shared<SurfaceMesh>();
-    auto volTetMesh     = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+    // set up maps
+    auto mapPhysicsToVisual = std::make_shared<TetraTriangleMap>(coarseTetMesh, highResSurfMesh);
+    auto mapCollisionToPhysics = std::make_shared<OneToOneMap>(coarseTetMesh, coarseSurfMesh);
 
+    // set up visual model based on high res mesh
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    auto deformMapP2C = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
-    auto deformableObj = std::make_shared<PbdObject>("Dragon");
+    // configure the deformable object
+    auto deformableObj = std::make_shared<PbdObject>("DeformableObj");
     deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setCollidingGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(volTetMesh);
-    deformableObj->setPhysicsToCollidingMap(deformMapP2C);
+    deformableObj->setCollidingGeometry(coarseSurfMesh);
+    deformableObj->setPhysicsGeometry(coarseTetMesh);
+    deformableObj->setPhysicsToCollidingMap(mapCollisionToPhysics);
+    deformableObj->setPhysicsToVisualMap(mapPhysicsToVisual);
 
     // Create model and object
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->setModelGeometry(coarseTetMesh);
 
     // configure model
     auto pbdParams = std::make_shared<PBDModelConfig>();
@@ -75,7 +79,8 @@ main()
     // FEM constraint
     pbdParams->m_YoungModulus = 1000.0;
     pbdParams->m_PoissonRatio = 0.3;
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::Corotation);
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, 
+                                   PbdFEMConstraint::MaterialType::Corotation);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
