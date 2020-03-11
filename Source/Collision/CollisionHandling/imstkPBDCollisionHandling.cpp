@@ -111,7 +111,7 @@ PBDCollisionHandling::generatePBDConstraints()
             const auto& colData    = m_colData->EEColData[idx];
 
             size_t edgeA1, edgeA2;
-            if (map1)
+            if (map1 && map1->getType() == GeometryMap::Type::OneToOne)
             {
                 edgeA1 = map1->getMapIdx(colData.edgeIdA.first);
                 edgeA2 = map1->getMapIdx(colData.edgeIdA.second);
@@ -123,7 +123,7 @@ PBDCollisionHandling::generatePBDConstraints()
             }
 
             size_t edgeB1, edgeB2;
-            if (map2)
+            if (map2 && map2->getType() == GeometryMap::Type::OneToOne)
             {
                 edgeB1 = map2->getMapIdx(colData.edgeIdB.first);
                 edgeB2 = map2->getMapIdx(colData.edgeIdB.second);
@@ -154,7 +154,7 @@ PBDCollisionHandling::generatePBDConstraints()
             const auto& triVerts = colGeo2->getTrianglesVertices()[colData.triIdx];
 
             size_t v1, v2, v3;
-            if (map2)
+            if (map2 && map2->getType() == GeometryMap::Type::OneToOne)
             {
                 v1 = map2->getMapIdx(triVerts[0]);
                 v2 = map2->getMapIdx(triVerts[1]);
