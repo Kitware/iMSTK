@@ -25,8 +25,8 @@
 
 // imstk
 #include "imstkGeometryMap.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {
@@ -42,13 +42,13 @@ public:
     ///
     /// \brief Constructor
     ///
-    TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle) {}
+    TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle), m_bBoxAvailable(false) {}
 
     ///
     /// \brief Constructor
     ///
-    TetraTriangleMap(std::shared_ptr<Geometry> master,
-                     std::shared_ptr<Geometry> slave) : GeometryMap(GeometryMap::Type::TetraTriangle)
+    TetraTriangleMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave)
+        : GeometryMap(GeometryMap::Type::TetraTriangle), m_bBoxAvailable(false)
     {
         this->setMaster(master);
         this->setSlave(slave);
@@ -90,19 +90,24 @@ public:
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
     ///
-    /// \brief Find the closest tetrahedron based on the distance to their centroids for a given point in 3D space
+    /// \brief Find the closest tetrahedron based on the distance to their centroids for a given
+    /// point in 3D space
     ///
-    static size_t findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
-                                         const Vec3d&                     pos);
+    size_t findClosestTetrahedron(const Vec3d& pos) const;
 
     ///
     /// \brief Find the tetrahedron that encloses a given point in 3D space
     ///
-    static size_t findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
-                                           const Vec3d&                     pos);
+    size_t findEnclosingTetrahedron(const Vec3d& pos) const;
+    void updateBoundingBox(void);
 
 protected:
     std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
-    std::vector<size_t> m_verticesEnclosingTetraId;               ///> Enclosing tetrahedra to interpolate the weights upon
+    std::vector<size_t>
+    m_verticesEnclosingTetraId;                                   ///> Enclosing tetrahedra to interpolate the weights upon
+    std::vector<Vec3d> m_bBoxMin;
+    std::vector<Vec3d> m_bBoxMax;
+    bool m_bBoxAvailable;
+    // void               m_updateBoundingBox(void);
 };
-} // imstk
+}  // namespace imstk

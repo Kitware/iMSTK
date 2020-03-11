@@ -20,14 +20,14 @@
 =========================================================================*/
 
 #include "imstkSurfaceMesh.h"
+#include "imstkTimer.h"
 //#include "imstkGraph.h"
 
 namespace imstk
 {
 void
-SurfaceMesh::initialize(const StdVectorOfVec3d&           vertices,
-                        const std::vector<TriangleArray>& triangles,
-                        const bool                        computeDerivedData)
+SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
+                        const std::vector<TriangleArray>& triangles, const bool computeDerivedData)
 {
     this->clear();
 
@@ -41,10 +41,9 @@ SurfaceMesh::initialize(const StdVectorOfVec3d&           vertices,
 }
 
 void
-SurfaceMesh::initialize(const StdVectorOfVec3d&           vertices,
+SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
                         const std::vector<TriangleArray>& triangles,
-                        const StdVectorOfVec3d&           normals,
-                        const bool                        computeDerivedData)
+                        const StdVectorOfVec3d& normals, const bool computeDerivedData)
 {
     this->initialize(vertices, triangles, computeDerivedData);
 
@@ -174,7 +173,8 @@ SurfaceMesh::computeTrianglesNormals()
             float diffUV1[2] = { uv1[0] - uv0[0], uv1[1] - uv0[1] };
             float diffUV2[2] = { uv2[0] - uv0[0], uv2[1] - uv0[1] };
 
-            m_triangleTangents.at(triangleId) = (diffPos1 * diffUV2[1] - diffPos2 * diffUV1[0]) / (diffUV1[0] * diffUV2[1] - diffUV1[1] * diffUV2[0]);
+            m_triangleTangents.at(triangleId) = (diffPos1 * diffUV2[1] - diffPos2 * diffUV1[0]) /
+                                                (diffUV1[0] * diffUV2[1] - diffUV1[1] * diffUV2[0]);
         }
     }
 }
@@ -474,68 +474,64 @@ void
 SurfaceMesh::correctWindingOrder()
 {
     // Enforce consistency in winding of a particular triangle with its neighbor (master)
-    auto enforceWindingConsistency =
-        [this](const size_t masterTriId, const size_t neighTriId)
-        {
-            const auto& masterTri = m_trianglesVertices[masterTriId];
-            auto&       neighTri  = m_trianglesVertices[neighTriId];
+    auto enforceWindingConsistency = [this](const size_t masterTriId, const size_t neighTriId) {
+                                         const auto& masterTri = m_trianglesVertices[masterTriId];
+                                         auto&       neighTri  = m_trianglesVertices[neighTriId];
 
-            for (unsigned int l = 0; l < 3; ++l)
-            {
-                for (unsigned int k = 0; k < 3; ++k)
-                {
-                    if (masterTri[k] == neighTri[l] && masterTri[(k + 1) % 3] == neighTri[(l + 1) % 3])
-                    {
-                        // Flip the order of neighbor triangle
-                        auto tempId = neighTri[0];
-                        neighTri[0] = neighTri[1];
-                        neighTri[1] = tempId;
-                        break;
-                    }
-                }
-            }
-        };
+                                         for (unsigned int l = 0; l < 3; ++l)
+                                         {
+                                             for (unsigned int k = 0; k < 3; ++k)
+                                             {
+                                                 if (masterTri[k] == neighTri[l] && masterTri[(k + 1) % 3] == neighTri[(l + 1) % 3])
+                                                 {
+                                                     // Flip the order of neighbor triangle
+                                                     auto tempId = neighTri[0];
+                                                     neighTri[0] = neighTri[1];
+                                                     neighTri[1] = tempId;
+                                                     break;
+                                                 }
+                                             }
+                                         }
+                                     };
 
     // Search for triangle neighbors that share a common edge
-    auto getTriangleNeighbors =
-        [this](const size_t triID, int* neig)
-        {
-            const auto& currentTri = m_trianglesVertices[triID];
-            size_t      currentId  = 0;
-            int         numNeigh   = 0;
-            for (auto& tri : m_trianglesVertices)
-            {
-                if (triID == currentId)
-                {
-                    currentId++;
-                    continue;
-                }
+    auto getTriangleNeighbors = [this](const size_t triID, int* neig) {
+                                    const auto& currentTri = m_trianglesVertices[triID];
+                                    size_t      currentId  = 0;
+                                    int         numNeigh   = 0;
+                                    for (auto& tri : m_trianglesVertices)
+                                    {
+                                        if (triID == currentId)
+                                        {
+                                            currentId++;
+                                            continue;
+                                        }
 
-                int numCommon = 0;
-                for (int i = 0; i < 3; ++i)
-                {
-                    if (currentTri[i] == tri[0] || currentTri[i] == tri[1] || currentTri[i] == tri[2])
-                    {
-                        numCommon++;
-                        if (numCommon == 2)
-                        {
-                            neig[numNeigh] = (int)currentId;
-                            numNeigh++;
+                                        int numCommon = 0;
+                                        for (int i = 0; i < 3; ++i)
+                                        {
+                                            if (currentTri[i] == tri[0] || currentTri[i] == tri[1] || currentTri[i] == tri[2])
+                                            {
+                                                numCommon++;
+                                                if (numCommon == 2)
+                                                {
+                                                    neig[numNeigh] = (int)currentId;
+                                                    numNeigh++;
 
-                            if (numNeigh == 3)
-                            {
-                                return;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-                currentId++;
-            }
-        };
+                                                    if (numNeigh == 3)
+                                                    {
+                                                        return;
+                                                    }
+                                                    else
+                                                    {
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        currentId++;
+                                    }
+                                };
 
     // Start with a reference triangle and enforce the consistency of its neighbors
     // Keep track of those neighbor triangles whose order is enforced but its neighbors not
@@ -544,7 +540,7 @@ SurfaceMesh::correctWindingOrder()
     std::vector<bool>   trianglesCorrected(this->getNumTriangles(), false);
     std::vector<size_t> correctedTriangles;
 
-    size_t currentTriangle = 0; // Start with triangle 0
+    size_t currentTriangle = 0;  // Start with triangle 0
     correctedTriangles.push_back(currentTriangle);
     trianglesCorrected[currentTriangle] = true;
     do
@@ -564,10 +560,9 @@ SurfaceMesh::correctWindingOrder()
             }
         }
 
-        correctedTriangles.erase(std::remove(correctedTriangles.begin(),
-                                             correctedTriangles.end(),
-                                             currentTriangle),
-                                 correctedTriangles.end());
+        correctedTriangles.erase(
+                std::remove(correctedTriangles.begin(), correctedTriangles.end(), currentTriangle),
+                correctedTriangles.end());
     }
     while (correctedTriangles.size() > 0);
 }
@@ -590,8 +585,9 @@ SurfaceMesh::computeUVSeamVertexGroups()
 
         if (m_UVSeamVertexGroups.find(group) == m_UVSeamVertexGroups.end())
         {
-            m_UVSeamVertexGroups.insert(std::pair<NormalGroup, std::shared_ptr<std::vector<size_t>>>(
-                group, std::make_shared<std::vector<size_t>>()));
+            m_UVSeamVertexGroups.insert(
+                    std::pair<NormalGroup, std::shared_ptr<std::vector<size_t>>>(
+                            group, std::make_shared<std::vector<size_t>>()));
         }
         m_UVSeamVertexGroups[group]->push_back(i);
     }
@@ -613,4 +609,220 @@ SurfaceMesh::getMaxNumTriangles()
 {
     return m_maxNumTriangles;
 }
-} // imstk
+
+std::vector<bool>
+SurfaceMesh::markPointsInsideAndOut(const StdVectorOfVec3d& coords)
+{
+    std::vector<bool> isInside;
+    isInside.resize(coords.size(), false);
+
+    Vec3d aabbMin, aabbMax;
+    this->computeBoundingBox(aabbMin, aabbMax, 1.);
+
+    auto genRandomDirection = [](Vec3d& dir)
+                              {
+                                  for (int i = 0; i < 3; ++i)
+                                  {
+                                      dir[i] = rand();
+                                  }
+                                  double mag = dir.norm();
+
+                                  for (int i = 0; i < 3; ++i)
+                                  {
+                                      dir[i] /= mag;
+                                  }
+                                  return;
+                              };
+
+    auto intersectTriangle = [](const Vec3d& xyz, const Vec3d& xyz0, const Vec3d& xyz1, const Vec3d& xyz2, const Vec3d& dir)
+                             {
+                                 // const double eps = 1e-15;
+                                 const double eps   = std::numeric_limits<double>::epsilon();
+                                 Vec3d        edge0 = xyz1 - xyz0;
+                                 Vec3d        edge1 = xyz2 - xyz0;
+                                 Vec3d        pvec  = dir.cross(edge1);
+                                 double       det   = edge0.dot(pvec);
+
+                                 if (det > -eps && det < eps)
+                                 {
+                                     return false;
+                                 }
+                                 double inv_det = 1.0 / det;
+                                 Vec3d  tvec    = xyz - xyz0;
+                                 double u       = tvec.dot(pvec) * inv_det;
+                                 if (u < 0.0 || u > 1.0)
+                                 {
+                                     return false;
+                                 }
+                                 Vec3d  qvec = tvec.cross(edge0);
+                                 double v    = dir.dot(qvec) * inv_det;
+                                 if (v < 0.0 || u + v > 1.0)
+                                 {
+                                     return false;
+                                 }
+
+                                 double t = edge1.dot(qvec) * inv_det;
+                                 if (t > 0.0)
+                                 {
+                                     return true;
+                                 }
+                                 else
+                                 {
+                                     return false;
+                                 }
+                             };
+
+#if 1
+    std::vector<Vec3d> bBoxMin;
+    std::vector<Vec3d> bBoxMax;
+
+    bBoxMin.resize(this->getNumTriangles());
+    bBoxMax.resize(this->getNumTriangles());
+
+    for (size_t idx = 0; idx < this->getNumTriangles(); ++idx)
+    {
+        const auto& verts = m_trianglesVertices.at(idx);
+        const auto& xyz0  = m_vertexPositions[verts[0]];
+        const auto& xyz1  = m_vertexPositions[verts[1]];
+        const auto& xyz2  = m_vertexPositions[verts[2]];
+
+        bBoxMin[idx][0] = xyz0[0];
+        bBoxMin[idx][1] = xyz0[1];
+        bBoxMin[idx][2] = xyz0[2];
+        bBoxMax[idx][0] = xyz0[0];
+        bBoxMax[idx][1] = xyz0[1];
+        bBoxMax[idx][2] = xyz0[2];
+
+        bBoxMin[idx][0] = std::min(bBoxMin[idx][0], xyz1[0]);
+        bBoxMin[idx][1] = std::min(bBoxMin[idx][1], xyz1[1]);
+        bBoxMin[idx][2] = std::min(bBoxMin[idx][2], xyz1[2]);
+        bBoxMin[idx][0] = std::min(bBoxMin[idx][0], xyz2[0]);
+        bBoxMin[idx][1] = std::min(bBoxMin[idx][1], xyz2[1]);
+        bBoxMin[idx][2] = std::min(bBoxMin[idx][2], xyz2[2]);
+
+        bBoxMax[idx][0] = std::max(bBoxMax[idx][0], xyz1[0]);
+        bBoxMax[idx][1] = std::max(bBoxMax[idx][1], xyz1[1]);
+        bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz1[2]);
+        bBoxMax[idx][0] = std::max(bBoxMax[idx][0], xyz2[0]);
+        bBoxMax[idx][1] = std::max(bBoxMax[idx][1], xyz2[1]);
+        bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz2[2]);
+    }
+
+    auto rayTracingFunc = [&coords, &aabbMin, &aabbMax, &bBoxMin, &bBoxMax, &isInside, &intersectTriangle, &genRandomDirection, this](const size_t i) {
+                              bool outBox = coords[i][0] < aabbMin[0] || coords[i][0] > aabbMax[0]
+                                            || coords[i][1] < aabbMin[1] || coords[i][1] > aabbMax[1]
+                                            || coords[i][2] < aabbMin[2] || coords[i][2] > aabbMax[2];
+                              if (outBox)
+                              {
+                                  return;
+                              }
+
+                              // TODO: generate a random direction?
+                              const Vec3d direction = { 0.0, 0.0, 1.0 };
+                              // Vec3d direction;
+                              // genRandomDirection(direction);
+                              // std::cout << direction << std::endl;
+                              int         numIntersections = 0;
+                              const auto& xyz = m_vertexPositions;
+
+                              for (size_t j = 0; j < this->getNumTriangles(); ++j)
+                              {
+                                  const auto& verts = m_trianglesVertices[j];
+
+                                  // consider directed ray
+                                  if (coords[i][2] > bBoxMax[j][2])
+                                  {
+                                      continue;
+                                  }
+
+                                  if (coords[i][0] > bBoxMax[j][0])
+                                  {
+                                      continue;
+                                  }
+                                  if (coords[i][0] < bBoxMin[j][0])
+                                  {
+                                      continue;
+                                  }
+                                  if (coords[i][1] > bBoxMax[j][1])
+                                  {
+                                      continue;
+                                  }
+                                  if (coords[i][1] < bBoxMin[j][1])
+                                  {
+                                      continue;
+                                  }
+
+                                  auto intersected = intersectTriangle(coords[i],
+                                                 xyz[verts[0]],
+                                                 xyz[verts[1]],
+                                                 xyz[verts[2]],
+                                                 direction);
+                                  if (intersected)
+                                  {
+                                      ++numIntersections;
+                                  }
+                              }
+
+                              if (numIntersections % 2 == 1)
+                              {
+                                  isInside[i] = true;
+                              }
+
+                              return;
+                          };
+
+#else
+    auto rayTracingFunc = [&coords, &aabbMin, &aabbMax, &isInside, &intersectTriangle, &genRandomDirection, this](const size_t i) {
+                              bool outBox = coords[i][0] < aabbMin[0] || coords[i][0] > aabbMax[0]
+                                            || coords[i][1] < aabbMin[1] || coords[i][1] > aabbMax[1]
+                                            || coords[i][2] < aabbMin[2] || coords[i][2] > aabbMax[2];
+                              if (outBox)
+                              {
+                                  return;
+                              }
+
+                              // TODO: generate a random direction?
+                              // const Vec3d direction = {1.0, 0.0, 0.0};
+                              Vec3d direction;
+                              genRandomDirection(direction);
+                              // std::cout << direction << std::endl;
+                              int numIntersections = 0;
+
+                              for (size_t j = 0; j < this->getNumTriangles(); ++j)
+                              {
+                                  const auto& verts       = m_trianglesVertices[j];
+                                  auto        intersected = intersectTriangle(coords[i],
+                                  m_vertexPositions[verts[0]],
+                                  m_vertexPositions[verts[1]],
+                                  m_vertexPositions[verts[2]],
+                                  direction);
+                                  if (intersected)
+                                  {
+                                      ++numIntersections;
+                                  }
+                              }
+
+                              if (numIntersections % 2 == 1)
+                              {
+                                  isInside[i] = true;
+                              }
+
+                              return;
+                          };
+
+#endif
+    // for (size_t i = 0; i < coords.size(); ++i)
+    // {
+    //     rayTracingFunc(i);
+    // }
+
+    // CpuTimer timer;
+    StopWatch timer;
+    timer.start();
+    ParallelUtils::parallelFor(coords.size(), rayTracingFunc);
+    timer.stop();
+    timer.printTimeElapsed();
+
+    return isInside;
+}
+}  // namespace imstk
