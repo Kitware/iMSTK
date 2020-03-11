@@ -112,20 +112,27 @@ OneToOneMap::isValid() const
     auto numVertSlave  = meshSlave->getNumVertices();
     bool bOK           = true;
 
-    ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
-        [&](const size_t idx) {
-            if (!bOK) // If map is invalid, no need to check further
-            {
-                return;
-            }
-            const auto& mapValue = m_oneToOneMapVector[idx];
-            if (mapValue.first >= numVertSlave
-                && mapValue.second >= numVertMaster)
-            {
-                LOG(WARNING) << "OneToOneMap map is not valid! Vertex indices out of bounds.";
-                bOK = false;
-            }
-        });
+    if (m_oneToOneMapVector.size() == 0)
+    {
+        bOK = false;
+    }
+    else
+    {
+        ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
+            [&](const size_t idx) {
+                if (!bOK) // If map is invalid, no need to check further
+                {
+                    return;
+                }
+                const auto& mapValue = m_oneToOneMapVector[idx];
+                if (mapValue.first >= numVertSlave
+                    && mapValue.second >= numVertMaster)
+                {
+                    LOG(WARNING) << "OneToOneMap map is not valid! Vertex indices out of bounds.";
+                    bOK = false;
+                }
+            });
+    }
 
     return bOK;
 }
