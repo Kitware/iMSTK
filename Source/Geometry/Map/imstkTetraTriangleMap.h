@@ -109,8 +109,8 @@ protected:
 
     std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
 
-    std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
-    
+    std::vector<size_t> m_verticesEnclosingTetraId;               ///> Enclosing tetrahedra to interpolate the weights upon
+
     std::vector<Vec3d> m_bBoxMin;
     std::vector<Vec3d> m_bBoxMax;
     bool m_boundingBoxAvailable;

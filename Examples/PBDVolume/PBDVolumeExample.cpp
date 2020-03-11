@@ -42,8 +42,8 @@ main()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto tetMesh = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 20, 10, 10);
-    auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
+    auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 20, 10, 10);
+    auto map      = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);

@@ -100,10 +100,10 @@ TetraTriangleMap::apply()
     auto triMesh = static_cast<SurfaceMesh*>(m_slave.get());
 
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) && dynamic_cast<SurfaceMesh*>(m_slave.get())) 
+    CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) && dynamic_cast<SurfaceMesh*>(m_slave.get()))
         << "Fail to cast from geometry to meshes";
 #endif
-    ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexId) {      
+    ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexId) {
             const auto tetVerts = tetMesh->getTetrahedronVertices(m_verticesEnclosingTetraId[vertexId]);
             const auto weights  = m_verticesWeights[vertexId];
 
@@ -161,7 +161,7 @@ TetraTriangleMap::isValid() const
 void
 TetraTriangleMap::setMaster(std::shared_ptr<Geometry> master)
 {
-    CHECK(master->getType() == Geometry::Type::TetrahedralMesh) << 
+    CHECK(master->getType() == Geometry::Type::TetrahedralMesh) <<
         "The geometry provided as master is not of tetrahedral type";
 
     GeometryMap::setMaster(master);
@@ -179,10 +179,10 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 size_t
 TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 {
-    const auto   tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
-    double closestDistanceSqr = MAX_D;
-    size_t closestTetrahedron = std::numeric_limits<size_t>::max();
-    Vec3d  center(0, 0, 0);
+    const auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    double     closestDistanceSqr = MAX_D;
+    size_t     closestTetrahedron = std::numeric_limits<size_t>::max();
+    Vec3d      center(0, 0, 0);
 
     for (size_t tetId = 0; tetId < tetMesh->getNumTetrahedra(); ++tetId)
     {
@@ -208,15 +208,15 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
 size_t
 TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
 {
-    const auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    const auto                    tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
     TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
-    size_t enclosingTetrahedron = std::numeric_limits<size_t>::max();
+    size_t                        enclosingTetrahedron = std::numeric_limits<size_t>::max();
 
     for (size_t idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
     {
         bool inBox = (pos[0] >= m_bBoxMin[idx][0] && pos[0] <= m_bBoxMax[idx][0])
-                  && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])
-                  && (pos[2] >= m_bBoxMin[idx][2] && pos[2] <= m_bBoxMax[idx][2]);
+                     && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])
+                     && (pos[2] >= m_bBoxMin[idx][2] && pos[2] <= m_bBoxMax[idx][2]);
 
         // if the point is outside the bounding box, it is for sure not inside
         // the element
@@ -252,5 +252,4 @@ TetraTriangleMap::updateBoundingBox()
 
     m_boundingBoxAvailable = true;
 }
-
 }  // namespace imstk
