@@ -33,7 +33,7 @@
 using namespace imstk;
 
 std::shared_ptr<imstk::RigidObject>
-addMeshRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
+addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
 {
     // create cube object
     auto meshObj = std::make_shared<RigidObject>(name);
