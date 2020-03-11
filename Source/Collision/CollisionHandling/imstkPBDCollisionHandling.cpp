@@ -111,7 +111,7 @@ PBDCollisionHandling::generatePBDConstraints()
             const auto& colData    = m_colData->EEColData[idx];
 
             size_t edgeA1, edgeA2;
-            if (map1 && map1->getType()==GeometryMap::Type::OneToOne)
+            if (map1 && map1->getType() == GeometryMap::Type::OneToOne)
             {
                 edgeA1 = map1->getMapIdx(colData.edgeIdA.first);
                 edgeA2 = map1->getMapIdx(colData.edgeIdA.second);

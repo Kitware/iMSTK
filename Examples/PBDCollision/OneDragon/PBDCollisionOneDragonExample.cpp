@@ -47,12 +47,12 @@ main()
 
     // set up the meshes
     auto highResSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto coarseTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
+    auto coarseTetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+    auto coarseSurfMesh  = std::make_shared<SurfaceMesh>();
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
     // set up maps
-    auto mapPhysicsToVisual = std::make_shared<TetraTriangleMap>(coarseTetMesh, highResSurfMesh);
+    auto mapPhysicsToVisual    = std::make_shared<TetraTriangleMap>(coarseTetMesh, highResSurfMesh);
     auto mapCollisionToPhysics = std::make_shared<OneToOneMap>(coarseTetMesh, coarseSurfMesh);
 
     // set up visual model based on high res mesh
@@ -79,7 +79,7 @@ main()
     // FEM constraint
     pbdParams->m_YoungModulus = 1000.0;
     pbdParams->m_PoissonRatio = 0.3;
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, 
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
                                    PbdFEMConstraint::MaterialType::Corotation);
 
     // Other parameters
