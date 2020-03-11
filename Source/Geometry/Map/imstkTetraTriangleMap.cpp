@@ -58,6 +58,7 @@ TetraTriangleMap::compute()
             size_t closestTetId = findEnclosingTetrahedron(surfVertPos);
             if (closestTetId == std::numeric_limits<size_t>::max())
             {
+                LOG(WARNING) << "Could not find enclosing tetrahedron for vertex ID "<< vertexIdx << ". Finding the closest one.";
                 closestTetId = findClosestTetrahedron(surfVertPos);
             }
             if (closestTetId == std::numeric_limits<size_t>::max())
@@ -218,7 +219,7 @@ TetraTriangleMap::findEnclosingTetrahedron(const Vec3d& pos) const
                      && (pos[1] >= m_bBoxMin[idx][1] && pos[1] <= m_bBoxMax[idx][1])
                      && (pos[2] >= m_bBoxMin[idx][2] && pos[2] <= m_bBoxMax[idx][2]);
 
-        // if the point is outside the bounding box, it is for sure not inside
+        // If the point is outside the bounding box, it is for sure not inside
         // the element
         if (!inBox)
         {
