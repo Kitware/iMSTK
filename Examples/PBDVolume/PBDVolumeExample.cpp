@@ -26,6 +26,7 @@
 #include "imstkPbdSolver.h"
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
+#include "imstkTetraTriangleMap.h"
 
 using namespace imstk;
 
@@ -40,27 +41,18 @@ main()
     auto scene      = simManager->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
-    // Load a sample mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-
-    // Extract the surface mesh
-    auto surfMesh   = std::make_shared<SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
+    auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 20, 10, 10);
+    auto map      = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    // Construct a map
-
-    // Construct one to one nodal map based on the above meshes
-    auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
     auto deformableObj = std::make_shared<PbdObject>("Beam");
     auto pbdModel      = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->setModelGeometry(tetMesh);
 
     // configure model
     auto pbdParams = std::make_shared<PBDModelConfig>();
@@ -82,8 +74,8 @@ main()
     pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::fixed);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(volTetMesh);
-    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->setPhysicsGeometry(tetMesh);
+    deformableObj->setPhysicsToVisualMap(map); //assign the computed map
 
     deformableObj->setDynamicalModel(pbdModel);
     auto pbdSolver = std::make_shared<PbdSolver>();

@@ -42,13 +42,13 @@ public:
     ///
     /// \brief Constructor
     ///
-    TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle), m_bBoxAvailable(false) {}
+    TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle), m_boundingBoxAvailable(false) {}
 
     ///
     /// \brief Constructor
     ///
     TetraTriangleMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave)
-        : GeometryMap(GeometryMap::Type::TetraTriangle), m_bBoxAvailable(false)
+        : GeometryMap(GeometryMap::Type::TetraTriangle), m_boundingBoxAvailable(false)
     {
         this->setMaster(master);
         this->setSlave(slave);
@@ -89,25 +89,33 @@ public:
     ///
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
+protected:
+
+    ///
+    /// \brief Find the tetrahedron that encloses a given point in 3D space
+    ///
+    size_t findEnclosingTetrahedron(const Vec3d& pos) const;
+
+    ///
+    /// \brief Update bounding box of each tetrahedra of the mesh
+    ///
+    void updateBoundingBox();
+
     ///
     /// \brief Find the closest tetrahedron based on the distance to their centroids for a given
     /// point in 3D space
     ///
     size_t findClosestTetrahedron(const Vec3d& pos) const;
 
-    ///
-    /// \brief Find the tetrahedron that encloses a given point in 3D space
-    ///
-    size_t findEnclosingTetrahedron(const Vec3d& pos) const;
-    void updateBoundingBox(void);
-
-protected:
     std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
-    std::vector<size_t>
-    m_verticesEnclosingTetraId;                                   ///> Enclosing tetrahedra to interpolate the weights upon
+
+    std::vector<size_t> m_verticesEnclosingTetraId;               ///> Enclosing tetrahedra to interpolate the weights upon
+
     std::vector<Vec3d> m_bBoxMin;
     std::vector<Vec3d> m_bBoxMax;
-    bool m_bBoxAvailable;
-    // void               m_updateBoundingBox(void);
+    bool m_boundingBoxAvailable;
+
+private:
+    StdVectorOfVec3d m_slaveVerts;
 };
 }  // namespace imstk
