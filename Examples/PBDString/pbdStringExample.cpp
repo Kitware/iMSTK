@@ -35,7 +35,9 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
+    auto c = std::make_shared<simManagerConfig>();
+    c->VR_Enabled = true;
+    auto simManager = std::make_shared<SimulationManager>(c);
     auto scene      = simManager->createNewScene("PBDString");
 
     // Setup N separate string simulations with varying bend stiffnesses

@@ -106,6 +106,12 @@ public:
     }
 
 protected:
+
+    ///
+    /// \brief Returns the first matching vertex
+    ///
+    bool findMatchingVertex(const std::shared_ptr<PointSet>& masterMesh, const Vec3d& p, size_t& nodeId);
+
     std::map<size_t, size_t> m_oneToOneMap; ///> One to one mapping data
 
     // This vector is for parallel processing, it should contain identical data as m_oneToOneMap
