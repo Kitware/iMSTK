@@ -34,7 +34,7 @@ OneToOneMap::compute()
     CHECK(m_master && m_slave) << "OneToOneMap map is being applied without valid geometries";
 
     auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
-    auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
+    auto meshSlave  = std::dynamic_pointer_cast<PointSet>(m_slave);
 
     CHECK(meshMaster && meshSlave) << "Fail to cast from geometry to pointset";
 
@@ -95,9 +95,9 @@ OneToOneMap::findMatchingVertex(const std::shared_ptr<PointSet>& masterMesh, con
 
 bool
 OneToOneMap::isValid() const
-{   
+{
     auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
-    auto meshSlave = std::dynamic_pointer_cast<PointSet>(m_slave);
+    auto meshSlave  = std::dynamic_pointer_cast<PointSet>(m_slave);
 
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     CHECK(dynamic_cast<PointSet*>(m_master.get()) && dynamic_cast<PointSet*>(m_slave.get())) <<
@@ -117,7 +117,7 @@ OneToOneMap::isValid() const
             const auto& mapValue = m_oneToOneMapVector[idx];
             if (mapValue.first >= numVertSlave
                 && mapValue.second >= numVertMaster)
-            {                
+            {
                 valid = false;
             }
         });
@@ -126,26 +126,26 @@ OneToOneMap::isValid() const
     if (valid)
     {
         ParallelUtils::parallelFor(meshSlave->getNumVertices(), [&](const size_t nodeId)
-        {
-            if (!valid) // If map is invalid, no need to check further
             {
-                return;
-            }
-
-            const auto p = meshSlave->getVertexPosition(nodeId);
-            bool matchFound = false;
-            for (size_t idx = 0; idx < meshMaster->getNumVertices(); ++idx)
-            {
-                if (meshMaster->getInitialVertexPosition(idx) == p)
+                if (!valid) // If map is invalid, no need to check further
                 {
-                    matchFound =true;
-                    break;
+                    return;
                 }
-            }
-            if (!matchFound)
-            { 
-                valid = false; 
-            }
+
+                const auto p = meshSlave->getVertexPosition(nodeId);
+                bool matchFound = false;
+                for (size_t idx = 0; idx < meshMaster->getNumVertices(); ++idx)
+                {
+                    if (meshMaster->getInitialVertexPosition(idx) == p)
+                    {
+                        matchFound = true;
+                        break;
+                    }
+                }
+                if (!matchFound)
+                {
+                    valid = false;
+                }
         });
     }
 
