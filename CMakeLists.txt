@@ -113,7 +113,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
 
   imstk_define_dependency(Assimp)
-  imstk_define_dependency(Eigen)
+  imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
   imstk_define_dependency(glm)
   imstk_define_dependency(imgui)
@@ -194,7 +194,7 @@ include(imstkFind)
 # Assimp
 find_package( Assimp REQUIRED )
 # Eigen
-find_package( Eigen 3.1.2 REQUIRED )
+find_package( Eigen3 3.1.2 REQUIRED )
 if(WIN32)
   # FTD2XX
   find_package( FTD2XX REQUIRED )

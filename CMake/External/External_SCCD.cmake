@@ -29,8 +29,8 @@ endif()
 
 
 imstk_add_external_project( SCCD
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/SCCD.git
-  GIT_TAG 760854d53f4db6fd1d1a073aabd2d3ecb32506b5
+  URL https://gitlab.kitware.com/iMSTK/SCCD/-/archive/addressWarnings/SCCD-addressWarnings.zip
+  URL_MD5 a45b33df99ea3e7ad85340afe8dcc489
   CMAKE_CACHE_ARGS
     -DBUILD_SAMPLE_APP:BOOL=OFF
   RELATIVE_INCLUDE_PATH "inc"
@@ -38,6 +38,6 @@ imstk_add_external_project( SCCD
     COMMAND ${copy_sccd_headers_command}
     COMMAND ${copy_sccd_lib_command}
   DEPENDENCIES
-    Eigen
+    Eigen3
   #VERBOSE
   )

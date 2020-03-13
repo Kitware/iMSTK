@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( Assimp
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/assimp.git
-  GIT_TAG ce3d6a91d2e0e945493c0fdeb162b50c9034e5f9
+  URL https://gitlab.kitware.com/iMSTK/assimp/-/archive/fixCompilationError/assimp-fixCompilationError.zip
+  URL_MD5 fab081af9dbd73a9a5c61cd33dd93340
   CMAKE_CACHE_ARGS
     -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=ON
     -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF

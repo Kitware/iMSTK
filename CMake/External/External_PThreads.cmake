@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( PThreads
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/libpthread.git
-  GIT_TAG 660654b332126834a20db43ca649e43fdcd32016
+  URL https://gitlab.kitware.com/iMSTK/libpthread/-/archive/iMSTK/libpthread-iMSTK.zip
+  URL_MD5 9bc417d5ebb8ac0859eeb77a147569ba
   # This is the iMSTK branch
   CMAKE_CACHE_ARGS
     -DBUILD_TESTING:BOOL=OFF

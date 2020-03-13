@@ -21,8 +21,8 @@ set(copy_imgui_headers_command
   )
 
 imstk_add_external_project( imgui
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/imgui.git
-  GIT_TAG v1.65
+  URL https://gitlab.kitware.com/iMSTK/imgui/-/archive/v1.65/imgui-v1.65.zip
+  URL_MD5 e255a471fa1cc4f2be931659c253956a
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
   INSTALL_COMMAND

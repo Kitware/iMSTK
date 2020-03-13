@@ -2,14 +2,13 @@
 # Add External Project
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
-imstk_add_external_project( GoogleTest
-  URL https://github.com/google/googletest/archive/release-1.10.0.zip
-  URL_MD5 82358affdd7ab94854c8ee73a180fc53
+imstk_add_external_project( Eigen3
+  URL "https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz"
+  URL_HASH MD5=9e30f67e8531477de4117506fe44669b
   CMAKE_CACHE_ARGS
-    -DBUILD_GMOCK:BOOL=ON
-    -DBUILD_GTEST:BOOL=ON
-    -DBUILD_SHARED_LIBS:BOOL=ON
-  DEPENDENCIES ""
+        -DBUILD_TESTING:BOOL=OFF
   RELATIVE_INCLUDE_PATH ""
+  DEPENDENCIES ""
   #VERBOSE
   )
+set(Eigen3_DIR ${PhysX_INSTALL_DIR}/install/share/eigen3/cmake)
