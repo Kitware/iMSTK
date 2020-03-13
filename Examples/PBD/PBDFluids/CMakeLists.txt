@@ -16,17 +16,21 @@
 #
 ###########################################################################
 
-project(Example-Viewer)
+if(iMSTK_USE_Vulkan)
+  return()
+endif()
+
+project(Example-PBDFluids)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} ViewerExample.cpp)
+imstk_add_executable(${PROJECT_NAME} PBDFluidsExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

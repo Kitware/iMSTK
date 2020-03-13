@@ -31,7 +31,7 @@ imstk_add_executable(${PROJECT_NAME} SPHFluid-HighViscousity.cpp)
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

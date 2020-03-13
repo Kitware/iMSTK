@@ -22,7 +22,7 @@ if(iMSTK_USE_Vulkan)
   return()
 endif()
 
-project(Example-Octree)
+project(Example-OctreeCollision)
 
 #-----------------------------------------------------------------------------
 # Create executable

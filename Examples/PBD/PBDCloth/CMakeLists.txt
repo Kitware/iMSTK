@@ -16,22 +16,17 @@
 #
 ###########################################################################
 
-# Uses VTK Text Status Manager
-if(iMSTK_USE_Vulkan)
-  return()
-endif()
-
-project(Example-PBDCollision-ManyDragons)
+project(Example-PBDCloth)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} PBDCollisionManyDragonsExample.cpp)
+imstk_add_executable(${PROJECT_NAME} pbdClothExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

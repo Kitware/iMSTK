@@ -16,17 +16,17 @@
 #
 ###########################################################################
 
-project(Example-MeshIO)
+project(Example-PBDString)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} MeshIOExample.cpp)
+imstk_add_executable(${PROJECT_NAME} pbdStringExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable
