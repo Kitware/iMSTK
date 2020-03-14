@@ -39,7 +39,7 @@ class NonLinearSolver : public SolverBase
 {
 public:
     using JacobianType      = std::function<const SparseMatrixd& (const Vectord&)>;
-    using UpdateIterateType = std::function<void(const Vectord&, Vectord&)>;
+    using UpdateIterateType = std::function<void (const Vectord&, Vectord&)>;
     using FunctionType      = NonLinearSystem::VectorFunctionType;
 
 public:

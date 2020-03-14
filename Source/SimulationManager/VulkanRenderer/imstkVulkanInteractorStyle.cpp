@@ -177,8 +177,8 @@ VulkanInteractorStyle::OnChar(int keyID, int type)
 void
 VulkanInteractorStyle::OnMouseMove(double x, double y)
 {
-    m_mousePos[0]           = x;
-    m_mousePos[1]           = y;
+    m_mousePos[0] = x;
+    m_mousePos[1] = y;
     m_mousePosNormalized[0] = x;
     m_mousePosNormalized[1] = y;
     this->normalizeCoordinate(m_mousePosNormalized[0], m_mousePosNormalized[1]);

@@ -168,7 +168,7 @@ public:
     ///
     void setUseArmijo(const bool value)
     {
-        m_useArmijo           = value;
+        m_useArmijo = value;
         (value) ? m_armijoMax = 30 : m_armijoMax = 0;
     }
 

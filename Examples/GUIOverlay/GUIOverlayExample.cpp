@@ -54,7 +54,7 @@ main()
     auto windowText = std::make_shared<GUIOverlay::Text>("Window Text", "Window Text", 0.0f, 0.0f);
     window->addWidget(windowText);
 
-    auto circle        = std::make_shared<GUIOverlay::Circle>("Circle", 100.0f, 100.0f, 25.0f, Color::Red, true);
+    auto circle = std::make_shared<GUIOverlay::Circle>("Circle", 100.0f, 100.0f, 25.0f, Color::Red, true);
     auto circleOutline = std::make_shared<GUIOverlay::Circle>("CircleOutline", 100.0f, 100.0f, 25.0f, Color::Black, false);
 
     // These two rectangles show that the ordering matters
@@ -93,7 +93,7 @@ main()
         };
     simManager->getViewer()->setOnTimerFunction(GUIUpdateFunction);
 
-    bool canvasVisible          = true;
+    bool canvasVisible = true;
     auto hideShowCanvasFunction =
         [&](InteractorStyle* style) -> bool
         {

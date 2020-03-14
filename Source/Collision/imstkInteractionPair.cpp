@@ -88,7 +88,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     m_colDetect    = CD;
     m_colHandlingA = CHA;
     m_colHandlingB = CHB;
-    m_valid        = true;
+    m_valid = true;
 }
 
 InteractionPair::InteractionPair(std::shared_ptr<CollidingObject>    A,
@@ -118,7 +118,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject>    A,
     m_colHandlingA = CHA;
     m_colHandlingB = CHB;
     m_colData      = CD->getCollisionData();
-    m_valid        = true;
+    m_valid = true;
 }
 
 void

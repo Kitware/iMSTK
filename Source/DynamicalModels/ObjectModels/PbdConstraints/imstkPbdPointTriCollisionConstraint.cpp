@@ -31,8 +31,8 @@ PbdPointTriangleConstraint::initConstraint(std::shared_ptr<PbdModel> model1, con
                                            std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
                                            const size_t& pIdx3, const size_t& pIdx4)
 {
-    m_model1          = model1;
-    m_model2          = model2;
+    m_model1 = model1;
+    m_model2 = model2;
     m_bodiesFirst[0]  = pIdx1;
     m_bodiesSecond[0] = pIdx2;
     m_bodiesSecond[1] = pIdx3;

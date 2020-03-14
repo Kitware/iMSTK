@@ -247,7 +247,7 @@ SPHModel::normalizeDensity()
                 const auto& qInfo = neighborInfo[i];
 
                 // because we're not done with density computation, qInfo does not contain desity of particle q yet
-                const auto q        = fluidNeighborList[i];
+                const auto q = fluidNeighborList[i];
                 const auto qdensity = getState().getDensities()[q];
                 tmp += m_kernels.W(qInfo.xpq) / qdensity;
             }
@@ -352,9 +352,9 @@ SPHModel::computeViscosity()
             {
                 for (size_t i = fluidNeighborList.size(); i < neighborInfo.size(); ++i)
                 {
-                    const auto& qInfo   = neighborInfo[i];
-                    const auto r        = qInfo.xpq;
-                    diffuseBoundary    -= m_modelParameters->m_restDensityInv * m_kernels.W(r) * pvel;
+                    const auto& qInfo = neighborInfo[i];
+                    const auto r      = qInfo.xpq;
+                    diffuseBoundary  -= m_modelParameters->m_restDensityInv * m_kernels.W(r) * pvel;
                 }
                 diffuseBoundary *= m_modelParameters->m_viscosityBoundary;
             }
@@ -411,19 +411,19 @@ SPHModel::computeSurfaceTension()
             Vec3r accel(0, 0, 0);
             for (size_t i = 0; i < fluidNeighborList.size(); ++i)
             {
-                const auto q  = fluidNeighborList[i];
+                const auto q = fluidNeighborList[i];
                 if (p == q)
                 {
                     continue;
                 }
-                const auto& qInfo = neighborInfo[i];
+                const auto& qInfo   = neighborInfo[i];
                 const auto qdensity = qInfo.density;
 
                 // Correction factor
                 const auto K_ij = Real(2) * m_modelParameters->m_restDensity / (pdensity + qdensity);
 
                 // Cohesion acc
-                const auto r = qInfo.xpq;
+                const auto r  = qInfo.xpq;
                 const auto d2 = r.squaredNorm();
                 if (d2 > Real(1e-20))
                 {

@@ -52,7 +52,7 @@ SPHCollisionHandling::processCollisionData()
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx)
         {
-            const auto& cd = m_colData->MAColData[idx];
+            const auto& cd  = m_colData->MAColData[idx];
             const auto pidx = cd.nodeIdx;  // Fluid particle index
             auto n = cd.penetrationVector; // This vector should point into solid object
 
@@ -68,7 +68,7 @@ SPHCollisionHandling::processCollisionData()
 
             // Correct particle velocity: slip boundary condition with friction
             const auto oldVel = state.getVelocities()[pidx];
-            const auto vn = oldVel.dot(n);
+            const auto vn     = oldVel.dot(n);
 
             // If particle is escaping the boundary, ignore it
             if (vn > 0)
@@ -77,7 +77,7 @@ SPHCollisionHandling::processCollisionData()
 
                 if (boundaryFriction > Real(1e-20))
                 {
-                    const auto velLength  = correctedVel.norm();
+                    const auto velLength      = correctedVel.norm();
                     const auto frictionLength = vn * boundaryFriction; // This is always positive
                     if (frictionLength < velLength && velLength > Real(1e-10))
                     {

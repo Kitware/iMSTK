@@ -697,7 +697,7 @@ NonLinearSystem::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord &q, const bool semiImplicit)->const Vectord &
+    return [&, this](const Vectord& q, const bool semiImplicit)->const Vectord&
            {
                (semiImplicit) ?
                this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
@@ -714,7 +714,7 @@ NonLinearSystem::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
     // Gradient of the nonlinear objective function given the current state
-    return [&, this](const Vectord &q)->const SparseMatrixd &
+    return [&, this](const Vectord& q)->const SparseMatrixd&
            {
                this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
@@ -730,7 +730,7 @@ NonLinearSystem::UpdateFunctionType
 FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord &q, const bool fullyImplicit)->void
+    return [&, this](const Vectord& q, const bool fullyImplicit)->void
            {
                (fullyImplicit) ?
                this->updateBodyIntermediateStates(q, m_updateType) :

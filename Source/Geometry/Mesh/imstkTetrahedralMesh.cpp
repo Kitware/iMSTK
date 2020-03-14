@@ -348,14 +348,14 @@ TetrahedralMesh::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, c
         {
             for (size_t i = 0; i < nx; ++i)
             {
-                indx[3]           = i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
-                indx[2]           = indx[3] + 1;
-                indx[0]           = indx[3] + nx + 1;
-                indx[1]           = indx[0] + 1;
-                indx[4]           = indx[0] + (nx + 1) * (ny + 1);
-                indx[5]           = indx[1] + (nx + 1) * (ny + 1);
-                indx[6]           = indx[2] + (nx + 1) * (ny + 1);
-                indx[7]           = indx[3] + (nx + 1) * (ny + 1);
+                indx[3] = i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
+                indx[2] = indx[3] + 1;
+                indx[0] = indx[3] + nx + 1;
+                indx[1] = indx[0] + 1;
+                indx[4] = indx[0] + (nx + 1) * (ny + 1);
+                indx[5] = indx[1] + (nx + 1) * (ny + 1);
+                indx[6] = indx[2] + (nx + 1) * (ny + 1);
+                indx[7] = indx[3] + (nx + 1) * (ny + 1);
                 vertices[cnt + 0] = { indx[0], indx[2], indx[3], indx[6] };
                 vertices[cnt + 1] = { indx[0], indx[3], indx[7], indx[6] };
                 vertices[cnt + 2] = { indx[0], indx[7], indx[4], indx[6] };
@@ -449,7 +449,7 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
     auto uniformMesh = createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
 
     // ray-tracing
-    const auto& coords         = uniformMesh->getVertexPositions();
+    const auto& coords = uniformMesh->getVertexPositions();
     auto        insideSurfMesh = surfMesh->markPointsInsideAndOut(coords);
 
     // label elements
@@ -486,7 +486,7 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
                                      if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
                                      {
                                          validTet[id] = true;
-                                         found        = true;
+                                         found = true;
                                          break;
                                      }
                                  }

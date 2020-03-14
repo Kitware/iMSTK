@@ -77,7 +77,7 @@ public:
 
 protected:
     VulkanInternalMemory* m_memory;
-    VkDeviceSize          m_size;
+    VkDeviceSize m_size;
 };
 
 class VulkanInternalImage : public VulkanInternalResource
@@ -146,8 +146,8 @@ protected:
     friend class VulkanMemoryManager;
     friend class VulkanInternalBuffer;
 
-    VkBuffer*        m_buffer;
-    char*            m_data;
+    VkBuffer* m_buffer;
+    char*     m_data;
     VulkanMemoryType m_type;
     bool m_mapped = false;
 };

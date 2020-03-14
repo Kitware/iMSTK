@@ -48,7 +48,7 @@ public:
     ///
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
                         const bool                            withGravity = true,
-                        const double                          gravity = -9.81) : InternalForceModel()
+                        const double                          gravity     = -9.81) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 

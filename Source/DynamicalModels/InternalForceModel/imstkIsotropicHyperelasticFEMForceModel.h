@@ -49,7 +49,7 @@ public:
                                       std::shared_ptr<vega::VolumetricMesh> mesh,
                                       const double                          inversionThreshold,
                                       const bool                            withGravity = true,
-                                      const double                          gravity = 10.0) : InternalForceModel()
+                                      const double                          gravity     = 10.0) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
@@ -147,7 +147,7 @@ public:
 
 protected:
     std::shared_ptr<vega::IsotropicHyperelasticFEM> m_isotropicHyperelasticFEM; ///>
-    std::shared_ptr<vega::IsotropicMaterial>        m_isotropicMaterial;        ///>
-    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;           ///>
+    std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///>
+    std::shared_ptr<vega::SparseMatrix>      m_vegaTangentStiffnessMatrix;      ///>
 };
 } // imstk

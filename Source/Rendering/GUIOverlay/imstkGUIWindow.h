@@ -47,8 +47,8 @@ public:
     /// \brief Protected constructor
     ///
     Window(std::string name,
-           std::string title = "",
-           float       width = 100,
+           std::string title  = "",
+           float       width  = 100,
            float       height = 50,
            float       x = 0,
            float       y = 0);

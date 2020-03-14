@@ -24,7 +24,7 @@
 namespace imstk
 {
 void
-PbdState::initialize(const size_t numNodes, const bool(&options)[3])
+PbdState::initialize(const size_t numNodes, const bool (& options)[3])
 {
     // CHECKBACK : m_pos could actually not be another copy
     if (options[0])
@@ -44,7 +44,7 @@ PbdState::initialize(const size_t numNodes, const bool(&options)[3])
 }
 
 void
-PbdState::initialize(const std::shared_ptr<PointSet>& m, const bool (&options)[3])
+PbdState::initialize(const std::shared_ptr<PointSet>& m, const bool (& options)[3])
 {
     this->initialize(m->getNumVertices(), options);
 }

@@ -223,9 +223,9 @@ protected:
     unsigned int m_height       = 1600;
     unsigned int m_windowWidth  = 1000;
     unsigned int m_windowHeight = 800;
-    float        m_fov          = PI;
-    float        m_nearPlane    = 0.01;
-    float        m_farPlane     = 1000;
+    float m_fov       = PI;
+    float m_nearPlane = 0.01;
+    float m_farPlane  = 1000;
 
     VulkanRendererConstants m_constants;
 
@@ -237,8 +237,8 @@ protected:
     VkInstance* m_instance = nullptr;
     VkDebugReportCallbackEXT m_debugReportCallback;
 
-    uint32_t          m_physicalDeviceCount = 0;
-    VkPhysicalDevice* m_physicalDevices     = nullptr;
+    uint32_t m_physicalDeviceCount      = 0;
+    VkPhysicalDevice* m_physicalDevices = nullptr;
     VkPhysicalDevice  m_renderPhysicalDevice;
 
     uint32_t  m_deviceCount = 0;
@@ -264,8 +264,8 @@ protected:
 
     std::shared_ptr<VulkanUniformBuffer> m_globalVertexUniformBuffer;
     std::shared_ptr<VulkanUniformBuffer> m_globalFragmentUniformBuffer;
-    VulkanGlobalVertexUniforms           m_globalVertexUniforms;
-    VulkanGlobalFragmentUniforms         m_globalFragmentUniforms;
+    VulkanGlobalVertexUniforms   m_globalVertexUniforms;
+    VulkanGlobalFragmentUniforms m_globalFragmentUniforms;
 
     VkDescriptorPool m_globalDescriptorPool;
     std::vector<VkDescriptorSet>       m_globalDescriptorSets;
@@ -281,8 +281,8 @@ protected:
     VkRenderPass m_GUIRenderPass;
 
     // Swapchain
-    VkSwapchainKHR* m_swapchain           = nullptr;
-    uint32_t        m_swapchainImageCount = 0;
+    VkSwapchainKHR* m_swapchain    = nullptr;
+    uint32_t m_swapchainImageCount = 0;
     std::vector<VulkanInternalImage*> m_swapchainImages;
     std::vector<VkImage>     m_swapchainNativeImages;
     std::vector<VkImageView> m_swapchainImageViews;
@@ -290,19 +290,19 @@ protected:
 
     // Final image buffers (used before image gets copied to swapchain images)
     VulkanInternalImage* m_LDRImage[2];
-    VkImageView          m_LDRImageView[2];
+    VkImageView m_LDRImageView[2];
 
     // Depth buffer
     std::vector<VulkanInternalImage*> m_depthImage;
-    std::vector<VkImageView>          m_depthImageView;
+    std::vector<VkImageView> m_depthImageView;
 
     // Normal buffer
     VulkanInternalImage* m_normalImage;
-    VkImageView          m_normalImageView;
+    VkImageView m_normalImageView;
 
     // AO buffers
     VulkanInternalImage* m_halfAOImage[2];
-    VkImageView          m_halfAOImageView[2];
+    VkImageView m_halfAOImageView[2];
 
     // Color buffers
     std::vector<VulkanInternalImage*> m_HDRImage[3];
@@ -341,8 +341,8 @@ protected:
 
     glm::mat4 m_projectionMatrix;
 
-    VulkanInternalImage*     m_shadowMaps;      ///< a single texture array (hence why it's one image)
-    VkImageView              m_shadowMapsView;  ///< for binding to the shaders (so shaders can access all layers)
+    VulkanInternalImage* m_shadowMaps;          ///< a single texture array (hence why it's one image)
+    VkImageView m_shadowMapsView;               ///< for binding to the shaders (so shaders can access all layers)
     std::vector<VkImageView> m_shadowMapsViews; ///< for framebuffers
     std::vector<std::shared_ptr<DirectionalLight>>  m_shadowLights;
     std::vector<std::shared_ptr<VulkanFramebuffer>> m_shadowFramebuffers;

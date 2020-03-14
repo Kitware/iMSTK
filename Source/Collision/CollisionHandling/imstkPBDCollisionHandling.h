@@ -82,7 +82,7 @@ private:
 
     std::shared_ptr<PbdObject> m_pbdObject1;     ///> PBD object
     std::shared_ptr<PbdObject> m_pbdObject2;     ///> PBD object
-    PBDConstraintVector        m_PBDConstraints; ///> List of PBD constraints
+    PBDConstraintVector m_PBDConstraints;        ///> List of PBD constraints
     std::shared_ptr<PbdSolver> m_PBDSolver;      /// The Solver for the collision constraints
 
     std::vector<PbdEdgeEdgeConstraint*>      m_EEConstraintPool;

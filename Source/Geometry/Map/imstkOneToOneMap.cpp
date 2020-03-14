@@ -132,7 +132,7 @@ OneToOneMap::isValid() const
                     return;
                 }
 
-                const auto p = meshSlave->getVertexPosition(nodeId);
+                const auto p    = meshSlave->getVertexPosition(nodeId);
                 bool matchFound = false;
                 for (size_t idx = 0; idx < meshMaster->getNumVertices(); ++idx)
                 {

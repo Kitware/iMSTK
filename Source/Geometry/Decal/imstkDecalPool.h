@@ -65,7 +65,7 @@ protected:
 
     unsigned int m_maxNumDecals;
     unsigned int m_numDecals = 0;
-    bool         m_recycle   = true;
+    bool m_recycle = true;
 
     glm::vec3  m_vertexPositions[8];
     glm::ivec3 m_triangles[12];

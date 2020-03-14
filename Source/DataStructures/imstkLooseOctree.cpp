@@ -183,7 +183,7 @@ OctreeNode::keepPrimitive(OctreePrimitive* const pPrimitive, const OctreePrimiti
     pPrimitive->m_bValid = true;
 
     m_PrimitiveLock[type].lock();
-    pPrimitive->m_pNext         = m_pPrimitiveListHeads[type];
+    pPrimitive->m_pNext = m_pPrimitiveListHeads[type];
     m_pPrimitiveListHeads[type] = pPrimitive;
     m_PrimitiveCounts[type]    += 1u;
     m_PrimitiveLock[type].unlock();

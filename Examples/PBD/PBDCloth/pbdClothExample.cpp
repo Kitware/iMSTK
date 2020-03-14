@@ -64,8 +64,8 @@ main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i* nCols + j, (i + 1) * nCols + j, i * nCols + j + 1 } };
-            tri[1] = { { (i + 1) * nCols + j + 1, i * nCols + j + 1, (i + 1) * nCols + j } };
+            tri[0] = { { i* nCols + j, (i + 1) * nCols + j, i* nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, i* nCols + j + 1, (i + 1) * nCols + j } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -93,9 +93,9 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt               = 0.03;
-    pbdParams->m_maxIter          = 5;
+    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt      = 0.03;
+    pbdParams->m_maxIter = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

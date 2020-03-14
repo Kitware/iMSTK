@@ -101,8 +101,8 @@ VulkanViewer::setResolution(unsigned int width, unsigned int height)
 {
     m_windowWidth  = width;
     m_windowHeight = height;
-    m_width        = width;
-    m_height       = height;
+    m_width  = width;
+    m_height = height;
 }
 
 void
@@ -346,10 +346,10 @@ VulkanViewer::setupSwapchain()
     }
 
     VkSwapchainCreateInfoKHR swapchainInfo;
-    swapchainInfo.sType   = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    swapchainInfo.pNext   = nullptr;
-    swapchainInfo.flags   = 0;
-    swapchainInfo.surface = m_surface;
+    swapchainInfo.sType                 = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainInfo.pNext                 = nullptr;
+    swapchainInfo.flags                 = 0;
+    swapchainInfo.surface               = m_surface;
     swapchainInfo.minImageCount         = m_renderer->m_buffering; // buffering
     swapchainInfo.imageFormat           = VulkanFormats::FINAL_FORMAT;
     swapchainInfo.imageColorSpace       = VK_COLORSPACE_SRGB_NONLINEAR_KHR;

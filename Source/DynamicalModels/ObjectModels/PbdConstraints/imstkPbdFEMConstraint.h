@@ -57,6 +57,6 @@ public:
 public:
     double       m_elementVolume; ///> Volume of the element
     MaterialType m_material;      ///> Material type
-    Mat3d        m_invRestMat;    ///>
+    Mat3d m_invRestMat;           ///>
 };
 }

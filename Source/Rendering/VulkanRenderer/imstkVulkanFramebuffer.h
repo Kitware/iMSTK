@@ -86,25 +86,25 @@ private:
 
     // Depth buffer
     VulkanInternalImage* m_depthImage;
-    VkImageView*         m_depthImageView;
+    VkImageView*  m_depthImageView;
     VkFormat      m_depthFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_depthLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
     // Normal buffer
     VulkanInternalImage* m_normalImage;
-    VkImageView*         m_normalImageView;
+    VkImageView*  m_normalImageView;
     VkFormat      m_normalFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_normalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Color accumulation buffer
     VulkanInternalImage* m_colorImage;
-    VkImageView*         m_colorImageView;
+    VkImageView*  m_colorImageView;
     VkFormat      m_colorFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_colorLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     // Specular accumulation buffer
     VulkanInternalImage* m_specularImage;
-    VkImageView*         m_specularImageView;
+    VkImageView*  m_specularImageView;
     VkFormat      m_specularFormat = VK_FORMAT_UNDEFINED;
     VkImageLayout m_specularLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 

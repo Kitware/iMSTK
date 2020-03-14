@@ -41,14 +41,14 @@ namespace imstk
 ///
 struct RenderParticle
 {
-    Vec3f m_position = Vec3f(0, 0, 0);
-    Vec3f m_velocity = Vec3f(0, 0, 0);
-    Vec3f m_acceleration           = Vec3f(0, 0, 0);
-    Color m_color                  = Color::White;
-    float m_age                    = 0;
-    bool m_created                 = false;
-    float m_scale                  = 1.0f;
-    float m_rotation               = 0;
+    Vec3f m_position     = Vec3f(0, 0, 0);
+    Vec3f m_velocity     = Vec3f(0, 0, 0);
+    Vec3f m_acceleration = Vec3f(0, 0, 0);
+    Color m_color    = Color::White;
+    float m_age      = 0;
+    bool m_created   = false;
+    float m_scale    = 1.0f;
+    float m_rotation = 0;
     float m_rotationalVelocity     = 0;
     float m_rotationalAcceleration = 0;
 };
@@ -115,7 +115,7 @@ protected:
 
     unsigned int m_numParticles    = 0;
     unsigned int m_maxNumParticles = 128; ///< Maximum particles
-    float        m_particleSize    = 0.1f;
+    float m_particleSize = 0.1f;
 
     std::vector<std::unique_ptr<RenderParticle>> m_particles; ///< Particle objects
     glm::vec3  m_vertexPositions[4];

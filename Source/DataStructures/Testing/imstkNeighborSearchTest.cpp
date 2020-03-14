@@ -210,8 +210,8 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
 {
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto  spacing         = Real(2) * PARTICLE_RADIUS;
-    const int   N               = int(2 * SPHERE_RADIUS / spacing);
+    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
     StdVectorOfVec3r particles;
     particles.reserve(N * N * N);
@@ -256,8 +256,8 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
 {
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto  spacing         = Real(2) * PARTICLE_RADIUS;
-    const int   N               = int(2 * SPHERE_RADIUS / spacing);
+    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
     StdVectorOfVec3r particles;
     particles.reserve(N * N * N);

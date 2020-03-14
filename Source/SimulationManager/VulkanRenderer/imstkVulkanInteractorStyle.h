@@ -87,7 +87,7 @@ private:
     ///
     void normalizeCoordinate(double& x, double& y);
 
-    GLFWwindow*        m_window;
+    GLFWwindow* m_window;
     SimulationManager* m_simManager;
     VulkanViewer*      m_viewer;
 
@@ -96,9 +96,9 @@ private:
     // States
     enum class MouseState
     {
-        LEFT_MOUSE_DOWN   = 0x1,
+        LEFT_MOUSE_DOWN = 0x1,
         MIDDLE_MOUSE_DOWN = 0x2,
-        RIGHT_MOUSE_DOWN  = 0x4
+        RIGHT_MOUSE_DOWN = 0x4
     };
 
     double m_mousePos[2];                                   ///< Mouse position
@@ -106,6 +106,6 @@ private:
     double m_mousePosLastNormalized[2];                     ///< Last frame mouse position normalized
 
     Renderer::Mode m_lastFrameMode = Renderer::Mode::EMPTY; ///< Last frame mode
-    unsigned int   m_state         = 0;
+    unsigned int   m_state = 0;
 };
 }

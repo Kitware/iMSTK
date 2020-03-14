@@ -100,7 +100,7 @@ const std::shared_ptr<CollisionData>&
 OctreeBasedCD::getCollisionPairData(const uint32_t geomIdx1, const uint32_t geomIdx2)
 {
     const auto collisionPair = computeCollisionPairHash(geomIdx1, geomIdx2);
-    const auto it            = m_mCollisionPair2AssociatedData.find(collisionPair);
+    const auto it = m_mCollisionPair2AssociatedData.find(collisionPair);
 
     LOG_IF(FATAL, (it == m_mCollisionPair2AssociatedData.end())) << "Collision pair does not exist";
     return it->second.m_CollisionData;
@@ -173,7 +173,7 @@ OctreeBasedCD::detectCollision()
 
         const auto geomIdxPointSet = geoPair.first->getGlobalIndex();
         const auto geomIdxMesh     = geoPair.second->getGlobalIndex();
-        size_t     writeIdx        = 0;
+        size_t     writeIdx = 0;
 
         // Check if the first data elemnt is valid
         if (pointStillColliding(collisionData->VTColData[0].vertexIdx, geomIdxPointSet, geomIdxMesh))
@@ -240,7 +240,7 @@ OctreeBasedCD::checkPointWithSubtree(OctreeNode* const pNode, OctreePrimitive* c
                 const auto geomIdxOther = pIter->m_GeomIdx;
                 if (pointStillColliding(pPrimitive->m_Idx, geomIdx, geomIdxOther))
                 {
-                    const auto  collisionPair           = computeCollisionPairHash(geomIdx, geomIdxOther);
+                    const auto  collisionPair = computeCollisionPairHash(geomIdx, geomIdxOther);
                     const auto& collisionAssociatedData = getCollisionPairAssociatedData(collisionPair);
                     if (collisionAssociatedData.m_CollisionData != nullptr)
                     {
@@ -292,8 +292,8 @@ OctreeBasedCD::checkNonPointWithSubtree(OctreeNode* const pNode, OctreePrimitive
             if (pPrimitive != pIter)
             {
                 // todo: this is necessary but not help
-                const auto geomIdxIter = pIter->m_GeomIdx;
-                const auto collisionPair           = computeCollisionPairHash(geomIdx, geomIdxIter);
+                const auto geomIdxIter   = pIter->m_GeomIdx;
+                const auto collisionPair = computeCollisionPairHash(geomIdx, geomIdxIter);
                 const auto collisionAssociatedData = getCollisionPairAssociatedData(collisionPair);
                 if (collisionAssociatedData.m_CollisionData != nullptr)     // Has collision pair
                 {
@@ -330,8 +330,8 @@ OctreeBasedCD::checkPointWithPrimitive(OctreePrimitive* const pPrimitive1, Octre
 {
     const auto  collisionType = collisionAssociatedData.m_Type;
     const auto& collisionData = collisionAssociatedData.m_CollisionData;
-    const auto  point         = Vec3r(pPrimitive1->m_Position[0], pPrimitive1->m_Position[1], pPrimitive1->m_Position[2]);
-    const auto  pointIdx      = pPrimitive1->m_Idx;
+    const auto  point    = Vec3r(pPrimitive1->m_Position[0], pPrimitive1->m_Position[1], pPrimitive1->m_Position[2]);
+    const auto  pointIdx = pPrimitive1->m_Idx;
 
     switch (collisionType)
     {
@@ -407,7 +407,7 @@ const OctreeBasedCD::CollisionPairAssociatedData&
 OctreeBasedCD::getCollisionPairAssociatedData(const uint64_t collisionPair) const
 {
     static const auto invalidData = CollisionPairAssociatedData { CollisionDetection::Type::Custom, nullptr };
-    const auto        it          = m_mCollisionPair2AssociatedData.find(collisionPair);
+    const auto        it = m_mCollisionPair2AssociatedData.find(collisionPair);
     return (it != m_mCollisionPair2AssociatedData.end()) ?  it->second : invalidData;
 }
 
@@ -417,7 +417,7 @@ OctreeBasedCD::pointStillColliding(const uint32_t primitiveIdx, const uint32_t g
 {
     const uint64_t uint64PrimitiveIdx = static_cast<uint64_t>(primitiveIdx);
     const uint64_t uint64GeometryIdx  = static_cast<uint64_t>(geometryIdx);
-    const uint64_t source             = (uint64PrimitiveIdx << 32) | uint64GeometryIdx;
+    const uint64_t source = (uint64PrimitiveIdx << 32) | uint64GeometryIdx;
 
     auto it = m_mInvalidPointMeshCollisions.find(source);
     if (it == m_mInvalidPointMeshCollisions.end())
@@ -434,7 +434,7 @@ OctreeBasedCD::setPointMeshCollisionInvalid(const uint32_t primitiveIdx, const u
 {
     const uint64_t uint64PrimitiveIdx = static_cast<uint64_t>(primitiveIdx);
     const uint64_t uint64GeometryIdx  = static_cast<uint64_t>(geometryIdx);
-    const uint64_t source             = (uint64PrimitiveIdx << 32) | uint64GeometryIdx;
+    const uint64_t source = (uint64PrimitiveIdx << 32) | uint64GeometryIdx;
     m_mInvalidPointMeshCollisions[source].insert(otherGeometryIdx);
 }
 } // end namespace imstk

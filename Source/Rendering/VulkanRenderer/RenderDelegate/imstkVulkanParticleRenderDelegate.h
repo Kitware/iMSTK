@@ -85,6 +85,6 @@ protected:
 
     std::vector<RenderParticle*> m_particles;
     std::vector<unsigned int>    m_particleIndices;
-    std::vector<float>           m_particleDistances;
+    std::vector<float> m_particleDistances;
 };
 }

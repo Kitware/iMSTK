@@ -159,7 +159,7 @@ protected:
     std::string       m_path;
     Texture::Type     m_type;
     Texture::FileType m_fileType;
-    VkFormat          m_format     = VK_FORMAT_UNDEFINED;
+    VkFormat     m_format = VK_FORMAT_UNDEFINED;
     bool         m_isDataFormatted = false;
     unsigned int m_mipLevels       = 0;
     bool         m_loadMipMaps     = false;
@@ -170,13 +170,13 @@ protected:
     unsigned int m_height   = 0;
     unsigned int m_channels = 0;
 
-    bool              m_isCompressed = false;
+    bool m_isCompressed = false;
     unsigned char*    m_data;
     gli::texture_cube m_cubemap;           ///> Only used for cubemaps
     gli::texture      m_compressedTexture; ///> only used for DDS files
-    bool              m_isCubemap = false;
+    bool m_isCubemap = false;
 
-    VkDeviceSize         m_imageOffsetAlignment;
+    VkDeviceSize m_imageOffsetAlignment;
     VulkanMemoryManager* m_memoryManager;
 };
 }

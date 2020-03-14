@@ -63,15 +63,15 @@ public:
                                       VulkanMemoryType   type);
 
     VkPhysicalDevice* m_physicalDevice;
-    VkDevice          m_device;
+    VkDevice m_device;
 
     VkPhysicalDeviceProperties       m_deviceProperties;
     VkPhysicalDeviceMemoryProperties m_deviceMemoryProperties;
 
-    uint32_t         m_queueFamilyIndex;
+    uint32_t m_queueFamilyIndex;
     VkCommandBuffer* m_transferCommandBuffer;
-    VkQueue*         m_transferQueue;
-    uint32_t         m_buffering = 3;
+    VkQueue* m_transferQueue;
+    uint32_t m_buffering = 3;
 
 protected:
     ///

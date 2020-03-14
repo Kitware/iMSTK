@@ -124,10 +124,10 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 
     // Other parameters
     pbdParams->m_uniformMassValue = 5.0;
-    pbdParams->m_gravity          = Vec3d(0, -1.0, 0);
-    pbdParams->m_dt               = 0.01;
-    pbdParams->m_maxIter          = 20;
-    pbdParams->m_proximity        = 0.5;
+    pbdParams->m_gravity   = Vec3d(0, -1.0, 0);
+    pbdParams->m_dt        = 0.01;
+    pbdParams->m_maxIter   = 20;
+    pbdParams->m_proximity = 0.5;
     pbdParams->m_contactStiffness = 0.1;
 
     pbdModel->configure(pbdParams);
@@ -186,7 +186,7 @@ main()
         {
             SurfaceMesh::TriangleArray tri[2];
             tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -211,9 +211,9 @@ main()
     // configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity        = 0.1;
+    pbdParams2->m_proximity = 0.1;
     pbdParams2->m_contactStiffness = 0.1;
-    pbdParams2->m_maxIter          = 0;
+    pbdParams2->m_maxIter = 0;
 
     // Set the parameters
     pbdModel2->configure(pbdParams2);
@@ -256,7 +256,7 @@ main()
                 std::shared_ptr<SurfaceMesh> mesh;
                 std::shared_ptr<PbdObject>   pbdObj;
                 std::shared_ptr<PbdSolver>   solver;
-                Vec3d                        translation(shiftX + i* distanceXZ, minHeight + j* distanceY, k* distanceXZ);
+                Vec3d                        translation(shiftX + i * distanceXZ, minHeight + j * distanceY, k * distanceXZ);
                 generateDragon(scene, translation, mesh, pbdObj, solver);
                 surfaceMeshes.push_back(mesh);
                 pbdObjs.push_back(pbdObj);

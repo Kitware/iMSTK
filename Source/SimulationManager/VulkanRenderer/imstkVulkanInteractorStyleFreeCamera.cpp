@@ -78,11 +78,11 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     auto dy        = m_mousePosNormalized[1] - m_mousePosLastNormalized[1];
     auto direction = Vec3d(pos - fp);
     direction.normalize();
-    auto yaw        = atan2(pos[0] - fp[0], pos[2] - fp[2]);
+    auto yaw = atan2(pos[0] - fp[0], pos[2] - fp[2]);
     auto xDirection = Vec3d(cos(yaw), 0, -sin(yaw));
 
     auto  currentTime = m_stopWatch.getTimeElapsed();
-    float dt          = currentTime - m_lastTime; // For variable time-step
+    float dt = currentTime - m_lastTime;          // For variable time-step
 
     // Update for next frame
     m_lastTime = currentTime;
@@ -113,7 +113,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     // Rotational offset
     auto xRotation = glm::rotate<float>(-4 * dx, glm::tvec3<float>(0.0f, 1.0f, 0.0f));
     auto yRotation = glm::rotate<float>(dCameraAngle, glm::tvec3<float>(xDirection[0], 0, xDirection[2]));
-    angleOffset        = xRotation * yRotation * angleOffset;
+    angleOffset = xRotation * yRotation * angleOffset;
     angleTempOffset[0] = angleOffset.x;
     angleTempOffset[1] = angleOffset.y;
     angleTempOffset[2] = angleOffset.z;

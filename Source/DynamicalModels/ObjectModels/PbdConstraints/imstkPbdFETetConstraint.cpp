@@ -133,7 +133,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
         invFT.col(0) /= Sigma(0);
         invFT.col(1) /= Sigma(1);
         invFT.col(2) /= Sigma(2);
-        invFT        *= svd.matrixV().adjoint();
+        invFT *= svd.matrixV().adjoint();
         double J  = Sigma(0) * Sigma(1) * Sigma(2);
         Mat3d  FR = F - R;
 

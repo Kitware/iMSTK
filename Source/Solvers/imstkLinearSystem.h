@@ -136,7 +136,7 @@ public:
 
 private:
     const SystemMatrixType& m_A;
-    const Vectord&          m_b;
+    const Vectord& m_b;
 
     Vectord m_f; ///> Scratch storage for matrix-vector operations
 };

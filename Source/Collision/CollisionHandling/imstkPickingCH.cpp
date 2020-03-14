@@ -68,7 +68,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     const auto& Vprev = deformableObj->getVelocities();
 
     auto PhysTetMesh = std::dynamic_pointer_cast<PointSet>(deformableObj->getPhysicsGeometry());
-    auto dT          = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
+    auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
 
     // If collision data, append LPC constraints
     ParallelUtils::SpinLock lock;

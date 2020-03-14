@@ -93,7 +93,7 @@ public:
 private:
     size_t m_nodeId;                                ///> Node id
     bool   m_isFixedConstraint = false;             ///> Flag to know if that node is fixed
-    Mat3d  m_projection        = Mat3d::Identity(); ///> Orthogonal projector
-    Vec3d  m_value = Vec3d(0., 0., 0.);             ///> Value in the subspace: range(I-m_projector)
+    Mat3d  m_projection = Mat3d::Identity();        ///> Orthogonal projector
+    Vec3d  m_value      = Vec3d(0., 0., 0.);        ///> Value in the subspace: range(I-m_projector)
 };
 } // imstk

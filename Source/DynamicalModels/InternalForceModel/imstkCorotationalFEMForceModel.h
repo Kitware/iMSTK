@@ -84,7 +84,7 @@ public:
 
 protected:
     std::shared_ptr<vega::CorotationalLinearFEM> m_corotationalLinearFEM;
-    std::shared_ptr<vega::SparseMatrix>          m_vegaTangentStiffnessMatrix;
+    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
     int m_warp;
 };
 } // imstk

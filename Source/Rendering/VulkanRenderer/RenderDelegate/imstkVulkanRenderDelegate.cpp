@@ -206,7 +206,7 @@ VulkanRenderDelegate::updateUniforms(uint32_t frameIndex)
     auto mat = this->getVisualModel()->getRenderMaterial();
 
     auto color = mat->getColor();
-    m_localFragmentUniforms.color           = glm::vec4(color.r, color.g, color.b, color.a);
+    m_localFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
     m_localFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
     m_localFragmentUniforms.emissivity      = mat->getEmissivity();
     m_localFragmentUniforms.roughness       = mat->getRoughness();

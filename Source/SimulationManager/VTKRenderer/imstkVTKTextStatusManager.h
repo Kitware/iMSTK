@@ -118,7 +118,7 @@ private:
 
     vtkTextActor* m_StatusActors[StatusType::NumStatusTypes];         ///> Statuses to display
     DisplayCorner m_StatusDisplayCorners[StatusType::NumStatusTypes]; ///> Location (corner) of the statuses
-    int           m_StatusFontSizes[StatusType::NumStatusTypes];      ///> Size of the statuses
+    int m_StatusFontSizes[StatusType::NumStatusTypes];                ///> Size of the statuses
 
     VTKInteractorStyle* m_vtkInteractorStyle;                         ///> vtkInteractorStyle
 };

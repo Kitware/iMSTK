@@ -58,7 +58,7 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
 
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
-    auto mat         = std::make_shared<RenderMaterial>();
+    auto mat = std::make_shared<RenderMaterial>();
     mat->setDisplayMode(RenderMaterial::WIREFRAME_SURFACE);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
@@ -89,11 +89,11 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     cubeGeom->translate(pos);
 
     // cube visual model
-    auto mesh        = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    auto mesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
     SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
-    auto mat         = std::make_shared<RenderMaterial>();
+    auto mat = std::make_shared<RenderMaterial>();
     mat->setDisplayMode(RenderMaterial::WIREFRAME_SURFACE);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);
