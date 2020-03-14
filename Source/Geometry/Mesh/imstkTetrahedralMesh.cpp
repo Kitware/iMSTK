@@ -94,24 +94,18 @@ void
 TetrahedralMesh::computeAttachedSurfaceMesh()
 {
     this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
-    if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
-    {
-        LOG(FATAL) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not "
-            "extracted.";
-    }
+
+    CHECK(this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
+        << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
 }
 
 bool
 TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
                                     const bool                   enforceWindingConsistency /* = false*/)
 {
-    if (!surfaceMesh)
-    {
-        LOG(FATAL) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not "
-            "instantiated.";
-        return false;
-    }
-
+    CHECK(surfaceMesh) 
+            << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
+ 
     using triArray = SurfaceMesh::TriangleArray;
     const std::vector<triArray> facePattern = {
         triArray { { 0, 1, 2 } }, triArray { { 0, 1, 3 } }, triArray { { 0, 2, 3 } }, triArray { { 1, 2, 3 } }

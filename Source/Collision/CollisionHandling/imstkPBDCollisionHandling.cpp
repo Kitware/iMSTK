@@ -74,14 +74,10 @@ PBDCollisionHandling::processCollisionData()
                      << " (rigid mesh not yet supported).";
     }*/
     this->generatePBDConstraints();
-    if (m_PBDSolver)
-    {
-        m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
-    }
-    else
-    {
-        LOG(FATAL) << "No PbdSolver found to handle the Collision constraints!";
-    }
+
+    CHECK(m_PBDSolver) << "No PbdSolver found to handle the Collision constraints!";
+
+    m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
 }
 
 void

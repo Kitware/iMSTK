@@ -65,10 +65,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObje
         return;
     }
 
-    if (analyticObj == nullptr)
-    {
-        LOG(FATAL) << m_object->getName() << " is not a colliding object";
-    }
+    CHECK(analyticObj) << m_object->getName() << " is not a colliding object";
 
     // If collision data is valid, append forces
     Vec3d force(0., 0., 0.);
@@ -97,12 +94,8 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
         return;
     }
 
-    if (deformableObj == nullptr)
-    {
-        LOG(FATAL) << "PenaltyRigidCH::computeContactForcesDiscreteDeformable error: "
-                   << m_object->getName() << " is not a deformable object.";
-        return;
-    }
+    CHECK(deformableObj) << "PenaltyRigidCH::computeContactForcesDiscreteDeformable error: "
+        << m_object->getName() << " is not a deformable object.";
 
     // Get current force vector
     auto&       force     = deformableObj->getContactForce();

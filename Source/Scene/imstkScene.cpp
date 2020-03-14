@@ -63,11 +63,8 @@ Scene::initialize()
         }
 
         auto sceneObject = it.second;
-        if (!sceneObject->initialize())
-        {
-            LOG(FATAL) << "Error initializing scene object: " << sceneObject->getName();
-            return false;
-        }
+
+        CHECK(sceneObject->initialize()) << "Error initializing scene object: " << sceneObject->getName();
     }
 
     for (auto const& it : m_collisionGraph->getInteractionPairList())
@@ -140,12 +137,9 @@ Scene::getSceneObjectControllers() const
 std::shared_ptr<SceneObject>
 Scene::getSceneObject(const std::string& sceneObjectName) const
 {
-    if (!this->isObjectRegistered(sceneObjectName))
-    {
-        LOG(FATAL) << "No scene object named '" << sceneObjectName
-                   << "' was registered in this scene.";
-        return nullptr;
-    }
+    CHECK(this->isObjectRegistered(sceneObjectName)) 
+        << "No scene object named '"  << sceneObjectName
+        << "' was registered in this scene.";
 
     return m_sceneObjectsMap.at(sceneObjectName);
 }

@@ -41,11 +41,7 @@ writePlotterVectorMatlab(Vectord& x, const char* fileName)
 {
     std::ofstream scriptFile(fileName);
 
-    if (!scriptFile.is_open())
-    {
-        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
-        return;
-    }
+    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
 
     // print x
     scriptFile << "X=[\n";
@@ -75,11 +71,7 @@ writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, const char* fileName)
 
     std::ofstream scriptFile(fileName);
 
-    if (!scriptFile.is_open())
-    {
-        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
-        return;
-    }
+    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
 
     // print x
     scriptFile << "X=[\n";
@@ -110,11 +102,7 @@ writePlotterVectorMatPlotlib(Vectord& x, const char* fileName)
 {
     std::ofstream scriptFile(fileName);
 
-    if (!scriptFile.is_open())
-    {
-        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
-        return;
-    }
+    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
 
     // import
     scriptFile << "import numpy as np\n";
@@ -151,11 +139,7 @@ writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName)
 
     std::ofstream scriptFile(fileName);
 
-    if (!scriptFile.is_open())
-    {
-        LOG(FATAL) << "Unable to create or open the specified file for plot script!";
-        return;
-    }
+    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
 
     // import
     scriptFile << "import numpy as np\n";

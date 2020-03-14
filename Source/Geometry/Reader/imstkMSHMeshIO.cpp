@@ -36,11 +36,7 @@ namespace imstk
 std::shared_ptr<imstk::VolumetricMesh>
 MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
 {
-    if (meshType != MeshFileType::MSH)
-    {
-        LOG(FATAL) << "MSHMeshIO::read error: file type not supported";
-        return nullptr;
-    }
+    CHECK(meshType == MeshFileType::MSH) << "MSHMeshIO::read error: file type not supported";
 
     // based on the format provided on
     // http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
@@ -60,11 +56,8 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
 
     // Open the file
     std::ifstream mshStream(filePath);
-    if (!mshStream.is_open())
-    {
-        LOG(FATAL) << "Failed to open the input .msh file";
-        return nullptr;
-    }
+
+    CHECK(mshStream.is_open()) << "Failed to open the input .msh file";
 
     // Look for "$MeshFormat"
     while (getline(mshStream, mshLine))

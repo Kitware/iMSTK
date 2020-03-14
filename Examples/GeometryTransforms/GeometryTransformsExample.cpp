@@ -40,11 +40,7 @@ main()
 
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
-    if (!sceneObj)
-    {
-        LOG(FATAL) << "ERROR: Unable to create scene object";
-        return 1;
-    }
+    CHECK(sceneObj) << "ERROR: Unable to create scene object";
 
     auto surfaceMesh = sceneObj->getVisualGeometry();
     surfaceMesh->scale(5., Geometry::TransformType::ConcatenateToTransform);

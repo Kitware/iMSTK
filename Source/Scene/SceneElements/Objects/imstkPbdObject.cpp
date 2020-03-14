@@ -31,15 +31,10 @@ bool
 PbdObject::initialize()
 {
     m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-    if (m_pbdModel)
-    {
-        return DynamicObject::initialize();
-    }
-    else
-    {
-        LOG(FATAL) << "Dynamics pointer cast failure in PbdObject::initialize()";
-        return false;
-    }
+
+    CHECK(m_pbdModel) << "Dynamics pointer cast failure in PbdObject::initialize()";
+    
+    return DynamicObject::initialize();
 }
 
 void
