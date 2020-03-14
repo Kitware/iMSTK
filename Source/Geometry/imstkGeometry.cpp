@@ -131,11 +131,7 @@ Geometry::rotate(const Vec3d& axis, double angle, TransformType type)
 void
 Geometry::scale(double s, TransformType type)
 {
-    if (s <= 0.0)
-    {
-        LOG(FATAL) << "Geometry::scale error: invalid scaling constant.";
-        return;
-    }
+    CHECK(s > 0) << "Geometry::scale error: invalid scaling constant.";
 
     if (std::abs(s - 1.0) < 1e-8)
     {

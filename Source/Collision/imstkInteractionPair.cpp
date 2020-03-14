@@ -36,11 +36,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     m_valid = false;
 
     // Check that objects exist
-    if (A == nullptr || B == nullptr)
-    {
-        LOG(FATAL) << "InteractionPair error: invalid objects (nullptr).";
-        return;
-    }
+    CHECK(A && B) << "InteractionPair error: invalid objects (nullptr).";
 
     // Check if objects are different
     /*if (A == B)
@@ -51,23 +47,17 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
 
     // Collision Detection
     std::shared_ptr<CollisionDetection> CD = CollisionDetection::makeCollisionDetectionObject(CDType, A, B, m_colData);
-    if (CD == nullptr)
-    {
-        LOG(FATAL) << "InteractionPair error: can not instantiate collision detection algorithm.";
-        return;
-    }
+
+    CHECK(CD) << "InteractionPair error: can not instantiate collision detection algorithm.";
 
     // Collision Handling A
     std::shared_ptr<CollisionHandling> CHA;
     if (CHAType != CollisionHandling::Type::None)
     {
         CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
-        if (CHA == nullptr)
-        {
-            LOG(FATAL) << "InteractionPair error: can not instantiate collision handling for '"
-                       << A->getName() << "' object.";
-            return;
-        }
+        
+        CHECK(CHA) << "InteractionPair error: can not instantiate collision handling for '"
+                   << A->getName() << "' object.";
     }
 
     // Collision Handling B
@@ -75,12 +65,9 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     if (CHBType != CollisionHandling::Type::None)
     {
         CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
-        if (CHB == nullptr)
-        {
-            LOG(FATAL) << "InteractionPair error: can not instantiate collision handling for '"
-                       << B->getName() << "' object.";
-            return;
-        }
+        
+        CHECK(CHB) << "InteractionPair error: can not instantiate collision handling for '"
+            << B->getName() << "' object.";
     }
 
     // Init interactionPair
@@ -100,11 +87,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject>    A,
     m_valid = false;
 
     // Check that objects exist
-    if (A == nullptr || B == nullptr)
-    {
-        LOG(FATAL) << "InteractionPair error: invalid objects (nullptr).";
-        return;
-    }
+    CHECK(A && B) << "InteractionPair error: invalid objects (nullptr).";
 
     // Check if objects are different
     /*if (A == B)
@@ -124,22 +107,14 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject>    A,
 void
 InteractionPair::computeCollisionData()
 {
-    if (!m_valid)
-    {
-        LOG(FATAL) << "InteractionPair::computeCollisionData error: interaction not valid.";
-        return;
-    }
+    CHECK(m_valid) << "InteractionPair::computeCollisionData error: interaction not valid.";
     m_colDetect->computeCollisionData();
 }
 
 void
 InteractionPair::processCollisionData()
 {
-    if (!m_valid)
-    {
-        LOG(FATAL) << "InteractionPair::computeContactForces error: interaction not valid.";
-        return;
-    }
+    CHECK(m_valid) << "InteractionPair::computeContactForces error: interaction not valid.";
 
     if (m_colHandlingA)
     {

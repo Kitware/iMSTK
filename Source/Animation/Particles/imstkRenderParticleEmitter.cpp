@@ -56,10 +56,7 @@ void
 RenderParticleEmitter::setGeometry(
     std::shared_ptr<Geometry> geometry)
 {
-    if (geometry->getType() != Geometry::Type::RenderParticles)
-    {
-        LOG(FATAL) << "Geometry must be RenderParticles";
-    }
+    CHECK(geometry->getType() == Geometry::Type::RenderParticles) << "Geometry must be RenderParticles";
 
     m_animationGeometry = geometry;
     m_particles = &std::static_pointer_cast<RenderParticles>(m_animationGeometry)->getParticles();

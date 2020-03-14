@@ -53,10 +53,8 @@ Capsule::getRadius(DataType type /* = DataType::PostTransform */)
 void
 Capsule::setRadius(const double r)
 {
-    if (r <= 0)
-    {
-        LOG(FATAL) << "Capsule::setRadius error: radius should be positive.";
-    }
+    CHECK(r > 0) << "Capsule::setRadius error: radius should be positive.";
+
     m_radius           = r;
     m_dataModified     = true;
     m_transformApplied = false;
@@ -76,10 +74,8 @@ Capsule::getLength(DataType type /* = DataType::PostTransform */)
 void
 Capsule::setLength(const double l)
 {
-    if (l <= 0)
-    {
-        LOG(FATAL) << "Capsule::setHeight error: height should be positive.";
-    }
+    CHECK(l > 0) << "Capsule::setHeight error: height should be positive.";
+
     m_length           = l;
     m_dataModified     = true;
     m_transformApplied = false;

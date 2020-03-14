@@ -55,11 +55,10 @@ SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
 void
 SPHSimulationState::initializeData()
 {
-    if (!m_KinematicState)
-    {
-        LOG(FATAL) << "SPH basic state has not been initialized";
-    }
+    CHECK(m_KinematicState) << "SPH basic state has not been initialized";
+    
     size_t numParticles = m_KinematicState->getNumParticles();
+    
     m_Normals.resize(numParticles);
     m_Densities.resize(numParticles);
     m_Accels.resize(numParticles);

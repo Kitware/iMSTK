@@ -34,12 +34,8 @@ IdentityMap::apply()
     }
 
     // Check geometries
-    if (!m_master || !m_slave)
-    {
-        LOG(FATAL) << "Identity map is being applied without valid geometries";
-        return;
-    }
-
+    CHECK(m_master && m_slave) << "Identity map is being applied without valid geometries";
+    
     // Set the follower mesh configuration to be same as that of master
     m_slave->setTranslation(m_master->getTranslation());
     m_slave->setRotation(m_master->getRotation());
