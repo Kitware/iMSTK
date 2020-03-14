@@ -78,7 +78,7 @@ Scene::initialize()
             if (chA->getType() == CollisionHandling::Type::PBD)
             {
                 auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chA);
-                ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast < PbdObject > (it->getObjectsPair().first)]);
+                ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast<PbdObject>(it->getObjectsPair().first)]);
             }
         }
         else
@@ -89,7 +89,7 @@ Scene::initialize()
                 if (chB->getType() == CollisionHandling::Type::PBD)
                 {
                     auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chB);
-                    ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast < PbdObject > (it->getObjectsPair().second)]);
+                    ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast<PbdObject>(it->getObjectsPair().second)]);
                 }
             }
         }

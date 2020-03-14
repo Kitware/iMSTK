@@ -108,7 +108,7 @@ PBDCollisionHandling::generatePBDConstraints()
     ParallelUtils::parallelFor(m_colData->EEColData.getSize(),
         [&] (const size_t idx)
         {
-            const auto& colData    = m_colData->EEColData[idx];
+            const auto& colData = m_colData->EEColData[idx];
 
             size_t edgeA1, edgeA2;
             if (map1 && map1->getType() == GeometryMap::Type::OneToOne)

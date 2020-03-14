@@ -144,7 +144,7 @@ Geometry::scale(double s, TransformType type)
 
     if (type == TransformType::ConcatenateToTransform)
     {
-        m_scaling          *= s;
+        m_scaling *= s;
         m_transformModified = true;
         m_transformApplied  = false;
     }
@@ -160,7 +160,7 @@ Geometry::transform(RigidTransform3d T, TransformType type)
 {
     if (type == TransformType::ConcatenateToTransform)
     {
-        m_transform         = T * m_transform;
+        m_transform = T * m_transform;
         m_transformModified = true;
         m_transformApplied  = false;
     }
@@ -183,7 +183,7 @@ Geometry::setTranslation(const Vec3d t)
 {
     m_transform.translation() = t;
     m_transformModified       = true;
-    m_transformApplied        = false;
+    m_transformApplied = false;
 }
 
 void
@@ -232,7 +232,7 @@ Geometry::setScaling(double s)
         LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
         return;
     }
-    m_scaling           = s;
+    m_scaling = s;
     m_transformModified = true;
     m_transformApplied  = false;
 }

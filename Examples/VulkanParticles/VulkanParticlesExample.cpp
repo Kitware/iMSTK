@@ -122,7 +122,7 @@ main()
         // Modifying the first keyframe
         auto startKeyFrame = particleEmitter->getStartKeyFrame();
         startKeyFrame->m_acceleration = Vec3f(0, -9.8, 0);
-        startKeyFrame->m_color        = Color::Yellow;
+        startKeyFrame->m_color = Color::Yellow;
 
         // Modifying the last keyframe
         auto endKeyFrame = particleEmitter->getEndKeyFrame();

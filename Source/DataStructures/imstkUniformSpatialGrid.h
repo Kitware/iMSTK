@@ -140,7 +140,7 @@ public:
     ///
     CellData& getCellData(const Vec3r& ppos)
     {
-        return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)];
+        return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)];
     }
 
     ///
@@ -148,7 +148,7 @@ public:
     /// \param A position in space
     ///
     const CellData& getCellData(const Vec3r& ppos) const
-    { return m_CellData[getCellLinearizedIndex < unsigned int > (ppos)]; }
+    { return m_CellData[getCellLinearizedIndex<unsigned int>(ppos)]; }
 
     ///
     /// \brief Get data in a cell

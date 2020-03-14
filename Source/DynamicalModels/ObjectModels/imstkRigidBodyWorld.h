@@ -76,9 +76,9 @@ public:
 
     PxDefaultAllocator     m_Allocator;
     PxDefaultErrorCallback m_ErrorCallback;
-    PxFoundation*          m_Foundation = NULL;
-    PxPhysics* m_Physics = NULL;
-    PxCooking* m_Cooking = NULL;
+    PxFoundation* m_Foundation = NULL;
+    PxPhysics*    m_Physics    = NULL;
+    PxCooking*    m_Cooking    = NULL;
     PxDefaultCpuDispatcher* m_Dispatcher = NULL;
     PxScene* m_Scene = NULL;
     PxPvd*   m_Pvd   = NULL;

@@ -87,7 +87,7 @@ VulkanPostProcessingChain::VulkanPostProcessingChain(VulkanRenderer* renderer)
     // Bloom pass
     if (m_bloom)
     {
-        int level        = 1;
+        int level = 1;
         int bloomSamples = 5;
 
         auto bloomThresholdPass = std::make_shared<VulkanPostProcess>(renderer, renderer->m_numViews, level);

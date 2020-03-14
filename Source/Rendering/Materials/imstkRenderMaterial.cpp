@@ -119,7 +119,7 @@ RenderMaterial::setBackFaceCulling(const bool culling)
     }
     m_backfaceCulling = culling;
     m_stateModified   = true;
-    m_modified        = true;
+    m_modified = true;
 }
 
 void

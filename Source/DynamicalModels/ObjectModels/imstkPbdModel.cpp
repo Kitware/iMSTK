@@ -193,7 +193,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
         [&](const size_t k)
         {
             auto& tet = elements[k];
-            auto c = std::make_shared<PbdFEMTetConstraint>(type);
+            auto c    = std::make_shared<PbdFEMTetConstraint>(type);
             c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
             lock.lock();
             m_constraints.push_back(std::move(c));
@@ -221,7 +221,7 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
         [&](const size_t k)
         {
             auto& tet = elements[k];
-            auto c = std::make_shared<PbdVolumeConstraint>();
+            auto c    = std::make_shared<PbdVolumeConstraint>();
             c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
             lock.lock();
             m_constraints.push_back(std::move(c));
@@ -318,7 +318,7 @@ PbdModel::initializeAreaConstraints(const double stiffness)
         [&](const size_t k)
         {
             auto& tri = elements[k];
-            auto c = std::make_shared<PbdAreaConstraint>();
+            auto c    = std::make_shared<PbdAreaConstraint>();
             c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
             lock.lock();
             m_constraints.push_back(std::move(c));
@@ -505,7 +505,7 @@ PbdModel::partitionConstraints(const bool print)
     vertexConstraints.clear();
 
     // do graph coloring for the constraint graph
-    const auto  coloring         = constraintGraph.doColoring();
+    const auto  coloring = constraintGraph.doColoring();
     const auto& partitionIndices = coloring.first;
     const auto  numPartitions    = coloring.second;
     assert(partitionIndices.size() == m_constraints.size());
@@ -659,9 +659,9 @@ PbdModel::integratePosition()
         {
             if (std::abs(m_invMass[i]) > MIN_REAL)
             {
-                vel[i] += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
+                vel[i]    += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
                 prevPos[i] = pos[i];
-                pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
+                pos[i]    += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
             }
         });
 }

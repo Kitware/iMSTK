@@ -104,8 +104,8 @@ private:
     // Mutex for performance reasons
     std::mutex* m_mutex;
     std::string m_message;
-    bool        m_changed = false;
-    bool        m_running = true;
+    bool m_changed = false;
+    bool m_running = true;
 
     int       m_frequency   = 30;
     int       m_period      = 1000 / 30;

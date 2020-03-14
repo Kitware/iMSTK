@@ -122,10 +122,10 @@ VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<
         m_particleFragmentUniforms.emissivity[i]      = mat->getEmissivity();
         m_particleFragmentUniforms.roughness[i]       = mat->getRoughness();
         m_particleFragmentUniforms.metalness[i]       = mat->getMetalness();
-        m_particleFragmentUniforms.color[i][0]        = m_particles[i]->m_color.r;
-        m_particleFragmentUniforms.color[i][1]        = m_particles[i]->m_color.g;
-        m_particleFragmentUniforms.color[i][2]        = m_particles[i]->m_color.b;
-        m_particleFragmentUniforms.color[i][3]        = m_particles[i]->m_color.a;
+        m_particleFragmentUniforms.color[i][0] = m_particles[i]->m_color.r;
+        m_particleFragmentUniforms.color[i][1] = m_particles[i]->m_color.g;
+        m_particleFragmentUniforms.color[i][2] = m_particles[i]->m_color.b;
+        m_particleFragmentUniforms.color[i][3] = m_particles[i]->m_color.a;
     }
 
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalParticleVertexUniforms),

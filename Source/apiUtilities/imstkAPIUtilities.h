@@ -58,7 +58,7 @@ createVisualAnalyticalSceneObject(Geometry::Type type,
                                   std::shared_ptr<Scene> scene,
                                   const std::string objName,
                                   const double scale = 1.,
-                                  const Vec3d t = Vec3d(0., 0., 0.))
+                                  const Vec3d t      = Vec3d(0., 0., 0.))
 {
     if (!scene)
     {
@@ -118,7 +118,7 @@ createCollidingAnalyticalSceneObject(Geometry::Type type,
                                      std::shared_ptr<Scene> scene,
                                      const std::string objName,
                                      const double scale = 1.,
-                                     const Vec3d t = Vec3d(0., 0., 0.))
+                                     const Vec3d t      = Vec3d(0., 0., 0.))
 {
     if (!scene)
     {
@@ -183,7 +183,7 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
         return nullptr;
     }
 
-    auto mesh        = MeshIO::read(fileName);
+    auto mesh = MeshIO::read(fileName);
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
 
     // Create object and add to scene

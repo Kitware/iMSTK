@@ -38,7 +38,7 @@ VTKInteractorStyle::VTKInteractorStyle()
 {
     m_textStatusManager = std::make_shared<VTKTextStatusManager>(this);
     m_lastFpsUpdate     = std::chrono::high_resolution_clock::now();
-    m_lastFps           = 60.0;
+    m_lastFps = 60.0;
 }
 
 VTKInteractorStyle::~VTKInteractorStyle()

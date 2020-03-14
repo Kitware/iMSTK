@@ -81,16 +81,16 @@ VulkanRenderPassGenerator::generateDepthRenderPass(
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
     // 3 is binary 11, 1 is binary 1
-    uint32_t viewMask        = numViews == 2 ? 3 : 1;
+    uint32_t viewMask = numViews == 2 ? 3 : 1;
     uint32_t correlationMask = numViews == 2 ? 3 : 1;
 
     VkRenderPassMultiviewCreateInfo multiviewInfo;
     VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
 
     VkRenderPassCreateInfo renderPassInfo[1];
-    renderPassInfo[0].sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo[0].pNext           = &multiviewInfo;
-    renderPassInfo[0].flags           = 0;
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = &multiviewInfo;
+    renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 1;
     renderPassInfo[0].pAttachments    = attachments;
     renderPassInfo[0].subpassCount    = 1;
@@ -208,16 +208,16 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
     // 3 is binary 11, 1 is binary 1
-    uint32_t viewMask        = numViews == 2 ? 3 : 1;
+    uint32_t viewMask = numViews == 2 ? 3 : 1;
     uint32_t correlationMask = numViews == 2 ? 3 : 1;
 
     VkRenderPassMultiviewCreateInfo multiviewInfo;
     VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
 
     VkRenderPassCreateInfo renderPassInfo[1];
-    renderPassInfo[0].sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo[0].pNext           = &multiviewInfo;
-    renderPassInfo[0].flags           = 0;
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = &multiviewInfo;
+    renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 4;
     renderPassInfo[0].pAttachments    = attachments;
     renderPassInfo[0].subpassCount    = 1;
@@ -319,16 +319,16 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
     dependencies[1].dependencyFlags = 0;
 
     // 3 is binary 11, 1 is binary 1
-    uint32_t viewMask        = numViews == 2 ? 3 : 1;
+    uint32_t viewMask = numViews == 2 ? 3 : 1;
     uint32_t correlationMask = numViews == 2 ? 3 : 1;
 
     VkRenderPassMultiviewCreateInfo multiviewInfo;
     VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
 
     VkRenderPassCreateInfo renderPassInfo[1];
-    renderPassInfo[0].sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo[0].pNext           = &multiviewInfo;
-    renderPassInfo[0].flags           = 0;
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = &multiviewInfo;
+    renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 3;
     renderPassInfo[0].pAttachments    = attachments;
     renderPassInfo[0].subpassCount    = 1;
@@ -430,16 +430,16 @@ VulkanRenderPassGenerator::generateParticleRenderPass(
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
     // 3 is binary 11, 1 is binary 1
-    uint32_t viewMask        = numViews == 2 ? 3 : 1;
+    uint32_t viewMask = numViews == 2 ? 3 : 1;
     uint32_t correlationMask = numViews == 2 ? 3 : 1;
 
     VkRenderPassMultiviewCreateInfo multiviewInfo;
     VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
 
     VkRenderPassCreateInfo renderPassInfo[1];
-    renderPassInfo[0].sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo[0].pNext           = &multiviewInfo;
-    renderPassInfo[0].flags           = 0;
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = &multiviewInfo;
+    renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 3;
     renderPassInfo[0].pAttachments    = attachments;
     renderPassInfo[0].subpassCount    = 1;
@@ -508,9 +508,9 @@ VulkanRenderPassGenerator::generateShadowRenderPass(
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
     VkRenderPassCreateInfo renderPassInfo[1];
-    renderPassInfo[0].sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo[0].pNext           = nullptr;
-    renderPassInfo[0].flags           = 0;
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = nullptr;
+    renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 1;
     renderPassInfo[0].pAttachments    = attachments;
     renderPassInfo[0].subpassCount    = 1;
@@ -579,16 +579,16 @@ VulkanRenderPassGenerator::generateGUIRenderPass(
     dependencies[1].dstAccessMask   = VK_ACCESS_MEMORY_READ_BIT;
     dependencies[1].dependencyFlags = 0;
 
-    uint32_t viewMask        = 1;
+    uint32_t viewMask = 1;
     uint32_t correlationMask = 1;
 
     VkRenderPassMultiviewCreateInfo multiviewInfo;
     VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
 
     VkRenderPassCreateInfo renderPassInfo[1];
-    renderPassInfo[0].sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo[0].pNext           = &multiviewInfo;
-    renderPassInfo[0].flags           = 0;
+    renderPassInfo[0].sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo[0].pNext = &multiviewInfo;
+    renderPassInfo[0].flags = 0;
     renderPassInfo[0].attachmentCount = 1;
     renderPassInfo[0].pAttachments    = attachments;
     renderPassInfo[0].subpassCount    = 1;

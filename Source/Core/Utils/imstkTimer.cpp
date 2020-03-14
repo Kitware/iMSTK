@@ -43,7 +43,7 @@ void
 StopWatch::start()
 {
     wallClockTimeKeeper = std::chrono::high_resolution_clock::now();
-    this->state         = TimerState::started;
+    this->state = TimerState::started;
 }
 
 void
@@ -165,8 +165,8 @@ UPSCounter::reset()
 {
     m_timer->reset();
     m_accumulatedTimer = 0.;
-    m_ups              = 0;
-    m_updateCount      = 0;
+    m_ups = 0;
+    m_updateCount = 0;
 }
 
 void

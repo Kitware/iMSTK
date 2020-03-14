@@ -37,10 +37,10 @@ namespace imstk
 class NonLinearSystem
 {
 public:
-    using VectorFunctionType          = std::function<const Vectord& (const Vectord&, const bool)>;
-    using MatrixFunctionType          = std::function<const SparseMatrixd& (const Vectord&)>;
-    using UpdateFunctionType          = std::function<void(const Vectord&, const bool)>;
-    using UpdatePrevStateFunctionType = std::function<void()>;
+    using VectorFunctionType = std::function<const Vectord& (const Vectord&, const bool)>;
+    using MatrixFunctionType = std::function<const SparseMatrixd& (const Vectord&)>;
+    using UpdateFunctionType = std::function<void (const Vectord&, const bool)>;
+    using UpdatePrevStateFunctionType = std::function<void ()>;
 
 public:
     ///
@@ -117,9 +117,9 @@ public:
         m_FUpdatePrevState = updateFunc;
     }
 
-    /// \brief Get the vector denoting the filter
-    ///
-    /*void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
+/// \brief Get the vector denoting the filter
+///
+/*void setDynamicLinearProjectors(std::vector<LinearProjectionConstraint>* f)
     {
         m_DynamicLinearProjConstraints = f;
     }
@@ -134,9 +134,9 @@ public:
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
     MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
-    Vectord*           m_unknown;
+    Vectord* m_unknown;
 
-    UpdateFunctionType          m_FUpdate;
+    UpdateFunctionType m_FUpdate;
     UpdatePrevStateFunctionType m_FUpdatePrevState;
     /*std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
     std::vector<LinearProjectionConstraint>  *m_DynamicLinearProjConstraints;*/

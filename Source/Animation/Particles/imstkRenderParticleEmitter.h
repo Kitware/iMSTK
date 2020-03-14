@@ -43,9 +43,9 @@ struct RenderParticleKeyFrame
 {
     float m_time  = 0;
     Color m_color = Color::White;
-    Vec3f m_acceleration           = Vec3f(0, 0, 0);
+    Vec3f m_acceleration = Vec3f(0, 0, 0);
     float m_rotationalAcceleration = 0;
-    float m_scale                  = 1.0f;
+    float m_scale = 1.0f;
 };
 
 ///
@@ -197,7 +197,7 @@ protected:
     imstk::StopWatch m_stopWatch;
 
     double m_lastUpdateTime = 0.0;
-    bool   m_started        = false;
+    bool   m_started = false;
 
     float m_emitterSize = 1.0f;
 

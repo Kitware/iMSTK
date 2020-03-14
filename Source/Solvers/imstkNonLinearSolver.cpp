@@ -114,7 +114,7 @@ NonLinearSolver::parabolicModel(const std::array<double, 3>& fnorm, std::array<d
         return;
     }
 
-    double b         = lambda[1] * a2 - lambda[2] * a1;
+    double b = lambda[1] * a2 - lambda[2] * a1;
     double newLambda = -.5 * b / a;
 
     if (newLambda < m_sigma[0] * lambda[1])

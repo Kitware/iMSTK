@@ -30,9 +30,9 @@ VulkanFramebuffer::VulkanFramebuffer(
     VkSampleCountFlagBits samples)
 {
     m_renderDevice = memoryManager.m_device;
-    m_width        = width;
-    m_height       = height;
-    m_samples      = samples;
+    m_width   = width;
+    m_height  = height;
+    m_samples = samples;
 }
 
 void

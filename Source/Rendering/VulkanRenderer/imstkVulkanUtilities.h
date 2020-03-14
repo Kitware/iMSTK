@@ -89,8 +89,8 @@ public:
         }
 
         // Get corresponding access and stage flags
-        VkAccessFlags        srcAccess        = getAccessFlags(oldLayout);
-        VkAccessFlags        dstAccess        = getAccessFlags(newLayout);
+        VkAccessFlags        srcAccess = getAccessFlags(oldLayout);
+        VkAccessFlags        dstAccess = getAccessFlags(newLayout);
         VkPipelineStageFlags srcPipelineStage = getPipelineStageFlags(oldLayout);
         VkPipelineStageFlags dstPipelineStage = getPipelineStageFlags(newLayout);
 
@@ -112,8 +112,8 @@ public:
         barrier.newLayout           = newLayout;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image               = *image->getImage();
-        barrier.subresourceRange    = range;
+        barrier.image = *image->getImage();
+        barrier.subresourceRange = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
             srcPipelineStage,
@@ -191,8 +191,8 @@ public:
         barrier.newLayout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image               = *image;
-        barrier.subresourceRange    = range;
+        barrier.image = *image;
+        barrier.subresourceRange = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
             VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
@@ -221,8 +221,8 @@ public:
         barrier.newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         barrier.srcQueueFamilyIndex = queueFamilyIndex;
         barrier.dstQueueFamilyIndex = queueFamilyIndex;
-        barrier.image               = *image;
-        barrier.subresourceRange    = range;
+        barrier.image = *image;
+        barrier.subresourceRange = range;
 
         vkCmdPipelineBarrier(*commandBuffer,
             VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
@@ -253,9 +253,9 @@ namespace VulkanFormats
 static const VkFormat FINAL_FORMAT      = VK_FORMAT_B8G8R8A8_SRGB;       /// Linear color space
 static const VkFormat HDR_FORMAT        = VK_FORMAT_R16G16B16A16_SFLOAT; // HDR internal format
 static const VkFormat NORMAL_SSS_FORMAT = VK_FORMAT_R8G8B8A8_SNORM;      // Normal/SSS format
-static const VkFormat AO_FORMAT         = VK_FORMAT_R8_UNORM;            // AO format
-static const VkFormat DEPTH_FORMAT      = VK_FORMAT_D32_SFLOAT;          // Depth buffer
-static const VkFormat SHADOW_FORMAT     = VK_FORMAT_D32_SFLOAT;          // Format for shadow maps
-static const VkFormat DEPTH_MIP_FORMAT  = VK_FORMAT_R32_SFLOAT;          // Depth mip buffer
+static const VkFormat AO_FORMAT        = VK_FORMAT_R8_UNORM;             // AO format
+static const VkFormat DEPTH_FORMAT     = VK_FORMAT_D32_SFLOAT;           // Depth buffer
+static const VkFormat SHADOW_FORMAT    = VK_FORMAT_D32_SFLOAT;           // Format for shadow maps
+static const VkFormat DEPTH_MIP_FORMAT = VK_FORMAT_R32_SFLOAT;           // Depth mip buffer
 };
 }

@@ -27,7 +27,7 @@ namespace GUIOverlay
 {
 Widget::Widget(std::string name, float x, float y)
 {
-    m_name        = name;
+    m_name = name;
     m_position[0] = x;
     m_position[1] = y;
 }

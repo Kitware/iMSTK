@@ -115,7 +115,7 @@ public:
     float getAnisotropyFactor();
 
 protected:
-    Type        m_type;     ///< Texture type
+    Type m_type;            ///< Texture type
     std::string m_path;     ///< Texture file path
 
     // Helps with texture aliasing (and a little with performance)

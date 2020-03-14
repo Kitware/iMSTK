@@ -81,7 +81,7 @@ LineMesh::setLinesVertices(const std::vector<LineArray>& lines)
     if (lines.size() <= m_maxNumLines)
     {
         m_topologyChanged = true;
-        m_lines           = lines;
+        m_lines = lines;
     }
     else
     {

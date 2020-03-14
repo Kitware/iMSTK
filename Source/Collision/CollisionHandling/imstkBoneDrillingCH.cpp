@@ -126,7 +126,7 @@ BoneDrillingCH::processCollisionData()
     // Update visual object position
 
     // Aggregate collision data
-    Vec3d  t           = Vec3d::Zero();
+    Vec3d  t = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
     for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
     {
@@ -140,7 +140,7 @@ BoneDrillingCH::processCollisionData()
         if (dSqr > maxDepthSqr)
         {
             maxDepthSqr = dSqr;
-            t           = cd.penetrationVector;
+            t = cd.penetrationVector;
         }
     }
     m_drill->getVisualGeometry()->setTranslation(devicePosition + t);

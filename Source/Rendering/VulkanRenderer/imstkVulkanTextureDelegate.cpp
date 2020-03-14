@@ -67,20 +67,20 @@ VulkanTextureDelegate::VulkanTextureDelegate(
 
     m_imageOffsetAlignment = this->getStride(m_format);
 
-    m_imageInfo.sType     = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    m_imageInfo.pNext     = nullptr;
-    m_imageInfo.format    = m_format;
-    m_imageInfo.imageType = VK_IMAGE_TYPE_2D;
-    m_imageInfo.extent    = { m_width, m_height, 1 };
-    m_imageInfo.mipLevels = m_mipLevels;
-    m_imageInfo.arrayLayers           = m_arrayLayers;
-    m_imageInfo.samples               = VK_SAMPLE_COUNT_1_BIT;
-    m_imageInfo.tiling                = VK_IMAGE_TILING_OPTIMAL;
-    m_imageInfo.usage                 = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
-    m_imageInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
+    m_imageInfo.sType       = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    m_imageInfo.pNext       = nullptr;
+    m_imageInfo.format      = m_format;
+    m_imageInfo.imageType   = VK_IMAGE_TYPE_2D;
+    m_imageInfo.extent      = { m_width, m_height, 1 };
+    m_imageInfo.mipLevels   = m_mipLevels;
+    m_imageInfo.arrayLayers = m_arrayLayers;
+    m_imageInfo.samples     = VK_SAMPLE_COUNT_1_BIT;
+    m_imageInfo.tiling      = VK_IMAGE_TILING_OPTIMAL;
+    m_imageInfo.usage       = VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+    m_imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     m_imageInfo.queueFamilyIndexCount = 1;
     m_imageInfo.pQueueFamilyIndices   = &memoryManager.m_queueFamilyIndex;
-    m_imageInfo.initialLayout         = VK_IMAGE_LAYOUT_PREINITIALIZED;
+    m_imageInfo.initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED;
 
     m_image = memoryManager.requestImage(memoryManager.m_device, m_imageInfo, VulkanMemoryType::TEXTURE);
 
@@ -127,23 +127,23 @@ VulkanTextureDelegate::VulkanTextureDelegate(
     vkCreateImageView(memoryManager.m_device, &imageViewInfo, nullptr, &m_imageView);
 
     VkSamplerCreateInfo samplerInfo;
-    samplerInfo.sType        = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.pNext        = nullptr;
-    samplerInfo.flags        = 0;
-    samplerInfo.magFilter    = VK_FILTER_LINEAR;
-    samplerInfo.minFilter    = VK_FILTER_LINEAR;
-    samplerInfo.mipmapMode   = VK_SAMPLER_MIPMAP_MODE_LINEAR;            // Trilinear interpolation
-    samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-    samplerInfo.mipLodBias   = 0.0;
-    samplerInfo.anisotropyEnable        = anisotropyAmount == 0.0f ? VK_FALSE : VK_TRUE; // TODO:: add option to enable
-    samplerInfo.maxAnisotropy           = anisotropyAmount;
-    samplerInfo.compareEnable           = VK_FALSE;
-    samplerInfo.compareOp               = VK_COMPARE_OP_ALWAYS;
-    samplerInfo.minLod                  = 0;
-    samplerInfo.maxLod                  = m_mipLevels - 1;
-    samplerInfo.borderColor             = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
+    samplerInfo.sType            = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.pNext            = nullptr;
+    samplerInfo.flags            = 0;
+    samplerInfo.magFilter        = VK_FILTER_LINEAR;
+    samplerInfo.minFilter        = VK_FILTER_LINEAR;
+    samplerInfo.mipmapMode       = VK_SAMPLER_MIPMAP_MODE_LINEAR;        // Trilinear interpolation
+    samplerInfo.addressModeU     = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeV     = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.addressModeW     = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    samplerInfo.mipLodBias       = 0.0;
+    samplerInfo.anisotropyEnable = anisotropyAmount == 0.0f ? VK_FALSE : VK_TRUE;        // TODO:: add option to enable
+    samplerInfo.maxAnisotropy    = anisotropyAmount;
+    samplerInfo.compareEnable    = VK_FALSE;
+    samplerInfo.compareOp        = VK_COMPARE_OP_ALWAYS;
+    samplerInfo.minLod           = 0;
+    samplerInfo.maxLod           = m_mipLevels - 1;
+    samplerInfo.borderColor      = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     samplerInfo.unnormalizedCoordinates = VK_FALSE;
 
     vkCreateSampler(memoryManager.m_device, &samplerInfo, nullptr, &m_sampler);
@@ -194,8 +194,8 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         {
             m_compressedTexture = gli::load(m_path);
             m_compressedTexture = gli::flip(m_compressedTexture);
-            m_format            = (VkFormat)(m_compressedTexture.format());
-            m_isDataFormatted   = true;
+            m_format = (VkFormat)(m_compressedTexture.format());
+            m_isDataFormatted = true;
 
             // Convert to SRGB for linear color space conversion
             if (m_type == Texture::Type::DIFFUSE)
@@ -237,7 +237,7 @@ VulkanTextureDelegate::loadTexture(VulkanMemoryManager& memoryManager)
         case Texture::FileType::BMP:
         {
             auto readerGenerator = vtkSmartPointer<vtkImageReader2Factory>::New();
-            auto reader          = readerGenerator->CreateImageReader2(m_path.c_str());
+            auto reader = readerGenerator->CreateImageReader2(m_path.c_str());
 
             reader->SetFileName(m_path.c_str());
             reader->Update();
@@ -307,12 +307,12 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
 
     // Staging image
     VkBufferCreateInfo stagingBufferInfo;
-    stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    stagingBufferInfo.pNext = nullptr;
-    stagingBufferInfo.flags = 0;
-    stagingBufferInfo.size  = imageSize;
-    stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    stagingBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
+    stagingBufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    stagingBufferInfo.pNext       = nullptr;
+    stagingBufferInfo.flags       = 0;
+    stagingBufferInfo.size        = imageSize;
+    stagingBufferInfo.usage       = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     stagingBufferInfo.queueFamilyIndexCount = 0;
     stagingBufferInfo.pQueueFamilyIndices   = nullptr;
 
@@ -400,8 +400,8 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
             }
 
             copyInfos[i] = copyInfo;
-            copyInfos[i].bufferRowLength           = dimensions.x;
-            copyInfos[i].bufferImageHeight         = dimensions.y;
+            copyInfos[i].bufferRowLength   = dimensions.x;
+            copyInfos[i].bufferImageHeight = dimensions.y;
             copyInfos[i].imageSubresource.mipLevel = i;
             copyInfos[i].bufferOffset = currentOffset;
             copyInfos[i].imageExtent  = { (uint32_t)dimensions.x, (uint32_t)dimensions.y, 1 };
@@ -462,12 +462,12 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
 
     // Staging image
     VkBufferCreateInfo stagingBufferInfo;
-    stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    stagingBufferInfo.pNext = nullptr;
-    stagingBufferInfo.flags = 0;
-    stagingBufferInfo.size  = imageSize;
-    stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-    stagingBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
+    stagingBufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    stagingBufferInfo.pNext       = nullptr;
+    stagingBufferInfo.flags       = 0;
+    stagingBufferInfo.size        = imageSize;
+    stagingBufferInfo.usage       = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+    stagingBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     stagingBufferInfo.queueFamilyIndexCount = 0;
     stagingBufferInfo.pQueueFamilyIndices   = nullptr;
 
@@ -489,7 +489,7 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
 
     vkBeginCommandBuffer(*memoryManager.m_transferCommandBuffer, &commandBufferBeginInfo);
 
-    std::vector<VkBufferImageCopy> copyInfos(m_mipLevels* m_arrayLayers);
+    std::vector<VkBufferImageCopy> copyInfos(m_mipLevels * m_arrayLayers);
 
     unsigned int currentOffset = 0;
     for (unsigned int layer = 0; layer < m_arrayLayers; layer++)
@@ -567,8 +567,8 @@ VulkanTextureDelegate::changeImageLayout(VkCommandBuffer&        commandBuffer,
     layoutChange.newLayout           = layout2;
     layoutChange.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     layoutChange.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-    layoutChange.image               = image;
-    layoutChange.subresourceRange    = range;
+    layoutChange.image = image;
+    layoutChange.subresourceRange = range;
 
     auto sourceStageFlags      = VK_PIPELINE_STAGE_HOST_BIT;
     auto destinationStageFlags = VK_PIPELINE_STAGE_HOST_BIT;

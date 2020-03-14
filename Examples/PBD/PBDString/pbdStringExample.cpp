@@ -59,7 +59,7 @@ main()
     };
     std::vector<PbdSim> sims(numStrings);
 
-    const double size          = stringSpacing * (numStrings - 1);
+    const double size = stringSpacing * (numStrings - 1);
     const double vertexSpacing = stringLength / numVerts;
     for (unsigned int i = 0; i < numStrings; i++)
     {
@@ -96,9 +96,9 @@ main()
         sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
         sims[i].params->m_fixedNodeIds     = { 0 }; // Fix the first node in each string
         sims[i].params->m_uniformMassValue = 5.0;
-        sims[i].params->m_gravity          = Vec3d(0, -9.8, 0);
-        sims[i].params->m_dt               = 0.0005;
-        sims[i].params->m_maxIter          = 5;
+        sims[i].params->m_gravity = Vec3d(0, -9.8, 0);
+        sims[i].params->m_dt      = 0.0005;
+        sims[i].params->m_maxIter = 5;
 
         // Set the parameters
         sims[i].model->configure(sims[i].params);

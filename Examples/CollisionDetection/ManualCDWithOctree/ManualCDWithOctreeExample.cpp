@@ -292,7 +292,7 @@ main()
         centers[i][0] = std::cos(rotation) * t;
         centers[i][2] = -std::sin(rotation) * t;
 
-        t          = dirs[i][0];
+        t = dirs[i][0];
         dirs[i][0] = std::cos(rotation) * t;
         dirs[i][2] = -std::sin(rotation) * t;
     }

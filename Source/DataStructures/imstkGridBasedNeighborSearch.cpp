@@ -117,9 +117,9 @@ GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, 
                         // get index q of point in setB
                         for (auto q : m_Grid.getCellData(cellX, cellY, cellZ).particleIndices)
                         {
-                            const auto qpos = setB[q];
+                            const auto qpos  = setB[q];
                             const Vec3r diff = ppos - qpos;
-                            const auto d2   = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
+                            const auto d2    = diff[0] * diff[0] + diff[1] * diff[1] + diff[2] * diff[2];
                             if (d2 < m_SearchRadiusSqr)
                             {
                                 pneighbors.push_back(q);

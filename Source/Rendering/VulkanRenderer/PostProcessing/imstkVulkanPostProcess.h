@@ -116,6 +116,6 @@ protected:
 
     std::vector<VkAttachmentReference> m_colorAttachments;
     VkRenderPass m_renderPass;
-    float        m_pushConstantData[32];
+    float m_pushConstantData[32];
 };
 }

@@ -207,7 +207,7 @@ protected:
     virtual void applyScaling(const double s)    = 0;
     virtual void updatePostTransformData()       = 0;
 
-    Type        m_type;          ///> Type of geometry
+    Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry
     uint32_t    m_geometryIndex; ///> Unique ID assigned to each geometry upon construction
 
@@ -216,6 +216,6 @@ protected:
     bool m_transformApplied  = true;
 
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transformation matrix
-    double           m_scaling   = 1.0;
+    double m_scaling = 1.0;
 };
 } //imstk
