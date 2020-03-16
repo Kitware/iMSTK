@@ -36,6 +36,8 @@
 #include "vtkFloatArray.h"
 #include "vtkTriangleFilter.h"
 #include "vtkPolyDataWriter.h"
+#include "vtkDICOMImageReader.h"
+#include "vtkNrrdReader.h"
 
 #include "g3log/g3log.hpp"
 

@@ -103,5 +103,16 @@ protected:
     ///
     template<typename ReaderType>
     static std::shared_ptr<VolumetricMesh> readVtkUnstructuredGrid(const std::string& filePath);
+
+    ///
+    /// \brief 
+    ///
+    template<typename ReaderType>
+    static std::shared_ptr<ImageData> readVtkImageData(const std::string& filePath);
+
+    ///
+    /// \brief 
+    ///
+    static std::shared_ptr<ImageData> readVtkImageDataDICOM(const std::string& filePath);
 };
 } // imstk
