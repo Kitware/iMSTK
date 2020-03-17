@@ -48,7 +48,7 @@ if(iMSTK_USE_Vulkan)
 endif()
 
 # Eigen
-find_package( Eigen 3.1.2 REQUIRED )
+find_package( Eigen3 3.3 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
 
 # imgui
