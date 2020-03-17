@@ -372,6 +372,7 @@ PbdModel::initializeBendConstraints(const double stiffness)
         }
         addConstraint(stiffness, seg1[0], seg1[1], i3);
     }
+    return true;
 }
 
 bool
