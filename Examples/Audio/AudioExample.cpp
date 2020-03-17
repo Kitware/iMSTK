@@ -37,11 +37,8 @@ playSound(const std::string& filename)
 #ifdef iMSTK_AUDIO_ENABLED
     // Load a sound buffer from a .wav file
     sf::SoundBuffer buffer;
-    if (!buffer.loadFromFile(filename))
-    {
-        LOG(FATAL) << "testSound: Could not open the input sound file: " << filename;
-        return;
-    }
+
+    CHECK(buffer.loadFromFile(filename)) << "testSound: Could not open the input sound file: " << filename;
 
     // Display sound informations
     std::cout << filename << std::endl;
@@ -84,11 +81,8 @@ playMusic(const std::string& filename)
 #ifdef iMSTK_AUDIO_ENABLED
     // Load an ogg music file
     sf::Music music;
-    if (!music.openFromFile(filename))
-    {
-        LOG(FATAL) << "playMusic: Could not open the input music file: " << filename;
-        return;
-    }
+        
+    CHECK(music.openFromFile(filename)) << "playMusic: Could not open the input music file: " << filename;
 
     // Display music informations
     std::cout << filename << ":" << std::endl;

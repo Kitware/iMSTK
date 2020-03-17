@@ -18,10 +18,11 @@ else()
                          ${g3log_BINARY_DIR}/libg3logger.so
                          ${CMAKE_INSTALL_PREFIX}/lib/)
 endif()
+set(g3log_hash 6c1698c4f7db6b9e4246ead38051f9866ea3ac06)
 
 imstk_add_external_project( g3log
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/g3log.git
-  GIT_TAG 6c1698c4f7db6b9e4246ead38051f9866ea3ac06
+  URL https://gitlab.kitware.com/iMSTK/g3log/-/archive/6c1698c4f7db6b9e4246ead38051f9866ea3ac06/archive.zip
+  URL_MD5 3815bbfec2ff51dc473063c35eec0f36
   CMAKE_CACHE_ARGS
     -DADD_FATAL_EXAMPLE:BOOL=OFF
   INSTALL_COMMAND

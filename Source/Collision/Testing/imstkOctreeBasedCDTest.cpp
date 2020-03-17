@@ -67,8 +67,8 @@ generatePointSet(const Real sphereRadius)
 {
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = sphereRadius * sphereRadius;
-    const auto  spacing         = Real(2) * PARTICLE_RADIUS;
-    const auto  N = uint64_t(2 * sphereRadius / spacing);
+    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const auto  N       = uint64_t(2 * sphereRadius / spacing);
 
     StdVectorOfVec3r particles;
     particles.reserve(N * N * N);
@@ -197,7 +197,7 @@ public:
         reset();
         const Real sphereRadius = rand01() * SPHERE_RADIUS + 0.5;
         const auto pointset     = generatePointSet(sphereRadius);
-        const auto mesh         = generateBoxMesh();
+        const auto mesh = generateBoxMesh();
         m_OctreeCD->addPointSet(pointset);
         m_OctreeCD->addTriangleMesh(mesh);
         m_OctreeCD->build();
@@ -209,7 +209,7 @@ public:
         for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
         {
             const auto& point = pointset->getVertexPositions()[p];
-            bool        bPenetration        = true;
+            bool        bPenetration = true;
             double      penetrationDistance = 1e10;
             for (uint32_t i = 0; i < 3; ++i)
             {
@@ -221,7 +221,7 @@ public:
                 penetrationDistance = std::min(penetrationDistance, std::abs(point[i] - 0.5));
                 penetrationDistance = std::min(penetrationDistance, std::abs(point[i] + 0.5));
             }
-            pointPenetrations[p]         = bPenetration;
+            pointPenetrations[p] = bPenetration;
             pointPenetrationDistances[p] = penetrationDistance;
             if (bPenetration)
             {
@@ -254,7 +254,7 @@ public:
     {
         const Real sphereRadius = rand01() * SPHERE_RADIUS + 0.5;
         const auto pointset     = generatePointSet(sphereRadius);
-        const auto mesh         = generateBoxMesh();
+        const auto mesh = generateBoxMesh();
 
         // Manually check for penetration
         std::vector<int>    pointPenetrations(pointset->getNumVertices());
@@ -263,7 +263,7 @@ public:
         for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
         {
             const auto& point = pointset->getVertexPositions()[p];
-            bool        bPenetration        = true;
+            bool        bPenetration = true;
             double      penetrationDistance = 1e10;
             for (uint32_t i = 0; i < 3; ++i)
             {
@@ -275,7 +275,7 @@ public:
                 penetrationDistance = std::min(penetrationDistance, std::abs(point[i] - 0.5));
                 penetrationDistance = std::min(penetrationDistance, std::abs(point[i] + 0.5));
             }
-            pointPenetrations[p]         = bPenetration;
+            pointPenetrations[p] = bPenetration;
             pointPenetrationDistances[p] = penetrationDistance;
             if (bPenetration)
             {
@@ -287,7 +287,7 @@ public:
         // Firstly we must reset the octree
         CollisionDetection::clearInternalOctree();
         const auto collisionData = std::make_shared<CollisionData>();
-        const auto CD            = std::make_shared<PointSetToSurfaceMeshCD>(pointset, mesh, collisionData);
+        const auto CD = std::make_shared<PointSetToSurfaceMeshCD>(pointset, mesh, collisionData);
         CollisionDetection::updateInternalOctreeAndDetectCollision();
 #ifdef PRINT_DEBUG
         std::cout << "VTColData.getSize() = " << collisionData->VTColData.getSize() << std::endl;

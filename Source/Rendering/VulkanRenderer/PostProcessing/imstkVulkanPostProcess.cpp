@@ -28,7 +28,7 @@ namespace imstk
 VulkanPostProcess::VulkanPostProcess(VulkanRenderer* renderer, uint32_t numViews, unsigned int level)
 {
     m_downsampleLevels = level;
-    m_numViews         = numViews;
+    m_numViews = numViews;
     auto width  = renderer->m_width >> level;
     auto height = renderer->m_height >> level;
     this->createFramebuffer(renderer, width, height);
@@ -37,7 +37,7 @@ VulkanPostProcess::VulkanPostProcess(VulkanRenderer* renderer, uint32_t numViews
 VulkanPostProcess::VulkanPostProcess(VulkanRenderer* renderer, uint32_t numViews, unsigned int width, unsigned int height)
 {
     m_downsampleLevels = 0;
-    m_numViews         = numViews;
+    m_numViews = numViews;
     this->createFramebuffer(renderer, width, height);
 }
 
@@ -94,7 +94,7 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     m_pipelineComponents.fragmentSpecializationInfo.mapEntryCount = 0;
     m_pipelineComponents.fragmentSpecializationInfo.pMapEntries   = nullptr;
     m_pipelineComponents.fragmentSpecializationInfo.dataSize      = 0;
-    m_pipelineComponents.fragmentSpecializationInfo.pData         = nullptr;
+    m_pipelineComponents.fragmentSpecializationInfo.pData = nullptr;
 
     // Vertex Shader
     m_pipelineComponents.shaderInfo[0].sType  = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -168,9 +168,9 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     m_pipelineComponents.scissors[0].offset = { 0, 0 };
     m_pipelineComponents.scissors[0].extent = { m_framebuffer->m_width, m_framebuffer->m_height };
 
-    m_pipelineComponents.viewportInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    m_pipelineComponents.viewportInfo.pNext         = nullptr;
-    m_pipelineComponents.viewportInfo.flags         = 0;
+    m_pipelineComponents.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    m_pipelineComponents.viewportInfo.pNext = nullptr;
+    m_pipelineComponents.viewportInfo.flags = 0;
     m_pipelineComponents.viewportInfo.viewportCount = (uint32_t)m_pipelineComponents.viewports.size();
     m_pipelineComponents.viewportInfo.pViewports    = &m_pipelineComponents.viewports[0];
     m_pipelineComponents.viewportInfo.scissorCount  = (uint32_t)m_pipelineComponents.scissors.size();
@@ -179,24 +179,24 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     m_pipelineComponents.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     m_pipelineComponents.rasterizationInfo.pNext = nullptr;
     m_pipelineComponents.rasterizationInfo.flags = 0;
-    m_pipelineComponents.rasterizationInfo.depthClampEnable        = VK_FALSE;
+    m_pipelineComponents.rasterizationInfo.depthClampEnable = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.rasterizerDiscardEnable = VK_FALSE;
-    m_pipelineComponents.rasterizationInfo.polygonMode             = VK_POLYGON_MODE_FILL;
-    m_pipelineComponents.rasterizationInfo.cullMode                = VK_CULL_MODE_NONE;
-    m_pipelineComponents.rasterizationInfo.frontFace               = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    m_pipelineComponents.rasterizationInfo.depthBiasEnable         = VK_FALSE;
+    m_pipelineComponents.rasterizationInfo.polygonMode     = VK_POLYGON_MODE_FILL;
+    m_pipelineComponents.rasterizationInfo.cullMode        = VK_CULL_MODE_NONE;
+    m_pipelineComponents.rasterizationInfo.frontFace       = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    m_pipelineComponents.rasterizationInfo.depthBiasEnable = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.depthBiasConstantFactor = 0.0;
-    m_pipelineComponents.rasterizationInfo.depthBiasClamp          = VK_FALSE;
-    m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor    = 0.0;
-    m_pipelineComponents.rasterizationInfo.lineWidth               = 1.0;
+    m_pipelineComponents.rasterizationInfo.depthBiasClamp       = VK_FALSE;
+    m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor = 0.0;
+    m_pipelineComponents.rasterizationInfo.lineWidth = 1.0;
 
     m_pipelineComponents.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     m_pipelineComponents.multisampleInfo.pNext = nullptr;
     m_pipelineComponents.multisampleInfo.flags = 0;
-    m_pipelineComponents.multisampleInfo.rasterizationSamples  = VK_SAMPLE_COUNT_1_BIT; // TODO: Enable multisampling
-    m_pipelineComponents.multisampleInfo.sampleShadingEnable   = VK_FALSE;
-    m_pipelineComponents.multisampleInfo.minSampleShading      = 0;
-    m_pipelineComponents.multisampleInfo.pSampleMask           = nullptr;
+    m_pipelineComponents.multisampleInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;  // TODO: Enable multisampling
+    m_pipelineComponents.multisampleInfo.sampleShadingEnable  = VK_FALSE;
+    m_pipelineComponents.multisampleInfo.minSampleShading     = 0;
+    m_pipelineComponents.multisampleInfo.pSampleMask = nullptr;
     m_pipelineComponents.multisampleInfo.alphaToCoverageEnable = VK_FALSE;
     m_pipelineComponents.multisampleInfo.alphaToOneEnable      = VK_FALSE;
 
@@ -225,25 +225,25 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     m_pipelineComponents.depthStencilInfo.depthCompareOp        = VK_COMPARE_OP_LESS;
     m_pipelineComponents.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.stencilTestEnable     = VK_FALSE;
-    m_pipelineComponents.depthStencilInfo.front                 = states[0];
-    m_pipelineComponents.depthStencilInfo.back                  = states[1];
-    m_pipelineComponents.depthStencilInfo.minDepthBounds        = VK_FALSE;
-    m_pipelineComponents.depthStencilInfo.maxDepthBounds        = VK_FALSE;
+    m_pipelineComponents.depthStencilInfo.front = states[0];
+    m_pipelineComponents.depthStencilInfo.back  = states[1];
+    m_pipelineComponents.depthStencilInfo.minDepthBounds = VK_FALSE;
+    m_pipelineComponents.depthStencilInfo.maxDepthBounds = VK_FALSE;
 
     m_pipelineComponents.colorBlendAttachments.resize(m_colorAttachments.size());
     for (int i = 0; i < m_pipelineComponents.colorBlendAttachments.size(); i++)
     {
-        m_pipelineComponents.colorBlendAttachments[i].blendEnable         = VK_TRUE;
+        m_pipelineComponents.colorBlendAttachments[i].blendEnable = VK_TRUE;
         m_pipelineComponents.colorBlendAttachments[i].srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
         m_pipelineComponents.colorBlendAttachments[i].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-        m_pipelineComponents.colorBlendAttachments[i].colorBlendOp        = VK_BLEND_OP_ADD;
+        m_pipelineComponents.colorBlendAttachments[i].colorBlendOp = VK_BLEND_OP_ADD;
         m_pipelineComponents.colorBlendAttachments[i].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         m_pipelineComponents.colorBlendAttachments[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-        m_pipelineComponents.colorBlendAttachments[i].alphaBlendOp        = VK_BLEND_OP_ADD;
-        m_pipelineComponents.colorBlendAttachments[i].colorWriteMask      = VK_COLOR_COMPONENT_R_BIT |
-                                                                            VK_COLOR_COMPONENT_G_BIT |
-                                                                            VK_COLOR_COMPONENT_B_BIT |
-                                                                            VK_COLOR_COMPONENT_A_BIT;
+        m_pipelineComponents.colorBlendAttachments[i].alphaBlendOp   = VK_BLEND_OP_ADD;
+        m_pipelineComponents.colorBlendAttachments[i].colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
+                                                                       VK_COLOR_COMPONENT_G_BIT |
+                                                                       VK_COLOR_COMPONENT_B_BIT |
+                                                                       VK_COLOR_COMPONENT_A_BIT;
     }
 
     m_pipelineComponents.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -267,8 +267,8 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.pNext = nullptr;
     layoutInfo.flags = 0;
-    layoutInfo.setLayoutCount         = (uint32_t)m_descriptorSetLayouts.size();
-    layoutInfo.pSetLayouts            = &m_descriptorSetLayouts[0];
+    layoutInfo.setLayoutCount = (uint32_t)m_descriptorSetLayouts.size();
+    layoutInfo.pSetLayouts    = &m_descriptorSetLayouts[0];
     layoutInfo.pushConstantRangeCount = 1;
     layoutInfo.pPushConstantRanges    = &pushConstants;
 
@@ -283,11 +283,11 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     m_pipelineComponents.dynamicStateInfo.dynamicStateCount = (uint32_t)m_pipelineComponents.dynamicStates.size();
     m_pipelineComponents.dynamicStateInfo.pDynamicStates    = &m_pipelineComponents.dynamicStates[0];
 
-    m_graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    m_graphicsPipelineInfo.pNext = nullptr;
-    m_graphicsPipelineInfo.flags = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
-    m_graphicsPipelineInfo.stageCount          = (uint32_t)m_pipelineComponents.shaderInfo.size();
-    m_graphicsPipelineInfo.pStages             = &m_pipelineComponents.shaderInfo[0];
+    m_graphicsPipelineInfo.sType      = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    m_graphicsPipelineInfo.pNext      = nullptr;
+    m_graphicsPipelineInfo.flags      = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
+    m_graphicsPipelineInfo.stageCount = (uint32_t)m_pipelineComponents.shaderInfo.size();
+    m_graphicsPipelineInfo.pStages    = &m_pipelineComponents.shaderInfo[0];
     m_graphicsPipelineInfo.pVertexInputState   = &m_pipelineComponents.vertexInfo;
     m_graphicsPipelineInfo.pInputAssemblyState = &m_pipelineComponents.inputAssemblyInfo;
     m_graphicsPipelineInfo.pTessellationState  = &m_pipelineComponents.tessellationInfo;
@@ -297,11 +297,11 @@ VulkanPostProcess::createPipeline(VulkanRenderer* renderer, std::string fragment
     m_graphicsPipelineInfo.pDepthStencilState  = &m_pipelineComponents.depthStencilInfo;
     m_graphicsPipelineInfo.pColorBlendState    = &m_pipelineComponents.colorBlendInfo;
     m_graphicsPipelineInfo.pDynamicState       = &m_pipelineComponents.dynamicStateInfo;
-    m_graphicsPipelineInfo.layout              = m_pipelineLayout;
-    m_graphicsPipelineInfo.renderPass          = m_renderPass;
-    m_graphicsPipelineInfo.subpass             = 0;
-    m_graphicsPipelineInfo.basePipelineHandle  = VK_NULL_HANDLE;
-    m_graphicsPipelineInfo.basePipelineIndex   = 0;
+    m_graphicsPipelineInfo.layout     = m_pipelineLayout;
+    m_graphicsPipelineInfo.renderPass = m_renderPass;
+    m_graphicsPipelineInfo.subpass    = 0;
+    m_graphicsPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    m_graphicsPipelineInfo.basePipelineIndex  = 0;
 }
 
 void
@@ -378,9 +378,9 @@ VulkanPostProcess::createDescriptorSetLayouts(VulkanRenderer* renderer)
     }
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo[1];
-    descriptorSetLayoutInfo[0].sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetLayoutInfo[0].pNext        = nullptr;
-    descriptorSetLayoutInfo[0].flags        = 0;
+    descriptorSetLayoutInfo[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetLayoutInfo[0].pNext = nullptr;
+    descriptorSetLayoutInfo[0].flags = 0;
     descriptorSetLayoutInfo[0].bindingCount = (uint32_t)fragmentDescriptorSetLayoutBindings.size();
     descriptorSetLayoutInfo[0].pBindings    = &fragmentDescriptorSetLayoutBindings[0];
 
@@ -420,7 +420,7 @@ VulkanPostProcess::createDescriptorSets(VulkanRenderer* renderer)
     descriptorSetAllocationInfo[0].pNext = nullptr;
     descriptorSetAllocationInfo[0].descriptorPool     = m_descriptorPool;
     descriptorSetAllocationInfo[0].descriptorSetCount = (uint32_t)m_descriptorSetLayouts.size();
-    descriptorSetAllocationInfo[0].pSetLayouts        = &m_descriptorSetLayouts[0];
+    descriptorSetAllocationInfo[0].pSetLayouts = &m_descriptorSetLayouts[0];
 
     VkDeviceSize size = { VK_WHOLE_SIZE };
 
@@ -440,8 +440,8 @@ VulkanPostProcess::createDescriptorSets(VulkanRenderer* renderer)
 
     m_writeDescriptorSets.resize(1);
 
-    m_writeDescriptorSets[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    m_writeDescriptorSets[0].pNext = nullptr;
+    m_writeDescriptorSets[0].sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    m_writeDescriptorSets[0].pNext            = nullptr;
     m_writeDescriptorSets[0].dstBinding       = 0;
     m_writeDescriptorSets[0].dstArrayElement  = 0;
     m_writeDescriptorSets[0].dstSet           = m_descriptorSets[0];
@@ -541,16 +541,16 @@ VulkanPostProcess::createRenderPass(VulkanRenderer* renderer)
     dependencies[1].dstAccessMask   = VK_ACCESS_SHADER_READ_BIT;
     dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
-    uint32_t viewMask        = m_numViews == 2 ? 3 : 1;
+    uint32_t viewMask = m_numViews == 2 ? 3 : 1;
     uint32_t correlationMask = m_numViews == 2 ? 3 : 1;
 
     VkRenderPassMultiviewCreateInfo multiviewInfo;
     VulkanRenderPassGenerator::generateRenderPassMultiviewCreateInfo(multiviewInfo, viewMask, correlationMask);
 
     VkRenderPassCreateInfo renderPassInfo;
-    renderPassInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.pNext           = &multiviewInfo;
-    renderPassInfo.flags           = 0;
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.pNext = &multiviewInfo;
+    renderPassInfo.flags = 0;
     renderPassInfo.attachmentCount = (uint32_t)attachments.size();
     renderPassInfo.pAttachments    = &attachments[0];
     renderPassInfo.subpassCount    = 1;

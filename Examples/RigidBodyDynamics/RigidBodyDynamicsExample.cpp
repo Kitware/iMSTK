@@ -33,32 +33,29 @@
 using namespace imstk;
 
 std::shared_ptr<imstk::RigidObject>
-addMeshRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
+addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
 {
     // create cube object
     auto meshObj = std::make_shared<RigidObject>(name);
 
     // Load a tetrahedral mesh
     auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    if (!tetMesh)
-    {
-        LOG(FATAL) << "Could not read mesh from file.";
-    }
+
+    CHECK(tetMesh) << "Could not read mesh from file.";
 
     // Extract the surface mesh
     auto surfMesh   = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-    if (!volTetMesh)
-    {
-        LOG(FATAL) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-    }
+
+    CHECK(volTetMesh) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+
     volTetMesh->scale(15., Geometry::TransformType::ApplyToData);
     volTetMesh->translate(pos, Geometry::TransformType::ApplyToData);
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
-    auto mat         = std::make_shared<RenderMaterial>();
+    auto mat = std::make_shared<RenderMaterial>();
     mat->setDisplayMode(RenderMaterial::WIREFRAME_SURFACE);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
@@ -89,11 +86,11 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     cubeGeom->translate(pos);
 
     // cube visual model
-    auto mesh        = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    auto mesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
     SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
-    auto mat         = std::make_shared<RenderMaterial>();
+    auto mat = std::make_shared<RenderMaterial>();
     mat->setDisplayMode(RenderMaterial::WIREFRAME_SURFACE);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);

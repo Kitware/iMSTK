@@ -31,9 +31,9 @@
 #include <stdio.h>
 
 // Vulkan data
-static const VkAllocationCallbacks* g_Allocator = NULL;
+static const VkAllocationCallbacks* g_Allocator      = NULL;
 static VkPhysicalDevice             g_PhysicalDevice = VK_NULL_HANDLE;
-static VkInstance                   g_Instance = VK_NULL_HANDLE;
+static VkInstance                   g_Instance       = VK_NULL_HANDLE;
 static VkDevice                     g_Device = VK_NULL_HANDLE;
 static uint32_t                     g_QueueFamily = (uint32_t)-1;
 static VkQueue                      g_Queue = VK_NULL_HANDLE;
@@ -64,10 +64,10 @@ static int                g_FrameIndex = 0;
 static FrameDataForRender g_FramesDataBuffers[IMGUI_VK_QUEUED_FRAMES] = {};
 
 // Font data
-static VkSampler      g_FontSampler        = VK_NULL_HANDLE;
-static VkDeviceMemory g_FontMemory         = VK_NULL_HANDLE;
-static VkImage        g_FontImage          = VK_NULL_HANDLE;
-static VkImageView    g_FontView           = VK_NULL_HANDLE;
+static VkSampler      g_FontSampler = VK_NULL_HANDLE;
+static VkDeviceMemory g_FontMemory  = VK_NULL_HANDLE;
+static VkImage        g_FontImage   = VK_NULL_HANDLE;
+static VkImageView    g_FontView    = VK_NULL_HANDLE;
 static VkDeviceMemory g_UploadBufferMemory = VK_NULL_HANDLE;
 static VkBuffer       g_UploadBuffer       = VK_NULL_HANDLE;
 
@@ -199,7 +199,7 @@ CreateOrResizeBuffer(VkBuffer& buffer, VkDeviceMemory& buffer_memory, VkDeviceSi
     vkGetBufferMemoryRequirements(g_Device, buffer, &req);
     g_BufferMemoryAlignment = (g_BufferMemoryAlignment > req.alignment) ? g_BufferMemoryAlignment : req.alignment;
     VkMemoryAllocateInfo alloc_info = {};
-    alloc_info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     alloc_info.allocationSize  = req.size;
     alloc_info.memoryTypeIndex = ImGui_ImplVulkan_MemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, req.memoryTypeBits);
     err = vkAllocateMemory(g_Device, &alloc_info, g_Allocator, &buffer_memory);
@@ -372,7 +372,7 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
         VkMemoryRequirements req;
         vkGetImageMemoryRequirements(g_Device, g_FontImage, &req);
         VkMemoryAllocateInfo alloc_info = {};
-        alloc_info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         alloc_info.allocationSize  = req.size;
         alloc_info.memoryTypeIndex = ImGui_ImplVulkan_MemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, req.memoryTypeBits);
         err = vkAllocateMemory(g_Device, &alloc_info, g_Allocator, &g_FontMemory);
@@ -402,8 +402,8 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
         desc_image[0].imageView   = g_FontView;
         desc_image[0].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         VkWriteDescriptorSet write_desc[1] = {};
-        write_desc[0].sType           = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_desc[0].dstSet          = g_DescriptorSet;
+        write_desc[0].sType  = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        write_desc[0].dstSet = g_DescriptorSet;
         write_desc[0].descriptorCount = 1;
         write_desc[0].descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         write_desc[0].pImageInfo      = desc_image;
@@ -423,7 +423,7 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
         vkGetBufferMemoryRequirements(g_Device, g_UploadBuffer, &req);
         g_BufferMemoryAlignment = (g_BufferMemoryAlignment > req.alignment) ? g_BufferMemoryAlignment : req.alignment;
         VkMemoryAllocateInfo alloc_info = {};
-        alloc_info.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         alloc_info.allocationSize  = req.size;
         alloc_info.memoryTypeIndex = ImGui_ImplVulkan_MemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, req.memoryTypeBits);
         err = vkAllocateMemory(g_Device, &alloc_info, g_Allocator, &g_UploadBufferMemory);
@@ -450,13 +450,13 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
     // Copy to Image:
     {
         VkImageMemoryBarrier copy_barrier[1] = {};
-        copy_barrier[0].sType         = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        copy_barrier[0].dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        copy_barrier[0].oldLayout     = VK_IMAGE_LAYOUT_UNDEFINED;
-        copy_barrier[0].newLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        copy_barrier[0].srcQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
-        copy_barrier[0].dstQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
-        copy_barrier[0].image                       = g_FontImage;
+        copy_barrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        copy_barrier[0].dstAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        copy_barrier[0].oldLayout           = VK_IMAGE_LAYOUT_UNDEFINED;
+        copy_barrier[0].newLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        copy_barrier[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        copy_barrier[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        copy_barrier[0].image = g_FontImage;
         copy_barrier[0].subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         copy_barrier[0].subresourceRange.levelCount = 1;
         copy_barrier[0].subresourceRange.layerCount = 1;
@@ -465,20 +465,20 @@ ImGui_ImplVulkan_CreateFontsTexture(VkCommandBuffer command_buffer)
         VkBufferImageCopy region = {};
         region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         region.imageSubresource.layerCount = 1;
-        region.imageExtent.width           = width;
-        region.imageExtent.height          = height;
-        region.imageExtent.depth           = 1;
+        region.imageExtent.width  = width;
+        region.imageExtent.height = height;
+        region.imageExtent.depth  = 1;
         vkCmdCopyBufferToImage(command_buffer, g_UploadBuffer, g_FontImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
         VkImageMemoryBarrier use_barrier[1] = {};
-        use_barrier[0].sType         = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-        use_barrier[0].srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-        use_barrier[0].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-        use_barrier[0].oldLayout     = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-        use_barrier[0].newLayout     = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        use_barrier[0].srcQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
-        use_barrier[0].dstQueueFamilyIndex         = VK_QUEUE_FAMILY_IGNORED;
-        use_barrier[0].image                       = g_FontImage;
+        use_barrier[0].sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        use_barrier[0].srcAccessMask       = VK_ACCESS_TRANSFER_WRITE_BIT;
+        use_barrier[0].dstAccessMask       = VK_ACCESS_SHADER_READ_BIT;
+        use_barrier[0].oldLayout           = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+        use_barrier[0].newLayout           = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        use_barrier[0].srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        use_barrier[0].dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        use_barrier[0].image = g_FontImage;
         use_barrier[0].subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
         use_barrier[0].subresourceRange.levelCount = 1;
         use_barrier[0].subresourceRange.layerCount = 1;
@@ -540,7 +540,7 @@ ImGui_ImplVulkan_CreateDeviceObjects()
         binding[0].stageFlags         = VK_SHADER_STAGE_FRAGMENT_BIT;
         binding[0].pImmutableSamplers = sampler;
         VkDescriptorSetLayoutCreateInfo info = {};
-        info.sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         info.bindingCount = 1;
         info.pBindings    = binding;
         err = vkCreateDescriptorSetLayout(g_Device, &info, g_Allocator, &g_DescriptorSetLayout);
@@ -553,7 +553,7 @@ ImGui_ImplVulkan_CreateDeviceObjects()
         alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         alloc_info.descriptorPool     = g_DescriptorPool;
         alloc_info.descriptorSetCount = 1;
-        alloc_info.pSetLayouts        = &g_DescriptorSetLayout;
+        alloc_info.pSetLayouts = &g_DescriptorSetLayout;
         err = vkAllocateDescriptorSets(g_Device, &alloc_info, &g_DescriptorSet);
         check_vk_result(err);
     }
@@ -568,8 +568,8 @@ ImGui_ImplVulkan_CreateDeviceObjects()
         VkDescriptorSetLayout      set_layout[1] = { g_DescriptorSetLayout };
         VkPipelineLayoutCreateInfo layout_info   = {};
         layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        layout_info.setLayoutCount         = 1;
-        layout_info.pSetLayouts            = set_layout;
+        layout_info.setLayoutCount = 1;
+        layout_info.pSetLayouts    = set_layout;
         layout_info.pushConstantRangeCount = 1;
         layout_info.pPushConstantRanges    = push_constants;
         err = vkCreatePipelineLayout(g_Device, &layout_info, g_Allocator, &g_PipelineLayout);
@@ -616,7 +616,7 @@ ImGui_ImplVulkan_CreateDeviceObjects()
     ia_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 
     VkPipelineViewportStateCreateInfo viewport_info = {};
-    viewport_info.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewport_info.viewportCount = 1;
     viewport_info.scissorCount  = 1;
 
@@ -632,20 +632,20 @@ ImGui_ImplVulkan_CreateDeviceObjects()
     ms_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
 
     VkPipelineColorBlendAttachmentState color_attachment[1] = {};
-    color_attachment[0].blendEnable         = VK_TRUE;
+    color_attachment[0].blendEnable = VK_TRUE;
     color_attachment[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
     color_attachment[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    color_attachment[0].colorBlendOp        = VK_BLEND_OP_ADD;
+    color_attachment[0].colorBlendOp = VK_BLEND_OP_ADD;
     color_attachment[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
     color_attachment[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-    color_attachment[0].alphaBlendOp        = VK_BLEND_OP_ADD;
-    color_attachment[0].colorWriteMask      = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    color_attachment[0].alphaBlendOp   = VK_BLEND_OP_ADD;
+    color_attachment[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
     VkPipelineDepthStencilStateCreateInfo depth_info = {};
     depth_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 
     VkPipelineColorBlendStateCreateInfo blend_info = {};
-    blend_info.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    blend_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     blend_info.attachmentCount = 1;
     blend_info.pAttachments    = color_attachment;
 
@@ -656,10 +656,10 @@ ImGui_ImplVulkan_CreateDeviceObjects()
     dynamic_state.pDynamicStates    = dynamic_states;
 
     VkGraphicsPipelineCreateInfo info = {};
-    info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    info.flags = g_PipelineCreateFlags;
-    info.stageCount          = 2;
-    info.pStages             = stage;
+    info.sType      = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    info.flags      = g_PipelineCreateFlags;
+    info.stageCount = 2;
+    info.pStages    = stage;
     info.pVertexInputState   = &vertex_info;
     info.pInputAssemblyState = &ia_info;
     info.pViewportState      = &viewport_info;
@@ -668,8 +668,8 @@ ImGui_ImplVulkan_CreateDeviceObjects()
     info.pDepthStencilState  = &depth_info;
     info.pColorBlendState    = &blend_info;
     info.pDynamicState       = &dynamic_state;
-    info.layout              = g_PipelineLayout;
-    info.renderPass          = g_RenderPass;
+    info.layout     = g_PipelineLayout;
+    info.renderPass = g_RenderPass;
     err = vkCreateGraphicsPipelines(g_Device, g_PipelineCache, 1, &info, g_Allocator, &g_Pipeline);
     check_vk_result(err);
 
@@ -760,8 +760,8 @@ ImGui_ImplVulkan_Init(ImGui_ImplVulkan_InitInfo* info, VkRenderPass render_pass)
     IM_ASSERT(info->DescriptorPool != VK_NULL_HANDLE);
     IM_ASSERT(render_pass != VK_NULL_HANDLE);
 
-    g_Instance        = info->Instance;
-    g_PhysicalDevice  = info->PhysicalDevice;
+    g_Instance       = info->Instance;
+    g_PhysicalDevice = info->PhysicalDevice;
     g_Device          = info->Device;
     g_QueueFamily     = info->QueueFamily;
     g_Queue           = info->Queue;
@@ -805,10 +805,10 @@ ImGui_ImplVulkan_NewFrame()
 
 ImGui_ImplVulkanH_FrameData::ImGui_ImplVulkanH_FrameData()
 {
-    BackbufferIndex         = 0;
-    CommandPool             = VK_NULL_HANDLE;
-    CommandBuffer           = VK_NULL_HANDLE;
-    Fence                   = VK_NULL_HANDLE;
+    BackbufferIndex = 0;
+    CommandPool     = VK_NULL_HANDLE;
+    CommandBuffer   = VK_NULL_HANDLE;
+    Fence = VK_NULL_HANDLE;
     ImageAcquiredSemaphore  = VK_NULL_HANDLE;
     RenderCompleteSemaphore = VK_NULL_HANDLE;
 }
@@ -931,9 +931,9 @@ ImGui_ImplVulkanH_CreateWindowDataCommandBuffers(VkPhysicalDevice physical_devic
         }
         {
             VkCommandBufferAllocateInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            info.commandPool        = fd->CommandPool;
-            info.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+            info.sType       = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+            info.commandPool = fd->CommandPool;
+            info.level       = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
             info.commandBufferCount = 1;
             err = vkAllocateCommandBuffers(device, &info, &fd->CommandBuffer);
             check_vk_result(err);
@@ -942,13 +942,13 @@ ImGui_ImplVulkanH_CreateWindowDataCommandBuffers(VkPhysicalDevice physical_devic
             VkFenceCreateInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
             info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-            err        = vkCreateFence(device, &info, allocator, &fd->Fence);
+            err = vkCreateFence(device, &info, allocator, &fd->Fence);
             check_vk_result(err);
         }
         {
             VkSemaphoreCreateInfo info = {};
             info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-            err        = vkCreateSemaphore(device, &info, allocator, &fd->ImageAcquiredSemaphore);
+            err = vkCreateSemaphore(device, &info, allocator, &fd->ImageAcquiredSemaphore);
             check_vk_result(err);
             err = vkCreateSemaphore(device, &info, allocator, &fd->RenderCompleteSemaphore);
             check_vk_result(err);
@@ -1012,7 +1012,7 @@ ImGui_ImplVulkanH_CreateWindowDataSwapChainAndFramebuffer(VkPhysicalDevice physi
     // Create Swapchain
     {
         VkSwapchainCreateInfoKHR info = {};
-        info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        info.sType            = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         info.surface          = wd->Surface;
         info.minImageCount    = min_image_count;
         info.imageFormat      = wd->SurfaceFormat.format;
@@ -1085,7 +1085,7 @@ ImGui_ImplVulkanH_CreateWindowDataSwapChainAndFramebuffer(VkPhysicalDevice physi
         dependency.srcAccessMask = 0;
         dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
         VkRenderPassCreateInfo info = {};
-        info.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         info.attachmentCount = 1;
         info.pAttachments    = &attachment;
         info.subpassCount    = 1;
@@ -1111,7 +1111,7 @@ ImGui_ImplVulkanH_CreateWindowDataSwapChainAndFramebuffer(VkPhysicalDevice physi
         for (uint32_t i = 0; i < wd->BackBufferCount; i++)
         {
             info.image = wd->BackBuffer[i];
-            err        = vkCreateImageView(device, &info, allocator, &wd->BackBufferView[i]);
+            err = vkCreateImageView(device, &info, allocator, &wd->BackBufferView[i]);
             check_vk_result(err);
         }
     }
@@ -1130,7 +1130,7 @@ ImGui_ImplVulkanH_CreateWindowDataSwapChainAndFramebuffer(VkPhysicalDevice physi
         for (uint32_t i = 0; i < wd->BackBufferCount; i++)
         {
             attachment[0] = wd->BackBufferView[i];
-            err           = vkCreateFramebuffer(device, &info, allocator, &wd->Framebuffer[i]);
+            err = vkCreateFramebuffer(device, &info, allocator, &wd->Framebuffer[i]);
             check_vk_result(err);
         }
     }

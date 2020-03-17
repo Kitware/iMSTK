@@ -56,7 +56,7 @@ struct FEMModelConfig
     double m_dampingLaplacianCoefficient = 0.0;
     double m_deformationCompliance       = 1.0;
     double m_compressionResistance       = 500.0;
-    double m_inversionThreshold          = -std::numeric_limits<double>::max();
+    double m_inversionThreshold = -std::numeric_limits<double>::max();
     double m_gravity = 9.81;
 
     // \todo remove from here ?

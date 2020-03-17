@@ -118,7 +118,7 @@ public:
 protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
-    bool        m_enableVR;
+    bool m_enableVR;
     std::string m_windowName = "imstk";
 
 #ifdef iMSTK_ENABLE_VR

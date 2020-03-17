@@ -29,12 +29,12 @@ VulkanUniformBuffer::VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uin
 
     // Uniform buffer
     VkBufferCreateInfo uniformBufferInfo;
-    uniformBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    uniformBufferInfo.pNext = nullptr;
-    uniformBufferInfo.flags = 0;
-    uniformBufferInfo.size  = uniformSize * memoryManager.m_buffering;
-    uniformBufferInfo.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
-    uniformBufferInfo.sharingMode           = VK_SHARING_MODE_EXCLUSIVE;
+    uniformBufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    uniformBufferInfo.pNext       = nullptr;
+    uniformBufferInfo.flags       = 0;
+    uniformBufferInfo.size        = uniformSize * memoryManager.m_buffering;
+    uniformBufferInfo.usage       = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    uniformBufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
     uniformBufferInfo.queueFamilyIndexCount = 0;
     uniformBufferInfo.pQueueFamilyIndices   = nullptr;
 

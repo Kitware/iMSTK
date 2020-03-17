@@ -108,17 +108,17 @@ private:
     double m_wPoly6Coeff;
     double m_wSpikyCoeff;
 
-    double m_maxDist = 0.2;                          ///> Max. neighbor distance
-    double m_maxDistSqr          = 0.04;             ///> Max. neighbor squared distance
+    double m_maxDist    = 0.2;                       ///> Max. neighbor distance
+    double m_maxDistSqr = 0.04;                      ///> Max. neighbor squared distance
     double m_relaxationParameter = 600.0;            ///> Relaxation parameter
-    double m_restDensity         = 6378.0;           ///> Fluid density
+    double m_restDensity = 6378.0;                   ///> Fluid density
 
     std::vector<double> m_lambdas;                   ///> lambdas
     std::vector<double> m_densities;                 ///> densities
     std::vector<Vec3d>  m_deltaPositions;            ///> delta positions
     std::vector<std::vector<size_t>> m_neighborList; ///> indices of neighbor particles
 
-    NeighborSearch::Method          m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
+    NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
     std::shared_ptr<NeighborSearch> m_NeighborSearcher;  ///> neighbor searcher, must be initialized during model initialization
 };
 }

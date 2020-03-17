@@ -63,11 +63,8 @@ Scene::initialize()
         }
 
         auto sceneObject = it.second;
-        if (!sceneObject->initialize())
-        {
-            LOG(FATAL) << "Error initializing scene object: " << sceneObject->getName();
-            return false;
-        }
+
+        CHECK(sceneObject->initialize()) << "Error initializing scene object: " << sceneObject->getName();
     }
 
     for (auto const& it : m_collisionGraph->getInteractionPairList())
@@ -78,7 +75,7 @@ Scene::initialize()
             if (chA->getType() == CollisionHandling::Type::PBD)
             {
                 auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chA);
-                ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast < PbdObject > (it->getObjectsPair().first)]);
+                ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast<PbdObject>(it->getObjectsPair().first)]);
             }
         }
         else
@@ -89,7 +86,7 @@ Scene::initialize()
                 if (chB->getType() == CollisionHandling::Type::PBD)
                 {
                     auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chB);
-                    ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast < PbdObject > (it->getObjectsPair().second)]);
+                    ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast<PbdObject>(it->getObjectsPair().second)]);
                 }
             }
         }
@@ -140,12 +137,9 @@ Scene::getSceneObjectControllers() const
 std::shared_ptr<SceneObject>
 Scene::getSceneObject(const std::string& sceneObjectName) const
 {
-    if (!this->isObjectRegistered(sceneObjectName))
-    {
-        LOG(FATAL) << "No scene object named '" << sceneObjectName
-                   << "' was registered in this scene.";
-        return nullptr;
-    }
+    CHECK(this->isObjectRegistered(sceneObjectName)) 
+        << "No scene object named '"  << sceneObjectName
+        << "' was registered in this scene.";
 
     return m_sceneObjectsMap.at(sceneObjectName);
 }

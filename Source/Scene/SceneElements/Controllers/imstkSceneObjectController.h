@@ -36,7 +36,7 @@ namespace imstk
 ///
 class SceneObjectController : public SceneObjectControllerBase
 {
-using ControllerCallbackFunction = std::function<void(SceneObjectController* hdapiClient)>;
+using ControllerCallbackFunction = std::function<void (SceneObjectController* hdapiClient)>;
 public:
     ///
     /// \brief Constructor

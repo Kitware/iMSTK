@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( GoogleTest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG dc043e1ca6bd509a92452ed54e817b6979869372
+  URL https://github.com/google/googletest/archive/release-1.10.0.zip
+  URL_MD5 82358affdd7ab94854c8ee73a180fc53
   CMAKE_CACHE_ARGS
     -DBUILD_GMOCK:BOOL=ON
     -DBUILD_GTEST:BOOL=ON

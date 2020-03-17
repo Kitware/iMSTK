@@ -105,8 +105,8 @@ protected:
 
     std::string  m_name;
     Vec2f        m_position;
-    Widget::Type m_type    = Widget::Type::None;
-    bool         m_visible = true;
+    Widget::Type m_type = Widget::Type::None;
+    bool m_visible      = true;
 };
 } // GUI
 } // imstk

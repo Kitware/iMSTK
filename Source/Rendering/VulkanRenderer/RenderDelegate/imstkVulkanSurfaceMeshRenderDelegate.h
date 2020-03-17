@@ -55,6 +55,6 @@ public:
 
 protected:
     VulkanLocalVertexUniforms m_localVertexUniforms;
-    std::vector<bool>         m_modified;
+    std::vector<bool> m_modified;
 };
 }

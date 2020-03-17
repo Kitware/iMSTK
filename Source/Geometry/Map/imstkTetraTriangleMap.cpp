@@ -73,7 +73,7 @@ TetraTriangleMap::compute()
             tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
 
             m_verticesEnclosingTetraId[vertexIdx] = closestTetId; // store nearest tetrahedron
-            m_verticesWeights[vertexIdx]          = weights;      // store weights
+            m_verticesWeights[vertexIdx] = weights;               // store weights
     });
 
     // Clear result if could not find closest tet
@@ -143,7 +143,7 @@ TetraTriangleMap::isValid() const
 #endif
 
     auto totalElementsMaster = meshMaster->getNumTetrahedra();
-    bool bOK                 = true;
+    bool bOK = true;
 
     ParallelUtils::parallelFor(m_verticesEnclosingTetraId.size(), [&](const size_t tetId) {
             if (!bOK) // If map is invalid, no need to check further

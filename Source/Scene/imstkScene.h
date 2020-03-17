@@ -71,7 +71,7 @@ public:
     /// \brief Constructor
     ///
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(name), m_config(config) {}
-    Scene(std::string&& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(std::move(name)), m_config(config) {}
+    Scene(std::string&& name, std::shared_ptr<SceneConfig> config      = std::make_shared<SceneConfig>()) : m_name(std::move(name)), m_config(config) {}
 
     ///
     /// \brief Destructor
@@ -215,13 +215,13 @@ public:
 protected:
     std::shared_ptr<SceneConfig> m_config;
 
-    std::string                              m_name; ///> Name of the scene
-    NamedMap<SceneObject>                    m_sceneObjectsMap;
-    NamedMap<DebugRenderGeometry>            m_DebugRenderGeometryMap;
-    NamedMap<Light>                          m_lightsMap;
-    std::shared_ptr<IBLProbe>                m_globalIBLProbe = nullptr;
-    std::shared_ptr<Camera>                  m_camera         = std::make_shared<Camera>();
-    std::shared_ptr<CollisionGraph>          m_collisionGraph = std::make_shared<CollisionGraph>();
+    std::string m_name;                              ///> Name of the scene
+    NamedMap<SceneObject> m_sceneObjectsMap;
+    NamedMap<DebugRenderGeometry> m_DebugRenderGeometryMap;
+    NamedMap<Light> m_lightsMap;
+    std::shared_ptr<IBLProbe>       m_globalIBLProbe = nullptr;
+    std::shared_ptr<Camera>         m_camera = std::make_shared<Camera>();
+    std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;                          ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
     std::unordered_map<std::string, std::thread> m_threadMap;                    ///>
@@ -231,6 +231,6 @@ protected:
 
     bool m_isInitialized = false;
 
-    std::atomic<bool> m_resetRequested = false;
+    std::atomic<bool> m_resetRequested = ATOMIC_VAR_INIT(false);
 };
 } // imstk

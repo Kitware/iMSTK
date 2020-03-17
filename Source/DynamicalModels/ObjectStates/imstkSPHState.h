@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    SPHKinematicState()          = default;
+    SPHKinematicState() = default;
     virtual ~SPHKinematicState() = default;
 
     ///
@@ -93,7 +93,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    SPHSimulationState()          = default;
+    SPHSimulationState() = default;
     virtual ~SPHSimulationState() = default;
 
     ///

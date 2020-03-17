@@ -67,7 +67,7 @@ VulkanMaterialDelegate::initialize(VulkanRenderer* renderer)
 void
 VulkanMaterialDelegate::createPipeline(VulkanRenderer* renderer)
 {
-    m_memoryManager->m_device           = renderer->m_renderDevice;
+    m_memoryManager->m_device = renderer->m_renderDevice;
     m_memoryManager->m_queueFamilyIndex = renderer->m_renderQueueFamily;
 
     if (m_material->isDecal())
@@ -196,7 +196,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_pipelineComponents.fragmentSpecializationInfo.mapEntryCount = m_numConstants;
     m_pipelineComponents.fragmentSpecializationInfo.pMapEntries   = &m_pipelineComponents.fragmentMapEntries[0];
     m_pipelineComponents.fragmentSpecializationInfo.dataSize      = sizeof(m_constants);
-    m_pipelineComponents.fragmentSpecializationInfo.pData         = (void*)(&m_constants);
+    m_pipelineComponents.fragmentSpecializationInfo.pData = (void*)(&m_constants);
 
     m_pipelineComponents.shaderInfo.clear();
 
@@ -344,9 +344,9 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_pipelineComponents.scissors[0].extent = { (uint32_t)m_pipelineComponents.viewports[0].width,
                                                 (uint32_t)m_pipelineComponents.viewports[0].height };
 
-    m_pipelineComponents.viewportInfo.sType         = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    m_pipelineComponents.viewportInfo.pNext         = nullptr;
-    m_pipelineComponents.viewportInfo.flags         = 0;
+    m_pipelineComponents.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    m_pipelineComponents.viewportInfo.pNext = nullptr;
+    m_pipelineComponents.viewportInfo.flags = 0;
     m_pipelineComponents.viewportInfo.viewportCount = (uint32_t)m_pipelineComponents.viewports.size();
     m_pipelineComponents.viewportInfo.pViewports    = &m_pipelineComponents.viewports[0];
     m_pipelineComponents.viewportInfo.scissorCount  = (uint32_t)m_pipelineComponents.scissors.size();
@@ -355,7 +355,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_pipelineComponents.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     m_pipelineComponents.rasterizationInfo.pNext = nullptr;
     m_pipelineComponents.rasterizationInfo.flags = 0;
-    m_pipelineComponents.rasterizationInfo.depthClampEnable        = VK_FALSE;
+    m_pipelineComponents.rasterizationInfo.depthClampEnable = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.rasterizerDiscardEnable = VK_FALSE; // Might be enabled later
 
     m_pipelineComponents.rasterizationInfo.polygonMode = VK_POLYGON_MODE_FILL;
@@ -377,21 +377,21 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
 
     m_pipelineComponents.rasterizationInfo.cullMode =
         m_material->getBackFaceCulling() ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
-    m_pipelineComponents.rasterizationInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
-    m_pipelineComponents.rasterizationInfo.depthBiasEnable         = VK_FALSE;
+    m_pipelineComponents.rasterizationInfo.frontFace       = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    m_pipelineComponents.rasterizationInfo.depthBiasEnable = VK_FALSE;
     m_pipelineComponents.rasterizationInfo.depthBiasConstantFactor = 0.0;
-    m_pipelineComponents.rasterizationInfo.depthBiasClamp          = VK_FALSE;
-    m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor    = 0.0;
+    m_pipelineComponents.rasterizationInfo.depthBiasClamp       = VK_FALSE;
+    m_pipelineComponents.rasterizationInfo.depthBiasSlopeFactor = 0.0;
 
     m_pipelineComponents.rasterizationInfo.lineWidth = renderer->m_supportsWideLines ? m_material->getLineWidth() : 1.0;
 
     m_pipelineComponents.multisampleInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     m_pipelineComponents.multisampleInfo.pNext = nullptr;
     m_pipelineComponents.multisampleInfo.flags = 0;
-    m_pipelineComponents.multisampleInfo.rasterizationSamples  = renderer->m_samples; // TODO: Enable multisampling
-    m_pipelineComponents.multisampleInfo.sampleShadingEnable   = VK_FALSE;
-    m_pipelineComponents.multisampleInfo.minSampleShading      = 0;
-    m_pipelineComponents.multisampleInfo.pSampleMask           = nullptr;
+    m_pipelineComponents.multisampleInfo.rasterizationSamples = renderer->m_samples;  // TODO: Enable multisampling
+    m_pipelineComponents.multisampleInfo.sampleShadingEnable  = VK_FALSE;
+    m_pipelineComponents.multisampleInfo.minSampleShading     = 0;
+    m_pipelineComponents.multisampleInfo.pSampleMask = nullptr;
     m_pipelineComponents.multisampleInfo.alphaToCoverageEnable = VK_FALSE;
     m_pipelineComponents.multisampleInfo.alphaToOneEnable      = VK_FALSE;
 
@@ -422,10 +422,10 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_pipelineComponents.depthStencilInfo.depthCompareOp        = VK_COMPARE_OP_LESS_OR_EQUAL;
     m_pipelineComponents.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
     m_pipelineComponents.depthStencilInfo.stencilTestEnable     = VK_FALSE;
-    m_pipelineComponents.depthStencilInfo.front                 = states[0];
-    m_pipelineComponents.depthStencilInfo.back                  = states[1];
-    m_pipelineComponents.depthStencilInfo.minDepthBounds        = VK_FALSE;
-    m_pipelineComponents.depthStencilInfo.maxDepthBounds        = VK_FALSE;
+    m_pipelineComponents.depthStencilInfo.front = states[0];
+    m_pipelineComponents.depthStencilInfo.back  = states[1];
+    m_pipelineComponents.depthStencilInfo.minDepthBounds = VK_FALSE;
+    m_pipelineComponents.depthStencilInfo.maxDepthBounds = VK_FALSE;
 
     size_t       numAttachments;
     VkRenderPass renderPass;
@@ -460,7 +460,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_pipelineComponents.colorBlendAttachments.resize(numAttachments);
 
     int  blendModeEnabled = (m_material->isDecal() || m_material->isParticle()) ? VK_TRUE : VK_FALSE;
-    auto blendMode        = m_material->getBlendMode();
+    auto blendMode = m_material->getBlendMode();
 
     for (int i = 0; i < m_pipelineComponents.colorBlendAttachments.size(); i++)
     {
@@ -477,7 +477,7 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
 
             break;
         }
-        m_pipelineComponents.colorBlendAttachments[i].colorBlendOp        = VK_BLEND_OP_ADD;
+        m_pipelineComponents.colorBlendAttachments[i].colorBlendOp = VK_BLEND_OP_ADD;
         m_pipelineComponents.colorBlendAttachments[i].srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
         m_pipelineComponents.colorBlendAttachments[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
 
@@ -488,9 +488,9 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
                                                                        VK_COLOR_COMPONENT_A_BIT;
     }
 
-    m_pipelineComponents.colorBlendInfo.sType           = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    m_pipelineComponents.colorBlendInfo.pNext           = nullptr;
-    m_pipelineComponents.colorBlendInfo.flags           = 0;
+    m_pipelineComponents.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    m_pipelineComponents.colorBlendInfo.pNext = nullptr;
+    m_pipelineComponents.colorBlendInfo.flags = 0;
     m_pipelineComponents.colorBlendInfo.logicOpEnable   = VK_FALSE;
     m_pipelineComponents.colorBlendInfo.logicOp         = VK_LOGIC_OP_SET;
     m_pipelineComponents.colorBlendInfo.attachmentCount = (uint32_t)m_pipelineComponents.colorBlendAttachments.size();
@@ -511,8 +511,8 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.pNext = nullptr;
     layoutInfo.flags = 0;
-    layoutInfo.setLayoutCount         = (uint32_t)m_descriptorSetLayouts.size();
-    layoutInfo.pSetLayouts            = &m_descriptorSetLayouts[0];
+    layoutInfo.setLayoutCount = (uint32_t)m_descriptorSetLayouts.size();
+    layoutInfo.pSetLayouts    = &m_descriptorSetLayouts[0];
     layoutInfo.pushConstantRangeCount = m_shadowPass ? 1 : 0;
     layoutInfo.pPushConstantRanges    = m_shadowPass ? &constantRange : nullptr;
 
@@ -527,11 +527,11 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_pipelineComponents.dynamicStateInfo.dynamicStateCount = (uint32_t)m_pipelineComponents.dynamicStates.size();
     m_pipelineComponents.dynamicStateInfo.pDynamicStates    = &m_pipelineComponents.dynamicStates[0];
 
-    m_graphicsPipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    m_graphicsPipelineInfo.pNext = nullptr;
-    m_graphicsPipelineInfo.flags = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
-    m_graphicsPipelineInfo.stageCount          = (uint32_t)m_pipelineComponents.shaderInfo.size();
-    m_graphicsPipelineInfo.pStages             = &m_pipelineComponents.shaderInfo[0];
+    m_graphicsPipelineInfo.sType      = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    m_graphicsPipelineInfo.pNext      = nullptr;
+    m_graphicsPipelineInfo.flags      = VK_PIPELINE_CREATE_DISABLE_OPTIMIZATION_BIT;
+    m_graphicsPipelineInfo.stageCount = (uint32_t)m_pipelineComponents.shaderInfo.size();
+    m_graphicsPipelineInfo.pStages    = &m_pipelineComponents.shaderInfo[0];
     m_graphicsPipelineInfo.pVertexInputState   = &m_pipelineComponents.vertexInfo;
     m_graphicsPipelineInfo.pInputAssemblyState = &m_pipelineComponents.inputAssemblyInfo;
     m_graphicsPipelineInfo.pTessellationState  = &m_pipelineComponents.tessellationInfo;
@@ -541,11 +541,11 @@ VulkanMaterialDelegate::buildMaterial(VulkanRenderer* renderer)
     m_graphicsPipelineInfo.pDepthStencilState  = &m_pipelineComponents.depthStencilInfo;
     m_graphicsPipelineInfo.pColorBlendState    = &m_pipelineComponents.colorBlendInfo;
     m_graphicsPipelineInfo.pDynamicState       = m_shadowPass ? nullptr : &m_pipelineComponents.dynamicStateInfo;
-    m_graphicsPipelineInfo.layout              = m_pipelineLayout;
-    m_graphicsPipelineInfo.renderPass          = renderPass;
-    m_graphicsPipelineInfo.subpass             = 0;
-    m_graphicsPipelineInfo.basePipelineHandle  = VK_NULL_HANDLE;
-    m_graphicsPipelineInfo.basePipelineIndex   = 0;
+    m_graphicsPipelineInfo.layout     = m_pipelineLayout;
+    m_graphicsPipelineInfo.renderPass = renderPass;
+    m_graphicsPipelineInfo.subpass    = 0;
+    m_graphicsPipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    m_graphicsPipelineInfo.basePipelineIndex  = 0;
 
     vkCreateGraphicsPipelines(renderer->m_renderDevice,
         renderer->m_pipelineCache,
@@ -579,7 +579,7 @@ VulkanMaterialDelegate::initializeTextures(VulkanRenderer* renderer)
 
     m_irradianceCubemapTexture = this->initializeTexture(renderer, defaultCubemap, Texture::Type::IRRADIANCE_CUBEMAP);
     m_radianceCubemapTexture   = this->initializeTexture(renderer, defaultCubemap, Texture::Type::RADIANCE_CUBEMAP);
-    m_brdfLUTTexture           = this->initializeTexture(renderer, defaultTexture, Texture::Type::BRDF_LUT);
+    m_brdfLUTTexture = this->initializeTexture(renderer, defaultTexture, Texture::Type::BRDF_LUT);
 }
 
 std::shared_ptr<VulkanTextureDelegate>
@@ -651,7 +651,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer* renderer)
 
     // Descriptor Sets
     VkDescriptorSetLayoutBinding vertexDescriptorSetLayoutBindings[2];
-    vertexDescriptorSetLayoutBindings[0].binding         = 0;
+    vertexDescriptorSetLayoutBindings[0].binding = 0;
     vertexDescriptorSetLayoutBindings[0].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     vertexDescriptorSetLayoutBindings[0].descriptorCount = 1;
     vertexDescriptorSetLayoutBindings[0].stageFlags      = VK_SHADER_STAGE_VERTEX_BIT
@@ -659,7 +659,7 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer* renderer)
                                                            | VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
     vertexDescriptorSetLayoutBindings[0].pImmutableSamplers = nullptr;
 
-    vertexDescriptorSetLayoutBindings[1].binding         = 1;
+    vertexDescriptorSetLayoutBindings[1].binding = 1;
     vertexDescriptorSetLayoutBindings[1].descriptorType  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     vertexDescriptorSetLayoutBindings[1].descriptorCount = 1;
     vertexDescriptorSetLayoutBindings[1].stageFlags      = VK_SHADER_STAGE_VERTEX_BIT
@@ -853,15 +853,15 @@ VulkanMaterialDelegate::createDescriptorSetLayouts(VulkanRenderer* renderer)
     }
 
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo[2];
-    descriptorSetLayoutInfo[0].sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetLayoutInfo[0].pNext        = nullptr;
-    descriptorSetLayoutInfo[0].flags        = 0;
+    descriptorSetLayoutInfo[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetLayoutInfo[0].pNext = nullptr;
+    descriptorSetLayoutInfo[0].flags = 0;
     descriptorSetLayoutInfo[0].bindingCount = 2;
     descriptorSetLayoutInfo[0].pBindings    = vertexDescriptorSetLayoutBindings;
 
-    descriptorSetLayoutInfo[1].sType        = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    descriptorSetLayoutInfo[1].pNext        = nullptr;
-    descriptorSetLayoutInfo[1].flags        = 0;
+    descriptorSetLayoutInfo[1].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetLayoutInfo[1].pNext = nullptr;
+    descriptorSetLayoutInfo[1].flags = 0;
     descriptorSetLayoutInfo[1].bindingCount = (uint32_t)fragmentDescriptorSetLayoutBindings.size();
     descriptorSetLayoutInfo[1].pBindings    = &fragmentDescriptorSetLayoutBindings[0];
 
@@ -920,7 +920,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer* renderer)
     descriptorSetAllocationInfo[0].pNext = nullptr;
     descriptorSetAllocationInfo[0].descriptorPool     = m_descriptorPool;
     descriptorSetAllocationInfo[0].descriptorSetCount = (uint32_t)m_descriptorSetLayouts.size();
-    descriptorSetAllocationInfo[0].pSetLayouts        = &m_descriptorSetLayouts[0];
+    descriptorSetAllocationInfo[0].pSetLayouts = &m_descriptorSetLayouts[0];
 
     VkDeviceSize size = { VK_WHOLE_SIZE };
 
@@ -1063,8 +1063,8 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer* renderer)
 
     for (int i = 0; i < m_writeDescriptorSets.size(); i++)
     {
-        m_writeDescriptorSets[i].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        m_writeDescriptorSets[i].pNext = nullptr;
+        m_writeDescriptorSets[i].sType            = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+        m_writeDescriptorSets[i].pNext            = nullptr;
         m_writeDescriptorSets[i].dstBinding       = 0;
         m_writeDescriptorSets[i].dstArrayElement  = 0;
         m_writeDescriptorSets[i].descriptorCount  = 0;
@@ -1076,22 +1076,22 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer* renderer)
 
     // Vertex descriptor set
     m_writeDescriptorSets[0].descriptorCount = 2;
-    m_writeDescriptorSets[0].dstSet          = m_descriptorSets[0];
-    m_writeDescriptorSets[0].pBufferInfo     = &vertexBufferInfo[0];
+    m_writeDescriptorSets[0].dstSet      = m_descriptorSets[0];
+    m_writeDescriptorSets[0].pBufferInfo = &vertexBufferInfo[0];
 
     // Fragment descriptor set
     m_writeDescriptorSets[1].descriptorCount = 2;
-    m_writeDescriptorSets[1].dstSet          = m_descriptorSets[1];
-    m_writeDescriptorSets[1].pBufferInfo     = &fragmentBufferInfo[0];
+    m_writeDescriptorSets[1].dstSet      = m_descriptorSets[1];
+    m_writeDescriptorSets[1].pBufferInfo = &fragmentBufferInfo[0];
 
     // Fragment texture descriptor set
     if (!m_depthOnlyPass)
     {
         m_writeDescriptorSets[2].descriptorCount = (uint32_t)fragmentTextureInfo.size();
         m_writeDescriptorSets[2].dstBinding      = 2;
-        m_writeDescriptorSets[2].dstSet          = m_descriptorSets[1];
-        m_writeDescriptorSets[2].descriptorType  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        m_writeDescriptorSets[2].pImageInfo      = &fragmentTextureInfo[0];
+        m_writeDescriptorSets[2].dstSet = m_descriptorSets[1];
+        m_writeDescriptorSets[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        m_writeDescriptorSets[2].pImageInfo     = &fragmentTextureInfo[0];
     }
 
     vkUpdateDescriptorSets(renderer->m_renderDevice, (uint32_t)m_writeDescriptorSets.size(), &m_writeDescriptorSets[0], 0, nullptr);

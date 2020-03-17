@@ -112,7 +112,7 @@ VTKTextStatusManager::setFPS(const double visualFPS, const double physicsFPS)
         fpsPhysicalStr = "P: " + std::string(buff);
     }
 
-    std::string fpsString           = fpsVisualStr + std::string(" | ") + fpsPhysicalStr;
+    std::string fpsString = fpsVisualStr + std::string(" | ") + fpsPhysicalStr;
     auto        fpsStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[StatusType::FPS],
                                                      m_StatusFontSizes[StatusType::FPS],
                                                      fpsString);

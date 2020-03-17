@@ -25,7 +25,7 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkAPIUtilities.h"
-#include "imstkMeshToMeshBruteforceCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPBDCollisionHandling.h"
 
 using namespace imstk;
@@ -71,10 +71,10 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity          = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt               = 0.05;
-    pbdParams->m_maxIter          = 2;
-    pbdParams->m_proximity        = 0.01;
+    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
+    pbdParams->m_dt        = 0.05;
+    pbdParams->m_maxIter   = 2;
+    pbdParams->m_proximity = 0.01;
     pbdParams->m_contactStiffness = 0.2;
 
     // Set the parameters
@@ -112,7 +112,7 @@ main()
         {
             SurfaceMesh::TriangleArray tri[2];
             tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -207,7 +207,7 @@ main()
     // Configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity        = 0.1;
+    pbdParams2->m_proximity = 0.1;
     pbdParams2->m_contactStiffness = 1.0;
 
     pbdModel2->configure(pbdParams2);

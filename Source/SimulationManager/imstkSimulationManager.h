@@ -83,8 +83,8 @@ struct simManagerConfig
     // states
     SimulationMode simulationMode   = SimulationMode::rendering;
     SimulationStatus startingStatus = SimulationStatus::running;
-    bool VR_Enabled                 = false;
-    bool startInPausedState         = false;
+    bool VR_Enabled = false;
+    bool startInPausedState = false;
 
     // 0 indicates that an optimal size will be used
     unsigned int threadPoolSize = 0;
@@ -99,7 +99,7 @@ struct simManagerConfig
 ///
 class SimulationManager
 {
-using keyPressCallback = std::function<void(void)>;
+using keyPressCallback = std::function<void (void)>;
 
 public:
     ///
@@ -218,7 +218,7 @@ public:
     /// and returned. In rendering and runInBackground modes the simulation manager
     /// module gets launched and an never returns
     ///
-    void start(const SimulationStatus simStatus = SimulationStatus::running,
+    void start(const SimulationStatus simStatus  = SimulationStatus::running,
                const Renderer::Mode   renderMode = Renderer::Mode::SIMULATION);
 
     ///
@@ -314,8 +314,8 @@ private:
 
     // Maps
     SceneNameMap<SceneManager> m_sceneManagerMap;
-    SceneNameMap<Scene>        m_sceneMap; // used in backend mode where m_sceneManagerMap is not used
-    SceneNameMap<Module>       m_modulesMap;
+    SceneNameMap<Scene>  m_sceneMap;       // used in backend mode where m_sceneManagerMap is not used
+    SceneNameMap<Module> m_modulesMap;
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
@@ -328,7 +328,7 @@ private:
     // states
     SimulationStatus m_status = SimulationStatus::inactive;
     bool m_simulationStarted  = false;
-    bool m_initialized        = false;
+    bool m_initialized = false;
 
     std::shared_ptr<simManagerConfig> m_config;
 

@@ -209,11 +209,9 @@ std::shared_ptr<ImageData>
 VTKMeshIO::readVtkImageDataDICOM(const std::string& filePath)
 {
     bool isDirectory;
-    if (!MeshIO::fileExists(filePath, isDirectory))
-    {
-        LOG(FATAL) << "VTKMeshIO::read error: file not found: " << filePath;
-        return nullptr;
-    }
+
+    CHECK(MeshIO::fileExists(filePath, isDirectory)) << "VTKMeshIO::read error: file not found: " << filePath;
+
     if (!isDirectory)
     {
         return VTKMeshIO::readVtkImageData<vtkDICOMImageReader>(filePath);
@@ -266,11 +264,7 @@ VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkM
 std::shared_ptr<SurfaceMesh>
 VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
 {
-    if (!vtkMesh)
-    {
-        LOG(FATAL) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
-        return nullptr;
-    }
+    CHECK(vtkMesh) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
 
     StdVectorOfVec3d vertices;
     VTKMeshIO::copyVerticesFromVtk(vtkMesh->GetPoints(), vertices);
@@ -349,11 +343,7 @@ VTKMeshIO::convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<Hexahedral
 std::shared_ptr<VolumetricMesh>
 VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh)
 {
-    if (!vtkMesh)
-    {
-        LOG(FATAL) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
-        return nullptr;
-    }
+    CHECK(vtkMesh) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
 
     StdVectorOfVec3d vertices;
     VTKMeshIO::copyVerticesFromVtk(vtkMesh->GetPoints(), vertices);
@@ -388,11 +378,7 @@ VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMe
 void
 VTKMeshIO::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
 {
-    if (!points)
-    {
-        LOG(FATAL) << "VTKMeshIO::copyVerticesFromVtk error: No points found.";
-        return;
-    }
+    CHECK(points) << "VTKMeshIO::copyVerticesFromVtk error: No points found.";
 
     vertices.reserve(points->GetNumberOfPoints());
     for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
@@ -406,11 +392,7 @@ VTKMeshIO::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
 void
 VTKMeshIO::copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points)
 {
-    if (!points)
-    {
-        LOG(FATAL) << "VTKMeshIO::copyVerticesToVtk error: No points found.";
-        return;
-    }
+    CHECK(points) << "VTKMeshIO::copyVerticesToVtk error: No points found.";
 
     points->SetNumberOfPoints(vertices.size());
     for (size_t i = 0; i < vertices.size(); i++)
@@ -423,11 +405,7 @@ template<size_t dim>
 void
 VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells)
 {
-    if (!vtkCells)
-    {
-        LOG(FATAL) << "VTKMeshIO::copyCellsToVtk error: No cells found.";
-        return;
-    }
+    CHECK(vtkCells) << "VTKMeshIO::copyCellsToVtk error: No cells found.";
 
     for (size_t i = 0; i < cells.size(); i++)
     {
@@ -443,11 +421,7 @@ template<size_t dim>
 void
 VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells)
 {
-    if (!vtkCells)
-    {
-        LOG(FATAL) << "VTKMeshIO::copyCellsFromVtk error: No cells found.";
-        return;
-    }
+    CHECK(vtkCells) << "VTKMeshIO::copyCellsFromVtk error: No cells found.";
 
     cells.reserve(vtkCells->GetNumberOfCells());
     vtkCells->InitTraversal();

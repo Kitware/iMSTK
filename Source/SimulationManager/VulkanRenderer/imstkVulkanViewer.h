@@ -131,7 +131,7 @@ protected:
 
     VkSurfaceCapabilitiesKHR m_physicalCapabilities;
 
-    uint32_t          m_presentModesCount;
+    uint32_t m_presentModesCount;
     VkPresentModeKHR* m_presentModes;
 
     uint32_t m_physicalFormatsCount;

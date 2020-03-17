@@ -94,24 +94,18 @@ void
 TetrahedralMesh::computeAttachedSurfaceMesh()
 {
     this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
-    if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
-    {
-        LOG(FATAL) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not "
-            "extracted.";
-    }
+
+    CHECK(this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
+        << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
 }
 
 bool
 TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
                                     const bool                   enforceWindingConsistency /* = false*/)
 {
-    if (!surfaceMesh)
-    {
-        LOG(FATAL) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not "
-            "instantiated.";
-        return false;
-    }
-
+    CHECK(surfaceMesh) 
+            << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
+ 
     using triArray = SurfaceMesh::TriangleArray;
     const std::vector<triArray> facePattern = {
         triArray { { 0, 1, 2 } }, triArray { { 0, 1, 3 } }, triArray { { 0, 2, 3 } }, triArray { { 1, 2, 3 } }
@@ -348,14 +342,14 @@ TetrahedralMesh::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, c
         {
             for (size_t i = 0; i < nx; ++i)
             {
-                indx[3]           = i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
-                indx[2]           = indx[3] + 1;
-                indx[0]           = indx[3] + nx + 1;
-                indx[1]           = indx[0] + 1;
-                indx[4]           = indx[0] + (nx + 1) * (ny + 1);
-                indx[5]           = indx[1] + (nx + 1) * (ny + 1);
-                indx[6]           = indx[2] + (nx + 1) * (ny + 1);
-                indx[7]           = indx[3] + (nx + 1) * (ny + 1);
+                indx[3] = i + j * (nx + 1) + k * (nx + 1) * (ny + 1);
+                indx[2] = indx[3] + 1;
+                indx[0] = indx[3] + nx + 1;
+                indx[1] = indx[0] + 1;
+                indx[4] = indx[0] + (nx + 1) * (ny + 1);
+                indx[5] = indx[1] + (nx + 1) * (ny + 1);
+                indx[6] = indx[2] + (nx + 1) * (ny + 1);
+                indx[7] = indx[3] + (nx + 1) * (ny + 1);
                 vertices[cnt + 0] = { indx[0], indx[2], indx[3], indx[6] };
                 vertices[cnt + 1] = { indx[0], indx[3], indx[7], indx[6] };
                 vertices[cnt + 2] = { indx[0], indx[7], indx[4], indx[6] };
@@ -449,7 +443,7 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
     auto uniformMesh = createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
 
     // ray-tracing
-    const auto& coords         = uniformMesh->getVertexPositions();
+    const auto& coords = uniformMesh->getVertexPositions();
     auto        insideSurfMesh = surfMesh->markPointsInsideAndOut(coords);
 
     // label elements
@@ -486,7 +480,7 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
                                      if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
                                      {
                                          validTet[id] = true;
-                                         found        = true;
+                                         found = true;
                                          break;
                                      }
                                  }

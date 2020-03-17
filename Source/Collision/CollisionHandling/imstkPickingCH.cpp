@@ -36,15 +36,10 @@ PickingCH::PickingCH(const CollisionHandling::Side&       side,
 void
 PickingCH::processCollisionData()
 {
-    if (m_object)
-    {
-        this->addPickConstraints(m_object);
-    }
-    else
-    {
-        LOG(FATAL) << "PickingCH::handleCollision error: "
-                   << "no picking collision handling available the object";
-    }
+    CHECK(m_object) << "PickingCH::handleCollision error: "
+                    << "no picking collision handling available the object";
+    
+    this->addPickConstraints(m_object);
 }
 
 void
@@ -56,19 +51,15 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
     {
         return;
     }
-
-    if (deformableObj == nullptr)
-    {
-        LOG(FATAL) << "PenaltyRigidCH::addPickConstraints error: "
-                   << " not a deformable object.";
-        return;
-    }
-
+    
+    CHECK(deformableObj) << "PenaltyRigidCH::addPickConstraints error: "
+                              << " not a deformable object.";
+        
     const auto& Uprev = deformableObj->getDisplacements();
     const auto& Vprev = deformableObj->getVelocities();
 
     auto PhysTetMesh = std::dynamic_pointer_cast<PointSet>(deformableObj->getPhysicsGeometry());
-    auto dT          = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
+    auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();
 
     // If collision data, append LPC constraints
     ParallelUtils::SpinLock lock;

@@ -282,7 +282,7 @@ private:
     const Real     m_HalfWidth;             ///> Half width of the node AABB
     const uint32_t m_Depth;                 ///> Depth of this node (depth > 0, depth = 1 starting at the root node)
     uint32_t       m_MaxDepth;              ///> Cache the max depth of the tree (maximum depth level possible)
-    bool           m_bIsLeaf = true;        ///> True if this node does not have any child node (a node should have either 0 or 8 children)
+    bool m_bIsLeaf = true;                  ///> True if this node does not have any child node (a node should have either 0 or 8 children)
 
     /// Heads of the link lists storing (Classified) primitives
     OctreePrimitive* m_pPrimitiveListHeads[OctreePrimitiveType::NumPrimitiveTypes];
@@ -528,7 +528,7 @@ protected:
 
     const std::string m_Name;   ///> Name of the tree
     const Vec3r       m_Center; ///> Center of the tree
-    const Real        m_Width;  ///> Width of the tree bounding box
+    const Real m_Width;         ///> Width of the tree bounding box
 
     /// If there is no point primitive, minWidth will be recomputed as minWidth = min(width of all non-point primitives) * minWidthRatio
     const Real m_MinWidthRatio;
@@ -536,10 +536,10 @@ protected:
     Real     m_MinWidth;                                         ///> Minimum width allowed for the tree nodes
     uint32_t m_MaxDepth;                                         ///> Max depth of the tree, which is computed based on m_MinWidth
 
-    OctreeNode* const       m_pRootNode;                         ///> Root node, should not be reassigned throughout the existence of the tree
-    OctreeNodeBlock*        m_pNodeBlockPoolHead      = nullptr; ///> The pool of tree nodes, storing pre-allocated nodes as a linked list
-    uint32_t                m_NumAvaiableBlocksInPool = 0;       ///> Count the number of nodes available in memory pool
-    uint32_t                m_NumAllocatedNodes;                 ///> Count the total number of allocated nodes so far
+    OctreeNode* const m_pRootNode;                               ///> Root node, should not be reassigned throughout the existence of the tree
+    OctreeNodeBlock*  m_pNodeBlockPoolHead = nullptr;            ///> The pool of tree nodes, storing pre-allocated nodes as a linked list
+    uint32_t m_NumAvaiableBlocksInPool     = 0;                  ///> Count the number of nodes available in memory pool
+    uint32_t m_NumAllocatedNodes;                                ///> Count the total number of allocated nodes so far
     ParallelUtils::SpinLock m_PoolLock;                          ///> Atomic lock for multi-threading modification of the memory pool
 
     /// Set of node blocks that are in use (node blocks that have been taken from memory pool)

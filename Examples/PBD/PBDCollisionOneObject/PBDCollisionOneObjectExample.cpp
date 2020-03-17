@@ -26,7 +26,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"
-#include "imstkMeshToMeshBruteforceCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPBDCollisionHandling.h"
 #include "imstkTetraTriangleMap.h"
 
@@ -84,10 +84,10 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity          = Vec3d(0, -10.0, 0);
-    pbdParams->m_dt               = 0.02;
-    pbdParams->m_maxIter          = 5;
-    pbdParams->m_proximity        = 0.3;
+    pbdParams->m_gravity   = Vec3d(0, -10.0, 0);
+    pbdParams->m_dt        = 0.02;
+    pbdParams->m_maxIter   = 5;
+    pbdParams->m_proximity = 0.3;
     pbdParams->m_contactStiffness = 0.1;
 
     pbdModel->configure(pbdParams);
@@ -123,7 +123,7 @@ main()
         {
             SurfaceMesh::TriangleArray tri[2];
             tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -148,9 +148,9 @@ main()
     // configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity        = 0.1;
+    pbdParams2->m_proximity = 0.1;
     pbdParams2->m_contactStiffness = 1.0;
-    pbdParams2->m_maxIter          = 0;
+    pbdParams2->m_maxIter = 0;
 
     // Set the parameters
     pbdModel2->configure(pbdParams2);

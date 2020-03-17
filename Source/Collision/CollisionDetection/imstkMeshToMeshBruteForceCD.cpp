@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkMeshToMeshBruteforceCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
@@ -63,7 +63,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
         // point
         for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
         {
-            const Vec3d p        = mesh1->getVertexPosition(i);
+            const Vec3d p = mesh1->getVertexPosition(i);
             const auto  elements = mesh2->getTrianglesVertices();
 
             for (size_t j = 0; j < elements.size(); ++j)
@@ -217,8 +217,8 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P         = mesh1->getVertexPosition(i1);
-                const Vec3d Q         = mesh1->getVertexPosition(i2);
+                const Vec3d P = mesh1->getVertexPosition(i1);
+                const Vec3d Q = mesh1->getVertexPosition(i2);
                 const auto& elements2 = mesh2->getTrianglesVertices();
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {
@@ -270,8 +270,8 @@ MeshToMeshBruteForceCD::computeCollisionData()
             i2 = tri[2];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P         = mesh1->getVertexPosition(i1);
-                const Vec3d Q         = mesh1->getVertexPosition(i2);
+                const Vec3d P = mesh1->getVertexPosition(i1);
+                const Vec3d Q = mesh1->getVertexPosition(i2);
                 const auto& elements2 = mesh2->getTrianglesVertices();
 
                 for (size_t j = 0; j < elements2.size(); ++j)
@@ -324,8 +324,8 @@ MeshToMeshBruteForceCD::computeCollisionData()
             i2 = tri[0];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P         = mesh1->getVertexPosition(i1);
-                const Vec3d Q         = mesh1->getVertexPosition(i2);
+                const Vec3d P = mesh1->getVertexPosition(i1);
+                const Vec3d Q = mesh1->getVertexPosition(i2);
                 const auto& elements2 = mesh2->getTrianglesVertices();
                 for (size_t j = 0; j < elements2.size(); ++j)
                 {

@@ -131,11 +131,7 @@ Geometry::rotate(const Vec3d& axis, double angle, TransformType type)
 void
 Geometry::scale(double s, TransformType type)
 {
-    if (s <= 0.0)
-    {
-        LOG(FATAL) << "Geometry::scale error: invalid scaling constant.";
-        return;
-    }
+    CHECK(s > 0) << "Geometry::scale error: invalid scaling constant.";
 
     if (std::abs(s - 1.0) < 1e-8)
     {
@@ -144,7 +140,7 @@ Geometry::scale(double s, TransformType type)
 
     if (type == TransformType::ConcatenateToTransform)
     {
-        m_scaling          *= s;
+        m_scaling *= s;
         m_transformModified = true;
         m_transformApplied  = false;
     }
@@ -160,7 +156,7 @@ Geometry::transform(RigidTransform3d T, TransformType type)
 {
     if (type == TransformType::ConcatenateToTransform)
     {
-        m_transform         = T * m_transform;
+        m_transform = T * m_transform;
         m_transformModified = true;
         m_transformApplied  = false;
     }
@@ -183,7 +179,7 @@ Geometry::setTranslation(const Vec3d t)
 {
     m_transform.translation() = t;
     m_transformModified       = true;
-    m_transformApplied        = false;
+    m_transformApplied = false;
 }
 
 void
@@ -232,7 +228,7 @@ Geometry::setScaling(double s)
         LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
         return;
     }
-    m_scaling           = s;
+    m_scaling = s;
     m_transformModified = true;
     m_transformApplied  = false;
 }

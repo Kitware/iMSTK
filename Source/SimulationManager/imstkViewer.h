@@ -131,7 +131,7 @@ public:
 protected:
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
-    std::shared_ptr<Scene>                m_activeScene;
+    std::shared_ptr<Scene> m_activeScene;
     std::shared_ptr<InteractorStyle>      m_interactorStyle;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 

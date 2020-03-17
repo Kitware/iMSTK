@@ -47,8 +47,8 @@ generatePointSet()
 {
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = SPHERE_RADIUS * SPHERE_RADIUS;
-    const auto  spacing         = Real(2) * PARTICLE_RADIUS;
-    const int   N = int(2 * SPHERE_RADIUS / spacing);
+    const auto  spacing = Real(2) * PARTICLE_RADIUS;
+    const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
     StdVectorOfVec3r particles;
     particles.reserve(N * N * N);
@@ -109,10 +109,10 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
     for (size_t i = 0; i < pointset->getNumVertices(); ++i)
     {
         pointset->setVertexPosition(i, Vec3r(
-                (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
-                (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
-                (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
-                ));
+            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
+            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
+            (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
+            ));
     }
 }
 
@@ -217,7 +217,7 @@ public:
                         primitiveCounts[i] += it->m_Nodes[idx].m_PrimitiveCounts[i];
 
                         unsigned int numPrimitives = 0;
-                        auto         pIter         = it->m_Nodes[idx].m_pPrimitiveListHeads[i];
+                        auto         pIter = it->m_Nodes[idx].m_pPrimitiveListHeads[i];
                         while (pIter) {
                             pIter = pIter->m_pNext;
                             ++numPrimitives;

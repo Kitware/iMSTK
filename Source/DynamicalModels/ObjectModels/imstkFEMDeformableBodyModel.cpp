@@ -74,10 +74,8 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
     vegaConfigFileOptions.addOptionOptional("gravity", &m_FEModelConfig->m_gravity, m_FEModelConfig->m_gravity);
 
     // Parse the configuration file
-    if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
-    {
-        LOG(FATAL) << "ForceModelConfig::parseConfig - Unable to load the configuration file";
-    }
+    CHECK(vegaConfigFileOptions.parseOptions(configFileName.data()) == 0) 
+        << "ForceModelConfig::parseConfig - Unable to load the configuration file";
 
     // get the root directory of the boundary file name
     std::string  rootDir;
@@ -179,11 +177,7 @@ bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
-    if (!m_geometry || !m_FEModelConfig)
-    {
-        LOG(FATAL) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
-        return false;
-    }
+    CHECK(m_geometry && m_FEModelConfig) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
 
     auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
@@ -325,11 +319,7 @@ FEMDeformableBodyModel::initializeForceModel()
 bool
 FEMDeformableBodyModel::initializeMassMatrix()
 {
-    if (!m_geometry)
-    {
-        LOG(FATAL) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
-        return false;
-    }
+    CHECK(m_geometry) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
 
     vega::SparseMatrix* vegaMatrix;
     vega::GenerateMassMatrix::computeMassMatrix(m_vegaPhysicsMesh.get(), &vegaMatrix, true);//caveat
@@ -396,26 +386,14 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 bool
 FEMDeformableBodyModel::initializeTangentStiffness()
 {
-    if (!m_internalForceModel)
-    {
-        LOG(FATAL) << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
-        return false;
-    }
-
+    CHECK(m_internalForceModel) 
+        << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
+    
     vega::SparseMatrix* matrix;
     m_internalForceModel->getTangentStiffnessMatrixTopology(&matrix);
 
-    if (!matrix)
-    {
-        LOG(FATAL) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
-        return false;
-    }
-
-    if (!m_vegaMassMatrix)
-    {
-        LOG(FATAL) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
-        return false;
-    }
+    CHECK(matrix) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
+    CHECK(m_vegaMassMatrix) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
 
     matrix->BuildSubMatrixIndices(*m_vegaMassMatrix.get());
 
@@ -697,7 +675,7 @@ NonLinearSystem::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord &q, const bool semiImplicit)->const Vectord &
+    return [&, this](const Vectord& q, const bool semiImplicit)->const Vectord&
            {
                (semiImplicit) ?
                this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
@@ -714,7 +692,7 @@ NonLinearSystem::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
     // Gradient of the nonlinear objective function given the current state
-    return [&, this](const Vectord &q)->const SparseMatrixd &
+    return [&, this](const Vectord& q)->const SparseMatrixd&
            {
                this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
@@ -730,7 +708,7 @@ NonLinearSystem::UpdateFunctionType
 FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord &q, const bool fullyImplicit)->void
+    return [&, this](const Vectord& q, const bool fullyImplicit)->void
            {
                (fullyImplicit) ?
                this->updateBodyIntermediateStates(q, m_updateType) :

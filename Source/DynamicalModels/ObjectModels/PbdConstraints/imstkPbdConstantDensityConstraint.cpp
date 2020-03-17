@@ -28,7 +28,7 @@ namespace imstk
 void
 PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double)
 {
-    const auto& state        = model.getCurrentState();
+    const auto& state = model.getCurrentState();
     const auto  numParticles = state->getPositions().size();
 
     // constraint parameters
@@ -87,7 +87,7 @@ PbdConstantDensityConstraint::wPoly6(const Vec3d& pi, const Vec3d& pj)
 Vec3d
 PbdConstantDensityConstraint::gradSpiky(const Vec3d& pi, const Vec3d& pj)
 {
-    Vec3d        r          = pi - pj;
+    Vec3d        r = pi - pj;
     const double rLengthSqr = r.squaredNorm();
 
     if (rLengthSqr > m_maxDistSqr || rLengthSqr < 1e-20)
@@ -143,7 +143,7 @@ PbdConstantDensityConstraint::updatePositions(const Vec3d&      pi,
     }
 
     m_deltaPositions[index] = gradientLambdaSum / m_restDensity;
-    positions[index]       += m_deltaPositions[index];
+    positions[index] += m_deltaPositions[index];
 }
 
 void

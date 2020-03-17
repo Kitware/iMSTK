@@ -101,7 +101,7 @@ VulkanDecalRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Cam
     auto mat = this->getVisualModel()->getRenderMaterial();
 
     auto color = mat->getColor();
-    m_decalFragmentUniforms.color           = glm::vec4(color.r, color.g, color.b, color.a);
+    m_decalFragmentUniforms.color = glm::vec4(color.r, color.g, color.b, color.a);
     m_decalFragmentUniforms.receivesShadows = mat->getReceivesShadows() ? 1 : 0;
     m_decalFragmentUniforms.emissivity      = mat->getEmissivity();
     m_decalFragmentUniforms.roughness       = mat->getRoughness();

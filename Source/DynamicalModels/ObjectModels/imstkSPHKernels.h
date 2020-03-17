@@ -234,15 +234,10 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        if (N == 2)
-        {
-            LOG(FATAL) << "Unimplemented function";
-        }
-        else
-        {
-            m_k = Real(32.0) / (PI * std::pow(m_radius, 9));
-            m_c = std::pow(m_radius, 6) / Real(64.0);
-        }
+        CHECK(N != 2) << "Unimplemented function";
+
+        m_k = Real(32.0) / (PI * std::pow(m_radius, 9));
+        m_c = std::pow(m_radius, 6) / Real(64.0);
         m_W0 = W(VecXr::Zero());
     }
 
@@ -326,14 +321,9 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
-        if (N == 2)
-        {
-            LOG(FATAL) << "Unimplemented function";
-        }
-        else
-        {
-            m_k = Real(0.007 / std::pow(m_radius, 3.25));
-        }
+        CHECK(N != 2) << "Unimplemented function";
+
+        m_k = Real(0.007 / std::pow(m_radius, 3.25));        
         m_W0 = W(VecXr::Zero());
     }
 

@@ -16,17 +16,17 @@
 #
 ###########################################################################
 
-project(Example-MshVegaIO)
+project(Example-PBDCollision-OneDragon)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} MshVegaIOExample.cpp)
+imstk_add_executable(${PROJECT_NAME} PBDCollisionOneObjectExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

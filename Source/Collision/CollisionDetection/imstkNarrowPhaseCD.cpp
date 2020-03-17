@@ -53,9 +53,9 @@ bidirectionalPlaneToSphere(Plane* const planeA, Sphere* const sphereB,
 {
     // Get geometry properties
     Vec3d  sphereBPos = sphereB->getPosition();
-    double r          = sphereB->getRadius() * sphereB->getScaling();
-    Vec3d  planeAPos  = planeA->getPosition();
-    Vec3d  n          = planeA->getNormal();
+    double r = sphereB->getRadius() * sphereB->getScaling();
+    Vec3d  planeAPos = planeA->getPosition();
+    Vec3d  n = planeA->getNormal();
 
     // Compute shortest distance
     double d = (sphereBPos - planeAPos).dot(n);
@@ -104,9 +104,9 @@ unidirectionalPlaneToSphere(Plane* const plane, Sphere* const sphere,
 {
     // Get geometry properties
     const Vec3d  sphereBPos = sphere->getPosition();
-    const double r          = sphere->getRadius();
-    const Vec3d  planeAPos  = plane->getPosition();
-    const Vec3d  n          = plane->getNormal();
+    const double r = sphere->getRadius();
+    const Vec3d  planeAPos = plane->getPosition();
+    const Vec3d  n = plane->getNormal();
 
     // Compute shortest distance
     double d = (sphereBPos - planeAPos).dot(n);
@@ -195,9 +195,9 @@ sphereToSphere(Sphere* const sphereA, Sphere* const sphereB,
 {
     // Get geometry properties
     Vec3d  sphereAPos = sphereA->getPosition();
-    double rA         = sphereA->getRadius();
+    double rA = sphereA->getRadius();
     Vec3d  sphereBPos = sphereB->getPosition();
-    double rB         = sphereB->getRadius();
+    double rB = sphereB->getRadius();
 
     // Compute direction vector
     Vec3d dirAToB = sphereBPos - sphereAPos;
@@ -258,7 +258,7 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
     }
 
     // Do the actual check
-    const auto  alpha        = (point.dot(p) - pDotp0) / pDotp;
+    const auto  alpha = (point.dot(p) - pDotp0) / pDotp;
     const Vec3d closestPoint = p0 + p * alpha;
 
     // If the point is inside the bounding sphere then the closest point

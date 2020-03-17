@@ -105,8 +105,8 @@ VulkanMemoryManager::requestMemoryAllocation(
     VkDeviceSize allocationSize = std::max(resourceSize, maxAllocationSize);
 
     VkMemoryAllocateInfo memoryInfo;
-    memoryInfo.sType           = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    memoryInfo.pNext           = nullptr;
+    memoryInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    memoryInfo.pNext = nullptr;
     memoryInfo.allocationSize  = allocationSize;
     memoryInfo.memoryTypeIndex = memoryIndex;
 
@@ -153,7 +153,7 @@ VulkanMemoryManager::requestBuffer(VkDevice&           device,
         if (buffer->m_type == type
             && info.size <= buffer->m_memory->m_capacity - tempSize)
         {
-            newBuffer           = new VulkanInternalBuffer(buffer);
+            newBuffer = new VulkanInternalBuffer(buffer);
             newBuffer->m_offset = tempSize;
             newBuffer->m_size   = info.size;
             buffer->m_size      = tempSize + info.size;
@@ -178,7 +178,7 @@ VulkanMemoryManager::requestBuffer(VkDevice&           device,
     vkBindBufferMemory(device, *bufferGroup->getBuffer(), *memoryAllocation->getMemory(), 0);
     bufferGroup->m_memory = memoryAllocation;
 
-    newBuffer           = new VulkanInternalBuffer(bufferGroup);
+    newBuffer = new VulkanInternalBuffer(bufferGroup);
     newBuffer->m_size   = bufferSize;
     newBuffer->m_offset = 0;
 
@@ -202,7 +202,7 @@ VulkanMemoryManager::requestImage(VkDevice&          device,
     vkGetImageMemoryRequirements(device, *newImage->getImage(), &requirements);
 
     newImage->m_memoryOffset = 0;
-    newImage->m_size         = requirements.size;
+    newImage->m_size = requirements.size;
 
     auto memoryAllocation = this->requestMemoryAllocation(requirements, type, c_imageAllocationSize, requirements.alignment);
     newImage->m_memoryOffset = this->getAlignedSize(memoryAllocation->m_lastOffset, requirements.alignment);

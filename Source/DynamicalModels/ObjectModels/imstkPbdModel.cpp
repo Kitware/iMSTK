@@ -178,11 +178,8 @@ bool
 PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
 {
     // Check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
-    {
-        LOG(FATAL) << "FEM Tetrahedral constraint should come with tetrahedral mesh";
-        return false;
-    }
+    CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh) 
+        << "FEM Tetrahedral constraint should come with tetrahedral mesh";
 
     // Create constraints
     const auto& tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
@@ -193,7 +190,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
         [&](const size_t k)
         {
             auto& tet = elements[k];
-            auto c = std::make_shared<PbdFEMTetConstraint>(type);
+            auto c    = std::make_shared<PbdFEMTetConstraint>(type);
             c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
             lock.lock();
             m_constraints.push_back(std::move(c));
@@ -206,11 +203,7 @@ bool
 PbdModel::initializeVolumeConstraints(const double stiffness)
 {
     // Check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
-    {
-        LOG(FATAL) << "Volume constraint should come with volumetric mesh";
-        return false;
-    }
+    CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh) << "Volume constraint should come with volumetric mesh";
 
     // Create constraints
     const auto& tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
@@ -221,7 +214,7 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
         [&](const size_t k)
         {
             auto& tet = elements[k];
-            auto c = std::make_shared<PbdVolumeConstraint>();
+            auto c    = std::make_shared<PbdVolumeConstraint>();
             c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
             lock.lock();
             m_constraints.push_back(std::move(c));
@@ -303,11 +296,8 @@ bool
 PbdModel::initializeAreaConstraints(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
-    {
-        LOG(FATAL) << "Area constraint should come with a triangular mesh";
-        return false;
-    }
+    CHECK (m_mesh->getType() == Geometry::Type::SurfaceMesh)
+        << "Area constraint should come with a triangular mesh";    
 
     // ok, now create constraints
     const auto& triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
@@ -318,7 +308,7 @@ PbdModel::initializeAreaConstraints(const double stiffness)
         [&](const size_t k)
         {
             auto& tri = elements[k];
-            auto c = std::make_shared<PbdAreaConstraint>();
+            auto c    = std::make_shared<PbdAreaConstraint>();
             c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
             lock.lock();
             m_constraints.push_back(std::move(c));
@@ -330,11 +320,7 @@ PbdModel::initializeAreaConstraints(const double stiffness)
 bool
 PbdModel::initializeBendConstraints(const double stiffness)
 {
-    if (m_mesh->getType() != Geometry::Type::LineMesh)
-    {
-        LOG(FATAL) << "Bend constraint should come with a line mesh";
-        return false;
-    }
+    CHECK(m_mesh->getType() == Geometry::Type::LineMesh) << "Bend constraint should come with a line mesh";
 
     auto addConstraint =
         [&](const double k, size_t i1, size_t i2, size_t i3)
@@ -378,11 +364,7 @@ PbdModel::initializeBendConstraints(const double stiffness)
 bool
 PbdModel::initializeDihedralConstraints(const double stiffness)
 {
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
-    {
-        LOG(FATAL) << "Dihedral constraint should come with a triangular mesh";
-        return false;
-    }
+    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh) << "Dihedral constraint should come with a triangular mesh";
 
     // Create constraints
     const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
@@ -457,16 +439,13 @@ bool
 PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    if (m_mesh->getType() != Geometry::Type::SurfaceMesh
-        && m_mesh->getType() != Geometry::Type::TetrahedralMesh
-        && m_mesh->getType() != Geometry::Type::LineMesh
-        && m_mesh->getType() != Geometry::Type::HexahedralMesh
-        && m_mesh->getType() != Geometry::Type::PointSet)
-    {
-        //\todo Really only need a point cloud, so may need to change this.
-        LOG(FATAL) << "Constant constraint should come with a mesh!";
-        return false;
-    }
+    CHECK (m_mesh->getType() == Geometry::Type::SurfaceMesh
+        || m_mesh->getType() == Geometry::Type::TetrahedralMesh
+        || m_mesh->getType() == Geometry::Type::LineMesh
+        || m_mesh->getType() == Geometry::Type::HexahedralMesh
+        || m_mesh->getType() == Geometry::Type::PointSet)
+        << "Constant constraint should come with a mesh!";
+    
 
     auto c = std::make_shared<PbdConstantDensityConstraint>();
     c->initConstraint(*this, stiffness);
@@ -506,7 +485,7 @@ PbdModel::partitionConstraints(const bool print)
     vertexConstraints.clear();
 
     // do graph coloring for the constraint graph
-    const auto  coloring         = constraintGraph.doColoring();
+    const auto  coloring = constraintGraph.doColoring();
     const auto& partitionIndices = coloring.first;
     const auto  numPartitions    = coloring.second;
     assert(partitionIndices.size() == m_constraints.size());
@@ -660,9 +639,9 @@ PbdModel::integratePosition()
         {
             if (std::abs(m_invMass[i]) > MIN_REAL)
             {
-                vel[i] += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
+                vel[i]    += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
                 prevPos[i] = pos[i];
-                pos[i] += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
+                pos[i]    += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
             }
         });
 }

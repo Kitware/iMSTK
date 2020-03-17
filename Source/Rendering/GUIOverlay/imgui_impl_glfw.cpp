@@ -51,9 +51,9 @@ enum GlfwClientApi
     GlfwClientApi_OpenGL,
     GlfwClientApi_Vulkan
 };
-static GLFWwindow*   g_Window = NULL;
-static GlfwClientApi g_ClientApi           = GlfwClientApi_Unknown;
-static double        g_Time                = 0.0;
+static GLFWwindow*   g_Window    = NULL;
+static GlfwClientApi g_ClientApi = GlfwClientApi_Unknown;
+static double        g_Time      = 0.0;
 static bool          g_MouseJustPressed[5] = { false, false, false, false, false };
 static GLFWcursor*   g_MouseCursors[ImGuiMouseCursor_COUNT] = { 0 };
 
@@ -152,12 +152,12 @@ ImGui_ImplGlfw_Init(GLFWwindow* window, bool install_callbacks, GlfwClientApi cl
     io.KeyMap[ImGuiKey_Space]      = GLFW_KEY_SPACE;
     io.KeyMap[ImGuiKey_Enter]      = GLFW_KEY_ENTER;
     io.KeyMap[ImGuiKey_Escape]     = GLFW_KEY_ESCAPE;
-    io.KeyMap[ImGuiKey_A]          = GLFW_KEY_A;
-    io.KeyMap[ImGuiKey_C]          = GLFW_KEY_C;
-    io.KeyMap[ImGuiKey_V]          = GLFW_KEY_V;
-    io.KeyMap[ImGuiKey_X]          = GLFW_KEY_X;
-    io.KeyMap[ImGuiKey_Y]          = GLFW_KEY_Y;
-    io.KeyMap[ImGuiKey_Z]          = GLFW_KEY_Z;
+    io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+    io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+    io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+    io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+    io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+    io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
     io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
@@ -295,7 +295,8 @@ ImGui_ImplGlfw_NewFrame()
         // Update gamepad inputs
         #define MAP_BUTTON(NAV_NO, BUTTON_NO)       { if (buttons_count > BUTTON_NO && buttons[BUTTON_NO] == GLFW_PRESS) { io.NavInputs[NAV_NO] = 1.0f; } \
 }
-        #define MAP_ANALOG(NAV_NO, AXIS_NO, V0, V1) { float v = (axes_count > AXIS_NO) ? axes[AXIS_NO] : V0; v = (v - V0) / (V1 - V0); if (v > 1.0f) { v = 1.0f; } if (io.NavInputs[NAV_NO] < v) { io.NavInputs[NAV_NO] = v; } }
+        #define MAP_ANALOG(NAV_NO, AXIS_NO, V0, V1) { float v = (axes_count > AXIS_NO) ? axes[AXIS_NO] : V0; v = (v - V0) / (V1 - V0); \
+                                                      if (v > 1.0f) { v = 1.0f; } if (io.NavInputs[NAV_NO] < v) { io.NavInputs[NAV_NO] = v; } }
         int                  axes_count = 0, buttons_count = 0;
         const float*         axes    = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axes_count);
         const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttons_count);

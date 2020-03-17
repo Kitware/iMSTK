@@ -244,7 +244,7 @@ private:
     void moveParticles(const Real timestep);
 
     std::shared_ptr<PointSet> m_pointSetGeometry;
-    SPHSimulationState        m_simulationState;
+    SPHSimulationState m_simulationState;
 
     Real m_dt;                                          ///> time step size
     Real m_defaultDt;                                   ///> default time step size

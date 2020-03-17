@@ -162,13 +162,13 @@ vtkCapsuleSource::RequestData(
 
     // Set number of points.;
     int halfSphereNumPts = (this->PhiResolution - 2) * this->ThetaResolution + 2;
-    int numPts           = halfSphereNumPts * 2;
+    int numPts = halfSphereNumPts * 2;
 
     // Set number of faces
     int halfSpheresNumsPolys = (this->ThetaResolution - 1) * 2                                //top and bottom
                                + (this->PhiResolution - 3) * (this->ThetaResolution - 1) * 2; //middle
     int cylinderNumPolys = (this->PhiResolution - 1) * 4;
-    int numPolys         = halfSpheresNumsPolys * 2 + cylinderNumPolys;
+    int numPolys = halfSpheresNumsPolys * 2 + cylinderNumPolys;
 
     // Allocate !
     newPoints = vtkPoints::New();

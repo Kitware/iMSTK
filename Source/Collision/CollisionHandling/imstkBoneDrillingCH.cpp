@@ -42,10 +42,7 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
 {
     auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
-    if (!boneMesh)
-    {
-        LOG(FATAL) << "BoneDrillingCH::BoneDrillingCH Error:The bone colliding geometry is not a mesh!";
-    }
+    CHECK(boneMesh) << "BoneDrillingCH::BoneDrillingCH Error:The bone colliding geometry is not a mesh!";
 
     // Initialize bone density values
     m_nodalDensity.reserve(boneMesh->getNumVertices());
@@ -126,7 +123,7 @@ BoneDrillingCH::processCollisionData()
     // Update visual object position
 
     // Aggregate collision data
-    Vec3d  t           = Vec3d::Zero();
+    Vec3d  t = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
     for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
     {
@@ -140,7 +137,7 @@ BoneDrillingCH::processCollisionData()
         if (dSqr > maxDepthSqr)
         {
             maxDepthSqr = dSqr;
-            t           = cd.penetrationVector;
+            t = cd.penetrationVector;
         }
     }
     m_drill->getVisualGeometry()->setTranslation(devicePosition + t);

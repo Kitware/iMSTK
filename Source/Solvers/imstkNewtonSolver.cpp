@@ -49,7 +49,7 @@ NewtonSolver::solveGivenState(Vectord& x)
     }
 
     // Compute norms, set tolerances and other temporaries
-    double fnorm         = m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
+    double fnorm = m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
     double stopTolerance = m_absoluteTolerance + m_relativeTolerance * fnorm;
 
     m_linearSolver->setTolerance(stopTolerance);

@@ -72,7 +72,7 @@ PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
     {
         m_initialVertexPositions = vertices;
         m_originalNumVertices    = vertices.size();
-        m_maxNumVertices         = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
+        m_maxNumVertices = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
         m_vertexPositions.reserve(m_maxNumVertices);
     }
     else
@@ -130,8 +130,8 @@ PointSet::setVertexPosition(const size_t vertNum, const Vec3d& pos)
     LOG_IF(FATAL, (vertNum >= m_vertexPositions.size())) << "Invalid index";
 #endif
     m_vertexPositions[vertNum] = pos;
-    m_dataModified             = true;
-    m_transformApplied         = false;
+    m_dataModified     = true;
+    m_transformApplied = false;
     this->updatePostTransformData();
 }
 
@@ -241,7 +241,7 @@ PointSet::applyTranslation(const Vec3d t)
     ParallelUtils::parallelFor(m_vertexPositions.size(),
         [&](const size_t i)
         {
-            m_vertexPositions[i]        += t;
+            m_vertexPositions[i] += t;
             m_initialVertexPositions[i] += t;
         });
     m_dataModified     = true;
@@ -254,7 +254,7 @@ PointSet::applyRotation(const Mat3d r)
     ParallelUtils::parallelFor(m_vertexPositions.size(),
         [&](const size_t i)
         {
-            m_vertexPositions[i]        = r * m_vertexPositions[i];
+            m_vertexPositions[i] = r * m_vertexPositions[i];
             m_initialVertexPositions[i] = r * m_initialVertexPositions[i];
         });
     m_dataModified     = true;
@@ -267,7 +267,7 @@ PointSet::applyScaling(const double s)
     ParallelUtils::parallelFor(m_vertexPositions.size(),
         [&](const size_t i)
         {
-            m_vertexPositions[i]        = s * m_vertexPositions[i];
+            m_vertexPositions[i] = s * m_vertexPositions[i];
             m_initialVertexPositions[i] = s * m_initialVertexPositions[i];
         });
     m_dataModified     = true;

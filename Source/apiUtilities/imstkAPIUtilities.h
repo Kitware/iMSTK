@@ -58,19 +58,10 @@ createVisualAnalyticalSceneObject(Geometry::Type type,
                                   std::shared_ptr<Scene> scene,
                                   const std::string objName,
                                   const double scale = 1.,
-                                  const Vec3d t = Vec3d(0., 0., 0.))
+                                  const Vec3d t      = Vec3d(0., 0., 0.))
 {
-    if (!scene)
-    {
-        LOG(FATAL) << "createVisualAnalyticalSceneObject: Scene is not valid!";
-        return nullptr;
-    }
-
-    if (objName.empty())
-    {
-        LOG(FATAL) << "createVisualAnalyticalSceneObject: Name is empty!";
-        return nullptr;
-    }
+    CHECK(scene) << "createVisualAnalyticalSceneObject: Scene is not valid!";
+    CHECK(!objName.empty()) << "createVisualAnalyticalSceneObject: Name is empty!";
 
     std::shared_ptr<Geometry> geom;
     switch (type)
@@ -118,19 +109,10 @@ createCollidingAnalyticalSceneObject(Geometry::Type type,
                                      std::shared_ptr<Scene> scene,
                                      const std::string objName,
                                      const double scale = 1.,
-                                     const Vec3d t = Vec3d(0., 0., 0.))
+                                     const Vec3d t      = Vec3d(0., 0., 0.))
 {
-    if (!scene)
-    {
-        LOG(FATAL) << "createCollidingSphereSceneObject: Scene is not valid!";
-        return nullptr;
-    }
-
-    if (objName.empty())
-    {
-        LOG(FATAL) << "createCollidingAnalyticalSceneObject: Name is empty!";
-        return nullptr;
-    }
+    CHECK(scene) << "createCollidingSphereSceneObject: Scene is not valid!";
+    CHECK(!objName.empty()) << "createCollidingAnalyticalSceneObject: Name is empty!";
 
     std::shared_ptr<Geometry> geom;
     switch (type)
@@ -171,19 +153,10 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
                               const std::string      fileName,
                               const std::string      objectName)
 {
-    if (!scene)
-    {
-        LOG(FATAL) << "createAndAddVisualSceneObject: Scene is not valid!";
-        return nullptr;
-    }
+    CHECK(scene) << "createAndAddVisualSceneObject: Scene is not valid!";
+    CHECK(!fileName.empty()) << "createAndAddVisualSceneObject: Name is empty!";
 
-    if (fileName.empty())
-    {
-        LOG(FATAL) << "createAndAddVisualSceneObject: File name is empty!";
-        return nullptr;
-    }
-
-    auto mesh        = MeshIO::read(fileName);
+    auto mesh = MeshIO::read(fileName);
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
 
     // Create object and add to scene
@@ -201,11 +174,7 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
 std::shared_ptr<NonLinearSystem>
 createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 {
-    if (!dynaModel)
-    {
-        LOG(FATAL) << "createNonLinearSystem: Dynamic model is not valid!";
-        return nullptr;
-    }
+    CHECK(dynaModel) << "createNonLinearSystem: Dynamic model is not valid!";
 
     auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),
