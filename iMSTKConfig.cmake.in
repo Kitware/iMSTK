@@ -66,6 +66,9 @@ include_directories( ${SCCD_INCLUDE_DIR} )
 # tbb
 find_package(tbb REQUIRED)
 include_directories(${TBB_INCLUDE_DIR})
+if (MSVC)
+  add_definitions(-D__TBB_NO_IMPLICIT_LINKAGE=1)
+endif()
 
 # VegaFEM
 find_package( VegaFEM REQUIRED CONFIG )
