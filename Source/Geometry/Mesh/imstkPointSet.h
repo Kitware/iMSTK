@@ -91,7 +91,7 @@ public:
     ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
-    const StdVectorOfVec3d& getVertexPositions(DataType type = DataType::PostTransform);
+    const StdVectorOfVec3d& getVertexPositions(DataType type = DataType::PostTransform) const;
 
     ///
     /// \brief Set the current position of a vertex given its index to certain position (this is not a thread-safe method)
@@ -101,7 +101,7 @@ public:
     ///
     /// \brief Returns the position of a vertex given its index
     ///
-    const Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform);
+    const Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform) const;
 
     ///
     /// \brief Sets the displacements of mesh vertices from an array
@@ -177,11 +177,11 @@ protected:
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;
     void applyScaling(const double s) override;
-    void updatePostTransformData() override;
+    void updatePostTransformData() const override;
 
     StdVectorOfVec3d m_initialVertexPositions;                ///> Initial positions of vertices
     StdVectorOfVec3d m_vertexPositions;                       ///> Current positions of vertices
-    StdVectorOfVec3d m_vertexPositionsPostTransform;          ///> Positions of vertices after transform
+    mutable StdVectorOfVec3d m_vertexPositionsPostTransform;  ///> Positions of vertices after transform
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 

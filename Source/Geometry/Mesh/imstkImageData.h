@@ -83,6 +83,6 @@ protected:
 
     void applyScaling(const double s) override;
 
-    void updatePostTransformData() override;
+    void updatePostTransformData() const override;
 };
 } // imstk

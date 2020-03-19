@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVTKMeshIO.h"
+#include "imstkGeometryUtilities.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkGenericDataObjectReader.h"
@@ -34,6 +35,7 @@
 #include "vtkSTLWriter.h"
 #include "vtkFloatArray.h"
 #include "vtkTriangleFilter.h"
+#include "vtkPolyDataWriter.h"
 #include "vtkDICOMImageReader.h"
 #include "vtkNrrdReader.h"
 
@@ -94,7 +96,19 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         switch (meshType)
         {
         case MeshFileType::VTU:
-            return VTKMeshIO::writeVtkUnstructuredGrid(vMesh, filePath);
+            if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
+            {
+                VTKMeshIO::writeVtkUnstructuredGrid(*tetMesh.get(), filePath);
+            }
+            else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
+            {
+                VTKMeshIO::writeVtkUnstructuredGrid(*hexMesh.get(), filePath);
+            }
+            else
+            {
+                return false;
+            }
+
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
             return false;
@@ -105,13 +119,28 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         switch (meshType)
         {
         case MeshFileType::VTP:
-            return VTKMeshIO::writeVtkPolyData<vtkXMLPolyDataWriter>(sMesh, filePath);
+            return VTKMeshIO::writeVtkPolyData<vtkXMLPolyDataWriter>(*sMesh.get(), filePath);
         case MeshFileType::STL:
-            return VTKMeshIO::writeVtkPolyData<vtkSTLWriter>(sMesh, filePath);
+            return VTKMeshIO::writeVtkPolyData<vtkSTLWriter>(*sMesh.get(), filePath);
         case MeshFileType::PLY:
-            return VTKMeshIO::writeVtkPolyData<vtkPLYWriter>(sMesh, filePath);
+            return VTKMeshIO::writeVtkPolyData<vtkPLYWriter>(*sMesh.get(), filePath);
+        case MeshFileType::VTK:
+            return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(*sMesh.get(), filePath);
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for surface mesh.";
+            return false;
+        }
+    }
+    else if (auto lMesh = std::dynamic_pointer_cast<LineMesh>(imstkMesh))
+    {
+        switch (meshType)
+        {
+        case MeshFileType::VTK:
+            return VTKMeshIO::writeVtkPolyData<vtkPolyDataWriter>(*lMesh.get(), filePath);
+        case MeshFileType::VTP:
+            return VTKMeshIO::writeVtkPolyData<vtkXMLPolyDataWriter>(*lMesh.get(), filePath);
+        default:
+            LOG(WARNING) << "vtkMeshIO::write error: file type not supported for line mesh.";
             return false;
         }
     }
@@ -130,13 +159,13 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
     reader->SetFileName(filePath.c_str());
     reader->Update();
 
-    if (vtkPolyData* vtkMesh = reader->GetPolyDataOutput())
+    if (vtkSmartPointer<vtkPolyData> vtkMesh = reader->GetPolyDataOutput())
     {
-        return VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkMesh);
+        return GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkMesh);
     }
     else if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
     {
-        return VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
+        return GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
     }
     else
     {
@@ -157,15 +186,15 @@ VTKMeshIO::readVtkPolyData(const std::string& filePath)
     triFilter->SetInputData(reader->GetOutput());
     triFilter->Update();
 
-    vtkPolyData* vtkMesh = triFilter->GetOutput();
-    return VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkMesh);
+    vtkSmartPointer<vtkPolyData> vtkMesh = triFilter->GetOutput();
+    return GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkMesh);
 }
 
 template<typename WriterType>
 bool
-VTKMeshIO::writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const std::string& filePath)
+VTKMeshIO::writeVtkPolyData(const SurfaceMesh& imstkMesh, const std::string& filePath)
 {
-    vtkPolyData* vtkMesh = convertSurfaceMeshToVtkPolyData(imstkMesh);
+    vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertSurfaceMeshToVtkPolyData(imstkMesh);
     if (!vtkMesh)  //conversion unsuccessful
     {
         return false;
@@ -175,7 +204,25 @@ VTKMeshIO::writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const 
     writer->SetInputData(vtkMesh);
     writer->SetFileName(filePath.c_str());
     writer->Update();
-    vtkMesh->Delete();
+
+    return true;
+}
+
+template<typename WriterType>
+bool
+VTKMeshIO::writeVtkPolyData(const LineMesh& imstkMesh, const std::string& filePath)
+{
+    vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertLineMeshToVtkPolyData(imstkMesh);
+    vtkMesh->PrintSelf(std::cout, vtkIndent());
+    if (!vtkMesh)  //conversion unsuccessful
+    {
+        return false;
+    }
+
+    auto writer = vtkSmartPointer<WriterType>::New();
+    writer->SetInputData(vtkMesh);
+    writer->SetFileName(filePath.c_str());
+    writer->Update();
 
     return true;
 }
@@ -188,8 +235,8 @@ VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
     reader->SetFileName(filePath.c_str());
     reader->Update();
 
-    vtkUnstructuredGrid* vtkMesh = reader->GetOutput();
-    return VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
+    vtkSmartPointer<vtkUnstructuredGrid> vtkMesh = reader->GetOutput();
+    return GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
 }
 
 template<typename ReaderType>
@@ -227,24 +274,9 @@ VTKMeshIO::readVtkImageDataDICOM(const std::string& filePath)
 }
 
 bool
-VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkMesh, const std::string& filePath)
+VTKMeshIO::writeVtkUnstructuredGrid(const TetrahedralMesh& tetMesh, const std::string& filePath)
 {
-    auto                 tMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(imstkMesh);
-    auto                 hMesh   = std::dynamic_pointer_cast<HexahedralMesh>(imstkMesh);
-    vtkUnstructuredGrid* vtkMesh = nullptr;
-    if (tMesh)
-    {
-        vtkMesh = convertTetrahedralMeshToVtkUnstructuredGrid(tMesh);
-    }
-    else if (hMesh)
-    {
-        vtkMesh = convertHexahedralMeshToVtkUnstructuredGrid(hMesh);
-    }
-    else
-    {
-        LOG(WARNING) << "VTKMeshIO::writeVtkUnstructuredGrid error: mesh is neither tetrahedral nor hexahedral";
-        return false;
-    }
+    auto vtkMesh = GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(tetMesh);
 
     if (!vtkMesh)
     {
@@ -256,218 +288,26 @@ VTKMeshIO::writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkM
     writer->SetInputData(vtkMesh);
     writer->SetFileName(filePath.c_str());
     writer->Update();
-    vtkMesh->Delete();
 
     return true;
 }
 
-std::shared_ptr<SurfaceMesh>
-VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
+bool
+VTKMeshIO::writeVtkUnstructuredGrid(const HexahedralMesh& hMesh, const std::string& filePath)
 {
-    CHECK(vtkMesh) << "VTKMeshIO::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
+    auto vtkMesh = GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(hMesh);
 
-    StdVectorOfVec3d vertices;
-    VTKMeshIO::copyVerticesFromVtk(vtkMesh->GetPoints(), vertices);
-
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    VTKMeshIO::copyCellsFromVtk<3>(vtkMesh->GetPolys(), triangles);
-
-    auto mesh = std::make_shared<SurfaceMesh>();
-    mesh->initialize(vertices, triangles, true);
-
-    // Point Data
-    std::map<std::string, StdVectorOfVectorf> dataMap;
-    VTKMeshIO::copyPointData(vtkMesh->GetPointData(), dataMap);
-    if (!dataMap.empty())
+    if (!vtkMesh)
     {
-        mesh->setPointDataMap(dataMap);
+        LOG(WARNING) << "VTKMeshIO::writeVtkUnstructuredGrid error: conversion unsuccessful";
+        return false;
     }
 
-    // Active Texture
-    if (auto pointData = vtkMesh->GetPointData())
-    {
-        if (auto tcoords = pointData->GetTCoords())
-        {
-            mesh->setDefaultTCoords(tcoords->GetName());
-        }
-    }
+    auto writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
+    writer->SetInputData(vtkMesh);
+    writer->SetFileName(filePath.c_str());
+    writer->Update();
 
-    return mesh;
-}
-
-vtkPolyData*
-VTKMeshIO::convertSurfaceMeshToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh)
-{
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    VTKMeshIO::copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
-
-    vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
-    VTKMeshIO::copyCellsToVtk<3>(imstkMesh->getTrianglesVertices(), polys.Get());
-
-    vtkPolyData* polydata = vtkPolyData::New();
-    polydata->SetPoints(points);
-    polydata->SetPolys(polys);
-    return polydata;
-}
-
-vtkUnstructuredGrid*
-VTKMeshIO::convertTetrahedralMeshToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkMesh)
-{
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    VTKMeshIO::copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
-
-    vtkSmartPointer<vtkCellArray> tetras = vtkSmartPointer<vtkCellArray>::New();
-    VTKMeshIO::copyCellsToVtk<4>(imstkMesh->getTetrahedraVertices(), tetras.Get());
-
-    vtkUnstructuredGrid* ug = vtkUnstructuredGrid::New();
-    ug->SetPoints(points);
-    ug->SetCells(VTK_TETRA, tetras);
-    return ug;
-}
-
-vtkUnstructuredGrid*
-VTKMeshIO::convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh)
-{
-    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-    VTKMeshIO::copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
-
-    vtkSmartPointer<vtkCellArray> bricks = vtkSmartPointer<vtkCellArray>::New();
-    VTKMeshIO::copyCellsToVtk<8>(imstkMesh->getHexahedraVertices(), bricks.Get());
-
-    vtkUnstructuredGrid* ug = vtkUnstructuredGrid::New();
-    ug->SetPoints(points);
-    ug->SetCells(VTK_HEXAHEDRON, bricks);
-    return ug;
-}
-
-std::shared_ptr<VolumetricMesh>
-VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh)
-{
-    CHECK(vtkMesh) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
-
-    StdVectorOfVec3d vertices;
-    VTKMeshIO::copyVerticesFromVtk(vtkMesh->GetPoints(), vertices);
-
-    int cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells() - 1);
-    if (cellType == VTK_TETRA)
-    {
-        std::vector<TetrahedralMesh::TetraArray> cells;
-        VTKMeshIO::copyCellsFromVtk<4>(vtkMesh->GetCells(), cells);
-
-        auto mesh = std::make_shared<TetrahedralMesh>();
-        mesh->initialize(vertices, cells, false);
-        return mesh;
-    }
-    else if (cellType == VTK_HEXAHEDRON)
-    {
-        std::vector<HexahedralMesh::HexaArray> cells;
-        VTKMeshIO::copyCellsFromVtk<8>(vtkMesh->GetCells(), cells);
-
-        auto mesh = std::make_shared<HexahedralMesh>();
-        mesh->initialize(vertices, cells, false);
-        return mesh;
-    }
-    else
-    {
-        LOG(FATAL) << "VTKMeshIO::convertVtkUnstructuredGridToVolumetricMesh error: No support for vtkCellType="
-                   << cellType << ".";
-        return nullptr;
-    }
-}
-
-void
-VTKMeshIO::copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices)
-{
-    CHECK(points) << "VTKMeshIO::copyVerticesFromVtk error: No points found.";
-
-    vertices.reserve(points->GetNumberOfPoints());
-    for (vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
-    {
-        double pos[3];
-        points->GetPoint(i, pos);
-        vertices.emplace_back(pos[0], pos[1], pos[2]);
-    }
-}
-
-void
-VTKMeshIO::copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points)
-{
-    CHECK(points) << "VTKMeshIO::copyVerticesToVtk error: No points found.";
-
-    points->SetNumberOfPoints(vertices.size());
-    for (size_t i = 0; i < vertices.size(); i++)
-    {
-        points->SetPoint(i, vertices[i][0], vertices[i][1], vertices[i][2]);
-    }
-}
-
-template<size_t dim>
-void
-VTKMeshIO::copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells)
-{
-    CHECK(vtkCells) << "VTKMeshIO::copyCellsToVtk error: No cells found.";
-
-    for (size_t i = 0; i < cells.size(); i++)
-    {
-        vtkCells->InsertNextCell(dim);
-        for (size_t k = 0; k < dim; k++)
-        {
-            vtkCells->InsertCellPoint(cells[i][k]);
-        }
-    }
-}
-
-template<size_t dim>
-void
-VTKMeshIO::copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells)
-{
-    CHECK(vtkCells) << "VTKMeshIO::copyCellsFromVtk error: No cells found.";
-
-    cells.reserve(vtkCells->GetNumberOfCells());
-    vtkCells->InitTraversal();
-    auto                    vtkCell = vtkSmartPointer<vtkIdList>::New();
-    std::array<size_t, dim> cell;
-    while (vtkCells->GetNextCell(vtkCell))
-    {
-        if (vtkCell->GetNumberOfIds() != dim)
-        {
-            continue;
-        }
-        for (size_t i = 0; i < dim; ++i)
-        {
-            cell[i] = vtkCell->GetId(i);
-        }
-        cells.emplace_back(cell);
-    }
-}
-
-void
-VTKMeshIO::copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap)
-{
-    if (!pointData)
-    {
-        return;
-    }
-
-    for (int i = 0; i < pointData->GetNumberOfArrays(); ++i)
-    {
-        vtkDataArray*      array       = pointData->GetArray(i);
-        std::string        name        = array->GetName();
-        int                nbrOfComp   = array->GetNumberOfComponents();
-        vtkIdType          nbrOfTuples = array->GetNumberOfTuples();
-        StdVectorOfVectorf data;
-        for (vtkIdType j = 0; j < nbrOfTuples; ++j)
-        {
-            double* tupleData = new double[nbrOfComp];
-            array->GetTuple(j, tupleData);
-            Vectorf tuple(nbrOfComp);
-            for (int k = 0; k < nbrOfComp; k++)
-            {
-                tuple[k] = tupleData[k];
-            }
-            data.push_back(tuple);
-        }
-        dataMap[name] = data;
-    }
+    return true;
 }
 } // imstk

@@ -60,9 +60,9 @@ protected:
     friend class VTKCubeRenderDelegate;
 
     void applyScaling(const double s) override;
-    void updatePostTransformData() override;
+    void updatePostTransformData() const override;
 
-    double m_width = 1.0;               ///> Width of the cube
-    double m_widthPostTransform = 1.0;  ///> Width of the cube once transform applied
+    double m_width = 1.0;                      ///> Width of the cube
+    mutable double m_widthPostTransform = 1.0; ///> Width of the cube once transform applied
 };
 }

@@ -88,7 +88,7 @@ Sphere::applyScaling(const double s)
 }
 
 void
-Sphere::updatePostTransformData()
+Sphere::updatePostTransformData() const
 {
     if (m_transformApplied)
     {

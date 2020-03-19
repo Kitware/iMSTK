@@ -33,6 +33,8 @@
 #include "imstkPbdFEHexConstraint.h"
 #include "imstkPbdConstantDensityConstraint.h"
 #include "imstkParallelUtils.h"
+#include "imstkGeometryUtilities.h"
+#include "imstkMeshIO.h"
 
 #include <g3log/g3log.hpp>
 
@@ -178,7 +180,7 @@ bool
 PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
 {
     // Check if constraint type matches the mesh type
-    CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh) 
+    CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh)
         << "FEM Tetrahedral constraint should come with tetrahedral mesh";
 
     // Create constraints
@@ -296,8 +298,8 @@ bool
 PbdModel::initializeAreaConstraints(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    CHECK (m_mesh->getType() == Geometry::Type::SurfaceMesh)
-        << "Area constraint should come with a triangular mesh";    
+    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh)
+        << "Area constraint should come with a triangular mesh";
 
     // ok, now create constraints
     const auto& triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
@@ -439,13 +441,12 @@ bool
 PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    CHECK (m_mesh->getType() == Geometry::Type::SurfaceMesh
+    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh
         || m_mesh->getType() == Geometry::Type::TetrahedralMesh
         || m_mesh->getType() == Geometry::Type::LineMesh
         || m_mesh->getType() == Geometry::Type::HexahedralMesh
         || m_mesh->getType() == Geometry::Type::PointSet)
         << "Constant constraint should come with a mesh!";
-    
 
     auto c = std::make_shared<PbdConstantDensityConstraint>();
     c->initConstraint(*this, stiffness);

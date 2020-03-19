@@ -236,8 +236,8 @@ public:
 
         CHECK(N != 2) << "Unimplemented function";
 
-        m_k = Real(32.0) / (PI * std::pow(m_radius, 9));
-        m_c = std::pow(m_radius, 6) / Real(64.0);
+        m_k  = Real(32.0) / (PI * std::pow(m_radius, 9));
+        m_c  = std::pow(m_radius, 6) / Real(64.0);
         m_W0 = W(VecXr::Zero());
     }
 
@@ -323,7 +323,7 @@ public:
 
         CHECK(N != 2) << "Unimplemented function";
 
-        m_k = Real(0.007 / std::pow(m_radius, 3.25));        
+        m_k  = Real(0.007 / std::pow(m_radius, 3.25));
         m_W0 = W(VecXr::Zero());
     }
 

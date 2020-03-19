@@ -102,7 +102,7 @@ AnalyticalGeometry::applyRotation(const Mat3d r)
 }
 
 void
-AnalyticalGeometry::updatePostTransformData()
+AnalyticalGeometry::updatePostTransformData() const
 {
     m_orientationAxisPostTransform = m_transform.rotation() * m_orientationAxis;
     m_orientationAxisPostTransform.normalize();
