@@ -33,7 +33,7 @@ PbdObject::initialize()
     m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
 
     CHECK(m_pbdModel) << "Dynamics pointer cast failure in PbdObject::initialize()";
-    
+
     return DynamicObject::initialize();
 }
 

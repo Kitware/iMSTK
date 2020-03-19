@@ -81,7 +81,7 @@ playMusic(const std::string& filename)
 #ifdef iMSTK_AUDIO_ENABLED
     // Load an ogg music file
     sf::Music music;
-        
+
     CHECK(music.openFromFile(filename)) << "playMusic: Could not open the input music file: " << filename;
 
     // Display music informations

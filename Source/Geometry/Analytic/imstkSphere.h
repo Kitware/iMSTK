@@ -68,9 +68,9 @@ protected:
     friend class VTKSphereRenderDelegate;
 
     void applyScaling(const double s) override;
-    void updatePostTransformData() override;
+    void updatePostTransformData() const override;
 
-    double m_radius = 1.0;              ///> Radius of the sphere
-    double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
+    double m_radius = 1.0;                      ///> Radius of the sphere
+    mutable double m_radiusPostTransform = 1.0; ///> Radius of the sphere once transform applied
 };
 } // imstk

@@ -74,7 +74,7 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
     vegaConfigFileOptions.addOptionOptional("gravity", &m_FEModelConfig->m_gravity, m_FEModelConfig->m_gravity);
 
     // Parse the configuration file
-    CHECK(vegaConfigFileOptions.parseOptions(configFileName.data()) == 0) 
+    CHECK(vegaConfigFileOptions.parseOptions(configFileName.data()) == 0)
         << "ForceModelConfig::parseConfig - Unable to load the configuration file";
 
     // get the root directory of the boundary file name
@@ -386,9 +386,9 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 bool
 FEMDeformableBodyModel::initializeTangentStiffness()
 {
-    CHECK(m_internalForceModel) 
+    CHECK(m_internalForceModel)
         << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
-    
+
     vega::SparseMatrix* matrix;
     m_internalForceModel->getTangentStiffnessMatrixTopology(&matrix);
 

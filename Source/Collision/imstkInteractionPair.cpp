@@ -55,7 +55,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     if (CHAType != CollisionHandling::Type::None)
     {
         CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
-        
+
         CHECK(CHA) << "InteractionPair error: can not instantiate collision handling for '"
                    << A->getName() << "' object.";
     }
@@ -65,9 +65,9 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     if (CHBType != CollisionHandling::Type::None)
     {
         CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
-        
+
         CHECK(CHB) << "InteractionPair error: can not instantiate collision handling for '"
-            << B->getName() << "' object.";
+                   << B->getName() << "' object.";
     }
 
     // Init interactionPair

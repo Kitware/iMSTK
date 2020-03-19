@@ -71,7 +71,7 @@ Cube::applyScaling(const double s)
 }
 
 void
-Cube::updatePostTransformData()
+Cube::updatePostTransformData() const
 {
     if (m_transformApplied)
     {

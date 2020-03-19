@@ -95,7 +95,7 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<Deformab
     }
 
     CHECK(deformableObj) << "PenaltyRigidCH::computeContactForcesDiscreteDeformable error: "
-        << m_object->getName() << " is not a deformable object.";
+                         << m_object->getName() << " is not a deformable object.";
 
     // Get current force vector
     auto&       force     = deformableObj->getContactForce();

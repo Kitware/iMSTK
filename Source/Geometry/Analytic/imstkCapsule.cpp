@@ -89,7 +89,7 @@ Capsule::applyScaling(const double s)
 }
 
 void
-Capsule::updatePostTransformData()
+Capsule::updatePostTransformData() const
 {
     if (m_transformApplied)
     {
