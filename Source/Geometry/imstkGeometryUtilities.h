@@ -39,99 +39,97 @@ class SurfaceMesh;
 class TetrahedralMesh;
 class VolumetricMesh;
 
-class GeometryUtils
+namespace GeometryUtils
 {
-public:
     ///
     /// \brief Converts vtk polydata into a imstk surface mesh
     ///
-    static std::shared_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
+    std::unique_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(const vtkSmartPointer<vtkPolyData> vtkMesh);
 
     ///
     /// \brief Converts vtk polydata into a imstk surface mesh
     ///
-    static std::shared_ptr<LineMesh> convertVtkPolyDataToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
+    std::unique_ptr<LineMesh> convertVtkPolyDataToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
     ///
     /// \brief Converts imstk surface mesh into a vtk polydata
     ///
-    static vtkSmartPointer<vtkPolyData> convertSurfaceMeshToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh);
+    vtkSmartPointer<vtkPolyData> convertSurfaceMeshToVtkPolyData(const SurfaceMesh& imstkMesh);
 
     ///
     /// \brief Converts imstk line mesh into a vtk polydata
     ///
-    static vtkSmartPointer<vtkPolyData> convertLineMeshToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh);
+    vtkSmartPointer<vtkPolyData> convertLineMeshToVtkPolyData(const LineMesh& imstkMesh);
 
     ///
     /// \brief Converts imstk tetrahedral mesh into a vtk unstructured grid
     ///
-    static vtkSmartPointer<vtkUnstructuredGrid> convertTetrahedralMeshToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkMesh);
+    vtkSmartPointer<vtkUnstructuredGrid> convertTetrahedralMeshToVtkUnstructuredGrid(const TetrahedralMesh& imstkMesh);
 
     ///
     /// \brief Converts imstk hexahedral mesh into a vtk unstructured grid
     ///
-    static vtkSmartPointer<vtkUnstructuredGrid> convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
+    vtkSmartPointer<vtkUnstructuredGrid> convertHexahedralMeshToVtkUnstructuredGrid(const HexahedralMesh& imstkMesh);
 
     ///
     /// \brief
     ///
-    static std::shared_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh);
+    std::unique_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* const vtkMesh);
 
     ///
     /// \brief
     ///
-    static void copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices);
+    void copyVerticesFromVtk(vtkPoints* const points, StdVectorOfVec3d& vertices);
 
     ///
     /// \brief Copies vertices from imstk structure to VTK one
     ///
-    static void copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points);
+    void copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points);
 
     ///
     /// \brief Copies cells of the given dimension from imstk structure to VTK one
     ///
     template<size_t dim>
-    static void copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells);
+    void copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells);
 
     ///
     /// \brief
     ///
     template<size_t dim>
-    static void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells);
+    void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells);
 
     ///
     /// \brief
     ///
-    static void copyPointDataFromVtk(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
+    void copyPointDataFromVtk(vtkPointData* const pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 
-public:
     ///
     /// \brief Appends two surface meshes
     ///
-    static std::shared_ptr<SurfaceMesh> appendSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2);
+    std::unique_ptr<SurfaceMesh> combineSurfaceMesh(const SurfaceMesh& surfaceMesh1, const SurfaceMesh& surfaceMesh2);
 
     ///
     /// \brief Converts an imstk SurfaceMesh to a LineMesh, removing duplicate edges. Cell indices not preserved
     ///
-    static std::shared_ptr<LineMesh> surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+    std::unique_ptr<LineMesh> surfaceMeshToLineMesh(const SurfaceMesh& surfaceMesh);
 
     ///
     /// \brief Smooths a SurfaceMesh using laplacian smoothening
     ///
-    static std::shared_ptr<SurfaceMesh> smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
-        int numberOfIterations = 20, double relaxationFactor = 0.01,
-        double convergence = 0.0, double featureAngle = 45.0,
-        double edgeAngle = 15.0, bool featureEdgeSmoothing = false,
-        bool boundarySmoothing = true);
+    std::unique_ptr<SurfaceMesh> smoothSurfaceMesh(const SurfaceMesh& surfaceMesh,
+        const int numberOfIterations = 20, const double relaxationFactor = 0.01,
+        const double convergence = 0.0, const double featureAngle = 45.0,
+        const double edgeAngle = 15.0, const bool featureEdgeSmoothing = false,
+        const bool boundarySmoothing = true);
 
     ///
-    /// \brief Subidivdes a SurfaceMesh using linear subdivision
+    /// \brief Sub-divdes a SurfaceMesh using linear subdivision
     ///
-    static std::shared_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, int numberOfSubdivisions);
+    std::unique_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions=1);
 
     ///
-    /// \brief Subidivides a SurfaceMesh using loop subdivision
+    /// \brief Sub-divides a SurfaceMesh using loop subdivision
     ///
-    static std::shared_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, int numberOfSubdivisions);
+    std::unique_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions=1);
 };
 }

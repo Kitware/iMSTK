@@ -85,18 +85,19 @@ protected:
     /// \brief Writes the given surface mesh to given file path using the provided writer type
     ///
     template<typename WriterType>
-    static bool writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const std::string& filePath);
+    static bool writeVtkPolyData(const SurfaceMesh& imstkMesh, const std::string& filePath);
 
     ///
     /// \brief Writes the given line mesh to given file path using the provided writer type
     ///
     template<typename WriterType>
-    static bool writeVtkPolyData(const std::shared_ptr<LineMesh> imstkMesh, const std::string& filePath);
+    static bool writeVtkPolyData(const LineMesh& imstkMesh, const std::string& filePath);
 
     ///
     /// \brief Writes the given volumetric mesh to given file path
     ///
-    static bool writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkMesh, const std::string& filePath);
+    static bool VTKMeshIO::writeVtkUnstructuredGrid(const TetrahedralMesh& tetMesh, const std::string& filePath);
+    static bool VTKMeshIO::writeVtkUnstructuredGrid(const HexahedralMesh& hMesh, const std::string& filePath);
 
     ///
     /// \brief
