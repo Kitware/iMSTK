@@ -75,8 +75,8 @@ protected:
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;
 
-    double m_radius = 1.;              ///> Radius of the cylinder
-    double m_length = 1.;              ///> Length of the cylinder
+    double m_radius = 1.;                      ///> Radius of the cylinder
+    double m_length = 1.;                      ///> Length of the cylinder
     mutable double m_radiusPostTransform = 1.; ///> Radius of the cylinder oncee transform applied
     mutable double m_lengthPostTransform = 1.; ///> Length of the cylinder onc transform applied
 };

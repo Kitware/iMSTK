@@ -66,7 +66,7 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     }
     case MeshFileType::PLY:
     {
-        return VTKMeshIO::readVtkPolyData<vtkPLYReader>(filePath); 
+        return VTKMeshIO::readVtkPolyData<vtkPLYReader>(filePath);
     }
     case MeshFileType::OBJ:
     {
@@ -95,20 +95,20 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
     {
         switch (meshType)
         {
-        case MeshFileType::VTU:            
-            if(auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
+        case MeshFileType::VTU:
+            if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
             {
                 VTKMeshIO::writeVtkUnstructuredGrid(*tetMesh.get(), filePath);
             }
-            else if(auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
-            {                
+            else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
+            {
                 VTKMeshIO::writeVtkUnstructuredGrid(*hexMesh.get(), filePath);
             }
             else
             {
                 return false;
             }
-            
+
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
             return false;
@@ -275,7 +275,7 @@ VTKMeshIO::readVtkImageDataDICOM(const std::string& filePath)
 
 bool
 VTKMeshIO::writeVtkUnstructuredGrid(const TetrahedralMesh& tetMesh, const std::string& filePath)
-{            
+{
     auto vtkMesh = GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(tetMesh);
 
     if (!vtkMesh)

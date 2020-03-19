@@ -65,7 +65,7 @@ void
 Cylinder::setRadius(const double r)
 {
     CHECK(r > 0) << "Cylinder::setRadius error: radius should be positive.";
-    
+
     if (m_radius == r)
     {
         return;

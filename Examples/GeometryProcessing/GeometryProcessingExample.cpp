@@ -39,7 +39,7 @@ main()
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("GeometryTransforms");
 
-    auto coarseTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+    auto coarseTetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
     auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 

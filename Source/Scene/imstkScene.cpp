@@ -137,8 +137,8 @@ Scene::getSceneObjectControllers() const
 std::shared_ptr<SceneObject>
 Scene::getSceneObject(const std::string& sceneObjectName) const
 {
-    CHECK(this->isObjectRegistered(sceneObjectName)) 
-        << "No scene object named '"  << sceneObjectName
+    CHECK(this->isObjectRegistered(sceneObjectName))
+        << "No scene object named '" << sceneObjectName
         << "' was registered in this scene.";
 
     return m_sceneObjectsMap.at(sceneObjectName);

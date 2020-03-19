@@ -76,7 +76,7 @@ protected:
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;
 
-    double m_width = 1.0;               ///> Width of the plane
-    mutable double m_widthPostTransform = 1.0;  ///> Width of the plane once transform applied
+    double m_width = 1.0;                      ///> Width of the plane
+    mutable double m_widthPostTransform = 1.0; ///> Width of the plane once transform applied
 };
 } // imstk

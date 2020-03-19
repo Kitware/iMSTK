@@ -205,7 +205,7 @@ protected:
     virtual void applyTranslation(const Vec3d t) = 0;
     virtual void applyRotation(const Mat3d r)    = 0;
     virtual void applyScaling(const double s)    = 0;
-    virtual void updatePostTransformData() const  const = 0;
+    virtual void updatePostTransformData() const const = 0;
 
     Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry
@@ -213,7 +213,7 @@ protected:
 
     bool m_dataModified      = false;
     bool m_transformModified = false;
-    mutable bool m_transformApplied  = true;
+    mutable bool m_transformApplied = true;
 
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transformation matrix
     double m_scaling = 1.0;

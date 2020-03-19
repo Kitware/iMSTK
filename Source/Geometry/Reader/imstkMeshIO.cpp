@@ -36,7 +36,7 @@ MeshIO::read(const std::string& filePath)
 {
     bool isDir;
 
-    CHECK(MeshIO::fileExists(filePath, isDir))<< "MeshIO::read error: file not found: " << filePath;
+    CHECK(MeshIO::fileExists(filePath, isDir)) << "MeshIO::read error: file not found: " << filePath;
 
     if (isDir)
     {
@@ -105,8 +105,8 @@ MeshIO::getFileType(const std::string& filePath)
     MeshFileType meshType = MeshFileType::UNKNOWN;
 
     std::string extString = filePath.substr(filePath.find_last_of(".") + 1);
-    
-    CHECK (!extString.empty()) << "MeshIO::getFileType error: invalid file name";
+
+    CHECK(!extString.empty()) << "MeshIO::getFileType error: invalid file name";
 
     if (extString == "vtk" || extString == "VTK")
     {
