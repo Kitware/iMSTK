@@ -73,11 +73,11 @@ protected:
     friend class VTKCapsuleRenderDelegate;
 
     void applyScaling(const double s) override;
-    void updatePostTransformData() override;
+    void updatePostTransformData() const override;
 
     double m_radius = 1.0;              ///> Radius of the hemispheres at the end of the capsule
-    double m_radiusPostTransform = 1.0; ///> Radius after transform
+    mutable double m_radiusPostTransform = 1.0; ///> Radius after transform
     double m_length = 1.0;              ///> Length between the centers of two hemispheres
-    double m_lengthPostTransform = 1.0; ///> Length after transform
+    mutable double m_lengthPostTransform = 1.0; ///> Length after transform
 };
 } // imstk

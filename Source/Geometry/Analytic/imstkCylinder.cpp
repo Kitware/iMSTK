@@ -101,7 +101,7 @@ Cylinder::applyScaling(const double s)
 }
 
 void
-Cylinder::updatePostTransformData()
+Cylinder::updatePostTransformData() const
 {
     if (m_transformApplied)
     {

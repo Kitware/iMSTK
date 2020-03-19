@@ -61,7 +61,7 @@ protected:
     void applyTranslation(const Vec3d t) override {}
     void applyRotation(const Mat3d r) override {}
     void applyScaling(const double s) override {}
-    virtual void updatePostTransformData() override {}
+    virtual void updatePostTransformData() const override {}
 
     unsigned int m_maxNumDecals;
     unsigned int m_numDecals = 0;

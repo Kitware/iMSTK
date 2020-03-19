@@ -113,7 +113,7 @@ PointSet::setVertexPositions(const StdVectorOfVec3d& vertices)
 }
 
 const StdVectorOfVec3d&
-PointSet::getVertexPositions(DataType type /* = DataType::PostTransform */)
+PointSet::getVertexPositions(DataType type /* = DataType::PostTransform */) const
 {
     if (type == DataType::PostTransform)
     {
@@ -136,7 +136,7 @@ PointSet::setVertexPosition(const size_t vertNum, const Vec3d& pos)
 }
 
 const Vec3d&
-PointSet::getVertexPosition(const size_t vertNum, DataType type)
+PointSet::getVertexPosition(const size_t vertNum, DataType type) const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
     LOG_IF(FATAL, (vertNum >= getVertexPositions().size())) << "Invalid index";
@@ -275,7 +275,7 @@ PointSet::applyScaling(const double s)
 }
 
 void
-PointSet::updatePostTransformData()
+PointSet::updatePostTransformData() const
 {
     if (m_transformApplied)
     {

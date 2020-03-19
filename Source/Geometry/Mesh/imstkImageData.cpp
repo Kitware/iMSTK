@@ -123,7 +123,7 @@ ImageData::applyRotation(const Mat3d r)
 }
 
 void
-ImageData::updatePostTransformData()
+ImageData::updatePostTransformData() const
 {
     if (m_transformApplied || !this->m_data)
     {

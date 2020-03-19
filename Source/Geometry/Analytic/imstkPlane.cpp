@@ -89,7 +89,7 @@ Plane::applyScaling(const double s)
 }
 
 void
-Plane::updatePostTransformData()
+Plane::updatePostTransformData() const
 {
     if (m_transformApplied)
     {
