@@ -87,6 +87,7 @@ endif ()
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
+include(CMakePackageConfigHelpers)
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
 
 if(${PROJECT_NAME}_SUPERBUILD)
@@ -175,6 +176,17 @@ if(${PROJECT_NAME}_SUPERBUILD)
   # CMakeLists.txt will be called back with SUPERBUILD=OFF, to execute
   # the rest of the code below (INNERBUILD), which explains the `return`
   add_subdirectory(CMake/External)
+  
+  write_basic_package_version_file(
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    VERSION ${Upstream_VERSION}
+    COMPATIBILITY AnyNewerVersion
+    )
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities/${PROJECT_NAME}Config.cmake.in"
+    ${PROJECT_NAME}Config.cmake
+    @ONLY
+    )
 
   return()
 
@@ -379,8 +391,7 @@ if(NOT WIN32)
   configure_file(
     ${CMAKE_SOURCE_DIR}/CMake/setup_iMSTK.sh.in
     ${CMAKE_INSTALL_PREFIX}/setup_iMSTK.sh
-    @ONLY
-    )
+    @ONLY)
 endif()
 
 #--------------------------------------------------------------------------
@@ -397,18 +408,17 @@ add_test(
 string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
 set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
 
-include(CMakePackageConfigHelpers)
+export(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
+  )
 write_basic_package_version_file(
   "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
   VERSION ${Upstream_VERSION}
   COMPATIBILITY AnyNewerVersion
   )
-export(EXPORT ${PROJECT_NAME}_TARGETS
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
-  NAMESPACE ${PROJECT_NAMESPACE}
-  )
-configure_file(${PROJECT_NAME}Config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities/${PROJECT_NAME}InnerbuildConfig.cmake.in"
+  ${PROJECT_NAME}Config.cmake
   @ONLY
   )
 
