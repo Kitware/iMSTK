@@ -42,6 +42,7 @@ MeshToMeshBruteForceCD::MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      ob
 {
 }
 
+// The above error is caused by the 
 void
 MeshToMeshBruteForceCD::computeCollisionData()
 {
@@ -80,7 +81,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                                        m_proximityTolerance,
                                        m_proximityTolerance))
                 {
-                    m_colData->VTColData.safeAppend({ static_cast<unsigned int>(i), static_cast<unsigned int>(j), 0.0 });
+                    m_colData->VTColData.safeAppend({ static_cast<uint32_t>(i), static_cast<uint32_t>(j), 0.0 });
                 }
             }
         }
@@ -113,7 +114,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                         p0[0], p0[1], p0[2],
                         p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                     {
-                        m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
+                        m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
                     }
                     E2[e[0]][e[1]] = 0;
                 }
@@ -125,7 +126,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                         p1[0], p1[1], p1[2],
                         p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                     {
-                        m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
+                        m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
                     }
                     E2[e[1]][e[2]] = 0;
                 }
@@ -137,7 +138,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                         p2[0], p2[1], p2[2],
                         p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                     {
-                        m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
+                        m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
                     }
                     E2[e[2]][e[0]] = 0;
                 }
@@ -167,7 +168,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    m_colData->VTColData.safeAppend({ static_cast<unsigned int>(i), static_cast<unsigned int>(j), 0.0 });
+                    m_colData->VTColData.safeAppend({ static_cast<uint32_t>(i), static_cast<uint32_t>(j), 0.0 });
                 }
             }
         }
@@ -195,7 +196,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                 {
-                    m_colData->VTColData.safeAppend({ static_cast<unsigned int>(i), static_cast<unsigned int>(j), 0.0 });
+                    m_colData->VTColData.safeAppend({ static_cast<uint32_t>(i), static_cast<uint32_t>(j), 0.0 });
                 }
             }
         }
@@ -235,7 +236,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
                             E2[e[0]][e[1]] = 0;
                         }
                     }
@@ -247,7 +248,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
                             E2[e[1]][e[2]] = 0;
                         }
                     }
@@ -259,7 +260,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
                             E2[e[2]][e[0]] = 0;
                         }
                     }
@@ -289,7 +290,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
                             E2[e[0]][e[1]] = 0;
                         }
                     }
@@ -301,7 +302,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
                             E2[e[1]][e[2]] = 0;
                         }
                     }
@@ -313,7 +314,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
                             E2[e[2]][e[0]] = 0;
                         }
                     }
@@ -342,7 +343,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[0], e[1] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[0], (uint32_t)e[1] }, 0.0 });
                             E2[e[0]][e[1]] = 0;
                         }
                     }
@@ -354,7 +355,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[1], e[2] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[1], (uint32_t)e[2] }, 0.0 });
                             E2[e[1]][e[2]] = 0;
                         }
                     }
@@ -366,7 +367,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], m_proximityTolerance, m_proximityTolerance))
                         {
-                            m_colData->EEColData.safeAppend({ { i1, i2 }, { e[2], e[0] }, 0.0 });
+                            m_colData->EEColData.safeAppend({ { (uint32_t)i1, (uint32_t)i2 }, { (uint32_t)e[2], (uint32_t)e[0] }, 0.0 });
                             E2[e[2]][e[0]] = 0;
                         }
                     }
