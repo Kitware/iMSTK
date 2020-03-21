@@ -50,7 +50,10 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
+#pragma warning(push)
+#pragma warning(disable:4127)
         if (N == 2)
+#pragma warning(pop)
         {
             m_k = Real(4.0) / (PI * std::pow(m_radius, 8));
             m_l = -Real(24.0) / (PI * std::pow(m_radius, 8));
@@ -152,7 +155,10 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
+#pragma warning(push)
+#pragma warning(disable:4127)
         if (N == 2)
+#pragma warning(pop)
         {
             const auto radius5 = std::pow(m_radius, 5);
             m_k = Real(10.0) / (PI * radius5);
@@ -234,7 +240,10 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
+#pragma warning(push)
+#pragma warning(disable:4127)
         CHECK(N != 2) << "Unimplemented function";
+#pragma warning(pop)
 
         m_k  = Real(32.0) / (PI * std::pow(m_radius, 9));
         m_c  = std::pow(m_radius, 6) / Real(64.0);

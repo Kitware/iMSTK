@@ -254,7 +254,7 @@ SPHModel::normalizeDensity()
 
             if (m_modelParameters->m_bDensityWithBoundary)
             {
-                const auto& BDNeighborList = getState().getBoundaryNeighborLists()[p];
+                //const auto& BDNeighborList = getState().getBoundaryNeighborLists()[p];
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
                 LOG_IF(FATAL, (fluidNeighborList.size() + BDNeighborList.size() != neighborInfo.size()))
                 << "Invalid neighborInfo computation";

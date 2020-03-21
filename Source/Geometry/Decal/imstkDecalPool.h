@@ -58,9 +58,12 @@ protected:
     std::deque<std::shared_ptr<Decal>> m_orderedDecals;
     std::deque<std::shared_ptr<Decal>> m_freeDecals;
 
+#pragma warning( push )
+#pragma warning( disable : 4100 )
     void applyTranslation(const Vec3d t) override {}
     void applyRotation(const Mat3d r) override {}
     void applyScaling(const double s) override {}
+#pragma warning( push )
     virtual void updatePostTransformData() const override {}
 
     unsigned int m_maxNumDecals;

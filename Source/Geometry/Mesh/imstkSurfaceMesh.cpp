@@ -149,7 +149,7 @@ SurfaceMesh::computeTrianglesNormals()
     }
 
     bool                      hasUVs = this->hasPointDataArray(m_defaultTCoords);
-    const StdVectorOfVectorf* UVs;
+    const StdVectorOfVectorf* UVs    = nullptr;
 
     if (hasUVs)
     {
@@ -258,14 +258,14 @@ SurfaceMesh::optimizeForDataLocality()
     // First find the list of triangles a given vertex is part of
     std::vector<std::vector<size_t>> vertexNeighbors;
     vertexNeighbors.resize(this->getNumVertices());
-    size_t triId = 0;
+    size_t triangleId = 0;
     for (const auto& tri : this->getTrianglesVertices())
     {
-        vertexNeighbors[tri[0]].push_back(triId);
-        vertexNeighbors[tri[1]].push_back(triId);
-        vertexNeighbors[tri[2]].push_back(triId);
+        vertexNeighbors[tri[0]].push_back(triangleId);
+        vertexNeighbors[tri[1]].push_back(triangleId);
+        vertexNeighbors[tri[2]].push_back(triangleId);
 
-        triId++;
+        triangleId++;
     }
 
     std::vector<TriangleArray> optimizedConnectivity;
@@ -637,11 +637,11 @@ SurfaceMesh::markPointsInsideAndOut(const StdVectorOfVec3d& coords)
     auto intersectTriangle = [](const Vec3d& xyz, const Vec3d& xyz0, const Vec3d& xyz1, const Vec3d& xyz2, const Vec3d& dir)
                              {
                                  // const double eps = 1e-15;
-                                 const double eps   = std::numeric_limits<double>::epsilon();
-                                 Vec3d        edge0 = xyz1 - xyz0;
-                                 Vec3d        edge1 = xyz2 - xyz0;
-                                 Vec3d        pvec  = dir.cross(edge1);
-                                 double       det   = edge0.dot(pvec);
+                                 constexpr const double eps   = std::numeric_limits<double>::epsilon();
+                                 Vec3d                  edge0 = xyz1 - xyz0;
+                                 Vec3d                  edge1 = xyz2 - xyz0;
+                                 Vec3d                  pvec  = dir.cross(edge1);
+                                 double                 det   = edge0.dot(pvec);
 
                                  if (det > -eps && det < eps)
                                  {

@@ -25,8 +25,12 @@
 
 #include "imstkMath.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4458 )
+#pragma warning( disable : 4100 )
 //vega
 #include "forceModel.h"
+#pragma warning( pop )
 
 namespace imstk
 {

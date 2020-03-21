@@ -34,7 +34,7 @@ public:
     ///
     /// \brief Enumerations for the render mode
     ///
-    enum Mode
+    enum class Mode
     {
         EMPTY,
         DEBUG,
@@ -57,6 +57,7 @@ public:
     virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
 protected:
+    bool m_VrEnabled = false;
     Renderer::Mode m_currentMode = Renderer::Mode::EMPTY;
 };
 }

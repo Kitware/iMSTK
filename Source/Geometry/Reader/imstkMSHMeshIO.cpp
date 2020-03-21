@@ -41,18 +41,18 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     // based on the format provided on
     // http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
 
-    size_t                                   nNodes;                          // number-of-nodes
-    size_t                                   nElements;                       // number-of-elements
-    std::vector<size_t>                      nodeIDs;                         // number assigned to each node (node number)
-    StdVectorOfVec3d                         nodesCoords;                     // nodes coordinates
-    std::vector<size_t>                      tetrahedronIDs;                  // tet elements IDs
-    std::vector<size_t>                      hexahedronIDs;                   // hex elements IDs
-    std::vector<TetrahedralMesh::TetraArray> tetrahedronConnectivity;         // tet element connectivity
-    std::vector<HexahedralMesh::HexaArray>   hexahedronConnectivity;          // hex element connectivity
-    std::map<ElemType, size_t>               elemCountMap;                    // map of the element types to their number of counts
-    std::string                              subString;                       // to store space separated strings in a line
-    std::string                              mshLine;                         // a msh file line
-    std::stringstream                        mshLineStream;                   // sting stream object which represent a line in the .msh file
+    size_t                                   nNodes    = 0;           // number-of-nodes
+    size_t                                   nElements = 0;           // number-of-elements
+    std::vector<size_t>                      nodeIDs;                 // number assigned to each node (node number)
+    StdVectorOfVec3d                         nodesCoords;             // nodes coordinates
+    std::vector<size_t>                      tetrahedronIDs;          // tet elements IDs
+    std::vector<size_t>                      hexahedronIDs;           // hex elements IDs
+    std::vector<TetrahedralMesh::TetraArray> tetrahedronConnectivity; // tet element connectivity
+    std::vector<HexahedralMesh::HexaArray>   hexahedronConnectivity;  // hex element connectivity
+    std::map<ElemType, size_t>               elemCountMap;            // map of the element types to their number of counts
+    std::string                              subString;               // to store space separated strings in a line
+    std::string                              mshLine;                 // a msh file line
+    std::stringstream                        mshLineStream;           // sting stream object which represent a line in the .msh file
 
     // Open the file
     std::ifstream mshStream(filePath);
@@ -252,8 +252,8 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     hexahedronConnectivity.resize(elemCountMap[ElemType::hexahedron]);
     size_t                      tetElemCount = 0;
     size_t                      hexElemCount = 0;
-    TetrahedralMesh::TetraArray tmp_4arr;       // Temp array to store the connectivity of a tet element (if any)
-    HexahedralMesh::HexaArray   tmp_8arr;       // Temp array to store the connectivity of a hex element (if any)
+    TetrahedralMesh::TetraArray tmp_4arr     = {};   // Temp array to store the connectivity of a tet element (if any)
+    HexahedralMesh::HexaArray   tmp_8arr     = {};   // Temp array to store the connectivity of a hex element (if any)
     // Look for "$Elements" field
     mshStream.clear();
     mshStream.seekg(0, std::ios::beg);

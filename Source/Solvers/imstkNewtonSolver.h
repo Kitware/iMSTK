@@ -191,10 +191,9 @@ public:
     ///
     /// \brief Set the Newton solver to be fully implicit
     ///
-    virtual void setToFullyImplicit(const int maxNumIter = 50) override
+    virtual void setToFullyImplicit() override
     {
         m_isSemiImplicit = false;
-        m_maxIterations  = maxNumIter;
     }
 
     ///

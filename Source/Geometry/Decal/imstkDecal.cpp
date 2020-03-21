@@ -40,7 +40,7 @@ Decal::print() const
 double
 Decal::getVolume() const
 {
-    return m_dimensions.x * m_dimensions.y * m_dimensions.z;
+    return (double)m_dimensions.x * (double)m_dimensions.y * (double)m_dimensions.z;
 }
 
 void
@@ -49,8 +49,11 @@ Decal::applyScaling(const double s)
     m_dimensions *= s;
 }
 
+#pragma warning(push)
+#pragma warning( disable : 4100 )
 void
 Decal::updateDecal(glm::mat4& viewMatrix)
+#pragma warning(pop)
 {
     glm::mat4 transform;
 

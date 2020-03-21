@@ -22,7 +22,12 @@
 #pragma once
 
 #include <Eigen/Geometry>
+
+#pragma warning( push )
+#pragma warning( disable : 4127 )
 #include <Eigen/Sparse>
+#pragma warning( pop )
+
 #include <Eigen/StdVector>
 #include <vector>
 

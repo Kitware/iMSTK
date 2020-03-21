@@ -30,7 +30,7 @@ VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel
 
     auto geometry = std::static_pointer_cast<Cylinder>(visualModel->getGeometry());
 
-    Geometry::DataType type = Geometry::DataType::PreTransform;
+    //Geometry::DataType type = Geometry::DataType::PreTransform;
     cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
     cylinderSource->SetCenter(0., 0., 0.);
     cylinderSource->SetRadius(1.);

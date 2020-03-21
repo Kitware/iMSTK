@@ -113,7 +113,13 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    void setTimeStep(const double timeStep) {}
+    void setTimeStep(const double timeStep)
+    {
+        if (m_rigidBodyWorld)
+        {  
+            m_rigidBodyWorld->setTimeStep((float)timeStep);
+        }
+    }
 
     ///
     /// \brief Returns the time step size
@@ -130,7 +136,7 @@ public:
             //auto q = Quatd(r);
             PxTransform pose;
             //pose.q = PxQuat(q.x(), q.y(), q.z(), q.w());
-            pose.p = PxVec3(p.x(), p.y(), p.z());
+            pose.p = PxVec3((float)p.x(), (float)p.y(), (float)p.z());
             m_pxDynamicActor->setGlobalPose(pose);
         }
 

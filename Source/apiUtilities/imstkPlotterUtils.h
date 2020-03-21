@@ -29,6 +29,8 @@
 #include "imstkMath.h"
 #include "g3log/g3log.hpp"
 
+#pragma warning( push )
+#pragma warning( disable : 4505 ) // Warning C4505 will vanish upon calls to the following functions
 namespace imstk
 {
 namespace plotterutils
@@ -169,3 +171,5 @@ writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName)
 }
 } // plotters
 } // imstk
+
+#pragma warning( pop )
