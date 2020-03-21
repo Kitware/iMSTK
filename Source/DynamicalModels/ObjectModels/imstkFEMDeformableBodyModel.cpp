@@ -283,7 +283,7 @@ FEMDeformableBodyModel::initializeForceModel()
     const double g = m_FEModelConfig->m_gravity;
     const bool   isGravityPresent = (g > 0) ? true : false;
 
-    m_numDOF = m_vegaPhysicsMesh->getNumVertices() * 3;
+    m_numDOF = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
 
     switch (m_FEModelConfig->m_femMethod)
     {
@@ -393,7 +393,7 @@ FEMDeformableBodyModel::initializeTangentStiffness()
     CHECK(m_internalForceModel)
         << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
 
-    vega::SparseMatrix* matrix;
+    vega::SparseMatrix* matrix = nullptr;
     m_internalForceModel->getTangentStiffnessMatrixTopology(&matrix);
 
     CHECK(matrix) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
@@ -519,11 +519,15 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
                                                  kinematicState&       newState,
                                                  const StateUpdateType updateType)
 {
+   
+
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
     case StateUpdateType::deltaVelocity:
+        
+        stateAtT;// supress warning (state is not used in this update type hence can be ignored)
 
         this->updateMassMatrix();
         m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);

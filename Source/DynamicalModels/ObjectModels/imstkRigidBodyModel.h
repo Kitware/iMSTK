@@ -113,7 +113,13 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    void setTimeStep(const double timeStep) {}
+    void setTimeStep(const double timeStep)
+    {
+        if (m_rigidBodyWorld)
+        {  
+            m_rigidBodyWorld->setTimeStep((float)timeStep);
+        }
+    }
 
     ///
     /// \brief Returns the time step size

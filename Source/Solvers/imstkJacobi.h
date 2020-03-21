@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override {};
+    //void iterate(Vectord& x, bool updateResidual = true) override {};
 
     ///
     /// \brief Jacobi solver
