@@ -33,7 +33,7 @@
 // Mesh to mesh
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 #include "imstkSurfaceMeshToSurfaceMeshCCD.h"
-#include "imstkMeshToMeshBruteforceCD.h"
+#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkTetraToTetraCD.h"
 
 // Analytical object to analytical object
