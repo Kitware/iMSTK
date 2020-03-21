@@ -460,9 +460,9 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
                              {
                                  const auto& xyz = surfMesh->getVertexPosition(i);
                                  // find the hex that encloses the point;
-                                 size_t idX   = (xyz[0] - aabbMin[0]) / h[0];
-                                 size_t idY   = (xyz[1] - aabbMin[1]) / h[1];
-                                 size_t idZ   = (xyz[2] - aabbMin[2]) / h[2];
+                                 size_t idX   = (size_t)((xyz[0] - aabbMin[0]) / h[0]);
+                                 size_t idY   = (size_t)((xyz[1] - aabbMin[1]) / h[1]);
+                                 size_t idZ   = (size_t)((xyz[2] - aabbMin[2]) / h[2]);
                                  size_t hexId = idX + idY * nx + idZ * nx * ny;
 
                                  // the index range of tets inside the enclosing hex

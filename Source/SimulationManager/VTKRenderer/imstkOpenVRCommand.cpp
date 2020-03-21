@@ -125,7 +125,7 @@ OpenVRCommand::Execute(
     // override DoOneEvent() by calling itself and then updateRenderDelegates()
     if (eventId == vtkCommand::StartEvent)
     {
-        SimulationStatus status = m_simManager->getStatus();
+        //SimulationStatus status = m_simManager->getStatus();
 
 #ifndef iMSTK_USE_Vulkan
         std::dynamic_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer())->updateRenderDelegates();
@@ -133,7 +133,7 @@ OpenVRCommand::Execute(
     }
     else
     {
-        int a = eventId;
+        //int a = eventId;
     }
 }
 } // imstk

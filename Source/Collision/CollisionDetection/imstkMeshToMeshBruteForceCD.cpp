@@ -90,7 +90,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
         std::vector<std::vector<bool>> E2(numVertices, std::vector<bool>(numVertices, 1));
         const auto                     triangleVertices = mesh2->getTrianglesVertices();
 
-        for (int k = 0; k < numLines; ++k)
+        for (size_t k = 0; k < numLines; ++k)
         {
             const auto   nodes = mesh1->getLinesVertices()[k];
             const size_t i1    = nodes[0];
@@ -212,8 +212,9 @@ MeshToMeshBruteForceCD::computeCollisionData()
         for (size_t k = 0; k < elements.size(); ++k)
         {
             const SurfaceMesh::TriangleArray& tri = elements[k];
-            size_t                            i1  = tri[0];
-            size_t                            i2  = tri[1];
+
+            size_t i1 = tri[0];
+            size_t i2 = tri[1];
 
             if (E[i1][i2] && E[i2][i1])
             {

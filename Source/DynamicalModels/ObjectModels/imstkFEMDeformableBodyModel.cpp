@@ -476,10 +476,10 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
                                                      kinematicState&       newState,
                                                      const StateUpdateType updateType)
 {
-    auto& uPrev = stateAtT.getQ();
+    //auto& uPrev = stateAtT.getQ();
     auto& vPrev = stateAtT.getQDot();
     auto& u     = newState.getQ();
-    auto& v     = newState.getQDot();
+    //auto& v     = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
@@ -646,10 +646,10 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
     const Vectord&        solution,
     const StateUpdateType updateType)
 {
-    auto&        uPrev = m_previousState->getQ();
-    auto&        u     = m_currentState->getQ();
-    auto&        v     = m_currentState->getQDot();
-    const double dT    = m_timeIntegrator->getTimestepSize();
+    auto& uPrev = m_previousState->getQ();
+    //auto&        u     = m_currentState->getQ();
+    auto&        v  = m_currentState->getQDot();
+    const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
@@ -674,6 +674,9 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 NonLinearSystem::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
+#pragma warning( push )
+#pragma warning( disable : 4100 )
+
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool semiImplicit)->const Vectord&
            {
@@ -686,11 +689,15 @@ FEMDeformableBodyModel::getFunction()
                }
                return m_Feff;
            };
+
+#pragma warning( pop )
 }
 
 NonLinearSystem::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
+#pragma warning( push )
+#pragma warning( disable : 4100 )
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord& q)->const SparseMatrixd&
            {
@@ -702,6 +709,8 @@ FEMDeformableBodyModel::getFunctionGradient()
                }
                return m_Keff;
            };
+
+#pragma warning( pop )
 }
 
 NonLinearSystem::UpdateFunctionType

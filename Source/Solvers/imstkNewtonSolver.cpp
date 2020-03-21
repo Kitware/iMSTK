@@ -97,7 +97,7 @@ NewtonSolver::solve()
     auto&   u  = m_nonLinearSystem->getUnknownVector();
     Vectord du = u; // make this a class member in future
 
-    double error0, error;
+    double error0 = MAX_D, error = MAX_D;
     double epsilon = m_relativeTolerance * m_relativeTolerance;
     for (iterNum = 0; iterNum < m_maxIterations; ++iterNum)
     {

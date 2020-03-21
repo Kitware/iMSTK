@@ -131,7 +131,7 @@ public:
 
 private:
 
-    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints;
-    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints;
+    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
+    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk

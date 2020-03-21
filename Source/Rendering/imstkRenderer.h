@@ -34,7 +34,7 @@ public:
     ///
     /// \brief Enumerations for the render mode
     ///
-    enum Mode
+    enum class Mode
     {
         EMPTY,
         DEBUG,

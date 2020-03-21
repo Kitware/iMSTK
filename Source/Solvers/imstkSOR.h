@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Constructors/Destructor
     ///
-    SOR(const double relaxationFactor = 0.5) { m_type = Type::SuccessiveOverRelaxation; };
+    SOR(const double relaxationFactor = 0.5) : m_relaxationFactor(relaxationFactor) { m_type = Type::SuccessiveOverRelaxation; };
     SOR(const SparseMatrixd& A, const Vectord& rhs);
     ~SOR() = default;
 
@@ -137,7 +137,7 @@ public:
 private:
     double m_relaxationFactor = 0.5;
 
-    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints;
-    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints;
+    std::vector<LinearProjectionConstraint>* m_FixedLinearProjConstraints   = nullptr;
+    std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
 } // imstk

@@ -56,6 +56,6 @@ VRPNArduinoDeviceClient::analogChangeHandler(void* userData, const _vrpn_ANALOGC
 
     //deviceClient->m_ypr << a.channel[0], a.channel[1], a.channel[2];
     //deviceClient->m_accel << a.channel[3], a.channel[4], a.channel[5];
-    deviceClient->m_roll = a.channel[0];
+    deviceClient->m_roll = (float)a.channel[0];
 }
 } // imstk
