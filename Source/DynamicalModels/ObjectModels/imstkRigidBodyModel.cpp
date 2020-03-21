@@ -313,11 +313,16 @@ RigidBodyModel::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
         PxForceMode::eFORCE, wakeup);
 }
 
+#pragma warning( push )
+#pragma warning( disable : 4100 )
 //TODO updating body states as in
 void
 RigidBodyModel::updateBodyStates(const Vectord& q, const StateUpdateType updateType /* = stateUpdateType::displacement*/)
 {
+    LOG(WARNING) << "RigidBodyModel::updateBodyStates Not implemented!";
 }
+
+#pragma warning( pop )
 
 void
 RigidBodyModel::configure(const std::shared_ptr<Geometry>              geom,

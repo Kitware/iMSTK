@@ -50,6 +50,7 @@ public:
 
     ///
     /// \brief Update decal transforms
+    /// \todo clear warning C4100
     ///
     void updateDecal(glm::mat4& viewMatrix);
 

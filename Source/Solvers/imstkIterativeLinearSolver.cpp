@@ -69,7 +69,7 @@ void
 IterativeLinearSolver::solve(Vectord& x)
 {
     LOG(WARNING) << "IterativeLinearSolver::solve is not implemented!";
-
+    x;
     /*
     if (!m_linearSystem)
     {

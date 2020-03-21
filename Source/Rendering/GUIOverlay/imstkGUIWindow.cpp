@@ -50,8 +50,12 @@ Window::clear()
     m_widgets.clear();
 }
 
+#pragma warning(push)
+#pragma warning( disable : 4100 )
+/// \todo clear C4100
 void
 Window::render(const bool inWindow)
+#pragma warning(pop)
 {
     ImGui::SetNextWindowPos(ImVec2(m_position[0], m_position[1]));
     ImGui::SetNextWindowSize(ImVec2(m_width, m_height));

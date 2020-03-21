@@ -49,8 +49,11 @@ Decal::applyScaling(const double s)
     m_dimensions *= s;
 }
 
+#pragma warning(push)
+#pragma warning( disable : 4100 )
 void
 Decal::updateDecal(glm::mat4& viewMatrix)
+#pragma warning(pop)
 {
     glm::mat4 transform;
 

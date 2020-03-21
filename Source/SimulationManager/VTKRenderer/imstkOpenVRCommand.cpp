@@ -35,6 +35,11 @@ OpenVRCommand::Execute(
     unsigned long eventId,
     void*         callData)
 {
+    /// \todo Clear warnings  caller, callData are not used!
+    // prevent warnings
+    caller;
+    callData;
+
     if (!m_simManager)
     {
         return;

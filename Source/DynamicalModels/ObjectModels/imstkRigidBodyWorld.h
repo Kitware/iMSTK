@@ -94,7 +94,7 @@ public:
     float getTimeStep() const { return m_timeStep; }
 
 protected:
-    float m_timeStep = 1. / 300.;
+    float m_timeStep = 1.f / 300.f;
 private:
 
 

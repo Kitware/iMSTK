@@ -152,7 +152,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
             {
                 surfaceTri.push_back(triArray { { a, b, c } });
                 surfaceTriTet.push_back(tetId);
-                tetRemainingVert.push_back(3 - t);
+                tetRemainingVert.push_back((size_t)(3 - t));
             }
             else
             {

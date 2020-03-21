@@ -402,12 +402,15 @@ vtkCapsuleSource::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
+#pragma warning(push)
+#pragma warning(disable : 4100)
 int
 vtkCapsuleSource::RequestInformation(
     vtkInformation*        vtkNotUsed(request),
     vtkInformationVector** vtkNotUsed(inputVector),
     vtkInformationVector*  outputVector)
 {
+    std::cout << "WARNING-vtkCapsuleSource::RequestInformation is not implemented!" << std::endl;
     // get the info object
     /*vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
@@ -425,3 +428,5 @@ vtkCapsuleSource::RequestInformation(
 
     return 1;
 }
+
+#pragma warning(pop)
