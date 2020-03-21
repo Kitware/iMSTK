@@ -27,7 +27,11 @@
 // vega
 #include "generateMassMatrix.h"
 #include "generateMeshGraph.h"
+
+#pragma warning( push )
+#pragma warning( disable : 4458 )
 #include "configFile.h"
+#pragma warning( pop )
 
 namespace imstk
 {

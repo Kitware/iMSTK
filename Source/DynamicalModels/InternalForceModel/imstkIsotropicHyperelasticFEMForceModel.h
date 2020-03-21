@@ -27,7 +27,11 @@
 #include "imstkInternalForceModel.h"
 
 //vega
+#pragma warning( push )
+#pragma warning( disable : 4458 )
 #include "isotropicHyperelasticFEM.h"
+#pragma warning( pop )
+
 #include "StVKIsotropicMaterial.h"
 #include "neoHookeanIsotropicMaterial.h"
 #include "MooneyRivlinIsotropicMaterial.h"

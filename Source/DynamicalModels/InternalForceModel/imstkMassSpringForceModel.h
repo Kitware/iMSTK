@@ -25,8 +25,11 @@
 
 #include "imstkInternalForceModel.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4458 )
 //vega
 #include "massSpringSystem.h"
+#pragma warning( pop )
 
 namespace imstk
 {
