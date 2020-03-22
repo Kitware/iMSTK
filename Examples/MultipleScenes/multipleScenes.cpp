@@ -159,7 +159,7 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt      = 0.03;
+    pbdParams->m_DefaultDt = 0.03;
     pbdParams->m_maxIter = 5;
 
     // Set the parameters
