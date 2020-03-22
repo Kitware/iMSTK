@@ -42,8 +42,8 @@ main()
     StdVectorOfVec3d vertList;
     const double     width  = 10.0;
     const double     height = 10.0;
-    const int        nRows  = 11;
-    const int        nCols  = 11;
+    const int        nRows  = 16;
+    const int        nCols  = 16;
     vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -64,8 +64,22 @@ main()
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i* nCols + j, (i + 1) * nCols + j, i* nCols + j + 1 } };
-            tri[1] = { { (i + 1) * nCols + j + 1, i* nCols + j + 1, (i + 1) * nCols + j } };
+            const size_t               index1 = i * nCols + j;
+            const size_t               index2 = index1 + nCols;
+            const size_t               index3 = index1 + 1;
+            const size_t               index4 = index2 + 1;
+
+            // Interleave [/][\]
+            if (i % 2 ^ j % 2)
+            {
+                tri[0] = { { index1, index2, index3 } };
+                tri[1] = { { index4, index3, index2 } };
+            }
+            else
+            {
+                tri[0] = { { index2, index4, index1 } };
+                tri[1] = { { index4, index3, index1 } };
+            }
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
@@ -93,9 +107,9 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
-    pbdParams->m_dt      = 0.03;
-    pbdParams->m_maxIter = 5;
+    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
+    pbdParams->m_DefaultDt = 0.005;
+    pbdParams->m_maxIter   = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

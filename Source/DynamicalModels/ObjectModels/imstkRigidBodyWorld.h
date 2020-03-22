@@ -87,7 +87,7 @@ public:
     /// \brief Set the time step for the entire physX scene
     ///
     void setTimeStep(const float dT) { m_timeStep = dT; };
-    
+
     ///
     /// \brief Return the time step size
     ///
@@ -96,7 +96,6 @@ public:
 protected:
     float m_timeStep = 1.f / 300.f;
 private:
-
 
     static RigidBodyWorld* m_rigidBodyWorldInstance;
 

@@ -64,7 +64,6 @@ IterativeLinearSolver::print() const
     LOG(INFO) << "Solver type (direct/iterative): Iterative";
 }
 
-
 void
 IterativeLinearSolver::solve(Vectord& x)
 {
