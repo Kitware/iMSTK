@@ -519,14 +519,12 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
                                                  kinematicState&       newState,
                                                  const StateUpdateType updateType)
 {
-   
-
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
     case StateUpdateType::deltaVelocity:
-        
+
         stateAtT;// supress warning (state is not used in this update type hence can be ignored)
 
         this->updateMassMatrix();

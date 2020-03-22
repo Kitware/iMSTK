@@ -42,7 +42,7 @@ MeshToMeshBruteForceCD::MeshToMeshBruteForceCD(std::shared_ptr<Geometry>      ob
 {
 }
 
-// The above error is caused by the 
+// The above error is caused by the
 void
 MeshToMeshBruteForceCD::computeCollisionData()
 {

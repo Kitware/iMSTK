@@ -116,7 +116,7 @@ public:
     void setTimeStep(const double timeStep)
     {
         if (m_rigidBodyWorld)
-        {  
+        {
             m_rigidBodyWorld->setTimeStep((float)timeStep);
         }
     }
