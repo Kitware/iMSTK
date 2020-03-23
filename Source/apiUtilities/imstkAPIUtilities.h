@@ -60,7 +60,7 @@ createVisualAnalyticalSceneObject(Geometry::Type type,
                                   const double scale = 1.,
                                   const Vec3d t      = Vec3d(0., 0., 0.))
 {
-    CHECK(scene) << "createVisualAnalyticalSceneObject: Scene is not valid!";
+    CHECK(scene != nullptr) << "createVisualAnalyticalSceneObject: Scene is not valid!";
     CHECK(!objName.empty()) << "createVisualAnalyticalSceneObject: Name is empty!";
 
     std::shared_ptr<Geometry> geom;
@@ -111,7 +111,7 @@ createCollidingAnalyticalSceneObject(Geometry::Type type,
                                      const double scale = 1.,
                                      const Vec3d t      = Vec3d(0., 0., 0.))
 {
-    CHECK(scene) << "createCollidingSphereSceneObject: Scene is not valid!";
+    CHECK(scene != nullptr) << "createCollidingSphereSceneObject: Scene is not valid!";
     CHECK(!objName.empty()) << "createCollidingAnalyticalSceneObject: Name is empty!";
 
     std::shared_ptr<Geometry> geom;
@@ -153,7 +153,7 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
                               const std::string      fileName,
                               const std::string      objectName)
 {
-    CHECK(scene) << "createAndAddVisualSceneObject: Scene is not valid!";
+    CHECK(scene != nullptr) << "createAndAddVisualSceneObject: Scene is not valid!";
     CHECK(!fileName.empty()) << "createAndAddVisualSceneObject: Name is empty!";
 
     auto mesh = MeshIO::read(fileName);
@@ -174,7 +174,7 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
 std::shared_ptr<NonLinearSystem>
 createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 {
-    CHECK(dynaModel) << "createNonLinearSystem: Dynamic model is not valid!";
+    CHECK(dynaModel != nullptr) << "createNonLinearSystem: Dynamic model is not valid!";
 
     auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),

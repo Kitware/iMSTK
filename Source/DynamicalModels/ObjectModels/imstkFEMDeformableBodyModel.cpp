@@ -181,7 +181,7 @@ bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
-    CHECK(m_geometry && m_FEModelConfig) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
+    CHECK(m_geometry != nullptr && m_FEModelConfig != nullptr) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
 
     auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
@@ -323,7 +323,7 @@ FEMDeformableBodyModel::initializeForceModel()
 bool
 FEMDeformableBodyModel::initializeMassMatrix()
 {
-    CHECK(m_geometry) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
+    CHECK(m_geometry != nullptr) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
 
     vega::SparseMatrix* vegaMatrix;
     vega::GenerateMassMatrix::computeMassMatrix(m_vegaPhysicsMesh.get(), &vegaMatrix, true);//caveat
@@ -390,14 +390,14 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 bool
 FEMDeformableBodyModel::initializeTangentStiffness()
 {
-    CHECK(m_internalForceModel)
+    CHECK(m_internalForceModel != nullptr)
         << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
 
     vega::SparseMatrix* matrix = nullptr;
     m_internalForceModel->getTangentStiffnessMatrixTopology(&matrix);
 
-    CHECK(matrix) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
-    CHECK(m_vegaMassMatrix) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
+    CHECK(matrix != nullptr) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
+    CHECK(m_vegaMassMatrix != nullptr) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
 
     matrix->BuildSubMatrixIndices(*m_vegaMassMatrix.get());
 

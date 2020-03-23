@@ -96,8 +96,8 @@ protected:
     ///
     /// \brief Writes the given volumetric mesh to given file path
     ///
-    static bool VTKMeshIO::writeVtkUnstructuredGrid(const TetrahedralMesh& tetMesh, const std::string& filePath);
-    static bool VTKMeshIO::writeVtkUnstructuredGrid(const HexahedralMesh& hMesh, const std::string& filePath);
+    static bool writeVtkUnstructuredGrid(const TetrahedralMesh& tetMesh, const std::string& filePath);
+    static bool writeVtkUnstructuredGrid(const HexahedralMesh& hMesh, const std::string& filePath);
 
     ///
     /// \brief
