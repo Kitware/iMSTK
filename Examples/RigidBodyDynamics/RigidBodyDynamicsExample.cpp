@@ -41,13 +41,13 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
     // Load a tetrahedral mesh
     auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
-    CHECK(tetMesh) << "Could not read mesh from file.";
+    CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
 
     // Extract the surface mesh
     auto surfMesh   = std::make_shared<SurfaceMesh>();
     auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
 
-    CHECK(volTetMesh) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+    CHECK(volTetMesh != nullptr) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
 
     volTetMesh->scale(15., Geometry::TransformType::ApplyToData);
     volTetMesh->translate(pos, Geometry::TransformType::ApplyToData);
