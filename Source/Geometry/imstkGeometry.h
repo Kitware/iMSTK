@@ -27,6 +27,11 @@
 #include "imstkParallelUtils.h"
 
 #include <string>
+#include <memory>
+#include <numeric>
+#include <unordered_set>
+#include <set>
+
 
 namespace imstk
 {
@@ -218,4 +223,207 @@ protected:
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transformation matrix
     double m_scaling = 1.0;
 };
+
+class GeometricUtils {
+public:
+    ///
+    /// \brief Reverse Cuthill-Mckee; return the permutation vector that maps from new indices to old indices
+    //
+    /// \param conn element-to-vertex connectivity
+    /// \param numVerts number of vertices
+    ///
+    template <typename ElemConn>
+    static std::vector<size_t>
+    RCM(const std::vector<ElemConn>& conn, const size_t numVerts)
+    {
+        // connectivity of vertex-to-vertex
+        std::vector<std::unordered_set<size_t>> vertToVert;
+        buildVertToVert(conn, numVerts, vertToVert);
+        return RCM(vertToVert);
+    }
+
+    ///
+    /// \brief Reverse Cuthill-Mckee; returns the permutation vector that map from new indices to old indices
+    ///
+    /// \param neighbors array of neighbors of each vertex; eg, neighbors[i] is an object containing all neighbors of vertex-i
+    ///
+    template <typename NBR>
+    static std::vector<size_t>
+    RCM(const std::vector<NBR>& neighbors)
+    {
+        const size_t INVALID = std::numeric_limits<size_t>::max();
+
+        // is greater in terms of degrees
+        auto isGreater = [&neighbors](const size_t i, const size_t j) {
+            return neighbors[i].size() > neighbors[j].size() ? true : false;
+        };
+
+        const size_t numVerts = neighbors.size();
+
+        std::vector<size_t> P(numVerts);
+        for (size_t i = 0; i < numVerts; ++i)
+        {
+            P[i] = i;
+        }
+        std::sort(P.begin(), P.end(), isGreater);
+
+        // an alternative is to use std::set for P
+        // std::set<size_t, isGreater> P;
+        // for (size_t i=0; i<numVerts; ++i)
+        // {
+        //     P.insert(i);
+        // }
+
+        std::vector<size_t> R(numVerts, INVALID);   // permutation
+        std::queue<size_t>  Q;                      // queue
+        std::vector<bool>   isInP(numVerts, true);  // if a vertex is still in P
+        size_t              pos = 0;  // track how many vertices are put into R
+
+        ///
+        /// \brief Move a vertex into R, and enque its neighbors into Q in ascending order.
+        /// \param vid index of vertex to be moved into R
+        ///
+        auto moveIntoRAndNbrIntoQ = [&neighbors, &isInP, &pos, &R, &Q](const size_t vid) {
+            R[pos] = vid;
+            ++pos;
+            isInP[vid] = false;
+
+            // Put the unordered neighbors into Q, in ascending order.
+            // first find unordered neighbors
+            std::set<size_t> unorderedNbrs;
+            for (auto nbr : neighbors[vid])
+            {
+                if (isInP[nbr])
+                {
+                    unorderedNbrs.insert(nbr);
+                }
+            }
+
+            for (auto nbr : unorderedNbrs)
+            {
+                Q.push(nbr);
+                isInP[nbr] = false;
+            }
+        };
+
+        size_t pCur = 0;
+
+        ///
+        /// \brief pop a vertex that is not ordered from \p P
+        ///
+        auto popFromP = [&pCur, &isInP]() {
+            for (size_t vid = pCur; vid < isInP.size(); ++vid)
+            {
+                if (isInP[vid])
+                {
+                    isInP[vid] = false;
+                    pCur       = vid;
+                    return vid;
+                }
+            }
+            return INVALID;
+        };
+
+        // main loop
+        while (true)
+        {
+            std::size_t parent = popFromP();
+            if (parent == INVALID)
+            {
+                break;
+            }
+
+            moveIntoRAndNbrIntoQ(parent);
+
+            while (!Q.empty())
+            {
+                parent = Q.front();
+                Q.pop();
+                moveIntoRAndNbrIntoQ(parent);
+            }
+
+            // here we have empty Q
+        }
+
+        CHECK(pos == numVerts);
+
+        std::reverse(R.begin(), R.end());
+        return R;
+    }
+
+private:
+    ///
+    /// \brief Build the vertex-to-vertex connectivity
+    /// 
+    /// \param conn element-to-vertex connectivity
+    /// \param numVerts number of vertices
+    /// \param vertToVert the vertex-to-vertex connectivity on return
+    ///
+    template <typename ElemConn>
+    static void
+    buildVertToVert(const std::vector<ElemConn>&             conn,
+                    const size_t                             numVerts,
+                    std::vector<std::unordered_set<size_t>>& vertToVert)
+    {
+        // constexpr size_t numVertPerElem = ElemConn::size();
+        std::vector<size_t> vertToElemPtr(numVerts + 1, 0);
+        std::vector<size_t> vertToElem;
+
+        // find the number of adjacent elements for each vertex
+        for (const auto& vertices : conn)
+        {
+            for (auto vid : vertices)
+            {
+                vertToElemPtr[vid + 1] += 1;
+            }
+        }
+
+        // accumulate pointer
+        for (size_t i = 0; i < numVerts; ++i)
+        {
+            vertToElemPtr[i + 1] += vertToElemPtr[i];
+        }
+
+        // track the number
+        auto   pos    = vertToElemPtr;
+        size_t totNum = vertToElemPtr.back();
+
+        vertToElem.resize(totNum);
+
+        for (size_t eid = 0; eid < conn.size(); ++eid)
+        {
+            for (auto vid : conn[eid])
+            {
+                vertToElem[pos[vid]] = eid;
+                ++pos[vid];
+            }
+        }
+
+        // connectivity of vertex-to-vertex
+        vertToVert.resize(numVerts);
+        auto getVertexNbrs = [&vertToElem, &vertToElemPtr, &conn, &vertToVert](const size_t i) {
+            const auto ptr0 = vertToElemPtr[i];
+            const auto ptr1 = vertToElemPtr[i + 1];
+            size_t     eid;
+
+            for (auto ptr = ptr0; ptr < ptr1; ++ptr)
+            {
+                eid = vertToElem[ptr];
+                for (auto vid : conn[eid])
+                {
+                    // vertex-i itself is also included.
+                    vertToVert[i].insert(vid);
+                }
+            }
+        };
+
+        for (size_t i = 0; i < numVerts; ++i)
+        {
+            getVertexNbrs(i);
+        }
+    }
+
+};  // class GeometricUtils 
+
+
 } //imstk
