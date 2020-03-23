@@ -75,7 +75,7 @@ PBDCollisionHandling::processCollisionData()
     }*/
     this->generatePBDConstraints();
 
-    CHECK(m_PBDSolver!=nullptr) << "No PbdSolver found to handle the Collision constraints!";
+    CHECK(m_PBDSolver != nullptr) << "No PbdSolver found to handle the Collision constraints!";
 
     m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
 }

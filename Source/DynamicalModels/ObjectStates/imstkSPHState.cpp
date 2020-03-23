@@ -55,7 +55,7 @@ SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
 void
 SPHSimulationState::initializeData()
 {
-    CHECK(m_KinematicState!=nullptr) << "SPH basic state has not been initialized";
+    CHECK(m_KinematicState != nullptr) << "SPH basic state has not been initialized";
 
     size_t numParticles = m_KinematicState->getNumParticles();
 

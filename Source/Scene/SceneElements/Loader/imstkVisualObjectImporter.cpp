@@ -53,7 +53,7 @@ VisualObjectImporter::importVisualObject(
     auto             scene = importer.ReadFile(modelFilePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
-    CHECK(scene!=nullptr && scene->HasMeshes()) << "AssimpMeshIO::readMeshData error: could not read with reader.";
+    CHECK(scene != nullptr && scene->HasMeshes()) << "AssimpMeshIO::readMeshData error: could not read with reader.";
 
     std::vector<std::string> materialTextureCoreFileNames;
     std::vector<std::string> materialTextureFileExtensions;

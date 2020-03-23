@@ -31,12 +31,12 @@ namespace imstk
 void
 OneToOneMap::compute()
 {
-    CHECK(m_master!=nullptr && m_slave!=nullptr) << "OneToOneMap map is being applied without valid geometries";
+    CHECK(m_master != nullptr && m_slave != nullptr) << "OneToOneMap map is being applied without valid geometries";
 
     auto meshMaster = std::dynamic_pointer_cast<PointSet>(m_master);
     auto meshSlave  = std::dynamic_pointer_cast<PointSet>(m_slave);
 
-    CHECK(meshMaster!=nullptr && meshSlave!=nullptr) << "Fail to cast from geometry to pointset";
+    CHECK(meshMaster != nullptr && meshSlave != nullptr) << "Fail to cast from geometry to pointset";
 
     m_oneToOneMap.clear();
     ParallelUtils::SpinLock lock;
@@ -176,7 +176,7 @@ OneToOneMap::apply()
     }
 
     // Check geometries
-    CHECK(m_master!=nullptr && m_slave!=nullptr) << "OneToOneMap map is being applied without valid geometries";
+    CHECK(m_master != nullptr && m_slave != nullptr) << "OneToOneMap map is being applied without valid geometries";
 
     // Check data
     CHECK(m_oneToOneMap.size() == m_oneToOneMapVector.size()) << "Internal data is corrupted";
