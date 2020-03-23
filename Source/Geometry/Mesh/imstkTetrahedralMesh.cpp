@@ -368,70 +368,6 @@ TetrahedralMesh::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, c
     return mesh;
 }
 
-#if 0
-std::shared_ptr<TetrahedralMesh>
-TetrahedralMesh::createEnclosingMesh(const SurfaceMesh& surfMesh, const size_t nx, const size_t ny,
-                                     const size_t nz)
-{
-    // Given the index of a tet, return the corresponding index of the hex
-    auto tetIdToHexId = [](const size_t tetId) { return tetId / 5; }
-
-                        Vec3d aabbMin, aabbMax;
-    const double              paddingPerc = 10.0;
-    PointSet.computeBoundingBox(aabbMin, aabbMax, paddingPerc);
-    const Vec3d h = { (aabbMax[0] - aabbMin[0]) / nx,
-                      (aabbMax[1] - aabbMin[1]) / ny,
-                      (aabbMax[2] - aabbMin[2]) / nz };
-
-    auto findHexId = [&aabbMin, &aabbMax, &h](const Vec3d& xyz) {
-                         size_t idX = (xyz[0] - aabbMin[0]) / h[0];
-                         size_t idY = (xyz[1] - aabbMin[1]) / h[1];
-                         size_t idZ = (xyz[2] - aabbMin[2]) / h[2];
-                         return { idX, idY, idZ };
-                     };
-
-    auto uniformMesh = createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
-
-    std::vector<bool> enclosePoint(uniformMesh.getNumHexahedra(), false);
-
-    // ParallelUtils::parallelFor(surfMesh.getNumVertices(), [&](const size_t vid) {
-    //     auto xyz = surfMesh.getVertexPosition(vid);
-    //     size_t idX = (xyz[0] - aabbMin[0]) / h[0];
-    //     size_t idY = (xyz[1] - aabbMin[1]) / h[1];
-    //     size_t idZ = (xyz[2] - aabbMin[2]) / h[2];
-    //     size_t hexId = idX + idY *nx + idZ * nx*ny;
-    //     size_t tetId0 = 5*hexId;
-    //     size_t tetId1 = tetId0 + 5;
-    //
-    //
-    //     static ParallelUtils::SpinLock lock;
-    //     lock.lock();
-    //     for (size_t id = tetId0; id<tetId1; ++id)
-    //     {
-    //         enclosePoint[id] = true;
-    //     }
-    //     lock.unlock();
-    // });
-
-    for (size_t vid = 0; vid < surfMesh.getNumVertices(); ++vid)
-    {
-        auto   xyz    = surfMesh.getVertexPosition(vid);
-        size_t idX    = (xyz[0] - aabbMin[0]) / h[0];
-        size_t idY    = (xyz[1] - aabbMin[1]) / h[1];
-        size_t idZ    = (xyz[2] - aabbMin[2]) / h[2];
-        size_t hexId  = idX + idY * nx + idZ * nx * ny;
-        size_t tetId0 = 5 * hexId;
-        size_t tetId1 = tetId0 + 5;
-
-        for (size_t i = tetId0; i < tetId1; ++i)
-        {
-            enclosePoint[i] = true;
-        }
-    }
-}
-
-#endif
-
 std::shared_ptr<TetrahedralMesh>
 TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh, const size_t nx, const size_t ny,
                                             const size_t nz)
@@ -444,7 +380,8 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
 
     // ray-tracing
     const auto& coords = uniformMesh->getVertexPositions();
-    auto        insideSurfMesh = surfMesh->markPointsInsideAndOut(coords);
+    // auto        insideSurfMesh = surfMesh->markPointsInsideAndOut(coords);
+    auto insideSurfMesh = surfMesh->markPointsInsideAndOut(coords, nx + 1, ny + 1, nz + 1);
 
     // label elements
     std::vector<bool> validTet(uniformMesh->getNumTetrahedra(), false);
@@ -455,14 +392,13 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
                       (aabbMax[1] - aabbMin[1]) / ny,
                       (aabbMax[2] - aabbMin[2]) / nz };
 
+    // a customized approach to find the enclosing tet for each surface points
     // TODO: can be parallelized by make NUM_THREADS copies of validTet, or use atomic op on validTet
-    auto labelEnclosingTet = [&surfMesh, &uniformMesh, &aabbMin, &h, nx, ny, nz, &validTet](const size_t i)
+    auto labelEnclosingTet = [&aabbMin, &h, nx, ny, nz, &uniformMesh, &validTet](const Vec3d& xyz)
                              {
-                                 const auto& xyz = surfMesh->getVertexPosition(i);
-                                 // find the hex that encloses the point;
-                                 size_t idX   = (size_t)((xyz[0] - aabbMin[0]) / h[0]);
-                                 size_t idY   = (size_t)((xyz[1] - aabbMin[1]) / h[1]);
-                                 size_t idZ   = (size_t)((xyz[2] - aabbMin[2]) / h[2]);
+                                 size_t idX   = (xyz[0] - aabbMin[0]) / h[0];
+                                 size_t idY   = (xyz[1] - aabbMin[1]) / h[1];
+                                 size_t idZ   = (xyz[2] - aabbMin[2]) / h[2];
                                  size_t hexId = idX + idY * nx + idZ * nx * ny;
 
                                  // the index range of tets inside the enclosing hex
@@ -470,30 +406,30 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
                                  size_t    tetId0 = numDiv * hexId;
                                  size_t    tetId1 = tetId0 + numDiv;
 
+                                 static TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
+
                                  // loop over the tets to find the enclosing tets
-                                 bool                          found   = false;
-                                 TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
                                  for (size_t id = tetId0; id < tetId1; ++id)
                                  {
+                                     if (validTet[id])
+                                     {
+                                         continue;
+                                     }
                                      uniformMesh->computeBarycentricWeights(id, xyz, weights);
 
                                      if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
                                      {
                                          validTet[id] = true;
-                                         found = true;
                                          break;
                                      }
                                  }
-
-                                 // TODO: not sure how to do thread-safe logging
-                                 CHECK(found) << "Failed to find the enclosing tetrahedron";
                              };
 
-    // a customized approach to find the enclosing tet for each surface points
-    for (size_t i = 0; i < surfMesh->getNumVertices(); ++i)
-    {
-        labelEnclosingTet(i);
-    }
+    auto labelEnclosingTetOfVertices = [&surfMesh, &uniformMesh, &aabbMin, &h, nx, ny, nz, &labelEnclosingTet, &validTet](const size_t i)
+                                       {
+                                           const auto& xyz = surfMesh->getVertexPosition(i);
+                                           labelEnclosingTet(xyz);
+                                       };
 
     for (size_t i = 0; i < validTet.size(); ++i)
     {
@@ -505,6 +441,46 @@ TetrahedralMesh::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMes
         {
             validTet[i] = true;
         }
+    }
+
+    // find the enclosing tets of a group of points on a surface triangle
+    auto labelEnclosingTetOfInteriorPnt = [&surfMesh, &labelEnclosingTet](const size_t fid)
+                                          {
+                                              auto               verts = surfMesh->getTrianglesVertices()[fid];
+                                              const auto&        vtx0  = surfMesh->getVertexPosition(verts[0]);
+                                              const auto&        vtx1  = surfMesh->getVertexPosition(verts[1]);
+                                              const auto&        vtx2  = surfMesh->getVertexPosition(verts[2]);
+                                              std::vector<Vec3d> pnts(12);
+
+                                              pnts[0]  = 0.75 * vtx0 + 0.25 * vtx1;
+                                              pnts[1]  = 0.50 * vtx0 + 0.50 * vtx1;
+                                              pnts[2]  = 0.25 * vtx0 + 0.75 * vtx1;
+                                              pnts[3]  = 0.75 * vtx1 + 0.25 * vtx2;
+                                              pnts[4]  = 0.50 * vtx1 + 0.50 * vtx2;
+                                              pnts[5]  = 0.25 * vtx1 + 0.75 * vtx2;
+                                              pnts[6]  = 0.75 * vtx2 + 0.25 * vtx0;
+                                              pnts[7]  = 0.50 * vtx2 + 0.50 * vtx0;
+                                              pnts[8]  = 0.25 * vtx2 + 0.75 * vtx0;
+                                              pnts[9]  = 2.0 / 3.0 * pnts[0] + 1.0 / 3.0 * pnts[5];
+                                              pnts[10] = 0.5 * (pnts[1] + pnts[4]);
+                                              pnts[11] = 0.5 * (pnts[4] + pnts[7]);
+
+                                              for (size_t i = 0; i < pnts.size(); ++i)
+                                              {
+                                                  labelEnclosingTet(pnts[i]);
+                                              }
+                                          };
+
+    // enclose all vertices
+    for (size_t i = 0; i < surfMesh->getNumVertices(); ++i)
+    {
+        labelEnclosingTetOfVertices(i);
+    }
+
+    // enclose some interior points on triangles
+    for (size_t i = 0; i < surfMesh->getNumTriangles(); ++i)
+    {
+        labelEnclosingTetOfInteriorPnt(i);
     }
 
     size_t numElems = 0;
