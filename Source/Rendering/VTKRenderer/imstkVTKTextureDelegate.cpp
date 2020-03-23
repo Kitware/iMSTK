@@ -65,7 +65,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
 
             imgReader = readerFactory->CreateImageReader2(sideName.c_str());
 
-            CHECK(imgReader) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+            CHECK(imgReader!=nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
                              << sideName;
 
             auto imageFlip = vtkSmartPointer<vtkImageFlip>::New();
@@ -81,7 +81,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
         vtkImageReader2* imgReader;
         imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
 
-        CHECK(imgReader) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+        CHECK(imgReader!=nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
                          << tFileName;
 
         imgReader->SetFileName(tFileName.c_str());

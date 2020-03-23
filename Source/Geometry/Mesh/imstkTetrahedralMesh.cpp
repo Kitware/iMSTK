@@ -103,7 +103,7 @@ bool
 TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
                                     const bool                   enforceWindingConsistency /* = false*/)
 {
-    CHECK(surfaceMesh)
+    CHECK(surfaceMesh!=nullptr)
         << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
 
     using triArray = SurfaceMesh::TriangleArray;

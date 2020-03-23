@@ -45,7 +45,7 @@ loadMesh(std::string externalDataSuffix)
     std::shared_ptr<TetrahedralMesh> volMesh
         = std::static_pointer_cast<TetrahedralMesh>(imstk::MeshIO::read(file));
 
-    CHECK(volMesh) << "Failed to read a volumetric mesh file : " << file;
+    CHECK(volMesh!=nullptr) << "Failed to read a volumetric mesh file : " << file;
 
     return volMesh;
 }

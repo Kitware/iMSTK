@@ -36,7 +36,7 @@ PickingCH::PickingCH(const CollisionHandling::Side&       side,
 void
 PickingCH::processCollisionData()
 {
-    CHECK(m_object) << "PickingCH::handleCollision error: "
+    CHECK(m_object!=nullptr) << "PickingCH::handleCollision error: "
                     << "no picking collision handling available the object";
 
     this->addPickConstraints(m_object);
@@ -52,7 +52,7 @@ PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
         return;
     }
 
-    CHECK(deformableObj) << "PenaltyRigidCH::addPickConstraints error: "
+    CHECK(deformableObj!=nullptr) << "PenaltyRigidCH::addPickConstraints error: "
                          << " not a deformable object.";
 
     const auto& Uprev = deformableObj->getDisplacements();

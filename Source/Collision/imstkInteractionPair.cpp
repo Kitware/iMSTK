@@ -36,7 +36,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     m_valid = false;
 
     // Check that objects exist
-    CHECK(A && B) << "InteractionPair error: invalid objects (nullptr).";
+    CHECK(A!=nullptr && B!=nullptr) << "InteractionPair error: invalid objects (nullptr).";
 
     // Check if objects are different
     /*if (A == B)
@@ -48,7 +48,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     // Collision Detection
     std::shared_ptr<CollisionDetection> CD = CollisionDetection::makeCollisionDetectionObject(CDType, A, B, m_colData);
 
-    CHECK(CD) << "InteractionPair error: can not instantiate collision detection algorithm.";
+    CHECK(CD!=nullptr) << "InteractionPair error: can not instantiate collision detection algorithm.";
 
     // Collision Handling A
     std::shared_ptr<CollisionHandling> CHA;
@@ -56,7 +56,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     {
         CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
 
-        CHECK(CHA) << "InteractionPair error: can not instantiate collision handling for '"
+        CHECK(CHA!=nullptr) << "InteractionPair error: can not instantiate collision handling for '"
                    << A->getName() << "' object.";
     }
 
@@ -66,7 +66,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     {
         CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
 
-        CHECK(CHB) << "InteractionPair error: can not instantiate collision handling for '"
+        CHECK(CHB!=nullptr) << "InteractionPair error: can not instantiate collision handling for '"
                    << B->getName() << "' object.";
     }
 
@@ -87,7 +87,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject>    A,
     m_valid = false;
 
     // Check that objects exist
-    CHECK(A && B) << "InteractionPair error: invalid objects (nullptr).";
+    CHECK(A!=nullptr && B!=nullptr) << "InteractionPair error: invalid objects (nullptr).";
 
     // Check if objects are different
     /*if (A == B)

@@ -32,7 +32,7 @@ Viewer::getActiveScene() const
 const std::shared_ptr<Renderer>&
 Viewer::getActiveRenderer() const
 {
-    CHECK(m_activeScene) << "no active scene!";
+    CHECK(m_activeScene!=nullptr) << "no active scene!";
 
     return m_rendererMap.at(m_activeScene);
 }
