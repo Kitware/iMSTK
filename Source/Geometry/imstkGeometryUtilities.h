@@ -181,9 +181,9 @@ std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(const SurfaceMesh& s
 ///
 /// \brief Enumeration for reordering method
 ///
-enum class ReorderMethod
+enum class MeshNodeRenumberingStrategy
 {
-    RCM // Reverse Cuthill-Mckee
+    ReverseCuthillMckee // Reverse Cuthill-Mckee
 };
 
 ///
@@ -196,7 +196,7 @@ enum class ReorderMethod
 ///
 template <typename NeighborContainer>
 std::vector<size_t>
-reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const ReorderMethod& method=ReorderMethod::RCM);
+reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const MeshNodeRenumberingStrategy& method=MeshNodeRenumberingStrategy::ReverseCuthillMckee);
 
 ///
 /// \brief Reorder using Reverse Cuthill-Mckee
@@ -209,6 +209,6 @@ reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const Reord
 ///
 template <typename ElemConn>
 std::vector<size_t>
-reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const ReorderMethod& method=ReorderMethod::RCM);
+reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const MeshNodeRenumberingStrategy& method=MeshNodeRenumberingStrategy::ReverseCuthillMckee);
 } // namespace GeometryUtils
 } // namespace imstk

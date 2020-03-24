@@ -22,7 +22,7 @@
 #include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkGeometryUtilities.h"
-
+#include "imstkLogUtility.h"
 #include "bandwidth.h"
 
 using namespace imstk;
@@ -38,7 +38,11 @@ std::pair<std::vector<QuadConn>, size_t> createConn();
 template <typename ElemConn>
 void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts);
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv) 
+{
+
+    auto logUtil = std::make_shared<LogUtility>();
+    logUtil->createLogger("simulation", "./");
      
     // a 2D Cartesian mesh
     {
@@ -46,25 +50,21 @@ int main(int argc, char** argv) {
         testRCM(p.first, p.second);
     }
 
-    // dragon mesh
+    // 3D mesh
     {
-        auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-        auto conn = tetMesh->getTetrahedraVertices(); 
-        auto numVerts = tetMesh->getNumVertices();
-        std::cout << "num of vertices = " << numVerts << std::endl;
-        testRCM(conn, numVerts);
+        auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));        
+        const auto numVerts = tetMesh->getNumVertices();
+        std::cout << "Number of vertices = " << numVerts << std::endl;
+        testRCM(tetMesh->getTetrahedraVertices(), numVerts);
     }
 
-    // a mesh cover
+    // a surface mesh cover
     {
-        const size_t nx = 80;
-        const size_t ny = 40;
-        const size_t nz = 60;
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-        auto tetMesh = GeometryUtils::createTetrahedralMeshCover(*surfMesh, nx, ny, nz);
+        auto tetMesh = GeometryUtils::createTetrahedralMeshCover(*surfMesh, 80, 40, 60);
         auto conn = tetMesh->getTetrahedraVertices(); 
         auto numVerts = tetMesh->getNumVertices();
-        std::cout << "num of vertices = " << numVerts << std::endl;
+        std::cout << "Number of vertices = " << numVerts << std::endl;
         testRCM(conn, numVerts);
     }
 
@@ -74,11 +74,10 @@ int main(int argc, char** argv) {
 template <typename ElemConn>
 void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts) 
 {
-    std::cout << "bandwidth_old = " << bandwidth(conn, numVerts) << std::endl;
+    std::cout << "Old bandwidth = " << bandwidth(conn, numVerts) << std::endl;
 
     // new-to-old permutation
-    auto perm = GeometryUtils::reorderConnectivity(conn, numVerts);
-    // auto perm = GeometryUtils::RCM(conn, numVerts);
+    auto perm = GeometryUtils::reorderConnectivity(conn, numVerts);   
 
     // old-to-new permutation
     std::vector<size_t> invPerm(perm.size());
@@ -94,12 +93,12 @@ void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts)
     {
         for (auto& vid : vertices)
         {
-            CHECK(vid < numVerts);
+            CHECK(vid < numVerts) << "Vertex id invalid since its greater than the number of vertices";
             vid = invPerm[vid];
         }
     }
 
-    std::cout << "bandwidth_new = " << bandwidth(newConn, numVerts) << "\n" << std::endl;
+    std::cout << "New bandwidth = " << bandwidth(newConn, numVerts) << "\n" << std::endl;
 
     return;
 }

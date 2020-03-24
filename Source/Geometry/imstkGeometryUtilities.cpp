@@ -464,7 +464,7 @@ RCM(const std::vector<NeighborContainer>& neighbors)
     }
     std::sort(P.begin(), P.end(), isGreater);
 
-    // TODO: an alternative is to use std::set for P
+    // \todo an alternative is to use std::set for P
     // std::set<size_t, isGreater> P;
     // for (size_t i=0; i<numVerts; ++i)
     // {
@@ -506,26 +506,19 @@ RCM(const std::vector<NeighborContainer>& neighbors)
 
     size_t pCur = 0;
 
-    ///
-    /// \brief pop a vertex that is not ordered from \p P
-    ///
-    auto popFromP = [&pCur, &isInP]() {
+    // main loop
+    while (true)
+    {
+        size_t parent = invalid;
         for (size_t vid = pCur; vid < isInP.size(); ++vid)
         {
             if (isInP[vid])
             {
                 isInP[vid] = false;
-                pCur       = vid;
-                return vid;
+                pCur = vid;
+                parent =  vid;
             }
         }
-        return invalid;
-    };
-
-    // main loop
-    while (true)
-    {
-        std::size_t parent = popFromP();
         if (parent == invalid)
         {
             break;
@@ -598,7 +591,11 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
         return;
     };
 
-    auto triangleRayIntersection = [](const Vec3d& xyz, const Vec3d& triVert0, const Vec3d& triVert1, const Vec3d& triVert2, const Vec3d& direction)
+    auto triangleRayIntersection = [](const Vec3d& xyz, 
+                                      const Vec3d& triVert0, 
+                                      const Vec3d& triVert1, 
+                                      const Vec3d& triVert2, 
+                                      const Vec3d& direction)
     {
         // const double eps = 1e-15;
         constexpr const double eps   = std::numeric_limits<double>::epsilon();
@@ -674,7 +671,15 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
         bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz2[2]);
     }
 
-    auto rayTracingFunc = [&coords, &aabbMin, &aabbMax, &bBoxMin, &bBoxMax, &isInside, &triangleRayIntersection, &genRandomDirection, &surfaceMesh](const size_t i) 
+    auto rayTracingFunc = [&coords, 
+                           &aabbMin, 
+                           &aabbMax, 
+                           &bBoxMin, 
+                           &bBoxMax, 
+                           &isInside, 
+                           &triangleRayIntersection, 
+                           &genRandomDirection, 
+                           &surfaceMesh](const size_t i) 
     {
         bool outBox = coords[i][0] < aabbMin[0] || coords[i][0] > aabbMax[0]
                       || coords[i][1] < aabbMin[1] || coords[i][1] > aabbMax[1]
@@ -684,7 +689,7 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
             return;
         }
 
-        // TODO: generate a random direction?
+        /// \todo generate a random direction?
         const Vec3d direction = { 0.0, 0.0, 1.0 };
         // Vec3d direction;
         // genRandomDirection(direction);
@@ -779,7 +784,6 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
     /// \param[out] distance on return it is the distance of the point and the triangle
     auto triangleRayIntersection = [](const Vec3d& xyz, const Vec3d& triVert0, const Vec3d& triVert1, const Vec3d& triVert2, const Vec3d& direction, double& distance)
     {
-        // const double eps = 1e-15;
         const double eps   = std::numeric_limits<double>::epsilon();
         const Vec3d edge0 = triVert1 - triVert0;
         const Vec3d edge1 = triVert2 - triVert0;
@@ -942,8 +946,11 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
 } // anonymous namespace
 
 std::shared_ptr<TetrahedralMesh>
-GeometryUtils::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx,
-                                   const size_t ny, const size_t nz)
+GeometryUtils::createUniformMesh(const Vec3d& aabbMin, 
+                                 const Vec3d& aabbMax, 
+                                 const size_t nx,
+                                 const size_t ny, 
+                                 const size_t nz)
 {
     const Vec3d h = { (aabbMax[0] - aabbMin[0]) / nx,
                       (aabbMax[1] - aabbMin[1]) / ny,
@@ -1013,7 +1020,9 @@ GeometryUtils::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, con
 }
 
 std::shared_ptr<TetrahedralMesh>
-GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const size_t nx, const size_t ny,
+GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, 
+                                          const size_t nx, 
+                                          const size_t ny,
                                           const size_t nz)
 {
     Vec3d aabbMin, aabbMax;
@@ -1037,7 +1046,7 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const siz
                       (aabbMax[2] - aabbMin[2]) / nz };
 
     // a customized approach to find the enclosing tet for each surface points
-    // TODO: can be parallelized by make NUM_THREADS copies of validTet, or use atomic op on validTet
+    /// \todo can be parallelized by make NUM_THREADS copies of validTet, or use atomic op on validTet
     auto labelEnclosingTet = [&aabbMin, &h, nx, ny, nz, &uniformMesh, &validTet](const Vec3d& xyz)
     {
         const size_t idX   = (xyz[0] - aabbMin[0]) / h[0];
@@ -1153,8 +1162,8 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const siz
 
     StdVectorOfVec3d    newCoords(numVerts);
     std::vector<size_t> oldToNew(coords.size(), std::numeric_limits<size_t>::max());
-    size_t              cnt = 0;
-
+    
+    size_t cnt = 0;
     for (size_t i = 0; i < validVtx.size(); ++i)
     {
         if (validVtx[i])
@@ -1193,11 +1202,11 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const siz
 
 template <typename NeighborContainer>
 std::vector<size_t>
-GeometryUtils::reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const ReorderMethod& method)
+GeometryUtils::reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const MeshNodeRenumberingStrategy& method)
 {
     switch (method)
     {
-    case (ReorderMethod::RCM) :
+    case (MeshNodeRenumberingStrategy::ReverseCuthillMckee) :
         return RCM(neighbors);
     default:
         LOG(WARNING) << "Unrecognized reorder method; using RCM instead";
@@ -1207,19 +1216,19 @@ GeometryUtils::reorderConnectivity(const std::vector<NeighborContainer>& neighbo
 
 template <typename ElemConn>
 std::vector<size_t>
-GeometryUtils::reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const ReorderMethod& method)
+GeometryUtils::reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const MeshNodeRenumberingStrategy& method)
 {
     switch (method)
     {
-    case (ReorderMethod::RCM) :
+    case (MeshNodeRenumberingStrategy::ReverseCuthillMckee) :
         return RCM(conn, numVerts);
     default:
-        LOG(WARNING) << "Unrecognized reorder method; using RCM instead";
+        LOG(WARNING) << "Unrecognized reorder method; using Reverse Cuthill-Mckee strategy instead";
         return RCM(conn, numVerts);
     }
 }
 } // namespace imstk 
 
-template std::vector<size_t> imstk::GeometryUtils::reorderConnectivity<std::set<size_t>>(const std::vector<std::set<size_t>>&, const GeometryUtils::ReorderMethod&);
+template std::vector<size_t> imstk::GeometryUtils::reorderConnectivity<std::set<size_t>>(const std::vector<std::set<size_t>>&, const GeometryUtils::MeshNodeRenumberingStrategy&);
 
-template std::vector<size_t> imstk::GeometryUtils::reorderConnectivity<std::array<size_t, 4>>(const std::vector<std::array<size_t, 4>>&, const size_t, const ReorderMethod&);
+template std::vector<size_t> imstk::GeometryUtils::reorderConnectivity<std::array<size_t, 4>>(const std::vector<std::array<size_t, 4>>&, const size_t, const MeshNodeRenumberingStrategy&);
