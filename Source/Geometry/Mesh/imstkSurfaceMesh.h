@@ -212,26 +212,6 @@ public:
     ///
     size_t getMaxNumTriangles();
 
-    ///
-    /// \brief Given a set of points mark them as inside (true) and outside
-    /// \param coords a set of points to be tested
-    ///
-    /// \note this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
-    ///
-    std::vector<bool> markPointsInsideAndOut(const StdVectorOfVec3d& coords);
-
-    ///
-    /// \brief Given a set of uniformly spaced points, mark them as inside (true) and outside.
-    /// It makes uses of ray-tracing but skips points based on the nearest distance between current point and the surface.
-    ///
-    /// \param coords a set of points to be tested
-    /// \param nx number of points in x-direction
-    /// \param ny number of points in y-direction
-    /// \param nz number of points in z-direction
-    /// \note this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
-    ///
-    std::vector<bool> markPointsInsideAndOut(const StdVectorOfVec3d& coords, const size_t nx, const size_t ny, const size_t nz);
-
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;

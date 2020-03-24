@@ -53,7 +53,7 @@ PointSet::print() const
 }
 
 void
-PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
+PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent) const
 {
     updatePostTransformData();
     ParallelUtils::findAABB(m_vertexPositions, lowerCorner, upperCorner);

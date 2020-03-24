@@ -21,7 +21,7 @@
 
 #include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkGeometry.h"
+#include "imstkGeometryUtilities.h"
 
 #include "bandwidth.h"
 
@@ -51,6 +51,7 @@ int main(int argc, char** argv) {
         auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
         auto conn = tetMesh->getTetrahedraVertices(); 
         auto numVerts = tetMesh->getNumVertices();
+        std::cout << "num of vertices = " << numVerts << std::endl;
         testRCM(conn, numVerts);
     }
 
@@ -60,9 +61,10 @@ int main(int argc, char** argv) {
         const size_t ny = 40;
         const size_t nz = 60;
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-        auto tetMesh = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
+        auto tetMesh = GeometryUtils::createTetrahedralMeshCover(*surfMesh, nx, ny, nz);
         auto conn = tetMesh->getTetrahedraVertices(); 
         auto numVerts = tetMesh->getNumVertices();
+        std::cout << "num of vertices = " << numVerts << std::endl;
         testRCM(conn, numVerts);
     }
 
@@ -75,13 +77,14 @@ void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts)
     std::cout << "bandwidth_old = " << bandwidth(conn, numVerts) << std::endl;
 
     // new-to-old permutation
-    auto perm = GeometricUtils::RCM(conn, numVerts);
+    auto perm = GeometryUtils::reorderConnectivity(conn, numVerts);
+    // auto perm = GeometryUtils::RCM(conn, numVerts);
 
     // old-to-new permutation
     std::vector<size_t> invPerm(perm.size());
     for (size_t i=0; i<perm.size(); ++i)
     {
-        CHECK(perm[i] < numVerts);
+        CHECK(perm[i] < numVerts) << "new vertex index should not be greater than number of vertices";
         invPerm[perm[i]] = i;
     }
 

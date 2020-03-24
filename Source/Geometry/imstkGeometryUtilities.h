@@ -21,9 +21,16 @@
 
 #pragma once
 
+#include "g3log/g3log.hpp"
 #include "imstkMath.h"
-#include <memory>
 #include <vtkSmartPointer.h>
+#include "imstkParallelUtils.h"
+
+#include <memory>
+#include <numeric>
+#include <queue>
+#include <unordered_set>
+#include <set>
 
 class vtkCellArray;
 class vtkPolyData;
@@ -153,5 +160,55 @@ std::unique_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(const SurfaceMesh& surfa
 /// for more details
 ///
 std::unique_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions = 1);
+
+///
+/// \brief Create a tetrahedral mesh based on a uniform Cartesian mesh
+/// \param aabbMin  the small conner of a box
+/// \param aabbMax  the large conner of a box
+/// \param nx number of elements in the x-direction
+/// \param ny number of elements in the y-direction
+/// \param nz number of elements in the z-direction
+///
+/// \note Refer: Dompierre, Julien & Labbé, Paul & Vallet, Marie-Gabrielle & Camarero, Ricardo. (1999).
+/// How to Subdivide Pyramids, Prisms, and Hexahedra into Tetrahedra.. 195-204.
+std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx, const size_t ny, const size_t nz);
+
+///
+/// \brief Create a tetrahedral mesh cover
+///
+std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const size_t nx, const size_t ny, size_t nz);
+
+///
+/// \brief Enumeration for reordering method
+///
+enum class ReorderMethod
+{
+    RCM // Reverse Cuthill-Mckee
 };
-}
+
+///
+/// \brief Reorder indices in a connectivity to reduce bandwidth
+///
+/// \param[in] neighbors array of neighbors of each vertex; eg, neighbors[i] is an object containing all neighbors of vertex-i
+/// \param[i] method reordering method; see \ref ReorderMethod
+///
+/// \return the permutation vector that map from new indices to old indices
+///
+template <typename NeighborContainer>
+std::vector<size_t>
+reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const ReorderMethod& method=ReorderMethod::RCM);
+
+///
+/// \brief Reorder using Reverse Cuthill-Mckee
+///
+/// \param[in] conn element-to-vertex connectivity
+/// \param[in] numVerts number of vertices
+/// \param[in] method reordering method; see \ref ReorderMethod
+///
+/// \return the permutation vector that maps from new indices to old indices
+///
+template <typename ElemConn>
+std::vector<size_t>
+reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const ReorderMethod& method=ReorderMethod::RCM);
+} // namespace GeometryUtils
+} // namespace imstk

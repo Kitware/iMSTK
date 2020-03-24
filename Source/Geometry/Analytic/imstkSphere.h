@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Compute the bounding box for the geometry
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const override;
 
 protected:
     friend class VTKSphereRenderDelegate;
