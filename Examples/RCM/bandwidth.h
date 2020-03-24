@@ -5,7 +5,7 @@
 /// \param numVerts number of vertice in the map
 /// \retval vertToVert vertex-to-vertex connectivity
 ///
-template <typename ElemConn>
+template<typename ElemConn>
 static void
 buildVertToVert(const std::vector<ElemConn>&             conn,
                 const size_t                             numVerts,
@@ -48,20 +48,20 @@ buildVertToVert(const std::vector<ElemConn>&             conn,
     // connectivity of vertex-to-vertex
     vertToVert.resize(numVerts);
     auto getVertexNbrs = [&vertToElem, &vertToElemPtr, &conn, &vertToVert](const size_t i) {
-        const auto ptr0 = vertToElemPtr[i];
-        const auto ptr1 = vertToElemPtr[i + 1];
-        size_t     eid;
+                             const auto ptr0 = vertToElemPtr[i];
+                             const auto ptr1 = vertToElemPtr[i + 1];
+                             size_t     eid;
 
-        for (auto ptr = ptr0; ptr < ptr1; ++ptr)
-        {
-            eid = vertToElem[ptr];
-            for (auto vid : conn[eid])
-            {
-                // vertex-i itself is also included.
-                vertToVert[i].insert(vid);
-            }
-        }
-    };
+                             for (auto ptr = ptr0; ptr < ptr1; ++ptr)
+                             {
+                                 eid = vertToElem[ptr];
+                                 for (auto vid : conn[eid])
+                                 {
+                                     // vertex-i itself is also included.
+                                     vertToVert[i].insert(vid);
+                                 }
+                             }
+                         };
 
     for (size_t i = 0; i < numVerts; ++i)
     {
@@ -74,7 +74,7 @@ buildVertToVert(const std::vector<ElemConn>&             conn,
 ///
 /// \param neighbors array of neighbors of each vertex; eg, neighbors[i] is a object containing
 ///
-template <typename NBR>
+template<typename NBR>
 size_t
 bandwidth(const std::vector<NBR>& neighbors)
 {
@@ -97,7 +97,7 @@ bandwidth(const std::vector<NBR>& neighbors)
 /// \param conn element-to-vertex connectivity of the map
 /// \param numVerts number of vertices in the map
 ///
-template <typename ElemConn>
+template<typename ElemConn>
 size_t
 bandwidth(const std::vector<ElemConn>& conn, const size_t numVerts)
 {

@@ -28,7 +28,6 @@
 
 #include <string>
 
-
 namespace imstk
 {
 ///
@@ -219,5 +218,4 @@ protected:
     RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transformation matrix
     double m_scaling = 1.0;
 };
-
 } //imstk

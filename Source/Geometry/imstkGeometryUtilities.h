@@ -194,9 +194,8 @@ enum class MeshNodeRenumberingStrategy
 ///
 /// \return the permutation vector that map from new indices to old indices
 ///
-template <typename NeighborContainer>
-std::vector<size_t>
-reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const MeshNodeRenumberingStrategy& method=MeshNodeRenumberingStrategy::ReverseCuthillMckee);
+template<typename NeighborContainer>
+std::vector<size_t> reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const MeshNodeRenumberingStrategy& method = MeshNodeRenumberingStrategy::ReverseCuthillMckee);
 
 ///
 /// \brief Reorder using Reverse Cuthill-Mckee
@@ -207,8 +206,7 @@ reorderConnectivity(const std::vector<NeighborContainer>& neighbors, const MeshN
 ///
 /// \return the permutation vector that maps from new indices to old indices
 ///
-template <typename ElemConn>
-std::vector<size_t>
-reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const MeshNodeRenumberingStrategy& method=MeshNodeRenumberingStrategy::ReverseCuthillMckee);
+template<typename ElemConn>
+std::vector<size_t> reorderConnectivity(const std::vector<ElemConn>& conn, const size_t numVerts, const MeshNodeRenumberingStrategy& method = MeshNodeRenumberingStrategy::ReverseCuthillMckee);
 } // namespace GeometryUtils
 } // namespace imstk

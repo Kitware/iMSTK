@@ -609,5 +609,4 @@ SurfaceMesh::getMaxNumTriangles()
 {
     return m_maxNumTriangles;
 }
-
 }  // namespace imstk
