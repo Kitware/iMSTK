@@ -480,7 +480,8 @@ RCM(const std::vector<NeighborContainer>& neighbors)
     /// \brief Move a vertex into R, and enque its neighbors into Q in ascending order.
     /// \param vid index of vertex to be moved into R
     ///
-    auto moveVertexIntoRAndItsNeighborsIntoQ = [&neighbors, &isInP, &pos, &R, &Q](const size_t vid) {
+    auto moveVertexIntoRAndItsNeighborsIntoQ = [&neighbors, &isInP, &pos, &R, &Q](const size_t vid) 
+    {
         R[pos] = vid;
         ++pos;
         isInP[vid] = false;
@@ -582,58 +583,58 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
     Vec3d aabbMin, aabbMax;
     surfaceMesh.computeBoundingBox(aabbMin, aabbMax, 1.);
 
-    auto genRandomDirection = [](Vec3d& dir)
-                              {
-                                  for (int i = 0; i < 3; ++i)
-                                  {
-                                      dir[i] = rand();
-                                  }
-                                  double mag = dir.norm();
+    auto genRandomDirection = [](Vec3d& direction)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            direction[i] = rand();
+        }
+        double mag = direction.norm();
 
-                                  for (int i = 0; i < 3; ++i)
-                                  {
-                                      dir[i] /= mag;
-                                  }
-                                  return;
-                              };
+        for (int i = 0; i < 3; ++i)
+        {
+            direction[i] /= mag;
+        }
+        return;
+    };
 
-    auto intersectTriangle = [](const Vec3d& xyz, const Vec3d& xyz0, const Vec3d& xyz1, const Vec3d& xyz2, const Vec3d& dir)
-                             {
-                                 // const double eps = 1e-15;
-                                 constexpr const double eps   = std::numeric_limits<double>::epsilon();
-                                 Vec3d                  edge0 = xyz1 - xyz0;
-                                 Vec3d                  edge1 = xyz2 - xyz0;
-                                 Vec3d                  pvec  = dir.cross(edge1);
-                                 double                 det   = edge0.dot(pvec);
+    auto triangleRayIntersection = [](const Vec3d& xyz, const Vec3d& triVert0, const Vec3d& triVert1, const Vec3d& triVert2, const Vec3d& direction)
+    {
+        // const double eps = 1e-15;
+        constexpr const double eps   = std::numeric_limits<double>::epsilon();
+        Vec3d                  edge0 = triVert1 - triVert0;
+        Vec3d                  edge1 = triVert2 - triVert0;
+        Vec3d                  pvec  = direction.cross(edge1);
+        double                 det   = edge0.dot(pvec);
 
-                                 if (det > -eps && det < eps)
-                                 {
-                                     return false;
-                                 }
-                                 double inv_det = 1.0 / det;
-                                 Vec3d  tvec    = xyz - xyz0;
-                                 double u       = tvec.dot(pvec) * inv_det;
-                                 if (u < 0.0 || u > 1.0)
-                                 {
-                                     return false;
-                                 }
-                                 Vec3d  qvec = tvec.cross(edge0);
-                                 double v    = dir.dot(qvec) * inv_det;
-                                 if (v < 0.0 || u + v > 1.0)
-                                 {
-                                     return false;
-                                 }
+        if (det > -eps && det < eps)
+        {
+            return false;
+        }
+        double inv_det = 1.0 / det;
+        Vec3d  tvec    = xyz - triVert0;
+        double u       = tvec.dot(pvec) * inv_det;
+        if (u < 0.0 || u > 1.0)
+        {
+            return false;
+        }
+        Vec3d  qvec = tvec.cross(edge0);
+        double v    = direction.dot(qvec) * inv_det;
+        if (v < 0.0 || u + v > 1.0)
+        {
+            return false;
+        }
 
-                                 double t = edge1.dot(qvec) * inv_det;
-                                 if (t > 0.0)
-                                 {
-                                     return true;
-                                 }
-                                 else
-                                 {
-                                     return false;
-                                 }
-                             };
+        double t = edge1.dot(qvec) * inv_det;
+        if (t > 0.0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
 
     std::vector<Vec3d> bBoxMin;
     std::vector<Vec3d> bBoxMax;
@@ -673,69 +674,70 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
         bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz2[2]);
     }
 
-    auto rayTracingFunc = [&coords, &aabbMin, &aabbMax, &bBoxMin, &bBoxMax, &isInside, &intersectTriangle, &genRandomDirection, &surfaceMesh](const size_t i) {
-                              bool outBox = coords[i][0] < aabbMin[0] || coords[i][0] > aabbMax[0]
-                                            || coords[i][1] < aabbMin[1] || coords[i][1] > aabbMax[1]
-                                            || coords[i][2] < aabbMin[2] || coords[i][2] > aabbMax[2];
-                              if (outBox)
-                              {
-                                  return;
-                              }
+    auto rayTracingFunc = [&coords, &aabbMin, &aabbMax, &bBoxMin, &bBoxMax, &isInside, &triangleRayIntersection, &genRandomDirection, &surfaceMesh](const size_t i) 
+    {
+        bool outBox = coords[i][0] < aabbMin[0] || coords[i][0] > aabbMax[0]
+                      || coords[i][1] < aabbMin[1] || coords[i][1] > aabbMax[1]
+                      || coords[i][2] < aabbMin[2] || coords[i][2] > aabbMax[2];
+        if (outBox)
+        {
+            return;
+        }
 
-                              // TODO: generate a random direction?
-                              const Vec3d direction = { 0.0, 0.0, 1.0 };
-                              // Vec3d direction;
-                              // genRandomDirection(direction);
-                              // std::cout << direction << std::endl;
-                              int         numIntersections = 0;
-                              const auto& xyz = surfaceMesh.getVertexPositions();
-                              const auto& triVerts = surfaceMesh.getTrianglesVertices();
+        // TODO: generate a random direction?
+        const Vec3d direction = { 0.0, 0.0, 1.0 };
+        // Vec3d direction;
+        // genRandomDirection(direction);
+        // std::cout << direction << std::endl;
+        int         numIntersections = 0;
+        const auto& xyz = surfaceMesh.getVertexPositions();
+        const auto& triVerts = surfaceMesh.getTrianglesVertices();
 
-                              for (size_t j = 0; j < surfaceMesh.getNumTriangles(); ++j)
-                              {
-                                  const auto& verts = triVerts[j];
+        for (size_t j = 0; j < surfaceMesh.getNumTriangles(); ++j)
+        {
+            const auto& verts = triVerts[j];
 
-                                  // consider directed ray
-                                  if (coords[i][2] > bBoxMax[j][2])
-                                  {
-                                      continue;
-                                  }
+            // consider directed ray
+            if (coords[i][2] > bBoxMax[j][2])
+            {
+                continue;
+            }
 
-                                  if (coords[i][0] > bBoxMax[j][0])
-                                  {
-                                      continue;
-                                  }
-                                  if (coords[i][0] < bBoxMin[j][0])
-                                  {
-                                      continue;
-                                  }
-                                  if (coords[i][1] > bBoxMax[j][1])
-                                  {
-                                      continue;
-                                  }
-                                  if (coords[i][1] < bBoxMin[j][1])
-                                  {
-                                      continue;
-                                  }
+            if (coords[i][0] > bBoxMax[j][0])
+            {
+                continue;
+            }
+            if (coords[i][0] < bBoxMin[j][0])
+            {
+                continue;
+            }
+            if (coords[i][1] > bBoxMax[j][1])
+            {
+                continue;
+            }
+            if (coords[i][1] < bBoxMin[j][1])
+            {
+                continue;
+            }
 
-                                  auto intersected = intersectTriangle(coords[i],
-                                                 xyz[verts[0]],
-                                                 xyz[verts[1]],
-                                                 xyz[verts[2]],
-                                                 direction);
-                                  if (intersected)
-                                  {
-                                      ++numIntersections;
-                                  }
-                              }
+            auto intersected = triangleRayIntersection(coords[i],
+                           xyz[verts[0]],
+                           xyz[verts[1]],
+                           xyz[verts[2]],
+                           direction);
+            if (intersected)
+            {
+                ++numIntersections;
+            }
+        }
 
-                              if (numIntersections % 2 == 1)
-                              {
-                                  isInside[i] = true;
-                              }
+        if (numIntersections % 2 == 1)
+        {
+            isInside[i] = true;
+        }
 
-                              return;
-                          };
+        return;
+    };
 
     // for (size_t i = 0; i < coords.size(); ++i)
     // {
@@ -768,50 +770,50 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
     Vec3d aabbMin, aabbMax;
     surfaceMesh.computeBoundingBox(aabbMin, aabbMax, 1.);
     // space between two adjacent points
-    Vec3d h = { coords[1][0] - coords[0][0], coords[nx][1] - coords[0][1], coords[nx * ny][2] - coords[0][2] };
+    const Vec3d h = { coords[1][0] - coords[0][0], coords[nx][1] - coords[0][1], coords[nx * ny][2] - coords[0][2] };
 
     /// \brief if a ray intersects with a triangle.
     /// \param xyz starting point of ray
-    /// \param xyz0 xyz0, xyz1, xyz2 are 3 vertices of the triangle
-    /// \param dir direction of the ray
-    /// \param dist on return it is the distance of the point and the triangle
-    auto intersectTriangle = [](const Vec3d& xyz, const Vec3d& xyz0, const Vec3d& xyz1, const Vec3d& xyz2, const Vec3d& dir, double& dist)
-                             {
-                                 // const double eps = 1e-15;
-                                 const double eps   = std::numeric_limits<double>::epsilon();
-                                 Vec3d        edge0 = xyz1 - xyz0;
-                                 Vec3d        edge1 = xyz2 - xyz0;
-                                 Vec3d        pvec  = dir.cross(edge1);
-                                 double       det   = edge0.dot(pvec);
+    /// \param triVert0 triVert0, triVert1, triVert2 are 3 vertices of the triangle
+    /// \param direction direction of the ray
+    /// \param[out] distance on return it is the distance of the point and the triangle
+    auto triangleRayIntersection = [](const Vec3d& xyz, const Vec3d& triVert0, const Vec3d& triVert1, const Vec3d& triVert2, const Vec3d& direction, double& distance)
+    {
+        // const double eps = 1e-15;
+        const double eps   = std::numeric_limits<double>::epsilon();
+        const Vec3d edge0 = triVert1 - triVert0;
+        const Vec3d edge1 = triVert2 - triVert0;
+        const Vec3d pvec  = direction.cross(edge1);
+        const double det  = edge0.dot(pvec);
 
-                                 if (det > -eps && det < eps)
-                                 {
-                                     return false;
-                                 }
-                                 double inv_det = 1.0 / det;
-                                 Vec3d  tvec    = xyz - xyz0;
-                                 double u       = tvec.dot(pvec) * inv_det;
-                                 if (u < 0.0 || u > 1.0)
-                                 {
-                                     return false;
-                                 }
-                                 Vec3d  qvec = tvec.cross(edge0);
-                                 double v    = dir.dot(qvec) * inv_det;
-                                 if (v < 0.0 || u + v > 1.0)
-                                 {
-                                     return false;
-                                 }
+        if (det > -eps && det < eps)
+        {
+            return false;
+        }
+        const double inv_det = 1.0 / det;
+        const Vec3d  tvec    = xyz - triVert0;
+        const double u       = tvec.dot(pvec) * inv_det;
+        if (u < 0.0 || u > 1.0)
+        {
+            return false;
+        }
+        const Vec3d  qvec = tvec.cross(edge0);
+        const double v    = direction.dot(qvec) * inv_det;
+        if (v < 0.0 || u + v > 1.0)
+        {
+            return false;
+        }
 
-                                 dist = edge1.dot(qvec) * inv_det;
-                                 if (dist > 0.0)
-                                 {
-                                     return true;
-                                 }
-                                 else
-                                 {
-                                     return false;
-                                 }
-                             };
+        distance = edge1.dot(qvec) * inv_det;
+        if (distance > 0.0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
 
     std::vector<Vec3d> bBoxMin;
     std::vector<Vec3d> bBoxMax;
@@ -821,117 +823,117 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
 
     /// \brief find the bounding boxes of each surface triangle
     auto findBoundingBox = [&](const size_t idx)
-                           {
-                               const auto& verts = surfaceMesh.getTrianglesVertices().at(idx);
-                               const auto& vertXyz = surfaceMesh.getVertexPositions();
-                               const auto& xyz0  = vertXyz[verts[0]];
-                               const auto& xyz1  = vertXyz[verts[1]];
-                               const auto& xyz2  = vertXyz[verts[2]];
+    {
+        const auto& verts = surfaceMesh.getTrianglesVertices().at(idx);
+        const auto& vertXyz = surfaceMesh.getVertexPositions();
+        const auto& xyz0  = vertXyz[verts[0]];
+        const auto& xyz1  = vertXyz[verts[1]];
+        const auto& xyz2  = vertXyz[verts[2]];
 
-                               bBoxMin[idx][0] = xyz0[0];
-                               bBoxMin[idx][1] = xyz0[1];
-                               bBoxMin[idx][2] = xyz0[2];
-                               bBoxMax[idx][0] = xyz0[0];
-                               bBoxMax[idx][1] = xyz0[1];
-                               bBoxMax[idx][2] = xyz0[2];
+        bBoxMin[idx][0] = xyz0[0];
+        bBoxMin[idx][1] = xyz0[1];
+        bBoxMin[idx][2] = xyz0[2];
+        bBoxMax[idx][0] = xyz0[0];
+        bBoxMax[idx][1] = xyz0[1];
+        bBoxMax[idx][2] = xyz0[2];
 
-                               bBoxMin[idx][0] = std::min(bBoxMin[idx][0], xyz1[0]);
-                               bBoxMin[idx][1] = std::min(bBoxMin[idx][1], xyz1[1]);
-                               bBoxMin[idx][2] = std::min(bBoxMin[idx][2], xyz1[2]);
-                               bBoxMin[idx][0] = std::min(bBoxMin[idx][0], xyz2[0]);
-                               bBoxMin[idx][1] = std::min(bBoxMin[idx][1], xyz2[1]);
-                               bBoxMin[idx][2] = std::min(bBoxMin[idx][2], xyz2[2]);
+        bBoxMin[idx][0] = std::min(bBoxMin[idx][0], xyz1[0]);
+        bBoxMin[idx][1] = std::min(bBoxMin[idx][1], xyz1[1]);
+        bBoxMin[idx][2] = std::min(bBoxMin[idx][2], xyz1[2]);
+        bBoxMin[idx][0] = std::min(bBoxMin[idx][0], xyz2[0]);
+        bBoxMin[idx][1] = std::min(bBoxMin[idx][1], xyz2[1]);
+        bBoxMin[idx][2] = std::min(bBoxMin[idx][2], xyz2[2]);
 
-                               bBoxMax[idx][0] = std::max(bBoxMax[idx][0], xyz1[0]);
-                               bBoxMax[idx][1] = std::max(bBoxMax[idx][1], xyz1[1]);
-                               bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz1[2]);
-                               bBoxMax[idx][0] = std::max(bBoxMax[idx][0], xyz2[0]);
-                               bBoxMax[idx][1] = std::max(bBoxMax[idx][1], xyz2[1]);
-                               bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz2[2]);
-                           };
+        bBoxMax[idx][0] = std::max(bBoxMax[idx][0], xyz1[0]);
+        bBoxMax[idx][1] = std::max(bBoxMax[idx][1], xyz1[1]);
+        bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz1[2]);
+        bBoxMax[idx][0] = std::max(bBoxMax[idx][0], xyz2[0]);
+        bBoxMax[idx][1] = std::max(bBoxMax[idx][1], xyz2[1]);
+        bBoxMax[idx][2] = std::max(bBoxMax[idx][2], xyz2[2]);
+    };
 
     ParallelUtils::parallelFor(surfaceMesh.getNumTriangles(), findBoundingBox);
 
     // ray tracing for all points in the x-axis. These points are those start with indices (0,j,k)
     // and jk = j + k*ny
     auto rayTracingLine = [&](const size_t jk)
-                          {
-                              size_t idx0   = jk * nx;
-                              bool   outBox = coords[idx0][0] < aabbMin[0] || coords[idx0][0] > aabbMax[0]
-                                              || coords[idx0][1] < aabbMin[1] || coords[idx0][1] > aabbMax[1]
-                                              || coords[idx0][2] < aabbMin[2] || coords[idx0][2] > aabbMax[2];
-                              if (outBox)
-                              {
-                                  return;
-                              }
+    {
+        size_t idx0   = jk * nx;
+        bool   outBox = coords[idx0][0] < aabbMin[0] || coords[idx0][0] > aabbMax[0]
+                        || coords[idx0][1] < aabbMin[1] || coords[idx0][1] > aabbMax[1]
+                        || coords[idx0][2] < aabbMin[2] || coords[idx0][2] > aabbMax[2];
+        if (outBox)
+        {
+            return;
+        }
 
-                              const Vec3d direction = { 1.0, 0.0, 0.0 };
-                              const auto& xyz       = surfaceMesh.getVertexPositions();
-                              const auto& triVerts  = surfaceMesh.getTrianglesVertices();
+        const Vec3d direction = { 1.0, 0.0, 0.0 };
+        const auto& xyz       = surfaceMesh.getVertexPositions();
+        const auto& triVerts  = surfaceMesh.getTrianglesVertices();
 
-                              size_t i = 0;
-                              while (i < nx)
-                              {
-                                  size_t idx = idx0 + i;
-                                  int    numIntersections = 0;
-                                  double dist    = 0.0;
-                                  double distMin = h[0] * (nz + 1);
+        size_t i = 0;
+        while (i < nx)
+        {
+            size_t idx = idx0 + i;
+            int    numIntersections = 0;
+            double dist    = 0.0;
+            double distMin = h[0] * (nz + 1);
 
-                                  for (size_t j = 0; j < surfaceMesh.getNumTriangles(); ++j)
-                                  {
-                                      const auto& verts = triVerts[j];
+            for (size_t j = 0; j < surfaceMesh.getNumTriangles(); ++j)
+            {
+                const auto& verts = triVerts[j];
 
-                                      // consider directed ray
-                                      if (coords[idx][0] > bBoxMax[j][0])
-                                      {
-                                          continue;
-                                      }
+                // consider directed ray
+                if (coords[idx][0] > bBoxMax[j][0])
+                {
+                    continue;
+                }
 
-                                      if (coords[idx][1] > bBoxMax[j][1])
-                                      {
-                                          continue;
-                                      }
-                                      if (coords[idx][1] < bBoxMin[j][1])
-                                      {
-                                          continue;
-                                      }
-                                      if (coords[idx][2] > bBoxMax[j][2])
-                                      {
-                                          continue;
-                                      }
-                                      if (coords[idx][2] < bBoxMin[j][2])
-                                      {
-                                          continue;
-                                      }
+                if (coords[idx][1] > bBoxMax[j][1])
+                {
+                    continue;
+                }
+                if (coords[idx][1] < bBoxMin[j][1])
+                {
+                    continue;
+                }
+                if (coords[idx][2] > bBoxMax[j][2])
+                {
+                    continue;
+                }
+                if (coords[idx][2] < bBoxMin[j][2])
+                {
+                    continue;
+                }
 
-                                      auto intersected = intersectTriangle(coords[idx],
-                                                     xyz[verts[0]],
-                                                     xyz[verts[1]],
-                                                     xyz[verts[2]],
-                                                     direction,
-                                                     dist);
-                                      if (intersected)
-                                      {
-                                          ++numIntersections;
-                                          distMin = std::min(dist, distMin);
-                                      }
-                                  }
+                auto intersected = triangleRayIntersection(coords[idx],
+                               xyz[verts[0]],
+                               xyz[verts[1]],
+                               xyz[verts[2]],
+                               direction,
+                               dist);
+                if (intersected)
+                {
+                    ++numIntersections;
+                    distMin = std::min(dist, distMin);
+                }
+            }
 
-                                  // core of the algorithm: points between the current one and iEnd share the same label so we can skip them.
-                                  size_t iEnd = i + static_cast<size_t>(distMin / h[0]) + 1;
-                                  iEnd = std::min(iEnd, nx);
+            // core of the algorithm: points between the current one and iEnd share the same label so we can skip them.
+            size_t iEnd = i + static_cast<size_t>(distMin / h[0]) + 1;
+            iEnd = std::min(iEnd, nx);
 
-                                  if (numIntersections % 2 == 1)
-                                  {
-                                      for (size_t ii = idx; ii < idx0 + iEnd; ++ii)
-                                      {
-                                          isInside[ii] = true;
-                                      }
-                                  }
+            if (numIntersections % 2 == 1)
+            {
+                for (size_t ii = idx; ii < idx0 + iEnd; ++ii)
+                {
+                    isInside[ii] = true;
+                }
+            }
 
-                                  i = iEnd;
-                              }
-                          };
+            i = iEnd;
+        }
+    };
 
     ParallelUtils::parallelFor(ny * nz, rayTracingLine);
 
@@ -943,12 +945,12 @@ std::shared_ptr<TetrahedralMesh>
 GeometryUtils::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx,
                                    const size_t ny, const size_t nz)
 {
-    Vec3d h = { (aabbMax[0] - aabbMin[0]) / nx,
-                (aabbMax[1] - aabbMin[1]) / ny,
-                (aabbMax[2] - aabbMin[2]) / nz };
+    const Vec3d h = { (aabbMax[0] - aabbMin[0]) / nx,
+                      (aabbMax[1] - aabbMin[1]) / ny,
+                      (aabbMax[2] - aabbMin[2]) / nz };
     LOG_IF(FATAL, (h[0] <= 0.0 || h[1] <= 0.0 || h[2] <= 0.0)) << "Invalid bounding box";
 
-    size_t numVertices = (nx + 1) * (ny + 1) * (nz + 1);
+    const size_t numVertices = (nx + 1) * (ny + 1) * (nz + 1);
 
     // std::vector<Vec3d> coords;
     StdVectorOfVec3d coords;
@@ -971,7 +973,7 @@ GeometryUtils::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, con
     }
 
     const size_t numDiv  = 6;
-    size_t       numTets = numDiv * nx * ny * nz;
+    const size_t numTets = numDiv * nx * ny * nz;
 
     std::vector<TetrahedralMesh::TetraArray> vertices;
     vertices.resize(numTets);
@@ -1012,7 +1014,7 @@ GeometryUtils::createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, con
 
 std::shared_ptr<TetrahedralMesh>
 GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const size_t nx, const size_t ny,
-                                            const size_t nz)
+                                          const size_t nz)
 {
     Vec3d aabbMin, aabbMax;
 
@@ -1023,7 +1025,7 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const siz
     // ray-tracing
     const auto& coords = uniformMesh->getVertexPositions();
     // auto        insideSurfMesh = markPointsInsideAndOut(surfMesh, coords);
-    auto insideSurfMesh = markPointsInsideAndOut(surfMesh, coords, nx + 1, ny + 1, nz + 1);
+    const auto insideSurfMesh = markPointsInsideAndOut(surfMesh, coords, nx + 1, ny + 1, nz + 1);
 
     // label elements
     std::vector<bool> validTet(uniformMesh->getNumTetrahedra(), false);
@@ -1037,41 +1039,41 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const siz
     // a customized approach to find the enclosing tet for each surface points
     // TODO: can be parallelized by make NUM_THREADS copies of validTet, or use atomic op on validTet
     auto labelEnclosingTet = [&aabbMin, &h, nx, ny, nz, &uniformMesh, &validTet](const Vec3d& xyz)
-                             {
-                                 size_t idX   = (xyz[0] - aabbMin[0]) / h[0];
-                                 size_t idY   = (xyz[1] - aabbMin[1]) / h[1];
-                                 size_t idZ   = (xyz[2] - aabbMin[2]) / h[2];
-                                 size_t hexId = idX + idY * nx + idZ * nx * ny;
+    {
+        const size_t idX   = (xyz[0] - aabbMin[0]) / h[0];
+        const size_t idY   = (xyz[1] - aabbMin[1]) / h[1];
+        const size_t idZ   = (xyz[2] - aabbMin[2]) / h[2];
+        const size_t hexId = idX + idY * nx + idZ * nx * ny;
 
-                                 // the index range of tets inside the enclosing hex
-                                 const int numDiv = 6;
-                                 size_t    tetId0 = numDiv * hexId;
-                                 size_t    tetId1 = tetId0 + numDiv;
+        // the index range of tets inside the enclosing hex
+        const int numDiv = 6;
+        const size_t tetId0 = numDiv * hexId;
+        const size_t tetId1 = tetId0 + numDiv;
 
-                                 static TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
+        static TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
 
-                                 // loop over the tets to find the enclosing tets
-                                 for (size_t id = tetId0; id < tetId1; ++id)
-                                 {
-                                     if (validTet[id])
-                                     {
-                                         continue;
-                                     }
-                                     uniformMesh->computeBarycentricWeights(id, xyz, weights);
+        // loop over the tets to find the enclosing tets
+        for (size_t id = tetId0; id < tetId1; ++id)
+        {
+            if (validTet[id])
+            {
+                continue;
+            }
+            uniformMesh->computeBarycentricWeights(id, xyz, weights);
 
-                                     if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
-                                     {
-                                         validTet[id] = true;
-                                         break;
-                                     }
-                                 }
-                             };
+            if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
+            {
+                validTet[id] = true;
+                break;
+            }
+        }
+    };
 
     auto labelEnclosingTetOfVertices = [&surfMesh, &uniformMesh, &aabbMin, &h, nx, ny, nz, &labelEnclosingTet, &validTet](const size_t i)
-                                       {
-                                           const auto& xyz = surfMesh.getVertexPosition(i);
-                                           labelEnclosingTet(xyz);
-                                       };
+    {
+        const auto& xyz = surfMesh.getVertexPosition(i);
+        labelEnclosingTet(xyz);
+    };
 
     for (size_t i = 0; i < validTet.size(); ++i)
     {
@@ -1087,31 +1089,31 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const siz
 
     // find the enclosing tets of a group of points on a surface triangle
     auto labelEnclosingTetOfInteriorPnt = [&surfMesh, &labelEnclosingTet](const size_t fid)
-                                          {
-                                              auto               verts = surfMesh.getTrianglesVertices()[fid];
-                                              const auto&        vtx0  = surfMesh.getVertexPosition(verts[0]);
-                                              const auto&        vtx1  = surfMesh.getVertexPosition(verts[1]);
-                                              const auto&        vtx2  = surfMesh.getVertexPosition(verts[2]);
-                                              std::vector<Vec3d> pnts(12);
+    {
+        auto               verts = surfMesh.getTrianglesVertices()[fid];
+        const auto&        vtx0  = surfMesh.getVertexPosition(verts[0]);
+        const auto&        vtx1  = surfMesh.getVertexPosition(verts[1]);
+        const auto&        vtx2  = surfMesh.getVertexPosition(verts[2]);
+        std::vector<Vec3d> pnts(12);
 
-                                              pnts[0]  = 0.75 * vtx0 + 0.25 * vtx1;
-                                              pnts[1]  = 0.50 * vtx0 + 0.50 * vtx1;
-                                              pnts[2]  = 0.25 * vtx0 + 0.75 * vtx1;
-                                              pnts[3]  = 0.75 * vtx1 + 0.25 * vtx2;
-                                              pnts[4]  = 0.50 * vtx1 + 0.50 * vtx2;
-                                              pnts[5]  = 0.25 * vtx1 + 0.75 * vtx2;
-                                              pnts[6]  = 0.75 * vtx2 + 0.25 * vtx0;
-                                              pnts[7]  = 0.50 * vtx2 + 0.50 * vtx0;
-                                              pnts[8]  = 0.25 * vtx2 + 0.75 * vtx0;
-                                              pnts[9]  = 2.0 / 3.0 * pnts[0] + 1.0 / 3.0 * pnts[5];
-                                              pnts[10] = 0.5 * (pnts[1] + pnts[4]);
-                                              pnts[11] = 0.5 * (pnts[4] + pnts[7]);
+        pnts[0]  = 0.75 * vtx0 + 0.25 * vtx1;
+        pnts[1]  = 0.50 * vtx0 + 0.50 * vtx1;
+        pnts[2]  = 0.25 * vtx0 + 0.75 * vtx1;
+        pnts[3]  = 0.75 * vtx1 + 0.25 * vtx2;
+        pnts[4]  = 0.50 * vtx1 + 0.50 * vtx2;
+        pnts[5]  = 0.25 * vtx1 + 0.75 * vtx2;
+        pnts[6]  = 0.75 * vtx2 + 0.25 * vtx0;
+        pnts[7]  = 0.50 * vtx2 + 0.50 * vtx0;
+        pnts[8]  = 0.25 * vtx2 + 0.75 * vtx0;
+        pnts[9]  = 2.0 / 3.0 * pnts[0] + 1.0 / 3.0 * pnts[5];
+        pnts[10] = 0.5 * (pnts[1] + pnts[4]);
+        pnts[11] = 0.5 * (pnts[4] + pnts[7]);
 
-                                              for (size_t i = 0; i < pnts.size(); ++i)
-                                              {
-                                                  labelEnclosingTet(pnts[i]);
-                                              }
-                                          };
+        for (size_t i = 0; i < pnts.size(); ++i)
+        {
+            labelEnclosingTet(pnts[i]);
+        }
+    };
 
     // enclose all vertices
     for (size_t i = 0; i < surfMesh.getNumVertices(); ++i)
