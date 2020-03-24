@@ -517,6 +517,7 @@ RCM(const std::vector<NeighborContainer>& neighbors)
                 isInP[vid] = false;
                 pCur = vid;
                 parent =  vid;
+                break;
             }
         }
         if (parent == invalid)
