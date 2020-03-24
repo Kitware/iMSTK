@@ -123,23 +123,6 @@ public:
     void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
 
-    ///
-    /// \brief Create a tetrahedral mesh based on a uniform Cartesian mesh
-    /// \param aabbMin  the small conner of a box
-    /// \param aabbMax  the large conner of a box
-    /// \param nx number of elements in the x-direction
-    /// \param ny number of elements in the y-direction
-    /// \param nz number of elements in the z-direction
-    ///
-    /// \note Refer: Dompierre, Julien & Labbé, Paul & Vallet, Marie-Gabrielle & Camarero, Ricardo. (1999).
-    /// How to Subdivide Pyramids, Prisms, and Hexahedra into Tetrahedra.. 195-204.
-    static std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx, const size_t ny, const size_t nz);
-
-    ///
-    /// \brief Create a tetrahedral mesh cover
-    /// \note surfMesh can't be const since the non-const member function rayTracing is called inside.
-    ///
-    static std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh, const size_t nx, const size_t ny, size_t nz);
 protected:
 
     friend class VTKTetrahedralMeshRenderDelegate;

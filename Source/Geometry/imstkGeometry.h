@@ -103,7 +103,7 @@ public:
     ///
     /// \brief Compute the bounding box for the geometry
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0);
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const;
 
     ///
     /// \brief Translate the geometry in Cartesian space

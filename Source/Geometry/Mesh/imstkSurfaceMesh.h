@@ -212,12 +212,6 @@ public:
     ///
     size_t getMaxNumTriangles();
 
-    ///
-    /// \brief Given a set of points mark them as inside (true) and outside
-    /// <Explain how this works; limitations etc.>
-    ///
-    /// \note this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
-    std::vector<bool> markPointsInsideAndOut(const StdVectorOfVec3d& coords);
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;
