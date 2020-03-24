@@ -115,7 +115,7 @@ GeometryUtils::convertSurfaceMeshToVtkPolyData(const SurfaceMesh& imstkMesh)
     vtkNew<vtkCellArray> polys;
     copyCellsToVtk<3>(imstkMesh.getTrianglesVertices(), polys.Get());
 
-    vtkNew<vtkPolyData> polydata;
+    auto polydata = vtkSmartPointer<vtkPolyData>::New();;
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
 
@@ -131,7 +131,7 @@ GeometryUtils::convertLineMeshToVtkPolyData(const LineMesh& imstkMesh)
     vtkNew<vtkCellArray> polys;
     copyCellsToVtk<2>(imstkMesh.getLinesVertices(), polys.Get());
 
-    vtkNew<vtkPolyData> polydata;
+    auto polydata = vtkSmartPointer<vtkPolyData>::New();;
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
     return polydata;
@@ -146,7 +146,7 @@ GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(const TetrahedralMesh
     vtkNew<vtkCellArray> tetras;
     copyCellsToVtk<4>(imstkMesh.getTetrahedraVertices(), tetras.Get());
 
-    vtkNew<vtkUnstructuredGrid> ug;
+    auto ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
     ug->SetPoints(points);
     ug->SetCells(VTK_TETRA, tetras);
     return ug;
@@ -161,7 +161,7 @@ GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(const HexahedralMesh& 
     vtkNew<vtkCellArray> bricks;
     copyCellsToVtk<8>(imstkMesh.getHexahedraVertices(), bricks.Get());
 
-    vtkNew<vtkUnstructuredGrid> ug;
+    auto ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
     ug->SetPoints(points);
     ug->SetCells(VTK_HEXAHEDRON, bricks);
     return ug;
