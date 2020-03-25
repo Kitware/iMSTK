@@ -32,7 +32,7 @@ macro(imstk_find_header package header)
     else()
       set(_SEARCH_DIR ${PACKAGE_PREFIX_DIR}/include/${sub_dir})
     endif()
-    message(STATUS "Searching for : ${_SEARCH_DIR}/${header}")
+    #message(STATUS "Searching for : ${_SEARCH_DIR}/${header}")
 
     find_path(${package}_INCLUDE_DIR
       NAMES
@@ -42,13 +42,13 @@ macro(imstk_find_header package header)
       NO_DEFAULT_PATH
     )
   else()
-    message(STATUS "I am looking in system for ${package}")
+    #message(STATUS "I am looking in system for ${package}")
     find_path(${package}_INCLUDE_DIR
       NAMES
         ${header}
     )
   endif()
-  message(STATUS "Found it : ${${package}_INCLUDE_DIR}/${header}")
+  #message(STATUS "Found it : ${${package}_INCLUDE_DIR}/${header}")
   
 
   if (EXISTS ${${package}_INCLUDE_DIR}/${header})
@@ -58,7 +58,7 @@ macro(imstk_find_header package header)
   else()
     message(FATAL_ERROR "Could not find ${${package}_INCLUDE_DIR}/${header}")
   endif()
-  message(STATUS "${package}_INCLUDE_DIRS : ${${package}_INCLUDE_DIRS}")
+  #message(STATUS "${package}_INCLUDE_DIRS : ${${package}_INCLUDE_DIRS}")
   unset(${package}_INCLUDE_DIR CACHE)
 endmacro()
 
@@ -83,7 +83,7 @@ macro(imstk_find_libary package library)
     string(STRIP ${release_postfix} release_postfix)
     list(GET extra_macro_args 1 debug_postfix)
     string(STRIP ${debug_postfix} debug_postfix)
-    message(STATUS "Looking for ${package} libraries ${library}${release_postfix} and ${library}${debug_postfix}")
+    #message(STATUS "Looking for ${package} libraries ${library}${release_postfix} and ${library}${debug_postfix}")
   endif()
   
   # Should I look in system locations?
@@ -100,11 +100,10 @@ macro(imstk_find_libary package library)
       if(${package}_LIB_DIR)
         set(_SEARCH_DIR ${${package}_ROOT_DIR}/${${package}_LIB_DIR})
       endif()
-      #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
     else()
       set(_SEARCH_DIR ${PACKAGE_PREFIX_DIR}/lib)
     endif()
-    
+    #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
     
     unset(${PACKAGE}_LIBRARY_${library}-RELEASE CACHE)
     string(TOUPPER ${package} PACKAGE)
@@ -146,21 +145,23 @@ macro(imstk_find_libary package library)
 
   endif()
 
+  #message(STATUS "Looking for Release Library : ${library}${release_postfix} in ${_SEARCH_DIR}")
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-RELEASE})
     #message(STATUS "${PACKAGE}_LIBRARY_${library}-RELEASE : ${${PACKAGE}_LIBRARY_${library}-RELEASE}")
     list(APPEND ${PACKAGE}_LIBRARIES optimized ${${PACKAGE}_LIBRARY_${library}-RELEASE})
     list(APPEND ${PACKAGE}_RELEASE_LIBRARIES ${${PACKAGE}_LIBRARY_${library}-RELEASE})
   endif()
   mark_as_advanced(${PACKAGE}_LIBRARY_${library}-RELEASE)
-  #message(STATUS "Libraries : ${${PACKAGE}_RELEASE_LIBRARIES}")
+  #message(STATUS "Release Libraries : ${${PACKAGE}_RELEASE_LIBRARIES}")
 
+  #message(STATUS "Looking for Debug Library : ${library}${debug_postfix} in ${_SEARCH_DIR}")
   if (EXISTS ${${PACKAGE}_LIBRARY_${library}-DEBUG})
     #message(STATUS "${PACKAGE}_LIBRARY_${library}-DEBUG : ${${PACKAGE}_LIBRARY_${library}-DEBUG}")
     list(APPEND ${PACKAGE}_LIBRARIES debug ${${PACKAGE}_LIBRARY_${library}-DEBUG})
     list(APPEND ${PACKAGE}_DEBUG_LIBRARIES ${${PACKAGE}_LIBRARY_${library}-DEBUG})
   endif()
   mark_as_advanced(${PACKAGE}_LIBRARY_${library}-DEBUG)
-  #message(STATUS "Libraries : ${${PACKAGE}_DEBUG_LIBRARIES}")
+  #message(STATUS "Debug Libraries : ${${PACKAGE}_DEBUG_LIBRARIES}")
 endmacro()
 
 #-----------------------------------------------------------------------------

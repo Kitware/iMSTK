@@ -17,6 +17,7 @@ set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
 include(${CMAKE_CURRENT_LIST_DIR}/modules/imstkFind)
 include(CMakeFindDependencyMacro)
+set(CMAKE_DEBUG_POSTFIX @CMAKE_DEBUG_POSTFIX@)
 
 # Assimp
 find_package( Assimp REQUIRED )
@@ -56,7 +57,7 @@ find_package( Libusb REQUIRED)
 if(iMSTK_ENABLE_VR)
   add_definitions( -DiMSTK_ENABLE_VR )
   find_package( openvr REQUIRED )
-else()
+endif()
 
 # PhysX
 find_package(PhysX REQUIRED)
@@ -114,7 +115,7 @@ else()
     RenderingCore
     RenderingOpenGL2
     RenderingVolume
-    RenderingVolumeOpenGL2
+    RenderingVolumeOpenGL2)
 endif()
 
 # glfw, gli

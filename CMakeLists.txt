@@ -201,6 +201,10 @@ find_package( g3log REQUIRED )
 # glm
 find_package( glm REQUIRED)
 # imgui
+# iMSTK actually includes and compiles imgui code
+# As imgui does not have any cmake support
+# So tell our find_package to also find the imgui source directory
+set(FIND_IMGUI_SOURCE ON)
 find_package( imgui REQUIRED )
 # LibNiFalcon
 find_package( LibNiFalcon REQUIRED)
