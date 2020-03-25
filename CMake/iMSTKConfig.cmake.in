@@ -15,7 +15,7 @@ set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)
 
 # Use the iMSTK modules to find all required packages
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")
-include(${CMAKE_CURRENT_LIST_DIR}/modules/imstkFind)
+include(${CMAKE_CURRENT_LIST_DIR}/modules/imstkFind.cmake)
 include(CMakeFindDependencyMacro)
 set(CMAKE_DEBUG_POSTFIX @CMAKE_DEBUG_POSTFIX@)
 
