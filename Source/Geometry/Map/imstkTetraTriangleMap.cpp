@@ -246,10 +246,9 @@ TetraTriangleMap::updateBoundingBox()
     m_bBoxMin.resize(tetMesh->getNumTetrahedra());
     m_bBoxMax.resize(tetMesh->getNumTetrahedra());
 
-    for (size_t idx = 0; idx < tetMesh->getNumTetrahedra(); ++idx)
-    {
-        tetMesh->computeTetrahedronBoundingBox(idx, m_bBoxMin[idx], m_bBoxMax[idx]);
-    }
+    ParallelUtils::parallelFor(tetMesh->getNumTetrahedra(), [&](const size_t tid) {
+            tetMesh->computeTetrahedronBoundingBox(tid, m_bBoxMin[tid], m_bBoxMax[tid]);
+                               });
 
     m_boundingBoxAvailable = true;
 }

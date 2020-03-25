@@ -98,7 +98,7 @@ public:
     ///
     /// \brief Render
     ///
-    virtual void render(const bool inWindow = false);
+    virtual void render(const bool inWindow = false) = 0;
 
 protected:
     Widget() = delete;

@@ -21,8 +21,11 @@
 
 #pragma once
 
+#pragma warning( push )
+#pragma warning( disable : 4127 )
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
+#pragma warning( pop )
 
 // iMSTK includes
 #include "imstkLinearSolver.h"

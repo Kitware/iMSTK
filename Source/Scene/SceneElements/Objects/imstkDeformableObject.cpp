@@ -26,7 +26,7 @@ namespace imstk
 Vectord&
 DeformableObject::getContactForce()
 {
-    CHECK(m_defModel) << "deformation model pointer not valid DeformableObject::getContactForce()";
+    CHECK(m_defModel != nullptr) << "deformation model pointer not valid DeformableObject::getContactForce()";
 
     return m_defModel->getContactForce();
 }

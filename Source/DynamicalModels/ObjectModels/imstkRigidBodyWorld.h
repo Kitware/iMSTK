@@ -83,7 +83,20 @@ public:
     PxScene* m_Scene = NULL;
     PxPvd*   m_Pvd   = NULL;
 
+    ///
+    /// \brief Set the time step for the entire physX scene
+    ///
+    void setTimeStep(const float dT) { m_timeStep = dT; };
+
+    ///
+    /// \brief Return the time step size
+    ///
+    float getTimeStep() const { return m_timeStep; }
+
+protected:
+    float m_timeStep = 1.f / 300.f;
 private:
+
     static RigidBodyWorld* m_rigidBodyWorldInstance;
 
     ///

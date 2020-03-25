@@ -67,6 +67,9 @@ IterativeLinearSolver::print() const
 void
 IterativeLinearSolver::solve(Vectord& x)
 {
+    LOG(WARNING) << "IterativeLinearSolver::solve is not implemented!";
+    x;
+    /*
     if (!m_linearSystem)
     {
         LOG(WARNING) << "IterativeLinearSolver::solve: The linear system should be assigned before solving!";
@@ -85,5 +88,6 @@ IterativeLinearSolver::solve(Vectord& x)
 
         this->iterate(x);
     }
+    */
 }
 } //imstk

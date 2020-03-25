@@ -85,10 +85,5 @@ Widget::isVisible()
 {
     return m_visible;
 }
-
-void
-Widget::render(const bool inWindow)
-{
-}
 } // GUI
 } // imstk

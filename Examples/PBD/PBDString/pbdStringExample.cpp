@@ -92,11 +92,11 @@ main()
         sims[i].params = std::make_shared<PBDModelConfig>();
         sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 0.001);
         sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
-        sims[i].params->m_fixedNodeIds     = { 0 }; // Fix the first node in each string
+        sims[i].params->m_fixedNodeIds     = { 0 };
         sims[i].params->m_uniformMassValue = 5.0;
-        sims[i].params->m_gravity = Vec3d(0, -9.8, 0);
-        sims[i].params->m_dt      = 0.0005;
-        sims[i].params->m_maxIter = 5;
+        sims[i].params->m_gravity   = Vec3d(0, -9.8, 0);
+        sims[i].params->m_DefaultDt = 0.0005;
+        sims[i].params->m_maxIter   = 5;
 
         // Set the parameters
         sims[i].model->configure(sims[i].params);
@@ -136,9 +136,9 @@ main()
                 Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
                 // Move in circle, derivatives of parametric eq of circle
                 sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
-                pos.x() + -std::sin(t) * radius * dt,
-                pos.y(),
-                pos.z() + std::cos(t) * radius * dt));
+                    pos.x() + -std::sin(t) * radius * dt,
+                    pos.y(),
+                    pos.z() + std::cos(t) * radius * dt));
             }
             t += dt;
         };

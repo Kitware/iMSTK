@@ -85,38 +85,39 @@ RigidBodyModel::initialize()
 void
 RigidBodyModel::createSphere()
 {
-    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial(m_material->m_staticFriction,
-        m_material->m_dynamicFriction,
-        m_material->m_restitution);
+    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_material->m_staticFriction,
+        (PxReal)m_material->m_dynamicFriction,
+        (PxReal)m_material->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
     const auto PxScene = m_rigidBodyWorld->m_Scene;
 
     const auto sphereGeo = std::dynamic_pointer_cast<imstk::Sphere>(m_geometry);
 
-    auto       r     = sphereGeo->getRadius();
+    auto       r     = (PxReal)sphereGeo->getRadius();
     const auto p     = sphereGeo->getPosition() + sphereGeo->getTranslation();
-    auto       trans = PxTransform(p[0], p[1], p[2]);
+    auto       trans = PxTransform((float)p[0], (float)p[1], (float)p[2]);
 
     if (m_isStatic)
     {
-        if (m_pxStaticActor = PxCreateStatic(*physics,
-            trans,
-            PxSphereGeometry(r),
-            *physxMaterial))
+        m_pxStaticActor = PxCreateStatic(*physics,
+                                         trans,
+                                         PxSphereGeometry(r),
+                                         *physxMaterial);
+        if (m_pxStaticActor)
         {
             PxScene->addActor(*m_pxStaticActor);
         }
     }
     else
     {
-        PxGeometry s = PxSphereGeometry(2 * r);
-
-        if (m_pxDynamicActor = PxCreateDynamic(*physics,
-            trans,
-            s,
-            *physxMaterial,
-            1.))
+        PxGeometry s = PxSphereGeometry((PxReal)2. * r);
+        m_pxDynamicActor = PxCreateDynamic(*physics,
+                                           trans,
+                                           s,
+                                           *physxMaterial,
+                                           1.);
+        if (m_pxDynamicActor)
         {
             PxScene->addActor(*m_pxDynamicActor);
         }
@@ -126,9 +127,9 @@ RigidBodyModel::createSphere()
 void
 RigidBodyModel::createPlane()
 {
-    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial(m_material->m_staticFriction,
-        m_material->m_dynamicFriction,
-        m_material->m_restitution);
+    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_material->m_staticFriction,
+        (PxReal)m_material->m_dynamicFriction,
+        (PxReal)m_material->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
     const auto PxScene = m_rigidBodyWorld->m_Scene;
@@ -141,11 +142,13 @@ RigidBodyModel::createPlane()
 
     if (m_isStatic)
     {
-        auto plane = PxPlane(PxVec3(0., 0., 0.), PxVec3(n[0], n[1], n[2]));
-        if (m_pxStaticActor = PxCreateStatic(*physics,
-            PxTransformFromPlaneEquation(plane),
-            PxPlaneGeometry(),
-            *physxMaterial))
+        auto plane = PxPlane(PxVec3(0., 0., 0.), PxVec3((float)n[0], (float)n[1], (float)n[2]));
+
+        m_pxStaticActor = PxCreateStatic(*physics,
+                                         PxTransformFromPlaneEquation(plane),
+                                         PxPlaneGeometry(),
+                                         *physxMaterial);
+        if (m_pxStaticActor)
         {
             PxScene->addActor(*m_pxStaticActor);
         }
@@ -159,39 +162,42 @@ RigidBodyModel::createPlane()
 void
 RigidBodyModel::createCube()
 {
-    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial(m_material->m_staticFriction,
-        m_material->m_dynamicFriction,
-        m_material->m_restitution);
+    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_material->m_staticFriction,
+        (PxReal)m_material->m_dynamicFriction,
+        (PxReal)m_material->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
     const auto PxScene = m_rigidBodyWorld->m_Scene;
 
     const auto cubeGeo = std::dynamic_pointer_cast<imstk::Cube>(m_geometry);
 
-    auto l = cubeGeo->getWidth();
+    auto l = (PxReal)cubeGeo->getWidth();
 
     const auto  p = cubeGeo->getPosition() + cubeGeo->getTranslation();
     const Quatd q(cubeGeo->getRotation());
 
-    PxTransform trans(p[0], p[1], p[2], PxQuat(q.x(), q.y(), q.z(), q.w()));
+    PxTransform trans((float)p[0], (float)p[1], (float)p[2], PxQuat((float)q.x(), (float)q.y(), (float)q.z(), (float)q.w()));
 
     if (m_isStatic)
     {
-        if (m_pxStaticActor = PxCreateStatic(*physics,
-            trans,
-            PxBoxGeometry(l / 2., l / 2., l / 2.),
-            *physxMaterial))
+        m_pxStaticActor = PxCreateStatic(*physics,
+                                         trans,
+                                         PxBoxGeometry(l / (PxReal)2., l / (PxReal)2., l / (PxReal)2.),
+                                         *physxMaterial);
+        if (m_pxStaticActor)
         {
             PxScene->addActor(*m_pxStaticActor);
         }
     }
     else
     {
-        if (m_pxDynamicActor = PxCreateDynamic(*physics,
-            trans,
-            PxBoxGeometry(l / 2., l / 2., l / 2.),
-            *physxMaterial,
-            0.1))
+        m_pxDynamicActor = PxCreateDynamic(*physics,
+                                           trans,
+                                           PxBoxGeometry(l / (PxReal)2., l / (PxReal)2., l / (PxReal)2.),
+                                           *physxMaterial,
+            (PxReal)0.1);
+
+        if (m_pxDynamicActor)
         {
             m_pxDynamicActor->setSleepThreshold(0);
             PxScene->addActor(*m_pxDynamicActor);
@@ -219,26 +225,33 @@ RigidBodyModel::createMesh()
     for (size_t i = 0; i < numVerts; ++i)
     {
         auto v = vertData[i];
-        vertices[i] = PxVec3(v.x(), v.y(), v.z());
+        vertices[i] = PxVec3((float)v.x(), (float)v.y(), (float)v.z());
     }
 
     for (size_t i = 0; i < numTriangles; ++i)
     {
         auto t = triVerts[i];
-        indices[3 * i]     = t[0];
-        indices[3 * i + 1] = t[1];
-        indices[3 * i + 2] = t[2];
+        indices[3 * i]     = (PxU32)t[0];
+        indices[3 * i + 1] = (PxU32)t[1];
+        indices[3 * i + 2] = (PxU32)t[2];
     }
 
-    PxTriangleMesh* triMesh = createBV34TriangleMesh(numVerts, vertices, numTriangles, indices, false, false, false, 4);
+    PxTriangleMesh* triMesh = createBV34TriangleMesh((PxU32)numVerts, vertices, (PxU32)numTriangles, indices, false, false, false, 4);
     PxTransform     trans(PxIdentity);
-    const auto      physxMaterial = PxPhysics->createMaterial(m_material->m_staticFriction, m_material->m_dynamicFriction, m_material->m_restitution);
+    const auto      physxMaterial = PxPhysics->createMaterial((PxReal)m_material->m_staticFriction,
+        (PxReal)m_material->m_dynamicFriction,
+        (PxReal)m_material->m_restitution);
 
     // Add mesh actor
     if (m_isStatic)
     {
         m_pxStaticActor = PxPhysics->createRigidStatic(trans);
         PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*m_pxStaticActor, PxTriangleMeshGeometry(triMesh), *physxMaterial, PxShapeFlag::eSIMULATION_SHAPE);
+        if (!aConvexShape)
+        {
+            LOG(FATAL) << "Could not create convex shape!";
+        }
+
         PxScene->addActor(*m_pxStaticActor);
     }
     else
@@ -250,6 +263,12 @@ RigidBodyModel::createMesh()
         }
 
         PxShape* aConvexShape = PxRigidActorExt::createExclusiveShape(*m_pxDynamicActor, PxTriangleMeshGeometry(triMesh), *physxMaterial, PxShapeFlag::eSIMULATION_SHAPE);
+
+        if (!aConvexShape)
+        {
+            LOG(FATAL) << "Could not create convex shape!";
+        }
+
         PxScene->addActor(*m_pxDynamicActor);
     }
 }
@@ -288,14 +307,22 @@ RigidBodyModel::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
 {
     m_force   += force;
     m_forcePos = pos;
-    PxRigidBodyExt::addForceAtLocalPos(*m_pxDynamicActor, physx::PxVec3(force[0], force[1], force[2]), physx::PxVec3(pos[0], pos[1], pos[2]), PxForceMode::eFORCE, wakeup);
+    PxRigidBodyExt::addForceAtLocalPos(*m_pxDynamicActor,
+        physx::PxVec3((float)force[0], (float)force[1], (float)force[2]),
+        physx::PxVec3((float)pos[0], (float)pos[1], (float)pos[2]),
+        PxForceMode::eFORCE, wakeup);
 }
 
+#pragma warning( push )
+#pragma warning( disable : 4100 )
 //TODO updating body states as in
 void
 RigidBodyModel::updateBodyStates(const Vectord& q, const StateUpdateType updateType /* = stateUpdateType::displacement*/)
 {
+    LOG(WARNING) << "RigidBodyModel::updateBodyStates Not implemented!";
 }
+
+#pragma warning( pop )
 
 void
 RigidBodyModel::configure(const std::shared_ptr<Geometry>              geom,

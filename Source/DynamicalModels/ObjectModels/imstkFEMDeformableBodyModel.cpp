@@ -27,7 +27,11 @@
 // vega
 #include "generateMassMatrix.h"
 #include "generateMeshGraph.h"
+
+#pragma warning( push )
+#pragma warning( disable : 4458 )
 #include "configFile.h"
+#pragma warning( pop )
 
 namespace imstk
 {
@@ -177,7 +181,7 @@ bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
-    CHECK(m_geometry && m_FEModelConfig) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
+    CHECK(m_geometry != nullptr && m_FEModelConfig != nullptr) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
 
     auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
@@ -279,7 +283,7 @@ FEMDeformableBodyModel::initializeForceModel()
     const double g = m_FEModelConfig->m_gravity;
     const bool   isGravityPresent = (g > 0) ? true : false;
 
-    m_numDOF = m_vegaPhysicsMesh->getNumVertices() * 3;
+    m_numDOF = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
 
     switch (m_FEModelConfig->m_femMethod)
     {
@@ -319,7 +323,7 @@ FEMDeformableBodyModel::initializeForceModel()
 bool
 FEMDeformableBodyModel::initializeMassMatrix()
 {
-    CHECK(m_geometry) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
+    CHECK(m_geometry != nullptr) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
 
     vega::SparseMatrix* vegaMatrix;
     vega::GenerateMassMatrix::computeMassMatrix(m_vegaPhysicsMesh.get(), &vegaMatrix, true);//caveat
@@ -386,14 +390,14 @@ FEMDeformableBodyModel::initializeDampingMatrix()
 bool
 FEMDeformableBodyModel::initializeTangentStiffness()
 {
-    CHECK(m_internalForceModel)
+    CHECK(m_internalForceModel != nullptr)
         << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
 
-    vega::SparseMatrix* matrix;
+    vega::SparseMatrix* matrix = nullptr;
     m_internalForceModel->getTangentStiffnessMatrixTopology(&matrix);
 
-    CHECK(matrix) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
-    CHECK(m_vegaMassMatrix) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
+    CHECK(matrix != nullptr) << "DeformableBodyModel::initializeTangentStiffness - Tangent stiffness matrix topology not avaliable!";
+    CHECK(m_vegaMassMatrix != nullptr) << "DeformableBodyModel::initializeTangentStiffness - Vega mass matrix doesn't exist!";
 
     matrix->BuildSubMatrixIndices(*m_vegaMassMatrix.get());
 
@@ -476,10 +480,10 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
                                                      kinematicState&       newState,
                                                      const StateUpdateType updateType)
 {
-    auto& uPrev = stateAtT.getQ();
+    //auto& uPrev = stateAtT.getQ();
     auto& vPrev = stateAtT.getQDot();
     auto& u     = newState.getQ();
-    auto& v     = newState.getQDot();
+    //auto& v     = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
@@ -520,6 +524,8 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
     switch (updateType)
     {
     case StateUpdateType::deltaVelocity:
+
+        stateAtT;// supress warning (state is not used in this update type hence can be ignored)
 
         this->updateMassMatrix();
         m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
@@ -646,10 +652,10 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
     const Vectord&        solution,
     const StateUpdateType updateType)
 {
-    auto&        uPrev = m_previousState->getQ();
-    auto&        u     = m_currentState->getQ();
-    auto&        v     = m_currentState->getQDot();
-    const double dT    = m_timeIntegrator->getTimestepSize();
+    auto& uPrev = m_previousState->getQ();
+    //auto&        u     = m_currentState->getQ();
+    auto&        v  = m_currentState->getQDot();
+    const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
@@ -674,6 +680,9 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 NonLinearSystem::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
+#pragma warning( push )
+#pragma warning( disable : 4100 )
+
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool semiImplicit)->const Vectord&
            {
@@ -686,11 +695,15 @@ FEMDeformableBodyModel::getFunction()
                }
                return m_Feff;
            };
+
+#pragma warning( pop )
 }
 
 NonLinearSystem::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
+#pragma warning( push )
+#pragma warning( disable : 4100 )
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord& q)->const SparseMatrixd&
            {
@@ -702,6 +715,8 @@ FEMDeformableBodyModel::getFunctionGradient()
                }
                return m_Keff;
            };
+
+#pragma warning( pop )
 }
 
 NonLinearSystem::UpdateFunctionType

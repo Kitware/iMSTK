@@ -27,8 +27,12 @@
 //imstk
 #include "imstkInternalForceModel.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4458 )
 //vega
 #include "StVKInternalForces.h"
+#pragma warning( pop )
+
 #include "StVKStiffnessMatrix.h"
 #include "StVKElementABCDLoader.h"
 

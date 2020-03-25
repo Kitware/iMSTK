@@ -88,13 +88,18 @@ public:
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
+#pragma warning( push )
+#pragma warning( disable : 4100 )
     ///
     /// \brief Get the tangent stiffness matrix
+    /// \todo Clear warning C4100
     ///
     inline void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
+
+#pragma warning( pop )
 
     ///
     /// \brief Get the tangent stiffness matrix topology

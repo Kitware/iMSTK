@@ -43,8 +43,8 @@ TetraToTetraCD::TetraToTetraCD(std::shared_ptr<TetrahedralMesh> meshA,
 void
 TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<TetrahedralMesh> mesh, size_t idOffset)
 {
-    const auto   eps  = VERY_SMALL_EPSILON;
-    const double eps2 = 1e-10;
+    constexpr const auto eps  = VERY_SMALL_EPSILON;
+    const double         eps2 = 1e-10;
 
     //tetrahedron belonging part of penetration type does not change
     auto cType = static_cast<PointTetrahedronCollisionDataElement::CollisionType>(idOffset > 0);
@@ -97,8 +97,11 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                             && bCoord[2] >= -eps
                             && bCoord[3] >= -eps)
                         {
+#pragma warning( push )
+#pragma warning( disable : 4189 )
                             auto coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
                             assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
+#pragma warning( pop )
                             m_colData->PTColData.safeAppend({ cType, static_cast<uint32_t>(vId), static_cast<uint32_t>(tId), bCoord });
                         }
                     } //if not this tetrahedron

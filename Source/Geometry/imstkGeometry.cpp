@@ -63,7 +63,7 @@ Geometry::print() const
 }
 
 void
-Geometry::computeBoundingBox(Vec3d&, Vec3d&, const double)
+Geometry::computeBoundingBox(Vec3d&, Vec3d&, const double) const
 {
     LOG(FATAL) << "computeBoundingBox() must be called from an instance of a specific geometry class";
 }
@@ -258,8 +258,10 @@ Geometry::getTypeName() const
     case Type::DecalPool: return "DecalPool";
     case Type::RenderParticles: return "RenderParticles";
     case Type::ImageData: return "ImageData";
+    default:
+        LOG(FATAL) << "Mesh type to string has not been completely implemented";
+        return "";
     }
-    LOG(FATAL) << "Mesh type to string has not been completely implemented";
 }
 
 bool

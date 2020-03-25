@@ -163,15 +163,14 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
     {
         return GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkMesh);
     }
-    else if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
+
+    if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
     {
         return GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
     }
-    else
-    {
-        LOG(FATAL) << "VTKMeshIO::readVtkGenericFormatData error: could not read with VTK reader.";
-        return nullptr;
-    }
+
+    LOG(FATAL) << "VTKMeshIO::readVtkGenericFormatData error: could not read with VTK reader.";
+    return nullptr;
 }
 
 template<typename ReaderType>

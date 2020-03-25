@@ -82,6 +82,7 @@ endif ()
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
+include(CMakePackageConfigHelpers)
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
 
 if(${PROJECT_NAME}_SUPERBUILD)
@@ -375,8 +376,7 @@ if(NOT WIN32)
   configure_file(
     ${CMAKE_SOURCE_DIR}/CMake/setup_iMSTK.sh.in
     ${CMAKE_INSTALL_PREFIX}/setup_iMSTK.sh
-    @ONLY
-    )
+    @ONLY)
 endif()
 
 #--------------------------------------------------------------------------
@@ -411,7 +411,10 @@ string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
 set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
 #------------------------------------------------------------------------------
 # Configure ${PROJECT_NAME}ConfigVersion.cmake common to build and install tree
-include(CMakePackageConfigHelpers)
+export(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
+  )
 set(config_version_file ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
 write_basic_package_version_file(
   ${config_version_file}
@@ -428,7 +431,7 @@ export(
 # Configure '${PROJECT_NAME}Config.cmake' for a build tree
 set(build_config ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
 configure_package_config_file(
-  ${PROJECT_NAME}Config.cmake.in
+  CMake/${PROJECT_NAME}Config.cmake.in
   ${build_config}
   INSTALL_DESTINATION "${PROJECT_BINARY_DIR}"
   )
@@ -444,7 +447,7 @@ install(
   
 set(install_config ${PROJECT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}Config.cmake)
 configure_package_config_file(
-  ${PROJECT_NAME}Config.cmake.in 
+  CMake/${PROJECT_NAME}Config.cmake.in 
   ${install_config}
   INSTALL_DESTINATION ${${PROJECT_NAME}_INSTALL_CONFIG_DIR}
   )

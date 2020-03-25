@@ -103,7 +103,7 @@ public:
     ///
     /// \brief Compute the bounding box for the geometry
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0);
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const;
 
     ///
     /// \brief Translate the geometry in Cartesian space
@@ -205,7 +205,7 @@ protected:
     virtual void applyTranslation(const Vec3d t) = 0;
     virtual void applyRotation(const Mat3d r)    = 0;
     virtual void applyScaling(const double s)    = 0;
-    virtual void updatePostTransformData() const const = 0;
+    virtual void updatePostTransformData() const = 0;
 
     Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry

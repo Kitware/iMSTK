@@ -25,7 +25,10 @@
 #include <climits>
 #include <memory>
 
+#pragma warning( push )
+#pragma warning( disable : 4201 )
 #include "glm/glm.hpp"
+#pragma warning( pop )
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
@@ -124,9 +127,13 @@ protected:
     glm::vec2  m_vertexUVs[4];
     glm::ivec3 m_triangles[2];
 
-    void applyTranslation(const Vec3d t) override {}
-    void applyRotation(const Mat3d r) override {}
-    void applyScaling(const double s) override {}
+#pragma warning( push )
+#pragma warning( disable : 4100 )
+    void applyTranslation(const Vec3d t) override { LOG(WARNING) << "applyTranslation Not implemented!"; }
+    void applyRotation(const Mat3d r) override { LOG(WARNING) << "applyRotation Not implemented!"; }
+    void applyScaling(const double s) override { LOG(WARNING) << "applyScaling Not implemented!"; }
+#pragma warning( pop )
+
     virtual void updatePostTransformData() const override {}
 };
 }
