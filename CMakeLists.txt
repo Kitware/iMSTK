@@ -411,10 +411,7 @@ string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
 set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
 #------------------------------------------------------------------------------
 # Configure ${PROJECT_NAME}ConfigVersion.cmake common to build and install tree
-export(EXPORT ${PROJECT_NAME}_TARGETS
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
-  NAMESPACE ${PROJECT_NAMESPACE}
-  )
+include(CMakePackageConfigHelpers)
 set(config_version_file ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
 write_basic_package_version_file(
   ${config_version_file}
