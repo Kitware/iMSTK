@@ -18,4 +18,9 @@ imstk_add_external_project( VegaFEM
   DEPENDENCIES ${VegaFEM_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE
-  )
+)
+if(NOT USE_SYSTEM_VegaFEM)
+  set(VegaFEM_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/VegaFEM)
+  message(STATUS "VegaFEM_DIR : ${VegaFEM_DIR}")
+endif()
+

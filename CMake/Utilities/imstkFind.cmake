@@ -1,4 +1,7 @@
 include(FindPackageHandleStandardArgs)
+if(NOT PACKAGE_PREFIX_DIR)
+  set(PACKAGE_PREFIX_DIR ${CMAKE_INSTALL_PREFIX})
+endif()
 #-----------------------------------------------------------------------------
 # Look for header directory
 #-----------------------------------------------------------------------------
@@ -27,9 +30,9 @@ macro(imstk_find_header package header)
     if(${package}_ROOT_DIR)
       set(_SEARCH_DIR ${${package}_ROOT_DIR}/${sub_dir})
     else()
-      set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX}/include/${sub_dir})
+      set(_SEARCH_DIR ${PACKAGE_PREFIX_DIR}/include/${sub_dir})
     endif()
-    #message(STATUS "Searching for : ${_SEARCH_DIR}/${header}")
+    message(STATUS "Searching for : ${_SEARCH_DIR}/${header}")
 
     find_path(${package}_INCLUDE_DIR
       NAMES
@@ -45,7 +48,7 @@ macro(imstk_find_header package header)
         ${header}
     )
   endif()
-  #message(STATUS "Found it : ${${package}_INCLUDE_DIR}/${header}")
+  message(STATUS "Found it : ${${package}_INCLUDE_DIR}/${header}")
   
 
   if (EXISTS ${${package}_INCLUDE_DIR}/${header})
@@ -55,7 +58,7 @@ macro(imstk_find_header package header)
   else()
     message(FATAL_ERROR "Could not find ${${package}_INCLUDE_DIR}/${header}")
   endif()
-  #message(STATUS "${package}_INCLUDE_DIRS : ${${package}_INCLUDE_DIRS}")
+  message(STATUS "${package}_INCLUDE_DIRS : ${${package}_INCLUDE_DIRS}")
   unset(${package}_INCLUDE_DIR CACHE)
 endmacro()
 
@@ -99,7 +102,7 @@ macro(imstk_find_libary package library)
       endif()
       #message(STATUS "Looking for ${package} libs in ${_SEARCH_DIR}")
     else()
-      set(_SEARCH_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+      set(_SEARCH_DIR ${PACKAGE_PREFIX_DIR}/lib)
     endif()
     
     

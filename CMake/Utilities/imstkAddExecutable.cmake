@@ -12,5 +12,5 @@ macro(imstk_add_executable target)
   set_target_properties(${target} PROPERTIES
     DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
   add_custom_command(TARGET ${target} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${iMSTK_INSTALL_BIN_DIR})
+                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${CMAKE_INSTALL_PREFIX}/bin)
 endmacro()

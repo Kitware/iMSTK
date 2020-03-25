@@ -32,4 +32,4 @@ imstk_add_external_project( g3log
   RELATIVE_INCLUDE_PATH "src"
   DEPENDENCIES ""
   #VERBOSE
-  )
+)

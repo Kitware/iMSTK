@@ -69,7 +69,7 @@ function(imstk_add_library target)
     list(APPEND ${target}_LIBRARIES "${d}")
   endforeach()
   #message(STATUS "${target} using libraries : ${${target}_LIBRARIES}")
-  target_link_libraries( ${target}
+  target_link_libraries( ${target} PUBLIC
     ${${target}_LIBRARIES}
     )
 
@@ -78,7 +78,7 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   target_include_directories( ${target} PUBLIC
     ${target_BUILD_INTERFACE_LIST}
-    $<INSTALL_INTERFACE:${iMSTK_INSTALL_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:${${PROJECT_NAME}_INSTALL_FOLDER}>
     )
 
   #-----------------------------------------------------------------------------
@@ -95,17 +95,17 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   install( FILES
     ${target_H_FILES}
-    DESTINATION ${iMSTK_INSTALL_INCLUDE_DIR}
+    DESTINATION include
     COMPONENT Development
     )
 
   #-----------------------------------------------------------------------------
   # Install library
   #-----------------------------------------------------------------------------
-  install( TARGETS ${target} EXPORT iMSTK_TARGETS
-    RUNTIME DESTINATION ${iMSTK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
-    LIBRARY DESTINATION ${iMSTK_INSTALL_LIB_DIR} COMPONENT RuntimeLibraries
-    ARCHIVE DESTINATION ${iMSTK_INSTALL_LIB_DIR} COMPONENT Development
+  install( TARGETS ${target} EXPORT ${PROJECT_NAME}Targets
+    RUNTIME DESTINATION bin COMPONENT RuntimeLibraries
+    LIBRARY DESTINATION lib COMPONENT RuntimeLibraries
+    ARCHIVE DESTINATION lib COMPONENT Development
     )
 	
 	
