@@ -92,5 +92,5 @@ imstk_add_external_project( VTK
 )
 if(NOT USE_SYSTEM_VTK)
   set(VTK_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/vtk-8.2)
-  message(STATUS "VTK_DIR : ${VTK_DIR}")
+  #message(STATUS "VTK_DIR : ${VTK_DIR}")
 endif()

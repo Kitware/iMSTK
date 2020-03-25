@@ -15,5 +15,5 @@ imstk_add_external_project( GTest
   )
 if(NOT USE_SYSTEM_GTest)
   set(GTest_DIR ${CMAKE_INSTALL_PREFIX}/lib/cmake/GTest)
-  message(STATUS "GTest_DIR : ${GTest_DIR}")
+  #message(STATUS "GTest_DIR : ${GTest_DIR}")
 endif()
