@@ -78,7 +78,7 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   target_include_directories( ${target} PUBLIC
     ${target_BUILD_INTERFACE_LIST}
-    $<INSTALL_INTERFACE:${${PROJECT_NAME}_INSTALL_FOLDER}>
+    $<INSTALL_INTERFACE:include/${${PROJECT_NAME}_INSTALL_FOLDER}>
     )
 
   #-----------------------------------------------------------------------------
@@ -95,7 +95,7 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   install( FILES
     ${target_H_FILES}
-    DESTINATION include
+    DESTINATION include/${${PROJECT_NAME}_INSTALL_FOLDER}
     COMPONENT Development
     )
 
