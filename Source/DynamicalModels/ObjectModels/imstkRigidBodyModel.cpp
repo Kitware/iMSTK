@@ -132,7 +132,6 @@ RigidBodyModel::createPlane()
         (PxReal)m_material->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
-    const auto PxScene = m_rigidBodyWorld->m_Scene;
 
     const auto planeGeo = std::dynamic_pointer_cast<imstk::Plane>(m_geometry);
 
@@ -150,7 +149,7 @@ RigidBodyModel::createPlane()
                                          *physxMaterial);
         if (m_pxStaticActor)
         {
-            PxScene->addActor(*m_pxStaticActor);
+            m_rigidBodyWorld->m_Scene->addActor(*m_pxStaticActor);
         }
     }
     else

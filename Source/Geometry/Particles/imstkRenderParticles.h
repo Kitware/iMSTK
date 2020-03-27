@@ -71,7 +71,7 @@ public:
     /// \param time Lifespan of each particle (in milliseconds)
     /// \param mode Mode for emitter
     ///
-    RenderParticles(const unsigned int maxNumParticles = 128, const std::string name = std::string(""));
+    RenderParticles(const unsigned int maxNumParticles = 128, const std::string& name = std::string(""));
 
     ///
     /// \brief Set size of particle

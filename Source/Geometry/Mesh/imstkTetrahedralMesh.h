@@ -47,7 +47,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    TetrahedralMesh(const std::string name = std::string("")) : VolumetricMesh(Geometry::Type::TetrahedralMesh, name) {}
+    TetrahedralMesh(const std::string& name = std::string("")) : VolumetricMesh(Geometry::Type::TetrahedralMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and

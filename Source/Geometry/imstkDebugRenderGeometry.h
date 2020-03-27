@@ -122,7 +122,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DebugRenderGeometry(const std::string& name, const Type type) :
+    explicit DebugRenderGeometry(const std::string& name, const Type type) :
         m_name(name), m_type(type), m_renderMaterial(std::make_shared<RenderMaterial>())
     {
     }
@@ -149,7 +149,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DebugRenderPoints(const std::string& name) : DebugRenderGeometry(name, Type::Points) {}
+    explicit DebugRenderPoints(const std::string& name) : DebugRenderGeometry(name, Type::Points) {}
 };
 
 ///
@@ -163,7 +163,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DebugRenderLines(const std::string& name) : DebugRenderGeometry(name, Type::Lines) {}
+    explicit DebugRenderLines(const std::string& name) : DebugRenderGeometry(name, Type::Lines) {}
 
     ///
     /// \brief Reserve memory for fast push_back
@@ -182,7 +182,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DebugRenderTriangles(const std::string& name) : DebugRenderGeometry(name, Type::Triangles) {}
+    explicit DebugRenderTriangles(const std::string& name) : DebugRenderGeometry(name, Type::Triangles) {}
 
     ///
     /// \brief Reserve memory for fast push_back

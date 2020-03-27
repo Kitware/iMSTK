@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Module(std::string name, int loopDelay = 0) :
+    Module(const std::string& name, int loopDelay = 0) :
         m_name(name),
         m_loopDelay(loopDelay) {}
 

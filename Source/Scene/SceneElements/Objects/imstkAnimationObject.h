@@ -38,15 +38,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    AnimationObject(const std::string& name) : SceneObject(name)
-    {
-        m_type = Type::Animation;
-    }
-
-    ///
-    /// \brief Constructor
-    ///
-    AnimationObject(std::string&& name) : SceneObject(std::move(name))
+    explicit AnimationObject(const std::string& name) : SceneObject(name)
     {
         m_type = Type::Animation;
     }
@@ -65,7 +57,7 @@ public:
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize()
+    virtual bool initialize() override
     {
         if (SceneObject::initialize())
         {

@@ -46,7 +46,7 @@ public:
     /// \brief Constructor
     /// \param The selected search method
     ///
-    NeighborSearch(Method searchMethod, Real searchRadius = 0);
+    explicit NeighborSearch(Method searchMethod, Real searchRadius = 0);
 
     ///
     /// \brief Set the search radius

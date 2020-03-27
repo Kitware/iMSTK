@@ -30,11 +30,10 @@ VulkanMaterialDelegate::VulkanMaterialDelegate(
     std::shared_ptr<VulkanUniformBuffer> fragmentUniformBuffer,
     std::shared_ptr<RenderMaterial>      material,
     VulkanMemoryManager&                 memoryManager,
-    VulkanMaterialType                   type)
+    VulkanMaterialType                   type) :
+    m_vertexUniformBuffer(vertexUniformBuffer),
+    m_fragmentUniformBuffer(fragmentUniformBuffer)
 {
-    m_vertexUniformBuffer   = vertexUniformBuffer;
-    m_fragmentUniformBuffer = fragmentUniformBuffer;
-
     m_shadowPass    = (type == VulkanMaterialType::Shadow);
     m_depthPrePass  = (type == VulkanMaterialType::Depth);
     m_wireframe     = (type == VulkanMaterialType::Wireframe);
@@ -922,7 +921,7 @@ VulkanMaterialDelegate::createDescriptorSets(VulkanRenderer* renderer)
     descriptorSetAllocationInfo[0].descriptorSetCount = (uint32_t)m_descriptorSetLayouts.size();
     descriptorSetAllocationInfo[0].pSetLayouts = &m_descriptorSetLayouts[0];
 
-    VkDeviceSize size = { VK_WHOLE_SIZE };
+    //VkDeviceSize size = { VK_WHOLE_SIZE };
 
     // Global Buffers
     std::vector<VkDescriptorBufferInfo> vertexBufferInfo(2);

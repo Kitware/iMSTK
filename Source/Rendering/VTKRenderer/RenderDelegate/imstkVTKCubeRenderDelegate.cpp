@@ -30,7 +30,7 @@ VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visual
 {
     m_visualModel = visualModel;
 
-    auto geometry = std::static_pointer_cast<Cube>(visualModel->getGeometry());
+    //auto geometry = std::static_pointer_cast<Cube>(visualModel->getGeometry());
 
     auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
     cubeSource->SetCenter(0, 0, 0);

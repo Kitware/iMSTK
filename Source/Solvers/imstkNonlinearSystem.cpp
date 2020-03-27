@@ -25,10 +25,8 @@
 
 namespace imstk
 {
-NonLinearSystem::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF)
+NonLinearSystem::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF) : m_F(F), m_dF(dF)
 {
-    m_F  = F;
-    m_dF = dF;
 }
 
 void

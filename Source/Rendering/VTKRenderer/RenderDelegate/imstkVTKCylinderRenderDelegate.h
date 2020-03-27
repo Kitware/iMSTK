@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor

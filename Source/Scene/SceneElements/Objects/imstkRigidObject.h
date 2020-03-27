@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    RigidObject(std::string name) : DynamicObject(name)
+    explicit RigidObject(const std::string& name) : DynamicObject(name)
     {
         m_type = Type::Rigid;
     }

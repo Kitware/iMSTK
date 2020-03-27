@@ -49,14 +49,14 @@ public:
     /// \brief Constructor
     ///
     explicit PbdFEMConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK) :
-        PbdConstraint(), m_material(mtype)
+        PbdConstraint(), m_material(mtype), m_invRestMat(Mat3d::Identity())
     {
         m_vertexIds.resize(cardinality);
     }
 
 public:
-    double       m_elementVolume; ///> Volume of the element
-    MaterialType m_material;      ///> Material type
-    Mat3d m_invRestMat;           ///>
+    double       m_elementVolume = 0.; ///> Volume of the element
+    MaterialType m_material;           ///> Material type
+    Mat3d m_invRestMat;                ///>
 };
 }

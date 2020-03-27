@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Sphere(const std::string name = std::string("")) : AnalyticalGeometry(Type::Sphere, name) {}
+    Sphere(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Sphere, name) {}
 
     ///
     /// \brief Print the sphere info

@@ -26,17 +26,18 @@ namespace imstk
 {
 namespace GUIOverlay
 {
-Window::Window(std::string name,
-               std::string title,
-               float       width,
-               float       height,
-               float       x,
-               float       y) : Widget(name, x, y)
+Window::Window(const std::string& name,
+               const std::string& title,
+               const float        width,
+               const float        height,
+               const float        x,
+               const float        y) :
+    Widget(name, x, y),
+    m_title(title),
+    m_width(width),
+    m_height(height)
 {
-    m_type   = Widget::Type::Window;
-    m_title  = title;
-    m_width  = width;
-    m_height = height;
+    m_type = Widget::Type::Window;
 }
 
 Window::~Window()

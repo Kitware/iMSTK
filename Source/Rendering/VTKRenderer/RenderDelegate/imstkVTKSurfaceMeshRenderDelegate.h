@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor

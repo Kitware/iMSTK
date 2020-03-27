@@ -23,7 +23,7 @@
 
 namespace imstk
 {
-DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/, const std::string name)
+DecalPool::DecalPool(unsigned int maxNumDecals /*= 128*/, const std::string& name)
     : Geometry(Geometry::Type::DecalPool, name)
 {
     if (maxNumDecals <= 128)

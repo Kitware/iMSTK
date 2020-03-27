@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    AnimationModel(std::shared_ptr<Geometry> geometry);
+    explicit AnimationModel(std::shared_ptr<Geometry> geometry);
 
     AnimationModel() = delete;
 

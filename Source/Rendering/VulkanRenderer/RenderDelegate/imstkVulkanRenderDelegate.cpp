@@ -197,7 +197,7 @@ VulkanRenderDelegate::updateTransform()
 void
 VulkanRenderDelegate::updateUniforms(uint32_t frameIndex)
 {
-    auto geometry = this->getVisualModel()->getGeometry();
+    //auto geometry = this->getVisualModel()->getGeometry();
     this->updateTransform();
     m_vertexUniformBuffer->updateUniforms(sizeof(VulkanLocalVertexUniforms),
         (void*)&m_localVertexUniforms,

@@ -53,7 +53,7 @@ public:
     ///
     /// \brief Get the master geometry
     ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const { return m_physicsGeometry; }
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const override { return m_physicsGeometry; }
 
     ///
     /// \brief Set/Get the Physics-to-Collision map
@@ -151,8 +151,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DynamicObject(const std::string& name) : CollidingObject(name) {}
-    DynamicObject(std::string&& name) : CollidingObject(std::move(name)) {}
+    explicit DynamicObject(const std::string& name) : CollidingObject(name) {}
 
     std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel;        ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry;                     ///> Geometry used for Physics

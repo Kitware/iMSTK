@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Protected constructor
     ///
-    PointSet(const Type type = Geometry::Type::PointSet, const std::string name = std::string("")) :
+    PointSet(const Type type = Geometry::Type::PointSet, const std::string& name = std::string("")) :
         Geometry(type, name) {}
 
     ///

@@ -63,7 +63,7 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(const std::shared_ptr<Deb
     updateActorProperties();
     setUpMapper(m_glyph->GetOutputPort(), false, m_RenderGeoData->getRenderMaterial());
 
-    updateDataSource();
+    //updateDataSource();
 }
 
 void

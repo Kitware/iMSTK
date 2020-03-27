@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor

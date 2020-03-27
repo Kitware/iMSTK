@@ -178,9 +178,9 @@ CollisionDetection::makeCollisionDetectionObject(const Type                     
     }
 }
 
-CollisionDetection::CollisionDetection(const CollisionDetection::Type& type, std::shared_ptr<CollisionData> colData) : m_type(type)
+CollisionDetection::CollisionDetection(const CollisionDetection::Type& type, std::shared_ptr<CollisionData> colData) : m_type(type),
+    m_colData((colData == nullptr) ? std::make_shared<CollisionData>() : colData)
 {
-    m_colData = (colData == nullptr) ? std::make_shared<CollisionData>() : colData;
 }
 
 // Static functions ==>

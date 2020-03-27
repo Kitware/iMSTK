@@ -46,8 +46,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
-    DeformableObject(std::string&& name) : DynamicObject(std::move(name)) { m_type = Type::FEMDeformable; }
+    explicit DeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
     DeformableObject() = delete;
 
     ///

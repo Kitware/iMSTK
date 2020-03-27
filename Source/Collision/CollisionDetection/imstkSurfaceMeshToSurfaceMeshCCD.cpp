@@ -34,10 +34,12 @@ SurfaceMeshToSurfaceMeshCCD::SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<Surface
                                                          std::shared_ptr<CollisionData> colData) :
     CollisionDetection(CollisionDetection::Type::SurfaceMeshToSurfaceMeshCCD, colData),
     m_meshA(meshA),
-    m_meshB(meshB)
+    m_meshB(meshB),
+    m_modelA(std::make_shared<DeformModel>(meshA->getVertexPositions(), meshA->getTrianglesVertices())),
+    m_modelB(std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices()))
 {
-    m_modelA = std::make_shared<DeformModel>(meshA->getVertexPositions(), meshA->getTrianglesVertices());
-    m_modelB = std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices());
+    //m_modelA = std::make_shared<DeformModel>(meshA->getVertexPositions(), meshA->getTrianglesVertices());
+    //m_modelB = std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices());
 
     // Setup Callbacks
     m_modelA->SetEECallBack(SurfaceMeshToSurfaceMeshCCD::EECallback, this);

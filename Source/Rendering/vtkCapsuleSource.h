@@ -99,7 +99,7 @@ protected:
     int    ThetaResolution;
     int    PhiResolution;
     int    LatLongTessellation;
-    int    FillPoles;
+    //int    FillPoles;
     double CylinderLength;
 
 private:

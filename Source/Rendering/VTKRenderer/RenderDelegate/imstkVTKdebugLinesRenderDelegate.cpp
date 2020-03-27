@@ -63,7 +63,7 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(const std::shared_ptr<Debug
     updateActorProperties();
     setUpMapper(source->GetOutputPort(), false, m_RenderGeoData->getRenderMaterial());
 
-    updateDataSource();
+    //updateDataSource();
 }
 
 void

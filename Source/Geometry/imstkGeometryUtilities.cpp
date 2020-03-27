@@ -416,12 +416,10 @@ buildVertexToVertexConnectivity(const std::vector<ElemConn>&             conn,
                          {
                              const auto ptr0 = vertToElemPtr[i];
                              const auto ptr1 = vertToElemPtr[i + 1];
-                             size_t     eid;
 
                              for (auto ptr = ptr0; ptr < ptr1; ++ptr)
                              {
-                                 eid = vertToElem[ptr];
-                                 for (auto vid : conn[eid])
+                                 for (auto vid : conn[vertToElem[ptr]])
                                  {
                                      // vertex-i itself is also included.
                                      vertToVert[i].insert(vid);

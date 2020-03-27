@@ -35,9 +35,9 @@ namespace imstk
 ///
 enum class LightType
 {
-    DIRECTIONAL_LIGHT,
-    POINT_LIGHT,
-    SPOT_LIGHT
+    directional,
+    point,
+    spot
 };
 
 ///
@@ -117,8 +117,7 @@ public:
     void setName(const std::string&& name) { m_name = std::move(name); };
 
 protected:
-    Light(const std::string& name) : m_name(name), Entity() {};
-    Light(std::string&& name) : m_name(std::move(name)), Entity() {};
+    explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), Entity() {};
 
     // properties with defaults
     float m_intensity   = 100.;
@@ -146,14 +145,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    DirectionalLight(const std::string& name) : Light(name)
+    explicit DirectionalLight(const std::string& name) : Light(name, LightType::directional)
     {
-        m_type = LightType::DIRECTIONAL_LIGHT;
-        this->setFocalPoint(-1, -1, -1);
-    };
-    DirectionalLight(std::string&& name) : Light(std::move(name))
-    {
-        m_type = LightType::DIRECTIONAL_LIGHT;
         this->setFocalPoint(-1, -1, -1);
     };
 
@@ -199,14 +192,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    PointLight(const std::string& name) : Light(name)
-    {
-        m_type = LightType::POINT_LIGHT;
-    };
-    PointLight(std::string&& name) : Light(std::move(name))
-    {
-        m_type = LightType::POINT_LIGHT;
-    };
+    explicit PointLight(const std::string& name, const LightType& type = LightType::point) : Light(name, type) {};
 
     ///
     /// \brief Get the cone angle
@@ -253,14 +239,8 @@ public:
     ///
     /// \brief Constructors
     ///
-    SpotLight(const std::string& name) : PointLight(name)
+    explicit SpotLight(const std::string& name) : PointLight(name, LightType::spot)
     {
-        m_type      = LightType::SPOT_LIGHT;
-        m_coneAngle = 10.;
-    };
-    SpotLight(std::string&& name) : PointLight(std::move(name))
-    {
-        m_type      = LightType::SPOT_LIGHT;
         m_coneAngle = 10.;
     };
 

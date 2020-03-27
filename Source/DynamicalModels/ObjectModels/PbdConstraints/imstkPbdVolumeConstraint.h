@@ -56,7 +56,7 @@ public:
     bool solvePositionConstraint(PbdModel& model) override;
 
 public:
-    double m_restVolume; ///> Rest volume
-    double m_stiffness;  ///> Stiffness of the volume constraint
+    double m_restVolume = 0.; ///> Rest volume
+    double m_stiffness  = 0.; ///> Stiffness of the volume constraint
 };
 }

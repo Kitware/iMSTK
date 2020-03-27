@@ -55,8 +55,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SceneObject(const std::string& name);
-    SceneObject(std::string&& name);
+    explicit SceneObject(const std::string& name);
 
     ///
     /// \brief Destructor

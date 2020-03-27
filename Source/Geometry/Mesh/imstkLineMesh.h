@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    LineMesh(const std::string name = std::string("")) : PointSet(Geometry::Type::LineMesh, name) {}
+    LineMesh(const std::string& name = std::string("")) : PointSet(Geometry::Type::LineMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and

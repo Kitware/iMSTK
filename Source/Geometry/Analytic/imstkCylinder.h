@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Cylinder(const std::string name = std::string("")) : AnalyticalGeometry(Type::Cylinder, name) {}
+    Cylinder(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Cylinder, name) {}
 
     ///
     /// \brief Print the cylinder info

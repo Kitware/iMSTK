@@ -20,22 +20,20 @@
 =========================================================================*/
 
 #include "imstkLogger.h"
+#include "imstkLogUtility.h"
 #include <cstring>
 
 namespace imstk
 {
-Logger::Logger(std::string filename)
+Logger::Logger(const std::string& filename) :
+    m_filename(filename + "_" + this->getCurrentTimeFormatted() + ".log"),
+    m_thread(std::thread(Logger::eventLoop, this))
 {
-    m_filename = filename + "_" + this->getCurrentTimeFormatted() + ".log";
-    m_mutex    = new std::mutex();
-    m_thread   = new std::thread(Logger::eventLoop, this);
 }
 
 Logger::~Logger()
 {
-    delete m_mutex;
-    m_thread->join();
-    delete m_thread;
+    m_thread.join();
 }
 
 std::string
@@ -85,8 +83,14 @@ Logger::eventLoop(Logger* logger)
     std::ofstream file(logger->m_filename);
     std::string   buffer;
 
-    while (logger->m_running) {
-        std::unique_lock<std::mutex> ul(*logger->m_mutex);
+    if (!file.is_open())
+    {
+        LOG(FATAL) << "Failed to open file: " << logger->m_filename;
+    }
+
+    while (logger->m_running)
+    {
+        std::unique_lock<std::mutex> ul(logger->m_mutex);
         logger->m_condition.wait(ul, [logger] { return logger->m_changed; });
 
         if (!logger->m_running)
@@ -109,7 +113,7 @@ Logger::eventLoop(Logger* logger)
 }
 
 void
-Logger::log(std::string message, bool prependTime /* = false */)
+Logger::log(const std::string& message, bool prependTime /* = false */)
 {
     m_message = "";
     if (prependTime)
@@ -120,12 +124,12 @@ Logger::log(std::string message, bool prependTime /* = false */)
 
     // Safely setting the change state
     {
-        std::lock_guard<std::mutex> guard(*m_mutex);
+        std::lock_guard<std::mutex> guard(m_mutex);
         m_changed = true;
     }
 
     m_condition.notify_one();
-    std::unique_lock<std::mutex> ul(*m_mutex);
+    std::unique_lock<std::mutex> ul(m_mutex);
     m_condition.wait(ul, [this] { return !m_changed; });
     ul.unlock();
 }
@@ -165,13 +169,13 @@ Logger::shutdown()
 {
     // Safely setting the running state
     {
-        std::lock_guard<std::mutex> guard(*m_mutex);
+        std::lock_guard<std::mutex> guard(m_mutex);
         m_changed = true;
         m_running = false;
     }
 
     m_condition.notify_one();
-    std::unique_lock<std::mutex> ul(*m_mutex);
+    std::unique_lock<std::mutex> ul(m_mutex);
     m_condition.wait(ul, [this] { return !m_changed; });
     ul.unlock();
 }

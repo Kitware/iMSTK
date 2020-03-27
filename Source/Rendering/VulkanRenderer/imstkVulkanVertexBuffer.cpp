@@ -28,11 +28,10 @@ VulkanVertexBuffer::VulkanVertexBuffer(VulkanMemoryManager&   memoryManager,
                                        unsigned int           vertexSize,
                                        unsigned int           numTriangles,
                                        double                 loadFactor,
-                                       VulkanVertexBufferMode mode)
+                                       VulkanVertexBufferMode mode) : m_renderDevice(memoryManager.m_device)
 {
-    m_mode = mode;
-    m_renderDevice     = memoryManager.m_device;
-    m_buffering        = (m_mode == VulkanVertexBufferMode::VERTEX_BUFFER_STATIC) ? 1 : memoryManager.m_buffering;
+    m_mode      = mode;
+    m_buffering = (m_mode == VulkanVertexBufferMode::VERTEX_BUFFER_STATIC) ? 1 : memoryManager.m_buffering;
     m_vertexBufferSize = (uint32_t)(numVertices * vertexSize * loadFactor) * m_buffering;
     m_numIndices       = numTriangles * 3;
     m_indexBufferSize  = (uint32_t)(m_numIndices * sizeof(uint32_t) * loadFactor) * m_buffering;
@@ -133,7 +132,6 @@ VulkanVertexBuffer::updateVertexBuffer(std::vector<VulkanBasicVertex>* vertices,
                                        std::vector<std::array<uint32_t, 3>>* triangles)
 {
     auto local_vertices = (VulkanBasicVertex*)this->getVertexMemory();
-
     for (unsigned int i = 0; i < vertices->size(); i++)
     {
         local_vertices[i].position = glm::vec3(

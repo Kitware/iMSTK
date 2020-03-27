@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VRPNArduinoDeviceClient(std::string deviceName, std::string ip) :
+    VRPNArduinoDeviceClient(const std::string& deviceName, const std::string& ip) :
         DeviceClient(deviceName, ip),
         Module(deviceName + "@" + ip)
     {}

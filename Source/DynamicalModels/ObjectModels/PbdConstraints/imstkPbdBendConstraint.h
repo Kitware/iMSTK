@@ -68,7 +68,7 @@ public:
     bool solvePositionConstraint(PbdModel& model) override;
 
 public:
-    double m_restLength; ///> Rest length
-    double m_stiffness;  ///> Bend stiffness
+    double m_restLength = 0.; ///> Rest length
+    double m_stiffness  = 0.; ///> Bend stiffness
 };
 } //imstk

@@ -422,7 +422,7 @@ VulkanPostProcess::createDescriptorSets(VulkanRenderer* renderer)
     descriptorSetAllocationInfo[0].descriptorSetCount = (uint32_t)m_descriptorSetLayouts.size();
     descriptorSetAllocationInfo[0].pSetLayouts = &m_descriptorSetLayouts[0];
 
-    VkDeviceSize size = { VK_WHOLE_SIZE };
+    //VkDeviceSize size = { VK_WHOLE_SIZE };
 
     std::vector<VkDescriptorImageInfo> fragmentTextureInfo;
 

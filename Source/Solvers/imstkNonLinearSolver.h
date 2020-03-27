@@ -53,7 +53,7 @@ public:
     /// \brief Main solve routine.
     ///
     virtual void solveGivenState(Vectord& x) = 0;
-    virtual void solve() = 0;
+    virtual void solve() override = 0;
 
     ///
     /// \brief Backtracking line search method based on the Armijo-Goldstein condition

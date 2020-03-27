@@ -56,7 +56,7 @@ namespace apiutils
 std::shared_ptr<VisualObject>
 createVisualAnalyticalSceneObject(Geometry::Type type,
                                   std::shared_ptr<Scene> scene,
-                                  const std::string objName,
+                                  const std::string& objName,
                                   const double scale = 1.,
                                   const Vec3d t      = Vec3d(0., 0., 0.))
 {
@@ -107,7 +107,7 @@ createVisualAnalyticalSceneObject(Geometry::Type type,
 std::shared_ptr<CollidingObject>
 createCollidingAnalyticalSceneObject(Geometry::Type type,
                                      std::shared_ptr<Scene> scene,
-                                     const std::string objName,
+                                     const std::string& objName,
                                      const double scale = 1.,
                                      const Vec3d t      = Vec3d(0., 0., 0.))
 {
@@ -150,8 +150,8 @@ createCollidingAnalyticalSceneObject(Geometry::Type type,
 ///
 std::shared_ptr<SceneObject>
 createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
-                              const std::string      fileName,
-                              const std::string      objectName)
+                              const std::string&     fileName,
+                              const std::string&     objectName)
 {
     CHECK(scene != nullptr) << "createAndAddVisualSceneObject: Scene is not valid!";
     CHECK(!fileName.empty()) << "createAndAddVisualSceneObject: Name is empty!";

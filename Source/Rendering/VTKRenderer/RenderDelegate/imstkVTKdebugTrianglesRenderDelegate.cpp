@@ -56,8 +56,8 @@ VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(const std::shared_p
     source->SetOutput(m_polyData);
 
     // Update Transform, Render Properties
-    updateDataSource();
-    updateActorProperties();
+    //updateDataSource();
+    //updateActorProperties();
 
     setUpMapper(source->GetOutputPort(), true, m_RenderGeoData->getRenderMaterial());
 }

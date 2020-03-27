@@ -55,7 +55,7 @@ public:
     bool solvePositionConstraint(PbdModel& model) override;
 
 public:
-    double m_restLength; ///> Rest length between the nodes
-    double m_stiffness;  ///> Stiffness of the constaint
+    double m_restLength = 0.; ///> Rest length between the nodes
+    double m_stiffness  = 0.; ///> Stiffness of the constaint
 };
 } // imstk

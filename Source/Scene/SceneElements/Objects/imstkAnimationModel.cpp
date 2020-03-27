@@ -23,9 +23,8 @@
 
 namespace imstk
 {
-AnimationModel::AnimationModel(std::shared_ptr<Geometry> geometry)
+AnimationModel::AnimationModel(std::shared_ptr<Geometry> geometry) : m_geometry(geometry)
 {
-    m_geometry = geometry;
 }
 
 std::shared_ptr<Geometry>

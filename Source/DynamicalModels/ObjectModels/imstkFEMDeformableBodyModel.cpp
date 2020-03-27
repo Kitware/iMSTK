@@ -356,7 +356,7 @@ FEMDeformableBodyModel::initializeDampingMatrix()
         return false;
     }
 
-    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
+    //auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
     //std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
 
     auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(m_vegaPhysicsMesh.get()));
@@ -441,10 +441,10 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
                                                  kinematicState&       newState,
                                                  const StateUpdateType updateType)
 {
-    auto& uPrev = stateAtT.getQ();
-    auto& vPrev = stateAtT.getQDot();
-    auto& u     = newState.getQ();
-    auto& v     = newState.getQDot();
+    const auto& uPrev = stateAtT.getQ();
+    const auto& vPrev = stateAtT.getQDot();
+    auto&       u     = newState.getQ();
+    const auto& v     = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
@@ -481,8 +481,8 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
                                                      const StateUpdateType updateType)
 {
     //auto& uPrev = stateAtT.getQ();
-    auto& vPrev = stateAtT.getQDot();
-    auto& u     = newState.getQ();
+    const auto& vPrev = stateAtT.getQDot();
+    auto&       u     = newState.getQ();
     //auto& v     = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
@@ -652,9 +652,9 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
     const Vectord&        solution,
     const StateUpdateType updateType)
 {
-    auto& uPrev = m_previousState->getQ();
+    const auto& uPrev = m_previousState->getQ();
     //auto&        u     = m_currentState->getQ();
-    auto&        v  = m_currentState->getQDot();
+    const auto&  v  = m_currentState->getQDot();
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)

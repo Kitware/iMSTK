@@ -234,7 +234,7 @@ void
 VulkanInteractorStyleVR::OnTimer()
 {
     vr::VRCompositor()->WaitGetPoses(m_devicePoses, vr::k_unMaxTrackedDeviceCount, nullptr, 0);
-    auto scene    = m_simManager->getActiveScene();
+    //auto scene    = m_simManager->getActiveScene();
     auto indexHMD = vr::k_unTrackedDeviceIndex_Hmd;
     auto nameHMD  = this->getDeviceID(indexHMD);
 

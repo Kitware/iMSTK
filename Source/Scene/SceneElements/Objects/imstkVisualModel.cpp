@@ -23,9 +23,8 @@
 
 namespace imstk
 {
-VisualModel::VisualModel(std::shared_ptr<Geometry> geometry)
+VisualModel::VisualModel(std::shared_ptr<Geometry> geometry) : m_geometry(geometry)
 {
-    m_geometry = geometry;
 }
 
 std::shared_ptr<Geometry>

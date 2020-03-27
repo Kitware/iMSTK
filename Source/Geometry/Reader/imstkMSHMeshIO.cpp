@@ -208,7 +208,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             {
                 break;
             }
-            elemID = stoul(subString);  // Read the element ID
+            //elemID = stoul(subString);  // Read the element ID
             subString.clear();
             mshLineStream >> subString; // Read the element type
             elemType = stoul(subString);

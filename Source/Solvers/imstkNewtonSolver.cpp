@@ -66,9 +66,7 @@ NewtonSolver::solveGivenState(Vectord& x)
         m_linearSolver->solve(dx);
         m_updateIterate(-dx, x);
 
-        double newNorm = fnorm;
-
-        newNorm = this->armijo(dx, x, fnorm);
+        double newNorm = this->armijo(dx, x, fnorm);
 
         if (m_forcingTerm > 0.0 && newNorm > stopTolerance)
         {
@@ -93,15 +91,15 @@ NewtonSolver::solve()
         return;
     }
 
-    size_t  iterNum;
-    auto&   u  = m_nonLinearSystem->getUnknownVector();
-    Vectord du = u; // make this a class member in future
+    size_t      iterNum;
+    const auto& u  = m_nonLinearSystem->getUnknownVector();
+    Vectord     du = u; // make this a class member in future
 
-    double error0 = MAX_D, error = MAX_D;
     double epsilon = m_relativeTolerance * m_relativeTolerance;
     for (iterNum = 0; iterNum < m_maxIterations; ++iterNum)
     {
-        error = updateJacobian(u);
+        double error0 = MAX_D;
+        double error  = updateJacobian(u);
 
         if (iterNum == 0)
         {

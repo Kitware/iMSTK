@@ -38,10 +38,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdRigidObject(std::string name) : PbdObject(name)
-    {
-        m_type = SceneObject::Type::Pbd;
-    }
+    explicit PbdRigidObject(const std::string& name) : PbdObject(name)
+    { m_type = SceneObject::Type::Pbd; }
 
     ///
     /// \brief Destructor

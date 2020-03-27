@@ -25,11 +25,10 @@ namespace imstk
 {
 namespace GUIOverlay
 {
-Widget::Widget(std::string name, float x, float y)
+Widget::Widget(const std::string& name, const float x, const float y) :
+    m_name(name),
+    m_position(Vec2f(x, y))
 {
-    m_name = name;
-    m_position[0] = x;
-    m_position[1] = y;
 }
 
 Widget::~Widget()

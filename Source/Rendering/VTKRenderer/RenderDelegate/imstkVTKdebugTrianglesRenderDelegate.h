@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKdbgTrianglesRenderDelegate(const std::shared_ptr<DebugRenderTriangles>& renderTriangles);
+    explicit VTKdbgTrianglesRenderDelegate(const std::shared_ptr<DebugRenderTriangles>& renderTriangles);
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry

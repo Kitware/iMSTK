@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKdbgLinesRenderDelegate(const std::shared_ptr<DebugRenderLines>& lineData);
+    explicit VTKdbgLinesRenderDelegate(const std::shared_ptr<DebugRenderLines>& lineData);
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry

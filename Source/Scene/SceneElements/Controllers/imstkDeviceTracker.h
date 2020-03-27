@@ -51,7 +51,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DeviceTracker(std::shared_ptr<DeviceClient> deviceClient) :
+    explicit DeviceTracker(std::shared_ptr<DeviceClient> deviceClient) :
         m_deviceClient(deviceClient) {}
 
     ///

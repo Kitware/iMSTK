@@ -126,7 +126,7 @@ protected:
 class VulkanInternalBufferGroup : public VulkanInternalResource
 {
 public:
-    VulkanInternalBufferGroup(VulkanMemoryType type)
+    explicit VulkanInternalBufferGroup(VulkanMemoryType type)
     {
         m_type   = type;
         m_buffer = new VkBuffer();
@@ -155,7 +155,7 @@ protected:
 class VulkanInternalBuffer
 {
 public:
-    VulkanInternalBuffer(VulkanInternalBufferGroup* bufferGroup)
+    explicit VulkanInternalBuffer(VulkanInternalBufferGroup* bufferGroup)
     {
         m_bufferGroup = bufferGroup;
     };

@@ -33,7 +33,7 @@ namespace imstk
 class DecalPool : public Geometry
 {
 public:
-    DecalPool(unsigned int maxNumDecals = 128, const std::string name = std::string(""));
+    DecalPool(unsigned int maxNumDecals = 128, const std::string& name = std::string(""));
 
     std::shared_ptr<Decal> addDecal();
 

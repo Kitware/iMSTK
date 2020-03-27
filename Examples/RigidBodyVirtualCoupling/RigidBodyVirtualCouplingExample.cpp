@@ -20,16 +20,8 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
-#include "imstkRigidObject.h"
-#include "imstkRigidBodyModel.h"
 #include "imstkSceneObject.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkCube.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkMeshIO.h"
-#include "imstkIsometricMap.h"
-
 #include "imstkSimulationManager.h"
 #include "imstkVirtualCouplingCH.h"
 #include "imstkHDAPIDeviceServer.h"

@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem);
+    explicit MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem);
     MassSpringForceModel() = delete;
 
     ///
@@ -55,17 +55,17 @@ public:
     ///
     /// \brief Set the internal force
     ///
-    void getInternalForce(const Vectord& u, Vectord& internalForce);
+    void getInternalForce(const Vectord& u, Vectord& internalForce) override;
 
     ///
     /// \brief Set the tangent stiffness matrix topology
     ///
-    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix);
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix) override;
 
     ///
     /// \brief Set the tangent stiffness matrix
     ///
-    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix);
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override;
 
 protected:
     std::shared_ptr<vega::MassSpringSystem> m_massSpringSystem;// Need to be initialized

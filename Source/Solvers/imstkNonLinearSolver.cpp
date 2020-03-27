@@ -60,7 +60,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
     }
 
     // Save iterate in case this fails
-    auto x_old = x;
+    //auto x_old = x;
 
     // Starts Armijo line search loop
     size_t i;

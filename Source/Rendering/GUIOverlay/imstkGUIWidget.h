@@ -52,7 +52,7 @@ public:
     ///
     /// \brief Protected constructor
     ///
-    Widget(std::string name, float x = 0.0f, float y = 0.0f);
+    Widget(const std::string& name, float x = 0.0f, float y = 0.0f);
 
     ///
     /// \brief Destructor

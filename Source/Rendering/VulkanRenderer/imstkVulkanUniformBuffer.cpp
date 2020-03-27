@@ -23,10 +23,9 @@
 
 namespace imstk
 {
-VulkanUniformBuffer::VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uint32_t uniformSize)
+VulkanUniformBuffer::VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uint32_t uniformSize) :
+    m_renderDevice(memoryManager.m_device)
 {
-    m_renderDevice = memoryManager.m_device;
-
     // Uniform buffer
     VkBufferCreateInfo uniformBufferInfo;
     uniformBufferInfo.sType       = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

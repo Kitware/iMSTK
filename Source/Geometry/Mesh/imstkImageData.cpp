@@ -27,7 +27,7 @@
 
 namespace imstk
 {
-ImageData::ImageData(const std::string name)
+ImageData::ImageData(const std::string& name)
     : PointSet(Geometry::Type::ImageData, name),
     m_dataTransform(vtkSmartPointer<vtkTransform>::New())
 {

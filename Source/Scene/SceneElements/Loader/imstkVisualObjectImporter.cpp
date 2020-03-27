@@ -58,7 +58,7 @@ VisualObjectImporter::importVisualObject(
     std::vector<std::string> materialTextureCoreFileNames;
     std::vector<std::string> materialTextureFileExtensions;
 
-    std::string texturePath;
+    //std::string texturePath;
 
     // Normalizes, for examples ".png" to "png"
     auto cleanFileExtension = VisualObjectImporter::getSubstringGivenString(fileExtension, ".", true);
@@ -208,7 +208,6 @@ VisualObjectImporter::getSubstringGivenString(
 {
     unsigned long long index = 0;
     unsigned long long tempIndex;
-    std::string        output;
 
     if (lastInstance)
     {

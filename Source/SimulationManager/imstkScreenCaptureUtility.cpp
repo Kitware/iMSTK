@@ -32,7 +32,7 @@ ScreenCaptureUtility::getScreenShotNumber() const
 }
 
 void
-ScreenCaptureUtility::setScreenShotPrefix(const std::string newPrefix)
+ScreenCaptureUtility::setScreenShotPrefix(const std::string& newPrefix)
 {
     if (m_screenShotPrefix.compare(newPrefix) != 0)
     {

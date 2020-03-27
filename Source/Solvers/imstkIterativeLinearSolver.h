@@ -68,7 +68,7 @@ public:
     ///
     /// \brief Solve the linear system using Gauss-Seidel iterations.
     ///
-    virtual void solve(Vectord& x);
+    virtual void solve(Vectord& x) override;
 
     ///
     /// \brief Returns true if the solver is iterative
