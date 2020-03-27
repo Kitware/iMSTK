@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKdbgPointsRenderDelegate(const std::shared_ptr<DebugRenderPoints>& pointData);
+    explicit VTKdbgPointsRenderDelegate(const std::shared_ptr<DebugRenderPoints>& pointData);
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry

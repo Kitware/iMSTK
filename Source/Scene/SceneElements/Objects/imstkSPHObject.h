@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SPHObject(const std::string& name);
+    explicit SPHObject(const std::string& name);
 
     ///
     /// \brief Destructor

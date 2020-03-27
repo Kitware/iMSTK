@@ -23,10 +23,10 @@
 
 namespace imstk
 {
-SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining()
-    : SpatialHashTable()
+SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining() :
+    SpatialHashTable(),
+    m_table(std::make_shared<std::unordered_set<PointEntry>>())
 {
-    m_table = std::make_shared<std::unordered_set<PointEntry>>();
     this->clear();
 }
 

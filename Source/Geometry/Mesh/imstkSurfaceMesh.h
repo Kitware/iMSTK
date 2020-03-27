@@ -83,7 +83,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SurfaceMesh(const std::string name = std::string("")) : PointSet(Geometry::Type::SurfaceMesh, name) {}
+    SurfaceMesh(const std::string& name = std::string("")) : PointSet(Geometry::Type::SurfaceMesh, name) {}
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -182,7 +182,7 @@ public:
     ///
     /// \brief Set/Get the array defining the default material coordinates
     ///
-    void setDefaultTCoords(std::string arrayName);
+    void setDefaultTCoords(const std::string& arrayName);
     std::string getDefaultTCoords();
 
     ///

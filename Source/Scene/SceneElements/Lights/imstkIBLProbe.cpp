@@ -23,22 +23,6 @@
 
 namespace imstk
 {
-IBLProbe::IBLProbe(std::string irradianceCubemapPath,
-                   std::string radianceCubemapPath,
-                   std::string brdfLUTPath)
-{
-    m_irradianceCubemapPath = irradianceCubemapPath;
-    m_radianceCubemapPath   = radianceCubemapPath;
-    m_brdfLUTPath = brdfLUTPath;
-
-    m_irradianceCubemapTexture
-        = std::make_shared<Texture>(irradianceCubemapPath, Texture::Type::IRRADIANCE_CUBEMAP);
-    m_radianceCubemapTexture
-        = std::make_shared<Texture>(radianceCubemapPath, Texture::Type::RADIANCE_CUBEMAP);
-    m_brdfLUTTexture
-        = std::make_shared<Texture>(brdfLUTPath, Texture::Type::BRDF_LUT);
-}
-
 std::shared_ptr<Texture>
 IBLProbe::getIrradianceCubemapTexture()
 {

@@ -29,7 +29,7 @@ VulkanDecalRenderDelegate::VulkanDecalRenderDelegate(std::shared_ptr<VisualModel
 {
     this->initialize(visualModel);
 
-    auto geometry = std::static_pointer_cast<DecalPool>(visualModel->getGeometry());
+    //auto geometry = std::static_pointer_cast<DecalPool>(visualModel->getGeometry());
 
     m_numVertices  = 8;
     m_numTriangles = 12;

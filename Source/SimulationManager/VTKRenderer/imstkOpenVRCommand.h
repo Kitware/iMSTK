@@ -58,6 +58,6 @@ protected:
     ///
     virtual ~OpenVRCommand() = default;
 
-    SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
+    SimulationManager* m_simManager = nullptr; ///> SimulationManager owning the current simulation being interacted with
 };
 } // imstk

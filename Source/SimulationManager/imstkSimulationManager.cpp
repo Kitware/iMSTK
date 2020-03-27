@@ -29,11 +29,8 @@
 
 namespace imstk
 {
-SimulationManager::SimulationManager(const std::shared_ptr<simManagerConfig> config)
+SimulationManager::SimulationManager(const std::shared_ptr<simManagerConfig> config) : m_config(config)
 {
-    // set the configuration
-    m_config = config;
-
     // Initialize the logger
     m_logUtil->createLogger(m_config->logFilePrefix, m_config->logPath);
 

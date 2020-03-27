@@ -38,7 +38,7 @@ public:
     /// \brief Construct class with search radius
     /// \param radius The search radius
     ///
-    GridBasedNeighborSearch(const Real radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
+    explicit GridBasedNeighborSearch(const Real radius) : m_SearchRadius(radius), m_SearchRadiusSqr(radius * radius) {}
 
     ///
     /// \brief Set the search radius

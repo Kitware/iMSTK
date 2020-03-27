@@ -70,8 +70,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(name), m_config(config) {}
-    Scene(std::string&& name, std::shared_ptr<SceneConfig> config      = std::make_shared<SceneConfig>()) : m_name(std::move(name)), m_config(config) {}
+    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(name), m_config(config) {}
 
     ///
     /// \brief Destructor

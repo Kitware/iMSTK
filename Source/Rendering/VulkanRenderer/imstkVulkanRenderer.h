@@ -72,7 +72,7 @@ struct VulkanRendererConstants
 class VulkanRenderer : public Renderer
 {
 public:
-    VulkanRenderer(std::shared_ptr<Scene> scene);
+    explicit VulkanRenderer(std::shared_ptr<Scene> scene);
     ~VulkanRenderer();
 
     void setShadowMapResolution(uint32_t resolution);

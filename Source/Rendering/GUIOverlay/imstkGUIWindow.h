@@ -46,12 +46,12 @@ public:
     ///
     /// \brief Protected constructor
     ///
-    Window(std::string name,
-           std::string title  = "",
-           float       width  = 100,
-           float       height = 50,
-           float       x = 0,
-           float       y = 0);
+    explicit Window(const std::string& name,
+                    const std::string& title = "",
+                    const float        width  = 100,
+                    const float        height = 50,
+                    const float        x      = 0,
+                    const float        y      = 0);
 
     ///
     /// \brief Destructor
@@ -66,7 +66,7 @@ public:
     ///
     /// \brief Render
     ///
-    virtual void render(const bool inWindow);
+    virtual void render(const bool inWindow) override;
 
     ///
     /// \brief Add widget

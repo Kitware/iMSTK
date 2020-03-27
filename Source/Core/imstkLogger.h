@@ -47,7 +47,7 @@ public:
     /// \brief Logger instantiation method
     /// \params filename this name will be used in the file name of the log file
     ///
-    Logger(std::string filename);
+    explicit Logger(const std::string& filename);
     virtual ~Logger();
 
     ///
@@ -56,7 +56,7 @@ public:
     /// \params prependTime defines if the current time is prepended to
     ///         the message. Disabled by default.
     ///
-    void log(std::string message, bool prependTime = false);
+    void log(const std::string& message, bool prependTime = false);
 
     ///
     /// \brief Sets the frequency in Hz. This also updates the period.
@@ -102,7 +102,7 @@ private:
     static std::string getCurrentTimeFormatted();
 
     // Mutex for performance reasons
-    std::mutex* m_mutex;
+    std::mutex  m_mutex;
     std::string m_message;
     bool m_changed = false;
     bool m_running = true;
@@ -111,8 +111,8 @@ private:
     int       m_period      = 1000 / 30;
     long long m_lastLogTime = 0;
 
-    std::string  m_filename;
-    std::thread* m_thread;
+    std::string m_filename;
+    std::thread m_thread;
     std::condition_variable m_condition;
 };
 }

@@ -204,17 +204,16 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
     helper.Program->SetUniformf("metalness", material->getMetalness());
     helper.Program->SetUniformf("roughness", material->getRoughness());
 
-    unsigned int textureCount   = 0;
-    unsigned int currentTexture = 0;
-
     auto renderWindow = (vtkOpenGLRenderWindow*)(renderer->GetRenderWindow());
 
     if (this->GetOpenGLMode(actor->GetProperty()->GetRepresentation(), helper.PrimitiveType) == GL_TRIANGLES)
     {
-        auto  diffuseColorTemp = material->getColor();
-        float diffuseColor[3]  = { (float)diffuseColorTemp.r,
-                                   (float)diffuseColorTemp.g,
-                                   (float)diffuseColorTemp.b };
+        unsigned int textureCount     = 0;
+        unsigned int currentTexture   = 0;
+        auto         diffuseColorTemp = material->getColor();
+        float        diffuseColor[3]  = { (float)diffuseColorTemp.r,
+                                          (float)diffuseColorTemp.g,
+                                          (float)diffuseColorTemp.b };
         helper.Program->SetUniform3f("diffuseColorUniform", diffuseColor);
 
         auto diffuseTexture = material->getTexture(Texture::Type::DIFFUSE);
@@ -287,7 +286,7 @@ VTKCustomPolyDataMapper::UpdateShaders(
 }
 
 void
-VTKCustomPolyDataMapper::loadShader(const std::string filename, std::string& source)
+VTKCustomPolyDataMapper::loadShader(const std::string& filename, std::string& source)
 {
     std::stringstream stream;
     std::ifstream     file(filename);

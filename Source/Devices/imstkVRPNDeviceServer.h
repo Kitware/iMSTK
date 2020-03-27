@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceServer(std::string machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO) :
+    VRPNDeviceServer(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO) :
         m_machine(machine),
         m_port(port),
         Module(machine + ":" + std::to_string(port))
@@ -73,12 +73,12 @@ public:
     ///
     /// \brief Add device
     ///
-    void addDevice(std::string deviceName, DeviceType deviceType, int id = 0);
+    void addDevice(const std::string& deviceName, DeviceType deviceType, int id = 0);
 
     ///
     /// \brief Add serial device
     ///
-    void addSerialDevice(std::string deviceName, DeviceType deviceType, std::string port = "COM6", int baudRate = 57600, int id = 0);
+    void addSerialDevice(const std::string& deviceName, DeviceType deviceType, const std::string& port = "COM6", int baudRate = 57600, int id = 0);
 
 protected:
 
@@ -110,7 +110,7 @@ private:
 
     std::map<std::string, std::pair<DeviceType, int>> m_deviceInfoMap; ///< list of iMSTK client info
     std::map<std::string, SerialInfo> m_SerialInfoMap;
-    vrpn_Connection* m_serverConnection;                               ///< VRPN server connection
-    vrpn_MainloopContainer* m_deviceConnections;                       ///< VRPN device connections
+    vrpn_Connection* m_serverConnection = nullptr;                     ///< VRPN server connection
+    vrpn_MainloopContainer* m_deviceConnections = nullptr;             ///< VRPN device connections
 };
 } // imstk

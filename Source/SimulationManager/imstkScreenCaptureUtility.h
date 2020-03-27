@@ -45,7 +45,7 @@ public:
 
     ///
     /// \brief set/reset the prefix amd the count numbers
-    void setScreenShotPrefix(const std::string newPrefix);
+    void setScreenShotPrefix(const std::string& newPrefix);
 
     ///
     /// \brief reset the screenshot number indicator
@@ -62,7 +62,7 @@ protected:
     ///
     ~ScreenCaptureUtility() = default;
 
-    unsigned int m_screenShotNumber; //> screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
-    std::string  m_screenShotPrefix; //> the prefix for the screenshots to be saved
+    unsigned int m_screenShotNumber = 0; //> screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
+    std::string  m_screenShotPrefix;     //> the prefix for the screenshots to be saved
 };
 } // imstk

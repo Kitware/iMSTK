@@ -30,7 +30,7 @@ VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<VisualModel> visu
 {
     m_visualModel = visualModel;
 
-    auto geometry = std::static_pointer_cast<Plane>(m_visualModel->getGeometry());
+    //auto geometry = std::static_pointer_cast<Plane>(m_visualModel->getGeometry());
 
     auto planeSource = vtkSmartPointer<vtkPlaneSource>::New();
     planeSource->SetCenter(0, 0, 0);

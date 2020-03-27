@@ -25,10 +25,10 @@ namespace imstk
 {
 void
 VulkanRenderPassGenerator::generateDepthRenderPass(
-    VkDevice&              device,
-    VkRenderPass&          renderPass,
-    VkSampleCountFlagBits& samples,
-    const uint32_t         numViews)
+    VkDevice&                    device,
+    VkRenderPass&                renderPass,
+    const VkSampleCountFlagBits& samples,
+    const uint32_t               numViews)
 {
     VkAttachmentDescription attachments[1];
 
@@ -103,10 +103,10 @@ VulkanRenderPassGenerator::generateDepthRenderPass(
 
 void
 VulkanRenderPassGenerator::generateOpaqueRenderPass(
-    VkDevice&              device,
-    VkRenderPass&          renderPass,
-    VkSampleCountFlagBits& samples,
-    const uint32_t         numViews)
+    VkDevice&                    device,
+    VkRenderPass&                renderPass,
+    const VkSampleCountFlagBits& samples,
+    const uint32_t               numViews)
 {
     VkAttachmentDescription attachments[4];
 
@@ -230,10 +230,10 @@ VulkanRenderPassGenerator::generateOpaqueRenderPass(
 
 void
 VulkanRenderPassGenerator::generateDecalRenderPass(
-    VkDevice&              device,
-    VkRenderPass&          renderPass,
-    VkSampleCountFlagBits& samples,
-    const uint32_t         numViews)
+    VkDevice&                    device,
+    VkRenderPass&                renderPass,
+    const VkSampleCountFlagBits& samples,
+    const uint32_t               numViews)
 {
     VkAttachmentDescription attachments[3];
 
@@ -341,10 +341,10 @@ VulkanRenderPassGenerator::generateDecalRenderPass(
 
 void
 VulkanRenderPassGenerator::generateParticleRenderPass(
-    VkDevice&              device,
-    VkRenderPass&          renderPass,
-    VkSampleCountFlagBits& samples,
-    uint32_t               numViews)
+    VkDevice&                    device,
+    VkRenderPass&                renderPass,
+    const VkSampleCountFlagBits& samples,
+    uint32_t                     numViews)
 {
     VkAttachmentDescription attachments[3];
 
@@ -452,10 +452,10 @@ VulkanRenderPassGenerator::generateParticleRenderPass(
 
 void
 VulkanRenderPassGenerator::generateShadowRenderPass(
-    VkDevice&              device,
-    VkRenderPass&          renderPass,
-    VkSampleCountFlagBits& samples,
-    const uint32_t         numViews)
+    VkDevice&                    device,
+    VkRenderPass&                renderPass,
+    const VkSampleCountFlagBits& samples,
+    const uint32_t               numViews)
 {
     VkAttachmentDescription attachments[1];
 
@@ -523,10 +523,10 @@ VulkanRenderPassGenerator::generateShadowRenderPass(
 
 void
 VulkanRenderPassGenerator::generateGUIRenderPass(
-    VkDevice&              device,
-    VkRenderPass&          renderPass,
-    VkSampleCountFlagBits& samples,
-    const uint32_t         numViews)
+    VkDevice&                    device,
+    VkRenderPass&                renderPass,
+    const VkSampleCountFlagBits& samples,
+    const uint32_t               numViews)
 {
     VkAttachmentDescription attachments[1];
 

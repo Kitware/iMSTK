@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Update line source based on the line mesh

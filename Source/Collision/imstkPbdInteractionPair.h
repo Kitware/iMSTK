@@ -78,8 +78,8 @@ private:
     std::shared_ptr<PbdObject> m_firstObj;
     std::shared_ptr<PbdObject> m_secondObj;
 
-    double       m_firstObjProximity;
-    double       m_secondObjProximity;
-    unsigned int maxIter;
+    double       m_firstObjProximity  = MAX_D;
+    double       m_secondObjProximity = MAX_D;
+    unsigned int maxIter = 50;
 };
 }

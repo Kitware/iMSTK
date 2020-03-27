@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor

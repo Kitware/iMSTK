@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VisualModel(std::shared_ptr<Geometry> geometry);
+    explicit VisualModel(std::shared_ptr<Geometry> geometry);
 
     VisualModel() = delete;
 

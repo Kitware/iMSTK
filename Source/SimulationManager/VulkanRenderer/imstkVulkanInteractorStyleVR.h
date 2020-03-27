@@ -100,7 +100,7 @@ public:
     /// \brief Update function for VR
     /// Computes/extracts matrices for devices (HMD, controllers, etc.)
     ///
-    virtual void OnTimer();
+    virtual void OnTimer() override;
 
 protected:
     friend VulkanViewer;

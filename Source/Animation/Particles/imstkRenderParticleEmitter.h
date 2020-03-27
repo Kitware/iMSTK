@@ -77,9 +77,9 @@ public:
     ///
     /// \brief Constructor
     ///
-    RenderParticleEmitter(std::shared_ptr<Geometry> geometry,
-                          const float               time = 3000.0f,
-                          Mode                      mode = Mode::CONTINUOUS);
+    explicit RenderParticleEmitter(std::shared_ptr<Geometry> geometry,
+                                   const float               time = 3000.0f,
+                                   Mode                      mode = Mode::CONTINUOUS);
 
     ///
     /// \brief Set animation geometry

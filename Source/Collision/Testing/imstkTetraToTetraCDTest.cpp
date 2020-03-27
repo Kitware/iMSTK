@@ -39,7 +39,7 @@ protected:
 };
 
 std::shared_ptr<TetrahedralMesh>
-loadMesh(std::string externalDataSuffix)
+loadMesh(const std::string& externalDataSuffix)
 {
     std::string                      file = iMSTK_DATA_ROOT + externalDataSuffix;
     std::shared_ptr<TetrahedralMesh> volMesh

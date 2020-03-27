@@ -56,12 +56,12 @@ public:
     ///
     /// \brief Remove widget
     ///
-    bool removeWidget(std::string name);
+    bool removeWidget(const std::string& name);
 
     ///
     /// \brief Get widget
     ///
-    std::shared_ptr<Widget> getWidget(std::string name);
+    std::shared_ptr<Widget> getWidget(const std::string& name);
 
     ///
     /// \brief Get number of widgets

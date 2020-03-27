@@ -34,7 +34,7 @@
 namespace imstk
 {
 void
-VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, int id)
+VRPNDeviceServer::addDevice(const std::string& deviceName, DeviceType deviceType, int id)
 {
     m_deviceInfoMap[deviceName] = std::make_pair(deviceType, id);
 
@@ -47,7 +47,7 @@ VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, int i
 }
 
 void
-VRPNDeviceServer::addSerialDevice(std::string deviceName, DeviceType deviceType, std::string port, int baudRate, int id)
+VRPNDeviceServer::addSerialDevice(const std::string& deviceName, DeviceType deviceType, const std::string& port, int baudRate, int id)
 {
     SerialInfo serialSettings;
     serialSettings.baudRate     = baudRate;

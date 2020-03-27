@@ -108,7 +108,7 @@ public:
     ///
     void printTimeElapsed(std::string const& name = std::string("noName"), const TimeUnitType unitType = TimeUnitType::milliSeconds);
 private:
-    TimerState state;
+    TimerState state = TimerState::stopped;
     std::vector<double>      lapTimes;
     std::vector<std::string> lapNames;
     std::chrono::high_resolution_clock::time_point wallClockTimeKeeper; ///> time keeper for wall clock time
@@ -145,7 +145,7 @@ public:
     double getTimeElapsed(const TimeUnitType unitType = TimeUnitType::milliSeconds) override;
 
 private:
-    std::clock_t cpuTimeKeeper; ///> time keeper for cpu time
+    std::clock_t cpuTimeKeeper = std::clock_t(); ///> time keeper for cpu time
 };
 
 ///

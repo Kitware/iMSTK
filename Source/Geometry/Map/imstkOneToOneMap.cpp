@@ -127,11 +127,6 @@ OneToOneMap::isValid() const
     {
         ParallelUtils::parallelFor(meshSlave->getNumVertices(), [&](const size_t nodeId)
             {
-                if (!valid) // If map is invalid, no need to check further
-                {
-                    return;
-                }
-
                 const auto p    = meshSlave->getVertexPosition(nodeId);
                 bool matchFound = false;
                 for (size_t idx = 0; idx < meshMaster->getNumVertices(); ++idx)

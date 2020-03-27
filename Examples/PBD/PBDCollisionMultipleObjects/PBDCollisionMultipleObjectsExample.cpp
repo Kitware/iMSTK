@@ -229,9 +229,9 @@ main()
     const double distanceY  = 5.0;
     const double minHeight  = -5.0;
 
-    std::vector<std::shared_ptr<SurfaceMesh>>   surfaceMeshes;
-    std::vector<std::shared_ptr<PbdObject>>     pbdObjs;
-    std::vector<std::shared_ptr<PbdSolver>>     pbdSolvers;
+    std::vector<std::shared_ptr<SurfaceMesh>> surfaceMeshes;
+    std::vector<std::shared_ptr<PbdObject>>   pbdObjs;
+    //std::vector<std::shared_ptr<PbdSolver>>     pbdSolvers;
     std::vector<std::shared_ptr<CollisionData>> allCollisionData;
     size_t                                      numTriangles = 0;
 
@@ -260,7 +260,7 @@ main()
                 generateDragon(scene, translation, mesh, pbdObj, solver);
                 surfaceMeshes.push_back(mesh);
                 pbdObjs.push_back(pbdObj);
-                pbdSolvers.push_back(solver);
+                //pbdSolvers.push_back(solver);
                 numTriangles += mesh->getNumTriangles();
 
                 // Collision between dragon with floor

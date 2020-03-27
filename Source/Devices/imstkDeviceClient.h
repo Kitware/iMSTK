@@ -100,7 +100,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DeviceClient(std::string name, std::string ip) :
+    DeviceClient(const std::string& name, const std::string& ip) :
         m_deviceName(name),
         m_ip(ip)
     {}

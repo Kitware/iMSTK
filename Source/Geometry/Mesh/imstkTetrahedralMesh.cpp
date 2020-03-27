@@ -75,8 +75,7 @@ TetrahedralMesh::getVolume() const
             v[i] = m_vertexPositions[tetVertices[i]];
         }
 
-        A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2],
-            1, v[3][0], v[3][1], v[3][2], 1;
+        A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1, v[3][0], v[3][1], v[3][2], 1;
 
         double det = A.determinant();
         if (det < 0)
@@ -116,8 +115,8 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
     std::vector<triArray> surfaceTri;
     std::vector<size_t>   surfaceTriTet;
     std::vector<size_t>   tetRemainingVert;
-    bool                  unique = true;
-    size_t                foundAt = 0, tetId = 0;
+    bool                  unique;
+    size_t                foundAt, tetId = 0;
     size_t                a, b, c;
 
     for (auto& tetVertArray : vertArray)
@@ -236,8 +235,7 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
     }
 
     Mat4d A;
-    A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1,
-        v[3][0], v[3][1], v[3][2], 1;
+    A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1, v[3][0], v[3][1], v[3][2], 1;
 
     det = A.determinant();
 

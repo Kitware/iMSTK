@@ -142,7 +142,7 @@ protected:
     ///
     /// \brief Loads a shader
     ///
-    void loadShader(const std::string filename, std::string& source);
+    void loadShader(const std::string& filename, std::string& source);
 
     std::shared_ptr<RenderMaterial> m_renderMaterial; ///< Geometry reference
 

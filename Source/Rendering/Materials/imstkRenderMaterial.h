@@ -93,13 +93,13 @@ public:
     /// it affects the specular color in the case of metals.
     ///
     const Color& getColor() const;
-    void setColor(const Color color);
+    void setColor(const Color& color);
 
     ///
     /// \brief Get/Set the color of the wireframe and points
     ///
     const Color& getDebugColor() const;
-    void setDebugColor(const Color color);
+    void setDebugColor(const Color& color);
 
     ///
     /// \brief Get/Set the metalness

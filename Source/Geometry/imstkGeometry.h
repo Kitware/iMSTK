@@ -83,7 +83,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Geometry(const Type type, const std::string name = std::string(""));
+    explicit Geometry(const Geometry::Type type, const std::string& name = std::string(""));
 
     ///
     /// \brief Destructor

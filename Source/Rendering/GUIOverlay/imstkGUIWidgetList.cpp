@@ -39,7 +39,7 @@ WidgetList::addWidget(std::shared_ptr<Widget> widget)
 }
 
 bool
-WidgetList::removeWidget(std::string name)
+WidgetList::removeWidget(const std::string& name)
 {
     int index = 0;
 
@@ -56,7 +56,7 @@ WidgetList::removeWidget(std::string name)
 }
 
 std::shared_ptr<Widget>
-WidgetList::getWidget(std::string name)
+WidgetList::getWidget(const std::string& name)
 {
     for (auto widget : m_widgets)
     {

@@ -102,13 +102,11 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
     {
         applyLinearProjectionFilter(res, *m_FixedLinearProjConstraints, false);
     }
-    auto       c         = res;
-    auto       delta     = res.dot(res);
-    auto       deltaPrev = delta;
-    const auto eps       = m_tolerance * m_tolerance * delta;
-    double     alpha     = 0.0;
-    double     dotval;
-    auto       q       = Vectord(b.size()).setZero();
+    auto       c     = res;
+    auto       delta = res.dot(res);
+    const auto eps   = m_tolerance * m_tolerance * delta;
+    double     alpha = 0.0;
+    Vectord    q;
     size_t     iterNum = 0;
 
     while (delta > eps)
@@ -122,7 +120,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
         {
             applyLinearProjectionFilter(q, *m_FixedLinearProjConstraints, false);
         }
-        dotval = c.dot(q);
+        double dotval = c.dot(q);
         if (dotval != 0.0)
         {
             alpha = delta / dotval;
@@ -132,12 +130,12 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
             LOG(WARNING) << "ConjugateGradient::modifiedCGSolve: deniminator zero. Terminating MCG iteation!";
             return;
         }
-        x        += alpha * c;
-        res      -= alpha * q;
-        deltaPrev = delta;
-        delta     = res.dot(res);
-        c        *= delta / deltaPrev;
-        c        += res;
+        x   += alpha * c;
+        res -= alpha * q;
+        const double deltaPrev = delta;
+        delta = res.dot(res);
+        c    *= delta / deltaPrev;
+        c    += res;
         if (m_DynamicLinearProjConstraints)
         {
             applyLinearProjectionFilter(c, *m_DynamicLinearProjConstraints, false);

@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Plane(const std::string name = std::string("")) : AnalyticalGeometry(Type::Plane, name) {}
+    Plane(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Plane, name) {}
 
     ///
     /// \brief Print the plane info

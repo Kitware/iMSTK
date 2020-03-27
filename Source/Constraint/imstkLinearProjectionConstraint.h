@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    LinearProjectionConstraint(const size_t& nodeId, const bool isFixed = false);
+    explicit LinearProjectionConstraint(const size_t& nodeId, const bool isFixed = false);
     LinearProjectionConstraint() = delete;
 
     ///

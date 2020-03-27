@@ -121,7 +121,7 @@ VTKTextStatusManager::setFPS(const double visualFPS, const double physicsFPS)
 }
 
 void
-VTKTextStatusManager::setCustomStatus(const std::string status)
+VTKTextStatusManager::setCustomStatus(const std::string& status)
 {
     auto customStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[StatusType::Custom],
                                                         m_StatusFontSizes[StatusType::Custom],

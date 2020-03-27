@@ -26,12 +26,11 @@ namespace imstk
 VulkanTextureDelegate::VulkanTextureDelegate(
     VulkanMemoryManager&     memoryManager,
     std::shared_ptr<Texture> texture,
-    float                    anisotropyAmount)
+    float                    anisotropyAmount) :
+    m_path(texture->getPath()),
+    m_type(texture->getType()),
+    m_fileType(texture->getFileType())
 {
-    m_path     = texture->getPath();
-    m_type     = texture->getType();
-    m_fileType = texture->getFileType();
-
     // Load textures and get texture information
     if ((m_type == Texture::Type::IRRADIANCE_CUBEMAP)
         || (m_type == Texture::Type::RADIANCE_CUBEMAP))
@@ -323,7 +322,6 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
 
     auto imageEditData = (unsigned char*)m_stagingBuffer->getMemoryData(memoryManager.m_device);
 
-    unsigned int y_offset      = 0;
     unsigned int totalChannels = this->getNumChannels(m_format);
     unsigned int colorChannels = std::min(std::min(m_channels, 3u), totalChannels);
 
@@ -331,7 +329,7 @@ VulkanTextureDelegate::uploadTexture(VulkanMemoryManager& memoryManager)
     {
         for (unsigned int y = 0; y < m_height; y++)
         {
-            y_offset = y * m_width;
+            unsigned int y_offset = y * m_width;
             for (unsigned int x = 0; x < m_width; x++)
             {
                 // Fill in image data
@@ -551,7 +549,7 @@ VulkanTextureDelegate::uploadCubemapTexture(VulkanMemoryManager& memoryManager)
 
 void
 VulkanTextureDelegate::changeImageLayout(VkCommandBuffer&        commandBuffer,
-                                         VkImage&                image,
+                                         const VkImage&          image,
                                          VkImageLayout           layout1,
                                          VkImageLayout           layout2,
                                          VkAccessFlags           sourceFlags,
@@ -709,6 +707,7 @@ VulkanTextureDelegate::getStride(const VkFormat& format)
         break;
     case VK_FORMAT_R8_UNORM:
         stride = 1;
+    /// \\todo add break here?
     case VK_FORMAT_BC1_RGB_UNORM_BLOCK:
     case VK_FORMAT_BC1_RGB_SRGB_BLOCK:
     case VK_FORMAT_BC1_RGBA_UNORM_BLOCK:

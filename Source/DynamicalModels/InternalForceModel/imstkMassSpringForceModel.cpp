@@ -23,9 +23,8 @@
 
 namespace imstk
 {
-MassSpringForceModel::MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem) : InternalForceModel()
+MassSpringForceModel::MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem) : m_massSpringSystem(massSpringSystem), InternalForceModel()
 {
-    m_massSpringSystem = massSpringSystem;
 }
 
 void

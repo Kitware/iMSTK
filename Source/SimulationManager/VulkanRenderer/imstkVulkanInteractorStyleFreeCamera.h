@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Controls camera movement
     ///
-    virtual void OnTimer();
+    virtual void OnTimer() override;
 
 protected:
     friend class VulkanViewer;

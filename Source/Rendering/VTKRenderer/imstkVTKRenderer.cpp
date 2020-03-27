@@ -36,10 +36,8 @@
 
 namespace imstk
 {
-VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
+VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_scene(scene)
 {
-    m_scene = scene;
-
     // create m_vtkRenderer depending on enableVR
     if (!enableVR)
     {
@@ -70,7 +68,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
         // Create lights specified in the scene
         switch (light->getType())
         {
-        case imstk::LightType::DIRECTIONAL_LIGHT:
+        case imstk::LightType::directional:
         {
             auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
             m_vtkLight->SetPositional(false);
@@ -83,7 +81,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
         }
         break;
 
-        case imstk::LightType::SPOT_LIGHT:
+        case imstk::LightType::spot:
         {
             auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
             m_vtkLight->SetPositional(true);
@@ -105,7 +103,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR)
         }
         break;
 
-        case imstk::LightType::POINT_LIGHT:
+        case imstk::LightType::point:
         {
             auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
             m_vtkLight->SetPositional(true);

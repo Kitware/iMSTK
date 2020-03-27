@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-Geometry::Geometry(const Geometry::Type type, const std::string name) :
+Geometry::Geometry(const Geometry::Type type, const std::string& name) :
     m_type(type), m_name(name), m_geometryIndex(Geometry::getUniqueID())
 {
     // If the geometry name is empty, enumerate it by name (which will not be duplicated)
@@ -65,7 +65,7 @@ Geometry::print() const
 void
 Geometry::computeBoundingBox(Vec3d&, Vec3d&, const double) const
 {
-    LOG(FATAL) << "computeBoundingBox() must be called from an instance of a specific geometry class";
+    LOG(WARNING) << "computeBoundingBox() must be called from an instance of a specific geometry class";
 }
 
 void

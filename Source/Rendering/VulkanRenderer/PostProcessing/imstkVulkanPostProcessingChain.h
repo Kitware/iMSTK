@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VulkanPostProcessingChain(VulkanRenderer* renderer);
+    explicit VulkanPostProcessingChain(VulkanRenderer* renderer);
 
     std::vector<std::shared_ptr<VulkanPostProcess>>& getPostProcesses();
 

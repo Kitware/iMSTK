@@ -57,6 +57,6 @@ public:
     ///
     /// \brief
     ///
-    bool solvePositionConstraint();
+    bool solvePositionConstraint() override;
 };
 }

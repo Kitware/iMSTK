@@ -54,6 +54,6 @@ public:
     ///
     /// \brief Solve edge-edge collision constraint
     ///
-    bool solvePositionConstraint();
+    bool solvePositionConstraint() override;
 };
 }

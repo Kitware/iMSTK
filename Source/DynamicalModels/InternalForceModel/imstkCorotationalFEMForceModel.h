@@ -47,7 +47,7 @@ public:
     ///
     /// \brief
     ///
-    CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);
+    explicit CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);
     CorotationalFEMForceModel() = delete;
 
     ///

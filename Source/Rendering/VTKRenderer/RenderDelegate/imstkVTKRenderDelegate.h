@@ -105,17 +105,17 @@ protected:
     ///
     /// \brief Default constructor (protected)
     ///
-    VTKRenderDelegate()
+    VTKRenderDelegate() :
+        m_actor(vtkSmartPointer<vtkActor>::New()),
+        m_mapper(vtkSmartPointer<VTKCustomPolyDataMapper>::New()),
+        m_transform(vtkSmartPointer<vtkTransform>::New()),
+        m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
+        m_volume(vtkSmartPointer<vtkVolume>::New()),
+        m_modelIsVolume(false)
     {
-        m_actor     = vtkSmartPointer<vtkActor>::New();
-        m_mapper    = vtkSmartPointer<VTKCustomPolyDataMapper>::New();
-        m_transform = vtkSmartPointer<vtkTransform>::New();
         m_actor->SetMapper(m_mapper);
         m_actor->SetUserTransform(m_transform);
-        m_volumeMapper = vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New();
-        m_volume       = vtkSmartPointer<vtkVolume>::New();
         m_volume->SetMapper(m_volumeMapper);
-        m_modelIsVolume = false;
     }
 
     virtual ~VTKRenderDelegate() = default;

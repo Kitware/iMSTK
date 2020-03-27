@@ -64,7 +64,7 @@ public:
         LowerRight
     };
 
-    VTKTextStatusManager(VTKInteractorStyle* const vtkInteractorStyle);
+    explicit VTKTextStatusManager(VTKInteractorStyle* const vtkInteractorStyle);
     virtual ~VTKTextStatusManager();
 
     ///
@@ -103,7 +103,7 @@ public:
     /// \brief Set custom status text
     /// The string parameter should be passed by value, not const reference
     ///
-    void setCustomStatus(const std::string status);
+    void setCustomStatus(const std::string& status);
 
     ///
     /// \brief Clear custom status text (and hide it)

@@ -23,9 +23,8 @@
 
 namespace imstk
 {
-VulkanRenderer::VulkanRenderer(std::shared_ptr<Scene> scene)
+VulkanRenderer::VulkanRenderer(std::shared_ptr<Scene> scene) : m_scene(scene)
 {
-    m_scene = scene;
 }
 
 void
@@ -129,8 +128,8 @@ VulkanRenderer::initialize(const unsigned int width,
     this->createGlobalUniformBuffers();
     this->createShadowMaps(m_shadowMapResolution);
 
-    std::vector<VkPipeline>                   graphicsPipelines;
-    std::vector<VkGraphicsPipelineCreateInfo> graphicsPipelinesInfo;
+    //std::vector<VkPipeline>                   graphicsPipelines;
+    //std::vector<VkGraphicsPipelineCreateInfo> graphicsPipelinesInfo;
 
     VkPhysicalDeviceProperties deviceProperties;
     vkGetPhysicalDeviceProperties(m_renderPhysicalDevice, &deviceProperties);

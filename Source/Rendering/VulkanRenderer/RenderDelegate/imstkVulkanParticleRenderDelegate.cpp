@@ -85,7 +85,7 @@ VulkanParticleRenderDelegate::initializeData(VulkanMemoryManager& memoryManager,
 void
 VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<Camera> camera)
 {
-    unsigned int index = 0;
+    //unsigned int index = 0;
 
     auto particles = std::static_pointer_cast<RenderParticles>(m_visualModel->getGeometry());
 
@@ -97,7 +97,7 @@ VulkanParticleRenderDelegate::update(const uint32_t frameIndex, std::shared_ptr<
         camera->getViewUp()[1],
         camera->getViewUp()[2]);
 
-    auto matColor = mat->getColor();
+    //auto matColor = mat->getColor();
 
     this->sortParticles(particles->getParticles(), particles->getNumParticles(), cameraPosition);
 

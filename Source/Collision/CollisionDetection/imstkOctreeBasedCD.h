@@ -47,7 +47,7 @@ public:
     /// \param name Name of the octree
     ///
     explicit OctreeBasedCD(const Vec3r& center, const Real width, const Real minWidth,
-                           const Real minWidthRatio = 1.0, const std::string name = "OctreeBasedCD") :
+                           const Real minWidthRatio = 1.0, const std::string& name = "OctreeBasedCD") :
         LooseOctree(center, width, minWidth, minWidthRatio, name) {}
 
     ///

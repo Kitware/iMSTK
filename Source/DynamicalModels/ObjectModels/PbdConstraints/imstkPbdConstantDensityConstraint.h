@@ -37,7 +37,14 @@ public:
     ///
     /// \brief constructor
     ///
-    PbdConstantDensityConstraint() : PbdConstraint() {}
+    PbdConstantDensityConstraint() : PbdConstraint()
+    {
+        // constraint parameters
+        // Refer: Miller, et al 2003 "Particle-Based Fluid Simulation for Interactive Applications."
+        /// \todo Check if these numbers can be variable
+        m_wPoly6Coeff = 315.0 / (64.0 * PI * pow(m_maxDist, 9));
+        m_wSpikyCoeff = 15.0 / (PI * pow(m_maxDist, 6));
+    }
 
     ///
     /// \Constant Density Constraint Initialization
@@ -47,12 +54,12 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::ConstantDensity
     ///
-    Type getType() const { return Type::ConstantDensity; }
+    Type getType() const override { return Type::ConstantDensity; }
 
     ///
     /// \brief Solves the constant density constraint
     ///
-    bool solvePositionConstraint(PbdModel& model);
+    bool solvePositionConstraint(PbdModel& model) override;
 
 private:
     ///

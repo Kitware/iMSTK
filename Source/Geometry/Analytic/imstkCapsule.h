@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const std::string name = std::string("")) : AnalyticalGeometry(Type::Capsule, name) {}
+    Capsule(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Capsule, name) {}
 
     ///
     /// \brief Print the capsule info

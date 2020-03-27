@@ -154,10 +154,6 @@ SurfaceMesh::computeTrianglesNormals()
     if (hasUVs)
     {
         UVs = this->getPointDataArray(m_defaultTCoords);
-    }
-
-    if (hasUVs)
-    {
         for (size_t triangleId = 0; triangleId < m_triangleNormals.size(); ++triangleId)
         {
             const auto& t   = m_trianglesVertices.at(triangleId);
@@ -208,13 +204,12 @@ SurfaceMesh::computeVertexNormals()
     }
 
     // Correct for UV seams
-    Vec3d                     normal, tangent;
-    bool                      hasUVs = this->hasPointDataArray(m_defaultTCoords);
-    const StdVectorOfVectorf* UVs;
+    Vec3d normal, tangent;
+    bool  hasUVs = this->hasPointDataArray(m_defaultTCoords);
 
     if (hasUVs)
     {
-        UVs = this->getPointDataArray(m_defaultTCoords);
+        auto UVs = this->getPointDataArray(m_defaultTCoords);
     }
 
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
@@ -286,7 +281,7 @@ SurfaceMesh::optimizeForDataLocality()
     // B. Iterate till all the nodes are added to optimized mesh
     size_t vertId[3];
     auto   connectivity = this->getTrianglesVertices();
-    while (triUnderConsideration.size() != 0)
+    while (!triUnderConsideration.empty())
     {
         // B.1 Add new nodes and triangles
         for (const auto& triId : triUnderConsideration)
@@ -448,7 +443,7 @@ SurfaceMesh::getNumTriangles() const
 }
 
 void
-SurfaceMesh::setDefaultTCoords(std::string arrayName)
+SurfaceMesh::setDefaultTCoords(const std::string& arrayName)
 {
     m_defaultTCoords = arrayName;
 }

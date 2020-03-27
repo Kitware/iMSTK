@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix = "Screenshot-");
+    explicit VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix = "Screenshot-");
 
     ///
     /// \brief Destructor

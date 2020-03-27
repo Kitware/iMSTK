@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor

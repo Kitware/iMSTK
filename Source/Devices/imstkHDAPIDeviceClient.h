@@ -53,7 +53,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    HDAPIDeviceClient(std::string name) : DeviceClient(name, "localhost") {}
+    explicit HDAPIDeviceClient(const std::string& name) : DeviceClient(name, "localhost") {}
     virtual ~HDAPIDeviceClient() {}
 
 protected:

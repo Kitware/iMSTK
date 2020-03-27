@@ -141,7 +141,7 @@ RenderMaterial::getColor() const
 }
 
 void
-RenderMaterial::setColor(const Color color)
+RenderMaterial::setColor(const Color& color)
 {
     m_color    = color;
     m_modified = true;
@@ -154,7 +154,7 @@ RenderMaterial::getDebugColor() const
 }
 
 void
-RenderMaterial::setDebugColor(const Color color)
+RenderMaterial::setDebugColor(const Color& color)
 {
     m_debugColor = color;
     m_modified   = true;

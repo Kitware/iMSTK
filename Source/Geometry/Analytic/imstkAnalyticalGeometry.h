@@ -57,7 +57,7 @@ public:
 
 protected:
 
-    AnalyticalGeometry(Type type, const std::string name = std::string("")) : Geometry(type, name) {}
+    explicit AnalyticalGeometry(Type type, const std::string& name = std::string("")) : Geometry(type, name) {}
 
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;

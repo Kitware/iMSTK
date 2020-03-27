@@ -60,7 +60,7 @@ Color::Color(const double* rgba)
     setValue(rgba[0], rgba[1], rgba[2], rgba[3]);
 }
 
-Color::Color(const Color color, const double a)
+Color::Color(const Color& color, const double a)
 {
     setValue(color.r, color.g, color.b, a);
 }

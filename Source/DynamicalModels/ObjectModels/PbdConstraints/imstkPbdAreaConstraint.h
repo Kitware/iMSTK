@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::Area
     ///
-    Type getType() const { return Type::Area; }
+    Type getType() const override { return Type::Area; }
 
     ///
     /// \brief Initializes the area constraint
@@ -53,10 +53,10 @@ public:
     ///
     /// \brief Solves the area constraint
     ///
-    bool solvePositionConstraint(PbdModel& model);
+    bool solvePositionConstraint(PbdModel& model) override;
 
 public:
-    double m_restArea;  ///> Area at the rest position
-    double m_stiffness; ///> Stiffness of the area constraint
+    double m_restArea  = 0.; ///> Area at the rest position
+    double m_stiffness = 0.; ///> Stiffness of the area constraint
 };
 } // imstk

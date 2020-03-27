@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    DummyClient(std::string name) : DeviceClient(name, "localhost") {}
+    explicit DummyClient(const std::string& name) : DeviceClient(name, "localhost") {}
     virtual ~DummyClient() {}
 
 protected:

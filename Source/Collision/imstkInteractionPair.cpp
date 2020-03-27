@@ -29,12 +29,10 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
                                  std::shared_ptr<CollidingObject> B,
                                  CollisionDetection::Type         CDType,
                                  CollisionHandling::Type          CHAType,
-                                 CollisionHandling::Type          CHBType)
+                                 CollisionHandling::Type          CHBType) :
+    m_colData(std::make_shared<CollisionData>()),
+    m_valid(false)
 {
-    m_colData = std::make_shared<CollisionData>();
-
-    m_valid = false;
-
     // Check that objects exist
     CHECK(A != nullptr && B != nullptr) << "InteractionPair error: invalid objects (nullptr).";
 

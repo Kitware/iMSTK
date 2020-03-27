@@ -39,7 +39,7 @@ private:
     void initialize();
 
 public:
-    SPHModelConfig(const Real particleRadius);
+    explicit SPHModelConfig(const Real particleRadius);
 
     /// \todo Move this to solver or time integrator in the future
     Real m_minTimestep = Real(1e-6);

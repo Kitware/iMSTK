@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SceneManager(std::shared_ptr<Scene> scene) :
+    explicit SceneManager(std::shared_ptr<Scene> scene) :
         Module(scene->getName()),
         m_scene(scene) {}
 

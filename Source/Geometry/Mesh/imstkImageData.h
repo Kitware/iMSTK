@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    ImageData(const std::string name = std::string(""));
+    ImageData(const std::string& name = std::string(""));
 
     ///
     /// \brief Print the image data info

@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor

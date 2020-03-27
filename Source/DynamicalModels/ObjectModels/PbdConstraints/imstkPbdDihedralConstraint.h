@@ -70,7 +70,7 @@ public:
     bool solvePositionConstraint(PbdModel& model) override;
 
 public:
-    double m_restAngle; ///> Rest angle
-    double m_stiffness; ///> Angular stiffness
+    double m_restAngle = 0.; ///> Rest angle
+    double m_stiffness = 0.; ///> Angular stiffness
 };
 } //imstk

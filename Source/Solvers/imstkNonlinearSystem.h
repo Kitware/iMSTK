@@ -134,7 +134,7 @@ public:
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
     MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
-    Vectord* m_unknown;
+    Vectord* m_unknown = nullptr;
 
     UpdateFunctionType m_FUpdate;
     UpdatePrevStateFunctionType m_FUpdatePrevState;

@@ -39,7 +39,8 @@ struct RigidBodyPropertyDesc
 enum class RigidBodyType
 { Static,
   Dynamic,
-  Kinematic };
+  Kinematic,
+  none };
 
 using namespace physx;
 
@@ -131,7 +132,7 @@ public:
         if (m_pxDynamicActor)
         {
             auto p = m_initialState->getPosition();
-            auto r = m_initialState->getRotation();
+            //auto r = m_initialState->getRotation();
 
             //auto q = Quatd(r);
             PxTransform pose;
@@ -148,8 +149,8 @@ protected:
     std::shared_ptr<RigidBodyPropertyDesc> m_material;
     PxRigidDynamic* m_pxDynamicActor = NULL;
     PxRigidStatic*  m_pxStaticActor  = NULL;
-    bool m_isStatic;          ///> Indicates if the body is static or dynamic
-    RigidBodyType m_type;     ///> Indicates if the body is static, dynamic
+    bool m_isStatic      = true;                ///> Indicates if the body is static or dynamic
+    RigidBodyType m_type = RigidBodyType::none; ///> Indicates if the body is static, dynamic
 
     Vec3d m_force = Vec3d(0., 0., 0.);
     Vec3d m_forcePos;
