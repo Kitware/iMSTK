@@ -8,6 +8,7 @@ include(${${export_config_name}Targets})
 include(CMakeFindDependencyMacro)
 
 # iMSTK settings
+set(iMSTK_ROOT ${PACKAGE_PREFIX_DIR})
 set(iMSTK_ENABLE_VR @iMSTK_ENABLE_VR@)
 set(iMSTK_USE_Vulkan @iMSTK_USE_Vulkan@)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
