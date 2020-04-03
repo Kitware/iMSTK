@@ -44,11 +44,4 @@ if(iMSTK_USE_OpenHaptics)
     SFML)
   endif()
   
-
-  #-----------------------------------------------------------------------------
-  # Set MSVC working directory to the install/bin directory
-  #-----------------------------------------------------------------------------
-  if(MSVC) # Configure running executable out of MSVC
-    set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${iMSTK_INSTALL_BIN_DIR}")
-  endif()
 endif()
