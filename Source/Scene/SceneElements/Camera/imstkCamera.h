@@ -28,9 +28,6 @@
 
 namespace imstk
 {
-class CameraController;
-class DeviceClient;
-
 ///
 /// \class Camera
 ///
@@ -103,18 +100,7 @@ public:
     ///
     void setFieldOfView(const double& fov);
 
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<CameraController> getController() const;
-
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<CameraController> setController(std::shared_ptr<CameraController> controller);
-
 protected:
-    std::shared_ptr<CameraController> m_controller; ///>
 
     Vec3d  m_position    = Vec3d(0, 2, 5);          ///> camera position
     Vec3d  m_focalPoint  = WORLD_ORIGIN;            ///> camera focal point

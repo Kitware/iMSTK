@@ -29,6 +29,7 @@
 namespace imstk
 {
 class SceneObjectControllerBase;
+class CameraController;
 class DebugRenderGeometry;
 class SceneObject;
 class SolverBase;
@@ -198,6 +199,11 @@ public:
     void addObjectController(std::shared_ptr<SceneObjectControllerBase> controller);
 
     ///
+    /// \brief Add objects controllers
+    ///
+    void addCameraController(std::shared_ptr<CameraController> camController);
+
+    ///
     /// \brief
     ///
     bool isInitialized() const { return m_isInitialized; }
@@ -225,8 +231,9 @@ protected:
     std::shared_ptr<Camera>         m_camera = std::make_shared<Camera>();
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;                          ///> List of non-linear solvers
-    std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
-    std::unordered_map<std::string, std::thread> m_threadMap;                    ///>
+    std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
+    std::vector<std::shared_ptr<CameraController>> m_cameraControllers;          ///> List of camera controllers
+    std::unordered_map<std::string, std::thread>   m_threadMap;                  ///>
 
     double m_fps       = 0.0;
     double elapsedTime = 0.0;

@@ -21,7 +21,7 @@
 
 // imstk
 #include "imstkSceneManager.h"
-#include "imstkCameraController.h"
+//#include "imstkCameraController.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
 
@@ -38,11 +38,11 @@ SceneManager::cleanUpModule()
 {
     // End Camera Controller
     /// \todo move this out of scene manager
-    if (auto camController = m_scene->getCamera()->getController())
+    /*if (auto camController = m_scene->getCamera()->getController())
     {
         camController->end();
         m_threadMap.at(camController->getName()).join();
-    }
+    }*/
 }
 
 void

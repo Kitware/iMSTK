@@ -42,9 +42,8 @@ namespace imstk
 {
 Scene::~Scene()
 {
-    // End Camera Controller
-    /// \todo move this out of scene
-    if (auto camController = this->getCamera()->getController())
+    // Join Camera Controllers
+    for (auto camController : m_cameraControllers)
     {
         camController->end();
         m_threadMap.at(camController->getName()).join();
@@ -108,7 +107,7 @@ void
 Scene::launchModules()
 {
     // Start Camera Controller (asynchronous)
-    if (auto camController = this->getCamera()->getController())
+    for (auto camController : m_cameraControllers)
     {
         m_threadMap[camController->getName()] = std::thread([camController] { camController->start(); });
     }
@@ -322,6 +321,12 @@ void
 Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller)
 {
     m_objectControllers.push_back(controller);
+}
+
+void
+Scene::addCameraController(std::shared_ptr<CameraController> camController)
+{
+    m_cameraControllers.push_back(camController);
 }
 
 void

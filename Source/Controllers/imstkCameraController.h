@@ -40,7 +40,7 @@ public:
     ///
     /// \brief
     ///
-    CameraController(Camera&                       camera,
+    CameraController(std::shared_ptr<Camera>       camera,
                      std::shared_ptr<DeviceClient> deviceClient) :
         Module("Camera controller"),
         m_camera(camera),
@@ -84,7 +84,7 @@ protected:
     ///
     void cleanUpModule() override {};
 
-    Camera& m_camera;                                    ///< Camera controlled by the external device
+    std::shared_ptr<Camera> m_camera;                    ///< Camera controlled by the external device
 
     Vec3d m_cameraTranslationOffset = WORLD_ORIGIN;      ///< Translation offset for the camera over tracking data
     Quatd m_cameraRotationalOffset  = Quatd::Identity(); ///< camera head angle offset (in deg)
