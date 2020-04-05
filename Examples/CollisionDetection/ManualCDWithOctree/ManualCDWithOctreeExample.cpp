@@ -27,6 +27,7 @@
 #include "imstkVTKViewer.h"
 #include "imstkTimer.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionData.h"
 
 // This is for collision detection between geometries
 #include "imstkOctreeBasedCD.h"

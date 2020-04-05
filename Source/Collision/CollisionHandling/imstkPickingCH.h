@@ -21,18 +21,15 @@
 
 #pragma once
 
-// std library
-#include <memory>
-
 // imstk
 #include "imstkCollisionHandling.h"
-#include "imstkNonlinearSystem.h"
 
 namespace imstk
 {
 class CollidingObject;
 class FeDeformableObject;
-struct CollisionData;
+class LinearProjectionConstraint;
+struct CollisionData; 
 
 ///
 /// \class PickingCH

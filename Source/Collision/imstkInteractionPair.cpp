@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkInteractionPair.h"
+#include "imstkCollisionData.h"
+#include "imstkCollidingObject.h"
 
 #include <g3log/g3log.hpp>
 

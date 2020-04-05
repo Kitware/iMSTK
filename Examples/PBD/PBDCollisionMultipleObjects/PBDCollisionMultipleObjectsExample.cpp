@@ -33,6 +33,7 @@
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 #include "imstkPBDCollisionHandling.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionData.h"
 
 // Enable this macro to generate many dragons
 #define BIG_SCENE

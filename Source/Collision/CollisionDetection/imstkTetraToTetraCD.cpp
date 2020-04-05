@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkTetraToTetraCD.h"
-
 #include "imstkCollisionData.h"
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"

@@ -22,12 +22,12 @@
 #pragma once
 
 #include "imstkInteractionPair.h"
-#include "imstkPbdEdgeEdgeCollisionConstraint.h"
-#include "imstkPbdPointTriCollisionConstraint.h"
-#include "imstkPbdObject.h"
 
 namespace imstk
 {
+class PbdObject; 
+class PbdCollisionConstraint;
+
 ///
 /// \class PbdInteractionPair
 ///

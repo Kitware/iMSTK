@@ -25,6 +25,8 @@ limitations under the License.
 #include "imstkPointSet.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkTimeIntegrator.h"
+#include "imstkCollisionData.h"
+#include "imstkLinearProjectionConstraint.h"
 
 namespace imstk
 {
