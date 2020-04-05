@@ -23,18 +23,19 @@
 
 #include <unordered_map>
 #include <memory>
-
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkIBLProbe.h"
-#include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
-#include "imstkSolverBase.h"
+#include <thread>
+#include <atomic>
 
 namespace imstk
 {
 class SceneObjectControllerBase;
 class DebugRenderGeometry;
+class SceneObject;
+class SolverBase;
+class Camera;
+class IBLProbe;
+class CollisionGraph;
+class Light;
 
 enum class TimeSteppingPolicy
 {
@@ -70,7 +71,9 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(name), m_config(config) {}
+    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : 
+                   m_name(name), 
+                   m_config(config) {}
 
     ///
     /// \brief Destructor

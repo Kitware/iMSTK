@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkSceneObject.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"

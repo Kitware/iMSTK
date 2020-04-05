@@ -22,15 +22,8 @@
 // imstk
 #include "imstkSceneManager.h"
 #include "imstkCameraController.h"
-#include "imstkSceneObjectController.h"
-#include "imstkDynamicObject.h"
-#include "imstkPbdObject.h"
-#include "imstkDeformableObject.h"
-#include "imstkGeometryMap.h"
-#include "imstkTimer.h"
-#include "imstkPbdSolver.h"
-
-#include "g3log/g3log.hpp"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 namespace imstk
 {
@@ -44,6 +37,7 @@ void
 SceneManager::cleanUpModule()
 {
     // End Camera Controller
+    /// \todo move this out of scene manager
     if (auto camController = m_scene->getCamera()->getController())
     {
         camController->end();

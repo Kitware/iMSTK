@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDebugRenderGeometry.h"
@@ -29,6 +30,11 @@
 #include "imstkPbdSolver.h"
 #include "imstkPbdObject.h"
 #include "imstkPBDCollisionHandling.h"
+#include "imstkSolverBase.h"
+#include "imstkCamera.h"
+#include "imstkIBLProbe.h"
+#include "imstkCollisionGraph.h"
+#include "imstkLight.h"
 
 #include <g3log/g3log.hpp>
 

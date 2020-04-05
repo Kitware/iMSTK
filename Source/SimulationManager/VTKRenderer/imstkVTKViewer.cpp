@@ -20,8 +20,9 @@
 =========================================================================*/
 
 #include "imstkVTKViewer.h"
-
 #include "imstkVTKRenderDelegate.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 namespace imstk
 {

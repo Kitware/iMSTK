@@ -20,10 +20,13 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
 #include "imstkRigidObject.h"
 #include "imstkRigidBodyModel.h"
 #include "imstkSceneObject.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkLight.h"
+#include "imstkCamera.h"
 #include "imstkCube.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"

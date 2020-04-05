@@ -24,6 +24,7 @@
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
 #include "imstkAPIUtilities.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 

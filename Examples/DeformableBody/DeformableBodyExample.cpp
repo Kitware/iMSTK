@@ -32,6 +32,7 @@
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
 #include "imstkConjugateGradient.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 

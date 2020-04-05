@@ -22,9 +22,12 @@
 #include "imstkVTKRenderer.h"
 
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkLight.h"
 
 #include "vtkLightActor.h"
 #include "vtkCameraActor.h"
