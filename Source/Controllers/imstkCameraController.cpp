@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCameraController.h"
+#include "imstkCamera.h"
 
 #include <utility>
 

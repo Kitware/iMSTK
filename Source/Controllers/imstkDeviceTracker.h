@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 // imstk
 #include "imstkMath.h"
 #include "imstkDeviceClient.h"

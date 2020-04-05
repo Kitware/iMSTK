@@ -23,12 +23,15 @@
 
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDeviceTracker.h"
-#include "imstkSceneObject.h"
 
 #include <memory>
+#include <functional>
 
 namespace imstk
 {
+
+class SceneObject;
+
 ///
 /// \class SceneObjectController
 ///

@@ -23,12 +23,11 @@
 
 #include "imstkModule.h"
 #include "imstkDeviceTracker.h"
-#include "imstkCamera.h"
-
-#include <memory>
 
 namespace imstk
 {
+class Camera;
+
 ///
 /// \class CameraController
 ///
