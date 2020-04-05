@@ -89,7 +89,7 @@ main()
     surfMeshModel->setRenderMaterial(material);
 
     // Scene Object
-    auto deformableObj = std::make_shared<DeformableObject>("Dragon");
+    auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map

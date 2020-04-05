@@ -70,9 +70,9 @@ struct FEMModelConfig
 /// Note: Vega specifics will removed in future when the inertial and damping calculations
 /// are done with in-house code
 ///
-class FEMDeformableBodyModel : public DynamicalModel<VectorizedState>
+class FEMDeformableBodyModel : public DynamicalModel<FeDeformBodyState>
 {
-using kinematicState = VectorizedState;
+using kinematicState = FeDeformBodyState;
 public:
     ///
     /// \brief Constructor

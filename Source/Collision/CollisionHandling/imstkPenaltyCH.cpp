@@ -41,7 +41,7 @@ PenaltyCH::PenaltyCH(const Side&                             side,
 void
 PenaltyCH::processCollisionData()
 {
-    if (auto deformableObj = std::dynamic_pointer_cast<DeformableObject>(m_object))
+    if (auto deformableObj = std::dynamic_pointer_cast<FeDeformableObject>(m_object))
     {
         this->computeContactForcesDiscreteDeformable(deformableObj);
     }
@@ -87,7 +87,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObje
 }
 
 void
-PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<DeformableObject>& deformableObj)
+PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeformableObject>& deformableObj)
 {
     if (m_colData->MAColData.isEmpty())
     {

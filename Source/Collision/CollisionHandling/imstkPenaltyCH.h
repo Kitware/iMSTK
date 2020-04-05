@@ -30,7 +30,7 @@
 namespace imstk
 {
 class CollidingObject;
-class DeformableObject;
+class FeDeformableObject;
 struct CollisionData;
 
 ///
@@ -62,7 +62,7 @@ public:
     ///
     void processCollisionData() override;
     void computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj);
-    void computeContactForcesDiscreteDeformable(const std::shared_ptr<DeformableObject>& deformableObj);
+    void computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeformableObject>& deformableObj);
 
     ///
     /// \brief Set the contact stiffness

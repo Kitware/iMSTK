@@ -48,29 +48,29 @@ public:
     ///
     /// \brief Update state given change in velocity
     ///
-    void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
-                            std::shared_ptr<VectorizedState> currentState,
+    void updateStateGivenDv(std::shared_ptr<FeDeformBodyState> prevState,
+                            std::shared_ptr<FeDeformBodyState> currentState,
                             Vectord&                         dV) override;
 
     ///
     /// \brief Update state given change in displacement
     ///
-    void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
-                            std::shared_ptr<VectorizedState> currentState,
+    void updateStateGivenDu(std::shared_ptr<FeDeformBodyState> prevState,
+                            std::shared_ptr<FeDeformBodyState> currentState,
                             Vectord&                         dU) override;
 
     ///
     /// \brief Update state given updated velocity
     ///
-    void updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
-                           std::shared_ptr<VectorizedState> currentState,
+    void updateStateGivenV(std::shared_ptr<FeDeformBodyState> prevState,
+                           std::shared_ptr<FeDeformBodyState> currentState,
                            Vectord&                         v) override;
 
     ///
     /// \brief Update state given updated displacement
     ///
-    void updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
-                           std::shared_ptr<VectorizedState> currentState,
+    void updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState,
+                           std::shared_ptr<FeDeformBodyState> currentState,
                            Vectord&                         u) override;
 protected:
 

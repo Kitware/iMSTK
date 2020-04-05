@@ -11,7 +11,7 @@ imstk_add_library( DynamicalModels
     ObjectModels/PbdConstraints
     InternalForceModel
   DEPENDS
-    Core
+    Common
     DataStructures
     Constraints
     Geometry

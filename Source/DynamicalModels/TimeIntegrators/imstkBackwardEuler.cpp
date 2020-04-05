@@ -24,8 +24,8 @@
 namespace imstk
 {
 void
-BackwardEuler::updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
-                                  std::shared_ptr<VectorizedState> currentState,
+BackwardEuler::updateStateGivenDv(std::shared_ptr<FeDeformBodyState> prevState,
+                                  std::shared_ptr<FeDeformBodyState> currentState,
                                   Vectord&                         dV)
 {
     currentState->getQDot() = prevState->getQDot() + dV;
@@ -33,8 +33,8 @@ BackwardEuler::updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
 }
 
 void
-BackwardEuler::updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
-                                  std::shared_ptr<VectorizedState> currentState,
+BackwardEuler::updateStateGivenDu(std::shared_ptr<FeDeformBodyState> prevState,
+                                  std::shared_ptr<FeDeformBodyState> currentState,
                                   Vectord&                         dU)
 {
     currentState->getQ()    = prevState->getQ() + dU;
@@ -42,8 +42,8 @@ BackwardEuler::updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
 }
 
 void
-BackwardEuler::updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
-                                 std::shared_ptr<VectorizedState> currentState,
+BackwardEuler::updateStateGivenV(std::shared_ptr<FeDeformBodyState> prevState,
+                                 std::shared_ptr<FeDeformBodyState> currentState,
                                  Vectord&                         v)
 {
     currentState->getQDot() = v;
@@ -51,8 +51,8 @@ BackwardEuler::updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
 }
 
 void
-BackwardEuler::updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
-                                 std::shared_ptr<VectorizedState> currentState,
+BackwardEuler::updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState,
+                                 std::shared_ptr<FeDeformBodyState> currentState,
                                  Vectord&                         u)
 {
     currentState->getQ()    = u;

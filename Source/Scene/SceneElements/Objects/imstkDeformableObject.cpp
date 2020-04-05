@@ -24,7 +24,7 @@
 namespace imstk
 {
 Vectord&
-DeformableObject::getContactForce()
+FeDeformableObject::getContactForce()
 {
     CHECK(m_defModel != nullptr) << "deformation model pointer not valid DeformableObject::getContactForce()";
 
@@ -32,7 +32,7 @@ DeformableObject::getContactForce()
 }
 
 bool
-DeformableObject::initialize()
+FeDeformableObject::initialize()
 {
     m_defModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
     if (m_defModel)
@@ -47,37 +47,37 @@ DeformableObject::initialize()
 }
 
 const Vectord&
-DeformableObject::getDisplacements() const
+FeDeformableObject::getDisplacements() const
 {
     return m_defModel->getCurrentState()->getQ();
 }
 
 const Vectord&
-DeformableObject::getPrevDisplacements() const
+FeDeformableObject::getPrevDisplacements() const
 {
     return m_defModel->getPreviousState()->getQ();
 }
 
 const Vectord&
-DeformableObject::getVelocities() const
+FeDeformableObject::getVelocities() const
 {
     return m_defModel->getCurrentState()->getQDot();
 }
 
 const Vectord&
-DeformableObject::getPrevVelocities() const
+FeDeformableObject::getPrevVelocities() const
 {
     return m_defModel->getPreviousState()->getQDot();
 }
 
 const Vectord&
-DeformableObject::getAccelerations() const
+FeDeformableObject::getAccelerations() const
 {
     return m_defModel->getCurrentState()->getQDotDot();
 }
 
 const Vectord&
-DeformableObject::getPrevAccelerations() const
+FeDeformableObject::getPrevAccelerations() const
 {
     return m_defModel->getPreviousState()->getQDotDot();
 }

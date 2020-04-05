@@ -8,7 +8,7 @@ if(${PROJECT_NAME}_USE_OpenHaptics)
 endif()
 imstk_add_library( Devices
   DEPENDS
-    Core
+    Common
     VRPN
     ${HAPTIC_DEVICE_LIBS}
   )

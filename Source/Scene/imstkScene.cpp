@@ -370,7 +370,7 @@ Scene::advance(const double dt)
     // Reset Contact forces to 0
     for (auto obj : this->getSceneObjects())
     {
-        if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+        if (auto defObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
         {
             defObj->getContactForce().setConstant(0.0);
         }
@@ -440,7 +440,7 @@ Scene::advance(const double dt)
         }
         else if (obj->getType() == SceneObject::Type::FEMDeformable)
         {
-            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            if (auto dynaObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
             {
                 if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
                 {

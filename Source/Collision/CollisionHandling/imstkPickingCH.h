@@ -31,7 +31,7 @@
 namespace imstk
 {
 class CollidingObject;
-class DeformableObject;
+class FeDeformableObject;
 struct CollisionData;
 
 ///
@@ -65,7 +65,7 @@ public:
     ///
     /// \brief Add LPC constraints for the node that is picked
     ///
-    void addPickConstraints(std::shared_ptr<DeformableObject> deformableObj);
+    void addPickConstraints(std::shared_ptr<FeDeformableObject> deformableObj);
 
     ///
     /// \brief Get the vector denoting the filter
@@ -85,7 +85,7 @@ public:
 
 private:
 
-    std::shared_ptr<DeformableObject> m_object;        ///> Deformable object
+    std::shared_ptr<FeDeformableObject> m_object;        ///> Deformable object
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
 }

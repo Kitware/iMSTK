@@ -11,7 +11,7 @@ endif()
 include(imstkAddLibrary)
 imstk_add_library( SceneElements
   DEPENDS
-    Core
+    Common
     Geometry
     DataStructures
     Constraints

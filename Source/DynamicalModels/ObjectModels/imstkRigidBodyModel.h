@@ -29,18 +29,22 @@
 
 namespace imstk
 {
-struct RigidBodyPropertyDesc
+
+enum class RigidBodyType
+{ 
+    Static,
+    Dynamic,
+    Kinematic,
+    none 
+};
+
+struct RigidBodyConfig
 {
+    RigidBodyType m_rigidBodyType = RigidBodyType::Static;
     double m_staticFriction  = 0.01;
     double m_dynamicFriction = 0.01;
     double m_restitution     = 0.01;
 };
-
-enum class RigidBodyType
-{ Static,
-  Dynamic,
-  Kinematic,
-  none };
 
 using namespace physx;
 
@@ -58,7 +62,8 @@ public:
     ///
     RigidBodyModel() : DynamicalModel(DynamicalModelType::rigidBodyDynamics)
     {
-        m_validGeometryTypes = {
+        m_validGeometryTypes = 
+        {
             Geometry::Type::Plane,
             Geometry::Type::Sphere,
             Geometry::Type::Cube,
@@ -76,9 +81,7 @@ public:
     /// \brief Configure the model
     ///
     // TODO: Setting of mass and gravity has to happen somewhere.
-    void configure(const std::shared_ptr<Geometry>              geom,
-                   const std::shared_ptr<RigidBodyPropertyDesc> matProperty,
-                   const RigidBodyType                          type = RigidBodyType::Kinematic);
+    void configure(const std::shared_ptr<RigidBodyConfig> matProperty);
 
     ///
     /// \brief Update the model geometry from the newest rigid body state
@@ -146,11 +149,11 @@ public:
     }
 
 protected:
-    std::shared_ptr<RigidBodyPropertyDesc> m_material;
+    std::shared_ptr<RigidBodyConfig> m_config;
     PxRigidDynamic* m_pxDynamicActor = NULL;
     PxRigidStatic*  m_pxStaticActor  = NULL;
     bool m_isStatic      = true;                ///> Indicates if the body is static or dynamic
-    RigidBodyType m_type = RigidBodyType::none; ///> Indicates if the body is static, dynamic
+    //RigidBodyType m_type = RigidBodyType::none; ///> Indicates if the body is static, dynamic
 
     Vec3d m_force = Vec3d(0., 0., 0.);
     Vec3d m_forcePos;

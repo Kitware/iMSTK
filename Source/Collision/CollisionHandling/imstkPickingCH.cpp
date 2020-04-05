@@ -29,7 +29,7 @@ PickingCH::PickingCH(const CollisionHandling::Side&       side,
                      const std::shared_ptr<CollisionData> colData,
                      std::shared_ptr<CollidingObject>     obj) :
     CollisionHandling(Type::NodalPicking, side, colData),
-    m_object(std::dynamic_pointer_cast<DeformableObject>(obj))
+    m_object(std::dynamic_pointer_cast<FeDeformableObject>(obj))
 {
 }
 
@@ -43,7 +43,7 @@ PickingCH::processCollisionData()
 }
 
 void
-PickingCH::addPickConstraints(std::shared_ptr<DeformableObject> deformableObj)
+PickingCH::addPickConstraints(std::shared_ptr<FeDeformableObject> deformableObj)
 {
     m_DynamicLinearProjConstraints->clear();
 
