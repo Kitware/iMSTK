@@ -85,7 +85,7 @@ public:
 
 private:
 
-    std::shared_ptr<FeDeformableObject> m_object;        ///> Deformable object
+    std::shared_ptr<FeDeformableObject>      m_object;   ///> Deformable object
     std::vector<LinearProjectionConstraint>* m_DynamicLinearProjConstraints = nullptr;
 };
 }

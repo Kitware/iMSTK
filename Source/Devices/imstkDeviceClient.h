@@ -102,7 +102,7 @@ protected:
     ///
     DeviceClient(const std::string& name, const std::string& ip) :
         m_deviceName(name),
-        m_ip(ip){}
+        m_ip(ip) {}
 
     std::string m_deviceName;                ///< Device Name
     std::string m_ip;                        ///< Connection device IP

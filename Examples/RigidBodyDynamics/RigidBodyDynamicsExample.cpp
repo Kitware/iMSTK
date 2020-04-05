@@ -112,7 +112,7 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     rigidProp->m_dynamicFriction = 0.01;
     rigidProp->m_restitution     = 0.01;
     rigidProp->m_staticFriction  = 0.005;
-    rigidProp->m_rigidBodyType = RigidBodyType::Dynamic;
+    rigidProp->m_rigidBodyType   = RigidBodyType::Dynamic;
     rigidModel->configure(rigidProp);
     rigidModel->setModelGeometry(cubeGeom);
     cubeObj->setDynamicalModel(rigidModel);

@@ -50,28 +50,28 @@ public:
     ///
     void updateStateGivenDv(std::shared_ptr<FeDeformBodyState> prevState,
                             std::shared_ptr<FeDeformBodyState> currentState,
-                            Vectord&                         dV) override;
+                            Vectord&                           dV) override;
 
     ///
     /// \brief Update state given change in displacement
     ///
     void updateStateGivenDu(std::shared_ptr<FeDeformBodyState> prevState,
                             std::shared_ptr<FeDeformBodyState> currentState,
-                            Vectord&                         dU) override;
+                            Vectord&                           dU) override;
 
     ///
     /// \brief Update state given updated velocity
     ///
     void updateStateGivenV(std::shared_ptr<FeDeformBodyState> prevState,
                            std::shared_ptr<FeDeformBodyState> currentState,
-                           Vectord&                         v) override;
+                           Vectord&                           v) override;
 
     ///
     /// \brief Update state given updated displacement
     ///
     void updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState,
                            std::shared_ptr<FeDeformBodyState> currentState,
-                           Vectord&                         u) override;
+                           Vectord&                           u) override;
 protected:
 
 //    // Coefficients of the time integrator

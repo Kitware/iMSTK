@@ -49,6 +49,6 @@ protected:
     // Not the best design pattern
     static std::atomic<EntityID> s_count; ///< current count of entities
 
-    EntityID m_ID;  ///< unique ID of entity
+    EntityID m_ID;                        ///< unique ID of entity
 };
 }
