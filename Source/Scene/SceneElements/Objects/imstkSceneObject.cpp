@@ -21,7 +21,7 @@
 
 #include "imstkSceneObject.h"
 
-#include "imstkSceneObjectController.h"
+//#include "imstkSceneObjectController.h"
 #include "imstkDeviceClient.h"
 
 namespace imstk

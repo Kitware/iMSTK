@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {

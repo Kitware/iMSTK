@@ -26,7 +26,7 @@
 // imstk
 #include "imstkMath.h"
 #include "imstkColor.h"
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {

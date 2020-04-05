@@ -2,19 +2,11 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
-  H_FILES
-    imstkScene.h
-    imstkCollisionGraph.h
-  CPP_FILES
-    imstkScene.cpp
-    imstkCollisionGraph.cpp
+imstk_add_library( Controllers
   DEPENDS
     Common
-    Collision
+	Scene
     SceneElements
-    Controllers
-    DynamicalModels
   )
 
 #-----------------------------------------------------------------------------

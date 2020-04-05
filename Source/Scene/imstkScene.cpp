@@ -43,6 +43,7 @@ namespace imstk
 Scene::~Scene()
 {
     // End Camera Controller
+    /// \todo move this out of scene
     if (auto camController = this->getCamera()->getController())
     {
         camController->end();

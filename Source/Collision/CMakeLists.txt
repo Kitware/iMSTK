@@ -8,6 +8,7 @@ imstk_add_library( Collision
     Geometry
     SceneElements
     DynamicalModels
+    Controllers
     SCCD
   )
 

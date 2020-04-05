@@ -25,7 +25,7 @@
 #include <string>
 
 #include "imstkVisualModel.h"
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {
