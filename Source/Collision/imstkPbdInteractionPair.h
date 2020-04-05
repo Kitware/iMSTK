@@ -25,7 +25,7 @@
 
 namespace imstk
 {
-class PbdObject; 
+class PbdObject;
 class PbdCollisionConstraint;
 
 ///

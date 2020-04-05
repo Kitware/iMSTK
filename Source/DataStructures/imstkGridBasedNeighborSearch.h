@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Class for searching neighbors using regular grid
 ///

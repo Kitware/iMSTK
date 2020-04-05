@@ -29,7 +29,7 @@ namespace imstk
 class CollidingObject;
 class FeDeformableObject;
 class LinearProjectionConstraint;
-struct CollisionData; 
+struct CollisionData;
 
 ///
 /// \class PickingCH

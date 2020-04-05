@@ -31,8 +31,8 @@
 
 namespace imstk
 {
-PbdInteractionPair::PbdInteractionPair(const std::shared_ptr<PbdObject>& A, 
-    const std::shared_ptr<PbdObject>& B) : 
+PbdInteractionPair::PbdInteractionPair(const std::shared_ptr<PbdObject>& A,
+                                       const std::shared_ptr<PbdObject>& B) :
     m_firstObj(A), m_secondObj(B)
 {
 }

@@ -788,16 +788,15 @@ FEMDeformableBodyModel::setFixedSizeTimeStepping()
     m_timeIntegrator->setTimestepSizeToDefault();
 }
 
-void 
-FEMDeformableBodyModel::setTimeStep(const double timeStep) 
-{ 
-    m_timeIntegrator->setTimestepSize(timeStep); 
+void
+FEMDeformableBodyModel::setTimeStep(const double timeStep)
+{
+    m_timeIntegrator->setTimestepSize(timeStep);
 }
 
-double 
-FEMDeformableBodyModel::getTimeStep() const 
-{ 
-    return m_timeIntegrator->getTimestepSize(); 
+double
+FEMDeformableBodyModel::getTimeStep() const
+{
+    return m_timeIntegrator->getTimestepSize();
 };
-
 } // imstk

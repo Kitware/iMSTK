@@ -29,7 +29,6 @@
 
 namespace imstk
 {
-
 class SceneObject;
 
 ///

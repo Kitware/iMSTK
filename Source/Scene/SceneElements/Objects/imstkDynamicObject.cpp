@@ -25,7 +25,7 @@
 
 namespace imstk
 {
-size_t 
+size_t
 DynamicObject::getNumOfDOF() const
 {
     if (!m_dynamicalModel)
@@ -37,7 +37,7 @@ DynamicObject::getNumOfDOF() const
     return m_dynamicalModel->getNumDegreeOfFreedom();
 }
 
-void 
+void
 DynamicObject::updateGeometries()
 {
     m_dynamicalModel->updatePhysicsGeometry();
@@ -60,7 +60,7 @@ DynamicObject::updateGeometries()
     }
 }
 
-bool 
+bool
 DynamicObject::initialize()
 {
     if (CollidingObject::initialize())
@@ -83,7 +83,7 @@ DynamicObject::initialize()
     }
 }
 
-void 
+void
 DynamicObject::reset()
 {
     m_dynamicalModel->resetToInitialState();

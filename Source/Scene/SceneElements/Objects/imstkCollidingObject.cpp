@@ -24,7 +24,6 @@
 
 namespace imstk
 {
-
 bool
 CollidingObject::initialize()
 {

@@ -35,7 +35,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class InternalForceModel
 ///

@@ -33,7 +33,6 @@
 
 namespace imstk
 {
-
 ///
 /// \struct RenderParticle
 ///

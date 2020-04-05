@@ -34,11 +34,11 @@
 
 namespace imstk
 {
-    class SurfaceMesh;
-        class LineMesh;
-        class TetrahedralMesh;
-        class HexahedralMesh;
-        class VolumetricMesh;
+class SurfaceMesh;
+class LineMesh;
+class TetrahedralMesh;
+class HexahedralMesh;
+class VolumetricMesh;
 ///
 /// \class VTKMeshIO
 ///
