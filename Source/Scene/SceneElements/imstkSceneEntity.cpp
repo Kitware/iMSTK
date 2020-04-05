@@ -19,36 +19,21 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include <atomic>
+#include "imstkEntity.h"
 
 namespace imstk
 {
-using EntityID = unsigned long;
+std::atomic<EntityID> SceneEntity::s_count { 0 };
 
-///
-/// \class Entity
-/// \brief Top-level class for iMSTK objects
-///
-class Entity
+SceneEntity::SceneEntity()
 {
-public:
-    ///
-    /// \brief Get ID (ALWAYS query the ID in your code, DO NOT hardcode it)
-    /// \returns ID of entity
-    ///
-    EntityID getID() const;
+    s_count++;
+    m_ID = s_count;
+}
 
-protected:
-    ///
-    /// \brief Constructor
-    ///
-    Entity();
-
-    // Not the best design pattern
-    static std::atomic<EntityID> s_count; ///< current count of entities
-
-    EntityID m_ID;                        ///< unique ID of entity
-};
+EntityID
+SceneEntity::getID() const
+{
+    return m_ID;
+}
 }

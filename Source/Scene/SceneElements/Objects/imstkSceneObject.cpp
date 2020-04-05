@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-SceneObject::SceneObject(const std::string& name) : m_name(name), Entity()
+SceneObject::SceneObject(const std::string& name) : m_name(name), SceneEntity()
 {
     m_type = Type::Visual;
 }
