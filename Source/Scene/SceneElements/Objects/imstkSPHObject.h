@@ -22,11 +22,11 @@
 #pragma once
 
 #include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
-#include "imstkSPHModel.h"
 
 namespace imstk
 {
+class SPHModel;
+
 ///
 /// \class SPHObject
 ///

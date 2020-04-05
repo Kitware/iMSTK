@@ -21,9 +21,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "imstkVisualModel.h"
 #include "imstkSceneEntity.h"
 

@@ -26,13 +26,13 @@
 
 // imstk
 #include "imstkDynamicObject.h"
-#include "imstkFEMDeformableBodyModel.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
 class Geometry;
 class GeometryMap;
+class FEMDeformableBodyModel;
 
 ///
 /// \class DeformableObject

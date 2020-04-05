@@ -21,15 +21,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkSceneObject.h"
-#include "imstkGeometryMap.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
 class Geometry;
+class GeometryMap;
 
 class CollidingObject : public SceneObject
 {
@@ -80,22 +77,7 @@ public:
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize() override
-    {
-        if (SceneObject::initialize())
-        {
-            if (m_collidingToVisualMap)
-            {
-                m_collidingToVisualMap->initialize();
-            }
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
+    virtual bool initialize() override;
 
 protected:
 

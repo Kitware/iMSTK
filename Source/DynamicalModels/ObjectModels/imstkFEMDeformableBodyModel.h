@@ -21,27 +21,26 @@
 
 #pragma once
 
-#include "Eigen/Sparse"
-
+// imstk
 #include "imstkDynamicalModel.h"
-#include "imstkTimeIntegrator.h"
-#include "imstkInternalForceModel.h"
+#include "imstkInternalForceModelTypes.h"
 #include "imstkNonlinearSystem.h"
-#include "imstkVegaMeshIO.h"
-#include "imstkNewtonSolver.h"
 
-//force models
-#include "imstkStVKForceModel.h"
-#include "imstkLinearFEMForceModel.h"
-#include "imstkCorotationalFEMForceModel.h"
-#include "imstkIsotropicHyperelasticFEMForceModel.h"
-#include "imstkVegaMeshIO.h"
-
-//vega
+// vega
 #include "sparseMatrix.h"
+
+namespace vega
+{
+class VolumetricMesh;
+}
 
 namespace imstk
 {
+class TimeIntegrator;
+class VegaMeshIO;
+class NewtonSolver;
+class InternalForceModel;
+
 struct FEMModelConfig
 {
     FEMMethodType m_femMethod = FEMMethodType::Invertible;
@@ -247,12 +246,12 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    virtual void setTimeStep(const double timeStep) { m_timeIntegrator->setTimestepSize(timeStep); };
+    virtual void setTimeStep(const double timeStep);
 
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const { return m_timeIntegrator->getTimestepSize(); };
+    virtual double getTimeStep() const;
 
     ///
     /// \brief Set the time step size to fixed size

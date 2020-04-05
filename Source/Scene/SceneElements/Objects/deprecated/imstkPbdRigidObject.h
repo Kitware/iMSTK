@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkPbdObject.h"
+
 namespace imstk
 {
 class Geometry;

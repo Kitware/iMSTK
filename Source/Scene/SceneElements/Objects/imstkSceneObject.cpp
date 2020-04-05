@@ -21,9 +21,6 @@
 
 #include "imstkSceneObject.h"
 
-//#include "imstkSceneObjectController.h"
-#include "imstkDeviceClient.h"
-
 namespace imstk
 {
 SceneObject::SceneObject(const std::string& name) : m_name(name), SceneEntity()

@@ -18,3 +18,75 @@
    limitations under the License.
 
 =========================================================================*/
+
+#include "imstkDynamicObject.h"
+#include "imstkGeometryMap.h"
+#include "imstkAbstractDynamicalModel.h"
+
+namespace imstk
+{
+size_t 
+DynamicObject::getNumOfDOF() const
+{
+    if (!m_dynamicalModel)
+    {
+        LOG(WARNING) << "Cannot get the degree of freedom since the dynamical model is not initialized! returning 0";
+        return 0;
+    }
+
+    return m_dynamicalModel->getNumDegreeOfFreedom();
+}
+
+void 
+DynamicObject::updateGeometries()
+{
+    m_dynamicalModel->updatePhysicsGeometry();
+
+    if (m_physicsToCollidingGeomMap)
+    {
+        m_physicsToCollidingGeomMap->apply();
+    }
+
+    if (m_updateVisualFromPhysicsGeometry)
+    {
+        if (m_physicsToVisualGeomMap)
+        {
+            m_physicsToVisualGeomMap->apply();
+        }
+    }
+    else
+    {
+        CollidingObject::updateGeometries();
+    }
+}
+
+bool 
+DynamicObject::initialize()
+{
+    if (CollidingObject::initialize())
+    {
+        if (m_physicsToCollidingGeomMap)
+        {
+            m_physicsToCollidingGeomMap->initialize();
+        }
+
+        if (m_physicsToVisualGeomMap)
+        {
+            m_physicsToVisualGeomMap->initialize();
+        }
+
+        return m_dynamicalModel->initialize();
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void 
+DynamicObject::reset()
+{
+    m_dynamicalModel->resetToInitialState();
+    this->updateGeometries();
+};
+}

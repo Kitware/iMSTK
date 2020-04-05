@@ -21,17 +21,16 @@
 
 #pragma once
 
-#include "imstkTexture.h"
 #include "imstkColor.h"
 #include "imstkTextureManager.h"
 
 #include <memory>
 #include <vector>
 
-#include "g3log/g3log.hpp"
-
 namespace imstk
 {
+class Texture;
+
 class RenderMaterial
 {
 public:

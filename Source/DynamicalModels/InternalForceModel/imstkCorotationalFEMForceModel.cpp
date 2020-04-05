@@ -21,6 +21,12 @@
 
 #include "imstkCorotationalFEMForceModel.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4458 )
+//vega
+#include "corotationalLinearFEM.h"
+#pragma warning( pop )
+
 namespace imstk
 {
 CorotationalFEMForceModel::CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp) : InternalForceModel(), m_warp(warp)

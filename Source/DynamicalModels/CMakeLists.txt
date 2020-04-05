@@ -25,7 +25,6 @@ imstk_add_library( DynamicalModels
     VegaFEM::volumetricMesh
     PhysX
   )
-
   
 #-----------------------------------------------------------------------------
 # Testing

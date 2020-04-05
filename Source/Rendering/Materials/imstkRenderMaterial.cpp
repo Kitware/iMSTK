@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkRenderMaterial.h"
+#include "imstkTexture.h"
 
 namespace imstk
 {

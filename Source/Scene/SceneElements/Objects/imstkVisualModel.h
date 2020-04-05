@@ -28,6 +28,7 @@
 
 namespace imstk
 {
+
 ///
 /// \class VisualModel
 ///

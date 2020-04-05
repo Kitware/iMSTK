@@ -22,6 +22,7 @@
 #pragma once
 #include "imstkCollisionHandling.h"
 #include "imstkSPHObject.h"
+#include "imstkSPHModel.h"
 
 namespace imstk
 {

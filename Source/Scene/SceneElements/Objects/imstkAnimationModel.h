@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkGeometry.h"
 
 namespace imstk
