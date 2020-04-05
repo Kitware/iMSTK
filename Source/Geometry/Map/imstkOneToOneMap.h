@@ -25,11 +25,11 @@
 
 // imstk
 #include "imstkGeometryMap.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {
+class PointSet;
+
 ///
 /// \class OneToOneMap
 ///

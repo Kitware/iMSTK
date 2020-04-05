@@ -26,6 +26,7 @@
 #include "imstkMSHMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
+#include "imstkVolumetricMesh.h"
 
 #include "tetMesh.h"
 

@@ -26,6 +26,7 @@
 #include "vtkColorTransferFunction.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkGPUVolumeRayCastMapper.h"
+#include "vtkImageData.h"
 
 namespace imstk
 {

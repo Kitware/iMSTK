@@ -21,15 +21,13 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-#include <array>
-
 #include "imstkMeshIO.h"
-#include "imstkVolumetricMesh.h"
 
 namespace imstk
 {
+class VolumetricMesh;
+class SurfaceMesh;
+
 ///
 /// \class MSHMeshIO
 ///
@@ -52,7 +50,7 @@ public:
     ///
     /// \brief Read and generate a volumetric mesh given a external msh file
     ///
-    static std::shared_ptr<imstk::VolumetricMesh> read(const std::string& filePath, const MeshFileType meshType);
+    static std::shared_ptr<VolumetricMesh> read(const std::string& filePath, const MeshFileType meshType);
 
 protected:
     ///

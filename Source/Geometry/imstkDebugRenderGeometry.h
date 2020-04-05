@@ -22,11 +22,11 @@
 #pragma once
 
 #include "imstkMath.h"
-#include "imstkRenderMaterial.h"
-#include <memory>
 
 namespace imstk
 {
+class RenderMaterial;
+
 ///
 /// \class imstkDbgRenderGeometry
 ///

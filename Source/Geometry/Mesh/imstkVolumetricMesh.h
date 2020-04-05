@@ -34,6 +34,7 @@
 
 namespace imstk
 {
+
 ///
 /// \class VolumetricMesh
 ///

@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkGeometryMap.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

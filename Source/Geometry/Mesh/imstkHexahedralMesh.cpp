@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkHexahedralMesh.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

@@ -29,6 +29,7 @@
 #include "imstkCorotationalFEMForceModel.h"
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
 #include "imstkVegaMeshIO.h"
+#include "imstkVolumetricMesh.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkNewtonSolver.h"

@@ -21,17 +21,13 @@
 
 #pragma once
 
-#include <set>
-#include <list>
-#include <iostream>
-
 // imstk
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkVolumetricMesh.h"
 
 namespace imstk
 {
+class SurfaceMesh;
+
 ///
 /// \class TetrahedralMesh
 ///

@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <vector>
-#include <climits>
-#include <memory>
-
 #pragma warning( push )
 #pragma warning( disable : 4201 )
 #include "glm/glm.hpp"
@@ -32,11 +28,12 @@
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
+#include "imstkLogUtility.h"
 #include "imstkColor.h"
-#include "imstkTimer.h"
 
 namespace imstk
 {
+
 ///
 /// \struct RenderParticle
 ///

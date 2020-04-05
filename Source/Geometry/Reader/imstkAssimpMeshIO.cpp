@@ -20,8 +20,13 @@
 =========================================================================*/
 
 #include "imstkAssimpMeshIO.h"
+#include "imstkLogUtility.h"
 
-#include "g3log/g3log.hpp"
+// assimp
+#include "assimp/Importer.hpp"
+#include "assimp/mesh.h"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
 
 namespace imstk
 {

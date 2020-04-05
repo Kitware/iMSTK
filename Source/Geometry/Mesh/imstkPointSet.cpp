@@ -20,8 +20,8 @@
 =========================================================================*/
 
 #include "imstkPointSet.h"
-//#include "imstkGraph.h"
 #include "imstkParallelUtils.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

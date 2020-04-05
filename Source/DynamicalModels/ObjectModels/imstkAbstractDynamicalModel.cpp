@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkAbstractDynamicalModel.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkPlane.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

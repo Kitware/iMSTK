@@ -21,12 +21,8 @@
 
 #pragma once
 
-#include "g3log/g3log.hpp"
-
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
-
-#include <string>
 
 namespace imstk
 {

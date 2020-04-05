@@ -25,10 +25,11 @@
 #include "imstkPointSet.h"
 
 // vtk
-#include <vtkImageData.h>
 #include <vtkSmartPointer.h>
 
 // forward declarations
+class vtkTransform;
+class vtkImageData;
 class vtkTransform;
 
 namespace imstk
