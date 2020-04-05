@@ -355,7 +355,7 @@ endif()
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Source/Core)
+add_subdirectory(Source/Common)
 add_subdirectory(Source/Geometry)
 add_subdirectory(Source/DataStructures)
 add_subdirectory(Source/Devices)
