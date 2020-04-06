@@ -27,7 +27,7 @@ if(iMSTK_USE_OpenHaptics)
     #-----------------------------------------------------------------------------
     # Add the target to Examples folder
     #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
 
     #-----------------------------------------------------------------------------
     # Link libraries to executable
