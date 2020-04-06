@@ -40,12 +40,12 @@ namespace imstk
 ///
 enum class DeviceType
 {
-    SPACE_EXPLORER_3DCONNEXION,
-    NAVIGATOR_3DCONNEXION,
-    NOVINT_FALCON,
-    PHANTOM_OMNI,
+    SpaceExplorer3DConnexion,
+    Navigator3DConnexion,
+    NovintFalcon,
+    PhantomOmni,
     OSVR_HDK,
-    ARDUINO_IMU
+    Arduino
 };
 
 ///

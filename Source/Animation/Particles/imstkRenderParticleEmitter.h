@@ -58,7 +58,7 @@ public:
     ///
     enum class Shape
     {
-        CUBE
+        Cube
     };
 
     ///
@@ -66,8 +66,8 @@ public:
     ///
     enum class Mode
     {
-        CONTINUOUS, ///< Emitter continuously releases/recycles particles
-        BURST       ///< Emitter releases particles once until manually reset
+        Continuous, ///< Emitter continuously releases/recycles particles
+        Burst       ///< Emitter releases particles once until manually reset
     };
 
     ///
@@ -75,7 +75,7 @@ public:
     ///
     explicit RenderParticleEmitter(std::shared_ptr<Geometry> geometry,
                                    const float               time = 3000.0f,
-                                   Mode                      mode = Mode::CONTINUOUS);
+                                   Mode                      mode = Mode::Continuous);
 
     ///
     /// \brief Set animation geometry
@@ -176,9 +176,9 @@ protected:
     std::vector<RenderParticleKeyFrame> m_keyFrames; ///< Particle keyframes
 
     RenderParticleEmitter::Mode m_mode
-        = RenderParticleEmitter::Mode::CONTINUOUS;
+        = RenderParticleEmitter::Mode::Continuous;
     RenderParticleEmitter::Shape m_shape
-        = RenderParticleEmitter::Shape::CUBE;
+        = RenderParticleEmitter::Shape::Cube;
 
     Vec3f m_minDirection;
     Vec3f m_maxDirection;

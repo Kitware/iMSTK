@@ -45,39 +45,39 @@ Texture::getTypeAsString(Type type)
 {
     switch (type)
     {
-    case Type::DIFFUSE:
+    case Type::Diffuse:
     {
         return "Diffuse";
     }
-    case Type::NORMAL:
+    case Type::Normal:
     {
         return "Normal";
     }
-    case Type::ROUGHNESS:
+    case Type::Roughness:
     {
         return "Roughness";
     }
-    case Type::METALNESS:
+    case Type::Metalness:
     {
         return "Metalness";
     }
-    case Type::SUBSURFACE_SCATTERING:
+    case Type::SubsurfaceScattering:
     {
         return "Subsurface_scattering";
     }
-    case Type::AMBIENT_OCCLUSION:
+    case Type::AmbientOcclusion:
     {
         return "Ambient_Occlusion";
     }
-    case Type::CAVITY:
+    case Type::Cavity:
     {
         return "Cavity";
     }
-    case Type::IRRADIANCE_CUBEMAP:
+    case Type::IrradianceCubeMap:
     {
         return "Irradiance_Cubemap";
     }
-    case Type::RADIANCE_CUBEMAP:
+    case Type::RadianceCubeMap:
     {
         return "Radiance_Cubemap";
     }
@@ -101,7 +101,7 @@ Texture::getPath() const
 const Texture::FileType
 Texture::getFileType()
 {
-    FileType textureType = FileType::UNKNOWN;
+    FileType textureType = FileType::Unknown;
 
     std::string extString = m_path.substr(m_path.find_last_of(".") + 1);
 
@@ -112,20 +112,20 @@ Texture::getFileType()
 
     if (extString == "bmp" || extString == "BMP")
     {
-        textureType = FileType::BMP;
+        textureType = FileType::Bmp;
     }
     else if (extString == "png" || extString == "PNG")
     {
-        textureType = FileType::PNG;
+        textureType = FileType::Png;
     }
     else if (extString == "jpg" || extString == "JPG"
              || extString == "jpeg" || extString == "JPEG")
     {
-        textureType = FileType::JPG;
+        textureType = FileType::Jpg;
     }
     else if (extString == "dds" || extString == "DDS")
     {
-        textureType = FileType::DDS;
+        textureType = FileType::Dds;
     }
 
     return textureType;

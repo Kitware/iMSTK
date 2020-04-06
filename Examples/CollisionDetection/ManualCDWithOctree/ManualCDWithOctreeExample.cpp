@@ -76,11 +76,11 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     material->setLineWidth(2);
     if (meshObj->getNumTriangles() > 100)
     {
-        material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+        material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     }
     else
     {
-        material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     }
     visualModel->setRenderMaterial(material);
 
@@ -471,7 +471,7 @@ main()
     }
 
     // Run
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

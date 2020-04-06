@@ -75,7 +75,7 @@ public:
     ///
     /// \brief Get the current renderer's mode
     ///
-    virtual Renderer::Mode getRenderingMode() { return Renderer::Mode::EMPTY; }
+    virtual Renderer::Mode getRenderingMode() { return Renderer::Mode::Empty; }
 
     ///
     /// \brief Returns true if the Viewer is rendering

@@ -36,7 +36,13 @@ struct stdSink
 {
     // Linux xterm color
     // http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
-    enum FontColor { Yellow = 33, Red = 31, Green = 32, White = 97 };
+    enum FontColor
+    {
+        Yellow = 33,
+        Red = 31,
+        Green = 32,
+        White = 97
+    };
 
     FontColor GetColor(const LEVELS level) const;
     void ReceiveLogMessage(g3::LogMessageMover logEntry);

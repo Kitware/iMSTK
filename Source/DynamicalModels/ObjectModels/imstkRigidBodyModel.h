@@ -34,7 +34,7 @@ enum class RigidBodyType
     Static,
     Dynamic,
     Kinematic,
-    none
+    None
 };
 
 struct RigidBodyConfig
@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    RigidBodyModel() : DynamicalModel(DynamicalModelType::rigidBodyDynamics)
+    RigidBodyModel() : DynamicalModel(DynamicalModelType::RigidBodyDynamics)
     {
         m_validGeometryTypes =
         {
@@ -101,7 +101,7 @@ public:
     /// \brief Update the body states given the solution
     ///
     void updateBodyStates(const Vectord&        q,
-                          const StateUpdateType updateType = StateUpdateType::displacement) override;
+                          const StateUpdateType updateType = StateUpdateType::Displacement) override;
 
     ///
     /// \brief Set kinematic target of RigidBody

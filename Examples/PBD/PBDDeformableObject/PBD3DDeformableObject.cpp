@@ -49,7 +49,7 @@ main()
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -74,7 +74,7 @@ main()
     // Set the parameters
     pbdModel->configure(pbdParams);
     pbdModel->setDefaultTimeStep(0.02);
-    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::fixed);
+    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::Fixed);
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
@@ -105,7 +105,7 @@ main()
 
     simManager->setActiveScene(scene);
     simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

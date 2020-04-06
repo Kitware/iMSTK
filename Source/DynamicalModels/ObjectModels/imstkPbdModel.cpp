@@ -581,7 +581,7 @@ void
 PbdModel::setTimeStepSizeType(const TimeSteppingType type)
 {
     m_timeStepSizeType = type;
-    if (type == TimeSteppingType::fixed)
+    if (type == TimeSteppingType::Fixed)
     {
         m_Parameters->m_dt = m_Parameters->m_DefaultDt;
     }

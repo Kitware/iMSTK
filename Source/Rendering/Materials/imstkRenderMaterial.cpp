@@ -27,7 +27,7 @@ namespace imstk
 RenderMaterial::RenderMaterial()
 {
     // Instantiating one type of each texture per material
-    for (int i = 0; i < (int)Texture::Type::NONE; i++)
+    for (int i = 0; i < (int)Texture::Type::None; i++)
     {
         m_textures.emplace_back(std::make_shared<Texture>("", (Texture::Type)i));
     }
@@ -212,7 +212,7 @@ RenderMaterial::setSphereGlyphSize(const double size)
 std::shared_ptr<Texture>
 RenderMaterial::getTexture(Texture::Type type)
 {
-    if (type >= Texture::Type::NONE)
+    if (type >= Texture::Type::None)
     {
         LOG(WARNING) << "RenderMaterial::getTexture error: Invalid texture format";
         return nullptr;
@@ -223,7 +223,7 @@ RenderMaterial::getTexture(Texture::Type type)
 void
 RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
 {
-    if (texture->getType() >= Texture::Type::NONE)
+    if (texture->getType() >= Texture::Type::None)
     {
         LOG(WARNING) << "RenderMaterial::addTexture: Invalid texture format";
         return;

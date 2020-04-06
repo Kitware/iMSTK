@@ -147,7 +147,7 @@ RenderParticleEmitter::getKeyFrames()
 void
 RenderParticleEmitter::reset()
 {
-    if (m_mode != Mode::BURST)
+    if (m_mode != Mode::Burst)
     {
         return;
     }
@@ -193,7 +193,7 @@ RenderParticleEmitter::update()
             continue;
         }
 
-        if (m_mode == RenderParticleEmitter::Mode::CONTINUOUS
+        if (m_mode == RenderParticleEmitter::Mode::Continuous
             && particle->m_age > m_time)
         {
             particle->m_age = particle->m_age - ((int)(particle->m_age / m_time) * m_time);
@@ -258,7 +258,7 @@ RenderParticleEmitter::emitParticle(std::unique_ptr<RenderParticle>& particle)
 {
     auto position = m_animationGeometry->getTranslation();
 
-    if (m_shape == Shape::CUBE)
+    if (m_shape == Shape::Cube)
     {
         float x = (getRandomNormalizedFloat() - 0.5f) * m_emitterSize;
         float y = (getRandomNormalizedFloat() - 0.5f) * m_emitterSize;

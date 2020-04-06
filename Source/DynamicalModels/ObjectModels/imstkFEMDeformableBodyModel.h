@@ -292,7 +292,7 @@ protected:
 
     std::vector<std::size_t> m_fixedNodeIds;                            ///> Nodal IDs of the nodes that are fixed
 
-    StateUpdateType m_updateType = StateUpdateType::deltaVelocity;      ///> Update type of the model
+    StateUpdateType m_updateType = StateUpdateType::DeltaVelocity;      ///> Update type of the model
 
     bool m_damped = false;                                              ///> Viscous or structurally damped system
 

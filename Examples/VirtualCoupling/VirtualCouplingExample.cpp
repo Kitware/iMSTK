@@ -24,6 +24,9 @@
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkSceneObjectController.h"
+#include "imstkCollisionGraph.h"
+#include "imstkLight.h"
+#include "imstkCamera.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 
@@ -114,7 +117,7 @@ main()
 
     //Run
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::running);
+    simManager->start(SimulationStatus::Running);
 
     return 0;
 #endif

@@ -105,7 +105,7 @@ main()
 
         sims[i].visualModel = std::make_shared<VisualModel>(sims[i].geometry);
         std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
-        material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
         material->setDebugColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));
         material->setLineWidth(2.0f);
         sims[i].visualModel->setRenderMaterial(material);

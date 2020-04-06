@@ -77,7 +77,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -116,7 +116,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -147,7 +147,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -178,7 +178,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -213,7 +213,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -248,7 +248,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -285,7 +285,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -318,7 +318,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -351,7 +351,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -386,7 +386,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -423,7 +423,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -460,7 +460,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -493,7 +493,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -532,7 +532,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -569,7 +569,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -604,7 +604,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -635,7 +635,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::MAXIMUM_INTENSITY);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::MaximumIntensity);
 
         break;
     }
@@ -668,7 +668,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -705,7 +705,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -738,7 +738,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -769,7 +769,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -798,7 +798,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(10);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::MAXIMUM_INTENSITY);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::MaximumIntensity);
 
         break;
     }
@@ -833,7 +833,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -868,7 +868,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }
@@ -899,7 +899,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(1);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::MAXIMUM_INTENSITY);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::MaximumIntensity);
 
         break;
     }
@@ -931,7 +931,7 @@ VolumeRenderMaterialPresets::getPreset(int p)
         volProp->SetSpecularPower(40);
 
         // blend mode
-        mat->setBlendMode(VolumeRenderMaterial::BlendMode::ALPHA);
+        mat->setBlendMode(VolumeRenderMaterial::BlendMode::Alpha);
 
         break;
     }

@@ -29,7 +29,7 @@
   #include "vrpn_Phantom.h"
 #endif
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -38,7 +38,7 @@ VRPNDeviceServer::addDevice(const std::string& deviceName, DeviceType deviceType
 {
     m_deviceInfoMap[deviceName] = std::make_pair(deviceType, id);
 
-    if (deviceType == DeviceType::PHANTOM_OMNI)
+    if (deviceType == DeviceType::PhantomOmni)
     {
         LOG(WARNING) << "VRPNDeviceServer::addDevice warning: OpenHaptics support on VRPN "
                      << "currently unstable for the Phantom Omni (no force feedback implemented).\n"
@@ -72,15 +72,15 @@ VRPNDeviceServer::initModule()
 
         switch (type)
         {
-        case DeviceType::SPACE_EXPLORER_3DCONNEXION:
+        case DeviceType::SpaceExplorer3DConnexion:
         {
             m_deviceConnections->add(new vrpn_3DConnexion_SpaceExplorer(name.c_str(), m_serverConnection));
         } break;
-        case DeviceType::NAVIGATOR_3DCONNEXION:
+        case DeviceType::Navigator3DConnexion:
         {
             m_deviceConnections->add(new vrpn_3DConnexion_Navigator(name.c_str(), m_serverConnection));
         } break;
-        case DeviceType::NOVINT_FALCON:
+        case DeviceType::NovintFalcon:
         {
 #ifdef VRPN_USE_LIBNIFALCON
             m_deviceConnections->add(new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
@@ -90,7 +90,7 @@ VRPNDeviceServer::initModule()
                          << "Build VRPN with VRPN_USE_LIBNIFALCON.";
 #endif
         } break;
-        case DeviceType::PHANTOM_OMNI:
+        case DeviceType::PhantomOmni:
         {
 #ifdef VRPN_USE_PHANTOM_SERVER
             char* deviceName = const_cast<char*>(name.c_str());
@@ -104,7 +104,7 @@ VRPNDeviceServer::initModule()
         //{
         //    m_deviceConnections->add(new vrpn_Tracker_OSVRHackerDevKit(name.c_str(), m_serverConnection));
         //} break;
-        case DeviceType::ARDUINO_IMU:
+        case DeviceType::Arduino:
         {
             SerialInfo connectionSettings = m_SerialInfoMap[name];
             //open with 6 channels (max needed for IMU, can use less)

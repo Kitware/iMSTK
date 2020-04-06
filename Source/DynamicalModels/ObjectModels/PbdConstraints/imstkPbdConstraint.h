@@ -46,7 +46,7 @@ public:
         FEMTet,
         FEMHex,
         ConstantDensity,
-        none
+        None
     };
 
     ///

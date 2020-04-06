@@ -445,7 +445,7 @@ Scene::advance(const double dt)
         {
             if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
             {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
                 {
                     dynaObj->getDynamicalModel()->setTimeStep(dt);
                 }
@@ -455,7 +455,7 @@ Scene::advance(const double dt)
         {
             if (auto dynaObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
             {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
+                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
                 {
                     dynaObj->getDynamicalModel()->setTimeStep(dt);
                 }

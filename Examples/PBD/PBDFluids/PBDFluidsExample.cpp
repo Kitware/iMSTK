@@ -82,7 +82,7 @@ main()
 
     // Set the parameters
     pbdModel->configure(pbdParams);
-    pbdModel->setTimeStepSizeType(TimeSteppingType::fixed);
+    pbdModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     deformableObj->setDynamicalModel(pbdModel);
 
     scene->addSceneObject(deformableObj);
@@ -240,7 +240,7 @@ main()
     apiutils::printUPS(simManager->getSceneManager(scene));
 
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

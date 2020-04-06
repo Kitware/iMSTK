@@ -35,9 +35,9 @@ namespace imstk
 ///
 enum class LightType
 {
-    directional,
-    point,
-    spot
+    Directional,
+    Point,
+    Spot
 };
 
 ///
@@ -145,7 +145,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit DirectionalLight(const std::string& name) : Light(name, LightType::directional)
+    explicit DirectionalLight(const std::string& name) : Light(name, LightType::Directional)
     {
         this->setFocalPoint(-1, -1, -1);
     };
@@ -192,7 +192,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    explicit PointLight(const std::string& name, const LightType& type = LightType::point) : Light(name, type) {};
+    explicit PointLight(const std::string& name, const LightType& type = LightType::Point) : Light(name, type) {};
 
     ///
     /// \brief Get the cone angle
@@ -239,7 +239,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    explicit SpotLight(const std::string& name) : PointLight(name, LightType::spot)
+    explicit SpotLight(const std::string& name) : PointLight(name, LightType::Spot)
     {
         m_coneAngle = 10.;
     };

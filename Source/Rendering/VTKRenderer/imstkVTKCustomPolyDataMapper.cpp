@@ -70,8 +70,8 @@ VTKCustomPolyDataMapper::GetShaderTemplate(
 
     //auto renderMaterial = m_geometry->getRenderMaterial();
 
-    auto diffuseTexture = m_renderMaterial->getTexture(Texture::Type::DIFFUSE);
-    auto cubemapTexture = m_renderMaterial->getTexture(Texture::Type::CUBEMAP);
+    auto diffuseTexture = m_renderMaterial->getTexture(Texture::Type::Diffuse);
+    auto cubemapTexture = m_renderMaterial->getTexture(Texture::Type::Cubemap);
 
     //auto surfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(m_geometry);
 
@@ -216,7 +216,7 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
                                           (float)diffuseColorTemp.b };
         helper.Program->SetUniform3f("diffuseColorUniform", diffuseColor);
 
-        auto diffuseTexture = material->getTexture(Texture::Type::DIFFUSE);
+        auto diffuseTexture = material->getTexture(Texture::Type::Diffuse);
         if (diffuseTexture->getPath() != "" && textureCount < textures.size())
         {
 #if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION <= 1)
@@ -229,7 +229,7 @@ VTKCustomPolyDataMapper::SetMapperShaderParameters(
             currentTexture++;
         }
 
-        auto cubemapTexture = material->getTexture(Texture::Type::CUBEMAP);
+        auto cubemapTexture = material->getTexture(Texture::Type::Cubemap);
         if (cubemapTexture->getPath() != "" && textureCount < textures.size())
         {
 #if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION < 2)

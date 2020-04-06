@@ -40,6 +40,7 @@
 #include "imstkSceneObjectController.h"
 
 // Collisions
+#include "imstkCollisionGraph.h"
 #include "imstkInteractionPair.h"
 #include "imstkPointSetToSphereCD.h"
 #include "imstkVirtualCouplingCH.h"
