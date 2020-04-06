@@ -54,9 +54,9 @@ public:
         m_radianceCubemapPath(radianceCubemapPath),
         m_brdfLUTPath(brdfLUTPath),
         m_irradianceCubemapTexture(std::make_shared<Texture>(irradianceCubemapPath,
-                           Texture::Type::IRRADIANCE_CUBEMAP)),
+                           Texture::Type::IrradianceCubeMap)),
         m_radianceCubemapTexture(std::make_shared<Texture>(radianceCubemapPath,
-                           Texture::Type::RADIANCE_CUBEMAP)),
+                           Texture::Type::RadianceCubeMap)),
         m_brdfLUTTexture(std::make_shared<Texture>(brdfLUTPath, Texture::Type::BRDF_LUT)) {}
 
     std::shared_ptr<Texture> getIrradianceCubemapTexture();

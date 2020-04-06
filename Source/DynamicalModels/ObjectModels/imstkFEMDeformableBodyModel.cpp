@@ -48,7 +48,7 @@
 namespace imstk
 {
 FEMDeformableBodyModel::FEMDeformableBodyModel() :
-    DynamicalModel(DynamicalModelType::elastoDynamics)
+    DynamicalModel(DynamicalModelType::ElastoDynamics)
 {
     m_fixedNodeIds.reserve(1000);
 
@@ -464,7 +464,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
 
     switch (updateType)
     {
-    case StateUpdateType::deltaVelocity:
+    case StateUpdateType::DeltaVelocity:
 
         m_Feff = m_K * -(uPrev - u + v * dT);
 
@@ -503,7 +503,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 
     switch (updateType)
     {
-    case StateUpdateType::deltaVelocity:
+    case StateUpdateType::DeltaVelocity:
 
         m_Feff = m_K * (vPrev * -dT);
 
@@ -535,7 +535,7 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
 
     switch (updateType)
     {
-    case StateUpdateType::deltaVelocity:
+    case StateUpdateType::DeltaVelocity:
 
         stateAtT;// supress warning (state is not used in this update type hence can be ignored)
 
@@ -671,13 +671,13 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 
     switch (updateType)
     {
-    case StateUpdateType::deltaVelocity:
+    case StateUpdateType::DeltaVelocity:
         m_currentState->setV(v + solution);
         m_currentState->setU(uPrev + dT * v);
 
         break;
 
-    case StateUpdateType::velocity:
+    case StateUpdateType::Velocity:
         m_currentState->setV(solution);
         m_currentState->setU(uPrev + dT * v);
 
@@ -784,7 +784,7 @@ FEMDeformableBodyModel::getContactForce()
 void
 FEMDeformableBodyModel::setFixedSizeTimeStepping()
 {
-    m_timeStepSizeType = TimeSteppingType::fixed;
+    m_timeStepSizeType = TimeSteppingType::Fixed;
     m_timeIntegrator->setTimestepSizeToDefault();
 }
 

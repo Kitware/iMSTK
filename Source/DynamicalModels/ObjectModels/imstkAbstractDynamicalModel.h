@@ -34,11 +34,11 @@ namespace imstk
 ///
 enum class DynamicalModelType
 {
-    rigidBodyDynamics,
-    elastoDynamics,
-    positionBasedDynamics,
-    SPH,
-    none
+    RigidBodyDynamics,
+    ElastoDynamics,
+    PositionBasedDynamics,
+    SmoothedParticleHydrodynamics,
+    None
 };
 
 ///
@@ -46,8 +46,8 @@ enum class DynamicalModelType
 ///
 enum class TimeSteppingType
 {
-    realTime,
-    fixed
+    RealTime,
+    Fixed
 };
 
 ///
@@ -64,18 +64,18 @@ public:
     ///
     enum class StateUpdateType
     {
-        displacement,
-        velocity,
-        deltaDisplacement,
-        deltaVelocity,
-        none
+        Displacement,
+        Velocity,
+        DeltaDisplacement,
+        DeltaVelocity,
+        None
     };
 
 public:
     ///
     /// \brief Constructor
     ///
-    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type), m_numDOF(0) {}
+    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::None) : m_type(type), m_numDOF(0) {}
 
     ///
     /// \brief Destructor
@@ -101,7 +101,7 @@ public:
     ///
     /// \brief Update states
     ///
-    virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::displacement) = 0;
+    virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::Displacement) = 0;
 
     ///
     /// \brief
@@ -152,6 +152,6 @@ protected:
     std::shared_ptr<Geometry> m_geometry;           ///> Physics geometry of the model
     std::set<Geometry::Type>  m_validGeometryTypes; ///> Valid geometry types of this model
 
-    TimeSteppingType m_timeStepSizeType = TimeSteppingType::fixed;
+    TimeSteppingType m_timeStepSizeType = TimeSteppingType::Fixed;
 };
 } // imstk

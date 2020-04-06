@@ -164,7 +164,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     }
 
     sphModel->configure(sphParams);
-    sphModel->setTimeStepSizeType(TimeSteppingType::realTime);
+    sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Add the component models
     fluidObj->addVisualModel(fluidVisualModel);

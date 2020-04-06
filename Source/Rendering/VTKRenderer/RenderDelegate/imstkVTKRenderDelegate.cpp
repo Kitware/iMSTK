@@ -263,16 +263,16 @@ VTKRenderDelegate::updateActorProperties()
     {
         switch (volumeMat->getBlendMode())
         {
-        case RenderMaterial::BlendMode::ALPHA:
+        case RenderMaterial::BlendMode::Alpha:
             m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
             break;
-        case RenderMaterial::BlendMode::ADDITIVE:
+        case RenderMaterial::BlendMode::Additive:
             m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
             break;
-        case RenderMaterial::BlendMode::MAXIMUM_INTENSITY:
+        case RenderMaterial::BlendMode::MaximumIntensity:
             m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
             break;
-        case RenderMaterial::BlendMode::MINIMUM_INTENSITY:
+        case RenderMaterial::BlendMode::MinimumIntensity:
             m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
             break;
         default:
@@ -299,19 +299,19 @@ VTKRenderDelegate::updateActorProperties()
     // Display mode
     switch (material->m_displayMode)
     {
-    case RenderMaterial::DisplayMode::WIREFRAME:
+    case RenderMaterial::DisplayMode::Wireframe:
         actorProperty->SetRepresentationToWireframe();
         actorProperty->SetEdgeVisibility(false);
         break;
-    case RenderMaterial::DisplayMode::POINTS:
+    case RenderMaterial::DisplayMode::Points:
         actorProperty->SetRepresentationToPoints();
         actorProperty->SetEdgeVisibility(false);
         break;
-    case RenderMaterial::DisplayMode::WIREFRAME_SURFACE:
+    case RenderMaterial::DisplayMode::WireframeSurface:
         actorProperty->SetRepresentationToSurface();
         actorProperty->SetEdgeVisibility(true);
         break;
-    case RenderMaterial::DisplayMode::SURFACE:
+    case RenderMaterial::DisplayMode::Surface:
     default:
         actorProperty->SetRepresentationToSurface();
         actorProperty->SetEdgeVisibility(false);

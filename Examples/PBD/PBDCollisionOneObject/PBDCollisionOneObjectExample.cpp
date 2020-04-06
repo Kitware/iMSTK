@@ -60,7 +60,7 @@ main()
 
     // set up visual model based on high res mesh
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -136,7 +136,7 @@ main()
     floorMesh->initialize(vertList, triangles);
 
     auto materialFloor = std::make_shared<RenderMaterial>();
-    materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
     floorMeshModel->setRenderMaterial(materialFloor);
 
@@ -174,7 +174,7 @@ main()
     scene->addLight(light);
 
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

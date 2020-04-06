@@ -41,9 +41,9 @@ class Light;
 
 enum class TimeSteppingPolicy
 {
-    asFastAsPossible,
-    fixedFrameRate,
-    realTime
+    AsFastAsPossible,
+    FixedFrameRate,
+    RealTime
 };
 
 struct SceneConfig
@@ -52,7 +52,7 @@ struct SceneConfig
     // Note: May cause delays to run the first frame of the scene due to scene initialization
     bool lazyInitialization = false;
 
-    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::asFastAsPossible;
+    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::AsFastAsPossible;
 
     // Keep track of the fps for the scene
     bool trackFPS = false;

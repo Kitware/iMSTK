@@ -48,7 +48,7 @@ public:
         NewmarkBeta,
         CentralDifference,
         NoTimeStepper,
-        none
+        None
     };
 
 public:

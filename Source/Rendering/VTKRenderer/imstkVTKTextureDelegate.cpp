@@ -49,7 +49,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     std::string manglingSymbol = "::";
     m_textureName = texture->getTypeAsString() + manglingSymbol + texture->getPath();
 
-    if (texture->getType() == Texture::Type::CUBEMAP)
+    if (texture->getType() == Texture::Type::Cubemap)
     {
         std::string sideNames[6] = { "posx", "negx", "posy", "negy", "posz", "negz" };
         m_sourceTexture->SetCubeMap(true);

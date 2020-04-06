@@ -91,7 +91,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SPH)
+    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SmoothedParticleHydrodynamics)
     {
         m_validGeometryTypes = { Geometry::Type::PointSet };
     }

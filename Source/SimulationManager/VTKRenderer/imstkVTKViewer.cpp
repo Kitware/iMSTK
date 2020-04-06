@@ -140,7 +140,7 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
         return;
     }
     // Setup render window
-    if (mode == Renderer::Mode::SIMULATION)
+    if (mode == Renderer::Mode::Simulation)
     {
         std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->HighlightProp(nullptr);
         m_vtkRenderWindow->HideCursor();

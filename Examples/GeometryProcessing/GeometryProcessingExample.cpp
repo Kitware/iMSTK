@@ -50,7 +50,7 @@ main()
     coarseSurfMesh->translate(Vec3d(0., 5., 0.), Geometry::TransformType::ConcatenateToTransform);
 
     auto material0 = std::make_shared<RenderMaterial>();
-    material0->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material0->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel0 = std::make_shared<VisualModel>(coarseSurfMesh);
     surfMeshModel0->setRenderMaterial(material0);
 
@@ -61,7 +61,7 @@ main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDebugColor(imstk::Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(fineSurfaceMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -83,7 +83,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::running);
+    simManager->start(SimulationStatus::Running);
 
     return 0;
 }

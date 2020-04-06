@@ -52,19 +52,19 @@ OpenVRCommand::Execute(
     {
         SimulationStatus status = m_simManager->getStatus();
 
-        if (status == SimulationStatus::running)
+        if (status == SimulationStatus::Running)
         {
             m_simManager->pause();
         }
 
         // pause simulation
-        if (status == SimulationStatus::inactive)
+        if (status == SimulationStatus::Inactive)
         {
             m_simManager->start();
         }
 
         // continue simulation
-        if (status == SimulationStatus::paused)
+        if (status == SimulationStatus::Paused)
         {
             m_simManager->run();
         }
@@ -77,13 +77,13 @@ OpenVRCommand::Execute(
         SimulationStatus status = m_simManager->getStatus();
 
         // pause simulation
-        if (status == SimulationStatus::running)
+        if (status == SimulationStatus::Running)
         {
             m_simManager->pause();
         }
 
         // continue simulation
-        if (status == SimulationStatus::paused)
+        if (status == SimulationStatus::Paused)
         {
             m_simManager->run();
         }
@@ -96,7 +96,7 @@ OpenVRCommand::Execute(
     {
         SimulationStatus status = m_simManager->getStatus();
 
-        if (status == SimulationStatus::inactive)
+        if (status == SimulationStatus::Inactive)
         {
             m_simManager->start();
         }
@@ -113,7 +113,7 @@ OpenVRCommand::Execute(
     {
         SimulationStatus status = m_simManager->getStatus();
         // desactivate pad if in simulation mode
-        if (status != SimulationStatus::inactive)
+        if (status != SimulationStatus::Inactive)
         {
             this->AbortFlagOn();
         }

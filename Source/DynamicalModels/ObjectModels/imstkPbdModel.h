@@ -86,7 +86,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdModel() : DynamicalModel(DynamicalModelType::positionBasedDynamics)
+    PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
     {
         m_validGeometryTypes = {
             Geometry::Type::PointSet,

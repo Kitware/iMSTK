@@ -132,7 +132,7 @@ main(int argc, char* argv[])
     scene->addLight(whiteLight);
 
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }
