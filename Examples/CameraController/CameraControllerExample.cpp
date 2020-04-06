@@ -29,6 +29,7 @@
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkCameraController.h"
+#include "imstkCollisionGraph.h"
 
 const std::string phantomOmni1Name = "Phantom1";
 
@@ -92,7 +93,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

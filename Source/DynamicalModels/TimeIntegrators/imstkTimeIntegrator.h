@@ -22,7 +22,7 @@
 #pragma once
 
 #include <array>
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 #include "Eigen/Sparse"
 

@@ -24,7 +24,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 #include "imstkScene.h"
 #include "imstkVTKRenderer.h"

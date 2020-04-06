@@ -46,7 +46,7 @@
 #include "imstkCamera.h"
 
 // logger
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 #include "imstkTimer.h"
 
 namespace imstk

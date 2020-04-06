@@ -24,7 +24,7 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 #include "imstkTimer.h"
 
 namespace imstk

@@ -21,9 +21,13 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkCube.h"
+#include "imstkCamera.h"
+#include "imstkLight.h"
+#include "imstkCollidingObject.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkSceneObjectController.h"
+#include "imstkCollisionGraph.h"
 
 // global variables
 const std::string phantomOmni1Name = "Phantom1";
