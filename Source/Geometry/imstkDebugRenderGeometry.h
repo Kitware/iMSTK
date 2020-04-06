@@ -21,12 +21,13 @@
 
 #pragma once
 
+#include <memory>
+
 #include "imstkMath.h"
+#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
-class RenderMaterial;
-
 ///
 /// \class imstkDbgRenderGeometry
 ///
@@ -112,7 +113,7 @@ public:
     ///
     /// \brief Set/Get render material
     ///
-    void                                   setRenderMaterial(const std::shared_ptr<RenderMaterial>& renderMat);
+    void setRenderMaterial(const std::shared_ptr<RenderMaterial>& renderMat);
     const std::shared_ptr<RenderMaterial>& getRenderMaterial() const;
 
 protected:

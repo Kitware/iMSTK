@@ -35,8 +35,9 @@
 #include "imstkIBLProbe.h"
 #include "imstkCollisionGraph.h"
 #include "imstkLight.h"
+#include "imstkLogUtility.h"
 
-#include <g3log/g3log.hpp>
+#include <iterator>
 
 namespace imstk
 {

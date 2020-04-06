@@ -26,10 +26,11 @@
 #include <thread>
 #include <atomic>
 
+#include "imstkCameraController.h"
+
 namespace imstk
 {
 class SceneObjectControllerBase;
-class CameraController;
 class DebugRenderGeometry;
 class SceneObject;
 class SolverBase;

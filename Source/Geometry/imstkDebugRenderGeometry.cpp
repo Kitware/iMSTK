@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkDebugRenderGeometry.h"
-#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
