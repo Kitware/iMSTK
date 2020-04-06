@@ -21,12 +21,14 @@
 
 #pragma once
 
-#include "imstkMath.h"
 #include <memory>
+
+#include "imstkMath.h"
 
 namespace imstk
 {
 struct CollisionData;
+
 class Geometry;
 class Plane;
 class Sphere;

@@ -22,10 +22,6 @@
 #pragma once
 
 #include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
-#include "imstkPbdState.h"
-
-#include <stdarg.h>
 
 namespace imstk
 {

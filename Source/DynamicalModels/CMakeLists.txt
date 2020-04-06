@@ -11,7 +11,7 @@ imstk_add_library( DynamicalModels
     ObjectModels/PbdConstraints
     InternalForceModel
   DEPENDS
-    Core
+    Common
     DataStructures
     Constraints
     Geometry
@@ -25,7 +25,6 @@ imstk_add_library( DynamicalModels
     VegaFEM::volumetricMesh
     PhysX
   )
-
   
 #-----------------------------------------------------------------------------
 # Testing

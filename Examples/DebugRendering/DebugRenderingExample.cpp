@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
+#include "imstkLight.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVTKViewer.h"

@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCube.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

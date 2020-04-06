@@ -21,10 +21,12 @@
 
 #pragma once
 #include "imstkCollisionHandling.h"
-#include "imstkSPHObject.h"
 
 namespace imstk
 {
+struct CollisionData;
+class SPHObject;
+
 class SPHCollisionHandling : public CollisionHandling
 {
 public:

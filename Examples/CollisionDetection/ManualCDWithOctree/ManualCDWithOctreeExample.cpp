@@ -20,12 +20,14 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkSceneObject.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVTKViewer.h"
 #include "imstkTimer.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionData.h"
 
 // This is for collision detection between geometries
 #include "imstkOctreeBasedCD.h"

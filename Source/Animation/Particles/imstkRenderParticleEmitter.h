@@ -21,19 +21,15 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
-#include "g3log/g3log.hpp"
-
 #include "imstkMath.h"
-#include "imstkColor.h"
-#include "imstkTimer.h"
 #include "imstkAnimationModel.h"
 #include "imstkRenderParticles.h"
+#include "imstkTimer.h"
 
 namespace imstk
 {
+struct Color;
+
 ///
 /// \struct RenderParticleKeyFrame
 ///
@@ -194,7 +190,7 @@ protected:
     float m_time; ///< total time for particle system
     float m_emitTime;
 
-    imstk::StopWatch m_stopWatch;
+    StopWatch m_stopWatch;
 
     double m_lastUpdateTime = 0.0;
     bool   m_started = false;

@@ -20,6 +20,9 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
+#include "imstkLight.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"

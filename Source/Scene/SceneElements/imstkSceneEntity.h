@@ -28,10 +28,10 @@ namespace imstk
 using EntityID = unsigned long;
 
 ///
-/// \class Entity
-/// \brief Top-level class for iMSTK objects
+/// \class SceneEntity
+/// \brief Top-level class for iMSTK scene elements (scene objects, lights, camera)
 ///
-class Entity
+class SceneEntity
 {
 public:
     ///
@@ -44,7 +44,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    Entity();
+    SceneEntity();
 
     // Not the best design pattern
     static std::atomic<EntityID> s_count; ///< current count of entities

@@ -25,7 +25,6 @@
 
 // imstk
 #include "imstkGeometryMap.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 
 namespace imstk

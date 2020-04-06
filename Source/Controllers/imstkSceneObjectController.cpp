@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkSceneObjectController.h"
-
+#include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
 

@@ -19,10 +19,22 @@
 
 =========================================================================*/
 
+// std lib
 #include <fstream>
 
 //imstk
 #include "imstkFEMDeformableBodyModel.h"
+#include "imstkStVKForceModel.h"
+#include "imstkLinearFEMForceModel.h"
+#include "imstkCorotationalFEMForceModel.h"
+#include "imstkIsotropicHyperelasticFEMForceModel.h"
+#include "imstkVegaMeshIO.h"
+#include "imstkVolumetricMesh.h"
+#include "imstkTimeIntegrator.h"
+#include "imstkVegaMeshIO.h"
+#include "imstkNewtonSolver.h"
+#include "imstkInternalForceModel.h"
+#include "imstkMath.h"
 
 // vega
 #include "generateMassMatrix.h"
@@ -775,4 +787,16 @@ FEMDeformableBodyModel::setFixedSizeTimeStepping()
     m_timeStepSizeType = TimeSteppingType::fixed;
     m_timeIntegrator->setTimestepSizeToDefault();
 }
+
+void
+FEMDeformableBodyModel::setTimeStep(const double timeStep)
+{
+    m_timeIntegrator->setTimestepSize(timeStep);
+}
+
+double
+FEMDeformableBodyModel::getTimeStep() const
+{
+    return m_timeIntegrator->getTimestepSize();
+};
 } // imstk

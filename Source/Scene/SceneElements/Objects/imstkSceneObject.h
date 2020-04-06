@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
 #include "imstkVisualModel.h"
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {
@@ -38,7 +35,7 @@ class DeviceClient;
 /// \brief Base class for all scene objects. A scene object can optionally be visible and
 /// collide with other scene objects. A object of the class is static.
 ///
-class SceneObject : public Entity
+class SceneObject : public SceneEntity
 {
 public:
     enum class Type

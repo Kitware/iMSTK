@@ -26,7 +26,7 @@
 // imstk
 #include "imstkMath.h"
 #include "imstkColor.h"
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {
@@ -45,7 +45,7 @@ enum class LightType
 ///
 /// \brief Abstract base class for lights
 ///
-class Light : public Entity
+class Light : public SceneEntity
 {
 public:
     ///
@@ -117,7 +117,7 @@ public:
     void setName(const std::string&& name) { m_name = std::move(name); };
 
 protected:
-    explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), Entity() {};
+    explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), SceneEntity() {};
 
     // properties with defaults
     float m_intensity   = 100.;

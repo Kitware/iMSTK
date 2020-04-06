@@ -21,8 +21,9 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
 #include "imstkVectorizedState.h"
+#include "imstkGeometry.h"
+
 #include <set>
 #include <string>
 

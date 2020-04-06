@@ -22,6 +22,7 @@
 #include <string>
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkSPHObject.h"
 #include "imstkAPIUtilities.h"
 #include "imstkPlane.h"

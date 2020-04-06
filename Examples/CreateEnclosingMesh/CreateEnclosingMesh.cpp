@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkAPIUtilities.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"

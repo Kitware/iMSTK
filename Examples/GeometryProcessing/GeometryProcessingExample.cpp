@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
+#include "imstkLight.h"
 #include "imstkPlane.h"
 #include "imstkCylinder.h"
 #include "imstkCube.h"

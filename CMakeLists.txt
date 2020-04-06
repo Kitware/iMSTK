@@ -355,21 +355,22 @@ endif()
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Source/Core)
+add_subdirectory(Source/Common)
 add_subdirectory(Source/Geometry)
 add_subdirectory(Source/DataStructures)
+add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Devices)
 add_subdirectory(Source/Rendering/Materials)
 add_subdirectory(Source/Rendering/GUIOverlay)
 add_subdirectory(Source/Rendering)
 add_subdirectory(Source/Solvers)
 add_subdirectory(Source/DynamicalModels)
-add_subdirectory(Source/Collision)
 add_subdirectory(Source/Scene/SceneElements)
+add_subdirectory(Source/Animation)
+add_subdirectory(Source/Controllers)
+add_subdirectory(Source/Collision)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
-add_subdirectory(Source/Constraint)
-add_subdirectory(Source/Animation)
 add_subdirectory(Source/apiUtilities)
 
 #--------------------------------------------------------------------------

@@ -32,7 +32,7 @@ imstk_add_library( GUIOverlay
     ${IMPLEMENTATION_CPP_FILES}
     ${GUI_cpp_files}
   DEPENDS
-    Core
+    Common
     imgui
     ${Vulkan_Dependency}
   )

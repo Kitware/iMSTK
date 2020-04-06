@@ -19,20 +19,20 @@
 
 =========================================================================*/
 
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {
-std::atomic<EntityID> Entity::s_count { 0 };
+std::atomic<EntityID> SceneEntity::s_count { 0 };
 
-Entity::Entity()
+SceneEntity::SceneEntity()
 {
     s_count++;
     m_ID = s_count;
 }
 
 EntityID
-Entity::getID() const
+SceneEntity::getID() const
 {
     return m_ID;
 }

@@ -26,6 +26,8 @@ limitations under the License.
 #include "imstkOpenVRCommand.h"
 #include "imstkSimulationManager.h"
 #include "VTKRenderer/imstkVTKRenderer.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 namespace imstk
 {

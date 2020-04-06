@@ -26,22 +26,22 @@ limitations under the License.
 
 namespace imstk
 {
-stdSink::FG_Color
+stdSink::FontColor
 stdSink::GetColor(const LEVELS level) const
 {
     if (level.value == WARNING.value)
     {
-        return YELLOW;
+        return Yellow;
     }
     if (level.value == DEBUG.value)
     {
-        return GREEN;
+        return Green;
     }
     if (level.value == FATAL.value)
     {
-        return RED;
+        return Red;
     }
-    return WHITE;
+    return White;
 }
 
 #ifdef WIN32

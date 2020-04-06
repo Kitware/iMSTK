@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <memory>
-#include <iostream>
-
 #include "imstkGeometry.h"
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

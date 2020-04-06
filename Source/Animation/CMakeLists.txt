@@ -4,7 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Animation
   DEPENDS
-    Core
+    Common
     Geometry
     SceneElements
   )

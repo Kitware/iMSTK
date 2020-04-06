@@ -26,6 +26,7 @@
 #include "imstkLooseOctree.h"
 #include "imstkVTKViewer.h"
 #include "imstkTimer.h"
+#include "imstkLight.h"
 #include "imstkVTKTextStatusManager.h"
 
 #include <thread>

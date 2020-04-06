@@ -19,20 +19,24 @@
 
 =========================================================================*/
 
-#include "imstkAnimationObject.h"
-#include "imstkAnimationModel.h"
+#pragma once
 
 namespace imstk
 {
-std::shared_ptr<AnimationModel>
-AnimationObject::getAnimationModel() const
+enum class FEMMethodType
 {
-    return m_animationModel;
-}
+    StVK,
+    Corotational,
+    Linear,
+    Invertible
+};
 
-void
-AnimationObject::setAnimationModel(std::shared_ptr<AnimationModel> model)
+/// \todo Move to appropriate place
+enum class HyperElasticMaterialType
 {
-    m_animationModel = model;
-}
-} // imstk
+    StVK,
+    NeoHookean,
+    MooneyRivlin,
+    none
+};
+} //imstk

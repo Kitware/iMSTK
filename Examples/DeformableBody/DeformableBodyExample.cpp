@@ -32,6 +32,7 @@
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
 #include "imstkConjugateGradient.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 
@@ -89,7 +90,7 @@ main()
     surfMeshModel->setRenderMaterial(material);
 
     // Scene Object
-    auto deformableObj = std::make_shared<DeformableObject>("Dragon");
+    auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map

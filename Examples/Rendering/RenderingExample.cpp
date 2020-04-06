@@ -22,6 +22,8 @@
 #include "imstkSimulationManager.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVisualObjectImporter.h"
+#include "imstkIBLProbe.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 

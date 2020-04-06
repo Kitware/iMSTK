@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"

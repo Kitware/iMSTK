@@ -24,7 +24,7 @@
 namespace imstk
 {
 void
-VectorizedState::initialize(const size_t numDof)
+FeDeformBodyState::initialize(const size_t numDof)
 {
     m_q.resize(numDof);
     m_qDot.resize(numDof);
@@ -36,7 +36,7 @@ VectorizedState::initialize(const size_t numDof)
 };
 
 void
-VectorizedState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
+FeDeformBodyState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
 {
     m_q       = u;
     m_qDot    = v;
@@ -44,25 +44,25 @@ VectorizedState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
 }
 
 void
-VectorizedState::setU(const Vectord& u)
+FeDeformBodyState::setU(const Vectord& u)
 {
     m_q = u;
 }
 
 void
-VectorizedState::setV(const Vectord& v)
+FeDeformBodyState::setV(const Vectord& v)
 {
     m_qDot = v;
 }
 
 void
-VectorizedState::setA(const Vectord& a)
+FeDeformBodyState::setA(const Vectord& a)
 {
     m_qDotDot = a;
 }
 
 void
-VectorizedState::setState(std::shared_ptr<VectorizedState> rhs)
+FeDeformBodyState::setState(std::shared_ptr<FeDeformBodyState> rhs)
 {
     m_q       = rhs->getQ();
     m_qDot    = rhs->getQDot();

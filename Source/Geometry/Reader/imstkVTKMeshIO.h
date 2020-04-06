@@ -30,14 +30,15 @@
 #include "vtkPointData.h"
 
 #include "imstkMeshIO.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkLineMesh.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkHexahedralMesh.h"
 #include "imstkImageData.h"
 
 namespace imstk
 {
+class SurfaceMesh;
+class LineMesh;
+class TetrahedralMesh;
+class HexahedralMesh;
+class VolumetricMesh;
 ///
 /// \class VTKMeshIO
 ///

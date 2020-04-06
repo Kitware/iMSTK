@@ -21,21 +21,18 @@
 
 #pragma once
 
-#include "assimp/Importer.hpp"
-#include "assimp/mesh.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-
 #include <memory>
 #include <fstream>
+#include <string>
 #include <initializer_list>
 
+#include "imstkTexture.h"
 #include "imstkSceneObject.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkAssimpMeshIO.h"
 
 namespace imstk
 {
+class RenderMaterial;
+
 ///
 /// \class VisualObjectImporter
 ///

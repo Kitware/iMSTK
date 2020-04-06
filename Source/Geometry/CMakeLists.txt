@@ -4,7 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Geometry
   DEPENDS
-    Core
+    Common
     glm
     Assimp
     Materials

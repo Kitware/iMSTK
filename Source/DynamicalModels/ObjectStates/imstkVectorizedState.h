@@ -32,21 +32,21 @@ namespace imstk
 ///
 /// \brief This class stores the state of the unknown field variable in vectorized form
 ///
-class VectorizedState
+class FeDeformBodyState
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    VectorizedState() = default;
-    explicit VectorizedState(const size_t size) { initialize(size); }
+    FeDeformBodyState() = default;
+    explicit FeDeformBodyState(const size_t size) { initialize(size); }
     //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
     /// \brief Destructor
     ///
-    ~VectorizedState() = default;
+    ~FeDeformBodyState() = default;
 
     ///
     /// \brief Initialize the problem state
@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<VectorizedState> rhs);
+    void setState(std::shared_ptr<FeDeformBodyState> rhs);
 
     ///
     /// \brief Get the state

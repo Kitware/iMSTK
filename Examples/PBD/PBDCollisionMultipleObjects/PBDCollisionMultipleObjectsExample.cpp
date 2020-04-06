@@ -20,6 +20,10 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
+#include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
+#include "imstkSceneManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
@@ -29,6 +33,7 @@
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 #include "imstkPBDCollisionHandling.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionData.h"
 
 // Enable this macro to generate many dragons
 #define BIG_SCENE

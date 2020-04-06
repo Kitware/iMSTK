@@ -20,9 +20,28 @@
 =========================================================================*/
 
 #include "imstkCollidingObject.h"
+#include "imstkGeometryMap.h"
 
 namespace imstk
 {
+bool
+CollidingObject::initialize()
+{
+    if (SceneObject::initialize())
+    {
+        if (m_collidingToVisualMap)
+        {
+            m_collidingToVisualMap->initialize();
+        }
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 const std::shared_ptr<Geometry>&
 CollidingObject::getCollidingGeometry() const
 {

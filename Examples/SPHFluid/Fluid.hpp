@@ -22,6 +22,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
 #include "imstkSPHSolver.h"
+#include "imstkSPHModel.h"
 
 using namespace imstk;
 

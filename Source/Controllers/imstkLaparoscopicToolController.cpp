@@ -20,13 +20,12 @@
 =========================================================================*/
 
 #include "imstkLaparoscopicToolController.h"
-
 #include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
+#include "imstkSceneObject.h"
+#include "imstkLogUtility.h"
 
 #include <utility>
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {

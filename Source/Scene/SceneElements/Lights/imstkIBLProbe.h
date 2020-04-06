@@ -47,9 +47,9 @@ public:
     /// \param radianceCubemapPath path to .dds radiance (specular) cubemap
     /// \param brdfLUTPath path to BRDF LUT (shouldn't be .dds)
     ///
-    IBLProbe::IBLProbe(std::string irradianceCubemapPath,
-                       std::string radianceCubemapPath,
-                       std::string brdfLUTPath) :
+    IBLProbe(std::string irradianceCubemapPath,
+             std::string radianceCubemapPath,
+             std::string brdfLUTPath) :
         m_irradianceCubemapPath(irradianceCubemapPath),
         m_radianceCubemapPath(radianceCubemapPath),
         m_brdfLUTPath(brdfLUTPath),

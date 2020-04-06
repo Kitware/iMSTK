@@ -24,6 +24,7 @@
 // vtk
 #include "vtkImageReslice.h"
 #include "vtkTransform.h"
+#include <vtkImageData.h>
 
 namespace imstk
 {

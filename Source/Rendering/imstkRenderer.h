@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "imstkTextureManager.h"
 #include "imstkMath.h"
 
 #include <memory>

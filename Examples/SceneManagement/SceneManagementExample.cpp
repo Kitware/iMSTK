@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 using namespace imstk;
 

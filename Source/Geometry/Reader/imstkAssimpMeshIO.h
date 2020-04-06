@@ -24,10 +24,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
 
-#include "assimp/Importer.hpp"
-#include "assimp/mesh.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+struct aiMesh;
 
 namespace imstk
 {

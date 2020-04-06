@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDebugRenderGeometry.h"
@@ -29,15 +30,21 @@
 #include "imstkPbdSolver.h"
 #include "imstkPbdObject.h"
 #include "imstkPBDCollisionHandling.h"
+#include "imstkSolverBase.h"
+#include "imstkCamera.h"
+#include "imstkIBLProbe.h"
+#include "imstkCollisionGraph.h"
+#include "imstkLight.h"
+#include "imstkLogUtility.h"
 
-#include <g3log/g3log.hpp>
+#include <iterator>
 
 namespace imstk
 {
 Scene::~Scene()
 {
-    // End Camera Controller
-    if (auto camController = this->getCamera()->getController())
+    // Join Camera Controllers
+    for (auto camController : m_cameraControllers)
     {
         camController->end();
         m_threadMap.at(camController->getName()).join();
@@ -101,7 +108,7 @@ void
 Scene::launchModules()
 {
     // Start Camera Controller (asynchronous)
-    if (auto camController = this->getCamera()->getController())
+    for (auto camController : m_cameraControllers)
     {
         m_threadMap[camController->getName()] = std::thread([camController] { camController->start(); });
     }
@@ -318,6 +325,12 @@ Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller
 }
 
 void
+Scene::addCameraController(std::shared_ptr<CameraController> camController)
+{
+    m_cameraControllers.push_back(camController);
+}
+
+void
 Scene::reset()
 {
     m_resetRequested = true;
@@ -370,7 +383,7 @@ Scene::advance(const double dt)
     // Reset Contact forces to 0
     for (auto obj : this->getSceneObjects())
     {
-        if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+        if (auto defObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
         {
             defObj->getContactForce().setConstant(0.0);
         }
@@ -440,7 +453,7 @@ Scene::advance(const double dt)
         }
         else if (obj->getType() == SceneObject::Type::FEMDeformable)
         {
-            if (auto dynaObj = std::dynamic_pointer_cast<DeformableObject>(obj))
+            if (auto dynaObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
             {
                 if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::realTime)
                 {

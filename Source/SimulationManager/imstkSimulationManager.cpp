@@ -20,7 +20,11 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 #include "imstkThreadManager.h"
+#include "imstkSceneManager.h"
+#include "imstkViewer.h"
 #include "imstkTimer.h"
 
 #include <string>

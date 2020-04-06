@@ -24,6 +24,7 @@
 #include "g3log/g3log.hpp"
 
 #include "imstkMath.h"
+#include "imstkInternalForceModelTypes.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4458 )
@@ -34,23 +35,6 @@
 
 namespace imstk
 {
-enum class FEMMethodType
-{
-    StVK,
-    Corotational,
-    Linear,
-    Invertible
-};
-
-/// \todo Move to appropriate place
-enum class HyperElasticMaterialType
-{
-    StVK,
-    NeoHookean,
-    MooneyRivlin,
-    none
-};
-
 ///
 /// \class InternalForceModel
 ///
