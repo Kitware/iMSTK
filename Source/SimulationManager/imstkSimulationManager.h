@@ -28,7 +28,7 @@
 #include <memory>
 
 #include "imstkModule.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #ifdef iMSTK_USE_Vulkan
 #include "imstkVulkanViewer.h"
@@ -322,7 +322,7 @@ private:
     std::unordered_map<std::string, std::thread> m_threadMap;
 
     std::shared_ptr<Viewer>     m_viewer  = nullptr;
-    std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
+    std::shared_ptr<Logger> m_logUtil = std::make_shared<Logger>();
 
     struct callbackKeyPair { int key; keyPressCallback func; };
     std::vector<callbackKeyPair> m_kepPressCallbacks;

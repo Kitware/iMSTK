@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #ifdef iMSTK_AUDIO_ENABLED
 
@@ -117,7 +117,7 @@ int
 main()
 {
     // Initialize g3logger
-    auto logger = std::make_shared<LogUtility>();
+    auto logger = std::make_shared<Logger>();
     logger->createLogger("audio-Example", "./");
 
     #ifndef iMSTK_AUDIO_ENABLED

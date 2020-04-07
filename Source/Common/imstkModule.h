@@ -24,7 +24,7 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkTimer.h"
 
 namespace imstk

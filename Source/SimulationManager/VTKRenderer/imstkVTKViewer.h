@@ -24,7 +24,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include "imstkScene.h"
 #include "imstkVTKRenderer.h"

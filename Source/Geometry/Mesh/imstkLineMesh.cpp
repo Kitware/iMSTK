@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkLineMesh.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

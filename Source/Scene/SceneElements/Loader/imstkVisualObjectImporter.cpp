@@ -29,7 +29,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkAssimpMeshIO.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

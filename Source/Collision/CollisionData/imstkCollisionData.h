@@ -25,7 +25,7 @@
 #include <algorithm>
 
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 
 namespace imstk

@@ -35,7 +35,7 @@
 #include "vtkCullerCollection.h"
 #include "vtkAxesActor.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

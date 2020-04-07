@@ -26,7 +26,7 @@
 #include <HDU/hduVector.h>
 #include <HDU/hduError.h>
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
