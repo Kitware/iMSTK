@@ -58,7 +58,6 @@ TetraTriangleMap::compute()
             size_t closestTetId = findEnclosingTetrahedron(surfVertPos);
             if (closestTetId == std::numeric_limits<size_t>::max())
             {
-                LOG(WARNING) << "Could not find enclosing tetrahedron for vertex ID " << vertexIdx << ". Finding the closest one.";
                 closestTetId = findClosestTetrahedron(surfVertPos);
             }
             if (closestTetId == std::numeric_limits<size_t>::max())

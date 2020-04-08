@@ -43,7 +43,7 @@ main()
     auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
-    std::shared_ptr<SurfaceMesh> fineSurfaceMesh(std::move(GeometryUtils::loopSubdivideSurfaceMesh(*coarseSurfMesh.get())));
+    std::shared_ptr<SurfaceMesh> fineSurfaceMesh(std::move(GeometryUtils::loopSubdivideSurfaceMesh(coarseSurfMesh)));
 
     fineSurfaceMesh->translate(Vec3d(0., -5., 0.), Geometry::TransformType::ConcatenateToTransform);
     coarseSurfMesh->translate(Vec3d(0., 5., 0.), Geometry::TransformType::ConcatenateToTransform);

@@ -206,6 +206,11 @@ public:
     double getFPS() { return m_fps; }
 
     ///
+    /// \brief Get the elapsed time
+    ///
+    double getElapsedTime() { return elapsedTime; }
+
+    ///
     /// \brief Get the configuration
     ///
     std::shared_ptr<const SceneConfig> getConfig() const { return m_config; };

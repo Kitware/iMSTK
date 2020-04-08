@@ -22,8 +22,6 @@
 #include "imstkSimulationManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
-#include "imstkAPIUtilities.h"
 
 using namespace imstk;
 

@@ -21,15 +21,15 @@
 
 #pragma once
 
-#include "g3log/g3log.hpp"
-
 #include "imstkMath.h"
-#include "imstkParallelUtils.h"
 
 #include <string>
+#include <tbb/concurrent_unordered_set.h>
 
 namespace imstk
 {
+namespace ParallelUtils { class SpinLock; }
+
 ///
 /// \class Geometry
 /// \brief Base class for any geometrical representation

@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkDecal.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

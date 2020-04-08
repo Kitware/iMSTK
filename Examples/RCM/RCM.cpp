@@ -63,7 +63,7 @@ main(int argc, char** argv)
     // a surface mesh cover
     {
         auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-        auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(*surfMesh, 80, 40, 60);
+        auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
         auto conn     = tetMesh->getTetrahedraVertices();
         auto numVerts = tetMesh->getNumVertices();
         std::cout << "Number of vertices = " << numVerts << std::endl;
