@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

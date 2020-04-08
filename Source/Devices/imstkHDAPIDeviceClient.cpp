@@ -26,7 +26,7 @@
 #include <HDU/hduVector.h>
 #include <HDU/hduError.h>
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -44,12 +44,7 @@ HDAPIDeviceClient::init()
 
     // If failed
     HDErrorInfo error;
-    if (HD_DEVICE_ERROR(error = hdGetError()))
-    {
-        LOG(FATAL) << "Failed to initialize Phantom Omni " << this->getDeviceName();
-        m_handle = -1;
-        return;
-    }
+    LOG_IF(FATAL, HD_DEVICE_ERROR(error = hdGetError())) << "Failed to initialize Phantom Omni " << this->getDeviceName();
 
     // Enable forces
     hdEnable(HD_FORCE_OUTPUT);

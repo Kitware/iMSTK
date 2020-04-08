@@ -29,7 +29,7 @@
   #include "vrpn_Phantom.h"
 #endif
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

@@ -35,7 +35,7 @@
 #include "imstkIBLProbe.h"
 #include "imstkCollisionGraph.h"
 #include "imstkLight.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include <iterator>
 

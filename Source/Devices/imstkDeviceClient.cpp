@@ -21,7 +21,7 @@
 
 #include "imstkDeviceClient.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

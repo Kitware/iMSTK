@@ -22,7 +22,7 @@
 #include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "bandwidth.h"
 #include <thread>
 
@@ -42,8 +42,9 @@ void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts);
 int
 main(int argc, char** argv)
 {
-    auto logUtil = std::make_shared<LogUtility>();
-    logUtil->createLogger("simulation", "./");
+    auto logger = Logger::getInstance();
+    logger->addFileSink("rcm-Example", "./");
+    logger->addStdoutSink();
 
     // a 2D Cartesian mesh
     {

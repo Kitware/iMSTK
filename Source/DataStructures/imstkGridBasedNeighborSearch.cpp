@@ -21,7 +21,7 @@
 
 #include "imstkGridBasedNeighborSearch.h"
 #include "imstkParallelUtils.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

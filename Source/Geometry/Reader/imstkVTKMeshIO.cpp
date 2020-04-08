@@ -45,7 +45,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

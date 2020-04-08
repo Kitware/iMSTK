@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
 

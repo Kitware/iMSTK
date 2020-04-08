@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include <array>
 using namespace imstk;

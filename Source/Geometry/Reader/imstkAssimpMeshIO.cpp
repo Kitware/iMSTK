@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkAssimpMeshIO.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 // assimp
 #include "assimp/Importer.hpp"

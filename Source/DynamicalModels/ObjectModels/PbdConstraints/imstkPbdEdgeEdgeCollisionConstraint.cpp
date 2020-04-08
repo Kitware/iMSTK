@@ -22,7 +22,7 @@
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
 #include "imstkPbdModel.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
