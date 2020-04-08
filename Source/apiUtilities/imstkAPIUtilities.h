@@ -46,7 +46,7 @@
 #include "imstkCamera.h"
 
 // logger
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkTimer.h"
 
 namespace imstk

@@ -22,7 +22,7 @@
 #pragma once
 
 #include <array>
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include "Eigen/Sparse"
 

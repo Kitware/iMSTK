@@ -23,7 +23,7 @@
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKInteractorStyle.h"
 #include "imstkCollisionGraph.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkCamera.h"
 
 #include "vtkTextActor.h"

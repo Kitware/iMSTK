@@ -21,7 +21,7 @@
 
 #include "imstkRenderParticleEmitter.h"
 #include "imstkColor.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

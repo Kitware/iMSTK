@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkIdentityMap.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

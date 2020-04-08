@@ -21,7 +21,7 @@
 
 #include "imstkPbdFETetConstraint.h"
 #include "imstkPbdModel.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace  imstk
 {

@@ -23,7 +23,7 @@
 
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include <array>
 #include <cstdint>
