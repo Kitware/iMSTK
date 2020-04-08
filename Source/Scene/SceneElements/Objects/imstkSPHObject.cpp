@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSPHObject.h"
+#include "imstkSPHModel.h"
 
 namespace imstk
 {

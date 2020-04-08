@@ -26,33 +26,33 @@
 
 // imstk
 #include "imstkDynamicObject.h"
-#include "imstkFEMDeformableBodyModel.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
 class Geometry;
 class GeometryMap;
+class FEMDeformableBodyModel;
 
 ///
 /// \class DeformableObject
 ///
 /// \brief Scene objects that can deform
 ///
-class DeformableObject : public DynamicObject
+class FeDeformableObject : public DynamicObject
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    explicit DeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
-    DeformableObject() = delete;
+    explicit FeDeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
+    FeDeformableObject() = delete;
 
     ///
     /// \brief Destructor
     ///
-    ~DeformableObject() = default;
+    ~FeDeformableObject() = default;
 
     ///
     /// \brief Initialize the deformable object

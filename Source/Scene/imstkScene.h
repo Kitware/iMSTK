@@ -23,24 +23,27 @@
 
 #include <unordered_map>
 #include <memory>
+#include <thread>
+#include <atomic>
 
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkIBLProbe.h"
-#include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
-#include "imstkSolverBase.h"
+#include "imstkCameraController.h"
 
 namespace imstk
 {
 class SceneObjectControllerBase;
 class DebugRenderGeometry;
+class SceneObject;
+class SolverBase;
+class Camera;
+class IBLProbe;
+class CollisionGraph;
+class Light;
 
 enum class TimeSteppingPolicy
 {
-    asFastAsPossible,
-    fixedFrameRate,
-    realTime
+    AsFastAsPossible,
+    FixedFrameRate,
+    RealTime
 };
 
 struct SceneConfig
@@ -49,7 +52,7 @@ struct SceneConfig
     // Note: May cause delays to run the first frame of the scene due to scene initialization
     bool lazyInitialization = false;
 
-    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::asFastAsPossible;
+    TimeSteppingPolicy timeStepping = TimeSteppingPolicy::AsFastAsPossible;
 
     // Keep track of the fps for the scene
     bool trackFPS = false;
@@ -70,7 +73,9 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) : m_name(name), m_config(config) {}
+    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) :
+        m_name(name),
+        m_config(config) {}
 
     ///
     /// \brief Destructor
@@ -195,6 +200,11 @@ public:
     void addObjectController(std::shared_ptr<SceneObjectControllerBase> controller);
 
     ///
+    /// \brief Add objects controllers
+    ///
+    void addCameraController(std::shared_ptr<CameraController> camController);
+
+    ///
     /// \brief
     ///
     bool isInitialized() const { return m_isInitialized; }
@@ -227,8 +237,9 @@ protected:
     std::shared_ptr<Camera>         m_camera = std::make_shared<Camera>();
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<SolverBase>> m_solvers;                          ///> List of non-linear solvers
-    std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
-    std::unordered_map<std::string, std::thread> m_threadMap;                    ///>
+    std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
+    std::vector<std::shared_ptr<CameraController>> m_cameraControllers;          ///> List of camera controllers
+    std::unordered_map<std::string, std::thread>   m_threadMap;                  ///>
 
     double m_fps       = 0.0;
     double elapsedTime = 0.0;

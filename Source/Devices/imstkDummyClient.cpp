@@ -23,7 +23,7 @@
 
 #include "imstkDummyClient.h"
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

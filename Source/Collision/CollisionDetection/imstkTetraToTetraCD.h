@@ -21,9 +21,6 @@
 
 #pragma once
 
-// std library
-#include <memory>
-
 // imstk
 #include "imstkCollisionDetection.h"
 #include "imstkSpatialHashTableSeparateChaining.h"

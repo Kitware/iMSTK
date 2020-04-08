@@ -23,8 +23,13 @@
 #include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
+#include "imstkVolumetricMesh.h"
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
+
+// Vega
+#include "volumetricMeshLoader.h"
+#include "volumetricMesh.h"
 
 #include "tetMesh.h"
 

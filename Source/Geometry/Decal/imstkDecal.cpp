@@ -21,6 +21,7 @@
 
 #include "imstkDecal.h"
 #include "imstkLogUtility.h"
+#include "imstkMath.h"
 
 namespace imstk
 {

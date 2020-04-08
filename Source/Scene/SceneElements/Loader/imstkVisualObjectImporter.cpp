@@ -21,7 +21,15 @@
 
 #include "imstkVisualObjectImporter.h"
 
-#include "g3log/g3log.hpp"
+#include "assimp/Importer.hpp"
+#include "assimp/mesh.h"
+#include "assimp/scene.h"
+#include "assimp/postprocess.h"
+
+#include "imstkSurfaceMesh.h"
+#include "imstkAssimpMeshIO.h"
+
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -85,12 +93,12 @@ VisualObjectImporter::importVisualObject(
     }
 
     std::vector<Texture::Type> textureTypes;
-    textureTypes.push_back(Texture::Type::DIFFUSE);
-    textureTypes.push_back(Texture::Type::NORMAL);
-    textureTypes.push_back(Texture::Type::ROUGHNESS);
-    textureTypes.push_back(Texture::Type::METALNESS);
-    textureTypes.push_back(Texture::Type::AMBIENT_OCCLUSION);
-    textureTypes.push_back(Texture::Type::SUBSURFACE_SCATTERING);
+    textureTypes.push_back(Texture::Type::Diffuse);
+    textureTypes.push_back(Texture::Type::Normal);
+    textureTypes.push_back(Texture::Type::Roughness);
+    textureTypes.push_back(Texture::Type::Metalness);
+    textureTypes.push_back(Texture::Type::AmbientOcclusion);
+    textureTypes.push_back(Texture::Type::SubsurfaceScattering);
 
     // Iterate over each mesh
     for (unsigned int i = 0; i < scene->mNumMeshes; i++)
@@ -141,7 +149,7 @@ VisualObjectImporter::findAndAddTexture(
 
     switch (textureType)
     {
-    case Texture::Type::DIFFUSE:
+    case Texture::Type::Diffuse:
         VisualObjectImporter::findAndAddTextureWithExtensions(
                 renderMaterial,
                 textureFolderPath,
@@ -150,7 +158,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureType,
             { "_BaseColor", "_Diffuse", "_Albedo" });
         break;
-    case Texture::Type::NORMAL:
+    case Texture::Type::Normal:
         VisualObjectImporter::findAndAddTextureWithExtensions(
                 renderMaterial,
                 textureFolderPath,
@@ -159,7 +167,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureType,
             { "_Normal" });
         break;
-    case Texture::Type::ROUGHNESS:
+    case Texture::Type::Roughness:
         VisualObjectImporter::findAndAddTextureWithExtensions(
                 renderMaterial,
                 textureFolderPath,
@@ -168,7 +176,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureType,
             { "_Roughness" });
         break;
-    case Texture::Type::METALNESS:
+    case Texture::Type::Metalness:
         VisualObjectImporter::findAndAddTextureWithExtensions(
                 renderMaterial,
                 textureFolderPath,
@@ -177,7 +185,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureType,
             { "_Metalness", "_Metallic" });
         break;
-    case Texture::Type::AMBIENT_OCCLUSION:
+    case Texture::Type::AmbientOcclusion:
         VisualObjectImporter::findAndAddTextureWithExtensions(
                 renderMaterial,
                 textureFolderPath,
@@ -186,7 +194,7 @@ VisualObjectImporter::findAndAddTexture(
                 textureType,
             { "_AO", "_AmbientOcclusion" });
         break;
-    case Texture::Type::SUBSURFACE_SCATTERING:
+    case Texture::Type::SubsurfaceScattering:
         VisualObjectImporter::findAndAddTextureWithExtensions(
                 renderMaterial,
                 textureFolderPath,

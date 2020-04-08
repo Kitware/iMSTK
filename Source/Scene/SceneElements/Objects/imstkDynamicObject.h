@@ -21,14 +21,13 @@
 
 #pragma once
 
-#include "imstkSceneObject.h"
 #include "imstkCollidingObject.h"
-#include "imstkAbstractDynamicalModel.h"
-#include "imstkGeometryMap.h"
 
 namespace imstk
 {
 class Geometry;
+class GeometryMap;
+class AbstractDynamicalModel;
 
 ///
 /// \class DynamicObject
@@ -76,75 +75,22 @@ public:
     ///
     /// \brief Returns the number of degree of freedom
     ///
-    size_t getNumOfDOF() const
-    {
-        if (!m_dynamicalModel)
-        {
-            LOG(WARNING) << "Cannot get the degree of freedom since the dynamical model is not initialized! returning 0";
-            return 0;
-        }
-
-        return m_dynamicalModel->getNumDegreeOfFreedom();
-    }
+    size_t getNumOfDOF() const;
 
     ///
     /// \brief Update the physics geometry and the apply the maps (if defined)
     ///
-    void updateGeometries() final
-    {
-        m_dynamicalModel->updatePhysicsGeometry();
-
-        if (m_physicsToCollidingGeomMap)
-        {
-            m_physicsToCollidingGeomMap->apply();
-        }
-
-        if (m_updateVisualFromPhysicsGeometry)
-        {
-            if (m_physicsToVisualGeomMap)
-            {
-                m_physicsToVisualGeomMap->apply();
-            }
-        }
-        else
-        {
-            CollidingObject::updateGeometries();
-        }
-    }
+    void updateGeometries() final;
 
     ///
     /// \brief Initialize the scene object
     ///
-    virtual bool initialize() override
-    {
-        if (CollidingObject::initialize())
-        {
-            if (m_physicsToCollidingGeomMap)
-            {
-                m_physicsToCollidingGeomMap->initialize();
-            }
-
-            if (m_physicsToVisualGeomMap)
-            {
-                m_physicsToVisualGeomMap->initialize();
-            }
-
-            return m_dynamicalModel->initialize();
-        }
-        else
-        {
-            return false;
-        }
-    }
+    virtual bool initialize() override;
 
     ///
     /// \brief Reset the dynamic object to its initial state
     ///
-    virtual void reset() override
-    {
-        m_dynamicalModel->resetToInitialState();
-        this->updateGeometries();
-    };
+    virtual void reset() override;
 
 protected:
 

@@ -26,10 +26,11 @@
 #include "imstkMSHMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
+#include "imstkVolumetricMesh.h"
 
 #include "tetMesh.h"
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

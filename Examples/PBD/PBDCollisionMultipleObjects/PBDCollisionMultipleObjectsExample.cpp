@@ -20,6 +20,10 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
+#include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
+#include "imstkSceneManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
@@ -29,6 +33,7 @@
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 #include "imstkPBDCollisionHandling.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionData.h"
 
 // Enable this macro to generate many dragons
 #define BIG_SCENE
@@ -95,7 +100,7 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     material->setDebugColor(getRandomColor()); // Wireframe color
     material->setLineWidth(2);
 #else
-    material->setDisplayMode(RenderMaterial::DisplayMode::SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setColor(getRandomColor());
 #endif
 
@@ -196,7 +201,7 @@ main()
     floorMesh->initialize(vertList, triangles);
 
     auto materialFloor = std::make_shared<RenderMaterial>();
-    materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
     floorMeshModel->setRenderMaterial(materialFloor);
 
@@ -323,7 +328,7 @@ main()
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

@@ -20,10 +20,13 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
 #include "imstkRigidObject.h"
 #include "imstkRigidBodyModel.h"
 #include "imstkSceneObject.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkLight.h"
+#include "imstkCamera.h"
 #include "imstkCube.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -56,7 +59,7 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::WIREFRAME_SURFACE);
+    mat->setDisplayMode(RenderMaterial::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
     renderModel->setRenderMaterial(mat);
@@ -64,8 +67,10 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
 
     // add dynamic model
     auto rigidModel = std::make_shared<RigidBodyModel>();
-    auto rigidProp  = std::make_shared<RigidBodyPropertyDesc>();
-    rigidModel->configure(surfMesh, rigidProp, RigidBodyType::Kinematic);
+    auto rigidProp  = std::make_shared<RigidBodyConfig>();
+    rigidProp->m_rigidBodyType = RigidBodyType::Kinematic;
+    rigidModel->configure(rigidProp);
+    rigidModel->setModelGeometry(surfMesh);
     meshObj->setPhysicsGeometry(surfMesh);
     meshObj->setDynamicalModel(rigidModel);
 
@@ -91,7 +96,7 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::WIREFRAME_SURFACE);
+    mat->setDisplayMode(RenderMaterial::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);
     renderModel->setRenderMaterial(mat);
@@ -103,12 +108,13 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
 
     // cube dynamic model
     auto rigidModel = std::make_shared<RigidBodyModel>();
-    auto rigidProp  = std::make_shared<RigidBodyPropertyDesc>();
+    auto rigidProp  = std::make_shared<RigidBodyConfig>();
     rigidProp->m_dynamicFriction = 0.01;
     rigidProp->m_restitution     = 0.01;
     rigidProp->m_staticFriction  = 0.005;
-
-    rigidModel->configure(cubeGeom, rigidProp, RigidBodyType::Dynamic);
+    rigidProp->m_rigidBodyType   = RigidBodyType::Dynamic;
+    rigidModel->configure(rigidProp);
+    rigidModel->setModelGeometry(cubeGeom);
     cubeObj->setDynamicalModel(rigidModel);
 
     //cubeObj->setPhysicsToVisualMap(rigidMap);
@@ -134,11 +140,9 @@ addPlaneRigidObject(std::shared_ptr<Scene> scene)
 
     // dynamic model
     auto rigidModel2 = std::make_shared<RigidBodyModel>();
-    auto rigidProp2  = std::make_shared<RigidBodyPropertyDesc>();
-    /*   rigidProp2->m_staticFriction = 0.1;
-       rigidProp2->m_dynamicFriction = 0.1;
-       rigidProp2->m_restitution = 0.1;*/
-    rigidModel2->configure(planeGeom, rigidProp2, RigidBodyType::Static);
+    auto rigidProp2  = std::make_shared<RigidBodyConfig>();
+    rigidModel2->configure(rigidProp2);
+    rigidModel2->setModelGeometry(planeGeom);
     planeObj->setDynamicalModel(rigidModel2);
 
     scene->addSceneObject(planeObj);
@@ -162,8 +166,10 @@ addSphereRigidObject(std::shared_ptr<Scene> scene, Vec3d t = Vec3d(0., 0., 0.))
 
     // cube dynamic model
     auto rigidModel3 = std::make_shared<RigidBodyModel>();
-    auto rigidProp   = std::make_shared<RigidBodyPropertyDesc>();
-    rigidModel3->configure(sphereGeom, rigidProp, RigidBodyType::Dynamic);
+    auto rigidProp   = std::make_shared<RigidBodyConfig>();
+    rigidProp->m_rigidBodyType = RigidBodyType::Dynamic;
+    rigidModel3->configure(rigidProp);
+    rigidModel3->setModelGeometry(sphereGeom);
     sphereObj->setDynamicalModel(rigidModel3);
 
     // add cube to scene
@@ -197,7 +203,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

@@ -26,7 +26,7 @@
 // imstk
 #include "imstkMath.h"
 #include "imstkColor.h"
-#include "imstkEntity.h"
+#include "imstkSceneEntity.h"
 
 namespace imstk
 {
@@ -35,9 +35,9 @@ namespace imstk
 ///
 enum class LightType
 {
-    directional,
-    point,
-    spot
+    Directional,
+    Point,
+    Spot
 };
 
 ///
@@ -45,7 +45,7 @@ enum class LightType
 ///
 /// \brief Abstract base class for lights
 ///
-class Light : public Entity
+class Light : public SceneEntity
 {
 public:
     ///
@@ -117,7 +117,7 @@ public:
     void setName(const std::string&& name) { m_name = std::move(name); };
 
 protected:
-    explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), Entity() {};
+    explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), SceneEntity() {};
 
     // properties with defaults
     float m_intensity   = 100.;
@@ -145,7 +145,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit DirectionalLight(const std::string& name) : Light(name, LightType::directional)
+    explicit DirectionalLight(const std::string& name) : Light(name, LightType::Directional)
     {
         this->setFocalPoint(-1, -1, -1);
     };
@@ -192,7 +192,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    explicit PointLight(const std::string& name, const LightType& type = LightType::point) : Light(name, type) {};
+    explicit PointLight(const std::string& name, const LightType& type = LightType::Point) : Light(name, type) {};
 
     ///
     /// \brief Get the cone angle
@@ -239,7 +239,7 @@ public:
     ///
     /// \brief Constructors
     ///
-    explicit SpotLight(const std::string& name) : PointLight(name, LightType::spot)
+    explicit SpotLight(const std::string& name) : PointLight(name, LightType::Spot)
     {
         m_coneAngle = 10.;
     };

@@ -21,18 +21,15 @@
 
 #pragma once
 
-// std library
-#include <map>
-#include <memory>
-
 // imstk
-#include "imstkCollidingObject.h"
 #include "imstkCollisionDetection.h"
-#include "imstkCollisionData.h"
 #include "imstkCollisionHandling.h"
 
 namespace imstk
 {
+struct CollisionData;
+class CollidingObject;
+
 ///
 /// \class InteractionPair
 ///

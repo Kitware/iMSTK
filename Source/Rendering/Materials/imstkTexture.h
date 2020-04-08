@@ -24,7 +24,7 @@
 #include <string>
 #include <memory>
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -39,27 +39,27 @@ public:
     ///
     enum class Type
     {
-        DIFFUSE = 0, // Also used for albedo
-        NORMAL,
-        ROUGHNESS,
-        METALNESS,
-        SUBSURFACE_SCATTERING,
-        AMBIENT_OCCLUSION,
-        CAVITY,
-        CUBEMAP,
-        IRRADIANCE_CUBEMAP,
-        RADIANCE_CUBEMAP,
+        Diffuse = 0, // Also used for albedo
+        Normal,
+        Roughness,
+        Metalness,
+        SubsurfaceScattering,
+        AmbientOcclusion,
+        Cavity,
+        Cubemap,
+        IrradianceCubeMap,
+        RadianceCubeMap,
         BRDF_LUT,
-        NONE
+        None
     };
 
     enum class FileType
     {
-        UNKNOWN,
-        BMP,
-        PNG,
-        JPG,
-        DDS
+        Unknown,
+        Bmp,
+        Png,
+        Jpg,
+        Dds
     };
 
     ///
@@ -67,7 +67,7 @@ public:
     /// \param path Path to the texture source file
     /// \param type Type of texture
     ///
-    Texture(std::string path = "", Type type = Type::DIFFUSE);
+    Texture(std::string path = "", Type type = Type::Diffuse);
 
     ///
     /// \brief Destructor

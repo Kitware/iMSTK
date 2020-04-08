@@ -37,7 +37,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DynamicalModel(DynamicalModelType type = DynamicalModelType::none) : AbstractDynamicalModel(type) {}
+    DynamicalModel(DynamicalModelType type = DynamicalModelType::None) : AbstractDynamicalModel(type) {}
 
     ///
     /// \brief Destructor

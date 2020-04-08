@@ -19,16 +19,19 @@
 //
 //=========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkCamera.h"
+#include "imstkMeshIO.h"
+#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkOneToOneMap.h"
+#include "imstkPBDCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
+#include "imstkSimulationManager.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
-#include "imstkOneToOneMap.h"
-#include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkPBDCollisionHandling.h"
 #include "imstkTetraTriangleMap.h"
+#include "imstkCollisionGraph.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 
@@ -128,7 +131,7 @@ main()
 
 		// Setup VisualModel
 		auto material = std::make_shared<RenderMaterial>();
-		material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+		material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 		auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
 		surfMeshModel->setRenderMaterial(material);
 
@@ -162,7 +165,7 @@ main()
 
 		// Setup VisualModel
 		auto stairMaterial = std::make_shared<RenderMaterial>();
-		stairMaterial->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+		stairMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 		auto stairMeshModel = std::make_shared<VisualModel>(stairMesh);
 		stairMeshModel->setRenderMaterial(stairMaterial);
 
@@ -187,7 +190,7 @@ main()
 	scene->addLight(light);
 
 	simManager->setActiveScene(scene);
-	simManager->start(SimulationStatus::paused);
+	simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

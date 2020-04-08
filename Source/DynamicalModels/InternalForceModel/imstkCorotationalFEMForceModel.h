@@ -21,18 +21,15 @@
 
 #pragma once
 
-#include <memory>
-
-#include "g3log/g3log.hpp"
-
 //imstk
 #include "imstkInternalForceModel.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4458 )
-//vega
-#include "corotationalLinearFEM.h"
-#pragma warning( pop )
+namespace vega
+{
+class VolumetricMesh;
+class CorotationalLinearFEM;
+class SparseMatrix;
+}
 
 namespace imstk
 {

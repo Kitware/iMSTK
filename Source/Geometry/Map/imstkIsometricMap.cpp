@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkIsometricMap.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

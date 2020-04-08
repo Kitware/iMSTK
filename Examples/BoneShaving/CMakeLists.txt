@@ -18,17 +18,17 @@
 
 if(iMSTK_USE_OpenHaptics)
 
-  project(Example-BoneDrilling)
+  project(Example-BoneShaving)
 
   #-----------------------------------------------------------------------------
   # Create executable
   #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} BoneDrillingExample.cpp)
+  imstk_add_executable(${PROJECT_NAME} BoneShavingExample.cpp)
 
   #-----------------------------------------------------------------------------
   # Add the target to Examples folder
   #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Haptics)
 
   #-----------------------------------------------------------------------------
   # Link libraries to executable

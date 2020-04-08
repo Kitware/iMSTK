@@ -25,10 +25,15 @@
 #include "imstkGeometryMap.h"
 #include "imstkCollisionUtils.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
+#include "imstkPbdEdgeEdgeCollisionConstraint.h"
+#include "imstkPbdPointTriCollisionConstraint.h"
 
 namespace imstk
 {
-PbdInteractionPair::PbdInteractionPair(const std::shared_ptr<PbdObject>& A, const std::shared_ptr<PbdObject>& B) : m_firstObj(A), m_secondObj(B)
+PbdInteractionPair::PbdInteractionPair(const std::shared_ptr<PbdObject>& A,
+                                       const std::shared_ptr<PbdObject>& B) :
+    m_firstObj(A), m_secondObj(B)
 {
 }
 

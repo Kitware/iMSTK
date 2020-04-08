@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "imstkTextureManager.h"
 #include "imstkMath.h"
 
 #include <memory>
@@ -36,9 +35,9 @@ public:
     ///
     enum class Mode
     {
-        EMPTY,
-        DEBUG,
-        SIMULATION
+        Empty,
+        Debug,
+        Simulation
     };
 
     ///
@@ -58,6 +57,6 @@ public:
 
 protected:
     bool m_VrEnabled = false;
-    Renderer::Mode m_currentMode = Renderer::Mode::EMPTY;
+    Renderer::Mode m_currentMode = Renderer::Mode::Empty;
 };
 }

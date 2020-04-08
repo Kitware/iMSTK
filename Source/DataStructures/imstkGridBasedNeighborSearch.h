@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "imstkUniformSpatialGrid.h"
 #include "imstkSpinLock.h"
+#include "imstkUniformSpatialGrid.h"
 
 namespace imstk
 {

@@ -22,9 +22,12 @@
 #include "imstkVTKRenderer.h"
 
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkLight.h"
 
 #include "vtkLightActor.h"
 #include "vtkCameraActor.h"
@@ -32,7 +35,7 @@
 #include "vtkCullerCollection.h"
 #include "vtkAxesActor.h"
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -68,7 +71,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         // Create lights specified in the scene
         switch (light->getType())
         {
-        case imstk::LightType::directional:
+        case imstk::LightType::Directional:
         {
             auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
             m_vtkLight->SetPositional(false);
@@ -81,7 +84,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         }
         break;
 
-        case imstk::LightType::spot:
+        case imstk::LightType::Spot:
         {
             auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
             m_vtkLight->SetPositional(true);
@@ -103,7 +106,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         }
         break;
 
-        case imstk::LightType::point:
+        case imstk::LightType::Point:
         {
             auto m_vtkLight = vtkSmartPointer<vtkLight>::New();
             m_vtkLight->SetPositional(true);
@@ -251,12 +254,12 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
         }
     }
 #endif
-    if (mode == Mode::EMPTY && m_currentMode != Mode::EMPTY)
+    if (mode == Mode::Empty && m_currentMode != Mode::Empty)
     {
         this->removeActors(m_objectVtkActors);
         m_vtkRenderer->RemoveAllLights();
 
-        if (m_currentMode == Mode::DEBUG)
+        if (m_currentMode == Mode::Debug)
         {
             this->removeActors(m_debugVtkActors);
         }
@@ -266,11 +269,11 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
         }
     }
-    else if (mode == Mode::DEBUG && m_currentMode != Mode::DEBUG)
+    else if (mode == Mode::Debug && m_currentMode != Mode::Debug)
     {
         this->addActors(m_debugVtkActors);
 
-        if (m_currentMode == Mode::EMPTY)
+        if (m_currentMode == Mode::Empty)
         {
             this->addActors(m_objectVtkActors);
             for (const auto& light : m_vtkLights)
@@ -292,9 +295,9 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
         }
 #endif
     }
-    else if (mode == Mode::SIMULATION && m_currentMode != Mode::SIMULATION)
+    else if (mode == Mode::Simulation && m_currentMode != Mode::Simulation)
     {
-        if (m_currentMode == Mode::EMPTY)
+        if (m_currentMode == Mode::Empty)
         {
             this->addActors(m_objectVtkActors);
             for (const auto& light : m_vtkLights)
@@ -302,7 +305,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
                 m_vtkRenderer->AddLight(light);
             }
         }
-        else if (m_currentMode == Mode::DEBUG)
+        else if (m_currentMode == Mode::Debug)
         {
             this->removeActors(m_debugVtkActors);
 

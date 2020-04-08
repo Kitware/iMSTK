@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCameraController.h"
+#include "imstkCamera.h"
 
 #include <utility>
 
@@ -47,9 +48,9 @@ CameraController::runModule()
     r *= m_cameraRotationalOffset;          // Apply camera head rotation offset
 
     // Set camera info
-    m_camera.setPosition(p);
-    m_camera.setFocalPoint((r * FORWARD_VECTOR) + p);
-    m_camera.setViewUp(r * UP_VECTOR);
+    m_camera->setPosition(p);
+    m_camera->setFocalPoint((r * FORWARD_VECTOR) + p);
+    m_camera->setViewUp(r * UP_VECTOR);
 
     m_trackingDataUptoDate = false;
 }
@@ -57,9 +58,9 @@ CameraController::runModule()
 void
 CameraController::setOffsetUsingCurrentCameraPose()
 {
-    auto pos    = m_camera.getPosition();
-    auto viewUp = m_camera.getViewUp();
-    auto focus  = m_camera.getFocalPoint();
+    auto pos    = m_camera->getPosition();
+    auto viewUp = m_camera->getViewUp();
+    auto focus  = m_camera->getFocalPoint();
 
     m_translationOffset = pos;
 

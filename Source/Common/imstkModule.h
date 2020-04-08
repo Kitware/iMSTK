@@ -24,7 +24,7 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 #include "imstkTimer.h"
 
 namespace imstk
@@ -34,12 +34,12 @@ namespace imstk
 ///
 enum class ModuleStatus
 {
-    starting,
-    running,
-    pausing,
-    paused,
-    terminating,
-    inactive
+    Starting,
+    Running,
+    Pausing,
+    Paused,
+    Terminating,
+    Inactive
 };
 
 ///
@@ -151,7 +151,7 @@ protected:
     CallbackFunction m_preCleanUpCallback;                         ///> function callback preceding module cleanup
     CallbackFunction m_postCleanUpCallback;                        ///> function callback following module cleanup
 
-    std::atomic<ModuleStatus> m_status { ModuleStatus::inactive }; ///> Module status
+    std::atomic<ModuleStatus> m_status { ModuleStatus::Inactive }; ///> Module status
 
     bool m_trackFPS = false;
     std::shared_ptr<UPSCounter> m_frameCounter = std::make_shared<UPSCounter>();

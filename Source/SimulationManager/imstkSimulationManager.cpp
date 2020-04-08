@@ -20,12 +20,16 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 #include "imstkThreadManager.h"
+#include "imstkSceneManager.h"
+#include "imstkViewer.h"
 #include "imstkTimer.h"
 
 #include <string>
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -35,7 +39,7 @@ SimulationManager::SimulationManager(const std::shared_ptr<simManagerConfig> con
     m_logUtil->createLogger(m_config->logFilePrefix, m_config->logPath);
 
     // create viewer if the selected mode is 'rendering'
-    if (m_config->simulationMode == SimulationMode::rendering)
+    if (m_config->simulationMode == SimulationMode::Rendering)
     {
         createViewer(m_config->VR_Enabled);
     }
@@ -89,7 +93,7 @@ SimulationManager::isSceneRegistered(const std::string& sceneName) const
 std::shared_ptr<SceneManager>
 SimulationManager::getSceneManager(const std::string& sceneName) const
 {
-    if (m_config->simulationMode == SimulationMode::backend)
+    if (m_config->simulationMode == SimulationMode::Backend)
     {
         LOG(WARNING) << "The simulation manager is in backend mode. No scene managers were created!";
         return nullptr;
@@ -139,7 +143,7 @@ SimulationManager::createNewScene(const std::string& newSceneName, std::shared_p
     m_mutex.lock();
 
     m_sceneMap[newScene->getName()] = newScene;
-    if (m_config->simulationMode != SimulationMode::backend)
+    if (m_config->simulationMode != SimulationMode::Backend)
     {
         m_sceneManagerMap[newScene->getName()] = std::make_shared<SceneManager>(newScene);
     }
@@ -182,7 +186,7 @@ SimulationManager::addScene(std::shared_ptr<Scene> newScene)
     m_mutex.lock();
 
     // create a scene manager if not 'backend' mode
-    if (m_config->simulationMode != SimulationMode::backend)
+    if (m_config->simulationMode != SimulationMode::Backend)
     {
         m_sceneManagerMap[newSceneName] = std::make_shared<SceneManager>(newScene);
     }
@@ -206,7 +210,7 @@ SimulationManager::removeScene(const std::string& sceneName)
     }
 
     // If the scene to be removed is the currently active in the rendering mode, return with warning
-    if (m_activeSceneName == sceneName && m_config->simulationMode == SimulationMode::rendering)
+    if (m_activeSceneName == sceneName && m_config->simulationMode == SimulationMode::Rendering)
     {
         LOG(WARNING) << "Cannot remove the active scene that is currently rendered";
         return;
@@ -215,7 +219,7 @@ SimulationManager::removeScene(const std::string& sceneName)
     m_mutex.lock();
 
     // remove the scene manager and the scene
-    if (m_config->simulationMode != SimulationMode::backend)
+    if (m_config->simulationMode != SimulationMode::Backend)
     {
         m_sceneManagerMap.erase(sceneName);
     }
@@ -281,7 +285,7 @@ SimulationManager::removeModule(const std::string& moduleName)
 std::shared_ptr<Viewer>
 SimulationManager::getViewer() const
 {
-    LOG_IF(WARNING, (m_config->simulationMode != SimulationMode::rendering)) << "The simulation is not in rendering mode!";
+    LOG_IF(WARNING, (m_config->simulationMode != SimulationMode::Rendering)) << "The simulation is not in rendering mode!";
 
     return m_viewer;
 }
@@ -337,11 +341,11 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
 
     // If rendering and simulation not active:
     // render scene in debug, update current scene, and return
-    if (m_status == SimulationStatus::inactive)
+    if (m_status == SimulationStatus::Inactive)
     {
         if (m_viewer)
         {
-            m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+            m_viewer->setRenderingMode(Renderer::Mode::Debug);
         }
         m_activeSceneName = newSceneName;
         return;
@@ -351,11 +355,11 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
     {
         // If rendering and simulation active:
         // render scene in simulation mode, and update simulation
-        m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
+        m_viewer->setRenderingMode(Renderer::Mode::Simulation);
     }
 
     // Stop/Pause currently running scene
-    if (m_config->simulationMode != SimulationMode::backend)
+    if (m_config->simulationMode != SimulationMode::Backend)
     {
         auto oldSceneManager = m_sceneManagerMap.at(m_activeSceneName);
         if (unloadCurrentScene)
@@ -370,7 +374,7 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
         }
 
         // Start/Run new scene
-        if (m_status != SimulationStatus::paused)
+        if (m_status != SimulationStatus::Paused)
         {
             this->launchSceneModule(newSceneName);
             m_sceneManagerMap.at(newSceneName)->run();
@@ -388,7 +392,7 @@ SimulationManager::initialize()
     }
 
     // Do some checks
-    if (m_status == SimulationStatus::running)
+    if (m_status == SimulationStatus::Running)
     {
         LOG(WARNING) << "Simulation already running!";
         return;
@@ -428,7 +432,7 @@ SimulationManager::launchSceneModule(std::string sceneName)
         sceneMan->enableFrameCount();
     }
 
-    if (sceneMan->getStatus() == ModuleStatus::inactive)
+    if (sceneMan->getStatus() == ModuleStatus::Inactive)
     {
         this->startModuleInNewThread(sceneMan);
     }
@@ -443,7 +447,7 @@ SimulationManager::startNonSceneModules()
         this->startModuleInNewThread(pair.second);
     }
 
-    if (m_config->simulationMode == SimulationMode::backend)
+    if (m_config->simulationMode == SimulationMode::Backend)
     {
         return;
     }
@@ -465,7 +469,7 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
     // start modules other than scene modules
     this->startNonSceneModules();
 
-    if (m_config->simulationMode == SimulationMode::backend) // returns in backend mode
+    if (m_config->simulationMode == SimulationMode::Backend) // returns in backend mode
     {
         return;
     }
@@ -475,7 +479,7 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
             << "Cannot start simulation without active scene in rendering and background modes!";
     }
 
-    if (m_status != SimulationStatus::inactive)
+    if (m_status != SimulationStatus::Inactive)
     {
         LOG(INFO) << "Simulation already active";
         return;
@@ -484,36 +488,36 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
     if (m_activeSceneName != "")
     {
         auto startingSceneManager = m_sceneManagerMap.at(m_activeSceneName);
-        if (startingSceneManager->getStatus() != ModuleStatus::inactive)
+        if (startingSceneManager->getStatus() != ModuleStatus::Inactive)
         {
             return;
         }
     }
 
-    if (simStatus != SimulationStatus::paused)
+    if (simStatus != SimulationStatus::Paused)
     {
-        if (m_sceneManagerMap.at(m_activeSceneName)->getStatus() == ModuleStatus::inactive)
+        if (m_sceneManagerMap.at(m_activeSceneName)->getStatus() == ModuleStatus::Inactive)
         {
             launchSceneModule(m_activeSceneName);
         }
         m_sceneManagerMap.at(m_activeSceneName)->run();
-        m_status = SimulationStatus::running;
+        m_status = SimulationStatus::Running;
     }
     else
     {
-        m_status = SimulationStatus::paused;
+        m_status = SimulationStatus::Paused;
     }
 
     m_simulationStarted = true;
 
     // Note: This never returns until the viewer is terminated
-    if (m_config->simulationMode == SimulationMode::rendering)
+    if (m_config->simulationMode == SimulationMode::Rendering)
     {
         // start the viewer
         this->startViewer(renderMode);
     }
 
-    if (m_config->simulationMode == SimulationMode::runInBackgroundSync) // never returns
+    if (m_config->simulationMode == SimulationMode::RunInBackgroundSync) // never returns
     {
         this->printUserControlsInfo(false);
         this->infiniteLoopNoRenderingMode();
@@ -524,8 +528,8 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
 void
 SimulationManager::infiniteLoopNoRenderingMode()
 {
-    while (this->getStatus() == SimulationStatus::running
-           || this->getStatus() == SimulationStatus::paused)
+    while (this->getStatus() == SimulationStatus::Running
+           || this->getStatus() == SimulationStatus::Paused)
     {
         const auto c = getchar();
         if (c == 'e' || c == 'E')
@@ -541,13 +545,13 @@ SimulationManager::infiniteLoopNoRenderingMode()
 
         if (c == ' ')
         {
-            if (this->getStatus() == SimulationStatus::running)
+            if (this->getStatus() == SimulationStatus::Running)
             {
                 this->pause();
                 continue;
             }
 
-            if (this->getStatus() == SimulationStatus::paused)
+            if (this->getStatus() == SimulationStatus::Paused)
             {
                 this->run();
                 continue;
@@ -582,7 +586,7 @@ SimulationManager::startViewer(const Renderer::Mode renderMode /*= Renderer::Mod
         LOG(INFO) << "Closing viewer";
 
         // End simulation if active when loop exits
-        if (m_status != SimulationStatus::inactive)
+        if (m_status != SimulationStatus::Inactive)
         {
             LOG(INFO) << "Ending simulation";
             this->end();
@@ -621,13 +625,13 @@ SimulationManager::printUserControlsInfo(const bool isRendering) const
 void
 SimulationManager::run()
 {
-    if (m_config->simulationMode == SimulationMode::backend)
+    if (m_config->simulationMode == SimulationMode::Backend)
     {
         LOG(INFO) << "Simulation cannot be run in backend mode";
         return;
     }
 
-    if (m_status != SimulationStatus::paused)
+    if (m_status != SimulationStatus::Paused)
     {
         LOG(INFO) << "Simulation is not paused! cannot run (un-pause) simulation";
         return;
@@ -646,7 +650,7 @@ SimulationManager::run()
     }
 
     const auto sceneMan = m_sceneManagerMap.at(m_activeSceneName);
-    if (sceneMan->getStatus() == ModuleStatus::inactive)
+    if (sceneMan->getStatus() == ModuleStatus::Inactive)
     {
         launchSceneModule(m_activeSceneName);
     }
@@ -661,31 +665,31 @@ SimulationManager::run()
     }
 
     // Update simulation status
-    m_status = SimulationStatus::running;
+    m_status = SimulationStatus::Running;
 }
 
 void
 SimulationManager::pause()
 {
-    if (m_config->simulationMode == SimulationMode::backend)
+    if (m_config->simulationMode == SimulationMode::Backend)
     {
         LOG(INFO) << "Simulation manager is in backend mode and hence pause doesn't make sense!";
         return;
     }
 
-    if (m_status != SimulationStatus::running)
+    if (m_status != SimulationStatus::Running)
     {
         LOG(WARNING) << "Simulation not running, can not pause";
         return;
     }
 
-    m_status = SimulationStatus::pausing;
+    m_status = SimulationStatus::Pausing;
 
     // Pause scene managers
     this->pauseModules();
 
     // Update simulation status
-    m_status = SimulationStatus::paused;
+    m_status = SimulationStatus::Paused;
 
     LOG(INFO) << "Simulation is paused";
 }
@@ -694,7 +698,7 @@ void
 SimulationManager::pauseModules()
 {
     // Pause scene managers
-    if (m_config->simulationMode != SimulationMode::backend)
+    if (m_config->simulationMode != SimulationMode::Backend)
     {
         m_sceneManagerMap.at(m_activeSceneName)->pause();
     }
@@ -718,7 +722,7 @@ SimulationManager::reset()
         {
             s.second->reset();
 
-            if (m_status == SimulationStatus::paused)
+            if (m_status == SimulationStatus::Paused)
             {
                 s.second->resetSceneObjects();
             }
@@ -732,13 +736,13 @@ SimulationManager::end()
     endModules();
 
     // Update simulation status
-    m_status = SimulationStatus::inactive;
+    m_status = SimulationStatus::Inactive;
 }
 
 void
 SimulationManager::endModules()
 {
-    m_status = SimulationStatus::terminating;
+    m_status = SimulationStatus::Terminating;
 
     // End modules
     for (const auto& pair : m_modulesMap)
@@ -753,7 +757,7 @@ SimulationManager::endModules()
         std::string  sceneName   = pair.first;
         ModuleStatus sceneStatus = pair.second->getStatus();
 
-        if (sceneStatus != ModuleStatus::inactive)
+        if (sceneStatus != ModuleStatus::Inactive)
         {
             m_sceneManagerMap.at(sceneName)->end();
             m_threadMap.at(sceneName).join();

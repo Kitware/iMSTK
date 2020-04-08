@@ -21,6 +21,8 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
+#include "imstkCamera.h"
+#include "imstkLight.h"
 #include "imstkPlane.h"
 #include "imstkCylinder.h"
 #include "imstkCube.h"
@@ -97,7 +99,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::running);
+    simManager->start(SimulationStatus::Running);
 
     return 0;
 }

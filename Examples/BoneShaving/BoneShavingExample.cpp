@@ -40,6 +40,7 @@
 #include "imstkSceneObjectController.h"
 
 // Collisions
+#include "imstkCollisionGraph.h"
 #include "imstkInteractionPair.h"
 #include "imstkPointSetToSphereCD.h"
 #include "imstkVirtualCouplingCH.h"
@@ -123,6 +124,6 @@ main()
     cam->setPosition(Vec3d(0, 0, 15));
 
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::RUNNING);
+    simManager->start();
     return 0;
 }

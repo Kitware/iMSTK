@@ -26,6 +26,7 @@
 #include "imstkLooseOctree.h"
 #include "imstkVTKViewer.h"
 #include "imstkTimer.h"
+#include "imstkLight.h"
 #include "imstkVTKTextStatusManager.h"
 
 #include <thread>
@@ -58,7 +59,7 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     auto material    = std::make_shared<RenderMaterial>();
     material->setDebugColor(color); // Wireframe color
     material->setLineWidth(4);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     visualModel->setRenderMaterial(material);
 
     auto visualObject = std::make_shared<VisualObject>(objectName);
@@ -256,7 +257,7 @@ main()
     }
 
     // Run
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

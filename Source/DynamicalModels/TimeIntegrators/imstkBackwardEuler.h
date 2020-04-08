@@ -24,7 +24,7 @@
 #include "imstkTimeIntegrator.h"
 
 #include <array>
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -48,30 +48,30 @@ public:
     ///
     /// \brief Update state given change in velocity
     ///
-    void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
-                            std::shared_ptr<VectorizedState> currentState,
-                            Vectord&                         dV) override;
+    void updateStateGivenDv(std::shared_ptr<FeDeformBodyState> prevState,
+                            std::shared_ptr<FeDeformBodyState> currentState,
+                            Vectord&                           dV) override;
 
     ///
     /// \brief Update state given change in displacement
     ///
-    void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
-                            std::shared_ptr<VectorizedState> currentState,
-                            Vectord&                         dU) override;
+    void updateStateGivenDu(std::shared_ptr<FeDeformBodyState> prevState,
+                            std::shared_ptr<FeDeformBodyState> currentState,
+                            Vectord&                           dU) override;
 
     ///
     /// \brief Update state given updated velocity
     ///
-    void updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
-                           std::shared_ptr<VectorizedState> currentState,
-                           Vectord&                         v) override;
+    void updateStateGivenV(std::shared_ptr<FeDeformBodyState> prevState,
+                           std::shared_ptr<FeDeformBodyState> currentState,
+                           Vectord&                           v) override;
 
     ///
     /// \brief Update state given updated displacement
     ///
-    void updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
-                           std::shared_ptr<VectorizedState> currentState,
-                           Vectord&                         u) override;
+    void updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState,
+                           std::shared_ptr<FeDeformBodyState> currentState,
+                           Vectord&                           u) override;
 protected:
 
 //    // Coefficients of the time integrator

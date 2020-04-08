@@ -20,6 +20,11 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollidingObject.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
+#include "imstkLight.h"
+#include "imstkSceneManager.h"
 #include "imstkCube.h"
 #include "imstkDummyClient.h"
 #include "imstkSceneObjectController.h"

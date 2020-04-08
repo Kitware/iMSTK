@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkViewer.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 namespace imstk
 {

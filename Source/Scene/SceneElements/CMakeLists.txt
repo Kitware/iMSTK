@@ -1,23 +1,15 @@
-
-set(iMSTK_ODE_DEPENDS)
-if( iMSTK_USE_ODE)
-    # add ode if requested
-    set(iMSTK_ODE_DEPENDS libodedouble)
-endif()
-
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( SceneElements
   DEPENDS
-    Core
+    Common
     Geometry
     DataStructures
     Constraints
     Devices
     DynamicalModels
-    ${iMSTK_ODE_DEPENDS}
   )
 
 #-----------------------------------------------------------------------------

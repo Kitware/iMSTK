@@ -21,17 +21,17 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkMeshIO.h"
-#include "imstkVolumetricMesh.h"
 
-// Vega
-#include "volumetricMeshLoader.h"
-#include "volumetricMesh.h"
+namespace vega
+{
+class VolumetricMesh;
+}
 
 namespace imstk
 {
+class VolumetricMesh;
+
 ///
 /// \class VegaMeshIO
 ///

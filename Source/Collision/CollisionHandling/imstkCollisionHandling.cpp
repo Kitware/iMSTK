@@ -28,6 +28,7 @@
 #include "imstkBoneDrillingCH.h"
 #include "imstkSPHCollisionHandling.h"
 #include "imstkPBDCollisionHandling.h"
+#include "imstkCollisionData.h"
 
 #include <g3log/g3log.hpp>
 

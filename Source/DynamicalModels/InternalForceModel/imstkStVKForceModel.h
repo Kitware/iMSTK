@@ -22,7 +22,7 @@
 #pragma once
 
 #include <memory>
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 //imstk
 #include "imstkInternalForceModel.h"

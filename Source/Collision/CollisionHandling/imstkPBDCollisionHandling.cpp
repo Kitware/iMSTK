@@ -28,6 +28,8 @@
 #include "imstkPbdPointTriCollisionConstraint.h"
 #include "imstkPbdSolver.h"
 #include "imstkParallelUtils.h"
+#include "imstkGeometryMap.h"
+#include "imstkSurfaceMesh.h"
 
 #include <memory>
 #include <g3log/g3log.hpp>

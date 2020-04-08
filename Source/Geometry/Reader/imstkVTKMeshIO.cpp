@@ -40,7 +40,12 @@
 #include "vtkXMLUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 
-#include "g3log/g3log.hpp"
+#include "imstkSurfaceMesh.h"
+#include "imstkLineMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkHexahedralMesh.h"
+
+#include "imstkLogUtility.h"
 
 namespace imstk
 {
@@ -176,6 +181,7 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         LOG(WARNING) << "VTKMeshIO::write error: the provided mesh is not a surface or volumetric mesh.";
         return false;
     }
+    return true;
 }
 
 template<typename ReaderType>
@@ -221,7 +227,7 @@ bool
 VTKMeshIO::writeVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh, const std::string& filePath)
 {
     vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertSurfaceMeshToVtkPolyData(imstkMesh);
-    if (!vtkMesh)  //conversion unsuccessful
+    if (!vtkMesh)
     {
         return false;
     }
@@ -239,7 +245,7 @@ bool
 VTKMeshIO::writeVtkPolyData(std::shared_ptr<LineMesh> imstkMesh, const std::string& filePath)
 {
     vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertLineMeshToVtkPolyData(imstkMesh);
-    if (!vtkMesh)  //conversion unsuccessful
+    if (!vtkMesh)
     {
         return false;
     }
@@ -257,7 +263,7 @@ bool
 VTKMeshIO::writeVtkPointSet(const std::shared_ptr<PointSet> imstkMesh, const std::string& filePath)
 {
     vtkSmartPointer<vtkPointSet> vtkMesh = GeometryUtils::convertPointSetToVtkPointSet(imstkMesh);
-    if (!vtkMesh)  // Conversion unsuccessful
+    if (!vtkMesh)
     {
         return false;
     }

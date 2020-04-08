@@ -29,6 +29,7 @@
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkCameraController.h"
+#include "imstkCollisionGraph.h"
 
 const std::string phantomOmni1Name = "Phantom1";
 
@@ -69,19 +70,19 @@ main()
     scene->addSceneObject(meshObject);
 
     // Update Camera position
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 0, 10));
+    auto camera = scene->getCamera();
+    camera->setPosition(Vec3d(0, 0, 10));
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
-    auto camControllerInput = std::make_shared<CameraController>(*cam, client);
+    auto camController = std::make_shared<CameraController>(camera, client);
 
-    // Set camera controller
-    auto camController = cam->setController(camControllerInput);
     //camController->setTranslationScaling(100);
     //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
     camController->setInversionFlags(CameraController::InvertFlag::rotY |
-        CameraController::InvertFlag::rotZ);
+                                     CameraController::InvertFlag::rotZ);
+
+    scene->addCameraController(camController);
 #endif
 
     // Light
@@ -92,7 +93,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::PAUSED);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

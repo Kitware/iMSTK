@@ -21,11 +21,6 @@
 
 #pragma once
 
-// std library
-#include <memory>
-#include <vector>
-#include <array>
-
 // imstk
 #include "imstkPointSet.h"
 

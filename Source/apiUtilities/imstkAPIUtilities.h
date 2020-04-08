@@ -25,6 +25,7 @@
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkSceneObject.h"
 #include "imstkSceneManager.h"
+#include "imstkCollidingObject.h"
 
 // Solvers
 #include "imstkNonlinearSystem.h"
@@ -41,9 +42,11 @@
 #include "imstkImageData.h"
 
 #include "imstkGraph.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 // logger
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 #include "imstkTimer.h"
 
 namespace imstk

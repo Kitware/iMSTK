@@ -23,13 +23,12 @@
 
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDeviceTracker.h"
-#include "imstkSceneObject.h"
 #include "imstkMath.h"
-
-#include <memory>
 
 namespace imstk
 {
+class SceneObject;
+
 ///
 /// \class LaparoscopicTool
 ///

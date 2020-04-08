@@ -20,9 +20,9 @@
 =========================================================================*/
 
 #include "imstkTetrahedralMesh.h"
-#include "imstkLogUtility.h"
-#include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

@@ -22,6 +22,9 @@
 #include "imstkSimulationManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkPbdSolver.h"
+#include "imstkAPIUtilities.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 
@@ -117,7 +120,7 @@ main()
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setColor(Color::LightGray);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     deformableObj->addVisualModel(surfMeshModel);
@@ -150,7 +153,7 @@ main()
 
     // Start
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

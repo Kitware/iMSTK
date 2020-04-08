@@ -20,12 +20,14 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkSceneObject.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVTKViewer.h"
 #include "imstkTimer.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionData.h"
 
 // This is for collision detection between geometries
 #include "imstkOctreeBasedCD.h"
@@ -74,11 +76,11 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     material->setLineWidth(2);
     if (meshObj->getNumTriangles() > 100)
     {
-        material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+        material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     }
     else
     {
-        material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     }
     visualModel->setRenderMaterial(material);
 
@@ -469,7 +471,7 @@ main()
     }
 
     // Run
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

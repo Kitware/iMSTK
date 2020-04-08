@@ -21,10 +21,11 @@
 
 #pragma once
 
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 #include "imstkMath.h"
-#include <vtkSmartPointer.h>
 #include "imstkParallelUtils.h"
+
+#include <vtkSmartPointer.h>
 
 #include <memory>
 #include <numeric>

@@ -22,6 +22,7 @@
 #include <string>
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkSPHObject.h"
 #include "imstkAPIUtilities.h"
 #include "imstkPlane.h"
@@ -131,7 +132,7 @@ main(int argc, char* argv[])
     scene->addLight(whiteLight);
 
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

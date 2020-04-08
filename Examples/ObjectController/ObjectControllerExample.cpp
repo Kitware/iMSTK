@@ -21,9 +21,13 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkCube.h"
+#include "imstkCamera.h"
+#include "imstkLight.h"
+#include "imstkCollidingObject.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkSceneObjectController.h"
+#include "imstkCollisionGraph.h"
 
 // global variables
 const std::string phantomOmni1Name = "Phantom1";
@@ -78,7 +82,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->startSimulation(SimulationStatus::RUNNING);
+    simManager->start();
 #endif
     return 0;
 }

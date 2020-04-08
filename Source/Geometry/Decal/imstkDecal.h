@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #pragma once
+#include "imstkAnalyticalGeometry.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4201 )
@@ -27,9 +28,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/quaternion.hpp"
 #pragma warning( pop )
-
-#include "imstkMath.h"
-#include "imstkAnalyticalGeometry.h"
 
 namespace imstk
 {

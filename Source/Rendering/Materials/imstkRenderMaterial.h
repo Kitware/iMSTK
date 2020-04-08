@@ -21,34 +21,33 @@
 
 #pragma once
 
-#include "imstkTexture.h"
 #include "imstkColor.h"
 #include "imstkTextureManager.h"
 
 #include <memory>
 #include <vector>
 
-#include "g3log/g3log.hpp"
-
 namespace imstk
 {
+class Texture;
+
 class RenderMaterial
 {
 public:
     enum DisplayMode
     {
-        SURFACE,
-        WIREFRAME,
-        POINTS,
-        WIREFRAME_SURFACE
+        Surface,
+        Wireframe,
+        Points,
+        WireframeSurface
     };
 
     enum class BlendMode
     {
-        ALPHA,
-        ADDITIVE,
-        MAXIMUM_INTENSITY,
-        MINIMUM_INTENSITY
+        Alpha,
+        Additive,
+        MaximumIntensity,
+        MinimumIntensity
     };
 
     ///
@@ -167,7 +166,7 @@ protected:
     friend class VTKdbgLinesRenderDelegate;
 
     // State
-    DisplayMode m_displayMode = DisplayMode::SURFACE;
+    DisplayMode m_displayMode = DisplayMode::Surface;
     bool  m_tessellated       = false;
     float m_lineWidth       = 1.0;
     float m_pointSize       = 1.0;
@@ -202,6 +201,6 @@ protected:
     bool m_modified      = true; ///< Flag for any material property changes
     bool m_flatShading   = false;
 
-    BlendMode m_blendMode = BlendMode::ALPHA;
+    BlendMode m_blendMode = BlendMode::Alpha;
 };
 }

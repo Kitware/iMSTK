@@ -22,7 +22,7 @@
 #pragma once
 
 #include <array>
-#include "g3log/g3log.hpp"
+#include "imstkLogUtility.h"
 
 #include "Eigen/Sparse"
 
@@ -48,7 +48,7 @@ public:
         NewmarkBeta,
         CentralDifference,
         NoTimeStepper,
-        none
+        None
     };
 
 public:
@@ -83,10 +83,10 @@ public:
     ///
     /// \brief Update states given the updates in different forms
     ///
-    virtual void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dV) = 0;
-    virtual void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dU) = 0;
-    virtual void updateStateGivenV(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& v)   = 0;
-    virtual void updateStateGivenU(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& u)   = 0;
+    virtual void updateStateGivenDv(std::shared_ptr<FeDeformBodyState> prevState, std::shared_ptr<FeDeformBodyState> currentState, Vectord& dV) = 0;
+    virtual void updateStateGivenDu(std::shared_ptr<FeDeformBodyState> prevState, std::shared_ptr<FeDeformBodyState> currentState, Vectord& dU) = 0;
+    virtual void updateStateGivenV(std::shared_ptr<FeDeformBodyState> prevState, std::shared_ptr<FeDeformBodyState> currentState, Vectord& v)   = 0;
+    virtual void updateStateGivenU(std::shared_ptr<FeDeformBodyState> prevState, std::shared_ptr<FeDeformBodyState> currentState, Vectord& u)   = 0;
 
 protected:
     Type   m_type; ///> Type of the time integrator

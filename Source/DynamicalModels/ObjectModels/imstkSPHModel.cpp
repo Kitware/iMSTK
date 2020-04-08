@@ -111,7 +111,7 @@ SPHModel::advanceTimeStep()
 void
 SPHModel::computeTimeStepSize()
 {
-    m_dt = (this->m_timeStepSizeType == TimeSteppingType::fixed) ? m_defaultDt : computeCFLTimeStepSize();
+    m_dt = (this->m_timeStepSizeType == TimeSteppingType::Fixed) ? m_defaultDt : computeCFLTimeStepSize();
 }
 
 Real

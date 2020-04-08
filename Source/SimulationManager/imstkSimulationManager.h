@@ -21,16 +21,14 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <vector>
-#include <thread>
+//#include <unordered_map>
+//#include <vector>
+//#include <thread>
+#include <mutex>
 #include <memory>
 
-#include "imstkScene.h"
 #include "imstkModule.h"
-#include "imstkSceneManager.h"
 #include "imstkLogUtility.h"
-#include "imstkViewer.h"
 
 #ifdef iMSTK_USE_Vulkan
 #include "imstkVulkanViewer.h"
@@ -40,6 +38,10 @@
 
 namespace imstk
 {
+class SceneManager;
+class Scene;
+class Viewer;
+
 using SimulationStatus = ModuleStatus;
 
 template<class T>
@@ -53,19 +55,19 @@ enum class SimulationMode
 {
     /// Simulation manager launches the simulation with a
     /// render window
-    rendering = 0,
+    Rendering = 0,
 
     /// Simulation manager launches the simulation without a
     /// render window but keeps looping the simulation
-    runInBackgroundSync,
+    RunInBackgroundSync,
 
     /// Simulation manager launches the simulation without a
     /// render window no waiting
-    runInBackgroundAsync,
+    RunInBackgroundAsync,
 
     /// Simulation manager launches the simulation without a
     /// render window and returns the control
-    backend
+    Backend
 };
 
 ///
@@ -81,8 +83,8 @@ struct simManagerConfig
     std::string simulationName = "imstk";
 
     // states
-    SimulationMode simulationMode   = SimulationMode::rendering;
-    SimulationStatus startingStatus = SimulationStatus::running;
+    SimulationMode simulationMode   = SimulationMode::Rendering;
+    SimulationStatus startingStatus = SimulationStatus::Running;
     bool VR_Enabled = false;
     bool startInPausedState = false;
 
@@ -218,8 +220,8 @@ public:
     /// and returned. In rendering and runInBackground modes the simulation manager
     /// module gets launched and an never returns
     ///
-    void start(const SimulationStatus simStatus  = SimulationStatus::running,
-               const Renderer::Mode   renderMode = Renderer::Mode::SIMULATION);
+    void start(const SimulationStatus simStatus  = SimulationStatus::Running,
+               const Renderer::Mode   renderMode = Renderer::Mode::Simulation);
 
     ///
     /// \brief Initialize the modules and the active scene
@@ -272,7 +274,7 @@ private:
     ///
     /// \brief Start the viewer
     ///
-    void startViewer(const Renderer::Mode renderMode = Renderer::Mode::DEBUG);
+    void startViewer(const Renderer::Mode renderMode = Renderer::Mode::Debug);
 
     ///
     /// \brief Print user keyboard controls
@@ -326,7 +328,7 @@ private:
     std::vector<callbackKeyPair> m_kepPressCallbacks;
 
     // states
-    SimulationStatus m_status = SimulationStatus::inactive;
+    SimulationStatus m_status = SimulationStatus::Inactive;
     bool m_simulationStarted  = false;
     bool m_initialized = false;
 

@@ -27,7 +27,12 @@
 #include "imstkVegaMeshIO.h"
 #include "imstkMSHMeshIO.h"
 
-#include "g3log/g3log.hpp"
+#include "imstkSurfaceMesh.h"
+#include "imstkLineMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkHexahedralMesh.h"
+
+#include "imstkLogUtility.h"
 
 namespace imstk
 {

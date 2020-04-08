@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
+#include "imstkLight.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVTKViewer.h"
@@ -64,7 +65,7 @@ addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto material       = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     debugTriangles->setRenderMaterial(material);
     scene->addDebugGeometry(debugTriangles);
 

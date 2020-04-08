@@ -22,6 +22,8 @@
 #include "imstkSimulationManager.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVisualObjectImporter.h"
+#include "imstkIBLProbe.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 
@@ -54,7 +56,7 @@ main()
         iMSTK_DATA_ROOT "/head/");
 
     // Head material
-    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_Normal.png", Texture::Type::NORMAL);
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_Normal.png", Texture::Type::Normal);
     auto headMaterial      = headObject->getVisualModel(0)->getRenderMaterial();
     headMaterial->addTexture(headNormalTexture);
 #endif
@@ -105,7 +107,7 @@ main()
     //viewer->enableFullscreen();
 #endif
 
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

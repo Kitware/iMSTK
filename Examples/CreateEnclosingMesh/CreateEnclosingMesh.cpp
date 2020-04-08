@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkLight.h"
 #include "imstkAPIUtilities.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
@@ -48,7 +49,7 @@ main()
 
     // configure and add the render model to the scene object
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(Color::Red);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);

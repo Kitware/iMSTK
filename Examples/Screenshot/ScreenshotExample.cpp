@@ -20,6 +20,10 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkSceneObject.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
+#include "imstkLight.h"
 #include "imstkCube.h"
 #include "imstkSphere.h"
 #include "imstkPlane.h"
@@ -102,7 +106,7 @@ main()
 
     // Run
     simManager->setActiveScene(sceneTest);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

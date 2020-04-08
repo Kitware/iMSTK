@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 using namespace imstk;
 
@@ -68,7 +70,7 @@ main()
     simManager->end();
 
     // Quit
-    while (simManager->getStatus() != SimulationStatus::inactive) {}
+    while (simManager->getStatus() != SimulationStatus::Inactive) {}
 
     return 0;
 }

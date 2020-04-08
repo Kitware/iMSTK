@@ -23,6 +23,8 @@
 #include "imstkVTKInteractorStyle.h"
 #include "imstkSimulationManager.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 
 // vtk
 #include "vtkObjectFactory.h"
@@ -94,7 +96,7 @@ VTKInteractorStyle::OnTimer()
         if (t > 250) //wait 250ms before updating displayed value
         {
             double physicalFPS;
-            if (m_simManager->getStatus() != SimulationStatus::paused)
+            if (m_simManager->getStatus() != SimulationStatus::Paused)
             {
                 physicalFPS = m_simManager->getActiveScene()->getFPS();
             }
@@ -143,23 +145,23 @@ VTKInteractorStyle::OnChar()
     if (key == ' ')
     {
         // pause simulation
-        if (status == SimulationStatus::running)
+        if (status == SimulationStatus::Running)
         {
             m_simManager->pause();
         }
         // play simulation
-        else if (status == SimulationStatus::paused)
+        else if (status == SimulationStatus::Paused)
         {
             m_simManager->run();
         }
         // Launch simulation if inactive
-        if (status == SimulationStatus::inactive)
+        if (status == SimulationStatus::Inactive)
         {
             m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
-            m_simManager->start(SimulationStatus::running);
+            m_simManager->start(SimulationStatus::Running);
         }
     }
-    else if (status != SimulationStatus::inactive
+    else if (status != SimulationStatus::Inactive
              && (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
     {
         m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, false);
@@ -167,13 +169,13 @@ VTKInteractorStyle::OnChar()
     }
     else if (key == 'd' || key == 'D')  // switch rendering mode
     {
-        if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::SIMULATION)
+        if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Simulation)
         {
-            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::SIMULATION);
+            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::Simulation);
         }
         else
         {
-            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::DEBUG);
+            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::Debug);
         }
     }
     else if (key == '\u001B')  // quit viewer
@@ -204,7 +206,7 @@ VTKInteractorStyle::OnMouseMove()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -225,7 +227,7 @@ VTKInteractorStyle::OnLeftButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -246,7 +248,7 @@ VTKInteractorStyle::OnLeftButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -267,7 +269,7 @@ VTKInteractorStyle::OnMiddleButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -288,7 +290,7 @@ VTKInteractorStyle::OnMiddleButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -309,7 +311,7 @@ VTKInteractorStyle::OnRightButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -330,7 +332,7 @@ VTKInteractorStyle::OnRightButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -351,7 +353,7 @@ VTKInteractorStyle::OnMouseWheelForward()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }
@@ -372,7 +374,7 @@ VTKInteractorStyle::OnMouseWheelBackward()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::DEBUG)
+    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
     {
         return;
     }

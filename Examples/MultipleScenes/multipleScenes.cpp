@@ -45,7 +45,7 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -170,7 +170,7 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setColor(Color::LightGray);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     deformableObj->addVisualModel(surfMeshModel);
@@ -192,7 +192,7 @@ void
 testMultipleScenesInBackendMode()
 {
     auto simConfig = std::make_shared<simManagerConfig>();
-    simConfig->simulationMode = SimulationMode::backend;
+    simConfig->simulationMode = SimulationMode::Backend;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
 
     auto scene1 = createClothScene(simManager, "clothScene");
@@ -290,7 +290,7 @@ void
 testMultipleScenesInBackgroundMode()
 {
     auto simConfig = std::make_shared<simManagerConfig>();
-    simConfig->simulationMode = SimulationMode::runInBackgroundSync;
+    simConfig->simulationMode = SimulationMode::RunInBackgroundSync;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene1     = createClothScene(simManager, "clothScene");
     auto scene2     = createSoftBodyScene(simManager, "deformableBodyScene");

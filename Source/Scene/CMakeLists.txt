@@ -10,9 +10,10 @@ imstk_add_library( Scene
     imstkScene.cpp
     imstkCollisionGraph.cpp
   DEPENDS
-    Core
+    Common
     Collision
     SceneElements
+    Controllers
     DynamicalModels
   )
 

@@ -33,7 +33,7 @@ namespace imstk
 ///
 /// \class SceneManager
 ///
-/// \brief
+/// \brief Scene manager module launches the scene in a separate thread
 ///
 class SceneManager : public Module
 {

@@ -22,9 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
-
-#include <string>
-#include <tbb/concurrent_unordered_set.h>
+#include "tbb/tbb.h"
 
 namespace imstk
 {

@@ -85,9 +85,9 @@ RigidBodyModel::initialize()
 void
 RigidBodyModel::createSphere()
 {
-    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_material->m_staticFriction,
-        (PxReal)m_material->m_dynamicFriction,
-        (PxReal)m_material->m_restitution);
+    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_config->m_staticFriction,
+        (PxReal)m_config->m_dynamicFriction,
+        (PxReal)m_config->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
     const auto PxScene = m_rigidBodyWorld->m_Scene;
@@ -127,9 +127,9 @@ RigidBodyModel::createSphere()
 void
 RigidBodyModel::createPlane()
 {
-    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_material->m_staticFriction,
-        (PxReal)m_material->m_dynamicFriction,
-        (PxReal)m_material->m_restitution);
+    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_config->m_staticFriction,
+        (PxReal)m_config->m_dynamicFriction,
+        (PxReal)m_config->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
 
@@ -161,9 +161,9 @@ RigidBodyModel::createPlane()
 void
 RigidBodyModel::createCube()
 {
-    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_material->m_staticFriction,
-        (PxReal)m_material->m_dynamicFriction,
-        (PxReal)m_material->m_restitution);
+    const auto physxMaterial = m_rigidBodyWorld->m_Physics->createMaterial((PxReal)m_config->m_staticFriction,
+        (PxReal)m_config->m_dynamicFriction,
+        (PxReal)m_config->m_restitution);
 
     const auto physics = m_rigidBodyWorld->m_Physics;
     const auto PxScene = m_rigidBodyWorld->m_Scene;
@@ -237,9 +237,9 @@ RigidBodyModel::createMesh()
 
     PxTriangleMesh* triMesh = createBV34TriangleMesh((PxU32)numVerts, vertices, (PxU32)numTriangles, indices, false, false, false, 4);
     PxTransform     trans(PxIdentity);
-    const auto      physxMaterial = PxPhysics->createMaterial((PxReal)m_material->m_staticFriction,
-        (PxReal)m_material->m_dynamicFriction,
-        (PxReal)m_material->m_restitution);
+    const auto      physxMaterial = PxPhysics->createMaterial((PxReal)m_config->m_staticFriction,
+        (PxReal)m_config->m_dynamicFriction,
+        (PxReal)m_config->m_restitution);
 
     // Add mesh actor
     if (m_isStatic)
@@ -256,7 +256,7 @@ RigidBodyModel::createMesh()
     else
     {
         m_pxDynamicActor = PxPhysics->createRigidDynamic(trans);
-        if (m_type == RigidBodyType::Kinematic)
+        if (m_config->m_rigidBodyType == RigidBodyType::Kinematic)
         {
             m_pxDynamicActor->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
         }
@@ -324,12 +324,9 @@ RigidBodyModel::updateBodyStates(const Vectord& q, const StateUpdateType updateT
 #pragma warning( pop )
 
 void
-RigidBodyModel::configure(const std::shared_ptr<Geometry>              geom,
-                          const std::shared_ptr<RigidBodyPropertyDesc> matProperty,
-                          const RigidBodyType                          type /*=RigidBodyType::Static*/)
+RigidBodyModel::configure(const std::shared_ptr<RigidBodyConfig> matProperty)
 {
-    m_type = type;
-    if (type == RigidBodyType::Static)
+    if (matProperty->m_rigidBodyType == RigidBodyType::Static)
     {
         m_isStatic = true;
     }
@@ -337,14 +334,13 @@ RigidBodyModel::configure(const std::shared_ptr<Geometry>              geom,
     {
         m_isStatic = false;
     }
-    this->setModelGeometry(geom);
-    m_material = matProperty;
+    m_config = matProperty;
 }
 
 void
 RigidBodyModel::setKinematicTarget(const PxTransform& destination)
 {
-    if (m_type == RigidBodyType::Kinematic)
+    if (m_config->m_rigidBodyType == RigidBodyType::Kinematic)
     {
         m_pxDynamicActor->setKinematicTarget(destination);
     }

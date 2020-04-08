@@ -32,6 +32,7 @@
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
 #include "imstkConjugateGradient.h"
+#include "imstkLight.h"
 
 using namespace imstk;
 
@@ -44,7 +45,7 @@ main()
 {
     // simManager and Scene
     auto simConfig = std::make_shared<simManagerConfig>();
-    simConfig->simulationMode = SimulationMode::rendering;
+    simConfig->simulationMode = SimulationMode::Rendering;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene      = simManager->createNewScene("DeformableBodyFEM");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
@@ -78,18 +79,18 @@ main()
     config->m_fixedNodeIds = { 51, 127, 178 };
     dynaModel->configure(config);
 
-    dynaModel->setTimeStepSizeType(TimeSteppingType::fixed);
+    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     dynaModel->setModelGeometry(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.05);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     // Scene Object
-    auto deformableObj = std::make_shared<DeformableObject>("Dragon");
+    auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
@@ -137,7 +138,7 @@ main()
 
     // Run the simulation
     simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::paused);
+    simManager->start(SimulationStatus::Paused);
 
     return 0;
 }

@@ -21,6 +21,9 @@
 
 #include "imstkSPHCollisionHandling.h"
 #include "imstkParallelUtils.h"
+#include "imstkCollisionData.h"
+#include "imstkSPHObject.h"
+#include "imstkSPHModel.h"
 
 #include <g3log/g3log.hpp>
 

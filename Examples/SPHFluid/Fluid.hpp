@@ -22,6 +22,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
 #include "imstkSPHSolver.h"
+#include "imstkSPHModel.h"
 
 using namespace imstk;
 
@@ -163,7 +164,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     }
 
     sphModel->configure(sphParams);
-    sphModel->setTimeStepSizeType(TimeSteppingType::realTime);
+    sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Add the component models
     fluidObj->addVisualModel(fluidVisualModel);

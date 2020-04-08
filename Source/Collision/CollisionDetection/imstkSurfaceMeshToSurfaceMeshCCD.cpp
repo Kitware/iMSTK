@@ -20,12 +20,9 @@
 =========================================================================*/
 
 #include "imstkSurfaceMeshToSurfaceMeshCCD.h"
-
 #include "imstkCollisionData.h"
 #include "imstkSurfaceMesh.h"
 #include "DeformModel.h"
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {

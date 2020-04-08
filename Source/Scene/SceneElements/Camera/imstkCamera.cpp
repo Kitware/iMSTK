@@ -22,7 +22,6 @@
 #include <memory>
 
 #include "imstkCamera.h"
-#include "imstkCameraController.h"
 
 #include <g3log/g3log.hpp>
 
@@ -98,18 +97,5 @@ void
 Camera::setFieldOfView(const double& fov)
 {
     m_fieldOfView = fov;
-}
-
-std::shared_ptr<CameraController>
-Camera::getController() const
-{
-    return m_controller;
-}
-
-std::shared_ptr<CameraController>
-Camera::setController(std::shared_ptr<CameraController> controller)
-{
-    m_controller = controller;
-    return m_controller;
 }
 } // imstk

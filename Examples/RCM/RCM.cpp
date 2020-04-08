@@ -24,7 +24,6 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkLogUtility.h"
 #include "bandwidth.h"
-#include <chrono>
 #include <thread>
 
 using namespace imstk;
@@ -70,7 +69,6 @@ main(int argc, char** argv)
         testRCM(conn, numVerts);
     }
     using namespace std::chrono_literals;
-    std::this_thread::sleep_for(5s);
     return 0;
 }
 
