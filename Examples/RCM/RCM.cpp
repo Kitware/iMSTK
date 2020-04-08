@@ -42,8 +42,9 @@ void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts);
 int
 main(int argc, char** argv)
 {
-    auto logUtil = std::make_shared<Logger>();
-    logUtil->createLogger("simulation", "./");
+    auto logger = Logger::getInstance();
+    logger->addFileSink("rcm-Example", "./");
+    logger->addStdoutSink();
 
     // a 2D Cartesian mesh
     {

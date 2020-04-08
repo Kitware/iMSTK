@@ -76,6 +76,8 @@ enum class SimulationMode
 struct simManagerConfig
 {
     // logger
+    bool enableFileLogging    = true;
+    bool enableStdoutLogging  = true;
     std::string logPath       = "./";
     std::string logFilePrefix = "simulation";
 
@@ -122,7 +124,7 @@ public:
     ///
     /// \brief Returns log worker
     ///
-    std::shared_ptr<g3::LogWorker> getLogWorker() { return m_logUtil->getLogWorker(); }
+    //std::shared_ptr<g3::LogWorker> getLogWorker() { return m_logUtil->getLogWorker(); }
 
     ///
     /// \brief Set number of worker threads in thread pool for parallel computation
@@ -321,8 +323,12 @@ private:
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
-    std::shared_ptr<Viewer>     m_viewer  = nullptr;
-    std::shared_ptr<Logger> m_logUtil = std::make_shared<Logger>();
+    std::shared_ptr<Viewer> m_viewer = nullptr;
+
+    // logging
+    //std::shared_ptr<Logger> m_logUtil = std::make_shared<Logger>();
+    std::unique_ptr<FileSinkHandle>   m_fileSinkHandle;
+    std::unique_ptr<StdoutSinkHandle> m_stdSinkHandle;
 
     struct callbackKeyPair { int key; keyPressCallback func; };
     std::vector<callbackKeyPair> m_kepPressCallbacks;

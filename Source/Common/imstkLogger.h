@@ -63,6 +63,9 @@ struct LogManager
     std::map<std::string, std::thread*> loggerThreads;
 };
 
+using FileSinkHandle   = g3::SinkHandle<g3::FileSink>;
+using StdoutSinkHandle = g3::SinkHandle<stdSink>;
+
 ///
 /// \struct Logger
 ///
@@ -71,13 +74,40 @@ struct LogManager
 class Logger
 {
 public:
-    std::shared_ptr<g3::LogWorker> getLogWorker() { return m_g3logWorker; }
+    static Logger* getInstance()
+    {
+        std::lock_guard<std::mutex> myLock(m_mutex);
+        if (!m_loggerInstance)
+        {
+            m_loggerInstance = new Logger();
+        }
+        return m_loggerInstance;
+    }
 
-    void createLogger(std::string name, std::string path);
+    ~Logger() = default;
+
+    //std::shared_ptr<g3::LogWorker> getLogWorker() { return m_g3logWorker; }
+
+    ///
+    /// \brief Add a sink that logs to standard output
+    ///
+    std::unique_ptr<StdoutSinkHandle> addStdoutSink();
+
+    ///
+    /// \brief Add a sink that logs to file
+    ///
+    std::unique_ptr<FileSinkHandle> addFileSink(const std::string& name, const std::string& path);
 
 private:
+    Logger() { initialize(); };
+
+    ///
+    /// \brief Create and initialize the logger
+    ///
+    void initialize();
+
+    static Logger* m_loggerInstance;
     std::shared_ptr<g3::LogWorker> m_g3logWorker;
-    std::unique_ptr<g3::SinkHandle<g3::FileSink>> m_fileSinkHandle;
-    std::unique_ptr<g3::SinkHandle<stdSink>>      m_stdSinkHandle;
+    static std::mutex m_mutex;
 };
 }

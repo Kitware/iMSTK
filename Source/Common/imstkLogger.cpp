@@ -26,6 +26,9 @@ limitations under the License.
 
 namespace imstk
 {
+Logger*    Logger::m_loggerInstance = NULL;
+std::mutex Logger::m_mutex;
+
 stdSink::FontColor
 stdSink::GetColor(const LEVELS level) const
 {
@@ -62,8 +65,8 @@ setColorWin(const int colCode)
 void
 stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 {
-    auto level   = logEntry.get()._level;
-    auto message = logEntry.get().message();
+    const auto level   = logEntry.get()._level;
+    const auto message = logEntry.get().message();
 
 #ifndef WIN32
     auto color = GetColor(level);
@@ -91,13 +94,22 @@ stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 #endif
 }
 
-void
-Logger::createLogger(std::string name, std::string path)
+std::unique_ptr<StdoutSinkHandle>
+Logger::addStdoutSink()
 {
-    m_g3logWorker    = g3::LogWorker::createLogWorker();
-    m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path, "imstk");
-    m_stdSinkHandle  = m_g3logWorker->addSink(std2::make_unique<stdSink>(), 
-                                              &stdSink::ReceiveLogMessage);
+    return std::unique_ptr<StdoutSinkHandle>(std::move(m_g3logWorker->addSink(std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage)));
+}
+
+std::unique_ptr<FileSinkHandle>
+Logger::addFileSink(const std::string& name, const std::string& path)
+{
+    return std::unique_ptr<FileSinkHandle>(m_g3logWorker->addDefaultLogger(name, path, "imstk"));
+}
+
+void
+Logger::initialize()
+{
+    m_g3logWorker = g3::LogWorker::createLogWorker();
     g3::initializeLogging(m_g3logWorker.get());
 }
 }
