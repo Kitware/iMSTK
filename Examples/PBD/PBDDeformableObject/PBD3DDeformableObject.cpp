@@ -24,7 +24,6 @@
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
 #include "imstkTetraTriangleMap.h"
@@ -82,9 +81,6 @@ main()
     deformableObj->setPhysicsToVisualMap(map); //assign the computed map
 
     deformableObj->setDynamicalModel(pbdModel);
-    auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
 
