@@ -25,7 +25,7 @@
 
 #include <HD/hd.h>
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

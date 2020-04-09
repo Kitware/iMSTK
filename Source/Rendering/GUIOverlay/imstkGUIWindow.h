@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include <string>
 #include <map>

@@ -27,7 +27,7 @@
 
 // imstk
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4505 ) // Warning C4505 will vanish upon calls to the following functions

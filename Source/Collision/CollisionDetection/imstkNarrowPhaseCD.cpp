@@ -22,7 +22,7 @@
 #include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionUtils.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkCollisionData.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"

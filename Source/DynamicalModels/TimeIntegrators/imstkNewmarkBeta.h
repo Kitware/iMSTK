@@ -24,7 +24,7 @@
 #include "imstkTimeIntegrator.h"
 
 #include <array>
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

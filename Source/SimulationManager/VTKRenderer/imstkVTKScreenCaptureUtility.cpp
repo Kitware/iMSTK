@@ -21,7 +21,7 @@
 
 #include "imstkVTKScreenCaptureUtility.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

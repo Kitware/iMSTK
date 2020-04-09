@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkGeometry.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 
 namespace imstk

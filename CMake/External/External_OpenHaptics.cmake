@@ -46,4 +46,4 @@ imstk_add_external_project( OpenHaptics
     COMMAND ${CMAKE_COMMAND} -E copy ${open_haptics_util_libs_dir}/hlu.${lib_ext} ${open_haptics_libs_dest}
   RELATIVE_INCLUDE_PATH "/"
   #VERBOSE
-  )
+)

@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #ifdef iMSTK_AUDIO_ENABLED
 
@@ -116,9 +116,9 @@ playMusic(const std::string& filename)
 int
 main()
 {
-    // Initialize g3logger
-    auto logger = std::make_shared<LogUtility>();
-    logger->createLogger("audio-Example", "./");
+    auto logger = Logger::getInstance();
+    logger->addFileSink("audio-Example", "./");
+    logger->addStdoutSink();
 
     #ifndef iMSTK_AUDIO_ENABLED
     LOG(INFO) << "Audio not enabled at build time\n";

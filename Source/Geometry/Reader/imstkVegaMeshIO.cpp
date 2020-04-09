@@ -25,7 +25,7 @@
 #include "imstkHexahedralMesh.h"
 #include "imstkVolumetricMesh.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 // Vega
 #include "volumetricMeshLoader.h"

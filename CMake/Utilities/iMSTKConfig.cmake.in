@@ -1,2 +1,0 @@
-set(iMSTK_BINARY_DIR "@iMSTK_BINARY_DIR@")
-include("${iMSTK_BINARY_DIR}/Innerbuild/iMSTKConfig.cmake")

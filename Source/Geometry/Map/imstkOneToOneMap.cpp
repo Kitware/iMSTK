@@ -21,7 +21,7 @@
 
 #include "imstkOneToOneMap.h"
 #include "imstkParallelUtils.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkPointSet.h"
 
 #undef min

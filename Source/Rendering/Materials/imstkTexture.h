@@ -24,7 +24,7 @@
 #include <string>
 #include <memory>
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

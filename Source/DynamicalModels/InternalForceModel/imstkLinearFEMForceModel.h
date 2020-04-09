@@ -23,7 +23,7 @@
 
 #include <memory>
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 //imstk
 #include "imstkInternalForceModel.h"

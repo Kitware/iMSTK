@@ -23,7 +23,7 @@
 #include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
 #include "imstkSceneObject.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include <utility>
 

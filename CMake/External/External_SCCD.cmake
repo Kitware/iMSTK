@@ -40,4 +40,4 @@ imstk_add_external_project( SCCD
   DEPENDENCIES
     Eigen3
   #VERBOSE
-  )
+)

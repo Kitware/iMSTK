@@ -22,7 +22,7 @@
 #include "imstkTetraTriangleMap.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkParallelUtils.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

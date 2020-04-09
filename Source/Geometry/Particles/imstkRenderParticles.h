@@ -28,7 +28,7 @@
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 #include "imstkColor.h"
 
 namespace imstk

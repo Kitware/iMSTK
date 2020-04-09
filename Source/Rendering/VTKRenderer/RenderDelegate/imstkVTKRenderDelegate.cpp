@@ -21,7 +21,7 @@
 
 #include "imstkVTKRenderDelegate.h"
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 #include "imstkPlane.h"
 #include "imstkSphere.h"
