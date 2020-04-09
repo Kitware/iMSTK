@@ -22,7 +22,6 @@
 #include "imstkSimulationManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkAPIUtilities.h"
 #include "imstkLight.h"
 
@@ -124,11 +123,6 @@ main()
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     deformableObj->addVisualModel(surfMeshModel);
-
-    // Solver
-    /*auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);*/
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");

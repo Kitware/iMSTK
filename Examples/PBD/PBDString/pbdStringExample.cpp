@@ -23,7 +23,6 @@
 #include "imstkLineMesh.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkSimulationManager.h"
 
 using namespace imstk;
@@ -53,7 +52,6 @@ main()
         std::shared_ptr<PbdModel> model;
         std::shared_ptr<PBDModelConfig> params;
         std::shared_ptr<VisualModel> visualModel;
-        std::shared_ptr<PbdSolver> solver;
     };
     std::vector<PbdSim> sims(numStrings);
 
@@ -110,11 +108,6 @@ main()
         material->setLineWidth(2.0f);
         sims[i].visualModel->setRenderMaterial(material);
         sims[i].object->addVisualModel(sims[i].visualModel);
-
-        // Solver
-        sims[i].solver = std::make_shared<PbdSolver>();
-        sims[i].solver->setPbdObject(sims[i].object);
-        scene->addNonlinearSolver(sims[i].solver);
 
         // Add in scene
         scene->addSceneObject(sims[i].object);

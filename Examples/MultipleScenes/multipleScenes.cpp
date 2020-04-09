@@ -22,7 +22,6 @@
 #include "imstkSimulationManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkAPIUtilities.h"
 #include "imstkOneToOneMap.h"
 
@@ -78,9 +77,9 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
 
     deformableObj->setDynamicalModel(pbdModel);
-    auto pbdSolver = std::make_shared<PbdSolver>();
+    /*auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
+    scene->addNonlinearSolver(pbdSolver);*/
 
     scene->addSceneObject(deformableObj);
 
@@ -176,9 +175,6 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
     deformableObj->addVisualModel(surfMeshModel);
 
     // Solver
-    auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
 

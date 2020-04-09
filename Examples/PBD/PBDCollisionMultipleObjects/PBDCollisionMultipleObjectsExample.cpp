@@ -26,7 +26,6 @@
 #include "imstkSceneManager.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"
@@ -138,10 +137,6 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
 
-    // Create solver
-    /*pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);*/
     scene->addSceneObject(deformableObj);
 }
 
