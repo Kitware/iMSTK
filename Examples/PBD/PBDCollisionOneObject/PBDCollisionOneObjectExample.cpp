@@ -25,7 +25,6 @@
 #include "imstkLight.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"

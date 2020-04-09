@@ -64,15 +64,15 @@ Graph::print() const
     }
 }
 
-std::pair<std::vector<unsigned short>, unsigned short>
-Graph::doColoring(ColoringMethod method, bool print /*= false*/) const
+Graph::graphColorsType
+Graph::doColoring(ColoringMethod method /*=ColoringMethod::WelshPowell*/, bool print /*= false*/) const
 {
     return method == ColoringMethod::WelshPowell ?
            doColoringWelshPowell(print) :
            doColoringGreedy(print);
 }
 
-std::pair<std::vector<unsigned short>, unsigned short>
+Graph::graphColorsType
 Graph::doColoringWelshPowell(bool print /*= false*/) const
 {
     const auto numNodes = m_adjList.size();
