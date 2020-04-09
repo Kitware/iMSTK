@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -37,18 +37,25 @@ class vtkCellArray;
 class vtkPolyData;
 class vtkPointData;
 class vtkPoints;
+class vtkPointSet;
 class vtkUnstructuredGrid;
 
 namespace imstk
 {
 class HexahedralMesh;
 class LineMesh;
+class PointSet;
 class SurfaceMesh;
 class TetrahedralMesh;
 class VolumetricMesh;
 
 namespace GeometryUtils
 {
+///
+/// \brief Converts vtk polydata into a imstk point set
+///
+std::unique_ptr<PointSet> convertVtkPointSetToPointSet(const vtkSmartPointer<vtkPointSet> vtkMesh);
+
 ///
 /// \brief Converts vtk polydata into a imstk surface mesh
 ///
@@ -65,24 +72,29 @@ std::unique_ptr<LineMesh> convertVtkPolyDataToLineMesh(const vtkSmartPointer<vtk
 std::unique_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(const vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
 
 ///
-/// \brief Converts imstk surface mesh into a vtk polydata
+/// \brief Converts imstk point set into a vtk polydata
 ///
-vtkSmartPointer<vtkPolyData> convertSurfaceMeshToVtkPolyData(const SurfaceMesh& imstkMesh);
+vtkSmartPointer<vtkPointSet> convertPointSetToVtkPointSet(const std::shared_ptr<PointSet> imstkMesh);
 
 ///
 /// \brief Converts imstk line mesh into a vtk polydata
 ///
-vtkSmartPointer<vtkPolyData> convertLineMeshToVtkPolyData(const LineMesh& imstkMesh);
+vtkSmartPointer<vtkPolyData> convertLineMeshToVtkPolyData(const std::shared_ptr<LineMesh> imstkMesh);
+
+///
+/// \brief Converts imstk surface mesh into a vtk polydata
+///
+vtkSmartPointer<vtkPolyData> convertSurfaceMeshToVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh);
 
 ///
 /// \brief Converts imstk tetrahedral mesh into a vtk unstructured grid
 ///
-vtkSmartPointer<vtkUnstructuredGrid> convertTetrahedralMeshToVtkUnstructuredGrid(const TetrahedralMesh& imstkMesh);
+vtkSmartPointer<vtkUnstructuredGrid> convertTetrahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<TetrahedralMesh> imstkMesh);
 
 ///
 /// \brief Converts imstk hexahedral mesh into a vtk unstructured grid
 ///
-vtkSmartPointer<vtkUnstructuredGrid> convertHexahedralMeshToVtkUnstructuredGrid(const HexahedralMesh& imstkMesh);
+vtkSmartPointer<vtkUnstructuredGrid> convertHexahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<HexahedralMesh> imstkMesh);
 
 ///
 /// \brief Copy from vtk points to a imstk vertices array (StdVectorOfVec3d)
@@ -117,14 +129,38 @@ void copyPointDataFromVtk(vtkPointData* const pointData, std::map<std::string, S
 /// for more details
 ///
 ///
-std::unique_ptr<SurfaceMesh> combineSurfaceMesh(const SurfaceMesh& surfaceMesh1, const SurfaceMesh& surfaceMesh2);
+std::unique_ptr<SurfaceMesh> combineSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2);
 
 ///
 /// \brief Converts an imstk SurfaceMesh to a LineMesh, removing duplicate edges. Cell indices not preserved
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkExtractEdges.html#details">vtkExtractEdges</a> class
+///
+std::unique_ptr<LineMesh> surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+
+///
+/// \brief Removes duplicate edges & points in poly data
+/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkCleanPolyData.html#details">vtkCleanPolyData</a> class
 /// for more details
 ///
-std::unique_ptr<LineMesh> surfaceMeshToLineMesh(const SurfaceMesh& surfaceMesh);
+std::unique_ptr<SurfaceMesh> cleanSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+
+///
+/// \brief Returns points in pointSet within the provided surfaceMesh
+/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSelectEnclosedPoints.html#details">vtkSelectEnclosedPoints</a> class
+/// for more details
+///
+std::unique_ptr<PointSet> getEnclosedPoints(std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, const bool insideOut = false);
+
+///
+/// \brief Returns array indicating if point is enclosed or not
+/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSelectEnclosedPoints.html#details">vtkSelectEnclosedPoints</a> class
+/// for more details
+///
+void testEnclosedPoints(std::vector<bool>& results, std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, const bool insideOut = false);
+
+///
+/// \brief Reverse the winding of a SurfaceMesh
+/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSelectEnclosedPoints.html#details">vtkSelectEnclosedPoints</a> class
+///
 
 ///
 /// \brief Config for smooth polydata filter
@@ -145,27 +181,27 @@ struct smoothPolydataConfig
 /// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSmoothPolyDataFilter.html#details">vtkSmoothPolyDataFilter</a>
 /// for more details
 ///
-std::unique_ptr<SurfaceMesh> smoothSurfaceMesh(const SurfaceMesh&          surfaceMesh,
-                                               const smoothPolydataConfig& c);
+std::unique_ptr<SurfaceMesh> smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                                               const smoothPolydataConfig&  c);
 
 ///
 /// \brief Sub-divdes a SurfaceMesh using linear subdivision
 /// Refer <a href="https://vtk.org/doc/nightly/html/classvtkLinearSubdivisionFilter.html#details">vtk linear subdivision</a>
 /// for more details
 ///
-std::unique_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions = 1);
+std::unique_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions = 1);
 
 ///
 /// \brief Sub-divides an input imstk SurfaceMesh using loop subdivision algorithm
 /// Refer <a href="https://vtk.org/doc/nightly/html/classvtkLoopSubdivisionFilter.html#details">vtk loop subdivision</a>
 /// for more details
 ///
-std::unique_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions = 1);
+std::unique_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions = 1);
 
 ///
 /// \brief Create a tetrahedral mesh based on a uniform Cartesian mesh
-/// \param aabbMin  the small conner of a box
-/// \param aabbMax  the large conner of a box
+/// \param aabbMin  the small corner of a box
+/// \param aabbMax  the large corner of a box
 /// \param nx number of elements in the x-direction
 /// \param ny number of elements in the y-direction
 /// \param nz number of elements in the z-direction
@@ -177,14 +213,14 @@ std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const V
 ///
 /// \brief Create a tetrahedral mesh cover
 ///
-std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(const SurfaceMesh& surfMesh, const size_t nx, const size_t ny, size_t nz);
+std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh, const size_t nx, const size_t ny, size_t nz);
 
 ///
 /// \brief Enumeration for reordering method
 ///
 enum class MeshNodeRenumberingStrategy
 {
-    ReverseCuthillMckee // Reverse Cuthill-Mckee
+    ReverseCuthillMckee     // Reverse Cuthill-Mckee
 };
 
 ///

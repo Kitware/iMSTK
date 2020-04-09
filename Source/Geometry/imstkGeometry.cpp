@@ -21,6 +21,7 @@
 
 #include "imstkGeometry.h"
 #include "imstkLogger.h"
+#include "imstkParallelUtils.h"
 
 namespace imstk
 {

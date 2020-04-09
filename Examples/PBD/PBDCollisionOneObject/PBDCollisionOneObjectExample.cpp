@@ -113,7 +113,7 @@ main()
         {
             const double y = static_cast<double>(dy * j);
             const double x = static_cast<double>(dx * i);
-            vertList[i * nCols + j] = Vec3d(x - 50, -10.0, y - 50);
+            vertList[i * nCols + j] = Vec3d(x - width * 0.5, -10.0, y - height * 0.5);
         }
     }
 

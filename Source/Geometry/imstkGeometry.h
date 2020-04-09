@@ -22,10 +22,12 @@
 #pragma once
 
 #include "imstkMath.h"
-#include "imstkParallelUtils.h"
+#include "tbb/tbb.h"
 
 namespace imstk
 {
+namespace ParallelUtils { class SpinLock; }
+
 ///
 /// \class Geometry
 /// \brief Base class for any geometrical representation

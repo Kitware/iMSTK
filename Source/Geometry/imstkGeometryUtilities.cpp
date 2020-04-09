@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,15 +20,21 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
-#include "Mesh/imstkSurfaceMesh.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkLineMesh.h"
+#include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include <vtkAppendPolyData.h>
+#include <vtkCleanPolyData.h>
+#include <vtkDataSet.h>
+#include <vtkPolyData.h>
+#include <vtkPointSet.h>
 #include <vtkExtractEdges.h>
 #include <vtkLinearSubdivisionFilter.h>
 #include <vtkLoopSubdivisionFilter.h>
 #include <vtkPointData.h>
+#include <vtkSelectEnclosedPoints.h>
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkUnstructuredGrid.h>
@@ -47,8 +53,30 @@ make_unique(Args&&... args)
 
 namespace imstk
 {
+std::unique_ptr<PointSet>
+GeometryUtils::convertVtkPointSetToPointSet(const vtkSmartPointer<vtkPointSet> vtkMesh)
+{
+    CHECK(vtkMesh != nullptr) << "vtkPolyData provided is not valid!";
+
+    StdVectorOfVec3d vertices;
+    copyVerticesFromVtk(vtkMesh->GetPoints(), vertices);
+
+    auto mesh = std::make_unique<PointSet>();
+    mesh->initialize(vertices);
+
+    // Point Data
+    std::map<std::string, StdVectorOfVectorf> dataMap;
+    copyPointDataFromVtk(vtkMesh->GetPointData(), dataMap);
+    if (!dataMap.empty())
+    {
+        mesh->setPointDataMap(dataMap);
+    }
+
+    return mesh;
+}
+
 std::unique_ptr<SurfaceMesh>
-GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
+GeometryUtils::convertVtkPolyDataToSurfaceMesh(const vtkSmartPointer<vtkPolyData> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkPolyData provided is not valid!";
 
@@ -106,45 +134,56 @@ GeometryUtils::convertVtkPolyDataToLineMesh(const vtkSmartPointer<vtkPolyData> v
     return mesh;
 }
 
-vtkSmartPointer<vtkPolyData>
-GeometryUtils::convertSurfaceMeshToVtkPolyData(const SurfaceMesh& imstkMesh)
+vtkSmartPointer<vtkPointSet>
+GeometryUtils::convertPointSetToVtkPointSet(const std::shared_ptr<PointSet> imstkMesh)
 {
     vtkNew<vtkPoints> points;
-    copyVerticesToVtk(imstkMesh.getVertexPositions(), points.Get());
+    copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
+
+    auto polyData = vtkSmartPointer<vtkPolyData>::New();
+    polyData->SetPoints(points);
+    return polyData;
+}
+
+vtkSmartPointer<vtkPolyData>
+GeometryUtils::convertLineMeshToVtkPolyData(const std::shared_ptr<LineMesh> imstkMesh)
+{
+    vtkNew<vtkPoints> points;
+    copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
 
     vtkNew<vtkCellArray> polys;
-    copyCellsToVtk<3>(imstkMesh.getTrianglesVertices(), polys.Get());
+    copyCellsToVtk<2>(imstkMesh->getLinesVertices(), polys.Get());
 
     auto polydata = vtkSmartPointer<vtkPolyData>::New();;
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
-
     return polydata;
 }
 
 vtkSmartPointer<vtkPolyData>
-GeometryUtils::convertLineMeshToVtkPolyData(const LineMesh& imstkMesh)
+GeometryUtils::convertSurfaceMeshToVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
-    copyVerticesToVtk(imstkMesh.getVertexPositions(), points.Get());
+    copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
 
     vtkNew<vtkCellArray> polys;
-    copyCellsToVtk<2>(imstkMesh.getLinesVertices(), polys.Get());
+    copyCellsToVtk<3>(imstkMesh->getTrianglesVertices(), polys.Get());
 
     auto polydata = vtkSmartPointer<vtkPolyData>::New();;
     polydata->SetPoints(points);
     polydata->SetPolys(polys);
+
     return polydata;
 }
 
 vtkSmartPointer<vtkUnstructuredGrid>
-GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(const TetrahedralMesh& imstkMesh)
+GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<TetrahedralMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
-    copyVerticesToVtk(imstkMesh.getVertexPositions(), points.Get());
+    copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
 
     vtkNew<vtkCellArray> tetras;
-    copyCellsToVtk<4>(imstkMesh.getTetrahedraVertices(), tetras.Get());
+    copyCellsToVtk<4>(imstkMesh->getTetrahedraVertices(), tetras.Get());
 
     auto ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
     ug->SetPoints(points);
@@ -153,13 +192,13 @@ GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(const TetrahedralMesh
 }
 
 vtkSmartPointer<vtkUnstructuredGrid>
-GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(const HexahedralMesh& imstkMesh)
+GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<HexahedralMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
-    copyVerticesToVtk(imstkMesh.getVertexPositions(), points.Get());
+    copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
 
     vtkNew<vtkCellArray> bricks;
-    copyCellsToVtk<8>(imstkMesh.getHexahedraVertices(), bricks.Get());
+    copyCellsToVtk<8>(imstkMesh->getHexahedraVertices(), bricks.Get());
 
     auto ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
     ug->SetPoints(points);
@@ -168,7 +207,7 @@ GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(const HexahedralMesh& 
 }
 
 std::unique_ptr<VolumetricMesh>
-GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(const vtkSmartPointer<vtkUnstructuredGrid> vtkMesh)
+GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkUnstructuredGrid provided is not valid!";
 
@@ -296,7 +335,7 @@ GeometryUtils::copyPointDataFromVtk(vtkPointData* const pointData, std::map<std:
 }
 
 std::unique_ptr<SurfaceMesh>
-GeometryUtils::combineSurfaceMesh(const SurfaceMesh& surfaceMesh1, const SurfaceMesh& surfaceMesh2)
+GeometryUtils::combineSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2)
 {
     vtkNew<vtkAppendPolyData> filter;
     filter->AddInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh1));
@@ -307,7 +346,7 @@ GeometryUtils::combineSurfaceMesh(const SurfaceMesh& surfaceMesh1, const Surface
 }
 
 std::unique_ptr<LineMesh>
-GeometryUtils::surfaceMeshToLineMesh(const SurfaceMesh& surfaceMesh)
+GeometryUtils::surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
     vtkNew<vtkExtractEdges> filter;
     filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
@@ -321,8 +360,65 @@ GeometryUtils::surfaceMeshToLineMesh(const SurfaceMesh& surfaceMesh)
 }
 
 std::unique_ptr<SurfaceMesh>
-GeometryUtils::smoothSurfaceMesh(const SurfaceMesh&          surfaceMesh,
-                                 const smoothPolydataConfig& c)
+GeometryUtils::cleanSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
+{
+    vtkNew<vtkCleanPolyData> filter;
+    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
+    filter->Update();
+    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
+}
+
+std::unique_ptr<PointSet>
+GeometryUtils::getEnclosedPoints(std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, bool insideOut)
+{
+    vtkNew<vtkSelectEnclosedPoints> filter;
+    filter->SetInputData(convertPointSetToVtkPointSet(pointSet));
+    filter->SetSurfaceData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
+    filter->SetTolerance(0.0);
+    filter->SetInsideOut(insideOut);
+    filter->Update();
+    vtkSmartPointer<vtkPointSet> vtkResults = vtkPointSet::SafeDownCast(filter->GetOutput());
+
+    StdVectorOfVec3d points;
+    points.reserve(vtkResults->GetNumberOfPoints());
+    for (vtkIdType i = 0; i < vtkResults->GetNumberOfPoints(); i++)
+    {
+        if (filter->IsInside(i))
+        {
+            double pt[3];
+            vtkResults->GetPoint(i, pt);
+            points.push_back(Vec3d(pt[0], pt[1], pt[2]));
+        }
+    }
+    points.shrink_to_fit();
+
+    std::unique_ptr<PointSet> results = std::make_unique<PointSet>();
+    results->setInitialVertexPositions(points);
+    results->setVertexPositions(points);
+    return results;
+}
+
+void
+GeometryUtils::testEnclosedPoints(std::vector<bool>& results, std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, const bool insideOut)
+{
+    vtkNew<vtkSelectEnclosedPoints> filter;
+    filter->SetInputData(convertPointSetToVtkPointSet(pointSet));
+    filter->SetSurfaceData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
+    filter->SetTolerance(0.0);
+    filter->SetInsideOut(insideOut);
+    filter->Update();
+    vtkUnsignedCharArray* arr = vtkUnsignedCharArray::SafeDownCast(filter->GetOutput()->GetPointData()->GetArray("SelectedPoints"));
+
+    results.resize(arr->GetNumberOfValues());
+    for (vtkIdType i = 0; i < arr->GetNumberOfValues(); i++)
+    {
+        results[i] = (arr->GetValue(i) ? true : false);
+    }
+}
+
+std::unique_ptr<SurfaceMesh>
+GeometryUtils::smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                                 const smoothPolydataConfig&  c)
 {
     vtkNew<vtkSmoothPolyDataFilter> filter;
     filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
@@ -339,7 +435,7 @@ GeometryUtils::smoothSurfaceMesh(const SurfaceMesh&          surfaceMesh,
 }
 
 std::unique_ptr<SurfaceMesh>
-GeometryUtils::linearSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions)
+GeometryUtils::linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions)
 {
     vtkNew<vtkLinearSubdivisionFilter> filter;
     filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
@@ -350,7 +446,7 @@ GeometryUtils::linearSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const 
 }
 
 std::unique_ptr<SurfaceMesh>
-GeometryUtils::loopSubdivideSurfaceMesh(const SurfaceMesh& surfaceMesh, const int numSubdivisions)
+GeometryUtils::loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions)
 {
     vtkNew<vtkLoopSubdivisionFilter> filter;
     filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
@@ -469,10 +565,10 @@ RCM(const std::vector<NeighborContainer>& neighbors)
     //     P.insert(i);
     // }
 
-    std::vector<size_t> R(numVerts, invalid);  // permutation
-    std::queue<size_t>  Q;                     // queue
-    std::vector<bool>   isInP(numVerts, true); // if a vertex is still in P
-    size_t              pos = 0;               // track how many vertices are put into R
+    std::vector<size_t> R(numVerts, invalid);      // permutation
+    std::queue<size_t>  Q;                         // queue
+    std::vector<bool>   isInP(numVerts, true);     // if a vertex is still in P
+    size_t              pos = 0;                   // track how many vertices are put into R
 
     ///
     /// \brief Move a vertex into R, and enque its neighbors into Q in ascending order.
@@ -514,7 +610,7 @@ RCM(const std::vector<NeighborContainer>& neighbors)
             {
                 isInP[vid] = false;
                 pCur       = vid;
-                parent     =  vid;
+                parent     = vid;
                 break;
             }
         }
@@ -566,10 +662,12 @@ RCM(const std::vector<ElemConn>& conn, const size_t numVerts)
 ///
 /// \note this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
 ///
-std::vector<bool>
-markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& coords)
+void
+markPointsInsideAndOut(std::vector<bool>&      isInside,
+                       const SurfaceMesh&      surfaceMesh,
+                       const StdVectorOfVec3d& coords)
 {
-    std::vector<bool> isInside;
+    isInside.clear();
     isInside.resize(coords.size(), false);
 
     Vec3d aabbMin, aabbMax;
@@ -725,10 +823,10 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
                                   }
 
                                   auto intersected = triangleRayIntersection(coords[i],
-                           xyz[verts[0]],
-                           xyz[verts[1]],
-                           xyz[verts[2]],
-                           direction);
+                                xyz[verts[0]],
+                                xyz[verts[1]],
+                                xyz[verts[2]],
+                                direction);
                                   if (intersected)
                                   {
                                       ++numIntersections;
@@ -749,8 +847,6 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
     // }
 
     ParallelUtils::parallelFor(coords.size(), rayTracingFunc);
-
-    return isInside;
 }
 
 ///
@@ -765,10 +861,15 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
 ///
 /// \note this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
 ///
-std::vector<bool>
-markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& coords, const size_t nx, const size_t ny, const size_t nz)
+void
+markPointsInsideAndOut(std::vector<bool>&      isInside,
+                       const SurfaceMesh&      surfaceMesh,
+                       const StdVectorOfVec3d& coords,
+                       const size_t            nx,
+                       const size_t            ny,
+                       const size_t            nz)
 {
-    std::vector<bool> isInside;
+    isInside.clear();
     isInside.resize(coords.size(), false);
 
     Vec3d aabbMin, aabbMax;
@@ -910,11 +1011,11 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
                                       }
 
                                       auto intersected = triangleRayIntersection(coords[idx],
-                               xyz[verts[0]],
-                               xyz[verts[1]],
-                               xyz[verts[2]],
-                               direction,
-                               dist);
+                                        xyz[verts[0]],
+                                        xyz[verts[1]],
+                                        xyz[verts[2]],
+                                        direction,
+                                        dist);
                                       if (intersected)
                                       {
                                           ++numIntersections;
@@ -939,8 +1040,6 @@ markPointsInsideAndOut(const SurfaceMesh& surfaceMesh, const StdVectorOfVec3d& c
                           };
 
     ParallelUtils::parallelFor(ny * nz, rayTracingLine);
-
-    return isInside;
 }
 } // anonymous namespace
 
@@ -1012,28 +1111,26 @@ GeometryUtils::createUniformMesh(const Vec3d& aabbMin,
     }
 
     auto mesh = std::make_shared<TetrahedralMesh>();
-    // auto mesh = std::unique_ptr<TetrahedralMesh>(new TetrahedralMesh());
-
     mesh->initialize(coords, vertices);
     return mesh;
 }
 
 std::shared_ptr<TetrahedralMesh>
-GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh,
-                                          const size_t       nx,
-                                          const size_t       ny,
-                                          const size_t       nz)
+GeometryUtils::createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh,
+                                          const size_t                 nx,
+                                          const size_t                 ny,
+                                          const size_t                 nz)
 {
     Vec3d aabbMin, aabbMax;
 
     // create a background mesh
-    surfMesh.computeBoundingBox(aabbMin, aabbMax, 1. /*percentage padding*/);
+    surfMesh->computeBoundingBox(aabbMin, aabbMax, 1. /*percentage padding*/);
     auto uniformMesh = createUniformMesh(aabbMin, aabbMax, nx, ny, nz);
 
     // ray-tracing
-    const auto& coords = uniformMesh->getVertexPositions();
-    // auto        insideSurfMesh = markPointsInsideAndOut(surfMesh, coords);
-    const auto insideSurfMesh = markPointsInsideAndOut(surfMesh, coords, nx + 1, ny + 1, nz + 1);
+    const auto&       coords = uniformMesh->getVertexPositions();
+    std::vector<bool> insideSurfMesh;
+    markPointsInsideAndOut(insideSurfMesh, *surfMesh.get(), coords, nx + 1, ny + 1, nz + 1);
 
     // label elements
     std::vector<bool> validTet(uniformMesh->getNumTetrahedra(), false);
@@ -1079,7 +1176,7 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh,
 
     auto labelEnclosingTetOfVertices = [&surfMesh, &uniformMesh, &aabbMin, &h, nx, ny, nz, &labelEnclosingTet, &validTet](const size_t i)
                                        {
-                                           const auto& xyz = surfMesh.getVertexPosition(i);
+                                           const auto& xyz = surfMesh->getVertexPosition(i);
                                            labelEnclosingTet(xyz);
                                        };
 
@@ -1098,10 +1195,10 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh,
     // find the enclosing tets of a group of points on a surface triangle
     auto labelEnclosingTetOfInteriorPnt = [&surfMesh, &labelEnclosingTet](const size_t fid)
                                           {
-                                              auto               verts = surfMesh.getTrianglesVertices()[fid];
-                                              const auto&        vtx0  = surfMesh.getVertexPosition(verts[0]);
-                                              const auto&        vtx1  = surfMesh.getVertexPosition(verts[1]);
-                                              const auto&        vtx2  = surfMesh.getVertexPosition(verts[2]);
+                                              auto               verts = surfMesh->getTrianglesVertices()[fid];
+                                              const auto&        vtx0  = surfMesh->getVertexPosition(verts[0]);
+                                              const auto&        vtx1  = surfMesh->getVertexPosition(verts[1]);
+                                              const auto&        vtx2  = surfMesh->getVertexPosition(verts[2]);
                                               std::vector<Vec3d> pnts(12);
 
                                               pnts[0]  = 0.75 * vtx0 + 0.25 * vtx1;
@@ -1124,13 +1221,13 @@ GeometryUtils::createTetrahedralMeshCover(const SurfaceMesh& surfMesh,
                                           };
 
     // enclose all vertices
-    for (size_t i = 0; i < surfMesh.getNumVertices(); ++i)
+    for (size_t i = 0; i < surfMesh->getNumVertices(); ++i)
     {
         labelEnclosingTetOfVertices(i);
     }
 
     // enclose some interior points on triangles
-    for (size_t i = 0; i < surfMesh.getNumTriangles(); ++i)
+    for (size_t i = 0; i < surfMesh->getNumTriangles(); ++i)
     {
         labelEnclosingTetOfInteriorPnt(i);
     }

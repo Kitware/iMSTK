@@ -58,7 +58,7 @@ main()
     // add the scene object to the scene
     scene->addSceneObject(surfaceObject);
 
-    auto tetMesh = GeometryUtils::createTetrahedralMeshCover(*surfMesh, nx, ny, nz);
+    auto tetMesh = GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
 
     // add scene object for surface object
     auto volObject = std::make_shared<VisualObject>("VolObj");

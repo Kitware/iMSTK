@@ -21,6 +21,8 @@
 
 #pragma once
 
+#define NOMINMAX
+
 #include <Eigen/Geometry>
 
 #pragma warning( push )
