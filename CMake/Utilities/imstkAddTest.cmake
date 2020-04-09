@@ -38,7 +38,7 @@ function(GTEST_ADD_TESTS executable extra_args)
             continue()
           endif()
           add_test(NAME ${test_name} COMMAND ${executable} ${extra_args} --gtest_filter=${test_name} WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin) # changed here
-		  
+
         endforeach()
     endforeach()
 endfunction()
@@ -118,7 +118,7 @@ function(imstk_add_test target)
   # Link test driver against current target, gtest and pthread
   target_link_libraries(${test_driver_executable}
     ${target}
-    ${GOOGLETEST_LIBRARIES}
+    GTest::gtest
     Threads::Threads
   )
   

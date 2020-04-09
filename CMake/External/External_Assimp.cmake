@@ -14,4 +14,4 @@ imstk_add_external_project( Assimp
   RELATIVE_INCLUDE_PATH "include"
   #DEPENDENCIES ""
   #VERBOSE
-  )
+)

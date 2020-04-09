@@ -65,4 +65,5 @@ imstk_add_external_project( openvr
     COMMAND ${copy_openvr_dll_command}
   RELATIVE_INCLUDE_PATH "headers"
   #VERBOSE
-  )
+)
+
