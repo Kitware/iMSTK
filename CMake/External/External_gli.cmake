@@ -8,4 +8,4 @@ imstk_add_external_project( gli
   RELATIVE_INCLUDE_PATH ""
   DEPENDENCIES ""
   #VERBOSE
-  )
+)

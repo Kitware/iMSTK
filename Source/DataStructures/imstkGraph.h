@@ -34,6 +34,8 @@ namespace imstk
 ///
 class Graph
 {
+using edgeType = std::unordered_set<size_t>;
+using graphColorsType = std::pair<std::vector<unsigned short>, unsigned short>;
 public:
     enum class ColoringMethod
     {
@@ -68,31 +70,26 @@ public:
     void setDefaultColoringMethod(ColoringMethod method) { m_ColoringMethod = method; }
 
     ///
-    /// \brief Colorize using the default method and prints the assignment of colors
-    /// \return Vertex colors and number of colors
-    ///
-    std::pair<std::vector<unsigned short>, unsigned short> doColoring(bool print = false) const { return doColoring(m_ColoringMethod, print); }
-
-    ///
     /// \brief Colorize using the given method and prints the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short> doColoring(ColoringMethod method, bool print = false) const;
+    graphColorsType doColoring(ColoringMethod method = ColoringMethod::WelshPowell,
+                               bool           print = false) const;
 
 protected:
     ///
     /// \brief Colorize using greedy algorithm and print the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short> doColoringGreedy(bool print = false) const;
+    graphColorsType doColoringGreedy(bool print = false) const;
 
     ///
     /// \brief Colorize using Welsh-Powell algorithm and print the assignment of colors
     /// \return Vertex colors and number of colors
     ///
-    std::pair<std::vector<unsigned short>, unsigned short> doColoringWelshPowell(bool print = false) const;
+    graphColorsType doColoringWelshPowell(bool print = false) const;
 
-    std::vector<std::unordered_set<size_t>> m_adjList;    ///< A array of std::vectors to represent adjacency list
+    std::vector<edgeType> m_adjList;    ///< A array of std::vectors to represent adjacency list
     ColoringMethod m_ColoringMethod = ColoringMethod::WelshPowell;
 };
 }

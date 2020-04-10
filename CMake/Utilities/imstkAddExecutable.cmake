@@ -12,5 +12,13 @@ macro(imstk_add_executable target)
   set_target_properties(${target} PROPERTIES
     DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
   add_custom_command(TARGET ${target} POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${iMSTK_INSTALL_BIN_DIR})
+                   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${target}> ${CMAKE_INSTALL_PREFIX}/bin)
+                   
+  #-----------------------------------------------------------------------------
+  # Set MSVC working directory to the install/bin directory
+  #-----------------------------------------------------------------------------
+  if(MSVC) # Configure running executable out of MSVC
+    set_property(TARGET ${target} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_INSTALL_PREFIX}/bin")
+  endif()
+  
 endmacro()

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 1.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 2.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
@@ -25,19 +25,14 @@ set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 #-----------------------------------------------------------------------------
 # Project install directories
 #-----------------------------------------------------------------------------
-if(APPLE)
-  set(${PROJECT_NAME}_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents") # Set to create Bundle
-else()
-  set(${PROJECT_NAME}_INSTALL_ROOT "${CMAKE_INSTALL_PREFIX}")
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location" FORCE)
 endif()
-set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/bin")
-set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/lib")
-set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/include/imstk-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
-set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}")
+set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 # Let's go ahead and make these directories
-file(MAKE_DIRECTORY ${${PROJECT_NAME}_INSTALL_BIN_DIR})
-file(MAKE_DIRECTORY ${${PROJECT_NAME}_INSTALL_LIB_DIR})
-file(MAKE_DIRECTORY ${${PROJECT_NAME}_INSTALL_SHARE_DIR})
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/include)
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
 
 #-----------------------------------------------------------------------------
 # Update CMake module path & cmake dir
@@ -112,6 +107,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   endif()
 
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
+  option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
 
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
@@ -153,7 +149,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   endif()
 
   if(${PROJECT_NAME}_BUILD_TESTING)
-    imstk_define_dependency(GoogleTest)
+    imstk_define_dependency(GTest)
 
     #-----------------------------------------------------------------------------
     # Allow CTest to cover Innerbuild
@@ -176,22 +172,10 @@ if(${PROJECT_NAME}_SUPERBUILD)
   # CMakeLists.txt will be called back with SUPERBUILD=OFF, to execute
   # the rest of the code below (INNERBUILD), which explains the `return`
   add_subdirectory(CMake/External)
-  
-  write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    VERSION ${Upstream_VERSION}
-    COMPATIBILITY AnyNewerVersion
-    )
-  configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities/${PROJECT_NAME}Config.cmake.in"
-    ${PROJECT_NAME}Config.cmake
-    @ONLY
-    )
 
   return()
 
 endif()
-
 
 #-----------------------------------------------------------------------------
 #                               INNERBUILD
@@ -201,7 +185,8 @@ endif()
 # Find external dependencies
 #-----------------------------------------------------------------------------
 include(imstkFind)
-
+# Set where to look for packages (If not using system)
+set(PACKAGE_PREFIX_DIR ${CMAKE_INSTALL_PREFIX})
 
 # Assimp
 find_package( Assimp REQUIRED )
@@ -216,6 +201,10 @@ find_package( g3log REQUIRED )
 # glm
 find_package( glm REQUIRED)
 # imgui
+# iMSTK actually includes and compiles imgui code
+# As imgui does not have any cmake support
+# So tell our find_package to also find the imgui source directory
+set(FIND_IMGUI_SOURCE ON)
 find_package( imgui REQUIRED )
 # LibNiFalcon
 find_package( LibNiFalcon REQUIRED)
@@ -325,10 +314,7 @@ endif(Uncrustify_EXECUTABLE)
 
 # Google Test
 if(${PROJECT_NAME}_BUILD_TESTING)
-  find_package( GoogleTest REQUIRED )
-  include_directories(${GOOGLETEST_INCLUDE_DIRS})
-  find_package( GoogleMock REQUIRED )
-  include_directories(${GOOGLEMOCK_INCLUDE_DIRS})
+  find_package( GTest REQUIRED NO_DEFAULT_PATH)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -351,6 +337,9 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   include(imstkCopyAndCompileShaders)
   CopyAndCompileShaders()
 endif()
+
+# Folder name to put our headers/cmake config files under
+set(${PROJECT_NAME}_INSTALL_FOLDER ${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR})
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
@@ -396,6 +385,17 @@ if(NOT WIN32)
 endif()
 
 #--------------------------------------------------------------------------
+# Install Find Modules
+#--------------------------------------------------------------------------
+set(${PROJECT_NAME}_INSTALL_CONFIG_DIR "lib/cmake/${${PROJECT_NAME}_INSTALL_FOLDER}")
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/${${PROJECT_NAME}_INSTALL_CONFIG_DIR}/modules)
+file(GLOB modules ${CMAKE_SOURCE_DIR}/CMake/Find*.cmake)
+foreach(module ${modules})
+  install(FILES ${module} DESTINATION "${${PROJECT_NAME}_INSTALL_CONFIG_DIR}/modules")
+endforeach()
+install(FILES ${CMAKE_SOURCE_DIR}/CMake/Utilities/imstkFind.cmake DESTINATION "${${PROJECT_NAME}_INSTALL_CONFIG_DIR}/modules")
+
+#--------------------------------------------------------------------------
 # Innerbuild dummy test
 #--------------------------------------------------------------------------
 add_test(
@@ -406,37 +406,56 @@ add_test(
 #--------------------------------------------------------------------------
 # Export Targets
 #--------------------------------------------------------------------------
+# This variable controls the prefix used to generate the following files:
+#  ${PROJECT_NAME}ConfigVersion.cmake
+#  ${PROJECT_NAME}Config.cmake
+#  ${PROJECT_NAME}Targets.cmake
+# and it also used to initialize ${PROJECT_NAME}_INSTALL_CONFIG_DIR value.
+set(export_config_name ${PROJECT_NAME})
 string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
 set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
-
-export(EXPORT ${PROJECT_NAME}_TARGETS
+#------------------------------------------------------------------------------
+# Configure ${PROJECT_NAME}ConfigVersion.cmake common to build and install tree
+include(CMakePackageConfigHelpers)
+set(config_version_file ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake)
+write_basic_package_version_file(
+  ${config_version_file}
+  VERSION "${${PROJECT_NAME}_VERSION}"
+  COMPATIBILITY AnyNewerVersion
+  )
+#------------------------------------------------------------------------------
+# Export '${PROJECT_NAME}Targets.cmake' for a build tree
+export(
+  EXPORT ${PROJECT_NAME}Targets
   FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
   NAMESPACE ${PROJECT_NAMESPACE}
   )
-write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-  VERSION ${Upstream_VERSION}
-  COMPATIBILITY AnyNewerVersion
-  )
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities/${PROJECT_NAME}InnerbuildConfig.cmake.in"
-  ${PROJECT_NAME}Config.cmake
-  @ONLY
+# Configure '${PROJECT_NAME}Config.cmake' for a build tree
+set(build_config ${CMAKE_BINARY_DIR}/${PROJECT_NAME}Config.cmake)
+configure_package_config_file(
+  CMake/${PROJECT_NAME}Config.cmake.in
+  ${build_config}
+  INSTALL_DESTINATION "${PROJECT_BINARY_DIR}"
   )
 
-install(EXPORT ${PROJECT_NAME}_TARGETS
-  FILE
-    ${PROJECT_NAME}Targets.cmake
-  NAMESPACE
-    ${PROJECT_NAMESPACE}
-  DESTINATION
-    ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
-  )
+#------------------------------------------------------------------------------
+# Export '${PROJECT_NAME}Targets.cmake' for an install tree
 install(
-  FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
-  DESTINATION
-    ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
-  COMPONENT
-    Devel
+  EXPORT ${PROJECT_NAME}Targets
+  FILE ${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
+  DESTINATION ${${PROJECT_NAME}_INSTALL_CONFIG_DIR}
+  )
+  
+set(install_config ${PROJECT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}Config.cmake)
+configure_package_config_file(
+  CMake/${PROJECT_NAME}Config.cmake.in 
+  ${install_config}
+  INSTALL_DESTINATION ${${PROJECT_NAME}_INSTALL_CONFIG_DIR}
+  )
+
+# Install config files
+install(
+  FILES ${config_version_file} ${install_config}
+  DESTINATION "${${PROJECT_NAME}_INSTALL_CONFIG_DIR}"
   )

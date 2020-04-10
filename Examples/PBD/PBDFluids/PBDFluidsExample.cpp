@@ -26,7 +26,6 @@
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
 #include "imstkAPIUtilities.h"
 #include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPBDCollisionHandling.h"
@@ -215,10 +214,6 @@ main()
 
     pbdModel2->configure(pbdParams2);
     floor->setDynamicalModel(pbdModel2);
-
-    auto pbdSolverfloor = std::make_shared<PbdSolver>();
-    pbdSolverfloor->setPbdObject(floor);
-    scene->addNonlinearSolver(pbdSolverfloor);
 
     scene->addSceneObject(floor);
 

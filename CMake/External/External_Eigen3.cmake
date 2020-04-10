@@ -10,5 +10,8 @@ imstk_add_external_project( Eigen3
   RELATIVE_INCLUDE_PATH ""
   DEPENDENCIES ""
   #VERBOSE
-  )
-set(Eigen3_DIR ${PhysX_INSTALL_DIR}/install/share/eigen3/cmake)
+)
+if(NOT USE_SYSTEM_Eigen3)
+  set(Eigen3_DIR ${CMAKE_INSTALL_PREFIX}/share/eigen3/cmake)
+  #message(STATUS "Eigen3_DIR : ${Eigen3_DIR}")
+endif()
