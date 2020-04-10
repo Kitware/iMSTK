@@ -160,7 +160,7 @@ PointSet::setVertexDisplacements(const StdVectorOfVec3d& diff)
 void
 PointSet::setVertexDisplacements(const Vectord& u)
 {
-    assert(u.size() == 3 * m_vertexPositions.size());
+    assert(static_cast<size_t>(u.size()) == 3 * m_vertexPositions.size());
     ParallelUtils::parallelFor(m_vertexPositions.size(),
         [&](const size_t i)
         {
