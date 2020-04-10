@@ -170,6 +170,10 @@ endmacro()
 macro(imstk_find_package package)
 
   string(TOUPPER ${package} PACKAGE)
+  if (${PACKAGE}_FOUND)
+    return()
+  endif()
+
   find_package_handle_standard_args(${PACKAGE}
     REQUIRED_VARS
       ${PACKAGE}_INCLUDE_DIRS
@@ -203,6 +207,10 @@ endmacro()
 macro(imstk_find_header_package package)
 
   string(TOUPPER ${package} PACKAGE)
+  if (${PACKAGE}_FOUND)
+    return()
+  endif()
+
   find_package_handle_standard_args(${PACKAGE}
     REQUIRED_VARS
       ${PACKAGE}_INCLUDE_DIRS)
