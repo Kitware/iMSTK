@@ -82,7 +82,9 @@ public:
         static Logger instance;
 
         if (instance.m_g3logWorker == nullptr)
+        {
             instance.initialize();
+        }
 
         return instance;
     }
