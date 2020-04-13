@@ -36,15 +36,16 @@ namespace imstk
 SimulationManager::SimulationManager(const std::shared_ptr<simManagerConfig> config) : m_config(config)
 {
     // Initialize the logger and add optional sinks
-    auto logger = Logger::getInstance();
     if (config->enableFileLogging)
     {
-        m_fileSinkHandle = logger->addFileSink(m_config->logFilePrefix, m_config->logPath);
+        Logger& logger = Logger::getInstance();
+        m_fileSinkHandle = logger.addFileSink(m_config->logFilePrefix, m_config->logPath);
     }
 
     if (config->enableStdoutLogging)
     {
-        m_stdSinkHandle = logger->addStdoutSink();
+        Logger& logger = Logger::getInstance();
+        m_stdSinkHandle = logger.addStdoutSink();
     }
 
     // create viewer if the selected mode is 'rendering'

@@ -42,9 +42,9 @@ void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts);
 int
 main(int argc, char** argv)
 {
-    auto logger = Logger::getInstance();
-    logger->addFileSink("rcm-Example", "./");
-    logger->addStdoutSink();
+    Logger& logger = Logger::getInstance();
+    logger.addFileSink("rcm-Example1", "./");
+    logger.addStdoutSink();
 
     // a 2D Cartesian mesh
     {
