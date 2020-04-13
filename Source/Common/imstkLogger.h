@@ -80,6 +80,10 @@ public:
     {
         // Thread safe in C++11 ("magic statics")
         static Logger instance;
+
+        if (instance.m_g3logWorker == nullptr)
+            instance.initialize();
+
         return instance;
     }
 
@@ -117,7 +121,7 @@ public:
     ///
     /// \brief Manual destruction of the logger members
     ///
-    void clear() { m_g3logWorker = nullptr; }
+    void destroy() { m_g3logWorker = nullptr; }
 
 private:
     Logger() { initialize(); }
