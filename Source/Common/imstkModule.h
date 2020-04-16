@@ -57,6 +57,7 @@ public:
     ///
     Module(const std::string& name, int loopDelay = 0) :
         m_name(name),
+        m_frameCounter(std::make_shared<UPSCounter>()),
         m_loopDelay(loopDelay) {}
 
     ///
@@ -154,7 +155,7 @@ protected:
     std::atomic<ModuleStatus> m_status { ModuleStatus::Inactive }; ///> Module status
 
     bool m_trackFPS = false;
-    std::shared_ptr<UPSCounter> m_frameCounter = std::make_shared<UPSCounter>();
+    std::shared_ptr<UPSCounter> m_frameCounter = nullptr;
 
     std::string m_name;                                            ///> Name of the module
     double      m_loopDelay = 0;                                   ///> Loop delay

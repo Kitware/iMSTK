@@ -159,7 +159,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    UPSCounter()  = default;
+    UPSCounter() : m_timer(std::make_shared<StopWatch>()) {};
     ~UPSCounter() = default;
 
     ///
@@ -184,10 +184,10 @@ public:
 
 protected:
 
-    std::shared_ptr<StopWatch> m_timer = std::make_shared<StopWatch>(); ///> Timer
+    std::shared_ptr<StopWatch> m_timer = nullptr; ///> Timer
 
-    double       m_accumulatedTimer = 0.;                               ///> Accumulated time (always < 1 sec)
-    unsigned int m_ups = 0;                                             ///> Most up-to-date ups
-    unsigned int m_updateCount = 0;                                     ///> Current update count
+    double       m_accumulatedTimer = 0.;         ///> Accumulated time (always < 1 sec)
+    unsigned int m_ups = 0;                       ///> Most up-to-date ups
+    unsigned int m_updateCount = 0;               ///> Current update count
 };
 }
