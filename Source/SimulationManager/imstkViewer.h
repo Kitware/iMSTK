@@ -42,7 +42,7 @@ class Viewer
 {
 public:
 
-    Viewer() {}
+    Viewer() : m_canvas(std::make_shared<GUIOverlay::Canvas>()) {}
     Viewer(SimulationManager*) {}
     virtual ~Viewer() = default;
 
@@ -136,6 +136,6 @@ protected:
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
     bool m_running = false;
-    std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();
+    std::shared_ptr<GUIOverlay::Canvas> m_canvas;
 };
 }
