@@ -69,7 +69,7 @@ main(int argc, char** argv)
         std::cout << "Number of vertices = " << numVerts << std::endl;
         testRCM(conn, numVerts);
     }
-    using namespace std::chrono_literals;
+
     return 0;
 }
 
