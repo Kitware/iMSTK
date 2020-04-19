@@ -44,9 +44,9 @@ void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts);
 int
 main(int argc, char** argv)
 {
-    auto logger = Logger::getInstance();
-    logger->addFileSink("rcm-Example", "./");
-    logger->addStdoutSink();
+    Logger& logger = Logger::getInstance();
+    logger.addFileSink("rcm-Example1", "./");
+    logger.addStdoutSink();
 
     // a 2D Cartesian mesh
     {
@@ -71,7 +71,7 @@ main(int argc, char** argv)
         std::cout << "Number of vertices = " << numVerts << std::endl;
         testRCM(conn, numVerts);
     }
-    using namespace std::chrono_literals;
+
     return 0;
 }
 

@@ -105,11 +105,11 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTU:
             if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
             {
-                VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(tetMesh, filePath);
+                return VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(tetMesh, filePath);
             }
             else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
             {
-                VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(hexMesh, filePath);
+                return VTKMeshIO::writeVtkUnstructuredGrid<vtkXMLUnstructuredGridWriter>(hexMesh, filePath);
             }
             else
             {
@@ -119,11 +119,11 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::VTK:
             if (auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(vMesh))
             {
-                VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(tetMesh, filePath);
+                return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(tetMesh, filePath);
             }
             else if (auto hexMesh = std::dynamic_pointer_cast<HexahedralMesh>(vMesh))
             {
-                VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(hexMesh, filePath);
+                return VTKMeshIO::writeVtkUnstructuredGrid<vtkGenericDataObjectWriter>(hexMesh, filePath);
             }
             else
             {
@@ -182,7 +182,6 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         LOG(WARNING) << "VTKMeshIO::write error: the provided mesh is not a surface or volumetric mesh.";
         return false;
     }
-    return true;
 }
 
 template<typename ReaderType>

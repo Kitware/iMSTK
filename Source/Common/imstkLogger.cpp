@@ -26,9 +26,6 @@ limitations under the License.
 
 namespace imstk
 {
-Logger*    Logger::m_loggerInstance = NULL;
-std::mutex Logger::m_mutex;
-
 stdSink::FontColor
 stdSink::GetColor(const LEVELS level) const
 {

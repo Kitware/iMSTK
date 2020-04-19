@@ -116,9 +116,9 @@ playMusic(const std::string& filename)
 int
 main()
 {
-    auto logger = Logger::getInstance();
-    logger->addFileSink("audio-Example", "./");
-    logger->addStdoutSink();
+    Logger& logger = Logger::getInstance();
+    logger.addFileSink("audio-Example", "./");
+    logger.addStdoutSink();
 
     #ifndef iMSTK_AUDIO_ENABLED
     LOG(INFO) << "Audio not enabled at build time\n";

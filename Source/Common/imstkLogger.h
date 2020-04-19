@@ -25,6 +25,8 @@ limitations under the License.
 
 #include "imstkDataLogger.h"
 
+#include <memory>
+
 namespace imstk
 {
 ///
@@ -69,25 +71,31 @@ using StdoutSinkHandle = g3::SinkHandle<stdSink>;
 ///
 /// \struct Logger
 ///
-/// \brief
+/// \brief lazy initialized singleton
 ///
 class Logger
 {
 public:
-    static Logger* getInstance()
+    static Logger& getInstance()
     {
-        std::lock_guard<std::mutex> myLock(m_mutex);
-        if (!m_loggerInstance)
+        // Thread safe in C++11 ("magic statics")
+        static Logger instance;
+
+        if (instance.m_g3logWorker == nullptr)
         {
-            m_loggerInstance = new Logger();
+            instance.initialize();
         }
-        return m_loggerInstance;
+
+        return instance;
     }
 
-    ~Logger() = default;
+    // Disable copy & move constructors & assignments
+    Logger(const Logger&) = delete;
+    Logger& operator=(const Logger&) = delete;
+    Logger(Logger&&) = delete;
+    Logger& operator=(Logger&&) = delete;
 
-    //std::shared_ptr<g3::LogWorker> getLogWorker() { return m_g3logWorker; }
-
+public:
     ///
     /// \brief Add a sink that logs to standard output
     ///
@@ -98,16 +106,28 @@ public:
     ///
     std::unique_ptr<FileSinkHandle> addFileSink(const std::string& name, const std::string& path);
 
-private:
-    Logger() { initialize(); };
+    ///
+    /// \brief Add your own sink
+    ///
+    template<typename T, typename DefaultLogCall>
+    void addSink(std::unique_ptr<T> real_sink, DefaultLogCall call)
+    {
+        m_g3logWorker->addSink(std::move(real_sink), call);
+    }
 
     ///
     /// \brief Create and initialize the logger
     ///
     void initialize();
 
-    static Logger* m_loggerInstance;
+    ///
+    /// \brief Manual destruction of the logger members
+    ///
+    void destroy() { m_g3logWorker = nullptr; }
+
+private:
+    Logger() { initialize(); }
+
     std::shared_ptr<g3::LogWorker> m_g3logWorker;
-    static std::mutex m_mutex;
 };
 }
