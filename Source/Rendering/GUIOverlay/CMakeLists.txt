@@ -1,6 +1,9 @@
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
+if( NOT iMSTK_USE_Vulkan )
+
+else()
 include(imstkAddLibrary)
 
 file (GLOB_RECURSE GUI_h_files "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.h")
@@ -36,6 +39,7 @@ imstk_add_library( GUIOverlay
     imgui
     ${Vulkan_Dependency}
   )
+endif()  
 
 #-----------------------------------------------------------------------------
 # Testing

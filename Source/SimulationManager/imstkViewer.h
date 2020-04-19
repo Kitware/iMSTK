@@ -29,10 +29,13 @@ namespace imstk
 class SimulationManager;
 class Scene;
 class ScreenCaptureUtility;
+
+#ifdef iMSTK_USE_Vulkan
 namespace GUIOverlay
 {
 class Canvas;
 }
+#endif
 ///
 /// \class Viewer
 ///
@@ -103,10 +106,12 @@ public:
     ///
     virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
+#ifdef iMSTK_USE_Vulkan
     ///
     /// \brief Get canvas
     ///
     const std::shared_ptr<GUIOverlay::Canvas>& getCanvas();
+#endif
 
     ///
     /// \brief Set custom event handlers on interactor style
@@ -136,6 +141,8 @@ protected:
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
     bool m_running = false;
+#ifdef iMSTK_USE_Vulkan
     std::shared_ptr<GUIOverlay::Canvas> m_canvas = nullptr;
+#endif
 };
 }
