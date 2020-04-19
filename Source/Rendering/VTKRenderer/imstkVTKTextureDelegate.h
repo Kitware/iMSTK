@@ -23,11 +23,9 @@
 
 #include "imstkTextureDelegate.h"
 
-//#include <string>
-//#include <memory>
-
-#include <vtkTexture.h>
 #include <vtkSmartPointer.h>
+
+class vtkTexture;
 
 namespace imstk
 {

@@ -24,10 +24,6 @@
 #include "imstkTexture.h"
 #include "imstkTextureDelegate.h"
 
-#include <map>
-#include <string>
-#include <memory>
-
 namespace imstk
 {
 template<class T>

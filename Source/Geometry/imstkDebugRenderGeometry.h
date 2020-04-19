@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkMath.h"
 #include "imstkRenderMaterial.h"
 

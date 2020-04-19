@@ -28,7 +28,6 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkLight.h"
-#include "imstkLogger.h"
 
 #include <vtkLightActor.h>
 #include <vtkCameraActor.h>

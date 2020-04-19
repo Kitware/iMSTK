@@ -21,13 +21,11 @@
 
 #pragma once
 
-#include "imstkMath.h"
-#include "imstkTextureManager.h"
-#include "imstkVTKTextureDelegate.h"
 #include "imstkRenderer.h"
+#include "imstkVTKTextureDelegate.h"
+#include "imstkTextureManager.h"
 
 #include <vtkSmartPointer.h>
-
 #ifdef iMSTK_ENABLE_VR
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRCamera.h>
@@ -48,6 +46,7 @@ namespace imstk
 class Scene;
 class Camera;
 class VTKRenderDelegate;
+//class TextureManager;
 
 ///
 /// \class Renderer
