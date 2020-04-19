@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include "imstkPointSet.h"
 #include "imstkDynamicalModel.h"
 #include "imstkSPHState.h"
 #include "imstkSPHKernels.h"
@@ -29,6 +28,8 @@
 
 namespace imstk
 {
+class PointSet;
+
 ///
 /// \class SPHModelConfig
 /// \brief Class that holds the SPH model parameters

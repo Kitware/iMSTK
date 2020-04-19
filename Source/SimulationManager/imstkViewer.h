@@ -21,18 +21,18 @@
 
 #pragma once
 
-#include <memory>
-
-#include "imstkScene.h"
 #include "imstkRenderer.h"
-#include "imstkScreenCaptureUtility.h"
 #include "imstkInteractorStyle.h"
-#include "imstkGUICanvas.h"
 
 namespace imstk
 {
 class SimulationManager;
-
+class Scene;
+class ScreenCaptureUtility;
+namespace GUIOverlay
+{
+class Canvas;
+}
 ///
 /// \class Viewer
 ///
@@ -42,7 +42,7 @@ class Viewer
 {
 public:
 
-    Viewer() {}
+    Viewer();
     Viewer(SimulationManager*) {}
     virtual ~Viewer() = default;
 
@@ -136,6 +136,6 @@ protected:
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
     bool m_running = false;
-    std::shared_ptr<GUIOverlay::Canvas> m_canvas = std::make_shared<GUIOverlay::Canvas>();
+    std::shared_ptr<GUIOverlay::Canvas> m_canvas = nullptr;
 };
 }

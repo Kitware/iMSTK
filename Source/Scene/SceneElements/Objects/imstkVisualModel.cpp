@@ -20,10 +20,12 @@
 =========================================================================*/
 
 #include "imstkVisualModel.h"
+#include "imstkGeometry.h"
+#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
-VisualModel::VisualModel(std::shared_ptr<Geometry> geometry) : m_geometry(geometry)
+VisualModel::VisualModel(std::shared_ptr<Geometry> geometry) : m_geometry(geometry), m_renderMaterial(std::make_shared<RenderMaterial>())
 {
 }
 

@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include <memory>
-
-#include "imstkLogger.h"
-
 //imstk
 #include "imstkInternalForceModel.h"
+#include "imstkLogger.h"
 
 //vega
 #include "StVKInternalForces.h"

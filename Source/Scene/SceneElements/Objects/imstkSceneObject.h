@@ -24,6 +24,9 @@
 #include "imstkVisualModel.h"
 #include "imstkSceneEntity.h"
 
+#include <string>
+#include <vector>
+
 namespace imstk
 {
 class Geometry;

@@ -23,8 +23,6 @@
 
 #include "imstkMath.h"
 
-#include <memory>
-
 namespace imstk
 {
 class Renderer

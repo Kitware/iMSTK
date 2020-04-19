@@ -22,6 +22,7 @@
 #include "imstkPbdObject.h"
 #include "imstkGeometryMap.h"
 #include "imstkPbdModel.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

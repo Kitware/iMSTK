@@ -20,8 +20,8 @@
 =========================================================================*/
 
 #include "imstkConjugateGradient.h"
-
-#include <iostream>
+#include "imstkLinearProjectionConstraint.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

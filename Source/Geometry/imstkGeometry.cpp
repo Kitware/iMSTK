@@ -26,7 +26,7 @@
 namespace imstk
 {
 Geometry::Geometry(const Geometry::Type type, const std::string& name) :
-    m_type(type), m_name(name), m_geometryIndex(Geometry::getUniqueID())
+    m_type(type), m_name(name), m_geometryIndex(Geometry::getUniqueID()), m_transform(RigidTransform3d::Identity())
 {
     // If the geometry name is empty, enumerate it by name (which will not be duplicated)
     if (m_name.empty())

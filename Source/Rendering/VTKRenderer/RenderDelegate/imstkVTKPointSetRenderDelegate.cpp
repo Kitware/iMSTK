@@ -22,10 +22,10 @@
 #include "imstkVTKPointSetRenderDelegate.h"
 #include "imstkPointSet.h"
 
-#include <vtkTrivialProducer.h>
-#include <vtkDoubleArray.h>
 #include <vtkVertexGlyphFilter.h>
+#include <vtkTrivialProducer.h>
 #include <vtkSphereSource.h>
+#include <vtkDoubleArray.h>
 #include <vtkGlyph3D.h>
 #include <vtkVersion.h>
 

@@ -20,6 +20,7 @@
 =========================================================================*/
 
 // imstk
+#include "imstkScene.h"
 #include "imstkSceneManager.h"
 //#include "imstkCameraController.h"
 #include "imstkCollisionGraph.h"
@@ -27,6 +28,12 @@
 
 namespace imstk
 {
+SceneManager::SceneManager(std::shared_ptr<Scene> scene) :
+    Module(scene->getName()),
+    m_scene(scene)
+{
+}
+
 void
 SceneManager::initModule()
 {
@@ -44,6 +51,12 @@ SceneManager::cleanUpModule()
         m_threadMap.at(camController->getName()).join();
     }*/
 }
+
+void
+SceneManager::runModule()
+{
+    m_scene->advance();
+};
 
 void
 SceneManager::startModuleInNewThread(std::shared_ptr<Module> module)

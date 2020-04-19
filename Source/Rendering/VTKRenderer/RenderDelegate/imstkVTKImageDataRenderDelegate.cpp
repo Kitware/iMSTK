@@ -20,13 +20,14 @@
 =========================================================================*/
 
 #include "imstkVTKImageDataRenderDelegate.h"
+#include "imstkImageData.h"
 
-#include "vtkTrivialProducer.h"
-#include "vtkVolumeProperty.h"
-#include "vtkColorTransferFunction.h"
-#include "vtkPiecewiseFunction.h"
-#include "vtkGPUVolumeRayCastMapper.h"
-#include "vtkImageData.h"
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
+#include <vtkTrivialProducer.h>
+#include <vtkVolumeProperty.h>
+#include <vtkImageData.h>
 
 namespace imstk
 {

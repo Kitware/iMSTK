@@ -28,6 +28,7 @@
 
 #include "imstkTexture.h"
 #include "imstkSceneObject.h"
+#include "imstkMath.h"
 
 namespace imstk
 {

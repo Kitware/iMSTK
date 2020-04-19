@@ -20,8 +20,10 @@
 =========================================================================*/
 
 #include "imstkVTKSphereRenderDelegate.h"
+#include "imstkSphere.h"
 
-#include "vtkSphereSource.h"
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkSphereSource.h>
 
 namespace imstk
 {

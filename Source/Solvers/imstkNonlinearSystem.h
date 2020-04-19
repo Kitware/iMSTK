@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <memory>
-#include <stdio.h>
-
 #include "imstkMath.h"
-#include "imstkLinearProjectionConstraint.h"
+//#include "imstkLinearProjectionConstraint.h"
 
 namespace imstk
 {

@@ -19,14 +19,22 @@
 
 =========================================================================*/
 
+#include "imstkMath.h"
 #include "imstkDeviceTracker.h"
+#include "imstkDeviceClient.h"
+#include "imstkLogger.h"
 
 #include <utility>
 
-#include <g3log/g3log.hpp>
-
 namespace imstk
 {
+DeviceTracker::DeviceTracker(std::shared_ptr<DeviceClient> deviceClient) :
+    m_deviceClient(deviceClient),
+    m_translationOffset(WORLD_ORIGIN),
+    m_rotationOffset(Quatd::Identity())
+{
+}
+
 bool
 DeviceTracker::updateTrackingData()
 {

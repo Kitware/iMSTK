@@ -21,11 +21,16 @@
 
 // imstk
 #include "imstkAPIUtilities.h"
+#include "imstkCamera.h"
 #include "imstkMeshIO.h"
 #include "imstkSimulationManager.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkSceneManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkScene.h"
+#include "imstkVTKRenderer.h"
 
 // STL
 #include <sstream>

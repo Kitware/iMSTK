@@ -19,6 +19,7 @@
 
 =========================================================================*/
 #include "imstkRigidObject.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

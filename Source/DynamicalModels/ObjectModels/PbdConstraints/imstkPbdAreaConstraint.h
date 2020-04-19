@@ -46,9 +46,11 @@ public:
     ///
     /// \brief Initializes the area constraint
     ///
-    void initConstraint(PbdModel& model, const size_t& pIdx1,
-                        const size_t& pIdx2, const size_t& pIdx3,
-                        const double k = 2.5);
+    void initConstraint(PbdModel&     model,
+                        const size_t& pIdx1,
+                        const size_t& pIdx2,
+                        const size_t& pIdx3,
+                        const double  k = 2.5);
 
     ///
     /// \brief Solves the area constraint

@@ -33,6 +33,11 @@
 #include "imstkAPIUtilities.h"
 #include "imstkConjugateGradient.h"
 #include "imstkLight.h"
+#include "imstkCamera.h"
+#include "imstkFEMDeformableBodyModel.h"
+#include "imstkCollisionGraph.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

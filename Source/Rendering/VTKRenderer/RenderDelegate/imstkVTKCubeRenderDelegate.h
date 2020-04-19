@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkVTKRenderDelegate.h"
-#include "imstkCube.h"
 
-#include "vtkTransformPolyDataFilter.h"
+class vtkTransformPolyDataFilter;
 
 namespace imstk
 {

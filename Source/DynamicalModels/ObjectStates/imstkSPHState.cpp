@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkSPHState.h"
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -65,5 +65,65 @@ SPHSimulationState::initializeData()
     m_DiffuseVelocities.resize(numParticles);
     m_NeighborInfo.resize(numParticles);
     m_NeighborLists.resize(numParticles);
+}
+
+///
+/// \brief Get number of particles
+///
+size_t
+SPHSimulationState::getNumParticles() const
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getNumParticles();
+}
+
+///
+/// \brief Returns the vector of all particle positions
+///
+StdVectorOfVec3r&
+SPHSimulationState::getPositions()
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getPositions();
+}
+
+///
+/// \brief Returns the vector of all particle positions
+///
+const StdVectorOfVec3r&
+SPHSimulationState::getPositions() const
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getPositions();
+}
+
+///
+/// \brief Returns the vector of all particle velocities
+///
+StdVectorOfVec3r&
+SPHSimulationState::getVelocities()
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getVelocities();
+}
+
+///
+/// \brief Returns the vector of all particle velocities
+///
+const StdVectorOfVec3r&
+SPHSimulationState::getVelocities() const
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getVelocities();
 }
 } // end namespace imstk

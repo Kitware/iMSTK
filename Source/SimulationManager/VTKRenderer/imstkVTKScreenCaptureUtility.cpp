@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkVTKScreenCaptureUtility.h"
-
 #include "imstkLogger.h"
 
 namespace imstk

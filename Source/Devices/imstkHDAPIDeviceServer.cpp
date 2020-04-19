@@ -22,6 +22,7 @@
 #ifdef iMSTK_USE_OPENHAPTICS
 
 #include "imstkHDAPIDeviceServer.h"
+#include "imstkHDAPIDeviceClient.h"
 
 #include <HD/hd.h>
 

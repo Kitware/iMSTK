@@ -22,14 +22,13 @@
 #pragma once
 
 #include <unordered_map>
-#include <memory>
 #include <thread>
 
 #include "imstkModule.h"
-#include "imstkScene.h"
 
 namespace imstk
 {
+class Scene;
 ///
 /// \class SceneManager
 ///
@@ -41,9 +40,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit SceneManager(std::shared_ptr<Scene> scene) :
-        Module(scene->getName()),
-        m_scene(scene) {}
+    explicit SceneManager(std::shared_ptr<Scene> scene);
 
     ///
     /// \brief Destructor
@@ -64,7 +61,7 @@ protected:
     ///
     /// \brief Run the module
     ///
-    void runModule() override { m_scene->advance(); };
+    void runModule() override;
 
     ///
     /// \brief Clean up the module

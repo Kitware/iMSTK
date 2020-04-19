@@ -20,8 +20,10 @@
 =========================================================================*/
 
 #include "imstkVTKCapsuleRenderDelegate.h"
+#include "imstkCapsule.h"
 
-#include "vtkCapsuleSource.h"
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkCapsuleSource.h>
 
 namespace imstk
 {

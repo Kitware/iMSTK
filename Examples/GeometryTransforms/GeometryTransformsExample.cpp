@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
+#include "imstkCollisionGraph.h"
 #include "imstkSceneObject.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
@@ -27,6 +29,7 @@
 #include "imstkCylinder.h"
 #include "imstkCube.h"
 #include "imstkAPIUtilities.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

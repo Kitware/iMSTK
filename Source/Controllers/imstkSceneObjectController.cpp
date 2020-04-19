@@ -20,7 +20,9 @@
 =========================================================================*/
 
 #include "imstkSceneObjectController.h"
+#include "imstkDeviceTracker.h"
 #include "imstkSceneObject.h"
+#include "imstkDeviceClient.h"
 #include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
 
@@ -30,6 +32,11 @@
 
 namespace imstk
 {
+SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceTracker> trackingController) :
+    m_trackingController(trackingController), m_sceneObject(sceneObject)
+{
+}
+
 void
 SceneObjectController::updateControlledObjects()
 {
@@ -59,5 +66,11 @@ SceneObjectController::applyForces()
     {
         m_trackingController->getDeviceClient()->setForce(collidingObject->getForce());
     }
+}
+
+void
+SceneObjectController::setTrackerToOutOfDate()
+{
+    m_trackingController->setTrackerToOutOfDate();
 }
 } // imstk

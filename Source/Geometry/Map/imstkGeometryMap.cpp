@@ -99,4 +99,12 @@ GeometryMap::getSlave() const
 {
     return m_slave;
 }
+
+void
+GeometryMap::initialize()
+{
+    CHECK(this->isValid()) << "Map is invalid!";
+
+    this->compute();
+}
 } // imstk

@@ -28,14 +28,17 @@
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkLight.h"
-
-#include "vtkLightActor.h"
-#include "vtkCameraActor.h"
-#include "vtkAxesActor.h"
-#include "vtkCullerCollection.h"
-#include "vtkAxesActor.h"
-
 #include "imstkLogger.h"
+
+#include <vtkLightActor.h>
+#include <vtkCameraActor.h>
+#include <vtkAxesActor.h>
+#include <vtkCullerCollection.h>
+#include <vtkAxesActor.h>
+#include <vtkCamera.h>
+#include <vtkProp.h>
+#include <vtkLight.h>
+#include <vtkRenderer.h>
 
 namespace imstk
 {

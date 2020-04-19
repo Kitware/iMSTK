@@ -20,19 +20,20 @@
 =========================================================================*/
 
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
-
 #include "imstkTetrahedralMesh.h"
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkDataSetMapper.h>
-#include <vtkPoints.h>
 #include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
 #include <vtkCellArray.h>
+#include <vtkPointData.h>
 #include <vtkProperty.h>
 #include <vtkPolyData.h>
-#include <vtkPointData.h>
-#include <vtkFloatArray.h>
+#include <vtkPoints.h>
 #include <vtkNew.h>
+
+#include <array>
 
 namespace imstk
 {

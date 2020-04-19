@@ -19,9 +19,37 @@
 
 =========================================================================*/
 
-#include "imstkVTKCustomPolyDataMapper.h"
+#include <fstream>
+#include <sstream>
 
-#include "vtkVersion.h"
+#include "imstkVTKCustomPolyDataMapper.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkGeometry.h"
+
+#include <vtkOpenGLVertexBufferObjectCache.h>
+#include <vtkOpenGLVertexBufferObjectGroup.h>
+#include <vtkOpenGLVertexBufferObject.h>
+#include <vtkOpenGLVertexArrayObject.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLBufferObject.h>
+#include <vtkOpenGLRenderWindow.h>
+#include <vtkLightCollection.h>
+#include <vtkObjectFactory.h>
+#include <vtkShaderProgram.h>
+#include <vtkOpenGLTexture.h>
+#include <vtkRenderWindow.h>
+#include <vtkOpenGLCamera.h>
+#include <vtkOpenGLActor.h>
+#include <vtkOpenGLError.h>
+#include <vtkMatrix4x4.h>
+#include <vtkPointData.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkPolyData.h>
+#include <vtkVersion.h>
+#include <vtkCamera.h>
+#include <vtkActor.h>
+#include <vtkLight.h>
 
 namespace imstk
 {

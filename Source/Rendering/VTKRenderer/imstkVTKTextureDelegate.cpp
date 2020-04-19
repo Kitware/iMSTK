@@ -21,6 +21,14 @@
 
 #include "imstkVTKTextureDelegate.h"
 #include "imstkLogger.h"
+#include "imstkTexture.h"
+#include "imstkTextureDelegate.h"
+#include "imstkTextureManager.h"
+
+#include <vtkSmartPointer.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkImageReader2.h>
+#include <vtkImageFlip.h>
 
 namespace imstk
 {

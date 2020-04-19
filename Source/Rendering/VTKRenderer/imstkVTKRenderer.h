@@ -21,30 +21,27 @@
 
 #pragma once
 
-#include <memory>
-#include <vector>
-
 #include "imstkMath.h"
 #include "imstkTextureManager.h"
 #include "imstkVTKTextureDelegate.h"
 #include "imstkRenderer.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkRenderer.h"
-#include "vtkProp.h"
-#include "vtkCamera.h"
-#include "vtkLight.h"
+#include <vtkSmartPointer.h>
 
 #ifdef iMSTK_ENABLE_VR
-#include "vtkOpenVRRenderer.h"
-#include "vtkOpenVRCamera.h"
-#include "vtkOpenVRRenderWindow.h"
-#include "vtkOpenVRRenderWindowInteractor.h"
-#include "vtkInteractorStyle3D.h"
-#include "vtkOpenVROverlayInternal.h"
+#include <vtkOpenVRRenderer.h>
+#include <vtkOpenVRCamera.h>
+#include <vtkOpenVRRenderWindow.h>
+#include <vtkOpenVRRenderWindowInteractor.h>
+#include <vtkInteractorStyle3D.h>
+#include <vtkOpenVROverlayInternal.h>
 #endif
 
 class vtkAxesActor;
+class vtkCamera;
+class vtkProp;
+class vtkLight;
+class vtkRenderer;
 
 namespace imstk
 {

@@ -19,38 +19,17 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkVTKRenderDelegate.h"
-
-class vtkTransformPolyDataFilter;
+#include "imstkPbdFEMConstraint.h"
 
 namespace imstk
 {
-///
-/// \class CapsuleRenderDelegate
-///
-/// \brief Render capsule using vtk api
-///
-class VTKCapsuleRenderDelegate : public VTKRenderDelegate
+PbdFEMConstraint::PbdFEMConstraint(const unsigned int cardinality,
+                                   MaterialType       mtype /*= MaterialType::StVK*/) :
+    PbdConstraint(),
+    m_elementVolume(0),
+    m_material(mtype),
+    m_invRestMat(Mat3d::Identity())
 {
-public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
-
-    ///
-    /// \brief destructor
-    ///
-    ~VTKCapsuleRenderDelegate() = default;
-
-    ///
-    /// \brief Update capsule source based on the capsule geometry
-    ///
-    void updateDataSource() override;
-
-protected:
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
-};
+    m_vertexIds.resize(cardinality);
+}
 } // imstk

@@ -33,6 +33,8 @@
 
 #include "tetMesh.h"
 
+#include <array>
+
 namespace imstk
 {
 std::shared_ptr<VolumetricMesh>

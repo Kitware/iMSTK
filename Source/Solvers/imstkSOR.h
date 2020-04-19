@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 // iMSTK includes
 #include "imstkNonlinearSystem.h"
 #include "imstkIterativeLinearSolver.h"
@@ -32,6 +30,8 @@
 
 namespace imstk
 {
+class LinearProjectionConstraint;
+
 ///
 /// \brief Successive Over Relaxation (SOR) sparse linear solver
 ///

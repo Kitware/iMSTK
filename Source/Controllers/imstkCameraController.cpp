@@ -20,14 +20,24 @@
 =========================================================================*/
 
 #include "imstkCameraController.h"
+#include "imstkMath.h"
 #include "imstkCamera.h"
+#include "imstkLogger.h"
 
 #include <utility>
 
-#include <g3log/g3log.hpp>
-
 namespace imstk
 {
+CameraController::CameraController(std::shared_ptr<Camera>       camera,
+                                   std::shared_ptr<DeviceClient> deviceClient) :
+    Module("Camera controller"),
+    m_camera(camera),
+    m_cameraTranslationOffset(WORLD_ORIGIN),
+    m_cameraRotationalOffset(Quatd::Identity()),
+    DeviceTracker(deviceClient)
+{
+}
+
 void
 CameraController::runModule()
 {

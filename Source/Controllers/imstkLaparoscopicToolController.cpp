@@ -21,14 +21,31 @@
 
 #include "imstkLaparoscopicToolController.h"
 #include "imstkCollidingObject.h"
+#include "imstkDeviceClient.h"
 #include "imstkGeometry.h"
 #include "imstkSceneObject.h"
 #include "imstkLogger.h"
+#include "imstkMath.h"
 
 #include <utility>
 
 namespace imstk
 {
+LaparoscopicToolController::LaparoscopicToolController(
+    std::shared_ptr<SceneObject>   shaft,
+    std::shared_ptr<SceneObject>   upperJaw,
+    std::shared_ptr<SceneObject>   lowerJaw,
+    std::shared_ptr<DeviceTracker> trackingController) :
+    SceneObjectControllerBase(),
+    m_trackingController(trackingController),
+    m_shaft(shaft),
+    m_upperJaw(upperJaw),
+    m_lowerJaw(lowerJaw),
+    m_jawRotationAxis(Vec3d(0, 1., 0))
+{
+    m_trackingController->getDeviceClient()->setButtonsEnabled(true);
+}
+
 void
 LaparoscopicToolController::updateControlledObjects()
 {

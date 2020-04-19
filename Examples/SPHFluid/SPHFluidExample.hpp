@@ -28,6 +28,9 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkSceneManager.h"
+#include "imstkCamera.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"

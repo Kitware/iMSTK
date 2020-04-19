@@ -21,14 +21,14 @@
 
 #include "imstkVTKdebugTrianglesRenderDelegate.h"
 
-#include <vtkPolyData.h>
+#include <vtkTrivialProducer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkDoubleArray.h>
-#include <vtkCellArray.h>
 #include <vtkFloatArray.h>
+#include <vtkCellArray.h>
 #include <vtkPointData.h>
+#include <vtkPolyData.h>
 #include <vtkProperty.h>
-#include <vtkTrivialProducer.h>
 
 namespace imstk
 {

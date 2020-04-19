@@ -21,36 +21,18 @@
 
 #pragma once
 
-#include <fstream>
-#include <sstream>
-
-#include "vtkOpenGLPolyDataMapper.h"
-#include "vtkOpenGLBufferObject.h"
-#include "vtkObjectFactory.h"
-#include "vtkActor.h"
-#include "vtkProperty.h"
-#include "vtkOpenGLVertexArrayObject.h"
-#include "vtkOpenGLVertexBufferObject.h"
-#include "vtkOpenGLVertexBufferObjectCache.h"
-#include "vtkOpenGLVertexBufferObjectGroup.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkRenderWindow.h"
-#include "vtkShaderProgram.h"
-#include "vtkRenderer.h"
-#include "vtkCamera.h"
-#include "vtkMatrix4x4.h"
-#include "vtkOpenGLCamera.h"
-#include "vtkOpenGLActor.h"
-#include "vtkPolyData.h"
-#include "vtkPointData.h"
-#include "vtkLightCollection.h"
-#include "vtkLight.h"
-#include "vtkOpenGLTexture.h"
-#include "vtkOpenGLError.h"
-
-#include "imstkGeometry.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkRenderMaterial.h"
+
+#include "vtkSetGet.h"
+#include "vtkOpenGLPolyDataMapper.h"
+
+class vtkOpenGLPolyDataMapper;
+class vtkOpenGLBufferObject;
+class vtkOpenGLHelper;
+class vtkOpenGLHelper;
+class vtkRenderer;
+class vtkShader;
+class vtkActor;
 
 namespace imstk
 {

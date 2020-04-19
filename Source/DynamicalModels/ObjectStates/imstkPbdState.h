@@ -21,14 +21,11 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <vector>
-
-#include "imstkPointSet.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
+class PointSet;
 ///
 /// \class PbdState
 ///

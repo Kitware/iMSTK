@@ -24,7 +24,6 @@
 
 #include "imstkDynamicalModel.h"
 #include "imstkRigidBodyState.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkRigidBodyWorld.h"
 
 namespace imstk

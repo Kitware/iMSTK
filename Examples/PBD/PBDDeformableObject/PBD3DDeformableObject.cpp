@@ -27,6 +27,13 @@
 #include "imstkOneToOneMap.h"
 #include "imstkAPIUtilities.h"
 #include "imstkTetraTriangleMap.h"
+#include "imstkCollisionGraph.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkCamera.h"
+#include "imstkPlane.h"
+#include "imstkScene.h"
+
+#include <array>
 
 using namespace imstk;
 

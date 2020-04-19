@@ -28,7 +28,6 @@
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
-#include "imstkLogger.h"
 #include "imstkColor.h"
 
 namespace imstk
@@ -125,9 +124,9 @@ protected:
 
 #pragma warning( push )
 #pragma warning( disable : 4100 )
-    void applyTranslation(const Vec3d t) override { LOG(WARNING) << "applyTranslation Not implemented!"; }
-    void applyRotation(const Mat3d r) override { LOG(WARNING) << "applyRotation Not implemented!"; }
-    void applyScaling(const double s) override { LOG(WARNING) << "applyScaling Not implemented!"; }
+    void applyTranslation(const Vec3d t) override;
+    void applyRotation(const Mat3d r) override;
+    void applyScaling(const double s) override;
 #pragma warning( pop )
 
     virtual void updatePostTransformData() const override {}

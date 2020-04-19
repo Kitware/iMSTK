@@ -22,8 +22,10 @@
 #include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkLogger.h"
 #include "bandwidth.h"
+
 #include <thread>
 
 using namespace imstk;

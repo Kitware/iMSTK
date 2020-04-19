@@ -21,12 +21,15 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkLight.h"
+#include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkAPIUtilities.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkVTKMeshIO.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

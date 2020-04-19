@@ -25,8 +25,6 @@
 #include "imstkLinearSystem.h"
 #include "imstkMath.h"
 
-#include "imstkLogger.h"
-
 namespace imstk
 {
 ///
@@ -97,7 +95,7 @@ public:
     ///
     virtual void print() const
     {
-        LOG(INFO) << "Solver type (broad): Linear";
+        //LOG(INFO) << "Solver type (broad): Linear";
     };
 
     ///

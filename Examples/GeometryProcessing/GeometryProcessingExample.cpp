@@ -27,6 +27,12 @@
 #include "imstkCube.h"
 #include "imstkAPIUtilities.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkCamera.h"
+#include "imstkMeshIO.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkCollisionGraph.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

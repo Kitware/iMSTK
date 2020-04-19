@@ -24,11 +24,13 @@
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkSceneObjectController.h"
+#include "imstkDeviceTracker.h"
 #include "imstkCollisionGraph.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
+#include "imstkScene.h"
 
 // global variables
 const std::string phantomOmni1Name = "Phantom1";

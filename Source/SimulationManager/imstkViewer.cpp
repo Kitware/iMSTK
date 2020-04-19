@@ -20,11 +20,18 @@
 =========================================================================*/
 
 #include "imstkViewer.h"
+#include "imstkScene.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
+#include "imstkScreenCaptureUtility.h"
+#include "imstkGUICanvas.h"
 
 namespace imstk
 {
+Viewer::Viewer() : m_canvas(std::make_shared<GUIOverlay::Canvas>())
+{
+}
+
 const std::shared_ptr<Scene>&
 Viewer::getActiveScene() const
 {

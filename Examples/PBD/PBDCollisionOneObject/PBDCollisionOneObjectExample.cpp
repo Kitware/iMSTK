@@ -31,6 +31,8 @@
 #include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPBDCollisionHandling.h"
 #include "imstkTetraTriangleMap.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

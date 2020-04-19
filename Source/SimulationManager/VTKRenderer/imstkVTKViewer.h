@@ -21,22 +21,9 @@
 
 #pragma once
 
-#include <memory>
-#include <unordered_map>
-
-#include "imstkLogger.h"
-
-#include "imstkScene.h"
-#include "imstkVTKRenderer.h"
-#include "imstkVTKInteractorStyle.h"
 #include "imstkVTKScreenCaptureUtility.h"
 #include "imstkViewer.h"
 #include "imstkVTKRenderDelegate.h"
-#include "vtkSmartPointer.h"
-#include "vtkRenderWindow.h"
-#include "vtkRenderWindowInteractor.h"
-
-//Screenshot utility
 #include "imstkVTKScreenCaptureUtility.h"
 
 #ifdef iMSTK_ENABLE_VR
@@ -45,10 +32,14 @@
 #include "vtkOpenVRRenderWindowInteractor.h"
 #endif
 
+class vtkRenderWindow;
+
 namespace imstk
 {
 class SimulationManager;
 class VTKTextStatusManager;
+class VTKInteractorStyle;
+class Scene;
 
 ///
 /// \class VTKViewer

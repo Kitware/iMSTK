@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkGeometry.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
@@ -57,16 +56,16 @@ public:
 
 protected:
 
-    explicit AnalyticalGeometry(Type type, const std::string& name = std::string("")) : Geometry(type, name) {}
+    explicit AnalyticalGeometry(Type type, const std::string& name = std::string(""));
 
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;
     virtual void updatePostTransformData() const override;
 
-    Vec3d m_position = WORLD_ORIGIN;                          ///> position
-    mutable Vec3d m_positionPostTransform = WORLD_ORIGIN;     ///> position once transform applied
+    Vec3d m_position;                             ///> position
+    mutable Vec3d m_positionPostTransform;        ///> position once transform applied
 
-    Vec3d m_orientationAxis = UP_VECTOR;                      ///> orientation
-    mutable Vec3d m_orientationAxisPostTransform = UP_VECTOR; ///> orientation once transform applied
+    Vec3d m_orientationAxis;                      ///> orientation
+    mutable Vec3d m_orientationAxisPostTransform; ///> orientation once transform applied
 };
 } //imstk

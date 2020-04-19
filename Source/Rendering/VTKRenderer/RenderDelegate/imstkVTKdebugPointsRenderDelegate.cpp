@@ -20,22 +20,21 @@
 =========================================================================*/
 
 #include "imstkVTKdebugPointsRenderDelegate.h"
-
 #include "imstkSurfaceMesh.h"
 
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPoints.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkTrivialProducer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkSphereSource.h>
 #include <vtkDoubleArray.h>
-#include <vtkCellArray.h>
 #include <vtkFloatArray.h>
+#include <vtkCellArray.h>
 #include <vtkPointData.h>
+#include <vtkPolyData.h>
 #include <vtkPolyLine.h>
 #include <vtkProperty.h>
-#include <vtkSphereSource.h>
 #include <vtkGlyph3D.h>
-#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkPoints.h>
 
 namespace imstk
 {

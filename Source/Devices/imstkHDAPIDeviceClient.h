@@ -24,13 +24,9 @@
 #ifndef imstkHDAPIDeviceClient_h
 #define imstkHDAPIDeviceClient_h
 
-#include <map>
-
 #include "imstkDeviceClient.h"
 
 #include <HD/hd.h>
-
-#include <memory>
 
 namespace imstk
 {

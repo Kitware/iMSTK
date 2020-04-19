@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
-// iMSTK includes
-#include "imstkNonlinearSystem.h"
 #include "imstkIterativeLinearSolver.h"
 
 // Eigen includes
@@ -32,6 +28,7 @@
 
 namespace imstk
 {
+class LinearProjectionConstraint;
 ///
 /// \brief Conjugate gradient sparse linear solver for SPD matrices
 ///

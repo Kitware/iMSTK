@@ -20,7 +20,8 @@
 =========================================================================*/
 
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
-
+#include "imstkVTKTextureDelegate.h"
+#include "imstkTextureManager.h"
 #include "imstkSurfaceMesh.h"
 
 #include <vtkPolyData.h>

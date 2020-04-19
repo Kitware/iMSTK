@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkBoneDrillingCH.h"
-
 #include "imstkCollidingObject.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkCollisionData.h"

@@ -21,17 +21,12 @@
 
 #pragma once
 
-#include <memory>
-
-// iMSTK includes
-#include "imstkNonlinearSystem.h"
 #include "imstkIterativeLinearSolver.h"
-
-// Eigen includes
-#include <Eigen/IterativeLinearSolvers>
 
 namespace imstk
 {
+class LinearProjectionConstraint;
+
 ///
 /// \brief Jacobi sparse linear solver
 ///

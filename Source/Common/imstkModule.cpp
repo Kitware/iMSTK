@@ -21,9 +21,18 @@
 
 #include "imstkModule.h"
 #include "imstkMath.h"
+#include "imstkTimer.h"
 
 namespace imstk
 {
+Module::Module(const std::string& name, int loopDelay /*= 0*/) :
+    m_name(name),
+    m_frameCounter(std::make_shared<UPSCounter>()),
+    m_trackFPS(false),
+    m_loopDelay(loopDelay)
+{
+}
+
 void
 Module::start()
 {

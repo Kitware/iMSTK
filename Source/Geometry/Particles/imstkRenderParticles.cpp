@@ -91,4 +91,22 @@ RenderParticles::getMaxNumParticles()
 {
     return m_maxNumParticles;
 }
+
+void
+RenderParticles::applyTranslation(const Vec3d t)
+{
+    LOG(WARNING) << "applyTranslation Not implemented!";
+}
+
+void
+RenderParticles::applyRotation(const Mat3d r)
+{
+    LOG(WARNING) << "applyRotation Not implemented!";
+}
+
+void
+RenderParticles::applyScaling(const double s)
+{
+    LOG(WARNING) << "applyScaling Not implemented!";
+}
 }

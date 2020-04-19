@@ -27,7 +27,9 @@
 #include "imstkSceneManager.h"
 #include "imstkCube.h"
 #include "imstkDummyClient.h"
+#include "imstkDeviceTracker.h"
 #include "imstkSceneObjectController.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

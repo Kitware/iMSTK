@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <limits>
-
 // imstk
 #include "imstkGeometryMap.h"
 

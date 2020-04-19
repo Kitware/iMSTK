@@ -21,10 +21,7 @@
 
 #pragma once
 
-#include <memory>
 #include <chrono>
-#include <unordered_map>
-#include <functional>
 
 #include "imstkInteractorStyle.h"
 

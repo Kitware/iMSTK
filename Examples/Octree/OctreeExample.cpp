@@ -27,7 +27,13 @@
 #include "imstkVTKViewer.h"
 #include "imstkTimer.h"
 #include "imstkLight.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkSceneManager.h"
+#include "imstkCamera.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkScene.h"
+#include "imstkVTKRenderer.h"
 
 #include <thread>
 #include <chrono>

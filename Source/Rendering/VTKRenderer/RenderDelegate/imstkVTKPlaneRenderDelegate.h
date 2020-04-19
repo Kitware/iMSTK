@@ -21,15 +21,14 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkVTKRenderDelegate.h"
-#include "imstkPlane.h"
 
-#include "vtkTransformPolyDataFilter.h"
+class vtkTransformPolyDataFilter;
 
 namespace imstk
 {
+class Plane;
+
 ///
 /// \class PlaneRenderDelegate
 ///

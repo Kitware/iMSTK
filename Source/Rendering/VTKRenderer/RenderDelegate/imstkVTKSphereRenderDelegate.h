@@ -21,15 +21,13 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkVTKRenderDelegate.h"
-#include "imstkSphere.h"
 
-#include "vtkTransformPolyDataFilter.h"
+class vtkTransformPolyDataFilter;
 
 namespace imstk
 {
+class VisualModel;
 ///
 /// \class SphereRenderDelegate
 ///

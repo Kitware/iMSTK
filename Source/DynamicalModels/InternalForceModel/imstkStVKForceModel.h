@@ -21,21 +21,18 @@
 
 #pragma once
 
-#include <memory>
-#include "imstkLogger.h"
-
 //imstk
 #include "imstkInternalForceModel.h"
+#include "imstkLogger.h"
 
+//vega
 #pragma warning( push )
 #pragma warning( disable : 4458 )
-//vega
 #include "StVKInternalForces.h"
 #pragma warning( pop )
 
 #include "StVKStiffnessMatrix.h"
 #include "StVKElementABCDLoader.h"
-
 #include "tetMesh.h"
 
 namespace imstk

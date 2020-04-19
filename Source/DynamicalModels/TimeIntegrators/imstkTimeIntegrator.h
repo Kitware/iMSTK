@@ -21,11 +21,6 @@
 
 #pragma once
 
-#include <array>
-#include "imstkLogger.h"
-
-#include "Eigen/Sparse"
-
 #include "imstkVectorizedState.h"
 
 namespace imstk

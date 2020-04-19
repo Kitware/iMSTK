@@ -21,8 +21,16 @@
 
 #include "imstkVTKViewer.h"
 #include "imstkVTKRenderDelegate.h"
+#include "imstkVTKInteractorStyle.h"
 #include "imstkCollisionGraph.h"
+#include "imstkVTKRenderer.h"
 #include "imstkCamera.h"
+#include "imstkLogger.h"
+#include "imstkScene.h"
+
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 
 namespace imstk
 {
