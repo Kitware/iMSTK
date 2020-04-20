@@ -22,6 +22,7 @@
 #include "imstkDynamicObject.h"
 #include "imstkGeometryMap.h"
 #include "imstkAbstractDynamicalModel.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

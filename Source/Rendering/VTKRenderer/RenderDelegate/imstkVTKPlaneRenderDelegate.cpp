@@ -20,8 +20,10 @@
 =========================================================================*/
 
 #include "imstkVTKPlaneRenderDelegate.h"
+#include "imstkPlane.h"
 
-#include "vtkPlaneSource.h"
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkPlaneSource.h>
 
 namespace imstk
 {

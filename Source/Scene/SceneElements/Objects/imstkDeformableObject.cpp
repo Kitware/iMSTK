@@ -21,6 +21,7 @@
 
 #include "imstkDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

@@ -22,8 +22,11 @@
 #include "imstkSimulationManager.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVisualObjectImporter.h"
+#include "imstkCollisionGraph.h"
 #include "imstkIBLProbe.h"
+#include "imstkCamera.h"
 #include "imstkLight.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

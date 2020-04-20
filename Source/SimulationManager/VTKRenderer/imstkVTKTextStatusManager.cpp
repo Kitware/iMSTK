@@ -27,6 +27,7 @@
 #include "imstkCamera.h"
 
 #include "vtkTextActor.h"
+#include "vtkRenderWindow.h"
 #include "vtkTextProperty.h"
 
 #include <algorithm>

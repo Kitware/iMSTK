@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkThreadManager.h"
+
 #include <g3log/g3log.hpp>
 
 namespace imstk

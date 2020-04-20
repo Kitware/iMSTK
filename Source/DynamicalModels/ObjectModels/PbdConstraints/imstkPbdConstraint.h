@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkMath.h"
+#include <vector>
 
 namespace imstk
 {

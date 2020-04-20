@@ -27,6 +27,7 @@
 #include "imstkCube.h"
 #include "imstkSphere.h"
 #include "imstkPlane.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

@@ -24,7 +24,11 @@
 namespace  imstk
 {
 LinearProjectionConstraint::
-LinearProjectionConstraint(const size_t& nodeId, const bool isFixed /*= false*/)
+LinearProjectionConstraint(const size_t& nodeId,
+                           const bool    isFixed /*= false*/) :
+    m_isFixedConstraint(false),
+    m_projection(Mat3d::Identity()),
+    m_value(Vec3d(0., 0., 0.))
 {
     m_nodeId = nodeId;
     if (isFixed)

@@ -90,6 +90,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type                     
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, capsule)
         return std::make_shared<PointSetToCapsuleCD>(pointset, capsule, colData);
     }
+#if 0
     case Type::PointSetToSpherePicking:
     {
         auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
@@ -97,6 +98,7 @@ CollisionDetection::makeCollisionDetectionObject(const Type                     
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, sphere)
         return std::make_shared<PointSetToSpherePickingCD>(pointset, sphere, colData);
     }
+#endif
     case Type::PointSetToSurfaceMesh:
     {
         const auto& geomA    = objA->getCollidingGeometry();

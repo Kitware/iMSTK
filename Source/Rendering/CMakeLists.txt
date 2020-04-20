@@ -95,7 +95,7 @@ if( NOT iMSTK_USE_Vulkan )
     VTKRenderer
     VTKRenderer/RenderDelegate)
   set(RENDERING_DEPENDENCIES
-    GUIOverlay
+    #GUIOverlay
     Materials)
 else()
   set(RENDERING_H_FILES ${VULKAN_H_FILES})

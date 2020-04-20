@@ -32,6 +32,7 @@
 #include "imstkSphere.h"
 #include "imstkMeshIO.h"
 #include "imstkIsometricMap.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

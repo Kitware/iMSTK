@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <map>
-
 #include "imstkMath.h"
 
 namespace imstk
@@ -100,9 +98,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DeviceClient(const std::string& name, const std::string& ip) :
-        m_deviceName(name),
-        m_ip(ip) {}
+    DeviceClient(const std::string& name, const std::string& ip);
 
     std::string m_deviceName;                ///< Device Name
     std::string m_ip;                        ///< Connection device IP
@@ -112,10 +108,10 @@ protected:
     bool m_buttonsEnabled  = true;           ///< Buttons enabled if true
     bool m_forceEnabled    = false;          ///< Force enabled if true
 
-    Vec3d m_position    = Vec3d::Zero();     ///< Position of end effector
-    Vec3d m_velocity    = Vec3d::Zero();     ///< Linear velocity of end effector
-    Quatd m_orientation = Quatd::Identity(); ///< Orientation of the end effector
+    Vec3d m_position;                        ///< Position of end effector
+    Vec3d m_velocity;                        ///< Linear velocity of end effector
+    Quatd m_orientation;                     ///< Orientation of the end effector
     std::map<size_t, bool> m_buttons;        ///< Buttons: true = pressed/false = not pressed
-    Vec3d m_force = Vec3d::Zero();           ///< Force vector
+    Vec3d m_force;                           ///< Force vector
 };
 }

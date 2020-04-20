@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkIterativeLinearSolver.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

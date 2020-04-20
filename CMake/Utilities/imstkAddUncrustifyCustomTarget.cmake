@@ -1,5 +1,5 @@
 # Add target to run uncrustify
-  add_custom_target(uncrustifyRun
+  add_custom_target(CodeFormatter
     COMMAND ${Uncrustify_EXECUTABLE}
       -c ${CMAKE_CURRENT_LIST_DIR}/../../Utilities/Uncrustify/iMSTKUncrustify.cfg
       -F ${CMAKE_CURRENT_BINARY_DIR}/Uncrustify.list
@@ -11,11 +11,11 @@
 	#-----------------------------------------------------------------------------
     # Add the target to iMSTK folder
     #-----------------------------------------------------------------------------
-    SET_TARGET_PROPERTIES (uncrustifyRun PROPERTIES FOLDER iMSTK)
+    #SET_TARGET_PROPERTIES (uncrustifyRun PROPERTIES FOLDER iMSTK)
 
   if(BUILD_TESTING)
     # Add test to check style using uncrustify
-    add_test(NAME uncrustifyCheck
+    add_test(NAME CodeFormatTest
       COMMAND ${Uncrustify_EXECUTABLE}
       -c ${CMAKE_CURRENT_LIST_DIR}/../../Utilities/Uncrustify/iMSTKUncrustify.cfg
       -F ${CMAKE_CURRENT_BINARY_DIR}/Uncrustify.list

@@ -22,11 +22,15 @@
 #pragma once
 
 #include "imstkMath.h"
-#include "tbb/tbb.h"
+
+#include <tbb\concurrent_unordered_set.h>
 
 namespace imstk
 {
-namespace ParallelUtils { class SpinLock; }
+namespace ParallelUtils
+{
+class SpinLock;
+}
 
 ///
 /// \class Geometry
@@ -213,7 +217,7 @@ protected:
     bool m_transformModified = false;
     mutable bool m_transformApplied = true;
 
-    RigidTransform3d m_transform = RigidTransform3d::Identity(); ///> Transformation matrix
+    RigidTransform3d m_transform; ///> Transformation matrix
     double m_scaling = 1.0;
 };
 } //imstk

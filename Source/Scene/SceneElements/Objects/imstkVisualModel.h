@@ -23,11 +23,10 @@
 
 #include <memory>
 
-#include "imstkGeometry.h"
-#include "imstkRenderMaterial.h"
-
 namespace imstk
 {
+class Geometry;
+class RenderMaterial;
 ///
 /// \class VisualModel
 ///
@@ -68,8 +67,8 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VTKRenderer;
 
-    std::shared_ptr<Geometry>       m_geometry       = nullptr;
-    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr;
+    std::shared_ptr<Geometry>       m_geometry = nullptr;
+    std::shared_ptr<RenderMaterial> m_renderMaterial;
 
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
     bool m_renderDelegateCreated = false; ///< true if RenderDelegate has been created

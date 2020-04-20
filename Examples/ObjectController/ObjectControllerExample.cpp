@@ -28,6 +28,8 @@
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkSceneObjectController.h"
 #include "imstkCollisionGraph.h"
+#include "imstkDeviceTracker.h"
+#include "imstkScene.h"
 
 // global variables
 const std::string phantomOmni1Name = "Phantom1";

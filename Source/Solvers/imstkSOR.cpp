@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkSOR.h"
+#include "imstkLogger.h"
+#include "imstkLinearProjectionConstraint.h"
 
 namespace imstk
 {

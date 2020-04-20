@@ -24,6 +24,7 @@
 #include "imstkNewtonSolver.h"
 #include "imstkIterativeLinearSolver.h"
 #include "imstkConjugateGradient.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

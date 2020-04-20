@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include "imstkLogger.h"
-
 #include "imstkMath.h"
 #include "imstkInternalForceModelTypes.h"
 

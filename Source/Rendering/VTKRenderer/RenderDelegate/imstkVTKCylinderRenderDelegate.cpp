@@ -20,6 +20,10 @@
 =========================================================================*/
 
 #include "imstkVTKCylinderRenderDelegate.h"
+#include "imstkCylinder.h"
+
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkCylinderSource.h>
 
 namespace imstk
 {

@@ -24,12 +24,15 @@
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkMeshIO.h"
+#include "imstkScene.h"
 
 // Devices and controllers
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkCameraController.h"
 #include "imstkCollisionGraph.h"
+
+#include "imstkScene.h"
 
 const std::string phantomOmni1Name = "Phantom1";
 

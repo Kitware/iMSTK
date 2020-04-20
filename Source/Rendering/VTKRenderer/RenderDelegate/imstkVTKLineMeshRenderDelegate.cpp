@@ -20,17 +20,18 @@
 =========================================================================*/
 
 #include "imstkVTKLineMeshRenderDelegate.h"
-
 #include "imstkLineMesh.h"
 
-#include <vtkLineSource.h>
+#include <vtkUnsignedCharArray.h>
+#include <vtkTrivialProducer.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkPoints.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
+#include <vtkLineSource.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
 #include <vtkLine.h>
-#include <vtkTrivialProducer.h>
-#include <vtkUnsignedCharArray.h>
 
 namespace imstk
 {

@@ -20,11 +20,25 @@
 =========================================================================*/
 
 #include "imstkViewer.h"
+#include "imstkScene.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
+#include "imstkLogger.h"
+#include "imstkScreenCaptureUtility.h"
+
+#ifdef iMSTK_USE_Vulkan
+#include "imstkGUICanvas.h"
+#endif
 
 namespace imstk
 {
+Viewer::Viewer()
+{
+#ifdef iMSTK_USE_Vulkan
+    m_canvas(std::make_shared<GUIOverlay::Canvas>())
+#endif
+}
+
 const std::shared_ptr<Scene>&
 Viewer::getActiveScene() const
 {
@@ -51,11 +65,14 @@ Viewer::getScreenCaptureUtility() const
     return m_screenCapturer;
 }
 
+#ifdef iMSTK_USE_Vulkan
 const std::shared_ptr<GUIOverlay::Canvas>&
 Viewer::getCanvas()
 {
     return m_canvas;
 }
+
+#endif
 
 void
 Viewer::setOnCharFunction(char c, EventHandlerFunction func)

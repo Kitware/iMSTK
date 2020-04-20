@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <array>
 
 #include "imstkMSHMeshIO.h"
 #include "imstkTetrahedralMesh.h"

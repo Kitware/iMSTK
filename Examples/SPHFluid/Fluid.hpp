@@ -23,6 +23,8 @@
 #include "imstkSPHObject.h"
 #include "imstkSPHSolver.h"
 #include "imstkSPHModel.h"
+#include "imstkPointSet.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

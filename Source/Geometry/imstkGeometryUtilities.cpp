@@ -25,6 +25,8 @@
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkColor.h"
+
 #include <vtkAppendPolyData.h>
 #include <vtkCleanPolyData.h>
 #include <vtkDataSet.h>

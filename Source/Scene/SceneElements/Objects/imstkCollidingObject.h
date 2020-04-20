@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkSceneObject.h"
+#include "imstkMath.h"
 
 namespace imstk
 {

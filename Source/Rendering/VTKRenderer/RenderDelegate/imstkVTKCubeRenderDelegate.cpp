@@ -20,7 +20,9 @@
 =========================================================================*/
 
 #include "imstkVTKCubeRenderDelegate.h"
+#include "imstkCube.h"
 
+#include "vtkTransformPolyDataFilter.h"
 #include "vtkCubeSource.h"
 
 namespace imstk

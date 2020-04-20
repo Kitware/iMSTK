@@ -21,14 +21,11 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkVTKRenderDelegate.h"
-#include "imstkCylinder.h"
 
-#include "vtkTransformPolyDataFilter.h"
+class vtkTransformPolyDataFilter;
+class vtkCylinderSource;
 
-#include "vtkCylinderSource.h"
 namespace imstk
 {
 ///

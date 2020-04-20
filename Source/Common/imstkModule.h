@@ -24,11 +24,11 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
-#include "imstkLogger.h"
-#include "imstkTimer.h"
 
 namespace imstk
 {
+class UPSCounter;
+
 ///
 /// \brief Enumerations for the status of the module
 ///
@@ -55,10 +55,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Module(const std::string& name, int loopDelay = 0) :
-        m_name(name),
-        m_frameCounter(std::make_shared<UPSCounter>()),
-        m_loopDelay(loopDelay) {}
+    Module(const std::string& name, int loopDelay = 0);
 
     ///
     /// \brief Destructor
@@ -145,19 +142,18 @@ protected:
     ///
     virtual void cleanUpModule() = 0;
 
-    CallbackFunction m_preInitCallback;                            ///> function callback preceding module initialization
-    CallbackFunction m_postInitCallback;                           ///> function callback following module initialization
-    CallbackFunction m_preUpdateCallback;                          ///> function callback preceding module update
-    CallbackFunction m_postUpdateCallback;                         ///> function callback following module update
-    CallbackFunction m_preCleanUpCallback;                         ///> function callback preceding module cleanup
-    CallbackFunction m_postCleanUpCallback;                        ///> function callback following module cleanup
+    CallbackFunction m_preInitCallback;                              ///> function callback preceding module initialization
+    CallbackFunction m_postInitCallback;                             ///> function callback following module initialization
+    CallbackFunction m_preUpdateCallback;                            ///> function callback preceding module update
+    CallbackFunction m_postUpdateCallback;                           ///> function callback following module update
+    CallbackFunction m_preCleanUpCallback;                           ///> function callback preceding module cleanup
+    CallbackFunction m_postCleanUpCallback;                          ///> function callback following module cleanup
 
-    std::atomic<ModuleStatus> m_status { ModuleStatus::Inactive }; ///> Module status
+    std::atomic<ModuleStatus>   m_status { ModuleStatus::Inactive }; ///> Module status
+    std::shared_ptr<UPSCounter> m_frameCounter;
 
-    bool m_trackFPS = false;
-    std::shared_ptr<UPSCounter> m_frameCounter = nullptr;
-
-    std::string m_name;                                            ///> Name of the module
-    double      m_loopDelay = 0;                                   ///> Loop delay
+    std::string m_name;      ///> Name of the module
+    double      m_loopDelay; ///> Loop delay
+    bool m_trackFPS;         ///> Flag to enable/diable FPS tracking
 };
 }

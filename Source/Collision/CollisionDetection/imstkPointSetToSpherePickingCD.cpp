@@ -18,7 +18,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 =========================================================================*/
-
+#if 0
 #include "imstkPointSetToSpherePickingCD.h"
 #include "imstkDeviceTracker.h"
 #include "imstkNarrowPhaseCD.h"
@@ -59,3 +59,4 @@ PointSetToSpherePickingCD::setDeviceTrackerAndButton(const std::shared_ptr<Devic
     m_deviceTracker = devTracker;
 }
 } // imstk
+#endif

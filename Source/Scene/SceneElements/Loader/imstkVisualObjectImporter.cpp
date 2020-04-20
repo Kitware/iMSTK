@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVisualObjectImporter.h"
+#include "imstkRenderMaterial.h"
 
 #include "assimp/Importer.hpp"
 #include "assimp/mesh.h"

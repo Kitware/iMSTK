@@ -26,6 +26,8 @@
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
 #include "imstkTimer.h"
+#include "imstkLogger.h"
+#include "imstkScene.h"
 
 #include <string>
 

@@ -25,15 +25,13 @@
 #define imstkHDAPIDeviceServer_h
 
 #include <vector>
-#include <map>
-#include <typeinfo>
 
 // imstk
 #include "imstkModule.h"
-#include "imstkHDAPIDeviceClient.h"
 
 namespace imstk
 {
+class HDAPIDeviceClient;
 ///
 /// \class HDAPIDeviceServer
 /// \brief Devices server using HDAPI

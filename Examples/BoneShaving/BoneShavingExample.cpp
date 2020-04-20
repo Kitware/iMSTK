@@ -22,6 +22,7 @@
 #include "imstkMath.h"
 #include "imstkTimer.h"
 #include "imstkSimulationManager.h"
+#include "imstkScene.h"
 
 // Objects
 #include "imstkSceneObject.h"
@@ -35,6 +36,7 @@
 #include "imstkMeshIO.h"
 
 // Devices and controllers
+#include "imstkDeviceTracker.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkSceneObjectController.h"

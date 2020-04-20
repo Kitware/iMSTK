@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    StopWatch() {};
+    StopWatch() : state(TimerState::stopped) {};
 
     ///
     /// \brief Destructor
@@ -108,7 +108,7 @@ public:
     ///
     void printTimeElapsed(std::string const& name = std::string("noName"), const TimeUnitType unitType = TimeUnitType::milliSeconds);
 private:
-    TimerState state = TimerState::stopped;
+    TimerState state;
     std::vector<double>      lapTimes;
     std::vector<std::string> lapNames;
     std::chrono::high_resolution_clock::time_point wallClockTimeKeeper; ///> time keeper for wall clock time
@@ -125,7 +125,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    CpuTimer() : StopWatch() {};
+    CpuTimer() : StopWatch(), cpuTimeKeeper(std::clock_t()) {};
 
     ///
     /// \brief Destructor
@@ -145,7 +145,7 @@ public:
     double getTimeElapsed(const TimeUnitType unitType = TimeUnitType::milliSeconds) override;
 
 private:
-    std::clock_t cpuTimeKeeper = std::clock_t(); ///> time keeper for cpu time
+    std::clock_t cpuTimeKeeper; ///> time keeper for cpu time
 };
 
 ///
@@ -159,7 +159,11 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    UPSCounter() : m_timer(std::make_shared<StopWatch>()) {};
+    UPSCounter() :  m_timer(std::make_shared<StopWatch>()),
+        m_accumulatedTimer(0.),
+        m_ups(0),
+        m_updateCount(0) {};
+
     ~UPSCounter() = default;
 
     ///
@@ -184,10 +188,10 @@ public:
 
 protected:
 
-    std::shared_ptr<StopWatch> m_timer = nullptr; ///> Timer
+    std::shared_ptr<StopWatch> m_timer; ///> Timer
 
-    double       m_accumulatedTimer = 0.;         ///> Accumulated time (always < 1 sec)
-    unsigned int m_ups = 0;                       ///> Most up-to-date ups
-    unsigned int m_updateCount = 0;               ///> Current update count
+    double       m_accumulatedTimer;    ///> Accumulated time (always < 1 sec)
+    unsigned int m_ups;                 ///> Most up-to-date ups
+    unsigned int m_updateCount;         ///> Current update count
 };
 }

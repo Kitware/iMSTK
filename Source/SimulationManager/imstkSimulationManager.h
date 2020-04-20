@@ -21,14 +21,9 @@
 
 #pragma once
 
-//#include <unordered_map>
-//#include <vector>
-//#include <thread>
 #include <mutex>
-#include <memory>
 
 #include "imstkModule.h"
-#include "imstkLogger.h"
 
 #ifdef iMSTK_USE_Vulkan
 #include "imstkVulkanViewer.h"
@@ -40,6 +35,7 @@ namespace imstk
 {
 class SceneManager;
 class Scene;
+struct SceneConfig;
 class Viewer;
 
 using SimulationStatus = ModuleStatus;

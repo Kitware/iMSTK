@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkVTKRenderDelegate.h"
 
 class vtkDoubleArray;

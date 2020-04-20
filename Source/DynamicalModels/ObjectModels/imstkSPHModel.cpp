@@ -21,7 +21,7 @@
 
 #include "imstkSPHModel.h"
 #include "imstkParallelUtils.h"
-#include <g3log/g3log.hpp>
+#include "imstkPointSet.h"
 
 namespace imstk
 {

@@ -21,14 +21,12 @@
 
 #pragma once
 
-#include <memory>
-
-// imstk
 #include "imstkMath.h"
-#include "imstkDeviceClient.h"
 
 namespace imstk
 {
+class DeviceClient;
+
 ///
 /// \class DeviceTracker
 ///
@@ -51,8 +49,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit DeviceTracker(std::shared_ptr<DeviceClient> deviceClient) :
-        m_deviceClient(deviceClient) {}
+    explicit DeviceTracker(std::shared_ptr<DeviceClient> deviceClient);
 
     ///
     /// \brief Destructor
@@ -119,8 +116,8 @@ protected:
 
     std::shared_ptr<DeviceClient> m_deviceClient;          ///< Reports device tracking information
     double m_scaling = 1.0;                                ///< Scaling factor for physical to virtual translations
-    Vec3d  m_translationOffset  = WORLD_ORIGIN;            ///< Translation concatenated to the device translation
-    Quatd  m_rotationOffset     = Quatd::Identity();       ///< Rotation concatenated to the device rotation
+    Vec3d  m_translationOffset;                            ///< Translation concatenated to the device translation
+    Quatd  m_rotationOffset;                               ///< Rotation concatenated to the device rotation
     unsigned char m_invertFlags = 0x00;                    ///< Invert flags to be masked with DeviceTracker::InvertFlag
 
     Vec3d m_currentPos;

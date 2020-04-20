@@ -29,6 +29,8 @@
 #include "imstkAPIUtilities.h"
 #include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkPBDCollisionHandling.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

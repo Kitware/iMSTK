@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkGeometry.h"
-#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -119,12 +118,7 @@ public:
     ///
     /// \brief Initialize the map
     ///
-    virtual void initialize()
-    {
-        LOG_IF(FATAL, (!this->isValid())) << "Map is invalid!";
-
-        this->compute();
-    }
+    virtual void initialize();
 
 protected:
 
@@ -138,7 +132,9 @@ protected:
     ///
     GeometryMap(const std::shared_ptr<Geometry> master,
                 const std::shared_ptr<Geometry> slave,
-                Type                            type) : m_type(type), m_isActive(true)
+                Type                            type) :
+        m_type(type),
+        m_isActive(true)
     {
         this->setMaster(master);
         this->setSlave(slave);

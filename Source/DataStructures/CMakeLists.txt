@@ -5,7 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( DataStructures
   DEPENDS
     Common
-    Materials
+    #Materials
     Geometry
   )
 

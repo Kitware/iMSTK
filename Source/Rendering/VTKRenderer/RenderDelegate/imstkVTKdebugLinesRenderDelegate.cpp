@@ -22,16 +22,16 @@
 #include "imstkVTKdebugLinesRenderDelegate.h"
 #include "imstkSurfaceMesh.h"
 
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPoints.h>
-#include <vtkDoubleArray.h>
-#include <vtkCellArray.h>
-#include <vtkFloatArray.h>
-#include <vtkPointData.h>
-#include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkTrivialProducer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkDoubleArray.h>
+#include <vtkFloatArray.h>
+#include <vtkCellArray.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkProperty.h>
+#include <vtkPoints.h>
 #include <vtkLine.h>
 
 namespace imstk

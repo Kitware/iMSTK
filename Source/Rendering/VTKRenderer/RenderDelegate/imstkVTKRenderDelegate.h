@@ -21,8 +21,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include "imstkGeometry.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVTKTextureDelegate.h"
@@ -31,14 +29,14 @@
 #include "imstkDebugRenderGeometry.h"
 #include "imstkVisualModel.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkAlgorithmOutput.h"
-#include "vtkActor.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkTransform.h"
-#include "vtkProperty.h"
-#include "vtkGPUVolumeRayCastMapper.h"
-#include "vtkVolume.h"
+#include <vtkSmartPointer.h>
+#include <vtkAlgorithmOutput.h>
+#include <vtkActor.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkTransform.h>
+#include <vtkProperty.h>
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkVolume.h>
 
 namespace imstk
 {

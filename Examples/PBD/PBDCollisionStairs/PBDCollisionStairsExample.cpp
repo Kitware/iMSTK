@@ -31,7 +31,9 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraTriangleMap.h"
 #include "imstkCollisionGraph.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkLight.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

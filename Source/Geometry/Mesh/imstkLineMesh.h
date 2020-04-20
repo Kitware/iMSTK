@@ -21,14 +21,14 @@
 
 #pragma once
 
-#include <memory>
 #include <array>
 
 #include "imstkPointSet.h"
-#include "imstkColor.h"
 
 namespace imstk
 {
+struct Color;
+
 ///
 /// \class LineMesh
 ///

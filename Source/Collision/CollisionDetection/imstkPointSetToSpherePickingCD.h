@@ -18,7 +18,7 @@
    limitations under the License.
 
    =========================================================================*/
-
+#if 0
 #pragma once
 
 #include "imstkCollisionDetection.h"
@@ -61,7 +61,8 @@ private:
     std::shared_ptr<PointSet> m_pointSet;
     std::shared_ptr<Sphere>   m_sphere;
 
-    std::shared_ptr<imstk::DeviceTracker> m_deviceTracker; ///> Device tracker to get the button status
+    std::shared_ptr<DeviceTracker> m_deviceTracker;        ///> Device tracker to get the button status
     unsigned int m_buttonId = 0;                           ///> button id
 };
 }
+#endif

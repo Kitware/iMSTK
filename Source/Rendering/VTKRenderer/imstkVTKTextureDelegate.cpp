@@ -20,7 +20,11 @@
 =========================================================================*/
 
 #include "imstkVTKTextureDelegate.h"
-#include "imstkLogger.h"
+
+#include <vtkImageReader2Factory.h>
+#include <vtkImageReader2.h>
+#include <vtkImageFlip.h>
+#include <vtkTexture.h>
 
 namespace imstk
 {

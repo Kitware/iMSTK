@@ -21,13 +21,10 @@
 
 #pragma once
 
-#include <map>
-
 #include "imstkDeviceClient.h"
 #include "imstkModule.h"
 
-#include <memory>
-
+// vrpn includes
 #include <vrpn_Configure.h>
 #include <vrpn_Tracker.h>
 #include <vrpn_Analog.h>

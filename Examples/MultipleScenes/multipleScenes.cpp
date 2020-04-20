@@ -24,6 +24,13 @@
 #include "imstkPbdObject.h"
 #include "imstkAPIUtilities.h"
 #include "imstkOneToOneMap.h"
+#include "imstkCamera.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkMeshIO.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkCollisionGraph.h"
+#include "imstkPlane.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

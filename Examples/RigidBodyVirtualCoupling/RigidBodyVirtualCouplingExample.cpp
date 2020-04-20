@@ -39,6 +39,8 @@
 #include "imstkCamera.h"
 #include "imstkRigidBodyModel.h"
 #include "imstkCollisionGraph.h"
+#include "imstkDeviceTracker.h"
+#include "imstkScene.h"
 
 // global variables
 const std::string phantomOmni1Name = "Default Device";

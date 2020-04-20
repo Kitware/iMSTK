@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkSceneObjectControllerBase.h"
-#include "imstkDeviceTracker.h"
 
 #include <memory>
 #include <functional>
@@ -30,6 +29,7 @@
 namespace imstk
 {
 class SceneObject;
+class DeviceTracker;
 
 ///
 /// \class SceneObjectController
@@ -39,12 +39,12 @@ class SceneObject;
 class SceneObjectController : public SceneObjectControllerBase
 {
 using ControllerCallbackFunction = std::function<void (SceneObjectController* hdapiClient)>;
+
 public:
     ///
     /// \brief Constructor
     ///
-    SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceTracker> trackingController) :
-        m_trackingController(trackingController), m_sceneObject(sceneObject) {}
+    SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceTracker> trackingController);
 
     SceneObjectController() = delete;
 
@@ -66,7 +66,7 @@ public:
     ///
     /// \brief Sets the tracker to out-of-date
     ///
-    inline void setTrackerToOutOfDate() override { m_trackingController->setTrackerToOutOfDate(); }
+    void setTrackerToOutOfDate() override;
 
     ///
     /// \brief Get/Set controlled scene object

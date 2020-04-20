@@ -23,10 +23,7 @@
 
 // std library
 #include <array>
-#include <list>
 #include <set>
-#include <unordered_set>
-#include <memory>
 
 // imstk
 #include "imstkPointSet.h"

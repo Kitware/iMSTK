@@ -28,6 +28,14 @@
 #include "imstkTimer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkCollisionData.h"
+#include "imstkCamera.h"
+#include "imstkDebugRenderGeometry.h"
+#include "imstkCollidingObject.h"
+#include "imstkSceneManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkCollisionGraph.h"
+#include "imstkScene.h"
+#include "imstkVTKRenderer.h"
 
 // This is for collision detection between geometries
 #include "imstkOctreeBasedCD.h"

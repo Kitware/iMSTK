@@ -23,7 +23,6 @@
 
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkDeviceTracker.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
@@ -47,14 +46,7 @@ public:
         std::shared_ptr<SceneObject>   shaft,
         std::shared_ptr<SceneObject>   upperJaw,
         std::shared_ptr<SceneObject>   lowerJaw,
-        std::shared_ptr<DeviceTracker> trackingController) :
-        m_trackingController(trackingController),
-        m_shaft(shaft),
-        m_upperJaw(upperJaw),
-        m_lowerJaw(lowerJaw)
-    {
-        m_trackingController->getDeviceClient()->setButtonsEnabled(true);
-    }
+        std::shared_ptr<DeviceTracker> trackingController);
 
     LaparoscopicToolController() = delete; //not allowed for now
 
@@ -121,6 +113,6 @@ protected:
     double m_change      = 6.0e-5;                       ///< Amount of change in jaw angle per frame
     double m_maxJawAngle = PI / 6.0;                     ///< Maximum angle of the jaws
 
-    Vec3d m_jawRotationAxis = Vec3d(0, 1., 0);           ///< Angle of the jaws
+    Vec3d m_jawRotationAxis;                             ///< Angle of the jaws
 };
 } // imstk

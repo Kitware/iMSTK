@@ -22,10 +22,11 @@
 #pragma once
 
 #include "imstkVTKRenderDelegate.h"
-#include "imstkImageData.h"
 
 namespace imstk
 {
+class ImageData;
+
 ///
 /// \class ImageDataRenderDelegate
 ///

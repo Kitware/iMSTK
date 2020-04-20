@@ -21,6 +21,7 @@
 
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
+#include "imstkColor.h"
 
 namespace imstk
 {

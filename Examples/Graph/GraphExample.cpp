@@ -23,6 +23,7 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkAPIUtilities.h"
+#include "imstkSurfaceMesh.h"
 
 #include <iostream>
 

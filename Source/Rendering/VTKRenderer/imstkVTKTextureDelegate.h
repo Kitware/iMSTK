@@ -21,18 +21,11 @@
 
 #pragma once
 
-#include "imstkTexture.h"
 #include "imstkTextureDelegate.h"
-#include "imstkTextureManager.h"
 
-#include <vtkTexture.h>
 #include <vtkSmartPointer.h>
-#include <vtkImageReader2Factory.h>
-#include <vtkImageReader2.h>
-#include <vtkImageFlip.h>
 
-#include <string>
-#include <memory>
+class vtkTexture;
 
 namespace imstk
 {

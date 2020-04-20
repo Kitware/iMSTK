@@ -23,10 +23,10 @@
 
 #include "imstkScreenCaptureUtility.h"
 
-#include "vtkNew.h"
-#include "vtkRenderWindow.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkPNGWriter.h"
+#include <vtkRenderWindow.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+#include <vtkNew.h>
 
 #include <string>
 

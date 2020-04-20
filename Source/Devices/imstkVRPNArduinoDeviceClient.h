@@ -21,12 +21,8 @@
 
 #pragma once
 
-#include <map>
-
 #include "imstkDeviceClient.h"
 #include "imstkModule.h"
-
-#include <memory>
 
 #include <vrpn_Configure.h>
 #include <vrpn_Analog.h>
@@ -46,8 +42,10 @@ public:
     ///
     VRPNArduinoDeviceClient(const std::string& deviceName, const std::string& ip) :
         DeviceClient(deviceName, ip),
-        Module(deviceName + "@" + ip)
-    {}
+        Module(deviceName + "@" + ip),
+        m_ypr(Vec3d::Zero()),
+        m_accel(Vec3d::Zero()),
+        m_roll(0) {}
 
     ///
     /// \brief Destructor
@@ -88,8 +86,8 @@ private:
     static void VRPN_CALLBACK analogChangeHandler(void* userData, const _vrpn_ANALOGCB a);
 
     std::shared_ptr<vrpn_Analog_Remote> m_vrpnAnalog;           //!< VRPN position/orientation interface
-    Vec3d m_ypr   = Vec3d::Zero();
-    Vec3d m_accel = Vec3d::Zero();
-    float m_roll  = 0;
+    Vec3d m_ypr;
+    Vec3d m_accel;
+    float m_roll;
 };
 }

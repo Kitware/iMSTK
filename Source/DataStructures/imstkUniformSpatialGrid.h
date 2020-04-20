@@ -22,7 +22,6 @@
 #pragma once
 
 #include <array>
-#include <vector>
 
 #include "imstkMath.h"
 #include "imstkLogger.h"
@@ -63,7 +62,7 @@ public:
     ///
     void initialize(const Vec3r& lowerCorner, const Vec3r& upperCorner, const Real cellSize)
     {
-        LOG_IF(FATAL, (cellSize <= 0)) << "Invalid cell size";
+        CHECK(cellSize > 0) << "Invalid cell size";
 
         m_LowerCorner = lowerCorner;
         m_UpperCorner = upperCorner;
@@ -78,7 +77,7 @@ public:
             m_NTotalCells  *= m_Resolution[i];
         }
 
-        LOG_IF(FATAL, (m_NTotalCells == 0)) << "Invalid grid size: [" +
+        CHECK(m_NTotalCells != 0) << "Invalid grid size: [" +
             std::to_string(m_LowerCorner[0]) + ", " + std::to_string(m_LowerCorner[1]) + ", " + std::to_string(m_LowerCorner[2]) + "] => " +
             std::to_string(m_UpperCorner[0]) + ", " + std::to_string(m_UpperCorner[1]) + ", " + std::to_string(m_UpperCorner[2]) + "], " +
             "cellSize = " + std::to_string(m_CellSize);

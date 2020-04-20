@@ -24,9 +24,6 @@
 #include "imstkColor.h"
 #include "imstkTextureManager.h"
 
-#include <memory>
-#include <vector>
-
 namespace imstk
 {
 class Texture;

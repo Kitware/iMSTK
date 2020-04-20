@@ -30,7 +30,8 @@ class SPHObject;
 class SPHCollisionHandling : public CollisionHandling
 {
 public:
-    SPHCollisionHandling(const Side& side, const std::shared_ptr<CollisionData>& colData,
+    SPHCollisionHandling(const Side&                             side,
+                         const std::shared_ptr<CollisionData>&   colData,
                          const std::shared_ptr<CollidingObject>& obj);
 
     SPHCollisionHandling() = delete;

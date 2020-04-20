@@ -23,7 +23,11 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkAPIUtilities.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
 #include "imstkLight.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 

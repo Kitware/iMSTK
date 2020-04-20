@@ -24,6 +24,10 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCamera.h"
+#include "imstkScene.h"
 
 using namespace imstk;
 
