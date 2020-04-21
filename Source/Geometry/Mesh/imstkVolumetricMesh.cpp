@@ -23,12 +23,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkLogger.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4458 )
-// Vega
-#include "volumetricMesh.h"
-#pragma warning( pop )
-
 namespace imstk
 {
 std::shared_ptr<SurfaceMesh>

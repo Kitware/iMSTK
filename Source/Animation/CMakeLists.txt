@@ -6,6 +6,7 @@ imstk_add_library( Animation
   DEPENDS
     Common
     #Geometry
+    Materials
     SceneElements
   )
 

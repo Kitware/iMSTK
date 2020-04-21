@@ -2,21 +2,20 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SceneElements
+imstk_add_library( MeshIO
   DEPENDS
     Common
-    Geometry
-    GeometryMappers
-    MeshIO
-    DataStructures
-    Constraints
-    Devices
-    DynamicalModels
+	Geometry
+    glm
+    Assimp    
+    VegaFEM::volumetricMesh
+    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
 #if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
+#  include(imstkAddTest)
+#  imstk_add_test( Geometry )
 #endif()

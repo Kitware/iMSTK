@@ -366,6 +366,8 @@ set(${PROJECT_NAME}_INSTALL_FOLDER ${PROJECT_NAME}-${${PROJECT_NAME}_VERSION_MAJ
 #--------------------------------------------------------------------------
 add_subdirectory(Source/Common)
 add_subdirectory(Source/Geometry)
+add_subdirectory(Source/MeshIO)
+add_subdirectory(Source/GeometryMappers)
 add_subdirectory(Source/DataStructures)
 add_subdirectory(Source/Constraint)
 add_subdirectory(Source/Devices)
