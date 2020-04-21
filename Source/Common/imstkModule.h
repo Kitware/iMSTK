@@ -24,6 +24,7 @@
 #include <iostream>
 #include <atomic>
 #include <functional>
+#include <memory>
 
 namespace imstk
 {

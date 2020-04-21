@@ -24,6 +24,7 @@
 #include <unordered_map>
 #include <thread>
 #include <atomic>
+#include <vector>
 
 namespace imstk
 {

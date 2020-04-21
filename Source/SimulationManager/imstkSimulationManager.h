@@ -160,7 +160,8 @@ public:
     /// \brief Create a new scene with a given name
     ///
     std::shared_ptr<Scene> createNewScene(const std::string&           newSceneName,
-                                          std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
+                                          std::shared_ptr<SceneConfig> config);
+    std::shared_ptr<Scene> createNewScene(const std::string& newSceneName);
 
     ///
     /// \brief Create a new scene
