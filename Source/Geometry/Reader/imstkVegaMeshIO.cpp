@@ -131,7 +131,7 @@ VegaMeshIO::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
 {
     for (int i = 0; i < vegaMesh->getNumVertices(); ++i)
     {
-        auto pos = *vegaMesh->getVertex(i);
+        auto pos = vegaMesh->getVertex(i);
         vertices.emplace_back(pos[0], pos[1], pos[2]);
     }
 }

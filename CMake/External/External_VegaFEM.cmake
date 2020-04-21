@@ -8,8 +8,8 @@ endif(WIN32)
 
 include(imstkAddExternalProject)
 imstk_add_external_project( VegaFEM
-  URL https://gitlab.kitware.com/iMSTK/VegaFEM-CMake/-/archive/iMSTK/VegaFEM-CMake-iMSTK.zip
-  URL_MD5 11d1f47599b6d70f9b6dc6391bed7a20
+  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vegafemv4.0
+  GIT_TAG f9c96c4128437a559e5fb9a93830ef3c9a627d5e
   CMAKE_CACHE_ARGS
     -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
     -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=OFF
