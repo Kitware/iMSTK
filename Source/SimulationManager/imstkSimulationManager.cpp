@@ -168,6 +168,12 @@ SimulationManager::createNewScene(const std::string& newSceneName, std::shared_p
 }
 
 std::shared_ptr<Scene>
+SimulationManager::createNewScene(const std::string& newSceneName)
+{
+    return this->createNewScene(newSceneName, std::make_shared<SceneConfig>());
+}
+
+std::shared_ptr<Scene>
 SimulationManager::createNewScene()
 {
     m_mutex.lock();
@@ -179,7 +185,7 @@ SimulationManager::createNewScene()
 
     std::string newSceneName = "Scene_" + std::to_string(id);
 
-    return this->createNewScene(newSceneName);
+    return this->createNewScene(newSceneName, std::make_shared<SceneConfig>());
 }
 
 void
