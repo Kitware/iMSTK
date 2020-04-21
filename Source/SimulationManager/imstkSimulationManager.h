@@ -69,7 +69,7 @@ enum class SimulationMode
 ///
 /// \brief Simulation manager configuration
 ///
-struct simManagerConfig
+struct SimManagerConfig
 {
     // logger
     bool enableFileLogging    = true;
@@ -105,7 +105,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SimulationManager(const std::shared_ptr<simManagerConfig> config = std::make_shared<simManagerConfig>());
+    SimulationManager(const std::shared_ptr<SimManagerConfig> config = std::make_shared<SimManagerConfig>());
 
     ///
     /// \brief Default destructor
@@ -335,7 +335,7 @@ private:
     bool m_simulationStarted  = false;
     bool m_initialized = false;
 
-    std::shared_ptr<simManagerConfig> m_config;
+    std::shared_ptr<SimManagerConfig> m_config;
 
     std::mutex m_mutex;
 };

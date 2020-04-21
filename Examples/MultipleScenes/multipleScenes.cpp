@@ -194,7 +194,7 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
 void
 testMultipleScenesInBackendMode()
 {
-    auto simConfig = std::make_shared<simManagerConfig>();
+    auto simConfig = std::make_shared<SimManagerConfig>();
     simConfig->simulationMode = SimulationMode::Backend;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
 
@@ -292,7 +292,7 @@ testMultipleScenesInRenderMode()
 void
 testMultipleScenesInBackgroundMode()
 {
-    auto simConfig = std::make_shared<simManagerConfig>();
+    auto simConfig = std::make_shared<SimManagerConfig>();
     simConfig->simulationMode = SimulationMode::RunInBackgroundSync;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene1     = createClothScene(simManager, "clothScene");
