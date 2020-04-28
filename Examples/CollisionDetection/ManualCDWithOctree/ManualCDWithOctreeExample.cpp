@@ -112,8 +112,9 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
     auto material    = std::make_shared<RenderMaterial>();
     material->setDebugColor(Color::Yellow);
     material->setSphereGlyphSize(.01);
-    debugPoints->setRenderMaterial(material);
-    scene->addDebugGeometry(debugPoints);
+    
+    auto dbgViz = std::make_shared<VisualModel>(debugPoints, material);
+    scene->addDebugVisualModel(dbgViz);
 
     return std::dynamic_pointer_cast<DebugRenderGeometry>(debugPoints);
 }
@@ -129,8 +130,9 @@ addVTConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Green);
     material->setLineWidth(4.0);
-    debugLines->setRenderMaterial(material);
-    scene->addDebugGeometry(debugLines);
+
+    auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
+    scene->addDebugVisualModel(dbgViz);
 
     return std::dynamic_pointer_cast<DebugRenderGeometry>(debugLines);
 }
@@ -146,8 +148,9 @@ addEEConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Red);
     material->setLineWidth(4.0);
-    debugLines->setRenderMaterial(material);
-    scene->addDebugGeometry(debugLines);
+
+    auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
+    scene->addDebugVisualModel(dbgViz);
 
     return std::dynamic_pointer_cast<DebugRenderGeometry>(debugLines);
 }
@@ -163,8 +166,9 @@ addHighlightedLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Orange);
     material->setLineWidth(8.0);
-    debugLines->setRenderMaterial(material);
-    scene->addDebugGeometry(debugLines);
+
+    auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
+    scene->addDebugVisualModel(dbgViz);
 
     return std::dynamic_pointer_cast<DebugRenderGeometry>(debugLines);
 }

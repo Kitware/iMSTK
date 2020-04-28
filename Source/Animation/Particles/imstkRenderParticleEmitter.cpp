@@ -231,7 +231,8 @@ RenderParticleEmitter::update()
         particle->m_scale = (alpha * endKeyFrame->m_scale)
                             + ((1.0f - alpha) * startKeyFrame->m_scale);
 
-        this->interpolateColor(particle->m_color,
+        auto particleColor = imstk::Color(particle->m_color[0], particle->m_color[1], particle->m_color[2], particle->m_color[3]);
+        this->interpolateColor(particleColor,
             endKeyFrame->m_color,
             startKeyFrame->m_color,
             alpha);

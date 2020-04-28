@@ -21,7 +21,6 @@
 
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
-#include "imstkColor.h"
 
 namespace imstk
 {
@@ -40,7 +39,6 @@ void
 LineMesh::clear()
 {
     m_lines.clear();
-    m_vertexColors.clear();
 }
 
 void
@@ -53,19 +51,6 @@ double
 LineMesh::getVolume() const
 {
     return 0.0;
-}
-
-void
-LineMesh::setVertexColors(const std::vector<Color>& colors)
-{
-    if (colors.size() <= m_maxNumVertices)
-    {
-        m_vertexColors = colors;
-    }
-    else
-    {
-        LOG(WARNING) << "Vertex colors not set, exceeded maximum number of vertices";
-    }
 }
 
 void
@@ -99,11 +84,5 @@ std::vector<LineMesh::LineArray>
 LineMesh::getLinesVertices() const
 {
     return m_lines;
-}
-
-std::vector<Color>
-LineMesh::getVertexColors() const
-{
-    return m_vertexColors;
 }
 } // imstk

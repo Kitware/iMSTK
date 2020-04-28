@@ -165,7 +165,12 @@ main()
 
     // Create debug geometry for the octree (render up to 8 levels, and render all non-empty nodes)
     const auto debugOctree = octree.getDebugGeometry(8, true);
-    scene->addDebugGeometry(debugOctree);
+
+    const auto matDbgViz = std::make_shared<RenderMaterial>();
+    matDbgViz->setDebugColor(Color::Green);
+    matDbgViz->setLineWidth(1.0);
+    auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
+    scene->addDebugVisualModel(octreeVizDbgModel);
 
     // Data for animation
     const double     translation = 15.0;

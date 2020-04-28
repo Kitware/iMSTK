@@ -35,7 +35,7 @@
 #include "imstkParallelUtils.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
-#include "imstkColor.h"
+//#include "imstkColor.h"
 
 #include <unordered_map>
 

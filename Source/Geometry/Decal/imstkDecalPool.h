@@ -26,7 +26,7 @@
 
 #include "imstkDecal.h"
 #include "imstkGeometry.h"
-#include "imstkRenderMaterial.h"
+//#include "imstkRenderMaterial.h"
 
 namespace imstk
 {

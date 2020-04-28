@@ -4,12 +4,13 @@
 include(imstkAddLibrary)
 imstk_add_library( Collision
   DEPENDS
+    Common
     DataStructures
     Geometry
     SceneElements
     DynamicalModels
     Controllers
-    SCCD
+    SCCD    
   )
 
 #-----------------------------------------------------------------------------

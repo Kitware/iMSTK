@@ -52,7 +52,6 @@ main()
     size_t numVoxels  = resolution * resolution * resolution;
 
     points.resize(numVoxels * 8);
-    colors.resize(numVoxels * 8);
     lines.resize(numVoxels * 12);
 
     size_t index     = 0;
@@ -74,15 +73,6 @@ main()
                 points[index + 5] = Vec3d(x + 1, y, z + 1);
                 points[index + 6] = Vec3d(x + 1, y + 1, z);
                 points[index + 7] = Vec3d(x + 1, y + 1, z + 1);
-
-                colors[index + 0] = color;
-                colors[index + 1] = color;
-                colors[index + 2] = color;
-                colors[index + 3] = color;
-                colors[index + 4] = color;
-                colors[index + 5] = color;
-                colors[index + 6] = color;
-                colors[index + 7] = color;
 
                 lines[lineIndex + 0][0] = index + 0;
                 lines[lineIndex + 0][1] = index + 1;
@@ -118,7 +108,6 @@ main()
     }
 
     lineMesh->initialize(points, lines);
-    lineMesh->setVertexColors(colors);
     auto lineModel = std::make_shared<VisualModel>(lineMesh);
     lineModel->setRenderMaterial(lineMeshMaterial);
     lineObject->addVisualModel(lineModel);

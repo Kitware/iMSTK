@@ -71,7 +71,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
     lines->SetLines(lineIndices);
 
     // Add colors
-    if (0)//(geometry->getVertexColors().size() == geometry->getNumVertices())
+    /*if (geometry->getVertexColors().size() == geometry->getNumVertices())
     {
         auto colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
         colors->SetNumberOfComponents(3);
@@ -86,24 +86,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
         }
 
         lines->GetPointData()->SetScalars(colors);
-    }
-
-
-    {
-        auto colors2 = vtkSmartPointer<vtkUnsignedCharArray>::New();
-        colors2->SetNumberOfComponents(3);
-        colors2->SetName("Colors2");
-
-        for (int i=0;i< geometry->getNumLines();++i)
-        {
-            unsigned char c[3] = { (unsigned char)(100),
-                                   (unsigned char)(255),
-                                   (unsigned char)(255) };
-            colors2->InsertNextTypedTuple(c);
-        }
-
-        lines->GetCellData()->SetScalars(colors2);
-    }
+    }*/
 
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();

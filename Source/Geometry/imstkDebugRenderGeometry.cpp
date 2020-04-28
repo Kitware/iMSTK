@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkDebugRenderGeometry.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -27,7 +28,7 @@ const Vec3d&
 DebugRenderGeometry::getVertex(const size_t idx) const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (idx >= getNumVertices())) << "Invalid index";
+    CHECK(idx < getNumVertices()) << "Invalid index";
 #endif
     return m_VertexBuffer[idx];
 }
@@ -36,20 +37,8 @@ void
 DebugRenderGeometry::setVertex(const size_t idx, const Vec3d& vert)
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (idx >= getNumVertices())) << "Invalid index";
+    CHECK(idx < getNumVertices()) << "Invalid index";
 #endif
     m_VertexBuffer[idx] = vert;
-}
-
-void
-DebugRenderGeometry::setRenderMaterial(const std::shared_ptr<RenderMaterial>& renderMat)
-{
-    m_renderMaterial = renderMat;
-}
-
-const std::shared_ptr<imstk::RenderMaterial>&
-DebugRenderGeometry::getRenderMaterial() const
-{
-    return m_renderMaterial;
 }
 } // end namespace imstk

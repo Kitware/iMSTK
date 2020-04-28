@@ -27,7 +27,7 @@
 #include "imstkPointSet.h"
 #include "imstkLineMesh.h"
 #include "imstkGeometry.h"
-#include "imstkColor.h"
+//#include "imstkColor.h"
 #include "imstkCollisionUtils.h"
 
 #include <g3log/g3log.hpp>

@@ -6,6 +6,7 @@ imstk_add_library( Geometry
   DEPENDS
     Common
     tbb
+    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------

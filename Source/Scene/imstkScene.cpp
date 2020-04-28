@@ -21,6 +21,7 @@
 
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
+#include "imstkVisualModel.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkCameraController.h"
@@ -126,11 +127,9 @@ Scene::getSceneObjects() const
 {
     std::vector<std::shared_ptr<SceneObject>> v;
 
-    for (auto it = m_sceneObjectsMap.begin();
-         it != m_sceneObjectsMap.end();
-         ++it)
+    for (auto it : m_sceneObjectsMap)
     {
-        v.push_back(it->second);
+        v.push_back(it.second);
     }
 
     return v;
@@ -152,16 +151,14 @@ Scene::getSceneObject(const std::string& sceneObjectName) const
     return m_sceneObjectsMap.at(sceneObjectName);
 }
 
-const std::vector<std::shared_ptr<DebugRenderGeometry>>
-Scene::getDebugRenderObjects() const
+const std::vector<std::shared_ptr<VisualModel>>
+Scene::getDebugRenderModels() const
 {
-    std::vector<std::shared_ptr<DebugRenderGeometry>> v;
+    std::vector<std::shared_ptr<VisualModel>> v;
 
-    for (auto it = m_DebugRenderGeometryMap.begin();
-         it != m_DebugRenderGeometryMap.end();
-         ++it)
+    for (auto it : m_DebugRenderModelMap)
     {
-        v.push_back(it->second);
+        v.push_back(it.second);
     }
 
     return v;
@@ -183,20 +180,20 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
     LOG(INFO) << newSceneObjectName << " object added to " << m_name;
 }
 
-void
-Scene::addDebugGeometry(std::shared_ptr<DebugRenderGeometry> newDebugRenderObject)
+void 
+Scene::addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel)
 {
-    std::string name = newDebugRenderObject->getName();
+    const std::string name = dbgRenderModel->getGeometry()->getName();
 
-    if (m_sceneObjectsMap.find(name) != m_sceneObjectsMap.end())
+    if (m_DebugRenderModelMap.find(name) != m_DebugRenderModelMap.end())
     {
-        LOG(WARNING) << "Can not add debug render object: '" << name
+        LOG(WARNING) << "Can not add debug render mdoel: '" << name
                      << "' is already registered in this scene.";
         return;
     }
 
-    m_DebugRenderGeometryMap[name] = newDebugRenderObject;
-    LOG(INFO) << name << " object added to " << m_name;
+    m_DebugRenderModelMap[name] = dbgRenderModel;
+    LOG(INFO) << name << " debug model added to " << m_name;
 }
 
 void

@@ -25,10 +25,11 @@
 #include "imstkAnimationModel.h"
 #include "imstkRenderParticles.h"
 #include "imstkTimer.h"
+#include "imstkColor.h"
 
 namespace imstk
 {
-struct Color;
+//struct Color;
 
 ///
 /// \struct RenderParticleKeyFrame

@@ -9,6 +9,7 @@ imstk_add_library( SceneElements
     GeometryMappers
     MeshIO
     DataStructures
+    Materials
     Constraints
     Devices
     DynamicalModels

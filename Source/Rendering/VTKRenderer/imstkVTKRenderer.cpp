@@ -408,11 +408,12 @@ VTKRenderer::updateRenderDelegates()
     }
 
     // Debug render actors
-    for (const auto& geom : m_scene->getDebugRenderObjects())
+    for (const auto& dbgVizModel : m_scene->getDebugRenderModels())
     {
-        if (geom && !geom->m_renderDelegateCreated)
+        auto geom = std::static_pointer_cast<DebugRenderGeometry>(dbgVizModel->getDebugGeometry());
+        if (dbgVizModel && !dbgVizModel->isRenderDelegateCreated())
         {
-            auto delegate = VTKRenderDelegate::makeDebugDelegate(geom);
+            auto delegate = VTKRenderDelegate::makeDebugDelegate(dbgVizModel);
             if (delegate == nullptr)
             {
                 LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
@@ -423,7 +424,7 @@ VTKRenderer::updateRenderDelegates()
             m_debugRenderDelegates.push_back(delegate);
             m_objectVtkActors.push_back(delegate->getVtkActor());
             m_vtkRenderer->AddActor(delegate->getVtkActor());
-            geom->m_renderDelegateCreated = true;
+            dbgVizModel->m_renderDelegateCreated = true;
         }
     }
 

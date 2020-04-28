@@ -37,19 +37,19 @@
 
 using namespace imstk;
 
-std::shared_ptr<DebugRenderGeometry>
+std::shared_ptr<DebugRenderPoints>
 addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
     auto material    = std::make_shared<RenderMaterial>();
     material->setDebugColor(Color::Blue);
-    debugPoints->setRenderMaterial(material);
-    scene->addDebugGeometry(debugPoints);
+    auto vizModel = std::make_shared<VisualModel>(debugPoints, material);
+    scene->addDebugVisualModel(vizModel);
 
-    return std::dynamic_pointer_cast<DebugRenderGeometry>(debugPoints);
+    return debugPoints;
 }
 
-std::shared_ptr<DebugRenderGeometry>
+std::shared_ptr<DebugRenderLines>
 addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Lines");
@@ -57,13 +57,13 @@ addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Green);
     material->setLineWidth(2.0);
-    debugLines->setRenderMaterial(material);
-    scene->addDebugGeometry(debugLines);
-
-    return std::dynamic_pointer_cast<DebugRenderGeometry>(debugLines);
+    auto vizModel = std::make_shared<VisualModel>(debugLines, material);
+    scene->addDebugVisualModel(vizModel);
+    
+    return debugLines;
 }
 
-std::shared_ptr<DebugRenderGeometry>
+std::shared_ptr<DebugRenderTriangles>
 addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugTriangles = std::make_shared<DebugRenderTriangles>("Debug Triangles");
@@ -71,10 +71,9 @@ addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setBackFaceCulling(false);
     material->setDebugColor(Color::Red);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    debugTriangles->setRenderMaterial(material);
-    scene->addDebugGeometry(debugTriangles);
-
-    return std::dynamic_pointer_cast<DebugRenderGeometry>(debugTriangles);
+    auto vizModel = std::make_shared<VisualModel>(debugTriangles, material);
+    
+    return debugTriangles;
 }
 
 Vec3d

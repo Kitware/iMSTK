@@ -41,7 +41,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKdbgPointsRenderDelegate(const std::shared_ptr<DebugRenderPoints>& pointData);
+    explicit VTKdbgPointsRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry
@@ -49,8 +49,6 @@ public:
     void updateDataSource() override;
 
 protected:
-
-    std::shared_ptr<DebugRenderPoints> m_RenderGeoData; ///> Geometry to render
 
     // Auxiliary variables for rendering
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
