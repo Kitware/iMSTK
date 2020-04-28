@@ -286,6 +286,8 @@ else()
     CommonDataModel
     FiltersGeneral
     FiltersSources
+	FiltersModeling
+	FiltersExtraction
     IOExport
     IOImport
     IOPLY
