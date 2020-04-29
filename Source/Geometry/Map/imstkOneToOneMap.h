@@ -95,13 +95,7 @@ public:
     ///
     /// \brief
     ///
-    size_t getMapIdx(const size_t& idx) override
-    {
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-        LOG_IF(FATAL, (m_oneToOneMap.find(idx) == m_oneToOneMap.end())) << "Invalid source index";
-#endif
-        return m_oneToOneMap[idx];
-    }
+    size_t getMapIdx(const size_t& idx) override;
 
 protected:
 

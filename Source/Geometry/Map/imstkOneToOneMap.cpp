@@ -228,4 +228,13 @@ OneToOneMap::setSlave(std::shared_ptr<Geometry> slave)
     }
     GeometryMap::setSlave(slave);
 }
+
+size_t
+OneToOneMap::getMapIdx(const size_t& idx)
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    CHECK(m_oneToOneMap.find(idx) != m_oneToOneMap.end()) << "Invalid source index";
+#endif
+    return m_oneToOneMap[idx];
+}
 } // imstk
