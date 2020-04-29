@@ -40,6 +40,7 @@
 #include <vtkSmoothPolyDataFilter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkUnstructuredGrid.h>
+#include <vtkUnsignedCharArray.h>
 
 namespace imstk
 {
