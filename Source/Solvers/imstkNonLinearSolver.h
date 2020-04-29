@@ -35,12 +35,13 @@ namespace imstk
 ///
 /// \brief Base class for non-linear solvers
 ///
+template <typename SystemMatrix>
 class NonLinearSolver : public SolverBase
 {
 public:
-    using JacobianType      = std::function<const SparseMatrixd& (const Vectord&)>;
+    using JacobianType      = std::function<const SystemMatrix& (const Vectord&)>;
     using UpdateIterateType = std::function<void (const Vectord&, Vectord&)>;
-    using FunctionType      = NonLinearSystem::VectorFunctionType;
+    using FunctionType      = NonLinearSystem<SparseMatrixd>::VectorFunctionType;
 
 public:
     ///
@@ -105,8 +106,8 @@ public:
     ///
     /// \param newSystem Non-linear system replacement.
     ///
-    void setSystem(std::shared_ptr<NonLinearSystem> newSystem);
-    std::shared_ptr<NonLinearSystem> getSystem() const;
+    void setSystem(std::shared_ptr<NonLinearSystem<SystemMatrix>> newSystem);
+    std::shared_ptr<NonLinearSystem<SystemMatrix>> getSystem() const;
 
     ///
     /// \brief Set a customized iterate update function.
@@ -136,7 +137,7 @@ protected:
     double m_alpha;                                     ///< Parameter to measure decrease
     size_t m_armijoMax;                                 ///< Maximum number of step length reductions
 
-    std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///< System of non-linear equations
+    std::shared_ptr<NonLinearSystem<SystemMatrix>> m_nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType m_updateIterate;                  ///< Update iteration function
     bool m_isSemiImplicit = true;                       ///> Semi-Implicit solver
 };

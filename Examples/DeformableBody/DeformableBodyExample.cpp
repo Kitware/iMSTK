@@ -112,7 +112,7 @@ main()
     scene->addSceneObject(planeObj);
 
     // create a nonlinear system
-    auto nlSystem = std::make_shared<NonLinearSystem>(
+    auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(
         dynaModel->getFunction(),
         dynaModel->getFunctionGradient());
 
@@ -130,7 +130,7 @@ main()
     }
 
     // create a non-linear solver and add to the scene
-    auto nlSolver = std::make_shared<NewtonSolver>();
+    auto nlSolver = std::make_shared<NewtonSolver<SparseMatrixd>>();
     nlSolver->setLinearSolver(linSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);

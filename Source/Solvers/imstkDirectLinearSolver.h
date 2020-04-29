@@ -46,7 +46,8 @@ public:
     ///
     /// \brief Default constructor/destructor.
     ///
-    DirectLinearSolver() = delete;
+    // DirectLinearSolver() = delete;
+    DirectLinearSolver()  {}
     ~DirectLinearSolver() {};
 
     ///
@@ -70,6 +71,11 @@ public:
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
     ///
+    /// \brief Sets the matrix
+    ///
+    void setSystem(std::shared_ptr<Matrixd> matrix);
+
+    ///
     /// \brief Returns true if the solver is iterative
     ///
     bool isIterative() const override
@@ -79,6 +85,7 @@ public:
 
 private:
     Eigen::LDLT<Matrixd> m_solver;
+    bool m_system_set;
 };
 
 ///
@@ -117,5 +124,6 @@ public:
 
 private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;//?
+    bool m_system_set;
 };
 } // imstk

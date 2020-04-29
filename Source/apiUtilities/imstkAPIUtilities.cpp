@@ -177,12 +177,12 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
 ///
 /// \brief Create a non-linear system using FEM dynamic model
 ///
-std::shared_ptr<NonLinearSystem>
+std::shared_ptr<NonLinearSystem<SparseMatrixd>>
 createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
 {
     CHECK(dynaModel != nullptr) << "createNonLinearSystem: Dynamic model is not valid!";
 
-    auto nlSystem = std::make_shared<NonLinearSystem>(
+    auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(
                 dynaModel->getFunction(),
                 dynaModel->getFunctionGradient());
 

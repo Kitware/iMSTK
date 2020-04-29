@@ -52,7 +52,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() {};
+    LinearSolver() : m_linearSystem(nullptr) {};
     virtual ~LinearSolver() {};
 
     ///

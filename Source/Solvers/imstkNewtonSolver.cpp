@@ -20,15 +20,18 @@
 =========================================================================*/
 
 #include <iostream>
+#include <memory>
 
 #include "imstkNewtonSolver.h"
 #include "imstkIterativeLinearSolver.h"
 #include "imstkConjugateGradient.h"
+#include "imstkDirectLinearSolver.h"
 #include "imstkLogger.h"
 
 namespace imstk
 {
-NewtonSolver::NewtonSolver() :
+template <> 
+NewtonSolver<SparseMatrixd>::NewtonSolver() :
     m_linearSolver(std::make_shared<ConjugateGradient>()),
     m_forcingTerm(0.9),
     m_absoluteTolerance(1e-3),
@@ -40,17 +43,32 @@ NewtonSolver::NewtonSolver() :
 {
 }
 
-void
-NewtonSolver::solveGivenState(Vectord& x)
+template <>
+NewtonSolver<Matrixd>::NewtonSolver() :
+    m_linearSolver(std::make_shared<DirectLinearSolver<Matrixd>>()),
+    m_forcingTerm(0.9),
+    m_absoluteTolerance(1e-3),
+    m_relativeTolerance(1e-6),
+    m_gamma(0.9),
+    m_etaMax(0.9),
+    m_maxIterations(1),
+    m_useArmijo(true)
 {
-    if (!m_nonLinearSystem)
+}
+
+
+template <typename SystemMatrix> 
+void
+NewtonSolver<SystemMatrix>::solveGivenState(Vectord& x)
+{
+    if (!this->m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
         return;
     }
 
     // Compute norms, set tolerances and other temporaries
-    double fnorm = m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
+    double fnorm = this->m_nonLinearSystem->evaluateF(x, this->m_isSemiImplicit).norm();
     double stopTolerance = m_absoluteTolerance + m_relativeTolerance * fnorm;
 
     m_linearSolver->setTolerance(stopTolerance);
@@ -65,7 +83,7 @@ NewtonSolver::solveGivenState(Vectord& x)
         }
         this->updateJacobian(x);
         m_linearSolver->solve(dx);
-        m_updateIterate(-dx, x);
+        this->m_updateIterate(-dx, x);
 
         double newNorm = this->armijo(dx, x, fnorm);
 
@@ -83,17 +101,18 @@ NewtonSolver::solveGivenState(Vectord& x)
     }
 }
 
+template <typename SystemMatrix> 
 void
-NewtonSolver::solve()
+NewtonSolver<SystemMatrix>::solve()
 {
-    if (!m_nonLinearSystem)
+    if (!this->m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
         return;
     }
 
     size_t      iterNum;
-    const auto& u  = m_nonLinearSystem->getUnknownVector();
+    const auto& u  = this->m_nonLinearSystem->getUnknownVector();
     Vectord     du = u; // make this a class member in future
 
     double epsilon = m_relativeTolerance * m_relativeTolerance;
@@ -114,44 +133,46 @@ NewtonSolver::solve()
         }
 
         m_linearSolver->solve(du);
-        m_nonLinearSystem->m_FUpdate(du, m_isSemiImplicit);
+        this->m_nonLinearSystem->m_FUpdate(du, this->m_isSemiImplicit);
     }
-    m_nonLinearSystem->m_FUpdatePrevState();
+    this->m_nonLinearSystem->m_FUpdatePrevState();
 
-    if (iterNum == m_maxIterations && !m_isSemiImplicit)
+    if (iterNum == m_maxIterations && !this->m_isSemiImplicit)
     {
         LOG(WARNING) << "NewtonMethod::solve - The solver did not converge after max. iterations";
     }
 }
 
+template <typename SystemMatrix> 
 double
-NewtonSolver::updateJacobian(const Vectord& x)
+NewtonSolver<SystemMatrix>::updateJacobian(const Vectord& x)
 {
     // Evaluate the Jacobian and sets the matrix
-    if (!m_nonLinearSystem)
+    if (!this->m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - nonlinear system is not set to the nonlinear solver";
         return -1;
     }
 
-    auto& A = m_nonLinearSystem->m_dF(x);
+    auto& A = this->m_nonLinearSystem->m_dF(x);
     if (A.innerSize() == 0)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - Size of matrix is 0!";
         return -1;
     }
 
-    auto& b = m_nonLinearSystem->m_F(x, m_isSemiImplicit);
+    auto& b = this->m_nonLinearSystem->m_F(x, this->m_isSemiImplicit);
 
-    auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
-    //linearSystem->setLinearProjectors(m_nonLinearSystem->getLinearProjectors()); /// \todo Left for near future reference. Clear in future.
+    auto linearSystem = std::make_shared<typename LinearSolverType::LinearSystemType>(A, b);
+    //linearSystem->setLinearProjectors(this->m_nonLinearSystem->getLinearProjectors()); /// \todo Left for near future reference. Clear in future.
     m_linearSolver->setSystem(linearSystem);
 
     return b.dot(b);
 }
 
+template <typename SystemMatrix> 
 void
-NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
+NewtonSolver<SystemMatrix>::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
 {
     double eta = m_gamma * ratio * ratio;
     double forcingTermSqr = m_forcingTerm * m_forcingTerm;
@@ -166,27 +187,36 @@ NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, 
     m_forcingTerm = std::max(std::min(eta, m_etaMax), 0.5 * stopTolerance / fnorm);
 }
 
+template <typename SystemMatrix> 
 void
-NewtonSolver::setLinearSolver(std::shared_ptr<NewtonSolver::LinearSolverType> newLinearSolver)
+NewtonSolver<SystemMatrix>::setLinearSolver(std::shared_ptr<NewtonSolver::LinearSolverType> newLinearSolver)
 {
     m_linearSolver = newLinearSolver;
 }
 
-std::shared_ptr<NewtonSolver::LinearSolverType>
-NewtonSolver::getLinearSolver() const
+template <typename SystemMatrix> 
+// std::shared_ptr<NewtonSolver<SystemMatrix>::LinearSolverType>
+auto
+NewtonSolver<SystemMatrix>::getLinearSolver() const -> std::shared_ptr<LinearSolverType>
 {
     return m_linearSolver;
 }
 
+template <typename SystemMatrix> 
 void
-NewtonSolver::setAbsoluteTolerance(const double aTolerance)
+NewtonSolver<SystemMatrix>::setAbsoluteTolerance(const double aTolerance)
 {
     m_absoluteTolerance = aTolerance;
 }
 
+template <typename SystemMatrix> 
 double
-NewtonSolver::getAbsoluteTolerance() const
+NewtonSolver<SystemMatrix>::getAbsoluteTolerance() const
 {
     return m_absoluteTolerance;
 }
+
+
+template class NewtonSolver<SparseMatrixd>;
+template class NewtonSolver<Matrixd>;
 } // imstk

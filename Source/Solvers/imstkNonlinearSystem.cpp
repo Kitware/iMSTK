@@ -20,36 +20,46 @@
 =========================================================================*/
 
 #include "imstkNonlinearSystem.h"
+#include "imstkMath.h"
 
-#include <g3log/g3log.hpp>
+// #include <g3log/g3log.hpp>
 
 namespace imstk
 {
-NonLinearSystem::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF) : m_F(F), m_dF(dF)
+template <typename Matrix>
+NonLinearSystem<Matrix>::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF) : m_F(F), m_dF(dF)
 {
 }
 
+template <typename Matrix>
 void
-NonLinearSystem::setFunction(const VectorFunctionType& function)
+NonLinearSystem<Matrix>::setFunction(const VectorFunctionType& function)
 {
     m_F = function;
 }
 
+template <typename Matrix>
 void
-NonLinearSystem::setJacobian(const MatrixFunctionType& function)
+NonLinearSystem<Matrix>::setJacobian(const MatrixFunctionType& function)
 {
     m_dF = function;
 }
 
+template <typename Matrix>
 const Vectord&
-NonLinearSystem::evaluateF(const Vectord& x, const bool isSemiImplicit)
+NonLinearSystem<Matrix>::evaluateF(const Vectord& x, const bool isSemiImplicit)
 {
     return m_F(x, isSemiImplicit);
 }
 
-const SparseMatrixd&
-NonLinearSystem::evaluateJacobian(const Vectord& x)
+template <typename Matrix>
+const Matrix&
+NonLinearSystem<Matrix>::evaluateJacobian(const Vectord& x)
 {
     return m_dF(x);
 }
+
+template class NonLinearSystem<SparseMatrixd>;
+template class NonLinearSystem<Matrixd>;
+
 } //imstk
