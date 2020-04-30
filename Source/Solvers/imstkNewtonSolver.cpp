@@ -114,11 +114,11 @@ NewtonSolver<SystemMatrix>::solve()
     size_t      iterNum;
     const auto& u  = this->m_nonLinearSystem->getUnknownVector();
     Vectord     du = u; // make this a class member in future
+    double error0 = MAX_D;
 
     double epsilon = m_relativeTolerance * m_relativeTolerance;
     for (iterNum = 0; iterNum < m_maxIterations; ++iterNum)
     {
-        double error0 = MAX_D;
         double error  = updateJacobian(u);
 
         if (iterNum == 0)
@@ -128,13 +128,14 @@ NewtonSolver<SystemMatrix>::solve()
 
         if (error / error0 < epsilon && iterNum > 0)
         {
-            //std::cout << "Num. of Newton Iterations: " << i << "\tError ratio: " << error/error0 << std::endl;
+            // std::cout << "Num. of Newton Iterations: " << iterNum << "\tError ratio: " << error/error0 << ", " << error << " " << error0 << std::endl;
             break;
         }
 
         m_linearSolver->solve(du);
         this->m_nonLinearSystem->m_FUpdate(du, this->m_isSemiImplicit);
     }
+
     this->m_nonLinearSystem->m_FUpdatePrevState();
 
     if (iterNum == m_maxIterations && !this->m_isSemiImplicit)
@@ -167,7 +168,7 @@ NewtonSolver<SystemMatrix>::updateJacobian(const Vectord& x)
     //linearSystem->setLinearProjectors(this->m_nonLinearSystem->getLinearProjectors()); /// \todo Left for near future reference. Clear in future.
     m_linearSolver->setSystem(linearSystem);
 
-    return b.dot(b);
+    return std::sqrt(b.dot(b));
 }
 
 template <typename SystemMatrix> 

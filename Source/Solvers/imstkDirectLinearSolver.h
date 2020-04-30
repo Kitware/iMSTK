@@ -85,7 +85,6 @@ public:
 
 private:
     Eigen::LDLT<Matrixd> m_solver;
-    bool m_system_set;
 };
 
 ///
@@ -124,6 +123,5 @@ public:
 
 private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;//?
-    bool m_system_set;
 };
 } // imstk

@@ -23,7 +23,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkDeformableObject.h"
 #include "imstkBackwardEuler.h"
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 #include "imstkNewtonSolver.h"
 #include "imstkGaussSeidel.h"
 #include "imstkPlane.h"

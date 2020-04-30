@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 
 namespace imstk
 {

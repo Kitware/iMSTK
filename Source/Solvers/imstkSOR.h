@@ -22,7 +22,7 @@
 #pragma once
 
 // iMSTK includes
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 #include "imstkIterativeLinearSolver.h"
 
 // Eigen includes

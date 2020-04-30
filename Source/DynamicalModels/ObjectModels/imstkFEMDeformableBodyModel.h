@@ -24,7 +24,7 @@
 // imstk
 #include "imstkDynamicalModel.h"
 #include "imstkInternalForceModelTypes.h"
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 
 // vega
 #include "sparseMatrix.h"

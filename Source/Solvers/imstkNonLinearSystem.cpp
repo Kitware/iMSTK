@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 #include "imstkMath.h"
 
 // #include <g3log/g3log.hpp>

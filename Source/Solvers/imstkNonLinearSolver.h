@@ -26,7 +26,7 @@
 #include <functional>
 
 // imstk includes
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 #include "imstkMath.h"
 #include "imstkSolverBase.h"
 

@@ -30,7 +30,7 @@
 #include "imstkColor.h"
 
 // Solvers
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 
 // Geometry
 #include "imstkPlane.h"

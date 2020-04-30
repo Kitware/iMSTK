@@ -83,7 +83,7 @@ DirectLinearSolver<Matrixd>::solve(const Vectord& rhs, Vectord& x)
 void
 DirectLinearSolver<Matrixd>::solve(Vectord& x)
 {
-    if(!m_system_set) LOG(FATAL) << "Linear system has not been set";
+    if(!m_linearSystem) LOG(FATAL) << "Linear system has not been set";
     x.setZero();
 
     auto b = m_linearSystem->getRHSVector();
