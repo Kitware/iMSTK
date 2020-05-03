@@ -180,7 +180,7 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
     LOG(INFO) << newSceneObjectName << " object added to " << m_name;
 }
 
-void 
+void
 Scene::addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel)
 {
     const std::string name = dbgRenderModel->getGeometry()->getName();

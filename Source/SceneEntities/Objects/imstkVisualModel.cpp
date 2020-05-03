@@ -29,18 +29,24 @@ namespace imstk
 VisualModel::VisualModel(std::shared_ptr<Geometry> geometry) : m_geometry(geometry), m_renderMaterial(std::make_shared<RenderMaterial>())
 {
 }
-VisualModel::VisualModel(std::shared_ptr<Geometry> geometry, 
-                         std::shared_ptr<RenderMaterial> renderMaterial) : 
-                         m_geometry(geometry), 
-                         m_renderMaterial(renderMaterial){}
+
+VisualModel::VisualModel(std::shared_ptr<Geometry>       geometry,
+                         std::shared_ptr<RenderMaterial> renderMaterial) :
+    m_geometry(geometry),
+    m_renderMaterial(renderMaterial)
+{
+}
 
 VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry) : m_DbgGeometry(geometry), m_renderMaterial(std::make_shared<RenderMaterial>())
 {
 }
+
 VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
-    std::shared_ptr<RenderMaterial> renderMaterial) :
+                         std::shared_ptr<RenderMaterial>      renderMaterial) :
     m_DbgGeometry(geometry),
-    m_renderMaterial(renderMaterial) {}
+    m_renderMaterial(renderMaterial)
+{
+}
 
 std::shared_ptr<Geometry>
 VisualModel::getGeometry()

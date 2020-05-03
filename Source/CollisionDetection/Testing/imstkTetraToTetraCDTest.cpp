@@ -58,7 +58,7 @@ duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
-    auto b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
+    auto                             b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
 
     auto cd = std::make_shared<CollisionData>();
 
@@ -108,7 +108,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
-    auto b = duplicate(a);
+    auto                             b = duplicate(a);
 
     b->translateVertices(imstk::Vec3d(16.0, 0.0, 1.0));
 

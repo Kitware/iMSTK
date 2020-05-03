@@ -40,12 +40,11 @@ public:
     /// \brief Constructor
     ///
     explicit VisualModel(std::shared_ptr<Geometry> geometry);
-    explicit VisualModel(std::shared_ptr<Geometry> geometry, 
+    explicit VisualModel(std::shared_ptr<Geometry>       geometry,
                          std::shared_ptr<RenderMaterial> renderMaterial);
     explicit VisualModel(std::shared_ptr<DebugRenderGeometry> geometry);
     explicit VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
-                         std::shared_ptr<RenderMaterial> renderMaterial);
-   
+                         std::shared_ptr<RenderMaterial>      renderMaterial);
 
     VisualModel() = delete;
 
@@ -80,9 +79,9 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VTKRenderer;
 
-    std::shared_ptr<Geometry>       m_geometry = nullptr;
+    std::shared_ptr<Geometry> m_geometry = nullptr;
     std::shared_ptr<DebugRenderGeometry> m_DbgGeometry = nullptr;
-    std::shared_ptr<RenderMaterial> m_renderMaterial;
+    std::shared_ptr<RenderMaterial>      m_renderMaterial;
 
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
     bool m_renderDelegateCreated = false; ///< true if RenderDelegate has been created

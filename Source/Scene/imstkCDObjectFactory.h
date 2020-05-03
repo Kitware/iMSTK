@@ -60,7 +60,6 @@
 
 namespace imstk
 {
-
 ///
 /// \brief Static factory for collision detection sub classes
 /// If the collision pair is PointSet to SurfaceMesh, or SurfaceMesh to SurfaceMesh,
@@ -69,32 +68,32 @@ namespace imstk
 ///
 static
 std::shared_ptr<CollisionDetection>
-makeCollisionDetectionObject(const CollisionDetection::Type type,
-    std::shared_ptr<CollidingObject> objA,
-    std::shared_ptr<CollidingObject> objB,
-    std::shared_ptr<CollisionData>   colData)
+makeCollisionDetectionObject(const CollisionDetection::Type   type,
+                             std::shared_ptr<CollidingObject> objA,
+                             std::shared_ptr<CollidingObject> objB,
+                             std::shared_ptr<CollisionData>   colData)
 {
     switch (type)
     {
-        // Points to objects
+    // Points to objects
     case CollisionDetection::Type::PointSetToSphere:
     {
         auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
-        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+        auto sphere   = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, sphere)
         return std::make_shared<PointSetToSphereCD>(pointset, sphere, colData);
     }
     case CollisionDetection::Type::PointSetToPlane:
     {
         auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
-        auto plane = std::dynamic_pointer_cast<Plane>(objB->getCollidingGeometry());
+        auto plane    = std::dynamic_pointer_cast<Plane>(objB->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, plane)
         return std::make_shared<PointSetToPlaneCD>(pointset, plane, colData);
     }
     case CollisionDetection::Type::PointSetToCapsule:
     {
         auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
-        auto capsule = std::dynamic_pointer_cast<Capsule>(objB->getCollidingGeometry());
+        auto capsule  = std::dynamic_pointer_cast<Capsule>(objB->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, capsule)
         return std::make_shared<PointSetToCapsuleCD>(pointset, capsule, colData);
     }
@@ -102,17 +101,17 @@ makeCollisionDetectionObject(const CollisionDetection::Type type,
     case CollisionDetection::ype::PointSetToSpherePicking:
     {
         auto pointset = std::dynamic_pointer_cast<PointSet>(objA->getCollidingGeometry());
-        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+        auto sphere   = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, sphere)
         return std::make_shared<PointSetToSpherePickingCD>(pointset, sphere, colData);
     }
 #endif
     case CollisionDetection::Type::PointSetToSurfaceMesh:
     {
-        const auto& geomA = objA->getCollidingGeometry();
-        const auto& geomB = objB->getCollidingGeometry();
+        const auto& geomA    = objA->getCollidingGeometry();
+        const auto& geomB    = objB->getCollidingGeometry();
         auto        pointset = std::dynamic_pointer_cast<PointSet>(geomA);
-        auto        triMesh = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
+        auto        triMesh  = std::dynamic_pointer_cast<SurfaceMesh>(geomB);
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointset, triMesh)
         CollisionDetection::addCollisionPairToOctree(geomA, geomB, type, colData);
         return std::make_shared<PointSetToSurfaceMeshCD>(pointset, triMesh, colData);
@@ -147,14 +146,14 @@ makeCollisionDetectionObject(const CollisionDetection::Type type,
     // Analytical object to analytical object
     case CollisionDetection::Type::UnidirectionalPlaneToSphere:
     {
-        auto plane = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
-        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());        
-        IMSTK_CHECK_FOR_VALID_GEOMETRIES(plane, sphere)        
+        auto plane  = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
+        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+        IMSTK_CHECK_FOR_VALID_GEOMETRIES(plane, sphere)
         return std::make_shared<UnidirectionalPlaneToSphereCD>(plane, sphere, colData);
     }
     case CollisionDetection::Type::BidirectionalPlaneToSphere:
     {
-        auto plane = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
+        auto plane  = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(plane, sphere)
         return std::make_shared<BidirectionalPlaneToSphereCD>(plane, sphere, colData);
@@ -168,7 +167,7 @@ makeCollisionDetectionObject(const CollisionDetection::Type type,
     }
     case CollisionDetection::Type::SphereToCylinder:
     {
-        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+        auto sphere   = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
         auto cylinder = std::dynamic_pointer_cast<Cylinder>(objA->getCollidingGeometry());
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(sphere, cylinder)
         return std::make_shared<SphereToCylinderCD>(sphere, cylinder, colData);

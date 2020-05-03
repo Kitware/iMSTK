@@ -114,10 +114,10 @@ protected:
     ///
     /// \brief Constructor
     ///
-    explicit DebugRenderGeometry(const std::string& name,   
-                                 const Type type) :
-                                 m_name(name), 
-                                 m_type(type){}
+    explicit DebugRenderGeometry(const std::string& name,
+                                 const Type         type) :
+        m_name(name),
+        m_type(type) {}
 
     virtual ~DebugRenderGeometry() = default;
 

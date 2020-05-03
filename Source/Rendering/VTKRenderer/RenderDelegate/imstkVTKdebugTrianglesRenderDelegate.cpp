@@ -32,7 +32,7 @@
 
 namespace imstk
 {
-VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :    
+VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_pappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;

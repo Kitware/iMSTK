@@ -36,12 +36,12 @@
 
 namespace imstk
 {
-VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :    
+VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
-    // assert that the visual model has debug lines 
+    // assert that the visual model has debug lines
     //auto dbgLines = std::static_pointer_cast<DebugRenderLines>(m_visualModel->getGeometry());
 
     // Map vertices

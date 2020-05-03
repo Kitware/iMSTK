@@ -59,7 +59,7 @@ addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setLineWidth(2.0);
     auto vizModel = std::make_shared<VisualModel>(debugLines, material);
     scene->addDebugVisualModel(vizModel);
-    
+
     return debugLines;
 }
 
@@ -72,7 +72,7 @@ addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
     material->setDebugColor(Color::Red);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto vizModel = std::make_shared<VisualModel>(debugTriangles, material);
-    
+
     return debugTriangles;
 }
 

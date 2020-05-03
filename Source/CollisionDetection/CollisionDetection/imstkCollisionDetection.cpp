@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-
 CollisionDetection::CollisionDetection(const CollisionDetection::Type& type, std::shared_ptr<CollisionData> colData) : m_type(type),
     m_colData((colData == nullptr) ? std::make_shared<CollisionData>() : colData)
 {

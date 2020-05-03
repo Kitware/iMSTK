@@ -81,11 +81,6 @@ public:
     ///
     std::vector<LineArray> getLinesVertices() const;
 
-    ///
-    /// \brief
-    ///
-    std::vector<Color> getVertexColors() const;
-
 private:
     friend class VTKLineMeshRenderDelegate;
 
