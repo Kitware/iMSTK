@@ -2,7 +2,7 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SceneElements
+imstk_add_library( SceneEntities
   DEPENDS
     Common
     Geometry

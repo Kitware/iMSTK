@@ -7,7 +7,7 @@ imstk_add_library( Animation
     Common
     Geometry
     Materials
-    SceneElements
+    SceneEntities
   )
 
 #-----------------------------------------------------------------------------

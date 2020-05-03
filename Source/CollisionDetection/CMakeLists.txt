@@ -2,16 +2,22 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Controllers
+imstk_add_library( CollisionDetection
   DEPENDS
     Common
-	Scene
-    SceneEntities
+    DataStructures
+    Geometry
+    MeshIO
+    SCCD    
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-#if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
-#endif()
+if( ${PROJECT_NAME}_BUILD_TESTING )
+
+  include(imstkAddTest)
+
+  imstk_add_test(CollisionDetection)
+  imstk_add_data(CollisionDetection ${FILE_LIST_COL_TEST})
+endif()

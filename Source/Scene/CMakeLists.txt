@@ -3,16 +3,11 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( Scene
-  H_FILES
-    imstkScene.h
-    imstkCollisionGraph.h
-  CPP_FILES
-    imstkScene.cpp
-    imstkCollisionGraph.cpp
   DEPENDS
     Common
-    Collision
-    SceneElements
+    CollisionDetection
+    CollisionHandling
+    SceneEntities
     Controllers
     DynamicalModels
   )

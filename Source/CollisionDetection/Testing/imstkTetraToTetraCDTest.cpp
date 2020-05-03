@@ -25,7 +25,6 @@
 #include  <memory>
 
 #include "imstkCollisionData.h"
-#include "imstkIsometricMap.h"
 #include "imstkMeshIO.h"
 #include "imstkTetraToTetraCD.h"
 #include "imstkTetrahedralMesh.h"
@@ -41,9 +40,9 @@ protected:
 std::shared_ptr<TetrahedralMesh>
 loadMesh(const std::string& externalDataSuffix)
 {
-    std::string                      file = iMSTK_DATA_ROOT + externalDataSuffix;
-    std::shared_ptr<TetrahedralMesh> volMesh
-        = std::static_pointer_cast<TetrahedralMesh>(imstk::MeshIO::read(file));
+    std::string file = iMSTK_DATA_ROOT + externalDataSuffix;
+
+    auto volMesh = std::static_pointer_cast<TetrahedralMesh>(imstk::MeshIO::read(file));
 
     CHECK(volMesh != nullptr) << "Failed to read a volumetric mesh file : " << file;
 
@@ -59,7 +58,7 @@ duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
-    auto                             b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
+    auto b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
 
     auto cd = std::make_shared<CollisionData>();
 
@@ -109,7 +108,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
-    auto                             b = duplicate(a);
+    auto b = duplicate(a);
 
     b->translateVertices(imstk::Vec3d(16.0, 0.0, 1.0));
 

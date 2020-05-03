@@ -7,7 +7,7 @@ imstk_add_library( Solvers
     Common
     DataStructures
     Constraints
-    SceneElements
+    SceneEntities
   )
 
 #-----------------------------------------------------------------------------

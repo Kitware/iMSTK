@@ -2,12 +2,10 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Collision
+imstk_add_library( CollisionHandling
   DEPENDS
-    Common
-    DataStructures
-    Geometry
-    SceneElements
+    CollisionDetection
+    SceneEntities
     DynamicalModels
     Controllers
     SCCD    
@@ -16,10 +14,10 @@ imstk_add_library( Collision
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( ${PROJECT_NAME}_BUILD_TESTING )
+#if( ${PROJECT_NAME}_BUILD_TESTING )
 
-  include(imstkAddTest)
+#  include(imstkAddTest)
 
-  imstk_add_test(Collision)
-  imstk_add_data(Collision ${FILE_LIST_COL_TEST})
-endif()
+#  imstk_add_test(Collision)
+#  imstk_add_data(Collision ${FILE_LIST_COL_TEST})
+#endif()

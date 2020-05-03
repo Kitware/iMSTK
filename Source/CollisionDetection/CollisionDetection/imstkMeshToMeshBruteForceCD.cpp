@@ -21,7 +21,7 @@
 
 #include "imstkMeshToMeshBruteForceCD.h"
 
-#include "imstkCollidingObject.h"
+//#include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkPointSet.h"
