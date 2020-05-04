@@ -69,11 +69,6 @@ public:
     ///
     /// \brief
     ///
-    void setVertexColors(const std::vector<Color>& colors);
-
-    ///
-    /// \brief
-    ///
     void setLinesVertices(const std::vector<LineArray>& lines);
 
     ///
@@ -86,11 +81,6 @@ public:
     ///
     std::vector<LineArray> getLinesVertices() const;
 
-    ///
-    /// \brief
-    ///
-    std::vector<Color> getVertexColors() const;
-
 private:
     friend class VTKLineMeshRenderDelegate;
 
@@ -98,6 +88,5 @@ private:
     size_t m_maxNumLines      = 0;
 
     std::vector<LineArray> m_lines;  ///> line connectivity
-    std::vector<Color>     m_vertexColors;
 };
 } // imstk

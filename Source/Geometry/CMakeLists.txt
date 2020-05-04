@@ -4,11 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Geometry
   DEPENDS
-    Common
-    glm
-    Assimp
-    Materials
-    VegaFEM::volumetricMesh
+    Common    
     ${VTK_LIBRARIES}
   )
 

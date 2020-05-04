@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkDecalPool.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

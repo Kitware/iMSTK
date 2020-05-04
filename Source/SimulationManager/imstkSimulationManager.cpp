@@ -35,7 +35,7 @@
 
 namespace imstk
 {
-SimulationManager::SimulationManager(const std::shared_ptr<simManagerConfig> config) : m_config(config)
+SimulationManager::SimulationManager(const std::shared_ptr<SimManagerConfig> config) : m_config(config)
 {
     // Initialize the logger and add optional sinks
     if (config->enableFileLogging)

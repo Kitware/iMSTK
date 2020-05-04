@@ -25,7 +25,6 @@
 #include  <memory>
 
 #include "imstkCollisionData.h"
-#include "imstkIsometricMap.h"
 #include "imstkMeshIO.h"
 #include "imstkTetraToTetraCD.h"
 #include "imstkTetrahedralMesh.h"
@@ -41,9 +40,9 @@ protected:
 std::shared_ptr<TetrahedralMesh>
 loadMesh(const std::string& externalDataSuffix)
 {
-    std::string                      file = iMSTK_DATA_ROOT + externalDataSuffix;
-    std::shared_ptr<TetrahedralMesh> volMesh
-        = std::static_pointer_cast<TetrahedralMesh>(imstk::MeshIO::read(file));
+    std::string file = iMSTK_DATA_ROOT + externalDataSuffix;
+
+    auto volMesh = std::static_pointer_cast<TetrahedralMesh>(imstk::MeshIO::read(file));
 
     CHECK(volMesh != nullptr) << "Failed to read a volumetric mesh file : " << file;
 

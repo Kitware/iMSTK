@@ -5,8 +5,9 @@ include(imstkAddLibrary)
 imstk_add_library( Animation
   DEPENDS
     Common
-    #Geometry
-    SceneElements
+    Geometry
+    Materials
+    SceneEntities
   )
 
 #-----------------------------------------------------------------------------

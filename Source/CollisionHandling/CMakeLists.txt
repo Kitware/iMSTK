@@ -2,11 +2,9 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
+imstk_add_library( CollisionHandling
   DEPENDS
-    Common
     CollisionDetection
-    CollisionHandling
     SceneEntities
     Controllers
   )
@@ -15,5 +13,9 @@ imstk_add_library( Scene
 # Testing
 #-----------------------------------------------------------------------------
 #if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
+
+#  include(imstkAddTest)
+
+#  imstk_add_test(Collision)
+#  imstk_add_data(Collision ${FILE_LIST_COL_TEST})
 #endif()

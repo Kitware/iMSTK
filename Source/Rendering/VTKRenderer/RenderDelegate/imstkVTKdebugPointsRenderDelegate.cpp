@@ -38,10 +38,11 @@
 
 namespace imstk
 {
-VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(const std::shared_ptr<DebugRenderPoints>& pointRenderData) :
-    m_RenderGeoData(pointRenderData),
+VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
     // Map vertices
     m_mappedVertexArray->SetNumberOfComponents(3);
 
@@ -60,7 +61,7 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(const std::shared_ptr<Deb
 
     // Update Transform, Render Properties
     updateActorProperties();
-    setUpMapper(m_glyph->GetOutputPort(), false, m_RenderGeoData->getRenderMaterial());
+    setUpMapper(m_glyph->GetOutputPort(), false, visualModel->getRenderMaterial());
 
     //updateDataSource();
 }
@@ -68,16 +69,18 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(const std::shared_ptr<Deb
 void
 VTKdbgPointsRenderDelegate::updateDataSource()
 {
-    if (m_RenderGeoData->isModified())
+    auto dbgPoints = std::static_pointer_cast<DebugRenderPoints>(m_visualModel->getDebugGeometry());
+
+    if (dbgPoints->isModified())
     {
-        m_RenderGeoData->setDataModified(false);
-        m_mappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
-                                      m_RenderGeoData->getNumVertices() * 3, 1);
+        dbgPoints->setDataModified(false);
+        m_mappedVertexArray->SetArray(dbgPoints->getVertexBufferPtr(),
+                                      dbgPoints->getNumVertices() * 3, 1);
 
         // Update points geometry
         // m_Points need to be created from scrach, otherwise program will crash
         m_points = vtkSmartPointer<vtkPoints>::New();
-        m_points->SetNumberOfPoints(m_RenderGeoData->getNumVertices());
+        m_points->SetNumberOfPoints(dbgPoints->getNumVertices());
         m_points->SetData(m_mappedVertexArray);
         m_polyData->SetPoints(m_points);
 

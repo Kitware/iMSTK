@@ -22,6 +22,7 @@
 #include "imstkInteractionPair.h"
 #include "imstkCollisionData.h"
 #include "imstkCollidingObject.h"
+#include "imstkCDObjectFactory.h"
 
 #include <g3log/g3log.hpp>
 
@@ -46,7 +47,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }*/
 
     // Collision Detection
-    std::shared_ptr<CollisionDetection> CD = CollisionDetection::makeCollisionDetectionObject(CDType, A, B, m_colData);
+    std::shared_ptr<CollisionDetection> CD = makeCollisionDetectionObject(CDType, A, B, m_colData);
 
     CHECK(CD != nullptr) << "InteractionPair error: can not instantiate collision detection algorithm.";
 

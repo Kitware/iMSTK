@@ -2,18 +2,20 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
+imstk_add_library( MeshIO
   DEPENDS
     Common
-    CollisionDetection
-    CollisionHandling
-    SceneEntities
-    Controllers
+	Geometry
+    glm
+    Assimp    
+    VegaFEM::volumetricMesh
+    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
 #if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
+#  include(imstkAddTest)
+#  imstk_add_test( Geometry )
 #endif()

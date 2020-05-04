@@ -25,7 +25,7 @@
 #include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkRenderMaterial.h"
+//#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
@@ -1026,10 +1026,6 @@ LooseOctree::getDebugGeometry(const uint32_t maxLevel, bool bDrawNonEmptyParent 
 
     // Create debug geometry and set default rendering mateirial
     m_DebugGeometry = std::make_shared<DebugRenderLines>("OctreeDebugRendering");
-    const auto material = std::make_shared<RenderMaterial>();
-    material->setDebugColor(Color::Green);
-    material->setLineWidth(1.0);
-    m_DebugGeometry->setRenderMaterial(material);
 
     // Update debug rendering data (if any)
     m_pRootNode->updateDebugGeometry();

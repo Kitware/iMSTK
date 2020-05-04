@@ -36,10 +36,14 @@
 
 namespace imstk
 {
-VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(const std::shared_ptr<DebugRenderLines>& lineData) :
-    m_RenderGeoData(lineData),
+VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
+    // assert that the visual model has debug lines
+    //auto dbgLines = std::static_pointer_cast<DebugRenderLines>(m_visualModel->getGeometry());
+
     // Map vertices
     m_mappedVertexArray->SetNumberOfComponents(3);
 
@@ -61,7 +65,7 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(const std::shared_ptr<Debug
 
     // Update Transform, Render Properties
     updateActorProperties();
-    setUpMapper(source->GetOutputPort(), false, m_RenderGeoData->getRenderMaterial());
+    setUpMapper(source->GetOutputPort(), false, visualModel->getRenderMaterial());
 
     //updateDataSource();
 }
@@ -69,17 +73,18 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(const std::shared_ptr<Debug
 void
 VTKdbgLinesRenderDelegate::updateDataSource()
 {
-    if (m_RenderGeoData->isModified())
-    {
-        m_RenderGeoData->setDataModified(false);
-        m_mappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
-                                      m_RenderGeoData->getNumVertices() * 3, 1);
+    auto dbgLines = std::static_pointer_cast<DebugRenderLines>(m_visualModel->getDebugGeometry());
 
-        m_points->SetNumberOfPoints(m_RenderGeoData->getNumVertices());
+    if (dbgLines->isModified())
+    {
+        dbgLines->setDataModified(false);
+        m_mappedVertexArray->SetArray(dbgLines->getVertexBufferPtr(), dbgLines->getNumVertices() * 3, 1);
+
+        m_points->SetNumberOfPoints(dbgLines->getNumVertices());
 
         // Set line data
         int numCurrentLines = m_cellArray->GetNumberOfCells();
-        if (numCurrentLines > static_cast<int>(m_RenderGeoData->getNumVertices() / 2))
+        if (numCurrentLines > static_cast<int>(dbgLines->getNumVertices() / 2))
         {
             // There should is a better way to modify the existing data,
             // instead of discarding everything and add from the beginning
@@ -88,7 +93,7 @@ VTKdbgLinesRenderDelegate::updateDataSource()
         }
 
         vtkIdType cell[2];
-        for (int i = numCurrentLines; i < static_cast<int>(m_RenderGeoData->getNumVertices() / 2); ++i)
+        for (int i = numCurrentLines; i < static_cast<int>(dbgLines->getNumVertices() / 2); ++i)
         {
             cell[0] = 2 * i;
             cell[1] = cell[0] + 1;

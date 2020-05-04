@@ -67,18 +67,6 @@ public:
     };
 
     ///
-    /// \brief Static factory for collision detection sub classes
-    /// If the collision pair is PointSet to SurfaceMesh, or SurfaceMesh to SurfaceMesh,
-    /// it will be added to an internal static octree for detecting collision
-    /// \todo Other collision pair may be considered to use octree too
-    ///
-    static std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(
-        const Type                       type,
-        std::shared_ptr<CollidingObject> objA,
-        std::shared_ptr<CollidingObject> objB,
-        std::shared_ptr<CollisionData>   colData);
-
-    ///
     /// \brief Constructor
     ///
     CollisionDetection(const Type& type, std::shared_ptr<CollisionData> colData);
@@ -114,10 +102,6 @@ public:
     ///
     static void clearInternalOctree();
 
-protected:
-    Type m_type = Type::Custom;               ///< Collision detection algorithm type
-    std::shared_ptr<CollisionData> m_colData; ///< Collision data
-
     ///
     /// \brief Add the geometry into the background octree for collision detection
     /// \todo Add line primitive geometry
@@ -126,6 +110,10 @@ protected:
                                          const std::shared_ptr<Geometry>&      geomB,
                                          const CollisionDetection::Type        collisionType,
                                          const std::shared_ptr<CollisionData>& collisionData);
+
+protected:
+    Type m_type = Type::Custom;               ///< Collision detection algorithm type
+    std::shared_ptr<CollisionData> m_colData; ///< Collision data
 
     /// Static octree for collision detection
     /// This octree is valid throughout the lifetime of the program

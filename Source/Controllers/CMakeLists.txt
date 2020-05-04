@@ -4,9 +4,8 @@
 include(imstkAddLibrary)
 imstk_add_library( Controllers
   DEPENDS
-    Common
-	Scene
-    SceneElements
+	Devices
+    SceneEntities
   )
 
 #-----------------------------------------------------------------------------

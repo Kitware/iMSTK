@@ -21,13 +21,13 @@
 
 #include "imstkMeshToMeshBruteForceCD.h"
 
-#include "imstkCollidingObject.h"
+//#include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkPointSet.h"
 #include "imstkLineMesh.h"
 #include "imstkGeometry.h"
-#include "imstkColor.h"
+//#include "imstkColor.h"
 #include "imstkCollisionUtils.h"
 
 #include <g3log/g3log.hpp>

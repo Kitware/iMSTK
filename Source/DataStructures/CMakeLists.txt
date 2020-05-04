@@ -5,8 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( DataStructures
   DEPENDS
     Common
-    #Materials
-    Geometry
+    Geometry #TODO remove this dependency
   )
 
 #-----------------------------------------------------------------------------

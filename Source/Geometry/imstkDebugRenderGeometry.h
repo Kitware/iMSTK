@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkMath.h"
-#include "imstkRenderMaterial.h"
 
 namespace imstk
 {
@@ -108,12 +107,6 @@ public:
     bool isModified() const { return m_isModified; }
     void setDataModified(const bool bState) { m_isModified = bState; }
 
-    ///
-    /// \brief Set/Get render material
-    ///
-    void setRenderMaterial(const std::shared_ptr<RenderMaterial>& renderMat);
-    const std::shared_ptr<RenderMaterial>& getRenderMaterial() const;
-
 protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
@@ -121,10 +114,10 @@ protected:
     ///
     /// \brief Constructor
     ///
-    explicit DebugRenderGeometry(const std::string& name, const Type type) :
-        m_name(name), m_type(type), m_renderMaterial(std::make_shared<RenderMaterial>())
-    {
-    }
+    explicit DebugRenderGeometry(const std::string& name,
+                                 const Type         type) :
+        m_name(name),
+        m_type(type) {}
 
     virtual ~DebugRenderGeometry() = default;
 
@@ -132,9 +125,7 @@ protected:
     Type m_type;                          ///> Debug geometry type
     StdVectorOfVec3d m_VertexBuffer;      ///> Vertex buffer
 
-    bool m_renderDelegateCreated = false; ///> This variable is used in Renderer
     bool m_isModified = false;
-    std::shared_ptr<RenderMaterial> m_renderMaterial = nullptr;
 };
 
 ///

@@ -29,6 +29,7 @@
 #include <vtkFloatArray.h>
 #include <vtkLineSource.h>
 #include <vtkPointData.h>
+#include <vtkCellData.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 #include <vtkLine.h>
@@ -70,7 +71,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
     lines->SetLines(lineIndices);
 
     // Add colors
-    if (geometry->getVertexColors().size() == geometry->getNumVertices())
+    /*if (geometry->getVertexColors().size() == geometry->getNumVertices())
     {
         auto colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
         colors->SetNumberOfComponents(3);
@@ -85,7 +86,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
         }
 
         lines->GetPointData()->SetScalars(colors);
-    }
+    }*/
 
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();

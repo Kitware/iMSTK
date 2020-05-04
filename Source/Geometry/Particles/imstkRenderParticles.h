@@ -28,7 +28,7 @@
 
 #include "imstkGeometry.h"
 #include "imstkMath.h"
-#include "imstkColor.h"
+//#include "imstkColor.h"
 
 namespace imstk
 {
@@ -42,7 +42,7 @@ struct RenderParticle
     Vec3f m_position     = Vec3f(0, 0, 0);
     Vec3f m_velocity     = Vec3f(0, 0, 0);
     Vec3f m_acceleration = Vec3f(0, 0, 0);
-    Color m_color    = Color::White;
+    Vec4d m_color    = Vec4d(1., 1., 1., 1.);
     float m_age      = 0;
     bool m_created   = false;
     float m_scale    = 1.0f;

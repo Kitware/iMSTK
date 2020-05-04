@@ -49,7 +49,7 @@ int
 main()
 {
     // simManager and Scene
-    auto simConfig = std::make_shared<simManagerConfig>();
+    auto simConfig = std::make_shared<SimManagerConfig>();
     simConfig->simulationMode = SimulationMode::Rendering;
     auto simManager = std::make_shared<SimulationManager>(simConfig);
     auto scene      = simManager->createNewScene("DeformableBodyFEM");

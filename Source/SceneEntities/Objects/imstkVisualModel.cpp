@@ -22,10 +22,29 @@
 #include "imstkVisualModel.h"
 #include "imstkGeometry.h"
 #include "imstkRenderMaterial.h"
+#include "imstkDebugRenderGeometry.h"
 
 namespace imstk
 {
 VisualModel::VisualModel(std::shared_ptr<Geometry> geometry) : m_geometry(geometry), m_renderMaterial(std::make_shared<RenderMaterial>())
+{
+}
+
+VisualModel::VisualModel(std::shared_ptr<Geometry>       geometry,
+                         std::shared_ptr<RenderMaterial> renderMaterial) :
+    m_geometry(geometry),
+    m_renderMaterial(renderMaterial)
+{
+}
+
+VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry) : m_DbgGeometry(geometry), m_renderMaterial(std::make_shared<RenderMaterial>())
+{
+}
+
+VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
+                         std::shared_ptr<RenderMaterial>      renderMaterial) :
+    m_DbgGeometry(geometry),
+    m_renderMaterial(renderMaterial)
 {
 }
 
@@ -39,6 +58,18 @@ void
 VisualModel::setGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_geometry = geometry;
+}
+
+std::shared_ptr<DebugRenderGeometry>
+VisualModel::getDebugGeometry()
+{
+    return m_DbgGeometry;
+}
+
+void
+VisualModel::setDebugGeometry(std::shared_ptr<DebugRenderGeometry> dbgGeometry)
+{
+    m_DbgGeometry = dbgGeometry;
 }
 
 void

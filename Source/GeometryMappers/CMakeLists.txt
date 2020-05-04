@@ -2,19 +2,15 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SceneElements
+imstk_add_library( GeometryMappers
   DEPENDS
-    Common
-    Geometry
-    DataStructures
-    Constraints
-    Devices
-    DynamicalModels
+	Geometry
   )
 
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
 #if( ${PROJECT_NAME}_BUILD_TESTING )
-#  add_subdirectory( Testing )
+#  include(imstkAddTest)
+#  imstk_add_test( GeometryMappers )
 #endif()

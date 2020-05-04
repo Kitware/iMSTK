@@ -2,13 +2,16 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
-  DEPENDS
+imstk_add_library( SceneEntities
+  DEPENDS    
     Common
-    CollisionDetection
-    CollisionHandling
-    SceneEntities
-    Controllers
+    Geometry
+    GeometryMappers
+    Materials
+    MeshIO
+    Constraints
+    Devices
+    DynamicalModels
   )
 
 #-----------------------------------------------------------------------------

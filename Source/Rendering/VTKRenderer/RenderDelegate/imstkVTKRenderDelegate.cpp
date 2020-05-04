@@ -119,28 +119,25 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 }
 
 std::shared_ptr<imstk::VTKRenderDelegate>
-VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<DebugRenderGeometry> geom)
+VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
 {
-    switch (geom->getType())
+    switch (dbgVizModel->getDebugGeometry()->getType())
     {
     case DebugRenderGeometry::Type::Points:
     {
-        auto points = std::dynamic_pointer_cast<DebugRenderPoints>(geom);
-        return std::make_shared<VTKdbgPointsRenderDelegate>(points);
+        return std::make_shared<VTKdbgPointsRenderDelegate>(dbgVizModel);
     }
     case DebugRenderGeometry::Type::Lines:
     {
-        auto lines = std::dynamic_pointer_cast<DebugRenderLines>(geom);
-        return std::make_shared<VTKdbgLinesRenderDelegate>(lines);
+        return std::make_shared<VTKdbgLinesRenderDelegate>(dbgVizModel);
     }
     case DebugRenderGeometry::Type::Triangles:
     {
-        auto triangles = std::dynamic_pointer_cast<DebugRenderTriangles>(geom);
-        return std::make_shared<VTKdbgTrianglesRenderDelegate>(triangles);
+        return std::make_shared<VTKdbgTrianglesRenderDelegate>(dbgVizModel);
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
+        LOG(WARNING) << "RenderDelegate::makeDebugDelegate error: Geometry type incorrect.";
         return nullptr;
     }
     }

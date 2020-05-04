@@ -29,6 +29,7 @@
 namespace imstk
 {
 class SceneObjectControllerBase;
+class VisualModel;
 class CameraController;
 class DebugRenderGeometry;
 class SceneObject;
@@ -124,7 +125,7 @@ public:
     /// \brief Return a vector of shared pointers to the scene objects
     /// NOTE: A separate list might be efficient as this is called runtime
     ///
-    const std::vector<std::shared_ptr<DebugRenderGeometry>> getDebugRenderObjects() const;
+    const std::vector<std::shared_ptr<VisualModel>> getDebugRenderModels() const;
 
     ///
     /// \brief Get the scene object controllers
@@ -140,8 +141,12 @@ public:
     /// \brief Add/remove a scene object
     ///
     void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
-    void addDebugGeometry(std::shared_ptr<DebugRenderGeometry> newSceneObject);
     void removeSceneObject(const std::string& sceneObjectName);
+
+    ///
+    /// \brief Add a debug visual model object
+    ///
+    void addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel);
 
     ///
     /// \brief
@@ -231,9 +236,9 @@ protected:
     std::shared_ptr<SceneConfig> m_config;
 
     std::string m_name;                              ///> Name of the scene
-    NamedMap<SceneObject> m_sceneObjectsMap;
-    NamedMap<DebugRenderGeometry> m_DebugRenderGeometryMap;
-    NamedMap<Light> m_lightsMap;
+    NamedMap<SceneObject>           m_sceneObjectsMap;
+    NamedMap<VisualModel>           m_DebugRenderModelMap;
+    NamedMap<Light>                 m_lightsMap;
     std::shared_ptr<IBLProbe>       m_globalIBLProbe = nullptr;
     std::shared_ptr<Camera>         m_camera = nullptr;
     std::shared_ptr<CollisionGraph> m_collisionGraph = nullptr;

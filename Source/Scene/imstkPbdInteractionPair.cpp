@@ -26,7 +26,7 @@
 #include "imstkCollisionUtils.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkColor.h"
+//#include "imstkColor.h"
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
 #include "imstkPbdPointTriCollisionConstraint.h"
 

@@ -26,7 +26,7 @@
 #include "imstkAssimpMeshIO.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkMSHMeshIO.h"
-#include "imstkColor.h"
+//#include "imstkColor.h"
 
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"

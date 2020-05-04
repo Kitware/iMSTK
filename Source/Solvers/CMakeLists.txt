@@ -4,10 +4,8 @@
 include(imstkAddLibrary)
 imstk_add_library( Solvers
   DEPENDS
-    Common
-    DataStructures
     Constraints
-    SceneElements
+    SceneEntities
   )
 
 #-----------------------------------------------------------------------------

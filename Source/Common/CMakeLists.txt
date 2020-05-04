@@ -16,3 +16,4 @@ if( ${PROJECT_NAME}_BUILD_TESTING )
   include(imstkAddTest)
   imstk_add_test( Common )
 endif()
+

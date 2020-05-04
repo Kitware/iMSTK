@@ -32,10 +32,11 @@
 
 namespace imstk
 {
-VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(const std::shared_ptr<DebugRenderTriangles>& renderTriangles) :
-    m_RenderGeoData(renderTriangles),
+VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_pappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
+    m_visualModel = visualModel;
+
     // Map vertices in memory
     m_pappedVertexArray->SetNumberOfComponents(3);
 
@@ -59,24 +60,26 @@ VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(const std::shared_p
     //updateDataSource();
     //updateActorProperties();
 
-    setUpMapper(source->GetOutputPort(), true, m_RenderGeoData->getRenderMaterial());
+    setUpMapper(source->GetOutputPort(), true, visualModel->getRenderMaterial());
 }
 
 void
 VTKdbgTrianglesRenderDelegate::updateDataSource()
 {
-    if (m_RenderGeoData->isModified())
+    auto dbgTriangles = std::static_pointer_cast<DebugRenderTriangles>(m_visualModel->getDebugGeometry());
+
+    if (dbgTriangles->isModified())
     {
-        m_RenderGeoData->setDataModified(false);
-        m_pappedVertexArray->SetArray(m_RenderGeoData->getVertexBufferPtr(),
-                                      m_RenderGeoData->getNumVertices() * 3, 1);
+        dbgTriangles->setDataModified(false);
+        m_pappedVertexArray->SetArray(dbgTriangles->getVertexBufferPtr(),
+                                      dbgTriangles->getNumVertices() * 3, 1);
 
         // Set point data
-        m_points->SetNumberOfPoints(m_RenderGeoData->getNumVertices());
+        m_points->SetNumberOfPoints(dbgTriangles->getNumVertices());
 
         // Set tri data
         int numCurrentTriangles = m_cellArray->GetNumberOfCells();
-        if (numCurrentTriangles > static_cast<int>(m_RenderGeoData->getNumVertices() / 3))
+        if (numCurrentTriangles > static_cast<int>(dbgTriangles->getNumVertices() / 3))
         {
             // There should is a better way to modify the existing data,
             // instead of discarding everything and add from the beginning
@@ -85,7 +88,7 @@ VTKdbgTrianglesRenderDelegate::updateDataSource()
         }
 
         vtkIdType cell[3];
-        for (int i = numCurrentTriangles; i < static_cast<int>(m_RenderGeoData->getNumVertices() / 3); ++i)
+        for (int i = numCurrentTriangles; i < static_cast<int>(dbgTriangles->getNumVertices() / 3); ++i)
         {
             cell[0] = 3 * i;
             cell[1] = cell[0] + 1;
