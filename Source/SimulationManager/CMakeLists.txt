@@ -61,8 +61,8 @@ imstk_add_library( SimulationManager
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}
   DEPENDS
+    Scene
     Rendering
-    Controllers
     ${Vulkan}
   )
 

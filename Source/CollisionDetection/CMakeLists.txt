@@ -7,7 +7,7 @@ imstk_add_library( CollisionDetection
     Common
     DataStructures
     Geometry
-    MeshIO
+    MeshIO #TODO: remove this dependency
     SCCD    
   )
 

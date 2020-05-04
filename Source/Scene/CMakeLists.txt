@@ -9,7 +9,6 @@ imstk_add_library( Scene
     CollisionHandling
     SceneEntities
     Controllers
-    DynamicalModels
   )
 
 #-----------------------------------------------------------------------------

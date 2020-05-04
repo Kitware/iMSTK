@@ -3,13 +3,12 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( SceneEntities
-  DEPENDS
+  DEPENDS    
     Common
     Geometry
     GeometryMappers
-    MeshIO
-    DataStructures
     Materials
+    MeshIO
     Constraints
     Devices
     DynamicalModels

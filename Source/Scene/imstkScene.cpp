@@ -183,7 +183,7 @@ Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 void
 Scene::addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel)
 {
-    const std::string name = dbgRenderModel->getGeometry()->getName();
+    const std::string name = dbgRenderModel->getDebugGeometry()->getName();
 
     if (m_DebugRenderModelMap.find(name) != m_DebugRenderModelMap.end())
     {

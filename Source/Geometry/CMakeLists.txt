@@ -4,8 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Geometry
   DEPENDS
-    Common
-    tbb
+    Common    
     ${VTK_LIBRARIES}
   )
 

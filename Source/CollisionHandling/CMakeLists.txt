@@ -6,9 +6,7 @@ imstk_add_library( CollisionHandling
   DEPENDS
     CollisionDetection
     SceneEntities
-    DynamicalModels
     Controllers
-    SCCD    
   )
 
 #-----------------------------------------------------------------------------
