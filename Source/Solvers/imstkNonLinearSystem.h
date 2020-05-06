@@ -31,11 +31,12 @@ namespace imstk
 ///
 /// \brief Base class for a multi-variable nonlinear system
 ///
+template <typename Matrix>
 class NonLinearSystem
 {
 public:
     using VectorFunctionType = std::function<const Vectord& (const Vectord&, const bool)>;
-    using MatrixFunctionType = std::function<const SparseMatrixd& (const Vectord&)>;
+    using MatrixFunctionType = std::function<const Matrix& (const Vectord&)>;
     using UpdateFunctionType = std::function<void (const Vectord&, const bool)>;
     using UpdatePrevStateFunctionType = std::function<void ()>;
 
@@ -66,7 +67,7 @@ public:
     ///
     /// \brief Evaluate gradient of the function at a given state
     ///
-    virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
+    virtual const Matrix& evaluateJacobian(const Vectord& x);
 
     ///
     /// \brief

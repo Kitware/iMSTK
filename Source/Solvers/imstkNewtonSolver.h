@@ -33,10 +33,11 @@ namespace imstk
 ///     root of F or fails. Global convergence is achieved using a line search sub-process
 ///     and the Armijo rule
 ///
-class NewtonSolver : public NonLinearSolver
+template <typename SystemMatrix> 
+class NewtonSolver : public NonLinearSolver<SystemMatrix>
 {
 public:
-    using LinearSolverType = LinearSolver<SparseMatrixd>;
+    using LinearSolverType = LinearSolver<SystemMatrix>;
 
 public:
     ///
@@ -78,7 +79,8 @@ public:
     ///
     /// \brief Get LinearSolver
     ///
-    std::shared_ptr<LinearSolverType> getLinearSolver() const;
+    // std::shared_ptr<LinearSolverType> getLinearSolver() const;
+    auto getLinearSolver() const -> std::shared_ptr<LinearSolverType>;
 
     ///
     /// \brief Update jacobians
@@ -90,7 +92,7 @@ public:
     ///
     /// \brief Get JacobianMatrix. Returns jacobian matrix
     ///
-    SparseMatrixd& getJacobianMatrix();
+    SystemMatrix& getJacobianMatrix();
 
     ///
     /// \brief Set AbsoluteTolerance
@@ -169,7 +171,7 @@ public:
     void setUseArmijo(const bool value)
     {
         m_useArmijo = value;
-        (value) ? m_armijoMax = 30 : m_armijoMax = 0;
+        (value) ? this->m_armijoMax = 30 : this->m_armijoMax = 0;
     }
 
     ///
@@ -193,7 +195,7 @@ public:
     ///
     virtual void setToFullyImplicit() override
     {
-        m_isSemiImplicit = false;
+        this->m_isSemiImplicit = false;
     }
 
     ///
@@ -201,7 +203,7 @@ public:
     ///
     virtual void setToSemiImplicit() override
     {
-        m_isSemiImplicit = true;
+        this->m_isSemiImplicit = true;
         m_maxIterations  = 1;
     }
 

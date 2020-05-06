@@ -20,10 +20,12 @@
 =========================================================================*/
 
 #include "imstkNonLinearSolver.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
-NonLinearSolver::NonLinearSolver() : m_sigma(std::array<double, 2>
+template <typename SystemMatrix>
+NonLinearSolver<SystemMatrix>::NonLinearSolver() : m_sigma(std::array<double, 2>
     {
         { 0.1, 0.5 }
     }),
@@ -36,8 +38,9 @@ NonLinearSolver::NonLinearSolver() : m_sigma(std::array<double, 2>
                       };
 }
 
+template <typename SystemMatrix>
 double
-NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnorm)
+NonLinearSolver<SystemMatrix>::armijo(const Vectord& dx, Vectord& x, const double previousFnorm)
 {
     /// Temporaries used in the line search
     std::array<double, 3> fnormSqr = { previousFnorm* previousFnorm, 0.0, 0.0 };
@@ -96,8 +99,9 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
     return currentFnorm;
 }
 
+template <typename SystemMatrix>
 void
-NonLinearSolver::parabolicModel(const std::array<double, 3>& fnorm, std::array<double, 3>& lambda)
+NonLinearSolver<SystemMatrix>::parabolicModel(const std::array<double, 3>& fnorm, std::array<double, 3>& lambda)
 {
     /// Compute the coefficients for the interpolation polynomial:
     ///     p(lambda) = fnorm[0] + (b*lambda + a*lambda^2)/d1, where
@@ -130,57 +134,69 @@ NonLinearSolver::parabolicModel(const std::array<double, 3>& fnorm, std::array<d
     lambda[0] = newLambda;
 }
 
+template <typename SystemMatrix>
 void
-NonLinearSolver::setSigma(const std::array<double, 2>& newSigma)
+NonLinearSolver<SystemMatrix>::setSigma(const std::array<double, 2>& newSigma)
 {
     m_sigma = newSigma;
 }
 
+template <typename SystemMatrix>
 const std::array<double, 2>&
-NonLinearSolver::getSigma() const
+NonLinearSolver<SystemMatrix>::getSigma() const
 {
     return m_sigma;
 }
 
+template <typename SystemMatrix>
 void
-NonLinearSolver::setAlpha(const double newAlpha)
+NonLinearSolver<SystemMatrix>::setAlpha(const double newAlpha)
 {
     m_alpha = newAlpha;
 }
 
+template <typename SystemMatrix>
 double
-NonLinearSolver::getAlpha() const
+NonLinearSolver<SystemMatrix>::getAlpha() const
 {
     return m_alpha;
 }
 
+template <typename SystemMatrix>
 void
-NonLinearSolver::setArmijoMax(const size_t newArmijoMax)
+NonLinearSolver<SystemMatrix>::setArmijoMax(const size_t newArmijoMax)
 {
     m_armijoMax = newArmijoMax;
 }
 
+template <typename SystemMatrix>
 size_t
-NonLinearSolver::getArmijoMax() const
+NonLinearSolver<SystemMatrix>::getArmijoMax() const
 {
     return m_armijoMax;
 }
 
+template <typename SystemMatrix>
 void
-NonLinearSolver::setSystem(std::shared_ptr<NonLinearSystem> newSystem)
+NonLinearSolver<SystemMatrix>::setSystem(std::shared_ptr<NonLinearSystem<SystemMatrix>> newSystem)
 {
     m_nonLinearSystem = newSystem;
 }
 
-std::shared_ptr<NonLinearSystem>
-NonLinearSolver::getSystem() const
+template <typename SystemMatrix>
+std::shared_ptr<NonLinearSystem<SystemMatrix>>
+NonLinearSolver<SystemMatrix>::getSystem() const
 {
     return m_nonLinearSystem;
 }
 
+template <typename SystemMatrix>
 void
-NonLinearSolver::setUpdateIterate(const NonLinearSolver::UpdateIterateType& newUpdateIterate)
+NonLinearSolver<SystemMatrix>::setUpdateIterate(const NonLinearSolver<SystemMatrix>::UpdateIterateType& newUpdateIterate)
 {
     m_updateIterate = newUpdateIterate;
 }
+
+template class NonLinearSolver<SparseMatrixd>;
+template class NonLinearSolver<Matrixd>;
 } // imstk

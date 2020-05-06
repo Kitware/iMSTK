@@ -23,7 +23,7 @@
 #include "imstkSimulationManager.h"
 #include "imstkDeformableObject.h"
 #include "imstkBackwardEuler.h"
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 #include "imstkNewtonSolver.h"
 #include "imstkGaussSeidel.h"
 #include "imstkPlane.h"
@@ -112,7 +112,7 @@ main()
     scene->addSceneObject(planeObj);
 
     // create a nonlinear system
-    auto nlSystem = std::make_shared<NonLinearSystem>(
+    auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(
         dynaModel->getFunction(),
         dynaModel->getFunctionGradient());
 
@@ -130,7 +130,7 @@ main()
     }
 
     // create a non-linear solver and add to the scene
-    auto nlSolver = std::make_shared<NewtonSolver>();
+    auto nlSolver = std::make_shared<NewtonSolver<SparseMatrixd>>();
     nlSolver->setLinearSolver(linSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);

@@ -33,6 +33,7 @@ class PointSet;
 class SceneManager;
 class Scene;
 class FEMDeformableBodyModel;
+template <typename Matrix>
 class NonLinearSystem;
 class CollidingObject;
 class Graph;
@@ -67,7 +68,7 @@ std::shared_ptr<SceneObject> createAndAddVisualSceneObject(std::shared_ptr<Scene
 ///
 /// \brief Create a non-linear system using FEM dynamic model
 ///
-std::shared_ptr<NonLinearSystem> createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel);
+std::shared_ptr<NonLinearSystem<SparseMatrixd>> createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel);
 
 ///
 /// \brief Print number of updates for second for a given scene

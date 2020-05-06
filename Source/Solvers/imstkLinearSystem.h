@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 
 namespace imstk
 {
@@ -30,7 +30,7 @@ namespace imstk
 /// \brief Represents the linear system of the form \f$ Ax = b \f$
 ///
 template<typename SystemMatrixType>
-class LinearSystem : public NonLinearSystem
+class LinearSystem : public NonLinearSystem<SystemMatrixType>
 {
 public:
     ///
@@ -91,7 +91,7 @@ public:
     ///
     /// \brief Set the system matrix corresponding to this ODE system.
     ///
-    void setMatrix(const SparseMatrixd& newMatrix)
+    void setMatrix(const SystemMatrixType& newMatrix)
     {
         m_A = newMatrix;
     }
