@@ -81,12 +81,12 @@ main()
     //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
 
     auto config = std::make_shared<FEMModelConfig>();
-    config->m_fixedNodeIds = { 51, 127, 178 };
+    config->m_fixedNodeIds = { 50, 126, 177 };
     dynaModel->configure(config);
 
     dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     dynaModel->setModelGeometry(volTetMesh);
-    auto timeIntegrator = std::make_shared<BackwardEuler>(0.05);// Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     auto material = std::make_shared<RenderMaterial>();

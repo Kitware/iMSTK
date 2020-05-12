@@ -159,8 +159,8 @@ VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::Volumet
     if (imstkVolMesh->getType() == Geometry::Type::TetrahedralMesh)
     {
         // Using default material properties to append to the .veg file
-        const double E       = 1E6;
-        const double nu      = 0.45;
+        const double E       = 1E7;
+        const double nu      = 0.4;
         const double density = 1000.0;
 
         auto imstkVolTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(imstkVolMesh);
