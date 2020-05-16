@@ -197,18 +197,6 @@ RenderMaterial::setEmissivity(const float emissivity)
     m_emissivity = emissivity;
 }
 
-const double&
-RenderMaterial::getSphereGlyphSize() const
-{
-    return m_sphereGlyphSize;
-}
-
-void
-RenderMaterial::setSphereGlyphSize(const double size)
-{
-    m_sphereGlyphSize = size;
-}
-
 std::shared_ptr<Texture>
 RenderMaterial::getTexture(Texture::Type type)
 {

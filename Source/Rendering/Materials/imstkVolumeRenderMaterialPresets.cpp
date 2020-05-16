@@ -33,7 +33,7 @@
 namespace imstk
 {
 std::shared_ptr<VolumeRenderMaterial>
-VolumeRenderMaterialPresets::getPreset(int p)
+VolumeRenderMaterialPresets::getPreset(const int p)
 {
     auto mat     = std::make_shared<VolumeRenderMaterial>();
     auto volProp = mat->getVolumeProperty();

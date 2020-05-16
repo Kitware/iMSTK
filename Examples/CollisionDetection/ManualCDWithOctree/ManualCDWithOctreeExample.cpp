@@ -111,7 +111,7 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
     auto material    = std::make_shared<RenderMaterial>();
     material->setDebugColor(Color::Yellow);
-    material->setSphereGlyphSize(.01);
+    //material->setSphereGlyphSize(.01);
 
     auto dbgViz = std::make_shared<VisualModel>(debugPoints, material);
     scene->addDebugVisualModel(dbgViz);

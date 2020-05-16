@@ -51,13 +51,20 @@
 #include "imstkVTKPointSetRenderDelegate.h"
 #include "imstkVTKImageDataRenderDelegate.h"
 
-#include "vtkOpenGLPolyDataMapper.h"
-#include "vtkOpenGLVertexBufferObject.h"
-#include "vtkPolyDataNormals.h"
-#include "vtkTriangleMeshPointNormals.h"
-#include "vtkTransform.h"
-#include "vtkImageData.h"
-#include "vtkProp3D.h"
+#include <vtkOpenGLVertexBufferObject.h>
+#include <vtkTriangleMeshPointNormals.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkImageReader2.h>
+#include <vtkTransform.h>
+#include <vtkImageData.h>
+#include <vtkTexture.h>
+#include <vtkVolume.h>
+#include <vtkVector.h>
+#include <vtkProp3D.h>
+#include <vtkActor.h>
+#include <vtkNew.h>
 
 namespace imstk
 {
@@ -144,9 +151,8 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
 }
 
 void
-VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
-                               const bool                      notSurfaceMesh,
-                               std::shared_ptr<RenderMaterial> renderMat)
+VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput* source,
+                               const std::shared_ptr<VisualModel> vizModel)
 {
     if (auto imData = vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
     {
@@ -159,7 +165,7 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
         m_modelIsVolume = false;
     }
     // Add normals
-    if (notSurfaceMesh)
+    if (!vizModel->getGeometry()->isMesh())
     {
         vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
         normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -174,29 +180,22 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*             source,
 
     // Disable auto Shift & Scale which is slow for deformable objects
     // as it needs to compute a bounding box at every frame
-    if (auto mapper = VTKCustomPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+    if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
     {
         mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
-
-        /*if (!renderMat)
-        {
-            geometry->setRenderMaterial(std::make_shared<RenderMaterial>());
-        }*/
-
-        mapper->setRenderMaterial(renderMat);
     }
 }
 
-vtkSmartPointer<vtkProp3D>
+vtkProp3D*
 VTKRenderDelegate::getVtkActor() const
-{
+{       
     if (m_modelIsVolume)
     {
-        return m_volume;
+        return m_volume.GetPointer();
     }
     else
     {
-        return m_actor;
+        return m_actor.GetPointer();
     }
 }
 
@@ -207,24 +206,13 @@ VTKRenderDelegate::update()
     this->updateActorTransform();
     this->updateActorProperties();
 
-    vtkSmartPointer<vtkProp3D> actor = nullptr;
     if (m_modelIsVolume)
     {
-        actor = m_volume;
+        m_volume.GetPointer()->SetVisibility(m_visualModel->isVisible());
     }
     else
     {
-        actor = m_actor;
-    }
-    if (m_visualModel->isVisible())
-    {
-        actor->VisibilityOn();
-        return;
-    }
-    else
-    {
-        actor->VisibilityOff();
-        return;
+        m_actor.GetPointer()->SetVisibility(m_visualModel->isVisible());
     }
 }
 
@@ -246,37 +234,28 @@ VTKRenderDelegate::updateActorTransform()
 void
 VTKRenderDelegate::updateActorProperties()
 {
-    if (!m_visualModel)
+    if (this->isMesh())
+    {
+        updateActorPropertiesMesh();
+        return;
+    }
+    if (this->isVolume())
+    {
+        updateActorPropertiesVolumeRendering();
+        return;
+    }
+
+    // remove this because there should be a default visual model?
+    // not visible: nothing to do; mind the initialization need the first time around
+    if (!m_visualModel || !m_visualModel->isVisible())
     {
         return;
     }
-    auto material = m_visualModel->getRenderMaterial();
 
+    const auto material = m_visualModel->getRenderMaterial();
     if (!material || !material->m_modified)
     {
         return;
-    }
-    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
-    {
-        switch (volumeMat->getBlendMode())
-        {
-        case RenderMaterial::BlendMode::Alpha:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
-            break;
-        case RenderMaterial::BlendMode::Additive:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
-            break;
-        case RenderMaterial::BlendMode::MaximumIntensity:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
-            break;
-        case RenderMaterial::BlendMode::MinimumIntensity:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
-            break;
-        default:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
-            break;
-        }
-        m_volume->SetProperty(volumeMat->getVolumeProperty());
     }
 
     auto actorProperty = m_actor->GetProperty();
@@ -312,15 +291,19 @@ VTKRenderDelegate::updateActorProperties()
     default:
         actorProperty->SetRepresentationToSurface();
         actorProperty->SetEdgeVisibility(false);
-        if (material->m_flatShading)
-        {
-            actorProperty->SetInterpolationToFlat();
+        
+        switch (material->getShadingModel())
+        {           
+            case RenderMaterial::ShadingModel::Gouraud:
+                actorProperty->SetInterpolationToGouraud();
+                break;
+            case RenderMaterial::ShadingModel::Flat:
+                actorProperty->SetInterpolationToFlat();
+                break;
+            case RenderMaterial::ShadingModel::Phong:                               
+            default:
+                actorProperty->SetInterpolationToPhong();
         }
-        else
-        {
-            actorProperty->SetInterpolationToGouraud();
-        }
-        break;
     }
 
     // Display properties
@@ -331,4 +314,299 @@ VTKRenderDelegate::updateActorProperties()
     // Material state is now up to date
     material->m_stateModified = false;
 }
+
+void
+VTKRenderDelegate::updateActorPropertiesMesh()
+{
+    // remove this because there should be a default visual model?
+    // not visible: nothing to do; mind the initialization need the first time around
+    if (!m_visualModel || !m_visualModel->isVisible())
+    {
+        return;
+    }
+
+    const auto material = m_visualModel->getRenderMaterial();
+    if (!material || !material->isModified())
+    {
+        return;
+    }
+
+    const auto actorProperty = m_actor->GetProperty();
+
+    // Material state is now up to date
+    material->m_modified = false;
+    if (!material->m_stateModified)
+    {
+        return;
+    }
+    
+    const auto edgeColor = material->getEdgeColor();
+    const auto vertexColor = material->getVertexColor();
+    const auto surfaceColor = material->getColor();
+    
+    actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
+    if (material->getDisplayMode() != RenderMaterial::DisplayMode::Surface)
+    {
+        switch (material->getDisplayMode())
+        {
+        case RenderMaterial::DisplayMode::Wireframe:
+            actorProperty->SetRepresentationToWireframe();
+            break;
+        case RenderMaterial::DisplayMode::Points:
+            actorProperty->SetRepresentationToPoints();
+            break;
+        default:
+            actorProperty->SetRepresentationToSurface();//wireframeSurface
+        }
+
+        // enable vertex visibility and vertex edge properties
+        actorProperty->SetEdgeVisibility(false);
+        actorProperty->SetPointSize(material->getPointSize());
+        actorProperty->SetRenderPointsAsSpheres(true);
+        actorProperty->SetVertexVisibility(true);
+        actorProperty->SetVertexColor(vertexColor.r, vertexColor.g, vertexColor.b);
+
+        if (material->getDisplayMode() != RenderMaterial::DisplayMode::Points)
+        {
+            // enable edge visibility and set edge properties
+            actorProperty->SetEdgeVisibility(true);
+            actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b);
+            actorProperty->SetLineWidth(material->getLineWidth());
+            actorProperty->SetRenderLinesAsTubes(true);
+        }
+
+        if (material->getDisplayMode() == RenderMaterial::DisplayMode::WireframeSurface)
+        {
+            switch (material->getShadingModel())
+            {
+                case RenderMaterial::ShadingModel::Flat:
+                    actorProperty->SetInterpolationToFlat();
+                    break;
+                case RenderMaterial::ShadingModel::Gouraud:
+                    actorProperty->SetInterpolationToGouraud();
+                    break;
+                default:
+                    actorProperty->SetInterpolationToPhong();
+            }
+        }
+    
+    }
+    else // surface
+    {
+        actorProperty->SetRepresentationToSurface();
+        actorProperty->SetEdgeVisibility(false);
+        actorProperty->SetVertexVisibility(false);
+        if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
+        {
+            
+            /*actorProperty->UseImageBasedLightingOn();
+            actorProperty->SetEnvironmentCubeMap(getVTKTexture(cubemap));*/
+            
+            actorProperty->SetInterpolationToPBR();
+
+            // configure the basic properties
+            actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
+            actorProperty->SetMetallic(material->getMetalness());
+            actorProperty->SetRoughness(material->getRoughness());
+
+            // configure textures (needs tcoords on the mesh)
+            const auto baseColorTexture = material->getTexture(Texture::Type::Diffuse);
+            if (baseColorTexture)
+            {
+                actorProperty->SetBaseColorTexture(getVTKTexture(baseColorTexture));
+            }
+
+            const auto ormTexture = material->getTexture(Texture::Type::ORM);
+            if (ormTexture)
+            {
+                actorProperty->SetORMTexture(getVTKTexture(ormTexture));
+                actorProperty->SetOcclusionStrength(material->getOcclusionStrength());
+            }
+
+            const auto emmisiveTexture = material->getTexture(Texture::Type::Emissive);
+            if (emmisiveTexture)
+            {
+                actorProperty->SetEmissiveTexture(getVTKTexture(emmisiveTexture));
+                const double emmis = material->getEmissivity();
+                actorProperty->SetEmissiveFactor(emmis, emmis, emmis);
+            }            
+
+            const auto normalTexture = material->getTexture(Texture::Type::Normal);
+            if (normalTexture)
+            {
+                // needs tcoords, normals and tangents on the mesh
+                actorProperty->SetNormalTexture(getVTKTexture(normalTexture));
+                actorProperty->SetNormalScale(material->getNormalStrength());
+            }
+        }
+        else if (material->getShadingModel() == RenderMaterial::ShadingModel::Phong)
+        {
+            actorProperty->SetInterpolationToPhong();
+        }
+        else if (material->getShadingModel() == RenderMaterial::ShadingModel::Gouraud)
+        {
+            actorProperty->SetInterpolationToGouraud();
+        }
+        else
+        {
+            actorProperty->SetInterpolationToFlat();
+        }
+    }
+
+    // Display mode
+    //switch (material->getDisplayMode())
+    //{
+    //case RenderMaterial::DisplayMode::Wireframe:
+    //    actorProperty->SetRepresentationToWireframe();       
+    //    actorProperty->SetEdgeVisibility(true);
+    //    actorProperty->SetEdgeColor(ec.r, ec.g, ec.b);
+    //    actorProperty->SetLineWidth(material->getLineWidth());
+    //    actorProperty->SetPointSize(material->getPointSize());
+    //    actorProperty->SetRenderLinesAsTubes(true);
+    //    actorProperty->SetRenderPointsAsSpheres(true);
+    //    actorProperty->SetVertexVisibility(true);
+    //    actorProperty->SetVertexColor(vc.r, vc.g, vc.b);
+    //    break;
+    //case RenderMaterial::DisplayMode::Points:
+    //    actorProperty->SetRepresentationToPoints();
+    //    actorProperty->SetEdgeVisibility(false);              
+    //    actorProperty->SetPointSize(material->getPointSize());        
+    //    actorProperty->SetRenderPointsAsSpheres(true);
+    //    actorProperty->SetVertexVisibility(true);
+    //    actorProperty->SetVertexColor(vc.r, vc.g, vc.b);
+    //    break;
+    //case RenderMaterial::DisplayMode::WireframeSurface:
+    //    actorProperty->SetRepresentationToSurface();
+    //    actorProperty->SetColor(sc.r, sc.g, sc.b);
+    //    actorProperty->SetEdgeVisibility(true);
+    //    actorProperty->SetEdgeColor(ec.r, ec.g, ec.b);
+    //    actorProperty->SetLineWidth(material->getLineWidth());
+    //    actorProperty->SetPointSize(material->getPointSize());
+    //    actorProperty->SetRenderLinesAsTubes(true);
+    //    actorProperty->SetRenderPointsAsSpheres(true);
+    //    actorProperty->SetVertexVisibility(true);
+    //    actorProperty->SetVertexColor(vc.r, vc.g, vc.b);
+    //    break;
+    //case RenderMaterial::DisplayMode::Surface:
+    //default:
+    //    actorProperty->SetRepresentationToSurface();
+    //    actorProperty->SetEdgeVisibility(false);
+    //    if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
+    //    {
+    //        //renderer->UseImageBasedLightingOn();
+    //        //renderer->SetEnvironmentCubeMap(cubemap);
+    //        actorProperty->SetInterpolationToPBR();
+    //        // configure the basic properties
+    //        actorProperty->SetColor(0.5, 1.0, 0.8);
+    //        actorProperty->SetMetallic(material->getMetalness());
+    //        actorProperty->SetRoughness(material->getRoughness());
+
+    //        // configure textures (needs tcoords on the mesh)
+    //        actorProperty->SetBaseColorTexture(getVTKTexture(material->getTexture(Texture::Type::Diffuse)));
+
+    //        actorProperty->SetORMTexture(getVTKTexture(material->getTexture(Texture::Type::ORM)));
+    //        actorProperty->SetOcclusionStrength(material->getOcclusionStrength());
+
+    //        actorProperty->SetEmissiveTexture(getVTKTexture(material->getTexture(Texture::Type::Emissive)));
+    //        const double emmis = material->getEmissivity();
+    //        actorProperty->SetEmissiveFactor(emmis, emmis, emmis);
+
+    //        // needs tcoords, normals and tangents on the mesh
+    //        actorProperty->SetNormalTexture(getVTKTexture(material->getTexture(Texture::Type::Normal)));
+    //        actorProperty->SetNormalScale(material->getNormalStrength());
+    //    }
+    //    else if (material->getShadingModel() == RenderMaterial::ShadingModel::Phong)
+    //    {
+    //        actorProperty->SetInterpolationToPhong();
+    //    }
+    //    else if (material->getShadingModel() == RenderMaterial::ShadingModel::Gouraud)
+    //    {
+    //        actorProperty->SetInterpolationToGouraud();
+    //    }
+    //    else
+    //    {
+    //        actorProperty->SetInterpolationToFlat();
+    //    }
+    //    break;
+    //}
+
+    actorProperty->SetBackfaceCulling(material->getBackfaceCulling());
+    actorProperty->SetOpacity(material->getOpacity());
+
+    // Material state is now up-to-date
+    material->m_stateModified = false;
+}
+
+void
+VTKRenderDelegate::updateActorPropertiesVolumeRendering()
+{
+    if (!m_visualModel || !m_visualModel->isVisible())
+    {
+        return;
+    }
+
+    const auto material = m_visualModel->getRenderMaterial();
+    if (!material || !material->isModified())
+    {
+        return;
+    }
+
+    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
+    {
+        
+        switch (volumeMat->getBlendMode())
+        {
+        case RenderMaterial::BlendMode::Alpha:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
+            break;
+        case RenderMaterial::BlendMode::Additive:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
+            break;
+        case RenderMaterial::BlendMode::MaximumIntensity:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
+            break;
+        case RenderMaterial::BlendMode::MinimumIntensity:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
+            break;
+        default:
+            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
+            break;
+        }
+        m_volume->SetProperty(volumeMat->getVolumeProperty());
+    }
+
+    // Material state is now up to date
+    material->setModified(false);
+
+    // Material state is now up to date
+    //material->m_stateModified = false;
+
+}
+
+vtkSmartPointer<vtkTexture>
+VTKRenderDelegate::getVTKTexture(std::shared_ptr<Texture> texture)
+{
+    vtkNew<vtkImageReader2Factory> readerFactory;
+    vtkSmartPointer<vtkImageReader2> imageReader;
+    
+    const std::string fileName = texture->getPath();
+
+    imageReader.TakeReference(readerFactory->CreateImageReader2(fileName.c_str()));
+    imageReader->SetFileName(fileName.c_str());
+    imageReader->Update();
+
+    // Create texture
+    vtkNew<vtkTexture> vtktexture;
+    vtktexture->SetInputConnection(imageReader->GetOutputPort());
+
+    return vtktexture;
+}
+
+
+std::shared_ptr<VisualModel> 
+VTKRenderDelegate::getVisualModel() const
+{
+    return m_visualModel;
+}
+
 } // imstk

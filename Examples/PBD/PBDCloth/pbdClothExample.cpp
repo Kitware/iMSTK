@@ -122,8 +122,11 @@ main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(Color::LightGray);
+    material->setColor(Color::DarkGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setPointSize(6.);
+    material->setLineWidth(4.);
+    material->setEdgeColor(Color::Color::Orange);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     deformableObj->addVisualModel(surfMeshModel);

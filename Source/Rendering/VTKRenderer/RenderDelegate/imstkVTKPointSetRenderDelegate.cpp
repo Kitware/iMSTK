@@ -22,6 +22,7 @@
 #include "imstkVTKPointSetRenderDelegate.h"
 #include "imstkPointSet.h"
 
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkTrivialProducer.h>
 #include <vtkSphereSource.h>
@@ -53,32 +54,21 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
     pointsPolydata->SetPoints(points);
 
-    auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkVertexGlyphFilter> glyphFilter;     
+    glyphFilter->SetInputData(pointsPolydata);
+    glyphFilter->Update();
 
-    auto glyph = vtkSmartPointer<vtkGlyph3D>::New();
-
-#if VTK_MAJOR_VERSION <= 5
-    glyph->SetSource(sphere->GetOutput());
-    glyph->SetInput(selectPoints->GetOutput());
-#else
-    glyph->SetSourceConnection(sphere->GetOutputPort());
-    glyph->SetInputData(pointsPolydata);
-#endif
+    // Create connection source
+    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
+    source->SetOutput(pointsPolydata);
     geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
+    this->setUpMapper(glyphFilter->GetOutputPort(), m_visualModel);
 
-    // Setup custom mapper
-    m_mapper->SetInputConnection(glyph->GetOutputPort());
-    auto mapper = VTKCustomPolyDataMapper::SafeDownCast(m_mapper.GetPointer());
-    if (!m_visualModel->getRenderMaterial())
-    {
-        m_visualModel->setRenderMaterial(std::make_shared<RenderMaterial>());
-    }
-    sphere->SetRadius(m_visualModel->getRenderMaterial()->getSphereGlyphSize());
-
-    mapper->setRenderMaterial(m_visualModel->getRenderMaterial());
+    m_isMesh = true;
+    m_modelIsVolume = false;
 }
 
 void

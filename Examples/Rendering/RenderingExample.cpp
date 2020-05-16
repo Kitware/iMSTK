@@ -55,13 +55,17 @@ main()
         iMSTK_DATA_ROOT "/head/", 1, Vec3d(0, 0, 0), "dds");
 #else
     auto headObject = VisualObjectImporter::importVisualObject(
-        "head", iMSTK_DATA_ROOT "/head/head_revised.obj",
+        "head", 
+        iMSTK_DATA_ROOT "/head/head_revised.obj",
         iMSTK_DATA_ROOT "/head/");
 
-    // Head material
+    // Head material with textures
     auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_Normal.png", Texture::Type::Normal);
-    auto headMaterial      = headObject->getVisualModel(0)->getRenderMaterial();
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_BaseColor.png", Texture::Type::Diffuse);
+    auto headMaterial      = headObject->getVisualModel()->getRenderMaterial();
+    headMaterial->setShadingModel(RenderMaterial::ShadingModel::Gouraud);
     headMaterial->addTexture(headNormalTexture);
+    headMaterial->addTexture(headDiffuseTexture);
 #endif
 
     scene->addSceneObject(headObject);

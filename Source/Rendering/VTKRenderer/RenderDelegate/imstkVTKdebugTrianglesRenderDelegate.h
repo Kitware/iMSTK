@@ -24,6 +24,7 @@
 #include "imstkVTKRenderDelegate.h"
 
 class vtkDoubleArray;
+class vtkCellArray;
 
 namespace imstk
 {
@@ -50,7 +51,7 @@ public:
 protected:
 
     // Auxiliary variables for rendering
-    vtkSmartPointer<vtkDoubleArray> m_pappedVertexArray;
+    vtkSmartPointer<vtkDoubleArray> m_paddedVertexArray;
     vtkSmartPointer<vtkPoints>      m_points;
     vtkSmartPointer<vtkCellArray>   m_cellArray;
     vtkSmartPointer<vtkPolyData>    m_polyData;

@@ -23,6 +23,7 @@
 #include "imstkSurfaceMesh.h"
 
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkVertexGlyphFilter.h>
 #include <vtkTrivialProducer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkSphereSource.h>
@@ -54,14 +55,16 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualMod
     m_polyData = vtkSmartPointer<vtkPolyData>::New();
     m_polyData->SetPoints(m_points);
 
-    auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
-    m_glyph = vtkSmartPointer<vtkGlyph3D>::New();
-    m_glyph->SetSourceConnection(sphereSource->GetOutputPort());
-    m_glyph->SetInputData(m_polyData);
+    vtkNew<vtkVertexGlyphFilter> glyphFilter;
+    glyphFilter->SetInputData(m_polyData);
+    glyphFilter->Update();
 
     // Update Transform, Render Properties
     updateActorProperties();
-    setUpMapper(m_glyph->GetOutputPort(), false, visualModel->getRenderMaterial());
+    setUpMapper(glyphFilter->GetOutputPort(), m_visualModel);
+
+    m_isMesh = true;
+    m_modelIsVolume = false;
 
     //updateDataSource();
 }

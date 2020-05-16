@@ -84,7 +84,7 @@ public:
     ///
     /// \brief Get/add visual model
     ///
-    std::shared_ptr<VisualModel> getVisualModel(unsigned int index);
+    std::shared_ptr<VisualModel> getVisualModel(unsigned int index=0);
     void addVisualModel(std::shared_ptr<VisualModel> visualModel);
 
     ///

@@ -63,7 +63,7 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     // Create a visiual model
     auto visualModel = std::make_shared<VisualModel>(meshObj);
     auto material    = std::make_shared<RenderMaterial>();
-    material->setDebugColor(color); // Wireframe color
+    material->setColor(color); // Wireframe color
     material->setLineWidth(4);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     visualModel->setRenderMaterial(material);
@@ -167,6 +167,7 @@ main()
     const auto debugOctree = octree.getDebugGeometry(8, true);
 
     const auto matDbgViz = std::make_shared<RenderMaterial>();
+    matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     matDbgViz->setDebugColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
     auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);

@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkVTKImageDataRenderDelegate.h"
+#include "imstkVolumeRenderMaterial.h"
 #include "imstkImageData.h"
 
 #include <vtkGPUVolumeRayCastMapper.h>
@@ -34,14 +35,17 @@ namespace imstk
 VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel)
 {
     m_visualModel = visualModel;
+    m_isMesh = false; 
+    m_modelIsVolume = true;
 
     auto imageData = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
     if (imageData->getData())
     {
         auto tp = vtkSmartPointer<vtkTrivialProducer>::New();
         tp->SetOutput(imageData->getData());
-        this->setUpMapper(tp->GetOutputPort(), false,
-                          m_visualModel->getRenderMaterial());
+        this->setUpMapper(tp->GetOutputPort(), m_visualModel);
+
+        this->updateActorPropertiesVolumeRendering();// check if this is needed once more!
     }
 }
 
@@ -58,4 +62,5 @@ VTKImageDataRenderDelegate::updateDataSource()
     // TODO: Any transforms/modifications?
     imageData->m_dataModified = false;
 }
+
 } // imstk

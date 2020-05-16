@@ -22,6 +22,7 @@
 #include "imstkVTKTextureDelegate.h"
 
 #include <vtkImageReader2Factory.h>
+#include <vtkPNGReader.h>
 #include <vtkImageReader2.h>
 #include <vtkImageFlip.h>
 #include <vtkTexture.h>
@@ -82,7 +83,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     }
     else
     {
-        vtkImageReader2* imgReader;
+        /*vtkImageReader2* imgReader;
         imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
 
         CHECK(imgReader != nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
@@ -92,7 +93,14 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
         imgReader->Update();
         m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
         m_sourceTexture->RepeatOff();
-        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
+        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());*/
+
+        vtkNew<vtkPNGReader> normalReader;
+        normalReader->SetFileName(tFileName.c_str());
+        normalReader->Update();
+        m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+        m_sourceTexture->RepeatOff();
+        m_sourceTexture->SetInputConnection(normalReader->GetOutputPort());
     }
 }
 }

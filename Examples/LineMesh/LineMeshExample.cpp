@@ -40,8 +40,6 @@ main()
 
     // Construct line mesh
     auto lineMesh = std::make_shared<LineMesh>();
-    auto lineMeshMaterial = std::make_shared<RenderMaterial>();
-    lineMeshMaterial->setLineWidth(3);
     auto lineObject = std::make_shared<VisualObject>("lineMesh");
 
     std::vector<LineMesh::LineArray> lines;
@@ -109,6 +107,11 @@ main()
 
     lineMesh->initialize(points, lines);
     auto lineModel = std::make_shared<VisualModel>(lineMesh);
+    auto lineMeshMaterial = std::make_shared<RenderMaterial>();
+    lineMeshMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    lineMeshMaterial->setLineWidth(2.);
+    lineMeshMaterial->setPointSize(6.);
+    lineMeshMaterial->setColor(Color::Orange);
     lineModel->setRenderMaterial(lineMeshMaterial);
     lineObject->addVisualModel(lineModel);
 

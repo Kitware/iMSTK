@@ -136,8 +136,11 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
 
     // Update Transform, Render Properties
     this->update();
-    this->setUpMapper(source->GetOutputPort(), false, m_visualModel->getRenderMaterial());
-    m_mapper->setIsSurfaceMapper(true);
+    this->setUpMapper(source->GetOutputPort(), m_visualModel);
+
+    m_isMesh = true;
+    
+    //m_mapper->setIsSurfaceMapper(true);
 }
 
 void

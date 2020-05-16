@@ -52,7 +52,7 @@ main()
 
     // configure and add the render model to the scene object
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setColor(Color::Red);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
@@ -64,8 +64,13 @@ main()
     auto tetMesh = GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
 
     // add scene object for surface object
-    auto volObject = std::make_shared<VisualObject>("VolObj");
-    volObject->setVisualGeometry(tetMesh);
+    auto volObject = std::make_shared<VisualObject>("VolObj"); 
+    auto tetMaterial = std::make_shared<RenderMaterial>();
+    tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    tetMaterial->setPointSize(7.);
+    tetMaterial->setLineWidth(3.);
+    auto tetVizModel = std::make_shared<VisualModel>(tetMesh, tetMaterial);
+    volObject->addVisualModel(tetVizModel);
 
     // add the scene object to the scene
     scene->addSceneObject(volObject);

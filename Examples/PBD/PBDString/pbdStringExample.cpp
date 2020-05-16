@@ -106,10 +106,11 @@ main()
         sims[i].object->setPhysicsGeometry(sims[i].geometry);
 
         sims[i].visualModel = std::make_shared<VisualModel>(sims[i].geometry);
-        std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
-        material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-        material->setDebugColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));
-        material->setLineWidth(2.0f);
+        auto material = std::make_shared<RenderMaterial>();
+        material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+        material->setLineWidth(2.);
+        material->setPointSize(6.);
+        material->setColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));        
         sims[i].visualModel->setRenderMaterial(material);
         sims[i].object->addVisualModel(sims[i].visualModel);
 

@@ -33,16 +33,16 @@
 namespace imstk
 {
 VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_pappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_paddedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
     // Map vertices in memory
-    m_pappedVertexArray->SetNumberOfComponents(3);
+    m_paddedVertexArray->SetNumberOfComponents(3);
 
     // Create points
     m_points = vtkSmartPointer<vtkPoints>::New();
-    m_points->SetData(m_pappedVertexArray);
+    m_points->SetData(m_paddedVertexArray);
 
     // Create cells
     m_cellArray = vtkSmartPointer<vtkCellArray>::New();
@@ -60,7 +60,7 @@ VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<Vis
     //updateDataSource();
     //updateActorProperties();
 
-    setUpMapper(source->GetOutputPort(), true, visualModel->getRenderMaterial());
+    setUpMapper(source->GetOutputPort(), visualModel);
 }
 
 void
@@ -71,7 +71,7 @@ VTKdbgTrianglesRenderDelegate::updateDataSource()
     if (dbgTriangles->isModified())
     {
         dbgTriangles->setDataModified(false);
-        m_pappedVertexArray->SetArray(dbgTriangles->getVertexBufferPtr(),
+        m_paddedVertexArray->SetArray(dbgTriangles->getVertexBufferPtr(),
                                       dbgTriangles->getNumVertices() * 3, 1);
 
         // Set point data
@@ -96,7 +96,7 @@ VTKdbgTrianglesRenderDelegate::updateDataSource()
             m_cellArray->InsertNextCell(3, cell);
         }
 
-        m_pappedVertexArray->Modified();
+        m_paddedVertexArray->Modified();
 
         // Sleep for a while, wating for the data to propagate.
         // This is necessary to avoid access violation error during CPU/GPU data transfer
