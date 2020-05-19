@@ -56,7 +56,7 @@ main()
 
     auto material1 = std::make_shared<RenderMaterial>();
     material1->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material1->setVertexColor(Color::Yellow);
+    material1->setVertexColor(Color::Red);
     material1->setPointSize(12.);
     fluidVisualModel->setRenderMaterial(material1);
 

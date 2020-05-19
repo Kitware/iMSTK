@@ -37,7 +37,8 @@ public:
         Wireframe,
         Points,
         WireframeSurface,
-        VolumeRendering
+        VolumeRendering,
+        Fluid
     };
 
     enum class ShadingModel

@@ -19,21 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkVTKPointSetRenderDelegate.h"
+#include "imstkVTKFluidRenderDelegate.h"
 #include "imstkPointSet.h"
 
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLFluidMapper.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkTrivialProducer.h>
 #include <vtkSphereSource.h>
 #include <vtkDoubleArray.h>
 #include <vtkGlyph3D.h>
 #include <vtkVersion.h>
+#include <vtkVolume.h>
 
 namespace imstk
 {
-VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -54,22 +56,42 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
     pointsPolydata->SetPoints(points);
 
-    vtkNew<vtkVertexGlyphFilter> glyphFilter;     
-    glyphFilter->SetInputData(pointsPolydata);
-    glyphFilter->Update();
+    // Create fluid mapper
+    vtkNew<vtkOpenGLFluidMapper> fluidMapper;
+    fluidMapper->SetInputData(pointsPolydata);
 
+    // set some fluid rendering properties
+    fluidMapper->SetParticleRadius(0.03f * 6.0f);
+    fluidMapper->SetSurfaceFilterIterations(3);
+    fluidMapper->SetSurfaceFilterRadius(5);
+    fluidMapper->SetSurfaceFilterMethod(vtkOpenGLFluidMapper::FluidSurfaceFilterMethod::BilateralGaussian);
+    fluidMapper->SetDisplayMode(vtkOpenGLFluidMapper::FluidDisplayMode::TransparentFluidVolume);
+    fluidMapper->SetAttenuationColor(0.8f, 0.2f, 0.15f);
+    fluidMapper->SetAttenuationScale(1.0f);
+    fluidMapper->SetOpaqueColor(0.0f, 0.0f, 0.9f);
+    fluidMapper->SetParticleColorPower(0.1f);
+    fluidMapper->SetParticleColorScale(0.57f);
+    fluidMapper->SetAdditionalReflection(0.0f);
+    fluidMapper->SetRefractiveIndex(1.33f);
+    fluidMapper->SetRefractionScale(0.07f);
+    
+    m_volume->SetMapper(fluidMapper);
+
+    // Create connection source
+    auto pointDataSource = vtkSmartPointer<vtkTrivialProducer>::New();
+    pointDataSource->SetOutput(pointsPolydata);
     geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
-    this->setUpMapper(glyphFilter->GetOutputPort(), m_visualModel);
+    this->setUpMapper(pointDataSource->GetOutputPort(), m_visualModel);
 
-    m_isMesh = true;
-    m_modelIsVolume = false;
+    m_isMesh = false;
+    m_modelIsVolume = true;
 }
 
 void
-VTKPointSetRenderDelegate::updateDataSource()
+VTKFluidRenderDelegate::updateDataSource()
 {
     auto geometry = std::static_pointer_cast<PointSet>(m_visualModel->getGeometry());
 

@@ -55,7 +55,7 @@ main()
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 

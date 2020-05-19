@@ -39,17 +39,18 @@
 #include "imstkVolumeRenderMaterial.h"
 
 // VTK render delegates
-#include "imstkVTKPlaneRenderDelegate.h"
-#include "imstkVTKSphereRenderDelegate.h"
-#include "imstkVTKCapsuleRenderDelegate.h"
-#include "imstkVTKCubeRenderDelegate.h"
-#include "imstkVTKSurfaceMeshRenderDelegate.h"
-#include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
+#include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkVTKImageDataRenderDelegate.h"
+#include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkVTKPointSetRenderDelegate.h"
-#include "imstkVTKImageDataRenderDelegate.h"
+#include "imstkVTKCapsuleRenderDelegate.h"
+#include "imstkVTKSphereRenderDelegate.h"
+#include "imstkVTKPlaneRenderDelegate.h"
+#include "imstkVTKFluidRenderDelegate.h"
+#include "imstkVTKCubeRenderDelegate.h"
 
 #include <vtkOpenGLVertexBufferObject.h>
 #include <vtkTriangleMeshPointNormals.h>
@@ -95,6 +96,10 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     }
     case Geometry::Type::PointSet:
     {
+        if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
+        {
+            return std::make_shared<VTKFluidRenderDelegate>(visualModel);
+        }
         return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
     }
     case Geometry::Type::SurfaceMesh:
