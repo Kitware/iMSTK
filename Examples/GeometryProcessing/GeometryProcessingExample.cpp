@@ -70,9 +70,9 @@ main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setColor(imstk::Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::Points);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     material->setPointSize(6.);
-    material->setLineWidth(4.);
+    material->setLineWidth(1.);
     auto surfMeshModel = std::make_shared<VisualModel>(fineSurfaceMesh);
     surfMeshModel->setRenderMaterial(material);
 

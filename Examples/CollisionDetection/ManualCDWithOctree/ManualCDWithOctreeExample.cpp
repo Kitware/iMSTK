@@ -49,7 +49,7 @@ using namespace imstk;
 #define NUM_MESHES 5u
 
 // Uncomment this to render octree
-// #define DEBUG_RENDER_OCTREE
+ #define DEBUG_RENDER_OCTREE
 
 // Load pre-computed mesh data (vertex positions and triangle faces)
 std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getTriangle();
@@ -110,8 +110,9 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
     auto material    = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setDebugColor(Color::Yellow);
-    //material->setSphereGlyphSize(.01);
+    material->setPointSize(8.);
 
     auto dbgViz = std::make_shared<VisualModel>(debugPoints, material);
     scene->addDebugVisualModel(dbgViz);
@@ -276,7 +277,13 @@ main()
     // Add debug geometry to render octree
 #ifdef DEBUG_RENDER_OCTREE
     const auto debugOctree = octreeCD.getDebugGeometry(8, false);
-    scene->addDebugGeometry(debugOctree);
+
+    const auto matDbgViz = std::make_shared<RenderMaterial>();
+    matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    matDbgViz->setDebugColor(Color::Green);
+    matDbgViz->setLineWidth(1.0);
+    auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
+    scene->addDebugVisualModel(octreeVizDbgModel);
 #endif
 
     // Helper variables for animation

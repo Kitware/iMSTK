@@ -142,8 +142,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     // Create a visual model
     auto fluidVisualModel = std::make_shared<VisualModel>(fluidGeometry);
     auto fluidMaterial    = std::make_shared<RenderMaterial>();
-    fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
-    fluidMaterial->setVertexColor(Color::Blue);
+    fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
+    fluidMaterial->setVertexColor(Color::Orange);
     fluidMaterial->setPointSize(10.);
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 

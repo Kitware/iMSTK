@@ -169,18 +169,30 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput* source,
     {
         m_modelIsVolume = false;
     }
-    // Add normals
-    if (!vizModel->getGeometry()->isMesh())
+    
+    if (vizModel->getGeometry())
+    {
+        // Add normals
+        if (!vizModel->getGeometry()->isMesh())
+        {
+            vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
+            normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
+            vtkPolyDataNormals::SafeDownCast(normalGen)->SplittingOff();
+            normalGen->SetInputConnection(source);
+            m_mapper->SetInputConnection(normalGen->GetOutputPort());
+        }
+        else
+        {
+            m_mapper->SetInputConnection(source);
+        }
+    }
+    else
     {
         vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
         normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
         vtkPolyDataNormals::SafeDownCast(normalGen)->SplittingOff();
         normalGen->SetInputConnection(source);
         m_mapper->SetInputConnection(normalGen->GetOutputPort());
-    }
-    else
-    {
-        m_mapper->SetInputConnection(source);
     }
 
     // Disable auto Shift & Scale which is slow for deformable objects
@@ -365,7 +377,7 @@ VTKRenderDelegate::updateActorPropertiesMesh()
         }
 
         // enable vertex visibility and vertex edge properties
-        actorProperty->SetEdgeVisibility(false);
+        actorProperty->SetEdgeVisibility(1);
         actorProperty->SetPointSize(material->getPointSize());
         actorProperty->SetRenderPointsAsSpheres(true);
         actorProperty->SetVertexVisibility(true);

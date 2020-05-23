@@ -66,7 +66,7 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualMod
     m_isMesh = true;
     m_modelIsVolume = false;
 
-    //updateDataSource();
+    updateDataSource();
 }
 
 void

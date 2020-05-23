@@ -131,7 +131,7 @@ main(int argc, char* argv[])
     // configure light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
+    whiteLight->setIntensity(1.5);
     scene->addLight(whiteLight);
 
     simManager->setActiveScene(scene);
