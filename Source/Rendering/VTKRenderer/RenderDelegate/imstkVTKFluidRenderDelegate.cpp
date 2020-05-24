@@ -80,7 +80,7 @@ m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
     // Create connection source
     auto pointDataSource = vtkSmartPointer<vtkTrivialProducer>::New();
     pointDataSource->SetOutput(pointsPolydata);
-    geometry->m_dataModified = false;
+    geometry->m_dataModified = true;
 
     // Update Transform, Render Properties
     this->update();

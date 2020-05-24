@@ -180,7 +180,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     {
         // Get imstk texture
         auto texture = material->getTexture((Texture::Type)unit);
-        if (texture->getPath() == "")
+        if (!texture)
         {
             continue;
         }

@@ -72,61 +72,77 @@ namespace imstk
 std::shared_ptr<VTKRenderDelegate>
 VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
-    switch (visualModel->getGeometry()->getType())
-    {
-    case Geometry::Type::Plane:
-    {
-        return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::Sphere:
-    {
-        return std::make_shared<VTKSphereRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::Capsule:
-    {
-        return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::Cube:
-    {
-        return std::make_shared<VTKCubeRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::Cylinder:
-    {
-        return std::make_shared<VTKCylinderRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::PointSet:
+    if (visualModel->getGeometry()->isMesh())
     {
         if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
         {
             return std::make_shared<VTKFluidRenderDelegate>(visualModel);
         }
-        return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
+        
+        switch (visualModel->getGeometry()->getType())
+        {
+            case Geometry::Type::PointSet:
+            {
+                return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::SurfaceMesh:
+            {
+                return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::TetrahedralMesh:
+            {
+                return std::make_shared<VTKTetrahedralMeshRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::LineMesh:
+            {
+                return std::make_shared<VTKLineMeshRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::HexahedralMesh:
+            {
+                return std::make_shared<VTKHexahedralMeshRenderDelegate>(visualModel);
+            }
+            default:
+            {
+                LOG(FATAL) << "RenderDelegate::makeDelegate error: Mesh type incorrect.";
+                return nullptr; // will never be reached
+            }
+
+        }
     }
-    case Geometry::Type::SurfaceMesh:
+    else
     {
-        return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::TetrahedralMesh:
-    {
-        return std::make_shared<VTKTetrahedralMeshRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::LineMesh:
-    {
-        return std::make_shared<VTKLineMeshRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::HexahedralMesh:
-    {
-        return std::make_shared<VTKHexahedralMeshRenderDelegate>(visualModel);
-    }
-    case Geometry::Type::ImageData:
-    {
-        return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
-    }
-    default:
-    {
-        LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
-        return nullptr;
-    }
+        switch (visualModel->getGeometry()->getType())
+        {
+            case Geometry::Type::Plane:
+            {
+                return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::Sphere:
+            {
+                return std::make_shared<VTKSphereRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::Capsule:
+            {
+                return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::Cube:
+            {
+                return std::make_shared<VTKCubeRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::Cylinder:
+            {
+                return std::make_shared<VTKCylinderRenderDelegate>(visualModel);
+            }
+            case Geometry::Type::ImageData:
+            {
+                return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
+            }
+            default:
+            {
+                LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
+                return nullptr; // will never be reached
+            }
+        }
     }
 }
 
@@ -149,8 +165,8 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::makeDebugDelegate error: Geometry type incorrect.";
-        return nullptr;
+        LOG(FATAL) << "RenderDelegate::makeDebugDelegate error: Geometry type incorrect.";
+        return nullptr; // will never be reached
     }
     }
 }
@@ -186,7 +202,7 @@ VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput* source,
             m_mapper->SetInputConnection(source);
         }
     }
-    else
+    else // debug geometry
     {
         vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
         normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -361,8 +377,9 @@ VTKRenderDelegate::updateActorPropertiesMesh()
     const auto vertexColor = material->getVertexColor();
     const auto surfaceColor = material->getColor();
     
-    actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
-    if (material->getDisplayMode() != RenderMaterial::DisplayMode::Surface)
+    //actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
+    if (material->getDisplayMode() != RenderMaterial::DisplayMode::Surface &&
+        material->getDisplayMode() != RenderMaterial::DisplayMode::Fluid)
     {
         switch (material->getDisplayMode())
         {
@@ -371,13 +388,14 @@ VTKRenderDelegate::updateActorPropertiesMesh()
             break;
         case RenderMaterial::DisplayMode::Points:
             actorProperty->SetRepresentationToPoints();
+            actorProperty->SetColor(vertexColor.r, vertexColor.g, vertexColor.b);
             break;
         default:
             actorProperty->SetRepresentationToSurface();//wireframeSurface
         }
 
         // enable vertex visibility and vertex edge properties
-        actorProperty->SetEdgeVisibility(1);
+        actorProperty->SetEdgeVisibility(true);
         actorProperty->SetPointSize(material->getPointSize());
         actorProperty->SetRenderPointsAsSpheres(true);
         actorProperty->SetVertexVisibility(true);
@@ -603,17 +621,17 @@ VTKRenderDelegate::updateActorPropertiesVolumeRendering()
 vtkSmartPointer<vtkTexture>
 VTKRenderDelegate::getVTKTexture(std::shared_ptr<Texture> texture)
 {
-    vtkNew<vtkImageReader2Factory> readerFactory;
-    vtkSmartPointer<vtkImageReader2> imageReader;
-    
-    const std::string fileName = texture->getPath();
+    vtkNew<vtkImageReader2Factory> readerFactory;    
+    std::string fileName = texture->getPath();
+    vtkSmartPointer<vtkImageReader2> imageReader = readerFactory->CreateImageReader2(fileName.c_str());
 
-    imageReader.TakeReference(readerFactory->CreateImageReader2(fileName.c_str()));
+    //imageReader.TakeReference(readerFactory->CreateImageReader2(fileName.c_str()));
     imageReader->SetFileName(fileName.c_str());
     imageReader->Update();
 
     // Create texture
     vtkNew<vtkTexture> vtktexture;
+    vtktexture->UseSRGBColorSpaceOff();
     vtktexture->SetInputConnection(imageReader->GetOutputPort());
 
     return vtktexture;

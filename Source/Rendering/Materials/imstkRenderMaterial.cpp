@@ -205,7 +205,16 @@ RenderMaterial::getTexture(Texture::Type type)
         LOG(WARNING) << "RenderMaterial::getTexture error: Invalid texture format";
         return nullptr;
     }
-    return m_textures[(unsigned int)type];
+    auto tex = m_textures[(unsigned int)type];
+
+    if (std::strcmp(tex->getPath().c_str(), "")==0)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return tex;
+    }
 }
 
 void

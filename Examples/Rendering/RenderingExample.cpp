@@ -59,13 +59,23 @@ main()
         iMSTK_DATA_ROOT "/head/head_revised.obj",
         iMSTK_DATA_ROOT "/head/");
 
+    /*auto headObject = VisualObjectImporter::importVisualObject(
+        "head",
+        iMSTK_DATA_ROOT "/cloth/gauze21.obj",
+        iMSTK_DATA_ROOT "/cloth/");*/
+
     // Head material with textures
-    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_Normal.png", Texture::Type::Normal);
-    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "/head/HeadTexture_BaseColor.png", Texture::Type::Diffuse);
+   /* auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.jpg", Texture::Type::Normal);
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.jpg", Texture::Type::Diffuse);
     auto headMaterial      = headObject->getVisualModel()->getRenderMaterial();
-    headMaterial->setShadingModel(RenderMaterial::ShadingModel::Gouraud);
+    headMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
     headMaterial->addTexture(headNormalTexture);
-    headMaterial->addTexture(headDiffuseTexture);
+    headMaterial->addTexture(headDiffuseTexture);*/
+    
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "cloth/gauze_diffuse.jpg", Texture::Type::Diffuse);
+    auto headMaterial = headObject->getVisualModel()->getRenderMaterial();
+    headMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);    
+    //headMaterial->addTexture(headDiffuseTexture);
 #endif
 
     scene->addSceneObject(headObject);
@@ -105,7 +115,7 @@ main()
 
     // Run
     simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
+    //simManager->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
 
 #ifdef iMSTK_USE_Vulkan
     auto viewer = std::dynamic_pointer_cast<VulkanViewer>(simManager->getViewer());
