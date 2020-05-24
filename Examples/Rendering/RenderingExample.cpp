@@ -25,6 +25,7 @@
 #include "imstkCollisionGraph.h"
 #include "imstkIBLProbe.h"
 #include "imstkCamera.h"
+#include "imstkMeshIO.h"
 #include "imstkLight.h"
 #include "imstkScene.h"
 
@@ -54,15 +55,27 @@ main()
         "head", iMSTK_DATA_ROOT "/head/head_revised.obj",
         iMSTK_DATA_ROOT "/head/", 1, Vec3d(0, 0, 0), "dds");
 #else
-    auto headObject = VisualObjectImporter::importVisualObject(
+    /*auto headObject = VisualObjectImporter::importVisualObject(
         "head", 
         iMSTK_DATA_ROOT "/head/head_revised.obj",
-        iMSTK_DATA_ROOT "/head/");
+        iMSTK_DATA_ROOT "/head/");*/
 
-    /*auto headObject = VisualObjectImporter::importVisualObject(
-        "head",
-        iMSTK_DATA_ROOT "/cloth/gauze21.obj",
-        iMSTK_DATA_ROOT "/cloth/");*/
+    auto surfaceMesh = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);     
+    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.png", Texture::Type::Diffuse); 
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.jpg", Texture::Type::Normal);
+
+    /*material->addTexture(headDiffuseTexture);
+    material->addTexture(headNormalTexture);*/
+
+    auto surfMeshModel = std::make_shared<VisualModel>(surfaceMesh);
+    surfMeshModel->setRenderMaterial(material);
+
+    auto headObject = std::make_shared<VisualObject>("head");
+    headObject->addVisualModel(surfMeshModel);
 
     // Head material with textures
    /* auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.jpg", Texture::Type::Normal);
@@ -72,9 +85,7 @@ main()
     headMaterial->addTexture(headNormalTexture);
     headMaterial->addTexture(headDiffuseTexture);*/
     
-    auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "cloth/gauze_diffuse.jpg", Texture::Type::Diffuse);
-    auto headMaterial = headObject->getVisualModel()->getRenderMaterial();
-    headMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);    
+   
     //headMaterial->addTexture(headDiffuseTexture);
 #endif
 
@@ -93,10 +104,10 @@ main()
     directionalLight->setShadowRange(1.5);
     scene->addLight(directionalLight);
 
-    auto pointLight = std::make_shared<PointLight>("PointLight");
+   /* auto pointLight = std::make_shared<PointLight>("PointLight");
     pointLight->setIntensity(0.1);
     pointLight->setPosition(0.1, 0.2, 0.5);
-    scene->addLight(pointLight);
+    scene->addLight(pointLight);*/
 
     // Sphere
     auto sphereObj      = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);

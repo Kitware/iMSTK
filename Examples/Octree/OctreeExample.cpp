@@ -54,7 +54,7 @@ static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyDa
 std::shared_ptr<VisualObject>
 createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
                  const std::string&                   objectName,
-                 Color                                color)
+                 const Color&                         color)
 {
     // Create a surface mesh for the bunny
     auto meshObj = std::make_shared<SurfaceMesh>();
@@ -63,9 +63,9 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     // Create a visiual model
     auto visualModel = std::make_shared<VisualModel>(meshObj);
     auto material    = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(color); // Wireframe color
     material->setLineWidth(1);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     visualModel->setRenderMaterial(material);
 
     auto visualObject = std::make_shared<VisualObject>(objectName);
@@ -168,7 +168,7 @@ main()
 
     const auto matDbgViz = std::make_shared<RenderMaterial>();
     matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    matDbgViz->setDebugColor(Color::Green);
+    matDbgViz->setEdgeColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
     auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
     scene->addDebugVisualModel(octreeVizDbgModel);

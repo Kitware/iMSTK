@@ -388,7 +388,6 @@ VTKRenderDelegate::updateActorPropertiesMesh()
             break;
         case RenderMaterial::DisplayMode::Points:
             actorProperty->SetRepresentationToPoints();
-            actorProperty->SetColor(vertexColor.r, vertexColor.g, vertexColor.b);
             break;
         default:
             actorProperty->SetRepresentationToSurface();//wireframeSurface
@@ -400,18 +399,22 @@ VTKRenderDelegate::updateActorPropertiesMesh()
         actorProperty->SetRenderPointsAsSpheres(true);
         actorProperty->SetVertexVisibility(true);
         actorProperty->SetVertexColor(vertexColor.r, vertexColor.g, vertexColor.b);
+        
+
 
         if (material->getDisplayMode() != RenderMaterial::DisplayMode::Points)
         {
             // enable edge visibility and set edge properties
             actorProperty->SetEdgeVisibility(true);
-            actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b);
-            actorProperty->SetLineWidth(material->getLineWidth());
             actorProperty->SetRenderLinesAsTubes(true);
+            //actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b); // doesn't work if edges are rendered as tubes
+            actorProperty->SetLineWidth(material->getLineWidth());
         }
 
         if (material->getDisplayMode() == RenderMaterial::DisplayMode::WireframeSurface)
         {
+            actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b);
+            actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
             switch (material->getShadingModel())
             {
                 case RenderMaterial::ShadingModel::Flat:
@@ -423,6 +426,16 @@ VTKRenderDelegate::updateActorPropertiesMesh()
                 default:
                     actorProperty->SetInterpolationToPhong();
             }
+        }
+
+        if (material->getDisplayMode() == RenderMaterial::DisplayMode::Points)
+        {
+            actorProperty->SetColor(vertexColor.r, vertexColor.g, vertexColor.b);
+        }
+
+        if (material->getDisplayMode() == RenderMaterial::DisplayMode::Wireframe)
+        {
+            actorProperty->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
         }
     
     }

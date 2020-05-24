@@ -57,8 +57,8 @@ VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<Vis
     source->SetOutput(m_polyData);
 
     // Update Transform, Render Properties
-    //updateDataSource();
-    //updateActorProperties();
+    updateDataSource();
+    updateActorProperties();
 
     setUpMapper(source->GetOutputPort(), visualModel);
 }

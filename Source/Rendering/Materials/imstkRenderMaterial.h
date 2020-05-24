@@ -220,7 +220,6 @@ protected:
 
     ///-------------------Common properties---------------------    
     Color m_color = Color::LightGray;
-    Color m_debugColor = Color::Black;// remove?
     float m_opacity = 1.0;
    
 

@@ -64,7 +64,7 @@ m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
     fluidMapper->SetParticleRadius(0.03f * 6.0f);
     fluidMapper->SetSurfaceFilterIterations(3);
     fluidMapper->SetSurfaceFilterRadius(5);
-    fluidMapper->SetSurfaceFilterMethod(vtkOpenGLFluidMapper::FluidSurfaceFilterMethod::BilateralGaussian);
+    fluidMapper->SetSurfaceFilterMethod(vtkOpenGLFluidMapper::FluidSurfaceFilterMethod::NarrowRange);
     fluidMapper->SetDisplayMode(vtkOpenGLFluidMapper::FluidDisplayMode::TransparentFluidVolume);
     fluidMapper->SetAttenuationColor(0.8f, 0.2f, 0.15f);
     fluidMapper->SetAttenuationScale(1.0f);

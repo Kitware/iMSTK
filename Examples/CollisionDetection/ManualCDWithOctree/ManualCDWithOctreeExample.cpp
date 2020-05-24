@@ -80,7 +80,7 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     // Create a visiual model
     auto visualModel = std::make_shared<VisualModel>(meshObj);
     auto material    = std::make_shared<RenderMaterial>();
-    material->setDebugColor(color); // Wireframe color
+    material->setEdgeColor(color); // Wireframe color
     material->setLineWidth(2);
     if (meshObj->getNumTriangles() > 100)
     {
@@ -111,7 +111,7 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
     auto material    = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setDebugColor(Color::Yellow);
+    material->setVertexColor(Color::Yellow);
     material->setPointSize(8.);
 
     auto dbgViz = std::make_shared<VisualModel>(debugPoints, material);
@@ -129,7 +129,7 @@ addVTConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Connecting VT Lines");
     auto material   = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Green);
+    material->setEdgeColor(Color::Green);
     material->setLineWidth(4.0);
 
     auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
@@ -147,7 +147,7 @@ addEEConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Connecting EE Lines");
     auto material   = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Red);
+    material->setEdgeColor(Color::Red);
     material->setLineWidth(4.0);
 
     auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
@@ -165,7 +165,7 @@ addHighlightedLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Highlighted Lines");
     auto material   = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Orange);
+    material->setEdgeColor(Color::Orange);
     material->setLineWidth(8.0);
 
     auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
@@ -280,7 +280,7 @@ main()
 
     const auto matDbgViz = std::make_shared<RenderMaterial>();
     matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    matDbgViz->setDebugColor(Color::Green);
+    matDbgViz->setEdgeColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
     auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
     scene->addDebugVisualModel(octreeVizDbgModel);

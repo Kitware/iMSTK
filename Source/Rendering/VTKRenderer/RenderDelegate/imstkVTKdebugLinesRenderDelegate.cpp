@@ -67,7 +67,7 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel
     updateActorProperties();
     setUpMapper(source->GetOutputPort(), visualModel);
 
-    //updateDataSource();
+    updateDataSource();
 }
 
 void

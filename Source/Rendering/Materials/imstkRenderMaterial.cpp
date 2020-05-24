@@ -148,19 +148,6 @@ RenderMaterial::setColor(const Color& color)
     m_modified = true;
 }
 
-const Color&
-RenderMaterial::getDebugColor() const
-{
-    return m_debugColor;
-}
-
-void
-RenderMaterial::setDebugColor(const Color& color)
-{
-    m_debugColor = color;
-    m_modified   = true;
-}
-
 const float&
 RenderMaterial::getMetalness() const
 {
