@@ -636,7 +636,7 @@ VTKRenderDelegate::getVTKTexture(std::shared_ptr<Texture> texture)
 {
     vtkNew<vtkImageReader2Factory> readerFactory;    
     std::string fileName = texture->getPath();
-    vtkSmartPointer<vtkImageReader2> imageReader = readerFactory->CreateImageReader2(fileName.c_str());
+    auto imageReader = readerFactory->CreateImageReader2(fileName.c_str());
 
     //imageReader.TakeReference(readerFactory->CreateImageReader2(fileName.c_str()));
     imageReader->SetFileName(fileName.c_str());

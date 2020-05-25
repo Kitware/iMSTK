@@ -153,7 +153,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
     }
 #endif
     this->updateSceneCamera(scene->getCamera());
-    auto camActor = vtkSmartPointer<vtkCameraActor>::New();
+    vtkNew<vtkCameraActor> camActor;
     camActor->SetCamera(m_sceneVtkCamera);
     m_debugVtkActors.push_back(camActor);
 

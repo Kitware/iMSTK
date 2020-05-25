@@ -118,14 +118,13 @@ main()
         auto pbdParams = std::make_shared<PBDModelConfig>();
         pbdParams->m_YoungModulus = 1000.0;
         pbdParams->m_PoissonRatio = 0.3;
-        pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
-                        PbdFEMConstraint::MaterialType::StVK);
+        pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
         pbdParams->m_uniformMassValue = 1.0;
         pbdParams->m_gravity   = Vec3d(0, -10.0, 0);
         pbdParams->m_DefaultDt = 0.01;
         pbdParams->m_maxIter   = 5;
         pbdParams->m_proximity = 0.3;
-        pbdParams->m_contactStiffness = 0.1;
+        pbdParams->m_contactStiffness = 0.08;
 
         // Setup Model
         auto pbdModel = std::make_shared<PbdModel>();
@@ -134,7 +133,7 @@ main()
 
         // Setup VisualModel
         auto material = std::make_shared<RenderMaterial>();
-        material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
         surfMeshModel->setRenderMaterial(material);
 
@@ -158,7 +157,7 @@ main()
         auto pbdParams2 = std::make_shared<PBDModelConfig>();
         pbdParams2->m_uniformMassValue = 0.0;
         pbdParams2->m_proximity = 0.1;
-        pbdParams2->m_contactStiffness = 1.0;
+        pbdParams2->m_contactStiffness = 0.08;
         pbdParams2->m_maxIter = 0;
 
         // Setup model
@@ -183,14 +182,20 @@ main()
 
     // Collision
     scene->getCollisionGraph()->addInteractionPair(deformableObj, stairObj,
-                CollisionDetection::Type::MeshToMeshBruteForce,
+                CollisionDetection::Type::SurfaceMeshToSurfaceMesh,
                 CollisionHandling::Type::PBD,
                 CollisionHandling::Type::None);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, 5));
+    light->setIntensity(1.2);
     scene->addLight(light);
+
+    auto light2 = std::make_shared<DirectionalLight>("light 2");
+    light2->setFocalPoint(-Vec3d(5, -8, 5));
+    light2->setIntensity(1.2);
+    scene->addLight(light2);
 
     simManager->setActiveScene(scene);
     simManager->start(SimulationStatus::Paused);

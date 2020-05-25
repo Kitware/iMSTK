@@ -68,8 +68,8 @@ main()
     auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.png", Texture::Type::Diffuse); 
     auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.jpg", Texture::Type::Normal);
 
-    /*material->addTexture(headDiffuseTexture);
-    material->addTexture(headNormalTexture);*/
+    material->addTexture(headDiffuseTexture);
+    /*material->addTexture(headNormalTexture);*/
 
     auto surfMeshModel = std::make_shared<VisualModel>(surfaceMesh);
     surfMeshModel->setRenderMaterial(material);
