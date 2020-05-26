@@ -203,7 +203,7 @@ protected:
     friend class VTKdbgLinesRenderDelegate;
 
     // State    
-    bool  m_tessellated       = false;//?
+    bool  m_tessellated = false;//?
     
         
     bool  m_isDecal    = false;//?

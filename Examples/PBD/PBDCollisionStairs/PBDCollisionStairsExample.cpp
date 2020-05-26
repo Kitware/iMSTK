@@ -168,6 +168,7 @@ main()
         // Setup VisualModel
         auto stairMaterial = std::make_shared<RenderMaterial>();
         stairMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+        stairMaterial->setEdgeColor(Color::Black);
         auto stairMeshModel = std::make_shared<VisualModel>(stairMesh);
         stairMeshModel->setRenderMaterial(stairMaterial);
 

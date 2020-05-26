@@ -26,6 +26,7 @@
 #include <vtkImageReader2.h>
 #include <vtkImageFlip.h>
 #include <vtkTexture.h>
+#include <vtkImageCast.h>
 
 namespace imstk
 {
@@ -51,8 +52,8 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     m_sourceTexture = vtkSmartPointer<vtkTexture>::New();
 
     // Mangle an unique texture name from the texture type and texture path
-    std::string manglingSymbol = "::";
-    m_textureName = texture->getTypeAsString() + manglingSymbol + texture->getPath();
+    //std::string manglingSymbol = "::";
+    m_textureName = texture->getTypeAsString();// +manglingSymbol + texture->getPath() + std::string("\"");
 
     if (texture->getType() == Texture::Type::Cubemap)
     {
@@ -83,7 +84,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     }
     else
     {
-        /*vtkImageReader2* imgReader;
+        vtkImageReader2* imgReader;
         imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
 
         CHECK(imgReader != nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
@@ -93,14 +94,14 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
         imgReader->Update();
         m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
         m_sourceTexture->RepeatOff();
-        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());*/
+        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());        
 
-        vtkNew<vtkPNGReader> normalReader;
+        /*vtkNew<vtkPNGReader> normalReader;
         normalReader->SetFileName(tFileName.c_str());
         normalReader->Update();
         m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
         m_sourceTexture->RepeatOff();
-        m_sourceTexture->SetInputConnection(normalReader->GetOutputPort());
+        m_sourceTexture->SetInputConnection(normalReader->GetOutputPort());*/
     }
 }
 }

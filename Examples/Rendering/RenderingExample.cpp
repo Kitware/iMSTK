@@ -66,10 +66,12 @@ main()
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);     
     auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.png", Texture::Type::Diffuse); 
-    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.jpg", Texture::Type::Normal);
+    auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.png", Texture::Type::Normal);
+    auto headAoTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_AO.png", Texture::Type::AmbientOcclusion);
 
     material->addTexture(headDiffuseTexture);
-    /*material->addTexture(headNormalTexture);*/
+    material->addTexture(headNormalTexture);
+    material->addTexture(headAoTexture);
 
     auto surfMeshModel = std::make_shared<VisualModel>(surfaceMesh);
     surfMeshModel->setRenderMaterial(material);
@@ -98,7 +100,7 @@ main()
 
     // Lights
     auto directionalLight = std::make_shared<DirectionalLight>("DirectionalLight");
-    directionalLight->setIntensity(7);
+    directionalLight->setIntensity(1);
     directionalLight->setColor(Color(1.0, 0.95, 0.8));
     directionalLight->setCastsShadow(true);
     directionalLight->setShadowRange(1.5);
@@ -114,7 +116,7 @@ main()
     auto sphereMaterial = std::make_shared<RenderMaterial>();
     auto sphereMesh     = sphereObj->getVisualGeometry();
     sphereMesh->translate(0.1, 0.2, 0.5);
-    sphereMaterial->setEmissivity(10);
+    sphereMaterial->setEmissivity(1);
     sphereMaterial->setCastsShadows(false);
     sphereObj->getVisualModel(0)->setRenderMaterial(sphereMaterial);
 
