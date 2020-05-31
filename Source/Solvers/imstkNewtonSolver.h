@@ -74,7 +74,10 @@ public:
     ///
     /// \param newLinearSolver Linear solver pointer
     ///
-    void setLinearSolver(std::shared_ptr<LinearSolverType> newLinearSolver);
+    void setLinearSolver(std::shared_ptr<LinearSolverType> newLinearSolver)
+	{
+		m_linearSolver = newLinearSolver;
+	}
 
     ///
     /// \brief Get LinearSolver

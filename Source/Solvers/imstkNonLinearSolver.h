@@ -114,7 +114,10 @@ public:
     ///
     /// \param newUpdateIterate Function used to update iterates. Default: x+=dx.
     ///
-    void setUpdateIterate(const UpdateIterateType& newUpdateIterate);
+    void setUpdateIterate(const UpdateIterateType& newUpdateIterate)
+	{
+		m_updateIterate = newUpdateIterate;
+	}
 
     ///
     /// \brief Set the Newton solver to be fully implicit

@@ -189,13 +189,6 @@ NewtonSolver<SystemMatrix>::updateForcingTerm(const double ratio, const double s
 }
 
 template <typename SystemMatrix> 
-void
-NewtonSolver<SystemMatrix>::setLinearSolver(std::shared_ptr<NewtonSolver::LinearSolverType> newLinearSolver)
-{
-    m_linearSolver = newLinearSolver;
-}
-
-template <typename SystemMatrix> 
 // std::shared_ptr<NewtonSolver<SystemMatrix>::LinearSolverType>
 auto
 NewtonSolver<SystemMatrix>::getLinearSolver() const -> std::shared_ptr<LinearSolverType>
