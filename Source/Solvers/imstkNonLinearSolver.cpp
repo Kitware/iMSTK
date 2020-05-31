@@ -190,13 +190,6 @@ NonLinearSolver<SystemMatrix>::getSystem() const
     return m_nonLinearSystem;
 }
 
-template <typename SystemMatrix>
-void
-NonLinearSolver<SystemMatrix>::setUpdateIterate(const NonLinearSolver<SystemMatrix>::UpdateIterateType& newUpdateIterate)
-{
-    m_updateIterate = newUpdateIterate;
-}
-
 template class NonLinearSolver<SparseMatrixd>;
 template class NonLinearSolver<Matrixd>;
 } // imstk
