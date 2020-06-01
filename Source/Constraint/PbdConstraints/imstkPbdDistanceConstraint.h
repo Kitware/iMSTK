@@ -21,40 +21,44 @@
 
 #pragma once
 
-#include "imstkPbdFEMConstraint.h"
+#include "imstkPbdConstraint.h"
 
 namespace imstk
 {
 ///
-/// \class FEMTetConstraint
+/// \class PbdDistanceConstraint
 ///
-/// \brief The FEMTetConstraint class class for constraint as the elastic energy
-/// computed by linear shape functions with tetrahedral mesh.
+/// \brief Distance constraints between two nodal points
 ///
-class PbdFEMTetConstraint : public PbdFEMConstraint
+class PbdDistanceConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit PbdFEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
-        PbdFEMConstraint(4, mtype) {}
+    PbdDistanceConstraint() : PbdConstraint() { m_vertexIds.resize(2); }
 
     ///
-    /// \brief Get the type of FEM constraint
+    /// \brief Returns PBD constraint of type Type::Distance
     ///
-    inline Type getType() const override { return Type::FEMTet; }
+    inline Type getType() const override { return Type::Distance; }
 
     ///
-    /// \brief Initialize the tetrahedral FEM constraint
+    /// \brief Initializes the distance constraint
     ///
-    bool initConstraint(PbdModel& model,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        const size_t& pIdx3, const size_t& pIdx4);
+    void initConstraint(
+        const StdVectorOfVec3d& initVertexPositions,
+        const size_t& pIdx1, const size_t& pIdx2, const double k = 1e-1);
 
     ///
-    /// \brief Solve the tetrahedral FEM constraint
+    /// \brief Solves the Distance constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) override;
+
+public:
+    double m_restLength = 0.0; ///> Rest length between the nodes
+    double m_stiffness  = 0.0; ///> Stiffness of the constaint
 };
 } // imstk

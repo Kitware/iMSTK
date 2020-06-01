@@ -49,7 +49,7 @@ public:
     ///
     /// \Constant Density Constraint Initialization
     ///
-    void initConstraint(PbdModel& model, const double k);
+    void initConstraint(const StdVectorOfVec3d& initVertexPositions, const double k);
 
     ///
     /// \brief Returns PBD constraint of type Type::ConstantDensity
@@ -59,7 +59,9 @@ public:
     ///
     /// \brief Solves the constant density constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) override;
 
 private:
     ///

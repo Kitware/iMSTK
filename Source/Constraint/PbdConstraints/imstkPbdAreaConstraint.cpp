@@ -20,14 +20,14 @@
 =========================================================================*/
 
 #include "imstkPbdAreaConstraint.h"
-#include "imstkPbdModel.h"
 
 namespace  imstk
 {
 void
-PbdAreaConstraint::initConstraint(PbdModel& model, const size_t& pIdx1,
-                                  const size_t& pIdx2, const size_t& pIdx3,
-                                  const double k)
+PbdAreaConstraint::initConstraint(
+    const StdVectorOfVec3d& initVertexPositions,
+    const size_t& pIdx1, const size_t& pIdx2, const size_t& pIdx3,
+    const double k)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
@@ -35,38 +35,36 @@ PbdAreaConstraint::initConstraint(PbdModel& model, const size_t& pIdx1,
 
     m_stiffness = k;
 
-    auto state = model.getInitialState();
-
-    const Vec3d& p0 = state->getVertexPosition(pIdx1);
-    const Vec3d& p1 = state->getVertexPosition(pIdx2);
-    const Vec3d& p2 = state->getVertexPosition(pIdx3);
+    const Vec3d& p0 = initVertexPositions[pIdx1];
+    const Vec3d& p1 = initVertexPositions[pIdx2];
+    const Vec3d& p2 = initVertexPositions[pIdx3];
 
     m_restArea = 0.5 * (p1 - p0).cross(p2 - p0).norm();
 }
 
 bool
-PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
+PbdAreaConstraint::solvePositionConstraint(
+    StdVectorOfVec3d&      currVertexPositions,
+    const StdVectorOfReal& currInvMasses)
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];
     const auto i3 = m_vertexIds[2];
 
-    auto state = model.getCurrentState();
+    Vec3d& p0 = currVertexPositions[i1];
+    Vec3d& p1 = currVertexPositions[i2];
+    Vec3d& p2 = currVertexPositions[i3];
 
-    Vec3d& p0 = state->getVertexPosition(i1);
-    Vec3d& p1 = state->getVertexPosition(i2);
-    Vec3d& p2 = state->getVertexPosition(i3);
+    const Real im0 = currInvMasses[i1];
+    const Real im1 = currInvMasses[i2];
+    const Real im2 = currInvMasses[i3];
 
-    const auto im0 = model.getInvMass(i1);
-    const auto im1 = model.getInvMass(i2);
-    const auto im2 = model.getInvMass(i3);
+    const Vec3d e1 = p0 - p1;
+    const Vec3d e2 = p1 - p2;
+    const Vec3d e3 = p2 - p0;
 
-    const auto e1 = p0 - p1;
-    const auto e2 = p1 - p2;
-    const auto e3 = p2 - p0;
-
-    auto       n = e1.cross(e2);
-    const auto A = 0.5 * n.norm();
+    Vec3d      n = e1.cross(e2);
+    const Real A = 0.5 * n.norm();
 
     if (A < m_epsilon)
     {
@@ -79,7 +77,7 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
     const Vec3d grad1 = e3.cross(n);
     const Vec3d grad2 = e1.cross(n);
 
-    auto lambda = im0 * grad0.squaredNorm() + im1 * grad1.squaredNorm() + im2 * grad2.squaredNorm();
+    Real lambda = im0 * grad0.squaredNorm() + im1 * grad1.squaredNorm() + im2 * grad2.squaredNorm();
 
     lambda = (A - m_restArea) / lambda * m_stiffness;
 

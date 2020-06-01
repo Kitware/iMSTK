@@ -20,30 +20,28 @@
 =========================================================================*/
 
 #include "imstkPbdFETetConstraint.h"
-#include "imstkPbdModel.h"
 #include "imstkLogger.h"
-#include "imstkMath.h"
 
 namespace  imstk
 {
 bool
-PbdFEMTetConstraint::initConstraint(PbdModel& model,
+PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
                                     const size_t& pIdx1, const size_t& pIdx2,
-                                    const size_t& pIdx3, const size_t& pIdx4)
+                                    const size_t& pIdx3, const size_t& pIdx4,
+                                    std::shared_ptr<PbdFEMConstraintConfig> config)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
     m_vertexIds[2] = pIdx3;
     m_vertexIds[3] = pIdx4;
 
-    auto state = model.getInitialState();
-
-    const Vec3d& p0 = state->getVertexPosition(pIdx1);
-    const Vec3d& p1 = state->getVertexPosition(pIdx2);
-    const Vec3d& p2 = state->getVertexPosition(pIdx3);
-    const Vec3d& p3 = state->getVertexPosition(pIdx4);
+    const Vec3d& p0 = initVertexPositions[pIdx1];
+    const Vec3d& p1 = initVertexPositions[pIdx2];
+    const Vec3d& p2 = initVertexPositions[pIdx3];
+    const Vec3d& p3 = initVertexPositions[pIdx4];
 
     m_elementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
+    this->config    = config;
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -61,19 +59,19 @@ PbdFEMTetConstraint::initConstraint(PbdModel& model,
 }
 
 bool
-PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
+PbdFEMTetConstraint::solvePositionConstraint(
+    StdVectorOfVec3d&      currVertexPositions,
+    const StdVectorOfReal& currInvMasses)
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];
     const auto i3 = m_vertexIds[2];
     const auto i4 = m_vertexIds[3];
 
-    auto state = model.getCurrentState();
-
-    Vec3d& p0 = state->getVertexPosition(i1);
-    Vec3d& p1 = state->getVertexPosition(i2);
-    Vec3d& p2 = state->getVertexPosition(i3);
-    Vec3d& p3 = state->getVertexPosition(i4);
+    Vec3d& p0 = currVertexPositions[i1];
+    Vec3d& p1 = currVertexPositions[i2];
+    Vec3d& p2 = currVertexPositions[i3];
+    Vec3d& p3 = currVertexPositions[i4];
 
     //double currentVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
 
@@ -89,8 +87,8 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     // energy constraint
     double C = 0;
 
-    const auto mu     = model.getParameters()->m_mu;
-    const auto lambda = model.getParameters()->m_lambda;
+    const auto mu     = config->m_mu;
+    const auto lambda = config->m_lambda;
 
     switch (m_material)
     {
@@ -176,17 +174,17 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
     }
     }
 
-    const double im1 = model.getInvMass(i1);
-    const double im2 = model.getInvMass(i2);
-    const double im3 = model.getInvMass(i3);
-    const double im4 = model.getInvMass(i4);
+    const double im1 = currInvMasses[i1];
+    const double im2 = currInvMasses[i2];
+    const double im3 = currInvMasses[i3];
+    const double im4 = currInvMasses[i4];
 
     Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();
 
-    double sum = im1 * gradC.col(0).squaredNorm()
-                 + im2 * gradC.col(1).squaredNorm()
-                 + im3 * gradC.col(2).squaredNorm()
-                 + im4 * (gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
+    const double sum = im1 * gradC.col(0).squaredNorm()
+                       + im2 * gradC.col(1).squaredNorm()
+                       + im3 * gradC.col(2).squaredNorm()
+                       + im4 * (gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
 
     if (sum < m_epsilon)
     {

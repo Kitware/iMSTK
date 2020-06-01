@@ -59,18 +59,21 @@ public:
       \param pIdx4 index of p3
       \param k stiffness
     */
-    void initConstraint(PbdModel& model,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        const size_t& pIdx3, const size_t& pIdx4,
-                        const double k);
+    void initConstraint(
+        const StdVectorOfVec3d& initVertexPositions,
+        const size_t& pIdx1, const size_t& pIdx2,
+        const size_t& pIdx3, const size_t& pIdx4,
+        const double k);
 
     ///
     /// \brief Solves the dihedral angular constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& invMasses) override;
 
 public:
-    double m_restAngle = 0.; ///> Rest angle
-    double m_stiffness = 0.; ///> Angular stiffness
+    double m_restAngle = 0.0; ///> Rest angle
+    double m_stiffness = 0.0; ///> Angular stiffness
 };
 } //imstk

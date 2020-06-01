@@ -20,45 +20,46 @@
 =========================================================================*/
 
 #include "imstkPbdPointTriCollisionConstraint.h"
-#include "imstkPbdModel.h"
 
 #include "imstkLogger.h"
 
 namespace imstk
 {
 void
-PbdPointTriangleConstraint::initConstraint(std::shared_ptr<PbdModel> model1, const size_t& pIdx1,
-                                           std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
-                                           const size_t& pIdx3, const size_t& pIdx4)
+PbdPointTriangleConstraint::initConstraint(const size_t& pIdxA1,
+                                           const size_t& pIdxB1, const size_t& pIdxB2, const size_t& pIdxB3,
+                                           std::shared_ptr<PbdCollisionConstraintConfig> configA,
+                                           std::shared_ptr<PbdCollisionConstraintConfig> configB)
 {
-    m_model1 = model1;
-    m_model2 = model2;
-    m_bodiesFirst[0]  = pIdx1;
-    m_bodiesSecond[0] = pIdx2;
-    m_bodiesSecond[1] = pIdx3;
-    m_bodiesSecond[2] = pIdx4;
+    m_bodiesFirst[0]  = pIdxA1;
+    m_bodiesSecond[0] = pIdxB1;
+    m_bodiesSecond[1] = pIdxB2;
+    m_bodiesSecond[2] = pIdxB3;
+    m_configA = configA;
+    m_configB = configB;
 }
 
 bool
-PbdPointTriangleConstraint::solvePositionConstraint()
+PbdPointTriangleConstraint::solvePositionConstraint(
+    StdVectorOfVec3d&      currVertexPositionsA,
+    StdVectorOfVec3d&      currVertexPositionsB,
+    const StdVectorOfReal& currInvMassesA,
+    const StdVectorOfReal& currInvMassesB)
 {
-    const auto i0 = m_bodiesFirst[0];
-    const auto i1 = m_bodiesSecond[0];
-    const auto i2 = m_bodiesSecond[1];
-    const auto i3 = m_bodiesSecond[2];
+    const size_t i0 = m_bodiesFirst[0];
+    const size_t i1 = m_bodiesSecond[0];
+    const size_t i2 = m_bodiesSecond[1];
+    const size_t i3 = m_bodiesSecond[2];
 
-    auto state1 = m_model1->getCurrentState();
-    auto state2 = m_model2->getCurrentState();
+    Vec3d& x0 = currVertexPositionsA[i0];
+    Vec3d& x1 = currVertexPositionsB[i1];
+    Vec3d& x2 = currVertexPositionsB[i2];
+    Vec3d& x3 = currVertexPositionsB[i3];
 
-    Vec3d& x0 = state1->getVertexPosition(i0);
-    Vec3d& x1 = state2->getVertexPosition(i1);
-    Vec3d& x2 = state2->getVertexPosition(i2);
-    Vec3d& x3 = state2->getVertexPosition(i3);
-
-    Vec3d x12 = x2 - x1;
-    Vec3d x13 = x3 - x1;
-    Vec3d n   = x12.cross(x13);
-    Vec3d x01 = x0 - x1;
+    const Vec3d x12 = x2 - x1;
+    const Vec3d x13 = x3 - x1;
+    Vec3d       n   = x12.cross(x13);
+    const Vec3d x01 = x0 - x1;
 
     double alpha = n.dot(x12.cross(x01)) / (n.dot(n));
     double beta  = n.dot(x01.cross(x13)) / (n.dot(n));
@@ -69,7 +70,7 @@ PbdPointTriangleConstraint::solvePositionConstraint()
         return false;
     }
 
-    const double dist = m_model1->getParameters()->m_proximity + m_model2->getParameters()->m_proximity;
+    const double dist = m_configA->m_proximity + m_configB->m_proximity;
 
     n.normalize();
 
@@ -86,10 +87,10 @@ PbdPointTriangleConstraint::solvePositionConstraint()
     Vec3d  grad2 = -beta * n;
     Vec3d  grad3 = -gamma * n;
 
-    const auto im0 = m_model1->getInvMass(i0);
-    const auto im1 = m_model2->getInvMass(i1);
-    const auto im2 = m_model2->getInvMass(i2);
-    const auto im3 = m_model2->getInvMass(i3);
+    const Real im0 = currInvMassesA[i0];
+    const Real im1 = currInvMassesB[i1];
+    const Real im2 = currInvMassesB[i2];
+    const Real im3 = currInvMassesB[i3];
 
     double lambda = im0 * grad0.squaredNorm() +
                     im1 * grad1.squaredNorm() +
@@ -102,22 +103,22 @@ PbdPointTriangleConstraint::solvePositionConstraint()
 
     if (im0 > 0)
     {
-        x0 += -im0* lambda* grad0* m_model1->getParameters()->m_contactStiffness;
+        x0 += -im0 * lambda * grad0 * m_configA->m_stiffness;
     }
 
     if (im1 > 0)
     {
-        x1 += -im1* lambda* grad1* m_model2->getParameters()->m_contactStiffness;
+        x1 += -im1 * lambda * grad1 * m_configB->m_stiffness;
     }
 
     if (im2 > 0)
     {
-        x2 += -im2* lambda* grad2* m_model2->getParameters()->m_contactStiffness;
+        x2 += -im2 * lambda * grad2 * m_configB->m_stiffness;
     }
 
     if (im3 > 0)
     {
-        x3 += -im3* lambda* grad3* m_model2->getParameters()->m_contactStiffness;
+        x3 += -im3 * lambda * grad3 * m_configB->m_stiffness;
     }
 
     return true;

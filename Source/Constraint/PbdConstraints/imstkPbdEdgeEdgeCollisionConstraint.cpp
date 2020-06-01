@@ -20,41 +20,41 @@
 =========================================================================*/
 
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
-#include "imstkPbdModel.h"
-
 #include "imstkLogger.h"
 
 namespace imstk
 {
 void
-PbdEdgeEdgeConstraint::initConstraint(std::shared_ptr<PbdModel> model1,
-                                      const size_t& pIdx1, const size_t& pIdx2,
-                                      std::shared_ptr<PbdModel> model2,
-                                      const size_t& pIdx3, const size_t& pIdx4)
+PbdEdgeEdgeConstraint::initConstraint(
+    const size_t& pIdxA1, const size_t& pIdxA2,
+    const size_t& pIdxB1, const size_t& pIdxB2,
+    std::shared_ptr<PbdCollisionConstraintConfig> configA,
+    std::shared_ptr<PbdCollisionConstraintConfig> configB)
 {
-    m_model1 = model1;
-    m_model2 = model2;
-    m_bodiesFirst[0]  = pIdx1;
-    m_bodiesFirst[1]  = pIdx2;
-    m_bodiesSecond[0] = pIdx3;
-    m_bodiesSecond[1] = pIdx4;
+    m_configA = configA;
+    m_configB = configB;
+    m_bodiesFirst[0]  = pIdxA1;
+    m_bodiesFirst[1]  = pIdxA2;
+    m_bodiesSecond[0] = pIdxB1;
+    m_bodiesSecond[1] = pIdxB2;
 }
 
 bool
-PbdEdgeEdgeConstraint::solvePositionConstraint()
+PbdEdgeEdgeConstraint::solvePositionConstraint(
+    StdVectorOfVec3d&      currVertexPositionsA,
+    StdVectorOfVec3d&      currVertexPositionsB,
+    const StdVectorOfReal& currInvMassesA,
+    const StdVectorOfReal& currInvMassesB)
 {
     const auto i0 = m_bodiesFirst[0];
     const auto i1 = m_bodiesFirst[1];
     const auto i2 = m_bodiesSecond[0];
     const auto i3 = m_bodiesSecond[1];
 
-    auto state1 = m_model1->getCurrentState();
-    auto state2 = m_model2->getCurrentState();
-
-    Vec3d& x0 = state1->getVertexPosition(i0);
-    Vec3d& x1 = state1->getVertexPosition(i1);
-    Vec3d& x2 = state2->getVertexPosition(i2);
-    Vec3d& x3 = state2->getVertexPosition(i3);
+    Vec3d& x0 = currVertexPositionsA[i0];
+    Vec3d& x1 = currVertexPositionsA[i1];
+    Vec3d& x2 = currVertexPositionsB[i2];
+    Vec3d& x3 = currVertexPositionsB[i3];
 
     auto a = (x3 - x2).dot(x1 - x0);
     auto b = (x1 - x0).dot(x1 - x0);
@@ -87,7 +87,7 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     auto  l = n.norm();
     n /= l;
 
-    const auto dist = m_model1->getParameters()->m_proximity + m_model2->getParameters()->m_proximity;
+    const auto dist = m_configA->m_proximity + m_configB->m_proximity;
 
     if (l > dist)
     {
@@ -99,10 +99,10 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
     Vec3d grad2 = (1 - s) * n;
     Vec3d grad3 = (s) * n;
 
-    const auto im0 = m_model1->getInvMass(i0);
-    const auto im1 = m_model1->getInvMass(i1);
-    const auto im2 = m_model2->getInvMass(i2);
-    const auto im3 = m_model2->getInvMass(i3);
+    const auto im0 = currInvMassesA[i0];
+    const auto im1 = currInvMassesA[i1];
+    const auto im2 = currInvMassesB[i2];
+    const auto im3 = currInvMassesB[i3];
 
     auto lambda = im0 * grad0.squaredNorm() +
                   im1 * grad1.squaredNorm() +
@@ -115,22 +115,22 @@ PbdEdgeEdgeConstraint::solvePositionConstraint()
 
     if (im0 > 0)
     {
-        x0 += -im0* lambda* grad0* m_model1->getParameters()->m_contactStiffness;
+        x0 += -im0 * lambda * grad0 * m_configA->m_stiffness;
     }
 
     if (im1 > 0)
     {
-        x1 += -im1* lambda* grad1* m_model1->getParameters()->m_contactStiffness;
+        x1 += -im1 * lambda * grad1 * m_configA->m_stiffness;
     }
 
     if (im2 > 0)
     {
-        x2 += -im2* lambda* grad2* m_model2->getParameters()->m_contactStiffness;
+        x2 += -im2 * lambda * grad2 * m_configB->m_stiffness;
     }
 
     if (im3 > 0)
     {
-        x3 += -im3* lambda* grad3* m_model2->getParameters()->m_contactStiffness;
+        x3 += -im3 * lambda * grad3 * m_configB->m_stiffness;
     }
 
     return true;

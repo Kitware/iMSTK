@@ -21,12 +21,10 @@
 
 #pragma once
 
-#include <vector>
+#include "imstkMath.h"
 
 namespace imstk
 {
-class PbdModel;
-
 ///
 /// \brief Base Constraint class for Position based dynamics constraints
 ///
@@ -70,7 +68,9 @@ public:
     /// \param model \class PbdModel
     /// \return true if succeeded
     ///
-    virtual bool solvePositionConstraint(PbdModel& model) = 0;
+    virtual bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) = 0;
 
     ///
     /// \brief Get the vertex indices of the constraint
@@ -82,8 +82,15 @@ public:
     ///
     void setTolerance(const double eps) { m_epsilon = eps; }
 
+    ///
+    /// \brief Get the tolerance used for pbd constraints
+    ///
+    double getTolerance() const { return m_epsilon; }
+
 protected:
     std::vector<size_t> m_vertexIds;   ///> index of points for the constraint
     double m_epsilon = 1.0e-16;        ///> Tolerance used for the costraints
 };
+
+using PBDConstraintVector = std::vector<std::shared_ptr<PbdConstraint>>;
 }

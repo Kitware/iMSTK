@@ -25,40 +25,41 @@
 
 namespace imstk
 {
-////
-/// \class AreaConstraint
 ///
-/// \brief Area constraint for triangular face
+/// \class VolumeConstraint
 ///
-class PbdAreaConstraint : public PbdConstraint
+/// \brief Volume constraint for tetrahedral element
+///
+class PbdVolumeConstraint : public PbdConstraint
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief constructor
     ///
-    PbdAreaConstraint() : PbdConstraint() { m_vertexIds.resize(3); }
+    PbdVolumeConstraint() { m_vertexIds.resize(4); }
 
     ///
-    /// \brief Returns PBD constraint of type Type::Area
+    /// \brief Returns PBD constraint of type Type::Volume
     ///
-    Type getType() const override { return Type::Area; }
+    inline Type getType() const override { return Type::Volume; }
 
     ///
-    /// \brief Initializes the area constraint
+    /// \brief Initializes the volume constraint
     ///
-    void initConstraint(PbdModel&     model,
-                        const size_t& pIdx1,
-                        const size_t& pIdx2,
-                        const size_t& pIdx3,
-                        const double  k = 2.5);
+    void initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                        const size_t& pIdx1, const size_t& pIdx2,
+                        const size_t& pIdx3, const size_t& pIdx4,
+                        double k = 2.0);
 
     ///
-    /// \brief Solves the area constraint
+    /// \brief Solves the volume constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) override;
 
-public:
-    double m_restArea  = 0.; ///> Area at the rest position
-    double m_stiffness = 0.; ///> Stiffness of the area constraint
+protected:
+    double m_restVolume = 0.0; ///> Rest volume
+    double m_stiffness  = 1.0;
 };
-} // imstk
+}

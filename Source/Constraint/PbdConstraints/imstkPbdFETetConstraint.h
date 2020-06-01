@@ -26,37 +26,38 @@
 namespace imstk
 {
 ///
-/// \class FEMHexConstraint
+/// \class FEMTetConstraint
 ///
-/// \brief The FEMHexConstraint class class for constraint as the elastic energy
-/// computed by linear shape functions with hexahedral mesh.
+/// \brief The FEMTetConstraint class class for constraint as the elastic energy
+/// computed by linear shape functions with tetrahedral mesh.
 ///
-class PbdFEMHexConstraint : public PbdFEMConstraint
+class PbdFEMTetConstraint : public PbdFEMConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit PbdFEMHexConstraint(MaterialType mtype = MaterialType::StVK) :
-        PbdFEMConstraint(8, mtype) {}
+    explicit PbdFEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
+        PbdFEMConstraint(4, mtype) {}
 
     ///
     /// \brief Get the type of FEM constraint
     ///
-    inline Type getType() const override { return Type::FEMHex; }
+    inline Type getType() const override { return Type::FEMTet; }
 
     ///
-    /// \brief Initializes the FEM hexahedral element constraint
+    /// \brief Initialize the tetrahedral FEM constraint
     ///
-    bool initConstraint(PbdModel& model, const unsigned int& pIdx1,
-                        const unsigned int& pIdx2, const unsigned int& pIdx3,
-                        const unsigned int& pIdx4, const unsigned int& pIdx5,
-                        const unsigned int& pIdx6, const unsigned int& pIdx7,
-                        const unsigned int& pIdx8);
+    bool initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                        const size_t& pIdx1, const size_t& pIdx2,
+                        const size_t& pIdx3, const size_t& pIdx4,
+                        std::shared_ptr<PbdFEMConstraintConfig> config);
 
     ///
-    /// \brief Solves the FEM hexahedral element constraint
+    /// \brief Solve the tetrahedral FEM constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) override;
 };
 } // imstk

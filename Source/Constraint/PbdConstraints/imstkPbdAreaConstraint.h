@@ -25,37 +25,41 @@
 
 namespace imstk
 {
+////
+/// \class AreaConstraint
 ///
-/// \class PbdDistanceConstraint
+/// \brief Area constraint for triangular face
 ///
-/// \brief Distance constraints between two nodal points
-///
-class PbdDistanceConstraint : public PbdConstraint
+class PbdAreaConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    PbdDistanceConstraint() : PbdConstraint() { m_vertexIds.resize(2); }
+    PbdAreaConstraint() : PbdConstraint() { m_vertexIds.resize(3); }
 
     ///
-    /// \brief Returns PBD constraint of type Type::Distance
+    /// \brief Returns PBD constraint of type Type::Area
     ///
-    inline Type getType() const override { return Type::Distance; }
+    Type getType() const override { return Type::Area; }
 
     ///
-    /// \brief Initializes the distance constraint
+    /// \brief Initializes the area constraint
     ///
-    void initConstraint(PbdModel& model, const size_t& pIdx1,
-                        const size_t& pIdx2, const double k = 1e-1);
+    void initConstraint(
+        const StdVectorOfVec3d& initVertexPositions,
+        const size_t& pIdx1, const size_t& pIdx2, const size_t& pIdx3,
+        const double k = 2.5);
 
     ///
-    /// \brief Solves the Distance constraint
+    /// \brief Solves the area constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) override;
 
 public:
-    double m_restLength = 0.; ///> Rest length between the nodes
-    double m_stiffness  = 0.; ///> Stiffness of the constaint
+    double m_restArea  = 0.; ///> Area at the rest position
+    double m_stiffness = 0.; ///> Stiffness of the area constraint
 };
 } // imstk

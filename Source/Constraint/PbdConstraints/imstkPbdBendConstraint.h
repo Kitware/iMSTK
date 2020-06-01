@@ -58,14 +58,17 @@ public:
         \param pIdx3 index of p2
         \param k stiffness
     */
-    void initConstraint(PbdModel& model,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        const size_t& pIdx3, const double k);
+    void initConstraint(
+        const StdVectorOfVec3d& initVertexPositions,
+        const size_t& pIdx1, const size_t& pIdx2,
+        const size_t& pIdx3, const double k);
 
     ///
     /// \brief Solves the bend constraint
     ///
-    bool solvePositionConstraint(PbdModel& model) override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositions,
+        const StdVectorOfReal& currInvMasses) override;
 
 public:
     double m_restLength = 0.; ///> Rest length

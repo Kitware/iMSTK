@@ -44,19 +44,24 @@ public:
 
     ///
     /// \brief initialize constraint
-    /// \param pIdx1 index of the point from object1
-    /// \param pIdx2 first point of the triangle from object2
-    /// \param pIdx3 second point of the triangle from object2
-    /// \param pIdx4 third point of the triangle from object2
+    /// \param pIdxA1 index of the point from object1
+    /// \param pIdxB1 first point of the triangle from object2
+    /// \param pIdxB2 second point of the triangle from object2
+    /// \param pIdxB3 third point of the triangle from object2
     /// \return
     ///
-    void initConstraint(std::shared_ptr<PbdModel> model1, const size_t& pIdx1,
-                        std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
-                        const size_t& pIdx3, const size_t& pIdx4);
+    void initConstraint(const size_t& pIdxA1,
+                        const size_t& pIdxB1, const size_t& pIdxB2, const size_t& pIdxB3,
+                        std::shared_ptr<PbdCollisionConstraintConfig> configA,
+                        std::shared_ptr<PbdCollisionConstraintConfig> configB);
 
     ///
     /// \brief
     ///
-    bool solvePositionConstraint() override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositionsA,
+        StdVectorOfVec3d&      currVertexPositionsB,
+        const StdVectorOfReal& currInvMassesA,
+        const StdVectorOfReal& currInvMassesB) override;
 };
 }

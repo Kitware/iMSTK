@@ -19,41 +19,17 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkPbdConstraint.h"
-#include "imstkMath.h"
+#include "imstkPbdFEMConstraint.h"
 
 namespace imstk
 {
-///
-/// \class PbdFEMConstraint
-///
-/// \brief The PbdFEMConstraint class for constraint as the elastic energy
-/// computed by linear shape functions with tetrahedral mesh.
-/// We provide several model for elastic energy including:
-/// Linear, Co-rotation, St Venant-Kirchhof and NeoHookean
-///
-class PbdFEMConstraint : public PbdConstraint
+PbdFEMConstraint::PbdFEMConstraint(const unsigned int cardinality,
+                                   MaterialType       mtype /*= MaterialType::StVK*/) :
+    PbdConstraint(),
+    m_elementVolume(0),
+    m_material(mtype),
+    m_invRestMat(Mat3d::Identity())
 {
-public:
-    // Material type
-    enum class MaterialType
-    {
-        Linear,
-        Corotation,
-        StVK,
-        NeoHookean
-    };
-
-    ///
-    /// \brief Constructor
-    ///
-    explicit PbdFEMConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK);
-
-public:
-    double       m_elementVolume;      ///> Volume of the element
-    MaterialType m_material;           ///> Material type
-    Mat3d m_invRestMat;                ///>
-};
+    m_vertexIds.resize(cardinality);
 }
+} // imstk

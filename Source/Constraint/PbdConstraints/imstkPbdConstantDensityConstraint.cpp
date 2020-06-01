@@ -20,16 +20,14 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPbdConstantDensityConstraint.h"
-#include "imstkPbdModel.h"
 #include "imstkParallelUtils.h"
 
 namespace imstk
 {
 void
-PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double)
+PbdConstantDensityConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions, const double)
 {
-    const auto& state = model.getCurrentState();
-    const auto  numParticles = state->getPositions().size();
+    const size_t numParticles = initVertexPositions.size();
 
     // constraint parameters
     // Refer: Miller, et al 2003 "Particle-Based Fluid Simulation for Interactive Applications."
@@ -47,28 +45,28 @@ PbdConstantDensityConstraint::initConstraint(PbdModel& model, const double)
 }
 
 bool
-PbdConstantDensityConstraint::solvePositionConstraint(PbdModel& model)
+PbdConstantDensityConstraint::solvePositionConstraint(
+    StdVectorOfVec3d&      currVertexPositions,
+    const StdVectorOfReal& currInvMasses)
 {
-    const auto& state        = model.getCurrentState();
-    auto&       positions    = state->getPositions();
-    const auto  numParticles = positions.size();
+    const size_t numParticles = currVertexPositions.size();
 
     // Search neighbor for each particle
-    m_NeighborSearcher->getNeighbors(m_neighborList, positions);
+    m_NeighborSearcher->getNeighbors(m_neighborList, currVertexPositions);
 
     ParallelUtils::parallelFor(numParticles,
         [&](const size_t idx) {
-            computeDensity(positions[idx], idx, positions);
+            computeDensity(currVertexPositions[idx], idx, currVertexPositions);
     });
 
     ParallelUtils::parallelFor(numParticles,
         [&](const size_t idx) {
-            computeLambdaScalingFactor(positions[idx], idx, positions);
+            computeLambdaScalingFactor(currVertexPositions[idx], idx, currVertexPositions);
     });
 
     ParallelUtils::parallelFor(numParticles,
         [&](const size_t idx) {
-            updatePositions(positions[idx], idx, positions);
+            updatePositions(currVertexPositions[idx], idx, currVertexPositions);
     });
 
     return true;

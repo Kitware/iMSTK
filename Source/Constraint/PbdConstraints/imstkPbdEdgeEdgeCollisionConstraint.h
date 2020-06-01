@@ -46,14 +46,19 @@ public:
     /// \param pIdx4 second point of the edge from object2
     /// \return  true if succeeded
     ///
-    void initConstraint(std::shared_ptr<PbdModel> model1,
-                        const size_t& pIdx1, const size_t& pIdx2,
-                        std::shared_ptr<PbdModel> model2,
-                        const size_t& pIdx3, const size_t& pIdx4);
+    void initConstraint(
+        const size_t& pIdxA1, const size_t& pIdxA2,
+        const size_t& pIdxB1, const size_t& pIdxB2,
+        std::shared_ptr<PbdCollisionConstraintConfig> configA,
+        std::shared_ptr<PbdCollisionConstraintConfig> configB);
 
     ///
     /// \brief Solve edge-edge collision constraint
     ///
-    bool solvePositionConstraint() override;
+    bool solvePositionConstraint(
+        StdVectorOfVec3d&      currVertexPositionsA,
+        StdVectorOfVec3d&      currVertexPositionsB,
+        const StdVectorOfReal& currInvMassesA,
+        const StdVectorOfReal& currInvMassesB) override;
 };
 }
