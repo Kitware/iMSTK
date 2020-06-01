@@ -20,18 +20,16 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
-#include "imstkThreadManager.h"
-#include "imstkSceneManager.h"
-#include "imstkViewer.h"
-#include "imstkTimer.h"
 #include "imstkLogger.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkThreadManager.h"
+#include "imstkTimer.h"
+#include "imstkViewer.h"
+#include "imstkVTKRenderer.h"
 
 #include <string>
-
-#include "imstkLogger.h"
 
 namespace imstk
 {

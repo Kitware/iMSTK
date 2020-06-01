@@ -21,7 +21,6 @@
 
 #pragma once
 
-#include <memory>
 #include "imstkCollisionDetection.h"
 
 namespace imstk

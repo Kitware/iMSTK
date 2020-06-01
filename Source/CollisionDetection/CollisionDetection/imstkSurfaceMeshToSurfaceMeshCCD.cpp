@@ -35,9 +35,6 @@ SurfaceMeshToSurfaceMeshCCD::SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<Surface
     m_modelA(std::make_shared<DeformModel>(meshA->getVertexPositions(), meshA->getTrianglesVertices())),
     m_modelB(std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices()))
 {
-    //m_modelA = std::make_shared<DeformModel>(meshA->getVertexPositions(), meshA->getTrianglesVertices());
-    //m_modelB = std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices());
-
     // Setup Callbacks
     m_modelA->SetEECallBack(SurfaceMeshToSurfaceMeshCCD::EECallback, this);
     m_modelA->SetVFCallBack(SurfaceMeshToSurfaceMeshCCD::VFCallbackA, this);
