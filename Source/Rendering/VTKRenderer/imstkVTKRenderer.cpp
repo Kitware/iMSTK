@@ -24,7 +24,6 @@
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkLight.h"
@@ -38,6 +37,18 @@
 #include <vtkProp.h>
 #include <vtkLight.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+
+#include <vtkChartXY.h>
+#include <vtkContextActor.h>
+#include <vtkContextScene.h>
+#include <vtkPlotBar.h>
+#include <vtkTable.h>
+#include <vtkStringArray.h>
+#include <vtkDoubleArray.h>
+#include <vtkAxis.h>
+#include <vtkTextProperty.h>
+#include <vtkIntArray.h>
 
 namespace imstk
 {
@@ -171,7 +182,6 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         m_defaultVtkCamera = vtkSmartPointer<vtkOpenVRCamera>::New();
         m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
     }
-
 #endif
     ///TODO : based on scene properties
     // Customize background colors
@@ -234,6 +244,49 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         m_camPos[1].Translation[2] = 0.0;
     }
 #endif
+
+    {
+        // Add the benchmarking chart
+        m_benchmarkChart = vtkSmartPointer<vtkChartXY>::New();
+        vtkSmartPointer<vtkContextScene> m_benchmarkChartScene = vtkSmartPointer<vtkContextScene>::New();
+        m_benchmarkChartActor = vtkSmartPointer<vtkContextActor>::New();
+        m_vtkRenderer->AddActor(m_benchmarkChartActor);
+        m_benchmarkChartScene->SetRenderer(m_vtkRenderer);
+
+        m_benchmarkChart->SetAutoSize(true);
+        m_benchmarkChart->SetSize(vtkRectf(0.0, 0.0, 600.0, 600.0));
+
+        m_benchmarkChartScene->AddItem(m_benchmarkChart);
+        m_benchmarkChartActor->SetScene(m_benchmarkChartScene);
+        m_benchmarkChartActor->SetVisibility(false);
+
+        m_benchmarkPlot = vtkPlotBar::SafeDownCast(m_benchmarkChart->AddPlot(vtkChart::BAR));
+        m_benchmarkPlot->SetColor(0.6, 0.1, 0.1);
+        m_benchmarkPlot->SetOrientation(vtkPlotBar::HORIZONTAL);
+        m_benchmarkChart->GetAxis(vtkAxis::BOTTOM)->SetTitle("ms");
+        m_benchmarkChart->GetAxis(vtkAxis::LEFT)->SetTitle("");
+        m_benchmarkChart->GetAxis(vtkAxis::LEFT)->GetLabelProperties()->SetVerticalJustification(VTK_TEXT_CENTERED);
+        m_benchmarkChart->GetAxis(vtkAxis::LEFT)->GetLabelProperties()->SetJustification(VTK_TEXT_RIGHT);
+
+        m_benchmarkTable = vtkSmartPointer<vtkTable>::New();
+        vtkSmartPointer<vtkDoubleArray> xIndices = vtkSmartPointer<vtkDoubleArray>::New();
+        xIndices->SetName("Indices");
+        xIndices->SetNumberOfValues(0);
+        vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkSmartPointer<vtkDoubleArray>::New();
+        yElapsedTimes->SetName("Elapsed Times");
+        yElapsedTimes->SetNumberOfValues(0);
+        vtkSmartPointer<vtkStringArray> labels = vtkSmartPointer<vtkStringArray>::New();
+        labels->SetName("Labels");
+        labels->SetNumberOfValues(0);
+        m_benchmarkTable->AddColumn(xIndices);
+        m_benchmarkTable->AddColumn(yElapsedTimes);
+        m_benchmarkTable->AddColumn(labels);
+        m_benchmarkPlot->SetInputData(m_benchmarkTable, 0, 1);
+
+        vtkAxis* axisY = m_benchmarkChart->GetAxis(vtkAxis::LEFT);
+        //axisY->SetRange(xIndices->GetRange());
+        axisY->SetCustomTickPositions(xIndices, labels);
+    }
 }
 
 vtkSmartPointer<vtkRenderer>
@@ -356,14 +409,84 @@ VTKRenderer::setAxesVisibility(const bool visible)
     m_AxesActor->SetVisibility(visible);
 }
 
-///
-/// \brief Returns whether the debug axes is visible or not
-///
 bool
 VTKRenderer::getAxesVisibility() const
 {
     return m_AxesActor->GetVisibility();
 }
+
+
+void
+VTKRenderer::setBenchmarkTable(const std::unordered_map<std::string, double>& nameToElapsedTimes)
+{
+    // Sort by elapsed times
+    std::vector<std::pair<std::string, double>> nameToElapsedTimesVec(nameToElapsedTimes.begin(), nameToElapsedTimes.end());
+    std::sort(nameToElapsedTimesVec.begin(), nameToElapsedTimesVec.end(),
+        [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) { return a.second < b.second; });
+
+    // Construct vtkTable from provided data
+    vtkSmartPointer<vtkDoubleArray> xIndices = vtkDoubleArray::SafeDownCast(m_benchmarkTable->GetColumn(0));
+    vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkDoubleArray::SafeDownCast(m_benchmarkTable->GetColumn(1));
+    vtkSmartPointer<vtkStringArray> labels = vtkStringArray::SafeDownCast(m_benchmarkTable->GetColumn(2));
+
+    labels->SetNumberOfValues(nameToElapsedTimesVec.size());
+    xIndices->SetNumberOfValues(nameToElapsedTimesVec.size());
+    yElapsedTimes->SetNumberOfValues(nameToElapsedTimesVec.size());
+    for (size_t i = 0; i < nameToElapsedTimesVec.size(); i++)
+    {
+        labels->SetValue(i, nameToElapsedTimesVec[i].first.c_str());
+        xIndices->SetValue(i, i + 1);
+        yElapsedTimes->SetValue(i, nameToElapsedTimesVec[i].second);
+    }
+
+    // The range for the x axis is based on history of the elapsed times
+    vtkAxis* botAxis = m_benchmarkChart->GetAxis(vtkAxis::BOTTOM);
+
+    // Get the previous and current range
+    double newMaxElapsed = yElapsedTimes->GetRange()[1];
+    yElapsedTimes->Modified();
+    double currMaxElapsed = botAxis->GetMaximum();
+
+    // Always respect the max as all information should be shown
+    if (newMaxElapsed > currMaxElapsed)
+    {
+        botAxis->SetRange(0.0, newMaxElapsed);
+    }
+    // But if current elapsed is less than the existing one we can lag
+    else
+    {
+        // Lag downscaling by 400 iterations
+        if (benchmarkIter % 400 == 0)
+        {
+            botAxis->SetRange(0.0, newMaxElapsed);
+        }
+        else
+        {
+            botAxis->SetRange(0.0, currMaxElapsed);
+        }
+        benchmarkIter++;
+    }
+    botAxis->Modified();
+
+    vtkAxis* leftAxis = m_benchmarkChart->GetAxis(vtkAxis::LEFT);
+    leftAxis->SetRange(xIndices->GetRange());
+    leftAxis->SetCustomTickPositions(xIndices, labels);
+
+    m_benchmarkTable->Modified();
+}
+
+void
+VTKRenderer::setBenchmarkTableVisibility(const bool visible)
+{
+    m_benchmarkChartActor->SetVisibility(visible);
+}
+
+bool
+VTKRenderer::getBenchmarkTableVisibility() const
+{
+    return m_benchmarkChartActor->GetVisibility();
+}
+
 
 void
 VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
