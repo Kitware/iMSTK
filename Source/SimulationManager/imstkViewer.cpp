@@ -21,7 +21,6 @@
 
 #include "imstkViewer.h"
 #include "imstkScene.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
 #include "imstkLogger.h"
 #include "imstkScreenCaptureUtility.h"

@@ -19,16 +19,33 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkCollisionHandling.h"
-#include "imstkComputeNode.h"
+#pragma once
+
+#include "imstkCollisionPair.h"
 
 namespace imstk
 {
-CollisionHandling::CollisionHandling(const Type& type, const Side& side,
-                                     const std::shared_ptr<CollisionData> colData) :
-    m_type(type), m_side(side), m_colData(colData),
-    m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
-{
+class ComputeNode;
+class PbdObject;
+class PbdSolver;
 
-}
+///
+/// \class PbdObjectCollisionPair
+///
+/// \brief This class defines a collision interaction between two PbdObjects
+///
+class PbdObjectCollisionPair : public CollisionPair
+{
+public:
+    PbdObjectCollisionPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<PbdObject> obj2,
+        CollisionDetection::Type cdType = CollisionDetection::Type::MeshToMeshBruteForce);
+
+    void modifyComputeGraph() override;
+
+private:
+    // Pbd defines two interactions (one at CD and one at solver)
+    Inputs m_solveNodeInputs;
+    Outputs m_solveNodeOutputs;
+    std::shared_ptr<ComputeNode> m_collisionSolveNode = nullptr;
+};
 }

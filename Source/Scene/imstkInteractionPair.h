@@ -21,89 +21,35 @@
 
 #pragma once
 
-// imstk
-#include "imstkCollisionDetection.h"
-#include "imstkCollisionHandling.h"
+#include <memory>
+#include <vector>
 
 namespace imstk
 {
-struct CollisionData;
-class CollidingObject;
+class ComputeNode;
 
 ///
 /// \class InteractionPair
 ///
-/// \brief This class implements collision interaction between two given scene objects
+/// \brief This class defines an interaction between nodes
 ///
 class InteractionPair
 {
-using ObjectsPair = std::pair<std::shared_ptr<CollidingObject>, std::shared_ptr<CollidingObject>>;
+public:
+    using Inputs = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
+    using Outputs = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
 
 public:
+    InteractionPair() = default;
+    virtual ~InteractionPair() = default;
 
-    ///
-    /// \brief Constructor
-    ///
-    InteractionPair(std::shared_ptr<CollidingObject> A,
-                    std::shared_ptr<CollidingObject> B,
-                    CollisionDetection::Type         CDType,
-                    CollisionHandling::Type          CHAType,
-                    CollisionHandling::Type          CHBType);
-
-    InteractionPair(std::shared_ptr<CollidingObject>    A,
-                    std::shared_ptr<CollidingObject>    B,
-                    std::shared_ptr<CollisionDetection> CD,
-                    std::shared_ptr<CollisionHandling>  CHA,
-                    std::shared_ptr<CollisionHandling>  CHB);
-
-    ///
-    /// \brief Destructor
-    ///
-    ~InteractionPair() = default;
-
-    ///
-    /// \brief Call collision detection algorithm to compute collision data
-    ///
-    void computeCollisionData();
-
-    ///
-    /// \brief Call collision handling algorithm to compute contact forces for an object
-    ///
-    void processCollisionData();
-
-    ///
-    /// \brief Call collision handling algorithm to compute contact forces for an object
-    ///
-    const bool& isValid();
-
-    ///
-    /// \brief Returns objects pair
-    ///
-    const ObjectsPair& getObjectsPair() const;
-
-    ///
-    /// \brief Returns collision detection algorithm for A-B
-    ///
-    std::shared_ptr<CollisionDetection> getCollisionDetection() const;
-
-    ///
-    /// \brief Returns collision handling algorithm for object B
-    ///
-    std::shared_ptr<CollisionHandling> getCollisionHandlingA() const;
-
-    ///
-    /// \brief Returns collision handling algorithm for object A
-    ///
-    std::shared_ptr<CollisionHandling> getCollisionHandlingB() const;
+public:
+    const Inputs& getComputeNodeInputs() const { return m_computeNodeInputs; }
+    const Outputs& getComputeNodeOutputs() const { return m_computeNodeOutputs; }
 
 protected:
-
-    ObjectsPair m_objects;                              ///< Colliding objects
-    std::shared_ptr<CollisionDetection> m_colDetect;    ///< Collision detection algorithm
-    std::shared_ptr<CollisionData>      m_colData;      ///< Common Collision Data
-    std::shared_ptr<CollisionHandling>  m_colHandlingA; ///< Collision handling algorithm for A
-    std::shared_ptr<CollisionHandling>  m_colHandlingB; ///< Collision handling algorithm for B
-
-    bool m_valid;
+    Inputs m_computeNodeInputs;                         ///> The interacting nodes
+    Outputs m_computeNodeOutputs;                       ///> The interacting nodes
+    std::shared_ptr<ComputeNode> m_interactionFunction; ///> Function to execute on interaction
 };
 }

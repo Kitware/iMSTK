@@ -19,16 +19,17 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkCollisionHandling.h"
-#include "imstkComputeNode.h"
+#include "imstkObjectInteractionPair.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
-CollisionHandling::CollisionHandling(const Type& type, const Side& side,
-                                     const std::shared_ptr<CollisionData> colData) :
-    m_type(type), m_side(side), m_colData(colData),
-    m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
+ObjectInteractionPair::ObjectInteractionPair(std::shared_ptr<SceneObject> objA, std::shared_ptr<SceneObject> objB)
 {
+    // Check that objects exist
+    CHECK(objA != nullptr && objB != nullptr) << "InteractionPair error: invalid objects (nullptr).";
 
+    this->m_objects.first  = objA;
+    this->m_objects.second = objB;
 }
 }

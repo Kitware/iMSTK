@@ -25,10 +25,12 @@
 
 namespace imstk
 {
+struct CollisionData;
+
 class CollidingObject;
+class ComputeNode;
 class OctreeBasedCD;
 class Geometry;
-struct CollisionData;
 
 ///
 /// \class CollisionDetection
@@ -62,6 +64,9 @@ public:
         BidirectionalPlaneToSphere,
         SphereToCylinder,
         SphereToSphere,
+        
+        // Image based CD
+        SignedDistanceField,
 
         Custom
     };
@@ -93,6 +98,11 @@ public:
     const std::shared_ptr<CollisionData> getCollisionData() const { return m_colData; }
 
     ///
+    /// \brief Returns computational node
+    ///
+    std::shared_ptr<ComputeNode> getComputeNode() const { return m_computeNode; }
+
+    ///
     /// \brief Update the intrernal octree, preparing for collision detection
     ///
     static void updateInternalOctreeAndDetectCollision();
@@ -112,8 +122,9 @@ public:
                                          const std::shared_ptr<CollisionData>& collisionData);
 
 protected:
-    Type m_type = Type::Custom;               ///< Collision detection algorithm type
-    std::shared_ptr<CollisionData> m_colData; ///< Collision data
+    Type m_type = Type::Custom;                             ///> Collision detection algorithm type
+    std::shared_ptr<CollisionData> m_colData     = nullptr; ///> Collision data
+    std::shared_ptr<ComputeNode>   m_computeNode = nullptr; ///> Computational node to execute the detection
 
     /// Static octree for collision detection
     /// This octree is valid throughout the lifetime of the program

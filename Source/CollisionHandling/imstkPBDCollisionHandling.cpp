@@ -21,28 +21,24 @@
 
 #include "imstkPBDCollisionHandling.h"
 #include "imstkCollisionData.h"
-#include "imstkDeformableObject.h"
+#include "imstkGeometryMap.h"
+#include "imstkPbdEdgeEdgeCollisionConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdEdgeEdgeCollisionConstraint.h"
 #include "imstkPbdPointTriCollisionConstraint.h"
 #include "imstkPbdSolver.h"
-#include "imstkParallelUtils.h"
-#include "imstkGeometryMap.h"
 #include "imstkSurfaceMesh.h"
-
-#include <memory>
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {
 PBDCollisionHandling::PBDCollisionHandling(const Side&                          side,
                                            const std::shared_ptr<CollisionData> colData,
-                                           std::shared_ptr<CollidingObject>     obj1,
-                                           std::shared_ptr<CollidingObject>     obj2) :
+                                           std::shared_ptr<PbdObject> pbdObject1,
+                                           std::shared_ptr<PbdObject> pbdObject2) :
     CollisionHandling(Type::PBD, side, colData),
-    m_pbdObject1(std::dynamic_pointer_cast<PbdObject>(obj1)),
-    m_pbdObject2(std::dynamic_pointer_cast<PbdObject>(obj2))
+    m_PbdObject1(pbdObject1),
+    m_PbdObject2(pbdObject2),
+    m_pbdCollisionSolver(std::make_shared<PbdCollisionSolver>())
 {
 }
 
@@ -61,36 +57,30 @@ PBDCollisionHandling::~PBDCollisionHandling()
 void
 PBDCollisionHandling::processCollisionData()
 {
-    /*if (auto deformableObj = std::dynamic_pointer_cast<DeformableObject>(m_object))
-    {
-        this->computeContactForcesDiscreteDeformable(deformableObj);
-    }
-    else if (auto analyticObj = std::dynamic_pointer_cast<CollidingObject>(m_object))
-    {
-        this->computeContactForcesAnalyticRigid(analyticObj);
-    }
-    else
-    {
-        LOG(WARNING) << "PenaltyRigidCH::computeContactForces error: "
-                     << "no penalty collision handling available for " << m_object->getName()
-                     << " (rigid mesh not yet supported).";
-    }*/
     this->generatePBDConstraints();
 
-    CHECK(m_PBDSolver != nullptr) << "No PbdSolver found to handle the Collision constraints!";
+    if (m_PBDConstraints.size() == 0)
+    {
+        return;
+    }
 
-    m_PBDSolver->addCollisionConstraints(&m_PBDConstraints);
+    m_pbdCollisionSolver->addCollisionConstraints(&m_PBDConstraints,
+        m_PbdObject1->getPbdModel()->getCurrentState()->getPositions(),
+        m_PbdObject1->getPbdModel()->getInvMasses(),
+        m_PbdObject2->getPbdModel()->getCurrentState()->getPositions(),
+        m_PbdObject2->getPbdModel()->getInvMasses());
 }
 
 void
 PBDCollisionHandling::generatePBDConstraints()
 {
-    const auto dynaModel1 = std::static_pointer_cast<PbdModel>(m_pbdObject1->getDynamicalModel());
-    const auto dynaModel2 = std::static_pointer_cast<PbdModel>(m_pbdObject2->getDynamicalModel());
-    const auto colGeo2    = std::static_pointer_cast<SurfaceMesh>(m_pbdObject2->getCollidingGeometry());
+    std::shared_ptr<PbdCollisionConstraintConfig> config1 = m_PbdObject1->getPbdModel()->getParameters()->collisionParams;
+    std::shared_ptr<PbdCollisionConstraintConfig> config2 = m_PbdObject2->getPbdModel()->getParameters()->collisionParams;
 
-    const auto map1 = m_pbdObject1->getPhysicsToCollidingMap();
-    const auto map2 = m_pbdObject2->getPhysicsToCollidingMap();
+    const auto colGeo2 = std::static_pointer_cast<SurfaceMesh>(m_PbdObject2->getCollidingGeometry());
+
+    const auto map1 = m_PbdObject1->getPhysicsToCollidingMap();
+    const auto map2 = m_PbdObject2->getPhysicsToCollidingMap();
 
 //    std::cout << "EE: " << m_colData->EEColData.getSize() << "TV: " << m_colData->VTColData.getSize() << std::endl;
 
@@ -133,7 +123,7 @@ PBDCollisionHandling::generatePBDConstraints()
             }
 
             const auto constraint = m_EEConstraintPool[idx];
-            constraint->initConstraint(dynaModel1, edgeA1, edgeA2, dynaModel2, edgeB1, edgeB2);
+            constraint->initConstraint(edgeA1, edgeA2, edgeB1, edgeB2, config1, config2);
     });
 
     // Generate vertex-triangle pbd constraints
@@ -166,7 +156,10 @@ PBDCollisionHandling::generatePBDConstraints()
             }
 
             const auto constraint = m_VTConstraintPool[idx];
-            constraint->initConstraint(dynaModel1, colData.vertexIdx, dynaModel2, v1, v2, v3);
+            constraint->initConstraint(
+                colData.vertexIdx,
+                v1, v2, v3,
+                config1, config2);
     });
 
     // Copy constraints

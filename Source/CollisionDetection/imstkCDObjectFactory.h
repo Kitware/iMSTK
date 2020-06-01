@@ -19,16 +19,23 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkCollisionHandling.h"
-#include "imstkComputeNode.h"
+#pragma once
+
+#include "imstkCollisionDetection.h"
 
 namespace imstk
 {
-CollisionHandling::CollisionHandling(const Type& type, const Side& side,
-                                     const std::shared_ptr<CollisionData> colData) :
-    m_type(type), m_side(side), m_colData(colData),
-    m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
-{
+class Geometry;
 
-}
+///
+/// \brief Static factory for collision detection sub classes
+/// If the collision pair is PointSet to SurfaceMesh, or SurfaceMesh to SurfaceMesh,
+/// it will be added to an internal static octree for detecting collision
+/// \todo Other collision pair may be considered to use octree too
+///
+extern std::shared_ptr<CollisionDetection>
+makeCollisionDetectionObject(const CollisionDetection::Type type,
+    std::shared_ptr<Geometry> collidingGeometryA,
+    std::shared_ptr<Geometry> collidingGeometryB,
+    std::shared_ptr<CollisionData> colData);
 }
