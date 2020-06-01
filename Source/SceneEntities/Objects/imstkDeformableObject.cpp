@@ -25,62 +25,19 @@
 
 namespace imstk
 {
-Vectord&
-FeDeformableObject::getContactForce()
-{
-    CHECK(m_defModel != nullptr) << "deformation model pointer not valid DeformableObject::getContactForce()";
-
-    return m_defModel->getContactForce();
-}
-
 bool
 FeDeformableObject::initialize()
 {
-    m_defModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
-    if (m_defModel)
-    {
-        return DynamicObject::initialize();
-    }
-    else
+    m_femModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
+    if (m_femModel == nullptr)
     {
         LOG(FATAL) << "Dynamics pointer cast failure in DeformableObject::initialize()";
         return false;
     }
-}
 
-const Vectord&
-FeDeformableObject::getDisplacements() const
-{
-    return m_defModel->getCurrentState()->getQ();
-}
+    DynamicObject::initialize();
+    m_femModel->initialize();
 
-const Vectord&
-FeDeformableObject::getPrevDisplacements() const
-{
-    return m_defModel->getPreviousState()->getQ();
-}
-
-const Vectord&
-FeDeformableObject::getVelocities() const
-{
-    return m_defModel->getCurrentState()->getQDot();
-}
-
-const Vectord&
-FeDeformableObject::getPrevVelocities() const
-{
-    return m_defModel->getPreviousState()->getQDot();
-}
-
-const Vectord&
-FeDeformableObject::getAccelerations() const
-{
-    return m_defModel->getCurrentState()->getQDotDot();
-}
-
-const Vectord&
-FeDeformableObject::getPrevAccelerations() const
-{
-    return m_defModel->getPreviousState()->getQDotDot();
+    return true;
 }
 } // imstk

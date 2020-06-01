@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRigidBodyState_h
-#define imstkRigidBodyState_h
+#pragma once
 
 #include <Eigen/Dense>
 #include <memory>
@@ -78,5 +77,3 @@ private:
     //Can add linear velocity and angular velocity too.
 };
 } // imstk
-
-#endif // imstkPbdState_h

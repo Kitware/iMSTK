@@ -19,8 +19,7 @@
 
 =========================================================================*/
 
-#ifndef imstkRigidBodyModel_h
-#define imstkRigidBodyModel_h
+#pragma once
 
 #include "imstkDynamicalModel.h"
 #include "imstkRigidBodyState.h"
@@ -176,5 +175,3 @@ private:
     void createMesh();
 };
 } // imstk
-
-#endif

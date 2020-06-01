@@ -20,10 +20,16 @@
 =========================================================================*/
 
 #include "imstkAbstractDynamicalModel.h"
+#include "imstkComputeGraph.h"
 #include "imstkLogger.h"
 
 namespace imstk
 {
+AbstractDynamicalModel::AbstractDynamicalModel(DynamicalModelType type) :
+    m_type(type), m_numDOF(0), m_computeGraph(std::make_shared<ComputeGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
+{
+}
+
 bool
 AbstractDynamicalModel::isGeometryValid(const std::shared_ptr<Geometry> geometry)
 {
@@ -64,5 +70,30 @@ AbstractDynamicalModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
     {
         LOG(WARNING) << "Invalid geometry for Model";
     }
+}
+
+void
+AbstractDynamicalModel::initGraphEdges()
+{
+    m_computeGraph->clearEdges();
+    initGraphEdges(m_computeGraph->getSource(), m_computeGraph->getSink());
+}
+
+void
+AbstractDynamicalModel::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+{
+    m_computeGraph->addEdge(source, sink);
+}
+
+std::shared_ptr<ComputeNode>
+AbstractDynamicalModel::addFunction(std::string name, std::function<void()> func)
+{
+    return m_computeGraph->addFunction(name, func);
+}
+
+void
+AbstractDynamicalModel::addEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode)
+{
+    m_computeGraph->addEdge(srcNode, destNode);
 }
 } // imstk

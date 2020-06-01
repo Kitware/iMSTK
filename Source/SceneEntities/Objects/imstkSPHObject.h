@@ -30,22 +30,17 @@ class SPHModel;
 ///
 /// \class SPHObject
 ///
-/// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation
+/// \brief Base class for scene objects that move and/or deform under
+/// smooth particle hydrodynamics
 ///
 class SPHObject : public DynamicObject
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     explicit SPHObject(const std::string& name);
 
-    ///
-    /// \brief Destructor
-    ///
     virtual ~SPHObject() override = default;
 
+public:
     ///
     /// \brief Initialize the SPH scene object
     ///
@@ -54,9 +49,9 @@ public:
     ///
     /// \brief Get the SPH model of the object
     ///
-    const std::shared_ptr<SPHModel>& getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+    std::shared_ptr<SPHModel> getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
 
 protected:
-    std::shared_ptr<SPHModel> m_SPHModel;
+    std::shared_ptr<SPHModel> m_SPHModel = nullptr;
 };
 } // end namespace imstk

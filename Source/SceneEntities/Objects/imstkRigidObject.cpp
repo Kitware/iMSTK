@@ -18,28 +18,32 @@
    limitations under the License.
 
 =========================================================================*/
+
 #include "imstkRigidObject.h"
 #include "imstkLogger.h"
+#include "imstkRigidBodyModel.h"
 
 namespace imstk
 {
 bool
 RigidObject::initialize()
 {
-    auto m_rigidBodyModel = std::dynamic_pointer_cast<RigidBodyModel>(m_dynamicalModel);
-    if (m_rigidBodyModel)
+    m_rigidBodyModel = std::dynamic_pointer_cast<RigidBodyModel>(m_dynamicalModel);
+    if (m_rigidBodyModel == nullptr)
     {
-        /*if (!m_rigidBodyModel->getRigidBodyWorld())
-        {
-            LOG(WARNING) << "RigidObject::initialize() - Rigid body world not specified!";
-            return false;
-        }*/
-        return DynamicObject::initialize();
-    }
-    else
-    {
-        LOG(WARNING) << "RigidObject::initialize() - Dynamics pointer cast failure";
+        LOG(FATAL) << "Dynamics pointer cast failure in RigidObject::initialize()";
         return false;
     }
+
+    DynamicObject::initialize();
+    m_rigidBodyModel->initialize();
+
+    return true;
+}
+
+void
+RigidObject::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
+{
+    m_rigidBodyModel->addForce(force, pos, wakeup);
 }
 } // imstk

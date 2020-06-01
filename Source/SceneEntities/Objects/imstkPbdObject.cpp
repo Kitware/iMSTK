@@ -20,53 +20,31 @@
 =========================================================================*/
 
 #include "imstkPbdObject.h"
-#include "imstkGeometryMap.h"
-#include "imstkPbdModel.h"
 #include "imstkLogger.h"
+#include "imstkPbdModel.h"
 
 namespace imstk
 {
+std::shared_ptr<PbdModel>
+PbdObject::getPbdModel()
+{
+    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
+    return m_pbdModel;
+};
+
 bool
 PbdObject::initialize()
 {
     m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-
-    CHECK(m_pbdModel != nullptr) << "Dynamics pointer cast failure in PbdObject::initialize()";
-
-    return DynamicObject::initialize();
-}
-
-void
-PbdObject::integratePosition()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
+    if (m_pbdModel == nullptr)
     {
-        m_pbdModel->integratePosition();
+        LOG(FATAL) << "Dynamics pointer cast failure in PbdObject::initialize()";
+        return false;
     }
-}
 
-void
-PbdObject::updateVelocity()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
-    {
-        m_pbdModel->updateVelocity();
-    }
-}
+    DynamicObject::initialize();
+    m_pbdModel->initialize();
 
-void
-PbdObject::solveConstraints()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
-    {
-        m_pbdModel->projectConstraints();
-    }
-}
-
-void
-PbdObject::reset()
-{
-    DynamicObject::reset();
-    this->updateVelocity();
+    return true;
 }
 } //imstk

@@ -21,18 +21,15 @@
 
 #pragma once
 
-#include <vector>
-#include <Eigen/Dense>
-
-#include "imstkPbdConstraint.h"
-#include "imstkPbdFEMConstraint.h"
 #include "imstkDynamicalModel.h"
+#include "imstkPbdCollisionConstraint.h"
+#include "imstkPbdFEMConstraint.h"
 #include "imstkPbdState.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
 class PointSet;
+class PbdSolver;
 
 ///
 /// \class PBDModelConfig
@@ -40,28 +37,35 @@ class PointSet;
 ///
 struct PBDModelConfig
 {
-    double m_uniformMassValue    = 1.0;                                       ///> Mass properties
-    double m_viscousDampingCoeff = 0.01;                                      ///> Viscous damping coefficient [0, 1]
+    double m_uniformMassValue    = 1.0;  ///> Mass properties
+    double m_viscousDampingCoeff = 0.01; ///> Viscous damping coefficient [0, 1]
 
-    double m_contactStiffness = 1.0;                                          ///> Contact stiffness for collisions
-    double m_proximity = 0.1;                                                 ///> Proximity for collisions
+    std::shared_ptr<PbdCollisionConstraintConfig> collisionParams =
+        std::make_shared<PbdCollisionConstraintConfig>(PbdCollisionConstraintConfig
+        {
+            0.1,                             // Proximity
+            1.0                              // Contact stiffness
+        });                                  ///> Info shared between the collision constraints
 
-    unsigned int m_maxIter = 10;                                              ///> Max. pbd iterations
-    double m_dt = 0.0;                                                        ///> Time step size
-    double m_DefaultDt = 0.01;                                                ///> Default Time step size
+    unsigned int m_iterations = 10;          ///> Pbd iterations
+    unsigned int m_collisionIterations = 5;  ///> Pbd collision iterations
+    double m_dt = 0.0;                       ///> Time step size
+    double m_defaultDt = 0.01;               ///> Default Time step size
 
-    std::vector<std::size_t> m_fixedNodeIds;                                  ///> Nodal IDs of the nodes that are fixed
-    Vec3r m_gravity = Vec3r(0, -9.81, 0);                                     ///> Gravity
+    std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
+    Vec3r m_gravity = Vec3r(0, -9.81, 0);    ///> Gravity
 
-    double m_mu     = 0;                                                      ///> Lame constant, if constraint type is FEM
-    double m_lambda = 0;                                                      ///> Lame constant, if constraint type is FEM
+    std::shared_ptr<PbdFEMConstraintConfig> femParams =
+        std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
+        {
+            0.0,                                                                                  // Lame constant, if constraint type is FEM
+            0.0,                                                                                  // Lame constant, if constraint type is FEM
+            1000.0,                                                                               // FEM parameter, if constraint type is FEM
+            0.2                                                                                   // FEM parameter, if constraint type is FEM
+        });                                                                                       ///> Info shared between the fem constraints
 
-    double m_YoungModulus = 1000;                                             ///> FEM parameter, if constraint type is FEM
-    double m_PoissonRatio = 0.2;                                              ///> FEM parameter, if constraint type is FEM
-
-    std::vector<std::pair<PbdConstraint::Type, double>> m_RegularConstraints; ///> Constraints except FEM
-    std::vector<std::pair<PbdConstraint::Type,
-                          PbdFEMConstraint::MaterialType>> m_FEMConstraints;  ///> FEM constraints
+    std::vector<std::pair<PbdConstraint::Type, double>> m_RegularConstraints;                     ///> Constraints except FEM
+    std::vector<std::pair<PbdConstraint::Type, PbdFEMConstraint::MaterialType>> m_FEMConstraints; ///> Constraints except FEM
 
     ///
     /// \brief Enable a regular constraint (constraint that is not FEM constraint)
@@ -70,7 +74,7 @@ struct PBDModelConfig
     void enableConstraint(PbdConstraint::Type type, double stiffness);
 
     ///
-    /// \brief Enable a FEM constraint with a given FEM material
+    /// \brief Enable a FEM constraint with mu, lambda
     ///
     void enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material);
 };
@@ -86,16 +90,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
-    {
-        m_validGeometryTypes = {
-            Geometry::Type::PointSet,
-            Geometry::Type::LineMesh,
-            Geometry::Type::SurfaceMesh,
-            Geometry::Type::TetrahedralMesh,
-            Geometry::Type::HexahedralMesh
-        };
-    }
+    PbdModel();
 
     ///
     /// \brief Destructor
@@ -105,7 +100,7 @@ public:
     ///
     /// \brief Set simulation parameters
     ///
-    void configure(const std::shared_ptr<PBDModelConfig>& params);
+    void configure(std::shared_ptr<PBDModelConfig> params);
 
     ///
     /// \brief Get the simulation parameters
@@ -155,11 +150,6 @@ public:
     bool initializeConstantDensityConstraint(const double stiffness);
 
     ///
-    /// \brief compute delta x (position) and update position
-    ///
-    void projectConstraints();
-
-    ///
     /// \brief Update the model geometry from the newest PBD state
     ///
     void updatePhysicsGeometry() override;
@@ -172,13 +162,13 @@ public:
     ///
     /// \brief Returns true if there is at least one constraint
     ///
-    bool hasConstraints() const { return !m_constraints.empty() || !m_partitionedConstraints.empty(); }
+    bool hasConstraints() const { return !m_constraints->empty() || !m_partitionedConstraints->empty(); }
 
     ///
     /// \brief Set the time step size
     ///
     virtual void setTimeStep(const Real timeStep) override { m_Parameters->m_dt = timeStep; }
-    void setDefaultTimeStep(const Real timeStep) { m_Parameters->m_DefaultDt = static_cast<Real>(timeStep); }
+    void setDefaultTimeStep(const Real timeStep) { m_Parameters->m_defaultDt = static_cast<Real>(timeStep); }
 
     ///
     /// \brief Set the time step size to fixed size
@@ -189,7 +179,17 @@ public:
     /// \brief Returns the time step size
     ///
     virtual double getTimeStep() const override { return m_Parameters->m_dt; }
-    double getDefaultTimeStep() const { return m_Parameters->m_DefaultDt; }
+    double getDefaultTimeStep() const { return m_Parameters->m_defaultDt; }
+
+    ///
+    /// \brief
+    ///
+    std::shared_ptr<PBDConstraintVector> getConstraints() { return m_constraints; }
+
+    ///
+    /// \brief
+    ///
+    std::shared_ptr<std::vector<PBDConstraintVector>> getPartitionedConstraints() { return m_partitionedConstraints; }
 
     ///
     /// \brief Set uniform mass to all the nodes
@@ -209,7 +209,9 @@ public:
     ///
     /// \brief Get the inverse of mass of a certain node
     ///
-    double getInvMass(const size_t idx) const;
+    double getInvMass(const size_t idx) const { return (*m_invMass)[idx]; }
+
+    std::shared_ptr<StdVectorOfReal> getInvMasses() { return m_invMass; }
 
     ///
     /// \brief Time integrate the position
@@ -237,22 +239,46 @@ public:
     ///
     void setConstraintPartitionThreshold(size_t threshold) { m_partitionThreshold = threshold; }
 
+    std::shared_ptr<PbdSolver> getSolver() const { return m_pbdSolver; }
+
+    void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
+
+    std::shared_ptr<ComputeNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
+
+    std::shared_ptr<ComputeNode> getUpdateCollisionGeometryNode() const { return m_updateCollisionGeometryNode; }
+
+    std::shared_ptr<ComputeNode> getSolveNode() const { return m_solveConstraintsNode; }
+
+    std::shared_ptr<ComputeNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
+
 protected:
     ///
     /// \brief Partition constraints for parallelization
     ///
     void partitionConstraints(const bool print = false);
 
-    size_t m_partitionThreshold = 16;    ///> Threshold for constraint partitioning
+    ///
+    /// \brief Setup the computational graph of PBD
+    ///
+    void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
 
-    std::shared_ptr<PointSet> m_mesh;    ///> PointSet on which the pbd model operates on
-    std::vector<double>       m_mass;    ///> Mass of nodes
-    std::vector<double>       m_invMass; ///> Inverse of mass of nodes
+protected:
+    size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
 
-    using PBDConstraintVector = std::vector<std::shared_ptr<PbdConstraint>>;
+    std::shared_ptr<PbdSolver>       m_pbdSolver = nullptr;                               ///> PBD solver
+    std::shared_ptr<PointSet>        m_mesh      = nullptr;                               ///> PointSet on which the pbd model operates on
+    std::shared_ptr<StdVectorOfReal> m_mass      = nullptr;                               ///> Mass of nodes
+    std::shared_ptr<StdVectorOfReal> m_invMass   = nullptr;                               ///> Inverse of mass of nodes
 
-    PBDConstraintVector m_constraints;                         ///> List of pbd constraints
-    std::vector<PBDConstraintVector> m_partitionedConstraints; ///> List of pbd constraints
-    std::shared_ptr<PBDModelConfig>  m_Parameters;             ///> Model parameters, must be set before simulation
+    std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> List of pbd constraints
+    std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> List of pbd constraints
+    std::shared_ptr<PBDModelConfig> m_Parameters = nullptr;                               ///> Model parameters, must be set before simulation
+
+protected:
+    // Computational Nodes
+    std::shared_ptr<ComputeNode> m_integrationPositionNode = nullptr;
+    std::shared_ptr<ComputeNode> m_updateCollisionGeometryNode = nullptr;
+    std::shared_ptr<ComputeNode> m_solveConstraintsNode    = nullptr;
+    std::shared_ptr<ComputeNode> m_updateVelocityNode      = nullptr;
 };
 } // imstk

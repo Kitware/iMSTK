@@ -19,44 +19,25 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkSolverBase.h"
-#include "imstkSPHObject.h"
-#include "imstkSPHModel.h"
+#include "imstkSequentialComputeGraphController.h"
+#include "imstkComputeGraph.h"
+#include "imstkComputeNode.h"
 
 namespace imstk
 {
-///
-/// \class SPHSolver
-/// \brief SPH solver
-///
-class SPHSolver : public SolverBase
+void
+SequentialComputeGraphController::init()
 {
-public:
-    SPHSolver() = default;
-    virtual ~SPHSolver() override = default;
+    m_executionOrderedNodes = ComputeGraph::topologicalSort(m_graph);
+}
 
-    SPHSolver(const SPHSolver& other) = delete;
-    SPHSolver& operator=(const SPHSolver& other) = delete;
-
-    ///
-    /// \brief Set the simulation object
-    ///
-    void setSPHObject(const std::shared_ptr<SPHObject>& obj)
-    { assert(obj); m_SPHObject = obj; }
-
-    ///
-    /// \brief Advance one time step
-    ///
-    virtual void solve() override
+void
+SequentialComputeGraphController::execute()
+{
+    // Sequential
+    for (std::shared_ptr<ComputeNode> node : *m_executionOrderedNodes)
     {
-        const auto& SPHModel = m_SPHObject->getSPHModel();
-        LOG_IF(FATAL, (!SPHModel)) << "SPH model has not been initialized";
-        SPHModel->advanceTimeStep();
+        node->execute();
     }
-
-private:
-    std::shared_ptr<SPHObject> m_SPHObject;
-};
-} // end namespace imstk
+}
+}
