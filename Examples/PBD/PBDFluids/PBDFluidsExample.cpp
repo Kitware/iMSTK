@@ -76,9 +76,9 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt = 0.01;
-    pbdParams->m_iterations   = 2;
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt  = 0.01;
+    pbdParams->m_iterations = 2;
     pbdParams->collisionParams->m_proximity = 0.01;
 
     // Set the parameters

@@ -32,7 +32,6 @@
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
 #include "imstkLinearFEMForceModel.h"
 #include "imstkMath.h"
-#include "imstkNewtonSolver.h"
 #include "imstkSolverBase.h"
 #include "imstkStVKForceModel.h"
 #include "imstkTimeIntegrator.h"
@@ -60,7 +59,7 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
         Geometry::Type::HexahedralMesh
     };
 
-    m_solveNode      = addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
+    m_solveNode = addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
 
 FEMDeformableBodyModel::~FEMDeformableBodyModel()
@@ -167,7 +166,7 @@ FEMDeformableBodyModel::initialize()
     if (m_solver == nullptr)
     {
         // Create a nonlinear system
-        auto nlSystem = std::make_shared<NonLinearSystem>(getFunction(), getFunctionGradient());
+        auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(getFunction(), getFunctionGradient());
 
         nlSystem->setUnknownVector(getUnknownVec());
         nlSystem->setUpdateFunction(getUpdateFunction());
@@ -183,7 +182,7 @@ FEMDeformableBodyModel::initialize()
         }
 
         // Create a non-linear solver and add to the scene
-        auto nlSolver = std::make_shared<NewtonSolver>();
+        auto nlSolver = std::make_shared<NewtonSolver<SparseMatrixd>>();
         nlSolver->setLinearSolver(linSolver);
         nlSolver->setSystem(nlSystem);
         setSolver(nlSolver);
@@ -289,7 +288,7 @@ FEMDeformableBodyModel::initializeForceModel()
     const double g = m_FEModelConfig->m_gravity;
     // Since vega 4.0 doesn't add gravity correcntly in all cases, we do it ourselves; see \ref initializeGravityForce
     // const bool   isGravityPresent = (g > 0) ? true : false;
-    const bool   isGravityPresent = false;
+    const bool isGravityPresent = false;
 
     m_numDOF = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
 

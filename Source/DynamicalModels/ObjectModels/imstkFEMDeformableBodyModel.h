@@ -25,6 +25,7 @@
 #include "imstkDynamicalModel.h"
 #include "imstkInternalForceModelTypes.h"
 #include "imstkNonLinearSystem.h"
+#include "imstkNewtonSolver.h"
 
 // vega
 #include "sparseMatrix.h"
@@ -37,7 +38,6 @@ class VolumetricMesh;
 namespace imstk
 {
 class InternalForceModel;
-class NewtonSolver;
 class TimeIntegrator;
 class SolverBase;
 class VegaMeshIO;
@@ -279,9 +279,9 @@ protected:
 
 protected:
     std::shared_ptr<SolverBase> m_solver = nullptr;
-    std::shared_ptr<InternalForceModel> m_internalForceModel = nullptr;       ///> Mathematical model for intenal forces
-    std::shared_ptr<TimeIntegrator>     m_timeIntegrator     = nullptr;       ///> Time integrator
-    std::shared_ptr<NonLinearSystem>    m_nonLinearSystem    = nullptr;       ///> Nonlinear system resulting from TI and force model
+    std::shared_ptr<InternalForceModel> m_internalForceModel = nullptr;          ///> Mathematical model for intenal forces
+    std::shared_ptr<TimeIntegrator>     m_timeIntegrator     = nullptr;          ///> Time integrator
+    std::shared_ptr<NonLinearSystem<SparseMatrixd>> m_nonLinearSystem = nullptr; ///> Nonlinear system resulting from TI and force model
 
     std::shared_ptr<FEMModelConfig> m_FEModelConfig = nullptr;
 

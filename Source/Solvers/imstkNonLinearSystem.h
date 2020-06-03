@@ -31,7 +31,7 @@ namespace imstk
 ///
 /// \brief Base class for a multi-variable nonlinear system
 ///
-template <typename Matrix>
+template<typename Matrix>
 class NonLinearSystem
 {
 public:

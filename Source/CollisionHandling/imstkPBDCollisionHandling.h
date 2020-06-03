@@ -49,8 +49,8 @@ public:
     ///
     PBDCollisionHandling(const Side&                          side,
                          const std::shared_ptr<CollisionData> colData,
-                         std::shared_ptr<PbdObject> pbdObject1,
-                         std::shared_ptr<PbdObject> pbdObject2);
+                         std::shared_ptr<PbdObject>           pbdObject1,
+                         std::shared_ptr<PbdObject>           pbdObject2);
 
     PBDCollisionHandling() = delete;
 

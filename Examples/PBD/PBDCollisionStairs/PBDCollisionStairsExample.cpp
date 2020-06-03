@@ -113,8 +113,8 @@ makeDragonPbdObject(const std::string& name)
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
         PbdFEMConstraint::MaterialType::StVK);
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity   = Vec3d(0, -10.0, 0);
-    pbdParams->m_defaultDt = 0.01;
+    pbdParams->m_gravity    = Vec3d(0, -10.0, 0);
+    pbdParams->m_defaultDt  = 0.01;
     pbdParams->m_iterations = 10;
     pbdParams->collisionParams->m_proximity = 0.3;
     pbdParams->collisionParams->m_stiffness = 0.1;

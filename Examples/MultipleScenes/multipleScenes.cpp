@@ -72,7 +72,7 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_iterations = 45;
 
     // Set the parameters
@@ -163,9 +163,9 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt = 0.03;
-    pbdParams->m_iterations   = 5;
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt  = 0.03;
+    pbdParams->m_iterations = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

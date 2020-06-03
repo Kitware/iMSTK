@@ -98,9 +98,9 @@ main()
         sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
         sims[i].params->m_fixedNodeIds     = { 0 };
         sims[i].params->m_uniformMassValue = 5.0;
-        sims[i].params->m_gravity   = Vec3d(0, -9.8, 0);
-        sims[i].params->m_defaultDt = 0.0005;
-        sims[i].params->m_iterations   = 5;
+        sims[i].params->m_gravity    = Vec3d(0, -9.8, 0);
+        sims[i].params->m_defaultDt  = 0.0005;
+        sims[i].params->m_iterations = 5;
 
         // Set the parameters
         sims[i].model->configure(sims[i].params);
@@ -129,18 +129,18 @@ main()
     const double radius     = 1.5;
     auto         movePoints =
         [&sims, &t, dt, radius](Module* module)
-    {
-        for (unsigned int i = 0; i < sims.size(); i++)
         {
-            Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
-            // Move in circle, derivatives of parametric eq of circle
-            sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
+            for (unsigned int i = 0; i < sims.size(); i++)
+            {
+                Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
+                // Move in circle, derivatives of parametric eq of circle
+                sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
                 pos.x() + -std::sin(t) * radius * dt,
                 pos.y(),
                 pos.z() + std::cos(t) * radius * dt));
-        }
-        t += dt;
-    };
+            }
+            t += dt;
+        };
     simManager->getSceneManager(scene)->setPostUpdateCallback(movePoints);
 
     // Start

@@ -36,7 +36,7 @@ class ComputeNode;
 class InteractionPair
 {
 public:
-    using Inputs = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
+    using Inputs  = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
     using Outputs = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
 
 public:
@@ -48,7 +48,7 @@ public:
     const Outputs& getComputeNodeOutputs() const { return m_computeNodeOutputs; }
 
 protected:
-    Inputs m_computeNodeInputs;                         ///> The interacting nodes
+    Inputs  m_computeNodeInputs;                        ///> The interacting nodes
     Outputs m_computeNodeOutputs;                       ///> The interacting nodes
     std::shared_ptr<ComputeNode> m_interactionFunction; ///> Function to execute on interaction
 };

@@ -33,8 +33,8 @@ namespace imstk
 {
 PBDCollisionHandling::PBDCollisionHandling(const Side&                          side,
                                            const std::shared_ptr<CollisionData> colData,
-                                           std::shared_ptr<PbdObject> pbdObject1,
-                                           std::shared_ptr<PbdObject> pbdObject2) :
+                                           std::shared_ptr<PbdObject>           pbdObject1,
+                                           std::shared_ptr<PbdObject>           pbdObject2) :
     CollisionHandling(Type::PBD, side, colData),
     m_PbdObject1(pbdObject1),
     m_PbdObject2(pbdObject2),

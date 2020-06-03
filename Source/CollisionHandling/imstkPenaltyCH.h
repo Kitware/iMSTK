@@ -79,7 +79,7 @@ public:
 private:
     std::shared_ptr<CollidingObject> m_object = nullptr; ///>
 
-    double m_stiffness = 5.0e5;                ///> Stiffness of contact
-    double m_damping   = 0.5;                  ///> Damping of the contact
+    double m_stiffness = 5.0e5;                          ///> Stiffness of contact
+    double m_damping   = 0.5;                            ///> Damping of the contact
 };
 }

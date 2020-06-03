@@ -64,7 +64,7 @@ public:
         BidirectionalPlaneToSphere,
         SphereToCylinder,
         SphereToSphere,
-        
+
         // Image based CD
         SignedDistanceField,
 

@@ -27,7 +27,6 @@
 
 namespace imstk
 {
-
 class SceneObject;
 class ObjectInteractionPair;
 
@@ -39,8 +38,8 @@ class ObjectInteractionPair;
 class CollisionGraph
 {
 public:
-    using SceneObjectPtr        = std::shared_ptr<SceneObject>;
-    using ObjectInteractionPtr  = std::shared_ptr<ObjectInteractionPair>;
+    using SceneObjectPtr       = std::shared_ptr<SceneObject>;
+    using ObjectInteractionPtr = std::shared_ptr<ObjectInteractionPair>;
 
     ///
     /// \brief Default constructor
@@ -93,7 +92,7 @@ public:
     const std::unordered_map<SceneObjectPtr, std::vector<ObjectInteractionPtr>>& getInteractionPairMap() const;
 
 protected:
-    std::vector<ObjectInteractionPtr> m_interactionPairs;                                           ///< All interaction pairs in the collision graph
+    std::vector<ObjectInteractionPtr> m_interactionPairs;                                       ///< All interaction pairs in the collision graph
     std::unordered_map<SceneObjectPtr, std::vector<ObjectInteractionPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
 };
 }

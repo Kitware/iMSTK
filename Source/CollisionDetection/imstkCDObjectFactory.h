@@ -33,9 +33,8 @@ class Geometry;
 /// it will be added to an internal static octree for detecting collision
 /// \todo Other collision pair may be considered to use octree too
 ///
-extern std::shared_ptr<CollisionDetection>
-makeCollisionDetectionObject(const CollisionDetection::Type type,
-    std::shared_ptr<Geometry> collidingGeometryA,
-    std::shared_ptr<Geometry> collidingGeometryB,
-    std::shared_ptr<CollisionData> colData);
+extern std::shared_ptr<CollisionDetection> makeCollisionDetectionObject(const CollisionDetection::Type type,
+                                                                        std::shared_ptr<Geometry>      collidingGeometryA,
+                                                                        std::shared_ptr<Geometry>      collidingGeometryB,
+                                                                        std::shared_ptr<CollisionData> colData);
 }

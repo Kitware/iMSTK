@@ -29,6 +29,5 @@ CollisionHandling::CollisionHandling(const Type& type, const Side& side,
     m_type(type), m_side(side), m_colData(colData),
     m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
 {
-
 }
 }

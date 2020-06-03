@@ -64,11 +64,11 @@ ComputeGraphVizWriter::write()
         critPath = ComputeGraph::getCriticalPath(m_inputGraph);
     }
     auto edgeExists = [&](const std::shared_ptr<ComputeNode>& a, const std::shared_ptr<ComputeNode>& b)
-    {
-        ComputeNodeList::iterator srcNode = std::find(critPath.begin(), critPath.end(), a);
-        // If srcNode was found and the next node is b
-        return (srcNode != critPath.end() && *std::next(srcNode) == b);
-    };
+                      {
+                          ComputeNodeList::iterator srcNode = std::find(critPath.begin(), critPath.end(), a);
+                          // If srcNode was found and the next node is b
+                          return (srcNode != critPath.end() && *std::next(srcNode) == b);
+                      };
 
     // Compute completion times of each node
     if (m_writeTimes)

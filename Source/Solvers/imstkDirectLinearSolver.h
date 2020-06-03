@@ -47,7 +47,7 @@ public:
     /// \brief Default constructor/destructor.
     ///
     // DirectLinearSolver() = delete;
-    DirectLinearSolver()  {}
+    DirectLinearSolver() {}
     ~DirectLinearSolver() {};
 
     ///

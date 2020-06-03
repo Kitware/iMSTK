@@ -75,7 +75,7 @@ public:
 
 private:
     std::shared_ptr<ComputeGraph> m_inputGraph = nullptr;
-    std::string m_fileName = "";
+    std::string m_fileName       = "";
     bool m_highlightCriticalPath = false;
     bool m_writeTimes = false;
 };

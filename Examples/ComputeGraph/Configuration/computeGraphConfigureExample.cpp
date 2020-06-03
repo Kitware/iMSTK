@@ -38,13 +38,14 @@
 
 using namespace imstk;
 
-static std::unique_ptr<SurfaceMesh> makeCloth(
+static std::unique_ptr<SurfaceMesh>
+makeCloth(
     const double width, const double height, const int nRows, const int nCols)
 {
     // Create surface mesh
     std::unique_ptr<SurfaceMesh> clothMesh = std::make_unique<SurfaceMesh>();
-    StdVectorOfVec3d vertList;
-    
+    StdVectorOfVec3d             vertList;
+
     vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -91,7 +92,8 @@ static std::unique_ptr<SurfaceMesh> makeCloth(
     return clothMesh;
 }
 
-static std::shared_ptr<PbdObject> makeClothObj(const std::string& name, double width, double height, int nRows, int nCols)
+static std::shared_ptr<PbdObject>
+makeClothObj(const std::string& name, double width, double height, int nRows, int nCols)
 {
     auto clothObj = std::make_shared<PbdObject>(name);
 
@@ -100,9 +102,9 @@ static std::shared_ptr<PbdObject> makeClothObj(const std::string& name, double w
     // Setup the Parameters
     auto pbdParams = std::make_shared<PBDModelConfig>();
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt = 0.005;
-    pbdParams->m_iterations   = 5;
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt  = 0.005;
+    pbdParams->m_iterations = 5;
     pbdParams->m_viscousDampingCoeff = 0.05;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
@@ -144,10 +146,10 @@ main()
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("PBDCloth");
 
-    const double width  = 10.0;
-    const double height = 10.0;
-    const int nRows = 16;
-    const int nCols = 16;
+    const double               width    = 10.0;
+    const double               height   = 10.0;
+    const int                  nRows    = 16;
+    const int                  nCols    = 16;
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
@@ -174,33 +176,32 @@ main()
     {
         std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
         scene->setComputeGraphConfigureCallback([&](Scene* scene)
+        {
+            // Get the graph
+            std::shared_ptr<ComputeGraph> graph = scene->getComputeGraph();
+
+            // First write the graph before we make modifications, just to show the changes
+            ComputeGraphVizWriter writer;
+            writer.setInput(graph);
+            writer.setFileName("computeGraphConfigureExampleOld.svg");
+            writer.write();
+
+            std::shared_ptr<ComputeNode> printVelocities = std::make_shared<ComputeNode>([&]()
             {
-                // Get the graph
-                std::shared_ptr<ComputeGraph> graph = scene->getComputeGraph();
-
-                // First write the graph before we make modifications, just to show the changes
-                ComputeGraphVizWriter writer;
-                writer.setInput(graph);
-                writer.setFileName("computeGraphConfigureExampleOld.svg");
-                writer.write();
-
-                std::shared_ptr<ComputeNode> printVelocities = std::make_shared<ComputeNode>([&]()
-                    {
-                        // Make the timestep a function of max velocity
-                        const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
-                        for (size_t i = 0; i < velocities.size(); i++)
-                        {
-                            printf("Velocity: %f, %f, %f\n", velocities[i].x(), velocities[i].y(), velocities[i].z());
-                        }
-
+                // Make the timestep a function of max velocity
+                const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+                for (size_t i = 0; i < velocities.size(); i++)
+                {
+                    printf("Velocity: %f, %f, %f\n", velocities[i].x(), velocities[i].y(), velocities[i].z());
+                }
                     }, "PrintVelocities");
 
-                // After IntegratePosition
-                graph->insertAfter(pbdModel->getIntegratePositionNode(), printVelocities);
+            // After IntegratePosition
+            graph->insertAfter(pbdModel->getIntegratePositionNode(), printVelocities);
 
-                // Write the modified graph
-                writer.setFileName("computeGraphConfigureExampleNew.svg");
-                writer.write();
+            // Write the modified graph
+            writer.setFileName("computeGraphConfigureExampleNew.svg");
+            writer.write();
             });
     }
 

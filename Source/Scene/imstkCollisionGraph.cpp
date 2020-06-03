@@ -154,9 +154,9 @@ CollisionGraph::removeInteractionPair(SceneObjectPtr A, SceneObjectPtr B)
 bool
 CollisionGraph::removeInteractionPair(ObjectInteractionPtr intPair)
 {
-   /* std::shared_ptr<CollidingObject> obj1 = std::static_pointer_cast<CollidingObject>(intPair->getObjectsPair().first);
-    std::shared_ptr<CollidingObject> obj2 = std::static_pointer_cast<CollidingObject>(intPair->getObjectsPair().second);
-    return this->removeInteractionPair(obj1, obj2);*/
+    /* std::shared_ptr<CollidingObject> obj1 = std::static_pointer_cast<CollidingObject>(intPair->getObjectsPair().first);
+     std::shared_ptr<CollidingObject> obj2 = std::static_pointer_cast<CollidingObject>(intPair->getObjectsPair().second);
+     return this->removeInteractionPair(obj1, obj2);*/
     return true;
 }
 

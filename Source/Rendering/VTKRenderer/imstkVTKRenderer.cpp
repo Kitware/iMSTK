@@ -415,7 +415,6 @@ VTKRenderer::getAxesVisibility() const
     return m_AxesActor->GetVisibility();
 }
 
-
 void
 VTKRenderer::setBenchmarkTable(const std::unordered_map<std::string, double>& nameToElapsedTimes)
 {
@@ -425,7 +424,7 @@ VTKRenderer::setBenchmarkTable(const std::unordered_map<std::string, double>& na
         [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) { return a.second < b.second; });
 
     // Construct vtkTable from provided data
-    vtkSmartPointer<vtkDoubleArray> xIndices = vtkDoubleArray::SafeDownCast(m_benchmarkTable->GetColumn(0));
+    vtkSmartPointer<vtkDoubleArray> xIndices      = vtkDoubleArray::SafeDownCast(m_benchmarkTable->GetColumn(0));
     vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkDoubleArray::SafeDownCast(m_benchmarkTable->GetColumn(1));
     vtkSmartPointer<vtkStringArray> labels = vtkStringArray::SafeDownCast(m_benchmarkTable->GetColumn(2));
 
@@ -486,7 +485,6 @@ VTKRenderer::getBenchmarkTableVisibility() const
 {
     return m_benchmarkChartActor->GetVisibility();
 }
-
 
 void
 VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)

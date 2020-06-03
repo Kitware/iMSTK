@@ -57,10 +57,10 @@ PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
     };
 
     // Setup PBD compute nodes
-    m_integrationPositionNode = addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
+    m_integrationPositionNode     = addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
     m_updateCollisionGeometryNode = addFunction("PbdModel_UpdateCollisionGeometry", std::bind(&PbdModel::updatePhysicsGeometry, this));
-    m_solveConstraintsNode    = addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); }); // Avoids rebinding on solver swap
-    m_updateVelocityNode      = addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
+    m_solveConstraintsNode = addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); });    // Avoids rebinding on solver swap
+    m_updateVelocityNode   = addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
 }
 
 void
