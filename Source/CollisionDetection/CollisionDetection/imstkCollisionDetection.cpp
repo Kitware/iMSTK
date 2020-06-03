@@ -21,15 +21,16 @@
 
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionData.h"
+#include "imstkComputeNode.h"
+#include "imstkLogger.h"
 #include "imstkOctreeBasedCD.h"
 #include "imstkSurfaceMesh.h"
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {
 CollisionDetection::CollisionDetection(const CollisionDetection::Type& type, std::shared_ptr<CollisionData> colData) : m_type(type),
-    m_colData((colData == nullptr) ? std::make_shared<CollisionData>() : colData)
+    m_colData((colData == nullptr) ? std::make_shared<CollisionData>() : colData),
+    m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionDetection::computeCollisionData, this), "CollisionDetection"))
 {
 }
 

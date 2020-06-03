@@ -25,10 +25,7 @@
 #include "imstkDeviceClient.h"
 #include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
-
-#include <utility>
-
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
 
 namespace imstk
 {

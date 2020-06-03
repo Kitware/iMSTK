@@ -28,7 +28,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkCollisionGraph.h"
 #include "imstkPlane.h"
 #include "imstkScene.h"
 
@@ -66,15 +65,15 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_YoungModulus = 100.0;
-    pbdParams->m_PoissonRatio = 0.3;
+    pbdParams->femParams->m_YoungModulus = 100.0;
+    pbdParams->femParams->m_PoissonRatio = 0.3;
     pbdParams->m_fixedNodeIds = { 51, 127, 178 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity = Vec3d(0, -9.8, 0);
-    pbdParams->m_maxIter = 45;
+    pbdParams->m_iterations = 45;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
@@ -165,8 +164,8 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdParams->m_DefaultDt = 0.03;
-    pbdParams->m_maxIter   = 5;
+    pbdParams->m_defaultDt = 0.03;
+    pbdParams->m_iterations   = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

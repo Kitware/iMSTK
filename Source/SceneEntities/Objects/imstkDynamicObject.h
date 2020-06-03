@@ -37,7 +37,6 @@ class AbstractDynamicalModel;
 class DynamicObject : public CollidingObject
 {
 public:
-
     ///
     /// \brief Destructor
     ///
@@ -83,14 +82,25 @@ public:
     void updateGeometries() final;
 
     ///
+    /// \brief Update only the physics geometry and apply collision map
+    ///
+    void updatePhysicsGeometry();
+
+    ///
     /// \brief Initialize the scene object
     ///
     virtual bool initialize() override;
 
     ///
-    /// \brief Reset the dynamic object to its initial state
+    /// \brief Reset the dynamic object by reseting the respective DynamicalModel and Geometry
     ///
     virtual void reset() override;
+
+protected:
+    ///
+    /// \brief Setup connectivity of compute graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
 
 protected:
 
@@ -99,12 +109,12 @@ protected:
     ///
     explicit DynamicObject(const std::string& name) : CollidingObject(name) {}
 
-    std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel;        ///> Dynamical model
-    std::shared_ptr<Geometry> m_physicsGeometry;                     ///> Geometry used for Physics
+    std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///> Dynamical model
+    std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///> Geometry used for Physics
 
-    //Maps
-    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;           ///> Maps from Physics to collision geometry
-    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;              ///> Maps from Physics to visual geometry
+    // Maps
+    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap = nullptr; ///> Maps from Physics to collision geometry
+    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap    = nullptr; ///> Maps from Physics to visual geometry
     bool m_updateVisualFromPhysicsGeometry = true;                      ///> Defines if visual is updated from colliding mapping or physics mapping
 };
 } // imstk

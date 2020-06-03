@@ -21,12 +21,12 @@
 
 #pragma once
 
-// imstk
 #include "imstkDynamicObject.h"
-#include "imstkRigidBodyModel.h"
 
 namespace imstk
 {
+class RigidBodyModel;
+
 ///
 /// \class RigidObject
 ///
@@ -35,20 +35,14 @@ namespace imstk
 class RigidObject : public DynamicObject
 {
 public:
-
-    ///
-    /// \brief Constructor
-    ///
     explicit RigidObject(const std::string& name) : DynamicObject(name)
     {
         m_type = Type::Rigid;
     }
 
-    ///
-    /// \brief Destructor
-    ///
     ~RigidObject() = default;
 
+public:
     ///
     /// \brief Initialize the rigid scene object
     ///
@@ -57,24 +51,11 @@ public:
     ///
     /// \brief Add local force at a position relative to object
     ///
-    void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true)
-    {
-        getRigidBodyModel()->addForce(force, pos, wakeup);
-    }
+    void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true);
 
-    ///
-    /// \brief Get/Set rigid body model
-    ///
-    void setRigidBodyModel(std::shared_ptr<RigidBodyModel> rbModel) { m_dynamicalModel = rbModel; };
-    std::shared_ptr<RigidBodyModel> getRigidBodyModel() const { return std::dynamic_pointer_cast<RigidBodyModel>(m_dynamicalModel); };
-
-    void reset() override
-    {
-        m_dynamicalModel->resetToInitialState();
-        this->updateGeometries();
-    }
+    std::shared_ptr<RigidBodyModel> getRigidBodyModel() const { return m_rigidBodyModel; }
 
 protected:
-    //std::shared_ptr<RigidBodyModel> m_rigidBodyModel; ///> PBD mathematical model
+    std::shared_ptr<RigidBodyModel> m_rigidBodyModel;
 };
 } // imstk

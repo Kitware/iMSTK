@@ -35,7 +35,6 @@
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkCollisionGraph.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkScene.h"
 
@@ -68,21 +67,16 @@ main()
 
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
-    // Construct a map
-
     // Construct one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
-    // Scene object 1: Dragon
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
 
-    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
-
     auto config = std::make_shared<FEMModelConfig>();
     config->m_fixedNodeIds = { 50, 126, 177 };
     dynaModel->configure(config);
+    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
 
     dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     dynaModel->setModelGeometry(volTetMesh);
@@ -94,7 +88,7 @@ main()
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    // Scene Object
+    // Scene object 1: Dragon
     auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);

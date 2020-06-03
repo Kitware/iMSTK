@@ -24,15 +24,13 @@
 #include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"
-#include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkPBDCollisionHandling.h"
 #include "imstkTetraTriangleMap.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkScene.h"
+#include "imstkComputeGraphVizWriter.h"
+#include "imstkObjectInteractionFactory.h"
 
 using namespace imstk;
 
@@ -44,8 +42,7 @@ int
 main()
 {
     auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PbdCollision");
-
+    auto scene      = simManager->createNewScene("PbdCollisionOneDragon");
     scene->getCamera()->setPosition(0, 3.0, 20.0);
     scene->getCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
@@ -81,18 +78,18 @@ main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_YoungModulus = 1000.0;
-    pbdParams->m_PoissonRatio = 0.3;
+    pbdParams->femParams->m_YoungModulus = 1000.0;
+    pbdParams->femParams->m_PoissonRatio = 0.3;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
                                    PbdFEMConstraint::MaterialType::Corotation);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity   = Vec3d(0, -10.0, 0);
-    pbdParams->m_DefaultDt = 0.01;
-    pbdParams->m_maxIter   = 5;
-    pbdParams->m_proximity = 0.3;
-    pbdParams->m_contactStiffness = 0.1;
+    pbdParams->m_defaultDt = 0.01;
+    pbdParams->m_iterations   = 5;
+    pbdParams->collisionParams->m_proximity = 0.3;
+    pbdParams->collisionParams->m_stiffness = 0.1;
 
     pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
@@ -152,9 +149,8 @@ main()
     // configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity = 0.1;
-    pbdParams2->m_contactStiffness = 1.0;
-    pbdParams2->m_maxIter = 0;
+    pbdParams2->m_iterations = 0;
+    pbdParams2->collisionParams->m_proximity = -0.1;
 
     // Set the parameters
     pbdModel2->configure(pbdParams2);
@@ -163,10 +159,8 @@ main()
     scene->addSceneObject(floor);
 
     // Collision
-    scene->getCollisionGraph()->addInteractionPair(deformableObj, floor,
-        CollisionDetection::Type::MeshToMeshBruteForce,
-        CollisionHandling::Type::PBD,
-        CollisionHandling::Type::None);
+    scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
+        InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");

@@ -25,36 +25,25 @@
 namespace imstk
 {
 void
-PbdState::initialize(const size_t numNodes, const bool (& options)[3])
+PbdState::initialize(const size_t numNodes)
 {
-    // CHECKBACK : m_pos could actually not be another copy
-    if (options[0])
-    {
-        m_pos.resize(numNodes, Vec3d(0, 0, 0));
-    }
-
-    if (options[1])
-    {
-        m_vel.resize(numNodes, Vec3d(0, 0, 0));
-    }
-
-    if (options[2])
-    {
-        m_acc.resize(numNodes, Vec3d(0, 0, 0));
-    }
+    m_pos->resize(numNodes, Vec3d(0.0, 0.0, 0.0));
+    m_vel->resize(numNodes, Vec3d(0.0, 0.0, 0.0));
+    m_acc->resize(numNodes, Vec3d(0.0, 0.0, 0.0));
 }
 
 void
-PbdState::initialize(const std::shared_ptr<PointSet>& m, const bool (& options)[3])
+PbdState::initialize(const StdVectorOfVec3d& vertices)
 {
-    this->initialize(m->getNumVertices(), options);
+    this->initialize(vertices.size());
+    setPositions(vertices);
 }
 
 void
 PbdState::setState(std::shared_ptr<PbdState> rhs)
 {
-    m_pos = rhs->getPositions();
-    m_vel = rhs->getVelocities();
-    m_acc = rhs->getAccelerations();
+    *m_pos = *rhs->getPositions();
+    *m_vel = *rhs->getVelocities();
+    *m_acc = *rhs->getAccelerations();
 }
 } // imstk

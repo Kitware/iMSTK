@@ -24,7 +24,6 @@
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkSceneManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVTKViewer.h"

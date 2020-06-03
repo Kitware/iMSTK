@@ -19,10 +19,10 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkScene.h"
+#include "imstkSimulationManager.h"
 
 using namespace imstk;
 

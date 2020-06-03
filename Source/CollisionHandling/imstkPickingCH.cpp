@@ -32,9 +32,9 @@ namespace imstk
 {
 PickingCH::PickingCH(const CollisionHandling::Side&       side,
                      const std::shared_ptr<CollisionData> colData,
-                     std::shared_ptr<CollidingObject>     obj) :
+                     std::shared_ptr<FeDeformableObject>  obj) :
     CollisionHandling(Type::NodalPicking, side, colData),
-    m_object(std::dynamic_pointer_cast<FeDeformableObject>(obj))
+    m_object(obj)
 {
 }
 
@@ -60,8 +60,9 @@ PickingCH::addPickConstraints(std::shared_ptr<FeDeformableObject> deformableObj)
     CHECK(deformableObj != nullptr) << "PenaltyRigidCH::addPickConstraints error: "
                                     << " not a deformable object.";
 
-    const auto& Uprev = deformableObj->getDisplacements();
-    const auto& Vprev = deformableObj->getVelocities();
+    std::shared_ptr<FEMDeformableBodyModel> model = deformableObj->getFEMModel();
+    const Vectord&                          Uprev = model->getCurrentState()->getQ();
+    const Vectord&                          Vprev = model->getCurrentState()->getQDot();
 
     auto PhysTetMesh = std::dynamic_pointer_cast<PointSet>(deformableObj->getPhysicsGeometry());
     auto dT = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_object->getDynamicalModel())->getTimeIntegrator()->getTimestepSize();

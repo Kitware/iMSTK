@@ -28,11 +28,10 @@ namespace imstk
 ///
 class SolverBase
 {
-public:
-    ///
-    /// \brief Default Constructor/Destructor
-    ///
+protected:
     SolverBase() = default;
+
+public:
     virtual ~SolverBase() = default;
 
     virtual void solve() = 0;

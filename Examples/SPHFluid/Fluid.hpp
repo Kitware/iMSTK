@@ -21,7 +21,6 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
-#include "imstkSPHSolver.h"
 #include "imstkSPHModel.h"
 #include "imstkPointSet.h"
 #include "imstkScene.h"
@@ -174,11 +173,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     fluidObj->setDynamicalModel(sphModel);
     fluidObj->setPhysicsGeometry(fluidGeometry); // TODO: Look into API duplication and resulting conflicts
     scene->addSceneObject(fluidObj);
-
-    // Configure the solver
-    auto sphSolver = std::make_shared<SPHSolver>();
-    sphSolver->setSPHObject(fluidObj);
-    scene->addNonlinearSolver(sphSolver);
 
     return fluidObj;
 }

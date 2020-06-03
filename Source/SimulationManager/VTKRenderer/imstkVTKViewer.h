@@ -32,6 +32,7 @@
 #include "vtkOpenVRRenderWindowInteractor.h"
 #endif
 
+class vtkCallbackCommand;
 class vtkRenderWindow;
 
 namespace imstk
@@ -107,10 +108,14 @@ public:
     const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
 
 protected:
+    static void timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
+
+protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
     bool m_enableVR;
     std::string m_windowName = "imstk";
+    vtkSmartPointer<vtkCallbackCommand> timerCallbackCommand = nullptr;
 
 #ifdef iMSTK_ENABLE_VR
     vtkSmartPointer<OpenVRCommand> m_openVRCommand;

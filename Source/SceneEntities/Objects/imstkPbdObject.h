@@ -25,22 +25,17 @@
 
 namespace imstk
 {
-class Geometry;
-class GeometryMap;
 class PbdModel;
 
 ///
 /// \class PbdObject
 ///
 /// \brief Base class for scene objects that move and/or deform under position
-/// based dynamics formulation
+/// based dynamics formulation, implements the PbdModel and PbdSolver
 ///
 class PbdObject : public DynamicObject
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     explicit PbdObject(const std::string& name) : DynamicObject(name)
     {
         m_type = SceneObject::Type::Pbd;
@@ -48,37 +43,20 @@ public:
 
     PbdObject() = delete;
 
-    ///
-    /// \brief Destructor
-    ///
     ~PbdObject() override = default;
+
+public:
+    ///
+    /// \biref Get the Pbd model of the object
+    ///
+    std::shared_ptr<PbdModel> getPbdModel();
 
     ///
     /// \brief Initialize the pbd scene object
     ///
     bool initialize() override;
 
-    ///
-    /// \brief Update the position based on Verlet time stepping rule
-    ///
-    virtual void integratePosition();
-
-    ///
-    /// \brief Update the velocity
-    ///
-    virtual void updateVelocity();
-
-    ///
-    /// \brief Solve the pbd constraints by projection
-    ///
-    virtual void solveConstraints();
-
-    ///
-    /// \brief Reset the PBD object to its initial state
-    ///
-    void reset() override;
-
 protected:
-    std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
+    std::shared_ptr<PbdModel> m_pbdModel = nullptr;  ///> PBD mathematical model
 };
 } // imstk

@@ -22,7 +22,6 @@
 #include "imstkSimulationManager.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkAPIUtilities.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"

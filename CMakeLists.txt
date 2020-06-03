@@ -282,6 +282,7 @@ else()
   # modules are linked via `VTK::CommonCore`
   # vtk_module_autoinit is needed
   find_package(VTK COMPONENTS
+    ChartsCore
     CommonCore
     CommonDataModel
     FiltersGeneral
@@ -300,6 +301,7 @@ else()
     RenderingOpenGL2
     RenderingVolume
     RenderingVolumeOpenGL2
+    ViewsContext2D
   )
 endif()
 

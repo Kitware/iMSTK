@@ -8,13 +8,13 @@ imstk_add_library( DynamicalModels
     ObjectStates
     TimeIntegrators
     ObjectModels
-    ObjectModels/PbdConstraints
     InternalForceModel
   DEPENDS    
     DataStructures
     Constraints
     Geometry
     Solvers
+    MeshIO
     VegaFEM::massSpringSystem
     VegaFEM::corotationalLinearFEM
     VegaFEM::isotropicHyperelasticFEM

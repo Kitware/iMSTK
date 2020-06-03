@@ -24,7 +24,6 @@
 #include "imstkPbdObject.h"
 #include "imstkAPIUtilities.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkScene.h"
@@ -112,8 +111,8 @@ main()
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdParams->m_DefaultDt = 0.005;
-    pbdParams->m_maxIter   = 5;
+    pbdParams->m_defaultDt = 0.005;
+    pbdParams->m_iterations   = 5;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

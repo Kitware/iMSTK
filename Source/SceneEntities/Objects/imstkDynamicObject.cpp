@@ -22,6 +22,7 @@
 #include "imstkDynamicObject.h"
 #include "imstkGeometryMap.h"
 #include "imstkAbstractDynamicalModel.h"
+#include "imstkComputeGraph.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -61,6 +62,17 @@ DynamicObject::updateGeometries()
     }
 }
 
+void
+DynamicObject::updatePhysicsGeometry()
+{
+    m_dynamicalModel->updatePhysicsGeometry();
+
+    if (m_physicsToCollidingGeomMap)
+    {
+        m_physicsToCollidingGeomMap->apply();
+    }
+}
+
 bool
 DynamicObject::initialize()
 {
@@ -82,6 +94,16 @@ DynamicObject::initialize()
     {
         return false;
     }
+}
+
+void
+DynamicObject::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+{
+    // Copy, sum, and connect the model graph to nest within this graph
+    m_computeGraph->addEdge(source, getUpdateNode());
+    m_dynamicalModel->initGraphEdges();
+    m_computeGraph->nestGraph(m_dynamicalModel->getComputeGraph(), getUpdateNode(), getUpdateGeometryNode());
+    m_computeGraph->addEdge(getUpdateGeometryNode(), sink);
 }
 
 void
