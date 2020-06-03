@@ -276,9 +276,9 @@ protected:
 
 protected:
     // Computational Nodes
-    std::shared_ptr<ComputeNode> m_integrationPositionNode = nullptr;
+    std::shared_ptr<ComputeNode> m_integrationPositionNode     = nullptr;
     std::shared_ptr<ComputeNode> m_updateCollisionGeometryNode = nullptr;
-    std::shared_ptr<ComputeNode> m_solveConstraintsNode    = nullptr;
-    std::shared_ptr<ComputeNode> m_updateVelocityNode      = nullptr;
+    std::shared_ptr<ComputeNode> m_solveConstraintsNode = nullptr;
+    std::shared_ptr<ComputeNode> m_updateVelocityNode   = nullptr;
 };
 } // imstk

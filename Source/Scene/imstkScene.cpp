@@ -469,10 +469,8 @@ Scene::advance(const double dt)
 
     CollisionDetection::updateInternalOctreeAndDetectCollision();
 
-
     // Execute the computational graph
     m_computeGraphController->execute();
-
 
     // Apply updated forces on device
     for (auto controller : this->getSceneObjectControllers())

@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 NonLinearSolver<SystemMatrix>::NonLinearSolver() : m_sigma(std::array<double, 2>
     {
         { 0.1, 0.5 }
@@ -38,7 +38,7 @@ NonLinearSolver<SystemMatrix>::NonLinearSolver() : m_sigma(std::array<double, 2>
                       };
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 double
 NonLinearSolver<SystemMatrix>::armijo(const Vectord& dx, Vectord& x, const double previousFnorm)
 {
@@ -99,7 +99,7 @@ NonLinearSolver<SystemMatrix>::armijo(const Vectord& dx, Vectord& x, const doubl
     return currentFnorm;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 void
 NonLinearSolver<SystemMatrix>::parabolicModel(const std::array<double, 3>& fnorm, std::array<double, 3>& lambda)
 {
@@ -134,56 +134,56 @@ NonLinearSolver<SystemMatrix>::parabolicModel(const std::array<double, 3>& fnorm
     lambda[0] = newLambda;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 void
 NonLinearSolver<SystemMatrix>::setSigma(const std::array<double, 2>& newSigma)
 {
     m_sigma = newSigma;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 const std::array<double, 2>&
 NonLinearSolver<SystemMatrix>::getSigma() const
 {
     return m_sigma;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 void
 NonLinearSolver<SystemMatrix>::setAlpha(const double newAlpha)
 {
     m_alpha = newAlpha;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 double
 NonLinearSolver<SystemMatrix>::getAlpha() const
 {
     return m_alpha;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 void
 NonLinearSolver<SystemMatrix>::setArmijoMax(const size_t newArmijoMax)
 {
     m_armijoMax = newArmijoMax;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 size_t
 NonLinearSolver<SystemMatrix>::getArmijoMax() const
 {
     return m_armijoMax;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 void
 NonLinearSolver<SystemMatrix>::setSystem(std::shared_ptr<NonLinearSystem<SystemMatrix>> newSystem)
 {
     m_nonLinearSystem = newSystem;
 }
 
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 std::shared_ptr<NonLinearSystem<SystemMatrix>>
 NonLinearSolver<SystemMatrix>::getSystem() const
 {

@@ -85,9 +85,9 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity   = Vec3d(0, -10.0, 0);
-    pbdParams->m_defaultDt = 0.01;
-    pbdParams->m_iterations   = 5;
+    pbdParams->m_gravity    = Vec3d(0, -10.0, 0);
+    pbdParams->m_defaultDt  = 0.01;
+    pbdParams->m_iterations = 5;
     pbdParams->collisionParams->m_proximity = 0.3;
     pbdParams->collisionParams->m_stiffness = 0.1;
 
@@ -149,7 +149,7 @@ main()
     // configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_iterations = 0;
+    pbdParams2->m_iterations       = 0;
     pbdParams2->collisionParams->m_proximity = -0.1;
 
     // Set the parameters

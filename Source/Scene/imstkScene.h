@@ -289,12 +289,12 @@ protected:
 
     std::shared_ptr<ComputeGraph> m_computeGraph = nullptr;                      ///> Computational graph
     std::shared_ptr<ComputeGraphController> m_computeGraphController = nullptr;  ///> Controller for the computational graph
-    std::function<void(Scene*)> m_postComputeGraphConfigureCallback = nullptr;
+    std::function<void(Scene*)> m_postComputeGraphConfigureCallback  = nullptr;
 
     std::shared_ptr<ParallelUtils::SpinLock> benchmarkLock = nullptr;
-    std::unordered_map<std::string, double> m_nodeNamesToElapsedTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
+    std::unordered_map<std::string, double>  m_nodeNamesToElapsedTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
 
-    double m_fps         = 0.0;
+    double m_fps = 0.0;
     double m_elapsedTime = 0.0;
 
     bool m_isInitialized = false;

@@ -73,7 +73,7 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_iterations = 45;
 
     // Set the parameters

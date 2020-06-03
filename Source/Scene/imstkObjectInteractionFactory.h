@@ -61,15 +61,16 @@ enum class InteractionType
 /// \brief Factory for InteractionPairs
 ///
 template<typename ObjectType1, typename ObjectType2>
-extern std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(
+extern std::shared_ptr<ObjectInteractionPair>
+makeObjectInteractionPair(
     std::shared_ptr<ObjectType1> obj1, std::shared_ptr<ObjectType2> obj2,
     InteractionType intType, CollisionDetection::Type cdType)
 {
     std::shared_ptr<ObjectInteractionPair> results = nullptr;
     if (intType == InteractionType::PbdObjToPbdObj_Collision)
     {
-        if (std::is_base_of<PbdObject, ObjectType1>::value &&
-            std::is_base_of<PbdObject, ObjectType2>::value)
+        if (std::is_base_of<PbdObject, ObjectType1>::value
+            && std::is_base_of<PbdObject, ObjectType2>::value)
         {
             results = std::make_shared<PbdObjectCollisionPair>(
                 std::dynamic_pointer_cast<PbdObject>(obj1),
@@ -88,27 +89,27 @@ extern std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(
     }*/
     else if (intType == InteractionType::SphObjToCollidingObj_Collision)
     {
-        if (std::is_base_of<SPHObject, ObjectType1>::value &&
-            std::is_base_of<CollidingObject, ObjectType2>::value)
+        if (std::is_base_of<SPHObject, ObjectType1>::value
+            && std::is_base_of<CollidingObject, ObjectType2>::value)
         {
             // Setup CD, and collision data
-            std::shared_ptr<CollisionData> colData = std::make_shared<CollisionData>();
+            std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
             std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
             // Setup the handler
             std::shared_ptr<SPHCollisionHandling> colHandler =
                 std::make_shared<SPHCollisionHandling>(CollisionHandling::Side::A, colData, std::dynamic_pointer_cast<SPHObject>(obj1));
-           
+
             results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
         }
     }
     else if (intType == InteractionType::FemObjToCollidingObj_NodalPicking)
     {
-        if (std::is_base_of<FeDeformableObject, ObjectType1>::value &&
-            std::is_base_of<CollidingObject, ObjectType2>::value)
+        if (std::is_base_of<FeDeformableObject, ObjectType1>::value
+            && std::is_base_of<CollidingObject, ObjectType2>::value)
         {
             // Setup CD, and collision data
-            std::shared_ptr<CollisionData> colData = std::make_shared<CollisionData>();
+            std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
             std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
             // Setup the handler
@@ -120,11 +121,11 @@ extern std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(
     }
     else if (intType == InteractionType::FemObjToCollidingObj_PenaltyForce)
     {
-        if ((std::is_base_of<CollidingObject, ObjectType1>::value) &&
-            std::is_base_of<CollidingObject, ObjectType2>::value)
+        if ((std::is_base_of<CollidingObject, ObjectType1>::value)
+            && std::is_base_of<CollidingObject, ObjectType2>::value)
         {
             // Setup CD, and collision data
-            std::shared_ptr<CollisionData> colData = std::make_shared<CollisionData>();
+            std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
             std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
             // Setup the handler
@@ -136,11 +137,11 @@ extern std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(
     }
     else if (intType == InteractionType::FemObjToCollidingObj_BoneDrilling)
     {
-        if (std::is_base_of<FeDeformableObject, ObjectType1>::value &&
-            std::is_base_of<CollidingObject, ObjectType2>::value)
+        if (std::is_base_of<FeDeformableObject, ObjectType1>::value
+            && std::is_base_of<CollidingObject, ObjectType2>::value)
         {
             // Setup CD, and collision data
-            std::shared_ptr<CollisionData> colData = std::make_shared<CollisionData>();
+            std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
             std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
             // Setup the handler

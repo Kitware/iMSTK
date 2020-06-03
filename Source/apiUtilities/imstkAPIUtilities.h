@@ -33,7 +33,7 @@ class PointSet;
 class SceneManager;
 class Scene;
 class FEMDeformableBodyModel;
-template <typename Matrix>
+template<typename Matrix>
 class NonLinearSystem;
 class CollidingObject;
 class Graph;

@@ -30,9 +30,9 @@ namespace imstk
 struct CollisionConstraintData
 {
     CollisionConstraintData(std::shared_ptr<StdVectorOfVec3d> posA,
-        std::shared_ptr<StdVectorOfReal> invMassA,
-        std::shared_ptr<StdVectorOfVec3d> posB,
-        std::shared_ptr<StdVectorOfReal> invMassB) :
+                            std::shared_ptr<StdVectorOfReal>  invMassA,
+                            std::shared_ptr<StdVectorOfVec3d> posB,
+                            std::shared_ptr<StdVectorOfReal>  invMassB) :
         m_posA(posA), m_invMassA(invMassA), m_posB(posB), m_invMassB(invMassB)
     {
     }
@@ -98,7 +98,7 @@ public:
     void solve() override;
 
 private:
-    size_t m_iterations = 20; ///> Number of NL Gauss-Seidel iterations for regular constraints
+    size_t m_iterations = 20;                                                             ///> Number of NL Gauss-Seidel iterations for regular constraints
 
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> Set of vector'd/partitioned pbd constraints
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> Vector of constraints
@@ -123,8 +123,8 @@ public:
     /// \brief Add the global collision contraints to this solver
     ///
     void addCollisionConstraints(PBDCollisionConstraintVector* constraints,
-        std::shared_ptr<StdVectorOfVec3d> posA, std::shared_ptr<StdVectorOfReal> invMassA,
-        std::shared_ptr<StdVectorOfVec3d> posB, std::shared_ptr<StdVectorOfReal> invMassB);
+                                 std::shared_ptr<StdVectorOfVec3d> posA, std::shared_ptr<StdVectorOfReal> invMassA,
+                                 std::shared_ptr<StdVectorOfVec3d> posB, std::shared_ptr<StdVectorOfReal> invMassB);
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.
@@ -132,7 +132,7 @@ public:
     void solve() override;
 
 private:
-    size_t m_collisionIterations = 5; ///> Number of NL Gauss-Seidel iterations for collision constraints
+    size_t m_collisionIterations = 5;                                                               ///> Number of NL Gauss-Seidel iterations for collision constraints
 
     std::shared_ptr<std::list<PBDCollisionConstraintVector*>> m_collisionConstraints     = nullptr; ///< Collision contraints charged to this solver
     std::shared_ptr<std::list<CollisionConstraintData>>       m_collisionConstraintsData = nullptr;

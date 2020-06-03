@@ -66,7 +66,7 @@ public:
     ///
     ComputeNodeAdjList& getInvAdjList() { return m_invAdjList; }
 
-    // Node operations
+// Node operations
 public:
     ///
     /// \brief Linear search for node by name within this graph
@@ -130,7 +130,7 @@ public:
     ///
     void insertBefore(std::shared_ptr<ComputeNode> refNode, std::shared_ptr<ComputeNode> newNode);
 
-    // Edge operations
+// Edge operations
 public:
     ///
     /// \brief Returns whether or not this graph contains the given directed edge
@@ -173,7 +173,7 @@ public:
         m_invAdjList.clear();
     }
 
-    // Graph algorithms, todo: Move into filtering module
+// Graph algorithms, todo: Move into filtering module
 public:
     ///
     /// \brief Graph sum, shared references are considered identical nodes, source/sink of results invalidated/nullptr
@@ -232,7 +232,7 @@ public:
 
 protected:
     ComputeNodeVector  m_nodes;
-    ComputeNodeAdjList m_adjList; ///> This gives the outputs of every node
+    ComputeNodeAdjList m_adjList;    ///> This gives the outputs of every node
     ComputeNodeAdjList m_invAdjList; ///> This gives the inputs of every node
     // inv adjlist?
 

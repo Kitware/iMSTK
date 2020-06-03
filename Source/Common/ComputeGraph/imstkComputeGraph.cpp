@@ -175,7 +175,7 @@ ComputeGraph::removeNode(std::shared_ptr<ComputeNode> node)
     }
 
     // Erase edges
-    ComputeNodeSet inputs = m_invAdjList[node];
+    ComputeNodeSet inputs  = m_invAdjList[node];
     ComputeNodeSet outputs = m_adjList[node];
     for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
@@ -205,7 +205,7 @@ ComputeGraph::removeNodeAndFix(std::shared_ptr<ComputeNode> node)
     }
 
     // Erase edges
-    ComputeNodeSet inputs = m_invAdjList[node];
+    ComputeNodeSet inputs  = m_invAdjList[node];
     ComputeNodeSet outputs = m_adjList[node];
     for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
@@ -386,7 +386,7 @@ ComputeGraph::topologicalSort(std::shared_ptr<ComputeGraph> graph)
     // Compute the number of inputs to each node (we will remove these as we go)
     std::unordered_map<std::shared_ptr<ComputeNode>, size_t> numInputs;
 
-    const ComputeNodeAdjList& adjList = graph->getAdjList();
+    const ComputeNodeAdjList& adjList    = graph->getAdjList();
     const ComputeNodeAdjList& invAdjList = graph->getInvAdjList();
 
     for (ComputeNodeAdjList::const_iterator i = invAdjList.begin(); i != invAdjList.end(); i++)
@@ -449,7 +449,7 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
     std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>(*graph);
 
     const ComputeNodeAdjList& adjList = graph->getAdjList();
-    const ComputeNodeVector& nodes = graph->getNodes();
+    const ComputeNodeVector&  nodes   = graph->getNodes();
 
     // Compute the levels of each node via DFS
     std::unordered_map<std::shared_ptr<ComputeNode>, int> depths;
@@ -462,8 +462,8 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
         nodeStack.push(graph->getSource());
         while (!nodeStack.empty())
         {
-            std::shared_ptr<ComputeNode> currNode = nodeStack.top();
-            int currLevel = depths[currNode];
+            std::shared_ptr<ComputeNode> currNode  = nodeStack.top();
+            int                          currLevel = depths[currNode];
             nodeStack.pop();
 
             // Add children to stack if not yet visited
@@ -489,7 +489,9 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
     for (size_t i = 0; i < nodes.size(); i++)
     {
         if (nodes[i]->m_critical)
+        {
             critNodes.push_back(nodes[i]);
+        }
     }
 
     // Compute the critical adjacency list
@@ -538,8 +540,8 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
         {
             std::shared_ptr<ComputeNode> destNode = critNodes[j];
             // If the edge doesn't exist, either way
-            if ((critAdjList.count(srcNode) == 0 || critAdjList.at(srcNode).count(destNode) == 0) &&
-                (critAdjList.count(destNode) == 0 || critAdjList.at(destNode).count(srcNode) == 0))
+            if ((critAdjList.count(srcNode) == 0 || critAdjList.at(srcNode).count(destNode) == 0)
+                && (critAdjList.count(destNode) == 0 || critAdjList.at(destNode).count(srcNode) == 0))
             {
                 // Add an edge between the critical nodes in the direction of levels
                 int leveli = depths[srcNode];
@@ -565,7 +567,9 @@ ComputeGraph::transitiveReduce(std::shared_ptr<ComputeGraph> graph)
 {
     // It's a bad idea to do this method if the graph is cyclic
     if (isCyclic(graph))
+    {
         return nullptr;
+    }
 
     std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>(*graph);
 
@@ -575,8 +579,8 @@ ComputeGraph::transitiveReduce(std::shared_ptr<ComputeGraph> graph)
     // For every edge in the graph
     for (ComputeNodeAdjList::const_iterator i = adjList.begin(); i != adjList.end(); i++)
     {
-        std::shared_ptr<ComputeNode> inputNode = i->first;
-        const ComputeNodeSet& outputNodes = i->second;
+        std::shared_ptr<ComputeNode> inputNode   = i->first;
+        const ComputeNodeSet&        outputNodes = i->second;
         for (ComputeNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
         {
             std::shared_ptr<ComputeNode> outputNode = *j;
@@ -601,9 +605,9 @@ ComputeGraph::nonFunctionalPrune(std::shared_ptr<ComputeGraph> graph)
 {
     std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>(*graph);
 
-    const ComputeNodeAdjList& adjList = results->getAdjList();
+    const ComputeNodeAdjList& adjList    = results->getAdjList();
     const ComputeNodeAdjList& invAdjList = results->getInvAdjList();
-    ComputeNodeVector& nodes = results->getNodes();
+    ComputeNodeVector&        nodes      = results->getNodes();
 
     for (size_t i = 0; i < nodes.size(); i++)
     {
@@ -619,7 +623,7 @@ ComputeGraph::nonFunctionalPrune(std::shared_ptr<ComputeGraph> graph)
         if (!node->isFunctional())
         {
             // Get copies of the inputs and outputs of the node
-            ComputeNodeSet inputs = invAdjList.at(node);
+            ComputeNodeSet inputs  = invAdjList.at(node);
             ComputeNodeSet outputs = adjList.at(node);
             if (inputs.size() == 1 && outputs.size() == 1)
             {
@@ -658,7 +662,7 @@ ComputeGraph::isCyclic(std::shared_ptr<ComputeGraph> graph)
 {
     // Brute force, DFS every node to find it again
     const ComputeNodeAdjList& adjList = graph->getAdjList();
-    const ComputeNodeVector& nodes = graph->getNodes();
+    const ComputeNodeVector&  nodes   = graph->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
     {
         std::unordered_set<std::shared_ptr<ComputeNode>> visitedNodes;
@@ -715,8 +719,8 @@ ComputeGraph::getUniqueNames(std::shared_ptr<ComputeGraph> graph, bool apply)
 {
     // Produce non colliding names
     std::unordered_map<std::shared_ptr<ComputeNode>, std::string> nodeNames;
-    std::unordered_map<std::string, int> names;
-    const ComputeNodeVector& nodes = graph->getNodes();
+    std::unordered_map<std::string, int>                          names;
+    const ComputeNodeVector&                                      nodes = graph->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
     {
         nodeNames[nodes[i]] = nodes[i]->m_name;
@@ -724,9 +728,9 @@ ComputeGraph::getUniqueNames(std::shared_ptr<ComputeGraph> graph, bool apply)
     }
     // Adjust names
     for (std::unordered_map<std::shared_ptr<ComputeNode>, std::string>::iterator it = nodeNames.begin();
-        it != nodeNames.end(); it++)
+         it != nodeNames.end(); it++)
     {
-        int nameIter = 0;
+        int         nameIter = 0;
         std::string currName = it->second;
         // If we can find a node with this name, increment name counter and try again
         while (names[currName] > 1)
@@ -794,7 +798,7 @@ ComputeGraph::getCriticalPath(std::shared_ptr<ComputeGraph> graph)
     std::unordered_map<std::shared_ptr<ComputeNode>, double> times = getTimes(graph);
 
     // Now backtrack to acquire the path of longest duration
-    const ComputeNodeAdjList& invAdjList = graph->getInvAdjList();
+    const ComputeNodeAdjList&               invAdjList = graph->getInvAdjList();
     std::list<std::shared_ptr<ComputeNode>> results;
     {
         std::shared_ptr<ComputeNode> currNode = graph->getSink();
@@ -803,7 +807,7 @@ ComputeGraph::getCriticalPath(std::shared_ptr<ComputeGraph> graph)
         {
             results.push_front(currNode);
             std::shared_ptr<ComputeNode> longestNode = nullptr;
-            double maxTime = 0.0;
+            double                       maxTime     = 0.0;
 
             // For every parent
             if (invAdjList.count(currNode) != 0)
@@ -814,7 +818,7 @@ ComputeGraph::getCriticalPath(std::shared_ptr<ComputeGraph> graph)
                     std::shared_ptr<ComputeNode> parentNode = *i;
                     if (times[parentNode] >= maxTime)
                     {
-                        maxTime = times[parentNode];
+                        maxTime     = times[parentNode];
                         longestNode = parentNode;
                     }
                 }

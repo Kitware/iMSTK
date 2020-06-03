@@ -34,40 +34,40 @@ using namespace imstk;
 int
 main(int argc, char** argv)
 {
-    const int N = 2;
-    auto      x = Vectord(N);
+    const int N  = 2;
+    auto      x  = Vectord(N);
     auto      xe = Vectord(N);
-    auto      y = Vectord(N);
-    auto      A = Matrixd(N, N);
+    auto      y  = Vectord(N);
+    auto      A  = Matrixd(N, N);
 
-    x[0] = 100.0;
-    x[1] = 100.0;
+    x[0]  = 100.0;
+    x[1]  = 100.0;
     xe[0] = 1.0;
     xe[1] = 10.0;
 
     auto func = [&y](const Vectord& x, const bool isSemiImplicit) -> const Vectord& {
-        // auto y = Vectord(x.size());
-        y[0] = x[0] * x[0] - 1.0;
-        y[1] = x[1] * x[1] - 100.0;
+                    // auto y = Vectord(x.size());
+                    y[0] = x[0] * x[0] - 1.0;
+                    y[1] = x[1] * x[1] - 100.0;
 
-        return y;
-    };
+                    return y;
+                };
 
     auto jac = [&A](const Vectord& x) -> const Matrixd& {
-        // auto A = Matrixd(x.size(), x.size());
-        A(0, 0) = 2 * x[0];
-        A(0, 1) = 0.0;
-        A(1, 0) = 0.0;
-        A(1, 1) = 2 * x[1];
+                   // auto A = Matrixd(x.size(), x.size());
+                   A(0, 0) = 2 * x[0];
+                   A(0, 1) = 0.0;
+                   A(1, 0) = 0.0;
+                   A(1, 1) = 2 * x[1];
 
-        return A;
-    };
+                   return A;
+               };
 
     auto updateX = [&x](const Vectord& du, const bool isSemiImplicit)
-    {
-        x -= du;
-        return;
-    };
+                   {
+                       x -= du;
+                       return;
+                   };
 
     auto updateXold = [](void) {};
 
@@ -84,8 +84,8 @@ main(int argc, char** argv)
     nlSolver->setSystem(nlSystem);
     nlSolver->setLinearSolver(linSolver);
 
-    std::cout << "init_error = " << std::setprecision(12) << std::scientific << (x-xe).norm() << std::endl;
+    std::cout << "init_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
     nlSolver->solve();
 
-    std::cout << "final_error = " << std::setprecision(12) << std::scientific << (x-xe).norm() << std::endl;
+    std::cout << "final_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
 }

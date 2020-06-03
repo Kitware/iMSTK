@@ -38,13 +38,13 @@ class PbdObjectCollisionPair : public CollisionPair
 {
 public:
     PbdObjectCollisionPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<PbdObject> obj2,
-        CollisionDetection::Type cdType = CollisionDetection::Type::MeshToMeshBruteForce);
+                           CollisionDetection::Type cdType = CollisionDetection::Type::MeshToMeshBruteForce);
 
     void modifyComputeGraph() override;
 
 private:
     // Pbd defines two interactions (one at CD and one at solver)
-    Inputs m_solveNodeInputs;
+    Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
     std::shared_ptr<ComputeNode> m_collisionSolveNode = nullptr;
 };

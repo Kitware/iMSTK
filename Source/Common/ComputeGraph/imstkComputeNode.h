@@ -55,11 +55,11 @@ public:
     virtual void execute();
 
 public:
-    std::string m_name = "none";
-    bool m_enabled     = true;
-    bool m_critical    = false;
+    std::string m_name   = "none";
+    bool   m_enabled     = true;
+    bool   m_critical    = false;
     double m_elapsedTime = 0.0;
-    bool m_enableBenchmarking = false;
+    bool   m_enableBenchmarking = false;
 
 protected:
     std::function<void()> m_func = nullptr; ///> Don't allow user to call directly (must use execute)

@@ -30,7 +30,7 @@ namespace imstk
 {
 SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side& side,
                                            std::shared_ptr<CollisionData> colData,
-                                           std::shared_ptr<SPHObject> obj) :
+                                           std::shared_ptr<SPHObject>     obj) :
     CollisionHandling(Type::SPH, side, colData), m_SPHObject(obj)
 {
     LOG_IF(FATAL, (!m_SPHObject)) << "Invalid SPH object";
@@ -54,9 +54,9 @@ SPHCollisionHandling::processCollisionData()
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx)
         {
-            const MeshToAnalyticalCollisionDataElement& cd  = m_colData->MAColData[idx];
-            const uint32_t pidx = cd.nodeIdx;  // Fluid particle index
-            Vec3d n = cd.penetrationVector; // This vector should point into solid object
+            const MeshToAnalyticalCollisionDataElement& cd = m_colData->MAColData[idx];
+            const uint32_t pidx = cd.nodeIdx; // Fluid particle index
+            Vec3d n = cd.penetrationVector;   // This vector should point into solid object
 
             // Correct particle position
             state.getPositions()[pidx] -= n;
