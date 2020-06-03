@@ -281,8 +281,8 @@ protected:
     NamedMap<VisualModel>           m_DebugRenderModelMap;
     NamedMap<Light>                 m_lightsMap;
     std::shared_ptr<IBLProbe>       m_globalIBLProbe = nullptr;
-    std::shared_ptr<Camera>         m_camera = std::make_shared<Camera>();
-    std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
+    std::shared_ptr<Camera>         m_camera = nullptr;
+    std::shared_ptr<CollisionGraph> m_collisionGraph = nullptr;
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
     std::vector<std::shared_ptr<CameraController>> m_cameraControllers;          ///> List of camera controllers
     std::unordered_map<std::string, std::thread>   m_threadMap;                  ///>

@@ -27,6 +27,12 @@
 
 using namespace imstk;
 
+std::shared_ptr<LineMesh>
+createLineMesh(const size_t nx, const size_t ny, const size_t nz);
+
+// some parameters that users can play with
+const size_t resolution = 16;
+
 ///
 /// \brief This example demonstrates line mesh rendering
 ///
@@ -38,17 +44,38 @@ main()
     auto scene      = simManager->createNewScene("LineMeshRenderingTest");
 
     // Construct line mesh
-    auto lineMesh = std::make_shared<LineMesh>();
+    auto lineMesh = createLineMesh(resolution, resolution, resolution);
+
+    auto lineModel = std::make_shared<VisualModel>(lineMesh);
     auto lineMeshMaterial = std::make_shared<RenderMaterial>();
     lineMeshMaterial->setLineWidth(3);
+    lineModel->setRenderMaterial(lineMeshMaterial);
     auto lineObject = std::make_shared<VisualObject>("lineMesh");
+    lineObject->addVisualModel(lineModel);
+
+    auto camera = scene->getCamera();
+    camera->setPosition(resolution / 2.0, resolution / 2.0, resolution * 4.0);
+    camera->setFocalPoint(resolution / 2.0, resolution / 2.0, resolution / 2.0);
+
+    lineObject->setVisualGeometry(lineMesh);
+    scene->addSceneObject(lineObject);
+
+    // Start simulation
+    simManager->setActiveScene(scene);
+    simManager->start();
+}
+
+std::shared_ptr<LineMesh>
+createLineMesh(const size_t nx, const size_t ny, const size_t nz)
+{
+    // Construct line mesh
+    auto lineMesh = std::make_shared<LineMesh>();
 
     std::vector<LineMesh::LineArray> lines;
     StdVectorOfVec3d                 points;
     std::vector<Color>               colors;
 
-    size_t resolution = 16;
-    size_t numVoxels  = resolution * resolution * resolution;
+    const size_t numVoxels  = nx * ny* nz;
 
     points.resize(numVoxels * 8);
     lines.resize(numVoxels * 12);
@@ -56,13 +83,13 @@ main()
     size_t index     = 0;
     size_t lineIndex = 0;
 
-    for (int z = 0; z < resolution; z++)
+    for (int z = 0; z < nz; z++)
     {
-        for (int y = 0; y < resolution; y++)
+        for (int y = 0; y < ny; y++)
         {
-            for (int x = 0; x < resolution; x++)
+            for (int x = 0; x < nx; x++)
             {
-                Color color = Color((float)x / resolution, (float)y / resolution, (float)z / resolution);
+                Color color = Color((float)x / nx, (float)y / ny, (float)z / nz);
 
                 points[index + 0] = Vec3d(x, y, z);
                 points[index + 1] = Vec3d(x, y, z + 1);
@@ -107,18 +134,8 @@ main()
     }
 
     lineMesh->initialize(points, lines);
-    auto lineModel = std::make_shared<VisualModel>(lineMesh);
-    lineModel->setRenderMaterial(lineMeshMaterial);
-    lineObject->addVisualModel(lineModel);
 
-    auto camera = scene->getCamera();
-    camera->setPosition(resolution / 2.0, resolution / 2.0, resolution * 4.0);
-    camera->setFocalPoint(resolution / 2.0, resolution / 2.0, resolution / 2.0);
-
-    lineObject->setVisualGeometry(lineMesh);
-    scene->addSceneObject(lineObject);
-
-    // Start simulation
-    simManager->setActiveScene(scene);
-    simManager->start();
+    return lineMesh;
 }
+
+

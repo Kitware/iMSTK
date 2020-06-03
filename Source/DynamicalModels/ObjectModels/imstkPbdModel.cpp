@@ -175,7 +175,11 @@ PbdModel::initialize()
     }
 
     // Partition constraints for parallel computation
+#ifdef __linux__
+    // \todo there is probably a bug to be fixed here on linux
+#else
     partitionConstraints();
+#endif
 
     this->setTimeStepSizeType(m_timeStepSizeType);
 
@@ -196,20 +200,20 @@ PbdModel::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<Co
 void
 PbdModel::computeElasticConstants()
 {
-    if (std::abs(m_Parameters->femParams->m_mu) < MIN_REAL
-        && std::abs(m_Parameters->femParams->m_lambda) < MIN_REAL)
+    if (std::abs(m_Parameters->m_femParams->m_mu) < MIN_REAL
+        && std::abs(m_Parameters->m_femParams->m_lambda) < MIN_REAL)
     {
-        const auto E  = m_Parameters->femParams->m_YoungModulus;
-        const auto nu = m_Parameters->femParams->m_PoissonRatio;
-        m_Parameters->femParams->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
-        m_Parameters->femParams->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
+        const auto E  = m_Parameters->m_femParams->m_YoungModulus;
+        const auto nu = m_Parameters->m_femParams->m_PoissonRatio;
+        m_Parameters->m_femParams->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
+        m_Parameters->m_femParams->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
     }
     else
     {
-        const auto mu     = m_Parameters->femParams->m_mu;
-        const auto lambda = m_Parameters->femParams->m_lambda;
-        m_Parameters->femParams->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
-        m_Parameters->femParams->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
+        const auto mu     = m_Parameters->m_femParams->m_mu;
+        const auto lambda = m_Parameters->m_femParams->m_lambda;
+        m_Parameters->m_femParams->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
+        m_Parameters->m_femParams->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
     }
 }
 
@@ -231,7 +235,7 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
             auto& tet = elements[k];
             auto c    = std::make_shared<PbdFEMTetConstraint>(type);
             c->initConstraint(*m_initialState->getPositions(),
-                tet[0], tet[1], tet[2], tet[3], m_Parameters->femParams);
+                tet[0], tet[1], tet[2], tet[3], m_Parameters->m_femParams);
             lock.lock();
             m_constraints->push_back(std::move(c));
             lock.unlock();

@@ -119,8 +119,8 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->femParams->m_YoungModulus = 1000.0;
-    pbdParams->femParams->m_PoissonRatio = 0.3;
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
@@ -137,6 +137,14 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 }
 
 ///
+/// \brief Create a surface mesh
+/// \param nRows number of vertices in x-direction
+/// \param nCols number of vertices in y-direction
+///
+std::shared_ptr<SurfaceMesh>
+createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
+
+///
 /// \brief This example demonstrates the collision interaction
 /// using Position based dynamics
 ///
@@ -150,68 +158,31 @@ main()
     auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
 
-    // Build floor geometry
-    const double width  = 100.0;
-    const double height = 100.0;
-    const size_t nRows  = 2;
-    const size_t nCols  = 2;
-    const double dy     = width / static_cast<double>(nCols - 1);
-    const double dx     = height / static_cast<double>(nRows - 1);
+    auto floorMesh = createUniformSurfaceMesh(100.0, 100.0, 2, 2);
 
-    StdVectorOfVec3d vertList;
-    vertList.resize(nRows * nCols);
-    for (size_t i = 0; i < nRows; ++i)
-    {
-        for (size_t j = 0; j < nCols; j++)
-        {
-            const double y = static_cast<double>(dy * j);
-            const double x = static_cast<double>(dx * i);
-            vertList[i * nCols + j] = Vec3d(x - 50, -10.0, y - 50);
-        }
-    }
-
-    // c. Add connectivity data
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    for (std::size_t i = 0; i < nRows - 1; ++i)
-    {
-        for (std::size_t j = 0; j < nCols - 1; j++)
-        {
-            SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
-        }
-    }
+    auto materialFloor = std::make_shared<RenderMaterial>();
+    materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
+    floorMeshModel->setRenderMaterial(materialFloor);
 
     auto floorObj = std::make_shared<PbdObject>("Floor");
-    {
-        auto floorMesh = std::make_shared<SurfaceMesh>();
-        floorMesh->initialize(vertList, triangles);
+    floorObj->setCollidingGeometry(floorMesh);
+    floorObj->setVisualGeometry(floorMesh);
+    floorObj->setPhysicsGeometry(floorMesh);
 
-        auto materialFloor = std::make_shared<RenderMaterial>();
-        materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-        auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
-        floorMeshModel->setRenderMaterial(materialFloor);
+    auto pbdModel2 = std::make_shared<PbdModel>();
+    pbdModel2->setModelGeometry(floorMesh);
 
-        floorObj->setCollidingGeometry(floorMesh);
-        floorObj->setVisualGeometry(floorMesh);
-        floorObj->setPhysicsGeometry(floorMesh);
+    // configure model
+    auto pbdParams2 = std::make_shared<PBDModelConfig>();
+    pbdParams2->m_uniformMassValue = 0.0;
+    pbdParams2->collisionParams->m_proximity = 0.1;
+    pbdParams2->m_iterations = 0;
 
-        auto pbdFloorModel = std::make_shared<PbdModel>();
-        pbdFloorModel->setModelGeometry(floorMesh);
-
-        // Configure floor
-        auto pbdFloorConfig = std::make_shared<PBDModelConfig>();
-        pbdFloorConfig->m_uniformMassValue = 0.0;
-        pbdFloorConfig->collisionParams->m_proximity = -0.1;
-        pbdFloorConfig->m_iterations = 0;
-
-        // Set the parameters
-        pbdFloorModel->configure(pbdFloorConfig);
-        floorObj->setDynamicalModel(pbdFloorModel);
-        scene->addSceneObject(floorObj);
-    }
+    // Set the parameters
+    pbdModel2->configure(pbdParams2);
+    floorObj->setDynamicalModel(pbdModel2);
+    scene->addSceneObject(floorObj);
 
 #ifdef BIG_SCENE
     const int expandsXZ = 1;
@@ -226,20 +197,16 @@ main()
 
 #ifdef BIG_SCENE
     for (int i = -expandsXZ; i < expandsXZ; ++i)
-#else
-    int i = 0;
-#endif
     {
-#ifdef BIG_SCENE
         for (int j = 0; j < expandsY; ++j)
-#else
-        int j = 0;
-#endif
         {
-#ifdef BIG_SCENE
             for (int k = -expandsXZ; k < expandsXZ; ++k)
 #else
-            int k = 0;
+    int i=0;
+    { 
+       int j = 0; 
+       {
+           int k = 0;
 #endif
             {
                 std::shared_ptr<SurfaceMesh> mesh;
@@ -280,3 +247,48 @@ main()
 
     return 0;
 }
+
+std::shared_ptr<SurfaceMesh>
+createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols)
+{
+    // Build floor geometry
+    // const double width  = 100.0;
+    // const double height = 100.0;
+    // const size_t nRows  = 2;
+    // const size_t nCols  = 2;
+    const double dy     = width / static_cast<double>(nCols - 1);
+    const double dx     = height / static_cast<double>(nRows - 1);
+
+    StdVectorOfVec3d vertList;
+    vertList.resize(nRows * nCols);
+    for (size_t i = 0; i < nRows; ++i)
+    {
+        for (size_t j = 0; j < nCols; j++)
+        {
+            const double y = static_cast<double>(dy * j);
+            const double x = static_cast<double>(dx * i);
+            vertList[i * nCols + j] = Vec3d(x - height*0.5, -10.0, y - width*0.5);
+        }
+    }
+
+    // c. Add connectivity data
+    std::vector<SurfaceMesh::TriangleArray> triangles;
+    for (std::size_t i = 0; i < nRows - 1; ++i)
+    {
+        for (std::size_t j = 0; j < nCols - 1; j++)
+        {
+            SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    surfMesh->initialize(vertList, triangles);
+
+    return surfMesh;
+}
+
+

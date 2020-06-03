@@ -546,6 +546,9 @@ TEST_F(OctreeBasedCDTest, TestMeshMeshUsingSurfaceMeshToSurfaceMeshCD)
     }
 }
 
+///
+/// \brief TODO
+///
 int
 imstkOctreeBasedCDTest(int argc, char* argv[])
 {

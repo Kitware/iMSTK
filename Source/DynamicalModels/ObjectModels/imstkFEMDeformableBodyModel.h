@@ -42,6 +42,9 @@ class TimeIntegrator;
 class SolverBase;
 class VegaMeshIO;
 
+///
+/// \strut FEMModelConfig
+/// \brief Parameters for finite element model
 struct FEMModelConfig
 {
     FEMMethodType m_femMethod = FEMMethodType::Invertible;
@@ -64,7 +67,7 @@ struct FEMModelConfig
 /// \class FEMDeformableBodyModel
 ///
 /// \brief Mathematical model of the physics governing the dynamic deformable object
-/// Note: Vega specifics will removed in future when the inertial and damping calculations
+/// \note Vega specifics will removed in future when the inertial and damping calculations
 /// are done with in-house code
 ///
 class FEMDeformableBodyModel : public DynamicalModel<FeDeformBodyState>
@@ -266,8 +269,14 @@ public:
     void disableFixedBC() { m_implementFixedBC = false; };
     bool isFixedBCImplemented() const { return m_implementFixedBC; };
 
+    ///
+    /// \brief Get the compute node
+    ///
     std::shared_ptr<ComputeNode> getSolveNode() const { return m_solveNode; }
 
+    ///
+    /// \brief Get/Set the solver pointer
+    ///
     std::shared_ptr<SolverBase> getSolver() const { return m_solver; }
     void setSolver(std::shared_ptr<SolverBase> solver) { this->m_solver = solver; }
 

@@ -115,7 +115,7 @@ protected:
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
     bool m_enableVR;
     std::string m_windowName = "imstk";
-    vtkSmartPointer<vtkCallbackCommand> timerCallbackCommand = nullptr;
+    vtkSmartPointer<vtkCallbackCommand> timerCallbackCommand;
 
 #ifdef iMSTK_ENABLE_VR
     vtkSmartPointer<OpenVRCommand> m_openVRCommand;

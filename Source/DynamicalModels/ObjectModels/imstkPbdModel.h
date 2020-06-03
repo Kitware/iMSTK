@@ -55,7 +55,7 @@ struct PBDModelConfig
     std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
     Vec3r m_gravity = Vec3r(0, -9.81, 0);    ///> Gravity
 
-    std::shared_ptr<PbdFEMConstraintConfig> femParams =
+    std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
         std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
         {
             0.0,                                                                                  // Lame constant, if constraint type is FEM
@@ -182,12 +182,12 @@ public:
     double getDefaultTimeStep() const { return m_Parameters->m_defaultDt; }
 
     ///
-    /// \brief
+    /// \brief Return all constraints that are solved sequentially
     ///
     std::shared_ptr<PBDConstraintVector> getConstraints() { return m_constraints; }
 
     ///
-    /// \brief
+    /// \brief Return the constraints that are colored and run in parallel
     ///
     std::shared_ptr<std::vector<PBDConstraintVector>> getPartitionedConstraints() { return m_partitionedConstraints; }
 
@@ -243,12 +243,16 @@ public:
 
     void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
 
+    /// \return the compute node for integrating positions
     std::shared_ptr<ComputeNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
 
+    /// \return the compute node for updating collision geometry
     std::shared_ptr<ComputeNode> getUpdateCollisionGeometryNode() const { return m_updateCollisionGeometryNode; }
 
+    /// \return the compute node for solving the constraints
     std::shared_ptr<ComputeNode> getSolveNode() const { return m_solveConstraintsNode; }
 
+    /// \return the compute node for updating velocity
     std::shared_ptr<ComputeNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
 
 protected:

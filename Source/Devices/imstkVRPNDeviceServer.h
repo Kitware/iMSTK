@@ -98,6 +98,10 @@ protected:
 
 private:
 
+    ///
+    /// \struct
+    /// \brief TODO
+    ///
     struct SerialInfo
     {
         int baudRate;

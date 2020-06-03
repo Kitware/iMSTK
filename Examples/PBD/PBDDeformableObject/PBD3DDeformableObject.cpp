@@ -33,8 +33,21 @@
 #include "imstkScene.h"
 
 #include <array>
+#include <string>
 
 using namespace imstk;
+
+///
+/// \brief Create a PbdObject and add it to a \p scene
+///
+std::shared_ptr<PbdObject>
+createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                      const std::string& surfMeshName,
+                      const std::string& tetMeshName);
+
+// mesh file names
+const std::string& surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj";
+const std::string& tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -47,46 +60,8 @@ main()
     auto scene      = simManager->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
-
-    auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
-
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
-
-    auto deformableObj = std::make_shared<PbdObject>("DeformableObject");
-    auto pbdModel      = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(tetMesh);
-
-    // configure model
-    auto pbdParams = std::make_shared<PBDModelConfig>();
-
-    // FEM constraint
-    pbdParams->femParams->m_YoungModulus = 100.0;
-    pbdParams->femParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = { 51, 127, 178 };
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
-
-    // Other parameters
-    pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_iterations = 45;
-
-    // Set the parameters
-    pbdModel->configure(pbdParams);
-    pbdModel->setDefaultTimeStep(0.02);
-    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::Fixed);
-
-    deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(tetMesh);
-    deformableObj->setPhysicsToVisualMap(map); //assign the computed map
-
-    scene->addSceneObject(deformableObj);
+    // create and add a PBD object
+    createAndAddPbdObject(scene, surfMeshFileName, tetMeshFileName);
 
     // Setup plane
     auto planeGeom = std::make_shared<Plane>();
@@ -109,3 +84,55 @@ main()
 
     return 0;
 }
+
+
+std::shared_ptr<PbdObject>
+createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                      const std::string& surfMeshName,
+                      const std::string& tetMeshName)
+{
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(surfMeshName));
+    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
+                                                               //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
+
+    auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    surfMeshModel->setRenderMaterial(material);
+
+    auto deformableObj = std::make_shared<PbdObject>("DeformableObject");
+    auto pbdModel      = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(tetMesh);
+
+    // configure model
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+
+    // FEM constraint
+    pbdParams->m_femParams->m_YoungModulus = 100.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.3;
+    pbdParams->m_fixedNodeIds = { 51, 127, 178 };
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_iterations = 45;
+
+    // Set the parameters
+    pbdModel->configure(pbdParams);
+    pbdModel->setDefaultTimeStep(0.02);
+    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::Fixed);
+
+    deformableObj->setDynamicalModel(pbdModel);
+    deformableObj->addVisualModel(surfMeshModel);
+    deformableObj->setPhysicsGeometry(tetMesh);
+    deformableObj->setPhysicsToVisualMap(map); //assign the computed map
+
+    scene->addSceneObject(deformableObj);
+
+    return deformableObj;
+}
+
+

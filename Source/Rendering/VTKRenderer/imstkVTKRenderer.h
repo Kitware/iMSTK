@@ -168,9 +168,9 @@ protected:
     std::vector<vtkOpenVRCameraPose> m_camPos;
 #endif
 
-    vtkSmartPointer<vtkChartXY>      m_benchmarkChart      = nullptr;
-    vtkSmartPointer<vtkContextActor> m_benchmarkChartActor = nullptr;
-    vtkSmartPointer<vtkTable> m_benchmarkTable = nullptr;
+    vtkSmartPointer<vtkChartXY>      m_benchmarkChart;
+    vtkSmartPointer<vtkContextActor> m_benchmarkChartActor;
+    vtkSmartPointer<vtkTable> m_benchmarkTable;
     vtkPlotBar* m_benchmarkPlot = nullptr;
     int benchmarkIter = 0;
 };

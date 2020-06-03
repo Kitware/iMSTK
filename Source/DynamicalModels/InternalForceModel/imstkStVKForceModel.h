@@ -95,7 +95,7 @@ public:
     }
 
     ///
-    /// \brief
+    /// \brief Speficy tangent stiffness matrix
     ///
     inline void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
     {

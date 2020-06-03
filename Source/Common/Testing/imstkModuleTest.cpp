@@ -31,6 +31,9 @@
 
 namespace imstk
 {
+///
+/// \brief TODO
+///
 class ModuleMock : public Module
 {
 public:
@@ -52,6 +55,9 @@ protected:
 
 using namespace imstk;
 
+///
+/// \brief TODO
+///
 class imstkModuleTest : public ::testing::Test
 {
 protected:
@@ -192,6 +198,9 @@ TEST_F(imstkModuleTest, ControlModule)
     t.join();
 }
 
+///
+/// \brief TODO
+///
 int
 imstkModuleTest(int argc, char* argv[])
 {

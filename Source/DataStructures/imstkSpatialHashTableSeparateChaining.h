@@ -38,6 +38,10 @@ struct PointEntry
 
 namespace std
 {
+///
+/// \struct hash 
+/// \brief Returns a hash value for a \ref PointEntry
+///
 template<> struct hash<imstk::PointEntry>
 {
     size_t operator()(const imstk::PointEntry& point) const
@@ -50,6 +54,10 @@ template<> struct hash<imstk::PointEntry>
     }
 };
 
+///
+/// \struct equal_to
+/// \brief Test if two points are the same or not by comparing their id and coordinates
+///
 template<> struct equal_to<imstk::PointEntry>
 {
     size_t operator()(const imstk::PointEntry& point1, const imstk::PointEntry& point2) const

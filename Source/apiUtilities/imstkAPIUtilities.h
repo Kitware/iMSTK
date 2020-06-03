@@ -75,10 +75,11 @@ std::shared_ptr<NonLinearSystem<SparseMatrixd>> createNonLinearSystem(std::share
 ///
 void printUPS(std::shared_ptr<SceneManager> sceneManager);
 
+///
+/// \brief Create a \ref Graph ref
+///
 std::shared_ptr<Graph> getMeshGraph(std::shared_ptr<PointSet> m);
-
 std::shared_ptr<Graph> getMeshGraph(std::shared_ptr<SurfaceMesh> m);
-
 std::shared_ptr<Graph> getMeshGraph(std::shared_ptr<TetrahedralMesh> m);
 } //apiutils
 } // imstk

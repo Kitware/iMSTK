@@ -57,7 +57,13 @@ public:
     /// \brief Compute forces based on collision data
     ///
     void processCollisionData() override;
+    ///
+    /// \brief TODO
+    ///
     void computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObject>& analyticObj);
+    ///
+    /// \brief TODO
+    ///
     void computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeformableObject>& deformableObj);
 
     ///

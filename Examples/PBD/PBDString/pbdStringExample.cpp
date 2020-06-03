@@ -30,6 +30,30 @@
 
 using namespace imstk;
 
+// helps to create string objects
+struct PbdSim
+{
+    std::shared_ptr<LineMesh> geometry;
+    std::shared_ptr<PbdObject> object;
+    std::shared_ptr<PbdModel> model;
+    std::shared_ptr<PBDModelConfig> params;
+    std::shared_ptr<VisualModel> visualModel;
+};
+
+///
+/// \brief Create string objects
+///
+std::vector<PbdSim> 
+createAndAddStrings(std::shared_ptr<Scene> scene, 
+                    const size_t numStrings, 
+                    const size_t numVerts, 
+                    const double stringSpacing, 
+                    const double stringLength, 
+                    const Color& startColor, 
+                    const Color& endColor);
+
+const double dt = 0.0005;
+const double radius = 1.5;
 ///
 /// \brief This example demonstrates string simulation
 /// using Position based dynamics with varying bend stiffnesses
@@ -41,31 +65,64 @@ main()
     auto scene      = simManager->createNewScene("PBDString");
 
     // Setup N separate string simulations with varying bend stiffnesses
-    const unsigned int numStrings    = 8;
-    const unsigned int numVerts      = 30;
-    const double       stringSpacing = 2.0;          // How far each string is apart
-    const double       stringLength  = 10.0;         // Total length of string
-    const Color        startColor    = Color::Red;   // Color of first string
-    const Color        endColor      = Color::Green; // Color of last string
+    const size_t numStrings    = 8;
+    const size_t numVerts      = 30;
+    const double stringSpacing = 2.0;          // How far each string is apart
+    const double stringLength  = 10.0;         // Total length of string
+    const Color  startColor    = Color::Red;   // Color of first string
+    const Color  endColor      = Color::Green; // Color of last string
 
-    struct PbdSim
+    auto sims = createAndAddStrings(scene, numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
+    
+    // Adjust the camera
+    scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
+    scene->getCamera()->setPosition(0.0, 0.0, 15.0);
+
+    // Move the points every frame
+    double t = 0.0;
+
+    auto movePoints = [&sims, &t, dt, radius](Module* module)
     {
-        std::shared_ptr<LineMesh> geometry;
-        std::shared_ptr<PbdObject> object;
-        std::shared_ptr<PbdModel> model;
-        std::shared_ptr<PBDModelConfig> params;
-        std::shared_ptr<VisualModel> visualModel;
+        for (unsigned int i = 0; i < sims.size(); i++)
+        {
+            Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
+            // Move in circle, derivatives of parametric eq of circle
+            sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(pos.x() + -std::sin(t) * radius * dt,
+                                                                                pos.y(),
+                                                                                pos.z() + std::cos(t) * radius * dt));
+        }
+        t += dt;
     };
+    simManager->getSceneManager(scene)->setPostUpdateCallback(movePoints);
+
+    // Start
+    simManager->setActiveScene(scene);
+    simManager->start();
+
+    return 0;
+}
+
+
+std::vector<PbdSim> 
+createAndAddStrings(std::shared_ptr<Scene> scene, 
+                    const size_t numStrings, 
+                    const size_t numVerts, 
+                    const double stringSpacing, 
+                    const double stringLength, 
+                    const Color& startColor, 
+                    const Color& endColor)
+{
     std::vector<PbdSim> sims(numStrings);
 
     const double size = stringSpacing * (numStrings - 1);
     const double vertexSpacing = stringLength / numVerts;
-    for (unsigned int i = 0; i < numStrings; i++)
+    for (unsigned int i = 0; i < numStrings; ++i)
     {
         // Setup the line mesh
         sims[i].geometry = std::make_shared<LineMesh>();
         StdVectorOfVec3d vertList;
         vertList.resize(numVerts);
+
         for (size_t j = 0; j < numVerts; j++)
         {
             vertList[j] = Vec3d(
@@ -116,33 +173,6 @@ main()
         scene->addSceneObject(sims[i].object);
     }
 
-    // Adjust the camera
-    scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
-    scene->getCamera()->setPosition(0.0, 0.0, 15.0);
-
-    // Move the points every frame
-    double       t          = 0.0;
-    const double dt         = 0.0005;
-    const double radius     = 1.5;
-    auto         movePoints =
-        [&sims, &t, dt, radius](Module* module)
-        {
-            for (unsigned int i = 0; i < sims.size(); i++)
-            {
-                Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
-                // Move in circle, derivatives of parametric eq of circle
-                sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
-                    pos.x() + -std::sin(t) * radius * dt,
-                    pos.y(),
-                    pos.z() + std::cos(t) * radius * dt));
-            }
-            t += dt;
-        };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(movePoints);
-
-    // Start
-    simManager->setActiveScene(scene);
-    simManager->start();
-
-    return 0;
+    return sims;
 }
+

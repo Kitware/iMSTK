@@ -311,6 +311,9 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
     }
 }
 
+///
+/// \brief TODO
+///
 int
 imstkNeighborSearchTest(int argc, char* argv[])
 {

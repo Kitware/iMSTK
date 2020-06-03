@@ -33,7 +33,7 @@
 #include "imstkSurfaceMesh.h"
 
 #include "imstkVTKRenderer.h"
-#include "VTKRenderer.h"
+#include "vtkRenderer.h"
 #include "vtkRenderWindowInteractor.h"
 
 using namespace imstk;

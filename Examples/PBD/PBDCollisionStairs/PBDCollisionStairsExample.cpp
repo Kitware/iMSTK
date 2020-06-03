@@ -38,7 +38,9 @@
 
 using namespace imstk;
 
-// Creates a non-manifold top part of a staircase
+///
+/// \brief Creates a non-manifold top part of a staircase
+//.
 static std::unique_ptr<SurfaceMesh>
 buildStairs(int nSteps, double width, double height, double depth)
 {
@@ -108,8 +110,8 @@ makeDragonPbdObject(const std::string& name)
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PBDModelConfig>();
-    pbdParams->femParams->m_YoungModulus = 1000.0;
-    pbdParams->femParams->m_PoissonRatio = 0.3;
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
         PbdFEMConstraint::MaterialType::StVK);
     pbdParams->m_uniformMassValue = 1.0;

@@ -126,7 +126,7 @@ writePlotterVectorMatPlotlib(Vectord& x, const char* fileName)
 }
 
 ///
-/// \brief Write a MatPlotlib script to plot X vs Y where X, Y are input vectors of same
+/// \brief Write a MatPlotlib script to plot \p x vs \p y where \p x, \p y are of same
 /// size
 ///
 static void

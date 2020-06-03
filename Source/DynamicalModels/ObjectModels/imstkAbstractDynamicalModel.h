@@ -92,6 +92,9 @@ public:
     std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
     void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
 
+    ///
+    /// \brief Get the compute graph
+    ///
     std::shared_ptr<ComputeGraph> getComputeGraph() const { return m_computeGraph; }
 
     ///

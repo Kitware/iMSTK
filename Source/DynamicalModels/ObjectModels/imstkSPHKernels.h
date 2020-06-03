@@ -31,6 +31,11 @@ namespace imstk
 {
 namespace SPH
 {
+
+///
+/// \class Poly6Kernel
+/// \brief The poly6 Kernel
+///
 template<int N>
 class Poly6Kernel
 {
@@ -136,6 +141,10 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
+///
+/// \class SpikyKernel
+/// \brief Spiky Kernel
+///
 template<int N>
 class SpikyKernel
 {
@@ -221,6 +230,10 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
+/// 
+/// \class CohesionKernel
+/// \brief Cohesion Kernel
+///
 template<int N>
 class CohesionKernel
 {
@@ -311,6 +324,10 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
+/// 
+/// \class AdhesionKernel 
+/// \brief Adhesion kernel
+/// 
 template<int N>
 class AdhesionKernel
 {
@@ -386,6 +403,10 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
+/// 
+/// \class ViscosityKernel
+/// \brief Viscosity kernel 
+/// 
 template<int N>
 class ViscosityKernel
 {
@@ -437,6 +458,9 @@ protected:
 class SPHSimulationKernels
 {
 public:
+    ///
+    /// \brief Initialize with kernel radius \p kernelRadius
+    ///
     void initialize(const Real kernelRadius)
     {
         m_poly6.setRadius(kernelRadius);
