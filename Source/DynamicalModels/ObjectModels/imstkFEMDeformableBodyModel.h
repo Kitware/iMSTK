@@ -24,7 +24,7 @@
 // imstk
 #include "imstkDynamicalModel.h"
 #include "imstkInternalForceModelTypes.h"
-#include "imstkNonlinearSystem.h"
+#include "imstkNonLinearSystem.h"
 
 // vega
 #include "sparseMatrix.h"
@@ -70,6 +70,8 @@ struct FEMModelConfig
 class FEMDeformableBodyModel : public DynamicalModel<FeDeformBodyState>
 {
 using kinematicState = FeDeformBodyState;
+using System = NonLinearSystem<SparseMatrixd>;
+
 public:
     ///
     /// \brief Constructor
@@ -208,19 +210,19 @@ public:
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
-    NonLinearSystem::VectorFunctionType getFunction();
+    System::VectorFunctionType getFunction();
 
     ///
     /// \brief Get the function that updates the model given the solution
     ///
-    NonLinearSystem::UpdateFunctionType getUpdateFunction();
-    NonLinearSystem::UpdatePrevStateFunctionType getUpdatePrevStateFunction();
+    System::UpdateFunctionType getUpdateFunction();
+    System::UpdatePrevStateFunctionType getUpdatePrevStateFunction();
 
     ///
     /// \brief Returns the "function" that evaluates the gradient of the nonlinear
     /// function given the state vector
     ///
-    NonLinearSystem::MatrixFunctionType getFunctionGradient();
+    System::MatrixFunctionType getFunctionGradient();
 
     ///
     /// \brief Get the contact force vector

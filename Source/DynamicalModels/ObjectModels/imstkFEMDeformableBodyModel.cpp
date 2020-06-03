@@ -255,7 +255,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
         if (file.is_open())
         {
             size_t index;
-            auto   maxAllowed = m_vegaPhysicsMesh->getNumVertices();
+            size_t maxAllowed = m_vegaPhysicsMesh->getNumVertices();
             while (!file.eof())
             {
                 file >> index;
@@ -287,7 +287,9 @@ bool
 FEMDeformableBodyModel::initializeForceModel()
 {
     const double g = m_FEModelConfig->m_gravity;
-    const bool   isGravityPresent = (g > 0) ? true : false;
+    // Since vega 4.0 doesn't add gravity correcntly in all cases, we do it ourselves; see \ref initializeGravityForce
+    // const bool   isGravityPresent = (g > 0) ? true : false;
+    const bool   isGravityPresent = false;
 
     m_numDOF = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
 
@@ -683,7 +685,7 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
     m_qSol = m_currentState->getQ();
 }
 
-NonLinearSystem::VectorFunctionType
+NonLinearSystem<SparseMatrixd>::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
 #pragma warning( push )
@@ -705,7 +707,7 @@ FEMDeformableBodyModel::getFunction()
 #pragma warning( pop )
 }
 
-NonLinearSystem::MatrixFunctionType
+NonLinearSystem<SparseMatrixd>::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
 #pragma warning( push )
@@ -725,7 +727,7 @@ FEMDeformableBodyModel::getFunctionGradient()
 #pragma warning( pop )
 }
 
-NonLinearSystem::UpdateFunctionType
+NonLinearSystem<SparseMatrixd>::UpdateFunctionType
 FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
@@ -737,7 +739,7 @@ FEMDeformableBodyModel::getUpdateFunction()
            };
 }
 
-NonLinearSystem::UpdatePrevStateFunctionType
+NonLinearSystem<SparseMatrixd>::UpdatePrevStateFunctionType
 FEMDeformableBodyModel::getUpdatePrevStateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state

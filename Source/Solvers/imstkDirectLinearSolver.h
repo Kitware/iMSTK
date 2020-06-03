@@ -46,7 +46,8 @@ public:
     ///
     /// \brief Default constructor/destructor.
     ///
-    DirectLinearSolver() = delete;
+    // DirectLinearSolver() = delete;
+    DirectLinearSolver()  {}
     ~DirectLinearSolver() {};
 
     ///
@@ -68,6 +69,11 @@ public:
     /// \brief Sets the system. System of linear equations.
     ///
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
+
+    ///
+    /// \brief Sets the matrix
+    ///
+    void setSystem(std::shared_ptr<Matrixd> matrix);
 
     ///
     /// \brief Returns true if the solver is iterative
