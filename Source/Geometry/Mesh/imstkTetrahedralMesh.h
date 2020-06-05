@@ -79,6 +79,7 @@ public:
     /// (b) Checks and flips the triangle connectivity order if it is not consistent
     /// (c) Renumbers the vertices
     /// (d) optionally enforces the consistency of winding of resulting surface triangles
+    ///
     bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const bool enforceWindingConsistency = false);
 
     ///

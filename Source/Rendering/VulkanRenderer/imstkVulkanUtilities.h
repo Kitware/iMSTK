@@ -40,9 +40,11 @@ const std::string Mesh("../data/shaders/VulkanShaders/mesh/");
 const std::string PostProcessing("../data/shaders/VulkanShaders/PostProcessing/");
 }
 
+/// \brief TODO
 class VulkanShaderLoader
 {
 public:
+    /// \brief TODO
     VulkanShaderLoader(std::string filename, VkDevice& device, VkShaderModule& module)
     {
         std::ifstream file(filename, std::ios_base::binary);
@@ -63,19 +65,23 @@ public:
         }
     };
 
+    /// \brief TODO
     uint32_t getShaderLength() { return (uint32_t)m_data->size(); };
 
+    /// \brief TODO
     uint32_t* getShaderData() { return (uint32_t*)m_data->data(); };
 
 protected:
     std::shared_ptr<std::vector<char>> m_data;
 };
 
+/// \brief TODO
 class VulkanAttachmentBarriers
 {
 public:
+    /// \brief TODO
     static void changeImageLayout(
-        VkCommandBuffer*     commandBuffer,
+                                  VkCommandBuffer*     commandBuffer,
         uint32_t             queueFamilyIndex,
         VulkanInternalImage* image,
         VkImageLayout        oldLayout,
@@ -127,6 +133,7 @@ public:
         image->setImageLayout(newLayout);
     };
 
+    /// \brief TODO
     static const VkAccessFlags getAccessFlags(VkImageLayout imageLayout)
     {
         switch (imageLayout)
@@ -150,6 +157,7 @@ public:
         ;
     }
 
+    /// \brief TODO
     static const VkPipelineStageFlags getPipelineStageFlags(VkImageLayout imageLayout)
     {
         switch (imageLayout)
@@ -173,6 +181,7 @@ public:
         ;
     }
 
+    /// \brief TODO
     static void addDepthAttachmentBarrier(VkCommandBuffer* commandBuffer, uint32_t queueFamilyIndex, VkImage* image)
     {
         VkImageSubresourceRange range;
@@ -203,6 +212,7 @@ public:
             1, &barrier); // image barriers
     };
 
+    /// \brief TODO
     static void addShadowAttachmentBarrier(VkCommandBuffer* commandBuffer, uint32_t queueFamilyIndex, VkImage* image)
     {
         VkImageSubresourceRange range;
@@ -234,6 +244,7 @@ public:
     };
 };
 
+/// \brief TODO
 class VulkanDefaults
 {
 public:

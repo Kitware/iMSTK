@@ -32,21 +32,26 @@
 
 namespace imstk
 {
+
+/// \brief TODO
 struct VulkanLocalVertexUniforms
 {
     glm::mat4 transform;
 };
 
+/// \brief TODO
 struct VulkanLocalDecalVertexUniforms
 {
     glm::mat4 transforms[128];
 };
 
+/// \brief TODO
 struct VulkanLocalParticleVertexUniforms
 {
     glm::mat4 transform[128];
 };
 
+/// \brief TODO
 struct VulkanLocalFragmentUniforms
 {
     glm::mat4 transform;
@@ -58,6 +63,7 @@ struct VulkanLocalFragmentUniforms
     glm::vec4 debugColor;
 };
 
+/// \brief TODO
 struct VulkanLocalDecalFragmentUniforms
 {
     glm::mat4 inverses[128];
@@ -68,6 +74,7 @@ struct VulkanLocalDecalFragmentUniforms
     float metalness;
 };
 
+/// \brief TODO
 struct VulkanLocalParticleFragmentUniforms
 {
     glm::vec4 color[128];
@@ -77,6 +84,7 @@ struct VulkanLocalParticleFragmentUniforms
     float metalness[128];
 };
 
+/// \brief TODO
 struct VulkanLight
 {
     glm::vec4 position;  // 3 position
@@ -85,6 +93,7 @@ struct VulkanLight
     glm::ivec4 state;    // 1 type, 1 shadow map index
 };
 
+/// \brief TODO
 struct VulkanGlobalVertexUniforms
 {
     glm::mat4 projectionMatrices[2];
@@ -93,6 +102,7 @@ struct VulkanGlobalVertexUniforms
     VulkanLight lights[16];
 };
 
+/// \brief TODO
 struct VulkanGlobalFragmentUniforms
 {
     glm::mat4 inverseViewMatrices[2];
@@ -102,11 +112,14 @@ struct VulkanGlobalFragmentUniforms
     glm::mat4 lightMatrices[16];
 };
 
+/// \brief TODO
 class VulkanUniformBuffer : public VulkanBuffer
 {
 public:
+    /// \brief TODO
     VulkanUniformBuffer(VulkanMemoryManager& memoryManager, uint32_t uniformSize);
 
+    /// \brief TODO
     void updateUniforms(uint32_t uniformSize, void* uniformData, uint32_t frameIndex);
 
     ~VulkanUniformBuffer() = default;
@@ -115,8 +128,10 @@ protected:
     friend class VulkanRenderer;
     friend class VulkanMaterialDelegate;
 
+    /// \brief TODO
     VulkanInternalBuffer* getUniformBuffer();
 
+    /// \brief TODO
     void* getUniformMemory();
 
     VulkanInternalBuffer* m_uniformBuffer;

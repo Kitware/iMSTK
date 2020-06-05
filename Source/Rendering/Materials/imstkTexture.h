@@ -53,6 +53,9 @@ public:
         None
     };
 
+    ///
+    /// \brief TODO
+    ///
     enum class FileType
     {
         Unknown,
@@ -127,9 +130,13 @@ protected:
 };
 }
 
-// This method is defined to allow for the map to be properly indexed by Texture objects
 namespace std
 {
+
+///
+/// \struct less
+/// \brief This method is defined to allow for the map to be properly indexed by Texture objects
+///
 template<> struct less<std::shared_ptr<imstk::Texture>>
 {
     bool operator()(const std::shared_ptr<imstk::Texture>& texture1,

@@ -32,6 +32,10 @@ class InteractorStyle;
 /// Return true to override base class behavior, or false to maintain it.
 using EventHandlerFunction = std::function<bool (InteractorStyle* iStyle)>;
 
+///
+/// \class InteractorStyle
+/// \brief TODO
+///
 class InteractorStyle
 {
 public:

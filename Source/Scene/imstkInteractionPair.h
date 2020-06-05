@@ -44,6 +44,7 @@ public:
     virtual ~InteractionPair() = default;
 
 public:
+    /// \brief TODO
     const Inputs& getComputeNodeInputs() const { return m_computeNodeInputs; }
     const Outputs& getComputeNodeOutputs() const { return m_computeNodeOutputs; }
 

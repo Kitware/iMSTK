@@ -27,6 +27,11 @@
 
 namespace imstk
 {
+
+/// 
+/// \struct CollisionConstraintData
+/// \brief Stores positions and masses of two colliding objects
+///
 struct CollisionConstraintData
 {
     CollisionConstraintData(std::shared_ptr<StdVectorOfVec3d> posA,

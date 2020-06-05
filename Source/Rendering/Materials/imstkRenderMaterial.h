@@ -28,9 +28,16 @@ namespace imstk
 {
 class Texture;
 
+///
+/// \class RenderMaterial
+/// \brief TODO
+///
 class RenderMaterial
 {
 public:
+    ///
+    /// \brief TODO
+    ///
     enum DisplayMode
     {
         Surface,
@@ -39,6 +46,9 @@ public:
         WireframeSurface
     };
 
+    ///
+    /// \brief TODO
+    ///
     enum class BlendMode
     {
         Alpha,

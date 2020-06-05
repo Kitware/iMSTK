@@ -38,6 +38,7 @@
 
 #define VTK_MAX_SPHERE_RESOLUTION 1024
 
+/// \brief TODO
 class vtkCapsuleSource : public vtkPolyDataAlgorithm
 {
 public:

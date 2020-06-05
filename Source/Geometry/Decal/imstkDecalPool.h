@@ -35,16 +35,35 @@ class DecalPool : public Geometry
 public:
     DecalPool(unsigned int maxNumDecals = 128, const std::string& name = std::string(""));
 
+    ///
+    /// \brief Add a \ref Decal object to this pool
+    ///
     std::shared_ptr<Decal> addDecal();
 
+    ///
+    /// \brief Remove a \ref Decal object to this pool
+    ///
     void removeDecal();
 
+    /// 
+    /// \brief Get all decals
+    /// 
     std::deque<std::shared_ptr<Decal>>& getDecals();
 
+    ///
+    /// \brief Set/Get recyle
+    ///
     void setRecycle(bool recycle);
     bool getRecycle();
 
+    ///
+    /// \brief Get the number of decals
+    ///
     unsigned int getNumDecals();
+
+    ///
+    /// \brief Get the max number of decals
+    ///
     unsigned int getMaxNumDecals();
 
     ///

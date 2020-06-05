@@ -30,39 +30,63 @@
 
 namespace imstk
 {
+///
+/// \brief TODO
+///
 class VulkanFramebuffer
 {
 public:
+    ///
+    /// \brief TODO
+    ///
     VulkanFramebuffer(
         VulkanMemoryManager&  memoryManager,
         unsigned int          width,
         unsigned int          height,
         VkSampleCountFlagBits samples = VK_SAMPLE_COUNT_1_BIT);
 
+    ///
+    /// \brief TODO
+    ///
     void setColor(VulkanInternalImage* image,
                   VkImageView*         imageView,
                   VkFormat             format,
                   VkImageLayout        layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
+    ///
+    /// \brief TODO
+    ///
     void setSpecular(VulkanInternalImage* image,
                      VkImageView*         imageView,
                      VkFormat             format,
                      VkImageLayout        layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
+    ///
+    /// \brief TODO
+    ///
     void setDepth(VulkanInternalImage* image,
                   VkImageView*         imageView,
                   VkFormat             format,
                   VkImageLayout        layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 
+    ///
+    /// \brief TODO
+    ///
     void setNormal(VulkanInternalImage* image,
                    VkImageView*         imageView,
                    VkFormat             format,
                    VkImageLayout        layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
+    ///
+    /// \brief TODO
+    ///
     void initializeFramebuffer(VkRenderPass* renderPass);
 
     ~VulkanFramebuffer() {};
 
+    ///
+    /// \brief TODO
+    ///
     void changeImageLayout(VkCommandBuffer&        commandBuffer,
                            VkImage&                image,
                            VkImageLayout           layout1,
@@ -71,6 +95,9 @@ public:
                            VkAccessFlags           destinationFlags,
                            VkImageSubresourceRange range);
 
+    ///
+    /// \brief TODO
+    ///
     void clear(VkDevice* device);
 
 private:

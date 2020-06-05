@@ -102,6 +102,7 @@ main()
                                    PbdFEMConstraint::MaterialType::Corotation);
 
     // Other parameters
+    // \todo use lumped mass
     pbdParams->m_uniformMassValue = 1.0;
 
     pbdParams->m_gravity    = Vec3d(0, -10.0, 0);

@@ -48,6 +48,9 @@ class VTKCustomPolyDataMapper : public vtkOpenGLPolyDataMapper
 public:
     vtkTypeMacro(VTKCustomPolyDataMapper, vtkOpenGLPolyDataMapper);
 
+    ///
+    /// \brief Create a new object
+    ///
     static VTKCustomPolyDataMapper* New();
 
     ///

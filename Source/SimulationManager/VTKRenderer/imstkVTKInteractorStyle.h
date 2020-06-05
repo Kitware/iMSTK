@@ -36,9 +36,9 @@ class VTKTextStatusManager;
 using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 
 ///
-/// \class classname
+/// \class VTKInteractorStyle
 ///
-/// \brief
+/// \brief TODO
 ///
 class VTKInteractorStyle : public vtkBaseInteractorStyle, public InteractorStyle
 {

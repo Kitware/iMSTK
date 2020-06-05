@@ -26,12 +26,18 @@
 #include "imstkSphere.h"
 using namespace imstk;
 
+///
+/// \brief TODO
+///
 class imstkSphereTest : public ::testing::Test
 {
 protected:
     Sphere m_sphere;
 };
 
+///
+/// \brief TODO
+///
 TEST_F(imstkSphereTest, SetGetRadius)
 {
     m_sphere.setRadius(2);
@@ -63,6 +69,9 @@ TEST_F(imstkSphereTest, GetVolume)
     EXPECT_EQ(m_sphere.getVolume(), 4.0 / 3.0 * PI * r * r * r);
 }
 
+///
+/// \brief TODO
+///
 int
 imstkSphereTest(int argc, char* argv[])
 {

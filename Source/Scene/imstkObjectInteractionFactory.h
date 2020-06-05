@@ -40,7 +40,9 @@ limitations under the License.
 
 namespace imstk
 {
-// Predefined standard/types of interaction from imstk
+///
+/// \brief Predefined standard/types of interaction from imstk
+///
 enum class InteractionType
 {
     PbdObjToPbdObj_Collision,

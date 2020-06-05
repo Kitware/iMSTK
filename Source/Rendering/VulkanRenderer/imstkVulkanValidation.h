@@ -25,19 +25,24 @@
 
 namespace imstk
 {
+
+/// \brief TODO
 class VulkanValidation
 {
 public:
+    /// \brief TODO
     static char* getValidationLayer()
     {
         return "VK_LAYER_LUNARG_standard_validation";
     };
 
+    /// \brief TODO
     static char* getValidationExtension()
     {
         return "VK_EXT_debug_report";
     };
 
+    /// \brief TODO
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugReportCallback(VkDebugReportFlagsEXT      debugReportFlags,
                                                               VkDebugReportObjectTypeEXT debugReportObjectType,
                                                               uint64_t                   callbackObject,

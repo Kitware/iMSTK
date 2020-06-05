@@ -33,7 +33,7 @@ class ObjectInteractionPair;
 ///
 /// \class CollisionGraph
 ///
-/// \brief
+/// \brief TODO
 ///
 class CollisionGraph
 {
@@ -68,6 +68,9 @@ public:
     //                                    CollisionHandlingPtr  CHA,
     //                                    CollisionHandlingPtr  CHB);
 
+    ///
+    /// \brief Add interaction pair in collision graph
+    ///
     void addInteraction(ObjectInteractionPtr pair);
 
     ///

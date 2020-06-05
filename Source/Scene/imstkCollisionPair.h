@@ -60,15 +60,18 @@ public:
     ~CollisionPair() = default;
 
 public:
+    /// \brief TODO
     void setCollisionDetection(std::shared_ptr<CollisionDetection> colDetect);
     void setCollisionHandlingA(std::shared_ptr<CollisionHandling> colHandlingA);
     void setCollisionHandlingB(std::shared_ptr<CollisionHandling> colHandlingB);
     void setCollisionHandlingAB(std::shared_ptr<CollisionHandling> colHandlingAB);
 
+    /// \brief TODO
     std::shared_ptr<CollisionDetection> getCollisionDetection() const { return m_colDetect; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingA() const { return m_colHandlingA; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingB() const { return m_colHandlingB; }
 
+    /// \brief TODO
     std::shared_ptr<ComputeNode> getCollisionDetectionNode() const { return m_collisionDetectionNode; }
     std::shared_ptr<ComputeNode> getCollisionHandlingANode() const { return m_collisionHandleANode; }
     std::shared_ptr<ComputeNode> getCollisionHandlingBNode() const { return m_collisionHandleBNode; }

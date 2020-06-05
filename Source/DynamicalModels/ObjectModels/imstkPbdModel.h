@@ -58,11 +58,11 @@ struct PBDModelConfig
     std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
         std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
         {
-            0.0,                                                                                  // Lame constant, if constraint type is FEM
-            0.0,                                                                                  // Lame constant, if constraint type is FEM
-            1000.0,                                                                               // FEM parameter, if constraint type is FEM
-            0.2                                                                                   // FEM parameter, if constraint type is FEM
-        });                                                                                       ///> Info shared between the fem constraints
+            0.0,                      // Lame constant, if constraint type is FEM
+            0.0,                      // Lame constant, if constraint type is FEM
+            1000.0,                   // FEM parameter, if constraint type is FEM
+            0.2                       // FEM parameter, if constraint type is FEM
+        });                           ///> Info shared between the fem constraints
 
     std::vector<std::pair<PbdConstraint::Type, double>> m_RegularConstraints;                     ///> Constraints except FEM
     std::vector<std::pair<PbdConstraint::Type, PbdFEMConstraint::MaterialType>> m_FEMConstraints; ///> Constraints except FEM

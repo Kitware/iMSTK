@@ -112,7 +112,7 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     // FEM constraint
     pbdParams->m_femParams->m_YoungModulus = 100.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = { 51, 127, 178 };
+    pbdParams->m_fixedNodeIds = { 50, 126, 177 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters

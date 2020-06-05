@@ -25,6 +25,7 @@
 
 namespace imstk
 {
+/// \brief TODO
 enum VulkanMemoryType
 {
     TEXTURE,
@@ -38,6 +39,7 @@ enum VulkanMemoryType
     FRAMEBUFFER
 };
 
+/// \brief TODO
 class VulkanInternalMemory
 {
 protected:
@@ -46,6 +48,7 @@ protected:
     friend class VulkanInternalImage;
     friend class VulkanInternalResource;
 
+    /// \brief TODO
     VulkanInternalMemory()
     {
         m_memory = new VkDeviceMemory();
@@ -62,6 +65,7 @@ protected:
     }
 };
 
+/// \brief TODO
 class VulkanInternalResource
 {
 public:
@@ -80,9 +84,12 @@ protected:
     VkDeviceSize m_size;
 };
 
+/// \brief TODO
 class VulkanInternalImage : public VulkanInternalResource
 {
 public:
+
+    /// \brief Constructor
     VulkanInternalImage(VkImage* image = nullptr)
     {
         if (image)
@@ -95,16 +102,21 @@ public:
         }
     };
 
+    /// \brief Get the image
     VkImage* getImage()
     {
         return m_image;
     }
 
+    /// \brief TODO
     void mapMemory(VkDevice& device, void** data)
     {
         vkMapMemory(device, *m_memory->m_memory, m_memoryOffset, m_size, 0, data);
     }
 
+    ///
+    /// \brief Set imange layout
+    ///
     void setImageLayout(const VkImageLayout imageLayout)
     {
         m_imageLayout = imageLayout;
@@ -123,20 +135,30 @@ protected:
     VkImageLayout m_imageLayout;
 };
 
+/// \brief
 class VulkanInternalBufferGroup : public VulkanInternalResource
 {
 public:
+    ///
+    /// \brief Constructor
+    ///
     explicit VulkanInternalBufferGroup(VulkanMemoryType type)
     {
         m_type   = type;
         m_buffer = new VkBuffer();
     };
 
+    ///
+    /// \brief TODO
+    ///
     VkBuffer* getBuffer()
     {
         return m_buffer;
     }
 
+    ///
+    /// \brief TODO
+    ///
     VkDeviceSize getSize()
     {
         return m_size;
@@ -155,21 +177,25 @@ protected:
 class VulkanInternalBuffer
 {
 public:
+    /// \brief TODO
     explicit VulkanInternalBuffer(VulkanInternalBufferGroup* bufferGroup)
     {
         m_bufferGroup = bufferGroup;
     };
 
+    /// \brief TODO
     VkBuffer* getBuffer()
     {
         return m_bufferGroup->getBuffer();
     }
 
+    /// \brief TODO
     VulkanInternalMemory* getMemory()
     {
         return m_bufferGroup->getMemory();
     }
 
+    /// \brief TODO
     void* getMemoryData(VkDevice& device)
     {
         void* data;
@@ -189,16 +215,19 @@ public:
         return &m_bufferGroup->m_data[m_offset];
     }
 
+    /// \brief TODO
     void unmapMemory(VkDevice& device)
     {
         vkUnmapMemory(device, *m_bufferGroup->getMemory()->m_memory);
     }
 
+    /// \brief TODO
     VkDeviceSize getSize()
     {
         return m_size;
     }
 
+    /// \brief TODO
     VkDeviceSize getOffset()
     {
         return m_offset;

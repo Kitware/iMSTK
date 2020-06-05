@@ -64,24 +64,38 @@
 
 namespace imstk
 {
+///
+/// \struct VulkanRendererConstants
+/// \brief TODO
+///
 struct VulkanRendererConstants
 {
     unsigned int numLights;
 };
 
+///
+/// \struct VulkanRenderer
+/// \brief TODO
+///
 class VulkanRenderer : public Renderer
 {
 public:
     explicit VulkanRenderer(std::shared_ptr<Scene> scene);
     ~VulkanRenderer();
 
+    /// \brief TODO
     void setShadowMapResolution(uint32_t resolution);
 
+    /// \brief TODO
     void setResolution(unsigned int width, unsigned int height);
 
+    /// \brief TODO
     void setBloomOn();
+
+    /// \brief TODO
     void setBloomOff();
 
+    /// \brief TODO
     void enableLensDistortion(const float distortion);
 
 protected:
@@ -186,12 +200,16 @@ protected:
     friend class VulkanPostProcess;
     friend class VulkanPostProcessingChain;
 
+    /// \brief TODO
     void createInstance();
 
+    /// \brief TODO
     void initialize(const unsigned int width,
                     const unsigned int height,
                     const unsigned int windowWidth,
                     const unsigned int windowHeight);
+
+    /// \brief TODO
     void loadAllVisualModels();
 
     ///

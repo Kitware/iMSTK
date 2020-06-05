@@ -28,6 +28,9 @@ namespace imstk
 class Geometry;
 class AnimationModel;
 
+/// 
+/// \brief TODO
+/// 
 class AnimationObject : public SceneObject
 {
 public:

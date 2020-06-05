@@ -30,6 +30,7 @@ namespace imstk
 class Geometry;
 class GeometryMap;
 
+/// \brief TODO
 class CollidingObject : public SceneObject
 {
 public:
