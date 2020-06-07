@@ -46,19 +46,17 @@ public:
     ///
     /// \brief Initializes the distance constraint
     ///
-    void initConstraint(
-        const StdVectorOfVec3d& initVertexPositions,
-        const size_t& pIdx1, const size_t& pIdx2, const double k = 1e-1);
+    void initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                        const size_t& pIdx0, 
+                        const size_t& pIdx1, 
+                        const double k = 1e5);
 
-    ///
-    /// \brief Solves the Distance constraint
-    ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& currInvMasses) override;
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                 double& c,
+                                 StdVectorOfVec3d& dcdx) const override;
+
 
 public:
     double m_restLength = 0.0; ///> Rest length between the nodes
-    double m_stiffness  = 0.0; ///> Stiffness of the constaint
 };
 } // imstk

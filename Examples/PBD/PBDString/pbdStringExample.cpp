@@ -91,8 +91,8 @@ main()
 
         // Configure the parameters with bend stiffnesses varying from 0.001 to ~0.1
         sims[i].params = std::make_shared<PBDModelConfig>();
-        sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 0.001);
-        sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
+        sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 1e7);
+        sims[i].params->enableConstraint(PbdConstraint::Type::Bend, (static_cast<double>(i) * 0.1 / numStrings + 0.001)*1e6);
         sims[i].params->m_fixedNodeIds     = { 0 };
         sims[i].params->m_uniformMassValue = 5.0;
         sims[i].params->m_gravity    = Vec3d(0, -9.8, 0);

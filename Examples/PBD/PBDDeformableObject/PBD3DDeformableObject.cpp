@@ -66,15 +66,16 @@ main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->femParams->m_YoungModulus = 100.0;
-    pbdParams->femParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = { 51, 127, 178 };
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.3;
+    pbdParams->m_fixedNodeIds = { 50, 126, 177 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_iterations = 45;
+    pbdParams->m_iterations = 15;
+    // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
 
     // Set the parameters
     pbdModel->configure(pbdParams);

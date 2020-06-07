@@ -42,23 +42,36 @@ PbdSolver::solve()
     const PBDConstraintVector&              constraints = *m_constraints;
     const std::vector<PBDConstraintVector>& partitionedConstraints = *m_partitionedConstraints;
 
+    // zero out the Lagrange multiplier
+    for (size_t j = 0; j < constraints.size(); ++j)
+    {
+        constraints[j]->zeroOutLambda();
+    }
+
+    for (size_t j = 0; j < partitionedConstraints.size(); j++)
+    {
+        const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
+        ParallelUtils::parallelFor(constraintPartition.size(),
+                                   [&](const size_t idx) { constraintPartition[idx]->zeroOutLambda(); }
+                                  );
+    }
+
     unsigned int i = 0;
     while (i++ < m_iterations)
     {
-        for (size_t j = 0; j < constraints.size(); j++)
+        for (size_t j = 0; j < constraints.size(); ++j)
         {
-            constraints[j]->solvePositionConstraint(currPositions, invMasses);
+            constraints[j]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
         }
 
         for (size_t j = 0; j < partitionedConstraints.size(); j++)
         {
             const PBDConstraintVector& constraintPartition       = partitionedConstraints[j];
-            const size_t               numConstraintsInPartition = constraintPartition.size();
 
             ParallelUtils::parallelFor(constraintPartition.size(),
                 [&](const size_t idx)
                 {
-                    constraintPartition[idx]->solvePositionConstraint(currPositions, invMasses);
+                    constraintPartition[idx]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
                 });
             // Sequential
             /*for (size_t k = 0; k < constraintPartition.size(); k++)
@@ -104,7 +117,7 @@ PbdCollisionSolver::solve()
                 const PBDCollisionConstraintVector& constraints = *constraintList;
                 for (size_t j = 0; j < constraints.size(); j++)
                 {
-                    constraints[j]->solvePositionConstraint(posA, posB, invMassA, invMassB);
+                    constraints[j]->projectConstraint(invMassA, invMassB, posA, posB);
                 }
                 colDataIter++;
             }

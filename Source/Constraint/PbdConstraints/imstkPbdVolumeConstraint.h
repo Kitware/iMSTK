@@ -49,17 +49,16 @@ public:
     void initConstraint(const StdVectorOfVec3d& initVertexPositions,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
-                        double k = 2.0);
+                        const double k = 2.0);
 
     ///
-    /// \brief Solves the volume constraint
+    /// \brief Compute the value and gradient of constraint
     ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& currInvMasses) override;
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
+                                 double& c, 
+                                 StdVectorOfVec3d& dcdx) const override;
 
 protected:
     double m_restVolume = 0.0; ///> Rest volume
-    double m_stiffness  = 1.0;
 };
-}
+} // imstk

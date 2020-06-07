@@ -44,10 +44,11 @@ PbdConstantDensityConstraint::initConstraint(const StdVectorOfVec3d& initVertexP
     m_NeighborSearcher = std::make_shared<NeighborSearch>(m_NeighborSearchMethod, m_maxDist);
 }
 
-bool
-PbdConstantDensityConstraint::solvePositionConstraint(
-    StdVectorOfVec3d&      currVertexPositions,
-    const StdVectorOfReal& currInvMasses)
+void
+PbdConstantDensityConstraint::projectConstraint(const StdVectorOfReal& currInvMasses, 
+                                                const double dt, 
+                                                const PbdConstraint::SolverType& type,
+                                                StdVectorOfVec3d&      currVertexPositions)
 {
     const size_t numParticles = currVertexPositions.size();
 
@@ -68,8 +69,6 @@ PbdConstantDensityConstraint::solvePositionConstraint(
         [&](const size_t idx) {
             updatePositions(currVertexPositions[idx], idx, currVertexPositions);
     });
-
-    return true;
 }
 
 double

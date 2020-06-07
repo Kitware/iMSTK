@@ -25,6 +25,7 @@
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdState.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -55,16 +56,16 @@ struct PBDModelConfig
     std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
     Vec3r m_gravity = Vec3r(0, -9.81, 0);    ///> Gravity
 
-    std::shared_ptr<PbdFEMConstraintConfig> femParams =
+    std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
         std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
         {
-            0.0,                                                                                  // Lame constant, if constraint type is FEM
-            0.0,                                                                                  // Lame constant, if constraint type is FEM
-            1000.0,                                                                               // FEM parameter, if constraint type is FEM
-            0.2                                                                                   // FEM parameter, if constraint type is FEM
+            0.0,                // Lame constant, if constraint type is FEM
+            0.0,                // Lame constant, if constraint type is FEM
+            1000.0,             // FEM parameter, if constraint type is FEM
+            0.2                 // FEM parameter, if constraint type is FEM
         });                                                                                       ///> Info shared between the fem constraints
 
-    std::vector<std::pair<PbdConstraint::Type, double>> m_RegularConstraints;                     ///> Constraints except FEM
+    std::vector<std::pair<PbdConstraint::Type, double>> m_regularConstraints;                     ///> Constraints except FEM
     std::vector<std::pair<PbdConstraint::Type, PbdFEMConstraint::MaterialType>> m_FEMConstraints; ///> Constraints except FEM
 
     ///
@@ -77,6 +78,23 @@ struct PBDModelConfig
     /// \brief Enable a FEM constraint with mu, lambda
     ///
     void enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::MaterialType material);
+
+    ///
+    /// \brief Set the PBD solver type
+    ///
+    void setSolverType(const PbdConstraint::SolverType& type)
+    {
+        if (type == PbdConstraint::SolverType::GCD)
+        {
+            LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
+            m_solverType = PbdConstraint::SolverType::xPBD;
+            return;
+        }
+
+        m_solverType = type;
+    }
+
+    PbdConstraint::SolverType m_solverType = PbdConstraint::SolverType::xPBD;
 };
 
 ///
@@ -105,7 +123,7 @@ public:
     ///
     /// \brief Get the simulation parameters
     ///
-    const std::shared_ptr<PBDModelConfig>& getParameters() const { assert(m_Parameters); return m_Parameters; }
+    const std::shared_ptr<PBDModelConfig>& getParameters() const { assert(m_parameters); return m_parameters; }
 
     ///
     /// \brief Compute elastic constants: Young Modulus, Poisson Ratio, first and second Lame
@@ -167,8 +185,8 @@ public:
     ///
     /// \brief Set the time step size
     ///
-    virtual void setTimeStep(const Real timeStep) override { m_Parameters->m_dt = timeStep; }
-    void setDefaultTimeStep(const Real timeStep) { m_Parameters->m_defaultDt = static_cast<Real>(timeStep); }
+    virtual void setTimeStep(const Real timeStep) override { m_parameters->m_dt = timeStep; }
+    void setDefaultTimeStep(const Real timeStep) { m_parameters->m_defaultDt = static_cast<Real>(timeStep); }
 
     ///
     /// \brief Set the time step size to fixed size
@@ -178,8 +196,8 @@ public:
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const override { return m_Parameters->m_dt; }
-    double getDefaultTimeStep() const { return m_Parameters->m_defaultDt; }
+    virtual double getTimeStep() const override { return m_parameters->m_dt; }
+    double getDefaultTimeStep() const { return m_parameters->m_defaultDt; }
 
     ///
     /// \brief
@@ -263,6 +281,7 @@ protected:
     void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
 
 protected:
+    bool m_partitioned = false; /// \todo this is used in initialize() as a temporary fix to problems on linux
     size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
 
     std::shared_ptr<PbdSolver>       m_pbdSolver = nullptr;                               ///> PBD solver
@@ -272,7 +291,7 @@ protected:
 
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> List of pbd constraints
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> List of pbd constraints
-    std::shared_ptr<PBDModelConfig> m_Parameters = nullptr;                               ///> Model parameters, must be set before simulation
+    std::shared_ptr<PBDModelConfig> m_parameters = nullptr;                               ///> Model parameters, must be set before simulation
 
 protected:
     // Computational Nodes

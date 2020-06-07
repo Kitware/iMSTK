@@ -27,7 +27,9 @@ namespace imstk
 {
 void
 PbdPointTriangleConstraint::initConstraint(const size_t& pIdxA1,
-                                           const size_t& pIdxB1, const size_t& pIdxB2, const size_t& pIdxB3,
+                                           const size_t& pIdxB1, 
+                                           const size_t& pIdxB2, 
+                                           const size_t& pIdxB3,
                                            std::shared_ptr<PbdCollisionConstraintConfig> configA,
                                            std::shared_ptr<PbdCollisionConstraintConfig> configB)
 {
@@ -40,21 +42,21 @@ PbdPointTriangleConstraint::initConstraint(const size_t& pIdxA1,
 }
 
 bool
-PbdPointTriangleConstraint::solvePositionConstraint(
-    StdVectorOfVec3d&      currVertexPositionsA,
-    StdVectorOfVec3d&      currVertexPositionsB,
-    const StdVectorOfReal& currInvMassesA,
-    const StdVectorOfReal& currInvMassesB)
+PbdPointTriangleConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
+                                                    const StdVectorOfVec3d& currVertexPositionsB,
+                                                    double& c,
+                                                    StdVectorOfVec3d& dcdxA,
+                                                    StdVectorOfVec3d& dcdxB) const
 {
     const size_t i0 = m_bodiesFirst[0];
     const size_t i1 = m_bodiesSecond[0];
     const size_t i2 = m_bodiesSecond[1];
     const size_t i3 = m_bodiesSecond[2];
 
-    Vec3d& x0 = currVertexPositionsA[i0];
-    Vec3d& x1 = currVertexPositionsB[i1];
-    Vec3d& x2 = currVertexPositionsB[i2];
-    Vec3d& x3 = currVertexPositionsB[i3];
+    const Vec3d& x0 = currVertexPositionsA[i0];
+    const Vec3d& x1 = currVertexPositionsB[i1];
+    const Vec3d& x2 = currVertexPositionsB[i2];
+    const Vec3d& x3 = currVertexPositionsB[i3];
 
     const Vec3d x12 = x2 - x1;
     const Vec3d x13 = x3 - x1;
@@ -67,6 +69,7 @@ PbdPointTriangleConstraint::solvePositionConstraint(
     if (alpha < 0 || beta < 0 || alpha + beta > 1)
     {
         //LOG(WARNING) << "Projection point not inside the triangle";
+        c = 0.0;
         return false;
     }
 
@@ -78,49 +81,19 @@ PbdPointTriangleConstraint::solvePositionConstraint(
 
     if (l > dist)
     {
+        c = 0.0;
         return false;
     }
 
     double gamma = 1.0 - alpha - beta;
-    Vec3d  grad0 = n;
-    Vec3d  grad1 = -alpha * n;
-    Vec3d  grad2 = -beta * n;
-    Vec3d  grad3 = -gamma * n;
+    dcdxA.resize(1);
+    dcdxB.resize(3);
+    dcdxA[0] = n;
+    dcdxB[0] = -alpha * n;
+    dcdxB[1] = -beta * n;
+    dcdxB[2] = -gamma * n;
 
-    const Real im0 = currInvMassesA[i0];
-    const Real im1 = currInvMassesB[i1];
-    const Real im2 = currInvMassesB[i2];
-    const Real im3 = currInvMassesB[i3];
-
-    double lambda = im0 * grad0.squaredNorm() +
-                    im1 * grad1.squaredNorm() +
-                    im2 * grad2.squaredNorm() +
-                    im3 * grad3.squaredNorm();
-
-    lambda = (l - dist) / lambda;
-
-    //LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
-
-    if (im0 > 0)
-    {
-        x0 += -im0 * lambda * grad0 * m_configA->m_stiffness;
-    }
-
-    if (im1 > 0)
-    {
-        x1 += -im1 * lambda * grad1 * m_configB->m_stiffness;
-    }
-
-    if (im2 > 0)
-    {
-        x2 += -im2 * lambda * grad2 * m_configB->m_stiffness;
-    }
-
-    if (im3 > 0)
-    {
-        x3 += -im3 * lambda * grad3 * m_configB->m_stiffness;
-    }
-
+    c = l - dist;
     return true;
 }
 } // imstk

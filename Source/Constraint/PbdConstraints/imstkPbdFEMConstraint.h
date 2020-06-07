@@ -74,6 +74,6 @@ public:
     MaterialType m_material;            ///> Material type
     Mat3d m_invRestMat;
 
-    std::shared_ptr<PbdFEMConstraintConfig> config = nullptr;
+    std::shared_ptr<PbdFEMConstraintConfig> m_config = nullptr;
 };
-}
+} // imstk

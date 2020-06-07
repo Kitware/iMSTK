@@ -99,17 +99,16 @@ main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // Constraints
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
-    std::vector<size_t> fixedNodes(nCols);
-    for (size_t i = 0; i < fixedNodes.size(); i++)
-    {
-        fixedNodes[i] = i;
-    }
+    // pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
+    // pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e2);
+    // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    std::vector<size_t> fixedNodes = {0, nCols-1};
     pbdParams->m_fixedNodeIds = fixedNodes;
 
     // Other parameters
-    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;

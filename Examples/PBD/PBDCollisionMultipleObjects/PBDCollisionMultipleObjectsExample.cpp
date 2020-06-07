@@ -119,8 +119,8 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->femParams->m_YoungModulus = 1000.0;
-    pbdParams->femParams->m_PoissonRatio = 0.3;
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters

@@ -20,26 +20,30 @@
 =========================================================================*/
 
 #include "imstkPbdDihedralConstraint.h"
+#include <iostream>
 
 namespace  imstk
 {
 void
 PbdDihedralConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                                      const size_t& pIdx1, const size_t& pIdx2,
-                                      const size_t& pIdx3, const size_t& pIdx4,
+                                      const size_t& pIdx0, 
+                                      const size_t& pIdx1,
+                                      const size_t& pIdx2, 
+                                      const size_t& pIdx3,
                                       const double k)
 {
-    m_vertexIds[0] = pIdx1;
-    m_vertexIds[1] = pIdx2;
-    m_vertexIds[2] = pIdx3;
-    m_vertexIds[3] = pIdx4;
+    m_vertexIds[0] = pIdx0;
+    m_vertexIds[1] = pIdx1;
+    m_vertexIds[2] = pIdx2;
+    m_vertexIds[3] = pIdx3;
 
     m_stiffness = k;
+    m_compliance = 1.0 / k;
 
-    const Vec3d& p0 = initVertexPositions[pIdx1];
-    const Vec3d& p1 = initVertexPositions[pIdx2];
-    const Vec3d& p2 = initVertexPositions[pIdx3];
-    const Vec3d& p3 = initVertexPositions[pIdx4];
+    const Vec3d& p0 = initVertexPositions[pIdx0];
+    const Vec3d& p1 = initVertexPositions[pIdx1];
+    const Vec3d& p2 = initVertexPositions[pIdx2];
+    const Vec3d& p3 = initVertexPositions[pIdx3];
 
     const Vec3d n1 = (p2 - p0).cross(p3 - p0).normalized();
     const Vec3d n2 = (p3 - p1).cross(p2 - p1).normalized();
@@ -48,29 +52,19 @@ PbdDihedralConstraint::initConstraint(const StdVectorOfVec3d& initVertexPosition
 }
 
 bool
-PbdDihedralConstraint::solvePositionConstraint(
-    StdVectorOfVec3d&      currVertexPositions,
-    const StdVectorOfReal& invMasses)
+PbdDihedralConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                               double& c,
+                                               StdVectorOfVec3d& dcdx) const 
 {
-    const auto i1 = m_vertexIds[0];
-    const auto i2 = m_vertexIds[1];
-    const auto i3 = m_vertexIds[2];
-    const auto i4 = m_vertexIds[3];
+    const auto i0 = m_vertexIds[0];
+    const auto i1 = m_vertexIds[1];
+    const auto i2 = m_vertexIds[2];
+    const auto i3 = m_vertexIds[3];
 
-    Vec3d& p0 = currVertexPositions[i1];
-    Vec3d& p1 = currVertexPositions[i2];
-    Vec3d& p2 = currVertexPositions[i3];
-    Vec3d& p3 = currVertexPositions[i4];
-
-    const auto im0 = invMasses[i1];
-    const auto im1 = invMasses[i2];
-    const auto im2 = invMasses[i3];
-    const auto im3 = invMasses[i4];
-
-    if (im0 == 0.0 && im1 == 0.0)
-    {
-        return false;
-    }
+    const Vec3d& p0 = currVertexPositions[i0];
+    const Vec3d& p1 = currVertexPositions[i1];
+    const Vec3d& p2 = currVertexPositions[i2];
+    const Vec3d& p3 = currVertexPositions[i3];
 
     const auto e  = p3 - p2;
     const auto e1 = p3 - p0;
@@ -91,39 +85,15 @@ PbdDihedralConstraint::solvePositionConstraint(
         return false;
     }
 
-    const Vec3d grad0 = -(l / A1) * n1;
-    const Vec3d grad1 = -(l / A2) * n2;
-    const Vec3d grad2 = (e.dot(e1) / (A1 * l)) * n1 + (e.dot(e3) / (A2 * l)) * n2;
-    const Vec3d grad3 = (e.dot(e2) / (A1 * l)) * n1 + (e.dot(e4) / (A2 * l)) * n2;
+    dcdx.resize(4);
+    dcdx[0] = -(l / A1) * n1;
+    dcdx[1] = -(l / A2) * n2;
+    dcdx[2] = (e.dot(e1) / (A1 * l)) * n1 + (e.dot(e3) / (A2 * l)) * n2;
+    dcdx[3] = (e.dot(e2) / (A1 * l)) * n1 + (e.dot(e4) / (A2 * l)) * n2;
 
-    auto lambda = im0 * grad0.squaredNorm() +
-                  im1 * grad1.squaredNorm() +
-                  im2 * grad2.squaredNorm() +
-                  im3 * grad3.squaredNorm();
-
-    // huge difference if use acos instead of atan2
-    lambda = (atan2(n1.cross(n2).dot(e), l * n1.dot(n2)) - m_restAngle) / lambda * m_stiffness;
-
-    if (im0 > 0)
-    {
-        p0 += -im0 * lambda * grad0;
-    }
-
-    if (im1 > 0)
-    {
-        p1 += -im1 * lambda * grad1;
-    }
-
-    if (im2 > 0)
-    {
-        p2 += -im2 * lambda * grad2;
-    }
-
-    if (im3 > 0)
-    {
-        p3 += -im3 * lambda * grad3;
-    }
+    c = atan2(n1.cross(n2).dot(e), l * n1.dot(n2)) - m_restAngle; 
 
     return true;
 }
 } // imstk
+

@@ -59,9 +59,17 @@ public:
     ///
     /// \brief Solves the constant density constraint
     ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& currInvMasses) override;
+    void projectConstraint(const StdVectorOfReal& currInvMasses,
+                           const double dt,
+                           const PbdConstraint::SolverType& type,
+                           StdVectorOfVec3d&      currVertexPositions) override;
+
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                 double& c,
+                                 StdVectorOfVec3d& dcdx) const 
+    {
+        return true;
+    }
 
 private:
     ///

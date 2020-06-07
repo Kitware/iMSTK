@@ -54,10 +54,10 @@ public:
                         std::shared_ptr<PbdFEMConstraintConfig> config);
 
     ///
-    /// \brief Solve the tetrahedral FEM constraint
+    /// \brief Compute the value and gradient of constraint
     ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& currInvMasses) override;
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
+                                 double& c, 
+                                 StdVectorOfVec3d& dcdx) const override;
 };
 } // imstk

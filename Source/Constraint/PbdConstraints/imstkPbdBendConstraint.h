@@ -53,7 +53,7 @@ public:
                /
             p2
         \param model
-        \param pIdx1 index of p0
+        \param pIdx0 index of p0
         \param pIdx2 index of p1
         \param pIdx3 index of p2
         \param k stiffness
@@ -64,14 +64,12 @@ public:
         const size_t& pIdx3, const double k);
 
     ///
-    /// \brief Solves the bend constraint
+    /// \brief Compute the value and gradient of constraint
     ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& currInvMasses) override;
-
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
+                                  double& c, 
+                                  StdVectorOfVec3d& dcdx) const override;
 public:
     double m_restLength = 0.; ///> Rest length
-    double m_stiffness  = 0.; ///> Bend stiffness
 };
 } //imstk
