@@ -755,7 +755,6 @@ TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
 std::unordered_map<std::shared_ptr<TaskNode>, double>
 TaskGraph::getNodeStartTimes(std::shared_ptr<TaskGraph> graph)
 {
-    const TaskNodeVector&  nodes   = graph->getNodes();
     const TaskNodeAdjList& adjList = graph->getAdjList();
 
     // Setup a map for total elapsed times at each node
