@@ -22,12 +22,10 @@ limitations under the License.
 #include "imstkCollisionPair.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
+#include "imstkDynamicObject.h"
 #include "imstkInteractionPair.h"
 #include "imstkLogger.h"
-#include "imstkDynamicObject.h"
-#include "imstkComputeGraphVizWriter.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -70,7 +68,7 @@ void
 CollisionPair::setCollisionDetection(std::shared_ptr<CollisionDetection> colDetect)
 {
     m_colDetect = colDetect;
-    m_collisionDetectionNode = m_interactionFunction = m_colDetect->getComputeNode();
+    m_collisionDetectionNode = m_interactionFunction = m_colDetect->getTaskNode();
     m_collisionDetectionNode->m_name = getObjectsPair().first->getName() + "_" + getObjectsPair().second->getName() + "_CollisionDetection";
     m_colData = m_colDetect->getCollisionData();
 }
@@ -79,7 +77,7 @@ void
 CollisionPair::setCollisionHandlingA(std::shared_ptr<CollisionHandling> colHandlingA)
 {
     m_colHandlingA = colHandlingA;
-    m_collisionHandleANode = m_colHandlingA->getComputeNode();
+    m_collisionHandleANode = m_colHandlingA->getTaskNode();
     m_collisionHandleANode->m_name = getObjectsPair().first->getName() + "_CollisionHandling";
 }
 
@@ -87,7 +85,7 @@ void
 CollisionPair::setCollisionHandlingB(std::shared_ptr<CollisionHandling> colHandlingB)
 {
     m_colHandlingB = colHandlingB;
-    m_collisionHandleBNode = m_colHandlingB->getComputeNode();
+    m_collisionHandleBNode = m_colHandlingB->getTaskNode();
     m_collisionHandleBNode->m_name = getObjectsPair().second->getName() + "_CollisionHandling";
 }
 
@@ -95,31 +93,31 @@ void
 CollisionPair::setCollisionHandlingAB(std::shared_ptr<CollisionHandling> colHandlingAB)
 {
     m_colHandlingA = m_colHandlingB = colHandlingAB;
-    m_collisionHandleANode = m_collisionHandleBNode = colHandlingAB->getComputeNode();
+    m_collisionHandleANode = m_collisionHandleBNode = colHandlingAB->getTaskNode();
     m_collisionHandleANode->m_name = getObjectsPair().first->getName() + '_' + getObjectsPair().second->getName() + "_CollisionHandling";
 }
 
 void
-CollisionPair::modifyComputeGraph()
+CollisionPair::apply()
 {
-    std::shared_ptr<ComputeGraph> computeGraphA = m_objects.first->getComputeGraph();
-    std::shared_ptr<ComputeGraph> computeGraphB = m_objects.second->getComputeGraph();
+    std::shared_ptr<TaskGraph> computeGraphA = m_objects.first->getTaskGraph();
+    std::shared_ptr<TaskGraph> computeGraphB = m_objects.second->getTaskGraph();
 
     // If nothing was added to the input/output list use default collision location
-    if ((m_computeNodeInputs.first.size() == 0) && (m_computeNodeInputs.second.size() == 0)
-        && (m_computeNodeOutputs.first.size() == 0) && (m_computeNodeOutputs.second.size() == 0))
+    if ((m_taskNodeInputs.first.size() == 0) && (m_taskNodeInputs.second.size() == 0)
+        && (m_taskNodeOutputs.first.size() == 0) && (m_taskNodeOutputs.second.size() == 0))
     {
-        m_computeNodeInputs.first.clear();
-        m_computeNodeInputs.second.clear();
-        m_computeNodeOutputs.first.clear();
-        m_computeNodeOutputs.second.clear();
+        m_taskNodeInputs.first.clear();
+        m_taskNodeInputs.second.clear();
+        m_taskNodeOutputs.first.clear();
+        m_taskNodeOutputs.second.clear();
 
-        // Default location is the first node in the SceneObject
-        m_computeNodeInputs.first.push_back(computeGraphA->getSource());
-        m_computeNodeInputs.first.push_back(computeGraphB->getSource());
+        // Default location is inbetween the source->updateNode
+        m_taskNodeInputs.first.push_back(computeGraphA->getSource());
+        m_taskNodeInputs.second.push_back(computeGraphB->getSource());
 
-        m_computeNodeInputs.first.push_back(m_objects.first->getUpdateNode());
-        m_computeNodeInputs.first.push_back(m_objects.second->getUpdateNode());
+        m_taskNodeOutputs.first.push_back(m_objects.first->getUpdateNode());
+        m_taskNodeOutputs.second.push_back(m_objects.second->getUpdateNode());
     }
 
     // Add all the nodes to the graph
@@ -137,15 +135,15 @@ CollisionPair::modifyComputeGraph()
     // Add the edges
     {
         // Connect inputA's->CD
-        for (size_t i = 0; i < m_computeNodeInputs.first.size(); i++)
+        for (size_t i = 0; i < m_taskNodeInputs.first.size(); i++)
         {
-            computeGraphA->addEdge(m_computeNodeInputs.first[i], m_collisionDetectionNode);
+            computeGraphA->addEdge(m_taskNodeInputs.first[i], m_collisionDetectionNode);
         }
 
         // Connect inputB's->CD
-        for (size_t i = 0; i < m_computeNodeInputs.second.size(); i++)
+        for (size_t i = 0; i < m_taskNodeInputs.second.size(); i++)
         {
-            computeGraphA->addEdge(m_computeNodeInputs.second[i], m_collisionDetectionNode);
+            computeGraphA->addEdge(m_taskNodeInputs.second[i], m_collisionDetectionNode);
         }
     }
 
@@ -163,27 +161,27 @@ CollisionPair::modifyComputeGraph()
     }
 
     // Connect either CD or CHA/CHAB to outputA's
-    for (size_t i = 0; i < m_computeNodeOutputs.first.size(); i++)
+    for (size_t i = 0; i < m_taskNodeOutputs.first.size(); i++)
     {
         if (m_collisionHandleANode != nullptr)
         {
-            computeGraphA->addEdge(m_collisionHandleANode, m_computeNodeOutputs.first[i]);
+            computeGraphA->addEdge(m_collisionHandleANode, m_taskNodeOutputs.first[i]);
         }
         else
         {
-            computeGraphA->addEdge(m_collisionDetectionNode, m_computeNodeOutputs.first[i]);
+            computeGraphA->addEdge(m_collisionDetectionNode, m_taskNodeOutputs.first[i]);
         }
     }
     // Connect eitehr CD or CHB/CHAB to outputB's
-    for (size_t i = 0; i < m_computeNodeOutputs.second.size(); i++)
+    for (size_t i = 0; i < m_taskNodeOutputs.second.size(); i++)
     {
         if (m_collisionHandleBNode != nullptr)
         {
-            computeGraphB->addEdge(m_collisionHandleBNode, m_computeNodeOutputs.second[i]);
+            computeGraphB->addEdge(m_collisionHandleBNode, m_taskNodeOutputs.second[i]);
         }
         else
         {
-            computeGraphB->addEdge(m_collisionDetectionNode, m_computeNodeOutputs.second[i]);
+            computeGraphB->addEdge(m_collisionDetectionNode, m_taskNodeOutputs.second[i]);
         }
     }
 }

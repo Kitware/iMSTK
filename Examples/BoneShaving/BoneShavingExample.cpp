@@ -105,13 +105,9 @@ main()
     auto objController = std::make_shared<SceneObjectController>(drill, deviceTracker);
     scene->addObjectController(objController);
 
-    // Create a collision graph
-    auto graph = scene->getCollisionGraph();
-    auto pair  = graph->addInteractionPair(bone,
-        drill,
-        CollisionDetection::Type::PointSetToSphere,
-        CollisionHandling::Type::BoneDrilling,
-        CollisionHandling::Type::None);
+    // Add interaction
+    scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
+        InteractionType::FemObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
 
 #endif
 

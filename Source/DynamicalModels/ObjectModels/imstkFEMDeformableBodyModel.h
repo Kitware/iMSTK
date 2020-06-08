@@ -266,7 +266,7 @@ public:
     void disableFixedBC() { m_implementFixedBC = false; };
     bool isFixedBCImplemented() const { return m_implementFixedBC; };
 
-    std::shared_ptr<ComputeNode> getSolveNode() const { return m_solveNode; }
+    std::shared_ptr<TaskNode> getSolveNode() const { return m_solveNode; }
 
     std::shared_ptr<SolverBase> getSolver() const { return m_solver; }
     void setSolver(std::shared_ptr<SolverBase> solver) { this->m_solver = solver; }
@@ -275,7 +275,7 @@ protected:
     ///
     /// \brief Setup the computational graph of FEM
     ///
-    void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     std::shared_ptr<SolverBase> m_solver = nullptr;
@@ -314,6 +314,6 @@ protected:
     bool m_implementFixedBC = true;
 
 private:
-    std::shared_ptr<ComputeNode> m_solveNode = nullptr;
+    std::shared_ptr<TaskNode> m_solveNode = nullptr;
 };
 } // imstk

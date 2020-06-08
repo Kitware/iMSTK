@@ -94,17 +94,20 @@ main()
     auto objController = std::make_shared<SceneObjectController>(obj, deviceTracker);
     scene->addObjectController(objController);
 
-    // Create a collision graph
-    auto graph = scene->getCollisionGraph();
-    auto pair  = graph->addInteractionPair(planeObj, obj,
-        CollisionDetection::Type::UnidirectionalPlaneToSphere,
-        CollisionHandling::Type::None,
-        CollisionHandling::Type::VirtualCoupling);
+    {
+        // Setup CD, and collision data
+        auto                                colData   = std::make_shared<CollisionData>();
+        std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(CollisionDetection::Type::UnidirectionalPlaneToSphere,
+            planeObj, obj, colData);
 
-    // Customize collision handling algorithm
-    auto colHandlingAlgo = std::dynamic_pointer_cast<VirtualCouplingCH>(pair->getCollisionHandlingB());
-    colHandlingAlgo->setStiffness(5e-01);
-    colHandlingAlgo->setDamping(0.005);
+        // Setup the handler
+        auto colHandler = std::make_shared<VirtualCouplingCH>(CollisionHandling::Side::B, colData, planeObj, obj);
+        colHandler->setStiffness(5e-01);
+        colHandler->setDamping(0.005);
+
+        auto pair = std::make_shared<CollisionPair>(planeObj, obj, colDetect, nullptr, colHandler);
+        scene->getCollisionGraph()->addInteractionPair(pair);
+    }
 
     // Camera
     auto cam = scene->getCamera();

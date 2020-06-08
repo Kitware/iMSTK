@@ -69,12 +69,12 @@ public:
     std::shared_ptr<CollisionHandling> getCollisionHandlingA() const { return m_colHandlingA; }
     std::shared_ptr<CollisionHandling> getCollisionHandlingB() const { return m_colHandlingB; }
 
-    std::shared_ptr<ComputeNode> getCollisionDetectionNode() const { return m_collisionDetectionNode; }
-    std::shared_ptr<ComputeNode> getCollisionHandlingANode() const { return m_collisionHandleANode; }
-    std::shared_ptr<ComputeNode> getCollisionHandlingBNode() const { return m_collisionHandleBNode; }
+    std::shared_ptr<TaskNode> getCollisionDetectionNode() const { return m_collisionDetectionNode; }
+    std::shared_ptr<TaskNode> getCollisionHandlingANode() const { return m_collisionHandleANode; }
+    std::shared_ptr<TaskNode> getCollisionHandlingBNode() const { return m_collisionHandleBNode; }
 
 public:
-    virtual void modifyComputeGraph() override;
+    virtual void apply() override;
 
 protected:
     std::shared_ptr<CollisionDetection> m_colDetect    = nullptr; ///< Collision detection algorithm
@@ -82,8 +82,8 @@ protected:
     std::shared_ptr<CollisionHandling>  m_colHandlingA = nullptr;
     std::shared_ptr<CollisionHandling>  m_colHandlingB = nullptr;
 
-    std::shared_ptr<ComputeNode> m_collisionDetectionNode = nullptr;
-    std::shared_ptr<ComputeNode> m_collisionHandleANode   = nullptr;
-    std::shared_ptr<ComputeNode> m_collisionHandleBNode   = nullptr;
+    std::shared_ptr<TaskNode> m_collisionDetectionNode = nullptr;
+    std::shared_ptr<TaskNode> m_collisionHandleANode   = nullptr;
+    std::shared_ptr<TaskNode> m_collisionHandleBNode   = nullptr;
 };
 }

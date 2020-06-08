@@ -250,7 +250,7 @@ main()
                 pbdObjs.push_back(pbdObj);
 
                 scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdObj, floorObj,
-                    InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
+                    InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
             }
         }
     }
@@ -260,7 +260,7 @@ main()
         for (size_t j = i + 1; j < pbdObjs.size(); ++j)
         {
             scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdObjs[i], pbdObjs[j],
-                InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
+                InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
         }
     }
 

@@ -20,17 +20,16 @@
 =========================================================================*/
 
 #include "imstkSceneObject.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
 SceneObject::SceneObject(const std::string& name) :
     m_type(Type::Visual), m_name(name),
-    m_computeGraph(std::make_shared<ComputeGraph>("SceneObject_" + name + "_Source", "SceneObject_" + name + "_Sink")), SceneEntity()
+    m_taskGraph(std::make_shared<TaskGraph>("SceneObject_" + name + "_Source", "SceneObject_" + name + "_Sink")), SceneEntity()
 {
-    m_updateNode = m_computeGraph->addFunction("SceneObject_" + name + "_Update", [&]() { this->update(); });
-    m_updateGeometryNode = m_computeGraph->addFunction("SceneObject_" + name + "_UpdateGeometry", [&]() { this->updateGeometries(); });
+    m_updateNode = m_taskGraph->addFunction("SceneObject_" + name + "_Update", std::bind(&SceneObject::update, this));
+    m_updateGeometryNode = m_taskGraph->addFunction("SceneObject_" + name + "_UpdateGeometry", std::bind(&SceneObject::updateGeometries, this));
 }
 
 std::shared_ptr<Geometry>
@@ -59,15 +58,15 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 void
 SceneObject::initGraphEdges()
 {
-    m_computeGraph->clearEdges();
-    initGraphEdges(m_computeGraph->getSource(), m_computeGraph->getSink());
+    m_taskGraph->clearEdges();
+    initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
 }
 
 void
-SceneObject::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+SceneObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    m_computeGraph->addEdge(source, m_updateNode);
-    m_computeGraph->addEdge(m_updateNode, m_updateGeometryNode);
-    m_computeGraph->addEdge(m_updateGeometryNode, sink);
+    m_taskGraph->addEdge(source, m_updateNode);
+    m_taskGraph->addEdge(m_updateNode, m_updateGeometryNode);
+    m_taskGraph->addEdge(m_updateGeometryNode, sink);
 }
 } // imstk

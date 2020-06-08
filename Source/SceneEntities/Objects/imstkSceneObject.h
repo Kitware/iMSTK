@@ -29,10 +29,10 @@
 
 namespace imstk
 {
-class ComputeNode;
-class ComputeGraph;
 class DeviceClient;
 class Geometry;
+class TaskGraph;
+class TaskNode;
 
 ///
 /// \class SceneObject
@@ -73,7 +73,7 @@ public:
     ///
     /// \brief Get the computational graph
     ///
-    std::shared_ptr<ComputeGraph> getComputeGraph() const { return m_computeGraph; }
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
     ///
     /// \brief Get/Set the custom name of the scene object
@@ -113,12 +113,12 @@ public:
     ///
     /// \brief Returns the computational node for updating
     ///
-    std::shared_ptr<ComputeNode> getUpdateNode() const { return m_updateNode; }
+    std::shared_ptr<TaskNode> getUpdateNode() const { return m_updateNode; }
 
     ///
     /// \brief Returns the computational node for updating geometry
     ///
-    std::shared_ptr<ComputeNode> getUpdateGeometryNode() const { return m_updateGeometryNode; }
+    std::shared_ptr<TaskNode> getUpdateGeometryNode() const { return m_updateGeometryNode; }
 
     ///
     /// \brief
@@ -149,18 +149,18 @@ protected:
     ///
     /// \brief Setup connectivity of the compute graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink);
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
 protected:
     Type m_type;                                              ///> Type of the scene object
     std::string m_name;                                       ///> Custom name of the scene object
     std::vector<std::shared_ptr<VisualModel>> m_visualModels; ///> Visual objects for rendering
-    std::shared_ptr<ComputeGraph> m_computeGraph = nullptr;   ///> Computational Graph
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;         ///> Computational Graph
 
 private:
     // Dissallow reassignment of these in subclasses
-    std::shared_ptr<ComputeNode> m_updateNode = nullptr;
-    std::shared_ptr<ComputeNode> m_updateGeometryNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateGeometryNode = nullptr;
 };
 
 using VisualObject = SceneObject;

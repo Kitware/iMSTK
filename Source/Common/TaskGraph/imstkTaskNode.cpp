@@ -19,17 +19,17 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkComputeNode.h"
+#include "imstkTaskNode.h"
 #include "imstkTimer.h"
 
 namespace imstk
 {
 void
-ComputeNode::execute()
+TaskNode::execute()
 {
     if (m_enabled && m_func != nullptr)
     {
-        if (!m_enableBenchmarking)
+        if (!m_enableTiming)
         {
             m_func();
         }
@@ -38,13 +38,13 @@ ComputeNode::execute()
             StopWatch timer;
             timer.start();
             m_func();
-            m_elapsedTime = timer.getTimeElapsed();
+            m_computeTime = timer.getTimeElapsed();
             timer.stop();
         }
     }
     else
     {
-        m_elapsedTime = 0.0;
+        m_computeTime = 0.0;
     }
 }
 }

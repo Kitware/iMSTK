@@ -26,25 +26,25 @@ limitations under the License.
 
 namespace imstk
 {
-class ComputeGraph;
+class TaskGraph;
 
 ///
-/// \class ComputeGraph
+/// \class TaskGraphVizWriter
 ///
-/// \brief Writes a ComputeGraph to an svg file. Produces unique node names from duplicates with postfix.
-/// May also highlight cyclic graph edges.
+/// \brief Writes a TaskGraph to an svg file. Produces unique node names from duplicates with postfix.
+/// Can also color by node compute time and highlight the critical path
 ///
-class ComputeGraphVizWriter
+class TaskGraphVizWriter
 {
 public:
-    ComputeGraphVizWriter() = default;
-    virtual ~ComputeGraphVizWriter() = default;
+    TaskGraphVizWriter() = default;
+    virtual ~TaskGraphVizWriter() = default;
 
 public:
     ///
     /// \brief The graph to write
     ///
-    void setInput(std::shared_ptr<ComputeGraph> graph) { this->m_inputGraph = graph; }
+    void setInput(std::shared_ptr<TaskGraph> graph) { this->m_inputGraph = graph; }
 
     ///
     /// \brief The filename and path to write too
@@ -57,16 +57,20 @@ public:
     void setHighlightCriticalPath(bool highlightCriticalPath) { this->m_highlightCriticalPath = highlightCriticalPath; }
 
     ///
-    /// \brief If on, will write the time the node completed in the node name
-    /// This isn't exact timing (completion times of each node) as it was run in iMSTK,
-    /// this is timing purely from the timers around the execution of each step
+    /// \brief If on, will write the time the node took to complete as a color
     ///
-    void setWriteTimes(bool writeTimes) { this->m_writeTimes = writeTimes; }
+    void setWriteNodeComputeTimesColor(bool writeNodeComputeTimesColor) { this->m_writeNodeComputeTimesColor = writeNodeComputeTimesColor; }
 
-    std::shared_ptr<ComputeGraph> getInput() const { return m_inputGraph; }
+    ///
+    /// \brief If on, will write the time the node took to complete in name as text
+    ///
+    void setWriteNodeComputeTimesText(bool writeNodeComputeTimesText) { this->m_writeNodeComputeTimesText = writeNodeComputeTimesText; }
+
+    std::shared_ptr<TaskGraph> getInput() const { return m_inputGraph; }
     const std::string& getFileName() const { return m_fileName; }
     bool getHighlightCriticalPath() const { return m_highlightCriticalPath; }
-    bool getWriteTimes() const { return m_writeTimes; }
+    bool getWriteNodeComputeTimesColor() const { return m_writeNodeComputeTimesColor; }
+    bool getWriteNodeComputeTimesText() const { return m_writeNodeComputeTimesText; }
 
     ///
     /// \brief Writes the graph to a file given the filename
@@ -74,9 +78,10 @@ public:
     void write();
 
 private:
-    std::shared_ptr<ComputeGraph> m_inputGraph = nullptr;
-    std::string m_fileName       = "";
-    bool m_highlightCriticalPath = false;
-    bool m_writeTimes = false;
+    std::shared_ptr<TaskGraph> m_inputGraph = nullptr;
+    std::string m_fileName            = "";
+    bool m_highlightCriticalPath      = false;
+    bool m_writeNodeComputeTimesColor = false;
+    bool m_writeNodeComputeTimesText  = false;
 };
 }

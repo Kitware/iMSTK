@@ -20,14 +20,14 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkCollisionHandling.h"
-#include "imstkComputeNode.h"
+#include "imstkTaskNode.h"
 
 namespace imstk
 {
 CollisionHandling::CollisionHandling(const Type& type, const Side& side,
                                      const std::shared_ptr<CollisionData> colData) :
     m_type(type), m_side(side), m_colData(colData),
-    m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
+    m_taskNode(std::make_shared<TaskNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
 {
 }
 }

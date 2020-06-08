@@ -20,13 +20,13 @@
 =========================================================================*/
 
 #include "imstkAbstractDynamicalModel.h"
-#include "imstkComputeGraph.h"
 #include "imstkLogger.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
 AbstractDynamicalModel::AbstractDynamicalModel(DynamicalModelType type) :
-    m_type(type), m_numDOF(0), m_computeGraph(std::make_shared<ComputeGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
+    m_type(type), m_numDOF(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
 {
 }
 
@@ -75,25 +75,13 @@ AbstractDynamicalModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
 void
 AbstractDynamicalModel::initGraphEdges()
 {
-    m_computeGraph->clearEdges();
-    initGraphEdges(m_computeGraph->getSource(), m_computeGraph->getSink());
+    m_taskGraph->clearEdges();
+    initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
 }
 
 void
-AbstractDynamicalModel::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+AbstractDynamicalModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    m_computeGraph->addEdge(source, sink);
-}
-
-std::shared_ptr<ComputeNode>
-AbstractDynamicalModel::addFunction(std::string name, std::function<void()> func)
-{
-    return m_computeGraph->addFunction(name, func);
-}
-
-void
-AbstractDynamicalModel::addEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode)
-{
-    m_computeGraph->addEdge(srcNode, destNode);
+    m_taskGraph->addEdge(source, sink);
 }
 } // imstk
