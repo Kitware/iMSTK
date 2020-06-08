@@ -187,8 +187,8 @@ VTKViewer::startRenderingLoop()
 
         // If the Scene wants benchmarking hookup timer to update the table
         auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
-        vtkRen->setBenchmarkTableVisibility(m_activeScene->getConfig()->benchmarkingEnabled);
-        if (m_activeScene->getConfig()->benchmarkingEnabled)
+        vtkRen->setTimeTableVisibility(m_activeScene->getConfig()->taskTimingEnabled);
+        if (m_activeScene->getConfig()->taskTimingEnabled)
         {
             m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::TimerEvent, timerCallbackCommand);
             m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
@@ -251,16 +251,16 @@ VTKViewer::getTextStatusManager()
 }
 
 void
-VTKViewer::timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData)
+VTKViewer::timerCallback(vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
 {
     VTKViewer* self = static_cast<VTKViewer*>(clientData);
 
-    if (self->getActiveScene()->getConfig()->benchmarkingEnabled)
+    if (self->getActiveScene()->getConfig()->taskTimingEnabled)
     {
         auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(self->getActiveRenderer());
-        self->getActiveScene()->lockBenchmark();
-        vtkRen->setBenchmarkTable(self->getActiveScene()->getElapsedTimes());
-        self->getActiveScene()->unlockBenchmark();
+        self->getActiveScene()->lockComputeTimes();
+        vtkRen->setTimeTable(self->getActiveScene()->getTaskComputeTimes());
+        self->getActiveScene()->unlockComputeTimes();
     }
 }
 } // imstk

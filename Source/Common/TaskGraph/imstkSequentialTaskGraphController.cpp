@@ -19,23 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkSequentialComputeGraphController.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
+#include "imstkSequentialTaskGraphController.h"
+#include "imstkTaskGraph.h"
+#include "imstkTaskNode.h"
 
 namespace imstk
 {
 void
-SequentialComputeGraphController::init()
+SequentialTaskGraphController::init()
 {
-    m_executionOrderedNodes = ComputeGraph::topologicalSort(m_graph);
+    m_executionOrderedNodes = TaskGraph::topologicalSort(m_graph);
 }
 
 void
-SequentialComputeGraphController::execute()
+SequentialTaskGraphController::execute()
 {
     // Sequential
-    for (std::shared_ptr<ComputeNode> node : *m_executionOrderedNodes)
+    for (std::shared_ptr<TaskNode> node : *m_executionOrderedNodes)
     {
         node->execute();
     }

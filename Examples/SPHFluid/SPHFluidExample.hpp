@@ -108,12 +108,12 @@ main(int argc, char* argv[])
         if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
         {
             collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-                InteractionType::SphObjToCollidingObj_Collision, CollisionDetection::Type::PointSetToPlane));
+                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
         }
         else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
         {
             collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-                InteractionType::SphObjToCollidingObj_Collision, CollisionDetection::Type::PointSetToSphere));
+                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
         }
         else
         {

@@ -195,7 +195,7 @@ main()
 
     // Collision
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdDragon1, stairObj,
-        InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::MeshToMeshBruteForce));
+        InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light
     auto light = std::make_shared<DirectionalLight>("Light");

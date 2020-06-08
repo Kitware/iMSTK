@@ -19,18 +19,18 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
+#include "imstkTaskGraph.h"
 #include "imstkLogger.h"
+#include "imstkTaskNode.h"
 #include <queue>
-#include <stack>
 #include <set>
+#include <stack>
 
 namespace imstk
 {
-ComputeGraph::ComputeGraph(std::string sourceName, std::string sinkName) :
-    m_source(std::make_shared<ComputeNode>()),
-    m_sink(std::make_shared<ComputeNode>())
+TaskGraph::TaskGraph(std::string sourceName, std::string sinkName) :
+    m_source(std::make_shared<TaskNode>()),
+    m_sink(std::make_shared<TaskNode>())
 {
     m_source->m_name = sourceName;
     m_sink->m_name   = sinkName;
@@ -38,77 +38,77 @@ ComputeGraph::ComputeGraph(std::string sourceName, std::string sinkName) :
     addNode(m_sink);
 }
 
-ComputeNodeVector::iterator
-ComputeGraph::findNode(std::string name)
+TaskNodeVector::iterator
+TaskGraph::findNode(std::string name)
 {
     return std::find_if(m_nodes.begin(), m_nodes.end(),
-        [&name](const std::shared_ptr<ComputeNode>& x) { return x->m_name == name; });
+        [&name](const std::shared_ptr<TaskNode>& x) { return x->m_name == name; });
 }
 
-ComputeNodeVector::const_iterator
-ComputeGraph::findNode(std::string name) const
+TaskNodeVector::const_iterator
+TaskGraph::findNode(std::string name) const
 {
     return std::find_if(m_nodes.begin(), m_nodes.end(),
-        [&name](const std::shared_ptr<ComputeNode>& x) { return x->m_name == name; });
+        [&name](const std::shared_ptr<TaskNode>& x) { return x->m_name == name; });
 }
 
-ComputeNodeVector::iterator
-ComputeGraph::findNode(std::shared_ptr<ComputeNode> node)
+TaskNodeVector::iterator
+TaskGraph::findNode(std::shared_ptr<TaskNode> node)
 {
     return std::find(m_nodes.begin(), m_nodes.end(), node);
 }
 
-ComputeNodeVector::const_iterator
-ComputeGraph::findNode(std::shared_ptr<ComputeNode> node) const
+TaskNodeVector::const_iterator
+TaskGraph::findNode(std::shared_ptr<TaskNode> node) const
 {
     return std::find(m_nodes.begin(), m_nodes.end(), node);
 }
 
 bool
-ComputeGraph::containsNode(std::shared_ptr<ComputeNode> node) const
+TaskGraph::containsNode(std::shared_ptr<TaskNode> node) const
 {
-    return findNode(node) != nodesEnd();
+    return findNode(node) != endNode();
 }
 
 bool
-ComputeGraph::containsEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode)
+TaskGraph::containsEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
 {
     return (m_adjList.count(srcNode) != 0 && m_adjList[srcNode].count(destNode) != 0);
 }
 
 void
-ComputeGraph::addEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode)
+TaskGraph::addEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
 {
     m_adjList[srcNode].insert(destNode);
     m_invAdjList[destNode].insert(srcNode);
 }
 
 void
-ComputeGraph::nestGraph(std::shared_ptr<ComputeGraph> subgraph, std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+TaskGraph::nestGraph(std::shared_ptr<TaskGraph> subgraph, std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Ensure source and sink are in the graph
-    if (findNode(source) == nodesEnd())
+    if (findNode(source) == endNode())
     {
         LOG(WARNING) << "Tried to nest a graph using source, but source does not exist in this";
         return;
     }
-    if (findNode(sink) == nodesEnd())
+    if (findNode(sink) == endNode())
     {
         LOG(WARNING) << "Tried to nest a graph using sink, but sink does not exist in this";
         return;
     }
 
     // Copy all of the nodes into this graph (check duplicates)
-    for (ComputeNodeVector::iterator it = subgraph->getNodes().begin(); it != subgraph->getNodes().end(); it++)
+    for (TaskNodeVector::iterator it = subgraph->getNodes().begin(); it != subgraph->getNodes().end(); it++)
     {
         addNode(*it);
     }
     // Copy all the edges into the graph (no need to check for duplicates)
-    const ComputeNodeAdjList& adjList = subgraph->getAdjList();
-    for (ComputeNodeAdjList::const_iterator it = adjList.begin(); it != adjList.end(); it++)
+    const TaskNodeAdjList& adjList = subgraph->getAdjList();
+    for (TaskNodeAdjList::const_iterator it = adjList.begin(); it != adjList.end(); it++)
     {
-        const ComputeNodeSet& outputNodes = it->second;
-        for (ComputeNodeSet::const_iterator jt = outputNodes.begin(); jt != outputNodes.end(); jt++)
+        const TaskNodeSet& outputNodes = it->second;
+        for (TaskNodeSet::const_iterator jt = outputNodes.begin(); jt != outputNodes.end(); jt++)
         {
             addEdge(it->first, *jt);
         }
@@ -119,7 +119,7 @@ ComputeGraph::nestGraph(std::shared_ptr<ComputeGraph> subgraph, std::shared_ptr<
 }
 
 void
-ComputeGraph::removeEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode)
+TaskGraph::removeEdge(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
 {
     if (m_adjList.count(srcNode) == 0)
     {
@@ -142,7 +142,7 @@ ComputeGraph::removeEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<C
 }
 
 bool
-ComputeGraph::addNode(std::shared_ptr<ComputeNode> node)
+TaskGraph::addNode(std::shared_ptr<TaskNode> node)
 {
     // If the node already exists return false
     if (!containsNode(node))
@@ -157,16 +157,16 @@ ComputeGraph::addNode(std::shared_ptr<ComputeNode> node)
     }
 }
 
-std::shared_ptr<ComputeNode>
-ComputeGraph::addFunction(std::string name, std::function<void()> func)
+std::shared_ptr<TaskNode>
+TaskGraph::addFunction(std::string name, std::function<void()> func)
 {
-    std::shared_ptr<ComputeNode> node = std::make_shared<ComputeNode>(func, name);
+    std::shared_ptr<TaskNode> node = std::make_shared<TaskNode>(func, name);
     m_nodes.push_back(node);
     return node;
 }
 
 bool
-ComputeGraph::removeNode(std::shared_ptr<ComputeNode> node)
+TaskGraph::removeNode(std::shared_ptr<TaskNode> node)
 {
     if (!containsNode(node))
     {
@@ -175,20 +175,20 @@ ComputeGraph::removeNode(std::shared_ptr<ComputeNode> node)
     }
 
     // Erase edges
-    ComputeNodeSet inputs  = m_invAdjList[node];
-    ComputeNodeSet outputs = m_adjList[node];
-    for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
+    TaskNodeSet inputs  = m_invAdjList[node];
+    TaskNodeSet outputs = m_adjList[node];
+    for (TaskNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
         removeEdge(*i, node);
     }
-    for (ComputeNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
+    for (TaskNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
     {
         removeEdge(node, *i);
     }
 
     // Finally remove the node from the graph
-    ComputeNodeVector::iterator it = findNode(node);
-    if (it != nodesEnd())
+    TaskNodeVector::iterator it = findNode(node);
+    if (it != endNode())
     {
         m_nodes.erase(it);
     }
@@ -196,7 +196,7 @@ ComputeGraph::removeNode(std::shared_ptr<ComputeNode> node)
 }
 
 bool
-ComputeGraph::removeNodeAndFix(std::shared_ptr<ComputeNode> node)
+TaskGraph::removeNodeAndRedirect(std::shared_ptr<TaskNode> node)
 {
     if (!containsNode(node))
     {
@@ -205,29 +205,29 @@ ComputeGraph::removeNodeAndFix(std::shared_ptr<ComputeNode> node)
     }
 
     // Erase edges
-    ComputeNodeSet inputs  = m_invAdjList[node];
-    ComputeNodeSet outputs = m_adjList[node];
-    for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
+    TaskNodeSet inputs  = m_invAdjList[node];
+    TaskNodeSet outputs = m_adjList[node];
+    for (TaskNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
         removeEdge(*i, node);
     }
-    for (ComputeNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
+    for (TaskNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
     {
         removeEdge(node, *i);
     }
 
     // Fix the edges
-    for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
+    for (TaskNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
-        for (ComputeNodeSet::iterator j = outputs.begin(); j != outputs.end(); j++)
+        for (TaskNodeSet::iterator j = outputs.begin(); j != outputs.end(); j++)
         {
             addEdge(*i, *j);
         }
     }
 
     // Finally remove the node from the graph
-    ComputeNodeVector::iterator it = findNode(node);
-    if (it != nodesEnd())
+    TaskNodeVector::iterator it = findNode(node);
+    if (it != endNode())
     {
         m_nodes.erase(it);
     }
@@ -236,7 +236,7 @@ ComputeGraph::removeNodeAndFix(std::shared_ptr<ComputeNode> node)
 }
 
 void
-ComputeGraph::insertAfter(std::shared_ptr<ComputeNode> refNode, std::shared_ptr<ComputeNode> newNode)
+TaskGraph::insertAfter(std::shared_ptr<TaskNode> refNode, std::shared_ptr<TaskNode> newNode)
 {
     // Try to add to graph, if already exists, exit
     if (!addNode(newNode))
@@ -245,8 +245,8 @@ ComputeGraph::insertAfter(std::shared_ptr<ComputeNode> refNode, std::shared_ptr<
     }
 
     // Remove output edges
-    ComputeNodeSet outputs = m_adjList[refNode]; // Copy (since we are modifying)
-    for (ComputeNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
+    TaskNodeSet outputs = m_adjList[refNode]; // Copy (since we are modifying)
+    for (TaskNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
     {
         removeEdge(refNode, *i);
     }
@@ -255,14 +255,14 @@ ComputeGraph::insertAfter(std::shared_ptr<ComputeNode> refNode, std::shared_ptr<
     addEdge(refNode, newNode);
 
     // Add newNode->outputs[i]
-    for (ComputeNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
+    for (TaskNodeSet::iterator i = outputs.begin(); i != outputs.end(); i++)
     {
         addEdge(newNode, *i);
     }
 }
 
 void
-ComputeGraph::insertBefore(std::shared_ptr<ComputeNode> refNode, std::shared_ptr<ComputeNode> newNode)
+TaskGraph::insertBefore(std::shared_ptr<TaskNode> refNode, std::shared_ptr<TaskNode> newNode)
 {
     // Try to add to graph, if already exists, exit
     if (!addNode(newNode))
@@ -271,14 +271,14 @@ ComputeGraph::insertBefore(std::shared_ptr<ComputeNode> refNode, std::shared_ptr
     }
 
     // Remove input edges
-    ComputeNodeSet inputs = m_invAdjList[refNode]; // Copy (since we are modifying)
-    for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
+    TaskNodeSet inputs = m_invAdjList[refNode]; // Copy (since we are modifying)
+    for (TaskNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
         removeEdge(*i, refNode);
     }
 
     // inputs[i]->newNode
-    for (ComputeNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
+    for (TaskNodeSet::iterator i = inputs.begin(); i != inputs.end(); i++)
     {
         addEdge(*i, newNode);
     }
@@ -288,19 +288,19 @@ ComputeGraph::insertBefore(std::shared_ptr<ComputeNode> refNode, std::shared_ptr
 }
 
 bool
-ComputeGraph::reaches(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode)
+TaskGraph::isReachable(std::shared_ptr<TaskNode> srcNode, std::shared_ptr<TaskNode> destNode)
 {
-    const ComputeNodeAdjList& adjList = getAdjList();
+    const TaskNodeAdjList& adjList = getAdjList();
 
     // Simple BFS
-    std::unordered_set<std::shared_ptr<ComputeNode>> visitedNodes;
+    std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
     // It inserts itself as well
-    std::queue<std::shared_ptr<ComputeNode>> nodeStack;
+    std::queue<std::shared_ptr<TaskNode>> nodeStack;
     nodeStack.push(srcNode);
     while (!nodeStack.empty())
     {
-        std::shared_ptr<ComputeNode> currNode = nodeStack.front();
+        std::shared_ptr<TaskNode> currNode = nodeStack.front();
         nodeStack.pop();
 
         // If we've arrived at the desired node
@@ -312,10 +312,10 @@ ComputeGraph::reaches(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<Comp
         // Add children to stack if not yet visited
         if (adjList.count(currNode) != 0)
         {
-            const ComputeNodeSet& outputNodes = adjList.at(currNode);
-            for (ComputeNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+            const TaskNodeSet& outputNodes = adjList.at(currNode);
+            for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
             {
-                std::shared_ptr<ComputeNode> childNode = *j;
+                std::shared_ptr<TaskNode> childNode = *j;
                 if (visitedNodes.count(childNode) == 0)
                 {
                     visitedNodes.insert(childNode);
@@ -328,7 +328,7 @@ ComputeGraph::reaches(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<Comp
 }
 
 void
-ComputeGraph::clear()
+TaskGraph::clear()
 {
     m_nodes.clear();
     clearEdges();
@@ -336,68 +336,68 @@ ComputeGraph::clear()
     addNode(m_sink);
 }
 
-std::shared_ptr<ComputeGraph>
-ComputeGraph::sum(std::shared_ptr<ComputeGraph> graphA, std::shared_ptr<ComputeGraph> graphB)
-{
-    std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>();
-    // Get rid of the results source/sink
-    results->m_source = nullptr;
-    results->m_sink   = nullptr;
-    results->m_nodes.clear();
+//std::shared_ptr<TaskGraph>
+//TaskGraph::sum(std::shared_ptr<TaskGraph> graphA, std::shared_ptr<TaskGraph> graphB)
+//{
+//    std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>();
+//    // Get rid of the results source/sink
+//    results->m_source = nullptr;
+//    results->m_sink   = nullptr;
+//    results->m_nodes.clear();
+//
+//    // Sum the nodes
+//    TaskNodeVector& nodesA = graphA->getNodes();
+//    for (size_t i = 0; i < nodesA.size(); i++)
+//    {
+//        results->addNode(nodesA[i]);
+//    }
+//    TaskNodeVector& nodesB = graphB->getNodes();
+//    for (size_t i = 0; i < nodesB.size(); i++)
+//    {
+//        results->addNode(nodesB[i]);
+//    }
+//
+//    // Now sum the edges
+//    const TaskNodeAdjList& adjListA = graphA->getAdjList();
+//    for (TaskNodeAdjList::const_iterator it = adjListA.begin(); it != adjListA.end(); it++)
+//    {
+//        const TaskNodeSet& outputNodes = it->second;
+//        for (TaskNodeSet::const_iterator jt = outputNodes.begin(); jt != outputNodes.end(); jt++)
+//        {
+//            results->addEdge(it->first, *jt);
+//        }
+//    }
+//    const TaskNodeAdjList& adjListB = graphB->getAdjList();
+//    for (TaskNodeAdjList::const_iterator it = adjListB.begin(); it != adjListB.end(); it++)
+//    {
+//        const TaskNodeSet& outputNodes = it->second;
+//        for (TaskNodeSet::const_iterator jt = outputNodes.begin(); jt != outputNodes.end(); jt++)
+//        {
+//            results->addEdge(it->first, *jt);
+//        }
+//    }
+//
+//    return results;
+//}
 
-    // Sum the nodes
-    ComputeNodeVector& nodesA = graphA->getNodes();
-    for (size_t i = 0; i < nodesA.size(); i++)
-    {
-        results->addNode(nodesA[i]);
-    }
-    ComputeNodeVector& nodesB = graphB->getNodes();
-    for (size_t i = 0; i < nodesB.size(); i++)
-    {
-        results->addNode(nodesB[i]);
-    }
-
-    // Now sum the edges
-    const ComputeNodeAdjList& adjListA = graphA->getAdjList();
-    for (ComputeNodeAdjList::const_iterator it = adjListA.begin(); it != adjListA.end(); it++)
-    {
-        const ComputeNodeSet& outputNodes = it->second;
-        for (ComputeNodeSet::const_iterator jt = outputNodes.begin(); jt != outputNodes.end(); jt++)
-        {
-            results->addEdge(it->first, *jt);
-        }
-    }
-    const ComputeNodeAdjList& adjListB = graphB->getAdjList();
-    for (ComputeNodeAdjList::const_iterator it = adjListB.begin(); it != adjListB.end(); it++)
-    {
-        const ComputeNodeSet& outputNodes = it->second;
-        for (ComputeNodeSet::const_iterator jt = outputNodes.begin(); jt != outputNodes.end(); jt++)
-        {
-            results->addEdge(it->first, *jt);
-        }
-    }
-
-    return results;
-}
-
-std::shared_ptr<ComputeNodeList>
-ComputeGraph::topologicalSort(std::shared_ptr<ComputeGraph> graph)
+std::shared_ptr<TaskNodeList>
+TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
 {
     // Compute the number of inputs to each node (we will remove these as we go)
-    std::unordered_map<std::shared_ptr<ComputeNode>, size_t> numInputs;
+    std::unordered_map<std::shared_ptr<TaskNode>, size_t> numInputs;
 
-    const ComputeNodeAdjList& adjList    = graph->getAdjList();
-    const ComputeNodeAdjList& invAdjList = graph->getInvAdjList();
+    const TaskNodeAdjList& adjList    = graph->getAdjList();
+    const TaskNodeAdjList& invAdjList = graph->getInvAdjList();
 
-    for (ComputeNodeAdjList::const_iterator i = invAdjList.begin(); i != invAdjList.end(); i++)
+    for (TaskNodeAdjList::const_iterator i = invAdjList.begin(); i != invAdjList.end(); i++)
     {
         numInputs[i->first] = invAdjList.size();
     }
 
     // Create an edge blacklist for edge removal during algorithm
-    std::unordered_map<std::shared_ptr<ComputeNode>, std::shared_ptr<ComputeNode>> removedEdges;
+    std::unordered_map<std::shared_ptr<TaskNode>, std::shared_ptr<TaskNode>> removedEdges;
 
-    auto edgeHasBeenRemoved = [&](const std::shared_ptr<ComputeNode>& node1, const std::shared_ptr<ComputeNode>& node2)
+    auto edgeHasBeenRemoved = [&](const std::shared_ptr<TaskNode>& node1, const std::shared_ptr<TaskNode>& node2)
                               {
                                   return (removedEdges.count(node1) != 0) && (removedEdges[node1] == node2);
                               };
@@ -405,14 +405,14 @@ ComputeGraph::topologicalSort(std::shared_ptr<ComputeGraph> graph)
     // Kahns algorithm (BFS/queue)
     //  iterate through all nodes (BFS or DFS) removing edges
     //  nodes are accepted when all input edges have been removed
-    std::queue<std::shared_ptr<ComputeNode>> sources;
+    std::queue<std::shared_ptr<TaskNode>> sources;
     sources.push(graph->m_source);
-    std::shared_ptr<ComputeNodeList> results = std::make_shared<ComputeNodeList>();
+    std::shared_ptr<TaskNodeList> results = std::make_shared<TaskNodeList>();
 
     while (!sources.empty())
     {
         // Remove a node
-        std::shared_ptr<ComputeNode> node = sources.front();
+        std::shared_ptr<TaskNode> node = sources.front();
         sources.pop();
 
         results->push_back(node);
@@ -420,10 +420,10 @@ ComputeGraph::topologicalSort(std::shared_ptr<ComputeGraph> graph)
         // As long as there are children
         if (adjList.count(node) != 0)
         {
-            const ComputeNodeSet& outputNodes = adjList.at(node);
-            for (ComputeNodeSet::const_iterator it = outputNodes.begin(); it != outputNodes.end(); it++)
+            const TaskNodeSet& outputNodes = adjList.at(node);
+            for (TaskNodeSet::const_iterator it = outputNodes.begin(); it != outputNodes.end(); it++)
             {
-                std::shared_ptr<ComputeNode> childNode = *it;
+                std::shared_ptr<TaskNode> childNode = *it;
                 // If edge is present
                 if (!edgeHasBeenRemoved(node, childNode))
                 {
@@ -443,36 +443,36 @@ ComputeGraph::topologicalSort(std::shared_ptr<ComputeGraph> graph)
     return results;
 }
 
-std::shared_ptr<ComputeGraph>
-ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
+std::shared_ptr<TaskGraph>
+TaskGraph::resolveCriticalNodes(std::shared_ptr<TaskGraph> graph)
 {
-    std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>(*graph);
+    std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
 
-    const ComputeNodeAdjList& adjList = graph->getAdjList();
-    const ComputeNodeVector&  nodes   = graph->getNodes();
+    const TaskNodeAdjList& adjList = graph->getAdjList();
+    const TaskNodeVector&  nodes   = graph->getNodes();
 
     // Compute the levels of each node via DFS
-    std::unordered_map<std::shared_ptr<ComputeNode>, int> depths;
+    std::unordered_map<std::shared_ptr<TaskNode>, int> depths;
     {
-        std::unordered_set<std::shared_ptr<ComputeNode>> visitedNodes;
+        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
         // DFS for the dependencies
-        std::stack<std::shared_ptr<ComputeNode>> nodeStack;
+        std::stack<std::shared_ptr<TaskNode>> nodeStack;
         depths[graph->getSource()] = 0;
         nodeStack.push(graph->getSource());
         while (!nodeStack.empty())
         {
-            std::shared_ptr<ComputeNode> currNode  = nodeStack.top();
-            int                          currLevel = depths[currNode];
+            std::shared_ptr<TaskNode> currNode  = nodeStack.top();
+            int                       currLevel = depths[currNode];
             nodeStack.pop();
 
             // Add children to stack if not yet visited
             if (adjList.count(currNode) != 0)
             {
-                const ComputeNodeSet& outputNodes = adjList.at(currNode);
-                for (ComputeNodeSet::const_iterator i = outputNodes.begin(); i != outputNodes.end(); i++)
+                const TaskNodeSet& outputNodes = adjList.at(currNode);
+                for (TaskNodeSet::const_iterator i = outputNodes.begin(); i != outputNodes.end(); i++)
                 {
-                    std::shared_ptr<ComputeNode> childNode = *i;
+                    std::shared_ptr<TaskNode> childNode = *i;
                     if (visitedNodes.count(childNode) == 0)
                     {
                         visitedNodes.insert(childNode);
@@ -485,31 +485,31 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
     }
 
     // Identify the set of critical nodes
-    ComputeNodeVector critNodes;
+    TaskNodeVector critNodes;
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        if (nodes[i]->m_critical)
+        if (nodes[i]->m_isCritical)
         {
             critNodes.push_back(nodes[i]);
         }
     }
 
     // Compute the critical adjacency list
-    ComputeNodeAdjList critAdjList;
+    TaskNodeAdjList critAdjList;
     for (size_t i = 0; i < critNodes.size(); i++)
     {
-        std::unordered_set<std::shared_ptr<ComputeNode>> visitedNodes;
+        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
         // DFS for the dependencies
-        std::stack<std::shared_ptr<ComputeNode>> nodeStack;
+        std::stack<std::shared_ptr<TaskNode>> nodeStack;
         nodeStack.push(critNodes[i]);
         while (!nodeStack.empty())
         {
-            std::shared_ptr<ComputeNode> currNode = nodeStack.top();
+            std::shared_ptr<TaskNode> currNode = nodeStack.top();
             nodeStack.pop();
 
             // If you can reach one critical node from the other then they are adjacent
-            if (currNode->m_critical)
+            if (currNode->m_isCritical)
             {
                 critAdjList[critNodes[i]].insert(currNode);
             }
@@ -517,10 +517,10 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
             // Add children to stack if not yet visited
             if (adjList.count(currNode) != 0)
             {
-                const ComputeNodeSet& outputNodes = adjList.at(currNode);
-                for (ComputeNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+                const TaskNodeSet& outputNodes = adjList.at(currNode);
+                for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
                 {
-                    std::shared_ptr<ComputeNode> childNode = *j;
+                    std::shared_ptr<TaskNode> childNode = *j;
                     if (visitedNodes.count(childNode) == 0)
                     {
                         visitedNodes.insert(childNode);
@@ -535,10 +535,10 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
     // For every critical pair
     for (size_t i = 0; i < critNodes.size(); i++)
     {
-        std::shared_ptr<ComputeNode> srcNode = critNodes[i];
+        std::shared_ptr<TaskNode> srcNode = critNodes[i];
         for (size_t j = i + 1; j < critNodes.size(); j++)
         {
-            std::shared_ptr<ComputeNode> destNode = critNodes[j];
+            std::shared_ptr<TaskNode> destNode = critNodes[j];
             // If the edge doesn't exist, either way
             if ((critAdjList.count(srcNode) == 0 || critAdjList.at(srcNode).count(destNode) == 0)
                 && (critAdjList.count(destNode) == 0 || critAdjList.at(destNode).count(srcNode) == 0))
@@ -562,8 +562,8 @@ ComputeGraph::resolveCriticalNodes(std::shared_ptr<ComputeGraph> graph)
     return results;
 }
 
-std::shared_ptr<ComputeGraph>
-ComputeGraph::transitiveReduce(std::shared_ptr<ComputeGraph> graph)
+std::shared_ptr<TaskGraph>
+TaskGraph::transitiveReduce(std::shared_ptr<TaskGraph> graph)
 {
     // It's a bad idea to do this method if the graph is cyclic
     if (isCyclic(graph))
@@ -571,26 +571,26 @@ ComputeGraph::transitiveReduce(std::shared_ptr<ComputeGraph> graph)
         return nullptr;
     }
 
-    std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>(*graph);
+    std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
 
     // Copy the adjList
-    const ComputeNodeAdjList adjList = results->getAdjList();
+    const TaskNodeAdjList adjList = results->getAdjList();
 
     // For every edge in the graph
-    for (ComputeNodeAdjList::const_iterator i = adjList.begin(); i != adjList.end(); i++)
+    for (TaskNodeAdjList::const_iterator i = adjList.begin(); i != adjList.end(); i++)
     {
-        std::shared_ptr<ComputeNode> inputNode   = i->first;
-        const ComputeNodeSet&        outputNodes = i->second;
-        for (ComputeNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+        std::shared_ptr<TaskNode> inputNode   = i->first;
+        const TaskNodeSet&        outputNodes = i->second;
+        for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
         {
-            std::shared_ptr<ComputeNode> outputNode = *j;
+            std::shared_ptr<TaskNode> outputNode = *j;
             // Edge inputNode->outputNode
 
             // Remove the edge and see if it still reaches
             results->removeEdge(inputNode, outputNode);
 
             // If there still exists a path inputNode->outputNode, leave it removed
-            if (!results->reaches(inputNode, outputNode))
+            if (!results->isReachable(inputNode, outputNode))
             {
                 results->addEdge(inputNode, outputNode);
             }
@@ -600,18 +600,18 @@ ComputeGraph::transitiveReduce(std::shared_ptr<ComputeGraph> graph)
     return results;
 }
 
-std::shared_ptr<ComputeGraph>
-ComputeGraph::nonFunctionalPrune(std::shared_ptr<ComputeGraph> graph)
+std::shared_ptr<TaskGraph>
+TaskGraph::removeRedundantNodes(std::shared_ptr<TaskGraph> graph)
 {
-    std::shared_ptr<ComputeGraph> results = std::make_shared<ComputeGraph>(*graph);
+    std::shared_ptr<TaskGraph> results = std::make_shared<TaskGraph>(*graph);
 
-    const ComputeNodeAdjList& adjList    = results->getAdjList();
-    const ComputeNodeAdjList& invAdjList = results->getInvAdjList();
-    ComputeNodeVector&        nodes      = results->getNodes();
+    const TaskNodeAdjList& adjList    = results->getAdjList();
+    const TaskNodeAdjList& invAdjList = results->getInvAdjList();
+    TaskNodeVector&        nodes      = results->getNodes();
 
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        std::shared_ptr<ComputeNode> node = nodes[i];
+        std::shared_ptr<TaskNode> node = nodes[i];
 
         // These can't be removed (following code would break as they have no inputs/outputs)
         if (node == graph->getSource() || node == graph->getSink())
@@ -623,24 +623,24 @@ ComputeGraph::nonFunctionalPrune(std::shared_ptr<ComputeGraph> graph)
         if (!node->isFunctional())
         {
             // Get copies of the inputs and outputs of the node
-            ComputeNodeSet inputs  = invAdjList.at(node);
-            ComputeNodeSet outputs = adjList.at(node);
+            TaskNodeSet inputs  = invAdjList.at(node);
+            TaskNodeSet outputs = adjList.at(node);
             if (inputs.size() == 1 && outputs.size() == 1)
             {
                 // Remove inputs/outputs of node
-                for (ComputeNodeSet::iterator j = inputs.begin(); j != inputs.end(); j++)
+                for (TaskNodeSet::iterator j = inputs.begin(); j != inputs.end(); j++)
                 {
                     results->removeEdge(*j, node);
                 }
-                for (ComputeNodeSet::iterator j = outputs.begin(); j != outputs.end(); j++)
+                for (TaskNodeSet::iterator j = outputs.begin(); j != outputs.end(); j++)
                 {
                     results->removeEdge(node, *j);
                 }
 
                 // Fix the edges
-                for (ComputeNodeSet::iterator j = inputs.begin(); j != inputs.end(); j++)
+                for (TaskNodeSet::iterator j = inputs.begin(); j != inputs.end(); j++)
                 {
-                    for (ComputeNodeSet::iterator k = outputs.begin(); k != outputs.end(); k++)
+                    for (TaskNodeSet::iterator k = outputs.begin(); k != outputs.end(); k++)
                     {
                         results->addEdge(*j, *k);
                     }
@@ -658,24 +658,24 @@ ComputeGraph::nonFunctionalPrune(std::shared_ptr<ComputeGraph> graph)
 }
 
 bool
-ComputeGraph::isCyclic(std::shared_ptr<ComputeGraph> graph)
+TaskGraph::isCyclic(std::shared_ptr<TaskGraph> graph)
 {
     // Brute force, DFS every node to find it again
-    const ComputeNodeAdjList& adjList = graph->getAdjList();
-    const ComputeNodeVector&  nodes   = graph->getNodes();
+    const TaskNodeAdjList& adjList = graph->getAdjList();
+    const TaskNodeVector&  nodes   = graph->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        std::unordered_set<std::shared_ptr<ComputeNode>> visitedNodes;
+        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
         // DFS for the dependencies (start at children instead of itself)
-        std::stack<std::shared_ptr<ComputeNode>> nodeStack;
+        std::stack<std::shared_ptr<TaskNode>> nodeStack;
         // Add children to stack if not yet visited
         if (adjList.count(nodes[i]) != 0)
         {
-            const ComputeNodeSet& outputNodes = adjList.at(nodes[i]);
-            for (ComputeNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+            const TaskNodeSet& outputNodes = adjList.at(nodes[i]);
+            for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
             {
-                std::shared_ptr<ComputeNode> childNode = *j;
+                std::shared_ptr<TaskNode> childNode = *j;
                 if (visitedNodes.count(childNode) == 0)
                 {
                     visitedNodes.insert(childNode);
@@ -685,7 +685,7 @@ ComputeGraph::isCyclic(std::shared_ptr<ComputeGraph> graph)
         }
         while (!nodeStack.empty())
         {
-            std::shared_ptr<ComputeNode> currNode = nodeStack.top();
+            std::shared_ptr<TaskNode> currNode = nodeStack.top();
             nodeStack.pop();
 
             // If we revisit a node then it must be cyclic
@@ -697,10 +697,10 @@ ComputeGraph::isCyclic(std::shared_ptr<ComputeGraph> graph)
             // Add children to stack if not yet visited
             if (adjList.count(currNode) != 0)
             {
-                const ComputeNodeSet& outputNodes = adjList.at(currNode);
-                for (ComputeNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
+                const TaskNodeSet& outputNodes = adjList.at(currNode);
+                for (TaskNodeSet::const_iterator j = outputNodes.begin(); j != outputNodes.end(); j++)
                 {
-                    std::shared_ptr<ComputeNode> childNode = *j;
+                    std::shared_ptr<TaskNode> childNode = *j;
                     if (visitedNodes.count(childNode) == 0)
                     {
                         visitedNodes.insert(childNode);
@@ -714,20 +714,20 @@ ComputeGraph::isCyclic(std::shared_ptr<ComputeGraph> graph)
     return false;
 }
 
-std::unordered_map<std::shared_ptr<ComputeNode>, std::string>
-ComputeGraph::getUniqueNames(std::shared_ptr<ComputeGraph> graph, bool apply)
+std::unordered_map<std::shared_ptr<TaskNode>, std::string>
+TaskGraph::getUniqueNodeNames(std::shared_ptr<TaskGraph> graph, bool apply)
 {
     // Produce non colliding names
-    std::unordered_map<std::shared_ptr<ComputeNode>, std::string> nodeNames;
-    std::unordered_map<std::string, int>                          names;
-    const ComputeNodeVector&                                      nodes = graph->getNodes();
+    std::unordered_map<std::shared_ptr<TaskNode>, std::string> nodeNames;
+    std::unordered_map<std::string, int>                       names;
+    const TaskNodeVector&                                      nodes = graph->getNodes();
     for (size_t i = 0; i < nodes.size(); i++)
     {
         nodeNames[nodes[i]] = nodes[i]->m_name;
         names[nodes[i]->m_name]++;
     }
     // Adjust names
-    for (std::unordered_map<std::shared_ptr<ComputeNode>, std::string>::iterator it = nodeNames.begin();
+    for (std::unordered_map<std::shared_ptr<TaskNode>, std::string>::iterator it = nodeNames.begin();
          it != nodeNames.end(); it++)
     {
         int         nameIter = 0;
@@ -744,7 +744,7 @@ ComputeGraph::getUniqueNames(std::shared_ptr<ComputeGraph> graph, bool apply)
     }
     if (apply)
     {
-        for (std::shared_ptr<ComputeNode> node : nodes)
+        for (std::shared_ptr<TaskNode> node : nodes)
         {
             node->m_name = nodeNames[node];
         }
@@ -752,73 +752,83 @@ ComputeGraph::getUniqueNames(std::shared_ptr<ComputeGraph> graph, bool apply)
     return nodeNames;
 }
 
-std::unordered_map<std::shared_ptr<ComputeNode>, double>
-ComputeGraph::getTimes(std::shared_ptr<ComputeGraph> graph)
+std::unordered_map<std::shared_ptr<TaskNode>, double>
+TaskGraph::getNodeStartTimes(std::shared_ptr<TaskGraph> graph)
 {
-    const ComputeNodeAdjList& adjList = graph->getAdjList();
+    const TaskNodeVector&  nodes   = graph->getNodes();
+    const TaskNodeAdjList& adjList = graph->getAdjList();
 
     // Setup a map for total elapsed times at each node
-    std::unordered_map<std::shared_ptr<ComputeNode>, double> times;
+    std::unordered_map<std::shared_ptr<TaskNode>, double> startTimes;
 
     {
-        std::unordered_set<std::shared_ptr<ComputeNode>> visitedNodes;
+        std::unordered_set<std::shared_ptr<TaskNode>> visitedNodes;
 
         // BFS down the tree computing total times
-        std::stack<std::shared_ptr<ComputeNode>> nodeStack;
-        times[graph->getSource()] = 0.0;
+        std::stack<std::shared_ptr<TaskNode>> nodeStack;
+        startTimes[graph->getSource()] = 0.0;
         nodeStack.push(graph->getSource());
         while (!nodeStack.empty())
         {
-            std::shared_ptr<ComputeNode> currNode = nodeStack.top();
+            std::shared_ptr<TaskNode> currNode = nodeStack.top();
             nodeStack.pop();
 
             // Add children to stack if not yet visited
             if (adjList.count(currNode) != 0)
             {
-                const ComputeNodeSet& outputNodes = adjList.at(currNode);
-                for (ComputeNodeSet::const_iterator i = outputNodes.begin(); i != outputNodes.end(); i++)
+                const TaskNodeSet& outputNodes = adjList.at(currNode);
+                for (TaskNodeSet::const_iterator i = outputNodes.begin(); i != outputNodes.end(); i++)
                 {
-                    std::shared_ptr<ComputeNode> childNode = *i;
+                    std::shared_ptr<TaskNode> childNode = *i;
+
+                    // Determine the time it would take to start this child
+                    const double childStartTime = startTimes[currNode] + currNode->m_computeTime;
+                    if (childStartTime > startTimes[childNode])
+                    {
+                        // Accept the longest time as nodes can't continue until all child inputs complete
+                        startTimes[childNode] = childStartTime;
+                    }
+                    // If not visited yet add child to stack
                     if (visitedNodes.count(childNode) == 0)
                     {
                         visitedNodes.insert(childNode);
-                        times[childNode] = times[currNode] + childNode->m_elapsedTime;
+                        //times[childNode] = times[currNode] + childNode->m_computeTime;
                         nodeStack.push(childNode);
                     }
                 }
             }
         }
     }
-    return times;
+    return startTimes;
 }
 
-ComputeNodeList
-ComputeGraph::getCriticalPath(std::shared_ptr<ComputeGraph> graph)
+TaskNodeList
+TaskGraph::getCriticalPath(std::shared_ptr<TaskGraph> graph)
 {
-    std::unordered_map<std::shared_ptr<ComputeNode>, double> times = getTimes(graph);
+    std::unordered_map<std::shared_ptr<TaskNode>, double> nodeStartTimes = getNodeStartTimes(graph);
 
     // Now backtrack to acquire the path of longest duration
-    const ComputeNodeAdjList&               invAdjList = graph->getInvAdjList();
-    std::list<std::shared_ptr<ComputeNode>> results;
+    const TaskNodeAdjList&               invAdjList = graph->getInvAdjList();
+    std::list<std::shared_ptr<TaskNode>> results;
     {
-        std::shared_ptr<ComputeNode> currNode = graph->getSink();
-        // Starting from the sink, choose the input with the longest total elapsed time
+        std::shared_ptr<TaskNode> currNode = graph->getSink();
+        // Starting from the sink, always choose the input with the longer start time
         while (currNode != graph->getSource())
         {
             results.push_front(currNode);
-            std::shared_ptr<ComputeNode> longestNode = nullptr;
-            double                       maxTime     = 0.0;
+            std::shared_ptr<TaskNode> longestNode = nullptr;
+            double                    maxTime     = 0.0;
 
             // For every parent
             if (invAdjList.count(currNode) != 0)
             {
-                const ComputeNodeSet& inputNodes = invAdjList.at(currNode);
-                for (ComputeNodeSet::const_iterator i = inputNodes.begin(); i != inputNodes.end(); i++)
+                const TaskNodeSet& inputNodes = invAdjList.at(currNode);
+                for (TaskNodeSet::const_iterator i = inputNodes.begin(); i != inputNodes.end(); i++)
                 {
-                    std::shared_ptr<ComputeNode> parentNode = *i;
-                    if (times[parentNode] >= maxTime)
+                    std::shared_ptr<TaskNode> parentNode = *i;
+                    if (nodeStartTimes[parentNode] >= maxTime)
                     {
-                        maxTime     = times[parentNode];
+                        maxTime     = nodeStartTimes[parentNode];
                         longestNode = parentNode;
                     }
                 }

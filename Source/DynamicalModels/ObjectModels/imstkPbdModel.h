@@ -243,13 +243,13 @@ public:
 
     void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
 
-    std::shared_ptr<ComputeNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
+    std::shared_ptr<TaskNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
 
-    std::shared_ptr<ComputeNode> getUpdateCollisionGeometryNode() const { return m_updateCollisionGeometryNode; }
+    std::shared_ptr<TaskNode> getUpdateCollisionGeometryNode() const { return m_updateCollisionGeometryNode; }
 
-    std::shared_ptr<ComputeNode> getSolveNode() const { return m_solveConstraintsNode; }
+    std::shared_ptr<TaskNode> getSolveNode() const { return m_solveConstraintsNode; }
 
-    std::shared_ptr<ComputeNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
+    std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
 
 protected:
     ///
@@ -260,7 +260,7 @@ protected:
     ///
     /// \brief Setup the computational graph of PBD
     ///
-    void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
     size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
@@ -276,9 +276,9 @@ protected:
 
 protected:
     // Computational Nodes
-    std::shared_ptr<ComputeNode> m_integrationPositionNode     = nullptr;
-    std::shared_ptr<ComputeNode> m_updateCollisionGeometryNode = nullptr;
-    std::shared_ptr<ComputeNode> m_solveConstraintsNode = nullptr;
-    std::shared_ptr<ComputeNode> m_updateVelocityNode   = nullptr;
+    std::shared_ptr<TaskNode> m_integrationPositionNode     = nullptr;
+    std::shared_ptr<TaskNode> m_updateCollisionGeometryNode = nullptr;
+    std::shared_ptr<TaskNode> m_solveConstraintsNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode   = nullptr;
 };
 } // imstk

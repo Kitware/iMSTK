@@ -20,39 +20,48 @@ limitations under the License.
 =========================================================================*/
 
 #pragma once
+
 #include <memory>
 
 namespace imstk
 {
-class ComputeGraph;
+class TaskGraph;
 
 ///
-/// \brief Base class for compute graph controllers which are responsible
-/// for executing the compute graph
+/// \class TaskGraphController
 ///
-class ComputeGraphController
+/// \brief Base class for TaskGraph controllers which are responsible for executing the TaskGraph
+///
+class TaskGraphController
 {
 public:
-    ComputeGraphController() = default;
-    virtual ~ComputeGraphController() = default;
+    TaskGraphController() = default;
+    virtual ~TaskGraphController() = default;
 
 public:
-    virtual void setComputeGraph(std::shared_ptr<ComputeGraph> graph) { this->m_graph = graph; }
+    virtual void setTaskGraph(std::shared_ptr<TaskGraph> graph) { this->m_graph = graph; }
 
-    std::shared_ptr<ComputeGraph> getComputeGraph() const { return m_graph; }
-
-    ///
-    /// \brief Initialization of the ComputeGraphController, good for anything the controller might need
-    /// to do before execution
-    ///
-    virtual void init() { };
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_graph; }
 
     ///
-    /// \brief Executes the ComputeGraph
+    /// \brief Initialization of the TaskGraphController, good for anything the controller may need
+    /// to do after it recieves input, before execution, but not do everytime execution is called.
+    /// Returns if successful
+    ///
+    bool initialize();
+
+    ///
+    /// \brief Executes the TaskGraph
     ///
     virtual void execute() = 0;
 
 protected:
-    std::shared_ptr<ComputeGraph> m_graph = nullptr;
+    ///
+    /// \brief Subclass initialization call
+    ///
+    virtual void init() { }
+
+protected:
+    std::shared_ptr<TaskGraph> m_graph = nullptr;
 };
 }

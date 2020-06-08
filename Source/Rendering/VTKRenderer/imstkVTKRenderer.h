@@ -101,17 +101,17 @@ public:
     ///
     /// \brief Sets the benchmarking table using unordered_map
     ///
-    void setBenchmarkTable(const std::unordered_map<std::string, double>& nameToElapsedTimes);
+    void setTimeTable(const std::unordered_map<std::string, double>& timeTable);
 
     ///
     /// \brief Set the visibility of the benchmark graph
     ///
-    void setBenchmarkTableVisibility(const bool visible);
+    void setTimeTableVisibility(const bool visible);
 
     ///
     /// \brief Get the visibility of the benchmark graph
     ///
-    bool getBenchmarkTableVisibility() const;
+    bool getTimeTableVisibility() const;
 
     ///
     /// \brief Updates the scene camera's position and orientation
@@ -168,10 +168,10 @@ protected:
     std::vector<vtkOpenVRCameraPose> m_camPos;
 #endif
 
-    vtkSmartPointer<vtkChartXY>      m_benchmarkChart      = nullptr;
-    vtkSmartPointer<vtkContextActor> m_benchmarkChartActor = nullptr;
-    vtkSmartPointer<vtkTable> m_benchmarkTable = nullptr;
-    vtkPlotBar* m_benchmarkPlot = nullptr;
-    int benchmarkIter = 0;
+    vtkSmartPointer<vtkChartXY>      m_timeTableChart      = nullptr;
+    vtkSmartPointer<vtkContextActor> m_timeTableChartActor = nullptr;
+    vtkSmartPointer<vtkTable> m_timeTable = nullptr;
+    vtkPlotBar* m_timeTablePlot = nullptr;
+    int m_timeTableIter = 0;
 };
 }

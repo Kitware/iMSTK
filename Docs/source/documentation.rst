@@ -36,7 +36,7 @@ Setup for Development
 =====================
 
 iMSTK and its external dependencies can be configured and built from
-scratch Cmake to create a super-build on UNIX (MAC, Linux) and Windows
+scratch with Cmake to create a super-build on UNIX (MAC, Linux) and Windows
 platforms. The instructions below describe this process in detail.
 
 Configuration and Build
@@ -1011,7 +1011,7 @@ An example code on how to instantiate a haptic device is shown below
     sdk->addModule(server);
 
 
-Paralle Support
+Parallel Support
 ===============
 
 iMSTK allows CPU based shared memory parallelization using Intel TBB library. 
@@ -1040,6 +1040,99 @@ options to parallelize over a dimension of choice.
 
 Miscellaneous Topics
 ====================
+
+Task Graphs
+------------------
+iMSTK provides Task Graphs. These are used internally but may also be used by the user.
+A TaskGraph contains a set of TaskNode's. Each node accomplishes some computation.
+The TaskGraph also contains edges establishing successor/predeccessor relationships between
+the tasks. For example, one could specify that a task may only happen after two others have
+completed. Additionally a TaskGraph will always contain a source and sink node.
+
+This TaskGraph may be then executed by the user using one of the TaskGraphControllers.
+Currently, there are two provided TaskGraphControllers. SequentialTaskGraphController and 
+TbbTaskGraphController. Sequential executes the tasks one by one in topological order while
+Tbb executes them in parallel.
+
+To use a TaskGraph, create one and begin adding functions/nodes to it. One can either
+create a TaskNode or use the overloaded function in TaskGraph to directly supply a function
+pointer. Then we can establish edges between the nodes and execute.
+
+::
+
+    // Inputs
+    const int x = 0;
+    const int y = 2;
+    const int z = 3;
+    const int w = 5;
+
+    // Results
+    int a = 0;
+    int b = 0;
+    int c = 0;
+
+    std::shared_ptr<TaskGraph> graph = std::make_shared<TaskGraph>();
+
+    // Setup Nodes
+    std::shared_ptr<TaskNode> addXYNode = graph->addFunction([&]() { a = x + y; });
+    std::shared_ptr<TaskNode> multZWNode = graph->addFunction([&]() { b = z * w; });
+    std::shared_ptr<TaskNode> addABNode = graph->addFunction([&]() { c = a + b; });
+
+    // Setup Edges
+    graph->addEdge(graph->getSource(), addXYNode);
+    graph->addEdge(graph->getSource(), multZWNode);
+    graph->addEdge(addXYNode, addABNode);
+    graph->addEdge(multZWNode, addABNode);
+    graph->addEdge(addABNode, graph->getSink());
+
+    // Finally, execute
+    std::shared_ptr<TbbTaskGraphController> controller = std::make_shared<TbbTaskGraphController>();
+    controller->setInput(graph);
+    controller->init(); // Possible preprocessing steps
+    controller->execute();
+
+TaskGraphs are also used internally in iMSTK's physics loop. This allows one to reconfigure
+iMSTK's sequence of events. The Scene, SceneObject, and AbstractDynamicalModel classes all contain
+member TaskGraphs which are composited into each other. To modify the main physics loop one should
+modify the top level TaskGraph, that would be the Scene TaskGraph. Keep in mind that the Scene's TaskGraph
+is rebuilt on initialize. One can have their own step within initialization like so:
+
+::
+
+    scene->setComputeGraphConfigureCallback([&](Scene* scene)
+    {
+        // Insert nodes or edges
+    });
+
+Additionally many of the classes in iMSTK expose getters for their nodes. This is useful, for example,
+if one wanted to insert a step after PbdModel does its position integration.
+
+::
+
+    std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
+    ...
+    scene->setComputeGraphConfigureCallback([&](Scene* scene)
+    {
+        std::shared_ptr<ComputeGraph> graph = scene->getComputeGraph();
+
+        // A TaskNode to print all velocities
+        std::shared_ptr<TaskNode> printVelocities = std::make_shared<TaskNode>([&]()
+        {
+            const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+            for (size_t i = 0; i < velocities.size(); i++)
+            {
+                printf("Velocity: %f, %f, %f\n", velocities[i].x(), velocities[i].y(), velocities[i].z());
+            }
+        });
+
+        // Add to the graph, after positions are integrated
+        graph->insertAfter(pbdModel->getIntegratePositionNode(), printVelocities);
+    });    
+
+Lastly, the TaskGraph comes with a number of graph functions. Static functions such as sum, nest, topological sort,
+transitive reduction, cyclic check, etc. Member functions such as addNode, addFunction, addEdge, insertAfter, 
+insertBefore, ... The graph sum and nest are especially useful when maintaining multiple decoupled graphs with identical
+nodes between them that you would then like to combine.
 
 Object Controllers
 ------------------

@@ -220,7 +220,7 @@ main()
 
     // Collisions
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
-        InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::MeshToMeshBruteForce));
+        InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");

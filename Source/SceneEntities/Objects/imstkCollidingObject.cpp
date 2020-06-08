@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCollidingObject.h"
-#include "imstkComputeGraph.h"
 #include "imstkGeometryMap.h"
 
 namespace imstk

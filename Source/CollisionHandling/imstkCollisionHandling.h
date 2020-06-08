@@ -28,8 +28,8 @@ namespace imstk
 struct CollisionData;
 
 class CollidingObject;
-class ComputeNode;
 class InteractionPair;
+class TaskNode;
 
 ///
 /// \class CollisionHandling
@@ -81,12 +81,12 @@ public:
     const Type& getType() const { return m_type; }
     const Side& getSide() const { return m_side; }
 
-    std::shared_ptr<ComputeNode> getComputeNode() const { return m_computeNode; }
+    std::shared_ptr<TaskNode> getTaskNode() const { return m_taskNode; }
 
 protected:
     Type m_type;                                              ///< Collision handling algorithm type
     Side m_side;                                              ///< Direction of the collisionData
     const std::shared_ptr<CollisionData> m_colData = nullptr; ///< Collision data
-    std::shared_ptr<ComputeNode> m_computeNode     = nullptr;
+    std::shared_ptr<TaskNode> m_taskNode = nullptr;
 };
 }

@@ -21,27 +21,27 @@ limitations under the License.
 
 #include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
-#include "imstkComputeGraphVizWriter.h"
 #include "imstkLineMesh.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkTaskGraphVizWriter.h"
 
 using namespace imstk;
 
 ///
-/// \brief This examples uses the benchmarking features of the computational graph
-/// This allows one to see the elapsed time of every step of iMSTK as well as
-/// export the computational graph and show information such as the critical path
+/// \brief This examples uses the timing features of the task graph This allows one
+/// to see the elapsed time of every step of iMSTK as well as export the computational
+/// graph and show information such as the critical path
 ///
 int
 main()
 {
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("PBDString");
-    scene->getConfig()->benchmarkingEnabled = true;
+    scene->getConfig()->taskTimingEnabled = true;
 
     // Setup N separate string simulations with varying bend stiffnesses
     const unsigned int numStrings    = 8;
@@ -148,11 +148,12 @@ main()
     simManager->start();
 
     // Write the graph, highlighting the critical path and putting the completion time in the name
-    ComputeGraphVizWriter writer;
-    writer.setInput(scene->getComputeGraph());
-    writer.setFileName("computeGraphBenchmarkExample.svg");
+    TaskGraphVizWriter writer;
+    writer.setInput(scene->getTaskGraph());
+    writer.setFileName("taskGraphBenchmarkExample.svg");
     writer.setHighlightCriticalPath(true);
-    writer.setWriteTimes(true);
+    writer.setWriteNodeComputeTimesColor(true);
+    writer.setWriteNodeComputeTimesText(true);
     writer.write();
 
     return 0;

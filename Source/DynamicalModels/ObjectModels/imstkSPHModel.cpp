@@ -20,11 +20,10 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkSPHModel.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -61,8 +60,8 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
 {
     m_validGeometryTypes = { Geometry::Type::PointSet };
 
-    m_findParticleNeighborsNode = addFunction("SPHModel_Partition", std::bind(&SPHModel::findParticleNeighbors, this));
-    m_computeDensityNode = addFunction("SPHModel_ComputeDensity", [&]()
+    m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SPHModel::findParticleNeighbors, this));
+    m_computeDensityNode = m_taskGraph->addFunction("SPHModel_ComputeDensity", [&]()
         {
             computeNeighborRelativePositions();
             computeDensity();
@@ -70,13 +69,13 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
             collectNeighborDensity();
         });
     m_computePressureAccelNode =
-        addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
+        m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
     m_computeSurfaceTensionNode =
-        addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
-    m_computeTimeSetpSizeNode =
-        addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
+        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
+    m_computeTimeStepSizeNode =
+        m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
     m_integrateNode =
-        addFunction("SPHModel_Integrate", [&]()
+        m_taskGraph->addFunction("SPHModel_Integrate", [&]()
         {
             sumAccels();
             updateVelocity(getTimeStep());
@@ -127,22 +126,22 @@ SPHModel::updatePhysicsGeometry()
 }
 
 void
-SPHModel::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
-    addEdge(source, m_findParticleNeighborsNode);
-    addEdge(m_findParticleNeighborsNode, m_computeDensityNode);
+    m_taskGraph->addEdge(source, m_findParticleNeighborsNode);
+    m_taskGraph->addEdge(m_findParticleNeighborsNode, m_computeDensityNode);
 
     // Pressure, Surface Tension, and time step size can be done in parallel
-    addEdge(m_computeDensityNode, m_computePressureAccelNode);
-    addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
-    addEdge(m_computeDensityNode, m_computeTimeSetpSizeNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_computePressureAccelNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_computeTimeStepSizeNode);
 
-    addEdge(m_computePressureAccelNode, m_integrateNode);
-    addEdge(m_computeSurfaceTensionNode, m_integrateNode);
-    addEdge(m_computeTimeSetpSizeNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
 
-    addEdge(m_integrateNode, sink);
+    m_taskGraph->addEdge(m_integrateNode, sink);
 }
 
 void

@@ -50,9 +50,9 @@ public:
 
 public:
     ///
-    /// \brief Modifies the compute graph of the provide objects to apply the interaction
+    /// \brief Modifies the graph of the provide objects to apply the interaction
     ///
-    virtual void modifyComputeGraph() = 0;
+    virtual void apply() = 0;
 
 protected:
     SceneObjectPair m_objects; ///> The two objects interacting

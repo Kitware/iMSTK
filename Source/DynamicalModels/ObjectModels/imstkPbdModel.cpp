@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkPbdModel.h"
-#include "imstkComputeGraph.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
@@ -33,9 +32,8 @@
 #include "imstkPbdSolver.h"
 #include "imstkPbdVolumeConstraint.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
-
-#include "imstkTimer.h"
 
 #include <unordered_map>
 
@@ -57,10 +55,10 @@ PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
     };
 
     // Setup PBD compute nodes
-    m_integrationPositionNode     = addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
-    m_updateCollisionGeometryNode = addFunction("PbdModel_UpdateCollisionGeometry", std::bind(&PbdModel::updatePhysicsGeometry, this));
-    m_solveConstraintsNode = addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); });    // Avoids rebinding on solver swap
-    m_updateVelocityNode   = addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
+    m_integrationPositionNode     = m_taskGraph->addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
+    m_updateCollisionGeometryNode = m_taskGraph->addFunction("PbdModel_UpdateCollisionGeometry", std::bind(&PbdModel::updatePhysicsGeometry, this));
+    m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); });    // Avoids rebinding on solver swap
+    m_updateVelocityNode   = m_taskGraph->addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
 }
 
 void
@@ -183,14 +181,14 @@ PbdModel::initialize()
 }
 
 void
-PbdModel::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
-    addEdge(source, m_integrationPositionNode);
-    addEdge(m_integrationPositionNode, m_updateCollisionGeometryNode);
-    addEdge(m_updateCollisionGeometryNode, m_solveConstraintsNode);
-    addEdge(m_solveConstraintsNode, m_updateVelocityNode);
-    addEdge(m_updateVelocityNode, sink);
+    m_taskGraph->addEdge(source, m_integrationPositionNode);
+    m_taskGraph->addEdge(m_integrationPositionNode, m_updateCollisionGeometryNode);
+    m_taskGraph->addEdge(m_updateCollisionGeometryNode, m_solveConstraintsNode);
+    m_taskGraph->addEdge(m_solveConstraintsNode, m_updateVelocityNode);
+    m_taskGraph->addEdge(m_updateVelocityNode, sink);
 }
 
 void

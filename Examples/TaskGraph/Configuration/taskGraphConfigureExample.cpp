@@ -21,20 +21,14 @@
 
 #include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeGraphVizWriter.h"
 #include "imstkLight.h"
-#include "imstkParallelReduce.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkScene.h"
-#include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-
-#include "imstkVTKRenderer.h"
-#include "VTKRenderer.h"
-#include "vtkRenderWindowInteractor.h"
+#include "imstkTaskGraph.h"
+#include "imstkTaskGraphVizWriter.h"
 
 using namespace imstk;
 
@@ -138,7 +132,7 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
 }
 
 ///
-/// \brief This example demonstrates how to modify the computational graph, post initialization
+/// \brief This example demonstrates how to modify the task graph
 ///
 int
 main()
@@ -175,20 +169,19 @@ main()
     // Adds a custom physics step to print out intermediate velocities
     {
         std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
-        scene->setComputeGraphConfigureCallback([&](Scene* scene)
+        scene->setTaskGraphConfigureCallback([&](Scene* scene)
         {
             // Get the graph
-            std::shared_ptr<ComputeGraph> graph = scene->getComputeGraph();
+            std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
 
             // First write the graph before we make modifications, just to show the changes
-            ComputeGraphVizWriter writer;
+            TaskGraphVizWriter writer;
             writer.setInput(graph);
-            writer.setFileName("computeGraphConfigureExampleOld.svg");
+            writer.setFileName("taskGraphConfigureExampleOld.svg");
             writer.write();
 
-            std::shared_ptr<ComputeNode> printVelocities = std::make_shared<ComputeNode>([&]()
+            std::shared_ptr<TaskNode> printVelocities = std::make_shared<TaskNode>([&]()
             {
-                // Make the timestep a function of max velocity
                 const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
                 for (size_t i = 0; i < velocities.size(); i++)
                 {
@@ -200,7 +193,7 @@ main()
             graph->insertAfter(pbdModel->getIntegratePositionNode(), printVelocities);
 
             // Write the modified graph
-            writer.setFileName("computeGraphConfigureExampleNew.svg");
+            writer.setFileName("taskGraphConfigureExampleNew.svg");
             writer.write();
             });
     }

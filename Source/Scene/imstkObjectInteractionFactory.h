@@ -43,18 +43,18 @@ namespace imstk
 // Predefined standard/types of interaction from imstk
 enum class InteractionType
 {
-    PbdObjToPbdObj_Collision,
+    PbdObjToPbdObjCollision,
 
-    PbdObjToCollidingObj_Collision,
-    SphObjToCollidingObj_Collision,
-    FemObjToCollidingObj_Collision,
-    //RigidObjToCollidingObj_Collision,
+    PbdObjToCollidingObjCollision,
+    SphObjToCollidingObjCollision,
+    FemObjToCollidingObjCollision,
+    //RigidObjToCollidingObjCollision,
 
-    //RigidObjToRigidObj_Collision,
+    //RigidObjToRigidObjCollision,
 
-    FemObjToCollidingObj_PenaltyForce,
-    FemObjToCollidingObj_BoneDrilling,
-    FemObjToCollidingObj_NodalPicking
+    FemObjToCollidingObjPenaltyForce,
+    FemObjToCollidingObjBoneDrilling,
+    FemObjToCollidingObjNodalPicking
 };
 
 ///
@@ -67,7 +67,7 @@ makeObjectInteractionPair(
     InteractionType intType, CollisionDetection::Type cdType)
 {
     std::shared_ptr<ObjectInteractionPair> results = nullptr;
-    if (intType == InteractionType::PbdObjToPbdObj_Collision)
+    if (intType == InteractionType::PbdObjToPbdObjCollision)
     {
         if (std::is_base_of<PbdObject, ObjectType1>::value
             && std::is_base_of<PbdObject, ObjectType2>::value)
@@ -87,7 +87,7 @@ makeObjectInteractionPair(
                 std::dynamic_pointer_cast<PbdObject>(obj2), cdType);
         }
     }*/
-    else if (intType == InteractionType::SphObjToCollidingObj_Collision)
+    else if (intType == InteractionType::SphObjToCollidingObjCollision)
     {
         if (std::is_base_of<SPHObject, ObjectType1>::value
             && std::is_base_of<CollidingObject, ObjectType2>::value)
@@ -103,7 +103,7 @@ makeObjectInteractionPair(
             results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
         }
     }
-    else if (intType == InteractionType::FemObjToCollidingObj_NodalPicking)
+    else if (intType == InteractionType::FemObjToCollidingObjNodalPicking)
     {
         if (std::is_base_of<FeDeformableObject, ObjectType1>::value
             && std::is_base_of<CollidingObject, ObjectType2>::value)
@@ -119,7 +119,7 @@ makeObjectInteractionPair(
             results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
         }
     }
-    else if (intType == InteractionType::FemObjToCollidingObj_PenaltyForce)
+    else if (intType == InteractionType::FemObjToCollidingObjPenaltyForce)
     {
         if ((std::is_base_of<CollidingObject, ObjectType1>::value)
             && std::is_base_of<CollidingObject, ObjectType2>::value)
@@ -135,7 +135,7 @@ makeObjectInteractionPair(
             results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
         }
     }
-    else if (intType == InteractionType::FemObjToCollidingObj_BoneDrilling)
+    else if (intType == InteractionType::FemObjToCollidingObjBoneDrilling)
     {
         if (std::is_base_of<FeDeformableObject, ObjectType1>::value
             && std::is_base_of<CollidingObject, ObjectType2>::value)

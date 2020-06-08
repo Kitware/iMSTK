@@ -19,15 +19,30 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkCollisionHandling.h"
-#include "imstkTaskNode.h"
+#include "imstkTaskGraphController.h"
+#include "imstkTaskGraph.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
-CollisionHandling::CollisionHandling(const Type& type, const Side& side,
-                                     const std::shared_ptr<CollisionData> colData) :
-    m_type(type), m_side(side), m_colData(colData),
-    m_taskNode(std::make_shared<TaskNode>(std::bind(&CollisionHandling::processCollisionData, this), "CollisionHandling", true))
+bool
+TaskGraphController::initialize()
 {
+    // Ensure the source is reachable from the sink and the graph is not cyclic
+    // todo: Safer check would be to ensure all nodes reach sink
+    if (!m_graph->isReachable(m_graph->getSource(), m_graph->getSink()))
+    {
+        LOG(WARNING) << "TaskGraph Sink not reachable from source. Graph initialization failed.";
+        return false;
+    }
+
+    if (TaskGraph::isCyclic(m_graph))
+    {
+        LOG(WARNING) << "TaskGraph is cyclic. Graph initialization failed.";
+        return false;
+    }
+
+    init();
+    return true;
 }
 }
