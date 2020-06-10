@@ -26,6 +26,7 @@
 #include "imstkObjectInteractionFactory.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"

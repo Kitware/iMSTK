@@ -32,6 +32,7 @@
 #include "imstkSceneManager.h"
 #include "imstkCamera.h"
 #include "imstkObjectInteractionFactory.h"
+#include "imstkCollisionDetection.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"
