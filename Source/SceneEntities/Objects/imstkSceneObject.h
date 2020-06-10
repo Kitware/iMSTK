@@ -50,6 +50,7 @@ public:
         Colliding,
         Rigid,
         FEMDeformable,
+        ReducedFEMDeformable,
         Pbd,
         SPH
     };

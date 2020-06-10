@@ -9,7 +9,8 @@ imstk_add_library( DynamicalModels
     TimeIntegrators
     ObjectModels
     InternalForceModel
-  DEPENDS    
+  DEPENDS
+    Common
     DataStructures
     Constraints
     Geometry
@@ -20,6 +21,8 @@ imstk_add_library( DynamicalModels
     VegaFEM::isotropicHyperelasticFEM
     VegaFEM::forceModel
     VegaFEM::stvk
+    VegaFEM::reducedStvk
+    VegaFEM::reducedElasticForceModel
     VegaFEM::graph
     VegaFEM::volumetricMesh
     PhysX
