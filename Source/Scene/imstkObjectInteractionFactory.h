@@ -48,7 +48,6 @@ enum class InteractionType
 ///
 /// \brief Factory for InteractionPairs, returns nullptr and logs warning if failed
 ///
-extern std::shared_ptr<ObjectInteractionPair>
-makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
-    InteractionType intType, CollisionDetection::Type cdType);
+extern std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
+                                                                        InteractionType intType, CollisionDetection::Type cdType);
 }
