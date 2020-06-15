@@ -106,8 +106,7 @@ public:
     const Vectord& getPrevAccelerations() const;
 
 protected:
-    // std::shared_ptr<FEMDeformableBodyModel> m_defModel;
-    std::shared_ptr<ReducedStVK> m_defModel;
+    std::shared_ptr<ReducedStVK> m_defModel = nullptr;
 };
 } // imstk
 

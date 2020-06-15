@@ -19,8 +19,6 @@
 
 =========================================================================*/
 
-#ifdef iMSTK_USE_MODEL_REDUCTION
-
 #pragma once
 
 #include <memory>
@@ -375,5 +373,3 @@ private:
 };
 
 }  // namespace imstk
-
-#endif

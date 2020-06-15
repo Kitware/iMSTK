@@ -19,8 +19,6 @@
 
 =========================================================================*/
 
-#ifdef iMSTK_USE_MODEL_REDUCTION
-
 // std lib
 #include <fstream>
 #include <ios>
@@ -165,7 +163,7 @@ ReducedStVK::initialize()
             << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set "
                "yet!";
 
-    // Setup default solver if model doesn't yet have one
+    // Setup default solver if model wasn't assigned one
     if (m_solver == nullptr)
     {
         // create a nonlinear system
@@ -692,5 +690,3 @@ ReducedStVK::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Ta
 }
 
 }  // namespace imstk
-
-#endif

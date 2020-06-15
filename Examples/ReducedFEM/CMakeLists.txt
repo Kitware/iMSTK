@@ -18,7 +18,7 @@
 
 project(Example-ReducedFEM)
 
-if (${${PROJECT_NAME}_USE_MODEL_REDUCTION})
+if (${iMSTK_USE_MODEL_REDUCTION})
     #-----------------------------------------------------------------------------
     # Create executable
     #-----------------------------------------------------------------------------
