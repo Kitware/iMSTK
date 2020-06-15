@@ -51,7 +51,7 @@ ReducedStVK::ReducedStVK() : DynamicalModel(DynamicalModelType::ElastoDynamics)
 {
     // m_fixedNodeIds.reserve(1000);
 
-    m_validGeometryTypes = {  Geometry::Type::TetrahedralMesh, Geometry::Type::HexahedralMesh };
+    m_validGeometryTypes = { Geometry::Type::TetrahedralMesh, Geometry::Type::HexahedralMesh };
 
     m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
@@ -92,7 +92,7 @@ ReducedStVK::configure(const std::string& configFileName)
 
     // Parse the configuration file
     CHECK(vegaConfigFileOptions.parseOptions(configFileName.data()) == 0)
-            << "ForceModelConfig::parseConfig - Unable to load the configuration file";
+        << "ForceModelConfig::parseConfig - Unable to load the configuration file";
 
     // get the root directory of the boundary file name
     // std::string  rootDir;
@@ -160,8 +160,8 @@ ReducedStVK::initialize()
 {
     // prerequisite of for successfully initializing
     CHECK(m_geometry != nullptr && m_config != nullptr)
-            << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set "
-               "yet!";
+        << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set "
+        "yet!";
 
     // Setup default solver if model wasn't assigned one
     if (m_solver == nullptr)
@@ -185,13 +185,13 @@ ReducedStVK::initialize()
     this->readModalMatrix(m_config->m_modesFileName);
     this->loadInitialStates();
 
-    auto physicsMesh  = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
+    auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
-    CHECK(m_numDOF == m_vegaPhysicsMesh->getNumVertices()*3);
+    CHECK(m_numDOF == m_vegaPhysicsMesh->getNumVertices() * 3);
 
-    if (!this->initializeForceModel() || !this->initializeMassMatrix() ||
-        !this->initializeTangentStiffness() || !this->initializeDampingMatrix() ||
-        !this->initializeGravityForce() || !this->initializeExplicitExternalForces())
+    if (!this->initializeForceModel() || !this->initializeMassMatrix()
+        || !this->initializeTangentStiffness() || !this->initializeDampingMatrix()
+        || !this->initializeGravityForce() || !this->initializeExplicitExternalForces())
     {
         return false;
     }
@@ -221,7 +221,7 @@ ReducedStVK::readModalMatrix(const std::string& fname)
     std::vector<float> Ufloat;
     int                m, n;
     vega::ReadMatrixFromDisk_(fname.c_str(), m, n, Ufloat);
-    m_numDOF        = m;
+    m_numDOF = m;
     m_numDOFReduced = n;
     std::vector<double> Udouble(Ufloat.size());
 
@@ -231,7 +231,7 @@ ReducedStVK::readModalMatrix(const std::string& fname)
     }
 
     m_modalMatrix =
-            std::make_shared<vega::ModalMatrix>(m_numDOF / 3, m_numDOFReduced, Udouble.data());
+        std::make_shared<vega::ModalMatrix>(m_numDOF / 3, m_numDOFReduced, Udouble.data());
     return;
 }
 
@@ -256,7 +256,7 @@ ReducedStVK::loadInitialStates()
 bool
 ReducedStVK::initializeForceModel()
 {
-    const double g                = m_config->m_gravity;
+    const double g = m_config->m_gravity;
     const bool   isGravityPresent = (g > 0) ? true : false;
 
     // m_numDOFReduced = m_config->r;
@@ -272,7 +272,7 @@ bool
 ReducedStVK::initializeMassMatrix()
 {
     CHECK(m_geometry != nullptr)
-            << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
+        << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
     this->m_massMatrix.resize(m_numDOFReduced * m_numDOFReduced, 0.0);
 
     // set M to identity
@@ -308,8 +308,8 @@ bool
 ReducedStVK::initializeTangentStiffness()
 {
     CHECK(m_forceModel != nullptr)
-            << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be "
-               "initialized without force model";
+        << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be "
+        "initialized without force model";
 
     this->m_stiffnessMatrix.resize(m_numDOFReduced * m_numDOFReduced, 0.0);
     m_forceModel->GetTangentStiffnessMatrix(m_initialStateReduced->getQ().data(),
@@ -350,30 +350,30 @@ ReducedStVK::computeImplicitSystemRHS(kinematicState&       stateAtT,
 
     switch (updateType)
     {
-        case StateUpdateType::DeltaVelocity:
+    case StateUpdateType::DeltaVelocity:
 
-            m_Feff = m_K * -(uPrev - u + v * dT);
+        m_Feff = m_K * -(uPrev - u + v * dT);
 
-            if (m_damped)
-            {
-                m_Feff -= m_C * v;
-            }
+        if (m_damped)
+        {
+            m_Feff -= m_C * v;
+        }
 
-            m_forceModel->GetInternalForce(u.data(), m_Finternal.data());
-            m_Feff -= m_Finternal;
-            this->project(m_FexplicitExternal, m_FexplicitExternalReduced);
-            m_Feff += m_FexplicitExternalReduced;
-            // the reduced gravity has alredy been initialized in initializeGravityForce
-            // this->project(m_Fgravity, m_FgravityReduced);
-            m_Feff += m_FgravityReduced;
-            this->project(m_Fcontact, m_FcontactReduced);
-            m_Feff += m_FcontactReduced;
-            m_Feff *= dT;
-            m_Feff += m_M * (vPrev - v);
+        m_forceModel->GetInternalForce(u.data(), m_Finternal.data());
+        m_Feff -= m_Finternal;
+        this->project(m_FexplicitExternal, m_FexplicitExternalReduced);
+        m_Feff += m_FexplicitExternalReduced;
+        // the reduced gravity has alredy been initialized in initializeGravityForce
+        // this->project(m_Fgravity, m_FgravityReduced);
+        m_Feff += m_FgravityReduced;
+        this->project(m_Fcontact, m_FcontactReduced);
+        m_Feff += m_FcontactReduced;
+        m_Feff *= dT;
+        m_Feff += m_M * (vPrev - v);
 
-            break;
-        default:
-            LOG(WARNING) << "ReducedStVK::computeImplicitSystemRHS: Update type not supported";
+        break;
+    default:
+        LOG(WARNING) << "ReducedStVK::computeImplicitSystemRHS: Update type not supported";
     }
 }
 
@@ -395,29 +395,29 @@ ReducedStVK::computeSemiImplicitSystemRHS(kinematicState&       stateAtT,
 
     switch (updateType)
     {
-        case StateUpdateType::DeltaVelocity:
+    case StateUpdateType::DeltaVelocity:
 
-            m_Feff = m_K * (vPrev * -dT);
+        m_Feff = m_K * (vPrev * -dT);
 
-            if (m_damped)
-            {
-                m_Feff -= m_C * vPrev;
-            }
+        if (m_damped)
+        {
+            m_Feff -= m_C * vPrev;
+        }
 
-            m_forceModel->GetInternalForce(u.data(), m_Finternal.data());
-            m_Feff -= m_Finternal;
-            this->project(m_FexplicitExternal, m_FexplicitExternalReduced);
-            m_Feff += m_FexplicitExternalReduced;
-            this->project(m_Fgravity, m_FgravityReduced);
-            m_Feff += m_FgravityReduced;
-            this->project(m_Fcontact, m_FcontactReduced);
-            m_Feff += m_FcontactReduced;
-            m_Feff *= dT;
+        m_forceModel->GetInternalForce(u.data(), m_Finternal.data());
+        m_Feff -= m_Finternal;
+        this->project(m_FexplicitExternal, m_FexplicitExternalReduced);
+        m_Feff += m_FexplicitExternalReduced;
+        this->project(m_Fgravity, m_FgravityReduced);
+        m_Feff += m_FgravityReduced;
+        this->project(m_Fcontact, m_FcontactReduced);
+        m_Feff += m_FcontactReduced;
+        m_Feff *= dT;
 
-            break;
+        break;
 
-        default:
-            LOG(FATAL) << "ReducedStVK::computeSemiImplicitSystemRHS: Update type not supported";
+    default:
+        LOG(FATAL) << "ReducedStVK::computeSemiImplicitSystemRHS: Update type not supported";
     }
 }
 
@@ -430,30 +430,29 @@ ReducedStVK::computeImplicitSystemLHS(const kinematicState& stateAtT,
 
     switch (updateType)
     {
-        case StateUpdateType::DeltaVelocity:
+    case StateUpdateType::DeltaVelocity:
 
-            stateAtT;  // supress warning (state is not used in this update type hence can be
+        stateAtT;      // supress warning (state is not used in this update type hence can be
                        // ignored)
 
-            this->updateMassMatrix();
-            m_forceModel->GetTangentStiffnessMatrix(newState.getQ().data(),
+        this->updateMassMatrix();
+        m_forceModel->GetTangentStiffnessMatrix(newState.getQ().data(),
                                                     m_stiffnessMatrix.data());
-            this->initializeEigenMatrixFromStdVector(m_stiffnessMatrix, m_K);
-            this->updateDampingMatrix();
+        this->initializeEigenMatrixFromStdVector(m_stiffnessMatrix, m_K);
+        this->updateDampingMatrix();
 
-            m_Keff = m_M;
-            if (m_damped)
-            {
-                m_Keff += dT * m_C;
-            }
-            m_Keff += (dT * dT) * m_K;
+        m_Keff = m_M;
+        if (m_damped)
+        {
+            m_Keff += dT * m_C;
+        }
+        m_Keff += (dT * dT) * m_K;
 
-            break;
+        break;
 
-        default:
-            LOG(FATAL) << "ReducedStVK::computeImplicitSystemLHS: Update type not supported";
+    default:
+        LOG(FATAL) << "ReducedStVK::computeImplicitSystemLHS: Update type not supported";
     }
-
 }
 
 bool
@@ -470,7 +469,10 @@ ReducedStVK::initializeExplicitExternalForces()
 void
 ReducedStVK::updateDampingMatrix()
 {
-    if (!m_damped) return;
+    if (!m_damped)
+    {
+        return;
+    }
 
     const auto& dampingStiffnessCoefficient = m_config->m_dampingStiffnessCoefficient;
     const auto& dampingMassCoefficient      = m_config->m_dampingMassCoefficient;
@@ -546,21 +548,21 @@ ReducedStVK::updateBodyIntermediateStates(const Vectord& solution, const StateUp
 
     switch (updateType)
     {
-        case StateUpdateType::DeltaVelocity:
-            m_currentStateReduced->setV(v + solution);
-            m_currentStateReduced->setU(uPrev + dT * v);
+    case StateUpdateType::DeltaVelocity:
+        m_currentStateReduced->setV(v + solution);
+        m_currentStateReduced->setU(uPrev + dT * v);
 
-            break;
+        break;
 
-        case StateUpdateType::Velocity:
-            m_currentStateReduced->setV(solution);
-            m_currentStateReduced->setU(uPrev + dT * v);
+    case StateUpdateType::Velocity:
+        m_currentStateReduced->setV(solution);
+        m_currentStateReduced->setU(uPrev + dT * v);
 
-            break;
+        break;
 
-        default:
-            LOG(FATAL) << "DeformableBodyModel::updateBodyIntermediateStates: Unknown state update "
-                          "type";
+    default:
+        LOG(FATAL) << "DeformableBodyModel::updateBodyIntermediateStates: Unknown state update "
+            "type";
     }
     prolongate(*m_currentStateReduced, *m_currentState);
     m_qSolReduced = m_currentStateReduced->getQ();
@@ -574,13 +576,13 @@ ReducedStVK::getFunction()
 
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool semiImplicit) -> const Vectord& {
-        (semiImplicit) ? this->computeSemiImplicitSystemRHS(*m_previousStateReduced,
+               (semiImplicit) ? this->computeSemiImplicitSystemRHS(*m_previousStateReduced,
                                                             *m_currentStateReduced,
                                                             m_updateType)
                        : this->computeImplicitSystemRHS(*m_previousStateReduced,
                                                         *m_currentStateReduced,
                                                         m_updateType);
-        return m_Feff;
+               return m_Feff;
     };
 
 #pragma warning(pop)
@@ -593,10 +595,10 @@ ReducedStVK::getFunctionGradient()
 #pragma warning(disable : 4100)
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord& q) -> const Matrixd& {
-        this->computeImplicitSystemLHS(*m_previousStateReduced,
+               this->computeImplicitSystemLHS(*m_previousStateReduced,
                                        *m_currentStateReduced,
                                        m_updateType);
-        return m_Keff;
+               return m_Keff;
     };
 
 #pragma warning(pop)
@@ -607,7 +609,7 @@ ReducedStVK::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool fullyImplicit) -> void {
-        (fullyImplicit) ? this->updateBodyIntermediateStates(q, m_updateType)
+               (fullyImplicit) ? this->updateBodyIntermediateStates(q, m_updateType)
                         : this->updateBodyStates(q, m_updateType);
     };
 }
@@ -688,5 +690,4 @@ ReducedStVK::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<Ta
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
-
 }  // namespace imstk

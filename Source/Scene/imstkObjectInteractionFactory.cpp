@@ -38,14 +38,15 @@ namespace imstk
 {
 // Cast type check
 template<typename ObjectType>
-static bool isType(std::shared_ptr<SceneObject> obj)
+static bool
+isType(std::shared_ptr<SceneObject> obj)
 {
     return std::dynamic_pointer_cast<ObjectType>(obj) != nullptr;
 }
 
 std::shared_ptr<ObjectInteractionPair>
 makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
-    InteractionType intType, CollisionDetection::Type cdType)
+                          InteractionType intType, CollisionDetection::Type cdType)
 {
     std::shared_ptr<ObjectInteractionPair> results = nullptr;
     if (intType == InteractionType::PbdObjToPbdObjCollision && isType<PbdObject>(obj1) && isType<PbdObject>(obj2))

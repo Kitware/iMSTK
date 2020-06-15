@@ -109,4 +109,3 @@ protected:
     std::shared_ptr<ReducedStVK> m_defModel = nullptr;
 };
 } // imstk
-

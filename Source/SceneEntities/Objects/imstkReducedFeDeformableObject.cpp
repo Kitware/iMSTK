@@ -85,4 +85,3 @@ ReducedFeDeformableObject::getPrevAccelerations() const
     return m_defModel->getPreviousState()->getQDotDot();
 }
 } // imstk
-
