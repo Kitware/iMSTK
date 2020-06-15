@@ -115,31 +115,6 @@ main()
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
-    // create a nonlinear system
-    auto nlSystem = std::make_shared<NonLinearSystem<Matrixd>>(
-        dynaModel->getFunction(),
-        dynaModel->getFunctionGradient());
-
-    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
-    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
-    nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
-
-    // create a linear solver
-    // auto linSolver = std::make_shared<ConjugateGradient>();
-    //
-    // if (linSolver->getType() == imstk::LinearSolver<imstk::Matrixd>::Type::GaussSeidel
-    //     && dynaModel->isFixedBCImplemented())
-    // {
-    //     LOG(WARNING) << "The GS solver may not be viable!";
-    // }
-
-    // create a non-linear solver and add to the scene
-    auto nlSolver = std::make_shared<NewtonSolver<Matrixd>>();
-    // nlSolver->setLinearSolver(linSolver);
-    nlSolver->setMaxIterations(1);
-    nlSolver->setSystem(nlSystem);
-    scene->addNonlinearSolver(nlSolver);
-
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));

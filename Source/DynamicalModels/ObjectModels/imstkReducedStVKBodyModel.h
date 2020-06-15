@@ -19,6 +19,8 @@
 
 =========================================================================*/
 
+#ifdef iMSTK_USE_MODEL_REDUCTION
+
 #pragma once
 
 #include <memory>
@@ -37,9 +39,11 @@ class ModalMatrix;
 
 namespace imstk
 {
+class InternalForceModel;
+class SolverBase;
+class TaskNode;
 class TimeIntegrator;
 class VegaMeshIO;
-class InternalForceModel;
 
 struct ReducedStVKConfig
 {
@@ -304,7 +308,19 @@ public:
     ///
     void readModalMatrix(const std::string& fname);
 
+    std::shared_ptr<TaskNode> getSolveNode() const { return m_solveNode; }
+
+    std::shared_ptr<SolverBase> getSolver() const { return m_solver; }
+    void setSolver(std::shared_ptr<SolverBase> solver) { this->m_solver = solver; }
+
 protected:
+    ///
+    /// \brief Setup the computational graph of FEM
+    ///
+    void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
+
+protected:
+    std::shared_ptr<SolverBase> m_solver = nullptr;
     std::shared_ptr<vega::StVKReducedInternalForces> m_internalForceModel;  ///> Mathematical model for intenal forces
     std::shared_ptr<vega::ReducedStVKForceModel> m_forceModel;
     std::shared_ptr<TimeIntegrator> m_timeIntegrator;      ///> Time integrator
@@ -353,6 +369,11 @@ protected:
     std::shared_ptr<kinematicState> m_initialStateReduced;
     std::shared_ptr<kinematicState> m_previousStateReduced;
     std::shared_ptr<kinematicState> m_currentStateReduced;
+
+private:
+    std::shared_ptr<TaskNode> m_solveNode = nullptr;
 };
 
 }  // namespace imstk
+
+#endif

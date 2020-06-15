@@ -3,30 +3,44 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 
-imstk_add_library( DynamicalModels
+list(APPEND Dependencies
+  Common
+  DataStructures
+  Constraints
+  Geometry
+  Solvers
+  MeshIO
+  VegaFEM::massSpringSystem
+  VegaFEM::corotationalLinearFEM
+  VegaFEM::isotropicHyperelasticFEM
+  VegaFEM::forceModel
+  VegaFEM::stvk
+  VegaFEM::graph
+  VegaFEM::volumetricMesh
+  PhysX)
+list(APPEND ExclusionFiles "")
+
+# If using model reduction link to these libs
+if (${${PROJECT_NAME}_USE_MODEL_REDUCTION})
+  list(APPEND Dependencies
+    VegaFEM::reducedStvk  
+    VegaFEM::reducedElasticForceModel)
+else()
+  list(APPEND ExclusionFiles
+    ObjectModels/imstkReducedStVKBodyModel.h
+    ObjectModels/imstkReducedStVKBodyModel.cpp)
+endif()
+
+imstk_add_library(DynamicalModels
   SUBDIR_LIST
     ObjectStates
     TimeIntegrators
     ObjectModels
     InternalForceModel
+  EXCLUDE_FILES
+    ${ExclusionFiles}
   DEPENDS
-    Common
-    DataStructures
-    Constraints
-    Geometry
-    Solvers
-    MeshIO
-    VegaFEM::massSpringSystem
-    VegaFEM::corotationalLinearFEM
-    VegaFEM::isotropicHyperelasticFEM
-    VegaFEM::forceModel
-    VegaFEM::stvk
-    VegaFEM::reducedStvk
-    VegaFEM::reducedElasticForceModel
-    VegaFEM::graph
-    VegaFEM::volumetricMesh
-    PhysX
-  )
+    ${Dependencies})
  
 #-----------------------------------------------------------------------------
 # Testing

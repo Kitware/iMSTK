@@ -19,6 +19,8 @@
 
 =========================================================================*/
 
+#ifdef iMSTK_USE_MODEL_REDUCTION
+
 // std lib
 #include <fstream>
 #include <ios>
@@ -31,6 +33,8 @@
 #include "imstkTimeIntegrator.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkVolumetricMesh.h"
+#include "imstkTaskGraph.h"
+#include "imstkNewtonSolver.h"
 
 // vega
 #include "StVKReducedInternalForces.h"
@@ -49,7 +53,9 @@ ReducedStVK::ReducedStVK() : DynamicalModel(DynamicalModelType::ElastoDynamics)
 {
     // m_fixedNodeIds.reserve(1000);
 
-    m_validGeometryTypes = {Geometry::Type::TetrahedralMesh, Geometry::Type::HexahedralMesh};
+    m_validGeometryTypes = {  Geometry::Type::TetrahedralMesh, Geometry::Type::HexahedralMesh };
+
+    m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
 
 ReducedStVK::~ReducedStVK()
@@ -158,6 +164,25 @@ ReducedStVK::initialize()
     CHECK(m_geometry != nullptr && m_config != nullptr)
             << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set "
                "yet!";
+
+    // Setup default solver if model doesn't yet have one
+    if (m_solver == nullptr)
+    {
+        // create a nonlinear system
+        auto nlSystem = std::make_shared<NonLinearSystem<Matrixd>>(getFunction(), getFunctionGradient());
+
+        nlSystem->setUnknownVector(getUnknownVec());
+        nlSystem->setUpdateFunction(getUpdateFunction());
+        nlSystem->setUpdatePreviousStatesFunction(getUpdatePrevStateFunction());
+
+        // create a non-linear solver and add to the scene
+        auto nlSolver = std::make_shared<NewtonSolver<Matrixd>>();
+        // nlSolver->setLinearSolver(linSolver);
+        nlSolver->setMaxIterations(1);
+        nlSolver->setSystem(nlSystem);
+        setSolver(nlSolver);
+    }
+
     // This will specify \p m_numDOF and \p m_numDOFReduced
     this->readModalMatrix(m_config->m_modesFileName);
     this->loadInitialStates();
@@ -658,5 +683,14 @@ ReducedStVK::project(const Vectord& u, Vectord& uReduced) const
     m_modalMatrix->ProjectVector(const_cast<double*>(u.data()), uReduced.data());
 }
 
+void
+ReducedStVK::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+{
+    // Setup graph connectivity
+    m_taskGraph->addEdge(source, m_solveNode);
+    m_taskGraph->addEdge(m_solveNode, sink);
+}
+
 }  // namespace imstk
 
+#endif

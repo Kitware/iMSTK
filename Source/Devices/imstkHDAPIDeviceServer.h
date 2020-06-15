@@ -19,10 +19,7 @@
 
 =========================================================================*/
 
-#ifdef iMSTK_USE_OPENHAPTICS
-
-#ifndef imstkHDAPIDeviceServer_h
-#define imstkHDAPIDeviceServer_h
+#pragma once
 
 #include <vector>
 
@@ -78,6 +75,3 @@ private:
     std::vector<std::shared_ptr<HDAPIDeviceClient>> m_deviceClients; ///< list of OpenHaptics
 };
 } // imstk
-
-#endif // ifndef imstkHDAPIDeviceServer_h
-#endif // ifdef iMSTK_USE_OpenHaptics

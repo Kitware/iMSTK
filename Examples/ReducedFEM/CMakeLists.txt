@@ -18,17 +18,19 @@
 
 project(Example-ReducedFEM)
 
-#-----------------------------------------------------------------------------
-# Create executable
-#-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} ReducedFEM.cpp)
+if (${${PROJECT_NAME}_USE_MODEL_REDUCTION})
+    #-----------------------------------------------------------------------------
+    # Create executable
+    #-----------------------------------------------------------------------------
+    imstk_add_executable(${PROJECT_NAME} ReducedFEM.cpp)
 
-#-----------------------------------------------------------------------------
-# Add the target to Examples folder
-#-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
+    #-----------------------------------------------------------------------------
+    # Add the target to Examples folder
+    #-----------------------------------------------------------------------------
+    SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples)
 
-#-----------------------------------------------------------------------------
-# Link libraries to executable
-#-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
+    #-----------------------------------------------------------------------------
+    # Link libraries to executable
+    #-----------------------------------------------------------------------------
+    target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
+endif()

@@ -1,8 +1,17 @@
 #-----------------------------------------------------------------------------
 # Create target
 #-----------------------------------------------------------------------------
+
+if (NOT ${${PROJECT_NAME}_USE_MODEL_REDUCTION})
+  list(APPEND ExclusionFiles
+    Objects/imstkReducedFeDeformableObject.h
+    Objects/imstkReducedFeDeformableObject.cpp)
+endif()
+
 include(imstkAddLibrary)
-imstk_add_library( SceneEntities
+imstk_add_library(SceneEntities
+  EXCLUDE_FILES
+    ${ExclusionFiles}
   DEPENDS    
     Common
     Geometry
@@ -11,8 +20,7 @@ imstk_add_library( SceneEntities
     MeshIO
     Constraints
     Devices
-    DynamicalModels
-  )
+    DynamicalModels)
 
 #-----------------------------------------------------------------------------
 # Testing
