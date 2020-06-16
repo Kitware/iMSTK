@@ -35,7 +35,7 @@ namespace imstk
 ///
 /// \brief Base class for non-linear solvers
 ///
-template <typename SystemMatrix>
+template<typename SystemMatrix>
 class NonLinearSolver : public SolverBase
 {
 public:
@@ -114,7 +114,10 @@ public:
     ///
     /// \param newUpdateIterate Function used to update iterates. Default: x+=dx.
     ///
-    void setUpdateIterate(const UpdateIterateType& newUpdateIterate);
+    void setUpdateIterate(const UpdateIterateType& newUpdateIterate)
+    {
+        m_updateIterate = newUpdateIterate;
+    }
 
     ///
     /// \brief Set the Newton solver to be fully implicit
@@ -133,12 +136,12 @@ public:
     }
 
 protected:
-    std::array<double, 2> m_sigma;                      ///< Safeguarding bounds for the line search
-    double m_alpha;                                     ///< Parameter to measure decrease
-    size_t m_armijoMax;                                 ///< Maximum number of step length reductions
+    std::array<double, 2> m_sigma;                                    ///< Safeguarding bounds for the line search
+    double m_alpha;                                                   ///< Parameter to measure decrease
+    size_t m_armijoMax;                                               ///< Maximum number of step length reductions
 
     std::shared_ptr<NonLinearSystem<SystemMatrix>> m_nonLinearSystem; ///< System of non-linear equations
-    UpdateIterateType m_updateIterate;                  ///< Update iteration function
-    bool m_isSemiImplicit = true;                       ///> Semi-Implicit solver
+    UpdateIterateType m_updateIterate;                                ///< Update iteration function
+    bool m_isSemiImplicit = true;                                     ///> Semi-Implicit solver
 };
 } // imstk

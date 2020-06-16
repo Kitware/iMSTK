@@ -20,29 +20,40 @@
 =========================================================================*/
 
 #include "imstkScene.h"
-#include "imstkSceneObject.h"
-#include "imstkVisualModel.h"
+#include "imstkCamera.h"
 #include "imstkCameraController.h"
-#include "imstkSceneObjectControllerBase.h"
-#include "imstkCameraController.h"
+#include "imstkCollidingObject.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCollisionPair.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkDeformableObject.h"
-#include "imstkTimer.h"
-#include "imstkRigidBodyWorld.h"
-#include "imstkPbdSolver.h"
-#include "imstkPbdObject.h"
-#include "imstkPBDCollisionHandling.h"
-#include "imstkSolverBase.h"
-#include "imstkCamera.h"
-#include "imstkIBLProbe.h"
-#include "imstkCollisionGraph.h"
+#include "imstkDynamicObject.h"
+#include "imstkFEMDeformableBodyModel.h"
+#include "imstkInteractionPair.h"
 #include "imstkLight.h"
-#include "imstkLogger.h"
-
-#include <iterator>
+#include "imstkParallelUtils.h"
+#include "imstkPbdObject.h"
+#include "imstkRigidBodyWorld.h"
+#include "imstkSceneObject.h"
+#include "imstkSceneObjectControllerBase.h"
+#include "imstkSequentialTaskGraphController.h"
+#include "imstkTaskGraph.h"
+#include "imstkTaskGraphVizWriter.h"
+#include "imstkTbbTaskGraphController.h"
+#include "imstkTimer.h"
 
 namespace imstk
 {
+Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
+    m_name(name),
+    m_camera(std::make_shared<Camera>()),
+    m_collisionGraph(std::make_shared<CollisionGraph>()),
+    m_config(config),
+    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
+    computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
+{
+}
+
 Scene::~Scene()
 {
     // Join Camera Controllers
@@ -56,54 +67,133 @@ Scene::~Scene()
 bool
 Scene::initialize()
 {
-    std::unordered_map<std::shared_ptr<PbdObject>, std::shared_ptr<PbdSolver>> pbdObjSolver;
-
+    // Initialize all the SceneObjects
     for (auto const& it : m_sceneObjectsMap)
     {
-        // Add pbd solver for all the pbd scene objects
-        if (it.second->getType() == SceneObject::Type::Pbd)
-        {
-            auto pbdSolver = std::make_shared<PbdSolver>();
-            auto pbdObj    = std::dynamic_pointer_cast<PbdObject>(it.second);
-            pbdSolver->setPbdObject(pbdObj);
-            this->addNonlinearSolver(pbdSolver);
-
-            pbdObjSolver[pbdObj] = pbdSolver;
-        }
-
         auto sceneObject = it.second;
-
         CHECK(sceneObject->initialize()) << "Error initializing scene object: " << sceneObject->getName();
     }
 
-    for (auto const& it : m_collisionGraph->getInteractionPairList())
+    // Build the compute graph
+    buildTaskGraph();
+
+    // Opportunity for external configuration
+    if (m_postTaskGraphConfigureCallback != nullptr)
     {
-        auto chA = it->getCollisionHandlingA();
-        if (chA)
-        {
-            if (chA->getType() == CollisionHandling::Type::PBD)
-            {
-                auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chA);
-                ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast<PbdObject>(it->getObjectsPair().first)]);
-            }
-        }
-        else
-        {
-            auto chB = it->getCollisionHandlingB();
-            if (chB)
-            {
-                if (chB->getType() == CollisionHandling::Type::PBD)
-                {
-                    auto ch = std::dynamic_pointer_cast<PBDCollisionHandling>(chB);
-                    ch->setSolver(pbdObjSolver[std::dynamic_pointer_cast<PbdObject>(it->getObjectsPair().second)]);
-                }
-            }
-        }
+        m_postTaskGraphConfigureCallback(this);
     }
+
+    // Then init
+    initTaskGraph();
 
     m_isInitialized = true;
     LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
     return true;
+}
+
+void
+Scene::buildTaskGraph()
+{
+    // Configures the edges/flow of the graph
+
+    // Clear the compute graph of all nodes/edges except source+sink
+    m_taskGraph->clear();
+
+    // Setup all SceneObject compute graphs (and segment the rigid bodies)
+    std::list<std::shared_ptr<SceneObject>> rigidBodies;
+    for (auto const& it : m_sceneObjectsMap)
+    {
+        auto sceneObject = it.second;
+        if (sceneObject->getType() == SceneObject::Type::Rigid)
+        {
+            rigidBodies.push_back(sceneObject);
+        }
+
+        sceneObject->initGraphEdges();
+    }
+
+    // Apply all the interaction graph element operations to the SceneObject graphs
+    const std::vector<std::shared_ptr<ObjectInteractionPair>>& pairs = m_collisionGraph->getInteractionPairs();
+    for (size_t i = 0; i < pairs.size(); i++)
+    {
+        pairs[i]->apply();
+    }
+
+    // Nest all the SceneObject graphs within this Scene's ComputeGraph
+    for (auto const& it : m_sceneObjectsMap)
+    {
+        std::shared_ptr<TaskGraph> objComputeGraph = it.second->getTaskGraph();
+        if (objComputeGraph != nullptr)
+        {
+            // Add edges between any nodes that are marked critical and running simulatenously
+            objComputeGraph = TaskGraph::resolveCriticalNodes(objComputeGraph);
+            // Sum and nest the graph
+            m_taskGraph->nestGraph(objComputeGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
+        }
+    }
+
+    // Edge Case: Rigid bodies all have a singular update point because of how PhysX works
+    // Think about generalizes these islands of interaction to Systems
+    if (rigidBodies.size() > 0)
+    {
+        // The node that updates the rigid body system
+        auto physXUpdate = m_taskGraph->addFunction("PhysXUpdate", [&]()
+            {
+                auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
+                // TODO: update the time step, split into two steps, collide and advance
+                physxScene->simulate(RigidBodyWorld::getInstance()->getTimeStep());
+                physxScene->fetchResults(true);
+            });
+
+        // Scene Source->physX Update->Rigid Body Update Geometry[i]
+        m_taskGraph->addEdge(m_taskGraph->getSource(), physXUpdate);
+        m_taskGraph->addEdge(physXUpdate, m_taskGraph->getSink());
+        for (std::list<std::shared_ptr<SceneObject>>::iterator i = rigidBodies.begin(); i != rigidBodies.end(); i++)
+        {
+            m_taskGraph->addEdge(physXUpdate, (*i)->getUpdateGeometryNode());
+        }
+    }
+}
+
+void
+Scene::initTaskGraph()
+{
+    // Pick a controller for the graph execution
+    if (m_config->taskParallelizationEnabled)
+    {
+        m_taskGraphController = std::make_shared<TbbTaskGraphController>();
+    }
+    else
+    {
+        m_taskGraphController = std::make_shared<SequentialTaskGraphController>();
+    }
+    m_taskGraphController->setTaskGraph(m_taskGraph);
+
+    // Reduce the graph, removing nonfunctional nodes, and redundant edges
+    if (m_config->graphReductionEnabled)
+    {
+        m_taskGraph = TaskGraph::reduce(m_taskGraph);
+    }
+
+    // If user wants to benchmark, tell all the nodes to time themselves
+    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
+    {
+        node->m_enableTiming = m_config->taskTimingEnabled;
+    }
+
+    // Generate unique names among the nodes
+    TaskGraph::getUniqueNodeNames(m_taskGraph, true);
+    m_nodeComputeTimes.clear();
+
+    if (m_config->writeTaskGraph)
+    {
+        TaskGraphVizWriter writer;
+        writer.setInput(m_taskGraph);
+        writer.setFileName("sceneTaskGraph.svg");
+        writer.write();
+    }
+
+    m_taskGraphController->initialize();
 }
 
 void
@@ -304,18 +394,6 @@ Scene::getCollisionGraph() const
     return m_collisionGraph;
 }
 
-const std::vector<std::shared_ptr<SolverBase>>
-Scene::getSolvers()
-{
-    return m_solvers;
-}
-
-void
-Scene::addNonlinearSolver(std::shared_ptr<SolverBase> solver)
-{
-    m_solvers.push_back(solver);
-}
-
 void
 Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller)
 {
@@ -340,20 +418,7 @@ Scene::resetSceneObjects()
     // Apply the geometry and apply maps to all the objects
     for (auto obj : this->getSceneObjects())
     {
-        const auto objType = obj->getType();
-        if (objType == SceneObject::Type::Rigid
-            || objType == SceneObject::Type::FEMDeformable
-            || objType == SceneObject::Type::Pbd
-            || objType == SceneObject::Type::SPH)
-        {
-            obj->reset();
-        }
-    }
-
-    // Apply the geometry and apply maps to all the objects
-    for (auto obj : this->getSceneObjects())
-    {
-        obj->updateGeometries();
+        obj->reset();
     }
 
     //\todo reset the timestep to the fixed default value when paused->run or reset
@@ -365,25 +430,20 @@ Scene::advance()
     StopWatch wwt;
     wwt.start();
 
-    advance(elapsedTime);
+    advance(m_elapsedTime);
 
-    elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+    m_elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
 }
 
 void
 Scene::advance(const double dt)
 {
-    // PhysX update; move this to solver
-    auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
-    physxScene->simulate(RigidBodyWorld::getInstance()->getTimeStep()); // TODO: update the time step
-    physxScene->fetchResults(true);
-
     // Reset Contact forces to 0
     for (auto obj : this->getSceneObjects())
     {
         if (auto defObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
         {
-            defObj->getContactForce().setConstant(0.0);
+            defObj->getFEMModel()->getContactForce().setConstant(0.0);
         }
         else if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
         {
@@ -397,37 +457,15 @@ Scene::advance(const double dt)
         controller->updateControlledObjects();
     }
 
-    // Update the static octree and perform collision detection for some collision pairs
     CollisionDetection::updateInternalOctreeAndDetectCollision();
 
-    // Compute collision data per interaction pair
-    for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
-    {
-        intPair->computeCollisionData();
-    }
-
-    // Process collision data per interaction pair
-    for (auto intPair : this->getCollisionGraph()->getInteractionPairList())
-    {
-        intPair->processCollisionData();
-    }
-
-    // Run the solvers
-    for (auto solvers : this->getSolvers())
-    {
-        solvers->solve();
-    }
+    // Execute the computational graph
+    m_taskGraphController->execute();
 
     // Apply updated forces on device
     for (auto controller : this->getSceneObjectControllers())
     {
         controller->applyForces();
-    }
-
-    // Apply the geometry and apply maps to all the objects
-    for (auto obj : this->getSceneObjects())
-    {
-        obj->updateGeometries();
     }
 
     // Set the trackers of the scene object controllers to out-of-date
@@ -436,27 +474,13 @@ Scene::advance(const double dt)
         controller->setTrackerToOutOfDate();
     }
 
-    // Update time step size of the dynamic objects
     for (auto obj : this->getSceneObjects())
     {
-        if (obj->getType() == SceneObject::Type::Pbd)
+        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
         {
-            if (auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj))
+            if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
             {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
-                {
-                    dynaObj->getDynamicalModel()->setTimeStep(dt);
-                }
-            }
-        }
-        else if (obj->getType() == SceneObject::Type::FEMDeformable)
-        {
-            if (auto dynaObj = std::dynamic_pointer_cast<FeDeformableObject>(obj))
-            {
-                if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
-                {
-                    dynaObj->getDynamicalModel()->setTimeStep(dt);
-                }
+                dynaObj->getDynamicalModel()->setTimeStep(dt);
             }
         }
     }
@@ -469,5 +493,42 @@ Scene::advance(const double dt)
     }
 
     this->setFPS(1.0 / dt);
+
+    // If benchmarking enabled, produce a time table for each step
+    if (m_config->taskTimingEnabled)
+    {
+        lockComputeTimes();
+        for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
+        {
+            m_nodeComputeTimes[node->m_name] = node->m_computeTime;
+        }
+        unlockComputeTimes();
+    }
+}
+
+double
+Scene::getElapsedTime(const std::string& stepName) const
+{
+    if (m_nodeComputeTimes.count(stepName) == 0)
+    {
+        LOG(WARNING) << "Tried to get elapsed time of nonexistent step. Is benchmarking enabled?";
+        return 0.0;
+    }
+    else
+    {
+        return m_nodeComputeTimes.at(stepName);
+    }
+}
+
+void
+Scene::lockComputeTimes()
+{
+    computeTimesLock->lock();
+}
+
+void
+Scene::unlockComputeTimes()
+{
+    computeTimesLock->unlock();
 }
 } // imstk

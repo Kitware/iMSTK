@@ -210,6 +210,7 @@ printUPS(std::shared_ptr<SceneManager> sceneManager)
         return;
     }
 
+    sceneManager->enableFrameCount();
     sceneManager->setPostUpdateCallback([&sceneManager](Module* module)
             {
                 std::cout << "\r" << module->getName() << " running at "

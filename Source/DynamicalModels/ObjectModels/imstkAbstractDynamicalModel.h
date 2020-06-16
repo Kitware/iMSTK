@@ -26,9 +26,13 @@
 
 #include <set>
 #include <string>
+#include <unordered_map>
 
 namespace imstk
 {
+class TaskGraph;
+class TaskNode;
+
 ///
 /// \brief Type of the time dependent mathematical model
 ///
@@ -58,7 +62,6 @@ enum class TimeSteppingType
 class AbstractDynamicalModel
 {
 public:
-
     ///
     /// \brief Type of the update of the state of the body
     ///
@@ -71,17 +74,13 @@ public:
         None
     };
 
-public:
-    ///
-    /// \brief Constructor
-    ///
-    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::None) : m_type(type), m_numDOF(0) {}
+protected:
+    AbstractDynamicalModel(DynamicalModelType type = DynamicalModelType::None);
 
-    ///
-    /// \brief Destructor
-    ///
+public:
     virtual ~AbstractDynamicalModel() = default;
 
+public:
     ///
     /// \brief Reset the current state to the initial state
     ///
@@ -92,6 +91,8 @@ public:
     ///
     std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
     void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
+
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
     ///
     /// \brief Get the type of the object
@@ -104,9 +105,9 @@ public:
     virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::Displacement) = 0;
 
     ///
-    /// \brief
+    /// \brief Update the geometry of the model
     ///
-    virtual void updatePhysicsGeometry() {}
+    virtual void updatePhysicsGeometry() { }
 
     ///
     /// \brief Set the time step size
@@ -139,19 +140,32 @@ public:
     virtual bool initialize() = 0;
 
     ///
+    /// \brief Initializes the edges of the graph
+    ///
+    void initGraphEdges();
+
+    ///
     /// \brief Set the type of approach used to update the time step size after every frame
     ///
     virtual void setTimeStepSizeType(const TimeSteppingType type) { m_timeStepSizeType = type; }
     TimeSteppingType getTimeStepSizeType() { return m_timeStepSizeType; }
 
 protected:
+    ///
+    /// \brief Setup connectivity of the compute graph
+    ///
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
+
+protected:
     DynamicalModelType m_type;                      ///> Mathematical model type
 
     std::size_t m_numDOF;                           ///> Total number of degree of freedom
 
-    std::shared_ptr<Geometry> m_geometry;           ///> Physics geometry of the model
+    std::shared_ptr<Geometry> m_geometry = nullptr; ///> Physics geometry of the model
     std::set<Geometry::Type>  m_validGeometryTypes; ///> Valid geometry types of this model
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::Fixed;
+
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
 } // imstk

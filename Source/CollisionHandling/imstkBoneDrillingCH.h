@@ -23,6 +23,7 @@
 
 // imstk
 #include "imstkCollisionHandling.h"
+#include "imstkMath.h"
 
 namespace imstk
 {

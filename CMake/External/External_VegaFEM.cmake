@@ -8,12 +8,12 @@ endif(WIN32)
 
 include(imstkAddExternalProject)
 imstk_add_external_project( VegaFEM
-  GIT_REPOSITORY https://gitlab.kitware.com/iMSTK/vegafemv4.0
-  GIT_TAG f9c96c4128437a559e5fb9a93830ef3c9a627d5e
+  URL https://gitlab.kitware.com/iMSTK/vegafemv4.0/-/archive/build_model_reduction/vegafemv4.0-build_model_reduction.zip
+  URL_MD5 3f04bb7c2ba080785bcadf44d1a462a3
   CMAKE_CACHE_ARGS
     -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
     -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=OFF
-    -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
+    -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=${${PROJECT_NAME}_USE_MODEL_REDUCTION}
     -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
   DEPENDENCIES ${VegaFEM_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""

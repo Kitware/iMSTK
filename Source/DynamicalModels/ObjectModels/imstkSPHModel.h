@@ -28,6 +28,7 @@
 
 namespace imstk
 {
+class ComputeNode;
 class PointSet;
 
 ///
@@ -92,10 +93,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SmoothedParticleHydrodynamics)
-    {
-        m_validGeometryTypes = { Geometry::Type::PointSet };
-    }
+    SPHModel();
 
     ///
     /// \brief Destructor
@@ -175,10 +173,19 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
+    std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
+    std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
+    std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
+    std::shared_ptr<TaskNode> getComputeSurfaceTensionNode() const { return m_computeSurfaceTensionNode; }
+    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
+    std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
+    std::shared_ptr<TaskNode> getIntegrateNode() const { m_integrateNode; }
+
+protected:
     ///
-    /// \brief Do one time step simulation
+    /// \brief Setup SPH compute graph connectivity
     ///
-    void advanceTimeStep();
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 private:
     ///
@@ -223,6 +230,11 @@ private:
     void computePressureAcceleration();
 
     ///
+    /// \brief Sum the forces computed in parallel
+    ///
+    void sumAccels();
+
+    ///
     /// \brief Update particle velocities due to pressure
     ///
     void updateVelocity(const Real timestep);
@@ -244,6 +256,16 @@ private:
     ///
     void moveParticles(const Real timestep);
 
+protected:
+    std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
+    std::shared_ptr<TaskNode> m_computeDensityNode        = nullptr;
+    std::shared_ptr<TaskNode> m_computePressureAccelNode  = nullptr;
+    std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
+    std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
+    std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
+    std::shared_ptr<TaskNode> m_integrateNode = nullptr;
+
+private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
     SPHSimulationState m_simulationState;
 
@@ -253,5 +275,8 @@ private:
     SPHSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
     std::shared_ptr<SPHModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)
     std::shared_ptr<NeighborSearch> m_neighborSearcher; ///> Neighbor Search (must be initialized during model initialization)
+
+    std::shared_ptr<StdVectorOfVec3d> m_pressureAccels       = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
 };
 } // end namespace imstk

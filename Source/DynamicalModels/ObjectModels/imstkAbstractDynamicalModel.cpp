@@ -21,9 +21,15 @@
 
 #include "imstkAbstractDynamicalModel.h"
 #include "imstkLogger.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
+AbstractDynamicalModel::AbstractDynamicalModel(DynamicalModelType type) :
+    m_type(type), m_numDOF(0), m_taskGraph(std::make_shared<TaskGraph>("AbstractDynamicalModel_Source", "AbstractDynamicalModel_Sink"))
+{
+}
+
 bool
 AbstractDynamicalModel::isGeometryValid(const std::shared_ptr<Geometry> geometry)
 {
@@ -64,5 +70,18 @@ AbstractDynamicalModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
     {
         LOG(WARNING) << "Invalid geometry for Model";
     }
+}
+
+void
+AbstractDynamicalModel::initGraphEdges()
+{
+    m_taskGraph->clearEdges();
+    initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
+}
+
+void
+AbstractDynamicalModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+{
+    m_taskGraph->addEdge(source, sink);
 }
 } // imstk

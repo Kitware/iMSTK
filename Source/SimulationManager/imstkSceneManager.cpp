@@ -23,7 +23,6 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 //#include "imstkCameraController.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
 
 namespace imstk

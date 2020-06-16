@@ -59,14 +59,20 @@ setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 void
 DirectLinearSolver<SparseMatrixd>::solve(const Vectord& rhs, Vectord& x)
 {
-    if(!m_linearSystem) LOG(FATAL) << "Linear system has not been set";
+    if (!m_linearSystem)
+    {
+        LOG(FATAL) << "Linear system has not been set";
+    }
     x = m_solver.solve(rhs);
 }
 
 void
 DirectLinearSolver<SparseMatrixd>::solve(Vectord& x)
 {
-    if(!m_linearSystem) LOG(FATAL) << "Linear system has not been set";
+    if (!m_linearSystem)
+    {
+        LOG(FATAL) << "Linear system has not been set";
+    }
     x.setZero();
 
     auto b = m_linearSystem->getRHSVector();
@@ -76,14 +82,20 @@ DirectLinearSolver<SparseMatrixd>::solve(Vectord& x)
 void
 DirectLinearSolver<Matrixd>::solve(const Vectord& rhs, Vectord& x)
 {
-    if(!m_linearSystem) LOG(FATAL) << "Linear system has not been set";
+    if (!m_linearSystem)
+    {
+        LOG(FATAL) << "Linear system has not been set";
+    }
     x = m_solver.solve(rhs);
 }
 
 void
 DirectLinearSolver<Matrixd>::solve(Vectord& x)
 {
-    if(!m_linearSystem) LOG(FATAL) << "Linear system has not been set";
+    if (!m_linearSystem)
+    {
+        LOG(FATAL) << "Linear system has not been set";
+    }
     x.setZero();
 
     auto b = m_linearSystem->getRHSVector();

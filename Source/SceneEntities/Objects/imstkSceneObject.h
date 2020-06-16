@@ -29,8 +29,10 @@
 
 namespace imstk
 {
-class Geometry;
 class DeviceClient;
+class Geometry;
+class TaskGraph;
+class TaskNode;
 
 ///
 /// \class SceneObject
@@ -48,6 +50,7 @@ public:
         Colliding,
         Rigid,
         FEMDeformable,
+        ReducedFEMDeformable,
         Pbd,
         SPH
     };
@@ -62,16 +65,22 @@ public:
     ///
     virtual ~SceneObject() = default;
 
+public:
     ///
     /// \brief Get the type of the object
     ///
-    const Type& getType() const;
+    const Type& getType() const { return m_type; }
+
+    ///
+    /// \brief Get the computational graph
+    ///
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
     ///
     /// \brief Get/Set the custom name of the scene object
     ///
-    const std::string& getName() const;
-    void setName(const std::string& name);
+    const std::string& getName() const { return m_name; }
+    void setName(const std::string& name) { m_name = name; }
 
     ///
     /// \brief DEPRECATED: Get/Set geometry used for viewing
@@ -84,23 +93,38 @@ public:
     ///
     /// \brief Get/add visual model
     ///
-    std::shared_ptr<VisualModel> getVisualModel(unsigned int index=0);
-    void addVisualModel(std::shared_ptr<VisualModel> visualModel);
+    std::shared_ptr<VisualModel> getVisualModel(unsigned int index) { return m_visualModels[index]; }
+    void addVisualModel(std::shared_ptr<VisualModel> visualModel) { m_visualModels.push_back(visualModel); }
 
     ///
     /// \brief Get all visual models
     ///
-    const std::vector<std::shared_ptr<VisualModel>>& getVisualModels();
+    const std::vector<std::shared_ptr<VisualModel>>& getVisualModels() { return m_visualModels; }
 
     ///
     /// \brief Get number of visual models
     ///
-    size_t getNumVisualModels();
+    size_t getNumVisualModels() { return m_visualModels.size(); }
 
     ///
     /// \brief Get the master geometry
     ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const { return this->getVisualGeometry(); }
+
+    ///
+    /// \brief Returns the computational node for updating
+    ///
+    std::shared_ptr<TaskNode> getUpdateNode() const { return m_updateNode; }
+
+    ///
+    /// \brief Returns the computational node for updating geometry
+    ///
+    std::shared_ptr<TaskNode> getUpdateGeometryNode() const { return m_updateGeometryNode; }
+
+    ///
+    /// \brief
+    ///
+    virtual void update() { }
 
     ///
     /// \brief
@@ -113,19 +137,31 @@ public:
     virtual bool initialize() { return true; }
 
     ///
+    /// \brief Initializes the edges of the SceneObject's computational graph
+    ///
+    void initGraphEdges();
+
+    ///
     /// \brief
     ///
-    virtual void reset() {}
+    virtual void reset() { }
 
 protected:
     ///
-    /// \brief Assigns the type of the object
+    /// \brief Setup connectivity of the compute graph
     ///
-    void setType(Type type);
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
+protected:
     Type m_type;                                              ///> Type of the scene object
     std::string m_name;                                       ///> Custom name of the scene object
     std::vector<std::shared_ptr<VisualModel>> m_visualModels; ///> Visual objects for rendering
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;         ///> Computational Graph
+
+private:
+    // Dissallow reassignment of these in subclasses
+    std::shared_ptr<TaskNode> m_updateNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateGeometryNode = nullptr;
 };
 
 using VisualObject = SceneObject;

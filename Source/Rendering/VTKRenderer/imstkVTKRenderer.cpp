@@ -24,7 +24,6 @@
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkLight.h"
@@ -38,6 +37,18 @@
 #include <vtkProp.h>
 #include <vtkLight.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+
+#include <vtkAxis.h>
+#include <vtkChartXY.h>
+#include <vtkContextActor.h>
+#include <vtkContextScene.h>
+#include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
+#include <vtkPlotBar.h>
+#include <vtkStringArray.h>
+#include <vtkTable.h>
+#include <vtkTextProperty.h>
 
 namespace imstk
 {
@@ -171,7 +182,6 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         m_defaultVtkCamera = vtkSmartPointer<vtkOpenVRCamera>::New();
         m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
     }
-
 #endif
     ///TODO : based on scene properties
     // Customize background colors
@@ -231,6 +241,49 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         m_camPos[1].Translation[2] = 0.0;
     }
 #endif
+
+    {
+        // Add the benchmarking chart
+        m_timeTableChart = vtkSmartPointer<vtkChartXY>::New();
+        vtkSmartPointer<vtkContextScene> m_benchmarkChartScene = vtkSmartPointer<vtkContextScene>::New();
+        m_timeTableChartActor = vtkSmartPointer<vtkContextActor>::New();
+        m_vtkRenderer->AddActor(m_timeTableChartActor);
+        m_benchmarkChartScene->SetRenderer(m_vtkRenderer);
+
+        m_timeTableChart->SetAutoSize(true);
+        m_timeTableChart->SetSize(vtkRectf(0.0, 0.0, 600.0, 600.0));
+
+        m_benchmarkChartScene->AddItem(m_timeTableChart);
+        m_timeTableChartActor->SetScene(m_benchmarkChartScene);
+        m_timeTableChartActor->SetVisibility(false);
+
+        m_timeTablePlot = vtkPlotBar::SafeDownCast(m_timeTableChart->AddPlot(vtkChart::BAR));
+        m_timeTablePlot->SetColor(0.6, 0.1, 0.1);
+        m_timeTablePlot->SetOrientation(vtkPlotBar::HORIZONTAL);
+        m_timeTableChart->GetAxis(vtkAxis::BOTTOM)->SetTitle("ms");
+        m_timeTableChart->GetAxis(vtkAxis::LEFT)->SetTitle("");
+        m_timeTableChart->GetAxis(vtkAxis::LEFT)->GetLabelProperties()->SetVerticalJustification(VTK_TEXT_CENTERED);
+        m_timeTableChart->GetAxis(vtkAxis::LEFT)->GetLabelProperties()->SetJustification(VTK_TEXT_RIGHT);
+
+        m_timeTable = vtkSmartPointer<vtkTable>::New();
+        vtkSmartPointer<vtkDoubleArray> xIndices = vtkSmartPointer<vtkDoubleArray>::New();
+        xIndices->SetName("Indices");
+        xIndices->SetNumberOfValues(0);
+        vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkSmartPointer<vtkDoubleArray>::New();
+        yElapsedTimes->SetName("Elapsed Times");
+        yElapsedTimes->SetNumberOfValues(0);
+        vtkSmartPointer<vtkStringArray> labels = vtkSmartPointer<vtkStringArray>::New();
+        labels->SetName("Labels");
+        labels->SetNumberOfValues(0);
+        m_timeTable->AddColumn(xIndices);
+        m_timeTable->AddColumn(yElapsedTimes);
+        m_timeTable->AddColumn(labels);
+        m_timeTablePlot->SetInputData(m_timeTable, 0, 1);
+
+        vtkAxis* axisY = m_timeTableChart->GetAxis(vtkAxis::LEFT);
+        //axisY->SetRange(xIndices->GetRange());
+        axisY->SetCustomTickPositions(xIndices, labels);
+    }
 }
 
 vtkSmartPointer<vtkRenderer>
@@ -360,13 +413,81 @@ VTKRenderer::setAxesVisibility(const bool visible)
     m_AxesActor->SetVisibility(visible);
 }
 
-///
-/// \brief Returns whether the debug axes is visible or not
-///
 bool
 VTKRenderer::getAxesVisibility() const
 {
     return m_AxesActor->GetVisibility();
+}
+
+void
+VTKRenderer::setTimeTable(const std::unordered_map<std::string, double>& timeTable)
+{
+    // Sort by elapsed times
+    std::vector<std::pair<std::string, double>> nameToTimesVec(timeTable.begin(), timeTable.end());
+    std::sort(nameToTimesVec.begin(), nameToTimesVec.end(),
+        [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) { return a.second < b.second; });
+
+    // Construct vtkTable from provided data
+    vtkSmartPointer<vtkDoubleArray> xIndices      = vtkDoubleArray::SafeDownCast(m_timeTable->GetColumn(0));
+    vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkDoubleArray::SafeDownCast(m_timeTable->GetColumn(1));
+    vtkSmartPointer<vtkStringArray> labels = vtkStringArray::SafeDownCast(m_timeTable->GetColumn(2));
+
+    labels->SetNumberOfValues(nameToTimesVec.size());
+    xIndices->SetNumberOfValues(nameToTimesVec.size());
+    yElapsedTimes->SetNumberOfValues(nameToTimesVec.size());
+    for (size_t i = 0; i < nameToTimesVec.size(); i++)
+    {
+        labels->SetValue(i, nameToTimesVec[i].first.c_str());
+        xIndices->SetValue(i, i + 1);
+        yElapsedTimes->SetValue(i, nameToTimesVec[i].second);
+    }
+
+    // The range for the x axis is based on history of the elapsed times
+    vtkAxis* botAxis = m_timeTableChart->GetAxis(vtkAxis::BOTTOM);
+
+    // Get the previous and current range
+    double newMaxElapsed = yElapsedTimes->GetRange()[1];
+    yElapsedTimes->Modified();
+    double currMaxElapsed = botAxis->GetMaximum();
+
+    // Always respect the max as all information should be shown
+    if (newMaxElapsed > currMaxElapsed)
+    {
+        botAxis->SetRange(0.0, newMaxElapsed);
+    }
+    // But if current elapsed is less than the existing one we can lag
+    else
+    {
+        // Lag downscaling by 400 iterations
+        if (m_timeTableIter % 400 == 0)
+        {
+            botAxis->SetRange(0.0, newMaxElapsed);
+        }
+        else
+        {
+            botAxis->SetRange(0.0, currMaxElapsed);
+        }
+        m_timeTableIter++;
+    }
+    botAxis->Modified();
+
+    vtkAxis* leftAxis = m_timeTableChart->GetAxis(vtkAxis::LEFT);
+    leftAxis->SetRange(xIndices->GetRange());
+    leftAxis->SetCustomTickPositions(xIndices, labels);
+
+    m_timeTable->Modified();
+}
+
+void
+VTKRenderer::setTimeTableVisibility(const bool visible)
+{
+    m_timeTableChartActor->SetVisibility(visible);
+}
+
+bool
+VTKRenderer::getTimeTableVisibility() const
+{
+    return m_timeTableChartActor->GetVisibility();
 }
 
 void

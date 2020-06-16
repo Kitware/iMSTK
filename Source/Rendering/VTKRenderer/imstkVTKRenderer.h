@@ -35,11 +35,17 @@
 #include <vtkOpenVROverlayInternal.h>
 #endif
 
+#include <unordered_map>
+
 class vtkAxesActor;
 class vtkCamera;
-class vtkProp;
+class vtkChartXY;
+class vtkContextActor;
 class vtkLight;
+class vtkPlotBar;
+class vtkProp;
 class vtkRenderer;
+class vtkTable;
 
 namespace imstk
 {
@@ -94,6 +100,21 @@ public:
     bool getAxesVisibility() const;
 
     ///
+    /// \brief Sets the benchmarking table using unordered_map
+    ///
+    void setTimeTable(const std::unordered_map<std::string, double>& timeTable);
+
+    ///
+    /// \brief Set the visibility of the benchmark graph
+    ///
+    void setTimeTableVisibility(const bool visible);
+
+    ///
+    /// \brief Get the visibility of the benchmark graph
+    ///
+    bool getTimeTableVisibility() const;
+
+    ///
     /// \brief Updates the scene camera's position and orientation
     ///
     void updateSceneCamera(std::shared_ptr<Camera> imstkCam);
@@ -129,6 +150,7 @@ protected:
     ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
+protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
     // cameras
@@ -154,5 +176,12 @@ protected:
 #ifdef iMSTK_ENABLE_VR
     std::vector<vtkOpenVRCameraPose> m_camPos;
 #endif
+
+    vtkSmartPointer<vtkChartXY>      m_timeTableChart      = nullptr;
+    vtkSmartPointer<vtkContextActor> m_timeTableChartActor = nullptr;
+    vtkSmartPointer<vtkTable> m_timeTable = nullptr;
+
+    vtkPlotBar* m_timeTablePlot = nullptr;
+    int m_timeTableIter = 0;
 };
 }

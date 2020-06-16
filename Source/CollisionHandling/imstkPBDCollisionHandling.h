@@ -24,14 +24,15 @@
 // imstk
 #include "imstkCollisionHandling.h"
 
+#include <vector>
+
 namespace imstk
 {
-class CollidingObject;
 class PbdObject;
 class PbdCollisionConstraint;
 class PbdEdgeEdgeConstraint;
 class PbdPointTriangleConstraint;
-class PbdSolver;
+class PbdCollisionSolver;
 struct CollisionData;
 
 ///
@@ -41,7 +42,6 @@ struct CollisionData;
 ///
 class PBDCollisionHandling : public CollisionHandling
 {
-typedef std::vector<PbdCollisionConstraint*> PBDConstraintVector;
 public:
 
     ///
@@ -49,8 +49,8 @@ public:
     ///
     PBDCollisionHandling(const Side&                          side,
                          const std::shared_ptr<CollisionData> colData,
-                         std::shared_ptr<CollidingObject>     obj1,
-                         std::shared_ptr<CollidingObject>     obj2);
+                         std::shared_ptr<PbdObject>           pbdObject1,
+                         std::shared_ptr<PbdObject>           pbdObject2);
 
     PBDCollisionHandling() = delete;
 
@@ -69,18 +69,14 @@ public:
     ///
     void generatePBDConstraints();
 
-    ///
-    /// \brief Get/Set pbd solver
-    ///
-    void setSolver(std::shared_ptr<PbdSolver> solver) { m_PBDSolver = solver; };
-    std::shared_ptr<PbdSolver> getSolver() { return m_PBDSolver; };
+    std::shared_ptr<PbdCollisionSolver> getCollisionSolver() const { return m_pbdCollisionSolver; }
 
 private:
+    std::shared_ptr<PbdObject> m_PbdObject1 = nullptr; ///> PBD object
+    std::shared_ptr<PbdObject> m_PbdObject2 = nullptr; ///> PBD object
+    std::shared_ptr<PbdCollisionSolver> m_pbdCollisionSolver = nullptr;
 
-    std::shared_ptr<PbdObject> m_pbdObject1;     ///> PBD object
-    std::shared_ptr<PbdObject> m_pbdObject2;     ///> PBD object
-    PBDConstraintVector m_PBDConstraints;        ///> List of PBD constraints
-    std::shared_ptr<PbdSolver> m_PBDSolver;      /// The Solver for the collision constraints
+    std::vector<PbdCollisionConstraint*> m_PBDConstraints; ///> List of PBD constraints
 
     std::vector<PbdEdgeEdgeConstraint*>      m_EEConstraintPool;
     std::vector<PbdPointTriangleConstraint*> m_VTConstraintPool;

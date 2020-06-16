@@ -35,7 +35,6 @@
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkCollisionGraph.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkScene.h"
 
@@ -68,25 +67,20 @@ main()
 
     volTetMesh->extractSurfaceMesh(surfMesh, true);
 
-    // Construct a map
-
     // Construct one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
-    // Scene object 1: Dragon
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
 
-    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
-
     auto config = std::make_shared<FEMModelConfig>();
-    config->m_fixedNodeIds = { 51, 127, 178 };
+    config->m_fixedNodeIds = { 50, 126, 177 };
     dynaModel->configure(config);
+    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
 
     dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
     dynaModel->setModelGeometry(volTetMesh);
-    auto timeIntegrator = std::make_shared<BackwardEuler>(0.05);// Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     auto material = std::make_shared<RenderMaterial>();
@@ -97,7 +91,7 @@ main()
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    // Scene Object
+    // Scene object 1: Dragon
     auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setPhysicsGeometry(volTetMesh);
@@ -113,30 +107,6 @@ main()
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
-
-    // create a nonlinear system
-    auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(
-        dynaModel->getFunction(),
-        dynaModel->getFunctionGradient());
-
-    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
-    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
-    nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
-
-    // create a linear solver
-    auto linSolver = std::make_shared<ConjugateGradient>();
-
-    if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel
-        && dynaModel->isFixedBCImplemented())
-    {
-        LOG(WARNING) << "The GS solver may not be viable!";
-    }
-
-    // create a non-linear solver and add to the scene
-    auto nlSolver = std::make_shared<NewtonSolver<SparseMatrixd>>();
-    nlSolver->setLinearSolver(linSolver);
-    nlSolver->setSystem(nlSystem);
-    scene->addNonlinearSolver(nlSolver);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");

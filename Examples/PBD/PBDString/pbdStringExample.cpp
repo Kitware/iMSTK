@@ -25,7 +25,6 @@
 #include "imstkPbdObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSceneManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
 #include "imstkScene.h"
 
@@ -92,13 +91,13 @@ main()
 
         // Configure the parameters with bend stiffnesses varying from 0.001 to ~0.1
         sims[i].params = std::make_shared<PBDModelConfig>();
-        sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 0.001);
-        sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
+        sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 1e7);
+        sims[i].params->enableConstraint(PbdConstraint::Type::Bend, (static_cast<double>(i) * 0.1 / numStrings + 0.001) * 1e6);
         sims[i].params->m_fixedNodeIds     = { 0 };
         sims[i].params->m_uniformMassValue = 5.0;
-        sims[i].params->m_gravity   = Vec3d(0, -9.8, 0);
-        sims[i].params->m_DefaultDt = 0.0005;
-        sims[i].params->m_maxIter   = 5;
+        sims[i].params->m_gravity    = Vec3d(0, -9.8, 0);
+        sims[i].params->m_defaultDt  = 0.0005;
+        sims[i].params->m_iterations = 5;
 
         // Set the parameters
         sims[i].model->configure(sims[i].params);

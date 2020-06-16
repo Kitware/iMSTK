@@ -33,7 +33,6 @@
 #include "imstkCollidingObject.h"
 #include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkCollisionGraph.h"
 #include "imstkScene.h"
 #include "imstkVTKRenderer.h"
 

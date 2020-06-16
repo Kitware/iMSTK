@@ -3,8 +3,11 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( Constraints
+  SUBDIR_LIST
+    PbdConstraints
   DEPENDS
     Common
+    DataStructures
     Geometry
   )
 

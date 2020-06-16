@@ -1,27 +1,29 @@
 /*=========================================================================
 
-   Library: iMSTK
+Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+& Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 
 =========================================================================*/
 
 #include "imstkSPHModel.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -54,6 +56,34 @@ SPHModelConfig::initialize()
     m_kernelRadiusSqr = m_kernelRadius * m_kernelRadius;
 }
 
+SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SmoothedParticleHydrodynamics)
+{
+    m_validGeometryTypes = { Geometry::Type::PointSet };
+
+    m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SPHModel::findParticleNeighbors, this));
+    m_computeDensityNode = m_taskGraph->addFunction("SPHModel_ComputeDensity", [&]()
+        {
+            computeNeighborRelativePositions();
+            computeDensity();
+            normalizeDensity();
+            collectNeighborDensity();
+        });
+    m_computePressureAccelNode =
+        m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
+    m_computeSurfaceTensionNode =
+        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
+    m_computeTimeStepSizeNode =
+        m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
+    m_integrateNode =
+        m_taskGraph->addFunction("SPHModel_Integrate", [&]()
+        {
+            sumAccels();
+            updateVelocity(getTimeStep());
+            computeViscosity();
+            moveParticles(getTimeStep());
+        });
+}
+
 bool
 SPHModel::initialize()
 {
@@ -80,7 +110,10 @@ SPHModel::initialize()
 
     // Initialize neighbor searcher
     m_neighborSearcher = std::make_shared<NeighborSearch>(m_modelParameters->m_NeighborSearchMethod,
-                                                          m_modelParameters->m_kernelRadius);
+        m_modelParameters->m_kernelRadius);
+
+    m_pressureAccels       = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles());
+    m_surfaceTensionAccels = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles());
 
     return true;
 }
@@ -93,19 +126,22 @@ SPHModel::updatePhysicsGeometry()
 }
 
 void
-SPHModel::advanceTimeStep()
+SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    findParticleNeighbors();
-    computeNeighborRelativePositions();
-    computeDensity();
-    normalizeDensity();
-    collectNeighborDensity();
-    computePressureAcceleration();
-    computeSurfaceTension();
-    computeTimeStepSize();
-    updateVelocity(getTimeStep());
-    computeViscosity();
-    moveParticles(getTimeStep());
+    // Setup graph connectivity
+    m_taskGraph->addEdge(source, m_findParticleNeighborsNode);
+    m_taskGraph->addEdge(m_findParticleNeighborsNode, m_computeDensityNode);
+
+    // Pressure, Surface Tension, and time step size can be done in parallel
+    m_taskGraph->addEdge(m_computeDensityNode, m_computePressureAccelNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_computeTimeStepSizeNode);
+
+    m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
+
+    m_taskGraph->addEdge(m_integrateNode, sink);
 }
 
 void
@@ -282,6 +318,7 @@ SPHModel::computePressureAcceleration()
                                 return error > Real(0) ? error : Real(0);
                             };
 
+    StdVectorOfVec3d& pressureAccels = *m_pressureAccels;
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             Vec3r accel(0, 0, 0);
@@ -307,7 +344,19 @@ SPHModel::computePressureAcceleration()
             }
 
             accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass;
-            getState().getAccelerations()[p] = accel;
+            //getState().getAccelerations()[p] = accel;
+            pressureAccels[p] = accel;
+        });
+}
+
+void
+SPHModel::sumAccels()
+{
+    const StdVectorOfVec3d& pressureAccels       = *m_pressureAccels;
+    const StdVectorOfVec3d& surfaceTensionAccels = *m_surfaceTensionAccels;
+    ParallelUtils::parallelFor(getState().getNumParticles(),
+        [&](const size_t p) {
+            getState().getAccelerations()[p] = pressureAccels[p] + surfaceTensionAccels[p];
         });
 }
 
@@ -366,7 +415,7 @@ SPHModel::computeViscosity()
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getVelocities()[p] += getState().getDiffuseVelocities()[p];
-    });
+        });
 }
 
 void
@@ -396,6 +445,7 @@ SPHModel::computeSurfaceTension()
         });
 
     // Second, compute surface tension acceleration
+    StdVectorOfVec3d& surfaceTensionAccels = *m_surfaceTensionAccels;
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
@@ -436,7 +486,8 @@ SPHModel::computeSurfaceTension()
             }
 
             accel *= m_modelParameters->m_surfaceTensionStiffness;
-            getState().getAccelerations()[p] += accel;
+            //getState().getAccelerations()[p] += accel;
+            surfaceTensionAccels[p] = accel;
         });
 }
 
@@ -446,6 +497,6 @@ SPHModel::moveParticles(Real timestep)
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
-    });
+        });
 }
 } // end namespace imstk

@@ -27,19 +27,17 @@ namespace imstk
 bool
 CollidingObject::initialize()
 {
-    if (SceneObject::initialize())
-    {
-        if (m_collidingToVisualMap)
-        {
-            m_collidingToVisualMap->initialize();
-        }
-
-        return true;
-    }
-    else
+    if (!SceneObject::initialize())
     {
         return false;
     }
+
+    if (m_collidingToVisualMap)
+    {
+        m_collidingToVisualMap->initialize();
+    }
+
+    return true;
 }
 
 const std::shared_ptr<Geometry>&

@@ -24,17 +24,18 @@
 
 //imstk
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkStVKForceModel.h"
-#include "imstkLinearFEMForceModel.h"
+#include "imstkConjugateGradient.h"
 #include "imstkCorotationalFEMForceModel.h"
+#include "imstkInternalForceModel.h"
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
-#include "imstkVegaMeshIO.h"
-#include "imstkVolumetricMesh.h"
+#include "imstkLinearFEMForceModel.h"
+#include "imstkMath.h"
+#include "imstkSolverBase.h"
+#include "imstkStVKForceModel.h"
+#include "imstkTaskGraph.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkVegaMeshIO.h"
-#include "imstkNewtonSolver.h"
-#include "imstkInternalForceModel.h"
-#include "imstkMath.h"
+#include "imstkVolumetricMesh.h"
 
 // vega
 #include "generateMassMatrix.h"
@@ -56,6 +57,8 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
         Geometry::Type::TetrahedralMesh,
         Geometry::Type::HexahedralMesh
     };
+
+    m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
 
 FEMDeformableBodyModel::~FEMDeformableBodyModel()
@@ -86,7 +89,6 @@ FEMDeformableBodyModel::configure(const std::string& configFileName)
     vegaConfigFileOptions.addOptionOptional("deformationCompliance", &m_FEModelConfig->m_deformationCompliance, m_FEModelConfig->m_deformationCompliance);
     vegaConfigFileOptions.addOptionOptional("compressionResistance", &m_FEModelConfig->m_compressionResistance, m_FEModelConfig->m_compressionResistance);
     vegaConfigFileOptions.addOptionOptional("inversionThreshold", &m_FEModelConfig->m_inversionThreshold, m_FEModelConfig->m_inversionThreshold);
-    vegaConfigFileOptions.addOptionOptional("numberOfThreads", &m_FEModelConfig->m_numberOfThreads, m_FEModelConfig->m_numberOfThreads);
     vegaConfigFileOptions.addOptionOptional("gravity", &m_FEModelConfig->m_gravity, m_FEModelConfig->m_gravity);
 
     // Parse the configuration file
@@ -153,47 +155,37 @@ FEMDeformableBodyModel::configure(std::shared_ptr<FEMModelConfig> config)
     m_FEModelConfig = config;
 }
 
-void
-FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<FEMModelConfig> fmConfig)
-{
-    m_FEModelConfig = fmConfig;
-}
-
-std::shared_ptr<imstk::FEMModelConfig>
-FEMDeformableBodyModel::getForceModelConfiguration() const
-{
-    return m_FEModelConfig;
-}
-
-void
-FEMDeformableBodyModel::setInternalForceModel(std::shared_ptr<InternalForceModel> fm)
-{
-    m_internalForceModel = fm;
-}
-
-std::shared_ptr<imstk::InternalForceModel>
-FEMDeformableBodyModel::getInternalForceModel() const
-{
-    return m_internalForceModel;
-}
-
-void
-FEMDeformableBodyModel::setTimeIntegrator(std::shared_ptr<TimeIntegrator> timeIntegrator)
-{
-    m_timeIntegrator = timeIntegrator;
-}
-
-std::shared_ptr<imstk::TimeIntegrator>
-FEMDeformableBodyModel::getTimeIntegrator() const
-{
-    return m_timeIntegrator;
-}
-
 bool
 FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
     CHECK(m_geometry != nullptr && m_FEModelConfig != nullptr) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
+
+    // Setup default solver if model doesn't yet have one
+    if (m_solver == nullptr)
+    {
+        // Create a nonlinear system
+        auto nlSystem = std::make_shared<NonLinearSystem<SparseMatrixd>>(getFunction(), getFunctionGradient());
+
+        nlSystem->setUnknownVector(getUnknownVec());
+        nlSystem->setUpdateFunction(getUpdateFunction());
+        nlSystem->setUpdatePreviousStatesFunction(getUpdatePrevStateFunction());
+
+        // Create a linear solver
+        auto linSolver = std::make_shared<ConjugateGradient>();
+
+        if (linSolver->getType() == imstk::LinearSolver<imstk::SparseMatrixd>::Type::GaussSeidel
+            && isFixedBCImplemented())
+        {
+            LOG(WARNING) << "The GS solver may not be viable!";
+        }
+
+        // Create a non-linear solver and add to the scene
+        auto nlSolver = std::make_shared<NewtonSolver<SparseMatrixd>>();
+        nlSolver->setLinearSolver(linSolver);
+        nlSolver->setSystem(nlSystem);
+        setSolver(nlSolver);
+    }
 
     auto physicsMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(this->getModelGeometry());
     m_vegaPhysicsMesh = VegaMeshIO::convertVolumetricMeshToVegaMesh(physicsMesh);
@@ -293,7 +285,9 @@ bool
 FEMDeformableBodyModel::initializeForceModel()
 {
     const double g = m_FEModelConfig->m_gravity;
-    const bool   isGravityPresent = (g > 0) ? true : false;
+    // Since vega 4.0 doesn't add gravity correcntly in all cases, we do it ourselves; see \ref initializeGravityForce
+    // const bool   isGravityPresent = (g > 0) ? true : false;
+    const bool isGravityPresent = false;
 
     m_numDOF = (size_t)m_vegaPhysicsMesh->getNumVertices() * 3;
 
@@ -775,12 +769,6 @@ FEMDeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMa
     eigenMatrix.makeCompressed();
 }
 
-Vectord&
-FEMDeformableBodyModel::getContactForce()
-{
-    return m_Fcontact;
-}
-
 void
 FEMDeformableBodyModel::setFixedSizeTimeStepping()
 {
@@ -799,4 +787,12 @@ FEMDeformableBodyModel::getTimeStep() const
 {
     return m_timeIntegrator->getTimestepSize();
 };
+
+void
+FEMDeformableBodyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+{
+    // Setup graph connectivity
+    m_taskGraph->addEdge(source, m_solveNode);
+    m_taskGraph->addEdge(m_solveNode, sink);
+}
 } // imstk

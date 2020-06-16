@@ -23,6 +23,7 @@
 
 #include "imstkSceneObject.h"
 #include "imstkMath.h"
+#include <unordered_map>
 
 namespace imstk
 {
@@ -81,7 +82,6 @@ public:
     virtual bool initialize() override;
 
 protected:
-
     std::shared_ptr<Geometry>    m_collidingGeometry;    ///> Geometry for collisions
     std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
     Vec3d m_force = Vec3d::Zero();

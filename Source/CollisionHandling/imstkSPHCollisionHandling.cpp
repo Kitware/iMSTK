@@ -20,19 +20,18 @@
 =========================================================================*/
 
 #include "imstkSPHCollisionHandling.h"
-#include "imstkParallelUtils.h"
 #include "imstkCollisionData.h"
-#include "imstkSPHObject.h"
+#include "imstkLogger.h"
+#include "imstkParallelUtils.h"
 #include "imstkSPHModel.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkSPHObject.h"
 
 namespace imstk
 {
-SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side&          side,
-                                           const std::shared_ptr<CollisionData>&   colData,
-                                           const std::shared_ptr<CollidingObject>& obj) :
-    CollisionHandling(Type::SPH, side, colData), m_SPHObject(std::dynamic_pointer_cast<SPHObject>(obj))
+SPHCollisionHandling::SPHCollisionHandling(const CollisionHandling::Side& side,
+                                           std::shared_ptr<CollisionData> colData,
+                                           std::shared_ptr<SPHObject>     obj) :
+    CollisionHandling(Type::SPH, side, colData), m_SPHObject(obj)
 {
     LOG_IF(FATAL, (!m_SPHObject)) << "Invalid SPH object";
 }
@@ -55,9 +54,9 @@ SPHCollisionHandling::processCollisionData()
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx)
         {
-            const auto& cd  = m_colData->MAColData[idx];
-            const auto pidx = cd.nodeIdx;  // Fluid particle index
-            auto n = cd.penetrationVector; // This vector should point into solid object
+            const MeshToAnalyticalCollisionDataElement& cd = m_colData->MAColData[idx];
+            const uint32_t pidx = cd.nodeIdx; // Fluid particle index
+            Vec3d n = cd.penetrationVector;   // This vector should point into solid object
 
             // Correct particle position
             state.getPositions()[pidx] -= n;

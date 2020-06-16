@@ -21,23 +21,26 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <thread>
 #include <atomic>
+#include <functional>
+#include <thread>
+#include <unordered_map>
 #include <vector>
 
 namespace imstk
 {
-class SceneObjectControllerBase;
-class VisualModel;
-class CameraController;
-class DebugRenderGeometry;
-class SceneObject;
-class SolverBase;
 class Camera;
-class IBLProbe;
+class CameraController;
 class CollisionGraph;
+class IBLProbe;
 class Light;
+class SceneObject;
+class SceneObjectControllerBase;
+class TaskGraph;
+class TaskGraphController;
+class VisualModel;
+
+namespace ParallelUtils { class SpinLock; }
 
 enum class TimeSteppingPolicy
 {
@@ -56,6 +59,18 @@ struct SceneConfig
 
     // Keep track of the fps for the scene
     bool trackFPS = false;
+
+    // If off, tasks will run sequentially
+    bool taskParallelizationEnabled = true;
+
+    // If on, elapsed times for computational steps will be reported in map
+    bool taskTimingEnabled = false;
+
+    // If on, the task graph will be written to a file
+    bool writeTaskGraph = false;
+
+    // If on, non functional nodes and redundant edges will be removed from final graph
+    bool graphReductionEnabled = true;
 };
 
 ///
@@ -69,25 +84,31 @@ template<class T>
 using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
 public:
-
     ///
     /// \brief Constructor
     ///
-    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>()) :
-        m_name(name),
-        m_camera(std::make_shared<Camera>()),
-        m_collisionGraph(std::make_shared<CollisionGraph>()),
-        m_config(config) {}
+    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
 
     ///
     /// \brief Destructor
     ///
     ~Scene();
 
+public:
     ///
     /// \brief Initialize the scene
     ///
     bool initialize();
+
+    ///
+    /// \brief Setup the task graph, this completely rebuilds the graph
+    ///
+    void buildTaskGraph();
+
+    ///
+    /// \brief Intializes the graph after its in a built state
+    ///
+    void initTaskGraph();
 
     ///
     /// \brief Launch camera controller and other scene specific modules that need to run independently
@@ -181,6 +202,11 @@ public:
     const std::string& getName() const;
 
     ///
+    /// \brief Get the computational graph of the scene
+    ///
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
+
+    ///
     /// \brief Get the camera for the scene
     ///
     std::shared_ptr<Camera> getCamera() const;
@@ -189,16 +215,6 @@ public:
     /// \brief Return the collision graph
     ///
     std::shared_ptr<CollisionGraph> getCollisionGraph() const;
-
-    ///
-    /// \brief Get the vector of non-linear solvers
-    ///
-    const std::vector<std::shared_ptr<SolverBase>> getSolvers();
-
-    ///
-    /// \brief Add nonlinear solver to the scene
-    ///
-    void addNonlinearSolver(std::shared_ptr<SolverBase> solver);
 
     ///
     /// \brief Add objects controllers
@@ -224,7 +240,32 @@ public:
     ///
     /// \brief Get the elapsed time
     ///
-    double getElapsedTime() { return elapsedTime; }
+    double getElapsedTime() { return m_elapsedTime; }
+
+    ///
+    /// \brief Get the elapsed time of a particular step
+    ///
+    double getElapsedTime(const std::string& stepName) const;
+
+    ///
+    /// \brief Get the map of elapsed times
+    ///
+    const std::unordered_map<std::string, double>& getTaskComputeTimes() const { return m_nodeComputeTimes; }
+
+    ///
+    /// \brief Lock the compute times resource
+    ///
+    void lockComputeTimes();
+
+    ///
+    /// \brief Unlock the compute times resource
+    ///
+    void unlockComputeTimes();
+
+    ///
+    /// \brief Called after compute graph is built, but before initialized
+    ///
+    void setTaskGraphConfigureCallback(std::function<void(Scene*)> callback) { this->m_postTaskGraphConfigureCallback = callback; }
 
     ///
     /// \brief Get the configuration
@@ -236,19 +277,27 @@ protected:
     std::shared_ptr<SceneConfig> m_config;
 
     std::string m_name;                              ///> Name of the scene
-    NamedMap<SceneObject>           m_sceneObjectsMap;
-    NamedMap<VisualModel>           m_DebugRenderModelMap;
-    NamedMap<Light>                 m_lightsMap;
-    std::shared_ptr<IBLProbe>       m_globalIBLProbe = nullptr;
-    std::shared_ptr<Camera>         m_camera = nullptr;
+    NamedMap<SceneObject>     m_sceneObjectsMap;
+    NamedMap<VisualModel>     m_DebugRenderModelMap;
+    NamedMap<Light>           m_lightsMap;
+    std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
+
+    std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
+
     std::shared_ptr<CollisionGraph> m_collisionGraph = nullptr;
-    std::vector<std::shared_ptr<SolverBase>> m_solvers;                          ///> List of non-linear solvers
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
     std::vector<std::shared_ptr<CameraController>> m_cameraControllers;          ///> List of camera controllers
     std::unordered_map<std::string, std::thread>   m_threadMap;                  ///>
 
-    double m_fps       = 0.0;
-    double elapsedTime = 0.0;
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;                            ///> Computational graph
+    std::shared_ptr<TaskGraphController> m_taskGraphController   = nullptr;      ///> Controller for the computational graph
+    std::function<void(Scene*)> m_postTaskGraphConfigureCallback = nullptr;
+
+    std::shared_ptr<ParallelUtils::SpinLock> computeTimesLock = nullptr;
+    std::unordered_map<std::string, double>  m_nodeComputeTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
+
+    double m_fps = 0.0;
+    double m_elapsedTime = 0.0;
 
     bool m_isInitialized = false;
 

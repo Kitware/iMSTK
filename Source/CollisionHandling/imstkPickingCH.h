@@ -24,6 +24,8 @@
 // imstk
 #include "imstkCollisionHandling.h"
 
+#include <vector>
+
 namespace imstk
 {
 class CollidingObject;
@@ -45,7 +47,7 @@ public:
     ///
     PickingCH(const Side&                          side,
               const std::shared_ptr<CollisionData> colData,
-              std::shared_ptr<CollidingObject>     obj);
+              std::shared_ptr<FeDeformableObject>  obj);
 
     PickingCH() = delete;
 

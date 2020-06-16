@@ -21,13 +21,11 @@
 
 #include "imstkBoneDrillingCH.h"
 #include "imstkCollidingObject.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkCollisionData.h"
 #include "imstkDeviceTracker.h"
-#include "imstkMath.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {

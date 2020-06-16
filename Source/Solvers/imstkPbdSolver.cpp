@@ -19,39 +19,111 @@
 
 =========================================================================*/
 
-#include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
-#include "imstkPbdCollisionConstraint.h"
 #include "imstkParallelUtils.h"
 
 namespace imstk
 {
-void
-PbdSolver::solve()
+PbdSolver::PbdSolver() :
+    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
+    m_constraints(std::make_shared<PBDConstraintVector>()),
+    m_positions(std::make_shared<StdVectorOfVec3d>()),
+    m_invMasses(std::make_shared<StdVectorOfReal>())
 {
-    m_pbdObject->integratePosition();
-    m_pbdObject->solveConstraints();
-    resolveCollisionConstraints();
-    m_pbdObject->updateVelocity();
 }
 
 void
-PbdSolver::resolveCollisionConstraints()
+PbdSolver::solve()
 {
-    if (m_PBDConstraints.size() > 0)
+    // Solve the constraints and partitioned constraints
+    StdVectorOfVec3d&      currPositions = *m_positions;
+    const StdVectorOfReal& invMasses     = *m_invMasses;
+
+    const PBDConstraintVector&              constraints = *m_constraints;
+    const std::vector<PBDConstraintVector>& partitionedConstraints = *m_partitionedConstraints;
+
+    // zero out the Lagrange multiplier
+    for (size_t j = 0; j < constraints.size(); ++j)
     {
-        uint32_t maxIter = 3u;
-        uint32_t i       = 0;
-        while (++i < maxIter)
+        constraints[j]->zeroOutLambda();
+    }
+
+    for (size_t j = 0; j < partitionedConstraints.size(); j++)
+    {
+        const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
+        ParallelUtils::parallelFor(constraintPartition.size(),
+            [&](const size_t idx) { constraintPartition[idx]->zeroOutLambda(); }
+            );
+    }
+
+    unsigned int i = 0;
+    while (i++ < m_iterations)
+    {
+        for (size_t j = 0; j < constraints.size(); ++j)
         {
-            for (const auto constraintList : m_PBDConstraints)
-            {
-                for (size_t k = 0; k < constraintList->size(); ++k)
+            constraints[j]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
+        }
+
+        for (size_t j = 0; j < partitionedConstraints.size(); j++)
+        {
+            const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
+
+            ParallelUtils::parallelFor(constraintPartition.size(),
+                [&](const size_t idx)
                 {
-                    (*constraintList)[k]->solvePositionConstraint();
+                    constraintPartition[idx]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
+                });
+            // Sequential
+            /*for (size_t k = 0; k < constraintPartition.size(); k++)
+            {
+                constraintPartition[k]->solvePositionConstraint(currPositions, invMasses);
+            }*/
+        }
+    }
+}
+
+PbdCollisionSolver::PbdCollisionSolver() :
+    m_collisionConstraints(std::make_shared<std::list<PBDCollisionConstraintVector*>>()),
+    m_collisionConstraintsData(std::make_shared<std::list<CollisionConstraintData>>())
+{
+}
+
+void
+PbdCollisionSolver::addCollisionConstraints(PBDCollisionConstraintVector* constraints,
+                                            std::shared_ptr<StdVectorOfVec3d> posA, std::shared_ptr<StdVectorOfReal> invMassA,
+                                            std::shared_ptr<StdVectorOfVec3d> posB, std::shared_ptr<StdVectorOfReal> invMassB)
+{
+    m_collisionConstraints->push_back(constraints);
+    m_collisionConstraintsData->push_back({ posA, invMassA, posB, invMassB });
+}
+
+void
+PbdCollisionSolver::solve()
+{
+    // Solve collision constraints
+    if (m_collisionConstraints->size() > 0)
+    {
+        unsigned int i = 0;
+        while (i++ < m_collisionIterations)
+        {
+            std::list<CollisionConstraintData>::iterator colDataIter = m_collisionConstraintsData->begin();
+            for (auto constraintList : *m_collisionConstraints)
+            {
+                CollisionConstraintData             colData     = *colDataIter;
+                StdVectorOfVec3d&                   posA        = *colData.m_posA;
+                const StdVectorOfReal&              invMassA    = *colData.m_invMassA;
+                StdVectorOfVec3d&                   posB        = *colData.m_posB;
+                const StdVectorOfReal&              invMassB    = *colData.m_invMassB;
+                const PBDCollisionConstraintVector& constraints = *constraintList;
+                for (size_t j = 0; j < constraints.size(); j++)
+                {
+                    constraints[j]->projectConstraint(invMassA, invMassB, posA, posB);
                 }
+                colDataIter++;
             }
         }
+        m_collisionConstraints->clear();
+        m_collisionConstraintsData->clear();
     }
 }
 } // end namespace imstk

@@ -30,7 +30,7 @@
 
 namespace imstk
 {
-template <> 
+template<>
 NewtonSolver<SparseMatrixd>::NewtonSolver() :
     m_linearSolver(std::make_shared<ConjugateGradient>()),
     m_forcingTerm(0.9),
@@ -43,7 +43,7 @@ NewtonSolver<SparseMatrixd>::NewtonSolver() :
 {
 }
 
-template <>
+template<>
 NewtonSolver<Matrixd>::NewtonSolver() :
     m_linearSolver(std::make_shared<DirectLinearSolver<Matrixd>>()),
     m_forcingTerm(0.9),
@@ -56,8 +56,7 @@ NewtonSolver<Matrixd>::NewtonSolver() :
 {
 }
 
-
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 void
 NewtonSolver<SystemMatrix>::solveGivenState(Vectord& x)
 {
@@ -101,7 +100,7 @@ NewtonSolver<SystemMatrix>::solveGivenState(Vectord& x)
     }
 }
 
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 void
 NewtonSolver<SystemMatrix>::solve()
 {
@@ -112,14 +111,14 @@ NewtonSolver<SystemMatrix>::solve()
     }
 
     size_t      iterNum;
-    const auto& u  = this->m_nonLinearSystem->getUnknownVector();
-    Vectord     du = u; // make this a class member in future
-    double error0 = MAX_D;
+    const auto& u      = this->m_nonLinearSystem->getUnknownVector();
+    Vectord     du     = u; // make this a class member in future
+    double      error0 = MAX_D;
 
     double epsilon = m_relativeTolerance * m_relativeTolerance;
     for (iterNum = 0; iterNum < m_maxIterations; ++iterNum)
     {
-        double error  = updateJacobian(u);
+        double error = updateJacobian(u);
 
         if (iterNum == 0)
         {
@@ -144,7 +143,7 @@ NewtonSolver<SystemMatrix>::solve()
     }
 }
 
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 double
 NewtonSolver<SystemMatrix>::updateJacobian(const Vectord& x)
 {
@@ -171,7 +170,7 @@ NewtonSolver<SystemMatrix>::updateJacobian(const Vectord& x)
     return std::sqrt(b.dot(b));
 }
 
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 void
 NewtonSolver<SystemMatrix>::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
 {
@@ -188,35 +187,27 @@ NewtonSolver<SystemMatrix>::updateForcingTerm(const double ratio, const double s
     m_forcingTerm = std::max(std::min(eta, m_etaMax), 0.5 * stopTolerance / fnorm);
 }
 
-template <typename SystemMatrix> 
-void
-NewtonSolver<SystemMatrix>::setLinearSolver(std::shared_ptr<NewtonSolver::LinearSolverType> newLinearSolver)
-{
-    m_linearSolver = newLinearSolver;
-}
-
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 // std::shared_ptr<NewtonSolver<SystemMatrix>::LinearSolverType>
 auto
-NewtonSolver<SystemMatrix>::getLinearSolver() const -> std::shared_ptr<LinearSolverType>
+NewtonSolver<SystemMatrix>::getLinearSolver() const->std::shared_ptr<LinearSolverType>
 {
     return m_linearSolver;
 }
 
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 void
 NewtonSolver<SystemMatrix>::setAbsoluteTolerance(const double aTolerance)
 {
     m_absoluteTolerance = aTolerance;
 }
 
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 double
 NewtonSolver<SystemMatrix>::getAbsoluteTolerance() const
 {
     return m_absoluteTolerance;
 }
-
 
 template class NewtonSolver<SparseMatrixd>;
 template class NewtonSolver<Matrixd>;

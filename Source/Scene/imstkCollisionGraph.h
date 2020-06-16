@@ -21,31 +21,25 @@
 
 #pragma once
 
-#include <vector>
+#include <memory>
 #include <unordered_map>
-
-// imstk
-#include "imstkCollidingObject.h"
-#include "imstkInteractionPair.h"
-#include "imstkCollisionDetection.h"
-#include "imstkCollisionHandling.h"
-
-#include "imstkPbdInteractionPair.h"
+#include <vector>
 
 namespace imstk
 {
+class SceneObject;
+class ObjectInteractionPair;
+
 ///
 /// \class CollisionGraph
 ///
-/// \brief
+/// \brief The CollisionGraph holds a set of interacting pairs of SceneObject's
 ///
 class CollisionGraph
 {
 public:
-    using CollidingObjectPtr    = std::shared_ptr<CollidingObject>;
-    using CollisionHandlingPtr  = std::shared_ptr<CollisionHandling>;
-    using CollisionDetectionPtr = std::shared_ptr<CollisionDetection>;
-    using InteractionPairPtr    = std::shared_ptr<InteractionPair>;
+    using SceneObjectPtr       = std::shared_ptr<SceneObject>;
+    using ObjectInteractionPtr = std::shared_ptr<ObjectInteractionPair>;
 
     ///
     /// \brief Default constructor
@@ -57,51 +51,35 @@ public:
     ///
     ~CollisionGraph() = default;
 
+public:
     ///
-    /// \brief Add interaction pair in collision graph
+    /// \brief Add an interaction pair to the graph
     ///
-    InteractionPairPtr addInteractionPair(CollidingObjectPtr       A,
-                                          CollidingObjectPtr       B,
-                                          CollisionDetection::Type CDType,
-                                          CollisionHandling::Type  CHAType,
-                                          CollisionHandling::Type  CHBType);
-
-    //\todo Refactor -> PBD only
-    InteractionPairPtr addInteractionPair(CollidingObjectPtr    A,
-                                          CollidingObjectPtr    B,
-                                          CollisionDetectionPtr CD,
-                                          CollisionHandlingPtr  CHA,
-                                          CollisionHandlingPtr  CHB);
-
-    void addInteractionPair(std::shared_ptr<PbdInteractionPair> pair);
+    void addInteraction(ObjectInteractionPtr pair);
 
     ///
     /// \brief Remove interaction pair in collision graph
     ///
-    bool removeInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B);
-    bool removeInteractionPair(InteractionPairPtr intPair);
+    bool removeInteractionPair(SceneObjectPtr A, SceneObjectPtr B);
+    bool removeInteractionPair(ObjectInteractionPtr intPair);
 
     ///
     /// \brief Returns the interaction pair if it exists
     ///
-    InteractionPairPtr getInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B);
+    ObjectInteractionPtr getInteractionPair(SceneObjectPtr A, SceneObjectPtr B);
 
     ///
-    /// \brief Returns a vector of all interaction pairs in the collision graph
+    /// \brief Returns all interaction pairs
     ///
-    const std::vector<InteractionPairPtr>& getInteractionPairList() const;
-
-    const std::vector<std::shared_ptr<PbdInteractionPair>>& getPbdPairList() const;
+    const std::vector<ObjectInteractionPtr>& getInteractionPairs() const { return m_interactionPairs; }
 
     ///
     /// \brief Returns a map of all interaction pairs per object
     ///
-    const std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
+    const std::unordered_map<SceneObjectPtr, std::vector<ObjectInteractionPtr>>& getInteractionPairMap() const;
 
 protected:
-    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList;                    //\todo Refactor -> PBD only
-
-    std::vector<InteractionPairPtr> m_interactionPairList;                                        ///< All interaction pairs in the collision graph
-    std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
+    std::vector<ObjectInteractionPtr> m_interactionPairs;                                       ///< All interaction pairs in the collision graph
+    std::unordered_map<SceneObjectPtr, std::vector<ObjectInteractionPtr>> m_interactionPairMap; ///< Map of interaction pairs per colliding object
 };
 }

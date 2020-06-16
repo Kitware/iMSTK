@@ -19,18 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCollisionGraph.h"
+#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
+#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkObjectInteractionFactory.h"
+#include "imstkPBDCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkAPIUtilities.h"
-#include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkPBDCollisionHandling.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
 
 using namespace imstk;
 
@@ -76,11 +77,10 @@ main()
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
-    pbdParams->m_DefaultDt = 0.01;
-    pbdParams->m_maxIter   = 2;
-    pbdParams->m_proximity = 0.01;
-    pbdParams->m_contactStiffness = 0.2;
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt  = 0.01;
+    pbdParams->m_iterations = 2;
+    pbdParams->collisionParams->m_proximity = 0.01;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
@@ -212,8 +212,7 @@ main()
     // Configure model
     auto pbdParams2 = std::make_shared<PBDModelConfig>();
     pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->m_proximity = 0.1;
-    pbdParams2->m_contactStiffness = 1.0;
+    pbdParams2->collisionParams->m_proximity = 0.1;
 
     pbdModel2->configure(pbdParams2);
     floor->setDynamicalModel(pbdModel2);
@@ -221,11 +220,8 @@ main()
     scene->addSceneObject(floor);
 
     // Collisions
-    auto colGraph = scene->getCollisionGraph();
-    auto CD       = std::make_shared<MeshToMeshBruteForceCD>(fluidMesh, floorMeshColliding, nullptr);
-    auto CH       = std::make_shared<PBDCollisionHandling>(CollisionHandling::Side::A,
-                CD->getCollisionData(), deformableObj, floor);
-    colGraph->addInteractionPair(deformableObj, floor, CD, CH, nullptr);
+    scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
+        InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");

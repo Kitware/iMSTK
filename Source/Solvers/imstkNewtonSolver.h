@@ -33,7 +33,7 @@ namespace imstk
 ///     root of F or fails. Global convergence is achieved using a line search sub-process
 ///     and the Armijo rule
 ///
-template <typename SystemMatrix> 
+template<typename SystemMatrix>
 class NewtonSolver : public NonLinearSolver<SystemMatrix>
 {
 public:
@@ -74,7 +74,10 @@ public:
     ///
     /// \param newLinearSolver Linear solver pointer
     ///
-    void setLinearSolver(std::shared_ptr<LinearSolverType> newLinearSolver);
+    void setLinearSolver(std::shared_ptr<LinearSolverType> newLinearSolver)
+    {
+        m_linearSolver = newLinearSolver;
+    }
 
     ///
     /// \brief Get LinearSolver
@@ -204,7 +207,7 @@ public:
     virtual void setToSemiImplicit() override
     {
         this->m_isSemiImplicit = true;
-        m_maxIterations  = 1;
+        m_maxIterations = 1;
     }
 
 private:

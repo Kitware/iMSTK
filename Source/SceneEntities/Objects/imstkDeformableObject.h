@@ -30,8 +30,6 @@
 
 namespace imstk
 {
-class Geometry;
-class GeometryMap;
 class FEMDeformableBodyModel;
 
 ///
@@ -42,70 +40,20 @@ class FEMDeformableBodyModel;
 class FeDeformableObject : public DynamicObject
 {
 public:
-
-    ///
-    /// \brief Constructor
-    ///
     explicit FeDeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
     FeDeformableObject() = delete;
 
-    ///
-    /// \brief Destructor
-    ///
     ~FeDeformableObject() = default;
 
+public:
     ///
     /// \brief Initialize the deformable object
     ///
     bool initialize() override;
 
-    ///
-    /// \brief Initialize the kinematic state of the body
-    ///
-    void initializeState();
-    void initializeState(const Vectord& p, const Vectord& v);
-
-    ///
-    /// \brief Set/Get dynamical model
-    ///
-    //void setDynamicalModel(std::shared_ptr<DynamicalModel<VectorizedState>> dynaDefModel) override;
-
-    ///
-    /// \brief Get the vector that holds the contact forces
-    ///
-    Vectord& getContactForce();
-
-    ///
-    ///  \brief Get the vector of current displacements
-    ///
-    const Vectord& getDisplacements() const;
-
-    ///
-    /// \brief Get the vector of displacements from previous time step
-    ///
-    const Vectord& getPrevDisplacements() const;
-
-    ///
-    /// \brief Get the vector of current velocities
-    ///
-    const Vectord& getVelocities() const;
-
-    ///
-    /// \brief Get the vector of velocities from previous time step
-    ///
-    const Vectord& getPrevVelocities() const;
-
-    ///
-    /// \brief Get the vector of current accelerations
-    ///
-    const Vectord& getAccelerations() const;
-
-    ///
-    /// \brief Get the vector of accelerations from previous time step
-    ///
-    const Vectord& getPrevAccelerations() const;
+    std::shared_ptr<FEMDeformableBodyModel> getFEMModel() const { return m_femModel; }
 
 protected:
-    std::shared_ptr<FEMDeformableBodyModel> m_defModel;
+    std::shared_ptr<FEMDeformableBodyModel> m_femModel = nullptr;
 };
 } // imstk

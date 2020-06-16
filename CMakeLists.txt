@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 2.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 3.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
@@ -88,6 +88,7 @@ set(BUILD_TESTING OFF)
 if (${PROJECT_NAME}_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
+option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
@@ -282,6 +283,7 @@ else()
   # modules are linked via `VTK::CommonCore`
   # vtk_module_autoinit is needed
   find_package(VTK COMPONENTS
+    ChartsCore
     CommonCore
     CommonDataModel
     FiltersGeneral
@@ -300,6 +302,7 @@ else()
     RenderingOpenGL2
     RenderingVolume
     RenderingVolumeOpenGL2
+    ViewsContext2D
   )
 endif()
 

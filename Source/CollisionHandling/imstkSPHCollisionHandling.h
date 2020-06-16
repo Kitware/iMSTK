@@ -30,9 +30,9 @@ class SPHObject;
 class SPHCollisionHandling : public CollisionHandling
 {
 public:
-    SPHCollisionHandling(const Side&                             side,
-                         const std::shared_ptr<CollisionData>&   colData,
-                         const std::shared_ptr<CollidingObject>& obj);
+    SPHCollisionHandling(const Side&                    side,
+                         std::shared_ptr<CollisionData> colData,
+                         std::shared_ptr<SPHObject>     obj);
 
     SPHCollisionHandling() = delete;
 
@@ -42,6 +42,6 @@ public:
     virtual void processCollisionData() override;
 
 private:
-    std::shared_ptr<SPHObject> m_SPHObject;
+    std::shared_ptr<SPHObject> m_SPHObject = nullptr;
 };
 } // end namespace imstk

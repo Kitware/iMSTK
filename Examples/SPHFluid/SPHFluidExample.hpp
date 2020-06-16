@@ -31,6 +31,8 @@
 #include "imstkCollisionGraph.h"
 #include "imstkSceneManager.h"
 #include "imstkCamera.h"
+#include "imstkObjectInteractionFactory.h"
+#include "imstkCollisionDetection.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"
@@ -101,23 +103,18 @@ main(int argc, char* argv[])
     });
 
     // Collision between fluid and solid objects
-    auto colGraph = scene->getCollisionGraph();
-
+    std::shared_ptr<CollisionGraph> collisionGraph = scene->getCollisionGraph();
     for (auto& solid: solids)
     {
         if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
         {
-            colGraph->addInteractionPair(fluidObj, solid,
-                                 CollisionDetection::Type::PointSetToPlane,
-                                 CollisionHandling::Type::SPH,
-                                 CollisionHandling::Type::None);
+            collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
         }
         else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
         {
-            colGraph->addInteractionPair(fluidObj, solid,
-                                         CollisionDetection::Type::PointSetToSphere,
-                                         CollisionHandling::Type::SPH,
-                                         CollisionHandling::Type::None);
+            collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
         }
         else
         {

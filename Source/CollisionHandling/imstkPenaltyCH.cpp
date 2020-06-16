@@ -20,13 +20,12 @@
 =========================================================================*/
 
 #include "imstkPenaltyCH.h"
-
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkDeformableObject.h"
+#include "imstkFEMDeformableBodyModel.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {
@@ -98,8 +97,9 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeform
                                     << m_object->getName() << " is not a deformable object.";
 
     // Get current force vector
-    auto&       force     = deformableObj->getContactForce();
-    const auto& velVector = deformableObj->getVelocities();
+    std::shared_ptr<FEMDeformableBodyModel> model     = deformableObj->getFEMModel();
+    auto&                                   force     = model->getContactForce();
+    const auto&                             velVector = model->getCurrentState()->getQDot();
 
     // If collision data, append forces
     ParallelUtils::SpinLock lock;

@@ -22,7 +22,6 @@
 #include "imstkSimulationManager.h"
 #include "imstkAPIUtilities.h"
 #include "imstkVisualObjectImporter.h"
-#include "imstkCollisionGraph.h"
 #include "imstkIBLProbe.h"
 #include "imstkCamera.h"
 #include "imstkMeshIO.h"

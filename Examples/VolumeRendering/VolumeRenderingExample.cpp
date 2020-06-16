@@ -28,7 +28,6 @@
 #include "imstkVolumeRenderMaterialPresets.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkSceneManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkScene.h"
 #include "imstkVTKRenderer.h"
 

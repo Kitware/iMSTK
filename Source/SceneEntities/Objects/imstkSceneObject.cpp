@@ -20,12 +20,16 @@
 =========================================================================*/
 
 #include "imstkSceneObject.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
-SceneObject::SceneObject(const std::string& name) : m_name(name), SceneEntity()
+SceneObject::SceneObject(const std::string& name) :
+    m_type(Type::Visual), m_name(name),
+    m_taskGraph(std::make_shared<TaskGraph>("SceneObject_" + name + "_Source", "SceneObject_" + name + "_Sink")), SceneEntity()
 {
-    m_type = Type::Visual;
+    m_updateNode = m_taskGraph->addFunction("SceneObject_" + name + "_Update", std::bind(&SceneObject::update, this));
+    m_updateGeometryNode = m_taskGraph->addFunction("SceneObject_" + name + "_UpdateGeometry", std::bind(&SceneObject::updateGeometries, this));
 }
 
 std::shared_ptr<Geometry>
@@ -51,57 +55,18 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
     }
 }
 
-std::shared_ptr<Geometry>
-SceneObject::getMasterGeometry() const
+void
+SceneObject::initGraphEdges()
 {
-    return this->getVisualGeometry();
-}
-
-std::shared_ptr<VisualModel>
-SceneObject::getVisualModel(unsigned int index)
-{
-    return m_visualModels[index];
+    m_taskGraph->clearEdges();
+    initGraphEdges(m_taskGraph->getSource(), m_taskGraph->getSink());
 }
 
 void
-SceneObject::addVisualModel(std::shared_ptr<VisualModel> visualModel)
+SceneObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
-    m_visualModels.push_back(visualModel);
-}
-
-const std::vector<std::shared_ptr<VisualModel>>&
-SceneObject::getVisualModels()
-{
-    return m_visualModels;
-}
-
-size_t
-SceneObject::getNumVisualModels()
-{
-    return m_visualModels.size();
-}
-
-const SceneObject::Type&
-SceneObject::getType() const
-{
-    return m_type;
-}
-
-void
-SceneObject::setType(SceneObject::Type type)
-{
-    m_type = type;
-}
-
-const std::string&
-SceneObject::getName() const
-{
-    return m_name;
-}
-
-void
-SceneObject::setName(const std::string& name)
-{
-    m_name = name;
+    m_taskGraph->addEdge(source, m_updateNode);
+    m_taskGraph->addEdge(m_updateNode, m_updateGeometryNode);
+    m_taskGraph->addEdge(m_updateGeometryNode, sink);
 }
 } // imstk

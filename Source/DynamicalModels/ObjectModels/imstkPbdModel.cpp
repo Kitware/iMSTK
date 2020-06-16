@@ -19,34 +19,54 @@
 
 =========================================================================*/
 
-#include "imstkGraph.h"
 #include "imstkPbdModel.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkGeometryUtilities.h"
+#include "imstkGraph.h"
 #include "imstkLineMesh.h"
-#include "imstkPbdVolumeConstraint.h"
-#include "imstkPbdDistanceConstraint.h"
-#include "imstkPbdDihedralConstraint.h"
 #include "imstkPbdAreaConstraint.h"
 #include "imstkPbdBendConstraint.h"
-#include "imstkPbdFETetConstraint.h"
-#include "imstkPbdFEHexConstraint.h"
 #include "imstkPbdConstantDensityConstraint.h"
-#include "imstkParallelUtils.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkMeshIO.h"
-//#include "imstkColor.h"
+#include "imstkPbdDihedralConstraint.h"
+#include "imstkPbdDistanceConstraint.h"
+#include "imstkPbdFETetConstraint.h"
+#include "imstkPbdSolver.h"
+#include "imstkPbdVolumeConstraint.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTaskGraph.h"
+#include "imstkTetrahedralMesh.h"
 
 #include <unordered_map>
 
 namespace imstk
 {
+PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics),
+    m_constraints(std::make_shared<PBDConstraintVector>()),
+    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
+    m_mass(std::make_shared<StdVectorOfReal>()),
+    m_invMass(std::make_shared<StdVectorOfReal>()),
+    m_parameters(std::make_shared<PBDModelConfig>())
+{
+    m_validGeometryTypes = {
+        Geometry::Type::PointSet,
+        Geometry::Type::LineMesh,
+        Geometry::Type::SurfaceMesh,
+        Geometry::Type::TetrahedralMesh,
+        Geometry::Type::HexahedralMesh
+    };
+
+    // Setup PBD compute nodes
+    m_integrationPositionNode     = m_taskGraph->addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
+    m_updateCollisionGeometryNode = m_taskGraph->addFunction("PbdModel_UpdateCollisionGeometry", std::bind(&PbdModel::updatePhysicsGeometry, this));
+    m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); });    // Avoids rebinding on solver swap
+    m_updateVelocityNode   = m_taskGraph->addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
+}
+
 void
 PBDModelConfig::enableConstraint(PbdConstraint::Type type, double stiffness)
 {
     LOG_IF(FATAL, (type == PbdConstraint::Type::FEMTet || type == PbdConstraint::Type::FEMHex))
         << "FEM constraint should be enabled by the enableFEMConstraint function";
-    m_RegularConstraints.push_back({ type, stiffness });
+    m_regularConstraints.push_back({ type, stiffness });
 }
 
 void
@@ -58,11 +78,11 @@ PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::
 }
 
 void
-PbdModel::configure(const std::shared_ptr<PBDModelConfig>& params)
+PbdModel::configure(std::shared_ptr<PBDModelConfig> params)
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "PbdModel::configure - Set PBD Model geometry before configuration!";
 
-    m_Parameters = params;
+    m_parameters = params;
     this->setNumDegreeOfFreedom(std::dynamic_pointer_cast<PointSet>(m_geometry)->getNumVertices() * 3);
 }
 
@@ -76,31 +96,38 @@ PbdModel::initialize()
     m_previousState = std::make_shared<PbdState>();
     m_currentState  = std::make_shared<PbdState>();
 
-    bool option[3] = { 1, 0, 0 };
-    m_initialState->initialize(m_mesh, option);
-    m_previousState->initialize(m_mesh, option);
-
-    option[1] = option[2] = 1;
-    m_currentState->initialize(m_mesh, option);
-
-    m_initialState->setPositions(m_mesh->getVertexPositions());
-    m_currentState->setPositions(m_mesh->getVertexPositions());
+    m_initialState->initialize(m_mesh->getVertexPositions());
+    m_previousState->initialize(m_mesh->getVertexPositions());
+    m_currentState->initialize(m_mesh->getVertexPositions());
 
     auto numParticles = m_mesh->getNumVertices();
 
-    m_mass.resize(numParticles, 0);
-    m_invMass.resize(numParticles, 0);
-    setUniformMass(m_Parameters->m_uniformMassValue);
+    m_mass->resize(numParticles, 0);
+    m_invMass->resize(numParticles, 0);
+    setUniformMass(m_parameters->m_uniformMassValue);
 
-    for (auto i : m_Parameters->m_fixedNodeIds)
+    for (auto i : m_parameters->m_fixedNodeIds)
     {
         setFixedPoint(i);
     }
 
     bool bOK = true; // Return immediately if some constraint failed to initialize
 
+    // Setup the default pbd solver if none exists
+    if (m_pbdSolver == nullptr)
+    {
+        m_pbdSolver = std::make_shared<PbdSolver>();
+        m_pbdSolver->setIterations(m_parameters->m_iterations);
+        m_pbdSolver->setSolverType(m_parameters->m_solverType);
+    }
+    m_pbdSolver->setPositions(getCurrentState()->getPositions());
+    m_pbdSolver->setInvMasses(getInvMasses());
+    m_pbdSolver->setConstraints(getConstraints());
+    m_pbdSolver->setPartitionedConstraints(getPartitionedConstraints());
+    m_pbdSolver->setTimeStep(m_parameters->m_dt);
+
     // Initialize FEM constraints
-    for (auto& constraint: m_Parameters->m_FEMConstraints)
+    for (auto& constraint: m_parameters->m_FEMConstraints)
     {
         computeElasticConstants();
         if (!initializeFEMConstraints(constraint.second))
@@ -110,8 +137,17 @@ PbdModel::initialize()
     }
 
     // Initialize other constraints
-    for (auto& constraint: m_Parameters->m_RegularConstraints)
+    for (auto& constraint: m_parameters->m_regularConstraints)
     {
+        if (m_parameters->m_solverType == PbdConstraint::SolverType::PBD && constraint.second > 1.0)
+        {
+            LOG(WARNING) << "for PBD, k should be between [0, 1]";
+        }
+        else if (m_parameters->m_solverType == PbdConstraint::SolverType::xPBD && constraint.second <= 1.0)
+        {
+            LOG(WARNING) << "for xPBD, k is Young's Modulu, and should be much larger than 1";
+        }
+
         if (!bOK)
         {
             return false;
@@ -148,7 +184,11 @@ PbdModel::initialize()
     }
 
     // Partition constraints for parallel computation
-    partitionConstraints();
+    if (!m_partitioned)
+    {
+        this->partitionConstraints();
+        m_partitioned = true;
+    }
 
     this->setTimeStepSizeType(m_timeStepSizeType);
 
@@ -156,22 +196,33 @@ PbdModel::initialize()
 }
 
 void
+PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+{
+    // Setup graph connectivity
+    m_taskGraph->addEdge(source, m_integrationPositionNode);
+    m_taskGraph->addEdge(m_integrationPositionNode, m_updateCollisionGeometryNode);
+    m_taskGraph->addEdge(m_updateCollisionGeometryNode, m_solveConstraintsNode);
+    m_taskGraph->addEdge(m_solveConstraintsNode, m_updateVelocityNode);
+    m_taskGraph->addEdge(m_updateVelocityNode, sink);
+}
+
+void
 PbdModel::computeElasticConstants()
 {
-    if (std::abs(m_Parameters->m_mu) < MIN_REAL
-        && std::abs(m_Parameters->m_lambda) < MIN_REAL)
+    if (std::abs(m_parameters->m_femParams->m_mu) < MIN_REAL
+        && std::abs(m_parameters->m_femParams->m_lambda) < MIN_REAL)
     {
-        const auto E  = m_Parameters->m_YoungModulus;
-        const auto nu = m_Parameters->m_PoissonRatio;
-        m_Parameters->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
-        m_Parameters->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
+        const auto E  = m_parameters->m_femParams->m_YoungModulus;
+        const auto nu = m_parameters->m_femParams->m_PoissonRatio;
+        m_parameters->m_femParams->m_mu     = E / Real(2.0) / (Real(1.0) + nu);
+        m_parameters->m_femParams->m_lambda = E * nu / ((Real(1.0) + nu) * (Real(1.0) - Real(2.0) * nu));
     }
     else
     {
-        const auto mu     = m_Parameters->m_mu;
-        const auto lambda = m_Parameters->m_lambda;
-        m_Parameters->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
-        m_Parameters->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
+        const auto mu     = m_parameters->m_femParams->m_mu;
+        const auto lambda = m_parameters->m_femParams->m_lambda;
+        m_parameters->m_femParams->m_YoungModulus = mu * (Real(3.0) * lambda + Real(2.0) * mu) / (lambda + mu);
+        m_parameters->m_femParams->m_PoissonRatio = lambda / Real(2.0) / (lambda + mu);
     }
 }
 
@@ -192,9 +243,10 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
         {
             auto& tet = elements[k];
             auto c    = std::make_shared<PbdFEMTetConstraint>(type);
-            c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
+            c->initConstraint(*m_initialState->getPositions(),
+                tet[0], tet[1], tet[2], tet[3], m_parameters->m_femParams);
             lock.lock();
-            m_constraints.push_back(std::move(c));
+            m_constraints->push_back(std::move(c));
             lock.unlock();
         });
     return true;
@@ -216,9 +268,10 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
         {
             auto& tet = elements[k];
             auto c    = std::make_shared<PbdVolumeConstraint>();
-            c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
+            c->initConstraint(*m_initialState->getPositions(),
+                tet[0], tet[1], tet[2], tet[3], stiffness);
             lock.lock();
-            m_constraints.push_back(std::move(c));
+            m_constraints->push_back(std::move(c));
             lock.unlock();
         });
     return true;
@@ -238,8 +291,8 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             {
                 E[i1][i2] = 0;
                 auto c = std::make_shared<PbdDistanceConstraint>();
-                c->initConstraint(*this, i1, i2, stiffness);
-                m_constraints.push_back(std::move(c));
+                c->initConstraint(*m_initialState->getPositions(), i1, i2, stiffness);
+                m_constraints->push_back(std::move(c));
             }
         };
 
@@ -310,9 +363,9 @@ PbdModel::initializeAreaConstraints(const double stiffness)
         {
             auto& tri = elements[k];
             auto c    = std::make_shared<PbdAreaConstraint>();
-            c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
+            c->initConstraint(*m_initialState->getPositions(), tri[0], tri[1], tri[2], stiffness);
             lock.lock();
-            m_constraints.push_back(std::move(c));
+            m_constraints->push_back(std::move(c));
             lock.unlock();
         });
     return true;
@@ -338,8 +391,8 @@ PbdModel::initializeBendConstraints(const double stiffness)
             }
 
             auto c = std::make_shared<PbdBendConstraint>();
-            c->initConstraint(*this, i1, i2, i3, k);
-            m_constraints.push_back(std::move(c));
+            c->initConstraint(*m_initialState->getPositions(), i1, i2, i3, k);
+            m_constraints->push_back(std::move(c));
         };
 
     // Create constraints
@@ -411,8 +464,8 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
                         }
                     }
                     auto c = std::make_shared<PbdDihedralConstraint>();
-                    c->initConstraint(*this, tri[2], tri[idx], tri[0], tri[1], stiffness);
-                    m_constraints.push_back(std::move(c));
+                    c->initConstraint(*m_initialState->getPositions(), tri[2], tri[idx], tri[0], tri[1], stiffness);
+                    m_constraints->push_back(std::move(c));
                 }
             }
         };
@@ -448,8 +501,8 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
         << "Constant constraint should come with a mesh!";
 
     auto c = std::make_shared<PbdConstantDensityConstraint>();
-    c->initConstraint(*this, stiffness);
-    m_constraints.push_back(std::move(c));
+    c->initConstraint(*m_initialState->getPositions(), stiffness);
+    m_constraints->push_back(std::move(c));
 
     return true;
 }
@@ -458,10 +511,14 @@ void
 PbdModel::partitionConstraints(const bool print)
 {
     // Form the map { vertex : list_of_constraints_involve_vertex }
+    PBDConstraintVector& allConstraints = *m_constraints;
+
+    //std::cout << "---------partitionConstraints: " << allConstraints.size() << std::endl;
+
     std::unordered_map<size_t, std::vector<size_t>> vertexConstraints;
-    for (size_t constrIdx = 0; constrIdx < m_constraints.size(); ++constrIdx)
+    for (size_t constrIdx = 0; constrIdx < allConstraints.size(); ++constrIdx)
     {
-        const auto& constr = m_constraints[constrIdx];
+        const auto& constr = allConstraints[constrIdx];
         for (const auto& vIds : constr->getVertexIds())
         {
             vertexConstraints[vIds].push_back(constrIdx);
@@ -470,7 +527,7 @@ PbdModel::partitionConstraints(const bool print)
 
     // Add edges to the constraint graph
     // Each edge represent a shared vertex between two constraints
-    Graph constraintGraph(m_constraints.size());
+    Graph constraintGraph(allConstraints.size());
     for (const auto& kv : vertexConstraints)
     {
         const auto& constraints = kv.second;     // the list of constraints for a vertex
@@ -485,89 +542,68 @@ PbdModel::partitionConstraints(const bool print)
     vertexConstraints.clear();
 
     // do graph coloring for the constraint graph
-    const auto  coloring = constraintGraph.doColoring();
+    const auto  coloring = constraintGraph.doColoring(Graph::ColoringMethod::WelshPowell);
     const auto& partitionIndices = coloring.first;
     const auto  numPartitions    = coloring.second;
-    assert(partitionIndices.size() == m_constraints.size());
+    assert(partitionIndices.size() == allConstraints.size());
 
-    m_partitionedConstraints.resize(0);
-    m_partitionedConstraints.resize(static_cast<size_t>(numPartitions));
+    std::vector<PBDConstraintVector>& partitionedConstraints = *m_partitionedConstraints;
+    partitionedConstraints.resize(0);
+    partitionedConstraints.resize(static_cast<size_t>(numPartitions));
 
     for (size_t constrIdx = 0; constrIdx < partitionIndices.size(); ++constrIdx)
     {
         const auto partitionIdx = partitionIndices[constrIdx];
-        m_partitionedConstraints[partitionIdx].push_back(std::move(m_constraints[constrIdx]));
+        partitionedConstraints[partitionIdx].push_back(std::move(allConstraints[constrIdx]));
     }
 
     // If a partition has size smaller than the partition threshold, then move its constraints back
     // These constraints will be processed sequentially
     // Because small size partitions yield bad performance upon running in parallel
-    m_constraints.resize(0);
-    for (const auto& constraints : m_partitionedConstraints)
+    allConstraints.resize(0);
+    for (const auto& constraints : partitionedConstraints)
     {
         if (constraints.size() < m_partitionThreshold)
         {
             for (size_t constrIdx = 0; constrIdx < constraints.size(); ++constrIdx)
             {
-                m_constraints.push_back(std::move(constraints[constrIdx]));
+                allConstraints.push_back(std::move(constraints[constrIdx]));
             }
         }
     }
 
     // Remove all empty partitions
     size_t writeIdx = 0;
-    for (size_t readIdx = 0; readIdx < m_partitionedConstraints.size(); ++readIdx)
+    for (size_t readIdx = 0; readIdx < partitionedConstraints.size(); ++readIdx)
     {
-        if (m_partitionedConstraints[readIdx].size() >= m_partitionThreshold)
+        if (partitionedConstraints[readIdx].size() >= m_partitionThreshold)
         {
-            m_partitionedConstraints[writeIdx++] = std::move(m_partitionedConstraints[readIdx]);
+            partitionedConstraints[writeIdx++] = std::move(partitionedConstraints[readIdx]);
         }
     }
-    m_partitionedConstraints.resize(writeIdx);
+    partitionedConstraints.resize(writeIdx);
 
     // Print
     if (print)
     {
         size_t numConstraints = 0;
         int    idx = 0;
-        for (const auto& constraints : m_partitionedConstraints)
+        for (const auto& constraints : partitionedConstraints)
         {
             std::cout << "Partition # " << idx++ << " | # nodes: " << constraints.size() << std::endl;
             numConstraints += constraints.size();
         }
-        std::cout << "Sequential processing # nodes: " << m_constraints.size() << std::endl;
-        numConstraints += m_constraints.size();
+        std::cout << "Sequential processing # nodes: " << allConstraints.size() << std::endl;
+        numConstraints += allConstraints.size();
         std::cout << "Total constraints: " << numConstraints << " | Graph size: "
                   << constraintGraph.size() << std::endl;
     }
 }
 
 void
-PbdModel::projectConstraints()
-{
-    unsigned int i = 0;
-    while (++i < m_Parameters->m_maxIter)
-    {
-        for (auto c: m_constraints)
-        {
-            c->solvePositionConstraint(*this);
-        }
-
-        for (auto& partitionConstraints : m_partitionedConstraints)
-        {
-            ParallelUtils::parallelFor(partitionConstraints.size(),
-                [&](const size_t idx)
-                {
-                    partitionConstraints[idx]->solvePositionConstraint(*this);
-                });
-        }
-    }
-}
-
-void
 PbdModel::updatePhysicsGeometry()
 {
-    m_mesh->setVertexPositions(m_currentState->getPositions());
+    m_mesh->setVertexPositions(*m_currentState->getPositions());
 }
 
 void
@@ -582,7 +618,7 @@ PbdModel::setTimeStepSizeType(const TimeSteppingType type)
     m_timeStepSizeType = type;
     if (type == TimeSteppingType::Fixed)
     {
-        m_Parameters->m_dt = m_Parameters->m_DefaultDt;
+        m_parameters->m_dt = m_parameters->m_defaultDt;
     }
 }
 
@@ -591,57 +627,55 @@ PbdModel::setUniformMass(const double val)
 {
     if (val != 0.0)
     {
-        std::fill(m_mass.begin(), m_mass.end(), val);
-        std::fill(m_invMass.begin(), m_invMass.end(), 1 / val);
+        std::fill(m_mass->begin(), m_mass->end(), val);
+        std::fill(m_invMass->begin(), m_invMass->end(), 1.0 / val);
     }
     else
     {
-        std::fill(m_invMass.begin(), m_invMass.end(), 0.0);
-        std::fill(m_mass.begin(), m_mass.end(), 0.0);
+        std::fill(m_invMass->begin(), m_invMass->end(), 0.0);
+        std::fill(m_mass->begin(), m_mass->end(), 0.0);
     }
 }
 
 void
 PbdModel::setParticleMass(const double val, const size_t idx)
 {
+    StdVectorOfReal& masses    = *m_mass;
+    StdVectorOfReal& invMasses = *m_invMass;
     if (idx < m_mesh->getNumVertices())
     {
-        m_mass[idx]    = val;
-        m_invMass[idx] = 1.0 / val;
+        masses[idx]    = val;
+        invMasses[idx] = 1.0 / val;
     }
 }
 
 void
 PbdModel::setFixedPoint(const size_t idx)
 {
+    StdVectorOfReal& invMasses = *m_invMass;
     if (idx < m_mesh->getNumVertices())
     {
-        m_invMass[idx] = 0;
+        invMasses[idx] = 0.0;
     }
-}
-
-double
-PbdModel::getInvMass(const size_t idx) const
-{
-    return m_invMass[idx];
 }
 
 void
 PbdModel::integratePosition()
 {
-    const auto& accn    = m_currentState->getAccelerations();
-    auto&       prevPos = m_previousState->getPositions();
-    auto&       pos     = m_currentState->getPositions();
-    auto&       vel     = m_currentState->getVelocities();
+    StdVectorOfVec3d&       prevPos   = *m_previousState->getPositions();
+    StdVectorOfVec3d&       pos       = *m_currentState->getPositions();
+    StdVectorOfVec3d&       vel       = *m_currentState->getVelocities();
+    const StdVectorOfVec3d& accn      = *m_currentState->getAccelerations();
+    const StdVectorOfReal&  invMasses = *m_invMass;
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)
         {
-            if (std::abs(m_invMass[i]) > MIN_REAL)
+            if (std::abs(invMasses[i]) > MIN_REAL)
             {
-                vel[i]    += (accn[i] + m_Parameters->m_gravity) * m_Parameters->m_dt;
+                vel[i]    += (accn[i] + m_parameters->m_gravity) * m_parameters->m_dt;
                 prevPos[i] = pos[i];
-                pos[i]    += (1.0 - m_Parameters->m_viscousDampingCoeff) * vel[i] * m_Parameters->m_dt;
+                pos[i]    += (1.0 - m_parameters->m_viscousDampingCoeff) * vel[i] * m_parameters->m_dt;
             }
         });
 }
@@ -649,16 +683,17 @@ PbdModel::integratePosition()
 void
 PbdModel::updateVelocity()
 {
-    const auto& prevPos = m_previousState->getPositions();
-    const auto& pos     = m_currentState->getPositions();
-    auto&       vel     = m_currentState->getVelocities();
+    const StdVectorOfVec3d& prevPos   = *m_previousState->getPositions();
+    const StdVectorOfVec3d& pos       = *m_currentState->getPositions();
+    StdVectorOfVec3d&       vel       = *m_currentState->getVelocities();
+    const StdVectorOfReal&  invMasses = *m_invMass;
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)
         {
-            if (std::abs(m_invMass[i]) > MIN_REAL && m_Parameters->m_dt > 0.)
+            if (std::abs(invMasses[i]) > MIN_REAL && m_parameters->m_dt > 0.0)
             {
-                vel[i] = (pos[i] - prevPos[i]) / m_Parameters->m_dt;
+                vel[i] = (pos[i] - prevPos[i]) / m_parameters->m_dt;
             }
         });
 }

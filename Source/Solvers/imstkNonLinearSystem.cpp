@@ -26,33 +26,33 @@
 
 namespace imstk
 {
-template <typename Matrix>
+template<typename Matrix>
 NonLinearSystem<Matrix>::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF) : m_F(F), m_dF(dF)
 {
 }
 
-template <typename Matrix>
+template<typename Matrix>
 void
 NonLinearSystem<Matrix>::setFunction(const VectorFunctionType& function)
 {
     m_F = function;
 }
 
-template <typename Matrix>
+template<typename Matrix>
 void
 NonLinearSystem<Matrix>::setJacobian(const MatrixFunctionType& function)
 {
     m_dF = function;
 }
 
-template <typename Matrix>
+template<typename Matrix>
 const Vectord&
 NonLinearSystem<Matrix>::evaluateF(const Vectord& x, const bool isSemiImplicit)
 {
     return m_F(x, isSemiImplicit);
 }
 
-template <typename Matrix>
+template<typename Matrix>
 const Matrix&
 NonLinearSystem<Matrix>::evaluateJacobian(const Vectord& x)
 {
@@ -61,5 +61,4 @@ NonLinearSystem<Matrix>::evaluateJacobian(const Vectord& x)
 
 template class NonLinearSystem<SparseMatrixd>;
 template class NonLinearSystem<Matrixd>;
-
 } //imstk
