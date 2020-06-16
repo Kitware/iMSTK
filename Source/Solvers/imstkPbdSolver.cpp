@@ -52,8 +52,8 @@ PbdSolver::solve()
     {
         const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
         ParallelUtils::parallelFor(constraintPartition.size(),
-                                   [&](const size_t idx) { constraintPartition[idx]->zeroOutLambda(); }
-                                  );
+            [&](const size_t idx) { constraintPartition[idx]->zeroOutLambda(); }
+            );
     }
 
     unsigned int i = 0;
@@ -66,7 +66,7 @@ PbdSolver::solve()
 
         for (size_t j = 0; j < partitionedConstraints.size(); j++)
         {
-            const PBDConstraintVector& constraintPartition       = partitionedConstraints[j];
+            const PBDConstraintVector& constraintPartition = partitionedConstraints[j];
 
             ParallelUtils::parallelFor(constraintPartition.size(),
                 [&](const size_t idx)

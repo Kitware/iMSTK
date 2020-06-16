@@ -59,10 +59,10 @@ struct PBDModelConfig
     std::shared_ptr<PbdFEMConstraintConfig> m_femParams =
         std::make_shared<PbdFEMConstraintConfig>(PbdFEMConstraintConfig
         {
-            0.0,                // Lame constant, if constraint type is FEM
-            0.0,                // Lame constant, if constraint type is FEM
-            1000.0,             // FEM parameter, if constraint type is FEM
-            0.2                 // FEM parameter, if constraint type is FEM
+            0.0,                                                                                  // Lame constant, if constraint type is FEM
+            0.0,                                                                                  // Lame constant, if constraint type is FEM
+            1000.0,                                                                               // FEM parameter, if constraint type is FEM
+            0.2                                                                                   // FEM parameter, if constraint type is FEM
         });                                                                                       ///> Info shared between the fem constraints
 
     std::vector<std::pair<PbdConstraint::Type, double>> m_regularConstraints;                     ///> Constraints except FEM
@@ -281,7 +281,7 @@ protected:
     void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
 
 protected:
-    bool m_partitioned = false; /// \todo this is used in initialize() as a temporary fix to problems on linux
+    bool   m_partitioned = false;                                                         /// \todo this is used in initialize() as a temporary fix to problems on linux
     size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
 
     std::shared_ptr<PbdSolver>       m_pbdSolver = nullptr;                               ///> PBD solver

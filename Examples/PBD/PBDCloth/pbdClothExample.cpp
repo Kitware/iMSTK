@@ -104,7 +104,7 @@ main()
     // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
-    std::vector<size_t> fixedNodes = {0, nCols-1};
+    std::vector<size_t> fixedNodes = { 0, nCols - 1 };
     pbdParams->m_fixedNodeIds = fixedNodes;
 
     // Other parameters

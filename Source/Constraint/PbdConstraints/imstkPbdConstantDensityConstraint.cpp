@@ -45,10 +45,10 @@ PbdConstantDensityConstraint::initConstraint(const StdVectorOfVec3d& initVertexP
 }
 
 void
-PbdConstantDensityConstraint::projectConstraint(const StdVectorOfReal& currInvMasses, 
-                                                const double dt, 
+PbdConstantDensityConstraint::projectConstraint(const StdVectorOfReal&           currInvMasses,
+                                                const double                     dt,
                                                 const PbdConstraint::SolverType& type,
-                                                StdVectorOfVec3d&      currVertexPositions)
+                                                StdVectorOfVec3d&                currVertexPositions)
 {
     const size_t numParticles = currVertexPositions.size();
 

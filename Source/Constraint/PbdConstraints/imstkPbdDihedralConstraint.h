@@ -65,7 +65,7 @@ public:
         const size_t& pIdx2, const size_t& pIdx3,
         const double k);
 
-    /// 
+    ///
     /// \brief Compute value and gradient of the constraint
     ///
     /// \param[in] currVertexPositions vector of current positions
@@ -73,8 +73,8 @@ public:
     /// \param[inout] dcdx constraint gradient
     ///
     bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                 double& c,
-                                 StdVectorOfVec3d& dcdx) const override;
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdx) const override;
 
 public:
     double m_restAngle = 0.0; ///> Rest angle

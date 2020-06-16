@@ -120,7 +120,7 @@ public:
 
 private:
     size_t m_iterations = 20;                                                             ///> Number of NL Gauss-Seidel iterations for regular constraints
-    double m_dt; ///> time step
+    double m_dt;                                                                          ///> time step
 
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> Set of vector'd/partitioned pbd constraints
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> Vector of constraints

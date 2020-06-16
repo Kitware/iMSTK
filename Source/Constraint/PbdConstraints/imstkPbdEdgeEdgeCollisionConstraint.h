@@ -54,7 +54,7 @@ public:
 
     ///
     /// \brief compute value and gradient of constraint function
-    /// 
+    ///
     /// \param[in] currVertexPositionsA current positions from object A
     /// \param[in] currVertexPositionsA current positions from object B
     /// \param[inout] c constraint value
@@ -62,9 +62,8 @@ public:
     ///
     bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
                                  const StdVectorOfVec3d& currVertexPositionsB,
-                                 double& c,
-                                 StdVectorOfVec3d& dcdxA,
-                                 StdVectorOfVec3d& dcdxB) const override;
-
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdxA,
+                                 StdVectorOfVec3d&       dcdxB) const override;
 };
 } // imstk

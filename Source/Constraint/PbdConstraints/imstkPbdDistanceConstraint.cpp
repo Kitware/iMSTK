@@ -24,15 +24,15 @@
 namespace  imstk
 {
 void
-PbdDistanceConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions, 
-                                      const size_t& pIdx0, 
-                                      const size_t& pIdx1, 
-                                      const double k)
+PbdDistanceConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                                      const size_t&           pIdx0,
+                                      const size_t&           pIdx1,
+                                      const double            k)
 {
     m_vertexIds[0] = pIdx0;
     m_vertexIds[1] = pIdx1;
     m_stiffness    = k;
-    m_compliance = 1.0 / k;
+    m_compliance   = 1.0 / k;
 
     const Vec3d& p0 = initVertexPositions[pIdx0];
     const Vec3d& p1 = initVertexPositions[pIdx1];
@@ -41,9 +41,9 @@ PbdDistanceConstraint::initConstraint(const StdVectorOfVec3d& initVertexPosition
 }
 
 bool
-PbdDistanceConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions, 
-                                               double& c, 
-                                               StdVectorOfVec3d& dcdx) const
+PbdDistanceConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                               double&                 c,
+                                               StdVectorOfVec3d&       dcdx) const
 {
     const Vec3d& p0 = currVertexPositions[m_vertexIds[0]];
     const Vec3d& p1 = currVertexPositions[m_vertexIds[1]];
@@ -52,8 +52,8 @@ PbdDistanceConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVerte
     dcdx[0] = p0 - p1;
     const double len = dcdx[0].norm();
     dcdx[0] /= len;
-    dcdx[1] = -dcdx[0];
-    c = len - m_restLength;
+    dcdx[1]  = -dcdx[0];
+    c        = len - m_restLength;
 
     return true;
 }

@@ -67,8 +67,8 @@ public:
     /// \brief Compute the value and gradient of constraint
     ///
     bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
-                                  double& c, 
-                                  StdVectorOfVec3d& dcdx) const override;
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdx) const override;
 public:
     double m_restLength = 0.; ///> Rest length
 };

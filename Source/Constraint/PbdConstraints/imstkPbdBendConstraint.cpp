@@ -24,17 +24,17 @@
 namespace imstk
 {
 void
-    PbdBendConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                                      const size_t& pIdx0, 
-                                      const size_t& pIdx1,
-                                      const size_t& pIdx2, 
-                                      const double k)
+PbdBendConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                                  const size_t&           pIdx0,
+                                  const size_t&           pIdx1,
+                                  const size_t&           pIdx2,
+                                  const double            k)
 {
     m_vertexIds[0] = pIdx0;
     m_vertexIds[1] = pIdx1;
     m_vertexIds[2] = pIdx2;
 
-    m_stiffness = k;
+    m_stiffness  = k;
     m_compliance = 1.0 / k;
 
     const Vec3d& p0 = initVertexPositions[pIdx0];
@@ -49,8 +49,8 @@ void
 
 bool
 PbdBendConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                           double& c,
-                                           StdVectorOfVec3d& dcdx) const
+                                           double&                 c,
+                                           StdVectorOfVec3d&       dcdx) const
 {
     const size_t i0 = m_vertexIds[0];
     const size_t i1 = m_vertexIds[1];
@@ -65,7 +65,7 @@ PbdBendConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPos
     const Vec3d& diff   = p1 - center;
     const double dist   = diff.norm();
 
-    if (dist < m_epsilon) 
+    if (dist < m_epsilon)
     {
         return false;
     }
@@ -79,5 +79,4 @@ PbdBendConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPos
 
     return true;
 }
-
 } // imstk

@@ -34,7 +34,7 @@ PbdAreaConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
     m_vertexIds[1] = pIdx1;
     m_vertexIds[2] = pIdx2;
 
-    this->m_stiffness = k;
+    this->m_stiffness  = k;
     this->m_compliance = 1.0 / k;
 
     const Vec3d& p0 = initVertexPositions[pIdx0];
@@ -62,9 +62,12 @@ PbdAreaConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPos
     const Vec3d e2 = p2 - p0;
 
     Vec3d n = e0.cross(e1);
-    c       = 0.5 * n.norm();
+    c = 0.5 * n.norm();
 
-    if (c < m_epsilon) return false;
+    if (c < m_epsilon)
+    {
+        return false;
+    }
 
     n /= 2 * c;
     c -= m_restArea;

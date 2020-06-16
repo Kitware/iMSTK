@@ -34,7 +34,7 @@ PbdVolumeConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
     m_vertexIds[2] = pIdx2;
     m_vertexIds[3] = pIdx3;
 
-    m_stiffness = k;
+    m_stiffness  = k;
     m_compliance = 1.0 / k;
 
     const Vec3d& p0 = initVertexPositions[pIdx0];
@@ -45,9 +45,10 @@ PbdVolumeConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
     m_restVolume = (1.0 / 6.0) * ((p1 - p0).cross(p2 - p0)).dot(p3 - p0);
 }
 
-bool PbdVolumeConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                                  double& c, 
-                                                  StdVectorOfVec3d& dcdx) const
+bool
+PbdVolumeConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                             double&                 c,
+                                             StdVectorOfVec3d&       dcdx) const
 {
     const auto i0 = m_vertexIds[0];
     const auto i1 = m_vertexIds[1];

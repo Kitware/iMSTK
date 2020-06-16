@@ -43,7 +43,7 @@ PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
 
     m_elementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
     m_config     = config;
-    m_compliance = 1.0 / ( config->m_lambda + 2*config->m_mu );
+    m_compliance = 1.0 / (config->m_lambda + 2 * config->m_mu);
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -60,9 +60,10 @@ PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
     return false;
 }
 
-bool PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                                  double& cval, 
-                                                  StdVectorOfVec3d& dcdx) const
+bool
+PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                             double&                 cval,
+                                             StdVectorOfVec3d&       dcdx) const
 {
     const auto i0 = m_vertexIds[0];
     const auto i1 = m_vertexIds[1];
@@ -73,7 +74,7 @@ bool PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVe
     const Vec3d& p1 = currVertexPositions[i1];
     const Vec3d& p2 = currVertexPositions[i2];
     const Vec3d& p3 = currVertexPositions[i3];
-    
+
     Mat3d m;
     m.col(0) = p0 - p3;
     m.col(1) = p1 - p3;
@@ -174,7 +175,7 @@ bool PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVe
     }
 
     Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();
-    cval = C;
+    cval  = C;
     cval *=  m_elementVolume;
     dcdx.resize(m_vertexIds.size());
     dcdx[0] = gradC.col(0);

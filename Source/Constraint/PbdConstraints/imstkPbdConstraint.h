@@ -71,7 +71,7 @@ public:
     ///
     virtual Type getType() const = 0;
 
-    /// 
+    ///
     /// \brief Compute value and gradient of the constraint
     ///
     /// \param[in] currVertexPositions vector of current positions
@@ -79,8 +79,8 @@ public:
     /// \param[inout] dcdx constraint gradient
     ///
     virtual bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                         double& c,
-                                         StdVectorOfVec3d& dcdx) const = 0;
+                                         double&                 c,
+                                         StdVectorOfVec3d&       dcdx) const = 0;
 
     ///
     /// \brief Get the vertex indices of the constraint
@@ -100,9 +100,10 @@ public:
     ///
     /// \brief  Set the stiffness
     ///
-    void setStiffness(const double stiffness) { 
-        m_stiffness = stiffness; 
-        m_compliance = 1.0 / stiffness; 
+    void setStiffness(const double stiffness)
+    {
+        m_stiffness  = stiffness;
+        m_compliance = 1.0 / stiffness;
     }
 
     ///
@@ -111,7 +112,7 @@ public:
     double getStiffness() const { return m_stiffness; }
 
     ///
-    /// \brief Use PBD 
+    /// \brief Use PBD
     ///
     void zeroOutLambda() { m_lambda = 0.0; }
 
@@ -121,9 +122,9 @@ public:
     virtual void projectConstraint(const StdVectorOfReal& currInvMasses, const double dt, const SolverType& type, StdVectorOfVec3d& pos);
 protected:
     std::vector<size_t> m_vertexIds;   ///> index of points for the constraint
-    double m_epsilon = 1.0e-16;        ///> Tolerance used for the costraints
-    double m_stiffness = 1.0;          ///> used in PBD, [0, 1]
-    double m_compliance = 1e-7;        ///> used in xPBD, inverse of Young's Modulus
+    double m_epsilon        = 1.0e-16; ///> Tolerance used for the costraints
+    double m_stiffness      = 1.0;     ///> used in PBD, [0, 1]
+    double m_compliance     = 1e-7;    ///> used in xPBD, inverse of Young's Modulus
     mutable double m_lambda = 0.0;     ///> Lagrange multiplier
 };
 

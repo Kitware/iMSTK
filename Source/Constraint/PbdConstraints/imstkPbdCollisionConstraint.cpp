@@ -30,34 +30,37 @@ PbdCollisionConstraint::PbdCollisionConstraint(const unsigned int& n1, const uns
     m_bodiesSecond.resize(n2);
 }
 
-
-void PbdCollisionConstraint::projectConstraint(const StdVectorOfReal& invMassA,
-                                               const StdVectorOfReal& invMassB,
-                                               StdVectorOfVec3d& posA,
-                                               StdVectorOfVec3d& posB)
+void
+PbdCollisionConstraint::projectConstraint(const StdVectorOfReal& invMassA,
+                                          const StdVectorOfReal& invMassB,
+                                          StdVectorOfVec3d&      posA,
+                                          StdVectorOfVec3d&      posB)
 {
-    double c;
+    double           c;
     StdVectorOfVec3d dcdxA;
     StdVectorOfVec3d dcdxB;
 
     bool update = this->computeValueAndGradient(posA, posB, c, dcdxA, dcdxB);
-    if (!update) return;
+    if (!update)
+    {
+        return;
+    }
 
     double lambda = 0.0;
 
-    for (size_t i=0; i<m_bodiesFirst.size(); ++i)
+    for (size_t i = 0; i < m_bodiesFirst.size(); ++i)
     {
         lambda += invMassA[m_bodiesFirst[i]] * dcdxA[i].squaredNorm();
     }
 
-    for (size_t i=0; i<m_bodiesSecond.size(); ++i)
+    for (size_t i = 0; i < m_bodiesSecond.size(); ++i)
     {
         lambda += invMassB[m_bodiesSecond[i]] * dcdxB[i].squaredNorm();
     }
 
     lambda = c / lambda;
 
-    for (size_t i=0, vid=0; i<m_bodiesFirst.size(); ++i)
+    for (size_t i = 0, vid = 0; i < m_bodiesFirst.size(); ++i)
     {
         vid = m_bodiesFirst[i];
         if (invMassA[vid] > 0.0)
@@ -66,7 +69,7 @@ void PbdCollisionConstraint::projectConstraint(const StdVectorOfReal& invMassA,
         }
     }
 
-    for (size_t i=0, vid=0; i<m_bodiesSecond.size(); ++i)
+    for (size_t i = 0, vid = 0; i < m_bodiesSecond.size(); ++i)
     {
         vid = m_bodiesSecond[i];
         if (invMassB[vid] > 0.0)

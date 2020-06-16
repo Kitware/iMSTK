@@ -25,10 +25,10 @@
 namespace imstk
 {
 void
-PbdEdgeEdgeConstraint::initConstraint(const size_t& pIdxA1, 
-                                      const size_t& pIdxA2,
-                                      const size_t& pIdxB1, 
-                                      const size_t& pIdxB2,
+PbdEdgeEdgeConstraint::initConstraint(const size_t&                                 pIdxA1,
+                                      const size_t&                                 pIdxA2,
+                                      const size_t&                                 pIdxB1,
+                                      const size_t&                                 pIdxB2,
                                       std::shared_ptr<PbdCollisionConstraintConfig> configA,
                                       std::shared_ptr<PbdCollisionConstraintConfig> configB)
 {
@@ -40,11 +40,12 @@ PbdEdgeEdgeConstraint::initConstraint(const size_t& pIdxA1,
     m_bodiesSecond[1] = pIdxB2;
 }
 
-bool PbdEdgeEdgeConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
-                                                    const StdVectorOfVec3d& currVertexPositionsB,
-                                                    double& cc,
-                                                    StdVectorOfVec3d& dcdxA,
-                                                    StdVectorOfVec3d& dcdxB) const
+bool
+PbdEdgeEdgeConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
+                                               const StdVectorOfVec3d& currVertexPositionsB,
+                                               double&                 cc,
+                                               StdVectorOfVec3d&       dcdxA,
+                                               StdVectorOfVec3d&       dcdxB) const
 {
     const auto i0 = m_bodiesFirst[0];
     const auto i1 = m_bodiesFirst[1];

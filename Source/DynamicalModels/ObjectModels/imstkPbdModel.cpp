@@ -146,7 +146,6 @@ PbdModel::initialize()
             LOG(WARNING) << "for PBD, k should be between [0, 1]";
         }
         else if (m_parameters->m_solverType == PbdConstraint::SolverType::xPBD && constraint.second <= 1.0)
-
         {
             LOG(WARNING) << "for xPBD, k is Young's Modulu, and should be much larger than 1";
         }
@@ -514,7 +513,10 @@ void
 PbdModel::partitionConstraints(const bool print)
 {
     // Form the map { vertex : list_of_constraints_involve_vertex }
-    PBDConstraintVector&                            allConstraints = *m_constraints;
+    PBDConstraintVector& allConstraints = *m_constraints;
+
+    //std::cout << "---------partitionConstraints: " << allConstraints.size() << std::endl;
+
     std::unordered_map<size_t, std::vector<size_t>> vertexConstraints;
     for (size_t constrIdx = 0; constrIdx < allConstraints.size(); ++constrIdx)
     {
@@ -542,7 +544,7 @@ PbdModel::partitionConstraints(const bool print)
     vertexConstraints.clear();
 
     // do graph coloring for the constraint graph
-    const auto  coloring = constraintGraph.doColoring();
+    const auto  coloring = constraintGraph.doColoring(Graph::ColoringMethod::WelshPowell);
     const auto& partitionIndices = coloring.first;
     const auto  numPartitions    = coloring.second;
     assert(partitionIndices.size() == allConstraints.size());

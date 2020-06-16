@@ -52,10 +52,10 @@ public:
         const double k = 2.5);
 
     bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                 double& c,
-                                 StdVectorOfVec3d& dcdx) const override;
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdx) const override;
 
 public:
-    double m_restArea  = 0.; ///> Area at the rest position
+    double m_restArea = 0.;  ///> Area at the rest position
 };
 } // imstk

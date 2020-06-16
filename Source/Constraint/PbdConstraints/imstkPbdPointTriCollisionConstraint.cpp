@@ -26,10 +26,10 @@
 namespace imstk
 {
 void
-PbdPointTriangleConstraint::initConstraint(const size_t& pIdxA1,
-                                           const size_t& pIdxB1, 
-                                           const size_t& pIdxB2, 
-                                           const size_t& pIdxB3,
+PbdPointTriangleConstraint::initConstraint(const size_t&                                 pIdxA1,
+                                           const size_t&                                 pIdxB1,
+                                           const size_t&                                 pIdxB2,
+                                           const size_t&                                 pIdxB3,
                                            std::shared_ptr<PbdCollisionConstraintConfig> configA,
                                            std::shared_ptr<PbdCollisionConstraintConfig> configB)
 {
@@ -44,9 +44,9 @@ PbdPointTriangleConstraint::initConstraint(const size_t& pIdxA1,
 bool
 PbdPointTriangleConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
                                                     const StdVectorOfVec3d& currVertexPositionsB,
-                                                    double& c,
-                                                    StdVectorOfVec3d& dcdxA,
-                                                    StdVectorOfVec3d& dcdxB) const
+                                                    double&                 c,
+                                                    StdVectorOfVec3d&       dcdxA,
+                                                    StdVectorOfVec3d&       dcdxB) const
 {
     const size_t i0 = m_bodiesFirst[0];
     const size_t i1 = m_bodiesSecond[0];
