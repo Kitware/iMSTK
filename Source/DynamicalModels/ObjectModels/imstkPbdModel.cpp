@@ -187,17 +187,11 @@ PbdModel::initialize()
     }
 
     // Partition constraints for parallel computation
-#ifdef __linux__
-    /// \todo: this is a tempory fix of PBD problems on linux
     if (!m_partitioned)
     {
-        partitionConstraints();
+        this->partitionConstraints();
         m_partitioned = true;
     }
-#else
-    partitionConstraints();
-#endif
-
 
     this->setTimeStepSizeType(m_timeStepSizeType);
 
