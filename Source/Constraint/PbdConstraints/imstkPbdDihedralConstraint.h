@@ -61,19 +61,22 @@ public:
     */
     void initConstraint(
         const StdVectorOfVec3d& initVertexPositions,
-        const size_t& pIdx1, const size_t& pIdx2,
-        const size_t& pIdx3, const size_t& pIdx4,
+        const size_t& pIdx0, const size_t& pIdx1,
+        const size_t& pIdx2, const size_t& pIdx3,
         const double k);
 
     ///
-    /// \brief Solves the dihedral angular constraint
+    /// \brief Compute value and gradient of the constraint
     ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& invMasses) override;
+    /// \param[in] currVertexPositions vector of current positions
+    /// \param[inout] c constraint value
+    /// \param[inout] dcdx constraint gradient
+    ///
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdx) const override;
 
 public:
     double m_restAngle = 0.0; ///> Rest angle
-    double m_stiffness = 0.0; ///> Angular stiffness
 };
 } //imstk

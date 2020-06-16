@@ -24,56 +24,37 @@
 namespace  imstk
 {
 void
-PbdDistanceConstraint::initConstraint(
-    const StdVectorOfVec3d& initVertexPositions,
-    const size_t& pIdx1, const size_t& pIdx2, const double k)
+PbdDistanceConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                                      const size_t&           pIdx0,
+                                      const size_t&           pIdx1,
+                                      const double            k)
 {
-    m_vertexIds[0] = pIdx1;
-    m_vertexIds[1] = pIdx2;
+    m_vertexIds[0] = pIdx0;
+    m_vertexIds[1] = pIdx1;
     m_stiffness    = k;
+    m_compliance   = 1.0 / k;
 
+    const Vec3d& p0 = initVertexPositions[pIdx0];
     const Vec3d& p1 = initVertexPositions[pIdx1];
-    const Vec3d& p2 = initVertexPositions[pIdx2];
 
-    m_restLength = (p1 - p2).norm();
+    m_restLength = (p0 - p1).norm();
 }
 
 bool
-PbdDistanceConstraint::solvePositionConstraint(
-    StdVectorOfVec3d&      currVertexPositions,
-    const StdVectorOfReal& currInvMasses)
+PbdDistanceConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                               double&                 c,
+                                               StdVectorOfVec3d&       dcdx) const
 {
-    const size_t i1 = m_vertexIds[0];
-    const size_t i2 = m_vertexIds[1];
+    const Vec3d& p0 = currVertexPositions[m_vertexIds[0]];
+    const Vec3d& p1 = currVertexPositions[m_vertexIds[1]];
+    dcdx.resize(m_vertexIds.size());
 
-    Vec3d& p0 = currVertexPositions[i1];
-    Vec3d& p1 = currVertexPositions[i2];
+    dcdx[0] = p0 - p1;
+    const double len = dcdx[0].norm();
+    dcdx[0] /= len;
+    dcdx[1]  = -dcdx[0];
+    c        = len - m_restLength;
 
-    const Real im1 = currInvMasses[i1];
-    const Real im2 = currInvMasses[i2];
-
-    const auto wsum = im1 + im2;
-
-    if (wsum == 0.0)
-    {
-        return false;
-    }
-
-    Vec3d      n   = p1 - p0;
-    const auto len = n.norm();
-    n /= len;
-
-    const Vec3d gradC = n * m_stiffness * (len - m_restLength) / wsum;
-
-    if (im1 > 0)
-    {
-        p0 += im1 * gradC;
-    }
-
-    if (im2 > 0)
-    {
-        p1 += -im2 * gradC;
-    }
     return true;
 }
-} // imstk
+}

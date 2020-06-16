@@ -53,12 +53,17 @@ public:
         std::shared_ptr<PbdCollisionConstraintConfig> configB);
 
     ///
-    /// \brief Solve edge-edge collision constraint
+    /// \brief compute value and gradient of constraint function
     ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositionsA,
-        StdVectorOfVec3d&      currVertexPositionsB,
-        const StdVectorOfReal& currInvMassesA,
-        const StdVectorOfReal& currInvMassesB) override;
+    /// \param[in] currVertexPositionsA current positions from object A
+    /// \param[in] currVertexPositionsA current positions from object B
+    /// \param[inout] c constraint value
+    /// \param[inout] dcdx constraint gradient
+    ///
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
+                                 const StdVectorOfVec3d& currVertexPositionsB,
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdxA,
+                                 StdVectorOfVec3d&       dcdxB) const override;
 };
-}
+} // imstk

@@ -51,15 +51,11 @@ public:
         const size_t& pIdx1, const size_t& pIdx2, const size_t& pIdx3,
         const double k = 2.5);
 
-    ///
-    /// \brief Solves the area constraint
-    ///
-    bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositions,
-        const StdVectorOfReal& currInvMasses) override;
+    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                 double&                 c,
+                                 StdVectorOfVec3d&       dcdx) const override;
 
 public:
-    double m_restArea  = 0.; ///> Area at the rest position
-    double m_stiffness = 0.; ///> Stiffness of the area constraint
+    double m_restArea = 0.;  ///> Area at the rest position
 };
 } // imstk

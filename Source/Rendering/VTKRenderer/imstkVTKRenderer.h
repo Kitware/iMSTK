@@ -167,11 +167,11 @@ protected:
 #ifdef iMSTK_ENABLE_VR
     std::vector<vtkOpenVRCameraPose> m_camPos;
 #endif
-
     vtkSmartPointer<vtkChartXY>      m_timeTableChart      = nullptr;
     vtkSmartPointer<vtkContextActor> m_timeTableChartActor = nullptr;
     vtkSmartPointer<vtkTable> m_timeTable = nullptr;
     vtkPlotBar* m_timeTablePlot = nullptr;
     int m_timeTableIter = 0;
+
 };
 }

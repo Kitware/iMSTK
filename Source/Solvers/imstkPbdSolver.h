@@ -24,6 +24,7 @@
 #include "imstkPbdCollisionConstraint.h"
 #include "imstkPbdConstraint.h"
 #include "imstkSolverBase.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -88,9 +89,29 @@ public:
     void setInvMasses(std::shared_ptr<StdVectorOfReal> invMasses) { this->m_invMasses = invMasses; }
 
     ///
+    /// \brief Set time step
+    ///
+    void setTimeStep(const double dt) { m_dt = dt; }
+
+    ///
     /// \brief Get Iterations. Returns current nonlinear iterations.
     ///
     size_t getIterations() const { return this->m_iterations; }
+
+    ///
+    /// \brief Set the PBD solver type
+    ///
+    void setSolverType(const PbdConstraint::SolverType& type)
+    {
+        if (type == PbdConstraint::SolverType::GCD)
+        {
+            LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
+            m_solverType = PbdConstraint::SolverType::xPBD;
+            return;
+        }
+
+        m_solverType = type;
+    }
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.
@@ -99,12 +120,14 @@ public:
 
 private:
     size_t m_iterations = 20;                                                             ///> Number of NL Gauss-Seidel iterations for regular constraints
+    double m_dt;                                                                          ///> time step
 
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> Set of vector'd/partitioned pbd constraints
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> Vector of constraints
 
     std::shared_ptr<StdVectorOfVec3d> m_positions = nullptr;
     std::shared_ptr<StdVectorOfReal>  m_invMasses = nullptr;
+    PbdConstraint::SolverType m_solverType = PbdConstraint::SolverType::xPBD;
 };
 
 class PbdCollisionSolver : SolverBase
