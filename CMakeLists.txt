@@ -64,7 +64,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" ON)
+option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" OFF)
 if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
 	include(CheckLanguage)
 	check_language(CUDA)

@@ -20,6 +20,8 @@
 =========================================================================*/
 // \author Johan Andruejol <johan.andruejol@kitware.com>
 
+//#if (VTK_MAJOR_VERSION <= 8)
+
 #include "vtkCapsuleSource.h"
 
 #include <vtkCellArray.h>
@@ -430,3 +432,5 @@ vtkCapsuleSource::RequestInformation(
 }
 
 #pragma warning(pop)
+
+//#endif
