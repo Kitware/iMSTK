@@ -21,27 +21,29 @@
 
 #include "imstkPbdFETetConstraint.h"
 #include "imstkLogger.h"
+#include <iostream>
 
 namespace  imstk
 {
 bool
 PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                                    const size_t& pIdx1, const size_t& pIdx2,
-                                    const size_t& pIdx3, const size_t& pIdx4,
+                                    const size_t& pIdx0, const size_t& pIdx1,
+                                    const size_t& pIdx2, const size_t& pIdx3,
                                     std::shared_ptr<PbdFEMConstraintConfig> config)
 {
-    m_vertexIds[0] = pIdx1;
-    m_vertexIds[1] = pIdx2;
-    m_vertexIds[2] = pIdx3;
-    m_vertexIds[3] = pIdx4;
+    m_vertexIds[0] = pIdx0;
+    m_vertexIds[1] = pIdx1;
+    m_vertexIds[2] = pIdx2;
+    m_vertexIds[3] = pIdx3;
 
-    const Vec3d& p0 = initVertexPositions[pIdx1];
-    const Vec3d& p1 = initVertexPositions[pIdx2];
-    const Vec3d& p2 = initVertexPositions[pIdx3];
-    const Vec3d& p3 = initVertexPositions[pIdx4];
+    const Vec3d& p0 = initVertexPositions[pIdx0];
+    const Vec3d& p1 = initVertexPositions[pIdx1];
+    const Vec3d& p2 = initVertexPositions[pIdx2];
+    const Vec3d& p3 = initVertexPositions[pIdx3];
 
     m_elementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
-    this->config    = config;
+    m_config     = config;
+    m_compliance = 1.0 / (config->m_lambda + 2 * config->m_mu);
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -59,21 +61,19 @@ PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
 }
 
 bool
-PbdFEMTetConstraint::solvePositionConstraint(
-    StdVectorOfVec3d&      currVertexPositions,
-    const StdVectorOfReal& currInvMasses)
+PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                             double&                 cval,
+                                             StdVectorOfVec3d&       dcdx) const
 {
-    const auto i1 = m_vertexIds[0];
-    const auto i2 = m_vertexIds[1];
-    const auto i3 = m_vertexIds[2];
-    const auto i4 = m_vertexIds[3];
+    const auto i0 = m_vertexIds[0];
+    const auto i1 = m_vertexIds[1];
+    const auto i2 = m_vertexIds[2];
+    const auto i3 = m_vertexIds[3];
 
-    Vec3d& p0 = currVertexPositions[i1];
-    Vec3d& p1 = currVertexPositions[i2];
-    Vec3d& p2 = currVertexPositions[i3];
-    Vec3d& p3 = currVertexPositions[i4];
-
-    //double currentVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
+    const Vec3d& p0 = currVertexPositions[i0];
+    const Vec3d& p1 = currVertexPositions[i1];
+    const Vec3d& p2 = currVertexPositions[i2];
+    const Vec3d& p3 = currVertexPositions[i3];
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -87,8 +87,8 @@ PbdFEMTetConstraint::solvePositionConstraint(
     // energy constraint
     double C = 0;
 
-    const auto mu     = config->m_mu;
-    const auto lambda = config->m_lambda;
+    const auto mu     = m_config->m_mu;
+    const auto lambda = m_config->m_lambda;
 
     switch (m_material)
     {
@@ -174,46 +174,14 @@ PbdFEMTetConstraint::solvePositionConstraint(
     }
     }
 
-    const double im1 = currInvMasses[i1];
-    const double im2 = currInvMasses[i2];
-    const double im3 = currInvMasses[i3];
-    const double im4 = currInvMasses[i4];
-
     Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();
-
-    const double sum = im1 * gradC.col(0).squaredNorm()
-                       + im2 * gradC.col(1).squaredNorm()
-                       + im3 * gradC.col(2).squaredNorm()
-                       + im4 * (gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
-
-    if (sum < m_epsilon)
-    {
-        return false;
-    }
-
-    C = C * m_elementVolume;
-
-    const double s = C / sum;
-
-    if (im1 > 0)
-    {
-        p0 += -s* im1* gradC.col(0);
-    }
-
-    if (im2 > 0)
-    {
-        p1 += -s* im2* gradC.col(1);
-    }
-
-    if (im3 > 0)
-    {
-        p2 += -s* im3* gradC.col(2);
-    }
-
-    if (im4 > 0)
-    {
-        p3 += s * im4 * (gradC.col(0) + gradC.col(1) + gradC.col(2));
-    }
+    cval  = C;
+    cval *=  m_elementVolume;
+    dcdx.resize(m_vertexIds.size());
+    dcdx[0] = gradC.col(0);
+    dcdx[1] = gradC.col(1);
+    dcdx[2] = gradC.col(2);
+    dcdx[3] = -dcdx[0] - dcdx[1] - dcdx[2];
 
     return true;
 }
