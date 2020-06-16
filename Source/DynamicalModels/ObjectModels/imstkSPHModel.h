@@ -173,11 +173,19 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
+    std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
+    std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
+    std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
+    std::shared_ptr<TaskNode> getComputeSurfaceTensionNode() const { return m_computeSurfaceTensionNode; }
+    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
+    std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
+    std::shared_ptr<TaskNode> getIntegrateNode() const { m_integrateNode; }
+
 protected:
     ///
     /// \brief Setup SPH compute graph connectivity
     ///
-    virtual void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 private:
     ///
@@ -249,13 +257,13 @@ private:
     void moveParticles(const Real timestep);
 
 protected:
-    std::shared_ptr<ComputeNode> m_findParticleNeighborsNode = nullptr;
-    std::shared_ptr<ComputeNode> m_computeDensityNode        = nullptr;
-    std::shared_ptr<ComputeNode> m_computePressureAccelNode  = nullptr;
-    std::shared_ptr<ComputeNode> m_computeSurfaceTensionNode = nullptr;
-    std::shared_ptr<ComputeNode> m_computeTimeSetpSizeNode   = nullptr;
-    std::shared_ptr<ComputeNode> m_sumAccelsNode = nullptr;
-    std::shared_ptr<ComputeNode> m_integrateNode = nullptr;
+    std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
+    std::shared_ptr<TaskNode> m_computeDensityNode        = nullptr;
+    std::shared_ptr<TaskNode> m_computePressureAccelNode  = nullptr;
+    std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
+    std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
+    std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
+    std::shared_ptr<TaskNode> m_integrateNode = nullptr;
 
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;

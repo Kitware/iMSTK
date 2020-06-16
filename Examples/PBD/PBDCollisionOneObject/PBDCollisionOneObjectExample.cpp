@@ -19,18 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkLight.h"
-#include "imstkPbdModel.h"
 #include "imstkMeshIO.h"
-#include "imstkOneToOneMap.h"
-#include "imstkTetraTriangleMap.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkScene.h"
-#include "imstkComputeGraphVizWriter.h"
 #include "imstkObjectInteractionFactory.h"
+#include "imstkOneToOneMap.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
+#include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTaskGraphVizWriter.h"
+#include "imstkTetraTriangleMap.h"
 
 using namespace imstk;
 
@@ -160,7 +161,7 @@ main()
 
     // Collision
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
-        InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::MeshToMeshBruteForce));
+        InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");

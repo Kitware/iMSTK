@@ -27,20 +27,20 @@ limitations under the License.
 namespace imstk
 {
 ///
-/// \class ComputeNode
+/// \class TaskNode
 ///
-/// \brief Base class for compute graph nodes
+/// \brief Base class for TaskGraph nodes
 ///
-class ComputeNode
+class TaskNode
 {
 public:
-    ComputeNode() = default;
-    ComputeNode(std::function<void()> func, std::string name = "none", bool critical = false) :
-        m_func(func), m_name(name), m_critical(critical), m_elapsedTime(0.0)
+    TaskNode() = default;
+    TaskNode(std::function<void()> func, std::string name = "none", bool isCritical = false) :
+        m_func(func), m_name(name), m_isCritical(isCritical), m_computeTime(0.0)
     {
     }
 
-    virtual ~ComputeNode() = default;
+    virtual ~TaskNode() = default;
 
 public:
     void setFunction(std::function<void()> func) { this->m_func = func; }
@@ -51,15 +51,17 @@ public:
     ///
     bool isFunctional() const { return m_func != nullptr; }
 
-    // Executes
+    ///
+    /// \brief Calls the function pointer provided if node enabled
+    ///
     virtual void execute();
 
 public:
-    std::string m_name   = "none";
-    bool   m_enabled     = true;
-    bool   m_critical    = false;
-    double m_elapsedTime = 0.0;
-    bool   m_enableBenchmarking = false;
+    std::string m_name    = "none";
+    bool   m_enabled      = true;
+    bool   m_isCritical   = false;
+    double m_computeTime  = 0.0;
+    bool   m_enableTiming = false;
 
 protected:
     std::function<void()> m_func = nullptr; ///> Don't allow user to call directly (must use execute)

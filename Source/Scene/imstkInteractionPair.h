@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-class ComputeNode;
+class TaskNode;
 
 ///
 /// \class InteractionPair
@@ -36,20 +36,20 @@ class ComputeNode;
 class InteractionPair
 {
 public:
-    using Inputs  = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
-    using Outputs = std::pair<std::vector<std::shared_ptr<ComputeNode>>, std::vector<std::shared_ptr<ComputeNode>>>;
+    using Inputs  = std::pair<std::vector<std::shared_ptr<TaskNode>>, std::vector<std::shared_ptr<TaskNode>>>;
+    using Outputs = std::pair<std::vector<std::shared_ptr<TaskNode>>, std::vector<std::shared_ptr<TaskNode>>>;
 
 public:
     InteractionPair() = default;
     virtual ~InteractionPair() = default;
 
 public:
-    const Inputs& getComputeNodeInputs() const { return m_computeNodeInputs; }
-    const Outputs& getComputeNodeOutputs() const { return m_computeNodeOutputs; }
+    const Inputs& getTaskNodeInputs() const { return m_taskNodeInputs; }
+    const Outputs& getTaskNodeOutputs() const { return m_taskNodeOutputs; }
 
 protected:
-    Inputs  m_computeNodeInputs;                        ///> The interacting nodes
-    Outputs m_computeNodeOutputs;                       ///> The interacting nodes
-    std::shared_ptr<ComputeNode> m_interactionFunction; ///> Function to execute on interaction
+    Inputs  m_taskNodeInputs;                        ///> The interacting nodes
+    Outputs m_taskNodeOutputs;                       ///> The interacting nodes
+    std::shared_ptr<TaskNode> m_interactionFunction; ///> Function to execute on interaction
 };
 }

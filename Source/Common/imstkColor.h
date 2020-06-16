@@ -101,6 +101,8 @@ struct Color
     ///
     const double* getValue() const;
 
+    std::string rgbHex();
+
     ///
     /// \brief interpolate between two colors by ratio t
     ///

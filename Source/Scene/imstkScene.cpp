@@ -25,8 +25,6 @@
 #include "imstkCollidingObject.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeGraphVizWriter.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkDeformableObject.h"
 #include "imstkDynamicObject.h"
@@ -38,8 +36,10 @@
 #include "imstkRigidBodyWorld.h"
 #include "imstkSceneObject.h"
 #include "imstkSceneObjectControllerBase.h"
-#include "imstkSequentialComputeGraphController.h"
-#include "imstkTbbComputeGraphController.h"
+#include "imstkSequentialTaskGraphController.h"
+#include "imstkTaskGraph.h"
+#include "imstkTaskGraphVizWriter.h"
+#include "imstkTbbTaskGraphController.h"
 #include "imstkTimer.h"
 
 namespace imstk
@@ -49,8 +49,8 @@ Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
     m_camera(std::make_shared<Camera>()),
     m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_config(config),
-    m_computeGraph(std::make_shared<ComputeGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
-    benchmarkLock(std::make_shared<ParallelUtils::SpinLock>())
+    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
+    computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
 }
 
@@ -75,16 +75,16 @@ Scene::initialize()
     }
 
     // Build the compute graph
-    buildComputeGraph();
+    buildTaskGraph();
 
     // Opportunity for external configuration
-    if (m_postComputeGraphConfigureCallback != nullptr)
+    if (m_postTaskGraphConfigureCallback != nullptr)
     {
-        m_postComputeGraphConfigureCallback(this);
+        m_postTaskGraphConfigureCallback(this);
     }
 
     // Then init
-    initComputeGraph();
+    initTaskGraph();
 
     m_isInitialized = true;
     LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
@@ -92,12 +92,12 @@ Scene::initialize()
 }
 
 void
-Scene::buildComputeGraph()
+Scene::buildTaskGraph()
 {
     // Configures the edges/flow of the graph
 
     // Clear the compute graph of all nodes/edges except source+sink
-    m_computeGraph->clear();
+    m_taskGraph->clear();
 
     // Setup all SceneObject compute graphs (and segment the rigid bodies)
     std::list<std::shared_ptr<SceneObject>> rigidBodies;
@@ -116,19 +116,19 @@ Scene::buildComputeGraph()
     const std::vector<std::shared_ptr<ObjectInteractionPair>>& pairs = m_collisionGraph->getInteractionPairs();
     for (size_t i = 0; i < pairs.size(); i++)
     {
-        pairs[i]->modifyComputeGraph();
+        pairs[i]->apply();
     }
 
     // Nest all the SceneObject graphs within this Scene's ComputeGraph
     for (auto const& it : m_sceneObjectsMap)
     {
-        std::shared_ptr<ComputeGraph> objComputeGraph = it.second->getComputeGraph();
+        std::shared_ptr<TaskGraph> objComputeGraph = it.second->getTaskGraph();
         if (objComputeGraph != nullptr)
         {
             // Add edges between any nodes that are marked critical and running simulatenously
-            objComputeGraph = ComputeGraph::resolveCriticalNodes(objComputeGraph);
+            objComputeGraph = TaskGraph::resolveCriticalNodes(objComputeGraph);
             // Sum and nest the graph
-            m_computeGraph->nestGraph(objComputeGraph, m_computeGraph->getSource(), m_computeGraph->getSink());
+            m_taskGraph->nestGraph(objComputeGraph, m_taskGraph->getSource(), m_taskGraph->getSink());
         }
     }
 
@@ -137,7 +137,7 @@ Scene::buildComputeGraph()
     if (rigidBodies.size() > 0)
     {
         // The node that updates the rigid body system
-        auto physXUpdate = m_computeGraph->addFunction("PhysXUpdate", [&]()
+        auto physXUpdate = m_taskGraph->addFunction("PhysXUpdate", [&]()
             {
                 auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
                 // TODO: update the time step, split into two steps, collide and advance
@@ -146,64 +146,54 @@ Scene::buildComputeGraph()
             });
 
         // Scene Source->physX Update->Rigid Body Update Geometry[i]
-        m_computeGraph->addEdge(m_computeGraph->getSource(), physXUpdate);
-        m_computeGraph->addEdge(physXUpdate, m_computeGraph->getSink());
+        m_taskGraph->addEdge(m_taskGraph->getSource(), physXUpdate);
+        m_taskGraph->addEdge(physXUpdate, m_taskGraph->getSink());
         for (std::list<std::shared_ptr<SceneObject>>::iterator i = rigidBodies.begin(); i != rigidBodies.end(); i++)
         {
-            m_computeGraph->addEdge(physXUpdate, (*i)->getUpdateGeometryNode());
+            m_taskGraph->addEdge(physXUpdate, (*i)->getUpdateGeometryNode());
         }
     }
 }
 
 void
-Scene::initComputeGraph()
+Scene::initTaskGraph()
 {
     // Pick a controller for the graph execution
     if (m_config->taskParallelizationEnabled)
     {
-        m_computeGraphController = std::make_shared<TbbComputeGraphController>();
+        m_taskGraphController = std::make_shared<TbbTaskGraphController>();
     }
     else
     {
-        m_computeGraphController = std::make_shared<SequentialComputeGraphController>();
+        m_taskGraphController = std::make_shared<SequentialTaskGraphController>();
     }
-    m_computeGraphController->setComputeGraph(m_computeGraph);
-
-    m_computeGraphController->init();
-
-    // Check if the graph is cyclic
-    if (ComputeGraph::isCyclic(m_computeGraph))
-    {
-        ComputeGraphVizWriter writer;
-        writer.setInput(m_computeGraph);
-        writer.setFileName("sceneComputeGraph.svg");
-        writer.write();
-        LOG(FATAL) << "Scene, '" << this->getName() << "', cannot be initialized, computational graph is cyclic. Writing graph to: computeGraph.svg";
-    }
+    m_taskGraphController->setTaskGraph(m_taskGraph);
 
     // Reduce the graph, removing nonfunctional nodes, and redundant edges
     if (m_config->graphReductionEnabled)
     {
-        m_computeGraph = ComputeGraph::reduce(m_computeGraph);
+        m_taskGraph = TaskGraph::reduce(m_taskGraph);
     }
 
     // If user wants to benchmark, tell all the nodes to time themselves
-    for (std::shared_ptr<ComputeNode> node : m_computeGraph->getNodes())
+    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
     {
-        node->m_enableBenchmarking = m_config->benchmarkingEnabled;
+        node->m_enableTiming = m_config->taskTimingEnabled;
     }
 
     // Generate unique names among the nodes
-    ComputeGraph::getUniqueNames(m_computeGraph, true);
-    m_nodeNamesToElapsedTimes.clear();
+    TaskGraph::getUniqueNodeNames(m_taskGraph, true);
+    m_nodeComputeTimes.clear();
 
-    if (m_config->writeComputeGraph)
+    if (m_config->writeTaskGraph)
     {
-        ComputeGraphVizWriter writer;
-        writer.setInput(m_computeGraph);
-        writer.setFileName("sceneComputeGraph.svg");
+        TaskGraphVizWriter writer;
+        writer.setInput(m_taskGraph);
+        writer.setFileName("sceneTaskGraph.svg");
         writer.write();
     }
+
+    m_taskGraphController->initialize();
 }
 
 void
@@ -470,7 +460,7 @@ Scene::advance(const double dt)
     CollisionDetection::updateInternalOctreeAndDetectCollision();
 
     // Execute the computational graph
-    m_computeGraphController->execute();
+    m_taskGraphController->execute();
 
     // Apply updated forces on device
     for (auto controller : this->getSceneObjectControllers())
@@ -505,40 +495,40 @@ Scene::advance(const double dt)
     this->setFPS(1.0 / dt);
 
     // If benchmarking enabled, produce a time table for each step
-    if (m_config->benchmarkingEnabled)
+    if (m_config->taskTimingEnabled)
     {
-        lockBenchmark();
-        for (std::shared_ptr<ComputeNode> node : m_computeGraph->getNodes())
+        lockComputeTimes();
+        for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
         {
-            m_nodeNamesToElapsedTimes[node->m_name] = node->m_elapsedTime;
+            m_nodeComputeTimes[node->m_name] = node->m_computeTime;
         }
-        unlockBenchmark();
+        unlockComputeTimes();
     }
 }
 
 double
 Scene::getElapsedTime(const std::string& stepName) const
 {
-    if (m_nodeNamesToElapsedTimes.count(stepName) == 0)
+    if (m_nodeComputeTimes.count(stepName) == 0)
     {
         LOG(WARNING) << "Tried to get elapsed time of nonexistent step. Is benchmarking enabled?";
         return 0.0;
     }
     else
     {
-        return m_nodeNamesToElapsedTimes.at(stepName);
+        return m_nodeComputeTimes.at(stepName);
     }
 }
 
 void
-Scene::lockBenchmark()
+Scene::lockComputeTimes()
 {
-    benchmarkLock->lock();
+    computeTimesLock->lock();
 }
 
 void
-Scene::unlockBenchmark()
+Scene::unlockComputeTimes()
 {
-    benchmarkLock->unlock();
+    computeTimesLock->unlock();
 }
 } // imstk

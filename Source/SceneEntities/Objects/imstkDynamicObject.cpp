@@ -20,10 +20,10 @@
 =========================================================================*/
 
 #include "imstkDynamicObject.h"
-#include "imstkGeometryMap.h"
 #include "imstkAbstractDynamicalModel.h"
-#include "imstkComputeGraph.h"
+#include "imstkGeometryMap.h"
 #include "imstkLogger.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -97,13 +97,13 @@ DynamicObject::initialize()
 }
 
 void
-DynamicObject::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+DynamicObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Copy, sum, and connect the model graph to nest within this graph
-    m_computeGraph->addEdge(source, getUpdateNode());
+    m_taskGraph->addEdge(source, getUpdateNode());
     m_dynamicalModel->initGraphEdges();
-    m_computeGraph->nestGraph(m_dynamicalModel->getComputeGraph(), getUpdateNode(), getUpdateGeometryNode());
-    m_computeGraph->addEdge(getUpdateGeometryNode(), sink);
+    m_taskGraph->nestGraph(m_dynamicalModel->getTaskGraph(), getUpdateNode(), getUpdateGeometryNode());
+    m_taskGraph->addEdge(getUpdateGeometryNode(), sink);
 }
 
 void

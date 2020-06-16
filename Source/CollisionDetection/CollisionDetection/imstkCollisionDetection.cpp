@@ -21,7 +21,7 @@
 
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionData.h"
-#include "imstkComputeNode.h"
+#include "imstkTaskNode.h"
 #include "imstkLogger.h"
 #include "imstkOctreeBasedCD.h"
 #include "imstkSurfaceMesh.h"
@@ -30,7 +30,7 @@ namespace imstk
 {
 CollisionDetection::CollisionDetection(const CollisionDetection::Type& type, std::shared_ptr<CollisionData> colData) : m_type(type),
     m_colData((colData == nullptr) ? std::make_shared<CollisionData>() : colData),
-    m_computeNode(std::make_shared<ComputeNode>(std::bind(&CollisionDetection::computeCollisionData, this), "CollisionDetection"))
+    m_taskNode(std::make_shared<TaskNode>(std::bind(&CollisionDetection::computeCollisionData, this), "CollisionDetection"))
 {
 }
 

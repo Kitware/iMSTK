@@ -28,9 +28,9 @@ namespace imstk
 struct CollisionData;
 
 class CollidingObject;
-class ComputeNode;
-class OctreeBasedCD;
 class Geometry;
+class OctreeBasedCD;
+class TaskNode;
 
 ///
 /// \class CollisionDetection
@@ -100,7 +100,7 @@ public:
     ///
     /// \brief Returns computational node
     ///
-    std::shared_ptr<ComputeNode> getComputeNode() const { return m_computeNode; }
+    std::shared_ptr<TaskNode> getTaskNode() const { return m_taskNode; }
 
     ///
     /// \brief Update the intrernal octree, preparing for collision detection
@@ -123,8 +123,8 @@ public:
 
 protected:
     Type m_type = Type::Custom;                             ///> Collision detection algorithm type
-    std::shared_ptr<CollisionData> m_colData     = nullptr; ///> Collision data
-    std::shared_ptr<ComputeNode>   m_computeNode = nullptr; ///> Computational node to execute the detection
+    std::shared_ptr<CollisionData> m_colData  = nullptr;    ///> Collision data
+    std::shared_ptr<TaskNode>      m_taskNode = nullptr;    ///> Computational node to execute the detection
 
     /// Static octree for collision detection
     /// This octree is valid throughout the lifetime of the program

@@ -100,7 +100,7 @@ protected:
     ///
     /// \brief Setup connectivity of compute graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink) override;
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
 

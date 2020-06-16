@@ -19,16 +19,16 @@
 
 =========================================================================*/
 
-#include "imstkTbbComputeGraphController.h"
-#include "imstkComputeGraph.h"
+#include "imstkTbbTaskGraphController.h"
+#include "imstkTaskGraph.h"
 #include <tbb/tbb.h>
 
 namespace imstk
 {
-class ComputeNodeTask : public tbb::task
+class NodeTbbTask : public tbb::task
 {
 public:
-    ComputeNodeTask(std::shared_ptr<ComputeNode> node) : m_node(node) { }
+    NodeTbbTask(std::shared_ptr<TaskNode> node) : m_node(node) { }
 
 public:
     task* execute() override
@@ -48,31 +48,31 @@ public:
     }
 
 public:
-    std::shared_ptr<ComputeNode>  m_node = nullptr;
-    std::vector<ComputeNodeTask*> successors;
+    std::shared_ptr<TaskNode> m_node = nullptr;
+    std::vector<NodeTbbTask*> successors;
 };
 
 void
-TbbComputeGraphController::execute()
+TbbTaskGraphController::execute()
 {
     // Create a Task for every node
-    const ComputeNodeVector& nodes = m_graph->getNodes();
+    const TaskNodeVector& nodes = m_graph->getNodes();
     if (nodes.size() == 0)
     {
         return;
     }
 
     // Create a task for every node
-    std::unordered_map<std::shared_ptr<ComputeNode>, ComputeNodeTask*> tasks;
+    std::unordered_map<std::shared_ptr<TaskNode>, NodeTbbTask*> tasks;
     tasks.reserve(nodes.size());
 
     for (size_t i = 0; i < nodes.size(); i++)
     {
-        std::shared_ptr<ComputeNode> node = nodes[i];
-        tasks[node] = new (tbb::task::allocate_root())ComputeNodeTask(node);
+        std::shared_ptr<TaskNode> node = nodes[i];
+        tasks[node] = new (tbb::task::allocate_root())NodeTbbTask(node);
     }
     // Increment successor reference counts
-    const ComputeNodeAdjList& adjList = m_graph->getAdjList();
+    const TaskNodeAdjList& adjList = m_graph->getAdjList();
     // For every node in graph
     for (size_t i = 0; i < nodes.size(); i++)
     {
@@ -80,23 +80,24 @@ TbbComputeGraphController::execute()
         if (adjList.count(nodes[i]) != 0)
         {
             // For every output
-            const ComputeNodeSet& outputNodes = adjList.at(nodes[i]);
-            for (ComputeNodeSet::const_iterator it = outputNodes.begin(); it != outputNodes.end(); it++)
+            const TaskNodeSet& outputNodes = adjList.at(nodes[i]);
+            for (TaskNodeSet::const_iterator it = outputNodes.begin(); it != outputNodes.end(); it++)
             {
                 // Lookup the task of the node
-                ComputeNodeTask* successor = tasks[*it];
+                NodeTbbTask* successor = tasks[*it];
                 tasks[nodes[i]]->successors.push_back(successor);
                 successor->increment_ref_count();
             }
         }
     }
 
-    ComputeNodeTask* startTask = tasks[m_graph->getSource()];
-    ComputeNodeTask* finalTask = tasks[m_graph->getSink()];
+    NodeTbbTask* startTask = tasks[m_graph->getSource()];
+    NodeTbbTask* finalTask = tasks[m_graph->getSink()];
+
     // Extra ref count on the final task
     finalTask->increment_ref_count();
     finalTask->spawn_and_wait_for_all(*startTask);
-    finalTask->execute();     // Execute final task explicitly
+    finalTask->execute(); // Execute final task explicitly
     tbb::task::destroy(*finalTask);
 }
 }
