@@ -45,6 +45,8 @@ class Scene;
 /// \class VTKViewer
 ///
 /// \brief Subclasses viewer for the VTK rendering back-end
+/// Creates vtk renderer for each scene. Forwards mouse and keyboard events
+/// to the vtk renderwindow
 ///
 class VTKViewer : public Viewer
 {
@@ -110,7 +112,6 @@ protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
     bool m_enableVR;
-    std::string m_windowName = "imstk";
 
 #ifdef iMSTK_ENABLE_VR
     vtkSmartPointer<OpenVRCommand> m_openVRCommand;

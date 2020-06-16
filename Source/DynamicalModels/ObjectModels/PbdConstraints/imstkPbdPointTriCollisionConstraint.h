@@ -26,6 +26,8 @@
 namespace imstk
 {
 ///
+/// \class PbdPointTriangleConstraint
+///
 /// \brief The PbdPointTriangleConstraint class for point-triangle collision response
 ///
 class PbdPointTriangleConstraint : public PbdCollisionConstraint

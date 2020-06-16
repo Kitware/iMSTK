@@ -40,9 +40,9 @@
 namespace imstk
 {
 ///
-/// \class RenderDelegate
+/// \class VTKRenderDelegate
 ///
-/// \brief Base class for render delegates
+/// \brief Base class for VTK render delegates
 ///
 class VTKRenderDelegate
 {
@@ -63,8 +63,7 @@ public:
     /// \param source input data object
     /// \param vizModel imstk visual model
     ///
-    void setUpMapper(vtkAlgorithmOutput*             source,
-        const std::shared_ptr<VisualModel> vizModel);
+    void setUpMapper(vtkAlgorithmOutput*  source, const std::shared_ptr<VisualModel> vizModel);
 
     ///
     /// \brief Return geometry to render
@@ -128,6 +127,7 @@ protected:
     vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_volumeMapper;
     vtkSmartPointer<vtkVolume> m_volume;
     bool m_modelIsVolume=false;// remove?
+
     bool m_isMesh = true;
 
     // VTK data members used to create the rendering pipeline

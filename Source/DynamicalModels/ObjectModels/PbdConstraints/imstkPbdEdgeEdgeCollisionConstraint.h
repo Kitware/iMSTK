@@ -26,6 +26,8 @@
 namespace imstk
 {
 ///
+/// \class PbdEdgeEdgeConstraint
+///
 /// \brief The PbdEdgeEdgeConstraint class for edge-edge collision response
 ///
 class PbdEdgeEdgeConstraint : public PbdCollisionConstraint

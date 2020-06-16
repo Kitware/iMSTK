@@ -28,9 +28,9 @@ class vtkTransformPolyDataFilter;
 namespace imstk
 {
 ///
-/// \class CapsuleRenderDelegate
+/// \class VTKCapsuleRenderDelegate
 ///
-/// \brief Render capsule using vtk api
+/// \brief Render capsule object with vtk backend
 ///
 class VTKCapsuleRenderDelegate : public VTKRenderDelegate
 {

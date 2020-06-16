@@ -26,7 +26,8 @@
 namespace imstk
 {
 ///
-/// \class Backward Euler time integration
+/// \class BackwardEuler
+/// \brief Backward Euler time integration
 ///
 class BackwardEuler : public TimeIntegrator
 {

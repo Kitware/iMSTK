@@ -28,9 +28,9 @@ class vtkTransformPolyDataFilter;
 namespace imstk
 {
 ///
-/// \class CubeRenderDelegate
+/// \class VTKCubeRenderDelegate
 ///
-/// \brief Cube render delegate
+/// \brief Cube render delegate with VTK backend
 ///
 class VTKCubeRenderDelegate : public VTKRenderDelegate
 {

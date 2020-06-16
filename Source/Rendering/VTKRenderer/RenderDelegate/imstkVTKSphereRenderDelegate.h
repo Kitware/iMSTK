@@ -29,9 +29,9 @@ namespace imstk
 {
 class VisualModel;
 ///
-/// \class SphereRenderDelegate
+/// \class VTKSphereRenderDelegate
 ///
-/// \brief
+/// \brief Sphere object render delegate with VTK backend
 ///
 class VTKSphereRenderDelegate : public VTKRenderDelegate
 {

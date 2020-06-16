@@ -31,9 +31,10 @@ namespace imstk
 class SurfaceMesh;
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class VTKdbgTrianglesRenderDelegate
 ///
-/// \brief
+/// \brief Render delegate for a set of disjoint triangles whose size could change
+///  more frequently which is typically he case for rendering arbitrary set of triangles
 ///
 class VTKdbgTrianglesRenderDelegate : public VTKRenderDelegate
 {

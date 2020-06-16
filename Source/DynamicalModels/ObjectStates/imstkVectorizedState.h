@@ -26,7 +26,7 @@
 namespace imstk
 {
 ///
-/// \class DeformableBodyState
+/// \class FeDeformBodyState
 ///
 /// \brief This class stores the state of the unknown field variable in vectorized form
 ///

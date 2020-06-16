@@ -26,7 +26,7 @@
 namespace imstk
 {
 ////
-/// \class AreaConstraint
+/// \class PbdAreaConstraint
 ///
 /// \brief Area constraint for triangular face
 ///

@@ -26,7 +26,7 @@
 namespace imstk
 {
 ///
-/// \class FEMHexConstraint
+/// \class PbdFEMHexConstraint
 ///
 /// \brief The FEMHexConstraint class class for constraint as the elastic energy
 /// computed by linear shape functions with hexahedral mesh.

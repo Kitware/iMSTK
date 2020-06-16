@@ -35,7 +35,7 @@ namespace imstk
 class PointSet;
 
 ///
-/// \class PBDModelConfig
+/// \struct PBDModelConfig
 /// \brief Parameters for PBD simulation
 ///
 struct PBDModelConfig

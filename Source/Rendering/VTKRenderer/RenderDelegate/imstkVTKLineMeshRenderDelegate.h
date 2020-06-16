@@ -30,7 +30,7 @@ namespace imstk
 class LineMesh;
 
 ///
-/// \class LineMeshRenderDelegate
+/// \class VTKLineMeshRenderDelegate
 ///
 /// \brief
 ///

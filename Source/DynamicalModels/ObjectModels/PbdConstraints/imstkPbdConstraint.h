@@ -28,6 +28,8 @@ namespace imstk
 class PbdModel;
 
 ///
+/// \class PbdConstraint
+/// 
 /// \brief Base Constraint class for Position based dynamics constraints
 ///
 class PbdConstraint

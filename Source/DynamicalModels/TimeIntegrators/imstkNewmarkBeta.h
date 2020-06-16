@@ -27,7 +27,8 @@
 namespace imstk
 {
 ///
-/// \class Newmark-beta time integration
+/// \class NewmarkBeta
+/// \brief Newmark-beta time integration
 ///
 class NewmarkBeta : public TimeIntegrator
 {

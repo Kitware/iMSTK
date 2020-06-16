@@ -30,9 +30,9 @@ namespace imstk
 class SurfaceMesh;
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class VTKSurfaceMeshRenderDelegate
 ///
-/// \brief
+/// \brief Surface mesh render delegate with VTK backend
 ///
 class VTKSurfaceMeshRenderDelegate : public VTKRenderDelegate
 {

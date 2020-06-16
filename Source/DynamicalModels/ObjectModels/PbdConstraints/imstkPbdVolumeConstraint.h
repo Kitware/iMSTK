@@ -26,7 +26,7 @@
 namespace imstk
 {
 ///
-/// \class VolumeConstraint
+/// \class PbdVolumeConstraint
 ///
 /// \brief Volume constraint for tetrahedral element
 ///
