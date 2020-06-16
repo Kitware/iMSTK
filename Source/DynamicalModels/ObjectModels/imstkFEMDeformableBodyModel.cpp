@@ -30,7 +30,6 @@
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
 #include "imstkLinearFEMForceModel.h"
 #include "imstkMath.h"
-#include "imstkNewtonSolver.h"
 #include "imstkSolverBase.h"
 #include "imstkStVKForceModel.h"
 #include "imstkTaskGraph.h"
