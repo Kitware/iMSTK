@@ -277,12 +277,12 @@ protected:
     std::shared_ptr<SceneConfig> m_config;
 
     std::string m_name;                              ///> Name of the scene
-    NamedMap<SceneObject>           m_sceneObjectsMap;
-    NamedMap<VisualModel>           m_DebugRenderModelMap;
-    NamedMap<Light>                 m_lightsMap;
-    std::shared_ptr<IBLProbe>       m_globalIBLProbe = nullptr;
+    NamedMap<SceneObject>     m_sceneObjectsMap;
+    NamedMap<VisualModel>     m_DebugRenderModelMap;
+    NamedMap<Light>           m_lightsMap;
+    std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
 
-    std::shared_ptr<Camera>         m_camera = std::make_shared<Camera>();
+    std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
 
     std::shared_ptr<CollisionGraph> m_collisionGraph = nullptr;
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
