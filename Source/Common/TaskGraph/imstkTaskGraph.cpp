@@ -391,7 +391,10 @@ TaskGraph::topologicalSort(std::shared_ptr<TaskGraph> graph)
 
     for (TaskNodeAdjList::const_iterator i = invAdjList.begin(); i != invAdjList.end(); i++)
     {
-        numInputs[i->first] = invAdjList.size();
+        if (invAdjList.count(i->first) != 0)
+        {
+            numInputs[i->first] = invAdjList.at(i->first).size();
+        }
     }
 
     // Create an edge blacklist for edge removal during algorithm
