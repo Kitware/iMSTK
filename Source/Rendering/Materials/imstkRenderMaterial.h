@@ -109,12 +109,6 @@ public:
     void setColor(const Color& color);
 
     ///
-    /// \brief Get/Set the color of the wireframe and points
-    ///
-    const Color& getDebugColor() const;
-    void setDebugColor(const Color& color);
-
-    ///
     /// \brief Get/Set the metalness
     ///
     const float& getMetalness() const;

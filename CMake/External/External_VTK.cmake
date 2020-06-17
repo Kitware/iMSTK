@@ -10,7 +10,7 @@ endif()
 
 
 set(${PROJECT_NAME}_VTK_REPO_SOURCE "8.2" CACHE STRING "Select VTK Source Branch/Tag")
-set(VTK_SOURCES "8.2;8.9;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
+set(VTK_SOURCES "8.2;8.9;9.0;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
 set_property(CACHE ${PROJECT_NAME}_VTK_REPO_SOURCE PROPERTY STRINGS ${VTK_SOURCES})
 
 
@@ -75,6 +75,9 @@ else()
   if(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "8.9")
     set(${PROJECT_NAME}_VTK_SOURCE GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
     set(${PROJECT_NAME}_VTK_HASH GIT_TAG 9b6a039f43404053a0653f742148d123f6ada7d6)
+  elseif(${PROJECT_NAME}_VTK_REPO_SOURCE EQUAL "9.0")
+    set(${PROJECT_NAME}_VTK_SOURCE GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
+    set(${PROJECT_NAME}_VTK_HASH GIT_TAG ab278e87b181e3a02082bea7361fbaa3ddafb3ad)
   else()
     set(${PROJECT_NAME}_VTK_SOURCE GIT_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
     set(${PROJECT_NAME}_VTK_HASH GIT_TAG origin/${${PROJECT_NAME}_VTK_REPO_SOURCE})
