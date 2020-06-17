@@ -99,12 +99,14 @@ ExternalProject_Add( ${PROJECT_NAME}
     -D${PROJECT_NAME}_USE_Vulkan:BOOL=${${PROJECT_NAME}_USE_Vulkan}
     -D${PROJECT_NAME}_ENABLE_AUDIO:BOOL=${${PROJECT_NAME}_ENABLE_AUDIO}
     -D${PROJECT_NAME}_ENABLE_VR:BOOL=${${PROJECT_NAME}_ENABLE_VR}
+    -D${PROJECT_NAME}_USE_Pulse:BOOL=${${PROJECT_NAME}_USE_Pulse}
     # External Libraries
     -DEigen3_DIR:PATH=${Eigen3_DIR}
     -Dglm_DIR:PATH=${glm_DIR}
     -DGTest_DIR:PATH=${GTest_DIR}
     -DVegaFEM_DIR:PATH=${VegaFEM_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}
+    -DPulse_DIR:PATH=${Pulse_DIR}
     # I don't think this is needed by the inner build
     # -DPHYSX_CONFIGURATION:STRING=${${PROJECT_NAME}_PHYSX_CONFIGURATION}
   DEPENDS ${${PROJECT_NAME}_DEPENDENCIES}
