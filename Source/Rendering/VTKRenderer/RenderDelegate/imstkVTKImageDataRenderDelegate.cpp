@@ -34,8 +34,8 @@ namespace imstk
 {
 VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel)
 {
-    m_visualModel = visualModel;
-    m_isMesh = false; 
+    m_visualModel   = visualModel;
+    m_isMesh        = false;
     m_modelIsVolume = true;
 
     auto imageData = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
@@ -62,5 +62,4 @@ VTKImageDataRenderDelegate::updateDataSource()
     // TODO: Any transforms/modifications?
     imageData->m_dataModified = false;
 }
-
 } // imstk

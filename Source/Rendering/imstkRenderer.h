@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 struct rendererConfig
 {
     bool m_enableVR = false;
@@ -53,7 +52,7 @@ public:
         Simulation
     };
 
-    Renderer() : m_config(std::make_shared<rendererConfig>()){}
+    Renderer() : m_config(std::make_shared<rendererConfig>()) {}
 
     ///
     /// \brief Set rendering mode

@@ -109,7 +109,7 @@ main()
         material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
         material->setLineWidth(2.);
         material->setPointSize(6.);
-        material->setColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));        
+        material->setColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));
         sims[i].visualModel->setRenderMaterial(material);
         sims[i].object->addVisualModel(sims[i].visualModel);
 

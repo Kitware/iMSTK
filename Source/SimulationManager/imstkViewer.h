@@ -45,16 +45,14 @@ struct viewerConfig
     bool m_hideBorder = true;
     bool m_fullScreen = false;
 
-    int m_renderWinWidth = 1000;
+    int m_renderWinWidth  = 1000;
     int m_renderWinHeight = 800;
-    
 };
-
 
 ///
 /// \class Viewer
 ///
-/// \brief Based class for viewer that manages render window and the renderers 
+/// \brief Based class for viewer that manages render window and the renderers
 /// Creates backend-specific renderers on a per-scene basis.
 /// Contains user API to configure the rendering with various backends
 /// Manages the keyboard and mouse events

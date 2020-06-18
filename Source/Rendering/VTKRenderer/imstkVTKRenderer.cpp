@@ -403,8 +403,8 @@ VTKRenderer::setAxesLength(const Vec3d& len)
 Vec3d
 VTKRenderer::getAxesLength()
 {
-   const auto ptr = m_AxesActor->GetTotalLength();   
-   return Vec3d(ptr[0], ptr[1], ptr[2]);
+    const auto ptr = m_AxesActor->GetTotalLength();
+    return Vec3d(ptr[0], ptr[1], ptr[2]);
 }
 
 void

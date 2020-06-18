@@ -94,7 +94,7 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
         imgReader->Update();
         m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
         m_sourceTexture->RepeatOff();
-        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());        
+        m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
 
         /*vtkNew<vtkPNGReader> normalReader;
         normalReader->SetFileName(tFileName.c_str());

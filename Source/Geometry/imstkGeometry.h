@@ -201,7 +201,7 @@ protected:
 
     friend class VulkanSurfaceMeshRenderDelegate;
     friend class VulkanLineMeshRenderDelegate;
-    friend class VulkanRenderDelegate;    
+    friend class VulkanRenderDelegate;
     friend class VulkanRenderer;
 
     virtual void applyTranslation(const Vec3d t) = 0;

@@ -38,7 +38,7 @@ main()
     auto scene      = simManager->createNewScene("LineMeshRenderingTest");
 
     // Construct line mesh
-    auto lineMesh = std::make_shared<LineMesh>();
+    auto lineMesh   = std::make_shared<LineMesh>();
     auto lineObject = std::make_shared<VisualObject>("lineMesh");
 
     std::vector<LineMesh::LineArray> lines;

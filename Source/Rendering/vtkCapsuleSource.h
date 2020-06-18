@@ -31,7 +31,7 @@
 
 // \author Johan Andruejol <johan.andruejol@kitware.com>
 
-//#if (VTK_MAJOR_VERSION <= 8) 
+//#if (VTK_MAJOR_VERSION <= 8)
 
 #pragma once
 

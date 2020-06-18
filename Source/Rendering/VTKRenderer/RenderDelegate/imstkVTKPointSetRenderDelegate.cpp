@@ -54,7 +54,7 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
     pointsPolydata->SetPoints(points);
 
-    vtkNew<vtkVertexGlyphFilter> glyphFilter;     
+    vtkNew<vtkVertexGlyphFilter> glyphFilter;
     glyphFilter->SetInputData(pointsPolydata);
     glyphFilter->Update();
 

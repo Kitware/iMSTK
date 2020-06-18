@@ -35,7 +35,7 @@
 namespace imstk
 {
 VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -74,7 +74,7 @@ m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
     fluidMapper->SetAdditionalReflection(0.0f);
     fluidMapper->SetRefractiveIndex(1.33f);
     fluidMapper->SetRefractionScale(0.07f);
-    
+
     m_volume->SetMapper(fluidMapper);
 
     // Create connection source

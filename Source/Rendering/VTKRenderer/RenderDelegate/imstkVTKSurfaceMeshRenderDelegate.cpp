@@ -139,7 +139,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     this->setUpMapper(source->GetOutputPort(), m_visualModel);
 
     m_isMesh = true;
-    
+
     //m_mapper->setIsSurfaceMapper(true);
 }
 
@@ -211,7 +211,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
 #else
         if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
         {
-            switch(texture->getType())
+            switch (texture->getType())
             {
             case Texture::Type::Diffuse:
             {
@@ -232,9 +232,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
             }
             default:
             {
-                
             }
-
             }
         }
         else

@@ -31,7 +31,7 @@
 
 namespace imstk
 {
-Viewer::Viewer(): m_config(std::make_shared<viewerConfig>())
+Viewer::Viewer() : m_config(std::make_shared<viewerConfig>())
 {
 #ifdef iMSTK_USE_Vulkan
     m_canvas(std::make_shared<GUIOverlay::Canvas>())

@@ -63,7 +63,7 @@ main()
     auto tetMesh = GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
 
     // add scene object for surface object
-    auto volObject = std::make_shared<VisualObject>("VolObj"); 
+    auto volObject   = std::make_shared<VisualObject>("VolObj");
     auto tetMaterial = std::make_shared<RenderMaterial>();
     tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     tetMaterial->setPointSize(7.);

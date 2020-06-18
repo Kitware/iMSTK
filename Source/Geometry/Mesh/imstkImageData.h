@@ -25,7 +25,7 @@
 #include "imstkPointSet.h"
 
 // vtk
-#include <vtkSmartPointer.h>
+#include "vtkSmartPointer.h"
 
 // forward declarations
 class vtkTransform;

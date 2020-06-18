@@ -154,15 +154,15 @@ protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
     // cameras
-    vtkSmartPointer<vtkCamera>   m_defaultVtkCamera;
-    vtkSmartPointer<vtkCamera>   m_sceneVtkCamera;
-    
+    vtkSmartPointer<vtkCamera> m_defaultVtkCamera;
+    vtkSmartPointer<vtkCamera> m_sceneVtkCamera;
+
     // lights
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
-    
+
     // Props to be rendered
-    std::vector<vtkSmartPointer<vtkProp>>  m_objectVtkActors;
-    std::vector<vtkSmartPointer<vtkProp>>  m_debugVtkActors;
+    std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
+    std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
     vtkSmartPointer<vtkAxesActor> m_AxesActor;
 
     // Render delegates for the props

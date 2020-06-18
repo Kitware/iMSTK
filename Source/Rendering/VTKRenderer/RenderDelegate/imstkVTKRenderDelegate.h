@@ -63,7 +63,7 @@ public:
     /// \param source input data object
     /// \param vizModel imstk visual model
     ///
-    void setUpMapper(vtkAlgorithmOutput*  source, const std::shared_ptr<VisualModel> vizModel);
+    void setUpMapper(vtkAlgorithmOutput* source, const std::shared_ptr<VisualModel> vizModel);
 
     ///
     /// \brief Return geometry to render
@@ -92,7 +92,7 @@ public:
     void updateActorPropertiesVolumeRendering();
     void updateActorPropertiesMesh();
     bool isMesh() { return m_isMesh; }
-    bool isVolume(){ return m_modelIsVolume; }
+    bool isVolume() { return m_modelIsVolume; }
 
     ///
     /// \brief Update render delegate source based on the geometry internal data
@@ -112,11 +112,11 @@ protected:
         m_transform(vtkSmartPointer<vtkTransform>::New()),
         m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
         m_volume(vtkSmartPointer<vtkVolume>::New()),
-        m_modelIsVolume(false)// remove?
+        m_modelIsVolume(false)               // remove?
     {
-        m_actor->SetMapper(m_mapper);// remove this as a default since it could be volume mapper?
+        m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
         m_actor->SetUserTransform(m_transform);
-        m_volume->SetMapper(m_volumeMapper);// remove this as a default?
+        m_volume->SetMapper(m_volumeMapper); // remove this as a default?
     }
 
     virtual ~VTKRenderDelegate() = default;
@@ -126,12 +126,12 @@ protected:
     // volume mapping
     vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_volumeMapper;
     vtkSmartPointer<vtkVolume> m_volume;
-    bool m_modelIsVolume=false;// remove?
+    bool m_modelIsVolume = false;// remove?
 
     bool m_isMesh = true;
 
     // VTK data members used to create the rendering pipeline
-    vtkSmartPointer<vtkActor>    m_actor;
+    vtkSmartPointer<vtkActor> m_actor;
     vtkSmartPointer<vtkOpenGLPolyDataMapper> m_mapper;
 
     std::shared_ptr<VisualModel> m_visualModel; ///< imstk visual model (contains data (geometry) and render specification (render material))

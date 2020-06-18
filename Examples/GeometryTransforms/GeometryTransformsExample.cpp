@@ -80,7 +80,7 @@ main()
     materialCube->setLineWidth(4.);
     auto cubeVizModel = std::make_shared<VisualModel>(cubeGeom);
     cubeVizModel->setRenderMaterial(materialCube);
-    
+
     auto cubeObj = std::make_shared<VisualObject>("Cube");
     //cubeObj->setVisualGeometry(cubeGeom);
     cubeObj->addVisualModel(cubeVizModel);
