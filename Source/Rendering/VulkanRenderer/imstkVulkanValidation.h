@@ -25,7 +25,6 @@
 
 namespace imstk
 {
-
 /// \brief TODO
 class VulkanValidation
 {

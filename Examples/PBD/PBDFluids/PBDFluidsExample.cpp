@@ -38,16 +38,13 @@ using namespace imstk;
 ///
 /// \brief create a PbdObject for fluids
 ///
-std::shared_ptr<PbdObject>
-createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string& tetMeshName);
-
+std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                                                 const std::string&     tetMeshName);
 
 ///
 /// \brief Create a box mesh to hold the fluid
-/// 
-std::shared_ptr<SurfaceMesh>
-createCollidingSurfaceMesh();
+///
+std::shared_ptr<SurfaceMesh> createCollidingSurfaceMesh();
 
 // mesh file name
 const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
@@ -64,9 +61,9 @@ main()
 
     scene->getCamera()->setPosition(0, 10.0, 15.0);
 
-    auto deformableObj = createAndAddPbdObject(scene, tetMeshFileName);
+    auto deformableObj      = createAndAddPbdObject(scene, tetMeshFileName);
     auto floorMeshColliding = createCollidingSurfaceMesh();
-    auto floorMeshVisual = std::make_shared<SurfaceMesh>();
+    auto floorMeshVisual    = std::make_shared<SurfaceMesh>();
     floorMeshVisual->initialize(floorMeshColliding->getVertexPositions(), floorMeshColliding->getTrianglesVertices());
     auto floorMeshPhysics = std::make_shared<SurfaceMesh>();
     floorMeshPhysics->initialize(floorMeshColliding->getVertexPositions(), floorMeshColliding->getTrianglesVertices());
@@ -91,7 +88,7 @@ main()
 
     // Collisions
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
-                                                                         InteractionType::PbdObjToPbdObj_Collision, 
+                                                                         InteractionType::PbdObjToPbdObjCollision,
                                                                          CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light (white)
@@ -112,7 +109,7 @@ main()
 
 std::shared_ptr<PbdObject>
 createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string& tetMeshName)
+                      const std::string&     tetMeshName)
 {
     // Load a sample mesh
     auto tetMesh = MeshIO::read(tetMeshName);
@@ -158,11 +155,9 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     return deformableObj;
 }
 
-
 std::shared_ptr<SurfaceMesh>
 createCollidingSurfaceMesh()
 {
-
     StdVectorOfVec3d vertList;
     int              nSides = 5;
     double           width  = 40.0;
@@ -271,5 +266,3 @@ createCollidingSurfaceMesh()
     floorMeshColliding->initialize(vertList, triangles);
     return floorMeshColliding;
 }
-
-

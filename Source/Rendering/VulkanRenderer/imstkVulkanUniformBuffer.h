@@ -32,7 +32,6 @@
 
 namespace imstk
 {
-
 /// \brief TODO
 struct VulkanLocalVertexUniforms
 {

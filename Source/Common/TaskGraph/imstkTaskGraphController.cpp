@@ -19,20 +19,30 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkInteractionPair.h"
-#include "imstkComputeNode.h"
+#include "imstkTaskGraphController.h"
+#include "imstkTaskGraph.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
-//InteractionPair::InteractionPair(std::shared_ptr<ComputeNode> nodeA, std::shared_ptr<ComputeNode> nodeB,
-//    std::function<void()> func,
-//    Synchronicity aAsync, Synchronicity bAsync,
-//    std::string interactionName)
-//{
-//    this->m_computeNodePair.first = nodeA;
-//    this->m_computeNodePair.second = nodeB;
-//    this->m_interactionFunction = std::make_shared<ComputeNode>(func, interactionName);
-//    this->m_aAsync = aAsync;
-//    this->m_bAsync = bAsync;
-//}
+bool
+TaskGraphController::initialize()
+{
+    // Ensure the source is reachable from the sink and the graph is not cyclic
+    // todo: Safer check would be to ensure all nodes reach sink
+    if (!m_graph->isReachable(m_graph->getSource(), m_graph->getSink()))
+    {
+        LOG(WARNING) << "TaskGraph Sink not reachable from source. Graph initialization failed.";
+        return false;
+    }
+
+    if (TaskGraph::isCyclic(m_graph))
+    {
+        LOG(WARNING) << "TaskGraph is cyclic. Graph initialization failed.";
+        return false;
+    }
+
+    init();
+    return true;
+}
 }

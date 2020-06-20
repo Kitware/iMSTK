@@ -73,7 +73,7 @@ struct VulkanMaterialPipelineComponents
     VkPipelineDynamicStateCreateInfo dynamicStateInfo;
     std::vector<VkDynamicState> dynamicStates;
 };
- 
+
 ///
 /// \struct VulkanMaterialConstants
 /// \brief TODO

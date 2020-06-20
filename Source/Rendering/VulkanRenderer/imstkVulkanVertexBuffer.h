@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 /// \brief TODO
 enum VulkanVertexBufferMode
 {

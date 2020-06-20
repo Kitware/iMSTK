@@ -20,8 +20,9 @@
 =========================================================================*/
 
 #include "imstkColor.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
+#include <iomanip>
+#include <sstream>
 
 namespace imstk
 {
@@ -164,6 +165,19 @@ Color
 Color::lerpRgb(const Color& start, const Color& end, const double t)
 {
     return Color(start + (end - start) * t, 1.0);
+}
+
+std::string
+Color::rgbHex()
+{
+    std::stringstream ss;
+    const int         red   = static_cast<int>(r * 255.0);
+    const int         green = static_cast<int>(g * 255.0);
+    const int         blue  = static_cast<int>(b * 255.0);
+    ss << std::setfill('0') << std::setw(2) << std::hex << red;
+    ss << std::setfill('0') << std::setw(2) << std::hex << green;
+    ss << std::setfill('0') << std::setw(2) << std::hex << blue;
+    return ss.str();
 }
 
 Color

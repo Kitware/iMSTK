@@ -22,12 +22,11 @@ limitations under the License.
 #include "imstkPbdObjectCollisionPair.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
 #include "imstkPBDCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdSolver.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
@@ -39,11 +38,11 @@ PbdObjectCollisionPair::PbdObjectCollisionPair(std::shared_ptr<PbdObject> obj1, 
     std::shared_ptr<PbdModel> pbdModel2 = obj2->getPbdModel();
 
     // Define where collision interaction happens
-    m_computeNodeInputs.first.push_back(pbdModel1->getUpdateCollisionGeometryNode());
-    m_computeNodeInputs.second.push_back(pbdModel2->getUpdateCollisionGeometryNode());
+    m_taskNodeInputs.first.push_back(pbdModel1->getUpdateCollisionGeometryNode());
+    m_taskNodeInputs.second.push_back(pbdModel2->getUpdateCollisionGeometryNode());
 
-    m_computeNodeOutputs.first.push_back(pbdModel1->getSolveNode());
-    m_computeNodeOutputs.second.push_back(pbdModel2->getSolveNode());
+    m_taskNodeOutputs.first.push_back(pbdModel1->getSolveNode());
+    m_taskNodeOutputs.second.push_back(pbdModel2->getSolveNode());
 
     // Define where solver interaction happens
     m_solveNodeInputs.first.push_back(pbdModel1->getSolveNode());
@@ -61,37 +60,37 @@ PbdObjectCollisionPair::PbdObjectCollisionPair(std::shared_ptr<PbdObject> obj1, 
     setCollisionHandlingAB(ch);
 
     // Setup compute node for collision solver (true/critical node)
-    m_collisionSolveNode = std::make_shared<ComputeNode>([ch]() { ch->getCollisionSolver()->solve(); },
+    m_collisionSolveNode = std::make_shared<TaskNode>([ch]() { ch->getCollisionSolver()->solve(); },
                 obj1->getName() + "_vs_" + obj2->getName() + "_CollisionSolver", true);
 }
 
 void
-PbdObjectCollisionPair::modifyComputeGraph()
+PbdObjectCollisionPair::apply()
 {
     // Add the collision interaction
-    CollisionPair::modifyComputeGraph();
+    CollisionPair::apply();
 
     // Add a secondary interaction
-    m_objects.first->getComputeGraph()->addNode(m_collisionSolveNode);
-    m_objects.second->getComputeGraph()->addNode(m_collisionSolveNode);
+    m_objects.first->getTaskGraph()->addNode(m_collisionSolveNode);
+    m_objects.second->getTaskGraph()->addNode(m_collisionSolveNode);
 
     // Add the solver interaction
     for (size_t i = 0; i < m_solveNodeInputs.first.size(); i++)
     {
-        m_objects.first->getComputeGraph()->addEdge(m_solveNodeInputs.first[i], m_collisionSolveNode);
+        m_objects.first->getTaskGraph()->addEdge(m_solveNodeInputs.first[i], m_collisionSolveNode);
     }
     for (size_t i = 0; i < m_solveNodeInputs.second.size(); i++)
     {
-        m_objects.second->getComputeGraph()->addEdge(m_solveNodeInputs.second[i], m_collisionSolveNode);
+        m_objects.second->getTaskGraph()->addEdge(m_solveNodeInputs.second[i], m_collisionSolveNode);
     }
 
     for (size_t i = 0; i < m_solveNodeOutputs.first.size(); i++)
     {
-        m_objects.first->getComputeGraph()->addEdge(m_collisionSolveNode, m_solveNodeOutputs.first[i]);
+        m_objects.first->getTaskGraph()->addEdge(m_collisionSolveNode, m_solveNodeOutputs.first[i]);
     }
     for (size_t i = 0; i < m_solveNodeOutputs.second.size(); i++)
     {
-        m_objects.second->getComputeGraph()->addEdge(m_collisionSolveNode, m_solveNodeOutputs.second[i]);
+        m_objects.second->getTaskGraph()->addEdge(m_collisionSolveNode, m_solveNodeOutputs.second[i]);
     }
 }
 }

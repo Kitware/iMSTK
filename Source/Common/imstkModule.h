@@ -89,7 +89,7 @@ public:
     inline void setPreInitCallback(CallbackFunction foo) { m_preInitCallback = foo; }
     inline void setPostInitCallback(CallbackFunction foo) { m_postInitCallback = foo; }
     ///
-    /// \brief Set callback function for update 
+    /// \brief Set callback function for update
     ///
     inline void setPreUpdateCallback(CallbackFunction foo) { m_preUpdateCallback = foo; }
     inline void setPostUpdateCallback(CallbackFunction foo) { m_postUpdateCallback = foo; }
@@ -134,7 +134,7 @@ public:
     ///
     void enableFrameCount() { m_trackFPS = true; };
     ///
-    /// \brief Disanable frame count
+    /// \brief Disable frame count
     ///
     void disableFrameCount() { m_trackFPS = false; };
 

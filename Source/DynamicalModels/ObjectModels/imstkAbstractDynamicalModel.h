@@ -30,8 +30,8 @@
 
 namespace imstk
 {
-class ComputeGraph;
-class ComputeNode;
+class TaskGraph;
+class TaskNode;
 
 ///
 /// \brief Type of the time dependent mathematical model
@@ -92,10 +92,7 @@ public:
     std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
     void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
 
-    ///
-    /// \brief Get the compute graph
-    ///
-    std::shared_ptr<ComputeGraph> getComputeGraph() const { return m_computeGraph; }
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
     ///
     /// \brief Get the type of the object
@@ -155,19 +152,9 @@ public:
 
 protected:
     ///
-    /// \brief Adds a function to the computational graph of this model
-    ///
-    std::shared_ptr<ComputeNode> addFunction(std::string name, std::function<void()> func);
-
-    ///
-    /// \brief Adds an edge to the computational graph of this model
-    ///
-    void addEdge(std::shared_ptr<ComputeNode> srcNode, std::shared_ptr<ComputeNode> destNode);
-
-    ///
     /// \brief Setup connectivity of the compute graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink);
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
 protected:
     DynamicalModelType m_type;                      ///> Mathematical model type
@@ -179,6 +166,6 @@ protected:
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::Fixed;
 
-    std::shared_ptr<ComputeGraph> m_computeGraph = nullptr;
+    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;
 };
 } // imstk

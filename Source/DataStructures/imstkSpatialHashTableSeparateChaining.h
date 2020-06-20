@@ -39,7 +39,7 @@ struct PointEntry
 namespace std
 {
 ///
-/// \struct hash 
+/// \struct hash
 /// \brief Returns a hash value for a \ref PointEntry
 ///
 template<> struct hash<imstk::PointEntry>

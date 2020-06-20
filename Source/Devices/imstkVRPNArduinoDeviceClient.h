@@ -58,14 +58,14 @@ public:
     ///
     Vec3d& getYPR() { return m_ypr; }
 
-    /// 
+    ///
     /// \brief Get acceleration
-    /// 
+    ///
     Vec3d& getAcceleration() { return m_accel; }
 
-    /// 
+    ///
     /// \brief Get the roll
-    /// 
+    ///
     float getRoll() { return m_roll; }
 
 protected:

@@ -42,7 +42,7 @@ class CorotationalFEMForceModel : public InternalForceModel
 {
 public:
     ///
-    /// \brief Constructor using \p mesh 
+    /// \brief Constructor using \p mesh
     /// \param warp if use warp
     ///
     explicit CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, const int warp = 1);

@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VulkanMemoryManager
 /// \brief TODO

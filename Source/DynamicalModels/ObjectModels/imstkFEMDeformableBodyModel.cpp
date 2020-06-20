@@ -24,8 +24,6 @@
 
 //imstk
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkComputeGraph.h"
-#include "imstkComputeNode.h"
 #include "imstkConjugateGradient.h"
 #include "imstkCorotationalFEMForceModel.h"
 #include "imstkInternalForceModel.h"
@@ -34,6 +32,7 @@
 #include "imstkMath.h"
 #include "imstkSolverBase.h"
 #include "imstkStVKForceModel.h"
+#include "imstkTaskGraph.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkVolumetricMesh.h"
@@ -59,7 +58,7 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
         Geometry::Type::HexahedralMesh
     };
 
-    m_solveNode = addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
+    m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
 
 FEMDeformableBodyModel::~FEMDeformableBodyModel()
@@ -790,10 +789,10 @@ FEMDeformableBodyModel::getTimeStep() const
 };
 
 void
-FEMDeformableBodyModel::initGraphEdges(std::shared_ptr<ComputeNode> source, std::shared_ptr<ComputeNode> sink)
+FEMDeformableBodyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
-    addEdge(source, m_solveNode);
-    addEdge(m_solveNode, sink);
+    m_taskGraph->addEdge(source, m_solveNode);
+    m_taskGraph->addEdge(m_solveNode, sink);
 }
 } // imstk

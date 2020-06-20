@@ -132,7 +132,6 @@ protected:
 
 namespace std
 {
-
 ///
 /// \struct less
 /// \brief This method is defined to allow for the map to be properly indexed by Texture objects

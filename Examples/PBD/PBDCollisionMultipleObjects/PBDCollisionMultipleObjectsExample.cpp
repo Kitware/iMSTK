@@ -26,6 +26,7 @@
 #include "imstkObjectInteractionFactory.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
@@ -141,8 +142,7 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 /// \param nRows number of vertices in x-direction
 /// \param nCols number of vertices in y-direction
 ///
-std::shared_ptr<SurfaceMesh>
-createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
+std::shared_ptr<SurfaceMesh> createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
 
 ///
 /// \brief This example demonstrates the collision interaction
@@ -202,11 +202,11 @@ main()
         {
             for (int k = -expandsXZ; k < expandsXZ; ++k)
 #else
-    int i=0;
-    { 
-       int j = 0; 
-       {
-           int k = 0;
+    int i = 0;
+    {
+        int j = 0;
+        {
+            int k = 0;
 #endif
             {
                 std::shared_ptr<SurfaceMesh> mesh;
@@ -217,7 +217,7 @@ main()
                 pbdObjs.push_back(pbdObj);
 
                 scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdObj, floorObj,
-                    InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
+                    InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
             }
         }
     }
@@ -227,7 +227,7 @@ main()
         for (size_t j = i + 1; j < pbdObjs.size(); ++j)
         {
             scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdObjs[i], pbdObjs[j],
-                InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
+                InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::SurfaceMeshToSurfaceMesh));
         }
     }
 
@@ -256,8 +256,8 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
     // const double height = 100.0;
     // const size_t nRows  = 2;
     // const size_t nCols  = 2;
-    const double dy     = width / static_cast<double>(nCols - 1);
-    const double dx     = height / static_cast<double>(nRows - 1);
+    const double dy = width / static_cast<double>(nCols - 1);
+    const double dx = height / static_cast<double>(nRows - 1);
 
     StdVectorOfVec3d vertList;
     vertList.resize(nRows * nCols);
@@ -267,7 +267,7 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
         {
             const double y = static_cast<double>(dy * j);
             const double x = static_cast<double>(dx * i);
-            vertList[i * nCols + j] = Vec3d(x - height*0.5, -10.0, y - width*0.5);
+            vertList[i * nCols + j] = Vec3d(x - height * 0.5, -10.0, y - width * 0.5);
         }
     }
 
@@ -290,5 +290,3 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
 
     return surfMesh;
 }
-
-

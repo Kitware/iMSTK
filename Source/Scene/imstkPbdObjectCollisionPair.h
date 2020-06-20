@@ -25,7 +25,6 @@ limitations under the License.
 
 namespace imstk
 {
-class ComputeNode;
 class PbdObject;
 class PbdSolver;
 
@@ -40,12 +39,12 @@ public:
     PbdObjectCollisionPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<PbdObject> obj2,
                            CollisionDetection::Type cdType = CollisionDetection::Type::MeshToMeshBruteForce);
 
-    void modifyComputeGraph() override;
+    void apply() override;
 
 private:
     // Pbd defines two interactions (one at CD and one at solver)
     Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
-    std::shared_ptr<ComputeNode> m_collisionSolveNode = nullptr;
+    std::shared_ptr<TaskNode> m_collisionSolveNode = nullptr;
 };
 }

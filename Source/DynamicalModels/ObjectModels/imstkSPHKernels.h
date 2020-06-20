@@ -31,7 +31,6 @@ namespace imstk
 {
 namespace SPH
 {
-
 ///
 /// \class Poly6Kernel
 /// \brief The poly6 Kernel
@@ -230,7 +229,7 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
-/// 
+///
 /// \class CohesionKernel
 /// \brief Cohesion Kernel
 ///
@@ -324,10 +323,10 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
-/// 
-/// \class AdhesionKernel 
+///
+/// \class AdhesionKernel
 /// \brief Adhesion kernel
-/// 
+///
 template<int N>
 class AdhesionKernel
 {
@@ -403,10 +402,10 @@ protected:
     Real m_W0;      ///> Precomputed W(0)
 };
 
-/// 
+///
 /// \class ViscosityKernel
-/// \brief Viscosity kernel 
-/// 
+/// \brief Viscosity kernel
+///
 template<int N>
 class ViscosityKernel
 {

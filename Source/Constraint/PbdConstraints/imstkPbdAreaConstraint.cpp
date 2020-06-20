@@ -21,81 +21,61 @@
 
 #include "imstkPbdAreaConstraint.h"
 
-namespace  imstk
+namespace imstk
 {
 void
-PbdAreaConstraint::initConstraint(
-    const StdVectorOfVec3d& initVertexPositions,
-    const size_t& pIdx1, const size_t& pIdx2, const size_t& pIdx3,
-    const double k)
+PbdAreaConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
+                                  const size_t&           pIdx0,
+                                  const size_t&           pIdx1,
+                                  const size_t&           pIdx2,
+                                  const double            k)
 {
-    m_vertexIds[0] = pIdx1;
-    m_vertexIds[1] = pIdx2;
-    m_vertexIds[2] = pIdx3;
+    m_vertexIds[0] = pIdx0;
+    m_vertexIds[1] = pIdx1;
+    m_vertexIds[2] = pIdx2;
 
-    m_stiffness = k;
+    this->m_stiffness  = k;
+    this->m_compliance = 1.0 / k;
 
-    const Vec3d& p0 = initVertexPositions[pIdx1];
-    const Vec3d& p1 = initVertexPositions[pIdx2];
-    const Vec3d& p2 = initVertexPositions[pIdx3];
+    const Vec3d& p0 = initVertexPositions[pIdx0];
+    const Vec3d& p1 = initVertexPositions[pIdx1];
+    const Vec3d& p2 = initVertexPositions[pIdx2];
 
     m_restArea = 0.5 * (p1 - p0).cross(p2 - p0).norm();
 }
 
 bool
-PbdAreaConstraint::solvePositionConstraint(
-    StdVectorOfVec3d&      currVertexPositions,
-    const StdVectorOfReal& currInvMasses)
+PbdAreaConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
+                                           double&                 c,
+                                           StdVectorOfVec3d&       dcdx) const
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];
     const auto i3 = m_vertexIds[2];
 
-    Vec3d& p0 = currVertexPositions[i1];
-    Vec3d& p1 = currVertexPositions[i2];
-    Vec3d& p2 = currVertexPositions[i3];
+    const Vec3d& p0 = currVertexPositions[i1];
+    const Vec3d& p1 = currVertexPositions[i2];
+    const Vec3d& p2 = currVertexPositions[i3];
 
-    const Real im0 = currInvMasses[i1];
-    const Real im1 = currInvMasses[i2];
-    const Real im2 = currInvMasses[i3];
+    const Vec3d e0 = p0 - p1;
+    const Vec3d e1 = p1 - p2;
+    const Vec3d e2 = p2 - p0;
 
-    const Vec3d e1 = p0 - p1;
-    const Vec3d e2 = p1 - p2;
-    const Vec3d e3 = p2 - p0;
+    Vec3d n = e0.cross(e1);
+    c = 0.5 * n.norm();
 
-    Vec3d      n = e1.cross(e2);
-    const Real A = 0.5 * n.norm();
-
-    if (A < m_epsilon)
+    if (c < m_epsilon)
     {
         return false;
     }
 
-    n /= 2 * A;
+    n /= 2 * c;
+    c -= m_restArea;
 
-    const Vec3d grad0 = e2.cross(n);
-    const Vec3d grad1 = e3.cross(n);
-    const Vec3d grad2 = e1.cross(n);
-
-    Real lambda = im0 * grad0.squaredNorm() + im1 * grad1.squaredNorm() + im2 * grad2.squaredNorm();
-
-    lambda = (A - m_restArea) / lambda * m_stiffness;
-
-    if (im0 > 0)
-    {
-        p0 += -im0 * lambda * grad0;
-    }
-
-    if (im1 > 0)
-    {
-        p1 += -im1 * lambda * grad1;
-    }
-
-    if (im2 > 0)
-    {
-        p2 += -im2 * lambda * grad2;
-    }
+    dcdx[0] = e1.cross(n);
+    dcdx[1] = e2.cross(n);
+    dcdx[2] = e0.cross(n);
 
     return true;
 }
-} // imstk
+}

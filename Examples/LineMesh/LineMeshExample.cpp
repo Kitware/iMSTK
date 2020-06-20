@@ -27,8 +27,7 @@
 
 using namespace imstk;
 
-std::shared_ptr<LineMesh>
-createLineMesh(const size_t nx, const size_t ny, const size_t nz);
+std::shared_ptr<LineMesh> createLineMesh(const size_t nx, const size_t ny, const size_t nz);
 
 // some parameters that users can play with
 const size_t resolution = 16;
@@ -75,7 +74,7 @@ createLineMesh(const size_t nx, const size_t ny, const size_t nz)
     StdVectorOfVec3d                 points;
     std::vector<Color>               colors;
 
-    const size_t numVoxels  = nx * ny* nz;
+    const size_t numVoxels = nx * ny * nz;
 
     points.resize(numVoxels * 8);
     lines.resize(numVoxels * 12);
@@ -137,5 +136,3 @@ createLineMesh(const size_t nx, const size_t ny, const size_t nz)
 
     return lineMesh;
 }
-
-

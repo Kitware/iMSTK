@@ -16,17 +16,17 @@
 #
 ###########################################################################
 
-project(Example-ComputeGraphBenchmark)
+project(Example-TaskGraph)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} computeGraphBenchmarkExample.cpp)
+imstk_add_executable(${PROJECT_NAME} taskGraphExample.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/ComputeGraph)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/TaskGraph)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

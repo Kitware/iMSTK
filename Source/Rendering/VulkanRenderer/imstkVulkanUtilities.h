@@ -81,7 +81,7 @@ class VulkanAttachmentBarriers
 public:
     /// \brief TODO
     static void changeImageLayout(
-                                  VkCommandBuffer*     commandBuffer,
+        VkCommandBuffer*     commandBuffer,
         uint32_t             queueFamilyIndex,
         VulkanInternalImage* image,
         VkImageLayout        oldLayout,

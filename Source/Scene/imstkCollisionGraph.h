@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <vector>
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
+#include <vector>
 
 namespace imstk
 {
@@ -33,7 +33,7 @@ class ObjectInteractionPair;
 ///
 /// \class CollisionGraph
 ///
-/// \brief TODO
+/// \brief The CollisionGraph holds a set of interacting pairs of SceneObject's
 ///
 class CollisionGraph
 {
@@ -53,23 +53,7 @@ public:
 
 public:
     ///
-    /// \brief Add interaction pair in collision graph
-    /////
-    //ObjectInteractionPtr addInteractionPair(SceneObjectPtr     A,
-    //    SceneObjectPtr       B,
-    //                                    CollisionDetection::Type CDType,
-    //                                    CollisionHandling::Type  CHAType,
-    //                                    CollisionHandling::Type  CHBType);
-
-    ////\todo Refactor -> PBD only
-    //ObjectInteractionPtr addInteractionPair(SceneObjectPtr  A,
-    //    SceneObjectPtr    B,
-    //                                    CollisionDetectionPtr CD,
-    //                                    CollisionHandlingPtr  CHA,
-    //                                    CollisionHandlingPtr  CHB);
-
-    ///
-    /// \brief Add interaction pair in collision graph
+    /// \brief Add an interaction pair to the graph
     ///
     void addInteraction(ObjectInteractionPtr pair);
 

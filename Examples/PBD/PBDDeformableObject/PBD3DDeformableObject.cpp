@@ -40,14 +40,13 @@ using namespace imstk;
 ///
 /// \brief Create a PbdObject and add it to a \p scene
 ///
-std::shared_ptr<PbdObject>
-createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string& surfMeshName,
-                      const std::string& tetMeshName);
+std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                                                 const std::string&     surfMeshName,
+                                                 const std::string&     tetMeshName);
 
 // mesh file names
 const std::string& surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj";
-const std::string& tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
+const std::string& tetMeshFileName  = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -85,15 +84,14 @@ main()
     return 0;
 }
 
-
 std::shared_ptr<PbdObject>
 createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string& surfMeshName,
-                      const std::string& tetMeshName)
+                      const std::string&     surfMeshName,
+                      const std::string&     tetMeshName)
 {
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(surfMeshName));
     auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
-                                                               //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
+    //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
 
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
@@ -110,7 +108,7 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_femParams->m_YoungModulus = 100.0;
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->m_fixedNodeIds = { 50, 126, 177 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
@@ -118,7 +116,8 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_iterations = 45;
+    pbdParams->m_iterations = 15;
+    // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
@@ -134,5 +133,3 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
 
     return deformableObj;
 }
-
-

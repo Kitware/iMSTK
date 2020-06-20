@@ -26,7 +26,6 @@
 
 namespace imstk
 {
-
 ///
 /// \class VulkanRenderPassGenerator
 /// \brief TODO

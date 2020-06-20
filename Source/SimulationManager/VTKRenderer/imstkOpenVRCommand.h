@@ -26,7 +26,6 @@ limitations under the License.
 
 namespace imstk
 {
-
 class SimulationManager;
 
 /// \brief TODO

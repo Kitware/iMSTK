@@ -21,8 +21,8 @@
 
 #pragma once
 
-// imstk
 #include "imstkVolumetricMesh.h"
+#include <array>
 
 namespace imstk
 {

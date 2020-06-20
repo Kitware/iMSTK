@@ -19,10 +19,7 @@
 
 =========================================================================*/
 
-#ifdef iMSTK_USE_OPENHAPTICS
-
-#ifndef imstkHDAPIDeviceClient_h
-#define imstkHDAPIDeviceClient_h
+#pragma once
 
 #include "imstkDeviceClient.h"
 
@@ -81,6 +78,3 @@ private:
     HD_state m_state;  ///< device reading state
 };
 }
-
-#endif // ifndef imstkHDAPIDeviceClient_h
-#endif // ifdef iMSTK_USE_OpenHaptics

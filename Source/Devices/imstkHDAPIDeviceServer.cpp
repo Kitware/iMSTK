@@ -19,8 +19,6 @@
 
 =========================================================================*/
 
-#ifdef iMSTK_USE_OPENHAPTICS
-
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 
@@ -65,5 +63,3 @@ HDAPIDeviceServer::cleanUpModule()
     }
 }
 } // imstk
-
-#endif // ifdef iMSTK_USE_OpenHaptics

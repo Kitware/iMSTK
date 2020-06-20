@@ -14,7 +14,7 @@ function(imstk_add_library target)
 
   set(options VERBOSE)
   set(oneValueArgs)
-  set(multiValueArgs H_FILES CPP_FILES SUBDIR_LIST DEPENDS)
+  set(multiValueArgs H_FILES CPP_FILES SUBDIR_LIST EXCLUDE_FILES DEPENDS)
   include(CMakeParseArguments)
   cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -41,6 +41,13 @@ function(imstk_add_library target)
       list(REMOVE_ITEM target_CPP_FILES ${testing_FILES})
     endif()
   endif()
+
+  # Exclude files
+  foreach(file ${target_EXCLUDE_FILES})
+    list(REMOVE_ITEM target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${file}")
+    list(REMOVE_ITEM target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${file}")
+    list(REMOVE_ITEM testing_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${file}")
+  endforeach()
 
   if( NOT target_SUBDIR_LIST )
     imstk_subdir_list(target_SUBDIR_LIST ${CMAKE_CURRENT_SOURCE_DIR})

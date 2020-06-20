@@ -62,7 +62,7 @@ public:
     ///
     /// \brief Reset the current state to the initial state
     ///
-    void resetToInitialState() override
+    virtual void resetToInitialState() override
     {
         m_currentState->setState(m_initialState);
         m_previousState->setState(m_initialState);

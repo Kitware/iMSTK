@@ -45,9 +45,9 @@ public:
     ///
     void removeDecal();
 
-    /// 
+    ///
     /// \brief Get all decals
-    /// 
+    ///
     std::deque<std::shared_ptr<Decal>>& getDecals();
 
     ///

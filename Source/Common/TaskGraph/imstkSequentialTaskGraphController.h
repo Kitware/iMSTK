@@ -21,18 +21,31 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkComputeGraphController.h"
+#include "imstkTaskGraphController.h"
+#include <list>
 
 namespace imstk
 {
+class TaskNode;
+
 ///
-/// \class TbbComputeGraphController
+/// \class SequentialTaskGraphController
 ///
-/// \brief This class runs an input ComputeGraph in parallel using tbb tasks
+/// \brief This class executes a TaskGraph by first topologically sorting them (Kahn's algorithm)
+/// then sequentially running them
 ///
-class TbbComputeGraphController : public ComputeGraphController
+class SequentialTaskGraphController : public TaskGraphController
 {
 public:
+    ///
+    /// \brief Sorts the computational nodes
+    ///
+    void init() override;
+
     void execute() override;
+
+private:
+    // The current nodes to execute, ordered
+    std::shared_ptr<std::list<std::shared_ptr<TaskNode>>> m_executionOrderedNodes;
 };
 };

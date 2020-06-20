@@ -19,38 +19,38 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCollisionGraph.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 #include "imstkLight.h"
-#include "imstkPbdModel.h"
 #include "imstkMeshIO.h"
-#include "imstkOneToOneMap.h"
-#include "imstkTetraTriangleMap.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkScene.h"
-#include "imstkComputeGraphVizWriter.h"
 #include "imstkObjectInteractionFactory.h"
+#include "imstkOneToOneMap.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
+#include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTaskGraphVizWriter.h"
+#include "imstkTetraTriangleMap.h"
 
 using namespace imstk;
 
 // mesh file names
 const std::string surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj";
-const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
+const std::string tetMeshFileName  = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 ///
 /// \brief Create a surface mesh
 /// \param nRows number of vertices in x-direction
 /// \param nCols number of vertices in y-direction
 ///
-std::shared_ptr<SurfaceMesh>
-createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
+std::shared_ptr<SurfaceMesh> createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
 
 // parameters to play with
-const double youngModulus = 1000.0;
-const double poissonRatio = 0.3;
-const double timeStep = 0.01;
+const double youngModulus     = 1000.0;
+const double poissonRatio     = 0.3;
+const double timeStep         = 0.01;
 const double contactStiffness = 0.1;
-const int maxIter = 5;
+const int    maxIter = 5;
 
 ///
 /// \brief This example demonstrates the collision interaction
@@ -146,7 +146,7 @@ main()
 
     // Collision
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
-        InteractionType::PbdObjToPbdObj_Collision, CollisionDetection::Type::MeshToMeshBruteForce));
+        InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
@@ -175,7 +175,7 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
         {
             const double y = static_cast<double>(dy * j);
             const double x = static_cast<double>(dx * i);
-            vertList[i * nCols + j] = Vec3d(x - height*0.5, -10.0, y - width*0.5);
+            vertList[i * nCols + j] = Vec3d(x - height * 0.5, -10.0, y - width * 0.5);
         }
     }
 
@@ -196,7 +196,4 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
     auto surfMesh = std::make_shared<SurfaceMesh>();
     surfMesh->initialize(vertList, triangles);
     return surfMesh;
-
 }
-
-

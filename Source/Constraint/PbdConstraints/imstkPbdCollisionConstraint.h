@@ -62,14 +62,35 @@ public:
     virtual ~PbdCollisionConstraint() = default;
 
     ///
-    /// \brief
+    /// \brief Get vertex indices of first object
     ///
-    virtual bool solvePositionConstraint(
-        StdVectorOfVec3d&      currVertexPositionsA,
-        StdVectorOfVec3d&      currVertexPositionsB,
-        const StdVectorOfReal& currInvMassesA,
-        const StdVectorOfReal& currInvMassesB) = 0;
+    const std::vector<size_t>& getVertexIdsFirst() const { return m_bodiesFirst; }
+    const std::vector<size_t>& getVertexIdsSecond() const { return m_bodiesSecond; }
 
+    ///
+    /// \brief Get config
+    ///
+    const PbdCollisionConstraintConfig& getConfigFirst() const { return *m_configA; }
+    const PbdCollisionConstraintConfig& getConfigSecond() const { return *m_configB; }
+
+    ///
+    /// \brief compute value and gradient of constraint function
+    ///
+    /// \param[in] currVertexPositionsA current positions from object A
+    /// \param[in] currVertexPositionsA current positions from object B
+    /// \param[inout] c constraint value
+    /// \param[inout] dcdx constraint gradient
+    ///
+    virtual bool computeValueAndGradient(const StdVectorOfVec3d& posA,
+                                         const StdVectorOfVec3d& posB,
+                                         double&                 c,
+                                         StdVectorOfVec3d&       dcdxA,
+                                         StdVectorOfVec3d&       dcdxB) const = 0;
+
+    virtual void projectConstraint(const StdVectorOfReal& invMassA,
+                                   const StdVectorOfReal& invMassB,
+                                   StdVectorOfVec3d&      posA,
+                                   StdVectorOfVec3d&      posB);
 protected:
     std::vector<size_t> m_bodiesFirst;                                 ///> index of points for the first object
     std::vector<size_t> m_bodiesSecond;                                ///> index of points for the second object
