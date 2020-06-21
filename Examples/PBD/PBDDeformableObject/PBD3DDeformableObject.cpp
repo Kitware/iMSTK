@@ -44,7 +44,7 @@ std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
                                                  const std::string&     tetMeshName);
 
 // mesh file names
-const std::string& tetMeshFileName  = iMSTK_DATA_ROOT "textured_organs/heart_volume.vtk";
+const std::string& tetMeshFileName = iMSTK_DATA_ROOT "textured_organs/heart_volume.vtk";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -86,7 +86,7 @@ std::shared_ptr<PbdObject>
 createAndAddPbdObject(std::shared_ptr<Scene> scene,
                       const std::string&     tetMeshName)
 {
-    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
     auto surfMesh = std::make_shared<SurfaceMesh>();
     tetMesh->extractSurfaceMesh(surfMesh, true);

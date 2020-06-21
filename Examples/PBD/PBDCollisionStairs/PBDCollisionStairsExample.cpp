@@ -101,7 +101,7 @@ makeArmadilloPbdObject(const std::string& name)
     auto pbdObj = std::make_shared<PbdObject>(name);
 
     // Read in the armadillo mesh
-    auto tetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "armadillo/armadillo_volume.vtk"));
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "armadillo/armadillo_volume.vtk"));
     tetMesh->scale(0.07, Geometry::TransformType::ApplyToData);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), 1.3, Geometry::TransformType::ApplyToData);
     tetMesh->translate(Vec3d(0.0f, 10.0f, 0.0f), Geometry::TransformType::ApplyToData);
