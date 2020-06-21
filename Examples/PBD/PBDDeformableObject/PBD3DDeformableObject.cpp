@@ -41,12 +41,10 @@ using namespace imstk;
 /// \brief Create a PbdObject and add it to a \p scene
 ///
 std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                                                 const std::string&     surfMeshName,
                                                  const std::string&     tetMeshName);
 
 // mesh file names
-const std::string& surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj";
-const std::string& tetMeshFileName  = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
+const std::string& tetMeshFileName  = iMSTK_DATA_ROOT "textured_organs/heart_volume.vtk";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -60,7 +58,7 @@ main()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // create and add a PBD object
-    createAndAddPbdObject(scene, surfMeshFileName, tetMeshFileName);
+    createAndAddPbdObject(scene, tetMeshFileName);
 
     // Setup plane
     auto planeGeom = std::make_shared<Plane>();
@@ -86,17 +84,21 @@ main()
 
 std::shared_ptr<PbdObject>
 createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string&     surfMeshName,
                       const std::string&     tetMeshName)
 {
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(surfMeshName));
     auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
-    //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
+    tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setColor(Color(147.0 / 255.0, 32.0 / 255.0, 30.0 / 255.0));
+    material->setMetalness(0.9f);
+    material->setRoughness(0.5);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -108,15 +110,15 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_YoungModulus = 500.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = { 50, 126, 177 };
+    pbdParams->m_fixedNodeIds = { 350 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_iterations = 15;
+    pbdParams->m_iterations = 10;
     // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
 
     // Set the parameters

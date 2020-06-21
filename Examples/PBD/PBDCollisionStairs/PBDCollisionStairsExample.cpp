@@ -96,17 +96,17 @@ buildStairs(int nSteps, double width, double height, double depth)
 }
 
 static std::shared_ptr<PbdObject>
-makeDragonPbdObject(const std::string& name)
+makeArmadilloPbdObject(const std::string& name)
 {
     auto pbdObj = std::make_shared<PbdObject>(name);
 
-    // Read in the dragon mesh
-    auto highResSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto coarseTetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    highResSurfMesh->translate(Vec3d(0.0f, 10.0f, 0.0f), Geometry::TransformType::ApplyToData);
-    coarseTetMesh->translate(Vec3d(0.0f, 10.0f, 0.0f), Geometry::TransformType::ApplyToData);
-    auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
-    coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
+    // Read in the armadillo mesh
+    auto tetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "armadillo/armadillo_volume.vtk"));
+    tetMesh->scale(0.07, Geometry::TransformType::ApplyToData);
+    tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), 1.3, Geometry::TransformType::ApplyToData);
+    tetMesh->translate(Vec3d(0.0f, 10.0f, 0.0f), Geometry::TransformType::ApplyToData);
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PBDModelConfig>();
@@ -117,27 +117,26 @@ makeDragonPbdObject(const std::string& name)
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -10.0, 0);
     pbdParams->m_defaultDt  = 0.01;
-    pbdParams->m_iterations = 10;
+    pbdParams->m_iterations = 5;
     pbdParams->collisionParams->m_proximity = 0.3;
     pbdParams->collisionParams->m_stiffness = 0.1;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(coarseTetMesh);
+    pbdModel->setModelGeometry(tetMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
+    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     // Setup the Object
     pbdObj->addVisualModel(surfMeshModel);
-    pbdObj->setCollidingGeometry(coarseSurfMesh);
-    pbdObj->setPhysicsGeometry(coarseTetMesh);
-    pbdObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(coarseTetMesh, coarseSurfMesh));
-    pbdObj->setPhysicsToVisualMap(std::make_shared<TetraTriangleMap>(coarseTetMesh, highResSurfMesh));
+    pbdObj->setCollidingGeometry(surfMesh);
+    pbdObj->setPhysicsGeometry(tetMesh);
+    pbdObj->setPhysicsToVisualMap(std::make_shared<TetraTriangleMap>(tetMesh, surfMesh));
     pbdObj->setDynamicalModel(pbdModel);
 
     return pbdObj;
@@ -189,7 +188,7 @@ main()
     scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
 
     // Create and add the dragon to the scene
-    auto pbdDragon1 = makeDragonPbdObject("PbdDragon1");
+    auto pbdDragon1 = makeArmadilloPbdObject("PbdArmadillo1");
     scene->addSceneObject(pbdDragon1);
 
     auto stairObj = makeStairsPbdObject("PbdStairs", 12, 20.0, 10.0, 20.0);
