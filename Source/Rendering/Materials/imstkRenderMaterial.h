@@ -105,14 +105,40 @@ public:
     /// \brief Get/Set the color. This affects the diffuse color directly, but
     /// it affects the specular color in the case of metals.
     ///
+    const Color& getDiffuseColor() const;
+    void setDiffuseColor(const Color& color);
     const Color& getColor() const;
     void setColor(const Color& color);
+
+    ///
+    /// \brief Get/Set the specular color
+    ///
+    const Color& getSpecularColor() const;
+    void setSpecularColor(const Color& color);
+
+    ///
+    /// \brief Get/Set the ambient color
+    ///
+    const Color& getAmbientColor() const;
+    void setAmbientColor(const Color& color);
 
     ///
     /// \brief Get/Set the metalness
     ///
     const float& getMetalness() const;
     void setMetalness(const float metalness);
+
+    ///
+    /// \brief Get/Set ambient light coefficient
+    ///
+    const float& getAmbientLightCoeff() const { return m_ambientLightCoeff; };
+    void setAmbientLightCoeff(const float a) { m_ambientLightCoeff = a; };
+
+    ///
+    /// \brief Get/Set ambient light coefficient
+    ///
+    const float& getSpecularPower() const { return m_specularPower; };
+    void setSpecularPower(const float p) { m_specularPower = p; };
 
     ///
     /// \brief Get/Set the roughness
@@ -205,8 +231,13 @@ protected:
     BlendMode m_blendMode = BlendMode::Alpha;
 
     ///-------------------Common properties---------------------
-    Color m_color   = Color::LightGray;
-    float m_opacity = 1.0;
+    Color m_diffuseColor  = Color::LightGray;
+    Color m_specularColor = Color::Red;
+    Color m_ambientColor  = Color::White;
+
+    float m_ambientLightCoeff = 0.1f;
+    float m_specularPower     = 100.f;
+    float m_opacity = 1.f;
 
     ///-------------Wireframe specific properties----------------
     float m_lineWidth        = 1.f;

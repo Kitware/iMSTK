@@ -32,7 +32,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 # Let's go ahead and make these directories
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/include)
-file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib) 
 
 #-----------------------------------------------------------------------------
 # Update CMake module path & cmake dir

@@ -136,16 +136,54 @@ RenderMaterial::backfaceCullingOff()
 }
 
 const Color&
+RenderMaterial::getDiffuseColor() const
+{
+    return m_diffuseColor;
+}
+
+void
+RenderMaterial::setDiffuseColor(const Color& color)
+{
+    m_diffuseColor = color;
+    m_modified     = true;
+}
+
+const Color&
 RenderMaterial::getColor() const
 {
-    return m_color;
-}
+    return this->getDiffuseColor();
+};
 
 void
 RenderMaterial::setColor(const Color& color)
 {
-    m_color    = color;
-    m_modified = true;
+    this->setDiffuseColor(color);
+};
+
+const Color&
+RenderMaterial::getSpecularColor() const
+{
+    return m_specularColor;
+}
+
+void
+RenderMaterial::setSpecularColor(const Color& color)
+{
+    m_specularColor = color;
+    m_modified      = true;
+}
+
+const Color&
+RenderMaterial::getAmbientColor() const
+{
+    return m_ambientColor;
+}
+
+void
+RenderMaterial::setAmbientColor(const Color& color)
+{
+    m_ambientColor = color;
+    m_modified     = true;
 }
 
 const float&
