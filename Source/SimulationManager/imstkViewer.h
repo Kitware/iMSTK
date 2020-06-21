@@ -36,10 +36,26 @@ namespace GUIOverlay
 class Canvas;
 }
 #endif
+
+struct viewerConfig
+{
+    std::string m_windowName = "imstk";
+
+    bool m_hideCurzor = false;
+    bool m_hideBorder = true;
+    bool m_fullScreen = false;
+
+    int m_renderWinWidth  = 1000;
+    int m_renderWinHeight = 800;
+};
+
 ///
 /// \class Viewer
 ///
-/// \brief Rendering window manager and contains user API to configure the rendering with various backends
+/// \brief Based class for viewer that manages render window and the renderers
+/// Creates backend-specific renderers on a per-scene basis.
+/// Contains user API to configure the rendering with various backends
+/// Manages the keyboard and mouse events
 ///
 class Viewer
 {
@@ -144,5 +160,7 @@ protected:
 #ifdef iMSTK_USE_Vulkan
     std::shared_ptr<GUIOverlay::Canvas> m_canvas = nullptr;
 #endif
+
+    std::shared_ptr<viewerConfig> m_config = nullptr;
 };
 }

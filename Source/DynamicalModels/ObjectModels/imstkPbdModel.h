@@ -33,7 +33,7 @@ class PointSet;
 class PbdSolver;
 
 ///
-/// \class PBDModelConfig
+/// \struct PBDModelConfig
 /// \brief Parameters for PBD simulation
 ///
 struct PBDModelConfig

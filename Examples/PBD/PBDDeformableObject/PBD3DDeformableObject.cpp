@@ -54,7 +54,7 @@ main()
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -101,7 +101,6 @@ main()
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
     scene->addLight(light);
 
     simManager->setActiveScene(scene);

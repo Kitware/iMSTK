@@ -29,7 +29,7 @@ namespace imstk
 class SceneObject;
 
 ///
-/// \class LaparoscopicTool
+/// \class LaparoscopicToolController
 ///
 /// \brief Two-jawed laparoscopic tool controlled by external device
 /// The tool is composed of three scene objects: pivot, lower jaw and upper jaw

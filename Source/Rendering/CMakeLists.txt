@@ -5,7 +5,6 @@
 set(VTK_H_FILES
     VTKRenderer/imstkVTKRenderer.h
     VTKRenderer/imstkVTKTextureDelegate.h
-    VTKRenderer/imstkVTKCustomPolyDataMapper.h
     VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.h
@@ -20,12 +19,12 @@ set(VTK_H_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugTrianglesRenderDelegate.h  
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.h 
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.h   
-    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h)
+    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h
+	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.h)
 
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKRenderer.cpp
     VTKRenderer/imstkVTKTextureDelegate.cpp
-    VTKRenderer/imstkVTKCustomPolyDataMapper.cpp
     VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
@@ -40,7 +39,8 @@ set(VTK_CPP_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugTrianglesRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.cpp
-    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.cpp)
+    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.cpp
+	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.cpp)
 
 set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanRenderer.h
@@ -121,11 +121,11 @@ imstk_add_library( Rendering
   H_FILES
     imstkRenderer.h
     ${RENDERING_H_FILES}
-    vtkCapsuleSource.h
+    imstkVtkCapsuleSource.h
   CPP_FILES
     imstkRenderer.cpp
     ${RENDERING_CPP_FILES}
-    vtkCapsuleSource.cpp
+    imstkVtkCapsuleSource.cpp
   SUBDIR_LIST
     ${RENDERING_SUBDIR}
   DEPENDS

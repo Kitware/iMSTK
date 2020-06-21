@@ -30,9 +30,9 @@ namespace imstk
 class SurfaceMesh;
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class VTKSurfaceMeshRenderDelegate
 ///
-/// \brief
+/// \brief Surface mesh render delegate with VTK backend
 ///
 class VTKSurfaceMeshRenderDelegate : public VTKRenderDelegate
 {
@@ -58,8 +58,8 @@ public:
     void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
 
 protected:
-
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
+    vtkSmartPointer<vtkDoubleArray> m_mappedTangentArray;   ///> Mapped array of tangents
 };
 }

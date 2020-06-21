@@ -120,7 +120,7 @@ protected:
     explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), SceneEntity() {};
 
     // properties with defaults
-    float m_intensity   = 100.;
+    float m_intensity   = 1.;
     Color m_color       = Color::White;
     bool  m_switchState = true;
     Vec3f m_focalPoint  = Vec3f(0, 0, 0);

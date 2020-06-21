@@ -148,19 +148,6 @@ RenderMaterial::setColor(const Color& color)
     m_modified = true;
 }
 
-const Color&
-RenderMaterial::getDebugColor() const
-{
-    return m_debugColor;
-}
-
-void
-RenderMaterial::setDebugColor(const Color& color)
-{
-    m_debugColor = color;
-    m_modified   = true;
-}
-
 const float&
 RenderMaterial::getMetalness() const
 {
@@ -195,18 +182,6 @@ void
 RenderMaterial::setEmissivity(const float emissivity)
 {
     m_emissivity = emissivity;
-}
-
-const double&
-RenderMaterial::getSphereGlyphSize() const
-{
-    return m_sphereGlyphSize;
-}
-
-void
-RenderMaterial::setSphereGlyphSize(const double size)
-{
-    m_sphereGlyphSize = size;
 }
 
 std::shared_ptr<Texture>

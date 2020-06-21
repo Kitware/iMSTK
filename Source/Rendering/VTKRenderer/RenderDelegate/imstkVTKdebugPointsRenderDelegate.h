@@ -31,9 +31,10 @@ class vtkGlyph3D;
 namespace imstk
 {
 ///
-/// \class LinesRenderDelegate
+/// \class VTKdbgPointsRenderDelegate
 ///
-/// \brief Renders a list of points
+/// \brief Render delegate for a set of disjoint points whose size could change
+///  more frequently which is typically he case for rendering arbitrary set of points
 ///
 class VTKdbgPointsRenderDelegate : public VTKRenderDelegate
 {

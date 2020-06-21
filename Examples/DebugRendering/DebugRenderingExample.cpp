@@ -41,7 +41,8 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
     auto material    = std::make_shared<RenderMaterial>();
-    material->setDebugColor(Color::Blue);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Points);
+    material->setPointSize(6.);
     auto vizModel = std::make_shared<VisualModel>(debugPoints, material);
     scene->addDebugVisualModel(vizModel);
 
@@ -53,9 +54,10 @@ addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Lines");
     auto material   = std::make_shared<RenderMaterial>();
-    material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Green);
-    material->setLineWidth(2.0);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    //material->setBackFaceCulling(false);
+    material->setEdgeColor(Color::Green);
+    material->setLineWidth(4.0);
     auto vizModel = std::make_shared<VisualModel>(debugLines, material);
     scene->addDebugVisualModel(vizModel);
 
@@ -67,10 +69,11 @@ addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugTriangles = std::make_shared<DebugRenderTriangles>("Debug Triangles");
     auto material       = std::make_shared<RenderMaterial>();
-    material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Red);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setBackFaceCulling(false);
+    material->setColor(Color::Red);
     auto vizModel = std::make_shared<VisualModel>(debugTriangles, material);
+    scene->addDebugVisualModel(vizModel);
 
     return debugTriangles;
 }

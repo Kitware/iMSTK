@@ -97,7 +97,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
     this->update();
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), true, m_visualModel->getRenderMaterial());
+    this->setUpMapper(source->GetOutputPort(), m_visualModel);
 }
 
 void

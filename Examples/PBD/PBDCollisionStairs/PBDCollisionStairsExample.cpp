@@ -203,6 +203,11 @@ main()
     light->setIntensity(1.0);
     scene->addLight(light);
 
+    auto light2 = std::make_shared<DirectionalLight>("light 2");
+    light2->setFocalPoint(-Vec3d(5, -8, 5));
+    light2->setIntensity(1.2);
+    scene->addLight(light2);
+
     simManager->setActiveScene(scene);
     simManager->start(SimulationStatus::Paused);
 

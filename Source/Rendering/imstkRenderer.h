@@ -22,9 +22,23 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkColor.h"
 
 namespace imstk
 {
+struct rendererConfig
+{
+    bool m_enableVR = false;
+
+    Color m_BGColor1 = Color(0.3285, 0.3285, 0.6525);
+    Color m_BGColor2 = Color(0.13836, 0.13836, 0.2748);
+};
+
+///
+/// \class Renderer
+///
+/// \brief Rendering window manager and contains user API to configure the rendering with various backends
+///
 class Renderer
 {
 public:
@@ -37,6 +51,8 @@ public:
         Debug,
         Simulation
     };
+
+    Renderer() : m_config(std::make_shared<rendererConfig>()) {}
 
     ///
     /// \brief Set rendering mode
@@ -56,5 +72,7 @@ public:
 protected:
     bool m_VrEnabled = false;
     Renderer::Mode m_currentMode = Renderer::Mode::Empty;
+
+    std::shared_ptr<rendererConfig> m_config;
 };
 }

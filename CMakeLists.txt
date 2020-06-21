@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 3.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 2.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
@@ -64,7 +64,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
-option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" ON)
+option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" OFF)
 if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
 	include(CheckLanguage)
 	check_language(CUDA)
@@ -358,7 +358,7 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   # Add shaders
   #-----------------------------------------------------------------------------
   include(imstkCopyAndCompileShaders)
-  CopyAndCompileShaders()
+  CopyAndCompileShaders() 
 endif()
 
 # Folder name to put our headers/cmake config files under

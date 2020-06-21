@@ -25,7 +25,7 @@
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
 
-#include <vtkSmartPointer.h>
+#include "vtkSmartPointer.h"
 
 #include <memory>
 #include <numeric>

@@ -31,7 +31,7 @@ class SurfaceMesh;
 struct CollisionData;
 
 ///
-/// \class MeshToMeshCCD
+/// \class SurfaceMeshToSurfaceMeshCCD
 ///
 /// \brief Continuous collision detection for surface meshes
 ///

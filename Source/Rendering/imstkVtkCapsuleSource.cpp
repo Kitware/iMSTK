@@ -20,9 +20,9 @@
 =========================================================================*/
 // \author Johan Andruejol <johan.andruejol@kitware.com>
 
-#if (VTK_MAJOR_VERSION <= 9)
+#if (VTK_MAJOR_VERSION < 9)
 
-#include "imstkVtkCapsuleSource.h"
+#include "vtkCapsuleSource.h"
 
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>

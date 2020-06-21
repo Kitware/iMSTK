@@ -94,7 +94,7 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 #if 0
     // Wireframe color
     material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    material->setDebugColor(getRandomColor()); // Wireframe color
+    material->setColor(getRandomColor()); // Wireframe color
     material->setLineWidth(2);
 #else
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);

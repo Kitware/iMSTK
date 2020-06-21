@@ -33,7 +33,7 @@ namespace imstk
 class FEMDeformableBodyModel;
 
 ///
-/// \class DeformableObject
+/// \class FeDeformableObject
 ///
 /// \brief Scene objects that can deform
 ///

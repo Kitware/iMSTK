@@ -30,7 +30,7 @@ class Cylinder;
 struct CollisionData;
 
 ///
-/// \class SphereCylinderCD
+/// \class SphereToCylinderCD
 ///
 /// \brief Sphere-Cylinder collision detection
 ///

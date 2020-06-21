@@ -199,9 +199,9 @@ protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
 
+    friend class VulkanSurfaceMeshRenderDelegate;
     friend class VulkanLineMeshRenderDelegate;
     friend class VulkanRenderDelegate;
-    friend class VulkanSurfaceMeshRenderDelegate;
     friend class VulkanRenderer;
 
     virtual void applyTranslation(const Vec3d t) = 0;

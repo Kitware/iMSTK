@@ -23,34 +23,37 @@
 
 #include "imstkVTKRenderDelegate.h"
 
-class vtkTransformPolyDataFilter;
+class vtkDoubleArray;
 
 namespace imstk
 {
+class PointSet;
+
 ///
-/// \class VTKCapsuleRenderDelegate
+/// \class VTKFluidRenderDelegate
 ///
-/// \brief Render capsule object with vtk backend
+/// \brief Render delegate for point set rendered as a fluid surface
 ///
-class VTKCapsuleRenderDelegate : public VTKRenderDelegate
+class VTKFluidRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    explicit VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
-    /// \brief destructor
+    /// \brief Destructor
     ///
-    ~VTKCapsuleRenderDelegate() = default;
+    ~VTKFluidRenderDelegate() = default;
 
     ///
-    /// \brief Update capsule source based on the capsule geometry
+    /// \brief Update polydata source based on the mesh geometry
     ///
     void updateDataSource() override;
 
 protected:
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
+
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };
-} // imstk
+}

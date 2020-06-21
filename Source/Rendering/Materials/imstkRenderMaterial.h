@@ -31,14 +31,26 @@ class Texture;
 class RenderMaterial
 {
 public:
-    enum DisplayMode
+    enum class DisplayMode
     {
         Surface,
         Wireframe,
         Points,
-        WireframeSurface
+        WireframeSurface,
+        VolumeRendering,
+        Fluid               ///< Renders a set of points using a screen-space fluid renderer
     };
 
+    /// surface shading model. Defaults to Phong
+    enum class ShadingModel
+    {
+        Phong,   ///< Phong shading model (default)
+        Gouraud, ///< Gouraud shading model (default)
+        Flat,    ///< Flat shading model with no interpolation
+        PBR      ///< Physically based rendering
+    };
+
+    /// Volume rendering blend mode
     enum class BlendMode
     {
         Alpha,
@@ -92,12 +104,6 @@ public:
     void setColor(const Color& color);
 
     ///
-    /// \brief Get/Set the color of the wireframe and points
-    ///
-    const Color& getDebugColor() const;
-    void setDebugColor(const Color& color);
-
-    ///
     /// \brief Get/Set the metalness
     ///
     const float& getMetalness() const;
@@ -114,12 +120,6 @@ public:
     ///
     const float& getEmissivity() const;
     void setEmissivity(const float emissivity);
-
-    ///
-    /// \brief Get/Set the roughness
-    ///
-    const double& getSphereGlyphSize() const;
-    void setSphereGlyphSize(const double size);
 
     ///
     /// \brief Add/Get texture
@@ -140,6 +140,12 @@ public:
     bool getCastsShadows() const;
 
     ///
+    /// \brief Get/Set edge visibility
+    ///
+    void setEdgeVisibility(const bool visibility) { m_edgeVisibility = visibility; };
+    bool getEdgeVisibility() const { return m_edgeVisibility; };
+
+    ///
     /// \brief Get/Set blend mode
     /// This function only works for volumes, particles and decals currently
     /// and the MAXIMUM_INTENSITY and MINIMUM_INTENSITY blend modes are only available for volumes
@@ -154,6 +160,31 @@ public:
     bool isParticle();
     bool isLineMesh();
 
+    DisplayMode getRenderMode() const { return m_displayMode; };
+    ShadingModel getShadingModel() const { return m_shadingModel; };
+    void setShadingModel(const ShadingModel& model) { m_shadingModel = model; }
+
+    bool isModified() const { return m_modified; };
+    void setModified(const bool modified) { m_modified = modified; };
+
+    float getOcclusionStrength() const { return m_occlusionStrength; }
+    void setOcclusionStrength(const float o) { m_occlusionStrength = o; };
+
+    float getNormalStrength() const { return m_normalStrength; }
+    void setNormalnStrength(const float n) { m_normalStrength = n; };
+
+    const Color& getEdgeColor() const { return m_edgeColor; };
+    void setEdgeColor(const Color& color) { m_edgeColor = color; };
+
+    const Color& getVertexColor() const { return m_vertexColor; };
+    void setVertexColor(const Color& color) { m_vertexColor = color; };
+
+    double getOpacity() const { return m_opacity; }
+    void setOpacity(const float opacity) { m_opacity = opacity; };
+
+    bool getBackfaceCulling() const { return m_backfaceCulling; };
+    void setBackfaceCulling(const bool c) { m_backfaceCulling = c; };
+
 protected:
     friend class VTKRenderDelegate;
     friend class VulkanRenderDelegate;
@@ -162,42 +193,52 @@ protected:
     friend class VulkanParticleRenderDelegate;
     friend class VTKdbgLinesRenderDelegate;
 
-    // State
-    DisplayMode m_displayMode = DisplayMode::Surface;
-    bool  m_tessellated       = false;
-    float m_lineWidth       = 1.0;
-    float m_pointSize       = 1.0;
-    bool  m_backfaceCulling = true;       ///< For performance, uncommon for this to be false
-    bool  m_isDecal    = false;
-    bool  m_isLineMesh = false;
-    bool  m_isParticle = false;
-
-    // Sphere size used for glyph in rendering (valid only for point set)
-    double m_sphereGlyphSize = 0.05;
-
-    // Colors
-    Color m_color      = Color::White;
-    Color m_debugColor = Color::Black;
-
-    // Classical values
-    float m_metalness  = 0.0; ///< Value for metalness with range: [0.0, 1.0]
-    float m_roughness  = 1.0; ///< Value for roughness with range: [0.0, 1.0]
-    float m_emissivity = 0.0;
-
     // Textures
     std::vector<std::shared_ptr<Texture>> m_textures; ///< Ordered by Texture::Type
 
-    // Shadows
-    bool m_receivesShadows = true;
-    bool m_castsShadows    = true;
-
-    // Visibility
-    bool m_isVisible = true;
-
-    bool m_stateModified = true; ///< Flag for expensive state changes
-    bool m_modified      = true; ///< Flag for any material property changes
-    bool m_flatShading   = false;
-
+    ///--------------Volume rendering properties----------------
     BlendMode m_blendMode = BlendMode::Alpha;
+
+    ///-------------------Common properties---------------------
+    Color m_color   = Color::LightGray;
+    float m_opacity = 1.0;
+
+    ///-------------Wireframe specific properties----------------
+    float m_lineWidth        = 1.f;
+    float m_pointSize        = 2.f;
+    Color m_edgeColor        = Color::Marigold;
+    Color m_vertexColor      = Color::Teal;
+    bool  m_edgeVisibility   = true; ///< \note not used (vtk backend)
+    bool  m_vertexVisibility = true; ///< \note not used (vtk backend)
+
+    ///----------------PBR specific properties-------------------
+    float m_emissivity    = 0.f;
+    Color m_emmisiveColor = Color::White;
+
+    float m_metalness = 0.f;  ///< Value for metalness with range: [0.0, 1.0]
+    float m_roughness = 10.f; ///< Value for roughness with range: [0.0, 1.0]
+
+    float m_occlusionStrength = 10.f;
+    float m_normalStrength    = 1.f;
+
+    ///---------------------Global states------------------------
+    bool m_imageBasedLighting = false;
+
+    // Shadows
+    bool m_receivesShadows = true; ///< \note not implemented
+    bool m_castsShadows    = true; ///< \note not implemented
+
+    /// \todo remove one of these?
+    bool m_stateModified   = true;      ///< Flag for expensive state changes
+    bool m_modified        = true;      ///< Flag for any material property changes
+    bool m_backfaceCulling = true;      ///< For performance, uncommon for this to be false
+
+    DisplayMode  m_displayMode  = DisplayMode::Surface;
+    ShadingModel m_shadingModel = ShadingModel::Phong;
+
+    bool m_tessellated = false;
+    bool m_isDecal     = false;
+    bool m_isLineMesh  = false;
+    bool m_isParticle  = false;
 };
 }

@@ -30,9 +30,9 @@ namespace imstk
 class HexahedralMesh;
 
 ///
-/// \class HexahedralMeshRenderDelegate
+/// \class VTKHexahedralMeshRenderDelegate
 ///
-/// \brief
+/// \brief Hexahedral mesh render delegate with VTK backend
 ///
 class VTKHexahedralMeshRenderDelegate : public VTKRenderDelegate
 {

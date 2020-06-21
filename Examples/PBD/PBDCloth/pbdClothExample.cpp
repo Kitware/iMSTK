@@ -120,8 +120,9 @@ main()
 
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(Color::LightGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setPointSize(6.);
+    material->setLineWidth(4.);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     deformableObj->addVisualModel(surfMeshModel);
@@ -129,7 +130,7 @@ main()
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
+    whiteLight->setIntensity(1.);
 
     // Light (red)
     auto colorLight = std::make_shared<SpotLight>("colorLight");
