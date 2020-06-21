@@ -73,34 +73,7 @@ main()
     auto tetVizModel = std::make_shared<VisualModel>(tetMesh, tetMaterial);
     volObject->addVisualModel(tetVizModel);
 
-    auto tetMesh2 = GeometryUtils::createTetrahedralMeshCover(surfMesh, nx / 2, ny / 2, nz / 2);
-
-    // add scene object for surface object
-    auto volObject2   = std::make_shared<VisualObject>("VolObj");
-    auto tetMaterial2 = std::make_shared<RenderMaterial>();
-    tetMaterial2->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    tetMaterial2->setEdgeColor(Color::Teal);
-    tetMaterial2->setPointSize(7.);
-    tetMaterial2->setLineWidth(3.);
-    auto tetVizModel2 = std::make_shared<VisualModel>(tetMesh2, tetMaterial2);
-    tetVizModel2->hide();
-    volObject2->addVisualModel(tetVizModel2);
-
-    // add the scene object to the scene
     scene->addSceneObject(volObject);
-    scene->addSceneObject(volObject2);
-
-    // Rotate the dragon every frame
-    auto swapFunc = [&](Module* module)
-                    {
-                        if (tetVizModel->isVisible())
-                        {
-                            std::this_thread::sleep_for(std::chrono::seconds(3));
-                            tetVizModel->hide();
-                            tetVizModel2->show();
-                        }
-                    };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(swapFunc);
 
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
