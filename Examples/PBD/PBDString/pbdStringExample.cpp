@@ -95,7 +95,6 @@ makePbdString(
     // Setup the VisualModel
     std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(color);
     material->setEdgeColor(color);
     material->setLineWidth(2.0f);
     material->setPointSize(6.0f);

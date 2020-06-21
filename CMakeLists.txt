@@ -274,37 +274,30 @@ endif()
 
 # VTK
 find_package(VTK CONFIG)
-if (VTK_VERSION VERSION_LESS "8.90")
-  # Modules are linked via `vtkCommonCore`
-  # VTK_DEFINITIONS has autoinit information
-  find_package(VTK REQUIRED)
-  include(${VTK_USE_FILE})
-else()
-  # modules are linked via `VTK::CommonCore`
-  # vtk_module_autoinit is needed
-  find_package(VTK COMPONENTS
-    ChartsCore
-    CommonCore
-    CommonDataModel
-    FiltersGeneral
-    FiltersSources
-	FiltersModeling
-	FiltersExtraction
-    IOExport
-    IOImport
-    IOPLY
-    IOParallel
-    IOParallelXML
-    ImagingCore
-    InteractionStyle
-    RenderingAnnotation
-    RenderingCore
-    RenderingOpenGL2
-    RenderingVolume
-    RenderingVolumeOpenGL2
-    ViewsContext2D
-  )
-endif()
+# modules are linked via `VTK::CommonCore`
+# vtk_module_autoinit is needed
+find_package(VTK COMPONENTS
+  ChartsCore
+  CommonCore
+  CommonDataModel
+  FiltersGeneral
+  FiltersSources
+FiltersModeling
+FiltersExtraction
+  IOExport
+  IOImport
+  IOPLY
+  IOParallel
+  IOParallelXML
+  ImagingCore
+  InteractionStyle
+  RenderingAnnotation
+  RenderingCore
+  RenderingOpenGL2
+  RenderingVolume
+  RenderingVolumeOpenGL2
+  ViewsContext2D
+)
 
 # Vulkan
 set(Vulkan_Dependency)

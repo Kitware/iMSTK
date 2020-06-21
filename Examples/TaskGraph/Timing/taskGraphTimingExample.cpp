@@ -68,11 +68,11 @@ makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringL
 static std::shared_ptr<PbdObject>
 makePbdString(
     const std::string& name,
-    const Vec3d&       pos,
+    const Vec3d& pos,
     const size_t       numVerts,
     const double       stringLength,
     const double       bendStiffness,
-    const Color&       color)
+    const Color& color)
 {
     std::shared_ptr<PbdObject> stringObj = std::make_shared<PbdObject>(name);
 
@@ -83,10 +83,10 @@ makePbdString(
     auto pbdParams = std::make_shared<PBDModelConfig>();
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e7);
     pbdParams->enableConstraint(PbdConstraint::Type::Bend, bendStiffness);
-    pbdParams->m_fixedNodeIds     = { 0 };
+    pbdParams->m_fixedNodeIds = { 0 };
     pbdParams->m_uniformMassValue = 5.0;
-    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt  = 0.0005;
+    pbdParams->m_gravity = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt = 0.0005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
@@ -97,7 +97,7 @@ makePbdString(
     // Setup the VisualModel
     std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(color);
+    material->setEdgeColor(color);
     material->setLineWidth(2.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
@@ -114,11 +114,11 @@ makePbdString(
 
 static std::vector<std::shared_ptr<PbdObject>>
 makePbdStrings(const size_t numStrings,
-               const size_t numVerts,
-               const double stringSpacing,
-               const double stringLength,
-               const Color& startColor,
-               const Color& endColor)
+    const size_t numVerts,
+    const double stringSpacing,
+    const double stringLength,
+    const Color& startColor,
+    const Color& endColor)
 {
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs(numStrings);
 
@@ -127,7 +127,7 @@ makePbdStrings(const size_t numStrings,
     for (unsigned int i = 0; i < numStrings; i++)
     {
         const Vec3d  tipPos = Vec3d(static_cast<double>(i) * stringSpacing - size * 0.5, stringLength * 0.5, 0.0);
-        const double t      = static_cast<double>(i) / (numStrings - 1);
+        const double t = static_cast<double>(i) / (numStrings - 1);
 
         pbdStringObjs[i] = makePbdString(
             "String " + std::to_string(i),
@@ -141,14 +141,14 @@ makePbdStrings(const size_t numStrings,
     return pbdStringObjs;
 }
 
-const double dt            = 0.0005;
-const double radius        = 1.5;
-const size_t numStrings    = 8;                    // Number of strings
-const size_t numVerts      = 30;                   // Number of vertices on each string
+const double dt = 0.0005;
+const double radius = 1.5;
+const size_t numStrings = 8;                    // Number of strings
+const size_t numVerts = 30;                   // Number of vertices on each string
 const double stringSpacing = 2.0;                  // How far each string is apart
-const double stringLength  = 10.0;                 // Total length of string
-const Color  startColor    = Color(1.0, 0.0, 0.0); // Color of first string
-const Color  endColor      = Color(0.0, 1.0, 0.0); // Color of last string
+const double stringLength = 10.0;                 // Total length of string
+const Color  startColor = Color(1.0, 0.0, 0.0); // Color of first string
+const Color  endColor = Color(0.0, 1.0, 0.0); // Color of last string
 
 ///
 /// \brief This examples uses the timing features of the task graph. This allows one
@@ -165,6 +165,7 @@ main()
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
         makePbdStrings(numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
+    // Add them to the scene
     for (std::shared_ptr<PbdObject> obj : pbdStringObjs)
     {
         scene->addSceneObject(obj);
@@ -176,7 +177,6 @@ main()
 
     // Move the points every frame
     double t = 0.0;
-
     auto movePoints =
         [&pbdStringObjs, &t](Module* module)
         {

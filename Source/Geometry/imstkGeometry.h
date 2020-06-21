@@ -118,7 +118,7 @@ public:
     ///
     void rotate(const Quatd& q, TransformType type = TransformType::ConcatenateToTransform);
     void rotate(const Mat3d& m, TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Vec3d& axis, double angle, TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Vec3d& axis, double radians, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Scale in Cartesian directions
