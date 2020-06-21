@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkLogger.h"
 

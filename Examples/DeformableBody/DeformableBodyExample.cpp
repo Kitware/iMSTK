@@ -21,7 +21,7 @@
 
 #include "imstkTimer.h"
 #include "imstkSimulationManager.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkBackwardEuler.h"
 #include "imstkNonLinearSystem.h"
 #include "imstkNewtonSolver.h"
