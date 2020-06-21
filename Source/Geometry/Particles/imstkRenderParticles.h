@@ -103,7 +103,7 @@ public:
 
     ///
     /// \brief Get volume
-    /// As these are particles, the volume is 0
+    /// \note As these are particles, the volume is 0
     ///
     double getVolume() const override { return 0; }
 

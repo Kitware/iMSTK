@@ -110,6 +110,7 @@ public:
     const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
 
 protected:
+    /// \brief TODO
     static void timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
 
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;

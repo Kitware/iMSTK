@@ -180,7 +180,6 @@ protected:
     vtkSmartPointer<vtkChartXY>      m_timeTableChart      = nullptr;
     vtkSmartPointer<vtkContextActor> m_timeTableChartActor = nullptr;
     vtkSmartPointer<vtkTable> m_timeTable = nullptr;
-
     vtkPlotBar* m_timeTablePlot = nullptr;
     int m_timeTableIter = 0;
 };

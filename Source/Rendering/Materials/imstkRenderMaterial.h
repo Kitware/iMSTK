@@ -28,9 +28,14 @@ namespace imstk
 {
 class Texture;
 
+///
+/// \class RenderMaterial
+/// \brief TODO
+///
 class RenderMaterial
 {
 public:
+    /// Display mode for the scene objects
     enum class DisplayMode
     {
         Surface,

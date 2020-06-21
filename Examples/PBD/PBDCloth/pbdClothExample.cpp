@@ -30,23 +30,23 @@
 
 using namespace imstk;
 
-///
-/// \brief This example demonstrates the cloth simulation
-/// using Position based dynamics
-///
-int
-main()
-{
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDCloth");
+// Parameters to play with
+const double width  = 10.0;
+const double height = 10.0;
+const int    nRows  = 16;
+const int    nCols  = 16;
 
+///
+/// \brief Creates cloth geometry
+///
+static std::unique_ptr<SurfaceMesh>
+makeClothGeometry(
+    const double width, const double height, const int nRows, const int nCols)
+{
     // Create surface mesh
-    auto             surfMesh = std::make_shared<SurfaceMesh>();
-    StdVectorOfVec3d vertList;
-    const double     width  = 10.0;
-    const double     height = 10.0;
-    const int        nRows  = 16;
-    const int        nCols  = 16;
+    std::unique_ptr<SurfaceMesh> clothMesh = std::make_unique<SurfaceMesh>();
+    StdVectorOfVec3d             vertList;
+
     vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -57,8 +57,8 @@ main()
             vertList[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
         }
     }
-    surfMesh->setInitialVertexPositions(vertList);
-    surfMesh->setVertexPositions(vertList);
+    clothMesh->setInitialVertexPositions(vertList);
+    clothMesh->setVertexPositions(vertList);
 
     // Add connectivity data
     std::vector<SurfaceMesh::TriangleArray> triangles;
@@ -88,49 +88,71 @@ main()
         }
     }
 
-    surfMesh->setTrianglesVertices(triangles);
+    clothMesh->setTrianglesVertices(triangles);
 
-    // Create Object & Model
-    auto deformableObj = std::make_shared<PbdObject>("Cloth");
-    auto pbdModel      = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(surfMesh);
+    return clothMesh;
+}
 
-    // configure model
+///
+/// \brief Creates cloth object
+///
+static std::shared_ptr<PbdObject>
+makeClothObj(const std::string& name, double width, double height, int nRows, int nCols)
+{
+    auto clothObj = std::make_shared<PbdObject>(name);
+
+    // Setup the Geometry
+    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeClothGeometry(width, height, nRows, nCols)));
+
+    // Setup the Parameters
     auto pbdParams = std::make_shared<PBDModelConfig>();
-
-    // Constraints
-    // pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
-    // pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e2);
-    // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
-    std::vector<size_t> fixedNodes = { 0, nCols - 1 };
-    pbdParams->m_fixedNodeIds = fixedNodes;
-
-    // Other parameters
+    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
 
-    // Set the parameters
+    // Setup the Model
+    auto pbdModel = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
-    deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->setPhysicsGeometry(surfMesh);
 
+    // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setPointSize(6.);
-    material->setLineWidth(4.);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
-    deformableObj->addVisualModel(surfMeshModel);
+
+    auto clothVisualModel = std::make_shared<VisualModel>(clothMesh);
+    clothVisualModel->setRenderMaterial(material);
+
+    // Setup the Object
+    clothObj->addVisualModel(clothVisualModel);
+    clothObj->setPhysicsGeometry(clothMesh);
+    clothObj->setDynamicalModel(pbdModel);
+
+    return clothObj;
+}
+
+///
+/// \brief This example demonstrates the cloth simulation
+/// using Position based dynamics
+///
+int
+main()
+{
+    auto simManager = std::make_shared<SimulationManager>();
+    auto scene      = simManager->createNewScene("PBDCloth");
+
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+    scene->addSceneObject(clothObj);
 
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
     whiteLight->setIntensity(1.);
+    scene->addLight(whiteLight);
 
     // Light (red)
     auto colorLight = std::make_shared<SpotLight>("colorLight");
@@ -139,12 +161,9 @@ main()
     colorLight->setIntensity(100);
     colorLight->setColor(Color::Red);
     colorLight->setSpotAngle(30);
-
-    // Add in scene
-    scene->addLight(whiteLight);
     scene->addLight(colorLight);
-    scene->addSceneObject(deformableObj);
 
+    // Adjust camera
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 

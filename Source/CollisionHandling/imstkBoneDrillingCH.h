@@ -69,12 +69,18 @@ public:
     /// \brief Get stiffness
     ///
     double getStiffness() const { return m_stiffness; }
+    ///
+    /// \brief Set stiffness
+    ///
     void setStiffness(const double k) { m_stiffness = k; }
 
     ///
     /// \brief Get damping coefficient
     ///
     double getDamping() const { return m_damping; }
+    ///
+    /// \brief Set damping coefficient
+    ///
     void setDamping(const double d) { m_damping = d; }
 
 private:

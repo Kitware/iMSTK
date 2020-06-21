@@ -32,6 +32,9 @@ protected:
     Cube m_cube;
 };
 
+///
+/// \brief TODO
+///
 TEST_F(imstkCubeTest, SetGetWidth)
 {
     m_cube.setWidth(2);
@@ -50,6 +53,9 @@ TEST_F(imstkCubeTest, SetGetWidth)
     EXPECT_GT(m_cube.getWidth(), 0);
 }
 
+///
+/// \brief TODO
+///
 TEST_F(imstkCubeTest, GetVolume)
 {
     m_cube.setWidth(2);
@@ -63,6 +69,9 @@ TEST_F(imstkCubeTest, GetVolume)
     EXPECT_EQ(m_cube.getVolume(), w * w * w);
 }
 
+///
+/// \brief TODO
+///
 int
 imstkCubeTest(int argc, char* argv[])
 {

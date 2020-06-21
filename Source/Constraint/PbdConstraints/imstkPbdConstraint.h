@@ -122,6 +122,7 @@ public:
     /// \brief Update positions by projecting constraints.
     ///
     virtual void projectConstraint(const StdVectorOfReal& currInvMasses, const double dt, const SolverType& type, StdVectorOfVec3d& pos);
+
 protected:
     std::vector<size_t> m_vertexIds;   ///> index of points for the constraint
     double m_epsilon        = 1.0e-16; ///> Tolerance used for the costraints

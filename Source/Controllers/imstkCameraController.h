@@ -37,7 +37,7 @@ class CameraController : public Module, public DeviceTracker
 {
 public:
     ///
-    /// \brief
+    /// \brief TODO
     ///
     CameraController(std::shared_ptr<Camera> camera, std::shared_ptr<DeviceClient> deviceClient);
 
@@ -65,17 +65,17 @@ public:
 
 protected:
     ///
-    /// \brief
+    /// \brief TODO
     ///
     virtual void initModule() override {};
 
     ///
-    /// \brief
+    /// \brief TODO
     ///
     virtual void runModule() override;
 
     ///
-    /// \brief
+    /// \brief TODO
     ///
     void cleanUpModule() override {};
 

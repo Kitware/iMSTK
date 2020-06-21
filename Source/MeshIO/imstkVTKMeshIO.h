@@ -109,19 +109,19 @@ protected:
     static bool writeVtkUnstructuredGrid(const std::shared_ptr<HexahedralMesh> hMesh, const std::string& filePath);
 
     ///
-    /// \brief
+    /// \brief Reads vtk unstructured grid
     ///
     template<typename ReaderType>
     static std::shared_ptr<VolumetricMesh> readVtkUnstructuredGrid(const std::string& filePath);
 
     ///
-    /// \brief
+    /// \brief Reads vtk image data
     ///
     template<typename ReaderType>
     static std::shared_ptr<ImageData> readVtkImageData(const std::string& filePath);
 
     ///
-    /// \brief
+    /// \brief TODO
     ///
     static std::shared_ptr<ImageData> readVtkImageDataDICOM(const std::string& filePath);
 };

@@ -27,12 +27,18 @@
 
 using namespace imstk;
 
+///
+/// \brief TODO
+///
 class imstkGeometryTest : public ::testing::Test
 {
 protected:
     Plane m_geometry; // Can't use imstk::Geometry since pure virtual. Should use google mock class.
 };
 
+///
+/// \brief TODO
+///
 TEST_F(imstkGeometryTest, GetSetScaling)
 {
     m_geometry.setScaling(2);
@@ -51,6 +57,9 @@ TEST_F(imstkGeometryTest, GetSetScaling)
     EXPECT_GT(m_geometry.getScaling(), 0);
 }
 
+///
+/// \brief TODO
+///
 TEST_F(imstkGeometryTest, GetSetTranslation)
 {
     auto p1 = Vec3d(12, 0.0005, -400000);
@@ -69,6 +78,9 @@ TEST_F(imstkGeometryTest, GetSetTranslation)
     EXPECT_EQ(m_geometry.getTranslation(), p2);
 }
 
+///
+/// \brief TODO
+///
 TEST_F(imstkGeometryTest, GetSetRotation)
 {
     auto angle1 = 15;
@@ -99,6 +111,9 @@ TEST_F(imstkGeometryTest, GetSetRotation)
     EXPECT_TRUE(m_geometry.getRotation().isApprox(mat3));
 }
 
+///
+/// \brief TODO
+///
 int
 imstkGeometryTest(int argc, char* argv[])
 {

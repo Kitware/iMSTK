@@ -29,7 +29,7 @@ namespace imstk
 namespace CollisionUtils
 {
 ///
-/// \brief Do ranges [a,b] and [c,d] intersect?
+/// \brief Do ranges [\p a,\p b] and [\p c,\p d] intersect?
 ///
 inline bool
 isIntersect(const double a, const double b, const double c, const double d)

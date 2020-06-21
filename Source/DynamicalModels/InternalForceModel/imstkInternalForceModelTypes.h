@@ -23,6 +23,10 @@
 
 namespace imstk
 {
+///
+/// \enum class
+/// \brief Finite element material type
+///
 enum class FEMMethodType
 {
     StVK,

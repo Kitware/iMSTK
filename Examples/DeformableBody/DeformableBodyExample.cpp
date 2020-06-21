@@ -37,8 +37,13 @@
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkScene.h"
+#include <memory>
 
 using namespace imstk;
+
+std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> scene, std::shared_ptr<PointSet> tetMesh);
+
+const std::string meshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -55,49 +60,13 @@ main()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Load a tetrahedral mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto tetMesh = MeshIO::read(meshFileName);
 
     CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
 
-    // Extract the surface mesh
-    auto surfMesh   = std::make_shared<SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-
-    CHECK(volTetMesh != nullptr) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
-
-    // Construct one to one nodal map based on the above meshes
-    auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
-    // Configure dynamic model
-    auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-
-    auto config = std::make_shared<FEMModelConfig>();
-    config->m_fixedNodeIds = { 50, 126, 177 };
-    dynaModel->configure(config);
-    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
-
-    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
-    dynaModel->setModelGeometry(volTetMesh);
-    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
-    dynaModel->setTimeIntegrator(timeIntegrator);
-
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    material->setPointSize(6.);
-    material->setEdgeColor(Color::Marigold);
-    material->setLineWidth(4.);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
-
-    // Scene object 1: Dragon
-    auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
-    deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(volTetMesh);
-    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->setDynamicalModel(dynaModel);
-    scene->addSceneObject(deformableObj);
+    // Scene object 1: fe-FeDeformableObject
+    auto deformableObj = createAndAddFEDeformable(scene, tetMesh);
+    auto dynaModel     = std::dynamic_pointer_cast<FEMDeformableBodyModel>(deformableObj->getDynamicalModel());
 
     // Scene object 2: Plane
     auto planeGeom = std::make_shared<Plane>();
@@ -119,4 +88,48 @@ main()
     simManager->start(SimulationStatus::Paused);
 
     return 0;
+}
+
+std::shared_ptr<DynamicObject>
+createAndAddFEDeformable(std::shared_ptr<Scene>    scene,
+                         std::shared_ptr<PointSet> tetMesh)
+{
+    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
+    CHECK(volTetMesh != nullptr) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    volTetMesh->extractSurfaceMesh(surfMesh, true);
+
+    // Configure dynamic model
+    auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
+    auto config    = std::make_shared<FEMModelConfig>();
+    config->m_fixedNodeIds = { 50, 126, 177 };
+    dynaModel->configure(config);
+    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+
+    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
+    dynaModel->setModelGeometry(volTetMesh);
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setPointSize(6.);
+    material->setEdgeColor(Color::Marigold);
+    material->setLineWidth(4.);
+    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    surfMeshModel->setRenderMaterial(material);
+
+    // Scene object 1: Dragon
+    auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
+    deformableObj->addVisualModel(surfMeshModel);
+
+    deformableObj->setPhysicsGeometry(volTetMesh);
+
+    // Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->setDynamicalModel(dynaModel);
+    scene->addSceneObject(deformableObj);
+
+    return deformableObj;
 }

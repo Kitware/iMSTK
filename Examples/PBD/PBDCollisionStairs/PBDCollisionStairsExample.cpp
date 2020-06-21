@@ -38,7 +38,9 @@
 
 using namespace imstk;
 
-// Creates a non-manifold top part of a staircase
+///
+/// \brief Creates a non-manifold top part of a staircase
+//.
 static std::unique_ptr<SurfaceMesh>
 buildStairs(int nSteps, double width, double height, double depth)
 {

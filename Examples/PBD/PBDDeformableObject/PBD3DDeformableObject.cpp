@@ -33,8 +33,20 @@
 #include "imstkScene.h"
 
 #include <array>
+#include <string>
 
 using namespace imstk;
+
+///
+/// \brief Create a PbdObject and add it to a \p scene
+///
+std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                                                 const std::string&     surfMeshName,
+                                                 const std::string&     tetMeshName);
+
+// mesh file names
+const std::string& surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj";
+const std::string& tetMeshFileName  = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -47,8 +59,38 @@ main()
     auto scene      = simManager->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+    // create and add a PBD object
+    createAndAddPbdObject(scene, surfMeshFileName, tetMeshFileName);
+
+    // Setup plane
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->setWidth(40);
+    planeGeom->setTranslation(0, -6, 0);
+    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>("light");
+    light->setFocalPoint(Vec3d(5, -8, -5));
+    light->setIntensity(1);
+    scene->addLight(light);
+
+    simManager->setActiveScene(scene);
+    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+    simManager->start(SimulationStatus::Paused);
+
+    return 0;
+}
+
+std::shared_ptr<PbdObject>
+createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                      const std::string&     surfMeshName,
+                      const std::string&     tetMeshName)
+{
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(surfMeshName));
+    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
     //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
 
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
@@ -89,23 +131,5 @@ main()
 
     scene->addSceneObject(deformableObj);
 
-    // Setup plane
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(40);
-    planeGeom->setTranslation(0, -6, 0);
-    auto planeObj = std::make_shared<CollidingObject>("Plane");
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
-    scene->addSceneObject(planeObj);
-
-    // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    scene->addLight(light);
-
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::Paused);
-
-    return 0;
+    return deformableObj;
 }

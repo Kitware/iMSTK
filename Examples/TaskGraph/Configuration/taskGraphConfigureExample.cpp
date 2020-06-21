@@ -22,6 +22,7 @@
 #include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkScene.h"
@@ -33,7 +34,7 @@
 using namespace imstk;
 
 static std::unique_ptr<SurfaceMesh>
-makeCloth(
+makeClothGeometry(
     const double width, const double height, const int nRows, const int nCols)
 {
     // Create surface mesh
@@ -91,23 +92,17 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
 {
     auto clothObj = std::make_shared<PbdObject>(name);
 
-    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeCloth(width, height, nRows, nCols)));
+    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeClothGeometry(width, height, nRows, nCols)));
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PBDModelConfig>();
-    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
+    pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.05;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
-    std::vector<size_t> fixedNodes(nCols);
-    for (size_t i = 0; i < fixedNodes.size(); i++)
-    {
-        fixedNodes[i] = i;
-    }
-    pbdParams->m_fixedNodeIds = fixedNodes;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
@@ -166,7 +161,7 @@ main()
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 
-    // Adds a custom physics step to print out intermediate velocities
+    // Adds a custom physics step to print out maximum velocity
     {
         std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
         scene->setTaskGraphConfigureCallback([&](Scene* scene)
@@ -180,22 +175,28 @@ main()
             writer.setFileName("taskGraphConfigureExampleOld.svg");
             writer.write();
 
-            std::shared_ptr<TaskNode> printVelocities = std::make_shared<TaskNode>([&]()
+            std::shared_ptr<TaskNode> printMaxVelocity = std::make_shared<TaskNode>([&]()
             {
                 const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+                double maxVel = std::numeric_limits<double>::min();
                 for (size_t i = 0; i < velocities.size(); i++)
                 {
-                    printf("Velocity: %f, %f, %f\n", velocities[i].x(), velocities[i].y(), velocities[i].z());
+                    const double vel = velocities[i].squaredNorm();
+                    if (vel > maxVel)
+                    {
+                        maxVel = vel;
+                    }
                 }
-                    }, "PrintVelocities");
+                LOG(INFO) << "Max Velocity: " << std::sqrt(maxVel);
+            }, "PrintMaxVelocity");
 
             // After IntegratePosition
-            graph->insertAfter(pbdModel->getIntegratePositionNode(), printVelocities);
+            graph->insertAfter(pbdModel->getIntegratePositionNode(), printMaxVelocity);
 
             // Write the modified graph
             writer.setFileName("taskGraphConfigureExampleNew.svg");
             writer.write();
-            });
+        });
     }
 
     // Start

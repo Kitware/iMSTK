@@ -38,7 +38,7 @@ using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 ///
 /// \class VTKInteractorStyle
 ///
-/// \brief
+/// \brief TODO
 ///
 class VTKInteractorStyle : public vtkBaseInteractorStyle, public InteractorStyle
 {

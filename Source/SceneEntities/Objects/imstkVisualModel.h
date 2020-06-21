@@ -73,6 +73,9 @@ public:
     void hide();
     bool isVisible() const;
 
+    ///
+    /// \brief Return true if renderer delegate is created
+    ///
     bool isRenderDelegateCreated();
 
 protected:

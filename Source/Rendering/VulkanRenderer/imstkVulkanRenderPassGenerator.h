@@ -26,45 +26,56 @@
 
 namespace imstk
 {
+///
+/// \class VulkanRenderPassGenerator
+/// \brief TODO
+///
 class VulkanRenderPassGenerator
 {
 public:
+    /// \brief TODO
     static void generateDepthRenderPass(
         VkDevice&              device,
         VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
         const uint32_t         numViews);
 
+    /// \brief TODO
     static void generateOpaqueRenderPass(
         VkDevice&              device,
         VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
         const uint32_t         numViews);
 
+    /// \brief TODO
     static void generateDecalRenderPass(
         VkDevice&              device,
         VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
         const uint32_t         numViews);
 
+    /// \brief TODO
     static void generateParticleRenderPass(
         VkDevice&              device,
         VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
         const uint32_t         numViews);
 
+    /// \brief TODO
     static void generateShadowRenderPass(
         VkDevice&              device,
         VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
         const uint32_t         numViews);
 
+    /// \brief TODO
     static void generateGUIRenderPass(
         VkDevice&              device,
         VkRenderPass&          renderPass,
         VkSampleCountFlagBits& samples,
         const uint32_t         numViews);
 
+    /// \brief TODO
     static void generateRenderPassMultiviewCreateInfo(
         VkRenderPassMultiviewCreateInfo& multiviewInfo,
         const uint32_t&                  viewMask,

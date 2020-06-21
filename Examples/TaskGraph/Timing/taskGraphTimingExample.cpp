@@ -32,7 +32,126 @@ limitations under the License.
 using namespace imstk;
 
 ///
-/// \brief This examples uses the timing features of the task graph This allows one
+/// \brief Create pbd string geometry
+///
+static std::shared_ptr<LineMesh>
+makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringLength)
+{
+    // Create the geometry
+    std::shared_ptr<LineMesh> stringGeometry = std::make_shared<LineMesh>();
+
+    StdVectorOfVec3d vertList;
+    vertList.resize(numVerts);
+    const double vertexSpacing = stringLength / numVerts;
+    for (size_t j = 0; j < numVerts; j++)
+    {
+        vertList[j] = pos - Vec3d(0.0, static_cast<double>(j) * vertexSpacing, 0.0);
+    }
+    stringGeometry->setInitialVertexPositions(vertList);
+    stringGeometry->setVertexPositions(vertList);
+
+    // Add connectivity data
+    std::vector<LineMesh::LineArray> segments;
+    for (size_t j = 0; j < numVerts - 1; j++)
+    {
+        LineMesh::LineArray seg = { j, j + 1 };
+        segments.push_back(seg);
+    }
+
+    stringGeometry->setLinesVertices(segments);
+    return stringGeometry;
+}
+
+///
+/// \brief Create pbd string object
+///
+static std::shared_ptr<PbdObject>
+makePbdString(
+    const std::string& name,
+    const Vec3d&       pos,
+    const size_t       numVerts,
+    const double       stringLength,
+    const double       bendStiffness,
+    const Color&       color)
+{
+    std::shared_ptr<PbdObject> stringObj = std::make_shared<PbdObject>(name);
+
+    // Setup the Geometry
+    std::shared_ptr<LineMesh> stringMesh = makeStringGeometry(pos, numVerts, stringLength);
+
+    // Setup the Parameters
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e7);
+    pbdParams->enableConstraint(PbdConstraint::Type::Bend, bendStiffness);
+    pbdParams->m_fixedNodeIds     = { 0 };
+    pbdParams->m_uniformMassValue = 5.0;
+    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt  = 0.0005;
+    pbdParams->m_iterations = 5;
+
+    // Setup the Model
+    std::shared_ptr<PbdModel> pbdModel = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(stringMesh);
+    pbdModel->configure(pbdParams);
+
+    // Setup the VisualModel
+    std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
+    material->setBackFaceCulling(false);
+    material->setColor(color);
+    material->setLineWidth(2.0f);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+
+    std::shared_ptr<VisualModel> visualModel = std::make_shared<VisualModel>(stringMesh);
+    visualModel->setRenderMaterial(material);
+
+    // Setup the Object
+    stringObj->addVisualModel(visualModel);
+    stringObj->setPhysicsGeometry(stringMesh);
+    stringObj->setDynamicalModel(pbdModel);
+
+    return stringObj;
+}
+
+static std::vector<std::shared_ptr<PbdObject>>
+makePbdStrings(const size_t numStrings,
+               const size_t numVerts,
+               const double stringSpacing,
+               const double stringLength,
+               const Color& startColor,
+               const Color& endColor)
+{
+    std::vector<std::shared_ptr<PbdObject>> pbdStringObjs(numStrings);
+
+    const double size = stringSpacing * (numStrings - 1);
+
+    for (unsigned int i = 0; i < numStrings; i++)
+    {
+        const Vec3d  tipPos = Vec3d(static_cast<double>(i) * stringSpacing - size * 0.5, stringLength * 0.5, 0.0);
+        const double t      = static_cast<double>(i) / (numStrings - 1);
+
+        pbdStringObjs[i] = makePbdString(
+            "String " + std::to_string(i),
+            tipPos,
+            numVerts,
+            stringLength,
+            (static_cast<double>(i) * 0.1 / numStrings + 0.001) * 1e6,
+            Color::lerpRgb(startColor, endColor, t));
+    }
+
+    return pbdStringObjs;
+}
+
+const double dt            = 0.0005;
+const double radius        = 1.5;
+const size_t numStrings    = 8;                    // Number of strings
+const size_t numVerts      = 30;                   // Number of vertices on each string
+const double stringSpacing = 2.0;                  // How far each string is apart
+const double stringLength  = 10.0;                 // Total length of string
+const Color  startColor    = Color(1.0, 0.0, 0.0); // Color of first string
+const Color  endColor      = Color(0.0, 1.0, 0.0); // Color of last string
+
+///
+/// \brief This examples uses the timing features of the task graph. This allows one
 /// to see the elapsed time of every step of iMSTK as well as export the computational
 /// graph and show information such as the critical path
 ///
@@ -43,80 +162,12 @@ main()
     auto scene      = simManager->createNewScene("PBDString");
     scene->getConfig()->taskTimingEnabled = true;
 
-    // Setup N separate string simulations with varying bend stiffnesses
-    const unsigned int numStrings    = 8;
-    const unsigned int numVerts      = 30;
-    const double       stringSpacing = 2.0;          // How far each string is apart
-    const double       stringLength  = 10.0;         // Total length of string
-    const Color        startColor    = Color::Red;   // Color of first string
-    const Color        endColor      = Color::Green; // Color of last string
-
-    struct PbdSim
+    // Setup N separate strings with varying bend stiffnesses
+    std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
+        makePbdStrings(numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
+    for (std::shared_ptr<PbdObject> obj : pbdStringObjs)
     {
-        std::shared_ptr<LineMesh> geometry;
-        std::shared_ptr<PbdObject> object;
-        std::shared_ptr<PbdModel> model;
-        std::shared_ptr<PBDModelConfig> params;
-        std::shared_ptr<VisualModel> visualModel;
-    };
-    std::vector<PbdSim> sims(numStrings);
-
-    const double size = stringSpacing * (numStrings - 1);
-    const double vertexSpacing = stringLength / numVerts;
-    for (unsigned int i = 0; i < numStrings; i++)
-    {
-        // Setup the line mesh
-        sims[i].geometry = std::make_shared<LineMesh>();
-        StdVectorOfVec3d vertList;
-        vertList.resize(numVerts);
-        for (size_t j = 0; j < numVerts; j++)
-        {
-            vertList[j] = Vec3d(
-                static_cast<double>(i) * stringSpacing - size * 0.5,
-                stringLength * 0.5 - static_cast<double>(j) * vertexSpacing, 0.0);
-        }
-        sims[i].geometry->setInitialVertexPositions(vertList);
-        sims[i].geometry->setVertexPositions(vertList);
-
-        // Add connectivity data
-        std::vector<LineMesh::LineArray> segments;
-        for (size_t j = 0; j < numVerts - 1; j++)
-        {
-            LineMesh::LineArray seg = { j, j + 1 };
-            segments.push_back(seg);
-        }
-
-        sims[i].geometry->setLinesVertices(segments);
-
-        sims[i].object = std::make_shared<PbdObject>("String " + std::to_string(i));
-        sims[i].model  = std::make_shared<PbdModel>();
-        sims[i].model->setModelGeometry(sims[i].geometry);
-
-        // Configure the parameters with bend stiffnesses varying from 0.001 to ~0.1
-        sims[i].params = std::make_shared<PBDModelConfig>();
-        sims[i].params->enableConstraint(PbdConstraint::Type::Distance, 0.001);
-        sims[i].params->enableConstraint(PbdConstraint::Type::Bend, static_cast<double>(i) * 0.1 / numStrings + 0.001);
-        sims[i].params->m_fixedNodeIds     = { 0 };
-        sims[i].params->m_uniformMassValue = 5.0;
-        sims[i].params->m_gravity    = Vec3d(0, -9.8, 0);
-        sims[i].params->m_defaultDt  = 0.0005;
-        sims[i].params->m_iterations = 5;
-
-        // Set the parameters
-        sims[i].model->configure(sims[i].params);
-        sims[i].object->setDynamicalModel(sims[i].model);
-        sims[i].object->setPhysicsGeometry(sims[i].geometry);
-
-        sims[i].visualModel = std::make_shared<VisualModel>(sims[i].geometry);
-        std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
-        material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-        material->setColor(Color::lerpRgb(startColor, endColor, static_cast<double>(i) / (numStrings - 1)));
-        material->setLineWidth(2.0f);
-        sims[i].visualModel->setRenderMaterial(material);
-        sims[i].object->addVisualModel(sims[i].visualModel);
-
-        // Add in scene
-        scene->addSceneObject(sims[i].object);
+        scene->addSceneObject(obj);
     }
 
     // Adjust the camera
@@ -124,20 +175,21 @@ main()
     scene->getCamera()->setPosition(0.0, 0.0, 15.0);
 
     // Move the points every frame
-    double       t          = 0.0;
-    const double dt         = 0.0005;
-    const double radius     = 1.5;
-    auto         movePoints =
-        [&sims, &t, dt, radius](Module* module)
+    double t = 0.0;
+
+    auto movePoints =
+        [&pbdStringObjs, &t](Module* module)
         {
-            for (unsigned int i = 0; i < sims.size(); i++)
+            for (unsigned int i = 0; i < pbdStringObjs.size(); i++)
             {
-                Vec3d pos = sims[i].model->getCurrentState()->getVertexPosition(0);
+                std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
+                const Vec3d               pos   = model->getCurrentState()->getVertexPosition(0);
                 // Move in circle, derivatives of parametric eq of circle
-                sims[i].model->getCurrentState()->setVertexPosition(0, imstk::Vec3d(
+                const Vec3d newPos = Vec3d(
                 pos.x() + -std::sin(t) * radius * dt,
                 pos.y(),
-                pos.z() + std::cos(t) * radius * dt));
+                pos.z() + std::cos(t) * radius * dt);
+                model->getCurrentState()->setVertexPosition(0, newPos);
             }
             t += dt;
         };

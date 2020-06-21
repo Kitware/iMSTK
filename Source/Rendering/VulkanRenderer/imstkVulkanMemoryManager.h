@@ -31,11 +31,19 @@
 
 namespace imstk
 {
+///
+/// \class VulkanMemoryManager
+/// \brief TODO
+///
 class VulkanMemoryManager
 {
 public:
     VulkanMemoryManager();
+
+    /// \brief TODO
     void setup(VkPhysicalDevice* device);
+
+    /// \brief TODO
     void clear();
 
     ///

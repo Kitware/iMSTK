@@ -83,10 +83,19 @@ public:
     ///
     void end();
 
+    ///
+    /// \brief Set callback function for initialization
+    ///
     inline void setPreInitCallback(CallbackFunction foo) { m_preInitCallback = foo; }
     inline void setPostInitCallback(CallbackFunction foo) { m_postInitCallback = foo; }
+    ///
+    /// \brief Set callback function for update
+    ///
     inline void setPreUpdateCallback(CallbackFunction foo) { m_preUpdateCallback = foo; }
     inline void setPostUpdateCallback(CallbackFunction foo) { m_postUpdateCallback = foo; }
+    ///
+    /// \brief Set callback function for cleanup
+    ///
     inline void setPreCleanUpCallback(CallbackFunction foo) { m_preCleanUpCallback = foo; }
     inline void setPostCleanUpCallback(CallbackFunction foo) { m_postCleanUpCallback = foo; }
 
@@ -120,8 +129,16 @@ public:
     ///
     void setFrequency(const double f);
 
+    ///
+    /// \brief Enable frame count
+    ///
     void enableFrameCount() { m_trackFPS = true; };
+    ///
+    /// \brief Disable frame count
+    ///
     void disableFrameCount() { m_trackFPS = false; };
+
+    /// \return true is frame count is already enabled
     bool isFrameCountEnabled() const { return m_trackFPS; };
 
     unsigned int getUPS();
