@@ -93,40 +93,38 @@ main()
 
     // Position camera
     auto cam = scene->getCamera();
-    cam->setPosition(0, 0.25, 1);
+    cam->setPosition(0, 0.25, 0.6);
     cam->setFocalPoint(0, 0.25, 0);
 
     // Lights
     auto directionalLight = std::make_shared<DirectionalLight>("DirectionalLight");
-    directionalLight->setIntensity(1);
+    directionalLight->setIntensity(4);
     directionalLight->setColor(Color(1.0, 0.95, 0.8));
     directionalLight->setCastsShadow(true);
     directionalLight->setShadowRange(1.5);
     scene->addLight(directionalLight);
 
-    /* auto pointLight = std::make_shared<PointLight>("PointLight");
-     pointLight->setIntensity(0.1);
-     pointLight->setPosition(0.1, 0.2, 0.5);
-     scene->addLight(pointLight);*/
+    auto pointLight = std::make_shared<PointLight>("PointLight");
+    pointLight->setIntensity(0.1);
+    pointLight->setPosition(0.1, 0.2, 0.5);
+    scene->addLight(pointLight);
 
+#ifdef iMSTK_USE_Vulkan
     // Sphere
     auto sphereObj      = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
     auto sphereMaterial = std::make_shared<RenderMaterial>();
     auto sphereMesh     = sphereObj->getVisualGeometry();
     sphereMesh->translate(0.1, 0.2, 0.5);
-    sphereMaterial->setEmissivity(1);
+    sphereMaterial->setEmissivity(2);
     sphereMaterial->setCastsShadows(false);
     sphereObj->getVisualModel(0)->setRenderMaterial(sphereMaterial);
+#endif
 
     // Plane
     auto planeObj      = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
     auto planeMaterial = std::make_shared<RenderMaterial>();
-    planeMaterial->setColor(Color::DarkGray);
+    planeMaterial->setColor(Color::LightGray);
     planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);
-
-    // Run
-    simManager->setActiveScene(scene);
-    //simManager->getViewer()->setBackgroundColors(Vec3d(0, 0, 0));
 
 #ifdef iMSTK_USE_Vulkan
     auto viewer = std::dynamic_pointer_cast<VulkanViewer>(simManager->getViewer());
@@ -135,6 +133,8 @@ main()
     //viewer->enableFullscreen();
 #endif
 
+    // Run
+    simManager->setActiveScene(scene);
     simManager->start(SimulationStatus::Paused);
 
     return 0;
