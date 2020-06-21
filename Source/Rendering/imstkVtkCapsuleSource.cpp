@@ -20,7 +20,7 @@
 =========================================================================*/
 // \author Johan Andruejol <johan.andruejol@kitware.com>
 
-//#if (VTK_MAJOR_VERSION <= 8)
+#if(VTK_MAJOR_VERSION < 9)
 
 #include "vtkCapsuleSource.h"
 
@@ -433,4 +433,4 @@ vtkCapsuleSource::RequestInformation(
 
 #pragma warning(pop)
 
-//#endif
+#endif
