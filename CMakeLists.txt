@@ -358,7 +358,7 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   # Add shaders
   #-----------------------------------------------------------------------------
   include(imstkCopyAndCompileShaders)
-  CopyAndCompileShaders()
+  CopyAndCompileShaders() 
 endif()
 
 # Folder name to put our headers/cmake config files under

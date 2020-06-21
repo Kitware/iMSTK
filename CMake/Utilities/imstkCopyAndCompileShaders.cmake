@@ -49,8 +49,6 @@ function(CopyAndCompileShaders)
 
     install(DIRECTORY ${PROJECT_BINARY_DIR}/Shaders/VulkanShaders
       DESTINATION ${CMAKE_INSTALL_PREFIX}/data/shaders)
-  else()
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/Source/Rendering/VTKRenderer/VTKShaders
-            DESTINATION ${CMAKE_INSTALL_PREFIX}/data/shaders)
+  
   endif()
 endfunction()
