@@ -59,7 +59,7 @@ main()
 
     // set up visual model based on high res mesh
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setLineWidth(0.5);
     material->setEdgeColor(Color::Blue);
     material->setShadingModel(RenderMaterial::ShadingModel::Flat);
