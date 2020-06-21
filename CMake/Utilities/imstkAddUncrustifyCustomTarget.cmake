@@ -1,5 +1,5 @@
 # Add target to run uncrustify
-  add_custom_target(CodeFormatter
+  add_custom_target(CodeFormatEnforcer
     COMMAND ${Uncrustify_EXECUTABLE}
       -c ${CMAKE_CURRENT_LIST_DIR}/../../Utilities/Uncrustify/iMSTKUncrustify.cfg
       -F ${CMAKE_CURRENT_BINARY_DIR}/Uncrustify.list
