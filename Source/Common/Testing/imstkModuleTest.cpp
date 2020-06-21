@@ -139,7 +139,7 @@ TEST_F(imstkModuleTest, ControlModule)
     ASSERT_TRUE(m_module.m_cleanup);
 
     auto t = std::thread([this] { m_module.start(); });
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Running);
     ASSERT_TRUE(m_module.m_init);
     ASSERT_TRUE(m_module.m_run);
@@ -147,19 +147,19 @@ TEST_F(imstkModuleTest, ControlModule)
     m_module.pause();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Paused);
     m_module.m_run = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_FALSE(m_module.m_run);
 
     m_module.run();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Running);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_TRUE(m_module.m_run);
 
     m_module.end();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Inactive);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_TRUE(m_module.m_run);
     ASSERT_TRUE(m_module.m_cleanup);
@@ -168,7 +168,7 @@ TEST_F(imstkModuleTest, ControlModule)
     m_module.m_init = m_module.m_run = m_module.m_cleanup = false;
 
     t = std::thread([this] { m_module.start(); });
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Running);
     ASSERT_TRUE(m_module.m_init);
     ASSERT_TRUE(m_module.m_run);
@@ -177,14 +177,14 @@ TEST_F(imstkModuleTest, ControlModule)
     m_module.pause();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Paused);
     m_module.m_run = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_FALSE(m_module.m_run);
     ASSERT_FALSE(m_module.m_cleanup);
 
     m_module.end();
     ASSERT_EQ(m_module.getStatus(), ModuleStatus::Inactive);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
     ASSERT_TRUE(m_module.m_init);
     ASSERT_FALSE(m_module.m_run);
     ASSERT_TRUE(m_module.m_cleanup);
