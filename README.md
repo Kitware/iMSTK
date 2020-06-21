@@ -22,12 +22,8 @@
 - [CeMSIM-Rensselaer Polytechnic Institute](http://cemsim.rpi.edu/)
 - [University of Central Arkansas](http://sun0.cs.uca.edu/~thalic/virasim.html)
 
-Funding support:
-- [NIH-OD] SBIR award [9R44OD018334](https://www.sbir.gov/sbirsearch/detail/1032259)
-- [NIH-NIBIB] SBIR award [1R44EB019802](https://www.sbir.gov/sbirsearch/detail/1047037)
-- [NIH-NIAMS] SBIR award [1R44AR075481](https://projectreporter.nih.gov/project_info_details.cfm?aid=9777225&icde=50531419) 
-- [NIH-NIBIB] R01 award [1R01EB025247](https://projectreporter.nih.gov/project_info_details.cfm?aid=9738646&icde=50531433)
-- [NIH-NIDDK] SBIR award [2R44DK115332](https://projectreporter.nih.gov/project_info_details.cfm?aid=9843084&icde=50531443)
+####Funding support:
+This project is supported in part by the following grants [9R44OD018334](https://www.sbir.gov/sbirsearch/detail/1032259), [1R44EB019802](https://www.sbir.gov/sbirsearch/detail/1047037), [1R44AR075481](https://projectreporter.nih.gov/project_info_details.cfm?aid=9777225&icde=50531419) , [1R01EB025247](https://projectreporter.nih.gov/project_info_details.cfm?aid=9738646&icde=50531433), [2R44DK115332](https://projectreporter.nih.gov/project_info_details.cfm?aid=9843084&icde=50531443)
 
 Disclaimer: The content is solely the responsibility of the authors and does not necessarily represent the official views of the NIH and its institutes.
 
