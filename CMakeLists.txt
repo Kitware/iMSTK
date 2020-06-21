@@ -355,10 +355,12 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
   #-----------------------------------------------------------------------------
-  # Add shaders
+  # Add shaders (vulkan only)
   #-----------------------------------------------------------------------------
-  include(imstkCopyAndCompileShaders)
-  CopyAndCompileShaders() 
+  if(${PROJECT_NAME}_USE_Vulkan)    
+      include(imstkCopyAndCompileShaders)
+      CopyAndCompileShaders() 
+  endif()
 endif()
 
 # Folder name to put our headers/cmake config files under
