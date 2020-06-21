@@ -9,7 +9,7 @@ if(${${PROJECT_NAME}_ENABLE_VR})
 endif()
 
 
-set(${PROJECT_NAME}_VTK_REPO_SOURCE "8.2" CACHE STRING "Select VTK Source Branch/Tag")
+set(${PROJECT_NAME}_VTK_REPO_SOURCE "9.0" CACHE STRING "Select VTK Source Branch/Tag")
 set(VTK_SOURCES "8.2;8.9;9.0;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
 set_property(CACHE ${PROJECT_NAME}_VTK_REPO_SOURCE PROPERTY STRINGS ${VTK_SOURCES})
 
