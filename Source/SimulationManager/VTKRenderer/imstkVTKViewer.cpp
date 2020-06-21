@@ -56,7 +56,7 @@ VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*=
         // Render window
         m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
         m_vtkRenderWindow->SetInteractor(vtkInteractor);
-        m_vtkRenderWindow->SetSize(1000, 800);
+        m_vtkRenderWindow->SetSize(m_config->m_renderWinWidth, m_config->m_renderWinHeight);
 
         // Screen capture
         m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
@@ -154,19 +154,23 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     {
         return;
     }
+
     // Setup render window
-    if (mode == Renderer::Mode::Simulation)
+    //std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->HighlightProp(nullptr);
+
+    if (m_config->m_hideCurzor)
     {
-        std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->HighlightProp(nullptr);
         m_vtkRenderWindow->HideCursor();
-        //m_vtkRenderWindow->BordersOff();
-        //m_vtkRenderWindow->FullScreenOn(1);
     }
-    else
+
+    if (m_config->m_hideBorder)
     {
-        m_vtkRenderWindow->ShowCursor();
-        //m_vtkRenderWindow->BordersOn();
-        //m_vtkRenderWindow->FullScreenOff(1);
+        m_vtkRenderWindow->BordersOff();
+    }
+
+    if (m_config->m_fullScreen)
+    {
+        m_vtkRenderWindow->FullScreenOn();
     }
 }
 
@@ -194,7 +198,7 @@ VTKViewer::startRenderingLoop()
             m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
         }
 
-        m_vtkRenderWindow->SetWindowName(m_windowName.c_str());
+        m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());
         m_vtkRenderWindow->GetInteractor()->Start();
         m_vtkRenderWindow->GetInteractor()->DestroyTimer();
     }
@@ -237,7 +241,7 @@ VTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d:
 void
 VTKViewer::setWindowTitle(const std::string& title)
 {
-    m_windowName = title;
+    m_config->m_windowName = title;
     if (m_vtkRenderWindow)
     {
         m_vtkRenderWindow->SetWindowName(title.c_str());

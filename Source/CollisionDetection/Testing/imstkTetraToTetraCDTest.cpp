@@ -123,7 +123,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 ///
 /// \brief TODO
 ///
-TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
+TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
     auto                             b = duplicate(a);
@@ -167,7 +167,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
 ///
 /// \brief TODO
 ///
-TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
+TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionOfDifferentMeshes)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
     std::shared_ptr<TetrahedralMesh> b = loadMesh("/human/human.veg");

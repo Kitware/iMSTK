@@ -43,8 +43,7 @@ main()
     auto scene      = simManager->createNewScene("LineMeshRenderingTest");
 
     // Construct line mesh
-    auto lineMesh = createLineMesh(resolution, resolution, resolution);
-
+    auto lineMesh  = createLineMesh(resolution, resolution, resolution);
     auto lineModel = std::make_shared<VisualModel>(lineMesh);
     auto lineMeshMaterial = std::make_shared<RenderMaterial>();
     lineMeshMaterial->setLineWidth(3);

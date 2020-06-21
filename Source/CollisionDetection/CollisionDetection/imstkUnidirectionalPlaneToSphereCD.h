@@ -30,7 +30,7 @@ class Sphere;
 struct CollisionData;
 
 ///
-/// \class PlaneToSphereCD
+/// \class UnidirectionalPlaneToSphereCD
 ///
 /// \brief Plane to sphere collision detection
 ///

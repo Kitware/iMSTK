@@ -168,6 +168,7 @@ public:
 
 protected:
     friend class VTKPointSetRenderDelegate;
+    friend class VTKFluidRenderDelegate;
 
     ///
     /// \brief Get vertices positions

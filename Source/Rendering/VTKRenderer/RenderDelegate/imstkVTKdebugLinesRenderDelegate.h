@@ -31,9 +31,10 @@ class vtkCellArray;
 namespace imstk
 {
 ///
-/// \class LinesRenderDelegate
+/// \class VTKdbgLinesRenderDelegate
 ///
-/// \brief Renders a list of disjoint line segments
+/// \brief Render delegate for a set of disjoint lines whose size could change
+///  more frequently which is typically he case for rendering arbitrary set of lines
 ///
 class VTKdbgLinesRenderDelegate : public VTKRenderDelegate
 {

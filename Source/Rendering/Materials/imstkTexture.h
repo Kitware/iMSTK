@@ -50,6 +50,8 @@ public:
         IrradianceCubeMap,
         RadianceCubeMap,
         BRDF_LUT,
+        Emissive,
+        ORM,
         None
     };
 

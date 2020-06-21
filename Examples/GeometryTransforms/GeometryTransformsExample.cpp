@@ -55,8 +55,16 @@ main()
     planeGeom->translate(0, -20, 0, Geometry::TransformType::ConcatenateToTransform);
     planeGeom->rotate(Vec3d(0, 1., 0), PI / 4, Geometry::TransformType::ConcatenateToTransform);
 
+    auto materialPlane = std::make_shared<RenderMaterial>();
+    materialPlane->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    materialPlane->setPointSize(6.);
+    materialPlane->setLineWidth(4.);
+    auto planeVizModel = std::make_shared<VisualModel>(planeGeom);
+    planeVizModel->setRenderMaterial(materialPlane);
+
     auto planeObj = std::make_shared<VisualObject>("Plane");
-    planeObj->setVisualGeometry(planeGeom);
+    //planeObj->setVisualGeometry(planeGeom);
+    planeObj->addVisualModel(planeVizModel);
     scene->addSceneObject(planeObj);
 
     //  Cube
@@ -65,8 +73,17 @@ main()
     cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
     cubeGeom->rotate(Vec3d(1., 1., 0), PI / 4, Geometry::TransformType::ApplyToData);
 
+    auto materialCube = std::make_shared<RenderMaterial>();
+    materialCube->setColor(imstk::Color::Red);
+    materialCube->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    materialCube->setPointSize(6.);
+    materialCube->setLineWidth(4.);
+    auto cubeVizModel = std::make_shared<VisualModel>(cubeGeom);
+    cubeVizModel->setRenderMaterial(materialCube);
+
     auto cubeObj = std::make_shared<VisualObject>("Cube");
-    cubeObj->setVisualGeometry(cubeGeom);
+    //cubeObj->setVisualGeometry(cubeGeom);
+    cubeObj->addVisualModel(cubeVizModel);
     scene->addSceneObject(cubeObj);
 
     //  Cylinder
@@ -76,8 +93,17 @@ main()
     CylinderGeom->scale(0.4, Geometry::TransformType::ConcatenateToTransform);
     CylinderGeom->rotate(Vec3d(1., 1., 0), PI / 2, Geometry::TransformType::ApplyToData);
 
+    auto materialCyl = std::make_shared<RenderMaterial>();
+    materialCyl->setColor(imstk::Color::Red);
+    materialCyl->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    materialCyl->setPointSize(6.);
+    materialCyl->setLineWidth(4.);
+    auto cylVizModel = std::make_shared<VisualModel>(CylinderGeom);
+    cylVizModel->setRenderMaterial(materialCube);
+
     auto CylinderObj = std::make_shared<VisualObject>("Cylinder");
-    CylinderObj->setVisualGeometry(CylinderGeom);
+    //CylinderObj->setVisualGeometry(CylinderGeom);
+    CylinderObj->addVisualModel(cylVizModel);
     scene->addSceneObject(CylinderObj);
 
     // Rotate the dragon every frame

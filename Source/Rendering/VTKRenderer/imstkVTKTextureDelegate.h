@@ -32,7 +32,7 @@ namespace imstk
 class VTKTextureDelegate;
 
 ///
-/// \class VTKTexture
+/// \class VTKTextureDelegate
 ///
 /// \brief VTK texture implementation.
 ///

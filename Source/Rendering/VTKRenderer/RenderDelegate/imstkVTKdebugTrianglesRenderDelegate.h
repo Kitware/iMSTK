@@ -24,15 +24,17 @@
 #include "imstkVTKRenderDelegate.h"
 
 class vtkDoubleArray;
+class vtkCellArray;
 
 namespace imstk
 {
 class SurfaceMesh;
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class VTKdbgTrianglesRenderDelegate
 ///
-/// \brief
+/// \brief Render delegate for a set of disjoint triangles whose size could change
+///  more frequently which is typically he case for rendering arbitrary set of triangles
 ///
 class VTKdbgTrianglesRenderDelegate : public VTKRenderDelegate
 {
@@ -50,7 +52,7 @@ public:
 protected:
 
     // Auxiliary variables for rendering
-    vtkSmartPointer<vtkDoubleArray> m_pappedVertexArray;
+    vtkSmartPointer<vtkDoubleArray> m_paddedVertexArray;
     vtkSmartPointer<vtkPoints>      m_points;
     vtkSmartPointer<vtkCellArray>   m_cellArray;
     vtkSmartPointer<vtkPolyData>    m_polyData;

@@ -272,6 +272,7 @@ Geometry::isMesh() const
             || this->m_type == Type::SurfaceMesh
             || this->m_type == Type::TetrahedralMesh
             || this->m_type == Type::LineMesh
+            || this->m_type == Type::PointSet
             ) ? true : false;
 }
 

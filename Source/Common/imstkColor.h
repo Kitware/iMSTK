@@ -120,6 +120,8 @@ struct Color
     static Color Pink;
     static Color Orange;
     static Color Yellow;
+    static Color Teal;
+    static Color Marigold;
 };
 #pragma warning(default : 4201)
 

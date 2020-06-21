@@ -60,7 +60,7 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::WireframeSurface);
+    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
     renderModel->setRenderMaterial(mat);
@@ -97,7 +97,7 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::WireframeSurface);
+    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);
     renderModel->setRenderMaterial(mat);

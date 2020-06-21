@@ -45,7 +45,7 @@ VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
 }
 
 void

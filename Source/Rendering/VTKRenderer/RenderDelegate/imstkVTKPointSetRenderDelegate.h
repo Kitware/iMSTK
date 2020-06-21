@@ -30,7 +30,7 @@ namespace imstk
 class PointSet;
 
 ///
-/// \class PointSetRenderDelegate
+/// \class VTKPointSetRenderDelegate
 ///
 /// \brief Render delegate for point set. A 3D glyph of spheres is
 /// created to render each node

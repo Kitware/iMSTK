@@ -42,7 +42,9 @@ VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> vi
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
+
+    m_isMesh = false;
 }
 
 void

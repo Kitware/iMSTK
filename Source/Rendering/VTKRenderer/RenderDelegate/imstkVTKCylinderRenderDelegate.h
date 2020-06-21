@@ -29,9 +29,9 @@ class vtkCylinderSource;
 namespace imstk
 {
 ///
-/// \class CylinderRenderDelegate
+/// \class VTKCylinderRenderDelegate
 ///
-/// \brief Cylinder render delegate
+/// \brief Cylinder object render delegate with VTK backend
 ///
 class VTKCylinderRenderDelegate : public VTKRenderDelegate
 {

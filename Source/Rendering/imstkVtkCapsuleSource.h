@@ -31,6 +31,8 @@
 
 // \author Johan Andruejol <johan.andruejol@kitware.com>
 
+#if (VTK_MAJOR_VERSION < 9)
+
 #pragma once
 
 // VTK includes
@@ -107,3 +109,5 @@ private:
     vtkCapsuleSource(const vtkCapsuleSource&); // Not implemented.
     void operator=(const vtkCapsuleSource&);   // Not implemented.
 };
+
+#endif

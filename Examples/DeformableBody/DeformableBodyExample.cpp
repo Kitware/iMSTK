@@ -112,7 +112,10 @@ createAndAddFEDeformable(std::shared_ptr<Scene>    scene,
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setPointSize(6.);
+    material->setEdgeColor(Color::Marigold);
+    material->setLineWidth(4.);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 

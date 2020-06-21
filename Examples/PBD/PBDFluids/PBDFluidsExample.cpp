@@ -120,8 +120,9 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     auto fluidVisualModel = std::make_shared<VisualModel>(fluidMesh);
 
     auto material1 = std::make_shared<RenderMaterial>();
-    material1->setColor(Color::Blue);
-    material1->setSphereGlyphSize(.15);
+    material1->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
+    material1->setVertexColor(Color::Red);
+    material1->setPointSize(12.);
     fluidVisualModel->setRenderMaterial(material1);
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");

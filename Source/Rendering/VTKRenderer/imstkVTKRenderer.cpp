@@ -164,7 +164,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
     }
 #endif
     this->updateSceneCamera(scene->getCamera());
-    auto camActor = vtkSmartPointer<vtkCameraActor>::New();
+    vtkNew<vtkCameraActor> camActor;
     camActor->SetCamera(m_sceneVtkCamera);
     m_debugVtkActors.push_back(camActor);
 
@@ -186,11 +186,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
     ///TODO : based on scene properties
     // Customize background colors
 
-    //m_vtkRenderer->SetBackground(0.66,0.66,0.66);
-    //m_vtkRenderer->SetBackground2(0.406, 0.481, 0.497);
-
-    m_vtkRenderer->SetBackground(0.3285, 0.3285, 0.6525);
-    m_vtkRenderer->SetBackground2(0.13836, 0.13836, 0.274);
+    m_vtkRenderer->SetBackground(m_config->m_BGColor1.r, m_config->m_BGColor1.g, m_config->m_BGColor1.b);
+    m_vtkRenderer->SetBackground2(m_config->m_BGColor2.r, m_config->m_BGColor2.g, m_config->m_BGColor2.b);
 
     m_vtkRenderer->GradientBackgroundOn();
 
@@ -397,10 +394,17 @@ VTKRenderer::setAxesLength(const double x, const double y, const double z)
     m_AxesActor->SetTotalLength(x, y, z);
 }
 
-double*
+void
+VTKRenderer::setAxesLength(const Vec3d& len)
+{
+    m_AxesActor->SetTotalLength(len.x(), len.y(), len.z());
+}
+
+Vec3d
 VTKRenderer::getAxesLength()
 {
-    return m_AxesActor->GetTotalLength();
+    const auto ptr = m_AxesActor->GetTotalLength();
+    return Vec3d(ptr[0], ptr[1], ptr[2]);
 }
 
 void
@@ -490,9 +494,9 @@ void
 VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
 {
     // Get imstk Camera info
-    auto p = imstkCam->getPosition();
-    auto f = imstkCam->getFocalPoint();
-    auto v = imstkCam->getViewUp();
+    const auto p = imstkCam->getPosition();
+    const auto f = imstkCam->getFocalPoint();
+    const auto v = imstkCam->getViewUp();
 
     // Update vtk Camera
     m_sceneVtkCamera->SetPosition(p[0], p[1], p[2]);
@@ -523,6 +527,9 @@ VTKRenderer::updateRenderDelegates()
                 m_renderDelegates.push_back(delegate);
                 m_objectVtkActors.push_back(delegate->getVtkActor());
                 m_vtkRenderer->AddActor(delegate->getVtkActor());
+
+                //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
+
                 visualModel->m_renderDelegateCreated = true;
             }
         }

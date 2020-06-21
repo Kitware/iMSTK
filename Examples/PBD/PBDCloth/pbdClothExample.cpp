@@ -122,7 +122,6 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     // Setup the VisualModel
     auto material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(Color::LightGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
     auto clothVisualModel = std::make_shared<VisualModel>(clothMesh);
@@ -152,7 +151,7 @@ main()
     // Light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
+    whiteLight->setIntensity(1.);
     scene->addLight(whiteLight);
 
     // Light (red)

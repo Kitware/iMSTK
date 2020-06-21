@@ -55,7 +55,7 @@ class VTKRenderDelegate;
 //class TextureManager;
 
 ///
-/// \class Renderer
+/// \class VTKRenderer
 ///
 /// \brief
 ///
@@ -82,11 +82,12 @@ public:
     /// \brief Change the debug axes length
     ///
     void setAxesLength(const double x, const double y, const double z);
+    void setAxesLength(const Vec3d& len);
 
     ///
     /// \brief Get the debug axes length
     ///
-    double* getAxesLength();
+    Vec3d getAxesLength();
 
     ///
     /// \brief Change the visibility of the debug axes
@@ -151,16 +152,24 @@ protected:
 
 protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
-    vtkSmartPointer<vtkCamera>   m_defaultVtkCamera;
-    vtkSmartPointer<vtkCamera>   m_sceneVtkCamera;
+
+    // cameras
+    vtkSmartPointer<vtkCamera> m_defaultVtkCamera;
+    vtkSmartPointer<vtkCamera> m_sceneVtkCamera;
+
+    // lights
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
-    std::vector<vtkSmartPointer<vtkProp>>  m_objectVtkActors;
-    std::vector<vtkSmartPointer<vtkProp>>  m_debugVtkActors;
+
+    // Props to be rendered
+    std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
+    std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
     vtkSmartPointer<vtkAxesActor> m_AxesActor;
 
+    // Render delegates for the props
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
 
+    // imstk scene
     std::shared_ptr<Scene> m_scene;
 
     TextureManager<VTKTextureDelegate> m_textureManager;
