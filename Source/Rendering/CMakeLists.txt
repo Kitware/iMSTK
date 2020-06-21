@@ -121,11 +121,11 @@ imstk_add_library( Rendering
   H_FILES
     imstkRenderer.h
     ${RENDERING_H_FILES}
-    vtkCapsuleSource.h
+    imstkVtkCapsuleSource.h
   CPP_FILES
     imstkRenderer.cpp
     ${RENDERING_CPP_FILES}
-    vtkCapsuleSource.cpp
+    imstkVtkCapsuleSource.cpp
   SUBDIR_LIST
     ${RENDERING_SUBDIR}
   DEPENDS

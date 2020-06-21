@@ -39,12 +39,14 @@
 #include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkVersion.h>
+#include <vtkPolyDataTangents.h>
 
 namespace imstk
 {
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedTangentArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -131,7 +133,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
                                      (float)tangent[2] };
             tangents->InsertNextTuple(tempTangent);
         }
-        polydata->GetPointData()->AddArray(tangents);
+        polydata->GetPointData()->SetTangents(tangents);
     }
 
     // Update Transform, Render Properties

@@ -527,6 +527,9 @@ VTKRenderer::updateRenderDelegates()
                 m_renderDelegates.push_back(delegate);
                 m_objectVtkActors.push_back(delegate->getVtkActor());
                 m_vtkRenderer->AddActor(delegate->getVtkActor());
+
+                //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
+
                 visualModel->m_renderDelegateCreated = true;
             }
         }

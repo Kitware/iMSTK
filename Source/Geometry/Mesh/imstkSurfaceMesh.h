@@ -217,6 +217,7 @@ protected:
     /// \brief Get vertex normals
     ///
     StdVectorOfVec3d& getVertexNormalsNotConst();
+    StdVectorOfVec3d& getVertexTangentsNotConst();
 
     std::vector<TriangleArray> m_trianglesVertices;       ///> Triangle connectivity
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices

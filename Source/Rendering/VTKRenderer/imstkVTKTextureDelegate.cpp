@@ -96,6 +96,11 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
         m_sourceTexture->RepeatOff();
         m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
 
+        if (texture->getType() == Texture::Type::Diffuse)
+        {
+            m_sourceTexture->SetUseSRGBColorSpace(true);
+        }
+
         /*vtkNew<vtkPNGReader> normalReader;
         normalReader->SetFileName(tFileName.c_str());
         normalReader->Update();

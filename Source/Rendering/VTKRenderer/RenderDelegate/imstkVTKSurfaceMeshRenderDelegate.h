@@ -58,8 +58,8 @@ public:
     void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
 
 protected:
-
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
+    vtkSmartPointer<vtkDoubleArray> m_mappedTangentArray;   ///> Mapped array of tangents
 };
 }

@@ -42,6 +42,8 @@ Color Color::Red(1.0, 0.0, 0.0, 1.0);
 Color Color::Yellow(1.0, 1.0, 0.0, 1.0);
 Color Color::Orange(1.0, 0.6, 0.0, 1.0);
 Color Color::Pink(1.0, 0.0, 1.0, 1.0);
+Color Color::Teal(0.5, 1.0, 0.8, 1.0);
+Color Color::Marigold(0.9, 0.9, 0.4);
 
 Color::Color()
 {

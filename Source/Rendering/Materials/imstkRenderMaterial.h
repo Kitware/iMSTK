@@ -38,24 +38,19 @@ public:
         Points,
         WireframeSurface,
         VolumeRendering,
-        Fluid
+        Fluid               ///< Renders a set of points using a screen-space fluid renderer
     };
 
+    /// surface shading model. Defaults to Phong
     enum class ShadingModel
     {
-        Phong,
-        PBR, // Physicall based rendering
-        Flat,
-        Gouraud
+        Phong,   ///< Phong shading model (default)
+        Gouraud, ///< Gouraud shading model (default)
+        Flat,    ///< Flat shading model with no interpolation
+        PBR      ///< Physically based rendering
     };
 
-    enum class PointGlyphType
-    {
-        Sphere,
-        Cube
-    };
-
-    // Volume rendering blend mode
+    /// Volume rendering blend mode
     enum class BlendMode
     {
         Alpha,
@@ -145,7 +140,7 @@ public:
     bool getCastsShadows() const;
 
     ///
-    /// \brief Get/Set shadow receiving ability
+    /// \brief Get/Set edge visibility
     ///
     void setEdgeVisibility(const bool visibility) { m_edgeVisibility = visibility; };
     bool getEdgeVisibility() const { return m_edgeVisibility; };
@@ -161,20 +156,22 @@ public:
     ///
     /// \brief Checks if the material must be handled uniquely
     ///
-    bool isDecal();    // remove?
-    bool isParticle(); // remove?
-    bool isLineMesh(); // remove?
+    bool isDecal();
+    bool isParticle();
+    bool isLineMesh();
 
     DisplayMode getRenderMode() const { return m_displayMode; };
     ShadingModel getShadingModel() const { return m_shadingModel; };
     void setShadingModel(const ShadingModel& model) { m_shadingModel = model; }
 
     bool isModified() const { return m_modified; };
-
-    void setModified(const bool c) { m_modified = c; };
+    void setModified(const bool modified) { m_modified = modified; };
 
     float getOcclusionStrength() const { return m_occlusionStrength; }
+    void setOcclusionStrength(const float o) { m_occlusionStrength = o; };
+
     float getNormalStrength() const { return m_normalStrength; }
+    void setNormalnStrength(const float n) { m_normalStrength = n; };
 
     const Color& getEdgeColor() const { return m_edgeColor; };
     void setEdgeColor(const Color& color) { m_edgeColor = color; };
@@ -196,13 +193,6 @@ protected:
     friend class VulkanParticleRenderDelegate;
     friend class VTKdbgLinesRenderDelegate;
 
-    // State
-    bool m_tessellated = false; //?
-
-    bool m_isDecal    = false;  //?
-    bool m_isLineMesh = false;  //?
-    bool m_isParticle = false;  //?
-
     // Textures
     std::vector<std::shared_ptr<Texture>> m_textures; ///< Ordered by Texture::Type
 
@@ -214,37 +204,41 @@ protected:
     float m_opacity = 1.0;
 
     ///-------------Wireframe specific properties----------------
-    PointGlyphType m_pointGlyphType = PointGlyphType::Sphere;
     float m_lineWidth        = 1.f;
     float m_pointSize        = 2.f;
-    Color m_edgeColor        = Color(0.9, 0.9, 0.4);
-    Color m_vertexColor      = Color(0.5, 1.0, 0.8);
-    bool  m_edgeVisibility   = true;
-    bool  m_vertexVisibility = true;
+    Color m_edgeColor        = Color::Marigold;
+    Color m_vertexColor      = Color::Teal;
+    bool  m_edgeVisibility   = true; ///< \note not used (vtk backend)
+    bool  m_vertexVisibility = true; ///< \note not used (vtk backend)
 
     ///----------------PBR specific properties-------------------
-    float m_emissivity    = 0.0;
+    float m_emissivity    = 0.f;
     Color m_emmisiveColor = Color::White;
 
-    float m_metalness = 0.f; ///< Value for metalness with range: [0.0, 1.0]
-    float m_roughness = 1.f; ///< Value for roughness with range: [0.0, 1.0]
+    float m_metalness = 0.f;  ///< Value for metalness with range: [0.0, 1.0]
+    float m_roughness = 10.f; ///< Value for roughness with range: [0.0, 1.0]
 
-    float m_occlusionStrength = 10.0;
-    float m_normalStrength    = 10.0;
+    float m_occlusionStrength = 10.f;
+    float m_normalStrength    = 1.f;
 
-    ///-----------------Global states/flags----------------------
+    ///---------------------Global states------------------------
     bool m_imageBasedLighting = false;
 
     // Shadows
-    bool m_receivesShadows = true; //?
-    bool m_castsShadows    = true; //?
+    bool m_receivesShadows = true; ///< \note not implemented
+    bool m_castsShadows    = true; ///< \note not implemented
 
-    // remove one of these?
+    /// \todo remove one of these?
     bool m_stateModified   = true;      ///< Flag for expensive state changes
     bool m_modified        = true;      ///< Flag for any material property changes
     bool m_backfaceCulling = true;      ///< For performance, uncommon for this to be false
 
     DisplayMode  m_displayMode  = DisplayMode::Surface;
     ShadingModel m_shadingModel = ShadingModel::Phong;
+
+    bool m_tessellated = false;
+    bool m_isDecal     = false;
+    bool m_isLineMesh  = false;
+    bool m_isParticle  = false;
 };
 }
