@@ -177,10 +177,10 @@ protected:
     std::vector<vtkOpenVRCameraPose> m_camPos;
 #endif
 
-    vtkSmartPointer<vtkChartXY>      m_timeTableChart      = nullptr;
-    vtkSmartPointer<vtkContextActor> m_timeTableChartActor = nullptr;
-    vtkSmartPointer<vtkTable> m_timeTable = nullptr;
-    vtkPlotBar* m_timeTablePlot = nullptr;
+    vtkSmartPointer<vtkChartXY>      m_timeTableChart;
+    vtkSmartPointer<vtkContextActor> m_timeTableChartActor;
+    vtkSmartPointer<vtkTable> m_timeTable;
+    vtkPlotBar* m_timeTablePlot;
     int m_timeTableIter = 0;
 };
 }
