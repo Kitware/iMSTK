@@ -60,19 +60,10 @@ main()
     // create and add a PBD object
     createAndAddPbdObject(scene, tetMeshFileName);
 
-    // Setup plane
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(40);
-    planeGeom->setTranslation(0, -6, 0);
-    auto planeObj = std::make_shared<CollidingObject>("Plane");
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
-    scene->addSceneObject(planeObj);
-
     // Light
     auto light = std::make_shared<DirectionalLight>("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    light->setIntensity(1.1);
     scene->addLight(light);
 
     simManager->setActiveScene(scene);
@@ -95,10 +86,13 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    material->setColor(Color(147.0 / 255.0, 32.0 / 255.0, 30.0 / 255.0));
-    material->setMetalness(0.9f);
+    material->setColor(Color(220. / 255.0, 100. / 255.0, 70. / 255.0));
+    material->setMetalness(100.9f);
     material->setRoughness(0.5);
-    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->setEdgeColor(Color::Teal);
+    material->setAmbientLightCoeff(50.);
+    material->setShadingModel(RenderMaterial::ShadingModel::Phong);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -112,14 +106,13 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     // FEM constraint
     pbdParams->m_femParams->m_YoungModulus = 500.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = { 350 };
+    pbdParams->m_fixedNodeIds = { 75, 82, 84, 94, 95, 105, 110, 124, 139, 150, 161, 171, 350 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_iterations = 10;
-    // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
+    pbdParams->m_iterations = 6;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
