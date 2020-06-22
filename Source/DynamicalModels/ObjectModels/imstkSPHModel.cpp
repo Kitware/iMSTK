@@ -140,7 +140,7 @@ SPHModelConfig::initialize()
     pe->ProcessAction(hemorrhageLeg);
 
     // Advance some time to let the body bleed out a bit
-    tracker.AdvanceModelTime(3);
+    //tracker.AdvanceModelTime(3);
 
     pe->GetLogger()->Info("The patient has been hemorrhaging for 3s");
     pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
@@ -158,7 +158,7 @@ SPHModelConfig::initialize()
     pe->ProcessAction(hemorrhageLeg);
 
     // Advance some time while the medic gets the drugs ready
-    tracker.AdvanceModelTime(5);
+    //tracker.AdvanceModelTime(5);
 
     pe->GetLogger()->Info("The patient has NOT been hemorrhaging for 100s");
     pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
@@ -178,7 +178,7 @@ SPHModelConfig::initialize()
     iVSaline.GetRate().SetValue(100, VolumePerTimeUnit::mL_Per_min);//The rate to admnister the compound in the bag in this case saline
     pe->ProcessAction(iVSaline);
 
-    tracker.AdvanceModelTime(5);
+    //tracker.AdvanceModelTime(5);
 
     pe->GetLogger()->Info("The patient has been getting fluids for the past 5s");
     pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
@@ -227,6 +227,7 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         {
             sumAccels();
             updateVelocity(getTimeStep());
+            //updateVelocityNoGravity(getTimeStep());
             computeViscosity();
             moveParticles(getTimeStep());
         });
@@ -244,7 +245,7 @@ SPHModel::initialize()
 
     // Set particle positions and zero default velocities
     /// \todo set particle data with given (non-zero) velocities
-    this->m_initialState->setParticleData(m_pointSetGeometry->getVertexPositions());
+    this->m_initialState->setParticleData(m_pointSetGeometry->getVertexPositions(), m_initialVelocities);
     this->m_currentState->setState(this->m_initialState);
 
     // Attach current state to simulation state
@@ -518,6 +519,15 @@ SPHModel::updateVelocity(Real timestep)
 }
 
 void
+SPHModel::updateVelocityNoGravity(Real timestep)
+{
+  ParallelUtils::parallelFor(getState().getNumParticles(),
+    [&](const size_t p) {
+      getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
+    });
+}
+
+void
 SPHModel::computeViscosity()
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
@@ -645,6 +655,24 @@ SPHModel::moveParticles(Real timestep)
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
+            //periodicBCs(p);
         });
+}
+
+void SPHModel::periodicBCs(const size_t p)
+{
+   if (getState().getPositions()[p].x() > 0.33)
+   {
+     getState().getPositions()[p] = Vec3r(-9.5, getState().getPositions()[p].y(), getState().getPositions()[p].z());
+   }
+}
+
+void SPHModel::setInitialVelocities(StdVectorOfVec3d& initialVelocities)
+{
+  m_initialVelocities = initialVelocities;
+}
+StdVectorOfVec3d SPHModel::getInitialVelocities()
+{
+  return m_initialVelocities;
 }
 } // end namespace imstk

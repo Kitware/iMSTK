@@ -173,6 +173,10 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
+    void setInitialVelocities(StdVectorOfVec3d& initialVelocities);
+    StdVectorOfVec3d getInitialVelocities();
+    void periodicBCs(const size_t p);
+
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
     std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
@@ -239,6 +243,8 @@ private:
     ///
     void updateVelocity(const Real timestep);
 
+    void updateVelocityNoGravity(Real timestep);
+
     ///
     /// \brief Compute viscosity
     ///
@@ -255,6 +261,7 @@ private:
     /// \brief Move particles
     ///
     void moveParticles(const Real timestep);
+
 
 protected:
     std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
@@ -278,5 +285,8 @@ private:
 
     std::shared_ptr<StdVectorOfVec3d> m_pressureAccels       = nullptr;
     std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
+
+    StdVectorOfVec3d m_initialVelocities;
+
 };
 } // end namespace imstk
