@@ -419,76 +419,76 @@ VTKRenderer::getAxesVisibility() const
     return m_AxesActor->GetVisibility();
 }
 
-void
-VTKRenderer::setTimeTable(const std::unordered_map<std::string, double>& timeTable)
-{
-    // Sort by elapsed times
-    std::vector<std::pair<std::string, double>> nameToTimesVec(timeTable.begin(), timeTable.end());
-    std::sort(nameToTimesVec.begin(), nameToTimesVec.end(),
-        [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) { return a.second < b.second; });
-
-    // Construct vtkTable from provided data
-    vtkSmartPointer<vtkDoubleArray> xIndices      = vtkDoubleArray::SafeDownCast(m_timeTable->GetColumn(0));
-    vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkDoubleArray::SafeDownCast(m_timeTable->GetColumn(1));
-    vtkSmartPointer<vtkStringArray> labels = vtkStringArray::SafeDownCast(m_timeTable->GetColumn(2));
-
-    labels->SetNumberOfValues(nameToTimesVec.size());
-    xIndices->SetNumberOfValues(nameToTimesVec.size());
-    yElapsedTimes->SetNumberOfValues(nameToTimesVec.size());
-    for (size_t i = 0; i < nameToTimesVec.size(); i++)
-    {
-        labels->SetValue(i, nameToTimesVec[i].first.c_str());
-        xIndices->SetValue(i, i + 1);
-        yElapsedTimes->SetValue(i, nameToTimesVec[i].second);
-    }
-
-    // The range for the x axis is based on history of the elapsed times
-    vtkAxis* botAxis = m_timeTableChart->GetAxis(vtkAxis::BOTTOM);
-
-    // Get the previous and current range
-    double newMaxElapsed = yElapsedTimes->GetRange()[1];
-    yElapsedTimes->Modified();
-    double currMaxElapsed = botAxis->GetMaximum();
-
-    // Always respect the max as all information should be shown
-    if (newMaxElapsed > currMaxElapsed)
-    {
-        botAxis->SetRange(0.0, newMaxElapsed);
-    }
-    // But if current elapsed is less than the existing one we can lag
-    else
-    {
-        // Lag downscaling by 400 iterations
-        if (m_timeTableIter % 400 == 0)
-        {
-            botAxis->SetRange(0.0, newMaxElapsed);
-        }
-        else
-        {
-            botAxis->SetRange(0.0, currMaxElapsed);
-        }
-        m_timeTableIter++;
-    }
-    botAxis->Modified();
-
-    vtkAxis* leftAxis = m_timeTableChart->GetAxis(vtkAxis::LEFT);
-    leftAxis->SetRange(xIndices->GetRange());
-    leftAxis->SetCustomTickPositions(xIndices, labels);
-
-    m_timeTable->Modified();
-}
-
-void
-VTKRenderer::setTimeTableVisibility(const bool visible)
-{
-    m_timeTableChartActor->SetVisibility(visible);
-}
-
-bool
-VTKRenderer::getTimeTableVisibility() const
-{
-    return m_timeTableChartActor->GetVisibility();
-}
+//void
+//VTKRenderer::setTimeTable(const std::unordered_map<std::string, double>& timeTable)
+//{
+//    // Sort by elapsed times
+//    std::vector<std::pair<std::string, double>> nameToTimesVec(timeTable.begin(), timeTable.end());
+//    std::sort(nameToTimesVec.begin(), nameToTimesVec.end(),
+//        [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) { return a.second < b.second; });
+//
+//    // Construct vtkTable from provided data
+//    vtkSmartPointer<vtkDoubleArray> xIndices      = vtkDoubleArray::SafeDownCast(m_timeTable->GetColumn(0));
+//    vtkSmartPointer<vtkDoubleArray> yElapsedTimes = vtkDoubleArray::SafeDownCast(m_timeTable->GetColumn(1));
+//    vtkSmartPointer<vtkStringArray> labels = vtkStringArray::SafeDownCast(m_timeTable->GetColumn(2));
+//
+//    labels->SetNumberOfValues(nameToTimesVec.size());
+//    xIndices->SetNumberOfValues(nameToTimesVec.size());
+//    yElapsedTimes->SetNumberOfValues(nameToTimesVec.size());
+//    for (size_t i = 0; i < nameToTimesVec.size(); i++)
+//    {
+//        labels->SetValue(i, nameToTimesVec[i].first.c_str());
+//        xIndices->SetValue(i, i + 1);
+//        yElapsedTimes->SetValue(i, nameToTimesVec[i].second);
+//    }
+//
+//    // The range for the x axis is based on history of the elapsed times
+//    vtkAxis* botAxis = m_timeTableChart->GetAxis(vtkAxis::BOTTOM);
+//
+//    // Get the previous and current range
+//    double newMaxElapsed = yElapsedTimes->GetRange()[1];
+//    yElapsedTimes->Modified();
+//    double currMaxElapsed = botAxis->GetMaximum();
+//
+//    // Always respect the max as all information should be shown
+//    if (newMaxElapsed > currMaxElapsed)
+//    {
+//        botAxis->SetRange(0.0, newMaxElapsed);
+//    }
+//    // But if current elapsed is less than the existing one we can lag
+//    else
+//    {
+//        // Lag downscaling by 400 iterations
+//        if (m_timeTableIter % 400 == 0)
+//        {
+//            botAxis->SetRange(0.0, newMaxElapsed);
+//        }
+//        else
+//        {
+//            botAxis->SetRange(0.0, currMaxElapsed);
+//        }
+//        m_timeTableIter++;
+//    }
+//    botAxis->Modified();
+//
+//    vtkAxis* leftAxis = m_timeTableChart->GetAxis(vtkAxis::LEFT);
+//    leftAxis->SetRange(xIndices->GetRange());
+//    leftAxis->SetCustomTickPositions(xIndices, labels);
+//
+//    m_timeTable->Modified();
+//}
+//
+//void
+//VTKRenderer::setTimeTableVisibility(const bool visible)
+//{
+//    m_timeTableChartActor->SetVisibility(visible);
+//}
+//
+//bool
+//VTKRenderer::getTimeTableVisibility() const
+//{
+//    return m_timeTableChartActor->GetVisibility();
+//}
 
 void
 VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)

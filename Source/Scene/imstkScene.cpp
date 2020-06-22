@@ -26,7 +26,7 @@
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkInteractionPair.h"

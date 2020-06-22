@@ -293,8 +293,11 @@ VTKRenderDelegate::updateActorProperties()
     auto actorProperty = m_actor->GetProperty();
 
     // Colors & Light
-    auto diffuseColor = material->m_color;
-    actorProperty->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b);
+    actorProperty->SetDiffuseColor(material->m_diffuseColor.r, material->m_diffuseColor.g, material->m_diffuseColor.b);
+    actorProperty->SetAmbientColor(material->m_ambientColor.r, material->m_ambientColor.g, material->m_ambientColor.b);
+    actorProperty->SetAmbient(material->m_ambientLightCoeff);
+    actorProperty->SetSpecularColor(material->m_specularColor.r, material->m_specularColor.g, material->m_specularColor.b);
+    actorProperty->SetSpecularPower(material->m_specularPower);
 
     // Material state is now up to date
     material->m_modified = false;
@@ -437,12 +440,19 @@ VTKRenderDelegate::updateActorPropertiesMesh()
     }
     else
     {
-        if (material->getDisplayMode() != RenderMaterial::DisplayMode::Fluid)// surface
+        if (material->getDisplayMode() != RenderMaterial::DisplayMode::Fluid)// = surface
         {
             actorProperty->SetRepresentationToSurface();
             actorProperty->SetEdgeVisibility(false);
             actorProperty->SetVertexVisibility(false);
-            actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
+
+            // Colors & Light
+            actorProperty->SetDiffuseColor(material->m_diffuseColor.r, material->m_diffuseColor.g, material->m_diffuseColor.b);
+            actorProperty->SetAmbientColor(material->m_ambientColor.r, material->m_ambientColor.g, material->m_ambientColor.b);
+            actorProperty->SetAmbient(material->m_ambientLightCoeff);
+            actorProperty->SetSpecularColor(material->m_specularColor.r, material->m_specularColor.g, material->m_specularColor.b);
+            actorProperty->SetSpecularPower(material->m_specularPower);
+
             if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
             {
                 /*actorProperty->UseImageBasedLightingOn();

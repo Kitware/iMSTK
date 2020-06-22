@@ -97,7 +97,7 @@ makePbdString(
     // Setup the VisualModel
     std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(color);
+    material->setEdgeColor(color);
     material->setLineWidth(2.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
@@ -165,6 +165,7 @@ main()
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
         makePbdStrings(numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
+    // Add them to the scene
     for (std::shared_ptr<PbdObject> obj : pbdStringObjs)
     {
         scene->addSceneObject(obj);
@@ -176,8 +177,7 @@ main()
 
     // Move the points every frame
     double t = 0.0;
-
-    auto movePoints =
+    auto   movePoints =
         [&pbdStringObjs, &t](Module* module)
         {
             for (unsigned int i = 0; i < pbdStringObjs.size(); i++)

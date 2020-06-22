@@ -79,7 +79,7 @@ main()
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setLineWidth(0.5);
     material->setEdgeColor(Color::Blue);
-    material->setShadingModel(RenderMaterial::ShadingModel::Flat);
+    material->setShadingModel(RenderMaterial::ShadingModel::Phong);
     auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 

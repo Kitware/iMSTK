@@ -22,7 +22,7 @@
 #include "imstkPenaltyCH.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"

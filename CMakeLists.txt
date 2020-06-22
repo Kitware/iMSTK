@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(iMSTK VERSION 2.0.0 LANGUAGES C CXX)
+project(iMSTK VERSION 3.0.0 LANGUAGES C CXX)
 
 if(UNIX AND NOT APPLE)
   set(LINUX TRUE)
@@ -21,7 +21,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install CACHE PATH "Install location" FORCE)
 endif()
 set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
-
+ 
 #-----------------------------------------------------------------------------
 # Project install directories
 #-----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ set(CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
 # Let's go ahead and make these directories
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/bin)
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/include)
-file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
+file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib) 
 
 #-----------------------------------------------------------------------------
 # Update CMake module path & cmake dir
@@ -274,37 +274,30 @@ endif()
 
 # VTK
 find_package(VTK CONFIG)
-if (VTK_VERSION VERSION_LESS "8.90")
-  # Modules are linked via `vtkCommonCore`
-  # VTK_DEFINITIONS has autoinit information
-  find_package(VTK REQUIRED)
-  include(${VTK_USE_FILE})
-else()
-  # modules are linked via `VTK::CommonCore`
-  # vtk_module_autoinit is needed
-  find_package(VTK COMPONENTS
-    ChartsCore
-    CommonCore
-    CommonDataModel
-    FiltersGeneral
-    FiltersSources
-	FiltersModeling
-	FiltersExtraction
-    IOExport
-    IOImport
-    IOPLY
-    IOParallel
-    IOParallelXML
-    ImagingCore
-    InteractionStyle
-    RenderingAnnotation
-    RenderingCore
-    RenderingOpenGL2
-    RenderingVolume
-    RenderingVolumeOpenGL2
-    ViewsContext2D
-  )
-endif()
+# modules are linked via `VTK::CommonCore`
+# vtk_module_autoinit is needed
+find_package(VTK COMPONENTS
+  ChartsCore
+  CommonCore
+  CommonDataModel
+  FiltersGeneral
+  FiltersSources
+FiltersModeling
+FiltersExtraction
+  IOExport
+  IOImport
+  IOPLY
+  IOParallel
+  IOParallelXML
+  ImagingCore
+  InteractionStyle
+  RenderingAnnotation
+  RenderingCore
+  RenderingOpenGL2
+  RenderingVolume
+  RenderingVolumeOpenGL2
+  ViewsContext2D
+)
 
 # Vulkan
 set(Vulkan_Dependency)
@@ -355,10 +348,12 @@ if(${PROJECT_NAME}_BUILD_TESTING OR ${PROJECT_NAME}_BUILD_EXAMPLES)
   imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
 
   #-----------------------------------------------------------------------------
-  # Add shaders
+  # Add shaders (vulkan only)
   #-----------------------------------------------------------------------------
-  include(imstkCopyAndCompileShaders)
-  CopyAndCompileShaders() 
+  if(${PROJECT_NAME}_USE_Vulkan)    
+      include(imstkCopyAndCompileShaders)
+      CopyAndCompileShaders() 
+  endif()
 endif()
 
 # Folder name to put our headers/cmake config files under

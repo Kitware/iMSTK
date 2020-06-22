@@ -95,9 +95,10 @@ makePbdString(
     // Setup the VisualModel
     std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setColor(color);
+    material->setEdgeColor(color);
     material->setLineWidth(2.0f);
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setPointSize(6.0f);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
     std::shared_ptr<VisualModel> visualModel = std::make_shared<VisualModel>(stringMesh);
     visualModel->setRenderMaterial(material);

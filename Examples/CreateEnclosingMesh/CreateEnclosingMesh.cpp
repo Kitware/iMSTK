@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkAPIUtilities.h"
@@ -52,7 +53,7 @@ main()
     // configure and add the render model to the scene object
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    material->setColor(Color::Red);
+    material->setColor(Color::LightGray);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     surfaceObject->addVisualModel(surfMeshModel);
@@ -66,12 +67,12 @@ main()
     auto volObject   = std::make_shared<VisualObject>("VolObj");
     auto tetMaterial = std::make_shared<RenderMaterial>();
     tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    tetMaterial->setEdgeColor(Color::Teal);
     tetMaterial->setPointSize(7.);
     tetMaterial->setLineWidth(3.);
     auto tetVizModel = std::make_shared<VisualModel>(tetMesh, tetMaterial);
     volObject->addVisualModel(tetVizModel);
 
-    // add the scene object to the scene
     scene->addSceneObject(volObject);
 
     // Light
