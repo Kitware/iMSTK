@@ -116,6 +116,11 @@ main(int argc, char* argv[])
             collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
                 InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
         }
+        else if (std::dynamic_pointer_cast<SurfaceMesh>(solid->getCollidingGeometry()))
+        {
+          collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+            InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSurfaceMesh));
+        }
         else
         {
             LOG(FATAL) << "Invalid collision object";
