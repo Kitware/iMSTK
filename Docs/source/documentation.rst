@@ -752,6 +752,8 @@ vector and Jacobian matrices to be used by the solvers.
 
 3D Deformable Objects
 ---------------------
+Finite Element Method (FEM)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 iMSTK supports elastic solids both using finite element (FE) and PBD. FE
 support is only limited to tetrahedral elements while the PBD
@@ -776,24 +778,105 @@ formulation available. The formulation that are available are (i) Linear
 (ii) Co-rotation (iii) invertable (iv) Saint-Venant Kirchhoff. Currently
 backward Euler is the only time stepping that is available in iMSTK.
 
+Position Based Dynamics (PBD)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Below is a sample code that shows the configuration of an elastic object
 with PBD formulation.
 ::
 
-    auto deformableObj = std::make_shared<PbdObject>("Beam");
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(volTetMesh);
-    pbdModel->configure(/*Number of Constraints*/ 1,
-                        /*Constraint configuration*/ "FEM StVk 100.0 0.3",
-                        /*Mass*/ 1.0,
-                        /*Gravity*/ "0 -9.8 0",
-                        /*TimeStep*/ 0.01,
-                        /*FixedPoint*/ "51 127 178",
-                        /*NumberOfIterationInConstraintSolver*/ 5);
+    auto pbdModel      = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(surfMesh);
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+
+    // Constraints
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    pbdParams->m_fixedNodeIds = { 0, 1 };
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt = 0.005; 
+    pbdParams->m_iterations = 10;
+    pbdParam->m_solverType = PbdConstraint::SolverType::PBD;
 
 Note that unlike FE, for the case of PBD formulation, the choice of time
 stepping scheme and solver is restricted in choice resulting in a
 compact API to prescribe the entirety of the object configuration.
+
+xPBD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An well known drawback of PBD is that PBD’s behavior depends on the time step
+and the number of iterations of the simulation [pbd]_; that is, constraints become
+extremely stiff as the time step decreases, or the number of interactions increases.
+To alleviate this problem, extended PBD (xPBD) was introduced in [xpbd]_ based on a small
+modification to the original PBD algorithm. Compared to PBD, it can simulate elastic
+objects with physically meaningful material parameters, and requires computing and
+storing a single additional scalar for each constraint.
+
+Due to the superiority of xPBD over PBD, PbdModel is created using xPBD by default.
+In order to use PBD, users have to change the solver type in PBDModelConfig, ie,
+pbdParam->m_solverType = PbdConstraint::SolverType::PBD;. Another significant
+difference from PBD happens when specifying the stiffness: the stiffness in xPBD
+is indeed Young’s Modulus of materials, rather than a parameter between [0,1] without
+physics meaning as in PBD.
+
+::
+
+    auto pbdModel      = std::make_shared<PbdModel>();
+    pbdModel->setModelGeometry(surfMesh);
+    auto pbdParams = std::make_shared<PBDModelConfig>();
+
+    // Constraints
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    pbdParams->m_fixedNodeIds = { 0, 1 };
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->m_gravity   = Vec3d(0, -9.8, 0);
+    pbdParams->m_defaultDt = 0.005; 
+    pbdParams->m_iterations = 10;
+
+    // Set the parameters
+    pbdModel->configure(pbdParams);
+
+Model order reduction
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In the solid mechanics community, the finite element methods are usually used to simulate
+the dynamic systems of deformable objects. These simulations are set up in an offline,
+non-interactive manner, partially due to the high computational and storage cost. For
+example, in a typical simulation there are tens of thousands of degrees of freedoms. Hence,
+interactive simulations are prohibited for objects with complex geometry and non-trivial
+material. As an alternative, model order reduction (MOR, also called dimensional model reduction)
+provides quantitatively accurate descriptions of the dynamics of systems at a computational
+cost much lower than the original numerical model. 
+
+The idea is to project the original, high-dimensional solution space onto a low-dimensional
+subspace to arrive at a reduced model that approximates the original system. The low-dimensional
+subspace is carefully chosen such that the most important characteristics (also known as modes)
+of the original system's behaviors are preserved. With much less degrees of freedom, the reduced
+model can be solved much faster than the original system.
+
+In the following is an example of how to create and configure an MOR dynamical model. Two input
+files generated in Vega for the time being have to be specified, one storing the coefficients
+of the cubic polynomials for the reduced internal forces, and the other the basis matrix.
+
+::
+
+    auto dynaModel = std::make_shared<ReducedStVK>();
+    auto config = std::make_shared<ReducedStVKConfig>();
+    config->m_cubicPolynomialFilename = iMSTK_DATA_ROOT "/asianDragon/asianDragon.cub";
+    config->m_modesFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.URendering.float";
+    dynaModel->configure(config);
+    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
+    dynaModel->setModelGeometry(volTetMesh);
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+.. Note:: Model order reduction requires installation of MKL and arpack, only on Linux.
 
 Cloth
 -----
@@ -1422,6 +1505,10 @@ Bibliography
 .. [pbd] Matthias Müller, Bruno Heidelberger, Marcus Hennix, and John
    Ratcliff. 2007. Position based dynamics. J. Vis. Comun. Image
    Represent. 18, 2 (April 2007), 109-118.
+
+.. [xpbd] Miles Macklin, Matthias Müller, and Nuttapong Chentanez
+    2016. XPBD: position-based simulation of compliant constrained dynamics.
+    In Proc. of Motion in Games. 49–54
 
 .. [vrpn] Russell M. Taylor, II, Thomas C. Hudson, Adam Seeger, Hans Weber,
     Jeffrey Juliano, and Aron T. Helser. 2001. VRPN: a device-independent,
