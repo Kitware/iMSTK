@@ -40,13 +40,15 @@ const int    nCols  = 16;
 /// \brief Creates cloth geometry
 ///
 static std::unique_ptr<SurfaceMesh>
-makeClothGeometry(
-    const double width, const double height, const int nRows, const int nCols)
+makeClothGeometry(const double width,
+                  const double height,
+                  const int    nRows,
+                  const int    nCols)
 {
     // Create surface mesh
-    std::unique_ptr<SurfaceMesh> clothMesh = std::make_unique<SurfaceMesh>();
-    StdVectorOfVec3d             vertList;
+    auto clothMesh = std::make_unique<SurfaceMesh>();
 
+    StdVectorOfVec3d vertList;
     vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -97,7 +99,11 @@ makeClothGeometry(
 /// \brief Creates cloth object
 ///
 static std::shared_ptr<PbdObject>
-makeClothObj(const std::string& name, double width, double height, int nRows, int nCols)
+makeClothObj(const std::string& name,
+             const double       width,
+             const double       height,
+             const int          nRows,
+             const int          nCols)
 {
     auto clothObj = std::make_shared<PbdObject>(name);
 
@@ -109,7 +115,7 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
-    pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
+    pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
@@ -156,16 +162,16 @@ main()
 
     // Light (red)
     auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(-5, -3, 5));
-    colorLight->setFocalPoint(Vec3d(0, -5, 5));
-    colorLight->setIntensity(100);
+    colorLight->setPosition(Vec3d(-5., -3., 5.));
+    colorLight->setFocalPoint(Vec3d(0., -5., 5.));
+    colorLight->setIntensity(100.);
     colorLight->setColor(Color::Red);
     colorLight->setSpotAngle(30);
     scene->addLight(colorLight);
 
     // Adjust camera
-    scene->getCamera()->setFocalPoint(0, -5, 5);
-    scene->getCamera()->setPosition(-15., -5.0, 15.0);
+    scene->getCamera()->setFocalPoint(0., -5., 5.);
+    scene->getCamera()->setPosition(-15., -5., 15.);
 
     // Start
     simManager->setActiveScene(scene);
