@@ -101,10 +101,13 @@ else()
   # modules are linked via `VTK::CommonCore`
   # vtk_module_autoinit is needed
   find_dependency(VTK COMPONENTS
+    ChartsCore
     CommonCore
     CommonDataModel
     FiltersGeneral
     FiltersSources
+    FiltersModeling
+    FiltersExtraction
     IOExport
     IOImport
     IOPLY
@@ -113,10 +116,13 @@ else()
     ImagingCore
     InteractionStyle
     RenderingAnnotation
+    RenderingContext2D
+    RenderingContextOpenGL2
     RenderingCore
     RenderingOpenGL2
     RenderingVolume
-    RenderingVolumeOpenGL2)
+    RenderingVolumeOpenGL2
+    ViewsContext2D)
 endif()
 
 # glfw, gli

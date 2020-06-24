@@ -282,8 +282,8 @@ find_package(VTK COMPONENTS
   CommonDataModel
   FiltersGeneral
   FiltersSources
-FiltersModeling
-FiltersExtraction
+  FiltersModeling
+  FiltersExtraction
   IOExport
   IOImport
   IOPLY
@@ -292,12 +292,13 @@ FiltersExtraction
   ImagingCore
   InteractionStyle
   RenderingAnnotation
+  RenderingContext2D
+  RenderingContextOpenGL2
   RenderingCore
   RenderingOpenGL2
   RenderingVolume
   RenderingVolumeOpenGL2
-  ViewsContext2D
-)
+  ViewsContext2D)
 
 # Vulkan
 set(Vulkan_Dependency)
