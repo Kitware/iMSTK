@@ -80,9 +80,9 @@ VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*=
 #endif
 
     // Setup callback for timer on the interactor
-    /*timerCallbackCommand = vtkSmartPointer<vtkCallbackCommand>::New();
+    timerCallbackCommand = vtkSmartPointer<vtkCallbackCommand>::New();
     timerCallbackCommand->SetCallback(timerCallback);
-    timerCallbackCommand->SetClientData(this);*/
+    timerCallbackCommand->SetClientData(this);
 }
 
 void
@@ -190,13 +190,13 @@ VTKViewer::startRenderingLoop()
         m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
 
         // If the Scene wants benchmarking hookup timer to update the table
-        /*auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
+        auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
         vtkRen->setTimeTableVisibility(m_activeScene->getConfig()->taskTimingEnabled);
         if (m_activeScene->getConfig()->taskTimingEnabled)
         {
             m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::TimerEvent, timerCallbackCommand);
             m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
-        }*/
+        }
 
         m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());
         m_vtkRenderWindow->GetInteractor()->Start();
@@ -254,17 +254,17 @@ VTKViewer::getTextStatusManager()
     return m_vtkInteractorStyle->getTextStatusManager();
 }
 
-//void
-//VTKViewer::timerCallback(vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
-//{
-//    VTKViewer* self = static_cast<VTKViewer*>(clientData);
-//
-//    if (self->getActiveScene()->getConfig()->taskTimingEnabled)
-//    {
-//        auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(self->getActiveRenderer());
-//        self->getActiveScene()->lockComputeTimes();
-//        vtkRen->setTimeTable(self->getActiveScene()->getTaskComputeTimes());
-//        self->getActiveScene()->unlockComputeTimes();
-//    }
-//}
+void
+VTKViewer::timerCallback(vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
+{
+    VTKViewer* self = static_cast<VTKViewer*>(clientData);
+
+    if (self->getActiveScene()->getConfig()->taskTimingEnabled)
+    {
+        auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(self->getActiveRenderer());
+        self->getActiveScene()->lockComputeTimes();
+        vtkRen->setTimeTable(self->getActiveScene()->getTaskComputeTimes());
+        self->getActiveScene()->unlockComputeTimes();
+    }
+}
 } // imstk

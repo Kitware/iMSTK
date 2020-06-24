@@ -102,17 +102,17 @@ public:
     ///
     /// \brief Sets the benchmarking table using unordered_map
     ///
-    //void setTimeTable(const std::unordered_map<std::string, double>& timeTable);
+    void setTimeTable(const std::unordered_map<std::string, double>& timeTable);
 
     ///
     /// \brief Set the visibility of the benchmark graph
     ///
-    //void setTimeTableVisibility(const bool visible);
+    void setTimeTableVisibility(const bool visible);
 
     ///
     /// \brief Get the visibility of the benchmark graph
     ///
-    //bool getTimeTableVisibility() const;
+    bool getTimeTableVisibility() const;
 
     ///
     /// \brief Updates the scene camera's position and orientation

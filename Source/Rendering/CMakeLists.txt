@@ -134,9 +134,12 @@ imstk_add_library( Rendering
     Animation
     glm
     ${VTK_LIBRARIES}
-    ${RENDERING_LIBRARIES}
-  #VERBOSE
-  )
+    ${RENDERING_LIBRARIES})
+  #VERBOSE)
+
+if( NOT iMSTK_USE_Vulkan )
+  vtk_module_autoinit(TARGETS Rendering MODULES ${VTK_LIBRARIES})
+endif()
 
 #-----------------------------------------------------------------------------
 # Testing
