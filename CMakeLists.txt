@@ -276,7 +276,7 @@ endif()
 find_package(VTK CONFIG)
 # modules are linked via `VTK::CommonCore`
 # vtk_module_autoinit is needed
-find_package(VTK COMPONENTS
+list(APPEND VTK_DEPENDENCIES
   ChartsCore
   CommonCore
   CommonDataModel
@@ -299,6 +299,10 @@ find_package(VTK COMPONENTS
   RenderingVolume
   RenderingVolumeOpenGL2
   ViewsContext2D)
+if (${PROJECT_NAME}_ENABLE_VR)
+  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
+endif()
+find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # Vulkan
 set(Vulkan_Dependency)

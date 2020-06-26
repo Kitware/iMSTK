@@ -147,6 +147,11 @@ public:
     std::shared_ptr<SceneManager> getSceneManager(std::shared_ptr<Scene> scene) const;
 
     ///
+    /// \brief Returns the scene manager config
+    ///
+    std::shared_ptr<SimManagerConfig> getConfig() const { return m_config; }
+
+    ///
     /// \brief Returns the scene with a given name
     ///
     std::shared_ptr<Scene> getScene(const std::string& sceneName) const;

@@ -21,13 +21,8 @@
 
 #include "imstkVTKCapsuleRenderDelegate.h"
 #include "imstkCapsule.h"
-#include "imstkVtkCapsuleSource.h"
-
-#include <vtkTransformPolyDataFilter.h>
-
-#if (VTK_MAJOR_VERSION >= 9)
 #include <vtkCapsuleSource.h>
-#endif
+#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {

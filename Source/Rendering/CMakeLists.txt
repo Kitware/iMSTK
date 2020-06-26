@@ -97,6 +97,9 @@ if( NOT iMSTK_USE_Vulkan )
   set(RENDERING_DEPENDENCIES
     #GUIOverlay
     Materials)
+  if (iMSTK_ENABLE_VR)
+    list(APPEND RENDERING_DEPENDENCIES openvr)
+  endif()
 else()
   set(RENDERING_H_FILES ${VULKAN_H_FILES})
   set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
@@ -111,9 +114,6 @@ else()
     ${Vulkan}
     glfw
     gli)
-  if (iMSTK_ENABLE_VR)
-    list(APPEND RENDERING_DEPENDENCIES openvr)
-  endif()
 endif()
 
 include(imstkAddLibrary)
@@ -121,11 +121,9 @@ imstk_add_library( Rendering
   H_FILES
     imstkRenderer.h
     ${RENDERING_H_FILES}
-    imstkVtkCapsuleSource.h
   CPP_FILES
     imstkRenderer.cpp
     ${RENDERING_CPP_FILES}
-    imstkVtkCapsuleSource.cpp
   SUBDIR_LIST
     ${RENDERING_SUBDIR}
   DEPENDS

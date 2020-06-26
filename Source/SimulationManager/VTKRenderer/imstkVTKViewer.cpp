@@ -255,7 +255,7 @@ VTKViewer::getTextStatusManager()
 }
 
 void
-VTKViewer::timerCallback(vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
+VTKViewer::timerCallback(vtkObject* vtkNotUsed(caller), long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
 {
     VTKViewer* self = static_cast<VTKViewer*>(clientData);
 
