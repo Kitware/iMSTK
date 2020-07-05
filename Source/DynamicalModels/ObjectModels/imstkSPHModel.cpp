@@ -25,63 +25,6 @@ limitations under the License.
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"
 
-/////////////////////////////////////////////////////////////////////////
-// These includes are temporary for testing Pulse in iMSTK
-#include "PulsePhysiologyEngine.h"
-#include "engine/SEEngineTracker.h"
-#include "engine/SEDataRequest.h"
-#include "properties/SEScalarTime.h"
-#include "CommonDataModel.h"
-#include "engine/SEDataRequestManager.h"
-#include "engine/SEEngineTracker.h"
-#include "compartment/SECompartmentManager.h"
-#include "patient/actions/SEHemorrhage.h"
-#include "patient/actions/SESubstanceCompoundInfusion.h"
-#include "system/physiology/SEBloodChemistrySystem.h"
-#include "system/physiology/SECardiovascularSystem.h"
-#include "system/physiology/SEEnergySystem.h"
-#include "system/physiology/SERespiratorySystem.h"
-#include "substance/SESubstanceManager.h"
-#include "substance/SESubstanceCompound.h"
-#include "properties/SEScalar0To1.h"
-#include "properties/SEScalarFrequency.h"
-#include "properties/SEScalarMass.h"
-#include "properties/SEScalarMassPerVolume.h"
-#include "properties/SEScalarPressure.h"
-#include "properties/SEScalarTemperature.h"
-#include "properties/SEScalarTime.h"
-#include "properties/SEScalarVolume.h"
-#include "properties/SEScalarVolumePerTime.h"
-/////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////
-// Temporary class for testing Pulse in iMSTK
-class HowToTracker
-{
-private:
-  double m_dT_s;  // Cached Engine Time Step
-  PhysiologyEngine& m_Engine;
-public:
-  HowToTracker(PhysiologyEngine& engine) : m_Engine(engine) 
-  {
-    m_dT_s = m_Engine.GetTimeStep(TimeUnit::s);
-  };
-  ~HowToTracker() {};
-
-  // This class will operate on seconds
-  void AdvanceModelTime(double time_s) {
-    // This samples the engine at each time step
-    int count = static_cast<int>(time_s / m_dT_s);
-    for (int i = 0; i < count; i++)
-    {
-      m_Engine.AdvanceModelTime();  // Compute 1 time step
-
-      // Pull Track will pull data from the engine and append it to the file
-      m_Engine.GetEngineTracker()->TrackData(m_Engine.GetSimulationTime(TimeUnit::s));
-    };
-  }
-};
-////////////////////////////////////////////////////////////////
 
 namespace imstk
 {
@@ -103,96 +46,6 @@ SPHModelConfig::SPHModelConfig(const Real particleRadius)
 void
 SPHModelConfig::initialize()
 {
-    ///////////////////////////////////////////////////////////////////////////////////
-    // Temporary method to test that Pulse is working in iMSTK with hemorrhage model
-
-    // Create the engine and load the patient
-    std::unique_ptr<PhysiologyEngine> pe = CreatePulseEngine();
-    pe->GetLogger()->SetLogFile("./test_results/HowTo_Hemorrhage.log");
-    pe->GetLogger()->Info("HowTo_Hemorrhage");
-    if (!pe->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json", JSON))
-    {
-      pe->GetLogger()->Error("Could not load state, check the error");
-      return;
-    }
-
-    // The tracker is responsible for advancing the engine time and outputting the data requests below at each time step
-    HowToTracker tracker(*pe);
-
-    // Create data requests for each value that should be written to the output log as the engine is executing
-    pe->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("HeartRate", FrequencyUnit::Per_min);
-    pe->GetEngineTracker()->GetDataRequestManager().SetResultsFilename("HowToHemorrhage.csv");
-
-    pe->GetLogger()->Info("The patient is nice and healthy");
-    pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
-    pe->GetLogger()->Info(std::stringstream() << "Hemoglobin Content : " << pe->GetBloodChemistrySystem()->GetHemoglobinContent(MassUnit::g) << MassUnit::g);
-    pe->GetLogger()->Info(std::stringstream() << "Blood Volume : " << pe->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    pe->GetLogger()->Info(std::stringstream() << "Mean Arterial Pressure : " << pe->GetCardiovascularSystem()->GetMeanArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Systolic Pressure : " << pe->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Diastolic Pressure : " << pe->GetCardiovascularSystem()->GetDiastolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Heart Rate : " << pe->GetCardiovascularSystem()->GetHeartRate(FrequencyUnit::Per_min) << "bpm");
-
-    // Hemorrhage Starts - instantiate a hemorrhage action and have the engine process it
-    SEHemorrhage hemorrhageLeg;
-    hemorrhageLeg.SetType(eHemorrhage_Type::External);
-    hemorrhageLeg.SetCompartment(pulse::VascularCompartment::RightLeg);//the location of the hemorrhage
-    hemorrhageLeg.GetRate().SetValue(250, VolumePerTimeUnit::mL_Per_min);//the rate of hemorrhage
-    pe->ProcessAction(hemorrhageLeg);
-
-    // Advance some time to let the body bleed out a bit
-    //tracker.AdvanceModelTime(3);
-
-    pe->GetLogger()->Info("The patient has been hemorrhaging for 3s");
-    pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
-    pe->GetLogger()->Info(std::stringstream() << "Hemoglobin Content : " << pe->GetBloodChemistrySystem()->GetHemoglobinContent(MassUnit::g) << MassUnit::g);
-    pe->GetLogger()->Info(std::stringstream() << "Blood Volume : " << pe->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    pe->GetLogger()->Info(std::stringstream() << "Mean Arterial Pressure : " << pe->GetCardiovascularSystem()->GetMeanArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Systolic Pressure : " << pe->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Diastolic Pressure : " << pe->GetCardiovascularSystem()->GetDiastolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Heart Rate : " << pe->GetCardiovascularSystem()->GetHeartRate(FrequencyUnit::Per_min) << "bpm");;
-
-    // Hemorrhage is sealed
-    hemorrhageLeg.SetType(eHemorrhage_Type::External);
-    hemorrhageLeg.SetCompartment(pulse::VascularCompartment::RightLeg);//location of hemorrhage
-    hemorrhageLeg.GetRate().SetValue(0, VolumePerTimeUnit::mL_Per_min);//rate is set to 0 to close the bleed
-    pe->ProcessAction(hemorrhageLeg);
-
-    // Advance some time while the medic gets the drugs ready
-    //tracker.AdvanceModelTime(5);
-
-    pe->GetLogger()->Info("The patient has NOT been hemorrhaging for 100s");
-    pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
-    pe->GetLogger()->Info(std::stringstream() << "Hemoglobin Content : " << pe->GetBloodChemistrySystem()->GetHemoglobinContent(MassUnit::g) << MassUnit::g);
-    pe->GetLogger()->Info(std::stringstream() << "Blood Volume : " << pe->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    pe->GetLogger()->Info(std::stringstream() << "Mean Arterial Pressure : " << pe->GetCardiovascularSystem()->GetMeanArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Systolic Pressure : " << pe->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Diastolic Pressure : " << pe->GetCardiovascularSystem()->GetDiastolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Heart Rate : " << pe->GetCardiovascularSystem()->GetHeartRate(FrequencyUnit::Per_min) << "bpm");;
-
-    // Patient is stabilizing, but not great
-
-    // Let's administer a saline drip, we need to get saline from the substance maganer
-    SESubstanceCompound* saline = pe->GetSubstanceManager().GetCompound("Saline");
-    SESubstanceCompoundInfusion iVSaline(*saline);
-    iVSaline.GetBagVolume().SetValue(500, VolumeUnit::mL);//the total volume in the bag of Saline
-    iVSaline.GetRate().SetValue(100, VolumePerTimeUnit::mL_Per_min);//The rate to admnister the compound in the bag in this case saline
-    pe->ProcessAction(iVSaline);
-
-    //tracker.AdvanceModelTime(5);
-
-    pe->GetLogger()->Info("The patient has been getting fluids for the past 5s");
-    pe->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << pe->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
-    pe->GetLogger()->Info(std::stringstream() << "Hemoglobin Content : " << pe->GetBloodChemistrySystem()->GetHemoglobinContent(MassUnit::g) << MassUnit::g);
-    pe->GetLogger()->Info(std::stringstream() << "Blood Volume : " << pe->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    pe->GetLogger()->Info(std::stringstream() << "Mean Arterial Pressure : " << pe->GetCardiovascularSystem()->GetMeanArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Systolic Pressure : " << pe->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Diastolic Pressure : " << pe->GetCardiovascularSystem()->GetDiastolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    pe->GetLogger()->Info(std::stringstream() << "Heart Rate : " << pe->GetCardiovascularSystem()->GetHeartRate(FrequencyUnit::Per_min) << "bpm");;
-    pe->GetLogger()->Info("Finished");
-
-    // end Pulse hemorrhage test
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-
     // Compute the derived quantities
     m_particleRadiusSqr = m_particleRadius * m_particleRadius;
 
@@ -218,16 +71,16 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         });
     m_computePressureAccelNode =
         m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
-    m_computeSurfaceTensionNode =
-        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
+    //m_computeSurfaceTensionNode =
+    //    m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
     m_computeTimeStepSizeNode =
         m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
     m_integrateNode =
         m_taskGraph->addFunction("SPHModel_Integrate", [&]()
         {
             sumAccels();
-            updateVelocity(getTimeStep());
-            //updateVelocityNoGravity(getTimeStep());
+            //updateVelocity(getTimeStep());
+            updateVelocityNoGravity(getTimeStep());
             computeViscosity();
             moveParticles(getTimeStep());
         });
@@ -262,7 +115,9 @@ SPHModel::initialize()
         m_modelParameters->m_kernelRadius);
 
     m_pressureAccels       = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles());
-    m_surfaceTensionAccels = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles());
+
+    // initialize surface tension to 0 in case you remove the surface tension node
+    m_surfaceTensionAccels = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0.0, 0.0, 0.0));
 
     return true;
 }
@@ -283,11 +138,11 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
 
     // Pressure, Surface Tension, and time step size can be done in parallel
     m_taskGraph->addEdge(m_computeDensityNode, m_computePressureAccelNode);
-    m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
+    //m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
     m_taskGraph->addEdge(m_computeDensityNode, m_computeTimeStepSizeNode);
 
     m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
-    m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
+    //m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
     m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
 
     m_taskGraph->addEdge(m_integrateNode, sink);
@@ -461,11 +316,11 @@ SPHModel::normalizeDensity()
 void
 SPHModel::computePressureAcceleration()
 {
-    auto particlePressure = [&](const Real density) {
-                                const Real error = std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1);
-                                // clamp pressure error to zero to maintain stability
-                                return error > Real(0) ? error : Real(0);
-                            };
+    //auto particlePressure = [&](const Real density) {
+    //                            const Real error = std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1);
+    //                            // clamp pressure error to zero to maintain stability
+    //                            return error > Real(0) ? error : Real(0);
+    //                        };
 
     StdVectorOfVec3d& pressureAccels = *m_pressureAccels;
     ParallelUtils::parallelFor(getState().getNumParticles(),
@@ -655,15 +510,31 @@ SPHModel::moveParticles(Real timestep)
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
             getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
-            //periodicBCs(p);
+            periodicBCs(p);
         });
+
+    if (!m_wallPointIndices.empty())
+    {
+      ParallelUtils::parallelFor(m_wallPointIndices.size(),
+        [&](const size_t p) {
+          getState().getPositions()[m_wallPointIndices[p]] -= getState().getVelocities()[m_wallPointIndices[p]] * timestep;
+          getState().getVelocities()[m_wallPointIndices[p]] = Vec3r(0.0, 0.0, 0.0);
+        });
+    }
+}
+
+Real SPHModel::particlePressure(const double density)
+{
+  const Real error = std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1);
+  // clamp pressure error to zero to maintain stability
+  return error > Real(0) ? error : Real(0);
 }
 
 void SPHModel::periodicBCs(const size_t p)
 {
-   if (getState().getPositions()[p].x() > 0.33)
+   if (getState().getPositions()[p].x() > m_maxXCoord)
    {
-     getState().getPositions()[p] = Vec3r(-9.5, getState().getPositions()[p].y(), getState().getPositions()[p].z());
+     getState().getPositions()[p].x() = m_minXCoord;
    }
 }
 

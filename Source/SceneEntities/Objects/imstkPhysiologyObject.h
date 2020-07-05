@@ -25,35 +25,34 @@
 
 namespace imstk
 {
-class SPHModel;
+class PhysiologyModel;
 
 ///
-/// \class SPHObject
+/// \class PhysiologyObject
 ///
-/// \brief Base class for scene objects that move and/or deform under
-/// smooth particle hydrodynamics
+/// \brief Base class for Physiology objects
 ///
-class SPHObject : public DynamicObject
+class PhysiologyObject : public DynamicObject
 {
 public:
-    explicit SPHObject(const std::string& name);
+    explicit PhysiologyObject(const std::string& name);
 
-    virtual ~SPHObject() override = default;
+    virtual ~PhysiologyObject() override = default;
 
 public:
     ///
-    /// \brief Initialize the SPH scene object
+    /// \brief Initialize the Physiology scene object
     ///
     bool initialize() override;
 
-    std::shared_ptr<SPHModel> getDynamicalSPHModel();
+    std::shared_ptr<PhysiologyModel> getPhysiologyModel();
 
     ///
-    /// \brief Get the SPH model of the object
+    /// \brief Get the Physiology model of the object
     ///
-    std::shared_ptr<SPHModel> getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+    //std::shared_ptr<PhysiologyModel> getPhysiologyModel() const { assert(m_PhysiologyModel); return m_PhysiologyModel; }
 
 protected:
-    std::shared_ptr<SPHModel> m_SPHModel = nullptr;
+    std::shared_ptr<PhysiologyModel> m_PhysiologyModel = nullptr;
 };
 } // end namespace imstk

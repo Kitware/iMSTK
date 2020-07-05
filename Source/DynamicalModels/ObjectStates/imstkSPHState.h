@@ -65,9 +65,13 @@ public:
     ///
     void setState(const std::shared_ptr<SPHKinematicState>& rhs);
 
+    void setWallParticleData(const StdVectorOfVec3r& positions) { m_WallPositions = positions; }
+
+
 private:
     StdVectorOfVec3r m_Positions;   ///> Particle positions
     StdVectorOfVec3r m_Velocities;  ///> Particle velocities
+    StdVectorOfVec3r m_WallPositions;  ///> Particle velocities
 };
 
 ///

@@ -42,7 +42,9 @@ enum class InteractionType
 
     FemObjToCollidingObjPenaltyForce,
     FemObjToCollidingObjBoneDrilling,
-    FemObjToCollidingObjNodalPicking
+    FemObjToCollidingObjNodalPicking,
+
+    SphObjToPhysObjCollision
 };
 
 ///

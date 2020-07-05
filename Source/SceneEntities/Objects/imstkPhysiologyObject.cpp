@@ -19,41 +19,35 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkDynamicObject.h"
+#include "imstkPhysiologyObject.h"
+#include "imstkPhysiologyModel.h"
 
 namespace imstk
 {
-class SPHModel;
-
-///
-/// \class SPHObject
-///
-/// \brief Base class for scene objects that move and/or deform under
-/// smooth particle hydrodynamics
-///
-class SPHObject : public DynamicObject
+  PhysiologyObject::PhysiologyObject(const std::string& name) : DynamicObject(name)
 {
-public:
-    explicit SPHObject(const std::string& name);
+    this->m_type = Type::Physiology;
+}
 
-    virtual ~SPHObject() override = default;
-
-public:
-    ///
-    /// \brief Initialize the SPH scene object
-    ///
-    bool initialize() override;
-
-    std::shared_ptr<SPHModel> getDynamicalSPHModel();
-
-    ///
-    /// \brief Get the SPH model of the object
-    ///
-    std::shared_ptr<SPHModel> getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
-
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel = nullptr;
+std::shared_ptr<PhysiologyModel> PhysiologyObject::getPhysiologyModel()
+{
+    m_PhysiologyModel = std::dynamic_pointer_cast<PhysiologyModel>(m_dynamicalModel);
+    return m_PhysiologyModel;
 };
+
+bool
+PhysiologyObject::initialize()
+{
+    m_PhysiologyModel = std::dynamic_pointer_cast<PhysiologyModel>(m_dynamicalModel);
+    if (m_PhysiologyModel == nullptr)
+    {
+        LOG(FATAL) << "Dynamics pointer cast failure in SPHObject::initialize()";
+        return false;
+    }
+
+    DynamicObject::initialize();
+    m_PhysiologyModel->initialize();
+
+    return true;
+}
 } // end namespace imstk

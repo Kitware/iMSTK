@@ -477,7 +477,10 @@ SimulationManager::start(const SimulationStatus simStatus /*= SimulationStatus::
     LOG_IF(WARNING, !this->getActiveScene()) << "No valid active scene! Simulation canceled";
 
     setThreadPoolSize(m_config->threadPoolSize);
+
+    // is this line correct?
     if (!m_initialized)
+    //if (!this->getActiveScene()->isInitialized())
     {
         this->initialize();
     }

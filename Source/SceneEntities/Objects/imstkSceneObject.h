@@ -52,7 +52,8 @@ public:
         FEMDeformable,
         ReducedFEMDeformable,
         Pbd,
-        SPH
+        SPH,
+        Physiology
     };
 
     ///

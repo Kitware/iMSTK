@@ -21,39 +21,28 @@
 
 #pragma once
 
-#include "imstkDynamicObject.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
-class SPHModel;
-
 ///
-/// \class SPHObject
+/// \class PhysiologyState
+/// \brief State of Physiology model
 ///
-/// \brief Base class for scene objects that move and/or deform under
-/// smooth particle hydrodynamics
-///
-class SPHObject : public DynamicObject
+class PhysiologyState // keep class for now in case we need it in future
 {
 public:
-    explicit SPHObject(const std::string& name);
-
-    virtual ~SPHObject() override = default;
-
-public:
     ///
-    /// \brief Initialize the SPH scene object
+    /// \brief Default constructor/destructor
     ///
-    bool initialize() override;
-
-    std::shared_ptr<SPHModel> getDynamicalSPHModel();
+    PhysiologyState() = default;
+    virtual ~PhysiologyState() = default;
 
     ///
-    /// \brief Get the SPH model of the object
+    /// \brief Set the state to a given one
     ///
-    std::shared_ptr<SPHModel> getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+    void setState(const std::shared_ptr<PhysiologyState>&) {};
 
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel = nullptr;
+private:
 };
 } // end namespace imstk

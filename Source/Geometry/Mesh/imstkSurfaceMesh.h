@@ -209,6 +209,11 @@ public:
     ///
     size_t getMaxNumTriangles();
 
+    /// 
+    /// \brief Scale a surface mesh independently in each direction
+    ///
+    void directionalScale(const double s_x, const double s_y, const double s_z);
+
 protected:
 
     friend class VTKSurfaceMeshRenderDelegate;

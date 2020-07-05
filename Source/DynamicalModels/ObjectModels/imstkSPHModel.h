@@ -175,7 +175,12 @@ public:
 
     void setInitialVelocities(StdVectorOfVec3d& initialVelocities);
     StdVectorOfVec3d getInitialVelocities();
+
+    Real particlePressure(const double density);
     void periodicBCs(const size_t p);
+
+    void setWallPointIndices(std::vector<size_t>& wallPointIndices) { m_wallPointIndices = wallPointIndices; }
+    void setMaxMinXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
 
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
@@ -183,7 +188,7 @@ public:
     std::shared_ptr<TaskNode> getComputeSurfaceTensionNode() const { return m_computeSurfaceTensionNode; }
     std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
     std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
-    std::shared_ptr<TaskNode> getIntegrateNode() const { m_integrateNode; }
+    std::shared_ptr<TaskNode> getIntegrateNode() const { return m_integrateNode; }
 
 protected:
     ///
@@ -287,6 +292,12 @@ private:
     std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
 
     StdVectorOfVec3d m_initialVelocities;
+    StdVectorOfReal m_initialDensities;
+
+    std::vector<size_t> m_wallPointIndices;
+    double m_minXCoord;
+    double m_maxXCoord;
+
 
 };
 } // end namespace imstk

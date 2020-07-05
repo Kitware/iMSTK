@@ -29,6 +29,13 @@ SPHObject::SPHObject(const std::string& name) : DynamicObject(name)
     this->m_type = Type::SPH;
 }
 
+std::shared_ptr<SPHModel>
+SPHObject::getDynamicalSPHModel()
+{
+  m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
+  return m_SPHModel;
+}
+
 bool
 SPHObject::initialize()
 {
@@ -39,6 +46,7 @@ SPHObject::initialize()
         return false;
     }
 
+    // why are we initializing twice?
     DynamicObject::initialize();
     m_SPHModel->initialize();
 
