@@ -297,7 +297,5 @@ private:
     std::vector<size_t> m_wallPointIndices;
     double m_minXCoord;
     double m_maxXCoord;
-
-
 };
 } // end namespace imstk
