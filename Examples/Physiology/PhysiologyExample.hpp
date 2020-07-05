@@ -129,9 +129,12 @@ main(int argc, char* argv[])
 
   simManager->setActiveScene(scene);
 
-  // removing the surface tension node is not working, manually removed node from SPH model instead
-  //auto taskGraph = scene->getTaskGraph();
-  //taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
+  // remove the surface tension node
+  scene->setTaskGraphConfigureCallback([&](Scene* scene)
+    {
+      auto taskGraph = scene->getTaskGraph();
+      taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
+    });
 
   simManager->start(SimulationStatus::Paused);
 

@@ -71,8 +71,8 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         });
     m_computePressureAccelNode =
         m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
-    //m_computeSurfaceTensionNode =
-    //    m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
+    m_computeSurfaceTensionNode =
+        m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
     m_computeTimeStepSizeNode =
         m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
     m_integrateNode =
@@ -138,11 +138,11 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
 
     // Pressure, Surface Tension, and time step size can be done in parallel
     m_taskGraph->addEdge(m_computeDensityNode, m_computePressureAccelNode);
-    //m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
     m_taskGraph->addEdge(m_computeDensityNode, m_computeTimeStepSizeNode);
 
     m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
-    //m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
     m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
 
     m_taskGraph->addEdge(m_integrateNode, sink);
