@@ -84,13 +84,14 @@ main(int argc, char* argv[])
 
     auto scene = simManager->createNewScene("SPH Fluid");
 
-    // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    // Create the viewer
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("SPH Fluid");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
     statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Red);
+    simManager->setViewer(viewer);
 
     // Generate fluid and solid objects
     auto fluidObj = generateFluid(scene, particleRadius);
