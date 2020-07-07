@@ -182,6 +182,12 @@ public:
     void setWallPointIndices(std::vector<size_t>& wallPointIndices) { m_wallPointIndices = wallPointIndices; }
     void setMaxMinXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
 
+    void writeStateToCSV();
+    void setWriteToCSVModulo(const Real modulo) { m_writeToCSVModulo = modulo; }
+    Real getTotalTime() const { return m_totalTime; }
+    int getTimeStepCount() const { return m_timeStepCount; }
+
+
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
     std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
@@ -297,5 +303,10 @@ private:
     std::vector<size_t> m_wallPointIndices;
     double m_minXCoord;
     double m_maxXCoord;
+
+    double m_totalTime;
+    double m_writeToCSVModulo;
+    int m_timeStepCount;
+
 };
 } // end namespace imstk

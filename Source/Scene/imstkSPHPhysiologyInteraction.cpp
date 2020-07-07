@@ -50,7 +50,7 @@ void SPHPhysiologyObjectInteractionPair::computeInletBCs()
 {
     // todo input femoral flow rate as inlet boundary condition of SPH model
     double femoralFlowRate = m_physiologyModel1->m_femoralFlowRate;
-    std::cout << femoralFlowRate << std::endl;
+    //std::cout << femoralFlowRate << std::endl;
 }
 
 void

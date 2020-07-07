@@ -119,6 +119,10 @@ SPHModel::initialize()
     // initialize surface tension to 0 in case you remove the surface tension node
     m_surfaceTensionAccels = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0.0, 0.0, 0.0));
 
+    m_totalTime = 0.0;
+    m_timeStepCount = 0;
+    //m_writeToCSVModulo = DBL_MAX;
+
     return true;
 }
 
@@ -152,6 +156,8 @@ void
 SPHModel::computeTimeStepSize()
 {
     m_dt = (this->m_timeStepSizeType == TimeSteppingType::Fixed) ? m_defaultDt : computeCFLTimeStepSize();
+    m_totalTime += m_dt;
+    m_timeStepCount++;
 }
 
 Real
@@ -546,4 +552,26 @@ StdVectorOfVec3d SPHModel::getInitialVelocities()
 {
   return m_initialVelocities;
 }
+
+void SPHModel::writeStateToCSV()
+{
+  if (std::fmod(m_totalTime, m_writeToCSVModulo) < 1e-8 && m_totalTime > 0)
+  {
+    std::cout << "Writing CSV at time: " << m_totalTime << std::endl;
+    std::ofstream outputFile;
+    outputFile.open(iMSTK_DATA_ROOT + std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".csv"));
+    outputFile << "X,Y,Z,Vx,Vy,Vz,Pressure\n";
+    auto positions = getState().getPositions();
+    auto velocities = getState().getVelocities();
+    auto densities = getState().getDensities();
+    for (int i = 0; i < getState().getNumParticles(); ++i)
+    {
+      outputFile << positions[i].x() << "," << positions[i].y() << "," << positions[i].z() << ",";
+      outputFile << velocities[i].x() << "," << velocities[i].y() << "," << velocities[i].z() << ",";
+      outputFile << particlePressure(densities[i]) << "\n";
+    }
+    outputFile.close();
+  }
+}
+
 } // end namespace imstk

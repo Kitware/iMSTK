@@ -252,7 +252,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   if (SCENE_ID == 1)
   {
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
-    auto surfMeshExpanded = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
+    std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
+
     surfMeshExpanded->scale(1.2, Geometry::TransformType::ApplyToData);
 
     surfMesh->directionalScale(1.4, 1.0, 1.0);
@@ -292,7 +293,9 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
     sphModel->setInitialVelocities(initialFluidVelocities);
   }
-   
+  
+  sphModel->setWriteToCSVModulo(0.5);
+
   LOG(INFO) << "Number of particles: " << particles.size();
 
   // Create a geometry object

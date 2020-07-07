@@ -134,6 +134,21 @@ main(int argc, char* argv[])
     {
       auto taskGraph = scene->getTaskGraph();
       taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
+
+      std::shared_ptr<TaskNode> printTotalTime = std::make_shared<TaskNode>([&]()
+        {
+          if (fluidObj->getDynamicalSPHModel()->getTimeStepCount() % 100 == 0)
+          {
+            printf("Total time (s): %f\n", fluidObj->getDynamicalSPHModel()->getTotalTime());
+          }
+        }, "PrintTotalTime");
+
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), printTotalTime);
+
+      std::shared_ptr<TaskNode> writeSPHStateToCSV = std::make_shared<TaskNode>([&]() {
+        fluidObj->getDynamicalSPHModel()->writeStateToCSV();
+        }, "WriteStateToCSV");
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), writeSPHStateToCSV);
     });
 
   simManager->start(SimulationStatus::Paused);
