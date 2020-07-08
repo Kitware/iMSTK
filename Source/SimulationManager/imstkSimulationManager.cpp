@@ -52,20 +52,23 @@ SimulationManager::SimulationManager(const std::shared_ptr<SimManagerConfig> con
 void
 SimulationManager::createViewer(const bool enableVR)
 {
+    if (m_viewer == nullptr)
+    {
 #ifdef iMSTK_USE_Vulkan
-    m_viewer = std::make_shared<VulkanViewer>(this, enableVR);
+        m_viewer = std::make_shared<VulkanViewer>(this, enableVR);
 #else
 
 #ifdef iMSTK_ENABLE_VR
-    m_viewer = std::make_shared<VTKViewer>(this, enableVR);
+        m_viewer = std::make_shared<VTKViewer>(this, enableVR);
 #else
 
-    LOG_IF(FATAL, enableVR) << "Can not run VR simulation without iMSTK_ENABLE_VR";
+        LOG_IF(FATAL, enableVR) << "Can not run VR simulation without iMSTK_ENABLE_VR";
 
-    m_viewer = std::make_shared<VTKViewer>(this, false);
-    m_viewer->setWindowTitle(m_config->simulationName);
+        m_viewer = std::make_shared<VTKViewer>(this, false);
+        m_viewer->setWindowTitle(m_config->simulationName);
 #endif
 #endif
+    }
 }
 
 void

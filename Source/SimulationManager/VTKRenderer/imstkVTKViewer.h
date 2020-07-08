@@ -54,6 +54,7 @@ class VTKViewer : public Viewer
 public:
     ///
     /// \brief Constructor
+    /// \todo: SimulationManager and Viewer's should not have a circular dependence
     ///
     VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false);
 

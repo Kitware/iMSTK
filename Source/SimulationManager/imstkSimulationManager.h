@@ -136,6 +136,11 @@ public:
     void setOptimalThreadPoolSize();
 
     ///
+    /// \brief Set the viewer
+    ///
+    void setViewer(std::shared_ptr<Viewer> viewer) { m_viewer = viewer; }
+
+    ///
     /// \brief Returns true if the scene is registered, else false
     ///
     bool isSceneRegistered(const std::string& sceneName) const;
