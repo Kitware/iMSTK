@@ -26,6 +26,12 @@
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
 
+#include "vtkPolyData.h"
+#include "vtkUnstructuredGrid.h"
+
+#include "imstkTetrahedralMesh.h"
+
+
 namespace imstk
 {
 class ComputeNode;
@@ -183,9 +189,14 @@ public:
     void setMaxMinXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
 
     void writeStateToCSV();
-    void setWriteToCSVModulo(const Real modulo) { m_writeToCSVModulo = modulo; }
+    void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
     Real getTotalTime() const { return m_totalTime; }
     int getTimeStepCount() const { return m_timeStepCount; }
+    void writeStateToVtk();
+    void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
+    size_t findNearestParticleToVertex(const Vec3d point);
+
+
 
 
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
@@ -305,8 +316,11 @@ private:
     double m_maxXCoord;
 
     double m_totalTime;
-    double m_writeToCSVModulo;
+    double m_writeToOutputModulo;
     int m_timeStepCount;
+
+    std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
+
 
 };
 } // end namespace imstk

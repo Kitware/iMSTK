@@ -149,6 +149,11 @@ main(int argc, char* argv[])
         fluidObj->getDynamicalSPHModel()->writeStateToCSV();
         }, "WriteStateToCSV");
       taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), writeSPHStateToCSV);
+
+      std::shared_ptr<TaskNode> writeSPHStateToVtk = std::make_shared<TaskNode>([&]() {
+        fluidObj->getDynamicalSPHModel()->writeStateToVtk();
+        }, "WriteStateToVtk");
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), writeSPHStateToVtk);
     });
 
   simManager->start(SimulationStatus::Paused);

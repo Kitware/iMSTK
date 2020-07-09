@@ -27,6 +27,7 @@
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 
 #include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkCenterOfMass.h>
@@ -252,6 +253,10 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   if (SCENE_ID == 1)
   {
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.vtk"));
+
+    sphModel->setGeometryMesh(tetMesh);
+
     std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
 
     surfMeshExpanded->scale(1.2, Geometry::TransformType::ApplyToData);
@@ -265,7 +270,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
 
     auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
-
     auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
     particles = enclosedFluidPoints->getInitialVertexPositions();
     auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
@@ -294,7 +298,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     sphModel->setInitialVelocities(initialFluidVelocities);
   }
   
-  sphModel->setWriteToCSVModulo(0.5);
+  sphModel->setWriteToOutputModulo(0.5);
 
   LOG(INFO) << "Number of particles: " << particles.size();
 

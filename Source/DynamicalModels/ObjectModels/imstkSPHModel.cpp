@@ -25,6 +25,9 @@ limitations under the License.
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"
 
+#include "imstkGeometryUtilities.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVTKMeshIO.h"
 
 namespace imstk
 {
@@ -555,7 +558,7 @@ StdVectorOfVec3d SPHModel::getInitialVelocities()
 
 void SPHModel::writeStateToCSV()
 {
-  if (std::fmod(m_totalTime, m_writeToCSVModulo) < 1e-8 && m_totalTime > 0)
+  if (std::fmod(m_totalTime, m_writeToOutputModulo) < 1e-3 && m_totalTime > 0)
   {
     std::cout << "Writing CSV at time: " << m_totalTime << std::endl;
     std::ofstream outputFile;
@@ -571,6 +574,56 @@ void SPHModel::writeStateToCSV()
       outputFile << particlePressure(densities[i]) << "\n";
     }
     outputFile.close();
+  }
+}
+
+size_t SPHModel::findNearestParticleToVertex(const Vec3d point)
+{
+  double minDistance = 1e10;
+  size_t minIndex = -1;
+  for (size_t i = 0; i < getState().getNumParticles(); i++)
+  {
+    Vec3d p1 = getState().getPositions()[i];
+
+    double distance = (point - p1).norm();
+    if (distance < minDistance)
+    {
+      minDistance = distance;
+      minIndex = i;
+    }
+  }
+
+  return minIndex;
+}
+
+void SPHModel::writeStateToVtk()
+{
+  if (std::fmod(m_totalTime, m_writeToOutputModulo) < 1e-3 && m_totalTime > 0)
+  {
+    auto particleVelocities = getState().getVelocities();
+    auto particleDensities = getState().getDensities();
+    std::map<std::string, StdVectorOfVectorf> pointDataMap;
+    StdVectorOfVectorf velocity;
+    StdVectorOfVectorf pressure;
+    velocity.reserve(m_geomUnstructuredGrid->getNumVertices());
+    pressure.reserve(m_geomUnstructuredGrid->getNumVertices());
+
+    Vectorf pressureVec(1);
+    Vectorf velocityVec(3);
+    for (auto i : m_geomUnstructuredGrid->getInitialVertexPositions())
+    {
+      size_t index = findNearestParticleToVertex(i);
+      velocityVec(0) = particleVelocities[index].x();
+      velocityVec(1) = particleVelocities[index].y();
+      velocityVec(2) = particleVelocities[index].z();
+      velocity.push_back(velocityVec);
+    }
+    pointDataMap.insert(std::pair<std::string, StdVectorOfVectorf>("velocity", velocity));
+    m_geomUnstructuredGrid->setPointDataMap(pointDataMap);
+
+    VTKMeshIO vtkWriter;
+    std::string filePath = iMSTK_DATA_ROOT + std::string("temp_sph_output_") + std::to_string(m_totalTime) + std::string(".vtu");
+    vtkWriter.write(m_geomUnstructuredGrid, filePath, VTK);
   }
 }
 
