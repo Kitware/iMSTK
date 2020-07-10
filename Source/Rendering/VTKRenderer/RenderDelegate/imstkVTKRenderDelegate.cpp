@@ -380,16 +380,16 @@ VTKRenderDelegate::updateActorPropertiesMesh()
     if (material->m_scalarVisibility)
     {
         // Convert color table
-        std::shared_ptr<ColorFunction> imstkLookupTable = material->getColorLookupTable();
-        const double* range = imstkLookupTable->getRange().data();
-        double spacing = (range[1] - range[0]) / imstkLookupTable->getNumberOfColors();
+        std::shared_ptr<ColorFunction>   imstkLookupTable = material->getColorLookupTable();
+        const double*                    range   = imstkLookupTable->getRange().data();
+        double                           spacing = (range[1] - range[0]) / imstkLookupTable->getNumberOfColors();
         vtkNew<vtkColorTransferFunction> lookupTable;
         lookupTable->SetColorSpaceToRGB();
         for (int i = 0; i < imstkLookupTable->getNumberOfColors(); i++)
         {
-            const double t = static_cast<double>(i) / imstkLookupTable->getNumberOfColors();
+            const double t     = static_cast<double>(i) / imstkLookupTable->getNumberOfColors();
             const Color& color = imstkLookupTable->getColor(i);
-            lookupTable->AddRGBPoint(t  * (range[1] - range[0]) + range[0] + spacing * 0.5, color.r, color.g, color.b);
+            lookupTable->AddRGBPoint(t * (range[1] - range[0]) + range[0] + spacing * 0.5, color.r, color.g, color.b);
         }
 
         switch (imstkLookupTable->getColorSpace())

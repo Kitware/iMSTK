@@ -193,7 +193,7 @@ protected:
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
     // \todo: move to pointDataMap eventually, currently pointDataMap is non-continguous and can't be mapped
-    std::shared_ptr<StdVectorOfReal> m_pointScalars; ///> vector of scalars, singular doubles per vertex.
+    std::shared_ptr<StdVectorOfReal> m_pointScalars;          ///> vector of scalars, singular doubles per vertex.
 
     bool   m_topologyChanged     = false;
     double m_loadFactor          = 2.0;

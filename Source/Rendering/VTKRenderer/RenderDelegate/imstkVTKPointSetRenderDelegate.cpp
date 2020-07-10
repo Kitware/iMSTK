@@ -63,7 +63,7 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
         m_mappedScalarArray->SetArray(reinterpret_cast<double*>(scalars->data()), scalars->size(), 1);
         pointsPolydata->GetPointData()->SetScalars(m_mappedScalarArray);
     }
-    
+
     vtkNew<vtkVertexGlyphFilter> glyphFilter;
     glyphFilter->SetInputData(pointsPolydata);
     glyphFilter->Update();
