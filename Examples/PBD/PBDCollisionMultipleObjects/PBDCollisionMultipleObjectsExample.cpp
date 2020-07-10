@@ -160,8 +160,10 @@ main()
     auto scene      = simManager->createNewScene("PbdCollision");
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("PbdCollision");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
+    simManager->setViewer(viewer);
 
     auto floorMesh = createUniformSurfaceMesh(100.0, 100.0, 2, 2);
 

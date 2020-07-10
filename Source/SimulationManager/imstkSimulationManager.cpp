@@ -46,31 +46,28 @@ SimulationManager::SimulationManager(const std::shared_ptr<SimManagerConfig> con
         Logger& logger = Logger::getInstance();
         m_stdSinkHandle = logger.addStdoutSink();
     }
-
-    // create viewer if the selected mode is 'rendering'
-    if (m_config->simulationMode == SimulationMode::Rendering)
-    {
-        createViewer(m_config->VR_Enabled);
-    }
 }
 
 void
 SimulationManager::createViewer(const bool enableVR)
 {
+    if (m_viewer == nullptr)
+    {
 #ifdef iMSTK_USE_Vulkan
-    m_viewer = std::make_shared<VulkanViewer>(this, enableVR);
+        m_viewer = std::make_shared<VulkanViewer>(this, enableVR);
 #else
 
 #ifdef iMSTK_ENABLE_VR
-    m_viewer = std::make_shared<VTKViewer>(this, enableVR);
+        m_viewer = std::make_shared<VTKViewer>(this, enableVR);
 #else
 
-    LOG_IF(FATAL, enableVR) << "Can not run VR simulation without iMSTK_ENABLE_VR";
+        LOG_IF(FATAL, enableVR) << "Can not run VR simulation without iMSTK_ENABLE_VR";
 
-    m_viewer = std::make_shared<VTKViewer>(this, false);
-    m_viewer->setWindowTitle(m_config->simulationName);
+        m_viewer = std::make_shared<VTKViewer>(this, false);
+        m_viewer->setWindowTitle(m_config->simulationName);
 #endif
 #endif
+    }
 }
 
 void
@@ -317,6 +314,16 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
                                   const bool         unloadCurrentScene /*= false*/)
 {
     LOG(INFO) << "Setting scene '" << newSceneName << "' as active";
+
+    // If the viewer doesn't exist create it
+    if (m_viewer == nullptr)
+    {
+        // create viewer if the selected mode is 'rendering'
+        if (m_config->simulationMode == SimulationMode::Rendering)
+        {
+            createViewer(m_config->VR_Enabled);
+        }
+    }
 
     // check if the scene is registered
     if (!this->isSceneRegistered(newSceneName))

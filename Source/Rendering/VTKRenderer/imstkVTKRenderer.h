@@ -27,6 +27,14 @@
 
 #include <vtkSmartPointer.h>
 
+#ifdef iMSTK_ENABLE_VR
+#include <vtkOpenVRRenderer.h>
+#include <vtkOpenVRCamera.h>
+#include <vtkOpenVRRenderWindow.h>
+#include <vtkOpenVRRenderWindowInteractor.h>
+#include <vtkInteractorStyle3D.h>
+#endif
+
 #include <unordered_map>
 
 class vtkAxesActor;
@@ -165,7 +173,7 @@ protected:
 
     TextureManager<VTKTextureDelegate> m_textureManager;
 #ifdef iMSTK_ENABLE_VR
-    std::vector<vtkOpenVRCameraPose> m_camPos;
+    std::vector<vtkSmartPointer<vtkOpenVRCamera>> m_cams;
 #endif
 
     vtkSmartPointer<vtkChartXY>      m_timeTableChart;

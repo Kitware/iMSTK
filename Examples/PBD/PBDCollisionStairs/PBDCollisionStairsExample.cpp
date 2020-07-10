@@ -38,7 +38,7 @@ using namespace imstk;
 
 ///
 /// \brief Creates a non-manifold top part of a staircase
-//.
+//
 static std::unique_ptr<SurfaceMesh>
 buildStairs(int nSteps, double width, double height, double depth)
 {
@@ -93,6 +93,9 @@ buildStairs(int nSteps, double width, double height, double depth)
     return stairMesh;
 }
 
+////
+/// \brief Creates an Armadillo PbdObject
+///
 static std::shared_ptr<PbdObject>
 makeArmadilloPbdObject(const std::string& name)
 {

@@ -106,11 +106,13 @@ main()
     // simManager and Scene
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("Octree Example");
-    simManager->setActiveScene(scene);
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("Octree Example");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
+    simManager->setViewer(viewer);
+    simManager->setActiveScene(scene); // Viewer has depedence on scene
 
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);

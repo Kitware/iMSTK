@@ -286,7 +286,7 @@ OctreeBasedCD::checkNonPointWithSubtree(OctreeNode* const pNode, OctreePrimitive
 
             if (pPrimitive != pIter)
             {
-                // todo: this is necessary but not help
+                // \todo: this is necessary but not help
                 const auto geomIdxIter   = pIter->m_GeomIdx;
                 const auto collisionPair = computeCollisionPairHash(geomIdx, geomIdxIter);
                 const auto collisionAssociatedData = getCollisionPairAssociatedData(collisionPair);

@@ -208,43 +208,19 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
 #ifdef iMSTK_ENABLE_VR
     if (enableVR)
     {
-        m_camPos.resize(2);
+        m_cams.resize(2);
 
         // save debug camera m_camPos[0]
-        m_defaultVtkCamera->GetPosition(m_camPos[0].Position);
-        m_defaultVtkCamera->GetDirectionOfProjection(m_camPos[0].ViewDirection);
-
-        m_camPos[0].PhysicalViewUp[0] = 0.0;
-        m_camPos[0].PhysicalViewUp[1] = 1.0;
-        m_camPos[0].PhysicalViewUp[2] = 0.0;
-
-        m_camPos[0].PhysicalViewDirection[0] = 1.0;
-        m_camPos[0].PhysicalViewDirection[1] = 0.0;
-        m_camPos[0].PhysicalViewDirection[2] = 0.0;
-
-        m_camPos[0].Distance = 10; // room scale factor
-
-        m_camPos[0].Translation[0] = 0.0;
-        m_camPos[0].Translation[1] = 0.0;
-        m_camPos[0].Translation[2] = 0.0;
+        m_cams[0] = vtkSmartPointer<vtkOpenVRCamera>::New();
+        m_cams[0]->SetPosition(m_defaultVtkCamera->GetPosition());
+        m_cams[0]->SetViewUp(0.0, 1.0, 0.0);
+        m_cams[0]->SetDistance(10.0); // room scale factor
 
         // save scene camera m_camPos[1]
-        m_sceneVtkCamera->GetPosition(m_camPos[1].Position);
-        m_sceneVtkCamera->GetDirectionOfProjection(m_camPos[1].ViewDirection);
-
-        m_camPos[1].PhysicalViewUp[0] = 0.0;
-        m_camPos[1].PhysicalViewUp[1] = 1.0;
-        m_camPos[1].PhysicalViewUp[2] = 0.0;
-
-        m_camPos[1].PhysicalViewDirection[0] = 1.0;
-        m_camPos[1].PhysicalViewDirection[1] = 0.0;
-        m_camPos[1].PhysicalViewDirection[2] = 0.0;
-
-        m_camPos[1].Distance = 1.0; // room scale factor of 1 meter
-
-        m_camPos[1].Translation[0] = 0.0;
-        m_camPos[1].Translation[1] = 0.0;
-        m_camPos[1].Translation[2] = 0.0;
+        m_cams[1] = vtkSmartPointer<vtkOpenVRCamera>::New();
+        m_cams[1]->SetPosition(m_sceneVtkCamera->GetPosition());
+        m_cams[1]->SetViewUp(0.0, 1.0, 0.0);
+        m_cams[1]->SetDistance(1.0); // room scale factor of 1 meter
     }
 #endif
 
@@ -350,7 +326,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
 #ifdef iMSTK_ENABLE_VR
         else // go to debug position camera
         {    // apply debug camera
-            m_camPos[0].Apply(static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()), renWin);
+            static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera())->DeepCopy(m_cams[0]);
             m_vtkRenderer->ResetCameraClippingRange();
         }
 #endif
@@ -373,9 +349,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
             // save last debug position camera
             if (enableVR)
             {
-                m_camPos[0].Set(
-                    static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()),
-                    vtkOpenVRRenderWindow::SafeDownCast(renWin));
+                static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera())->DeepCopy(m_cams[0]);
             }
 #endif
         }
@@ -387,7 +361,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
 #ifdef iMSTK_ENABLE_VR
         else // go to Predefined sceneVtkCamera position
         {    // apply scene camera
-            m_camPos[1].Apply(static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera()), renWin);
+            static_cast<vtkOpenVRCamera*>(m_vtkRenderer->GetActiveCamera())->DeepCopy(m_cams[1]);
         }
 #endif
         m_vtkRenderer->ResetCameraClippingRange();

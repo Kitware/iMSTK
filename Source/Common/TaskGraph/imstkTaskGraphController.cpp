@@ -29,7 +29,7 @@ bool
 TaskGraphController::initialize()
 {
     // Ensure the source is reachable from the sink and the graph is not cyclic
-    // todo: Safer check would be to ensure all nodes reach sink
+    // Still doesn't garuntee all nodes reach sink
     if (!m_graph->isReachable(m_graph->getSource(), m_graph->getSink()))
     {
         LOG(WARNING) << "TaskGraph Sink not reachable from source. Graph initialization failed.";

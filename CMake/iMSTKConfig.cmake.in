@@ -126,7 +126,10 @@ else()
     RenderingVolume
     RenderingVolumeOpenGL2
     ViewsContext2D)
+if (${PROJECT_NAME}_ENABLE_VR)
+  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
 endif()
+find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # glfw, gli
 if(iMSTK_USE_Vulkan)

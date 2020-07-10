@@ -201,15 +201,16 @@ main()
     // simManager and Scene
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("Collision Test");
-    simManager->setActiveScene(scene);
 
-    // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    // Configure the VTKViewer
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("Collision Test");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 25);
     statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+    simManager->setViewer(viewer);
+    simManager->setActiveScene(scene); // Viewer has depedence on scene
 
     // Get VTK Renderer
     auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
