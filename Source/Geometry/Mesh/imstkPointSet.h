@@ -162,6 +162,13 @@ public:
     virtual double getLoadFactor();
 
     ///
+    /// \brief Set the active scalars
+    /// \param name of the scalar array in the point data map
+    ///
+    void setScalars(std::shared_ptr<StdVectorOfReal> scalars) { m_pointScalars = scalars; }
+    std::shared_ptr<StdVectorOfReal> getScalars() const { return m_pointScalars; }
+
+    ///
     /// \brief Get the maximum number of vertices
     ///
     size_t getMaxNumVertices();
@@ -185,6 +192,8 @@ protected:
     mutable StdVectorOfVec3d m_vertexPositionsPostTransform;  ///> Positions of vertices after transform
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
+    // \todo: move to pointDataMap eventually, currently pointDataMap is non-continguous and can't be mapped
+    std::shared_ptr<StdVectorOfReal> m_pointScalars; ///> vector of scalars, singular doubles per vertex.
 
     bool   m_topologyChanged     = false;
     double m_loadFactor          = 2.0;

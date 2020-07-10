@@ -21,6 +21,7 @@
 
 #include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
+#include "imstkColorFunction.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkPbdModel.h"
@@ -142,27 +143,28 @@ main()
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
-    // Light (white)
-    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
-    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
-    scene->addLight(whiteLight);
-
-    // Light (red)
-    auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(-5, -3, 5));
-    colorLight->setFocalPoint(Vec3d(0, -5, 5));
-    colorLight->setIntensity(100);
-    colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(30);
-    scene->addLight(colorLight);
-
     // Adjust camera
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 
-    // Adds a custom physics step to print out maximum velocity
     {
+        // Setup some scalars
+        std::shared_ptr<SurfaceMesh> clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
+        std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
+        std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
+        clothGeometry->setScalars(scalarsPtr);
+
+        // Setup the material for the scalars
+        std::shared_ptr<RenderMaterial> material = clothObj->getVisualModel(0)->getRenderMaterial();
+        material->setScalarVisibility(true);
+        std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+        colorFunc->setNumberOfColors(2);
+        colorFunc->setColor(0, Color::Green);
+        colorFunc->setColor(1, Color::Red);
+        colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
+        colorFunc->setRange(0.0, 2.0);
+        material->setColorLookupTable(colorFunc);
+
         std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
         scene->setTaskGraphConfigureCallback([&](Scene* scene)
         {
@@ -175,23 +177,26 @@ main()
             writer.setFileName("taskGraphConfigureExampleOld.svg");
             writer.write();
 
-            std::shared_ptr<TaskNode> printMaxVelocity = std::make_shared<TaskNode>([&]()
+            // This node computes displacements and sets the color to the magnitude
+            std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
             {
-                const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
-                double maxVel = std::numeric_limits<double>::min();
-                for (size_t i = 0; i < velocities.size(); i++)
-                {
-                    const double vel = velocities[i].squaredNorm();
-                    if (vel > maxVel)
+                    /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
+                    const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
+                    StdVectorOfReal& scalars = *scalarsPtr;
+                    for (size_t i = 0; i < initPos.size(); i++)
                     {
-                        maxVel = vel;
+                        scalars[i] = (currPos[i] - initPos[i]).norm();
+                    }*/
+                    const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+                    StdVectorOfReal& scalars = *scalarsPtr;
+                    for (size_t i = 0; i < velocities.size(); i++)
+                    {
+                        scalars[i] = velocities[i].norm();
                     }
-                }
-                LOG(INFO) << "Max Velocity: " << std::sqrt(maxVel);
-            }, "PrintMaxVelocity");
+            }, "ComputeVelocityScalars");
 
             // After IntegratePosition
-            graph->insertAfter(pbdModel->getIntegratePositionNode(), printMaxVelocity);
+            graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
 
             // Write the modified graph
             writer.setFileName("taskGraphConfigureExampleNew.svg");

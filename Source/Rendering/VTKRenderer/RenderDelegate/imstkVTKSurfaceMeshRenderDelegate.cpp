@@ -46,7 +46,8 @@ namespace imstk
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
     m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedTangentArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedTangentArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedScalarArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -79,6 +80,14 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
     polydata->SetPolys(cells);
+    // If the geometry has scalars, set them on the polydata
+    if (geometry->getScalars() != nullptr)
+    {
+        std::shared_ptr<StdVectorOfReal> scalars = geometry->getScalars();
+        m_mappedScalarArray->SetNumberOfComponents(1);
+        m_mappedScalarArray->SetArray(reinterpret_cast<double*>(scalars->data()), scalars->size(), 1);
+        polydata->GetPointData()->SetScalars(m_mappedScalarArray);
+    }
 
     // Map normals
     geometry->computeVertexNormals();

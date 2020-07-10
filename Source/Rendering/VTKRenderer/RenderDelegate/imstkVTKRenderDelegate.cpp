@@ -37,6 +37,7 @@
 #include "imstkVTKdebugLinesRenderDelegate.h"
 #include "imstkVTKdebugPointsRenderDelegate.h"
 #include "imstkVolumeRenderMaterial.h"
+#include "imstkColorFunction.h"
 
 // VTK render delegates
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
@@ -65,6 +66,7 @@
 #include <vtkVector.h>
 #include <vtkProp3D.h>
 #include <vtkActor.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkNew.h>
 
 namespace imstk
@@ -373,6 +375,44 @@ VTKRenderDelegate::updateActorPropertiesMesh()
     if (!material->m_stateModified)
     {
         return;
+    }
+
+    if (material->m_scalarVisibility)
+    {
+        // Convert color table
+        std::shared_ptr<ColorFunction> imstkLookupTable = material->getColorLookupTable();
+        const double* range = imstkLookupTable->getRange().data();
+        double spacing = (range[1] - range[0]) / imstkLookupTable->getNumberOfColors();
+        vtkNew<vtkColorTransferFunction> lookupTable;
+        lookupTable->SetColorSpaceToRGB();
+        for (int i = 0; i < imstkLookupTable->getNumberOfColors(); i++)
+        {
+            const double t = static_cast<double>(i) / imstkLookupTable->getNumberOfColors();
+            const Color& color = imstkLookupTable->getColor(i);
+            lookupTable->AddRGBPoint(t  * (range[1] - range[0]) + range[0] + spacing * 0.5, color.r, color.g, color.b);
+        }
+
+        switch (imstkLookupTable->getColorSpace())
+        {
+        case ColorFunction::ColorSpace::RGB:
+            lookupTable->SetColorSpaceToRGB();
+            break;
+        case ColorFunction::ColorSpace::HSV:
+            lookupTable->SetColorSpaceToHSV();
+            break;
+        case ColorFunction::ColorSpace::LAB:
+            lookupTable->SetColorSpaceToLab();
+            break;
+        case ColorFunction::ColorSpace::DIVERING:
+            lookupTable->SetColorSpaceToDiverging();
+            break;
+        default:
+            lookupTable->SetColorSpaceToRGB();
+            break;
+        }
+
+        m_mapper->SetLookupTable(lookupTable);
+        m_mapper->SetScalarVisibility(material->m_scalarVisibility);
     }
 
     const auto edgeColor    = material->getEdgeColor();

@@ -55,6 +55,7 @@ public:
 
 protected:
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedScalarArray;  ///> Mapped array of scalars
 };
 }
