@@ -53,7 +53,6 @@
 #include <vtkOpenVRRenderWindow.h>
 #include <vtkOpenVRRenderWindowInteractor.h>
 #include <vtkInteractorStyle3D.h>
-#include <vtkOpenVROverlayInternal.h>
 #endif
 
 namespace imstk

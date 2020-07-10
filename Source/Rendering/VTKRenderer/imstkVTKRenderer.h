@@ -26,15 +26,6 @@
 #include "imstkVTKTextureDelegate.h"
 
 #include <vtkSmartPointer.h>
-
-#ifdef iMSTK_ENABLE_VR
-#include <vtkOpenVRRenderer.h>
-#include <vtkOpenVRCamera.h>
-#include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
-#include <vtkInteractorStyle3D.h>
-#endif
-
 #include <unordered_map>
 
 class vtkAxesActor;
@@ -46,6 +37,10 @@ class vtkPlotBar;
 class vtkProp;
 class vtkRenderer;
 class vtkTable;
+
+#ifdef iMSTK_ENABLE_VR
+class vtkOpenVRCamera;
+#endif
 
 namespace imstk
 {
