@@ -53,9 +53,9 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     Vec3d minima, maxima;
     spawnVolumeSurface->computeBoundingBox(minima, maxima);
 
-    double particleDiameter = particleRadius * 2.0;
-    const Vec3d  size = (maxima - minima) + Vec3d(particleDiameter, particleDiameter, particleDiameter);
-    Vec3i  dim = size.cwiseProduct(Vec3d(1.0 / particleDiameter, 1.0 / particleDiameter, 1.0 / particleDiameter)).cast<int>();
+    double      particleDiameter = particleRadius * 2.0;
+    const Vec3d size = (maxima - minima) + Vec3d(particleDiameter, particleDiameter, particleDiameter);
+    Vec3i       dim  = size.cwiseProduct(Vec3d(1.0 / particleDiameter, 1.0 / particleDiameter, 1.0 / particleDiameter)).cast<int>();
 
     imstkNew<SurfaceMeshImageMask> makeBinaryMask;
     makeBinaryMask->setInputMesh(spawnVolumeSurface);
@@ -66,9 +66,9 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     distTransformFromMask->update();
 
     DataArray<float>& scalars = *std::dynamic_pointer_cast<DataArray<float>>(distTransformFromMask->getOutputImage()->getScalars());
-    const Vec3i& dim1    = makeBinaryMask->getOutputImage()->getDimensions();
-    const Vec3d& spacing = makeBinaryMask->getOutputImage()->getSpacing();
-    const Vec3d& shift = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
+    const Vec3i&      dim1    = makeBinaryMask->getOutputImage()->getDimensions();
+    const Vec3d&      spacing = makeBinaryMask->getOutputImage()->getSpacing();
+    const Vec3d&      shift   = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
 
     imstkNew<StdVectorOfVec3d> particles;
     particles->reserve(dim1[0] * dim1[1] * dim1[2]);
@@ -98,7 +98,7 @@ makeSPHObject(const std::string& name, const double particleRadius)
     imstkNew<SPHObject> fluidObj(name);
 
     // Setup the Geometry
-    auto fluidSpawnVolumeSurf = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/vesselsCut.stl");
+    auto                              fluidSpawnVolumeSurf = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/vesselsCut.stl");
     std::shared_ptr<StdVectorOfVec3d> particles = generateFluidVolume(particleRadius, fluidSpawnVolumeSurf);
     LOG(INFO) << "Number of particles: " << particles->size();
     imstkNew<PointSet> fluidGeometry;
@@ -142,7 +142,7 @@ makeCollidingObject(const std::string& name, const Vec3d& position)
     imstkNew<CollidingObject> collidingObj(name);
 
     // Setup the Geometry (read dragon mesh)
-    auto fullBodyMesh = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/humanWithHead.stl");
+    auto fullBodyMesh  = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/humanWithHead.stl");
     auto collisionMesh = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/invertedVessels.stl");
 
     imstkNew<CleanMesh> cleanMesh;

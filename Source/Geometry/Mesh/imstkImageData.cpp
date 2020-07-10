@@ -107,8 +107,8 @@ void
 ImageData::computePoints()
 {
     StdVectorOfVec3d vertices(m_dims[0] * m_dims[1] * m_dims[2]);
-    const Vec3d shift = m_origin + m_spacing * 0.5;
-    int i = 0;
+    const Vec3d      shift = m_origin + m_spacing * 0.5;
+    int              i     = 0;
     for (int z = 0; z < m_dims[2]; z++)
     {
         for (int y = 0; y < m_dims[1]; y++)

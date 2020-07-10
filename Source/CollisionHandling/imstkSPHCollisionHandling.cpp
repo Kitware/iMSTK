@@ -107,7 +107,7 @@ SPHCollisionHandling::processCollisionData()
             {
                 // Because of const, make some extra copies
                 const MeshToAnalyticalCollisionDataElement& cd = m_colData->MAColData[idx];
-                const uint32_t pidx = cd.nodeIdx;           // Fluid particle index
+                const uint32_t pidx     = cd.nodeIdx;           // Fluid particle index
                 Vec3d penetrationVector = cd.penetrationVector; // This vector should point into solid object
 
                 solve(pidx, penetrationVector);
@@ -118,7 +118,7 @@ SPHCollisionHandling::processCollisionData()
             {
                 // Because of const, make some extra copies
                 const PositionDirectionCollisionDataElement& cd = m_colData->PDColData[idx];
-                const uint32_t pidx = cd.nodeIdx;                       // Fluid particle index
+                const uint32_t pidx     = cd.nodeIdx;                       // Fluid particle index
                 Vec3d penetrationVector = cd.dirAtoB * cd.penetrationDepth; // This vector should point into solid object
 
                 solve(pidx, penetrationVector);

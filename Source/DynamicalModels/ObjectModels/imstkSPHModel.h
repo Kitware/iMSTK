@@ -262,7 +262,7 @@ protected:
     std::shared_ptr<TaskNode> m_computePressureAccelNode  = nullptr;
     std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
-    std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
+    std::shared_ptr<TaskNode> m_sumAccelsNode       = nullptr;
     std::shared_ptr<TaskNode> m_computeVelocityNode = nullptr;
     std::shared_ptr<TaskNode> m_computePositionNode = nullptr;
 

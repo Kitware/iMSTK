@@ -127,7 +127,7 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
     const Vec3i& dim     = imageData->getDimensions();
     const Vec3d  size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
     const Vec3d  spacing = imageData->getSpacing();
-    const Vec3d  shift = imageData->getOrigin() + spacing * 0.5;
+    const Vec3d  shift   = imageData->getOrigin() + spacing * 0.5;
 
     DataArray<float>& scalars = *static_cast<DataArray<float>*>(imageData->getScalars().get());
 
@@ -145,7 +145,7 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
                 {
                     for (int x = 0; x < dim[0]; x++, j++)
                     {
-                        double pos[3] = { x * spacing[0] + shift[0], y * spacing[1] + shift[1], z * spacing[2] + shift[2] };
+                        double pos[3] = { x* spacing[0] + shift[0], y * spacing[1] + shift[1], z * spacing[2] + shift[2] };
                         scalars[j]    = polyDataDist->FunctionValue(pos);
                     }
                 }
@@ -222,8 +222,8 @@ SurfaceMeshDistanceTransform::requestUpdate()
     Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);
     outputImageData->allocate(IMSTK_FLOAT, 1, Dimensions, spacing, origin);
 
-   /* StopWatch timer;
-    timer.start();*/
+    /* StopWatch timer;
+     timer.start();*/
 
     /*if (NarrowBanded)
     {

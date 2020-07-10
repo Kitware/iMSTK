@@ -35,23 +35,23 @@ class ImageData;
 class ImageResample : public GeometryAlgorithm
 {
 public:
-	ImageResample();
+    ImageResample();
 
-	virtual ~ImageResample() override = default;
+    virtual ~ImageResample() override = default;
 
 public:
-	std::shared_ptr<ImageData> getOutputImage() const;
+    std::shared_ptr<ImageData> getOutputImage() const;
 
-	void setInputImage(std::shared_ptr<ImageData> inputData);
+    void setInputImage(std::shared_ptr<ImageData> inputData);
 
-	imstkGetMacro(Dimensions, const Vec3i&);
+    imstkGetMacro(Dimensions, const Vec3i&);
 
-	imstkSetMacro(Dimensions, const Vec3i&);
+    imstkSetMacro(Dimensions, const Vec3i&);
 
 protected:
-	void requestUpdate() override;
+    void requestUpdate() override;
 
 private:
-	Vec3i Dimensions;
+    Vec3i Dimensions;
 };
 }

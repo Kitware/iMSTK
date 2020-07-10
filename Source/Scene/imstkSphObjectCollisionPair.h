@@ -37,7 +37,7 @@ class SphObjectCollisionPair : public CollisionPair
 {
 public:
     SphObjectCollisionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
-        CollisionDetection::Type cdType = CollisionDetection::Type::PointSetToImplicit);
+                           CollisionDetection::Type cdType = CollisionDetection::Type::PointSetToImplicit);
 
     virtual ~SphObjectCollisionPair() override = default;
 };

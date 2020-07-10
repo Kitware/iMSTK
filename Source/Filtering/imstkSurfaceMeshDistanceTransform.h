@@ -73,7 +73,7 @@ protected:
     void requestUpdate() override;
 
 private:
-    Vec3i  Dimensions   = Vec3i(0, 0, 0);
+    Vec3i Dimensions = Vec3i(0, 0, 0);
     //bool   NarrowBanded = false;
     //double NarrowBandWidth = 1.0;
 };

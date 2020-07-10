@@ -82,8 +82,8 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         });
     m_computePositionNode =
         m_taskGraph->addFunction("SPHModel_ComputePositions", [&]()
-            {
-                moveParticles(getTimeStep());
+        {
+            moveParticles(getTimeStep());
             });
 }
 

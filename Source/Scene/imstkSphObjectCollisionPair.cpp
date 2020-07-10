@@ -32,12 +32,12 @@ namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 SphObjectCollisionPair::SphObjectCollisionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
-    CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
+                                               CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
 {
     std::shared_ptr<Geometry> colGeometry = obj2->getCollidingGeometry();
-    if (colGeometry->getType() != Geometry::Type::ImplicitPlane &&
-        colGeometry->getType() != Geometry::Type::ImplicitSphere &&
-        colGeometry->getType() != Geometry::Type::SDF)
+    if (colGeometry->getType() != Geometry::Type::ImplicitPlane
+        && colGeometry->getType() != Geometry::Type::ImplicitSphere
+        && colGeometry->getType() != Geometry::Type::SDF)
     {
         LOG(WARNING) << "SphObjectCollisionPair: geometry type not supported";
         return;

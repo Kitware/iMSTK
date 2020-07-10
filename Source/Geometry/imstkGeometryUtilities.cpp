@@ -205,7 +205,7 @@ GeometryUtils::copyToVtkImageData(std::shared_ptr<ImageData> imageData)
     CHECK(imageData != nullptr) << "ImageData provided is not valid!";
 
     // Our image data does not use vtk extents
-    const Vec3i& dim    = imageData->getDimensions();
+    const Vec3i& dim = imageData->getDimensions();
 
     vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
     imageDataVtk->SetSpacing(imageData->getSpacing().data());
