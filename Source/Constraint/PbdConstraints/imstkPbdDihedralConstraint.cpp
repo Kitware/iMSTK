@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkPbdDihedralConstraint.h"
-#include <iostream>
 
 namespace  imstk
 {

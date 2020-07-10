@@ -23,18 +23,16 @@
 #include "imstkCollisionGraph.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
-#include "imstkMeshToMeshBruteForceCD.h"
-#include "imstkOneToOneMap.h"
-#include "imstkPBDCollisionHandling.h"
+#include "imstkObjectInteractionFactory.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkPbdSolver.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraTriangleMap.h"
-#include "imstkObjectInteractionFactory.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

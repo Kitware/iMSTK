@@ -20,7 +20,9 @@
 =========================================================================*/
 
 #include "imstkPbdSolver.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
+#include "imstkPbdCollisionConstraint.h"
 
 namespace imstk
 {
@@ -30,6 +32,19 @@ PbdSolver::PbdSolver() :
     m_positions(std::make_shared<StdVectorOfVec3d>()),
     m_invMasses(std::make_shared<StdVectorOfReal>())
 {
+}
+
+void
+PbdSolver::setSolverType(const PbdConstraint::SolverType& type)
+{
+    if (type == PbdConstraint::SolverType::GCD)
+    {
+        LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
+        m_solverType = PbdConstraint::SolverType::xPBD;
+        return;
+    }
+
+    m_solverType = type;
 }
 
 void

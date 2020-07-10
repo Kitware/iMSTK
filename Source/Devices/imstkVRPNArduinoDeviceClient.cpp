@@ -21,8 +21,6 @@
 
 #include "imstkVRPNArduinoDeviceClient.h"
 
-#include "imstkLogger.h"
-
 namespace imstk
 {
 void

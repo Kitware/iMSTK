@@ -21,12 +21,13 @@
 
 #include "imstkAssimpMeshIO.h"
 #include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkSurfaceMesh.h"
 
-// assimp
-#include "assimp/Importer.hpp"
-#include "assimp/mesh.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
+#include <assimp/Importer.hpp>
+#include <assimp/mesh.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 
 namespace imstk
 {

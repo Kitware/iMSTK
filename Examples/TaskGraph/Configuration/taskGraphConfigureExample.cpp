@@ -19,27 +19,29 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
-#include "imstkLogger.h"
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskGraphVizWriter.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
+using namespace imstk::expiremental;
 
-static std::unique_ptr<SurfaceMesh>
+static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(
     const double width, const double height, const int nRows, const int nCols)
 {
     // Create surface mesh
-    std::unique_ptr<SurfaceMesh> clothMesh = std::make_unique<SurfaceMesh>();
-    StdVectorOfVec3d             vertList;
+    imstkNew<SurfaceMesh> clothMesh;
+    StdVectorOfVec3d      vertList;
 
     vertList.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
@@ -92,10 +94,10 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
 {
     auto clothObj = std::make_shared<PbdObject>(name);
 
-    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeClothGeometry(width, height, nRows, nCols)));
+    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, nRows, nCols);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PBDModelConfig>();
+    imstkNew<PBDModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
@@ -105,12 +107,12 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    auto material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
     material->setColor(Color::LightGray);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -132,8 +134,8 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDCloth");
+    imstkNew<SimulationManager> simManager;
+    auto                        scene = simManager->createNewScene("PBDCloth");
 
     const double               width    = 10.0;
     const double               height   = 10.0;
@@ -143,13 +145,13 @@ main()
     scene->addSceneObject(clothObj);
 
     // Light (white)
-    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
+    imstkNew<DirectionalLight> whiteLight("whiteLight");
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
 
     // Light (red)
-    auto colorLight = std::make_shared<SpotLight>("colorLight");
+    imstkNew<SpotLight> colorLight("colorLight");
     colorLight->setPosition(Vec3d(-5, -3, 5));
     colorLight->setFocalPoint(Vec3d(0, -5, 5));
     colorLight->setIntensity(100);
@@ -170,12 +172,12 @@ main()
             std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
 
             // First write the graph before we make modifications, just to show the changes
-            TaskGraphVizWriter writer;
-            writer.setInput(graph);
-            writer.setFileName("taskGraphConfigureExampleOld.svg");
-            writer.write();
+            imstkNew<TaskGraphVizWriter> writer;
+            writer->setInput(graph);
+            writer->setFileName("taskGraphConfigureExampleOld.svg");
+            writer->write();
 
-            std::shared_ptr<TaskNode> printMaxVelocity = std::make_shared<TaskNode>([&]()
+            imstkNew<TaskNode> printMaxVelocity([&]()
             {
                 const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
                 double maxVel = std::numeric_limits<double>::min();
@@ -194,8 +196,8 @@ main()
             graph->insertAfter(pbdModel->getIntegratePositionNode(), printMaxVelocity);
 
             // Write the modified graph
-            writer.setFileName("taskGraphConfigureExampleNew.svg");
-            writer.write();
+            writer->setFileName("taskGraphConfigureExampleNew.svg");
+            writer->write();
         });
     }
 

@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkRenderMaterial.h"
-#include "imstkTexture.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

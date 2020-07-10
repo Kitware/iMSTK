@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKPlaneRenderDelegate() = default;
+    virtual ~VTKPlaneRenderDelegate() override = default;
 
     ///
     /// \brief Update plane source based on the plane geometry

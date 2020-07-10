@@ -19,16 +19,18 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneManager.h"
-#include "imstkSceneObject.h"
+#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
+#include "imstkCube.h"
+#include "imstkCylinder.h"
 #include "imstkLight.h"
 #include "imstkPlane.h"
-#include "imstkCylinder.h"
-#include "imstkCube.h"
-#include "imstkAPIUtilities.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

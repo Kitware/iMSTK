@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Default destructor
     ///
-    ~CollisionGraph() = default;
+    virtual ~CollisionGraph() = default;
 
 public:
     ///

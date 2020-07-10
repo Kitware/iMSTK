@@ -19,21 +19,21 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkPlane.h"
-#include "imstkCylinder.h"
-#include "imstkCube.h"
-#include "imstkAPIUtilities.h"
-#include "imstkGeometryUtilities.h"
 #include "imstkCamera.h"
+#include "imstkLight.h"
 #include "imstkMeshIO.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
+#include "imstkNew.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshSubdivide.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
+using namespace imstk::expiremental;
 
 ///
 /// \brief This example demonstrates the geometry transforms in imstk
@@ -42,40 +42,46 @@ int
 main()
 {
     // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("GeometryTransforms");
+    imstkNew<SimulationManager> simManager;
+    imstkSmartPtr<Scene>        scene = simManager->createNewScene("GeometryTransforms");
 
-    auto coarseTetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
+    std::shared_ptr<TetrahedralMesh> coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    imstkNew<SurfaceMesh>            coarseSurfMesh;
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
-    std::shared_ptr<SurfaceMesh> fineSurfaceMesh(std::move(GeometryUtils::loopSubdivideSurfaceMesh(coarseSurfMesh)));
+    imstkNew<SurfaceMeshSubdivide> subdivide;
+    subdivide->setInputMesh(coarseSurfMesh);
+    subdivide->setSubdivisionType(SurfaceMeshSubdivide::Type::LOOP);
+    subdivide->setNumberOfSubdivisions(1);
+    subdivide->update();
 
-    fineSurfaceMesh->translate(Vec3d(0., -5., 0.), Geometry::TransformType::ConcatenateToTransform);
-    coarseSurfMesh->translate(Vec3d(0., 5., 0.), Geometry::TransformType::ConcatenateToTransform);
+    std::shared_ptr<SurfaceMesh> fineSurfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(subdivide->getOutput());
 
-    auto material0 = std::make_shared<RenderMaterial>();
+    fineSurfaceMesh->translate(Vec3d(0.0, -5.0, 0.0), Geometry::TransformType::ConcatenateToTransform);
+    coarseSurfMesh->translate(Vec3d(0.0, 5.0, 0.0), Geometry::TransformType::ConcatenateToTransform);
+
+    imstkNew<RenderMaterial> material0;
     material0->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material0->setPointSize(10.);
     material0->setLineWidth(4.);
     material0->setEdgeColor(Color::Color::Orange);
-    auto surfMeshModel0 = std::make_shared<VisualModel>(coarseSurfMesh);
+    imstkNew<VisualModel> surfMeshModel0(coarseSurfMesh.get());
     surfMeshModel0->setRenderMaterial(material0);
 
-    auto sceneObj0 = std::make_shared<VisualObject>("coarse Mesh");
+    imstkNew<VisualObject> sceneObj0("coarse Mesh");
     sceneObj0->addVisualModel(surfMeshModel0);
 
     scene->addSceneObject(sceneObj0);
 
-    auto material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setColor(imstk::Color::Red);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     material->setPointSize(6.);
     material->setLineWidth(1.);
-    auto surfMeshModel = std::make_shared<VisualModel>(fineSurfaceMesh);
+    imstkNew<VisualModel> surfMeshModel(fineSurfaceMesh);
     surfMeshModel->setRenderMaterial(material);
 
-    auto sceneObj = std::make_shared<VisualObject>("fine Mesh");
+    imstkNew<VisualObject> sceneObj("fine Mesh");
     sceneObj->addVisualModel(surfMeshModel);
 
     scene->addSceneObject(sceneObj);
@@ -86,7 +92,7 @@ main()
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
+    imstkNew<DirectionalLight> light("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1);
     scene->addLight(light);

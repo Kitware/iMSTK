@@ -19,11 +19,8 @@
 
 =========================================================================*/
 
-// imstk
-#include "imstkScene.h"
 #include "imstkSceneManager.h"
-//#include "imstkCameraController.h"
-#include "imstkCamera.h"
+#include "imstkScene.h"
 
 namespace imstk
 {

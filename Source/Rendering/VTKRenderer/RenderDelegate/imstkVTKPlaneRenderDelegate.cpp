@@ -21,9 +21,11 @@
 
 #include "imstkVTKPlaneRenderDelegate.h"
 #include "imstkPlane.h"
+#include "imstkVisualModel.h"
 
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkPlaneSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {

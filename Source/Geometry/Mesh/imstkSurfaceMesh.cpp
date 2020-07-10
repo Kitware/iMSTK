@@ -20,8 +20,7 @@
 =========================================================================*/
 
 #include "imstkSurfaceMesh.h"
-#include "imstkTimer.h"
-//#include "imstkGraph.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

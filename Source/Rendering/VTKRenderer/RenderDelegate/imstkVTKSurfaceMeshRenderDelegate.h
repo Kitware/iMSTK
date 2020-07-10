@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkVTKRenderDelegate.h"
+#include "imstkVTKTextureDelegate.h"
 
 class vtkDoubleArray;
 
@@ -45,7 +46,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKSurfaceMeshRenderDelegate() = default;
+    virtual ~VTKSurfaceMeshRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry

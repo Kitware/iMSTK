@@ -21,14 +21,15 @@
 
 #pragma once
 
-#include "imstkVisualModel.h"
 #include "imstkSceneEntity.h"
 
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace imstk
 {
+class VisualModel;
 class DeviceClient;
 class Geometry;
 class TaskGraph;
@@ -63,7 +64,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~SceneObject() = default;
+    virtual ~SceneObject() override = default;
 
 public:
     ///

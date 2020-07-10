@@ -19,28 +19,16 @@ limitations under the License.
 
 =========================================================================*/
 
-// vtk
-#include <vtkObjectFactory.h>
-
-// imstk
 #include "imstkOpenVRCommand.h"
 #include "imstkSimulationManager.h"
-#include "VTKRenderer/imstkVTKRenderer.h"
-#include "imstkCamera.h"
+#include "imstkViewer.h"
+#include "imstkVTKRenderer.h"
 
 namespace imstk
 {
 void
-OpenVRCommand::Execute(
-    vtkObject*    caller,
-    unsigned long eventId,
-    void*         callData)
+OpenVRCommand::Execute(vtkObject* vtkNotUsed(caller), unsigned long eventId, void* vtkNotUsed(callData))
 {
-    /// \todo Clear warnings  caller, callData are not used!
-    // prevent warnings
-    caller;
-    callData;
-
     if (!m_simManager)
     {
         return;

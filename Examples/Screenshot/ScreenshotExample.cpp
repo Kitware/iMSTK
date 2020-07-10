@@ -19,14 +19,16 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneObject.h"
 #include "imstkCamera.h"
-#include "imstkLight.h"
 #include "imstkCube.h"
-#include "imstkSphere.h"
+#include "imstkLight.h"
 #include "imstkPlane.h"
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
+#include "imstkScreenCaptureUtility.h"
+#include "imstkSimulationManager.h"
+#include "imstkSphere.h"
+#include "imstkViewer.h"
 
 using namespace imstk;
 
@@ -90,8 +92,7 @@ main()
 
 #ifndef iMSTK_USE_Vulkan
     auto viewer = simManager->getViewer();
-    auto screenShotUtility
-        = std::dynamic_pointer_cast<VTKScreenCaptureUtility>(viewer->getScreenCaptureUtility());
+    auto screenShotUtility = viewer->getScreenCaptureUtility();
     // Set up for screen shot
     viewer->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
     // Create a call back on key press of 'b' to take the screen shot

@@ -20,12 +20,9 @@
 =========================================================================*/
 
 #include "imstkLooseOctree.h"
-
-#include "imstkGeometry.h"
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkDebugRenderGeometry.h"
-//#include "imstkRenderMaterial.h"
+#include "imstkLogger.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {
@@ -54,7 +51,7 @@ OctreeNode*
 OctreeNode::getChildNode(const uint32_t childIdx) const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (!m_pChildren)) << "Children node block is nullptr";
+    LOG_IF(WARNING, (!m_pChildren)) << "Children node block is nullptr";
 #endif
     return &m_pChildren->m_Nodes[childIdx];
 }
@@ -384,7 +381,24 @@ LooseOctree::LooseOctree(const Vec3r& center, const Real width, const Real minWi
     m_MinWidthRatio(minWidthRatio),
     m_MinWidth(minWidth),
     m_pRootNode(new OctreeNode(this, nullptr, center, width * static_cast<Real>(0.5), 1u)),
-    m_NumAllocatedNodes(1u)
+    m_NumAllocatedNodes(1u),
+    m_MaxDepth(0),
+    m_MaxLevelDebugRender(0),
+    m_useMaxDepth(false)
+{
+}
+
+LooseOctree::LooseOctree(const Vec3r& center, const Real width, const int maxDepth, std::string name) :
+    m_Name(name),
+    m_Center(center),
+    m_Width(width),
+    m_MinWidthRatio(0.0),
+    m_MinWidth(0.0),
+    m_pRootNode(new OctreeNode(this, nullptr, center, width * static_cast<Real>(0.5), 1u)),
+    m_NumAllocatedNodes(1u),
+    m_MaxDepth(maxDepth),
+    m_MaxLevelDebugRender(0),
+    m_useMaxDepth(true)
 {
 }
 
@@ -572,75 +586,85 @@ LooseOctree::build()
         return;
     }
 
-    // Compute the minimum bounding box of non-point primitives
-    if (m_vPrimitivePtrs[OctreePrimitiveType::Point].size() == 0
-        && (m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size() > 0
-            || m_vPrimitivePtrs[OctreePrimitiveType::AnalyticalGeometry].size() > 0))
+    if (!m_useMaxDepth)
     {
-        Real minWidth = MAX_REAL;
-        for (int type = OctreePrimitiveType::Triangle; type <= OctreePrimitiveType::AnalyticalGeometry; ++type)
+        // Compute the minimum bounding box of non-point primitives
+        if (m_vPrimitivePtrs[OctreePrimitiveType::Point].size() == 0
+            && (m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size() > 0
+                || m_vPrimitivePtrs[OctreePrimitiveType::AnalyticalGeometry].size() > 0))
         {
-            const auto& vPrimitivePtrs = m_vPrimitivePtrs[type];
-            if (vPrimitivePtrs.size() == 0)
+            Real minWidth = MAX_REAL;
+            for (int type = OctreePrimitiveType::Triangle; type <= OctreePrimitiveType::AnalyticalGeometry; ++type)
             {
-                continue;
-            }
-            const auto primitiveMinWidth = tbb::parallel_reduce(tbb::blocked_range<size_t>(0, vPrimitivePtrs.size()),
-                                                                MAX_REAL,
-                [&](const tbb::blocked_range<size_t>& r, Real prevResult) -> Real {
-                    for (auto i = r.begin(), iEnd = r.end(); i != iEnd; ++i)
-                    {
-                        const auto pPrimitive = vPrimitivePtrs[i];
-                        computePrimitiveBoundingBox(pPrimitive, static_cast<OctreePrimitiveType>(type));
-
-                        Vec3r widths;
-                        for (uint32_t dim = 0; dim < 3; ++dim)
+                const auto& vPrimitivePtrs = m_vPrimitivePtrs[type];
+                if (vPrimitivePtrs.size() == 0)
+                {
+                    continue;
+                }
+                const auto primitiveMinWidth = tbb::parallel_reduce(tbb::blocked_range<size_t>(0, vPrimitivePtrs.size()),
+                    MAX_REAL,
+                    [&](const tbb::blocked_range<size_t>& r, Real prevResult) -> Real {
+                        for (auto i = r.begin(), iEnd = r.end(); i != iEnd; ++i)
                         {
-                            widths[dim] = pPrimitive->m_UpperCorner[dim] - pPrimitive->m_LowerCorner[dim];
+                            const auto pPrimitive = vPrimitivePtrs[i];
+                            computePrimitiveBoundingBox(pPrimitive, static_cast<OctreePrimitiveType>(type));
+
+                            Vec3r widths;
+                            for (uint32_t dim = 0; dim < 3; ++dim)
+                            {
+                                widths[dim] = pPrimitive->m_UpperCorner[dim] - pPrimitive->m_LowerCorner[dim];
+                            }
+                            auto maxBoxWidth = widths[0];
+                            maxBoxWidth      = maxBoxWidth < widths[1] ? widths[1] : maxBoxWidth;
+                            maxBoxWidth      = maxBoxWidth < widths[2] ? widths[2] : maxBoxWidth;
+                            prevResult       = prevResult > maxBoxWidth ? maxBoxWidth : prevResult;
                         }
-                        auto maxBoxWidth = widths[0];
-                        maxBoxWidth      = maxBoxWidth < widths[1] ? widths[1] : maxBoxWidth;
-                        maxBoxWidth      = maxBoxWidth < widths[2] ? widths[2] : maxBoxWidth;
-                        prevResult       = prevResult > maxBoxWidth ? maxBoxWidth : prevResult;
-                    }
-                    return prevResult;
-                },
-                [](const Real x, const Real y) -> Real {
-                    return x < y ? x : y;
-                });
+                        return prevResult;
+                    },
+                    [](const Real x, const Real y) -> Real {
+                        return x < y ? x : y;
+                    });
 
-            minWidth = minWidth < primitiveMinWidth ? minWidth : primitiveMinWidth;
+                minWidth = minWidth < primitiveMinWidth ? minWidth : primitiveMinWidth;
+            }
+
+            if (minWidth < 1e-8)
+            {
+                LOG(WARNING) << "Object/triangles have too small size";
+            }
+            else
+            {
+                m_MinWidth = m_MinWidthRatio * minWidth;
+            }
         }
 
-        if (minWidth < 1e-8)
-        {
-            LOG(WARNING) << "Object/triangles have too small size";
+        // Compute max depth that the tree can reach
+        m_MaxDepth = 1u;
+        uint32_t numLevelNodes   = 1u;
+        uint32_t maxNumTreeNodes = 1u;
+        Real     nodeWidth       = m_Width;
+
+        while (nodeWidth * static_cast<Real>(0.5) > m_MinWidth) {
+            ++m_MaxDepth;
+            numLevelNodes   *= 8u;
+            maxNumTreeNodes += numLevelNodes;
+            nodeWidth       *= static_cast<Real>(0.5);
         }
-        else
-        {
-            m_MinWidth = m_MinWidthRatio * minWidth;
-        }
+        m_MaxDepth = 6;
+
+        LOG(INFO) << m_Name << " generated, center = [" << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2]
+                  << "], width = " << m_Width << ", min width = " << m_MinWidth
+                  << ", max depth = " << m_MaxDepth << ", max num. nodes = " << maxNumTreeNodes;
     }
-
-    // Compute max depth that the tree can reach
-    m_MaxDepth = 1u;
-    uint32_t numLevelNodes   = 1u;
-    uint32_t maxNumTreeNodes = 1u;
-    Real     nodeWidth       = m_Width;
-
-    while (nodeWidth * static_cast<Real>(0.5) > m_MinWidth) {
-        ++m_MaxDepth;
-        numLevelNodes   *= 8u;
-        maxNumTreeNodes += numLevelNodes;
-        nodeWidth       *= static_cast<Real>(0.5);
+    else
+    {
+        LOG(INFO) << m_Name << " generated, center = [" << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2]
+                  << "], width = " << m_Width << ", min width = " << m_MinWidth
+                  << ", max depth = " << m_MaxDepth;
     }
     m_pRootNode->m_MaxDepth = m_MaxDepth;
     rebuild();
     m_bCompleteBuild = true;
-
-    LOG(INFO) << m_Name << " generated, center = [" << m_Center[0] << ", " << m_Center[1] << ", " << m_Center[2]
-              << "], width = " << m_Width << ", min width = " << m_MinWidth
-              << ", max depth = " << m_MaxDepth << ", max num. nodes = " << maxNumTreeNodes;
 }
 
 void

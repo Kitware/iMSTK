@@ -19,6 +19,34 @@
 
 =========================================================================*/
 
+#pragma once
+
+#include "imstkGeometry.h"
+
 namespace imstk
 {
+///
+/// \class ImplicitGeometry
+///
+/// \brief Abstract base class for any implicit geometrical representation
+///
+class ImplicitGeometry : public Geometry
+{
+public:
+    virtual ~ImplicitGeometry() override = default;
+
+protected:
+    ImplicitGeometry(Type geomType, std::string name = "") : Geometry(geomType, name) { }
+
+public:
+    ///
+    /// \brief Returns signed distance to surface at pos
+    ///
+    virtual double getFunctionValue(const Vec3d& pos) const = 0;
+
+    ///
+    /// \brief Returns gradient of signed distance at pos
+    ///
+    virtual Vec3d getFunctionGrad(const Vec3d& pos) const = 0;
+};
 }

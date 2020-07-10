@@ -34,6 +34,8 @@ using EntityID = unsigned long;
 class SceneEntity
 {
 public:
+    virtual ~SceneEntity() = default;
+
     ///
     /// \brief Get ID (ALWAYS query the ID in your code, DO NOT hardcode it)
     /// \returns ID of entity

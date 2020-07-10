@@ -40,7 +40,7 @@ CollidingObject::initialize()
     return true;
 }
 
-const std::shared_ptr<Geometry>&
+std::shared_ptr<Geometry>
 CollidingObject::getCollidingGeometry() const
 {
     return m_collidingGeometry;

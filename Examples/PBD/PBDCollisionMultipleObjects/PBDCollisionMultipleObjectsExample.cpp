@@ -27,10 +27,15 @@
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
+
+#include <vtkRenderWindow.h>
 
 // Enable this macro to generate many dragons
 #define BIG_SCENE
@@ -43,7 +48,7 @@ using namespace imstk;
 Color
 getRandomColor()
 {
-    Color color(0, 0, 0, 1);
+    Color color(0.0, 0.0, 0.0, 1.0);
     while (true)
     {
         for (unsigned int i = 0; i < 3; ++i)

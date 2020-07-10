@@ -20,16 +20,15 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
-#include "imstkCamera.h"
-#include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkThreadManager.h"
-#include "imstkTimer.h"
-#include "imstkViewer.h"
-#include "imstkVTKRenderer.h"
 
-#include <string>
+#ifdef iMSTK_USE_Vulkan
+#include "imstkVulkanViewer.h"
+#else
+#include "imstkVTKViewer.h"
+#endif
 
 namespace imstk
 {

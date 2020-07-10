@@ -46,7 +46,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKPointSetRenderDelegate() = default;
+    virtual ~VTKPointSetRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the mesh geometry

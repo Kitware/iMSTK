@@ -20,26 +20,22 @@
 =========================================================================*/
 
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
-#include "imstkVTKTextureDelegate.h"
-#include "imstkTextureManager.h"
+#include "imstkLogger.h"
+#include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTextureManager.h"
+#include "imstkVisualModel.h"
 
-#include <vtkPolyData.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPoints.h>
-#include <vtkTrivialProducer.h>
+#include <vtkActor.h>
 #include <vtkDoubleArray.h>
-#include <vtkCellArray.h>
 #include <vtkFloatArray.h>
-#include <vtkPointData.h>
-#include <vtkImageReader2Factory.h>
-#include <vtkImageReader2.h>
-#include <vtkTexture.h>
-#include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkProperty.h>
+#include <vtkTexture.h>
+#include <vtkTrivialProducer.h>
 #include <vtkVersion.h>
-#include <vtkPolyDataTangents.h>
 
 namespace imstk
 {
@@ -174,6 +170,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     {
         return;
     }
+    m_actor->GetProperty()->SetOpacity(material->getOpacity());
 
     unsigned int currentUnit = 0;
 

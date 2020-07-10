@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKImageDataRenderDelegate() = default;
+    virtual ~VTKImageDataRenderDelegate() override = default;
 
     ///
     /// \brief Update render delegate source based on the internal data

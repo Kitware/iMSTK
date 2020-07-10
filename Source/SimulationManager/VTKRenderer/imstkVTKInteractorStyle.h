@@ -21,12 +21,10 @@
 
 #pragma once
 
-#include <chrono>
-#include <memory>
-
 #include "imstkInteractorStyle.h"
+#include <vtkInteractorStyleTrackballCamera.h>
 
-#include "vtkInteractorStyleTrackballCamera.h"
+#include <chrono>
 
 namespace imstk
 {

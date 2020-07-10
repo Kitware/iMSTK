@@ -20,9 +20,8 @@
 =========================================================================*/
 
 #include "imstkPointSetToPlaneCD.h"
-#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
-#include "imstkParallelUtils.h"
+#include "imstkNarrowPhaseCD.h"
 #include "imstkPointSet.h"
 
 namespace imstk

@@ -23,10 +23,7 @@
 #include "imstkLogger.h"
 
 #ifdef iMSTK_AUDIO_ENABLED
-
-// Audio
 #include <SFML/Audio.hpp>
-
 #endif
 
 using namespace imstk;

@@ -22,10 +22,6 @@
 #pragma once
 
 #include <unordered_set>
-#include <iostream>
-#include <algorithm>
-
-#include "imstkMath.h"
 
 namespace imstk
 {

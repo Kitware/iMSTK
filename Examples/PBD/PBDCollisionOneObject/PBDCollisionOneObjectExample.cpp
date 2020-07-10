@@ -27,11 +27,13 @@
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkTaskGraphVizWriter.h"
+#include "imstkTetrahedralMesh.h"
 #include "imstkTetraTriangleMap.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

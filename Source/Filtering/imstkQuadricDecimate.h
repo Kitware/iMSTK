@@ -18,9 +18,49 @@
    limitations under the License.
 
 =========================================================================*/
+#pragma once
 
-#include "imstkInteractorStyle.h"
+#include "imstkGeometryAlgorithm.h"
 
 namespace imstk
 {
+class SurfaceMesh;
+
+///
+/// \class CleanMesh
+///
+/// \brief This filter reduces a SurfaceMesh
+///
+class QuadricDecimate : public GeometryAlgorithm
+{
+public:
+    QuadricDecimate();
+    virtual ~QuadricDecimate() override = default;
+
+public:
+    ///
+    /// \brief Required input, port 0
+    ///
+    void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
+
+    imstkGetMacro(VolumePreserving, bool);
+    imstkGetMacro(TargetReduction, double);
+
+    ///
+    /// \brief Set whether to preserve volume or not, default on
+    ///
+    imstkSetMacro(VolumePreserving, bool);
+
+    ///
+    /// \brief Set the target reduction ratio
+    ///
+    imstkSetMacro(TargetReduction, double);
+
+protected:
+    void requestUpdate() override;
+
+private:
+    bool   VolumePreserving;
+    double TargetReduction;
+};
 }

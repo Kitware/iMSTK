@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionPair.h"
+#include "imstkCollisionDetection.h"
 
 namespace imstk
 {
@@ -38,6 +39,8 @@ class PbdObjectCollisionPair : public CollisionPair
 public:
     PbdObjectCollisionPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<PbdObject> obj2,
                            CollisionDetection::Type cdType = CollisionDetection::Type::MeshToMeshBruteForce);
+
+    virtual ~PbdObjectCollisionPair() override = default;
 
     void apply() override;
 

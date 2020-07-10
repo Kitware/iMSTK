@@ -20,19 +20,22 @@
 =========================================================================*/
 
 #include "imstkVTKViewer.h"
-#include "imstkVTKRenderDelegate.h"
-#include "imstkVTKInteractorStyle.h"
-#include "imstkVTKRenderer.h"
-#include "imstkCamera.h"
 #include "imstkLogger.h"
 #include "imstkScene.h"
+#include "imstkVTKInteractorStyle.h"
+#include "imstkVTKRenderer.h"
+#include "imstkVTKScreenCaptureUtility.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkCallbackCommand.h>
 
-#include "imstkParallelUtils.h"
+#ifdef iMSTK_ENABLE_VR
+#include "imstkOpenVRCommand.h"
+#include <vtkOpenVRRenderWindow.h>
+#include <vtkOpenVRRenderWindowInteractor.h>
+#endif
 
 namespace imstk
 {
@@ -255,7 +258,7 @@ VTKViewer::getTextStatusManager()
 }
 
 void
-VTKViewer::timerCallback(vtkObject* caller, long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
+VTKViewer::timerCallback(vtkObject* vtkNotUsed(caller), long unsigned int vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
 {
     VTKViewer* self = static_cast<VTKViewer*>(clientData);
 

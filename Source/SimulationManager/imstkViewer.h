@@ -22,13 +22,15 @@
 #pragma once
 
 #include "imstkRenderer.h"
-#include "imstkInteractorStyle.h"
+
+#include <unordered_map>
 
 namespace imstk
 {
-class SimulationManager;
+class InteractorStyle;
 class Scene;
 class ScreenCaptureUtility;
+class SimulationManager;
 
 #ifdef iMSTK_USE_Vulkan
 namespace GUIOverlay
@@ -36,6 +38,11 @@ namespace GUIOverlay
 class Canvas;
 }
 #endif
+
+namespace
+{
+using EventHandlerFunction = std::function<bool (InteractorStyle* iStyle)>;
+}
 
 struct viewerConfig
 {
@@ -62,7 +69,7 @@ class Viewer
 public:
 
     Viewer();
-    Viewer(SimulationManager*) {}
+    Viewer(SimulationManager*) { };
     virtual ~Viewer() = default;
 
     ///

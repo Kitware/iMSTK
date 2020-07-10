@@ -22,18 +22,10 @@
 #pragma once
 
 #include "imstkRenderer.h"
-#include "imstkVTKTextureDelegate.h"
 #include "imstkTextureManager.h"
+#include "imstkVTKTextureDelegate.h"
 
 #include <vtkSmartPointer.h>
-#ifdef iMSTK_ENABLE_VR
-#include <vtkOpenVRRenderer.h>
-#include <vtkOpenVRCamera.h>
-#include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
-#include <vtkInteractorStyle3D.h>
-#include <vtkOpenVROverlayInternal.h>
-#endif
 
 #include <unordered_map>
 
@@ -52,7 +44,6 @@ namespace imstk
 class Scene;
 class Camera;
 class VTKRenderDelegate;
-//class TextureManager;
 
 ///
 /// \class VTKRenderer
@@ -70,7 +61,7 @@ public:
     ///
     /// \brief Default destructor
     ///
-    ~VTKRenderer() = default;
+    virtual ~VTKRenderer() override = default;
 
     ///
     /// \brief Set/Get the rendering mode which defined the

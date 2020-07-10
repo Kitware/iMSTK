@@ -21,7 +21,6 @@
 
 #pragma once
 
-// imstk
 #include "imstkGeometryMap.h"
 
 namespace imstk

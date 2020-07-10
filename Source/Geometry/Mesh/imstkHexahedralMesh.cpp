@@ -23,8 +23,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkLogger.h"
 
-#include <array>
-
 namespace imstk
 {
 void

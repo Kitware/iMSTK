@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkSphere.h"
-
 #include "imstkLogger.h"
 
 namespace imstk

@@ -19,10 +19,7 @@
 
 =========================================================================*/
 
-#include <map>
-
 #include "imstkDummyClient.h"
-
 #include "imstkLogger.h"
 
 namespace imstk

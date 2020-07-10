@@ -43,7 +43,7 @@ public:
     ///
     /// \brief destructor
     ///
-    ~VTKCapsuleRenderDelegate() = default;
+    virtual ~VTKCapsuleRenderDelegate() override = default;
 
     ///
     /// \brief Update capsule source based on the capsule geometry

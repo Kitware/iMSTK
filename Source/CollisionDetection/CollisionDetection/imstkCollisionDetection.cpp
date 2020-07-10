@@ -21,10 +21,9 @@
 
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionData.h"
-#include "imstkTaskNode.h"
-#include "imstkLogger.h"
 #include "imstkOctreeBasedCD.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTaskNode.h"
 
 namespace imstk
 {

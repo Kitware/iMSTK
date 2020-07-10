@@ -22,15 +22,13 @@ limitations under the License.
 #include "imstkObjectInteractionFactory.h"
 #include "imstkBoneDrillingCH.h"
 #include "imstkCDObjectFactory.h"
-#include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkCollisionDetection.h"
 #include "imstkFeDeformableObject.h"
-#include "imstkLogger.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollisionPair.h"
 #include "imstkPenaltyCH.h"
 #include "imstkPickingCH.h"
+#include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkSPHCollisionHandling.h"
 #include "imstkSPHObject.h"
 
@@ -61,7 +59,7 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
     //}
     else if (intType == InteractionType::SphObjToCollidingObjCollision && isType<SPHObject>(obj1))
     {
-        // Setup CD, and collision data
+        // Setup CD and collision data
         std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
@@ -71,9 +69,19 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
 
         results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
     }
+    else if (intType == InteractionType::SphObjToCollidingObjSDFCollision && isType<SPHObject>(obj1))
+    {
+        // Setup CD and collision data
+        std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
+        std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
+
+        // Setup the handler
+        std::shared_ptr<SPHCollisionHandling> colHandler = std::make_shared<SPHCollisionHandling>(CollisionHandling::Side::B, colData, std::dynamic_pointer_cast<SPHObject>(obj1));
+        results = std::make_shared<CollisionPair>(obj2, obj1, colDetect, colHandler, nullptr);
+    }
     else if (intType == InteractionType::FemObjToCollidingObjNodalPicking && isType<FeDeformableObject>(obj1))
     {
-        // Setup CD, and collision data
+        // Setup CD and collision data
         std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
@@ -85,7 +93,7 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
     }
     else if (intType == InteractionType::FemObjToCollidingObjPenaltyForce && isType<FeDeformableObject>(obj1))
     {
-        // Setup CD, and collision data
+        // Setup CD and collision data
         std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 
@@ -95,7 +103,7 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
     }
     else if (intType == InteractionType::FemObjToCollidingObjBoneDrilling && isType<FeDeformableObject>(obj1))
     {
-        // Setup CD, and collision data
+        // Setup CD and collision data
         std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), colData);
 

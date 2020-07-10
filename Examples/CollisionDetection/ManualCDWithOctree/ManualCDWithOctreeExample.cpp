@@ -19,29 +19,25 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkLight.h"
-#include "imstkSceneObject.h"
-#include "imstkDebugRenderGeometry.h"
-#include "imstkAPIUtilities.h"
-#include "imstkVTKViewer.h"
-#include "imstkTimer.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkCollisionData.h"
 #include "imstkCamera.h"
-#include "imstkDebugRenderGeometry.h"
 #include "imstkCollidingObject.h"
-#include "imstkSceneManager.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkScene.h"
-#include "imstkVTKRenderer.h"
-
-// This is for collision detection between geometries
+#include "imstkCollisionData.h"
+#include "imstkDebugRenderGeometry.h"
+#include "imstkLight.h"
 #include "imstkOctreeBasedCD.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTimer.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKRenderer.h"
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
-#include <map>
-#include <thread>
-#include <chrono>
+#include <vtkRenderWindow.h>
 
 using namespace imstk;
 

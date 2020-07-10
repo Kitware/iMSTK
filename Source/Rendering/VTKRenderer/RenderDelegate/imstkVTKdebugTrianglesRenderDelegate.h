@@ -23,8 +23,10 @@
 
 #include "imstkVTKRenderDelegate.h"
 
-class vtkDoubleArray;
 class vtkCellArray;
+class vtkDoubleArray;
+class vtkPoints;
+class vtkPolyData;
 
 namespace imstk
 {
@@ -43,6 +45,8 @@ public:
     /// \brief Constructor
     ///
     explicit VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+
+    virtual ~VTKdbgTrianglesRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the surface mesh geometry

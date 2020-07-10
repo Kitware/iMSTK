@@ -58,8 +58,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    OpenVRCommand()
-    {}
+    OpenVRCommand() = default;
 
     ///
     /// \brief Destructor

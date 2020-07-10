@@ -23,7 +23,6 @@
 
 #include "imstkSceneObject.h"
 #include "imstkMath.h"
-#include <unordered_map>
 
 namespace imstk
 {
@@ -50,7 +49,7 @@ public:
     ///
     /// \brief
     ///
-    const std::shared_ptr<Geometry>& getCollidingGeometry() const;
+    std::shared_ptr<Geometry> getCollidingGeometry() const;
     void setCollidingGeometry(const std::shared_ptr<Geometry>& geometry);
 
     ///

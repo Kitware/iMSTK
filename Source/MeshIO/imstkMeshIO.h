@@ -21,11 +21,13 @@
 
 #pragma once
 
-// imstk
-#include "imstkPointSet.h"
+#include <memory>
+#include <string>
 
 namespace imstk
 {
+class PointSet;
+
 ///
 /// \brief Enumeration the mesh file type
 ///
@@ -44,7 +46,8 @@ enum MeshFileType
     VEG,
     MSH,
     NRRD,
-    DCM
+    DCM,
+    NII
 };
 
 ///
@@ -55,7 +58,6 @@ enum MeshFileType
 class MeshIO
 {
 public:
-
     ///
     /// \brief Constructor
     ///
@@ -70,6 +72,9 @@ public:
     /// \brief Read external file
     ///
     static std::shared_ptr<PointSet> read(const std::string& filePath);
+
+    template<typename T>
+    static std::shared_ptr<T> read(const std::string& filePath) { return std::dynamic_pointer_cast<T>(read(filePath)); }
 
     ///
     /// \brief Write external file

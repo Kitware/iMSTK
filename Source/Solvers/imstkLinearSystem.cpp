@@ -21,8 +21,6 @@
 
 #include "imstkLinearSystem.h"
 
-#include <g3log/g3log.hpp>
-
 namespace imstk
 {
 //template<typename SystemMatrixType>

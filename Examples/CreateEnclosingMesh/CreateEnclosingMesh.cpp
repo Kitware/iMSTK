@@ -19,17 +19,18 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneManager.h"
-#include "imstkLight.h"
 #include "imstkCamera.h"
-#include "imstkAPIUtilities.h"
+#include "imstkGeometryUtilities.h"
+#include "imstkLight.h"
+#include "imstkMeshIO.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
-#include "imstkVTKMeshIO.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkScene.h"
+#include "imstkViewer.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

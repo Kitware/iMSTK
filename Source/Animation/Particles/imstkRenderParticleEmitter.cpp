@@ -20,21 +20,19 @@
 =========================================================================*/
 
 #include "imstkRenderParticleEmitter.h"
-#include "imstkColor.h"
 #include "imstkLogger.h"
+#include "imstkRenderParticles.h"
+#include "imstkTimer.h"
 
 namespace imstk
 {
 RenderParticleEmitter::RenderParticleEmitter(std::shared_ptr<Geometry>   geometry,
                                              const float                 time /*= 3000*/,
                                              RenderParticleEmitter::Mode mode /*= Mode::CONTINUOUS*/)
-    : AnimationModel(geometry)
+    : AnimationModel(geometry),
+    m_stopWatch(std::make_unique<StopWatch>()), m_time(time), m_emitTime(m_time), m_mode(mode)
 {
     this->setGeometry(geometry);
-
-    m_time     = time;
-    m_emitTime = m_time;
-    m_mode     = mode;
 
     RenderParticleKeyFrame startFrame;
     startFrame.m_color = Color::White;
@@ -165,11 +163,11 @@ RenderParticleEmitter::update()
 
     if (!m_started)
     {
-        m_stopWatch.start();
+        m_stopWatch->start();
         m_started = true;
     }
 
-    auto  time = m_stopWatch.getTimeElapsed();
+    auto  time = m_stopWatch->getTimeElapsed();
     float dt   = (float)(time - m_lastUpdateTime);
     m_lastUpdateTime = time;
 

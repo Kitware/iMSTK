@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkDeviceClient.h"
-
 #include "imstkLogger.h"
 
 namespace imstk

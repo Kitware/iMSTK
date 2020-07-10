@@ -19,11 +19,11 @@
 
 =========================================================================*/
 
-#include "imstkGraph.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
 #include "imstkAPIUtilities.h"
+#include "imstkGraph.h"
+#include "imstkMeshIO.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 
 #include <iostream>
 

@@ -104,16 +104,19 @@ else()
     ChartsCore
     CommonCore
     CommonDataModel
-    FiltersGeneral
-    FiltersSources
-    FiltersModeling
+    FiltersCore
     FiltersExtraction
+    FiltersGeneral
+    FiltersModeling
+    FiltersSources
     IOExport
     IOImport
     IOPLY
     IOParallel
     IOParallelXML
     ImagingCore
+    ImagingGeneral
+    ImagingStencil
     InteractionStyle
     RenderingAnnotation
     RenderingContext2D

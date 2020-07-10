@@ -20,9 +20,7 @@
 =========================================================================*/
 
 #include "imstkCollisionGraph.h"
-#include "imstkLogger.h"
 #include "imstkObjectInteractionPair.h"
-#include "imstkSceneObject.h"
 
 namespace imstk
 {

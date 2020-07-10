@@ -20,14 +20,9 @@
 =========================================================================*/
 
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
 #include <g3log/g3log.hpp>
 
-#include "imstkMath.h"
 #include "imstkModule.h"
-
-#include <thread>
-#include <chrono>
 
 namespace imstk
 {

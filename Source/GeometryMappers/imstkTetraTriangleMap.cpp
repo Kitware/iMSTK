@@ -20,9 +20,10 @@
 =========================================================================*/
 
 #include "imstkTetraTriangleMap.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkParallelUtils.h"
 #include "imstkLogger.h"
+#include "imstkParallelUtils.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {

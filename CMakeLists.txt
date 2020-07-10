@@ -280,16 +280,19 @@ find_package(VTK COMPONENTS
   ChartsCore
   CommonCore
   CommonDataModel
-  FiltersGeneral
-  FiltersSources
-  FiltersModeling
+  FiltersCore
   FiltersExtraction
+  FiltersGeneral
+  FiltersModeling
+  FiltersSources
   IOExport
   IOImport
   IOPLY
   IOParallel
   IOParallelXML
   ImagingCore
+  ImagingGeneral
+  ImagingStencil
   InteractionStyle
   RenderingAnnotation
   RenderingContext2D
@@ -383,6 +386,7 @@ add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
+add_subdirectory(Source/Filtering)
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories

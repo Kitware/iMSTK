@@ -19,12 +19,14 @@
 
 =========================================================================*/
 
-#ifndef imstkRigidBodyWorld_h
-#define imstkRigidBodyWorld_h
+#pragma once
+
+#include "imstkDynamicalModel.h"
+#include "imstkRigidBodyState.h"
 
 #define PhysX_RELEASE(x)        if (x) { x->release(); x = NULL; }
 
-#include "physx/PxConfig.h"
+#include <physx/PxConfig.h>
 #if !defined(NDEBUG) && !defined(_DEBUG)
 // PhysX tests for _DEBUG preprocessor definition in a debug build
 // On Windows, MSVC defines this automatically
@@ -32,20 +34,11 @@
   # define _DEBUG 1
   # define imstkPxPhysXAPI_DEBUG
 #endif
-#include "physx/PxPhysicsAPI.h"
+#include <physx/PxPhysicsAPI.h>
 #ifdef imstkPxPhysXAPI_DEBUG
   #undef _DEBUG
   #undef imstkPxPhysXAPI_DEBUG
 #endif
-#include "physx/extensions/PxDefaultErrorCallback.h"
-
-#include "imstkDynamicalModel.h"
-#include "imstkRigidBodyState.h"
-#include "imstkSurfaceMesh.h"
-
-//#include "../snippets/snippetcommon/SnippetPrint.h"
-//#include "../snippets/snippetcommon/SnippetPVD.h"
-//#include "../snippets/snippetutils/SnippetUtils.h"
 
 namespace imstk
 {
@@ -105,5 +98,3 @@ private:
     RigidBodyWorld();
 };
 } // imstk
-
-#endif // imstkRigidBodyWorld_h

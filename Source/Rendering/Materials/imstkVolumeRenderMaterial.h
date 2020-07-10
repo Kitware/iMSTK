@@ -21,13 +21,10 @@
 
 #pragma once
 
-// imstk
 #include "imstkRenderMaterial.h"
 
-// vtk
 #include <vtkNew.h>
 
-// forward declarations
 class vtkVolumeProperty;
 
 namespace imstk

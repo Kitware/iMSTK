@@ -21,24 +21,17 @@
 
 #pragma once
 
-#include <memory>
-
-#include "vtkUnstructuredGrid.h"
-#include "vtkPolyData.h"
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkPointData.h"
-
 #include "imstkMeshIO.h"
-#include "imstkImageData.h"
 
 namespace imstk
 {
-class SurfaceMesh;
-class LineMesh;
-class TetrahedralMesh;
 class HexahedralMesh;
+class ImageData;
+class LineMesh;
+class SurfaceMesh;
+class TetrahedralMesh;
 class VolumetricMesh;
+
 ///
 /// \class VTKMeshIO
 ///
@@ -83,6 +76,12 @@ protected:
     static std::shared_ptr<SurfaceMesh> readVtkPolyData(const std::string& filePath);
 
     ///
+    /// \brief Writes the given image data to given file path using the provided writer type
+    ///
+    template<typename WriterType>
+    static bool writeVtkImageData(const std::shared_ptr<ImageData> imstkMesh, const std::string& filePath);
+
+    ///
     /// \brief Writes the given surface mesh to given file path using the provided writer type
     ///
     template<typename WriterType>
@@ -124,5 +123,15 @@ protected:
     /// \brief TODO
     ///
     static std::shared_ptr<ImageData> readVtkImageDataDICOM(const std::string& filePath);
+
+    ///
+    /// \brief Reads nifti/nii format image data
+    ///
+    static std::shared_ptr<ImageData> readVtkImageDataNIFTI(const std::string& filePath);
+
+    ///
+    /// \brief Write nifti/nii format image data
+    ///
+    static bool writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const std::string& filePath);
 };
 } // imstk

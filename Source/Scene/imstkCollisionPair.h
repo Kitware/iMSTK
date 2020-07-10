@@ -21,14 +21,14 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
-#include "imstkCollisionHandling.h"
 #include "imstkObjectInteractionPair.h"
 
 namespace imstk
 {
 struct CollisionData;
 class CollidingObject;
+class CollisionDetection;
+class CollisionHandling;
 
 ///
 /// \class CollisionPair
@@ -57,7 +57,7 @@ public:
                   std::shared_ptr<CollisionDetection> cd,
                   std::shared_ptr<CollisionHandling> chAB);
 
-    ~CollisionPair() = default;
+    virtual ~CollisionPair() override = default;
 
 public:
     /// \brief TODO

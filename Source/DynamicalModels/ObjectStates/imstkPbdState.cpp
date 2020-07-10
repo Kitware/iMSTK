@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkPbdState.h"
-#include "imstkPointSet.h"
 
 namespace imstk
 {

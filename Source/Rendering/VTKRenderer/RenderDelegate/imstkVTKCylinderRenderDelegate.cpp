@@ -21,9 +21,11 @@
 
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkCylinder.h"
+#include "imstkVisualModel.h"
 
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkCylinderSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {

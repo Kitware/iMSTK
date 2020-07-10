@@ -20,12 +20,10 @@ limitations under the License.
 =========================================================================*/
 #pragma once
 
-#include "g3log/logmessage.hpp"
-#include "g3log/logworker.hpp"
-
 #include "imstkDataLogger.h"
 
-#include <memory>
+#include <g3log/logmessage.hpp>
+#include <g3log/logworker.hpp>
 
 namespace imstk
 {

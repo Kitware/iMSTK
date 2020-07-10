@@ -21,9 +21,7 @@ limitations under the License.
 
 #include "imstkTaskGraph.h"
 #include "imstkLogger.h"
-#include "imstkTaskNode.h"
-#include <queue>
-#include <set>
+
 #include <stack>
 
 namespace imstk

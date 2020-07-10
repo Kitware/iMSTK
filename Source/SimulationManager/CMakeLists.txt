@@ -56,7 +56,6 @@ imstk_add_library( SimulationManager
     imstkSimulationManager.cpp
     imstkViewer.cpp
     imstkScreenCaptureUtility.cpp
-    imstkInteractorStyle.cpp
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}

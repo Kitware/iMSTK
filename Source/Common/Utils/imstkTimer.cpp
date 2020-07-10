@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkTimer.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

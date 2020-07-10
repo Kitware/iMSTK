@@ -19,17 +19,20 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkLineMesh.h"
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkTaskGraphVizWriter.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
+using namespace imstk::expiremental;
 
 ///
 /// \brief Create pbd string geometry
@@ -38,7 +41,7 @@ static std::shared_ptr<LineMesh>
 makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringLength)
 {
     // Create the geometry
-    std::shared_ptr<LineMesh> stringGeometry = std::make_shared<LineMesh>();
+    imstkNew<LineMesh> stringGeometry;
 
     StdVectorOfVec3d vertList;
     vertList.resize(numVerts);
@@ -74,13 +77,13 @@ makePbdString(
     const double       bendStiffness,
     const Color&       color)
 {
-    std::shared_ptr<PbdObject> stringObj = std::make_shared<PbdObject>(name);
+    imstkNew<PbdObject> stringObj(name);
 
     // Setup the Geometry
     std::shared_ptr<LineMesh> stringMesh = makeStringGeometry(pos, numVerts, stringLength);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PBDModelConfig>();
+    imstkNew<PBDModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e7);
     pbdParams->enableConstraint(PbdConstraint::Type::Bend, bendStiffness);
     pbdParams->m_fixedNodeIds     = { 0 };
@@ -90,18 +93,18 @@ makePbdString(
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    std::shared_ptr<PbdModel> pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(stringMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
     material->setEdgeColor(color);
     material->setLineWidth(2.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    std::shared_ptr<VisualModel> visualModel = std::make_shared<VisualModel>(stringMesh);
+    imstkNew<VisualModel> visualModel(stringMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
@@ -158,14 +161,14 @@ const Color  endColor      = Color(0.0, 1.0, 0.0); // Color of last string
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDString");
+    imstkNew<SimulationManager> simManager;
+    auto                        scene     = simManager->createNewScene("PBDString");
     scene->getConfig()->taskTimingEnabled = true;
 
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
         makePbdStrings(numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
-    // Add them to the scene
+    // Add the string scene objects to the scene
     for (std::shared_ptr<PbdObject> obj : pbdStringObjs)
     {
         scene->addSceneObject(obj);
@@ -200,13 +203,13 @@ main()
     simManager->start();
 
     // Write the graph, highlighting the critical path and putting the completion time in the name
-    TaskGraphVizWriter writer;
-    writer.setInput(scene->getTaskGraph());
-    writer.setFileName("taskGraphBenchmarkExample.svg");
-    writer.setHighlightCriticalPath(true);
-    writer.setWriteNodeComputeTimesColor(true);
-    writer.setWriteNodeComputeTimesText(true);
-    writer.write();
+    imstkNew<TaskGraphVizWriter> writer;
+    writer->setInput(scene->getTaskGraph());
+    writer->setFileName("taskGraphBenchmarkExample.svg");
+    writer->setHighlightCriticalPath(true);
+    writer->setWriteNodeComputeTimesColor(true);
+    writer->setWriteNodeComputeTimesText(true);
+    writer->write();
 
     return 0;
 }

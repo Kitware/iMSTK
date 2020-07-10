@@ -19,11 +19,13 @@
 
 =========================================================================*/
 
+#include "imstkPointSet.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
 #include "imstkSPHModel.h"
-#include "imstkPointSet.h"
-#include "imstkScene.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 
@@ -143,7 +145,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     auto fluidMaterial    = std::make_shared<RenderMaterial>();
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     fluidMaterial->setVertexColor(Color::Orange);
-    fluidMaterial->setPointSize(10.);
+    fluidMaterial->setPointSize(0.1);
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Create a physics model

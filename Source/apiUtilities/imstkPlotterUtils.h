@@ -21,13 +21,7 @@
 
 #pragma once
 
-// STL includes
-#include <iostream>
-#include <fstream>
-
-// imstk
 #include "imstkMath.h"
-#include "imstkLogger.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4505 ) // Warning C4505 will vanish upon calls to the following functions
@@ -38,137 +32,23 @@ namespace plotterutils
 ///
 /// \brief Write a Matlab script to plot a given vector
 ///
-static void
-writePlotterVectorMatlab(Vectord& x, const char* fileName)
-{
-    std::ofstream scriptFile(fileName);
-
-    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
-
-    // print x
-    scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); ++i)
-    {
-        scriptFile << x[i] << "\n";
-    }
-    scriptFile << "];\n";
-
-    // plot x
-    scriptFile << "plot(X, 'r-', 'LineWidth', 2, 'MarkerSize', 10);\n";
-    scriptFile.close();
-}
+void writePlotterVectorMatlab(Vectord& x, const char* fileName);
 
 ///
 /// \brief Write a Matlab script to plot X vs Y where X, Y are input vectors of same size
 ///
-static void
-writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, const char* fileName)
-{
-    // check if the vectors are of the same size
-    if (x.size() != y.size())
-    {
-        LOG(WARNING) << "The vectors supplied for plotting are not of same size!";
-        return;
-    }
-
-    std::ofstream scriptFile(fileName);
-
-    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
-
-    // print x
-    scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); ++i)
-    {
-        scriptFile << x[i] << "\n";
-    }
-    scriptFile << "];\n";
-
-    // print y
-    scriptFile << "Y=[\n";
-    for (auto i = 0; i < y.size(); ++i)
-    {
-        scriptFile << y[i] << "\n";
-    }
-    scriptFile << "];\n";
-
-    // plot x vs y
-    scriptFile << "plot(X, Y, 'r-', 'LineWidth', 2, 'MarkerSize', 10);\n";
-    scriptFile.close();
-}
+void writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, const char* fileName);
 
 ///
 /// \brief Write a MatPlotlib script to plot a given vector
 ///
-static void
-writePlotterVectorMatPlotlib(Vectord& x, const char* fileName)
-{
-    std::ofstream scriptFile(fileName);
-
-    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
-
-    // import
-    scriptFile << "import numpy as np\n";
-    scriptFile << "import matplotlib.pyplot as plt\n";
-
-    // print x
-    scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); ++i)
-    {
-        scriptFile << x[i] << ",\n";
-    }
-    scriptFile << "];\n";
-
-    // plot
-    scriptFile << "plt.plot(X, 'ro')\n";
-
-    // show the plot
-    scriptFile << "plt.show()\n";
-}
+void writePlotterVectorMatPlotlib(Vectord& x, const char* fileName);
 
 ///
 /// \brief Write a MatPlotlib script to plot \p x vs \p y where \p x, \p y are of same
 /// size
 ///
-static void
-writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName)
-{
-    // check if the vectors are of the same size
-    if (x.size() != y.size())
-    {
-        LOG(WARNING) << "The vectors supplied for plotting are not of same size!";
-        return;
-    }
-
-    std::ofstream scriptFile(fileName);
-
-    CHECK(scriptFile.is_open()) << "Unable to create or open the specified file for plot script!";
-
-    // import
-    scriptFile << "import numpy as np\n";
-    scriptFile << "import matplotlib.pyplot as plt\n";
-
-    // print x
-    scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); ++i)
-    {
-        scriptFile << x[i] << ",\n";
-    }
-    scriptFile << "];\n";
-
-    // print y
-    scriptFile << "Y=[\n";
-    for (auto i = 0; i < y.size(); ++i)
-    {
-        scriptFile << y[i] << ",\n";
-    }
-    scriptFile << "];\n";
-
-    // plot
-    scriptFile << "plt.plot(X, Y, 'ro')\n";
-
-    // show the plot
-    scriptFile << "plt.show()\n";
-}
+void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName);
 } // plotters
 } // imstk
 

@@ -21,6 +21,7 @@
 
 #include "imstkSceneObject.h"
 #include "imstkTaskGraph.h"
+#include "imstkVisualModel.h"
 
 namespace imstk
 {

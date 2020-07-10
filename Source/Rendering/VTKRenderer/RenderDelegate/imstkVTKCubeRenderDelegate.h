@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKCubeRenderDelegate() = default;
+    virtual ~VTKCubeRenderDelegate() override = default;
 
     ///
     /// \brief Update cube source based on the cube geometry

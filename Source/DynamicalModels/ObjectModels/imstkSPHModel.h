@@ -28,7 +28,6 @@
 
 namespace imstk
 {
-class ComputeNode;
 class PointSet;
 
 ///
@@ -177,9 +176,10 @@ public:
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
     std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
     std::shared_ptr<TaskNode> getComputeSurfaceTensionNode() const { return m_computeSurfaceTensionNode; }
-    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
-    std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
-    std::shared_ptr<TaskNode> getIntegrateNode() const { m_integrateNode; }
+    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { return m_computeTimeStepSizeNode; }
+    std::shared_ptr<TaskNode> getSumAccelsNode() const { return m_sumAccelsNode; }
+    std::shared_ptr<TaskNode> getComputeVelocityNode() const { return m_computeVelocityNode; }
+    std::shared_ptr<TaskNode> getComputePositionNode() const { return m_computePositionNode; }
 
 protected:
     ///
@@ -263,7 +263,8 @@ protected:
     std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
     std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
-    std::shared_ptr<TaskNode> m_integrateNode = nullptr;
+    std::shared_ptr<TaskNode> m_computeVelocityNode = nullptr;
+    std::shared_ptr<TaskNode> m_computePositionNode = nullptr;
 
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;

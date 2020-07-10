@@ -19,22 +19,16 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include <gtest/gtest.h>
 
-#include "imstkMath.h"
-#include "imstkSphere.h"
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkCollisionData.h"
 #include "imstkNarrowPhaseCD.h"
-
 #include "imstkOctreeBasedCD.h"
 #include "imstkPointSetToSurfaceMeshCD.h"
+#include "imstkSphere.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 
-#include <iostream>
-#include <unordered_set>
 #include <unordered_map>
 
 using namespace imstk;

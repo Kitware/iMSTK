@@ -19,14 +19,12 @@
 
 =========================================================================*/
 
-#include "imstkMeshIO.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkLogger.h"
 #include "bandwidth.h"
-
-#include <thread>
+#include "imstkGeometryUtilities.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 
 using namespace imstk;
 

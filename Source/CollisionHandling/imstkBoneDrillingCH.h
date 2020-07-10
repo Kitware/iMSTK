@@ -21,7 +21,6 @@
 
 #pragma once
 
-// imstk
 #include "imstkCollisionHandling.h"
 #include "imstkMath.h"
 

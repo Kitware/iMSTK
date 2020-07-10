@@ -19,25 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneObject.h"
-#include "imstkDebugRenderGeometry.h"
-#include "imstkAPIUtilities.h"
-#include "imstkLooseOctree.h"
-#include "imstkVTKViewer.h"
-#include "imstkTimer.h"
-#include "imstkLight.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkSceneManager.h"
 #include "imstkCamera.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkCollisionGraph.h"
+#include "imstkLight.h"
+#include "imstkLooseOctree.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTimer.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKRenderDelegate.h"
 #include "imstkVTKRenderer.h"
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
-#include <thread>
-#include <chrono>
-#include <sstream>
+#include <vtkRenderWindow.h>
 
 using namespace imstk;
 

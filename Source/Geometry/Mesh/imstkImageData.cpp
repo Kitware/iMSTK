@@ -20,123 +20,118 @@
 =========================================================================*/
 
 #include "imstkImageData.h"
-
-// vtk
-#include "vtkImageReslice.h"
-#include "vtkTransform.h"
-#include <vtkImageData.h>
+#include "imstkLogger.h"
+#include "imstkDataArray.h"
 
 namespace imstk
 {
 ImageData::ImageData(const std::string& name)
     : PointSet(Geometry::Type::ImageData, name),
-    m_dataTransform(vtkSmartPointer<vtkTransform>::New())
+    m_scalarArray(nullptr)
 {
 }
 
 void
 ImageData::print() const
 {
-    Geometry::print();
+    PointSet::print();
+    LOG(INFO) << "Scalar Type: " << static_cast<int>(m_scalarArray->getScalarType());
+    LOG(INFO) << "Number of Components" << m_numComps;
+    LOG(INFO) << "Dimensions: " << m_dims[0] << ", " << m_dims[1] << ", " << m_dims[2];
+    LOG(INFO) << "Spacing: " << m_spacing[0] << ", " << m_spacing[1] << ", " << m_spacing[2];
+    LOG(INFO) << "Origin: " << m_origin[0] << ", " << m_origin[1] << ", " << m_origin[2];
+    LOG(INFO) << "Bounds: ";
+    LOG(INFO) << "\t" << m_bounds[0] << ", " << m_bounds[1];
+    LOG(INFO) << "\t" << m_bounds[2] << ", " << m_bounds[3];
+    LOG(INFO) << "\t" << m_bounds[4] << ", " << m_bounds[5];
 }
 
 double
 ImageData::getVolume() const
 {
-    if (!this->m_data)
+    if (m_scalarArray == nullptr)
     {
         return 0.0;
     }
 
-    double bounds[6];
-    this->m_data->GetBounds(bounds);
-    return ((bounds[1] - bounds[0]) *
-            (bounds[3] - bounds[2]) *
-            (bounds[5] - bounds[4]));
+    return (m_dims[0] * m_spacing.x()) *
+           (m_dims[1] * m_spacing.y()) *
+           (m_dims[2] * m_spacing.z());
+}
+
+void*
+ImageData::getVoidPointer()
+{
+    return m_scalarArray->getVoidPointer();
+}
+
+const ScalarType
+ImageData::getScalarType() const
+{
+    return m_scalarArray->getScalarType();
 }
 
 void
-ImageData::initialize(vtkImageData* im)
+ImageData::setScalars(std::shared_ptr<AbstractDataArray> scalars, const int numComps, int* dim)
 {
-    this->clear();
-    if (im)
+    CHECK(scalars != nullptr);
+    if (dim[0] * dim[1] * dim[2] * numComps != scalars->size())
     {
-        this->m_data = vtkSmartPointer<vtkImageData>::New();
-        this->m_data->DeepCopy(im);
+        LOG(WARNING) << "Scalars don't align";
     }
+    m_scalarArray = scalars;
+    m_dims[0]     = dim[0];
+    m_dims[1]     = dim[1];
+    m_dims[2]     = dim[2];
+    m_numComps    = numComps;
+}
+
+void
+ImageData::allocate(const ScalarType type, const int numComps, const Vec3i& dims, const Vec3d& spacing, const Vec3d& origin)
+{
+    m_dims     = dims;
+    m_origin   = origin;
+    m_spacing  = spacing;
+    m_numComps = numComps;
+    const size_t numVals = static_cast<size_t>(dims[0] * dims[1] * dims[2] * numComps);
+    switch (type)
+    {
+        TemplateMacro(m_scalarArray = std::make_shared<DataArray<IMSTK_TT>>(numVals); );
+    default:
+        LOG(WARNING) << "Tried to allocate unknown scalar type";
+        break;
+    }
+}
+
+void
+ImageData::computePoints()
+{
+    StdVectorOfVec3d vertices(m_dims[0] * m_dims[1] * m_dims[2]);
+    const Vec3d shift = m_origin + m_spacing * 0.5;
+    int i = 0;
+    for (int z = 0; z < m_dims[2]; z++)
+    {
+        for (int y = 0; y < m_dims[1]; y++)
+        {
+            for (int x = 0; x < m_dims[0]; x++, i++)
+            {
+                vertices[i] = Vec3d(x, y, z).cwiseProduct(m_spacing) + shift;
+            }
+        }
+    }
+    setInitialVertexPositions(vertices);
+    setVertexPositions(vertices);
 }
 
 void
 ImageData::clear()
 {
-    if (this->m_data)
+    if (this->m_scalarArray != nullptr)
     {
-        this->m_data = nullptr;
+        this->m_scalarArray = nullptr;
     }
-    this->m_dataTransform->Identity();
+    //this->m_dataTransform->Identity();
     this->m_transformApplied = true;
     this->m_dataModified     = true;
-}
-
-vtkImageData*
-ImageData::getData(DataType type)
-{
-    if (type == DataType::PostTransform)
-    {
-        this->updatePostTransformData();
-    }
-    return this->m_data;
-}
-
-void
-ImageData::applyTranslation(const Vec3d t)
-{
-    this->m_dataTransform->Translate(t[0], t[1], t[2]);
-
-    this->m_dataModified     = true;
-    this->m_transformApplied = false;
-}
-
-void
-ImageData::applyScaling(const double s)
-{
-    this->m_dataTransform->Scale(s, s, s);
-
-    this->m_dataModified     = true;
-    this->m_transformApplied = false;
-}
-
-void
-ImageData::applyRotation(const Mat3d r)
-{
-    vtkNew<vtkMatrix4x4> mat;
-    for (int i = 0; i < 3; ++i)
-    {
-        for (int j = 0; j < 3; ++j)
-        {
-            mat->SetElement(i, j, r(i, j));
-        }
-    }
-    this->m_dataTransform->Concatenate(mat);
-
-    this->m_dataModified     = true;
-    this->m_transformApplied = false;
-}
-
-void
-ImageData::updatePostTransformData() const
-{
-    if (m_transformApplied || !this->m_data)
-    {
-        return;
-    }
-
-    vtkNew<vtkImageReslice> reslice;
-    reslice->SetInputData(this->m_data);
-    reslice->SetResliceTransform(this->m_dataTransform);
-    reslice->SetInterpolationModeToLinear();
-    reslice->Update();
-    this->m_data->DeepCopy(reslice->GetOutput());
-    this->m_transformApplied = true;
 }
 } // imstk

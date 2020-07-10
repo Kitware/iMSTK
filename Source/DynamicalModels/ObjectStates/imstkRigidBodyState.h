@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <Eigen/Dense>
-#include <memory>
-#include <vector>
-
 #include "imstkMath.h"
 
 namespace imstk

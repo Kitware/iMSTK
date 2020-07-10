@@ -20,15 +20,9 @@
 =========================================================================*/
 
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
 
-#include "imstkMath.h"
-#include "imstkPointSet.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLooseOctree.h"
-#include "imstkParallelUtils.h"
-
-#include <queue>
 
 using namespace imstk;
 

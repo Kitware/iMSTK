@@ -20,9 +20,7 @@
 =========================================================================*/
 
 #include "imstkDirectLinearSolver.h"
-#include "imstkLinearSystem.h"
 #include "imstkLogger.h"
-#include <iostream>
 
 namespace imstk
 {

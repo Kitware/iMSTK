@@ -21,12 +21,11 @@
 
 #pragma once
 
-#include <string>
-
-// imstk
 #include "imstkMath.h"
 #include "imstkColor.h"
 #include "imstkSceneEntity.h"
+
+#include <string>
 
 namespace imstk
 {
@@ -48,6 +47,8 @@ enum class LightType
 class Light : public SceneEntity
 {
 public:
+    virtual ~Light() override = default;
+
     ///
     /// \brief Returns the type of light (see imstk::LightType)
     ///
@@ -113,8 +114,7 @@ public:
     ///
     /// \brief Set the light name
     ///
-    void setName(const std::string& name) { m_name = name; };
-    void setName(const std::string&& name) { m_name = std::move(name); };
+    void setName(std::string name) { m_name = name; };
 
 protected:
     explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), SceneEntity() {};
@@ -150,6 +150,8 @@ public:
         this->setFocalPoint(-1, -1, -1);
     };
 
+    virtual ~DirectionalLight() override = default;
+
     ///
     /// \brief Turn shadows on
     ///
@@ -159,13 +161,19 @@ public:
     /// \brief Center point for shadow projection
     /// Sets the shadow map center to this position
     ///
-    void setShadowCenter(Vec3d center) { m_shadowCenter = Vec3f((float)center[0], (float)center[1], (float)center[2]); };
+    void setShadowCenter(const Vec3d& center) { m_shadowCenter = center.cast<float>(); };
 
     ///
     /// \brief Range for shadows
     /// A smaller range results in a denser shadow map
     ///
-    void setShadowRange(const double range) { m_shadowRange = (float)range; };
+    void setShadowRange(const double range) { m_shadowRange = static_cast<float>(range); };
+
+    ///
+    /// \brief Direction of the light
+    ///
+    void setDirection(const Vec3d& dir) { setFocalPoint(dir); }
+    void setDirection(const double x, const double y, const double z) { setFocalPoint(Vec3d(x, y, z)); }
 
 protected:
     friend class VulkanRenderer;
@@ -193,6 +201,8 @@ public:
     /// \brief Constructors
     ///
     explicit PointLight(const std::string& name, const LightType& type = LightType::Point) : Light(name, type) {};
+
+    virtual ~PointLight() override = default;
 
     ///
     /// \brief Get the cone angle
@@ -243,6 +253,8 @@ public:
     {
         m_coneAngle = 10.;
     };
+
+    virtual ~SpotLight() override = default;
 
     ///
     /// \brief Get the spotlight angle in degrees

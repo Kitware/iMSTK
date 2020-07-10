@@ -20,8 +20,6 @@
 =========================================================================*/
 
 #pragma once
-
-// imstk
 #include "imstkAnalyticalGeometry.h"
 
 namespace imstk

@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkRenderParticles.h"
-#include "imstkTimer.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {

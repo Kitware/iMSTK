@@ -19,25 +19,20 @@
 
 =========================================================================*/
 
-#include "imstkTimer.h"
-#include "imstkSimulationManager.h"
-#include "imstkFeDeformableObject.h"
 #include "imstkBackwardEuler.h"
-#include "imstkNonLinearSystem.h"
-#include "imstkNewtonSolver.h"
-#include "imstkGaussSeidel.h"
-#include "imstkPlane.h"
-#include "imstkTetrahedralMesh.h"
+#include "imstkCamera.h"
+#include "imstkFeDeformableObject.h"
+#include "imstkFEMDeformableBodyModel.h"
+#include "imstkLight.h"
 #include "imstkMeshIO.h"
 #include "imstkOneToOneMap.h"
-#include "imstkAPIUtilities.h"
-#include "imstkConjugateGradient.h"
-#include "imstkLight.h"
-#include "imstkCamera.h"
-#include "imstkFEMDeformableBodyModel.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include <memory>
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

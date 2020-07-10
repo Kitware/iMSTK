@@ -19,14 +19,17 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
 #include "imstkAPIUtilities.h"
-#include "imstkVisualObjectImporter.h"
-#include "imstkIBLProbe.h"
 #include "imstkCamera.h"
-#include "imstkMeshIO.h"
+#include "imstkIBLProbe.h"
 #include "imstkLight.h"
+#include "imstkMeshIO.h"
+#include "imstkPointSet.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

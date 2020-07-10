@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkModule.h"
+#include "imstkLogger.h"
 #include "imstkMath.h"
 #include "imstkTimer.h"
 

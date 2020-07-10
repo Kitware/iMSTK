@@ -19,15 +19,12 @@
 
 =========================================================================*/
 
-#include <ios>
-#include <iostream>
-#include <vector>
-#include <iomanip>
-
-#include "imstkMath.h"
 #include "imstkNewtonSolver.h"
 #include "imstkDirectLinearSolver.h"
-#include "imstkNonLinearSolver.h"
+
+#include <ios>
+#include <iostream>
+#include <iomanip>
 
 using namespace imstk;
 

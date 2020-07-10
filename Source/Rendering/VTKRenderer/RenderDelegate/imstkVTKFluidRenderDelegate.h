@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKFluidRenderDelegate() = default;
+    virtual ~VTKFluidRenderDelegate() override = default;
 
     ///
     /// \brief Update polydata source based on the mesh geometry

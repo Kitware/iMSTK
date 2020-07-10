@@ -20,11 +20,8 @@
 =========================================================================*/
 
 #include "imstkCameraController.h"
-#include "imstkMath.h"
 #include "imstkCamera.h"
 #include "imstkLogger.h"
-
-#include <utility>
 
 namespace imstk
 {

@@ -21,18 +21,13 @@
 
 #pragma once
 
-#include <memory>
-#include <fstream>
-#include <string>
-#include <initializer_list>
-
 #include "imstkTexture.h"
-#include "imstkSceneObject.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
 class RenderMaterial;
+class SceneObject;
 
 ///
 /// \class VisualObjectImporter
@@ -60,7 +55,7 @@ public:
     /// textures are converted to production-ready formats such as .dds.
     /// \returns Visual object
     ///
-    static std::shared_ptr<VisualObject> importVisualObject(
+    static std::shared_ptr<SceneObject> importVisualObject(
         const std::string& objName,
         const std::string& modelFilePath,
         const std::string& textureFolderPath,

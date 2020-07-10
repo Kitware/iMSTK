@@ -21,9 +21,6 @@
 
 #include "imstkVolumeRenderMaterial.h"
 
-// imstk
-#include <vtkVolumeProperty.h>
-
 namespace imstk
 {
 vtkVolumeProperty*

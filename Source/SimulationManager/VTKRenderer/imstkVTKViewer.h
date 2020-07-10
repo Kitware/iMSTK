@@ -21,26 +21,25 @@
 
 #pragma once
 
-#include "imstkVTKScreenCaptureUtility.h"
 #include "imstkViewer.h"
-#include "imstkVTKRenderDelegate.h"
-#include "imstkVTKScreenCaptureUtility.h"
 
-#ifdef iMSTK_ENABLE_VR
-#include "imstkOpenVRCommand.h"
-#include "vtkOpenVRRenderWindow.h"
-#include "vtkOpenVRRenderWindowInteractor.h"
-#endif
+#include <vtkSmartPointer.h>
 
 class vtkCallbackCommand;
+class vtkObject;
 class vtkRenderWindow;
 
 namespace imstk
 {
-class SimulationManager;
-class VTKTextStatusManager;
-class VTKInteractorStyle;
+#ifdef iMSTK_ENABLE_VR
+class OpenVRCommand;
+#endif
+
 class Scene;
+class SimulationManager;
+class VTKInteractorStyle;
+class VTKScreenCaptureUtility;
+class VTKTextStatusManager;
 
 ///
 /// \class VTKViewer
@@ -53,9 +52,10 @@ class VTKViewer : public Viewer
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Constructor/Destructor
     ///
     VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false);
+    virtual ~VTKViewer() override = default;
 
     ///
     /// \brief Destructor

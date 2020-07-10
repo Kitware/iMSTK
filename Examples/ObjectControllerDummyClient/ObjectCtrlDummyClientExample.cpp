@@ -19,16 +19,16 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCollidingObject.h"
 #include "imstkCamera.h"
-#include "imstkLight.h"
-#include "imstkSceneManager.h"
+#include "imstkCollidingObject.h"
 #include "imstkCube.h"
-#include "imstkDummyClient.h"
 #include "imstkDeviceTracker.h"
-#include "imstkSceneObjectController.h"
+#include "imstkDummyClient.h"
+#include "imstkLight.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkSimulationManager.h"
 
 using namespace imstk;
 

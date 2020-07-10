@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include <array>
-
 #include "imstkColor.h"
+
+#include <array>
 
 class vtkTextActor;
 

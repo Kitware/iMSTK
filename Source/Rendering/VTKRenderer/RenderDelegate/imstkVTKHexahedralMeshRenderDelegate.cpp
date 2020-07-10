@@ -21,13 +21,12 @@
 
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
 #include "imstkHexahedralMesh.h"
+#include "imstkVisualModel.h"
 
-#include <vtkUnstructuredGrid.h>
+#include <vtkActor.h>
 #include <vtkDataSetMapper.h>
 #include <vtkDoubleArray.h>
-#include <vtkCellArray.h>
-#include <vtkProperty.h>
-#include <vtkPoints.h>
+#include <vtkUnstructuredGrid.h>
 
 #include <array>
 

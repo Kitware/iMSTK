@@ -20,16 +20,19 @@
 =========================================================================*/
 
 #pragma once
-
-#include <queue>
-#include <array>
-
-#include "imstkDecal.h"
 #include "imstkGeometry.h"
-//#include "imstkRenderMaterial.h"
+#include <array>
+#include <queue>
+
+#pragma warning( push )
+#pragma warning( disable : 4201 )
+#include "glm/glm.hpp"
+#pragma warning( pop )
 
 namespace imstk
 {
+class Decal;
+
 class DecalPool : public Geometry
 {
 public:

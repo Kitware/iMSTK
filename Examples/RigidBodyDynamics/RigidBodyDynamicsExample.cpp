@@ -19,20 +19,21 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCollisionGraph.h"
-#include "imstkRigidObject.h"
-#include "imstkRigidBodyModel.h"
-#include "imstkSceneObject.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkCube.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkMeshIO.h"
 #include "imstkIsometricMap.h"
+#include "imstkLight.h"
+#include "imstkMeshIO.h"
+#include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
+#include "imstkRigidBodyModel.h"
+#include "imstkRigidObject.h"
 #include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSphere.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

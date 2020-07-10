@@ -20,13 +20,9 @@
 =========================================================================*/
 
 #pragma once
-
-// std library
+#include "imstkPointSet.h"
 #include <array>
 #include <set>
-
-// imstk
-#include "imstkPointSet.h"
 
 namespace imstk
 {

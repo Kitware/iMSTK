@@ -20,10 +20,8 @@
 =========================================================================*/
 
 #include "imstkViewer.h"
-#include "imstkScene.h"
-#include "imstkCamera.h"
 #include "imstkLogger.h"
-#include "imstkScreenCaptureUtility.h"
+#include "imstkInteractorStyle.h"
 
 #ifdef iMSTK_USE_Vulkan
 #include "imstkGUICanvas.h"
