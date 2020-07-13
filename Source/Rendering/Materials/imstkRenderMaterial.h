@@ -26,6 +26,7 @@
 
 namespace imstk
 {
+class ColorFunction;
 class Texture;
 
 ///
@@ -216,6 +217,12 @@ public:
     bool getBackfaceCulling() const { return m_backfaceCulling; };
     void setBackfaceCulling(const bool c) { m_backfaceCulling = c; };
 
+    std::shared_ptr<ColorFunction> getColorLookupTable() const { return m_lookupTable; }
+    void setColorLookupTable(std::shared_ptr<ColorFunction> lut) { this->m_lookupTable = lut; }
+
+    bool getScalarVisibility() const { return m_scalarVisibility; }
+    void setScalarVisibility(bool scalarVisibility) { this->m_scalarVisibility = scalarVisibility; }
+
 protected:
     friend class VTKRenderDelegate;
     friend class VulkanRenderDelegate;
@@ -276,5 +283,8 @@ protected:
     bool m_isDecal     = false;
     bool m_isLineMesh  = false;
     bool m_isParticle  = false;
+
+    std::shared_ptr<ColorFunction> m_lookupTable;
+    bool m_scalarVisibility = false;
 };
 }
