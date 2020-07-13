@@ -26,7 +26,7 @@
 namespace imstk
 {
 ///
-/// \class FEMTetConstraint
+/// \class PbdFEMTetConstraint
 ///
 /// \brief The FEMTetConstraint class class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.

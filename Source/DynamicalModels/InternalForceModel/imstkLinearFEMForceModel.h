@@ -77,7 +77,7 @@ public:
     };
 
     ///
-    /// \brief Get the internal force
+    /// \brief Compute the internal force
     ///
     inline void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {

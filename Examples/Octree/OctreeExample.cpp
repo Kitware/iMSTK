@@ -54,7 +54,7 @@ static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyDa
 std::shared_ptr<VisualObject>
 createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
                  const std::string&                   objectName,
-                 Color                                color)
+                 const Color&                         color)
 {
     // Create a surface mesh for the bunny
     auto meshObj = std::make_shared<SurfaceMesh>();
@@ -63,9 +63,9 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     // Create a visiual model
     auto visualModel = std::make_shared<VisualModel>(meshObj);
     auto material    = std::make_shared<RenderMaterial>();
-    material->setDebugColor(color); // Wireframe color
-    material->setLineWidth(4);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setColor(color); // Wireframe color
+    material->setLineWidth(1);
     visualModel->setRenderMaterial(material);
 
     auto visualObject = std::make_shared<VisualObject>(objectName);
@@ -108,11 +108,13 @@ main()
     // simManager and Scene
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("Octree Example");
-    simManager->setActiveScene(scene);
 
     // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("Octree Example");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
+    simManager->setViewer(viewer);
+    simManager->setActiveScene(scene); // Viewer has depedence on scene
 
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
@@ -167,7 +169,8 @@ main()
     const auto debugOctree = octree.getDebugGeometry(8, true);
 
     const auto matDbgViz = std::make_shared<RenderMaterial>();
-    matDbgViz->setDebugColor(Color::Green);
+    matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    matDbgViz->setEdgeColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
     auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
     scene->addDebugVisualModel(octreeVizDbgModel);

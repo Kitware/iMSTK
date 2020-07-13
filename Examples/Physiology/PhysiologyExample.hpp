@@ -54,7 +54,7 @@ main(int argc, char* argv[])
   auto simManager = std::make_shared<SimulationManager>();
 
   int    threads = -1;
-  double particleRadius = 0.05;
+  double particleRadius = 0.1;
 
   // Parse command line arguments
   for (int i = 1; i < argc; ++i)
@@ -87,12 +87,13 @@ main(int argc, char* argv[])
   //scene->getTaskComputeTimes().at("PhysiologyModel_Solve");
 
   // Get the VTKViewer
-  auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+  std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+  viewer->setWindowTitle("Physiolog Example");
   viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-
   auto statusManager = viewer->getTextStatusManager();
   statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
   statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Red);
+  simManager->setViewer(viewer);
 
   // Generate fluid and solid objects
   auto fluidObj = generateFluid(scene, particleRadius);

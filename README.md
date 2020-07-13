@@ -22,9 +22,10 @@
 - [CeMSIM-Rensselaer Polytechnic Institute](http://cemsim.rpi.edu/)
 - [University of Central Arkansas](http://sun0.cs.uca.edu/~thalic/virasim.html)
 
-Funding support:
-- [NIH-OD] SBIR award [9R44OD018334](https://www.sbir.gov/sbirsearch/detail/1032259)
-- [NIH-NIBIB] SBIR award [1R44EB019802-01A1](https://www.sbir.gov/sbirsearch/detail/1047037)
+####Funding support:
+This project is supported in part by the following grants [9R44OD018334](https://www.sbir.gov/sbirsearch/detail/1032259), [1R44EB019802](https://www.sbir.gov/sbirsearch/detail/1047037), [1R44AR075481](https://projectreporter.nih.gov/project_info_details.cfm?aid=9777225&icde=50531419) , [1R01EB025247](https://projectreporter.nih.gov/project_info_details.cfm?aid=9738646&icde=50531433), [2R44DK115332](https://projectreporter.nih.gov/project_info_details.cfm?aid=9843084&icde=50531443)
+
+Disclaimer: The content is solely the responsibility of the authors and does not necessarily represent the official views of the NIH and its institutes.
 
 ### Licensing
 iMSTK is licensed under [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -46,7 +47,7 @@ Designed more specifically for developers, the issue tracker allows developers t
 
 ## Prerequisites
 * Git
-* CMake 3.9 or higher
+* CMake 3.15 or higher
 
 ##### On Linux:
 
@@ -82,7 +83,7 @@ ninja
 This will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `Innerbuild` directory.
 
 * ##### On Windows
-Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
+Run CMake-GUI and follow the directions described [HERE](https://cmake.org/runningcmake/). You will have to choose which version of Visual Studio you'd like to use when configuring the project, make sure to select **Microsoft Visual Studio C++ 15 2017 or 2019**. CMake will generate a `iMSTK.sln` solution file for Visual Studio at the top level. Open this file and build all targets, which will checkout, build and link all iMSTK dependencies. When making changes to iMSTK [base source code](/Base), you can then build from the `iMSTK.sln` solution file located in the `Innerbuild` directory.
 If you would like to build on multiple cores add /MP[N] to CMAKE_CXX_FLAGS in CMake-GUI, where N is optional representing the number of cores (without N supplied, the build will use as many cores as available on the device).
 
 * ##### PhysX Support

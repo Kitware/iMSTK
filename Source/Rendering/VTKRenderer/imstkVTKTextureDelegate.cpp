@@ -22,9 +22,11 @@
 #include "imstkVTKTextureDelegate.h"
 
 #include <vtkImageReader2Factory.h>
+#include <vtkPNGReader.h>
 #include <vtkImageReader2.h>
 #include <vtkImageFlip.h>
 #include <vtkTexture.h>
+#include <vtkImageCast.h>
 
 namespace imstk
 {
@@ -50,8 +52,8 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
     m_sourceTexture = vtkSmartPointer<vtkTexture>::New();
 
     // Mangle an unique texture name from the texture type and texture path
-    std::string manglingSymbol = "::";
-    m_textureName = texture->getTypeAsString() + manglingSymbol + texture->getPath();
+    //std::string manglingSymbol = "::";
+    m_textureName = texture->getTypeAsString();// +manglingSymbol + texture->getPath() + std::string("\"");
 
     if (texture->getType() == Texture::Type::Cubemap)
     {
@@ -93,6 +95,18 @@ VTKTextureDelegate::loadTexture(std::shared_ptr<Texture> texture)
         m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
         m_sourceTexture->RepeatOff();
         m_sourceTexture->SetInputConnection(imgReader->GetOutputPort());
+
+        if (texture->getType() == Texture::Type::Diffuse)
+        {
+            m_sourceTexture->SetUseSRGBColorSpace(true);
+        }
+
+        /*vtkNew<vtkPNGReader> normalReader;
+        normalReader->SetFileName(tFileName.c_str());
+        normalReader->Update();
+        m_sourceTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+        m_sourceTexture->RepeatOff();
+        m_sourceTexture->SetInputConnection(normalReader->GetOutputPort());*/
     }
 }
 }

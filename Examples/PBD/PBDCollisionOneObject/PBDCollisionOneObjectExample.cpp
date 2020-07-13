@@ -35,6 +35,23 @@
 
 using namespace imstk;
 
+// mesh file names
+const std::string surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj";
+const std::string tetMeshFileName  = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
+///
+/// \brief Create a surface mesh
+/// \param nRows number of vertices in x-direction
+/// \param nCols number of vertices in y-direction
+///
+std::shared_ptr<SurfaceMesh> createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
+
+// parameters to play with
+const double youngModulus     = 1000.0;
+const double poissonRatio     = 0.3;
+const double timeStep         = 0.01;
+const double contactStiffness = 0.1;
+const int    maxIter = 5;
+
 ///
 /// \brief This example demonstrates the collision interaction
 /// using Position based dynamics
@@ -48,8 +65,8 @@ main()
     scene->getCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
     // set up the meshes
-    auto highResSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto coarseTetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+    auto highResSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(surfMeshFileName));
+    auto coarseTetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshFileName));
     auto coarseSurfMesh  = std::make_shared<SurfaceMesh>();
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
@@ -59,7 +76,10 @@ main()
 
     // set up visual model based on high res mesh
     auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setLineWidth(0.5);
+    material->setEdgeColor(Color::Blue);
+    material->setShadingModel(RenderMaterial::ShadingModel::Phong);
     auto surfMeshModel = std::make_shared<VisualModel>(highResSurfMesh);
     surfMeshModel->setRenderMaterial(material);
 
@@ -79,16 +99,18 @@ main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_femParams->m_YoungModulus = 1000.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.3;
+    pbdParams->m_femParams->m_YoungModulus = youngModulus;
+    pbdParams->m_femParams->m_PoissonRatio = poissonRatio;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
                                    PbdFEMConstraint::MaterialType::Corotation);
 
     // Other parameters
+    // \todo use lumped mass
     pbdParams->m_uniformMassValue = 1.0;
+
     pbdParams->m_gravity    = Vec3d(0, -10.0, 0);
-    pbdParams->m_defaultDt  = 0.01;
-    pbdParams->m_iterations = 5;
+    pbdParams->m_defaultDt  = timeStep;
+    pbdParams->m_iterations = maxIter;
     pbdParams->collisionParams->m_proximity = 0.3;
     pbdParams->collisionParams->m_stiffness = 0.1;
 
@@ -98,41 +120,7 @@ main()
     scene->addSceneObject(deformableObj);
 
     // Build floor geometry
-    const double width  = 100.0;
-    const double height = 100.0;
-    const size_t nRows  = 2;
-    const size_t nCols  = 2;
-    const double dy     = width / static_cast<double>(nCols - 1);
-    const double dx     = height / static_cast<double>(nRows - 1);
-
-    StdVectorOfVec3d vertList;
-    vertList.resize(nRows * nCols);
-    for (size_t i = 0; i < nRows; ++i)
-    {
-        for (size_t j = 0; j < nCols; j++)
-        {
-            const double y = static_cast<double>(dy * j);
-            const double x = static_cast<double>(dx * i);
-            vertList[i * nCols + j] = Vec3d(x - width * 0.5, -10.0, y - height * 0.5);
-        }
-    }
-
-    // c. Add connectivity data
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    for (std::size_t i = 0; i < nRows - 1; ++i)
-    {
-        for (std::size_t j = 0; j < nCols - 1; j++)
-        {
-            SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
-        }
-    }
-
-    auto floorMesh = std::make_shared<SurfaceMesh>();
-    floorMesh->initialize(vertList, triangles);
+    auto floorMesh = createUniformSurfaceMesh(100.0, 100.0, 2, 2);
 
     auto materialFloor = std::make_shared<RenderMaterial>();
     materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -173,4 +161,42 @@ main()
     simManager->start(SimulationStatus::Paused);
 
     return 0;
+}
+
+std::shared_ptr<SurfaceMesh>
+createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols)
+{
+    const double dy = width / static_cast<double>(nCols - 1);
+    const double dx = height / static_cast<double>(nRows - 1);
+
+    StdVectorOfVec3d vertList;
+    vertList.resize(nRows * nCols);
+
+    for (size_t i = 0; i < nRows; ++i)
+    {
+        for (size_t j = 0; j < nCols; j++)
+        {
+            const double y = static_cast<double>(dy * j);
+            const double x = static_cast<double>(dx * i);
+            vertList[i * nCols + j] = Vec3d(x - height * 0.5, -10.0, y - width * 0.5);
+        }
+    }
+
+    // c. Add connectivity data
+    std::vector<SurfaceMesh::TriangleArray> triangles;
+    for (std::size_t i = 0; i < nRows - 1; ++i)
+    {
+        for (std::size_t j = 0; j < nCols - 1; j++)
+        {
+            SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    surfMesh->initialize(vertList, triangles);
+    return surfMesh;
 }

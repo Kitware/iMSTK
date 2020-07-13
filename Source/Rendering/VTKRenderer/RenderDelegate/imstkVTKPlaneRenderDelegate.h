@@ -30,9 +30,9 @@ namespace imstk
 class Plane;
 
 ///
-/// \class PlaneRenderDelegate
+/// \class VTKPlaneRenderDelegate
 ///
-/// \brief
+/// \brief Plane object render delegate
 ///
 class VTKPlaneRenderDelegate : public VTKRenderDelegate
 {

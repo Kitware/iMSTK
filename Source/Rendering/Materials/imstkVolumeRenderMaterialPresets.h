@@ -28,6 +28,9 @@ namespace imstk
 // forward declarations
 class VolumeRenderMaterial;
 
+///
+/// \brief TODO
+///
 class VolumeRenderMaterialPresets
 {
 public:
@@ -62,6 +65,9 @@ public:
         NUM_PRESETS
     };
 
+    ///
+    /// \brief TODO
+    ///
     static std::shared_ptr<VolumeRenderMaterial> getPreset(int p = CT_BONES);
 
     // Convenience API to get preset names

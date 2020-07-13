@@ -27,6 +27,8 @@ limitations under the License.
 namespace imstk
 {
 class SimulationManager;
+
+/// \brief TODO
 class OpenVRCommand : public vtkCommand
 {
 public:
@@ -35,11 +37,17 @@ public:
         return new OpenVRCommand;
     }
 
+    ///
+    /// \brief Set the simulation manager
+    ///
     void SetSimulationManager(SimulationManager* manager = nullptr)
     {
         m_simManager = manager;
     }
 
+    ///
+    /// \brief TODO
+    ///
     virtual void Execute(
         vtkObject*    caller,
         unsigned long eventId,

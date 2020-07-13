@@ -344,11 +344,15 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   // Create a geometry object
   auto fluidGeometry = std::make_shared<PointSet>();
   fluidGeometry->initialize(particles);
+
+  // Create a visual model
   auto fluidVisualModel = std::make_shared<VisualModel>(fluidGeometry);
   auto fluidMaterial = std::make_shared<RenderMaterial>();
-  fluidMaterial->setColor(Color(1, 0, 1, 0));
-  fluidMaterial->setSphereGlyphSize(particleRadius);
+  fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
+  fluidMaterial->setVertexColor(Color(1, 0, 1, 0));
+  fluidMaterial->setPointSize(5.);
   fluidVisualModel->setRenderMaterial(fluidMaterial);
+
   sphModel->setModelGeometry(fluidGeometry);
 
   // configure model

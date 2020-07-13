@@ -136,29 +136,54 @@ RenderMaterial::backfaceCullingOff()
 }
 
 const Color&
+RenderMaterial::getDiffuseColor() const
+{
+    return m_diffuseColor;
+}
+
+void
+RenderMaterial::setDiffuseColor(const Color& color)
+{
+    m_diffuseColor = color;
+    m_modified     = true;
+}
+
+const Color&
 RenderMaterial::getColor() const
 {
-    return m_color;
-}
+    return this->getDiffuseColor();
+};
 
 void
 RenderMaterial::setColor(const Color& color)
 {
-    m_color    = color;
-    m_modified = true;
-}
+    this->setDiffuseColor(color);
+};
 
 const Color&
-RenderMaterial::getDebugColor() const
+RenderMaterial::getSpecularColor() const
 {
-    return m_debugColor;
+    return m_specularColor;
 }
 
 void
-RenderMaterial::setDebugColor(const Color& color)
+RenderMaterial::setSpecularColor(const Color& color)
 {
-    m_debugColor = color;
-    m_modified   = true;
+    m_specularColor = color;
+    m_modified      = true;
+}
+
+const Color&
+RenderMaterial::getAmbientColor() const
+{
+    return m_ambientColor;
+}
+
+void
+RenderMaterial::setAmbientColor(const Color& color)
+{
+    m_ambientColor = color;
+    m_modified     = true;
 }
 
 const float&
@@ -195,18 +220,6 @@ void
 RenderMaterial::setEmissivity(const float emissivity)
 {
     m_emissivity = emissivity;
-}
-
-const double&
-RenderMaterial::getSphereGlyphSize() const
-{
-    return m_sphereGlyphSize;
-}
-
-void
-RenderMaterial::setSphereGlyphSize(const double size)
-{
-    m_sphereGlyphSize = size;
 }
 
 std::shared_ptr<Texture>

@@ -33,8 +33,18 @@
 #include "imstkScene.h"
 
 #include <array>
+#include <string>
 
 using namespace imstk;
+
+///
+/// \brief Create a PbdObject and add it to a \p scene
+///
+std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                                                 const std::string&     tetMeshName);
+
+// mesh file names
+const std::string& tetMeshFileName = iMSTK_DATA_ROOT "textured_organs/heart_volume.vtk";
 
 ///
 /// \brief This example demonstrates the soft body simulation
@@ -47,13 +57,41 @@ main()
     auto scene      = simManager->createNewScene("PBDVolume");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
-    auto tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    //auto tetMesh  = TetrahedralMesh::createTetrahedralMeshCover(surfMesh, 10, 6, 6);
+    // create and add a PBD object
+    createAndAddPbdObject(scene, tetMeshFileName);
+
+    // Light
+    auto light = std::make_shared<DirectionalLight>("light");
+    light->setFocalPoint(Vec3d(5, -8, -5));
+    light->setIntensity(1.1);
+    scene->addLight(light);
+
+    simManager->setActiveScene(scene);
+    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+    simManager->start(SimulationStatus::Paused);
+
+    return 0;
+}
+
+std::shared_ptr<PbdObject>
+createAndAddPbdObject(std::shared_ptr<Scene> scene,
+                      const std::string&     tetMeshName)
+{
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
+    tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
 
     auto material = std::make_shared<RenderMaterial>();
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setColor(Color(220. / 255.0, 100. / 255.0, 70. / 255.0));
+    material->setMetalness(100.9f);
+    material->setRoughness(0.5);
+    material->setEdgeColor(Color::Teal);
+    material->setAmbientLightCoeff(50.);
+    material->setShadingModel(RenderMaterial::ShadingModel::Phong);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
@@ -66,16 +104,15 @@ main()
     auto pbdParams = std::make_shared<PBDModelConfig>();
 
     // FEM constraint
-    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_YoungModulus = 500.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
-    pbdParams->m_fixedNodeIds = { 50, 126, 177 };
+    pbdParams->m_fixedNodeIds = { 75, 82, 84, 94, 95, 105, 110, 124, 139, 150, 161, 171, 350 };
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_iterations = 15;
-    // pbdParams->m_solverType = PbdConstraint::SolverType::PBD;
+    pbdParams->m_iterations = 6;
 
     // Set the parameters
     pbdModel->configure(pbdParams);
@@ -89,24 +126,5 @@ main()
 
     scene->addSceneObject(deformableObj);
 
-    // Setup plane
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(40);
-    planeGeom->setTranslation(0, -6, 0);
-    auto planeObj = std::make_shared<CollidingObject>("Plane");
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
-    scene->addSceneObject(planeObj);
-
-    // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
-    scene->addLight(light);
-
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::Paused);
-
-    return 0;
+    return deformableObj;
 }

@@ -31,6 +31,9 @@
 
 using namespace imstk;
 
+///
+/// \brief This example is for demonstration of how to use a NewtonSolver and its verification
+///
 int
 main(int argc, char** argv)
 {
@@ -87,5 +90,10 @@ main(int argc, char** argv)
     std::cout << "init_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
     nlSolver->solve();
 
+    std::cout << "final_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
+
+    x[0] = 100.0;
+    x[1] = 100.0;
+    nlSolver->solveGivenState(x);
     std::cout << "final_error = " << std::setprecision(12) << std::scientific << (x - xe).norm() << std::endl;
 }

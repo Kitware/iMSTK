@@ -31,12 +31,18 @@
 
 using namespace imstk;
 
+///
+/// \brief TODO
+///
 class imstkTetraToTetraCDTest : public ::testing::Test
 {
 protected:
     TetraToTetraCD* m_CD;
 };
 
+///
+/// \brief TODO
+///
 std::shared_ptr<TetrahedralMesh>
 loadMesh(const std::string& externalDataSuffix)
 {
@@ -49,12 +55,18 @@ loadMesh(const std::string& externalDataSuffix)
     return volMesh;
 }
 
+///
+/// \brief TODO
+///
 std::shared_ptr<TetrahedralMesh>
 duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 {
     return std::make_shared<TetrahedralMesh>(*mesh.get());
 }
 
+///
+/// \brief TODO
+///
 TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
@@ -71,6 +83,9 @@ TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
     EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
+///
+/// \brief TODO
+///
 TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/oneTet/oneTet.veg");
@@ -105,7 +120,10 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
     EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
-TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
+///
+/// \brief TODO
+///
+TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
     auto                             b = duplicate(a);
@@ -146,7 +164,10 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersectionHuman)
     EXPECT_EQ(cd->PTColData.getSize(), 0);
 }
 
-TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
+///
+/// \brief TODO
+///
+TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionOfDifferentMeshes)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
     std::shared_ptr<TetrahedralMesh> b = loadMesh("/human/human.veg");
@@ -157,6 +178,9 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionOfDifferentMeshes)
     EXPECT_EQ(cd->PTColData.getSize(), 595);
 }
 
+///
+/// \brief TODO
+///
 int
 imstkTetraToTetraCDTest(int argc, char* argv[])
 {

@@ -69,7 +69,7 @@ protected:
     void cleanUpModule() override;
 
     ///
-    /// \brief
+    /// \brief TODO
     ///
     void startModuleInNewThread(std::shared_ptr<Module> module);
 

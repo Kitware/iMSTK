@@ -44,7 +44,10 @@ enum class VulkanMaterialType
 
 class VulkanRenderer;
 
-// Large struct to contain pipeline components for later pipeline creation
+///
+/// \struct VulkanMaterialPipelineComponents
+/// \brief Large struct to contain pipeline components for later pipeline creation
+///
 struct VulkanMaterialPipelineComponents
 {
     VkShaderModule fragmentShader;
@@ -71,6 +74,10 @@ struct VulkanMaterialPipelineComponents
     std::vector<VkDynamicState> dynamicStates;
 };
 
+///
+/// \struct VulkanMaterialConstants
+/// \brief TODO
+///
 struct VulkanMaterialConstants
 {
     unsigned int numLights;
@@ -88,6 +95,10 @@ struct VulkanMaterialConstants
     bool brdfLUTTexture;
 };
 
+///
+/// \class VulkanMaterialDelegate
+/// \brief TODO
+///
 class VulkanMaterialDelegate
 {
 public:

@@ -33,7 +33,7 @@ class PointSet;
 class PbdSolver;
 
 ///
-/// \class PBDModelConfig
+/// \struct PBDModelConfig
 /// \brief Parameters for PBD simulation
 ///
 struct PBDModelConfig
@@ -200,12 +200,12 @@ public:
     double getDefaultTimeStep() const { return m_parameters->m_defaultDt; }
 
     ///
-    /// \brief
+    /// \brief Return all constraints that are solved sequentially
     ///
     std::shared_ptr<PBDConstraintVector> getConstraints() { return m_constraints; }
 
     ///
-    /// \brief
+    /// \brief Return the constraints that are colored and run in parallel
     ///
     std::shared_ptr<std::vector<PBDConstraintVector>> getPartitionedConstraints() { return m_partitionedConstraints; }
 

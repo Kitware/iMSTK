@@ -39,12 +39,15 @@
 #include <vtkProperty.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkVersion.h>
+#include <vtkPolyDataTangents.h>
 
 namespace imstk
 {
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedTangentArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedScalarArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -77,6 +80,14 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
     polydata->SetPolys(cells);
+    // If the geometry has scalars, set them on the polydata
+    if (geometry->getScalars() != nullptr)
+    {
+        std::shared_ptr<StdVectorOfReal> scalars = geometry->getScalars();
+        m_mappedScalarArray->SetNumberOfComponents(1);
+        m_mappedScalarArray->SetArray(reinterpret_cast<double*>(scalars->data()), scalars->size(), 1);
+        polydata->GetPointData()->SetScalars(m_mappedScalarArray);
+    }
 
     // Map normals
     geometry->computeVertexNormals();
@@ -131,13 +142,16 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
                                      (float)tangent[2] };
             tangents->InsertNextTuple(tempTangent);
         }
-        polydata->GetPointData()->AddArray(tangents);
+        polydata->GetPointData()->SetTangents(tangents);
     }
 
     // Update Transform, Render Properties
     this->update();
-    this->setUpMapper(source->GetOutputPort(), false, m_visualModel->getRenderMaterial());
-    m_mapper->setIsSurfaceMapper(true);
+    this->setUpMapper(source->GetOutputPort(), m_visualModel);
+
+    m_isMesh = true;
+
+    //m_mapper->setIsSurfaceMapper(true);
 }
 
 void
@@ -177,7 +191,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     {
         // Get imstk texture
         auto texture = material->getTexture((Texture::Type)unit);
-        if (texture->getPath() == "")
+        if (std::strcmp(texture->getPath().c_str(), "") == 0)
         {
             continue;
         }
@@ -201,11 +215,42 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         */
 
         // Set texture
-        vtkSmartPointer<vtkTexture> currentTexture = textureDelegate->getTexture();
+        auto currentTexture = textureDelegate->getTexture();
+
 #if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION <= 1)
         m_actor->GetProperty()->SetTexture(currentUnit, currentTexture);
 #else
-        m_actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
+        if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
+        {
+            switch (texture->getType())
+            {
+            case Texture::Type::Diffuse:
+            {
+                m_actor->GetProperty()->SetBaseColorTexture(currentTexture);
+                break;
+            }
+            case Texture::Type::Normal:
+            {
+                m_actor->GetProperty()->SetNormalTexture(currentTexture);
+                m_actor->GetProperty()->SetNormalScale(material->getNormalStrength());
+                break;
+            }
+            case Texture::Type::AmbientOcclusion:
+            {
+                m_actor->GetProperty()->SetORMTexture(currentTexture);
+                m_actor->GetProperty()->SetOcclusionStrength(material->getOcclusionStrength());
+                break;
+            }
+            default:
+            {
+            }
+            }
+        }
+        else
+        {
+            m_actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
+        }
+
 #endif
 
         currentUnit++;

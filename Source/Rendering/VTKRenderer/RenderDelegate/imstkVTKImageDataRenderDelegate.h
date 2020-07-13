@@ -28,7 +28,7 @@ namespace imstk
 class ImageData;
 
 ///
-/// \class ImageDataRenderDelegate
+/// \class VTKImageDataRenderDelegate
 ///
 /// \brief Render delegate to do to volume rendering using VTK
 ///

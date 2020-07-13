@@ -31,12 +31,14 @@
 
 namespace imstk
 {
+/// \brief TODO
 enum VulkanVertexBufferMode
 {
     VERTEX_BUFFER_STATIC,
     VERTEX_BUFFER_DYNAMIC
 };
 
+/// \brief TODO
 struct VulkanBasicVertex
 {
     glm::vec3 position;
@@ -46,9 +48,11 @@ struct VulkanBasicVertex
     glm::vec3 color;
 };
 
+/// \brief TODO
 class VulkanVertexBuffer : public VulkanBuffer
 {
 public:
+    /// \brief TODO
     VulkanVertexBuffer(VulkanMemoryManager&   memoryManager,
                        unsigned int           numVertices,
                        unsigned int           vertexSize,
@@ -56,8 +60,10 @@ public:
                        double                 loadFactor = 1.0,
                        VulkanVertexBufferMode mode = VERTEX_BUFFER_STATIC);
 
+    /// \brief TODO
     void* getVertexMemory(uint32_t frameIndex = 0);
 
+    /// \brief TODO
     void* getIndexMemory(uint32_t frameIndex = 0);
 
     ~VulkanVertexBuffer() = default;
@@ -68,12 +74,16 @@ public:
     void updateVertexBuffer(std::vector<VulkanBasicVertex>* vertices,
                             std::vector<std::array<uint32_t, 3>>* triangles);
 
+    /// \brief TODO
     void uploadBuffers(VkCommandBuffer& commandBuffer);
 
+    /// \brief TODO
     void initializeBuffers(VulkanMemoryManager& memoryManager);
 
+    /// \brief TODO
     void setNumIndices(uint32_t numIndices);
 
+    /// \brief TODO
     void bindBuffers(VkCommandBuffer* commandBuffer, uint32_t frameIndex);
 
     ///
@@ -82,6 +92,7 @@ public:
     ///
     void setModified();
 
+    /// \brief TODO
     VulkanVertexBufferMode getMode();
 
 private:

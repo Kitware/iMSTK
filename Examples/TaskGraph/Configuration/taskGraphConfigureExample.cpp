@@ -21,7 +21,9 @@
 
 #include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
+#include "imstkColorFunction.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkScene.h"
@@ -33,7 +35,7 @@
 using namespace imstk;
 
 static std::unique_ptr<SurfaceMesh>
-makeCloth(
+makeClothGeometry(
     const double width, const double height, const int nRows, const int nCols)
 {
     // Create surface mesh
@@ -91,23 +93,17 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
 {
     auto clothObj = std::make_shared<PbdObject>(name);
 
-    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeCloth(width, height, nRows, nCols)));
+    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeClothGeometry(width, height, nRows, nCols)));
 
     // Setup the Parameters
     auto pbdParams = std::make_shared<PBDModelConfig>();
-    pbdParams->m_uniformMassValue = 1.0;
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
+    pbdParams->m_uniformMassValue = width * height / (nRows * nCols);
     pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
-    pbdParams->m_viscousDampingCoeff = 0.05;
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 0.1);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 0.001);
-    std::vector<size_t> fixedNodes(nCols);
-    for (size_t i = 0; i < fixedNodes.size(); i++)
-    {
-        fixedNodes[i] = i;
-    }
-    pbdParams->m_fixedNodeIds = fixedNodes;
 
     // Setup the Model
     auto pbdModel = std::make_shared<PbdModel>();
@@ -147,27 +143,28 @@ main()
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
-    // Light (white)
-    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
-    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
-    scene->addLight(whiteLight);
-
-    // Light (red)
-    auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(-5, -3, 5));
-    colorLight->setFocalPoint(Vec3d(0, -5, 5));
-    colorLight->setIntensity(100);
-    colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(30);
-    scene->addLight(colorLight);
-
     // Adjust camera
     scene->getCamera()->setFocalPoint(0, -5, 5);
     scene->getCamera()->setPosition(-15., -5.0, 15.0);
 
-    // Adds a custom physics step to print out intermediate velocities
     {
+        // Setup some scalars
+        std::shared_ptr<SurfaceMesh>     clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
+        std::shared_ptr<StdVectorOfReal> scalarsPtr    = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
+        std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
+        clothGeometry->setScalars(scalarsPtr);
+
+        // Setup the material for the scalars
+        std::shared_ptr<RenderMaterial> material = clothObj->getVisualModel(0)->getRenderMaterial();
+        material->setScalarVisibility(true);
+        std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+        colorFunc->setNumberOfColors(2);
+        colorFunc->setColor(0, Color::Green);
+        colorFunc->setColor(1, Color::Red);
+        colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
+        colorFunc->setRange(0.0, 2.0);
+        material->setColorLookupTable(colorFunc);
+
         std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
         scene->setTaskGraphConfigureCallback([&](Scene* scene)
         {
@@ -180,22 +177,31 @@ main()
             writer.setFileName("taskGraphConfigureExampleOld.svg");
             writer.write();
 
-            std::shared_ptr<TaskNode> printVelocities = std::make_shared<TaskNode>([&]()
+            // This node computes displacements and sets the color to the magnitude
+            std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
             {
+                /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
+                const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
+                StdVectorOfReal& scalars = *scalarsPtr;
+                for (size_t i = 0; i < initPos.size(); i++)
+                {
+                    scalars[i] = (currPos[i] - initPos[i]).norm();
+                }*/
                 const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+                StdVectorOfReal& scalars = *scalarsPtr;
                 for (size_t i = 0; i < velocities.size(); i++)
                 {
-                    printf("Velocity: %f, %f, %f\n", velocities[i].x(), velocities[i].y(), velocities[i].z());
+                    scalars[i] = velocities[i].norm();
                 }
-                    }, "PrintVelocities");
+            }, "ComputeVelocityScalars");
 
             // After IntegratePosition
-            graph->insertAfter(pbdModel->getIntegratePositionNode(), printVelocities);
+            graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
 
             // Write the modified graph
             writer.setFileName("taskGraphConfigureExampleNew.svg");
             writer.write();
-            });
+        });
     }
 
     // Start

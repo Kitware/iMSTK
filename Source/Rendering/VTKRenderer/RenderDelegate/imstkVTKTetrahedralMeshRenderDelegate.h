@@ -31,9 +31,9 @@ namespace imstk
 class TetrahedralMesh;
 
 ///
-/// \class TetrahedralMeshRenderDelegate
+/// \class VTKTetrahedralMeshRenderDelegate
 ///
-/// \brief
+/// \brief Tetrahedral mesh render delegate with vtk render backend
 ///
 class VTKTetrahedralMeshRenderDelegate : public VTKRenderDelegate
 {

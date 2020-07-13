@@ -20,7 +20,7 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPickingCH.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkFEMDeformableBodyModel.h"

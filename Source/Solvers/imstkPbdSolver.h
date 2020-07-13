@@ -28,6 +28,10 @@
 
 namespace imstk
 {
+///
+/// \struct CollisionConstraintData
+/// \brief Stores positions and masses of two colliding objects
+///
 struct CollisionConstraintData
 {
     CollisionConstraintData(std::shared_ptr<StdVectorOfVec3d> posA,
@@ -48,7 +52,7 @@ struct CollisionConstraintData
 /// \class PbdSolver
 ///
 /// \brief Position Based Dynamics solver
-/// This solver can operate on both partitioned constraints (unordered_set of vector'd constraints) in parallel
+/// This solver can solve both partitioned constraints (unordered_set of vector'd constraints) in parallel
 /// and sequentially on vector'd constraints. It requires a set of constraints, positions, and invMasses.
 ///
 class PbdSolver : public SolverBase
@@ -130,6 +134,12 @@ private:
     PbdConstraint::SolverType m_solverType = PbdConstraint::SolverType::xPBD;
 };
 
+///
+/// \class PbdCollisionSolver
+///
+/// \brief Position Based Dynamics collision solver
+/// This solver can sequentially solve constraints in a list
+///
 class PbdCollisionSolver : SolverBase
 {
 public:

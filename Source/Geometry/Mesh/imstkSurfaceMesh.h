@@ -40,9 +40,12 @@ struct NormalGroup
 };
 }
 
-// This method is defined to allow for the map to be properly indexed by Texture objects
 namespace std
 {
+///
+/// \struct less
+/// \brief This method is defined to allow for the map to be properly indexed by Texture objects
+///
 template<> struct less<imstk::NormalGroup>
 {
     bool operator()(const imstk::NormalGroup& group1,
@@ -222,6 +225,7 @@ protected:
     /// \brief Get vertex normals
     ///
     StdVectorOfVec3d& getVertexNormalsNotConst();
+    StdVectorOfVec3d& getVertexTangentsNotConst();
 
     std::vector<TriangleArray> m_trianglesVertices;       ///> Triangle connectivity
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices

@@ -56,6 +56,9 @@ main()
 
     auto material0 = std::make_shared<RenderMaterial>();
     material0->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material0->setPointSize(10.);
+    material0->setLineWidth(4.);
+    material0->setEdgeColor(Color::Color::Orange);
     auto surfMeshModel0 = std::make_shared<VisualModel>(coarseSurfMesh);
     surfMeshModel0->setRenderMaterial(material0);
 
@@ -65,8 +68,10 @@ main()
     scene->addSceneObject(sceneObj0);
 
     auto material = std::make_shared<RenderMaterial>();
-    material->setDebugColor(imstk::Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setColor(imstk::Color::Red);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    material->setPointSize(6.);
+    material->setLineWidth(1.);
     auto surfMeshModel = std::make_shared<VisualModel>(fineSurfaceMesh);
     surfMeshModel->setRenderMaterial(material);
 

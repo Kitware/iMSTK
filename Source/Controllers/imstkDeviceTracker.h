@@ -36,6 +36,10 @@ class DeviceTracker
 {
 public:
 
+    ///
+    /// \enum
+    /// \brief TODO
+    ///
     enum InvertFlag
     {
         transX = 0x01,

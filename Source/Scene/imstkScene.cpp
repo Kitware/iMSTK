@@ -26,7 +26,7 @@
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkInteractionPair.h"
@@ -167,7 +167,6 @@ Scene::initTaskGraph()
     {
         m_taskGraphController = std::make_shared<SequentialTaskGraphController>();
     }
-    m_taskGraphController->setTaskGraph(m_taskGraph);
 
     // Reduce the graph, removing nonfunctional nodes, and redundant edges
     if (m_config->graphReductionEnabled)
@@ -193,6 +192,7 @@ Scene::initTaskGraph()
         writer.write();
     }
 
+    m_taskGraphController->setTaskGraph(m_taskGraph);
     m_taskGraphController->initialize();
 }
 

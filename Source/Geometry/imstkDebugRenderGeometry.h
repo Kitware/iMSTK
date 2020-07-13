@@ -26,7 +26,7 @@
 namespace imstk
 {
 ///
-/// \class imstkDbgRenderGeometry
+/// \class DebugRenderGeometry
 ///
 /// \brief Debug render geometry base class
 /// During rendering, firstly call to clear() to clear the vertex buffer then iteratively call to appendVertex()

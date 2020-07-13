@@ -25,7 +25,7 @@ limitations under the License.
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionDetection.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
 #include "imstkLogger.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollisionPair.h"

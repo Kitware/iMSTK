@@ -76,6 +76,9 @@ using StdoutSinkHandle = g3::SinkHandle<stdSink>;
 class Logger
 {
 public:
+    ///
+    /// \brief TODO
+    ///
     static Logger& getInstance()
     {
         // Thread safe in C++11 ("magic statics")

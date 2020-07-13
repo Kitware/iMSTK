@@ -107,7 +107,7 @@ public:
     void setKinematicTarget(const PxTransform& destination);
 
     ///
-    /// \brief
+    /// \brief Get the pointer to \ref RigidBodyWorld
     ///
     RigidBodyWorld* getRigidBodyWorld() { return m_rigidBodyWorld; }
 
@@ -127,6 +127,9 @@ public:
     ///
     double getTimeStep() const { return 0; }
 
+    ///
+    /// \brief Reset to initial state
+    ///
     void resetToInitialState() override
     {
         if (m_pxDynamicActor)
@@ -158,6 +161,9 @@ protected:
 private:
     RigidBodyWorld* m_rigidBodyWorld = NULL;
 
+    ///
+    /// \brief TODO
+    ///
     PxTriangleMesh* createBV34TriangleMesh(PxU32         numVertices,
                                            const PxVec3* vertices,
                                            PxU32         numTriangles,
@@ -167,11 +173,26 @@ private:
                                            bool          inserted,
                                            const PxU32   numTrisPerLeaf);
 
+    ///
+    /// \brief TODO
+    ///
     void setupCommonCookingParams(PxCookingParams& params, bool skipMeshCleanup, bool skipEdgeData);
 
+    ///
+    /// \brief TODO
+    ///
     void createSphere();
+    ///
+    /// \brief TODO
+    ///
     void createPlane();
+    ///
+    /// \brief TODO
+    ///
     void createCube();
+    ///
+    /// \brief TODO
+    ///
     void createMesh();
 };
 } // imstk

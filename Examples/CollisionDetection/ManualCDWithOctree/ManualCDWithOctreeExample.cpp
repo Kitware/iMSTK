@@ -48,7 +48,7 @@ using namespace imstk;
 #define NUM_MESHES 5u
 
 // Uncomment this to render octree
-// #define DEBUG_RENDER_OCTREE
+ #define DEBUG_RENDER_OCTREE
 
 // Load pre-computed mesh data (vertex positions and triangle faces)
 std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getTriangle();
@@ -79,7 +79,7 @@ createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
     // Create a visiual model
     auto visualModel = std::make_shared<VisualModel>(meshObj);
     auto material    = std::make_shared<RenderMaterial>();
-    material->setDebugColor(color); // Wireframe color
+    material->setEdgeColor(color); // Wireframe color
     material->setLineWidth(2);
     if (meshObj->getNumTriangles() > 100)
     {
@@ -109,8 +109,9 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
     auto material    = std::make_shared<RenderMaterial>();
-    material->setDebugColor(Color::Yellow);
-    material->setSphereGlyphSize(.01);
+    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setVertexColor(Color::Yellow);
+    material->setPointSize(8.);
 
     auto dbgViz = std::make_shared<VisualModel>(debugPoints, material);
     scene->addDebugVisualModel(dbgViz);
@@ -127,7 +128,7 @@ addVTConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Connecting VT Lines");
     auto material   = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Green);
+    material->setEdgeColor(Color::Green);
     material->setLineWidth(4.0);
 
     auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
@@ -145,7 +146,7 @@ addEEConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Connecting EE Lines");
     auto material   = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Red);
+    material->setEdgeColor(Color::Red);
     material->setLineWidth(4.0);
 
     auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
@@ -163,7 +164,7 @@ addHighlightedLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     auto debugLines = std::make_shared<DebugRenderLines>("Debug Highlighted Lines");
     auto material   = std::make_shared<RenderMaterial>();
     material->setBackFaceCulling(false);
-    material->setDebugColor(Color::Orange);
+    material->setEdgeColor(Color::Orange);
     material->setLineWidth(8.0);
 
     auto dbgViz = std::make_shared<VisualModel>(debugLines, material);
@@ -204,15 +205,16 @@ main()
     // simManager and Scene
     auto simManager = std::make_shared<SimulationManager>();
     auto scene      = simManager->createNewScene("Collision Test");
-    simManager->setActiveScene(scene);
 
-    // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    // Configure the VTKViewer
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("Collision Test");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 25);
     statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+    simManager->setViewer(viewer);
+    simManager->setActiveScene(scene); // Viewer has depedence on scene
 
     // Get VTK Renderer
     auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
@@ -275,7 +277,13 @@ main()
     // Add debug geometry to render octree
 #ifdef DEBUG_RENDER_OCTREE
     const auto debugOctree = octreeCD.getDebugGeometry(8, false);
-    scene->addDebugGeometry(debugOctree);
+
+    const auto matDbgViz = std::make_shared<RenderMaterial>();
+    matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+    matDbgViz->setEdgeColor(Color::Green);
+    matDbgViz->setLineWidth(1.0);
+    auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
+    scene->addDebugVisualModel(octreeVizDbgModel);
 #endif
 
     // Helper variables for animation

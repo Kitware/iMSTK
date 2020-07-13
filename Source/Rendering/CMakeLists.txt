@@ -5,7 +5,6 @@
 set(VTK_H_FILES
     VTKRenderer/imstkVTKRenderer.h
     VTKRenderer/imstkVTKTextureDelegate.h
-    VTKRenderer/imstkVTKCustomPolyDataMapper.h
     VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.h
     VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.h
@@ -20,12 +19,12 @@ set(VTK_H_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugTrianglesRenderDelegate.h  
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.h 
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.h   
-    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h)
+    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h
+	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.h)
 
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKRenderer.cpp
     VTKRenderer/imstkVTKTextureDelegate.cpp
-    VTKRenderer/imstkVTKCustomPolyDataMapper.cpp
     VTKRenderer/RenderDelegate/imstkVTKCubeRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
@@ -40,7 +39,8 @@ set(VTK_CPP_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugTrianglesRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.cpp
-    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.cpp)
+    VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.cpp
+	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.cpp)
 
 set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanRenderer.h
@@ -97,6 +97,9 @@ if( NOT iMSTK_USE_Vulkan )
   set(RENDERING_DEPENDENCIES
     #GUIOverlay
     Materials)
+  if (iMSTK_ENABLE_VR)
+    list(APPEND RENDERING_DEPENDENCIES openvr)
+  endif()
 else()
   set(RENDERING_H_FILES ${VULKAN_H_FILES})
   set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
@@ -111,9 +114,6 @@ else()
     ${Vulkan}
     glfw
     gli)
-  if (iMSTK_ENABLE_VR)
-    list(APPEND RENDERING_DEPENDENCIES openvr)
-  endif()
 endif()
 
 include(imstkAddLibrary)
@@ -121,11 +121,9 @@ imstk_add_library( Rendering
   H_FILES
     imstkRenderer.h
     ${RENDERING_H_FILES}
-    vtkCapsuleSource.h
   CPP_FILES
     imstkRenderer.cpp
     ${RENDERING_CPP_FILES}
-    vtkCapsuleSource.cpp
   SUBDIR_LIST
     ${RENDERING_SUBDIR}
   DEPENDS
@@ -134,9 +132,12 @@ imstk_add_library( Rendering
     Animation
     glm
     ${VTK_LIBRARIES}
-    ${RENDERING_LIBRARIES}
-  #VERBOSE
-  )
+    ${RENDERING_LIBRARIES})
+  #VERBOSE)
+
+if( NOT iMSTK_USE_Vulkan )
+  vtk_module_autoinit(TARGETS Rendering MODULES ${VTK_LIBRARIES})
+endif()
 
 #-----------------------------------------------------------------------------
 # Testing

@@ -136,6 +136,11 @@ public:
     void setOptimalThreadPoolSize();
 
     ///
+    /// \brief Set the viewer
+    ///
+    void setViewer(std::shared_ptr<Viewer> viewer) { m_viewer = viewer; }
+
+    ///
     /// \brief Returns true if the scene is registered, else false
     ///
     bool isSceneRegistered(const std::string& sceneName) const;
@@ -145,6 +150,11 @@ public:
     ///
     std::shared_ptr<SceneManager> getSceneManager(const std::string& sceneName) const;
     std::shared_ptr<SceneManager> getSceneManager(std::shared_ptr<Scene> scene) const;
+
+    ///
+    /// \brief Returns the scene manager config
+    ///
+    std::shared_ptr<SimManagerConfig> getConfig() const { return m_config; }
 
     ///
     /// \brief Returns the scene with a given name

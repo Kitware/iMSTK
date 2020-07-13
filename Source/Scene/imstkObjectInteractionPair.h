@@ -46,6 +46,7 @@ protected:
     virtual ~ObjectInteractionPair() override = default;
 
 public:
+    /// \brief TODO
     const SceneObjectPair& getObjectsPair() const { return m_objects; }
 
 public:

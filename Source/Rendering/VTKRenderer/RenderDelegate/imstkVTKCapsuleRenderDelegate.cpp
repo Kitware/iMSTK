@@ -21,9 +21,8 @@
 
 #include "imstkVTKCapsuleRenderDelegate.h"
 #include "imstkCapsule.h"
-
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkCapsuleSource.h>
+#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {
@@ -45,7 +44,7 @@ VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> 
     m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
 
     this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), true, m_visualModel->getRenderMaterial());
+    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
 }
 
 void

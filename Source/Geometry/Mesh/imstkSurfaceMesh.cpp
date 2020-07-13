@@ -419,6 +419,12 @@ SurfaceMesh::getVertexNormalsNotConst()
     return m_vertexNormals;
 }
 
+StdVectorOfVec3d&
+SurfaceMesh::getVertexTangentsNotConst()
+{
+    return m_vertexTangents;
+}
+
 void
 SurfaceMesh::setVertexTangents(const StdVectorOfVec3d& tangents)
 {

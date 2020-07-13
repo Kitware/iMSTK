@@ -53,22 +53,22 @@ public:
     virtual ~InternalForceModel() = default;
 
     ///
-    /// \brief Get the internal force given the present state
+    /// \brief Compute internal force \p internalForce at state \p u
     ///
     virtual void getInternalForce(const Vectord& u, Vectord& internalForce) = 0;
 
     ///
-    /// \brief Return the tangent stiffness matrix the present state
+    /// \brief Compute stiffness matrix \p tangentStiffnessMatrix at state \u
     ///
     virtual void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
     ///
-    /// \brief Return the tangent stiffness matrix the present state
+    /// \brief Build the sparsity pattern for stiffness matrix
     ///
     virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix) = 0;
 
     ///
-    /// \brief Return both internal force and tangent stiffness matrix given the present state
+    /// \brief Compute both internal force \p internalForce and stiffness matrix \p tangentStiffnessMatrix at state \u
     ///
     virtual void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
@@ -78,7 +78,7 @@ public:
     static void updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double* values);
 
     ///
-    /// \brief
+    /// \brief Specify tangent stiffness matrix
     ///
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) = 0;
 };

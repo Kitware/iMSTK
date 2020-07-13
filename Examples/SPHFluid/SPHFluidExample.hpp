@@ -84,13 +84,14 @@ main(int argc, char* argv[])
 
     auto scene = simManager->createNewScene("SPH Fluid");
 
-    // Get the VTKViewer
-    auto viewer = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
+    // Create the viewer
+    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    viewer->setWindowTitle("SPH Fluid");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-
     auto statusManager = viewer->getTextStatusManager();
     statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
     statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Red);
+    simManager->setViewer(viewer);
 
     // Generate fluid and solid objects
     auto fluidObj = generateFluid(scene, particleRadius);
@@ -104,27 +105,22 @@ main(int argc, char* argv[])
 
     // Collision between fluid and solid objects
     std::shared_ptr<CollisionGraph> collisionGraph = scene->getCollisionGraph();
-    for (auto& solid: solids)
+    for (auto& solid : solids)
     {
-        if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
-        {
-            collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
-        }
-        else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
-        {
-            collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
-        }
-        else if (std::dynamic_pointer_cast<SurfaceMesh>(solid->getCollidingGeometry()))
-        {
-          collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-            InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSurfaceMesh));
-        }
-        else
-        {
-            LOG(FATAL) << "Invalid collision object";
-        }
+      if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
+      {
+        collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+          InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
+      }
+      else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
+      {
+        collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+          InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
+      }
+      else
+      {
+        LOG(FATAL) << "Invalid collision object";
+      }
     }
 
     // configure camera
@@ -133,7 +129,7 @@ main(int argc, char* argv[])
     // configure light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
+    whiteLight->setIntensity(1.5);
     scene->addLight(whiteLight);
 
     simManager->setActiveScene(scene);

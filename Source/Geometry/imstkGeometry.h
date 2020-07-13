@@ -118,7 +118,7 @@ public:
     ///
     void rotate(const Quatd& q, TransformType type = TransformType::ConcatenateToTransform);
     void rotate(const Mat3d& m, TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Vec3d& axis, double angle, TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Vec3d& axis, double radians, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Scale in Cartesian directions
@@ -199,9 +199,9 @@ protected:
     friend class VTKRenderer;
     friend class VTKRenderDelegate;
 
+    friend class VulkanSurfaceMeshRenderDelegate;
     friend class VulkanLineMeshRenderDelegate;
     friend class VulkanRenderDelegate;
-    friend class VulkanSurfaceMeshRenderDelegate;
     friend class VulkanRenderer;
 
     virtual void applyTranslation(const Vec3d t) = 0;

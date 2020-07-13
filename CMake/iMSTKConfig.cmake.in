@@ -92,32 +92,35 @@ endif()
 # VTK
 set(VTK_DIR @VTK_DIR@)
 find_dependency(VTK CONFIG)
-if (VTK_VERSION VERSION_LESS "8.90")
-  # Modules are linked via `vtkCommonCore`
-  # VTK_DEFINITIONS has autoinit information
-  find_dependency (VTK REQUIRED)
-  include(${VTK_USE_FILE})
-else()
-  # modules are linked via `VTK::CommonCore`
-  # vtk_module_autoinit is needed
-  find_dependency(VTK COMPONENTS
-    CommonCore
-    CommonDataModel
-    FiltersGeneral
-    FiltersSources
-    IOExport
-    IOImport
-    IOPLY
-    IOParallel
-    IOParallelXML
-    ImagingCore
-    InteractionStyle
-    RenderingAnnotation
-    RenderingCore
-    RenderingOpenGL2
-    RenderingVolume
-    RenderingVolumeOpenGL2)
+# modules are linked via `VTK::CommonCore`
+# vtk_module_autoinit is needed
+list(APPEND VTK_DEPENDENCIES
+  ChartsCore
+  CommonCore
+  CommonDataModel
+  FiltersGeneral
+  FiltersSources
+  FiltersModeling
+  FiltersExtraction
+  IOExport
+  IOImport
+  IOPLY
+  IOParallel
+  IOParallelXML
+  ImagingCore
+  InteractionStyle
+  RenderingAnnotation
+  RenderingContext2D
+  RenderingContextOpenGL2
+  RenderingCore
+  RenderingOpenGL2
+  RenderingVolume
+  RenderingVolumeOpenGL2
+  ViewsContext2D)
+if (${PROJECT_NAME}_ENABLE_VR)
+  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
 endif()
+find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # glfw, gli
 if(iMSTK_USE_Vulkan)

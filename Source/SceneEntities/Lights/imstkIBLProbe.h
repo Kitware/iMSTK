@@ -59,8 +59,11 @@ public:
                            Texture::Type::RadianceCubeMap)),
         m_brdfLUTTexture(std::make_shared<Texture>(brdfLUTPath, Texture::Type::BRDF_LUT)) {}
 
+    /// \brief TODO
     std::shared_ptr<Texture> getIrradianceCubemapTexture();
+    /// \brief TODO
     std::shared_ptr<Texture> getRadianceCubemapTexture();
+    /// \brief TODO
     std::shared_ptr<Texture> getBrdfLUTTexture();
 
 protected:

@@ -55,10 +55,19 @@ public:
     ///
     virtual void saveScreenShot();
 
+    ///
+    /// \brief Get screen shot number
+    ///
     unsigned int getScreenShotNumber() const;
 
+    ///
+    /// \brief Set screen shot prefix
+    ///
     void setScreenShotPrefix(const std::string newPrefix);
 
+    ///
+    /// \brief Reset screen shot number to zero
+    ///
     void resetScreenShotNumber();
 
 protected:

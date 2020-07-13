@@ -46,12 +46,15 @@ class Scene;
 /// \class VTKViewer
 ///
 /// \brief Subclasses viewer for the VTK rendering back-end
+/// Creates vtk renderer for each scene. Forwards mouse and keyboard events
+/// to the vtk renderwindow
 ///
 class VTKViewer : public Viewer
 {
 public:
     ///
     /// \brief Constructor
+    /// \todo: SimulationManager and Viewer's should not have a circular dependence
     ///
     VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false);
 
@@ -108,13 +111,13 @@ public:
     const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
 
 protected:
+    /// \brief VTKTimer callback, every 500ms
     static void timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
 
-protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
     bool m_enableVR;
-    std::string m_windowName = "imstk";
+
     vtkSmartPointer<vtkCallbackCommand> timerCallbackCommand;
 
 #ifdef iMSTK_ENABLE_VR

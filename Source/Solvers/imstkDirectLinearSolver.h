@@ -84,6 +84,7 @@ public:
     };
 
 private:
+    /// \todo: only works for SPB matrices
     Eigen::LDLT<Matrixd> m_solver;
 };
 

@@ -76,6 +76,9 @@ public:
     AABBFunctor() = delete;
     AABBFunctor& operator=(const AABBFunctor&) = delete;
 
+    ///
+    /// \brief Compute the lower and upper corner of \p this in range \p r
+    ///
     void operator()(const tbb::blocked_range<size_t>& r)
     {
         for (size_t i = r.begin(); i != r.end(); ++i)
@@ -89,6 +92,9 @@ public:
         }
     }
 
+    ///
+    /// \brief Compute the AABB of \p this and anohter object \p pObj as a whole
+    ///
     void join(AABBFunctor& pObj)
     {
         for (int j = 0; j < 3; ++j)
@@ -98,7 +104,13 @@ public:
         }
     }
 
+    ///
+    /// \brief Get the lower corner
+    ///
     const Vec3r& getLowerCorner() const { return m_LowerCorner; }
+    ///
+    /// \brief Get the upper corner
+    ///
     const Vec3r& getUpperCorner() const { return m_UpperCorner; }
 
 private:

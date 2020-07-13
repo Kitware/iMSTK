@@ -22,17 +22,20 @@
 #include "imstkVTKPointSetRenderDelegate.h"
 #include "imstkPointSet.h"
 
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkTrivialProducer.h>
 #include <vtkSphereSource.h>
 #include <vtkDoubleArray.h>
+#include <vtkPointData.h>
 #include <vtkGlyph3D.h>
 #include <vtkVersion.h>
 
 namespace imstk
 {
 VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedScalarArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -52,33 +55,27 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     // Create PolyData
     auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
     pointsPolydata->SetPoints(points);
+    // If the geometry has scalars, set them on the polydata
+    if (geometry->getScalars() != nullptr)
+    {
+        std::shared_ptr<StdVectorOfReal> scalars = geometry->getScalars();
+        m_mappedScalarArray->SetNumberOfComponents(1);
+        m_mappedScalarArray->SetArray(reinterpret_cast<double*>(scalars->data()), scalars->size(), 1);
+        pointsPolydata->GetPointData()->SetScalars(m_mappedScalarArray);
+    }
 
-    auto sphere = vtkSmartPointer<vtkSphereSource>::New();
+    vtkNew<vtkVertexGlyphFilter> glyphFilter;
+    glyphFilter->SetInputData(pointsPolydata);
+    glyphFilter->Update();
 
-    auto glyph = vtkSmartPointer<vtkGlyph3D>::New();
-
-#if VTK_MAJOR_VERSION <= 5
-    glyph->SetSource(sphere->GetOutput());
-    glyph->SetInput(selectPoints->GetOutput());
-#else
-    glyph->SetSourceConnection(sphere->GetOutputPort());
-    glyph->SetInputData(pointsPolydata);
-#endif
     geometry->m_dataModified = false;
 
     // Update Transform, Render Properties
     this->update();
+    this->setUpMapper(glyphFilter->GetOutputPort(), m_visualModel);
 
-    // Setup custom mapper
-    m_mapper->SetInputConnection(glyph->GetOutputPort());
-    auto mapper = VTKCustomPolyDataMapper::SafeDownCast(m_mapper.GetPointer());
-    if (!m_visualModel->getRenderMaterial())
-    {
-        m_visualModel->setRenderMaterial(std::make_shared<RenderMaterial>());
-    }
-    sphere->SetRadius(m_visualModel->getRenderMaterial()->getSphereGlyphSize());
-
-    mapper->setRenderMaterial(m_visualModel->getRenderMaterial());
+    m_isMesh = true;
+    m_modelIsVolume = false;
 }
 
 void
