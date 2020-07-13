@@ -273,6 +273,12 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
     sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
 
+    // compute center and radius of inlet
+    Vec3d inletCenterPoint = Vec3d(aabbMin1.x(), (aabbMax1.y() + aabbMin1.y()) / 2.0, (aabbMax1.z() + aabbMin1.z()) / 2.0);
+    double inletRadius = (aabbMax1.y() - aabbMin1.y()) / 2.0;
+    sphModel->setInletRadius(inletRadius);
+    sphModel->setInletCenterPoint(inletCenterPoint);
+
     Vec3d aabbMin, aabbMax;
     surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
 
@@ -303,6 +309,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     // buffer domain
     StdVectorOfVec3d bufferParticles;
     double bufferXCoordMin = 1;
+    sphModel->setBufferXCoord(bufferXCoordMin);
     for (int i = 0; i < 2000; i++)
     {
       bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));

@@ -204,15 +204,15 @@ public:
     void setInletVelocity(const Vec3d inletVelocity) { m_inletVelocity = inletVelocity; }
     void setOutletVelocity(const Vec3d outletVelocity) { m_outletVelocity = outletVelocity; }
 
-
     void setInletRegionXCoord(const double inletRegionXCoord) { m_inletRegionXCoord = inletRegionXCoord; }
     void setOutletRegionXCoord(const double outletRegionXCoord) { m_outletRegionXCoord = outletRegionXCoord; }
     void printParticleTypes();
 
+    void setInletRadius(const double inletRadius) { m_inletRadius = inletRadius; }
+    void setInletCenterPoint(const Vec3d inletCenterPoint) { m_inletCenterPoint = inletCenterPoint; }
+    void setBufferXCoord(const double bufferXCoord) { m_bufferXCoord = bufferXCoord; }
 
-
-
-
+    Vec3d computeParabolicInletVelocity(const Vec3d particlePosition);
 
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
@@ -350,6 +350,9 @@ private:
     double m_writeToOutputModulo;
     int m_timeStepCount;
     double m_bufferXCoord;
+
+    double m_inletRadius;
+    Vec3d m_inletCenterPoint;
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 

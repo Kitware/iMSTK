@@ -147,7 +147,6 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     m_taskGraph->addEdge(m_computeDensityNode, m_normalizeDensityNode);
     m_taskGraph->addEdge(m_normalizeDensityNode, m_collectNeighborDensityNode);
 
-
     // Pressure, Surface Tension, and time step size can be done in parallel
     m_taskGraph->addEdge(m_collectNeighborDensityNode, m_computePressureAccelNode);
     m_taskGraph->addEdge(m_collectNeighborDensityNode, m_computeSurfaceTensionNode);
@@ -407,7 +406,7 @@ SPHModel::updateVelocityNoGravity(Real timestep)
       getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
       if (getState().getPositions()[p].x() < m_inletRegionXCoord)
       {
-        getState().getVelocities()[p] = m_inletVelocity;
+          getState().getVelocities()[p] = computeParabolicInletVelocity(getState().getPositions()[p]);
       }
     });
 }
@@ -537,51 +536,52 @@ SPHModel::computeSurfaceTension()
 void
 SPHModel::moveParticles(Real timestep)
 {
-    //ParallelUtils::parallelFor(getState().getNumParticles(),
-    //    [&](const size_t p) {
-        for (int p = 0; p < getState().getNumParticles(); p++)
-        {
-          Vec3r oldPosition = getState().getPositions()[p];
-          Vec3r newPosition = oldPosition + getState().getVelocities()[p] * timestep;
-          getState().getPositions()[p] = newPosition;
-          //periodicBCs(p);
-          if (!m_bufferParticleIndices.empty())
-          {
-            if (oldPosition.x() < m_inletRegionXCoord && newPosition.x() > m_inletRegionXCoord)
-            {
-              // insert particle into inlet domain from buffer domain
-              const size_t bufferParticleIndex = m_bufferParticleIndices.back();
-              m_bufferParticleIndices.pop_back();
-              getState().getPositions()[bufferParticleIndex] = Vec3d(m_minXCoord, newPosition.y(), newPosition.z());
-            }
-            else if (oldPosition.x() < m_maxXCoord && newPosition.x() > m_maxXCoord)
-            {
-              // insert particle into buffer domain after it leaves outlet domain
-              getState().getPositions()[p] = Vec3d(m_bufferXCoord, 0, 0);
-              getState().getVelocities()[p] = Vec3d(0, 0, 0);
-              //getState().getDensities()[p] = 1000;
-              m_bufferParticleIndices.push_back(p);
-            }
-          }
-        }
+	//ParallelUtils::parallelFor(getState().getNumParticles(),
+	//    [&](const size_t p) {
+	if (!m_bufferParticleIndices.empty())
+	{
+		ParallelUtils::parallelFor(m_bufferParticleIndices.size(),
+			[&](const size_t p) {
+				getState().getPositions()[m_bufferParticleIndices[p]] -= getState().getVelocities()[m_bufferParticleIndices[p]] * timestep;
+				getState().getVelocities()[m_bufferParticleIndices[p]] = Vec3r(0.0, 0.0, 0.0);
+			});
+	}
 
-    if (!m_wallPointIndices.empty())
-    {
-      ParallelUtils::parallelFor(m_wallPointIndices.size(),
-        [&](const size_t p) {
-          getState().getPositions()[m_wallPointIndices[p]] -= getState().getVelocities()[m_wallPointIndices[p]] * timestep;
-          getState().getVelocities()[m_wallPointIndices[p]] = Vec3r(0.0, 0.0, 0.0);
-        });
-    }
+	for (int p = 0; p < getState().getNumParticles(); p++)
+	{
+		Vec3r oldPosition = getState().getPositions()[p];
+		Vec3r newPosition = oldPosition + getState().getVelocities()[p] * timestep;
+		getState().getPositions()[p] = newPosition;
+		//periodicBCs(p);
+		if (!m_bufferParticleIndices.empty())
+		{
+			if (oldPosition.x() < m_inletRegionXCoord && newPosition.x() > m_inletRegionXCoord)
+			{
+				// insert particle into inlet domain from buffer domain
+				const size_t bufferParticleIndex = m_bufferParticleIndices.back();
+				m_bufferParticleIndices.pop_back();
+				getState().getPositions()[bufferParticleIndex] = Vec3d(m_minXCoord, newPosition.y(), newPosition.z());
+        getState().getDensities()[bufferParticleIndex] = 1000.0; // update this to compute density based on points in inlet domain
+			}
+			else if (oldPosition.x() < m_maxXCoord && newPosition.x() > m_maxXCoord)
+			{
+				// insert particle into buffer domain after it leaves outlet domain
+				getState().getPositions()[p] = Vec3d(m_bufferXCoord, 0, 0);
+				getState().getVelocities()[p] = Vec3d(0, 0, 0);
+				//getState().getDensities()[p] = 1000;
+				m_bufferParticleIndices.push_back(p);
+			}
+		}
+	}
 
-    if (!m_bufferParticleIndices.empty())
-    {
-      ParallelUtils::parallelFor(m_bufferParticleIndices.size(),
-        [&](const size_t p) {
-          getState().getPositions()[m_bufferParticleIndices[p]] -= getState().getVelocities()[m_bufferParticleIndices[p]] * timestep;
-          getState().getVelocities()[m_bufferParticleIndices[p]] = Vec3r(0.0, 0.0, 0.0);
-        });
-    }
+	if (!m_wallPointIndices.empty())
+	{
+		ParallelUtils::parallelFor(m_wallPointIndices.size(),
+			[&](const size_t p) {
+				getState().getPositions()[m_wallPointIndices[p]] -= getState().getVelocities()[m_wallPointIndices[p]] * timestep;
+				getState().getVelocities()[m_wallPointIndices[p]] = Vec3r(0.0, 0.0, 0.0);
+			});
+	}
 }
 
 void SPHModel::printParticleTypes()
@@ -590,7 +590,6 @@ void SPHModel::printParticleTypes()
   int numOutletParticles = 0;
   int numFluidParticles = 0;
   //int numBufferParticles = 0;
-  auto h = m_minXCoord;
   for (int i = 0; i < getState().getNumParticles(); i++)
   {
     Vec3r position = getState().getPositions()[i];
@@ -614,6 +613,14 @@ void SPHModel::printParticleTypes()
   std::cout << "Num total particles_v2: " << getState().getNumParticles() << "\n\n";
 }
 
+Vec3d SPHModel::computeParabolicInletVelocity(const Vec3d particlePosition)
+{
+  // compute distance of point
+  const Vec3d inletRegionCenterPoint = Vec3d(particlePosition.x(), m_inletCenterPoint.y(), m_inletCenterPoint.z());
+  const double distance = (particlePosition - inletRegionCenterPoint).norm();
+  const double inletParabolicVelocityX = m_inletVelocity.x() * (1 - (distance / m_inletRadius) * (distance / m_inletRadius));
+  return Vec3d(inletParabolicVelocityX, 0, 0);
+}
 
 Real SPHModel::particlePressure(const double density)
 {
