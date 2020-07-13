@@ -336,8 +336,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   
   sphModel->setWriteToOutputModulo(0.5);
   //sphModel->setInletDensity(1001);
-  sphModel->setInletVelocity(Vec3d(1.0, 0.0, 0.0));
-  //sphModel->setOutletDensity(1000);
+  sphModel->setInletVelocity(Vec3d(0.3, 0.0, 0.0));
+  sphModel->setOutletDensity(1000);
 
   LOG(INFO) << "Number of particles: " << particles.size();
 

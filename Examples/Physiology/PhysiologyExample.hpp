@@ -54,7 +54,7 @@ main(int argc, char* argv[])
   auto simManager = std::make_shared<SimulationManager>();
 
   int    threads = -1;
-  double particleRadius = 0.1;
+  double particleRadius = 0.05;
 
   // Parse command line arguments
   for (int i = 1; i < argc; ++i)

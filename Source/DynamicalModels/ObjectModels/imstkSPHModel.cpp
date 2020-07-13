@@ -69,6 +69,7 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         {
             computeNeighborRelativePositions();
             computeDensity();
+            //computePressureOutlet();
             //normalizeDensity();
             //collectNeighborDensity();
         });
@@ -126,6 +127,11 @@ SPHModel::initialize()
 
     m_totalTime = 0.0;
     m_timeStepCount = 0;
+    m_previousTime = 0;
+    m_timeModulo = m_writeToOutputModulo;
+    m_speedOfSound = 5.0;
+
+    m_beta = m_speedOfSound * m_speedOfSound * m_modelParameters->m_restDensity / 7.0;
     //m_writeToCSVModulo = DBL_MAX;
 
     return true;
@@ -174,7 +180,7 @@ SPHModel::computeCFLTimeStepSize()
 
     // dt = CFL * 2r / max{|| v ||}
     Real timestep = maxVel > Real(1e-6) ?
-                    m_modelParameters->m_CFLFactor * (Real(2.0) * m_modelParameters->m_particleRadius / maxVel) :
+                    m_modelParameters->m_CFLFactor * (Real(2.0) * m_modelParameters->m_particleRadius / (m_speedOfSound + maxVel)) :
                     m_modelParameters->m_maxTimestep;
 
     // clamp the time step size to be within a given range
@@ -624,7 +630,7 @@ Vec3d SPHModel::computeParabolicInletVelocity(const Vec3d particlePosition)
 
 Real SPHModel::particlePressure(const double density)
 {
-  const Real error = std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1);
+  const Real error = m_beta * (std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1));
   // clamp pressure error to zero to maintain stability
   return error > Real(0) ? error : Real(0);
 }
@@ -648,7 +654,7 @@ StdVectorOfVec3d SPHModel::getInitialVelocities()
 
 void SPHModel::writeStateToCSV()
 {
-  if (std::fmod(m_totalTime, m_writeToOutputModulo) < 1e-3 && m_totalTime > 0)
+  if (m_previousTime <= m_timeModulo && m_totalTime >= m_timeModulo)
   {
     std::cout << "Writing CSV at time: " << m_totalTime << std::endl;
     std::ofstream outputFile;
@@ -664,6 +670,9 @@ void SPHModel::writeStateToCSV()
       outputFile << particlePressure(densities[i]) << "\n";
     }
     outputFile.close();
+
+    m_timeModulo += m_writeToOutputModulo;
+    m_previousTime = m_totalTime;
   }
 }
 
@@ -688,16 +697,20 @@ size_t SPHModel::findNearestParticleToVertex(const Vec3d point)
 
 void SPHModel::writeStateToVtk()
 {
-  if (std::fmod(m_totalTime, m_writeToOutputModulo) < 1e-3 && m_totalTime > 0)
+  if (m_previousTime <= m_timeModulo && m_totalTime >= m_timeModulo)
   {
     auto particleVelocities = getState().getVelocities();
     auto particleDensities = getState().getDensities();
     std::map<std::string, StdVectorOfVectorf> pointDataMap;
     StdVectorOfVectorf velocity;
     StdVectorOfVectorf pressure;
+    StdVectorOfVectorf density;
     velocity.reserve(m_geomUnstructuredGrid->getNumVertices());
     pressure.reserve(m_geomUnstructuredGrid->getNumVertices());
+    density.reserve(m_geomUnstructuredGrid->getNumVertices());
 
+
+    Vectorf densityVec(1);
     Vectorf pressureVec(1);
     Vectorf velocityVec(3);
     for (auto i : m_geomUnstructuredGrid->getInitialVertexPositions())
@@ -707,8 +720,16 @@ void SPHModel::writeStateToVtk()
       velocityVec(1) = particleVelocities[index].y();
       velocityVec(2) = particleVelocities[index].z();
       velocity.push_back(velocityVec);
+
+      densityVec(0) = particleDensities[index];
+      density.push_back(densityVec);
+
+      pressureVec(0) = particlePressure(particleDensities[index]);
+      pressure.push_back(pressureVec);
     }
     pointDataMap.insert(std::pair<std::string, StdVectorOfVectorf>("velocity", velocity));
+    pointDataMap.insert(std::pair<std::string, StdVectorOfVectorf>("pressure", pressure));
+    pointDataMap.insert(std::pair<std::string, StdVectorOfVectorf>("density", density));
     m_geomUnstructuredGrid->setPointDataMap(pointDataMap);
 
     VTKMeshIO vtkWriter;

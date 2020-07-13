@@ -353,6 +353,10 @@ private:
 
     double m_inletRadius;
     Vec3d m_inletCenterPoint;
+    double m_previousTime;
+    double m_timeModulo;
+    double m_speedOfSound;
+    double m_beta;
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 
