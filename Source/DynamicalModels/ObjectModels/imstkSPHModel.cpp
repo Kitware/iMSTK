@@ -69,9 +69,11 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         {
             computeNeighborRelativePositions();
             computeDensity();
-            normalizeDensity();
-            collectNeighborDensity();
+            //normalizeDensity();
+            //collectNeighborDensity();
         });
+    m_normalizeDensityNode = m_taskGraph->addFunction("SPHModel_NormalizeDensity", std::bind(&SPHModel::normalizeDensity, this));
+    m_collectNeighborDensityNode = m_taskGraph->addFunction("SPHModel_CollectNeighborDensity", std::bind(&SPHModel::collectNeighborDensity, this));
     m_computePressureAccelNode =
         m_taskGraph->addFunction("SPHModel_ComputePressureAccel", std::bind(&SPHModel::computePressureAcceleration, this));
     m_computeSurfaceTensionNode =
@@ -142,11 +144,14 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_findParticleNeighborsNode);
     m_taskGraph->addEdge(m_findParticleNeighborsNode, m_computeDensityNode);
+    m_taskGraph->addEdge(m_computeDensityNode, m_normalizeDensityNode);
+    m_taskGraph->addEdge(m_normalizeDensityNode, m_collectNeighborDensityNode);
+
 
     // Pressure, Surface Tension, and time step size can be done in parallel
-    m_taskGraph->addEdge(m_computeDensityNode, m_computePressureAccelNode);
-    m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
-    m_taskGraph->addEdge(m_computeDensityNode, m_computeTimeStepSizeNode);
+    m_taskGraph->addEdge(m_collectNeighborDensityNode, m_computePressureAccelNode);
+    m_taskGraph->addEdge(m_collectNeighborDensityNode, m_computeSurfaceTensionNode);
+    m_taskGraph->addEdge(m_collectNeighborDensityNode, m_computeTimeStepSizeNode);
 
     m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
     m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
@@ -272,6 +277,18 @@ SPHModel::computeDensity()
 }
 
 void
+SPHModel::computePressureOutlet()
+{
+  ParallelUtils::parallelFor(getState().getNumParticles(),
+    [&](const size_t p) {
+      if (getState().getPositions()[p].x() > m_outletRegionXCoord && getState().getPositions()[p].x() < m_maxXCoord)
+      {
+        getState().getDensities()[p] = m_outletDensity;
+      }
+    });
+}
+
+void
 SPHModel::normalizeDensity()
 {
     if (!m_modelParameters->m_bNormalizeDensity)
@@ -388,6 +405,10 @@ SPHModel::updateVelocityNoGravity(Real timestep)
   ParallelUtils::parallelFor(getState().getNumParticles(),
     [&](const size_t p) {
       getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
+      if (getState().getPositions()[p].x() < m_inletRegionXCoord)
+      {
+        getState().getVelocities()[p] = m_inletVelocity;
+      }
     });
 }
 
@@ -516,11 +537,33 @@ SPHModel::computeSurfaceTension()
 void
 SPHModel::moveParticles(Real timestep)
 {
-    ParallelUtils::parallelFor(getState().getNumParticles(),
-        [&](const size_t p) {
-            getState().getPositions()[p] += getState().getVelocities()[p] * timestep;
-            periodicBCs(p);
-        });
+    //ParallelUtils::parallelFor(getState().getNumParticles(),
+    //    [&](const size_t p) {
+        for (int p = 0; p < getState().getNumParticles(); p++)
+        {
+          Vec3r oldPosition = getState().getPositions()[p];
+          Vec3r newPosition = oldPosition + getState().getVelocities()[p] * timestep;
+          getState().getPositions()[p] = newPosition;
+          //periodicBCs(p);
+          if (!m_bufferParticleIndices.empty())
+          {
+            if (oldPosition.x() < m_inletRegionXCoord && newPosition.x() > m_inletRegionXCoord)
+            {
+              // insert particle into inlet domain from buffer domain
+              const size_t bufferParticleIndex = m_bufferParticleIndices.back();
+              m_bufferParticleIndices.pop_back();
+              getState().getPositions()[bufferParticleIndex] = Vec3d(m_minXCoord, newPosition.y(), newPosition.z());
+            }
+            else if (oldPosition.x() < m_maxXCoord && newPosition.x() > m_maxXCoord)
+            {
+              // insert particle into buffer domain after it leaves outlet domain
+              getState().getPositions()[p] = Vec3d(m_bufferXCoord, 0, 0);
+              getState().getVelocities()[p] = Vec3d(0, 0, 0);
+              //getState().getDensities()[p] = 1000;
+              m_bufferParticleIndices.push_back(p);
+            }
+          }
+        }
 
     if (!m_wallPointIndices.empty())
     {
@@ -530,7 +573,47 @@ SPHModel::moveParticles(Real timestep)
           getState().getVelocities()[m_wallPointIndices[p]] = Vec3r(0.0, 0.0, 0.0);
         });
     }
+
+    if (!m_bufferParticleIndices.empty())
+    {
+      ParallelUtils::parallelFor(m_bufferParticleIndices.size(),
+        [&](const size_t p) {
+          getState().getPositions()[m_bufferParticleIndices[p]] -= getState().getVelocities()[m_bufferParticleIndices[p]] * timestep;
+          getState().getVelocities()[m_bufferParticleIndices[p]] = Vec3r(0.0, 0.0, 0.0);
+        });
+    }
 }
+
+void SPHModel::printParticleTypes()
+{
+  int numInletParticles = 0;
+  int numOutletParticles = 0;
+  int numFluidParticles = 0;
+  //int numBufferParticles = 0;
+  auto h = m_minXCoord;
+  for (int i = 0; i < getState().getNumParticles(); i++)
+  {
+    Vec3r position = getState().getPositions()[i];
+    if (position.x() < m_inletRegionXCoord)
+    {
+      numInletParticles++;
+    }
+    else if (position.x() > m_outletRegionXCoord && position.x() < m_maxXCoord)
+    {
+      numOutletParticles++;
+    }
+    else if (position.x() > m_inletRegionXCoord && position.x() < m_outletRegionXCoord)
+    {
+      numFluidParticles++;
+    }
+  }
+  std::cout << "Num inlet particles: " << numInletParticles << std::endl;
+  std::cout << "Num outlet particles: " << numOutletParticles << std::endl;
+  std::cout << "Num fluid particles: " << numFluidParticles << std::endl;
+  std::cout << "Num buffer particles: " << m_bufferParticleIndices.size() << std::endl;
+  std::cout << "Num total particles_v2: " << getState().getNumParticles() << "\n\n";
+}
+
 
 Real SPHModel::particlePressure(const double density)
 {
@@ -580,7 +663,7 @@ void SPHModel::writeStateToCSV()
 size_t SPHModel::findNearestParticleToVertex(const Vec3d point)
 {
   double minDistance = 1e10;
-  size_t minIndex = -1;
+  size_t minIndex = 0;
   for (size_t i = 0; i < getState().getNumParticles(); i++)
   {
     Vec3d p1 = getState().getPositions()[i];
@@ -623,7 +706,7 @@ void SPHModel::writeStateToVtk()
 
     VTKMeshIO vtkWriter;
     std::string filePath = iMSTK_DATA_ROOT + std::string("temp_sph_output_") + std::to_string(m_totalTime) + std::string(".vtu");
-    vtkWriter.write(m_geomUnstructuredGrid, filePath, VTK);
+    vtkWriter.write(m_geomUnstructuredGrid, filePath, VTU);
   }
 }
 

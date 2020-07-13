@@ -121,7 +121,7 @@ generateParallelPlatesFlow(const double particleRadius, std::shared_ptr<SPHModel
   particles.insert(particles.end(), plateParticles.begin(), plateParticles.end());
 
   // set the coordinates needed for periodic boundary conditions
-  sphModel->setMaxMinXCoords(channelLowerCorner.x(), channelLowerCorner.x() + plateLength);
+  sphModel->setMinMaxXCoords(channelLowerCorner.x(), channelLowerCorner.x() + plateLength);
 
   return particles;
 }
@@ -240,7 +240,7 @@ generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh
 StdVectorOfVec3d
 initializeNonZeroVelocities(const size_t numParticles)
 {
-  StdVectorOfVec3d initialVelocities(numParticles, Vec3d(2, 0, 0));
+  StdVectorOfVec3d initialVelocities(numParticles, Vec3d(0, 0, 0));
   return initialVelocities;
 }
 
@@ -253,24 +253,40 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   if (SCENE_ID == 1)
   {
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
+    std::shared_ptr<SurfaceMesh> surfMeshSmall = std::make_shared<SurfaceMesh>(*surfMesh);
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.vtk"));
 
     sphModel->setGeometryMesh(tetMesh);
 
     std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
 
-    surfMeshExpanded->scale(1.2, Geometry::TransformType::ApplyToData);
+    const double scale = 1.5;
+    surfMeshExpanded->scale(scale, Geometry::TransformType::ApplyToData);
 
-    surfMesh->directionalScale(1.4, 1.0, 1.0);
+    surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
     std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
 
-    const size_t nx = 50 / 2, ny = 20 / 2, nz = 20 / 2;
+    Vec3d aabbMin1, aabbMax1;
+    surfMeshSmall->computeBoundingBox(aabbMin1, aabbMax1, 1.);
+    sphModel->setInletRegionXCoord(aabbMin1.x() + 1);
+    sphModel->setOutletRegionXCoord(aabbMax1.x() - 1);
+
+    sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
 
     Vec3d aabbMin, aabbMax;
     surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
 
+    const double length = aabbMax.x() - aabbMin.x();
+    const double width = aabbMax.y() - aabbMin.y();
+    const double depth = aabbMax.z() - aabbMin.z();
+
+    const auto spacing = 2.0 * particleRadius;
+    const auto nx = static_cast<size_t>(length / spacing);
+    const auto ny = static_cast<size_t>(width / spacing);
+    const auto nz = static_cast<size_t>(depth / spacing);
+
     auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
-    auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+    auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMeshSmall, uniformMesh, false);
     particles = enclosedFluidPoints->getInitialVertexPositions();
     auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
     StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
@@ -281,9 +297,22 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
     particles.insert(particles.end(), wallParticles.begin(), wallParticles.end());
 
-    // Create a physics model
+    // add wall particles
     sphModel->setWallPointIndices(wallParticlesIndices);
-    sphModel->setMaxMinXCoords(aabbMin.x(), aabbMax.x());
+
+    // buffer domain
+    StdVectorOfVec3d bufferParticles;
+    double bufferXCoordMin = 1;
+    for (int i = 0; i < 2000; i++)
+    {
+      bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));
+    }
+    std::vector<size_t> bufferParticlesIndices(bufferParticles.size());
+    std::iota(bufferParticlesIndices.begin(), bufferParticlesIndices.end(), particles.size());
+    sphModel->setBufferParticleIndices(bufferParticlesIndices);
+
+    particles.insert(particles.end(), bufferParticles.begin(), bufferParticles.end());
+
     StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
 
     sphModel->setInitialVelocities(initialFluidVelocities);
@@ -299,6 +328,9 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   }
   
   sphModel->setWriteToOutputModulo(0.5);
+  //sphModel->setInletDensity(1001);
+  sphModel->setInletVelocity(Vec3d(1.0, 0.0, 0.0));
+  //sphModel->setOutletDensity(1000);
 
   LOG(INFO) << "Number of particles: " << particles.size();
 

@@ -154,6 +154,14 @@ main(int argc, char* argv[])
         fluidObj->getDynamicalSPHModel()->writeStateToVtk();
         }, "WriteStateToVtk");
       taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), writeSPHStateToVtk);
+
+      std::shared_ptr<TaskNode> printSPHParticleTypes = std::make_shared<TaskNode>([&]() {
+        if (fluidObj->getDynamicalSPHModel()->getTimeStepCount() % 100 == 0)
+        {
+          fluidObj->getDynamicalSPHModel()->printParticleTypes();
+        }
+        }, "PrintSPHParticleTypes");
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), printSPHParticleTypes);
     });
 
   simManager->start(SimulationStatus::Paused);

@@ -91,6 +91,16 @@ struct NeighborInfo
 class SPHSimulationState
 {
 public:
+
+  enum class ParticleType
+  {
+    fluid,
+    wall,
+    inlet,
+    outlet,
+    buffer
+  };
+
     ///
     /// \brief Default constructor/destructor
     ///
@@ -192,6 +202,13 @@ public:
     std::vector<std::vector<NeighborInfo>>& getNeighborInfo() { return m_NeighborInfo; }
     const std::vector<std::vector<NeighborInfo>>& getNeighborInfo() const { return m_NeighborInfo; }
 
+    ///
+    /// \brief get particle type (fluid, wall, inlet, outlet, buffer)
+    ///
+    std::vector<ParticleType> getParticleTypes() { return m_particleTypes; }
+    const std::vector<ParticleType>& getParticleTypes() const { return m_particleTypes; }
+
+
 private:
     std::shared_ptr<SPHKinematicState> m_KinematicState;      ///> basic state: positions + velocities
     StdVectorOfVec3r m_BDPositions;                           ///> positions of boundary particles, if generated
@@ -204,5 +221,7 @@ private:
     std::vector<std::vector<size_t>>       m_NeighborLists;   ///>  store a list of neighbors for each particle, updated each time step
     std::vector<std::vector<size_t>>       m_BDNeighborLists; ///>  store a list of boundary particle neighbors for each particle, updated each time step
     std::vector<std::vector<NeighborInfo>> m_NeighborInfo;    ///>  store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
+
+    std::vector<ParticleType> m_particleTypes;
 };
 } // end namespace imstk

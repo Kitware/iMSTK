@@ -186,7 +186,9 @@ public:
     void periodicBCs(const size_t p);
 
     void setWallPointIndices(std::vector<size_t>& wallPointIndices) { m_wallPointIndices = wallPointIndices; }
-    void setMaxMinXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
+    void setBufferParticleIndices(std::vector<size_t>& bufferParticleIndices) { m_bufferParticleIndices = bufferParticleIndices; }
+
+    void setMinMaxXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
 
     void writeStateToCSV();
     void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
@@ -195,6 +197,19 @@ public:
     void writeStateToVtk();
     void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
     size_t findNearestParticleToVertex(const Vec3d point);
+
+    void setInletDensity(const double inletDensity) { m_inletDensity = inletDensity; }
+    void setOutletDensity(const double outletDensity) { m_outletDensity = outletDensity; }
+
+    void setInletVelocity(const Vec3d inletVelocity) { m_inletVelocity = inletVelocity; }
+    void setOutletVelocity(const Vec3d outletVelocity) { m_outletVelocity = outletVelocity; }
+
+
+    void setInletRegionXCoord(const double inletRegionXCoord) { m_inletRegionXCoord = inletRegionXCoord; }
+    void setOutletRegionXCoord(const double outletRegionXCoord) { m_outletRegionXCoord = outletRegionXCoord; }
+    void printParticleTypes();
+
+
 
 
 
@@ -284,6 +299,8 @@ private:
     ///
     void moveParticles(const Real timestep);
 
+    void computePressureOutlet();
+
 
 protected:
     std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
@@ -293,6 +310,10 @@ protected:
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
     std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
     std::shared_ptr<TaskNode> m_integrateNode = nullptr;
+
+    std::shared_ptr<TaskNode> m_normalizeDensityNode = nullptr;
+    std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;
+
 
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
@@ -312,12 +333,23 @@ private:
     StdVectorOfReal m_initialDensities;
 
     std::vector<size_t> m_wallPointIndices;
+    std::vector<size_t> m_bufferParticleIndices;
+
     double m_minXCoord;
     double m_maxXCoord;
+
+    double m_inletRegionXCoord;
+    double m_outletRegionXCoord;
+
+    double m_inletDensity;
+    double m_outletDensity;
+    Vec3d m_inletVelocity;
+    Vec3d m_outletVelocity;
 
     double m_totalTime;
     double m_writeToOutputModulo;
     int m_timeStepCount;
+    double m_bufferXCoord;
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 
