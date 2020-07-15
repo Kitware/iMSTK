@@ -86,9 +86,25 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         {
             sumAccels();
             //updateVelocity(getTimeStep());
-            updateVelocityNoGravity(getTimeStep());
-            computeViscosity();
-            moveParticles(getTimeStep());
+            //updateVelocityNoGravity(getTimeStep());
+            //computeViscosity();
+            //moveParticles(getTimeStep());
+        });
+
+    m_updateVelocityNoGravityNode =
+      m_taskGraph->addFunction("SPHModel_UpdateVelocityNoGravity", [&]()
+        {
+          updateVelocityNoGravity(getTimeStep());
+        });
+    m_computeViscosityNode =
+      m_taskGraph->addFunction("SPHModel_ComputeViscosity", [&]()
+        {
+          computeViscosity();
+        });
+    m_moveParticlesNode =
+      m_taskGraph->addFunction("SPHModel_MoveParticles", [&]()
+        {
+          moveParticles(getTimeStep());
         });
 }
 
@@ -120,7 +136,7 @@ SPHModel::initialize()
     m_neighborSearcher = std::make_shared<NeighborSearch>(m_modelParameters->m_NeighborSearchMethod,
         m_modelParameters->m_kernelRadius);
 
-    m_pressureAccels       = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles());
+    m_pressureAccels       = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0, 0, 0));
 
     // initialize surface tension to 0 in case you remove the surface tension node
     m_surfaceTensionAccels = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0.0, 0.0, 0.0));
@@ -129,7 +145,7 @@ SPHModel::initialize()
     m_timeStepCount = 0;
     m_previousTime = 0;
     m_timeModulo = m_writeToOutputModulo;
-    m_speedOfSound = 5.0;
+    m_speedOfSound = 5;
 
     m_beta = m_speedOfSound * m_speedOfSound * m_modelParameters->m_restDensity / 7.0;
     //m_writeToCSVModulo = DBL_MAX;
@@ -161,8 +177,10 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
     m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
     m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
-
-    m_taskGraph->addEdge(m_integrateNode, sink);
+    m_taskGraph->addEdge(m_integrateNode, m_updateVelocityNoGravityNode);
+    m_taskGraph->addEdge(m_updateVelocityNoGravityNode, m_computeViscosityNode);
+    m_taskGraph->addEdge(m_computeViscosityNode, m_moveParticlesNode);
+    m_taskGraph->addEdge(m_moveParticlesNode, sink);
 }
 
 void
@@ -378,7 +396,9 @@ SPHModel::computePressureAcceleration()
                 accel += -(ppressure / (pdensity * pdensity) + qpressure / (qdensity * qdensity)) * m_kernels.gradW(r);
             }
 
-            accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass;
+            accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass / pdensity;
+            //accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass;
+
             //getState().getAccelerations()[p] = accel;
             pressureAccels[p] = accel;
         });
@@ -440,9 +460,12 @@ SPHModel::computeViscosity()
                 const auto& qInfo   = neighborInfo[i];
                 const auto r        = qInfo.xpq;
                 const auto qdensity = qInfo.density;
-                diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.W(r) * (qvel - pvel);
+                diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.laplace(r) * (qvel - pvel);
+                //diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.W(r) * (qvel - pvel);
+
             }
-            diffuseFluid *= m_modelParameters->m_viscosityCoeff;
+            diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff / getState().getDensities()[p];
+            //diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff;
 
             Vec3r diffuseBoundary(0, 0, 0);
             if (m_modelParameters->m_bDensityWithBoundary)
@@ -544,20 +567,15 @@ SPHModel::moveParticles(Real timestep)
 {
 	//ParallelUtils::parallelFor(getState().getNumParticles(),
 	//    [&](const size_t p) {
-	if (!m_bufferParticleIndices.empty())
-	{
-		ParallelUtils::parallelFor(m_bufferParticleIndices.size(),
-			[&](const size_t p) {
-				getState().getPositions()[m_bufferParticleIndices[p]] -= getState().getVelocities()[m_bufferParticleIndices[p]] * timestep;
-				getState().getVelocities()[m_bufferParticleIndices[p]] = Vec3r(0.0, 0.0, 0.0);
-			});
-	}
 
 	for (int p = 0; p < getState().getNumParticles(); p++)
 	{
-		Vec3r oldPosition = getState().getPositions()[p];
-		Vec3r newPosition = oldPosition + getState().getVelocities()[p] * timestep;
-		getState().getPositions()[p] = newPosition;
+    Vec3r oldPosition = getState().getPositions()[p];
+    Vec3r newPosition = oldPosition + getState().getVelocities()[p] * timestep;
+    if (std::find(m_bufferParticleIndices.begin(), m_bufferParticleIndices.end(), p) == m_bufferParticleIndices.end())
+    {
+      getState().getPositions()[p] = newPosition;
+    }
 		//periodicBCs(p);
 		if (!m_bufferParticleIndices.empty())
 		{
@@ -567,7 +585,8 @@ SPHModel::moveParticles(Real timestep)
 				const size_t bufferParticleIndex = m_bufferParticleIndices.back();
 				m_bufferParticleIndices.pop_back();
 				getState().getPositions()[bufferParticleIndex] = Vec3d(m_minXCoord, newPosition.y(), newPosition.z());
-        getState().getDensities()[bufferParticleIndex] = 1000.0; // update this to compute density based on points in inlet domain
+        getState().getVelocities()[bufferParticleIndex] = Vec3r(0.0, 0.0, 0.0);
+        //getState().getDensities()[bufferParticleIndex] = 1000.0; // update this to compute density based on points in inlet domain
 			}
 			else if (oldPosition.x() < m_maxXCoord && newPosition.x() > m_maxXCoord)
 			{
@@ -658,7 +677,7 @@ void SPHModel::writeStateToCSV()
   {
     std::cout << "Writing CSV at time: " << m_totalTime << std::endl;
     std::ofstream outputFile;
-    outputFile.open(iMSTK_DATA_ROOT + std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".csv"));
+    outputFile.open(std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".csv"));
     outputFile << "X,Y,Z,Vx,Vy,Vz,Pressure\n";
     auto positions = getState().getPositions();
     auto velocities = getState().getVelocities();
@@ -699,6 +718,7 @@ void SPHModel::writeStateToVtk()
 {
   if (m_previousTime <= m_timeModulo && m_totalTime >= m_timeModulo)
   {
+    std::cout << "Writing VTK at time: " << m_totalTime << std::endl;
     auto particleVelocities = getState().getVelocities();
     auto particleDensities = getState().getDensities();
     std::map<std::string, StdVectorOfVectorf> pointDataMap;
@@ -708,7 +728,6 @@ void SPHModel::writeStateToVtk()
     velocity.reserve(m_geomUnstructuredGrid->getNumVertices());
     pressure.reserve(m_geomUnstructuredGrid->getNumVertices());
     density.reserve(m_geomUnstructuredGrid->getNumVertices());
-
 
     Vectorf densityVec(1);
     Vectorf pressureVec(1);
@@ -733,7 +752,7 @@ void SPHModel::writeStateToVtk()
     m_geomUnstructuredGrid->setPointDataMap(pointDataMap);
 
     VTKMeshIO vtkWriter;
-    std::string filePath = iMSTK_DATA_ROOT + std::string("temp_sph_output_") + std::to_string(m_totalTime) + std::string(".vtu");
+    std::string filePath = std::string("temp_sph_output_") + std::to_string(m_totalTime) + std::string(".vtu");
     vtkWriter.write(m_geomUnstructuredGrid, filePath, VTU);
   }
 }

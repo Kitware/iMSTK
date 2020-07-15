@@ -424,12 +424,12 @@ public:
     {
         m_radius  = radius;
         m_radius2 = radius * radius;
-        m_k       = Real(45.0 / PI) / (m_radius2 * m_radius2 * m_radius);
+        m_k       = Real(45.0 / PI) / (m_radius2 * m_radius2 * m_radius2);
     }
 
     ///
     /// \brief Compute laplacian
-    /// Laplace(r) = (45/PI/r^5) * (1 - |r| / h)
+    /// Laplace(r) = (45/PI/h^6) * (h - |r|)
     ///
     Real laplace(const VecXr& r) const
     {
@@ -438,7 +438,7 @@ public:
         if (r2 <= m_radius2)
         {
             const auto d = std::sqrt(r2);
-            res = m_k * (Real(1) - d / m_radius);
+            res = m_k * (m_radius - d);
         }
         return res;
     }

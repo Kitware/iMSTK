@@ -19,6 +19,7 @@
 
 =========================================================================*/
 
+#include "imstkColorFunction.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkMeshIO.h"
 #include "imstkPointSet.h"
@@ -191,11 +192,6 @@ Vec3d getCenter(std::shared_ptr<imstk::PointSet>& meshPoints)
 std::shared_ptr<SurfaceMesh>
 generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh>& surfMesh, std::shared_ptr<SurfaceMesh>& surfMeshExpanded)
 {
-  // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
-  Vec3d originalCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMesh));
-  Vec3d expandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
-  surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
-
   // subtract original mesh from expanded mesh so we can get wall mesh
   auto intersectionPolyDataFilter = vtkSmartPointer<vtkBooleanOperationPolyDataFilter>::New();
   intersectionPolyDataFilter->SetOperationToDifference();
@@ -240,7 +236,7 @@ generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh
 StdVectorOfVec3d
 initializeNonZeroVelocities(const size_t numParticles)
 {
-  StdVectorOfVec3d initialVelocities(numParticles, Vec3d(0, 0, 0));
+  StdVectorOfVec3d initialVelocities(numParticles, Vec3d(0.0, 0, 0));
   return initialVelocities;
 }
 
@@ -262,8 +258,16 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
     const double scale = 1.5;
     surfMeshExpanded->scale(scale, Geometry::TransformType::ApplyToData);
-
     surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
+
+    // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
+    Vec3d originalCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshSmall));
+    Vec3d directionalExpandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMesh));
+    Vec3d expandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
+    surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
+    surfMesh->translate(originalCylCenter - directionalExpandedCylCenter, Geometry::TransformType::ApplyToData);
+
+
     std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
 
     Vec3d aabbMin1, aabbMax1;
@@ -275,16 +279,16 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
     // compute center and radius of inlet
     Vec3d inletCenterPoint = Vec3d(aabbMin1.x(), (aabbMax1.y() + aabbMin1.y()) / 2.0, (aabbMax1.z() + aabbMin1.z()) / 2.0);
-    double inletRadius = (aabbMax1.y() - aabbMin1.y()) / 2.0;
+    double inletRadius = std::abs(aabbMax1.y() - aabbMin1.y()) / 2.0;
     sphModel->setInletRadius(inletRadius);
     sphModel->setInletCenterPoint(inletCenterPoint);
 
     Vec3d aabbMin, aabbMax;
     surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
 
-    const double length = aabbMax.x() - aabbMin.x();
-    const double width = aabbMax.y() - aabbMin.y();
-    const double depth = aabbMax.z() - aabbMin.z();
+    const double length = std::abs(aabbMax.x() - aabbMin.x());
+    const double width = std::abs(aabbMax.y() - aabbMin.y());
+    const double depth = std::abs(aabbMax.z() - aabbMin.z());
 
     const auto spacing = 2.0 * particleRadius;
     const auto nx = static_cast<size_t>(length / spacing);
@@ -334,9 +338,9 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     sphModel->setInitialVelocities(initialFluidVelocities);
   }
   
-  sphModel->setWriteToOutputModulo(0.5);
+  sphModel->setWriteToOutputModulo(0.1);
   //sphModel->setInletDensity(1001);
-  sphModel->setInletVelocity(Vec3d(0.3, 0.0, 0.0));
+  sphModel->setInletVelocity(Vec3d(1.0, 0.0, 0.0));
   sphModel->setOutletDensity(1000);
 
   LOG(INFO) << "Number of particles: " << particles.size();
@@ -349,8 +353,16 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   auto fluidVisualModel = std::make_shared<VisualModel>(fluidGeometry);
   auto fluidMaterial = std::make_shared<RenderMaterial>();
   fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
-  fluidMaterial->setVertexColor(Color(1, 0, 1, 0));
+  fluidMaterial->setVertexColor(Color(1, 0, 1, 0.2));
   fluidMaterial->setPointSize(5.);
+  //fluidMaterial->setScalarVisibility(true);
+  //std::shared_ptr<ColorFunction>lut = std::make_shared<ColorFunction>();
+  //lut->setNumberOfColors(2);
+  //lut->setColor(0, Color::Red);
+  //lut->setColor(1, Color::Green);
+  //lut->setRange(Vec2d(0.0, 6));
+  //fluidMaterial->setColorLookupTable(lut);
+
   fluidVisualModel->setRenderMaterial(fluidMaterial);
 
   sphModel->setModelGeometry(fluidGeometry);

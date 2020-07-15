@@ -72,7 +72,7 @@ public:
     Real m_pressureStiffness = Real(50000.0);
 
     // viscosity and surface tension/cohesion
-    Real m_viscosityCoeff          = Real(1e-2);
+    Real m_dynamicViscosityCoeff   = Real(4e-3);
     Real m_viscosityBoundary       = Real(1e-5);
     Real m_surfaceTensionStiffness = Real(1);
     Real m_frictionBoundary        = Real(0.1);
@@ -186,7 +186,10 @@ public:
     void periodicBCs(const size_t p);
 
     void setWallPointIndices(std::vector<size_t>& wallPointIndices) { m_wallPointIndices = wallPointIndices; }
+    std::vector<size_t>& getWallPointIndices() { return m_wallPointIndices; }
+
     void setBufferParticleIndices(std::vector<size_t>& bufferParticleIndices) { m_bufferParticleIndices = bufferParticleIndices; }
+    std::vector<size_t>& getBufferParticleIndices() { return m_bufferParticleIndices; }
 
     void setMinMaxXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
 
@@ -199,13 +202,21 @@ public:
     size_t findNearestParticleToVertex(const Vec3d point);
 
     void setInletDensity(const double inletDensity) { m_inletDensity = inletDensity; }
+    const double getInletDensity() { return m_inletDensity; }
     void setOutletDensity(const double outletDensity) { m_outletDensity = outletDensity; }
+    const double getOutletDensity() { return m_outletDensity; }
 
     void setInletVelocity(const Vec3d inletVelocity) { m_inletVelocity = inletVelocity; }
+    const Vec3d getInletVelocity() { return m_inletVelocity; }
+
     void setOutletVelocity(const Vec3d outletVelocity) { m_outletVelocity = outletVelocity; }
 
     void setInletRegionXCoord(const double inletRegionXCoord) { m_inletRegionXCoord = inletRegionXCoord; }
     void setOutletRegionXCoord(const double outletRegionXCoord) { m_outletRegionXCoord = outletRegionXCoord; }
+    double getInletRegionXCoord() { return m_inletRegionXCoord; }
+    double getOutletRegionXCoord() { return m_outletRegionXCoord; }
+
+
     void printParticleTypes();
 
     void setInletRadius(const double inletRadius) { m_inletRadius = inletRadius; }
@@ -214,6 +225,8 @@ public:
 
     Vec3d computeParabolicInletVelocity(const Vec3d particlePosition);
 
+
+
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
     std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
@@ -221,6 +234,9 @@ public:
     std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
     std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
     std::shared_ptr<TaskNode> getIntegrateNode() const { return m_integrateNode; }
+    std::shared_ptr<TaskNode> getComputeViscosityNode() const { return m_computeViscosityNode; }
+    std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNoGravityNode; }
+    std::shared_ptr<TaskNode> getMoveParticlesNode() const { return m_moveParticlesNode; }
 
 protected:
     ///
@@ -310,6 +326,10 @@ protected:
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
     std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
     std::shared_ptr<TaskNode> m_integrateNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNoGravityNode = nullptr;
+    std::shared_ptr<TaskNode> m_computeViscosityNode = nullptr;
+    std::shared_ptr<TaskNode> m_moveParticlesNode = nullptr;
+
 
     std::shared_ptr<TaskNode> m_normalizeDensityNode = nullptr;
     std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;

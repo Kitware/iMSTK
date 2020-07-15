@@ -61,8 +61,8 @@ SPHSimulationState::initializeData()
 
     m_Normals.resize(numParticles);
     m_Densities.resize(numParticles, 1000.0);
-    m_Accels.resize(numParticles);
-    m_DiffuseVelocities.resize(numParticles);
+    m_Accels.resize(numParticles, Vec3r(0, 0, 0));
+    m_DiffuseVelocities.resize(numParticles, Vec3r(0, 0, 0));
     m_NeighborInfo.resize(numParticles);
     m_NeighborLists.resize(numParticles);
 }

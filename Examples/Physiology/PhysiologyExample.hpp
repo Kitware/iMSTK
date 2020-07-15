@@ -83,7 +83,7 @@ main(int argc, char* argv[])
   auto scene = simManager->createNewScene("SPHPhysiologyInteraction");
 
   scene->getConfig()->writeTaskGraph = true;
-  scene->getConfig()->taskTimingEnabled = true;
+  //scene->getConfig()->taskTimingEnabled = true;
   //scene->getTaskComputeTimes().at("PhysiologyModel_Solve");
 
   // Get the VTKViewer
@@ -128,9 +128,30 @@ main(int argc, char* argv[])
   whiteLight->setIntensity(7);
   scene->addLight(whiteLight);
 
-  simManager->setActiveScene(scene);
 
   // remove the surface tension node
+
+  ///////////////////////////////////////
+  // Setup some scalars
+  std::shared_ptr<PointSet> fluidGeometry = std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry());
+  std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(fluidGeometry->getNumVertices());
+  std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
+  //fluidGeometry->setScalars(scalarsPtr);
+
+  // Setup the material for the scalars
+  //std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
+  //material->setScalarVisibility(true);
+  //std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+  //colorFunc->setNumberOfColors(2);
+  //colorFunc->setColor(0, Color(1, 0, 1, 0.2));
+  //colorFunc->setColor(1, Color(1, 0, 1, 0.2));
+  //colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
+  //colorFunc->setRange(0.0, 5);
+  //material->setColorLookupTable(colorFunc);
+
+  //std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
+  std::shared_ptr<SPHModel> sphModel = fluidObj->getDynamicalSPHModel();
+
   scene->setTaskGraphConfigureCallback([&](Scene* scene)
     {
       auto taskGraph = scene->getTaskGraph();
@@ -143,18 +164,17 @@ main(int argc, char* argv[])
             printf("Total time (s): %f\n", fluidObj->getDynamicalSPHModel()->getTotalTime());
           }
         }, "PrintTotalTime");
-
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), printTotalTime);
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printTotalTime);
 
       std::shared_ptr<TaskNode> writeSPHStateToCSV = std::make_shared<TaskNode>([&]() {
         fluidObj->getDynamicalSPHModel()->writeStateToCSV();
         }, "WriteStateToCSV");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), writeSPHStateToCSV);
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToCSV);
 
       std::shared_ptr<TaskNode> writeSPHStateToVtk = std::make_shared<TaskNode>([&]() {
         fluidObj->getDynamicalSPHModel()->writeStateToVtk();
         }, "WriteStateToVtk");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), writeSPHStateToVtk);
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToVtk);
 
       std::shared_ptr<TaskNode> printSPHParticleTypes = std::make_shared<TaskNode>([&]() {
         if (fluidObj->getDynamicalSPHModel()->getTimeStepCount() % 100 == 0)
@@ -162,8 +182,55 @@ main(int argc, char* argv[])
           fluidObj->getDynamicalSPHModel()->printParticleTypes();
         }
         }, "PrintSPHParticleTypes");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getIntegrateNode(), printSPHParticleTypes);
+      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printSPHParticleTypes);
+
+			////////////////////////////////////////////
+      // This node computes displacements and sets the color to the magnitude
+			std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
+				{
+					/*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
+					const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
+					StdVectorOfReal& scalars = *scalarsPtr;
+					for (size_t i = 0; i < initPos.size(); i++)
+					{
+							scalars[i] = (currPos[i] - initPos[i]).norm();
+					}*/
+					const StdVectorOfVec3r& velocities = sphModel->getCurrentState()->getVelocities();
+          const std::vector<size_t>& wallPointIndices = sphModel->getWallPointIndices();
+          const std::vector<size_t>& bufferDomainIndices = sphModel->getBufferParticleIndices();
+          const StdVectorOfVec3d& positions = sphModel->getCurrentState()->getPositions();
+
+          StdVectorOfReal& scalars = *scalarsPtr;
+          for (size_t i = 0; i < velocities.size(); i++)
+          {
+            //scalars[i] = velocities[i].norm();
+            if (std::find(wallPointIndices.begin(), wallPointIndices.end(), i) != wallPointIndices.end())
+            {
+              scalars[i] = 0;
+            }
+            else if (std::find(bufferDomainIndices.begin(), bufferDomainIndices.end(), i) != bufferDomainIndices.end())
+            {
+              scalars[i] = 1;
+            }
+            else if (positions[i].x() < sphModel->getInletRegionXCoord())
+            {
+              scalars[i] = 2;
+            }
+            else if (positions[i].x() > sphModel->getOutletRegionXCoord())
+            {
+              scalars[i] = 3;
+            }
+            else
+            {
+              scalars[i] = 4;
+            }
+					}
+				}, "ComputeVelocityScalars");
+      //taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
+			///////////////////////////////////////////
     });
+
+  simManager->setActiveScene(scene);
 
   simManager->start(SimulationStatus::Paused);
 
