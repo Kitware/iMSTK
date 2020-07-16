@@ -63,7 +63,7 @@ public:
     Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(0.95);         ///> scale particle mass to a smaller value to maintain stability
+    Real m_particleMassScale = Real(1.06);         ///> scale particle mass to a smaller value to maintain stability
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -72,7 +72,7 @@ public:
     Real m_pressureStiffness = Real(50000.0);
 
     // viscosity and surface tension/cohesion
-    Real m_dynamicViscosityCoeff   = Real(4e-3);
+    Real m_dynamicViscosityCoeff   = Real(1e-2);
     Real m_viscosityBoundary       = Real(1e-5);
     Real m_surfaceTensionStiffness = Real(1);
     Real m_frictionBoundary        = Real(0.1);
@@ -215,6 +215,7 @@ public:
     void setOutletRegionXCoord(const double outletRegionXCoord) { m_outletRegionXCoord = outletRegionXCoord; }
     double getInletRegionXCoord() { return m_inletRegionXCoord; }
     double getOutletRegionXCoord() { return m_outletRegionXCoord; }
+    double setInletOutletRegionYCoordDivision(const double inletOutletRegionYCoordDivision) { m_inletOutletRegionYCoordDivision = inletOutletRegionYCoordDivision; }
 
 
     void printParticleTypes();
@@ -377,6 +378,7 @@ private:
     double m_timeModulo;
     double m_speedOfSound;
     double m_beta;
+    double m_inletOutletRegionYCoordDivision;
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 

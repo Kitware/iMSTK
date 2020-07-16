@@ -337,6 +337,173 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
     sphModel->setInitialVelocities(initialFluidVelocities);
   }
+
+  else if (SCENE_ID == 3)
+  {
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus.stl"));
+    std::shared_ptr<SurfaceMesh> surfMeshSmall = std::make_shared<SurfaceMesh>(*surfMesh);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus.vtk"));
+
+    sphModel->setGeometryMesh(tetMesh);
+
+    std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
+
+    const double scale = 1.5;
+    surfMeshExpanded->directionalScale(1.0, scale, scale);
+    //surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
+
+    // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
+    Vec3d originalCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshSmall));
+    Vec3d directionalExpandedCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
+    //Vec3d expandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
+    //surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
+    surfMeshExpanded->translate(originalCenter - directionalExpandedCenter, Geometry::TransformType::ApplyToData);
+
+
+    std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
+
+    Vec3d aabbMin1, aabbMax1;
+    surfMeshSmall->computeBoundingBox(aabbMin1, aabbMax1, 1.);
+    sphModel->setInletRegionXCoord(-1.0);
+    sphModel->setOutletRegionXCoord(-1.0);
+    sphModel->setInletOutletRegionYCoordDivision(0.0);
+
+    sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
+
+    // compute center and radius of inlet
+    Vec3d inletCenterPoint = Vec3d(-2.4, 2.0, 0.0);
+    double inletRadius = 0.5;
+    sphModel->setInletRadius(inletRadius);
+    sphModel->setInletCenterPoint(inletCenterPoint);
+
+    Vec3d aabbMin, aabbMax;
+    surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
+
+    const double length = std::abs(aabbMax.x() - aabbMin.x());
+    const double width = std::abs(aabbMax.y() - aabbMin.y());
+    const double depth = std::abs(aabbMax.z() - aabbMin.z());
+
+    const auto spacing = 2.0 * particleRadius;
+    const auto nx = static_cast<size_t>(length / spacing);
+    const auto ny = static_cast<size_t>(width / spacing);
+    const auto nz = static_cast<size_t>(depth / spacing);
+
+    auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
+    auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMeshSmall, uniformMesh, false);
+    particles = enclosedFluidPoints->getInitialVertexPositions();
+    auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
+    StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
+
+    // get wallParticles positions within combined vector
+    std::vector<size_t> wallParticlesIndices(wallParticles.size());
+    std::iota(wallParticlesIndices.begin(), wallParticlesIndices.end(), particles.size());
+
+    particles.insert(particles.end(), wallParticles.begin(), wallParticles.end());
+
+    // add wall particles
+    sphModel->setWallPointIndices(wallParticlesIndices);
+
+    // buffer domain
+    StdVectorOfVec3d bufferParticles;
+    double bufferXCoordMin = 1;
+    sphModel->setBufferXCoord(bufferXCoordMin);
+    for (int i = 0; i < 2000; i++)
+    {
+      bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));
+    }
+    std::vector<size_t> bufferParticlesIndices(bufferParticles.size());
+    std::iota(bufferParticlesIndices.begin(), bufferParticlesIndices.end(), particles.size());
+    sphModel->setBufferParticleIndices(bufferParticlesIndices);
+
+    particles.insert(particles.end(), bufferParticles.begin(), bufferParticles.end());
+
+    StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
+
+    sphModel->setInitialVelocities(initialFluidVelocities);
+  }
+
+  else if (SCENE_ID == 4)
+  {
+  auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation.stl"));
+  std::shared_ptr<SurfaceMesh> surfMeshSmall = std::make_shared<SurfaceMesh>(*surfMesh);
+  auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation.vtk"));
+
+  sphModel->setGeometryMesh(tetMesh);
+
+  std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
+
+  const double scale = 1.5;
+  surfMeshExpanded->directionalScale(1.0, scale, scale);
+  //surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
+
+  // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
+  Vec3d originalCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshSmall));
+  Vec3d directionalExpandedCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
+  //Vec3d expandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
+  //surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
+  surfMeshExpanded->translate(originalCenter - directionalExpandedCenter, Geometry::TransformType::ApplyToData);
+
+
+  std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
+
+  Vec3d aabbMin1, aabbMax1;
+  surfMeshSmall->computeBoundingBox(aabbMin1, aabbMax1, 1.);
+  sphModel->setInletRegionXCoord(aabbMin1.x() + 1);
+  sphModel->setOutletRegionXCoord(aabbMax1.x() - 1);
+
+  sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
+
+  // compute center and radius of inlet
+  Vec3d inletCenterPoint = Vec3d(-2.0, 2.41, 0.0);
+  double inletRadius = 0.5;
+  sphModel->setInletRadius(inletRadius);
+  sphModel->setInletCenterPoint(inletCenterPoint);
+
+  Vec3d aabbMin, aabbMax;
+  surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
+
+  const double length = std::abs(aabbMax.x() - aabbMin.x());
+  const double width = std::abs(aabbMax.y() - aabbMin.y());
+  const double depth = std::abs(aabbMax.z() - aabbMin.z());
+
+  const auto spacing = 2.0 * particleRadius;
+  const auto nx = static_cast<size_t>(length / spacing);
+  const auto ny = static_cast<size_t>(width / spacing);
+  const auto nz = static_cast<size_t>(depth / spacing);
+
+  auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
+  auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMeshSmall, uniformMesh, false);
+  particles = enclosedFluidPoints->getInitialVertexPositions();
+  auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
+  StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
+
+  // get wallParticles positions within combined vector
+  std::vector<size_t> wallParticlesIndices(wallParticles.size());
+  std::iota(wallParticlesIndices.begin(), wallParticlesIndices.end(), particles.size());
+
+  particles.insert(particles.end(), wallParticles.begin(), wallParticles.end());
+
+  // add wall particles
+  sphModel->setWallPointIndices(wallParticlesIndices);
+
+  // buffer domain
+  StdVectorOfVec3d bufferParticles;
+  double bufferXCoordMin = 1;
+  sphModel->setBufferXCoord(bufferXCoordMin);
+  for (int i = 0; i < 2000; i++)
+  {
+    bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));
+  }
+  std::vector<size_t> bufferParticlesIndices(bufferParticles.size());
+  std::iota(bufferParticlesIndices.begin(), bufferParticlesIndices.end(), particles.size());
+  sphModel->setBufferParticleIndices(bufferParticlesIndices);
+
+  particles.insert(particles.end(), bufferParticles.begin(), bufferParticles.end());
+
+  StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
+
+  sphModel->setInitialVelocities(initialFluidVelocities);
+  }
   
   sphModel->setWriteToOutputModulo(0.1);
   //sphModel->setInletDensity(1001);

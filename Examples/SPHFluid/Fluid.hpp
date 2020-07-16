@@ -212,7 +212,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     if (SCENE_ID == 2)   // highly viscous fluid
     {
         sphParams->m_kernelOverParticleRadiusRatio = 6.0;
-        sphParams->m_viscosityCoeff                = 0.5;
+        sphParams->m_dynamicViscosityCoeff         = 0.5;
         sphParams->m_surfaceTensionStiffness       = 5.0;
     }
 

@@ -145,9 +145,10 @@ SPHModel::initialize()
     m_timeStepCount = 0;
     m_previousTime = 0;
     m_timeModulo = m_writeToOutputModulo;
-    m_speedOfSound = 5;
+    m_speedOfSound = 0;
 
     m_beta = m_speedOfSound * m_speedOfSound * m_modelParameters->m_restDensity / 7.0;
+    m_beta = 1;
     //m_writeToCSVModulo = DBL_MAX;
 
     return true;
@@ -297,6 +298,42 @@ SPHModel::computeDensity()
             pdensity *= m_modelParameters->m_particleMass;
             getState().getDensities()[p] = pdensity;
         });
+
+    double averageDensityInlet = 0.0;
+    double averageDensityOutlet = 0.0;
+    double averageDensityFluid = 0.0;
+
+    int countInlet = 0;
+    int countOutlet = 0;
+    int countFluid = 0;
+    for (int i = 0; i < getState().getNumParticles(); i++)
+    {
+      if (std::find(m_bufferParticleIndices.begin(), m_bufferParticleIndices.end(), i) == m_bufferParticleIndices.end() &&
+        std::find(m_wallPointIndices.begin(), m_wallPointIndices.end(), i) == m_wallPointIndices.end())
+      {
+        if (getState().getPositions()[i].x() < m_inletRegionXCoord && getState().getPositions()[i].y() > m_inletOutletRegionYCoordDivision)
+        {
+          averageDensityInlet += getState().getDensities()[i];
+          countInlet++;
+        }
+        else if (getState().getPositions()[i].x() < m_outletRegionXCoord && getState().getPositions()[i].y() < m_inletOutletRegionYCoordDivision)
+        {
+          averageDensityOutlet += getState().getDensities()[i];
+          countOutlet++;
+        }
+        else 
+        {
+          averageDensityFluid += getState().getDensities()[i];
+          countFluid++;
+        }
+      }
+    }
+    std::cout << "Average density inlet: " << averageDensityInlet / countInlet << ", count inlet: " << countInlet << std::endl;
+    std::cout << "Average density outlet: " << averageDensityOutlet / countOutlet << ", count outlet: " << countOutlet << std::endl;
+    std::cout << "Average density fluid: " << averageDensityFluid / countFluid << ", count fluid: " << countFluid << std::endl;
+    std::cout << "Average density total: " << (averageDensityFluid + averageDensityInlet + averageDensityOutlet) / (countFluid + countInlet + countOutlet) << std::endl << std::endl;
+
+
 }
 
 void
@@ -396,8 +433,8 @@ SPHModel::computePressureAcceleration()
                 accel += -(ppressure / (pdensity * pdensity) + qpressure / (qdensity * qdensity)) * m_kernels.gradW(r);
             }
 
-            accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass / pdensity;
-            //accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass;
+            //accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass / pdensity;
+            accel *= m_modelParameters->m_pressureStiffness * m_modelParameters->m_particleMass;
 
             //getState().getAccelerations()[p] = accel;
             pressureAccels[p] = accel;
@@ -430,7 +467,7 @@ SPHModel::updateVelocityNoGravity(Real timestep)
   ParallelUtils::parallelFor(getState().getNumParticles(),
     [&](const size_t p) {
       getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
-      if (getState().getPositions()[p].x() < m_inletRegionXCoord)
+      if (getState().getPositions()[p].x() < m_inletRegionXCoord && getState().getPositions()[p].y() > m_inletOutletRegionYCoordDivision)
       {
           getState().getVelocities()[p] = computeParabolicInletVelocity(getState().getPositions()[p]);
       }
@@ -464,8 +501,8 @@ SPHModel::computeViscosity()
                 //diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.W(r) * (qvel - pvel);
 
             }
-            diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff / getState().getDensities()[p];
-            //diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff;
+            //diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff / getState().getDensities()[p];
+            diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff;
 
             Vec3r diffuseBoundary(0, 0, 0);
             if (m_modelParameters->m_bDensityWithBoundary)
@@ -579,7 +616,7 @@ SPHModel::moveParticles(Real timestep)
 		//periodicBCs(p);
 		if (!m_bufferParticleIndices.empty())
 		{
-			if (oldPosition.x() < m_inletRegionXCoord && newPosition.x() > m_inletRegionXCoord)
+			if (oldPosition.x() < m_inletRegionXCoord && newPosition.x() > m_inletRegionXCoord && oldPosition.y() > m_inletOutletRegionYCoordDivision)
 			{
 				// insert particle into inlet domain from buffer domain
 				const size_t bufferParticleIndex = m_bufferParticleIndices.back();
@@ -588,7 +625,7 @@ SPHModel::moveParticles(Real timestep)
         getState().getVelocities()[bufferParticleIndex] = Vec3r(0.0, 0.0, 0.0);
         //getState().getDensities()[bufferParticleIndex] = 1000.0; // update this to compute density based on points in inlet domain
 			}
-			else if (oldPosition.x() < m_maxXCoord && newPosition.x() > m_maxXCoord)
+			else if (oldPosition.x() > m_minXCoord && newPosition.x() < m_minXCoord)
 			{
 				// insert particle into buffer domain after it leaves outlet domain
 				getState().getPositions()[p] = Vec3d(m_bufferXCoord, 0, 0);
@@ -618,15 +655,15 @@ void SPHModel::printParticleTypes()
   for (int i = 0; i < getState().getNumParticles(); i++)
   {
     Vec3r position = getState().getPositions()[i];
-    if (position.x() < m_inletRegionXCoord)
+    if (position.x() < m_inletRegionXCoord && position.y() > m_inletOutletRegionYCoordDivision)
     {
       numInletParticles++;
     }
-    else if (position.x() > m_outletRegionXCoord && position.x() < m_maxXCoord)
+    else if (position.x() < m_outletRegionXCoord && position.y() < m_inletOutletRegionYCoordDivision)
     {
       numOutletParticles++;
     }
-    else if (position.x() > m_inletRegionXCoord && position.x() < m_outletRegionXCoord)
+    else if (position.x() > m_inletRegionXCoord && position.x() < m_maxXCoord)
     {
       numFluidParticles++;
     }
