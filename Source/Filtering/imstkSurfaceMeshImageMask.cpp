@@ -70,20 +70,14 @@ SurfaceMeshImageMask::requestUpdate()
         return;
     }
 
-    double spacing[3];
-    int    extent[6];
-    double origin[3];
+    Vec3d spacing;
+    int   extent[6];
+    Vec3d origin;
     if (refImageInput != nullptr)
     {
-        const Vec3d& refSpacing = refImageInput->getSpacing();
-        spacing[0] = refSpacing.x();
-        spacing[1] = refSpacing.y();
-        spacing[2] = refSpacing.z();
+        spacing = refImageInput->getSpacing();
 
-        const Vec3d& refOrigin = refImageInput->getOrigin();
-        origin[0] = refOrigin[0];
-        origin[1] = refOrigin[1];
-        origin[2] = refOrigin[2];
+        origin = refImageInput->getOrigin();
 
         const Vec3i& dim = refImageInput->getDimensions();
         extent[0] = 0;
@@ -103,59 +97,46 @@ SurfaceMeshImageMask::requestUpdate()
         Vec3d min;
         Vec3d max;
         surfMeshInput->computeBoundingBox(min, max);
-        double bounds[6] =
-        {
-            min.x(), max.x(),
-            min.y(), max.y(),
-            min.z(), max.z()
-        };
-        double size[3] = {
-            bounds[1] - bounds[0],
-            bounds[3] - bounds[2],
-            bounds[5] - bounds[4] };
-        // Spacing required leaving room for extent
-        // ie: User will still get 100x100x100 around their objects bounds, bounds will be slightly increased
-        spacing[0] = size[0] / Dimensions[0];
-        spacing[1] = size[1] / Dimensions[1];
-        spacing[2] = size[2] / Dimensions[2];
+
+        Vec3d size = max - min;
+
+        // Compute spacing required for given dimension
+        spacing = size.cwiseQuotient(Dimensions.cast<double>());
 
         // Increase bounds by px length
-        bounds[0] -= spacing[0] * BorderExtent;
-        bounds[1] += spacing[0] * BorderExtent;
-        bounds[2] -= spacing[1] * BorderExtent;
-        bounds[3] += spacing[1] * BorderExtent;
-        bounds[4] -= spacing[2] * BorderExtent;
-        bounds[5] += spacing[2] * BorderExtent;
+        min -= spacing * BorderExtent;
+        max += spacing * BorderExtent;
+
+        size = max - min;
 
         extent[0] = 0;
-        extent[1] = static_cast<int>((bounds[1] - bounds[0]) / spacing[0]) - 1;
+        extent[1] = (Dimensions[0] + BorderExtent) - 1;
         extent[2] = 0;
-        extent[3] = static_cast<int>((bounds[3] - bounds[2]) / spacing[1]) - 1;
+        extent[3] = (Dimensions[1] + BorderExtent) - 1;
         extent[4] = 0;
-        extent[5] = static_cast<int>((bounds[5] - bounds[4]) / spacing[2]) - 1;
-        origin[0] = bounds[0] + spacing[0] * 0.5;
-        origin[1] = bounds[2] + spacing[1] * 0.5;
-        origin[2] = bounds[4] + spacing[2] * 0.5;
+        extent[5] = (Dimensions[2] + BorderExtent) - 1;
+
+        origin = min - BorderExtent * spacing;
     }
 
     // Allocate a new white image
-    vtkSmartPointer<vtkImageData> whiteImage = vtkSmartPointer<vtkImageData>::New();
-    whiteImage->SetSpacing(spacing);
-    whiteImage->SetExtent(extent);
-    whiteImage->SetOrigin(origin);
-    whiteImage->AllocateScalars(VTK_FLOAT, 1);
-    int* dim = whiteImage->GetDimensions();
-    std::fill_n(static_cast<float*>(whiteImage->GetScalarPointer()), dim[0] * dim[1] * dim[2], 1.0f);
+    vtkNew<vtkImageData> baseImage;
+    baseImage->SetSpacing(spacing.data());
+    baseImage->SetExtent(extent);
+    baseImage->SetOrigin(origin.data());
+    baseImage->AllocateScalars(VTK_FLOAT, 1);
+    int* dim = baseImage->GetDimensions();
+    std::fill_n(static_cast<float*>(baseImage->GetScalarPointer()), dim[0] * dim[1] * dim[2], 1.0f);
 
     // Creates a new image mask from this polygon using a reference mask
-    vtkSmartPointer<vtkPolyDataToImageStencil> poly2Stencil = vtkSmartPointer<vtkPolyDataToImageStencil>::New();
+    vtkNew<vtkPolyDataToImageStencil> poly2Stencil;
     poly2Stencil->SetInputData(GeometryUtils::copyToVtkPolyData(surfMeshInput));
-    poly2Stencil->SetOutputOrigin(origin);
-    poly2Stencil->SetOutputSpacing(spacing);
+    poly2Stencil->SetOutputOrigin(origin.data());
+    poly2Stencil->SetOutputSpacing(spacing.data());
     poly2Stencil->SetOutputWholeExtent(extent);
     poly2Stencil->Update();
-    vtkSmartPointer<vtkImageStencil> imgStencil = vtkSmartPointer<vtkImageStencil>::New();
-    imgStencil->SetInputData(whiteImage);
+    vtkNew<vtkImageStencil> imgStencil;
+    imgStencil->SetInputData(baseImage);
     imgStencil->SetStencilData(poly2Stencil->GetOutput());
     imgStencil->ReverseStencilOff();
     imgStencil->SetBackgroundValue(0.0);

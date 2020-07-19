@@ -27,6 +27,7 @@ limitations under the License.
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkTaskGraph.h"
+#include "imstkImplicitGeometry.h"
 
 namespace imstk
 {
@@ -34,12 +35,11 @@ namespace imstk
 SphObjectCollisionPair::SphObjectCollisionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<CollidingObject> obj2,
                                                CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
 {
-    std::shared_ptr<Geometry> colGeometry = obj2->getCollidingGeometry();
-    if (colGeometry->getType() != Geometry::Type::ImplicitPlane
-        && colGeometry->getType() != Geometry::Type::ImplicitSphere
-        && colGeometry->getType() != Geometry::Type::SDF)
+    std::shared_ptr<Geometry>         colGeometry  = obj2->getCollidingGeometry();
+    std::shared_ptr<ImplicitGeometry> implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(colGeometry);
+    if (implicitGeom == nullptr)
     {
-        LOG(WARNING) << "SphObjectCollisionPair: geometry type not supported";
+        LOG(WARNING) << "Geometry, " << colGeometry->getName() << " not an ImplicitGeometry";
         return;
     }
 

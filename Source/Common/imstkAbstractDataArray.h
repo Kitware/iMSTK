@@ -29,6 +29,7 @@ namespace imstk
 /// \class AbstractDataArray
 ///
 /// \brief This class serves as the base class of DataArray, for typeless use
+/// \todo: Component support, AOS/SOA design
 ///
 class AbstractDataArray
 {
@@ -55,7 +56,7 @@ public:
     ///
     /// \brief Returns the number of elements in the array
     ///
-    virtual size_t size() = 0;
+    virtual size_t size() const = 0;
 
     ///
     /// \brief Returns void pointer to data
@@ -72,7 +73,7 @@ public:
     /// Would not recommend using this for performant code. Instead one should
     /// downcast to the type and use it there.
     ///
-    virtual const Variant getVariantValue(size_t element) = 0;
+    virtual const Variant getVariantValue(size_t element) const = 0;
 
 public:
     ///
@@ -105,6 +106,6 @@ protected:
 
 private:
     ScalarType m_scalarType;
-    Signal<void*, size_t> modifiedSignal;
+    expiremental::Signal<void*, size_t> modifiedSignal;
 };
 }

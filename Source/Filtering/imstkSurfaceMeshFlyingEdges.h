@@ -18,43 +18,45 @@
    limitations under the License.
 
 =========================================================================*/
-
 #pragma once
 
-#include "imstkImplicitGeometry.h"
+#include "imstkGeometryAlgorithm.h"
 
 namespace imstk
 {
+class ImageData;
+class SurfaceMesh;
+
 ///
-/// \class ImplicitPlane
+/// \class SurfaceMeshFlyingEdges
 ///
-/// \brief Implicitly defined plane
+/// \brief This filter extracts a single isocontour from an imstkImageData
 ///
-class ImplicitPlane : public ImplicitGeometry
+class SurfaceMeshFlyingEdges : public GeometryAlgorithm
 {
 public:
-    ImplicitPlane(const Vec3d& pos, const Vec3d& normal, std::string name = "") : ImplicitGeometry(Type::ImplicitPlane, name),
-        m_pos(pos), m_normal(normal.normalized())
-    {
-    }
-
-    virtual ~ImplicitPlane() override = default;
+    SurfaceMeshFlyingEdges();
+    virtual ~SurfaceMeshFlyingEdges() override = default;
 
 public:
     ///
-    /// \brief Returns signed distance to surface at pos
+    /// \brief Required input, port 0
     ///
-    virtual double getFunctionValue(const Vec3d& pos) const override { return m_normal.dot(pos - m_pos); }
+    void setInputImage(std::shared_ptr<ImageData> inputImage);
+
+    std::shared_ptr<SurfaceMesh> getOutputMesh() const;
+
+    imstkGetMacro(IsoValue, double);
 
     ///
-    /// \brief Returns gradient of signed distance field at pos
+    /// \brief Get the value at which the surface should be produced
     ///
-    virtual Vec3d getFunctionGrad(const Vec3d& pos) const override { return -getFunctionValue(pos) * m_normal; }
+    imstkSetMacro(IsoValue, double);
 
 protected:
-    // A point on the plane
-    Vec3d m_pos;
-    // The normal
-    Vec3d m_normal;
+    void requestUpdate() override;
+
+private:
+    double IsoValue = 0.0;
 };
-} //imstk
+}

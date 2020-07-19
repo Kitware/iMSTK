@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkTypes.h"
 
 #include <tbb/concurrent_unordered_set.h>
 
@@ -58,9 +59,8 @@ public:
         DecalPool,
         RenderParticles,
         ImageData,
-        ImplicitSphere,
-        ImplicitPlane,
-        SDF
+        SignedDistanceField,
+        CompositeImplicitGeometry
     };
 
     ///
@@ -107,6 +107,7 @@ public:
 
     ///
     /// \brief Compute the bounding box for the geometry
+    /// \todo Padding should not be here
     ///
     virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const;
 
@@ -207,9 +208,9 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VulkanRenderer;
 
-    virtual void applyTranslation(const Vec3d t) { }
-    virtual void applyRotation(const Mat3d r) { }
-    virtual void applyScaling(const double s) { }
+    virtual void applyTranslation(const Vec3d imstkNotUsed(t)) { }
+    virtual void applyRotation(const Mat3d imstkNotUsed(r)) { }
+    virtual void applyScaling(const double imstkNotUsed(s)) { }
     virtual void updatePostTransformData() const { }
 
     Type m_type;                 ///> Type of geometry

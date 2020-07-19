@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
+#include "imstkImplicitGeometry.h"
 
 namespace imstk
 {
@@ -30,10 +30,9 @@ namespace imstk
 ///
 /// \brief Base class for any analytical geometrical representation
 ///
-class AnalyticalGeometry : public Geometry
+class AnalyticalGeometry : public ImplicitGeometry
 {
 public:
-
     ///
     /// \brief Print
     ///
@@ -54,8 +53,12 @@ public:
     Vec3d getOrientationAxis(DataType type = DataType::PostTransform);
     void setOrientationAxis(const Vec3d axis);
 
-protected:
+    ///
+    /// \brief Returns signed distance to surface at pos
+    ///
+    virtual double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const override { return 0.0; }
 
+protected:
     explicit AnalyticalGeometry(Type type, const std::string& name = std::string(""));
 
     ///

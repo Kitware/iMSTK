@@ -32,14 +32,8 @@
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
-#include "imstkNew.h"
-
-#include "imstkSurfaceMeshDistanceTransform.h"
-#include "imstkCleanMesh.h"
-#include "imstkSurfaceMesh.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief This example demonstrates the volume renderer
@@ -54,19 +48,6 @@ main()
 
     // Use MeshIO to read the image dataset
     std::shared_ptr<ImageData> imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
-
-    std::shared_ptr<SurfaceMesh> surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-
-    imstkNew<CleanMesh> cleanSurfMesh;
-    cleanSurfMesh->setInputMesh(surfMesh);
-    cleanSurfMesh->update();
-
-    imstkNew<SurfaceMeshDistanceTransform> surfMeshDT;
-    surfMeshDT->setInputMesh(std::dynamic_pointer_cast<SurfaceMesh>(cleanSurfMesh->getOutput()));
-    surfMeshDT->setDimensions(100, 100, 100);
-    surfMeshDT->update();
-
-    MeshIO::write(surfMeshDT->getOutputImage(), "C:/Users/Andx_/Desktop/test.nii");
 
     // Create a visual object in the scene for the volume
     auto volumeObj = std::make_shared<VisualObject>("VisualVolume");
@@ -108,10 +89,6 @@ main()
             std::cout << "Displaying with volume material preset: " << count / 2 << std::endl;
             // Query for a volume material preset
             auto mat = imstk::VolumeRenderMaterialPresets::getPreset(count / 2);
-            //auto ctf = vtkSmartPointer<vtkColorTransferFunction>::New();
-            //ctf->AddRGBPoint(0.47, 1.0, 0.0, 0.0);
-            //ctf->AddRGBPoint(0.5, 0.0, 1.0, 1.0);
-            //mat->getVolumeProperty()->SetColor(ctf);
             // Apply the preset to the visual object
             volumeObj->getVisualModel(0)->setRenderMaterial(mat);
 

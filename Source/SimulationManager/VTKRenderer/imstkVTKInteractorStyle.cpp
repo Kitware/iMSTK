@@ -26,12 +26,15 @@
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 
+#include <vtkObjectFactory.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkTextActor.h>
 
 namespace imstk
 {
+vtkStandardNewMacro(VTKInteractorStyle);
+
 VTKInteractorStyle::VTKInteractorStyle()
 {
     m_textStatusManager = std::make_shared<VTKTextStatusManager>(this);
@@ -57,7 +60,7 @@ VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
     }
 
     // Set new current renderer
-    vtkBaseInteractorStyle::SetCurrentRenderer(ren);
+    vtkInteractorStyleTrackballCamera::SetCurrentRenderer(ren);
 
     // Add actor to current renderer
     for (int i = 0; i < VTKTextStatusManager::NumStatusTypes; ++i)
@@ -208,7 +211,7 @@ VTKInteractorStyle::OnMouseMove()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnMouseMove();
+    vtkInteractorStyleTrackballCamera::OnMouseMove();
 }
 
 void
@@ -229,7 +232,7 @@ VTKInteractorStyle::OnLeftButtonDown()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnLeftButtonDown();
+    vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
 }
 
 void
@@ -250,7 +253,7 @@ VTKInteractorStyle::OnLeftButtonUp()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnLeftButtonUp();
+    vtkInteractorStyleTrackballCamera::OnLeftButtonUp();
 }
 
 void
@@ -271,7 +274,7 @@ VTKInteractorStyle::OnMiddleButtonDown()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnMiddleButtonDown();
+    vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
 }
 
 void
@@ -292,7 +295,7 @@ VTKInteractorStyle::OnMiddleButtonUp()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnMiddleButtonUp();
+    vtkInteractorStyleTrackballCamera::OnMiddleButtonUp();
 }
 
 void
@@ -313,7 +316,7 @@ VTKInteractorStyle::OnRightButtonDown()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnRightButtonDown();
+    vtkInteractorStyleTrackballCamera::OnRightButtonDown();
 }
 
 void
@@ -334,7 +337,7 @@ VTKInteractorStyle::OnRightButtonUp()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnRightButtonUp();
+    vtkInteractorStyleTrackballCamera::OnRightButtonUp();
 }
 
 void
@@ -355,7 +358,7 @@ VTKInteractorStyle::OnMouseWheelForward()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnMouseWheelForward();
+    vtkInteractorStyleTrackballCamera::OnMouseWheelForward();
 }
 
 void
@@ -376,6 +379,6 @@ VTKInteractorStyle::OnMouseWheelBackward()
     }
 
     // Else : use base class interaction
-    vtkBaseInteractorStyle::OnMouseWheelBackward();
+    vtkInteractorStyleTrackballCamera::OnMouseWheelBackward();
 }
 } // imstk

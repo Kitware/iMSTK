@@ -20,7 +20,10 @@
 =========================================================================*/
 
 #pragma once
+
 #include "imstkAbstractDataArray.h"
+#include "imstkParallelReduce.h"
+
 #include <vector>
 
 namespace imstk
@@ -29,6 +32,7 @@ namespace imstk
 /// \class DataArray
 ///
 /// \brief This class serves as a wrapping to STL vector, it also provides modified callback
+/// \todo: Support tuples/components
 ///
 template<class T>
 class DataArray : public AbstractDataArray
@@ -63,14 +67,15 @@ public:
 
     inline void reserve(const size_t count) override { vec.reserve(count); }
 
-    inline size_t size() override { return vec.size(); }
+    inline size_t size() const override { return vec.size(); }
 
     inline T* getPointer() { return vec.data(); }
     inline void* getVoidPointer() override { return static_cast<void*>(vec.data()); }
 
-    inline const Variant getVariantValue(size_t i) override { return Variant(vec[i]); }
+    inline const Variant getVariantValue(size_t i) const override { return Variant(vec[i]); }
 
     inline T& operator[](const size_t pos) { return vec[pos]; }
+    inline const T& operator[](const size_t pos) const { return vec[pos]; }
 
     ///
     /// \brief Allow initialization from initializer list, ie: DataArray<int> arr = { 1, 2 }
@@ -80,6 +85,16 @@ public:
     {
         vec = std::vector<U>(list.begin(), list.end());
         return *this;
+    }
+
+    ///
+    /// \brief Computes the scalar range
+    ///
+    inline Vec2d getScalarRange() const
+    {
+        ParallelUtils::RangeFunctor<std::vector<T>> pObj(vec);
+        tbb::parallel_reduce(tbb::blocked_range<size_t>(0, vec.size()), pObj);
+        return pObj.getRange();
     }
 
 private:

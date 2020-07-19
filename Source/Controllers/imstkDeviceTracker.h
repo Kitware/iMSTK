@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~DeviceTracker() = default;
+    virtual ~DeviceTracker() = default;
 
     ///
     /// \brief Compute the world position and orientation

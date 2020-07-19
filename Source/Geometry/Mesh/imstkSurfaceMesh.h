@@ -208,8 +208,13 @@ public:
     ///
     size_t getMaxNumTriangles();
 
-protected:
+    ///
+    /// \brief Copy the contents of one SurfaceMesh to the other
+    /// todo: generalize base classes and implement for every geometry
+    ///
+    void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
 
+protected:
     friend class VTKSurfaceMeshRenderDelegate;
 
     ///

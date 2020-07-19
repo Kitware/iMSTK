@@ -27,34 +27,19 @@ namespace imstk
 {
 namespace expiremental
 {
-//template <typename T>
-//struct IsComplete
-//{
-//private:
-//	template <typename U, std::size_t = sizeof(U)>
-//	static std::true_type impl(U*);
-//	static std::false_type impl(...);
-//	using bool_constant = decltype(impl(std::declval<T*>()));
+//template<typename T>
+//using imstkSmartPtr = std::shared_ptr<T>;
 //
-//public:
-//	static constexpr bool value = bool_constant::value;
-//};
-
-template<typename T>
-using imstkSmartPtr = std::shared_ptr<T>;
-
-template<typename T>
-using imstkWeakPtr = std::weak_ptr<T>;
-
-template<typename T>
-using imstkUniquePtr = std::unique_ptr<T>;
+//template<typename T>
+//using imstkWeakPtr = std::weak_ptr<T>;
+//
+//template<typename T>
+//using imstkUniquePtr = std::unique_ptr<T>;
 
 ///
 /// \class imstkNew
 ///
-/// \brief Convenience class for STL shared allocations. Since one cannot do
-/// multiple implicit conversions this cannot be used directly as argument
-/// to a function accepting a base class of T. Use get() instead.
+/// \brief Convenience class for STL shared allocations.
 ///
 template<class T>
 class imstkNew
@@ -72,23 +57,6 @@ public:
     // Move, reference to old is removed
     imstkNew(imstkNew&& obj) : object(obj.object) { obj.object = nullptr; }
 
-// Move from different type (intended for polymorphic), IsComplete is ill defined
-//template<class U>
-//imstkNew(imstkNew<U>&& obj) : object(obj.object)
-//{
-//	// Check they have not been forward declared
-//	static_assert(IsComplete<T>::value,
-//		"imstkNew<T>'s T type has not been defined. Missing include?");
-//	static_assert(IsComplete<U>::value,
-//		"Cannot store an object with undefined type in imstkNew. Missing include?");
-
-//	// Check that one is base of the other
-//	static_assert(std::is_base_of<U, T>::value,
-//		"Argument U type not compatible with imstkNew<T>'s T");
-
-//	obj.object = nullptr;
-//}
-
 public:
     T* operator->() const { return object.get(); }
     T& operator*() const { return *static_cast<T*>(object); }
@@ -105,8 +73,8 @@ public:
 
     ///
     /// \brief Implicit conversion, cannot do two implicit conversions in a row.
-    /// Thus it's not possible to go from imstkNew<T> -> std::shared_ptr<U>
-    /// where T : U using this conversion
+    /// Thus it's not possible to go from imstkNew<T> -> std::shared_ptr<U> with
+    /// this function. Where T : U.
     ///
     operator std::shared_ptr<T>() const { return object; }
 

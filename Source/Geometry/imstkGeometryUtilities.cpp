@@ -143,12 +143,13 @@ GeometryUtils::coupleVtkImageData(std::shared_ptr<ImageData> imageData)
 }
 
 vtkSmartPointer<vtkDataArray>
-GeometryUtils::copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray)
+GeometryUtils::copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray, int numComps)
 {
     CHECK(imstkArray != nullptr) << "AbstractDataArray provided is not valid!";
 
     // Create resulting data array
     vtkSmartPointer<vtkDataArray> arr = makeVtkDataArray(imstkToVtkScalarType[imstkArray->getScalarType()]);
+    arr->SetNumberOfComponents(numComps);
     arr->SetNumberOfValues(imstkArray->size());
     switch (imstkArray->getScalarType())
     {
@@ -212,7 +213,7 @@ GeometryUtils::copyToVtkImageData(std::shared_ptr<ImageData> imageData)
     imageDataVtk->SetOrigin(imageData->getOrigin().data());
     imageDataVtk->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
     imageDataVtk->AllocateScalars(imstkToVtkScalarType[imageData->getScalarType()], imageData->getNumComponents());
-    imageDataVtk->GetPointData()->SetScalars(copyToVtkDataArray(imageData->getScalars()));
+    imageDataVtk->GetPointData()->SetScalars(copyToVtkDataArray(imageData->getScalars(), imageData->getNumComponents()));
     return imageDataVtk;
 }
 
@@ -477,8 +478,12 @@ GeometryUtils::copyPointDataFromVtk(vtkPointData* const pointData, std::map<std:
 
     for (int i = 0; i < pointData->GetNumberOfArrays(); ++i)
     {
-        vtkDataArray*      array       = pointData->GetArray(i);
-        std::string        name        = array->GetName();
+        vtkDataArray* array = pointData->GetArray(i);
+        std::string   name  = "";
+        if (array->GetName() != NULL)
+        {
+            name = array->GetName();
+        }
         int                nbrOfComp   = array->GetNumberOfComponents();
         vtkIdType          nbrOfTuples = array->GetNumberOfTuples();
         StdVectorOfVectorf data;

@@ -30,18 +30,17 @@ namespace imstk
 {
 class SimulationManager;
 class VTKTextStatusManager;
-/// Base class of the vtk interactor style used
-using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 
 ///
 /// \class VTKInteractorStyle
 ///
 /// \brief TODO
 ///
-class VTKInteractorStyle : public vtkBaseInteractorStyle, public InteractorStyle
+class VTKInteractorStyle : public vtkInteractorStyleTrackballCamera, public InteractorStyle
 {
 public:
-    vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle) VTKInteractorStyle();
+    static VTKInteractorStyle* New();
+    vtkTypeMacro(VTKInteractorStyle, vtkInteractorStyleTrackballCamera) VTKInteractorStyle();
     virtual ~VTKInteractorStyle() override;
 
     ///

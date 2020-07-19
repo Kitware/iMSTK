@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCleanMesh.h"
 #include "imstkCollisionGraph.h"
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
@@ -47,28 +46,32 @@ using namespace imstk::expiremental;
 ///
 /// \brief Generate a volume of fluid with the specified SurfaceMesh
 ///
-std::shared_ptr<StdVectorOfVec3d>
-generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> spawnVolumeSurface)
+static std::shared_ptr<StdVectorOfVec3d>
+generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> spawnSurfaceVolume)
 {
     Vec3d minima, maxima;
-    spawnVolumeSurface->computeBoundingBox(minima, maxima);
+    spawnSurfaceVolume->computeBoundingBox(minima, maxima);
 
     double      particleDiameter = particleRadius * 2.0;
     const Vec3d size = (maxima - minima) + Vec3d(particleDiameter, particleDiameter, particleDiameter);
     Vec3i       dim  = size.cwiseProduct(Vec3d(1.0 / particleDiameter, 1.0 / particleDiameter, 1.0 / particleDiameter)).cast<int>();
 
+    // Compute the binary mask
     imstkNew<SurfaceMeshImageMask> makeBinaryMask;
-    makeBinaryMask->setInputMesh(spawnVolumeSurface);
+    makeBinaryMask->setInputMesh(spawnSurfaceVolume);
     makeBinaryMask->setDimensions(dim[0], dim[1], dim[2]);
     makeBinaryMask->update();
+
+    // Compute the DT (won't perfectly conform to surface as we used a binary mask)
     imstkNew<ImageDistanceTransform> distTransformFromMask;
     distTransformFromMask->setInputImage(makeBinaryMask->getOutputImage());
     distTransformFromMask->update();
 
-    DataArray<float>& scalars = *std::dynamic_pointer_cast<DataArray<float>>(distTransformFromMask->getOutputImage()->getScalars());
-    const Vec3i&      dim1    = makeBinaryMask->getOutputImage()->getDimensions();
-    const Vec3d&      spacing = makeBinaryMask->getOutputImage()->getSpacing();
-    const Vec3d&      shift   = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
+    const DataArray<float>& scalars   = *std::dynamic_pointer_cast<DataArray<float>>(distTransformFromMask->getOutputImage()->getScalars());
+    const Vec3i&            dim1      = makeBinaryMask->getOutputImage()->getDimensions();
+    const Vec3d&            spacing   = makeBinaryMask->getOutputImage()->getSpacing();
+    const Vec3d&            shift     = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
+    const double            threshold = particleDiameter * 1.0; // How far from the boundary to accept particles
 
     imstkNew<StdVectorOfVec3d> particles;
     particles->reserve(dim1[0] * dim1[1] * dim1[2]);
@@ -80,7 +83,7 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
         {
             for (int x = 0; x < dim1[0]; x++, i++)
             {
-                if (scalars[i] < -particleDiameter * 3.0)
+                if (x > 1 && y > 1 && z > 1 && scalars[i] < -threshold)
                 {
                     particles->push_back(Vec3d(x, y, z).cwiseProduct(spacing) + shift);
                 }
@@ -91,15 +94,16 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     return particles;
 }
 
-std::shared_ptr<SPHObject>
-makeSPHObject(const std::string& name, const double particleRadius)
+static std::shared_ptr<SPHObject>
+makeSPHObject(const std::string& name, const double particleRadius, const double particleSpacing)
 {
     // Create the sph object
     imstkNew<SPHObject> fluidObj(name);
 
     // Setup the Geometry
-    auto                              fluidSpawnVolumeSurf = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/vesselsCut.stl");
-    std::shared_ptr<StdVectorOfVec3d> particles = generateFluidVolume(particleRadius, fluidSpawnVolumeSurf);
+    auto spawnMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/femoralArteryCut.stl");
+    // By spacing them slightly closer we can induce larger compression at the start
+    std::shared_ptr<StdVectorOfVec3d> particles = generateFluidVolume(particleSpacing, spawnMesh);
     LOG(INFO) << "Number of particles: " << particles->size();
     imstkNew<PointSet> fluidGeometry;
     fluidGeometry->initialize(*particles);
@@ -136,42 +140,67 @@ makeSPHObject(const std::string& name, const double particleRadius)
 }
 
 static std::shared_ptr<CollidingObject>
-makeCollidingObject(const std::string& name, const Vec3d& position)
+makeLegs(const std::string& name, const Vec3d& position)
 {
     // Create the pbd object
-    imstkNew<CollidingObject> collidingObj(name);
+    imstkNew<CollidingObject> legsObj(name);
 
     // Setup the Geometry (read dragon mesh)
-    auto fullBodyMesh  = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/humanWithHead.stl");
-    auto collisionMesh = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/human model/invertedVessels.stl");
+    auto legsMesh      = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/legsCutaway.stl");
+    auto bonesMesh     = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/legsBones.stl");
+    auto femoralMesh   = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/femoralArtery.stl");
+    auto collisionMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/femoralArteryCut.stl");
 
-    imstkNew<CleanMesh> cleanMesh;
-    cleanMesh->setInputMesh(collisionMesh);
-    cleanMesh->update();
+    // Setup the Legs VisualModel
+    imstkNew<VisualModel>    legsMeshModel(legsMesh);
+    imstkNew<RenderMaterial> legsMaterial;
+    legsMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    legsMaterial->setOpacity(0.85f);
+    legsMaterial->setDiffuseColor(Color(0.8, 0.688, 0.396));
+    legsMeshModel->setRenderMaterial(legsMaterial);
+
+    // Setup the Bones VisualModel
+    imstkNew<VisualModel>    bonesMeshModel(bonesMesh);
+    imstkNew<RenderMaterial> bonesMaterial;
+    bonesMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    bonesMaterial->setDiffuseColor(Color(0.538, 0.538, 0.538));
+    bonesMeshModel->setRenderMaterial(bonesMaterial);
+
+    // Setup the Femoral VisualModel
+    imstkNew<VisualModel>    femoralMeshModel(femoralMesh);
+    imstkNew<RenderMaterial> femoralMaterial;
+    femoralMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    femoralMaterial->setOpacity(0.2f);
+    femoralMaterial->setDiffuseColor(Color(0.8, 0.119, 0.180));
+    femoralMeshModel->setRenderMaterial(femoralMaterial);
+
+    // Setup the Object
+    legsObj->addVisualModel(legsMeshModel);
+    legsObj->addVisualModel(bonesMeshModel);
+    legsObj->addVisualModel(femoralMeshModel);
 
     LOG(INFO) << "Computing SDF";
     imstkNew<SurfaceMeshDistanceTransform> computeSdf;
-    computeSdf->setInputMesh(cleanMesh->getOutputMesh());
-    computeSdf->setDimensions(150, 150, 150);
+    computeSdf->setInputMesh(collisionMesh);
+    computeSdf->setDimensions(100, 100, 100);
+    Vec3d min, max;
+    collisionMesh->computeBoundingBox(min, max);
+    const Vec3d size = max - min;
+    Vec6d       bounds;
+    bounds[0] = min[0] - size[0] * 0.25;
+    bounds[1] = max[0] + size[0] * 0.25;
+    bounds[2] = min[1] - size[1] * 0.25;
+    bounds[3] = max[1] + size[1] * 0.25;
+    bounds[4] = min[2] - size[2] * 0.25;
+    bounds[5] = max[2] + size[2] * 0.25;
+    computeSdf->setBounds(bounds);
+    computeSdf->setUseBounds(true);
     computeSdf->update();
     LOG(INFO) << "SDF Complete";
-
-    // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
-    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    material->setOpacity(0.2f);
-    material->setDiffuseColor(Color(71.0 / 255.0, 61.0 / 255.0, 57.0 / 255.0, 1.0));
-    imstkNew<VisualModel> surfMeshModel(fullBodyMesh);
-    surfMeshModel->setRenderMaterial(material);
-    //surfMeshModel->hide();
-
-    // Setup the Object
-    collidingObj->addVisualModel(surfMeshModel);
-    collidingObj->setCollidingGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
-
+    legsObj->setCollidingGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
     MeshIO::write(computeSdf->getOutputImage(), "C:/Users/Andx_/Desktop/test.nii");
 
-    return collidingObj;
+    return legsObj;
 }
 
 ///
@@ -186,26 +215,31 @@ main()
 
     // Setup the scene
     {
-        scene->getCamera()->setPosition(1.5, 5.0, 1.0);
-        scene->getCamera()->setFocalPoint(0.0, 4.5, 0.0);
         //scene->getConfig()->taskTimingEnabled = true;
 
         // Static Dragon object
-        std::shared_ptr<CollidingObject> dragonObj = makeCollidingObject("Vessel", Vec3d(0.0, 0.0, 0.0));
-        scene->addSceneObject(dragonObj);
+        std::shared_ptr<CollidingObject> legsObj = makeLegs("Vessel", Vec3d(0.0, 0.0, 0.0));
+        scene->addSceneObject(legsObj);
+
+        // Position the camera
+        const Vec6d& bounds = std::dynamic_pointer_cast<SignedDistanceField>(legsObj->getCollidingGeometry())->getBounds();
+        const Vec3d  center = (Vec3d(bounds[0], bounds[2], bounds[4]) + Vec3d(bounds[1], bounds[3], bounds[5])) * 0.5;
+        scene->getCamera()->setPosition(3.25, 1.6, 3.38);
+        scene->getCamera()->setFocalPoint(-2.05, 1.89, -1.32);
+        scene->getCamera()->setViewUp(-0.66, 0.01, 0.75);
 
         // SPH fluid box overtop the dragon
-        std::shared_ptr<SPHObject> sphObj = makeSPHObject("Fluid", 0.003);
+        std::shared_ptr<SPHObject> sphObj = makeSPHObject("Fluid", 0.004, 0.0035);
         scene->addSceneObject(sphObj);
 
         // Interaction
-        imstkNew<SphObjectCollisionPair> collisionInteraction(sphObj, dragonObj, CollisionDetection::Type::PointSetToImplicit);
+        imstkNew<SphObjectCollisionPair> collisionInteraction(sphObj, legsObj, CollisionDetection::Type::PointSetToImplicit);
         scene->getCollisionGraph()->addInteraction(collisionInteraction);
 
         // Light
         imstkNew<DirectionalLight> light("light");
         light->setDirection(0.0, 1.0, -1.0);
-        light->setIntensity(1);
+        light->setIntensity(1.0);
         scene->addLight(light);
     }
 

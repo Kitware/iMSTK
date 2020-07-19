@@ -51,14 +51,17 @@ public:
 
     ///
     /// \brief Returns gradient of signed distance field at pos
+    /// overriden to avoid multiple bounds check done in getFunctionValue
     ///
-    virtual Vec3d getFunctionGrad(const Vec3d& pos) const override;
+    virtual Vec3d getFunctionGrad(const Vec3d& pos, const double dx = 1.0) const override;
+
+    const Vec6d& getBounds() const { return m_bounds; }
 
 protected:
     std::shared_ptr<ImageData> m_imageDataSdf;
     std::shared_ptr<ImageData> m_imageDataGradient;
-    Vec3d invSpacing;
-    Vec6d bounds;
+    Vec3d m_invSpacing;
+    Vec6d m_bounds;
     std::shared_ptr<DataArray<float>> m_scalars;
 };
 }

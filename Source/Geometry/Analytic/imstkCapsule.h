@@ -71,6 +71,10 @@ public:
 protected:
     friend class VTKCapsuleRenderDelegate;
 
+    // Hide these unimplemented functions
+    using AnalyticalGeometry::getFunctionValue;
+    using AnalyticalGeometry::getFunctionGrad;
+
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;
 

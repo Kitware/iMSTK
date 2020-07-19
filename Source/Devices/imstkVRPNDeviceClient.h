@@ -51,8 +51,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~VRPNDeviceClient()
-    {}
+    virtual ~VRPNDeviceClient() override = default;
 
 protected:
     ///

@@ -99,7 +99,7 @@ vtkSmartPointer<vtkImageData> coupleVtkImageData(std::shared_ptr<ImageData> imst
 ///
 /// \brief Copy functions
 ///
-vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
+vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray, int numComps = 1);
 std::shared_ptr<AbstractDataArray> copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray);
 
 std::unique_ptr<ImageData> copyToImageData(vtkSmartPointer<vtkImageData> imageDataVtk);

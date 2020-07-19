@@ -36,7 +36,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    Cylinder(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Cylinder, name) {}
+    explicit Cylinder(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const double length = 1.0,
+                      const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0), const std::string& name = std::string("")) : AnalyticalGeometry(Type::Cylinder, name)
+    {
+        setPosition(pos);
+        setOrientationAxis(orientationAxis);
+        setRadius(radius);
+        setLength(length);
+        updatePostTransformData();
+    }
 
     ///
     /// \brief Print the cylinder info
@@ -70,6 +78,10 @@ public:
 
 protected:
     friend class VTKCylinderRenderDelegate;
+
+    // Hide these unimplemented functions
+    using AnalyticalGeometry::getFunctionValue;
+    using AnalyticalGeometry::getFunctionGrad;
 
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;

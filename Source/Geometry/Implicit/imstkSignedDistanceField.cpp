@@ -79,29 +79,29 @@ trilinearSample(const Vec3d& structuredPt, T* imgPtr, const Vec3i& dim, const in
 }
 
 ///
-/// \brief Trilinearly samples out the gradient, could precompute
+/// \brief Gives the gradient of the image in structured coordinate space
 ///
 template<typename T>
 static Vec3d
-trilinearGrad(const Vec3d& pt, T* imgPtr, const Vec3i& dim)
+trilinearGrad(const Vec3d& pt, T* imgPtr, const Vec3i& dim, const double dx = 1.0)
 {
-    const double xminVal = static_cast<double>(trilinearSample(Vec3d(pt[0] - 1.0, pt[1], pt[2]), imgPtr, dim, 1, 0));
-    const double xmaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0] + 1.0, pt[1], pt[2]), imgPtr, dim, 1, 0));
-    const double yminVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1] - 1.0, pt[2]), imgPtr, dim, 1, 0));
-    const double ymaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1] + 1.0, pt[2]), imgPtr, dim, 1, 0));
-    const double zminVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1], pt[2] - 1.0), imgPtr, dim, 1, 0));
-    const double zmaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1], pt[2] + 1.0), imgPtr, dim, 1, 0));
+    const double xminVal = static_cast<double>(trilinearSample(Vec3d(pt[0] - dx, pt[1], pt[2]), imgPtr, dim, 1, 0));
+    const double xmaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0] + dx, pt[1], pt[2]), imgPtr, dim, 1, 0));
+    const double yminVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1] - dx, pt[2]), imgPtr, dim, 1, 0));
+    const double ymaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1] + dx, pt[2]), imgPtr, dim, 1, 0));
+    const double zminVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1], pt[2] - dx), imgPtr, dim, 1, 0));
+    const double zmaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1], pt[2] + dx), imgPtr, dim, 1, 0));
 
     return Vec3d(xmaxVal - xminVal, ymaxVal - yminVal, zmaxVal - zminVal);
 }
 
 SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name) :
-    ImplicitGeometry(Type::SDF, name),
+    ImplicitGeometry(Type::SignedDistanceField, name),
     m_imageDataSdf(imageData)
 {
     const Vec3d& spacing = m_imageDataSdf->getSpacing();
-    invSpacing = Vec3d(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
-    bounds     = m_imageDataSdf->getBounds();
+    m_invSpacing = Vec3d(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
+    m_bounds     = m_imageDataSdf->getBounds();
 
     if (m_imageDataSdf->getScalarType() != IMSTK_FLOAT)
     {
@@ -115,28 +115,28 @@ SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, s
 double
 SignedDistanceField::getFunctionValue(const Vec3d& pos) const
 {
-    if (pos[0] < bounds[0] || pos[0] > bounds[1] || pos[1] < bounds[2] || pos[1] > bounds[3] || pos[2] < bounds[4] || pos[2] > bounds[5])
+    if (pos[0] < m_bounds[0] || pos[0] > m_bounds[1] || pos[1] < m_bounds[2] || pos[1] > m_bounds[3] || pos[2] < m_bounds[4] || pos[2] > m_bounds[5])
     {
         return IMSTK_DOUBLE_MAX;
     }
     else
     {
-        const Vec3d structuredPt = (pos - m_imageDataSdf->getOrigin()).cwiseProduct(invSpacing);
+        const Vec3d structuredPt = (pos - m_imageDataSdf->getOrigin()).cwiseProduct(m_invSpacing);
         return trilinearSample(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), 1, 0);
     }
 }
 
 Vec3d
-SignedDistanceField::getFunctionGrad(const Vec3d& pos) const
+SignedDistanceField::getFunctionGrad(const Vec3d& pos, const double dx) const
 {
-    if (pos[0] < bounds[0] || pos[0] > bounds[1] || pos[1] < bounds[2] || pos[1] > bounds[3] || pos[2] < bounds[4] || pos[2] > bounds[5])
+    if (pos[0] < m_bounds[0] || pos[0] > m_bounds[1] || pos[1] < m_bounds[2] || pos[1] > m_bounds[3] || pos[2] < m_bounds[4] || pos[2] > m_bounds[5])
     {
         return Vec3d(0.0, 0.0, 0.0);
     }
     else
     {
-        const Vec3d structuredPt = (pos - m_imageDataSdf->getOrigin()).cwiseProduct(invSpacing);
-        return trilinearGrad(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions());
+        const Vec3d structuredPt = (pos - m_imageDataSdf->getOrigin()).cwiseProduct(m_invSpacing);
+        return trilinearGrad(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), dx).cwiseProduct(m_invSpacing);
     }
 }
 }

@@ -26,6 +26,8 @@
 
 namespace imstk
 {
+namespace expiremental
+{
 ///
 /// \class Signal
 ///
@@ -70,4 +72,5 @@ private:
     std::unordered_map<unsigned int, std::function<void(Args...)>> slots;
     unsigned int handleIter = 0;
 };
+}
 }

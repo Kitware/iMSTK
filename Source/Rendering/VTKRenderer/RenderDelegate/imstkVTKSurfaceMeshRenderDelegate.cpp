@@ -170,7 +170,6 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     {
         return;
     }
-    m_actor->GetProperty()->SetOpacity(material->getOpacity());
 
     unsigned int currentUnit = 0;
 

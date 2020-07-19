@@ -218,6 +218,18 @@ PointSet::getPointDataArray(const std::string& arrayName) const
     return &(it->second);
 }
 
+StdVectorOfVectorf*
+PointSet::getPointDataArray(const std::string& arrayName)
+{
+    auto it = m_pointDataMap.find(arrayName);
+    if (it == m_pointDataMap.end())
+    {
+        LOG(WARNING) << "No array with such name holds any point data.";
+        return nullptr;
+    }
+    return &(it->second);
+}
+
 bool
 PointSet::hasPointDataArray(const std::string& arrayName) const
 {

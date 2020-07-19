@@ -211,12 +211,25 @@ SurfaceMeshDistanceTransform::requestUpdate()
     Vec3d min;
     Vec3d max;
     inputSurfaceMesh->computeBoundingBox(min, max);
-    double bounds[6] =
+    double bounds[6];
+    if (UseBounds)
     {
-        min.x(), max.x(),
-        min.y(), max.y(),
-        min.z(), max.z()
-    };
+        bounds[0] = Bounds[0];
+        bounds[1] = Bounds[1];
+        bounds[2] = Bounds[2];
+        bounds[3] = Bounds[3];
+        bounds[4] = Bounds[4];
+        bounds[5] = Bounds[5];
+    }
+    else
+    {
+        bounds[0] = min[0];
+        bounds[1] = max[0];
+        bounds[2] = min[1];
+        bounds[3] = max[1];
+        bounds[4] = min[2];
+        bounds[5] = max[2];
+    }
     Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
     Vec3d spacing = size.cwiseQuotient(Dimensions.cast<double>());
     Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);

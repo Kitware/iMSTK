@@ -27,7 +27,7 @@ namespace imstk
 class SurfaceMesh;
 
 ///
-/// \class CleanMesh
+/// \class SurfaceMeshSmoothen
 ///
 /// \brief This filter smoothes the input SurfaceMesh currently only laplacian
 /// smoothing is provided

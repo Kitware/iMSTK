@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-#include "imstkBackwardEuler.h"
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkLight.h"

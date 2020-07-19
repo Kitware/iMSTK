@@ -93,19 +93,19 @@ RenderParticles::getMaxNumParticles()
 }
 
 void
-RenderParticles::applyTranslation(const Vec3d t)
+RenderParticles::applyTranslation(const Vec3d imstkNotUsed(t))
 {
     LOG(WARNING) << "applyTranslation Not implemented!";
 }
 
 void
-RenderParticles::applyRotation(const Mat3d r)
+RenderParticles::applyRotation(const Mat3d imstkNotUsed(r))
 {
     LOG(WARNING) << "applyRotation Not implemented!";
 }
 
 void
-RenderParticles::applyScaling(const double s)
+RenderParticles::applyScaling(const double imstkNotUsed(s))
 {
     LOG(WARNING) << "applyScaling Not implemented!";
 }

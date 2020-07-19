@@ -60,7 +60,6 @@ SimulationManager::createViewer(const bool enableVR)
 #ifdef iMSTK_ENABLE_VR
         m_viewer = std::make_shared<VTKViewer>(this, enableVR);
 #else
-
         LOG_IF(FATAL, enableVR) << "Can not run VR simulation without iMSTK_ENABLE_VR";
 
         m_viewer = std::make_shared<VTKViewer>(this, false);
@@ -321,7 +320,7 @@ SimulationManager::setActiveScene(const std::string& newSceneName,
         // create viewer if the selected mode is 'rendering'
         if (m_config->simulationMode == SimulationMode::Rendering)
         {
-            createViewer(m_config->VR_Enabled);
+            createViewer(m_config->enableVR);
         }
     }
 

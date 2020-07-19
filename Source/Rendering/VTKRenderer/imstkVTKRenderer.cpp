@@ -537,6 +537,13 @@ VTKRenderer::updateRenderDelegates()
         }
     }
 
+    /* double* p = m_vtkRenderer->GetActiveCamera()->GetPosition();
+     double* f = m_vtkRenderer->GetActiveCamera()->GetFocalPoint();
+     double* v = m_vtkRenderer->GetActiveCamera()->GetViewUp();
+     printf("Pos: %f, %f, %f\n", p[0], p[1], p[2]);
+     printf("FocalPt: %f, %f, %f\n", f[0], f[1], f[2]);
+     printf("Up: %f, %f, %f\n", v[0], v[1], v[2]);*/
+
     for (auto delegate : m_renderDelegates)
     {
         delegate->update();

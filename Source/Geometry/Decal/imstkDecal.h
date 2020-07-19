@@ -54,6 +54,10 @@ public:
 protected:
     friend class VulkanDecalRenderDelegate;
 
+    // Hide these functions
+    using AnalyticalGeometry::getFunctionValue;
+    using AnalyticalGeometry::getFunctionGrad;
+
     void applyScaling(const double s) override;
 
     glm::vec3 m_dimensions;

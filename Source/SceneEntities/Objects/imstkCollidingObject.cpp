@@ -47,7 +47,7 @@ CollidingObject::getCollidingGeometry() const
 }
 
 void
-CollidingObject::setCollidingGeometry(const std::shared_ptr<Geometry>& geometry)
+CollidingObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_collidingGeometry = geometry;
 }

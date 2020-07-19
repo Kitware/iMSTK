@@ -20,8 +20,9 @@
 =========================================================================*/
 
 #include "imstkViewer.h"
-#include "imstkLogger.h"
 #include "imstkInteractorStyle.h"
+#include "imstkLogger.h"
+#include "imstkOpenVRDeviceClient.h"
 
 #ifdef iMSTK_USE_Vulkan
 #include "imstkGUICanvas.h"
@@ -29,7 +30,11 @@
 
 namespace imstk
 {
-Viewer::Viewer() : m_config(std::make_shared<viewerConfig>())
+Viewer::Viewer() : m_config(std::make_shared<ViewerConfig>())
+{
+}
+
+Viewer::Viewer(ViewerConfig config) : m_config(std::make_shared<ViewerConfig>(config))
 {
 #ifdef iMSTK_USE_Vulkan
     m_canvas(std::make_shared<GUIOverlay::Canvas>())
@@ -135,5 +140,16 @@ void
 Viewer::setOnTimerFunction(EventHandlerFunction func)
 {
     m_interactorStyle->m_onTimerFunction = func;
+}
+
+std::shared_ptr<OpenVRDeviceClient>
+Viewer::getVRDeviceClient(int deviceType)
+{
+    auto iter = std::find_if(m_vrDeviceClients.begin(), m_vrDeviceClients.end(),
+        [&](const std::shared_ptr<OpenVRDeviceClient>& deviceClient)
+        {
+            return static_cast<int>(deviceClient->getDeviceType()) == deviceType;
+        });
+    return (iter == m_vrDeviceClients.end()) ? nullptr : *iter;
 }
 }

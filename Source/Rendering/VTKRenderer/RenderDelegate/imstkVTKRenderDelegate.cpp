@@ -492,8 +492,8 @@ VTKRenderDelegate::updateActorPropertiesMesh()
         }
     }
 
-    /* actorProperty->SetBackfaceCulling(material->getBackfaceCulling());
-     actorProperty->SetOpacity(material->getOpacity());*/
+    //actorProperty->SetBackfaceCulling(material->getBackfaceCulling());
+    actorProperty->SetOpacity(material->getOpacity());
 
     // Material state is now up-to-date
     material->m_stateModified = false;

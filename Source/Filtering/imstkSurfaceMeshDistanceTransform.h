@@ -49,6 +49,8 @@ public:
     std::shared_ptr<ImageData> getOutputImage();
 
     imstkGetMacro(Dimensions, const Vec3i&);
+    imstkGetMacro(Bounds, const Vec6d&);
+    imstkGetMacro(UseBounds, bool);
     //imstkGetMacro(NarrowBanded, bool);
     //imstkGetMacro(NarrowBandWidth, double);
 
@@ -56,6 +58,14 @@ public:
     /// \brief Dimensions of distance transform to fill
     ///
     imstkSetMacro(Dimensions, const Vec3i&);
+
+    ///
+    /// \brief Optionally one may specify bounds, if not specified
+    /// bounds of the input SurfaceMesh is used
+    ///
+    imstkSetMacro(Bounds, const Vec6d&);
+
+    imstkSetMacro(UseBounds, bool);
 
     ///
     /// \brief If on, will compute only a narrow banded transform
@@ -74,6 +84,8 @@ protected:
 
 private:
     Vec3i Dimensions = Vec3i(0, 0, 0);
+    Vec6d Bounds;
+    bool  UseBounds = false;
     //bool   NarrowBanded = false;
     //double NarrowBandWidth = 1.0;
 };

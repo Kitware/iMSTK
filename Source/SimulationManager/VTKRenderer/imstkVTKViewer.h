@@ -26,18 +26,14 @@
 #include <vtkSmartPointer.h>
 
 class vtkCallbackCommand;
+class vtkInteractorStyle;
 class vtkObject;
 class vtkRenderWindow;
 
 namespace imstk
 {
-#ifdef iMSTK_ENABLE_VR
-class OpenVRCommand;
-#endif
-
 class Scene;
 class SimulationManager;
-class VTKInteractorStyle;
 class VTKScreenCaptureUtility;
 class VTKTextStatusManager;
 
@@ -108,20 +104,19 @@ public:
     ///
     /// \brief Return the window status handler
     ///
-    const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
+    std::shared_ptr<VTKTextStatusManager> getTextStatusManager();
+
+    ///
+    /// \brief Returns the vtk interactor style
+    ///
+    std::shared_ptr<vtkInteractorStyle> getVtkInteractorStyle() const { return m_vtkInteractorStyle; }
 
 protected:
     /// \brief VTKTimer callback, every 500ms
     static void timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
 
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
-    std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
-    bool m_enableVR;
-
-    vtkSmartPointer<vtkCallbackCommand> timerCallbackCommand;
-
-#ifdef iMSTK_ENABLE_VR
-    vtkSmartPointer<OpenVRCommand> m_openVRCommand;
-#endif
+    std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
+    vtkSmartPointer<vtkCallbackCommand> m_timerCallbackCommand;
 };
 } // imstk

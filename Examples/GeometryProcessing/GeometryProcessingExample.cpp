@@ -43,7 +43,7 @@ main()
 {
     // simManager and Scene
     imstkNew<SimulationManager> simManager;
-    imstkSmartPtr<Scene>        scene = simManager->createNewScene("GeometryTransforms");
+    std::shared_ptr<Scene>      scene = simManager->createNewScene("GeometryTransforms");
 
     std::shared_ptr<TetrahedralMesh> coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     imstkNew<SurfaceMesh>            coarseSurfMesh;

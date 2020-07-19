@@ -127,7 +127,7 @@ else()
     RenderingVolumeOpenGL2
     ViewsContext2D)
 if (${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
+  list(APPEND VTK_DEPENDENCIES RenderingOpenVR)
 endif()
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 

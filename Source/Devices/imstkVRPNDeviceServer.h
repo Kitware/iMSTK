@@ -64,7 +64,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~VRPNDeviceServer() {}
+    virtual ~VRPNDeviceServer() override = default;
 
     ///
     /// \brief Add device

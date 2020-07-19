@@ -64,6 +64,11 @@ using ScalarType = unsigned char;
 #define IMSTK_UNSIGNED_LONG_LONG_MAX std::numeric_limits<unsigned long long>::max();
 #define IMSTK_UNSIGNED_LONG_LONG_MIN std::numeric_limits<unsigned long long>::min();
 
+///
+/// \brief Used to quiet compiler warnings of parameters not used
+///
+#define imstkNotUsed(x)
+
 // todo: Switch to template type lists
 ///
 /// \brief Maps ScalarType type to templated function call
