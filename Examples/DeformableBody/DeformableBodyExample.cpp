@@ -85,7 +85,7 @@ main()
 }
 
 std::shared_ptr<DynamicObject>
-createAndAddFEDeformable(std::shared_ptr<Scene>    scene,
+createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
                          std::shared_ptr<TetrahedralMesh> tetMesh)
 {
     auto surfMesh = std::make_shared<SurfaceMesh>();

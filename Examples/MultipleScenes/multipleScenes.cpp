@@ -48,7 +48,7 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract the surface mesh
-    auto surfMesh   = std::make_shared<SurfaceMesh>();
+    auto surfMesh = std::make_shared<SurfaceMesh>();
     tetMesh->extractSurfaceMesh(surfMesh, true);
 
     auto material = std::make_shared<RenderMaterial>();

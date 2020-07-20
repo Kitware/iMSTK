@@ -47,7 +47,7 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
     auto tetMesh = imstk::MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract the surface mesh
-    auto surfMesh   = std::make_shared<SurfaceMesh>();
+    auto surfMesh = std::make_shared<SurfaceMesh>();
 
     tetMesh->scale(15., Geometry::TransformType::ApplyToData);
     tetMesh->translate(pos, Geometry::TransformType::ApplyToData);

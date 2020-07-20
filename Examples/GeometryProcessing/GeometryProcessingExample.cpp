@@ -49,8 +49,8 @@ main()
     imstkNew<SimulationManager> simManager;
     std::shared_ptr<Scene>      scene = simManager->createNewScene("GeometryTransforms");
 
-    auto coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    imstkNew<SurfaceMesh>            coarseSurfMesh;
+    auto                  coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    imstkNew<SurfaceMesh> coarseSurfMesh;
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
     // Compute DT
@@ -60,8 +60,8 @@ main()
     createSdf->update();
 
     // Erode
-    const float erosionDist = 0.2;
-    DataArray<float>& scalars = *std::dynamic_pointer_cast<DataArray<float>>(createSdf->getOutputImage()->getScalars());
+    const float       erosionDist = 0.2;
+    DataArray<float>& scalars     = *std::dynamic_pointer_cast<DataArray<float>>(createSdf->getOutputImage()->getScalars());
     for (size_t i = 0; i < scalars.size(); i++)
     {
         scalars[i] += erosionDist;
@@ -71,7 +71,7 @@ main()
     imstkNew<SurfaceMeshFlyingEdges> isoExtract;
     isoExtract->setInputImage(createSdf->getOutputImage());
     isoExtract->update();
-    
+
     // Reduce surface
     imstkNew<QuadricDecimate> reduce;
     reduce->setInputMesh(isoExtract->getOutputMesh());
@@ -82,7 +82,7 @@ main()
     imstkNew<VisualObject> sceneObj("Mesh");
     // Create the eroded visual model
     {
-        imstkNew<VisualModel> surfMeshModel(reduce->getOutput());
+        imstkNew<VisualModel>    surfMeshModel(reduce->getOutput());
         imstkNew<RenderMaterial> material;
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setLineWidth(4.0);
@@ -92,7 +92,7 @@ main()
     }
     // Create the original mesh visual model
     {
-        imstkNew<VisualModel> surfMeshModel(coarseSurfMesh.get());
+        imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh.get());
         imstkNew<RenderMaterial> material;
         material->setColor(imstk::Color::Red);
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
