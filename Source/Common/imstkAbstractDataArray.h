@@ -68,13 +68,6 @@ public:
     ///
     inline const ScalarType getScalarType() { return m_scalarType; }
 
-    ///
-    /// \brief Converts the return value to a variant for base class access
-    /// Would not recommend using this for performant code. Instead one should
-    /// downcast to the type and use it there.
-    ///
-    virtual const Variant getVariantValue(size_t element) const = 0;
-
 public:
     ///
     /// \brief Setup an observer for the modified call, returns id (for later removal)

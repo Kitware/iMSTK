@@ -346,15 +346,6 @@ public:
                          const Real minWidthRatio = 1.0, const std::string name = "LooseOctree");
 
     ///
-    /// \brief Octree constructor
-    /// \param center The center of the tree, which also is the center of the root node
-    /// \param width Width of the octree bounding box
-    /// \param maxDepth Maximum allowed depth of tree
-    /// \param name Name of the octree
-    ///
-    explicit LooseOctree(const Vec3r& center, const Real width, const int maxDepth, std::string name = "LooseOctree");
-
-    ///
     /// Destructor, doing memory cleanup
     ///
     virtual ~LooseOctree();

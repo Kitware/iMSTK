@@ -389,7 +389,7 @@ VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> hMesh, const
 /// \brief Reads vtk image data
 ///
 template<typename ReaderType>
-static std::shared_ptr<ImageData>
+std::shared_ptr<ImageData>
 VTKMeshIO::readVtkImageData(const std::string& filePath)
 {
     auto reader = vtkSmartPointer<ReaderType>::New();

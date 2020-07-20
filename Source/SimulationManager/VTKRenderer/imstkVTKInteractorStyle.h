@@ -22,9 +22,10 @@
 #pragma once
 
 #include "imstkInteractorStyle.h"
-#include <vtkInteractorStyleTrackballCamera.h>
 
+#include <vtkInteractorStyleTrackballCamera.h>
 #include <chrono>
+#include <memory>
 
 namespace imstk
 {

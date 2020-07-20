@@ -48,7 +48,7 @@ Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
     m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_config(config),
     m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
-    computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
+    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
 }
 
@@ -521,12 +521,12 @@ Scene::getElapsedTime(const std::string& stepName) const
 void
 Scene::lockComputeTimes()
 {
-    computeTimesLock->lock();
+    m_computeTimesLock->lock();
 }
 
 void
 Scene::unlockComputeTimes()
 {
-    computeTimesLock->unlock();
+    m_computeTimesLock->unlock();
 }
 } // imstk

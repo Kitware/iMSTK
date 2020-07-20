@@ -60,7 +60,7 @@ main()
     createSdf->update();
 
     // Erode
-    const float       erosionDist = 0.2;
+    const float       erosionDist = 0.2f;
     DataArray<float>& scalars     = *std::dynamic_pointer_cast<DataArray<float>>(createSdf->getOutputImage()->getScalars());
     for (size_t i = 0; i < scalars.size(); i++)
     {
@@ -97,7 +97,7 @@ main()
         material->setColor(imstk::Color::Red);
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setLineWidth(1.0);
-        material->setOpacity(0.2);
+        material->setOpacity(0.2f);
         surfMeshModel->setRenderMaterial(material);
         sceneObj->addVisualModel(surfMeshModel);
     }

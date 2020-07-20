@@ -61,6 +61,8 @@ main()
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->setMetalness(0.9f);
+    material->setRoughness(0.2f);
     material->addTexture(toolDiffuseTexture);
     surfMeshModel->setRenderMaterial(material);
 

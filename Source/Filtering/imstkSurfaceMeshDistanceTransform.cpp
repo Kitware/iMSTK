@@ -123,9 +123,7 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
     // Get the optimal number of threads
     const size_t numThreads = ParallelUtils::ThreadManager::getThreadPoolSize();
 
-    const Vec6d& bounds  = imageData->getBounds();
     const Vec3i& dim     = imageData->getDimensions();
-    const Vec3d  size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
     const Vec3d  spacing = imageData->getSpacing();
     const Vec3d  shift   = imageData->getOrigin() + spacing * 0.5;
 

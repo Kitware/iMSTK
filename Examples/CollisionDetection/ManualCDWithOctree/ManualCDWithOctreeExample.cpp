@@ -259,7 +259,7 @@ main()
         {
             if (i != j)
             {
-                octreeCD.addCollisionPair(triMeshes[i], triMeshes[j], CollisionDetection::Type::SurfaceMeshToSurfaceMesh);
+                octreeCD.addCollisionPair(triMeshes[i], triMeshes[j], CollisionDetection::Type::SurfaceMeshToSurfaceMesh, std::make_shared<CollisionData>());
             }
         }
     }

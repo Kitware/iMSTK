@@ -102,12 +102,12 @@ GeometryUtils::coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray)
     //     next emission of imstkArray. It is safe though.
     // 2.) If the imstk data is destroyed. The imstk array emits {nullptr, 0}. Here resulting in
     //     the reset of the coupled vtk data array.
-    int id = imstkArray->connect([ = ](void* ptr, size_t count)
+    imstkArray->connect([ = ](void* ptr, size_t count)
         {
             // If the vtk data was destroyed
             if (arr == NULL)
             {
-                imstkArray->disconnect(id);
+                //imstkArray->disconnect(id);
                 return;
             }
 

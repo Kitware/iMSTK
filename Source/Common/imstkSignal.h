@@ -62,14 +62,15 @@ public:
 
     void emit(Args... p)
     {
-        for (std::unordered_map<unsigned int, std::function<void(Args...)>>::iterator it = slots.begin(); it != slots.end(); it++)
+        for (typename std::unordered_map<unsigned int, std::function<void(Args...)>>::iterator it = slots.begin(); it != slots.end(); it++)
         {
             it->second(p ...);
         }
     }
 
 private:
-    std::unordered_map<unsigned int, std::function<void(Args...)>> slots;
+    typename std::unordered_map<unsigned int, std::function<void(Args...)>> slots;
+
     unsigned int handleIter = 0;
 };
 }

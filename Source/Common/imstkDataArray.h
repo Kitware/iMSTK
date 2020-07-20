@@ -72,8 +72,6 @@ public:
     inline T* getPointer() { return vec.data(); }
     inline void* getVoidPointer() override { return static_cast<void*>(vec.data()); }
 
-    inline const Variant getVariantValue(size_t i) const override { return Variant(vec[i]); }
-
     inline T& operator[](const size_t pos) { return vec[pos]; }
     inline const T& operator[](const size_t pos) const { return vec[pos]; }
 
