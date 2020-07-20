@@ -24,11 +24,11 @@
 #include "imstkIBLProbe.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
-#include "imstkPointSet.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 
 using namespace imstk;
@@ -62,7 +62,7 @@ main()
         iMSTK_DATA_ROOT "/head/head_revised.obj",
         iMSTK_DATA_ROOT "/head/");*/
 
-    auto surfaceMesh = MeshIO::read(iMSTK_DATA_ROOT "/head/head_revised.obj");
+    auto surfaceMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/head/head_revised.obj");
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);

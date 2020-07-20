@@ -20,15 +20,19 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDataArray.h"
+#include "imstkImageData.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
+#include "imstkQuadricDecimate.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkSurfaceMeshSubdivide.h"
+#include "imstkSurfaceMeshDistanceTransform.h"
+#include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 
@@ -36,7 +40,7 @@ using namespace imstk;
 using namespace imstk::expiremental;
 
 ///
-/// \brief This example demonstrates the geometry transforms in imstk
+/// \brief This example demonstrates erosion of a mesh
 ///
 int
 main()
@@ -45,45 +49,58 @@ main()
     imstkNew<SimulationManager> simManager;
     std::shared_ptr<Scene>      scene = simManager->createNewScene("GeometryTransforms");
 
-    std::shared_ptr<TetrahedralMesh> coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     imstkNew<SurfaceMesh>            coarseSurfMesh;
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
-    imstkNew<SurfaceMeshSubdivide> subdivide;
-    subdivide->setInputMesh(coarseSurfMesh);
-    subdivide->setSubdivisionType(SurfaceMeshSubdivide::Type::LOOP);
-    subdivide->setNumberOfSubdivisions(1);
-    subdivide->update();
+    // Compute DT
+    imstkNew<SurfaceMeshDistanceTransform> createSdf;
+    createSdf->setInputMesh(coarseSurfMesh);
+    createSdf->setDimensions(150, 150, 150);
+    createSdf->update();
 
-    std::shared_ptr<SurfaceMesh> fineSurfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(subdivide->getOutput());
+    // Erode
+    const float erosionDist = 0.2;
+    DataArray<float>& scalars = *std::dynamic_pointer_cast<DataArray<float>>(createSdf->getOutputImage()->getScalars());
+    for (size_t i = 0; i < scalars.size(); i++)
+    {
+        scalars[i] += erosionDist;
+    }
 
-    fineSurfaceMesh->translate(Vec3d(0.0, -5.0, 0.0), Geometry::TransformType::ConcatenateToTransform);
-    coarseSurfMesh->translate(Vec3d(0.0, 5.0, 0.0), Geometry::TransformType::ConcatenateToTransform);
+    // Extract surface
+    imstkNew<SurfaceMeshFlyingEdges> isoExtract;
+    isoExtract->setInputImage(createSdf->getOutputImage());
+    isoExtract->update();
+    
+    // Reduce surface
+    imstkNew<QuadricDecimate> reduce;
+    reduce->setInputMesh(isoExtract->getOutputMesh());
+    reduce->setTargetReduction(0.5);
+    reduce->update();
 
-    imstkNew<RenderMaterial> material0;
-    material0->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material0->setPointSize(10.);
-    material0->setLineWidth(4.);
-    material0->setEdgeColor(Color::Color::Orange);
-    imstkNew<VisualModel> surfMeshModel0(coarseSurfMesh.get());
-    surfMeshModel0->setRenderMaterial(material0);
-
-    imstkNew<VisualObject> sceneObj0("coarse Mesh");
-    sceneObj0->addVisualModel(surfMeshModel0);
-
-    scene->addSceneObject(sceneObj0);
-
-    imstkNew<RenderMaterial> material;
-    material->setColor(imstk::Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    material->setPointSize(6.);
-    material->setLineWidth(1.);
-    imstkNew<VisualModel> surfMeshModel(fineSurfaceMesh);
-    surfMeshModel->setRenderMaterial(material);
-
-    imstkNew<VisualObject> sceneObj("fine Mesh");
-    sceneObj->addVisualModel(surfMeshModel);
-
+    // Create the scene object
+    imstkNew<VisualObject> sceneObj("Mesh");
+    // Create the eroded visual model
+    {
+        imstkNew<VisualModel> surfMeshModel(reduce->getOutput());
+        imstkNew<RenderMaterial> material;
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setLineWidth(4.0);
+        material->setEdgeColor(Color::Color::Orange);
+        surfMeshModel->setRenderMaterial(material);
+        sceneObj->addVisualModel(surfMeshModel);
+    }
+    // Create the original mesh visual model
+    {
+        imstkNew<VisualModel> surfMeshModel(coarseSurfMesh.get());
+        imstkNew<RenderMaterial> material;
+        material->setColor(imstk::Color::Red);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setLineWidth(1.0);
+        material->setOpacity(0.2);
+        surfMeshModel->setRenderMaterial(material);
+        sceneObj->addVisualModel(surfMeshModel);
+    }
     scene->addSceneObject(sceneObj);
 
     // Set Camera configuration

@@ -73,26 +73,23 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
                std::shared_ptr<PbdSolver>&          pbdSolver)
 {
     // Load a sample mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    LOG_IF(FATAL, (!tetMesh)) << "Could not read mesh from file.";
-
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-    LOG_IF(FATAL, (!volTetMesh)) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    LOG_IF(FATAL, (!tetMesh)) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
 
     // Rotate a rando angle
-    volTetMesh->rotate(Vec3d(0, 1, 0), static_cast<double>(rand()), Geometry::TransformType::ApplyToData);
+    tetMesh->rotate(Vec3d(0, 1, 0), static_cast<double>(rand()), Geometry::TransformType::ApplyToData);
 
     // Translate
-    volTetMesh->translate(translation, Geometry::TransformType::ApplyToData);
+    tetMesh->translate(translation, Geometry::TransformType::ApplyToData);
 
     // Trick to force update geometry postUpdateTransform
-    const auto positions = volTetMesh->getVertexPositions();
+    const auto positions = tetMesh->getVertexPositions();
     (void)positions;
 
     static int count = -1;
     ++count;
     surfMesh = std::make_shared<SurfaceMesh>("Dragon-" + std::to_string(count));
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     auto material = std::make_shared<RenderMaterial>();
 
@@ -114,12 +111,12 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     deformableObj = std::make_shared<PbdObject>("Dragon-" + std::to_string(count));
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setCollidingGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsGeometry(tetMesh);
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
 
     // Create model and object
     auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->setModelGeometry(tetMesh);
 
     // configure model
     auto pbdParams = std::make_shared<PBDModelConfig>();

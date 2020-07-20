@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkDeviceTracker.h"
 #include "imstkIBLProbe.h"
@@ -27,7 +26,6 @@
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
 #include "imstkOpenVRDeviceClient.h"
-//#include "imstkOpenVRDeviceServer.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
@@ -36,9 +34,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkVTKInteractorStyleVR.h"
-
-#include "imstkSceneManager.h"
 
 using namespace imstk;
 using namespace imstk::expiremental;
@@ -54,17 +49,22 @@ main()
     simManager->getConfig()->enableVR = true; // Controllers cannot function without HMD
     std::shared_ptr<Scene> scene      = simManager->createNewScene("Rendering");
 
-    std::shared_ptr<SurfaceMesh> surfaceMesh = MeshIO::read<SurfaceMesh>("C:/Repos/Orthognathic/data/saw.obj");
-    surfaceMesh->scale(0.1, Geometry::TransformType::ApplyToData);
-    surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), -0.872, Geometry::TransformType::ApplyToData);
-    surfaceMesh->rotate(Vec3d(0.0, 0.0, 1.0), -1.57, Geometry::TransformType::ApplyToData);
+    std::shared_ptr<SurfaceMesh> toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel Blade10/Scalpel Blade10.obj");
+    auto                         toolDiffuseTexture =
+        std::make_shared<Texture>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel Blade10/Scalpel Blade10 Albedo.png", Texture::Type::Diffuse);
+    toolMesh->translate(0.0, 0.0, 1.0, Geometry::TransformType::ApplyToData);
+    toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
+    toolMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
+    toolMesh->scale(0.06, Geometry::TransformType::ApplyToData);
 
-    imstkNew<VisualModel>    surfMeshModel(surfaceMesh);
+    imstkNew<VisualModel>    surfMeshModel(toolMesh);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->addTexture(toolDiffuseTexture);
     surfMeshModel->setRenderMaterial(material);
 
-    imstkNew<SceneObject> sceneObject("saw");
+    imstkNew<SceneObject> sceneObject("scalpel");
     sceneObject->addVisualModel(surfMeshModel);
 
     scene->addSceneObject(sceneObject);
@@ -81,12 +81,6 @@ main()
     dirLight->setCastsShadow(true);
     dirLight->setShadowRange(1.5);
     scene->addLight(dirLight);
-
-    // Plane
-    /*auto planeObj      = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
-    imstkNew<RenderMaterial> planeMaterial;
-    planeMaterial->setColor(Color::LightGray);
-    planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);*/
 
     // The viewer must be setup before acquiring the VR device
     simManager->setActiveScene(scene);

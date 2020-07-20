@@ -36,7 +36,7 @@
 
 using namespace imstk;
 
-std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> scene, std::shared_ptr<PointSet> tetMesh);
+std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> scene, std::shared_ptr<TetrahedralMesh> tetMesh);
 
 const std::string meshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
@@ -55,8 +55,7 @@ main()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Load a tetrahedral mesh
-    auto tetMesh = MeshIO::read(meshFileName);
-
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(meshFileName);
     CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
 
     // Scene object 1: fe-FeDeformableObject
@@ -87,12 +86,10 @@ main()
 
 std::shared_ptr<DynamicObject>
 createAndAddFEDeformable(std::shared_ptr<Scene>    scene,
-                         std::shared_ptr<PointSet> tetMesh)
+                         std::shared_ptr<TetrahedralMesh> tetMesh)
 {
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-    CHECK(volTetMesh != nullptr) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
     auto surfMesh = std::make_shared<SurfaceMesh>();
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
@@ -102,7 +99,7 @@ createAndAddFEDeformable(std::shared_ptr<Scene>    scene,
     //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
 
     dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
-    dynaModel->setModelGeometry(volTetMesh);
+    dynaModel->setModelGeometry(tetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
@@ -118,7 +115,7 @@ createAndAddFEDeformable(std::shared_ptr<Scene>    scene,
     auto deformableObj = std::make_shared<FeDeformableObject>("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
 
-    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsGeometry(tetMesh);
 
     // Construct one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);

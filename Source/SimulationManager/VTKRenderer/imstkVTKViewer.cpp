@@ -224,7 +224,9 @@ VTKViewer::startRenderingLoop()
     }
     else
     {
-        // VR interactor doesn't support timers
+#ifdef iMSTK_ENABLE_VR
+        // VR interactor doesn't support timers, here we throw timer event every update
+        // another option would be to fix VTKs VR interactor
         vtkSmartPointer<vtkOpenVRRenderWindowInteractor> iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
         //iren->Start(); // Cannot use
         if (iren->HasObserver(vtkCommand::StartEvent))
@@ -239,6 +241,7 @@ VTKViewer::startRenderingLoop()
             iren->DoOneEvent(vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow), vtkOpenVRRenderer::SafeDownCast(vtkRen->getVtkRenderer()));
             iren->InvokeEvent(vtkCommand::TimerEvent);
         }
+#endif
     }
 
     m_running = false;

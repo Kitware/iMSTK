@@ -67,8 +67,8 @@ main()
     scene->getCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
     // set up the meshes
-    auto highResSurfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(surfMeshFileName));
-    auto coarseTetMesh   = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshFileName));
+    auto highResSurfMesh = MeshIO::read<SurfaceMesh>(surfMeshFileName);
+    auto coarseTetMesh   = MeshIO::read<TetrahedralMesh>(tetMeshFileName);
     auto coarseSurfMesh  = std::make_shared<SurfaceMesh>();
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 

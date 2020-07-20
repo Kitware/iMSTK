@@ -112,7 +112,7 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
                       const std::string&     tetMeshName)
 {
     // Load a sample mesh
-    auto tetMesh = MeshIO::read(tetMeshName);
+    std::shared_ptr<PointSet> tetMesh = MeshIO::read(tetMeshName);
 
     auto fluidMesh = std::make_shared<PointSet>();
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());

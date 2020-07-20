@@ -76,8 +76,8 @@ vtkInteractorStyleVR::OnButton3D(vtkEventData* eventData)
         return;
     }
     vtkEventDataButton3D* eventDataButton = static_cast<vtkEventDataButton3D*>(eventData);
-    printf("Button: %d\n", eventDataButton->GetInput());
-    /*bd->GetAction() == vtkEventDataAction::Press*/
+    //printf("Button: %d\n", eventDataButton->GetInput());
+    //bd->GetAction() == vtkEventDataAction::Press
 }
 
 void

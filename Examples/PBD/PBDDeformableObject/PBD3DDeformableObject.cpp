@@ -75,7 +75,7 @@ std::shared_ptr<PbdObject>
 createAndAddPbdObject(std::shared_ptr<Scene> scene,
                       const std::string&     tetMeshName)
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(tetMeshName);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
     auto surfMesh = std::make_shared<SurfaceMesh>();
     tetMesh->extractSurfaceMesh(surfMesh, true);

@@ -49,7 +49,7 @@ main()
     // add scene object for surface object
     auto surfaceObject = std::make_shared<VisualObject>("SurfaceObj");
 
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
+    auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
 
     // configure and add the render model to the scene object
     auto material = std::make_shared<RenderMaterial>();

@@ -19,7 +19,6 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkPbdModel.h"

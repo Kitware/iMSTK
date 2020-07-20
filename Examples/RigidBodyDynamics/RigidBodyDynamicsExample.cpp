@@ -44,19 +44,14 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
     auto meshObj = std::make_shared<RigidObject>(name);
 
     // Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-
-    CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
+    auto tetMesh = imstk::MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract the surface mesh
     auto surfMesh   = std::make_shared<SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
 
-    CHECK(volTetMesh != nullptr) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-
-    volTetMesh->scale(15., Geometry::TransformType::ApplyToData);
-    volTetMesh->translate(pos, Geometry::TransformType::ApplyToData);
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+    tetMesh->scale(15., Geometry::TransformType::ApplyToData);
+    tetMesh->translate(pos, Geometry::TransformType::ApplyToData);
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
@@ -93,9 +88,8 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     cubeGeom->translate(pos);
 
     // cube visual model
-    auto mesh = imstk::MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-    auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
-    SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
+    auto mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    mesh->scale(5.0, Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
     auto mat = std::make_shared<RenderMaterial>();
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -106,7 +100,7 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
 
     auto rigidMap = std::make_shared<IsometricMap>();
     rigidMap->setMaster(cubeGeom);
-    rigidMap->setSlave(SurfaceMesh);
+    rigidMap->setSlave(mesh);
 
     // cube dynamic model
     auto rigidModel = std::make_shared<RigidBodyModel>();
