@@ -25,7 +25,7 @@
 #include "imstkScene.h"
 
 // Objects
-#include "imstkSceneObject.h"
+#include "imstkCollidingObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 
@@ -47,6 +47,7 @@
 #include "imstkPointSetToSphereCD.h"
 #include "imstkVirtualCouplingCH.h"
 #include "imstkBoneDrillingCH.h"
+#include "imstkObjectInteractionFactory.h"
 
 // global variables
 const std::string phantomOmni1Name = "Phantom1";
