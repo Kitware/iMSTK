@@ -31,6 +31,8 @@
 
 #include "imstkTetrahedralMesh.h"
 
+#include "imstkSPHBoundaryConditions.h"
+
 
 namespace imstk
 {
@@ -63,7 +65,7 @@ public:
     Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(1.06);         ///> scale particle mass to a smaller value to maintain stability
+    Real m_particleMassScale = Real(1.0);         ///> scale particle mass to a smaller value to maintain stability
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -185,14 +187,6 @@ public:
     Real particlePressure(const double density);
     void periodicBCs(const size_t p);
 
-    void setWallPointIndices(std::vector<size_t>& wallPointIndices) { m_wallPointIndices = wallPointIndices; }
-    std::vector<size_t>& getWallPointIndices() { return m_wallPointIndices; }
-
-    void setBufferParticleIndices(std::vector<size_t>& bufferParticleIndices) { m_bufferParticleIndices = bufferParticleIndices; }
-    std::vector<size_t>& getBufferParticleIndices() { return m_bufferParticleIndices; }
-
-    void setMinMaxXCoords(const double minXCoord, const double maxXCoord) { m_minXCoord = minXCoord; m_maxXCoord = maxXCoord; }
-
     void writeStateToCSV();
     void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
     Real getTotalTime() const { return m_totalTime; }
@@ -201,30 +195,14 @@ public:
     void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
     size_t findNearestParticleToVertex(const Vec3d point);
 
-    void setInletDensity(const double inletDensity) { m_inletDensity = inletDensity; }
-    const double getInletDensity() { return m_inletDensity; }
-    void setOutletDensity(const double outletDensity) { m_outletDensity = outletDensity; }
-    const double getOutletDensity() { return m_outletDensity; }
-
-    void setInletVelocity(const Vec3d inletVelocity) { m_inletVelocity = inletVelocity; }
-    const Vec3d getInletVelocity() { return m_inletVelocity; }
-
-    void setOutletVelocity(const Vec3d outletVelocity) { m_outletVelocity = outletVelocity; }
-
-    void setInletRegionXCoord(const double inletRegionXCoord) { m_inletRegionXCoord = inletRegionXCoord; }
-    void setOutletRegionXCoord(const double outletRegionXCoord) { m_outletRegionXCoord = outletRegionXCoord; }
-    double getInletRegionXCoord() { return m_inletRegionXCoord; }
-    double getOutletRegionXCoord() { return m_outletRegionXCoord; }
-    double setInletOutletRegionYCoordDivision(const double inletOutletRegionYCoordDivision) { m_inletOutletRegionYCoordDivision = inletOutletRegionYCoordDivision; }
-
-
     void printParticleTypes();
 
-    void setInletRadius(const double inletRadius) { m_inletRadius = inletRadius; }
-    void setInletCenterPoint(const Vec3d inletCenterPoint) { m_inletCenterPoint = inletCenterPoint; }
-    void setBufferXCoord(const double bufferXCoord) { m_bufferXCoord = bufferXCoord; }
 
-    Vec3d computeParabolicInletVelocity(const Vec3d particlePosition);
+    //Vec3d computeParabolicInletVelocity(const Vec3d particlePosition);
+
+    void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
+    std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
+
 
 
 
@@ -319,6 +297,7 @@ private:
     void computePressureOutlet();
 
 
+
 protected:
     std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
     std::shared_ptr<TaskNode> m_computeDensityNode        = nullptr;
@@ -330,7 +309,6 @@ protected:
     std::shared_ptr<TaskNode> m_updateVelocityNoGravityNode = nullptr;
     std::shared_ptr<TaskNode> m_computeViscosityNode = nullptr;
     std::shared_ptr<TaskNode> m_moveParticlesNode = nullptr;
-
 
     std::shared_ptr<TaskNode> m_normalizeDensityNode = nullptr;
     std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;
@@ -353,35 +331,18 @@ private:
     StdVectorOfVec3d m_initialVelocities;
     StdVectorOfReal m_initialDensities;
 
-    std::vector<size_t> m_wallPointIndices;
-    std::vector<size_t> m_bufferParticleIndices;
-
-    double m_minXCoord;
-    double m_maxXCoord;
-
-    double m_inletRegionXCoord;
-    double m_outletRegionXCoord;
-
-    double m_inletDensity;
-    double m_outletDensity;
-    Vec3d m_inletVelocity;
-    Vec3d m_outletVelocity;
-
     double m_totalTime;
     double m_writeToOutputModulo;
     int m_timeStepCount;
-    double m_bufferXCoord;
 
-    double m_inletRadius;
-    Vec3d m_inletCenterPoint;
     double m_previousTime;
     double m_timeModulo;
     double m_speedOfSound;
     double m_beta;
-    double m_inletOutletRegionYCoordDivision;
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 
+    std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
 
 };
 } // end namespace imstk

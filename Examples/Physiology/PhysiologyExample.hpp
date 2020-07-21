@@ -53,7 +53,7 @@ main(int argc, char* argv[])
   // SimulationManager must be created first
   auto simManager = std::make_shared<SimulationManager>();
 
-  int    threads = -1;
+  int threads = -1;
   double particleRadius = 0.1;
 
   // Parse command line arguments
@@ -128,26 +128,23 @@ main(int argc, char* argv[])
   whiteLight->setIntensity(7);
   scene->addLight(whiteLight);
 
-
-  // remove the surface tension node
-
   ///////////////////////////////////////
   // Setup some scalars
   std::shared_ptr<PointSet> fluidGeometry = std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry());
   std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(fluidGeometry->getNumVertices());
   std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
-  //fluidGeometry->setScalars(scalarsPtr);
+  fluidGeometry->setScalars(scalarsPtr);
 
   // Setup the material for the scalars
-  //std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
-  //material->setScalarVisibility(true);
-  //std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-  //colorFunc->setNumberOfColors(2);
-  //colorFunc->setColor(0, Color(1, 0, 1, 0.2));
-  //colorFunc->setColor(1, Color(1, 0, 1, 0.2));
-  //colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
-  //colorFunc->setRange(0.0, 5);
-  //material->setColorLookupTable(colorFunc);
+  std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
+  material->setScalarVisibility(true);
+  std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+  colorFunc->setNumberOfColors(2);
+  colorFunc->setColor(0, Color::Red);
+  colorFunc->setColor(1, Color::Green);
+  colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
+  colorFunc->setRange(0, 3);
+  material->setColorLookupTable(colorFunc);
 
   //std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
   std::shared_ptr<SPHModel> sphModel = fluidObj->getDynamicalSPHModel();
@@ -185,48 +182,40 @@ main(int argc, char* argv[])
       taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printSPHParticleTypes);
 
 			////////////////////////////////////////////
-      // This node computes displacements and sets the color to the magnitude
+      // This node colors the fluid points based on their type
 			std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
 				{
-					/*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
-					const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
-					StdVectorOfReal& scalars = *scalarsPtr;
-					for (size_t i = 0; i < initPos.size(); i++)
-					{
-							scalars[i] = (currPos[i] - initPos[i]).norm();
-					}*/
 					const StdVectorOfVec3r& velocities = sphModel->getCurrentState()->getVelocities();
-          const std::vector<size_t>& wallPointIndices = sphModel->getWallPointIndices();
-          const std::vector<size_t>& bufferDomainIndices = sphModel->getBufferParticleIndices();
+          const std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions = sphModel->getBoundaryConditions();
           const StdVectorOfVec3d& positions = sphModel->getCurrentState()->getPositions();
 
           StdVectorOfReal& scalars = *scalarsPtr;
           for (size_t i = 0; i < velocities.size(); i++)
           {
             //scalars[i] = velocities[i].norm();
-            if (std::find(wallPointIndices.begin(), wallPointIndices.end(), i) != wallPointIndices.end())
+            if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::wall)
             {
               scalars[i] = 0;
             }
-            else if (std::find(bufferDomainIndices.begin(), bufferDomainIndices.end(), i) != bufferDomainIndices.end())
+            //else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::buffer)
+            //{
+            //  scalars[i] = 1;
+            //}
+            else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::inlet)
             {
               scalars[i] = 1;
             }
-            else if (positions[i].x() < sphModel->getInletRegionXCoord())
+            else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::outlet)
             {
               scalars[i] = 2;
             }
-            else if (positions[i].x() > sphModel->getOutletRegionXCoord())
+            else
             {
               scalars[i] = 3;
             }
-            else
-            {
-              scalars[i] = 4;
-            }
 					}
 				}, "ComputeVelocityScalars");
-      //taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
+      taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
 			///////////////////////////////////////////
     });
 

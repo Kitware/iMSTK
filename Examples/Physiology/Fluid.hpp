@@ -37,95 +37,11 @@
 #include <vtkSelectEnclosedPoints.h>
 #include <vtkTriangleFilter.h>
 
+#include "imstkSPHBoundaryConditions.h"
+
 
 using namespace imstk;
 
-///
-/// \brief Generate parallel plate flow
-///
-StdVectorOfVec3d
-generateParallelPlatesFlow(const double particleRadius, std::shared_ptr<SPHModel>& sphModel)
-{
-  /* 
-  Set the fluid channel dimensions. For now, we don't need the fluid channel to be as long as the
-  parallel plates
-  */
-  const double channelLength = 5.0;
-  const double channelWidth = 3.0;
-  const double channelDepth = 5.0;
-
-  const Vec3d channelLowerCorner(-8, 2, 0);
-
-  const auto spacing = 2.0 * particleRadius;
-  const auto nx = static_cast<size_t>(channelLength / spacing);
-  const auto ny = static_cast<size_t>(channelWidth / spacing);
-  const auto nz = static_cast<size_t>(channelDepth / spacing);
-
-  StdVectorOfVec3d particles;
-
-  for (size_t i = 0; i < nx; ++i)
-  {
-    for (size_t j = 0; j < ny; ++j)
-    {
-      for (size_t k = 0; k < nz; ++k)
-      {
-        Vec3d ppos = channelLowerCorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
-        particles.push_back(ppos);
-      }
-    }
-  }
-
-  // generate fixed particles for the top plate no slip boundary condition
-  StdVectorOfVec3d plateParticles;
-
-  const double plateLength = 10.0;
-  const double plateWidth = 1.0;
-  const double plateDepth = 5.0;
-
-  const auto nxPlate = static_cast<size_t>(plateLength / spacing);
-  const auto nyPlate = static_cast<size_t>(plateWidth / spacing);
-  const auto nzPlate = static_cast<size_t>(plateDepth / spacing);
-
-  const Vec3d topPlateLowerCorner(channelLowerCorner.x(), channelLowerCorner.y() + channelWidth, channelLowerCorner.z());
-  for (size_t i = 0; i < nxPlate; ++i)
-  {
-    for (size_t j = 0; j < nyPlate; ++j)
-    {
-      for (size_t k = 0; k < nzPlate; ++k)
-      {
-        Vec3d ppos = topPlateLowerCorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
-        plateParticles.push_back(ppos);
-      }
-    }
-  }
-
-  // generate fixed particles for the bottom plate no slip boundary condition
-  const Vec3d bottomPlateLowerCorner(channelLowerCorner.x(), channelLowerCorner.y() - plateWidth, channelLowerCorner.z());
-  for (size_t i = 0; i < nxPlate; ++i)
-  {
-    for (size_t j = 0; j < nyPlate; ++j)
-    {
-      for (size_t k = 0; k < nzPlate; ++k)
-      {
-        Vec3d ppos = bottomPlateLowerCorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
-        plateParticles.push_back(ppos);
-      }
-    }
-  }
-
-  // get wallParticles positions within combined vector
-  std::vector<size_t> wallParticlesIndices(plateParticles.size());
-  std::iota(wallParticlesIndices.begin(), wallParticlesIndices.end(), particles.size());
-  sphModel->setWallPointIndices(wallParticlesIndices);
-
-  // combine the wall particles with the fluid particles
-  particles.insert(particles.end(), plateParticles.begin(), plateParticles.end());
-
-  // set the coordinates needed for periodic boundary conditions
-  sphModel->setMinMaxXCoords(channelLowerCorner.x(), channelLowerCorner.x() + plateLength);
-
-  return particles;
-}
 
 ///
 /// \brief Generate fluid for pipe flow
@@ -248,18 +164,19 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
   if (SCENE_ID == 1)
   {
+    // pipe flow
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
     std::shared_ptr<SurfaceMesh> surfMeshSmall = std::make_shared<SurfaceMesh>(*surfMesh);
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.vtk"));
-
-    sphModel->setGeometryMesh(tetMesh);
-
     std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
 
+    // set tetrahedral mesh used when writing VTUs
+    sphModel->setGeometryMesh(tetMesh);
+
+    // scale meshes to create walls
     const double scale = 1.5;
     surfMeshExpanded->scale(scale, Geometry::TransformType::ApplyToData);
     surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
-
     // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
     Vec3d originalCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshSmall));
     Vec3d directionalExpandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMesh));
@@ -267,29 +184,22 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
     surfMesh->translate(originalCylCenter - directionalExpandedCylCenter, Geometry::TransformType::ApplyToData);
 
-
     std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
 
+    // find inlet and outlet domains
     Vec3d aabbMin1, aabbMax1;
     surfMeshSmall->computeBoundingBox(aabbMin1, aabbMax1, 1.);
-    sphModel->setInletRegionXCoord(aabbMin1.x() + 1);
-    sphModel->setOutletRegionXCoord(aabbMax1.x() - 1);
+    Vec3d inletMinCoord = aabbMin1;
+    Vec3d inletMaxCoord = Vec3d(aabbMin1.x() + 1, aabbMax1.y(), aabbMax1.z());
+    Vec3d outletMinCoord = Vec3d(aabbMax1.x() - 1, aabbMin1.y(), aabbMin1.z());
+    Vec3d outletMaxCoord = aabbMax1;
 
-    sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
-
-    // compute center and radius of inlet
-    Vec3d inletCenterPoint = Vec3d(aabbMin1.x(), (aabbMax1.y() + aabbMin1.y()) / 2.0, (aabbMax1.z() + aabbMin1.z()) / 2.0);
-    double inletRadius = std::abs(aabbMax1.y() - aabbMin1.y()) / 2.0;
-    sphModel->setInletRadius(inletRadius);
-    sphModel->setInletCenterPoint(inletCenterPoint);
-
+    // fill grid with points
     Vec3d aabbMin, aabbMax;
     surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
-
     const double length = std::abs(aabbMax.x() - aabbMin.x());
     const double width = std::abs(aabbMax.y() - aabbMin.y());
     const double depth = std::abs(aabbMax.z() - aabbMin.z());
-
     const auto spacing = 2.0 * particleRadius;
     const auto nx = static_cast<size_t>(length / spacing);
     const auto ny = static_cast<size_t>(width / spacing);
@@ -301,214 +211,151 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
     StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
-    // get wallParticles positions within combined vector
-    std::vector<size_t> wallParticlesIndices(wallParticles.size());
-    std::iota(wallParticlesIndices.begin(), wallParticlesIndices.end(), particles.size());
-
-    particles.insert(particles.end(), wallParticles.begin(), wallParticles.end());
-
-    // add wall particles
-    sphModel->setWallPointIndices(wallParticlesIndices);
-
-    // buffer domain
-    StdVectorOfVec3d bufferParticles;
-    double bufferXCoordMin = 1;
-    sphModel->setBufferXCoord(bufferXCoordMin);
-    for (int i = 0; i < 2000; i++)
-    {
-      bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));
-    }
-    std::vector<size_t> bufferParticlesIndices(bufferParticles.size());
-    std::iota(bufferParticlesIndices.begin(), bufferParticlesIndices.end(), particles.size());
-    sphModel->setBufferParticleIndices(bufferParticlesIndices);
-
-    particles.insert(particles.end(), bufferParticles.begin(), bufferParticles.end());
+    // set up boundary conditions
+    Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+    auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
+      std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+    sphModel->setBoundaryConditions(sphBoundaryConditions);
 
     StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-
     sphModel->setInitialVelocities(initialFluidVelocities);
   }
 
   else if (SCENE_ID == 2)
   {
-    particles = generateParallelPlatesFlow(particleRadius, sphModel);
+    // half torus flow
+    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus.stl"));
+    auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus_shell.stl"));
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus.vtk"));
+
+    // set tetrahedral mesh used when writing VTUs
+    sphModel->setGeometryMesh(tetMesh);
+
+    // fill grid with points
+    Vec3d aabbMin, aabbMax;
+    surfMeshShell->computeBoundingBox(aabbMin, aabbMax, 1.);
+    const double length = std::abs(aabbMax.x() - aabbMin.x());
+    const double width = std::abs(aabbMax.y() - aabbMin.y());
+    const double depth = std::abs(aabbMax.z() - aabbMin.z());
+    const auto spacing = 2.0 * particleRadius;
+    const auto nx = static_cast<size_t>(length / spacing);
+    const auto ny = static_cast<size_t>(width / spacing);
+    const auto nz = static_cast<size_t>(depth / spacing);
+    auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
+    auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+    particles = enclosedFluidPoints->getInitialVertexPositions();
+    auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh, false);
+    StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
+
+    // set up boundary conditions
+    Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+    Vec3d inletCenterPoint = Vec3d(-2.2, 2.0, 0.0);
+    Vec3d outletCenterPoint = Vec3d(-2.2, -2.0, 0.0);
+    double inletRadius = 0.6;
+    double outletRadius = 0.6;
+    Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+    Vec3d inletMaxCoord = inletCenterPoint + Vec3d(1.0, inletRadius, inletRadius);
+    Vec3d outletMinCoord = outletCenterPoint - Vec3d(0, outletRadius, outletRadius);
+    Vec3d outletMaxCoord = outletCenterPoint + Vec3d(1.0, outletRadius, outletRadius);
+    auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
+      std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+    sphModel->setBoundaryConditions(sphBoundaryConditions);
 
     StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-
     sphModel->setInitialVelocities(initialFluidVelocities);
   }
 
   else if (SCENE_ID == 3)
   {
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus.stl"));
-    std::shared_ptr<SurfaceMesh> surfMeshSmall = std::make_shared<SurfaceMesh>(*surfMesh);
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/torus/torus.vtk"));
+  // bifurcation flow
+  auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation_small.stl"));
+  auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation_small_shell.stl"));
+  auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation_small.vtk"));
 
-    sphModel->setGeometryMesh(tetMesh);
+  surfMesh->scale(0.7, Geometry::TransformType::ApplyToData);
+  surfMeshShell->scale(0.7, Geometry::TransformType::ApplyToData);
+  tetMesh->scale(0.7, Geometry::TransformType::ApplyToData);
 
-    std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
-
-    const double scale = 1.5;
-    surfMeshExpanded->directionalScale(1.0, scale, scale);
-    //surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
-
-    // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
-    Vec3d originalCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshSmall));
-    Vec3d directionalExpandedCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
-    //Vec3d expandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
-    //surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
-    surfMeshExpanded->translate(originalCenter - directionalExpandedCenter, Geometry::TransformType::ApplyToData);
-
-
-    std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
-
-    Vec3d aabbMin1, aabbMax1;
-    surfMeshSmall->computeBoundingBox(aabbMin1, aabbMax1, 1.);
-    sphModel->setInletRegionXCoord(-1.0);
-    sphModel->setOutletRegionXCoord(-1.0);
-    sphModel->setInletOutletRegionYCoordDivision(0.0);
-
-    sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
-
-    // compute center and radius of inlet
-    Vec3d inletCenterPoint = Vec3d(-2.4, 2.0, 0.0);
-    double inletRadius = 0.5;
-    sphModel->setInletRadius(inletRadius);
-    sphModel->setInletCenterPoint(inletCenterPoint);
-
-    Vec3d aabbMin, aabbMax;
-    surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
-
-    const double length = std::abs(aabbMax.x() - aabbMin.x());
-    const double width = std::abs(aabbMax.y() - aabbMin.y());
-    const double depth = std::abs(aabbMax.z() - aabbMin.z());
-
-    const auto spacing = 2.0 * particleRadius;
-    const auto nx = static_cast<size_t>(length / spacing);
-    const auto ny = static_cast<size_t>(width / spacing);
-    const auto nz = static_cast<size_t>(depth / spacing);
-
-    auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
-    auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMeshSmall, uniformMesh, false);
-    particles = enclosedFluidPoints->getInitialVertexPositions();
-    auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
-    StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
-
-    // get wallParticles positions within combined vector
-    std::vector<size_t> wallParticlesIndices(wallParticles.size());
-    std::iota(wallParticlesIndices.begin(), wallParticlesIndices.end(), particles.size());
-
-    particles.insert(particles.end(), wallParticles.begin(), wallParticles.end());
-
-    // add wall particles
-    sphModel->setWallPointIndices(wallParticlesIndices);
-
-    // buffer domain
-    StdVectorOfVec3d bufferParticles;
-    double bufferXCoordMin = 1;
-    sphModel->setBufferXCoord(bufferXCoordMin);
-    for (int i = 0; i < 2000; i++)
-    {
-      bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));
-    }
-    std::vector<size_t> bufferParticlesIndices(bufferParticles.size());
-    std::iota(bufferParticlesIndices.begin(), bufferParticlesIndices.end(), particles.size());
-    sphModel->setBufferParticleIndices(bufferParticlesIndices);
-
-    particles.insert(particles.end(), bufferParticles.begin(), bufferParticles.end());
-
-    StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-
-    sphModel->setInitialVelocities(initialFluidVelocities);
-  }
-
-  else if (SCENE_ID == 4)
-  {
-  auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation.stl"));
-  std::shared_ptr<SurfaceMesh> surfMeshSmall = std::make_shared<SurfaceMesh>(*surfMesh);
-  auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/bifurcation/bifurcation.vtk"));
-
+  // set tetrahedral mesh used when writing VTUs
   sphModel->setGeometryMesh(tetMesh);
 
-  std::shared_ptr<SurfaceMesh> surfMeshExpanded = std::make_shared<SurfaceMesh>(*surfMesh);
-
-  const double scale = 1.5;
-  surfMeshExpanded->directionalScale(1.0, scale, scale);
-  //surfMesh->directionalScale(scale + 0.1, 1.0, 1.0);
-
-  // translate expanded mesh on top of original mesh so that we can subtract them and get a wall mesh
-  Vec3d originalCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshSmall));
-  Vec3d directionalExpandedCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
-  //Vec3d expandedCylCenter = getCenter(std::dynamic_pointer_cast<PointSet>(surfMeshExpanded));
-  //surfMeshExpanded->translate(originalCylCenter - expandedCylCenter, Geometry::TransformType::ApplyToData);
-  surfMeshExpanded->translate(originalCenter - directionalExpandedCenter, Geometry::TransformType::ApplyToData);
-
-
-  std::shared_ptr<SurfaceMesh> wallMesh = generateWallFluidPoints(particleRadius, surfMesh, surfMeshExpanded);
-
-  Vec3d aabbMin1, aabbMax1;
-  surfMeshSmall->computeBoundingBox(aabbMin1, aabbMax1, 1.);
-  sphModel->setInletRegionXCoord(aabbMin1.x() + 1);
-  sphModel->setOutletRegionXCoord(aabbMax1.x() - 1);
-
-  sphModel->setMinMaxXCoords(aabbMin1.x(), aabbMax1.x());
-
-  // compute center and radius of inlet
-  Vec3d inletCenterPoint = Vec3d(-2.0, 2.41, 0.0);
-  double inletRadius = 0.5;
-  sphModel->setInletRadius(inletRadius);
-  sphModel->setInletCenterPoint(inletCenterPoint);
-
+  // fill grid with points
   Vec3d aabbMin, aabbMax;
-  surfMeshExpanded->computeBoundingBox(aabbMin, aabbMax, 1.);
-
+  surfMeshShell->computeBoundingBox(aabbMin, aabbMax, 1.);
   const double length = std::abs(aabbMax.x() - aabbMin.x());
   const double width = std::abs(aabbMax.y() - aabbMin.y());
   const double depth = std::abs(aabbMax.z() - aabbMin.z());
-
   const auto spacing = 2.0 * particleRadius;
   const auto nx = static_cast<size_t>(length / spacing);
   const auto ny = static_cast<size_t>(width / spacing);
   const auto nz = static_cast<size_t>(depth / spacing);
-
   auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
-  auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMeshSmall, uniformMesh, false);
+  auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
   particles = enclosedFluidPoints->getInitialVertexPositions();
-  auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(wallMesh, uniformMesh, false);
+  auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh, false);
   StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
-  // get wallParticles positions within combined vector
-  std::vector<size_t> wallParticlesIndices(wallParticles.size());
-  std::iota(wallParticlesIndices.begin(), wallParticlesIndices.end(), particles.size());
-
-  particles.insert(particles.end(), wallParticles.begin(), wallParticles.end());
-
-  // add wall particles
-  sphModel->setWallPointIndices(wallParticlesIndices);
-
-  // buffer domain
-  StdVectorOfVec3d bufferParticles;
-  double bufferXCoordMin = 1;
-  sphModel->setBufferXCoord(bufferXCoordMin);
-  for (int i = 0; i < 2000; i++)
-  {
-    bufferParticles.push_back(Vec3d(bufferXCoordMin, 0, 0));
-  }
-  std::vector<size_t> bufferParticlesIndices(bufferParticles.size());
-  std::iota(bufferParticlesIndices.begin(), bufferParticlesIndices.end(), particles.size());
-  sphModel->setBufferParticleIndices(bufferParticlesIndices);
-
-  particles.insert(particles.end(), bufferParticles.begin(), bufferParticles.end());
+  // set up boundary conditions
+  Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+  Vec3d inletCenterPoint = Vec3d(-5.81, 0.0, 0.0);
+  double inletRadius = 1.05;
+  Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+  Vec3d inletMaxCoord = inletCenterPoint + Vec3d(1.0, inletRadius, inletRadius);
+  Vec3d outletMinCoord = Vec3d(5.6, -1.295, -7.21);
+  Vec3d outletMaxCoord = Vec3d(6.3, 1.352, 7.21);
+  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
+    std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+  sphModel->setBoundaryConditions(sphBoundaryConditions);
 
   StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
+  sphModel->setInitialVelocities(initialFluidVelocities);
+  }
 
+  else if (SCENE_ID == 4)
+  {
+  // pipe flow with leak
+  auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
+  auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_hole.stl"));
+  auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.vtk"));
+
+  // set tetrahedral mesh used when writing VTUs
+  sphModel->setGeometryMesh(tetMesh);
+  
+  // fill grid with points
+  Vec3d aabbMin, aabbMax;
+  surfMeshShell->computeBoundingBox(aabbMin, aabbMax, 1.);
+  const double length = std::abs(aabbMax.x() - aabbMin.x());
+  const double width = std::abs(aabbMax.y() - aabbMin.y());
+  const double depth = std::abs(aabbMax.z() - aabbMin.z());
+  const auto spacing = 2.0 * particleRadius;
+  const auto nx = static_cast<size_t>(length / spacing);
+  const auto ny = static_cast<size_t>(width / spacing);
+  const auto nz = static_cast<size_t>(depth / spacing);
+  auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
+  auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+  particles = enclosedFluidPoints->getInitialVertexPositions();
+  auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh, false);
+  StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
+
+  // set up boundary conditions
+  Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+  Vec3d inletCenterPoint = Vec3d(-8.5, 6.0, 2.0);
+  Vec3d outletCenterPoint = Vec3d(0.5, 6.0, 2.0);
+  double inletRadius = 1.6;
+  double outletRadius = 1.6;
+  Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+  Vec3d inletMaxCoord = inletCenterPoint + Vec3d(1.0, inletRadius, inletRadius);
+  Vec3d outletMinCoord = outletCenterPoint - Vec3d(1.0, outletRadius, outletRadius);
+  Vec3d outletMaxCoord = outletCenterPoint + Vec3d(0, outletRadius, outletRadius);
+  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
+    std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+  sphModel->setBoundaryConditions(sphBoundaryConditions);
+
+  StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
   sphModel->setInitialVelocities(initialFluidVelocities);
   }
   
   sphModel->setWriteToOutputModulo(0.1);
-  //sphModel->setInletDensity(1001);
-  sphModel->setInletVelocity(Vec3d(1.0, 0.0, 0.0));
-  sphModel->setOutletDensity(1000);
 
   LOG(INFO) << "Number of particles: " << particles.size();
 
@@ -521,14 +368,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   auto fluidMaterial = std::make_shared<RenderMaterial>();
   fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
   fluidMaterial->setVertexColor(Color(1, 0, 1, 0.2));
-  fluidMaterial->setPointSize(5.);
-  //fluidMaterial->setScalarVisibility(true);
-  //std::shared_ptr<ColorFunction>lut = std::make_shared<ColorFunction>();
-  //lut->setNumberOfColors(2);
-  //lut->setColor(0, Color::Red);
-  //lut->setColor(1, Color::Green);
-  //lut->setRange(Vec2d(0.0, 6));
-  //fluidMaterial->setColorLookupTable(lut);
+  fluidMaterial->setPointSize(4.);
 
   fluidVisualModel->setRenderMaterial(fluidMaterial);
 
