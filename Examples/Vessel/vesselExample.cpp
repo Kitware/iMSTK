@@ -198,7 +198,6 @@ makeLegs(const std::string& name, const Vec3d& position)
     computeSdf->update();
     LOG(INFO) << "SDF Complete";
     legsObj->setCollidingGeometry(std::make_shared<SignedDistanceField>(computeSdf->getOutputImage()));
-    MeshIO::write(computeSdf->getOutputImage(), "C:/Users/Andx_/Desktop/test.nii");
 
     return legsObj;
 }

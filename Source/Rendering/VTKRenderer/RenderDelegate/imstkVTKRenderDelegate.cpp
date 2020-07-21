@@ -139,13 +139,13 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
         }
         case Geometry::Type::ImageData:
         {
-            if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Image)
-            {
-                return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
-            }
-            else if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points)
+            if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points)
             {
                 return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
+            }
+            else
+            {
+                return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
             }
         }
         default:
