@@ -20,12 +20,17 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
+#include "imstkCollidingObject.h"
+#include "imstkObjectInteractionFactory.h"
 #include "imstkVirtualCouplingCH.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkSceneObjectController.h"
+#include "imstkCDObjectFactory.h"
 #include "imstkDeviceTracker.h"
 #include "imstkCollisionGraph.h"
+#include "imstkCollisionPair.h"
+#include "imstkCollisionData.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkPlane.h"
@@ -96,17 +101,18 @@ main()
 
     {
         // Setup CD, and collision data
-        auto                                colData   = std::make_shared<CollisionData>();
+        auto colData = std::make_shared<CollisionData>();
+
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(CollisionDetection::Type::UnidirectionalPlaneToSphere,
-            planeObj, obj, colData);
+            planeObj->getCollidingGeometry(), obj->getCollidingGeometry(), colData);
 
         // Setup the handler
-        auto colHandler = std::make_shared<VirtualCouplingCH>(CollisionHandling::Side::B, colData, planeObj, obj);
+        auto colHandler = std::make_shared<VirtualCouplingCH>(CollisionHandling::Side::B, colData, obj);
         colHandler->setStiffness(5e-01);
         colHandler->setDamping(0.005);
 
         auto pair = std::make_shared<CollisionPair>(planeObj, obj, colDetect, nullptr, colHandler);
-        scene->getCollisionGraph()->addInteractionPair(pair);
+        scene->getCollisionGraph()->addInteraction(pair);
     }
 
     // Camera
