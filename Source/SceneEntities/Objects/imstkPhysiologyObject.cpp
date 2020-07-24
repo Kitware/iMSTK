@@ -19,6 +19,8 @@
 
 =========================================================================*/
 
+#include <g3log/g3log.hpp>
+
 #include "imstkPhysiologyObject.h"
 #include "imstkPhysiologyModel.h"
 

@@ -21,12 +21,11 @@ limitations under the License.
 
 #include "imstkPhysiologyModel.h"
 #include "imstkLogger.h"
-#include "imstkParallelUtils.h"
-#include "imstkPointSet.h"
+//#include "imstkParallelUtils.h"
 #include "imstkTaskGraph.h"
 
 /////////////////////////////////////////////////////////////////////////
-// These includes are temporary for testing Pulse in iMSTK
+// These includes are for Pulse
 #include "PulsePhysiologyEngine.h"
 #include "engine/SEEngineTracker.h"
 #include "engine/SEDataRequest.h"
@@ -54,20 +53,19 @@ limitations under the License.
 #include "properties/SEScalarVolumePerTime.h"
 #include "compartment/fluid/SELiquidCompartmentGraph.h"
 
-#include "controller/Controller.h";
 
 namespace imstk
 {
+// empty for now, but we can populate config params if needed
 PhysiologyModelConfig::PhysiologyModelConfig()
 {
     initialize();
 }
 
+// empty for now, but we can populate config params if needed
 void
 PhysiologyModelConfig::initialize()
-{
-   
-}
+{}
 
 PhysiologyModel::PhysiologyModel()
 {
@@ -79,36 +77,40 @@ PhysiologyModel::initialize()
 {
     // Create the engine and load the patient
     m_pulseObj = CreatePulseEngine();
-    m_pulseObj->GetLogger()->SetLogFile("./test_results/HowTo_Hemorrhage.log");
-    m_pulseObj->GetLogger()->Info("HowTo_Hemorrhage");
+    m_pulseObj->GetLogger()->LogToConsole(false);
+
     if (!m_pulseObj->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json"))
     {
       m_pulseObj->GetLogger()->Error("Could not load Pulse state, check the error");
       return true;
     }
 
-    //PulseConfiguration cfg(m_pulseObj->GetSubstanceManager());
+    // Pulse hemorrhage action
+    // here, we can add any Pulse actions that we want
+    m_hemorrhageLeg = std::make_shared<SEHemorrhage>();
+    m_hemorrhageLeg->SetType(eHemorrhage_Type::External);
+    m_hemorrhageLeg->SetCompartment(pulse::VascularCompartment::RightLeg);//the location of the hemorrhage
+
+    //PulseConfiguration cfg;
+    //cfg.GetTimeStep().SetValue(1 / 100, TimeUnit::s);
+    //m_->SetConfigurationOverride(&cfg);
 
     // The tracker is responsible for advancing the engine time and outputting the data requests below at each time step
-    m_dT_s = m_pulseObj->GetTimeStep(TimeUnit::s);
     m_femoralCompartment = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::LeftLeg);
     return true;
 }
 
 void PhysiologyModel::solvePulse()
 {
-    // Create the engine and load the patient
-    double timestep = m_pulseObj->GetTimeStep(TimeUnit::s);
-    //std::cout << timestep << std::endl;
-    //const SEEngineConfiguration* cfg = m_pulseObj->GetConfiguration();
+    // Hemorrhage Starts - instantiate a hemorrhage action and have the engine process it
+    m_hemorrhageLeg->GetRate().SetValue(m_hemorrhageRate, VolumePerTimeUnit::mL_Per_min);//the rate of hemorrhage
+    m_pulseObj->ProcessAction(*m_hemorrhageLeg);
 
-    timestep = m_pulseObj->GetTimeStep(TimeUnit::s);
-    //std::cout << timestep << std::endl;
-    //m_pulseObj->GetTimeStep().SetValue(1.0 / 50.0, TimeUnit::s);
-    m_pulseObj->AdvanceModelTime();
-    //m_pulseObj->GetEngineTracker()->TrackData(m_pulseObj->GetSimulationTime(TimeUnit::s));
+    m_pulseObj->AdvanceModelTime(m_dT_s, TimeUnit::s);
+
     m_femoralFlowRate = m_femoralCompartment->GetInFlow(VolumePerTimeUnit::mL_Per_s);
 
+    //uncomment these to get vitals
     //m_pulseObj->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << m_pulseObj->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
     //m_pulseObj->GetLogger()->Info(std::stringstream() << "Hemoglobin Content : " << m_pulseObj->GetBloodChemistrySystem()->GetHemoglobinContent(MassUnit::g) << MassUnit::g);
     //m_pulseObj->GetLogger()->Info(std::stringstream() << "Blood Volume : " << m_pulseObj->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) << VolumeUnit::mL);
@@ -119,41 +121,27 @@ void PhysiologyModel::solvePulse()
     //m_pulseObj->GetLogger()->Info("Finished");
 }
 
-void
-PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+void PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
 
-//void
-//SPHModel::computeTimeStepSize()
+//SEScalarTime& PhysiologyModel::GetTimeStep()
 //{
-//    m_dt = (this->m_timeStepSizeType == TimeSteppingType::Fixed) ? m_defaultDt : computeCFLTimeStepSize();
+//    if (m_timeStep == nullptr)
+//      m_timeStep = new SEScalarTime();
+//    return *m_timeStep;
+//}
+//const std::shared_ptr<SELiquidCompartment> PhysiologyModel::getFemoralCompartment()
+//{
+//    return m_femoralCompartment;
+//}
+//
+//const std::shared_ptr<SEHemorrhage> PhysiologyModel::getHemorrhageModel()
+//{
+//    return m_hemorrhageLeg;
 //}
 
-//Real
-//SPHModel::computeCFLTimeStepSize()
-//{
-//    auto maxVel = ParallelUtils::findMaxL2Norm(getState().getVelocities());
-//
-//    // dt = CFL * 2r / max{|| v ||}
-//    Real timestep = maxVel > Real(1e-6) ?
-//                    m_modelParameters->m_CFLFactor * (Real(2.0) * m_modelParameters->m_particleRadius / maxVel) :
-//                    m_modelParameters->m_maxTimestep;
-//
-//    // clamp the time step size to be within a given range
-//    if (timestep > m_modelParameters->m_maxTimestep)
-//    {
-//        timestep = m_modelParameters->m_maxTimestep;
-//    }
-//    else if (timestep < m_modelParameters->m_minTimestep)
-//    {
-//        timestep = m_modelParameters->m_minTimestep;
-//    }
-//
-//    return timestep;
-//}
-
-} // end namespace imstk
+}// end namespace imstk

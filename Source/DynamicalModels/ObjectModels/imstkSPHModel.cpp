@@ -99,7 +99,7 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
     m_computeViscosityNode =
       m_taskGraph->addFunction("SPHModel_ComputeViscosity", [&]()
         {
-          computeViscosity();
+          computeViscosity(getTimeStep());
         });
     m_moveParticlesNode =
       m_taskGraph->addFunction("SPHModel_MoveParticles", [&]()
@@ -184,12 +184,27 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     m_taskGraph->addEdge(m_moveParticlesNode, sink);
 }
 
+//void
+//SPHModel::computeFirstHalfTimeStep()
+//{
+//    findParticleNeighbors();
+//    computeNeighborRelativePositions();
+//    computeDensity();
+//    normalizeDensity();
+//    collectNeighborDensity();
+//    computePressureAcceleration();
+//    computeSurfaceTension();
+//    computeTimeStepSize();
+//    sumAccels();
+//    updateVelocityNoGravity(getTimeStep());
+//    computeViscosity(getTimeStep());
+//    moveParticles(getTimeStep());
+//}
+
 void
 SPHModel::computeTimeStepSize()
 {
     m_dt = (this->m_timeStepSizeType == TimeSteppingType::Fixed) ? m_defaultDt : computeCFLTimeStepSize();
-    m_totalTime += m_dt;
-    m_timeStepCount++;
 }
 
 Real
@@ -477,7 +492,7 @@ SPHModel::updateVelocityNoGravity(Real timestep)
       }
 
       getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
-      if (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::inlet)
+      if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::inlet)
       {
         getState().getVelocities()[p] = m_sphBoundaryConditions->computeParabolicInletVelocity(getState().getPositions()[p]);
       }
@@ -485,7 +500,7 @@ SPHModel::updateVelocityNoGravity(Real timestep)
 }
 
 void
-SPHModel::computeViscosity()
+SPHModel::computeViscosity(Real timestep)
 {
     ParallelUtils::parallelFor(getState().getNumParticles(),
         [&](const size_t p) {
@@ -546,7 +561,7 @@ SPHModel::computeViscosity()
               return;
             }
 
-            getState().getVelocities()[p] += getState().getDiffuseVelocities()[p];
+            getState().getVelocities()[p] += getState().getDiffuseVelocities()[p] * timestep;
         });
 }
 
@@ -640,27 +655,26 @@ SPHModel::computeSurfaceTension()
 void
 SPHModel::moveParticles(Real timestep)
 {
-  //ParallelUtils::parallelFor(getState().getNumParticles(),
-  //  [&](const size_t p) {
-
+    Vec3d averageVelThroughHemorrhage(0, 0, 0);
+    int numParticlesAcrossHemorrhagePlane = 0;
     for (int p = 0; p < getState().getNumParticles(); p++)
     {
         if (m_sphBoundaryConditions &&
-           (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::buffer ||
+          (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::buffer ||
             m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::wall))
         {
-            continue;
+          continue;
         }
 
         Vec3r oldPosition = getState().getPositions()[p];
-        Vec3r newPosition = oldPosition + getState().getVelocities()[p] * timestep;
+        Vec3r newPosition = oldPosition + (getState().getVelocities()[p]) * timestep;
         getState().getPositions()[p] = newPosition;
-
+    
         if (m_sphBoundaryConditions)
         {
             std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
             if (particleTypes[p] == SPHBoundaryConditions::ParticleType::inlet &&
-                !m_sphBoundaryConditions->isInInletDomain(newPosition))
+              !m_sphBoundaryConditions->isInInletDomain(newPosition))
             {
                 // change particle type to fluid
                 particleTypes[p] = SPHBoundaryConditions::ParticleType::fluid;
@@ -671,23 +685,41 @@ SPHModel::moveParticles(Real timestep)
                 particleTypes[bufferParticleIndex] = SPHBoundaryConditions::ParticleType::inlet;
 
                 getState().getPositions()[bufferParticleIndex] = Vec3d(m_sphBoundaryConditions->getInletCoord().x(), newPosition.y(), newPosition.z());
-
             }
             else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::outlet &&
-                     !m_sphBoundaryConditions->isInOutletDomain(newPosition))
+              !m_sphBoundaryConditions->isInOutletDomain(newPosition))
             {
                 particleTypes[p] = SPHBoundaryConditions::ParticleType::buffer;
                 // insert particle into buffer domain after it leaves outlet domain
                 getState().getPositions()[p] = m_sphBoundaryConditions->getBufferCoord();
-
             }
             else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::fluid &&
-                     m_sphBoundaryConditions->isInOutletDomain(newPosition))
+              m_sphBoundaryConditions->isInOutletDomain(newPosition))
             {
                 particleTypes[p] = SPHBoundaryConditions::ParticleType::outlet;
             }
         }
+
+        if (m_SPHHemorrhage)
+        {
+            if (m_SPHHemorrhage->pointCrossedHemorrhagePlane(oldPosition, newPosition))
+            {
+                averageVelThroughHemorrhage += m_SPHHemorrhage->getNormal() * getState().getVelocities()[p].dot(m_SPHHemorrhage->getNormal());
+                numParticlesAcrossHemorrhagePlane++;
+            }
+        }
     }
+
+    if (m_SPHHemorrhage)
+    {
+        (numParticlesAcrossHemorrhagePlane > 0) ? averageVelThroughHemorrhage /= numParticlesAcrossHemorrhagePlane : averageVelThroughHemorrhage;
+
+        // temporary code that assumes leak plane has y normal and plane is rectangular
+        double hemorrhageFlowRate = averageVelThroughHemorrhage.norm() * m_SPHHemorrhage->getHemorrhagePlaneArea();
+        m_SPHHemorrhage->setHemorrhageRate(hemorrhageFlowRate);
+    }
+    m_totalTime += m_dt;
+    m_timeStepCount++;
 }
 
 void SPHModel::printParticleTypes()

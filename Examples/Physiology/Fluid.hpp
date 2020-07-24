@@ -38,6 +38,7 @@
 #include <vtkTriangleFilter.h>
 
 #include "imstkSPHBoundaryConditions.h"
+#include "imstkSPHHemorrhage.h"
 
 
 using namespace imstk;
@@ -212,9 +213,11 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
     // set up boundary conditions
-    Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
-    auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
-      std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+    //Vec3d inletVelocity(1, 0.0, 0.0);
+    double inletFlowRate = 10;
+    Vec3d inletNormal(1, 0, 0);
+    auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord), inletNormal,
+      std::make_pair(outletMinCoord, outletMaxCoord), inletFlowRate, particles, wallParticles);
     sphModel->setBoundaryConditions(sphBoundaryConditions);
 
     StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
@@ -248,7 +251,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
     // set up boundary conditions
-    Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+    //Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+    double inletFlowRate = 10;
     Vec3d inletCenterPoint = Vec3d(-2.2, 2.0, 0.0);
     Vec3d outletCenterPoint = Vec3d(-2.2, -2.0, 0.0);
     double inletRadius = 0.6;
@@ -257,8 +261,9 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     Vec3d inletMaxCoord = inletCenterPoint + Vec3d(1.0, inletRadius, inletRadius);
     Vec3d outletMinCoord = outletCenterPoint - Vec3d(0, outletRadius, outletRadius);
     Vec3d outletMaxCoord = outletCenterPoint + Vec3d(1.0, outletRadius, outletRadius);
-    auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
-      std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+    Vec3d inletNormal(1, 0, 0);
+    auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord), inletNormal,
+      std::make_pair(outletMinCoord, outletMaxCoord), inletFlowRate, particles, wallParticles);
     sphModel->setBoundaryConditions(sphBoundaryConditions);
 
     StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
@@ -296,15 +301,17 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
   // set up boundary conditions
-  Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+  //Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+  double inletFlowRate = 10;
   Vec3d inletCenterPoint = Vec3d(-5.81, 0.0, 0.0);
   double inletRadius = 1.05;
   Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
   Vec3d inletMaxCoord = inletCenterPoint + Vec3d(1.0, inletRadius, inletRadius);
   Vec3d outletMinCoord = Vec3d(5.6, -1.295, -7.21);
   Vec3d outletMaxCoord = Vec3d(6.3, 1.352, 7.21);
-  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
-    std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+  Vec3d inletNormal(1, 0, 0);
+  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord), inletNormal,
+    std::make_pair(outletMinCoord, outletMaxCoord), inletFlowRate, particles, wallParticles);
   sphModel->setBoundaryConditions(sphBoundaryConditions);
 
   StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
@@ -338,7 +345,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
   // set up boundary conditions
-  Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+  //Vec3d inletVelocity = Vec3d(1, 0.0, 0.0);
+  double inletFlowRate = 10;
   Vec3d inletCenterPoint = Vec3d(-8.5, 6.0, 2.0);
   Vec3d outletCenterPoint = Vec3d(0.5, 6.0, 2.0);
   double inletRadius = 1.6;
@@ -347,9 +355,16 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   Vec3d inletMaxCoord = inletCenterPoint + Vec3d(1.0, inletRadius, inletRadius);
   Vec3d outletMinCoord = outletCenterPoint - Vec3d(1.0, outletRadius, outletRadius);
   Vec3d outletMaxCoord = outletCenterPoint + Vec3d(0, outletRadius, outletRadius);
-  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord),
-    std::make_pair(outletMinCoord, outletMaxCoord), inletVelocity, particles, wallParticles);
+  Vec3d inletNormal(1, 0, 0);
+  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(std::make_pair(inletMinCoord, inletMaxCoord), inletNormal,
+    std::make_pair(outletMinCoord, outletMaxCoord), inletFlowRate, particles, wallParticles);
   sphModel->setBoundaryConditions(sphBoundaryConditions);
+
+  Vec3d hemorrhagePlaneCenter(-4.16, 4.03, 1.97);
+  double hemorrhagePlaneRadius = 0.5;
+  Vec3d hemorrhagePlaneNormal(0, 1, 0);
+  auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneNormal);
+  sphModel->setHemorrhageModel(sphHemorrhageModel);
 
   StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
   sphModel->setInitialVelocities(initialFluidVelocities);

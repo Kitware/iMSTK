@@ -26,14 +26,12 @@
 
 namespace imstk
 {
-
 ///
 /// \class SPHBoundaryConditions
 /// \brief Class that holds methods and members for boundary conditions
 ///
 class SPHBoundaryConditions
 {
-
 public:
 
     enum class ParticleType
@@ -45,8 +43,8 @@ public:
       buffer
     };
 
-    SPHBoundaryConditions(const std::pair<Vec3d, Vec3d>& inletDomain, const std::pair<Vec3d, Vec3d>& outletDomain,
-      const Vec3r& inletVelocity, StdVectorOfVec3d& mainParticles, const StdVectorOfVec3d& wallParticlePositions);
+    SPHBoundaryConditions(const std::pair<Vec3d, Vec3d>& inletDomain, const Vec3d& inletNormal, const std::pair<Vec3d, Vec3d>& outletDomain,
+      const double inletFlowRate, StdVectorOfVec3d& mainParticles, const StdVectorOfVec3d& wallParticlePositions);
 
     bool isInInletDomain(Vec3d position);
 
@@ -62,21 +60,26 @@ public:
 
     void addBoundaryParticles(StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions);
 
+    void setInletVelocity(const double flowRate);
+
     Vec3d getInletCoord() { return m_inletDomain.first; }
 
 private:
-  std::pair<Vec3d, Vec3d> m_inletDomain;
-  std::pair<Vec3d, Vec3d> m_outletDomain;
-  //std::pair<Vec3d, Vec3d> m_fluidDomain;
+    std::pair<Vec3d, Vec3d> m_inletDomain;
+    std::pair<Vec3d, Vec3d> m_outletDomain;
+    //std::pair<Vec3d, Vec3d> m_fluidDomain;
 
-  std::vector<ParticleType> m_particleTypes;
+    std::vector<ParticleType> m_particleTypes;
 
-  Vec3d m_bufferCoord;
-  Vec3d m_inletCenterPoint;
-  Real m_inletRadius;
-  Vec3r m_inletVelocity;
+    Vec3d m_bufferCoord;
+    Vec3d m_inletCenterPoint;
+    Real m_inletRadius;
+    Vec3r m_inletVelocity;
+    Vec3d m_inletNormal;
 
-  const size_t m_numBufferParticles = 3000;
+    double m_inletCrossSectionalArea;
+
+    const size_t m_numBufferParticles = 3000;
 
 };
 } // end namespace imstk

@@ -23,26 +23,44 @@
 
 #include "imstkMath.h"
 
+
 namespace imstk
 {
 ///
-/// \class PhysiologyState
-/// \brief State of Physiology model
+/// \class SPHHemorrhage
+/// \brief Class that holds methods and members for hemorrhage model
 ///
-class PhysiologyState // keep class for now in case we need it in future
+class SPHHemorrhage
 {
 public:
-    ///
-    /// \brief Default constructor/destructor
-    ///
-    PhysiologyState() = default;
-    virtual ~PhysiologyState() = default;
+    // constructor
+    SPHHemorrhage(const Vec3d& center, const double radius, const Vec3d& normal);
 
     ///
-    /// \brief Set the state to a given one
+    /// \brief Compute the cross-sectional area of the hemorrhage plane
     ///
-    void setState(const std::shared_ptr<PhysiologyState>&) {};
+    void computeHemorrhagePlaneArea();
+
+    ///
+    /// \brief Determine if fluid particle crossed the hemorrhage plane
+    ///
+    bool pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const Vec3d& newPosition);
+
+    const Vec3d getNormal() { return m_normal; }
+
+    const double getHemorrhagePlaneArea() { return m_hemorrhagePlaneArea; }
+
+    const double getHemorrhageRate() { return m_hemorrhageRate; }
+    void setHemorrhageRate(const double hemorrhageRate) { m_hemorrhageRate = hemorrhageRate; }
+
 
 private:
+    Vec3d m_center;
+    double m_radius;
+    Vec3d m_normal;
+
+    double m_hemorrhageRate = 0;
+
+    double m_hemorrhagePlaneArea;
 };
 } // end namespace imstk

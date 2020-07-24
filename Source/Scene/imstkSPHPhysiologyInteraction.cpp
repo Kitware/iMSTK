@@ -27,30 +27,38 @@ limitations under the License.
 #include "imstkSPHObject.h"
 #include "imstkTaskGraph.h"
 
+
 namespace imstk
 {
   SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2) : ObjectInteractionPair(obj1, obj2)
 {
-    m_sphModel1 = obj1->getDynamicalSPHModel();
-    m_physiologyModel1 = obj2->getPhysiologyModel();
+    m_sphModel = obj1->getDynamicalSPHModel();
+    m_physiologyModel = obj2->getPhysiologyModel();
 
     // Define where the boundary condition happens
-    m_bcNode = std::make_shared<TaskNode>([&]() { computeInletBCs(); },
+    m_bcNode = std::make_shared<TaskNode>([&]() { computeInteraction(); },
       obj1->getName() + "_vs_" + obj2->getName() + "_boundaryCondition", true);
 
     // Define where solver interaction happens
-    m_solveNodeInputs.first.push_back(m_sphModel1->getTaskGraph()->getSource());
-    m_solveNodeInputs.second.push_back(m_physiologyModel1->getTaskGraph()->getSource());
+    m_solveNodeInputs.first.push_back(m_sphModel->getTaskGraph()->getSource());
+    m_solveNodeInputs.second.push_back(m_physiologyModel->getTaskGraph()->getSource());
 
-    m_solveNodeOutputs.first.push_back(m_sphModel1->getFindParticleNeighborsNode());
-    m_solveNodeOutputs.second.push_back(m_physiologyModel1->getSolveNode());
+    m_solveNodeOutputs.first.push_back(m_sphModel->getFindParticleNeighborsNode());
+    m_solveNodeOutputs.second.push_back(m_physiologyModel->getSolveNode());
 }
 
-void SPHPhysiologyObjectInteractionPair::computeInletBCs()
+void SPHPhysiologyObjectInteractionPair::computeInteraction()
 {
-    // todo input femoral flow rate as inlet boundary condition of SPH model
-    double femoralFlowRate = m_physiologyModel1->m_femoralFlowRate;
-    //std::cout << femoralFlowRate << std::endl;
+  if (m_sphModel->getHemorrhageModel())
+  {
+      double hemorrhageFlowRate = m_sphModel->getHemorrhageModel()->getHemorrhageRate();
+      m_physiologyModel->setHemorrhageRate(hemorrhageFlowRate);
+       
+      double femoralFlowRate = m_physiologyModel->getFemoralFlowRate();
+      m_sphModel->getBoundaryConditions()->setInletVelocity(femoralFlowRate);
+
+      m_physiologyModel->setPulseTimeStep(m_sphModel->getTimeStep());
+  }
 }
 
 void

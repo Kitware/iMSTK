@@ -32,6 +32,7 @@
 #include "imstkTetrahedralMesh.h"
 
 #include "imstkSPHBoundaryConditions.h"
+#include "imstkSPHHemorrhage.h"
 
 
 namespace imstk
@@ -66,6 +67,7 @@ public:
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
     Real m_particleMassScale = Real(1.0);         ///> scale particle mass to a smaller value to maintain stability
+    Real m_eta               = Real(0.1);
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -197,14 +199,17 @@ public:
 
     void printParticleTypes();
 
-
     //Vec3d computeParabolicInletVelocity(const Vec3d particlePosition);
 
     void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
     std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
 
+    void setHemorrhageModel(std::shared_ptr<SPHHemorrhage> sPHHemorrhage) { m_SPHHemorrhage = sPHHemorrhage; }
+    std::shared_ptr<SPHHemorrhage> getHemorrhageModel() { return m_SPHHemorrhage; }
 
-
+    double getPreviousTime() { return m_previousTime; }
+    double getTotalTime() { return m_totalTime; }
+    double getTimeModulo() { return m_timeModulo; }
 
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
@@ -280,7 +285,7 @@ private:
     ///
     /// \brief Compute viscosity
     ///
-    void computeViscosity();
+    void computeViscosity(Real timestep);
 
     ///
     /// \brief Compute surface tension and update velocities
@@ -295,6 +300,9 @@ private:
     void moveParticles(const Real timestep);
 
     void computePressureOutlet();
+
+    void computeFirstHalfTimeStep();
+
 
 
 
@@ -343,6 +351,9 @@ private:
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 
     std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
+
+    std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
+
 
 };
 } // end namespace imstk

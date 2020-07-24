@@ -23,42 +23,34 @@ limitations under the License.
 
 #include "imstkCollisionPair.h"
 
+
 namespace imstk
 {
-  class SPHObject;
-  class PhysiologyObject;
-  class PbdSolver;
-  class SPHModel;
-  class PhysiologyModel;
+ class SPHObject;
+ class PhysiologyObject;
+ class PbdSolver;
+ class SPHModel;
+ class PhysiologyModel;
 
-  ///
-  /// \class PbdObjectCollisionPair
-  ///
-  /// \brief This class defines a collision interaction between two PbdObjects
-  ///
-  class SPHPhysiologyObjectInteractionPair : public ObjectInteractionPair
-  {
-  public:
+///
+/// \class PbdObjectCollisionPair
+///
+/// \brief This class defines a collision interaction between two PbdObjects
+///
+class SPHPhysiologyObjectInteractionPair : public ObjectInteractionPair
+{
+public:
     SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2);
 
     void apply() override;
 
-    //void bcNode();
+    void computeInteraction();
 
-    void computeInletBCs();
-
-  private:
-    // Pbd defines two interactions (one at CD and one at solver)
+private:
     Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
-    std::shared_ptr<SPHModel> m_sphModel1 = nullptr;
-    std::shared_ptr<PhysiologyModel> m_physiologyModel1 = nullptr;
-
-    // Define where the boundary condition happens
-    //m_taskNodeInputs.first.push_back(sphModel1->getIntegrateNode());
-    //m_taskNodeInputs.second.push_back(physiologyModel1->getSolveNode());
-
+    std::shared_ptr<SPHModel> m_sphModel = nullptr;
+    std::shared_ptr<PhysiologyModel> m_physiologyModel = nullptr;
     std::shared_ptr<TaskNode> m_bcNode = nullptr;
-    std::shared_ptr<TaskNode> m_boundaryConditionNode = nullptr;
-  };
+};
 }
