@@ -25,14 +25,14 @@
 
 #define imstkSetMacro(name, dataType)       \
     virtual void set ## name(dataType _arg) \
+    {                                       \
+        if (this->m_ ## name != _arg)       \
         {                                   \
-                if (this->name != _arg)     \
-        {                                   \
-            this->name = _arg;              \
-                }                           \
+            this->m_ ## name = _arg;        \
+        }                                   \
     }
 #define imstkGetMacro(name, dataType) \
-    virtual dataType get ## name() { return this->name; }
+    virtual dataType get ## name() { return this->m_ ## name; }
 
 namespace imstk
 {
@@ -102,7 +102,7 @@ private:
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_inputs;
     std::unordered_map<size_t, std::shared_ptr<Geometry>> m_outputs;
     //bool m_modified = true;
-    size_t NumberOfInputPorts  = 1;
-    size_t NumberOfOutputPorts = 1;
+    size_t m_NumberOfInputPorts  = 1;
+    size_t m_NumberOfOutputPorts = 1;
 };
 }

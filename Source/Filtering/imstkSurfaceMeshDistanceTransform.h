@@ -83,10 +83,10 @@ protected:
     void requestUpdate() override;
 
 private:
-    Vec3i Dimensions = Vec3i(0, 0, 0);
-    Vec6d Bounds;
-    bool  UseBounds = false;
-    //bool   NarrowBanded = false;
-    //double NarrowBandWidth = 1.0;
+    Vec3i m_Dimensions = Vec3i(0, 0, 0);
+    Vec6d m_Bounds;
+    bool  m_UseBounds = false;
+    //bool   m_NarrowBanded = false;
+    //double m_NarrowBandWidth = 1.0;
 };
 }

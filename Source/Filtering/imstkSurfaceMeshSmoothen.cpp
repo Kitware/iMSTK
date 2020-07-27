@@ -53,13 +53,13 @@ SurfaceMeshSmoothen::requestUpdate()
 
     vtkNew<vtkSmoothPolyDataFilter> filter;
     filter->SetInputData(GeometryUtils::copyToVtkPolyData(inputMesh));
-    filter->SetNumberOfIterations(NumberOfIterations);
-    filter->SetRelaxationFactor(RelaxationFactor);
-    filter->SetConvergence(Convergence);
-    filter->SetFeatureAngle(FeatureAngle);
-    filter->SetEdgeAngle(EdgeAngle);
-    filter->SetFeatureEdgeSmoothing(FeatureEdgeSmoothing);
-    filter->SetBoundarySmoothing(BoundarySmoothing);
+    filter->SetNumberOfIterations(m_NumberOfIterations);
+    filter->SetRelaxationFactor(m_RelaxationFactor);
+    filter->SetConvergence(m_Convergence);
+    filter->SetFeatureAngle(m_FeatureAngle);
+    filter->SetEdgeAngle(m_EdgeAngle);
+    filter->SetFeatureEdgeSmoothing(m_FeatureEdgeSmoothing);
+    filter->SetBoundarySmoothing(m_BoundarySmoothing);
     filter->Update();
 
     setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));

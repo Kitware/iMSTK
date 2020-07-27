@@ -137,7 +137,7 @@ ImageResample::requestUpdate()
     }
 
     const Vec3i& inputDim  = inputImage->getDimensions();
-    const Vec3i& outputDim = Dimensions;
+    const Vec3i& outputDim = m_Dimensions;
 
     const Vec3d inputSpacing  = inputImage->getSpacing();
     const Vec3d inputSize     = inputDim.cast<double>().cwiseProduct(inputSpacing);

@@ -61,7 +61,7 @@ SurfaceMeshFlyingEdges::requestUpdate()
 
     vtkNew<vtkFlyingEdges3D> filter;
     filter->SetInputData(GeometryUtils::coupleVtkImageData(inputImage));
-    filter->SetValue(0, IsoValue);
+    filter->SetValue(0, m_IsoValue);
     filter->Update();
 
     setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));

@@ -58,7 +58,7 @@ protected:
     void requestUpdate() override;
 
 private:
-    Vec3i Dimensions;
-    Vec6d Bounds;
+    Vec3i m_Dimensions;
+    Vec6d m_Bounds;
 };
 }

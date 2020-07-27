@@ -53,6 +53,6 @@ protected:
     void requestUpdate() override;
 
 private:
-    bool ComputeMagnitude;
+    bool m_ComputeMagnitude;
 };
 }

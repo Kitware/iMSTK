@@ -52,6 +52,6 @@ protected:
     void requestUpdate() override;
 
 private:
-    bool UseUnsigned = false;
+    bool m_UseUnsigned = false;
 };
 }

@@ -29,7 +29,7 @@
 namespace imstk
 {
 QuadricDecimate::QuadricDecimate() :
-    VolumePreserving(true), TargetReduction(0.6)
+    m_VolumePreserving(true), m_TargetReduction(0.6)
 {
     setNumberOfInputPorts(1);
     setNumberOfOutputPorts(1);
@@ -55,8 +55,8 @@ QuadricDecimate::requestUpdate()
 
     vtkNew<vtkQuadricDecimation> filter;
     filter->SetInputData(inputMeshVtk);
-    filter->SetVolumePreservation(VolumePreserving);
-    filter->SetTargetReduction(TargetReduction);
+    filter->SetVolumePreservation(m_VolumePreserving);
+    filter->SetTargetReduction(m_TargetReduction);
     filter->Update();
 
     setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));

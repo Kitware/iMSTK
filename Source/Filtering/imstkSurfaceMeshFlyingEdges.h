@@ -57,6 +57,6 @@ protected:
     void requestUpdate() override;
 
 private:
-    double IsoValue = 0.0;
+    double m_IsoValue = 0.0;
 };
 }

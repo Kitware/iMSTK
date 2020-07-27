@@ -64,12 +64,12 @@ protected:
     void requestUpdate() override;
 
 private:
-    int    NumberOfIterations = 20;
-    double RelaxationFactor   = 0.01;
-    double Convergence  = 0.0;
-    double FeatureAngle = 45.0;
-    double EdgeAngle    = 15.0;
-    bool   FeatureEdgeSmoothing = false;
-    bool   BoundarySmoothing    = true;
+    int    m_NumberOfIterations = 20;
+    double m_RelaxationFactor   = 0.01;
+    double m_Convergence  = 0.0;
+    double m_FeatureAngle = 45.0;
+    double m_EdgeAngle    = 15.0;
+    bool   m_FeatureEdgeSmoothing = false;
+    bool   m_BoundarySmoothing    = true;
 };
 }

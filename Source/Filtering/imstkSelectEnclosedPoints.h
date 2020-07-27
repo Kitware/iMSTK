@@ -58,9 +58,9 @@ protected:
     void requestUpdate() override;
 
 private:
-    bool   UsePruning = true;
-    double Tolerance  = 0.0;
-    bool   InsideOut  = false;
-    std::shared_ptr<DataArray<unsigned char>> IsInsideMask = nullptr;
+    bool   m_UsePruning = true;
+    double m_Tolerance  = 0.0;
+    bool   m_InsideOut  = false;
+    std::shared_ptr<DataArray<unsigned char>> m_IsInsideMask = nullptr;
 };
 }

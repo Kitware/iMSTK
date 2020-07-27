@@ -57,21 +57,21 @@ ImplicitGeometryToImageData::requestUpdate()
         return;
     }
 
-    const Vec3d size    = Vec3d(Bounds[1] - Bounds[0], Bounds[3] - Bounds[2], Bounds[5] - Bounds[4]);
-    const Vec3d spacing = size.cwiseQuotient(Dimensions.cast<double>());
-    const Vec3d origin  = Vec3d(Bounds[0], Bounds[2], Bounds[4]) + spacing * 0.5;
+    const Vec3d size    = Vec3d(m_Bounds[1] - m_Bounds[0], m_Bounds[3] - m_Bounds[2], m_Bounds[5] - m_Bounds[4]);
+    const Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
+    const Vec3d origin  = Vec3d(m_Bounds[0], m_Bounds[2], m_Bounds[4]) + spacing * 0.5;
 
     std::shared_ptr<ImageData> outputImage = std::make_shared<ImageData>();
-    outputImage->allocate(IMSTK_FLOAT, 1, Dimensions, spacing, origin);
+    outputImage->allocate(IMSTK_FLOAT, 1, m_Dimensions, spacing, origin);
     DataArray<float>& scalars = *std::dynamic_pointer_cast<DataArray<float>>(outputImage->getScalars());
     float*            imgPtr  = scalars.getPointer();
 
     int i = 0;
-    for (int z = 0; z < Dimensions[2]; z++)
+    for (int z = 0; z < m_Dimensions[2]; z++)
     {
-        for (int y = 0; y < Dimensions[1]; y++)
+        for (int y = 0; y < m_Dimensions[1]; y++)
         {
-            for (int x = 0; x < Dimensions[0]; x++, i++)
+            for (int x = 0; x < m_Dimensions[0]; x++, i++)
             {
                 const Vec3d pos = Vec3d(x, y, z).cwiseProduct(spacing) + origin;
                 imgPtr[i] = inputGeometry->getFunctionValue(pos);

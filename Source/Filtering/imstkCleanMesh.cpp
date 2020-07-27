@@ -74,9 +74,9 @@ CleanMesh::requestUpdate()
 
     vtkNew<vtkCleanPolyData> filter;
     filter->SetInputData(inputMeshVtk);
-    filter->SetTolerance(Tolerance);
-    filter->SetAbsoluteTolerance(AbsoluteTolerance);
-    filter->SetToleranceIsAbsolute(UseAbsolute);
+    filter->SetTolerance(m_Tolerance);
+    filter->SetAbsoluteTolerance(m_AbsoluteTolerance);
+    filter->SetToleranceIsAbsolute(m_UseAbsolute);
     filter->Update();
 
     if (inputMesh->getType() == Geometry::Type::LineMesh)

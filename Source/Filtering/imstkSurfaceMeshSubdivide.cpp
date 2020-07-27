@@ -55,11 +55,11 @@ SurfaceMeshSubdivide::requestUpdate()
     }
 
     vtkSmartPointer<vtkSubdivisionFilter> filter = nullptr;
-    if (SubdivisionType == Type::BUTTERFLY)
+    if (m_SubdivisionType == Type::BUTTERFLY)
     {
         filter = vtkSmartPointer<vtkButterflySubdivisionFilter>::New();
     }
-    else if (SubdivisionType == Type::LOOP)
+    else if (m_SubdivisionType == Type::LOOP)
     {
         filter = vtkSmartPointer<vtkLoopSubdivisionFilter>::New();
     }
@@ -69,7 +69,7 @@ SurfaceMeshSubdivide::requestUpdate()
     }
 
     filter->SetInputData(GeometryUtils::copyToVtkPolyData(inputMesh));
-    filter->SetNumberOfSubdivisions(NumberOfSubdivisions);
+    filter->SetNumberOfSubdivisions(m_NumberOfSubdivisions);
     filter->Update();
 
     setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));

@@ -199,7 +199,7 @@ SurfaceMeshDistanceTransform::requestUpdate()
         return;
     }
 
-    if (Dimensions[0] == 0 || Dimensions[1] == 0 || Dimensions[2] == 0)
+    if (m_Dimensions[0] == 0 || m_Dimensions[1] == 0 || m_Dimensions[2] == 0)
     {
         LOG(WARNING) << "Dimensions not set";
         return;
@@ -210,14 +210,14 @@ SurfaceMeshDistanceTransform::requestUpdate()
     Vec3d max;
     inputSurfaceMesh->computeBoundingBox(min, max);
     double bounds[6];
-    if (UseBounds)
+    if (m_UseBounds)
     {
-        bounds[0] = Bounds[0];
-        bounds[1] = Bounds[1];
-        bounds[2] = Bounds[2];
-        bounds[3] = Bounds[3];
-        bounds[4] = Bounds[4];
-        bounds[5] = Bounds[5];
+        bounds[0] = m_Bounds[0];
+        bounds[1] = m_Bounds[1];
+        bounds[2] = m_Bounds[2];
+        bounds[3] = m_Bounds[3];
+        bounds[4] = m_Bounds[4];
+        bounds[5] = m_Bounds[5];
     }
     else
     {
@@ -229,9 +229,9 @@ SurfaceMeshDistanceTransform::requestUpdate()
         bounds[5] = max[2];
     }
     Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
-    Vec3d spacing = size.cwiseQuotient(Dimensions.cast<double>());
+    Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
     Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);
-    outputImageData->allocate(IMSTK_FLOAT, 1, Dimensions, spacing, origin);
+    outputImageData->allocate(IMSTK_FLOAT, 1, m_Dimensions, spacing, origin);
 
     /* StopWatch timer;
      timer.start();*/

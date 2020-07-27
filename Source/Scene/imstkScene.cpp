@@ -194,7 +194,7 @@ Scene::initTaskGraph()
 void
 Scene::setTaskTimingFlag(const bool flag)
 {
-    m_config->taskTimingEnabled=flag;
+    m_config->taskTimingEnabled = flag;
     // If user wants to benchmark, tell all the nodes to time themselves
     for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
     {

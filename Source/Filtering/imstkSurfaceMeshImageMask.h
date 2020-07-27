@@ -72,8 +72,8 @@ protected:
     void requestUpdate() override;
 
 private:
-    Vec3i Dimensions    = Vec3i(-1, -1, -1);
-    int   BorderExtent  = 1;
-    bool  CheckManifold = true;
+    Vec3i m_Dimensions    = Vec3i(-1, -1, -1);
+    int   m_BorderExtent  = 1;
+    bool  m_CheckManifold = true;
 };
 }

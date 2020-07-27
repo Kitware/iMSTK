@@ -60,7 +60,7 @@ protected:
     void requestUpdate() override;
 
 private:
-    bool   VolumePreserving;
-    double TargetReduction;
+    bool   m_VolumePreserving;
+    double m_TargetReduction;
 };
 }

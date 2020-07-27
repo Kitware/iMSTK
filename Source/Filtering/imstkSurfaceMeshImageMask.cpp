@@ -89,7 +89,7 @@ SurfaceMeshImageMask::requestUpdate()
     }
     else
     {
-        if (Dimensions[0] == -1 || Dimensions[1] == -1 || Dimensions[2] == -1)
+        if (m_Dimensions[0] == -1 || m_Dimensions[1] == -1 || m_Dimensions[2] == -1)
         {
             LOG(WARNING) << "No reference image or desired image dimensions.";
             return;
@@ -101,22 +101,22 @@ SurfaceMeshImageMask::requestUpdate()
         Vec3d size = max - min;
 
         // Compute spacing required for given dimension
-        spacing = size.cwiseQuotient(Dimensions.cast<double>());
+        spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
 
         // Increase bounds by px length
-        min -= spacing * BorderExtent;
-        max += spacing * BorderExtent;
+        min -= spacing * m_BorderExtent;
+        max += spacing * m_BorderExtent;
 
         size = max - min;
 
         extent[0] = 0;
-        extent[1] = (Dimensions[0] + BorderExtent) - 1;
+        extent[1] = (m_Dimensions[0] + m_BorderExtent) - 1;
         extent[2] = 0;
-        extent[3] = (Dimensions[1] + BorderExtent) - 1;
+        extent[3] = (m_Dimensions[1] + m_BorderExtent) - 1;
         extent[4] = 0;
-        extent[5] = (Dimensions[2] + BorderExtent) - 1;
+        extent[5] = (m_Dimensions[2] + m_BorderExtent) - 1;
 
-        origin = min - BorderExtent * spacing;
+        origin = min - m_BorderExtent * spacing;
     }
 
     // Allocate a new white image

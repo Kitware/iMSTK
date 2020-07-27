@@ -59,7 +59,7 @@ protected:
     void requestUpdate() override;
 
 private:
-    Type SubdivisionType      = Type::LINEAR;
-    int  NumberOfSubdivisions = 1;
+    Type m_SubdivisionType      = Type::LINEAR;
+    int  m_NumberOfSubdivisions = 1;
 };
 }

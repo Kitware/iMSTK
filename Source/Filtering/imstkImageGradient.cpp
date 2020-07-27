@@ -58,7 +58,7 @@ ImageGradient::requestUpdate()
         return;
     }
     vtkSmartPointer<vtkImageData> inputImageVtk = GeometryUtils::coupleVtkImageData(inputImage);
-    if (ComputeMagnitude)
+    if (m_ComputeMagnitude)
     {
         vtkNew<vtkImageGradientMagnitude> gradientMagnitude;
         gradientMagnitude->SetInputData(inputImageVtk);

@@ -56,22 +56,22 @@ public:
     ///
     void setTolerance(const double tolerance)
     {
-        this->Tolerance = tolerance;
-        UseAbsolute     = false;
+        this->m_Tolerance = tolerance;
+        m_UseAbsolute     = false;
     }
 
     void setAbsoluteTolerance(const double tolerance)
     {
-        this->AbsoluteTolerance = tolerance;
-        UseAbsolute = true;
+        this->m_AbsoluteTolerance = tolerance;
+        m_UseAbsolute = true;
     }
 
 protected:
     void requestUpdate() override;
 
 private:
-    double Tolerance = 0.0;
-    double AbsoluteTolerance = 1.0;
-    bool   UseAbsolute       = false;
+    double m_Tolerance = 0.0;
+    double m_AbsoluteTolerance = 1.0;
+    bool   m_UseAbsolute       = false;
 };
 }

@@ -106,7 +106,7 @@ ImageDistanceTransform::requestUpdate()
 
     // Inner distance should be negative
     vtkSmartPointer<vtkImageData> innerImage = innerSqrtFilter->GetOutput();
-    if (!UseUnsigned)
+    if (!m_UseUnsigned)
     {
         vtkSmartPointer<vtkImageShiftScale> negFilter = vtkSmartPointer<vtkImageShiftScale>::New();
         negFilter->SetInputData(innerSqrtFilter->GetOutput());

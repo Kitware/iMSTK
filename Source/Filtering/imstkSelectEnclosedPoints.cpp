@@ -59,7 +59,7 @@ SelectEnclosedPoints::requestUpdate()
 {
     std::shared_ptr<SurfaceMesh> inputSurfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
     std::shared_ptr<PointSet>    inputPointSet    = std::dynamic_pointer_cast<PointSet>(getInput(1));
-    IsInsideMask = nullptr;
+    m_IsInsideMask = nullptr;
 
     if (inputSurfaceMesh == nullptr || inputPointSet == nullptr)
     {
@@ -70,13 +70,13 @@ SelectEnclosedPoints::requestUpdate()
     vtkNew<vtkSelectEnclosedPoints> filter;
     filter->SetInputData(GeometryUtils::copyToVtkPointSet(inputPointSet));
     filter->SetSurfaceData(GeometryUtils::copyToVtkPolyData(inputSurfaceMesh));
-    filter->SetTolerance(Tolerance);
-    filter->SetInsideOut(InsideOut);
+    filter->SetTolerance(m_Tolerance);
+    filter->SetInsideOut(m_InsideOut);
     filter->Update();
 
     vtkSmartPointer<vtkPointSet> vtkResults = vtkPointSet::SafeDownCast(filter->GetOutput());
 
-    if (UsePruning)
+    if (m_UsePruning)
     {
         StdVectorOfVec3d points;
         points.reserve(vtkResults->GetNumberOfPoints());
@@ -98,8 +98,8 @@ SelectEnclosedPoints::requestUpdate()
     }
     else
     {
-        IsInsideMask = std::make_shared<DataArray<unsigned char>>(vtkResults->GetNumberOfPoints());
-        DataArray<unsigned char>& mask = *IsInsideMask;
+        m_IsInsideMask = std::make_shared<DataArray<unsigned char>>(vtkResults->GetNumberOfPoints());
+        DataArray<unsigned char>& mask = *m_IsInsideMask;
         for (vtkIdType i = 0; i < vtkResults->GetNumberOfPoints(); i++)
         {
             mask[i] = filter->IsInside(i);
