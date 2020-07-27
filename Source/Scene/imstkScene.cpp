@@ -173,10 +173,7 @@ Scene::initTaskGraph()
     }
 
     // If user wants to benchmark, tell all the nodes to time themselves
-    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
-    {
-        node->m_enableTiming = m_config->taskTimingEnabled;
-    }
+    this->setTaskTimingFlag(m_config->taskTimingEnabled);
 
     // Generate unique names among the nodes
     TaskGraph::getUniqueNodeNames(m_taskGraph, true);
@@ -192,6 +189,17 @@ Scene::initTaskGraph()
 
     m_taskGraphController->setTaskGraph(m_taskGraph);
     m_taskGraphController->initialize();
+}
+
+void
+Scene::setTaskTimingFlag(const bool flag)
+{
+    m_config->taskTimingEnabled=flag;
+    // If user wants to benchmark, tell all the nodes to time themselves
+    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
+    {
+        node->m_enableTiming = m_config->taskTimingEnabled;
+    }
 }
 
 void

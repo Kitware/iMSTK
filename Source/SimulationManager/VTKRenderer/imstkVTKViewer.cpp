@@ -209,14 +209,10 @@ VTKViewer::startRenderingLoop()
         m_vtkRenderWindow->GetInteractor()->Initialize();
         m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
 
-        // If the Scene wants benchmarking hookup timer to update the table
-        auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
-        vtkRen->setTimeTableVisibility(m_activeScene->getConfig()->taskTimingEnabled);
-        if (m_activeScene->getConfig()->taskTimingEnabled)
-        {
-            m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::TimerEvent, m_timerCallbackCommand);
-            m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
-        }
+        // If the Scene wants benchmarking hookup timer to update the table     
+        m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::TimerEvent, m_timerCallbackCommand);
+        m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
+        
 
         m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());
         m_vtkRenderWindow->GetInteractor()->Start();

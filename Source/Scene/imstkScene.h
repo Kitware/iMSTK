@@ -111,6 +111,7 @@ public:
     ///
     void initTaskGraph();
 
+    void setTaskTimingFlag(const bool flag);
     ///
     /// \brief Launch camera controller and other scene specific modules that need to run independently
     ///

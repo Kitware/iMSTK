@@ -25,6 +25,7 @@
 #include "imstkViewer.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkRenderer.h>
@@ -185,6 +186,12 @@ VTKInteractorStyle::OnChar()
     {
         m_displayFps = !m_displayFps;
         m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
+
+        const auto activeScene = m_simManager->getActiveScene();
+        activeScene->setTaskTimingFlag(!activeScene->getConfig()->taskTimingEnabled);
+        const auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer());
+        vtkRen->setTimeTableVisibility(activeScene->getConfig()->taskTimingEnabled);
+
         this->Interactor->Render();
     }
     else if (key == 'r' || key == 'R')
