@@ -24,6 +24,7 @@
 #include "imstkVisualModel.h"
 
 #include <vtkDoubleArray.h>
+#include <vtkPointData.h>
 #include <vtkGlyph3D.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkSphereSource.h>
@@ -34,7 +35,8 @@
 namespace imstk
 {
 VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
+    m_mappedScalarArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_visualModel = visualModel;
 
@@ -54,6 +56,14 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     // Create PolyData
     auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
     pointsPolydata->SetPoints(points);
+    // If the geometry has scalars, set them on the polydata
+    if (geometry->getScalars() != nullptr)
+    {
+        std::shared_ptr<StdVectorOfReal> scalars = geometry->getScalars();
+        m_mappedScalarArray->SetNumberOfComponents(1);
+        m_mappedScalarArray->SetArray(reinterpret_cast<double*>(scalars->data()), scalars->size(), 1);
+        pointsPolydata->GetPointData()->SetScalars(m_mappedScalarArray);
+    }
 
     vtkNew<vtkVertexGlyphFilter> glyphFilter;
     glyphFilter->SetInputData(pointsPolydata);
