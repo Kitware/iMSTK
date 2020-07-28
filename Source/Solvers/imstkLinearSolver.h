@@ -21,7 +21,6 @@
 
 #pragma once
 
-// imstk includes
 #include "imstkLinearSystem.h"
 #include "imstkMath.h"
 
@@ -53,7 +52,7 @@ public:
     /// \brief Default constructor/destructor
     ///
     LinearSolver() : m_linearSystem(nullptr) {};
-    virtual ~LinearSolver() {};
+    virtual ~LinearSolver() = default;
 
     ///
     /// \brief Main solve routine

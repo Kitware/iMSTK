@@ -21,8 +21,9 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkPbdConstraint.h"
 #include "imstkNeighborSearch.h"
+#include "imstkPbdConstraint.h"
+#include "imstkTypes.h"
 
 namespace imstk
 {
@@ -64,9 +65,9 @@ public:
                            const PbdConstraint::SolverType& type,
                            StdVectorOfVec3d&                currVertexPositions) override;
 
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const
+    bool computeValueAndGradient(const StdVectorOfVec3d& imstkNotUsed(currVertexPositions),
+                                 double&                 imstkNotUsed(c),
+                                 StdVectorOfVec3d&       imstkNotUsed(dcdx)) const
     {
         return true;
     }

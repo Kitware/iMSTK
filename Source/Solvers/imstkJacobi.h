@@ -38,7 +38,7 @@ public:
     ///
     Jacobi() { m_type = Type::Jacobi; };
     Jacobi(const SparseMatrixd& A, const Vectord& rhs);
-    ~Jacobi() = default;
+    virtual ~Jacobi() override = default;
 
     ///
     /// \brief Remove specific constructor signatures

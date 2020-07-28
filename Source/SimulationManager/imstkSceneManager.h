@@ -21,10 +21,10 @@
 
 #pragma once
 
+#include "imstkModule.h"
+
 #include <unordered_map>
 #include <thread>
-
-#include "imstkModule.h"
 
 namespace imstk
 {

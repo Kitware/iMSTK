@@ -21,12 +21,9 @@
 
 #pragma once
 
-#include "imstkVectorizedState.h"
 #include "imstkGeometry.h"
 
 #include <set>
-#include <string>
-#include <unordered_map>
 
 namespace imstk
 {

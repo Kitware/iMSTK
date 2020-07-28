@@ -20,69 +20,91 @@
 =========================================================================*/
 
 #include "imstkVTKViewer.h"
-#include "imstkVTKRenderDelegate.h"
+#include "imstkLogger.h"
+#include "imstkOpenVRDeviceClient.h"
+#include "imstkScene.h"
 #include "imstkVTKInteractorStyle.h"
 #include "imstkVTKRenderer.h"
-#include "imstkCamera.h"
-#include "imstkLogger.h"
-#include "imstkScene.h"
+#include "imstkVTKScreenCaptureUtility.h"
 
+#include <vtkCallbackCommand.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkCallbackCommand.h>
 
-#include "imstkParallelUtils.h"
+#ifdef iMSTK_ENABLE_VR
+#include "imstkVTKInteractorStyleVR.h"
+#include <vtkOpenVRRenderer.h>
+#include <vtkOpenVRRenderWindow.h>
+#include <vtkOpenVRRenderWindowInteractor.h>
+#endif
 
 namespace imstk
 {
-VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*= false*/) :
-    m_enableVR(enableVR)
+VTKViewer::VTKViewer(SimulationManager* manager /*= nullptr*/, bool enableVR /*= false*/)
 {
+    m_config->m_enableVR = enableVR;
+
     // init render window / interactor / command based
     // depending on if we enable VR or not
-    if (!m_enableVR)
+    if (!m_config->m_enableVR)
     {
-        // Interactor style / commands
-        m_interactorStyle = std::make_shared<VTKInteractorStyle>();
+        // Create the interactor style
+        m_interactorStyle    = std::make_shared<VTKInteractorStyle>();
+        m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
+        std::dynamic_pointer_cast<VTKInteractorStyle>(m_vtkInteractorStyle)->m_simManager = manager;
 
-        m_vtkInteractorStyle = std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle);
-        m_vtkInteractorStyle->m_simManager = manager;
+        // Create the interactor
+        vtkNew<vtkRenderWindowInteractor> iren;
+        iren->SetInteractorStyle(m_vtkInteractorStyle.get());
 
-        // Interactor
-        auto vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-        vtkInteractor->SetInteractorStyle(m_vtkInteractorStyle.get());
-
-        // Render window
+        // Create the RenderWindow
         m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-        m_vtkRenderWindow->SetInteractor(vtkInteractor);
+        m_vtkRenderWindow->SetInteractor(iren);
         m_vtkRenderWindow->SetSize(m_config->m_renderWinWidth, m_config->m_renderWinHeight);
 
         // Screen capture
         m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
+
+        // Setup callback for timer on the interactor
+        m_timerCallbackCommand = vtkSmartPointer<vtkCallbackCommand>::New();
+        m_timerCallbackCommand->SetCallback(timerCallback);
+        m_timerCallbackCommand->SetClientData(this);
     }
-#ifdef iMSTK_ENABLE_VR
     else
     {
-        // Interactor style / commands
-        m_openVRCommand = vtkSmartPointer<OpenVRCommand>::New();
-        m_openVRCommand->SetSimulationManager(manager);
+#ifdef iMSTK_ENABLE_VR
+        // Create the interactor style
+        auto vrInteractorStyle = std::make_shared<vtkInteractorStyleVR>();
+        m_interactorStyle    = vrInteractorStyle;
+        m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
+        vrInteractorStyle->m_simManager = manager;
 
-        // Interactor
-        auto vtkOpenVRinteractor = vtkSmartPointer<vtkOpenVRRenderWindowInteractor>::New();
+        // Create the interactor
+        vtkNew<vtkOpenVRRenderWindowInteractor> iren;
+        iren->SetInteractorStyle(m_vtkInteractorStyle.get());
 
-        // Add observer openVR command
+        // Create the RenderWindow
         m_vtkRenderWindow = vtkSmartPointer<vtkOpenVRRenderWindow>::New();
-        m_vtkRenderWindow->SetInteractor(vtkOpenVRinteractor);
-        vtkOpenVRinteractor->SetRenderWindow(m_vtkRenderWindow);
-        m_vtkRenderWindow->AddObserver(vtkCommand::StartEvent, m_openVRCommand, 1.0);
-    }
-#endif
+        m_vtkRenderWindow->SetInteractor(iren);
+        iren->SetRenderWindow(m_vtkRenderWindow);
 
-    // Setup callback for timer on the interactor
-    timerCallbackCommand = vtkSmartPointer<vtkCallbackCommand>::New();
-    timerCallbackCommand->SetCallback(timerCallback);
-    timerCallbackCommand->SetClientData(this);
+        // Setup the VR device clients
+        std::shared_ptr<OpenVRDeviceClient> leftControllerDevice = std::make_shared<OpenVRDeviceClient>(OPENVR_LEFT_CONTROLLER);
+        vrInteractorStyle->leftControllerPoseChanged.connect(std::bind(&OpenVRDeviceClient::setPose, leftControllerDevice.get(), std::placeholders::_1, std::placeholders::_2));
+        m_vrDeviceClients.push_back(leftControllerDevice);
+
+        std::shared_ptr<OpenVRDeviceClient> rightControllerDevice = std::make_shared<OpenVRDeviceClient>(OPENVR_RIGHT_CONTROLLER);
+        vrInteractorStyle->rightControllerPoseChanged.connect(std::bind(&OpenVRDeviceClient::setPose, rightControllerDevice.get(), std::placeholders::_1, std::placeholders::_2));
+        m_vrDeviceClients.push_back(rightControllerDevice);
+
+        std::shared_ptr<OpenVRDeviceClient> hmdDevice = std::make_shared<OpenVRDeviceClient>(OPENVR_HMD);
+        vrInteractorStyle->hmdPoseChanged.connect(std::bind(&OpenVRDeviceClient::setPose, hmdDevice.get(), std::placeholders::_1, std::placeholders::_2));
+        m_vrDeviceClients.push_back(hmdDevice);
+#else
+        LOG(WARNING) << "Cannot initialize viewer, VR requested but not enabled";
+#endif
+    }
 }
 
 void
@@ -111,7 +133,7 @@ VTKViewer::setActiveScene(const std::shared_ptr<Scene>& scene)
     // Create renderer if it doesn't exist
     if (!m_rendererMap.count(m_activeScene))
     {
-        m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene, m_enableVR);
+        m_rendererMap[m_activeScene] = std::make_shared<VTKRenderer>(m_activeScene, m_config->m_enableVR);
     }
 
     // Cast to VTK renderer
@@ -120,11 +142,9 @@ VTKViewer::setActiveScene(const std::shared_ptr<Scene>& scene)
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(vtkRenderer);
 
-    if (!m_enableVR)
+    m_vtkInteractorStyle->SetCurrentRenderer(vtkRenderer);
+    if (!m_config->m_enableVR)
     {
-        // Set renderer to interactorStyle
-        std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->SetCurrentRenderer(vtkRenderer);
-
         // Set name to renderWindow
         m_vtkRenderWindow->SetWindowName(m_activeScene->getName().data());
     }
@@ -141,7 +161,7 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     }
 
     // Setup renderer
-    this->getActiveRenderer()->setMode(mode, m_enableVR);
+    this->getActiveRenderer()->setMode(mode, m_config->m_enableVR);
     if (!m_running)
     {
         return;
@@ -150,7 +170,7 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     // Render to update displayed actors
     m_vtkRenderWindow->Render();
 
-    if (m_enableVR)
+    if (m_config->m_enableVR)
     {
         return;
     }
@@ -184,19 +204,14 @@ void
 VTKViewer::startRenderingLoop()
 {
     m_running = true;
-    if (!m_enableVR)
+    if (!m_config->m_enableVR)
     {
         m_vtkRenderWindow->GetInteractor()->Initialize();
         m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
 
         // If the Scene wants benchmarking hookup timer to update the table
-        auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
-        vtkRen->setTimeTableVisibility(m_activeScene->getConfig()->taskTimingEnabled);
-        if (m_activeScene->getConfig()->taskTimingEnabled)
-        {
-            m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::TimerEvent, timerCallbackCommand);
-            m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
-        }
+        m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::TimerEvent, m_timerCallbackCommand);
+        m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(500);
 
         m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());
         m_vtkRenderWindow->GetInteractor()->Start();
@@ -204,7 +219,24 @@ VTKViewer::startRenderingLoop()
     }
     else
     {
-        m_vtkRenderWindow->GetInteractor()->Start();
+#ifdef iMSTK_ENABLE_VR
+        // VR interactor doesn't support timers, here we throw timer event every update
+        // another option would be to fix VTKs VR interactor
+        vtkSmartPointer<vtkOpenVRRenderWindowInteractor> iren = vtkOpenVRRenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
+        //iren->Start(); // Cannot use
+        if (iren->HasObserver(vtkCommand::StartEvent))
+        {
+            iren->InvokeEvent(vtkCommand::StartEvent, nullptr);
+            return;
+        }
+        iren->Initialize();
+        while (!iren->GetDone())
+        {
+            auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
+            iren->DoOneEvent(vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow), vtkOpenVRRenderer::SafeDownCast(vtkRen->getVtkRenderer()));
+            iren->InvokeEvent(vtkCommand::TimerEvent);
+        }
+#endif
     }
 
     m_running = false;
@@ -248,10 +280,17 @@ VTKViewer::setWindowTitle(const std::string& title)
     }
 }
 
-const std::shared_ptr<VTKTextStatusManager>&
+std::shared_ptr<VTKTextStatusManager>
 VTKViewer::getTextStatusManager()
 {
-    return m_vtkInteractorStyle->getTextStatusManager();
+    if (VTKInteractorStyle* interactorStyle = static_cast<VTKInteractorStyle*>(m_interactorStyle.get()))
+    {
+        return interactorStyle->getTextStatusManager();
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void
@@ -259,7 +298,7 @@ VTKViewer::timerCallback(vtkObject* vtkNotUsed(caller), long unsigned int vtkNot
 {
     VTKViewer* self = static_cast<VTKViewer*>(clientData);
 
-    if (self->getActiveScene()->getConfig()->taskTimingEnabled)
+    if (self != nullptr && self->getActiveScene()->getConfig()->taskTimingEnabled)
     {
         auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(self->getActiveRenderer());
         self->getActiveScene()->lockComputeTimes();

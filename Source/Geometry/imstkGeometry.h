@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkTypes.h"
 
 #include <tbb/concurrent_unordered_set.h>
 
@@ -57,7 +58,9 @@ public:
         Decal,
         DecalPool,
         RenderParticles,
-        ImageData
+        ImageData,
+        SignedDistanceField,
+        CompositeImplicitGeometry
     };
 
     ///
@@ -100,10 +103,11 @@ public:
     ///
     /// \brief Returns the volume of the geometry (if valid)
     ///
-    virtual double getVolume() const = 0;
+    virtual double getVolume() const { return 0.0; };
 
     ///
     /// \brief Compute the bounding box for the geometry
+    /// \todo Padding should not be here
     ///
     virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const;
 
@@ -204,10 +208,10 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VulkanRenderer;
 
-    virtual void applyTranslation(const Vec3d t) = 0;
-    virtual void applyRotation(const Mat3d r)    = 0;
-    virtual void applyScaling(const double s)    = 0;
-    virtual void updatePostTransformData() const = 0;
+    virtual void applyTranslation(const Vec3d imstkNotUsed(t)) { }
+    virtual void applyRotation(const Mat3d imstkNotUsed(r)) { }
+    virtual void applyScaling(const double imstkNotUsed(s)) { }
+    virtual void updatePostTransformData() const { }
 
     Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry

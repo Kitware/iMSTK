@@ -243,6 +243,7 @@ Geometry::getType() const
 const std::string
 Geometry::getTypeName() const
 {
+    // /todo: create an actual object factory
     switch (m_type)
     {
     case Type::Plane: return "Plane";
@@ -259,6 +260,8 @@ Geometry::getTypeName() const
     case Type::DecalPool: return "DecalPool";
     case Type::RenderParticles: return "RenderParticles";
     case Type::ImageData: return "ImageData";
+    case Type::SignedDistanceField: return "SignedDistanceField";
+    case Type::CompositeImplicitGeometry: return "CompositeImplicitGeometry";
     default:
         LOG(FATAL) << "Mesh type to string has not been completely implemented";
         return "";

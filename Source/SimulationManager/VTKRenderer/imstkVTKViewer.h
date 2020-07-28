@@ -21,26 +21,21 @@
 
 #pragma once
 
-#include "imstkVTKScreenCaptureUtility.h"
 #include "imstkViewer.h"
-#include "imstkVTKRenderDelegate.h"
-#include "imstkVTKScreenCaptureUtility.h"
 
-#ifdef iMSTK_ENABLE_VR
-#include "imstkOpenVRCommand.h"
-#include "vtkOpenVRRenderWindow.h"
-#include "vtkOpenVRRenderWindowInteractor.h"
-#endif
+#include <vtkSmartPointer.h>
 
 class vtkCallbackCommand;
+class vtkInteractorStyle;
+class vtkObject;
 class vtkRenderWindow;
 
 namespace imstk
 {
-class SimulationManager;
-class VTKTextStatusManager;
-class VTKInteractorStyle;
 class Scene;
+class SimulationManager;
+class VTKScreenCaptureUtility;
+class VTKTextStatusManager;
 
 ///
 /// \class VTKViewer
@@ -53,10 +48,11 @@ class VTKViewer : public Viewer
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Constructor/Destructor
     /// \todo: SimulationManager and Viewer's should not have a circular dependence
     ///
     VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false);
+    virtual ~VTKViewer() override = default;
 
     ///
     /// \brief Destructor
@@ -108,20 +104,19 @@ public:
     ///
     /// \brief Return the window status handler
     ///
-    const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager();
+    std::shared_ptr<VTKTextStatusManager> getTextStatusManager();
+
+    ///
+    /// \brief Returns the vtk interactor style
+    ///
+    std::shared_ptr<vtkInteractorStyle> getVtkInteractorStyle() const { return m_vtkInteractorStyle; }
 
 protected:
     /// \brief VTKTimer callback, every 500ms
     static void timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
 
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
-    std::shared_ptr<VTKInteractorStyle> m_vtkInteractorStyle;
-    bool m_enableVR;
-
-    vtkSmartPointer<vtkCallbackCommand> timerCallbackCommand;
-
-#ifdef iMSTK_ENABLE_VR
-    vtkSmartPointer<OpenVRCommand> m_openVRCommand;
-#endif
+    std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
+    vtkSmartPointer<vtkCallbackCommand> m_timerCallbackCommand;
 };
 } // imstk

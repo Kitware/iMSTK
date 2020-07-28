@@ -45,6 +45,11 @@ public:
     ///
     static void setOptimalParallelism();
 
+    ///
+    /// \brief Returns the size of the thread pool
+    ///
+    static size_t getThreadPoolSize();
+
 private:
     ///
     /// \brief Global variable for controlling maximum number of worker threads

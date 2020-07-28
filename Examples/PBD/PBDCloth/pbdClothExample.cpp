@@ -19,14 +19,15 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
-#include "imstkAPIUtilities.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
+#include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

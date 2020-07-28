@@ -23,6 +23,7 @@
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
 #include "imstkTbbTaskGraphController.h"
+
 #include <iostream>
 
 using namespace imstk;

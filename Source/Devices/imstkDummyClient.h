@@ -38,7 +38,7 @@ public:
     /// \brief Constructor/Destructor
     ///
     explicit DummyClient(const std::string& name) : DeviceClient(name, "localhost") {}
-    virtual ~DummyClient() {}
+    virtual ~DummyClient() override = default;
 
 protected:
 

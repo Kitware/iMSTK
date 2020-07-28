@@ -51,8 +51,9 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~SceneObjectController() = default;
+    virtual ~SceneObjectController() override = default;
 
+public:
     ///
     /// \brief Update controlled scene object using latest tracking information
     ///

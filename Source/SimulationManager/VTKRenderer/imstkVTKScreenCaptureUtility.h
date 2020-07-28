@@ -23,12 +23,11 @@
 
 #include "imstkScreenCaptureUtility.h"
 
-#include <vtkRenderWindow.h>
-#include <vtkWindowToImageFilter.h>
-#include <vtkPNGWriter.h>
-#include <vtkNew.h>
+#include <vtkSmartPointer.h>
 
-#include <string>
+class vtkPNGWriter;
+class vtkRenderWindow;
+class vtkWindowToImageFilter;
 
 namespace imstk
 {
@@ -48,31 +47,16 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKScreenCaptureUtility() = default;
+    virtual ~VTKScreenCaptureUtility() override = default;
 
     ///
     /// \brief Saves the screenshot as a png file
     ///
-    virtual void saveScreenShot();
-
-    ///
-    /// \brief Get screen shot number
-    ///
-    unsigned int getScreenShotNumber() const;
-
-    ///
-    /// \brief Set screen shot prefix
-    ///
-    void setScreenShotPrefix(const std::string newPrefix);
-
-    ///
-    /// \brief Reset screen shot number to zero
-    ///
-    void resetScreenShotNumber();
+    virtual void saveScreenShot() override;
 
 protected:
-    vtkNew<vtkWindowToImageFilter> m_windowToImageFilter;
-    vtkNew<vtkPNGWriter> m_pngWriter;           //> using vtk's png writer to save the screenshots
-    vtkRenderWindow*     m_renderWindow;        //> render window whose screen shot will be taken
+    vtkSmartPointer<vtkWindowToImageFilter> m_windowToImageFilter;
+    vtkSmartPointer<vtkPNGWriter> m_pngWriter; //> using vtk's png writer to save the screenshots
+    vtkRenderWindow* m_renderWindow;           //> render window whose screen shot will be taken
 };
 } // imstk

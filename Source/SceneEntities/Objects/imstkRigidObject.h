@@ -40,7 +40,7 @@ public:
         m_type = Type::Rigid;
     }
 
-    ~RigidObject() = default;
+    virtual ~RigidObject() = default;
 
 public:
     ///

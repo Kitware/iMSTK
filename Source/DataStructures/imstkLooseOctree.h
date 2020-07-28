@@ -23,15 +23,9 @@
 
 #include "imstkMath.h"
 #include "imstkParallelUtils.h"
-#include "imstkLogger.h"
 
 #include <array>
-#include <cstdint>
-#include <climits>
-#include <memory>
-#include <unordered_map>
 #include <unordered_set>
-#include <vector>
 
 #pragma warning(disable : 4201)
 namespace imstk
@@ -147,6 +141,26 @@ public:
     /// \brief Get the number of primitives of the given type in this node
     ///
     uint32_t getPrimitiveCount(const OctreePrimitiveType type) const { return m_PrimitiveCounts[type]; }
+
+    ///
+    /// \brief Get the bounds of the node
+    ///
+    const Vec6d getBounds()
+    {
+        Vec6d bounds;
+        bounds << m_LowerBound[0], m_UpperBound[0], m_LowerBound[1], m_UpperBound[1], m_LowerBound[2], m_UpperBound[2];
+        return bounds;
+    }
+
+    ///
+    /// \brief Get the loose bounds of the node
+    ///
+    const Vec6d getLooseBounds()
+    {
+        Vec6d bounds;
+        bounds << m_LowerExtendedBound[0], m_UpperExtendedBound[0], m_LowerExtendedBound[1], m_UpperExtendedBound[1], m_LowerExtendedBound[2], m_UpperExtendedBound[2];
+        return bounds;
+    }
 
     ///
     /// \brief Recursively clear primitive data (linked lists and counters)
@@ -535,6 +549,7 @@ protected:
 
     Real     m_MinWidth;                                         ///> Minimum width allowed for the tree nodes
     uint32_t m_MaxDepth;                                         ///> Max depth of the tree, which is computed based on m_MinWidth
+    bool     m_useMaxDepth;                                      ///> If on max depth specified by user will be used, otherwise maxdepth is based of minwidth
 
     OctreeNode* const m_pRootNode;                               ///> Root node, should not be reassigned throughout the existence of the tree
     OctreeNodeBlock*  m_pNodeBlockPoolHead = nullptr;            ///> The pool of tree nodes, storing pre-allocated nodes as a linked list

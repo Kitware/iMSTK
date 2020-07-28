@@ -19,17 +19,11 @@
 
 =========================================================================*/
 
-#include <algorithm>
-#include <numeric>
-#include <map>
-#include <climits>
-#undef min
-#undef max
-
 #include "imstkGraph.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 
-#include <g3log/g3log.hpp>
+#include <numeric>
 
 namespace imstk
 {

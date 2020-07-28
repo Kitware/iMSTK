@@ -20,8 +20,8 @@
 =========================================================================*/
 
 #include "imstkSphereToSphereCD.h"
-#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
+#include "imstkNarrowPhaseCD.h"
 
 namespace imstk
 {

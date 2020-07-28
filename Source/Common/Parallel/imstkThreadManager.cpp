@@ -20,8 +20,7 @@
 =========================================================================*/
 
 #include "imstkThreadManager.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -49,6 +48,12 @@ void
 ThreadManager::setOptimalParallelism()
 {
     setThreadPoolSize(static_cast<size_t>(tbb::task_scheduler_init::default_num_threads()));
+}
+
+size_t
+ThreadManager::getThreadPoolSize()
+{
+    return s_tbbGlobalControl->active_value(tbb::global_control::max_allowed_parallelism);
 }
 }  // end namespace ParallelUtils
 }  // end namespace imstk

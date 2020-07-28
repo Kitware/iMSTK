@@ -111,6 +111,7 @@ public:
     ///
     void initTaskGraph();
 
+    void setTaskTimingFlag(const bool flag);
     ///
     /// \brief Launch camera controller and other scene specific modules that need to run independently
     ///
@@ -283,18 +284,18 @@ protected:
     NamedMap<Light>           m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
 
-    std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
+    std::shared_ptr<Camera> m_camera;
 
-    std::shared_ptr<CollisionGraph> m_collisionGraph = nullptr;
+    std::shared_ptr<CollisionGraph> m_collisionGraph;
     std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
     std::vector<std::shared_ptr<CameraController>> m_cameraControllers;          ///> List of camera controllers
     std::unordered_map<std::string, std::thread>   m_threadMap;                  ///>
 
-    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;                            ///> Computational graph
+    std::shared_ptr<TaskGraph> m_taskGraph;                                      ///> Computational graph
     std::shared_ptr<TaskGraphController> m_taskGraphController   = nullptr;      ///> Controller for the computational graph
     std::function<void(Scene*)> m_postTaskGraphConfigureCallback = nullptr;
 
-    std::shared_ptr<ParallelUtils::SpinLock> computeTimesLock = nullptr;
+    std::shared_ptr<ParallelUtils::SpinLock> m_computeTimesLock;
     std::unordered_map<std::string, double>  m_nodeComputeTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
 
     double m_fps = 0.0;

@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <cmath>
-#include <cassert>
-
 #include "imstkMath.h"
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
 
 namespace imstk
 {

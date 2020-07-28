@@ -22,13 +22,16 @@
 #pragma once
 
 #include "imstkRenderer.h"
-#include "imstkInteractorStyle.h"
+
+#include <unordered_map>
 
 namespace imstk
 {
-class SimulationManager;
+class InteractorStyle;
+class OpenVRDeviceClient;
 class Scene;
 class ScreenCaptureUtility;
+class SimulationManager;
 
 #ifdef iMSTK_USE_Vulkan
 namespace GUIOverlay
@@ -37,7 +40,12 @@ class Canvas;
 }
 #endif
 
-struct viewerConfig
+namespace
+{
+using EventHandlerFunction = std::function<bool (InteractorStyle* iStyle)>;
+}
+
+struct ViewerConfig
 {
     std::string m_windowName = "imstk";
 
@@ -47,6 +55,8 @@ struct viewerConfig
 
     int m_renderWinWidth  = 1000;
     int m_renderWinHeight = 800;
+
+    bool m_enableVR = false;
 };
 
 ///
@@ -60,9 +70,8 @@ struct viewerConfig
 class Viewer
 {
 public:
-
     Viewer();
-    Viewer(SimulationManager*) {}
+    Viewer(ViewerConfig config);
     virtual ~Viewer() = default;
 
     ///
@@ -149,18 +158,31 @@ public:
     ///
     void setOnTimerFunction(EventHandlerFunction func);
 
+    ///
+    /// \brief Acquire the first VR device of specified type
+    ///
+    std::shared_ptr<OpenVRDeviceClient> getVRDeviceClient(int deviceType);
+
+    ///
+    /// \brief Acquire the full list of VR devices tied to this viewer
+    ///
+    const std::list<std::shared_ptr<OpenVRDeviceClient>>& getVRDeviceClient() const { return m_vrDeviceClients; }
+
 protected:
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
-    std::shared_ptr<Scene> m_activeScene;
-    std::shared_ptr<InteractorStyle>      m_interactorStyle;
-    std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
+    std::shared_ptr<Scene> m_activeScene = nullptr;
+    std::shared_ptr<InteractorStyle>      m_interactorStyle = nullptr;
+    std::shared_ptr<ScreenCaptureUtility> m_screenCapturer  = nullptr; ///> Screen shot utility
 
     bool m_running = false;
 #ifdef iMSTK_USE_Vulkan
     std::shared_ptr<GUIOverlay::Canvas> m_canvas = nullptr;
 #endif
 
-    std::shared_ptr<viewerConfig> m_config = nullptr;
+    std::shared_ptr<ViewerConfig> m_config = nullptr;
+
+    ///> The VR controllers are tied to the view
+    std::list<std::shared_ptr<OpenVRDeviceClient>> m_vrDeviceClients;
 };
 }

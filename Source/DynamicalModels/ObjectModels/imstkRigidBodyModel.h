@@ -67,7 +67,7 @@ public:
             Geometry::Type::SurfaceMesh
         };
     };
-    ~RigidBodyModel() = default;
+    virtual ~RigidBodyModel() override = default;
 
     ///
     /// \brief Initialize the physx dynamic model

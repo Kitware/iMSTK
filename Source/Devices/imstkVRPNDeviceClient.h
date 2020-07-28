@@ -24,7 +24,6 @@
 #include "imstkDeviceClient.h"
 #include "imstkModule.h"
 
-// vrpn includes
 #include <vrpn_Configure.h>
 #include <vrpn_Tracker.h>
 #include <vrpn_Analog.h>
@@ -52,8 +51,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~VRPNDeviceClient()
-    {}
+    virtual ~VRPNDeviceClient() override = default;
 
 protected:
     ///

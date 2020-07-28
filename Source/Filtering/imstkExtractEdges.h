@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,26 +18,32 @@
    limitations under the License.
 
 =========================================================================*/
+#pragma once
 
-#include "imstkFeDeformableObject.h"
-#include "imstkFEMDeformableBodyModel.h"
-#include "imstkLogger.h"
+#include "imstkGeometryAlgorithm.h"
 
 namespace imstk
 {
-bool
-FeDeformableObject::initialize()
+class LineMesh;
+class SurfaceMesh;
+
+///
+/// \class ExtractEdges
+///
+/// \brief This filter extracts the edges of a SurfaceMesh producing a LineMesh
+///
+class ExtractEdges : public GeometryAlgorithm
 {
-    m_femModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
-    if (m_femModel == nullptr)
-    {
-        LOG(FATAL) << "Dynamics pointer cast failure in DeformableObject::initialize()";
-        return false;
-    }
+public:
+    ExtractEdges();
+    virtual ~ExtractEdges() override = default;
 
-    DynamicObject::initialize();
-    m_femModel->initialize();
+public:
+    std::shared_ptr<LineMesh> getOutputMesh() const;
 
-    return true;
+    void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
+
+protected:
+    void requestUpdate() override;
+};
 }
-} // imstk

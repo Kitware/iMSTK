@@ -18,14 +18,13 @@
    limitations under the License.
 
 =========================================================================*/
-#include "imstkRigidBodyModel.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkCube.h"
-#include "imstkSphere.h"
-#include "imstkPlane.h"
-#include "physx/extensions/PxSimpleFactory.h"
 
-#include <g3log/g3log.hpp>
+#include "imstkRigidBodyModel.h"
+#include "imstkCube.h"
+#include "imstkLogger.h"
+#include "imstkPlane.h"
+#include "imstkSphere.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {

@@ -20,35 +20,40 @@
 =========================================================================*/
 
 #include "imstkVTKRenderer.h"
-
+#include "imstkCamera.h"
+#include "imstkDebugRenderGeometry.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
-#include "imstkCamera.h"
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVisualModel.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
-#include "imstkLight.h"
 
-#include <vtkLightActor.h>
-#include <vtkCameraActor.h>
-#include <vtkAxesActor.h>
-#include <vtkCullerCollection.h>
 #include <vtkAxesActor.h>
 #include <vtkCamera.h>
-#include <vtkProp.h>
+#include <vtkCameraActor.h>
+#include <vtkCullerCollection.h>
 #include <vtkLight.h>
+#include <vtkLightActor.h>
 #include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
 
 #include <vtkAxis.h>
 #include <vtkChartXY.h>
 #include <vtkContextActor.h>
 #include <vtkContextScene.h>
 #include <vtkDoubleArray.h>
-#include <vtkIntArray.h>
 #include <vtkPlotBar.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTextProperty.h>
+
+#ifdef iMSTK_ENABLE_VR
+#include <vtkOpenVRRenderer.h>
+#include <vtkOpenVRCamera.h>
+#include <vtkOpenVRRenderWindow.h>
+#include <vtkOpenVRRenderWindowInteractor.h>
+#include <vtkInteractorStyle3D.h>
+#endif
 
 namespace imstk
 {
@@ -149,7 +154,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
     // Global Axis
     m_AxesActor = vtkSmartPointer<vtkAxesActor>::New();
     m_AxesActor->SetShaftType(vtkAxesActor::CYLINDER_SHAFT);
-    m_AxesActor->SetAxisLabels(false);
+    m_AxesActor->SetAxisLabels(true);
     m_debugVtkActors.push_back(m_AxesActor);
 
     // Camera and camera actor
@@ -256,8 +261,10 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) : m_
         m_timeTable->AddColumn(labels);
         m_timeTablePlot->SetInputData(m_timeTable, 0, 1);
 
+        m_timeTableChart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetColor(1.0, 1.0, 1.0);
         vtkAxis* axisY = m_timeTableChart->GetAxis(vtkAxis::LEFT);
-        //axisY->SetRange(xIndices->GetRange());
+        axisY->GetLabelProperties()->SetColor(1.0, 1.0, 1.0);
+        axisY->SetGridVisible(false);
         axisY->SetCustomTickPositions(xIndices, labels);
     }
 }
@@ -529,6 +536,13 @@ VTKRenderer::updateRenderDelegates()
             dbgVizModel->m_renderDelegateCreated = true;
         }
     }
+
+    /* double* p = m_vtkRenderer->GetActiveCamera()->GetPosition();
+     double* f = m_vtkRenderer->GetActiveCamera()->GetFocalPoint();
+     double* v = m_vtkRenderer->GetActiveCamera()->GetViewUp();
+     printf("Pos: %f, %f, %f\n", p[0], p[1], p[2]);
+     printf("FocalPt: %f, %f, %f\n", f[0], f[1], f[2]);
+     printf("Up: %f, %f, %f\n", v[0], v[1], v[2]);*/
 
     for (auto delegate : m_renderDelegates)
     {

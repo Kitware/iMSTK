@@ -19,29 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkLinearSolver.h"
-#include "imstkLogger.h"
+#include "imstkStVKForceModel.h"
+
+#include <StVKElementABCDLoader.h>
+#include <tetMesh.h>
 
 namespace imstk
 {
-//template<typename SystemMatrixType>
-//LinearSolver<SystemMatrixType>::LinearSolver() : m_linearSystem(nullptr)
-//{
-//
-//}
-
-//template<typename SystemMatrixType>
-//void
-//LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
-//{
-//    m_linearSystem.reset();
-//    m_linearSystem = newSystem;
-//}
-//
-//template<typename SystemMatrixType>
-//std::shared_ptr<LinearSystem<SystemMatrixType>>
-//LinearSolver<SystemMatrixType>::getSystem() const
-//{
-//    return m_linearSystem;
-//}
-} //imstk
+StVKForceModel::StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
+                               const bool withGravity, const double gravity) : InternalForceModel()
+{
+    auto                   tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
+    vega::StVKElementABCD* precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
+    m_stVKInternalForces      = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
+    m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
+}
+}

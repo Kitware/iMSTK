@@ -43,7 +43,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    TextureManager() {}
+    TextureManager() = default;
 
     std::map<std::shared_ptr<Texture>, std::shared_ptr<T>> m_textureMap;
 };

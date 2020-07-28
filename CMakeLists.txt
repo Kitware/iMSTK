@@ -280,16 +280,19 @@ list(APPEND VTK_DEPENDENCIES
   ChartsCore
   CommonCore
   CommonDataModel
-  FiltersGeneral
-  FiltersSources
-  FiltersModeling
+  FiltersCore
   FiltersExtraction
+  FiltersGeneral
+  FiltersModeling
+  FiltersSources
   IOExport
   IOImport
   IOPLY
   IOParallel
   IOParallelXML
   ImagingCore
+  ImagingGeneral
+  ImagingStencil
   InteractionStyle
   RenderingAnnotation
   RenderingContext2D
@@ -300,7 +303,7 @@ list(APPEND VTK_DEPENDENCIES
   RenderingVolumeOpenGL2
   ViewsContext2D)
 if (${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
+  list(APPEND VTK_DEPENDENCIES RenderingOpenVR)
 endif()
 find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
@@ -387,6 +390,7 @@ add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
+add_subdirectory(Source/Filtering)
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories

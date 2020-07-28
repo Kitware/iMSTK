@@ -21,6 +21,7 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
 #include "imstkSphere.h"
 
 using namespace imstk;

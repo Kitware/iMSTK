@@ -27,7 +27,10 @@ namespace imstk
 {
 ///
 /// \class DeviceClient
-/// \brief Base class for any device client
+///
+/// \brief Base class for any device client, this provides a common interface
+/// for other imstk classes to access quantities without knowing anything about
+/// the api of the device
 ///
 class DeviceClient
 {
@@ -36,7 +39,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~DeviceClient() {}
+    virtual ~DeviceClient() = default;
 
     ///
     /// \brief Get/Set the device IP

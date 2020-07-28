@@ -21,10 +21,12 @@
 
 #pragma once
 
-#include "imstkTexture.h"
+#include <memory>
 
 namespace imstk
 {
+class Texture;
+
 ///
 /// \class TextureDelegate
 ///
@@ -32,12 +34,15 @@ namespace imstk
 ///
 class TextureDelegate
 {
+public:
+    virtual ~TextureDelegate() = default;
+
 protected:
     ///
     /// \brief Constructor
     /// \param texture The texture
     ///
-    TextureDelegate() {}
+    TextureDelegate() { }
 
     ///
     /// \brief Abstract function to load textures

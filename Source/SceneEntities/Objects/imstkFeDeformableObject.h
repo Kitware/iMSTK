@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-// imstk
 #include "imstkDynamicObject.h"
 #include "imstkMath.h"
 

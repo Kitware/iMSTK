@@ -20,15 +20,12 @@
 =========================================================================*/
 
 #include "imstkVTKImageDataRenderDelegate.h"
-#include "imstkVolumeRenderMaterial.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
+#include "imstkVisualModel.h"
 
-#include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkColorTransferFunction.h>
-#include <vtkPiecewiseFunction.h>
-#include <vtkTrivialProducer.h>
-#include <vtkVolumeProperty.h>
 #include <vtkImageData.h>
+#include <vtkTrivialProducer.h>
 
 namespace imstk
 {
@@ -39,10 +36,11 @@ VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualMod
     m_modelIsVolume = true;
 
     auto imageData = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
-    if (imageData->getData())
+    if (imageData->getScalars() != nullptr)
     {
-        auto tp = vtkSmartPointer<vtkTrivialProducer>::New();
-        tp->SetOutput(imageData->getData());
+        vtkSmartPointer<vtkImageData> imageDataVtk = GeometryUtils::coupleVtkImageData(imageData);
+        auto                          tp = vtkSmartPointer<vtkTrivialProducer>::New();
+        tp->SetOutput(imageDataVtk);
         this->setUpMapper(tp->GetOutputPort(), m_visualModel);
 
         this->updateActorPropertiesVolumeRendering();// check if this is needed once more!

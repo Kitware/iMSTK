@@ -21,14 +21,12 @@
 
 #pragma once
 
-// imstk
 #include "imstkDynamicalModel.h"
 #include "imstkInternalForceModelTypes.h"
+#include "imstkVectorizedState.h"
 #include "imstkNonLinearSystem.h"
-#include "imstkNewtonSolver.h"
 
-// vega
-#include "sparseMatrix.h"
+#include <sparseMatrix.h>
 
 namespace vega
 {
@@ -84,7 +82,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~FEMDeformableBodyModel();
+    ~FEMDeformableBodyModel() override;
 
 public:
     ///

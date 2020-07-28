@@ -21,32 +21,32 @@
 
 #include "imstkVTKMeshIO.h"
 #include "imstkGeometryUtilities.h"
-
-#include "vtkDICOMImageReader.h"
-#include "vtkFloatArray.h"
-#include "vtkGenericDataObjectReader.h"
-#include "vtkGenericDataObjectWriter.h"
-#include "vtkNrrdReader.h"
-#include "vtkOBJReader.h"
-#include "vtkPLYReader.h"
-#include "vtkPLYWriter.h"
-#include "vtkPolyDataWriter.h"
-#include "vtkSmartPointer.h"
-#include "vtkSTLReader.h"
-#include "vtkSTLWriter.h"
-#include "vtkTriangleFilter.h"
-#include "vtkXMLPolyDataReader.h"
-#include "vtkXMLPolyDataWriter.h"
-#include "vtkXMLUnstructuredGridReader.h"
-#include "vtkXMLUnstructuredGridWriter.h"
-
-#include "imstkSurfaceMesh.h"
-#include "imstkLineMesh.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
-
-//#include "imstkColor.h"
+#include "imstkImageData.h"
+#include "imstkLineMesh.h"
 #include "imstkLogger.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+
+#include <vtkDICOMImageReader.h>
+#include <vtkGenericDataObjectReader.h>
+#include <vtkGenericDataObjectWriter.h>
+#include <vtkImageData.h>
+#include <vtkNIFTIImageReader.h>
+#include <vtkNIFTIImageWriter.h>
+#include <vtkNrrdReader.h>
+#include <vtkOBJReader.h>
+#include <vtkPLYReader.h>
+#include <vtkPLYWriter.h>
+#include <vtkPolyDataWriter.h>
+#include <vtkSTLReader.h>
+#include <vtkSTLWriter.h>
+#include <vtkTriangleFilter.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkXMLPolyDataReader.h>
+#include <vtkXMLPolyDataWriter.h>
+#include <vtkXMLUnstructuredGridReader.h>
+#include <vtkXMLUnstructuredGridWriter.h>
 
 namespace imstk
 {
@@ -87,6 +87,10 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     {
         return VTKMeshIO::readVtkImageData<vtkNrrdReader>(filePath);
     }
+    case MeshFileType::NII:
+    {
+        return VTKMeshIO::readVtkImageDataNIFTI(filePath);
+    }
     default:
     {
         LOG(FATAL) << "VTKMeshIO::read error: file type not supported";
@@ -98,7 +102,20 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
 bool
 VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& filePath, const MeshFileType meshType)
 {
-    if (auto vMesh = std::dynamic_pointer_cast<VolumetricMesh>(imstkMesh))
+    if (auto imgMesh = std::dynamic_pointer_cast<ImageData>(imstkMesh))
+    {
+        switch (meshType)
+        {
+        case MeshFileType::NII:
+        {
+            return VTKMeshIO::writeVtkImageDataNIFTI(imgMesh, filePath);
+        }
+        default:
+            LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
+            return false;
+        }
+    }
+    else if (auto vMesh = std::dynamic_pointer_cast<VolumetricMesh>(imstkMesh))
     {
         switch (meshType)
         {
@@ -129,7 +146,6 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
             {
                 return false;
             }
-            break;
 
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
@@ -194,12 +210,12 @@ VTKMeshIO::readVtkGenericFormatData(const std::string& filePath)
 
     if (vtkSmartPointer<vtkPolyData> vtkMesh = reader->GetPolyDataOutput())
     {
-        return GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkMesh);
+        return GeometryUtils::copyToSurfaceMesh(vtkMesh);
     }
 
     if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
     {
-        return GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
+        return GeometryUtils::copyToVolumetricMesh(vtkMesh);
     }
 
     LOG(FATAL) << "VTKMeshIO::readVtkGenericFormatData error: could not read with VTK reader.";
@@ -219,14 +235,34 @@ VTKMeshIO::readVtkPolyData(const std::string& filePath)
     triFilter->Update();
 
     vtkSmartPointer<vtkPolyData> vtkMesh = triFilter->GetOutput();
-    return GeometryUtils::convertVtkPolyDataToSurfaceMesh(vtkMesh);
+    return GeometryUtils::copyToSurfaceMesh(vtkMesh);
+}
+
+template<typename WriterType>
+bool
+VTKMeshIO::writeVtkImageData(const std::shared_ptr<ImageData> imstkMesh, const std::string& filePath)
+{
+    vtkSmartPointer<vtkImageData> vtkMesh = GeometryUtils::copyToVtkImageData(imstkMesh);
+    if (!vtkMesh)
+    {
+        return false;
+    }
+
+    int* dim    = vtkMesh->GetDimensions();
+    auto writer = vtkSmartPointer<WriterType>::New();
+    writer->SetFileDimensionality(3);
+    writer->SetInputData(vtkMesh);
+    writer->SetFileName(filePath.c_str());
+    writer->Write();
+
+    return true;
 }
 
 template<typename WriterType>
 bool
 VTKMeshIO::writeVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh, const std::string& filePath)
 {
-    vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertSurfaceMeshToVtkPolyData(imstkMesh);
+    vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::copyToVtkPolyData(imstkMesh);
     if (!vtkMesh)
     {
         return false;
@@ -244,7 +280,7 @@ template<typename WriterType>
 bool
 VTKMeshIO::writeVtkPolyData(std::shared_ptr<LineMesh> imstkMesh, const std::string& filePath)
 {
-    vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::convertLineMeshToVtkPolyData(imstkMesh);
+    vtkSmartPointer<vtkPolyData> vtkMesh = GeometryUtils::copyToVtkPolyData(imstkMesh);
     if (!vtkMesh)
     {
         return false;
@@ -262,7 +298,7 @@ template<typename WriterType>
 bool
 VTKMeshIO::writeVtkPointSet(const std::shared_ptr<PointSet> imstkMesh, const std::string& filePath)
 {
-    vtkSmartPointer<vtkPointSet> vtkMesh = GeometryUtils::convertPointSetToVtkPointSet(imstkMesh);
+    vtkSmartPointer<vtkPointSet> vtkMesh = GeometryUtils::copyToVtkPointSet(imstkMesh);
     if (!vtkMesh)
     {
         return false;
@@ -285,20 +321,7 @@ VTKMeshIO::readVtkUnstructuredGrid(const std::string& filePath)
     reader->Update();
 
     vtkSmartPointer<vtkUnstructuredGrid> vtkMesh = reader->GetOutput();
-    return GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
-}
-
-template<typename ReaderType>
-std::shared_ptr<ImageData>
-VTKMeshIO::readVtkImageData(const std::string& filePath)
-{
-    auto reader = vtkSmartPointer<ReaderType>::New();
-    reader->SetFileName(filePath.c_str());
-    reader->Update();
-
-    auto imageData = std::make_shared<ImageData>();
-    imageData->initialize(reader->GetOutput());
-    return imageData;
+    return GeometryUtils::copyToVolumetricMesh(vtkMesh);
 }
 
 std::shared_ptr<ImageData>
@@ -317,8 +340,8 @@ VTKMeshIO::readVtkImageDataDICOM(const std::string& filePath)
     reader->SetDirectoryName(filePath.c_str());
     reader->Update();
 
-    auto imageData = std::make_shared<ImageData>();
-    imageData->initialize(reader->GetOutput());
+    std::shared_ptr<ImageData> imageData(
+        std::move(GeometryUtils::copyToImageData(reader->GetOutput())));
     return imageData;
 }
 
@@ -326,7 +349,7 @@ template<typename WriterType>
 bool
 VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> tetMesh, const std::string& filePath)
 {
-    auto vtkMesh = GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(tetMesh);
+    auto vtkMesh = GeometryUtils::copyToVtkUnstructuredGrid(tetMesh);
 
     if (!vtkMesh)
     {
@@ -346,7 +369,7 @@ template<typename WriterType>
 bool
 VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> hMesh, const std::string& filePath)
 {
-    auto vtkMesh = GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(hMesh);
+    auto vtkMesh = GeometryUtils::copyToVtkUnstructuredGrid(hMesh);
 
     if (!vtkMesh)
     {
@@ -359,6 +382,58 @@ VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> hMesh, const
     writer->SetFileName(filePath.c_str());
     writer->Update();
 
+    return true;
+}
+
+///
+/// \brief Reads vtk image data
+///
+template<typename ReaderType>
+std::shared_ptr<ImageData>
+VTKMeshIO::readVtkImageData(const std::string& filePath)
+{
+    auto reader = vtkSmartPointer<ReaderType>::New();
+    reader->SetFileName(filePath.c_str());
+    reader->Update();
+
+    std::shared_ptr<ImageData> imageData(std::move(GeometryUtils::copyToImageData(reader->GetOutput())));
+    return imageData;
+}
+
+///
+/// \brief Reads nifti/nii format image data
+///
+std::shared_ptr<ImageData>
+VTKMeshIO::readVtkImageDataNIFTI(const std::string& filePath)
+{
+    auto reader = vtkSmartPointer<vtkNIFTIImageReader>::New();
+    reader->SetFileName(filePath.c_str());
+    reader->SetFileDimensionality(3);
+    reader->Update();
+
+    std::shared_ptr<ImageData> imageData(std::move(GeometryUtils::copyToImageData(reader->GetOutput())));
+    return imageData;
+}
+
+///
+/// \brief Write nifti/nii format image data
+///
+bool
+VTKMeshIO::writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const std::string& filePath)
+{
+    // Copy instead of couple for thread safety
+    auto vtkMesh = GeometryUtils::copyToVtkImageData(imageData);
+    if (!vtkMesh)
+    {
+        LOG(WARNING) << "VTKMeshIO::writeVtkImageDataNIFTI error: conversion unsuccessful";
+        return false;
+    }
+
+    auto writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
+    writer->SetFileName(filePath.c_str());
+    writer->SetFileDimensionality(3);
+    writer->SetInputData(vtkMesh);
+    writer->Update();
     return true;
 }
 } // imstk

@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,30 @@
    limitations under the License.
 
 =========================================================================*/
+#pragma once
+
+#include "imstkGeometryAlgorithm.h"
 
 namespace imstk
 {
+class SurfaceMesh;
+
+///
+/// \class CleanMesh
+///
+/// \brief This filter appends two SurfaceMeshes, no topological connections are made
+///
+class AppendMesh : public GeometryAlgorithm
+{
+public:
+    AppendMesh();
+    virtual ~AppendMesh() override = default;
+
+public:
+    void addInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
+    std::shared_ptr<SurfaceMesh> getOutputMesh() const;
+
+protected:
+    void requestUpdate() override;
+};
 }

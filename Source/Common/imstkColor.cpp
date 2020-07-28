@@ -21,8 +21,8 @@
 
 #include "imstkColor.h"
 #include "imstkLogger.h"
+
 #include <iomanip>
-#include <sstream>
 
 namespace imstk
 {
@@ -47,10 +47,10 @@ Color Color::Marigold(0.9, 0.9, 0.4);
 
 Color::Color()
 {
-    rgba[0] = 0.8f;
-    rgba[1] = 0.8f;
-    rgba[2] = 0.8f;
-    rgba[3] = 1.0f;
+    rgba[0] = 0.8;
+    rgba[1] = 0.8;
+    rgba[2] = 0.8;
+    rgba[3] = 1.0;
 }
 
 Color::Color(const double r, const double g, const double b, const double a)

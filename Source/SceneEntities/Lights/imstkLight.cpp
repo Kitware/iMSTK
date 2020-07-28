@@ -20,8 +20,7 @@
 =========================================================================*/
 
 #include "imstkLight.h"
-
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
 
 namespace imstk
 {

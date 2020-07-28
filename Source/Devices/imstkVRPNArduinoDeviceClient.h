@@ -50,8 +50,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~VRPNArduinoDeviceClient()
-    {}
+    virtual ~VRPNArduinoDeviceClient() override = default;
 
     ///
     /// \brief Get YPR

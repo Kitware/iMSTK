@@ -21,14 +21,12 @@
 
 #pragma once
 
-// STL includes
-#include <array>
-#include <functional>
-
-// imstk includes
 #include "imstkNonLinearSystem.h"
 #include "imstkMath.h"
 #include "imstkSolverBase.h"
+
+#include <array>
+#include <functional>
 
 namespace imstk
 {
@@ -48,7 +46,7 @@ public:
     /// \brief Default Constructor/Destructor
     ///
     NonLinearSolver();
-    virtual ~NonLinearSolver() = default;
+    virtual ~NonLinearSolver() override = default;
 
     ///
     /// \brief Main solve routine.

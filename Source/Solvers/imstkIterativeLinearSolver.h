@@ -21,7 +21,6 @@
 
 #pragma once
 
-// iMSTK includes
 #include "imstkLinearSolver.h"
 
 namespace imstk
@@ -35,8 +34,8 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    IterativeLinearSolver() {};
-    virtual ~IterativeLinearSolver() {};
+    IterativeLinearSolver() = default;
+    virtual ~IterativeLinearSolver() override = default;
 
     ///
     /// \brief Do one iteration of the method.

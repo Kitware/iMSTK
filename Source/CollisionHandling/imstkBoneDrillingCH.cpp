@@ -22,9 +22,6 @@
 #include "imstkBoneDrillingCH.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkDeviceTracker.h"
-#include "imstkLogger.h"
-#include "imstkParallelUtils.h"
 #include "imstkTetrahedralMesh.h"
 
 namespace imstk

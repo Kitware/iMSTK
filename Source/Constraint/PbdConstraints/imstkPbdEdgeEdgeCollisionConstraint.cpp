@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkPbdEdgeEdgeCollisionConstraint.h"
-#include "imstkLogger.h"
 
 namespace imstk
 {

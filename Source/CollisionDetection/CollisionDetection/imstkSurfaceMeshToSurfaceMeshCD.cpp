@@ -20,10 +20,8 @@
 =========================================================================*/
 
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
-#include "imstkNarrowPhaseCD.h"
-#include "imstkCollisionData.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkOctreeBasedCD.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {

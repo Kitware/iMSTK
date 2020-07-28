@@ -20,10 +20,9 @@
 =========================================================================*/
 
 #include "imstkSceneObjectController.h"
-#include "imstkDeviceTracker.h"
-#include "imstkSceneObject.h"
-#include "imstkDeviceClient.h"
 #include "imstkCollidingObject.h"
+#include "imstkDeviceClient.h"
+#include "imstkDeviceTracker.h"
 #include "imstkGeometry.h"
 #include "imstkLogger.h"
 

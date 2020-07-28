@@ -71,7 +71,7 @@ public:
     ///
     void addCollisionPair(const std::shared_ptr<Geometry>& geom1, const std::shared_ptr<Geometry>& geom2,
                           const CollisionDetection::Type collisionType,
-                          const std::shared_ptr<CollisionData>& collisionData = std::make_shared<CollisionData>());
+                          const std::shared_ptr<CollisionData>& collisionData);
 
     ///
     /// \brief Get pairs of geometries from the added collision pairs

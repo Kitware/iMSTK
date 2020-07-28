@@ -20,7 +20,7 @@ set(VTK_H_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.h 
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.h   
     VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h
-	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.h)
+	  VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.h)
 
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKRenderer.cpp
@@ -40,7 +40,7 @@ set(VTK_CPP_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.cpp
     VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.cpp
-	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.cpp)
+	  VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.cpp)
 
 set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanRenderer.h

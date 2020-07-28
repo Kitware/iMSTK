@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,21 +19,19 @@
 
 =========================================================================*/
 
-// imstk
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
+#include "imstkImageData.h"
 #include "imstkMeshIO.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSimulationManager.h"
+#include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkSceneManager.h"
-#include "imstkScene.h"
 #include "imstkVTKRenderer.h"
-
-// STL
-#include <sstream>
-#include <string>
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -49,9 +47,10 @@ main()
     simManager->setActiveScene(scene);
 
     // Use MeshIO to read the image dataset
-    auto imageData = imstk::MeshIO::read(iMSTK_DATA_ROOT "skullVolume.nrrd");
+    auto imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
+
     // Create a visual object in the scene for the volume
-    auto volumeObj = std::make_shared<imstk::VisualObject>("VisualVolume");
+    auto volumeObj = std::make_shared<VisualObject>("VisualVolume");
     volumeObj->setVisualGeometry(imageData);
     scene->addSceneObject(volumeObj);
 

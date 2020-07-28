@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKCylinderRenderDelegate() = default;
+    virtual ~VTKCylinderRenderDelegate() override = default;
 
     ///
     /// \brief Update cylinder source based on the cylinder geometry

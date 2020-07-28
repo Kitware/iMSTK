@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+
 #include <tbb/tbb.h>
 
 #undef min
@@ -31,6 +32,44 @@ namespace imstk
 {
 namespace ParallelUtils
 {
+///
+/// \brief Private helper class, providing operator() using in std::parallel_reduce
+///  for finding range of a container with specified begin/end/operator[],operator++ functions
+///
+template<class ContainerType>
+class RangeFunctor
+{
+public:
+    RangeFunctor(const ContainerType& data) : m_Data(data) { }
+    RangeFunctor(RangeFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) { }
+
+    // Prohibit copying
+    RangeFunctor() = delete;
+    RangeFunctor& operator=(const RangeFunctor&) = delete;
+
+    void operator()(const tbb::blocked_range<size_t>& r)
+    {
+        for (size_t i = r.begin(); i != r.end(); i++)
+        {
+            m_Max = m_Max > m_Data[i] ? m_Max : m_Data[i];
+            m_Min = m_Max < m_Data[i] ? m_Min : m_Data[i];
+        }
+    }
+
+    void join(RangeFunctor& pObj)
+    {
+        m_Max = m_Max > pObj.m_Max ? m_Max : pObj.m_Max;
+        m_Min = m_Min < pObj.m_Min ? m_Min : pObj.m_Min;
+    }
+
+    Vec2d getRange() const { return Vec2d(m_Min, m_Max); }
+
+private:
+    Real m_Min = std::numeric_limits<Real>::max();
+    Real m_Max = std::numeric_limits<Real>::min();
+    const ContainerType& m_Data;
+};
+
 ///
 /// \brief Private helper class, providing operator() using in std::parallel_reduce
 ///  for finding max L2 norm of an array of Vec3r

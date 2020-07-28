@@ -21,20 +21,21 @@
 
 #pragma once
 
-#include "imstkLogger.h"
 #include "imstkMath.h"
-#include "imstkParallelUtils.h"
-
-#include "vtkSmartPointer.h"
-
+#include "imstkTypes.h"
 #include <memory>
 #include <numeric>
 #include <queue>
-#include <unordered_set>
 #include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <vtkSmartPointer.h>
+#include <vtkType.h>
 
+class vtkDataArray;
 class vtkCellArray;
 class vtkPolyData;
+class vtkImageData;
 class vtkPointData;
 class vtkPoints;
 class vtkPointSet;
@@ -42,6 +43,8 @@ class vtkUnstructuredGrid;
 
 namespace imstk
 {
+class AbstractDataArray;
+class ImageData;
 class HexahedralMesh;
 class LineMesh;
 class PointSet;
@@ -49,52 +52,108 @@ class SurfaceMesh;
 class TetrahedralMesh;
 class VolumetricMesh;
 
+///
+/// \brief Contains a set of free functions for processing geometry
+/// also contains a set of conversion and coupling functions for VTK
+///
 namespace GeometryUtils
 {
+static std::unordered_map<int, ScalarType> vtkToImstkScalarType =
+{
+    { VTK_VOID, IMSTK_VOID },
+    { VTK_CHAR, IMSTK_CHAR },
+    { VTK_UNSIGNED_CHAR, IMSTK_UNSIGNED_CHAR },
+    { VTK_SHORT, IMSTK_SHORT },
+    { VTK_UNSIGNED_SHORT, IMSTK_UNSIGNED_SHORT },
+    { VTK_INT, IMSTK_INT },
+    { VTK_UNSIGNED_INT, IMSTK_UNSIGNED_INT },
+    { VTK_LONG, IMSTK_LONG },
+    { VTK_UNSIGNED_LONG, IMSTK_UNSIGNED_LONG },
+    { VTK_FLOAT, IMSTK_FLOAT },
+    { VTK_DOUBLE, IMSTK_DOUBLE },
+    { VTK_LONG_LONG, IMSTK_LONG_LONG },
+    { VTK_UNSIGNED_LONG_LONG, IMSTK_UNSIGNED_LONG_LONG }
+};
+static std::unordered_map<ScalarType, int> imstkToVtkScalarType =
+{
+    { IMSTK_VOID, VTK_VOID },
+    { IMSTK_CHAR, VTK_CHAR },
+    { IMSTK_UNSIGNED_CHAR, VTK_UNSIGNED_CHAR },
+    { IMSTK_SHORT, VTK_SHORT },
+    { IMSTK_UNSIGNED_SHORT, VTK_UNSIGNED_SHORT },
+    { IMSTK_INT, VTK_INT },
+    { IMSTK_UNSIGNED_INT, VTK_UNSIGNED_INT },
+    { IMSTK_LONG, VTK_LONG },
+    { IMSTK_UNSIGNED_LONG, VTK_UNSIGNED_LONG },
+    { IMSTK_FLOAT, VTK_FLOAT },
+    { IMSTK_DOUBLE, VTK_DOUBLE },
+    { IMSTK_LONG_LONG, VTK_LONG_LONG },
+    { IMSTK_UNSIGNED_LONG_LONG, VTK_UNSIGNED_LONG_LONG }
+};
+
+///
+/// \brief Couple functions
+vtkSmartPointer<vtkDataArray> coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
+vtkSmartPointer<vtkImageData> coupleVtkImageData(std::shared_ptr<ImageData> imstkImageData);
+
+///
+/// \brief Copy functions
+///
+vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray, int numComps = 1);
+std::shared_ptr<AbstractDataArray> copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray);
+
+std::unique_ptr<ImageData> copyToImageData(vtkSmartPointer<vtkImageData> imageDataVtk);
+vtkSmartPointer<vtkImageData> copyToVtkImageData(std::shared_ptr<ImageData> imageData);
+
 ///
 /// \brief Converts vtk polydata into a imstk point set
 ///
-std::unique_ptr<PointSet> convertVtkPointSetToPointSet(const vtkSmartPointer<vtkPointSet> vtkMesh);
+std::unique_ptr<PointSet> copyToPointSet(vtkSmartPointer<vtkPointSet> vtkMesh);
 
 ///
 /// \brief Converts vtk polydata into a imstk surface mesh
 ///
-std::unique_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(const vtkSmartPointer<vtkPolyData> vtkMesh);
+std::unique_ptr<SurfaceMesh> copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
 ///
 /// \brief Converts vtk polydata into a imstk surface mesh
 ///
-std::unique_ptr<LineMesh> convertVtkPolyDataToLineMesh(const vtkSmartPointer<vtkPolyData> vtkMesh);
+std::unique_ptr<LineMesh> copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
 ///
 /// \brief Get imstk volumetric mesh given vtkUnstructuredGrid as input
 ///
-std::unique_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(const vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
+std::unique_ptr<VolumetricMesh> copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
+
+///
+/// \brief Smart copy will try to tell the type of the input mesh to convert to imstk
+///
+//std::shared_ptr<PointSet> smartCopyToVtkPolyData(vtkSmartPointer<vtkPointSet> vtkMesh);
 
 ///
 /// \brief Converts imstk point set into a vtk polydata
 ///
-vtkSmartPointer<vtkPointSet> convertPointSetToVtkPointSet(const std::shared_ptr<PointSet> imstkMesh);
+vtkSmartPointer<vtkPointSet> copyToVtkPointSet(std::shared_ptr<PointSet> imstkMesh);
 
 ///
 /// \brief Converts imstk line mesh into a vtk polydata
 ///
-vtkSmartPointer<vtkPolyData> convertLineMeshToVtkPolyData(const std::shared_ptr<LineMesh> imstkMesh);
+vtkSmartPointer<vtkPolyData> copyToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh);
 
 ///
 /// \brief Converts imstk surface mesh into a vtk polydata
 ///
-vtkSmartPointer<vtkPolyData> convertSurfaceMeshToVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh);
+vtkSmartPointer<vtkPolyData> copyToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh);
 
 ///
 /// \brief Converts imstk tetrahedral mesh into a vtk unstructured grid
 ///
-vtkSmartPointer<vtkUnstructuredGrid> convertTetrahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<TetrahedralMesh> imstkMesh);
+vtkSmartPointer<vtkUnstructuredGrid> copyToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkMesh);
 
 ///
 /// \brief Converts imstk hexahedral mesh into a vtk unstructured grid
 ///
-vtkSmartPointer<vtkUnstructuredGrid> convertHexahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<HexahedralMesh> imstkMesh);
+vtkSmartPointer<vtkUnstructuredGrid> copyToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
 
 ///
 /// \brief Copy from vtk points to a imstk vertices array (StdVectorOfVec3d)
@@ -124,79 +183,18 @@ void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim
 void copyPointDataFromVtk(vtkPointData* const pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 
 ///
-/// \brief Combines two input surface meshes
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkAppendPolyData.html#details">vtkAppendPolyData</a> class
-/// for more details
+/// \brief Returns the number of open edges, use to tell if manifold (==0)
 ///
-///
-std::unique_ptr<SurfaceMesh> combineSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2);
+int getOpenEdgeCount(std::shared_ptr<SurfaceMesh> imstkMesh);
 
 ///
-/// \brief Converts an imstk SurfaceMesh to a LineMesh, removing duplicate edges. Cell indices not preserved
+/// \brief Returns if the surface is closed or not
 ///
-std::unique_ptr<LineMesh> surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
-
-///
-/// \brief Removes duplicate edges & points in poly data
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkCleanPolyData.html#details">vtkCleanPolyData</a> class
-/// for more details
-///
-std::unique_ptr<SurfaceMesh> cleanSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
-
-///
-/// \brief Returns points in pointSet within the provided surfaceMesh
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSelectEnclosedPoints.html#details">vtkSelectEnclosedPoints</a> class
-/// for more details
-///
-std::unique_ptr<PointSet> getEnclosedPoints(std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, const bool insideOut = false);
-
-///
-/// \brief Returns array indicating if point is enclosed or not
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSelectEnclosedPoints.html#details">vtkSelectEnclosedPoints</a> class
-/// for more details
-///
-void testEnclosedPoints(std::vector<bool>& results, std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, const bool insideOut = false);
-
-///
-/// \brief Reverse the winding of a SurfaceMesh
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSelectEnclosedPoints.html#details">vtkSelectEnclosedPoints</a> class
-///
-
-///
-/// \brief Config for smooth polydata filter
-///
-struct smoothPolydataConfig
+inline bool
+isClosed(std::shared_ptr<SurfaceMesh> imstkMesh)
 {
-    int numberOfIterations  = 20;
-    double relaxationFactor = 0.01;
-    double convergence      = 0.0;
-    double featureAngle     = 45.0;
-    double edgeAngle = 15.0;
-    bool featureEdgeSmoothing = false;
-    bool boundarySmoothing    = true;
-};
-
-///
-/// \brief Smooths a SurfaceMesh using laplacian smoothening
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkSmoothPolyDataFilter.html#details">vtkSmoothPolyDataFilter</a>
-/// for more details
-///
-std::unique_ptr<SurfaceMesh> smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
-                                               const smoothPolydataConfig&  c);
-
-///
-/// \brief Sub-divdes a SurfaceMesh using linear subdivision
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkLinearSubdivisionFilter.html#details">vtk linear subdivision</a>
-/// for more details
-///
-std::unique_ptr<SurfaceMesh> linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions = 1);
-
-///
-/// \brief Sub-divides an input imstk SurfaceMesh using loop subdivision algorithm
-/// Refer <a href="https://vtk.org/doc/nightly/html/classvtkLoopSubdivisionFilter.html#details">vtk loop subdivision</a>
-/// for more details
-///
-std::unique_ptr<SurfaceMesh> loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions = 1);
+    return getOpenEdgeCount(imstkMesh) == 0;
+}
 
 ///
 /// \brief Create a tetrahedral mesh based on a uniform Cartesian mesh

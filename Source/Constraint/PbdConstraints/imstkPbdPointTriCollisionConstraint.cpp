@@ -21,8 +21,6 @@
 
 #include "imstkPbdPointTriCollisionConstraint.h"
 
-#include "imstkLogger.h"
-
 namespace imstk
 {
 void

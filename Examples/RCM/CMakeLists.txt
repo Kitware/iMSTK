@@ -21,7 +21,7 @@ project(Example-RCM)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} RCM.cpp)
+imstk_add_executable(${PROJECT_NAME} RCM.cpp bandwidth.h)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

@@ -19,31 +19,24 @@
 
 =========================================================================*/
 
-// std lib
-#include <fstream>
-
-//imstk
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkConjugateGradient.h"
 #include "imstkCorotationalFEMForceModel.h"
-#include "imstkInternalForceModel.h"
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
 #include "imstkLinearFEMForceModel.h"
-#include "imstkMath.h"
-#include "imstkSolverBase.h"
+#include "imstkLogger.h"
+#include "imstkNewtonSolver.h"
 #include "imstkStVKForceModel.h"
 #include "imstkTaskGraph.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkVolumetricMesh.h"
 
-// vega
-#include "generateMassMatrix.h"
-#include "generateMeshGraph.h"
-
+#include <generateMassMatrix.h>
+#include <generateMeshGraph.h>
 #pragma warning( push )
 #pragma warning( disable : 4458 )
-#include "configFile.h"
+#include <configFile.h>
 #pragma warning( pop )
 
 namespace imstk

@@ -21,11 +21,9 @@
 
 #pragma once
 
-// iMSTK includes
 #include "imstkNonLinearSystem.h"
 #include "imstkIterativeLinearSolver.h"
 
-// Eigen includes
 #include <Eigen/IterativeLinearSolvers>
 
 namespace imstk
@@ -43,7 +41,7 @@ public:
     ///
     SOR(const double relaxationFactor = 0.5) : m_relaxationFactor(relaxationFactor) { m_type = Type::SuccessiveOverRelaxation; };
     SOR(const SparseMatrixd& A, const Vectord& rhs);
-    ~SOR() = default;
+    virtual ~SOR() override = default;
 
     ///
     /// \brief Remove specific constructor signatures

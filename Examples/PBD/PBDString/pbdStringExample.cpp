@@ -23,9 +23,11 @@
 #include "imstkLineMesh.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 

@@ -52,7 +52,8 @@ public:
         Simulation
     };
 
-    Renderer() : m_config(std::make_shared<rendererConfig>()) {}
+    Renderer() : m_config(std::make_shared<rendererConfig>()) { }
+    virtual ~Renderer() = default;
 
     ///
     /// \brief Set rendering mode

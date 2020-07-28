@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKHexahedralMeshRenderDelegate() = default;
+    virtual ~VTKHexahedralMeshRenderDelegate() override = default;
 
     ///
     /// \brief Update unstructured grid source based on the hexahedral mesh

@@ -22,7 +22,9 @@
 #pragma once
 
 #include "imstkColor.h"
-#include "imstkTextureManager.h"
+#include "imstkTexture.h"
+
+#include <vector>
 
 namespace imstk
 {
@@ -44,7 +46,8 @@ public:
         Points,
         WireframeSurface,
         VolumeRendering,
-        Fluid               ///< Renders a set of points using a screen-space fluid renderer
+        Fluid,               ///< Renders a set of points using a screen-space fluid renderer
+        Image
     };
 
     /// surface shading model. Defaults to Phong
@@ -89,9 +92,12 @@ public:
     void setLineWidth(const float width);
 
     ///
-    /// \brief Get/Set point size
+    /// \brief Get/Set point radius
     ///
     float getPointSize() const;
+    ///
+    /// \brief Get/Set point radius
+    ///
     void setPointSize(const float size);
 
     ///

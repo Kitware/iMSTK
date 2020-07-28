@@ -21,13 +21,14 @@
 
 #pragma once
 
-#include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
 
 struct aiMesh;
 
 namespace imstk
 {
+class SurfaceMesh;
+
 ///
 /// \class AssimpMeshIO
 ///

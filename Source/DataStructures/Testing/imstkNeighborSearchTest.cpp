@@ -20,9 +20,7 @@
 =========================================================================*/
 
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
 
-#include "imstkMath.h"
 #include "imstkSpatialHashTableSeparateChaining.h"
 #include "imstkGridBasedNeighborSearch.h"
 

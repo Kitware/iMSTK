@@ -21,7 +21,6 @@
 
 #pragma once
 
-// iMSTK includes
 #include "imstkIterativeLinearSolver.h"
 
 namespace imstk
@@ -39,7 +38,7 @@ public:
     ///
     GaussSeidel() { m_type = Type::GaussSeidel; };
     GaussSeidel(const SparseMatrixd& A, const Vectord& rhs);
-    ~GaussSeidel() = default;
+    virtual ~GaussSeidel() override = default;
 
     ///
     /// \brief Remove specific constructor signatures

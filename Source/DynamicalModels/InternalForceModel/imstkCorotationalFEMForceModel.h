@@ -21,7 +21,6 @@
 
 #pragma once
 
-//imstk
 #include "imstkInternalForceModel.h"
 
 namespace vega

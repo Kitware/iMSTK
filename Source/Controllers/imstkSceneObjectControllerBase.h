@@ -34,9 +34,10 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    SceneObjectControllerBase()  = default;
-    ~SceneObjectControllerBase() = default;
+    SceneObjectControllerBase() = default;
+    virtual ~SceneObjectControllerBase() = default;
 
+public:
     ///
     /// \brief Update controlled scene objects using latest tracking information
     ///

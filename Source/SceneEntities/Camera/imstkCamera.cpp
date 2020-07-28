@@ -19,11 +19,7 @@
 
 =========================================================================*/
 
-#include <memory>
-
 #include "imstkCamera.h"
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {

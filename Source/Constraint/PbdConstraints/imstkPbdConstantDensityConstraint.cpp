@@ -45,9 +45,9 @@ PbdConstantDensityConstraint::initConstraint(const StdVectorOfVec3d& initVertexP
 }
 
 void
-PbdConstantDensityConstraint::projectConstraint(const StdVectorOfReal&           currInvMasses,
-                                                const double                     dt,
-                                                const PbdConstraint::SolverType& type,
+PbdConstantDensityConstraint::projectConstraint(const StdVectorOfReal&           imstkNotUsed(currInvMasses),
+                                                const double                     imstkNotUsed(dt),
+                                                const PbdConstraint::SolverType& imstkNotUsed(type),
                                                 StdVectorOfVec3d&                currVertexPositions)
 {
     const size_t numParticles = currVertexPositions.size();

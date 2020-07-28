@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include <array>
-
 #include "imstkPointSet.h"
+#include <array>
 
 namespace imstk
 {

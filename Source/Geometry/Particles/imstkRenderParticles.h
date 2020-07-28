@@ -21,14 +21,13 @@
 
 #pragma once
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
-#include "glm/glm.hpp"
-#pragma warning( pop )
-
 #include "imstkGeometry.h"
 #include "imstkMath.h"
-//#include "imstkColor.h"
+
+#pragma warning( push )
+#pragma warning( disable : 4201 )
+#include <glm/glm.hpp>
+#pragma warning( pop )
 
 namespace imstk
 {

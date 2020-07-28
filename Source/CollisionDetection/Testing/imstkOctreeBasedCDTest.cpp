@@ -19,22 +19,16 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include <gtest/gtest.h>
 
-#include "imstkMath.h"
-#include "imstkSphere.h"
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkCollisionData.h"
 #include "imstkNarrowPhaseCD.h"
-
 #include "imstkOctreeBasedCD.h"
 #include "imstkPointSetToSurfaceMeshCD.h"
+#include "imstkSphere.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshToSurfaceMeshCD.h"
 
-#include <iostream>
-#include <unordered_set>
 #include <unordered_map>
 
 using namespace imstk;
@@ -230,7 +224,7 @@ public:
         }
 
         // Detect penetration using octree
-        m_OctreeCD->addCollisionPair(pointset, mesh, CollisionDetection::Type::PointSetToSurfaceMesh);
+        m_OctreeCD->addCollisionPair(pointset, mesh, CollisionDetection::Type::PointSetToSurfaceMesh, std::make_shared<CollisionData>());
         m_OctreeCD->detectCollision();
         const auto collisionData = m_OctreeCD->getCollisionPairData(pointset->getGlobalIndex(), mesh->getGlobalIndex());
 #ifdef PRINT_DEBUG
@@ -335,7 +329,7 @@ public:
         }
 
         // Detect penetration using octree
-        m_OctreeCD->addCollisionPair(pointset, sphere, CollisionDetection::Type::PointSetToSphere);
+        m_OctreeCD->addCollisionPair(pointset, sphere, CollisionDetection::Type::PointSetToSphere, std::make_shared<CollisionData>());
         m_OctreeCD->detectCollision();
         const auto collisionData = m_OctreeCD->getCollisionPairData(pointset->getGlobalIndex(), sphere->getGlobalIndex());
 #ifdef PRINT_DEBUG
@@ -393,7 +387,7 @@ public:
         }
 
         // Detect collision using octree
-        m_OctreeCD->addCollisionPair(mesh, box, CollisionDetection::Type::SurfaceMeshToSurfaceMesh);
+        m_OctreeCD->addCollisionPair(mesh, box, CollisionDetection::Type::SurfaceMeshToSurfaceMesh, std::make_shared<CollisionData>());
         m_OctreeCD->detectCollision();
         collisionData = m_OctreeCD->getCollisionPairData(mesh->getGlobalIndex(), box->getGlobalIndex());
 #ifdef PRINT_DEBUG

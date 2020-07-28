@@ -19,19 +19,12 @@
 
 =========================================================================*/
 
-#include <fstream>
-#include <iostream>
-#include <algorithm>
-#include <array>
-
 #include "imstkMSHMeshIO.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
-#include "imstkVolumetricMesh.h"
-
-#include "tetMesh.h"
-
 #include "imstkLogger.h"
+#include "imstkTetrahedralMesh.h"
+
+#include <fstream>
 
 namespace imstk
 {

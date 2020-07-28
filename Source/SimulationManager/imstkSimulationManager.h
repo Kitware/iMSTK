@@ -21,15 +21,12 @@
 
 #pragma once
 
-#include <mutex>
-
+#include "imstkLogger.h"
 #include "imstkModule.h"
+#include "imstkRenderer.h"
 
-#ifdef iMSTK_USE_Vulkan
-#include "imstkVulkanViewer.h"
-#else
-#include "imstkVTKViewer.h"
-#endif
+#include <mutex>
+#include <unordered_map>
 
 namespace imstk
 {
@@ -83,7 +80,7 @@ struct SimManagerConfig
     // states
     SimulationMode simulationMode   = SimulationMode::Rendering;
     SimulationStatus startingStatus = SimulationStatus::Running;
-    bool VR_Enabled = false;
+    bool enableVR = false;
     bool startInPausedState = false;
 
     // 0 indicates that an optimal size will be used

@@ -19,14 +19,12 @@
 
 =========================================================================*/
 
-#include "imstkMeshIO.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkLogger.h"
 #include "bandwidth.h"
-
-#include <thread>
+#include "imstkGeometryUtilities.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 
 using namespace imstk;
 
@@ -56,7 +54,7 @@ main(int argc, char** argv)
 
     // 3D mesh
     {
-        auto       tetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
+        auto       tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
         const auto numVerts = tetMesh->getNumVertices();
         std::cout << "Number of vertices = " << numVerts << std::endl;
         testRCM(tetMesh->getTetrahedraVertices(), numVerts);
@@ -64,7 +62,7 @@ main(int argc, char** argv)
 
     // a surface mesh cover
     {
-        auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
+        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
         auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
         auto conn     = tetMesh->getTetrahedraVertices();
         auto numVerts = tetMesh->getNumVertices();

@@ -20,15 +20,10 @@
 =========================================================================*/
 
 #include "imstkOctreeBasedCD.h"
-
-#include "imstkGeometry.h"
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
-
-// Collision detection headers
-#include "imstkNarrowPhaseCD.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionUtils.h"
+#include "imstkGeometry.h"
+#include "imstkNarrowPhaseCD.h"
 
 namespace imstk
 {

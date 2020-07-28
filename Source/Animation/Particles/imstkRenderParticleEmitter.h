@@ -23,13 +23,12 @@
 
 #include "imstkMath.h"
 #include "imstkAnimationModel.h"
-#include "imstkRenderParticles.h"
-#include "imstkTimer.h"
 #include "imstkColor.h"
 
 namespace imstk
 {
-//struct Color;
+struct RenderParticle;
+class StopWatch;
 
 ///
 /// \struct RenderParticleKeyFrame
@@ -191,7 +190,7 @@ protected:
     float m_time; ///< total time for particle system
     float m_emitTime;
 
-    StopWatch m_stopWatch;
+    std::unique_ptr<StopWatch> m_stopWatch;
 
     double m_lastUpdateTime = 0.0;
     bool   m_started = false;

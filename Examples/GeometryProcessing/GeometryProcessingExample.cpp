@@ -19,65 +19,88 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkPlane.h"
-#include "imstkCylinder.h"
-#include "imstkCube.h"
-#include "imstkAPIUtilities.h"
-#include "imstkGeometryUtilities.h"
 #include "imstkCamera.h"
+#include "imstkDataArray.h"
+#include "imstkImageData.h"
+#include "imstkLight.h"
 #include "imstkMeshIO.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
+#include "imstkNew.h"
+#include "imstkQuadricDecimate.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshDistanceTransform.h"
+#include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
+using namespace imstk::expiremental;
 
 ///
-/// \brief This example demonstrates the geometry transforms in imstk
+/// \brief This example demonstrates erosion of a mesh
 ///
 int
 main()
 {
     // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("GeometryTransforms");
+    imstkNew<SimulationManager> simManager;
+    std::shared_ptr<Scene>      scene = simManager->createNewScene("GeometryTransforms");
 
-    auto coarseTetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
+    auto                  coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    imstkNew<SurfaceMesh> coarseSurfMesh;
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
-    std::shared_ptr<SurfaceMesh> fineSurfaceMesh(std::move(GeometryUtils::loopSubdivideSurfaceMesh(coarseSurfMesh)));
+    // Compute DT
+    imstkNew<SurfaceMeshDistanceTransform> createSdf;
+    createSdf->setInputMesh(coarseSurfMesh);
+    createSdf->setDimensions(150, 150, 150);
+    createSdf->update();
 
-    fineSurfaceMesh->translate(Vec3d(0., -5., 0.), Geometry::TransformType::ConcatenateToTransform);
-    coarseSurfMesh->translate(Vec3d(0., 5., 0.), Geometry::TransformType::ConcatenateToTransform);
+    // Erode
+    const float       erosionDist = 0.2f;
+    DataArray<float>& scalars     = *std::dynamic_pointer_cast<DataArray<float>>(createSdf->getOutputImage()->getScalars());
+    for (size_t i = 0; i < scalars.size(); i++)
+    {
+        scalars[i] += erosionDist;
+    }
 
-    auto material0 = std::make_shared<RenderMaterial>();
-    material0->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material0->setPointSize(10.);
-    material0->setLineWidth(4.);
-    material0->setEdgeColor(Color::Color::Orange);
-    auto surfMeshModel0 = std::make_shared<VisualModel>(coarseSurfMesh);
-    surfMeshModel0->setRenderMaterial(material0);
+    // Extract surface
+    imstkNew<SurfaceMeshFlyingEdges> isoExtract;
+    isoExtract->setInputImage(createSdf->getOutputImage());
+    isoExtract->update();
 
-    auto sceneObj0 = std::make_shared<VisualObject>("coarse Mesh");
-    sceneObj0->addVisualModel(surfMeshModel0);
+    // Reduce surface
+    imstkNew<QuadricDecimate> reduce;
+    reduce->setInputMesh(isoExtract->getOutputMesh());
+    reduce->setTargetReduction(0.5);
+    reduce->update();
 
-    scene->addSceneObject(sceneObj0);
-
-    auto material = std::make_shared<RenderMaterial>();
-    material->setColor(imstk::Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    material->setPointSize(6.);
-    material->setLineWidth(1.);
-    auto surfMeshModel = std::make_shared<VisualModel>(fineSurfaceMesh);
-    surfMeshModel->setRenderMaterial(material);
-
-    auto sceneObj = std::make_shared<VisualObject>("fine Mesh");
-    sceneObj->addVisualModel(surfMeshModel);
-
+    // Create the scene object
+    imstkNew<VisualObject> sceneObj("Mesh");
+    // Create the eroded visual model
+    {
+        imstkNew<VisualModel>    surfMeshModel(reduce->getOutput());
+        imstkNew<RenderMaterial> material;
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setLineWidth(4.0);
+        material->setEdgeColor(Color::Color::Orange);
+        surfMeshModel->setRenderMaterial(material);
+        sceneObj->addVisualModel(surfMeshModel);
+    }
+    // Create the original mesh visual model
+    {
+        imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh.get());
+        imstkNew<RenderMaterial> material;
+        material->setColor(imstk::Color::Red);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setLineWidth(1.0);
+        material->setOpacity(0.2f);
+        surfMeshModel->setRenderMaterial(material);
+        sceneObj->addVisualModel(surfMeshModel);
+    }
     scene->addSceneObject(sceneObj);
 
     // Set Camera configuration
@@ -86,7 +109,7 @@ main()
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
+    imstkNew<DirectionalLight> light("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1);
     scene->addLight(light);

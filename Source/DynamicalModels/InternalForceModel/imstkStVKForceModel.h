@@ -21,19 +21,15 @@
 
 #pragma once
 
-//imstk
 #include "imstkInternalForceModel.h"
-#include "imstkLogger.h"
 
-//vega
-#pragma warning( push )
-#pragma warning( disable : 4458 )
-#include "StVKInternalForces.h"
-#pragma warning( pop )
+#include <StVKStiffnessMatrix.h>
 
-#include "StVKStiffnessMatrix.h"
-#include "StVKElementABCDLoader.h"
-#include "tetMesh.h"
+namespace vega
+{
+class StVKInternalForces;
+class VolumetricMesh;
+}
 
 namespace imstk
 {
@@ -44,19 +40,12 @@ public:
     /// \brief Constructor
     ///
     StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
-                   const bool                            withGravity = true,
-                   const double                          gravity     = 10.0) : InternalForceModel()
-    {
-        auto                   tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
-        vega::StVKElementABCD* precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
-        m_stVKInternalForces      = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
-        m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
-    }
+                   const bool withGravity = true, const double gravity = 10.0);
 
     ///
     /// \brief Destructor
     ///
-    virtual ~StVKForceModel() = default;
+    virtual ~StVKForceModel() override = default;
 
     ///
     /// \brief Get the internal force
@@ -103,7 +92,6 @@ public:
     }
 
 protected:
-
     std::shared_ptr<vega::StVKInternalForces>  m_stVKInternalForces;
     std::shared_ptr<vega::SparseMatrix>        m_vegaTangentStiffnessMatrix;
     std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaStVKStiffnessMatrix;

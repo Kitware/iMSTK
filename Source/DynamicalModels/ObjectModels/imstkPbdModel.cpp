@@ -20,9 +20,10 @@
 =========================================================================*/
 
 #include "imstkPbdModel.h"
-#include "imstkGeometryUtilities.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
+#include "imstkLogger.h"
+#include "imstkParallelUtils.h"
 #include "imstkPbdAreaConstraint.h"
 #include "imstkPbdBendConstraint.h"
 #include "imstkPbdConstantDensityConstraint.h"
@@ -34,8 +35,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
-
-#include <unordered_map>
 
 namespace imstk
 {
@@ -75,6 +74,19 @@ PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::
     LOG_IF(FATAL, (type != PbdConstraint::Type::FEMTet && type != PbdConstraint::Type::FEMHex))
         << "Non-FEM constraint should be enabled by the enableConstraint function";
     m_FEMConstraints.push_back({ type, material });
+}
+
+void
+PBDModelConfig::setSolverType(const PbdConstraint::SolverType& type)
+{
+    if (type == PbdConstraint::SolverType::GCD)
+    {
+        LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
+        m_solverType = PbdConstraint::SolverType::xPBD;
+        return;
+    }
+
+    m_solverType = type;
 }
 
 void

@@ -21,20 +21,12 @@
 
 #pragma once
 
-#include <g3log/g3log.hpp>
-
-//imstk
 #include "imstkInternalForceModel.h"
 
-//vega
 #pragma warning( push )
 #pragma warning( disable : 4458 )
-#include "isotropicHyperelasticFEM.h"
+#include <isotropicHyperelasticFEM.h>
 #pragma warning( pop )
-
-#include "StVKIsotropicMaterial.h"
-#include "neoHookeanIsotropicMaterial.h"
-#include "MooneyRivlinIsotropicMaterial.h"
 
 namespace imstk
 {
@@ -53,46 +45,7 @@ public:
                                       std::shared_ptr<vega::VolumetricMesh> mesh,
                                       const double                          inversionThreshold,
                                       const bool                            withGravity = true,
-                                      const double                          gravity     = 10.0) : InternalForceModel()
-    {
-        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
-
-        const int    enableCompressionResistance = 1;
-        const double compressionResistance       = 500;
-        switch (materialType)
-        {
-        case HyperElasticMaterialType::StVK:
-            m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(
-                    tetMesh.get(),
-                    enableCompressionResistance,
-                    compressionResistance);
-            break;
-
-        case HyperElasticMaterialType::NeoHookean:
-            m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(
-                    tetMesh.get(),
-                    enableCompressionResistance,
-                    compressionResistance);
-            break;
-
-        case HyperElasticMaterialType::MooneyRivlin:
-            m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(
-                    tetMesh.get(),
-                    enableCompressionResistance,
-                    compressionResistance);
-            break;
-
-        default:
-            LOG(WARNING) << "Error: Invalid hyperelastic material type.";
-        }
-
-        m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(
-            tetMesh.get(),
-            m_isotropicMaterial.get(),
-            inversionThreshold,
-            withGravity,
-            gravity);
-    }
+                                      const double                          gravity     = 10.0);
 
     ///
     /// \brief Constructor type that is not allowed
@@ -102,7 +55,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~IsotropicHyperelasticFEForceModel() = default;
+    virtual ~IsotropicHyperelasticFEForceModel() override = default;
 
     ///
     /// \brief Get the internal force

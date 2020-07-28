@@ -21,16 +21,13 @@
 
 #pragma once
 
-#include <vector>
+#include "imstkModule.h"
+
 #include <map>
 #include <string>
 
-// vrpn
 #include <vrpn_Connection.h>
 #include <vrpn_MainloopContainer.h>
-
-// imstk
-#include "imstkModule.h"
 
 namespace imstk
 {
@@ -67,7 +64,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~VRPNDeviceServer() {}
+    virtual ~VRPNDeviceServer() override = default;
 
     ///
     /// \brief Add device

@@ -27,8 +27,7 @@
 #pragma warning( push )
 #pragma warning( disable : 4458 )
 #pragma warning( disable : 4100 )
-//vega
-#include "forceModel.h"
+#include <forceModel.h>
 #pragma warning( pop )
 
 namespace imstk
@@ -45,7 +44,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    InternalForceModel() {};
+    InternalForceModel() = default;
 
     ///
     /// \brief Destructor

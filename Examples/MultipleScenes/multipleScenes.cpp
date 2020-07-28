@@ -19,17 +19,20 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkAPIUtilities.h"
+#include "imstkCamera.h"
+#include "imstkMeshIO.h"
+#include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkAPIUtilities.h"
-#include "imstkOneToOneMap.h"
-#include "imstkCamera.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkMeshIO.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkViewer.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 
@@ -42,12 +45,11 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // Load a sample mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract the surface mesh
-    auto surfMesh   = std::make_shared<SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -59,7 +61,7 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
 
     auto deformableObj = std::make_shared<PbdObject>("Dragon");
     auto pbdModel      = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(volTetMesh);
+    pbdModel->setModelGeometry(tetMesh);
 
     // configure model
     auto pbdParams = std::make_shared<PBDModelConfig>();
@@ -79,13 +81,9 @@ createSoftBodyScene(std::shared_ptr<SimulationManager> simManager, const char* s
     pbdModel->configure(pbdParams);
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsGeometry(tetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-
     deformableObj->setDynamicalModel(pbdModel);
-    /*auto pbdSolver = std::make_shared<PbdSolver>();
-    pbdSolver->setPbdObject(deformableObj);
-    scene->addNonlinearSolver(pbdSolver);*/
 
     scene->addSceneObject(deformableObj);
 
@@ -179,8 +177,6 @@ createClothScene(std::shared_ptr<SimulationManager> simManager, const char* scen
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     deformableObj->addVisualModel(surfMeshModel);
-
-    // Solver
 
     scene->addSceneObject(deformableObj);
 

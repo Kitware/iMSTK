@@ -19,23 +19,21 @@
 
 =========================================================================*/
 
-#include <string>
-
-#include "imstkSimulationManager.h"
-#include "imstkLight.h"
-#include "imstkSPHObject.h"
-#include "imstkAPIUtilities.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkCollisionGraph.h"
-#include "imstkSceneManager.h"
 #include "imstkCamera.h"
-#include "imstkObjectInteractionFactory.h"
 #include "imstkCollisionDetection.h"
+#include "imstkCollisionGraph.h"
+#include "imstkLight.h"
+#include "imstkObjectInteractionFactory.h"
+#include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
+#include "imstkSPHObject.h"
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"
+
+#include <vtkRenderWindow.h>
 
 using namespace imstk;
 

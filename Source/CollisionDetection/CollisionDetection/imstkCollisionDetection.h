@@ -46,12 +46,13 @@ public:
     ///
     enum class Type
     {
-        // Points to objects
+        // Points to analytical geometry
         PointSetToSphere,
         PointSetToPlane,
         PointSetToCapsule,
         PointSetToSpherePicking,
         PointSetToSurfaceMesh,
+        PointSetToImplicit,
 
         // Mesh to mesh (mesh to analytical object = mesh vertices to analytical object)
         SurfaceMeshToSurfaceMesh,
@@ -64,9 +65,6 @@ public:
         BidirectionalPlaneToSphere,
         SphereToCylinder,
         SphereToSphere,
-
-        // Image based CD
-        SignedDistanceField,
 
         Custom
     };

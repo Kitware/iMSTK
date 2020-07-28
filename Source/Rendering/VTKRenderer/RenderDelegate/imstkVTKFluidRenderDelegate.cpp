@@ -21,15 +21,13 @@
 
 #include "imstkVTKFluidRenderDelegate.h"
 #include "imstkPointSet.h"
+#include "imstkVisualModel.h"
+#include "imstkRenderMaterial.h"
 
-#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkOpenGLFluidMapper.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkTrivialProducer.h>
-#include <vtkSphereSource.h>
 #include <vtkDoubleArray.h>
-#include <vtkGlyph3D.h>
-#include <vtkVersion.h>
 #include <vtkVolume.h>
 
 namespace imstk
@@ -61,18 +59,18 @@ VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visu
     fluidMapper->SetInputData(pointsPolydata);
 
     // set some fluid rendering properties
-    fluidMapper->SetParticleRadius(0.03f * 6.0f);
+    fluidMapper->SetParticleRadius(m_visualModel->getRenderMaterial()->getPointSize());
     fluidMapper->SetSurfaceFilterIterations(3);
     fluidMapper->SetSurfaceFilterRadius(5);
     fluidMapper->SetSurfaceFilterMethod(vtkOpenGLFluidMapper::FluidSurfaceFilterMethod::NarrowRange);
     fluidMapper->SetDisplayMode(vtkOpenGLFluidMapper::FluidDisplayMode::TransparentFluidVolume);
-    fluidMapper->SetAttenuationColor(0.8f, 0.2f, 0.15f);
-    fluidMapper->SetAttenuationScale(1.0f);
-    fluidMapper->SetOpaqueColor(0.0f, 0.0f, 0.9f);
+    fluidMapper->SetAttenuationColor(0.1f, 0.9f, 0.9f);
+    fluidMapper->SetAttenuationScale(16.0f);
+    fluidMapper->SetOpaqueColor(0.9f, 0.1f, 0.1f);
     fluidMapper->SetParticleColorPower(0.1f);
     fluidMapper->SetParticleColorScale(0.57f);
     fluidMapper->SetAdditionalReflection(0.0f);
-    fluidMapper->SetRefractiveIndex(1.33f);
+    fluidMapper->SetRefractiveIndex(1.5f);
     fluidMapper->SetRefractionScale(0.07f);
 
     m_volume->SetMapper(fluidMapper);

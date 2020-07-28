@@ -19,21 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkOneToOneMap.h"
-#include "imstkAPIUtilities.h"
-#include "imstkTetraTriangleMap.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkCamera.h"
-#include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-
-#include <array>
-#include <string>
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkTetraTriangleMap.h"
+#include "imstkViewer.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 
@@ -77,7 +75,7 @@ std::shared_ptr<PbdObject>
 createAndAddPbdObject(std::shared_ptr<Scene> scene,
                       const std::string&     tetMeshName)
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(tetMeshName);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
     auto surfMesh = std::make_shared<SurfaceMesh>();
     tetMesh->extractSurfaceMesh(surfMesh, true);

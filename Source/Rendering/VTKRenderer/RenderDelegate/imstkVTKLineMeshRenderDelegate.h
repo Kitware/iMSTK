@@ -42,6 +42,8 @@ public:
     ///
     explicit VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
+    virtual ~VTKLineMeshRenderDelegate() override = default;
+
     ///
     /// \brief Update line source based on the line mesh
     ///

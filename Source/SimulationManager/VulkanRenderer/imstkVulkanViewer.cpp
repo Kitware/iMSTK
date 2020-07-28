@@ -21,12 +21,14 @@
 
 #include "imstkVulkanViewer.h"
 #include "imgui_impl_glfw.h"
+#include "imstkOpenVRDeviceClient.h"
 
 namespace imstk
 {
 VulkanViewer::VulkanViewer(SimulationManager* manager, bool enableVR)
 {
     m_simManager = manager;
+    m_config->m_enableVR = enableVR;
 
 #ifdef iMSTK_ENABLE_VR
     if (vr::VR_IsHmdPresent() && enableVR)
@@ -120,6 +122,13 @@ VulkanViewer::startRenderingLoop()
     if (m_VRMode)
     {
         m_renderer->m_VRMode = true;
+
+        std::shared_ptr<OpenVRDeviceClient> leftControllerDevice = std::make_shared<OpenVRDeviceClient>(OpenVRDeviceClient::DeviceType::LEFT_CONTROLLER);
+        m_vrDeviceClients.push_back(leftControllerDevice);
+        std::shared_ptr<OpenVRDeviceClient> rightControllerDevice = std::make_shared<OpenVRDeviceClient>(OpenVRDeviceClient::DeviceType::RIGHT_CONTROLLER);
+        m_vrDeviceClients.push_back(rightControllerDevice);
+        std::shared_ptr<OpenVRDeviceClient> hmdControllerDevice = std::make_shared<OpenVRDeviceClient>(OpenVRDeviceClient::DeviceType::RIGHT_CONTROLLER);
+        m_vrDeviceClients.push_back(hmdControllerDevice);
 
         vr::EVRInitError error;
         m_renderer->m_VRSystem = vr::VR_Init(&error, vr::EVRApplicationType::VRApplication_Scene);

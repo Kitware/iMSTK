@@ -20,7 +20,6 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkSPHModel.h"
-#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"
@@ -74,14 +73,18 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         m_taskGraph->addFunction("SPHModel_ComputeSurfaceTensionAccel", std::bind(&SPHModel::computeSurfaceTension, this));
     m_computeTimeStepSizeNode =
         m_taskGraph->addFunction("SPHModel_ComputeTimestep", std::bind(&SPHModel::computeTimeStepSize, this));
-    m_integrateNode =
-        m_taskGraph->addFunction("SPHModel_Integrate", [&]()
+    m_computeVelocityNode =
+        m_taskGraph->addFunction("SPHModel_ComputeVelocity", [&]()
         {
             sumAccels();
             updateVelocity(getTimeStep());
             computeViscosity();
-            moveParticles(getTimeStep());
         });
+    m_computePositionNode =
+        m_taskGraph->addFunction("SPHModel_ComputePositions", [&]()
+        {
+            moveParticles(getTimeStep());
+            });
 }
 
 bool
@@ -137,11 +140,12 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     m_taskGraph->addEdge(m_computeDensityNode, m_computeSurfaceTensionNode);
     m_taskGraph->addEdge(m_computeDensityNode, m_computeTimeStepSizeNode);
 
-    m_taskGraph->addEdge(m_computePressureAccelNode, m_integrateNode);
-    m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_integrateNode);
-    m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
+    m_taskGraph->addEdge(m_computePressureAccelNode, m_computeVelocityNode);
+    m_taskGraph->addEdge(m_computeSurfaceTensionNode, m_computeVelocityNode);
+    m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_computeVelocityNode);
 
-    m_taskGraph->addEdge(m_integrateNode, sink);
+    m_taskGraph->addEdge(m_computeVelocityNode, m_computePositionNode);
+    m_taskGraph->addEdge(m_computePositionNode, sink);
 }
 
 void

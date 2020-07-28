@@ -24,14 +24,14 @@
 #include "imstkCollisionGraph.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
-#include "imstkMeshToMeshBruteForceCD.h"
 #include "imstkObjectInteractionFactory.h"
-#include "imstkPBDCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 
@@ -112,7 +112,7 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
                       const std::string&     tetMeshName)
 {
     // Load a sample mesh
-    auto tetMesh = MeshIO::read(tetMeshName);
+    std::shared_ptr<PointSet> tetMesh = MeshIO::read(tetMeshName);
 
     auto fluidMesh = std::make_shared<PointSet>();
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());

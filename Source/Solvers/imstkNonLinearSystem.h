@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkMath.h"
-//#include "imstkLinearProjectionConstraint.h"
 
 namespace imstk
 {

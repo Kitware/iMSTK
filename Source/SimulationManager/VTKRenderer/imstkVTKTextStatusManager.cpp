@@ -19,19 +19,14 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
 #include "imstkVTKTextStatusManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkVTKInteractorStyle.h"
-#include "imstkLogger.h"
-#include "imstkCamera.h"
+#include "imstkVTKViewer.h"
 
-#include "vtkTextActor.h"
-#include "vtkRenderWindow.h"
-#include "vtkTextProperty.h"
-
-#include <algorithm>
-#include <sstream>
-#include <iostream>
+#include <vtkRenderWindow.h>
+#include <vtkTextActor.h>
+#include <vtkTextProperty.h>
 
 namespace imstk
 {

@@ -22,25 +22,23 @@
 #include "imstkScene.h"
 #include "imstkCamera.h"
 #include "imstkCameraController.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollisionDetection.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkFeDeformableObject.h"
-#include "imstkDynamicObject.h"
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkInteractionPair.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
-#include "imstkPbdObject.h"
 #include "imstkRigidBodyWorld.h"
-#include "imstkSceneObject.h"
 #include "imstkSceneObjectControllerBase.h"
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkTbbTaskGraphController.h"
 #include "imstkTimer.h"
+#include "imstkVisualModel.h"
 
 namespace imstk
 {
@@ -50,7 +48,7 @@ Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
     m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_config(config),
     m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
-    computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
+    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
 }
 
@@ -175,10 +173,7 @@ Scene::initTaskGraph()
     }
 
     // If user wants to benchmark, tell all the nodes to time themselves
-    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
-    {
-        node->m_enableTiming = m_config->taskTimingEnabled;
-    }
+    this->setTaskTimingFlag(m_config->taskTimingEnabled);
 
     // Generate unique names among the nodes
     TaskGraph::getUniqueNodeNames(m_taskGraph, true);
@@ -194,6 +189,17 @@ Scene::initTaskGraph()
 
     m_taskGraphController->setTaskGraph(m_taskGraph);
     m_taskGraphController->initialize();
+}
+
+void
+Scene::setTaskTimingFlag(const bool flag)
+{
+    m_config->taskTimingEnabled = flag;
+    // If user wants to benchmark, tell all the nodes to time themselves
+    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
+    {
+        node->m_enableTiming = m_config->taskTimingEnabled;
+    }
 }
 
 void
@@ -523,12 +529,12 @@ Scene::getElapsedTime(const std::string& stepName) const
 void
 Scene::lockComputeTimes()
 {
-    computeTimesLock->lock();
+    m_computeTimesLock->lock();
 }
 
 void
 Scene::unlockComputeTimes()
 {
-    computeTimesLock->unlock();
+    m_computeTimesLock->unlock();
 }
 } // imstk

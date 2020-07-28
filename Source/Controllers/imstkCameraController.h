@@ -44,7 +44,7 @@ public:
     ///
     /// \brief
     ///
-    ~CameraController() = default;
+    virtual ~CameraController() = default;
 
     ///
     /// \brief Set the offsets based on the current camera pose

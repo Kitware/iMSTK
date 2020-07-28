@@ -18,9 +18,9 @@
    limitations under the License.
 
 =========================================================================*/
-#include "imstkRigidBodyWorld.h"
 
-#include <g3log/g3log.hpp>
+#include "imstkRigidBodyWorld.h"
+#include "imstkLogger.h"
 
 #define MAX_CONTACTS_PER_BODY 16
 

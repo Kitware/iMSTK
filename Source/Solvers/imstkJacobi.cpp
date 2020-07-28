@@ -20,11 +20,8 @@
 =========================================================================*/
 
 #include "imstkJacobi.h"
-#include "imstkLogger.h"
 #include "imstkLinearProjectionConstraint.h"
-
-// Eigen includes
-#include <Eigen/IterativeLinearSolvers>
+#include "imstkLogger.h"
 
 namespace imstk
 {

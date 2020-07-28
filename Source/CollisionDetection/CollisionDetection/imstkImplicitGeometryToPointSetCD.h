@@ -21,51 +21,39 @@ limitations under the License.
 
 #pragma once
 
-#include <functional>
-#include <vtkCommand.h>
+#include "imstkCollisionDetection.h"
 
 namespace imstk
 {
-class SimulationManager;
+class ImplicitGeometry;
+class PointSet;
+struct CollisionData;
 
-/// \brief TODO
-class OpenVRCommand : public vtkCommand
+///
+/// \class ImplicitGeometryToPointSetCD
+///
+/// \brief ImplicitGeometry to PointSet collision detection.
+///
+class ImplicitGeometryToPointSetCD : public CollisionDetection
 {
 public:
-    static OpenVRCommand* New()
-    {
-        return new OpenVRCommand;
-    }
+    ///
+    /// \brief
+    /// \param ImplicitGeometry
+    /// \param PointSet to test collision with
+    /// \param CollisionData to write too
+    ///
+    ImplicitGeometryToPointSetCD(std::shared_ptr<ImplicitGeometry> implicitGeomA,
+                                 std::shared_ptr<PointSet>         pointSetB,
+                                 std::shared_ptr<CollisionData>    colData);
 
     ///
-    /// \brief Set the simulation manager
+    /// \brief Detect collision and compute collision data
     ///
-    void SetSimulationManager(SimulationManager* manager = nullptr)
-    {
-        m_simManager = manager;
-    }
+    void computeCollisionData() override;
 
-    ///
-    /// \brief TODO
-    ///
-    virtual void Execute(
-        vtkObject*    caller,
-        unsigned long eventId,
-        void*         callData) override;
-
-protected:
-
-    ///
-    /// \brief Constructor
-    ///
-    OpenVRCommand()
-    {}
-
-    ///
-    /// \brief Destructor
-    ///
-    virtual ~OpenVRCommand() = default;
-
-    SimulationManager* m_simManager = nullptr; ///> SimulationManager owning the current simulation being interacted with
+private:
+    std::shared_ptr<ImplicitGeometry> m_implicitGeomA;
+    std::shared_ptr<PointSet> m_pointSetB;
 };
-} // imstk
+}

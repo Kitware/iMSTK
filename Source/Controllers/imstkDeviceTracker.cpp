@@ -24,8 +24,6 @@
 #include "imstkDeviceClient.h"
 #include "imstkLogger.h"
 
-#include <utility>
-
 namespace imstk
 {
 DeviceTracker::DeviceTracker(std::shared_ptr<DeviceClient> deviceClient) :

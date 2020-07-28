@@ -23,7 +23,6 @@ limitations under the License.
 #include "imstkLogger.h"
 #include "imstkTaskGraph.h"
 #include "imstkColor.h"
-#include <fstream>
 
 namespace imstk
 {
@@ -81,7 +80,7 @@ TaskGraphVizWriter::write()
         }
 
         file <<
-            "digraph imstkDependency\n"
+            "digraph imstkTaskGraph\n"
             "{\n"
             "style=filled;\n"
             "color=lightgrey;\n"
