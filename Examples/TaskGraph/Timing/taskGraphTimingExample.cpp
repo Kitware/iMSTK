@@ -164,7 +164,7 @@ int
 main()
 {
     imstkNew<SimulationManager> simManager;
-    auto                        scene     = simManager->createNewScene("PBDString");
+    auto                        scene = simManager->createNewScene("PBDString");
 
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =

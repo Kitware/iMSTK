@@ -188,7 +188,7 @@ VTKInteractorStyle::OnChar()
         m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
 
         const auto activeScene = m_simManager->getActiveScene();
-        const bool enabled = !activeScene->getConfig()->taskTimingEnabled;
+        const bool enabled     = !activeScene->getConfig()->taskTimingEnabled;
         activeScene->setTaskTimingFlag(enabled);
         const auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer());
         vtkRen->setTimeTableVisibility(enabled);
