@@ -298,7 +298,7 @@ VTKViewer::timerCallback(vtkObject* vtkNotUsed(caller), long unsigned int vtkNot
 {
     VTKViewer* self = static_cast<VTKViewer*>(clientData);
 
-    if (self->getActiveScene()->getConfig()->taskTimingEnabled)
+    if (self != nullptr && self->getActiveScene()->getConfig()->taskTimingEnabled)
     {
         auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(self->getActiveRenderer());
         self->getActiveScene()->lockComputeTimes();

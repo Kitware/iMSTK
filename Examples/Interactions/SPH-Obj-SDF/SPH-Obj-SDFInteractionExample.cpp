@@ -161,7 +161,6 @@ main()
 
     // Setup the scene
     {
-        //scene->getConfig()->taskTimingEnabled = true;
         scene->getCamera()->setPosition(0, 2.0, 15.0);
 
         // Static Dragon object

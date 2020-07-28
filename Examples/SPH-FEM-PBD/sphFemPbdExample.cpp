@@ -125,7 +125,7 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     fluidMaterial->setVertexColor(Color::Orange);
-    fluidMaterial->setPointSize(10.0);
+    fluidMaterial->setPointSize(particleRadius);
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Setup the Object
@@ -246,7 +246,6 @@ main()
 
     // Setup the scene
     {
-        scene->getConfig()->taskTimingEnabled = true;
         scene->getCamera()->setPosition(0, 2.0, 15.0);
 
         // Deformable Pbd Dragon

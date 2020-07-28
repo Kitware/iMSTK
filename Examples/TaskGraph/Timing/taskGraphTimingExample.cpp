@@ -30,6 +30,8 @@ limitations under the License.
 #include "imstkSimulationManager.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKRenderer.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 using namespace imstk::expiremental;
@@ -163,7 +165,6 @@ main()
 {
     imstkNew<SimulationManager> simManager;
     auto                        scene     = simManager->createNewScene("PBDString");
-    scene->getConfig()->taskTimingEnabled = true;
 
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
@@ -200,6 +201,11 @@ main()
 
     // Start
     simManager->setActiveScene(scene);
+
+    // Inform the scene to time its tasks
+    scene->getConfig()->taskTimingEnabled = true;
+    std::dynamic_pointer_cast<VTKRenderer>(simManager->getViewer()->getActiveRenderer())->setTimeTableVisibility(true);
+
     simManager->start();
 
     // Write the graph, highlighting the critical path and putting the completion time in the name

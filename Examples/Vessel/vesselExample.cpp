@@ -214,8 +214,6 @@ main()
 
     // Setup the scene
     {
-        //scene->getConfig()->taskTimingEnabled = true;
-
         // Static Dragon object
         std::shared_ptr<CollidingObject> legsObj = makeLegs("Vessel", Vec3d(0.0, 0.0, 0.0));
         scene->addSceneObject(legsObj);
