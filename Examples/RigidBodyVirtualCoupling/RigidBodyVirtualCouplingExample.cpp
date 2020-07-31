@@ -28,6 +28,8 @@
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVisualModel.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkRigidObject.h"

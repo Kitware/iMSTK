@@ -31,6 +31,8 @@
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
 #include "imstkCollisionData.h"
+#include "imstkVisualModel.h"
+#include "imstkRenderMaterial.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkPlane.h"
