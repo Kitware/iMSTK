@@ -43,12 +43,13 @@ public:
       buffer
     };
 
-    SPHBoundaryConditions(const std::pair<Vec3d, Vec3d>& inletDomain, const Vec3d& inletNormal, const std::pair<Vec3d, Vec3d>& outletDomain,
-      const double inletFlowRate, StdVectorOfVec3d& mainParticles, const StdVectorOfVec3d& wallParticlePositions);
+    SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords,
+      const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate, StdVectorOfVec3d& mainParticlePositions,
+      const StdVectorOfVec3d& wallParticlePositions);
 
-    bool isInInletDomain(Vec3d position);
+    bool isInInletDomain(const Vec3d position);
 
-    bool isInOutletDomain(Vec3d position);
+    bool isInOutletDomain(const Vec3d position);
 
     void setParticleTypes(const StdVectorOfVec3d& mainParticlePositions, const size_t numWallParticles);
 
@@ -60,13 +61,19 @@ public:
 
     void addBoundaryParticles(StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions);
 
-    void setInletVelocity(const double flowRate);
+    void setInletVelocity(const Real flowRate);
 
     Vec3d getInletCoord() { return m_inletDomain.first; }
 
+    Vec3d getInletVelocity() { return m_inletVelocity; }
+
+    Vec3d getInletNormal() { return m_inletNormal; }
+
+    Vec3d placeParticleAtInlet(const Vec3d position);
+
 private:
     std::pair<Vec3d, Vec3d> m_inletDomain;
-    std::pair<Vec3d, Vec3d> m_outletDomain;
+    std::vector<std::pair<Vec3d, Vec3d>> m_outletDomain;
     //std::pair<Vec3d, Vec3d> m_fluidDomain;
 
     std::vector<ParticleType> m_particleTypes;
@@ -77,9 +84,9 @@ private:
     Vec3r m_inletVelocity;
     Vec3d m_inletNormal;
 
-    double m_inletCrossSectionalArea;
+    Real m_inletCrossSectionalArea;
 
-    const size_t m_numBufferParticles = 3000;
+    const size_t m_numBufferParticles = 10000;
 
 };
 } // end namespace imstk

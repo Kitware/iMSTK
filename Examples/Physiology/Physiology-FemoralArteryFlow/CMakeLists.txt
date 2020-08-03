@@ -21,17 +21,17 @@ if(iMSTK_USE_Vulkan)
   return()
 endif()
 
-project(Example-SPHFluid-PipeFlow)
+project(Example-Physiology-FemoralArteryFlow)
 
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} SPHFluid-PipeFlow.cpp)
+imstk_add_executable(${PROJECT_NAME} Physiology-FemoralArteryFlow.cpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
-SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/SPH)
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Physiology)
 
 #-----------------------------------------------------------------------------
 # Link libraries to executable

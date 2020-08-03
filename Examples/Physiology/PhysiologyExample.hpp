@@ -42,7 +42,6 @@
 #include "imstkSPHObject.h"
 
 #include "Fluid.hpp"
-#include "Solid.hpp"
 
 
 using namespace imstk;
@@ -54,8 +53,27 @@ main(int argc, char* argv[])
   auto simManager = std::make_shared<SimulationManager>();
 
   int threads = -1;
-  double particleRadius = 0.1;
-
+  double particleRadius;
+  if (SCENE_ID == 1)
+  {
+    particleRadius = 0.04;
+  }
+  else if (SCENE_ID == 2)
+  {
+    particleRadius = 0.04;
+  }
+  else if (SCENE_ID == 3)
+  {
+    particleRadius = 0.04;
+  }
+  else if (SCENE_ID == 4)
+  {
+    particleRadius = 0.04;
+  }
+  else if (SCENE_ID == 5)
+  {
+    particleRadius = 0.015;
+  }
   // Parse command line arguments
   for (int i = 1; i < argc; ++i)
   {
@@ -97,15 +115,10 @@ main(int argc, char* argv[])
 
   // Generate fluid and solid objects
   auto fluidObj = generateFluid(scene, particleRadius);
-  //auto solids = generateSolids(scene);
+  std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
+  std::shared_ptr<SPHModel> sphModel = fluidObj->getDynamicalSPHModel();
 
-  //simManager->getSceneManager(scene)->setPostUpdateCallback([&](Module*) {
-  //  statusManager->setCustomStatus("Number of particles: " +
-  //    std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
-  //    "\nNumber of solids: " + std::to_string(solids.size()));
-  //  });
-
-    // configure model
+  // configure model
   auto physiologyParams = std::make_shared<PhysiologyModelConfig>();
 
   // Create a physics model
@@ -120,7 +133,7 @@ main(int argc, char* argv[])
     InteractionType::SphObjToPhysObjCollision, CollisionDetection::Type::Custom));
 
   // configure camera
-  scene->getCamera()->setPosition(0, 5.0, 20.0);
+  scene->getCamera()->setPosition(0, 1.0, 5.0);
 
   // configure light (white)
   auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
@@ -136,7 +149,6 @@ main(int argc, char* argv[])
   fluidGeometry->setScalars(scalarsPtr);
 
   // Setup the material for the scalars
-  std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
   material->setScalarVisibility(true);
   std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
   colorFunc->setNumberOfColors(2);
@@ -146,13 +158,10 @@ main(int argc, char* argv[])
   colorFunc->setRange(0, 3);
   material->setColorLookupTable(colorFunc);
 
-  //std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
-  std::shared_ptr<SPHModel> sphModel = fluidObj->getDynamicalSPHModel();
-
   scene->setTaskGraphConfigureCallback([&](Scene* scene)
     {
       auto taskGraph = scene->getTaskGraph();
-      taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
+      //taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
 
       std::shared_ptr<TaskNode> printTotalTime = std::make_shared<TaskNode>([&]()
         {
@@ -173,34 +182,18 @@ main(int argc, char* argv[])
         }, "WriteStateToVtk");
       taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToVtk);
 
-      std::shared_ptr<TaskNode> printSPHParticleTypes = std::make_shared<TaskNode>([&]() {
-        if (fluidObj->getDynamicalSPHModel()->getTimeStepCount() % 100 == 0)
-        {
-          fluidObj->getDynamicalSPHModel()->printParticleTypes();
-        }
-        }, "PrintSPHParticleTypes");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printSPHParticleTypes);
-
 			////////////////////////////////////////////
       // This node colors the fluid points based on their type
 			std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
 				{
-					const StdVectorOfVec3r& velocities = sphModel->getCurrentState()->getVelocities();
           const std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions = sphModel->getBoundaryConditions();
-          const StdVectorOfVec3d& positions = sphModel->getCurrentState()->getPositions();
-
           StdVectorOfReal& scalars = *scalarsPtr;
-          for (size_t i = 0; i < velocities.size(); i++)
+          for (size_t i = 0; i < sphModel->getCurrentState()->getNumParticles(); i++)
           {
-            //scalars[i] = velocities[i].norm();
             if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::wall)
             {
               scalars[i] = 0;
             }
-            //else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::buffer)
-            //{
-            //  scalars[i] = 1;
-            //}
             else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::inlet)
             {
               scalars[i] = 1;

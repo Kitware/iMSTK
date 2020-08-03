@@ -36,6 +36,9 @@ SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const StdV
 
     m_Positions  = positions;
     m_Velocities = velocities;
+    m_HalfStepVelocities = velocities;
+    m_FullStepVelocities = velocities;
+
     //m_HalfStepVelocities = velocities;
 
     if (m_Velocities.size() != m_Positions.size())

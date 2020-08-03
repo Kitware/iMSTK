@@ -20,5 +20,5 @@
 =========================================================================*/
 
 // Generate a physiology example with pipe flow
-#define SCENE_ID 2
+#define SCENE_ID 5
 #include "../PhysiologyExample.hpp"

@@ -81,7 +81,7 @@ PhysiologyModel::initialize()
 
     if (!m_pulseObj->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json"))
     {
-      m_pulseObj->GetLogger()->Error("Could not load Pulse state, check the error");
+      //m_pulseObj->GetLogger()->Error("Could not load Pulse state, check the error");
       return true;
     }
 

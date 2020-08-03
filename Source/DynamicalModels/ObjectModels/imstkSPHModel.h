@@ -62,12 +62,12 @@ public:
     Real m_particleRadiusSqr = Real(0); ///> \note derived quantity
 
     // material parameters
-    Real m_restDensity       = Real(1000.0);
+    Real m_restDensity       = Real(1000);
     Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(1.0);         ///> scale particle mass to a smaller value to maintain stability
-    Real m_eta               = Real(0.1);
+    Real m_particleMassScale = Real(0.95);         ///> scale particle mass to a smaller value to maintain stability
+    Real m_eta               = Real(0.5);
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -76,7 +76,7 @@ public:
     Real m_pressureStiffness = Real(50000.0);
 
     // viscosity and surface tension/cohesion
-    Real m_dynamicViscosityCoeff   = Real(1e-2);
+    Real m_dynamicViscosityCoeff   = Real(1);
     Real m_viscosityBoundary       = Real(1e-5);
     Real m_surfaceTensionStiffness = Real(1);
     Real m_frictionBoundary        = Real(0.1);
@@ -184,10 +184,8 @@ public:
     { return static_cast<double>(m_dt); }
 
     void setInitialVelocities(StdVectorOfVec3d& initialVelocities);
-    StdVectorOfVec3d getInitialVelocities();
 
     Real particlePressure(const double density);
-    void periodicBCs(const size_t p);
 
     void writeStateToCSV();
     void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
@@ -195,11 +193,7 @@ public:
     int getTimeStepCount() const { return m_timeStepCount; }
     void writeStateToVtk();
     void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
-    size_t findNearestParticleToVertex(const Vec3d point);
-
-    void printParticleTypes();
-
-    //Vec3d computeParabolicInletVelocity(const Vec3d particlePosition);
+    void findNearestParticleToVertex(const StdVectorOfVec3d points, const std::vector<std::vector<size_t>> indices);
 
     void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
     std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
@@ -207,9 +201,9 @@ public:
     void setHemorrhageModel(std::shared_ptr<SPHHemorrhage> sPHHemorrhage) { m_SPHHemorrhage = sPHHemorrhage; }
     std::shared_ptr<SPHHemorrhage> getHemorrhageModel() { return m_SPHHemorrhage; }
 
-    double getPreviousTime() { return m_previousTime; }
     double getTotalTime() { return m_totalTime; }
-    double getTimeModulo() { return m_timeModulo; }
+
+    void setRestDensity(const Real restDensity) { m_modelParameters->m_restDensity = restDensity; }
 
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
@@ -301,11 +295,6 @@ private:
 
     void computePressureOutlet();
 
-    void computeFirstHalfTimeStep();
-
-
-
-
 protected:
     std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
     std::shared_ptr<TaskNode> m_computeDensityNode        = nullptr;
@@ -335,24 +324,27 @@ private:
 
     std::shared_ptr<StdVectorOfVec3d> m_pressureAccels       = nullptr;
     std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_viscousAccels        = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_neighborVelContr     = nullptr;
 
     StdVectorOfVec3d m_initialVelocities;
     StdVectorOfReal m_initialDensities;
 
-    double m_totalTime;
-    double m_writeToOutputModulo;
-    int m_timeStepCount;
-
-    double m_previousTime;
-    double m_timeModulo;
-    double m_speedOfSound;
-    double m_beta;
+    double m_totalTime = 0;
+    int m_timeStepCount = 0;
+    double m_writeToOutputModulo = 0;
+    double m_vtkPreviousTime = 0;
+    double m_vtkTimeModulo = 0;
+    double m_csvPreviousTime = 0;
+    double m_csvTimeModulo = 0;
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 
     std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
 
     std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
+
+    std::vector<size_t> m_minIndices;
 
 
 };
