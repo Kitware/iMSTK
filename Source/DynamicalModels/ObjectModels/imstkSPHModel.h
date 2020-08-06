@@ -25,14 +25,9 @@
 #include "imstkSPHState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
-
-#include "vtkPolyData.h"
-#include "vtkUnstructuredGrid.h"
-
-#include "imstkTetrahedralMesh.h"
-
 #include "imstkSPHBoundaryConditions.h"
 #include "imstkSPHHemorrhage.h"
+#include "imstkTetrahedralMesh.h"
 
 
 namespace imstk
@@ -67,7 +62,7 @@ public:
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
     Real m_particleMassScale = Real(0.95);         ///> scale particle mass to a smaller value to maintain stability
-    Real m_eta               = Real(0.5);
+    Real m_eta               = Real(0.5);          ///> proportion of position change due to neighbors velocity (XSPH method)
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -183,7 +178,7 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
-    void setInitialVelocities(StdVectorOfVec3d& initialVelocities);
+    void setInitialVelocities(const StdVectorOfVec3d& initialVelocities);
 
     Real particlePressure(const double density);
 
@@ -193,7 +188,7 @@ public:
     int getTimeStepCount() const { return m_timeStepCount; }
     void writeStateToVtk();
     void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
-    void findNearestParticleToVertex(const StdVectorOfVec3d points, const std::vector<std::vector<size_t>> indices);
+    void findNearestParticleToVertex(const StdVectorOfVec3d& points, const std::vector<std::vector<size_t>>& indices);
 
     void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
     std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }

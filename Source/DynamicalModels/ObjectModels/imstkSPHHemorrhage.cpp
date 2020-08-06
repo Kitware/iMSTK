@@ -37,11 +37,12 @@ void SPHHemorrhage::computeHemorrhagePlaneArea()
 
 bool SPHHemorrhage::pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const Vec3d& newPosition)
 {
+    // todo - loop through points that are near hemorrhage plane instead of all points
     const double dist = m_normal.dot(newPosition - m_center);
     if (m_normal.dot(oldPosition - m_center) < 0 && dist > 0)
     {
         // particle has crossed plane in the correct direction
-        // however, we still need to determine if the particle is in the domain of the circle
+        // however, we still need to determine if the particle is in the domain of the hemorrhage area
         // project point onto plane
         const Vec3d pointOnPlane = newPosition - dist * m_normal;
         // check if point is farther than radius from center point

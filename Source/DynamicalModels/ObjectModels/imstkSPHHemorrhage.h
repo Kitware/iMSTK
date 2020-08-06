@@ -46,21 +46,31 @@ public:
     ///
     bool pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const Vec3d& newPosition);
 
+    ///
+    /// \brief Get the outward normal to the hemorrhage plane
+    ///
     const Vec3d getNormal() { return m_normal; }
 
+    ///
+    /// \brief Get the area of the hemorrhage plane
+    ///
     const double getHemorrhagePlaneArea() { return m_hemorrhagePlaneArea; }
 
+    ///
+    /// \brief Get the rate of hemorrhage from SPH
+    ///
     const double getHemorrhageRate() { return m_hemorrhageRate; }
+
+    ///
+    /// \brief Set the rate of hemorrhage from SPH
+    ///
     void setHemorrhageRate(const double hemorrhageRate) { m_hemorrhageRate = hemorrhageRate; }
 
-
 private:
-    Vec3d m_center;
-    double m_radius;
-    Vec3d m_normal;
-
-    double m_hemorrhageRate = 0;
-
-    double m_hemorrhagePlaneArea;
+    Vec3d m_center;                   ///> hemorrhage plane center
+    double m_hemorrhagePlaneArea;     ///> cross-sectional area of hemorrhage plane
+    double m_hemorrhageRate = 0;      ///> rate of hemorrhage
+    Vec3d m_normal;                   ///> outward unit normal of hemorrhage plane
+    double m_radius;                  ///> hemorrhage plane radius
 };
 } // end namespace imstk

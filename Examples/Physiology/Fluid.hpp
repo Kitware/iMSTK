@@ -124,8 +124,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       const double length = std::abs(aabbMax.x() - aabbMin.x());
       const double width = std::abs(aabbMax.y() - aabbMin.y());
       const double depth = std::abs(aabbMax.z() - aabbMin.z());
-      const auto spacing = 2.0 * particleRadius;
-      const auto wallSpacing = 2.0 * particleRadius;
+      const auto spacing = 2.1 * particleRadius;
+      const auto wallSpacing = 1.9 * particleRadius;
       const auto nx = static_cast<size_t>(length / spacing);
       const auto ny = static_cast<size_t>(width / spacing);
       const auto nz = static_cast<size_t>(depth / spacing);
@@ -141,7 +141,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       // set up inlet boundary conditions
-      double inletFlowRate = 3;
+      double inletFlowRate = 30;
       double inletRadius = 0.5;
       Vec3d inletCenterPoint = Vec3d(-2.5, 0.0, 0);
       Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
@@ -284,7 +284,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   {
       // pipe flow with leak
       auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small.stl"));
-      auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small_shell_hole.stl"));
+      auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small_shell_cut_ellipse.stl"));
       auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small.vtk"));
 
       //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
@@ -338,8 +338,9 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       sphModel->setBoundaryConditions(sphBoundaryConditions);
       //Vec3d hemorrhagePlaneCenter(-4.16, 4.03, 1.97);
       //double hemorrhagePlaneRadius = 0.5;
+      //double hemorrhagePlaneArea = 0.16;
       //Vec3d hemorrhagePlaneNormal(0, 1, 0);
-      //auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneNormal);
+      //auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneArea, hemorrhagePlaneNormal);
       //sphModel->setHemorrhageModel(sphHemorrhageModel);
 
       StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
@@ -350,7 +351,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   {
   // pipe flow with leak
   auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.stl"));
-  auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery_shell.stl"));
+  auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery_shell_cut_ellipse.stl"));
   //auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.vtk"));
 
   //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
@@ -404,6 +405,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   sphModel->setBoundaryConditions(sphBoundaryConditions);
   //Vec3d hemorrhagePlaneCenter(-4.16, 4.03, 1.97);
   //double hemorrhagePlaneRadius = 0.5;
+  //double hemorrhagePlaneArea = 0.018;
   //Vec3d hemorrhagePlaneNormal(0, 1, 0);
   //auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneNormal);
   //sphModel->setHemorrhageModel(sphHemorrhageModel);
@@ -434,7 +436,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   if (SCENE_ID == 1)
   {
     fluidMaterial->setPointSize(5.0);
-    sphParams->m_dynamicViscosityCoeff = 1;
+    sphParams->m_dynamicViscosityCoeff = 1.0;
   }
   else if (SCENE_ID == 2)
   {

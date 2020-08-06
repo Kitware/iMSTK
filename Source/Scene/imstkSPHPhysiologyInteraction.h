@@ -26,31 +26,33 @@ limitations under the License.
 
 namespace imstk
 {
- class SPHObject;
- class PhysiologyObject;
- class PbdSolver;
- class SPHModel;
- class PhysiologyModel;
+  class SPHObject;
+  class PhysiologyObject;
+  class SPHModel;
+  class PhysiologyModel;
 
-///
-/// \class PbdObjectCollisionPair
-///
-/// \brief This class defines a collision interaction between two PbdObjects
-///
-class SPHPhysiologyObjectInteractionPair : public ObjectInteractionPair
-{
-public:
+  ///
+  /// \class SPHPhysiologyObjectInteractionPair
+  ///
+  /// \brief This class defines an interaction between SPH and physiology (Pulse)
+  ///
+  class SPHPhysiologyObjectInteractionPair : public ObjectInteractionPair
+  {
+  public:
     SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2);
 
     void apply() override;
 
+    ///
+    /// \brief Computes hemorrhage interaction between SPH and physiology (Pulse)
+    ///
     void computeInteraction();
 
-private:
+  private:
     Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
     std::shared_ptr<SPHModel> m_sphModel = nullptr;
     std::shared_ptr<PhysiologyModel> m_physiologyModel = nullptr;
     std::shared_ptr<TaskNode> m_bcNode = nullptr;
-};
+  };
 }

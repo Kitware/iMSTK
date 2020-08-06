@@ -74,7 +74,7 @@ SPHSimulationState::initializeData()
     size_t numParticles = m_KinematicState->getNumParticles();
 
     m_Normals.resize(numParticles);
-    m_Densities.resize(numParticles, 1000.0);
+    m_Densities.resize(numParticles, 1);
     m_Accels.resize(numParticles, Vec3r(0, 0, 0));
     m_DiffuseVelocities.resize(numParticles, Vec3r(0, 0, 0));
     m_NeighborInfo.resize(numParticles);

@@ -30,7 +30,7 @@ limitations under the License.
 
 namespace imstk
 {
-  SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2) : ObjectInteractionPair(obj1, obj2)
+SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2) : ObjectInteractionPair(obj1, obj2)
 {
     m_sphModel = obj1->getDynamicalSPHModel();
     m_physiologyModel = obj2->getPhysiologyModel();
@@ -49,20 +49,27 @@ namespace imstk
 
 void SPHPhysiologyObjectInteractionPair::computeInteraction()
 {
-  if (m_sphModel->getHemorrhageModel())
-  {
-      double hemorrhageFlowRate = m_sphModel->getHemorrhageModel()->getHemorrhageRate();
-      m_physiologyModel->setHemorrhageRate(hemorrhageFlowRate);
-       
-      double femoralFlowRate = m_physiologyModel->getFemoralFlowRate();
-      m_sphModel->getBoundaryConditions()->setInletVelocity(femoralFlowRate);
+    // check if the hemorrhage is being used in SPH
+    if (m_sphModel->getHemorrhageModel())
+    {
+        // compute the hemorrhage flow rate
+        const double hemorrhageFlowRate = m_sphModel->getHemorrhageModel()->getHemorrhageRate();
 
-      m_physiologyModel->setPulseTimeStep(m_sphModel->getTimeStep());
-  }
+        // set the hemorrhage flow rate in Pulse
+        m_physiologyModel->setHemorrhageRate(hemorrhageFlowRate);
+
+        // compute the femoral flow rate from Pulse
+        const double femoralFlowRate = m_physiologyModel->getFemoralFlowRate();
+
+        // set the femoral flow rate as an SPH inlet boundary condition
+        m_sphModel->getBoundaryConditions()->setInletVelocity(femoralFlowRate);
+
+        // set how much time to run Pulse for
+        m_physiologyModel->setPulseTimeStep(m_sphModel->getTimeStep());
+    }
 }
 
-void
-SPHPhysiologyObjectInteractionPair::apply()
+void SPHPhysiologyObjectInteractionPair::apply()
 {
     // Add the SPH physiology interaction node to the task graph
     m_objects.first->getTaskGraph()->addNode(m_bcNode);

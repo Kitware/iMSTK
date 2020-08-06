@@ -32,26 +32,26 @@ class SEHemorrhage;
 
 namespace imstk
 {
-///
-/// \class PhysiologyModelConfig
-/// \brief Empty for now but we can populate config params if needed
-///
-class PhysiologyModelConfig
-{
-private:
+  ///
+  /// \class PhysiologyModelConfig
+  /// \brief Empty for now but we can populate config params if needed
+  ///
+  class PhysiologyModelConfig
+  {
+  private:
     void initialize();
 
-public:
+  public:
     explicit PhysiologyModelConfig();
-};
+  };
 
-///
-/// \class PhysiologyModel
-/// \brief PhysiologyModel model
-///
-class PhysiologyModel : public AbstractDynamicalModel
-{
-public:
+  ///
+  /// \class PhysiologyModel
+  /// \brief PhysiologyModel model
+  ///
+  class PhysiologyModel : public AbstractDynamicalModel
+  {
+  public:
     ///
     /// \brief Constructor
     ///
@@ -80,13 +80,13 @@ public:
     /// \brief Update states
     ///
     virtual void updateBodyStates(const Vectord&, const StateUpdateType) override {}
-    
+
     ///
     /// \brief Set the default time step size,
     /// valid only if using a fixed time step for integration
     ///
     void setDefaultTimeStep(const Real) {}
-    
+
     ///
     /// \brief Returns the time step size
     ///
@@ -98,8 +98,6 @@ public:
     /// \brief Returns the flow rate in the femoral artery
     ///
     const double getFemoralFlowRate() { return m_femoralFlowRate; }
-    //const std::shared_ptr<SELiquidCompartment> getFemoralCompartment();
-    //const std::shared_ptr<SEHemorrhage> getHemorrhageModel();
 
     ///
     /// \brief Returns the hemorrhage flow rate
@@ -109,10 +107,7 @@ public:
 
     void setPulseTimeStep(const double timeStep) { m_dT_s = timeStep; }
 
-    //virtual SEScalarTime& GetTimeStep();
-    //virtual double GetTimeStep(const TimeUnit& unit) const;
-
-protected:
+  protected:
     ///
     /// \brief Setup physiology compute graph connectivity
     ///
@@ -122,28 +117,29 @@ protected:
 
     std::shared_ptr<TaskNode> m_solveNode = nullptr;
 
-private:
+  private:
     // Physiology Model parameters (must be set before simulation)
     // empty for now but can be set if  needed
     std::shared_ptr<PhysiologyModelConfig> m_modelParameters;
 
     // main pulse object
     std::unique_ptr<PhysiologyEngine> m_pulseObj = nullptr;
-    
+
     // Pulse hemorrhage action
     // here, we can add any Pulse actions that we want
     std::shared_ptr<SEHemorrhage> m_hemorrhageLeg = nullptr;
 
-    // Pulse time step
-    double m_dT_s = 0.02;
-
-    //SEScalarTime* m_timeStep;
-
     // sample the femoral compartment
     const SELiquidCompartment* m_femoralCompartment;
 
+    // Pulse time step
+    double m_dT_s = 0.02;
+
+    // set the default femoral flow rate
     double m_femoralFlowRate = 0;
+
+    // set the default hemorrhage rate
     double m_hemorrhageRate = 0;
 
-};
+  };
 } // end namespace imstk

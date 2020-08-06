@@ -24,9 +24,6 @@ limitations under the License.
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"
-
-//yy#include "imstkGeometryUtilities.h"
-//#include "imstkTetrahedralMesh.h"
 #include "imstkVTKMeshIO.h"
 
 namespace imstk
@@ -367,12 +364,6 @@ namespace imstk
   void
     SPHModel::computePressureAcceleration()
   {
-    //auto particlePressure = [&](const Real density) {
-    //                            const Real error = std::pow(density / m_modelParameters->m_restDensity, 7) - Real(1);
-    //                            // clamp pressure error to zero to maintain stability
-    //                            return error > Real(0) ? error : Real(0);
-    //                        };
-
     StdVectorOfVec3d& pressureAccels = *m_pressureAccels;
     ParallelUtils::parallelFor(getState().getNumParticles(),
       [&](const size_t p) {
@@ -655,8 +646,8 @@ namespace imstk
         else
         {
           //getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
-          getState().getHalfStepVelocities()[p] += (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep;
-          getState().getFullStepVelocities()[p] = getState().getHalfStepVelocities()[p] + (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep / 2;
+          getState().getHalfStepVelocities()[p] += (getState().getAccelerations()[p]) * timestep;
+          getState().getFullStepVelocities()[p] = getState().getHalfStepVelocities()[p] + (getState().getAccelerations()[p]) * timestep / 2;
         }
         if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::inlet)
         {
@@ -666,8 +657,6 @@ namespace imstk
         }
       });
   }
-
-
 
   void
     SPHModel::moveParticles(Real timestep)
@@ -732,22 +721,17 @@ namespace imstk
         }
       }
 
-      if (m_SPHHemorrhage)
+      if (m_SPHHemorrhage && m_SPHHemorrhage->pointCrossedHemorrhagePlane(oldPosition, newPosition))
       {
-          if (m_SPHHemorrhage->pointCrossedHemorrhagePlane(oldPosition, newPosition))
-          {
-              averageVelThroughHemorrhage += m_SPHHemorrhage->getNormal() * getState().getFullStepVelocities()[p].dot(m_SPHHemorrhage->getNormal());
-              numParticlesAcrossHemorrhagePlane++;
-          }
+          averageVelThroughHemorrhage += m_SPHHemorrhage->getNormal() * getState().getFullStepVelocities()[p].dot(m_SPHHemorrhage->getNormal());
+          numParticlesAcrossHemorrhagePlane++;
       }
     }
 
     if (m_SPHHemorrhage)
     {
-        (numParticlesAcrossHemorrhagePlane > 0) ? averageVelThroughHemorrhage /= numParticlesAcrossHemorrhagePlane : averageVelThroughHemorrhage;
-
-        // temporary code that assumes leak plane has y normal and plane is rectangular
-        double hemorrhageFlowRate = averageVelThroughHemorrhage.norm() * m_SPHHemorrhage->getHemorrhagePlaneArea();
+        numParticlesAcrossHemorrhagePlane > 0 ? averageVelThroughHemorrhage /= numParticlesAcrossHemorrhagePlane : averageVelThroughHemorrhage;
+        const double hemorrhageFlowRate = averageVelThroughHemorrhage.norm() * m_SPHHemorrhage->getHemorrhagePlaneArea();
         m_SPHHemorrhage->setHemorrhageRate(hemorrhageFlowRate);
     }
     m_totalTime += m_dt;
@@ -761,7 +745,7 @@ namespace imstk
     return error > Real(0) ? error : Real(0);
   }
 
-  void SPHModel::setInitialVelocities(StdVectorOfVec3d& initialVelocities)
+  void SPHModel::setInitialVelocities(const StdVectorOfVec3d& initialVelocities)
   {
     m_initialVelocities = initialVelocities;
   }
@@ -770,13 +754,14 @@ namespace imstk
   {
     if (m_csvPreviousTime <= m_csvTimeModulo && m_totalTime >= m_csvTimeModulo)
     {
+      // todo add log instead of cout
       std::cout << "Writing CSV at time: " << m_totalTime << std::endl;
       std::ofstream outputFile;
       outputFile.open(std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".csv"));
       outputFile << "X,Y,Z,Vx,Vy,Vz,Pressure\n";
-      auto positions = getState().getPositions();
-      auto velocities = getState().getFullStepVelocities();
-      auto densities = getState().getDensities();
+      const auto positions = getState().getPositions();
+      const auto velocities = getState().getFullStepVelocities();
+      const auto densities = getState().getDensities();
       for (int i = 0; i < getState().getNumParticles(); ++i)
       {
         outputFile << positions[i].x() << "," << positions[i].y() << "," << positions[i].z() << ",";
@@ -790,7 +775,7 @@ namespace imstk
     }
   }
 
-  void SPHModel::findNearestParticleToVertex(const StdVectorOfVec3d points, const std::vector<std::vector<size_t>> indices)
+  void SPHModel::findNearestParticleToVertex(const StdVectorOfVec3d& points, const std::vector<std::vector<size_t>>& indices)
   {
     for (size_t i = 0; i < points.size(); i++)
     {
@@ -798,8 +783,8 @@ namespace imstk
       size_t minIndex = 0;
       for (const size_t j : indices[i])
       {
-          Vec3d p1 = getState().getPositions()[j];
-          double distance = (points[i] - p1).norm();
+          const Vec3d p1 = getState().getPositions()[j];
+          const double distance = (points[i] - p1).norm();
           if (distance < minDistance)
           {
             minDistance = distance;
@@ -819,9 +804,10 @@ namespace imstk
 
     if (m_vtkPreviousTime <= m_vtkTimeModulo && m_totalTime >= m_vtkTimeModulo)
     {
+      // todo - add log instead of cout
       std::cout << "Writing VTK at time: " << m_totalTime << std::endl;
-      auto particleVelocities = getState().getFullStepVelocities();
-      auto particleDensities = getState().getDensities();
+      const auto particleVelocities = getState().getFullStepVelocities();
+      const auto particleDensities = getState().getDensities();
       std::map<std::string, StdVectorOfVectorf> pointDataMap;
       StdVectorOfVectorf velocity;
       StdVectorOfVectorf pressure;
@@ -863,7 +849,5 @@ namespace imstk
       m_vtkTimeModulo += m_writeToOutputModulo;
       m_vtkPreviousTime = m_totalTime;
     }
-    
   }
-
 } // end namespace imstk
