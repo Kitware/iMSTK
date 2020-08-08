@@ -46,6 +46,7 @@ private:
 
 public:
     explicit SPHModelConfig(const Real particleRadius);
+    explicit SPHModelConfig(const Real particleRadius, const Real speedOfSound, const Real restDensity);
 
     /// \todo Move this to solver or time integrator in the future
     Real m_minTimestep = Real(1e-6);
@@ -61,7 +62,7 @@ public:
     Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(0.95);         ///> scale particle mass to a smaller value to maintain stability
+    Real m_particleMassScale = Real(1.0);         ///> scale particle mass to a smaller value to maintain stability
     Real m_eta               = Real(0.5);          ///> proportion of position change due to neighbors velocity (XSPH method)
 
     bool m_bNormalizeDensity    = false;
@@ -71,7 +72,7 @@ public:
     Real m_pressureStiffness = Real(50000.0);
 
     // viscosity and surface tension/cohesion
-    Real m_dynamicViscosityCoeff   = Real(1);
+    Real m_dynamicViscosityCoeff   = Real(1e-2);
     Real m_viscosityBoundary       = Real(1e-5);
     Real m_surfaceTensionStiffness = Real(1);
     Real m_frictionBoundary        = Real(0.1);
@@ -83,6 +84,9 @@ public:
 
     // gravity
     Vec3r m_gravity = Vec3r(0, -9.81, 0);
+
+    // sound speed
+    Real m_speedOfSound = 18.7;
 
     // neighbor search
     NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
@@ -178,7 +182,7 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
-    void setInitialVelocities(const StdVectorOfVec3d& initialVelocities);
+    void setInitialVelocities(const int numParticles, const Vec3d& initialVelocities);
 
     Real particlePressure(const double density);
 
@@ -332,6 +336,7 @@ private:
     double m_vtkTimeModulo = 0;
     double m_csvPreviousTime = 0;
     double m_csvTimeModulo = 0;
+    Vec3d m_prevAvgVelThroughHemorrhage = Vec3d(0, 0, 0);
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 

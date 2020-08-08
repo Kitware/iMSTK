@@ -204,8 +204,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     auto sphModel = std::make_shared<SPHModel>();
     sphModel->setModelGeometry(fluidGeometry);
 
-    sphModel->setInitialVelocities(initialVelocities);
-
     // configure model
     auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
     sphParams->m_bNormalizeDensity = true;

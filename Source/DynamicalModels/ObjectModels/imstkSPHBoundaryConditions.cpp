@@ -26,8 +26,8 @@ limitations under the License.
 namespace imstk
 {
 SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords,
-  const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate, StdVectorOfVec3d& mainParticlePositions,
-  const StdVectorOfVec3d& wallParticlePositions):
+  const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
+    StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions):
   m_inletDomain(inletCoords), m_outletDomain(outletCoords), m_inletRadius(inletRadius), m_inletCenterPoint(inletCenterPt)
 {
     m_bufferCoord = Vec3d(100, 0, 0);
@@ -35,13 +35,12 @@ SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoord
     m_inletNormal = inletNormal.normalized();
 
     setInletVelocity(inletFlowRate);
-    std::cout << m_inletVelocity << std::endl;
     setParticleTypes(mainParticlePositions, wallParticlePositions.size());
 
     addBoundaryParticles(mainParticlePositions, wallParticlePositions);
 }
 
-bool SPHBoundaryConditions::isInInletDomain(const Vec3d position)
+bool SPHBoundaryConditions::isInInletDomain(const Vec3d& position)
 {
     if (position.x() >= m_inletDomain.first.x() && position.y() >= m_inletDomain.first.y() && position.z() >= m_inletDomain.first.z() &&
       position.x() <= m_inletDomain.second.x() && position.y() <= m_inletDomain.second.y() && position.z() <= m_inletDomain.second.z())
@@ -52,9 +51,9 @@ bool SPHBoundaryConditions::isInInletDomain(const Vec3d position)
     return false;
 }
 
-bool SPHBoundaryConditions::isInOutletDomain(const Vec3d position)
+bool SPHBoundaryConditions::isInOutletDomain(const Vec3d& position)
 {
-    for (const auto i : m_outletDomain)
+    for (const auto& i : m_outletDomain)
     {
         if (position.x() >= i.first.x() && position.y() >= i.first.y() && position.z() >= i.first.z() &&
           position.x() <= i.second.x() && position.y() <= i.second.y() && position.z() <= i.second.z())
@@ -71,8 +70,6 @@ bool SPHBoundaryConditions::isInOutletDomain(const Vec3d position)
 ///
 void SPHBoundaryConditions::setParticleTypes(const StdVectorOfVec3d& mainParticlePositions, const size_t numWallParticles)
 {
-    //CHECK(particleTypes.size() != m_KinematicState->getNumParticles()) << "Incorrect number of particle types";
-
     m_particleTypes.reserve(mainParticlePositions.size() + numWallParticles + m_numBufferParticles);
 
     for (auto const& i : mainParticlePositions)
@@ -125,7 +122,7 @@ void SPHBoundaryConditions::setInletVelocity(const Real flowRate)
     m_inletVelocity = -m_inletNormal * (flowRate / m_inletCrossSectionalArea * 2);
 }
 
-Vec3d SPHBoundaryConditions::placeParticleAtInlet(const Vec3d position)
+Vec3d SPHBoundaryConditions::placeParticleAtInlet(const Vec3d& position)
 {
     const Vec3d inletPosition = (Vec3d(1, 1, 1) + m_inletNormal).cwiseProduct(position) - m_inletCenterPoint.cwiseProduct(m_inletNormal);
     return inletPosition;

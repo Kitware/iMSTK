@@ -88,25 +88,16 @@ generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh
     return subtractedMesh;
 }
 
-///
-/// \brief Initialize fluid particle velocities
-///
-StdVectorOfVec3d
-initializeNonZeroVelocities(const size_t numParticles)
-{
-    StdVectorOfVec3d initialVelocities(numParticles, Vec3d(0.0, 0, 0));
-    return initialVelocities;
-}
-
 std::shared_ptr<SPHObject>
 generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 {
     StdVectorOfVec3d particles;
     auto sphModel = std::make_shared<SPHModel>();
-
+    double speedOfSound = 100;
+    double restDensity = 1;
     if (SCENE_ID == 1)
     {
-      // pipe flow with leak
+      // pipe flow
       auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small.stl"));
       auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small_shell.stl"));
       auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small.vtk"));
@@ -124,7 +115,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       const double length = std::abs(aabbMax.x() - aabbMin.x());
       const double width = std::abs(aabbMax.y() - aabbMin.y());
       const double depth = std::abs(aabbMax.z() - aabbMin.z());
-      const auto spacing = 2.1 * particleRadius;
+      const auto spacing = 2.2 * particleRadius;
       const auto wallSpacing = 1.9 * particleRadius;
       const auto nx = static_cast<size_t>(length / spacing);
       const auto ny = static_cast<size_t>(width / spacing);
@@ -141,10 +132,10 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       // set up inlet boundary conditions
-      double inletFlowRate = 30;
-      double inletRadius = 0.5;
+      double inletFlowRate = 10;
+      double inletRadius = 0.6;
       Vec3d inletCenterPoint = Vec3d(-2.5, 0.0, 0);
-      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0.1, inletRadius, inletRadius);
       Vec3d inletMaxCoord = inletCenterPoint + Vec3d(0.5, inletRadius, inletRadius);
       Vec3d inletNormal(-1, 0, 0);
       std::pair<Vec3d, Vec3d> inletCoords = std::make_pair(inletMinCoord, inletMaxCoord);
@@ -159,9 +150,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, outletCoords, inletNormal, outletNormals, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
       sphModel->setBoundaryConditions(sphBoundaryConditions);
-
-      StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-      sphModel->setInitialVelocities(initialFluidVelocities);
   }
 
   else if (SCENE_ID == 2)
@@ -180,7 +168,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       const double length = std::abs(aabbMax.x() - aabbMin.x());
       const double width = std::abs(aabbMax.y() - aabbMin.y());
       const double depth = std::abs(aabbMax.z() - aabbMin.z());
-      const auto spacing = 2.1 * particleRadius;
+      const auto spacing = 2.2 * particleRadius;
       const auto wallSpacing = 1.9 * particleRadius;
       const auto nx = static_cast<size_t>(length / spacing);
       const auto ny = static_cast<size_t>(width / spacing);
@@ -197,10 +185,10 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       // set up inlet boundary conditions
-      double inletFlowRate = 2;
+      double inletFlowRate = 5;
       double inletRadius = 0.4;
       Vec3d inletCenterPoint = Vec3d(-0.45, 1.5, 0.0);
-      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0.1, inletRadius, inletRadius);
       Vec3d inletMaxCoord = inletCenterPoint + Vec3d(0.5, inletRadius, inletRadius);
       Vec3d inletNormal(-1, 0, 0);
       std::pair<Vec3d, Vec3d> inletCoords = std::make_pair(inletMinCoord, inletMaxCoord);
@@ -208,7 +196,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       // set up outlet boundary conditions
       double outletRadius = 0.4;
       Vec3d outletCenterPoint = Vec3d(-0.45, -1.5, 0.0);
-      Vec3d outletMinCoord = outletCenterPoint - Vec3d(0, outletRadius, outletRadius);
+      Vec3d outletMinCoord = outletCenterPoint - Vec3d(0.0, outletRadius, outletRadius);
       Vec3d outletMaxCoord = outletCenterPoint + Vec3d(0.5, outletRadius, outletRadius);
       StdVectorOfVec3d outletNormal{ Vec3d(1, 0, 0) };
       std::vector<std::pair<Vec3d, Vec3d>> outletCoords{ std::make_pair(outletMinCoord, outletMaxCoord) };
@@ -217,8 +205,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
         outletNormal, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
       sphModel->setBoundaryConditions(sphBoundaryConditions);
 
-      StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-      sphModel->setInitialVelocities(initialFluidVelocities);
+      speedOfSound = 300;
   }
 
   else if (SCENE_ID == 3)
@@ -237,8 +224,8 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       const double length = std::abs(aabbMax.x() - aabbMin.x());
       const double width = std::abs(aabbMax.y() - aabbMin.y());
       const double depth = std::abs(aabbMax.z() - aabbMin.z());
-      const auto spacing = 2.1 * particleRadius;
-      const auto wallSpacing = 1.9 * particleRadius;
+      const auto spacing = 2.2 * particleRadius;
+      const auto wallSpacing = 2.0 * particleRadius;
       const auto nx = static_cast<size_t>(length / spacing);
       const auto ny = static_cast<size_t>(width / spacing);
       const auto nz = static_cast<size_t>(depth / spacing);
@@ -254,10 +241,10 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
   
       // set up inlet boundary condition
-      double inletFlowRate = 1;
-      double inletRadius = 0.3;
+      double inletFlowRate = 5;
+      double inletRadius = 0.35;
       Vec3d inletCenterPoint = Vec3d(-1.65, 0.0, 0.0);
-      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0.1, inletRadius, inletRadius);
       Vec3d inletMaxCoord = inletCenterPoint + Vec3d(0.3, inletRadius, inletRadius);
       Vec3d inletNormal(-1, 0, 0);
       std::pair<Vec3d, Vec3d> inletCoords = std::make_pair(inletMinCoord, inletMaxCoord);
@@ -277,8 +264,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
         outletNormals, inletRadius, inletCenterPoint,  inletFlowRate, particles, wallParticles);
       sphModel->setBoundaryConditions(sphBoundaryConditions);
 
-      StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-      sphModel->setInitialVelocities(initialFluidVelocities);
+      speedOfSound = 300;
   }
   else if (SCENE_ID == 4)
   {
@@ -300,7 +286,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       const double length = std::abs(aabbMax.x() - aabbMin.x());
       const double width = std::abs(aabbMax.y() - aabbMin.y());
       const double depth = std::abs(aabbMax.z() - aabbMin.z());
-      const auto spacing = 2.0 * particleRadius;
+      const auto spacing = 2.2 * particleRadius;
       const auto wallSpacing = 1.9 * particleRadius;
       const auto nx = static_cast<size_t>(length / spacing);
       const auto ny = static_cast<size_t>(width / spacing);
@@ -317,10 +303,10 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       // set up inlet boundary conditions
-      double inletFlowRate = 3;
-      double inletRadius = 0.5;
+      double inletFlowRate = 30;
+      double inletRadius = 0.6;
       Vec3d inletCenterPoint = Vec3d(-2.5, 0.0, 0);
-      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
+      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0.1, inletRadius, inletRadius);
       Vec3d inletMaxCoord = inletCenterPoint + Vec3d(0.5, inletRadius, inletRadius);
       Vec3d inletNormal(-1, 0, 0);
       std::pair<Vec3d, Vec3d> inletCoords = std::make_pair(inletMinCoord, inletMaxCoord);
@@ -336,82 +322,80 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, outletCoords, inletNormal, outletNormals, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
       sphModel->setBoundaryConditions(sphBoundaryConditions);
-      //Vec3d hemorrhagePlaneCenter(-4.16, 4.03, 1.97);
-      //double hemorrhagePlaneRadius = 0.5;
-      //double hemorrhagePlaneArea = 0.16;
-      //Vec3d hemorrhagePlaneNormal(0, 1, 0);
-      //auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneArea, hemorrhagePlaneNormal);
-      //sphModel->setHemorrhageModel(sphHemorrhageModel);
-
-      StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-      sphModel->setInitialVelocities(initialFluidVelocities);
+      const Vec3d hemorrhagePlaneCenter(0, 0.42, -0.48);
+      const double hemorrhagePlaneRadius = 0.4;
+      const double hemorrhagePlaneArea = 0.16;
+      const Vec3d hemorrhagePlaneOutwardNormal(0, 1, -1);
+      auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneArea, hemorrhagePlaneOutwardNormal);
+      sphModel->setHemorrhageModel(sphHemorrhageModel);
   }
 
   else if (SCENE_ID == 5)
   {
-  // pipe flow with leak
-  auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.stl"));
-  auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery_shell_cut_ellipse.stl"));
-  //auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.vtk"));
+      // femoral artery flow with leak
+      auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.stl"));
+      auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery_shell_cut_ellipse.stl"));
+      auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.vtk"));
 
-  //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-  //surfMeshShell->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-  //tetMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
+      //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
+      //surfMeshShell->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
+      //tetMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
 
-  // set tetrahedral mesh used when writing VTUs
-  //sphModel->setGeometryMesh(tetMesh);
+      // set tetrahedral mesh used when writing VTUs
+      sphModel->setGeometryMesh(tetMesh);
 
-  // fill grid with points
-  Vec3d aabbMin, aabbMax;
-  surfMeshShell->computeBoundingBox(aabbMin, aabbMax, 1.);
-  const double length = std::abs(aabbMax.x() - aabbMin.x());
-  const double width = std::abs(aabbMax.y() - aabbMin.y());
-  const double depth = std::abs(aabbMax.z() - aabbMin.z());
-  const auto spacing = 2.1 * particleRadius;
-  const auto wallSpacing = 1.8 * particleRadius;
-  const auto nx = static_cast<size_t>(length / spacing);
-  const auto ny = static_cast<size_t>(width / spacing);
-  const auto nz = static_cast<size_t>(depth / spacing);
-  const auto nx_wall = static_cast<size_t>(length / wallSpacing);
-  const auto ny_wall = static_cast<size_t>(width / wallSpacing);
-  const auto nz_wall = static_cast<size_t>(depth / wallSpacing);
-  auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
-  auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
+      // fill grid with points
+      Vec3d aabbMin, aabbMax;
+      surfMeshShell->computeBoundingBox(aabbMin, aabbMax, 1.);
+      const double length = std::abs(aabbMax.x() - aabbMin.x());
+      const double width = std::abs(aabbMax.y() - aabbMin.y());
+      const double depth = std::abs(aabbMax.z() - aabbMin.z());
+      const auto spacing = 2.2 * particleRadius;
+      const auto wallSpacing = 1.9 * particleRadius;
+      const auto nx = static_cast<size_t>(length / spacing);
+      const auto ny = static_cast<size_t>(width / spacing);
+      const auto nz = static_cast<size_t>(depth / spacing);
+      const auto nx_wall = static_cast<size_t>(length / wallSpacing);
+      const auto ny_wall = static_cast<size_t>(width / wallSpacing);
+      const auto nz_wall = static_cast<size_t>(depth / wallSpacing);
+      auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
+      auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-  auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
-  particles = enclosedFluidPoints->getInitialVertexPositions();
-  auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
-  StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
+      auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+      particles = enclosedFluidPoints->getInitialVertexPositions();
+      auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+      StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
-  // set up inlet boundary conditions
-  double inletFlowRate = 0.03;
-  double inletRadius = 0.1;
-  Vec3d inletCenterPoint = Vec3d(-2.07, 0.36, -0.52);
-  Vec3d inletMinCoord = inletCenterPoint - Vec3d(0, inletRadius, inletRadius);
-  Vec3d inletMaxCoord = inletCenterPoint + Vec3d(0.1, inletRadius, inletRadius);
-  Vec3d inletNormal(-1, 0, 0);
-  std::pair<Vec3d, Vec3d> inletCoords = std::make_pair(inletMinCoord, inletMaxCoord);
+      // set up inlet boundary conditions
+      double inletFlowRate = 3.0;
+      double inletRadius = 0.12;
+      Vec3d inletCenterPoint = Vec3d(-2.07, 0.36, -0.52);
+      Vec3d inletMinCoord = inletCenterPoint - Vec3d(0.01, inletRadius, inletRadius);
+      Vec3d inletMaxCoord = inletCenterPoint + Vec3d(0.2, inletRadius, inletRadius);
+      Vec3d inletNormal(-1, 0, 0);
+      std::pair<Vec3d, Vec3d> inletCoords = std::make_pair(inletMinCoord, inletMaxCoord);
 
-  // set up outlet boundary conditions
-  double outletRadius = 0.1;
-  Vec3d outletCenterPoint = Vec3d(2.66, -0.21, 0.72);
+      // set up outlet boundary conditions
+      double outletRadius = 0.15;
+      Vec3d outletCenterPoint = Vec3d(2.66, -0.21, 0.72);
 
-  Vec3d outletMinCoord = outletCenterPoint - Vec3d(0.1, outletRadius, outletRadius);
-  Vec3d outletMaxCoord = outletCenterPoint + Vec3d(0, outletRadius, outletRadius);
-  StdVectorOfVec3d outletNormals{ Vec3d(1, 0, 0) };
-  std::vector<std::pair<Vec3d, Vec3d>> outletCoords{ std::make_pair(outletMinCoord, outletMaxCoord) };
+      Vec3d outletMinCoord = outletCenterPoint - Vec3d(0.3, outletRadius, outletRadius);
+      Vec3d outletMaxCoord = outletCenterPoint + Vec3d(0, outletRadius, outletRadius);
+      StdVectorOfVec3d outletNormals{ Vec3d(1, 0, 0) };
+      std::vector<std::pair<Vec3d, Vec3d>> outletCoords{ std::make_pair(outletMinCoord, outletMaxCoord) };
 
-  auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, outletCoords, inletNormal, outletNormals, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
-  sphModel->setBoundaryConditions(sphBoundaryConditions);
-  //Vec3d hemorrhagePlaneCenter(-4.16, 4.03, 1.97);
-  //double hemorrhagePlaneRadius = 0.5;
-  //double hemorrhagePlaneArea = 0.018;
-  //Vec3d hemorrhagePlaneNormal(0, 1, 0);
-  //auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneNormal);
-  //sphModel->setHemorrhageModel(sphHemorrhageModel);
+      auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, outletCoords, inletNormal, outletNormals, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
+      sphModel->setBoundaryConditions(sphBoundaryConditions);
+      const Vec3d hemorrhagePlaneCenter(0.57, -0.16, -0.12);
+      const double hemorrhagePlaneRadius = 0.4;
+      const double hemorrhagePlaneArea = 0.018;
+      const Vec3d hemorrhagePlaneNormal(0.31, -0.14, -0.94);
+      auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneArea, hemorrhagePlaneNormal);
+      sphModel->setHemorrhageModel(sphHemorrhageModel);
 
-  StdVectorOfVec3d initialFluidVelocities = initializeNonZeroVelocities(particles.size());
-  sphModel->setInitialVelocities(initialFluidVelocities);
+      sphModel->setInitialVelocities(particles.size(), Vec3d(80, 0, 0));
+
+      speedOfSound = 800;
   }
   
   sphModel->setWriteToOutputModulo(0.1);
@@ -432,32 +416,17 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
   sphModel->setModelGeometry(fluidGeometry);
 
   // configure model
-  auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
-  if (SCENE_ID == 1)
+  auto sphParams = std::make_shared<SPHModelConfig>(particleRadius, speedOfSound, restDensity);
+  sphParams->m_gravity = Vec3d(0, 0, 0);
+  
+  fluidMaterial->setPointSize(5.0);
+  sphParams->m_dynamicViscosityCoeff = 1.0;
+
+  if (SCENE_ID == 5)
   {
-    fluidMaterial->setPointSize(5.0);
-    sphParams->m_dynamicViscosityCoeff = 1.0;
+    fluidMaterial->setPointSize(1.8);
   }
-  else if (SCENE_ID == 2)
-  {
-    fluidMaterial->setPointSize(5.0);
-    sphParams->m_dynamicViscosityCoeff = 0.5;
-  }
-  else if (SCENE_ID == 3)
-  {
-    fluidMaterial->setPointSize(5.0);
-    sphParams->m_dynamicViscosityCoeff = 0.5;
-  }
-  else if (SCENE_ID == 4)
-  {
-      fluidMaterial->setPointSize(5.0);
-      sphParams->m_dynamicViscosityCoeff = 1;
-  }
-  else if (SCENE_ID == 5)
-  {
-    fluidMaterial->setPointSize(2.0);
-    sphParams->m_dynamicViscosityCoeff = 0.1;
-  }
+
   sphParams->m_bNormalizeDensity = true;
 
   sphModel->configure(sphParams);

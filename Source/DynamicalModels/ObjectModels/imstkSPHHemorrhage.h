@@ -34,12 +34,7 @@ class SPHHemorrhage
 {
 public:
     // constructor
-    SPHHemorrhage(const Vec3d& center, const double radius, const Vec3d& normal);
-
-    ///
-    /// \brief Compute the cross-sectional area of the hemorrhage plane
-    ///
-    void computeHemorrhagePlaneArea();
+    SPHHemorrhage(const Vec3d& center, const double radius, const double area, const Vec3d& normal);
 
     ///
     /// \brief Determine if fluid particle crossed the hemorrhage plane
@@ -54,7 +49,7 @@ public:
     ///
     /// \brief Get the area of the hemorrhage plane
     ///
-    const double getHemorrhagePlaneArea() { return m_hemorrhagePlaneArea; }
+    const double getHemorrhagePlaneArea() { return m_area; }
 
     ///
     /// \brief Get the rate of hemorrhage from SPH
@@ -67,8 +62,8 @@ public:
     void setHemorrhageRate(const double hemorrhageRate) { m_hemorrhageRate = hemorrhageRate; }
 
 private:
+    double m_area;                    ///> cross-sectional area of hemorrhage plane
     Vec3d m_center;                   ///> hemorrhage plane center
-    double m_hemorrhagePlaneArea;     ///> cross-sectional area of hemorrhage plane
     double m_hemorrhageRate = 0;      ///> rate of hemorrhage
     Vec3d m_normal;                   ///> outward unit normal of hemorrhage plane
     double m_radius;                  ///> hemorrhage plane radius

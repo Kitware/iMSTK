@@ -28,19 +28,52 @@ limitations under the License.
 
 namespace imstk
 {
-  SPHModelConfig::SPHModelConfig(const Real particleRadius)
+	SPHModelConfig::SPHModelConfig(const Real particleRadius)
+	{
+		if (std::abs(particleRadius) > Real(1.e-6))
+		{
+			LOG_IF(WARNING, (particleRadius < 0)) << "Particle radius supplied is negative! Using absolute value of the supplied radius.";
+			m_particleRadius = std::abs(particleRadius);
+		}
+		else
+		{
+			LOG(WARNING) << "Particle radius too small! Setting to 1.e-6";
+			m_particleRadius = 1.e-6;
+		}
+		initialize();
+	}
+
+  SPHModelConfig::SPHModelConfig(const Real particleRadius, const Real speedOfSound, const Real restDensity)
   {
-    if (std::abs(particleRadius) > Real(1.e-6))
-    {
-      LOG_IF(WARNING, (particleRadius < 0)) << "Particle radius supplied is negative! Using absolute value of the supplied radius.";
-      m_particleRadius = std::abs(particleRadius);
-    }
-    else
-    {
-      LOG(WARNING) << "Particle radius too small! Setting to 1.e-6";
-      m_particleRadius = 1.e-6;
-    }
-    initialize();
+      if (std::abs(particleRadius) > Real(1.e-6))
+      {
+          LOG_IF(WARNING, (particleRadius < 0)) << "Particle radius supplied is negative! Using absolute value of the supplied radius.";
+          m_particleRadius = std::abs(particleRadius);
+      }
+      else
+      {
+          LOG(WARNING) << "Particle radius too small! Setting to 1.e-6";
+          m_particleRadius = 1.e-6;
+      }
+
+      if (speedOfSound < 0)
+      {
+          LOG(WARNING) << "Speed of sound is negative! Setting speed of sound to default value.";
+      }
+      else
+      {
+          m_speedOfSound = speedOfSound;
+      }
+
+      if (restDensity < 0)
+      {
+          LOG(WARNING) << "Rest density is negative! Setting rest density to default value.";
+      }
+      else
+      {
+          m_restDensity = restDensity;
+      }
+      initialize();
   }
 
   void
@@ -55,6 +88,8 @@ namespace imstk
 
     m_kernelRadius = m_particleRadius * m_kernelOverParticleRadiusRatio;
     m_kernelRadiusSqr = m_kernelRadius * m_kernelRadius;
+
+    m_pressureStiffness = m_restDensity * m_speedOfSound * m_speedOfSound / 7;
   }
 
   SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::SmoothedParticleHydrodynamics)
@@ -184,27 +219,15 @@ namespace imstk
   {
     auto maxVel = ParallelUtils::findMaxL2Norm(getState().getFullStepVelocities());
 
-    // dt = CFL * 2r / max{|| v ||}
+    // dt = CFL * 2r / (speed of sound + max{|| v ||})
     Real timestep = maxVel > Real(1e-6) ?
-      m_modelParameters->m_CFLFactor * (Real(2.0) * m_modelParameters->m_particleRadius / maxVel) :
+      m_modelParameters->m_CFLFactor * (Real(2.0) * m_modelParameters->m_particleRadius / (m_modelParameters->m_speedOfSound + maxVel)) :
       m_modelParameters->m_maxTimestep;
-
-    if (m_timeStepCount % 100 == 0)
-    {
-
-      std::cout << "timestep: " << timestep << std::endl;
-      std::cout << "maxVel: " << maxVel << std::endl;
-      std::cout << "maxDensity: " << *std::max_element(getState().getDensities().begin(), getState().getDensities().end()) << std::endl;
-    }
 
     // clamp the time step size to be within a given range
     if (timestep > m_modelParameters->m_maxTimestep)
     {
       timestep = m_modelParameters->m_maxTimestep;
-    }
-    else if (timestep < m_modelParameters->m_minTimestep)
-    {
-      timestep = m_modelParameters->m_minTimestep;
     }
     return timestep;
   }
@@ -286,7 +309,6 @@ namespace imstk
   void
     SPHModel::computeDensity()
   {
-    auto x = getState().getNumParticles();
     ParallelUtils::parallelFor(getState().getNumParticles(),
       [&](const size_t p) {
         if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::buffer)
@@ -403,17 +425,6 @@ namespace imstk
   void
     SPHModel::computeViscosity(Real timestep)
   {
-    double inletDensityAvg = 0;
-    int numInletPts = 0;
-    double outletDensityAvg = 0;
-    int numOutletPts = 0;
-    double fluidDensityAvg = 0;
-    int numFluidPts = 0;
-    double wallDensityAvg = 0;
-    int numWallPts = 0;
-    Vec3d accelAvg(0, 0, 0);
-    int accelPts = 0;
-
     const StdVectorOfVec3d& pressureAccels = *m_pressureAccels;
     const StdVectorOfVec3d& surfaceTensionAccels = *m_surfaceTensionAccels;
     StdVectorOfVec3d& viscousAccels = *m_viscousAccels;
@@ -463,46 +474,7 @@ namespace imstk
         neighborVelContr[p] = neighborVelContributionsNumerator * m_modelParameters->m_eta / neighborVelContributionsDenominator;
 
         viscousAccels[p] = diffuseFluid;
-
-        if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::inlet)
-        {
-          inletDensityAvg += getState().getDensities()[p];
-          numInletPts++;
-        }
-        if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::outlet)
-        {
-          outletDensityAvg += getState().getDensities()[p];
-          numOutletPts++;
-        }
-        if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::fluid)
-        {
-          fluidDensityAvg += getState().getDensities()[p];
-          numFluidPts++;
-          accelAvg += pressureAccels[p] + surfaceTensionAccels[p] + viscousAccels[p];
-          accelPts++;
-        }
-        if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::wall)
-        {
-          wallDensityAvg += getState().getDensities()[p];
-          numWallPts++;
-        }
       });
-
-    inletDensityAvg /= numInletPts;
-    outletDensityAvg /= numOutletPts;
-    fluidDensityAvg /= numFluidPts;
-    wallDensityAvg /= numWallPts;
-    accelAvg /= accelPts;
-
-
-    if (m_timeStepCount % 100 == 0)
-    {
-      std::cout << "inletDensityAvg: " << inletDensityAvg << std::endl;
-      std::cout << "outletDensityAvg: " << outletDensityAvg << std::endl;
-      std::cout << "fluidDensityAvg: " << fluidDensityAvg << std::endl << std::endl;
-      std::cout << "accelAvg: " << accelAvg << std::endl << std::endl;
-    }
-
   }
 
   void
@@ -640,14 +612,14 @@ namespace imstk
 
         if (m_timeStepCount == 0)
         {
-          getState().getHalfStepVelocities()[p] = getState().getFullStepVelocities()[p] + getState().getAccelerations()[p] * timestep / 2;
-          getState().getFullStepVelocities()[p] += getState().getAccelerations()[p] * timestep;
+          getState().getHalfStepVelocities()[p] = getState().getFullStepVelocities()[p] + (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep / 2;
+          getState().getFullStepVelocities()[p] += (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep;
         }
         else
         {
           //getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
-          getState().getHalfStepVelocities()[p] += (getState().getAccelerations()[p]) * timestep;
-          getState().getFullStepVelocities()[p] = getState().getHalfStepVelocities()[p] + (getState().getAccelerations()[p]) * timestep / 2;
+          getState().getHalfStepVelocities()[p] += (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep;
+          getState().getFullStepVelocities()[p] = getState().getHalfStepVelocities()[p] + (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep / 2;
         }
         if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::inlet)
         {
@@ -696,7 +668,6 @@ namespace imstk
         if (particleTypes[p] == SPHBoundaryConditions::ParticleType::inlet &&
           !m_sphBoundaryConditions->isInInletDomain(newPosition))
         {
-
           // change particle type to fluid
           particleTypes[p] = SPHBoundaryConditions::ParticleType::fluid;
           // insert particle into inlet domain from buffer domain
@@ -730,7 +701,15 @@ namespace imstk
 
     if (m_SPHHemorrhage)
     {
-        numParticlesAcrossHemorrhagePlane > 0 ? averageVelThroughHemorrhage /= numParticlesAcrossHemorrhagePlane : averageVelThroughHemorrhage;
+        if (numParticlesAcrossHemorrhagePlane > 0)
+        {
+            averageVelThroughHemorrhage /= numParticlesAcrossHemorrhagePlane;
+        }
+        else
+        {
+            averageVelThroughHemorrhage = m_prevAvgVelThroughHemorrhage;
+        }
+        m_prevAvgVelThroughHemorrhage = averageVelThroughHemorrhage;
         const double hemorrhageFlowRate = averageVelThroughHemorrhage.norm() * m_SPHHemorrhage->getHemorrhagePlaneArea();
         m_SPHHemorrhage->setHemorrhageRate(hemorrhageFlowRate);
     }
@@ -745,23 +724,35 @@ namespace imstk
     return error > Real(0) ? error : Real(0);
   }
 
-  void SPHModel::setInitialVelocities(const StdVectorOfVec3d& initialVelocities)
+  void SPHModel::setInitialVelocities(const int numParticles, const Vec3d& initialVelocity)
   {
-    m_initialVelocities = initialVelocities;
+      m_initialVelocities.reserve(numParticles);
+      for (size_t p = 0; p < numParticles; p++)
+      {
+          if (m_sphBoundaryConditions &&
+              (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::buffer ||
+                  m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::wall))
+          {
+              m_initialVelocities.push_back(Vec3d(0, 0, 0));
+          }
+          else
+          {
+              m_initialVelocities.push_back(initialVelocity);
+          }
+      }
   }
 
   void SPHModel::writeStateToCSV()
   {
     if (m_csvPreviousTime <= m_csvTimeModulo && m_totalTime >= m_csvTimeModulo)
     {
-      // todo add log instead of cout
-      std::cout << "Writing CSV at time: " << m_totalTime << std::endl;
+      LOG(INFO) << "Writing CSV at time: " << m_totalTime;
       std::ofstream outputFile;
       outputFile.open(std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".csv"));
       outputFile << "X,Y,Z,Vx,Vy,Vz,Pressure\n";
-      const auto positions = getState().getPositions();
-      const auto velocities = getState().getFullStepVelocities();
-      const auto densities = getState().getDensities();
+      const auto& positions = getState().getPositions();
+      const auto& velocities = getState().getFullStepVelocities();
+      const auto& densities = getState().getDensities();
       for (int i = 0; i < getState().getNumParticles(); ++i)
       {
         outputFile << positions[i].x() << "," << positions[i].y() << "," << positions[i].z() << ",";
@@ -804,10 +795,9 @@ namespace imstk
 
     if (m_vtkPreviousTime <= m_vtkTimeModulo && m_totalTime >= m_vtkTimeModulo)
     {
-      // todo - add log instead of cout
-      std::cout << "Writing VTK at time: " << m_totalTime << std::endl;
-      const auto particleVelocities = getState().getFullStepVelocities();
-      const auto particleDensities = getState().getDensities();
+      LOG(INFO) << "Writing VTK at time: " << m_totalTime;
+      const auto& particleVelocities = getState().getFullStepVelocities();
+      const auto& particleDensities = getState().getDensities();
       std::map<std::string, StdVectorOfVectorf> pointDataMap;
       StdVectorOfVectorf velocity;
       StdVectorOfVectorf pressure;

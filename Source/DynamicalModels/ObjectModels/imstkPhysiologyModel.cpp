@@ -79,11 +79,7 @@ PhysiologyModel::initialize()
     m_pulseObj = CreatePulseEngine();
     m_pulseObj->GetLogger()->LogToConsole(false);
 
-    if (!m_pulseObj->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json"))
-    {
-      //m_pulseObj->GetLogger()->Error("Could not load Pulse state, check the error");
-      return true;
-    }
+    CHECK(m_pulseObj->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json")) << "Could not load Pulse state file.";
 
     // Pulse hemorrhage action
     // here, we can add any Pulse actions that we want

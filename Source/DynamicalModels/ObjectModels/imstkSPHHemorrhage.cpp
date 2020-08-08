@@ -20,25 +20,22 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkSPHHemorrhage.h"
+#include <iostream>
 
 
 namespace imstk
 {
-SPHHemorrhage::SPHHemorrhage(const Vec3d& center, const double radius, const Vec3d& normal) :
-    m_center(center), m_radius(radius), m_normal(normal)
+SPHHemorrhage::SPHHemorrhage(const Vec3d& center, const double radius, const double area, const Vec3d& normal) :
+    m_center(center), m_radius(radius), m_area(area)
 {
-    computeHemorrhagePlaneArea();
-}
-
-void SPHHemorrhage::computeHemorrhagePlaneArea()
-{
-    m_hemorrhagePlaneArea = PI * m_radius * m_radius;
+    m_normal = normal.normalized();
 }
 
 bool SPHHemorrhage::pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const Vec3d& newPosition)
 {
     // todo - loop through points that are near hemorrhage plane instead of all points
     const double dist = m_normal.dot(newPosition - m_center);
+
     if (m_normal.dot(oldPosition - m_center) < 0 && dist > 0)
     {
         // particle has crossed plane in the correct direction
@@ -47,6 +44,7 @@ bool SPHHemorrhage::pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const 
         const Vec3d pointOnPlane = newPosition - dist * m_normal;
         // check if point is farther than radius from center point
         const double distFromCenter = (pointOnPlane - m_center).norm();
+
         if (distFromCenter <= m_radius)
         {
             return true;

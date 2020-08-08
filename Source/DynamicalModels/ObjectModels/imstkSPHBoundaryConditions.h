@@ -47,9 +47,9 @@ public:
       const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate, StdVectorOfVec3d& mainParticlePositions,
       const StdVectorOfVec3d& wallParticlePositions);
 
-    bool isInInletDomain(const Vec3d position);
+    bool isInInletDomain(const Vec3d& position);
 
-    bool isInOutletDomain(const Vec3d position);
+    bool isInOutletDomain(const Vec3d& position);
 
     void setParticleTypes(const StdVectorOfVec3d& mainParticlePositions, const size_t numWallParticles);
 
@@ -69,7 +69,7 @@ public:
 
     Vec3d getInletNormal() { return m_inletNormal; }
 
-    Vec3d placeParticleAtInlet(const Vec3d position);
+    Vec3d placeParticleAtInlet(const Vec3d& position);
 
 private:
     std::pair<Vec3d, Vec3d> m_inletDomain;

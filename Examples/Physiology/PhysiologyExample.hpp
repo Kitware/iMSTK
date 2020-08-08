@@ -53,26 +53,10 @@ main(int argc, char* argv[])
   auto simManager = std::make_shared<SimulationManager>();
 
   int threads = -1;
-  double particleRadius;
-  if (SCENE_ID == 1)
+  double particleRadius = 0.04;
+  if (SCENE_ID == 5)
   {
-    particleRadius = 0.04;
-  }
-  else if (SCENE_ID == 2)
-  {
-    particleRadius = 0.04;
-  }
-  else if (SCENE_ID == 3)
-  {
-    particleRadius = 0.04;
-  }
-  else if (SCENE_ID == 4)
-  {
-    particleRadius = 0.04;
-  }
-  else if (SCENE_ID == 5)
-  {
-    particleRadius = 0.015;
+      particleRadius = 0.012;
   }
   // Parse command line arguments
   for (int i = 1; i < argc; ++i)
@@ -134,6 +118,7 @@ main(int argc, char* argv[])
 
   // configure camera
   scene->getCamera()->setPosition(0, 1.0, 5.0);
+  if (SCENE_ID == 5) scene->getCamera()->setPosition(0, 1.0, 4.0);
 
   // configure light (white)
   auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
@@ -182,10 +167,8 @@ main(int argc, char* argv[])
         }, "WriteStateToVtk");
       taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToVtk);
 
-			////////////////////////////////////////////
       // This node colors the fluid points based on their type
-			std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
-				{
+	  std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]() {
           const std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions = sphModel->getBoundaryConditions();
           StdVectorOfReal& scalars = *scalarsPtr;
           for (size_t i = 0; i < sphModel->getCurrentState()->getNumParticles(); i++)
@@ -206,10 +189,9 @@ main(int argc, char* argv[])
             {
               scalars[i] = 3;
             }
-					}
-				}, "ComputeVelocityScalars");
+		  }
+	  }, "ComputeVelocityScalars");
       taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
-			///////////////////////////////////////////
     });
 
   simManager->setActiveScene(scene);
