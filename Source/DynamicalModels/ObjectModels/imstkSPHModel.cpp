@@ -167,6 +167,7 @@ namespace imstk
 
     m_viscousAccels = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0, 0, 0));
     m_neighborVelContr = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0, 0, 0));
+    m_particleShift = std::make_shared<StdVectorOfVec3d>(getState().getNumParticles(), Vec3d(0, 0, 0));
 
     if (m_geomUnstructuredGrid)
     {
@@ -228,6 +229,10 @@ namespace imstk
     if (timestep > m_modelParameters->m_maxTimestep)
     {
       timestep = m_modelParameters->m_maxTimestep;
+    }
+    else if (timestep < m_modelParameters->m_minTimestep)
+    {
+        timestep = m_modelParameters->m_minTimestep;
     }
     return timestep;
   }
@@ -429,6 +434,7 @@ namespace imstk
     const StdVectorOfVec3d& surfaceTensionAccels = *m_surfaceTensionAccels;
     StdVectorOfVec3d& viscousAccels = *m_viscousAccels;
     StdVectorOfVec3d& neighborVelContr = *m_neighborVelContr;
+    StdVectorOfVec3d& particleShift = *m_particleShift;
     ParallelUtils::parallelFor(getState().getNumParticles(),
       [&](const size_t p) {
         if (m_sphBoundaryConditions &&
@@ -449,6 +455,7 @@ namespace imstk
         Vec3r neighborVelContributions(0, 0, 0);
         Vec3r neighborVelContributionsNumerator(0, 0, 0);
         Real neighborVelContributionsDenominator = 0;
+        Vec3r particleShifts(0, 0, 0);
 
         const auto& pvel = getState().getHalfStepVelocities()[p];
         const auto& fluidNeighborList = getState().getFluidNeighborLists()[p];
@@ -466,12 +473,15 @@ namespace imstk
 
           neighborVelContributionsNumerator += (qvel - pvel) * m_kernels.W(r);
           neighborVelContributionsDenominator += m_kernels.W(r);
+          particleShifts += m_kernels.gradW(r);
           //diffuseFluid       += (Real(1.0) / qdensity) * m_kernels.W(r) * (qvel - pvel);
 
         }
         //diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff / getState().getDensities()[p];
+        particleShifts *= 4 / 3 * PI * std::pow(m_modelParameters->m_particleRadius, 3) * 0.5 * m_modelParameters->m_kernelRadius * getState().getHalfStepVelocities()[p].norm();
         diffuseFluid *= m_modelParameters->m_dynamicViscosityCoeff * m_modelParameters->m_particleMass;
         neighborVelContr[p] = neighborVelContributionsNumerator * m_modelParameters->m_eta / neighborVelContributionsDenominator;
+        particleShift[p] = -particleShifts;
 
         viscousAccels[p] = diffuseFluid;
       });
@@ -639,6 +649,7 @@ namespace imstk
     Vec3d averageVelThroughHemorrhage(0, 0, 0);
     int numParticlesAcrossHemorrhagePlane = 0;
     StdVectorOfVec3d& neighborVelContr = *m_neighborVelContr;
+    StdVectorOfVec3d& particleShift = *m_particleShift;
 
     for (int p = 0; p < getState().getNumParticles(); p++)
     {
@@ -650,16 +661,8 @@ namespace imstk
       }
 
       Vec3r oldPosition = getState().getPositions()[p];
-      Vec3r newPosition;
-      // at the first timestep, update by half a timestep to get v(1/2) and r(1/2)
-      if (m_timeStepCount == 0)
-      {
-          newPosition = oldPosition + (getState().getHalfStepVelocities()[p] + neighborVelContr[p]) * timestep;
-      }
-      else
-      {
-          newPosition = oldPosition + (getState().getHalfStepVelocities()[p] + neighborVelContr[p]) * timestep;
-      }
+      Vec3r newPosition = oldPosition + particleShift[p] * timestep + (getState().getHalfStepVelocities()[p] + neighborVelContr[p]) * timestep;
+
       getState().getPositions()[p] = newPosition;
 
       if (m_sphBoundaryConditions)
@@ -676,7 +679,9 @@ namespace imstk
           const size_t bufferParticleIndex = std::distance(particleTypes.begin(), it);
           particleTypes[bufferParticleIndex] = SPHBoundaryConditions::ParticleType::inlet;
 
-          getState().getPositions()[bufferParticleIndex] = m_sphBoundaryConditions->placeParticleAtInlet(newPosition);
+          getState().getPositions()[bufferParticleIndex] = m_sphBoundaryConditions->placeParticleAtInlet(oldPosition);
+          getState().getHalfStepVelocities()[bufferParticleIndex] = m_sphBoundaryConditions->computeParabolicInletVelocity(getState().getPositions()[bufferParticleIndex]);
+          getState().getFullStepVelocities()[bufferParticleIndex] = m_sphBoundaryConditions->computeParabolicInletVelocity(getState().getPositions()[bufferParticleIndex]);
         }
         else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::outlet &&
           !m_sphBoundaryConditions->isInOutletDomain(newPosition))
@@ -689,6 +694,12 @@ namespace imstk
           m_sphBoundaryConditions->isInOutletDomain(newPosition))
         {
           particleTypes[p] = SPHBoundaryConditions::ParticleType::outlet;
+        }
+        else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::fluid &&
+            !m_sphBoundaryConditions->isInFluidDomain(newPosition))
+        {
+            particleTypes[p] = SPHBoundaryConditions::ParticleType::buffer;
+            getState().getPositions()[p] = m_sphBoundaryConditions->getBufferCoord();
         }
       }
 

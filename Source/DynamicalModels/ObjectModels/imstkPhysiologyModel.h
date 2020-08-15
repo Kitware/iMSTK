@@ -107,6 +107,11 @@ namespace imstk
 
     void setPulseTimeStep(const double timeStep) { m_dT_s = timeStep; }
 
+    ///
+    /// \brief Set up Pulse data requests to output vitals to CSV files
+    ///
+    void setUpDataRequests();
+
   protected:
     ///
     /// \brief Setup physiology compute graph connectivity
@@ -129,17 +134,21 @@ namespace imstk
     // here, we can add any Pulse actions that we want
     std::shared_ptr<SEHemorrhage> m_hemorrhageLeg = nullptr;
 
-    // sample the femoral compartment
+    // sample various physiological compartments
     const SELiquidCompartment* m_femoralCompartment;
+    const SELiquidCompartment* m_aorta;
 
     // Pulse time step
     double m_dT_s = 0.02;
 
+    // Total time passed
+    double m_totalTime;
+
     // set the default femoral flow rate
-    double m_femoralFlowRate = 0;
+    double m_femoralFlowRate;
 
     // set the default hemorrhage rate
-    double m_hemorrhageRate = 0;
+    double m_hemorrhageRate;
 
   };
 } // end namespace imstk

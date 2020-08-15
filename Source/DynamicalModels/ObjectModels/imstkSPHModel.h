@@ -325,6 +325,7 @@ private:
     std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
     std::shared_ptr<StdVectorOfVec3d> m_viscousAccels        = nullptr;
     std::shared_ptr<StdVectorOfVec3d> m_neighborVelContr     = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_particleShift        = nullptr;
 
     StdVectorOfVec3d m_initialVelocities;
     StdVectorOfReal m_initialDensities;

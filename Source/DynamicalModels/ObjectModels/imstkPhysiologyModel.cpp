@@ -51,7 +51,10 @@ limitations under the License.
 #include "properties/SEScalarTime.h"
 #include "properties/SEScalarVolume.h"
 #include "properties/SEScalarVolumePerTime.h"
+#include "properties/SEScalarVolumePerTimeArea.h"
 #include "compartment/fluid/SELiquidCompartmentGraph.h"
+#include "utils/DataTrack.h"
+
 
 
 namespace imstk
@@ -81,40 +84,68 @@ PhysiologyModel::initialize()
 
     CHECK(m_pulseObj->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json")) << "Could not load Pulse state file.";
 
+    setUpDataRequests();
+
     // Pulse hemorrhage action
     // here, we can add any Pulse actions that we want
     m_hemorrhageLeg = std::make_shared<SEHemorrhage>();
     m_hemorrhageLeg->SetType(eHemorrhage_Type::External);
     m_hemorrhageLeg->SetCompartment(pulse::VascularCompartment::RightLeg);//the location of the hemorrhage
 
-    //PulseConfiguration cfg;
-    //cfg.GetTimeStep().SetValue(1 / 100, TimeUnit::s);
-    //m_->SetConfigurationOverride(&cfg);
-
     // The tracker is responsible for advancing the engine time and outputting the data requests below at each time step
     m_femoralCompartment = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::LeftLeg);
+
+    m_dT_s = 0.0;
+    m_totalTime = 0.0;
+    m_femoralFlowRate = 0;
+    m_hemorrhageRate = 0;
     return true;
+}
+
+void PhysiologyModel::setUpDataRequests()
+{
+    // Setup data requests
+    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("DiastolicArterialPressure", PressureUnit::mmHg);
+    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("HeartRate", FrequencyUnit::Per_min);
+    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("MeanArterialPressure", PressureUnit::mmHg);
+    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("SystolicArterialPressure", PressureUnit::mmHg);
+    m_pulseObj->GetEngineTracker()->GetDataRequestManager().SetResultsFilename("pulse_vitals.csv");
+
+    m_aorta = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::Aorta);
 }
 
 void PhysiologyModel::solvePulse()
 {
     // Hemorrhage Starts - instantiate a hemorrhage action and have the engine process it
-    m_hemorrhageLeg->GetRate().SetValue(m_hemorrhageRate, VolumePerTimeUnit::mL_Per_min);//the rate of hemorrhage
+    m_hemorrhageLeg->GetRate().SetValue(m_hemorrhageRate, VolumePerTimeUnit::mL_Per_s);//the rate of hemorrhage
     m_pulseObj->ProcessAction(*m_hemorrhageLeg);
 
     m_pulseObj->AdvanceModelTime(m_dT_s, TimeUnit::s);
 
     m_femoralFlowRate = m_femoralCompartment->GetInFlow(VolumePerTimeUnit::mL_Per_s);
 
-    //uncomment these to get vitals
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Cardiac Output : " << m_pulseObj->GetCardiovascularSystem()->GetCardiacOutput(VolumePerTimeUnit::mL_Per_min) << VolumePerTimeUnit::mL_Per_min);
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Hemoglobin Content : " << m_pulseObj->GetBloodChemistrySystem()->GetHemoglobinContent(MassUnit::g) << MassUnit::g);
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Blood Volume : " << m_pulseObj->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) << VolumeUnit::mL);
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Mean Arterial Pressure : " << m_pulseObj->GetCardiovascularSystem()->GetMeanArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Systolic Pressure : " << m_pulseObj->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Diastolic Pressure : " << m_pulseObj->GetCardiovascularSystem()->GetDiastolicArterialPressure(PressureUnit::mmHg) << PressureUnit::mmHg);
-    //m_pulseObj->GetLogger()->Info(std::stringstream() << "Heart Rate : " << m_pulseObj->GetCardiovascularSystem()->GetHeartRate(FrequencyUnit::Per_min) << "bpm");;
-    //m_pulseObj->GetLogger()->Info("Finished");
+    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Aorta Pressure (mmHg)", m_aorta->GetPressure(PressureUnit::mmHg));
+    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Hemorrhage Rate (mL/s)", m_hemorrhageLeg->GetRate(VolumePerTimeUnit::mL_Per_s));
+
+    m_pulseObj->GetEngineTracker()->TrackData(m_totalTime);
+
+    // Check for hypovolumic shock
+    if (m_pulseObj->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) <= (0.65 * 5517.734437810328))
+    {
+        LOG(INFO) << "Patient in hypovolemic shock at time: " << m_totalTime;
+    }
+
+    // Check for cardiogenic shock
+    if (m_pulseObj->GetCardiovascularSystem()->GetCardiacIndex(VolumePerTimeAreaUnit::L_Per_min_m2) < 2.2 &&
+        m_pulseObj->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) < 90.0 &&
+        m_pulseObj->GetCardiovascularSystem()->GetPulmonaryCapillariesWedgePressure(PressureUnit::mmHg) > 15.0)
+    {
+        LOG(INFO) << "Patient in cardiogenic shock at time: " << m_totalTime;
+
+        /// \event Patient: Cardiogenic Shock: Cardiac Index has fallen below 2.2 L/min-m^2, Systolic Arterial Pressure is below 90 mmHg, and Pulmonary Capillary Wedge Pressure is above 15.0.
+        /// \cite dhakam2008review
+    }
+    m_totalTime += m_dT_s;
 }
 
 void PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
@@ -123,21 +154,5 @@ void PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shar
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
-
-//SEScalarTime& PhysiologyModel::GetTimeStep()
-//{
-//    if (m_timeStep == nullptr)
-//      m_timeStep = new SEScalarTime();
-//    return *m_timeStep;
-//}
-//const std::shared_ptr<SELiquidCompartment> PhysiologyModel::getFemoralCompartment()
-//{
-//    return m_femoralCompartment;
-//}
-//
-//const std::shared_ptr<SEHemorrhage> PhysiologyModel::getHemorrhageModel()
-//{
-//    return m_hemorrhageLeg;
-//}
 
 }// end namespace imstk
