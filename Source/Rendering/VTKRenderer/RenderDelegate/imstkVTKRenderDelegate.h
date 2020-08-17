@@ -22,6 +22,7 @@
 #pragma once
 
 #include <vtkSmartPointer.h>
+#include <memory>
 
 class vtkActor;
 class vtkAlgorithmOutput;
