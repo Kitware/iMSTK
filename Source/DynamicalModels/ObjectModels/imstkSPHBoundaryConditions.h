@@ -71,6 +71,8 @@ public:
 
     Vec3d getInletNormal() { return m_inletNormal; }
 
+    std::vector<size_t>& getBufferIndices() { return m_bufferIndices; }
+
     Vec3d placeParticleAtInlet(const Vec3d& position);
 
 private:
@@ -89,6 +91,7 @@ private:
     Real m_inletCrossSectionalArea;
 
     const size_t m_numBufferParticles = 10000;
+    std::vector<size_t> m_bufferIndices;
 
 };
 } // end namespace imstk

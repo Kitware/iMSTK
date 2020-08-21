@@ -212,7 +212,7 @@ public:
     std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
     std::shared_ptr<TaskNode> getIntegrateNode() const { return m_integrateNode; }
     std::shared_ptr<TaskNode> getComputeViscosityNode() const { return m_computeViscosityNode; }
-    std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNoGravityNode; }
+    std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
     std::shared_ptr<TaskNode> getMoveParticlesNode() const { return m_moveParticlesNode; }
 
 protected:
@@ -269,11 +269,9 @@ private:
     void sumAccels();
 
     ///
-    /// \brief Update particle velocities due to pressure
+    /// \brief Update particle velocities due to pressure, viscous, and surface tension forces
     ///
     void updateVelocity(const Real timestep);
-
-    void updateVelocityNoGravity(Real timestep);
 
     ///
     /// \brief Compute viscosity
@@ -302,7 +300,7 @@ protected:
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
     std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
     std::shared_ptr<TaskNode> m_integrateNode = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNoGravityNode = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode = nullptr;
     std::shared_ptr<TaskNode> m_computeViscosityNode = nullptr;
     std::shared_ptr<TaskNode> m_moveParticlesNode = nullptr;
 
@@ -314,7 +312,7 @@ private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
     SPHSimulationState m_simulationState;
 
-    Real m_dt;                                          ///> time step size
+    Real m_dt = 0;                                      ///> time step size
     Real m_defaultDt;                                   ///> default time step size
 
     SPHSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)

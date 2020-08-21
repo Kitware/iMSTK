@@ -149,6 +149,5 @@ namespace imstk
 
     // set the default hemorrhage rate
     double m_hemorrhageRate;
-
   };
 } // end namespace imstk

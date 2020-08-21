@@ -92,9 +92,6 @@ PhysiologyModel::initialize()
     m_hemorrhageLeg->SetType(eHemorrhage_Type::External);
     m_hemorrhageLeg->SetCompartment(pulse::VascularCompartment::RightLeg);//the location of the hemorrhage
 
-    // The tracker is responsible for advancing the engine time and outputting the data requests below at each time step
-    m_femoralCompartment = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::LeftLeg);
-
     m_dT_s = 0.0;
     m_totalTime = 0.0;
     m_femoralFlowRate = 0;
@@ -105,6 +102,7 @@ PhysiologyModel::initialize()
 void PhysiologyModel::setUpDataRequests()
 {
     // Setup data requests
+    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("BloodVolume", VolumeUnit::mL);
     m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("DiastolicArterialPressure", PressureUnit::mmHg);
     m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("HeartRate", FrequencyUnit::Per_min);
     m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("MeanArterialPressure", PressureUnit::mmHg);
@@ -112,6 +110,7 @@ void PhysiologyModel::setUpDataRequests()
     m_pulseObj->GetEngineTracker()->GetDataRequestManager().SetResultsFilename("pulse_vitals.csv");
 
     m_aorta = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::Aorta);
+    m_femoralCompartment = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::LeftLeg);
 }
 
 void PhysiologyModel::solvePulse()
@@ -125,6 +124,8 @@ void PhysiologyModel::solvePulse()
     m_femoralFlowRate = m_femoralCompartment->GetInFlow(VolumePerTimeUnit::mL_Per_s);
 
     m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Aorta Pressure (mmHg)", m_aorta->GetPressure(PressureUnit::mmHg));
+    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Femoral Flow Rate (mL/s)", m_femoralCompartment->GetInFlow(VolumePerTimeUnit::mL_Per_s));
+    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Femoral Pressure (mmHg)", m_femoralCompartment->GetPressure(PressureUnit::mmHg));
     m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Hemorrhage Rate (mL/s)", m_hemorrhageLeg->GetRate(VolumePerTimeUnit::mL_Per_s));
 
     m_pulseObj->GetEngineTracker()->TrackData(m_totalTime);

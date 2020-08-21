@@ -120,10 +120,10 @@ namespace imstk
         {
           sumAccels();
         });
-    m_updateVelocityNoGravityNode =
-      m_taskGraph->addFunction("SPHModel_UpdateVelocityNoGravity", [&]()
+    m_updateVelocityNode =
+      m_taskGraph->addFunction("SPHModel_UpdateVelocity", [&]()
         {
-          updateVelocityNoGravity(getTimeStep());
+          updateVelocity(getTimeStep());
         });
     m_moveParticlesNode =
       m_taskGraph->addFunction("SPHModel_MoveParticles", [&]()
@@ -204,8 +204,8 @@ namespace imstk
     m_taskGraph->addEdge(m_computeViscosityNode, m_integrateNode);
     m_taskGraph->addEdge(m_computeTimeStepSizeNode, m_integrateNode);
 
-    m_taskGraph->addEdge(m_integrateNode, m_updateVelocityNoGravityNode);
-    m_taskGraph->addEdge(m_updateVelocityNoGravityNode, m_moveParticlesNode);
+    m_taskGraph->addEdge(m_integrateNode, m_updateVelocityNode);
+    m_taskGraph->addEdge(m_updateVelocityNode, m_moveParticlesNode);
     m_taskGraph->addEdge(m_moveParticlesNode, sink);
   }
 
@@ -604,22 +604,7 @@ namespace imstk
           return;
         }
 
-        getState().getVelocities()[p] += (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep;
-      });
-  }
-
-  void
-    SPHModel::updateVelocityNoGravity(Real timestep)
-  {
-    ParallelUtils::parallelFor(getState().getNumParticles(),
-      [&](const size_t p) {
-        if (m_sphBoundaryConditions &&
-          (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::buffer ||
-            m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::wall))
-        {
-          return;
-        }
-
+        // todo - simply run SPH for half a time step to start to we don't need to perform this check at every time step
         if (m_timeStepCount == 0)
         {
           getState().getHalfStepVelocities()[p] = getState().getFullStepVelocities()[p] + (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep / 2;
@@ -627,13 +612,11 @@ namespace imstk
         }
         else
         {
-          //getState().getVelocities()[p] += getState().getAccelerations()[p] * timestep;
           getState().getHalfStepVelocities()[p] += (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep;
           getState().getFullStepVelocities()[p] = getState().getHalfStepVelocities()[p] + (m_modelParameters->m_gravity + getState().getAccelerations()[p]) * timestep / 2;
         }
         if (m_sphBoundaryConditions && m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::inlet)
         {
-          //getState().getVelocities()[p] = m_sphBoundaryConditions->computeParabolicInletVelocity(getState().getPositions()[p]);
           getState().getHalfStepVelocities()[p] = m_sphBoundaryConditions->computeParabolicInletVelocity(getState().getPositions()[p]);
           getState().getFullStepVelocities()[p] = m_sphBoundaryConditions->computeParabolicInletVelocity(getState().getPositions()[p]);
         }
@@ -675,8 +658,9 @@ namespace imstk
           particleTypes[p] = SPHBoundaryConditions::ParticleType::fluid;
           // insert particle into inlet domain from buffer domain
           // todo: come up with a better way to find buffer indices
-          const std::vector<SPHBoundaryConditions::ParticleType>::iterator it = std::find(particleTypes.begin(), particleTypes.end(), SPHBoundaryConditions::ParticleType::buffer);
-          const size_t bufferParticleIndex = std::distance(particleTypes.begin(), it);
+          // right now, the buffer index is limiting the parallel ability of this function
+          const size_t bufferParticleIndex = m_sphBoundaryConditions->getBufferIndices().back();
+          m_sphBoundaryConditions->getBufferIndices().pop_back();
           particleTypes[bufferParticleIndex] = SPHBoundaryConditions::ParticleType::inlet;
 
           getState().getPositions()[bufferParticleIndex] = m_sphBoundaryConditions->placeParticleAtInlet(oldPosition);
@@ -689,6 +673,7 @@ namespace imstk
           particleTypes[p] = SPHBoundaryConditions::ParticleType::buffer;
           // insert particle into buffer domain after it leaves outlet domain
           getState().getPositions()[p] = m_sphBoundaryConditions->getBufferCoord();
+          m_sphBoundaryConditions->getBufferIndices().push_back(p);
         }
         else if (particleTypes[p] == SPHBoundaryConditions::ParticleType::fluid &&
           m_sphBoundaryConditions->isInOutletDomain(newPosition))
@@ -700,6 +685,7 @@ namespace imstk
         {
             particleTypes[p] = SPHBoundaryConditions::ParticleType::buffer;
             getState().getPositions()[p] = m_sphBoundaryConditions->getBufferCoord();
+            m_sphBoundaryConditions->getBufferIndices().push_back(p);
         }
       }
 
