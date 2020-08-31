@@ -126,6 +126,8 @@ else()
     RenderingVolume
     RenderingVolumeOpenGL2
     ViewsContext2D)
+endif()
+
 if (${PROJECT_NAME}_ENABLE_VR)
   list(APPEND VTK_DEPENDENCIES RenderingOpenVR)
 endif()
