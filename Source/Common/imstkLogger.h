@@ -75,7 +75,7 @@ class Logger
 {
 public:
     ///
-    /// \brief TODO
+    /// \brief Gets logger instances, creates if doesn't exist yet
     ///
     static Logger& getInstance()
     {
@@ -88,6 +88,18 @@ public:
         }
 
         return instance;
+    }
+
+    ///
+    /// \brief Starts logger with default sinks, use getInstance to
+    /// create a logger with no sinks
+    /// 
+    static Logger& startLogger()
+    {
+        Logger& logger = Logger::getInstance();
+        logger.addFileSink("simulation");
+        logger.addStdoutSink();
+        return logger;
     }
 
     // Disable copy & move constructors & assignments
@@ -105,7 +117,7 @@ public:
     ///
     /// \brief Add a sink that logs to file
     ///
-    std::unique_ptr<FileSinkHandle> addFileSink(const std::string& name, const std::string& path);
+    std::unique_ptr<FileSinkHandle> addFileSink(const std::string& name, const std::string& path = "./");
 
     ///
     /// \brief Add your own sink

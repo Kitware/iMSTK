@@ -27,16 +27,16 @@ namespace imstk
 {
 CameraController::CameraController(std::shared_ptr<Camera>       camera,
                                    std::shared_ptr<DeviceClient> deviceClient) :
-    Module("Camera controller"),
+    LoopThreadObject("Camera controller"),
     m_camera(camera),
     m_cameraTranslationOffset(WORLD_ORIGIN),
     m_cameraRotationalOffset(Quatd::Identity()),
-    DeviceTracker(deviceClient)
+    TrackingDeviceControl(deviceClient)
 {
 }
 
 void
-CameraController::runModule()
+CameraController::updateThread()
 {
     if (!m_trackingDataUptoDate)
     {
@@ -104,4 +104,4 @@ CameraController::getCameraRotationOffset() const
 {
     return m_cameraRotationalOffset;
 }
-} // imstk
+}

@@ -24,18 +24,16 @@
 #include "imstkInteractorStyle.h"
 
 #include <vtkInteractorStyleTrackballCamera.h>
-#include <chrono>
-#include <memory>
 
 namespace imstk
 {
-class SimulationManager;
-class VTKTextStatusManager;
+class KeyboardDeviceClient;
+class MouseDeviceClient;
 
 ///
 /// \class VTKInteractorStyle
 ///
-/// \brief TODO
+/// \brief Interactor styles forward their controls to imstk objects
 ///
 class VTKInteractorStyle : public vtkInteractorStyleTrackballCamera, public InteractorStyle
 {
@@ -44,11 +42,7 @@ public:
     vtkTypeMacro(VTKInteractorStyle, vtkInteractorStyleTrackballCamera) VTKInteractorStyle();
     virtual ~VTKInteractorStyle() override;
 
-    ///
-    /// \brief Set current renderer
-    ///
-    virtual void SetCurrentRenderer(vtkRenderer* ren) override;
-
+public:
     ///
     /// \brief Slot for timer tick
     ///
@@ -57,7 +51,19 @@ public:
     ///
     /// \brief Slot for key pressed
     ///
-    virtual void OnChar() override;
+    virtual void OnKeyPress() override;
+
+    ///
+    /// \brief Slot for key released
+    ///
+    virtual void OnKeyRelease() override;
+
+    ///
+    /// \brief Filter out these events
+    /// 
+    virtual void OnKeyDown() override { }
+    virtual void OnKeyUp() override { }
+    virtual void OnChar() override { }
 
     ///
     /// \brief Slot for moved mouse cursor
@@ -112,27 +118,11 @@ public:
     virtual void OnFourthButtonUp() override {}
     virtual void OnFifthButtonUp() override {}
 
-    ///
-    /// \brief Return the pointer to simulation manager
-    ///
-    SimulationManager* getSimulationManager() { return m_simManager; }
-
-    ///
-    /// \brief Return the window status handler
-    ///
-    const std::shared_ptr<VTKTextStatusManager>& getTextStatusManager() { return m_textStatusManager; }
+    std::shared_ptr<KeyboardDeviceClient> getKeyboardDeviceClient() const { return m_keyboardDeviceClient; }
+    std::shared_ptr<MouseDeviceClient> getMouseDeviceClient() const { return m_mouseDeviceClient; }
 
 private:
-
-    friend class VTKViewer;
-
-    SimulationManager* m_simManager;                                ///> SimulationManager owning the current simulation being interacted with
-    std::chrono::high_resolution_clock::time_point m_pre;           ///> time point pre-rendering
-    std::chrono::high_resolution_clock::time_point m_post;          ///> time point post-rendering
-    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
-
-    std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///> Handle text statuses, including fps status and custom text status
-    bool   m_displayFps = false;                                    ///> hide or display framerate
-    double m_lastFps;                                               ///> last framerate value used for moving average estimate
+    std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
+    std::shared_ptr<MouseDeviceClient>    m_mouseDeviceClient;
 };
 } // imstk

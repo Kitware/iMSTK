@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <vtkSmartPointer.h>
 #include <memory>
 
@@ -43,10 +45,10 @@ class VisualModel;
 ///
 /// \brief Base class for VTK render delegates
 ///
-class VTKRenderDelegate
+class VTKRenderDelegate : public EventObject
 {
 public:
-    virtual ~VTKRenderDelegate() = default;
+    virtual ~VTKRenderDelegate() override = default;
 
     ///
     /// \brief Instantiate proper render delegate

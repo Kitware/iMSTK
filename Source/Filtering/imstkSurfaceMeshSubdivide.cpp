@@ -37,6 +37,12 @@ SurfaceMeshSubdivide::SurfaceMeshSubdivide()
     setOutput(std::make_shared<SurfaceMesh>());
 }
 
+std::shared_ptr<SurfaceMesh>
+SurfaceMeshSubdivide::getOutputMesh()
+{
+    return std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0));
+}
+
 void
 SurfaceMeshSubdivide::setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh)
 {

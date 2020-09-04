@@ -127,7 +127,7 @@ computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh>
     const Vec3d  spacing = imageData->getSpacing();
     const Vec3d  shift   = imageData->getOrigin() + spacing * 0.5;
 
-    DataArray<float>& scalars = *static_cast<DataArray<float>*>(imageData->getScalars().get());
+    DataArray<double>& scalars = *static_cast<DataArray<double>*>(imageData->getScalars().get());
 
     // Split the work up along z using thread count to avoid making too many octtrees (may not be most optimal)
     ParallelUtils::parallelFor(numThreads, [&](const size_t& i)
@@ -231,7 +231,7 @@ SurfaceMeshDistanceTransform::requestUpdate()
     Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
     Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
     Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);
-    outputImageData->allocate(IMSTK_FLOAT, 1, m_Dimensions, spacing, origin);
+    outputImageData->allocate(IMSTK_DOUBLE, 1, m_Dimensions, spacing, origin);
 
     /* StopWatch timer;
      timer.start();*/

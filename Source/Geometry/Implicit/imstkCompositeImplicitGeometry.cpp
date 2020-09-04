@@ -44,7 +44,6 @@ CompositeImplicitGeometry::getFunctionValue(const Vec3d& pos) const
             distA = std::min(distA, distB);
             break;
         }
-        ;
     }
     return distA;
 }

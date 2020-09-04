@@ -20,9 +20,9 @@
 =========================================================================*/
 
 #include "imstkVTKTextStatusManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkVTKInteractorStyle.h"
 #include "imstkVTKViewer.h"
+#include "imstkLogger.h"
 
 #include <vtkRenderWindow.h>
 #include <vtkTextActor.h>
@@ -30,11 +30,9 @@
 
 namespace imstk
 {
-VTKTextStatusManager::VTKTextStatusManager(VTKInteractorStyle* const vtkInteractorStyle) :
-    m_vtkInteractorStyle(vtkInteractorStyle)
+VTKTextStatusManager::VTKTextStatusManager()
 {
-    LOG_IF(FATAL, (!vtkInteractorStyle)) << "Invalid vtkInteractorStyle";
-    for (int i = 0; i < StatusType::NumStatusTypes; ++i)
+    for (int i = 0; i < static_cast<int>(StatusType::NumStatusTypes); ++i)
     {
         m_StatusActors[i] = vtkTextActor::New();
         m_StatusActors[i]->SetVisibility(false);
@@ -45,7 +43,7 @@ VTKTextStatusManager::VTKTextStatusManager(VTKInteractorStyle* const vtkInteract
 
 VTKTextStatusManager::~VTKTextStatusManager()
 {
-    for (int i = 0; i < StatusType::NumStatusTypes; ++i)
+    for (int i = 0; i < static_cast<int>(StatusType::NumStatusTypes); ++i)
     {
         m_StatusActors[i]->Delete();
     }
@@ -54,7 +52,7 @@ VTKTextStatusManager::~VTKTextStatusManager()
 vtkTextActor*
 VTKTextStatusManager::getTextActor(const int i)
 {
-    if (i < 0 || i >= StatusType::NumStatusTypes)
+    if (i < 0 || i >= static_cast<int>(StatusType::NumStatusTypes))
     {
         LOG(WARNING) << "Invalid text actor index";
         return m_StatusActors[0];
@@ -65,26 +63,32 @@ VTKTextStatusManager::getTextActor(const int i)
 void
 VTKTextStatusManager::setStatusVisibility(const StatusType type, const bool bVisible)
 {
-    m_StatusActors[type]->SetVisibility(bVisible);
+    m_StatusActors[static_cast<int>(type)]->SetVisibility(bVisible);
+}
+
+bool
+VTKTextStatusManager::getStatusVisibility(const StatusType type)
+{
+    return m_StatusActors[static_cast<int>(type)]->GetVisibility();
 }
 
 void
 VTKTextStatusManager::setStatusFontSize(const StatusType type, const int fontSize)
 {
-    m_StatusFontSizes[type] = fontSize; // Store font size to compute and adjust text location later
-    m_StatusActors[type]->GetTextProperty()->SetFontSize(fontSize);
+    m_StatusFontSizes[static_cast<int>(type)] = fontSize; // Store font size to compute and adjust text location later
+    m_StatusActors[static_cast<int>(type)]->GetTextProperty()->SetFontSize(fontSize);
 }
 
 void
 VTKTextStatusManager::setStatusFontColor(const StatusType type, const Color color)
 {
-    m_StatusActors[type]->GetTextProperty()->SetColor(color.r, color.g, color.b);
+    m_StatusActors[static_cast<int>(type)]->GetTextProperty()->SetColor(color.r, color.g, color.b);
 }
 
 void
 VTKTextStatusManager::setStatusDisplayCorner(const StatusType type, const DisplayCorner corner)
 {
-    m_StatusDisplayCorners[type] = corner;
+    m_StatusDisplayCorners[static_cast<int>(type)] = corner;
 }
 
 void
@@ -110,39 +114,35 @@ VTKTextStatusManager::setFPS(const double visualFPS, const double physicsFPS)
     }
 
     std::string fpsString = fpsVisualStr + std::string(" | ") + fpsPhysicalStr;
-    auto        fpsStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[StatusType::FPS],
-                                                     m_StatusFontSizes[StatusType::FPS],
+    auto        fpsStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[static_cast<int>(StatusType::FPS)],
+                                                     m_StatusFontSizes[static_cast<int>(StatusType::FPS)],
                                                      fpsString);
-    m_StatusActors[StatusType::FPS]->SetDisplayPosition(fpsStatusCoordinate[0], fpsStatusCoordinate[1]);
-    m_StatusActors[StatusType::FPS]->SetInput((fpsString).c_str());
+    m_StatusActors[static_cast<int>(StatusType::FPS)]->SetDisplayPosition(fpsStatusCoordinate[0], fpsStatusCoordinate[1]);
+    m_StatusActors[static_cast<int>(StatusType::FPS)]->SetInput((fpsString).c_str());
 }
 
 void
 VTKTextStatusManager::setCustomStatus(const std::string& status)
 {
-    auto customStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[StatusType::Custom],
-                                                        m_StatusFontSizes[StatusType::Custom],
+    auto customStatusCoordinate = computeStatusLocation(m_StatusDisplayCorners[static_cast<int>(StatusType::Custom)],
+                                                        m_StatusFontSizes[static_cast<int>(StatusType::Custom)],
                                                         status);
-    m_StatusActors[StatusType::Custom]->SetInput(status.c_str());
-    m_StatusActors[StatusType::Custom]->SetDisplayPosition(customStatusCoordinate[0], customStatusCoordinate[1]);
-    m_StatusActors[StatusType::Custom]->SetVisibility(true);
+    m_StatusActors[static_cast<int>(StatusType::Custom)]->SetInput(status.c_str());
+    m_StatusActors[static_cast<int>(StatusType::Custom)]->SetDisplayPosition(customStatusCoordinate[0], customStatusCoordinate[1]);
+    m_StatusActors[static_cast<int>(StatusType::Custom)]->SetVisibility(true);
 }
 
 void
 VTKTextStatusManager::clearCustomStatus()
 {
-    m_StatusActors[StatusType::Custom]->SetInput("");
-    m_StatusActors[StatusType::Custom]->SetVisibility(false);
+    m_StatusActors[static_cast<int>(StatusType::Custom)]->SetInput("");
+    m_StatusActors[static_cast<int>(StatusType::Custom)]->SetVisibility(false);
 }
 
 std::array<int, 2>
 VTKTextStatusManager::computeStatusLocation(const DisplayCorner corner, const int fontSize, const std::string& text)
 {
-    auto simManager = m_vtkInteractorStyle->getSimulationManager();
-    LOG_IF(FATAL, (!simManager)) << "Invalid simulation manager";
-
-    auto       viewer       = std::dynamic_pointer_cast<VTKViewer>(simManager->getViewer());
-    const int* windowSize   = viewer->getVtkRenderWindow()->GetSize();
+    const int* windowSize   = m_viewer->getVtkRenderWindow()->GetSize();
     const auto wWidth       = windowSize[0];
     const auto wHeight      = windowSize[1];
     const int  numLines     = static_cast<int>(std::count(text.begin(), text.end(), '\n')) + 1;

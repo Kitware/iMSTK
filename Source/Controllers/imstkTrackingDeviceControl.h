@@ -21,25 +21,20 @@
 
 #pragma once
 
+#include "imstkDeviceControl.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
-class DeviceClient;
-
 ///
-/// \class DeviceTracker
+/// \class TrackingDeviceControl
 ///
-/// \brief This class reports external device's position and orientation with a given offset
+/// \brief Base class for all DeviceControls that track
+/// something in space (position and orientation)
 ///
-class DeviceTracker
+class TrackingDeviceControl : public DeviceControl
 {
 public:
-
-    ///
-    /// \enum
-    /// \brief TODO
-    ///
     enum InvertFlag
     {
         transX = 0x01,
@@ -50,26 +45,52 @@ public:
         rotZ = 0x20
     };
 
+public:
+    TrackingDeviceControl();
+    TrackingDeviceControl(std::shared_ptr<DeviceClient> device);
+    virtual ~TrackingDeviceControl() override = default;
+
+public:
     ///
-    /// \brief Constructor
+    /// \brief Update controlled scene objects using latest tracking information
     ///
-    explicit DeviceTracker(std::shared_ptr<DeviceClient> deviceClient);
+    virtual void updateControlledObjects() = 0;
 
     ///
-    /// \brief Destructor
+    /// \brief Apply forces to the haptic device
     ///
-    virtual ~DeviceTracker() = default;
+    virtual void applyForces() = 0;
 
     ///
-    /// \brief Compute the world position and orientation
+    /// \brief Sets the tracking data to be out of date or up to date
     ///
-    bool updateTrackingData();
+    void setTrackerToOutOfDate() { m_trackingDataUptoDate = false; }
+    void setTrackerToUpToDate() { m_trackingDataUptoDate = true; }
 
     ///
-    /// \brief Get/Set the device client
+    /// \brief Returns true if the tracking data is already updated in current frame. Else, false.
     ///
-    std::shared_ptr<DeviceClient> getDeviceClient() const;
-    void setDeviceClient(std::shared_ptr<DeviceClient> deviceClient);
+    bool isTrackerUpToDate() const { return m_trackingDataUptoDate; }
+
+    ///
+    /// \brief Get the latest position
+    ///
+    const Vec3d& getPosition() const { return m_currentPos; };
+
+    ///
+    /// \brief Set the position of the tracker
+    ///
+    void setPosition(const Vec3d& pos) { this->m_currentPos = pos; }
+
+    ///
+    /// \brief Get the latest rotation
+    ///
+    const Quatd& getRotation() const { return m_currentRot; };
+
+    ///
+    /// \brief Set the orientation of the tracker
+    ///
+    void setRotation(const Quatd& orientation) { this->m_currentRot = orientation; }
 
     ///
     /// \brief Get/Set the current scaling factor
@@ -96,29 +117,11 @@ public:
     void setInversionFlags(unsigned char f);
 
     ///
-    /// \brief Sets the tracking data to be out of date or up to date
+    /// \brief Compute the world position and orientation
     ///
-    void setTrackerToOutOfDate() { m_trackingDataUptoDate = false; }
-    void setTrackerToUpToDate() { m_trackingDataUptoDate = true; }
-
-    ///
-    /// \brief Returns true if the tracking data is already updated in current frame. Else, false.
-    ///
-    bool isTrackerUpToDate() const { return m_trackingDataUptoDate; }
-
-    ///
-    /// \brief Get the latest position
-    ///
-    const Vec3d& getPosition() { return m_currentPos; };
-
-    ///
-    /// \brief Get the latest rotation
-    ///
-    const Quatd& getRotation() { return m_currentRot; };
+    bool updateTrackingData();
 
 protected:
-
-    std::shared_ptr<DeviceClient> m_deviceClient;          ///< Reports device tracking information
     double m_scaling = 1.0;                                ///< Scaling factor for physical to virtual translations
     Vec3d  m_translationOffset;                            ///< Translation concatenated to the device translation
     Quatd  m_rotationOffset;                               ///< Rotation concatenated to the device rotation
@@ -126,6 +129,6 @@ protected:
 
     Vec3d m_currentPos;
     Quatd m_currentRot;
-    bool  m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
+    bool  m_trackingDataUptoDate = false;
 };
 } // imstk

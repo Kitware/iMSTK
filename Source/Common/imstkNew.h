@@ -25,8 +25,6 @@ limitations under the License.
 
 namespace imstk
 {
-namespace expiremental
-{
 //template<typename T>
 //using imstkSmartPtr = std::shared_ptr<T>;
 //
@@ -39,7 +37,8 @@ namespace expiremental
 ///
 /// \class imstkNew
 ///
-/// \brief Convenience class for STL shared allocations.
+/// \brief std::shared_ptr<T> obj = std::make_shared<T>(); equivalent, convenience class
+/// for STL shared allocations. Cannot be used in overloaded polymorphic calls
 ///
 template<class T>
 class imstkNew
@@ -72,17 +71,13 @@ public:
     const std::shared_ptr<T>& get() const { return object; }
 
     ///
-    /// \brief Implicit conversion, cannot do two implicit conversions in a row.
-    /// Thus it's not possible to go from imstkNew<T> -> std::shared_ptr<U> with
-    /// this function. Where T : U.
+    /// \brief Implicit conversion
     ///
     operator std::shared_ptr<T>() const { return object; }
 
     ///
-    /// \brief Two implicit conversions cannot be done in row.
-    /// This provides one implicit conversion to base class type.
-    /// It will not work with overloads though as it will not know which type to
-    /// cast too.
+    /// \brief Hack for multiple implicit conversions, does not work with overloads though
+    /// as it won't know what to cast too
     ///
     template<typename U>
     operator std::shared_ptr<U>() const
@@ -96,5 +91,4 @@ private:
     void operator=(const imstkNew<T>&) = delete;
     std::shared_ptr<T> object;
 };
-}
 }

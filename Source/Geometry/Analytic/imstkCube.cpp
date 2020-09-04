@@ -82,12 +82,4 @@ Cube::updatePostTransformData() const
     m_widthPostTransform = m_scaling * m_width;
     m_transformApplied   = true;
 }
-
-double
-Cube::getFunctionValue(const Vec3d& pos) const
-{
-    // Make it so that only negatives are within the cube, ie: position so cube's maxima is at origin
-    const Vec3d d = (pos.cwiseAbs() - m_position) - Vec3d(m_width, m_width, m_width) * 0.5;
-    return std::min(std::max(d[0], std::max(d[1], d[2])), 0.0) + d.cwiseMax(0.0).norm();
-}
 } // imstk

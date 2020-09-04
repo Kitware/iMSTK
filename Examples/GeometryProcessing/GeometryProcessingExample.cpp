@@ -23,21 +23,22 @@
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
 #include "imstkQuadricDecimate.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
-#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief This example demonstrates erosion of a mesh
@@ -45,9 +46,10 @@ using namespace imstk::expiremental;
 int
 main()
 {
+    Logger::startLogger();
+
     // simManager and Scene
-    imstkNew<SimulationManager> simManager;
-    std::shared_ptr<Scene>      scene = simManager->createNewScene("GeometryTransforms");
+    imstkNew<Scene> scene("GeometryProcessing");
 
     auto                  coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     imstkNew<SurfaceMesh> coarseSurfMesh;
@@ -60,8 +62,8 @@ main()
     createSdf->update();
 
     // Erode
-    const float       erosionDist = 0.2f;
-    DataArray<float>& scalars     = *std::dynamic_pointer_cast<DataArray<float>>(createSdf->getOutputImage()->getScalars());
+    const double       erosionDist = 0.2;
+    DataArray<double>& scalars     = *std::dynamic_pointer_cast<DataArray<double>>(createSdf->getOutputImage()->getScalars());
     for (size_t i = 0; i < scalars.size(); i++)
     {
         scalars[i] += erosionDist;
@@ -104,19 +106,27 @@ main()
     scene->addSceneObject(sceneObj);
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 12, 12));
-    cam->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 12.0, 12.0));
 
     // Light
     imstkNew<DirectionalLight> light("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Running);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->start();
+    }
 
     return 0;
 }

@@ -33,14 +33,11 @@ class vtkCamera;
 class vtkChartXY;
 class vtkContextActor;
 class vtkLight;
+class vtkOpenVRCamera;
 class vtkPlotBar;
 class vtkProp;
 class vtkRenderer;
 class vtkTable;
-
-#ifdef iMSTK_ENABLE_VR
-class vtkOpenVRCamera;
-#endif
 
 namespace imstk
 {
@@ -51,24 +48,17 @@ class VTKRenderDelegate;
 ///
 /// \class VTKRenderer
 ///
-/// \brief
+/// \brief Wraps a vtkRenderer
 ///
 class VTKRenderer : public Renderer
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
     VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR);
-
-    ///
-    /// \brief Default destructor
-    ///
     virtual ~VTKRenderer() override = default;
 
+public:
     ///
-    /// \brief Set/Get the rendering mode which defined the
-    /// visibility of the renderer actors and the default camera
+    /// \brief Set the rendering mode to display debug actors or not
     ///
     void setMode(const Mode mode, const bool enableVR) override;
 
@@ -109,9 +99,9 @@ public:
     bool getTimeTableVisibility() const;
 
     ///
-    /// \brief Updates the scene camera's position and orientation
+    /// \brief Updates the camera
     ///
-    void updateSceneCamera(std::shared_ptr<Camera> imstkCam);
+    void updateCamera();
 
     ///
     /// \brief Updates the render delegates
@@ -126,7 +116,7 @@ public:
     ///
     /// \brief Returns VTK renderer
     ///
-    vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
+    vtkSmartPointer<vtkRenderer> getVtkRenderer() const { return m_vtkRenderer; }
 
     ///
     /// \brief Update background colors
@@ -147,9 +137,8 @@ protected:
 protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
-    // cameras
-    vtkSmartPointer<vtkCamera> m_defaultVtkCamera;
-    vtkSmartPointer<vtkCamera> m_sceneVtkCamera;
+    // Camera
+    vtkSmartPointer<vtkCamera> m_Camera;
 
     // lights
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
@@ -167,9 +156,6 @@ protected:
     std::shared_ptr<Scene> m_scene;
 
     TextureManager<VTKTextureDelegate> m_textureManager;
-#ifdef iMSTK_ENABLE_VR
-    std::vector<vtkSmartPointer<vtkOpenVRCamera>> m_cams;
-#endif
 
     vtkSmartPointer<vtkChartXY>      m_timeTableChart;
     vtkSmartPointer<vtkContextActor> m_timeTableChartActor;

@@ -26,7 +26,6 @@
 namespace imstk
 {
 class ImageData;
-class SurfaceMesh;
 template<typename T> class DataArray;
 
 ///
@@ -45,23 +44,32 @@ public:
 
 public:
     ///
-    /// \brief Returns signed distance to surface at pos, returns inf value if out of bounds of the SDF
+    /// \brief Returns signed distance to surface at pos, returns clamped/nearest if out of bounds
     ///
-    virtual double getFunctionValue(const Vec3d& pos) const override;
+    double getFunctionValue(const Vec3d& pos) const override;
 
     ///
-    /// \brief Returns gradient of signed distance field at pos
-    /// overriden to avoid multiple bounds check done in getFunctionValue
+    /// \brief Returns signed distance to surface at coordinate
     ///
-    virtual Vec3d getFunctionGrad(const Vec3d& pos, const double dx = 1.0) const override;
+    double getFunctionValueCoord(const Vec3i& coord) const;
 
+    ///
+    /// \brief Returns the bounds of the field
+    ///
     const Vec6d& getBounds() const { return m_bounds; }
+
+    ///
+    /// \brief Get the SDF as a float image
+    ///
+    std::shared_ptr<ImageData> getImage() const { return m_imageDataSdf; }
 
 protected:
     std::shared_ptr<ImageData> m_imageDataSdf;
-    std::shared_ptr<ImageData> m_imageDataGradient;
+
     Vec3d m_invSpacing;
     Vec6d m_bounds;
-    std::shared_ptr<DataArray<float>> m_scalars;
+    Vec3d m_shift;
+
+    std::shared_ptr<DataArray<double>> m_scalars;
 };
 }

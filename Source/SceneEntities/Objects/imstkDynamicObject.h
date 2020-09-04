@@ -84,7 +84,7 @@ public:
     ///
     /// \brief Update only the physics geometry and apply collision map
     ///
-    void updatePhysicsGeometry();
+    virtual void updatePhysicsGeometry();
 
     ///
     /// \brief Initialize the scene object

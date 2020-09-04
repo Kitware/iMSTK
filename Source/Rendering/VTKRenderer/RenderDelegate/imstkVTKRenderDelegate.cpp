@@ -48,6 +48,7 @@
 
 #include <vtkActor.h>
 #include <vtkAlgorithmOutput.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -59,7 +60,7 @@
 #include <vtkTexture.h>
 #include <vtkTransform.h>
 #include <vtkVolume.h>
-#include <vtkColorTransferFunction.h>
+#include <vtkVolumeProperty.h>
 
 namespace imstk
 {
@@ -74,6 +75,8 @@ VTKRenderDelegate::VTKRenderDelegate() :
     m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
     m_actor->SetUserTransform(m_transform);
     m_volume->SetMapper(m_volumeMapper); // remove this as a default?
+    /*m_volumeMapper->SetAutoAdjustSampleDistances(false);
+    m_volumeMapper->SetSampleDistance(0.01);*/
 }
 
 std::shared_ptr<VTKRenderDelegate>
@@ -553,7 +556,7 @@ VTKRenderDelegate::updateActorPropertiesVolumeRendering()
         return;
     }
 
-    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
+    if (auto volumeMat = std::dynamic_pointer_cast<VolumeRenderMaterial>(material))
     {
         switch (volumeMat->getBlendMode())
         {

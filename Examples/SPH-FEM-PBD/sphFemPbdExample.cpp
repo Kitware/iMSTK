@@ -24,8 +24,10 @@
 #include "imstkFeDeformableObject.h"
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkImageData.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdConstraint.h"
@@ -33,7 +35,7 @@
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSurfaceMesh.h"
@@ -42,9 +44,9 @@
 #include "imstkTetraTriangleMap.h"
 #include "imstkViewer.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief Generate a box-shape fluid object
@@ -125,7 +127,7 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     fluidMaterial->setVertexColor(Color::Orange);
-    fluidMaterial->setPointSize(particleRadius);
+    fluidMaterial->setPointSize(static_cast<double>(particleRadius));
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Setup the Object
@@ -241,12 +243,15 @@ makePBDDragonObject(const std::string& name, const Vec3d& position)
 int
 main()
 {
-    imstkNew<SimulationManager> simManager;
-    auto                        scene = simManager->createNewScene("SPH-FEM-PBD");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("SPH-FEM-PBD");
 
     // Setup the scene
     {
-        scene->getCamera()->setPosition(0, 2.0, 15.0);
+        scene->getConfig()->taskTimingEnabled = true;
+        scene->getActiveCamera()->setPosition(0.0, 2.0, 25.0);
 
         // Deformable Pbd Dragon
         std::shared_ptr<PbdObject> pbdDragon = makePBDDragonObject("PBDDragon", Vec3d(-5.0, 0.0, 0.0));
@@ -267,9 +272,34 @@ main()
         scene->addLight(light);
     }
 
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     imstkNew<TaskGraphVizWriter> writer;
     writer->setFileName("sphFemPbdInteractionTaskGraph.svg");

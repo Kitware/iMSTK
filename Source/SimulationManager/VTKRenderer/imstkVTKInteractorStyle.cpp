@@ -20,27 +20,21 @@
 =========================================================================*/
 
 #include "imstkVTKInteractorStyle.h"
-#include "imstkScene.h"
-#include "imstkSimulationManager.h"
-#include "imstkViewer.h"
-#include "imstkVTKRenderer.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkVTKViewer.h"
+#include "imstkKeyboardDeviceClient.h"
+#include "imstkMouseDeviceClient.h"
 
 #include <vtkObjectFactory.h>
-#include <vtkRenderer.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkTextActor.h>
+#include <vtkRenderWindow.h>
 
 namespace imstk
 {
 vtkStandardNewMacro(VTKInteractorStyle);
 
-VTKInteractorStyle::VTKInteractorStyle()
+VTKInteractorStyle::VTKInteractorStyle() :
+    m_keyboardDeviceClient(KeyboardDeviceClient::New()),
+    m_mouseDeviceClient(MouseDeviceClient::New())
 {
-    m_textStatusManager = std::make_shared<VTKTextStatusManager>(this);
-    m_lastFpsUpdate     = std::chrono::high_resolution_clock::now();
-    m_lastFps = 60.0;
 }
 
 VTKInteractorStyle::~VTKInteractorStyle()
@@ -49,344 +43,82 @@ VTKInteractorStyle::~VTKInteractorStyle()
 }
 
 void
-VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
-{
-    // Remove actor if previous renderer
-    if (this->CurrentRenderer)
-    {
-        for (int i = 0; i < VTKTextStatusManager::NumStatusTypes; ++i)
-        {
-            this->CurrentRenderer->RemoveActor2D(m_textStatusManager->getTextActor(i));
-        }
-    }
-
-    // Set new current renderer
-    vtkInteractorStyleTrackballCamera::SetCurrentRenderer(ren);
-
-    // Add actor to current renderer
-    for (int i = 0; i < VTKTextStatusManager::NumStatusTypes; ++i)
-    {
-        this->CurrentRenderer->AddActor2D(m_textStatusManager->getTextActor(i));
-    }
-}
-
-void
 VTKInteractorStyle::OnTimer()
 {
-    auto renderer = std::static_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer());
-
-    // Update Camera
-    renderer->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
-
-    // Update render delegates
-    renderer->updateRenderDelegates();
-
-    // Reset camera clipping range
-    this->CurrentRenderer->ResetCameraClippingRange();
-
-    if (m_displayFps)
-    {
-        // Update framerate value display
-        auto   now       = std::chrono::high_resolution_clock::now();
-        double visualFPS = 1e6 / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count());
-        visualFPS = 0.1 * visualFPS + 0.9 * m_lastFps;
-        m_lastFps = visualFPS;
-
-        int t = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastFpsUpdate).count());
-        if (t > 250) //wait 250ms before updating displayed value
-        {
-            double physicalFPS;
-            if (m_simManager->getStatus() != SimulationStatus::Paused)
-            {
-                physicalFPS = m_simManager->getActiveScene()->getFPS();
-            }
-            else
-            {
-                physicalFPS = -1.0; // negative value means paused
-            }
-
-            m_textStatusManager->setFPS(visualFPS, physicalFPS);
-            m_lastFpsUpdate = now;
-        }
-        m_pre = now;
-    }
-
-    // Render
-    this->Interactor->Render();
-    m_post = std::chrono::high_resolution_clock::now();
-
-    // Plan next render
-    this->Interactor->CreateOneShotTimer(0);
-
-    // Call custom behavior
-    if (m_onTimerFunction)
-    {
-        // Call the custom behavior to run on every frame
-        m_onTimerFunction(this);
-    }
+    m_updateFunc();
 }
 
 void
-VTKInteractorStyle::OnChar()
+VTKInteractorStyle::OnKeyPress()
 {
-    char key = this->Interactor->GetKeyCode();
+    // Submit the change to the keyboard device client
+    m_keyboardDeviceClient->emitKeyDown(this->Interactor->GetKeyCode());
+}
 
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onCharFunctionMap.count(key)
-        && m_onCharFunctionMap.at(key)
-        && m_onCharFunctionMap.at(key)(this))
-    {
-        return;
-    }
-
-    SimulationStatus status = m_simManager->getStatus();
-
-    if (key == ' ')
-    {
-        // pause simulation
-        if (status == SimulationStatus::Running)
-        {
-            m_simManager->pause();
-        }
-        // play simulation
-        else if (status == SimulationStatus::Paused)
-        {
-            m_simManager->run();
-        }
-        // Launch simulation if inactive
-        if (status == SimulationStatus::Inactive)
-        {
-            m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
-            m_simManager->start(SimulationStatus::Running);
-        }
-    }
-    else if (status != SimulationStatus::Inactive
-             && (key == 'q' || key == 'Q' || key == 'e' || key == 'E')) // end Simulation
-    {
-        m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, false);
-        //m_simManager->endSimulation();
-    }
-    else if (key == 'd' || key == 'D')  // switch rendering mode
-    {
-        if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Simulation)
-        {
-            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::Simulation);
-        }
-        else
-        {
-            m_simManager->getViewer()->setRenderingMode(Renderer::Mode::Debug);
-        }
-    }
-    else if (key == '\u001B')  // quit viewer
-    {
-        m_simManager->getViewer()->endRenderingLoop();
-    }
-    else if (key == 'p' || key == 'P')  // switch framerate display
-    {
-        m_displayFps = !m_displayFps;
-        m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
-
-        const auto activeScene = m_simManager->getActiveScene();
-        const bool enabled     = !activeScene->getConfig()->taskTimingEnabled;
-        activeScene->setTaskTimingFlag(enabled);
-        const auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(m_simManager->getViewer()->getActiveRenderer());
-        vtkRen->setTimeTableVisibility(enabled);
-
-        this->Interactor->Render();
-    }
-    else if (key == 'r' || key == 'R')
-    {
-        m_simManager->reset();
-    }
+void
+VTKInteractorStyle::OnKeyRelease()
+{
+    // Submit the change to the keyboard device client
+    m_keyboardDeviceClient->emitKeyUp(this->Interactor->GetKeyCode());
 }
 
 void
 VTKInteractorStyle::OnMouseMove()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onMouseMoveFunction
-        && m_onMouseMoveFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnMouseMove();
+    Vec2i mousePos;
+    this->Interactor->GetEventPosition(mousePos[0], mousePos[1]);
+    Vec2i dim;
+    Interactor->GetSize(dim[0], dim[1]);
+    m_mouseDeviceClient->updateMousePos(mousePos.cast<double>().cwiseQuotient(dim.cast<double>()));
 }
 
 void
 VTKInteractorStyle::OnLeftButtonDown()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onLeftButtonDownFunction
-        && m_onLeftButtonDownFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnLeftButtonDown();
+    m_mouseDeviceClient->emitButtonPress(LEFT_BUTTON);
 }
 
 void
 VTKInteractorStyle::OnLeftButtonUp()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onLeftButtonUpFunction
-        && m_onLeftButtonUpFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnLeftButtonUp();
+    m_mouseDeviceClient->emitButtonRelease(LEFT_BUTTON);
 }
 
 void
 VTKInteractorStyle::OnMiddleButtonDown()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onMiddleButtonDownFunction
-        && m_onMiddleButtonDownFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnMiddleButtonDown();
+    m_mouseDeviceClient->emitButtonPress(MIDDLE_BUTTON);
 }
 
 void
 VTKInteractorStyle::OnMiddleButtonUp()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onMiddleButtonUpFunction
-        && m_onMiddleButtonUpFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnMiddleButtonUp();
+    m_mouseDeviceClient->emitButtonRelease(MIDDLE_BUTTON);
 }
 
 void
 VTKInteractorStyle::OnRightButtonDown()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onRightButtonDownFunction
-        && m_onRightButtonDownFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnRightButtonDown();
+    m_mouseDeviceClient->emitButtonPress(RIGHT_BUTTON);
 }
 
 void
 VTKInteractorStyle::OnRightButtonUp()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onRightButtonUpFunction
-        && m_onRightButtonUpFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnRightButtonUp();
+    m_mouseDeviceClient->emitButtonRelease(RIGHT_BUTTON);
 }
 
 void
 VTKInteractorStyle::OnMouseWheelForward()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onMouseWheelForwardFunction
-        && m_onMouseWheelForwardFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnMouseWheelForward();
+    // todo: VTK provides no scroll amount?
+    m_mouseDeviceClient->emitScroll(-0.2);
 }
 
 void
 VTKInteractorStyle::OnMouseWheelBackward()
 {
-    // Call custom function if exists, and return
-    // if it returned `override=true`
-    if (m_onMouseWheelBackwardFunction
-        && m_onMouseWheelBackwardFunction(this))
-    {
-        return;
-    }
-
-    // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getViewer()->getRenderingMode() != Renderer::Mode::Debug)
-    {
-        return;
-    }
-
-    // Else : use base class interaction
-    vtkInteractorStyleTrackballCamera::OnMouseWheelBackward();
+    // todo: VTK provides no scroll amount?
+    m_mouseDeviceClient->emitScroll(0.2);
 }
-} // imstk
+}

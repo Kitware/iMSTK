@@ -25,6 +25,9 @@ limitations under the License.
 #include "imstkMath.h"
 #include "imstkPointSet.h"
 
+#include "imstkSignedDistanceField.h"
+#include "imstkImageData.h"
+
 namespace imstk
 {
 ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD(std::shared_ptr<ImplicitGeometry> implicitGeomA,
@@ -34,6 +37,11 @@ ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD(std::shared_ptr<Impli
     m_implicitGeomA(implicitGeomA),
     m_pointSetB(pointSetB)
 {
+    centralGrad.setFunction(m_implicitGeomA);
+    if (m_implicitGeomA->getType() == Geometry::Type::SignedDistanceField)
+    {
+        centralGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA)->getImage()->getSpacing());
+    }
 }
 
 void
@@ -50,7 +58,7 @@ ImplicitGeometryToPointSetCD::computeCollisionData()
             if (signedDistance < 0.0)
             {
                 PositionDirectionCollisionDataElement elem;
-                elem.dirAtoB = -m_implicitGeomA->getFunctionGrad(pt).normalized(); // Contact Normal
+                elem.dirAtoB = -centralGrad(pt).normalized(); // Contact Normal
                 elem.nodeIdx = static_cast<uint32_t>(idx);
                 elem.penetrationDepth = std::abs(signedDistance);
                 elem.posB = pt;

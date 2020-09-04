@@ -35,4 +35,4 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/PBD)
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
+target_link_libraries(${PROJECT_NAME} SimulationManager)

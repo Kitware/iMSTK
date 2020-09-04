@@ -20,8 +20,9 @@
 =========================================================================*/
 
 #pragma once
+
 #include "imstkTypes.h"
-#include "imstkSignal.h"
+#include "imstkEventObject.h"
 
 namespace imstk
 {
@@ -31,7 +32,7 @@ namespace imstk
 /// \brief This class serves as the base class of DataArray, for typeless use
 /// \todo: Component support, AOS/SOA design
 ///
-class AbstractDataArray
+class AbstractDataArray : public EventObject
 {
 // Users should not be able to construct
 protected:
@@ -40,7 +41,7 @@ protected:
     ///
     /// \brief Ensure all observers are disconnected
     ///
-    virtual ~AbstractDataArray() { disconnectAll(); };
+    virtual ~AbstractDataArray() { };
 
 public:
     ///
@@ -70,35 +71,15 @@ public:
 
 public:
     ///
-    /// \brief Setup an observer for the modified call, returns id (for later removal)
-    ///
-    inline int connect(std::function<void(void*, size_t)> func) { return modifiedSignal.connect(func); }
-
-    ///
-    /// \brief First emits nullptr, 0 to all observers then disconnects all
-    ///
-    inline void disconnectAll()
-    {
-        modifiedSignal.emit(nullptr, 0);
-        modifiedSignal.disconnectAll();
-    }
-
-    ///
-    /// \brief Disconnects a specific observer
-    ///
-    inline void disconnect(const int id) { modifiedSignal.disconnect(id); }
-
-    ///
     /// \brief emits signal to all observers, informing them on the current address
     /// in memory and size of array
     ///
-    inline void modified() { modifiedSignal.emit(getVoidPointer(), size()); }
+    inline void modified() { emit(Event(EventType::Modified)); }
 
 protected:
     void setType(const ScalarType type) { this->m_scalarType = type; }
 
 private:
     ScalarType m_scalarType;
-    expiremental::Signal<void*, size_t> modifiedSignal;
 };
 }

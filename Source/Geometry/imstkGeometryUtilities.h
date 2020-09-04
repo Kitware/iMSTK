@@ -52,6 +52,9 @@ class SurfaceMesh;
 class TetrahedralMesh;
 class VolumetricMesh;
 
+class Cube;
+class Sphere;
+
 ///
 /// \brief Contains a set of free functions for processing geometry
 /// also contains a set of conversion and coupling functions for VTK
@@ -92,12 +95,14 @@ static std::unordered_map<ScalarType, int> imstkToVtkScalarType =
 };
 
 ///
-/// \brief Couple functions
+/// \brief Coupling functions, these create vtk data objects that point to our data objects
+/// thus no copying is done here.
+/// 
 vtkSmartPointer<vtkDataArray> coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
 vtkSmartPointer<vtkImageData> coupleVtkImageData(std::shared_ptr<ImageData> imstkImageData);
 
 ///
-/// \brief Copy functions
+/// \brief Copy functions, these copy to/from vtk data objects
 ///
 vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray, int numComps = 1);
 std::shared_ptr<AbstractDataArray> copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray);
@@ -183,18 +188,34 @@ void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim
 void copyPointDataFromVtk(vtkPointData* const pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 
 ///
+/// \brief Produces SurfaceMesh cube from imstkCube
+///
+std::shared_ptr<SurfaceMesh> toCubeSurfaceMesh(std::shared_ptr<Cube> cube);
+
+///
+/// \brief UV sphere from imstkSphere
+///
+std::shared_ptr<SurfaceMesh> toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
+                                                   const unsigned int phiDivisions, const unsigned int thetaDivisions);
+
+///
 /// \brief Returns the number of open edges, use to tell if manifold (==0)
 ///
-int getOpenEdgeCount(std::shared_ptr<SurfaceMesh> imstkMesh);
+int getOpenEdgeCount(std::shared_ptr<SurfaceMesh> surfMesh);
 
 ///
 /// \brief Returns if the surface is closed or not
 ///
 inline bool
-isClosed(std::shared_ptr<SurfaceMesh> imstkMesh)
+isClosed(std::shared_ptr<SurfaceMesh> surfMesh)
 {
-    return getOpenEdgeCount(imstkMesh) == 0;
+    return getOpenEdgeCount(surfMesh) == 0;
 }
+
+///
+/// \brief Returns volume estimate of closed SurfaceMesh
+/// 
+double getVolume(std::shared_ptr<SurfaceMesh> surfMesh);
 
 ///
 /// \brief Create a tetrahedral mesh based on a uniform Cartesian mesh

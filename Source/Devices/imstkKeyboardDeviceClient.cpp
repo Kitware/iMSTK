@@ -19,20 +19,48 @@
 
 =========================================================================*/
 
-#include "imstkRenderer.h"
+#include "imstkKeyboardDeviceClient.h"
 
 namespace imstk
 {
-void
-Renderer::setMode(const Renderer::Mode mode, const bool enableVR)
+std::shared_ptr<KeyboardDeviceClient>
+KeyboardDeviceClient::New()
 {
-    m_VrEnabled   = enableVR;
-    m_currentMode = mode;
+    return std::shared_ptr<KeyboardDeviceClient>(new KeyboardDeviceClient());
 }
 
-const Renderer::Mode&
-Renderer::getMode()
+void
+KeyboardDeviceClient::emitKeyDown(char key)
 {
-    return m_currentMode;
+    const int prevKeyState = m_buttons[key];
+    m_buttons[key] = KEY_PRESS;
+    if (prevKeyState != KEY_PRESS)
+    {
+        emit(KeyPressEvent(key, KEY_PRESS));
+    }
+}
+
+void
+KeyboardDeviceClient::emitKeyUp(char key)
+{
+    const int prevKeyState = m_buttons[key];
+    m_buttons[key] = KEY_RELEASE;
+    if (prevKeyState != KEY_RELEASE)
+    {
+        emit(KeyPressEvent(key, KEY_RELEASE));
+    }
+}
+
+bool
+KeyboardDeviceClient::isKeyDown(const char key) const
+{
+    if (m_buttons.find(key) != m_buttons.end())
+    {
+        return (m_buttons.at(key) == KEY_PRESS);
+    }
+    else
+    {
+        return false;
+    }
 }
 }

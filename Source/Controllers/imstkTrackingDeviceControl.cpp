@@ -19,22 +19,25 @@
 
 =========================================================================*/
 
-#include "imstkMath.h"
-#include "imstkDeviceTracker.h"
+#include "imstkTrackingDeviceControl.h"
 #include "imstkDeviceClient.h"
 #include "imstkLogger.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
-DeviceTracker::DeviceTracker(std::shared_ptr<DeviceClient> deviceClient) :
-    m_deviceClient(deviceClient),
-    m_translationOffset(WORLD_ORIGIN),
-    m_rotationOffset(Quatd::Identity())
+TrackingDeviceControl::TrackingDeviceControl() :
+    m_translationOffset(WORLD_ORIGIN), m_rotationOffset(Quatd::Identity())
+{
+}
+
+TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> device) : DeviceControl(device),
+    m_translationOffset(WORLD_ORIGIN), m_rotationOffset(Quatd::Identity())
 {
 }
 
 bool
-DeviceTracker::updateTrackingData()
+TrackingDeviceControl::updateTrackingData()
 {
     if (m_deviceClient == nullptr)
     {
@@ -81,62 +84,50 @@ DeviceTracker::updateTrackingData()
     return true;
 }
 
-std::shared_ptr<DeviceClient>
-DeviceTracker::getDeviceClient() const
-{
-    return m_deviceClient;
-}
-
-void
-DeviceTracker::setDeviceClient(std::shared_ptr<DeviceClient> deviceClient)
-{
-    m_deviceClient = deviceClient;
-}
-
 double
-DeviceTracker::getTranslationScaling() const
+TrackingDeviceControl::getTranslationScaling() const
 {
     return m_scaling;
 }
 
 void
-DeviceTracker::setTranslationScaling(double scaling)
+TrackingDeviceControl::setTranslationScaling(double scaling)
 {
     m_scaling = scaling;
 }
 
 const Vec3d&
-DeviceTracker::getTranslationOffset() const
+TrackingDeviceControl::getTranslationOffset() const
 {
     return m_translationOffset;
 }
 
 void
-DeviceTracker::setTranslationOffset(const Vec3d& t)
+TrackingDeviceControl::setTranslationOffset(const Vec3d& t)
 {
     m_translationOffset = t;
 }
 
 const Quatd&
-DeviceTracker::getRotationOffset()
+TrackingDeviceControl::getRotationOffset()
 {
     return m_rotationOffset;
 }
 
 void
-DeviceTracker::setRotationOffset(const Quatd& r)
+TrackingDeviceControl::setRotationOffset(const Quatd& r)
 {
     m_rotationOffset = r;
 }
 
 unsigned char
-DeviceTracker::getInversionFlags()
+TrackingDeviceControl::getInversionFlags()
 {
     return m_invertFlags;
 }
 
 void
-DeviceTracker::setInversionFlags(unsigned char f)
+TrackingDeviceControl::setInversionFlags(unsigned char f)
 {
     m_invertFlags = f;
 }

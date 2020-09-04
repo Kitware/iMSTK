@@ -19,38 +19,17 @@
 
 =========================================================================*/
 
-#pragma once
+#include "imstkLevelSetState.h"
 
 namespace imstk
 {
-///
-/// \class SceneObjectControllerBase
-///
-/// \brief Base class for all the scene object controllers
-///
-class SceneObjectControllerBase
+void
+LevelSetState::initialize(std::shared_ptr<ImplicitGeometry> geometry)
 {
-public:
-    ///
-    /// \brief Constructor/Destructor
-    ///
-    SceneObjectControllerBase() = default;
-    virtual ~SceneObjectControllerBase() = default;
+}
 
-public:
-    ///
-    /// \brief Update controlled scene objects using latest tracking information
-    ///
-    virtual void updateControlledObjects() = 0;
-
-    ///
-    /// \brief Apply forces to the haptic device
-    ///
-    virtual void applyForces() = 0;
-
-    ///
-    /// \brief
-    ///
-    virtual void setTrackerToOutOfDate() = 0;
-};
-} // imstk
+void
+LevelSetState::setState(std::shared_ptr<LevelSetState> rhs)
+{
+}
+}

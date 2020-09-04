@@ -48,6 +48,8 @@ public:
     virtual ~SurfaceMeshSubdivide() override = default;
 
 public:
+    std::shared_ptr<SurfaceMesh> getOutputMesh();
+
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
 
     imstkGetMacro(SubdivisionType, Type);

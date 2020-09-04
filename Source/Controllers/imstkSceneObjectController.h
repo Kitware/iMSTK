@@ -21,36 +21,26 @@
 
 #pragma once
 
-#include "imstkSceneObjectControllerBase.h"
+#include "imstkTrackingDeviceControl.h"
 
-#include <memory>
 #include <functional>
 
 namespace imstk
 {
 class SceneObject;
-class DeviceTracker;
 
 ///
 /// \class SceneObjectController
 ///
 /// \brief This class implements once tracking controller controlling one scnene object
 ///
-class SceneObjectController : public SceneObjectControllerBase
+class SceneObjectController : public TrackingDeviceControl
 {
 using ControllerCallbackFunction = std::function<void (SceneObjectController* hdapiClient)>;
 
 public:
-    ///
-    /// \brief Constructor
-    ///
-    SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceTracker> trackingController);
-
+    SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceClient> trackingDevice);
     SceneObjectController() = delete;
-
-    ///
-    /// \brief Destructor
-    ///
     virtual ~SceneObjectController() override = default;
 
 public:
@@ -65,21 +55,10 @@ public:
     void applyForces() override;
 
     ///
-    /// \brief Sets the tracker to out-of-date
-    ///
-    void setTrackerToOutOfDate() override;
-
-    ///
     /// \brief Get/Set controlled scene object
     ///
     inline std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
     inline void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
-
-    ///
-    /// \brief Get/Set tracking controller
-    ///
-    inline std::shared_ptr<DeviceTracker> getTrackingController() const { return m_trackingController; }
-    inline void setTrackingController(std::shared_ptr<DeviceTracker> controller) { m_trackingController = controller; }
 
     ///
     /// \brief Setting custom behavior functions
@@ -87,8 +66,7 @@ public:
     inline void setUpdateCallback(ControllerCallbackFunction foo) { m_updateCallback = foo; }
 
 protected:
-    std::shared_ptr<DeviceTracker> m_trackingController; ///< Device tracker
-    std::shared_ptr<SceneObject>   m_sceneObject;        ///< SceneObject controlled by the Tracker
+    std::shared_ptr<SceneObject> m_sceneObject;          ///< SceneObject controlled by the Tracker
     //Callback functions
     ControllerCallbackFunction m_updateCallback;         ///> function callback preceding module update
 };

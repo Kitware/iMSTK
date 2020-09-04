@@ -28,8 +28,6 @@
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkSceneObjectController.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkVisualModel.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkRigidObject.h"
@@ -42,7 +40,6 @@
 #include "imstkRigidBodyModel.h"
 #include "imstkCollisionGraph.h"
 #include "imstkDeviceTracker.h"
-#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 
 // global variables
@@ -77,7 +74,7 @@ addMeshRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    mat->setDisplayMode(RenderMaterial::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
     renderModel->setRenderMaterial(mat);
@@ -114,7 +111,7 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    mat->setDisplayMode(RenderMaterial::Surface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);
     renderModel->setRenderMaterial(mat);

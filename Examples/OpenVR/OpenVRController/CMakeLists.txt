@@ -16,21 +16,19 @@
 #
 ###########################################################################
 
-if(iMSTK_ENABLE_VR)
-  project(Example-OpenVRController)
+project(Example-OpenVRController)
 
-  #-----------------------------------------------------------------------------
-  # Create executable
-  #-----------------------------------------------------------------------------
-  imstk_add_executable(${PROJECT_NAME} OpenVRControllerExample.cpp)
+#-----------------------------------------------------------------------------
+# Create executable
+#-----------------------------------------------------------------------------
+imstk_add_executable(${PROJECT_NAME} OpenVRControllerExample.cpp)
 
-  #-----------------------------------------------------------------------------
-  # Add the target to Examples folder
-  #-----------------------------------------------------------------------------
-  SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/OpenVR)
+#-----------------------------------------------------------------------------
+# Add the target to Examples folder
+#-----------------------------------------------------------------------------
+SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/OpenVR)
 
-  #-----------------------------------------------------------------------------
-  # Link libraries to executable
-  #-----------------------------------------------------------------------------
-  target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
-endif()
+#-----------------------------------------------------------------------------
+# Link libraries to executable
+#-----------------------------------------------------------------------------
+target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)

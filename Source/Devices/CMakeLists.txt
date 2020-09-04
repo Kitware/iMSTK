@@ -24,12 +24,6 @@ else()
     imstkHDAPIDeviceServer.cpp)
 endif()
 
-if(NOT ${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND ExclusionFiles
-    imstkOpenVRDeviceClient.h
-    imstkOpenVRDeviceClient.cpp)
-endif()
-
 set(HAPTIC_DEVICE_LIBS)
 if(${PROJECT_NAME}_USE_OpenHaptics)
   set(HAPTIC_DEVICE_LIBS OpenHapticsSDK)

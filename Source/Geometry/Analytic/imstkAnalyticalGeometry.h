@@ -53,10 +53,7 @@ public:
     Vec3d getOrientationAxis(DataType type = DataType::PostTransform);
     void setOrientationAxis(const Vec3d axis);
 
-    ///
-    /// \brief Returns signed distance to surface at pos
-    ///
-    virtual double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const override { return 0.0; }
+    double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const override { return 0.0; }
 
 protected:
     explicit AnalyticalGeometry(Type type, const std::string& name = std::string(""));

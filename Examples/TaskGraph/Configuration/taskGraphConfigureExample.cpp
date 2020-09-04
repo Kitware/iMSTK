@@ -20,21 +20,21 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkColorFunction.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(
@@ -135,8 +135,10 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
 int
 main()
 {
-    imstkNew<SimulationManager> simManager;
-    auto                        scene = simManager->createNewScene("PBDCloth");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("PBDCloth");
 
     const double               width    = 10.0;
     const double               height   = 10.0;
@@ -145,30 +147,29 @@ main()
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
+    // Light (white)
+    imstkNew<DirectionalLight> whiteLight("whiteLight");
+    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
+    whiteLight->setIntensity(7);
+    scene->addLight(whiteLight);
+
+    // Light (red)
+    imstkNew<SpotLight> colorLight("colorLight");
+    colorLight->setPosition(Vec3d(-5, -3, 5));
+    colorLight->setFocalPoint(Vec3d(0, -5, 5));
+    colorLight->setIntensity(100);
+    colorLight->setColor(Color::Red);
+    colorLight->setSpotAngle(30);
+    scene->addLight(colorLight);
+
     // Adjust camera
-    scene->getCamera()->setFocalPoint(0, -5, 5);
-    scene->getCamera()->setPosition(-15., -5.0, 15.0);
+    scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
+    scene->getActiveCamera()->setPosition(-15.0, -5.0, 15.0);
 
-    {
-        // Setup some scalars
-        std::shared_ptr<SurfaceMesh>     clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
-        std::shared_ptr<StdVectorOfReal> scalarsPtr    = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
-        std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
-        clothGeometry->setScalars(scalarsPtr);
-
-        // Setup the material for the scalars
-        std::shared_ptr<RenderMaterial> material = clothObj->getVisualModel(0)->getRenderMaterial();
-        material->setScalarVisibility(true);
-        std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-        colorFunc->setNumberOfColors(2);
-        colorFunc->setColor(0, Color::Green);
-        colorFunc->setColor(1, Color::Red);
-        colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
-        colorFunc->setRange(0.0, 2.0);
-        material->setColorLookupTable(colorFunc);
-
-        std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
-        scene->setTaskGraphConfigureCallback([&](Scene* scene)
+    // Adds a custom physics step to print out maximum velocity
+    std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
+    connect<Event>(scene, EventType::Configure,
+        [&](Event*)
         {
             // Get the graph
             std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
@@ -179,36 +180,42 @@ main()
             writer->setFileName("taskGraphConfigureExampleOld.svg");
             writer->write();
 
-            // This node computes displacements and sets the color to the magnitude
-            std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
-            {
-                /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
-                const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
-                StdVectorOfReal& scalars = *scalarsPtr;
-                for (size_t i = 0; i < initPos.size(); i++)
+            imstkNew<TaskNode> printMaxVelocity([&]()
                 {
-                    scalars[i] = (currPos[i] - initPos[i]).norm();
-                }*/
-                const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
-                StdVectorOfReal& scalars = *scalarsPtr;
-                for (size_t i = 0; i < velocities.size(); i++)
-                {
-                    scalars[i] = velocities[i].norm();
-                }
-            }, "ComputeVelocityScalars");
+                    const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities().get();
+                    double maxVel = std::numeric_limits<double>::min();
+                    for (size_t i = 0; i < velocities.size(); i++)
+                    {
+                        const double vel = velocities[i].squaredNorm();
+                        if (vel > maxVel)
+                        {
+                            maxVel = vel;
+                        }
+                    }
+                    LOG(INFO) << "Max Velocity: " << std::sqrt(maxVel);
+                }, "PrintMaxVelocity");
 
             // After IntegratePosition
-            graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
+            graph->insertAfter(pbdModel->getIntegratePositionNode(), printMaxVelocity);
 
             // Write the modified graph
             writer->setFileName("taskGraphConfigureExampleNew.svg");
             writer->write();
         });
-    }
 
-    // Start
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->start();
+    }
 
     return 0;
 }

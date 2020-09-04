@@ -21,8 +21,7 @@
 
 #pragma once
 
-#include "imstkSceneObjectControllerBase.h"
-#include "imstkDeviceTracker.h"
+#include "imstkTrackingDeviceControl.h"
 
 namespace imstk
 {
@@ -36,25 +35,23 @@ class SceneObject;
 /// The jaws open-close based on the buttons at present.
 /// This has to be replaced by potentiometer tracking in future.
 ///
-class LaparoscopicToolController : public SceneObjectControllerBase
+class LaparoscopicToolController : public TrackingDeviceControl
 {
 public:
     ///
     /// \brief Constructor
     ///
     LaparoscopicToolController(
-        std::shared_ptr<SceneObject>   shaft,
-        std::shared_ptr<SceneObject>   upperJaw,
-        std::shared_ptr<SceneObject>   lowerJaw,
-        std::shared_ptr<DeviceTracker> trackingController);
+        std::shared_ptr<SceneObject>  shaft,
+        std::shared_ptr<SceneObject>  upperJaw,
+        std::shared_ptr<SceneObject>  lowerJaw,
+        std::shared_ptr<DeviceClient> trackingDevice);
 
     LaparoscopicToolController() = delete; //not allowed for now
 
-    ///
-    /// \brief Destructor
-    ///
-    ~LaparoscopicToolController() = default;
+    ~LaparoscopicToolController() override = default;
 
+public:
     ///
     /// \brief Update controlled laparoscopic tool using latest tracking information
     ///
@@ -64,11 +61,6 @@ public:
     /// \brief Apply forces to the haptic device
     ///
     void applyForces() override;
-
-    ///
-    /// \brief Set the tracker to out-of-date
-    ///
-    inline void setTrackerToOutOfDate() override { m_trackingController->setTrackerToOutOfDate(); }
 
     ///
     /// \brief Set the maximum jaw angle
@@ -95,16 +87,7 @@ public:
     ///
     inline double getMaxJawAngle() const { return m_maxJawAngle; }
 
-    ///
-    /// \brief Get/Set tracking controller
-    ///
-    inline std::shared_ptr<DeviceTracker> getTrackingController() const { return m_trackingController; }
-    inline void setTrackingController(std::shared_ptr<DeviceTracker> controller) { m_trackingController = controller; }
-
 protected:
-
-    std::shared_ptr<DeviceTracker> m_trackingController; ///< Device tracker
-
     std::shared_ptr<SceneObject> m_shaft;                ///< Tool shaft
     std::shared_ptr<SceneObject> m_upperJaw;             ///< Tool upper jaw
     std::shared_ptr<SceneObject> m_lowerJaw;             ///< Tool lower jaw

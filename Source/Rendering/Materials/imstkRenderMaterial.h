@@ -68,11 +68,11 @@ public:
         MinimumIntensity
     };
 
-    ///
-    /// \brief Constructor
-    ///
+public:
     RenderMaterial();
+    virtual ~RenderMaterial() = default;
 
+public:
     ///
     /// \brief Get/Set display mode
     ///

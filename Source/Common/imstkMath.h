@@ -89,8 +89,10 @@ using StdVectorOfVectorf = std::vector<Vectorf, Eigen::aligned_allocator<Vectorf
 using StdVectorOfVectord = std::vector<Vectord, Eigen::aligned_allocator<Vectord>>;
 
 // Quaternion
-using Quatf = Eigen::Quaternion<float, Eigen::DontAlign>;
-using Quatd = Eigen::Quaternion<double, Eigen::DontAlign>;
+using Quatf = Eigen::Quaternion<float>;
+using Quatd = Eigen::Quaternion<double>;
+using StdVectorOfQuatf = std::vector<Quatf, Eigen::aligned_allocator<Quatf>>;
+using StdVectorOfQuatd = std::vector<Quatd, Eigen::aligned_allocator<Quatd>>;
 
 // Angle-Axis
 using Rotf = Eigen::AngleAxisf;
@@ -99,6 +101,7 @@ using Rotd = Eigen::AngleAxisd;
 // 3x3 Matrix
 using Mat3f = Eigen::Matrix3f;
 using Mat3d = Eigen::Matrix3d;
+using StdVectorOfMat3d = std::vector<Mat3d, Eigen::aligned_allocator<Mat3d>>;
 
 // 4x4 Matrix
 using Mat4f = Eigen::Matrix4f;
@@ -159,4 +162,4 @@ using AffineTransform3d = Eigen::Affine3d;
 #define MAX_F                std::numeric_limits<float>::max()
 #define MIN_F                std::numeric_limits<float>::min()
 #define VERY_SMALL_EPSILON_F std::numeric_limits<float>::epsilon()
-} // end namespace imstk
+}

@@ -22,13 +22,13 @@
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
 #include "imstkCube.h"
-#include "imstkDeviceTracker.h"
 #include "imstkDummyClient.h"
 #include "imstkLight.h"
+#include "imstkNew.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
-#include "imstkSimulationManager.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -39,31 +39,28 @@ using namespace imstk;
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("ObjectControllerDummyClient");
+    imstkNew<Scene> scene("ObjectControllerDummyClient");
 
     // Device Client
-    auto client = std::make_shared<DummyClient>("DummyClient");
+    imstkNew<DummyClient> client("DummyClient");
 
     // Object
-    auto geom = std::make_shared<Cube>();
-    geom->setPosition(0, 1, 0);
-    geom->setWidth(2);
+    imstkNew<Cube> geom;
+    geom->setPosition(0.0, 1.0, 0.0);
+    geom->setWidth(2.0);
 
-    auto object = std::make_shared<CollidingObject>("VirtualObject");
+    imstkNew<CollidingObject> object("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
 
-    auto trackCtrl = std::make_shared<DeviceTracker>(client);
-    trackCtrl->setTranslationScaling(0.1);
-    auto controller = std::make_shared<SceneObjectController>(object, trackCtrl);
-    scene->addObjectController(controller);
+    imstkNew<SceneObjectController> controller(object, client);
+    controller->setTranslationScaling(0.1);
+    scene->addController(controller);
 
     // Supply translation to dummy client frame
     auto translateFunc =
-        [&client](Module* module)
+        [&client](Event*)
         {
             Vec3d p = client->getPosition() + Vec3d(1.0e-4, 0, 0);
             if (p.x() > 50.)
@@ -72,22 +69,31 @@ main()
             }
             client->setPosition(p);
         };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(translateFunc);
 
     // Update Camera position
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 0, 10));
-    cam->setFocalPoint(geom->getPosition());
+    scene->getActiveCamera()->setPosition(0.0, 0.0, 10.0);
+    scene->getActiveCamera()->setFocalPoint(geom->getPosition());
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start();
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        connect<Event>(sceneManager, EventType::PostUpdate, translateFunc);
+
+        viewer->start();
+    }
 
     return 0;
 }

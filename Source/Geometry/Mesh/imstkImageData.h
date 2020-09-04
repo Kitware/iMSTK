@@ -75,14 +75,16 @@ public:
     ///
     /// \brief Returns index of data in scalar array given structured image coordinate, does no bounds checking
     ///
-    size_t getScalarIndex(int x, int y, int z = 0) { return getScalarIndex(x, y, z, m_dims, m_numComps); }
-    size_t getScalarIndex(const Vec3i& imgCoord) { return getScalarIndex(imgCoord[0], imgCoord[1], imgCoord[2], m_dims, m_numComps); }
+    inline size_t getScalarIndex(int x, int y, int z = 0) { return getScalarIndex(x, y, z, m_dims, m_numComps); }
+    inline size_t getScalarIndex(const Vec3i& imgCoord) { return getScalarIndex(imgCoord[0], imgCoord[1], imgCoord[2], m_dims, m_numComps); }
 
     ///
     /// \brief Returns index of data in scalar array given structured image coordinate, dimensions, and number of components
     /// does no bounds checking
     ///
-    static size_t getScalarIndex(int x, int y, int z, const Vec3i& dims, int numComps) { return (x + dims[0] * (y + z * dims[1])) * numComps; }
+    inline static size_t getScalarIndex(int x, int y, int z, const Vec3i& dims, int numComps) { return (x + dims[0] * (y + z * dims[1])) * numComps; }
+
+    std::shared_ptr<ImageData> cast(ScalarType type);
 
     ///
     /// \brief Returns the origin of the image
@@ -93,6 +95,11 @@ public:
     /// \brief Returns the spacing of the image
     ///
     const Vec3d& getSpacing() const { return m_spacing; }
+
+    ///
+    /// \brief Returns inv spacing of the image
+    ///
+    const Vec3d& getInvSpacing() const { return m_invSpacing; }
 
     ///
     /// \brief Returns the scalar type of the image
@@ -137,7 +144,11 @@ public:
     ///
     /// \brief Sets the spacing between pixels/voxels of the image
     ///
-    void setSpacing(const Vec3d& spacing) { m_spacing = spacing; }
+    void setSpacing(const Vec3d& spacing)
+    {
+        m_spacing    = spacing;
+        m_invSpacing = Vec3d(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
+    }
 
     ///
     /// \brief Allocate image by type
@@ -158,10 +169,11 @@ protected:
     friend class VTKImageDataRenderDelegate;
 
     std::shared_ptr<AbstractDataArray> m_scalarArray = nullptr;
-    Vec3i m_dims     = Vec3i(0, 0, 0);
-    int   m_numComps = 1;
-    Vec3d m_origin   = Vec3d(0.0, 0.0, 0.0);
-    Vec3d m_spacing  = Vec3d(1.0, 1.0, 1.0);
+    Vec3i m_dims       = Vec3i(0, 0, 0);
+    int   m_numComps   = 1;
+    Vec3d m_origin     = Vec3d(0.0, 0.0, 0.0);
+    Vec3d m_spacing    = Vec3d(1.0, 1.0, 1.0);
+    Vec3d m_invSpacing = Vec3d(1.0, 1.0, 1.0);
     Vec6d m_bounds;
 };
 } // imstk

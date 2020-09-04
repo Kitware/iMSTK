@@ -23,9 +23,11 @@
 
 #include "imstkVTKRenderDelegate.h"
 
+class vtkImageData;
+
 namespace imstk
 {
-class ImageData;
+class AbstractDataArray;
 
 ///
 /// \class VTKImageDataRenderDelegate
@@ -45,9 +47,16 @@ public:
     ///
     virtual ~VTKImageDataRenderDelegate() override = default;
 
+public:
     ///
     /// \brief Update render delegate source based on the internal data
     ///
     void updateDataSource() override;
+
+    void imageDataModified(Event* e);
+
+protected:
+    std::shared_ptr<AbstractDataArray> m_scalarArray;
+    vtkSmartPointer<vtkImageData> imageDataVtk;
 };
 } // imstk

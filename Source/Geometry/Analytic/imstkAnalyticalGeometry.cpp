@@ -25,7 +25,8 @@
 namespace imstk
 {
 AnalyticalGeometry::AnalyticalGeometry(Type type, const std::string& name) : ImplicitGeometry(type, name),
-    m_position(WORLD_ORIGIN), m_positionPostTransform(WORLD_ORIGIN), m_orientationAxis(UP_VECTOR), m_orientationAxisPostTransform(UP_VECTOR)
+    m_position(WORLD_ORIGIN), m_positionPostTransform(WORLD_ORIGIN),
+    m_orientationAxis(UP_VECTOR), m_orientationAxisPostTransform(UP_VECTOR)
 {
 }
 

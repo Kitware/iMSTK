@@ -56,7 +56,7 @@ VRPNDeviceServer::addSerialDevice(const std::string& deviceName, DeviceType devi
 }
 
 void
-VRPNDeviceServer::initModule()
+VRPNDeviceServer::initThread()
 {
     std::string ip = m_machine + ":" + std::to_string(m_port);
     m_serverConnection = vrpn_create_server_connection(ip.c_str());
@@ -119,14 +119,14 @@ VRPNDeviceServer::initModule()
 }
 
 void
-VRPNDeviceServer::runModule()
+VRPNDeviceServer::updateThread()
 {
     m_serverConnection->mainloop();
     m_deviceConnections->mainloop();
 }
 
 void
-VRPNDeviceServer::cleanUpModule()
+VRPNDeviceServer::stopThread()
 {
     m_deviceConnections->clear();
     delete(m_deviceConnections);

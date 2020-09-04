@@ -23,7 +23,6 @@
 
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKTextureDelegate.h"
-#include "imstkTextureManager.h"
 
 class vtkDoubleArray;
 

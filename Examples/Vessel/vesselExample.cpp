@@ -24,13 +24,15 @@
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
 #include "imstkImageDistanceTransform.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
 #include "imstkSignedDistanceField.h"
-#include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSphObjectCollisionPair.h"
@@ -39,9 +41,9 @@
 #include "imstkSurfaceMeshImageMask.h"
 #include "imstkViewer.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief Generate a volume of fluid with the specified SurfaceMesh
@@ -67,7 +69,8 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     distTransformFromMask->setInputImage(makeBinaryMask->getOutputImage());
     distTransformFromMask->update();
 
-    const DataArray<float>& scalars   = *std::dynamic_pointer_cast<DataArray<float>>(distTransformFromMask->getOutputImage()->getScalars());
+    std::shared_ptr<DataArray<float>> scalarsPtr = std::dynamic_pointer_cast<DataArray<float>>(distTransformFromMask->getOutputImage()->getScalars());
+    const DataArray<float>& scalars   = *scalarsPtr;
     const Vec3i&            dim1      = makeBinaryMask->getOutputImage()->getDimensions();
     const Vec3d&            spacing   = makeBinaryMask->getOutputImage()->getSpacing();
     const Vec3d&            shift     = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
@@ -126,8 +129,7 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
     imstkNew<VisualModel>    fluidVisualModel(fluidGeometry.get());
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
-    fluidMaterial->setPointSize(static_cast<float>(particleRadius) * 3.0f); // For fluids
-    //fluidMaterial->setPointSize(static_cast<float>(particleRadius) * 800.0f); // For spheres
+    fluidMaterial->setPointSize(particleRadius * 2.0f); // For fluids
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Setup the Object
@@ -209,11 +211,15 @@ makeLegs(const std::string& name, const Vec3d& position)
 int
 main()
 {
-    imstkNew<SimulationManager> simManager;
-    auto                        scene = simManager->createNewScene("Vessel");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("Vessel");
 
     // Setup the scene
     {
+        //scene->getConfig()->taskTimingEnabled = true;
+
         // Static Dragon object
         std::shared_ptr<CollidingObject> legsObj = makeLegs("Vessel", Vec3d(0.0, 0.0, 0.0));
         scene->addSceneObject(legsObj);
@@ -221,9 +227,9 @@ main()
         // Position the camera
         const Vec6d& bounds = std::dynamic_pointer_cast<SignedDistanceField>(legsObj->getCollidingGeometry())->getBounds();
         const Vec3d  center = (Vec3d(bounds[0], bounds[2], bounds[4]) + Vec3d(bounds[1], bounds[3], bounds[5])) * 0.5;
-        scene->getCamera()->setPosition(3.25, 1.6, 3.38);
-        scene->getCamera()->setFocalPoint(-2.05, 1.89, -1.32);
-        scene->getCamera()->setViewUp(-0.66, 0.01, 0.75);
+        scene->getActiveCamera()->setPosition(3.25, 1.6, 3.38);
+        scene->getActiveCamera()->setFocalPoint(-2.05, 1.89, -1.32);
+        scene->getActiveCamera()->setViewUp(-0.66, 0.01, 0.75);
 
         // SPH fluid box overtop the dragon
         std::shared_ptr<SPHObject> sphObj = makeSPHObject("Fluid", 0.004, 0.0035);
@@ -240,9 +246,34 @@ main()
         scene->addLight(light);
     }
 
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

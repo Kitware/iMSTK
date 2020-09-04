@@ -73,7 +73,7 @@ protected:
 
     // Hide these unimplemented functions
     using AnalyticalGeometry::getFunctionValue;
-    using AnalyticalGeometry::getFunctionGrad;
+    //using AnalyticalGeometry::getFunctionGrad;
 
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;

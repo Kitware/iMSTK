@@ -21,7 +21,6 @@
 
 #include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkMeshIO.h"

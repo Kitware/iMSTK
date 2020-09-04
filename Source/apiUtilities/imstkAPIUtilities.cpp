@@ -198,11 +198,13 @@ printUPS(std::shared_ptr<SceneManager> sceneManager)
     }
 
     sceneManager->enableFrameCount();
-    sceneManager->setPostUpdateCallback([&sceneManager](Module* module)
+    // When sceneManager emits PreUpdate, cout the ups
+    connect<Event>(sceneManager, EventType::PreUpdate,
+        [&sceneManager](Event*)
             {
-                std::cout << "\r" << module->getName() << " running at "
+                std::cout << "\r" << sceneManager->getName() << " running at "
                           << sceneManager->getUPS() << " ups   " << std::flush;
-                });
+        });
 }
 
 std::shared_ptr<Graph>

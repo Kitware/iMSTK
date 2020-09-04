@@ -52,7 +52,7 @@ enum class TimeSteppingType
 };
 
 ///
-/// \class DynamicalModel
+/// \class AbstractDynamicalModel
 ///
 /// \brief Abstract class for mathematical model of the physics governing the dynamic object
 ///
@@ -98,6 +98,7 @@ public:
 
     ///
     /// \brief Update states
+    /// \todo: Fem specific, needs to be moved
     ///
     virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::Displacement) = 0;
 

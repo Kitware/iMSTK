@@ -20,16 +20,20 @@
 =========================================================================*/
 
 #include "imstkVTKInteractorStyleVR.h"
-#include "imstkScene.h"
-#include "imstkSimulationManager.h"
-#include "imstkVTKRenderer.h"
-#include "imstkVTKViewer.h"
+#include "imstkOpenVRDeviceClient.h"
 
 #include <vtkObjectFactory.h>
 #include <vtkOpenVRRenderWindowInteractor.h>
-#include <vtkRenderer.h>
 
 vtkStandardNewMacro(vtkInteractorStyleVR);
+
+vtkInteractorStyleVR::vtkInteractorStyleVR()
+{
+    // Setup the VR device clients
+    m_leftControllerDeviceClient  = imstk::OpenVRDeviceClient::New(OPENVR_LEFT_CONTROLLER);
+    m_rightControllerDeviceClient = imstk::OpenVRDeviceClient::New(OPENVR_RIGHT_CONTROLLER);
+    m_hmdDeviceClient = imstk::OpenVRDeviceClient::New(OPENVR_HMD);
+}
 
 void
 vtkInteractorStyleVR::OnMove3D(vtkEventData* eventData)
@@ -45,8 +49,8 @@ vtkInteractorStyleVR::OnMove3D(vtkEventData* eventData)
         eventDataDevice->GetWorldPosition(pos.data());
         double orientation[4];
         eventDataDevice->GetWorldOrientation(orientation);
-        leftControllerPoseChanged.emit(pos, imstk::Quatd(imstk::Rotd(vtkMath::RadiansFromDegrees(orientation[0]),
-                        imstk::Vec3d(orientation[1], orientation[2], orientation[3]))));
+        m_leftControllerDeviceClient->setPose(pos, imstk::Quatd(imstk::Rotd(vtkMath::RadiansFromDegrees(orientation[0]),
+            imstk::Vec3d(orientation[1], orientation[2], orientation[3]))));
     }
     else if (vtkEventDataDevice::RightController == eventDataDevice->GetDevice())
     {
@@ -54,8 +58,8 @@ vtkInteractorStyleVR::OnMove3D(vtkEventData* eventData)
         eventDataDevice->GetWorldPosition(pos.data());
         double orientation[4];
         eventDataDevice->GetWorldOrientation(orientation);
-        rightControllerPoseChanged.emit(pos, imstk::Quatd(imstk::Rotd(vtkMath::RadiansFromDegrees(orientation[0]),
-                        imstk::Vec3d(orientation[1], orientation[2], orientation[3]))));
+        m_rightControllerDeviceClient->setPose(pos, imstk::Quatd(imstk::Rotd(vtkMath::RadiansFromDegrees(orientation[0]),
+            imstk::Vec3d(orientation[1], orientation[2], orientation[3]))));
     }
     else if (vtkEventDataDevice::HeadMountedDisplay == eventDataDevice->GetDevice())
     {
@@ -63,8 +67,8 @@ vtkInteractorStyleVR::OnMove3D(vtkEventData* eventData)
         eventDataDevice->GetWorldPosition(pos.data());
         double orientation[4];
         eventDataDevice->GetWorldOrientation(orientation);
-        hmdPoseChanged.emit(pos, imstk::Quatd(imstk::Rotd(vtkMath::RadiansFromDegrees(orientation[0]),
-                        imstk::Vec3d(orientation[1], orientation[2], orientation[3]))));
+        m_hmdDeviceClient->setPose(pos, imstk::Quatd(imstk::Rotd(vtkMath::RadiansFromDegrees(orientation[0]),
+            imstk::Vec3d(orientation[1], orientation[2], orientation[3]))));
     }
 }
 
@@ -75,28 +79,55 @@ vtkInteractorStyleVR::OnButton3D(vtkEventData* eventData)
     {
         return;
     }
-    //vtkEventDataButton3D* eventDataButton = static_cast<vtkEventDataButton3D*>(eventData);
-    //printf("Button: %d\n", eventDataButton->GetInput());
-    //bd->GetAction() == vtkEventDataAction::Press
-}
+    vtkEventDataButton3D*         eventDataButton = static_cast<vtkEventDataButton3D*>(eventData);
+    const vtkEventDataDevice      device = eventDataButton->GetDevice();
+    const vtkEventDataAction      action = eventDataButton->GetAction();
+    const vtkEventDataDeviceInput input  = eventDataButton->GetInput();
 
-void
-vtkInteractorStyleVR::OnTimer()
-{
-    auto renderer = std::static_pointer_cast<imstk::VTKRenderer>(m_simManager->getViewer()->getActiveRenderer());
-
-    // Update Camera
-    renderer->updateSceneCamera(m_simManager->getActiveScene()->getCamera());
-
-    // Update render delegates
-    renderer->updateRenderDelegates();
-
-    // Reset camera clipping range
-    this->CurrentRenderer->ResetCameraClippingRange();
-
-    // Render
-    this->Interactor->Render();
-
-    // Plan next render
-    this->Interactor->CreateOneShotTimer(0);
+    switch (action)
+    {
+    case vtkEventDataAction::Press:
+        if (device == vtkEventDataDevice::LeftController)
+        {
+            m_leftControllerDeviceClient->emitButtonPress(static_cast<int>(input));
+        }
+        else if (device == vtkEventDataDevice::RightController)
+        {
+            m_rightControllerDeviceClient->emitButtonPress(static_cast<int>(input));
+        }
+        break;
+    case vtkEventDataAction::Release:
+        if (device == vtkEventDataDevice::LeftController)
+        {
+            m_leftControllerDeviceClient->emitButtonRelease(static_cast<int>(input));
+        }
+        else if (device == vtkEventDataDevice::RightController)
+        {
+            m_rightControllerDeviceClient->emitButtonRelease(static_cast<int>(input));
+        }
+        break;
+    case vtkEventDataAction::Touch:
+        if (device == vtkEventDataDevice::LeftController)
+        {
+            m_leftControllerDeviceClient->emitButtonTouched(static_cast<int>(input));
+        }
+        else if (device == vtkEventDataDevice::RightController)
+        {
+            m_rightControllerDeviceClient->emitButtonTouched(static_cast<int>(input));
+        }
+        break;
+    case vtkEventDataAction::Untouch:
+        if (device == vtkEventDataDevice::LeftController)
+        {
+            m_leftControllerDeviceClient->emitButtonUntouched(static_cast<int>(input));
+        }
+        else if (device == vtkEventDataDevice::RightController)
+        {
+            m_rightControllerDeviceClient->emitButtonUntouched(static_cast<int>(input));
+        }
+        break;
+    default:
+        break;
+    }
+    ;
 }

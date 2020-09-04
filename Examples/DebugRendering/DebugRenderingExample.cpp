@@ -21,30 +21,31 @@
 
 #include "imstkCamera.h"
 #include "imstkDebugRenderGeometry.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
-#include <vtkRenderWindow.h>
-
 using namespace imstk;
 
 std::shared_ptr<DebugRenderPoints>
 addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
-    auto debugPoints = std::make_shared<DebugRenderPoints>("Debug Points");
-    auto material    = std::make_shared<RenderMaterial>();
+    imstkNew<DebugRenderPoints> debugPoints("Debug Points");
+    imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Points);
     material->setPointSize(6.);
-    auto vizModel = std::make_shared<VisualModel>(debugPoints, material);
-    scene->addDebugVisualModel(vizModel);
+    imstkNew<VisualModel> visualModel(debugPoints.get(), material);
+    scene->addDebugVisualModel(visualModel);
 
     return debugPoints;
 }
@@ -52,14 +53,14 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 std::shared_ptr<DebugRenderLines>
 addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
-    auto debugLines = std::make_shared<DebugRenderLines>("Debug Lines");
-    auto material   = std::make_shared<RenderMaterial>();
+    imstkNew<DebugRenderLines> debugLines("Debug Lines");
+    imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     //material->setBackFaceCulling(false);
     material->setEdgeColor(Color::Green);
     material->setLineWidth(4.0);
-    auto vizModel = std::make_shared<VisualModel>(debugLines, material);
-    scene->addDebugVisualModel(vizModel);
+    imstkNew<VisualModel> visualModel(debugLines.get(), material);
+    scene->addDebugVisualModel(visualModel);
 
     return debugLines;
 }
@@ -67,19 +68,19 @@ addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 std::shared_ptr<DebugRenderTriangles>
 addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
-    auto debugTriangles = std::make_shared<DebugRenderTriangles>("Debug Triangles");
-    auto material       = std::make_shared<RenderMaterial>();
+    imstkNew<DebugRenderTriangles> debugTriangles("Debug Triangles");
+    imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setBackFaceCulling(false);
     material->setColor(Color::Red);
-    auto vizModel = std::make_shared<VisualModel>(debugTriangles, material);
-    scene->addDebugVisualModel(vizModel);
+    imstkNew<VisualModel> visualModel(debugTriangles.get(), material);
+    scene->addDebugVisualModel(visualModel);
 
     return debugTriangles;
 }
 
 Vec3d
-getRandomPositions(double radius)
+getRandomPositions(const double radius)
 {
     return radius * Vec3d(2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
                           2.0 * static_cast<double>(rand()) / static_cast<double>(RAND_MAX) - 1.0,
@@ -92,20 +93,21 @@ getRandomPositions(double radius)
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("Debug rendering example");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Get the VTKViewer
-    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    // Create a scene
+    imstkNew<Scene> scene("Debug rendering example");
+
+    // Setup a viewer to render in its own thread
+    imstkNew<VTKViewer> viewer("Viewer");
+    viewer->setActiveScene(scene);
     viewer->setWindowTitle("Debug Rendering");
-    viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-    simManager->setViewer(viewer);
-    simManager->setActiveScene(scene); // Viewer has depedence on scene
+    viewer->setSize(1920, 1080);
 
     auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
-    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+    statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Orange);
 
     // Get VTK Renderer
     auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
@@ -119,7 +121,8 @@ main()
     int count = 0; // The number of times cycling between modes
 
     auto updateFunc =
-        [&](Module*) {
+        [&](Event*)
+        {
             if (count > 15)
             {
                 count = 0;
@@ -169,29 +172,43 @@ main()
 
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 0, 50));
-    cam->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.0, 50.0));
 
     // Light
-    {
-        auto light = std::make_shared<DirectionalLight>("Light 1");
-        light->setFocalPoint(Vec3d(-1, -1, -1));
-        light->setIntensity(1);
-        scene->addLight(light);
-    }
-    {
-        auto light = std::make_shared<DirectionalLight>("Light 2");
-        light->setFocalPoint(Vec3d(1, -1, -1));
-        light->setIntensity(1);
-        scene->addLight(light);
-    }
+    imstkNew<DirectionalLight> light1("light1");
+    light1->setFocalPoint(Vec3d(-1.0, -1.0, -1.0));
+    light1->setIntensity(1.0);
+    scene->addLight(light1);
 
-    // Run
-    simManager->start();
+    imstkNew<DirectionalLight> light2("light2");
+    light2->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
+    light2->setIntensity(1.0);
+    scene->addLight(light2);
+
+    // Run the simulation
+    {
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        viewer->start();
+    }
 
     return 0;
 }

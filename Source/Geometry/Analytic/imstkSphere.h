@@ -71,12 +71,12 @@ public:
     ///
     /// \brief Returns signed distance to surface given position
     ///
-    virtual double getFunctionValue(const Vec3d& pos) const override { return (pos - m_position).norm() - m_radius; }
+    double getFunctionValue(const Vec3d& pos) const override { return (pos - m_position).norm() - m_radius; }
 
-    ///
-    /// \brief Returns gradient of distances given position
-    ///
-    virtual Vec3d getFunctionGrad(const Vec3d& pos, const double dx) const override { return 2.0 * (pos - m_position) * dx; }
+///
+/// \brief Returns analytical gradient of distances given position
+///
+//Vec3d getFunctionGrad(const Vec3d& pos, const Vec3d& dx) const override { return 2.0 * (pos - m_position).cwiseProduct(dx); }
 
 protected:
     friend class VTKSphereRenderDelegate;

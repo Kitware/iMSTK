@@ -54,7 +54,7 @@ SphObjectCollisionPair::SphObjectCollisionPair(std::shared_ptr<SPHObject> obj1, 
 
     // Setup the CD
     m_colData = std::make_shared<CollisionData>();
-    setCollisionDetection(makeCollisionDetectionObject(cdType, obj2->getCollidingGeometry(), obj1->getCollidingGeometry(), m_colData));
+    setCollisionDetection(makeCollisionDetectionObject(cdType, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), m_colData));
 
     // Setup the handler
     std::shared_ptr<SPHCollisionHandling> ch = std::make_shared<SPHCollisionHandling>(CollisionHandling::Side::B, m_colData, obj1);

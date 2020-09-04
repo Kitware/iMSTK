@@ -38,10 +38,10 @@ playSound(const std::string& filename)
     CHECK(buffer.loadFromFile(filename)) << "testSound: Could not open the input sound file: " << filename;
 
     // Display sound informations
-    std::cout << filename << std::endl;
-    std::cout << " " << buffer.getDuration().asSeconds() << " seconds" << std::endl;
-    std::cout << " " << buffer.getSampleRate() << " samples / sec" << std::endl;
-    std::cout << " " << buffer.getChannelCount() << " channels" << std::endl;
+    LOG(INFO) << filename;
+    LOG(INFO) << " " << buffer.getDuration().asSeconds() << " seconds";
+    LOG(INFO) << " " << buffer.getSampleRate() << " samples / sec";
+    LOG(INFO) << " " << buffer.getChannelCount() << " channels";
 
     // Create a sound instance and play it
     sf::Sound sound(buffer);
@@ -63,11 +63,11 @@ playSound(const std::string& filename)
         sf::Listener::setPosition((float)listnerPos.x(), (float)listnerPos.y(), (float)listnerPos.z());
 
         // Display the playing position
-        std::cout << "\rPlaying... " << sound.getPlayingOffset().asSeconds() << " sec        ";
-        std::cout << std::flush;
+        LOG(INFO) << "\rPlaying... " << sound.getPlayingOffset().asSeconds() << " sec        ";
+        LOG(INFO) << std::flush;
     }
-    std::cout << "\n" << std::endl;
-#else if
+    LOG(INFO) << "\n";
+#elif
     LOG(INFO) << "testSound: Audio is supported only on windows!";
 #endif
 }
@@ -82,10 +82,10 @@ playMusic(const std::string& filename)
     CHECK(music.openFromFile(filename)) << "playMusic: Could not open the input music file: " << filename;
 
     // Display music informations
-    std::cout << filename << ":" << std::endl;
-    std::cout << " " << music.getDuration().asSeconds() << " seconds" << std::endl;
-    std::cout << " " << music.getSampleRate() << " samples / sec" << std::endl;
-    std::cout << " " << music.getChannelCount() << " channels" << std::endl;
+    LOG(INFO) << filename << ":";
+    LOG(INFO) << " " << music.getDuration().asSeconds() << " seconds";
+    LOG(INFO) << " " << music.getSampleRate() << " samples / sec";
+    LOG(INFO) << " " << music.getChannelCount() << " channels";
 
     // Play it
     music.play();
@@ -97,10 +97,10 @@ playMusic(const std::string& filename)
         sf::sleep(sf::milliseconds(100));
 
         // Display the playing position
-        std::cout << "\rPlaying... " << music.getPlayingOffset().asSeconds() << " sec        ";
-        std::cout << std::flush;
+       LOG(INFO) << "\rPlaying... " << music.getPlayingOffset().asSeconds() << " sec        ";
+       LOG(INFO) << std::flush;
     }
-    std::cout << "\n" << std::endl;
+    LOG(INFO) << "\n";
 #else
     LOG(INFO) << "playMusic: Audio is supported only on windows!";
 #endif
@@ -113,9 +113,7 @@ playMusic(const std::string& filename)
 int
 main()
 {
-    Logger& logger = Logger::getInstance();
-    logger.addFileSink("audio-Example", "./");
-    logger.addStdoutSink();
+    Logger::startLogger();
 
     #ifndef iMSTK_AUDIO_ENABLED
     LOG(INFO) << "Audio not enabled at build time\n";
