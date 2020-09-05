@@ -36,8 +36,6 @@ class SceneObject;
 ///
 class SceneObjectController : public TrackingDeviceControl
 {
-using ControllerCallbackFunction = std::function<void (SceneObjectController* hdapiClient)>;
-
 public:
     SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceClient> trackingDevice);
     SceneObjectController() = delete;
@@ -60,14 +58,7 @@ public:
     inline std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
     inline void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
 
-    ///
-    /// \brief Setting custom behavior functions
-    ///
-    inline void setUpdateCallback(ControllerCallbackFunction foo) { m_updateCallback = foo; }
-
 protected:
-    std::shared_ptr<SceneObject> m_sceneObject;          ///< SceneObject controlled by the Tracker
-    //Callback functions
-    ControllerCallbackFunction m_updateCallback;         ///> function callback preceding module update
+    std::shared_ptr<SceneObject> m_sceneObject; ///< SceneObject controlled by the Tracker
 };
 } // imstk

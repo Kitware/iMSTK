@@ -67,7 +67,7 @@ public:
     /// \brief Convience function to set the inertia tensor based off provided geometry
     /// assuming uniform mass at each point.
     ///
-    void setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale = 1.0);
+    void setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale = 1.0, const bool useBoundingBoxOrigin = true);
 };
 
 ///

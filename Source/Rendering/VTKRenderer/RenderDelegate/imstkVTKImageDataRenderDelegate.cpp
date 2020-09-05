@@ -64,7 +64,7 @@ VTKImageDataRenderDelegate::updateDataSource()
 }
 
 void
-VTKImageDataRenderDelegate::imageDataModified(Event* e)
+VTKImageDataRenderDelegate::imageDataModified(Event* imstkNotUsed(e))
 {
     // Here we utilize something similar to double buffering
     // We primarily use a single shared buffer until the moment 
@@ -79,7 +79,6 @@ VTKImageDataRenderDelegate::imageDataModified(Event* e)
 
         // Update vtk data array pointer to this new handle, this will cause existing array to deallocate assuming no
         // one else is referencing it
-        vtkSmartPointer<vtkImageData> imageDataVtk = m_volumeMapper->GetInput();
         imageDataVtk->GetPointData()->GetScalars()->SetVoidArray(m_scalarArray->getVoidPointer(), m_scalarArray->size(), 1);
 
         // Update information (currently can't handle type changes or number of components)

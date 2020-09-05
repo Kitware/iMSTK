@@ -122,7 +122,6 @@ else()
     RenderingContext2D
     RenderingContextOpenGL2
     RenderingCore
-    RenderingExternal
     RenderingOpenGL2
     RenderingVolume
     RenderingVolumeOpenGL2

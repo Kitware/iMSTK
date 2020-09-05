@@ -34,8 +34,8 @@ namespace expiremental
 RigidObjectController::RigidObjectController(std::shared_ptr<RigidObject2> rigidObject, std::shared_ptr<DeviceClient> trackingDevice) :
     SceneObjectController(rigidObject, trackingDevice), m_rigidObject(rigidObject)
 {
-    m_currentPos = rigidObject->getRigidBody()->getPosition();
-    m_currentRot = rigidObject->getRigidBody()->getOrientation();
+    /*m_currentPos = rigidObject->getRigidBody()->getPosition();
+    m_currentRot = rigidObject->getRigidBody()->getOrientation();*/
 }
 
 void
@@ -50,13 +50,17 @@ RigidObjectController::updateControlledObjects()
         }
     }
 
-    if (m_updateCallback)
+    emit(Event(EventType::Modified));
+    
+	// During initialization tracking may not be enabled for a time, in which case, freeze the thing
+    // or else extrenous forces may be applied torwards unitialized position (0, 0, 0) or gravity
+    // pull it down
+    if (!m_deviceClient->getTrackingEnabled())
     {
-        m_updateCallback(this);
+        (*m_rigidObject->getRigidBody()->m_pos) = m_rigidObject->getRigidBody()->m_initPos;
+        (*m_rigidObject->getRigidBody()->m_orientation) = m_rigidObject->getRigidBody()->m_initOrientation;
+        return;
     }
-
-    //(*m_rigidObject->getRigidBody()->m_pos) = m_trackingController->getPosition();
-    //(*m_rigidObject->getRigidBody()->m_orientation) = m_trackingController->getRotation();
 
     const Vec3d  ks = Vec3d(10000000.0, 10000000.0, 10000000.0);
     const double kd = 800.0;
@@ -82,7 +86,7 @@ RigidObjectController::updateControlledObjects()
     const Quatd desiredOrientation = getRotation();
     {
         // q gives the delta rotation that gets us from curr->desired
-        Quatd dq = desiredOrientation * currOrientation.inverse();
+        const Quatd dq = desiredOrientation * currOrientation.inverse();
         // Get the rotation axes
         Rotd angleAxes = Rotd(dq);
         angleAxes.axis().normalize();

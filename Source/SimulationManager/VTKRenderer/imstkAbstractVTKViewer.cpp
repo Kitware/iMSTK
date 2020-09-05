@@ -142,6 +142,11 @@ AbstractVTKViewer::setWindowTitle(const std::string& title)
 void
 AbstractVTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*= Vec3d::Zero()*/, const bool gradientBackground /*= false*/)
 {
+    if (getActiveScene() == nullptr)
+    {
+        LOG(WARNING) << "Must set active scene before setting background color";
+        return;
+    }
     this->getActiveRenderer()->updateBackground(color1, color2, gradientBackground);
 }
 

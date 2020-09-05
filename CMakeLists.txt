@@ -287,7 +287,6 @@ list(APPEND VTK_DEPENDENCIES
   RenderingContext2D
   RenderingContextOpenGL2
   RenderingCore
-  RenderingExternal
   RenderingOpenGL2
   RenderingOpenVR
   RenderingVolume

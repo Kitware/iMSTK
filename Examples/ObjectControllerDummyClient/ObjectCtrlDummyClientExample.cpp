@@ -24,6 +24,7 @@
 #include "imstkCube.h"
 #include "imstkDummyClient.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkNew.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
@@ -39,6 +40,8 @@ using namespace imstk;
 int
 main()
 {
+    Logger::startLogger();
+
     imstkNew<Scene> scene("ObjectControllerDummyClient");
 
     // Device Client

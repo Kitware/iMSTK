@@ -42,7 +42,8 @@ RigidObject2::initialize()
     DynamicObject::initialize();
     m_rigidBodyModel2->initialize();
 
-    updatePhysicsGeometry();
+    updateGeometries();
+    m_physicsGeometry->updatePostTransformData();
 
     return true;
 }
@@ -61,6 +62,7 @@ RigidObject2::updatePhysicsGeometry()
     // Apply the transform back to the geometry
     m_physicsGeometry->setTranslation(m_rigidBody->getPosition());
     m_physicsGeometry->setRotation(m_rigidBody->getOrientation());
+    m_physicsGeometry->updatePostTransformData();
 
     DynamicObject::updatePhysicsGeometry();
 }

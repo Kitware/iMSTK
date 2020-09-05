@@ -338,7 +338,7 @@ template<class T, class RecieverType>
 static void
 queueConnect(EventObject* sender, EventType type, RecieverType* reciever, void (RecieverType::* func)(T*))
 {
-    // todo: Concept check that the function exists on reciever obj
+    // \todo Concept check that the function exists on reciever obj
     std::function<void(T*)> bindFunc = std::bind(func, reciever, std::placeholders::_1);
     sender->queuedObservers[type].push_back(EventObject::Observer(reciever, [ = ](Event* e) { bindFunc(static_cast<T*>(e)); }));
 }

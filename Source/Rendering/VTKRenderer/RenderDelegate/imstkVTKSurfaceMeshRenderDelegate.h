@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkTextureManager.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKTextureDelegate.h"
 

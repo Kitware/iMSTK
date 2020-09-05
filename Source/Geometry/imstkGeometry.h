@@ -191,6 +191,8 @@ public:
     ///
     void modified() { emit(Event(EventType::Modified)); }
 
+    virtual void updatePostTransformData() const { }
+
 protected:
     ///
     /// \brief Get a unique ID for the new generated geometry object
@@ -217,7 +219,6 @@ protected:
     virtual void applyTranslation(const Vec3d imstkNotUsed(t)) { }
     virtual void applyRotation(const Mat3d imstkNotUsed(r)) { }
     virtual void applyScaling(const double imstkNotUsed(s)) { }
-    virtual void updatePostTransformData() const { }
 
     Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry

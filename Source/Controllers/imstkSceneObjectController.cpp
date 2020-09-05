@@ -44,10 +44,7 @@ SceneObjectController::updateControlledObjects()
         }
     }
 
-    if (m_updateCallback)
-    {
-        m_updateCallback(this);
-    }
+    emit(Event(EventType::Modified));
 
     // Update colliding geometry
     m_sceneObject->getMasterGeometry()->setTranslation(getPosition());

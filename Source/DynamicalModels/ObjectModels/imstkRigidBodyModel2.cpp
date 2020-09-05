@@ -156,9 +156,7 @@ RigidBodyModel2::configure(std::shared_ptr<RigidBodyModel2Config> config)
 void
 RigidBodyModel2::computeTentativeVelocities()
 {
-    //printf("Pos: %f, %f, %f\n", (*m_bodies[0]->m_pos)[0], (*m_bodies[0]->m_pos)[1], (*m_bodies[0]->m_pos)[2]);
-
-    const double            dt = m_config->m_dt;
+    const double dt = m_config->m_dt;
     const StdVectorOfReal& invMasses = getCurrentState()->getInvMasses();
     const StdVectorOfMat3d& invInteriaTensors = getCurrentState()->getInvIntertiaTensors();
     StdVectorOfVec3d& tentativeVelocities = getCurrentState()->getTentatveVelocities();
@@ -350,9 +348,9 @@ RigidBodyModel2::integrate()
             if (!isStatic[i])
             {
                 velocities[i] += forces[i] * invMasses[i] * dt;
-                velocities[i] *= 0.9;        // Damping
+                velocities[i] *= 0.99;        // Damping
                 angularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
-                angularVelocities[i] *= 0.9; // Damping
+                angularVelocities[i] *= 0.99; // Damping
                 positions[i] += velocities[i] * dt;
                 {
                     const Quatd q = Quatd(0.0,

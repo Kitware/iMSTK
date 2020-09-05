@@ -20,8 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCube.h"
-#include "imstkGeometryUtilities.h"
+#include "imstkCollisionGraph.h"
 #include "imstkImageData.h"
 #include "imstkImplicitGeometryToImageData.h"
 #include "imstkLevelSetDeformableObject.h"
@@ -36,18 +35,18 @@
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkRigidObjectController.h"
+#include "imstkRigidObjectLevelSetCollisionPair.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
-#include "imstkSurfaceMeshSubdivide.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVTKOpenVRViewer.h"
-
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkVolumeProperty.h>
+#include "imstkSurfaceMeshSubdivide.h"
 
 using namespace imstk;
 using namespace imstk::expiremental;
@@ -60,27 +59,10 @@ makeLevelsetObj(const std::string& name)
 {
     imstkNew<LevelSetDeformableObject> levelsetObj(name);
 
-    // Setup a plane
-    imstkNew<Plane> plane(Vec3d(0.0, 1.0, 0.0), Vec3d(0.0, 1.0, 0.0));
-
-    // Put into an image
-    imstkNew<ImplicitGeometryToImageData> toSdf;
-    toSdf->setInputGeometry(plane);
-    Vec6d bounds;
-    bounds[0] = -2.0;
-    bounds[1] = 2.0;
-    bounds[2] = -2.0;
-    bounds[3] = 2.0;
-    bounds[4] = -2.0;
-    bounds[5] = 2.0;
-    toSdf->setBounds(bounds);
-    toSdf->setDimensions(Vec3i(150, 150, 150));
-    toSdf->update();
-    std::shared_ptr<ImageData> initLvlsetImage = toSdf->getOutputImage();
-    //imstkNew<SignedDistanceField> sdf(initLvlsetImage);
-
-    // Setup the Geometry (read dragon mesh)
-    //std::shared_ptr<ImageData> initLvlsetImage = MeshIO::read<ImageData>("C:/Users/Andx_/Desktop/mandibleReducedSmoothened1_SDF.nii")->cast(IMSTK_DOUBLE);
+    std::shared_ptr<ImageData> initLvlsetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT"/legs/femurBone_SDF.nii")->cast(IMSTK_DOUBLE);
+    const Vec3d& currSpacing = initLvlsetImage->getSpacing();
+    initLvlsetImage->setSpacing(currSpacing * 0.0015);
+    initLvlsetImage->setOrigin(Vec3d(0.0, 1.0, -2.0));
 
     // Setup the Parameters
     imstkNew<LevelSetModelConfig> lvlSetConfig;
@@ -97,7 +79,7 @@ makeLevelsetObj(const std::string& name)
     imstkNew<VolumeRenderMaterial> mat;
     {
         vtkNew<vtkColorTransferFunction> color;
-        color->AddRGBPoint(0.0, 0.0, 0.0, 1.0);
+        color->AddRGBPoint(0.0, 0.75, 0.73, 0.66);
         mat->getVolumeProperty()->SetColor(color);
         vtkNew<vtkPiecewiseFunction> opacity;
         opacity->AddPoint(0.0, 0.0);
@@ -124,10 +106,6 @@ makeCollidingObject(const std::string& name)
 
     // Setup a plane, then cut with a sphere
     imstkNew<Plane> plane(Vec3d(0.0, 0.0, 0.0), Vec3d(0.0, 1.0, 0.0));
-    /*imstkNew<Sphere> sphere(Vec3d(0.0, 0.0, 0.0), 4.0);
-    imstkNew<CompositeImplicitGeometry> compGeometry;
-    compGeometry->addImplicitGeometry(plane, CompositeImplicitGeometry::GeometryBoolType::UNION);
-    compGeometry->addImplicitGeometry(sphere, CompositeImplicitGeometry::GeometryBoolType::DIFFERENCE);*/
 
     // Put into an image
     imstkNew<ImplicitGeometryToImageData> toSdf;
@@ -166,88 +144,35 @@ makeRigidObj(const std::string& name)
     rbdModel->getConfig()->m_maxNumIterations = 10;
 
     // Create the first rbd, plane floor
-    imstkNew<RigidObject2> rigidObj(name);
+    imstkNew<RigidObject2> rigidObj("Cube");
+
     {
-        // Setup a cube
-        imstkNew<Cube> cubeGeom;
-        cubeGeom->setWidth(0.05);
+        auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Blade10_Hull.stl");
+        toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
+        toolMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
+        toolMesh->scale(0.07, Geometry::TransformType::ApplyToData);
 
-        // Setup a surface for the cube, we use this for collision
-        std::shared_ptr<SurfaceMesh> cubeSurfMesh = GeometryUtils::toCubeSurfaceMesh(cubeGeom);
-        // The points are used for collision so we want it to be somewhat fine
-        imstkNew<SurfaceMeshSubdivide> subdiv;
-        subdiv->setInputMesh(cubeSurfMesh);
-        subdiv->setNumberOfSubdivisions(3);
-        subdiv->update();
-        std::shared_ptr<SurfaceMesh> cubeSurfMeshSubdiv = subdiv->getOutputMesh();
-
-        // Create the visual model
-        imstkNew<VisualModel> visualModel(cubeSurfMeshSubdiv);
+        imstkNew<VisualModel>    visualModel(toolMesh);
         imstkNew<RenderMaterial> mat;
-        mat->setDisplayMode(RenderMaterial::DisplayMode::Points);
-        mat->setPointSize(15.0);
+        mat->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        mat->setMetalness(0.9f);
+        mat->setRoughness(0.2f);
+        //mat->setDisplayMode(RenderMaterial::DisplayMode::Points);
+        //mat->setPointSize(15.0);
         visualModel->setRenderMaterial(mat);
 
         // Create the object
         rigidObj->addVisualModel(visualModel);
-        rigidObj->setPhysicsGeometry(cubeSurfMeshSubdiv);
-        rigidObj->setCollidingGeometry(cubeSurfMeshSubdiv);
-        rigidObj->setVisualGeometry(cubeSurfMeshSubdiv);
-        // Make the cube transform apply to the surface mesh
-        //rigidObj->setPhysicsToCollidingMap(cubeSurfMesh);
+        rigidObj->setPhysicsGeometry(toolMesh);
+        rigidObj->setCollidingGeometry(toolMesh);
+        rigidObj->setVisualGeometry(toolMesh);
         rigidObj->setDynamicalModel(rbdModel);
         rigidObj->getRigidBody()->m_mass = 100.0;
-        rigidObj->getRigidBody()->setInertiaFromPointSet(cubeSurfMeshSubdiv, 0.01);
-        rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 10.0, 0.0);
-        //rigidObj->getRigidBody()->m_initPos = Vec3d(0.702677, 0.798054, -1.161267);
-        //rigidObj->getRigidBody()->m_initOrientation = Rotd(0.8, Vec3d(1.0, 0.0, 0.0)) * Rotd(0.4, Vec3d(0.0, 1.0, 0.0));
+        rigidObj->getRigidBody()->setInertiaFromPointSet(toolMesh, 0.01, false);
+        rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 2.0, 0.0);
     }
-    //{
-    //    std::shared_ptr<SurfaceMesh> toolMesh1 = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel Blade10/Scalpel Blade10.obj");
-    //    imstkNew<SurfaceMeshSubdivide> subdivide;
-    //    subdivide->setInputMesh(toolMesh1);
-    //    subdivide->setNumberOfSubdivisions(2);
-    //    subdivide->update();
-    //    std::shared_ptr<SurfaceMesh> toolMesh = subdivide->getOutputMesh();
-    //    toolMesh->translate(0.0, 0.0, 1.0, Geometry::TransformType::ApplyToData);
-    //    toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
-    //    toolMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
-    //    toolMesh->scale(0.07, Geometry::TransformType::ApplyToData);
-
-    //    imstkNew<VisualModel>    visualModel(toolMesh);
-    //    imstkNew<RenderMaterial> material;
-    //    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    //    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    //    material->setMetalness(0.9f);
-    //    material->setRoughness(0.2f);
-    //    visualModel->setRenderMaterial(material);
-
-    //   // Create the object
-    //   rigidObj->addVisualModel(visualModel);
-    //   rigidObj->setPhysicsGeometry(toolMesh);
-    //   rigidObj->setCollidingGeometry(toolMesh);
-    //   rigidObj->setVisualGeometry(toolMesh);
-    //   rigidObj->setDynamicalModel(rbdModel);
-    //   rigidObj->getRigidBody()->m_mass = 100.0;
-    //   rigidObj->getRigidBody()->setInertiaFromPointSet(toolMesh, 0.01);
-    //   rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 4.0, 0.0);
-    //   //rigidObj->getRigidBody()->m_initOrientation = Rotd(0.8, Vec3d(1.0, 0.0, 0.0)) * Rotd(0.4, Vec3d(0.0, 1.0, 0.0));
-    //}
     return rigidObj;
-}
-
-std::shared_ptr<VisualObject>
-makeVisualObject(const std::string& name, const std::string& fileName, const Vec3d pos, const double scale = 1.0)
-{
-    // Create the first rbd, plane floor
-    imstkNew<VisualObject> visualObj(name);
-    {
-        std::shared_ptr<SurfaceMesh> surfMesh = MeshIO::read<SurfaceMesh>(fileName);
-        surfMesh->translate(pos, Geometry::TransformType::ApplyToData);
-        surfMesh->scale(scale, Geometry::TransformType::ApplyToData);
-        visualObj->addVisualModel(std::make_shared<VisualModel>(surfMesh));
-    }
-    return visualObj;
 }
 
 ///
@@ -262,16 +187,14 @@ main()
     imstkNew<Scene> scene("LevelsetDeformable");
     scene->getConfig()->writeTaskGraph = true;
 
-   /* std::shared_ptr<LevelSetDeformableObject> lvlSetObj = makeLevelsetObj("LevelSetObj");
-    scene->addSceneObject(lvlSetObj);*/
+    std::shared_ptr<LevelSetDeformableObject> lvlSetObj = makeLevelsetObj("LevelSetObj");
+    scene->addSceneObject(lvlSetObj);
 
     std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("RigidObj");
     scene->addSceneObject(rbdObj);
 
-    //scene->addSceneObject(makeVisualObject("modelTest", "C:/Users/Andx_/Desktop/torso.stl", Vec3d(0.0, 10.0, 0.0), 0.001));
-
-   /* imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, lvlSetObj);
-    scene->getCollisionGraph()->addInteraction(interaction);*/
+    imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, lvlSetObj);
+    scene->getCollisionGraph()->addInteraction(interaction);
 
 
     // Light (white)

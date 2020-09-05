@@ -27,14 +27,19 @@ namespace imstk
 namespace expiremental
 {
 void
-RigidBody::setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale)
+RigidBody::setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale, const bool useBoundingBoxOrigin)
 {
     Mat3d results;
     results.setZero();
-    Vec3d min, max;
-    pointset->computeBoundingBox(min, max);
-    const Vec3d             centroid = (min + max) * 0.5;
-    const StdVectorOfVec3d& vertices = pointset->getVertexPositions();
+    
+    Vec3d centroid = Vec3d(0.0, 0.0, 0.0);
+    if (useBoundingBoxOrigin)
+    {
+        Vec3d min, max;
+        pointset->computeBoundingBox(min, max);
+        centroid = (min + max) * 0.5;
+    }
+    const StdVectorOfVec3d& vertices = pointset->getVertexPositions(Geometry::DataType::PreTransform);
     for (size_t i = 0; i < vertices.size(); i++)
     {
         const Vec3d r = vertices[i] - centroid;

@@ -20,8 +20,11 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkColorFunction.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
@@ -147,61 +150,69 @@ main()
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
-    // Light (white)
-    imstkNew<DirectionalLight> whiteLight("whiteLight");
-    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
-    scene->addLight(whiteLight);
-
-    // Light (red)
-    imstkNew<SpotLight> colorLight("colorLight");
-    colorLight->setPosition(Vec3d(-5, -3, 5));
-    colorLight->setFocalPoint(Vec3d(0, -5, 5));
-    colorLight->setIntensity(100);
-    colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(30);
-    scene->addLight(colorLight);
-
     // Adjust camera
     scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
     scene->getActiveCamera()->setPosition(-15.0, -5.0, 15.0);
 
-    // Adds a custom physics step to print out maximum velocity
-    std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
-    connect<Event>(scene, EventType::Configure,
-        [&](Event*)
-        {
-            // Get the graph
-            std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
+    {
+        // Setup some scalars
+        auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
+        auto scalarsPtr = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
+        std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
+        clothGeometry->setScalars(scalarsPtr);
 
-            // First write the graph before we make modifications, just to show the changes
-            imstkNew<TaskGraphVizWriter> writer;
-            writer->setInput(graph);
-            writer->setFileName("taskGraphConfigureExampleOld.svg");
-            writer->write();
+        // Setup the material for the scalars
+        std::shared_ptr<RenderMaterial> material = clothObj->getVisualModel(0)->getRenderMaterial();
+        material->setScalarVisibility(true);
+        std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+        colorFunc->setNumberOfColors(2);
+        colorFunc->setColor(0, Color::Green);
+        colorFunc->setColor(1, Color::Red);
+        colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
+        colorFunc->setRange(0.0, 2.0);
+        material->setColorLookupTable(colorFunc);
 
-            imstkNew<TaskNode> printMaxVelocity([&]()
-                {
-                    const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities().get();
-                    double maxVel = std::numeric_limits<double>::min();
-                    for (size_t i = 0; i < velocities.size(); i++)
+        // Adds a custom physics step to print out maximum velocity
+        std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
+        connect<Event>(scene, EventType::Configure,
+            [&](Event*)
+            {
+                // Get the graph
+                std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
+
+                // First write the graph before we make modifications, just to show the changes
+                imstkNew<TaskGraphVizWriter> writer;
+                writer->setInput(graph);
+                writer->setFileName("taskGraphConfigureExampleOld.svg");
+                writer->write();
+
+                // This node computes displacements and sets the color to the magnitude
+                std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
                     {
-                        const double vel = velocities[i].squaredNorm();
-                        if (vel > maxVel)
+                        /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
+                        const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
+                        StdVectorOfReal& scalars = *scalarsPtr;
+                        for (size_t i = 0; i < initPos.size(); i++)
                         {
-                            maxVel = vel;
+                            scalars[i] = (currPos[i] - initPos[i]).norm();
+                        }*/
+                        const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+                        StdVectorOfReal& scalars = *scalarsPtr;
+                        for (size_t i = 0; i < velocities.size(); i++)
+                        {
+                            scalars[i] = velocities[i].norm();
                         }
-                    }
-                    LOG(INFO) << "Max Velocity: " << std::sqrt(maxVel);
-                }, "PrintMaxVelocity");
+                    }, "ComputeVelocityScalars");
 
-            // After IntegratePosition
-            graph->insertAfter(pbdModel->getIntegratePositionNode(), printMaxVelocity);
+                // After IntegratePosition
+                graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
 
-            // Write the modified graph
-            writer->setFileName("taskGraphConfigureExampleNew.svg");
-            writer->write();
-        });
+                // Write the modified graph
+                writer->setFileName("taskGraphConfigureExampleNew.svg");
+                writer->write();
+
+            });
+    }
 
     // Run the simulation
     {
@@ -213,6 +224,18 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
         viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
 
         viewer->start();
     }

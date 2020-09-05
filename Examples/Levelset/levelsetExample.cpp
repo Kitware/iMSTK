@@ -69,7 +69,7 @@ makeLevelsetObj(const std::string& name)
     imstkNew<LevelSetModelConfig> lvlsetConfig;
     lvlsetConfig->m_sparseUpdate = false;
     lvlsetConfig->m_dt = 0.0003;
-    lvlsetConfig->m_constantVelocity = 6.0;
+    lvlsetConfig->m_constantVelocity = -6.0;
 
     // Setup the Model
     imstkNew<LevelSetModel> dynamicalModel;

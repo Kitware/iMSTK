@@ -70,19 +70,46 @@ LevelSetCH::processCollisionData()
     const Vec3d& invSpacing = grid->getInvSpacing();
     const Vec3d& origin = grid->getOrigin();
 
+    //if (m_useProportionalForce)
+    //{
+    //    // Apply impulses at points of contacts
+    //    PositionDirectionCollisionData& pdColData = m_colData->PDColData;
+    //    for (int i = 0; i < pdColData.getSize(); i++)
+    //    {
+    //        const Vec3d& pos = pdColData[i].posB;
+    //        const Vec3d& normal = pdColData[i].dirAtoB;
+    //        const Vec3i  coord = (pos - origin).cwiseProduct(invSpacing).cast<int>();
+
+    //        const double fN = normal.dot(m_rigidObj->getRigidBody()->getForce());
+    //        const double S = m_velocityScaling;
+
+    //        for (int z = 0; z < 3; z++)
+    //        {
+    //            for (int y = 0; y < 3; y++)
+    //            {
+    //                for (int x = 0; x < 3; x++)
+    //                {
+    //                    const Vec3i fCoord = coord + Vec3i(x - 1, y - 1, z - 1);
+    //                    /*float S = 0.05f *
+    //                            glm::max(
+    //                                    glm::dot(-glm::normalize(computeGrad(fCoords[0], fCoords[1], imgPtr, dim, spacing)),
+    //                                            glm::vec2(rigidObj->getForce())), 0.0f);*/
+    //                    lvlSetModel->addImpulse(fCoord, S * gaussianKernel[x][y][z]);
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+    //else
     {
         // Apply impulses at points of contacts
         PositionDirectionCollisionData& pdColData = m_colData->PDColData;
         for (int i = 0; i < pdColData.getSize(); i++)
         {
             const Vec3d& pos = pdColData[i].posB;
-            const Vec3d& normal = pdColData[i].dirAtoB;
+            //const Vec3d& normal = pdColData[i].dirAtoB;
             const Vec3i  coord = (pos - origin).cwiseProduct(invSpacing).cast<int>();
-
-            //const double fN = normal.dot(m_rigidObj->getRigidBody()->getForce());
-            const double S = 0.1;
-            //const double S = 0.00001 * fN;
-            //printf("f: %f\n", fN);
+            const double S = m_velocityScaling;
 
             for (int z = 0; z < 3; z++)
             {
@@ -91,10 +118,6 @@ LevelSetCH::processCollisionData()
                     for (int x = 0; x < 3; x++)
                     {
                         const Vec3i fCoord = coord + Vec3i(x - 1, y - 1, z - 1);
-                        /*float S = 0.05f *
-                                glm::max(
-                                        glm::dot(-glm::normalize(computeGrad(fCoords[0], fCoords[1], imgPtr, dim, spacing)),
-                                                glm::vec2(rigidObj->getForce())), 0.0f);*/
                         lvlSetModel->addImpulse(fCoord, S * gaussianKernel[x][y][z]);
                     }
                 }

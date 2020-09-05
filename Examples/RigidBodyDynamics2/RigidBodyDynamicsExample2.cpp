@@ -21,8 +21,10 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkCompositeImplicitGeometry.h"
 #include "imstkCube.h"
 #include "imstkGeometryUtilities.h"
+#include "imstkImplicitGeometryToImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
@@ -38,7 +40,9 @@
 #include "imstkRigidObjectCollisionPair.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -67,16 +71,41 @@ main()
         // Create the first rbd, plane floor
         imstkNew<RigidObject2> planeObj("Plane");
         {
+            // Subtract the sphere from the plane to make a crater
             imstkNew<Plane> planeGeom;
             planeGeom->setWidth(40.0);
+            imstkNew<Sphere> sphereGeom;
+            sphereGeom->setRadius(15.0);
+            imstkNew<CompositeImplicitGeometry> compGeom;
+            compGeom->addImplicitGeometry(planeGeom, CompositeImplicitGeometry::GeometryBoolType::UNION);
+            compGeom->addImplicitGeometry(sphereGeom, CompositeImplicitGeometry::GeometryBoolType::DIFFERENCE);
+
+            // Rasterize the SDF into an image
+            imstkNew<ImplicitGeometryToImageData> toImage;
+            toImage->setInputGeometry(compGeom);
+            Vec6d bounds;
+            bounds[0] = -20.0;
+            bounds[1] = 20.0;
+            bounds[2] = -20.0;
+            bounds[3] = 20.0;
+            bounds[4] = -20.0;
+            bounds[5] = 20.0;
+            toImage->setBounds(bounds);
+            toImage->setDimensions(Vec3i(80, 80, 80));
+            toImage->update();
+
+            // Extract surface
+            imstkNew<SurfaceMeshFlyingEdges> toSurfMesh;
+            toSurfMesh->setInputImage(toImage->getOutputImage());
+            toSurfMesh->update();
 
             // Create the visual model
-            imstkNew<VisualModel> visualModel(planeGeom.get());
+            imstkNew<VisualModel> visualModel(toSurfMesh->getOutputMesh());
 
             // Create the object
             planeObj->addVisualModel(visualModel);
-            planeObj->setPhysicsGeometry(planeGeom);
-            planeObj->setCollidingGeometry(planeGeom);
+            planeObj->setPhysicsGeometry(compGeom);
+            planeObj->setCollidingGeometry(compGeom);
             planeObj->setDynamicalModel(rbdModel);
             planeObj->getRigidBody()->m_isStatic = true;
             planeObj->getRigidBody()->m_mass = 100.0;
@@ -146,6 +175,15 @@ main()
             viewer->addControl(keyControl);
         }
 
+        LOG(INFO) << "Cube Controls:";
+        LOG(INFO) << "----------------------------------------------------------------------";
+        LOG(INFO) << " | i - forward movement";
+        LOG(INFO) << " | j - left movement";
+        LOG(INFO) << " | l - right movement";
+        LOG(INFO) << " | k - backwards movement";
+        LOG(INFO) << " | u - rotate left";
+        LOG(INFO) << " | o - rotate right";
+
         // Not perfectly thread safe movement lambda, ijkl movement instead of wasd because d is already used
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
         const Vec3d dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
@@ -156,27 +194,27 @@ main()
                 // If w down, move forward
                 if (keyDevice->getButton('i') == KEY_PRESS)
                 {
-                    extForce += Vec3d(0.0, 0.0, -100.0);
+                    extForce += Vec3d(0.0, 0.0, -40.0);
                 }
                 if (keyDevice->getButton('k') == KEY_PRESS)
                 {
-                    extForce += Vec3d(0.0, 0.0, 100.0);
+                    extForce += Vec3d(0.0, 0.0, 40.0);
                 }
                 if (keyDevice->getButton('j') == KEY_PRESS)
                 {
-                    extForce += Vec3d(-100.0, 0.0, 0.0);
+                    extForce += Vec3d(-40.0, 0.0, 0.0);
                 }
                 if (keyDevice->getButton('l') == KEY_PRESS)
                 {
-                    extForce += Vec3d(100.0, 0.0, 0.0);
+                    extForce += Vec3d(40.0, 0.0, 0.0);
                 }
                 if (keyDevice->getButton('u') == KEY_PRESS)
                 {
-                    extTorque += Vec3d(0.0, 1.0, 0.0);
+                    extTorque += Vec3d(0.0, 0.5, 0.0);
                 }
                 if (keyDevice->getButton('o') == KEY_PRESS)
                 {
-                    extTorque += Vec3d(0.0, -1.0, 0.0);
+                    extTorque += Vec3d(0.0, -0.5, 0.0);
                 }
                 *cubeObj->getRigidBody()->m_force = extForce;
                 *cubeObj->getRigidBody()->m_torque = extTorque;

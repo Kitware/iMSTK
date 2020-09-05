@@ -125,6 +125,9 @@ SceneManager::updateThread()
     // Advance the scene
     if (m_activeScene != nullptr)
     {
+        // Process one event
+        doEvent();
+
         m_activeScene->advance();
     }
 }
