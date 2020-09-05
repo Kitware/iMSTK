@@ -36,12 +36,11 @@ public:
     ~LoopThreadObjectMock() override = default;
 
     bool m_init    = false;
-    bool m_run     = false;
     bool m_cleanup = false;
 
 protected:
     inline void initThread() override { m_init = true; }
-    inline void updateThread() override { m_run = true; }
+    inline void updateThread() override { }
     inline void stopThread() override { m_cleanup = true; }
 };
 }
@@ -115,80 +114,50 @@ TEST_F(imstkModuleTest, GetFrequency)
     m_threadObject.setLoopDelay(-5);
     EXPECT_GE(m_threadObject.getFrequency(), 0);
 }
+
 TEST_F(imstkModuleTest, ControlModule)
 {
     ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
 
-    m_threadObject.start();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
-    ASSERT_FALSE(m_threadObject.m_init);
-    ASSERT_FALSE(m_threadObject.m_run);
-    ASSERT_FALSE(m_threadObject.m_cleanup);
+    // Test sync stop/pause
+    {
+        ASSERT_FALSE(m_threadObject.m_init);
 
-    m_threadObject.pause();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
-    ASSERT_FALSE(m_threadObject.m_init);
-    ASSERT_FALSE(m_threadObject.m_run);
-    ASSERT_FALSE(m_threadObject.m_cleanup);
+        m_threadObject.start(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Running);
+        ASSERT_TRUE(m_threadObject.m_init);
+        ASSERT_FALSE(m_threadObject.m_cleanup);
 
-    m_threadObject.stop();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
-    ASSERT_FALSE(m_threadObject.m_init);
-    ASSERT_FALSE(m_threadObject.m_run);
-    ASSERT_TRUE(m_threadObject.m_cleanup);
+        m_threadObject.pause(true);
+        ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Paused);
+        ASSERT_TRUE(m_threadObject.m_init);
+        ASSERT_FALSE(m_threadObject.m_cleanup);
 
-    auto t = std::thread([this] { m_threadObject.start(); });
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Running);
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_TRUE(m_threadObject.m_run);
+        m_threadObject.stop(true);
+        ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
+        ASSERT_TRUE(m_threadObject.m_init);
+        ASSERT_TRUE(m_threadObject.m_cleanup);
+    }
 
-    m_threadObject.pause();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Paused);
-    m_threadObject.m_run = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_FALSE(m_threadObject.m_run);
+    // Test async start/stop/pause
+    {
+        m_threadObject.start(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Running);
+        ASSERT_TRUE(m_threadObject.m_init);
 
-    m_threadObject.start();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Running);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_TRUE(m_threadObject.m_run);
+        m_threadObject.pause(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Paused);
+        ASSERT_TRUE(m_threadObject.m_init);
 
-    m_threadObject.stop();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_TRUE(m_threadObject.m_run);
-    ASSERT_TRUE(m_threadObject.m_cleanup);
-
-    t.join();
-    m_threadObject.m_init = m_threadObject.m_run = m_threadObject.m_cleanup = false;
-
-    t = std::thread([this] { m_threadObject.start(); });
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Running);
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_TRUE(m_threadObject.m_run);
-    ASSERT_FALSE(m_threadObject.m_cleanup);
-
-    m_threadObject.pause();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Paused);
-    m_threadObject.m_run = false;
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_FALSE(m_threadObject.m_run);
-    ASSERT_FALSE(m_threadObject.m_cleanup);
-
-    m_threadObject.stop();
-    ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    ASSERT_TRUE(m_threadObject.m_init);
-    ASSERT_FALSE(m_threadObject.m_run);
-    ASSERT_TRUE(m_threadObject.m_cleanup);
-
-    t.join();
+        m_threadObject.stop(false);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
+        ASSERT_TRUE(m_threadObject.m_init);
+        ASSERT_TRUE(m_threadObject.m_cleanup);
+    }
 }
 
 ///
