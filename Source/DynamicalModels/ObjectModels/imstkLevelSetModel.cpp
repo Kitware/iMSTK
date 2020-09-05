@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkLeveLSetModel.h"
+#include "imstkLevelSetModel.h"
 #include "imstkTaskGraph.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
@@ -104,8 +104,7 @@ LevelSetModel::evolveDistanceField()
     const Vec3i& dim       = imageData->getDimensions();
     const Vec3d& spacing   = imageData->getSpacing();
     const Vec3d& origin    = imageData->getOrigin();
-    const double dt    = m_config->m_dt;
-    const Vec3d  shift = origin + spacing * 0.5;
+    const double dt = m_config->m_dt;
 
     if (m_config->m_sparseUpdate)
     {
@@ -144,7 +143,7 @@ LevelSetModel::evolveDistanceField()
 
         // Update levelset
         const double constantVel = m_config->m_constantVelocity;
-        for (int i = 0; i < nodeUpdates.size(); i++)
+        for (size_t i = 0; i < nodeUpdates.size(); i++)
         {
             const size_t index = std::get<0>(nodeUpdates[i]);
             //const Vec3i& coords = std::get<1>(nodeUpdates[i]);

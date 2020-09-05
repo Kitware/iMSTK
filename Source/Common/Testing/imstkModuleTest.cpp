@@ -119,7 +119,7 @@ TEST_F(imstkModuleTest, ControlModule)
 {
     ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
 
-    // Test sync stop/pause
+    // Test start/stop/pause
     ASSERT_FALSE(m_threadObject.m_init);
 
     m_threadObject.start(false);
@@ -137,24 +137,6 @@ TEST_F(imstkModuleTest, ControlModule)
     ASSERT_EQ(m_threadObject.getStatus(), ThreadStatus::Inactive);
     ASSERT_TRUE(m_threadObject.m_init);
     ASSERT_TRUE(m_threadObject.m_cleanup);
-
-    // Test async start/stop/pause
-    LoopThreadObjectMock threadObject2;
-    threadObject2.start(false);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_EQ(threadObject2.getStatus(), ThreadStatus::Running);
-    ASSERT_TRUE(threadObject2.m_init);
-
-    threadObject2.pause(false);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_EQ(threadObject2.getStatus(), ThreadStatus::Paused);
-    ASSERT_TRUE(threadObject2.m_init);
-
-    threadObject2.stop(true);
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_EQ(threadObject2.getStatus(), ThreadStatus::Inactive);
-    ASSERT_TRUE(threadObject2.m_init);
-    ASSERT_TRUE(threadObject2.m_cleanup);
 }
 
 ///

@@ -24,6 +24,8 @@
 
 #include <unordered_map>
 
+class vtkInteractorStyleVR;
+
 namespace imstk
 {
 using DeviceType = int;
@@ -40,7 +42,12 @@ using VRButtonStateType = int;
 class VRButtonEvent : public Event
 {
 public:
-    VRButtonEvent(const int button, const VRButtonStateType keyPressType) : Event(EventType::VRButtonPress, 1), m_button(button), m_buttonState(keyPressType) { }
+    VRButtonEvent(const int button, const VRButtonStateType keyPressType) : Event(EventType::VRButtonPress, 1),
+        m_buttonState(keyPressType),
+        m_button(button)
+    {
+    }
+
     virtual ~VRButtonEvent() override = default;
 
 public:
@@ -73,7 +80,7 @@ public:
     virtual ~OpenVRDeviceClient() override = default;
 
     // Only the viewer is allowed to provide these objects
-    friend class vtkInteractorStyleVR;
+    friend class ::vtkInteractorStyleVR;
 
 public:
     DeviceType getDeviceType() const { return m_deviceType; }

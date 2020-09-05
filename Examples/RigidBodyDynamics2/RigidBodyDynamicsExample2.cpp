@@ -43,6 +43,7 @@
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkSurfaceMeshSubdivide.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -66,7 +67,7 @@ main()
         // This model is shared among interacting rigid bodies
         imstkNew<RigidBodyModel2> rbdModel;
         rbdModel->getConfig()->m_dt = 0.005;
-        rbdModel->getConfig()->m_maxNumIterations = 10;
+        rbdModel->getConfig()->m_maxNumIterations = 20;
 
         // Create the first rbd, plane floor
         imstkNew<RigidObject2> planeObj("Plane");
@@ -75,7 +76,8 @@ main()
             imstkNew<Plane> planeGeom;
             planeGeom->setWidth(40.0);
             imstkNew<Sphere> sphereGeom;
-            sphereGeom->setRadius(15.0);
+            sphereGeom->setRadius(25.0);
+            sphereGeom->setPosition(0.0, 10.0, 0.0);
             imstkNew<CompositeImplicitGeometry> compGeom;
             compGeom->addImplicitGeometry(planeGeom, CompositeImplicitGeometry::GeometryBoolType::UNION);
             compGeom->addImplicitGeometry(sphereGeom, CompositeImplicitGeometry::GeometryBoolType::DIFFERENCE);
@@ -117,11 +119,15 @@ main()
         {
             imstkNew<Cube> cubeGeom;
             cubeGeom->setWidth(4.0);
-            std::shared_ptr<SurfaceMesh> surfMesh =
-                GeometryUtils::toCubeSurfaceMesh(cubeGeom);
+            std::shared_ptr<SurfaceMesh> surfMesh = GeometryUtils::toCubeSurfaceMesh(cubeGeom);
+
+            imstkNew<SurfaceMeshSubdivide> subdivide;
+            subdivide->setInputMesh(surfMesh);
+            subdivide->setNumberOfSubdivisions(1);
+            subdivide->update();
 
             // Create the visual model
-            imstkNew<VisualModel>    visualModel(surfMesh);
+            imstkNew<VisualModel>    visualModel(subdivide->getOutputMesh());
             imstkNew<RenderMaterial> mat;
             mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
             mat->setLineWidth(2.0);
@@ -130,13 +136,13 @@ main()
 
             // Create the cube rigid object
             cubeObj->setDynamicalModel(rbdModel);
-            cubeObj->setPhysicsGeometry(surfMesh);
-            cubeObj->setCollidingGeometry(surfMesh);
+            cubeObj->setPhysicsGeometry(subdivide->getOutputMesh());
+            cubeObj->setCollidingGeometry(subdivide->getOutputMesh());
             cubeObj->addVisualModel(visualModel);
-            cubeObj->getRigidBody()->m_mass    = 10.0;
+            cubeObj->getRigidBody()->m_mass    = 100.0;
             cubeObj->getRigidBody()->m_initPos = Vec3d(0.0, 8.0, 0.0);
             cubeObj->getRigidBody()->m_initOrientation = Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0)));
-            cubeObj->getRigidBody()->setInertiaFromPointSet(surfMesh, 0.005);
+            cubeObj->getRigidBody()->setInertiaFromPointSet(subdivide->getOutputMesh(), 0.001, true);
 
             scene->addSceneObject(cubeObj);
         }
@@ -210,11 +216,11 @@ main()
             }
             if (keyDevice->getButton('u') == KEY_PRESS)
             {
-                extTorque += Vec3d(0.0, 0.5, 0.0);
+                extTorque += Vec3d(0.0, 1.5, 0.0);
             }
             if (keyDevice->getButton('o') == KEY_PRESS)
             {
-                extTorque += Vec3d(0.0, -0.5, 0.0);
+                extTorque += Vec3d(0.0, -1.5, 0.0);
             }
             *cubeObj->getRigidBody()->m_force  = extForce;
             *cubeObj->getRigidBody()->m_torque = extTorque;

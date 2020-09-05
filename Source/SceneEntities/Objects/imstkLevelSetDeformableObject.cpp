@@ -22,7 +22,7 @@
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLogger.h"
 #include "imstkPbdModel.h"
-#include "imstkLeveLSetModel.h"
+#include "imstkLevelSetModel.h"
 
 namespace imstk
 {

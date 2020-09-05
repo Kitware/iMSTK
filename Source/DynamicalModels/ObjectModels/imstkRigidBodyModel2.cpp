@@ -30,8 +30,8 @@ namespace imstk
 namespace expiremental
 {
 RigidBodyModel2::RigidBodyModel2() :
-    m_pgsSolver(std::make_shared<ProjectedGaussSeidelSolver<double>>()),
-    m_config(std::make_shared<RigidBodyModel2Config>())
+    m_config(std::make_shared<RigidBodyModel2Config>()),
+    m_pgsSolver(std::make_shared<ProjectedGaussSeidelSolver<double>>())
 {
     m_computeTentativeVelocities = std::make_shared<TaskNode>(
         std::bind(&RigidBodyModel2::computeTentativeVelocities, this), "RigidBodyModel_ComputeTentativeVelocities");
@@ -89,7 +89,7 @@ RigidBodyModel2::initialize()
     m_Minv = Eigen::SparseMatrix<double>(m_bodies.size() * 6, m_bodies.size() * 6);
     std::vector<Eigen::Triplet<double>> mInvTriplets;
     mInvTriplets.reserve((9 + 3) * m_bodies.size());
-    for (int i = 0; i < m_bodies.size(); i++)
+    for (size_t i = 0; i < m_bodies.size(); i++)
     {
         RigidBody& body = *m_bodies[i];
 
@@ -302,7 +302,7 @@ RigidBodyModel2::solveConstraints()
      std::cout << "V: " << std::endl << V << std::endl;
      std::cout << "b: " << std::endl << b << std::endl;*/
 
-    m_pgsSolver->setA(A);
+    m_pgsSolver->setA(&A);
     //pgsSolver.setGuess(F); // Not using warm starting
     m_pgsSolver->setMaxIterations(m_config->m_maxNumIterations);
     F = J.transpose() * m_pgsSolver->solve(b, cu);

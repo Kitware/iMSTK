@@ -38,7 +38,7 @@ VTKOpenVRViewer::VTKOpenVRViewer(std::string name) : AbstractVTKViewer(name)
 {
     // Create the interactor style
     auto vrInteractorStyle = std::make_shared<vtkInteractorStyleVR>();
-    m_interactorStyle    = vrInteractorStyle;
+    m_interactorStyle    = std::dynamic_pointer_cast<InteractorStyle>(vrInteractorStyle);
     m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
     m_interactorStyle->setUpdateFunc([&]() { updateThread(); });
 

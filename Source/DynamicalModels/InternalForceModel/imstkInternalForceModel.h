@@ -24,11 +24,15 @@
 #include "imstkMath.h"
 #include "imstkInternalForceModelTypes.h"
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4458 )
 #pragma warning( disable : 4100 )
+#endif
 #include <forceModel.h>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 namespace imstk
 {

@@ -28,10 +28,10 @@ namespace imstk
 CameraController::CameraController(std::shared_ptr<Camera>       camera,
                                    std::shared_ptr<DeviceClient> deviceClient) :
     LoopThreadObject("Camera controller"),
+    TrackingDeviceControl(deviceClient),
     m_camera(camera),
     m_cameraTranslationOffset(WORLD_ORIGIN),
-    m_cameraRotationalOffset(Quatd::Identity()),
-    TrackingDeviceControl(deviceClient)
+    m_cameraRotationalOffset(Quatd::Identity())
 {
 }
 

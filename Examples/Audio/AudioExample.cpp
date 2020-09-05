@@ -67,7 +67,7 @@ playSound(const std::string& filename)
         LOG(INFO) << std::flush;
     }
     LOG(INFO) << "\n";
-#elif
+#else
     LOG(INFO) << "testSound: Audio is supported only on windows!";
 #endif
 }
@@ -115,10 +115,10 @@ main()
 {
     Logger::startLogger();
 
-    #ifndef iMSTK_AUDIO_ENABLED
+#ifndef iMSTK_AUDIO_ENABLED
     LOG(INFO) << "Audio not enabled at build time\n";
     return 1;
-    #endif
+#endif
 
     LOG(INFO) << "--Testing audio--\n";
 

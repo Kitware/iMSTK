@@ -23,10 +23,14 @@
 
 #include "imstkInternalForceModel.h"
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4458 )
+#endif
 #include <isotropicHyperelasticFEM.h>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 namespace imstk
 {

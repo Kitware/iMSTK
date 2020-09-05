@@ -65,15 +65,15 @@ RigidObjectController::updateControlledObjects()
     const Vec3d  ks      = Vec3d(10000000.0, 10000000.0, 10000000.0);
     const double kd      = 800.0;
     const double ksTheta = 1000.0;
-    const double kdTheta = 1.0; // Not used yet
+    //const double kdTheta = 1.0; // Not used yet
 
     // Apply virtual coupling
     const Vec3d currPos    = m_rigidObject->getRigidBody()->getPosition();
     const Vec3d desiredPos = getPosition();
     {
-        const Vec3d  diff   = desiredPos - currPos;
-        const double length = diff.norm();
-        const Vec3d  dir    = diff.normalized();
+        const Vec3d diff = desiredPos - currPos;
+        //const double length = diff.norm();
+        //const Vec3d  dir    = diff.normalized();
 
         const Vec3d fS = ks.cwiseProduct(diff);
         const Vec3d fD = m_rigidObject->getRigidBody()->getVelocity() * -kd;

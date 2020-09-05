@@ -65,12 +65,12 @@
 namespace imstk
 {
 VTKRenderDelegate::VTKRenderDelegate() :
-    m_actor(vtkSmartPointer<vtkActor>::New()),
-    m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New()),
     m_transform(vtkSmartPointer<vtkTransform>::New()),
     m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
     m_volume(vtkSmartPointer<vtkVolume>::New()),
-    m_modelIsVolume(false)               // remove?
+    m_modelIsVolume(false),
+    m_actor(vtkSmartPointer<vtkActor>::New()),
+    m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New())
 {
     m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
     m_actor->SetUserTransform(m_transform);
@@ -191,7 +191,7 @@ void
 VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*                source,
                                const std::shared_ptr<VisualModel> vizModel)
 {
-    if (auto imData = vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
+    if (vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
     {
         m_volumeMapper->SetInputConnection(source);
         m_modelIsVolume = true;

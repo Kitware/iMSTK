@@ -59,8 +59,10 @@ public:
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4100 )
+#endif
     ///
     /// \brief Get the tangent stiffness matrix
     /// \todo Clear warning C4100
@@ -70,7 +72,9 @@ public:
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
     ///
     /// \brief Get the tangent stiffness matrix topology

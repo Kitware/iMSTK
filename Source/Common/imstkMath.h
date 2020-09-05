@@ -25,10 +25,14 @@
 
 #include <Eigen/Geometry>
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4127 )
+#endif
 #include <Eigen/Sparse>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 #include <Eigen/StdVector>
 #include <vector>

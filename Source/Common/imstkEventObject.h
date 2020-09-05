@@ -84,7 +84,7 @@ public:
 class Command
 {
 public:
-    Command() : m_event(nullptr), m_call(nullptr) { }
+    Command() : m_call(nullptr), m_event(nullptr) { }
     Command(std::function<void(Event*)> call, Event* event) : m_call(call), m_event(event) { }
 
 public:

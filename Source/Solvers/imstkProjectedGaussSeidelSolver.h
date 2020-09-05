@@ -20,7 +20,7 @@
 =========================================================================*/
 #pragma once
 
-#include <Eigen/SparseCore>
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -30,12 +30,15 @@ class ProjectedGaussSeidelSolver
 public:
     // Sets the vector to be used for the solve
     //void setGuess(Matrix<Scalar, -1, 1>& g) { x = g; }
-    void setA(Eigen::SparseMatrix<Scalar>& A) { this->m_A = A; }
+    void setA(Eigen::SparseMatrix<Scalar>* A) { this->m_A = A; }
     void setMaxIterations(const unsigned int maxIterations) { this->m_maxIterations = maxIterations; }
     void setRelaxation(const Scalar relaxation) { this->m_relaxation = relaxation; }
 
-    Eigen::Matrix<Scalar, -1, 1>& solve(const Eigen::Matrix<Scalar, -1, 1>& b, const Eigen::Matrix<Scalar, -1, 2>& cu) const
+    Eigen::Matrix<Scalar, -1, 1>& solve(const Eigen::Matrix<Scalar, -1, 1>& b, const Eigen::Matrix<Scalar, -1, 2>& cu)
     {
+        const Eigen::SparseMatrix<Scalar>& A = *m_A;
+
+        // Allocate new results
         m_x = Eigen::Matrix<Scalar, -1, 1>(b.rows());
         m_x.setZero();
 
@@ -45,22 +48,21 @@ public:
         for (unsigned int i = 0; i < m_maxIterations; i++)
         {
             xOld = m_x;
-            for (Eigen::Index r = 0; r < m_A.rows(); r++)
+            for (Eigen::Index r = 0; r < A.rows(); r++)
             {
                 Scalar delta = 0.0;
 
                 // Sum up rows (skip r)
                 for (Eigen::Index c = 0; c < r; c++)
                 {
-                    delta += m_A.coeff(r, c) * m_x[c];
+                    delta += A.coeff(r, c) * m_x[c];
                 }
-                for (Eigen::Index c = r + 1; c < m_A.cols(); c++)
+                for (Eigen::Index c = r + 1; c < A.cols(); c++)
                 {
-                    delta += m_A.coeff(r, c) * m_x[c];
+                    delta += A.coeff(r, c) * m_x[c];
                 }
 
-                const Scalar diagVal = m_A.coeff(r, r);
-                delta = (b[r] - delta) / m_A.coeff(r, r);
+                delta = (b[r] - delta) / A.coeff(r, r);
                 // Apply relaxation factor
                 m_x(r) += m_relaxation * (delta - m_x(r));
                 // Do projection *every iteration*
@@ -78,9 +80,9 @@ public:
     }
 
 private:
-    unsigned int m_maxIterations      = 3;
-    Scalar       m_relaxation         = static_cast<Scalar>(0.1);
-    Eigen::Matrix<Scalar, -1, 1>& m_x = Eigen::Matrix<Scalar, -1, 1>();
-    Eigen::SparseMatrix<Scalar>&  m_A = Eigen::SparseMatrix<Scalar>();
+    unsigned int m_maxIterations = 3;
+    Scalar       m_relaxation    = static_cast<Scalar>(0.1);
+    Eigen::Matrix<Scalar, -1, 1> m_x; ///> Results
+    Eigen::SparseMatrix<Scalar>* m_A = nullptr;
 };
 }

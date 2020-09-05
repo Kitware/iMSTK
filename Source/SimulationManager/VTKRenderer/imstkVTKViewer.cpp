@@ -36,8 +36,8 @@
 namespace imstk
 {
 VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
-    m_textStatusManager(std::make_shared<VTKTextStatusManager>()),
     m_lastFpsUpdate(std::chrono::high_resolution_clock::now()),
+    m_textStatusManager(std::make_shared<VTKTextStatusManager>()),
     m_lastFps(60.0)
 {
     // Create the interactor style
