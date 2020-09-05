@@ -325,6 +325,8 @@ RigidBodyModel2::integrate()
 {
     // Just a basic symplectic euler
     const double dt = m_config->m_dt;
+    const double velocityDamping = m_config->m_velocityDamping;
+    const double angularVelocityDamping = m_config->m_angularVelocityDamping;
 
     const std::vector<bool>& isStatic = getCurrentState()->getIsStatic();
 
@@ -348,9 +350,9 @@ RigidBodyModel2::integrate()
                 if (!isStatic[i])
                 {
                     velocities[i] += forces[i] * invMasses[i] * dt;
-                    velocities[i] *= 0.99;        // Damping
+                    velocities[i] *= velocityDamping;
                     angularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
-                    angularVelocities[i] *= 0.99; // Damping
+                    angularVelocities[i] *= angularVelocityDamping;
                     positions[i] += velocities[i] * dt;
                     {
                         const Quatd q = Quatd(0.0,
