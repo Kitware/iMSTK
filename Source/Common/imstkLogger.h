@@ -93,7 +93,7 @@ public:
     ///
     /// \brief Starts logger with default sinks, use getInstance to
     /// create a logger with no sinks
-    /// 
+    ///
     static Logger& startLogger()
     {
         Logger& logger = Logger::getInstance();

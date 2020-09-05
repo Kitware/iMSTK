@@ -157,7 +157,7 @@ main()
     {
         // Setup some scalars
         auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
-        auto scalarsPtr = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
+        auto scalarsPtr    = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
         std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
         clothGeometry->setScalars(scalarsPtr);
 
@@ -176,41 +176,40 @@ main()
         std::shared_ptr<PbdModel> pbdModel = clothObj->getPbdModel();
         connect<Event>(scene, EventType::Configure,
             [&](Event*)
+        {
+            // Get the graph
+            std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
+
+            // First write the graph before we make modifications, just to show the changes
+            imstkNew<TaskGraphVizWriter> writer;
+            writer->setInput(graph);
+            writer->setFileName("taskGraphConfigureExampleOld.svg");
+            writer->write();
+
+            // This node computes displacements and sets the color to the magnitude
+            std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
             {
-                // Get the graph
-                std::shared_ptr<TaskGraph> graph = scene->getTaskGraph();
-
-                // First write the graph before we make modifications, just to show the changes
-                imstkNew<TaskGraphVizWriter> writer;
-                writer->setInput(graph);
-                writer->setFileName("taskGraphConfigureExampleOld.svg");
-                writer->write();
-
-                // This node computes displacements and sets the color to the magnitude
-                std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]()
-                    {
-                        /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
-                        const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
-                        StdVectorOfReal& scalars = *scalarsPtr;
-                        for (size_t i = 0; i < initPos.size(); i++)
-                        {
-                            scalars[i] = (currPos[i] - initPos[i]).norm();
-                        }*/
-                        const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
-                        StdVectorOfReal& scalars = *scalarsPtr;
-                        for (size_t i = 0; i < velocities.size(); i++)
-                        {
-                            scalars[i] = velocities[i].norm();
-                        }
+                /*const StdVectorOfVec3d& initPos = clothGeometry->getInitialVertexPositions();
+                const StdVectorOfVec3d& currPos = clothGeometry->getVertexPositions();
+                StdVectorOfReal& scalars = *scalarsPtr;
+                for (size_t i = 0; i < initPos.size(); i++)
+                {
+                    scalars[i] = (currPos[i] - initPos[i]).norm();
+                }*/
+                const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
+                StdVectorOfReal& scalars = *scalarsPtr;
+                for (size_t i = 0; i < velocities.size(); i++)
+                {
+                    scalars[i] = velocities[i].norm();
+                }
                     }, "ComputeVelocityScalars");
 
-                // After IntegratePosition
-                graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
+            // After IntegratePosition
+            graph->insertAfter(clothObj->getUpdateGeometryNode(), computeVelocityScalars);
 
-                // Write the modified graph
-                writer->setFileName("taskGraphConfigureExampleNew.svg");
-                writer->write();
-
+            // Write the modified graph
+            writer->setFileName("taskGraphConfigureExampleNew.svg");
+            writer->write();
             });
     }
 

@@ -67,7 +67,7 @@ void
 VTKImageDataRenderDelegate::imageDataModified(Event* imstkNotUsed(e))
 {
     // Here we utilize something similar to double buffering
-    // We primarily use a single shared buffer until the moment 
+    // We primarily use a single shared buffer until the moment
     // it is reallocated
     auto imageData = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
 

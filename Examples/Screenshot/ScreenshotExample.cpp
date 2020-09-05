@@ -123,14 +123,14 @@ main()
 
             connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyPress,
                 [&](KeyPressEvent* e)
+            {
+                if (e->m_keyPressType == KEY_PRESS)
                 {
-                    if (e->m_keyPressType == KEY_PRESS)
+                    if (e->m_key == 'b')
                     {
-                        if (e->m_key == 'b')
-                        {
-                            viewer->getScreenCaptureUtility()->saveScreenShot();
-                        }
+                        viewer->getScreenCaptureUtility()->saveScreenShot();
                     }
+                }
                 });
         }
 

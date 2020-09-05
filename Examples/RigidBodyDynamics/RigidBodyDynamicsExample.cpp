@@ -59,7 +59,7 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
     tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // add visual model
-    imstkNew<VisualModel> renderModel(surfMesh.get());
+    imstkNew<VisualModel>    renderModel(surfMesh.get());
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
@@ -68,7 +68,7 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
     meshObj->addVisualModel(renderModel);
 
     // add dynamic model
-    imstkNew<RigidBodyModel> rigidModel;
+    imstkNew<RigidBodyModel>  rigidModel;
     imstkNew<RigidBodyConfig> rigidProp;
     rigidProp->m_rigidBodyType = RigidBodyType::Kinematic;
     rigidModel->configure(rigidProp);
@@ -93,7 +93,7 @@ makeCubeRigidObject(std::string& name, const Vec3d& pos, const bool isStatic = f
     // Create cube VisualModel
     auto mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     mesh->scale(5.0, Geometry::TransformType::ApplyToData);
-    imstkNew<VisualModel> renderModel(cubeGeom.get());
+    imstkNew<VisualModel>    renderModel(cubeGeom.get());
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
@@ -106,7 +106,7 @@ makeCubeRigidObject(std::string& name, const Vec3d& pos, const bool isStatic = f
     rigidMap->setSlave(mesh);
 
     // Create cube DynamicalModel
-    imstkNew<RigidBodyModel> rigidModel;
+    imstkNew<RigidBodyModel>  rigidModel;
     imstkNew<RigidBodyConfig> rigidProp;
     rigidProp->m_dynamicFriction = 0.01;
     rigidProp->m_restitution     = 0.01;
@@ -134,7 +134,7 @@ makePlaneRigidObject()
     planeObj->addVisualModel(renderModel);
 
     // dynamic model
-    imstkNew<RigidBodyModel> rigidModel;
+    imstkNew<RigidBodyModel>  rigidModel;
     imstkNew<RigidBodyConfig> rigidProp;
     rigidModel->configure(rigidProp);
     rigidModel->setModelGeometry(planeGeom);
@@ -160,7 +160,7 @@ makeSphereRigidObject(const Vec3d& t = Vec3d(0.0, 0.0, 0.0))
     sphereObj->addVisualModel(renderModel);
 
     // cube dynamic model
-    imstkNew<RigidBodyModel> rigidModel;
+    imstkNew<RigidBodyModel>  rigidModel;
     imstkNew<RigidBodyConfig> rigidProp;
     rigidProp->m_rigidBodyType = RigidBodyType::Dynamic;
     rigidModel->configure(rigidProp);

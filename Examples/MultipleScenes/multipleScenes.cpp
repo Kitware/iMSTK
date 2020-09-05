@@ -47,9 +47,9 @@ using namespace imstk;
 ///
 static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(const double width,
-    const double height,
-    const int    nRows,
-    const int    nCols)
+                  const double height,
+                  const int    nRows,
+                  const int    nCols)
 {
     imstkNew<SurfaceMesh> clothMesh;
 
@@ -105,10 +105,10 @@ makeClothGeometry(const double width,
 ///
 static std::shared_ptr<PbdObject>
 makeClothObj(const std::string& name,
-    const double       width,
-    const double       height,
-    const int          nRows,
-    const int          nCols)
+             const double       width,
+             const double       height,
+             const int          nRows,
+             const int          nCols)
 {
     imstkNew<PbdObject> clothObj(name);
 
@@ -119,10 +119,10 @@ makeClothObj(const std::string& name,
     imstkNew<PBDModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1.0e2);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1.0e1);
-    pbdParams->m_fixedNodeIds = { 0, static_cast<size_t>(nCols) - 1 };
+    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
-    pbdParams->m_gravity = Vec3d(0.0, -9.8, 0.0);
-    pbdParams->m_defaultDt = 0.005;
+    pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
+    pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
@@ -168,7 +168,7 @@ createSoftBodyScene(std::string sceneName)
     surfMeshModel->setRenderMaterial(material);
 
     imstkNew<PbdObject> deformableObj("Dragon");
-    imstkNew<PbdModel> pbdModel;
+    imstkNew<PbdModel>  pbdModel;
     pbdModel->setModelGeometry(tetMesh);
 
     // configure model
@@ -241,7 +241,7 @@ void
 testMultipleScenesInBackendMode()
 {
     imstkNew<SceneManager> sceneManager("SceneManager");
-    auto scene1 = createClothScene("clothScene");
+    auto                   scene1 = createClothScene("clothScene");
     sceneManager->addScene(scene1);
     auto scene2 = createSoftBodyScene("deformableBodyScene");
     sceneManager->addScene(scene2);
@@ -290,8 +290,8 @@ void
 testMultipleScenesInRenderMode()
 {
     // Simulation manager defaults to rendering mode
-    auto scene1     = createClothScene("clothScene");
-    auto scene2     = createSoftBodyScene("deformableBodyScene");
+    auto scene1 = createClothScene("clothScene");
+    auto scene2 = createSoftBodyScene("deformableBodyScene");
 
     scene1->getConfig()->trackFPS = true;
 
@@ -313,33 +313,33 @@ testMultipleScenesInRenderMode()
 
     connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyPress,
         [&](KeyPressEvent* e)
+    {
+        if (e->m_keyPressType == KEY_PRESS)
         {
-            if (e->m_keyPressType == KEY_PRESS)
+            if (e->m_key == 's' || e->m_key == 'S')
             {
-                if (e->m_key == 's' || e->m_key == 'S')
+                if (sceneManager->getActiveScene() == scene1)
                 {
-                    if (sceneManager->getActiveScene() == scene1)
-                    {
-                        sceneManager->setActiveScene(scene2);
-                        viewer->setActiveScene(scene2);
-                    }
-                    else
-                    {
-                        sceneManager->setActiveScene(scene1);
-                        viewer->setActiveScene(scene1);
-                    }
-
-                    if (!sceneManager->getActiveScene())
-                    {
-                        sceneManager->setActiveScene(scene1);
-                        viewer->setActiveScene(scene1);
-                    }
+                    sceneManager->setActiveScene(scene2);
+                    viewer->setActiveScene(scene2);
                 }
-                else if (e->m_key == 'q' || e->m_key == 'Q')
+                else
                 {
-                    viewer->stop(false);
+                    sceneManager->setActiveScene(scene1);
+                    viewer->setActiveScene(scene1);
+                }
+
+                if (!sceneManager->getActiveScene())
+                {
+                    sceneManager->setActiveScene(scene1);
+                    viewer->setActiveScene(scene1);
                 }
             }
+            else if (e->m_key == 'q' || e->m_key == 'Q')
+            {
+                viewer->stop(false);
+            }
+        }
         });
 
     if (scene1->getConfig()->trackFPS)
@@ -357,8 +357,8 @@ testMultipleScenesInBackgroundMode()
 
     imstkNew<SceneManager> sceneManager("SceneManager");
     consoleThread->addChildThread(sceneManager); // Start/stop scene with console
-    auto scene1     = createClothScene("clothScene");
-    auto scene2     = createSoftBodyScene("deformableBodyScene");
+    auto scene1 = createClothScene("clothScene");
+    auto scene2 = createSoftBodyScene("deformableBodyScene");
     sceneManager->addScene(scene1);
     sceneManager->addScene(scene2);
 
@@ -370,26 +370,26 @@ testMultipleScenesInBackgroundMode()
     LOG(INFO) << "s/S followed by enter to switch scenes";
     LOG(INFO) << "q/Q followed by enter to quit";
     auto keyPressFunc = [&](KeyPressEvent* e)
-        {
-            if (e->m_keyPressType == KEY_PRESS)
-            {
-                if (e->m_key == 's' || e->m_key == 'S')
-                {
-                    if (sceneManager->getActiveScene()->getName() == scene1->getName())
-                    {
-                        sceneManager->setActiveScene(scene2);
-                    }
-                    else
-                    {
-                        sceneManager->setActiveScene(scene1);
-                    }
-                }
-                else if (e->m_key == 'q' || e->m_key == 'Q')
-                {
-                    consoleThread->stop(false);
-                }
-            }
-        };
+                        {
+                            if (e->m_keyPressType == KEY_PRESS)
+                            {
+                                if (e->m_key == 's' || e->m_key == 'S')
+                                {
+                                    if (sceneManager->getActiveScene()->getName() == scene1->getName())
+                                    {
+                                        sceneManager->setActiveScene(scene2);
+                                    }
+                                    else
+                                    {
+                                        sceneManager->setActiveScene(scene1);
+                                    }
+                                }
+                                else if (e->m_key == 'q' || e->m_key == 'Q')
+                                {
+                                    consoleThread->stop(false);
+                                }
+                            }
+                        };
     connect<KeyPressEvent>(consoleThread->getKeyboardDevice(), EventType::KeyPress, keyPressFunc);
 
     consoleThread->start();

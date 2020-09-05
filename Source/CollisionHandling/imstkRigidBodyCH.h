@@ -32,7 +32,6 @@ namespace expiremental
 {
 class RigidObject2;
 
-
 ///
 /// \class RigidBodyContactHandler
 ///
@@ -44,12 +43,12 @@ class RigidObject2;
 class RigidBodyCH : public CollisionHandling
 {
 public:
-    RigidBodyCH(const Side& side,
-        const std::shared_ptr<CollisionData> colData,
-        std::shared_ptr<RigidObject2>        rbdObjectA,
-        std::shared_ptr<RigidObject2>        rbdObjectB = nullptr,
-        const double                         stiffness = 0.0,
-        const double                         frictionalCoefficient = 0.8);
+    RigidBodyCH(const Side&                          side,
+                const std::shared_ptr<CollisionData> colData,
+                std::shared_ptr<RigidObject2>        rbdObjectA,
+                std::shared_ptr<RigidObject2>        rbdObjectB = nullptr,
+                const double                         stiffness = 0.0,
+                const double                         frictionalCoefficient = 0.8);
 
     RigidBodyCH() = delete;
 

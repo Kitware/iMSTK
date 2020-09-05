@@ -77,7 +77,7 @@ makeLevelsetObj(const std::string& name)
     dynamicalModel->configure(lvlsetConfig);
 
     // Setup the VisualModel
-    imstkNew<VisualModel> visualModel(initLvlsetImage);
+    imstkNew<VisualModel>          visualModel(initLvlsetImage);
     imstkNew<VolumeRenderMaterial> mat;
     {
         vtkNew<vtkColorTransferFunction> color;

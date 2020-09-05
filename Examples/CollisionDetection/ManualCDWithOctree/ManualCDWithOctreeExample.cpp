@@ -65,15 +65,15 @@ static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyDa
 /// \brief Read a mesh, create a visual scene object and add to the scene
 ///
 std::shared_ptr<CollidingObject>
-createMeshObject(const std::string&                   objectName,
-                 Color                                color)
+createMeshObject(const std::string& objectName,
+                 Color              color)
 {
     // Create a surface mesh
     imstkNew<SurfaceMesh> meshObj(objectName);
     meshObj->initialize(MESH_DATA.first, MESH_DATA.second);
 
     // Create a visiual model
-    imstkNew<VisualModel> visualModel(meshObj.get());
+    imstkNew<VisualModel>    visualModel(meshObj.get());
     imstkNew<RenderMaterial> material;
     material->setEdgeColor(color); // Wireframe color
     material->setLineWidth(2.0);
@@ -102,7 +102,7 @@ std::shared_ptr<DebugRenderGeometry>
 addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderPoints> debugPoints("Debug Points");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>    material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setVertexColor(Color::Yellow);
     material->setPointSize(8.0);
@@ -120,7 +120,7 @@ std::shared_ptr<DebugRenderGeometry>
 addVTConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderLines> debugLines("Debug Connecting VT Lines");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>   material;
     material->setBackFaceCulling(false);
     material->setEdgeColor(Color::Green);
     material->setLineWidth(4.0);
@@ -138,7 +138,7 @@ std::shared_ptr<DebugRenderGeometry>
 addEEConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderLines> debugLines("Debug Connecting EE Lines");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>   material;
     material->setBackFaceCulling(false);
     material->setEdgeColor(Color::Red);
     material->setLineWidth(4.0);
@@ -156,7 +156,7 @@ std::shared_ptr<DebugRenderGeometry>
 addHighlightedLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderLines> debugLines("Debug Highlighted Lines");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>   material;
     material->setBackFaceCulling(false);
     material->setEdgeColor(Color::Orange);
     material->setLineWidth(8.0);
@@ -310,144 +310,144 @@ main()
     }
 
     auto updateFunc = [&](Event*)
-    {
-            for (size_t i = 0; i < triMeshes.size(); ++i)
-            {
-                triMeshes[i]->translate(dirs[i][0], dirs[i][1], dirs[i][2], Geometry::TransformType::ApplyToData);
-                centers[i] += dirs[i];
+                      {
+                          for (size_t i = 0; i < triMeshes.size(); ++i)
+                          {
+                              triMeshes[i]->translate(dirs[i][0], dirs[i][1], dirs[i][2], Geometry::TransformType::ApplyToData);
+                              centers[i] += dirs[i];
 
-                // Trick to force update geometry postUpdateTransform
-                const auto positions = triMeshes[i]->getVertexPositions();
-                (void)positions;
-            }
+                              // Trick to force update geometry postUpdateTransform
+                              const auto positions = triMeshes[i]->getVertexPositions();
+                              (void)positions;
+                          }
 
-            Vec3d lowerCorners, upperCorner;
-            ParallelUtils::findAABB(centers, lowerCorners, upperCorner);
-            if ((lowerCorners - upperCorner).norm() > 70.0)
-            {
-                for (auto& dir : dirs)
-                {
-                    dir = -dir;
-                }
-            }
+                          Vec3d lowerCorners, upperCorner;
+                          ParallelUtils::findAABB(centers, lowerCorners, upperCorner);
+                          if ((lowerCorners - upperCorner).norm() > 70.0)
+                          {
+                              for (auto& dir : dirs)
+                              {
+                                  dir = -dir;
+                              }
+                          }
 
-            StopWatch timer;
+                          StopWatch timer;
 
-            // Update octree
-            timer.start();
-            octreeCD.update();
-            const auto updateTime = timer.getTimeElapsed();
+                          // Update octree
+                          timer.start();
+                          octreeCD.update();
+                          const auto updateTime = timer.getTimeElapsed();
 #ifdef DEBUG_RENDER_OCTREE
-            octreeCD.updateDebugGeometry();
+                          octreeCD.updateDebugGeometry();
 #endif
 
-            // Detect collision
-            timer.start();
-            octreeCD.detectCollision();
-            const auto CDTime = timer.getTimeElapsed();
+                          // Detect collision
+                          timer.start();
+                          octreeCD.detectCollision();
+                          const auto CDTime = timer.getTimeElapsed();
 
-            const auto numActiveNodes = octreeCD.getNumActiveNodes();
-            const auto numTotalNodes  = octreeCD.getNumAllocatedNodes();
-            const auto numPrimitives  = octreeCD.getPrimitiveCount(OctreePrimitiveType::Point) +
-                                        octreeCD.getPrimitiveCount(OctreePrimitiveType::Triangle) +
-                                        octreeCD.getPrimitiveCount(OctreePrimitiveType::AnalyticalGeometry);
-            const auto maxNumPrimitivesInTree = octreeCD.getMaxNumPrimitivesInNodes();
+                          const auto numActiveNodes = octreeCD.getNumActiveNodes();
+                          const auto numTotalNodes  = octreeCD.getNumAllocatedNodes();
+                          const auto numPrimitives  = octreeCD.getPrimitiveCount(OctreePrimitiveType::Point) +
+                                                      octreeCD.getPrimitiveCount(OctreePrimitiveType::Triangle) +
+                                                      octreeCD.getPrimitiveCount(OctreePrimitiveType::AnalyticalGeometry);
+                          const auto maxNumPrimitivesInTree = octreeCD.getMaxNumPrimitivesInNodes();
 
-            // Clear collision debug rendering
-            debugPoints->clear();
-            debugVTConnectingLines->clear();
-            debugEEConnectingLines->clear();
-            debugHighlightedLines->clear();
+                          // Clear collision debug rendering
+                          debugPoints->clear();
+                          debugVTConnectingLines->clear();
+                          debugEEConnectingLines->clear();
+                          debugHighlightedLines->clear();
 
-            size_t numVTCollisions = 0;
-            size_t numEECollisions = 0;
-            for (const auto& geoPair : octreeCD.getCollidingGeometryPairs())
-            {
-                const auto& colData = octreeCD.getCollisionPairData(geoPair.first->getGlobalIndex(),
+                          size_t numVTCollisions = 0;
+                          size_t numEECollisions = 0;
+                          for (const auto& geoPair : octreeCD.getCollidingGeometryPairs())
+                          {
+                              const auto& colData = octreeCD.getCollisionPairData(geoPair.first->getGlobalIndex(),
                                                                     geoPair.second->getGlobalIndex());
-                if (colData->VTColData.getSize())
-                {
-                    numVTCollisions += colData->VTColData.getSize();
-                    const auto mesh1 = static_cast<SurfaceMesh*>(geoPair.first);
-                    const auto mesh2 = static_cast<SurfaceMesh*>(geoPair.second);
-                    for (size_t i = 0; i < colData->VTColData.getSize(); ++i)
-                    {
-                        const auto tv = colData->VTColData[i];
-                        const auto v  = mesh1->getVertexPosition(tv.vertexIdx);
-                        debugPoints->appendVertex(v);
+                              if (colData->VTColData.getSize())
+                              {
+                                  numVTCollisions += colData->VTColData.getSize();
+                                  const auto mesh1 = static_cast<SurfaceMesh*>(geoPair.first);
+                                  const auto mesh2 = static_cast<SurfaceMesh*>(geoPair.second);
+                                  for (size_t i = 0; i < colData->VTColData.getSize(); ++i)
+                                  {
+                                      const auto tv = colData->VTColData[i];
+                                      const auto v  = mesh1->getVertexPosition(tv.vertexIdx);
+                                      debugPoints->appendVertex(v);
 
-                        const auto face = mesh2->getTrianglesVertices()[tv.triIdx];
-                        const auto tv0  = mesh2->getVertexPosition(face[0]);
-                        const auto tv1  = mesh2->getVertexPosition(face[1]);
-                        const auto tv2  = mesh2->getVertexPosition(face[2]);
+                                      const auto face = mesh2->getTrianglesVertices()[tv.triIdx];
+                                      const auto tv0  = mesh2->getVertexPosition(face[0]);
+                                      const auto tv1  = mesh2->getVertexPosition(face[1]);
+                                      const auto tv2  = mesh2->getVertexPosition(face[2]);
 
-                        debugHighlightedLines->appendVertex(tv0);
-                        debugHighlightedLines->appendVertex(tv1);
-                        debugHighlightedLines->appendVertex(tv1);
-                        debugHighlightedLines->appendVertex(tv2);
-                        debugHighlightedLines->appendVertex(tv2);
-                        debugHighlightedLines->appendVertex(tv0);
+                                      debugHighlightedLines->appendVertex(tv0);
+                                      debugHighlightedLines->appendVertex(tv1);
+                                      debugHighlightedLines->appendVertex(tv1);
+                                      debugHighlightedLines->appendVertex(tv2);
+                                      debugHighlightedLines->appendVertex(tv2);
+                                      debugHighlightedLines->appendVertex(tv0);
 
-                        debugVTConnectingLines->appendVertex(v);
-                        debugVTConnectingLines->appendVertex((tv0 + tv1 + tv2) / 3.0);
-                    }
-                }
+                                      debugVTConnectingLines->appendVertex(v);
+                                      debugVTConnectingLines->appendVertex((tv0 + tv1 + tv2) / 3.0);
+                                  }
+                              }
 
-                if (colData->EEColData.getSize())
-                {
-                    numEECollisions += colData->EEColData.getSize();
-                    const auto mesh1 = static_cast<SurfaceMesh*>(geoPair.first);
-                    const auto mesh2 = static_cast<SurfaceMesh*>(geoPair.second);
-                    for (size_t i = 0; i < colData->EEColData.getSize(); ++i)
-                    {
-                        const auto ee = colData->EEColData[i];
+                              if (colData->EEColData.getSize())
+                              {
+                                  numEECollisions += colData->EEColData.getSize();
+                                  const auto mesh1 = static_cast<SurfaceMesh*>(geoPair.first);
+                                  const auto mesh2 = static_cast<SurfaceMesh*>(geoPair.second);
+                                  for (size_t i = 0; i < colData->EEColData.getSize(); ++i)
+                                  {
+                                      const auto ee = colData->EEColData[i];
 
-                        const auto e0v0     = mesh1->getVertexPosition(ee.edgeIdA.first);
-                        const auto e0v1     = mesh1->getVertexPosition(ee.edgeIdA.second);
-                        const auto e0Center = (e0v0 + e0v1) * 0.5;
-                        debugPoints->appendVertex(e0Center);
+                                      const auto e0v0     = mesh1->getVertexPosition(ee.edgeIdA.first);
+                                      const auto e0v1     = mesh1->getVertexPosition(ee.edgeIdA.second);
+                                      const auto e0Center = (e0v0 + e0v1) * 0.5;
+                                      debugPoints->appendVertex(e0Center);
 
-                        const auto e1v0     = mesh2->getVertexPosition(ee.edgeIdB.first);
-                        const auto e1v1     = mesh2->getVertexPosition(ee.edgeIdB.second);
-                        const auto e1Center = (e1v0 + e1v1) * 0.5;
-                        debugPoints->appendVertex(e1Center);
+                                      const auto e1v0     = mesh2->getVertexPosition(ee.edgeIdB.first);
+                                      const auto e1v1     = mesh2->getVertexPosition(ee.edgeIdB.second);
+                                      const auto e1Center = (e1v0 + e1v1) * 0.5;
+                                      debugPoints->appendVertex(e1Center);
 
-                        debugHighlightedLines->appendVertex(e0v0);
-                        debugHighlightedLines->appendVertex(e0v1);
-                        debugHighlightedLines->appendVertex(e1v0);
-                        debugHighlightedLines->appendVertex(e1v1);
+                                      debugHighlightedLines->appendVertex(e0v0);
+                                      debugHighlightedLines->appendVertex(e0v1);
+                                      debugHighlightedLines->appendVertex(e1v0);
+                                      debugHighlightedLines->appendVertex(e1v1);
 
-                        debugEEConnectingLines->appendVertex(e0Center);
-                        debugEEConnectingLines->appendVertex(e1Center);
-                    }
-                }
-            }
+                                      debugEEConnectingLines->appendVertex(e0Center);
+                                      debugEEConnectingLines->appendVertex(e1Center);
+                                  }
+                              }
+                          }
 
-            debugPoints->setDataModified(true);
-            debugVTConnectingLines->setDataModified(true);
-            debugEEConnectingLines->setDataModified(true);
-            debugHighlightedLines->setDataModified(true);
+                          debugPoints->setDataModified(true);
+                          debugVTConnectingLines->setDataModified(true);
+                          debugEEConnectingLines->setDataModified(true);
+                          debugHighlightedLines->setDataModified(true);
 
-            std::stringstream ss;
-            ss << "Octree update time: " << updateTime << " ms\n"
-               << "Active nodes: " << numActiveNodes
-               << " (" << static_cast<double>(numActiveNodes) / static_cast<double>(numTotalNodes) * 100.0
-               << " % usage / total allocated nodes: " << numTotalNodes << ")\n"
-               << "Num. primitives: " << numPrimitives
-               << " | Max number of primitives in tree nodes: " << maxNumPrimitivesInTree
-               << "\nCollision detection time: " << CDTime << " ms"
-               << "\nNum. collision: " << numVTCollisions << " (VT) | "
-               << numEECollisions << " (EE)";
-            statusManager->setCustomStatus(ss.str());
+                          std::stringstream ss;
+                          ss << "Octree update time: " << updateTime << " ms\n"
+                             << "Active nodes: " << numActiveNodes
+                             << " (" << static_cast<double>(numActiveNodes) / static_cast<double>(numTotalNodes) * 100.0
+                             << " % usage / total allocated nodes: " << numTotalNodes << ")\n"
+                             << "Num. primitives: " << numPrimitives
+                             << " | Max number of primitives in tree nodes: " << maxNumPrimitivesInTree
+                             << "\nCollision detection time: " << CDTime << " ms"
+                             << "\nNum. collision: " << numVTCollisions << " (VT) | "
+                             << numEECollisions << " (EE)";
+                          statusManager->setCustomStatus(ss.str());
 
-            // Update debug rendering data
-            for (auto& delegate : ren->getDebugRenderDelegates())
-            {
-                delegate->updateDataSource();
-            }
+                          // Update debug rendering data
+                          for (auto& delegate : ren->getDebugRenderDelegates())
+                          {
+                              delegate->updateDataSource();
+                          }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        };
+                          std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                      };
 
     // Set Camera configuration
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 15.0, 50.0));
@@ -485,14 +485,14 @@ main()
             // Add an extra control
             connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyPress,
                 [&](KeyPressEvent* e)
+            {
+                if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)
                 {
-                    if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)
+                    for (auto& dir : dirs)
                     {
-                        for (auto& dir : dirs)
-                        {
-                            dir = -dir;
-                        }
+                        dir = -dir;
                     }
+                }
                 });
         }
 

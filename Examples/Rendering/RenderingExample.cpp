@@ -59,10 +59,10 @@ main()
             "head", iMSTK_DATA_ROOT "/head/head_revised.obj",
             iMSTK_DATA_ROOT "/head/", 1, Vec3d(0, 0, 0), "dds");
 #else
-    /*auto headObject = VisualObjectImporter::importVisualObject(
-        "head",
-        iMSTK_DATA_ROOT "/head/head_revised.obj",
-        iMSTK_DATA_ROOT "/head/");*/
+        /*auto headObject = VisualObjectImporter::importVisualObject(
+            "head",
+            iMSTK_DATA_ROOT "/head/head_revised.obj",
+            iMSTK_DATA_ROOT "/head/");*/
 
         auto surfaceMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/head/head_revised.obj");
 
@@ -91,7 +91,7 @@ main()
          headMaterial->addTexture(headNormalTexture);
          headMaterial->addTexture(headDiffuseTexture);*/
 
-         //headMaterial->addTexture(headDiffuseTexture);
+        //headMaterial->addTexture(headDiffuseTexture);
 #endif
 
         scene->addSceneObject(headObject);
@@ -115,9 +115,9 @@ main()
 
 #ifdef iMSTK_USE_Vulkan
         // Sphere
-        auto sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
+        auto                     sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
         imstkNew<RenderMaterial> sphereMaterial;
-        auto sphereMesh = sphereObj->getVisualGeometry();
+        auto                     sphereMesh = sphereObj->getVisualGeometry();
         sphereMesh->translate(0.1, 0.2, 0.5);
         sphereMaterial->setEmissivity(2);
         sphereMaterial->setCastsShadows(false);
@@ -125,7 +125,7 @@ main()
 #endif
 
         // Plane
-        auto planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
+        auto                     planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", 10);
         imstkNew<RenderMaterial> planeMaterial;
         planeMaterial->setColor(Color::LightGray);
         planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);

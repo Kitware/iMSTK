@@ -77,12 +77,12 @@ public:
 
     ///
     /// \brief Set the render window size
-    /// 
+    ///
     void setSize(const int width, const int height) override;
 
     ///
     /// \brief Set the render window title
-    /// 
+    ///
     void setWindowTitle(const std::string& title) override;
 
     ///

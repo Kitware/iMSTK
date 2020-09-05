@@ -43,10 +43,10 @@ class RigidObject2;
 class LevelSetCH : public CollisionHandling
 {
 public:
-    LevelSetCH(const Side& side,
-        const std::shared_ptr<CollisionData>      colData,
-        std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
-        std::shared_ptr<RigidObject2>             rigidObj);
+    LevelSetCH(const Side&                               side,
+               const std::shared_ptr<CollisionData>      colData,
+               std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
+               std::shared_ptr<RigidObject2>             rigidObj);
 
     LevelSetCH() = delete;
 
@@ -60,15 +60,15 @@ public:
 
     ///
     /// \brief Set/Get Scale of the velocity used for the levelset, default 0.1
-    /// 
+    ///
     double getLevelSetVelocityScaling() const { return m_velocityScaling; }
     void setLevelSetVelocityScaling(const double velocityScaling) { m_velocityScaling = velocityScaling; }
 
-    ///
-    /// \brief Set/Get whether the velocity used on the levelset should be proportional to the force of the rigid body
-    /// along the normal of the levelset
-    /// 
-   /* void setUseProportionalVelocity(const bool useProportionalForce) { m_useProportionalForce = useProportionalForce; }
+///
+/// \brief Set/Get whether the velocity used on the levelset should be proportional to the force of the rigid body
+/// along the normal of the levelset
+///
+/* void setUseProportionalVelocity(const bool useProportionalForce) { m_useProportionalForce = useProportionalForce; }
     bool getUseProportionalVelocity() const { return m_useProportionalForce; }*/
 
 private:

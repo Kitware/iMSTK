@@ -80,7 +80,7 @@ main()
     cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
     cubeGeom->rotate(Vec3d(1.0, 1.0, 0.0), PI_4, Geometry::TransformType::ApplyToData);
 
-    auto materialCube = std::make_shared<RenderMaterial>();
+    auto                     materialCube = std::make_shared<RenderMaterial>();
     imstkNew<RenderMaterial> cubeMaterial;
     cubeMaterial->setColor(imstk::Color::Red);
     cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);

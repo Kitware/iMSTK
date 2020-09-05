@@ -50,10 +50,10 @@ static double gaussianKernel[3][3][3] =
     }
 };
 
-LevelSetCH::LevelSetCH(const Side& side,
-    const std::shared_ptr<CollisionData>      colData,
-    std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
-    std::shared_ptr<RigidObject2>             rigidObj) :
+LevelSetCH::LevelSetCH(const Side&                               side,
+                       const std::shared_ptr<CollisionData>      colData,
+                       std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
+                       std::shared_ptr<RigidObject2>             rigidObj) :
     CollisionHandling(Type::RBD, side, colData),
     m_lvlSetObj(lvlSetObj),
     m_rigidObj(rigidObj)
@@ -68,7 +68,7 @@ LevelSetCH::processCollisionData()
 
     //const Vec3i& dim = grid->getDimensions();
     const Vec3d& invSpacing = grid->getInvSpacing();
-    const Vec3d& origin = grid->getOrigin();
+    const Vec3d& origin     = grid->getOrigin();
 
     //if (m_useProportionalForce)
     //{
@@ -109,7 +109,7 @@ LevelSetCH::processCollisionData()
             const Vec3d& pos = pdColData[i].posB;
             //const Vec3d& normal = pdColData[i].dirAtoB;
             const Vec3i  coord = (pos - origin).cwiseProduct(invSpacing).cast<int>();
-            const double S = m_velocityScaling;
+            const double S     = m_velocityScaling;
 
             for (int z = 0; z < 3; z++)
             {

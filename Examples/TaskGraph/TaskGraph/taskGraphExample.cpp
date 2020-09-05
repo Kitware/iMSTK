@@ -66,19 +66,19 @@ main()
     // Create and add the nodes
     std::shared_ptr<TaskNode> addNode = graph->addFunction("Add Step",
         [&]()
+    {
+        for (int i = 0; i < countA; i++)
         {
-            for (int i = 0; i < countA; i++)
-            {
-                sumA += (x[i] + y[i]);
-            }
+            sumA += (x[i] + y[i]);
+        }
         });
     std::shared_ptr<TaskNode> multNode = graph->addFunction("Mult Step",
         [&]()
+    {
+        for (int i = 0; i < countB; i++)
         {
-            for (int i = 0; i < countB; i++)
-            {
-                sumB += (w[i] * z[i]);
-            }
+            sumB += (w[i] * z[i]);
+        }
         });
 
     // Define the edges, add and mult steps will be done in parallel

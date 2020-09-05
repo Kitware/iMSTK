@@ -41,7 +41,7 @@ std::shared_ptr<DebugRenderPoints>
 addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderPoints> debugPoints("Debug Points");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>    material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Points);
     material->setPointSize(6.);
     imstkNew<VisualModel> visualModel(debugPoints.get(), material);
@@ -54,7 +54,7 @@ std::shared_ptr<DebugRenderLines>
 addLinesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderLines> debugLines("Debug Lines");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>   material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     //material->setBackFaceCulling(false);
     material->setEdgeColor(Color::Green);
@@ -69,7 +69,7 @@ std::shared_ptr<DebugRenderTriangles>
 addTrianglesDebugRendering(const std::shared_ptr<Scene>& scene)
 {
     imstkNew<DebugRenderTriangles> debugTriangles("Debug Triangles");
-    imstkNew<RenderMaterial> material;
+    imstkNew<RenderMaterial>       material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setBackFaceCulling(false);
     material->setColor(Color::Red);

@@ -191,7 +191,7 @@ public:
     /// \brief Not thread safe, could run forever if events are constantly
     /// being posted
     /// todo: need lock
-    /// 
+    ///
     void doAllEvents()
     {
         while (!eventQueue.empty())
@@ -203,7 +203,7 @@ public:
 
     ///
     /// \brief Pops all events and does the last one
-    /// 
+    ///
     void doLastEvent()
     {
         Command command;

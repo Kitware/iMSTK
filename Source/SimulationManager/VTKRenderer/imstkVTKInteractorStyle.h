@@ -60,7 +60,7 @@ public:
 
     ///
     /// \brief Filter out these events
-    /// 
+    ///
     virtual void OnKeyDown() override { }
     virtual void OnKeyUp() override { }
     virtual void OnChar() override { }

@@ -29,8 +29,8 @@ namespace expiremental
 RbdFrictionConstraint::RbdFrictionConstraint(
     std::shared_ptr<RigidBody> obj1,
     std::shared_ptr<RigidBody> obj2,
-    const Vec3d& contactNormal,
-    const Vec3d& contactPt,
+    const Vec3d&               contactNormal,
+    const Vec3d&               contactPt,
     const double               contactDepth,
     const double               frictionCoefficient,
     const Side                 side) : RbdConstraint(obj1, obj2, side),
@@ -50,9 +50,9 @@ RbdFrictionConstraint::compute(double imstkNotUsed(dt))
     J = Eigen::Matrix<double, 3, 4>::Zero();
     if ((m_side == Side::AB || m_side == Side::A) && !m_obj1->m_isStatic)
     {
-        const double vN = m_contactN.dot(m_obj1->getVelocity());
+        const double vN   = m_contactN.dot(m_obj1->getVelocity());
         const Vec3d  vTan = m_obj1->getVelocity() - vN * m_contactN;
-        const Vec3d  tan = vTan.normalized();
+        const Vec3d  tan  = vTan.normalized();
 
         // No angular friction
         J(0, 0) = -tan[0]; J(0, 1) = 0.0;
@@ -60,15 +60,15 @@ RbdFrictionConstraint::compute(double imstkNotUsed(dt))
         J(2, 0) = -tan[2]; J(2, 1) = 0.0;
 
         const double fNMag = std::max(0.0, m_obj1->getForce().dot(-m_contactN));
-        const double fu = m_frictionCoefficient * fNMag;
+        const double fu    = m_frictionCoefficient * fNMag;
         range[0] = -fu;
         range[1] = fu;
     }
     if ((m_side == Side::AB || m_side == Side::B) && !m_obj2->m_isStatic)
     {
-        const double vN = m_contactN.dot(m_obj2->getVelocity());
+        const double vN   = m_contactN.dot(m_obj2->getVelocity());
         const Vec3d  vTan = m_obj2->getVelocity() - vN * -m_contactN;
-        const Vec3d  tan = vTan.normalized();
+        const Vec3d  tan  = vTan.normalized();
 
         // No angular friction
         J(0, 0) = tan[0]; J(0, 1) = 0.0;
@@ -77,7 +77,7 @@ RbdFrictionConstraint::compute(double imstkNotUsed(dt))
 
         // Get normal force
         const double fNMag = std::max(0.0, m_obj2->getForce().dot(m_contactN));
-        const double fu = m_frictionCoefficient * fNMag;
+        const double fu    = m_frictionCoefficient * fNMag;
         range[0] = -fu;
         range[1] = fu;
     }

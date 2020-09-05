@@ -59,8 +59,8 @@ makeLevelsetObj(const std::string& name)
 {
     imstkNew<LevelSetDeformableObject> levelsetObj(name);
 
-    std::shared_ptr<ImageData> initLvlsetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT"/legs/femurBone_SDF.nii")->cast(IMSTK_DOUBLE);
-    const Vec3d& currSpacing = initLvlsetImage->getSpacing();
+    std::shared_ptr<ImageData> initLvlsetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBone_SDF.nii")->cast(IMSTK_DOUBLE);
+    const Vec3d&               currSpacing     = initLvlsetImage->getSpacing();
     initLvlsetImage->setSpacing(currSpacing * 0.0015);
     initLvlsetImage->setOrigin(Vec3d(0.0, 1.0, -2.0));
 
@@ -75,7 +75,7 @@ makeLevelsetObj(const std::string& name)
     model->configure(lvlSetConfig);
 
     // Setup the VisualModel
-    imstkNew<VisualModel> visualModel(initLvlsetImage);
+    imstkNew<VisualModel>          visualModel(initLvlsetImage);
     imstkNew<VolumeRenderMaterial> mat;
     {
         vtkNew<vtkColorTransferFunction> color;
@@ -139,7 +139,7 @@ makeCollidingObject(const std::string& name)
 std::shared_ptr<RigidObject2>
 makeRigidObj(const std::string& name)
 {
-    imstkNew<RigidBodyModel2>       rbdModel;
+    imstkNew<RigidBodyModel2> rbdModel;
     rbdModel->getConfig()->m_dt = 0.0005;
     rbdModel->getConfig()->m_maxNumIterations = 10;
 
@@ -195,7 +195,6 @@ main()
 
     imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, lvlSetObj);
     scene->getCollisionGraph()->addInteraction(interaction);
-
 
     // Light (white)
     imstkNew<DirectionalLight> whiteLight("whiteLight");

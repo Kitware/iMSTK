@@ -116,11 +116,11 @@ GeometryUtils::coupleVtkImageData(std::shared_ptr<ImageData> imageData)
     CHECK(imageData != nullptr) << "ImageData provided is not valid!";
 
     // VTK puts center of min voxel at origin of world space, we put min of bot voxel at origin
-    std::shared_ptr<AbstractDataArray> arr          = imageData->getScalars();
-    vtkSmartPointer<vtkDataArray>      vtkArr       = coupleVtkDataArray(arr);
+    std::shared_ptr<AbstractDataArray> arr    = imageData->getScalars();
+    vtkSmartPointer<vtkDataArray>      vtkArr = coupleVtkDataArray(arr);
 
-    vtkSmartPointer<vtkImageData>      imageDataVtk = vtkSmartPointer<vtkImageData>::New();
-    const Vec3i& dim = imageData->getDimensions();
+    vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
+    const Vec3i&                  dim = imageData->getDimensions();
     imageDataVtk->SetDimensions(imageData->getDimensions().data());
     imageDataVtk->SetSpacing(imageData->getSpacing().data());
     const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;

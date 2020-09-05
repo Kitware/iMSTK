@@ -97,7 +97,7 @@ static std::unordered_map<ScalarType, int> imstkToVtkScalarType =
 ///
 /// \brief Coupling functions, these create vtk data objects that point to our data objects
 /// thus no copying is done here.
-/// 
+///
 vtkSmartPointer<vtkDataArray> coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
 vtkSmartPointer<vtkImageData> coupleVtkImageData(std::shared_ptr<ImageData> imstkImageData);
 
@@ -214,7 +214,7 @@ isClosed(std::shared_ptr<SurfaceMesh> surfMesh)
 
 ///
 /// \brief Returns volume estimate of closed SurfaceMesh
-/// 
+///
 double getVolume(std::shared_ptr<SurfaceMesh> surfMesh);
 
 ///

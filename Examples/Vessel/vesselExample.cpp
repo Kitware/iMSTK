@@ -70,11 +70,11 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     distTransformFromMask->update();
 
     std::shared_ptr<DataArray<float>> scalarsPtr = std::dynamic_pointer_cast<DataArray<float>>(distTransformFromMask->getOutputImage()->getScalars());
-    const DataArray<float>& scalars   = *scalarsPtr;
-    const Vec3i&            dim1      = makeBinaryMask->getOutputImage()->getDimensions();
-    const Vec3d&            spacing   = makeBinaryMask->getOutputImage()->getSpacing();
-    const Vec3d&            shift     = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
-    const double            threshold = particleDiameter * 1.0; // How far from the boundary to accept particles
+    const DataArray<float>&           scalars    = *scalarsPtr;
+    const Vec3i&                      dim1       = makeBinaryMask->getOutputImage()->getDimensions();
+    const Vec3d&                      spacing    = makeBinaryMask->getOutputImage()->getSpacing();
+    const Vec3d&                      shift      = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
+    const double                      threshold  = particleDiameter * 1.0; // How far from the boundary to accept particles
 
     imstkNew<StdVectorOfVec3d> particles;
     particles->reserve(dim1[0] * dim1[1] * dim1[2]);

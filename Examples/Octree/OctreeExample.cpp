@@ -53,15 +53,15 @@ static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyDa
 /// \brief Read a mesh, create a visual scene object and add to the scene
 ///
 std::shared_ptr<VisualObject>
-createMeshObject(const std::string&                   objectName,
-                 const Color&                         color)
+createMeshObject(const std::string& objectName,
+                 const Color&       color)
 {
     // Create a surface mesh for the bunny
     imstkNew<SurfaceMesh> surfMesh;
     surfMesh->initialize(g_BunnyData.first, g_BunnyData.second);
 
     // Create a visiual model
-    imstkNew<VisualModel> visualModel(surfMesh.get());
+    imstkNew<VisualModel>    visualModel(surfMesh.get());
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(color); // Wireframe color

@@ -37,7 +37,7 @@ namespace expiremental
 RigidObjectLevelSetCollisionPair::RigidObjectLevelSetCollisionPair(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
     CollisionPair(obj1, obj2)
 {
-    std::shared_ptr<RigidBodyModel2> rbdModel = obj1->getRigidBodyModel2();
+    std::shared_ptr<RigidBodyModel2> rbdModel    = obj1->getRigidBodyModel2();
     std::shared_ptr<LevelSetModel>   lvlSetModel = obj2->getLevelSetModel();
 
     if (rbdModel == nullptr || lvlSetModel == nullptr)

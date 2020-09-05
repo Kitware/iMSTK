@@ -20,16 +20,16 @@
 =========================================================================*/
 
 #include "imstkSimulationManager.h"
-<<<<<<< HEAD
+    << << << < HEAD
 #include "imstkCollidingObject.h"
 #include "imstkObjectInteractionFactory.h"
-=======
->>>>>>> 486fd644... temp commit: all examples working, bug fixes
+== == == =
+    >> >> >> > 486fd64 4 ... temp commit: all examples working, bug fixes
 #include "imstkVirtualCouplingCH.h"
 #include "imstkHDAPIDeviceServer.h"
 #include "imstkHDAPIDeviceClient.h"
 #include "imstkSceneObjectController.h"
-<<<<<<< HEAD
+    << << << < HEAD
 #include "imstkCDObjectFactory.h"
 #include "imstkDeviceTracker.h"
 #include "imstkCollisionGraph.h"
@@ -37,10 +37,10 @@
 #include "imstkCollisionData.h"
 #include "imstkVisualModel.h"
 #include "imstkRenderMaterial.h"
-=======
+== == == =
 #include "imstkDeviceTracker.h"
 #include "imstkCollisionGraph.h"
->>>>>>> 486fd644... temp commit: all examples working, bug fixes
+    >> >> >> > 486fd64 4 ... temp commit: all examples working, bug fixes
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkPlane.h"

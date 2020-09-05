@@ -47,9 +47,9 @@ const std::string surfMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.o
 const std::string tetMeshFileName  = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
 // parameters to play with
-const double youngModulus = 1000.0;
-const double poissonRatio = 0.3;
-const double timeStep = 0.01;
+const double youngModulus     = 1000.0;
+const double poissonRatio     = 0.3;
+const double timeStep         = 0.01;
 const double contactStiffness = 0.1;
 const int    maxIter = 5;
 
@@ -77,8 +77,8 @@ main()
         scene->getActiveCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
         // set up the meshes
-        auto highResSurfMesh = MeshIO::read<SurfaceMesh>(surfMeshFileName);
-        auto coarseTetMesh = MeshIO::read<TetrahedralMesh>(tetMeshFileName);
+        auto                  highResSurfMesh = MeshIO::read<SurfaceMesh>(surfMeshFileName);
+        auto                  coarseTetMesh   = MeshIO::read<TetrahedralMesh>(tetMeshFileName);
         imstkNew<SurfaceMesh> coarseSurfMesh;
         coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
@@ -115,8 +115,8 @@ main()
         // Other parameters
         // \todo use lumped mass
         pbdParams->m_uniformMassValue = 1.0;
-        pbdParams->m_gravity = Vec3d(0, -10.0, 0);
-        pbdParams->m_defaultDt = timeStep;
+        pbdParams->m_gravity    = Vec3d(0, -10.0, 0);
+        pbdParams->m_defaultDt  = timeStep;
         pbdParams->m_iterations = maxIter;
         pbdParams->collisionParams->m_proximity = 0.3;
         pbdParams->collisionParams->m_stiffness = 0.1;
@@ -145,7 +145,7 @@ main()
         // configure model
         imstkNew<PBDModelConfig> floorPbdParams;
         floorPbdParams->m_uniformMassValue = 0.0;
-        floorPbdParams->m_iterations = 0;
+        floorPbdParams->m_iterations       = 0;
         floorPbdParams->collisionParams->m_proximity = -0.1;
 
         // Set the parameters

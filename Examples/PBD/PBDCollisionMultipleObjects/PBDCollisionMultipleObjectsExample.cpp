@@ -50,9 +50,9 @@ using namespace imstk;
 Color getRandomColor();
 
 void generateDragon(const std::shared_ptr<imstk::Scene>& scene,
-    const Vec3d& translation,
-    std::shared_ptr<SurfaceMesh>& surfMesh,
-    std::shared_ptr<PbdObject>& deformableObj);
+                    const Vec3d&                         translation,
+                    std::shared_ptr<SurfaceMesh>&        surfMesh,
+                    std::shared_ptr<PbdObject>&          deformableObj);
 
 ///
 /// \brief Create a surface mesh
@@ -188,7 +188,8 @@ main()
     return 0;
 }
 
-Color getRandomColor()
+Color
+getRandomColor()
 {
     Color color(0.0, 0.0, 0.0, 1.0);
     while (true)
@@ -209,9 +210,9 @@ Color getRandomColor()
 
 void
 generateDragon(const std::shared_ptr<imstk::Scene>& scene,
-    const Vec3d& translation,
-    std::shared_ptr<SurfaceMesh>& surfMesh,
-    std::shared_ptr<PbdObject>& deformableObj)
+               const Vec3d&                         translation,
+               std::shared_ptr<SurfaceMesh>&        surfMesh,
+               std::shared_ptr<PbdObject>&          deformableObj)
 {
     // Load a sample mesh
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
@@ -266,8 +267,8 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 
     // Other parameters
     pbdParams->m_uniformMassValue = 5.0;
-    pbdParams->m_gravity = Vec3d(0, -1.0, 0);
-    pbdParams->m_defaultDt = 0.01;
+    pbdParams->m_gravity    = Vec3d(0, -1.0, 0);
+    pbdParams->m_defaultDt  = 0.01;
     pbdParams->m_iterations = 20;
     pbdParams->collisionParams->m_proximity = 0.5;
 
@@ -276,7 +277,6 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
 
     scene->addSceneObject(deformableObj);
 }
-
 
 std::shared_ptr<SurfaceMesh>
 createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols)
@@ -304,8 +304,8 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
             SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i * nCols + j, i * nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1 } };
+            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
+            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }

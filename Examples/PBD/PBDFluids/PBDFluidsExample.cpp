@@ -67,7 +67,7 @@ main()
     {
         scene->getActiveCamera()->setPosition(0.0, 15.0, 20.0);
 
-        std::shared_ptr<PbdObject> deformableObj = createAndAddPbdObject(scene, tetMeshFileName);
+        std::shared_ptr<PbdObject>   deformableObj      = createAndAddPbdObject(scene, tetMeshFileName);
         std::shared_ptr<SurfaceMesh> floorMeshColliding = createCollidingSurfaceMesh();
 
         imstkNew<PbdObject> floorObj("Floor");

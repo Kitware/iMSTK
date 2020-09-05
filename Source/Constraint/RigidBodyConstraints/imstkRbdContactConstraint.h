@@ -40,8 +40,8 @@ public:
     RbdContactConstraint(
         std::shared_ptr<RigidBody> obj1,
         std::shared_ptr<RigidBody> obj2,
-        const Vec3d& contactN,
-        const Vec3d& contactPt,
+        const Vec3d&               contactN,
+        const Vec3d&               contactPt,
         const double               contactDepth,
         const double               beta = 0.05,
         const Side                 side = Side::AB) : RbdConstraint(obj1, obj2, side),

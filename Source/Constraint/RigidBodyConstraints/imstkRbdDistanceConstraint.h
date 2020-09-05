@@ -48,8 +48,8 @@ public:
     void compute(double dt) override;
 
 private:
-    Vec3d  m_p1 = Vec3d(0.0, 0.0, 0.0);
-    Vec3d  m_p2 = Vec3d(0.0, 0.0, 0.0);
+    Vec3d  m_p1   = Vec3d(0.0, 0.0, 0.0);
+    Vec3d  m_p2   = Vec3d(0.0, 0.0, 0.0);
     double m_dist = 1.0;
 };
 }

@@ -97,8 +97,8 @@ playMusic(const std::string& filename)
         sf::sleep(sf::milliseconds(100));
 
         // Display the playing position
-       LOG(INFO) << "\rPlaying... " << music.getPlayingOffset().asSeconds() << " sec        ";
-       LOG(INFO) << std::flush;
+        LOG(INFO) << "\rPlaying... " << music.getPlayingOffset().asSeconds() << " sec        ";
+        LOG(INFO) << std::flush;
     }
     LOG(INFO) << "\n";
 #else

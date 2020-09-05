@@ -140,8 +140,8 @@ protected:
     std::atomic<ThreadStatus> m_status{ ThreadStatus::Inactive };         ///> Thread status
     std::atomic<ThreadStatus> m_requestedStatus{ ThreadStatus::Running }; ///> Requested status
     std::vector<std::shared_ptr<ThreadObject>> m_children;                ///> Child threads
-    ThreadObject*     m_parent;                                           ///> Parent thread, may only have one (or none)
-    std::string m_name;                                                   ///> Name of the thread
-    std::thread m_stlThread;                                              ///> Used for the thread
+    ThreadObject* m_parent;                                               ///> Parent thread, may only have one (or none)
+    std::string   m_name;                                                 ///> Name of the thread
+    std::thread   m_stlThread;                                            ///> Used for the thread
 };
 }

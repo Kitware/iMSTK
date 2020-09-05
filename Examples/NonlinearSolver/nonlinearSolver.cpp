@@ -78,7 +78,7 @@ main(int argc, char** argv)
     nlSystem->setUpdatePreviousStatesFunction(updateXold);
 
     imstkNew<DirectLinearSolver<Matrixd>> linSolver;
-    imstkNew<NewtonSolver<Matrixd>> nlSolver;
+    imstkNew<NewtonSolver<Matrixd>>       nlSolver;
     nlSolver->setMaxIterations(100);
     nlSolver->setRelativeTolerance(1e-8);
     nlSolver->setAbsoluteTolerance(1e-10);

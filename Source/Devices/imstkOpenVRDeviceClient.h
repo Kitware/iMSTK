@@ -83,7 +83,7 @@ public:
     ///
     void setPose(const Vec3d& pos, const Quatd& orientation)
     {
-    	m_trackingEnabled = true;
+        m_trackingEnabled = true;
         m_position    = pos;
         m_orientation = orientation;
     }

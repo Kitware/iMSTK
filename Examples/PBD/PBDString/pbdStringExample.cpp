@@ -181,7 +181,7 @@ main()
 
     // Move the points every frame
     double t = 0.0;
-    auto movePoints =
+    auto   movePoints =
         [&pbdStringObjs, &t](Event*)
         {
             for (unsigned int i = 0; i < pbdStringObjs.size(); i++)

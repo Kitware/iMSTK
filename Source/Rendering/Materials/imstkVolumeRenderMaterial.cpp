@@ -25,7 +25,9 @@
 
 namespace imstk
 {
-VolumeRenderMaterial::VolumeRenderMaterial() : m_property(vtkSmartPointer<vtkVolumeProperty>::New()) { }
+VolumeRenderMaterial::VolumeRenderMaterial() : m_property(vtkSmartPointer<vtkVolumeProperty>::New())
+{
+}
 
 vtkSmartPointer<vtkVolumeProperty>
 VolumeRenderMaterial::getVolumeProperty()

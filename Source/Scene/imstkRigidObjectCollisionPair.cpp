@@ -33,7 +33,7 @@ namespace imstk
 namespace expiremental
 {
 RigidObjectCollisionPair::RigidObjectCollisionPair(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<RigidObject2> obj2,
-    CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
+                                                   CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
 {
     std::shared_ptr<RigidBodyModel2> model1 = obj1->getRigidBodyModel2();
     std::shared_ptr<RigidBodyModel2> model2 = obj2->getRigidBodyModel2();

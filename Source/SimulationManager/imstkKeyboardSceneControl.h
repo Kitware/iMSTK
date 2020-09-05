@@ -61,6 +61,6 @@ public:
 protected:
     std::shared_ptr<SceneManager> m_sceneManager;
     std::shared_ptr<Viewer>       m_viewer;
-    bool                          m_showFps;
+    bool m_showFps;
 };
 }

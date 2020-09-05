@@ -52,7 +52,7 @@ public:
 public:
     ///
     /// \brief Set the rendering mode. In debug, debug actors will be shown.
-    /// 
+    ///
     void setRenderingMode(const Renderer::Mode mode) override;
 
     ///
@@ -72,12 +72,12 @@ public:
 
     ///
     /// \brief Returns the device that emits key events
-    /// 
+    ///
     std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const;
 
     ///
     /// \brief Returns the device that emits mouse events
-    /// 
+    ///
     std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
 
 protected:

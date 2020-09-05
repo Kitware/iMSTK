@@ -209,7 +209,7 @@ public:
 
     ///
     /// \brief Get the name of the camera, if it exists
-    /// 
+    ///
     std::string getCameraName(std::shared_ptr<Camera> cam) const
     {
         auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
@@ -226,7 +226,7 @@ public:
 
     ///
     /// \brief Get camera by name
-    /// 
+    ///
     std::shared_ptr<Camera> getCamera(std::string name) const
     {
         auto i = m_cameras.find(name);
@@ -247,7 +247,7 @@ public:
 
     ///
     /// \brief Set the active camera by name
-    /// 
+    ///
     void setActiveCamera(std::string name)
     {
         auto i = m_cameras.find(name);

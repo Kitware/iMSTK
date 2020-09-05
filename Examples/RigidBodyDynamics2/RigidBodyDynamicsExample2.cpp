@@ -60,11 +60,11 @@ main()
     // Write log to stdout and file
     Logger::startLogger();
 
-    imstkNew<Scene> scene("Rigid Body Dynamics");
+    imstkNew<Scene>        scene("Rigid Body Dynamics");
     imstkNew<RigidObject2> cubeObj("Cube");
     {
         // This model is shared among interacting rigid bodies
-        imstkNew<RigidBodyModel2>       rbdModel;
+        imstkNew<RigidBodyModel2> rbdModel;
         rbdModel->getConfig()->m_dt = 0.005;
         rbdModel->getConfig()->m_maxNumIterations = 10;
 
@@ -108,7 +108,7 @@ main()
             planeObj->setCollidingGeometry(compGeom);
             planeObj->setDynamicalModel(rbdModel);
             planeObj->getRigidBody()->m_isStatic = true;
-            planeObj->getRigidBody()->m_mass = 100.0;
+            planeObj->getRigidBody()->m_mass     = 100.0;
 
             scene->addSceneObject(planeObj);
         }
@@ -133,7 +133,7 @@ main()
             cubeObj->setPhysicsGeometry(surfMesh);
             cubeObj->setCollidingGeometry(surfMesh);
             cubeObj->addVisualModel(visualModel);
-            cubeObj->getRigidBody()->m_mass = 10.0;
+            cubeObj->getRigidBody()->m_mass    = 10.0;
             cubeObj->getRigidBody()->m_initPos = Vec3d(0.0, 8.0, 0.0);
             cubeObj->getRigidBody()->m_initOrientation = Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0)));
             cubeObj->getRigidBody()->setInertiaFromPointSet(surfMesh, 0.005);
@@ -186,40 +186,40 @@ main()
 
         // Not perfectly thread safe movement lambda, ijkl movement instead of wasd because d is already used
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
-        const Vec3d dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
+        const Vec3d                           dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
         connect<Event>(sceneManager, EventType::PreUpdate, [&](Event*)
+        {
+            Vec3d extForce  = Vec3d(0.0, 0.0, 0.0);
+            Vec3d extTorque = Vec3d(0.0, 0.0, 0.0);
+            // If w down, move forward
+            if (keyDevice->getButton('i') == KEY_PRESS)
             {
-                Vec3d extForce = Vec3d(0.0, 0.0, 0.0);
-                Vec3d extTorque = Vec3d(0.0, 0.0, 0.0);
-                // If w down, move forward
-                if (keyDevice->getButton('i') == KEY_PRESS)
-                {
-                    extForce += Vec3d(0.0, 0.0, -40.0);
-                }
-                if (keyDevice->getButton('k') == KEY_PRESS)
-                {
-                    extForce += Vec3d(0.0, 0.0, 40.0);
-                }
-                if (keyDevice->getButton('j') == KEY_PRESS)
-                {
-                    extForce += Vec3d(-40.0, 0.0, 0.0);
-                }
-                if (keyDevice->getButton('l') == KEY_PRESS)
-                {
-                    extForce += Vec3d(40.0, 0.0, 0.0);
-                }
-                if (keyDevice->getButton('u') == KEY_PRESS)
-                {
-                    extTorque += Vec3d(0.0, 0.5, 0.0);
-                }
-                if (keyDevice->getButton('o') == KEY_PRESS)
-                {
-                    extTorque += Vec3d(0.0, -0.5, 0.0);
-                }
-                *cubeObj->getRigidBody()->m_force = extForce;
-                *cubeObj->getRigidBody()->m_torque = extTorque;
-                scene->getActiveCamera()->setFocalPoint(cubeObj->getRigidBody()->getPosition());
-                scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
+                extForce += Vec3d(0.0, 0.0, -40.0);
+            }
+            if (keyDevice->getButton('k') == KEY_PRESS)
+            {
+                extForce += Vec3d(0.0, 0.0, 40.0);
+            }
+            if (keyDevice->getButton('j') == KEY_PRESS)
+            {
+                extForce += Vec3d(-40.0, 0.0, 0.0);
+            }
+            if (keyDevice->getButton('l') == KEY_PRESS)
+            {
+                extForce += Vec3d(40.0, 0.0, 0.0);
+            }
+            if (keyDevice->getButton('u') == KEY_PRESS)
+            {
+                extTorque += Vec3d(0.0, 0.5, 0.0);
+            }
+            if (keyDevice->getButton('o') == KEY_PRESS)
+            {
+                extTorque += Vec3d(0.0, -0.5, 0.0);
+            }
+            *cubeObj->getRigidBody()->m_force  = extForce;
+            *cubeObj->getRigidBody()->m_torque = extTorque;
+            scene->getActiveCamera()->setFocalPoint(cubeObj->getRigidBody()->getPosition());
+            scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
             });
 
         // Start viewer running, scene as paused

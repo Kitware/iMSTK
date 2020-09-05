@@ -157,7 +157,7 @@ MouseSceneControl::OnMouseMove(const Vec2d& pos)
 
         // scale pan by zoom as well
         const double dist = (focalPt - camPos).norm();
-        const Vec3d dPos = (up * dx[1] + right * dx[0]) * -(m_panSpeed * m_panFactor * dist);
+        const Vec3d  dPos = (up * dx[1] + right * dx[0]) * -(m_panSpeed * m_panFactor * dist);
         cam->setFocalPoint(focalPt + dPos);
         cam->setPosition(camPos + dPos);
         cam->update();

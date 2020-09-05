@@ -36,38 +36,38 @@ namespace expiremental
 ///
 struct RigidBody
 {
-public:
-    double m_mass;
-    Mat3d m_intertiaTensor;
-    Vec3d m_initPos = Vec3d(0.0, 0.0, 0.0);
-    Quatd m_initOrientation = Quatd(1.0, 0.0, 0.0, 0.0);
-    Vec3d m_initVelocity;
-    Vec3d m_initAngularVelocity;
-    Vec3d m_initForce;
-    Vec3d m_initTorque;
-    bool m_isStatic;
+    public:
+        double m_mass;
+        Mat3d m_intertiaTensor;
+        Vec3d m_initPos = Vec3d(0.0, 0.0, 0.0);
+        Quatd m_initOrientation = Quatd(1.0, 0.0, 0.0, 0.0);
+        Vec3d m_initVelocity;
+        Vec3d m_initAngularVelocity;
+        Vec3d m_initForce;
+        Vec3d m_initTorque;
+        bool m_isStatic;
 
-    // Vec3d m_externalForce;
-    //RigidBodyState2* m_state; // A RigidBody can only belong to one state
-    Vec3d* m_pos;
-    Quatd* m_orientation;
-    Vec3d* m_velocity;
-    Vec3d* m_angularVelocity;
-    Vec3d* m_force;
-    Vec3d* m_torque;
+        // Vec3d m_externalForce;
+        //RigidBodyState2* m_state; // A RigidBody can only belong to one state
+        Vec3d* m_pos;
+        Quatd* m_orientation;
+        Vec3d* m_velocity;
+        Vec3d* m_angularVelocity;
+        Vec3d* m_force;
+        Vec3d* m_torque;
 
-    const Vec3d& getPosition() const { return *m_pos; }
-    const Quatd& getOrientation() const { return *m_orientation; }
-    const Vec3d& getVelocity() const { return *m_velocity; }
-    const Vec3d& getAngularVelocity() const { return *m_angularVelocity; }
-    const Vec3d& getForce() const { return *m_force; }
-    const Vec3d& getTorque() const { return *m_torque; }
+        const Vec3d& getPosition() const { return *m_pos; }
+        const Quatd& getOrientation() const { return *m_orientation; }
+        const Vec3d& getVelocity() const { return *m_velocity; }
+        const Vec3d& getAngularVelocity() const { return *m_angularVelocity; }
+        const Vec3d& getForce() const { return *m_force; }
+        const Vec3d& getTorque() const { return *m_torque; }
 
-    ///
-    /// \brief Convience function to set the inertia tensor based off provided geometry
-    /// assuming uniform mass at each point.
-    ///
-    void setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale = 1.0, const bool useBoundingBoxOrigin = true);
+        ///
+        /// \brief Convience function to set the inertia tensor based off provided geometry
+        /// assuming uniform mass at each point.
+        ///
+        void setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale = 1.0, const bool useBoundingBoxOrigin = true);
 };
 
 ///
@@ -88,7 +88,7 @@ public:
 
 protected:
     RbdConstraint(std::shared_ptr<RigidBody> rbd1,
-        std::shared_ptr<RigidBody> rbd2, const Side side) :
+                  std::shared_ptr<RigidBody> rbd2, const Side side) :
         m_obj1(rbd1), m_obj2(rbd2), m_side(side)
     {
     }
@@ -105,7 +105,7 @@ public:
 public:
     // Jacobian
     Eigen::Matrix<double, 3, 4> J = Eigen::Matrix<double, 3, 4>::Zero();
-    double vu = 0.0;
+    double vu       = 0.0;
     double range[2] = { 0.0, std::numeric_limits<double>::max() };
 
     // Objects involved

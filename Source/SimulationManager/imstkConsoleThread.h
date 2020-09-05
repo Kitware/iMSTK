@@ -29,7 +29,7 @@ class KeyboardDeviceClient;
 
 ///
 /// \class ConsoleThread
-/// 
+///
 /// \brief The console thread can run separately or in
 /// sync to provide keyboard events from the console
 /// they should be handled on another thread
@@ -38,7 +38,7 @@ class ConsoleThread : public LoopThreadObject
 {
 public:
     ConsoleThread(std::string name = "ConsoleThread");
-    ~ConsoleThread() override = default;
+    ~ConsoleThread() override      = default;
 
 public:
     std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const { return m_keyboardDeviceClient; }
@@ -46,7 +46,7 @@ public:
 protected:
     ///
     /// \brief Awaits input
-    /// 
+    ///
     void updateThread() override;
 
 protected:

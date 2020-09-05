@@ -30,8 +30,8 @@ static void
 castArray(std::shared_ptr<DataArray<FROM_TYPE>> fromArray, std::shared_ptr<DataArray<TO_TYPE>> toArray)
 {
     const DataArray<FROM_TYPE>& fromArrayRef = *fromArray;
-    DataArray<TO_TYPE>& toArrayRef = *toArray;
-    const size_t                numVals = fromArray->size();
+    DataArray<TO_TYPE>&         toArrayRef   = *toArray;
+    const size_t                numVals      = fromArray->size();
     for (size_t i = 0; i < numVals; i++)
     {
         toArrayRef[i] = static_cast<TO_TYPE>(fromArrayRef[i]);
@@ -143,7 +143,7 @@ ImageData::allocate(const ScalarType type, const int numComps, const Vec3i& dims
     const size_t numVals = static_cast<size_t>(dims[0] * dims[1] * dims[2] * numComps);
     switch (type)
     {
-        TemplateMacro(m_scalarArray = std::make_shared<DataArray<IMSTK_TT>>(numVals););
+        TemplateMacro(m_scalarArray = std::make_shared<DataArray<IMSTK_TT>>(numVals); );
     default:
         LOG(WARNING) << "Tried to allocate unknown scalar type";
         break;

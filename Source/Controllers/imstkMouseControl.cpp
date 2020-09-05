@@ -65,6 +65,7 @@ MouseControl::mouseEvent(MouseEvent* e)
         OnMouseMove(m_mouseDeviceClient->getPos());
     default:
         break;
-    };
+    }
+    ;
 }
 }

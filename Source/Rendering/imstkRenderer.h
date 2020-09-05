@@ -61,7 +61,7 @@ public:
     ///
     virtual void setMode(const Renderer::Mode mode, const bool enableVR)
     {
-        m_VrEnabled = enableVR;
+        m_VrEnabled   = enableVR;
         m_currentMode = mode;
     }
 

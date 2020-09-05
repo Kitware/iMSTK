@@ -51,7 +51,7 @@ public:
 
     ///
     /// \brief Prints the controls
-    /// 
+    ///
     virtual void printControls() { }
 
     ///

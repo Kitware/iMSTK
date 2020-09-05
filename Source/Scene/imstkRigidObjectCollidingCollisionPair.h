@@ -39,7 +39,7 @@ class RigidObjectCollidingCollisionPair : public CollisionPair
 {
 public:
     RigidObjectCollidingCollisionPair(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2,
-        CollisionDetection::Type cdType, const double stiffness = 0.0, const double frictionalCoefficient = 0.8);
+                                      CollisionDetection::Type cdType, const double stiffness = 0.0, const double frictionalCoefficient = 0.8);
 
     virtual ~RigidObjectCollidingCollisionPair() override = default;
 };

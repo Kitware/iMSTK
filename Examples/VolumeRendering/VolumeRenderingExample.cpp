@@ -48,14 +48,14 @@ main()
 
     // Create a visual object in the scene for the volume
     imstkNew<VisualObject> volumeObj("VisualVolume");
-    auto imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
+    auto                   imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
     volumeObj->setVisualGeometry(imageData);
     scene->addSceneObject(volumeObj);
 
     // Update Camera to position volume close to viewer
     auto cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(0.0, -200.0, -100.0));
-    cam->setFocalPoint(Vec3d(0.0, 0.0, -50.0));                                                                                                                                                                                                                                            
+    cam->setFocalPoint(Vec3d(0.0, 0.0, -50.0));
     cam->setViewUp(Vec3d(0.02, 0.4, 0.9));
 
     int count = 0;

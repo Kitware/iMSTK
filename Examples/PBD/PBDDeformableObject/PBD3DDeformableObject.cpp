@@ -122,7 +122,7 @@ createAndAddPbdObject(const std::string& tetMeshName)
     visualModel->setRenderMaterial(material);
 
     imstkNew<PbdObject> deformableObj("DeformableObject");
-    imstkNew<PbdModel> pbdModel;
+    imstkNew<PbdModel>  pbdModel;
     pbdModel->setModelGeometry(tetMesh);
 
     // Configure model

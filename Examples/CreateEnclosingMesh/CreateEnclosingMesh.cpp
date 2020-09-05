@@ -71,7 +71,7 @@ main()
             GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
 
         // add scene object for surface object
-        imstkNew<VisualObject> volObject("VolObj");
+        imstkNew<VisualObject>   volObject("VolObj");
         imstkNew<RenderMaterial> tetMaterial;
         tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
         tetMaterial->setEdgeColor(Color::Teal);

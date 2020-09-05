@@ -51,8 +51,8 @@ RigidObjectController::updateControlledObjects()
     }
 
     emit(Event(EventType::Modified));
-    
-	// During initialization tracking may not be enabled for a time, in which case, freeze the thing
+
+    // During initialization tracking may not be enabled for a time, in which case, freeze the thing
     // or else extrenous forces may be applied torwards unitialized position (0, 0, 0) or gravity
     // pull it down
     if (!m_deviceClient->getTrackingEnabled())
@@ -62,18 +62,18 @@ RigidObjectController::updateControlledObjects()
         return;
     }
 
-    const Vec3d  ks = Vec3d(10000000.0, 10000000.0, 10000000.0);
-    const double kd = 800.0;
+    const Vec3d  ks      = Vec3d(10000000.0, 10000000.0, 10000000.0);
+    const double kd      = 800.0;
     const double ksTheta = 1000.0;
     const double kdTheta = 1.0; // Not used yet
 
     // Apply virtual coupling
-    const Vec3d currPos = m_rigidObject->getRigidBody()->getPosition();
+    const Vec3d currPos    = m_rigidObject->getRigidBody()->getPosition();
     const Vec3d desiredPos = getPosition();
     {
-        const Vec3d  diff = desiredPos - currPos;
+        const Vec3d  diff   = desiredPos - currPos;
         const double length = diff.norm();
-        const Vec3d  dir = diff.normalized();
+        const Vec3d  dir    = diff.normalized();
 
         const Vec3d fS = ks.cwiseProduct(diff);
         const Vec3d fD = m_rigidObject->getRigidBody()->getVelocity() * -kd;
@@ -82,7 +82,7 @@ RigidObjectController::updateControlledObjects()
         (*m_rigidObject->getRigidBody()->m_force) += (fS + fD);
     }
 
-    const Quatd currOrientation = m_rigidObject->getRigidBody()->getOrientation();
+    const Quatd currOrientation    = m_rigidObject->getRigidBody()->getOrientation();
     const Quatd desiredOrientation = getRotation();
     {
         // q gives the delta rotation that gets us from curr->desired

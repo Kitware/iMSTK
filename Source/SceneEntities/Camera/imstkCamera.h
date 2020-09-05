@@ -31,7 +31,7 @@ namespace imstk
 static Mat4d
 lookAt(const Vec3d& pos, const Vec3d& target, const Vec3d& up)
 {
-    Mat4d results= Mat4d::Identity();
+    Mat4d results = Mat4d::Identity();
     Mat3d R;
     R.col(2) = (pos - target).normalized();
     R.col(0) = up.cross(R.col(2)).normalized();
@@ -83,7 +83,7 @@ public:
 
     ///
     /// \brief Get the inverse view matrix
-    /// 
+    ///
     const Mat4d& getInvView() { return m_invView; }
 
     ///
@@ -117,7 +117,7 @@ public:
     ///
     void setFieldOfView(const double fov)
     {
-        m_fieldOfView  = fov;
+        m_fieldOfView = fov;
         //m_projModified = true;
     }
 
@@ -125,8 +125,8 @@ public:
     {
         if (m_viewModified)
         {
-            m_view = lookAt(m_position, m_focalPoint, m_viewUp);
-            m_invView = m_view.inverse();
+            m_view         = lookAt(m_position, m_focalPoint, m_viewUp);
+            m_invView      = m_view.inverse();
             m_viewModified = false;
         }
         /*if (m_projModified)
@@ -150,6 +150,7 @@ public:
         m_position     = pos;
         m_viewModified = true;
     }
+
     void setPosition(const double x,
                      const double y,
                      const double z)
@@ -172,6 +173,7 @@ public:
         m_focalPoint   = focalPt;
         m_viewModified = true;
     }
+
     void setFocalPoint(const double x,
                        const double y,
                        const double z)
@@ -193,6 +195,7 @@ public:
         m_viewUp       = up.normalized();
         m_viewModified = true;
     }
+
     void setViewUp(const double x,
                    const double y,
                    const double z)
@@ -202,11 +205,11 @@ public:
 
 protected:
     // Base camera values
-    Mat4d m_view = Mat4d::Identity(); ///> Actual view matrix used
+    Mat4d m_view    = Mat4d::Identity(); ///> Actual view matrix used
     Mat4d m_invView = Mat4d::Identity(); ///> Inverse is often needed so we maintain it
     //Mat4d m_proj;
-    bool  m_viewModified = true;
-    //bool  m_projModified = true;
+    bool m_viewModified = true;
+//bool  m_projModified = true;
 
 protected:
     // Base projection parameters

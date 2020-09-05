@@ -204,7 +204,7 @@ VTKViewer::updateThread()
     {
         control->update();
     }
-    
+
     std::shared_ptr<VTKRenderer> ren = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
 
     // Update Camera

@@ -183,13 +183,13 @@ main()
 
     // Move the points every frame
     double t = 0.0;
-    auto movePoints =
+    auto   movePoints =
         [&pbdStringObjs, &t](Event*)
         {
             for (unsigned int i = 0; i < pbdStringObjs.size(); i++)
             {
                 std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
-                const Vec3d               pos = model->getCurrentState()->getVertexPosition(0);
+                const Vec3d               pos   = model->getCurrentState()->getVertexPosition(0);
                 // Move in circle, derivatives of parametric eq of circle
                 const Vec3d newPos = Vec3d(
                     pos.x() + -std::sin(t) * radius * dt,

@@ -30,12 +30,12 @@ namespace imstk
 {
 namespace expiremental
 {
-RigidBodyCH::RigidBodyCH(const Side& side,
-    const std::shared_ptr<CollisionData> colData,
-    std::shared_ptr<RigidObject2>        rbdObjectA,
-    std::shared_ptr<RigidObject2>        rbdObjectB,
-    const double                         stiffness,
-    const double                         frictionalCoefficient) :
+RigidBodyCH::RigidBodyCH(const Side&                          side,
+                         const std::shared_ptr<CollisionData> colData,
+                         std::shared_ptr<RigidObject2>        rbdObjectA,
+                         std::shared_ptr<RigidObject2>        rbdObjectB,
+                         const double                         stiffness,
+                         const double                         frictionalCoefficient) :
     CollisionHandling(Type::RBD, side, colData),
     m_rbdObjectA(rbdObjectA),
     m_rbdObjectB(rbdObjectB),
@@ -172,7 +172,7 @@ RigidBodyCH::processAB()
 {
     // Generate one two-way constraint
     std::shared_ptr<RigidBodyModel2> rbdModelAB = m_rbdObjectA->getRigidBodyModel2();
-    PositionDirectionCollisionData& pdColData = m_colData->PDColData;
+    PositionDirectionCollisionData&  pdColData  = m_colData->PDColData;
     for (int i = 0; i < pdColData.getSize(); i++)
     {
         std::shared_ptr<RbdContactConstraint> contactConstraint =

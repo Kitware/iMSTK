@@ -59,7 +59,7 @@ Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
     debugCam->setFocalPoint(0.0, 0.0, 0.0);
 
     m_cameras["default"] = defaultCam;
-    m_cameras["debug"] = debugCam;
+    m_cameras["debug"]   = debugCam;
     setActiveCamera("default");
 }
 

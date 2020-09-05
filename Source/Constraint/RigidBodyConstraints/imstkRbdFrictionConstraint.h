@@ -38,8 +38,8 @@ public:
     RbdFrictionConstraint(
         std::shared_ptr<RigidBody> obj1,
         std::shared_ptr<RigidBody> obj2,
-        const Vec3d& contactPt,
-        const Vec3d& contactNormal,
+        const Vec3d&               contactPt,
+        const Vec3d&               contactNormal,
         const double               contactDepth,
         const double               frictionCoefficient,
         const Side                 side = Side::AB);

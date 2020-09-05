@@ -87,7 +87,7 @@ public:
 
     ///
     /// \brief Set the render window size
-    /// 
+    ///
     virtual void setSize(int, int) { }
 
     ///

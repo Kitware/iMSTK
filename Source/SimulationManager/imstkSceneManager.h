@@ -46,7 +46,7 @@ public:
     };
 
 public:
-    SceneManager(std::string name = "SceneManager");
+    SceneManager(std::string name    = "SceneManager");
     virtual ~SceneManager() override = default;
 
 public:
@@ -57,7 +57,7 @@ public:
 
     ///
     /// \brief Search for scene by name, returns nullptr if not found
-    /// 
+    ///
     std::shared_ptr<Scene> getScene(std::string name) const
     {
         if (containsScene(name))
@@ -72,13 +72,13 @@ public:
 
     ///
     /// \brief Get the current mode
-    /// 
+    ///
     Mode getMode() const { return m_mode; }
 
     ///
     /// \brief Switches the mode of the scene manager
     /// This alters the active scene
-    /// 
+    ///
     void setMode(Mode mode);
 
     ///
@@ -103,7 +103,7 @@ public:
 
     ///
     /// \brief Remove a scene from the manager
-    /// 
+    ///
     void removeScene(std::string name);
 
 protected:
