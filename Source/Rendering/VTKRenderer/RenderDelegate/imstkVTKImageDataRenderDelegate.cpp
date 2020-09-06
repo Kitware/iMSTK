@@ -59,7 +59,7 @@ void
 VTKImageDataRenderDelegate::updateDataSource()
 {
     // Handle any queued events
-    // todo: Eventually move this to renderdelegate base class
+    // \todo: Eventually move this to renderdelegate base class
     doLastEvent();
 }
 

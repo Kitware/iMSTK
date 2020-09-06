@@ -137,7 +137,7 @@ Scene::buildTaskGraph()
         auto physXUpdate = m_taskGraph->addFunction("PhysXUpdate", [&]()
             {
                 auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
-                // TODO: update the time step, split into two steps, collide and advance
+                // \todo: update the time step, split into two steps, collide and advance
                 physxScene->simulate(RigidBodyWorld::getInstance()->getTimeStep());
                 physxScene->fetchResults(true);
             });

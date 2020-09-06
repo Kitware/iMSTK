@@ -98,7 +98,7 @@ public:
 
 protected:
     ///
-    /// \brief Setup connectivity of compute graph
+    /// \brief Setup connectivity of task graph
     ///
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 

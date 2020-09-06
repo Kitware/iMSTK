@@ -31,6 +31,7 @@
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRRenderWindow.h>
 #include <vtkOpenVRRenderWindowInteractor.h>
+#include <vtkOpenVRModel.h>
 
 namespace imstk
 {
@@ -50,6 +51,7 @@ VTKOpenVRViewer::VTKOpenVRViewer(std::string name) : AbstractVTKViewer(name)
     m_vtkRenderWindow = vtkSmartPointer<vtkOpenVRRenderWindow>::New();
     m_vtkRenderWindow->SetInteractor(iren);
     iren->SetRenderWindow(m_vtkRenderWindow);
+    m_vtkRenderWindow->HideCursor();
 
     m_vrDeviceClients.push_back(vrInteractorStyle->getLeftControllerDeviceClient());
     m_vrDeviceClients.push_back(vrInteractorStyle->getRightControllerDeviceClient());
@@ -134,6 +136,24 @@ VTKOpenVRViewer::startThread()
         return;
     }
     iren->Initialize();
+
+    // Hide the device overlays
+    // \todo: put in debug mode
+    vtkSmartPointer<vtkOpenVRRenderWindow> renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
+    renWin->Initialize();
+    renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the controllers
+
+    //renWin->GetTrackedDeviceModel(vr::trackeddevice)
+    // Hide all controllers
+    for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
+    {
+        vtkOpenVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
+        if (trackedDeviceModel != nullptr)
+        {
+            trackedDeviceModel->SetVisibility(false);
+        }
+    }
+
     while (!iren->GetDone())
     {
         auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
@@ -171,7 +191,7 @@ VTKOpenVRViewer::updateThread()
     }
 
     // Update Camera
-    // todo: No programmatic control over VR camera currently
+    // \todo: No programmatic control over VR camera currently
     //renderer->updateSceneCamera(getActiveScene()->getCamera());
 
     // Update render delegates

@@ -39,7 +39,7 @@ class VTKTextStatusManager;
 /// \class AbstractVTKViewer
 ///
 /// \brief Subclasses viewer for the VTK rendering back-end
-/// todo: Implement pausing/resuming
+/// \todo: Implement pausing/resuming
 ///
 class AbstractVTKViewer : public Viewer
 {

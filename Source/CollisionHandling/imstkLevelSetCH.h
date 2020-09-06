@@ -74,7 +74,7 @@ public:
 private:
     std::shared_ptr<LevelSetDeformableObject> m_lvlSetObj = nullptr;
     std::shared_ptr<RigidObject2> m_rigidObj = nullptr;
-    double m_velocityScaling = 0.1;
+    double m_velocityScaling = 0.002;
     //bool m_useProportionalForce = false;
 };
 }

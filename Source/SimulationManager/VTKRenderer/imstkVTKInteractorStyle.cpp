@@ -111,14 +111,14 @@ VTKInteractorStyle::OnRightButtonUp()
 void
 VTKInteractorStyle::OnMouseWheelForward()
 {
-    // todo: VTK provides no scroll amount?
+    // \todo: VTK provides no scroll amount?
     m_mouseDeviceClient->emitScroll(-0.2);
 }
 
 void
 VTKInteractorStyle::OnMouseWheelBackward()
 {
-    // todo: VTK provides no scroll amount?
+    // \todo: VTK provides no scroll amount?
     m_mouseDeviceClient->emitScroll(0.2);
 }
 }

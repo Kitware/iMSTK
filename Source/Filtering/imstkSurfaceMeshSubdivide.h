@@ -31,7 +31,7 @@ class SurfaceMesh;
 ///
 /// \brief This filter subidivdes the triangles of a SurfaceMesh into more
 /// smaller triangles
-/// todo: test with LineMesh
+/// \todo: test with LineMesh
 ///
 class SurfaceMeshSubdivide : public GeometryAlgorithm
 {

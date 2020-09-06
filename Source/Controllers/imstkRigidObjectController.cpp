@@ -62,11 +62,6 @@ RigidObjectController::updateControlledObjects()
         return;
     }
 
-    const Vec3d  ks      = Vec3d(10000000.0, 10000000.0, 10000000.0);
-    const double kd      = 800.0;
-    const double ksTheta = 1000.0;
-    //const double kdTheta = 1.0; // Not used yet
-
     // Apply virtual coupling
     const Vec3d currPos    = m_rigidObject->getRigidBody()->getPosition();
     const Vec3d desiredPos = getPosition();
@@ -75,8 +70,8 @@ RigidObjectController::updateControlledObjects()
         //const double length = diff.norm();
         //const Vec3d  dir    = diff.normalized();
 
-        const Vec3d fS = ks.cwiseProduct(diff);
-        const Vec3d fD = m_rigidObject->getRigidBody()->getVelocity() * -kd;
+        const Vec3d fS = m_linearKs.cwiseProduct(diff);
+        const Vec3d fD = m_rigidObject->getRigidBody()->getVelocity() * -m_linearKd;
 
         // Apply spring force and general damper
         (*m_rigidObject->getRigidBody()->m_force) += (fS + fD);
@@ -93,7 +88,7 @@ RigidObjectController::updateControlledObjects()
 
         // Because the scale of the *magnitude* of the rotation done is controllable
         // it doesn't matter if its exact, ksTheta can just be adjusted
-        (*m_rigidObject->getRigidBody()->m_torque) += angleAxes.axis() * angleAxes.angle() * ksTheta;
+        (*m_rigidObject->getRigidBody()->m_torque) += (angleAxes.axis() * angleAxes.angle()).cwiseProduct(m_rotKs);
     }
 }
 

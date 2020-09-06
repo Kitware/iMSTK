@@ -80,9 +80,9 @@ SurfaceMesh::print() const
 double
 SurfaceMesh::getVolume() const
 {
-    // TODO
-    // 1. Check for water tightness
-    // 2. Compute volume based on signed distance
+    /// \todo:
+    /// 1. Check for water tightness
+    /// 2. Compute volume based on signed distance
 
     LOG(WARNING) << "SurfaceMesh::getVolume error: not implemented.";
     return 0.0;

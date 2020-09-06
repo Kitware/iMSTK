@@ -121,7 +121,7 @@ static void disconnect(EventObject*, EventObject*, EventType);
 /// This can either be posted on an object or be a function pointer
 /// Queued observers recieve events within their queue
 /// These can be connected with the connect function
-/// todo: If objects are given affinity, we can automatically decide whether it could
+/// \todo: If objects are given affinity, we can automatically decide whether it could
 /// be dangerous to make a certain type of connection
 ///
 class EventObject
@@ -191,7 +191,7 @@ public:
     ///
     /// \brief Not thread safe, could run forever if events are constantly
     /// being posted
-    /// todo: need lock
+    /// \todo: need lock
     ///
     void doAllEvents()
     {

@@ -35,7 +35,7 @@ class Viewer;
 /// it may operate with both sceneManager and viewer, or only one or the other.
 /// warning: This control may pause a thread. Thus it is a bad idea to process it
 /// on the thread you're pausing, as you then could not resume.
-/// todo: Thread affinity
+/// \todo: Thread affinity
 ///
 class KeyboardSceneControl : public KeyboardControl
 {

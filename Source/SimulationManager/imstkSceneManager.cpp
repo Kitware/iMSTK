@@ -75,7 +75,7 @@ SceneManager::setActiveScene(std::string name)
     auto newScene = this->getScene(name);
 
     // If the scene wants to trackFPS enable framecounting in this module
-    // todo: Figure out why this can't change on the fly
+    // \todo: Figure out why this can't change on the fly
     if (newScene->getConfig()->trackFPS)
     {
         enableFrameCount();
@@ -90,7 +90,7 @@ SceneManager::setActiveScene(std::string name)
     }
     else if (prevStatus == ThreadStatus::Running)
     {
-        // todo: Dangerous to call this function from the thread you're about to pause
+        // \todo: Dangerous to call this function from the thread you're about to pause
         pause(true);
         m_activeScene = newScene;
         resume(true);
@@ -151,7 +151,7 @@ SceneManager::removeScene(std::string name)
         std::shared_ptr<Scene> scene = m_sceneMap[name];
         if (m_activeScene == scene)
         {
-            // todo: Dangerous to call this function from the thread you're about to pause
+            // \todo: Dangerous to call this function from the thread you're about to pause
             pause(true);
             m_activeScene = nullptr;
             resume(true);
