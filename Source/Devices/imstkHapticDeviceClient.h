@@ -27,8 +27,9 @@
 
 namespace imstk
 {
-struct HD_state
+struct HDstate
 {
+    // \todo pos are redundant?
     HDdouble pos[3];
     HDdouble vel[3];
     HDdouble trans[16];
@@ -38,35 +39,36 @@ struct HD_state
 ///
 /// \class HDAPIDeviceClient
 /// \brief Subclass of DeviceClient for phantom omni
+/// Holds and updates the data sync or on its own thread
+/// Holder of data
 ///
-class HDAPIDeviceClient : public DeviceClient
+class HapticDeviceClient : public DeviceClient
 {
-public:
+friend class HapticDeviceManager;
 
+public:
+    virtual ~HapticDeviceClient() {}
+
+protected:
     ///
     /// \brief Constructor/Destructor
     ///
-    explicit HDAPIDeviceClient(const std::string& name) : DeviceClient(name, "localhost") {}
-    virtual ~HDAPIDeviceClient() {}
-
-protected:
-
-    friend class HDAPIDeviceServer;
+    explicit HapticDeviceClient(const std::string& name) : DeviceClient(name, "localhost") {}
 
     ///
     /// \brief Initialize the phantom omni device
     ///
-    void init();
+    void initialize();
 
     ///
     /// \brief Use callback to get tracking data from phantom omni
     ///
-    void run();
+    void updateData();
 
     ///
-    /// \brief Closes the phantom omni device
+    /// \brief Disables the phantom omni device
     ///
-    void cleanUp();
+    void disable();
 
 private:
     ///
@@ -74,7 +76,7 @@ private:
     ///
     static HDCallbackCode HDCALLBACK hapticCallback(void* pData);
 
-    HHD      m_handle; ///< device handle
-    HD_state m_state;  ///< device reading state
+    HHD     m_handle; ///< device handle
+    HDstate m_state;  ///< device reading state
 };
 }

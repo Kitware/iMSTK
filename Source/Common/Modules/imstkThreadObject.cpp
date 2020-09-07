@@ -62,7 +62,7 @@ ThreadObject::requestStatus(ThreadStatus status)
 }
 
 void
-ThreadObject::start(bool sync)
+ThreadObject::start(const bool sync)
 {
     if (m_status != ThreadStatus::Inactive)
     {
@@ -75,7 +75,7 @@ ThreadObject::start(bool sync)
 
     m_status = ThreadStatus::Running;
 
-    // Start all of it's children first
+    // Start all of it's children first (does not wait)
     for (size_t i = 0; i < m_children.size(); i++)
     {
         //m_children[i]->requestStatus(m_status);
@@ -117,7 +117,7 @@ ThreadObject::start(bool sync)
 }
 
 void
-ThreadObject::stop(bool sync)
+ThreadObject::stop(const bool sync)
 {
     // Stop all of it's children first
     for (size_t i = 0; i < m_children.size(); i++)
@@ -149,7 +149,7 @@ ThreadObject::stop(bool sync)
 }
 
 void
-ThreadObject::resume(bool sync)
+ThreadObject::resume(const bool sync)
 {
     if (m_status == ThreadStatus::Inactive)
     {
@@ -172,7 +172,7 @@ ThreadObject::resume(bool sync)
 }
 
 void
-ThreadObject::pause(bool sync)
+ThreadObject::pause(const bool sync)
 {
     if (m_status == ThreadStatus::Inactive)
     {

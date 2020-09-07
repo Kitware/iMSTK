@@ -31,9 +31,9 @@ class Camera;
 ///
 /// \class CameraController
 ///
-/// \brief
+/// \brief \todo ??
 ///
-class CameraController : public LoopThreadObject, public TrackingDeviceControl
+class CameraController : public TrackingDeviceControl
 {
 public:
     CameraController(std::shared_ptr<Camera> camera, std::shared_ptr<DeviceClient> deviceClient);
@@ -46,26 +46,12 @@ public:
     void setOffsetUsingCurrentCameraPose();
 
     ///
-    /// \brief Get/Set translation offset of the camera
-    ///
-    const Vec3d& getCameraTranslationOffset() const;
-    void setCameraTranslationOffset(const Vec3d& t);
-
-    ///
-    /// \brief Get/Set rotation offset of the camera
-    ///
-    const Quatd& getCameraRotationOffset() const;
-    void setCameraRotationOffset(const Quatd& r);
-
-protected:
-    ///
     /// \brief Updates the view of the provided camera
     ///
-    virtual void updateThread() override;
+    void update() override;
+
+protected:
 
     std::shared_ptr<Camera> m_camera; ///< Camera controlled by the external device
-
-    Vec3d m_cameraTranslationOffset;  ///< Translation offset for the camera over tracking data
-    Quatd m_cameraRotationalOffset;   ///< camera head angle offset (in deg)
 };
 } // imstk

@@ -21,8 +21,13 @@
 
 #include "imstkMath.h"
 #include "imstkTimer.h"
-#include "imstkSimulationManager.h"
 #include "imstkScene.h"
+#include "imstkNew.h"
+#include "imstkLogger.h"
+#include "imstkSceneManager.h"
+#include "imstkVTKViewer.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkKeyboardSceneControl.h"
 
 // Objects
 #include "imstkCollidingObject.h"
@@ -36,9 +41,8 @@
 #include "imstkMeshIO.h"
 
 // Devices and controllers
-#include "imstkDeviceTracker.h"
-#include "imstkHDAPIDeviceClient.h"
-#include "imstkHDAPIDeviceServer.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkSceneObjectController.h"
 
 // Collisions
@@ -61,23 +65,18 @@ using namespace imstk;
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("BoneDrilling");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    // Create Scene
+    imstkNew<Scene> scene("BoneDrilling");
 
     // Add virtual coupling object in the scene.
 #ifdef iMSTK_USE_OPENHAPTICS
 
-    // Device clients
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
-
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
-
-    // Device tracker
-    auto deviceTracker = std::make_shared<DeviceTracker>(client);
+    auto server = std::make_shared<HapticDeviceManager>();
+    auto client = server->makeDeviceClient(phantomOmni1Name);
 
     // Create bone scene object
     // Load the mesh
@@ -103,8 +102,8 @@ main()
     scene->addSceneObject(drill);
 
     // Create and add virtual coupling object controller in the scene
-    auto objController = std::make_shared<SceneObjectController>(drill, deviceTracker);
-    scene->addObjectController(objController);
+    auto objController = std::make_shared<SceneObjectController>(drill, client);
+    scene->addController(objController);
 
     // Add interaction
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
@@ -119,10 +118,37 @@ main()
     scene->addLight(light);
 
     //Run
-    auto cam = scene->getCamera();
+    auto cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(0, 0, 15));
 
-    simManager->setActiveScene(scene);
-    simManager->start();
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->addChildThread(server);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
     return 0;
 }

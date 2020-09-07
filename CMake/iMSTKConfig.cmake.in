@@ -55,10 +55,8 @@ find_package( LibNiFalcon REQUIRED)
 find_package( Libusb REQUIRED)
 
 # OpenVR
-if(iMSTK_ENABLE_VR)
-  add_definitions( -DiMSTK_ENABLE_VR )
-  find_package( openvr REQUIRED )
-endif()
+add_definitions( -DiMSTK_ENABLE_VR )
+find_package( openvr REQUIRED )
 
 # PhysX
 find_package(PhysX REQUIRED)
@@ -128,9 +126,8 @@ else()
     ViewsContext2D)
 endif()
 
-if (${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND VTK_DEPENDENCIES RenderingOpenVR)
-endif()
+list(APPEND VTK_DEPENDENCIES RenderingOpenVR)
+
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # glfw, gli

@@ -31,6 +31,7 @@ namespace imstk
 ///
 /// \brief Base class for all DeviceControls that track
 /// something in space (position and orientation)
+/// ?? rename with 'spacial' in it?
 ///
 class TrackingDeviceControl : public DeviceControl
 {
@@ -53,13 +54,14 @@ public:
 public:
     ///
     /// \brief Update controlled scene objects using latest tracking information
+    /// \todo get rid of updateControlledObjects? replace with update (from DeviceControl)
     ///
-    virtual void updateControlledObjects() = 0;
+    virtual void updateControlledObjects() {}
 
     ///
     /// \brief Apply forces to the haptic device
     ///
-    virtual void applyForces() = 0;
+    virtual void applyForces() {}
 
     ///
     /// \brief Sets the tracking data to be out of date or up to date
@@ -96,7 +98,7 @@ public:
     /// \brief Get/Set the current scaling factor
     ///
     double getTranslationScaling() const;
-    void setTranslationScaling(double scaling);
+    void setTranslationScaling(const double scaling);
 
     ///
     /// \brief Get/Set the translation offset
@@ -114,7 +116,7 @@ public:
     /// \brief Get/Set the inversion flags
     ///
     unsigned char getInversionFlags();
-    void setInversionFlags(unsigned char f);
+    void setInversionFlags(const unsigned char f);
 
     ///
     /// \brief Compute the world position and orientation

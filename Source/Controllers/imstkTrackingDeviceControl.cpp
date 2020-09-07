@@ -27,12 +27,15 @@
 namespace imstk
 {
 TrackingDeviceControl::TrackingDeviceControl() :
-    m_translationOffset(WORLD_ORIGIN), m_rotationOffset(Quatd::Identity())
+    m_translationOffset(WORLD_ORIGIN),
+    m_rotationOffset(Quatd::Identity())
 {
 }
 
-TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> device) : DeviceControl(device),
-    m_translationOffset(WORLD_ORIGIN), m_rotationOffset(Quatd::Identity())
+TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> device) :
+    DeviceControl(device),
+    m_translationOffset(WORLD_ORIGIN),
+    m_rotationOffset(Quatd::Identity())
 {
 }
 
@@ -91,7 +94,7 @@ TrackingDeviceControl::getTranslationScaling() const
 }
 
 void
-TrackingDeviceControl::setTranslationScaling(double scaling)
+TrackingDeviceControl::setTranslationScaling(const double scaling)
 {
     m_scaling = scaling;
 }
@@ -127,7 +130,7 @@ TrackingDeviceControl::getInversionFlags()
 }
 
 void
-TrackingDeviceControl::setInversionFlags(unsigned char f)
+TrackingDeviceControl::setInversionFlags(const unsigned char f)
 {
     m_invertFlags = f;
 }

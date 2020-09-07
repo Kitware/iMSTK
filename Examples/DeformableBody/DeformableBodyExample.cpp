@@ -45,6 +45,45 @@ std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> s
 
 const std::string meshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg";
 
+std::shared_ptr<DynamicObject>
+createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
+                         std::shared_ptr<TetrahedralMesh> tetMesh)
+{
+    imstkNew<SurfaceMesh> surfMesh;
+    tetMesh->extractSurfaceMesh(surfMesh, true);
+
+    // Configure dynamic model
+    imstkNew<FEMDeformableBodyModel> dynaModel;
+    imstkNew<FEMModelConfig>         config;
+    config->m_fixedNodeIds = { 50, 126, 177 };
+    dynaModel->configure(config);
+    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+
+    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
+    dynaModel->setModelGeometry(tetMesh);
+    imstkNew<BackwardEuler> timeIntegrator(0.01); // Create and add Backward Euler time integrator
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    imstkNew<RenderMaterial> mat;
+    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    mat->setPointSize(10.);
+    mat->setLineWidth(4.);
+    mat->setEdgeColor(Color::Orange);
+    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
+    surfMeshModel->setRenderMaterial(mat);
+
+    // Scene object 1: Dragon
+    imstkNew<FeDeformableObject> deformableObj("Dragon");
+    deformableObj->addVisualModel(surfMeshModel);
+    deformableObj->setPhysicsGeometry(tetMesh);
+    // Map simulated geometry to visual
+    deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
+    deformableObj->setDynamicalModel(dynaModel);
+    scene->addSceneObject(deformableObj);
+
+    return deformableObj;
+}
+
 ///
 /// \brief This example demonstrates the soft body simulation
 /// using Finite elements
@@ -114,43 +153,4 @@ main()
     }
 
     return 0;
-}
-
-std::shared_ptr<DynamicObject>
-createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
-                         std::shared_ptr<TetrahedralMesh> tetMesh)
-{
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
-
-    // Configure dynamic model
-    imstkNew<FEMDeformableBodyModel> dynaModel;
-    imstkNew<FEMModelConfig>         config;
-    config->m_fixedNodeIds = { 50, 126, 177 };
-    dynaModel->configure(config);
-    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
-
-    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
-    dynaModel->setModelGeometry(tetMesh);
-    imstkNew<BackwardEuler> timeIntegrator(0.01); // Create and add Backward Euler time integrator
-    dynaModel->setTimeIntegrator(timeIntegrator);
-
-    imstkNew<RenderMaterial> mat;
-    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    mat->setPointSize(10.);
-    mat->setLineWidth(4.);
-    mat->setEdgeColor(Color::Orange);
-    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
-    surfMeshModel->setRenderMaterial(mat);
-
-    // Scene object 1: Dragon
-    imstkNew<FeDeformableObject> deformableObj("Dragon");
-    deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(tetMesh);
-    // Map simulated geometry to visual
-    deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
-    deformableObj->setDynamicalModel(dynaModel);
-    scene->addSceneObject(deformableObj);
-
-    return deformableObj;
 }

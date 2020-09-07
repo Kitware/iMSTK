@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkHDAPIDeviceClient.h"
+#include "imstkHapticDeviceClient.h"
 
 #include <HDU/hduVector.h>
 #include <HDU/hduError.h>
@@ -29,15 +29,18 @@
 namespace imstk
 {
 void
-HDAPIDeviceClient::init()
+HapticDeviceClient::initialize()
 {
-    m_buttons = std::map<size_t, bool>{ { 0, false }, { 1, false }, { 2, false }, { 3, false } };
+    m_buttons[0] = 0;
+    m_buttons[1] = 0;
+    m_buttons[2] = 0;
+    m_buttons[3] = 0;
 
     //flush error stack
     HDErrorInfo errorFlush;
     while (HD_DEVICE_ERROR(errorFlush = hdGetError())) {}
 
-    // Open Device
+    // Initialize the device
     m_handle = hdInitDevice(this->getDeviceName().c_str());
 
     // If failed
@@ -53,31 +56,33 @@ HDAPIDeviceClient::init()
 }
 
 void
-HDAPIDeviceClient::run()
+HapticDeviceClient::updateData()
 {
     hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
 }
 
 void
-HDAPIDeviceClient::cleanUp()
+HapticDeviceClient::disable()
 {
     hdDisableDevice(m_handle);
 }
 
 HDCallbackCode HDCALLBACK
-HDAPIDeviceClient::hapticCallback(void* pData)
+HapticDeviceClient::hapticCallback(void* pData)
 {
-    auto client = reinterpret_cast<HDAPIDeviceClient*>(pData);
+    auto client = reinterpret_cast<HapticDeviceClient*>(pData);
     auto handle = client->m_handle;
     auto state  = client->m_state;
 
     hdBeginFrame(handle);
+
     hdMakeCurrentDevice(handle);
     hdSetDoublev(HD_CURRENT_FORCE, client->m_force.data());
     hdGetDoublev(HD_CURRENT_POSITION, state.pos);
     hdGetDoublev(HD_CURRENT_VELOCITY, state.vel);
     hdGetDoublev(HD_CURRENT_TRANSFORM, state.trans);
     hdGetIntegerv(HD_CURRENT_BUTTONS, &state.buttons);
+
     hdEndFrame(handle);
 
     client->m_position << state.pos[0], state.pos[1], state.pos[2];

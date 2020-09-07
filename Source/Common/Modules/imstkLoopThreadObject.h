@@ -32,6 +32,7 @@ class UPSCounter;
 ///
 /// \brief A thread object that defines its own basic loop and update function
 /// Subclasses can define how to update
+/// ??
 ///
 class LoopThreadObject : public ThreadObject
 {
@@ -72,6 +73,10 @@ public:
     /// \return true is frame count is already enabled
     bool isFrameCountEnabled() const { return m_trackFPS; };
 
+    ///
+    /// \brief Get the updates per second
+    /// ?? UPS write it out
+    ///
     unsigned int getUPS() const;
 
 public:
@@ -94,7 +99,7 @@ protected:
     virtual void initThread() { }
 
     ///
-    /// \brief Update the thread
+    /// \brief Update the thread ??
     ///
     virtual void updateThread() = 0;
 

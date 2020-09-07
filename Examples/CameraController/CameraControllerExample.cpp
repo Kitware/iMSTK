@@ -19,16 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkMeshIO.h"
 #include "imstkScene.h"
+#include "imstkNew.h"
+#include "imstkLogger.h"
+#include "imstkSceneManager.h"
+#include "imstkVTKViewer.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkKeyboardSceneControl.h"
+
+#include "imstkSurfaceMesh.h"
 
 // Devices and controllers
-#include "imstkHDAPIDeviceClient.h"
-#include "imstkHDAPIDeviceServer.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkCameraController.h"
 #include "imstkCollisionGraph.h"
 
@@ -45,23 +52,23 @@ using namespace imstk;
 int
 main()
 {
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
     #ifndef iMSTK_USE_OPENHAPTICS
     std::cout << "Audio not enabled at build time" << std::endl;
     return 1;
     #endif
 
-    // Create simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("CameraController");
+    // Create Scene
+    imstkNew<Scene> scene("CameraController");
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
-
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
+    auto server = std::make_shared<HapticDeviceManager>();
+    auto client = server->makeDeviceClient(phantomOmni1Name);
+
 #else
     LOG(WARNING) << "Phantom device option not enabled during build!";
 #endif
@@ -73,7 +80,7 @@ main()
     scene->addSceneObject(meshObject);
 
     // Update Camera position
-    auto camera = scene->getCamera();
+    auto camera = scene->getActiveCamera();
     camera->setPosition(Vec3d(0, 0, 10));
 
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -85,7 +92,7 @@ main()
     camController->setInversionFlags(CameraController::InvertFlag::rotY |
                                      CameraController::InvertFlag::rotZ);
 
-    scene->addCameraController(camController);
+    scene->addController(camController);
 #endif
 
     // Light
@@ -94,9 +101,37 @@ main()
     light->setIntensity(1);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->addChildThread(server);
+
+        // attach the camera controller to the viewer
+        viewer->addControl(camController);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        viewer->start();
+    }
 
     return 0;
 }

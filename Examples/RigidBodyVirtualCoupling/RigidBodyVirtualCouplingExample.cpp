@@ -19,14 +19,19 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkNew.h"
+#include "imstkLogger.h"
+#include "imstkSceneManager.h"
+#include "imstkVTKViewer.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkKeyboardSceneControl.h"
+
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkSimulationManager.h"
 #include "imstkVirtualCouplingCH.h"
-#include "imstkHDAPIDeviceServer.h"
-#include "imstkHDAPIDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#include "imstkHapticDeviceClient.h"
 #include "imstkSceneObjectController.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -39,8 +44,10 @@
 #include "imstkCamera.h"
 #include "imstkRigidBodyModel.h"
 #include "imstkCollisionGraph.h"
-#include "imstkDeviceTracker.h"
 #include "imstkScene.h"
+#include "imstkRenderMaterial.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVisualModel.h"
 
 // global variables
 const std::string phantomOmni1Name = "Default Device";
@@ -74,7 +81,7 @@ addMeshRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
     // add visual model
     auto renderModel = std::make_shared<VisualModel>(surfMesh);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::WireframeSurface);
+    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
     renderModel->setRenderMaterial(mat);
@@ -111,7 +118,7 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     SurfaceMesh->scale(5., Geometry::TransformType::ApplyToData);
     auto renderModel = std::make_shared<VisualModel>(cubeGeom);
     auto mat = std::make_shared<RenderMaterial>();
-    mat->setDisplayMode(RenderMaterial::Surface);
+    mat->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);
     renderModel->setRenderMaterial(mat);
@@ -192,9 +199,11 @@ addSphereRigidObject(std::shared_ptr<Scene> scene, Vec3d t = Vec3d(0., 0., 0.))
 int
 main()
 {
-    //simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("Rigid Body Dynamics");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    // Create Scene
+    imstkNew<Scene> scene("ControlRB");
 
     auto cubeObj = addCubeRigidObject(std::string("cube"), scene, Vec3d(0., 0., 0.));
 
@@ -204,13 +213,9 @@ main()
 
     //-------------------------------------------------------------
 
-    // Device clients
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
-
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
+    auto server = std::make_shared<HapticDeviceManager>();
+    auto client = server->makeDeviceClient(phantomOmni1Name);
 
     // Create a virtual coupling object
     auto visualGeom = std::make_shared<Sphere>();
@@ -223,9 +228,8 @@ main()
     scene->addSceneObject(obj);
 
     // Device tracker
-    auto deviceTracker = std::make_shared<DeviceTracker>(client);
-    auto objController = std::make_shared<imstk::SceneObjectController>(obj, deviceTracker);
-    scene->addObjectController(objController);
+    auto objController = std::make_shared<imstk::SceneObjectController>(obj, client);
+    scene->addController(objController);
 
     //-----------------------------------------------------------------
 
@@ -238,26 +242,10 @@ main()
     }
     auto prevCubePos = rbModel->getModelGeometry()->getTranslation();
 
-    auto forceFunc =
-        [&](Module* module)
-        {
-            auto devPos = deviceTracker->getPosition();
-            auto devQ   = deviceTracker->getRotation();
-            rbModel->getModelGeometry()->rotate(devQ);
-            auto cubeGeo      = std::dynamic_pointer_cast<Cube>(cubeObj->getPhysicsGeometry());
-            auto cubePos      = rbModel->getModelGeometry()->getTranslation();
-            auto cubeVelocity = (cubePos - prevCubePos) / 2;
-            auto damp  = -1000000 * cubeVelocity;
-            auto force = -1000 * (cubePos - devPos) + damp;
-            rbModel->addForce(force, Vec3d(0., 0., 0.));
-            prevCubePos = cubePos;
-        };
-    simManager->getSceneManager(scene)->setPreUpdateCallback(forceFunc);
-
     //-------------------------------------------------------------------
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
+    auto cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(300, 300, 300));
 
     // Light
@@ -266,8 +254,50 @@ main()
     scene->addLight(light);
 
     // Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->addChildThread(server);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        connect<Event>(sceneManager, EventType::PostUpdate,
+            [&](Event*)
+        {
+            const auto devPos = objController->getPosition();
+            const auto devQ   = objController->getRotation();
+            rbModel->getModelGeometry()->rotate(devQ);
+            auto cubeGeo      = std::dynamic_pointer_cast<Cube>(cubeObj->getPhysicsGeometry());
+            auto cubePos      = rbModel->getModelGeometry()->getTranslation();
+            auto cubeVelocity = (cubePos - prevCubePos) / 2;
+            auto damp  = -1000000 * cubeVelocity;
+            auto force = -1000 * (cubePos - devPos) + damp;
+            rbModel->addForce(force, Vec3d(0., 0., 0.));
+            prevCubePos = cubePos;
+            });
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

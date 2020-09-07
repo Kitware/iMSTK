@@ -32,8 +32,9 @@ namespace imstk
 /// \class DeviceClient
 ///
 /// \brief The device client's represents the device and provides
-/// an interface to acquire quantities from a device.
+/// an interface to acquire data from a device.
 /// It posts events the device may have as well as provides the state
+/// \todo HAVE AN ABSTRACK BASE CLASS FOR THE DEVICE CLIENT
 ///
 class DeviceClient : public EventObject
 {

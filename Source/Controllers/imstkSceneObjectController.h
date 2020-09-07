@@ -32,7 +32,7 @@ class SceneObject;
 ///
 /// \class SceneObjectController
 ///
-/// \brief This class implements once tracking controller controlling one scnene object
+/// \brief This class implements once tracking controller controlling one scene object
 ///
 class SceneObjectController : public TrackingDeviceControl
 {
@@ -48,7 +48,7 @@ public:
     void updateControlledObjects() override;
 
     ///
-    /// \brief Apply forces to the haptic device
+    /// \brief Apply forces to the haptic-capable device
     ///
     void applyForces() override;
 

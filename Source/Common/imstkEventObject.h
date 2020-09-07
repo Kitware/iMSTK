@@ -45,6 +45,7 @@ enum class EventType
     PreUpdate,
     PostUpdate,
     Configure
+    //?? add one for collision?
 };
 
 ///
@@ -121,7 +122,7 @@ static void disconnect(EventObject*, EventObject*, EventType);
 /// This can either be posted on an object or be a function pointer
 /// Queued observers recieve events within their queue
 /// These can be connected with the connect function
-/// \todo: If objects are given affinity, we can automatically decide whether it could
+/// \todo If objects are given affinity, we can automatically decide whether it could
 /// be dangerous to make a certain type of connection
 ///
 class EventObject
@@ -136,7 +137,7 @@ public:
     ///
     /// \brief Emits the event
     /// Direct observers will be immediately called
-    /// Queued observers will recieve the EventFunctionPair in their queue
+    /// Queued observers will receive the EventFunctionPair in their queue
     /// That is, the function to call and data of the event
     /// The event will be copied before sent, and cleaned up after handled
     /// to allow for polymorphic event types

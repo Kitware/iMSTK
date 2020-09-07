@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#include "imstkHDAPIDeviceServer.h"
-#include "imstkHDAPIDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#include "imstkHapticDeviceClient.h"
 
 #include <HD/hd.h>
 
@@ -28,38 +28,37 @@
 
 namespace imstk
 {
-void
-HDAPIDeviceServer::addDeviceClient(std::shared_ptr<HDAPIDeviceClient> client)
+std::shared_ptr<HapticDeviceClient>
+HapticDeviceManager::makeDeviceClient(const std::string& name)
 {
-    m_deviceClients.push_back(client);
+    auto deviceClient = std::shared_ptr<HapticDeviceClient>(new HapticDeviceClient(name));
+    m_deviceClients.push_back(deviceClient);
+    return deviceClient;
 }
 
 void
-HDAPIDeviceServer::initModule()
+HapticDeviceManager::initialize()
 {
     for (const auto& client : m_deviceClients)
     {
-        client->init();
+        client->initialize();
     }
+}
+
+void
+HapticDeviceManager::startThread()
+{
+    initialize();
     hdStartScheduler();
 }
 
 void
-HDAPIDeviceServer::runModule()
-{
-    for (const auto& client : m_deviceClients)
-    {
-        client->run();
-    }
-}
-
-void
-HDAPIDeviceServer::cleanUpModule()
+HapticDeviceManager::stopThread()
 {
     hdStopScheduler();
     for (const auto& client : m_deviceClients)
     {
-        client->cleanUp();
+        client->disable();
     }
 }
 } // imstk

@@ -44,7 +44,7 @@ enum class ThreadStatus
 /// \class ThreadObject
 ///
 /// \brief Wraps Thread with an object oriented base class suited for real time,
-/// persistent threads
+/// persistent threads ??
 ///
 class ThreadObject : public EventObject
 {
@@ -83,25 +83,26 @@ public:
     /// children are started before parents
     /// \param sync: When true, returns after thread is complete. When false, returns immediately
     ///
-    virtual void start(bool sync = true);
+    virtual void start(const bool sync = true);
 
     ///
     /// \brief End/terminate the thread
-    /// \param sync: When true, returns after stop complete (like a thread join). When false, returns immediately
+    /// \param sync: When true, returns after stop complete (like a thread join).
+    /// When false, returns immediately
     ///
-    virtual void stop(bool sync = true);
+    virtual void stop(const bool sync = true);
 
     ///
     /// \brief Resume the thread
     /// \param sync: When true, returns after resume. When false, returns immediately
     ///
-    virtual void resume(bool sync = false);
+    virtual void resume(const bool sync = false);
 
     ///
     /// \brief Pause the thread
     /// \param sync: When true, returns after thread paused. When false, returns immediately
     ///
-    virtual void pause(bool sync = true);
+    virtual void pause(const bool sync = true);
 
     ///
     /// \brief Adds a child, this thread will start when *this* does

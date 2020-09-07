@@ -27,8 +27,10 @@
 
 namespace imstk
 {
-SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceClient> trackingDevice) :
-    TrackingDeviceControl(trackingDevice), m_sceneObject(sceneObject)
+SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject>  sceneObject,
+                                             std::shared_ptr<DeviceClient> trackingDevice) :
+    TrackingDeviceControl(trackingDevice),
+    m_sceneObject(sceneObject)
 {
 }
 
@@ -46,7 +48,8 @@ SceneObjectController::updateControlledObjects()
 
     emit(Event(EventType::Modified));
 
-    // Update colliding geometry
+    // Update geometry
+    // \todo revisit this; what if we need to move a group of objects
     m_sceneObject->getMasterGeometry()->setTranslation(getPosition());
     m_sceneObject->getMasterGeometry()->setRotation(getRotation());
 }

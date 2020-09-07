@@ -24,54 +24,53 @@
 #include <vector>
 
 // imstk
-#include "imstkModule.h"
+#include "imstkThreadObject.h"
 
 namespace imstk
 {
-class HDAPIDeviceClient;
+class HapticDeviceClient;
 ///
 /// \class HDAPIDeviceServer
-/// \brief Devices server using HDAPI
+/// \brief Devices manager using HDAPI
+/// \todo add the frame rate option for the servo loop
 ///
-class HDAPIDeviceServer : public Module
+class HapticDeviceManager : public ThreadObject
 {
+friend HapticDeviceClient;
+
 public:
 
-    ///
-    /// \brief Constructor
-    ///
-    HDAPIDeviceServer() : Module("HDAPIDeviceServer")
-    {}
+    HapticDeviceManager() : ThreadObject("HapticDeviceManager") {}
 
     ///
     /// \brief Destructor
+    /// Stop the scheduler
     ///
-    virtual ~HDAPIDeviceServer() {}
+    virtual ~HapticDeviceManager() override = default;
 
     ///
-    /// \brief Add device client
+    /// \brief Create a haptic device client and add it to the internal list
     ///
-    void addDeviceClient(std::shared_ptr<HDAPIDeviceClient> client);
+    std::shared_ptr<HapticDeviceClient> makeDeviceClient(const std::string& name);
+
+    ///
+    /// \brief Initialize the client devices and start the scheduler
+    ///
+    void initialize();
 
 protected:
+    ///
+    /// \brief
+    ///
+    void startThread() override;
 
     ///
-    /// \brief Initialize the server module
+    /// \brief
     ///
-    void initModule() override;
-
-    ///
-    /// \brief Run the server module
-    ///
-    void runModule() override;
-
-    ///
-    /// \brief Clean the server module
-    ///
-    void cleanUpModule() override;
+    void stopThread() override;
 
 private:
 
-    std::vector<std::shared_ptr<HDAPIDeviceClient>> m_deviceClients; ///< list of OpenHaptics
+    std::vector<std::shared_ptr<HapticDeviceClient>> m_deviceClients; ///< list of all the device clients
 };
 } // imstk
