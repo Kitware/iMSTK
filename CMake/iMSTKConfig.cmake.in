@@ -55,12 +55,11 @@ find_package( LibNiFalcon REQUIRED)
 find_package( Libusb REQUIRED)
 
 # OpenVR
-add_definitions( -DiMSTK_ENABLE_VR )
 find_package( openvr REQUIRED )
 
 # PhysX
 find_package(PhysX REQUIRED)
-#
+
 #SCCD
 find_package( SCCD REQUIRED )
 
@@ -121,12 +120,11 @@ else()
     RenderingContextOpenGL2
     RenderingCore
     RenderingOpenGL2
+    RenderingOpenVR
     RenderingVolume
     RenderingVolumeOpenGL2
     ViewsContext2D)
 endif()
-
-list(APPEND VTK_DEPENDENCIES RenderingOpenVR)
 
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
