@@ -31,7 +31,7 @@ class SurfaceMesh;
 ///
 /// \brief This filter subidivdes the triangles of a SurfaceMesh into more
 /// smaller triangles
-/// todo: test with LineMesh
+/// \todo: test with LineMesh
 ///
 class SurfaceMeshSubdivide : public GeometryAlgorithm
 {
@@ -48,6 +48,8 @@ public:
     virtual ~SurfaceMeshSubdivide() override = default;
 
 public:
+    std::shared_ptr<SurfaceMesh> getOutputMesh();
+
     void setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh);
 
     imstkGetMacro(SubdivisionType, Type);

@@ -28,7 +28,8 @@ namespace imstk
 ///
 /// \class ImplicitGeometry
 ///
-/// \brief Abstract base class for any implicit geometrical representation
+/// \brief Defines implicit geometry with an implicit function
+/// Implicit functions must be decoupled from geometry
 ///
 class ImplicitGeometry : public Geometry
 {
@@ -40,25 +41,8 @@ protected:
 
 public:
     ///
-    /// \brief Returns signed distance to surface at pos
+    /// \brief Returns function value given position
     ///
-    virtual double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const = 0;
-
-    ///
-    /// \brief Returns signed distance to surface at pos
-    ///
-    double getFunctionValue(const double x, const double y, const double z) const { return getFunctionValue(Vec3d(x, y, z)); }
-
-    ///
-    /// \brief Returns gradient of signed distance field at pos
-    /// if not implemented analytically, getFunctionValue is used
-    ///
-    virtual Vec3d getFunctionGrad(const Vec3d& pos, const double dx = 1.0) const
-    {
-        return Vec3d(
-            getFunctionValue(pos[0] + dx, pos[1], pos[2]) - getFunctionValue(pos[0] - dx, pos[1], pos[2]),
-            getFunctionValue(pos[0], pos[1] + dx, pos[2]) - getFunctionValue(pos[0], pos[1] - dx, pos[2]),
-            getFunctionValue(pos[0], pos[1], pos[2] + dx) - getFunctionValue(pos[0], pos[1], pos[2] - dx));
-    }
+    virtual double getFunctionValue(const Vec3d& pos) const = 0;
 };
 }

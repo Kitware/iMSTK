@@ -42,12 +42,7 @@ DynamicObject::getNumOfDOF() const
 void
 DynamicObject::updateGeometries()
 {
-    m_dynamicalModel->updatePhysicsGeometry();
-
-    if (m_physicsToCollidingGeomMap)
-    {
-        m_physicsToCollidingGeomMap->apply();
-    }
+    updatePhysicsGeometry();
 
     if (m_updateVisualFromPhysicsGeometry)
     {

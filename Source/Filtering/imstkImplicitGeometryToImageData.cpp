@@ -57,14 +57,21 @@ ImplicitGeometryToImageData::requestUpdate()
         return;
     }
 
+    if (m_Dimensions[0] == 0 || m_Dimensions[1] == 0 || m_Dimensions[2] == 0)
+    {
+        LOG(WARNING) << "Dimensions must be non-zero";
+        return;
+    }
+
     const Vec3d size    = Vec3d(m_Bounds[1] - m_Bounds[0], m_Bounds[3] - m_Bounds[2], m_Bounds[5] - m_Bounds[4]);
     const Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
-    const Vec3d origin  = Vec3d(m_Bounds[0], m_Bounds[2], m_Bounds[4]) + spacing * 0.5;
+    const Vec3d origin  = Vec3d(m_Bounds[0], m_Bounds[2], m_Bounds[4]);
+    const Vec3d shift   = origin + spacing * 0.5;
 
     std::shared_ptr<ImageData> outputImage = std::make_shared<ImageData>();
-    outputImage->allocate(IMSTK_FLOAT, 1, m_Dimensions, spacing, origin);
-    DataArray<float>& scalars = *std::dynamic_pointer_cast<DataArray<float>>(outputImage->getScalars());
-    float*            imgPtr  = scalars.getPointer();
+    outputImage->allocate(IMSTK_DOUBLE, 1, m_Dimensions, spacing, origin);
+    DataArray<double>& scalars = *std::dynamic_pointer_cast<DataArray<double>>(outputImage->getScalars());
+    double*            imgPtr  = scalars.getPointer();
 
     int i = 0;
     for (int z = 0; z < m_Dimensions[2]; z++)
@@ -73,7 +80,7 @@ ImplicitGeometryToImageData::requestUpdate()
         {
             for (int x = 0; x < m_Dimensions[0]; x++, i++)
             {
-                const Vec3d pos = Vec3d(x, y, z).cwiseProduct(spacing) + origin;
+                const Vec3d pos = Vec3d(x, y, z).cwiseProduct(spacing) + shift;
                 imgPtr[i] = inputGeometry->getFunctionValue(pos);
             }
         }

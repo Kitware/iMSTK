@@ -19,16 +19,21 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkNew.h"
+#include "imstkLogger.h"
+#include "imstkSceneManager.h"
+#include "imstkVTKViewer.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkKeyboardSceneControl.h"
+
 #include "imstkCube.h"
 #include "imstkCamera.h"
 #include "imstkLight.h"
 #include "imstkCollidingObject.h"
-#include "imstkHDAPIDeviceClient.h"
-#include "imstkHDAPIDeviceServer.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkSceneObjectController.h"
 #include "imstkCollisionGraph.h"
-#include "imstkDeviceTracker.h"
 #include "imstkScene.h"
 
 // global variables
@@ -43,18 +48,16 @@ using namespace imstk;
 int
 main()
 {
-#ifdef iMSTK_USE_OPENHAPTICS
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("ObjectController");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Device Client
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
+#ifdef iMSTK_USE_OPENHAPTICS
+    // Create Scene
+    imstkNew<Scene> scene("ObjectController");
 
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
+    auto server = std::make_shared<HapticDeviceManager>();
+    auto client = server->makeDeviceClient(phantomOmni1Name);
 
     // Object
     auto geom = std::make_shared<Cube>();
@@ -66,13 +69,12 @@ main()
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
 
-    auto trackCtrl = std::make_shared<DeviceTracker>(client);
-    trackCtrl->setTranslationScaling(0.1);
-    auto controller = std::make_shared<SceneObjectController>(object, trackCtrl);
-    scene->addObjectController(controller);
+    auto controller = std::make_shared<SceneObjectController>(object, client);
+    controller->setTranslationScaling(0.1);
+    scene->addController(controller);
 
     // Update Camera position
-    auto cam = scene->getCamera();
+    auto cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(0, 0, 10));
     cam->setFocalPoint(geom->getPosition());
 
@@ -82,9 +84,34 @@ main()
     light->setIntensity(1);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start();
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->addChildThread(server);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        viewer->start();
+    }
 #endif
     return 0;
 }

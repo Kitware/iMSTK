@@ -6,36 +6,33 @@ set(VTK_H_FILES
     VTKRenderer/imstkVTKTextStatusManager.h
     VTKRenderer/imstkVTKInteractorStyle.h
     VTKRenderer/imstkVTKScreenCaptureUtility.h
-    VTKRenderer/imstkVTKViewer.h)
+    VTKRenderer/imstkAbstractVTKViewer.h
+    VTKRenderer/imstkVTKOpenVRViewer.h
+    VTKRenderer/imstkVTKViewer.h
+    VTKRenderer/imstkVTKInteractorStyleVR.h)
 
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKTextStatusManager.cpp
     VTKRenderer/imstkVTKInteractorStyle.cpp
     VTKRenderer/imstkVTKScreenCaptureUtility.cpp
-    VTKRenderer/imstkVTKViewer.cpp)
+    VTKRenderer/imstkAbstractVTKViewer.cpp
+    VTKRenderer/imstkVTKOpenVRViewer.cpp
+    VTKRenderer/imstkVTKViewer.cpp
+    VTKRenderer/imstkVTKInteractorStyleVR.cpp)
 
 set(VULKAN_H_FILES
     VulkanRenderer/imstkVulkanInteractorStyle.h
     VulkanRenderer/imstkVulkanInteractorStyleFreeCamera.h
     VulkanRenderer/imstkVulkanScreenCaptureUtility.h
-    VulkanRenderer/imstkVulkanViewer.h)
+    VulkanRenderer/imstkVulkanViewer.h
+    VulkanRenderer/imstkVulkanInteractorStyleVR.h)
 
 set(VULKAN_CPP_FILES
     VulkanRenderer/imstkVulkanInteractorStyle.cpp
     VulkanRenderer/imstkVulkanInteractorStyleFreeCamera.cpp
     VulkanRenderer/imstkVulkanScreenCaptureUtility.cpp
-    VulkanRenderer/imstkVulkanViewer.cpp)
-
-if(${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND VULKAN_H_FILES
-    VulkanRenderer/imstkVulkanInteractorStyleVR.h)
-  list(APPEND VULKAN_CPP_FILES
+    VulkanRenderer/imstkVulkanViewer.cpp
     VulkanRenderer/imstkVulkanInteractorStyleVR.cpp)
-  list(APPEND VTK_H_FILES
-    VTKRenderer/imstkVTKInteractorStyleVR.h)
-  list(APPEND VTK_CPP_FILES
-    VTKRenderer/imstkVTKInteractorStyleVR.cpp)
-endif()
 
 if( NOT iMSTK_USE_Vulkan )
   set(SIMULATIONMANAGER_H_FILES ${VTK_H_FILES})
@@ -50,19 +47,23 @@ else()
 endif()
 
 include(imstkAddLibrary)
-imstk_add_library( SimulationManager
+imstk_add_library(SimulationManager
   H_FILES
-    imstkSceneManager.h
-    imstkSimulationManager.h
-    imstkViewer.h
-    imstkScreenCaptureUtility.h
+    imstkConsoleThread.h
     imstkInteractorStyle.h
+    imstkKeyboardSceneControl.h
+    imstkMouseSceneControl.h
+    imstkSceneManager.h
+    imstkScreenCaptureUtility.h
+    imstkViewer.h
     ${SIMULATIONMANAGER_H_FILES}
   CPP_FILES
+    imstkConsoleThread.cpp
+    imstkKeyboardSceneControl.cpp
+    imstkMouseSceneControl.cpp
     imstkSceneManager.cpp
-    imstkSimulationManager.cpp
-    imstkViewer.cpp
     imstkScreenCaptureUtility.cpp
+    imstkViewer.cpp
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}

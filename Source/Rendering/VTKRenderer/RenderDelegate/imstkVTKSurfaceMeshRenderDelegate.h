@@ -21,9 +21,9 @@
 
 #pragma once
 
+#include "imstkTextureManager.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKTextureDelegate.h"
-#include "imstkTextureManager.h"
 
 class vtkDoubleArray;
 

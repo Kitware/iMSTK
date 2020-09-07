@@ -1,13 +1,7 @@
 #-----------------------------------------------------------------------------
 # Dependencies
 #-----------------------------------------------------------------------------
-set(VTK_DEPENDENCIES "")
-set(VTK_ENABLE_OPENVR "NO")
-if(${${PROJECT_NAME}_ENABLE_VR})
-  list(APPEND VTK_DEPENDENCIES "openvr")
-  set(VTK_ENABLE_OPENVR "YES")
-endif()
-
+set(VTK_DEPENDENCIES "openvr")
 
 set(${PROJECT_NAME}_VTK_REPO_SOURCE "9.0" CACHE STRING "Select VTK Source Branch/Tag")
 set(VTK_SOURCES "9.0;master;release;nightly-master" CACHE INTERNAL "List of available VTK branch,tags to get")
@@ -35,7 +29,7 @@ set(VTK_MODULE_SETTINGS
   -DVTK_MODULE_ENABLE_VTK_RenderingContext2D:STRING=YES
   -DVTK_MODULE_ENABLE_VTK_RenderingContextOpenGL2:STRING=YES
   -DVTK_MODULE_ENABLE_VTK_RenderingOpenGL2:STRING=YES
-  -DVTK_MODULE_ENABLE_VTK_RenderingOpenVR:STRING=${VTK_ENABLE_OPENVR}
+  -DVTK_MODULE_ENABLE_VTK_RenderingOpenVR:STRING=YES
   -DVTK_MODULE_ENABLE_VTK_RenderingVolumeOpenGL2:STRING=YES
   -DVTK_MODULE_ENABLE_VTK_ViewsContext2D:STRING=YES
   -DVTK_MODULE_ENABLE_VTK_glew:STRING=YES

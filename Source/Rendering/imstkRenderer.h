@@ -55,15 +55,20 @@ public:
     Renderer() : m_config(std::make_shared<rendererConfig>()) { }
     virtual ~Renderer() = default;
 
+public:
     ///
     /// \brief Set rendering mode
     ///
-    virtual void setMode(const Renderer::Mode mode, const bool enableVR);
+    virtual void setMode(const Renderer::Mode mode, const bool enableVR)
+    {
+        m_VrEnabled   = enableVR;
+        m_currentMode = mode;
+    }
 
     ///
     /// \brief Get rendering mode
     ///
-    virtual const Renderer::Mode& getMode();
+    virtual const Renderer::Mode& getMode() const { return m_currentMode; }
 
     ///
     /// \brief Update background colors
@@ -72,7 +77,7 @@ public:
 
 protected:
     bool m_VrEnabled = false;
-    Renderer::Mode m_currentMode = Renderer::Mode::Empty;
+    Renderer::Mode m_currentMode = Renderer::Mode::Simulation;
 
     std::shared_ptr<rendererConfig> m_config;
 };

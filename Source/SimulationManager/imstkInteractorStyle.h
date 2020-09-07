@@ -21,16 +21,11 @@
 
 #pragma once
 
-#include <unordered_map>
-#include <functional>
+#include "imstkEventObject.h"
 
 namespace imstk
 {
 class InteractorStyle;
-
-/// Signature of custom function called in each even callback.
-/// Return true to override base class behavior, or false to maintain it.
-using EventHandlerFunction = std::function<bool (InteractorStyle* iStyle)>;
 
 ///
 /// \class InteractorStyle
@@ -39,26 +34,18 @@ using EventHandlerFunction = std::function<bool (InteractorStyle* iStyle)>;
 class InteractorStyle
 {
 public:
-    InteractorStyle() {};
+    InteractorStyle() = default;
+    virtual ~InteractorStyle() = default;
 
-    virtual ~InteractorStyle() {};
+    ///
+    /// \brief Called continously
+    ///
+    void setUpdateFunc(std::function<void()> func)
+    {
+        m_updateFunc = func;
+    }
 
 protected:
-    friend class Viewer;
-    friend class VulkanViewer;
-
-    /// Custom event handlers
-    /// Return true to override default event slot
-    std::unordered_map<char, EventHandlerFunction> m_onCharFunctionMap;
-    EventHandlerFunction m_onMouseMoveFunction;
-    EventHandlerFunction m_onLeftButtonDownFunction;
-    EventHandlerFunction m_onLeftButtonUpFunction;
-    EventHandlerFunction m_onMiddleButtonDownFunction;
-    EventHandlerFunction m_onMiddleButtonUpFunction;
-    EventHandlerFunction m_onRightButtonDownFunction;
-    EventHandlerFunction m_onRightButtonUpFunction;
-    EventHandlerFunction m_onMouseWheelForwardFunction;
-    EventHandlerFunction m_onMouseWheelBackwardFunction;
-    EventHandlerFunction m_onTimerFunction;
+    std::function<void()> m_updateFunc;
 };
 }

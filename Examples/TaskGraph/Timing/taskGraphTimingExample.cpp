@@ -20,21 +20,21 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkVisualModel.h"
-#include "imstkVTKRenderer.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief Create pbd string geometry
@@ -163,8 +163,11 @@ const Color  endColor      = Color(0.0, 1.0, 0.0); // Color of last string
 int
 main()
 {
-    imstkNew<SimulationManager> simManager;
-    auto                        scene = simManager->createNewScene("PBDString");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("PBDString");
+    scene->getConfig()->taskTimingEnabled = true;
 
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
@@ -176,13 +179,12 @@ main()
     }
 
     // Adjust the camera
-    scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
-    scene->getCamera()->setPosition(0.0, 0.0, 15.0);
+    scene->getActiveCamera()->setPosition(0.0, 0.0, 15.0);
 
     // Move the points every frame
     double t = 0.0;
     auto   movePoints =
-        [&pbdStringObjs, &t](Module* module)
+        [&pbdStringObjs, &t](Event*)
         {
             for (unsigned int i = 0; i < pbdStringObjs.size(); i++)
             {
@@ -190,23 +192,42 @@ main()
                 const Vec3d               pos   = model->getCurrentState()->getVertexPosition(0);
                 // Move in circle, derivatives of parametric eq of circle
                 const Vec3d newPos = Vec3d(
-                pos.x() + -std::sin(t) * radius * dt,
-                pos.y(),
-                pos.z() + std::cos(t) * radius * dt);
+                    pos.x() + -std::sin(t) * radius * dt,
+                    pos.y(),
+                    pos.z() + std::cos(t) * radius * dt);
                 model->getCurrentState()->setVertexPosition(0, newPos);
             }
             t += dt;
         };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(movePoints);
 
-    // Start
-    simManager->setActiveScene(scene);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
 
-    // Inform the scene to time its tasks
-    scene->getConfig()->taskTimingEnabled = true;
-    std::dynamic_pointer_cast<VTKRenderer>(simManager->getViewer()->getActiveRenderer())->setTimeTableVisibility(true);
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        connect<Event>(sceneManager, EventType::PostUpdate, movePoints);
 
-    simManager->start();
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     // Write the graph, highlighting the critical path and putting the completion time in the name
     imstkNew<TaskGraphVizWriter> writer;

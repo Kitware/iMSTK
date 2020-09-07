@@ -22,40 +22,45 @@
 #include "imstkCamera.h"
 #include "imstkCube.h"
 #include "imstkIsometricMap.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel.h"
 #include "imstkRigidObject.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 std::shared_ptr<imstk::RigidObject>
-addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d pos)
+makeMeshRigidObject(const std::string& name, const Vec3d& pos)
 {
     // create cube object
-    auto meshObj = std::make_shared<RigidObject>(name);
+    imstkNew<RigidObject> meshObj(name);
 
     // Load a tetrahedral mesh
     auto tetMesh = imstk::MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract the surface mesh
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    imstkNew<SurfaceMesh> surfMesh;
 
     tetMesh->scale(15., Geometry::TransformType::ApplyToData);
     tetMesh->translate(pos, Geometry::TransformType::ApplyToData);
     tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // add visual model
-    auto renderModel = std::make_shared<VisualModel>(surfMesh);
-    auto mat = std::make_shared<RenderMaterial>();
+    imstkNew<VisualModel>    renderModel(surfMesh.get());
+    imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Green);
@@ -63,35 +68,33 @@ addMeshRigidObject(const std::string& name, std::shared_ptr<Scene> scene, Vec3d 
     meshObj->addVisualModel(renderModel);
 
     // add dynamic model
-    auto rigidModel = std::make_shared<RigidBodyModel>();
-    auto rigidProp  = std::make_shared<RigidBodyConfig>();
+    imstkNew<RigidBodyModel>  rigidModel;
+    imstkNew<RigidBodyConfig> rigidProp;
     rigidProp->m_rigidBodyType = RigidBodyType::Kinematic;
     rigidModel->configure(rigidProp);
     rigidModel->setModelGeometry(surfMesh);
     meshObj->setPhysicsGeometry(surfMesh);
     meshObj->setDynamicalModel(rigidModel);
 
-    // add cube to scene
-    scene->addSceneObject(meshObj);
     return meshObj;
 }
 
 std::shared_ptr<imstk::RigidObject>
-addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, const bool isStatic = false)
+makeCubeRigidObject(std::string& name, const Vec3d& pos, const bool isStatic = false)
 {
-    // create cube object
-    auto cubeObj = std::make_shared<RigidObject>(name);
+    // Create cube object
+    imstkNew<RigidObject> cubeObj(name);
 
-    // Create Cube object
-    auto cubeGeom = std::make_shared<Cube>();
-    cubeGeom->setWidth(20.);
+    // Create cube geometry
+    imstkNew<Cube> cubeGeom;
+    cubeGeom->setWidth(20.0);
     cubeGeom->translate(pos);
 
-    // cube visual model
+    // Create cube VisualModel
     auto mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
     mesh->scale(5.0, Geometry::TransformType::ApplyToData);
-    auto renderModel = std::make_shared<VisualModel>(cubeGeom);
-    auto mat = std::make_shared<RenderMaterial>();
+    imstkNew<VisualModel>    renderModel(cubeGeom.get());
+    imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);
     mat->setColor(Color::Orange);
@@ -102,9 +105,9 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     rigidMap->setMaster(cubeGeom);
     rigidMap->setSlave(mesh);
 
-    // cube dynamic model
-    auto rigidModel = std::make_shared<RigidBodyModel>();
-    auto rigidProp  = std::make_shared<RigidBodyConfig>();
+    // Create cube DynamicalModel
+    imstkNew<RigidBodyModel>  rigidModel;
+    imstkNew<RigidBodyConfig> rigidProp;
     rigidProp->m_dynamicFriction = 0.01;
     rigidProp->m_restitution     = 0.01;
     rigidProp->m_staticFriction  = 0.005;
@@ -113,93 +116,113 @@ addCubeRigidObject(std::string& name, std::shared_ptr<Scene> scene, Vec3d pos, c
     rigidModel->setModelGeometry(cubeGeom);
     cubeObj->setDynamicalModel(rigidModel);
 
-    //cubeObj->setPhysicsToVisualMap(rigidMap);
-
-    // add cube to scene
-    scene->addSceneObject(cubeObj);
     return cubeObj;
 }
 
-void
-addPlaneRigidObject(std::shared_ptr<Scene> scene)
+std::shared_ptr<RigidObject>
+makePlaneRigidObject()
 {
     // create plane object
-    auto planeObj = std::make_shared<RigidObject>("Plane");
+    imstkNew<RigidObject> planeObj("Plane");
 
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(400.);
+    imstkNew<Plane> planeGeom;
+    planeGeom->setWidth(400.0);
 
     // visual model
-    auto renderModel2 = std::make_shared<VisualModel>(planeGeom);
-    renderModel2->setRenderMaterial(std::make_shared<RenderMaterial>());
-    planeObj->addVisualModel(renderModel2);
+    imstkNew<VisualModel> renderModel(planeGeom.get());
+    renderModel->setRenderMaterial(std::make_shared<RenderMaterial>());
+    planeObj->addVisualModel(renderModel);
 
     // dynamic model
-    auto rigidModel2 = std::make_shared<RigidBodyModel>();
-    auto rigidProp2  = std::make_shared<RigidBodyConfig>();
-    rigidModel2->configure(rigidProp2);
-    rigidModel2->setModelGeometry(planeGeom);
-    planeObj->setDynamicalModel(rigidModel2);
+    imstkNew<RigidBodyModel>  rigidModel;
+    imstkNew<RigidBodyConfig> rigidProp;
+    rigidModel->configure(rigidProp);
+    rigidModel->setModelGeometry(planeGeom);
+    planeObj->setDynamicalModel(rigidModel);
 
-    scene->addSceneObject(planeObj);
+    return planeObj;
 }
 
-void
-addSphereRigidObject(std::shared_ptr<Scene> scene, Vec3d t = Vec3d(0., 0., 0.))
+std::shared_ptr<RigidObject>
+makeSphereRigidObject(const Vec3d& t = Vec3d(0.0, 0.0, 0.0))
 {
     // create cube object
-    auto sphereObj = std::make_shared<RigidObject>("Sphere");
+    imstkNew<RigidObject> sphereObj("Sphere");
 
     // Create Cube object
-    auto sphereGeom = std::make_shared<Sphere>();
-    sphereGeom->setRadius(10.);
+    imstkNew<Sphere> sphereGeom;
+    sphereGeom->setRadius(10.0);
     sphereGeom->translate(t);
 
     // cube visual model
-    auto renderModel = std::make_shared<VisualModel>(sphereGeom);
+    imstkNew<VisualModel> renderModel(sphereGeom.get());
     renderModel->setRenderMaterial(std::make_shared<RenderMaterial>());
     sphereObj->addVisualModel(renderModel);
 
     // cube dynamic model
-    auto rigidModel3 = std::make_shared<RigidBodyModel>();
-    auto rigidProp   = std::make_shared<RigidBodyConfig>();
+    imstkNew<RigidBodyModel>  rigidModel;
+    imstkNew<RigidBodyConfig> rigidProp;
     rigidProp->m_rigidBodyType = RigidBodyType::Dynamic;
-    rigidModel3->configure(rigidProp);
-    rigidModel3->setModelGeometry(sphereGeom);
-    sphereObj->setDynamicalModel(rigidModel3);
+    rigidModel->configure(rigidProp);
+    rigidModel->setModelGeometry(sphereGeom);
+    sphereObj->setDynamicalModel(rigidModel);
 
-    // add cube to scene
-    scene->addSceneObject(sphereObj);
+    return sphereObj;
 }
 
 int
 main()
 {
-    //simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("Rigid Body Dynamics");
+    // Write log to stdout and file
+    Logger::startLogger();
 
-    for (int i = 0; i < 1; ++i)
+    imstkNew<Scene> scene("Rigid Body Dynamics");
     {
-        addCubeRigidObject(std::string("cube_").append(std::to_string(i)), scene, Vec3d(0., 150. + i * 21, 0.));
+        for (int i = 0; i < 1; i++)
+        {
+            scene->addSceneObject(makeCubeRigidObject(std::string("cube_").append(std::to_string(i)), Vec3d(0.0, 150.0 + i * 21.0, 0.0)));
+        }
+
+        scene->addSceneObject(makePlaneRigidObject());
+        scene->addSceneObject(makeSphereRigidObject(Vec3d(0.0, 200.0, 0.0)));
+        scene->addSceneObject(makeMeshRigidObject(std::string("dragon"), Vec3d(0.0, 30.0, 0.0)));
+
+        // Set Camera configuration
+        scene->getActiveCamera()->setPosition(Vec3d(300.0, 300.0, 300.0));
+
+        // Light
+        imstkNew<DirectionalLight> light("light");
+        light->setIntensity(1.0);
+        scene->addLight(light);
     }
 
-    addPlaneRigidObject(scene);
-    addSphereRigidObject(scene, Vec3d(0., 200, 0.));
-    auto rigidObj = addMeshRigidObject(std::string("dragon"), scene, Vec3d(0., 30., 0.));
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
 
-    // Set Camera configuration
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(300, 300, 300));
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
 
-    // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setIntensity(1);
-    scene->addLight(light);
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

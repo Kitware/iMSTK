@@ -80,9 +80,9 @@ SurfaceMesh::print() const
 double
 SurfaceMesh::getVolume() const
 {
-    // TODO
-    // 1. Check for water tightness
-    // 2. Compute volume based on signed distance
+    /// \todo:
+    /// 1. Check for water tightness
+    /// 2. Compute volume based on signed distance
 
     LOG(WARNING) << "SurfaceMesh::getVolume error: not implemented.";
     return 0.0;
@@ -147,7 +147,8 @@ SurfaceMesh::computeTrianglesNormals()
         m_triangleNormals.at(triangleId) = ((p1 - p0).cross(p2 - p0)).normalized();
     }
 
-    bool                      hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    // TCoords must be named (or else it will pick up any array without a name)
+    bool                      hasUVs = m_defaultTCoords == "" ? false : this->hasPointDataArray(m_defaultTCoords);
     const StdVectorOfVectorf* UVs    = nullptr;
 
     if (hasUVs)
@@ -204,7 +205,8 @@ SurfaceMesh::computeVertexNormals()
 
     // Correct for UV seams
     Vec3d normal, tangent;
-    bool  hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    // TCoords must be named (or else it will pick up any array without a name)
+    bool hasUVs = m_defaultTCoords == "" ? false : this->hasPointDataArray(m_defaultTCoords);
 
     /*if (hasUVs)
     {
@@ -595,8 +597,8 @@ void
 SurfaceMesh::setLoadFactor(double loadFactor)
 {
     m_loadFactor      = loadFactor;
-    m_maxNumVertices  = (size_t)(m_originalNumVertices * m_loadFactor);
-    m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+    m_maxNumVertices  = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
+    m_maxNumTriangles = static_cast<size_t>(m_originalNumTriangles * m_loadFactor);
     m_trianglesVertices.reserve(m_maxNumTriangles);
     m_vertexNormals.reserve(m_maxNumVertices);
     m_vertexTangents.reserve(m_maxNumVertices);

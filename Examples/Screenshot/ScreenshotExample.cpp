@@ -21,14 +21,20 @@
 
 #include "imstkCamera.h"
 #include "imstkCube.h"
+#include "imstkKeyboardDeviceClient.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPlane.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
-#include "imstkScreenCaptureUtility.h"
-#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkViewer.h"
+#include "imstkVTKScreenCaptureUtility.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -38,76 +44,100 @@ using namespace imstk;
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto sceneTest  = simManager->createNewScene("ScreenShotUtility");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("ScreenShotUtility");
 
     // Plane
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(10);
-    auto planeObj = std::make_shared<VisualObject>("VisualPlane");
+    imstkNew<Plane> planeGeom;
+    planeGeom->setWidth(10.0);
+    imstkNew<VisualObject> planeObj("VisualPlane");
     planeObj->setVisualGeometry(planeGeom);
 
     // Cube
-    auto cubeGeom = std::make_shared<Cube>();
+    imstkNew<Cube> cubeGeom;
     cubeGeom->setWidth(0.5);
     cubeGeom->setPosition(1.0, -1.0, 0.5);
     // rotates could be replaced by cubeGeom->setOrientationAxis(1,1,1) (normalized inside)
     cubeGeom->rotate(UP_VECTOR, PI_4, Geometry::TransformType::ApplyToData);
     cubeGeom->rotate(RIGHT_VECTOR, PI_4, Geometry::TransformType::ApplyToData);
-    auto cubeObj = std::make_shared<VisualObject>("VisualCube");
+    imstkNew<VisualObject> cubeObj("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
     // Sphere
-    auto sphereGeom = std::make_shared<Sphere>();
+    imstkNew<Sphere> sphereGeom;
     sphereGeom->setRadius(0.3);
-    sphereGeom->setPosition(0, 2, 0);
-    auto sphereObj = std::make_shared<VisualObject>("VisualSphere");
+    sphereGeom->setPosition(0.0, 2.0, 0.0);
+    imstkNew<VisualObject> sphereObj("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
     // Light (white)
-    auto whiteLight = std::make_shared<PointLight>("whiteLight");
-    whiteLight->setIntensity(100);
-    whiteLight->setPosition(Vec3d(5, 8, 5));
+    imstkNew<PointLight> whiteLight("whiteLight");
+    whiteLight->setIntensity(100.0);
+    whiteLight->setPosition(Vec3d(5.0, 8.0, 5.0));
 
     // Light (red)
-    auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(4, -3, 1));
-    colorLight->setFocalPoint(Vec3d(0, 0, 0));
-    colorLight->setIntensity(100);
+    imstkNew<SpotLight> colorLight("colorLight");
+    colorLight->setPosition(Vec3d(4.0, -3.0, 1.0));
+    colorLight->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
+    colorLight->setIntensity(100.0);
     colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(15);
+    colorLight->setSpotAngle(15.0);
 
     // Add in scene
-    sceneTest->addSceneObject(planeObj);
-    sceneTest->addSceneObject(cubeObj);
-    sceneTest->addSceneObject(sphereObj);
-    sceneTest->addLight(whiteLight);
-    sceneTest->addLight(colorLight);
+    scene->addSceneObject(planeObj);
+    scene->addSceneObject(cubeObj);
+    scene->addSceneObject(sphereObj);
+    scene->addLight(whiteLight);
+    scene->addLight(colorLight);
 
     // Update Camera
-    auto cam1 = sceneTest->getCamera();
-    cam1->setPosition(Vec3d(-5.5, 2.5, 32));
-    cam1->setFocalPoint(Vec3d(1, 1, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(-5.5, 2.5, 32.0));
+    scene->getActiveCamera()->setFocalPoint(Vec3d(1.0, 1.0, 0.0));
 
-#ifndef iMSTK_USE_Vulkan
-    auto viewer = simManager->getViewer();
-    auto screenShotUtility = viewer->getScreenCaptureUtility();
-    // Set up for screen shot
-    viewer->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
-    // Create a call back on key press of 'b' to take the screen shot
-    viewer->setOnCharFunction('b', [&](InteractorStyle* c) -> bool
+    LOG(INFO) << "PRESS 'b' for taking screenshots";
+
+    // Run the simulation
     {
-        screenShotUtility->saveScreenShot();
-        return false;
-    });
-#endif
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
 
-    std::cout << "PRESS 'b' for taking screenshot" << std::endl;
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
 
-    // Run
-    simManager->setActiveScene(sceneTest);
-    simManager->start(SimulationStatus::Paused);
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+
+            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyPress,
+                [&](KeyPressEvent* e)
+            {
+                if (e->m_keyPressType == KEY_PRESS)
+                {
+                    if (e->m_key == 'b')
+                    {
+                        viewer->getScreenCaptureUtility()->saveScreenShot();
+                    }
+                }
+                });
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

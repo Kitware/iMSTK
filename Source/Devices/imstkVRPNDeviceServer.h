@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkModule.h"
+#include "imstkLoopThreadObject.h"
 
 #include <map>
 #include <string>
@@ -48,7 +48,7 @@ enum class DeviceType
 /// \class VRPNDeviceServer
 /// \brief Devices server using VRPN
 ///
-class VRPNDeviceServer : public Module
+class VRPNDeviceServer : public LoopThreadObject
 {
 public:
 
@@ -58,7 +58,7 @@ public:
     VRPNDeviceServer(const std::string& machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO) :
         m_machine(machine),
         m_port(port),
-        Module(machine + ":" + std::to_string(port))
+        LoopThreadObject(machine + ":" + std::to_string(port))
     {}
 
     ///
@@ -81,17 +81,17 @@ protected:
     ///
     /// \brief Initialize the server module
     ///
-    void initModule() override;
+    void initThread() override;
 
     ///
     /// \brief Run the server module
     ///
-    void runModule() override;
+    void updateThread() override;
 
     ///
     /// \brief Clean the server module
     ///
-    void cleanUpModule() override;
+    void stopThread() override;
 
 private:
 

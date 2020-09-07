@@ -39,10 +39,10 @@
 namespace imstk
 {
 PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics),
-    m_constraints(std::make_shared<PBDConstraintVector>()),
-    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_mass(std::make_shared<StdVectorOfReal>()),
     m_invMass(std::make_shared<StdVectorOfReal>()),
+    m_constraints(std::make_shared<PBDConstraintVector>()),
+    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_parameters(std::make_shared<PBDModelConfig>())
 {
     m_validGeometryTypes = {
@@ -410,7 +410,6 @@ PbdModel::initializeBendConstraints(const double stiffness)
     // Create constraints
     const auto& lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
     const auto& elements = lineMesh->getLinesVertices();
-    const auto  nV       = lineMesh->getNumVertices();
 
     // Iterate sets of two segments
     for (size_t k = 0; k < elements.size() - 1; k++)

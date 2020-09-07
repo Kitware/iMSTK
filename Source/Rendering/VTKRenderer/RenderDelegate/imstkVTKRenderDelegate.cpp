@@ -48,6 +48,7 @@
 
 #include <vtkActor.h>
 #include <vtkAlgorithmOutput.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkImageData.h>
 #include <vtkImageReader2.h>
@@ -59,21 +60,23 @@
 #include <vtkTexture.h>
 #include <vtkTransform.h>
 #include <vtkVolume.h>
-#include <vtkColorTransferFunction.h>
+#include <vtkVolumeProperty.h>
 
 namespace imstk
 {
 VTKRenderDelegate::VTKRenderDelegate() :
-    m_actor(vtkSmartPointer<vtkActor>::New()),
-    m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New()),
     m_transform(vtkSmartPointer<vtkTransform>::New()),
     m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
     m_volume(vtkSmartPointer<vtkVolume>::New()),
-    m_modelIsVolume(false)               // remove?
+    m_modelIsVolume(false),
+    m_actor(vtkSmartPointer<vtkActor>::New()),
+    m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New())
 {
     m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
     m_actor->SetUserTransform(m_transform);
     m_volume->SetMapper(m_volumeMapper); // remove this as a default?
+    /*m_volumeMapper->SetAutoAdjustSampleDistances(false);
+    m_volumeMapper->SetSampleDistance(0.01);*/
 }
 
 std::shared_ptr<VTKRenderDelegate>
@@ -188,7 +191,7 @@ void
 VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*                source,
                                const std::shared_ptr<VisualModel> vizModel)
 {
-    if (auto imData = vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
+    if (vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
     {
         m_volumeMapper->SetInputConnection(source);
         m_modelIsVolume = true;
@@ -553,7 +556,7 @@ VTKRenderDelegate::updateActorPropertiesVolumeRendering()
         return;
     }
 
-    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
+    if (auto volumeMat = std::dynamic_pointer_cast<VolumeRenderMaterial>(material))
     {
         switch (volumeMat->getBlendMode())
         {

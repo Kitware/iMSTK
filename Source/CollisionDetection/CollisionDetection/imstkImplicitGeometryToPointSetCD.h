@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionDetection.h"
+#include "imstkImplicitFunctionFiniteDifferenceFunctor.h"
 
 namespace imstk
 {
@@ -54,6 +55,7 @@ public:
 
 private:
     std::shared_ptr<ImplicitGeometry> m_implicitGeomA;
-    std::shared_ptr<PointSet> m_pointSetB;
+    std::shared_ptr<PointSet>       m_pointSetB;
+    ImplicitFunctionCentralGradient centralGrad;
 };
 }

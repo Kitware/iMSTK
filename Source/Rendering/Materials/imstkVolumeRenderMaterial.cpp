@@ -21,9 +21,15 @@
 
 #include "imstkVolumeRenderMaterial.h"
 
+#include <vtkVolumeProperty.h>
+
 namespace imstk
 {
-vtkVolumeProperty*
+VolumeRenderMaterial::VolumeRenderMaterial() : m_property(vtkSmartPointer<vtkVolumeProperty>::New())
+{
+}
+
+vtkSmartPointer<vtkVolumeProperty>
 VolumeRenderMaterial::getVolumeProperty()
 {
     return this->m_property;

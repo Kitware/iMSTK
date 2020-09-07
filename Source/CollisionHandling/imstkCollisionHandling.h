@@ -50,7 +50,9 @@ public:
         NodalPicking,
         BoneDrilling,
         SPH,
-        PBD
+        PBD,
+        RBD,
+        LevelSet
     };
 
     ///

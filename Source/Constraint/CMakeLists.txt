@@ -5,6 +5,7 @@ include(imstkAddLibrary)
 imstk_add_library( Constraints
   SUBDIR_LIST
     PbdConstraints
+    RigidBodyConstraints
   DEPENDS
     Common
     DataStructures

@@ -27,7 +27,9 @@
 #include <array>
 #include <unordered_set>
 
+#ifdef WIN32
 #pragma warning(disable : 4201)
+#endif
 namespace imstk
 {
 class OctreeNode;
@@ -585,4 +587,6 @@ protected:
     bool m_bDrawNonEmptyParent = true;
 };
 } // end namespace imstk
+#ifdef WIN32
 #pragma warning(default : 4201)
+#endif

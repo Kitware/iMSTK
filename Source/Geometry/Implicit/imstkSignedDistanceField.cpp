@@ -23,12 +23,12 @@
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
 #include "imstkLogger.h"
-#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {
 ///
 /// \brief Accepts structured coordinates (ie: pre int cast, [0, dim)) so it can do interpolation
+/// origin should be image origin + spacing/2
 ///
 template<typename T>
 static T
@@ -36,6 +36,7 @@ trilinearSample(const Vec3d& structuredPt, T* imgPtr, const Vec3i& dim, const in
 {
     // minima of voxel, clamped to bounds
     const Vec3i s1 = structuredPt.cast<int>().cwiseMax(0).cwiseMin(dim - Vec3i(1, 1, 1));
+
     // maxima of voxel, clamped to bounds
     const Vec3i s2 = (structuredPt.cast<int>() + Vec3i(1, 1, 1)).cwiseMax(0).cwiseMin(dim - Vec3i(1, 1, 1));
 
@@ -59,84 +60,55 @@ trilinearSample(const Vec3d& structuredPt, T* imgPtr, const Vec3i& dim, const in
     const double val011 = static_cast<double>(imgPtr[index011]);
 
     // Interpolants
-    const Vec3d t = s2.cast<double>() - structuredPt;
+    //const Vec3d t = s2.cast<double>() - structuredPt;
+    const Vec3d t = structuredPt - s2.cast<double>();
 
     // Interpolate along x
-    const double ax = val000 + (val000 - val100) * t[0];
-    const double bx = val010 + (val010 - val110) * t[0];
+    const double ax = val000 + (val100 - val000) * t[0];
+    const double bx = val010 + (val110 - val010) * t[0];
 
-    const double dx = val001 + (val001 - val101) * t[0];
-    const double ex = val011 + (val011 - val111) * t[0];
+    const double dx = val001 + (val101 - val001) * t[0];
+    const double ex = val011 + (val111 - val011) * t[0];
 
     // Interpolate along y
-    const double cy = ax + (ax - bx) * t[1];
-    const double fy = dx + (dx - ex) * t[1];
+    const double cy = ax + (bx - ax) * t[1];
+    const double fy = dx + (ex - dx) * t[1];
 
     // Interpolate along z
-    const double gz = fy + (cy - fy) * t[2];
+    const double gz = cy + (fy - cy) * t[2];
 
     return static_cast<T>(gz);
-}
-
-///
-/// \brief Gives the gradient of the image in structured coordinate space
-///
-template<typename T>
-static Vec3d
-trilinearGrad(const Vec3d& pt, T* imgPtr, const Vec3i& dim, const double dx = 1.0)
-{
-    const double xminVal = static_cast<double>(trilinearSample(Vec3d(pt[0] - dx, pt[1], pt[2]), imgPtr, dim, 1, 0));
-    const double xmaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0] + dx, pt[1], pt[2]), imgPtr, dim, 1, 0));
-    const double yminVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1] - dx, pt[2]), imgPtr, dim, 1, 0));
-    const double ymaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1] + dx, pt[2]), imgPtr, dim, 1, 0));
-    const double zminVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1], pt[2] - dx), imgPtr, dim, 1, 0));
-    const double zmaxVal = static_cast<double>(trilinearSample(Vec3d(pt[0], pt[1], pt[2] + dx), imgPtr, dim, 1, 0));
-
-    return Vec3d(xmaxVal - xminVal, ymaxVal - yminVal, zmaxVal - zminVal);
 }
 
 SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name) :
     ImplicitGeometry(Type::SignedDistanceField, name),
     m_imageDataSdf(imageData)
 {
-    const Vec3d& spacing = m_imageDataSdf->getSpacing();
-    m_invSpacing = Vec3d(1.0 / spacing[0], 1.0 / spacing[1], 1.0 / spacing[2]);
+    m_invSpacing = m_imageDataSdf->getInvSpacing();
     m_bounds     = m_imageDataSdf->getBounds();
+    m_shift      = m_imageDataSdf->getOrigin() - m_imageDataSdf->getSpacing() * 0.5;
 
-    if (m_imageDataSdf->getScalarType() != IMSTK_FLOAT)
+    if (m_imageDataSdf->getScalarType() != IMSTK_DOUBLE)
     {
-        LOG(WARNING) << "SignedDistanceField requires float input image";
+        LOG(WARNING) << "SignedDistanceField requires double input image";
         return;
     }
 
-    m_scalars = std::dynamic_pointer_cast<DataArray<float>>(m_imageDataSdf->getScalars());
+    m_scalars = std::dynamic_pointer_cast<DataArray<double>>(m_imageDataSdf->getScalars());
 }
 
 double
 SignedDistanceField::getFunctionValue(const Vec3d& pos) const
 {
-    if (pos[0] < m_bounds[0] || pos[0] > m_bounds[1] || pos[1] < m_bounds[2] || pos[1] > m_bounds[3] || pos[2] < m_bounds[4] || pos[2] > m_bounds[5])
-    {
-        return IMSTK_DOUBLE_MAX;
-    }
-    else
-    {
-        const Vec3d structuredPt = (pos - m_imageDataSdf->getOrigin()).cwiseProduct(m_invSpacing);
-        return trilinearSample(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), 1, 0);
-    }
+    // origin at center of first voxel
+    const Vec3d structuredPt = (pos - m_shift).cwiseProduct(m_invSpacing);
+    return trilinearSample(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), 1, 0);
 }
 
-Vec3d
-SignedDistanceField::getFunctionGrad(const Vec3d& pos, const double dx) const
+double
+SignedDistanceField::getFunctionValueCoord(const Vec3i& coord) const
 {
-    if (pos[0] < m_bounds[0] || pos[0] > m_bounds[1] || pos[1] < m_bounds[2] || pos[1] > m_bounds[3] || pos[2] < m_bounds[4] || pos[2] > m_bounds[5])
-    {
-        return Vec3d(0.0, 0.0, 0.0);
-    }
-    else
-    {
-        const Vec3d structuredPt = (pos - m_imageDataSdf->getOrigin()).cwiseProduct(m_invSpacing);
-        return trilinearGrad(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), dx).cwiseProduct(m_invSpacing);
-    }
+    const Vec3i clampedCoord = coord.cwiseMin(m_imageDataSdf->getDimensions() - Vec3i(1, 1, 1)).cwiseMax(0);
+    return (*m_scalars)[m_imageDataSdf->getScalarIndex(clampedCoord)];
 }
 }

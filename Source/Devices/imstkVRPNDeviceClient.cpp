@@ -25,7 +25,7 @@
 namespace imstk
 {
 void
-VRPNDeviceClient::initModule()
+VRPNDeviceClient::initThread()
 {
     auto fullDeviceIp = this->getName().c_str();
 
@@ -46,7 +46,7 @@ VRPNDeviceClient::initModule()
 }
 
 void
-VRPNDeviceClient::runModule()
+VRPNDeviceClient::updateThread()
 {
     if (this->getTrackingEnabled())
     {
@@ -69,7 +69,7 @@ VRPNDeviceClient::runModule()
 }
 
 void
-VRPNDeviceClient::cleanUpModule()
+VRPNDeviceClient::stopThread()
 {
     m_vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
     m_vrpnTracker->unregister_change_handler(this, velocityChangeHandler);

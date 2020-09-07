@@ -21,13 +21,15 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
 #include "imstkSignedDistanceField.h"
-#include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSphObjectCollisionPair.h"
@@ -35,9 +37,9 @@
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkViewer.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief Generate a box-shape of fluid particles
@@ -156,12 +158,14 @@ makeDragonCollidingObject(const std::string& name, const Vec3d& position)
 int
 main()
 {
-    imstkNew<SimulationManager> simManager;
-    std::shared_ptr<Scene>      scene = simManager->createNewScene("SPH-Obj-SDFInteraction");
+    // Write log to stdout and file
+    Logger::startLogger();
 
     // Setup the scene
+    imstkNew<Scene> scene("SPH-Obj-SDFInteraction");
     {
-        scene->getCamera()->setPosition(0, 2.0, 15.0);
+        //scene->getConfig()->taskTimingEnabled = true;
+        scene->getActiveCamera()->setPosition(0, 2.0, 15.0);
 
         // Static Dragon object
         std::shared_ptr<CollidingObject> dragonObj = makeDragonCollidingObject("Dragon", Vec3d(0.0, 0.0, 0.0));
@@ -182,9 +186,34 @@ main()
         scene->addLight(light);
     }
 
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+        viewer->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

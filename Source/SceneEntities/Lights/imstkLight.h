@@ -117,7 +117,7 @@ public:
     void setName(std::string name) { m_name = name; };
 
 protected:
-    explicit Light(const std::string& name, const LightType& type) : m_name(name), m_type(type), SceneEntity() {};
+    explicit Light(const std::string& name, const LightType& type) : SceneEntity(), m_name(name), m_type(type) {};
 
     // properties with defaults
     float m_intensity   = 1.;

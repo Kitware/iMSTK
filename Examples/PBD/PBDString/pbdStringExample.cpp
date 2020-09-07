@@ -20,14 +20,18 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLineMesh.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -38,7 +42,7 @@ static std::shared_ptr<LineMesh>
 makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringLength)
 {
     // Create the geometry
-    std::shared_ptr<LineMesh> stringGeometry = std::make_shared<LineMesh>();
+    imstkNew<LineMesh> stringGeometry;
 
     StdVectorOfVec3d vertList;
     vertList.resize(numVerts);
@@ -74,14 +78,14 @@ makePbdString(
     const double       bendStiffness,
     const Color&       color)
 {
-    std::shared_ptr<PbdObject> stringObj = std::make_shared<PbdObject>(name);
+    imstkNew<PbdObject> stringObj(name);
 
     // Setup the Geometry
     std::shared_ptr<LineMesh> stringMesh = makeStringGeometry(pos, numVerts, stringLength);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PBDModelConfig>();
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e7);
+    imstkNew<PBDModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1.0e7);
     pbdParams->enableConstraint(PbdConstraint::Type::Bend, bendStiffness);
     pbdParams->m_fixedNodeIds     = { 0 };
     pbdParams->m_uniformMassValue = 5.0;
@@ -90,19 +94,19 @@ makePbdString(
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    std::shared_ptr<PbdModel> pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(stringMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    std::shared_ptr<RenderMaterial> material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
     material->setEdgeColor(color);
     material->setLineWidth(2.0f);
     material->setPointSize(6.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
-    std::shared_ptr<VisualModel> visualModel = std::make_shared<VisualModel>(stringMesh);
+    imstkNew<VisualModel> visualModel(stringMesh);
     visualModel->setRenderMaterial(material);
 
     // Setup the Object
@@ -158,8 +162,10 @@ const Color  endColor      = Color(0.0, 1.0, 0.0); // Color of last string
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDString");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("PBDString");
 
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
@@ -170,14 +176,13 @@ main()
     }
 
     // Adjust the camera
-    scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
-    scene->getCamera()->setPosition(0.0, 0.0, 15.0);
+    scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
+    scene->getActiveCamera()->setPosition(0.0, 0.0, 15.0);
 
     // Move the points every frame
     double t = 0.0;
-
-    auto movePoints =
-        [&pbdStringObjs, &t](Module* module)
+    auto   movePoints =
+        [&pbdStringObjs, &t](Event*)
         {
             for (unsigned int i = 0; i < pbdStringObjs.size(); i++)
             {
@@ -192,11 +197,35 @@ main()
             }
             t += dt;
         };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(movePoints);
 
-    // Start
-    simManager->setActiveScene(scene);
-    simManager->start();
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        connect<Event>(sceneManager, EventType::PostUpdate, movePoints);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

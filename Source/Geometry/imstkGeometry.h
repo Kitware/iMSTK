@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
 #include "imstkMath.h"
 #include "imstkTypes.h"
 
@@ -37,7 +38,7 @@ class SpinLock;
 /// \class Geometry
 /// \brief Base class for any geometrical representation
 ///
-class Geometry
+class Geometry : public EventObject
 {
 public:
     ///
@@ -93,7 +94,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~Geometry();
+    virtual ~Geometry() override;
 
     ///
     /// \brief Print
@@ -185,6 +186,13 @@ public:
     ///
     static uint32_t getTotalNumberGeometries() { return s_NumGeneratedGegometries; }
 
+    ///
+    /// \brief Post modified event
+    ///
+    void modified() { emit(Event(EventType::Modified)); }
+
+    virtual void updatePostTransformData() const { }
+
 protected:
     ///
     /// \brief Get a unique ID for the new generated geometry object
@@ -211,17 +219,17 @@ protected:
     virtual void applyTranslation(const Vec3d imstkNotUsed(t)) { }
     virtual void applyRotation(const Mat3d imstkNotUsed(r)) { }
     virtual void applyScaling(const double imstkNotUsed(s)) { }
-    virtual void updatePostTransformData() const { }
 
     Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry
     uint32_t    m_geometryIndex; ///> Unique ID assigned to each geometry upon construction
 
-    bool m_dataModified      = false;
     bool m_transformModified = false;
     mutable bool m_transformApplied = true;
 
     RigidTransform3d m_transform; ///> Transformation matrix
     double m_scaling = 1.0;
+
+    bool m_dataModified = true;
 };
 } //imstk

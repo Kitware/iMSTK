@@ -271,7 +271,7 @@ RigidBodyModel::createMesh()
     }
 }
 
-//TODO: Have to implement update physics geometry
+// \todo: Have to implement update physics geometry
 void
 RigidBodyModel::updatePhysicsGeometry()
 {
@@ -299,7 +299,7 @@ RigidBodyModel::updatePhysicsGeometry()
     m_force = Vec3d(0., 0., 0.);
 }
 
-//TODO: Have to implement update physics spring geometry
+// \todo: Have to implement update physics spring geometry
 void
 RigidBodyModel::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
 {
@@ -311,16 +311,20 @@ RigidBodyModel::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
         PxForceMode::eFORCE, wakeup);
 }
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4100 )
-//TODO updating body states as in
+#endif
+// \todo: updating body states as in
 void
 RigidBodyModel::updateBodyStates(const Vectord& q, const StateUpdateType updateType /* = stateUpdateType::displacement*/)
 {
     LOG(WARNING) << "RigidBodyModel::updateBodyStates Not implemented!";
 }
 
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 void
 RigidBodyModel::configure(const std::shared_ptr<RigidBodyConfig> matProperty)

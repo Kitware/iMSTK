@@ -21,25 +21,30 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraTriangleMap.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 ///
 /// \brief Creates a non-manifold top part of a staircase
 //
-static std::unique_ptr<SurfaceMesh>
+static std::shared_ptr<SurfaceMesh>
 buildStairs(int nSteps, double width, double height, double depth)
 {
     // Build stair geometry
@@ -88,7 +93,7 @@ buildStairs(int nSteps, double width, double height, double depth)
         triangles.push_back({ { (i + 1) * 4, (i + 1) * 4 + 1, i * 4 + 3 } });
     }
 
-    std::unique_ptr<SurfaceMesh> stairMesh = std::make_unique<SurfaceMesh>();
+    imstkNew<SurfaceMesh> stairMesh;
     stairMesh->initialize(vertList, triangles);
     return stairMesh;
 }
@@ -99,18 +104,18 @@ buildStairs(int nSteps, double width, double height, double depth)
 static std::shared_ptr<PbdObject>
 makeArmadilloPbdObject(const std::string& name)
 {
-    auto pbdObj = std::make_shared<PbdObject>(name);
+    imstkNew<PbdObject> pbdObj(name);
 
     // Read in the armadillo mesh
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "armadillo/armadillo_volume.vtk");
     tetMesh->scale(0.07, Geometry::TransformType::ApplyToData);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), 1.3, Geometry::TransformType::ApplyToData);
     tetMesh->translate(Vec3d(0.0f, 10.0f, 0.0f), Geometry::TransformType::ApplyToData);
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    imstkNew<SurfaceMesh> surfMesh;
     tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PBDModelConfig>();
+    imstkNew<PBDModelConfig> pbdParams;
     pbdParams->m_femParams->m_YoungModulus = 1000.0;
     pbdParams->m_femParams->m_PoissonRatio = 0.3;
     pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet,
@@ -123,14 +128,14 @@ makeArmadilloPbdObject(const std::string& name)
     pbdParams->collisionParams->m_stiffness = 0.1;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(tetMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    auto material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
+    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
     surfMeshModel->setRenderMaterial(material);
 
     // Setup the Object
@@ -146,31 +151,30 @@ makeArmadilloPbdObject(const std::string& name)
 static std::shared_ptr<PbdObject>
 makeStairsPbdObject(const std::string& name, int numSteps, double width, double height, double depth)
 {
-    auto stairObj = std::make_shared<PbdObject>(name);
+    imstkNew<PbdObject> stairObj(name);
 
-    std::shared_ptr<SurfaceMesh> stairMesh(std::move(buildStairs(numSteps, width, height, depth)));
+    std::shared_ptr<SurfaceMesh> stairMesh = buildStairs(numSteps, width, height, depth);
 
     // Setup the parameters
-    auto pbdParams = std::make_shared<PBDModelConfig>();
+    imstkNew<PBDModelConfig> pbdParams;
     pbdParams->m_uniformMassValue = 0.0;
     pbdParams->collisionParams->m_proximity = -0.1;
     pbdParams->m_iterations = 0;
 
     // Setup the model
-    auto pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(stairMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    auto stairMaterial = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> stairMaterial;
     stairMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto stairMeshModel = std::make_shared<VisualModel>(stairMesh);
-    stairMeshModel->setRenderMaterial(stairMaterial);
+    imstkNew<VisualModel> visualModel(stairMesh);
+    visualModel->setRenderMaterial(stairMaterial);
 
-    stairObj->addVisualModel(stairMeshModel);
+    stairObj->addVisualModel(visualModel);
     stairObj->setDynamicalModel(pbdModel);
     stairObj->setCollidingGeometry(stairMesh);
-    stairObj->setVisualGeometry(stairMesh);
     stairObj->setPhysicsGeometry(stairMesh);
 
     return stairObj;
@@ -183,35 +187,64 @@ makeStairsPbdObject(const std::string& name, int numSteps, double width, double 
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PbdStairsCollision");
-    scene->getCamera()->setPosition(0.0, 0.0, -30.0);
-    scene->getCamera()->setFocalPoint(0.0, 0.0, 0.0);
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Create and add the dragon to the scene
-    auto pbdDragon1 = makeArmadilloPbdObject("PbdArmadillo1");
-    scene->addSceneObject(pbdDragon1);
+    imstkNew<Scene> scene("PbdStairsCollision");
+    {
+        scene->getActiveCamera()->setPosition(0.0, 0.0, -30.0);
+        scene->getActiveCamera()->setFocalPoint(0.0, 0.0, 0.0);
 
-    auto stairObj = makeStairsPbdObject("PbdStairs", 12, 20.0, 10.0, 20.0);
-    scene->addSceneObject(stairObj);
+        // Create and add the dragon to the scene
+        auto pbdDragon1 = makeArmadilloPbdObject("Armadillo");
+        scene->addSceneObject(pbdDragon1);
 
-    // Collision
-    scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdDragon1, stairObj,
-        InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
+        auto stairObj = makeStairsPbdObject("PbdStairs", 12, 20.0, 10.0, 20.0);
+        scene->addSceneObject(stairObj);
 
-    // Light
-    auto light = std::make_shared<DirectionalLight>("Light");
-    light->setFocalPoint(Vec3d(5.0, -8.0, 5.0));
-    light->setIntensity(1.0);
-    scene->addLight(light);
+        // Collision
+        scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdDragon1, stairObj,
+            InteractionType::PbdObjToPbdObjCollision, CollisionDetection::Type::MeshToMeshBruteForce));
 
-    auto light2 = std::make_shared<DirectionalLight>("light 2");
-    light2->setFocalPoint(-Vec3d(5, -8, 5));
-    light2->setIntensity(1.2);
-    scene->addLight(light2);
+        // Light
+        imstkNew<DirectionalLight> light("Light1");
+        light->setFocalPoint(Vec3d(5.0, -8.0, 5.0));
+        light->setIntensity(1.0);
+        scene->addLight(light);
 
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+        imstkNew<DirectionalLight> light2("Light2");
+        light2->setFocalPoint(-Vec3d(5, -8, 5));
+        light2->setIntensity(1.2);
+        scene->addLight(light2);
+    }
+
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

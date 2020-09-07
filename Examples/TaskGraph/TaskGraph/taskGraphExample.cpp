@@ -19,12 +19,12 @@
 
 =========================================================================*/
 
+#include "imstkNew.h"
 #include "imstkParallelFor.h"
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
 #include "imstkTbbTaskGraphController.h"
-
-#include <iostream>
+#include "imstkLogger.h"
 
 using namespace imstk;
 
@@ -34,6 +34,8 @@ using namespace imstk;
 int
 main()
 {
+    Logger::startLogger();
+
     const bool runExampleInParallel = true;
 
     // Initialize some data arrays
@@ -59,17 +61,19 @@ main()
     int sumB = 0;
 
     // Now create a graph that computes results = sum_i(x_i + y_i) * sum_i(w_i * z_i)
-    std::shared_ptr<TaskGraph> graph = std::make_shared<TaskGraph>();
+    imstkNew<TaskGraph> graph;
 
     // Create and add the nodes
-    std::shared_ptr<TaskNode> addNode = graph->addFunction("Add Step", [&]()
+    std::shared_ptr<TaskNode> addNode = graph->addFunction("Add Step",
+        [&]()
     {
         for (int i = 0; i < countA; i++)
         {
             sumA += (x[i] + y[i]);
         }
         });
-    std::shared_ptr<TaskNode> multNode = graph->addFunction("Mult Step", [&]()
+    std::shared_ptr<TaskNode> multNode = graph->addFunction("Mult Step",
+        [&]()
     {
         for (int i = 0; i < countB; i++)
         {
@@ -98,11 +102,11 @@ main()
     controller->setTaskGraph(graph);
     if (!controller->initialize())
     {
-        std::cout << "TaskGraph failed to initialize" << std::endl;
+        LOG(FATAL) << "TaskGraph failed to initialize";
         return 1;
     }
     controller->execute();
-    std::cout << "Results: " << sumA + sumB << std::endl;
+    LOG(INFO) << "Results: " << sumA + sumB;
 
     return 0;
 }

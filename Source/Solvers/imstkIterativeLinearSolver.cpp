@@ -21,6 +21,7 @@
 
 #include "imstkIterativeLinearSolver.h"
 #include "imstkLogger.h"
+#include "imstkTypes.h"
 
 namespace imstk
 {
@@ -66,10 +67,9 @@ IterativeLinearSolver::print() const
 }
 
 void
-IterativeLinearSolver::solve(Vectord& x)
+IterativeLinearSolver::solve(Vectord& imstkNotUsed(x))
 {
     LOG(WARNING) << "IterativeLinearSolver::solve is not implemented!";
-    x;
     /*
     if (!m_linearSystem)
     {

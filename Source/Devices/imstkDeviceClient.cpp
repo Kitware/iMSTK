@@ -124,24 +124,6 @@ DeviceClient::getOrientation() const
     return m_orientation;
 }
 
-const std::map<size_t, bool>&
-DeviceClient::getButtons() const
-{
-    return m_buttons;
-}
-
-bool
-DeviceClient::getButton(size_t buttonId) const
-{
-    if (m_buttons.find(buttonId) == m_buttons.end())
-    {
-        LOG(WARNING) << "DeviceClient::getButton warning: button "
-                     << buttonId << " was not found in the buttons list.";
-        return false;
-    }
-    return m_buttons.at(buttonId);
-}
-
 const Vec3d&
 DeviceClient::getForce() const
 {

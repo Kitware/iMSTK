@@ -107,8 +107,8 @@ makeCollisionDetectionObject(const CollisionDetection::Type type,
     }
     case CollisionDetection::Type::PointSetToImplicit:
     {
-        auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(collidingGeometryA);
-        auto pointSet     = std::dynamic_pointer_cast<PointSet>(collidingGeometryB);
+        auto pointSet     = std::dynamic_pointer_cast<PointSet>(collidingGeometryA);
+        auto implicitGeom = std::dynamic_pointer_cast<ImplicitGeometry>(collidingGeometryB);
         IMSTK_CHECK_FOR_VALID_GEOMETRIES(pointSet, implicitGeom);
         return std::make_shared<ImplicitGeometryToPointSetCD>(implicitGeom, pointSet, colData);
     }

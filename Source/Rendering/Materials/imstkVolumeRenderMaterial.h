@@ -23,7 +23,7 @@
 
 #include "imstkRenderMaterial.h"
 
-#include <vtkNew.h>
+#include <vtkSmartPointer.h>
 
 class vtkVolumeProperty;
 
@@ -32,12 +32,16 @@ namespace imstk
 class VolumeRenderMaterial : public RenderMaterial
 {
 public:
+    VolumeRenderMaterial();
+    ~VolumeRenderMaterial() override = default;
+
+public:
     ///
-    /// \brief Set/Get the volume property
+    /// \brief Get the volume property
     ///
-    vtkVolumeProperty* getVolumeProperty();
+    vtkSmartPointer<vtkVolumeProperty> getVolumeProperty();
 
 protected:
-    vtkNew<vtkVolumeProperty> m_property;
+    vtkSmartPointer<vtkVolumeProperty> m_property;
 };
 }

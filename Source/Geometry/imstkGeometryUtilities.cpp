@@ -28,15 +28,23 @@
 #include "imstkParallelUtils.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkCube.h"
+#include "imstkSphere.h"
 
 #include <vtkAppendPolyData.h>
 #include <vtkCharArray.h>
+#include <vtkCubeSource.h>
 #include <vtkDoubleArray.h>
 #include <vtkFeatureEdges.h>
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
+#include <vtkMassProperties.h>
 #include <vtkPointData.h>
 #include <vtkShortArray.h>
+#include <vtkSphereSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
+#include <vtkTriangleFilter.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedIntArray.h>
 #include <vtkUnsignedLongArray.h>
@@ -93,35 +101,12 @@ vtkSmartPointer<vtkDataArray>
 GeometryUtils::coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray)
 {
     CHECK(imstkArray != nullptr) << "AbstractDataArray provided is not valid!";
+    CHECK(imstkArray->getVoidPointer() != nullptr) << "AbstractDataArray data provided is not valid!";
 
     // Create corresponding data array
     vtkSmartPointer<vtkDataArray> arr = makeVtkDataArray(imstkToVtkScalarType[imstkArray->getScalarType()]);
+    arr->SetVoidArray(imstkArray->getVoidPointer(), imstkArray->size(), 1);
 
-    // Connect imstkArray to arr, some rules here:
-    // 1.) If vtk data destroyed, the connection is not immediately removed, will be removed on the
-    //     next emission of imstkArray. It is safe though.
-    // 2.) If the imstk data is destroyed. The imstk array emits {nullptr, 0}. Here resulting in
-    //     the reset of the coupled vtk data array.
-    imstkArray->connect([ = ](void* ptr, size_t count)
-        {
-            // If the vtk data was destroyed
-            if (arr == NULL)
-            {
-                //imstkArray->disconnect(id);
-                return;
-            }
-
-            if (ptr != nullptr)
-            {
-                arr->SetVoidArray(ptr, count, 1);
-            }
-            else
-            {
-                // Clear it, don't reference imstkDataArray memory once it's gone
-                arr->Initialize();
-            }
-        });
-    imstkArray->modified();
     return arr;
 }
 
@@ -130,12 +115,16 @@ GeometryUtils::coupleVtkImageData(std::shared_ptr<ImageData> imageData)
 {
     CHECK(imageData != nullptr) << "ImageData provided is not valid!";
 
-    std::shared_ptr<AbstractDataArray> arr          = imageData->getScalars();
-    vtkSmartPointer<vtkDataArray>      vtkArr       = coupleVtkDataArray(arr);
-    vtkSmartPointer<vtkImageData>      imageDataVtk = vtkSmartPointer<vtkImageData>::New();
+    // VTK puts center of min voxel at origin of world space, we put min of bot voxel at origin
+    std::shared_ptr<AbstractDataArray> arr    = imageData->getScalars();
+    vtkSmartPointer<vtkDataArray>      vtkArr = coupleVtkDataArray(arr);
+
+    vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
+    const Vec3i&                  dim = imageData->getDimensions();
     imageDataVtk->SetDimensions(imageData->getDimensions().data());
     imageDataVtk->SetSpacing(imageData->getSpacing().data());
-    imageDataVtk->SetOrigin(imageData->getOrigin().data());
+    const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;
+    imageDataVtk->SetOrigin(vtkOrigin.data());
     imageDataVtk->SetNumberOfScalarComponents(imageData->getNumComponents(), imageDataVtk->GetInformation());
     imageDataVtk->SetScalarType(imstkToVtkScalarType[arr->getScalarType()], imageDataVtk->GetInformation());
     imageDataVtk->GetPointData()->SetScalars(vtkArr);
@@ -186,11 +175,12 @@ GeometryUtils::copyToImageData(vtkSmartPointer<vtkImageData> vtkImage)
 {
     CHECK(vtkImage != nullptr) << "vtkImageData provided is not valid!";
 
-    double* spacingPtr = vtkImage->GetSpacing();
-    Vec3d   spacing    = Vec3d(spacingPtr[0], spacingPtr[1], spacingPtr[2]);
-    double* bounds     = vtkImage->GetBounds();
-    // VTK ImageData origin is not neccesarily the coner of the first voxel
-    Vec3d origin = Vec3d(bounds[0], bounds[2], bounds[4]);
+    double*     spacingPtr = vtkImage->GetSpacing();
+    const Vec3d spacing    = Vec3d(spacingPtr[0], spacingPtr[1], spacingPtr[2]);
+    // vtk origin is not bounds and vtk origin is not actual origin
+    double* bounds = vtkImage->GetBounds();
+    // image data origin starts at center of first voxel
+    const Vec3d origin = Vec3d(bounds[0], bounds[2], bounds[4]) - spacing * 0.5;
 
     std::unique_ptr<ImageData> imageData = std::make_unique<ImageData>();
     imageData->setScalars(copyToDataArray(vtkImage->GetPointData()->GetScalars()),
@@ -210,7 +200,8 @@ GeometryUtils::copyToVtkImageData(std::shared_ptr<ImageData> imageData)
 
     vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
     imageDataVtk->SetSpacing(imageData->getSpacing().data());
-    imageDataVtk->SetOrigin(imageData->getOrigin().data());
+    const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;
+    imageDataVtk->SetOrigin(vtkOrigin.data());
     imageDataVtk->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
     imageDataVtk->AllocateScalars(imstkToVtkScalarType[imageData->getScalarType()], imageData->getNumComponents());
     imageDataVtk->GetPointData()->SetScalars(copyToVtkDataArray(imageData->getScalars(), imageData->getNumComponents()));
@@ -502,16 +493,66 @@ GeometryUtils::copyPointDataFromVtk(vtkPointData* const pointData, std::map<std:
     }
 }
 
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::toCubeSurfaceMesh(std::shared_ptr<Cube> cube)
+{
+    vtkNew<vtkCubeSource> cubeSource;
+    cubeSource->SetCenter(cube->getPosition(Geometry::DataType::PreTransform).data());
+    cubeSource->SetXLength(cube->getWidth());
+    cubeSource->SetYLength(cube->getWidth());
+    cubeSource->SetZLength(cube->getWidth());
+    cubeSource->Update();
+
+    Mat4d mat;
+    mat.setIdentity();
+    mat.block<3, 3>(0, 0) = cube->getRotation();
+
+    vtkNew<vtkTransform> transform;
+    transform->SetMatrix(mat.data());
+
+    vtkNew<vtkTransformFilter> transformCube;
+    transformCube->SetInputData(cubeSource->GetOutput());
+    transformCube->SetTransform(transform);
+    transformCube->Update();
+    vtkNew<vtkTriangleFilter> triangulate;
+    triangulate->SetInputData(transformCube->GetOutput());
+    triangulate->Update();
+    return copyToSurfaceMesh(triangulate->GetOutput());
+}
+
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
+                                     const unsigned int phiDivisions, const unsigned int thetaDivisions)
+{
+    vtkNew<vtkSphereSource> sphereSource;
+    sphereSource->SetCenter(sphere->getPosition(Geometry::DataType::PreTransform).data());
+    sphereSource->SetRadius(sphere->getRadius());
+    sphereSource->SetPhiResolution(phiDivisions);
+    sphereSource->SetThetaResolution(thetaDivisions);
+    sphereSource->Update();
+
+    return copyToSurfaceMesh(sphereSource->GetOutput());
+}
+
 int
-GeometryUtils::getOpenEdgeCount(std::shared_ptr<SurfaceMesh> imstkMesh)
+GeometryUtils::getOpenEdgeCount(std::shared_ptr<SurfaceMesh> surfMesh)
 {
     vtkNew<vtkFeatureEdges> checkClosed;
-    checkClosed->SetInputData(GeometryUtils::copyToVtkPolyData(imstkMesh));
+    checkClosed->SetInputData(GeometryUtils::copyToVtkPolyData(surfMesh));
     checkClosed->FeatureEdgesOff();
     checkClosed->BoundaryEdgesOn();
     checkClosed->NonManifoldEdgesOn();
     checkClosed->Update();
     return checkClosed->GetOutput()->GetNumberOfCells();
+}
+
+double
+GeometryUtils::getVolume(std::shared_ptr<SurfaceMesh> surfMesh)
+{
+    vtkNew<vtkMassProperties> massProps;
+    massProps->SetInputData(copyToVtkPolyData(surfMesh));
+    massProps->Update();
+    return massProps->GetVolume();
 }
 
 namespace // anonymous namespace

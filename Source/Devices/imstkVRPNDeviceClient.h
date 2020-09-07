@@ -22,13 +22,14 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
-#include "imstkModule.h"
+#include "imstkLoopThreadObject.h"
 
 #include <vrpn_Configure.h>
 #include <vrpn_Tracker.h>
 #include <vrpn_Analog.h>
 #include <vrpn_Button.h>
 #include <vrpn_ForceDevice.h>
+#include <unordered_map>
 
 namespace imstk
 {
@@ -36,7 +37,7 @@ namespace imstk
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
 ///
-class VRPNDeviceClient : public DeviceClient, public Module
+class VRPNDeviceClient : public DeviceClient, public LoopThreadObject
 {
 public:
 
@@ -45,7 +46,7 @@ public:
     ///
     VRPNDeviceClient(const std::string& deviceName, const std::string& ip) :
         DeviceClient(deviceName, ip),
-        Module(deviceName + "@" + ip)
+        LoopThreadObject(deviceName + "@" + ip)
     {}
 
     ///
@@ -57,17 +58,17 @@ protected:
     ///
     /// \brief Initialize device client module
     ///
-    void initModule() override;
+    void initThread() override;
 
     ///
     /// \brief Run the device client
     ///
-    void runModule() override;
+    void updateThread() override;
 
     ///
-    /// \brief Clean the device client module
+    /// \brief Clean the device client
     ///
-    void cleanUpModule() override;
+    void stopThread() override;
 
 private:
 
@@ -118,5 +119,8 @@ private:
     std::shared_ptr<vrpn_Analog_Remote>      m_vrpnAnalog;      //!< VRPN position/orientation interface
     std::shared_ptr<vrpn_Button_Remote>      m_vrpnButton;      //!< VRPN button interface
     std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
+
+public:
+    std::unordered_map<int, bool> m_buttons;
 };
 }

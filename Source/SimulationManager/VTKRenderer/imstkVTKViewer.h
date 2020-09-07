@@ -21,19 +21,13 @@
 
 #pragma once
 
-#include "imstkViewer.h"
-
-#include <vtkSmartPointer.h>
-
-class vtkCallbackCommand;
-class vtkInteractorStyle;
-class vtkObject;
-class vtkRenderWindow;
+#include "imstkAbstractVTKViewer.h"
 
 namespace imstk
 {
+class KeyboardDeviceClient;
+class MouseDeviceClient;
 class Scene;
-class SimulationManager;
 class VTKScreenCaptureUtility;
 class VTKTextStatusManager;
 
@@ -41,48 +35,30 @@ class VTKTextStatusManager;
 /// \class VTKViewer
 ///
 /// \brief Subclasses viewer for the VTK rendering back-end
-/// Creates vtk renderer for each scene. Forwards mouse and keyboard events
-/// to the vtk renderwindow
+/// Creates vtk renderer for each scene.
 ///
-class VTKViewer : public Viewer
+class VTKViewer : public AbstractVTKViewer
 {
 public:
-    ///
-    /// \brief Constructor/Destructor
-    /// \todo: SimulationManager and Viewer's should not have a circular dependence
-    ///
-    VTKViewer(SimulationManager* manager = nullptr, bool enableVR = false);
-    virtual ~VTKViewer() override = default;
+    VTKViewer(std::string name = "VTKViewer");
+    ~VTKViewer() override      = default;
 
+public:
     ///
-    /// \brief Destructor
+    /// \brief Start rendering
     ///
-    virtual void setRenderingMode(const Renderer::Mode mode) override;
+    void startThread() override;
+
+public:
+    ///
+    /// \brief Set the rendering mode. In debug, debug actors will be shown.
+    ///
+    void setRenderingMode(const Renderer::Mode mode) override;
 
     ///
     /// \brief Set scene to be rendered
     ///
-    virtual void setActiveScene(const std::shared_ptr<Scene>& scene) override;
-
-    ///
-    /// \brief Get the current renderer mode
-    ///
-    virtual Renderer::Mode getRenderingMode() override;
-
-    ///
-    /// \brief Start rendering
-    ///
-    virtual void startRenderingLoop() override;
-
-    ///
-    /// \brief Terminate rendering
-    ///
-    virtual void endRenderingLoop() override;
-
-    ///
-    /// \brief Get pointer to the vtkRenderWindow rendering
-    ///
-    vtkSmartPointer<vtkRenderWindow> getVtkRenderWindow() const;
+    void setActiveScene(const std::shared_ptr<Scene>& scene) override;
 
     ///
     /// \brief Access screen shot utility
@@ -90,33 +66,34 @@ public:
     std::shared_ptr<VTKScreenCaptureUtility> getScreenCaptureUtility() const;
 
     ///
-    /// \brief Set the coloring of the screen background
-    /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
-    ///
-    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
-                                     const bool gradientBackground = false) override;
-
-    ///
-    /// \brief set the window title
-    ///
-    virtual void setWindowTitle(const std::string& title);
-
-    ///
     /// \brief Return the window status handler
     ///
-    std::shared_ptr<VTKTextStatusManager> getTextStatusManager();
+    std::shared_ptr<VTKTextStatusManager> getTextStatusManager() const { return m_textStatusManager; }
 
     ///
-    /// \brief Returns the vtk interactor style
+    /// \brief Returns the device that emits key events
     ///
-    std::shared_ptr<vtkInteractorStyle> getVtkInteractorStyle() const { return m_vtkInteractorStyle; }
+    std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const;
+
+    ///
+    /// \brief Returns the device that emits mouse events
+    ///
+    std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
 
 protected:
-    /// \brief VTKTimer callback, every 500ms
-    static void timerCallback(vtkObject* caller, long unsigned int eventId, void* clientData, void* callData);
+    ///
+    /// \brief Connected to VTKs on timer event, called continously
+    /// and synchronously on the VTK/rendering thread
+    ///
+    void updateThread() override;
 
-    vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
-    std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
-    vtkSmartPointer<vtkCallbackCommand> m_timerCallbackCommand;
+protected:
+    std::chrono::high_resolution_clock::time_point m_pre;           ///> time point pre-rendering
+    std::chrono::high_resolution_clock::time_point m_post;          ///> time point post-rendering
+    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
+
+    std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///> Handle text statuses, including fps status and custom text status
+    bool   m_displayFps = false;                                    ///> hide or display framerate
+    double m_lastFps;                                               ///> last framerate value used for moving average estimate
 };
 } // imstk

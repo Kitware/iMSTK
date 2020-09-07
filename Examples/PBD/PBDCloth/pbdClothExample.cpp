@@ -20,14 +20,19 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -40,14 +45,13 @@ const int    nCols  = 16;
 ///
 /// \brief Creates cloth geometry
 ///
-static std::unique_ptr<SurfaceMesh>
+static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(const double width,
                   const double height,
                   const int    nRows,
                   const int    nCols)
 {
-    // Create surface mesh
-    auto clothMesh = std::make_unique<SurfaceMesh>();
+    imstkNew<SurfaceMesh> clothMesh;
 
     StdVectorOfVec3d vertList;
     vertList.resize(nRows * nCols);
@@ -106,36 +110,36 @@ makeClothObj(const std::string& name,
              const int          nRows,
              const int          nCols)
 {
-    auto clothObj = std::make_shared<PbdObject>(name);
+    imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh(std::move(makeClothGeometry(width, height, nRows, nCols)));
+    std::shared_ptr<SurfaceMesh> clothMesh(makeClothGeometry(width, height, nRows, nCols));
 
     // Setup the Parameters
-    auto pbdParams = std::make_shared<PBDModelConfig>();
-    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1e2);
-    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1e1);
+    imstkNew<PBDModelConfig> pbdParams;
+    pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1.0e2);
+    pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1.0e1);
     pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
     pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
-    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
 
     // Setup the Model
-    auto pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
 
     // Setup the VisualModel
-    auto material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
-    auto clothVisualModel = std::make_shared<VisualModel>(clothMesh);
-    clothVisualModel->setRenderMaterial(material);
+    imstkNew<VisualModel> visualModel(clothMesh);
+    visualModel->setRenderMaterial(material);
 
     // Setup the Object
-    clothObj->addVisualModel(clothVisualModel);
+    clothObj->addVisualModel(visualModel);
     clothObj->setPhysicsGeometry(clothMesh);
     clothObj->setDynamicalModel(pbdModel);
 
@@ -149,34 +153,62 @@ makeClothObj(const std::string& name,
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDCloth");
+    // Write log to stdout and file
+    Logger::startLogger();
 
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
-    scene->addSceneObject(clothObj);
+    // Setup a scene
+    imstkNew<Scene> scene("PBDCloth");
+    {
+        std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+        scene->addSceneObject(clothObj);
 
-    // Light (white)
-    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
-    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(1.);
-    scene->addLight(whiteLight);
+        // Light (white)
+        imstkNew<DirectionalLight> whiteLight("whiteLight");
+        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+        whiteLight->setIntensity(1.0);
+        scene->addLight(whiteLight);
 
-    // Light (red)
-    auto colorLight = std::make_shared<SpotLight>("colorLight");
-    colorLight->setPosition(Vec3d(-5., -3., 5.));
-    colorLight->setFocalPoint(Vec3d(0., -5., 5.));
-    colorLight->setIntensity(100.);
-    colorLight->setColor(Color::Red);
-    colorLight->setSpotAngle(30);
-    scene->addLight(colorLight);
+        // Light (red)
+        imstkNew<SpotLight> colorLight("colorLight");
+        colorLight->setPosition(Vec3d(-5.0, -3.0, 5.0));
+        colorLight->setFocalPoint(Vec3d(0.0, -5.0, 5.0));
+        colorLight->setIntensity(100.);
+        colorLight->setColor(Color::Red);
+        colorLight->setSpotAngle(30.0);
+        scene->addLight(colorLight);
 
-    // Adjust camera
-    scene->getCamera()->setFocalPoint(0., -5., 5.);
-    scene->getCamera()->setPosition(-15., -5., 15.);
+        // Adjust camera
+        scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
+        scene->getActiveCamera()->setPosition(-15.0, -5.0, 25.0);
+    }
 
-    // Start
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

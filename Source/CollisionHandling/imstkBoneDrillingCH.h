@@ -27,7 +27,6 @@
 namespace imstk
 {
 class CollidingObject;
-class DeviceTracker;
 struct CollisionData;
 
 ///

@@ -36,7 +36,7 @@ class TaskNode
 public:
     TaskNode() = default;
     TaskNode(std::function<void()> func, std::string name = "none", bool isCritical = false) :
-        m_func(func), m_name(name), m_isCritical(isCritical), m_computeTime(0.0)
+        m_name(name), m_isCritical(isCritical), m_computeTime(0.0), m_func(func)
     {
     }
 

@@ -21,21 +21,23 @@
 
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkOneToOneMap.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-
-#include <vtkRenderWindow.h>
 
 // Enable this macro to generate many dragons
 #define BIG_SCENE
@@ -45,99 +47,12 @@ using namespace imstk;
 ///
 /// \brief Generate a random color
 ///
-Color
-getRandomColor()
-{
-    Color color(0.0, 0.0, 0.0, 1.0);
-    while (true)
-    {
-        for (unsigned int i = 0; i < 3; ++i)
-        {
-            color.rgba[i] = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
-        }
-        if (color.rgba[0] > 0.95
-            || color.rgba[1] > 0.95
-            || color.rgba[2] > 0.95)
-        {
-            break;
-        }
-    }
-    return color;
-}
+Color getRandomColor();
 
-void
-generateDragon(const std::shared_ptr<imstk::Scene>& scene,
-               const Vec3d&                         translation,
-               std::shared_ptr<SurfaceMesh>&        surfMesh,
-               std::shared_ptr<PbdObject>&          deformableObj,
-               std::shared_ptr<PbdSolver>&          pbdSolver)
-{
-    // Load a sample mesh
-    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    LOG_IF(FATAL, (!tetMesh)) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
-
-    // Rotate a rando angle
-    tetMesh->rotate(Vec3d(0, 1, 0), static_cast<double>(rand()), Geometry::TransformType::ApplyToData);
-
-    // Translate
-    tetMesh->translate(translation, Geometry::TransformType::ApplyToData);
-
-    // Trick to force update geometry postUpdateTransform
-    const auto positions = tetMesh->getVertexPositions();
-    (void)positions;
-
-    static int count = -1;
-    ++count;
-    surfMesh = std::make_shared<SurfaceMesh>("Dragon-" + std::to_string(count));
-    tetMesh->extractSurfaceMesh(surfMesh, true);
-
-    auto material = std::make_shared<RenderMaterial>();
-
-#if 0
-    // Wireframe color
-    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
-    material->setColor(getRandomColor()); // Wireframe color
-    material->setLineWidth(2);
-#else
-    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    material->setColor(getRandomColor());
-#endif
-
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
-
-    auto deformMapP2C = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
-
-    deformableObj = std::make_shared<PbdObject>("Dragon-" + std::to_string(count));
-    deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setCollidingGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(tetMesh);
-    deformableObj->setPhysicsToCollidingMap(deformMapP2C);
-
-    // Create model and object
-    auto pbdModel = std::make_shared<PbdModel>();
-    pbdModel->setModelGeometry(tetMesh);
-
-    // configure model
-    auto pbdParams = std::make_shared<PBDModelConfig>();
-
-    // FEM constraint
-    pbdParams->m_femParams->m_YoungModulus = 1000.0;
-    pbdParams->m_femParams->m_PoissonRatio = 0.3;
-    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
-
-    // Other parameters
-    pbdParams->m_uniformMassValue = 5.0;
-    pbdParams->m_gravity    = Vec3d(0, -1.0, 0);
-    pbdParams->m_defaultDt  = 0.01;
-    pbdParams->m_iterations = 20;
-    pbdParams->collisionParams->m_proximity = 0.5;
-
-    pbdModel->configure(pbdParams);
-    deformableObj->setDynamicalModel(pbdModel);
-
-    scene->addSceneObject(deformableObj);
-}
+void generateDragon(const std::shared_ptr<imstk::Scene>& scene,
+                    const Vec3d&                         translation,
+                    std::shared_ptr<SurfaceMesh>&        surfMesh,
+                    std::shared_ptr<PbdObject>&          deformableObj);
 
 ///
 /// \brief Create a surface mesh
@@ -153,39 +68,35 @@ std::shared_ptr<SurfaceMesh> createUniformSurfaceMesh(const double width, const 
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PbdCollision");
+    // Write log to stdout and file
+    Logger::startLogger();
 
-    // Get the VTKViewer
-    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
-    viewer->setWindowTitle("PbdCollision");
-    viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-    simManager->setViewer(viewer);
+    imstkNew<Scene> scene("PbdCollision");
 
-    auto floorMesh = createUniformSurfaceMesh(100.0, 100.0, 2, 2);
+    std::shared_ptr<SurfaceMesh> floorMesh = createUniformSurfaceMesh(100.0, 100.0, 2, 2);
 
-    auto materialFloor = std::make_shared<RenderMaterial>();
-    materialFloor->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto floorMeshModel = std::make_shared<VisualModel>(floorMesh);
-    floorMeshModel->setRenderMaterial(materialFloor);
+    imstkNew<RenderMaterial> floorMaterial;
+    floorMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    imstkNew<VisualModel> floorMeshModel(floorMesh);
+    floorMeshModel->setRenderMaterial(floorMaterial);
 
-    auto floorObj = std::make_shared<PbdObject>("Floor");
+    imstkNew<PbdObject> floorObj("Floor");
     floorObj->setCollidingGeometry(floorMesh);
     floorObj->setVisualGeometry(floorMesh);
     floorObj->setPhysicsGeometry(floorMesh);
 
-    auto pbdModel2 = std::make_shared<PbdModel>();
-    pbdModel2->setModelGeometry(floorMesh);
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(floorMesh);
 
     // configure model
-    auto pbdParams2 = std::make_shared<PBDModelConfig>();
-    pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->collisionParams->m_proximity = 0.1;
-    pbdParams2->m_iterations = 0;
+    imstkNew<PBDModelConfig> pbdParams;
+    pbdParams->m_uniformMassValue = 0.0;
+    pbdParams->collisionParams->m_proximity = 0.1;
+    pbdParams->m_iterations = 0;
 
     // Set the parameters
-    pbdModel2->configure(pbdParams2);
-    floorObj->setDynamicalModel(pbdModel2);
+    pbdModel->configure(pbdParams);
+    floorObj->setDynamicalModel(pbdModel);
     scene->addSceneObject(floorObj);
 
 #ifdef BIG_SCENE
@@ -215,9 +126,8 @@ main()
             {
                 std::shared_ptr<SurfaceMesh> mesh;
                 std::shared_ptr<PbdObject>   pbdObj;
-                std::shared_ptr<PbdSolver>   solver;
                 Vec3d                        translation(shiftX + i * distanceXZ, minHeight + j * distanceY, k * distanceXZ);
-                generateDragon(scene, translation, mesh, pbdObj, solver);
+                generateDragon(scene, translation, mesh, pbdObj);
                 pbdObjs.push_back(pbdObj);
 
                 scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(pbdObj, floorObj,
@@ -236,30 +146,142 @@ main()
     }
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
+    imstkNew<DirectionalLight> light("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1);
     scene->addLight(light);
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
+    std::shared_ptr<Camera> cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(0, 15, 30));
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+    {
+        // Add a module to run the viewer
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->setWindowTitle("PbdCollision");
+        viewer->setSize(1920, 1080);
+
+        // Add a module to run the scene
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // Start/stop scene with the view
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
+}
+
+Color
+getRandomColor()
+{
+    Color color(0.0, 0.0, 0.0, 1.0);
+    while (true)
+    {
+        for (unsigned int i = 0; i < 3; ++i)
+        {
+            color.rgba[i] = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+        }
+        if (color.rgba[0] > 0.95
+            || color.rgba[1] > 0.95
+            || color.rgba[2] > 0.95)
+        {
+            break;
+        }
+    }
+    return color;
+}
+
+void
+generateDragon(const std::shared_ptr<imstk::Scene>& scene,
+               const Vec3d&                         translation,
+               std::shared_ptr<SurfaceMesh>&        surfMesh,
+               std::shared_ptr<PbdObject>&          deformableObj)
+{
+    // Load a sample mesh
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    LOG_IF(FATAL, (!tetMesh)) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+
+    // Rotate a rando angle
+    tetMesh->rotate(Vec3d(0, 1, 0), static_cast<double>(rand()), Geometry::TransformType::ApplyToData);
+
+    // Translate
+    tetMesh->translate(translation, Geometry::TransformType::ApplyToData);
+
+    // Trick to force update geometry postUpdateTransform
+    const auto positions = tetMesh->getVertexPositions();
+    (void)positions;
+
+    static int count = -1;
+    ++count;
+    surfMesh = std::make_shared<SurfaceMesh>("Dragon-" + std::to_string(count));
+    tetMesh->extractSurfaceMesh(surfMesh, true);
+
+    imstkNew<RenderMaterial> material;
+#if 0
+    // Wireframe color
+    material->setDisplayMode(RenderMaterial::DisplayMode::WIREFRAME_SURFACE);
+    material->setColor(getRandomColor()); // Wireframe color
+    material->setLineWidth(2);
+#else
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setColor(getRandomColor());
+#endif
+
+    imstkNew<VisualModel> surfMeshModel(surfMesh);
+    surfMeshModel->setRenderMaterial(material);
+
+    deformableObj = std::make_shared<PbdObject>("Dragon-" + std::to_string(count));
+    deformableObj->addVisualModel(surfMeshModel);
+    deformableObj->setCollidingGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(tetMesh);
+    deformableObj->setPhysicsToCollidingMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
+
+    // Create model and object
+    imstkNew<PbdModel> pbdModel;
+    pbdModel->setModelGeometry(tetMesh);
+
+    // configure model
+    imstkNew<PBDModelConfig> pbdParams;
+
+    // FEM constraint
+    pbdParams->m_femParams->m_YoungModulus = 1000.0;
+    pbdParams->m_femParams->m_PoissonRatio = 0.3;
+    pbdParams->enableFEMConstraint(PbdConstraint::Type::FEMTet, PbdFEMConstraint::MaterialType::StVK);
+
+    // Other parameters
+    pbdParams->m_uniformMassValue = 5.0;
+    pbdParams->m_gravity    = Vec3d(0, -1.0, 0);
+    pbdParams->m_defaultDt  = 0.01;
+    pbdParams->m_iterations = 20;
+    pbdParams->collisionParams->m_proximity = 0.5;
+
+    pbdModel->configure(pbdParams);
+    deformableObj->setDynamicalModel(pbdModel);
+
+    scene->addSceneObject(deformableObj);
 }
 
 std::shared_ptr<SurfaceMesh>
 createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols)
 {
     // Build floor geometry
-    // const double width  = 100.0;
-    // const double height = 100.0;
-    // const size_t nRows  = 2;
-    // const size_t nCols  = 2;
     const double dy = width / static_cast<double>(nCols - 1);
     const double dx = height / static_cast<double>(nRows - 1);
 
@@ -289,7 +311,7 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
         }
     }
 
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    imstkNew<SurfaceMesh> surfMesh;
     surfMesh->initialize(vertList, triangles);
 
     return surfMesh;

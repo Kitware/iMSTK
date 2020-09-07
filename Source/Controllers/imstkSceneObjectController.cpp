@@ -22,37 +22,36 @@
 #include "imstkSceneObjectController.h"
 #include "imstkCollidingObject.h"
 #include "imstkDeviceClient.h"
-#include "imstkDeviceTracker.h"
 #include "imstkGeometry.h"
 #include "imstkLogger.h"
 
 namespace imstk
 {
-SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceTracker> trackingController) :
-    m_trackingController(trackingController), m_sceneObject(sceneObject)
+SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject>  sceneObject,
+                                             std::shared_ptr<DeviceClient> trackingDevice) :
+    TrackingDeviceControl(trackingDevice),
+    m_sceneObject(sceneObject)
 {
 }
 
 void
 SceneObjectController::updateControlledObjects()
 {
-    if (!m_trackingController->isTrackerUpToDate())
+    if (!isTrackerUpToDate())
     {
-        if (!m_trackingController->updateTrackingData())
+        if (!updateTrackingData())
         {
             LOG(WARNING) << "SceneObjectController::updateControlledObjects warning: could not update tracking info.";
             return;
         }
     }
 
-    if (m_updateCallback)
-    {
-        m_updateCallback(this);
-    }
+    emit(Event(EventType::Modified));
 
-    // Update colliding geometry
-    m_sceneObject->getMasterGeometry()->setTranslation(m_trackingController->getPosition());
-    m_sceneObject->getMasterGeometry()->setRotation(m_trackingController->getRotation());
+    // Update geometry
+    // \todo revisit this; what if we need to move a group of objects
+    m_sceneObject->getMasterGeometry()->setTranslation(getPosition());
+    m_sceneObject->getMasterGeometry()->setRotation(getRotation());
 }
 
 void
@@ -60,13 +59,7 @@ SceneObjectController::applyForces()
 {
     if (auto collidingObject = dynamic_cast<CollidingObject*>(m_sceneObject.get()))
     {
-        m_trackingController->getDeviceClient()->setForce(collidingObject->getForce());
+        m_deviceClient->setForce(collidingObject->getForce());
     }
 }
-
-void
-SceneObjectController::setTrackerToOutOfDate()
-{
-    m_trackingController->setTrackerToOutOfDate();
 }
-} // imstk

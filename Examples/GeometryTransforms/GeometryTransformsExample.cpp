@@ -23,14 +23,18 @@
 #include "imstkCamera.h"
 #include "imstkCube.h"
 #include "imstkCylinder.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
-#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -40,96 +44,116 @@ using namespace imstk;
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("GeometryTransforms");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("GeometryTransforms");
 
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
     CHECK(sceneObj != nullptr) << "ERROR: Unable to create scene object";
 
     auto surfaceMesh = sceneObj->getVisualGeometry();
-    surfaceMesh->scale(5., Geometry::TransformType::ConcatenateToTransform);
+    surfaceMesh->scale(5.0, Geometry::TransformType::ConcatenateToTransform);
 
     //  Plane
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->scale(80, Geometry::TransformType::ConcatenateToTransform);
-    planeGeom->translate(0, -20, 0, Geometry::TransformType::ConcatenateToTransform);
-    planeGeom->rotate(Vec3d(0, 1., 0), PI / 4, Geometry::TransformType::ConcatenateToTransform);
+    imstkNew<Plane> planeGeom;
+    planeGeom->scale(80.0, Geometry::TransformType::ConcatenateToTransform);
+    planeGeom->translate(0.0, -20.0, 0.0, Geometry::TransformType::ConcatenateToTransform);
+    planeGeom->rotate(Vec3d(0.0, 1.0, 0.0), PI_4, Geometry::TransformType::ConcatenateToTransform);
 
-    auto materialPlane = std::make_shared<RenderMaterial>();
-    materialPlane->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    materialPlane->setPointSize(6.);
-    materialPlane->setLineWidth(4.);
-    auto planeVizModel = std::make_shared<VisualModel>(planeGeom);
-    planeVizModel->setRenderMaterial(materialPlane);
+    imstkNew<RenderMaterial> planeMaterial;
+    planeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    planeMaterial->setPointSize(6.);
+    planeMaterial->setLineWidth(4.);
+    imstkNew<VisualModel> planeVisualModel(planeGeom.get());
+    planeVisualModel->setRenderMaterial(planeMaterial);
 
-    auto planeObj = std::make_shared<VisualObject>("Plane");
+    imstkNew<VisualObject> planeObj("Plane");
     //planeObj->setVisualGeometry(planeGeom);
-    planeObj->addVisualModel(planeVizModel);
+    planeObj->addVisualModel(planeVisualModel);
     scene->addSceneObject(planeObj);
 
     //  Cube
-    auto cubeGeom = std::make_shared<Cube>();
-    cubeGeom->setWidth(20.);
+    imstkNew<Cube> cubeGeom;
+    cubeGeom->setWidth(20.0);
     cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
-    cubeGeom->rotate(Vec3d(1., 1., 0), PI / 4, Geometry::TransformType::ApplyToData);
+    cubeGeom->rotate(Vec3d(1.0, 1.0, 0.0), PI_4, Geometry::TransformType::ApplyToData);
 
-    auto materialCube = std::make_shared<RenderMaterial>();
-    materialCube->setColor(imstk::Color::Red);
-    materialCube->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    materialCube->setPointSize(6.);
-    materialCube->setLineWidth(4.);
-    auto cubeVizModel = std::make_shared<VisualModel>(cubeGeom);
-    cubeVizModel->setRenderMaterial(materialCube);
+    auto                     materialCube = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> cubeMaterial;
+    cubeMaterial->setColor(imstk::Color::Red);
+    cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    cubeMaterial->setPointSize(6.);
+    cubeMaterial->setLineWidth(4.);
+    imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
+    cubeVisualModel->setRenderMaterial(cubeMaterial);
 
-    auto cubeObj = std::make_shared<VisualObject>("Cube");
-    //cubeObj->setVisualGeometry(cubeGeom);
-    cubeObj->addVisualModel(cubeVizModel);
+    imstkNew<VisualObject> cubeObj("Cube");
+    cubeObj->addVisualModel(cubeVisualModel);
     scene->addSceneObject(cubeObj);
 
     //  Cylinder
-    auto CylinderGeom = std::make_shared<Cylinder>();
-    CylinderGeom->setRadius(4.);
-    CylinderGeom->setLength(8.);
-    CylinderGeom->scale(0.4, Geometry::TransformType::ConcatenateToTransform);
-    CylinderGeom->rotate(Vec3d(1., 1., 0), PI / 2, Geometry::TransformType::ApplyToData);
+    imstkNew<Cylinder> cylinderGeom;
+    cylinderGeom->setRadius(4.0);
+    cylinderGeom->setLength(8.0);
+    cylinderGeom->scale(0.4, Geometry::TransformType::ConcatenateToTransform);
+    cylinderGeom->rotate(Vec3d(1.0, 1.0, 0), PI_2, Geometry::TransformType::ApplyToData);
 
-    auto materialCyl = std::make_shared<RenderMaterial>();
-    materialCyl->setColor(imstk::Color::Red);
-    materialCyl->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    materialCyl->setPointSize(6.);
-    materialCyl->setLineWidth(4.);
-    auto cylVizModel = std::make_shared<VisualModel>(CylinderGeom);
-    cylVizModel->setRenderMaterial(materialCube);
+    imstkNew<RenderMaterial> cylMaterial;
+    cylMaterial->setColor(imstk::Color::Red);
+    cylMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    cylMaterial->setPointSize(6.0);
+    cylMaterial->setLineWidth(4.0);
+    imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
+    cylVisualModel->setRenderMaterial(materialCube);
 
-    auto CylinderObj = std::make_shared<VisualObject>("Cylinder");
-    //CylinderObj->setVisualGeometry(CylinderGeom);
-    CylinderObj->addVisualModel(cylVizModel);
-    scene->addSceneObject(CylinderObj);
+    imstkNew<VisualObject> cylObj("Cylinder");
+    cylObj->addVisualModel(cylVisualModel);
+    scene->addSceneObject(cylObj);
 
-    // Rotate the dragon every frame
+    // Setup function to rotate the dragon every frame
     auto rotateFunc =
-        [&surfaceMesh](Module* module)
+        [&surfaceMesh](Event*)
         {
-            surfaceMesh->rotate(Vec3d(1., 0, 0), PI / 1000, Geometry::TransformType::ApplyToData);
+            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * 0.0001, Geometry::TransformType::ApplyToData);
         };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(rotateFunc);
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 30, 30));
-    cam->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 30.0, 30.0));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setDirection(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Running);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        connect<Event>(sceneManager, EventType::PostUpdate, rotateFunc);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        viewer->start();
+    }
 
     return 0;
 }

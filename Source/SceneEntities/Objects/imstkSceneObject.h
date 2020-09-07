@@ -50,10 +50,12 @@ public:
         Animation,
         Colliding,
         Rigid,
+        Rigid2,
         FEMDeformable,
         ReducedFEMDeformable,
         Pbd,
-        SPH
+        SPH,
+        LevelSetDeformable
     };
 
     ///
