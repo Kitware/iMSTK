@@ -36,7 +36,7 @@ KeyboardDeviceClient::emitKeyDown(char key)
     m_buttons[key] = KEY_PRESS;
     if (prevKeyState != KEY_PRESS)
     {
-        emit(KeyPressEvent(key, KEY_PRESS));
+        this->postEvent(KeyPressEvent(key, KEY_PRESS));
     }
 }
 
@@ -47,7 +47,7 @@ KeyboardDeviceClient::emitKeyUp(char key)
     m_buttons[key] = KEY_RELEASE;
     if (prevKeyState != KEY_RELEASE)
     {
-        emit(KeyPressEvent(key, KEY_RELEASE));
+        this->postEvent(KeyPressEvent(key, KEY_RELEASE));
     }
 }
 

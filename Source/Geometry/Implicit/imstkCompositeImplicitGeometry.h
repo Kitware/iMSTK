@@ -36,9 +36,9 @@ class CompositeImplicitGeometry : public ImplicitGeometry
 public:
     enum class GeometryBoolType
     {
-        INTERSECTION,
-        DIFFERENCE,
-        UNION
+        Intersection,
+        Difference,
+        Union
     };
 
     using GeometryBoolPair = std::pair<std::shared_ptr<ImplicitGeometry>, GeometryBoolType>;

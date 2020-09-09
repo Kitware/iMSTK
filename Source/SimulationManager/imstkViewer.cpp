@@ -55,11 +55,11 @@ Viewer::getActiveRenderer() const
 void
 Viewer::updateThread()
 {
-    emit(Event(EventType::PreUpdate));
+    this->postEvent(Event(EventType::PreUpdate));
     for (auto control : m_controls)
     {
         control->update();
     }
-    emit(Event(EventType::PostUpdate));
+    this->postEvent(Event(EventType::PostUpdate));
 }
 }

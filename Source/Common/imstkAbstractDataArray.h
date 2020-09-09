@@ -74,7 +74,7 @@ public:
     /// \brief emits signal to all observers, informing them on the current address
     /// in memory and size of array
     ///
-    inline void modified() { emit(Event(EventType::Modified)); }
+    inline void modified() { this->postEvent(Event(EventType::Modified)); }
 
 protected:
     void setType(const ScalarType type) { this->m_scalarType = type; }

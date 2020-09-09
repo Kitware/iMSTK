@@ -24,7 +24,7 @@
 namespace imstk
 {
 std::shared_ptr<OpenVRDeviceClient>
-OpenVRDeviceClient::New(DeviceType deviceType)
+OpenVRDeviceClient::New(VRDeviceType deviceType)
 {
     return std::shared_ptr<OpenVRDeviceClient>(new OpenVRDeviceClient(deviceType));
 }
@@ -36,7 +36,7 @@ OpenVRDeviceClient::emitButtonTouched(const int buttonId)
     m_buttons[buttonId] = BUTTON_TOUCHED;
     if (prevButtonState != BUTTON_TOUCHED)
     {
-        emit(VRButtonEvent(buttonId, BUTTON_TOUCHED));
+        this->postEvent(VRButtonEvent(buttonId, BUTTON_TOUCHED));
     }
 }
 
@@ -47,7 +47,7 @@ OpenVRDeviceClient::emitButtonUntouched(const int buttonId)
     m_buttons[buttonId] = BUTTON_UNTOUCHED;
     if (prevButtonState != BUTTON_UNTOUCHED)
     {
-        emit(VRButtonEvent(buttonId, BUTTON_UNTOUCHED));
+        this->postEvent(VRButtonEvent(buttonId, BUTTON_UNTOUCHED));
     }
 }
 
@@ -58,7 +58,7 @@ OpenVRDeviceClient::emitButtonPress(const int buttonId)
     m_buttons[buttonId] = BUTTON_PRESSED;
     if (prevButtonState != BUTTON_PRESSED)
     {
-        emit(VRButtonEvent(buttonId, BUTTON_PRESSED));
+        this->postEvent(VRButtonEvent(buttonId, BUTTON_PRESSED));
     }
 }
 
@@ -69,7 +69,7 @@ OpenVRDeviceClient::emitButtonRelease(const int buttonId)
     m_buttons[buttonId] = BUTTON_RELEASED;
     if (prevButtonState != BUTTON_RELEASED)
     {
-        emit(VRButtonEvent(buttonId, BUTTON_RELEASED));
+        this->postEvent(VRButtonEvent(buttonId, BUTTON_RELEASED));
     }
 }
 }

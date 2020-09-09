@@ -34,13 +34,13 @@ CompositeImplicitGeometry::getFunctionValue(const Vec3d& pos) const
         double                  distB = pair.first->getFunctionValue(pos);
         switch (pair.second)
         {
-        case GeometryBoolType::DIFFERENCE:
+        case GeometryBoolType::Difference:
             distA = std::max(distA, -distB);
             break;
-        case GeometryBoolType::INTERSECTION:
+        case GeometryBoolType::Intersection:
             distA = std::max(distA, distB);
             break;
-        case GeometryBoolType::UNION:
+        case GeometryBoolType::Union:
             distA = std::min(distA, distB);
             break;
         }

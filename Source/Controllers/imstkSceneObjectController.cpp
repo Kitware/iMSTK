@@ -46,7 +46,7 @@ SceneObjectController::updateControlledObjects()
         }
     }
 
-    emit(Event(EventType::Modified));
+    this->postEvent(Event(EventType::Modified));
 
     // Update geometry
     // \todo revisit this; what if we need to move a group of objects

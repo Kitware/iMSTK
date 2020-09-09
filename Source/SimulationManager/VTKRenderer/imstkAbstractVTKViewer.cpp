@@ -68,7 +68,7 @@ AbstractVTKViewer::pause(bool sync)
         return;
     }
 
-    emit(Event(EventType::Pause));
+    this->postEvent(Event(EventType::Pause));
 
     pauseThread();
 
@@ -99,7 +99,7 @@ AbstractVTKViewer::resume(bool sync)
         return;
     }
 
-    emit(Event(EventType::Resume));
+    this->postEvent(Event(EventType::Resume));
 
     resumeThread();
     if (m_status == ThreadStatus::Paused)

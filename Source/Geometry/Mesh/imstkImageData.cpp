@@ -149,7 +149,7 @@ ImageData::allocate(const ScalarType type, const int numComps, const Vec3i& dims
         break;
     }
     // When allocation is done, post modified on the image
-    connect<Event>(m_scalarArray, EventType::Modified, [&](Event*) { this->emit(Event(EventType::Modified)); });
+    connect<Event>(m_scalarArray, EventType::Modified, [&](Event*) { this->postEvent(Event(EventType::Modified)); });
 }
 
 void

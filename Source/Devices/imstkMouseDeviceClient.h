@@ -126,7 +126,7 @@ protected:
     {
         m_prevPos = m_pos;
         m_pos     = pos;
-        emit(MouseEvent(MOUSE_MOVE));
+        this->postEvent(MouseEvent(MOUSE_MOVE));
     }
 
     ///
@@ -135,7 +135,7 @@ protected:
     void emitButtonPress(const MouseButtonType buttonId)
     {
         m_buttons[buttonId] = MOUSE_PRESS;
-        emit(MouseEvent(MOUSE_PRESS, buttonId));
+        this->postEvent(MouseEvent(MOUSE_PRESS, buttonId));
     }
 
     ///
@@ -144,13 +144,13 @@ protected:
     void emitButtonRelease(const MouseButtonType buttonId)
     {
         m_buttons[buttonId] = MOUSE_RELEASE;
-        emit(MouseEvent(MOUSE_RELEASE, buttonId));
+        this->postEvent(MouseEvent(MOUSE_RELEASE, buttonId));
     }
 
     ///
     /// \brief Post a mouse scroll event
     ///
-    void emitScroll(const double dx) { emit(MouseEvent(MOUSE_SCROLL, dx)); }
+    void emitScroll(const double dx) { this->postEvent(MouseEvent(MOUSE_SCROLL, dx)); }
 
 protected:
     Vec2d m_prevPos;

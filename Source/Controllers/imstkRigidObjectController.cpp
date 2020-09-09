@@ -52,7 +52,7 @@ RigidObjectController::updateControlledObjects()
         }
     }
 
-    emit(Event(EventType::Modified));
+    this->postEvent(Event(EventType::Modified));
 
     // During initialization tracking may not be enabled for a time, in which case, freeze the thing
     // or else extraneous forces may be applied towards uninitialized position (0, 0, 0) or gravity

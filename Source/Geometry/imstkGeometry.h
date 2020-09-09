@@ -189,7 +189,7 @@ public:
     ///
     /// \brief Post modified event
     ///
-    void modified() { emit(Event(EventType::Modified)); }
+    void modified() { this->postEvent(Event(EventType::Modified)); }
 
     virtual void updatePostTransformData() const { }
 

@@ -197,7 +197,7 @@ VTKViewer::getMouseDevice() const
 void
 VTKViewer::updateThread()
 {
-    emit(Event(EventType::PreUpdate));
+    this->postEvent(Event(EventType::PreUpdate));
 
     // Update all controls
     for (auto control : m_controls)
@@ -244,7 +244,7 @@ VTKViewer::updateThread()
     getVtkRenderWindow()->GetInteractor()->Render();
     m_post = std::chrono::high_resolution_clock::now();
 
-    emit(Event(EventType::PostUpdate));
+    this->postEvent(Event(EventType::PostUpdate));
 
     // Plan next render
     getVtkRenderWindow()->GetInteractor()->CreateOneShotTimer(0);

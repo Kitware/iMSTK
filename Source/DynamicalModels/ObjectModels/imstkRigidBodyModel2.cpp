@@ -120,7 +120,7 @@ RigidBodyModel2::initialize()
             // invMass expanded to 3x3 matrix
             const double invMass     = invMasses[i];
             const Mat3d& invInvertia = invInteriaTensors[i];
-            unsigned     index       = i * 6;
+            int          index       = static_cast<int>(i * 6);
             mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));
             index++;
             mInvTriplets.push_back(Eigen::Triplet<double>(index, index, invMass));

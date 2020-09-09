@@ -120,7 +120,6 @@ GeometryUtils::coupleVtkImageData(std::shared_ptr<ImageData> imageData)
     vtkSmartPointer<vtkDataArray>      vtkArr = coupleVtkDataArray(arr);
 
     vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
-    const Vec3i&                  dim = imageData->getDimensions();
     imageDataVtk->SetDimensions(imageData->getDimensions().data());
     imageDataVtk->SetSpacing(imageData->getSpacing().data());
     const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;

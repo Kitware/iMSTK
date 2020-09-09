@@ -87,45 +87,41 @@ if(iMSTK_USE_OpenHaptics)
 endif()
 
 # VTK
+list(GET OPENVR_INCLUDE_DIRS 0 OpenVR_INCLUDE_DIR)
+list(GET OPENVR_LIBRARIES 1 OpenVR_LIBRARY)
+set(OpenVR_INCLUDE_DIR ${OpenVR_INCLUDE_DIR} CACHE INTERNAL "")
+set(OpenVR_LIBRARY ${OpenVR_LIBRARY} CACHE INTERNAL "")
 set(VTK_DIR @VTK_DIR@)
 find_dependency(VTK CONFIG)
-if (VTK_VERSION VERSION_LESS "8.90")
-  # Modules are linked via `vtkCommonCore`
-  # VTK_DEFINITIONS has autoinit information
-  find_dependency (VTK REQUIRED)
-  include(${VTK_USE_FILE})
-else()
-  # modules are linked via `VTK::CommonCore`
-  # vtk_module_autoinit is needed
-  find_dependency(VTK COMPONENTS
-    ChartsCore
-    CommonCore
-    CommonDataModel
-    FiltersCore
-    FiltersExtraction
-    FiltersGeneral
-    FiltersModeling
-    FiltersSources
-    IOExport
-    IOImport
-    IOPLY
-    IOParallel
-    IOParallelXML
-    ImagingCore
-    ImagingGeneral
-    ImagingStencil
-    InteractionStyle
-    RenderingAnnotation
-    RenderingContext2D
-    RenderingContextOpenGL2
-    RenderingCore
-    RenderingOpenGL2
-    RenderingOpenVR
-    RenderingVolume
-    RenderingVolumeOpenGL2
-    ViewsContext2D)
-endif()
-
+# modules are linked via `VTK::CommonCore`
+# vtk_module_autoinit is needed
+find_dependency(VTK COMPONENTS
+  ChartsCore
+  CommonCore
+  CommonDataModel
+  FiltersCore
+  FiltersExtraction
+  FiltersGeneral
+  FiltersModeling
+  FiltersSources
+  IOExport
+  IOImport
+  IOPLY
+  IOParallel
+  IOParallelXML
+  ImagingCore
+  ImagingGeneral
+  ImagingStencil
+  InteractionStyle
+  RenderingAnnotation
+  RenderingContext2D
+  RenderingContextOpenGL2
+  RenderingCore
+  RenderingOpenGL2
+  RenderingOpenVR
+  RenderingVolume
+  RenderingVolumeOpenGL2
+  ViewsContext2D)
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # glfw, gli

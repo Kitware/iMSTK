@@ -120,10 +120,10 @@ static void disconnect(EventObject*, EventObject*, EventType);
 /// can recieve and emit events. It supports direct and queued observer functions.
 /// Direct observers recieve events immediately on the same thread
 /// This can either be posted on an object or be a function pointer
-/// Queued observers recieve events within their queue
-/// These can be connected with the connect function
-/// \todo If objects are given affinity, we can automatically decide whether it could
-/// be dangerous to make a certain type of connection
+/// Queued observers recieve events within their queue which they can process whenever
+/// they like.
+/// These can be connected with the connect/queuedConnect/disconnect functions
+/// \todo ThreadObject affinity
 ///
 class EventObject
 {
@@ -136,14 +136,12 @@ public:
 public:
     ///
     /// \brief Emits the event
-    /// Direct observers will be immediately called
-    /// Queued observers will receive the EventFunctionPair in their queue
-    /// That is, the function to call and data of the event
-    /// The event will be copied before sent, and cleaned up after handled
-    /// to allow for polymorphic event types
+    /// Direct observers will be immediately called, in sync
+    /// Queued observers will receive the Command in their queue for later
+    /// execution, reciever must implement doEvent
     ///
     template<typename T>
-    void emit(const T& e)
+    void postEvent(const T& e)
     {
         // For every direct observer
         for (std::list<Observer>::iterator i = directObservers[e.m_type].begin(); i != directObservers[e.m_type].end(); i++)

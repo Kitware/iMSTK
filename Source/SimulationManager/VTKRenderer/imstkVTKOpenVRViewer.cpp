@@ -176,7 +176,7 @@ VTKOpenVRViewer::getVRDeviceClient(int deviceType)
 void
 VTKOpenVRViewer::updateThread()
 {
-    emit(Event(EventType::PreUpdate));
+    this->postEvent(Event(EventType::PreUpdate));
 
     // Update all controls
     for (auto control : m_controls)
@@ -200,7 +200,7 @@ VTKOpenVRViewer::updateThread()
     // Render
     m_vtkRenderWindow->GetInteractor()->Render();
 
-    emit(Event(EventType::PostUpdate));
+    this->postEvent(Event(EventType::PostUpdate));
 
     // Plan next render
     m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);

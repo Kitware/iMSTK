@@ -71,7 +71,7 @@ ThreadObject::start(const bool sync)
         return;
     }
 
-    this->emit(Event(EventType::Start, 5));
+    this->postEvent(Event(EventType::Start, 5));
 
     m_status = ThreadStatus::Running;
 
@@ -93,7 +93,7 @@ ThreadObject::start(const bool sync)
         {
             m_children[i]->stop(true);
         }
-        emit(Event(EventType::End, 5));
+        this->postEvent(Event(EventType::End, 5));
         m_requestedStatus = ThreadStatus::Running;
     }
     else
@@ -110,7 +110,7 @@ ThreadObject::start(const bool sync)
                 {
                     m_children[i]->stop(true);
                 }
-                emit(Event(EventType::End, 5));
+                this->postEvent(Event(EventType::End, 5));
                 m_requestedStatus = ThreadStatus::Running;
             });
     }
@@ -125,7 +125,7 @@ ThreadObject::stop(const bool sync)
         m_children[i]->stop(true);
     }
 
-    this->emit(Event(EventType::End, 5));
+    this->postEvent(Event(EventType::End, 5));
 
     stopThread();
     if ((m_status == ThreadStatus::Inactive))
@@ -156,7 +156,7 @@ ThreadObject::resume(const bool sync)
         return;
     }
 
-    this->emit(Event(EventType::Resume, 5));
+    this->postEvent(Event(EventType::Resume, 5));
 
     resumeThread();
     if (m_status == ThreadStatus::Paused)
@@ -179,7 +179,7 @@ ThreadObject::pause(const bool sync)
         return;
     }
 
-    this->emit(Event(EventType::Pause, 5));
+    this->postEvent(Event(EventType::Pause, 5));
 
     pauseThread();
     if (m_status == ThreadStatus::Running)

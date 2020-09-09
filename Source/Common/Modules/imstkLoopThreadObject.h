@@ -82,9 +82,9 @@ public:
 public:
     void update()
     {
-        emit(Event(EventType::PostUpdate));
+        this->postEvent(Event(EventType::PostUpdate));
         updateThread();
-        emit(Event(EventType::PreUpdate));
+        this->postEvent(Event(EventType::PreUpdate));
     }
 
 protected:

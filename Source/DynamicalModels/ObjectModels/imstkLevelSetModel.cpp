@@ -102,8 +102,8 @@ LevelSetModel::evolveDistanceField()
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
     double*      imgPtr    = static_cast<double*>(imageData->getVoidPointer());
     const Vec3i& dim       = imageData->getDimensions();
-    const Vec3d& spacing   = imageData->getSpacing();
-    const Vec3d& origin    = imageData->getOrigin();
+    //const Vec3d& spacing   = imageData->getSpacing();
+    //const Vec3d& origin    = imageData->getOrigin();
     const double dt = m_config->m_dt;
 
     if (m_config->m_sparseUpdate)

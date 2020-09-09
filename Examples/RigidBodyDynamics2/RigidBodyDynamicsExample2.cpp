@@ -79,8 +79,8 @@ main()
             sphereGeom->setRadius(25.0);
             sphereGeom->setPosition(0.0, 10.0, 0.0);
             imstkNew<CompositeImplicitGeometry> compGeom;
-            compGeom->addImplicitGeometry(planeGeom, CompositeImplicitGeometry::GeometryBoolType::UNION);
-            compGeom->addImplicitGeometry(sphereGeom, CompositeImplicitGeometry::GeometryBoolType::DIFFERENCE);
+            compGeom->addImplicitGeometry(planeGeom, CompositeImplicitGeometry::GeometryBoolType::Union);
+            compGeom->addImplicitGeometry(sphereGeom, CompositeImplicitGeometry::GeometryBoolType::Difference);
 
             // Rasterize the SDF into an image
             imstkNew<ImplicitGeometryToImageData> toImage;
