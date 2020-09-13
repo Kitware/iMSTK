@@ -48,6 +48,8 @@ TrackingDeviceControl::updateTrackingData()
         return false;
     }
 
+    m_deviceClient->update();
+
     // Retrieve device info
     m_currentPos = m_deviceClient->getPosition();
     m_currentRot = m_deviceClient->getOrientation();

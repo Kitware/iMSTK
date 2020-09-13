@@ -63,7 +63,7 @@ protected:
     ///
     /// \brief Use callback to get tracking data from phantom omni
     ///
-    void updateData();
+    void update() override;
 
     ///
     /// \brief Disables the phantom omni device

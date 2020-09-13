@@ -101,7 +101,7 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
         std::shared_ptr<PenaltyCH> colHandler =
             std::make_shared<PenaltyCH>(CollisionHandling::Side::A, colData, obj1);
     }
-    else if (intType == InteractionType::FemObjToCollidingObjBoneDrilling && isType<FeDeformableObject>(obj1))
+    else if (intType == InteractionType::CollidingObjToCollidingObjBoneDrilling)
     {
         // Setup CD and collision data
         std::shared_ptr<CollisionData>      colData   = std::make_shared<CollisionData>();
