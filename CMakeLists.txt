@@ -89,6 +89,11 @@ if (${PROJECT_NAME}_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
 option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
+option(${PROJECT_NAME}_USE_VTK_OSMESA "Build with VTK OSMesa rendering" OFF)
+if (${${PROJECT_NAME}_USE_VTK_OSMESA} AND NOT UNIX)
+  message(WARNING "OSMesa only works on unix, building without")
+  set(${PROJECT_NAME}_USE_VTK_OSMESA FALSE CACHE BOOL "Build with VTK OSMesa rendering" FORCE)
+endif()
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
