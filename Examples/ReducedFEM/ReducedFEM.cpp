@@ -49,7 +49,7 @@ createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
     tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // Configure dynamic model
-    imstkNew<ReducedStVK> dynaModel;
+    imstkNew<ReducedStVK>       dynaModel;
     imstkNew<ReducedStVKConfig> config;
     config->m_cubicPolynomialFilename = iMSTK_DATA_ROOT "/asianDragon/asianDragon.cub";
     config->m_modesFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.URendering.float";
@@ -80,6 +80,7 @@ createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
 
     return deformableObj;
 }
+
 ///
 /// \brief This example demonstrates the soft body simulation
 /// using Finite elements
