@@ -24,6 +24,7 @@
 #include <memory>
 
 #include "imstkDynamicalModel.h"
+#include "imstkVectorizedState.h"
 #include "imstkNonLinearSystem.h"
 #include "imstkLogger.h"
 

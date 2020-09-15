@@ -19,111 +19,171 @@
 
 =========================================================================*/
 
-#include "imstkTimer.h"
-#include "imstkSimulationManager.h"
-#include "imstkDeformableObject.h"
+#include "imstkFeDeformableObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkBackwardEuler.h"
-#include "imstkNonLinearSystem.h"
-#include "imstkNewtonSolver.h"
-#include "imstkGaussSeidel.h"
 #include "imstkPlane.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkOneToOneMap.h"
-#include "imstkAPIUtilities.h"
-#include "imstkConjugateGradient.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkReducedStVKBodyModel.h"
 #include "imstkReducedFeDeformableObject.h"
-#include "imstkCollisionGraph.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
+#include "imstkKeyboardSceneControl.h"
 
 using namespace imstk;
 
+std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> scene, std::shared_ptr<TetrahedralMesh> tetMesh);
+
+// enum to choose difference cases, currently asianDragon or heart
+enum Geom
+{
+    Dragon = 0,
+    Heart
+};
+
+struct Input
+{
+    std::string meshFileName;
+    std::string cubFileName;
+    std::string modesFileName;
+};
+
+Geom geom = Dragon;
+// const Geom geom = Heart;
+Input input;
+
 ///
 /// \brief This example demonstrates the soft body simulation
-/// using Finite elements
+/// using model order reduction (NOR)
 ///
 int
 main()
 {
-    // simManager and Scene
-    auto simConfig = std::make_shared<SimManagerConfig>();
-    simConfig->simulationMode = SimulationMode::Rendering;
-    auto simManager = std::make_shared<SimulationManager>(simConfig);
-    auto scene      = simManager->createNewScene("DeformableBodyFEM");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Load a tetrahedral mesh
-    // auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    if (geom == Dragon)
+    {
+        input.meshFileName  = iMSTK_DATA_ROOT "asianDragon/asianDragon.veg";
+        input.cubFileName   = iMSTK_DATA_ROOT "asianDragon/asianDragon.cub";
+        input.modesFileName = iMSTK_DATA_ROOT "asianDragon/asianDragon.URendering.float";
+    }
+    else if (geom == Heart)
+    {
+        input.meshFileName  = iMSTK_DATA_ROOT "/heart/heart.veg";
+        input.cubFileName   = iMSTK_DATA_ROOT "heart/heart.cub";
+        input.modesFileName = iMSTK_DATA_ROOT "heart/heart.URendering.float";
+    }
 
-    CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
+    // Construct the scene
+    imstkNew<SceneConfig> sceneConfig;
+    sceneConfig->taskParallelizationEnabled = false;
+    imstkNew<Scene> scene("ReducedFEM", sceneConfig);
 
-    // Extract the surface mesh
-    auto surfMesh   = std::make_shared<SurfaceMesh>();
-    auto volTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
+    {
+        std::shared_ptr<Camera> cam = scene->getActiveCamera();
+        cam->setPosition(0.0, 2.0, -25.0);
+        cam->setFocalPoint(0.0, 0.0, 0.0);
 
-    CHECK(volTetMesh != nullptr) << "Dynamic pointer cast from PointSet to TetrahedralMesh failed!";
+        // Load a tetrahedral mesh
+        auto tetMesh = MeshIO::read<TetrahedralMesh>(input.meshFileName);
+        CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
 
-    volTetMesh->extractSurfaceMesh(surfMesh, true);
+        // Scene object 1: fe-FeDeformableObject
+        std::shared_ptr<DynamicObject> deformableObj = createAndAddFEDeformable(scene, tetMesh);
 
-    // Construct a map
+        // Scene object 2: Plane
+        imstkNew<Plane> planeGeom;
+        planeGeom->setWidth(40);
+        planeGeom->setPosition(0, -6, 0);
+        imstkNew<CollidingObject> planeObj("Plane");
+        planeObj->setVisualGeometry(planeGeom);
+        planeObj->setCollidingGeometry(planeGeom);
+        scene->addSceneObject(planeObj);
 
-    // Construct one to one nodal map based on the above meshes
-    auto oneToOneNodalMap = std::make_shared<OneToOneMap>(tetMesh, surfMesh);
+        // Light
+        imstkNew<DirectionalLight> light("light");
+        light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+        light->setIntensity(1);
+        scene->addLight(light);
+    }
 
-    // Scene object 1: Dragon
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
+
+    return 0;
+}
+
+std::shared_ptr<DynamicObject>
+createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
+                         std::shared_ptr<TetrahedralMesh> tetMesh)
+{
+    imstkNew<SurfaceMesh> surfMesh;
+    tetMesh->extractSurfaceMesh(surfMesh, true);
 
     // Configure dynamic model
-    auto dynaModel = std::make_shared<ReducedStVK>();
-
+    imstkNew<ReducedStVK>       dynaModel;
+    imstkNew<ReducedStVKConfig> config;
+    config->m_cubicPolynomialFilename = input.cubFileName;
+    config->m_modesFileName = input.modesFileName;
+    dynaModel->configure(config);
     //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
 
-    auto config = std::make_shared<ReducedStVKConfig>();
-    // config->m_fixedNodeIds = { 51, 127, 178 };
-    config->m_cubicPolynomialFilename = iMSTK_DATA_ROOT "/asianDragon/asianDragon.cub";
-    config->m_modesFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.URendering.float";
-    dynaModel->configure(config);
-
     dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
-    dynaModel->setModelGeometry(volTetMesh);
-    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
+    dynaModel->setModelGeometry(tetMesh);
+    imstkNew<BackwardEuler> timeIntegrator(0.01); // Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
+    imstkNew<RenderMaterial> mat;
+    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    mat->setPointSize(10.);
+    mat->setLineWidth(4.);
+    mat->setEdgeColor(Color::Orange);
+    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
+    surfMeshModel->setRenderMaterial(mat);
 
-    // Scene Object
-    auto deformableObj = std::make_shared<ReducedFeDeformableObject>("Dragon");
+    // Scene object 1: Dragon
+    imstkNew<ReducedFeDeformableObject> deformableObj("Dragon");
     deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(volTetMesh);
-    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->setPhysicsGeometry(tetMesh);
+    // Map simulated geometry to visual
+    deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
     deformableObj->setDynamicalModel(dynaModel);
     scene->addSceneObject(deformableObj);
 
-    // Scene object 2: Plane
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(40);
-    planeGeom->setPosition(0, -6, 0);
-    auto planeObj = std::make_shared<CollidingObject>("Plane");
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
-    scene->addSceneObject(planeObj);
-
-    // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
-    scene->addLight(light);
-
-    // Run the simulation
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
-
-    return 0;
+    return deformableObj;
 }
