@@ -41,55 +41,48 @@
 
 using namespace imstk;
 
-std::shared_ptr<DynamicObject>
-createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
-                         std::shared_ptr<TetrahedralMesh> tetMesh)
+std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> scene, std::shared_ptr<TetrahedralMesh> tetMesh);
+
+// enum to choose difference cases, currently asianDragon or heart
+enum Geom
 {
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+    Dragon = 0,
+    Heart
+};
 
-    // Configure dynamic model
-    imstkNew<ReducedStVK>       dynaModel;
-    imstkNew<ReducedStVKConfig> config;
-    config->m_cubicPolynomialFilename = iMSTK_DATA_ROOT "/asianDragon/asianDragon.cub";
-    config->m_modesFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.URendering.float";
-    dynaModel->configure(config);
-    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+struct Input
+{
+    std::string meshFileName;
+    std::string cubFileName;
+    std::string modesFileName;
+};
 
-    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
-    dynaModel->setModelGeometry(tetMesh);
-    imstkNew<BackwardEuler> timeIntegrator(0.01); // Create and add Backward Euler time integrator
-    dynaModel->setTimeIntegrator(timeIntegrator);
-
-    imstkNew<RenderMaterial> mat;
-    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    mat->setPointSize(10.);
-    mat->setLineWidth(4.);
-    mat->setEdgeColor(Color::Orange);
-    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
-    surfMeshModel->setRenderMaterial(mat);
-
-    // Scene object 1: Dragon
-    imstkNew<ReducedFeDeformableObject> deformableObj("Dragon");
-    deformableObj->addVisualModel(surfMeshModel);
-    deformableObj->setPhysicsGeometry(tetMesh);
-    // Map simulated geometry to visual
-    deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
-    deformableObj->setDynamicalModel(dynaModel);
-    scene->addSceneObject(deformableObj);
-
-    return deformableObj;
-}
+Geom geom = Dragon;
+// const Geom geom = Heart;
+Input input;
 
 ///
 /// \brief This example demonstrates the soft body simulation
-/// using Finite elements
+/// using model order reduction (NOR)
 ///
 int
 main()
 {
     // Setup logger (write to file and stdout)
     Logger::startLogger();
+
+    if (geom == Dragon)
+    {
+        input.meshFileName  = iMSTK_DATA_ROOT "asianDragon/asianDragon.veg";
+        input.cubFileName   = iMSTK_DATA_ROOT "asianDragon/asianDragon.cub";
+        input.modesFileName = iMSTK_DATA_ROOT "asianDragon/asianDragon.URendering.float";
+    }
+    else if (geom == Heart)
+    {
+        input.meshFileName  = iMSTK_DATA_ROOT "/heart/heart.veg";
+        input.cubFileName   = iMSTK_DATA_ROOT "heart/heart.cub";
+        input.modesFileName = iMSTK_DATA_ROOT "heart/heart.URendering.float";
+    }
 
     // Construct the scene
     imstkNew<SceneConfig> sceneConfig;
@@ -102,7 +95,7 @@ main()
         cam->setFocalPoint(0.0, 0.0, 0.0);
 
         // Load a tetrahedral mesh
-        auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+        auto tetMesh = MeshIO::read<TetrahedralMesh>(input.meshFileName);
         CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
 
         // Scene object 1: fe-FeDeformableObject
@@ -153,4 +146,44 @@ main()
     }
 
     return 0;
+}
+
+std::shared_ptr<DynamicObject>
+createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
+                         std::shared_ptr<TetrahedralMesh> tetMesh)
+{
+    imstkNew<SurfaceMesh> surfMesh;
+    tetMesh->extractSurfaceMesh(surfMesh, true);
+
+    // Configure dynamic model
+    imstkNew<ReducedStVK>       dynaModel;
+    imstkNew<ReducedStVKConfig> config;
+    config->m_cubicPolynomialFilename = input.cubFileName;
+    config->m_modesFileName = input.modesFileName;
+    dynaModel->configure(config);
+    //dynaModel->configure(iMSTK_DATA_ROOT "/asianDragon/asianDragon.config");
+
+    dynaModel->setTimeStepSizeType(TimeSteppingType::Fixed);
+    dynaModel->setModelGeometry(tetMesh);
+    imstkNew<BackwardEuler> timeIntegrator(0.01); // Create and add Backward Euler time integrator
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    imstkNew<RenderMaterial> mat;
+    mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    mat->setPointSize(10.);
+    mat->setLineWidth(4.);
+    mat->setEdgeColor(Color::Orange);
+    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
+    surfMeshModel->setRenderMaterial(mat);
+
+    // Scene object 1: Dragon
+    imstkNew<ReducedFeDeformableObject> deformableObj("Dragon");
+    deformableObj->addVisualModel(surfMeshModel);
+    deformableObj->setPhysicsGeometry(tetMesh);
+    // Map simulated geometry to visual
+    deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
+    deformableObj->setDynamicalModel(dynaModel);
+    scene->addSceneObject(deformableObj);
+
+    return deformableObj;
 }
