@@ -72,6 +72,7 @@ PbdAreaConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPos
     n /= 2 * c;
     c -= m_restArea;
 
+    dcdx.resize(3);
     dcdx[0] = e1.cross(n);
     dcdx[1] = e2.cross(n);
     dcdx[2] = e0.cross(n);

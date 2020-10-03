@@ -22,6 +22,7 @@ limitations under the License.
 #pragma once
 
 #include "imstkTaskNode.h"
+
 #include <list>
 #include <memory>
 #include <unordered_map>

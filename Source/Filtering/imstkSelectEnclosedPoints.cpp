@@ -39,13 +39,13 @@ SelectEnclosedPoints::SelectEnclosedPoints()
 void
 SelectEnclosedPoints::setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh)
 {
-    setOutput(inputMesh, 0);
+    setInput(inputMesh, 0);
 }
 
 void
 SelectEnclosedPoints::setInputPoints(std::shared_ptr<PointSet> inputPts)
 {
-    setOutput(inputPts, 0);
+    setInput(inputPts, 1);
 }
 
 std::shared_ptr<PointSet>

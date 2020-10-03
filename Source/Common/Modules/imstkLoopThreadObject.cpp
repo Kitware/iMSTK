@@ -30,14 +30,15 @@ LoopThreadObject::LoopThreadObject(std::string name, int loopDelay) :
     ThreadObject(name),
     m_frameCounter(std::make_shared<UPSCounter>()),
     m_trackFPS(false),
-    m_loopDelay(loopDelay)
+    m_loopDelay(loopDelay),
+    m_isInitialized(false)
 {
 }
 
 void
 LoopThreadObject::startThread()
 {
-    initThread();
+    init();
 
     // Keep active, wait for terminating call
     std::chrono::steady_clock::time_point previous_t = std::chrono::steady_clock::now() - std::chrono::minutes(1);
