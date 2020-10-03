@@ -56,19 +56,20 @@ limitations under the License.
 namespace imstk
 {
 template<typename T1, typename T2>
-void checkValidGeometry(std::shared_ptr<Geometry> geom1, std::shared_ptr<Geometry> geom2, std::string t1TypeName, std::string t2TypeName)
+void
+checkValidGeometry(std::shared_ptr<Geometry> geom1, std::shared_ptr<Geometry> geom2, std::string t1TypeName, std::string t2TypeName)
 {
     std::string errorMsg = "Invalid object geometries were provided for the collision detection type.\n";
-    bool fail = false;
+    bool        fail     = false;
     if (std::dynamic_pointer_cast<T1>(geom1) == nullptr)
     {
         errorMsg += "Geometry 1 expected " + t1TypeName + " but got " + geom1->getTypeName() + ".\n";
-        fail = true;
+        fail      = true;
     }
     if (std::dynamic_pointer_cast<T2>(geom2) == nullptr)
     {
         errorMsg += "Geometry 2 expected " + t2TypeName + " but got " + geom2->getTypeName() + ".\n";
-        fail = true;
+        fail      = true;
     }
 
     if (fail)

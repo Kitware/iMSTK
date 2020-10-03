@@ -82,7 +82,7 @@ public:
     ///
     /// \brief Calls initThread on the thread object for subclasses to initialize
     /// can only be called once
-    /// 
+    ///
     void init()
     {
         if (!m_isInitialized)
@@ -91,9 +91,10 @@ public:
             m_isInitialized = true;
         }
     }
+
     ///
     /// \brief Toggles the initialization flag so init can be called again
-    /// 
+    ///
     void uninit()
     {
         m_isInitialized = false;
