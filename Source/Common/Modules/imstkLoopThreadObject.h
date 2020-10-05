@@ -79,6 +79,27 @@ public:
     ///
     unsigned int getUPS() const;
 
+    ///
+    /// \brief Calls initThread on the thread object for subclasses to initialize
+    /// can only be called once
+    ///
+    void init()
+    {
+        if (!m_isInitialized)
+        {
+            initThread();
+            m_isInitialized = true;
+        }
+    }
+
+    ///
+    /// \brief Toggles the initialization flag so init can be called again
+    ///
+    void uninit()
+    {
+        m_isInitialized = false;
+    }
+
 public:
     void update()
     {
@@ -105,7 +126,8 @@ protected:
 
 protected:
     std::shared_ptr<UPSCounter> m_frameCounter;
-    double m_loopDelay;      ///> Loop delay
-    bool   m_trackFPS;       ///> Flag to enable/diable FPS tracking
+    double m_loopDelay;     ///> Loop delay
+    bool   m_trackFPS;      ///> Flag to enable/diable FPS tracking
+    bool   m_isInitialized; ///> Flag to avoid reinitialization
 };
 }
