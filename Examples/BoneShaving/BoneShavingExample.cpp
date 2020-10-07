@@ -107,7 +107,7 @@ main()
 
     // Add interaction
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
-        InteractionType::FemObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
+        InteractionType::CollidingObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
 
 #endif
 

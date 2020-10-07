@@ -42,8 +42,8 @@ enum class InteractionType
     //RigidObjToRigidObjCollision,
 
     FemObjToCollidingObjPenaltyForce,
-    FemObjToCollidingObjBoneDrilling,
-    FemObjToCollidingObjNodalPicking
+    FemObjToCollidingObjNodalPicking,
+    CollidingObjToCollidingObjBoneDrilling
 };
 
 ///

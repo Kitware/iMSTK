@@ -108,6 +108,8 @@ public:
         }
     }
 
+    virtual void update() {}
+
 protected:
     DeviceClient(const std::string& name, const std::string& ip);
 

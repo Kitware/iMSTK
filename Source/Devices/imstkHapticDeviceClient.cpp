@@ -56,7 +56,7 @@ HapticDeviceClient::initialize()
 }
 
 void
-HapticDeviceClient::updateData()
+HapticDeviceClient::update()
 {
     hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
 }

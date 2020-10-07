@@ -48,10 +48,11 @@ using namespace imstk;
 int
 main()
 {
+#ifdef iMSTK_USE_OPENHAPTICS
+
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-#ifdef iMSTK_USE_OPENHAPTICS
     // Create Scene
     imstkNew<Scene> scene("ObjectController");
 
