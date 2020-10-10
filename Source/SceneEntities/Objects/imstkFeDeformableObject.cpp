@@ -40,4 +40,11 @@ FeDeformableObject::initialize()
 
     return true;
 }
+
+std::shared_ptr<FEMDeformableBodyModel>
+FeDeformableObject::getFEMModel()
+{
+    m_femModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
+    return m_femModel;
+}
 } // imstk

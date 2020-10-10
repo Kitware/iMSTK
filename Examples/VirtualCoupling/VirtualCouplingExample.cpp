@@ -19,32 +19,30 @@
 
 =========================================================================*/
 
-#include "imstkCollidingObject.h"
-#include "imstkObjectInteractionFactory.h"
-#include "imstkVirtualCouplingCH.h"
-#include "imstkHapticDeviceManager.h"
-#include "imstkHapticDeviceClient.h"
-#include "imstkSceneObjectController.h"
+#include "imstkCamera.h"
 #include "imstkCDObjectFactory.h"
+#include "imstkCollidingObject.h"
+#include "imstkCollisionData.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
-#include "imstkCollisionData.h"
-#include "imstkVisualModel.h"
-#include "imstkRenderMaterial.h"
-#include "imstkCollisionGraph.h"
-#include "imstkLight.h"
-#include "imstkCamera.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkScene.h"
-#include "imstkNew.h"
-#include "imstkVTKViewer.h"
-#include "imstkSceneManager.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
 #include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
+#include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkSphere.h"
+#include "imstkVirtualCouplingCH.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 // global variables
-const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni1Name = "Default Device";
 
 using namespace imstk;
 
@@ -58,18 +56,14 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-#ifndef iMSTK_USE_OPENHAPTICS
-    std::cout << "LaparoscopicToolController example needs haptic device to be enabled at build time" << std::endl;
-    return 1;
-#else if
     // Scene
     imstkNew<Scene> scene("VirtualCoupling");
 
     // Create a plane in the scene
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(400);
-    planeGeom->setPosition(0.0, -50, 0.0);
-    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    auto            planeGeom = std::make_shared<Plane>();
+    imstkNew<Plane> plane(Vec3d(0.0, -50.0, 0.0));
+    planeGeom->setWidth(400.0);
+    imstkNew<CollidingObject> planeObj("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
@@ -77,19 +71,17 @@ main()
     // Create the virtual coupling object controller
 
     // Device Server
-    auto server = std::make_shared<HapticDeviceManager>();
-    auto client = server->makeDeviceClient(phantomOmni1Name);
+    imstkNew<HapticDeviceManager>       server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Create a virtual coupling object
-    auto visualGeom = std::make_shared<Sphere>();
-    visualGeom->setRadius(20);
-    auto collidingGeom = std::make_shared<Sphere>();
-    collidingGeom->setRadius(20);
-    auto obj = std::make_shared<CollidingObject>("VirtualCouplingObject");
+    imstkNew<Sphere>          visualGeom(Vec3d(0.0, 0.0, 0.0), 20.0);
+    imstkNew<Sphere>          collidingGeom(Vec3d(0.0, 0.0, 0.0), 20.0);
+    imstkNew<CollidingObject> obj("VirtualCouplingObject");
     obj->setCollidingGeometry(collidingGeom);
 
-    auto material    = std::make_shared<RenderMaterial>();
-    auto visualModel = std::make_shared<VisualModel>(visualGeom);
+    imstkNew<RenderMaterial> material;
+    imstkNew<VisualModel>    visualModel(visualGeom.get());
     visualModel->setRenderMaterial(material);
     obj->addVisualModel(visualModel);
 
@@ -97,34 +89,33 @@ main()
     scene->addSceneObject(obj);
 
     // Create and add virtual coupling object controller in the scene
-    auto objController = std::make_shared<SceneObjectController>(obj, client);
-    scene->addController(objController);
+    imstkNew<SceneObjectController> controller(obj, client);
+    scene->addController(controller);
 
     {
         // Setup CD, and collision data
-        auto colData = std::make_shared<CollisionData>();
+        imstkNew<CollisionData> colData;
 
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(CollisionDetection::Type::UnidirectionalPlaneToSphere,
             planeObj->getCollidingGeometry(), obj->getCollidingGeometry(), colData);
 
         // Setup the handler
-        auto colHandler = std::make_shared<VirtualCouplingCH>(CollisionHandling::Side::B, colData, obj);
+        imstkNew<VirtualCouplingCH> colHandler(CollisionHandling::Side::B, colData, obj);
         colHandler->setStiffness(5e-01);
         colHandler->setDamping(0.005);
 
-        auto pair = std::make_shared<CollisionPair>(planeObj, obj, colDetect, nullptr, colHandler);
+        imstkNew<CollisionPair> pair(planeObj, obj, colDetect, nullptr, colHandler);
         scene->getCollisionGraph()->addInteraction(pair);
     }
 
     // Camera
-    auto cam = scene->getActiveCamera();
-    cam->setPosition(Vec3d(200, 200, 200));
-    cam->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(200, 200, 200));
+    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 0));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
     //Run the simulation
@@ -158,5 +149,4 @@ main()
     }
 
     return 0;
-#endif
 }
