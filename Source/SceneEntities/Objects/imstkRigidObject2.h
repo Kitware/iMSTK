@@ -57,7 +57,7 @@ public:
     ///
     //void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true);
 
-    std::shared_ptr<RigidBodyModel2> getRigidBodyModel2() const { return m_rigidBodyModel2; }
+    std::shared_ptr<RigidBodyModel2> getRigidBodyModel2();
 
     ///
     /// \brief Returns body in the model

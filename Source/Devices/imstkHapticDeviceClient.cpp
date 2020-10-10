@@ -20,11 +20,10 @@
 =========================================================================*/
 
 #include "imstkHapticDeviceClient.h"
-
-#include <HDU/hduVector.h>
-#include <HDU/hduError.h>
-
 #include "imstkLogger.h"
+
+#include <HDU/hduError.h>
+#include <HDU/hduVector.h>
 
 namespace imstk
 {
@@ -70,9 +69,14 @@ HapticDeviceClient::disable()
 HDCallbackCode HDCALLBACK
 HapticDeviceClient::hapticCallback(void* pData)
 {
-    auto client = reinterpret_cast<HapticDeviceClient*>(pData);
-    auto handle = client->m_handle;
-    auto state  = client->m_state;
+    auto    client = static_cast<HapticDeviceClient*>(pData);
+    HHD     handle = client->m_handle;
+    HDstate state  = client->m_state;
+
+    if (handle == HD_BAD_HANDLE || handle == HD_INVALID_HANDLE)
+    {
+        return HD_CALLBACK_DONE;
+    }
 
     hdBeginFrame(handle);
 
@@ -92,6 +96,8 @@ HapticDeviceClient::hapticCallback(void* pData)
     client->m_buttons[1]  = state.buttons & HD_DEVICE_BUTTON_2;
     client->m_buttons[2]  = state.buttons & HD_DEVICE_BUTTON_3;
     client->m_buttons[3]  = state.buttons & HD_DEVICE_BUTTON_4;
+
+    client->m_trackingEnabled = true;
 
     return HD_CALLBACK_DONE;
 }

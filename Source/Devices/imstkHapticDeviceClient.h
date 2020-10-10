@@ -51,9 +51,9 @@ public:
 
 protected:
     ///
-    /// \brief Constructor/Destructor
+    /// \brief Constructor/Destructor, only the DeviceManager can construct
     ///
-    explicit HapticDeviceClient(const std::string& name) : DeviceClient(name, "localhost") {}
+    HapticDeviceClient(const std::string& name) : DeviceClient(name, "localhost"), m_handle(HD_INVALID_HANDLE) { }
 
     ///
     /// \brief Initialize the phantom omni device

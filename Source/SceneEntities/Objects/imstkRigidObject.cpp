@@ -46,4 +46,11 @@ RigidObject::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
 {
     m_rigidBodyModel->addForce(force, pos, wakeup);
 }
+
+std::shared_ptr<RigidBodyModel>
+RigidObject::getRigidBodyModel()
+{
+    m_rigidBodyModel = std::dynamic_pointer_cast<RigidBodyModel>(m_dynamicalModel);
+    return m_rigidBodyModel;
+}
 } // imstk

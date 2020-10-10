@@ -48,6 +48,13 @@ RigidObject2::initialize()
     return true;
 }
 
+std::shared_ptr<RigidBodyModel2>
+RigidObject2::getRigidBodyModel2()
+{
+    m_rigidBodyModel2 = std::dynamic_pointer_cast<RigidBodyModel2>(m_dynamicalModel);
+    return m_rigidBodyModel2;
+}
+
 void
 RigidObject2::setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaModel)
 {

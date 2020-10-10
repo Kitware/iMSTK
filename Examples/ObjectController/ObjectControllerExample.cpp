@@ -19,25 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkNew.h"
-#include "imstkLogger.h"
-#include "imstkSceneManager.h"
-#include "imstkVTKViewer.h"
-#include "imstkMouseSceneControl.h"
-#include "imstkKeyboardSceneControl.h"
-
-#include "imstkCube.h"
 #include "imstkCamera.h"
-#include "imstkLight.h"
 #include "imstkCollidingObject.h"
+#include "imstkCube.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkSceneObjectController.h"
-#include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkVTKViewer.h"
 
 // global variables
-const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni1Name = "Default Device";
 
 using namespace imstk;
 
@@ -48,8 +46,6 @@ using namespace imstk;
 int
 main()
 {
-#ifdef iMSTK_USE_OPENHAPTICS
-
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
@@ -57,32 +53,29 @@ main()
     imstkNew<Scene> scene("ObjectController");
 
     // Device Server
-    auto server = std::make_shared<HapticDeviceManager>();
-    auto client = server->makeDeviceClient(phantomOmni1Name);
+    imstkNew<HapticDeviceManager>       server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Object
-    auto geom = std::make_shared<Cube>();
-    geom->setPosition(0, 1, 0);
-    geom->setWidth(2);
-
-    auto object = std::make_shared<CollidingObject>("VirtualObject");
+    imstkNew<Cube>            geom(Vec3d(0.0, 1.0, 0.0), 2.0);
+    imstkNew<CollidingObject> object("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
 
-    auto controller = std::make_shared<SceneObjectController>(object, client);
+    imstkNew<SceneObjectController> controller(object, client);
     controller->setTranslationScaling(0.1);
     scene->addController(controller);
 
     // Update Camera position
-    auto cam = scene->getActiveCamera();
-    cam->setPosition(Vec3d(0, 0, 10));
+    std::shared_ptr<Camera> cam = scene->getActiveCamera();
+    cam->setPosition(Vec3d(0.0, 0.0, 10.0));
     cam->setFocalPoint(geom->getPosition());
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
     //Run the simulation
@@ -110,9 +103,8 @@ main()
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
+        // Start the viewer and its children
         viewer->start();
     }
-#endif
     return 0;
 }

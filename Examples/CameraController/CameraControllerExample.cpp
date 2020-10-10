@@ -19,29 +19,24 @@
 
 =========================================================================*/
 
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
 #include "imstkCamera.h"
-#include "imstkMeshIO.h"
-#include "imstkScene.h"
-#include "imstkNew.h"
-#include "imstkLogger.h"
-#include "imstkSceneManager.h"
-#include "imstkVTKViewer.h"
-#include "imstkMouseSceneControl.h"
-#include "imstkKeyboardSceneControl.h"
-
-#include "imstkSurfaceMesh.h"
-
-// Devices and controllers
+#include "imstkCameraController.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkCameraController.h"
-#include "imstkCollisionGraph.h"
-
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
+#include "imstkPlane.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVTKViewer.h"
 
-const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni1Name = "Default Device";
 
 using namespace imstk;
 
@@ -55,50 +50,37 @@ main()
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
-    #ifndef iMSTK_USE_OPENHAPTICS
-    std::cout << "Audio not enabled at build time" << std::endl;
-    return 1;
-    #endif
-
     // Create Scene
     imstkNew<Scene> scene("CameraController");
 
-#ifdef iMSTK_USE_OPENHAPTICS
-
     // Device Server
-    auto server = std::make_shared<HapticDeviceManager>();
-    auto client = server->makeDeviceClient(phantomOmni1Name);
-
-#else
-    LOG(WARNING) << "Phantom device option not enabled during build!";
-#endif
+    imstkNew<HapticDeviceManager>       server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Load Mesh
-    auto mesh       = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-    auto meshObject = std::make_shared<VisualObject>("meshObject");
+    auto                   mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    imstkNew<VisualObject> meshObject("meshObject");
     meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);
 
+    imstkNew<VisualObject> planeObject("Plane");
+    imstkNew<Plane>        plane(Vec3d(0.0, -2.0, 0.0));
+    plane->setWidth(1000.0);
+    planeObject->setVisualGeometry(plane);
+    scene->addSceneObject(planeObject);
+
     // Update Camera position
-    auto camera = scene->getActiveCamera();
-    camera->setPosition(Vec3d(0, 0, 10));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 0.0, 10.0));
 
-#ifdef iMSTK_USE_OPENHAPTICS
-
-    auto camController = std::make_shared<CameraController>(camera, client);
-
+    imstkNew<CameraController> camController(scene->getActiveCamera(), client);
     //camController->setTranslationScaling(100);
     //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
-    camController->setInversionFlags(CameraController::InvertFlag::rotY |
-                                     CameraController::InvertFlag::rotZ);
-
     scene->addController(camController);
-#endif
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
     //Run the simulation
@@ -111,7 +93,6 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
         viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-
         viewer->addChildThread(server);
 
         // attach the camera controller to the viewer
@@ -129,7 +110,7 @@ main()
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
+        // Start viewer and its children
         viewer->start();
     }
 

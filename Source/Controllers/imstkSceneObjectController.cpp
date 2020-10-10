@@ -46,6 +46,16 @@ SceneObjectController::updateControlledObjects()
         }
     }
 
+    if (m_sceneObject == nullptr)
+    {
+        return;
+    }
+
+    if (!m_deviceClient->getTrackingEnabled())
+    {
+        return;
+    }
+
     this->postEvent(Event(EventType::Modified));
 
     // Update geometry
