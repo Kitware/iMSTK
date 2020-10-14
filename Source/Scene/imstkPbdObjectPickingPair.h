@@ -21,35 +21,32 @@ limitations under the License.
 
 #pragma once
 
+#include "imstkCollisionPair.h"
 #include "imstkCollisionDetection.h"
 
 namespace imstk
 {
-class CollidingObject;
-class ObjectInteractionPair;
+class PbdObject;
+class PbdSolver;
 
-// Predefined standard/types of interaction from imstk
-enum class InteractionType
+///
+/// \class PbdObjectCollisionPair
+///
+/// \brief This class defines a collision interaction between two PbdObjects
+///
+class PbdObjectPickingPair : public CollisionPair
 {
-    PbdObjToPbdObjCollision,
-    PbdObjToCollidingObjPicking,
+public:
+    PbdObjectPickingPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
+                         CollisionDetection::Type cdType = CollisionDetection::Type::PointSetToSphere);
 
-    PbdObjToCollidingObjCollision,
-    SphObjToCollidingObjCollision,
-    SphObjToCollidingObjSDFCollision,
-    FemObjToCollidingObjCollision,
-    //RigidObjToCollidingObjCollision,
+    virtual ~PbdObjectPickingPair() override = default;
 
-    //RigidObjToRigidObjCollision,
+    void apply() override;
 
-    FemObjToCollidingObjPenaltyForce,
-    FemObjToCollidingObjNodalPicking,
-    CollidingObjToCollidingObjBoneDrilling
+private:
+    // Pbd defines two interactions (one at CD and one at solver)
+    Inputs  m_solveNodeInputs;
+    Outputs m_solveNodeOutputs;
 };
-
-///
-/// \brief Factory for InteractionPairs, returns nullptr and logs warning if failed
-///
-std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                                                 InteractionType intType, CollisionDetection::Type cdType);
 }

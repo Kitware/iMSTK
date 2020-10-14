@@ -41,6 +41,7 @@ namespace imstk
 PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics),
     m_mass(std::make_shared<StdVectorOfReal>()),
     m_invMass(std::make_shared<StdVectorOfReal>()),
+    m_fixedNodeInvMass(std::make_shared<std::map<size_t, double>>()),
     m_constraints(std::make_shared<PBDConstraintVector>()),
     m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_parameters(std::make_shared<PBDModelConfig>())
@@ -663,10 +664,24 @@ PbdModel::setParticleMass(const double val, const size_t idx)
 void
 PbdModel::setFixedPoint(const size_t idx)
 {
-    StdVectorOfReal& invMasses = *m_invMass;
+    StdVectorOfReal&          invMasses = *m_invMass;
+    std::map<size_t, double>& fixedNodeInvMass = *m_fixedNodeInvMass;
     if (idx < m_mesh->getNumVertices())
     {
+        fixedNodeInvMass[idx] = invMasses[idx];
         invMasses[idx] = 0.0;
+    }
+}
+
+void
+PbdModel::setPointUnfixed(const size_t idx)
+{
+    StdVectorOfReal&          invMasses = *m_invMass;
+    std::map<size_t, double>& fixedNodeInvMass = *m_fixedNodeInvMass;
+    if (fixedNodeInvMass.find(idx) != fixedNodeInvMass.end())
+    {
+        invMasses[idx] = fixedNodeInvMass[idx];
+        fixedNodeInvMass.erase(idx);
     }
 }
 

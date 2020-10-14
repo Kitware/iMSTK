@@ -26,6 +26,8 @@ limitations under the License.
 #include "imstkFeDeformableObject.h"
 #include "imstkPbdObject.h"
 #include "imstkPbdObjectCollisionPair.h"
+#include "imstkPbdObjectPickingPair.h"
+#include "imstkPBDPickingCH.h"
 #include "imstkPenaltyCH.h"
 #include "imstkPickingCH.h"
 #include "imstkImplicitGeometryToPointSetCD.h"
@@ -50,6 +52,10 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
     if (intType == InteractionType::PbdObjToPbdObjCollision && isType<PbdObject>(obj1) && isType<PbdObject>(obj2))
     {
         results = std::make_shared<PbdObjectCollisionPair>(std::dynamic_pointer_cast<PbdObject>(obj1), std::dynamic_pointer_cast<PbdObject>(obj2), cdType);
+    }
+    else if (intType == InteractionType::PbdObjToCollidingObjPicking && isType<PbdObject>(obj1))
+    {
+        results = std::make_shared<PbdObjectPickingPair>(std::dynamic_pointer_cast<PbdObject>(obj1), std::dynamic_pointer_cast<CollidingObject>(obj2), cdType);
     }
     //else if (intType == InteractionType::PbdObjToCollidingObjCollision && isType<PbdObject>(obj1))
     //{
