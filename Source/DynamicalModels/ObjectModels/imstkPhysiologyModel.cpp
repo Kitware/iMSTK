@@ -21,20 +21,23 @@ limitations under the License.
 
 #include "imstkPhysiologyModel.h"
 #include "imstkLogger.h"
-//#include "imstkParallelUtils.h"
 #include "imstkTaskGraph.h"
 
-/////////////////////////////////////////////////////////////////////////
-// These includes are for Pulse
+// Pulse 
 #include "PulsePhysiologyEngine.h"
+#include "CommonDataModel.h"
 #include "engine/SEEngineTracker.h"
 #include "engine/SEDataRequest.h"
-#include "properties/SEScalarTime.h"
-#include "CommonDataModel.h"
 #include "engine/SEDataRequestManager.h"
+#include "engine/SEAction.h"
+#include "utils/DataTrack.h"
+#include "patient/actions/SEHemorrhage.h"
+#include "properties/SEScalarVolumePerTime.h"
+#include "compartment/SECompartmentManager.h"
+
+#include "properties/SEScalarTime.h"
 #include "engine/SEEngineTracker.h"
 #include "compartment/SECompartmentManager.h"
-#include "patient/actions/SEHemorrhage.h"
 #include "patient/actions/SESubstanceCompoundInfusion.h"
 #include "system/physiology/SEBloodChemistrySystem.h"
 #include "system/physiology/SECardiovascularSystem.h"
@@ -53,26 +56,13 @@ limitations under the License.
 #include "properties/SEScalarVolumePerTime.h"
 #include "properties/SEScalarVolumePerTimeArea.h"
 #include "compartment/fluid/SELiquidCompartmentGraph.h"
-#include "utils/DataTrack.h"
-
-
 
 namespace imstk
 {
-// empty for now, but we can populate config params if needed
-PhysiologyModelConfig::PhysiologyModelConfig()
-{
-    initialize();
-}
 
-// empty for now, but we can populate config params if needed
-void
-PhysiologyModelConfig::initialize()
-{}
-
-PhysiologyModel::PhysiologyModel()
+PhysiologyModel::PhysiologyModel() : AbstractDynamicalModel(DynamicalModelType::Physiology)
 {
-    m_solveNode = m_taskGraph->addFunction("PhysiologyModel_Solve", std::bind(&PhysiologyModel::solvePulse, this));
+    m_solveNode = m_taskGraph->addFunction("PhysiologyModel_Solve", std::bind(&PhysiologyModel::solve, this));
 }
 
 bool
@@ -80,80 +70,116 @@ PhysiologyModel::initialize()
 {
     // Create the engine and load the patient
     m_pulseObj = CreatePulseEngine();
-    m_pulseObj->GetLogger()->LogToConsole(false);
+    m_pulseObj->GetLogger()->LogToConsole(m_config->m_enableLogging);
 
-    CHECK(m_pulseObj->SerializeFromFile(iMSTK_DATA_ROOT "/states/StandardMale@0s.json")) << "Could not load Pulse state file.";
+    std::string patientFile;
+    switch (m_config->m_basePatient)
+    {
+    case patientPhysiology::StandardMale:
+            patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardMale.json";
+            break;
+    case patientPhysiology::StandardFemale:
+            patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardFemale.json";
+            break;
+    default:
+        LOG(WARNING) << "Could not find the patient. Initializing to StandardMale";
+        patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardMale.json";
+    }
 
-    setUpDataRequests();
+    CHECK(m_pulseObj->SerializeFromFile(patientFile)) << "Could not load Pulse state file.";
 
-    // Pulse hemorrhage action
-    // here, we can add any Pulse actions that we want
-    m_hemorrhageLeg = std::make_shared<SEHemorrhage>();
-    m_hemorrhageLeg->SetType(eHemorrhage_Type::External);
-    m_hemorrhageLeg->SetCompartment(pulse::VascularCompartment::RightLeg);//the location of the hemorrhage
+    // Submit data requests
+    for (auto dataPair : m_dataPairs)
+    {
+        m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest(dataPair.first, dataPair.second);
+    }
 
-    m_dT_s = 0.0;
-    m_totalTime = 0.0;
-    m_femoralFlowRate = 0;
-    m_hemorrhageRate = 0;
     return true;
 }
 
-void PhysiologyModel::setUpDataRequests()
+void 
+PhysiologyModel::addDataRequest(const std::string& property, SEDecimalFormat* dfault /*= nullptr*/)
 {
-    // Setup data requests
-    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("BloodVolume", VolumeUnit::mL);
-    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("DiastolicArterialPressure", PressureUnit::mmHg);
-    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("HeartRate", FrequencyUnit::Per_min);
-    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("MeanArterialPressure", PressureUnit::mmHg);
-    m_pulseObj->GetEngineTracker()->GetDataRequestManager().CreatePhysiologyDataRequest("SystolicArterialPressure", PressureUnit::mmHg);
-    m_pulseObj->GetEngineTracker()->GetDataRequestManager().SetResultsFilename("pulse_vitals.csv");
+    m_dataPairs.push_back(PhysiologyDataRequestPair(property, dfault));
 
-    m_aorta = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::Aorta);
-    m_femoralCompartment = m_pulseObj->GetCompartments().GetLiquidCompartment(pulse::VascularCompartment::LeftLeg);
+    
 }
 
-void PhysiologyModel::solvePulse()
+const SECompartment* 
+PhysiologyModel::getCompartment(const physiologyCompartmentType type, const std::string& compartmentName)
 {
-    // Hemorrhage Starts - instantiate a hemorrhage action and have the engine process it
-    m_hemorrhageLeg->GetRate().SetValue(m_hemorrhageRate, VolumePerTimeUnit::mL_Per_s);//the rate of hemorrhage
-    m_pulseObj->ProcessAction(*m_hemorrhageLeg);
-
-    m_pulseObj->AdvanceModelTime(m_dT_s, TimeUnit::s);
-
-    m_femoralFlowRate = m_femoralCompartment->GetInFlow(VolumePerTimeUnit::mL_Per_s);
-
-    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Aorta Pressure (mmHg)", m_aorta->GetPressure(PressureUnit::mmHg));
-    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Femoral Flow Rate (mL/s)", m_femoralCompartment->GetInFlow(VolumePerTimeUnit::mL_Per_s));
-    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Femoral Pressure (mmHg)", m_femoralCompartment->GetPressure(PressureUnit::mmHg));
-    m_pulseObj->GetEngineTracker()->GetDataTrack().Probe("Hemorrhage Rate (mL/s)", m_hemorrhageLeg->GetRate(VolumePerTimeUnit::mL_Per_s));
-
-    m_pulseObj->GetEngineTracker()->TrackData(m_totalTime);
-
-    // Check for hypovolumic shock
-    if (m_pulseObj->GetCardiovascularSystem()->GetBloodVolume(VolumeUnit::mL) <= (0.65 * 5517.734437810328))
+    switch (type)
     {
-        LOG(INFO) << "Patient in hypovolemic shock at time: " << m_totalTime;
+    case physiologyCompartmentType::Gas:
+        return (SECompartment*)m_pulseObj->GetCompartments().GetGasCompartment(compartmentName);
+        break;
+    case physiologyCompartmentType::Liquid:
+        return (SECompartment*)m_pulseObj->GetCompartments().GetLiquidCompartment(compartmentName);
+        break;
+    case physiologyCompartmentType::Thermal:
+        return (SECompartment*)m_pulseObj->GetCompartments().GetThermalCompartment(compartmentName);
+        break;
+    case physiologyCompartmentType::Tissue:
+        return (SECompartment*)m_pulseObj->GetCompartments().GetTissueCompartment(compartmentName);
+        break;
+    default:
+        LOG(WARNING) << "Could not find the compartment type";
+        return nullptr;
     }
-
-    // Check for cardiogenic shock
-    if (m_pulseObj->GetCardiovascularSystem()->GetCardiacIndex(VolumePerTimeAreaUnit::L_Per_min_m2) < 2.2 &&
-        m_pulseObj->GetCardiovascularSystem()->GetSystolicArterialPressure(PressureUnit::mmHg) < 90.0 &&
-        m_pulseObj->GetCardiovascularSystem()->GetPulmonaryCapillariesWedgePressure(PressureUnit::mmHg) > 15.0)
-    {
-        LOG(INFO) << "Patient in cardiogenic shock at time: " << m_totalTime;
-
-        /// \event Patient: Cardiogenic Shock: Cardiac Index has fallen below 2.2 L/min-m^2, Systolic Arterial Pressure is below 90 mmHg, and Pulmonary Capillary Wedge Pressure is above 15.0.
-        /// \cite dhakam2008review
-    }
-    m_totalTime += m_dT_s;
 }
 
-void PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
+void 
+PhysiologyModel::solve()
+{
+    // Process all actions that are currently stored
+    for (auto action : m_actions)
+    {
+        m_pulseObj->ProcessAction(*action->getAction().get());
+    }
+
+    // Advance physiology model in time
+    m_pulseObj->AdvanceModelTime(m_config->m_timeStep, TimeUnit::s);
+
+    m_currentTime += m_config->m_timeStep;
+}
+
+void 
+PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
 
-}// end namespace imstk
+void 
+Hemorrhage::setRate(double val /*in milliLiters/sec*/)
+{
+    m_hemorrhage->GetRate().SetValue(val, VolumePerTimeUnit::mL_Per_s);
+}
+
+void 
+Hemorrhage::setType(const Type t)
+{
+    (t == Type::External) ? m_hemorrhage->SetType(eHemorrhage_Type::External) :
+        m_hemorrhage->SetType(eHemorrhage_Type::External);
+}
+
+void 
+Hemorrhage::SetCompartment(const std::string& name)
+{
+    m_hemorrhage->SetCompartment(name);
+}
+
+double 
+Hemorrhage::getRate() const
+{
+    return m_hemorrhage->GetRate().GetValue(VolumePerTimeUnit::mL_Per_s);
+}
+
+std::shared_ptr<SEPatientAction> 
+Hemorrhage::getAction()
+{
+    return std::dynamic_pointer_cast<SEPatientAction>(m_hemorrhage);
+}
+
+}// imstk

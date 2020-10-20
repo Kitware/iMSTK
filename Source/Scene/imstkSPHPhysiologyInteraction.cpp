@@ -27,10 +27,12 @@ limitations under the License.
 #include "imstkSPHObject.h"
 #include "imstkTaskGraph.h"
 
-
 namespace imstk
 {
-SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2) : ObjectInteractionPair(obj1, obj2)
+SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(
+    std::shared_ptr<SPHObject> obj1, 
+    std::shared_ptr<PhysiologyObject> obj2) : 
+    ObjectInteractionPair(obj1, obj2)
 {
     m_sphModel = obj1->getDynamicalSPHModel();
     m_physiologyModel = obj2->getPhysiologyModel();
@@ -50,22 +52,22 @@ SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(std::shar
 void SPHPhysiologyObjectInteractionPair::computeInteraction()
 {
     // check if the hemorrhage is being used in SPH
-    if (m_sphModel->getHemorrhageModel())
+    if (m_sphModel->getHemorrhageModel() && m_hemorrhageAction && m_compartment)
     {
         // compute the hemorrhage flow rate
-        const double hemorrhageFlowRate = m_sphModel->getHemorrhageModel()->getHemorrhageRate();
+        const double hemorrhageRate = m_sphModel->getHemorrhageModel()->getHemorrhageRate();
 
         // set the hemorrhage flow rate in Pulse
-        m_physiologyModel->setHemorrhageRate(hemorrhageFlowRate);
+        m_hemorrhageAction->setRate(hemorrhageRate);
 
         // compute the femoral flow rate from Pulse
-        const double femoralFlowRate = m_physiologyModel->getFemoralFlowRate();
+        const double flowRate = m_compartment->GetInFlow();// (VolumePerTimeUnit::mL_Per_s);
 
         // set the femoral flow rate as an SPH inlet boundary condition
-        m_sphModel->getBoundaryConditions()->setInletVelocity(femoralFlowRate);
+        m_sphModel->getBoundaryConditions()->setInletVelocity(flowRate);
 
         // set how much time to run Pulse for
-        m_physiologyModel->setPulseTimeStep(m_sphModel->getTimeStep());
+        m_physiologyModel->setTimeStep(m_sphModel->getTimeStep());
     }
 }
 

@@ -35,14 +35,15 @@
 #include "imstkTaskGraph.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkObjectInteractionFactory.h"
-
+#include "imstkSPHPhysiologyInteraction.h"
 #include "imstkPhysiologyModel.h"
 #include "imstkPhysiologyObject.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 
-#include "Fluid.hpp"
+//#include "PulsePhysiologyEngine.h"
 
+#include "Fluid.hpp"
 
 using namespace imstk;
 
@@ -108,18 +109,33 @@ main(int argc, char* argv[])
   // Create a physics model
   auto physiologyModel = std::make_shared<PhysiologyModel>();
   physiologyModel->configure(physiologyParams);
+
+  // Setup hemorrhage action
+  const std::string hemorrhagingCompartment = "";// pulse::VascularCompartment::RightLeg;
+  auto hemorrhageAction = std::make_shared<Hemorrhage>(Hemorrhage::Type::External, hemorrhagingCompartment);
+  physiologyModel->addAction(hemorrhageAction);
+
   auto physiologyObj = std::make_shared<PhysiologyObject>("Pulse");
   physiologyObj->setDynamicalModel(physiologyModel);
-
+  
   scene->addSceneObject(physiologyObj);
 
-  scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(fluidObj, physiologyObj,
-    InteractionType::SphObjToPhysObjCollision, CollisionDetection::Type::Custom));
+  auto interactionPair = makeObjectInteractionPair(fluidObj,
+                                                   physiologyObj, 
+                                                   InteractionType::SphObjToPhysiologyObjCoupling, 
+                                                   CollisionDetection::Type::Custom);
 
-  // configure camera
-  scene->getCamera()->setPosition(0, 1.0, 5.0);
-  if (SCENE_ID == 5) scene->getCamera()->setPosition(0, 1.0, 4.0);
+  auto physiologyIp = std::dynamic_pointer_cast<SPHPhysiologyObjectInteractionPair>(interactionPair);  
 
+  // configure the sph-physiology interaction pair
+  physiologyIp->setHemorrhageAction(hemorrhageAction);
+  physiologyIp->setCompartment(physiologyModel->getCompartment(physiologyCompartmentType::Liquid, hemorrhagingCompartment));
+
+  scene->getCollisionGraph()->addInteraction(interactionPair);
+
+  // configure camera  
+  (SCENE_ID == 5) ? scene->getCamera()->setPosition(0, 1.0, 4.0): scene->getCamera()->setPosition(0, 1.0, 5.0);
+    
   // configure light (white)
   auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
   whiteLight->setFocalPoint(Vec3d(5, -8, -5));

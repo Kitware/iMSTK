@@ -108,7 +108,7 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
 
         results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
     }
-    else if (intType == InteractionType::SphObjToPhysObjCollision && isType<SPHObject>(obj1) && isType<PhysiologyObject>(obj2))
+    else if (intType == InteractionType::SphObjToPhysiologyObjCoupling && isType<SPHObject>(obj1) && isType<PhysiologyObject>(obj2))
     {
       results = std::make_shared<SPHPhysiologyObjectInteractionPair>(std::dynamic_pointer_cast<SPHObject>(obj1), std::dynamic_pointer_cast<PhysiologyObject>(obj2));
     }

@@ -182,7 +182,7 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
-    void setInitialVelocities(const int numParticles, const Vec3d& initialVelocities);
+    void setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocities);
 
     Real particlePressure(const double density);
 

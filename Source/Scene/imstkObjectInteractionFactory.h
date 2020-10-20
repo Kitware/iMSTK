@@ -44,7 +44,7 @@ enum class InteractionType
     FemObjToCollidingObjBoneDrilling,
     FemObjToCollidingObjNodalPicking,
 
-    SphObjToPhysObjCollision
+    SphObjToPhysiologyObjCoupling
 };
 
 ///

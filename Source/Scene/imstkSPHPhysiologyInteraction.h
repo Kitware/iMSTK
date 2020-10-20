@@ -23,6 +23,7 @@ limitations under the License.
 
 #include "imstkCollisionPair.h"
 
+class SECompartment;
 
 namespace imstk
 {
@@ -30,6 +31,7 @@ namespace imstk
   class PhysiologyObject;
   class SPHModel;
   class PhysiologyModel;
+  class Hemorrhage;
 
   ///
   /// \class SPHPhysiologyObjectInteractionPair
@@ -48,11 +50,24 @@ namespace imstk
     ///
     void computeInteraction();
 
+    ///
+    /// \brief Set the Pulse hemorrhage action that should be connected to the SPH hemorrhage model
+    ///
+    void setHemorrhageAction(std::shared_ptr<Hemorrhage> h) { m_hemorrhageAction = h; };
+
+    ///
+    /// \brief Set the pulse compartment of the body where the hemorrhage is happening
+    ///
+    void setCompartment(const SECompartment* c) { m_compartment = c; };
+
   private:
     Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
     std::shared_ptr<SPHModel> m_sphModel = nullptr;
     std::shared_ptr<PhysiologyModel> m_physiologyModel = nullptr;
     std::shared_ptr<TaskNode> m_bcNode = nullptr;
+
+    std::shared_ptr<Hemorrhage> m_hemorrhageAction;
+    const SECompartment* m_compartment;
   };
 }

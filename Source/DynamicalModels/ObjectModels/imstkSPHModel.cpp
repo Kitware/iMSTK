@@ -721,7 +721,7 @@ namespace imstk
     return error > Real(0) ? error : Real(0);
   }
 
-  void SPHModel::setInitialVelocities(const int numParticles, const Vec3d& initialVelocity)
+  void SPHModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocity)
   {
       m_initialVelocities.reserve(numParticles);
       for (size_t p = 0; p < numParticles; p++)
