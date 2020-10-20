@@ -21,7 +21,7 @@ list(APPEND Dependencies
 list(APPEND ExclusionFiles "")
 
 # If using model reduction link to these libs
-if (${${PROJECT_NAME}_USE_MODEL_REDUCTION})
+if (iMSTK_USE_MODEL_REDUCTION)
   list(APPEND Dependencies
     VegaFEM::reducedStvk  
     VegaFEM::reducedElasticForceModel)

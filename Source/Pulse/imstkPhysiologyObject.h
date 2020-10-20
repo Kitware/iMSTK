@@ -25,21 +25,21 @@
 
 namespace imstk
 {
-  class PhysiologyModel;
+class PhysiologyModel;
 
-  ///
-  /// \class PhysiologyObject
-  ///
-  /// \brief Base class for Physiology objects
-  ///
-  class PhysiologyObject : public DynamicObject
-  {
-  public:
+///
+/// \class PhysiologyObject
+///
+/// \brief Base class for Physiology objects
+///
+class PhysiologyObject : public DynamicObject
+{
+public:
     explicit PhysiologyObject(const std::string& name);
 
     virtual ~PhysiologyObject() override = default;
 
-  public:
+public:
     ///
     /// \brief Initialize the Physiology scene object
     ///
@@ -47,7 +47,7 @@ namespace imstk
 
     std::shared_ptr<PhysiologyModel> getPhysiologyModel();
 
-  protected:
+protected:
     std::shared_ptr<PhysiologyModel> m_PhysiologyModel = nullptr;
-  };
+};
 } // end namespace imstk

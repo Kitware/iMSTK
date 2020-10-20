@@ -34,9 +34,6 @@ limitations under the License.
 #include "imstkSPHCollisionHandling.h"
 #include "imstkSPHObject.h"
 
-#include "imstkPhysiologyObject.h"
-#include "imstkSPHPhysiologyInteraction.h"
-
 namespace imstk
 {
 // Cast type check
@@ -107,10 +104,6 @@ makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr
             std::make_shared<BoneDrillingCH>(CollisionHandling::Side::A, colData, obj1, obj2);
 
         results = std::make_shared<CollisionPair>(obj1, obj2, colDetect, colHandler, nullptr);
-    }
-    else if (intType == InteractionType::SphObjToPhysiologyObjCoupling && isType<SPHObject>(obj1) && isType<PhysiologyObject>(obj2))
-    {
-      results = std::make_shared<SPHPhysiologyObjectInteractionPair>(std::dynamic_pointer_cast<SPHObject>(obj1), std::dynamic_pointer_cast<PhysiologyObject>(obj2));
     }
 
     if (results == nullptr)

@@ -23,7 +23,6 @@
 
 #include "imstkMath.h"
 
-
 namespace imstk
 {
 ///
@@ -36,16 +35,17 @@ public:
 
     enum class ParticleType
     {
-      fluid,
-      wall,
-      inlet,
-      outlet,
-      buffer
+        fluid,
+        wall,
+        inlet,
+        outlet,
+        buffer
     };
 
     SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
-      const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate, StdVectorOfVec3d& mainParticlePositions,
-      const StdVectorOfVec3d& wallParticlePositions);
+                          const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
+                          StdVectorOfVec3d& mainParticlePositions,
+                          const StdVectorOfVec3d& wallParticlePositions);
 
     bool isInInletDomain(const Vec3d& position);
 
@@ -84,7 +84,7 @@ private:
 
     Vec3d m_bufferCoord;
     Vec3d m_inletCenterPoint;
-    Real m_inletRadius;
+    Real  m_inletRadius;
     Vec3r m_inletVelocity;
     Vec3d m_inletNormal;
 
@@ -92,6 +92,5 @@ private:
 
     const size_t m_numBufferParticles = 10000;
     std::vector<size_t> m_bufferIndices;
-
 };
 } // end namespace imstk

@@ -399,6 +399,7 @@ add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
+add_subdirectory(Source/Pulse)
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories

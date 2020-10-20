@@ -22,27 +22,28 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionPair.h"
-
-class SECompartment;
+#include "imstkPhysiologyModel.h"
 
 namespace imstk
 {
-  class SPHObject;
-  class PhysiologyObject;
-  class SPHModel;
-  class PhysiologyModel;
-  class Hemorrhage;
+class SPHObject;
+class PhysiologyObject;
+class SPHModel;
+class HemorrhageAction;
 
-  ///
-  /// \class SPHPhysiologyObjectInteractionPair
-  ///
-  /// \brief This class defines an interaction between SPH and physiology (Pulse)
-  ///
-  class SPHPhysiologyObjectInteractionPair : public ObjectInteractionPair
-  {
-  public:
+///
+/// \class SPHPhysiologyObjectInteractionPair
+///
+/// \brief This class defines an interaction between SPH and physiology (Pulse)
+///
+class SPHPhysiologyObjectInteractionPair : public ObjectInteractionPair
+{
+public:
     SPHPhysiologyObjectInteractionPair(std::shared_ptr<SPHObject> obj1, std::shared_ptr<PhysiologyObject> obj2);
 
+    virtual ~SPHPhysiologyObjectInteractionPair() override = default;
+
+public:
     void apply() override;
 
     ///
@@ -53,21 +54,27 @@ namespace imstk
     ///
     /// \brief Set the Pulse hemorrhage action that should be connected to the SPH hemorrhage model
     ///
-    void setHemorrhageAction(std::shared_ptr<Hemorrhage> h) { m_hemorrhageAction = h; };
+    void setHemorrhageAction(std::shared_ptr<HemorrhageAction> hemorrhageAction) { m_hemorrhageAction = hemorrhageAction; }
 
     ///
     /// \brief Set the pulse compartment of the body where the hemorrhage is happening
     ///
-    void setCompartment(const SECompartment* c) { m_compartment = c; };
+    void setCompartment(const PhysiologyCompartmentType type, const std::string& compartmentName)
+    {
+        m_compartmentType = type;
+        m_compartmentName = compartmentName;
+    }
 
-  private:
+private:
     Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
     std::shared_ptr<SPHModel> m_sphModel = nullptr;
     std::shared_ptr<PhysiologyModel> m_physiologyModel = nullptr;
     std::shared_ptr<TaskNode> m_bcNode = nullptr;
 
-    std::shared_ptr<Hemorrhage> m_hemorrhageAction;
-    const SECompartment* m_compartment;
-  };
+    std::shared_ptr<HemorrhageAction> m_hemorrhageAction;
+
+    PhysiologyCompartmentType m_compartmentType;
+    std::string m_compartmentName;
+};
 }

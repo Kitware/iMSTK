@@ -21,6 +21,10 @@ if(iMSTK_USE_Vulkan)
   return()
 endif()
 
+if(NOT iMSTK_USE_Pulse)
+  return()
+endif()
+
 project(Example-Physiology-PipeFlow)
 
 #-----------------------------------------------------------------------------
@@ -36,4 +40,4 @@ SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES FOLDER Examples/Physiology)
 #-----------------------------------------------------------------------------
 # Link libraries to executable
 #-----------------------------------------------------------------------------
-target_link_libraries(${PROJECT_NAME} SimulationManager apiUtilities)
+target_link_libraries(${PROJECT_NAME} SimulationManager Pulse)

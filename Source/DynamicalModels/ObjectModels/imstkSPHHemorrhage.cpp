@@ -20,8 +20,6 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkSPHHemorrhage.h"
-#include <iostream>
-
 
 namespace imstk
 {
@@ -31,7 +29,8 @@ SPHHemorrhage::SPHHemorrhage(const Vec3d& center, const double radius, const dou
     m_normal = normal.normalized();
 }
 
-bool SPHHemorrhage::pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const Vec3d& newPosition)
+bool
+SPHHemorrhage::pointCrossedHemorrhagePlane(const Vec3d& oldPosition, const Vec3d& newPosition)
 {
     // todo - loop through points that are near hemorrhage plane instead of all points
     const double dist = m_normal.dot(newPosition - m_center);

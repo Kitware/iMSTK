@@ -22,9 +22,9 @@ limitations under the License.
 #pragma once
 
 #include "imstkColor.h"
+#include "imstkMath.h"
 
 #include <vector>
-#include <algorithm>
 
 namespace imstk
 {
@@ -37,38 +37,38 @@ namespace imstk
 class ColorFunction
 {
 public:
-	enum class ColorSpace
-	{
-		RGB,
-		DIVERING,
-		HSV,
-		LAB
-	};
+    enum class ColorSpace
+    {
+        RGB,
+        DIVERING,
+        HSV,
+        LAB
+    };
 
 public:
-	ColorFunction() = default;
-	virtual ~ColorFunction() = default;
+    ColorFunction() = default;
+    virtual ~ColorFunction() = default;
 
 public:
-	size_t getNumberOfColors() const { return m_table.size(); }
-	const Color& getColor(int i) const { return m_table[i]; }
-	const Vec2d& getRange() const { return m_range; }
-	const ColorSpace& getColorSpace() const { return m_colorSpace; }
+    size_t getNumberOfColors() const { return m_table.size(); }
+    const Color& getColor(int i) const { return m_table[i]; }
+    const Vec2d& getRange() const { return m_range; }
+    const ColorSpace& getColorSpace() const { return m_colorSpace; }
 
-	void setNumberOfColors(int numColors) { m_table.resize(numColors); }
-	void setColor(int i, const Color& color) { m_table[i] = color; }
-	void setRange(double min, double max) { setRange(Vec2d(min, max)); }
-	void setRange(const Vec2d& range) { this->m_range = range; }
-	void setColorSpace(const ColorSpace& space) { this->m_colorSpace = space; }
+    void setNumberOfColors(int numColors) { m_table.resize(numColors); }
+    void setColor(int i, const Color& color) { m_table[i] = color; }
+    void setRange(double min, double max) { setRange(Vec2d(min, max)); }
+    void setRange(const Vec2d& range) { this->m_range = range; }
+    void setColorSpace(const ColorSpace& space) { this->m_colorSpace = space; }
 
-	///
-	/// \brief Clears all colors from the lookup table
-	///
-	void clear() { m_table.clear(); }
+    ///
+    /// \brief Clears all colors from the lookup table
+    ///
+    void clear() { m_table.clear(); }
 
 protected:
-	std::vector<Color> m_table;
-	Vec2d m_range;
-	ColorSpace m_colorSpace;
+    std::vector<Color> m_table;
+    Vec2d      m_range;
+    ColorSpace m_colorSpace;
 };
 }

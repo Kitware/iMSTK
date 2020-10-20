@@ -19,19 +19,19 @@
 
 =========================================================================*/
 
-#include <g3log/g3log.hpp>
-
 #include "imstkPhysiologyObject.h"
+#include "imstkLogger.h"
 #include "imstkPhysiologyModel.h"
 
 namespace imstk
 {
-  PhysiologyObject::PhysiologyObject(const std::string& name) : DynamicObject(name)
+PhysiologyObject::PhysiologyObject(const std::string& name) : DynamicObject(name)
 {
     this->m_type = Type::Physiology;
 }
 
-std::shared_ptr<PhysiologyModel> PhysiologyObject::getPhysiologyModel()
+std::shared_ptr<PhysiologyModel>
+PhysiologyObject::getPhysiologyModel()
 {
     m_PhysiologyModel = std::dynamic_pointer_cast<PhysiologyModel>(m_dynamicalModel);
     return m_PhysiologyModel;

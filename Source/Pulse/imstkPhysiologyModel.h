@@ -27,99 +27,54 @@
 
 class PhysiologyEngine;
 class SELiquidCompartment;
-class SEHemorrhage;
 class SEDecimalFormat;
 class SEPatientAction;
 class VolumePerTimeUnit;
 class SECompartment;
 
-
 namespace imstk
 {
-    using PhysiologyDataRequestPair = std::pair<std::string, SEDecimalFormat*>;
+using PhysiologyDataRequestPair = std::pair<std::string, SEDecimalFormat*>;
 
-    enum class patientPhysiology
-    {
-        StandardMale=0,
-        StandardFemale
-    };
+enum class PatientPhysiology
+{
+    StandardMale=0,
+    StandardFemale
+};
 
-    enum class physiologyCompartmentType
-    {
-        Gas = 0,
-        Liquid,
-        Thermal,
-        Tissue
-    };
+enum class PhysiologyCompartmentType
+{
+    Gas = 0,
+    Liquid,
+    Thermal,
+    Tissue
+};
 
-  class PhysiologyAction
-  {
-  public:
-      virtual std::shared_ptr<SEPatientAction> getAction()=0;
-  };
+class PhysiologyAction
+{
+public:
+    virtual std::shared_ptr<SEPatientAction> getAction() = 0;
+};
 
-  class Hemorrhage :  public PhysiologyAction
-  {
-  public:
-      enum class Type{ External = 0, Internal };
+///
+/// \struct PhysiologyModelConfig
+/// \brief Contains physiology model settings
+///
+struct PhysiologyModelConfig
+{
+    PatientPhysiology m_basePatient = PatientPhysiology::StandardMale;
 
-      Hemorrhage(const Type t, const std::string& name) 
-      {
-          this->setType(t);
-          this->SetCompartment(name);
-      }
+    double m_timeStep    = 0.02;  ///< Pulse time step
+    bool m_enableLogging = false; ///< Enable Pulse engine logging
+};
 
-      ///
-      /// \brief Set the rate of hemorrhage
-      ///
-      void setRate(double val /*in milliLiters/sec*/);
-
-      ///
-      /// \brief Set the rate of hemorrhage
-      ///
-      void setType(const Type t);
-
-      ///
-      /// \brief Set the vascular compartment for hemorrhage
-      /// The string is expected to be pulse::VascularCompartment::<name_of_compartment>
-      /// (Refer: PulsePhysiologyEngine.h)
-      ///
-      void SetCompartment(const std::string& name);
-
-      ///
-      /// \brief Get the rate of hemorrhage in milliLiters/sec
-      ///
-      double getRate() const;
-
-      ///
-      /// \brief 
-      ///
-      std::shared_ptr<SEPatientAction> getAction();
-
-  protected:
-      std::shared_ptr<SEHemorrhage> m_hemorrhage;
-  };
-
-  
-  ///
-  /// \struct PhysiologyModelConfig
-  /// \brief Contains physiology model settings
-  ///
-  struct PhysiologyModelConfig
-  {
-      patientPhysiology m_basePatient = patientPhysiology::StandardMale;
-
-      double m_timeStep = 0.02;     ///< Pulse time step
-      bool m_enableLogging = false; ///< Enable Pulse engine logging
-  };
-
-  ///
-  /// \class PhysiologyModel
-  /// \brief Human physiology dynamical model
-  ///
-  class PhysiologyModel : public AbstractDynamicalModel
-  {
-  public:
+///
+/// \class PhysiologyModel
+/// \brief Human physiology dynamical model
+///
+class PhysiologyModel : public AbstractDynamicalModel
+{
+public:
     ///
     /// \brief Constructor
     ///
@@ -179,7 +134,9 @@ namespace imstk
     ///
     /// \brief Add a new action
     ///
-    void addAction(std::shared_ptr<PhysiologyAction> action) { m_actions.push_back(action); };
+    void addAction(std::string name, std::shared_ptr<PhysiologyAction> action) { m_actions[name] = action; };
+
+    std::shared_ptr<PhysiologyAction> getAction(std::string name) const { return (m_actions.count(name) == 0) ? nullptr : m_actions.at(name); }
 
     ///
     /// \brief Clear all actions
@@ -194,9 +151,9 @@ namespace imstk
     ///
     /// \brief Get the physiology compartment model of the body
     ///
-    const SECompartment* getCompartment(const physiologyCompartmentType type, const std::string& compartmentName);
+    const SECompartment* getCompartment(const PhysiologyCompartmentType type, const std::string& compartmentName) const;
 
-  protected:
+protected:
     ///
     /// \brief Setup physiology compute graph connectivity
     ///
@@ -209,20 +166,19 @@ namespace imstk
 
     std::shared_ptr<TaskNode> m_solveNode = nullptr;
 
-    std::vector<std::shared_ptr<PhysiologyAction>> m_actions; ///< container for all the actions
-    std::vector<PhysiologyDataRequestPair> m_dataPairs; ///< container for data requests
+    std::unordered_map<std::string, std::shared_ptr<PhysiologyAction>> m_actions; ///< container for all the actions
+    std::vector<PhysiologyDataRequestPair> m_dataPairs;       ///< container for data requests
 
-  private:
-      // main pulse object
-      std::unique_ptr<PhysiologyEngine> m_pulseObj = nullptr;
+private:
+    // main pulse object
+    std::unique_ptr<PhysiologyEngine> m_pulseObj = nullptr;
 
-      double m_currentTime = 0.;    ///< Current total time (incremented every solve)
+    double m_currentTime = 0.;    ///< Current total time (incremented every solve)
 
-      std::string m_dataWriteOutFile = "pulseVitals.csv";
+    std::string m_dataWriteOutFile = "pulseVitals.csv";
 
-      // Physiology Model parameters (must be set before simulation)
-      // empty for now but can be set if  needed
-      std::shared_ptr<PhysiologyModelConfig> m_config;
-      
-  };
+    // Physiology Model parameters (must be set before simulation)
+    // empty for now but can be set if  needed
+    std::shared_ptr<PhysiologyModelConfig> m_config;
+};
 } // end namespace imstk

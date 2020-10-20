@@ -29,7 +29,6 @@
 #include "imstkSPHHemorrhage.h"
 #include "imstkTetrahedralMesh.h"
 
-
 namespace imstk
 {
 class ComputeNode;
@@ -62,8 +61,8 @@ public:
     Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(1.0);         ///> scale particle mass to a smaller value to maintain stability
-    Real m_eta               = Real(0.5);          ///> proportion of position change due to neighbors velocity (XSPH method)
+    Real m_particleMassScale = Real(1.0);          ///> scale particle mass to a smaller value to maintain stability
+    Real m_eta = Real(0.5);                        ///> proportion of position change due to neighbors velocity (XSPH method)
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -75,7 +74,7 @@ public:
     Real m_dynamicViscosityCoeff   = Real(1e-2);
     Real m_viscosityBoundary       = Real(1e-5);
     Real m_surfaceTensionStiffness = Real(1);
-    Real m_frictionBoundary        = Real(0.1);
+    Real m_frictionBoundary = Real(0.1);
 
     // kernel properties
     Real m_kernelOverParticleRadiusRatio = Real(4.0);
@@ -298,15 +297,14 @@ protected:
     std::shared_ptr<TaskNode> m_computePressureAccelNode  = nullptr;
     std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
-    std::shared_ptr<TaskNode> m_sumAccelsNode = nullptr;
-    std::shared_ptr<TaskNode> m_integrateNode = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNode = nullptr;
+    std::shared_ptr<TaskNode> m_sumAccelsNode        = nullptr;
+    std::shared_ptr<TaskNode> m_integrateNode        = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode   = nullptr;
     std::shared_ptr<TaskNode> m_computeViscosityNode = nullptr;
-    std::shared_ptr<TaskNode> m_moveParticlesNode = nullptr;
+    std::shared_ptr<TaskNode> m_moveParticlesNode    = nullptr;
 
-    std::shared_ptr<TaskNode> m_normalizeDensityNode = nullptr;
+    std::shared_ptr<TaskNode> m_normalizeDensityNode       = nullptr;
     std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;
-
 
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
@@ -321,21 +319,21 @@ private:
 
     std::shared_ptr<StdVectorOfVec3d> m_pressureAccels       = nullptr;
     std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_viscousAccels        = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_neighborVelContr     = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_particleShift        = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_viscousAccels    = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_neighborVelContr = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_particleShift    = nullptr;
 
     StdVectorOfVec3d m_initialVelocities;
-    StdVectorOfReal m_initialDensities;
+    StdVectorOfReal  m_initialDensities;
 
-    double m_totalTime = 0;
-    int m_timeStepCount = 0;
+    double m_totalTime           = 0;
+    int    m_timeStepCount       = 0;
     double m_writeToOutputModulo = 0;
-    double m_vtkPreviousTime = 0;
-    double m_vtkTimeModulo = 0;
-    double m_csvPreviousTime = 0;
-    double m_csvTimeModulo = 0;
-    Vec3d m_prevAvgVelThroughHemorrhage = Vec3d(0, 0, 0);
+    double m_vtkPreviousTime     = 0;
+    double m_vtkTimeModulo       = 0;
+    double m_csvPreviousTime     = 0;
+    double m_csvTimeModulo       = 0;
+    Vec3d  m_prevAvgVelThroughHemorrhage = Vec3d(0, 0, 0);
 
     std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
 
@@ -344,7 +342,5 @@ private:
     std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
 
     std::vector<size_t> m_minIndices;
-
-
 };
 } // end namespace imstk

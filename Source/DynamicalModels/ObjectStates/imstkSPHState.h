@@ -77,14 +77,11 @@ public:
     ///
     void setState(const std::shared_ptr<SPHKinematicState>& rhs);
 
-
 private:
-    StdVectorOfVec3r m_Positions;   ///> Particle positions
-    StdVectorOfVec3r m_FullStepVelocities;  ///> Particle velocities
-    StdVectorOfVec3r m_HalfStepVelocities;  ///> Particle velocities
-    StdVectorOfVec3r m_Velocities;  ///> Particle velocities
-
-
+    StdVectorOfVec3r m_Positions;          ///> Particle positions
+    StdVectorOfVec3r m_FullStepVelocities; ///> Particle velocities
+    StdVectorOfVec3r m_HalfStepVelocities; ///> Particle velocities
+    StdVectorOfVec3r m_Velocities;         ///> Particle velocities
 };
 
 ///
@@ -238,6 +235,5 @@ private:
     std::vector<std::vector<size_t>>       m_NeighborLists;   ///>  store a list of neighbors for each particle, updated each time step
     std::vector<std::vector<size_t>>       m_BDNeighborLists; ///>  store a list of boundary particle neighbors for each particle, updated each time step
     std::vector<std::vector<NeighborInfo>> m_NeighborInfo;    ///>  store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
-
 };
 } // end namespace imstk

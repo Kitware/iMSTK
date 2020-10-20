@@ -32,8 +32,8 @@ SPHObject::SPHObject(const std::string& name) : DynamicObject(name)
 std::shared_ptr<SPHModel>
 SPHObject::getDynamicalSPHModel()
 {
-  m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
-  return m_SPHModel;
+    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
+    return m_SPHModel;
 }
 
 bool

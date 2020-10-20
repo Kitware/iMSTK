@@ -18,20 +18,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 =========================================================================*/
-#include <iostream>
 
 #include "imstkSPHPhysiologyInteraction.h"
-#include "imstkPhysiologyModel.h"
+#include "imstkHemorrhageAction.h"
 #include "imstkPhysiologyObject.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkTaskGraph.h"
 
+// Pulse
+#include <PulsePhysiologyEngine.h>
+#include <compartment/fluid/SELiquidCompartmentGraph.h>
+
 namespace imstk
 {
 SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(
-    std::shared_ptr<SPHObject> obj1, 
-    std::shared_ptr<PhysiologyObject> obj2) : 
+    std::shared_ptr<SPHObject>        obj1,
+    std::shared_ptr<PhysiologyObject> obj2) :
     ObjectInteractionPair(obj1, obj2)
 {
     m_sphModel = obj1->getDynamicalSPHModel();
@@ -49,10 +52,14 @@ SPHPhysiologyObjectInteractionPair::SPHPhysiologyObjectInteractionPair(
     m_solveNodeOutputs.second.push_back(m_physiologyModel->getSolveNode());
 }
 
-void SPHPhysiologyObjectInteractionPair::computeInteraction()
+void
+SPHPhysiologyObjectInteractionPair::computeInteraction()
 {
+    std::shared_ptr<SPHHemorrhage> hemorrhageModel = m_sphModel->getHemorrhageModel();
+    const SELiquidCompartment* compartment = (SELiquidCompartment*)m_physiologyModel->getCompartment(m_compartmentType, m_compartmentName);
+
     // check if the hemorrhage is being used in SPH
-    if (m_sphModel->getHemorrhageModel() && m_hemorrhageAction && m_compartment)
+    if (hemorrhageModel != nullptr && m_hemorrhageAction != nullptr && compartment != nullptr)
     {
         // compute the hemorrhage flow rate
         const double hemorrhageRate = m_sphModel->getHemorrhageModel()->getHemorrhageRate();
@@ -61,7 +68,7 @@ void SPHPhysiologyObjectInteractionPair::computeInteraction()
         m_hemorrhageAction->setRate(hemorrhageRate);
 
         // compute the femoral flow rate from Pulse
-        const double flowRate = m_compartment->GetInFlow();// (VolumePerTimeUnit::mL_Per_s);
+        const double flowRate = compartment->GetInFlow(VolumePerTimeUnit::mL_Per_s);
 
         // set the femoral flow rate as an SPH inlet boundary condition
         m_sphModel->getBoundaryConditions()->setInletVelocity(flowRate);
@@ -71,7 +78,8 @@ void SPHPhysiologyObjectInteractionPair::computeInteraction()
     }
 }
 
-void SPHPhysiologyObjectInteractionPair::apply()
+void
+SPHPhysiologyObjectInteractionPair::apply()
 {
     // Add the SPH physiology interaction node to the task graph
     m_objects.first->getTaskGraph()->addNode(m_bcNode);

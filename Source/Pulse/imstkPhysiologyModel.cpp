@@ -23,43 +23,15 @@ limitations under the License.
 #include "imstkLogger.h"
 #include "imstkTaskGraph.h"
 
-// Pulse 
-#include "PulsePhysiologyEngine.h"
-#include "CommonDataModel.h"
-#include "engine/SEEngineTracker.h"
-#include "engine/SEDataRequest.h"
-#include "engine/SEDataRequestManager.h"
-#include "engine/SEAction.h"
-#include "utils/DataTrack.h"
-#include "patient/actions/SEHemorrhage.h"
-#include "properties/SEScalarVolumePerTime.h"
-#include "compartment/SECompartmentManager.h"
-
-#include "properties/SEScalarTime.h"
-#include "engine/SEEngineTracker.h"
-#include "compartment/SECompartmentManager.h"
-#include "patient/actions/SESubstanceCompoundInfusion.h"
-#include "system/physiology/SEBloodChemistrySystem.h"
-#include "system/physiology/SECardiovascularSystem.h"
-#include "system/physiology/SEEnergySystem.h"
-#include "system/physiology/SERespiratorySystem.h"
-#include "substance/SESubstanceManager.h"
-#include "substance/SESubstanceCompound.h"
-#include "properties/SEScalar0To1.h"
-#include "properties/SEScalarFrequency.h"
-#include "properties/SEScalarMass.h"
-#include "properties/SEScalarMassPerVolume.h"
-#include "properties/SEScalarPressure.h"
-#include "properties/SEScalarTemperature.h"
-#include "properties/SEScalarTime.h"
-#include "properties/SEScalarVolume.h"
-#include "properties/SEScalarVolumePerTime.h"
-#include "properties/SEScalarVolumePerTimeArea.h"
-#include "compartment/fluid/SELiquidCompartmentGraph.h"
+// Pulse
+#include <PulsePhysiologyEngine.h>
+#include <engine/SEEngineTracker.h>
+#include <engine/SEDataRequestManager.h>
+#include <patient/actions/SEHemorrhage.h>
+#include <compartment/SECompartmentManager.h>
 
 namespace imstk
 {
-
 PhysiologyModel::PhysiologyModel() : AbstractDynamicalModel(DynamicalModelType::Physiology)
 {
     m_solveNode = m_taskGraph->addFunction("PhysiologyModel_Solve", std::bind(&PhysiologyModel::solve, this));
@@ -75,12 +47,12 @@ PhysiologyModel::initialize()
     std::string patientFile;
     switch (m_config->m_basePatient)
     {
-    case patientPhysiology::StandardMale:
-            patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardMale.json";
-            break;
-    case patientPhysiology::StandardFemale:
-            patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardFemale.json";
-            break;
+    case PatientPhysiology::StandardMale:
+        patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardMale.json";
+        break;
+    case PatientPhysiology::StandardFemale:
+        patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardFemale.json";
+        break;
     default:
         LOG(WARNING) << "Could not find the patient. Initializing to StandardMale";
         patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardMale.json";
@@ -97,29 +69,27 @@ PhysiologyModel::initialize()
     return true;
 }
 
-void 
+void
 PhysiologyModel::addDataRequest(const std::string& property, SEDecimalFormat* dfault /*= nullptr*/)
 {
     m_dataPairs.push_back(PhysiologyDataRequestPair(property, dfault));
-
-    
 }
 
-const SECompartment* 
-PhysiologyModel::getCompartment(const physiologyCompartmentType type, const std::string& compartmentName)
+const SECompartment*
+PhysiologyModel::getCompartment(const PhysiologyCompartmentType type, const std::string& compartmentName) const
 {
     switch (type)
     {
-    case physiologyCompartmentType::Gas:
+    case PhysiologyCompartmentType::Gas:
         return (SECompartment*)m_pulseObj->GetCompartments().GetGasCompartment(compartmentName);
         break;
-    case physiologyCompartmentType::Liquid:
+    case PhysiologyCompartmentType::Liquid:
         return (SECompartment*)m_pulseObj->GetCompartments().GetLiquidCompartment(compartmentName);
         break;
-    case physiologyCompartmentType::Thermal:
+    case PhysiologyCompartmentType::Thermal:
         return (SECompartment*)m_pulseObj->GetCompartments().GetThermalCompartment(compartmentName);
         break;
-    case physiologyCompartmentType::Tissue:
+    case PhysiologyCompartmentType::Tissue:
         return (SECompartment*)m_pulseObj->GetCompartments().GetTissueCompartment(compartmentName);
         break;
     default:
@@ -128,13 +98,13 @@ PhysiologyModel::getCompartment(const physiologyCompartmentType type, const std:
     }
 }
 
-void 
+void
 PhysiologyModel::solve()
 {
     // Process all actions that are currently stored
-    for (auto action : m_actions)
+    for (auto i : m_actions)
     {
-        m_pulseObj->ProcessAction(*action->getAction().get());
+        m_pulseObj->ProcessAction(*i.second->getAction().get());
     }
 
     // Advance physiology model in time
@@ -143,43 +113,11 @@ PhysiologyModel::solve()
     m_currentTime += m_config->m_timeStep;
 }
 
-void 
+void
 PhysiologyModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
     m_taskGraph->addEdge(source, m_solveNode);
     m_taskGraph->addEdge(m_solveNode, sink);
 }
-
-void 
-Hemorrhage::setRate(double val /*in milliLiters/sec*/)
-{
-    m_hemorrhage->GetRate().SetValue(val, VolumePerTimeUnit::mL_Per_s);
-}
-
-void 
-Hemorrhage::setType(const Type t)
-{
-    (t == Type::External) ? m_hemorrhage->SetType(eHemorrhage_Type::External) :
-        m_hemorrhage->SetType(eHemorrhage_Type::External);
-}
-
-void 
-Hemorrhage::SetCompartment(const std::string& name)
-{
-    m_hemorrhage->SetCompartment(name);
-}
-
-double 
-Hemorrhage::getRate() const
-{
-    return m_hemorrhage->GetRate().GetValue(VolumePerTimeUnit::mL_Per_s);
-}
-
-std::shared_ptr<SEPatientAction> 
-Hemorrhage::getAction()
-{
-    return std::dynamic_pointer_cast<SEPatientAction>(m_hemorrhage);
-}
-
 }// imstk

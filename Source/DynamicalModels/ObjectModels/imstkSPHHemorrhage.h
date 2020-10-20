@@ -23,7 +23,6 @@
 
 #include "imstkMath.h"
 
-
 namespace imstk
 {
 ///
@@ -63,9 +62,9 @@ public:
 
 private:
     double m_area;                    ///> cross-sectional area of hemorrhage plane
-    Vec3d m_center;                   ///> hemorrhage plane center
+    Vec3d  m_center;                  ///> hemorrhage plane center
     double m_hemorrhageRate = 0;      ///> rate of hemorrhage
-    Vec3d m_normal;                   ///> outward unit normal of hemorrhage plane
+    Vec3d  m_normal;                  ///> outward unit normal of hemorrhage plane
     double m_radius;                  ///> hemorrhage plane radius
 };
 } // end namespace imstk

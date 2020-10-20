@@ -19,33 +19,76 @@
 
 =========================================================================*/
 
-#include <string>
+#include "Fluid.hpp"
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionGraph.h"
+#include "imstkHemorrhageAction.h"
 #include "imstkLight.h"
+#include "imstkPhysiologyModel.h"
+#include "imstkPhysiologyObject.h"
 #include "imstkPlane.h"
 #include "imstkPointSet.h"
+#include "imstkObjectInteractionFactory.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSphere.h"
-#include "imstkTaskGraph.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkObjectInteractionFactory.h"
-#include "imstkSPHPhysiologyInteraction.h"
-#include "imstkPhysiologyModel.h"
-#include "imstkPhysiologyObject.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
-
-//#include "PulsePhysiologyEngine.h"
-
-#include "Fluid.hpp"
+#include "imstkSPHPhysiologyInteraction.h"
+#include "imstkTaskGraph.h"
+#include "imstkVTKTextStatusManager.h"
 
 using namespace imstk;
+
+static std::shared_ptr<PhysiologyObject> makePhysiologyObject()
+{
+    // configure model
+    auto physiologyParams = std::make_shared<PhysiologyModelConfig>();
+
+    // Create a physics model
+    auto physiologyModel = std::make_shared<PhysiologyModel>();
+    physiologyModel->configure(physiologyParams);
+
+    // Setup hemorrhage action
+    auto hemorrhageAction = std::make_shared<HemorrhageAction>(HemorrhageAction::Type::External, "VascularCompartment::RightLeg");
+    physiologyModel->addAction("Hemorrhage", hemorrhageAction);
+
+    auto physiologyObj = std::make_shared<PhysiologyObject>("Pulse");
+    physiologyObj->setDynamicalModel(physiologyModel);
+
+    return physiologyObj;
+}
+
+static void parseArguments(int argc, char* argv[], double& particleRadius, int& numThreads)
+{
+    if (SCENE_ID == 5)
+    {
+        particleRadius = 0.012;
+    }
+    // Parse command line arguments
+    for (int i = 1; i < argc; ++i)
+    {
+        auto param = std::string(argv[i]);
+        if (param.find("threads") == 0
+            && param.find_first_of("=") != std::string::npos)
+        {
+            numThreads = std::stoi(param.substr(param.find_first_of("=") + 1));
+        }
+        else if (param.find("radius") == 0
+            && param.find_first_of("=") != std::string::npos)
+        {
+            particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
+            LOG(INFO) << "Particle radius: " << particleRadius;
+        }
+        else
+        {
+            LOG(FATAL) << "Invalid argument";
+        }
+    }
+}
 
 int
 main(int argc, char* argv[])
@@ -55,30 +98,7 @@ main(int argc, char* argv[])
 
   int threads = -1;
   double particleRadius = 0.04;
-  if (SCENE_ID == 5)
-  {
-      particleRadius = 0.012;
-  }
-  // Parse command line arguments
-  for (int i = 1; i < argc; ++i)
-  {
-    auto param = std::string(argv[i]);
-    if (param.find("threads") == 0
-      && param.find_first_of("=") != std::string::npos)
-    {
-      threads = std::stoi(param.substr(param.find_first_of("=") + 1));
-    }
-    else if (param.find("radius") == 0
-      && param.find_first_of("=") != std::string::npos)
-    {
-      particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
-      LOG(INFO) << "Particle radius: " << particleRadius;
-    }
-    else
-    {
-      LOG(FATAL) << "Invalid argument";
-    }
-  }
+  parseArguments(argc, argv, particleRadius, threads);
 
   // Set thread pool size (nthreads <= 0 means using all logical cores)
   simManager->setThreadPoolSize(threads);
@@ -91,7 +111,7 @@ main(int argc, char* argv[])
 
   // Get the VTKViewer
   std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
-  viewer->setWindowTitle("Physiolog Example");
+  viewer->setWindowTitle("Physiology Example");
   viewer->getVtkRenderWindow()->SetSize(1920, 1080);
   auto statusManager = viewer->getTextStatusManager();
   statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
@@ -103,37 +123,19 @@ main(int argc, char* argv[])
   std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
   std::shared_ptr<SPHModel> sphModel = fluidObj->getDynamicalSPHModel();
 
-  // configure model
-  auto physiologyParams = std::make_shared<PhysiologyModelConfig>();
-
-  // Create a physics model
-  auto physiologyModel = std::make_shared<PhysiologyModel>();
-  physiologyModel->configure(physiologyParams);
-
-  // Setup hemorrhage action
-  const std::string hemorrhagingCompartment = "";// pulse::VascularCompartment::RightLeg;
-  auto hemorrhageAction = std::make_shared<Hemorrhage>(Hemorrhage::Type::External, hemorrhagingCompartment);
-  physiologyModel->addAction(hemorrhageAction);
-
-  auto physiologyObj = std::make_shared<PhysiologyObject>("Pulse");
-  physiologyObj->setDynamicalModel(physiologyModel);
   
-  scene->addSceneObject(physiologyObj);
+  std::shared_ptr<PhysiologyObject> physioObj = makePhysiologyObject();
+  scene->addSceneObject(physioObj);
 
-  auto interactionPair = makeObjectInteractionPair(fluidObj,
-                                                   physiologyObj, 
-                                                   InteractionType::SphObjToPhysiologyObjCoupling, 
-                                                   CollisionDetection::Type::Custom);
-
-  auto physiologyIp = std::dynamic_pointer_cast<SPHPhysiologyObjectInteractionPair>(interactionPair);  
+  auto interactionPair = std::make_shared<SPHPhysiologyObjectInteractionPair>(fluidObj, physioObj);
 
   // configure the sph-physiology interaction pair
-  physiologyIp->setHemorrhageAction(hemorrhageAction);
-  physiologyIp->setCompartment(physiologyModel->getCompartment(physiologyCompartmentType::Liquid, hemorrhagingCompartment));
+  interactionPair->setHemorrhageAction(std::dynamic_pointer_cast<HemorrhageAction>(physioObj->getPhysiologyModel()->getAction("Hemorrhage")));
+  interactionPair->setCompartment(PhysiologyCompartmentType::Liquid, "VascularCompartment::RightLeg");
 
   scene->getCollisionGraph()->addInteraction(interactionPair);
 
-  // configure camera  
+  // configure camera
   (SCENE_ID == 5) ? scene->getCamera()->setPosition(0, 1.0, 4.0): scene->getCamera()->setPosition(0, 1.0, 5.0);
     
   // configure light (white)

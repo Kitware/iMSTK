@@ -47,11 +47,11 @@ SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const StdV
     }
     if (m_HalfStepVelocities.size() != m_Positions.size())
     {
-      m_HalfStepVelocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
+        m_HalfStepVelocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
     }
     if (m_FullStepVelocities.size() != m_Positions.size())
     {
-      m_FullStepVelocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
+        m_FullStepVelocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
     }
 }
 
@@ -148,7 +148,7 @@ StdVectorOfVec3r&
 SPHSimulationState::getHalfStepVelocities()
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-  LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
 #endif
     return m_KinematicState->getHalfStepVelocities();
 }
@@ -160,7 +160,7 @@ const StdVectorOfVec3r&
 SPHSimulationState::getHalfStepVelocities() const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-  LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
 #endif
     return m_KinematicState->getHalfStepVelocities();
 }
@@ -172,7 +172,7 @@ StdVectorOfVec3r&
 SPHSimulationState::getFullStepVelocities()
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-  LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
 #endif
     return m_KinematicState->getFullStepVelocities();
 }
@@ -184,7 +184,7 @@ const StdVectorOfVec3r&
 SPHSimulationState::getFullStepVelocities() const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-  LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
 #endif
     return m_KinematicState->getFullStepVelocities();
 }
