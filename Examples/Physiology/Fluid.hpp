@@ -42,15 +42,15 @@
 #include "imstkSPHBoundaryConditions.h"
 #include "imstkSPHHemorrhage.h"
 
-
 using namespace imstk;
-
 
 ///
 /// \brief Generate wall points for pipe flow
 ///
 std::shared_ptr<SurfaceMesh>
-generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh>& surfMesh, std::shared_ptr<SurfaceMesh>& surfMeshExpanded)
+generateWallFluidPoints(const double particleRadius, 
+                        std::shared_ptr<SurfaceMesh>& surfMesh, 
+                        std::shared_ptr<SurfaceMesh>& surfMeshExpanded)
 {
     // subtract original mesh from expanded mesh so we can get wall mesh
     auto intersectionPolyDataFilter = vtkSmartPointer<vtkBooleanOperationPolyDataFilter>::New();
@@ -59,22 +59,18 @@ generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh
     auto vtkPolySurfMesh = GeometryUtils::copyToVtkPolyData(surfMesh);
     auto vtkPolySurfMeshExpanded = GeometryUtils::copyToVtkPolyData(surfMeshExpanded);
 
-    vtkSmartPointer<vtkTriangleFilter> tri1 =
-      vtkSmartPointer<vtkTriangleFilter>::New();
+    auto tri1 = vtkSmartPointer<vtkTriangleFilter>::New();
     tri1->SetInputData(vtkPolySurfMesh);
     tri1->Update();
-    vtkSmartPointer<vtkCleanPolyData> clean1 =
-      vtkSmartPointer<vtkCleanPolyData>::New();
+    auto clean1 = vtkSmartPointer<vtkCleanPolyData>::New();
     clean1->SetInputConnection(tri1->GetOutputPort());
     clean1->Update();
     auto input1 = clean1->GetOutput();
 
-    vtkSmartPointer<vtkTriangleFilter> tri2 =
-      vtkSmartPointer<vtkTriangleFilter>::New();
+    auto tri2 = vtkSmartPointer<vtkTriangleFilter>::New();
     tri2->SetInputData(vtkPolySurfMeshExpanded);
     tri2->Update();
-    vtkSmartPointer<vtkCleanPolyData> clean2 =
-      vtkSmartPointer<vtkCleanPolyData>::New();
+    auto clean2 = vtkSmartPointer<vtkCleanPolyData>::New();
     clean2->SetInputConnection(tri2->GetOutputPort());
     clean2->Update();
     auto input2 = clean2->GetOutput();
@@ -98,7 +94,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     double speedOfSound = 100;
     double restDensity = 1;
 
-    auto selectionFilter = std::shared_ptr<SelectEnclosedPoints>();
+    auto selectionFilter = std::make_shared<SelectEnclosedPoints>();
     
     if (SCENE_ID == 1)
     {
@@ -133,6 +129,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMesh);      
       selectionFilter->setInputPoints(uniformMesh);
+      selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
       //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
@@ -140,6 +137,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMeshShell);
       selectionFilter->setInputPoints(uniformMesh_wall);
+      selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
       //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
 
@@ -196,6 +194,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMesh);
       selectionFilter->setInputPoints(uniformMesh);
+      selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
       //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
@@ -203,6 +202,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMeshShell);
       selectionFilter->setInputPoints(uniformMesh_wall);
+      selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
       //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
       
@@ -263,6 +263,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMesh);
       selectionFilter->setInputPoints(uniformMesh);
+      selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
       //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
@@ -270,6 +271,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMeshShell);
       selectionFilter->setInputPoints(uniformMesh_wall);
+      selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
       //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
 
@@ -336,6 +338,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMesh);
       selectionFilter->setInputPoints(uniformMesh);
+      selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
       //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
@@ -343,6 +346,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMeshShell);
       selectionFilter->setInputPoints(uniformMesh_wall);
+      selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
       //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
       
@@ -411,6 +415,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       selectionFilter->setInputMesh(surfMesh);
       selectionFilter->setInputPoints(uniformMesh);
+      selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
       //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
@@ -418,6 +423,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       
       selectionFilter->setInputMesh(surfMeshShell);
       selectionFilter->setInputPoints(uniformMesh_wall);
+      selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
       //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
 

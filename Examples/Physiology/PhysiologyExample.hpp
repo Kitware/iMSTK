@@ -226,7 +226,7 @@ main(int argc, char* argv[])
     }
 
     // Start viewer running, scene as paused
-    sceneManager->requestStatus(ThreadStatus::Paused);
+    sceneManager->requestStatus(ThreadStatus::Running);
     viewer->start();
 
     return 0;

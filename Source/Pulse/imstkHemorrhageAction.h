@@ -32,11 +32,7 @@ class HemorrhageAction : public PhysiologyAction
 public:
     enum class Type { External = 0, Internal };
 
-    HemorrhageAction(const Type t, const std::string& name)
-    {
-        this->setType(t);
-        this->SetCompartment("pulse::" + name);
-    }
+    HemorrhageAction(const Type t, const std::string& name);
 
 public:
     ///
