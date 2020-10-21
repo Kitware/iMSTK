@@ -21,13 +21,10 @@
 
 #pragma once
 
-// imstk
 #include "imstkRenderMaterial.h"
 
-// vtk
-#include <vtkNew.h>
+#include <vtkSmartPointer.h>
 
-// forward declarations
 class vtkVolumeProperty;
 
 namespace imstk
@@ -35,12 +32,16 @@ namespace imstk
 class VolumeRenderMaterial : public RenderMaterial
 {
 public:
+    VolumeRenderMaterial();
+    ~VolumeRenderMaterial() override = default;
+
+public:
     ///
-    /// \brief Set/Get the volume property
+    /// \brief Get the volume property
     ///
-    vtkVolumeProperty* getVolumeProperty();
+    vtkSmartPointer<vtkVolumeProperty> getVolumeProperty();
 
 protected:
-    vtkNew<vtkVolumeProperty> m_property;
+    vtkSmartPointer<vtkVolumeProperty> m_property;
 };
 }

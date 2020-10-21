@@ -20,10 +20,10 @@
 =========================================================================*/
 
 #include "imstkViewer.h"
-#include "imstkScene.h"
 #include "imstkCamera.h"
+#include "imstkDeviceControl.h"
+#include "imstkInteractorStyle.h"
 #include "imstkLogger.h"
-#include "imstkScreenCaptureUtility.h"
 
 #ifdef iMSTK_USE_Vulkan
 #include "imstkGUICanvas.h"
@@ -31,17 +31,17 @@
 
 namespace imstk
 {
-Viewer::Viewer() : m_config(std::make_shared<viewerConfig>())
+Viewer::Viewer(std::string name) :
+    ThreadObject(name),
+    m_activeScene(nullptr),
+    m_config(std::make_shared<ViewerConfig>()),
+    m_debugCamera(std::make_shared<Camera>()),
+    m_interactorStyle(nullptr),
+    m_screenCapturer(nullptr)
 {
 #ifdef iMSTK_USE_Vulkan
     m_canvas(std::make_shared<GUIOverlay::Canvas>())
 #endif
-}
-
-const std::shared_ptr<Scene>&
-Viewer::getActiveScene() const
-{
-    return m_activeScene;
 }
 
 const std::shared_ptr<Renderer>&
@@ -52,90 +52,14 @@ Viewer::getActiveRenderer() const
     return m_rendererMap.at(m_activeScene);
 }
 
-const bool&
-Viewer::isRendering() const
-{
-    return m_running;
-}
-
-const std::shared_ptr<ScreenCaptureUtility>&
-Viewer::getScreenCaptureUtility() const
-{
-    return m_screenCapturer;
-}
-
-#ifdef iMSTK_USE_Vulkan
-const std::shared_ptr<GUIOverlay::Canvas>&
-Viewer::getCanvas()
-{
-    return m_canvas;
-}
-
-#endif
-
 void
-Viewer::setOnCharFunction(char c, EventHandlerFunction func)
+Viewer::updateThread()
 {
-    m_interactorStyle->m_onCharFunctionMap[c] = func;
-}
-
-void
-Viewer::setOnMouseMoveFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onMouseMoveFunction = func;
-}
-
-void
-Viewer::setOnLeftButtonDownFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onLeftButtonDownFunction = func;
-}
-
-void
-Viewer::setOnLeftButtonUpFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onLeftButtonUpFunction = func;
-}
-
-void
-Viewer::setOnMiddleButtonDownFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onMiddleButtonDownFunction = func;
-}
-
-void
-Viewer::setOnMiddleButtonUpFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onMiddleButtonUpFunction = func;
-}
-
-void
-Viewer::setOnRightButtonDownFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onRightButtonDownFunction = func;
-}
-
-void
-Viewer::setOnRightButtonUpFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onRightButtonUpFunction = func;
-}
-
-void
-Viewer::setOnMouseWheelForwardFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onMouseWheelForwardFunction = func;
-}
-
-void
-Viewer::setOnMouseWheelBackwardFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onMouseWheelBackwardFunction = func;
-}
-
-void
-Viewer::setOnTimerFunction(EventHandlerFunction func)
-{
-    m_interactorStyle->m_onTimerFunction = func;
+    this->postEvent(Event(EventType::PreUpdate));
+    for (auto control : m_controls)
+    {
+        control->update();
+    }
+    this->postEvent(Event(EventType::PostUpdate));
 }
 }

@@ -41,11 +41,11 @@ public:
 
 public:
     ///
-    /// \brief Constructors/Destructors
+    /// \brief Constructors\Destructors
     ///
     NewtonSolver();
-    ~NewtonSolver() = default;
     NewtonSolver(const NewtonSolver& other) = delete;
+    virtual ~NewtonSolver() override = default;
 
     NewtonSolver& operator=(const NewtonSolver& other) = delete;
 
@@ -95,7 +95,7 @@ public:
     ///
     /// \brief Get JacobianMatrix. Returns jacobian matrix
     ///
-    SystemMatrix& getJacobianMatrix();
+    //SystemMatrix& getJacobianMatrix();
 
     ///
     /// \brief Set AbsoluteTolerance

@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCylinder.h"
-
 #include "imstkLogger.h"
 
 namespace imstk

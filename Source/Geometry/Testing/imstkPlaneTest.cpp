@@ -20,10 +20,9 @@
 =========================================================================*/
 
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
 
-#include "imstkMath.h"
 #include "imstkPlane.h"
+
 using namespace imstk;
 
 ///

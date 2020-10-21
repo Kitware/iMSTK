@@ -23,6 +23,8 @@
 
 #include "imstkDeviceClient.h"
 
+#include <unordered_map>
+
 namespace imstk
 {
 ///
@@ -38,7 +40,7 @@ public:
     /// \brief Constructor/Destructor
     ///
     explicit DummyClient(const std::string& name) : DeviceClient(name, "localhost") {}
-    virtual ~DummyClient() {}
+    virtual ~DummyClient() override = default;
 
 protected:
 
@@ -84,5 +86,8 @@ public:
     /// \brief Set the button status if it exists
     ///
     void setButton(const unsigned int buttonId, const bool buttonStatus);
+
+protected:
+    std::unordered_map<int, bool> m_buttons;
 };
 }

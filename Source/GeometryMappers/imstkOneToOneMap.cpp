@@ -24,10 +24,6 @@
 #include "imstkLogger.h"
 #include "imstkPointSet.h"
 
-#undef min
-#undef max
-#include <climits>
-
 namespace imstk
 {
 void

@@ -43,7 +43,7 @@ public:
 
     PbdObject() = delete;
 
-    ~PbdObject() override = default;
+    virtual ~PbdObject() override = default;
 
 public:
     ///

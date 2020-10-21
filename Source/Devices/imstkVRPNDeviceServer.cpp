@@ -20,16 +20,15 @@
 =========================================================================*/
 
 #include "imstkVRPNDeviceServer.h"
-
-#include "vrpn_3DConnexion.h"
-#include "vrpn_Tracker_NovintFalcon.h"
-#include "vrpn_Tracker_OSVRHackerDevKit.h"
-#include "vrpn_Streaming_Arduino.h"
-#ifdef VRPN_USE_PHANTOM_SERVER
-  #include "vrpn_Phantom.h"
-#endif
-
 #include "imstkLogger.h"
+
+#include <vrpn_3DConnexion.h>
+#include <vrpn_Streaming_Arduino.h>
+#include <vrpn_Tracker_NovintFalcon.h>
+#include <vrpn_Tracker_OSVRHackerDevKit.h>
+#ifdef VRPN_USE_PHANTOM_SERVER
+  #include <vrpn_Phantom.h>
+#endif
 
 namespace imstk
 {
@@ -57,7 +56,7 @@ VRPNDeviceServer::addSerialDevice(const std::string& deviceName, DeviceType devi
 }
 
 void
-VRPNDeviceServer::initModule()
+VRPNDeviceServer::initThread()
 {
     std::string ip = m_machine + ":" + std::to_string(m_port);
     m_serverConnection = vrpn_create_server_connection(ip.c_str());
@@ -120,14 +119,14 @@ VRPNDeviceServer::initModule()
 }
 
 void
-VRPNDeviceServer::runModule()
+VRPNDeviceServer::updateThread()
 {
     m_serverConnection->mainloop();
     m_deviceConnections->mainloop();
 }
 
 void
-VRPNDeviceServer::cleanUpModule()
+VRPNDeviceServer::stopThread()
 {
     m_deviceConnections->clear();
     delete(m_deviceConnections);

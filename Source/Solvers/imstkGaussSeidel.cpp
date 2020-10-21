@@ -21,10 +21,6 @@
 
 #include "imstkGaussSeidel.h"
 #include "imstkLogger.h"
-#include "imstkLinearProjectionConstraint.h"
-
-// Eigen includes
-#include <Eigen/IterativeLinearSolvers>
 
 namespace imstk
 {

@@ -19,21 +19,16 @@
 
 =========================================================================*/
 
-#include <sys/stat.h>
-
 #include "imstkMeshIO.h"
-#include "imstkVTKMeshIO.h"
 #include "imstkAssimpMeshIO.h"
-#include "imstkVegaMeshIO.h"
-#include "imstkMSHMeshIO.h"
-//#include "imstkColor.h"
-
-#include "imstkSurfaceMesh.h"
-#include "imstkLineMesh.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkHexahedralMesh.h"
-
 #include "imstkLogger.h"
+#include "imstkMSHMeshIO.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVegaMeshIO.h"
+#include "imstkVTKMeshIO.h"
+
+#include <sys/stat.h>
 
 namespace imstk
 {
@@ -59,6 +54,7 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::STL:
     case MeshFileType::PLY:
     case MeshFileType::NRRD:
+    case MeshFileType::NII:
     case MeshFileType::DCM:
         return VTKMeshIO::read(filePath, meshType);
         break;
@@ -166,6 +162,10 @@ MeshIO::getFileType(const std::string& filePath)
     {
         meshType = MeshFileType::NRRD;
     }
+    else if (extString == "nii" || extString == "NII")
+    {
+        meshType = MeshFileType::NII;
+    }
     else
     {
         LOG(FATAL) << "MeshIO::getFileType error: unknown file extension";
@@ -183,6 +183,8 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     case MeshFileType::VEG:
         return VegaMeshIO::write(imstkMesh, filePath, meshType);
         break;
+    case MeshFileType::NII:
+    case MeshFileType::NRRD:
     case MeshFileType::VTU:
     case MeshFileType::VTK:
     case MeshFileType::VTP:

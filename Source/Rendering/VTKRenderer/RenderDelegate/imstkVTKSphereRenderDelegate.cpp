@@ -21,9 +21,11 @@
 
 #include "imstkVTKSphereRenderDelegate.h"
 #include "imstkSphere.h"
+#include "imstkVisualModel.h"
 
-#include <vtkTransformPolyDataFilter.h>
 #include <vtkSphereSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {

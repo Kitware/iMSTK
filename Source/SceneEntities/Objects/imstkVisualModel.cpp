@@ -20,9 +20,7 @@
 =========================================================================*/
 
 #include "imstkVisualModel.h"
-#include "imstkGeometry.h"
 #include "imstkRenderMaterial.h"
-#include "imstkDebugRenderGeometry.h"
 
 namespace imstk
 {

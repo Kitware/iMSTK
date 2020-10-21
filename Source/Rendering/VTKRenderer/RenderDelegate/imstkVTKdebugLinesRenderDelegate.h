@@ -44,6 +44,8 @@ public:
     ///
     explicit VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
+    virtual ~VTKdbgLinesRenderDelegate() override = default;
+
     ///
     /// \brief Update polydata source based on the surface mesh geometry
     ///

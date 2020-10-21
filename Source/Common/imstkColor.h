@@ -24,7 +24,9 @@
 #include <iostream>
 
 /// \todo remove nameless union/struct in the future
+#ifdef WIN32
 #pragma warning(disable : 4201)
+#endif
 namespace imstk
 {
 ///
@@ -123,7 +125,9 @@ struct Color
     static Color Teal;
     static Color Marigold;
 };
+#ifdef WIN32
 #pragma warning(default : 4201)
+#endif
 
 ///
 /// \brief Multiplication operators

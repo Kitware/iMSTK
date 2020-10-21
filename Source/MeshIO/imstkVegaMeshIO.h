@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkMath.h"
 #include "imstkMeshIO.h"
 
 namespace vega

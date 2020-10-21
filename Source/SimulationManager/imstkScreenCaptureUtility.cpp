@@ -21,8 +21,6 @@
 
 #include "imstkScreenCaptureUtility.h"
 
-#include "imstkLogger.h"
-
 namespace imstk
 {
 unsigned int

@@ -52,4 +52,11 @@ SPHObject::initialize()
 
     return true;
 }
+
+std::shared_ptr<SPHModel>
+SPHObject::getSPHModel()
+{
+    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
+    return m_SPHModel;
+}
 } // end namespace imstk

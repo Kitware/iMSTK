@@ -23,8 +23,7 @@
 
 #pragma warning( push )
 #pragma warning( disable : 4458 )
-//vega
-#include "corotationalLinearFEM.h"
+#include <corotationalLinearFEM.h>
 #pragma warning( pop )
 
 namespace imstk

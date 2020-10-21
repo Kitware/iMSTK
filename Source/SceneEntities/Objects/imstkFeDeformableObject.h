@@ -21,10 +21,6 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-// imstk
 #include "imstkDynamicObject.h"
 #include "imstkMath.h"
 
@@ -51,7 +47,7 @@ public:
     ///
     bool initialize() override;
 
-    std::shared_ptr<FEMDeformableBodyModel> getFEMModel() const { return m_femModel; }
+    std::shared_ptr<FEMDeformableBodyModel> getFEMModel();
 
 protected:
     std::shared_ptr<FEMDeformableBodyModel> m_femModel = nullptr;

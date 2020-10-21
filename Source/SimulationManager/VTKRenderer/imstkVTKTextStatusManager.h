@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include <array>
-
 #include "imstkColor.h"
+#include "imstkMath.h"
+
+#include <array>
 
 class vtkTextActor;
 
@@ -36,7 +37,8 @@ class vtkTextActor;
 
 namespace imstk
 {
-class VTKInteractorStyle;
+class VTKViewer;
+
 ///
 /// \brief The VTKTextStatusManager class
 ///
@@ -46,7 +48,7 @@ public:
     ///
     /// \brief The StatusType enum
     ///
-    enum StatusType
+    enum class StatusType
     {
         FPS = 0,
         Custom,
@@ -56,7 +58,7 @@ public:
     ///
     /// \brief The TextLocation enum
     ///
-    enum DisplayCorner
+    enum class DisplayCorner
     {
         LowerLeft,
         UpperLeft,
@@ -64,9 +66,11 @@ public:
         LowerRight
     };
 
-    explicit VTKTextStatusManager(VTKInteractorStyle* const vtkInteractorStyle);
+public:
+    explicit VTKTextStatusManager();
     virtual ~VTKTextStatusManager();
 
+public:
     ///
     /// \brief Return the text actor at index i
     ///
@@ -76,6 +80,11 @@ public:
     /// \brief Set the visibility of the text status
     ///
     void setStatusVisibility(const StatusType type, const bool bVisible);
+
+    ///
+    /// \brief Get the visibility of the text status
+    ///
+    bool getStatusVisibility(const StatusType type);
 
     ///
     /// \brief Set the font size for the status
@@ -100,6 +109,11 @@ public:
     void setFPS(const double visualFPS, const double physicsFPS);
 
     ///
+    /// \brief Set the window size
+    ///
+    void setWindowSize(VTKViewer* viewer) { m_viewer = viewer; }
+
+    ///
     /// \brief Set custom status text
     /// The string parameter should be passed by value, not const reference
     ///
@@ -116,10 +130,10 @@ private:
     ///
     std::array<int, 2> computeStatusLocation(const DisplayCorner corner, const int fontSize, const std::string& text);
 
-    vtkTextActor* m_StatusActors[StatusType::NumStatusTypes];         ///> Statuses to display
-    DisplayCorner m_StatusDisplayCorners[StatusType::NumStatusTypes]; ///> Location (corner) of the statuses
-    int m_StatusFontSizes[StatusType::NumStatusTypes];                ///> Size of the statuses
+    vtkTextActor* m_StatusActors[static_cast<int>(StatusType::NumStatusTypes)];         ///> Statuses to display
+    DisplayCorner m_StatusDisplayCorners[static_cast<int>(StatusType::NumStatusTypes)]; ///> Location (corner) of the statuses
+    int m_StatusFontSizes[static_cast<int>(StatusType::NumStatusTypes)];                ///> Size of the statuses
 
-    VTKInteractorStyle* m_vtkInteractorStyle;                         ///> vtkInteractorStyle
+    VTKViewer* m_viewer;                                                                // Used for dimensions
 };
-} // end namespace imstk
+}

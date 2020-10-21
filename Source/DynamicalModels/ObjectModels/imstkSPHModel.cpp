@@ -20,7 +20,6 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkSPHModel.h"
-#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
 #include "imstkPointSet.h"
 #include "imstkTaskGraph.h"
@@ -130,6 +129,11 @@ SPHModel::SPHModel() : DynamicalModel<SPHKinematicState>(DynamicalModelType::Smo
         {
             moveParticles(getTimeStep());
         });
+    //m_computePositionNode =
+    //    m_taskGraph->addFunction("SPHModel_ComputePositions", [&]()
+    //    {
+    //        moveParticles(getTimeStep());
+    //        });
 }
 
 bool
@@ -207,6 +211,7 @@ SPHModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskN
     m_taskGraph->addEdge(m_integrateNode, m_updateVelocityNode);
     m_taskGraph->addEdge(m_updateVelocityNode, m_moveParticlesNode);
     m_taskGraph->addEdge(m_moveParticlesNode, sink);
+
 }
 
 void

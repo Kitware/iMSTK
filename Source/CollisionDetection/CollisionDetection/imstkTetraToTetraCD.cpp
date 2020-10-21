@@ -21,12 +21,7 @@
 
 #include "imstkTetraToTetraCD.h"
 #include "imstkCollisionData.h"
-#include "imstkMath.h"
-#include "imstkParallelUtils.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-
-//#include "DeformModel.h"
 
 namespace imstk
 {

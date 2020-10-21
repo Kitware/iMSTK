@@ -21,7 +21,9 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
 #include "imstkMath.h"
+#include "imstkTypes.h"
 
 #include <tbb/concurrent_unordered_set.h>
 
@@ -36,7 +38,7 @@ class SpinLock;
 /// \class Geometry
 /// \brief Base class for any geometrical representation
 ///
-class Geometry
+class Geometry : public EventObject
 {
 public:
     ///
@@ -57,7 +59,9 @@ public:
         Decal,
         DecalPool,
         RenderParticles,
-        ImageData
+        ImageData,
+        SignedDistanceField,
+        CompositeImplicitGeometry
     };
 
     ///
@@ -90,7 +94,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~Geometry();
+    virtual ~Geometry() override;
 
     ///
     /// \brief Print
@@ -100,10 +104,11 @@ public:
     ///
     /// \brief Returns the volume of the geometry (if valid)
     ///
-    virtual double getVolume() const = 0;
+    virtual double getVolume() const { return 0.0; };
 
     ///
     /// \brief Compute the bounding box for the geometry
+    /// \todo Padding should not be here
     ///
     virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const;
 
@@ -181,6 +186,13 @@ public:
     ///
     static uint32_t getTotalNumberGeometries() { return s_NumGeneratedGegometries; }
 
+    ///
+    /// \brief Post modified event
+    ///
+    void modified() { this->postEvent(Event(EventType::Modified)); }
+
+    virtual void updatePostTransformData() const { }
+
 protected:
     ///
     /// \brief Get a unique ID for the new generated geometry object
@@ -204,20 +216,20 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VulkanRenderer;
 
-    virtual void applyTranslation(const Vec3d t) = 0;
-    virtual void applyRotation(const Mat3d r)    = 0;
-    virtual void applyScaling(const double s)    = 0;
-    virtual void updatePostTransformData() const = 0;
+    virtual void applyTranslation(const Vec3d imstkNotUsed(t)) { }
+    virtual void applyRotation(const Mat3d imstkNotUsed(r)) { }
+    virtual void applyScaling(const double imstkNotUsed(s)) { }
 
     Type m_type;                 ///> Type of geometry
     std::string m_name;          ///> Unique name for each geometry
     uint32_t    m_geometryIndex; ///> Unique ID assigned to each geometry upon construction
 
-    bool m_dataModified      = false;
     bool m_transformModified = false;
     mutable bool m_transformApplied = true;
 
     RigidTransform3d m_transform; ///> Transformation matrix
     double m_scaling = 1.0;
+
+    bool m_dataModified = true;
 };
 } //imstk

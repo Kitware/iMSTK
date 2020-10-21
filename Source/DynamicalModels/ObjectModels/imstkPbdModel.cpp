@@ -20,9 +20,10 @@
 =========================================================================*/
 
 #include "imstkPbdModel.h"
-#include "imstkGeometryUtilities.h"
 #include "imstkGraph.h"
 #include "imstkLineMesh.h"
+#include "imstkLogger.h"
+#include "imstkParallelUtils.h"
 #include "imstkPbdAreaConstraint.h"
 #include "imstkPbdBendConstraint.h"
 #include "imstkPbdConstantDensityConstraint.h"
@@ -35,15 +36,13 @@
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 
-#include <unordered_map>
-
 namespace imstk
 {
 PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics),
-    m_constraints(std::make_shared<PBDConstraintVector>()),
-    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_mass(std::make_shared<StdVectorOfReal>()),
     m_invMass(std::make_shared<StdVectorOfReal>()),
+    m_constraints(std::make_shared<PBDConstraintVector>()),
+    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_parameters(std::make_shared<PBDModelConfig>())
 {
     m_validGeometryTypes = {
@@ -75,6 +74,19 @@ PBDModelConfig::enableFEMConstraint(PbdConstraint::Type type, PbdFEMConstraint::
     LOG_IF(FATAL, (type != PbdConstraint::Type::FEMTet && type != PbdConstraint::Type::FEMHex))
         << "Non-FEM constraint should be enabled by the enableConstraint function";
     m_FEMConstraints.push_back({ type, material });
+}
+
+void
+PBDModelConfig::setSolverType(const PbdConstraint::SolverType& type)
+{
+    if (type == PbdConstraint::SolverType::GCD)
+    {
+        LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
+        m_solverType = PbdConstraint::SolverType::xPBD;
+        return;
+    }
+
+    m_solverType = type;
 }
 
 void
@@ -398,7 +410,6 @@ PbdModel::initializeBendConstraints(const double stiffness)
     // Create constraints
     const auto& lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
     const auto& elements = lineMesh->getLinesVertices();
-    const auto  nV       = lineMesh->getNumVertices();
 
     // Iterate sets of two segments
     for (size_t k = 0; k < elements.size() - 1; k++)

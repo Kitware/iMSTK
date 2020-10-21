@@ -22,7 +22,7 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
-#include "imstkModule.h"
+#include "imstkLoopThreadObject.h"
 
 #include <vrpn_Configure.h>
 #include <vrpn_Analog.h>
@@ -33,7 +33,7 @@ namespace imstk
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
 ///
-class VRPNArduinoDeviceClient : public DeviceClient, public Module
+class VRPNArduinoDeviceClient : public DeviceClient, public LoopThreadObject
 {
 public:
 
@@ -42,7 +42,7 @@ public:
     ///
     VRPNArduinoDeviceClient(const std::string& deviceName, const std::string& ip) :
         DeviceClient(deviceName, ip),
-        Module(deviceName + "@" + ip),
+        LoopThreadObject(deviceName + "@" + ip),
         m_ypr(Vec3d::Zero()),
         m_accel(Vec3d::Zero()),
         m_roll(0) {}
@@ -50,8 +50,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~VRPNArduinoDeviceClient()
-    {}
+    virtual ~VRPNArduinoDeviceClient() override = default;
 
     ///
     /// \brief Get YPR
@@ -72,17 +71,17 @@ protected:
     ///
     /// \brief Initialize device client module
     ///
-    void initModule() override;
+    void initThread() override;
 
     ///
     /// \brief Run the device client
     ///
-    void runModule() override;
+    void updateThread() override;
 
     ///
-    /// \brief Clean the device client module
+    /// \brief Clean the device client
     ///
-    void cleanUpModule() override;
+    void stopThread() override;
 
 private:
 

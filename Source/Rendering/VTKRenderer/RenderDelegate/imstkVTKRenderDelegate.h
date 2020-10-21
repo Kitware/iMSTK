@@ -21,32 +21,34 @@
 
 #pragma once
 
-#include "imstkGeometry.h"
-#include "imstkRenderMaterial.h"
-#include "imstkVTKTextureDelegate.h"
-#include "imstkTextureManager.h"
-#include "imstkDebugRenderGeometry.h"
-#include "imstkVisualModel.h"
+#include "imstkEventObject.h"
 
 #include <vtkSmartPointer.h>
-#include <vtkAlgorithmOutput.h>
-#include <vtkActor.h>
-#include <vtkOpenGLPolyDataMapper.h>
-#include <vtkTransform.h>
-#include <vtkProperty.h>
-#include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkVolume.h>
+#include <memory>
+
+class vtkActor;
+class vtkAlgorithmOutput;
+class vtkGPUVolumeRayCastMapper;
+class vtkOpenGLPolyDataMapper;
+class vtkProp3D;
+class vtkTransform;
+class vtkTexture;
+class vtkVolume;
 
 namespace imstk
 {
+class Texture;
+class VisualModel;
+
 ///
 /// \class VTKRenderDelegate
 ///
 /// \brief Base class for VTK render delegates
 ///
-class VTKRenderDelegate
+class VTKRenderDelegate : public EventObject
 {
 public:
+    virtual ~VTKRenderDelegate() override = default;
 
     ///
     /// \brief Instantiate proper render delegate
@@ -106,20 +108,7 @@ protected:
     ///
     /// \brief Default constructor (protected)
     ///
-    VTKRenderDelegate() :
-        m_actor(vtkSmartPointer<vtkActor>::New()),
-        m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New()),
-        m_transform(vtkSmartPointer<vtkTransform>::New()),
-        m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
-        m_volume(vtkSmartPointer<vtkVolume>::New()),
-        m_modelIsVolume(false)               // remove?
-    {
-        m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
-        m_actor->SetUserTransform(m_transform);
-        m_volume->SetMapper(m_volumeMapper); // remove this as a default?
-    }
-
-    virtual ~VTKRenderDelegate() = default;
+    VTKRenderDelegate();
 
     vtkSmartPointer<vtkTransform> m_transform;
 

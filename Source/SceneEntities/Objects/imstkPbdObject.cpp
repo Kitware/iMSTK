@@ -30,7 +30,7 @@ PbdObject::getPbdModel()
 {
     m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
     return m_pbdModel;
-};
+}
 
 bool
 PbdObject::initialize()

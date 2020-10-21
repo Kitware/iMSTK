@@ -19,20 +19,18 @@
 
 =========================================================================*/
 
-#include <string>
-
-#include "imstkSimulationManager.h"
-#include "imstkLight.h"
-#include "imstkSPHObject.h"
-#include "imstkAPIUtilities.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkCollisionGraph.h"
-#include "imstkSceneManager.h"
 #include "imstkCamera.h"
-#include "imstkObjectInteractionFactory.h"
 #include "imstkCollisionDetection.h"
+#include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
+#include "imstkObjectInteractionFactory.h"
+#include "imstkSceneManager.h"
+#include "imstkSPHObject.h"
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
 #include "Fluid.hpp"
 #include "Solid.hpp"
@@ -46,22 +44,16 @@ using namespace imstk;
 int
 main(int argc, char* argv[])
 {
-    // SimulationManager must be created first
-    auto simManager = std::make_shared<SimulationManager>();
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    int    threads        = -1;
     double particleRadius = 0.1;
 
     // Parse command line arguments
     for (int i = 1; i < argc; ++i)
     {
         auto param = std::string(argv[i]);
-        if (param.find("threads") == 0
-            && param.find_first_of("=") != std::string::npos)
-        {
-            threads = std::stoi(param.substr(param.find_first_of("=") + 1));
-        }
-        else if (param.find("radius") == 0
+        if (param.find("radius") == 0
                  && param.find_first_of("=") != std::string::npos)
         {
             particleRadius = std::stod(param.substr(param.find_first_of("=") + 1));
@@ -79,29 +71,17 @@ main(int argc, char* argv[])
         particleRadius = 0.08;
     }
 
-    // Set thread pool size (nthreads <= 0 means using all logical cores)
-    simManager->setThreadPoolSize(threads);
-
-    auto scene = simManager->createNewScene("SPH Fluid");
-
-    // Create the viewer
-    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
-    viewer->setWindowTitle("SPH Fluid");
-    viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-    auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
-    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Red);
-    simManager->setViewer(viewer);
+    imstkNew<Scene> scene("SPH Fluid");
 
     // Generate fluid and solid objects
-    auto fluidObj = generateFluid(scene, particleRadius);
-    auto solids   = generateSolids(scene);
+    std::shared_ptr<SPHObject> fluidObj                  = generateFluid(particleRadius);
+    std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids();
 
-    simManager->getSceneManager(scene)->setPostUpdateCallback([&](Module*) {
-        statusManager->setCustomStatus("Number of particles: " +
-                                   std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
-                                        "\nNumber of solids: " + std::to_string(solids.size()));
-    });
+    scene->addSceneObject(fluidObj);
+    for (size_t i = 0; i < solids.size(); i++)
+    {
+        scene->addSceneObject(solids[i]);
+    }
 
     // Collision between fluid and solid objects
     std::shared_ptr<CollisionGraph> collisionGraph = scene->getCollisionGraph();
@@ -124,16 +104,53 @@ main(int argc, char* argv[])
     }
 
     // configure camera
-    scene->getCamera()->setPosition(0, 10.0, 15.0);
+    scene->getActiveCamera()->setPosition(-0.475, 8.116, -6.728);
 
     // configure light (white)
-    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
-    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
+    imstkNew<DirectionalLight> whiteLight("whiteLight");
+    whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     whiteLight->setIntensity(1.5);
     scene->addLight(whiteLight);
 
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->setWindowTitle("SPH Fluid");
+        viewer->setSize(1920, 1080);
+        auto statusManager = viewer->getTextStatusManager();
+        statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
+        statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Red);
+        connect<Event>(viewer, EventType::PostUpdate,
+            [&](Event*)
+            {
+                statusManager->setCustomStatus("Number of particles: " +
+                    std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
+                    "\nNumber of solids: " + std::to_string(solids.size()));
+            });
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

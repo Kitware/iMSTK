@@ -22,11 +22,11 @@ limitations under the License.
 #pragma once
 
 #include "imstkCollisionDetection.h"
-#include "imstkObjectInteractionPair.h"
 
 namespace imstk
 {
 class CollidingObject;
+class ObjectInteractionPair;
 
 // Predefined standard/types of interaction from imstk
 enum class InteractionType
@@ -35,6 +35,7 @@ enum class InteractionType
 
     PbdObjToCollidingObjCollision,
     SphObjToCollidingObjCollision,
+    SphObjToCollidingObjSDFCollision,
     FemObjToCollidingObjCollision,
     //RigidObjToCollidingObjCollision,
 
@@ -43,13 +44,14 @@ enum class InteractionType
     FemObjToCollidingObjPenaltyForce,
     FemObjToCollidingObjBoneDrilling,
     FemObjToCollidingObjNodalPicking,
+    SphObjToPhysiologyObjCoupling,
+    CollidingObjToCollidingObjBoneDrilling
 
-    SphObjToPhysiologyObjCoupling
 };
 
 ///
 /// \brief Factory for InteractionPairs, returns nullptr and logs warning if failed
 ///
-extern std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                                                        InteractionType intType, CollisionDetection::Type cdType);
+std::shared_ptr<ObjectInteractionPair> makeObjectInteractionPair(std::shared_ptr<CollidingObject> obj1, std::shared_ptr<CollidingObject> obj2,
+                                                                 InteractionType intType, CollisionDetection::Type cdType);
 }

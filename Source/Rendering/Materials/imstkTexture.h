@@ -24,8 +24,6 @@
 #include <string>
 #include <memory>
 
-#include "imstkLogger.h"
-
 namespace imstk
 {
 ///
@@ -77,7 +75,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~Texture() {}
+    virtual ~Texture() = default;
 
     ///
     /// \brief Get type

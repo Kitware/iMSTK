@@ -21,11 +21,8 @@
 
 #pragma once
 
-#include <cmath>
-#include <cassert>
-
 #include "imstkMath.h"
-#include <g3log/g3log.hpp>
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -54,10 +51,14 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
+#ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4127)
+#endif
         if (N == 2)
+#ifdef WIN32
 #pragma warning(pop)
+#endif
         {
             m_k = Real(4.0) / (PI * std::pow(m_radius, 8));
             m_l = -Real(24.0) / (PI * std::pow(m_radius, 8));
@@ -163,10 +164,14 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
+#ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4127)
+#endif
         if (N == 2)
+#ifdef WIN32
 #pragma warning(pop)
+#endif
         {
             const auto radius5 = std::pow(m_radius, 5);
             m_k = Real(10.0) / (PI * radius5);
@@ -252,10 +257,14 @@ public:
         m_radius  = radius;
         m_radius2 = m_radius * m_radius;
 
+#ifdef WIN32
 #pragma warning(push)
 #pragma warning(disable:4127)
+#endif
         CHECK(N != 2) << "Unimplemented function";
+#ifdef WIN32
 #pragma warning(pop)
+#endif
 
         m_k  = Real(32.0) / (PI * std::pow(m_radius, 9));
         m_c  = std::pow(m_radius, 6) / Real(64.0);

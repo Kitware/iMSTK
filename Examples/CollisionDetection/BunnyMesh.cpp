@@ -23,6 +23,7 @@
 #include "imstkLogger.h"
 
 #include <array>
+
 using namespace imstk;
 
 std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>>

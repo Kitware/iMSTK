@@ -21,10 +21,8 @@ limitations under the License.
 
 #include "imstkCollisionPair.h"
 #include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-#include "imstkDynamicObject.h"
-#include "imstkInteractionPair.h"
-#include "imstkLogger.h"
+#include "imstkCollisionDetection.h"
+#include "imstkCollisionHandling.h"
 #include "imstkTaskGraph.h"
 
 namespace imstk

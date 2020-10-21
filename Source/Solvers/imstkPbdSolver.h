@@ -21,13 +21,13 @@
 
 #pragma once
 
-#include "imstkPbdCollisionConstraint.h"
 #include "imstkPbdConstraint.h"
 #include "imstkSolverBase.h"
-#include "imstkLogger.h"
 
 namespace imstk
 {
+class PbdCollisionConstraint;
+
 ///
 /// \struct CollisionConstraintData
 /// \brief Stores positions and masses of two colliding objects
@@ -105,17 +105,7 @@ public:
     ///
     /// \brief Set the PBD solver type
     ///
-    void setSolverType(const PbdConstraint::SolverType& type)
-    {
-        if (type == PbdConstraint::SolverType::GCD)
-        {
-            LOG(WARNING) << "GCD is NOT implemented yet, use xPBD instead";
-            m_solverType = PbdConstraint::SolverType::xPBD;
-            return;
-        }
-
-        m_solverType = type;
-    }
+    void setSolverType(const PbdConstraint::SolverType& type);
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.
@@ -155,7 +145,7 @@ public:
     ///
     /// \brief Add the global collision contraints to this solver
     ///
-    void addCollisionConstraints(PBDCollisionConstraintVector* constraints,
+    void addCollisionConstraints(std::vector<PbdCollisionConstraint*>* constraints,
                                  std::shared_ptr<StdVectorOfVec3d> posA, std::shared_ptr<StdVectorOfReal> invMassA,
                                  std::shared_ptr<StdVectorOfVec3d> posB, std::shared_ptr<StdVectorOfReal> invMassB);
 
@@ -165,9 +155,9 @@ public:
     void solve() override;
 
 private:
-    size_t m_collisionIterations = 5;                                                               ///> Number of NL Gauss-Seidel iterations for collision constraints
+    size_t m_collisionIterations = 5;                                                                   ///> Number of NL Gauss-Seidel iterations for collision constraints
 
-    std::shared_ptr<std::list<PBDCollisionConstraintVector*>> m_collisionConstraints     = nullptr; ///< Collision contraints charged to this solver
-    std::shared_ptr<std::list<CollisionConstraintData>>       m_collisionConstraintsData = nullptr;
+    std::shared_ptr<std::list<std::vector<PbdCollisionConstraint*>*>> m_collisionConstraints = nullptr; ///< Collision contraints charged to this solver
+    std::shared_ptr<std::list<CollisionConstraintData>> m_collisionConstraintsData = nullptr;
 };
 } // imstk

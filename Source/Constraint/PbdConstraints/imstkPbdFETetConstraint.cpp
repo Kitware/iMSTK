@@ -20,8 +20,6 @@
 =========================================================================*/
 
 #include "imstkPbdFETetConstraint.h"
-#include "imstkLogger.h"
-#include <iostream>
 
 namespace  imstk
 {
@@ -166,12 +164,8 @@ PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexP
     {
         break;
     }
-
     default:
-    {
-        LOG(FATAL) << "Material type not supported ! \n";
         break;
-    }
     }
 
     Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();

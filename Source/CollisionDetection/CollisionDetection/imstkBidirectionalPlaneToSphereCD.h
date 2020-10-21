@@ -27,7 +27,6 @@ namespace imstk
 {
 class Plane;
 class Sphere;
-class Geometry;
 struct CollisionData;
 
 ///

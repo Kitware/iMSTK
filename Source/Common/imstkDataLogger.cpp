@@ -21,7 +21,6 @@
 
 #include "imstkDataLogger.h"
 #include "imstkLogger.h"
-#include <cstring>
 
 namespace imstk
 {

@@ -31,7 +31,6 @@
 
 namespace imstk
 {
-class ComputeNode;
 class PointSet;
 
 ///
@@ -302,7 +301,6 @@ protected:
     std::shared_ptr<TaskNode> m_updateVelocityNode   = nullptr;
     std::shared_ptr<TaskNode> m_computeViscosityNode = nullptr;
     std::shared_ptr<TaskNode> m_moveParticlesNode    = nullptr;
-
     std::shared_ptr<TaskNode> m_normalizeDensityNode       = nullptr;
     std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;
 

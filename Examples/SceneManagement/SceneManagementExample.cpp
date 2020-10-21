@@ -20,9 +20,10 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCollisionGraph.h"
+#include "imstkLogger.h"
+#include "imstkNew.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 
 using namespace imstk;
 
@@ -32,46 +33,49 @@ using namespace imstk;
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<SceneManager> sceneManager;
 
     // Scenes
     LOG(INFO) << "-- Test add scenes";
-    auto scene1 = std::make_shared<Scene>("scene1");
-    simManager->addScene(scene1);
+    imstkNew<Scene> scene1("scene1");
+    scene1->initialize();
+    sceneManager->addScene(scene1);
+    imstkNew<Scene> scene2("scene2");
+    scene2->initialize();
+    sceneManager->addScene(scene2);
 
-    simManager->createNewScene("scene2");
-    auto scene2 = simManager->getScene("scene2");
-
-    auto scene3 = simManager->createNewScene();
-    simManager->removeScene("Scene_3");
+    imstkNew<Scene> scene3("scene3");
+    scene3->initialize();
+    sceneManager->addScene(scene3);
+    sceneManager->removeScene("Scene3");
 
     // switch
     LOG(INFO) << "-- Test scene switch";
-    int delay = 5;
-    simManager->setActiveScene(scene1);
-    simManager->start();
+    int delay = 1;
+    sceneManager->setActiveScene(scene1);
+    sceneManager->start(false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->setActiveScene(scene2, false);
+    sceneManager->setActiveScene(scene2);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->setActiveScene(scene1, true);
+    sceneManager->setActiveScene(scene1);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->end();
+    sceneManager->stop(true);
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
-    simManager->setActiveScene(scene2);
-    simManager->start();
+    sceneManager->setActiveScene(scene2);
+    sceneManager->start(false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->pause();
+    sceneManager->pause(true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->run();
+    sceneManager->resume(true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->pause();
+    sceneManager->pause(true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    simManager->end();
-
-    // Quit
-    while (simManager->getStatus() != SimulationStatus::Inactive) {}
+    sceneManager->stop(true);
 
     return 0;
 }

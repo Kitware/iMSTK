@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <unordered_set>
-
-#include "imstkMath.h"
 #include "imstkSpatialHashTable.h"
+#include "imstkMath.h"
+
+#include <unordered_set>
 
 namespace imstk
 {

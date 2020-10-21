@@ -19,11 +19,12 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkPointSet.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
 #include "imstkSPHObject.h"
 #include "imstkSPHModel.h"
-#include "imstkPointSet.h"
-#include "imstkScene.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 
@@ -157,7 +158,7 @@ initializeNonZeroVelocities(const size_t numParticles)
 }
 
 std::shared_ptr<SPHObject>
-generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
+generateFluid(const double particleRadius)
 {
     StdVectorOfVec3d particles;
     StdVectorOfVec3d initialVelocities;
@@ -186,26 +187,33 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     LOG(INFO) << "Number of particles: " << particles.size();
 
     // Create a geometry object
-    auto fluidGeometry = std::make_shared<PointSet>();
-    fluidGeometry->initialize(particles);
+    imstkNew<PointSet> geometry;
+    geometry->initialize(particles);
 
     // Create a fluids object
-    auto fluidObj = std::make_shared<SPHObject>("Sphere");
+    imstkNew<SPHObject> fluidObj("Sphere");
 
     // Create a visual model
-    auto fluidVisualModel = std::make_shared<VisualModel>(fluidGeometry);
-    auto fluidMaterial    = std::make_shared<RenderMaterial>();
-    fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
-    fluidMaterial->setVertexColor(Color::Orange);
-    fluidMaterial->setPointSize(10.);
-    fluidVisualModel->setRenderMaterial(fluidMaterial);
+    imstkNew<VisualModel> visualModel(geometry.get());
+    imstkNew<RenderMaterial> material;
+    material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
+    material->setVertexColor(Color::Orange);
+    if (material->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
+    {
+        material->setPointSize(0.1);
+    }
+    else
+    {
+        material->setPointSize(15.0);
+    }
+    visualModel->setRenderMaterial(material);
 
     // Create a physics model
-    auto sphModel = std::make_shared<SPHModel>();
-    sphModel->setModelGeometry(fluidGeometry);
+    imstkNew<SPHModel> sphModel;
+    sphModel->setModelGeometry(geometry);
 
-    // configure model
-    auto sphParams = std::make_shared<SPHModelConfig>(particleRadius);
+    // Configure model
+    imstkNew<SPHModelConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     if (SCENE_ID == 2)   // highly viscous fluid
     {
@@ -223,11 +231,10 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     sphModel->setTimeStepSizeType(TimeSteppingType::RealTime);
 
     // Add the component models
-    fluidObj->addVisualModel(fluidVisualModel);
-    fluidObj->setCollidingGeometry(fluidGeometry);
+    fluidObj->addVisualModel(visualModel);
+    fluidObj->setCollidingGeometry(geometry);
     fluidObj->setDynamicalModel(sphModel);
-    fluidObj->setPhysicsGeometry(fluidGeometry); // TODO: Look into API duplication and resulting conflicts
-    scene->addSceneObject(fluidObj);
+    fluidObj->setPhysicsGeometry(geometry);
 
     return fluidObj;
 }

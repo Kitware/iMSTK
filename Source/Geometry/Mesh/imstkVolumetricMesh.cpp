@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkVolumetricMesh.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkLogger.h"
 
 namespace imstk

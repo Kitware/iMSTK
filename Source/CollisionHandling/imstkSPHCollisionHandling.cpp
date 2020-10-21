@@ -21,8 +21,7 @@
 
 #include "imstkSPHCollisionHandling.h"
 #include "imstkCollisionData.h"
-#include "imstkLogger.h"
-#include "imstkParallelUtils.h"
+#include "imstkImplicitGeometryToPointSetCD.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 
@@ -50,27 +49,23 @@ SPHCollisionHandling::processCollisionData()
         << "Invalid boundary friction coefficient (value must be in [0, 1])";
 #endif
 
-    auto& state = SPHModel->getState();
-    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
-        [&](const size_t idx)
+    SPHSimulationState&                   state = SPHModel->getState();
+    std::function<void(uint32_t, Vec3d&)> solve =
+        [&](const uint32_t pidx, const Vec3d& penetrationVector)
         {
-            const MeshToAnalyticalCollisionDataElement& cd = m_colData->MAColData[idx];
-            const uint32_t pidx = cd.nodeIdx; // Fluid particle index
-            Vec3d n = cd.penetrationVector;   // This vector should point into solid object
-
             // Correct particle position
-            state.getPositions()[pidx] -= n;
+            state.getPositions()[pidx] -= penetrationVector;
 
-            const auto nLengthSqr = n.squaredNorm();
+            const auto nLengthSqr = penetrationVector.squaredNorm();
             if (nLengthSqr < Real(1e-20)) // Normalize n
             {
                 return;                   // Too little penetration: ignore
             }
-            n /= std::sqrt(nLengthSqr);
+            const Vec3d n = penetrationVector / std::sqrt(nLengthSqr);
 
             // Correct particle velocity: slip boundary condition with friction
-            const auto oldVel = state.getVelocities()[pidx];
-            const auto vn     = oldVel.dot(n);
+            const Vec3d& oldVel = state.getVelocities()[pidx];
+            const double vn     = oldVel.dot(n);
 
             // If particle is escaping the boundary, ignore it
             if (vn > 0)
@@ -93,6 +88,41 @@ SPHCollisionHandling::processCollisionData()
 
                 state.getVelocities()[pidx] = correctedVel;
             }
-        });
+        };
+
+    // Solve analytical collision
+    for (int iter = 0; iter < m_iterations; iter++)
+    {
+        // Coming into this CH, CD has already been computed
+        if (iter != 0)
+        {
+            // Update the collision geometry
+            m_SPHObject->updateGeometries();
+            // Compute collision again
+            m_colDetect->computeCollisionData();
+        }
+
+        ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+            [&](const size_t idx)
+            {
+                // Because of const, make some extra copies
+                const MeshToAnalyticalCollisionDataElement& cd = m_colData->MAColData[idx];
+                const uint32_t pidx     = cd.nodeIdx;           // Fluid particle index
+                Vec3d penetrationVector = cd.penetrationVector; // This vector should point into solid object
+
+                solve(pidx, penetrationVector);
+            });
+        // Solve point/direction based collision
+        ParallelUtils::parallelFor(m_colData->PDColData.getSize(),
+            [&](const size_t idx)
+            {
+                // Because of const, make some extra copies
+                const PositionDirectionCollisionDataElement& cd = m_colData->PDColData[idx];
+                const uint32_t pidx     = cd.nodeIdx;                       // Fluid particle index
+                Vec3d penetrationVector = cd.dirAtoB * cd.penetrationDepth; // This vector should point into solid object
+
+                solve(pidx, penetrationVector);
+            });
+    }
 }
 } // end namespace imstk

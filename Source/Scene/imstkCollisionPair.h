@@ -21,21 +21,22 @@ limitations under the License.
 
 #pragma once
 
-#include "imstkCollisionDetection.h"
-#include "imstkCollisionHandling.h"
 #include "imstkObjectInteractionPair.h"
 
 namespace imstk
 {
 struct CollisionData;
 class CollidingObject;
+class CollisionDetection;
+class CollisionHandling;
 
 ///
 /// \class CollisionPair
 ///
 /// \brief CollisionPair is a specialization of InteractionPair that adds Handler functions.
 /// The handler functions precede the interaction node/step as their own computational node/step.
-/// The handler functions may be a singular handler node or two separate concurrent nodes.
+/// The handler functions may be a singular handler node (that handles both AB concurrently) or
+/// two separate concurrent nodes.
 ///
 class CollisionPair : public ObjectInteractionPair
 {
@@ -57,7 +58,7 @@ public:
                   std::shared_ptr<CollisionDetection> cd,
                   std::shared_ptr<CollisionHandling> chAB);
 
-    ~CollisionPair() = default;
+    virtual ~CollisionPair() override = default;
 
 public:
     /// \brief TODO

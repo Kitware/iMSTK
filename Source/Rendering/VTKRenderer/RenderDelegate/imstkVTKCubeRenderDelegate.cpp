@@ -21,9 +21,11 @@
 
 #include "imstkVTKCubeRenderDelegate.h"
 #include "imstkCube.h"
+#include "imstkVisualModel.h"
 
-#include "vtkTransformPolyDataFilter.h"
-#include "vtkCubeSource.h"
+#include <vtkCubeSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {

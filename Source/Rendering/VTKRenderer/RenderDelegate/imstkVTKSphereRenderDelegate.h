@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~VTKSphereRenderDelegate() = default;
+    virtual ~VTKSphereRenderDelegate() override = default;
 
     ///
     /// \brief Update sphere source based on the sphere geometry

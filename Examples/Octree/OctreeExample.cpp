@@ -19,25 +19,26 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneObject.h"
-#include "imstkDebugRenderGeometry.h"
-#include "imstkAPIUtilities.h"
-#include "imstkLooseOctree.h"
-#include "imstkVTKViewer.h"
-#include "imstkTimer.h"
-#include "imstkLight.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkSceneManager.h"
 #include "imstkCamera.h"
-#include "imstkVTKTextStatusManager.h"
-#include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkLooseOctree.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTimer.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKRenderDelegate.h"
 #include "imstkVTKRenderer.h"
+#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
 
-#include <thread>
-#include <chrono>
-#include <sstream>
+#include <vtkRenderWindow.h>
 
 using namespace imstk;
 
@@ -52,25 +53,23 @@ static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyDa
 /// \brief Read a mesh, create a visual scene object and add to the scene
 ///
 std::shared_ptr<VisualObject>
-createMeshObject(const std::shared_ptr<imstk::Scene>& scene,
-                 const std::string&                   objectName,
-                 const Color&                         color)
+createMeshObject(const std::string& objectName,
+                 const Color&       color)
 {
     // Create a surface mesh for the bunny
-    auto meshObj = std::make_shared<SurfaceMesh>();
-    meshObj->initialize(g_BunnyData.first, g_BunnyData.second);
+    imstkNew<SurfaceMesh> surfMesh;
+    surfMesh->initialize(g_BunnyData.first, g_BunnyData.second);
 
     // Create a visiual model
-    auto visualModel = std::make_shared<VisualModel>(meshObj);
-    auto material    = std::make_shared<RenderMaterial>();
+    imstkNew<VisualModel>    visualModel(surfMesh.get());
+    imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     material->setColor(color); // Wireframe color
-    material->setLineWidth(1);
+    material->setLineWidth(1.0);
     visualModel->setRenderMaterial(material);
 
-    auto visualObject = std::make_shared<VisualObject>(objectName);
+    imstkNew<VisualObject> visualObject(objectName);
     visualObject->addVisualModel(visualModel);
-    scene->addSceneObject(visualObject);
 
     return visualObject;
 }
@@ -105,20 +104,20 @@ getRandomColor()
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("Octree Example");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Get the VTKViewer
-    std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
+    imstkNew<Scene> scene("Octree Example");
+
+    // Setup a viewer to render in its own thread
+    imstkNew<VTKViewer> viewer("Viewer");
+    viewer->setActiveScene(scene);
     viewer->setWindowTitle("Octree Example");
     viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-    simManager->setViewer(viewer);
-    simManager->setActiveScene(scene); // Viewer has depedence on scene
 
     auto statusManager = viewer->getTextStatusManager();
-    statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
-    statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Orange);
+    statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
+    statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Orange);
 
     // Get VTK Renderer
     auto renderer = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
@@ -131,7 +130,8 @@ main()
     std::vector<std::shared_ptr<SurfaceMesh>> triMeshes;
     for (unsigned int i = 0; i < NUM_MESHES; ++i)
     {
-        const auto sceneObj = createMeshObject(scene, "Mesh-" + std::to_string(triMeshes.size()), getRandomColor());
+        std::shared_ptr<SceneObject> sceneObj = createMeshObject("Mesh-" + std::to_string(triMeshes.size()), getRandomColor());
+        scene->addSceneObject(sceneObj);
         triMeshes.push_back(std::dynamic_pointer_cast<SurfaceMesh>(sceneObj->getVisualGeometry()));
     }
 
@@ -149,7 +149,7 @@ main()
     timer.start();
 
     // Create octree
-    LooseOctree octree(Vec3d(0, 0, 0), 100.0, 0.125, 2.0, "TestOctree");
+    LooseOctree octree(Vec3d(0.0, 0.0, 0.0), 100.0, 0.125, 2.0, "TestOctree");
 
     // Add all meshes to the octree
     for (const auto& mesh: triMeshes)
@@ -168,11 +168,11 @@ main()
     // Create debug geometry for the octree (render up to 8 levels, and render all non-empty nodes)
     const auto debugOctree = octree.getDebugGeometry(8, true);
 
-    const auto matDbgViz = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> matDbgViz;
     matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     matDbgViz->setEdgeColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
-    auto octreeVizDbgModel = std::make_shared<VisualModel>(debugOctree, matDbgViz);
+    imstkNew<VisualModel> octreeVizDbgModel(debugOctree, matDbgViz);
     scene->addDebugVisualModel(octreeVizDbgModel);
 
     // Data for animation
@@ -203,7 +203,7 @@ main()
     }
 
     auto updateFunc =
-        [&](Module*) {
+        [&](Event*) {
             // Move objects
             for (size_t i = 0; i < triMeshes.size(); ++i)
             {
@@ -249,29 +249,50 @@ main()
             // Pause for a while
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         };
-    simManager->getSceneManager(scene)->setPostUpdateCallback(updateFunc);
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
+    auto cam = scene->getActiveCamera();
     cam->setPosition(Vec3d(0, 15, 50));
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
     // Light
     {
-        auto light = std::make_shared<DirectionalLight>("Light 1");
-        light->setFocalPoint(Vec3d(-1, -1, -1));
+        imstkNew<DirectionalLight> light("Light 1");
+        light->setFocalPoint(Vec3d(-1.0, -1.0, -1.0));
         light->setIntensity(1);
         scene->addLight(light);
     }
     {
-        auto light = std::make_shared<DirectionalLight>("Light 2");
-        light->setFocalPoint(Vec3d(1, -1, -1));
-        light->setIntensity(1);
+        imstkNew<DirectionalLight> light("Light 2");
+        light->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
+        light->setIntensity(1.0);
         scene->addLight(light);
     }
 
-    // Run
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }

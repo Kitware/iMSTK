@@ -89,6 +89,11 @@ if (${PROJECT_NAME}_BUILD_TESTING)
   set(BUILD_TESTING ON)
 endif ()
 option(${PROJECT_NAME}_USE_MODEL_REDUCTION "Build with model reduction, requires a VegaFEM built with Intel MKL and arpack" OFF)
+option(${PROJECT_NAME}_USE_VTK_OSMESA "Build with VTK OSMesa rendering" OFF)
+if (${${PROJECT_NAME}_USE_VTK_OSMESA} AND NOT UNIX)
+  message(WARNING "OSMesa only works on unix, building without")
+  set(${PROJECT_NAME}_USE_VTK_OSMESA FALSE CACHE BOOL "Build with VTK OSMesa rendering" FORCE)
+endif()
 
 #-----------------------------------------------------------------------------
 # CTest/Dashboards
@@ -139,6 +144,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   imstk_define_dependency(glm)
   imstk_define_dependency(imgui)
   imstk_define_dependency(LibNiFalcon)
+  imstk_define_dependency(openvr)
   imstk_define_dependency(PhysX)
   imstk_define_dependency(SCCD)
   imstk_define_dependency(tbb)
@@ -164,12 +170,6 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(glfw)
     imstk_define_dependency(gli)
     imstk_define_dependency(Vulkan)
-  endif()
-
-  option(${PROJECT_NAME}_ENABLE_VR "Allow the usage of VR rendering." OFF)
-
-  if(${PROJECT_NAME}_ENABLE_VR)
-    imstk_define_dependency(openvr)
   endif()
 
   if(${PROJECT_NAME}_BUILD_TESTING)
@@ -234,14 +234,8 @@ find_package( imgui REQUIRED )
 find_package( LibNiFalcon REQUIRED)
 # Libusb
 find_package( Libusb REQUIRED)
-
 # OpenVR
-if(${PROJECT_NAME}_ENABLE_VR)
-  add_definitions( -DiMSTK_ENABLE_VR )
-  find_package( openvr REQUIRED )
-else()
-  remove_definitions( -DiMSTK_ENABLE_VR )
-endif()
+find_package( openvr REQUIRED )
 
 # Select the release version of PhysX to use
 set(PHYSX_CONFIGURATION "${PHYSX_CONFIGURATION}" CACHE STRING "Select PhysX Library Type for Release and RelWithDebInfo builds")
@@ -292,28 +286,29 @@ list(APPEND VTK_DEPENDENCIES
   ChartsCore
   CommonCore
   CommonDataModel
-  FiltersGeneral
-  FiltersSources
-  FiltersModeling
+  FiltersCore
   FiltersExtraction
+  FiltersGeneral
+  FiltersModeling
+  FiltersSources
   IOExport
   IOImport
   IOPLY
   IOParallel
   IOParallelXML
   ImagingCore
+  ImagingGeneral
+  ImagingStencil
   InteractionStyle
   RenderingAnnotation
   RenderingContext2D
   RenderingContextOpenGL2
   RenderingCore
   RenderingOpenGL2
+  RenderingOpenVR
   RenderingVolume
   RenderingVolumeOpenGL2
   ViewsContext2D)
-if (${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
-endif()
 find_package(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # Vulkan
@@ -400,6 +395,7 @@ add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
 add_subdirectory(Source/Pulse)
+add_subdirectory(Source/Filtering)
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories

@@ -21,12 +21,11 @@
 
 #pragma once
 
-#include <array>
-#include <algorithm>
-
-#include "imstkMath.h"
 #include "imstkLogger.h"
+#include "imstkMath.h"
 #include "imstkParallelUtils.h"
+
+#include <array>
 
 namespace imstk
 {
@@ -111,6 +110,7 @@ struct PositionDirectionCollisionDataElement
     Vec3d posA;
     Vec3d posB;
     Vec3d dirAtoB;
+    uint32_t nodeIdx;
     double penetrationDepth;
 };
 class PositionDirectionCollisionData : public CollisionDataBase<PositionDirectionCollisionDataElement>

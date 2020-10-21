@@ -19,13 +19,13 @@
 
 =========================================================================*/
 
-#include "imstkGraph.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
 #include "imstkAPIUtilities.h"
+#include "imstkGraph.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkNew.h"
 #include "imstkSurfaceMesh.h"
-
-#include <iostream>
+#include "imstkTetrahedralMesh.h"
 
 using namespace imstk;
 
@@ -37,6 +37,8 @@ using namespace imstk;
 int
 main(int argc, char** argv)
 {
+    Logger::startLogger();
+
     // Using WelshPowell method by default
     Graph::ColoringMethod method = Graph::ColoringMethod::WelshPowell;
 
@@ -83,23 +85,22 @@ main(int argc, char** argv)
     g2.print();
     auto colorsG2 = g2.doColoring(method, true);
 
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
-        std::cout << "Could not read mesh from file." << std::endl;
+        LOG(INFO) << "Could not read mesh from file.";
         return 1;
     }
     else
     {
-        auto volMesh      = std::dynamic_pointer_cast<TetrahedralMesh>(tetMesh);
-        auto colorsGVMesh = apiutils::getMeshGraph(volMesh)->doColoring(method, true);
+        auto colorsGVMesh = apiutils::getMeshGraph(tetMesh)->doColoring(method, true);
 
-        auto surfMesh = std::make_shared<SurfaceMesh>();
-        volMesh->extractSurfaceMesh(surfMesh, true);
-        auto colorsGSMesh = apiutils::getMeshGraph(surfMesh)->doColoring(method, true);
+        imstkNew<SurfaceMesh> surfMesh;
+        tetMesh->extractSurfaceMesh(surfMesh, true);
+        auto colorsGSMesh = apiutils::getMeshGraph(surfMesh.get())->doColoring(method, true);
     }
 
-    std::cout << "Press any key to exit!" << std::endl;
+    LOG(INFO) << "Press any key to exit!";
     getchar();
 
     return 0;

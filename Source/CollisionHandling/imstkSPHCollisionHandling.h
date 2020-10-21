@@ -20,13 +20,20 @@
 =========================================================================*/
 
 #pragma once
+
 #include "imstkCollisionHandling.h"
 
 namespace imstk
 {
+class ImplicitGeometryToPointSetCD;
 struct CollisionData;
 class SPHObject;
 
+///
+/// \class SPHCollisionHandling
+///
+/// \brief Supports SPH vs analytic and SPH vs Implicit Geometry
+///
 class SPHCollisionHandling : public CollisionHandling
 {
 public:
@@ -36,6 +43,13 @@ public:
 
     SPHCollisionHandling() = delete;
 
+    virtual ~SPHCollisionHandling() override = default;
+
+public:
+    void setNumberOfIterations(int iterations) { this->m_iterations = iterations; }
+
+    void setDetection(std::shared_ptr<ImplicitGeometryToPointSetCD> colDetect) { this->m_colDetect = colDetect; }
+
     ///
     /// \brief Compute forces based on collision data
     ///
@@ -43,5 +57,7 @@ public:
 
 private:
     std::shared_ptr<SPHObject> m_SPHObject = nullptr;
+    std::shared_ptr<ImplicitGeometryToPointSetCD> m_colDetect = nullptr;
+    int m_iterations = 1;
 };
 } // end namespace imstk

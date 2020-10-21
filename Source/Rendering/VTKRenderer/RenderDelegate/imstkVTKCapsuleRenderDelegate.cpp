@@ -21,7 +21,10 @@
 
 #include "imstkVTKCapsuleRenderDelegate.h"
 #include "imstkCapsule.h"
+#include "imstkVisualModel.h"
+
 #include <vtkCapsuleSource.h>
+#include <vtkTransform.h>
 #include <vtkTransformPolyDataFilter.h>
 
 namespace imstk

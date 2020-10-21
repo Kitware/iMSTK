@@ -21,12 +21,10 @@
 
 #include "imstkVRPNArduinoDeviceClient.h"
 
-#include "imstkLogger.h"
-
 namespace imstk
 {
 void
-VRPNArduinoDeviceClient::initModule()
+VRPNArduinoDeviceClient::initThread()
 {
     auto fullDeviceIp = this->getName().c_str();
 
@@ -36,13 +34,13 @@ VRPNArduinoDeviceClient::initModule()
 }
 
 void
-VRPNArduinoDeviceClient::runModule()
+VRPNArduinoDeviceClient::updateThread()
 {
     m_vrpnAnalog->mainloop();
 }
 
 void
-VRPNArduinoDeviceClient::cleanUpModule()
+VRPNArduinoDeviceClient::stopThread()
 {
     //Module cleanup is causing TCP errors - seems to work fine without it
     //m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);

@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkAnimationObject.h"
-#include "imstkAnimationModel.h"
 
 namespace imstk
 {

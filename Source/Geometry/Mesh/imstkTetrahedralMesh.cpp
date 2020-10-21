@@ -21,7 +21,6 @@
 
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkLogger.h"
 
 namespace imstk

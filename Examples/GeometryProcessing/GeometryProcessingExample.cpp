@@ -19,81 +19,114 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
-#include "imstkPlane.h"
-#include "imstkCylinder.h"
-#include "imstkCube.h"
-#include "imstkAPIUtilities.h"
-#include "imstkGeometryUtilities.h"
 #include "imstkCamera.h"
+#include "imstkDataArray.h"
+#include "imstkImageData.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkTetrahedralMesh.h"
+#include "imstkNew.h"
+#include "imstkQuadricDecimate.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshDistanceTransform.h"
+#include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 ///
-/// \brief This example demonstrates the geometry transforms in imstk
+/// \brief This example demonstrates erosion of a mesh
 ///
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("GeometryTransforms");
+    Logger::startLogger();
 
-    auto coarseTetMesh  = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg"));
-    auto coarseSurfMesh = std::make_shared<SurfaceMesh>();
+    // simManager and Scene
+    imstkNew<Scene> scene("GeometryProcessing");
+
+    auto                  coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    imstkNew<SurfaceMesh> coarseSurfMesh;
     coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
 
-    std::shared_ptr<SurfaceMesh> fineSurfaceMesh(std::move(GeometryUtils::loopSubdivideSurfaceMesh(coarseSurfMesh)));
+    // Compute DT
+    imstkNew<SurfaceMeshDistanceTransform> createSdf;
+    createSdf->setInputMesh(coarseSurfMesh);
+    createSdf->setDimensions(150, 150, 150);
+    createSdf->update();
 
-    fineSurfaceMesh->translate(Vec3d(0., -5., 0.), Geometry::TransformType::ConcatenateToTransform);
-    coarseSurfMesh->translate(Vec3d(0., 5., 0.), Geometry::TransformType::ConcatenateToTransform);
+    // Erode
+    const double       erosionDist = 0.2;
+    DataArray<double>& scalars     = *std::dynamic_pointer_cast<DataArray<double>>(createSdf->getOutputImage()->getScalars());
+    for (size_t i = 0; i < scalars.size(); i++)
+    {
+        scalars[i] += erosionDist;
+    }
 
-    auto material0 = std::make_shared<RenderMaterial>();
-    material0->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material0->setPointSize(10.);
-    material0->setLineWidth(4.);
-    material0->setEdgeColor(Color::Color::Orange);
-    auto surfMeshModel0 = std::make_shared<VisualModel>(coarseSurfMesh);
-    surfMeshModel0->setRenderMaterial(material0);
+    // Extract surface
+    imstkNew<SurfaceMeshFlyingEdges> isoExtract;
+    isoExtract->setInputImage(createSdf->getOutputImage());
+    isoExtract->update();
 
-    auto sceneObj0 = std::make_shared<VisualObject>("coarse Mesh");
-    sceneObj0->addVisualModel(surfMeshModel0);
+    // Reduce surface
+    imstkNew<QuadricDecimate> reduce;
+    reduce->setInputMesh(isoExtract->getOutputMesh());
+    reduce->setTargetReduction(0.5);
+    reduce->update();
 
-    scene->addSceneObject(sceneObj0);
-
-    auto material = std::make_shared<RenderMaterial>();
-    material->setColor(imstk::Color::Red);
-    material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    material->setPointSize(6.);
-    material->setLineWidth(1.);
-    auto surfMeshModel = std::make_shared<VisualModel>(fineSurfaceMesh);
-    surfMeshModel->setRenderMaterial(material);
-
-    auto sceneObj = std::make_shared<VisualObject>("fine Mesh");
-    sceneObj->addVisualModel(surfMeshModel);
-
+    // Create the scene object
+    imstkNew<VisualObject> sceneObj("Mesh");
+    // Create the eroded visual model
+    {
+        imstkNew<VisualModel>    surfMeshModel(reduce->getOutput());
+        imstkNew<RenderMaterial> material;
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setLineWidth(4.0);
+        material->setEdgeColor(Color::Color::Orange);
+        surfMeshModel->setRenderMaterial(material);
+        sceneObj->addVisualModel(surfMeshModel);
+    }
+    // Create the original mesh visual model
+    {
+        imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh.get());
+        imstkNew<RenderMaterial> material;
+        material->setColor(imstk::Color::Red);
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setLineWidth(1.0);
+        material->setOpacity(0.2f);
+        surfMeshModel->setRenderMaterial(material);
+        sceneObj->addVisualModel(surfMeshModel);
+    }
     scene->addSceneObject(sceneObj);
 
     // Set Camera configuration
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 12, 12));
-    cam->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 12.0, 12.0));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Running);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->start();
+    }
 
     return 0;
 }

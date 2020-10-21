@@ -55,14 +55,11 @@ find_package( LibNiFalcon REQUIRED)
 find_package( Libusb REQUIRED)
 
 # OpenVR
-if(iMSTK_ENABLE_VR)
-  add_definitions( -DiMSTK_ENABLE_VR )
-  find_package( openvr REQUIRED )
-endif()
+find_package( openvr REQUIRED )
 
 # PhysX
 find_package(PhysX REQUIRED)
-#
+
 #SCCD
 find_package( SCCD REQUIRED )
 
@@ -90,36 +87,41 @@ if(iMSTK_USE_OpenHaptics)
 endif()
 
 # VTK
+list(GET OPENVR_INCLUDE_DIRS 0 OpenVR_INCLUDE_DIR)
+list(GET OPENVR_LIBRARIES 1 OpenVR_LIBRARY)
+set(OpenVR_INCLUDE_DIR ${OpenVR_INCLUDE_DIR} CACHE INTERNAL "")
+set(OpenVR_LIBRARY ${OpenVR_LIBRARY} CACHE INTERNAL "")
 set(VTK_DIR @VTK_DIR@)
 find_dependency(VTK CONFIG)
 # modules are linked via `VTK::CommonCore`
 # vtk_module_autoinit is needed
-list(APPEND VTK_DEPENDENCIES
+find_dependency(VTK COMPONENTS
   ChartsCore
   CommonCore
   CommonDataModel
-  FiltersGeneral
-  FiltersSources
-  FiltersModeling
+  FiltersCore
   FiltersExtraction
+  FiltersGeneral
+  FiltersModeling
+  FiltersSources
   IOExport
   IOImport
   IOPLY
   IOParallel
   IOParallelXML
   ImagingCore
+  ImagingGeneral
+  ImagingStencil
   InteractionStyle
   RenderingAnnotation
   RenderingContext2D
   RenderingContextOpenGL2
   RenderingCore
   RenderingOpenGL2
+  RenderingOpenVR
   RenderingVolume
   RenderingVolumeOpenGL2
   ViewsContext2D)
-if (${PROJECT_NAME}_ENABLE_VR)
-  list(APPEND VTK_DEPENDENCIES vtkRenderingOpenVR)
-endif()
 find_dependency(VTK COMPONENTS ${VTK_DEPENDENCIES})
 
 # glfw, gli

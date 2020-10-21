@@ -25,10 +25,14 @@
 
 #include <Eigen/Geometry>
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4127 )
+#endif
 #include <Eigen/Sparse>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 #include <Eigen/StdVector>
 #include <vector>
@@ -61,12 +65,14 @@ using StdVectorOfVec4r = std::vector<Vec4r, Eigen::aligned_allocator<Vec4r>>;
 // 2D vector
 using Vec2f = Eigen::Vector2f;
 using Vec2d = Eigen::Vector2d;
+using Vec2i = Eigen::Matrix<int, 2, 1>;
 using StdVectorOfVec2f = std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>>;
 using StdVectorOfVec2d = std::vector<Vec2d, Eigen::aligned_allocator<Vec2d>>;
 
 // 3D vector
 using Vec3f = Eigen::Vector3f;
 using Vec3d = Eigen::Vector3d;
+using Vec3i = Eigen::Matrix<int, 3, 1>;
 using StdVectorOfVec3f = std::vector<Vec3f, Eigen::aligned_allocator<Vec3f>>;
 using StdVectorOfVec3d = std::vector<Vec3d, Eigen::aligned_allocator<Vec3d>>;
 
@@ -76,6 +82,10 @@ using Vec4d = Eigen::Vector4d;
 using StdVectorOfVec4f = std::vector<Vec4f, Eigen::aligned_allocator<Vec4f>>;
 using StdVectorOfVec4d = std::vector<Vec4d, Eigen::aligned_allocator<Vec4d>>;
 
+// 6D vector
+using Vec6f = Eigen::Matrix<float, 6, 1>;
+using Vec6d = Eigen::Matrix<double, 6, 1>;
+
 // Dynamic size vector
 using Vectorf = Eigen::VectorXf;
 using Vectord = Eigen::VectorXd;
@@ -83,8 +93,10 @@ using StdVectorOfVectorf = std::vector<Vectorf, Eigen::aligned_allocator<Vectorf
 using StdVectorOfVectord = std::vector<Vectord, Eigen::aligned_allocator<Vectord>>;
 
 // Quaternion
-using Quatf = Eigen::Quaternion<float, Eigen::DontAlign>;
-using Quatd = Eigen::Quaternion<double, Eigen::DontAlign>;
+using Quatf = Eigen::Quaternion<float>;
+using Quatd = Eigen::Quaternion<double>;
+using StdVectorOfQuatf = std::vector<Quatf, Eigen::aligned_allocator<Quatf>>;
+using StdVectorOfQuatd = std::vector<Quatd, Eigen::aligned_allocator<Quatd>>;
 
 // Angle-Axis
 using Rotf = Eigen::AngleAxisf;
@@ -93,6 +105,7 @@ using Rotd = Eigen::AngleAxisd;
 // 3x3 Matrix
 using Mat3f = Eigen::Matrix3f;
 using Mat3d = Eigen::Matrix3d;
+using StdVectorOfMat3d = std::vector<Mat3d, Eigen::aligned_allocator<Mat3d>>;
 
 // 4x4 Matrix
 using Mat4f = Eigen::Matrix4f;
@@ -153,4 +166,4 @@ using AffineTransform3d = Eigen::Affine3d;
 #define MAX_F                std::numeric_limits<float>::max()
 #define MIN_F                std::numeric_limits<float>::min()
 #define VERY_SMALL_EPSILON_F std::numeric_limits<float>::epsilon()
-} // end namespace imstk
+}

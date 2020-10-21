@@ -20,12 +20,9 @@
 =========================================================================*/
 
 #include "imstkVirtualCouplingCH.h"
-
+#include "imstkAnalyticalGeometry.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkAnalyticalGeometry.h"
-
-#include <g3log/g3log.hpp>
 
 namespace imstk
 {

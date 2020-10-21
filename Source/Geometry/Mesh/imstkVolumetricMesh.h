@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkPointSet.h"
-
 #include <memory>
 
 namespace imstk

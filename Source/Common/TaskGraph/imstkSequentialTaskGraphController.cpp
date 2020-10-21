@@ -21,7 +21,6 @@
 
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
-#include "imstkTaskNode.h"
 
 namespace imstk
 {

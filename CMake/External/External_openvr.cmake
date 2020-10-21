@@ -1,4 +1,3 @@
-set(_version "1.0.9")
 #-----------------------------------------------------------------------------
 # Set project prefix path
 #-----------------------------------------------------------------------------
@@ -51,8 +50,8 @@ set(copy_openvr_lib_command
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( openvr
-  URL "https://github.com/ValveSoftware/openvr/archive/v${_version}.tar.gz"
-  URL_MD5 "0de39e805155cf4e0e907bb181924c48"
+  URL "https://gitlab.kitware.com/iMSTK/openvr/-/archive/v1.12.5/openvr-v1.12.5.tar.gz"
+  URL_MD5 "42c4d1c4a194860aaa4e793b009b99c0"
   DOWNLOAD_DIR ${OPENVR_PREFIX}
   SOURCE_DIR ${OPENVR_EXTRACT_DIR}
   BINARY_DIR ${OPENVR_EXTRACT_DIR}

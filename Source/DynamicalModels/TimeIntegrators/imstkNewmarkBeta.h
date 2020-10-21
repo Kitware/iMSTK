@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkTimeIntegrator.h"
-#include "imstkLogger.h"
 
 namespace imstk
 {

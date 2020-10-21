@@ -22,8 +22,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTimer.h"
 #include "imstkParallelUtils.h"
-
-//#include "imstkGraph.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -83,9 +82,9 @@ SurfaceMesh::print() const
 double
 SurfaceMesh::getVolume() const
 {
-    // TODO
-    // 1. Check for water tightness
-    // 2. Compute volume based on signed distance
+    /// \todo:
+    /// 1. Check for water tightness
+    /// 2. Compute volume based on signed distance
 
     LOG(WARNING) << "SurfaceMesh::getVolume error: not implemented.";
     return 0.0;
@@ -150,7 +149,8 @@ SurfaceMesh::computeTrianglesNormals()
         m_triangleNormals.at(triangleId) = ((p1 - p0).cross(p2 - p0)).normalized();
     }
 
-    bool                      hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    // TCoords must be named (or else it will pick up any array without a name)
+    bool                      hasUVs = m_defaultTCoords == "" ? false : this->hasPointDataArray(m_defaultTCoords);
     const StdVectorOfVectorf* UVs    = nullptr;
 
     if (hasUVs)
@@ -207,12 +207,13 @@ SurfaceMesh::computeVertexNormals()
 
     // Correct for UV seams
     Vec3d normal, tangent;
-    bool  hasUVs = this->hasPointDataArray(m_defaultTCoords);
+    // TCoords must be named (or else it will pick up any array without a name)
+    bool hasUVs = m_defaultTCoords == "" ? false : this->hasPointDataArray(m_defaultTCoords);
 
-    if (hasUVs)
+    /*if (hasUVs)
     {
         auto UVs = this->getPointDataArray(m_defaultTCoords);
-    }
+    }*/
 
     for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
     {
@@ -598,8 +599,8 @@ void
 SurfaceMesh::setLoadFactor(double loadFactor)
 {
     m_loadFactor      = loadFactor;
-    m_maxNumVertices  = (size_t)(m_originalNumVertices * m_loadFactor);
-    m_maxNumTriangles = (size_t)(m_originalNumTriangles * m_loadFactor);
+    m_maxNumVertices  = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
+    m_maxNumTriangles = static_cast<size_t>(m_originalNumTriangles * m_loadFactor);
     m_trianglesVertices.reserve(m_maxNumTriangles);
     m_vertexNormals.reserve(m_maxNumVertices);
     m_vertexTangents.reserve(m_maxNumVertices);
@@ -631,9 +632,43 @@ SurfaceMesh::directionalScale(double s_x, double s_y, double s_z)
                 m_initialVertexPositions[i].y() = s_y * m_initialVertexPositions[i].y();
                 m_vertexPositions[i].z() = s_z * m_vertexPositions[i].z();
                 m_initialVertexPositions[i].z() = s_z * m_initialVertexPositions[i].z();
-      });
-        m_dataModified     = true;
+            });
+        m_dataModified = true;
         m_transformApplied = false;
     }
 }
+
+SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
+{
+    this->m_trianglesVertices       = srcMesh->m_trianglesVertices;
+    this->m_vertexNeighborTriangles = srcMesh->m_vertexNeighborTriangles;
+    this->m_vertexNeighborVertices  = srcMesh->m_vertexNeighborVertices;
+    this->m_triangleNormals      = srcMesh->m_triangleNormals;
+    this->m_triangleTangents     = srcMesh->m_triangleTangents;
+    this->m_vertexNormals        = srcMesh->m_vertexNormals;
+    this->m_vertexTangents       = srcMesh->m_vertexTangents;
+    this->m_UVSeamVertexGroups   = srcMesh->m_UVSeamVertexGroups;
+    this->m_defaultTCoords       = srcMesh->m_defaultTCoords;
+    this->m_originalNumTriangles = srcMesh->m_originalNumTriangles;
+    this->m_maxNumTriangles      = srcMesh->m_maxNumTriangles;
+
+    this->m_initialVertexPositions = srcMesh->m_initialVertexPositions;
+    this->m_vertexPositions = srcMesh->m_vertexPositions;
+    this->m_vertexPositionsPostTransform = srcMesh->m_vertexPositionsPostTransform;
+    this->m_pointDataMap        = srcMesh->m_pointDataMap;
+    this->m_topologyChanged     = srcMesh->m_topologyChanged;
+    this->m_loadFactor          = srcMesh->m_loadFactor;
+    this->m_maxNumVertices      = srcMesh->m_maxNumVertices;
+    this->m_originalNumVertices = srcMesh->m_originalNumVertices;
+
+    this->m_type = srcMesh->m_type;
+    this->m_name = srcMesh->m_name;
+    this->m_geometryIndex     = srcMesh->m_geometryIndex;
+    this->m_dataModified      = srcMesh->m_dataModified;
+    this->m_transformModified = srcMesh->m_transformModified;
+    this->m_transformApplied  = srcMesh->m_transformApplied;
+    this->m_transform = srcMesh->m_transform;
+    this->m_scaling   = srcMesh->m_scaling;
+}
+
 }  // namespace imstk

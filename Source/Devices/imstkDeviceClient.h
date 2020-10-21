@@ -22,22 +22,29 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkEventObject.h"
+
+#include <unordered_map>
 
 namespace imstk
 {
 ///
 /// \class DeviceClient
-/// \brief Base class for any device client
 ///
-class DeviceClient
+/// \brief The device client's represents the device and provides
+/// an interface to acquire data from a device.
+/// It posts events the device may have as well as provides the state
+/// \todo HAVE AN ABSTRACK BASE CLASS FOR THE DEVICE CLIENT
+///
+class DeviceClient : public EventObject
 {
 public:
-
     ///
     /// \brief Destructor
     ///
-    virtual ~DeviceClient() {}
+    virtual ~DeviceClient() = default;
 
+public:
     ///
     /// \brief Get/Set the device IP
     ///
@@ -78,26 +85,32 @@ public:
     const Quatd& getOrientation() const;
 
     ///
-    /// \brief Get the status of the device buttons
-    ///
-    const std::map<size_t, bool>& getButtons() const;
-
-    ///
-    /// \brief Get the status of a device button
-    ///
-    bool getButton(size_t buttonId) const;
-
-    ///
     /// \brief Get/Set the device force
     ///
     const Vec3d& getForce() const;
     void setForce(Vec3d force);
 
-protected:
+    const std::unordered_map<int, int>& getButtons() const { return m_buttons; }
 
     ///
-    /// \brief Constructor
+    /// \brief Get the state of a button
+    /// returns 0 if can't find button
     ///
+    const int getButton(const int buttonId) const
+    {
+        if (m_buttons.find(buttonId) != m_buttons.end())
+        {
+            return m_buttons.at(buttonId);
+        }
+        else
+        {
+            return 0;
+        }
+    }
+
+    virtual void update() {}
+
+protected:
     DeviceClient(const std::string& name, const std::string& ip);
 
     std::string m_deviceName;                ///< Device Name
@@ -111,7 +124,8 @@ protected:
     Vec3d m_position;                        ///< Position of end effector
     Vec3d m_velocity;                        ///< Linear velocity of end effector
     Quatd m_orientation;                     ///< Orientation of the end effector
-    std::map<size_t, bool> m_buttons;        ///< Buttons: true = pressed/false = not pressed
     Vec3d m_force;                           ///< Force vector
+
+    std::unordered_map<int, int> m_buttons;
 };
 }

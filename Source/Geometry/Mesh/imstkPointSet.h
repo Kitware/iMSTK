@@ -139,6 +139,11 @@ public:
     const StdVectorOfVectorf* getPointDataArray(const std::string& arrayName) const;
 
     ///
+    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
+    ///
+    StdVectorOfVectorf* getPointDataArray(const std::string& arrayName);
+
+    ///
     /// \brief Check if a specific data array exists.
     ///
     bool hasPointDataArray(const std::string& arrayName) const;

@@ -19,38 +19,25 @@
 
 =========================================================================*/
 #include "imstkAPIUtilities.h"
+#include "imstkGraph.h"
+#include "imstkLinearProjectionConstraint.h"
+#include "imstkLogger.h"
 
 // Objects
-#include "imstkFEMDeformableBodyModel.h"
-#include "imstkSceneObject.h"
-#include "imstkSceneManager.h"
 #include "imstkCollidingObject.h"
+#include "imstkFEMDeformableBodyModel.h"
 #include "imstkScene.h"
-
-#include "imstkColor.h"
-
-// Solvers
-#include "imstkNonLinearSystem.h"
+#include "imstkSceneManager.h"
 
 // Geometry
-#include "imstkPlane.h"
-#include "imstkSphere.h"
 #include "imstkCapsule.h"
 #include "imstkCube.h"
-#include "imstkPointSet.h"
+#include "imstkImageData.h"
+#include "imstkMeshIO.h"
+#include "imstkPlane.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
-#include "imstkImageData.h"
-
-#include "imstkGraph.h"
-#include "imstkCollisionGraph.h"
-#include "imstkCamera.h"
-#include "imstkLinearProjectionConstraint.h"
-
-// logger
-#include "imstkLogger.h"
-#include "imstkTimer.h"
 
 namespace imstk
 {
@@ -211,11 +198,13 @@ printUPS(std::shared_ptr<SceneManager> sceneManager)
     }
 
     sceneManager->enableFrameCount();
-    sceneManager->setPostUpdateCallback([&sceneManager](Module* module)
+    // When sceneManager emits PreUpdate, cout the ups
+    connect<Event>(sceneManager, EventType::PreUpdate,
+        [&sceneManager](Event*)
             {
-                std::cout << "\r" << module->getName() << " running at "
+                std::cout << "\r" << sceneManager->getName() << " running at "
                           << sceneManager->getUPS() << " ups   " << std::flush;
-                });
+        });
 }
 
 std::shared_ptr<Graph>

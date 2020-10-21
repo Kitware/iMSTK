@@ -23,52 +23,47 @@
 #include "imstkCollidingObject.h"
 #include "imstkDeviceClient.h"
 #include "imstkGeometry.h"
-#include "imstkSceneObject.h"
 #include "imstkLogger.h"
-#include "imstkMath.h"
-
-#include <utility>
 
 namespace imstk
 {
 LaparoscopicToolController::LaparoscopicToolController(
-    std::shared_ptr<SceneObject>   shaft,
-    std::shared_ptr<SceneObject>   upperJaw,
-    std::shared_ptr<SceneObject>   lowerJaw,
-    std::shared_ptr<DeviceTracker> trackingController) :
-    SceneObjectControllerBase(),
-    m_trackingController(trackingController),
+    std::shared_ptr<SceneObject>  shaft,
+    std::shared_ptr<SceneObject>  upperJaw,
+    std::shared_ptr<SceneObject>  lowerJaw,
+    std::shared_ptr<DeviceClient> trackingDevice) :
+    TrackingDeviceControl(trackingDevice),
     m_shaft(shaft),
     m_upperJaw(upperJaw),
     m_lowerJaw(lowerJaw),
     m_jawRotationAxis(Vec3d(0, 1., 0))
 {
-    m_trackingController->getDeviceClient()->setButtonsEnabled(true);
+    trackingDevice->setButtonsEnabled(true);
 }
 
 void
 LaparoscopicToolController::updateControlledObjects()
 {
-    if (!m_trackingController->isTrackerUpToDate())
+    if (!isTrackerUpToDate())
     {
-        if (!m_trackingController->updateTrackingData())
+        if (!updateTrackingData())
         {
             LOG(WARNING) << "LaparoscopicToolController::updateControlledObjects warning: could not update tracking info.";
             return;
         }
     }
 
-    Vec3d p = m_trackingController->getPosition();
-    Quatd r = m_trackingController->getRotation();
+    Vec3d p = getPosition();
+    Quatd r = getRotation();
 
     // Update jaw angles
-    if (m_trackingController->getDeviceClient()->getButton(0))
+    if (m_deviceClient->getButton(0))
     {
         m_jawAngle += m_change;
         m_jawAngle  = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
     }
 
-    if (m_trackingController->getDeviceClient()->getButton(1))
+    if (m_deviceClient->getButton(1))
     {
         m_jawAngle -= m_change;
         m_jawAngle  = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
@@ -111,6 +106,6 @@ LaparoscopicToolController::applyForces()
         force += collidingObject->getForce();
     }
 
-    m_trackingController->getDeviceClient()->setForce(force);
+    m_deviceClient->setForce(force);
 }
 } // imstk

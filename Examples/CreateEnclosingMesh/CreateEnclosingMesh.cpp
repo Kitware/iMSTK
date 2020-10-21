@@ -19,17 +19,22 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkSceneManager.h"
-#include "imstkLight.h"
 #include "imstkCamera.h"
-#include "imstkAPIUtilities.h"
+#include "imstkGeometryUtilities.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
+#include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkMeshIO.h"
-#include "imstkVTKMeshIO.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkScene.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -38,50 +43,77 @@ const size_t nx = 80 / 2, ny = 40 / 2, nz = 40 / 2;
 int
 main()
 {
-    // Create simulation manager
-    auto simManager = std::make_shared<SimulationManager>();
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
     // Create a sample scene
-    auto scene = simManager->createNewScene("renderMesh");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    imstkNew<Scene> scene("renderMesh");
+    {
+        scene->getActiveCamera()->setPosition(0.0, 2.0, 15.0);
 
-    // add scene object for surface object
-    auto surfaceObject = std::make_shared<VisualObject>("SurfaceObj");
+        // add scene object for surface object
+        imstkNew<VisualObject> surfObj("SurfaceObject");
 
-    auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj"));
+        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
 
-    // configure and add the render model to the scene object
-    auto material = std::make_shared<RenderMaterial>();
-    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    material->setColor(Color::LightGray);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
-    surfaceObject->addVisualModel(surfMeshModel);
+        // configure and add the render model to the scene object
+        imstkNew<RenderMaterial> material;
+        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        material->setColor(Color::LightGray);
+        imstkNew<VisualModel> visualModel(surfMesh);
+        visualModel->setRenderMaterial(material);
+        surfObj->addVisualModel(visualModel);
 
-    // add the scene object to the scene
-    scene->addSceneObject(surfaceObject);
+        // add the scene object to the scene
+        scene->addSceneObject(surfObj);
 
-    auto tetMesh = GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
+        std::shared_ptr<TetrahedralMesh> tetMesh =
+            GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
 
-    // add scene object for surface object
-    auto volObject   = std::make_shared<VisualObject>("VolObj");
-    auto tetMaterial = std::make_shared<RenderMaterial>();
-    tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    tetMaterial->setEdgeColor(Color::Teal);
-    tetMaterial->setPointSize(7.);
-    tetMaterial->setLineWidth(3.);
-    auto tetVizModel = std::make_shared<VisualModel>(tetMesh, tetMaterial);
-    volObject->addVisualModel(tetVizModel);
+        // add scene object for surface object
+        imstkNew<VisualObject>   volObject("VolObj");
+        imstkNew<RenderMaterial> tetMaterial;
+        tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
+        tetMaterial->setEdgeColor(Color::Teal);
+        tetMaterial->setPointSize(7.0);
+        tetMaterial->setLineWidth(3.0);
+        imstkNew<VisualModel> tetVisualModel(tetMesh, tetMaterial);
+        volObject->addVisualModel(tetVisualModel);
 
-    scene->addSceneObject(volObject);
+        scene->addSceneObject(volObject);
 
-    // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
-    scene->addLight(light);
+        // Light
+        imstkNew<DirectionalLight> light("light");
+        light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+        light->setIntensity(1);
+        scene->addLight(light);
+    }
 
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start();
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        viewer->start();
+    }
 }

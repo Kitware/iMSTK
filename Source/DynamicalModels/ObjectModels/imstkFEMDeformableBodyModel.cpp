@@ -19,32 +19,30 @@
 
 =========================================================================*/
 
-// std lib
-#include <fstream>
-
-//imstk
 #include "imstkFEMDeformableBodyModel.h"
 #include "imstkConjugateGradient.h"
 #include "imstkCorotationalFEMForceModel.h"
-#include "imstkInternalForceModel.h"
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
 #include "imstkLinearFEMForceModel.h"
-#include "imstkMath.h"
-#include "imstkSolverBase.h"
+#include "imstkLogger.h"
+#include "imstkNewtonSolver.h"
 #include "imstkStVKForceModel.h"
 #include "imstkTaskGraph.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkVolumetricMesh.h"
+#include "imstkTypes.h"
 
-// vega
-#include "generateMassMatrix.h"
-#include "generateMeshGraph.h"
-
+#include <generateMassMatrix.h>
+#include <generateMeshGraph.h>
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4458 )
-#include "configFile.h"
+#endif
+#include <configFile.h>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 namespace imstk
 {
@@ -521,7 +519,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState&       state
 }
 
 void
-FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
+FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& imstkNotUsed(stateAtT),
                                                  kinematicState&       newState,
                                                  const StateUpdateType updateType)
 {
@@ -530,9 +528,6 @@ FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
     switch (updateType)
     {
     case StateUpdateType::DeltaVelocity:
-
-        stateAtT;// supress warning (state is not used in this update type hence can be ignored)
-
         this->updateMassMatrix();
         m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
         this->updateDampingMatrix();
@@ -686,8 +681,10 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(
 NonLinearSystem<SparseMatrixd>::VectorFunctionType
 FEMDeformableBodyModel::getFunction()
 {
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4100 )
+#endif
 
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool semiImplicit)->const Vectord&
@@ -701,15 +698,18 @@ FEMDeformableBodyModel::getFunction()
                }
                return m_Feff;
            };
-
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 }
 
 NonLinearSystem<SparseMatrixd>::MatrixFunctionType
 FEMDeformableBodyModel::getFunctionGradient()
 {
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4100 )
+#endif
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord& q)->const SparseMatrixd&
            {
@@ -721,8 +721,9 @@ FEMDeformableBodyModel::getFunctionGradient()
                }
                return m_Keff;
            };
-
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 }
 
 NonLinearSystem<SparseMatrixd>::UpdateFunctionType

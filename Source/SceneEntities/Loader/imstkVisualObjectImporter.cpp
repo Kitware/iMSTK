@@ -20,17 +20,15 @@
 =========================================================================*/
 
 #include "imstkVisualObjectImporter.h"
-#include "imstkRenderMaterial.h"
-
-#include "assimp/Importer.hpp"
-#include "assimp/mesh.h"
-#include "assimp/scene.h"
-#include "assimp/postprocess.h"
-
-#include "imstkSurfaceMesh.h"
 #include "imstkAssimpMeshIO.h"
-
 #include "imstkLogger.h"
+#include "imstkRenderMaterial.h"
+#include "imstkSceneObject.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVisualModel.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
 
 namespace imstk
 {

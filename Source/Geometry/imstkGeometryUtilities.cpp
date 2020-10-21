@@ -20,33 +20,197 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
+#include "imstkDataArray.h"
 #include "imstkHexahedralMesh.h"
+#include "imstkImageData.h"
 #include "imstkLineMesh.h"
-#include "imstkPointSet.h"
+#include "imstkLogger.h"
+#include "imstkParallelUtils.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkCube.h"
+#include "imstkSphere.h"
 
 #include <vtkAppendPolyData.h>
-#include <vtkCleanPolyData.h>
-#include <vtkDataSet.h>
-#include <vtkPolyData.h>
-#include <vtkPointSet.h>
-#include <vtkExtractEdges.h>
-#include <vtkLinearSubdivisionFilter.h>
-#include <vtkLoopSubdivisionFilter.h>
+#include <vtkCharArray.h>
+#include <vtkCubeSource.h>
+#include <vtkDoubleArray.h>
+#include <vtkFeatureEdges.h>
+#include <vtkFloatArray.h>
+#include <vtkImageData.h>
+#include <vtkMassProperties.h>
 #include <vtkPointData.h>
-#include <vtkSelectEnclosedPoints.h>
-#include <vtkSmoothPolyDataFilter.h>
+#include <vtkShortArray.h>
+#include <vtkSphereSource.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 #include <vtkTriangleFilter.h>
-#include <vtkUnstructuredGrid.h>
 #include <vtkUnsignedCharArray.h>
+#include <vtkUnsignedIntArray.h>
+#include <vtkUnsignedLongArray.h>
+#include <vtkUnsignedShortArray.h>
+#include <vtkUnstructuredGrid.h>
+
+static vtkSmartPointer<vtkDataArray>
+makeVtkDataArray(unsigned char type)
+{
+    vtkSmartPointer<vtkDataArray> arr = nullptr;
+    switch (type)
+    {
+    case VTK_CHAR:
+        arr = vtkSmartPointer<vtkCharArray>::New();
+        break;
+    case VTK_UNSIGNED_CHAR:
+        arr = vtkSmartPointer<vtkUnsignedCharArray>::New();
+        break;
+    case VTK_SHORT:
+        arr = vtkSmartPointer<vtkShortArray>::New();
+        break;
+    case VTK_UNSIGNED_SHORT:
+        arr = vtkSmartPointer<vtkUnsignedShortArray>::New();
+        break;
+    case VTK_INT:
+        arr = vtkSmartPointer<vtkIntArray>::New();
+        break;
+    case VTK_UNSIGNED_INT:
+        arr = vtkSmartPointer<vtkUnsignedIntArray>::New();
+        break;
+    case VTK_FLOAT:
+        arr = vtkSmartPointer<vtkFloatArray>::New();
+        break;
+    case VTK_DOUBLE:
+        arr = vtkSmartPointer<vtkDoubleArray>::New();
+        break;
+    case VTK_LONG_LONG:
+        arr = vtkSmartPointer<vtkLongLongArray>::New();
+        break;
+    case VTK_UNSIGNED_LONG_LONG:
+        arr = vtkSmartPointer<vtkUnsignedLongArray>::New();
+        break;
+    default:
+        LOG(WARNING) << "Unknown scalar type";
+        break;
+    }
+    ;
+    return arr;
+}
 
 #include <vtkFloatArray.h>
 
 namespace imstk
 {
+vtkSmartPointer<vtkDataArray>
+GeometryUtils::coupleVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray)
+{
+    CHECK(imstkArray != nullptr) << "AbstractDataArray provided is not valid!";
+    CHECK(imstkArray->getVoidPointer() != nullptr) << "AbstractDataArray data provided is not valid!";
+
+    // Create corresponding data array
+    vtkSmartPointer<vtkDataArray> arr = makeVtkDataArray(imstkToVtkScalarType[imstkArray->getScalarType()]);
+    arr->SetVoidArray(imstkArray->getVoidPointer(), imstkArray->size(), 1);
+
+    return arr;
+}
+
+vtkSmartPointer<vtkImageData>
+GeometryUtils::coupleVtkImageData(std::shared_ptr<ImageData> imageData)
+{
+    CHECK(imageData != nullptr) << "ImageData provided is not valid!";
+
+    // VTK puts center of min voxel at origin of world space, we put min of bot voxel at origin
+    std::shared_ptr<AbstractDataArray> arr    = imageData->getScalars();
+    vtkSmartPointer<vtkDataArray>      vtkArr = coupleVtkDataArray(arr);
+
+    vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
+    imageDataVtk->SetDimensions(imageData->getDimensions().data());
+    imageDataVtk->SetSpacing(imageData->getSpacing().data());
+    const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;
+    imageDataVtk->SetOrigin(vtkOrigin.data());
+    imageDataVtk->SetNumberOfScalarComponents(imageData->getNumComponents(), imageDataVtk->GetInformation());
+    imageDataVtk->SetScalarType(imstkToVtkScalarType[arr->getScalarType()], imageDataVtk->GetInformation());
+    imageDataVtk->GetPointData()->SetScalars(vtkArr);
+    return imageDataVtk;
+}
+
+vtkSmartPointer<vtkDataArray>
+GeometryUtils::copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray, int numComps)
+{
+    CHECK(imstkArray != nullptr) << "AbstractDataArray provided is not valid!";
+
+    // Create resulting data array
+    vtkSmartPointer<vtkDataArray> arr = makeVtkDataArray(imstkToVtkScalarType[imstkArray->getScalarType()]);
+    arr->SetNumberOfComponents(numComps);
+    arr->SetNumberOfValues(imstkArray->size());
+    switch (imstkArray->getScalarType())
+    {
+        TemplateMacro(std::copy_n(static_cast<IMSTK_TT*>(imstkArray->getVoidPointer()), imstkArray->size(), static_cast<IMSTK_TT*>(arr->GetVoidPointer(0))); );
+    default:
+        LOG(WARNING) << "Unknown scalar type";
+        break;
+    }
+
+    return arr;
+}
+
+std::shared_ptr<AbstractDataArray>
+GeometryUtils::copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray)
+{
+    CHECK(vtkArray != nullptr) << "vtkDataArray provided is not valid!";
+
+    std::shared_ptr<AbstractDataArray> arr = nullptr;
+
+    // Create and copy the array
+    switch (vtkToImstkScalarType[vtkArray->GetDataType()])
+    {
+        TemplateMacro(arr = std::make_shared<DataArray<IMSTK_TT>>(vtkArray->GetNumberOfValues());
+            std::copy_n(static_cast<IMSTK_TT*>(vtkArray->GetVoidPointer(0)), vtkArray->GetNumberOfValues(), static_cast<IMSTK_TT*>(arr->getVoidPointer())); );
+    default:
+        LOG(WARNING) << "Unknown scalar type";
+        break;
+    }
+    return arr;
+}
+
+std::unique_ptr<ImageData>
+GeometryUtils::copyToImageData(vtkSmartPointer<vtkImageData> vtkImage)
+{
+    CHECK(vtkImage != nullptr) << "vtkImageData provided is not valid!";
+
+    double*     spacingPtr = vtkImage->GetSpacing();
+    const Vec3d spacing    = Vec3d(spacingPtr[0], spacingPtr[1], spacingPtr[2]);
+    // vtk origin is not bounds and vtk origin is not actual origin
+    double* bounds = vtkImage->GetBounds();
+    // image data origin starts at center of first voxel
+    const Vec3d origin = Vec3d(bounds[0], bounds[2], bounds[4]) - spacing * 0.5;
+
+    std::unique_ptr<ImageData> imageData = std::make_unique<ImageData>();
+    imageData->setScalars(copyToDataArray(vtkImage->GetPointData()->GetScalars()),
+        vtkImage->GetNumberOfScalarComponents(), vtkImage->GetDimensions());
+    imageData->setSpacing(spacing);
+    imageData->setOrigin(origin);
+    return imageData;
+}
+
+vtkSmartPointer<vtkImageData>
+GeometryUtils::copyToVtkImageData(std::shared_ptr<ImageData> imageData)
+{
+    CHECK(imageData != nullptr) << "ImageData provided is not valid!";
+
+    // Our image data does not use vtk extents
+    const Vec3i& dim = imageData->getDimensions();
+
+    vtkSmartPointer<vtkImageData> imageDataVtk = vtkSmartPointer<vtkImageData>::New();
+    imageDataVtk->SetSpacing(imageData->getSpacing().data());
+    const Vec3d vtkOrigin = imageData->getOrigin() + imageData->getSpacing() * 0.5;
+    imageDataVtk->SetOrigin(vtkOrigin.data());
+    imageDataVtk->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+    imageDataVtk->AllocateScalars(imstkToVtkScalarType[imageData->getScalarType()], imageData->getNumComponents());
+    imageDataVtk->GetPointData()->SetScalars(copyToVtkDataArray(imageData->getScalars(), imageData->getNumComponents()));
+    return imageDataVtk;
+}
+
 std::unique_ptr<PointSet>
-GeometryUtils::convertVtkPointSetToPointSet(const vtkSmartPointer<vtkPointSet> vtkMesh)
+GeometryUtils::copyToPointSet(vtkSmartPointer<vtkPointSet> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkPolyData provided is not valid!";
 
@@ -68,7 +232,7 @@ GeometryUtils::convertVtkPointSetToPointSet(const vtkSmartPointer<vtkPointSet> v
 }
 
 std::unique_ptr<SurfaceMesh>
-GeometryUtils::convertVtkPolyDataToSurfaceMesh(const vtkSmartPointer<vtkPolyData> vtkMesh)
+GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkPolyData provided is not valid!";
 
@@ -102,7 +266,7 @@ GeometryUtils::convertVtkPolyDataToSurfaceMesh(const vtkSmartPointer<vtkPolyData
 }
 
 std::unique_ptr<LineMesh>
-GeometryUtils::convertVtkPolyDataToLineMesh(const vtkSmartPointer<vtkPolyData> vtkMesh)
+GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkPolyData provided is not valid!";
 
@@ -127,7 +291,7 @@ GeometryUtils::convertVtkPolyDataToLineMesh(const vtkSmartPointer<vtkPolyData> v
 }
 
 vtkSmartPointer<vtkPointSet>
-GeometryUtils::convertPointSetToVtkPointSet(const std::shared_ptr<PointSet> imstkMesh)
+GeometryUtils::copyToVtkPointSet(std::shared_ptr<PointSet> imstkMesh)
 {
     vtkNew<vtkPoints> points;
     copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
@@ -138,7 +302,7 @@ GeometryUtils::convertPointSetToVtkPointSet(const std::shared_ptr<PointSet> imst
 }
 
 vtkSmartPointer<vtkPolyData>
-GeometryUtils::convertLineMeshToVtkPolyData(const std::shared_ptr<LineMesh> imstkMesh)
+GeometryUtils::copyToVtkPolyData(std::shared_ptr<LineMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
     copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
@@ -153,7 +317,7 @@ GeometryUtils::convertLineMeshToVtkPolyData(const std::shared_ptr<LineMesh> imst
 }
 
 vtkSmartPointer<vtkPolyData>
-GeometryUtils::convertSurfaceMeshToVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh)
+GeometryUtils::copyToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
     copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
@@ -169,7 +333,7 @@ GeometryUtils::convertSurfaceMeshToVtkPolyData(const std::shared_ptr<SurfaceMesh
 }
 
 vtkSmartPointer<vtkUnstructuredGrid>
-GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<TetrahedralMesh> imstkMesh)
+GeometryUtils::copyToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
     copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
@@ -205,7 +369,7 @@ GeometryUtils::convertTetrahedralMeshToVtkUnstructuredGrid(const std::shared_ptr
 }
 
 vtkSmartPointer<vtkUnstructuredGrid>
-GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<HexahedralMesh> imstkMesh)
+GeometryUtils::copyToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh)
 {
     vtkNew<vtkPoints> points;
     copyVerticesToVtk(imstkMesh->getVertexPositions(), points.Get());
@@ -220,7 +384,7 @@ GeometryUtils::convertHexahedralMeshToVtkUnstructuredGrid(const std::shared_ptr<
 }
 
 std::unique_ptr<VolumetricMesh>
-GeometryUtils::convertVtkUnstructuredGridToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh)
+GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh)
 {
     CHECK(vtkMesh != nullptr) << "vtkUnstructuredGrid provided is not valid!";
 
@@ -327,8 +491,12 @@ GeometryUtils::copyPointDataFromVtk(vtkPointData* const pointData, std::map<std:
 
     for (int i = 0; i < pointData->GetNumberOfArrays(); ++i)
     {
-        vtkDataArray*      array       = pointData->GetArray(i);
-        std::string        name        = array->GetName();
+        vtkDataArray* array = pointData->GetArray(i);
+        std::string   name  = "";
+        if (array->GetName() != NULL)
+        {
+            name = array->GetName();
+        }
         int                nbrOfComp   = array->GetNumberOfComponents();
         vtkIdType          nbrOfTuples = array->GetNumberOfTuples();
         StdVectorOfVectorf data;
@@ -347,126 +515,66 @@ GeometryUtils::copyPointDataFromVtk(vtkPointData* const pointData, std::map<std:
     }
 }
 
-std::unique_ptr<SurfaceMesh>
-GeometryUtils::combineSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh1, std::shared_ptr<SurfaceMesh> surfaceMesh2)
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::toCubeSurfaceMesh(std::shared_ptr<Cube> cube)
 {
-    vtkNew<vtkAppendPolyData> filter;
-    filter->AddInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh1));
-    filter->AddInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh2));
-    filter->Update();
+    vtkNew<vtkCubeSource> cubeSource;
+    cubeSource->SetCenter(cube->getPosition(Geometry::DataType::PreTransform).data());
+    cubeSource->SetXLength(cube->getWidth());
+    cubeSource->SetYLength(cube->getWidth());
+    cubeSource->SetZLength(cube->getWidth());
+    cubeSource->Update();
 
-    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
+    Mat4d mat;
+    mat.setIdentity();
+    mat.block<3, 3>(0, 0) = cube->getRotation();
+
+    vtkNew<vtkTransform> transform;
+    transform->SetMatrix(mat.data());
+
+    vtkNew<vtkTransformFilter> transformCube;
+    transformCube->SetInputData(cubeSource->GetOutput());
+    transformCube->SetTransform(transform);
+    transformCube->Update();
+    vtkNew<vtkTriangleFilter> triangulate;
+    triangulate->SetInputData(transformCube->GetOutput());
+    triangulate->Update();
+    return copyToSurfaceMesh(triangulate->GetOutput());
 }
 
-std::unique_ptr<LineMesh>
-GeometryUtils::surfaceMeshToLineMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
+std::shared_ptr<SurfaceMesh>
+GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
+                                     const unsigned int phiDivisions, const unsigned int thetaDivisions)
 {
-    vtkNew<vtkExtractEdges> filter;
-    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->Update();
+    vtkNew<vtkSphereSource> sphereSource;
+    sphereSource->SetCenter(sphere->getPosition(Geometry::DataType::PreTransform).data());
+    sphereSource->SetRadius(sphere->getRadius());
+    sphereSource->SetPhiResolution(phiDivisions);
+    sphereSource->SetThetaResolution(thetaDivisions);
+    sphereSource->Update();
 
-    vtkNew<vtkTriangleFilter> triangleFilter;
-    triangleFilter->SetInputData(filter->GetOutput());
-    triangleFilter->Update();
-
-    return convertVtkPolyDataToLineMesh(triangleFilter->GetOutput());
+    return copyToSurfaceMesh(sphereSource->GetOutput());
 }
 
-std::unique_ptr<SurfaceMesh>
-GeometryUtils::cleanSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
+int
+GeometryUtils::getOpenEdgeCount(std::shared_ptr<SurfaceMesh> surfMesh)
 {
-    vtkNew<vtkCleanPolyData> filter;
-    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->Update();
-    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
+    vtkNew<vtkFeatureEdges> checkClosed;
+    checkClosed->SetInputData(GeometryUtils::copyToVtkPolyData(surfMesh));
+    checkClosed->FeatureEdgesOff();
+    checkClosed->BoundaryEdgesOn();
+    checkClosed->NonManifoldEdgesOn();
+    checkClosed->Update();
+    return checkClosed->GetOutput()->GetNumberOfCells();
 }
 
-std::unique_ptr<PointSet>
-GeometryUtils::getEnclosedPoints(std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, bool insideOut)
+double
+GeometryUtils::getVolume(std::shared_ptr<SurfaceMesh> surfMesh)
 {
-    vtkNew<vtkSelectEnclosedPoints> filter;
-    filter->SetInputData(convertPointSetToVtkPointSet(pointSet));
-    filter->SetSurfaceData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->SetTolerance(0.0);
-    filter->SetInsideOut(insideOut);
-    filter->Update();
-    vtkSmartPointer<vtkPointSet> vtkResults = vtkPointSet::SafeDownCast(filter->GetOutput());
-
-    StdVectorOfVec3d points;
-    points.reserve(vtkResults->GetNumberOfPoints());
-    for (vtkIdType i = 0; i < vtkResults->GetNumberOfPoints(); i++)
-    {
-        if (filter->IsInside(i))
-        {
-            double pt[3];
-            vtkResults->GetPoint(i, pt);
-            points.push_back(Vec3d(pt[0], pt[1], pt[2]));
-        }
-    }
-    points.shrink_to_fit();
-
-    std::unique_ptr<PointSet> results = std::make_unique<PointSet>();
-    results->setInitialVertexPositions(points);
-    results->setVertexPositions(points);
-    return results;
-}
-
-void
-GeometryUtils::testEnclosedPoints(std::vector<bool>& results, std::shared_ptr<SurfaceMesh> surfaceMesh, std::shared_ptr<PointSet> pointSet, const bool insideOut)
-{
-    vtkNew<vtkSelectEnclosedPoints> filter;
-    filter->SetInputData(convertPointSetToVtkPointSet(pointSet));
-    filter->SetSurfaceData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->SetTolerance(0.0);
-    filter->SetInsideOut(insideOut);
-    filter->Update();
-    vtkUnsignedCharArray* arr = vtkUnsignedCharArray::SafeDownCast(filter->GetOutput()->GetPointData()->GetArray("SelectedPoints"));
-
-    results.resize(arr->GetNumberOfValues());
-    for (vtkIdType i = 0; i < arr->GetNumberOfValues(); i++)
-    {
-        results[i] = (arr->GetValue(i) ? true : false);
-    }
-}
-
-std::unique_ptr<SurfaceMesh>
-GeometryUtils::smoothSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
-                                 const smoothPolydataConfig&  c)
-{
-    vtkNew<vtkSmoothPolyDataFilter> filter;
-    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->SetNumberOfIterations(c.numberOfIterations);
-    filter->SetRelaxationFactor(c.relaxationFactor);
-    filter->SetConvergence(c.convergence);
-    filter->SetFeatureAngle(c.featureAngle);
-    filter->SetEdgeAngle(c.edgeAngle);
-    filter->SetFeatureEdgeSmoothing(c.featureEdgeSmoothing);
-    filter->SetBoundarySmoothing(c.boundarySmoothing);
-    filter->Update();
-
-    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
-}
-
-std::unique_ptr<SurfaceMesh>
-GeometryUtils::linearSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions)
-{
-    vtkNew<vtkLinearSubdivisionFilter> filter;
-    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->SetNumberOfSubdivisions(numSubdivisions);
-    filter->Update();
-
-    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
-}
-
-std::unique_ptr<SurfaceMesh>
-GeometryUtils::loopSubdivideSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const int numSubdivisions)
-{
-    vtkNew<vtkLoopSubdivisionFilter> filter;
-    filter->SetInputData(convertSurfaceMeshToVtkPolyData(surfaceMesh));
-    filter->SetNumberOfSubdivisions(numSubdivisions);
-    filter->Update();
-
-    return convertVtkPolyDataToSurfaceMesh(filter->GetOutput());
+    vtkNew<vtkMassProperties> massProps;
+    massProps->SetInputData(copyToVtkPolyData(surfMesh));
+    massProps->Update();
+    return massProps->GetVolume();
 }
 
 namespace // anonymous namespace
@@ -864,15 +972,13 @@ markPointsInsideAndOut(std::vector<bool>&      isInside,
 
 ///
 /// \brief Given a set of uniformly spaced points, mark them as inside (true) and outside.
-/// It makes uses of ray-tracing but skips points based on the nearest distance between current point and the surface.
+/// It makes uses of ray-casting but skips points based on the nearest distance between current point and the surface.
 ///
 /// \param surfaceMesh a \ref SurfaceMesh
 /// \param coords a set of points to be tested
 /// \param nx number of points in x-direction
 /// \param ny number of points in y-direction
 /// \param nz number of points in z-direction
-///
-/// \note this function cannot be const because PointSet::computeBoundingBox, called inside, is not.
 ///
 void
 markPointsInsideAndOut(std::vector<bool>&      isInside,

@@ -21,15 +21,14 @@
 
 #pragma once
 
+#include "imstkLinearSolver.h"
+#include "imstkMath.h"
+
 #pragma warning( push )
 #pragma warning( disable : 4127 )
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
 #pragma warning( pop )
-
-// iMSTK includes
-#include "imstkLinearSolver.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
@@ -99,8 +98,8 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    DirectLinearSolver()  = default;
-    ~DirectLinearSolver() = default;
+    DirectLinearSolver() = default;
+    virtual ~DirectLinearSolver() override = default;
 
     ///
     /// \brief Constructor

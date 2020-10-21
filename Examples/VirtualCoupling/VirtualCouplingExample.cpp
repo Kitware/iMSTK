@@ -19,21 +19,30 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkVirtualCouplingCH.h"
-#include "imstkHDAPIDeviceServer.h"
-#include "imstkHDAPIDeviceClient.h"
-#include "imstkSceneObjectController.h"
-#include "imstkDeviceTracker.h"
-#include "imstkCollisionGraph.h"
-#include "imstkLight.h"
 #include "imstkCamera.h"
+#include "imstkCDObjectFactory.h"
+#include "imstkCollidingObject.h"
+#include "imstkCollisionData.h"
+#include "imstkCollisionGraph.h"
+#include "imstkCollisionPair.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPlane.h"
-#include "imstkSphere.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkSphere.h"
+#include "imstkVirtualCouplingCH.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 // global variables
-const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni1Name = "Default Device";
 
 using namespace imstk;
 
@@ -44,46 +53,35 @@ using namespace imstk;
 int
 main()
 {
-#ifndef iMSTK_USE_OPENHAPTICS
-    std::cout << "LaparoscopicToolController example needs haptic device to be enabled at build time" << std::endl;
-    return 1;
-#else if
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("VirtualCoupling");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    // Scene
+    imstkNew<Scene> scene("VirtualCoupling");
 
     // Create a plane in the scene
-    auto planeGeom = std::make_shared<Plane>();
-    planeGeom->setWidth(400);
-    planeGeom->setPosition(0.0, -50, 0.0);
-    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    auto            planeGeom = std::make_shared<Plane>();
+    imstkNew<Plane> plane(Vec3d(0.0, -50.0, 0.0));
+    planeGeom->setWidth(400.0);
+    imstkNew<CollidingObject> planeObj("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
     // Create the virtual coupling object controller
 
-    // Device clients
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
-
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
-
-    // Device tracker
-    auto deviceTracker = std::make_shared<DeviceTracker>(client);
+    imstkNew<HapticDeviceManager>       server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Create a virtual coupling object
-    auto visualGeom = std::make_shared<Sphere>();
-    visualGeom->setRadius(20);
-    auto collidingGeom = std::make_shared<Sphere>();
-    collidingGeom->setRadius(20);
-    auto obj = std::make_shared<CollidingObject>("VirtualCouplingObject");
+    imstkNew<Sphere>          visualGeom(Vec3d(0.0, 0.0, 0.0), 20.0);
+    imstkNew<Sphere>          collidingGeom(Vec3d(0.0, 0.0, 0.0), 20.0);
+    imstkNew<CollidingObject> obj("VirtualCouplingObject");
     obj->setCollidingGeometry(collidingGeom);
 
-    auto material    = std::make_shared<RenderMaterial>();
-    auto visualModel = std::make_shared<VisualModel>(visualGeom);
+    imstkNew<RenderMaterial> material;
+    imstkNew<VisualModel>    visualModel(visualGeom.get());
     visualModel->setRenderMaterial(material);
     obj->addVisualModel(visualModel);
 
@@ -91,39 +89,64 @@ main()
     scene->addSceneObject(obj);
 
     // Create and add virtual coupling object controller in the scene
-    auto objController = std::make_shared<SceneObjectController>(obj, deviceTracker);
-    scene->addObjectController(objController);
+    imstkNew<SceneObjectController> controller(obj, client);
+    scene->addController(controller);
 
     {
         // Setup CD, and collision data
-        auto                                colData   = std::make_shared<CollisionData>();
+        imstkNew<CollisionData> colData;
+
         std::shared_ptr<CollisionDetection> colDetect = makeCollisionDetectionObject(CollisionDetection::Type::UnidirectionalPlaneToSphere,
-            planeObj, obj, colData);
+            planeObj->getCollidingGeometry(), obj->getCollidingGeometry(), colData);
 
         // Setup the handler
-        auto colHandler = std::make_shared<VirtualCouplingCH>(CollisionHandling::Side::B, colData, planeObj, obj);
+        imstkNew<VirtualCouplingCH> colHandler(CollisionHandling::Side::B, colData, obj);
         colHandler->setStiffness(5e-01);
         colHandler->setDamping(0.005);
 
-        auto pair = std::make_shared<CollisionPair>(planeObj, obj, colDetect, nullptr, colHandler);
-        scene->getCollisionGraph()->addInteractionPair(pair);
+        imstkNew<CollisionPair> pair(planeObj, obj, colDetect, nullptr, colHandler);
+        scene->getCollisionGraph()->addInteraction(pair);
     }
 
     // Camera
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(200, 200, 200));
-    cam->setFocalPoint(Vec3d(0, 0, 0));
+    scene->getActiveCamera()->setPosition(Vec3d(200, 200, 200));
+    scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 0));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
-    //Run
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Running);
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->addChildThread(server);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
-#endif
 }

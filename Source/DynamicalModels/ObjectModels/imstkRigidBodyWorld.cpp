@@ -18,9 +18,9 @@
    limitations under the License.
 
 =========================================================================*/
-#include "imstkRigidBodyWorld.h"
 
-#include <g3log/g3log.hpp>
+#include "imstkRigidBodyWorld.h"
+#include "imstkLogger.h"
 
 #define MAX_CONTACTS_PER_BODY 16
 
@@ -34,7 +34,7 @@ RigidBodyWorld::RigidBodyWorld()
     m_Physics    = PxCreatePhysics(PX_PHYSICS_VERSION, *m_Foundation, PxTolerancesScale(), true, m_Pvd);
     m_Cooking    = PxCreateCooking(PX_PHYSICS_VERSION, *m_Foundation, PxCookingParams(PxTolerancesScale()));
 
-    // TODO: move this into a separate structure that user can supply
+    // \todo: move this into a separate structure that user can supply
     PxSceneDesc sceneDesc(m_Physics->getTolerancesScale());
     sceneDesc.gravity       = PxVec3(0.0f, -9.81f, 0.0f);
     m_Dispatcher            = PxDefaultCpuDispatcherCreate(2);

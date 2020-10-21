@@ -21,7 +21,6 @@
 
 #pragma once
 
-// imstk
 #include "imstkAnalyticalGeometry.h"
 
 namespace imstk
@@ -37,7 +36,14 @@ public:
     ///
     /// \brief Constructor
     ///
-    Plane(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Plane, name) {}
+    explicit Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
+                   const std::string& name = std::string("")) :
+        AnalyticalGeometry(Type::Plane, name)
+    {
+        setPosition(pos);
+        setNormal(normal.normalized());
+        updatePostTransformData();
+    }
 
     ///
     /// \brief Print the plane info
@@ -69,6 +75,16 @@ public:
     /// \brief Sets the width of the plane
     ///
     void setWidth(const double w);
+
+    ///
+    /// \brief Returns signed distance to surface at pos
+    ///
+    double getFunctionValue(const Vec3d& pos) const override { return m_orientationAxis.dot(pos - m_position); }
+
+///
+/// \brief Returns gradient of signed distance field at pos
+///
+//virtual Vec3d getFunctionGrad(const Vec3d& imstkNotUsed(pos), const Vec3d& dx) const override { return dx.cwiseProduct(m_orientationAxis); }
 
 protected:
     friend class VTKPlaneRenderDelegate;

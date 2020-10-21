@@ -21,8 +21,9 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <atomic>
-#include <functional>
 #include <string>
 #include <thread>
 #include <unordered_map>
@@ -36,9 +37,9 @@ class CollisionGraph;
 class IBLProbe;
 class Light;
 class SceneObject;
-class SceneObjectControllerBase;
 class TaskGraph;
 class TaskGraphController;
+class TrackingDeviceControl;
 class VisualModel;
 
 namespace ParallelUtils { class SpinLock; }
@@ -79,21 +80,14 @@ struct SceneConfig
 ///
 /// \brief
 ///
-class Scene
+class Scene : public EventObject
 {
 template<class T>
 using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
 public:
-    ///
-    /// \brief Constructor
-    ///
     explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
-
-    ///
-    /// \brief Destructor
-    ///
-    ~Scene();
+    virtual ~Scene() override = default;
 
 public:
     ///
@@ -110,11 +104,6 @@ public:
     /// \brief Intializes the graph after its in a built state
     ///
     void initTaskGraph();
-
-    ///
-    /// \brief Launch camera controller and other scene specific modules that need to run independently
-    ///
-    void launchModules();
 
     ///
     /// \brief Reset the scene
@@ -138,6 +127,12 @@ public:
     bool isObjectRegistered(const std::string& sceneObjectName) const;
 
     ///
+    /// \brief If true, tasks will be time and a table produced
+    /// every scene advance of the times
+    ///
+    void setEnableTaskTiming(bool enabled);
+
+    ///
     /// \brief Return a vector of shared pointers to the scene objects
     /// NOTE: A separate list might be efficient as this is called runtime
     ///
@@ -152,7 +147,7 @@ public:
     ///
     /// \brief Get the scene object controllers
     ///
-    const std::vector<std::shared_ptr<SceneObjectControllerBase>> getSceneObjectControllers() const;
+    const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const { return m_trackingControllers; }
 
     ///
     /// \brief Get a scene object of a specific name
@@ -194,13 +189,13 @@ public:
     ///
     /// \brief Add/remove lights from the scene
     ///
-    void setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe);
-    std::shared_ptr<IBLProbe> getGlobalIBLProbe();
+    void setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe) { m_globalIBLProbe = newIBLProbe; }
+    std::shared_ptr<IBLProbe> getGlobalIBLProbe() { return m_globalIBLProbe; }
 
     ///
     /// \brief Get the name of the scene
     ///
-    const std::string& getName() const;
+    const std::string& getName() const { return m_name; }
 
     ///
     /// \brief Get the computational graph of the scene
@@ -210,22 +205,67 @@ public:
     ///
     /// \brief Get the camera for the scene
     ///
-    std::shared_ptr<Camera> getCamera() const;
+    std::shared_ptr<Camera> getActiveCamera() const { return m_activeCamera; }
+
+    ///
+    /// \brief Get the name of the camera, if it exists
+    ///
+    std::string getCameraName(std::shared_ptr<Camera> cam) const
+    {
+        auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
+            [&cam](const NamedMap<Camera>::value_type& j) { return j.second == cam; });
+        if (i != m_cameras.end())
+        {
+            return i->first;
+        }
+        else
+        {
+            return "";
+        }
+    }
+
+    ///
+    /// \brief Get camera by name
+    ///
+    std::shared_ptr<Camera> getCamera(std::string name) const
+    {
+        auto i = m_cameras.find(name);
+        if (i != m_cameras.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    ///
+    /// \brief Set the camera for the scene
+    ///
+    void addCamera(std::string name, std::shared_ptr<Camera> cam) { m_cameras[name] = cam; }
+
+    ///
+    /// \brief Set the active camera by name
+    ///
+    void setActiveCamera(std::string name)
+    {
+        auto i = m_cameras.find(name);
+        if (i != m_cameras.end())
+        {
+            m_activeCamera = m_cameras[name];
+        }
+    }
 
     ///
     /// \brief Return the collision graph
     ///
-    std::shared_ptr<CollisionGraph> getCollisionGraph() const;
+    std::shared_ptr<CollisionGraph> getCollisionGraph() const { return m_collisionGraph; }
 
     ///
     /// \brief Add objects controllers
     ///
-    void addObjectController(std::shared_ptr<SceneObjectControllerBase> controller);
-
-    ///
-    /// \brief Add objects controllers
-    ///
-    void addCameraController(std::shared_ptr<CameraController> camController);
+    void addController(std::shared_ptr<TrackingDeviceControl> controller);
 
     ///
     /// \brief
@@ -264,11 +304,6 @@ public:
     void unlockComputeTimes();
 
     ///
-    /// \brief Called after compute graph is built, but before initialized
-    ///
-    void setTaskGraphConfigureCallback(std::function<void(Scene*)> callback) { this->m_postTaskGraphConfigureCallback = callback; }
-
-    ///
     /// \brief Get the configuration
     ///
     std::shared_ptr<const SceneConfig> getConfig() const { return m_config; };
@@ -283,18 +318,17 @@ protected:
     NamedMap<Light>           m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;
 
-    std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
+    NamedMap<Camera> m_cameras;
+    std::shared_ptr<Camera> m_activeCamera;
 
-    std::shared_ptr<CollisionGraph> m_collisionGraph = nullptr;
-    std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of object controllers
-    std::vector<std::shared_ptr<CameraController>> m_cameraControllers;          ///> List of camera controllers
-    std::unordered_map<std::string, std::thread>   m_threadMap;                  ///>
+    std::shared_ptr<CollisionGraph> m_collisionGraph;
+    std::vector<std::shared_ptr<TrackingDeviceControl>> m_trackingControllers; ///> List of object controllers
 
-    std::shared_ptr<TaskGraph> m_taskGraph = nullptr;                            ///> Computational graph
-    std::shared_ptr<TaskGraphController> m_taskGraphController   = nullptr;      ///> Controller for the computational graph
+    std::shared_ptr<TaskGraph> m_taskGraph;                                    ///> Computational graph
+    std::shared_ptr<TaskGraphController> m_taskGraphController   = nullptr;    ///> Controller for the computational graph
     std::function<void(Scene*)> m_postTaskGraphConfigureCallback = nullptr;
 
-    std::shared_ptr<ParallelUtils::SpinLock> computeTimesLock = nullptr;
+    std::shared_ptr<ParallelUtils::SpinLock> m_computeTimesLock;
     std::unordered_map<std::string, double>  m_nodeComputeTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
 
     double m_fps = 0.0;

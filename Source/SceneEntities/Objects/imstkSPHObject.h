@@ -42,16 +42,16 @@ public:
 
 public:
     ///
-    /// \brief Initialize the SPH scene object
+    /// \brief Get the SPH model of the object
     ///
-    bool initialize() override;
+    std::shared_ptr<SPHModel> getSPHModel();
 
     std::shared_ptr<SPHModel> getDynamicalSPHModel();
 
     ///
-    /// \brief Get the SPH model of the object
+    /// \brief Initialize the SPH scene object
     ///
-    std::shared_ptr<SPHModel> getSPHModel() const { assert(m_SPHModel); return m_SPHModel; }
+    bool initialize() override;
 
 protected:
     std::shared_ptr<SPHModel> m_SPHModel = nullptr;

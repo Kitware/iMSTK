@@ -20,13 +20,12 @@
 =========================================================================*/
 
 #pragma once
+
 #include "imstkAnalyticalGeometry.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4201 )
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/quaternion.hpp"
+#include <glm/glm.hpp>
 #pragma warning( pop )
 
 namespace imstk
@@ -54,6 +53,10 @@ public:
 
 protected:
     friend class VulkanDecalRenderDelegate;
+
+    // Hide these functions
+    using AnalyticalGeometry::getFunctionValue;
+    //using AnalyticalGeometry::getFunctionGrad;
 
     void applyScaling(const double s) override;
 

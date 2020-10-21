@@ -22,32 +22,32 @@
 #pragma once
 
 #include "imstkGeometry.h"
-#include "imstkSceneObject.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
-class TetrahedralMesh;
-class SurfaceMesh;
-class PointSet;
-class SceneManager;
-class Scene;
+class CollidingObject;
 class FEMDeformableBodyModel;
+class Graph;
 template<typename Matrix>
 class NonLinearSystem;
-class CollidingObject;
-class Graph;
+class PointSet;
+class Scene;
+class SceneManager;
+class SceneObject;
+class SurfaceMesh;
+class TetrahedralMesh;
 
 namespace apiutils
 {
 ///
 /// \brief Create a analytical visual scene object that and add it to the scene
 ///
-std::shared_ptr<VisualObject> createVisualAnalyticalSceneObject(Geometry::Type type,
-                                                                std::shared_ptr<Scene> scene,
-                                                                const std::string& objName,
-                                                                const double scale = 1.,
-                                                                const Vec3d t      = Vec3d(0., 0., 0.));
+std::shared_ptr<SceneObject> createVisualAnalyticalSceneObject(Geometry::Type type,
+                                                               std::shared_ptr<Scene> scene,
+                                                               const std::string& objName,
+                                                               const double scale = 1.,
+                                                               const Vec3d t      = Vec3d(0., 0., 0.));
 
 ///
 /// \brief Create a analytical colliding scene object that and add it to the scene

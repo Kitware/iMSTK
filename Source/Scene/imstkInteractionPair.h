@@ -31,7 +31,9 @@ class TaskNode;
 ///
 /// \class InteractionPair
 ///
-/// \brief This class defines an interaction between nodes
+/// \brief This class defines an interaction between 2 sets of nodes
+/// Given a set of input and output nodes, the interactionFunction will be
+/// inserted
 ///
 class InteractionPair
 {
@@ -46,6 +48,12 @@ public:
 public:
     const Inputs& getTaskNodeInputs() const { return m_taskNodeInputs; }
     const Outputs& getTaskNodeOutputs() const { return m_taskNodeOutputs; }
+
+public:
+    ///
+    /// \brief Modifies the computational graph
+    ///
+    void compute();
 
 protected:
     Inputs  m_taskNodeInputs;                        ///> The interacting nodes

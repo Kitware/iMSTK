@@ -20,57 +20,65 @@
 =========================================================================*/
 
 #include "imstkVTKRenderDelegate.h"
-
+#include "imstkDebugRenderGeometry.h"
+#include "imstkGeometry.h"
 #include "imstkLogger.h"
+#include "imstkVisualModel.h"
+#include "imstkVolumeRenderMaterial.h"
 
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkCapsule.h"
-#include "imstkCylinder.h"
-#include "imstkCube.h"
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkLineMesh.h"
-#include "imstkTetrahedralMesh.h"
-#include "imstkHexahedralMesh.h"
-#include "imstkVTKdebugTrianglesRenderDelegate.h"
+// Debug render delegates
 #include "imstkVTKdebugLinesRenderDelegate.h"
 #include "imstkVTKdebugPointsRenderDelegate.h"
-#include "imstkVolumeRenderMaterial.h"
+#include "imstkVTKdebugTrianglesRenderDelegate.h"
 #include "imstkColorFunction.h"
 
 // VTK render delegates
-#include "imstkVTKTetrahedralMeshRenderDelegate.h"
+#include "imstkVTKCapsuleRenderDelegate.h"
+#include "imstkVTKCubeRenderDelegate.h"
+#include "imstkVTKCylinderRenderDelegate.h"
+#include "imstkVTKFluidRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
-#include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkVTKImageDataRenderDelegate.h"
 #include "imstkVTKLineMeshRenderDelegate.h"
-#include "imstkVTKCylinderRenderDelegate.h"
-#include "imstkVTKPointSetRenderDelegate.h"
-#include "imstkVTKCapsuleRenderDelegate.h"
-#include "imstkVTKSphereRenderDelegate.h"
 #include "imstkVTKPlaneRenderDelegate.h"
-#include "imstkVTKFluidRenderDelegate.h"
-#include "imstkVTKCubeRenderDelegate.h"
+#include "imstkVTKPointSetRenderDelegate.h"
+#include "imstkVTKSphereRenderDelegate.h"
+#include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
-#include <vtkOpenGLVertexBufferObject.h>
-#include <vtkTriangleMeshPointNormals.h>
-#include <vtkOpenGLPolyDataMapper.h>
-#include <vtkImageReader2Factory.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkImageReader2.h>
-#include <vtkTransform.h>
-#include <vtkImageData.h>
-#include <vtkTexture.h>
-#include <vtkVolume.h>
-#include <vtkVector.h>
-#include <vtkProp3D.h>
 #include <vtkActor.h>
+#include <vtkAlgorithmOutput.h>
 #include <vtkColorTransferFunction.h>
-#include <vtkNew.h>
+#include <vtkGPUVolumeRayCastMapper.h>
+#include <vtkImageData.h>
+#include <vtkImageReader2.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLVertexBufferObject.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkProperty.h>
+#include <vtkTexture.h>
+#include <vtkTransform.h>
+#include <vtkVolume.h>
+#include <vtkVolumeProperty.h>
 
 namespace imstk
 {
+VTKRenderDelegate::VTKRenderDelegate() :
+    m_transform(vtkSmartPointer<vtkTransform>::New()),
+    m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
+    m_volume(vtkSmartPointer<vtkVolume>::New()),
+    m_modelIsVolume(false),
+    m_actor(vtkSmartPointer<vtkActor>::New()),
+    m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New())
+{
+    m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
+    m_actor->SetUserTransform(m_transform);
+    m_volume->SetMapper(m_volumeMapper); // remove this as a default?
+    /*m_volumeMapper->SetAutoAdjustSampleDistances(false);
+    m_volumeMapper->SetSampleDistance(0.01);*/
+}
+
 std::shared_ptr<VTKRenderDelegate>
 VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
@@ -136,7 +144,14 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
         }
         case Geometry::Type::ImageData:
         {
-            return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
+            if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points)
+            {
+                return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
+            }
+            else
+            {
+                return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
+            }
         }
         default:
         {
@@ -176,7 +191,7 @@ void
 VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*                source,
                                const std::shared_ptr<VisualModel> vizModel)
 {
-    if (auto imData = vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
+    if (vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
     {
         m_volumeMapper->SetInputConnection(source);
         m_modelIsVolume = true;
@@ -520,8 +535,8 @@ VTKRenderDelegate::updateActorPropertiesMesh()
         }
     }
 
-    /* actorProperty->SetBackfaceCulling(material->getBackfaceCulling());
-     actorProperty->SetOpacity(material->getOpacity());*/
+    //actorProperty->SetBackfaceCulling(material->getBackfaceCulling());
+    actorProperty->SetOpacity(material->getOpacity());
 
     // Material state is now up-to-date
     material->m_stateModified = false;
@@ -541,7 +556,7 @@ VTKRenderDelegate::updateActorPropertiesVolumeRendering()
         return;
     }
 
-    if (VolumeRenderMaterial* volumeMat = dynamic_cast<VolumeRenderMaterial*>(material.get()))
+    if (auto volumeMat = std::dynamic_pointer_cast<VolumeRenderMaterial>(material))
     {
         switch (volumeMat->getBlendMode())
         {

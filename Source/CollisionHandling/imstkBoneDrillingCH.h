@@ -21,14 +21,12 @@
 
 #pragma once
 
-// imstk
 #include "imstkCollisionHandling.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
 class CollidingObject;
-class DeviceTracker;
 struct CollisionData;
 
 ///

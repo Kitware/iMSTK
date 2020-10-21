@@ -20,11 +20,9 @@
 =========================================================================*/
 
 #pragma once
-
-#include "imstkLogger.h"
-
 #include <chrono>
 #include <ctime>
+#include <memory>
 #include <string>
 #include <vector>
 

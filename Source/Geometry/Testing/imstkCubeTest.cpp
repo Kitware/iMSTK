@@ -20,10 +20,9 @@
 =========================================================================*/
 
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
 
-#include "imstkMath.h"
 #include "imstkCube.h"
+
 using namespace imstk;
 
 class imstkCubeTest : public ::testing::Test

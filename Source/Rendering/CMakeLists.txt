@@ -20,7 +20,7 @@ set(VTK_H_FILES
     VTKRenderer/RenderDelegate/imstkVTKdebugLinesRenderDelegate.h 
     VTKRenderer/RenderDelegate/imstkVTKdebugPointsRenderDelegate.h   
     VTKRenderer/RenderDelegate/imstkVTKPointSetRenderDelegate.h
-	VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.h)
+	  VTKRenderer/RenderDelegate/imstkVTKFluidRenderDelegate.h)
 
 set(VTK_CPP_FILES
     VTKRenderer/imstkVTKRenderer.cpp
@@ -96,10 +96,8 @@ if( NOT iMSTK_USE_Vulkan )
     VTKRenderer/RenderDelegate)
   set(RENDERING_DEPENDENCIES
     #GUIOverlay
-    Materials)
-  if (iMSTK_ENABLE_VR)
-    list(APPEND RENDERING_DEPENDENCIES openvr)
-  endif()
+    Materials
+    openvr)
 else()
   set(RENDERING_H_FILES ${VULKAN_H_FILES})
   set(RENDERING_CPP_FILES ${VULKAN_CPP_FILES})
@@ -109,7 +107,8 @@ else()
     VulkanRenderer/PostProcessing)
   set(RENDERING_DEPENDENCIES
     GUIOverlay
-    Materials)
+    Materials
+    openvr)
   set(RENDERING_LIBRARIES
     ${Vulkan}
     glfw
@@ -122,7 +121,6 @@ imstk_add_library( Rendering
     imstkRenderer.h
     ${RENDERING_H_FILES}
   CPP_FILES
-    imstkRenderer.cpp
     ${RENDERING_CPP_FILES}
   SUBDIR_LIST
     ${RENDERING_SUBDIR}

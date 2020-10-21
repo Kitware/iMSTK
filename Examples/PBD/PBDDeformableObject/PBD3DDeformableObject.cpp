@@ -19,29 +19,30 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
+#include "imstkCamera.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkOneToOneMap.h"
-#include "imstkAPIUtilities.h"
-#include "imstkTetraTriangleMap.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkCamera.h"
-#include "imstkPlane.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-
-#include <array>
-#include <string>
+#include "imstkSceneManager.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkTetraTriangleMap.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 ///
 /// \brief Create a PbdObject and add it to a \p scene
 ///
-std::shared_ptr<PbdObject> createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                                                 const std::string&     tetMeshName);
+std::shared_ptr<PbdObject> createAndAddPbdObject(const std::string& tetMeshName);
 
 // mesh file names
 const std::string& tetMeshFileName = iMSTK_DATA_ROOT "textured_organs/heart_volume.vtk";
@@ -53,38 +54,62 @@ const std::string& tetMeshFileName = iMSTK_DATA_ROOT "textured_organs/heart_volu
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDVolume");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
+
+    imstkNew<Scene> scene("PBDVolume");
+    scene->getActiveCamera()->setPosition(0, 2.0, 15.0);
 
     // create and add a PBD object
-    createAndAddPbdObject(scene, tetMeshFileName);
+    scene->addSceneObject(createAndAddPbdObject(tetMeshFileName));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
+    imstkNew<DirectionalLight> light("light");
     light->setFocalPoint(Vec3d(5, -8, -5));
     light->setIntensity(1.1);
     scene->addLight(light);
 
-    simManager->setActiveScene(scene);
-    simManager->getViewer()->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
-    simManager->start(SimulationStatus::Paused);
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
+        viewer->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }
 
 std::shared_ptr<PbdObject>
-createAndAddPbdObject(std::shared_ptr<Scene> scene,
-                      const std::string&     tetMeshName)
+createAndAddPbdObject(const std::string& tetMeshName)
 {
-    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(tetMeshName));
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(tetMeshName);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
-    auto surfMesh = std::make_shared<SurfaceMesh>();
+    imstkNew<SurfaceMesh> surfMesh;
     tetMesh->extractSurfaceMesh(surfMesh, true);
 
-    auto map = std::make_shared<TetraTriangleMap>(tetMesh, surfMesh);
-
-    auto material = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setColor(Color(220. / 255.0, 100. / 255.0, 70. / 255.0));
     material->setMetalness(100.9f);
@@ -93,15 +118,15 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     material->setAmbientLightCoeff(50.);
     material->setShadingModel(RenderMaterial::ShadingModel::Phong);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
-    surfMeshModel->setRenderMaterial(material);
+    imstkNew<VisualModel> visualModel(surfMesh.get());
+    visualModel->setRenderMaterial(material);
 
-    auto deformableObj = std::make_shared<PbdObject>("DeformableObject");
-    auto pbdModel      = std::make_shared<PbdModel>();
+    imstkNew<PbdObject> deformableObj("DeformableObject");
+    imstkNew<PbdModel>  pbdModel;
     pbdModel->setModelGeometry(tetMesh);
 
-    // configure model
-    auto pbdParams = std::make_shared<PBDModelConfig>();
+    // Configure model
+    imstkNew<PBDModelConfig> pbdParams;
 
     // FEM constraint
     pbdParams->m_femParams->m_YoungModulus = 500.0;
@@ -120,11 +145,9 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
     pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::Fixed);
 
     deformableObj->setDynamicalModel(pbdModel);
-    deformableObj->addVisualModel(surfMeshModel);
+    deformableObj->addVisualModel(visualModel);
     deformableObj->setPhysicsGeometry(tetMesh);
-    deformableObj->setPhysicsToVisualMap(map); //assign the computed map
-
-    scene->addSceneObject(deformableObj);
+    deformableObj->setPhysicsToVisualMap(std::make_shared<TetraTriangleMap>(tetMesh, surfMesh));
 
     return deformableObj;
 }

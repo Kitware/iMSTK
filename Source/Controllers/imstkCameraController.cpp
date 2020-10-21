@@ -20,32 +20,26 @@
 =========================================================================*/
 
 #include "imstkCameraController.h"
-#include "imstkMath.h"
 #include "imstkCamera.h"
 #include "imstkLogger.h"
-
-#include <utility>
 
 namespace imstk
 {
 CameraController::CameraController(std::shared_ptr<Camera>       camera,
                                    std::shared_ptr<DeviceClient> deviceClient) :
-    Module("Camera controller"),
-    m_camera(camera),
-    m_cameraTranslationOffset(WORLD_ORIGIN),
-    m_cameraRotationalOffset(Quatd::Identity()),
-    DeviceTracker(deviceClient)
+    TrackingDeviceControl(deviceClient),
+    m_camera(camera)
 {
 }
 
 void
-CameraController::runModule()
+CameraController::update()
 {
     if (!m_trackingDataUptoDate)
     {
         if (!updateTrackingData())
         {
-            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
+            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info";
             return;
         }
     }
@@ -54,8 +48,8 @@ CameraController::runModule()
     Quatd r = getRotation();
 
     // Apply Offsets over the device pose
-    p  = p + m_cameraTranslationOffset;     // Offset the device position
-    r *= m_cameraRotationalOffset;          // Apply camera head rotation offset
+    p  = p + m_translationOffset;   // Offset the device position
+    r *= m_rotationOffset;          // Apply camera head rotation offset
 
     // Set camera info
     m_camera->setPosition(p);
@@ -68,9 +62,9 @@ CameraController::runModule()
 void
 CameraController::setOffsetUsingCurrentCameraPose()
 {
-    auto pos    = m_camera->getPosition();
-    auto viewUp = m_camera->getViewUp();
-    auto focus  = m_camera->getFocalPoint();
+    const auto pos    = m_camera->getPosition();
+    const auto focus  = m_camera->getFocalPoint();
+    auto       viewUp = m_camera->getViewUp();
 
     m_translationOffset = pos;
 
@@ -83,28 +77,4 @@ CameraController::setOffsetUsingCurrentCameraPose()
     rot.col(2)       = viewNormal;
     m_rotationOffset = Quatd(rot);
 }
-
-void
-CameraController::setCameraRotationOffset(const Quatd& r)
-{
-    m_cameraRotationalOffset = r;
 }
-
-void
-CameraController::setCameraTranslationOffset(const Vec3d& t)
-{
-    m_cameraTranslationOffset = t;
-}
-
-const Vec3d&
-CameraController::getCameraTranslationOffset() const
-{
-    return m_cameraTranslationOffset;
-}
-
-const Quatd&
-CameraController::getCameraRotationOffset() const
-{
-    return m_cameraRotationalOffset;
-}
-} // imstk

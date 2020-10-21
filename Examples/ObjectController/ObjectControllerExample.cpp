@@ -19,20 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkSimulationManager.h"
-#include "imstkCube.h"
 #include "imstkCamera.h"
-#include "imstkLight.h"
 #include "imstkCollidingObject.h"
-#include "imstkHDAPIDeviceClient.h"
-#include "imstkHDAPIDeviceServer.h"
-#include "imstkSceneObjectController.h"
-#include "imstkCollisionGraph.h"
-#include "imstkDeviceTracker.h"
+#include "imstkCube.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkVTKViewer.h"
 
 // global variables
-const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni1Name = "Default Device";
 
 using namespace imstk;
 
@@ -43,48 +46,65 @@ using namespace imstk;
 int
 main()
 {
-#ifdef iMSTK_USE_OPENHAPTICS
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("ObjectController");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Device Client
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
+    // Create Scene
+    imstkNew<Scene> scene("ObjectController");
 
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
+    imstkNew<HapticDeviceManager>       server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Object
-    auto geom = std::make_shared<Cube>();
-    geom->setPosition(0, 1, 0);
-    geom->setWidth(2);
-
-    auto object = std::make_shared<CollidingObject>("VirtualObject");
+    imstkNew<Cube>            geom(Vec3d(0.0, 1.0, 0.0), 2.0);
+    imstkNew<CollidingObject> object("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
 
-    auto trackCtrl = std::make_shared<DeviceTracker>(client);
-    trackCtrl->setTranslationScaling(0.1);
-    auto controller = std::make_shared<SceneObjectController>(object, trackCtrl);
-    scene->addObjectController(controller);
+    imstkNew<SceneObjectController> controller(object, client);
+    controller->setTranslationScaling(0.1);
+    scene->addController(controller);
 
     // Update Camera position
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 0, 10));
+    std::shared_ptr<Camera> cam = scene->getActiveCamera();
+    cam->setPosition(Vec3d(0.0, 0.0, 10.0));
     cam->setFocalPoint(geom->getPosition());
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
-    // Run
-    simManager->setActiveScene(scene);
-    simManager->start();
-#endif
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        viewer->addChildThread(server);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start the viewer and its children
+        viewer->start();
+    }
     return 0;
 }

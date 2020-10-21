@@ -20,13 +20,12 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkPickingCH.h"
-#include "imstkFeDeformableObject.h"
-#include "imstkParallelUtils.h"
-#include "imstkPointSet.h"
-#include "imstkFEMDeformableBodyModel.h"
-#include "imstkTimeIntegrator.h"
 #include "imstkCollisionData.h"
+#include "imstkFeDeformableObject.h"
+#include "imstkFEMDeformableBodyModel.h"
 #include "imstkLinearProjectionConstraint.h"
+#include "imstkPointSet.h"
+#include "imstkTimeIntegrator.h"
 
 namespace imstk
 {

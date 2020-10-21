@@ -24,6 +24,8 @@
 #include "imstkTexture.h"
 #include "imstkTextureDelegate.h"
 
+#include <map>
+
 namespace imstk
 {
 template<class T>
@@ -43,7 +45,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    TextureManager() {}
+    TextureManager() = default;
 
     std::map<std::shared_ptr<Texture>, std::shared_ptr<T>> m_textureMap;
 };

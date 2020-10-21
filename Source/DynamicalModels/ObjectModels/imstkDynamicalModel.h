@@ -47,17 +47,17 @@ public:
     ///
     /// \brief Return the initial state of the problem
     ///
-    std::shared_ptr<StateType> getInitialState() { return m_initialState; }
+    std::shared_ptr<StateType> getInitialState() const { return m_initialState; }
 
     ///
     /// \brief Return the current state of the problem
     ///
-    std::shared_ptr<StateType> getCurrentState() { return m_currentState; }
+    std::shared_ptr<StateType> getCurrentState() const { return m_currentState; }
 
     ///
     /// \brief Return the previous state of the problem
     ///
-    std::shared_ptr<StateType> getPreviousState() { return m_previousState; }
+    std::shared_ptr<StateType> getPreviousState() const { return m_previousState; }
 
     ///
     /// \brief Reset the current state to the initial state

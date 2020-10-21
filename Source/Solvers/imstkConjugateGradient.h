@@ -23,7 +23,6 @@
 
 #include "imstkIterativeLinearSolver.h"
 
-// Eigen includes
 #include <Eigen/IterativeLinearSolvers>
 
 namespace imstk
@@ -40,7 +39,7 @@ public:
     ///
     ConjugateGradient();
     ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs);
-    ~ConjugateGradient() = default;
+    virtual ~ConjugateGradient() override = default;
 
     ///
     /// \brief Remove specific constructor signatures

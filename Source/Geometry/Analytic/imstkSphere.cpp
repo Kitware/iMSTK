@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkSphere.h"
-
 #include "imstkLogger.h"
 
 namespace imstk
@@ -30,12 +29,6 @@ Sphere::print() const
 {
     AnalyticalGeometry::print();
     LOG(INFO) << "Radius: " << m_radius;
-}
-
-double
-Sphere::getVolume() const
-{
-    return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius;
 }
 
 double
@@ -79,12 +72,6 @@ Sphere::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double 
         lowerCorner = lowerCorner - range * (paddingPercent / 100.0);
         upperCorner = upperCorner + range * (paddingPercent / 100.0);
     }
-}
-
-void
-Sphere::applyScaling(const double s)
-{
-    this->setRadius(m_radius * s);
 }
 
 void

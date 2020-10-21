@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkNonLinearSolver.h"
-#include "imstkMath.h"
 
 namespace imstk
 {

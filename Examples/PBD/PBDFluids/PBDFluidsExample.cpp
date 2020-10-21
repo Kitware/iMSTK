@@ -19,19 +19,23 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
+#include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
-#include "imstkMeshToMeshBruteForceCD.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
-#include "imstkPBDCollisionHandling.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+#include "imstkRenderMaterial.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
+#include "imstkSceneManager.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -56,53 +60,73 @@ const std::string tetMeshFileName = iMSTK_DATA_ROOT "/asianDragon/asianDragon.ve
 int
 main()
 {
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("PBDFluid");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    scene->getCamera()->setPosition(0, 10.0, 15.0);
+    imstkNew<Scene> scene("PBDFluid");
+    {
+        scene->getActiveCamera()->setPosition(0.0, 15.0, 20.0);
 
-    auto deformableObj      = createAndAddPbdObject(scene, tetMeshFileName);
-    auto floorMeshColliding = createCollidingSurfaceMesh();
-    auto floorMeshVisual    = std::make_shared<SurfaceMesh>();
-    floorMeshVisual->initialize(floorMeshColliding->getVertexPositions(), floorMeshColliding->getTrianglesVertices());
-    auto floorMeshPhysics = std::make_shared<SurfaceMesh>();
-    floorMeshPhysics->initialize(floorMeshColliding->getVertexPositions(), floorMeshColliding->getTrianglesVertices());
+        std::shared_ptr<PbdObject>   deformableObj      = createAndAddPbdObject(scene, tetMeshFileName);
+        std::shared_ptr<SurfaceMesh> floorMeshColliding = createCollidingSurfaceMesh();
 
-    auto floor = std::make_shared<PbdObject>("Floor");
-    floor->setCollidingGeometry(floorMeshColliding);
-    floor->setVisualGeometry(floorMeshVisual);
-    floor->setPhysicsGeometry(floorMeshPhysics);
+        imstkNew<PbdObject> floorObj("Floor");
+        floorObj->setCollidingGeometry(floorMeshColliding);
+        floorObj->setVisualGeometry(floorMeshColliding);
+        floorObj->setPhysicsGeometry(floorMeshColliding);
 
-    auto pbdModel2 = std::make_shared<PbdModel>();
-    pbdModel2->setModelGeometry(floorMeshPhysics);
+        imstkNew<PbdModel> pbdModel;
+        pbdModel->setModelGeometry(floorMeshColliding);
 
-    // Configure model
-    auto pbdParams2 = std::make_shared<PBDModelConfig>();
-    pbdParams2->m_uniformMassValue = 0.0;
-    pbdParams2->collisionParams->m_proximity = 0.1;
+        // Configure model
+        imstkNew<PBDModelConfig> pbdParams;
+        pbdParams->m_uniformMassValue = 0.0;
+        pbdParams->collisionParams->m_proximity = 0.1;
 
-    pbdModel2->configure(pbdParams2);
-    floor->setDynamicalModel(pbdModel2);
+        pbdModel->configure(pbdParams);
+        floorObj->setDynamicalModel(pbdModel);
 
-    scene->addSceneObject(floor);
+        scene->addSceneObject(floorObj);
 
-    // Collisions
-    scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floor,
-                                                                         InteractionType::PbdObjToPbdObjCollision,
-                                                                         CollisionDetection::Type::MeshToMeshBruteForce));
+        // Collisions
+        scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floorObj,
+            InteractionType::PbdObjToPbdObjCollision,
+            CollisionDetection::Type::MeshToMeshBruteForce));
 
-    // Light (white)
-    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
-    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-    whiteLight->setIntensity(7);
-    scene->addLight(whiteLight);
+        // Light (white)
+        imstkNew<DirectionalLight> whiteLight("whiteLight");
+        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+        whiteLight->setIntensity(7);
+        scene->addLight(whiteLight);
+    }
 
-    // print UPS
-    scene->getConfig()->trackFPS = true;
-    apiutils::printUPS(simManager->getSceneManager(scene));
+    // Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
 
-    simManager->setActiveScene(scene);
-    simManager->start(SimulationStatus::Paused);
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
 
     return 0;
 }
@@ -112,37 +136,37 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
                       const std::string&     tetMeshName)
 {
     // Load a sample mesh
-    auto tetMesh = MeshIO::read(tetMeshName);
+    std::shared_ptr<PointSet> tetMesh = MeshIO::read(tetMeshName);
 
-    auto fluidMesh = std::make_shared<PointSet>();
+    imstkNew<PointSet> fluidMesh;
     fluidMesh->initialize(tetMesh->getInitialVertexPositions());
 
-    auto fluidVisualModel = std::make_shared<VisualModel>(fluidMesh);
+    imstkNew<VisualModel> fluidVisualModel(fluidMesh.get());
 
-    auto material1 = std::make_shared<RenderMaterial>();
-    material1->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
-    material1->setVertexColor(Color::Red);
-    material1->setPointSize(12.);
-    fluidVisualModel->setRenderMaterial(material1);
+    imstkNew<RenderMaterial> material;
+    material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
+    material->setVertexColor(Color::Red);
+    material->setPointSize(0.5);
+    fluidVisualModel->setRenderMaterial(material);
 
-    auto deformableObj = std::make_shared<PbdObject>("Dragon");
+    imstkNew<PbdObject> deformableObj("Dragon");
     deformableObj->addVisualModel(fluidVisualModel);
     deformableObj->setCollidingGeometry(fluidMesh);
     deformableObj->setPhysicsGeometry(fluidMesh);
 
-    auto pbdModel = std::make_shared<PbdModel>();
+    imstkNew<PbdModel> pbdModel;
     pbdModel->setModelGeometry(fluidMesh);
 
     // Configure model
-    auto pbdParams = std::make_shared<PBDModelConfig>();
+    imstkNew<PBDModelConfig> pbdParams;
 
     // Constant density constraint with stiffness
     pbdParams->enableConstraint(PbdConstraint::Type::ConstantDensity, 1.0);
 
     // Other parameters
     pbdParams->m_uniformMassValue = 1.0;
-    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
-    pbdParams->m_defaultDt  = 0.01;
+    pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
+    pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 2;
     pbdParams->collisionParams->m_proximity = 0.01;
 
@@ -263,7 +287,7 @@ createCollidingSurfaceMesh()
         }
     }
 
-    auto floorMeshColliding = std::make_shared<SurfaceMesh>();
+    imstkNew<SurfaceMesh> floorMeshColliding;
     floorMeshColliding->initialize(vertList, triangles);
     return floorMeshColliding;
 }

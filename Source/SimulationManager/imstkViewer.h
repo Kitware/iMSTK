@@ -22,11 +22,15 @@
 #pragma once
 
 #include "imstkRenderer.h"
-#include "imstkInteractorStyle.h"
+#include "imstkThreadObject.h"
+
+#include <unordered_map>
 
 namespace imstk
 {
-class SimulationManager;
+class Camera;
+class DeviceControl;
+class InteractorStyle;
 class Scene;
 class ScreenCaptureUtility;
 
@@ -37,7 +41,7 @@ class Canvas;
 }
 #endif
 
-struct viewerConfig
+struct ViewerConfig
 {
     std::string m_windowName = "imstk";
 
@@ -57,33 +61,23 @@ struct viewerConfig
 /// Contains user API to configure the rendering with various backends
 /// Manages the keyboard and mouse events
 ///
-class Viewer
+class Viewer : public ThreadObject
 {
+protected:
+    Viewer(std::string name);
 public:
-
-    Viewer();
-    Viewer(SimulationManager*) {}
     virtual ~Viewer() = default;
 
+public:
     ///
     /// \brief Get scene currently being rendered
     ///
-    const std::shared_ptr<Scene>& getActiveScene() const;
+    std::shared_ptr<Scene> getActiveScene() const { return m_activeScene; }
 
     ///
     /// \brief Set scene to be rendered
     ///
     virtual void setActiveScene(const std::shared_ptr<Scene>& scene) = 0;
-
-    ///
-    /// \brief Start rendering
-    ///
-    virtual void startRenderingLoop() = 0;
-
-    ///
-    /// \brief Terminate rendering
-    ///
-    virtual void endRenderingLoop() = 0;
 
     ///
     /// \brief Setup the current renderer to render what's needed
@@ -92,14 +86,14 @@ public:
     virtual void setRenderingMode(const Renderer::Mode mode) = 0;
 
     ///
-    /// \brief Get the current renderer's mode
+    /// \brief Set the render window size
     ///
-    virtual Renderer::Mode getRenderingMode() { return Renderer::Mode::Empty; }
+    virtual void setSize(int, int) { }
 
     ///
-    /// \brief Returns true if the Viewer is rendering
+    /// \brief Get the current renderer's mode
     ///
-    const bool& isRendering() const;
+    virtual Renderer::Mode getRenderingMode() const { return Renderer::Mode::Empty; }
 
     ///
     /// \brief Retrieve the renderer associated with the current scene
@@ -114,7 +108,7 @@ public:
     ///
     /// \brief access screen shot utility
     ///
-    const std::shared_ptr<ScreenCaptureUtility>& getScreenCaptureUtility() const;
+    std::shared_ptr<ScreenCaptureUtility> getScreenCaptureUtility() const { return m_screenCapturer; }
 
     ///
     /// \brief Set the coloring of the screen background
@@ -126,41 +120,43 @@ public:
     ///
     /// \brief Get canvas
     ///
-    const std::shared_ptr<GUIOverlay::Canvas>& getCanvas();
+    std::shared_ptr<GUIOverlay::Canvas> getCanvas() const { return m_canvas; }
 #endif
 
     ///
-    /// \brief Set custom event handlers on interactor style
+    /// \brief Add a control whose events should be handled
     ///
-    void setOnCharFunction(char c, EventHandlerFunction func);
-    void setOnMouseMoveFunction(EventHandlerFunction func);
-    void setOnLeftButtonDownFunction(EventHandlerFunction func);
-    void setOnLeftButtonUpFunction(EventHandlerFunction func);
-    void setOnMiddleButtonDownFunction(EventHandlerFunction func);
-    void setOnMiddleButtonUpFunction(EventHandlerFunction func);
-    void setOnRightButtonDownFunction(EventHandlerFunction func);
-    void setOnRightButtonUpFunction(EventHandlerFunction func);
-    void setOnMouseWheelForwardFunction(EventHandlerFunction func);
-    void setOnMouseWheelBackwardFunction(EventHandlerFunction func);
+    void addControl(std::shared_ptr<DeviceControl> control) { m_controls.push_back(control); }
 
     ///
-    /// \brief Set custom behavior to be run on every frame.
-    /// The return of the function will not have any  effect.
+    /// \brief Remove an existing control if it exists
     ///
-    void setOnTimerFunction(EventHandlerFunction func);
+    void removeControl(std::shared_ptr<DeviceControl> control)
+    {
+        std::vector<std::shared_ptr<DeviceControl>>::iterator i =
+            std::find(m_controls.begin(), m_controls.end(), control);
+        if (i != m_controls.end())
+        {
+            m_controls.erase(i);
+        }
+    }
 
 protected:
+    virtual void updateThread();
+
+protected:
+    std::vector<std::shared_ptr<DeviceControl>> m_controls; ///> Set of controls updated on the viewer thread
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 
-    std::shared_ptr<Scene> m_activeScene;
+    std::shared_ptr<Scene>  m_activeScene;
+    std::shared_ptr<Camera> m_debugCamera;
     std::shared_ptr<InteractorStyle>      m_interactorStyle;
     std::shared_ptr<ScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
 
-    bool m_running = false;
 #ifdef iMSTK_USE_Vulkan
     std::shared_ptr<GUIOverlay::Canvas> m_canvas = nullptr;
 #endif
 
-    std::shared_ptr<viewerConfig> m_config = nullptr;
+    std::shared_ptr<ViewerConfig> m_config;
 };
 }

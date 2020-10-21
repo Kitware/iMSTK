@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+
 #include <algorithm>
 
 namespace imstk

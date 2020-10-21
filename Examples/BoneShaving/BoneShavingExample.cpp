@@ -19,37 +19,36 @@
 
 =========================================================================*/
 
+#include "imstkLogger.h"
 #include "imstkMath.h"
-#include "imstkTimer.h"
-#include "imstkSimulationManager.h"
+#include "imstkNew.h"
 #include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkVTKViewer.h"
 
 // Objects
-#include "imstkSceneObject.h"
-#include "imstkLight.h"
 #include "imstkCamera.h"
+#include "imstkCollidingObject.h"
+#include "imstkLight.h"
 
 // Geometry
+#include "imstkMeshIO.h"
 #include "imstkSphere.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkMeshIO.h"
 
 // Devices and controllers
-#include "imstkDeviceTracker.h"
-#include "imstkHDAPIDeviceClient.h"
-#include "imstkHDAPIDeviceServer.h"
+#include "imstkHapticDeviceClient.h"
+#include "imstkHapticDeviceManager.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkMouseSceneControl.h"
 #include "imstkSceneObjectController.h"
 
 // Collisions
 #include "imstkCollisionGraph.h"
-#include "imstkInteractionPair.h"
-#include "imstkPointSetToSphereCD.h"
-#include "imstkVirtualCouplingCH.h"
-#include "imstkBoneDrillingCH.h"
+#include "imstkObjectInteractionFactory.h"
 
 // global variables
-const std::string phantomOmni1Name = "Phantom1";
+const std::string phantomOmni1Name = "Default Device";
 
 using namespace imstk;
 
@@ -60,68 +59,79 @@ using namespace imstk;
 int
 main()
 {
-    // simManager and Scene
-    auto simManager = std::make_shared<SimulationManager>();
-    auto scene      = simManager->createNewScene("BoneDrilling");
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-    // Add virtual coupling object in the scene.
-#ifdef iMSTK_USE_OPENHAPTICS
-
-    // Device clients
-    auto client = std::make_shared<HDAPIDeviceClient>(phantomOmni1Name);
+    // Create Scene
+    imstkNew<Scene> scene("BoneDrilling");
 
     // Device Server
-    auto server = std::make_shared<HDAPIDeviceServer>();
-    server->addDeviceClient(client);
-    simManager->addModule(server);
-
-    // Device tracker
-    auto deviceTracker = std::make_shared<DeviceTracker>(client);
+    imstkNew<HapticDeviceManager>       server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Create bone scene object
     // Load the mesh
-    auto tetMesh = MeshIO::read(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(FATAL) << "Could not read mesh from file.";
         return 1;
     }
-    auto bone = std::make_shared<CollidingObject>("Bone");
+    imstkNew<CollidingObject> bone("Bone");
     bone->setCollidingGeometry(tetMesh);
     bone->setVisualGeometry(tetMesh);
     scene->addSceneObject(bone);
 
     // Create a virtual coupling object: Drill
-    auto drillVisualGeom = std::make_shared<Sphere>();
-    drillVisualGeom->setRadius(3.);
-    auto drillCollidingGeom = std::make_shared<Sphere>();
-    drillCollidingGeom->setRadius(3.);
-    auto drill = std::make_shared<CollidingObject>("Drill");
-    drill->setCollidingGeometry(drillCollidingGeom);
-    drill->setVisualGeometry(drillVisualGeom);
+    imstkNew<Sphere>          drillGeom(Vec3d(0.0, 0.0, 0.0), 3.0);
+    imstkNew<CollidingObject> drill("Drill");
+    drill->setCollidingGeometry(drillGeom);
+    drill->setVisualGeometry(drillGeom);
     scene->addSceneObject(drill);
 
     // Create and add virtual coupling object controller in the scene
-    auto objController = std::make_shared<SceneObjectController>(drill, deviceTracker);
-    scene->addObjectController(objController);
+    imstkNew<SceneObjectController> controller(drill, client);
+    scene->addController(controller);
 
     // Add interaction
     scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(bone, drill,
-        InteractionType::FemObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
-
-#endif
+        InteractionType::CollidingObjToCollidingObjBoneDrilling, CollisionDetection::Type::PointSetToSphere));
 
     // Light
-    auto light = std::make_shared<DirectionalLight>("light");
-    light->setFocalPoint(Vec3d(5, -8, -5));
-    light->setIntensity(1);
+    imstkNew<DirectionalLight> light("light");
+    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setIntensity(1.0);
     scene->addLight(light);
 
-    //Run
-    auto cam = scene->getCamera();
-    cam->setPosition(Vec3d(0, 0, 15));
+    scene->getActiveCamera()->setPosition(Vec3d(0.0, 3.0, 25.0));
 
-    simManager->setActiveScene(scene);
-    simManager->start();
+    //Run the simulation
+    {
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer 1");
+        viewer->setActiveScene(scene);
+
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager 1");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        viewer->addChildThread(server);       // Server starts/stops with viewer
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start();
+    }
     return 0;
 }

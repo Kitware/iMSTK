@@ -22,46 +22,45 @@
 #include "imstkScene.h"
 #include "imstkCamera.h"
 #include "imstkCameraController.h"
-#include "imstkCollidingObject.h"
+#include "imstkCollisionDetection.h"
 #include "imstkCollisionGraph.h"
 #include "imstkCollisionPair.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkFeDeformableObject.h"
-#include "imstkDynamicObject.h"
 #include "imstkFEMDeformableBodyModel.h"
-#include "imstkInteractionPair.h"
 #include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkParallelUtils.h"
-#include "imstkPbdObject.h"
 #include "imstkRigidBodyWorld.h"
-#include "imstkSceneObject.h"
-#include "imstkSceneObjectControllerBase.h"
 #include "imstkSequentialTaskGraphController.h"
 #include "imstkTaskGraph.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkTbbTaskGraphController.h"
 #include "imstkTimer.h"
+#include "imstkTrackingDeviceControl.h"
+#include "imstkVisualModel.h"
 
 namespace imstk
 {
 Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
-    m_name(name),
-    m_camera(std::make_shared<Camera>()),
+    m_activeCamera(nullptr),
+    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>()),
     m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_config(config),
-    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
-    computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
+    m_name(name),
+    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink"))
 {
-}
+    std::shared_ptr<Camera> defaultCam = std::make_shared<Camera>();
+    defaultCam->setPosition(0.0, 2.0, -15.0);
+    defaultCam->setFocalPoint(0.0, 0.0, 0.0);
 
-Scene::~Scene()
-{
-    // Join Camera Controllers
-    for (auto camController : m_cameraControllers)
-    {
-        camController->end();
-        m_threadMap.at(camController->getName()).join();
-    }
+    std::shared_ptr<Camera> debugCam = std::make_shared<Camera>();
+    debugCam->setPosition(0.0, 4.0, -30.0);
+    debugCam->setFocalPoint(0.0, 0.0, 0.0);
+
+    m_cameras["default"] = defaultCam;
+    m_cameras["debug"]   = debugCam;
+    setActiveCamera("default");
 }
 
 bool
@@ -77,11 +76,8 @@ Scene::initialize()
     // Build the compute graph
     buildTaskGraph();
 
-    // Opportunity for external configuration
-    if (m_postTaskGraphConfigureCallback != nullptr)
-    {
-        m_postTaskGraphConfigureCallback(this);
-    }
+    // Opportunity for user configuration
+    this->postEvent(Event(EventType::Configure));
 
     // Then init
     initTaskGraph();
@@ -98,6 +94,7 @@ Scene::buildTaskGraph()
 
     // Clear the compute graph of all nodes/edges except source+sink
     m_taskGraph->clear();
+    m_taskGraph->addEdge(m_taskGraph->getSource(), m_taskGraph->getSink());
 
     // Setup all SceneObject compute graphs (and segment the rigid bodies)
     std::list<std::shared_ptr<SceneObject>> rigidBodies;
@@ -140,7 +137,7 @@ Scene::buildTaskGraph()
         auto physXUpdate = m_taskGraph->addFunction("PhysXUpdate", [&]()
             {
                 auto physxScene = RigidBodyWorld::getInstance()->m_Scene;
-                // TODO: update the time step, split into two steps, collide and advance
+                // \todo: update the time step, split into two steps, collide and advance
                 physxScene->simulate(RigidBodyWorld::getInstance()->getTimeStep());
                 physxScene->fetchResults(true);
             });
@@ -196,20 +193,21 @@ Scene::initTaskGraph()
     m_taskGraphController->initialize();
 }
 
-void
-Scene::launchModules()
-{
-    // Start Camera Controller (asynchronous)
-    for (auto camController : m_cameraControllers)
-    {
-        m_threadMap[camController->getName()] = std::thread([camController] { camController->start(); });
-    }
-}
-
 bool
 Scene::isObjectRegistered(const std::string& sceneObjectName) const
 {
     return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();
+}
+
+void
+Scene::setEnableTaskTiming(bool enabled)
+{
+    m_config->taskTimingEnabled = enabled;
+    // If user wants to benchmark, tell all the nodes to time themselves
+    for (std::shared_ptr<TaskNode> node : m_taskGraph->getNodes())
+    {
+        node->m_enableTiming = m_config->taskTimingEnabled;
+    }
 }
 
 const std::vector<std::shared_ptr<SceneObject>>
@@ -223,12 +221,6 @@ Scene::getSceneObjects() const
     }
 
     return v;
-}
-
-const std::vector<std::shared_ptr<SceneObjectControllerBase>>
-Scene::getSceneObjectControllers() const
-{
-    return m_objectControllers;
 }
 
 std::shared_ptr<SceneObject>
@@ -365,45 +357,9 @@ Scene::removeLight(const std::string& lightName)
 }
 
 void
-Scene::setGlobalIBLProbe(std::shared_ptr<IBLProbe> newIBLProbe)
+Scene::addController(std::shared_ptr<TrackingDeviceControl> controller)
 {
-    m_globalIBLProbe = newIBLProbe;
-}
-
-std::shared_ptr<IBLProbe>
-Scene::getGlobalIBLProbe()
-{
-    return m_globalIBLProbe;
-}
-
-const std::string&
-Scene::getName() const
-{
-    return m_name;
-}
-
-std::shared_ptr<Camera>
-Scene::getCamera() const
-{
-    return m_camera;
-}
-
-std::shared_ptr<CollisionGraph>
-Scene::getCollisionGraph() const
-{
-    return m_collisionGraph;
-}
-
-void
-Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller)
-{
-    m_objectControllers.push_back(controller);
-}
-
-void
-Scene::addCameraController(std::shared_ptr<CameraController> camController)
-{
-    m_cameraControllers.push_back(camController);
+    m_trackingControllers.push_back(controller);
 }
 
 void
@@ -452,7 +408,7 @@ Scene::advance(const double dt)
     }
 
     // Update objects controlled by the device controllers
-    for (auto controller : this->getSceneObjectControllers())
+    for (auto controller : this->getControllers())
     {
         controller->updateControlledObjects();
     }
@@ -463,13 +419,13 @@ Scene::advance(const double dt)
     m_taskGraphController->execute();
 
     // Apply updated forces on device
-    for (auto controller : this->getSceneObjectControllers())
+    for (auto controller : this->getControllers())
     {
         controller->applyForces();
     }
 
     // Set the trackers of the scene object controllers to out-of-date
-    for (auto controller : this->getSceneObjectControllers())
+    for (auto controller : this->getControllers())
     {
         controller->setTrackerToOutOfDate();
     }
@@ -523,12 +479,12 @@ Scene::getElapsedTime(const std::string& stepName) const
 void
 Scene::lockComputeTimes()
 {
-    computeTimesLock->lock();
+    m_computeTimesLock->lock();
 }
 
 void
 Scene::unlockComputeTimes()
 {
-    computeTimesLock->unlock();
+    m_computeTimesLock->unlock();
 }
 } // imstk

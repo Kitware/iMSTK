@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "imstkModule.h"
-#include "imstkDeviceTracker.h"
+#include "imstkTrackingDeviceControl.h"
+#include "imstkLoopThreadObject.h"
 
 namespace imstk
 {
@@ -31,57 +31,27 @@ class Camera;
 ///
 /// \class CameraController
 ///
-/// \brief
+/// \brief \todo ??
 ///
-class CameraController : public Module, public DeviceTracker
+class CameraController : public TrackingDeviceControl
 {
 public:
-    ///
-    /// \brief TODO
-    ///
     CameraController(std::shared_ptr<Camera> camera, std::shared_ptr<DeviceClient> deviceClient);
+    virtual ~CameraController() = default;
 
-    ///
-    /// \brief
-    ///
-    ~CameraController() = default;
-
+public:
     ///
     /// \brief Set the offsets based on the current camera pose
     ///
     void setOffsetUsingCurrentCameraPose();
 
     ///
-    /// \brief Get/Set translation offset of the camera
+    /// \brief Updates the view of the provided camera
     ///
-    const Vec3d& getCameraTranslationOffset() const;
-    void setCameraTranslationOffset(const Vec3d& t);
-
-    ///
-    /// \brief Get/Set rotation offset of the camera
-    ///
-    const Quatd& getCameraRotationOffset() const;
-    void setCameraRotationOffset(const Quatd& r);
+    void update() override;
 
 protected:
-    ///
-    /// \brief TODO
-    ///
-    virtual void initModule() override {};
 
-    ///
-    /// \brief TODO
-    ///
-    virtual void runModule() override;
-
-    ///
-    /// \brief TODO
-    ///
-    void cleanUpModule() override {};
-
-    std::shared_ptr<Camera> m_camera;     ///< Camera controlled by the external device
-
-    Vec3d m_cameraTranslationOffset;      ///< Translation offset for the camera over tracking data
-    Quatd m_cameraRotationalOffset;       ///< camera head angle offset (in deg)
+    std::shared_ptr<Camera> m_camera; ///< Camera controlled by the external device
 };
 } // imstk

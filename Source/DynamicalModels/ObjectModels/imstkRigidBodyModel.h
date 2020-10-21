@@ -67,7 +67,7 @@ public:
             Geometry::Type::SurfaceMesh
         };
     };
-    ~RigidBodyModel() = default;
+    virtual ~RigidBodyModel() override = default;
 
     ///
     /// \brief Initialize the physx dynamic model
@@ -77,7 +77,7 @@ public:
     ///
     /// \brief Configure the model
     ///
-    // TODO: Setting of mass and gravity has to happen somewhere.
+    // \todo: Setting of mass and gravity has to happen somewhere.
     void configure(const std::shared_ptr<RigidBodyConfig> matProperty);
 
     ///

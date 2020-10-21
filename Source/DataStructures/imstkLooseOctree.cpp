@@ -20,12 +20,9 @@
 =========================================================================*/
 
 #include "imstkLooseOctree.h"
-
-#include "imstkGeometry.h"
-#include "imstkPointSet.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkDebugRenderGeometry.h"
-//#include "imstkRenderMaterial.h"
+#include "imstkLogger.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {

@@ -19,14 +19,12 @@
 
 =========================================================================*/
 
-#include <iostream>
-#include <memory>
-
 #include "imstkNewtonSolver.h"
-#include "imstkIterativeLinearSolver.h"
 #include "imstkConjugateGradient.h"
 #include "imstkDirectLinearSolver.h"
 #include "imstkLogger.h"
+
+#include <iostream>
 
 namespace imstk
 {

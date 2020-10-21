@@ -21,6 +21,7 @@
 
 #include "imstkTbbTaskGraphController.h"
 #include "imstkTaskGraph.h"
+
 #include <tbb/tbb.h>
 
 namespace imstk
@@ -97,6 +98,7 @@ TbbTaskGraphController::execute()
     // Extra ref count on the final task
     finalTask->increment_ref_count();
     finalTask->spawn_and_wait_for_all(*startTask);
+
     finalTask->execute(); // Execute final task explicitly
     tbb::task::destroy(*finalTask);
 }

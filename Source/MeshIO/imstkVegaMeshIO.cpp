@@ -20,20 +20,12 @@
 =========================================================================*/
 
 #include "imstkVegaMeshIO.h"
-#include "imstkMeshIO.h"
-#include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
-#include "imstkVolumetricMesh.h"
-
 #include "imstkLogger.h"
+#include "imstkTetrahedralMesh.h"
 
-// Vega
-#include "volumetricMeshLoader.h"
-#include "volumetricMesh.h"
-
-#include "tetMesh.h"
-
-#include <array>
+#include <tetMesh.h>
+#include <volumetricMeshLoader.h>
 
 namespace imstk
 {

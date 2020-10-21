@@ -21,14 +21,13 @@
 
 #pragma once
 
-//imstk
 #include "imstkInternalForceModel.h"
-#include "imstkLogger.h"
 
-//vega
-#include "StVKInternalForces.h"
-#include "StVKStiffnessMatrix.h"
-#include "StVKElementABCDLoader.h"
+namespace vega
+{
+class StVKInternalForces;
+class VolumetricMesh;
+}
 
 namespace imstk
 {
@@ -44,37 +43,12 @@ public:
     /// \brief Constructor
     ///
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
-                        const bool                            withGravity = true,
-                        const double                          gravity     = -9.81) : InternalForceModel()
-    {
-        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
-
-        vega::StVKElementABCD* precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
-
-        auto stVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
-
-        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&m_stiffnessMatrixRawPtr);
-        std::shared_ptr<vega::SparseMatrix> m_stiffnessMatrix2(m_stiffnessMatrixRawPtr);
-        m_stiffnessMatrix = m_stiffnessMatrix2;
-
-        auto K = m_stiffnessMatrix.get();
-        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&K);
-        double* zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
-        stVKStiffnessMatrix->ComputeStiffnessMatrix(zero, m_stiffnessMatrix.get());
-        free(zero);
-    };
+                        const bool withGravity = true, const double gravity = -9.81);
 
     ///
     /// \brief Destructor
     ///
-    virtual ~LinearFEMForceModel()
-    {
-        if (m_stiffnessMatrixRawPtr)
-        {
-            delete m_stiffnessMatrixRawPtr;
-        }
-    };
+    virtual ~LinearFEMForceModel() override;
 
     ///
     /// \brief Compute the internal force
@@ -85,8 +59,10 @@ public:
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4100 )
+#endif
     ///
     /// \brief Get the tangent stiffness matrix
     /// \todo Clear warning C4100
@@ -96,7 +72,9 @@ public:
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
     ///
     /// \brief Get the tangent stiffness matrix topology

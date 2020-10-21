@@ -21,10 +21,10 @@
 
 #pragma once
 
-#include <array>
-
 #include "imstkMath.h"
 #include "imstkLogger.h"
+
+#include <array>
 
 namespace imstk
 {

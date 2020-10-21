@@ -20,14 +20,12 @@
 =========================================================================*/
 
 #include "imstkNarrowPhaseCD.h"
-#include "imstkCollisionUtils.h"
-
-#include "imstkLogger.h"
+#include "imstkCapsule.h"
 #include "imstkCollisionData.h"
+#include "imstkCollisionUtils.h"
+#include "imstkCylinder.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
-#include "imstkCapsule.h"
-#include "imstkCylinder.h"
 #include "imstkSurfaceMesh.h"
 
 namespace imstk
@@ -80,9 +78,12 @@ bidirectionalPlaneToSphere(Plane* const planeA, Sphere* const sphereB,
     Vec3d sphereBColPt = sphereBPos - dirAToB * r;
 
     // Set collisionData
-    colData->PDColData.safeAppend({ planeAColPt,
-                                    sphereBColPt,
-                                    dirAToB, penetrationDepth });
+    PositionDirectionCollisionDataElement elem;
+    elem.dirAtoB = dirAToB;
+    elem.penetrationDepth = penetrationDepth;
+    elem.posA = planeAColPt;
+    elem.posB = sphereBColPt;
+    colData->PDColData.safeAppend(elem);
 }
 
 void
@@ -124,9 +125,12 @@ unidirectionalPlaneToSphere(Plane* const plane, Sphere* const sphere,
     Vec3d sphereBColPt = sphereBPos - n * r;
 
     // Set collisionData
-    colData->PDColData.safeAppend({ planeAColPt,
-                                    sphereBColPt,
-                                    n, penetrationDepth });
+    PositionDirectionCollisionDataElement elem;
+    elem.dirAtoB = n;
+    elem.penetrationDepth = penetrationDepth;
+    elem.posA = planeAColPt;
+    elem.posB = sphereBColPt;
+    colData->PDColData.safeAppend(elem);
 }
 
 void
@@ -171,9 +175,12 @@ sphereToCylinder(Sphere* const sphere, Cylinder* const cylinder,
                           n * rCylinder;
 
     // Set collisionData
-    colData->PDColData.safeAppend({ sphereColPt,
-                                    cylinderColPt,
-                                    n, penetrationDepth });
+    PositionDirectionCollisionDataElement elem;
+    elem.dirAtoB = n;
+    elem.penetrationDepth = penetrationDepth;
+    elem.posA = sphereColPt;
+    elem.posB = cylinderColPt;
+    colData->PDColData.safeAppend(elem);
 }
 
 void
@@ -218,9 +225,12 @@ sphereToSphere(Sphere* const sphereA, Sphere* const sphereB,
     Vec3d sphereBColPt = sphereBPos - dirAToB * rB;
 
     // Set collisionData
-    colData->PDColData.safeAppend({ sphereAColPt,
-                                    sphereBColPt,
-                                    dirAToB, penetrationDepth });
+    PositionDirectionCollisionDataElement elem;
+    elem.dirAtoB = dirAToB;
+    elem.penetrationDepth = penetrationDepth;
+    elem.posA = sphereAColPt;
+    elem.posB = sphereBColPt;
+    colData->PDColData.safeAppend(elem);
 }
 
 void

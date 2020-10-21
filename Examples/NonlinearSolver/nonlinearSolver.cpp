@@ -19,15 +19,13 @@
 
 =========================================================================*/
 
+#include "imstkDirectLinearSolver.h"
+#include "imstkNew.h"
+#include "imstkNewtonSolver.h"
+
 #include <ios>
 #include <iostream>
-#include <vector>
 #include <iomanip>
-
-#include "imstkMath.h"
-#include "imstkNewtonSolver.h"
-#include "imstkDirectLinearSolver.h"
-#include "imstkNonLinearSolver.h"
 
 using namespace imstk;
 
@@ -74,13 +72,13 @@ main(int argc, char** argv)
 
     auto updateXold = [](void) {};
 
-    auto nlSystem = std::make_shared<NonLinearSystem<Matrixd>>(func, jac);
+    imstkNew<NonLinearSystem<Matrixd>> nlSystem(func, jac);
     nlSystem->setUnknownVector(x);
     nlSystem->setUpdateFunction(updateX);
     nlSystem->setUpdatePreviousStatesFunction(updateXold);
 
-    auto linSolver = std::make_shared<DirectLinearSolver<Matrixd>>();
-    auto nlSolver  = std::make_shared<NewtonSolver<Matrixd>>();
+    imstkNew<DirectLinearSolver<Matrixd>> linSolver;
+    imstkNew<NewtonSolver<Matrixd>>       nlSolver;
     nlSolver->setMaxIterations(100);
     nlSolver->setRelativeTolerance(1e-8);
     nlSolver->setAbsoluteTolerance(1e-10);

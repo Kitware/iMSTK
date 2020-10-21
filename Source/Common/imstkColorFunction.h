@@ -50,7 +50,7 @@ public:
     virtual ~ColorFunction() = default;
 
 public:
-    size_t getNumberOfColors() const { return m_table.size(); }
+    int getNumberOfColors() const { return static_cast<int>(m_table.size()); }
     const Color& getColor(int i) const { return m_table[i]; }
     const Vec2d& getRange() const { return m_range; }
     const ColorSpace& getColorSpace() const { return m_colorSpace; }

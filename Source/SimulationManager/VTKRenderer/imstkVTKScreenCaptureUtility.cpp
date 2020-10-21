@@ -22,9 +22,15 @@
 #include "imstkVTKScreenCaptureUtility.h"
 #include "imstkLogger.h"
 
+#include <vtkPNGWriter.h>
+#include <vtkRenderWindow.h>
+#include <vtkWindowToImageFilter.h>
+
 namespace imstk
 {
-VTKScreenCaptureUtility::VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix /*= "Screenshot-"*/)
+VTKScreenCaptureUtility::VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix /*= "Screenshot-"*/) :
+    m_windowToImageFilter(vtkSmartPointer<vtkWindowToImageFilter>::New()),
+    m_pngWriter(vtkSmartPointer<vtkPNGWriter>::New())
 {
     m_screenShotNumber = 0;
     m_screenShotPrefix = prefix;
@@ -65,27 +71,5 @@ VTKScreenCaptureUtility::saveScreenShot()
     LOG(INFO) << "Screen shot " << m_screenShotNumber << " saved as " << captureName << "\n";
 
     m_screenShotNumber++;
-}
-
-unsigned int
-VTKScreenCaptureUtility::getScreenShotNumber() const
-{
-    return m_screenShotNumber;
-}
-
-void
-VTKScreenCaptureUtility::setScreenShotPrefix(const std::string newPrefix)
-{
-    if (m_screenShotPrefix.compare(newPrefix) != 0)
-    {
-        m_screenShotPrefix = newPrefix;
-        m_screenShotNumber = 0;
-    }
-}
-
-void
-VTKScreenCaptureUtility::resetScreenShotNumber()
-{
-    m_screenShotNumber = 0;
 }
 } // imstk
