@@ -633,7 +633,7 @@ SurfaceMesh::directionalScale(double s_x, double s_y, double s_z)
                 m_vertexPositions[i].z() = s_z * m_vertexPositions[i].z();
                 m_initialVertexPositions[i].z() = s_z * m_initialVertexPositions[i].z();
             });
-        m_dataModified = true;
+        m_dataModified     = true;
         m_transformApplied = false;
     }
 }
@@ -671,5 +671,4 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     this->m_transform = srcMesh->m_transform;
     this->m_scaling   = srcMesh->m_scaling;
 }
-
 }  // namespace imstk

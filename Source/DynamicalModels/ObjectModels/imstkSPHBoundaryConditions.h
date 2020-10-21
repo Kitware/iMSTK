@@ -35,11 +35,11 @@ public:
 
     enum class ParticleType
     {
-        fluid,
-        wall,
-        inlet,
-        outlet,
-        buffer
+        Fluid,
+        Wall,
+        Inlet,
+        Outlet,
+        Buffer
     };
 
     SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,

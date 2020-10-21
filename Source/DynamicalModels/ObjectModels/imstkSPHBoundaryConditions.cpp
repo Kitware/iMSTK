@@ -92,21 +92,21 @@ SPHBoundaryConditions::setParticleTypes(const StdVectorOfVec3d& mainParticlePosi
         ParticleType type;
         if (isInInletDomain(i))
         {
-            type = ParticleType::inlet;
+            type = ParticleType::Inlet;
         }
         else if (isInOutletDomain(i))
         {
-            type = ParticleType::outlet;
+            type = ParticleType::Outlet;
         }
         else
         {
-            type = ParticleType::fluid;
+            type = ParticleType::Fluid;
         }
         m_particleTypes.push_back(type);
     }
 
-    m_particleTypes.insert(m_particleTypes.end(), numWallParticles, ParticleType::wall);
-    m_particleTypes.insert(m_particleTypes.end(), m_numBufferParticles, ParticleType::buffer);
+    m_particleTypes.insert(m_particleTypes.end(), numWallParticles, ParticleType::Wall);
+    m_particleTypes.insert(m_particleTypes.end(), m_numBufferParticles, ParticleType::Buffer);
     m_bufferIndices.resize(m_numBufferParticles);
     std::iota(std::begin(m_bufferIndices), std::end(m_bufferIndices), m_particleTypes.size() - m_numBufferParticles);
 }

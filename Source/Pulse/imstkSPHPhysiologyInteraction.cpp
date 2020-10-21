@@ -56,7 +56,7 @@ void
 SPHPhysiologyObjectInteractionPair::computeInteraction()
 {
     std::shared_ptr<SPHHemorrhage> hemorrhageModel = m_sphModel->getHemorrhageModel();
-    const SELiquidCompartment* compartment = (SELiquidCompartment*)m_physiologyModel->getCompartment(m_compartmentType, m_compartmentName);
+    const SELiquidCompartment*     compartment     = (SELiquidCompartment*)m_physiologyModel->getCompartment(m_compartmentType, m_compartmentName);
 
     // check if the hemorrhage is being used in SPH
     if (hemorrhageModel != nullptr && m_hemorrhageAction != nullptr && compartment != nullptr)

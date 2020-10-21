@@ -184,6 +184,10 @@ public:
 
     Real particlePressure(const double density);
 
+    ///
+    /// \brief Write the state to external file
+    /// \todo move this out of this class
+    ///
     void writeStateToCSV();
     void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
     Real getTotalTime() const { return m_totalTime; }
@@ -296,11 +300,11 @@ protected:
     std::shared_ptr<TaskNode> m_computePressureAccelNode  = nullptr;
     std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
-    std::shared_ptr<TaskNode> m_sumAccelsNode        = nullptr;
-    std::shared_ptr<TaskNode> m_integrateNode        = nullptr;
-    std::shared_ptr<TaskNode> m_updateVelocityNode   = nullptr;
-    std::shared_ptr<TaskNode> m_computeViscosityNode = nullptr;
-    std::shared_ptr<TaskNode> m_moveParticlesNode    = nullptr;
+    std::shared_ptr<TaskNode> m_sumAccelsNode              = nullptr;
+    std::shared_ptr<TaskNode> m_integrateNode              = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode         = nullptr;
+    std::shared_ptr<TaskNode> m_computeViscosityNode       = nullptr;
+    std::shared_ptr<TaskNode> m_moveParticlesNode          = nullptr;
     std::shared_ptr<TaskNode> m_normalizeDensityNode       = nullptr;
     std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;
 
@@ -331,12 +335,10 @@ private:
     double m_vtkTimeModulo       = 0;
     double m_csvPreviousTime     = 0;
     double m_csvTimeModulo       = 0;
-    Vec3d  m_prevAvgVelThroughHemorrhage = Vec3d(0, 0, 0);
+    Vec3d  m_prevAvgVelThroughHemorrhage = Vec3d(0., 0., 0.);
 
-    std::shared_ptr<TetrahedralMesh> m_geomUnstructuredGrid = nullptr;
-
+    std::shared_ptr<TetrahedralMesh>       m_geomUnstructuredGrid  = nullptr;
     std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
-
     std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
 
     std::vector<size_t> m_minIndices;

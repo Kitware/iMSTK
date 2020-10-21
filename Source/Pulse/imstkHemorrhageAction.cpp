@@ -66,7 +66,7 @@ void
 HemorrhageAction::setType(const Type t)
 {
     (t == Type::External) ? m_hemorrhage->SetType(eHemorrhage_Type::External) :
-        m_hemorrhage->SetType(eHemorrhage_Type::External);
+    m_hemorrhage->SetType(eHemorrhage_Type::External);
 }
 
 void

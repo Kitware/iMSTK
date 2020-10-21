@@ -136,8 +136,7 @@ main(int argc, char* argv[])
     whiteLight->setFocalPoint(Vec3d(5, -8, -5));
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
-
-    ///////////////////////////////////////
+    
     // Setup some scalars
     std::shared_ptr<PointSet> fluidGeometry = std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry());
     std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(fluidGeometry->getNumVertices());
@@ -154,8 +153,6 @@ main(int argc, char* argv[])
     colorFunc->setRange(0, 3);
     material->setColorLookupTable(colorFunc);
 
-
-    //scene->setTaskGraphConfigureCallback([&](Scene* scene)
     auto displayColors = [&](Event*)
     {
         auto taskGraph = scene->getTaskGraph();
@@ -186,15 +183,15 @@ main(int argc, char* argv[])
             StdVectorOfReal& scalars = *scalarsPtr;
             for (size_t i = 0; i < sphModel->getCurrentState()->getNumParticles(); i++)
             {
-                if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::wall)
+                if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::Wall)
                 {
                     scalars[i] = 0;
                 }
-                else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::inlet)
+                else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::Inlet)
                 {
                     scalars[i] = 1;
                 }
-                else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::outlet)
+                else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::Outlet)
                 {
                     scalars[i] = 2;
                 }

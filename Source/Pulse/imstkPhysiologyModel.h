@@ -169,7 +169,7 @@ protected:
     std::shared_ptr<TaskNode> m_solveNode = nullptr;
 
     std::unordered_map<std::string, std::shared_ptr<PhysiologyAction>> m_actions; ///< container for all the actions
-    std::vector<PhysiologyDataRequestPair> m_dataPairs;       ///< container for data requests
+    std::vector<PhysiologyDataRequestPair> m_dataPairs;                           ///< container for data requests
 
 private:
     // main pulse object

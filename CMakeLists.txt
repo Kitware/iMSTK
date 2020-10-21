@@ -133,7 +133,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
   
-  option(${PROJECT_NAME}_USE_Pulse "Use Pulse engine." OFF)
+  option(${PROJECT_NAME}_USE_Pulse "Use Pulse Physiology engine." OFF)
   if(${PROJECT_NAME}_USE_Pulse)
     imstk_define_dependency(Pulse)
   endif()
