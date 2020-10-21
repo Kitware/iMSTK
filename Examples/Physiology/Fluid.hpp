@@ -131,10 +131,7 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
       auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-      std::unordered_map<size_t, int> m_inputs;
-      auto s = m_inputs.count(0);
-
-      selectionFilter->setInputMesh(surfMesh);
+      selectionFilter->setInputMesh(surfMesh);      
       selectionFilter->setInputPoints(uniformMesh);
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
       //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
