@@ -24,11 +24,13 @@
 #include "imstkMeshIO.h"
 #include "imstkPointSet.h"
 #include "imstkScene.h"
-#include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkSelectEnclosedPoints.h"
+#include "imstkRenderMaterial.h"
+#include "imstkVisualModel.h"
 
 #include <vtkBooleanOperationPolyDataFilter.h>
 #include <vtkCenterOfMass.h>
@@ -54,8 +56,8 @@ generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh
     auto intersectionPolyDataFilter = vtkSmartPointer<vtkBooleanOperationPolyDataFilter>::New();
     intersectionPolyDataFilter->SetOperationToDifference();
 
-    auto vtkPolySurfMesh = GeometryUtils::convertSurfaceMeshToVtkPolyData(surfMesh);
-    auto vtkPolySurfMeshExpanded = GeometryUtils::convertSurfaceMeshToVtkPolyData(surfMeshExpanded);
+    auto vtkPolySurfMesh = GeometryUtils::copyToVtkPolyData(surfMesh);
+    auto vtkPolySurfMeshExpanded = GeometryUtils::copyToVtkPolyData(surfMeshExpanded);
 
     vtkSmartPointer<vtkTriangleFilter> tri1 =
       vtkSmartPointer<vtkTriangleFilter>::New();
@@ -83,7 +85,7 @@ generateWallFluidPoints(const double particleRadius, std::shared_ptr<SurfaceMesh
 
     auto outputPolyData = intersectionPolyDataFilter->GetOutput();
 
-    std::shared_ptr<SurfaceMesh> subtractedMesh = std::move(GeometryUtils::convertVtkPolyDataToSurfaceMesh(outputPolyData));
+    std::shared_ptr<SurfaceMesh> subtractedMesh = std::move(GeometryUtils::copyToSurfaceMesh(outputPolyData));
 
     return subtractedMesh;
 }
@@ -95,6 +97,9 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
     auto sphModel = std::make_shared<SPHModel>();
     double speedOfSound = 100;
     double restDensity = 1;
+
+    auto selectionFilter = std::shared_ptr<SelectEnclosedPoints>();
+    
     if (SCENE_ID == 1)
     {
       // pipe flow
@@ -126,9 +131,21 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
       auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-      auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+      std::unordered_map<size_t, int> m_inputs;
+      auto s = m_inputs.count(0);
+
+      selectionFilter->setInputMesh(surfMesh);
+      selectionFilter->setInputPoints(uniformMesh);
+      auto enclosedFluidPoints = selectionFilter->getOutputPoints();
+      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+
       particles = enclosedFluidPoints->getInitialVertexPositions();
-      auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
+      selectionFilter->setInputMesh(surfMeshShell);
+      selectionFilter->setInputPoints(uniformMesh_wall);
+      auto enclosedWallPoints = selectionFilter->getOutputPoints();
+      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       std::pair<Vec3d, Vec3d> fluidCoords = std::make_pair(aabbMin, aabbMax);
@@ -153,7 +170,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, outletCoords, fluidCoords, inletNormal, outletNormals, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
       sphModel->setBoundaryConditions(sphBoundaryConditions);
   }
-
   else if (SCENE_ID == 2)
   {
       // half torus flow
@@ -181,9 +197,18 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
       auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-      auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+      selectionFilter->setInputMesh(surfMesh);
+      selectionFilter->setInputPoints(uniformMesh);
+      auto enclosedFluidPoints = selectionFilter->getOutputPoints();
+      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+
       particles = enclosedFluidPoints->getInitialVertexPositions();
-      auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
+      selectionFilter->setInputMesh(surfMeshShell);
+      selectionFilter->setInputPoints(uniformMesh_wall);
+      auto enclosedWallPoints = selectionFilter->getOutputPoints();
+      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+      
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       std::pair<Vec3d, Vec3d> fluidCoords = std::make_pair(aabbMin, aabbMax);
@@ -239,9 +264,18 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
       auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-      auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+      selectionFilter->setInputMesh(surfMesh);
+      selectionFilter->setInputPoints(uniformMesh);
+      auto enclosedFluidPoints = selectionFilter->getOutputPoints();
+      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+
       particles = enclosedFluidPoints->getInitialVertexPositions();
-      auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
+      selectionFilter->setInputMesh(surfMeshShell);
+      selectionFilter->setInputPoints(uniformMesh_wall);
+      auto enclosedWallPoints = selectionFilter->getOutputPoints();
+      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
   
       std::pair<Vec3d, Vec3d> fluidCoords = std::make_pair(aabbMin, aabbMax);
@@ -303,9 +337,18 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
       auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-      auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+      selectionFilter->setInputMesh(surfMesh);
+      selectionFilter->setInputPoints(uniformMesh);
+      auto enclosedFluidPoints = selectionFilter->getOutputPoints();
+      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+
       particles = enclosedFluidPoints->getInitialVertexPositions();
-      auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
+      selectionFilter->setInputMesh(surfMeshShell);
+      selectionFilter->setInputPoints(uniformMesh_wall);
+      auto enclosedWallPoints = selectionFilter->getOutputPoints();
+      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+      
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       std::pair<Vec3d, Vec3d> fluidCoords = std::make_pair(aabbMin, aabbMax);
@@ -369,9 +412,18 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto uniformMesh = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx, ny, nz));
       auto uniformMesh_wall = std::dynamic_pointer_cast<PointSet>(GeometryUtils::createUniformMesh(aabbMin, aabbMax, nx_wall, ny_wall, nz_wall));
 
-      auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+      selectionFilter->setInputMesh(surfMesh);
+      selectionFilter->setInputPoints(uniformMesh);
+      auto enclosedFluidPoints = selectionFilter->getOutputPoints();
+      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
+
       particles = enclosedFluidPoints->getInitialVertexPositions();
-      auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+      
+      selectionFilter->setInputMesh(surfMeshShell);
+      selectionFilter->setInputPoints(uniformMesh_wall);
+      auto enclosedWallPoints = selectionFilter->getOutputPoints();
+      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
+
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
       std::pair<Vec3d, Vec3d> fluidCoords = std::make_pair(aabbMin, aabbMax);

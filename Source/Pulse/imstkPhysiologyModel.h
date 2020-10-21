@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 #include "imstkAbstractDynamicalModel.h"/*
 #include "properties/SEScalarVolumePerTime.h"
 #include "compartment/fluid/SELiquidCompartment.h"*/

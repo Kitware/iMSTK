@@ -26,8 +26,6 @@
 //#include "imstkVTKMeshIO.h"
 //#include "imstkGeometryUtilities.h"
 
-#include "imstkSimulationManager.h"
-
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSphere.h"
@@ -278,7 +276,7 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolids(const std::shared_p
     case 2:
         return generateSolidsScene2();
     case 3:
-        return generateSolidsScene3(scene);
+        return generateSolidsScene3();
     case 4:
       return generateSolidsScene4(scene);
     default:

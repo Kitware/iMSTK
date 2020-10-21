@@ -75,7 +75,7 @@ main(int argc, char* argv[])
 
     // Generate fluid and solid objects
     std::shared_ptr<SPHObject> fluidObj                  = generateFluid(particleRadius);
-    std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids();
+    std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids(scene);
 
     scene->addSceneObject(fluidObj);
     for (size_t i = 0; i < solids.size(); i++)

@@ -21,6 +21,7 @@
 
 #include "Fluid.hpp"
 
+#include "imstkNew.h"
 #include "imstkCamera.h"
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionGraph.h"
@@ -28,22 +29,27 @@
 #include "imstkLight.h"
 #include "imstkPhysiologyModel.h"
 #include "imstkPhysiologyObject.h"
-#include "imstkPlane.h"
+//#include "imstkPlane.h"
 #include "imstkPointSet.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSPHPhysiologyInteraction.h"
 #include "imstkTaskGraph.h"
-#include "imstkVTKTextStatusManager.h"
+//#include "imstkVTKTextStatusManager.h"
+#include "imstkVTKViewer.h"
+#include "imstkMouseSceneControl.h"
+#include "imstkKeyboardSceneControl.h"
+#include "imstkRenderMaterial.h"
+#include "imstkVisualModel.h"
 
 using namespace imstk;
 
-static std::shared_ptr<PhysiologyObject> makePhysiologyObject()
+static std::shared_ptr<PhysiologyObject> 
+makePhysiologyObject()
 {
     // configure model
     auto physiologyParams = std::make_shared<PhysiologyModelConfig>();
@@ -62,7 +68,8 @@ static std::shared_ptr<PhysiologyObject> makePhysiologyObject()
     return physiologyObj;
 }
 
-static void parseArguments(int argc, char* argv[], double& particleRadius, int& numThreads)
+static void 
+parseArguments(int argc, char* argv[], double& particleRadius, int& numThreads)
 {
     if (SCENE_ID == 5)
     {
@@ -93,128 +100,137 @@ static void parseArguments(int argc, char* argv[], double& particleRadius, int& 
 int
 main(int argc, char* argv[])
 {
-  // SimulationManager must be created first
-  auto simManager = std::make_shared<SimulationManager>();
+    // Setup logger (write to file and stdout)
+    Logger::startLogger();
 
-  int threads = -1;
-  double particleRadius = 0.04;
-  parseArguments(argc, argv, particleRadius, threads);
+    imstkNew<Scene> scene("SPHPhysiologyInteraction");
 
-  // Set thread pool size (nthreads <= 0 means using all logical cores)
-  simManager->setThreadPoolSize(threads);
 
-  auto scene = simManager->createNewScene("SPHPhysiologyInteraction");
+    int threads = -1;
+    double particleRadius = 0.04;
+    parseArguments(argc, argv, particleRadius, threads);
 
-  scene->getConfig()->writeTaskGraph = true;
-  //scene->getConfig()->taskTimingEnabled = true;
-  //scene->getTaskComputeTimes().at("PhysiologyModel_Solve");
+    // Generate fluid and solid objects
+    auto fluidObj = generateFluid(scene, particleRadius);
+    auto material = fluidObj->getVisualModel(0)->getRenderMaterial();
+    auto sphModel = fluidObj->getDynamicalSPHModel();
 
-  // Get the VTKViewer
-  std::shared_ptr<VTKViewer> viewer = std::make_shared<VTKViewer>(simManager.get(), false);
-  viewer->setWindowTitle("Physiology Example");
-  viewer->getVtkRenderWindow()->SetSize(1920, 1080);
-  auto statusManager = viewer->getTextStatusManager();
-  statusManager->setStatusFontSize(VTKTextStatusManager::Custom, 30);
-  statusManager->setStatusFontColor(VTKTextStatusManager::Custom, Color::Red);
-  simManager->setViewer(viewer);
 
-  // Generate fluid and solid objects
-  auto fluidObj = generateFluid(scene, particleRadius);
-  std::shared_ptr<RenderMaterial> material = fluidObj->getVisualModel(0)->getRenderMaterial();
-  std::shared_ptr<SPHModel> sphModel = fluidObj->getDynamicalSPHModel();
+    std::shared_ptr<PhysiologyObject> physioObj = makePhysiologyObject();
+    scene->addSceneObject(physioObj);
 
-  
-  std::shared_ptr<PhysiologyObject> physioObj = makePhysiologyObject();
-  scene->addSceneObject(physioObj);
+    auto interactionPair = std::make_shared<SPHPhysiologyObjectInteractionPair>(fluidObj, physioObj);
 
-  auto interactionPair = std::make_shared<SPHPhysiologyObjectInteractionPair>(fluidObj, physioObj);
+    // configure the sph-physiology interaction pair
+    interactionPair->setHemorrhageAction(
+        std::dynamic_pointer_cast<HemorrhageAction>(physioObj->getPhysiologyModel()->getAction("Hemorrhage")));
+    interactionPair->setCompartment(PhysiologyCompartmentType::Liquid, "VascularCompartment::RightLeg");
 
-  // configure the sph-physiology interaction pair
-  interactionPair->setHemorrhageAction(std::dynamic_pointer_cast<HemorrhageAction>(physioObj->getPhysiologyModel()->getAction("Hemorrhage")));
-  interactionPair->setCompartment(PhysiologyCompartmentType::Liquid, "VascularCompartment::RightLeg");
+    scene->getCollisionGraph()->addInteraction(interactionPair);
 
-  scene->getCollisionGraph()->addInteraction(interactionPair);
+    // configure camera
+    (SCENE_ID == 5) ? scene->getActiveCamera()->setPosition(0, 1.0, 4.0) : scene->getActiveCamera()->setPosition(0, 1.0, 5.0);
 
-  // configure camera
-  (SCENE_ID == 5) ? scene->getCamera()->setPosition(0, 1.0, 4.0): scene->getCamera()->setPosition(0, 1.0, 5.0);
-    
-  // configure light (white)
-  auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
-  whiteLight->setFocalPoint(Vec3d(5, -8, -5));
-  whiteLight->setIntensity(7);
-  scene->addLight(whiteLight);
+    // configure light (white)
+    auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
+    whiteLight->setFocalPoint(Vec3d(5, -8, -5));
+    whiteLight->setIntensity(7);
+    scene->addLight(whiteLight);
 
-  ///////////////////////////////////////
-  // Setup some scalars
-  std::shared_ptr<PointSet> fluidGeometry = std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry());
-  std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(fluidGeometry->getNumVertices());
-  std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
-  fluidGeometry->setScalars(scalarsPtr);
+    ///////////////////////////////////////
+    // Setup some scalars
+    std::shared_ptr<PointSet> fluidGeometry = std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry());
+    std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(fluidGeometry->getNumVertices());
+    std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
+    fluidGeometry->setScalars(scalarsPtr);
 
-  // Setup the material for the scalars
-  material->setScalarVisibility(true);
-  std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
-  colorFunc->setNumberOfColors(2);
-  colorFunc->setColor(0, Color::Red);
-  colorFunc->setColor(1, Color::Green);
-  colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
-  colorFunc->setRange(0, 3);
-  material->setColorLookupTable(colorFunc);
+    // Setup the material for the scalars
+    material->setScalarVisibility(true);
+    std::shared_ptr<ColorFunction> colorFunc = std::make_shared<ColorFunction>();
+    colorFunc->setNumberOfColors(2);
+    colorFunc->setColor(0, Color::Red);
+    colorFunc->setColor(1, Color::Green);
+    colorFunc->setColorSpace(ColorFunction::ColorSpace::RGB);
+    colorFunc->setRange(0, 3);
+    material->setColorLookupTable(colorFunc);
 
-  scene->setTaskGraphConfigureCallback([&](Scene* scene)
+
+    //scene->setTaskGraphConfigureCallback([&](Scene* scene)
+    auto displayColors = [&](Event*)
     {
-      auto taskGraph = scene->getTaskGraph();
-      //taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
+        auto taskGraph = scene->getTaskGraph();
+        //taskGraph->removeNode(fluidObj->getDynamicalSPHModel()->getComputeSurfaceTensionNode());
 
-      std::shared_ptr<TaskNode> printTotalTime = std::make_shared<TaskNode>([&]()
-        {
-          if (fluidObj->getDynamicalSPHModel()->getTimeStepCount() % 100 == 0)
-          {
-            printf("Total time (s): %f\n", fluidObj->getDynamicalSPHModel()->getTotalTime());
-          }
-        }, "PrintTotalTime");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printTotalTime);
-
-      std::shared_ptr<TaskNode> writeSPHStateToCSV = std::make_shared<TaskNode>([&]() {
-        fluidObj->getDynamicalSPHModel()->writeStateToCSV();
-        }, "WriteStateToCSV");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToCSV);
-
-      std::shared_ptr<TaskNode> writeSPHStateToVtk = std::make_shared<TaskNode>([&]() {
-        fluidObj->getDynamicalSPHModel()->writeStateToVtk();
-        }, "WriteStateToVtk");
-      taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToVtk);
-
-      // This node colors the fluid points based on their type
-	  std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]() {
-          const std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions = sphModel->getBoundaryConditions();
-          StdVectorOfReal& scalars = *scalarsPtr;
-          for (size_t i = 0; i < sphModel->getCurrentState()->getNumParticles(); i++)
-          {
-            if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::wall)
+        std::shared_ptr<TaskNode> printTotalTime = std::make_shared<TaskNode>([&]()
             {
-              scalars[i] = 0;
-            }
-            else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::inlet)
-            {
-              scalars[i] = 1;
-            }
-            else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::outlet)
-            {
-              scalars[i] = 2;
-            }
-            else
-            {
-              scalars[i] = 3;
-            }
-		  }
-	  }, "ComputeVelocityScalars");
-      taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
-    });
+                if (fluidObj->getDynamicalSPHModel()->getTimeStepCount() % 100 == 0)
+                {
+                    printf("Total time (s): %f\n", fluidObj->getDynamicalSPHModel()->getTotalTime());
+                }
+            }, "PrintTotalTime");
+        taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printTotalTime);
 
-  simManager->setActiveScene(scene);
+        std::shared_ptr<TaskNode> writeSPHStateToCSV = std::make_shared<TaskNode>([&]() {
+            fluidObj->getDynamicalSPHModel()->writeStateToCSV();
+            }, "WriteStateToCSV");
+        taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToCSV);
 
-  simManager->start(SimulationStatus::Paused);
+        std::shared_ptr<TaskNode> writeSPHStateToVtk = std::make_shared<TaskNode>([&]() {
+            fluidObj->getDynamicalSPHModel()->writeStateToVtk();
+            }, "WriteStateToVtk");
+        taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToVtk);
 
-  return 0;
+        // This node colors the fluid points based on their type
+        std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]() {
+            const std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions = sphModel->getBoundaryConditions();
+            StdVectorOfReal& scalars = *scalarsPtr;
+            for (size_t i = 0; i < sphModel->getCurrentState()->getNumParticles(); i++)
+            {
+                if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::wall)
+                {
+                    scalars[i] = 0;
+                }
+                else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::inlet)
+                {
+                    scalars[i] = 1;
+                }
+                else if (sphBoundaryConditions->getParticleTypes()[i] == SPHBoundaryConditions::ParticleType::outlet)
+                {
+                    scalars[i] = 2;
+                }
+                else
+                {
+                    scalars[i] = 3;
+                }
+            }
+            }, "ComputeVelocityScalars");
+        taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
+    };
+
+    // Setup a viewer to render in its own thread
+    imstkNew<VTKViewer> viewer("Viewer");
+    viewer->setActiveScene(scene);
+
+    // Setup a scene manager to advance the scene in its own thread
+    imstkNew<SceneManager> sceneManager("Scene Manager");
+    sceneManager->setActiveScene(scene);
+    viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+    connect<Event>(sceneManager, EventType::PostUpdate, displayColors);
+
+    // Add mouse and keyboard controls to the viewer
+    {
+        imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+        mouseControl->setSceneManager(sceneManager);
+        viewer->addControl(mouseControl);
+
+        imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+        keyControl->setSceneManager(sceneManager);
+        keyControl->setViewer(viewer);
+    }
+
+    // Start viewer running, scene as paused
+    sceneManager->requestStatus(ThreadStatus::Paused);
+    viewer->start();
+
+    return 0;
 }

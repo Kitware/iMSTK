@@ -638,6 +638,7 @@ SurfaceMesh::directionalScale(double s_x, double s_y, double s_z)
     }
 }
 
+void
 SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
 {
     this->m_trianglesVertices       = srcMesh->m_trianglesVertices;
