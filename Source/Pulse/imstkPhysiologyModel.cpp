@@ -48,10 +48,10 @@ PhysiologyModel::initialize()
     switch (m_config->m_basePatient)
     {
     case PatientPhysiology::StandardMale:
-        patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardMale.json";
+        patientFile = iMSTK_DATA_ROOT "/PhysiologyState/StandardMale@0s.pbb";
         break;
     case PatientPhysiology::StandardFemale:
-        patientFile = iMSTK_DATA_ROOT "/PhysiologyStates/StandardFemale.json";
+        patientFile = iMSTK_DATA_ROOT "/PhysiologyState/StandardFemale.json";
         break;
     default:
         LOG(WARNING) << "Could not find the patient. Initializing to StandardMale";

@@ -21,6 +21,10 @@ if(iMSTK_USE_Vulkan)
   return()
 endif()
 
+if(NOT iMSTK_USE_Pulse)
+  return()
+endif()
+
 project(Example-Physiology-HalfTorusFlow)
 
 #-----------------------------------------------------------------------------

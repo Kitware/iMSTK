@@ -56,7 +56,6 @@ limitations under the License.
 
 namespace imstk
 {
-
 HemorrhageAction::HemorrhageAction(const Type t, const std::string& name)
 {
     m_hemorrhage = std::make_shared<SEHemorrhage>();
