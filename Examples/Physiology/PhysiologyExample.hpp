@@ -29,7 +29,6 @@
 #include "imstkLight.h"
 #include "imstkPhysiologyModel.h"
 #include "imstkPhysiologyObject.h"
-//#include "imstkPlane.h"
 #include "imstkPointSet.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkScene.h"
@@ -39,7 +38,6 @@
 #include "imstkSPHObject.h"
 #include "imstkSPHPhysiologyInteraction.h"
 #include "imstkTaskGraph.h"
-//#include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkKeyboardSceneControl.h"
@@ -51,18 +49,25 @@ using namespace imstk;
 static std::shared_ptr<PhysiologyObject> 
 makePhysiologyObject()
 {
-    // configure model
-    auto physiologyParams = std::make_shared<PhysiologyModelConfig>();
+    // configuration for the Physiology model    
+    imstkNew<PhysiologyModelConfig> physiologyParams;
 
-    // Create a physics model
-    auto physiologyModel = std::make_shared<PhysiologyModel>();
+    // Set the base physiology state to available preset
+    physiologyParams->m_basePatient = PatientPhysiology::StandardMale;
+
+    // Create a Physiology model
+    imstkNew<PhysiologyModel> physiologyModel;
     physiologyModel->configure(physiologyParams);
 
-    // Setup hemorrhage action
-    auto hemorrhageAction = std::make_shared<HemorrhageAction>(HemorrhageAction::Type::External, "VascularCompartment::RightLeg");
+    // Create an external hemorrhage on the right leg
+    imstkNew<HemorrhageAction> hemorrhageAction(HemorrhageAction::Type::External,
+                                                               "VascularCompartment::RightLeg");
+    
+    
+    // Add a hemorrhage action to the model
     physiologyModel->addAction("Hemorrhage", hemorrhageAction);
 
-    auto physiologyObj = std::make_shared<PhysiologyObject>("Pulse");
+    imstkNew<PhysiologyObject> physiologyObj("Human physiology");
     physiologyObj->setDynamicalModel(physiologyModel);
 
     return physiologyObj;
@@ -129,7 +134,7 @@ main(int argc, char* argv[])
     scene->getCollisionGraph()->addInteraction(interactionPair);
 
     // configure camera
-    (SCENE_ID == 5) ? scene->getActiveCamera()->setPosition(0, 1.0, 4.0) : scene->getActiveCamera()->setPosition(0, 1.0, 5.0);
+    (SCENE_ID == 5) ? scene->getActiveCamera()->setPosition(0, 1.0, 4.0) : scene->getActiveCamera()->setPosition(0, 1.0, 7.0);
 
     // configure light (white)
     auto whiteLight = std::make_shared<DirectionalLight>("whiteLight");
@@ -137,7 +142,7 @@ main(int argc, char* argv[])
     whiteLight->setIntensity(7);
     scene->addLight(whiteLight);
     
-    // Setup some scalars
+    //Setup some scalars
     std::shared_ptr<PointSet> fluidGeometry = std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry());
     std::shared_ptr<StdVectorOfReal> scalarsPtr = std::make_shared<StdVectorOfReal>(fluidGeometry->getNumVertices());
     std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
@@ -167,18 +172,21 @@ main(int argc, char* argv[])
             }, "PrintTotalTime");
         taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), printTotalTime);
 
-        std::shared_ptr<TaskNode> writeSPHStateToCSV = std::make_shared<TaskNode>([&]() {
+        std::shared_ptr<TaskNode> writeSPHStateToCSV = std::make_shared<TaskNode>([&]() 
+            {
             fluidObj->getDynamicalSPHModel()->writeStateToCSV();
             }, "WriteStateToCSV");
         taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToCSV);
 
-        std::shared_ptr<TaskNode> writeSPHStateToVtk = std::make_shared<TaskNode>([&]() {
+        std::shared_ptr<TaskNode> writeSPHStateToVtk = std::make_shared<TaskNode>([&]() 
+            {
             fluidObj->getDynamicalSPHModel()->writeStateToVtk();
             }, "WriteStateToVtk");
         taskGraph->insertAfter(fluidObj->getDynamicalSPHModel()->getMoveParticlesNode(), writeSPHStateToVtk);
 
         // This node colors the fluid points based on their type
-        std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]() {
+        std::shared_ptr<TaskNode> computeVelocityScalars = std::make_shared<TaskNode>([&]() 
+            {
             const std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions = sphModel->getBoundaryConditions();
             StdVectorOfReal& scalars = *scalarsPtr;
             for (size_t i = 0; i < sphModel->getCurrentState()->getNumParticles(); i++)
@@ -204,30 +212,35 @@ main(int argc, char* argv[])
         taskGraph->insertAfter(fluidObj->getUpdateGeometryNode(), computeVelocityScalars);
     };
 
-    // Setup a viewer to render in its own thread
-    imstkNew<VTKViewer> viewer("Viewer");
-    viewer->setActiveScene(scene);
-
-    // Setup a scene manager to advance the scene in its own thread
-    imstkNew<SceneManager> sceneManager("Scene Manager");
-    sceneManager->setActiveScene(scene);
-    viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-    connect<Event>(sceneManager, EventType::PostUpdate, displayColors);
-
-    // Add mouse and keyboard controls to the viewer
+    // Run the simulation
     {
-        imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
-        mouseControl->setSceneManager(sceneManager);
-        viewer->addControl(mouseControl);
+        // Setup a viewer to render in its own thread
+        imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setActiveScene(scene);
 
-        imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
-        keyControl->setSceneManager(sceneManager);
-        keyControl->setViewer(viewer);
+        // Setup a scene manager to advance the scene in its own thread
+        imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setActiveScene(scene);
+        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer        
+        connect<Event>(sceneManager, EventType::PostUpdate, displayColors);
+
+        // Add mouse and keyboard controls to the viewer
+        {
+            imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+            mouseControl->setSceneManager(sceneManager);
+            viewer->addControl(mouseControl);
+
+            imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+            keyControl->setSceneManager(sceneManager);
+            keyControl->setViewer(viewer);
+            viewer->addControl(keyControl);
+        }
+   
+        // Start viewer running, scene as paused
+        sceneManager->requestStatus(ThreadStatus::Paused);
+        viewer->start(); 
+    
     }
-
-    // Start viewer running, scene as paused
-    sceneManager->requestStatus(ThreadStatus::Running);
-    viewer->start();
 
     return 0;
 }

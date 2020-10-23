@@ -103,10 +103,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small_shell.stl"));
       auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small.vtk"));
 
-      //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-      //surfMeshShell->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-      //tetMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-
       // set tetrahedral mesh used when writing VTUs
       sphModel->setGeometryMesh(tetMesh);
 
@@ -131,7 +127,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh);
       selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
-      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
       particles = enclosedFluidPoints->getInitialVertexPositions();
 
@@ -139,7 +134,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh_wall);
       selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
-      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
 
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
@@ -196,7 +190,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh);
       selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
-      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
       particles = enclosedFluidPoints->getInitialVertexPositions();
 
@@ -204,7 +197,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh_wall);
       selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
-      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
       
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
@@ -233,7 +225,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
 
       speedOfSound = 300;
   }
-
   else if (SCENE_ID == 3)
   {
       // bifurcation flow
@@ -265,7 +256,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh);
       selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
-      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
       particles = enclosedFluidPoints->getInitialVertexPositions();
 
@@ -273,7 +263,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh_wall);
       selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
-      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
 
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
   
@@ -312,10 +301,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small_shell_cut_ellipse.stl"));
       auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder_small.vtk"));
 
-      //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-      //surfMeshShell->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-      //tetMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-
       // set tetrahedral mesh used when writing VTUs
       sphModel->setGeometryMesh(tetMesh);
 
@@ -340,7 +325,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh);
       selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
-      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
       particles = enclosedFluidPoints->getInitialVertexPositions();
 
@@ -348,7 +332,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh_wall);
       selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
-      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
       
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
@@ -381,17 +364,12 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneArea, hemorrhagePlaneOutwardNormal);
       sphModel->setHemorrhageModel(sphHemorrhageModel);
   }
-
   else if (SCENE_ID == 5)
   {
       // femoral artery flow with leak
       auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.stl"));
       auto surfMeshShell = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery_shell.stl"));
       auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(MeshIO::read(iMSTK_DATA_ROOT "/femoral/femoral_artery.vtk"));
-
-      //surfMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-      //surfMeshShell->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
-      //tetMesh->rotate(Vec3d(1, 0, 0), PI / 5, Geometry::TransformType::ConcatenateToTransform);
 
       // set tetrahedral mesh used when writing VTUs
       sphModel->setGeometryMesh(tetMesh);
@@ -417,7 +395,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh);
       selectionFilter->update();
       auto enclosedFluidPoints = selectionFilter->getOutputPoints();
-      //auto enclosedFluidPoints = GeometryUtils::getEnclosedPoints(surfMesh, uniformMesh, false);
 
       particles = enclosedFluidPoints->getInitialVertexPositions();
       
@@ -425,7 +402,6 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       selectionFilter->setInputPoints(uniformMesh_wall);
       selectionFilter->update();
       auto enclosedWallPoints = selectionFilter->getOutputPoints();
-      //auto enclosedWallPoints = GeometryUtils::getEnclosedPoints(surfMeshShell, uniformMesh_wall, false);
 
       StdVectorOfVec3d wallParticles = enclosedWallPoints->getInitialVertexPositions();
 
@@ -449,15 +425,27 @@ generateFluid(const std::shared_ptr<Scene>& scene, const double particleRadius)
       StdVectorOfVec3d outletNormals{ Vec3d(1, 0, 0) };
       std::vector<std::pair<Vec3d, Vec3d>> outletCoords{ std::make_pair(outletMinCoord, outletMaxCoord) };
 
-      auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, outletCoords, fluidCoords, inletNormal, outletNormals, inletRadius, inletCenterPoint, inletFlowRate, particles, wallParticles);
+      auto sphBoundaryConditions = std::make_shared<SPHBoundaryConditions>(inletCoords, 
+                                                                           outletCoords, 
+                                                                           fluidCoords, 
+                                                                           inletNormal, 
+                                                                           outletNormals, 
+                                                                           inletRadius, 
+                                                                           inletCenterPoint, 
+                                                                           inletFlowRate, 
+                                                                           particles, 
+                                                                           wallParticles);
       sphModel->setBoundaryConditions(sphBoundaryConditions);
       const Vec3d hemorrhagePlaneCenter(0.57, -0.16, -0.12);
-      const double hemorrhagePlaneRadius = 0.4;
-      //const double hemorrhagePlaneArea = 0.018;
-      const double hemorrhagePlaneArea = 0.158;
-      //const double hemorrhagePlaneArea = 0.3152;
+      const double hemorrhagePlaneRadius = 0.4;      
+      const double hemorrhagePlaneArea = 0.158;      
       const Vec3d hemorrhagePlaneNormal(0.31, -0.14, -0.94);
-      auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(hemorrhagePlaneCenter, hemorrhagePlaneRadius, hemorrhagePlaneArea, hemorrhagePlaneNormal);
+      auto sphHemorrhageModel = std::make_shared<SPHHemorrhage>(
+          hemorrhagePlaneCenter, 
+          hemorrhagePlaneRadius, 
+          hemorrhagePlaneArea, 
+          hemorrhagePlaneNormal);
+
       sphModel->setHemorrhageModel(sphHemorrhageModel);
 
       sphModel->setInitialVelocities(particles.size(), Vec3d(0.1, 0, 0));
