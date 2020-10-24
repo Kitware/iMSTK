@@ -25,6 +25,9 @@
 #include "imstkSPHState.h"
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
+#include "imstkSPHBoundaryConditions.h"
+#include "imstkSPHHemorrhage.h"
+#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {
@@ -41,6 +44,7 @@ private:
 
 public:
     explicit SPHModelConfig(const Real particleRadius);
+    explicit SPHModelConfig(const Real particleRadius, const Real speedOfSound, const Real restDensity);
 
     /// \todo Move this to solver or time integrator in the future
     Real m_minTimestep = Real(1e-6);
@@ -52,11 +56,12 @@ public:
     Real m_particleRadiusSqr = Real(0); ///> \note derived quantity
 
     // material parameters
-    Real m_restDensity       = Real(1000.0);
+    Real m_restDensity       = Real(1000);
     Real m_restDensitySqr    = Real(1000000.0);    ///> \note derived quantity
     Real m_restDensityInv    = Real(1.0 / 1000.0); ///> \note derived quantity
     Real m_particleMass      = Real(1);
-    Real m_particleMassScale = Real(0.95);         ///> scale particle mass to a smaller value to maintain stability
+    Real m_particleMassScale = Real(1.0);          ///> scale particle mass to a smaller value to maintain stability
+    Real m_eta = Real(0.5);                        ///> proportion of position change due to neighbors velocity (XSPH method)
 
     bool m_bNormalizeDensity    = false;
     bool m_bDensityWithBoundary = false;
@@ -65,10 +70,10 @@ public:
     Real m_pressureStiffness = Real(50000.0);
 
     // viscosity and surface tension/cohesion
-    Real m_viscosityCoeff          = Real(1e-2);
+    Real m_dynamicViscosityCoeff   = Real(1e-2);
     Real m_viscosityBoundary       = Real(1e-5);
     Real m_surfaceTensionStiffness = Real(1);
-    Real m_frictionBoundary        = Real(0.1);
+    Real m_frictionBoundary = Real(0.1);
 
     // kernel properties
     Real m_kernelOverParticleRadiusRatio = Real(4.0);
@@ -77,6 +82,9 @@ public:
 
     // gravity
     Vec3r m_gravity = Vec3r(0, -9.81, 0);
+
+    // sound speed
+    Real m_speedOfSound = 18.7;
 
     // neighbor search
     NeighborSearch::Method m_NeighborSearchMethod = NeighborSearch::Method::UniformGridBasedSearch;
@@ -172,14 +180,42 @@ public:
     virtual double getTimeStep() const override
     { return static_cast<double>(m_dt); }
 
+    void setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocities);
+
+    Real particlePressure(const double density);
+
+    ///
+    /// \brief Write the state to external file
+    /// \todo move this out of this class
+    ///
+    void writeStateToCSV();
+    void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
+    Real getTotalTime() const { return m_totalTime; }
+    int getTimeStepCount() const { return m_timeStepCount; }
+    void writeStateToVtk();
+    void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
+    void findNearestParticleToVertex(const StdVectorOfVec3d& points, const std::vector<std::vector<size_t>>& indices);
+
+    void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
+    std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
+
+    void setHemorrhageModel(std::shared_ptr<SPHHemorrhage> sPHHemorrhage) { m_SPHHemorrhage = sPHHemorrhage; }
+    std::shared_ptr<SPHHemorrhage> getHemorrhageModel() { return m_SPHHemorrhage; }
+
+    double getTotalTime() { return m_totalTime; }
+
+    void setRestDensity(const Real restDensity) { m_modelParameters->m_restDensity = restDensity; }
+
     std::shared_ptr<TaskNode> getFindParticleNeighborsNode() const { return m_findParticleNeighborsNode; }
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
     std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
     std::shared_ptr<TaskNode> getComputeSurfaceTensionNode() const { return m_computeSurfaceTensionNode; }
-    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { return m_computeTimeStepSizeNode; }
-    std::shared_ptr<TaskNode> getSumAccelsNode() const { return m_sumAccelsNode; }
-    std::shared_ptr<TaskNode> getComputeVelocityNode() const { return m_computeVelocityNode; }
-    std::shared_ptr<TaskNode> getComputePositionNode() const { return m_computePositionNode; }
+    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
+    std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
+    std::shared_ptr<TaskNode> getIntegrateNode() const { return m_integrateNode; }
+    std::shared_ptr<TaskNode> getComputeViscosityNode() const { return m_computeViscosityNode; }
+    std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }
+    std::shared_ptr<TaskNode> getMoveParticlesNode() const { return m_moveParticlesNode; }
 
 protected:
     ///
@@ -235,14 +271,14 @@ private:
     void sumAccels();
 
     ///
-    /// \brief Update particle velocities due to pressure
+    /// \brief Update particle velocities due to pressure, viscous, and surface tension forces
     ///
     void updateVelocity(const Real timestep);
 
     ///
     /// \brief Compute viscosity
     ///
-    void computeViscosity();
+    void computeViscosity(Real timestep);
 
     ///
     /// \brief Compute surface tension and update velocities
@@ -256,21 +292,27 @@ private:
     ///
     void moveParticles(const Real timestep);
 
+    void computePressureOutlet();
+
 protected:
     std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
     std::shared_ptr<TaskNode> m_computeDensityNode        = nullptr;
     std::shared_ptr<TaskNode> m_computePressureAccelNode  = nullptr;
     std::shared_ptr<TaskNode> m_computeSurfaceTensionNode = nullptr;
     std::shared_ptr<TaskNode> m_computeTimeStepSizeNode   = nullptr;
-    std::shared_ptr<TaskNode> m_sumAccelsNode       = nullptr;
-    std::shared_ptr<TaskNode> m_computeVelocityNode = nullptr;
-    std::shared_ptr<TaskNode> m_computePositionNode = nullptr;
+    std::shared_ptr<TaskNode> m_sumAccelsNode              = nullptr;
+    std::shared_ptr<TaskNode> m_integrateNode              = nullptr;
+    std::shared_ptr<TaskNode> m_updateVelocityNode         = nullptr;
+    std::shared_ptr<TaskNode> m_computeViscosityNode       = nullptr;
+    std::shared_ptr<TaskNode> m_moveParticlesNode          = nullptr;
+    std::shared_ptr<TaskNode> m_normalizeDensityNode       = nullptr;
+    std::shared_ptr<TaskNode> m_collectNeighborDensityNode = nullptr;
 
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
     SPHSimulationState m_simulationState;
 
-    Real m_dt;                                          ///> time step size
+    Real m_dt = 0;                                      ///> time step size
     Real m_defaultDt;                                   ///> default time step size
 
     SPHSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
@@ -279,5 +321,26 @@ private:
 
     std::shared_ptr<StdVectorOfVec3d> m_pressureAccels       = nullptr;
     std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_viscousAccels    = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_neighborVelContr = nullptr;
+    std::shared_ptr<StdVectorOfVec3d> m_particleShift    = nullptr;
+
+    StdVectorOfVec3d m_initialVelocities;
+    StdVectorOfReal  m_initialDensities;
+
+    double m_totalTime           = 0;
+    int    m_timeStepCount       = 0;
+    double m_writeToOutputModulo = 0;
+    double m_vtkPreviousTime     = 0;
+    double m_vtkTimeModulo       = 0;
+    double m_csvPreviousTime     = 0;
+    double m_csvTimeModulo       = 0;
+    Vec3d  m_prevAvgVelThroughHemorrhage = Vec3d(0., 0., 0.);
+
+    std::shared_ptr<TetrahedralMesh>       m_geomUnstructuredGrid  = nullptr;
+    std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
+    std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
+
+    std::vector<size_t> m_minIndices;
 };
 } // end namespace imstk

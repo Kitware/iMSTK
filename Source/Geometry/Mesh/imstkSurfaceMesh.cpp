@@ -20,6 +20,8 @@
 =========================================================================*/
 
 #include "imstkSurfaceMesh.h"
+#include "imstkTimer.h"
+#include "imstkParallelUtils.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -608,6 +610,32 @@ size_t
 SurfaceMesh::getMaxNumTriangles()
 {
     return m_maxNumTriangles;
+}
+
+void
+SurfaceMesh::directionalScale(double s_x, double s_y, double s_z)
+{
+    CHECK(s_x > 0 && s_y > 0 && s_z > 0) << "Geometry::scale error: invalid scaling constants.";
+
+    if (std::abs(s_x - 1.0 < 1e-8 && s_y - 1.0 < 1e-8 && s_z - 1.0 < 1e-8))
+    {
+        return;
+    }
+    else
+    {
+        ParallelUtils::parallelFor(m_vertexPositions.size(),
+            [&](const size_t i)
+            {
+                m_vertexPositions[i].x() = s_x * m_vertexPositions[i].x();
+                m_initialVertexPositions[i].x() = s_x * m_initialVertexPositions[i].x();
+                m_vertexPositions[i].y() = s_y * m_vertexPositions[i].y();
+                m_initialVertexPositions[i].y() = s_y * m_initialVertexPositions[i].y();
+                m_vertexPositions[i].z() = s_z * m_vertexPositions[i].z();
+                m_initialVertexPositions[i].z() = s_z * m_initialVertexPositions[i].z();
+            });
+        m_dataModified     = true;
+        m_transformApplied = false;
+    }
 }
 
 void

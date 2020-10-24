@@ -39,6 +39,7 @@ enum class DynamicalModelType
     ElastoDynamics,
     PositionBasedDynamics,
     SmoothedParticleHydrodynamics,
+    Physiology,
     None
 };
 

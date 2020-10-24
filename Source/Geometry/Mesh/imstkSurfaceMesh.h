@@ -209,13 +209,17 @@ public:
     size_t getMaxNumTriangles();
 
     ///
+    /// \brief Scale a surface mesh independently in each direction
+    ///
+    void directionalScale(const double s_x, const double s_y, const double s_z);
+
+protected:
+    friend class VTKSurfaceMeshRenderDelegate;
+
     /// \brief Copy the contents of one SurfaceMesh to the other
     /// \todo: generalize base classes and implement for every geometry
     ///
     void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
-
-protected:
-    friend class VTKSurfaceMeshRenderDelegate;
 
     ///
     /// \brief Get vertex normals

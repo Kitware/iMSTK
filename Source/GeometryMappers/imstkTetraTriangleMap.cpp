@@ -141,7 +141,7 @@ TetraTriangleMap::isValid() const
 {
     auto meshMaster = static_cast<TetrahedralMesh*>(m_master.get());
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) == nullptr) << "Fail to cast from geometry to mesh";
+    CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get())) << "Fail to cast from geometry to mesh";
 #endif
 
     auto totalElementsMaster = meshMaster->getNumTetrahedra();

@@ -95,6 +95,8 @@ makeVtkDataArray(unsigned char type)
     return arr;
 }
 
+#include <vtkFloatArray.h>
+
 namespace imstk
 {
 vtkSmartPointer<vtkDataArray>
@@ -342,6 +344,27 @@ GeometryUtils::copyToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkM
     auto ug = vtkSmartPointer<vtkUnstructuredGrid>::New();
     ug->SetPoints(points);
     ug->SetCells(VTK_TETRA, tetras);
+
+    const std::map<std::string, StdVectorOfVectorf>& pointDataArrays = imstkMesh->getPointDataMap();
+    for (auto i : pointDataArrays)
+    {
+        StdVectorOfVectorf& pointDataArray = i.second;
+        if (pointDataArray.size() == 0)
+        {
+            continue;
+        }
+        //Assume homogenous vector size
+        vtkNew<vtkFloatArray> arrVtk;
+        arrVtk->SetName(i.first.c_str());
+        arrVtk->SetNumberOfComponents(i.second[0].size());
+        arrVtk->SetNumberOfTuples(pointDataArray.size());
+        for (int j = 0; j < pointDataArray.size(); j++)
+        {
+            arrVtk->SetTuple(j, pointDataArray[j].data());
+        }
+        ug->GetPointData()->AddArray(arrVtk);
+    }
+
     return ug;
 }
 

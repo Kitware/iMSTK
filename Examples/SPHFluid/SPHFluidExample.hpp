@@ -75,7 +75,7 @@ main(int argc, char* argv[])
 
     // Generate fluid and solid objects
     std::shared_ptr<SPHObject> fluidObj                  = generateFluid(particleRadius);
-    std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids();
+    std::vector<std::shared_ptr<CollidingObject>> solids = generateSolids(scene);
 
     scene->addSceneObject(fluidObj);
     for (size_t i = 0; i < solids.size(); i++)
@@ -85,22 +85,22 @@ main(int argc, char* argv[])
 
     // Collision between fluid and solid objects
     std::shared_ptr<CollisionGraph> collisionGraph = scene->getCollisionGraph();
-    for (auto& solid: solids)
+    for (auto& solid : solids)
     {
-        if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
-        {
-            collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
-        }
-        else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
-        {
-            collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
-                InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
-        }
-        else
-        {
-            LOG(FATAL) << "Invalid collision object";
-        }
+      if (std::dynamic_pointer_cast<Plane>(solid->getCollidingGeometry()))
+      {
+        collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+          InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToPlane));
+      }
+      else if (std::dynamic_pointer_cast<Sphere>(solid->getCollidingGeometry()))
+      {
+        collisionGraph->addInteraction(makeObjectInteractionPair(fluidObj, solid,
+          InteractionType::SphObjToCollidingObjCollision, CollisionDetection::Type::PointSetToSphere));
+      }
+      else
+      {
+        LOG(FATAL) << "Invalid collision object";
+      }
     }
 
     // configure camera

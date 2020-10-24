@@ -36,10 +36,22 @@ SPHKinematicState::setParticleData(const StdVectorOfVec3r& positions, const StdV
 
     m_Positions  = positions;
     m_Velocities = velocities;
+    m_HalfStepVelocities = velocities;
+    m_FullStepVelocities = velocities;
+
+    //m_HalfStepVelocities = velocities;
 
     if (m_Velocities.size() != m_Positions.size())
     {
         m_Velocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
+    }
+    if (m_HalfStepVelocities.size() != m_Positions.size())
+    {
+        m_HalfStepVelocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
+    }
+    if (m_FullStepVelocities.size() != m_Positions.size())
+    {
+        m_FullStepVelocities.resize(m_Positions.size(), Vec3r(0, 0, 0));
     }
 }
 
@@ -48,6 +60,8 @@ SPHKinematicState::setState(const std::shared_ptr<SPHKinematicState>& rhs)
 {
     m_Positions  = rhs->m_Positions;
     m_Velocities = rhs->m_Velocities;
+    m_HalfStepVelocities = rhs->m_Velocities;
+    m_FullStepVelocities = rhs->m_Velocities;
 }
 
 // SPHSimulationState implementation ===>
@@ -60,9 +74,9 @@ SPHSimulationState::initializeData()
     size_t numParticles = m_KinematicState->getNumParticles();
 
     m_Normals.resize(numParticles);
-    m_Densities.resize(numParticles);
-    m_Accels.resize(numParticles);
-    m_DiffuseVelocities.resize(numParticles);
+    m_Densities.resize(numParticles, 1);
+    m_Accels.resize(numParticles, Vec3r(0, 0, 0));
+    m_DiffuseVelocities.resize(numParticles, Vec3r(0, 0, 0));
     m_NeighborInfo.resize(numParticles);
     m_NeighborLists.resize(numParticles);
 }
@@ -125,5 +139,53 @@ SPHSimulationState::getVelocities() const
     LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
 #endif
     return m_KinematicState->getVelocities();
+}
+
+///
+/// \brief Returns the vector of all particle velocities
+///
+StdVectorOfVec3r&
+SPHSimulationState::getHalfStepVelocities()
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getHalfStepVelocities();
+}
+
+///
+/// \brief Returns the vector of all particle velocities
+///
+const StdVectorOfVec3r&
+SPHSimulationState::getHalfStepVelocities() const
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getHalfStepVelocities();
+}
+
+///
+/// \brief Returns the vector of all particle velocities
+///
+StdVectorOfVec3r&
+SPHSimulationState::getFullStepVelocities()
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getFullStepVelocities();
+}
+
+///
+/// \brief Returns the vector of all particle velocities
+///
+const StdVectorOfVec3r&
+SPHSimulationState::getFullStepVelocities() const
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (!m_KinematicState)) << "Particle kinematic state has not been initialized";
+#endif
+    return m_KinematicState->getFullStepVelocities();
 }
 } // end namespace imstk

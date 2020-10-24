@@ -19,41 +19,6 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkDynamicObject.h"
-
-namespace imstk
-{
-class SPHModel;
-
-///
-/// \class SPHObject
-///
-/// \brief Base class for scene objects that move and/or deform under
-/// smooth particle hydrodynamics
-///
-class SPHObject : public DynamicObject
-{
-public:
-    explicit SPHObject(const std::string& name);
-
-    virtual ~SPHObject() override = default;
-
-public:
-    ///
-    /// \brief Get the SPH model of the object
-    ///
-    std::shared_ptr<SPHModel> getSPHModel();
-
-    std::shared_ptr<SPHModel> getDynamicalSPHModel();
-
-    ///
-    /// \brief Initialize the SPH scene object
-    ///
-    bool initialize() override;
-
-protected:
-    std::shared_ptr<SPHModel> m_SPHModel = nullptr;
-};
-} // end namespace imstk
+// Generate a physiology example with pipe flow
+#define SCENE_ID 2
+#include "../PhysiologyExample.hpp"

@@ -22,9 +22,9 @@ limitations under the License.
 #pragma once
 
 #include "imstkColor.h"
+#include "imstkMath.h"
 
 #include <vector>
-#include <algorithm>
 
 namespace imstk
 {

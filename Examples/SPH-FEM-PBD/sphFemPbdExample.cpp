@@ -113,7 +113,7 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     imstkNew<SPHModelConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     sphParams->m_kernelOverParticleRadiusRatio = 6.0;
-    sphParams->m_viscosityCoeff = 0.5;
+    //sphParams->m_viscosityCoeff = 0.5;
     sphParams->m_surfaceTensionStiffness = 5.0;
 
     // Setup the Model

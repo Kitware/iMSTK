@@ -19,44 +19,37 @@
 
 =========================================================================*/
 
-#include "imstkSPHObject.h"
-#include "imstkSPHModel.h"
+#include "imstkPhysiologyObject.h"
+#include "imstkLogger.h"
+#include "imstkPhysiologyModel.h"
 
 namespace imstk
 {
-SPHObject::SPHObject(const std::string& name) : DynamicObject(name)
+PhysiologyObject::PhysiologyObject(const std::string& name) : DynamicObject(name)
 {
-    this->m_type = Type::SPH;
+    this->m_type = Type::Physiology;
 }
 
-std::shared_ptr<SPHModel>
-SPHObject::getDynamicalSPHModel()
+std::shared_ptr<PhysiologyModel>
+PhysiologyObject::getPhysiologyModel()
 {
-    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
-    return m_SPHModel;
-}
+    m_PhysiologyModel = std::dynamic_pointer_cast<PhysiologyModel>(m_dynamicalModel);
+    return m_PhysiologyModel;
+};
 
 bool
-SPHObject::initialize()
+PhysiologyObject::initialize()
 {
-    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
-    if (m_SPHModel == nullptr)
+    m_PhysiologyModel = std::dynamic_pointer_cast<PhysiologyModel>(m_dynamicalModel);
+    if (m_PhysiologyModel == nullptr)
     {
         LOG(FATAL) << "Dynamics pointer cast failure in SPHObject::initialize()";
         return false;
     }
 
-    // why are we initializing twice?
     DynamicObject::initialize();
-    m_SPHModel->initialize();
+    m_PhysiologyModel->initialize();
 
     return true;
-}
-
-std::shared_ptr<SPHModel>
-SPHObject::getSPHModel()
-{
-    m_SPHModel = std::dynamic_pointer_cast<SPHModel>(m_dynamicalModel);
-    return m_SPHModel;
 }
 } // end namespace imstk

@@ -132,7 +132,12 @@ if(${PROJECT_NAME}_SUPERBUILD)
 
   option(${PROJECT_NAME}_USE_Vulkan "Use the custom Vulkan renderer." OFF)
   option(${PROJECT_NAME}_USE_OpenHaptics "Use OpenHaptic Support." OFF)
-
+  
+  option(${PROJECT_NAME}_USE_Pulse "Use Pulse Physiology engine." OFF)
+  if(${PROJECT_NAME}_USE_Pulse)
+    imstk_define_dependency(Pulse)
+  endif()
+  
   imstk_define_dependency(Assimp)
   imstk_define_dependency(Eigen3)
   imstk_define_dependency(g3log)
@@ -237,6 +242,13 @@ set(PHYSX_CONFIGURATION "${PHYSX_CONFIGURATION}" CACHE STRING "Select PhysX Libr
 set(PHYSX_RELEASE_TYPES "RELEASE;CHECKED;PROFILE" CACHE INTERNAL "List of available PhysX release library types")
 set_property(CACHE PHYSX_CONFIGURATION PROPERTY STRINGS ${PHYSX_RELEASE_TYPES})
 find_package(PhysX REQUIRED)
+
+if(${PROJECT_NAME}_USE_Pulse)
+  add_definitions( -DiMSTK_USE_Pulse )
+  find_package( Pulse REQUIRED )
+else()
+  remove_definitions( -DiMSTK_USE_Pulse )
+endif()
 
 # SCCD
 find_package( SCCD REQUIRED )
@@ -382,6 +394,7 @@ add_subdirectory(Source/CollisionHandling)
 add_subdirectory(Source/Scene)
 add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
+add_subdirectory(Source/Pulse)
 add_subdirectory(Source/Filtering)
 
 #--------------------------------------------------------------------------

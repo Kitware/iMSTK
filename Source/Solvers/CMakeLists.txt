@@ -4,8 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Solvers
   DEPENDS
-    Constraints
-  )
+    Constraints)
 
 #-----------------------------------------------------------------------------
 # Testing

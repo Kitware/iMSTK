@@ -57,6 +57,18 @@ public:
     ///
     /// \brief Returns the vector of all particle velocities
     ///
+    StdVectorOfVec3r& getFullStepVelocities() { return m_FullStepVelocities; }
+    const StdVectorOfVec3r& getFullStepVelocities() const { return m_FullStepVelocities; }
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    StdVectorOfVec3r& getHalfStepVelocities() { return m_HalfStepVelocities; }
+    const StdVectorOfVec3r& getHalfStepVelocities() const { return m_HalfStepVelocities; }
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
     StdVectorOfVec3r& getVelocities() { return m_Velocities; }
     const StdVectorOfVec3r& getVelocities() const { return m_Velocities; }
 
@@ -66,8 +78,10 @@ public:
     void setState(const std::shared_ptr<SPHKinematicState>& rhs);
 
 private:
-    StdVectorOfVec3r m_Positions;   ///> Particle positions
-    StdVectorOfVec3r m_Velocities;  ///> Particle velocities
+    StdVectorOfVec3r m_Positions;          ///> Particle positions
+    StdVectorOfVec3r m_FullStepVelocities; ///> Particle velocities
+    StdVectorOfVec3r m_HalfStepVelocities; ///> Particle velocities
+    StdVectorOfVec3r m_Velocities;         ///> Particle velocities
 };
 
 ///
@@ -87,6 +101,7 @@ struct NeighborInfo
 class SPHSimulationState
 {
 public:
+
     ///
     /// \brief Default constructor/destructor
     ///
@@ -133,6 +148,26 @@ public:
     /// \brief Returns the vector of all particle velocities
     ///
     const StdVectorOfVec3r& getVelocities() const;
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    StdVectorOfVec3r& getHalfStepVelocities();
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    const StdVectorOfVec3r& getHalfStepVelocities() const;
+
+    ///
+    /// \brief Returns the vector of all particle velocities at a full time step
+    ///
+    StdVectorOfVec3r& getFullStepVelocities();
+
+    ///
+    /// \brief Returns the vector of all particle velocities at a half time step
+    ///
+    const StdVectorOfVec3r& getFullStepVelocities() const;
 
     ///
     /// \brief Returns the vector of all particle positions

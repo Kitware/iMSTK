@@ -55,6 +55,7 @@ public:
         ReducedFEMDeformable,
         Pbd,
         SPH,
+        Physiology,
         LevelSetDeformable
     };
 
