@@ -96,11 +96,14 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
             const auto& pv = cd.penetrationVector;
             const auto& relativePos = -pickSphere->getRadius() * pv.normalized();
 
-            lock.lock();
-            m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
-            //model->setFixedPoint(cd.nodeIdx);
-            model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickSphere->getPosition() + relativePos);
-            lock.unlock();
+            if (m_pickedPtIdxOffset.find(cd.nodeIdx) != m_pickedPtIdxOffset.end())
+            {
+                lock.lock();
+                m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
+                model->setFixedPoint(cd.nodeIdx);
+                model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickSphere->getPosition() + relativePos);
+                lock.unlock();
+            }
     });
 }
 
@@ -111,9 +114,7 @@ PBDPickingCH::removePickConstraints()
     m_isPicking = false;
     for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); ++iter)
     {
-        //model->setPointUnfixed(iter->first);
-        //CHECK(model->getInvMass(iter->first) > 0.0)
-        //    << "PBDPickingCH: unable to set invmasses back";
+        model->setPointUnfixed(iter->first);
     }
     m_pickedPtIdxOffset.clear();
 }
