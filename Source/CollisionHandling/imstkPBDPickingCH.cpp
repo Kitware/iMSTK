@@ -96,7 +96,7 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
             const auto& pv = cd.penetrationVector;
             const auto& relativePos = -pickSphere->getRadius() * pv.normalized();
 
-            if (m_pickedPtIdxOffset.find(cd.nodeIdx) != m_pickedPtIdxOffset.end())
+            if (m_pickedPtIdxOffset.find(cd.nodeIdx) == m_pickedPtIdxOffset.end())
             {
                 lock.lock();
                 m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;

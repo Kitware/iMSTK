@@ -65,9 +65,9 @@ Capsule::getLength(DataType type /* = DataType::PostTransform */)
     if (type == DataType::PostTransform)
     {
         this->updatePostTransformData();
-        return m_radiusPostTransform;
+        return m_lengthPostTransform;
     }
-    return m_radius;
+    return m_length;
 }
 
 void

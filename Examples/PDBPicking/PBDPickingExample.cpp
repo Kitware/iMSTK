@@ -31,25 +31,29 @@
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSceneObjectController.h"
-#include "imstkSphere.h"
-#include "imstkVirtualCouplingCH.h"
+#include "imstkLaparoscopicToolController.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
 #include "imstkLogger.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
+
+#include "imstkSphere.h"
+#include "imstkCapsule.h"
 #include "imstkSurfaceMesh.h"
 
 #include "imstkPBDPickingCH.h"
 #include "imstkPbdObjectPickingPair.h"
+
+#include "imstkIsometricMap.h"
 
 // global variables
 const std::string phantomOmni1Name = "Default Device";
@@ -186,22 +190,51 @@ main()
     imstkNew<HapticDeviceManager>       server;
     std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
+    // Load the meshes
+    auto    upperSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj");
+    auto    lowerSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj");
+    auto    pivotSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj");
+
     // Object
-    imstkNew<Sphere>            geom(Vec3d(0.0, 0.0, 0.0), 2.0);
-    imstkNew<CollidingObject> obj("VirtualObject");
-    obj->setVisualGeometry(geom);
-    obj->setCollidingGeometry(geom);
-    scene->addSceneObject(obj);
+    imstkNew<Capsule>          geomShaft;
+    geomShaft->setLength(20.0);
+    geomShaft->setPosition(Vec3d(0.0, 0.0, 10.0));
+    geomShaft->setRadius(1.0);
+    geomShaft->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
+    imstkNew<CollidingObject> objShaft("ShaftObject");
+    objShaft->setVisualGeometry(pivotSurfMesh);
+    objShaft->setCollidingGeometry(geomShaft);
+    objShaft->setCollidingToVisualMap(std::make_shared<IsometricMap>(geomShaft, pivotSurfMesh));
+    scene->addSceneObject(objShaft);
+
+    imstkNew<Sphere>          geomUpperJaw(Vec3d(0.0, 0.0, -25.0), 2.0);
+    //geomUpperJaw->setTranslation(Vec3d(0.0, 0.0, -25.0));
+    //geomUpperJaw->setOrientationAxis(Vec3d(1.0, 0.0, 0.0));
+    
+    imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
+    objUpperJaw->setVisualGeometry(geomUpperJaw);
+    objUpperJaw->setCollidingGeometry(geomUpperJaw);
+    //auto mapUpperJaw = std::make_shared<IsometricMap>(geomUpperJaw, upperSurfMesh);
+    //objUpperJaw->setCollidingToVisualMap(mapUpperJaw);
+    scene->addSceneObject(objUpperJaw);
+    
+    imstkNew<Sphere>          geomLowerJaw(Vec3d(0.0, 0.0, -25.0), 2.0);
+    imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
+    objLowerJaw->setVisualGeometry(lowerSurfMesh);
+    objLowerJaw->setCollidingGeometry(geomLowerJaw);
+    auto mapLowerJaw = std::make_shared<IsometricMap>(geomLowerJaw, lowerSurfMesh);
+    objLowerJaw->setCollidingToVisualMap(mapLowerJaw);
+    scene->addSceneObject(objLowerJaw);
 
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
     // Create and add virtual coupling object controller in the scene
-    imstkNew<SceneObjectController> controller(obj, client);
+    imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, client);
     scene->addController(controller);
 
     // Add interaction pair for pbd picking
-    imstkNew<PbdObjectPickingPair> pair(clothObj, obj, CollisionDetection::Type::PointSetToSphere);
+    imstkNew<PbdObjectPickingPair> pair(clothObj, objUpperJaw, CollisionDetection::Type::PointSetToSphere);
     scene->getCollisionGraph()->addInteraction(pair);
 
     // Camera
@@ -244,6 +277,7 @@ main()
         {
             std::shared_ptr<PBDPickingCH> ch = std::static_pointer_cast<PBDPickingCH>(pair->getCollisionHandlingA());
             // Activate picking
+            
             if (keyDevice->getButton('i') == KEY_PRESS)
             {
                 ch->activatePickConstraints();

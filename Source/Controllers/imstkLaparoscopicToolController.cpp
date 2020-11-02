@@ -36,7 +36,7 @@ LaparoscopicToolController::LaparoscopicToolController(
     m_shaft(shaft),
     m_upperJaw(upperJaw),
     m_lowerJaw(lowerJaw),
-    m_jawRotationAxis(Vec3d(0, 1., 0))
+    m_jawRotationAxis(Vec3d(1, 0, 0))
 {
     trackingDevice->setButtonsEnabled(true);
 }
@@ -56,15 +56,19 @@ LaparoscopicToolController::updateControlledObjects()
     Vec3d p = getPosition();
     Quatd r = getRotation();
 
+    printf("button test\n");
+
     // Update jaw angles
     if (m_deviceClient->getButton(0))
     {
+        printf("button 0\n");
         m_jawAngle += m_change;
         m_jawAngle  = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
     }
 
     if (m_deviceClient->getButton(1))
     {
+        printf("button 1\n");
         m_jawAngle -= m_change;
         m_jawAngle  = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
     }
