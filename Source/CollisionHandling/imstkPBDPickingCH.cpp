@@ -24,7 +24,7 @@ limitations under the License.
 
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
-#include "imstkSphere.h"
+#include "imstkAnalyticalGeometry.h"
 #include "imstkPointSet.h"
 
 namespace imstk
@@ -64,10 +64,10 @@ PBDPickingCH::updatePickConstraints()
     }
 
     std::shared_ptr<PbdModel> model = m_pbdObj->getPbdModel();
-    std::shared_ptr<Sphere> pickSphere = std::dynamic_pointer_cast<Sphere>(m_pickObj->getCollidingGeometry());
+    std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(m_pickObj->getCollidingGeometry());
     for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); iter++)
     {
-        model->getCurrentState()->setVertexPosition(iter->first, pickSphere->getPosition() + iter->second);
+        model->getCurrentState()->setVertexPosition(iter->first, pickGeom->getPosition() + iter->second);
     }
 }
 
@@ -86,22 +86,23 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
     std::shared_ptr<PbdModel> model = pbdObj->getPbdModel();
 
     //TODO: extending to other types of geometry
-    std::shared_ptr<Sphere> pickSphere = std::dynamic_pointer_cast<Sphere>(pickObj->getCollidingGeometry());
-    CHECK(pickSphere != nullptr) << "Colliding geometry is not Sphere";
+    std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());
+    CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
 
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx) {
-            const auto& cd = m_colData->MAColData[idx];
-            const auto& pv = cd.penetrationVector;
-            const auto& relativePos = -pickSphere->getRadius() * pv.normalized();
 
+            const auto& cd = m_colData->MAColData[idx];
             if (m_pickedPtIdxOffset.find(cd.nodeIdx) == m_pickedPtIdxOffset.end())
             {
+                
                 lock.lock();
+                const auto& pv = cd.penetrationVector;
+                const auto& relativePos = model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pickGeom->getPosition();
                 m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
                 model->setFixedPoint(cd.nodeIdx);
-                model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickSphere->getPosition() + relativePos);
+                model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickGeom->getPosition() + relativePos);
                 lock.unlock();
             }
     });
