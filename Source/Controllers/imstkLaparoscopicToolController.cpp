@@ -56,19 +56,15 @@ LaparoscopicToolController::updateControlledObjects()
     Vec3d p = getPosition();
     Quatd r = getRotation();
 
-    printf("button test\n");
-
     // Update jaw angles
     if (m_deviceClient->getButton(0))
     {
-        printf("button 0\n");
         m_jawAngle += m_change;
         m_jawAngle  = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
     }
 
     if (m_deviceClient->getButton(1))
     {
-        printf("button 1\n");
         m_jawAngle -= m_change;
         m_jawAngle  = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
     }

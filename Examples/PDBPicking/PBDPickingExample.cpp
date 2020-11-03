@@ -38,7 +38,11 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+
 #include "imstkLaparoscopicToolController.h"
+#include "imstkSceneObjectController.h"
+
+
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -195,22 +199,21 @@ main()
     auto    lowerSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj");
     auto    pivotSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj");
 
-    // Object
     imstkNew<Capsule>          geomShaft;
     geomShaft->setLength(20.0);
-    geomShaft->setPosition(Vec3d(0.0, 0.0, 10.0));
     geomShaft->setRadius(1.0);
     geomShaft->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(pivotSurfMesh);
+    objShaft->setVisualGeometry(geomShaft);
     objShaft->setCollidingGeometry(geomShaft);
-    objShaft->setCollidingToVisualMap(std::make_shared<IsometricMap>(geomShaft, pivotSurfMesh));
+    //objShaft->setCollidingToVisualMap(std::make_shared<IsometricMap>(geomShaft, pivotSurfMesh));
     scene->addSceneObject(objShaft);
 
-    imstkNew<Sphere>          geomUpperJaw(Vec3d(0.0, 0.0, -25.0), 2.0);
-    //geomUpperJaw->setTranslation(Vec3d(0.0, 0.0, -25.0));
-    //geomUpperJaw->setOrientationAxis(Vec3d(1.0, 0.0, 0.0));
-    
+    imstkNew<Capsule>          geomUpperJaw;
+    geomUpperJaw->setLength(30.0);
+    //geomUpperJaw->setPosition(Vec3d(0.0, 0.0, -12.5));
+    geomUpperJaw->setRadius(1.0);
+    geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
     objUpperJaw->setVisualGeometry(geomUpperJaw);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
@@ -218,7 +221,7 @@ main()
     //objUpperJaw->setCollidingToVisualMap(mapUpperJaw);
     scene->addSceneObject(objUpperJaw);
     
-    imstkNew<Sphere>          geomLowerJaw(Vec3d(0.0, 0.0, -25.0), 2.0);
+    imstkNew<Capsule>          geomLowerJaw;
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
     objLowerJaw->setVisualGeometry(lowerSurfMesh);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
@@ -231,10 +234,11 @@ main()
 
     // Create and add virtual coupling object controller in the scene
     imstkNew<LaparoscopicToolController> controller(objShaft, objUpperJaw, objLowerJaw, client);
+    controller->setJawAngleChange(6.0e-3);
     scene->addController(controller);
 
     // Add interaction pair for pbd picking
-    imstkNew<PbdObjectPickingPair> pair(clothObj, objUpperJaw, CollisionDetection::Type::PointSetToSphere);
+    imstkNew<PbdObjectPickingPair> pair(clothObj, objUpperJaw, CollisionDetection::Type::PointSetToCapsule);
     scene->getCollisionGraph()->addInteraction(pair);
 
     // Camera
@@ -278,12 +282,12 @@ main()
             std::shared_ptr<PBDPickingCH> ch = std::static_pointer_cast<PBDPickingCH>(pair->getCollisionHandlingA());
             // Activate picking
             
-            if (keyDevice->getButton('i') == KEY_PRESS)
+            if (client->getButton(1))
             {
                 ch->activatePickConstraints();
             }
             // Unpick
-            if (keyDevice->getButton('u') == KEY_PRESS)
+            if (client->getButton(0))
             {
                 ch->removePickConstraints();
             }
