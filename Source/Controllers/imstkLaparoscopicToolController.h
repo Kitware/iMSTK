@@ -97,5 +97,13 @@ protected:
     double m_maxJawAngle = PI / 6.0;                     ///< Maximum angle of the jaws
 
     Vec3d m_jawRotationAxis;                             ///< Angle of the jaws
+
+    Mat4d m_shaftWorldTransform = Mat4d::Identity(); // Final world transform of the shaft
+
+    Mat4d m_upperJawWorldTransform = Mat4d::Identity(); // Final world transform of the upper jaw
+    Mat4d m_lowerJawWorldTransform = Mat4d::Identity();// Final world transform of the lower jaw
+
+    Mat4d m_upperJawLocalTransform = Mat4d::Identity(); // m_upperJawWorldTransform = m_shaftWorldTransform * m_upperJawLocalTransform
+    Mat4d m_lowerJawLocalTransform = Mat4d::Identity(); // m_lowerJawWorldTransform = m_shaftWorldTransform * m_lowerJawLocalTransform
 };
 } // imstk

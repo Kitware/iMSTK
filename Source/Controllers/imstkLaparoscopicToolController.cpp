@@ -39,6 +39,15 @@ LaparoscopicToolController::LaparoscopicToolController(
     m_jawRotationAxis(Vec3d(1, 0, 0))
 {
     trackingDevice->setButtonsEnabled(true);
+
+    // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws from the shaft)
+    m_shaftWorldTransform = mat4dRotation(m_shaft->getMasterGeometry()->getRotation()) * mat4dTranslate(m_shaft->getMasterGeometry()->getTranslation());
+
+    m_upperJawLocalTransform = mat4dRotation(m_upperJaw->getMasterGeometry()->getRotation()) * mat4dTranslate(m_upperJaw->getMasterGeometry()->getTranslation());
+    m_lowerJawLocalTransform = mat4dRotation(m_lowerJaw->getMasterGeometry()->getRotation()) * mat4dTranslate(m_lowerJaw->getMasterGeometry()->getTranslation());
+
+    m_upperJawWorldTransform = m_shaftWorldTransform * m_upperJawLocalTransform;
+    m_lowerJawWorldTransform = m_shaftWorldTransform * m_lowerJawLocalTransform;
 }
 
 void
@@ -53,8 +62,19 @@ LaparoscopicToolController::updateControlledObjects()
         }
     }
 
-    Vec3d p = getPosition();
-    Quatd r = getRotation();
+    const Vec3d controllerPosition = getPosition();
+    const Quatd controllerOrientation = getRotation();
+
+    // Controller transform
+    m_shaftWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);
+    {
+        // TRS decompose and set shaft
+        Vec3d t, s;
+        Mat3d r;
+        mat4dTRS(m_shaftWorldTransform, t, r, s);
+        m_shaft->getMasterGeometry()->setRotation(r);
+        m_shaft->getMasterGeometry()->setTranslation(t);
+    }
 
     // Update jaw angles
     if (m_deviceClient->getButton(0))
@@ -62,28 +82,31 @@ LaparoscopicToolController::updateControlledObjects()
         m_jawAngle += m_change;
         m_jawAngle  = (m_jawAngle > m_maxJawAngle) ? m_maxJawAngle : m_jawAngle;
     }
-
     if (m_deviceClient->getButton(1))
     {
         m_jawAngle -= m_change;
         m_jawAngle  = (m_jawAngle < 0.0) ? 0.0 : m_jawAngle;
     }
 
-    // Update orientation of parts
-    Quatd jawRotUpper;
-    jawRotUpper = r * Rotd(m_jawAngle, m_jawRotationAxis);
-    m_upperJaw->getMasterGeometry()->setRotation(jawRotUpper);
+    m_upperJawLocalTransform = mat4dRotation(Rotd(m_jawAngle, m_jawRotationAxis));
+    m_lowerJawLocalTransform = mat4dRotation(Rotd(-m_jawAngle, m_jawRotationAxis));
+    m_upperJawWorldTransform = m_shaftWorldTransform * m_upperJawLocalTransform;
+    m_lowerJawWorldTransform = m_shaftWorldTransform * m_lowerJawLocalTransform;
 
-    Quatd jawRotLower;
-    jawRotLower = r * Rotd(-m_jawAngle, m_jawRotationAxis);
-    m_lowerJaw->getMasterGeometry()->setRotation(jawRotLower);
-
-    m_shaft->getMasterGeometry()->setRotation(r);
-
-    // Update positions of parts
-    m_shaft->getMasterGeometry()->setTranslation(p);
-    m_upperJaw->getMasterGeometry()->setTranslation(p);
-    m_lowerJaw->getMasterGeometry()->setTranslation(p);
+    {
+        Vec3d t, s;
+        Mat3d r;
+        mat4dTRS(m_upperJawWorldTransform, t, r, s);
+        m_upperJaw->getMasterGeometry()->setRotation(r);
+        m_upperJaw->getMasterGeometry()->setTranslation(t);
+    }
+    {
+        Vec3d t, s;
+        Mat3d r;
+        mat4dTRS(m_lowerJawWorldTransform, t, r, s);
+        m_lowerJaw->getMasterGeometry()->setRotation(r);
+        m_lowerJaw->getMasterGeometry()->setTranslation(t);
+    }
 }
 
 void

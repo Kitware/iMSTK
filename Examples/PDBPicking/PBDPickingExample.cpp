@@ -211,22 +211,26 @@ main()
 
     imstkNew<Capsule>          geomUpperJaw;
     geomUpperJaw->setLength(30.0);
-    //geomUpperJaw->setPosition(Vec3d(0.0, 0.0, -12.5));
+    geomUpperJaw->setPosition(Vec3d(0.0, 0.0, -12.5));
     geomUpperJaw->setRadius(1.0);
     geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
     objUpperJaw->setVisualGeometry(geomUpperJaw);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
-    //auto mapUpperJaw = std::make_shared<IsometricMap>(geomUpperJaw, upperSurfMesh);
-    //objUpperJaw->setCollidingToVisualMap(mapUpperJaw);
+   /* auto mapUpperJaw = std::make_shared<IsometricMap>(geomUpperJaw, upperSurfMesh);
+    objUpperJaw->setCollidingToVisualMap(mapUpperJaw);*/
     scene->addSceneObject(objUpperJaw);
     
     imstkNew<Capsule>          geomLowerJaw;
+    geomLowerJaw->setLength(30.0);
+    geomLowerJaw->setPosition(Vec3d(0.0, 0.0, -12.5));
+    geomLowerJaw->setRadius(1.0);
+    geomLowerJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(lowerSurfMesh);
+    objLowerJaw->setVisualGeometry(geomLowerJaw);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
-    auto mapLowerJaw = std::make_shared<IsometricMap>(geomLowerJaw, lowerSurfMesh);
-    objLowerJaw->setCollidingToVisualMap(mapLowerJaw);
+    //auto mapLowerJaw = std::make_shared<IsometricMap>(geomLowerJaw, lowerSurfMesh);
+    //objLowerJaw->setCollidingToVisualMap(mapLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
@@ -242,7 +246,7 @@ main()
     scene->getCollisionGraph()->addInteraction(pair);
 
     // Camera
-    scene->getActiveCamera()->setPosition(Vec3d(200, 200, 200));
+    scene->getActiveCamera()->setPosition(Vec3d(1, 1, 1) * 100.0);
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, 0, 0));
 
     // Light
