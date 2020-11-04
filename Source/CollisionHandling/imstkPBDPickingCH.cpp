@@ -67,7 +67,8 @@ PBDPickingCH::updatePickConstraints()
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(m_pickObj->getCollidingGeometry());
     for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); iter++)
     {
-        model->getCurrentState()->setVertexPosition(iter->first, pickGeom->getPosition() + iter->second);
+        auto rot = pickGeom->getRotation();
+        model->getCurrentState()->setVertexPosition(iter->first, pickGeom->getPosition() + rot * iter->second);
     }
 }
 
@@ -84,8 +85,6 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
         << "no pdb object or colliding object.";
 
     std::shared_ptr<PbdModel> model = pbdObj->getPbdModel();
-
-    //TODO: extending to other types of geometry
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());
     CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
 
@@ -98,11 +97,12 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
             {
                 
                 lock.lock();
-                const auto& pv = cd.penetrationVector;
-                const auto& relativePos = model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pickGeom->getPosition();
+
+                auto rot = pickGeom->getRotation().transpose();
+                auto relativePos = rot * (model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pickGeom->getPosition());
                 m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
                 model->setFixedPoint(cd.nodeIdx);
-                model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickGeom->getPosition() + relativePos);
+                model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickGeom->getPosition() + rot.transpose() * relativePos);
                 lock.unlock();
             }
     });

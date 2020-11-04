@@ -38,7 +38,7 @@ class PbdObjectPickingPair : public CollisionPair
 {
 public:
     PbdObjectPickingPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                         CollisionDetection::Type cdType = CollisionDetection::Type::PointSetToSphere);
+                         CollisionDetection::Type cdType = CollisionDetection::Type::PointSetToCapsule);
 
     virtual ~PbdObjectPickingPair() override = default;
 
