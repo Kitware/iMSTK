@@ -110,10 +110,22 @@ HapticDeviceClient::hapticCallback(void* pData)
     client->m_position << state.pos[0], state.pos[1], state.pos[2];
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
     client->m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(state.trans))).rotation();
-    client->m_buttons[0]  = state.buttons & HD_DEVICE_BUTTON_1;
-    client->m_buttons[1]  = state.buttons & HD_DEVICE_BUTTON_2;
-    client->m_buttons[2]  = state.buttons & HD_DEVICE_BUTTON_3;
-    client->m_buttons[3]  = state.buttons & HD_DEVICE_BUTTON_4;
+    
+    for (int i = 0; i < 4; i++)
+    {
+        // If button down and not previously down
+        if ((state.buttons & (1 << i)) && !client->m_buttons[i])
+        {
+            client->m_buttons[i] = true;
+            client->postEvent(ButtonEvent(i, BUTTON_PRESSED));
+        }
+        // If button not down, and previously down
+        else if (!(state.buttons & (1 << i)) && client->m_buttons[i])
+        {
+            client->m_buttons[i] = false;
+            client->postEvent(ButtonEvent(i, BUTTON_RELEASED));
+        }
+    }
 
     client->m_trackingEnabled = true;
 

@@ -28,33 +28,6 @@ class vtkInteractorStyleVR;
 
 namespace imstk
 {
-using VRDeviceType = int;
-#define OPENVR_LEFT_CONTROLLER 0
-#define OPENVR_RIGHT_CONTROLLER 1
-#define OPENVR_HMD 2
-
-using VRButtonStateType = int;
-#define BUTTON_RELEASED 0
-#define BUTTON_TOUCHED 1
-#define BUTTON_UNTOUCHED 2
-#define BUTTON_PRESSED 3
-
-class VRButtonEvent : public Event
-{
-public:
-    VRButtonEvent(const int button, const VRButtonStateType keyPressType) : Event(EventType::VRButtonPress, 1),
-        m_buttonState(keyPressType),
-        m_button(button)
-    {
-    }
-
-    virtual ~VRButtonEvent() override = default;
-
-public:
-    VRButtonStateType m_buttonState;
-    const int m_button = -1;
-};
-
 ///
 /// \class OpenVRDeviceClient
 ///
@@ -68,13 +41,13 @@ protected:
     ///
     /// This object is only creatable through its New method
     ///
-    OpenVRDeviceClient(VRDeviceType deviceType) : DeviceClient("OpenVRDevice", ""),
+    OpenVRDeviceClient(DeviceType deviceType) : DeviceClient("OpenVRDevice", ""),
         m_deviceType(deviceType) { }
 
     ///
     /// This object is only creatable through this method
     ///
-    static std::shared_ptr<OpenVRDeviceClient> New(VRDeviceType deviceType);
+    static std::shared_ptr<OpenVRDeviceClient> New(DeviceType deviceType);
 
 public:
     virtual ~OpenVRDeviceClient() override = default;
@@ -83,7 +56,7 @@ public:
     friend class ::vtkInteractorStyleVR;
 
 public:
-    VRDeviceType getDeviceType() const { return m_deviceType; }
+    DeviceType getDeviceType() const { return m_deviceType; }
 
     ///
     /// \brief Set the current position and orientation
@@ -105,6 +78,6 @@ protected:
     void emitButtonRelease(const int buttonId);
 
 private:
-    VRDeviceType m_deviceType;
+    DeviceType m_deviceType;
 };
 }

@@ -135,10 +135,11 @@ main()
         imstkNew<SceneObjectController> controller2(scalpelBlade10, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
         scene->addController(controller2);
 
-        // VRButtonPress emitted from viewer, recieve it in the scene that way the scene is not running whilst it is swapped
+        // This button event is emitted from the viewer's thread, thus it is queued to the scene so that we do not
+        // run it while the scene is updating
         bool blade10InHand = true;
-        queueConnect<VRButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), EventType::VRButtonPress, sceneManager,
-            [&](VRButtonEvent* e)
+        queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), EventType::DeviceButtonPress, sceneManager,
+            [&](ButtonEvent* e)
         {
             // When any button pressed, swap blade
             // todo: distance metric not working
