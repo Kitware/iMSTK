@@ -40,18 +40,36 @@ HapticDeviceClient::initialize()
     while (HD_DEVICE_ERROR(errorFlush = hdGetError())) {}
 
     // Initialize the device
-    m_handle = hdInitDevice(this->getDeviceName().c_str());
+    if (m_deviceName == "")
+    {
+        m_handle = hdInitDevice(HD_DEFAULT_DEVICE);
+    }
+    else
+    {
+        m_handle = hdInitDevice(getDeviceName().c_str());
+    }
 
     // If failed
     HDErrorInfo error;
-    LOG_IF(FATAL, HD_DEVICE_ERROR(error = hdGetError())) << "Failed to initialize Phantom Omni " << this->getDeviceName();
+    LOG_IF(FATAL, HD_DEVICE_ERROR(error = hdGetError())) << "Failed to initialize Phantom Omni \"" << this->getDeviceName() + "\"";
+
+    // If initialized as default, set the name
+    if (m_deviceName == "")
+    {
+        // Worth noting that in this case the name will not match the actual device name and is
+        // now only useful for scene level identification, OpenHaptics provides no mechanisms
+        // for querying device names
+        hdMakeCurrentDevice(m_handle);
+        HDstring str = hdGetString(HD_DEVICE_SERIAL_NUMBER);
+        m_deviceName = "Device_" + std::string(str);
+    }
 
     // Enable forces
     hdEnable(HD_FORCE_OUTPUT);
     hdEnable(HD_FORCE_RAMPING);
 
     // Success
-    LOG(INFO) << this->getDeviceName() << " successfully initialized.";
+    LOG(INFO) << "\"" << this->getDeviceName() << "\" successfully initialized.";
 }
 
 void

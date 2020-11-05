@@ -36,8 +36,6 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVTKViewer.h"
 
-const std::string phantomOmni1Name = "Default Device";
-
 using namespace imstk;
 
 ///
@@ -55,7 +53,8 @@ main()
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
+    const std::string deviceName = "";
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(deviceName);
 
     // Load Mesh
     auto                   mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
