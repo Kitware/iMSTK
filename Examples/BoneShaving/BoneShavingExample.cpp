@@ -64,8 +64,8 @@ main()
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    const std::string deviceName = "";
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(deviceName);
+    const std::string                   deviceName = "";
+    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
 
     // Create bone scene object
     // Load the mesh

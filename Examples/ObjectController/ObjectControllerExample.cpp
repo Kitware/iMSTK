@@ -51,8 +51,8 @@ main()
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    const std::string deviceName = "";
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(deviceName);
+    const std::string                   deviceName = "";
+    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
 
     // Object
     imstkNew<Cube>            geom(Vec3d(0.0, 1.0, 0.0), 2.0);

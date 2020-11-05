@@ -54,7 +54,7 @@ public:
 
 public:
     ButtonStateType m_buttonState;
-    const int m_button = -1;
+    const int       m_button = -1;
 };
 
 ///

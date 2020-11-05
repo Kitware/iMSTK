@@ -110,7 +110,7 @@ HapticDeviceClient::hapticCallback(void* pData)
     client->m_position << state.pos[0], state.pos[1], state.pos[2];
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
     client->m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(state.trans))).rotation();
-    
+
     for (int i = 0; i < 4; i++)
     {
         // If button down and not previously down

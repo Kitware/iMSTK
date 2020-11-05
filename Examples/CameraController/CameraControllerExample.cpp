@@ -53,8 +53,8 @@ main()
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    const std::string deviceName = "";
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(deviceName);
+    const std::string                   deviceName = "";
+    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
 
     // Load Mesh
     auto                   mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
