@@ -98,12 +98,17 @@ protected:
 
     Vec3d m_jawRotationAxis;                             ///< Angle of the jaws
 
-    Mat4d m_shaftWorldTransform = Mat4d::Identity(); // Final world transform of the shaft
+    Mat4d m_controllerWorldTransform = Mat4d::Identity(); // Final world transform of the controller
 
-    Mat4d m_upperJawWorldTransform = Mat4d::Identity(); // Final world transform of the upper jaw
-    Mat4d m_lowerJawWorldTransform = Mat4d::Identity();// Final world transform of the lower jaw
+    Mat4d m_shaftWorldTransform = Mat4d::Identity();      // Final world transform of the shaft
+    Mat4d m_upperJawWorldTransform = Mat4d::Identity();   // Final world transform of the upper jaw
+    Mat4d m_lowerJawWorldTransform = Mat4d::Identity();   // Final world transform of the lower jaw
 
-    Mat4d m_upperJawLocalTransform = Mat4d::Identity(); // m_upperJawWorldTransform = m_shaftWorldTransform * m_upperJawLocalTransform
-    Mat4d m_lowerJawLocalTransform = Mat4d::Identity(); // m_lowerJawWorldTransform = m_shaftWorldTransform * m_lowerJawLocalTransform
+    Mat4d m_shaftInitialTransform = Mat4d::Identity();    // Initial local transform of the shaft
+    Mat4d m_upperJawInitialTransform = Mat4d::Identity(); // Initial local transform of the upper jaw
+    Mat4d m_lowerJawInitialTransform = Mat4d::Identity(); // Initial local transform of the lower jaw
+
+    Mat4d m_upperJawLocalTransform = Mat4d::Identity();   // m_upperJawWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawInitialTransform
+    Mat4d m_lowerJawLocalTransform = Mat4d::Identity();   // m_lowerJawWorldTransform = m_controllerWorldTransform * m_lowerJawLocalTransform * m_lowerJawInitialTransform
 };
 } // imstk

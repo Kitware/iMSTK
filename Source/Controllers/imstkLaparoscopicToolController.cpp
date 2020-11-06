@@ -41,13 +41,9 @@ LaparoscopicToolController::LaparoscopicToolController(
     trackingDevice->setButtonsEnabled(true);
 
     // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws from the shaft)
-    m_shaftWorldTransform = mat4dRotation(m_shaft->getMasterGeometry()->getRotation()) * mat4dTranslate(m_shaft->getMasterGeometry()->getTranslation());
-
-    m_upperJawLocalTransform = mat4dRotation(m_upperJaw->getMasterGeometry()->getRotation()) * mat4dTranslate(m_upperJaw->getMasterGeometry()->getTranslation());
-    m_lowerJawLocalTransform = mat4dRotation(m_lowerJaw->getMasterGeometry()->getRotation()) * mat4dTranslate(m_lowerJaw->getMasterGeometry()->getTranslation());
-
-    m_upperJawWorldTransform = m_shaftWorldTransform * m_upperJawLocalTransform;
-    m_lowerJawWorldTransform = m_shaftWorldTransform * m_lowerJawLocalTransform;
+    m_shaftInitialTransform =  mat4dTranslate(m_shaft->getMasterGeometry()->getTranslation()) * mat4dRotation(m_shaft->getMasterGeometry()->getRotation());
+    m_upperJawInitialTransform = mat4dTranslate(m_upperJaw->getMasterGeometry()->getTranslation()) * mat4dRotation(m_upperJaw->getMasterGeometry()->getRotation());
+    m_lowerJawInitialTransform = mat4dTranslate(m_lowerJaw->getMasterGeometry()->getTranslation()) * mat4dRotation(m_lowerJaw->getMasterGeometry()->getRotation());
 }
 
 void
@@ -66,7 +62,8 @@ LaparoscopicToolController::updateControlledObjects()
     const Quatd controllerOrientation = getRotation();
 
     // Controller transform
-    m_shaftWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);
+    m_controllerWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);
+    m_shaftWorldTransform = m_controllerWorldTransform * m_shaftInitialTransform;
     {
         // TRS decompose and set shaft
         Vec3d t, s;
@@ -90,8 +87,8 @@ LaparoscopicToolController::updateControlledObjects()
 
     m_upperJawLocalTransform = mat4dRotation(Rotd(m_jawAngle, m_jawRotationAxis));
     m_lowerJawLocalTransform = mat4dRotation(Rotd(-m_jawAngle, m_jawRotationAxis));
-    m_upperJawWorldTransform = m_shaftWorldTransform * m_upperJawLocalTransform;
-    m_lowerJawWorldTransform = m_shaftWorldTransform * m_lowerJawLocalTransform;
+    m_upperJawWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawInitialTransform;
+    m_lowerJawWorldTransform = m_controllerWorldTransform * m_lowerJawLocalTransform * m_upperJawInitialTransform;
 
     {
         Vec3d t, s;
