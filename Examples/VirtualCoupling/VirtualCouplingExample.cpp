@@ -41,9 +41,6 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
-// global variables
-const std::string phantomOmni1Name = "Default Device";
-
 using namespace imstk;
 
 ///
@@ -72,7 +69,8 @@ main()
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
+    const std::string                   deviceName = "";
+    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
 
     // Create a virtual coupling object
     imstkNew<Sphere>          visualGeom(Vec3d(0.0, 0.0, 0.0), 20.0);

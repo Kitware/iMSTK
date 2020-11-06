@@ -28,6 +28,35 @@
 
 namespace imstk
 {
+using DeviceType = int;
+#define UNKNOWN_DEVICE 0
+#define OPENHAPTICS_DEVICE 1
+#define OPENVR_LEFT_CONTROLLER 3
+#define OPENVR_RIGHT_CONTROLLER 4
+#define OPENVR_HMD 5
+
+using ButtonStateType = int;
+#define BUTTON_RELEASED 0
+#define BUTTON_TOUCHED 1
+#define BUTTON_UNTOUCHED 2
+#define BUTTON_PRESSED 3
+
+class ButtonEvent : public Event
+{
+public:
+    ButtonEvent(const int button, const ButtonStateType keyPressType) : Event(EventType::DeviceButtonPress, 1),
+        m_buttonState(keyPressType),
+        m_button(button)
+    {
+    }
+
+    virtual ~ButtonEvent() override = default;
+
+public:
+    ButtonStateType m_buttonState;
+    const int       m_button = -1;
+};
+
 ///
 /// \class DeviceClient
 ///

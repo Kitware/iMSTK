@@ -50,8 +50,9 @@ public:
 
     ///
     /// \brief Create a haptic device client and add it to the internal list
+    /// \param Device name or use empty string for default device
     ///
-    std::shared_ptr<HapticDeviceClient> makeDeviceClient(const std::string& name);
+    std::shared_ptr<HapticDeviceClient> makeDeviceClient(std::string name = "");
 
     ///
     /// \brief Initialize the client devices and start the scheduler

@@ -40,12 +40,11 @@ enum class EventType
     Pause,
     Modified,
     KeyPress,
-    VRButtonPress,
+    DeviceButtonPress,
     MouseEvent,
     PreUpdate,
     PostUpdate,
     Configure
-    //?? add one for collision?
 };
 
 ///
