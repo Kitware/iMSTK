@@ -19,45 +19,40 @@
 
 =========================================================================*/
 
+#include "imstkLogger.h"
+#include "imstkNew.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkVTKViewer.h"
+
+// Objects
 #include "imstkCamera.h"
-#include "imstkCDObjectFactory.h"
 #include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-#include "imstkCollisionGraph.h"
-#include "imstkCollisionPair.h"
-#include "imstkCollisionDetection.h"
+#include "imstkLight.h"
+#include "imstkPbdObject.h"
+
+// Geometry
+#include "imstkMeshIO.h"
+#include "imstkCapsule.h"
+#include "imstkSurfaceMesh.h"
+
+// Devices and controllers
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
-#include "imstkMeshIO.h"
-#include "imstkMouseSceneControl.h"
-#include "imstkNew.h"
-#include "imstkPlane.h"
-#include "imstkRenderMaterial.h"
-#include "imstkScene.h"
-#include "imstkSceneManager.h"
-
 #include "imstkLaparoscopicToolController.h"
-#include "imstkSceneObjectController.h"
+#include "imstkMouseSceneControl.h"
 
-
-#include "imstkVisualModel.h"
-#include "imstkVTKViewer.h"
-
-#include "imstkLogger.h"
+// Collisions and Models
+#include "imstkCollisionGraph.h"
+#include "imstkCollisionPair.h"
+#include "imstkCollisionDetection.h"
 #include "imstkPbdModel.h"
-#include "imstkPbdObject.h"
-
-#include "imstkSphere.h"
-#include "imstkCapsule.h"
-#include "imstkSurfaceMesh.h"
-
-#include "imstkPBDPickingCH.h"
 #include "imstkPbdObjectPickingPair.h"
-
-#include "imstkIsometricMap.h"
+#include "imstkPBDPickingCH.h"
+#include "imstkRenderMaterial.h"
+#include "imstkVisualModel.h"
 
 // global variables
 const std::string phantomOmni1Name = "Default Device";

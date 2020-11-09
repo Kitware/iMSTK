@@ -40,7 +40,7 @@ LaparoscopicToolController::LaparoscopicToolController(
 {
     trackingDevice->setButtonsEnabled(true);
 
-    // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws from the shaft)
+    // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws/shaft from controller)
     m_shaftVisualTransform =  mat4dTranslate(m_shaft->getVisualGeometry()->getTranslation()) * mat4dRotation(m_shaft->getVisualGeometry()->getRotation());
     m_upperJawVisualTransform = mat4dTranslate(m_upperJaw->getVisualGeometry()->getTranslation()) * mat4dRotation(m_upperJaw->getVisualGeometry()->getRotation());
     m_lowerJawVisualTransform = mat4dTranslate(m_lowerJaw->getVisualGeometry()->getTranslation()) * mat4dRotation(m_lowerJaw->getVisualGeometry()->getRotation());
@@ -67,8 +67,9 @@ LaparoscopicToolController::updateControlledObjects()
 
     // Controller transform
     m_controllerWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);
+
+    // TRS decompose and set shaft geometries
     {
-        // TRS decompose and set shaft
         Vec3d t, s;
         Mat3d r;
 
@@ -95,6 +96,8 @@ LaparoscopicToolController::updateControlledObjects()
 
     m_upperJawLocalTransform = mat4dRotation(Rotd(m_jawAngle, m_jawRotationAxis));
     m_lowerJawLocalTransform = mat4dRotation(Rotd(-m_jawAngle, m_jawRotationAxis));
+
+    // TRS decompose and set upper/lower jaw geometries
     {
         Vec3d t, s;
         Mat3d r;
