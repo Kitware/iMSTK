@@ -42,10 +42,10 @@ public:
     /// \brief Constructor
     ///
     LaparoscopicToolController(
-        std::shared_ptr<CollidingObject>  shaft,
-        std::shared_ptr<CollidingObject>  upperJaw,
-        std::shared_ptr<CollidingObject>  lowerJaw,
-        std::shared_ptr<DeviceClient> trackingDevice);
+        std::shared_ptr<CollidingObject> shaft,
+        std::shared_ptr<CollidingObject> upperJaw,
+        std::shared_ptr<CollidingObject> lowerJaw,
+        std::shared_ptr<DeviceClient>    trackingDevice);
 
     LaparoscopicToolController() = delete; //not allowed for now
 
@@ -88,23 +88,23 @@ public:
     inline double getMaxJawAngle() const { return m_maxJawAngle; }
 
 protected:
-    std::shared_ptr<CollidingObject> m_shaft;                ///< Tool shaft
-    std::shared_ptr<CollidingObject> m_upperJaw;             ///< Tool upper jaw
-    std::shared_ptr<CollidingObject> m_lowerJaw;             ///< Tool lower jaw
+    std::shared_ptr<CollidingObject> m_shaft;               ///< Tool shaft
+    std::shared_ptr<CollidingObject> m_upperJaw;            ///< Tool upper jaw
+    std::shared_ptr<CollidingObject> m_lowerJaw;            ///< Tool lower jaw
 
-    double m_jawAngle    = PI / 6.0;                     ///< Angle of the jaws
-    double m_change      = 6.0e-5;                       ///< Amount of change in jaw angle per frame
-    double m_maxJawAngle = PI / 6.0;                     ///< Maximum angle of the jaws
+    double m_jawAngle    = PI / 6.0;                        ///< Angle of the jaws
+    double m_change      = 6.0e-5;                          ///< Amount of change in jaw angle per frame
+    double m_maxJawAngle = PI / 6.0;                        ///< Maximum angle of the jaws
 
-    Vec3d m_jawRotationAxis;                             ///< Angle of the jaws
+    Vec3d m_jawRotationAxis;                                ///< Angle of the jaws
 
     Mat4d m_controllerWorldTransform = Mat4d::Identity();   // Final world transform of the controller
 
-    Mat4d m_shaftVisualTransform = Mat4d::Identity();       // Initial local transform of the visual shaft
+    Mat4d m_shaftVisualTransform    = Mat4d::Identity();    // Initial local transform of the visual shaft
     Mat4d m_upperJawVisualTransform = Mat4d::Identity();    // Initial local transform of the visual upper jaw
     Mat4d m_lowerJawVisualTransform = Mat4d::Identity();    // Initial local transform of the visual lower jaw
 
-    Mat4d m_shaftCollidingTransform = Mat4d::Identity();    // Initial local transform of the colliding shaft
+    Mat4d m_shaftCollidingTransform    = Mat4d::Identity(); // Initial local transform of the colliding shaft
     Mat4d m_upperJawCollidingTransform = Mat4d::Identity(); // Initial local transform of the colliding upper jaw
     Mat4d m_lowerJawCollidingTransform = Mat4d::Identity(); // Initial local transform of the colliding lower jaw
 

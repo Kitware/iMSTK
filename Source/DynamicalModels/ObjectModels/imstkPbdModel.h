@@ -280,10 +280,10 @@ protected:
     bool   m_partitioned = false;                                                         /// \todo this is used in initialize() as a temporary fix to problems on linux
     size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
 
-    std::shared_ptr<PbdSolver>                m_pbdSolver = nullptr;                      ///> PBD solver
-    std::shared_ptr<PointSet>                 m_mesh      = nullptr;                      ///> PointSet on which the pbd model operates on
-    std::shared_ptr<StdVectorOfReal>          m_mass      = nullptr;                      ///> Mass of nodes
-    std::shared_ptr<StdVectorOfReal>          m_invMass   = nullptr;                      ///> Inverse of mass of nodes
+    std::shared_ptr<PbdSolver>       m_pbdSolver = nullptr;                               ///> PBD solver
+    std::shared_ptr<PointSet>        m_mesh      = nullptr;                               ///> PointSet on which the pbd model operates on
+    std::shared_ptr<StdVectorOfReal> m_mass      = nullptr;                               ///> Mass of nodes
+    std::shared_ptr<StdVectorOfReal> m_invMass   = nullptr;                               ///> Inverse of mass of nodes
     std::shared_ptr<std::map<size_t, double>> m_fixedNodeInvMass = nullptr;               ///> Map for archiving fixed nodes' mass.
 
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> List of pbd constraints

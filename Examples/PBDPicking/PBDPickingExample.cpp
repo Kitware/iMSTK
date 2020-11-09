@@ -190,11 +190,11 @@ main()
     std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
 
     // Load the meshes
-    auto    upperSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj");
-    auto    lowerSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj");
-    auto    pivotSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj");
+    auto upperSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj");
+    auto lowerSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/lower.obj");
+    auto pivotSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/pivot.obj");
 
-    imstkNew<Capsule>          geomShaft;
+    imstkNew<Capsule> geomShaft;
     geomShaft->setLength(20.0);
     geomShaft->setRadius(1.0);
     geomShaft->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
@@ -204,7 +204,7 @@ main()
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
-    imstkNew<Capsule>          geomUpperJaw;
+    imstkNew<Capsule> geomUpperJaw;
     geomUpperJaw->setLength(25.0);
     geomUpperJaw->setTranslation(Vec3d(0.0, 1.0, -12.5));
     geomUpperJaw->setRadius(1.0);
@@ -213,8 +213,8 @@ main()
     objUpperJaw->setVisualGeometry(upperSurfMesh);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
-    
-    imstkNew<Capsule>          geomLowerJaw;
+
+    imstkNew<Capsule> geomLowerJaw;
     geomLowerJaw->setLength(25.0);
     geomLowerJaw->setTranslation(Vec3d(0.0, -1.0, -12.5));
     geomLowerJaw->setRadius(1.0);
@@ -278,7 +278,7 @@ main()
         {
             std::shared_ptr<PBDPickingCH> chUpper = std::static_pointer_cast<PBDPickingCH>(upperJawPickingPair->getCollisionHandlingA());
             std::shared_ptr<PBDPickingCH> chLower = std::static_pointer_cast<PBDPickingCH>(lowerJawPickingPair->getCollisionHandlingA());
-            
+
             // Activate picking
             if (client->getButton(1))
             {

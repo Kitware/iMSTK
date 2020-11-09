@@ -256,7 +256,7 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
     // TODO: Fix this issue of extra computation in future
     const Vec3d mid    = capsulePos;
     const Vec3d p1     = mid + 0.5 * capsule->getOrientationAxis() * length;
-    const Vec3d p0       = 2 * mid - p1;
+    const Vec3d p0     = 2 * mid - p1;
     const Vec3d p      = p1 - p0;
     const auto  pDotp  = p.dot(p);
     const auto  pDotp0 = p.dot(p0);

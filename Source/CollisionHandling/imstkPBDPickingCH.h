@@ -75,15 +75,14 @@ public:
     void removePickConstraints();
 
     ///
-    /// \brief Activate picking constraints for nodes in the collision data 
+    /// \brief Activate picking constraints for nodes in the collision data
     ///
     void activatePickConstraints();
 
-
 private:
-    bool                                m_isPicking;
-    std::map<size_t, Vec3d>             m_pickedPtIdxOffset; ///> Map for picked nodes.
-    std::shared_ptr<PbdObject>          m_pbdObj;            ///> PBD object
-    std::shared_ptr<CollidingObject>    m_pickObj;           ///> Picking tool object
+    bool m_isPicking;
+    std::map<size_t, Vec3d>          m_pickedPtIdxOffset;    ///> Map for picked nodes.
+    std::shared_ptr<PbdObject>       m_pbdObj;               ///> PBD object
+    std::shared_ptr<CollidingObject> m_pickObj;              ///> Picking tool object
 };
 }

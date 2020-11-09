@@ -167,11 +167,14 @@ using AffineTransform3d = Eigen::Affine3d;
 #define MIN_F                std::numeric_limits<float>::min()
 #define VERY_SMALL_EPSILON_F std::numeric_limits<float>::epsilon()
 
-static inline Mat4d mat4dTranslate(const Vec3d& translate)
+static inline Mat4d
+mat4dTranslate(const Vec3d& translate)
 {
     return AffineTransform3d(Eigen::Translation3d(translate)).matrix();
 }
-static inline Mat4d mat4dScale(const Vec3d& scale)
+
+static inline Mat4d
+mat4dScale(const Vec3d& scale)
 {
     Mat4d mScale = Mat4d::Identity();
     mScale(0, 0) = scale[0];
@@ -179,34 +182,42 @@ static inline Mat4d mat4dScale(const Vec3d& scale)
     mScale(2, 2) = scale[2];
     return mScale;
 }
-static inline Mat4d mat4dRotation(const Quatd& rotation)
+
+static inline Mat4d
+mat4dRotation(const Quatd& rotation)
 {
     Mat4d mRot = Mat4d::Identity();
     mRot.block<3, 3>(0, 0) = rotation.toRotationMatrix();
     return mRot;
 }
-static inline Mat4d mat4dRotation(const Rotd& rotation)
+
+static inline Mat4d
+mat4dRotation(const Rotd& rotation)
 {
     Mat4d mRot = Mat4d::Identity();
     mRot.block<3, 3>(0, 0) = rotation.toRotationMatrix();
     return mRot;
 }
-static inline Mat4d mat4dRotation(const Mat3d& rotation)
+
+static inline Mat4d
+mat4dRotation(const Mat3d& rotation)
 {
     Mat4d mRot = Mat4d::Identity();
     mRot.block<3, 3>(0, 0) = rotation;
     return mRot;
 }
+
 ///
 /// \brief Translation, Rotation, Scaling decomposition, ignores shears
-/// 
-static inline void mat4dTRS(const Mat4d& m, Vec3d& t, Mat3d& r, Vec3d& s)
+///
+static inline void
+mat4dTRS(const Mat4d& m, Vec3d& t, Mat3d& r, Vec3d& s)
 {
     // Assumes affine, no shear
     const Vec3d& x = m.block<3, 1>(0, 0);
     const Vec3d& y = m.block<3, 1>(0, 1);
     const Vec3d& z = m.block<3, 1>(0, 2);
-    
+
     s = Vec3d(m.block<3, 1>(0, 0).norm(),
         m.block<3, 1>(0, 1).norm(),
         m.block<3, 1>(0, 2).norm());

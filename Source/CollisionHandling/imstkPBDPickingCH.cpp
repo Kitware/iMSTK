@@ -62,7 +62,7 @@ PBDPickingCH::updatePickConstraints()
         return;
     }
 
-    std::shared_ptr<PbdModel> model = m_pbdObj->getPbdModel();
+    std::shared_ptr<PbdModel>           model    = m_pbdObj->getPbdModel();
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(m_pickObj->getCollidingGeometry());
     for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); iter++)
     {
@@ -83,20 +83,19 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
         << "PBDPickingCH:addPickConstraints error: "
         << "no pdb object or colliding object.";
 
-    std::shared_ptr<PbdModel> model = pbdObj->getPbdModel();
+    std::shared_ptr<PbdModel>           model    = pbdObj->getPbdModel();
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());
     CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
 
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx) {
-
             const auto& cd = m_colData->MAColData[idx];
             if (m_pickedPtIdxOffset.find(cd.nodeIdx) == m_pickedPtIdxOffset.end() && model->getInvMass(cd.nodeIdx) != 0.0)
             {
                 auto rot = pickGeom->getRotation().transpose();
                 auto relativePos = rot * (model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pickGeom->getPosition());
-                
+
                 lock.lock();
                 m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
                 model->setFixedPoint(cd.nodeIdx);
@@ -122,7 +121,7 @@ void
 PBDPickingCH::activatePickConstraints()
 {
     if (!m_colData->MAColData.isEmpty())
-    {        
+    {
         this->addPickConstraints(m_pbdObj, m_pickObj);
         m_isPicking = true;
     }

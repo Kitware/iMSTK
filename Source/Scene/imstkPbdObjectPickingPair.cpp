@@ -32,7 +32,7 @@ namespace imstk
 {
 // Pbd Collision will be tested before any step of pbd, then resolved after the solve steps of the two objects
 PbdObjectPickingPair::PbdObjectPickingPair(std::shared_ptr<PbdObject> obj1, std::shared_ptr<CollidingObject> obj2,
-                                               CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
+                                           CollisionDetection::Type cdType) : CollisionPair(obj1, obj2)
 {
     // Setup the CD
     m_colData = std::make_shared<CollisionData>();
