@@ -205,33 +205,28 @@ main()
     geomShaft->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 10.0));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(geomShaft);
+    objShaft->setVisualGeometry(pivotSurfMesh);
     objShaft->setCollidingGeometry(geomShaft);
-    //objShaft->setCollidingToVisualMap(std::make_shared<IsometricMap>(geomShaft, pivotSurfMesh));
     scene->addSceneObject(objShaft);
 
     imstkNew<Capsule>          geomUpperJaw;
-    geomUpperJaw->setLength(15.0);
-    geomUpperJaw->setTranslation(Vec3d(0.0, 0.0, -15.0));
+    geomUpperJaw->setLength(25.0);
+    geomUpperJaw->setTranslation(Vec3d(0.0, 1.0, -12.5));
     geomUpperJaw->setRadius(1.0);
     geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
-    objUpperJaw->setVisualGeometry(geomUpperJaw);
+    objUpperJaw->setVisualGeometry(upperSurfMesh);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
-   /* auto mapUpperJaw = std::make_shared<IsometricMap>(geomUpperJaw, upperSurfMesh);
-    objUpperJaw->setCollidingToVisualMap(mapUpperJaw);*/
     scene->addSceneObject(objUpperJaw);
     
     imstkNew<Capsule>          geomLowerJaw;
-    geomLowerJaw->setLength(15.0);
-    geomLowerJaw->setTranslation(Vec3d(0.0, 0.0, -15.0));
+    geomLowerJaw->setLength(25.0);
+    geomLowerJaw->setTranslation(Vec3d(0.0, -1.0, -12.5));
     geomLowerJaw->setRadius(1.0);
     geomLowerJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(geomLowerJaw);
+    objLowerJaw->setVisualGeometry(lowerSurfMesh);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
-    //auto mapLowerJaw = std::make_shared<IsometricMap>(geomLowerJaw, lowerSurfMesh);
-    //objLowerJaw->setCollidingToVisualMap(mapLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
@@ -244,9 +239,9 @@ main()
 
     // Add interaction pair for pbd picking
     imstkNew<PbdObjectPickingPair> upperJawPickingPair(clothObj, objUpperJaw, CollisionDetection::Type::PointSetToCapsule);
-    //imstkNew<PbdObjectPickingPair> lowerJawPickingPair(clothObj, objLowerJaw, CollisionDetection::Type::PointSetToCapsule);
+    imstkNew<PbdObjectPickingPair> lowerJawPickingPair(clothObj, objLowerJaw, CollisionDetection::Type::PointSetToCapsule);
     scene->getCollisionGraph()->addInteraction(upperJawPickingPair);
-    //scene->getCollisionGraph()->addInteraction(lowerJawPickingPair);
+    scene->getCollisionGraph()->addInteraction(lowerJawPickingPair);
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1, 1, 1) * 100.0);
@@ -287,19 +282,19 @@ main()
         connect<Event>(sceneManager, EventType::PreUpdate, [&](Event*)
         {
             std::shared_ptr<PBDPickingCH> chUpper = std::static_pointer_cast<PBDPickingCH>(upperJawPickingPair->getCollisionHandlingA());
-            //std::shared_ptr<PBDPickingCH> chLower = std::static_pointer_cast<PBDPickingCH>(lowerJawPickingPair->getCollisionHandlingA());
+            std::shared_ptr<PBDPickingCH> chLower = std::static_pointer_cast<PBDPickingCH>(lowerJawPickingPair->getCollisionHandlingA());
             
             // Activate picking
             if (client->getButton(1))
             {
                 chUpper->activatePickConstraints();
-                //chLower->activatePickConstraints();
+                chLower->activatePickConstraints();
             }
             // Unpick
             if (client->getButton(0))
             {
                 chUpper->removePickConstraints();
-                //chLower->removePickConstraints();
+                chLower->removePickConstraints();
             }
         });
 
