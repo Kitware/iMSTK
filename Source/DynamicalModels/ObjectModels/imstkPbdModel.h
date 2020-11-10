@@ -26,6 +26,8 @@
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdState.h"
 
+#include <map>
+
 namespace imstk
 {
 class PointSet;
@@ -209,9 +211,14 @@ public:
     void setParticleMass(const double val, const size_t idx);
 
     ///
-    /// \brief Se the node as fixed
+    /// \brief Set the node as fixed
     ///
     void setFixedPoint(const size_t idx);
+
+    ///
+    /// \brief Set the node as unfixed
+    ///
+    void setPointUnfixed(const size_t idx);
 
     ///
     /// \brief Get the inverse of mass of a certain node
@@ -277,6 +284,7 @@ protected:
     std::shared_ptr<PointSet>        m_mesh      = nullptr;                               ///> PointSet on which the pbd model operates on
     std::shared_ptr<StdVectorOfReal> m_mass      = nullptr;                               ///> Mass of nodes
     std::shared_ptr<StdVectorOfReal> m_invMass   = nullptr;                               ///> Inverse of mass of nodes
+    std::shared_ptr<std::map<size_t, double>> m_fixedNodeInvMass = nullptr;               ///> Map for archiving fixed nodes' mass.
 
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> List of pbd constraints
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> List of pbd constraints

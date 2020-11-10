@@ -51,6 +51,7 @@ public:
         BoneDrilling,
         SPH,
         PBD,
+        PBDPicking,
         RBD,
         LevelSet
     };

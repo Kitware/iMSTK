@@ -32,6 +32,7 @@ class ObjectInteractionPair;
 enum class InteractionType
 {
     PbdObjToPbdObjCollision,
+    PbdObjToCollidingObjPicking,
 
     PbdObjToCollidingObjCollision,
     SphObjToCollidingObjCollision,
