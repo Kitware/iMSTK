@@ -93,8 +93,9 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
             const auto& cd = m_colData->MAColData[idx];
             if (m_pickedPtIdxOffset.find(cd.nodeIdx) == m_pickedPtIdxOffset.end() && model->getInvMass(cd.nodeIdx) != 0.0)
             {
+                auto pv = cd.penetrationVector;
                 auto rot = pickGeom->getRotation().transpose();
-                auto relativePos = rot * (model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pickGeom->getPosition());
+                auto relativePos = rot * (model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pv - pickGeom->getPosition());
 
                 lock.lock();
                 m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
