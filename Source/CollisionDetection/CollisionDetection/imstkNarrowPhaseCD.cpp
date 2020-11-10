@@ -268,8 +268,8 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
     }
 
     // Do the actual check
-    const auto  alpha = (point.dot(p) - pDotp0) / pDotp;
-    Vec3d closestPoint;
+    const auto alpha = (point.dot(p) - pDotp0) / pDotp;
+    Vec3d      closestPoint;
     if (alpha > 1.0)
     {
         closestPoint = p1;
