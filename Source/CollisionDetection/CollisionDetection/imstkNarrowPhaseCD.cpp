@@ -268,8 +268,20 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
     }
 
     // Do the actual check
-    const auto  alpha = (point.dot(p) - pDotp0) / pDotp;
-    const Vec3d closestPoint = p0 + p * alpha;
+    const auto alpha = (point.dot(p) - pDotp0) / pDotp;
+    Vec3d      closestPoint;
+    if (alpha > 1.0)
+    {
+        closestPoint = p1;
+    }
+    else if (alpha < 0.0)
+    {
+        closestPoint = p0;
+    }
+    else
+    {
+        closestPoint = p0 + alpha * p;
+    }
 
     // If the point is inside the bounding sphere then the closest point
     // should be inside the capsule
@@ -278,7 +290,7 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
     {
         const auto  direction      = (closestPoint - point) / dist;
         const Vec3d pointOnCapsule = closestPoint - radius * direction;
-        colData->MAColData.safeAppend({ pointIdx, p - pointOnCapsule });
+        colData->MAColData.safeAppend({ pointIdx, point - pointOnCapsule });
     }
 }
 
