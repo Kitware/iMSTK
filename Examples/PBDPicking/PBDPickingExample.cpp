@@ -62,8 +62,8 @@ using namespace imstk;
 // Parameters to play with
 const double width  = 50.0;
 const double height = 50.0;
-const int    nRows  = 16;
-const int    nCols  = 16;
+const int    nRows  = 31;
+const int    nCols  = 31;
 
 ///
 /// \brief Creates cloth geometry
@@ -207,7 +207,7 @@ main()
     imstkNew<Capsule> geomUpperJaw;
     geomUpperJaw->setLength(25.0);
     geomUpperJaw->setTranslation(Vec3d(0.0, 1.0, -12.5));
-    geomUpperJaw->setRadius(1.0);
+    geomUpperJaw->setRadius(2.0);
     geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
     objUpperJaw->setVisualGeometry(upperSurfMesh);
@@ -217,7 +217,7 @@ main()
     imstkNew<Capsule> geomLowerJaw;
     geomLowerJaw->setLength(25.0);
     geomLowerJaw->setTranslation(Vec3d(0.0, -1.0, -12.5));
-    geomLowerJaw->setRadius(1.0);
+    geomLowerJaw->setRadius(2.0);
     geomLowerJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
     objLowerJaw->setVisualGeometry(lowerSurfMesh);

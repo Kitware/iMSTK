@@ -21,10 +21,13 @@ limitations under the License.
 
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
+#include "imstkPbdAnalyticalCollisionConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPBDPickingCH.h"
+#include "imstkPbdSolver.h"
 #include "imstkPointSet.h"
+#include "imstkSurfaceMesh.h"
 
 namespace imstk
 {
@@ -34,10 +37,19 @@ PBDPickingCH::PBDPickingCH(const CollisionHandling::Side&       side,
                            std::shared_ptr<CollidingObject>     pickObj) :
     CollisionHandling(Type::PBDPicking, side, colData),
     m_pbdObj(pbdObj),
-    m_pickObj(pickObj)
+    m_pickObj(pickObj),
+    m_pbdCollisionSolver(std::make_shared<PbdCollisionSolver>())
 {
     m_isPicking = false;
     m_pickedPtIdxOffset.clear();
+}
+
+PBDPickingCH::~PBDPickingCH()
+{
+    for (const auto ptr : m_ACConstraintPool)
+    {
+        delete ptr;
+    }
 }
 
 void
@@ -50,6 +62,20 @@ PBDPickingCH::processCollisionData()
     if (m_isPicking)
     {
         this->updatePickConstraints();
+    }
+    else
+    {
+        this->generatePBDConstraints();
+        if (m_PBDConstraints.size() == 0)
+        {
+            return;
+        }
+
+        m_pbdCollisionSolver->addCollisionConstraints(&m_PBDConstraints,
+            m_pbdObj->getPbdModel()->getCurrentState()->getPositions(),
+            m_pbdObj->getPbdModel()->getInvMasses(),
+            nullptr,
+            nullptr);
     }
 }
 
@@ -125,6 +151,34 @@ PBDPickingCH::activatePickConstraints()
     {
         this->addPickConstraints(m_pbdObj, m_pickObj);
         m_isPicking = true;
+    }
+}
+
+void
+PBDPickingCH::generatePBDConstraints()
+{
+    std::shared_ptr<PbdCollisionConstraintConfig> config = m_pbdObj->getPbdModel()->getParameters()->collisionParams;
+
+    m_ACConstraintPool.resize(0);
+    m_ACConstraintPool.reserve(m_colData->MAColData.getSize());
+    for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
+    {
+        m_ACConstraintPool.push_back(new PbdAnalyticalCollisionConstraint);
+    }
+
+    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+        [&](const size_t idx)
+        {
+            m_ACConstraintPool[idx]->initConstraint(config, m_colData->MAColData[idx]);
+        });
+
+    // Copy constraints
+    m_PBDConstraints.resize(0);
+    m_PBDConstraints.reserve(m_colData->MAColData.getSize());
+
+    for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
+    {
+        m_PBDConstraints.push_back(static_cast<PbdCollisionConstraint*>(m_ACConstraintPool[i]));
     }
 }
 }

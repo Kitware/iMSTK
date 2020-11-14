@@ -48,5 +48,6 @@ private:
     // Pbd defines two interactions (one at CD and one at solver)
     Inputs  m_solveNodeInputs;
     Outputs m_solveNodeOutputs;
+    std::shared_ptr<TaskNode> m_collisionSolveNode = nullptr;
 };
 }
