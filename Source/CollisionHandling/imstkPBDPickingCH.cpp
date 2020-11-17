@@ -175,7 +175,6 @@ PBDPickingCH::generatePBDConstraints()
     // Copy constraints
     m_PBDConstraints.resize(0);
     m_PBDConstraints.reserve(m_colData->MAColData.getSize());
-
     for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
     {
         m_PBDConstraints.push_back(static_cast<PbdCollisionConstraint*>(m_ACConstraintPool[i]));

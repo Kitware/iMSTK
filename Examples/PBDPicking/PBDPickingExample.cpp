@@ -224,6 +224,18 @@ main()
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
+    /*
+    // big capsule for demonstrating pbd-analytical collision
+    imstkNew<Capsule> bigCapsule;
+    bigCapsule->setLength(25.0);
+    bigCapsule->setTranslation(Vec3d(25, -50.0, 25.0));
+    bigCapsule->setRadius(20.0);
+    imstkNew<CollidingObject> objBigCapsule("bigObject");
+    objBigCapsule->setVisualGeometry(bigCapsule);
+    objBigCapsule->setCollidingGeometry(bigCapsule);
+    scene->addSceneObject(objBigCapsule);
+    */
+
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
 
@@ -235,8 +247,10 @@ main()
     // Add interaction pair for pbd picking
     imstkNew<PbdObjectPickingPair> upperJawPickingPair(clothObj, objUpperJaw, CollisionDetection::Type::PointSetToCapsule);
     imstkNew<PbdObjectPickingPair> lowerJawPickingPair(clothObj, objLowerJaw, CollisionDetection::Type::PointSetToCapsule);
+    //imstkNew<PbdObjectPickingPair> bigCapsulePickingPair(clothObj, objBigCapsule, CollisionDetection::Type::PointSetToCapsule);
     scene->getCollisionGraph()->addInteraction(upperJawPickingPair);
     scene->getCollisionGraph()->addInteraction(lowerJawPickingPair);
+    //scene->getCollisionGraph()->addInteraction(bigCapsulePickingPair);
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1, 1, 1) * 100.0);

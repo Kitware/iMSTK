@@ -88,10 +88,10 @@ public:
                                          StdVectorOfVec3d&       dcdxA,
                                          StdVectorOfVec3d&       dcdxB) const = 0;
 
-    virtual void projectConstraint(const StdVectorOfReal& invMassA,
-                                   const StdVectorOfReal& invMassB,
-                                   StdVectorOfVec3d&      posA,
-                                   StdVectorOfVec3d&      posB);
+    virtual void projectConstraint(const StdVectorOfReal* invMassA,
+                                   const StdVectorOfReal* invMassB,
+                                   StdVectorOfVec3d*      posA,
+                                   StdVectorOfVec3d*      posB);
 protected:
     std::vector<size_t> m_bodiesFirst;                                 ///> index of points for the first object
     std::vector<size_t> m_bodiesSecond;                                ///> index of points for the second object

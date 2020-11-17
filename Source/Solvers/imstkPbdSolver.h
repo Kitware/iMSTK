@@ -155,7 +155,7 @@ public:
     void solve() override;
 
 private:
-    size_t m_collisionIterations = 5;                                                                   ///> Number of NL Gauss-Seidel iterations for collision constraints
+    size_t m_collisionIterations = 1;                                                                   ///> Number of NL Gauss-Seidel iterations for collision constraints
 
     std::shared_ptr<std::list<std::vector<PbdCollisionConstraint*>*>> m_collisionConstraints = nullptr; ///< Collision contraints charged to this solver
     std::shared_ptr<std::list<CollisionConstraintData>> m_collisionConstraintsData = nullptr;
