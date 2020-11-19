@@ -182,6 +182,7 @@ main()
 
     // Scene
     imstkNew<Scene> scene("PBDPicking");
+    scene->getConfig()->writeTaskGraph = true;
 
     // Create the virtual coupling object controller
 
@@ -228,8 +229,9 @@ main()
     // big capsule for demonstrating pbd-analytical collision
     imstkNew<Capsule> bigCapsule;
     bigCapsule->setLength(25.0);
-    bigCapsule->setTranslation(Vec3d(25, -50.0, 25.0));
-    bigCapsule->setRadius(20.0);
+    bigCapsule->setTranslation(Vec3d(25, -20.0, 25.0));
+    bigCapsule->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
+    bigCapsule->setRadius(5.0);
     imstkNew<CollidingObject> objBigCapsule("bigObject");
     objBigCapsule->setVisualGeometry(bigCapsule);
     objBigCapsule->setCollidingGeometry(bigCapsule);
@@ -251,6 +253,18 @@ main()
     scene->getCollisionGraph()->addInteraction(upperJawPickingPair);
     scene->getCollisionGraph()->addInteraction(lowerJawPickingPair);
     //scene->getCollisionGraph()->addInteraction(bigCapsulePickingPair);
+
+    /*
+    // Move the capsule every frame
+    double t = 0.0;
+    auto   moveCapsule =
+        [&bigCapsule, &t](Event*)
+    {
+
+        bigCapsule->setTranslation(Vec3d(25, -20.0 + 10 * sin(t), 25.0));
+        t += 0.01;
+    };
+    */
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1, 1, 1) * 100.0);
@@ -274,6 +288,8 @@ main()
         viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
 
         viewer->addChildThread(server);
+
+        //connect<Event>(sceneManager, EventType::PostUpdate, moveCapsule);
 
         // Add mouse and keyboard controls to the viewer
         {

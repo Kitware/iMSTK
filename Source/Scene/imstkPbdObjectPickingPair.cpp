@@ -38,6 +38,9 @@ PbdObjectPickingPair::PbdObjectPickingPair(std::shared_ptr<PbdObject> obj1, std:
     m_taskNodeInputs.first.push_back(pbdModel->getUpdateCollisionGeometryNode());
     m_taskNodeOutputs.first.push_back(pbdModel->getSolveNode());
 
+    m_taskNodeInputs.second.push_back(obj2->getUpdateGeometryNode());
+    m_taskNodeOutputs.second.push_back(obj2->getTaskGraph()->getSink());
+
     // Define where solver interaction happens
     m_solveNodeInputs.first.push_back(pbdModel->getSolveNode());
     m_solveNodeOutputs.first.push_back(pbdModel->getUpdateVelocityNode());
