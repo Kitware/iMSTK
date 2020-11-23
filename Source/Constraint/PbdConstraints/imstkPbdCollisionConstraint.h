@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -81,16 +82,17 @@ public:
     /// \param[inout] c constraint value
     /// \param[inout] dcdx constraint gradient
     ///
-    virtual bool computeValueAndGradient(const StdVectorOfVec3d& posA,
-                                         const StdVectorOfVec3d& posB,
-                                         double&                 c,
-                                         StdVectorOfVec3d&       dcdxA,
-                                         StdVectorOfVec3d&       dcdxB) const = 0;
+    virtual bool computeValueAndGradient(const VecDataArray<double, 3>& posA,
+                                         const VecDataArray<double, 3>& posB,
+                                         double& c,
+                                         VecDataArray<double, 3>& dcdxA,
+                                         VecDataArray<double, 3>& dcdxB) const = 0;
 
-    virtual void projectConstraint(const StdVectorOfReal& invMassA,
-                                   const StdVectorOfReal& invMassB,
-                                   StdVectorOfVec3d&      posA,
-                                   StdVectorOfVec3d&      posB);
+    virtual void projectConstraint(const DataArray<double>& invMassA,
+                                   const DataArray<double>& invMassB,
+                                   VecDataArray<double, 3>& posA,
+                                   VecDataArray<double, 3>& posB);
+
 protected:
     std::vector<size_t> m_bodiesFirst;                                 ///> index of points for the first object
     std::vector<size_t> m_bodiesSecond;                                ///> index of points for the second object

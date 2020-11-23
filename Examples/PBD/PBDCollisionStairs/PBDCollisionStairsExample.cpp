@@ -55,46 +55,48 @@ buildStairs(int nSteps, double width, double height, double depth)
     const double dy = height / static_cast<double>(nSteps);
 
     // Create vertices
-    StdVectorOfVec3d vertList;
+    imstkNew<VecDataArray<double, 3>> verticesPtr;
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
     // 4 verts per step, 2 back, then 2 bottom
-    vertList.reserve(nSteps * 4 + 4);
+    vertices.reserve(nSteps * 4 + 4);
     for (size_t i = 0; i < nSteps; i++)
     {
         const double z  = static_cast<double>(dz * i) - halfDepth;
         const double y1 = static_cast<double>(dy * i) - halfHeight;
-        vertList.push_back(Vec3d(-halfWidth, y1, z));
-        vertList.push_back(Vec3d(halfWidth, y1, z));
+        vertices.push_back(Vec3d(-halfWidth, y1, z));
+        vertices.push_back(Vec3d(halfWidth, y1, z));
 
         const double y2 = static_cast<double>(dy * (i + 1)) - halfHeight;
-        vertList.push_back(Vec3d(-halfWidth, y2, z));
-        vertList.push_back(Vec3d(halfWidth, y2, z));
+        vertices.push_back(Vec3d(-halfWidth, y2, z));
+        vertices.push_back(Vec3d(halfWidth, y2, z));
     }
     {
         const double z    = static_cast<double>(dz * nSteps) - halfDepth;
         const double yTop = static_cast<double>(dy * nSteps) - halfHeight;
-        vertList.push_back(Vec3d(-halfWidth, yTop, z));
-        vertList.push_back(Vec3d(halfWidth, yTop, z));
+        vertices.push_back(Vec3d(-halfWidth, yTop, z));
+        vertices.push_back(Vec3d(halfWidth, yTop, z));
 
         const double yBot = -halfHeight;
-        vertList.push_back(Vec3d(-halfWidth, yBot, z));
-        vertList.push_back(Vec3d(halfWidth, yBot, z));
+        vertices.push_back(Vec3d(-halfWidth, yBot, z));
+        vertices.push_back(Vec3d(halfWidth, yBot, z));
     }
 
     // Create cells
-    std::vector<SurfaceMesh::TriangleArray> triangles;
+    imstkNew<VecDataArray<int, 3>> trianglesPtr;
+    VecDataArray<int, 3>&          triangles = *trianglesPtr.get();
     // Create sides and tops of steps
-    for (std::size_t i = 0; i < nSteps; ++i)
+    for (int i = 0; i < nSteps; ++i)
     {
         // Stair front side
-        triangles.push_back({ { i* 4 + 3, i* 4 + 1, i* 4 } });
-        triangles.push_back({ { i* 4 + 2, i* 4 + 3, i* 4 } });
+        triangles.push_back(Vec3i(i * 4 + 3, i * 4 + 1, i * 4));
+        triangles.push_back(Vec3i(i * 4 + 2, i * 4 + 3, i * 4));
         // Stair top
-        triangles.push_back({ { (i + 1) * 4, i * 4 + 3, i * 4 + 2 } });
-        triangles.push_back({ { (i + 1) * 4, (i + 1) * 4 + 1, i * 4 + 3 } });
+        triangles.push_back(Vec3i((i + 1) * 4, i * 4 + 3, i * 4 + 2));
+        triangles.push_back(Vec3i((i + 1) * 4, (i + 1) * 4 + 1, i * 4 + 3));
     }
 
     imstkNew<SurfaceMesh> stairMesh;
-    stairMesh->initialize(vertList, triangles);
+    stairMesh->initialize(verticesPtr, trianglesPtr);
     return stairMesh;
 }
 

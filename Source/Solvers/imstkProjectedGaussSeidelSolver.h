@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -33,6 +33,8 @@ public:
     void setA(Eigen::SparseMatrix<Scalar>* A) { this->m_A = A; }
     void setMaxIterations(const unsigned int maxIterations) { this->m_maxIterations = maxIterations; }
     void setRelaxation(const Scalar relaxation) { this->m_relaxation = relaxation; }
+    void setEpsilon(const Scalar epsilon) { this->m_epsilon = epsilon; }
+    const double getEnergy() { return m_conv; } // Get final convergence
 
     Eigen::Matrix<Scalar, -1, 1>& solve(const Eigen::Matrix<Scalar, -1, 1>& b, const Eigen::Matrix<Scalar, -1, 2>& cu)
     {
@@ -41,6 +43,8 @@ public:
         // Allocate new results
         m_x = Eigen::Matrix<Scalar, -1, 1>(b.rows());
         m_x.setZero();
+
+        m_conv = 0.0;
 
         // Naive implementation of PGS
         // Consider graph coloring and TBB parallizing
@@ -70,19 +74,25 @@ public:
             }
 
             // Check convergence
-            if ((m_x - xOld).norm() < 1.0e-4)
+            m_conv = (m_x - xOld).norm();
+            //printf(" %d: %f\n", i, m_conv);
+            if (m_conv < m_epsilon)
             {
+                //printf("Eps: %f\n", conv);
                 return m_x;
             }
         }
 
+        //printf("Eps: %f\n", conv);
         return m_x;
     }
 
 private:
     unsigned int m_maxIterations = 3;
     Scalar       m_relaxation    = static_cast<Scalar>(0.1);
-    Eigen::Matrix<Scalar, -1, 1> m_x; ///> Results
+    Scalar       m_epsilon       = 1.0e-4; ///> Convergence criteria
+    Scalar       m_conv = 0.0;
+    Eigen::Matrix<Scalar, -1, 1> m_x;      ///> Results
     Eigen::SparseMatrix<Scalar>* m_A = nullptr;
 };
 }

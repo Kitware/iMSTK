@@ -21,27 +21,30 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkDataArray;
 class vtkDoubleArray;
 class vtkUnstructuredGrid;
+class vtkCellArray;
 
 namespace imstk
 {
 class TetrahedralMesh;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VTKTetrahedralMeshRenderDelegate
 ///
 /// \brief Tetrahedral mesh render delegate with vtk render backend
 ///
-class VTKTetrahedralMeshRenderDelegate : public VTKRenderDelegate
+class VTKTetrahedralMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -49,13 +52,31 @@ public:
     virtual ~VTKTetrahedralMeshRenderDelegate() override = default;
 
     ///
-    /// \brief Update unstructured grid source based on the tetrahedral mesh
+    /// \brief Process handling of messages recieved
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
+    ///
+    /// \brief Callback when vertices change
+    ///
+    void vertexDataModified(Event* e);
 
-    vtkSmartPointer<vtkDoubleArray>      m_mappedVertexArray; ///> Mapped array of vertices
-    vtkSmartPointer<vtkUnstructuredGrid> m_mesh;              ///> Mapped tetrahedral mesh
+    //void indexDataModified(Event* e);
+
+    ///
+    /// \brief Callback when geometry changes
+    ///
+    void geometryModified(Event* e);
+
+protected:
+    std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+    std::shared_ptr<VecDataArray<int, 4>>    m_indices;
+
+    vtkSmartPointer<vtkUnstructuredGrid> m_mesh;               ///> Mapped tetrahedral mesh
+
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
+    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
+    vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
 } // imstk

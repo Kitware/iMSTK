@@ -37,7 +37,7 @@ public:
     /// \brief Constructor
     ///
     explicit Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
-                   const std::string& name = std::string("")) :
+                   const std::string& name = std::string("defaultPlane")) :
         AnalyticalGeometry(Type::Plane, name)
     {
         setPosition(pos);
@@ -49,11 +49,6 @@ public:
     /// \brief Print the plane info
     ///
     void print() const override;
-
-    ///
-    /// \brief Returns the volume (=0.0) for the plane
-    ///
-    double getVolume() const override;
 
     ///
     /// \brief Returns the normal of the plane

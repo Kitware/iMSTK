@@ -37,7 +37,7 @@ public:
     /// \brief Constructor
     ///
     explicit Cylinder(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const double length = 1.0,
-                      const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0), const std::string& name = std::string("")) :
+                      const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0), const std::string& name = std::string("defaultCylinder")) :
         AnalyticalGeometry(Type::Cylinder, name)
     {
         setPosition(pos);
@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Returns the volume of the cylinder
     ///
-    double getVolume() const override;
+    double getVolume() override { return PI * m_radius * m_radius * m_length; }
 
     ///
     /// \brief Returns the radius of the cylinder
@@ -87,9 +87,9 @@ protected:
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;
 
-    double m_radius = 1.;                      ///> Radius of the cylinder
-    double m_length = 1.;                      ///> Length of the cylinder
-    mutable double m_radiusPostTransform = 1.; ///> Radius of the cylinder oncee transform applied
-    mutable double m_lengthPostTransform = 1.; ///> Length of the cylinder onc transform applied
+    double m_radius = 1.0;                      ///> Radius of the cylinder
+    double m_length = 1.0;                      ///> Length of the cylinder
+    mutable double m_radiusPostTransform = 1.0; ///> Radius of the cylinder oncee transform applied
+    mutable double m_lengthPostTransform = 1.0; ///> Length of the cylinder onc transform applied
 };
 } // imstk

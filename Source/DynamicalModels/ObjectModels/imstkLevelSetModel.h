@@ -37,7 +37,7 @@ struct LevelSetModelConfig
     double m_dt = 0.001;             ///> Time step size
     bool m_sparseUpdate = false;     ///> Only updates nodes that recieve force
     bool m_useCurvature = false;
-    double m_k = 0.2;                // Curvature term
+    double m_k = 0.05;               // Curvature term
     double m_constantVelocity = 0.0; // Constant velocity
 };
 
@@ -71,10 +71,7 @@ public:
     ///
     virtual double getTimeStep() const override { return m_config->m_dt; }
 
-    ///
-    /// \brief Update body states given the newest update and the type of update
-    ///
-    virtual void updateBodyStates(const Vectord& /*q*/, const StateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
+    std::shared_ptr<LevelSetModelConfig> getConfig() const { return m_config; }
 
     ///
     /// \brief Initialize the LevelSet model
@@ -93,6 +90,8 @@ public:
 
     std::shared_ptr<TaskNode> getQuantityEvolveNode(size_t i) const { return m_evolveQuantitiesNodes[i]; }
 
+    std::unordered_map<size_t, std::tuple<Vec3i, double>>& getNodesToUpdate() { return m_nodesToUpdate; }
+
 protected:
     ///
     /// \brief Setup the task graph of the LSM
@@ -106,15 +105,19 @@ protected:
 
     std::shared_ptr<LevelSetModelConfig> m_config;
 
-    std::unordered_map<size_t, std::tuple<Vec3i, double>> nodesToUpdate;
+    std::unordered_map<size_t, std::tuple<Vec3i, double>> m_nodesToUpdate;
 
-    std::shared_ptr<ImageData> gradientMagnitudes = nullptr; ///> Gradient magnitude field when using dense
+    std::shared_ptr<ImageData> m_gradientMagnitudes = nullptr; ///> Gradient magnitude field when using dense
+    std::shared_ptr<ImageData> m_velocities = nullptr;
+    std::shared_ptr<ImageData> m_curvatures = nullptr;
 
     // I'm unable to use the more generic double/floating pt based version
     // suspect floating point error
-    StructuredForwardGradient  forwardGrad;
-    StructuredBackwardGradient backwardGrad;
+    StructuredForwardGradient  m_forwardGrad;
+    StructuredBackwardGradient m_backwardGrad;
     /*ImplicitFunctionForwardGradient  forwardGrad;
     ImplicitFunctionBackwardGradient backwardGrad;*/
+
+    //ImplicitStructuredCurvature m_curvature;
 };
 }

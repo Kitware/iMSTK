@@ -22,14 +22,9 @@
 #include "imstkDecal.h"
 #include "imstkLogger.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
-#include <glm/gtc/matrix_transform.hpp>
-#pragma warning( pop )
-
 namespace imstk
 {
-Decal::Decal(const std::string& name) : m_dimensions(glm::vec3(1)), AnalyticalGeometry(Geometry::Type::Decal, name)
+Decal::Decal(const std::string& name) : m_dimensions(Vec3d(1.0, 1.0, 1.0)), AnalyticalGeometry(Geometry::Type::Decal, name)
 {
 }
 
@@ -37,15 +32,9 @@ void
 Decal::print() const
 {
     Geometry::print();
-    LOG(INFO) << "Dimensions: " << m_dimensions.x
-              << ", " << m_dimensions.y
-              << ", " << m_dimensions.z;
-}
-
-double
-Decal::getVolume() const
-{
-    return (double)m_dimensions.x * (double)m_dimensions.y * (double)m_dimensions.z;
+    LOG(INFO) << "Dimensions: " << m_dimensions[0]
+              << ", " << m_dimensions[1]
+              << ", " << m_dimensions[2];
 }
 
 void
@@ -54,30 +43,12 @@ Decal::applyScaling(const double s)
     m_dimensions *= s;
 }
 
-#pragma warning(push)
-#pragma warning( disable : 4100 )
 void
-Decal::updateDecal(glm::mat4& viewMatrix)
-#pragma warning(pop)
+Decal::updateDecal(Mat4d& imstkNotUsed(viewMatrix))
 {
-    glm::mat4 transform;
+    Mat4d transform = mat4dScale(Vec3d(getScaling(), getScaling(), getScaling()));
+    transform = mat4dRotation(getRotation()) * transform * mat4dTranslate(getPosition());
 
-    glm::vec3 scale((float) this->getScaling());
-    transform = glm::scale(transform, scale);
-
-    auto      rotation = this->getRotation();
-    glm::mat3 rotationMatrix(rotation(0, 0), rotation(0, 1), rotation(0, 2),
-                             rotation(1, 0), rotation(1, 1), rotation(1, 2),
-                             rotation(2, 0), rotation(2, 1), rotation(2, 2));
-
-    transform = glm::mat4(rotationMatrix) * transform;
-
-    transform[3][0] = (float)this->getPosition().x();
-    transform[3][1] = (float)this->getPosition().y();
-    transform[3][2] = (float)this->getPosition().z();
-
-    m_transform = transform;
-
-    m_inverse = glm::inverse(m_transform);
+    m_inverse = transform.inverse();
 }
 }

@@ -37,15 +37,15 @@ namespace expiremental
 struct RigidBody
 {
     public:
-        double m_mass;
-        Mat3d m_intertiaTensor;
+        double m_mass = 1.0;
+        Mat3d m_intertiaTensor = Mat3d::Identity();
         Vec3d m_initPos = Vec3d(0.0, 0.0, 0.0);
-        Quatd m_initOrientation = Quatd(1.0, 0.0, 0.0, 0.0);
-        Vec3d m_initVelocity;
-        Vec3d m_initAngularVelocity;
-        Vec3d m_initForce;
-        Vec3d m_initTorque;
-        bool m_isStatic;
+        Quatd m_initOrientation     = Quatd(1.0, 0.0, 0.0, 0.0);
+        Vec3d m_initVelocity        = Vec3d(0.0, 0.0, 0.0);
+        Vec3d m_initAngularVelocity = Vec3d(0.0, 0.0, 0.0);
+        Vec3d m_initForce  = Vec3d(0.0, 0.0, 0.0);
+        Vec3d m_initTorque = Vec3d(0.0, 0.0, 0.0);
+        bool m_isStatic    = false;
 
         // Vec3d m_externalForce;
         //RigidBodyState2* m_state; // A RigidBody can only belong to one state

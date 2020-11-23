@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkPointSet.h"
+
 #include <array>
 
 namespace imstk
@@ -36,19 +37,17 @@ struct Color;
 class LineMesh : public PointSet
 {
 public:
-
-    using LineArray = std::array<size_t, 2>;
-
     ///
     /// \brief Constructor
     ///
-    LineMesh(const std::string& name = std::string("")) : PointSet(Geometry::Type::LineMesh, name) {}
+    LineMesh(const std::string& name = std::string(""));
 
+public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  line connectivity
     ///
-    void initialize(const StdVectorOfVec3d& vertices, const std::vector<LineArray>& lines);
+    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices, std::shared_ptr<VecDataArray<int, 2>> lines);
 
     ///
     /// \brief
@@ -60,25 +59,27 @@ public:
     ///
     void print() const override;
 
+public:
     ///
-    /// \brief
+    /// \brief Get the number of segments/cells
     ///
-    double getVolume() const override;
+    size_t getNumLines() const;
 
     ///
-    /// \brief
+    /// \brief Set the connectivity of the segments
     ///
-    void setLinesVertices(const std::vector<LineArray>& lines);
+    void setLinesIndices(std::shared_ptr<VecDataArray<int, 2>> lines) { m_segmentIndices = lines; }
 
     ///
-    /// \brief
+    /// \brief Get the connectivity of the segments
     ///
-    size_t getNumLines();
+    std::shared_ptr<VecDataArray<int, 2>> getLinesIndices() const { return m_segmentIndices; }
 
     ///
-    /// \brief
+    /// \brief Get the connectivity of a segment
     ///
-    std::vector<LineArray> getLinesVertices() const;
+    const Vec2i& getLineIndices(const size_t pos) const;
+    Vec2i& getLineIndices(const size_t pos);
 
 private:
     friend class VTKLineMeshRenderDelegate;
@@ -86,6 +87,6 @@ private:
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
 
-    std::vector<LineArray> m_lines;  ///> line connectivity
+    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices; ///> line connectivity
 };
 } // imstk

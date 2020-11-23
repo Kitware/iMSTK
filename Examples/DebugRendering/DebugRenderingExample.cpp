@@ -161,7 +161,7 @@ main()
             // Must call to update render data
             for (auto& delegate : renderer->getDebugRenderDelegates())
             {
-                delegate->updateDataSource();
+                delegate->processEvents();
             }
 
             statusManager->setCustomStatus("Primatives: " +

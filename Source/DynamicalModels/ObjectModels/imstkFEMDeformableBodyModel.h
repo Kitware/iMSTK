@@ -39,6 +39,7 @@ class InternalForceModel;
 class TimeIntegrator;
 class SolverBase;
 class VegaMeshIO;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \strut FEMModelConfig
@@ -199,7 +200,7 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType) override;
+    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType);
     void updateBodyIntermediateStates(const Vectord& solution, const StateUpdateType updateType);
 
     ///

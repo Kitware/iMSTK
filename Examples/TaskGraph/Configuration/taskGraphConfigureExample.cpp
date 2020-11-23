@@ -1,26 +1,27 @@
 /*=========================================================================
 
-   Library: iMSTK
+  Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+  Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+  & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+     http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
 =========================================================================*/
 
 #include "imstkCamera.h"
 #include "imstkColorFunction.h"
+#include "imstkDataArray.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
@@ -44,51 +45,47 @@ makeClothGeometry(
     const double width, const double height, const int nRows, const int nCols)
 {
     // Create surface mesh
-    imstkNew<SurfaceMesh> clothMesh;
-    StdVectorOfVec3d      vertList;
+    imstkNew<SurfaceMesh>             clothMesh;
+    imstkNew<VecDataArray<double, 3>> verticesPtr;
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
 
-    vertList.resize(nRows * nCols);
+    vertices.resize(nRows * nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
-            vertList[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
+            vertices[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
         }
     }
-    clothMesh->setInitialVertexPositions(vertList);
-    clothMesh->setVertexPositions(vertList);
 
     // Add connectivity data
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    for (std::size_t i = 0; i < nRows - 1; ++i)
+    imstkNew<VecDataArray<int, 3>> trianglesPtr;
+    VecDataArray<int, 3>&          triangles = *trianglesPtr.get();
+    for (int i = 0; i < nRows - 1; ++i)
     {
-        for (std::size_t j = 0; j < nCols - 1; j++)
+        for (int j = 0; j < nCols - 1; j++)
         {
-            SurfaceMesh::TriangleArray tri[2];
-            const size_t               index1 = i * nCols + j;
-            const size_t               index2 = index1 + nCols;
-            const size_t               index3 = index1 + 1;
-            const size_t               index4 = index2 + 1;
+            const int index1 = i * nCols + j;
+            const int index2 = index1 + nCols;
+            const int index3 = index1 + 1;
+            const int index4 = index2 + 1;
 
             // Interleave [/][\]
             if (i % 2 ^ j % 2)
             {
-                tri[0] = { { index1, index2, index3 } };
-                tri[1] = { { index4, index3, index2 } };
+                triangles.push_back(Vec3i(index1, index2, index3));
+                triangles.push_back(Vec3i(index4, index3, index2));
             }
             else
             {
-                tri[0] = { { index2, index4, index1 } };
-                tri[1] = { { index4, index3, index1 } };
+                triangles.push_back(Vec3i(index2, index4, index1));
+                triangles.push_back(Vec3i(index4, index3, index1));
             }
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
         }
     }
-
-    clothMesh->setTrianglesVertices(triangles);
+    clothMesh->initialize(verticesPtr, trianglesPtr);
 
     return clothMesh;
 }
@@ -157,9 +154,9 @@ main()
     {
         // Setup some scalars
         auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
-        auto scalarsPtr    = std::make_shared<StdVectorOfReal>(clothGeometry->getNumVertices());
-        std::fill_n(scalarsPtr->data(), scalarsPtr->size(), 0.0);
-        clothGeometry->setScalars(scalarsPtr);
+        auto scalarsPtr    = std::make_shared<DataArray<double>>(static_cast<int>(clothGeometry->getNumVertices()));
+        std::fill_n(scalarsPtr->getPointer(), scalarsPtr->size(), 0.0);
+        clothGeometry->setVertexScalars("scalars", scalarsPtr);
 
         // Setup the material for the scalars
         std::shared_ptr<RenderMaterial> material = clothObj->getVisualModel(0)->getRenderMaterial();
@@ -196,8 +193,8 @@ main()
                 {
                     scalars[i] = (currPos[i] - initPos[i]).norm();
                 }*/
-                const StdVectorOfVec3d& velocities = *pbdModel->getCurrentState()->getVelocities();
-                StdVectorOfReal& scalars = *scalarsPtr;
+                const VecDataArray<double, 3>& velocities = *pbdModel->getCurrentState()->getVelocities();
+                DataArray<double>& scalars = *scalarsPtr;
                 for (size_t i = 0; i < velocities.size(); i++)
                 {
                     scalars[i] = velocities[i].norm();

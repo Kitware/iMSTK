@@ -20,18 +20,19 @@
 =========================================================================*/
 
 #include "imstkHexahedralMesh.h"
-#include "imstkSurfaceMesh.h"
 #include "imstkLogger.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
 void
-HexahedralMesh::initialize(const StdVectorOfVec3d&       vertices,
-                           const std::vector<HexaArray>& hexahedra,
-                           bool                          computeAttachedSurfaceMesh)
+HexahedralMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
+                           std::shared_ptr<VecDataArray<int, 8>> hexahedra,
+                           bool computeAttachedSurfaceMesh)
 {
     PointSet::initialize(vertices);
-    this->setHexahedraVertices(hexahedra);
+    this->setHexahedraIndices(hexahedra);
 
     if (computeAttachedSurfaceMesh)
     {
@@ -43,7 +44,7 @@ void
 HexahedralMesh::clear()
 {
     PointSet::clear();
-    m_hexahedraVertices.clear();
+    m_hexahedraIndices->clear();
 }
 
 void
@@ -53,27 +54,28 @@ HexahedralMesh::print() const
 
     LOG(INFO) << "Number of Hexahedra: " << this->getNumHexahedra();
     LOG(INFO) << "Hexahedra:";
-    for (auto& hex : m_hexahedraVertices)
+    for (auto& hex : *m_hexahedraIndices)
     {
-        LOG(INFO) << hex.at(0) << ", " << hex.at(1) << ", "
-                  << hex.at(2) << ", " << hex.at(3) << ", "
-                  << hex.at(4) << ", " << hex.at(5) << ", "
-                  << hex.at(6) << ", " << hex.at(7);
+        LOG(INFO) << hex[0] << ", " << hex[1] << ", "
+                  << hex[2] << ", " << hex[3] << ", "
+                  << hex[4] << ", " << hex[5] << ", "
+                  << hex[6] << ", " << hex[7];
     }
 }
 
 double
-HexahedralMesh::getVolume() const
+HexahedralMesh::getVolume()
 {
-    Vec3d  v[8];
-    Mat3d  A;
-    Vec3d  a, b, c;
-    double volume = 0.0;
-    for (const HexaArray& hexArray : m_hexahedraVertices)
+    Vec3d                          v[8];
+    Mat3d                          A;
+    Vec3d                          a, b, c;
+    double                         volume   = 0.0;
+    const VecDataArray<double, 3>& vertices = *m_vertexPositions;
+    for (const Vec8i& hexArray : *m_hexahedraIndices)
     {
         for (int i = 0; i < 8; ++i)
         {
-            v[i] = m_vertexPositions[hexArray[i]];
+            v[i] = vertices[hexArray[i]];
         }
 
         a = v[7] - v[0];
@@ -105,7 +107,7 @@ HexahedralMesh::getVolume() const
         volume += A.determinant();
     }
 
-    return volume / 6;
+    return volume / 6.0;
 }
 
 void
@@ -125,27 +127,15 @@ HexahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     return false;
 }
 
-void
-HexahedralMesh::setHexahedraVertices(const std::vector<HexaArray>& hexahedra)
+const Vec8i&
+HexahedralMesh::getHexahedronIndices(const int hexaNum) const
 {
-    m_hexahedraVertices = hexahedra;
-}
-
-const std::vector<HexahedralMesh::HexaArray>&
-HexahedralMesh::getHexahedraVertices() const
-{
-    return m_hexahedraVertices;
-}
-
-const HexahedralMesh::HexaArray&
-HexahedralMesh::getHexahedronVertices(const int& hexaNum) const
-{
-    return m_hexahedraVertices.at(hexaNum);
+    return (*m_hexahedraIndices)[hexaNum];
 }
 
 size_t
 HexahedralMesh::getNumHexahedra() const
 {
-    return m_hexahedraVertices.size();
+    return m_hexahedraIndices->size();
 }
 } // imstk

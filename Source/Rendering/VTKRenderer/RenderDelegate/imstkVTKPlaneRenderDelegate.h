@@ -21,20 +21,16 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
-
-class vtkTransformPolyDataFilter;
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 namespace imstk
 {
-class Plane;
-
 ///
 /// \class VTKPlaneRenderDelegate
 ///
 /// \brief Plane object render delegate
 ///
-class VTKPlaneRenderDelegate : public VTKRenderDelegate
+class VTKPlaneRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
@@ -50,10 +46,6 @@ public:
     ///
     /// \brief Update plane source based on the plane geometry
     ///
-    void updateDataSource() override;
-
-protected:
-
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
+    void processEvents() override;
 };
 } // imstk

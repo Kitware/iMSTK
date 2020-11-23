@@ -48,15 +48,15 @@ using namespace imstk;
  #define DEBUG_RENDER_OCTREE
 
 // Load pre-computed mesh data (vertex positions and triangle faces)
-std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getTriangle();
-std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getBox();
-std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getSphere();
-std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getBunny();
+std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getTriangle();
+std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getBox();
+std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getSphere();
+std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getBunny();
 
-static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_TriangleData = getTriangle();
-static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BoxData      = getBox();
-static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_SphereData   = getSphere();
-static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyData    = getBunny();
+static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> g_TriangleData = getTriangle();
+static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> g_BoxData      = getBox();
+static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> g_SphereData   = getSphere();
+static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> g_BunnyData    = getBunny();
 
 // Set MESH_DATA to 1 out of 4 data variables above
 #define MESH_DATA g_BunnyData
@@ -69,8 +69,10 @@ createMeshObject(const std::string& objectName,
                  Color              color)
 {
     // Create a surface mesh
-    imstkNew<SurfaceMesh> meshObj(objectName);
-    meshObj->initialize(MESH_DATA.first, MESH_DATA.second);
+    imstkNew<SurfaceMesh>                    meshObj(objectName);
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = std::make_shared<VecDataArray<double, 3>>(*MESH_DATA.first);
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = std::make_shared<VecDataArray<int, 3>>(*MESH_DATA.second);
+    meshObj->initialize(verticesPtr, indicesPtr);
 
     // Create a visiual model
     imstkNew<VisualModel>    visualModel(meshObj.get());
@@ -104,8 +106,9 @@ addPointsDebugRendering(const std::shared_ptr<Scene>& scene)
     imstkNew<DebugRenderPoints> debugPoints("Debug Points");
     imstkNew<RenderMaterial>    material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    material->setVertexColor(Color::Yellow);
+    material->setColor(Color::Yellow);
     material->setPointSize(8.0);
+    material->setRenderPointsAsSpheres(true);
 
     imstkNew<VisualModel> dbgViz(debugPoints.get(), material);
     scene->addDebugVisualModel(dbgViz);
@@ -122,7 +125,7 @@ addVTConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     imstkNew<DebugRenderLines> debugLines("Debug Connecting VT Lines");
     imstkNew<RenderMaterial>   material;
     material->setBackFaceCulling(false);
-    material->setEdgeColor(Color::Green);
+    material->setColor(Color::Green);
     material->setLineWidth(4.0);
 
     imstkNew<VisualModel> dbgViz(debugLines.get(), material);
@@ -140,7 +143,7 @@ addEEConnectingLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     imstkNew<DebugRenderLines> debugLines("Debug Connecting EE Lines");
     imstkNew<RenderMaterial>   material;
     material->setBackFaceCulling(false);
-    material->setEdgeColor(Color::Red);
+    material->setColor(Color::Red);
     material->setLineWidth(4.0);
 
     imstkNew<VisualModel> dbgViz(debugLines.get(), material);
@@ -158,7 +161,7 @@ addHighlightedLinesDebugRendering(const std::shared_ptr<Scene>& scene)
     imstkNew<DebugRenderLines> debugLines("Debug Highlighted Lines");
     imstkNew<RenderMaterial>   material;
     material->setBackFaceCulling(false);
-    material->setEdgeColor(Color::Orange);
+    material->setColor(Color::Orange);
     material->setLineWidth(8.0);
 
     imstkNew<VisualModel> dbgViz(debugLines.get(), material);
@@ -225,7 +228,7 @@ main()
     // Compute the scale factor to scale meshes such that meshes with different sizes are still visualized consistently
     Vec3d      lowerCorner, upperCorner;
     const auto pointset = std::dynamic_pointer_cast<PointSet>(triMeshes.front());
-    ParallelUtils::findAABB(pointset->getVertexPositions(), lowerCorner, upperCorner);
+    ParallelUtils::findAABB(*pointset->getVertexPositions(), lowerCorner, upperCorner);
     const auto scaleFactor = 20.0 / (upperCorner - lowerCorner).norm();
     for (const auto& obj: triMeshes)
     {
@@ -271,16 +274,16 @@ main()
 
     imstkNew<RenderMaterial> matDbgViz;
     matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    matDbgViz->setEdgeColor(Color::Green);
+    matDbgViz->setColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
     imstkNew<VisualModel> octreeVizDbgModel(debugOctree, matDbgViz);
     scene->addDebugVisualModel(octreeVizDbgModel);
 #endif
 
     // Helper variables for animation
-    const double     translation = 10.0;
-    StdVectorOfVec3d centers;
-    StdVectorOfVec3d dirs;
+    const double            translation = 10.0;
+    VecDataArray<double, 3> centers;
+    VecDataArray<double, 3> dirs;
     for (unsigned int i = 0; i < NUM_MESHES; ++i)
     {
         centers.push_back(Vec3d(translation, 0, 0));
@@ -376,7 +379,7 @@ main()
                                       const auto v  = mesh1->getVertexPosition(tv.vertexIdx);
                                       debugPoints->appendVertex(v);
 
-                                      const auto face = mesh2->getTrianglesVertices()[tv.triIdx];
+                                      const auto face = mesh2->getTriangleIndices(tv.triIdx);
                                       const auto tv0  = mesh2->getVertexPosition(face[0]);
                                       const auto tv1  = mesh2->getVertexPosition(face[1]);
                                       const auto tv2  = mesh2->getVertexPosition(face[2]);
@@ -443,7 +446,7 @@ main()
                           // Update debug rendering data
                           for (auto& delegate : ren->getDebugRenderDelegates())
                           {
-                              delegate->updateDataSource();
+                              delegate->processEvents();
                           }
 
                           std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -483,7 +486,7 @@ main()
             viewer->addControl(keyControl);
 
             // Add an extra control
-            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyPress,
+            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
                 [&](KeyPressEvent* e)
             {
                 if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)

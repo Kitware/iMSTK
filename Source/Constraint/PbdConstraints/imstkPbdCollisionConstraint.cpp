@@ -30,14 +30,14 @@ PbdCollisionConstraint::PbdCollisionConstraint(const unsigned int& n1, const uns
 }
 
 void
-PbdCollisionConstraint::projectConstraint(const StdVectorOfReal& invMassA,
-                                          const StdVectorOfReal& invMassB,
-                                          StdVectorOfVec3d&      posA,
-                                          StdVectorOfVec3d&      posB)
+PbdCollisionConstraint::projectConstraint(const DataArray<double>& invMassA,
+                                          const DataArray<double>& invMassB,
+                                          VecDataArray<double, 3>& posA,
+                                          VecDataArray<double, 3>& posB)
 {
-    double           c;
-    StdVectorOfVec3d dcdxA;
-    StdVectorOfVec3d dcdxB;
+    double                  c;
+    VecDataArray<double, 3> dcdxA;
+    VecDataArray<double, 3> dcdxB;
 
     bool update = this->computeValueAndGradient(posA, posB, c, dcdxA, dcdxB);
     if (!update)

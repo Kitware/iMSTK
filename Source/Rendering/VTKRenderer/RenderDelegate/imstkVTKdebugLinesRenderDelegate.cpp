@@ -24,20 +24,18 @@
 #include "imstkVisualModel.h"
 
 #include <thread>
+#include <vtkActor.h>
 #include <vtkDoubleArray.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLVertexBufferObject.h>
 #include <vtkPolyData.h>
 #include <vtkTrivialProducer.h>
 
 namespace imstk
 {
-VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_visualModel = visualModel;
-
-    // assert that the visual model has debug lines
-    //auto dbgLines = std::static_pointer_cast<DebugRenderLines>(m_visualModel->getGeometry());
-
     // Map vertices
     m_mappedVertexArray->SetNumberOfComponents(3);
 
@@ -53,19 +51,26 @@ VTKdbgLinesRenderDelegate::VTKdbgLinesRenderDelegate(std::shared_ptr<VisualModel
     m_polyData->SetPoints(m_points);
     m_polyData->SetLines(m_cellArray);
 
-    // Create connection source
-    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(m_polyData);
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputData(m_polyData);
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        //actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        {
+            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+        }
+    }
 
-    // Update Transform, Render Properties
-    updateActorProperties();
-    setUpMapper(source->GetOutputPort(), visualModel);
-
-    updateDataSource();
+    updateRenderProperties();
 }
 
 void
-VTKdbgLinesRenderDelegate::updateDataSource()
+VTKdbgLinesRenderDelegate::processEvents()
 {
     auto dbgLines = std::static_pointer_cast<DebugRenderLines>(m_visualModel->getDebugGeometry());
 

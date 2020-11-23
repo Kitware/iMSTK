@@ -23,17 +23,18 @@
 #include "imstkDebugRenderGeometry.h"
 #include "imstkVisualModel.h"
 
-#include <vtkVertexGlyphFilter.h>
-#include <vtkDoubleArray.h>
 #include <thread>
+#include <vtkActor.h>
+#include <vtkDoubleArray.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLVertexBufferObject.h>
+#include <vtkVertexGlyphFilter.h>
 
 namespace imstk
 {
-VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_visualModel = visualModel;
-
     // Map vertices
     m_mappedVertexArray->SetNumberOfComponents(3);
 
@@ -49,18 +50,26 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualMod
     glyphFilter->SetInputData(m_polyData);
     glyphFilter->Update();
 
-    // Update Transform, Render Properties
-    updateActorProperties();
-    setUpMapper(glyphFilter->GetOutputPort(), m_visualModel);
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputConnection(glyphFilter->GetOutputPort());
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        //actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        {
+            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+        }
+    }
 
-    m_isMesh = true;
-    m_modelIsVolume = false;
-
-    updateDataSource();
+    updateRenderProperties();
 }
 
 void
-VTKdbgPointsRenderDelegate::updateDataSource()
+VTKdbgPointsRenderDelegate::processEvents()
 {
     auto dbgPoints = std::static_pointer_cast<DebugRenderPoints>(m_visualModel->getDebugGeometry());
 

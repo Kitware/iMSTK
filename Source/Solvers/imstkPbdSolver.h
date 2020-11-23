@@ -34,18 +34,18 @@ class PbdCollisionConstraint;
 ///
 struct CollisionConstraintData
 {
-    CollisionConstraintData(std::shared_ptr<StdVectorOfVec3d> posA,
-                            std::shared_ptr<StdVectorOfReal>  invMassA,
-                            std::shared_ptr<StdVectorOfVec3d> posB,
-                            std::shared_ptr<StdVectorOfReal>  invMassB) :
+    CollisionConstraintData(std::shared_ptr<VecDataArray<double, 3>> posA,
+                            std::shared_ptr<DataArray<double>> invMassA,
+                            std::shared_ptr<VecDataArray<double, 3>> posB,
+                            std::shared_ptr<DataArray<double>> invMassB) :
         m_posA(posA), m_invMassA(invMassA), m_posB(posB), m_invMassB(invMassB)
     {
     }
 
-    std::shared_ptr<StdVectorOfVec3d> m_posA    = nullptr;
-    std::shared_ptr<StdVectorOfReal> m_invMassA = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_posB    = nullptr;
-    std::shared_ptr<StdVectorOfReal> m_invMassB = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_posA = nullptr;
+    std::shared_ptr<DataArray<double>> m_invMassA   = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_posB = nullptr;
+    std::shared_ptr<DataArray<double>> m_invMassB   = nullptr;
 };
 
 ///
@@ -85,12 +85,12 @@ public:
     ///
     /// \brief Sets the positions the solver should solve with
     ///
-    void setPositions(std::shared_ptr<StdVectorOfVec3d> positions) { this->m_positions = positions; }
+    void setPositions(std::shared_ptr<VecDataArray<double, 3>> positions) { this->m_positions = positions; }
 
     ///
     /// \brief Sets the invMasses the solver should solve with
     ///
-    void setInvMasses(std::shared_ptr<StdVectorOfReal> invMasses) { this->m_invMasses = invMasses; }
+    void setInvMasses(std::shared_ptr<DataArray<double>> invMasses) { this->m_invMasses = invMasses; }
 
     ///
     /// \brief Set time step
@@ -119,8 +119,8 @@ private:
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> Set of vector'd/partitioned pbd constraints
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> Vector of constraints
 
-    std::shared_ptr<StdVectorOfVec3d> m_positions = nullptr;
-    std::shared_ptr<StdVectorOfReal>  m_invMasses = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_positions = nullptr;
+    std::shared_ptr<DataArray<double>>       m_invMasses = nullptr;
     PbdConstraint::SolverType m_solverType = PbdConstraint::SolverType::xPBD;
 };
 
@@ -146,8 +146,8 @@ public:
     /// \brief Add the global collision contraints to this solver
     ///
     void addCollisionConstraints(std::vector<PbdCollisionConstraint*>* constraints,
-                                 std::shared_ptr<StdVectorOfVec3d> posA, std::shared_ptr<StdVectorOfReal> invMassA,
-                                 std::shared_ptr<StdVectorOfVec3d> posB, std::shared_ptr<StdVectorOfReal> invMassB);
+                                 std::shared_ptr<VecDataArray<double, 3>> posA, std::shared_ptr<DataArray<double>> invMassA,
+                                 std::shared_ptr<VecDataArray<double, 3>> posB, std::shared_ptr<DataArray<double>> invMassB);
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.

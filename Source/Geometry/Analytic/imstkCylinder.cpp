@@ -33,12 +33,6 @@ Cylinder::print() const
 }
 
 double
-Cylinder::getVolume() const
-{
-    return PI * m_radius * m_radius * m_length;
-}
-
-double
 Cylinder::getRadius(DataType type /* = DataType::PostTransform */)
 {
     if (type == DataType::PostTransform)
@@ -97,6 +91,7 @@ Cylinder::applyScaling(const double s)
 {
     this->setRadius(m_radius * s);
     this->setLength(m_length * s);
+    this->modified();
 }
 
 void

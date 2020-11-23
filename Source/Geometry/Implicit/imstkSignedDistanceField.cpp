@@ -82,7 +82,7 @@ trilinearSample(const Vec3d& structuredPt, T* imgPtr, const Vec3i& dim, const in
 
 SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name) :
     ImplicitGeometry(Type::SignedDistanceField, name),
-    m_imageDataSdf(imageData)
+    m_imageDataSdf(imageData), m_scale(1.0)
 {
     m_invSpacing = m_imageDataSdf->getInvSpacing();
     m_bounds     = m_imageDataSdf->getBounds();
@@ -95,20 +95,40 @@ SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, s
     }
 
     m_scalars = std::dynamic_pointer_cast<DataArray<double>>(m_imageDataSdf->getScalars());
+
+    // \todo: Verify the SDF distances
 }
 
 double
 SignedDistanceField::getFunctionValue(const Vec3d& pos) const
 {
     // origin at center of first voxel
-    const Vec3d structuredPt = (pos - m_shift).cwiseProduct(m_invSpacing);
-    return trilinearSample(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), 1, 0);
+    if (pos[0] < m_bounds[1] && pos[0] > m_bounds[0]
+        && pos[1] < m_bounds[3] && pos[1] > m_bounds[2]
+        && pos[2] < m_bounds[5] && pos[2] > m_bounds[4])
+    {
+        const Vec3d structuredPt = (pos - m_shift).cwiseProduct(m_invSpacing);
+        return trilinearSample(structuredPt, m_scalars->getPointer(), m_imageDataSdf->getDimensions(), 1, 0) * m_scale;
+    }
+    else
+    {
+        return std::numeric_limits<double>::min();
+    }
 }
 
 double
 SignedDistanceField::getFunctionValueCoord(const Vec3i& coord) const
 {
-    const Vec3i clampedCoord = coord.cwiseMin(m_imageDataSdf->getDimensions() - Vec3i(1, 1, 1)).cwiseMax(0);
-    return (*m_scalars)[m_imageDataSdf->getScalarIndex(clampedCoord)];
+    if (coord[0] < m_imageDataSdf->getDimensions()[0] && coord[0] > 0
+        && coord[1] < m_imageDataSdf->getDimensions()[1] && coord[1] > 0
+        && coord[2] < m_imageDataSdf->getDimensions()[2] && coord[2] > 0)
+    {
+        const Vec3i clampedCoord = coord.cwiseMin(m_imageDataSdf->getDimensions() - Vec3i(1, 1, 1)).cwiseMax(0);
+        return (*m_scalars)[m_imageDataSdf->getScalarIndex(clampedCoord)] * m_scale;
+    }
+    else
+    {
+        return std::numeric_limits<double>::min();
+    }
 }
 }

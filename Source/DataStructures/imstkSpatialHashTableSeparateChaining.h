@@ -23,6 +23,7 @@
 
 #include "imstkSpatialHashTable.h"
 #include "imstkMath.h"
+#include "imstkVecDataArray.h"
 
 #include <unordered_set>
 
@@ -96,7 +97,7 @@ public:
     /// \brief Insert an array of points
     /// \param points An array of point
     ///
-    void insertPoints(const StdVectorOfVec3d& points);
+    void insertPoints(const VecDataArray<double, 3>& points);
 
     ///
     /// \brief Insert an array of points

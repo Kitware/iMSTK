@@ -21,26 +21,31 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkCellArray;
+class vtkDataArray;
 class vtkDoubleArray;
+class vtkFloatArray;
+class vtkUnstructuredGrid;
 
 namespace imstk
 {
 class HexahedralMesh;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VTKHexahedralMeshRenderDelegate
 ///
 /// \brief Hexahedral mesh render delegate with VTK backend
 ///
-class VTKHexahedralMeshRenderDelegate : public VTKRenderDelegate
+class VTKHexahedralMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKHexahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -48,12 +53,22 @@ public:
     virtual ~VTKHexahedralMeshRenderDelegate() override = default;
 
     ///
-    /// \brief Update unstructured grid source based on the hexahedral mesh
+    /// \brief Process Events
     ///
-    void updateDataSource() override;
+    void processEvents() override;
+
+    void geometryModified(Event* e);
+
+    void vertexDataModified(Event* e);
 
 protected:
+    std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+    std::shared_ptr<VecDataArray<int, 8>>    m_indices;
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    vtkSmartPointer<vtkUnstructuredGrid> m_mesh;
+
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
+    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
+    vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
 } // imstk

@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 class vtkDoubleArray;
 class vtkPoints;
@@ -36,7 +36,7 @@ namespace imstk
 /// \brief Render delegate for a set of disjoint points whose size could change
 ///  more frequently which is typically he case for rendering arbitrary set of points
 ///
-class VTKdbgPointsRenderDelegate : public VTKRenderDelegate
+class VTKdbgPointsRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Update polydata source based on the surface mesh geometry
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
 

@@ -202,8 +202,9 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
     const double dy = width / static_cast<double>(nCols - 1);
     const double dx = height / static_cast<double>(nRows - 1);
 
-    StdVectorOfVec3d vertList;
-    vertList.resize(nRows * nCols);
+    imstkNew<VecDataArray<double, 3>> verticesPtr;
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
+    vertices.resize(nRows * nCols);
 
     for (size_t i = 0; i < nRows; ++i)
     {
@@ -211,25 +212,23 @@ createUniformSurfaceMesh(const double width, const double height, const size_t n
         {
             const double y = static_cast<double>(dy * j);
             const double x = static_cast<double>(dx * i);
-            vertList[i * nCols + j] = Vec3d(x - height * 0.5, -10.0, y - width * 0.5);
+            vertices[i * nCols + j] = Vec3d(x - height * 0.5, -10.0, y - width * 0.5);
         }
     }
 
     // c. Add connectivity data
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    for (std::size_t i = 0; i < nRows - 1; ++i)
+    imstkNew<VecDataArray<int, 3>> trianglesPtr;
+    VecDataArray<int, 3>&          triangles = *trianglesPtr.get();
+    for (int i = 0; i < nRows - 1; ++i)
     {
-        for (std::size_t j = 0; j < nCols - 1; j++)
+        for (int j = 0; j < nCols - 1; j++)
         {
-            SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
+            triangles.push_back(Vec3i(i * nCols + j, i * nCols + j + 1, (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1));
         }
     }
 
     imstkNew<SurfaceMesh> surfMesh;
-    surfMesh->initialize(vertList, triangles);
+    surfMesh->initialize(verticesPtr, trianglesPtr);
     return surfMesh;
 }

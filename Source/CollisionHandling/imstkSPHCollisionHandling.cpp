@@ -49,12 +49,14 @@ SPHCollisionHandling::processCollisionData()
         << "Invalid boundary friction coefficient (value must be in [0, 1])";
 #endif
 
-    SPHSimulationState&                   state = SPHModel->getState();
+    SPHState&                             state = *SPHModel->getCurrentState();
+    VecDataArray<double, 3>&              positions = *state.getPositions();
+    VecDataArray<double, 3>&              velocities = *state.getVelocities();
     std::function<void(uint32_t, Vec3d&)> solve =
         [&](const uint32_t pidx, const Vec3d& penetrationVector)
         {
             // Correct particle position
-            state.getPositions()[pidx] -= penetrationVector;
+            positions[pidx] -= penetrationVector;
 
             const auto nLengthSqr = penetrationVector.squaredNorm();
             if (nLengthSqr < Real(1e-20)) // Normalize n
@@ -64,7 +66,7 @@ SPHCollisionHandling::processCollisionData()
             const Vec3d n = penetrationVector / std::sqrt(nLengthSqr);
 
             // Correct particle velocity: slip boundary condition with friction
-            const Vec3d& oldVel = state.getVelocities()[pidx];
+            const Vec3d& oldVel = velocities[pidx];
             const double vn     = oldVel.dot(n);
 
             // If particle is escaping the boundary, ignore it
@@ -86,7 +88,7 @@ SPHCollisionHandling::processCollisionData()
                     }
                 }
 
-                state.getVelocities()[pidx] = correctedVel;
+                velocities[pidx] = correctedVel;
             }
         };
 

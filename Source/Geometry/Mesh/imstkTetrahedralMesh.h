@@ -36,10 +36,9 @@ class SurfaceMesh;
 class TetrahedralMesh : public VolumetricMesh
 {
 public:
-
-    using TetraArray   = std::array<size_t, 4>;
     using WeightsArray = std::array<double, 4>;
 
+public:
     ///
     /// \brief Constructor
     ///
@@ -49,9 +48,9 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  tetrahedra connectivity
     ///
-    void initialize(const StdVectorOfVec3d&        vertices,
-                    const std::vector<TetraArray>& tetrahedra,
-                    bool                           computeAttachedSurfaceMesh = false);
+    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
+                    std::shared_ptr<VecDataArray<int, 4>> tetrahedra,
+                    bool computeAttachedSurfaceMesh = false);
 
     ///
     /// \brief Clear all the mesh data
@@ -62,11 +61,6 @@ public:
     /// \brief Print the tetrahedral mesh
     ///
     void print() const override;
-
-    ///
-    /// \brief Compute and return the volume of the tetrahedral mesh
-    ///
-    double getVolume() const override;
 
     ///
     /// \brief Compute and set the attached surface mesh
@@ -92,22 +86,23 @@ public:
     ///
     void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
 
-    // Accessors
-
+// Accessors
+public:
     ///
     /// \brief set the vector of array of IDs for the mesh
     ///
-    void setTetrahedraVertices(const std::vector<TetraArray>& tetrahedrons);
+    void setTetrahedraIndices(std::shared_ptr<VecDataArray<int, 4>> indices) { m_tetrahedraIndices = indices; }
 
     ///
     /// \brief Return the vector of array of IDs for all the tetrahedra
     ///
-    const std::vector<TetraArray>& getTetrahedraVertices() const;
+    std::shared_ptr<VecDataArray<int, 4>> getTetrahedraIndices() const { return m_tetrahedraIndices; }
 
     ///
     /// \brief Return the array of IDs for a given tetrahedron
     ///
-    const TetraArray& getTetrahedronVertices(const size_t& tetId) const;
+    const Vec4i& getTetrahedronIndices(const size_t tetId) const;
+    Vec4i& getTetrahedronIndices(const size_t tetId);
 
     ///
     /// \brief Returns the number of tetrahedra
@@ -120,11 +115,15 @@ public:
     void setTetrahedraAsRemoved(const unsigned int tetId) { m_removedMeshElems[tetId] = true; }
     const std::vector<bool>& getRemovedTetrahedra() const { return m_removedMeshElems; }
 
-protected:
+    ///
+    /// \brief Compute and return the volume of the tetrahedral mesh
+    ///
+    double getVolume() override;
 
+protected:
     friend class VTKTetrahedralMeshRenderDelegate;
 
-    std::vector<TetraArray> m_tetrahedraVertices;///< vertices of the tetrahedra
+    std::shared_ptr<VecDataArray<int, 4>> m_tetrahedraIndices;
 
     std::vector<bool> m_removedMeshElems;
 };

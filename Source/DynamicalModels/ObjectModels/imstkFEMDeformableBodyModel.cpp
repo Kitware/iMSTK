@@ -26,12 +26,14 @@
 #include "imstkLinearFEMForceModel.h"
 #include "imstkLogger.h"
 #include "imstkNewtonSolver.h"
+#include "imstkPointSet.h"
 #include "imstkStVKForceModel.h"
 #include "imstkTaskGraph.h"
 #include "imstkTimeIntegrator.h"
+#include "imstkTypes.h"
+#include "imstkVecDataArray.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkVolumetricMesh.h"
-#include "imstkTypes.h"
 
 #include <generateMassMatrix.h>
 #include <generateMeshGraph.h>
@@ -158,6 +160,13 @@ FEMDeformableBodyModel::initialize()
 {
     // prerequisite of for successfully initializing
     CHECK(m_geometry != nullptr && m_FEModelConfig != nullptr) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(m_geometry);
+    // If there isn't already a displacements array for the geometry
+    if (!pointSet->hasVertexAttribute("displacements"))
+    {
+        int test = pointSet->getNumVertices();
+        pointSet->setVertexAttribute("displacements", std::make_shared<VecDataArray<double, 3>>(test));
+    }
 
     // Setup default solver if model doesn't yet have one
     if (m_solver == nullptr)
@@ -626,12 +635,24 @@ FEMDeformableBodyModel::updateMassMatrix()
     // Do nothing for now as topology changes are not supported yet!
 }
 
+static int testing = 0;
+
 void
 FEMDeformableBodyModel::updatePhysicsGeometry()
 {
-    auto  volMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
-    auto& u       = m_currentState->getQ();
-    volMesh->setVertexDisplacements(u);
+    auto                                     volMesh = std::static_pointer_cast<VolumetricMesh>(m_geometry);
+    auto&                                    u       = m_currentState->getQ();
+    std::shared_ptr<VecDataArray<double, 3>> displacementsPtr =
+        std::dynamic_pointer_cast<VecDataArray<double, 3>>(volMesh->getVertexAttribute("displacements"));
+    std::copy_n(u.data(), displacementsPtr->size() * 3, reinterpret_cast<double*>(displacementsPtr->getVoidPointer()));
+
+    const VecDataArray<double, 3>& initPositions = *volMesh->getVertexPositions(Geometry::DataType::PreTransform);
+    VecDataArray<double, 3>&       positions     = *volMesh->getVertexPositions();
+    const VecDataArray<double, 3>& displacements = *displacementsPtr;
+    for (int i = 0; i < displacementsPtr->size(); i++)
+    {
+        positions[i] = initPositions[i] + displacements[i];
+    }
 }
 
 void

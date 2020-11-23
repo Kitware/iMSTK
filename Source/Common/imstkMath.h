@@ -79,12 +79,17 @@ using StdVectorOfVec3d = std::vector<Vec3d, Eigen::aligned_allocator<Vec3d>>;
 // 4D vector
 using Vec4f = Eigen::Vector4f;
 using Vec4d = Eigen::Vector4d;
+using Vec4i = Eigen::Matrix<int, 4, 1>;
 using StdVectorOfVec4f = std::vector<Vec4f, Eigen::aligned_allocator<Vec4f>>;
 using StdVectorOfVec4d = std::vector<Vec4d, Eigen::aligned_allocator<Vec4d>>;
 
 // 6D vector
 using Vec6f = Eigen::Matrix<float, 6, 1>;
 using Vec6d = Eigen::Matrix<double, 6, 1>;
+using Vec6i = Eigen::Matrix<int, 6, 1>;
+
+// 8D vector
+using Vec8i = Eigen::Matrix<int, 8, 1>;
 
 // Dynamic size vector
 using Vectorf = Eigen::VectorXf;

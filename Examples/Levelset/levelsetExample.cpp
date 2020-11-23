@@ -69,7 +69,7 @@ makeLevelsetObj(const std::string& name)
     imstkNew<LevelSetModelConfig> lvlsetConfig;
     lvlsetConfig->m_sparseUpdate = false;
     lvlsetConfig->m_dt = 0.0003;
-    lvlsetConfig->m_constantVelocity = -6.0;
+    lvlsetConfig->m_constantVelocity = -1.0;
 
     // Setup the Model
     imstkNew<LevelSetModel> dynamicalModel;
@@ -81,7 +81,7 @@ makeLevelsetObj(const std::string& name)
     imstkNew<VolumeRenderMaterial> mat;
     {
         vtkNew<vtkColorTransferFunction> color;
-        color->AddRGBPoint(0.0, 1.0, 0.0, 0.0);
+        color->AddRGBPoint(0.0, 0.0, 0.0, 1.0);
         color->AddRGBPoint(-0.01, 0.0, 0.0, 1.0);
         mat->getVolumeProperty()->SetColor(color);
         vtkNew<vtkPiecewiseFunction> opacity;

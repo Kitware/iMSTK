@@ -22,7 +22,7 @@
 #pragma once
 
 #include "imstkDeviceControl.h"
-#include "imstkTypes.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {

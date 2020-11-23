@@ -135,11 +135,12 @@ PBDCollisionHandling::generatePBDConstraints()
         }
     }
 
+    const VecDataArray<int, 3>& indices = *colGeo2->getTriangleIndices();
     ParallelUtils::parallelFor(m_colData->VTColData.getSize(),
         [&] (const size_t idx)
         {
-            const auto& colData  = m_colData->VTColData[idx];
-            const auto& triVerts = colGeo2->getTrianglesVertices()[colData.triIdx];
+            const auto& colData   = m_colData->VTColData[idx];
+            const Vec3i& triVerts = indices[colData.triIdx];
 
             size_t v1, v2, v3;
             if (map2 && map2->getType() == GeometryMap::Type::OneToOne)

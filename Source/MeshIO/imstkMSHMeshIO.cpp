@@ -23,6 +23,7 @@
 #include "imstkHexahedralMesh.h"
 #include "imstkLogger.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkVecDataArray.h"
 
 #include <fstream>
 
@@ -39,11 +40,14 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     size_t                                   nNodes    = 0;           // number-of-nodes
     size_t                                   nElements = 0;           // number-of-elements
     std::vector<size_t>                      nodeIDs;                 // number assigned to each node (node number)
-    StdVectorOfVec3d                         nodesCoords;             // nodes coordinates
+    std::shared_ptr<VecDataArray<double, 3>> vertices    = std::make_shared<VecDataArray<double, 3>>();
+    VecDataArray<double, 3>&                 nodesCoords = *vertices; // nodes coordinates
     std::vector<size_t>                      tetrahedronIDs;          // tet elements IDs
     std::vector<size_t>                      hexahedronIDs;           // hex elements IDs
-    std::vector<TetrahedralMesh::TetraArray> tetrahedronConnectivity; // tet element connectivity
-    std::vector<HexahedralMesh::HexaArray>   hexahedronConnectivity;  // hex element connectivity
+    std::shared_ptr<VecDataArray<int, 4>>    tetrahedronConnectivityPtr = std::make_shared<VecDataArray<int, 4>>();
+    VecDataArray<int, 4>&                    tetrahedronConnectivity    = *tetrahedronConnectivityPtr;
+    std::shared_ptr<VecDataArray<int, 8>>    hexahedronConnectivityPtr  = std::make_shared<VecDataArray<int, 8>>();
+    VecDataArray<int, 8>&                    hexahedronConnectivity     = *hexahedronConnectivityPtr;
     std::map<ElemType, size_t>               elemCountMap;            // map of the element types to their number of counts
     std::string                              subString;               // to store space separated strings in a line
     std::string                              mshLine;                 // a msh file line
@@ -138,7 +142,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             mshLineStream >> node_yC;
             // z coordinate
             mshLineStream >> node_zC;
-            nodesCoords.push_back(Vec3d { stod(node_xC), stod(node_yC), stod(node_zC) });
+            nodesCoords.push_back(Vec3d{ stod(node_xC), stod(node_yC), stod(node_zC) });
             ++nodes_count;
         }
     }
@@ -245,10 +249,10 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     hexahedronIDs.resize(elemCountMap[ElemType::hexahedron]);
     tetrahedronConnectivity.resize(elemCountMap[ElemType::tetrahedron]);
     hexahedronConnectivity.resize(elemCountMap[ElemType::hexahedron]);
-    size_t                      tetElemCount = 0;
-    size_t                      hexElemCount = 0;
-    TetrahedralMesh::TetraArray tmp_4arr     = {};   // Temp array to store the connectivity of a tet element (if any)
-    HexahedralMesh::HexaArray   tmp_8arr     = {};   // Temp array to store the connectivity of a hex element (if any)
+    size_t tetElemCount = 0;
+    size_t hexElemCount = 0;
+    Vec4i  tmp_4arr;  // Temp array to store the connectivity of a tet element (if any)
+    Vec8i  tmp_8arr;  // Temp array to store the connectivity of a hex element (if any)
     // Look for "$Elements" field
     mshStream.clear();
     mshStream.seekg(0, std::ios::beg);
@@ -331,33 +335,35 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     // Generate iMSTK volumetric mesh
     if (elemCountMap[ElemType::tetrahedron] != 0)
     {
-        std::vector<TetrahedralMesh::TetraArray> cells;
+        std::shared_ptr<VecDataArray<int, 4>> cellsPtr = std::make_shared<VecDataArray<int, 4>>();
+        VecDataArray<int, 4>&                 cells    = *cellsPtr;
         for (size_t iTet = 0; iTet < elemCountMap[ElemType::tetrahedron]; ++iTet)
         {
             for (size_t jNode = 0; jNode < numElemNodes(ElemType::tetrahedron); ++jNode)
             {
                 tetrahedronConnectivity[iTet][jNode] = nodeIDMap[tetrahedronConnectivity[iTet][jNode]];
             }
-            cells.emplace_back(tetrahedronConnectivity[iTet]);
+            cells.push_back(tetrahedronConnectivity[iTet]);
         }
 
         auto volMesh = std::make_shared<TetrahedralMesh>();
-        volMesh->initialize(nodesCoords, cells, false);
+        volMesh->initialize(vertices, cellsPtr, false);
         return volMesh;
     }
     else if (elemCountMap[ElemType::hexahedron] != 0)
     {
-        std::vector<HexahedralMesh::HexaArray> cells;
+        std::shared_ptr<VecDataArray<int, 8>> cellsPtr = std::make_shared<VecDataArray<int, 8>>();
+        VecDataArray<int, 8>&                 cells    = *cellsPtr;
         for (size_t iHex = 0; iHex < elemCountMap[ElemType::hexahedron]; ++iHex)
         {
             for (size_t jNode = 0; jNode < numElemNodes(ElemType::hexahedron); ++jNode)
             {
                 hexahedronConnectivity[iHex][jNode] = nodeIDMap[hexahedronConnectivity[iHex][jNode]];
             }
-            cells.emplace_back(hexahedronConnectivity[iHex]);
+            cells.push_back(hexahedronConnectivity[iHex]);
         }
         auto volMesh = std::make_shared<HexahedralMesh>();
-        volMesh->initialize(nodesCoords, cells, false);
+        volMesh->initialize(vertices, cellsPtr, false);
         return volMesh;
     }
     else

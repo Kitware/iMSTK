@@ -81,11 +81,11 @@ SurfaceMeshImageMask::requestUpdate()
 
         const Vec3i& dim = refImageInput->getDimensions();
         extent[0] = 0;
-        extent[1] = dim[0];
+        extent[1] = dim[0] - 1;
         extent[2] = 0;
-        extent[3] = dim[1];
+        extent[3] = dim[1] - 1;
         extent[4] = 0;
-        extent[5] = dim[2];
+        extent[5] = dim[2] - 1;
     }
     else
     {

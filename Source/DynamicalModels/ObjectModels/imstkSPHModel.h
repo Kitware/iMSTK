@@ -94,7 +94,7 @@ public:
 /// \class SPHModel
 /// \brief SPH fluid model
 ///
-class SPHModel : public DynamicalModel<SPHKinematicState>
+class SPHModel : public DynamicalModel<SPHState>
 {
 public:
     ///
@@ -118,11 +118,6 @@ public:
     virtual bool initialize() override;
 
     ///
-    /// \brief Update states
-    ///
-    virtual void updateBodyStates(const Vectord&, const StateUpdateType) override {}
-
-    ///
     /// \brief Update positions of point set geometry
     ///
     virtual void updatePhysicsGeometry() override;
@@ -138,27 +133,6 @@ public:
     ///
     const std::shared_ptr<SPHModelConfig>& getParameters() const
     { assert(m_modelParameters); return m_modelParameters; }
-
-    ///
-    /// \brief Get the kinematics particle data (positions + velocities)
-    ///
-    SPHKinematicState& getKinematicsState()
-    {
-        assert(this->m_currentState);
-        return *this->m_currentState;
-    }
-
-    const SPHKinematicState& getKinematicsState() const
-    {
-        assert(this->m_currentState);
-        return *this->m_currentState;
-    }
-
-    ///
-    /// \brief Get particle simulation data
-    ///
-    SPHSimulationState& getState() { return m_simulationState; }
-    const SPHSimulationState& getState() const { return m_simulationState; }
 
     ///
     /// \brief Set the default time step size,
@@ -194,7 +168,7 @@ public:
     int getTimeStepCount() const { return m_timeStepCount; }
     void writeStateToVtk();
     void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
-    void findNearestParticleToVertex(const StdVectorOfVec3d& points, const std::vector<std::vector<size_t>>& indices);
+    void findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices);
 
     void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
     std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
@@ -278,7 +252,7 @@ private:
     ///
     /// \brief Compute viscosity
     ///
-    void computeViscosity(Real timestep);
+    void computeViscosity();
 
     ///
     /// \brief Compute surface tension and update velocities
@@ -310,7 +284,6 @@ protected:
 
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
-    SPHSimulationState m_simulationState;
 
     Real m_dt = 0;                                      ///> time step size
     Real m_defaultDt;                                   ///> default time step size
@@ -319,14 +292,14 @@ private:
     std::shared_ptr<SPHModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)
     std::shared_ptr<NeighborSearch> m_neighborSearcher; ///> Neighbor Search (must be initialized during model initialization)
 
-    std::shared_ptr<StdVectorOfVec3d> m_pressureAccels       = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_surfaceTensionAccels = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_viscousAccels    = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_neighborVelContr = nullptr;
-    std::shared_ptr<StdVectorOfVec3d> m_particleShift    = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_pressureAccels       = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_surfaceTensionAccels = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_viscousAccels    = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_neighborVelContr = nullptr;
+    std::shared_ptr<VecDataArray<double, 3>> m_particleShift    = nullptr;
 
-    StdVectorOfVec3d m_initialVelocities;
-    StdVectorOfReal  m_initialDensities;
+    std::shared_ptr<VecDataArray<double, 3>> m_initialVelocities = nullptr;
+    std::shared_ptr<DataArray<double>>       m_initialDensities  = nullptr;
 
     double m_totalTime           = 0;
     int    m_timeStepCount       = 0;
@@ -339,6 +312,7 @@ private:
 
     std::shared_ptr<TetrahedralMesh>       m_geomUnstructuredGrid  = nullptr;
     std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
+    // \todo: Should be refactored out of the base SPHModel
     std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
 
     std::vector<size_t> m_minIndices;

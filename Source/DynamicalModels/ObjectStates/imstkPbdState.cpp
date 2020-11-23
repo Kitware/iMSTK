@@ -24,21 +24,6 @@
 namespace imstk
 {
 void
-PbdState::initialize(const size_t numNodes)
-{
-    m_pos->resize(numNodes, Vec3d(0.0, 0.0, 0.0));
-    m_vel->resize(numNodes, Vec3d(0.0, 0.0, 0.0));
-    m_acc->resize(numNodes, Vec3d(0.0, 0.0, 0.0));
-}
-
-void
-PbdState::initialize(const StdVectorOfVec3d& vertices)
-{
-    this->initialize(vertices.size());
-    setPositions(vertices);
-}
-
-void
 PbdState::setState(std::shared_ptr<PbdState> rhs)
 {
     *m_pos = *rhs->getPositions();

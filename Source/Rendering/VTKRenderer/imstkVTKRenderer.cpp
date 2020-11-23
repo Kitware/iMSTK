@@ -416,17 +416,17 @@ VTKRenderer::updateRenderDelegates()
             auto geom = visualModel->getGeometry();
             if (visualModel && !visualModel->isRenderDelegateCreated())
             {
-                auto delegate = VTKRenderDelegate::makeDelegate(visualModel);
-                if (delegate == nullptr)
+                auto renderDelegate = VTKRenderDelegate::makeDelegate(visualModel);
+                if (renderDelegate == nullptr)
                 {
                     LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
                                  << obj->getName() << "'.";
                     continue;
                 }
 
-                m_renderDelegates.push_back(delegate);
-                m_objectVtkActors.push_back(delegate->getVtkActor());
-                m_vtkRenderer->AddActor(delegate->getVtkActor());
+                m_renderDelegates.push_back(renderDelegate);
+                m_objectVtkActors.push_back(renderDelegate->getVtkActor());
+                m_vtkRenderer->AddActor(renderDelegate->getVtkActor());
 
                 //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
 

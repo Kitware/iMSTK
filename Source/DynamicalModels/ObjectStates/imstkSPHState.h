@@ -25,64 +25,8 @@
 
 namespace imstk
 {
-///
-/// \class SPHKinematicState
-/// \brief State of the SPH fluid particles
-///
-class SPHKinematicState
-{
-public:
-    ///
-    /// \brief Default constructor/destructor
-    ///
-    SPHKinematicState() = default;
-    virtual ~SPHKinematicState() = default;
-
-    ///
-    /// \brief Set particle data with given positions and velocities
-    ///
-    void setParticleData(const StdVectorOfVec3r& positions, const StdVectorOfVec3r& velocities = {});
-
-    ///
-    /// \brief Get number of particles
-    ///
-    size_t getNumParticles() const { return m_Positions.size(); }
-
-    ///
-    /// \brief Returns the vector of all particle positions
-    ///
-    StdVectorOfVec3r& getPositions() { return m_Positions; }
-    const StdVectorOfVec3r& getPositions() const { return m_Positions; }
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    StdVectorOfVec3r& getFullStepVelocities() { return m_FullStepVelocities; }
-    const StdVectorOfVec3r& getFullStepVelocities() const { return m_FullStepVelocities; }
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    StdVectorOfVec3r& getHalfStepVelocities() { return m_HalfStepVelocities; }
-    const StdVectorOfVec3r& getHalfStepVelocities() const { return m_HalfStepVelocities; }
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    StdVectorOfVec3r& getVelocities() { return m_Velocities; }
-    const StdVectorOfVec3r& getVelocities() const { return m_Velocities; }
-
-    ///
-    /// \brief Set the state to a given one
-    ///
-    void setState(const std::shared_ptr<SPHKinematicState>& rhs);
-
-private:
-    StdVectorOfVec3r m_Positions;          ///> Particle positions
-    StdVectorOfVec3r m_FullStepVelocities; ///> Particle velocities
-    StdVectorOfVec3r m_HalfStepVelocities; ///> Particle velocities
-    StdVectorOfVec3r m_Velocities;         ///> Particle velocities
-};
+template<typename T> class DataArray;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \struct NeighborInfo
@@ -98,25 +42,25 @@ struct NeighborInfo
 /// \class SPHSimulationState
 /// \brief Simulation states of SPH particles
 ///
-class SPHSimulationState
+class SPHState
 {
 public:
-
     ///
     /// \brief Default constructor/destructor
     ///
-    SPHSimulationState() = default;
-    virtual ~SPHSimulationState() = default;
+    SPHState();
+    virtual ~SPHState() = default;
 
+public:
     ///
-    /// \brief Set the kinematic state: positions and velocities
+    /// \brief Set particle data with given positions and velocities
     ///
-    void setKinematicState(const std::shared_ptr<SPHKinematicState>& state) { m_KinematicState = state; }
+    void setParticleData(std::shared_ptr<VecDataArray<double, 3>> positions, std::shared_ptr<VecDataArray<double, 3>> velocities);
 
     ///
     /// \brief Set positions of the boundary (solid) particles
     ///
-    void setBoundaryParticlePositions(const StdVectorOfVec3r& positions) { m_BDPositions = positions; }
+    void setBoundaryParticlePositions(std::shared_ptr<VecDataArray<double, 3>> positions) { m_BDPositions = positions; }
 
     ///
     /// \brief Initialize simulation variables, must be called after setKinematicState and (if applicable)
@@ -132,78 +76,48 @@ public:
     ///
     /// \brief Returns the vector of all particle positions
     ///
-    StdVectorOfVec3r& getPositions();
+    std::shared_ptr<VecDataArray<double, 3>> getPositions() { return m_positions; }
+    void setPositions(std::shared_ptr<VecDataArray<double, 3>> positions) { m_positions = positions; }
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    std::shared_ptr<VecDataArray<double, 3>> getFullStepVelocities() { return m_fullStepVelocities; }
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    std::shared_ptr<VecDataArray<double, 3>> getHalfStepVelocities() { return m_halfStepVelocities; }
+
+    ///
+    /// \brief Returns the vector of all particle velocities
+    ///
+    std::shared_ptr<VecDataArray<double, 3>> getVelocities() { return m_velocities; }
 
     ///
     /// \brief Returns the vector of all particle positions
     ///
-    const StdVectorOfVec3r& getPositions() const;
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    StdVectorOfVec3r& getVelocities();
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    const StdVectorOfVec3r& getVelocities() const;
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    StdVectorOfVec3r& getHalfStepVelocities();
-
-    ///
-    /// \brief Returns the vector of all particle velocities
-    ///
-    const StdVectorOfVec3r& getHalfStepVelocities() const;
-
-    ///
-    /// \brief Returns the vector of all particle velocities at a full time step
-    ///
-    StdVectorOfVec3r& getFullStepVelocities();
-
-    ///
-    /// \brief Returns the vector of all particle velocities at a half time step
-    ///
-    const StdVectorOfVec3r& getFullStepVelocities() const;
-
-    ///
-    /// \brief Returns the vector of all particle positions
-    ///
-    StdVectorOfVec3r& getBoundaryParticlePositions() { return m_BDPositions; }
-    const StdVectorOfVec3r& getBoundaryParticlePositions() const { return m_BDPositions; }
+    std::shared_ptr<VecDataArray<double, 3>> getBoundaryParticlePositions() { return m_BDPositions; }
 
     ///
     /// \brief Returns the vector of all particle surface normals
     ///
-    StdVectorOfVec3r& getNormals() { return m_Normals; }
-    const StdVectorOfVec3r& getNormals() const { return m_Normals; }
+    std::shared_ptr<VecDataArray<double, 3>> getNormals() { return m_Normals; }
 
     ///
     /// \brief Returns the vector of all particle densities
     ///
-    StdVectorOfReal& getDensities() { return m_Densities; }
-    const StdVectorOfReal& getDensities() const { return m_Densities; }
-
-    ///
-    /// \brief Returns the vector of all particle densities
-    ///
-    StdVectorOfReal& getNormalizedDensities() { return m_NormalizedDensities; }
-    const StdVectorOfReal& getNormalizedDensities() const { return m_NormalizedDensities; }
+    std::shared_ptr<DataArray<double>> getDensities() { return m_Densities; }
 
     ///
     /// \brief Returns the vector of all particle accelerations
     ///
-    StdVectorOfVec3r& getAccelerations() { return m_Accels; }
-    const StdVectorOfVec3r& getAccelerations() const { return m_Accels; }
+    std::shared_ptr<VecDataArray<double, 3>> getAccelerations() { return m_Accels; }
 
     ///
     /// \brief Returns the vector of all velocity diffusion
     ///
-    StdVectorOfVec3r& getDiffuseVelocities() { return m_DiffuseVelocities; }
-    const StdVectorOfVec3r& getDiffuseVelocities() const { return m_DiffuseVelocities; }
+    std::shared_ptr<VecDataArray<double, 3>> getDiffuseVelocities() { return m_DiffuseVelocities; }
 
     ///
     /// \brief Returns the vector of neighbor fluid particles
@@ -223,17 +137,25 @@ public:
     std::vector<std::vector<NeighborInfo>>& getNeighborInfo() { return m_NeighborInfo; }
     const std::vector<std::vector<NeighborInfo>>& getNeighborInfo() const { return m_NeighborInfo; }
 
-private:
-    std::shared_ptr<SPHKinematicState> m_KinematicState;      ///> basic state: positions + velocities
-    StdVectorOfVec3r m_BDPositions;                           ///> positions of boundary particles, if generated
+    ///
+    /// \brief Set the state to a given one
+    ///
+    void setState(std::shared_ptr<SPHState> rhs);
 
-    StdVectorOfReal  m_Densities;                             ///>  particle densities
-    StdVectorOfReal  m_NormalizedDensities;                   ///>  variable for normalizing densities
-    StdVectorOfVec3r m_Normals;                               ///>  surface normals
-    StdVectorOfVec3r m_Accels;                                ///>  acceleration
-    StdVectorOfVec3r m_DiffuseVelocities;                     ///>  velocity diffusion, used for computing viscosity
-    std::vector<std::vector<size_t>>       m_NeighborLists;   ///>  store a list of neighbors for each particle, updated each time step
-    std::vector<std::vector<size_t>>       m_BDNeighborLists; ///>  store a list of boundary particle neighbors for each particle, updated each time step
-    std::vector<std::vector<NeighborInfo>> m_NeighborInfo;    ///>  store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
+private:
+    std::shared_ptr<VecDataArray<double, 3>> m_positions;
+    std::shared_ptr<VecDataArray<double, 3>> m_fullStepVelocities;
+    std::shared_ptr<VecDataArray<double, 3>> m_halfStepVelocities;
+    std::shared_ptr<VecDataArray<double, 3>> m_velocities;
+
+    std::shared_ptr<VecDataArray<double, 3>> m_BDPositions;       ///> positions of boundary particles, if generated
+
+    std::shared_ptr<DataArray<double>>       m_Densities;         ///>  particle densities
+    std::shared_ptr<VecDataArray<double, 3>> m_Normals;           ///>  surface normals
+    std::shared_ptr<VecDataArray<double, 3>> m_Accels;            ///>  acceleration
+    std::shared_ptr<VecDataArray<double, 3>> m_DiffuseVelocities; ///>  velocity diffusion, used for computing viscosity
+    std::vector<std::vector<size_t>>       m_NeighborLists;       ///>  store a list of neighbors for each particle, updated each time step
+    std::vector<std::vector<size_t>>       m_BDNeighborLists;     ///>  store a list of boundary particle neighbors for each particle, updated each time step
+    std::vector<std::vector<NeighborInfo>> m_NeighborInfo;        ///>  store a list of Vec4r(Vec3r(relative position), density) for neighbors, including boundary particle
 };
 } // end namespace imstk

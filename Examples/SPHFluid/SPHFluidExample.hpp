@@ -126,7 +126,7 @@ main(int argc, char* argv[])
             [&](Event*)
             {
                 statusManager->setCustomStatus("Number of particles: " +
-                    std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
+                    std::to_string(fluidObj->getSPHModel()->getCurrentState()->getNumParticles()) +
                     "\nNumber of solids: " + std::to_string(solids.size()));
             });
 

@@ -21,7 +21,7 @@
 
 #include "imstkImageData.h"
 #include "imstkLogger.h"
-#include "imstkDataArray.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -77,13 +77,8 @@ ImageData::print() const
 }
 
 double
-ImageData::getVolume() const
+ImageData::getVolume()
 {
-    if (m_scalarArray == nullptr)
-    {
-        return 0.0;
-    }
-
     return (m_dims[0] * m_spacing.x()) *
            (m_dims[1] * m_spacing.y()) *
            (m_dims[2] * m_spacing.z());
@@ -140,31 +135,32 @@ ImageData::allocate(const ScalarType type, const int numComps, const Vec3i& dims
     m_origin = origin;
     setSpacing(spacing);
     m_numComps = numComps;
-    const size_t numVals = static_cast<size_t>(dims[0] * dims[1] * dims[2] * numComps);
+    const int numVals = dims[0] * dims[1] * dims[2];
     switch (type)
     {
-        TemplateMacro(m_scalarArray = std::make_shared<DataArray<IMSTK_TT>>(numVals); );
+        TemplateMacro(m_scalarArray = std::make_shared<DataArray<IMSTK_TT>>(numVals * numComps); );
     default:
         LOG(WARNING) << "Tried to allocate unknown scalar type";
         break;
     }
-    // When allocation is done, post modified on the image
-    connect<Event>(m_scalarArray, EventType::Modified, [&](Event*) { this->postEvent(Event(EventType::Modified)); });
+    this->modified();
 }
 
 void
 ImageData::computePoints()
 {
-    StdVectorOfVec3d vertices(m_dims[0] * m_dims[1] * m_dims[2]);
-    const Vec3d      shift = m_origin + m_spacing * 0.5;
-    int              i     = 0;
+    std::shared_ptr<VecDataArray<double, 3>> vertices =
+        std::make_shared<VecDataArray<double, 3>>(m_dims[0] * m_dims[1] * m_dims[2]);
+    VecDataArray<double, 3>& vertexData = *vertices;
+    const Vec3d              shift      = m_origin + m_spacing * 0.5;
+    int                      i = 0;
     for (int z = 0; z < m_dims[2]; z++)
     {
         for (int y = 0; y < m_dims[1]; y++)
         {
             for (int x = 0; x < m_dims[0]; x++, i++)
             {
-                vertices[i] = Vec3d(x, y, z).cwiseProduct(m_spacing) + shift;
+                vertexData[i] = Vec3d(x, y, z).cwiseProduct(m_spacing) + shift;
             }
         }
     }
@@ -180,7 +176,6 @@ ImageData::clear()
         this->m_scalarArray = nullptr;
     }
     //this->m_dataTransform->Identity();
-    this->m_transformApplied = true;
-    this->m_dataModified     = true;
+    this->modified();
 }
 } // imstk

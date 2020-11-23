@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Initialize the tetrahedral FEM constraint
     ///
-    bool initConstraint(const StdVectorOfVec3d& initVertexPositions,
+    bool initConstraint(const VecDataArray<double, 3>& initVertexPositions,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
                         std::shared_ptr<PbdFEMConstraintConfig> config);
@@ -56,8 +56,9 @@ public:
     ///
     /// \brief Compute the value and gradient of constraint
     ///
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const override;
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPosition,
+        double& c,
+        std::vector<Vec3d>& dcdx) const override;
 };
 } // imstk

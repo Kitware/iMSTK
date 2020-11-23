@@ -26,7 +26,7 @@
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdState.h"
 
-#include <map>
+#include <unordered_map>
 
 namespace imstk
 {
@@ -159,16 +159,6 @@ public:
     bool initializeConstantDensityConstraint(const double stiffness);
 
     ///
-    /// \brief Update the model geometry from the newest PBD state
-    ///
-    void updatePhysicsGeometry() override;
-
-    ///
-    /// \brief Update the PBD state from the model geometry
-    ///
-    void updatePbdStateFromPhysicsGeometry();
-
-    ///
     /// \brief Returns true if there is at least one constraint
     ///
     bool hasConstraints() const { return !m_constraints->empty() || !m_partitionedConstraints->empty(); }
@@ -221,11 +211,14 @@ public:
     void setPointUnfixed(const size_t idx);
 
     ///
-    /// \brief Get the inverse of mass of a certain node
+    /// \brief Get the inverse of mass from a certain node
     ///
     double getInvMass(const size_t idx) const { return (*m_invMass)[idx]; }
 
-    std::shared_ptr<StdVectorOfReal> getInvMasses() { return m_invMass; }
+    ///
+    /// \brief Get the inverse masses
+    ///
+    std::shared_ptr<DataArray<double>> getInvMasses() { return m_invMass; }
 
     ///
     /// \brief Time integrate the position
@@ -238,12 +231,6 @@ public:
     void updateVelocity();
 
     ///
-    /// \brief Update body states given the newest update and the type of update
-    ///
-    virtual void updateBodyStates(const Vectord& /*q*/,
-                                  const StateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
-
-    ///
     /// \brief Initialize the PBD model
     ///
     virtual bool initialize() override;
@@ -253,8 +240,14 @@ public:
     ///
     void setConstraintPartitionThreshold(size_t threshold) { m_partitionThreshold = threshold; }
 
+    ///
+    /// \brief Returns the solver used for internal constraints
+    ///
     std::shared_ptr<PbdSolver> getSolver() const { return m_pbdSolver; }
 
+    ///
+    /// \brief Sets the solver used for internal constraints
+    ///
     void setSolver(std::shared_ptr<PbdSolver> solver) { this->m_pbdSolver = solver; }
 
     std::shared_ptr<TaskNode> getIntegratePositionNode() const { return m_integrationPositionNode; }
@@ -280,11 +273,11 @@ protected:
     bool   m_partitioned = false;                                                         /// \todo this is used in initialize() as a temporary fix to problems on linux
     size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
 
-    std::shared_ptr<PbdSolver>       m_pbdSolver = nullptr;                               ///> PBD solver
-    std::shared_ptr<PointSet>        m_mesh      = nullptr;                               ///> PointSet on which the pbd model operates on
-    std::shared_ptr<StdVectorOfReal> m_mass      = nullptr;                               ///> Mass of nodes
-    std::shared_ptr<StdVectorOfReal> m_invMass   = nullptr;                               ///> Inverse of mass of nodes
-    std::shared_ptr<std::map<size_t, double>> m_fixedNodeInvMass = nullptr;               ///> Map for archiving fixed nodes' mass.
+    std::shared_ptr<PbdSolver> m_pbdSolver       = nullptr;                               ///> PBD solver
+    std::shared_ptr<PointSet>  m_mesh            = nullptr;                               ///> PointSet on which the pbd model operates on
+    std::shared_ptr<DataArray<double>> m_mass    = nullptr;                               ///> Mass of nodes
+    std::shared_ptr<DataArray<double>> m_invMass = nullptr;                               ///> Inverse of mass of nodes
+    std::shared_ptr<std::unordered_map<size_t, double>> m_fixedNodeInvMass = nullptr;     ///> Map for archiving fixed nodes' mass.
 
     std::shared_ptr<PBDConstraintVector> m_constraints = nullptr;                         ///> List of pbd constraints
     std::shared_ptr<std::vector<PBDConstraintVector>> m_partitionedConstraints = nullptr; ///> List of pbd constraints

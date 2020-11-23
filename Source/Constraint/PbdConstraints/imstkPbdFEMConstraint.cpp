@@ -31,5 +31,6 @@ PbdFEMConstraint::PbdFEMConstraint(const unsigned int cardinality,
     m_invRestMat(Mat3d::Identity())
 {
     m_vertexIds.resize(cardinality);
+    m_dcdx.resize(cardinality);
 }
 } // imstk

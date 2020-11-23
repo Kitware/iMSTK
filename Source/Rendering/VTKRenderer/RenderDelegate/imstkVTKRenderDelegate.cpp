@@ -64,19 +64,18 @@
 
 namespace imstk
 {
-VTKRenderDelegate::VTKRenderDelegate() :
+VTKRenderDelegate::VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_transform(vtkSmartPointer<vtkTransform>::New()),
-    m_volumeMapper(vtkSmartPointer<vtkGPUVolumeRayCastMapper>::New()),
-    m_volume(vtkSmartPointer<vtkVolume>::New()),
-    m_modelIsVolume(false),
-    m_actor(vtkSmartPointer<vtkActor>::New()),
-    m_mapper(vtkSmartPointer<vtkOpenGLPolyDataMapper>::New())
+    m_actor(nullptr),
+    m_mapper(nullptr),
+    m_visualModel(visualModel),
+    m_material(visualModel->getRenderMaterial())
 {
-    m_actor->SetMapper(m_mapper);        // remove this as a default since it could be volume mapper?
-    m_actor->SetUserTransform(m_transform);
-    m_volume->SetMapper(m_volumeMapper); // remove this as a default?
-    /*m_volumeMapper->SetAutoAdjustSampleDistances(false);
-    m_volumeMapper->SetSampleDistance(0.01);*/
+    // When render material is modified call materialModified -> updateRenderProperties()
+    queueConnect<Event>(m_material, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+
+    // When the visual model is modified call visualModelModified
+    queueConnect<Event>(m_visualModel, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::visualModelModified);
 }
 
 std::shared_ptr<VTKRenderDelegate>
@@ -162,7 +161,7 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     }
 }
 
-std::shared_ptr<imstk::VTKRenderDelegate>
+std::shared_ptr<VTKRenderDelegate>
 VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
 {
     switch (dbgVizModel->getDebugGeometry()->getType())
@@ -185,405 +184,71 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
         return nullptr; // will never be reached
     }
     }
-}
-
-void
-VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput*                source,
-                               const std::shared_ptr<VisualModel> vizModel)
-{
-    if (vtkImageData::SafeDownCast(source->GetProducer()->GetOutputDataObject(0)))
-    {
-        m_volumeMapper->SetInputConnection(source);
-        m_modelIsVolume = true;
-        return;
-    }
-    else
-    {
-        m_modelIsVolume = false;
-    }
-
-    if (vizModel->getGeometry())
-    {
-        // Add normals
-        if (!vizModel->getGeometry()->isMesh())
-        {
-            vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
-            normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
-            vtkPolyDataNormals::SafeDownCast(normalGen)->SplittingOff();
-            normalGen->SetInputConnection(source);
-            m_mapper->SetInputConnection(normalGen->GetOutputPort());
-        }
-        else
-        {
-            m_mapper->SetInputConnection(source);
-        }
-    }
-    else // debug geometry
-    {
-        vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
-        normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
-        vtkPolyDataNormals::SafeDownCast(normalGen)->SplittingOff();
-        normalGen->SetInputConnection(source);
-        m_mapper->SetInputConnection(normalGen->GetOutputPort());
-    }
-
-    // Disable auto Shift & Scale which is slow for deformable objects
-    // as it needs to compute a bounding box at every frame
-    if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
-    {
-        mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
-    }
-}
-
-vtkProp3D*
-VTKRenderDelegate::getVtkActor() const
-{
-    if (m_modelIsVolume)
-    {
-        return m_volume.GetPointer();
-    }
-    else
-    {
-        return m_actor.GetPointer();
-    }
+    return nullptr;
 }
 
 void
 VTKRenderDelegate::update()
 {
-    this->updateDataSource();
-    this->updateActorTransform();
-    this->updateActorProperties();
+    // Always update the actor transform
+    updateActorTransform();
 
-    if (m_modelIsVolume)
-    {
-        m_volume.GetPointer()->SetVisibility(m_visualModel->isVisible());
-    }
-    else
-    {
-        m_actor.GetPointer()->SetVisibility(m_visualModel->isVisible());
-    }
+    // Then leave it up to subclasses to implement how to process the events
+    processEvents();
 }
 
 void
 VTKRenderDelegate::updateActorTransform()
 {
-    auto geom = m_visualModel->getGeometry();
-    if (!geom || !geom->m_transformModified)
-    {
-        return;
-    }
+    auto              geom = m_visualModel->getGeometry();
     AffineTransform3d T(geom->m_transform.matrix());
     T.scale(geom->getScaling());
     T.matrix().transposeInPlace();
     m_transform->SetMatrix(T.data());
-    geom->m_transformModified = false;
+    m_transform->Modified();
 }
 
 void
-VTKRenderDelegate::updateActorProperties()
+VTKRenderDelegate::processEvents()
 {
-    if (this->isMesh())
-    {
-        updateActorPropertiesMesh();
-        return;
-    }
-    if (this->isVolume())
-    {
-        updateActorPropertiesVolumeRendering();
-        return;
-    }
+    std::shared_ptr<RenderMaterial> renderMaterial = m_visualModel->getRenderMaterial();
 
-    // remove this because there should be a default visual model?
-    // not visible: nothing to do; mind the initialization need the first time around
-    if (!m_visualModel || !m_visualModel->isVisible())
-    {
-        return;
-    }
-
-    const auto material = m_visualModel->getRenderMaterial();
-    if (!material || !material->m_modified)
-    {
-        return;
-    }
-
-    auto actorProperty = m_actor->GetProperty();
-
-    // Colors & Light
-    actorProperty->SetDiffuseColor(material->m_diffuseColor.r, material->m_diffuseColor.g, material->m_diffuseColor.b);
-    actorProperty->SetAmbientColor(material->m_ambientColor.r, material->m_ambientColor.g, material->m_ambientColor.b);
-    actorProperty->SetAmbient(material->m_ambientLightCoeff);
-    actorProperty->SetSpecularColor(material->m_specularColor.r, material->m_specularColor.g, material->m_specularColor.b);
-    actorProperty->SetSpecularPower(material->m_specularPower);
-
-    // Material state is now up to date
-    material->m_modified = false;
-
-    if (!material->m_stateModified)
-    {
-        return;
-    }
-
-    // Display mode
-    switch (material->m_displayMode)
-    {
-    case RenderMaterial::DisplayMode::Wireframe:
-        actorProperty->SetRepresentationToWireframe();
-        actorProperty->SetEdgeVisibility(false);
-        break;
-    case RenderMaterial::DisplayMode::Points:
-        actorProperty->SetRepresentationToPoints();
-        actorProperty->SetEdgeVisibility(false);
-        break;
-    case RenderMaterial::DisplayMode::WireframeSurface:
-        actorProperty->SetRepresentationToSurface();
-        actorProperty->SetEdgeVisibility(true);
-        break;
-    case RenderMaterial::DisplayMode::Surface:
-    default:
-        actorProperty->SetRepresentationToSurface();
-        actorProperty->SetEdgeVisibility(false);
-
-        switch (material->getShadingModel())
+    // Only use the most recent event from respective sender
+    std::list<Command> cmds;
+    bool               contains[2] = { false, false };
+    rforeachEvent([&](Command cmd)
         {
-        case RenderMaterial::ShadingModel::Gouraud:
-            actorProperty->SetInterpolationToGouraud();
-            break;
-        case RenderMaterial::ShadingModel::Flat:
-            actorProperty->SetInterpolationToFlat();
-            break;
-        case RenderMaterial::ShadingModel::Phong:
-        default:
-            actorProperty->SetInterpolationToPhong();
-        }
+            if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
+            {
+                cmds.push_back(cmd);
+                contains[0] = true;
+            }
+            else if (cmd.m_event->m_sender == renderMaterial.get() && !contains[1])
+            {
+                cmds.push_back(cmd);
+                contains[1] = true;
+            }
+        });
+    // Now do each event in order recieved
+    for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
+    {
+        i->invoke();
     }
-
-    // Display properties
-    actorProperty->SetLineWidth(material->m_lineWidth);
-    actorProperty->SetPointSize(material->m_pointSize);
-    actorProperty->SetBackfaceCulling(material->m_backfaceCulling);
-
-    // Material state is now up to date
-    material->m_stateModified = false;
 }
 
 void
-VTKRenderDelegate::updateActorPropertiesMesh()
+VTKRenderDelegate::visualModelModified(Event* imstkNotUsed(e))
 {
-    // remove this because there should be a default visual model?
-    // not visible: nothing to do; mind the initialization need the first time around
-    if (!m_visualModel || !m_visualModel->isVisible())
-    {
-        return;
-    }
+    // Remove all modified's from the old material
+    disconnect(m_material, this, EventType::Modified);
 
-    const auto material = m_visualModel->getRenderMaterial();
-    if (!material || !material->isModified())
-    {
-        return;
-    }
+    m_material = m_visualModel->getRenderMaterial(); // Update handle
 
-    const auto actorProperty = m_actor->GetProperty();
+    // Recieve events from new material
+    queueConnect<Event>(m_material, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
 
-    // Material state is now up to date
-    material->m_modified = false;
-    if (!material->m_stateModified)
-    {
-        return;
-    }
-
-    if (material->m_scalarVisibility)
-    {
-        // Convert color table
-        std::shared_ptr<ColorFunction>   imstkLookupTable = material->getColorLookupTable();
-        const double*                    range   = imstkLookupTable->getRange().data();
-        double                           spacing = (range[1] - range[0]) / imstkLookupTable->getNumberOfColors();
-        vtkNew<vtkColorTransferFunction> lookupTable;
-        lookupTable->SetColorSpaceToRGB();
-        for (int i = 0; i < imstkLookupTable->getNumberOfColors(); i++)
-        {
-            const double t     = static_cast<double>(i) / imstkLookupTable->getNumberOfColors();
-            const Color& color = imstkLookupTable->getColor(i);
-            lookupTable->AddRGBPoint(t * (range[1] - range[0]) + range[0] + spacing * 0.5, color.r, color.g, color.b);
-        }
-
-        switch (imstkLookupTable->getColorSpace())
-        {
-        case ColorFunction::ColorSpace::RGB:
-            lookupTable->SetColorSpaceToRGB();
-            break;
-        case ColorFunction::ColorSpace::HSV:
-            lookupTable->SetColorSpaceToHSV();
-            break;
-        case ColorFunction::ColorSpace::LAB:
-            lookupTable->SetColorSpaceToLab();
-            break;
-        case ColorFunction::ColorSpace::DIVERING:
-            lookupTable->SetColorSpaceToDiverging();
-            break;
-        default:
-            lookupTable->SetColorSpaceToRGB();
-            break;
-        }
-
-        m_mapper->SetLookupTable(lookupTable);
-        m_mapper->SetScalarVisibility(material->m_scalarVisibility);
-    }
-
-    const auto edgeColor    = material->getEdgeColor();
-    const auto vertexColor  = material->getVertexColor();
-    const auto surfaceColor = material->getColor();
-
-    //actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
-    if (material->getDisplayMode() != RenderMaterial::DisplayMode::Surface
-        && material->getDisplayMode() != RenderMaterial::DisplayMode::Fluid)
-    {
-        switch (material->getDisplayMode())
-        {
-        case RenderMaterial::DisplayMode::Wireframe:
-            actorProperty->SetRepresentationToWireframe();
-            break;
-        case RenderMaterial::DisplayMode::Points:
-            actorProperty->SetRepresentationToPoints();
-            break;
-        default:
-            actorProperty->SetRepresentationToSurface();//wireframeSurface
-        }
-
-        // enable vertex visibility and vertex edge properties
-        actorProperty->SetEdgeVisibility(true);
-        actorProperty->SetPointSize(material->getPointSize());
-        actorProperty->SetRenderPointsAsSpheres(true);
-        actorProperty->SetVertexVisibility(true);
-        actorProperty->SetVertexColor(vertexColor.r, vertexColor.g, vertexColor.b);
-
-        if (material->getDisplayMode() != RenderMaterial::DisplayMode::Points)
-        {
-            // enable edge visibility and set edge properties
-            actorProperty->SetEdgeVisibility(true);
-            actorProperty->SetRenderLinesAsTubes(true);
-            //actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b); // doesn't work if edges are rendered as tubes
-            actorProperty->SetLineWidth(material->getLineWidth());
-        }
-
-        if (material->getDisplayMode() == RenderMaterial::DisplayMode::WireframeSurface)
-        {
-            actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b);
-            actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
-            switch (material->getShadingModel())
-            {
-            case RenderMaterial::ShadingModel::Flat:
-                actorProperty->SetInterpolationToFlat();
-                break;
-            case RenderMaterial::ShadingModel::Gouraud:
-                actorProperty->SetInterpolationToGouraud();
-                break;
-            default:
-                actorProperty->SetInterpolationToPhong();
-            }
-        }
-
-        if (material->getDisplayMode() == RenderMaterial::DisplayMode::Points)
-        {
-            actorProperty->SetColor(vertexColor.r, vertexColor.g, vertexColor.b);
-        }
-
-        if (material->getDisplayMode() == RenderMaterial::DisplayMode::Wireframe)
-        {
-            actorProperty->SetColor(edgeColor.r, edgeColor.g, edgeColor.b);
-        }
-    }
-    else
-    {
-        if (material->getDisplayMode() != RenderMaterial::DisplayMode::Fluid)// = surface
-        {
-            actorProperty->SetRepresentationToSurface();
-            actorProperty->SetEdgeVisibility(false);
-            actorProperty->SetVertexVisibility(false);
-
-            // Colors & Light
-            actorProperty->SetDiffuseColor(material->m_diffuseColor.r, material->m_diffuseColor.g, material->m_diffuseColor.b);
-            actorProperty->SetAmbientColor(material->m_ambientColor.r, material->m_ambientColor.g, material->m_ambientColor.b);
-            actorProperty->SetAmbient(material->m_ambientLightCoeff);
-            actorProperty->SetSpecularColor(material->m_specularColor.r, material->m_specularColor.g, material->m_specularColor.b);
-            actorProperty->SetSpecularPower(material->m_specularPower);
-
-            if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
-            {
-                /*actorProperty->UseImageBasedLightingOn();
-                 actorProperty->SetEnvironmentCubeMap(getVTKTexture(cubemap));*/
-
-                actorProperty->SetInterpolationToPBR();
-
-                // configure the basic properties
-                //actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
-                actorProperty->SetMetallic(material->getMetalness());
-                actorProperty->SetRoughness(material->getRoughness());
-            }
-            else if (material->getShadingModel() == RenderMaterial::ShadingModel::Phong)
-            {
-                actorProperty->SetInterpolationToPhong();
-            }
-            else if (material->getShadingModel() == RenderMaterial::ShadingModel::Gouraud)
-            {
-                actorProperty->SetInterpolationToGouraud();
-            }
-            else
-            {
-                actorProperty->SetInterpolationToFlat();
-            }
-        }
-    }
-
-    //actorProperty->SetBackfaceCulling(material->getBackfaceCulling());
-    actorProperty->SetOpacity(material->getOpacity());
-
-    // Material state is now up-to-date
-    material->m_stateModified = false;
-}
-
-void
-VTKRenderDelegate::updateActorPropertiesVolumeRendering()
-{
-    if (!m_visualModel || !m_visualModel->isVisible())
-    {
-        return;
-    }
-
-    const auto material = m_visualModel->getRenderMaterial();
-    if (!material || !material->isModified())
-    {
-        return;
-    }
-
-    if (auto volumeMat = std::dynamic_pointer_cast<VolumeRenderMaterial>(material))
-    {
-        switch (volumeMat->getBlendMode())
-        {
-        case RenderMaterial::BlendMode::Alpha:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
-            break;
-        case RenderMaterial::BlendMode::Additive:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::ADDITIVE_BLEND);
-            break;
-        case RenderMaterial::BlendMode::MaximumIntensity:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND);
-            break;
-        case RenderMaterial::BlendMode::MinimumIntensity:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::MINIMUM_INTENSITY_BLEND);
-            break;
-        default:
-            m_volumeMapper->SetBlendMode(vtkVolumeMapper::COMPOSITE_BLEND);
-            break;
-        }
-        m_volume->SetProperty(volumeMat->getVolumeProperty());
-    }
-
-    // Material state is now up to date
-    material->setModified(false);
-
-    // Material state is now up to date
-    //material->m_stateModified = false;
+    // Update our render properties
+    updateRenderProperties();
 }
 
 vtkSmartPointer<vtkTexture>
@@ -603,11 +268,5 @@ VTKRenderDelegate::getVTKTexture(std::shared_ptr<Texture> texture)
     vtktexture->SetInputConnection(imageReader->GetOutputPort());
 
     return vtktexture;
-}
-
-std::shared_ptr<VisualModel>
-VTKRenderDelegate::getVisualModel() const
-{
-    return m_visualModel;
 }
 } // imstk

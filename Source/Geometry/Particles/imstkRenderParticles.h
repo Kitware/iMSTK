@@ -100,12 +100,6 @@ public:
     ///
     unsigned int getMaxNumParticles();
 
-    ///
-    /// \brief Get volume
-    /// \note As these are particles, the volume is 0
-    ///
-    double getVolume() const override { return 0; }
-
 protected:
     friend class VulkanParticleRenderDelegate;
     friend class RenderParticles;
@@ -121,12 +115,9 @@ protected:
     glm::vec2  m_vertexUVs[4];
     glm::ivec3 m_triangles[2];
 
-#pragma warning( push )
-#pragma warning( disable : 4100 )
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;
     void applyScaling(const double s) override;
-#pragma warning( pop )
 
     virtual void updatePostTransformData() const override {}
 };

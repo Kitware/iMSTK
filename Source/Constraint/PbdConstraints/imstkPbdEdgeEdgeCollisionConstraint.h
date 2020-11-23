@@ -62,10 +62,10 @@ public:
     /// \param[inout] c constraint value
     /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
-                                 const StdVectorOfVec3d& currVertexPositionsB,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdxA,
-                                 StdVectorOfVec3d&       dcdxB) const override;
+    bool computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
+                                 const VecDataArray<double, 3>& currVertexPositionsB,
+                                 double& c,
+                                 VecDataArray<double, 3>& dcdxA,
+                                 VecDataArray<double, 3>& dcdxB) const override;
 };
 } // imstk

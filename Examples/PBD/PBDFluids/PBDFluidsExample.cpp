@@ -183,13 +183,14 @@ createAndAddPbdObject(std::shared_ptr<Scene> scene,
 std::shared_ptr<SurfaceMesh>
 createCollidingSurfaceMesh()
 {
-    StdVectorOfVec3d vertList;
-    int              nSides = 5;
-    double           width  = 40.0;
-    double           height = 40.0;
-    int              nRows  = 2;
-    int              nCols  = 2;
-    vertList.resize(nRows * nCols * nSides);
+    imstkNew<VecDataArray<double, 3>> verticesPtr;
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
+    int                               nSides   = 5;
+    double                            width    = 40.0;
+    double                            height   = 40.0;
+    int                               nRows    = 2;
+    int                               nCols    = 2;
+    vertices.resize(nRows * nCols * nSides);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
     for (int i = 0; i < nRows; ++i)
@@ -198,21 +199,19 @@ createCollidingSurfaceMesh()
         {
             const double y = (double)dy * j;
             const double x = (double)dx * i;
-            vertList[i * nCols + j] = Vec3d(x - 20, -10.0, y - 20);
+            vertices[i * nCols + j] = Vec3d(x - 20, -10.0, y - 20);
         }
     }
 
     // c. Add connectivity data
-    std::vector<SurfaceMesh::TriangleArray> triangles;
+    std::shared_ptr<VecDataArray<int, 3>> trianglesPtr = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                 triangles    = *trianglesPtr;
     for (std::size_t i = 0; i < nRows - 1; ++i)
     {
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
-            SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i* nCols + j, i* nCols + j + 1, (i + 1) * nCols + j } };
-            tri[1] = { { (i + 1) * nCols + j + 1, (i + 1) * nCols + j, i* nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
+            triangles.push_back(Vec3i(i * nCols + j, i * nCols + j + 1, (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1));
         }
     }
 
@@ -230,8 +229,8 @@ createCollidingSurfaceMesh()
         {
             const double z = (double)dz * j;
             const double x = (double)dx1 * i;
-            vertList[(nPointPerSide) + i * nCols + j]     = Vec3d(x - 20, z - 10.0, 20);
-            vertList[(nPointPerSide * 2) + i * nCols + j] = Vec3d(x - 20, z - 10.0, -20);
+            vertices[(nPointPerSide) + i * nCols + j]     = Vec3d(x - 20, z - 10.0, 20);
+            vertices[(nPointPerSide * 2) + i * nCols + j] = Vec3d(x - 20, z - 10.0, -20);
         }
     }
 
@@ -240,15 +239,11 @@ createCollidingSurfaceMesh()
     {
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
-            SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { (nPointPerSide) + i * nCols + j, (nPointPerSide) + i * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j } };
-            tri[1] = { { (nPointPerSide) + (i + 1) * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j, (nPointPerSide) + i * nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
-            tri[0] = { { (nPointPerSide * 2) + i * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j } };
-            tri[1] = { { (nPointPerSide * 2) + (i + 1) * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
+            triangles.push_back(Vec3i((nPointPerSide) + i * nCols + j, (nPointPerSide) + i * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((nPointPerSide) + (i + 1) * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j, (nPointPerSide) + i * nCols + j + 1));
+
+            triangles.push_back(Vec3i((nPointPerSide * 2) + i * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((nPointPerSide * 2) + (i + 1) * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1));
         }
     }
 
@@ -265,8 +260,8 @@ createCollidingSurfaceMesh()
         {
             const double z = (double)dz1 * j;
             const double y = (double)dy1 * i;
-            vertList[(nPointPerSide * 3) + i * nCols + j] = Vec3d(20, z - 10.0, y - 20);
-            vertList[(nPointPerSide * 4) + i * nCols + j] = Vec3d(-20, z - 10.0, y - 20);
+            vertices[(nPointPerSide * 3) + i * nCols + j] = Vec3d(20, z - 10.0, y - 20);
+            vertices[(nPointPerSide * 4) + i * nCols + j] = Vec3d(-20, z - 10.0, y - 20);
         }
     }
 
@@ -275,19 +270,15 @@ createCollidingSurfaceMesh()
     {
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
-            SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { (nPointPerSide * 3) + i * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j } };
-            tri[1] = { { (nPointPerSide * 3) + (i + 1) * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
-            tri[0] = { { (nPointPerSide * 4) + i * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j } };
-            tri[1] = { { (nPointPerSide * 4) + (i + 1) * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1 } };
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
+            triangles.push_back(Vec3i((nPointPerSide * 3) + i * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((nPointPerSide * 3) + (i + 1) * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1));
+
+            triangles.push_back(Vec3i((nPointPerSide * 4) + i * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((nPointPerSide * 4) + (i + 1) * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1));
         }
     }
 
     imstkNew<SurfaceMesh> floorMeshColliding;
-    floorMeshColliding->initialize(vertList, triangles);
+    floorMeshColliding->initialize(verticesPtr, trianglesPtr);
     return floorMeshColliding;
 }

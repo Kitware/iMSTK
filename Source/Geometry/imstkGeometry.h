@@ -22,8 +22,8 @@
 #pragma once
 
 #include "imstkEventObject.h"
+#include "imstkMacros.h"
 #include "imstkMath.h"
-#include "imstkTypes.h"
 
 #include <tbb/concurrent_unordered_set.h>
 
@@ -94,7 +94,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~Geometry() override;
+    virtual ~Geometry() override = default;
 
     ///
     /// \brief Print
@@ -104,13 +104,23 @@ public:
     ///
     /// \brief Returns the volume of the geometry (if valid)
     ///
-    virtual double getVolume() const { return 0.0; };
+    virtual double getVolume() { return 0.0; };
 
     ///
     /// \brief Compute the bounding box for the geometry
     /// \todo Padding should not be here
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const;
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0);
+
+    ///
+    /// \brief Returns the bounding box center
+    ///
+    virtual Vec3d getCenter()
+    {
+        Vec3d min, max;
+        computeBoundingBox(min, max);
+        return (min + max) * 0.5;
+    }
 
     ///
     /// \brief Translate the geometry in Cartesian space
@@ -153,13 +163,13 @@ public:
     ///
     /// \brief Get/Set scaling
     ///
-    double getScaling() const;
+    double getScaling() const { return m_scaling; }
     void setScaling(const double s);
 
     ///
     /// \brief Returns the type of the geometry
     ///
-    Type getType() const;
+    Type getType() const { return m_type; }
 
     ///
     /// \brief Get name of the geometry
@@ -204,9 +214,6 @@ protected:
 
     /// Total number of geometries that have been created in this program
     static uint32_t s_NumGeneratedGegometries;
-
-    /// Set of string names of all generated geometries, used to check for name duplication
-    static tbb::concurrent_unordered_set<std::string> s_sGegometryNames;
 
     friend class VTKRenderer;
     friend class VTKRenderDelegate;

@@ -101,5 +101,6 @@ CollidingObject::updateGeometries()
     {
         m_collidingToVisualMap->apply();
     }
+    SceneObject::updateGeometries();
 }
 } // imstk

@@ -24,7 +24,7 @@
 namespace  imstk
 {
 void
-PbdVolumeConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
+PbdVolumeConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
                                     const size_t& pIdx0, const size_t& pIdx1,
                                     const size_t& pIdx2, const size_t& pIdx3,
                                     const double k)
@@ -46,9 +46,10 @@ PbdVolumeConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
 }
 
 bool
-PbdVolumeConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                             double&                 c,
-                                             StdVectorOfVec3d&       dcdx) const
+PbdVolumeConstraint::computeValueAndGradient(
+    const VecDataArray<double, 3>& currVertexPositions,
+    double& c,
+    std::vector<Vec3d>& dcdx) const
 {
     const auto i0 = m_vertexIds[0];
     const auto i1 = m_vertexIds[1];

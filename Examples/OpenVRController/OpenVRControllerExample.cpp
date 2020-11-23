@@ -138,7 +138,7 @@ main()
         // This button event is emitted from the viewer's thread, thus it is queued to the scene so that we do not
         // run it while the scene is updating
         bool blade10InHand = true;
-        queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), EventType::DeviceButtonPress, sceneManager,
+        queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), EventType::DeviceButtonEvent, sceneManager,
             [&](ButtonEvent* e)
         {
             // When any button pressed, swap blade

@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -37,55 +38,56 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    PbdState()  = default;
-    ~PbdState() = default;
-
-    ///
-    /// \brief Initialize the pbd state
-    ///
-    void initialize(const size_t numNodes);
-    void initialize(const StdVectorOfVec3d& vertices);
-
-    ///
-    /// \brief Get/Set nodal position given the index
-    ///
-    void setVertexPosition(const size_t& idx, const Vec3d& pos) { m_pos->at(idx) = pos; }
-    Vec3d& getVertexPosition(const size_t& idx) { return m_pos->at(idx); }
-
-    ///
-    /// \brief Returns the vector of current nodal positions
-    ///
-    std::shared_ptr<StdVectorOfVec3d> getPositions() { return m_pos; }
-    void setPositions(std::shared_ptr<StdVectorOfVec3d> p)
+    PbdState(const int numElements) :
+        m_pos(std::make_shared<VecDataArray<double, 3>>(numElements)),
+        m_vel(std::make_shared<VecDataArray<double, 3>>(numElements)),
+        m_acc(std::make_shared<VecDataArray<double, 3>>(numElements))
     {
-        m_pos->resize(p->size());
-        std::copy(p->begin(), p->end(), m_pos->begin());
+        std::fill_n(m_pos->getPointer(), numElements, Vec3d(0.0, 0.0, 0.0));
+        std::fill_n(m_vel->getPointer(), numElements, Vec3d(0.0, 0.0, 0.0));
+        std::fill_n(m_acc->getPointer(), numElements, Vec3d(0.0, 0.0, 0.0));
     }
 
-    void setPositions(const StdVectorOfVec3d& p)
-    {
-        m_pos->resize(p.size());
-        std::copy(p.begin(), p.end(), m_pos->begin());
-    }
-
-    ///
-    /// \brief Returns the vector of current nodal velocities
-    ///
-    std::shared_ptr<StdVectorOfVec3d> getVelocities() { return m_vel; }
+    virtual ~PbdState() = default;
 
     ///
     /// \brief Returns the vector of current nodal accelerations
     ///
-    std::shared_ptr<StdVectorOfVec3d> getAccelerations() { return m_acc; }
+    std::shared_ptr<VecDataArray<double, 3>> getAccelerations() { return m_acc; }
 
     ///
-    /// \brief Set the state to a given one
+    /// \brief Returns the vector of current nodal positions
+    ///
+    std::shared_ptr<VecDataArray<double, 3>> getPositions() { return m_pos; }
+
+    ///
+    /// \brief Returns the vector of current nodal velocities
+    ///
+    std::shared_ptr<VecDataArray<double, 3>> getVelocities() { return m_vel; }
+
+    ///
+    /// \brief Set the vector for accelerations
+    ///
+    void setAccelerations(std::shared_ptr<VecDataArray<double, 3>> accelerations) { m_acc = accelerations; }
+
+    ///
+    /// \brief Sets the vector that stores the positions
+    ///
+    void setPositions(std::shared_ptr<VecDataArray<double, 3>> positions) { m_pos = positions; }
+
+    ///
+    /// \brief Set the vector for velocities
+    ///
+    void setVelocities(std::shared_ptr<VecDataArray<double, 3>> velocities) { m_vel = velocities; }
+
+    ///
+    /// \brief Set the state to a given one, copies vector values by value instead of references
     ///
     void setState(std::shared_ptr<PbdState> rhs);
 
 private:
-    std::shared_ptr<StdVectorOfVec3d> m_pos = std::make_shared<StdVectorOfVec3d>(); ///> Nodal positions
-    std::shared_ptr<StdVectorOfVec3d> m_vel = std::make_shared<StdVectorOfVec3d>(); ///> Nodal velocities
-    std::shared_ptr<StdVectorOfVec3d> m_acc = std::make_shared<StdVectorOfVec3d>(); ///> Nodal acelerations
+    std::shared_ptr<VecDataArray<double, 3>> m_pos; ///> Nodal positions
+    std::shared_ptr<VecDataArray<double, 3>> m_vel; ///> Nodal velocities
+    std::shared_ptr<VecDataArray<double, 3>> m_acc; ///> Nodal acelerations
 };
 } // imstk

@@ -24,11 +24,11 @@
 namespace imstk
 {
 void
-PbdBendConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                                  const size_t&           pIdx0,
-                                  const size_t&           pIdx1,
-                                  const size_t&           pIdx2,
-                                  const double            k)
+PbdBendConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+                                  const size_t& pIdx0,
+                                  const size_t& pIdx1,
+                                  const size_t& pIdx2,
+                                  const double k)
 {
     m_vertexIds[0] = pIdx0;
     m_vertexIds[1] = pIdx1;
@@ -48,9 +48,10 @@ PbdBendConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
 }
 
 bool
-PbdBendConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                           double&                 c,
-                                           StdVectorOfVec3d&       dcdx) const
+PbdBendConstraint::computeValueAndGradient(
+    const VecDataArray<double, 3>& currVertexPositions,
+    double& c,
+    std::vector<Vec3d>& dcdx) const
 {
     const size_t i0 = m_vertexIds[0];
     const size_t i1 = m_vertexIds[1];
@@ -72,7 +73,6 @@ PbdBendConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPos
 
     c = dist - m_restLength;
 
-    dcdx.resize(3);
     dcdx[0] = (-2.0 / dist) * diff;
     dcdx[1] = -2.0 * dcdx[0];
     dcdx[2] = dcdx[0];

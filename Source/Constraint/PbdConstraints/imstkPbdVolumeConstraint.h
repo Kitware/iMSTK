@@ -36,7 +36,11 @@ public:
     ///
     /// \brief constructor
     ///
-    PbdVolumeConstraint() { m_vertexIds.resize(4); }
+    PbdVolumeConstraint()
+    {
+        m_vertexIds.resize(4);
+        m_dcdx.resize(4);
+    }
 
     ///
     /// \brief Returns PBD constraint of type Type::Volume
@@ -46,7 +50,7 @@ public:
     ///
     /// \brief Initializes the volume constraint
     ///
-    void initConstraint(const StdVectorOfVec3d& initVertexPositions,
+    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
                         const double k = 2.0);
@@ -54,9 +58,10 @@ public:
     ///
     /// \brief Compute the value and gradient of constraint
     ///
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const override;
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPosition,
+        double& c,
+        std::vector<Vec3d>& dcdx) const override;
 
 protected:
     double m_restVolume = 0.0; ///> Rest volume

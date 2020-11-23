@@ -121,7 +121,7 @@ main()
             keyControl->setViewer(viewer);
             viewer->addControl(keyControl);
 
-            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyPress,
+            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
                 [&](KeyPressEvent* e)
             {
                 if (e->m_keyPressType == KEY_PRESS)

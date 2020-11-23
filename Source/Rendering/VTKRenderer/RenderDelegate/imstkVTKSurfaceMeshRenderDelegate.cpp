@@ -20,154 +20,261 @@
 =========================================================================*/
 
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkDataArray.h"
+#include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTextureManager.h"
 #include "imstkVisualModel.h"
+#include "imstkVecDataArray.h"
 
 #include <vtkActor.h>
+#include <vtkCellData.h>
 #include <vtkDoubleArray.h>
 #include <vtkFloatArray.h>
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLVertexBufferObject.h>
 #include <vtkPointData.h>
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkTexture.h>
+#include <vtkTransform.h>
 #include <vtkTrivialProducer.h>
 #include <vtkVersion.h>
 
+#include <vtkSTLWriter.h>
+
 namespace imstk
 {
-VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+    m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedTangentArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedScalarArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_visualModel = visualModel;
-
     auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    geometry->computeVertexNeighborTriangles();
 
-    // Map vertices
-    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double*           vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
+    // Get our own handles to these in case the geometry changes them
+    m_vertices = geometry->getVertexPositions();
+    m_indices  = geometry->getTriangleIndices();
 
-    // Create points
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(geometry->getNumVertices());
-    points->SetData(m_mappedVertexArray);
-
-    // Copy cells
-    auto      cells = vtkSmartPointer<vtkCellArray>::New();
-    vtkIdType cell[3];
-    for (const auto& t : geometry->getTrianglesVertices())
+    // Map vertices to VTK point data
+    if (m_vertices != nullptr)
     {
-        for (size_t i = 0; i < 3; ++i)
-        {
-            cell[i] = t[i];
-        }
-        cells->InsertNextCell(3, cell);
+        m_mappedVertexArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_vertices));
+        auto points = vtkSmartPointer<vtkPoints>::New();
+        points->SetNumberOfPoints(geometry->getNumVertices());
+        points->SetData(m_mappedVertexArray);
+        m_polydata->SetPoints(points);
     }
 
-    // Create PolyData
-    auto polydata = vtkSmartPointer<vtkPolyData>::New();
-    polydata->SetPoints(points);
-    polydata->SetPolys(cells);
-    // If the geometry has scalars, set them on the polydata
-    if (geometry->getScalars() != nullptr)
+    // Map indices to VTK cell data (copied)
+    if (m_indices != nullptr)
     {
-        std::shared_ptr<StdVectorOfReal> scalars = geometry->getScalars();
-        m_mappedScalarArray->SetNumberOfComponents(1);
-        m_mappedScalarArray->SetArray(reinterpret_cast<double*>(scalars->data()), scalars->size(), 1);
-        polydata->GetPointData()->SetScalars(m_mappedScalarArray);
-    }
-
-    // Map normals
-    geometry->computeVertexNormals();
-
-    StdVectorOfVec3d& normals    = geometry->getVertexNormalsNotConst();
-    double*           normalData = reinterpret_cast<double*>(normals.data());
-    m_mappedNormalArray->SetNumberOfComponents(3);
-    m_mappedNormalArray->SetArray(normalData, normals.size() * 3, 1);
-    polydata->GetPointData()->SetNormals(m_mappedNormalArray);
-
-    // Create connection source
-    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(polydata);
-    geometry->m_dataModified = false;
-
-    // Setup texture coordinates
-    if (geometry->getDefaultTCoords() != "")
-    {
-        // Convert texture coordinates
-        auto tcoords = geometry->getPointDataArray(geometry->getDefaultTCoords());
-        if (tcoords == nullptr)
+        m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+        vtkIdType cell[3];
+        for (const auto& t : *m_indices)
         {
-            LOG(WARNING) << "No default texture coordinates array for geometry " << geometry;
-        }
-        else
-        {
-            auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
-            vtkTCoords->SetNumberOfComponents(2);
-            vtkTCoords->SetName(geometry->getDefaultTCoords().c_str());
-
-            for (auto const tcoord : *tcoords)
+            for (size_t i = 0; i < 3; ++i)
             {
-                float tuple[2] = { tcoord[0], tcoord[1] };
-                vtkTCoords->InsertNextTuple(tuple);
+                cell[i] = t[i];
             }
-
-            polydata->GetPointData()->SetTCoords(vtkTCoords);
+            m_cellArray->InsertNextCell(3, cell);
         }
+        m_polydata->SetPolys(m_cellArray);
     }
 
-    // Update tangents
-    if (geometry->getVertexTangents().size() > 0)
+    // Map vertex scalars if it has them
+    if (geometry->getVertexScalars() != nullptr)
     {
-        auto tangents = vtkSmartPointer<vtkFloatArray>::New();
-        tangents->SetName("tangents");
-        tangents->SetNumberOfComponents(3);
-
-        for (auto const tangent : geometry->getVertexTangents())
-        {
-            float tempTangent[3] = { (float)tangent[0],
-                                     (float)tangent[1],
-                                     (float)tangent[2] };
-            tangents->InsertNextTuple(tempTangent);
-        }
-        polydata->GetPointData()->SetTangents(tangents);
+        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(geometry->getVertexScalars());
+        m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
     }
 
-    // Update Transform, Render Properties
-    this->update();
-    this->setUpMapper(source->GetOutputPort(), m_visualModel);
+    // Map cell scalars if it has them
+    if (geometry->getCellScalars() != nullptr)
+    {
+        m_mappedCellScalarArray = GeometryUtils::coupleVtkDataArray(geometry->getCellScalars());
+        m_polydata->GetCellData()->SetScalars(m_mappedCellScalarArray);
+    }
 
-    m_isMesh = true;
+    // Map normals, if none provided compute per vertex normals
+    if (geometry->getVertexNormals() == nullptr)
+    {
+        geometry->computeVertexNormals();
+    }
+    m_mappedNormalArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(geometry->getVertexNormals()));
+    m_polydata->GetPointData()->SetNormals(m_mappedNormalArray);
 
-    //m_mapper->setIsSurfaceMapper(true);
+    // Map TCoords
+    if (geometry->getVertexTCoords() != nullptr)
+    {
+        m_mappedTCoordsArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(geometry->getVertexTCoords()));
+        m_mappedTCoordsArray->SetName(geometry->getActiveVertexTCoords().c_str());
+        m_polydata->GetPointData()->SetTCoords(m_mappedTCoordsArray);
+
+        // Map Tangents
+        //geometry->computeVertexTangents();
+        //if (geometry->getVertexTangents() != nullptr)
+        //{
+        //    // todo: I might need these as float for PBR?
+        //    m_mappedTangentArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(geometry->getVertexTangents()));
+        //    m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
+        //}
+    }
+
+    // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
+    queueConnect<Event>(geometry, EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::geometryModified);
+
+    // When the vertex buffer internals are modified, ie: a single or N elements
+    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputData(m_polydata);
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        //actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+        if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper))
+        {
+            glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+        }
+    }
+
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKSurfaceMeshRenderDelegate::updateDataSource()
+VTKSurfaceMeshRenderDelegate::processEvents()
+{
+    // Custom handling of events
+    std::shared_ptr<SurfaceMesh>             geom     = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
+
+    // Only use the most recent event from respective sender
+    std::list<Command> cmds;
+    bool               contains[4] = { false, false, false, false };
+    rforeachEvent([&](Command cmd)
+        {
+            if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
+            {
+                cmds.push_back(cmd);
+                contains[0] = true;
+            }
+            else if (cmd.m_event->m_sender == m_material.get() && !contains[1])
+            {
+                cmds.push_back(cmd);
+                contains[1] = true;
+            }
+            else if (cmd.m_event->m_sender == geom.get() && !contains[2])
+            {
+                cmds.push_back(cmd);
+                contains[2] = true;
+            }
+            else if (cmd.m_event->m_sender == vertices.get() && !contains[3])
+            {
+                cmds.push_back(cmd);
+                contains[3] = true;
+            }
+        });
+
+    // Now do each event in order recieved
+    for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
+    {
+        i->invoke();
+    }
+}
+
+void
+VTKSurfaceMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
 
-    if (geometry->m_dataModified)
+    // Update the pointer of the coupled array
+    m_vertices = geometry->getVertexPositions();
+    if (m_vertices->getVoidPointer() != m_mappedVertexArray->GetVoidPointer(0))
+    {
+        m_mappedVertexArray->SetNumberOfComponents(3);
+        m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+    }
+    m_mappedVertexArray->Modified();
+
+    // If the material says we should recompute normals
+    if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
     {
         geometry->computeVertexNormals();
-
-        StdVectorOfVec3d& normals    = geometry->getVertexNormalsNotConst();
-        double*           normalData = reinterpret_cast<double*>(normals.data());
+        std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();
+        double*                                  normalData = reinterpret_cast<double*>(normals->getPointer());
         m_mappedNormalArray->SetNumberOfComponents(3);
-        m_mappedNormalArray->SetArray(normalData, normals.size() * 3, 1);
-        this->m_mapper->GetInput()->GetPointData()->SetNormals(m_mappedNormalArray);
-
-        m_mappedVertexArray->Modified();
+        m_mappedNormalArray->SetArray(normalData, normals->size() * 3, 1);
         m_mappedNormalArray->Modified();
-        geometry->m_dataModified = false;
+    }
+}
+
+//void
+//VTKSurfaceMeshRenderDelegate::indexDataModified(Event* e)
+//{
+//
+//}
+
+void
+VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+
+    //bool vertexOrIndexBufferChanged = false;
+
+    // If the vertices were reallocated
+    if (m_vertices != geometry->getVertexPositions())
+    {
+        //printf("Vertex data swapped\n");
+        m_vertices = geometry->getVertexPositions();
+        {
+            // Update the pointer of the coupled array
+            m_mappedVertexArray->SetNumberOfComponents(3);
+            m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+        }
+        //vertexOrIndexBufferChanged = true;
+    }
+
+    // Notify VTK that the vertices were changed
+    m_mappedVertexArray->Modified();
+
+    // Only update index buffer when reallocated
+    if (m_indices != geometry->getTriangleIndices())
+    {
+        m_indices = geometry->getTriangleIndices();
+        {
+            // Copy cells
+            m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+            vtkIdType cell[3];
+            for (const auto& t : *m_indices)
+            {
+                for (size_t i = 0; i < 3; ++i)
+                {
+                    cell[i] = t[i];
+                }
+                m_cellArray->InsertNextCell(3, cell);
+            }
+            m_polydata->SetPolys(m_cellArray);
+            m_polydata->Modified();
+        }
+        //vertexOrIndexBufferChanged = true;
+    }
+
+    if (/*vertexOrIndexBufferChanged && */ m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
+    {
+        geometry->computeVertexNormals();
+        std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();
+        double*                                  normalData = reinterpret_cast<double*>(normals->getPointer());
+        m_mappedNormalArray->SetNumberOfComponents(3);
+        m_mappedNormalArray->SetArray(normalData, normals->size() * 3, 1);
+        m_mappedNormalArray->Modified();
     }
 }
 
@@ -213,8 +320,10 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         // Set texture
         auto currentTexture = textureDelegate->getTexture();
 
+        vtkSmartPointer<vtkActor> actor = vtkActor::SafeDownCast(m_actor);
+
 #if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION <= 1)
-        m_actor->GetProperty()->SetTexture(currentUnit, currentTexture);
+        actor->GetProperty()->SetTexture(currentUnit, currentTexture);
 #else
         if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
         {
@@ -222,19 +331,19 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
             {
             case Texture::Type::Diffuse:
             {
-                m_actor->GetProperty()->SetBaseColorTexture(currentTexture);
+                actor->GetProperty()->SetBaseColorTexture(currentTexture);
                 break;
             }
             case Texture::Type::Normal:
             {
-                m_actor->GetProperty()->SetNormalTexture(currentTexture);
-                m_actor->GetProperty()->SetNormalScale(material->getNormalStrength());
+                actor->GetProperty()->SetNormalTexture(currentTexture);
+                actor->GetProperty()->SetNormalScale(material->getNormalStrength());
                 break;
             }
             case Texture::Type::AmbientOcclusion:
             {
-                m_actor->GetProperty()->SetORMTexture(currentTexture);
-                m_actor->GetProperty()->SetOcclusionStrength(material->getOcclusionStrength());
+                actor->GetProperty()->SetORMTexture(currentTexture);
+                actor->GetProperty()->SetOcclusionStrength(material->getOcclusionStrength());
                 break;
             }
             default:
@@ -244,7 +353,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         }
         else
         {
-            m_actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
+            actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
         }
 
 #endif

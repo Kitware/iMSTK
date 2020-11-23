@@ -21,36 +21,57 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkCellArray;
+class vtkDataArray;
 class vtkDoubleArray;
+class vtkPolyData;
 
 namespace imstk
 {
 class LineMesh;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VTKLineMeshRenderDelegate
 ///
 /// \brief
 ///
-class VTKLineMeshRenderDelegate : public VTKRenderDelegate
+class VTKLineMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     virtual ~VTKLineMeshRenderDelegate() override = default;
 
     ///
     /// \brief Update line source based on the line mesh
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
+    ///
+    /// \brief Callback when vertices change
+    ///
+    void vertexDataModified(Event* e);
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
+    ///
+    /// \brief Callback when geometry changes
+    ///
+    void geometryModified(Event* e);
+
+protected:
+    std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+    std::shared_ptr<VecDataArray<int, 2>>    m_indices;
+
+    vtkSmartPointer<vtkPolyData> m_polydata;
+
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
+    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
+    vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
 }

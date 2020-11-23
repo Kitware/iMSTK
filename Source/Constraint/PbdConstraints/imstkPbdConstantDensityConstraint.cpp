@@ -25,7 +25,7 @@ limitations under the License.
 namespace imstk
 {
 void
-PbdConstantDensityConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions, const double)
+PbdConstantDensityConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double)
 {
     const size_t numParticles = initVertexPositions.size();
 
@@ -45,10 +45,10 @@ PbdConstantDensityConstraint::initConstraint(const StdVectorOfVec3d& initVertexP
 }
 
 void
-PbdConstantDensityConstraint::projectConstraint(const StdVectorOfReal&           imstkNotUsed(currInvMasses),
-                                                const double                     imstkNotUsed(dt),
+PbdConstantDensityConstraint::projectConstraint(const DataArray<double>& imstkNotUsed(currInvMasses),
+                                                const double imstkNotUsed(dt),
                                                 const PbdConstraint::SolverType& imstkNotUsed(type),
-                                                StdVectorOfVec3d&                currVertexPositions)
+                                                VecDataArray<double, 3>& currVertexPositions)
 {
     const size_t numParticles = currVertexPositions.size();
 
@@ -97,9 +97,9 @@ PbdConstantDensityConstraint::gradSpiky(const Vec3d& pi, const Vec3d& pj)
 }
 
 void
-PbdConstantDensityConstraint::computeDensity(const Vec3d&            pi,
-                                             const size_t            index,
-                                             const StdVectorOfVec3d& positions)
+PbdConstantDensityConstraint::computeDensity(const Vec3d& pi,
+                                             const size_t index,
+                                             const VecDataArray<double, 3>& positions)
 {
     double densitySum = 0.0;
     for (auto q : m_neighborList[index])
@@ -111,9 +111,9 @@ PbdConstantDensityConstraint::computeDensity(const Vec3d&            pi,
 }
 
 void
-PbdConstantDensityConstraint::computeLambdaScalingFactor(const Vec3d&            pi,
-                                                         const size_t            index,
-                                                         const StdVectorOfVec3d& positions)
+PbdConstantDensityConstraint::computeLambdaScalingFactor(const Vec3d& pi,
+                                                         const size_t index,
+                                                         const VecDataArray<double, 3>& positions)
 {
     const double densityConstraint = (m_densities[index] / m_restDensity) - 1;
     double       gradientSum       = 0.0;
@@ -126,9 +126,9 @@ PbdConstantDensityConstraint::computeLambdaScalingFactor(const Vec3d&           
 }
 
 void
-PbdConstantDensityConstraint::updatePositions(const Vec3d&      pi,
-                                              const size_t      index,
-                                              StdVectorOfVec3d& positions)
+PbdConstantDensityConstraint::updatePositions(const Vec3d& pi,
+                                              const size_t index,
+                                              VecDataArray<double, 3>& positions)
 {
     //Make sure the point is valid
     Vec3d gradientLambdaSum(0., 0., 0.);

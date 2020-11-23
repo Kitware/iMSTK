@@ -69,23 +69,16 @@ public:
     ///
     unsigned int getMaxNumDecals();
 
-    ///
-    /// \brief Returns the volume of the cube
-    ///
-    double getVolume() const override { return 0; }
-
 protected:
     friend class VulkanDecalRenderDelegate;
 
     std::deque<std::shared_ptr<Decal>> m_orderedDecals;
     std::deque<std::shared_ptr<Decal>> m_freeDecals;
 
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-    void applyTranslation(const Vec3d t) override {}
-    void applyRotation(const Mat3d r) override {}
-    void applyScaling(const double s) override {}
-#pragma warning( push )
+    void applyTranslation(const Vec3d imstkNotUsed(t)) override {}
+    void applyRotation(const Mat3d imstkNotUsed(r)) override {}
+    void applyScaling(const double imstkNotUsed(s)) override {}
+
     virtual void updatePostTransformData() const override {}
 
     unsigned int m_maxNumDecals;

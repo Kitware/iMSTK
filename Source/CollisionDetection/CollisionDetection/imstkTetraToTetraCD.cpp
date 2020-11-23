@@ -43,13 +43,13 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
     //tetrahedron belonging part of penetration type does not change
     auto cType = static_cast<PointTetrahedronCollisionDataElement::CollisionType>(idOffset > 0);
 
-    auto nodesMeshA = m_meshA->getVertexPositions();
-    auto nodesMeshB = m_meshB->getVertexPositions();
+    auto nodesMeshA = *m_meshA->getVertexPositions();
+    auto nodesMeshB = *m_meshB->getVertexPositions();
 
     ParallelUtils::parallelFor(mesh->getNumTetrahedra(),
         [&](const size_t tId)
         {
-            TetrahedralMesh::TetraArray vInd = mesh->getTetrahedronVertices(tId);
+            Vec4i& vInd = mesh->getTetrahedronIndices(tId);
             for (size_t i = 0; i < 4; ++i)  //if idOffset!=0 ?
             {
                 vInd[i] += idOffset;
@@ -108,8 +108,8 @@ void
 TetraToTetraCD::computeCollisionData()
 {
     m_hashTable.clear();
-    m_hashTable.insertPoints(m_meshA->getVertexPositions());
-    m_hashTable.insertPoints(m_meshB->getVertexPositions());
+    m_hashTable.insertPoints(*m_meshA->getVertexPositions());
+    m_hashTable.insertPoints(*m_meshB->getVertexPositions());
 
     m_colData->clearAll();
     this->findCollisionsForMeshWithinHashTable(m_meshA, 0);
