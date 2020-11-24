@@ -44,10 +44,12 @@ public:
         using self_type  = iterator;
         using value_type = T;
         using iterator_category = std::forward_iterator_tag;
-        using difference_type   = int;
+        using difference_type   = std::ptrdiff_t;
+        using pointer   = T*;
+        using reference = T&;
 
     public:
-        iterator(value_type* ptr) : ptr_(ptr) { }
+        iterator(pointer ptr) : ptr_(ptr) { }
 
         self_type operator++()
         {
@@ -62,16 +64,16 @@ public:
             return *this;
         }
 
-        value_type& operator*() { return *ptr_; }
+        reference operator*() { return *ptr_; }
 
-        value_type* operator->() { return ptr_; }
+        pointer operator->() { return ptr_; }
 
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
 
         bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
 
     private:
-        value_type* ptr_;
+        pointer ptr_;
     };
 
     class const_iterator
@@ -80,10 +82,12 @@ public:
         using self_type  = const_iterator;
         using value_type = T;
         using iterator_category = std::forward_iterator_tag;
-        using difference_type   = int;
+        using difference_type   = std::ptrdiff_t;
+        using pointer   = T*;
+        using reference = T&;
 
     public:
-        const_iterator(value_type* ptr) : ptr_(ptr) { }
+        const_iterator(pointer ptr) : ptr_(ptr) { }
 
         self_type operator++()
         {
@@ -94,16 +98,16 @@ public:
 
         self_type operator++(int junk) { ptr_++; return *this; }
 
-        const value_type& operator*() { return *ptr_; }
+        const reference operator*() { return *ptr_; }
 
-        const value_type* operator->() { return ptr_; }
+        const pointer operator->() { return ptr_; }
 
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
 
         bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
 
     private:
-        value_type* ptr_;
+        pointer ptr_;
     };
 
 public:
@@ -215,6 +219,11 @@ public:
             m_size = m_capacity = size;
         }
     }
+
+    ///
+    /// \brief Fill the array with the specified value
+    ///
+    inline void fill(const T& val) { std::fill_n(m_data, m_size, val); }
 
     ///
     /// \brief Resize to current size

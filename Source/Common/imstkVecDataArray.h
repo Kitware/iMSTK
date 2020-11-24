@@ -45,10 +45,12 @@ public:
         using self_type  = iterator;
         using value_type = VecType;
         using iterator_category = std::forward_iterator_tag;
-        using difference_type   = int;
+        using difference_type   = std::ptrdiff_t;
+        using pointer   = VecType*;
+        using reference = VecType&;
 
     public:
-        iterator(value_type* ptr) : ptr_(ptr) { }
+        iterator(pointer ptr) : ptr_(ptr) { }
 
         self_type operator++()
         {
@@ -63,16 +65,16 @@ public:
             return *this;
         }
 
-        value_type& operator*() { return *ptr_; }
+        reference operator*() { return *ptr_; }
 
-        value_type* operator->() { return ptr_; }
+        pointer operator->() { return ptr_; }
 
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
 
         bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
 
     private:
-        value_type* ptr_;
+        pointer ptr_;
     };
 
     class const_iterator
@@ -81,10 +83,12 @@ public:
         using self_type  = const_iterator;
         using value_type = VecType;
         using iterator_category = std::forward_iterator_tag;
-        using difference_type   = int;
+        using difference_type   = std::ptrdiff_t;
+        using pointer   = VecType*;
+        using reference = VecType&;
 
     public:
-        const_iterator(value_type* ptr) : ptr_(ptr) { }
+        const_iterator(pointer ptr) : ptr_(ptr) { }
 
         self_type operator++()
         {
@@ -95,16 +99,16 @@ public:
 
         self_type operator++(int junk) { ptr_++; return *this; }
 
-        const value_type& operator*() { return *ptr_; }
+        const reference operator*() { return *ptr_; }
 
-        const value_type* operator->() { return ptr_; }
+        const pointer operator->() { return ptr_; }
 
         bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
 
         bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
 
     private:
-        value_type* ptr_;
+        pointer ptr_;
     };
 
 public:
@@ -195,6 +199,8 @@ public:
             m_vecSize  = m_vecCapacity = size;
         }
     }
+
+    inline void fill(const VecType& val) { std::fill_n(m_dataCast, m_vecSize, val); }
 
     inline int size() const { return m_vecSize; }
 
