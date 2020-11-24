@@ -136,7 +136,7 @@ void
 VegaMeshIO::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
                       VecDataArray<int, dim>& cells)
 {
-    VecDataArray<int, dim>::VecType cell;
+    typename VecDataArray<int, dim>::VecType cell;
     for (size_t cellId = 0; cellId < vegaMesh->getNumElements(); ++cellId)
     {
         for (int i = 0; i < vegaMesh->getNumElementVertices(); ++i)

@@ -596,7 +596,7 @@ template<size_t dim>
 std::shared_ptr<VecDataArray<int, dim>>
 GeometryUtils::copyToVecDataArray(vtkCellArray* vtkCells)
 {
-    using VecType = VecDataArray<int, dim>::VecType;
+    using VecType = typename VecDataArray<int, dim>::VecType;
 
     CHECK(vtkCells != nullptr) << "No cells found!";
 

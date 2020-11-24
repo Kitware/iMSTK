@@ -117,8 +117,8 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
     std::vector<size_t>                   surfaceTriTet;
     std::vector<size_t>                   tetRemainingVert;
     bool                                  unique;
-    size_t                                foundAt, tetId = 0;
-    size_t                                a, b, c;
+    int                                   foundAt, tetId = 0;
+    int                                   a, b, c;
 
     for (int i = 0; i < tetraIndices.size(); i++)
     {
@@ -185,7 +185,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
     }
 
     // Renumber the vertices
-    std::list<size_t> uniqueVertIdList;
+    std::list<int> uniqueVertIdList;
     for (const auto& face : surfaceTri)
     {
         uniqueVertIdList.push_back(face[0]);
@@ -195,12 +195,12 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
     uniqueVertIdList.sort();
     uniqueVertIdList.unique();
 
-    size_t                                   vertId;
-    std::list<size_t>::iterator              it;
+    int                                      vertId;
+    std::list<int>::iterator                 it;
     std::shared_ptr<VecDataArray<double, 3>> vertPositions = std::make_shared<VecDataArray<double, 3>>();
     for (vertId = 0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
     {
-        vertPositions->push_back(this->getVertexPosition(*it));
+        vertPositions->push_back(this->getVertexPosition(static_cast<size_t>(*it)));
         for (auto& face : surfaceTri)
         {
             for (size_t i = 0; i < 3; ++i)

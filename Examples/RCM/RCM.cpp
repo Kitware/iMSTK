@@ -36,56 +36,23 @@ using namespace imstk;
 std::pair<std::shared_ptr<VecDataArray<int, 4>>, size_t> createConn();
 
 template<int N>
-void testRCM(const VecDataArray<int, N>& conn, const size_t numVerts);
-
-template<int N>
 void
-toSTLVector(const VecDataArray<int, N>& inArr, std::vector<std::array<size_t, N>>& outArr)
+toSTLVector(const VecDataArray<int, N>& inArr, std::vector<std::array<size_t, static_cast<size_t>(N)>>& outArr)
 {
+    using VecType = typename VecDataArray<int, N>::VecType;
+
     outArr.clear();
     outArr.reserve(inArr.size());
     for (int i = 0; i < inArr.size(); i++)
     {
-        const VecDataArray<int, N>::VecType& vec = inArr[i];
-        std::array<size_t, N>                conn;
+        const VecType&                             vec = inArr[i];
+        std::array<size_t, static_cast<size_t>(N)> conn;
         for (int j = 0; j < vec.size(); j++)
         {
             conn[j] = vec[j];
         }
         outArr.push_back(conn);
     }
-}
-
-int
-main(int argc, char** argv)
-{
-    // Log to stdout and file
-    Logger::startLogger();
-
-    // a 2D Cartesian mesh
-    {
-        auto p = createConn();
-        testRCM(*p.first, p.second);
-    }
-
-    // 3D mesh
-    {
-        auto         tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-        const size_t numVerts = tetMesh->getNumVertices();
-        std::cout << "Number of vertices = " << numVerts << std::endl;
-        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
-    }
-
-    // a surface mesh cover
-    {
-        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-        auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
-        auto numVerts = tetMesh->getNumVertices();
-        std::cout << "Number of vertices = " << numVerts << std::endl;
-        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
-    }
-
-    return 0;
 }
 
 template<int N>
@@ -120,8 +87,38 @@ testRCM(const VecDataArray<int, N>& conn, const size_t numVerts)
     }
 
     std::cout << "New bandwidth = " << bandwidth(newConn, numVerts) << "\n" << std::endl;
+}
 
-    return;
+int
+main(int argc, char** argv)
+{
+    // Log to stdout and file
+    Logger::startLogger();
+
+    // a 2D Cartesian mesh
+    {
+        auto p = createConn();
+        testRCM<(int)4>(*p.first, p.second);
+    }
+
+    // 3D mesh
+    {
+        auto         tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+        const size_t numVerts = tetMesh->getNumVertices();
+        std::cout << "Number of vertices = " << numVerts << std::endl;
+        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
+    }
+
+    // a surface mesh cover
+    {
+        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+        auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
+        auto numVerts = tetMesh->getNumVertices();
+        std::cout << "Number of vertices = " << numVerts << std::endl;
+        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
+    }
+
+    return 0;
 }
 
 std::pair<std::shared_ptr<VecDataArray<int, 4>>, size_t>
