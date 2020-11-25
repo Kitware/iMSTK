@@ -236,7 +236,7 @@ main()
     }
 
     // Write out simulation geometry
-    //MeshIO::write(clothGeometry, "cloth.vtk");
+    MeshIO::write(clothGeometry, "cloth.vtk");
 
     return 0;
 }

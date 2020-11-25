@@ -28,7 +28,7 @@
 namespace imstk
 {
 ///
-/// \class DataArray
+/// \class VecDataArray
 ///
 /// \brief Simple dynamic array implementation that also supports
 /// event posting and viewing/facade
