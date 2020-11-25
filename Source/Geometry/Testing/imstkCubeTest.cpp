@@ -76,7 +76,6 @@ imstkCubeTest(int argc, char* argv[])
 {
     // Init Google Test & Mock
     ::testing::InitGoogleTest(&argc, argv);
-    
 
     // Run tests with gtest
     return RUN_ALL_TESTS();
