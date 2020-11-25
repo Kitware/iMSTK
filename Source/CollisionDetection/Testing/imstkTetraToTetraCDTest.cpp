@@ -64,7 +64,7 @@ duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 ///
 /// \brief TODO
 ///
-TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
+TEST_F(imstkTetraToTetraCDTest, DISABLED_NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
     std::shared_ptr<TetrahedralMesh> b = std::make_shared<TetrahedralMesh>(); //empty mesh
@@ -83,7 +83,7 @@ TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 ///
 /// \brief TODO
 ///
-TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
+TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersection1T)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/oneTet/oneTet.veg");
     auto                             b = duplicate(a);

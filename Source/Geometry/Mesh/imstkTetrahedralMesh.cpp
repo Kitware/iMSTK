@@ -26,6 +26,11 @@
 
 namespace imstk
 {
+TetrahedralMesh::TetrahedralMesh(const std::string& name) : VolumetricMesh(Geometry::Type::TetrahedralMesh, name),
+    m_tetrahedraIndices(std::make_shared<VecDataArray<int, 4>>())
+{
+}
+
 void
 TetrahedralMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
                             std::shared_ptr<VecDataArray<int, 4>> tetrahedra,
