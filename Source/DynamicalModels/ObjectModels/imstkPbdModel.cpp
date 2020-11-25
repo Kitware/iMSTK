@@ -103,29 +103,8 @@ bool
 PbdModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
-    m_mesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
-    const int numParticles = static_cast<int>(m_mesh->getNumVertices());
 
-    m_initialState  = std::make_shared<PbdState>(numParticles);
-    m_previousState = std::make_shared<PbdState>(numParticles);
-    m_currentState  = std::make_shared<PbdState>(numParticles);
-
-    // Set the positional values (by ptr reference)
-    m_initialState->setPositions(m_mesh->getInitialVertexPositions());
-    m_currentState->setPositions(m_mesh->getVertexPositions());
-    m_previousState->setPositions(std::make_shared<VecDataArray<double, 3>>(*m_mesh->getVertexPositions()));
-
-    // todo: Once states are changed to data arrays we can add point attributes to the mesh for velocities, accelerations, and mass
-
-    // Setup the masses
-    m_mass->resize(numParticles);
-    m_invMass->resize(numParticles);
-    setUniformMass(m_parameters->m_uniformMassValue);
-
-    for (auto i : m_parameters->m_fixedNodeIds)
-    {
-        setFixedPoint(i);
-    }
+    initState();
 
     bool bOK = true; // Return immediately if some constraint failed to initialize
 
@@ -209,6 +188,62 @@ PbdModel::initialize()
     this->setTimeStepSizeType(m_timeStepSizeType);
 
     return bOK;
+}
+
+void
+PbdModel::initState()
+{
+    // Get the mesh
+    m_mesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
+    const int numParticles = static_cast<int>(m_mesh->getNumVertices());
+
+    m_initialState  = std::make_shared<PbdState>(numParticles);
+    m_previousState = std::make_shared<PbdState>(numParticles);
+    m_currentState  = std::make_shared<PbdState>(numParticles);
+
+    // Set the positional values (by ptr reference)
+    m_initialState->setPositions(m_mesh->getInitialVertexPositions());
+    m_currentState->setPositions(m_mesh->getVertexPositions());
+    m_previousState->setPositions(std::make_shared<VecDataArray<double, 3>>(*m_mesh->getVertexPositions()));
+
+    // Initialize Mass+InvMass
+    {
+        // If the input mesh has masses defined, use those
+        std::shared_ptr<AbstractDataArray> masses = m_mesh->getVertexAttribute("Mass");
+        if (masses != nullptr && masses->getNumberOfComponents() == 1 && masses->getScalarType() == IMSTK_DOUBLE && masses->size() == numParticles)
+        {
+            m_mass = std::dynamic_pointer_cast<DataArray<double>>(masses);
+            m_invMass->resize(m_mass->size());
+            for (int i = 0; i < m_mass->size(); i++)
+            {
+                (*m_invMass)[i] = ((*m_mass)[i] == 0.0) ? 0.0 : 1.0 / (*m_mass)[i];
+            }
+        }
+        // If not, initialize as uniform and put on mesh
+        else
+        {
+            // Initialize as uniform
+            m_mass->resize(numParticles);
+            m_invMass->resize(numParticles);
+
+            const double uniformMass = m_parameters->m_uniformMassValue;
+            std::fill(m_mass->begin(), m_mass->end(), uniformMass);
+            std::fill(m_invMass->begin(), m_invMass->end(), (uniformMass != 0.0) ? 1.0 / uniformMass : 0.0);
+
+            m_mesh->setVertexAttribute("Mass", m_mass);
+            m_mesh->setVertexAttribute("InvMass", m_invMass);
+        }
+    }
+
+    // Define velocities and accelerations on the geometry
+    m_mesh->setVertexAttribute("Velocities", m_currentState->getVelocities());
+    m_mesh->setVertexAttribute("Accelerations", m_currentState->getAccelerations());
+
+    // Overwrite some masses for specified fixed points
+    for (auto i : m_parameters->m_fixedNodeIds)
+    {
+        setFixedPoint(i);
+    }
 }
 
 void
@@ -622,21 +657,6 @@ PbdModel::setTimeStepSizeType(const TimeSteppingType type)
     if (type == TimeSteppingType::Fixed)
     {
         m_parameters->m_dt = m_parameters->m_defaultDt;
-    }
-}
-
-void
-PbdModel::setUniformMass(const double val)
-{
-    if (val != 0.0)
-    {
-        std::fill(m_mass->begin(), m_mass->end(), val);
-        std::fill(m_invMass->begin(), m_invMass->end(), 1.0 / val);
-    }
-    else
-    {
-        std::fill(m_invMass->begin(), m_invMass->end(), 0.0);
-        std::fill(m_mass->begin(), m_mass->end(), 0.0);
     }
 }
 

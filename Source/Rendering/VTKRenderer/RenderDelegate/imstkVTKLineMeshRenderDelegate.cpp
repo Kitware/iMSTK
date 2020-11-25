@@ -22,19 +22,16 @@
 #include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkLineMesh.h"
 #include "imstkVisualModel.h"
-#include "imstkVecDataArray.h"
 #include "imstkRenderMaterial.h"
 #include "imstkGeometryUtilities.h"
 
 #include <vtkActor.h>
 #include <vtkDoubleArray.h>
-#include <vtkLine.h>
 #include <vtkLineSource.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkOpenGLVertexBufferObject.h>
 #include <vtkPointData.h>
 #include <vtkTransform.h>
-#include <vtkTrivialProducer.h>
 
 namespace imstk
 {

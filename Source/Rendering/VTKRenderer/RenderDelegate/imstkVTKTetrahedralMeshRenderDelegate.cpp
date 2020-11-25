@@ -23,7 +23,6 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkRenderMaterial.h"
-#include "imstkVecDataArray.h"
 #include "imstkGeometryUtilities.h"
 
 #include <vtkActor.h>

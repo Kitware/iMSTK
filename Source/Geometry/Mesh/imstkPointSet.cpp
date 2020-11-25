@@ -272,7 +272,6 @@ PointSet::getVertexAttribute(const std::string& arrayName) const
     auto it = m_vertexAttributes.find(arrayName);
     if (it == m_vertexAttributes.end())
     {
-        LOG(WARNING) << "No array with such name holds any point data.";
         return nullptr;
     }
     return it->second;

@@ -29,7 +29,6 @@
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkOpenGLVertexBufferObject.h>
 #include <vtkPolyData.h>
-#include <vtkTrivialProducer.h>
 
 namespace imstk
 {

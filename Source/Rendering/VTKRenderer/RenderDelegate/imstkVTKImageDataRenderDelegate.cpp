@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkVTKImageDataRenderDelegate.h"
-#include "imstkDataArray.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkImageData.h"
 #include "imstkRenderMaterial.h"
@@ -28,7 +27,6 @@
 
 #include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkImageData.h>
-#include <vtkTrivialProducer.h>
 #include <vtkPointData.h>
 #include <vtkDataArray.h>
 #include <vtkVolume.h>

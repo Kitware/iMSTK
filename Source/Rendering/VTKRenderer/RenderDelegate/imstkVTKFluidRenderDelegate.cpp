@@ -24,14 +24,11 @@
 #include "imstkVisualModel.h"
 #include "imstkRenderMaterial.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkVecDataArray.h"
 
 #include <vtkOpenGLFluidMapper.h>
 #include <vtkVertexGlyphFilter.h>
-#include <vtkTrivialProducer.h>
 #include <vtkDoubleArray.h>
 #include <vtkVolume.h>
-#include <vtkTransform.h>
 
 namespace imstk
 {

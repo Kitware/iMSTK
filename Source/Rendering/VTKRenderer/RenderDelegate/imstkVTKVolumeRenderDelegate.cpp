@@ -22,12 +22,8 @@
 #include "imstkVTKVolumeRenderDelegate.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVisualModel.h"
-#include "imstkColorFunction.h"
 
-#include <vtkActor.h>
-#include <vtkColorTransferFunction.h>
 #include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkProperty.h>
 #include <vtkVolume.h>
 #include <vtkVolumeProperty.h>
 

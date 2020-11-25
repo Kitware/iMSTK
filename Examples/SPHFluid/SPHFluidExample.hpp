@@ -152,5 +152,7 @@ main(int argc, char* argv[])
         viewer->start();
     }
 
+    //MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry()), "fluid.vtk");
+
     return 0;
 }

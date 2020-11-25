@@ -146,20 +146,23 @@ SPHModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
     m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
+    const int numParticles = m_pointSetGeometry->getNumVertices();
 
-    // Initialize  positions and velocity of the particles
-    m_initialState = std::make_shared<SPHState>();
-    m_currentState = std::make_shared<SPHState>();
+    // Allocate init and current state
+    m_initialState = std::make_shared<SPHState>(numParticles);
+    m_currentState = std::make_shared<SPHState>(numParticles);
 
-    // Set particle positions and zero default velocities
-    /// \todo set particle data with given (non-zero) velocities
-    m_currentState->setParticleData(m_pointSetGeometry->getVertexPositions(), m_initialVelocities);
+    // If there were initial velocities (set them)
+    if (m_initialVelocities != nullptr)
+    {
+        m_currentState->setVelocities(m_initialVelocities);
+    }
 
-    getCurrentState()->initializeData(); // Allocate space for things
+    // Copy current to initial
+    m_initialState->setState(m_currentState);
 
-    m_initialState->setState(m_currentState); // Copy current to initial
-
-    // Overwrite initial positions with geometry initial positions
+    // Share geometry and state position arrays
+    m_currentState->setPositions(m_pointSetGeometry->getVertexPositions());
     m_initialState->setPositions(m_pointSetGeometry->getInitialVertexPositions());
 
     // Initialize simulation dependent parameters and kernel data
@@ -168,8 +171,6 @@ SPHModel::initialize()
     // Initialize neighbor searcher
     m_neighborSearcher = std::make_shared<NeighborSearch>(m_modelParameters->m_NeighborSearchMethod,
       m_modelParameters->m_kernelRadius);
-
-    const int numParticles = static_cast<int>(getCurrentState()->getNumParticles());
 
     m_pressureAccels = std::make_shared<VecDataArray<double, 3>>(numParticles);
     std::fill_n(m_pressureAccels->getPointer(), m_pressureAccels->size(), Vec3d(0, 0, 0));
@@ -187,18 +188,22 @@ SPHModel::initialize()
     m_particleShift = std::make_shared<VecDataArray<double, 3>>(numParticles);
     std::fill_n(m_particleShift->getPointer(), m_particleShift->size(), Vec3d(0, 0, 0));
 
+    // Add all the attributes to the geometry
+    m_pointSetGeometry->setVertexAttribute("Pressure Accels", m_pressureAccels);
+    m_pointSetGeometry->setVertexAttribute("Surface Tension Accels", m_surfaceTensionAccels);
+    m_pointSetGeometry->setVertexAttribute("Viscous Accels", m_viscousAccels);
+    m_pointSetGeometry->setVertexAttribute("Densities", m_currentState->getDensities());
+    m_pointSetGeometry->setVertexAttribute("Velocities", m_currentState->getVelocities());
+    m_pointSetGeometry->setVertexAttribute("Diffuse Velocities", m_currentState->getDiffuseVelocities());
+    m_pointSetGeometry->setVertexAttribute("Normals", m_currentState->getNormals());
+    m_pointSetGeometry->setVertexAttribute("Accels", m_currentState->getAccelerations());
+
     if (m_geomUnstructuredGrid)
     {
         m_minIndices.resize(m_geomUnstructuredGrid->getNumVertices());
     }
 
     return true;
-}
-
-void
-SPHModel::updatePhysicsGeometry()
-{
-    assert(m_pointSetGeometry);
 }
 
 void
@@ -281,7 +286,8 @@ SPHModel::computeNeighborRelativePositions()
                                         }
                                     };
 
-    VecDataArray<double, 3>& positions = *getCurrentState()->getPositions();
+    std::shared_ptr<VecDataArray<double, 3>> positionsPtr = getCurrentState()->getPositions();
+    const VecDataArray<double, 3>&           positions = *positionsPtr;
 
     std::vector<std::vector<NeighborInfo>>& neighborInfos = getCurrentState()->getNeighborInfo();
 
@@ -314,7 +320,8 @@ SPHModel::collectNeighborDensity()
     // After computing particle densities, cache them into neighborInfo variable, next to relative positions
     // this is useful because relative positions and densities are accessed together multiple times
     // caching relative positions and densities therefore can reduce computation time significantly (tested)
-    DataArray<double>& densities = *getCurrentState()->getDensities();
+    std::shared_ptr<DataArray<double>> densitiesPtr = getCurrentState()->getDensities();
+    DataArray<double>&                 densities    = *densitiesPtr;
 
     const std::vector<std::vector<size_t>>&                 neighborLists = getCurrentState()->getFluidNeighborLists();
     const std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
@@ -345,7 +352,8 @@ SPHModel::collectNeighborDensity()
 void
 SPHModel::computeDensity()
 {
-    DataArray<double>& densities = *getCurrentState()->getDensities();
+    std::shared_ptr<DataArray<double>> densitiesPtr = getCurrentState()->getDensities();
+    DataArray<double>&                 densities    = *densitiesPtr;
 
     const std::vector<std::vector<NeighborInfo>>& neighborInfos = getCurrentState()->getNeighborInfo();
 
@@ -393,7 +401,8 @@ SPHModel::normalizeDensity()
         return;
     }
 
-    DataArray<double>& densities = *getCurrentState()->getDensities();
+    std::shared_ptr<DataArray<double>> densitiesPtr = getCurrentState()->getDensities();
+    DataArray<double>&                 densities    = *densitiesPtr;
 
     const std::vector<std::vector<size_t>>&                 neighborLists = getCurrentState()->getFluidNeighborLists();
     const std::vector<std::vector<NeighborInfo>>&           neighborInfos = getCurrentState()->getNeighborInfo();
@@ -433,8 +442,9 @@ SPHModel::normalizeDensity()
 void
 SPHModel::computePressureAcceleration()
 {
-    const DataArray<double>& densities      = *getCurrentState()->getDensities();
-    VecDataArray<double, 3>& pressureAccels = *m_pressureAccels;
+    std::shared_ptr<DataArray<double>> densitiesPtr   = getCurrentState()->getDensities();
+    const DataArray<double>&           densities      = *densitiesPtr;
+    VecDataArray<double, 3>&           pressureAccels = *m_pressureAccels;
 
     const std::vector<std::vector<NeighborInfo>>&           neighborInfos = getCurrentState()->getNeighborInfo();
     const std::vector<SPHBoundaryConditions::ParticleType>& particleTypes = m_sphBoundaryConditions->getParticleTypes();
@@ -816,32 +826,6 @@ SPHModel::setInitialVelocities(const size_t numParticles, const Vec3d& initialVe
 }
 
 void
-SPHModel::writeStateToCSV()
-{
-    // \todo: Should be moved out of model
-    if (m_csvPreviousTime <= m_csvTimeModulo && m_totalTime >= m_csvTimeModulo)
-    {
-        LOG(INFO) << "Writing CSV at time: " << m_totalTime;
-        std::ofstream outputFile;
-        outputFile.open(std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".csv"));
-        outputFile << "X,Y,Z,Vx,Vy,Vz,Pressure\n";
-        const VecDataArray<double, 3>& positions  = *getCurrentState()->getPositions();
-        const VecDataArray<double, 3>& velocities = *getCurrentState()->getFullStepVelocities();
-        const DataArray<double>&       densities  = *getCurrentState()->getDensities();
-        for (int i = 0; i < getCurrentState()->getNumParticles(); ++i)
-        {
-            outputFile << positions[i].x() << "," << positions[i].y() << "," << positions[i].z() << ",";
-            outputFile << velocities[i].x() << "," << velocities[i].y() << "," << velocities[i].z() << ",";
-            outputFile << particlePressure(densities[i]) << "\n";
-        }
-        outputFile.close();
-
-        m_csvTimeModulo  += m_writeToOutputModulo;
-        m_csvPreviousTime = m_totalTime;
-    }
-}
-
-void
 SPHModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices)
 {
     const VecDataArray<double, 3>& positions = *getCurrentState()->getPositions();
@@ -877,13 +861,12 @@ SPHModel::writeStateToVtk()
         const VecDataArray<double, 3>& particleVelocities = *getCurrentState()->getFullStepVelocities();
         const DataArray<double>&       particleDensities  = *getCurrentState()->getDensities();
 
-        std::map<std::string, StdVectorOfVectorf> pointDataMap;
-        std::shared_ptr<VecDataArray<double, 3>>  velocityPtr = std::make_shared<VecDataArray<double, 3>>();
-        VecDataArray<double, 3>&                  velocity    = *velocityPtr;
-        std::shared_ptr<DataArray<double>>        pressurePtr = std::make_shared<DataArray<double>>();
-        DataArray<double>&                        pressure    = *pressurePtr;
-        std::shared_ptr<DataArray<double>>        densityPtr  = std::make_shared<DataArray<double>>();
-        DataArray<double>&                        density     = *densityPtr;
+        std::shared_ptr<VecDataArray<double, 3>> velocityPtr = std::make_shared<VecDataArray<double, 3>>();
+        VecDataArray<double, 3>&                 velocity    = *velocityPtr;
+        std::shared_ptr<DataArray<double>>       pressurePtr = std::make_shared<DataArray<double>>();
+        DataArray<double>&                       pressure    = *pressurePtr;
+        std::shared_ptr<DataArray<double>>       densityPtr  = std::make_shared<DataArray<double>>();
+        DataArray<double>&                       density     = *densityPtr;
 
         velocity.reserve(static_cast<int>(m_geomUnstructuredGrid->getNumVertices()));
         pressure.reserve(static_cast<int>(m_geomUnstructuredGrid->getNumVertices()));

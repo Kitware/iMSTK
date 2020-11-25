@@ -30,7 +30,6 @@
 #include "imstkVTKdebugLinesRenderDelegate.h"
 #include "imstkVTKdebugPointsRenderDelegate.h"
 #include "imstkVTKdebugTrianglesRenderDelegate.h"
-#include "imstkColorFunction.h"
 
 // VTK render delegates
 #include "imstkVTKCapsuleRenderDelegate.h"
@@ -47,20 +46,11 @@
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
 #include <vtkActor.h>
-#include <vtkAlgorithmOutput.h>
-#include <vtkColorTransferFunction.h>
 #include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkImageData.h>
 #include <vtkImageReader2.h>
 #include <vtkImageReader2Factory.h>
-#include <vtkOpenGLPolyDataMapper.h>
-#include <vtkOpenGLVertexBufferObject.h>
-#include <vtkPolyDataNormals.h>
-#include <vtkProperty.h>
 #include <vtkTexture.h>
 #include <vtkTransform.h>
-#include <vtkVolume.h>
-#include <vtkVolumeProperty.h>
 
 namespace imstk
 {

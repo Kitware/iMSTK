@@ -24,7 +24,6 @@
 #include "imstkVisualModel.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkRenderMaterial.h"
-#include "imstkVecDataArray.h"
 
 #include <vtkActor.h>
 #include <vtkDataSetMapper.h>
@@ -32,8 +31,6 @@
 #include <vtkUnstructuredGrid.h>
 #include <vtkPointData.h>
 #include <vtkTransform.h>
-
-#include <array>
 
 namespace imstk
 {

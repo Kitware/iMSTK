@@ -164,8 +164,7 @@ FEMDeformableBodyModel::initialize()
     // If there isn't already a displacements array for the geometry
     if (!pointSet->hasVertexAttribute("displacements"))
     {
-        int test = pointSet->getNumVertices();
-        pointSet->setVertexAttribute("displacements", std::make_shared<VecDataArray<double, 3>>(test));
+        pointSet->setVertexAttribute("displacements", std::make_shared<VecDataArray<double, 3>>(pointSet->getNumVertices()));
     }
 
     // Setup default solver if model doesn't yet have one

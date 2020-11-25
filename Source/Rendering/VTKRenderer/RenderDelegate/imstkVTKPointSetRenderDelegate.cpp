@@ -27,11 +27,7 @@
 
 #include <vtkDoubleArray.h>
 #include <vtkPointData.h>
-#include <vtkGlyph3D.h>
 #include <vtkOpenGLPolyDataMapper.h>
-#include <vtkSphereSource.h>
-#include <vtkTrivialProducer.h>
-#include <vtkVersion.h>
 #include <vtkVertexGlyphFilter.h>
 #include <vtkOpenGLVertexBufferObject.h>
 #include <vtkActor.h>

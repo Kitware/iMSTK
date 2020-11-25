@@ -30,12 +30,10 @@
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 
 #include <vtkAxesActor.h>
-#include <vtkCamera.h>
 #include <vtkCameraActor.h>
 #include <vtkCullerCollection.h>
 #include <vtkLight.h>
 #include <vtkLightActor.h>
-#include <vtkRenderer.h>
 
 #include <vtkAxis.h>
 #include <vtkChartXY.h>
@@ -49,9 +47,6 @@
 
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRCamera.h>
-#include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
-#include <vtkInteractorStyle3D.h>
 
 namespace imstk
 {

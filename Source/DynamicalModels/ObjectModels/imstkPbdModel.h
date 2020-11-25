@@ -191,11 +191,6 @@ public:
     std::shared_ptr<std::vector<PBDConstraintVector>> getPartitionedConstraints() { return m_partitionedConstraints; }
 
     ///
-    /// \brief Set uniform mass to all the nodes
-    ///
-    void setUniformMass(const double val);
-
-    ///
     /// \brief Set mass to particular node
     ///
     void setParticleMass(const double val, const size_t idx);
@@ -234,6 +229,11 @@ public:
     /// \brief Initialize the PBD model
     ///
     virtual bool initialize() override;
+
+    ///
+    /// \brief Initialize the PBD State
+    ///
+    void initState();
 
     ///
     /// \brief Set the threshold for constraint partitioning

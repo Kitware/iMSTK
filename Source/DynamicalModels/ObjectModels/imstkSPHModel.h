@@ -107,6 +107,7 @@ public:
     ///
     virtual ~SPHModel() override = default;
 
+public:
     ///
     /// \brief Set simulation parameters
     ///
@@ -118,53 +119,46 @@ public:
     virtual bool initialize() override;
 
     ///
-    /// \brief Update positions of point set geometry
-    ///
-    virtual void updatePhysicsGeometry() override;
-
-    ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState() override
-    { this->m_currentState->setState(this->m_initialState); }
+    virtual void resetToInitialState() override { this->m_currentState->setState(this->m_initialState); }
 
     ///
     /// \brief Get the simulation parameters
     ///
     const std::shared_ptr<SPHModelConfig>& getParameters() const
-    { assert(m_modelParameters); return m_modelParameters; }
+    {
+        assert(m_modelParameters);
+        return m_modelParameters;
+    }
 
     ///
     /// \brief Set the default time step size,
     /// valid only if using a fixed time step for integration
     ///
-    virtual void setTimeStep(const double timeStep) override
-    { setDefaultTimeStep(static_cast<Real>(timeStep)); }
+    virtual void setTimeStep(const double timeStep) override { setDefaultTimeStep(timeStep); }
 
     ///
     /// \brief Set the default time step size,
     /// valid only if using a fixed time step for integration
     ///
-    void setDefaultTimeStep(const Real timeStep)
-    { m_defaultDt = static_cast<Real>(timeStep); }
+    void setDefaultTimeStep(const double timeStep) { m_defaultDt = timeStep; }
 
     ///
     /// \brief Returns the time step size
     ///
-    virtual double getTimeStep() const override
-    { return static_cast<double>(m_dt); }
+    virtual double getTimeStep() const override { return m_dt; }
 
     void setInitialVelocities(const size_t numParticles, const Vec3d& initialVelocities);
 
-    Real particlePressure(const double density);
+    double particlePressure(const double density);
 
     ///
     /// \brief Write the state to external file
     /// \todo move this out of this class
     ///
-    void writeStateToCSV();
-    void setWriteToOutputModulo(const Real modulo) { m_writeToOutputModulo = modulo; }
-    Real getTotalTime() const { return m_totalTime; }
+    void setWriteToOutputModulo(const double modulo) { m_writeToOutputModulo = modulo; }
+    double getTotalTime() const { return m_totalTime; }
     int getTimeStepCount() const { return m_timeStepCount; }
     void writeStateToVtk();
     void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
@@ -175,8 +169,6 @@ public:
 
     void setHemorrhageModel(std::shared_ptr<SPHHemorrhage> sPHHemorrhage) { m_SPHHemorrhage = sPHHemorrhage; }
     std::shared_ptr<SPHHemorrhage> getHemorrhageModel() { return m_SPHHemorrhage; }
-
-    double getTotalTime() { return m_totalTime; }
 
     void setRestDensity(const Real restDensity) { m_modelParameters->m_restDensity = restDensity; }
 
@@ -266,7 +258,7 @@ private:
     ///
     void moveParticles(const Real timestep);
 
-    void computePressureOutlet();
+//void computePressureOutlet();
 
 protected:
     std::shared_ptr<TaskNode> m_findParticleNeighborsNode = nullptr;
@@ -285,8 +277,8 @@ protected:
 private:
     std::shared_ptr<PointSet> m_pointSetGeometry;
 
-    Real m_dt = 0;                                      ///> time step size
-    Real m_defaultDt;                                   ///> default time step size
+    double m_dt = 0.0;                                  ///> time step size
+    double m_defaultDt;                                 ///> default time step size
 
     SPHSimulationKernels m_kernels;                     ///> SPH kernels (must be initialized during model initialization)
     std::shared_ptr<SPHModelConfig> m_modelParameters;  ///> SPH Model parameters (must be set before simulation)

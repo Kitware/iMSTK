@@ -20,14 +20,10 @@
 =========================================================================*/
 
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
-#include "imstkDataArray.h"
 #include "imstkGeometryUtilities.h"
-#include "imstkLogger.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkTextureManager.h"
 #include "imstkVisualModel.h"
-#include "imstkVecDataArray.h"
 
 #include <vtkActor.h>
 #include <vtkCellData.h>
@@ -39,11 +35,7 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkTexture.h>
-#include <vtkTransform.h>
-#include <vtkTrivialProducer.h>
 #include <vtkVersion.h>
-
-#include <vtkSTLWriter.h>
 
 namespace imstk
 {
