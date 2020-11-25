@@ -154,11 +154,13 @@ SPHModel::initialize()
     // Set particle positions and zero default velocities
     /// \todo set particle data with given (non-zero) velocities
     m_currentState->setParticleData(m_pointSetGeometry->getVertexPositions(), m_initialVelocities);
-    m_initialState->setState(m_currentState); // Copy current to initial
-    m_initialState->setPositions(m_pointSetGeometry->getInitialVertexPositions());
 
-    // Initialize (allocate memory for) simulation data such as density, acceleration etc.
-    getCurrentState()->initializeData();
+    getCurrentState()->initializeData(); // Allocate space for things
+
+    m_initialState->setState(m_currentState); // Copy current to initial
+
+    // Overwrite initial positions with geometry initial positions
+    m_initialState->setPositions(m_pointSetGeometry->getInitialVertexPositions());
 
     // Initialize simulation dependent parameters and kernel data
     m_kernels.initialize(m_modelParameters->m_kernelRadius);
