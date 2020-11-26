@@ -1,21 +1,21 @@
 /*=========================================================================
 
-   Library: iMSTK
+  Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+  Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+  & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+     http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
 =========================================================================*/
 
@@ -23,63 +23,49 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
+#include "imstkNew.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 
 using namespace imstk;
 
-using QuadConn = std::array<size_t, 4>;
-
 ///
 /// \brief create a quad mesh
 /// \retval pair of connectivity and num of vertices
 ///
-std::pair<std::vector<QuadConn>, size_t> createConn();
+std::pair<std::shared_ptr<VecDataArray<int, 4>>, size_t> createConn();
 
-template<typename ElemConn>
-void testRCM(const std::vector<ElemConn>& conn, const size_t numVerts);
-
-int
-main(int argc, char** argv)
+template<int N>
+void
+toSTLVector(const VecDataArray<int, N>& inArr, std::vector<std::array<size_t, static_cast<size_t>(N)>>& outArr)
 {
-    // Log to stdout and file
-    Logger::startLogger();
+    using VecType = typename VecDataArray<int, N>::VecType;
 
-    // a 2D Cartesian mesh
+    outArr.clear();
+    outArr.reserve(inArr.size());
+    for (int i = 0; i < inArr.size(); i++)
     {
-        auto p = createConn();
-        testRCM(p.first, p.second);
+        const VecType&                             vec = inArr[i];
+        std::array<size_t, static_cast<size_t>(N)> conn;
+        for (int j = 0; j < vec.size(); j++)
+        {
+            conn[j] = vec[j];
+        }
+        outArr.push_back(conn);
     }
-
-    // 3D mesh
-    {
-        auto       tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-        const auto numVerts = tetMesh->getNumVertices();
-        std::cout << "Number of vertices = " << numVerts << std::endl;
-        testRCM(tetMesh->getTetrahedraVertices(), numVerts);
-    }
-
-    // a surface mesh cover
-    {
-        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-        auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
-        auto conn     = tetMesh->getTetrahedraVertices();
-        auto numVerts = tetMesh->getNumVertices();
-        std::cout << "Number of vertices = " << numVerts << std::endl;
-        testRCM(conn, numVerts);
-    }
-
-    return 0;
 }
 
-template<typename ElemConn>
+template<int N>
 void
-testRCM(const std::vector<ElemConn>& conn, const size_t numVerts)
+testRCM(const VecDataArray<int, N>& conn, const size_t numVerts)
 {
-    std::cout << "Old bandwidth = " << bandwidth(conn, numVerts) << std::endl;
+    std::vector<std::array<size_t, N>> connSTL;
+    toSTLVector(conn, connSTL);
+
+    std::cout << "Old bandwidth = " << bandwidth(connSTL, numVerts) << std::endl;
 
     // new-to-old permutation
-    auto perm = GeometryUtils::reorderConnectivity(conn, numVerts);
+    auto perm = GeometryUtils::reorderConnectivity(connSTL, numVerts);
 
     // old-to-new permutation
     std::vector<size_t> invPerm(perm.size());
@@ -89,7 +75,7 @@ testRCM(const std::vector<ElemConn>& conn, const size_t numVerts)
         invPerm[perm[i]] = i;
     }
 
-    auto newConn = conn;
+    auto newConn = connSTL;
 
     for (auto& vertices : newConn)
     {
@@ -101,11 +87,41 @@ testRCM(const std::vector<ElemConn>& conn, const size_t numVerts)
     }
 
     std::cout << "New bandwidth = " << bandwidth(newConn, numVerts) << "\n" << std::endl;
-
-    return;
 }
 
-std::pair<std::vector<QuadConn>, size_t>
+int
+main(int argc, char** argv)
+{
+    // Log to stdout and file
+    Logger::startLogger();
+
+    // a 2D Cartesian mesh
+    {
+        auto p = createConn();
+        testRCM<(int)4>(*p.first, p.second);
+    }
+
+    // 3D mesh
+    {
+        auto         tetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+        const size_t numVerts = tetMesh->getNumVertices();
+        std::cout << "Number of vertices = " << numVerts << std::endl;
+        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
+    }
+
+    // a surface mesh cover
+    {
+        auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+        auto tetMesh  = GeometryUtils::createTetrahedralMeshCover(surfMesh, 80, 40, 60);
+        auto numVerts = tetMesh->getNumVertices();
+        std::cout << "Number of vertices = " << numVerts << std::endl;
+        testRCM(*tetMesh->getTetrahedraIndices(), numVerts);
+    }
+
+    return 0;
+}
+
+std::pair<std::shared_ptr<VecDataArray<int, 4>>, size_t>
 createConn()
 {
     /**
@@ -124,16 +140,17 @@ createConn()
     0------15-------1-------14
     **/
 
-    std::vector<QuadConn> conn(9);
-    conn[0] = { 0, 15, 13, 2 };
-    conn[1] = { 15, 1, 3, 13 };
-    conn[2] = { 1, 14, 12, 3 };
-    conn[3] = { 2, 13, 11, 4 };
-    conn[4] = { 13, 3, 5, 11 };
-    conn[5] = { 3, 12, 10, 5 };
-    conn[6] = { 4, 11, 9, 6 };
-    conn[7] = { 11, 5, 7, 9 };
-    conn[8] = { 5, 10, 8, 7 };
+    imstkNew<VecDataArray<int, 4>> connPtr(9);
+    VecDataArray<int, 4>&          conn = *connPtr.get();
+    conn[0] = Vec4i(0, 15, 13, 2);
+    conn[1] = Vec4i(15, 1, 3, 13);
+    conn[2] = Vec4i(1, 14, 12, 3);
+    conn[3] = Vec4i(2, 13, 11, 4);
+    conn[4] = Vec4i(13, 3, 5, 11);
+    conn[5] = Vec4i(3, 12, 10, 5);
+    conn[6] = Vec4i(4, 11, 9, 6);
+    conn[7] = Vec4i(11, 5, 7, 9);
+    conn[8] = Vec4i(5, 10, 8, 7);
 
-    return std::make_pair(conn, 16);
+    return std::make_pair(connPtr.get(), 16);
 }

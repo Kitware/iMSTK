@@ -66,7 +66,7 @@ main()
     {
         // This model is shared among interacting rigid bodies
         imstkNew<RigidBodyModel2> rbdModel;
-        rbdModel->getConfig()->m_dt = 0.005;
+        rbdModel->getConfig()->m_dt = 0.0005;
         rbdModel->getConfig()->m_maxNumIterations = 20;
 
         // Create the first rbd, plane floor
@@ -100,6 +100,7 @@ main()
             imstkNew<SurfaceMeshFlyingEdges> toSurfMesh;
             toSurfMesh->setInputImage(toImage->getOutputImage());
             toSurfMesh->update();
+            toSurfMesh->getOutputMesh()->flipNormals();
 
             // Create the visual model
             imstkNew<VisualModel> visualModel(toSurfMesh->getOutputMesh());
@@ -229,7 +230,7 @@ main()
             });
 
         // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
+        //sceneManager->requestStatus(ThreadStatus::Paused);
         viewer->start();
     }
 

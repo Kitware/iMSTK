@@ -1,21 +1,21 @@
 /*=========================================================================
 
-   Library: iMSTK
+  Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+  Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+  & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+     http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
 =========================================================================*/
 
@@ -46,8 +46,8 @@ using namespace imstk;
 #define NUM_MESHES 10u
 
 // Load bunny mesh data (vertex positions and triangle faces)
-std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> getBunny();
-static std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>> g_BunnyData = getBunny();
+std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getBunny();
+static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> g_BunnyData = getBunny();
 
 ///
 /// \brief Read a mesh, create a visual scene object and add to the scene
@@ -57,10 +57,14 @@ createMeshObject(const std::string& objectName,
                  const Color&       color)
 {
     // Create a surface mesh for the bunny
-    imstkNew<SurfaceMesh> surfMesh;
-    surfMesh->initialize(g_BunnyData.first, g_BunnyData.second);
+    imstkNew<SurfaceMesh>                    surfMesh;
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = std::make_shared<VecDataArray<double, 3>>();
+    *verticesPtr = *g_BunnyData.first;
+    std::shared_ptr<VecDataArray<int, 3>> indicesPtr = std::make_shared<VecDataArray<int, 3>>();
+    *indicesPtr = *g_BunnyData.second;
+    surfMesh->initialize(verticesPtr, indicesPtr);
 
-    // Create a visiual model
+    // Create a visual model
     imstkNew<VisualModel>    visualModel(surfMesh.get());
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
@@ -138,9 +142,9 @@ main()
     // Compute the scale factor to scale meshes such that meshes with different sizes are still visualized consistently
     Vec3d      lowerCorner, upperCorner;
     const auto pointset = std::dynamic_pointer_cast<PointSet>(triMeshes.front());
-    ParallelUtils::findAABB(pointset->getVertexPositions(), lowerCorner, upperCorner);
+    ParallelUtils::findAABB(*pointset->getVertexPositions(), lowerCorner, upperCorner);
     const auto scaleFactor = 20.0 / (upperCorner - lowerCorner).norm();
-    for (const auto& mesh: triMeshes)
+    for (const auto& mesh : triMeshes)
     {
         mesh->scale(scaleFactor, Geometry::TransformType::ApplyToData);
     }
@@ -152,7 +156,7 @@ main()
     LooseOctree octree(Vec3d(0.0, 0.0, 0.0), 100.0, 0.125, 2.0, "TestOctree");
 
     // Add all meshes to the octree
-    for (const auto& mesh: triMeshes)
+    for (const auto& mesh : triMeshes)
     {
         octree.addTriangleMesh(mesh);
     }
@@ -170,15 +174,15 @@ main()
 
     imstkNew<RenderMaterial> matDbgViz;
     matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-    matDbgViz->setEdgeColor(Color::Green);
+    matDbgViz->setColor(Color::Green);
     matDbgViz->setLineWidth(1.0);
     imstkNew<VisualModel> octreeVizDbgModel(debugOctree, matDbgViz);
     scene->addDebugVisualModel(octreeVizDbgModel);
 
     // Data for animation
-    const double     translation = 15.0;
-    StdVectorOfVec3d centers;
-    StdVectorOfVec3d dirs;
+    const double            translation = 15.0;
+    VecDataArray<double, 3> centers;
+    VecDataArray<double, 3> dirs;
     for (unsigned int i = 0; i < NUM_MESHES; ++i)
     {
         centers.push_back(Vec3d(translation, 0, 0));
@@ -243,7 +247,7 @@ main()
             octree.updateDebugGeometry();
             for (auto& delegate : renderer->getDebugRenderDelegates())
             {
-                delegate->updateDataSource();
+                delegate->processEvents();
             }
 
             // Pause for a while

@@ -31,12 +31,6 @@ Plane::print() const
     LOG(INFO) << "Width: " << m_width;
 }
 
-double
-Plane::getVolume() const
-{
-    return 0.0;
-}
-
 Vec3d
 Plane::getNormal(DataType type /* = DataType::PostTransform */)
 {
@@ -87,6 +81,7 @@ void
 Plane::applyScaling(const double s)
 {
     this->setWidth(m_width * s);
+    this->modified();
 }
 
 void

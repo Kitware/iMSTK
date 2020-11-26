@@ -51,8 +51,8 @@ public:
     imstkGetMacro(Dimensions, const Vec3i&);
     imstkGetMacro(Bounds, const Vec6d&);
     imstkGetMacro(UseBounds, bool);
-    //imstkGetMacro(NarrowBanded, bool);
-    //imstkGetMacro(NarrowBandWidth, double);
+    imstkGetMacro(NarrowBanded, bool);
+    imstkGetMacro(DilateSize, int);
 
     ///
     /// \brief Dimensions of distance transform to fill
@@ -70,12 +70,12 @@ public:
     ///
     /// \brief If on, will compute only a narrow banded transform
     ///
-    //imstkSetMacro(NarrowBanded, bool);
+    imstkSetMacro(NarrowBanded, bool);
 
     ///
     /// \brief Width of the band
     ///
-    //imstkSetMacro(NarrowBandWidth, double);
+    imstkSetMacro(DilateSize, int);
 
     void setDimensions(int dimX, int dimY, int dimZ) { setDimensions(Vec3i(dimX, dimY, dimZ)); }
 
@@ -86,7 +86,8 @@ private:
     Vec3i m_Dimensions = Vec3i(0, 0, 0);
     Vec6d m_Bounds;
     bool  m_UseBounds = false;
-    //bool   m_NarrowBanded = false;
-    //double m_NarrowBandWidth = 1.0;
+
+    int  m_DilateSize   = 4; ///> Only for narrow banded
+    bool m_NarrowBanded = false;
 };
 }

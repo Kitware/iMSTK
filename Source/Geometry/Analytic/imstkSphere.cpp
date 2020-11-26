@@ -60,7 +60,7 @@ Sphere::setRadius(const double r)
 }
 
 void
-Sphere::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent) const
+Sphere::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
 {
     updatePostTransformData();
     const Vec3d span = Vec3d(1, 1, 1) * m_radiusPostTransform;

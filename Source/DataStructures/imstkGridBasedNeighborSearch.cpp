@@ -32,7 +32,7 @@ GridBasedNeighborSearch::setSearchRadius(const Real radius)
 }
 
 std::vector<std::vector<size_t>>
-GridBasedNeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
+GridBasedNeighborSearch::getNeighbors(const VecDataArray<double, 3>& points)
 {
     std::vector<std::vector<size_t>> result;
     getNeighbors(result, points, points);
@@ -40,13 +40,13 @@ GridBasedNeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
 }
 
 void
-GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points)
+GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& points)
 {
     getNeighbors(result, points, points);
 }
 
 void
-GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
+GridBasedNeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& setA, const VecDataArray<double, 3>& setB)
 {
     LOG_IF(FATAL, (std::abs(m_SearchRadius) < Real(1e-8))) << "Neighbor search radius is zero";
 

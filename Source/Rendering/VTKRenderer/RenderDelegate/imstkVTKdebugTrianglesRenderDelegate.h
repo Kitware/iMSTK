@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 class vtkCellArray;
 class vtkDoubleArray;
@@ -38,7 +38,7 @@ class SurfaceMesh;
 /// \brief Render delegate for a set of disjoint triangles whose size could change
 ///  more frequently which is typically he case for rendering arbitrary set of triangles
 ///
-class VTKdbgTrianglesRenderDelegate : public VTKRenderDelegate
+class VTKdbgTrianglesRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
@@ -51,7 +51,7 @@ public:
     ///
     /// \brief Update polydata source based on the surface mesh geometry
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
 

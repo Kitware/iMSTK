@@ -82,7 +82,7 @@ main()
 
     auto                     materialCube = std::make_shared<RenderMaterial>();
     imstkNew<RenderMaterial> cubeMaterial;
-    cubeMaterial->setColor(imstk::Color::Red);
+    cubeMaterial->setColor(Color::Red);
     cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     cubeMaterial->setPointSize(6.);
     cubeMaterial->setLineWidth(4.);
@@ -101,7 +101,7 @@ main()
     cylinderGeom->rotate(Vec3d(1.0, 1.0, 0), PI_2, Geometry::TransformType::ApplyToData);
 
     imstkNew<RenderMaterial> cylMaterial;
-    cylMaterial->setColor(imstk::Color::Red);
+    cylMaterial->setColor(Color::Red);
     cylMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     cylMaterial->setPointSize(6.0);
     cylMaterial->setLineWidth(4.0);
@@ -111,13 +111,6 @@ main()
     imstkNew<VisualObject> cylObj("Cylinder");
     cylObj->addVisualModel(cylVisualModel);
     scene->addSceneObject(cylObj);
-
-    // Setup function to rotate the dragon every frame
-    auto rotateFunc =
-        [&surfaceMesh](Event*)
-        {
-            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * 0.0001, Geometry::TransformType::ApplyToData);
-        };
 
     // Set Camera configuration
     scene->getActiveCamera()->setPosition(Vec3d(0.0, 30.0, 30.0));
@@ -138,7 +131,13 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
         viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-        connect<Event>(sceneManager, EventType::PostUpdate, rotateFunc);
+
+        // Rotate after every scene update
+        connect<Event>(sceneManager, EventType::PostUpdate,
+            [&](Event*)
+        {
+            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime(), Geometry::TransformType::ApplyToData);
+            });
 
         // Add mouse and keyboard controls to the viewer
         {

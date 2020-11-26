@@ -106,7 +106,7 @@ makeCollisionDetectionObject(const CollisionDetection::Type type,
     }
     case CollisionDetection::Type::PointSetToPlane:
     {
-        IMSTK_CHECK_FOR_VALID_GEOMETRIES(collidingGeometryA, collidingGeometryB, PointSet, Sphere);
+        IMSTK_CHECK_FOR_VALID_GEOMETRIES(collidingGeometryA, collidingGeometryB, PointSet, Plane);
 
         auto pointset = std::dynamic_pointer_cast<PointSet>(collidingGeometryA);
         auto plane    = std::dynamic_pointer_cast<Plane>(collidingGeometryB);

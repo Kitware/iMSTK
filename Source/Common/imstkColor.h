@@ -152,4 +152,10 @@ Color operator-(const Color& color_lhs, const Color& color_rhs);
 Color operator-(const Color& color_rhs, const double intensity_lhs);
 Color operator-=(const Color& color_lhs, const Color& color_rhs);
 Color operator-=(const Color& color_rhs, const double intensity_lhs);
+
+///
+/// \brief Comparison operator
+///
+bool operator==(const Color& color_lhs, const Color& color_rhs);
+bool operator!=(const Color& color_lhs, const Color& color_rhs);
 }

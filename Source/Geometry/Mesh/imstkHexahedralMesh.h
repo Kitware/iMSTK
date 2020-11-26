@@ -33,21 +33,19 @@ namespace imstk
 class HexahedralMesh : public VolumetricMesh
 {
 public:
-
-    using HexaArray = std::array<size_t, 8>;
-
     ///
     /// \brief Constructor
     ///
-    HexahedralMesh(const std::string& name = std::string("")) : VolumetricMesh(Geometry::Type::HexahedralMesh, name) {}
+    HexahedralMesh(const std::string& name = std::string(""));
 
+public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  hexahedra connectivity
     ///
-    void initialize(const StdVectorOfVec3d&       vertices,
-                    const std::vector<HexaArray>& hexahedra,
-                    bool                          computeAttachedSurfaceMesh = false);
+    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
+                    std::shared_ptr<VecDataArray<int, 8>> hexahedra,
+                    bool computeAttachedSurfaceMesh = false);
 
     ///
     /// \brief Clear all the mesh data
@@ -60,11 +58,6 @@ public:
     void print() const override;
 
     ///
-    /// \brief Compute and return the volume of the hexahedral mesh
-    ///
-    double getVolume() const override;
-
-    ///
     /// \brief Compute and set the attached surface mesh
     ///
     void computeAttachedSurfaceMesh() override;
@@ -73,27 +66,32 @@ public:
     /// \brief Extract surface Mesh
     bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
-    // Accessors
-
+// Accessors
+public:
     ///
     /// \brief Sets/Returns the hexahedral connectivity
     ///
-    void setHexahedraVertices(const std::vector<HexaArray>& hexahedra);
-    const std::vector<HexaArray>& getHexahedraVertices() const;
+    void setHexahedraIndices(std::shared_ptr<VecDataArray<int, 8>> hexahedra) { m_hexahedraIndices = hexahedra; }
+    std::shared_ptr<VecDataArray<int, 8>> getHexahedraIndices() const { return m_hexahedraIndices; }
 
     ///
     /// \brief Returns the connectivity of a hexahedron given its index
     ///
-    const HexaArray& getHexahedronVertices(const int& hexaNum) const;
+    const Vec8i& getHexahedronIndices(const int hexaNum) const;
 
     ///
     /// \brief Returns the number of hexahedra
     ///
     size_t getNumHexahedra() const;
 
+    ///
+    /// \brief Compute and return the volume of the hexahedral mesh
+    ///
+    double getVolume() override;
+
 protected:
     friend class VTKHexahedralMeshRenderDelegate;
 
-    std::vector<HexaArray> m_hexahedraVertices; ///< vertices of the hexahedra
+    std::shared_ptr<VecDataArray<int, 8>> m_hexahedraIndices; ///< indices of the hexahedra
 };
 } // imstk

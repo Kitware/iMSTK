@@ -33,7 +33,7 @@ namespace imstk
 namespace NarrowPhaseCD
 {
 void
-bidirectionalPlaneToSphere(Geometry* const planeGeo, Geometry* const sphereGeo,
+bidirectionalPlaneToSphere(Geometry* planeGeo, Geometry* sphereGeo,
                            const std::shared_ptr<CollisionData>& colData)
 {
     const auto plane  = static_cast<Plane*>(planeGeo);
@@ -46,12 +46,12 @@ bidirectionalPlaneToSphere(Geometry* const planeGeo, Geometry* const sphereGeo,
 }
 
 void
-bidirectionalPlaneToSphere(Plane* const planeA, Sphere* const sphereB,
+bidirectionalPlaneToSphere(Plane* planeA, Sphere* sphereB,
                            const std::shared_ptr<CollisionData>& colData)
 {
     // Get geometry properties
     Vec3d  sphereBPos = sphereB->getPosition();
-    double r = sphereB->getRadius() * sphereB->getScaling();
+    double r = sphereB->getRadius();
     Vec3d  planeAPos = planeA->getPosition();
     Vec3d  n = planeA->getNormal();
 
@@ -87,7 +87,7 @@ bidirectionalPlaneToSphere(Plane* const planeA, Sphere* const sphereB,
 }
 
 void
-unidirectionalPlaneToSphere(Geometry* const planeGeo, Geometry* const sphereGeo,
+unidirectionalPlaneToSphere(Geometry* planeGeo, Geometry* sphereGeo,
                             const std::shared_ptr<CollisionData>& colData)
 {
     const auto plane  = static_cast<Plane*>(planeGeo);
@@ -134,7 +134,7 @@ unidirectionalPlaneToSphere(Plane* const plane, Sphere* const sphere,
 }
 
 void
-sphereToCylinder(Geometry* const sphereGeo, Geometry* const cylinderGeo,
+sphereToCylinder(Geometry* sphereGeo, Geometry* cylinderGeo,
                  const std::shared_ptr<CollisionData>& colData)
 {
     const auto sphere   = static_cast<Sphere*>(sphereGeo);
@@ -184,7 +184,7 @@ sphereToCylinder(Sphere* const sphere, Cylinder* const cylinder,
 }
 
 void
-sphereToSphere(Geometry* const sphereGeoA, Geometry* const sphereGeoB,
+sphereToSphere(Geometry* sphereGeoA, Geometry* sphereGeoB,
                const std::shared_ptr<CollisionData>& colData)
 {
     const auto sphereA = static_cast<Sphere*>(sphereGeoA);
@@ -234,7 +234,7 @@ sphereToSphere(Sphere* const sphereA, Sphere* const sphereB,
 }
 
 void
-pointToCapsule(const Vec3r& point, uint32_t pointIdx, Geometry* const capsuleGeo,
+pointToCapsule(const Vec3r& point, uint32_t pointIdx, Geometry* capsuleGeo,
                const std::shared_ptr<CollisionData>& colData)
 {
     const auto capsule = static_cast<Capsule*>(capsuleGeo);
@@ -245,7 +245,7 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Geometry* const capsuleGeo
 }
 
 void
-pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
+pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* capsule,
                const std::shared_ptr<CollisionData>& colData)
 {
     const Vec3d capsulePos = capsule->getPosition();
@@ -295,7 +295,7 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* const capsule,
 }
 
 void
-pointToPlane(const Vec3r& point, uint32_t pointIdx, Geometry* const planeGeo,
+pointToPlane(const Vec3r& point, uint32_t pointIdx, Geometry* planeGeo,
              const std::shared_ptr<CollisionData>& colData)
 {
     const auto plane = static_cast<Plane*>(planeGeo);
@@ -306,7 +306,7 @@ pointToPlane(const Vec3r& point, uint32_t pointIdx, Geometry* const planeGeo,
 }
 
 void
-pointToPlane(const Vec3r& point, uint32_t pointIdx, Plane* const plane,
+pointToPlane(const Vec3r& point, uint32_t pointIdx, Plane* plane,
              const std::shared_ptr<CollisionData>& colData)
 {
     // Get plane properties
@@ -322,7 +322,7 @@ pointToPlane(const Vec3r& point, uint32_t pointIdx, Plane* const plane,
 }
 
 void
-pointToSphere(const Vec3r& point, uint32_t pointIdx, Geometry* const sphereGeo,
+pointToSphere(const Vec3r& point, uint32_t pointIdx, Geometry* sphereGeo,
               const std::shared_ptr<CollisionData>& colData)
 {
     const auto sphere = static_cast<Sphere*>(sphereGeo);
@@ -333,7 +333,7 @@ pointToSphere(const Vec3r& point, uint32_t pointIdx, Geometry* const sphereGeo,
 }
 
 void
-pointToSphere(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere,
+pointToSphere(const Vec3r& point, uint32_t pointIdx, Sphere* sphere,
               const std::shared_ptr<CollisionData>& colData)
 {
     const Vec3r sphereCenter    = sphere->getPosition();
@@ -352,7 +352,7 @@ pointToSphere(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere,
 }
 
 void
-pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Geometry* const sphereGeo,
+pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Geometry* sphereGeo,
                      const std::shared_ptr<CollisionData>& colData)
 {
     const auto sphere = static_cast<Sphere*>(sphereGeo);
@@ -363,7 +363,7 @@ pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Geometry* const sphe
 }
 
 void
-pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere,
+pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Sphere* sphere,
                      const std::shared_ptr<CollisionData>& colData)
 {
     const Vec3r sphereCenter    = sphere->getPosition();
@@ -379,7 +379,7 @@ pointToSpherePicking(const Vec3r& point, uint32_t pointIdx, Sphere* const sphere
 }
 
 void
-triangleToTriangle(uint32_t triIdx1, Geometry* const triMeshGeo1, uint32_t triIdx2, Geometry* const triMeshGeo2,
+triangleToTriangle(uint32_t triIdx1, Geometry* triMeshGeo1, uint32_t triIdx2, Geometry* triMeshGeo2,
                    const std::shared_ptr<CollisionData>& colData)
 {
     const auto mesh1 = static_cast<SurfaceMesh*>(triMeshGeo1);
@@ -392,11 +392,11 @@ triangleToTriangle(uint32_t triIdx1, Geometry* const triMeshGeo1, uint32_t triId
 }
 
 void
-triangleToTriangle(uint32_t triIdx1, SurfaceMesh* const triMesh1, uint32_t triIdx2, SurfaceMesh* const triMesh2,
+triangleToTriangle(uint32_t triIdx1, SurfaceMesh* triMesh1, uint32_t triIdx2, SurfaceMesh* triMesh2,
                    const std::shared_ptr<CollisionData>& colData)
 {
-    const auto tri1Face = triMesh1->getTrianglesVertices()[triIdx1];
-    const auto tri2Face = triMesh2->getTrianglesVertices()[triIdx2];
+    const auto tri1Face = triMesh1->getTriangleIndices(triIdx1);
+    const auto tri2Face = triMesh2->getTriangleIndices(triIdx2);
 
     const std::array<Vec3r, 3> tri1Verts = { triMesh1->getVertexPosition(tri1Face[0]),
                                              triMesh1->getVertexPosition(tri1Face[1]),
@@ -494,7 +494,7 @@ triangleToTriangle(uint32_t triIdx1, SurfaceMesh* const triMesh1, uint32_t triId
 }
 
 bool
-pointToTriangle(const Vec3r& point, uint32_t pointIdx, uint32_t triIdx, Geometry* const triMeshGeo,
+pointToTriangle(const Vec3r& point, uint32_t pointIdx, uint32_t triIdx, Geometry* triMeshGeo,
                 const std::shared_ptr<CollisionData>& colData)
 {
     const auto triMesh = static_cast<SurfaceMesh*>(triMeshGeo);
@@ -505,15 +505,15 @@ pointToTriangle(const Vec3r& point, uint32_t pointIdx, uint32_t triIdx, Geometry
 }
 
 bool
-pointToTriangle(const Vec3r& point, uint32_t pointIdx, uint32_t triIdx, SurfaceMesh* const triMesh,
+pointToTriangle(const Vec3r& point, uint32_t pointIdx, uint32_t triIdx, SurfaceMesh* triMesh,
                 const std::shared_ptr<CollisionData>& colData)
 {
-    const auto face   = triMesh->getTrianglesVertices()[triIdx];
-    const auto x1     = triMesh->getVertexPosition(face[0]);
-    const auto x2     = triMesh->getVertexPosition(face[1]);
-    const auto x3     = triMesh->getVertexPosition(face[2]);
-    const auto normal = (x2 - x1).cross(x3 - x1);
-    const auto pa     = point - x1;
+    const Vec3i& face   = triMesh->getTriangleIndices(triIdx);
+    const auto   x1     = triMesh->getVertexPosition(face[0]);
+    const auto   x2     = triMesh->getVertexPosition(face[1]);
+    const auto   x3     = triMesh->getVertexPosition(face[2]);
+    const auto   normal = (x2 - x1).cross(x3 - x1);
+    const auto   pa     = point - x1;
     if (pa.dot(normal) > 0)
     {
         return false;

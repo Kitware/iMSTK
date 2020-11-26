@@ -23,9 +23,12 @@
 
 #include "imstkGeometry.h"
 
+#include <unordered_map>
+
 namespace imstk
 {
-class Graph;
+class AbstractDataArray;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class PointSet
@@ -38,13 +41,12 @@ public:
     ///
     /// \brief Protected constructor
     ///
-    PointSet(const Type type = Geometry::Type::PointSet, const std::string& name = std::string("")) :
-        Geometry(type, name) {}
+    PointSet(const Type type = Geometry::Type::PointSet, const std::string& name = std::string(""));
 
     ///
     /// \brief Initializes the data structure given vertex positions
     ///
-    void initialize(const StdVectorOfVec3d& vertices);
+    void initialize(std::shared_ptr<VecDataArray<double, 3>> positions);
 
     ///
     /// \brief Clears all the mesh data
@@ -57,41 +59,37 @@ public:
     virtual void print() const override;
 
     ///
-    /// \brief Returns the volume of the geometry (if valid)
-    ///
-    virtual double getVolume() const override { return 0; }
-
-    ///
     /// \brief Compute the bounding box for the entire mesh
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const override;
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
     // Accessors
 
     ///
     /// \brief Sets initial positions from an array
     ///
-    void setInitialVertexPositions(const StdVectorOfVec3d& vertices);
+    void setInitialVertexPositions(std::shared_ptr<VecDataArray<double, 3>> vertices);
 
     ///
     /// \brief Returns the vector of initial positions of the mesh vertices
     ///
-    const StdVectorOfVec3d& getInitialVertexPositions() const;
+    std::shared_ptr<VecDataArray<double, 3>> getInitialVertexPositions() const { return m_initialVertexPositions; }
 
     ///
     /// \brief Returns the initial position of a vertex given its index
     ///
     const Vec3d& getInitialVertexPosition(const size_t vertNum) const;
+    Vec3d& getInitialVertexPosition(const size_t vertNum);
 
     ///
-    /// \brief Sets current vertex positions of the mesh from an array
+    /// \brief Sets current vertex positions of the mesh
     ///
-    void setVertexPositions(const StdVectorOfVec3d& vertices);
+    void setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> positions);
 
     ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
-    const StdVectorOfVec3d& getVertexPositions(DataType type = DataType::PostTransform) const;
+    std::shared_ptr<VecDataArray<double, 3>> getVertexPositions(DataType type = DataType::PostTransform) const;
 
     ///
     /// \brief Set the current position of a vertex given its index to certain position (this is not a thread-safe method)
@@ -102,51 +100,7 @@ public:
     /// \brief Returns the position of a vertex given its index
     ///
     const Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform) const;
-
-    ///
-    /// \brief Sets the displacements of mesh vertices from an array
-    ///
-    void setVertexDisplacements(const StdVectorOfVec3d& diff);
-
-    ///
-    /// \brief Sets the displacements of mesh vertices from a linearized displacement vector
-    ///
-    void setVertexDisplacements(const Vectord& u);
-
-    ///
-    /// \brief Concatenate the displacements of mesh vertices using the given 3D vector
-    ///
-    void translateVertices(const Vec3d& t);
-
-    ///
-    /// \brief Sets the point data for all arrays at each vertex
-    ///
-    void setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData);
-
-    ///
-    /// \brief Get the map of the point data for all arrays at each vertex
-    ///
-    const std::map<std::string, StdVectorOfVectorf>& getPointDataMap() const;
-
-    ///
-    /// \brief Set a data array holding some point data
-    ///
-    void setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData);
-
-    ///
-    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
-    ///
-    const StdVectorOfVectorf* getPointDataArray(const std::string& arrayName) const;
-
-    ///
-    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
-    ///
-    StdVectorOfVectorf* getPointDataArray(const std::string& arrayName);
-
-    ///
-    /// \brief Check if a specific data array exists.
-    ///
-    bool hasPointDataArray(const std::string& arrayName) const;
+    Vec3d& getVertexPosition(const size_t vertNum, DataType type       = DataType::PostTransform);
 
     ///
     /// \brief Returns the number of total vertices in the mesh
@@ -164,41 +118,93 @@ public:
     /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
     ///
     virtual void setLoadFactor(double loadFactor);
-    virtual double getLoadFactor();
-
-    ///
-    /// \brief Set the active scalars
-    /// \param name of the scalar array in the point data map
-    ///
-    void setScalars(std::shared_ptr<StdVectorOfReal> scalars) { m_pointScalars = scalars; }
-    std::shared_ptr<StdVectorOfReal> getScalars() const { return m_pointScalars; }
+    virtual double getLoadFactor() const { return m_loadFactor; }
 
     ///
     /// \brief Get the maximum number of vertices
     ///
-    size_t getMaxNumVertices();
+    size_t getMaxNumVertices() const { return m_maxNumVertices; }
+
+    ///
+    /// \brief Set the name of the geometry
+    ///
+    void setName(std::string name) { m_name = name; }
+
+public:
+    ///
+    /// \brief Set a data array holding some per vertex data
+    ///
+    void setVertexAttribute(const std::string& arrayName, std::shared_ptr<AbstractDataArray> arr);
+
+    ///
+    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
+    ///
+    std::shared_ptr<AbstractDataArray> getVertexAttribute(const std::string& arrayName) const;
+
+    ///
+    /// \brief Check if a specific data array exists.
+    ///
+    bool hasVertexAttribute(const std::string& arrayName) const;
+
+    ///
+    /// \brief Set the vertex attributes map
+    ///
+    void setVertexAttributes(std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes) { m_vertexAttributes = attributes; }
+
+    ///
+    /// \brief Get the vertex attributes map
+    ///
+    const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& getVertexAttributes() const { return m_vertexAttributes; }
+
+    ///
+    /// \brief Get/Set the active scalars
+    ///
+    void setVertexScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
+    void setVertexScalars(const std::string& arrayName);
+    std::string getActiveVertexScalars() const { return m_activeVertexScalars; }
+    std::shared_ptr<AbstractDataArray> getVertexScalars() const;
+
+    ///
+    /// \brief Get/Set the active normals
+    ///
+    void setVertexNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals);
+    void setVertexNormals(const std::string& arrayName);
+    std::string getActiveVertexNormals() const { return m_activeVertexNormals; }
+    std::shared_ptr<VecDataArray<double, 3>> getVertexNormals() const;
+
+    ///
+    /// \brief Get/Set the active tangents
+    ///
+    void setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents);
+    void setVertexTangents(const std::string& arrayName);
+    std::string getActiveVertexTangents() const { return m_activeVertexTangents; }
+    std::shared_ptr<VecDataArray<double, 3>> getVertexTangents() const;
+
+    ///
+    /// \brief Get/Set the active tcoords
+    ///
+    void setVertexTCoords(const std::string& arrayName, std::shared_ptr<VecDataArray<float, 2>> tcoords);
+    void setVertexTCoords(const std::string& arrayName);
+    std::string getActiveVertexTCoords() const { return m_activeVertexTCoords; }
+    std::shared_ptr<VecDataArray<float, 2>> getVertexTCoords() const;
 
 protected:
     friend class VTKPointSetRenderDelegate;
     friend class VTKFluidRenderDelegate;
-
-    ///
-    /// \brief Get vertices positions
-    ///
-    StdVectorOfVec3d& getVertexPositionsNotConst() { return m_vertexPositions; }
 
     void applyTranslation(const Vec3d t) override;
     void applyRotation(const Mat3d r) override;
     void applyScaling(const double s) override;
     void updatePostTransformData() const override;
 
-    StdVectorOfVec3d m_initialVertexPositions;                ///> Initial positions of vertices
-    StdVectorOfVec3d m_vertexPositions;                       ///> Current positions of vertices
-    mutable StdVectorOfVec3d m_vertexPositionsPostTransform;  ///> Positions of vertices after transform
+    std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
+    std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;
 
-    std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
-    // \todo: move to pointDataMap eventually, currently pointDataMap is non-continguous and can't be mapped
-    std::shared_ptr<StdVectorOfReal> m_pointScalars;          ///> vector of scalars, singular doubles per vertex.
+    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_vertexAttributes;
+    std::string m_activeVertexNormals  = "";
+    std::string m_activeVertexScalars  = "";
+    std::string m_activeVertexTangents = "";
+    std::string m_activeVertexTCoords  = "";
 
     bool   m_topologyChanged     = false;
     double m_loadFactor          = 2.0;

@@ -34,7 +34,7 @@ using KeyStateType = int;
 class KeyPressEvent : public Event
 {
 public:
-    KeyPressEvent(const char key, const KeyStateType keyPressType) : Event(EventType::KeyPress, 1), m_key(key), m_keyPressType(keyPressType) { }
+    KeyPressEvent(const char key, const KeyStateType keyPressType) : Event(EventType::KeyEvent, 1), m_key(key), m_keyPressType(keyPressType) { }
     virtual ~KeyPressEvent() override = default;
 
 public:

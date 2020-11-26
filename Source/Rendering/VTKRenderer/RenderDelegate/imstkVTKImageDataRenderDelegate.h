@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKVolumeRenderDelegate.h"
 
 class vtkImageData;
 
@@ -34,7 +34,7 @@ class AbstractDataArray;
 ///
 /// \brief Render delegate to do to volume rendering using VTK
 ///
-class VTKImageDataRenderDelegate : public VTKRenderDelegate
+class VTKImageDataRenderDelegate : public VTKVolumeRenderDelegate
 {
 public:
     ///
@@ -51,9 +51,18 @@ public:
     ///
     /// \brief Update render delegate source based on the internal data
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
+protected:
+    ///
+    /// \brief Callback for when the image is modified
+    ///
     void imageDataModified(Event* e);
+
+    ///
+    /// \brief Callback for when the image scalars are modified
+    ///
+    void imageScalarsModified(Event* e);
 
 protected:
     std::shared_ptr<AbstractDataArray> m_scalarArray;

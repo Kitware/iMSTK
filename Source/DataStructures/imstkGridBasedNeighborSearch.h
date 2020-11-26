@@ -23,6 +23,7 @@
 
 #include "imstkSpinLock.h"
 #include "imstkUniformSpatialGrid.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -56,14 +57,14 @@ public:
     /// \param points The given points to search for neighbors
     /// \return List of list of neighbor indices for each point
     ///
-    std::vector<std::vector<size_t>> getNeighbors(const StdVectorOfVec3r& points);
+    std::vector<std::vector<size_t>> getNeighbors(const VecDataArray<double, 3>& points);
 
     ///
     /// \brief Search neighbors for each point within the search radius
     /// \param result The list of lists of neighbor indices for each point
     /// \param points The given points to search for neighbors
     ///
-    void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points);
+    void getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& points);
 
     ///
     /// \brief Search neighbors from setB for each point in setA within the search radius. SetA and setB can be different.
@@ -71,7 +72,7 @@ public:
     /// \param setA The point set for which performing neighbor search
     /// \param setB The point set where neighbor indices will be collected
     ///
-    void getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB);
+    void getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& setA, const VecDataArray<double, 3>& setB);
 
 private:
     Real m_SearchRadius    = 0.;

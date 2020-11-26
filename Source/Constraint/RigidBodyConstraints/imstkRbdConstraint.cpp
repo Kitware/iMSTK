@@ -21,6 +21,7 @@
 
 #include "imstkRbdConstraint.h"
 #include "imstkPointSet.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -39,7 +40,8 @@ RigidBody::setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const doub
         pointset->computeBoundingBox(min, max);
         centroid = (min + max) * 0.5;
     }
-    const StdVectorOfVec3d& vertices = pointset->getVertexPositions(Geometry::DataType::PreTransform);
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = pointset->getVertexPositions(Geometry::DataType::PreTransform);
+    const VecDataArray<double, 3>&           vertices   = *vertexData;
     for (size_t i = 0; i < vertices.size(); i++)
     {
         const Vec3d r = vertices[i] - centroid;

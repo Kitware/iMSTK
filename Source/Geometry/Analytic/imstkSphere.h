@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit Sphere(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const std::string& name = std::string("")) :
+    explicit Sphere(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const std::string& name = std::string("defaultSphere")) :
         AnalyticalGeometry(Type::Sphere, name)
     {
         setPosition(pos);
@@ -51,7 +51,7 @@ public:
     ///
     /// \brief Returns the volume of the sphere
     ///
-    double getVolume() const override { return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius; }
+    double getVolume() override { return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius; }
 
     ///
     /// \brief Returns the radius of the sphere
@@ -66,7 +66,7 @@ public:
     ///
     /// \brief Compute the bounding box for the geometry
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) const override;
+    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
     ///
     /// \brief Returns signed distance to surface given position
@@ -81,7 +81,12 @@ public:
 protected:
     friend class VTKSphereRenderDelegate;
 
-    void applyScaling(const double s) override { this->setRadius(m_radius * s); }
+    void applyScaling(const double s) override
+    {
+        this->setRadius(m_radius * s);
+        this->modified();
+    }
+
     void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the sphere

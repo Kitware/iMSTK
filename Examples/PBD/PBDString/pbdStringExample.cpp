@@ -39,30 +39,28 @@ using namespace imstk;
 /// \brief Create pbd string geometry
 ///
 static std::shared_ptr<LineMesh>
-makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringLength)
+makeStringGeometry(const Vec3d& pos, const int numVerts, const double stringLength)
 {
     // Create the geometry
     imstkNew<LineMesh> stringGeometry;
 
-    StdVectorOfVec3d vertList;
-    vertList.resize(numVerts);
-    const double vertexSpacing = stringLength / numVerts;
-    for (size_t j = 0; j < numVerts; j++)
+    imstkNew<VecDataArray<double, 3>> verticesPtr(numVerts);
+    VecDataArray<double, 3>&          vertices      = *verticesPtr.get();
+    const double                      vertexSpacing = stringLength / numVerts;
+    for (int i = 0; i < numVerts; i++)
     {
-        vertList[j] = pos - Vec3d(0.0, static_cast<double>(j) * vertexSpacing, 0.0);
+        vertices[i] = pos - Vec3d(0.0, static_cast<double>(i) * vertexSpacing, 0.0);
     }
-    stringGeometry->setInitialVertexPositions(vertList);
-    stringGeometry->setVertexPositions(vertList);
 
     // Add connectivity data
-    std::vector<LineMesh::LineArray> segments;
-    for (size_t j = 0; j < numVerts - 1; j++)
+    imstkNew<VecDataArray<int, 2>> segmentsPtr;
+    VecDataArray<int, 2>&          segments = *segmentsPtr.get();
+    for (int i = 0; i < numVerts - 1; i++)
     {
-        LineMesh::LineArray seg = { j, j + 1 };
-        segments.push_back(seg);
+        segments.push_back(Vec2i(i, i + 1));
     }
 
-    stringGeometry->setLinesVertices(segments);
+    stringGeometry->initialize(verticesPtr, segmentsPtr);
     return stringGeometry;
 }
 
@@ -73,7 +71,7 @@ static std::shared_ptr<PbdObject>
 makePbdString(
     const std::string& name,
     const Vec3d&       pos,
-    const size_t       numVerts,
+    const int          numVerts,
     const double       stringLength,
     const double       bendStiffness,
     const Color&       color)
@@ -89,7 +87,7 @@ makePbdString(
     pbdParams->enableConstraint(PbdConstraint::Type::Bend, bendStiffness);
     pbdParams->m_fixedNodeIds     = { 0 };
     pbdParams->m_uniformMassValue = 5.0;
-    pbdParams->m_gravity    = Vec3d(0, -9.8, 0);
+    pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_defaultDt  = 0.0005;
     pbdParams->m_iterations = 5;
 
@@ -101,7 +99,7 @@ makePbdString(
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
-    material->setEdgeColor(color);
+    material->setColor(color);
     material->setLineWidth(2.0f);
     material->setPointSize(6.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
@@ -119,7 +117,7 @@ makePbdString(
 
 static std::vector<std::shared_ptr<PbdObject>>
 makePbdStrings(const size_t numStrings,
-               const size_t numVerts,
+               const int    numVerts,
                const double stringSpacing,
                const double stringLength,
                const Color& startColor,
@@ -149,7 +147,7 @@ makePbdStrings(const size_t numStrings,
 const double dt            = 0.0005;
 const double radius        = 1.5;
 const size_t numStrings    = 8;                    // Number of strings
-const size_t numVerts      = 30;                   // Number of vertices on each string
+const int    numVerts      = 30;                   // Number of vertices on each string
 const double stringSpacing = 2.0;                  // How far each string is apart
 const double stringLength  = 10.0;                 // Total length of string
 const Color  startColor    = Color(1.0, 0.0, 0.0); // Color of first string
@@ -170,7 +168,7 @@ main()
     // Setup N separate strings with varying bend stiffnesses
     std::vector<std::shared_ptr<PbdObject>> pbdStringObjs =
         makePbdStrings(numStrings, numVerts, stringSpacing, stringLength, startColor, endColor);
-    for (std::shared_ptr<PbdObject> obj : pbdStringObjs)
+    for (auto obj : pbdStringObjs)
     {
         scene->addSceneObject(obj);
     }
@@ -184,16 +182,14 @@ main()
     auto   movePoints =
         [&pbdStringObjs, &t](Event*)
         {
-            for (unsigned int i = 0; i < pbdStringObjs.size(); i++)
+            for (size_t i = 0; i < pbdStringObjs.size(); i++)
             {
-                std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
-                const Vec3d               pos   = model->getCurrentState()->getVertexPosition(0);
-                // Move in circle, derivatives of parametric eq of circle
-                const Vec3d newPos = Vec3d(
-                    pos.x() + -std::sin(t) * radius * dt,
-                    pos.y(),
-                    pos.z() + std::cos(t) * radius * dt);
-                model->getCurrentState()->setVertexPosition(0, newPos);
+                std::shared_ptr<PbdModel>                model     = pbdStringObjs[i]->getPbdModel();
+                std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
+                (*positions)[0] += Vec3d(
+                -std::sin(t) * radius * dt,
+                0.0,
+                std::cos(t) * radius * dt);
             }
             t += dt;
         };

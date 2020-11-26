@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Constructor/destructor
     ///
-    explicit Graph(const size_t size) { m_adjList.resize(size); }
+    Graph(const size_t size) { m_adjList.resize(size); }
     ~Graph() = default;
 
     ///

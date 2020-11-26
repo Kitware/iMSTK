@@ -62,10 +62,10 @@ generatePointSet(const Real sphereRadius)
     const Vec3r sphereCenter    = SPHERE_CENTER;
     const auto  sphereRadiusSqr = sphereRadius * sphereRadius;
     const auto  spacing = Real(2) * PARTICLE_RADIUS;
-    const auto  N       = uint64_t(2 * sphereRadius / spacing);
+    const int   N       = static_cast<int>(2.0 * sphereRadius / spacing);
 
-    StdVectorOfVec3r particles;
-    particles.reserve(N * N * N);
+    std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
+    particles->reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(1, 1, 1) * sphereRadius;
 
     for (uint64_t i = 0; i < N; ++i)
@@ -78,7 +78,7 @@ generatePointSet(const Real sphereRadius)
                 const Vec3r d    = ppos - sphereCenter;
                 if (d.squaredNorm() < sphereRadiusSqr)
                 {
-                    particles.push_back(ppos);
+                    particles->push_back(ppos);
                 }
             }
         }
@@ -123,29 +123,26 @@ generateBoxMesh()
         2, 4, 7
     };
 
-    StdVectorOfVec3d vertices;
-    vertices.reserve(buffVertices.size() / 3);
+    std::shared_ptr<VecDataArray<double, 3>> vertices = std::make_shared<VecDataArray<double, 3>>();
+    vertices->reserve(static_cast<int>(buffVertices.size() / 3));
     for (size_t i = 0; i < buffVertices.size() / 3; ++i)
     {
-        vertices.emplace_back(Vec3d(buffVertices[i * 3],
-                                    buffVertices[i * 3 + 1],
-                                    buffVertices[i * 3 + 2]));
+        vertices->push_back(Vec3d(buffVertices[i * 3],
+                                     buffVertices[i * 3 + 1],
+                                     buffVertices[i * 3 + 2]));
     }
 
-    std::vector<std::array<size_t, 3>> faces;
+    std::shared_ptr<VecDataArray<int, 3>> facesPtr = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                 faces    = *facesPtr;
     faces.reserve(buffFaces.size() / 3);
     for (size_t i = 0; i < buffFaces.size() / 3; ++i)
     {
         // Face ID of triangles is 0-based index (data from .obj file is 1-based index)
-        std::array<size_t, 3> tmp;
-        tmp[0] = buffFaces[i * 3] - 1;
-        tmp[1] = buffFaces[i * 3 + 1] - 1;
-        tmp[2] = buffFaces[i * 3 + 2] - 1;
-        faces.push_back(std::move(tmp));
+        faces.push_back(Vec3i(buffFaces[i * 3] - 1, buffFaces[i * 3 + 1] - 1, buffFaces[i * 3 + 2] - 1));
     }
 
     const auto mesh = std::make_shared<SurfaceMesh>();
-    mesh->initialize(vertices, faces);
+    mesh->initialize(vertices, facesPtr);
     return mesh;
 }
 
@@ -155,22 +152,23 @@ generateBoxMesh()
 std::shared_ptr<SurfaceMesh>
 generateMesh()
 {
-    StdVectorOfVec3r                        vertices;
-    std::vector<SurfaceMesh::TriangleArray> faces;
+    std::shared_ptr<VecDataArray<double, 3>> vertices = std::make_shared<VecDataArray<double, 3>>();
+    std::shared_ptr<VecDataArray<int, 3>>    facesPtr = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                    faces    = *facesPtr;
 
     auto randD = [] { return (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND; };
 
-    vertices.reserve(300);
+    vertices->reserve(300);
     faces.reserve(100);
     for (size_t i = 0; i < 100; ++i)
     {
-        faces.push_back({ i*3, i*3 + 1, i*3 + 2 });
-        vertices.push_back(Vec3d(randD(), randD(), randD()));
-        vertices.push_back(Vec3d(randD(), randD(), randD()));
-        vertices.push_back(Vec3d(randD(), randD(), randD()) * rand11() * 0.1);
+        faces.push_back(Vec3i(i * 3, i * 3 + 1, i * 3 + 2));
+        vertices->push_back(Vec3d(randD(), randD(), randD()));
+        vertices->push_back(Vec3d(randD(), randD(), randD()));
+        vertices->push_back(Vec3d(randD(), randD(), randD()) * rand11() * 0.1);
     }
     auto mesh = std::make_shared<SurfaceMesh>();
-    mesh->initialize(vertices, faces);
+    mesh->initialize(vertices, facesPtr);
     return mesh;
 }
 
@@ -202,7 +200,7 @@ public:
         size_t              numPenetrations = 0;
         for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
         {
-            const auto& point = pointset->getVertexPositions()[p];
+            const auto& point = pointset->getVertexPosition(p);
             bool        bPenetration = true;
             double      penetrationDistance = 1e10;
             for (uint32_t i = 0; i < 3; ++i)
@@ -256,7 +254,7 @@ public:
         size_t              numPenetrations = 0;
         for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
         {
-            const auto& point = pointset->getVertexPositions()[p];
+            const auto& point = pointset->getVertexPosition(p);
             bool        bPenetration = true;
             double      penetrationDistance = 1e10;
             for (uint32_t i = 0; i < 3; ++i)
@@ -316,7 +314,7 @@ public:
         size_t           numPenetrations = 0;
         for (uint32_t p = 0; p < pointset->getNumVertices(); ++p)
         {
-            const auto& point = pointset->getVertexPositions()[p];
+            const auto& point = pointset->getVertexPosition(p);
             if ((point - SPHERE_CENTER).norm() < sphereRadius)
             {
                 pointPenetration[p] = true;

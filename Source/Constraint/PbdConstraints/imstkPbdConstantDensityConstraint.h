@@ -50,7 +50,7 @@ public:
     ///
     /// \Constant Density Constraint Initialization
     ///
-    void initConstraint(const StdVectorOfVec3d& initVertexPositions, const double k);
+    void initConstraint(const VecDataArray<double, 3>& initVertexPositions, const double k);
 
     ///
     /// \brief Returns PBD constraint of type Type::ConstantDensity
@@ -60,14 +60,15 @@ public:
     ///
     /// \brief Solves the constant density constraint
     ///
-    void projectConstraint(const StdVectorOfReal&           currInvMasses,
-                           const double                     dt,
+    void projectConstraint(const DataArray<double>& currInvMasses,
+                           const double dt,
                            const PbdConstraint::SolverType& type,
-                           StdVectorOfVec3d&                currVertexPositions) override;
+                           VecDataArray<double, 3>& currVertexPositions) override;
 
-    bool computeValueAndGradient(const StdVectorOfVec3d& imstkNotUsed(currVertexPositions),
-                                 double&                 imstkNotUsed(c),
-                                 StdVectorOfVec3d&       imstkNotUsed(dcdx)) const
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& imstkNotUsed(currVertexPositions),
+        double& imstkNotUsed(c),
+        std::vector<Vec3d>& imstkNotUsed(dcdx)) const override
     {
         return true;
     }
@@ -91,17 +92,17 @@ private:
     ///
     /// \brief
     ///
-    void computeDensity(const Vec3d& pi, const size_t index, const StdVectorOfVec3d& positions);
+    void computeDensity(const Vec3d& pi, const size_t index, const VecDataArray<double, 3>& positions);
 
     ///
     /// \brief
     ///
-    void computeLambdaScalingFactor(const Vec3d& pi, const size_t index, const StdVectorOfVec3d& positions);
+    void computeLambdaScalingFactor(const Vec3d& pi, const size_t index, const VecDataArray<double, 3>& positions);
 
     ///
     /// \brief
     ///
-    void updatePositions(const Vec3d& pi, const size_t index, StdVectorOfVec3d& positions);
+    void updatePositions(const Vec3d& pi, const size_t index, VecDataArray<double, 3>& positions);
 
     ///
     /// \brief Set/Get rest density

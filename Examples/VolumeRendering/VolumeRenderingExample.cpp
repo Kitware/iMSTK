@@ -54,7 +54,7 @@ main()
 
     // Update Camera to position volume close to viewer
     auto cam = scene->getActiveCamera();
-    cam->setPosition(Vec3d(0.0, -200.0, -100.0));
+    cam->setPosition(Vec3d(0.0, -200.0, -100.0) * 2.0);
     cam->setFocalPoint(Vec3d(0.0, 0.0, -50.0));
     cam->setViewUp(Vec3d(0.02, 0.4, 0.9));
 
@@ -89,9 +89,9 @@ main()
             // Change view background to black every other frame
             std::cout << "Displaying with volume material preset: " << count / 2 << std::endl;
             // Query for a volume material preset
-            auto mat = imstk::VolumeRenderMaterialPresets::getPreset(count / 2);
+            std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(count / 2);
             // Apply the preset to the visual object
-            volumeObj->getVisualModel(0)->setRenderMaterial(mat);
+            volumeObj->getVisualModel(0)->setRenderMaterial(volumeMaterial);
 
             std::ostringstream ss;
             ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(count / 2);

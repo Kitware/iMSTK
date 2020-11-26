@@ -44,7 +44,7 @@ using namespace imstk;
 ///
 /// \brief Generate a box-shape of fluid particles
 ///
-std::shared_ptr<StdVectorOfVec3d>
+std::shared_ptr<VecDataArray<double, 3>>
 generateBoxShapeFluid(const double particleRadius, const Vec3d& boxCenter, const Vec3d& boxSize)
 {
     double bounds[6] =
@@ -63,7 +63,7 @@ generateBoxShapeFluid(const double particleRadius, const Vec3d& boxCenter, const
         static_cast<int>(boxSize.y() / spacing),
         static_cast<int>(boxSize.z() / spacing) };
 
-    imstkNew<StdVectorOfVec3d> particles;
+    imstkNew<VecDataArray<double, 3>> particles;
     particles->reserve(dim[0] * dim[1] * dim[2]);
 
     for (double z = bounds[4]; z < bounds[5]; z += spacing)
@@ -87,10 +87,10 @@ makeSPHBoxObject(const std::string& name, const double particleRadius, const Vec
     imstkNew<SPHObject> fluidObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<StdVectorOfVec3d> particles = generateBoxShapeFluid(particleRadius, boxShift, boxSize);
+    std::shared_ptr<VecDataArray<double, 3>> particles = generateBoxShapeFluid(particleRadius, boxShift, boxSize);
     LOG(INFO) << "Number of particles: " << particles->size();
     imstkNew<PointSet> fluidGeometry;
-    fluidGeometry->initialize(*particles);
+    fluidGeometry->initialize(particles);
 
     // Setup the Parameters
     imstkNew<SPHModelConfig> sphParams(particleRadius);

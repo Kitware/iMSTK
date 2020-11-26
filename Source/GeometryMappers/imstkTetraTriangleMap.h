@@ -22,10 +22,13 @@
 #pragma once
 
 #include "imstkGeometryMap.h"
+
 #include <array>
 
 namespace imstk
 {
+template<typename T, int N> class VecDataArray;
+
 ///
 /// \class TetraTriangleMap
 ///
@@ -112,6 +115,6 @@ protected:
     bool m_boundingBoxAvailable;
 
 private:
-    StdVectorOfVec3d m_slaveVerts;
+    std::shared_ptr<VecDataArray<double, 3>> m_slaveVerts;
 };
 }  // namespace imstk

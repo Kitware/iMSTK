@@ -35,11 +35,11 @@ PbdAnalyticalCollisionConstraint::initConstraint(std::shared_ptr<PbdCollisionCon
 }
 
 bool
-PbdAnalyticalCollisionConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
-                                                          const StdVectorOfVec3d& currVertexPositionsB,
+PbdAnalyticalCollisionConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
+                                                          const VecDataArray<double, 3>& currVertexPositionsB,
                                                           double&                 c,
-                                                          StdVectorOfVec3d&       dcdxA,
-                                                          StdVectorOfVec3d&       dcdxB) const
+    VecDataArray<double, 3>&       dcdxA,
+    VecDataArray<double, 3>&       dcdxB) const
 {
     c = m_penetrationVector.norm();
     dcdxA.resize(1);

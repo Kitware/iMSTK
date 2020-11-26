@@ -24,12 +24,11 @@
 namespace imstk
 {
 void
-PbdConstraint::projectConstraint(const StdVectorOfReal& invMasses, const double dt, const SolverType& solverType, StdVectorOfVec3d& pos)
+PbdConstraint::projectConstraint(const DataArray<double>& invMasses, const double dt, const SolverType& solverType, VecDataArray<double, 3>& pos)
 {
-    double           c;
-    StdVectorOfVec3d dcdx;
+    double c;
 
-    bool update = this->computeValueAndGradient(pos, c, dcdx);
+    bool update = this->computeValueAndGradient(pos, c, m_dcdx);
     if (!update)
     {
         return;
@@ -41,7 +40,7 @@ PbdConstraint::projectConstraint(const StdVectorOfReal& invMasses, const double 
 
     for (size_t i = 0; i < m_vertexIds.size(); ++i)
     {
-        dcMidc += invMasses[m_vertexIds[i]] * dcdx[i].squaredNorm();
+        dcMidc += invMasses[m_vertexIds[i]] * m_dcdx[i].squaredNorm();
     }
 
     if (dcMidc < VERY_SMALL_EPSILON)
@@ -70,7 +69,7 @@ PbdConstraint::projectConstraint(const StdVectorOfReal& invMasses, const double 
         vid = m_vertexIds[i];
         if (invMasses[vid] > 0.0)
         {
-            pos[vid] += invMasses[vid] * lambda * dcdx[i];
+            pos[vid] += invMasses[vid] * lambda * m_dcdx[i];
         }
     }
 

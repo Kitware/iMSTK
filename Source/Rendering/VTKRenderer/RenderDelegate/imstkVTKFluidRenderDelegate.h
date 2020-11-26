@@ -21,20 +21,21 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKVolumeRenderDelegate.h"
 
 class vtkDoubleArray;
+class vtkPolyData;
 
 namespace imstk
 {
-class PointSet;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VTKFluidRenderDelegate
 ///
 /// \brief Render delegate for point set rendered as a fluid surface
 ///
-class VTKFluidRenderDelegate : public VTKRenderDelegate
+class VTKFluidRenderDelegate : public VTKVolumeRenderDelegate
 {
 public:
     ///
@@ -50,9 +51,25 @@ public:
     ///
     /// \brief Update polydata source based on the mesh geometry
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
+    ///
+    /// \brief Callback for when geometry changes
+    ///
+    void geometryModified(Event* e);
+
+    ///
+    /// \brief Callback for when vertices change
+    ///
+    void vertexDataModified(Event* e);
+
+    virtual void updateRenderProperties() override;
+
+protected:
+    std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+
+    vtkSmartPointer<vtkPolyData> m_polydata;
 
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
 };

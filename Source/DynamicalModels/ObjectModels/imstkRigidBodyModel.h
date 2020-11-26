@@ -96,12 +96,6 @@ public:
     bool isStatic() { return m_isStatic; }
 
     ///
-    /// \brief Update the body states given the solution
-    ///
-    void updateBodyStates(const Vectord&        q,
-                          const StateUpdateType updateType = StateUpdateType::Displacement) override;
-
-    ///
     /// \brief Set kinematic target of RigidBody
     ///
     void setKinematicTarget(const PxTransform& destination);

@@ -42,8 +42,10 @@ struct RigidBodyModel2Config
     double m_dt     = 0.001; ///> Time step size
     Vec3d m_gravity = Vec3d(0.0, -9.8, 0.0);
     unsigned int m_maxNumIterations = 10;
-    double m_velocityDamping = 0.99;
-    double m_angularVelocityDamping = 0.99;
+    double m_velocityDamping = 1.0;
+    double m_angularVelocityDamping = 1.0;
+    double m_epsilon = 1e-4;
+    int m_maxNumConstraints = -1;
 };
 
 ///
@@ -80,6 +82,8 @@ public:
     virtual double getTimeStep() const override { return m_config->m_dt; }
 
     std::shared_ptr<RigidBodyModel2Config> getConfig() const { return m_config; }
+    const std::list<std::shared_ptr<RbdConstraint>>& getConstraints() const { return m_constraints; }
+    std::shared_ptr<ProjectedGaussSeidelSolver<double>> getSolver() const { return m_pgsSolver; }
 
     ///
     /// \brief Adds a body to the system, must call initialize for changes to effect
@@ -96,11 +100,6 @@ public:
     /// \brief Removes a body from the system, must call initialize for changes to effect
     ///
     void removeRigidBody(std::shared_ptr<RigidBody> body);
-
-    ///
-    /// \todo: remove
-    ///
-    virtual void updateBodyStates(const Vectord& /*q*/, const StateUpdateType /*updateType = stateUpdateType::displacement*/) override {}
 
     ///
     /// \brief Initialize the RigidBody model

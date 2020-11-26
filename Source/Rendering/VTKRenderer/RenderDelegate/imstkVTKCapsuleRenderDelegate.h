@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
-
-class vtkTransformPolyDataFilter;
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 namespace imstk
 {
@@ -32,13 +30,13 @@ namespace imstk
 ///
 /// \brief Render capsule object with vtk backend
 ///
-class VTKCapsuleRenderDelegate : public VTKRenderDelegate
+class VTKCapsuleRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief destructor
@@ -48,9 +46,6 @@ public:
     ///
     /// \brief Update capsule source based on the capsule geometry
     ///
-    void updateDataSource() override;
-
-protected:
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
+    void processEvents() override;
 };
 } // imstk

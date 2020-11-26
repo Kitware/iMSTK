@@ -23,52 +23,49 @@
 #include "imstkSphere.h"
 #include "imstkVisualModel.h"
 
+#include <vtkActor.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkSphereSource.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {
-VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
+VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
 {
-    m_visualModel = visualModel;
-
-    auto sphereSource = vtkSmartPointer<vtkSphereSource>::New();
-    sphereSource->SetCenter(0, 0, 0);
+    vtkNew<vtkSphereSource> sphereSource;
+    sphereSource->SetCenter(0.0, 0.0, 0.0);
     sphereSource->SetRadius(1.0);
     sphereSource->SetPhiResolution(20);
     sphereSource->SetThetaResolution(20);
 
-    m_transformFilter->SetInputConnection(sphereSource->GetOutputPort());
-    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputConnection(sphereSource->GetOutputPort());
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+    }
 
-    this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
-
-    m_isMesh = false;
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKSphereRenderDelegate::updateDataSource()
+VTKSphereRenderDelegate::processEvents()
 {
+    VTKRenderDelegate::processEvents();
+
     auto geometry = std::static_pointer_cast<Sphere>(m_visualModel->getGeometry());
 
-    if (!geometry->m_dataModified)
-    {
-        return;
-    }
-
-    Geometry::DataType type = Geometry::DataType::PreTransform;
-
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
-    T.scale(geometry->getRadius(type));
+    T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
+    T.scale(geometry->getRadius(Geometry::DataType::PreTransform));
     T.matrix().transposeInPlace();
 
-    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
-    vtkT->SetMatrix(T.data());
-    geometry->m_dataModified = false;
+    m_transform->SetMatrix(T.data());
 }
 } // imstk

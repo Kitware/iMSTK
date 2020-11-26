@@ -20,7 +20,9 @@
 =========================================================================*/
 
 #pragma once
+
 #include "imstkPointSet.h"
+
 #include <array>
 #include <set>
 
@@ -72,31 +74,30 @@ namespace imstk
 class SurfaceMesh : public PointSet
 {
 public:
-
-    using TriangleArray = std::array<size_t, 3>;
     using NeighborsType = std::set<size_t>;
 
+public:
     ///
     /// \brief Constructor
     ///
-    SurfaceMesh(const std::string& name = std::string("")) : PointSet(Geometry::Type::SurfaceMesh, name) {}
+    SurfaceMesh(const std::string& name = std::string(""));
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  triangle connectivity
     ///
-    void initialize(const StdVectorOfVec3d&           vertices,
-                    const std::vector<TriangleArray>& triangles,
-                    const bool                        computeDerivedData = false);
+    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
+                    std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
+                    const bool computeDerivedData = false);
 
     ///
     /// \brief Initializes the rest of the data structures given vertex positions,
     ///  triangle connectivity, and normals
     ///
-    void initialize(const StdVectorOfVec3d&           vertices,
-                    const std::vector<TriangleArray>& triangles,
-                    const StdVectorOfVec3d&           normals,
-                    const bool                        computeDerivedData = false);
+    void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
+                    std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
+                    std::shared_ptr<VecDataArray<double, 3>> normals,
+                    const bool computeDerivedData = false);
 
     ///
     /// \brief Clear all the mesh data
@@ -109,11 +110,6 @@ public:
     void print() const override;
 
     ///
-    /// \brief Get the volume enclosed by the surface mesh
-    ///
-    double getVolume() const override;
-
-    ///
     /// \brief Computes neighboring triangles for all vertices
     ///
     void computeVertexNeighborTriangles();
@@ -124,9 +120,15 @@ public:
     void computeVertexNeighborVertices();
 
     ///
-    /// \brief Compute the normals to the triangles
+    /// \brief Compute the normals of all the triangles
     ///
     void computeTrianglesNormals();
+
+    ///
+    /// \brief Compute the tangents of all the triangles
+    /// based off
+    ///
+    void computeTriangleTangents();
 
     ///
     /// \brief Computes the normals of all the vertices
@@ -134,52 +136,16 @@ public:
     void computeVertexNormals();
 
     ///
+    /// \brief Comptues the tangents of all the vertices
+    ///
+    void computeVertexTangents();
+
+    ///
     /// \brief Rewire the node order and triangle connectivity to optimize for memory layout
     ///  The intended use is for large meshes that doesn't fit into CPU/GPU memory.
     ///  \todo Further optimization to find a 1-d uninterrupted sub-graph at each iteration.
     ///
     void optimizeForDataLocality();
-
-    // Accessors
-
-    ///
-    /// \brief Get/Set triangle connectivity
-    ///
-    void setTrianglesVertices(const std::vector<TriangleArray>& triangles);
-    const std::vector<TriangleArray>& getTrianglesVertices() const;
-
-    ///
-    /// \brief Get vector of normals of all the triangles
-    ///
-    const StdVectorOfVec3d& getTriangleNormals() const;
-
-    ///
-    /// \brief Get normal of a triangle given its index
-    ///
-    const Vec3d& getTriangleNormal(size_t i) const;
-
-    ///
-    /// \brief Set/Get vector of normals of all the vertices
-    ///
-    void setVertexNormals(const StdVectorOfVec3d& normals);
-    const StdVectorOfVec3d& getVertexNormals() const;
-
-    ///
-    /// \brief Set/Get vector of tangents of all the vertices
-    ///
-    void setVertexTangents(const StdVectorOfVec3d& tangents);
-    const StdVectorOfVec3d& getVertexTangents() const;
-
-    ///
-    /// \brief Returns the number of triangles
-    ///
-    size_t getNumTriangles() const;
-
-    ///
-    /// \brief Set/Get the array defining the default material coordinates
-    ///
-    void setDefaultTCoords(const std::string& arrayName);
-    std::string getDefaultTCoords();
 
     ///
     /// \brief Flip the normals for the whole mesh by reversing the winding order
@@ -197,6 +163,31 @@ public:
     void computeUVSeamVertexGroups();
 
     ///
+    /// \brief Copy the contents of one SurfaceMesh to the other (no pointers to shared data between this and srcMesh)
+    /// \todo: generalize base classes and implement for every geometry
+    ///
+    void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
+
+// Accessors
+public:
+    ///
+    /// \brief Get/Set triangle connectivity
+    ///
+    void setTriangleIndices(std::shared_ptr<VecDataArray<int, 3>> indices) { m_triangleIndices = indices; }
+    std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return m_triangleIndices; }
+
+    ///
+    /// \brief Return connectivity of triangle
+    ///
+    const Vec3i& getTriangleIndices(const int triangleNum) const;
+    Vec3i& getTriangleIndices(const int triangleNum);
+
+    ///
+    /// \brief Returns the number of triangles
+    ///
+    size_t getNumTriangles() const;
+
+    ///
     /// \brief Set load factor
     /// \param loadFactor the maximum number of vertices
     /// a multiple of the original vertex count
@@ -206,40 +197,79 @@ public:
     ///
     /// \brief Get the maximum number of triangles
     ///
-    size_t getMaxNumTriangles();
+    size_t getMaxNumTriangles() const { return m_maxNumTriangles; }
 
     ///
-    /// \brief Scale a surface mesh independently in each direction
+    /// \brief Get the volume enclosed by the surface mesh
     ///
-    void directionalScale(const double s_x, const double s_y, const double s_z);
+    double getVolume() override;
+
+// Attributes
+public:
+    ///
+    /// \brief Set a data array holding some per cell data
+    ///
+    void setCellAttribute(const std::string& arrayName, std::shared_ptr<AbstractDataArray> arr);
+
+    ///
+    /// \brief Get a specific data array. If the array name cannot be found, nullptr is returned.
+    ///
+    std::shared_ptr<AbstractDataArray> getCellAttribute(const std::string& arrayName) const;
+
+    ///
+    /// \brief Get the cell attributes map
+    ///
+    const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& getCellAttributes() const { return m_cellAttributes; }
+
+    ///
+    /// \brief Check if a specific data array exists.
+    ///
+    bool hasCellAttribute(const std::string& arrayName) const;
+
+    ///
+    /// \brief Set the cell attributes map
+    ///
+    void setCellAttributes(std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes) { m_cellAttributes = attributes; }
+
+    ///
+    /// \brief Get/Set the active scalars
+    ///
+    void setCellScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars);
+    void setCellScalars(const std::string& arrayName);
+    std::string getActiveCellScalars() const { return m_activeCellScalars; }
+    std::shared_ptr<AbstractDataArray> getCellScalars() const;
+
+    ///
+    /// \brief Get/Set the active normals
+    ///
+    void setCellNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals);
+    void setCellNormals(const std::string& arrayName);
+    std::string getActiveCellNormals() const { return m_activeCellNormals; }
+    std::shared_ptr<VecDataArray<double, 3>> getCellNormals() const;
+
+    ///
+    /// \brief Get/Set the active tangents
+    ///
+    void setCellTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents);
+    void setCellTangents(const std::string& arrayName);
+    std::string getActiveCellTangents() const { return m_activeCellTangents; }
+    std::shared_ptr<VecDataArray<double, 3>> getCellTangents() const;
 
 protected:
     friend class VTKSurfaceMeshRenderDelegate;
 
-    /// \brief Copy the contents of one SurfaceMesh to the other
-    /// \todo: generalize base classes and implement for every geometry
-    ///
-    void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
-
-    ///
-    /// \brief Get vertex normals
-    ///
-    StdVectorOfVec3d& getVertexNormalsNotConst();
-    StdVectorOfVec3d& getVertexTangentsNotConst();
-
-    std::vector<TriangleArray> m_trianglesVertices;       ///> Triangle connectivity
+    std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices
 
-    StdVectorOfVec3d m_triangleNormals;                   ///> Normals to the triangles
-    StdVectorOfVec3d m_triangleTangents;                  ///> Tangents to the triangles
-    StdVectorOfVec3d m_vertexNormals;                     ///> Normals of the vertices
-    StdVectorOfVec3d m_vertexTangents;                    ///> Tangents of the vertices
-
     std::map<NormalGroup, std::shared_ptr<std::vector<size_t>>> m_UVSeamVertexGroups;
 
-    std::string m_defaultTCoords       = ""; ///> Name of the array used as default material coordinates
-    size_t      m_originalNumTriangles = 0;
-    size_t      m_maxNumTriangles      = 0;
+    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> m_cellAttributes;
+    std::string m_activeCellNormals  = "";
+    std::string m_activeCellTangents = "";
+    std::string m_activeCellScalars  = "";
+
+    size_t m_originalNumTriangles = 0;
+    size_t m_maxNumTriangles      = 0;
 };
 } // imstk

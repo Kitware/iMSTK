@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
-
-class vtkTransformPolyDataFilter;
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 namespace imstk
 {
@@ -32,13 +30,13 @@ namespace imstk
 ///
 /// \brief Cube render delegate with VTK backend
 ///
-class VTKCubeRenderDelegate : public VTKRenderDelegate
+class VTKCubeRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -48,9 +46,6 @@ public:
     ///
     /// \brief Update cube source based on the cube geometry
     ///
-    void updateDataSource() override;
-
-protected:
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
+    void processEvents() override;
 };
 } // imstk

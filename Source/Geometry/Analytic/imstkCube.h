@@ -36,7 +36,7 @@ class Cube : public AnalyticalGeometry
 {
 public:
     explicit Cube(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double width = 1.0, const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0),
-                  const std::string& name = std::string("")) : AnalyticalGeometry(Type::Cube, name)
+                  const std::string& name = std::string("defaultCube")) : AnalyticalGeometry(Type::Cube, name)
     {
         setPosition(pos);
         setOrientationAxis(orientationAxis);
@@ -51,7 +51,7 @@ public:
     ///
     /// \brief Returns the volume of the cube
     ///
-    double getVolume() const override;
+    double getVolume() override { return m_width * m_width * m_width; }
 
     ///
     /// \brief Returns the width of the cube
@@ -69,9 +69,10 @@ public:
     ///
     double getFunctionValue(const Vec3d& pos) const override
     {
-        // Make it so that only negatives are within the cube, ie: position so cube's maxima is at origin
-        const Vec3d d = (pos.cwiseAbs() - m_position) - Vec3d(m_width, m_width, m_width) * 0.5;
-        return std::min(std::max(d[0], std::max(d[1], d[2])), 0.0) + d.cwiseMax(0.0).norm();
+        const Vec3d dmin = pos - m_position - Vec3d(m_width, m_width, m_width) * 0.5;
+        const Vec3d dmax = m_position - pos - Vec3d(m_width, m_width, m_width) * 0.5;
+        const Vec3d d    = dmin.cwiseMax(dmax);
+        return std::max(std::max(d[0], d[1]), d[2]);
     }
 
 protected:

@@ -44,7 +44,7 @@ using ButtonStateType = int;
 class ButtonEvent : public Event
 {
 public:
-    ButtonEvent(const int button, const ButtonStateType keyPressType) : Event(EventType::DeviceButtonPress, 1),
+    ButtonEvent(const int button, const ButtonStateType keyPressType) : Event(EventType::DeviceButtonEvent, 1),
         m_buttonState(keyPressType),
         m_button(button)
     {

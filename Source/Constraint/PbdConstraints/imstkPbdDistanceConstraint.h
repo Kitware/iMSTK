@@ -36,7 +36,11 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdDistanceConstraint() : PbdConstraint() { m_vertexIds.resize(2); }
+    PbdDistanceConstraint() : PbdConstraint()
+    {
+        m_vertexIds.resize(2);
+        m_dcdx.resize(2);
+    }
 
     ///
     /// \brief Returns PBD constraint of type Type::Distance
@@ -46,14 +50,15 @@ public:
     ///
     /// \brief Initializes the distance constraint
     ///
-    void initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                        const size_t&           pIdx0,
-                        const size_t&           pIdx1,
-                        const double            k = 1e5);
+    void initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+                        const size_t& pIdx0,
+                        const size_t& pIdx1,
+                        const double k = 1e5);
 
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const override;
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPositions,
+        double& c,
+        std::vector<Vec3d>& dcdx) const override;
 
 public:
     double m_restLength = 0.0; ///> Rest length between the nodes

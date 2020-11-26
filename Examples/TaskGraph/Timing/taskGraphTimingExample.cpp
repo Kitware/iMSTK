@@ -42,28 +42,30 @@ using namespace imstk;
 static std::shared_ptr<LineMesh>
 makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringLength)
 {
+    const double vertexSpacing = stringLength / numVerts;
+
     // Create the geometry
     imstkNew<LineMesh> stringGeometry;
 
-    StdVectorOfVec3d vertList;
-    vertList.resize(numVerts);
-    const double vertexSpacing = stringLength / numVerts;
+    imstkNew<VecDataArray<double, 3>> verticesPtr;
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
+    vertices.resize(static_cast<int>(numVerts));
     for (size_t j = 0; j < numVerts; j++)
     {
-        vertList[j] = pos - Vec3d(0.0, static_cast<double>(j) * vertexSpacing, 0.0);
+        vertices[j] = pos - Vec3d(0.0, static_cast<double>(j) * vertexSpacing, 0.0);
     }
-    stringGeometry->setInitialVertexPositions(vertList);
-    stringGeometry->setVertexPositions(vertList);
+    stringGeometry->setInitialVertexPositions(verticesPtr);
+    stringGeometry->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*verticesPtr.get()));
 
     // Add connectivity data
-    std::vector<LineMesh::LineArray> segments;
+    imstkNew<VecDataArray<int, 2>> segmentsPtr;
+    VecDataArray<int, 2>&          segments = *segmentsPtr.get();
     for (size_t j = 0; j < numVerts - 1; j++)
     {
-        LineMesh::LineArray seg = { j, j + 1 };
-        segments.push_back(seg);
+        segments.push_back(Vec2i(j, j + 1));
     }
 
-    stringGeometry->setLinesVertices(segments);
+    stringGeometry->setLinesIndices(segmentsPtr);
     return stringGeometry;
 }
 
@@ -102,7 +104,7 @@ makePbdString(
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
-    material->setEdgeColor(color);
+    material->setColor(color);
     material->setLineWidth(2.0f);
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
 
@@ -186,16 +188,14 @@ main()
     auto   movePoints =
         [&pbdStringObjs, &t](Event*)
         {
-            for (unsigned int i = 0; i < pbdStringObjs.size(); i++)
+            for (size_t i = 0; i < pbdStringObjs.size(); i++)
             {
-                std::shared_ptr<PbdModel> model = pbdStringObjs[i]->getPbdModel();
-                const Vec3d               pos   = model->getCurrentState()->getVertexPosition(0);
-                // Move in circle, derivatives of parametric eq of circle
-                const Vec3d newPos = Vec3d(
-                    pos.x() + -std::sin(t) * radius * dt,
-                    pos.y(),
-                    pos.z() + std::cos(t) * radius * dt);
-                model->getCurrentState()->setVertexPosition(0, newPos);
+                std::shared_ptr<PbdModel>                model     = pbdStringObjs[i]->getPbdModel();
+                std::shared_ptr<VecDataArray<double, 3>> positions = model->getCurrentState()->getPositions();
+                (*positions)[0] += Vec3d(
+                -std::sin(t) * radius * dt,
+                0.0,
+                std::cos(t) * radius * dt);
             }
             t += dt;
         };

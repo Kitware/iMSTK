@@ -58,7 +58,7 @@ main()
     // Compute DT
     imstkNew<SurfaceMeshDistanceTransform> createSdf;
     createSdf->setInputMesh(coarseSurfMesh);
-    createSdf->setDimensions(150, 150, 150);
+    createSdf->setDimensions(50, 50, 50);
     createSdf->update();
 
     // Erode
@@ -96,7 +96,7 @@ main()
     {
         imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh.get());
         imstkNew<RenderMaterial> material;
-        material->setColor(imstk::Color::Red);
+        material->setColor(Color::Red);
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setLineWidth(1.0);
         material->setOpacity(0.2f);

@@ -38,16 +38,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdAnalyticalCollisionConstraint() : PbdCollisionConstraint(1, 0)
-    {}
+    PbdAnalyticalCollisionConstraint() : PbdCollisionConstraint(1, 0) { }
 
     ///
     /// \brief Returns the type of the pbd collision constraint
     ///
-    Type getType() const
-    {
-        return Type::Analytical;
-    }
+    Type getType() const { return Type::Analytical; }
 
     ///
     /// \brief initialize constraint
@@ -64,11 +60,11 @@ public:
     /// \param[inout] c constraint value
     /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
-                                 const StdVectorOfVec3d& currVertexPositionsB,
+    bool computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
+                                 const VecDataArray<double, 3>& currVertexPositionsB,
                                  double&                 c,
-                                 StdVectorOfVec3d&       dcdxA,
-                                 StdVectorOfVec3d&       dcdxB) const override;
+        VecDataArray<double, 3>&       dcdxA,
+        VecDataArray<double, 3>&       dcdxB) const override;
 
 public:
     Vec3d m_penetrationVector = Vec3d::Zero();

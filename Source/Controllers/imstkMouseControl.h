@@ -23,7 +23,7 @@
 
 #include "imstkDeviceControl.h"
 #include "imstkMath.h"
-#include "imstkTypes.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {

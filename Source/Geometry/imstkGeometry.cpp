@@ -26,29 +26,13 @@
 namespace imstk
 {
 Geometry::Geometry(const Geometry::Type type, const std::string& name) :
-    m_type(type), m_name(name), m_geometryIndex(Geometry::getUniqueID()), m_transform(RigidTransform3d::Identity())
+    m_type(type), m_geometryIndex(Geometry::getUniqueID()), m_transform(RigidTransform3d::Identity())
 {
     // If the geometry name is empty, enumerate it by name (which will not be duplicated)
     if (m_name.empty())
     {
         m_name = getTypeName() + std::string("-") + std::to_string(m_geometryIndex);
     }
-    else if (s_sGegometryNames.find(m_name) != s_sGegometryNames.end())
-    {
-        LOG(FATAL) << "The provided geometry name '" + m_name + "' is duplicated";
-    }
-
-    // Store geometry name to keep track and avoid duplication
-    s_sGegometryNames.insert(m_name);
-}
-
-Geometry::~Geometry()
-{
-    // Remove the string name of this geometry from the global name set so it can be re-used by new geometry
-    // Since erasing element from tbb::concurrrent_unordered_set is not thread-safe, spin lock need to be used
-    s_GeomGlobalLock.lock();
-    s_sGegometryNames.unsafe_erase(m_name);
-    s_GeomGlobalLock.unlock();
 }
 
 void
@@ -64,7 +48,7 @@ Geometry::print() const
 }
 
 void
-Geometry::computeBoundingBox(Vec3d&, Vec3d&, const double) const
+Geometry::computeBoundingBox(Vec3d& imstkNotUsed(min), Vec3d& imstkNotUsed(max), const double imstkNotUsed(padding))
 {
     LOG(WARNING) << "computeBoundingBox() must be called from an instance of a specific geometry class";
 }
@@ -221,12 +205,6 @@ Geometry::setRotation(const Vec3d axis, const double angle)
     this->setRotation(Rotd(angle, axis).toRotationMatrix());
 }
 
-double
-Geometry::getScaling() const
-{
-    return m_scaling;
-}
-
 void
 Geometry::setScaling(double s)
 {
@@ -238,12 +216,6 @@ Geometry::setScaling(double s)
     m_scaling = s;
     m_transformModified = true;
     m_transformApplied  = false;
-}
-
-Geometry::Type
-Geometry::getType() const
-{
-    return m_type;
 }
 
 const std::string
@@ -292,10 +264,6 @@ Geometry::s_GeomGlobalLock;
 // Static counter
 uint32_t
 Geometry::s_NumGeneratedGegometries = 0;
-
-// Static name set
-tbb::concurrent_unordered_set<std::string>
-Geometry::s_sGegometryNames;
 
 uint32_t
 Geometry::getUniqueID()

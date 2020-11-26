@@ -109,6 +109,7 @@ RigidBodyCH::processA()
                     m_rbdObjectA->getRigidBody(), nullptr,
                     pdColData[i].dirAtoB.normalized(),
                     pdColData[i].posB,
+                    //0.0001,
                     pdColData[i].penetrationDepth,
                     m_stiffness,
                     RbdConstraint::Side::A);

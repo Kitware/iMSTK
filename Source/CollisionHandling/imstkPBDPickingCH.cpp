@@ -88,12 +88,14 @@ PBDPickingCH::updatePickConstraints()
         return;
     }
 
-    std::shared_ptr<PbdModel>           model    = m_pbdObj->getPbdModel();
-    std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(m_pickObj->getCollidingGeometry());
+    std::shared_ptr<PbdModel>                model      = m_pbdObj->getPbdModel();
+    std::shared_ptr<AnalyticalGeometry>      pickGeom   = std::dynamic_pointer_cast<AnalyticalGeometry>(m_pickObj->getCollidingGeometry());
+    std::shared_ptr<VecDataArray<double, 3>> vertices   = model->getCurrentState()->getPositions();
+    VecDataArray<double, 3>&                 vertexData = *vertices;
     for (auto iter = m_pickedPtIdxOffset.begin(); iter != m_pickedPtIdxOffset.end(); iter++)
     {
         auto rot = pickGeom->getRotation();
-        model->getCurrentState()->setVertexPosition(iter->first, pickGeom->getPosition() + rot * iter->second);
+        vertexData[iter->first] = pickGeom->getPosition() + rot * iter->second;
     }
 }
 
@@ -113,6 +115,9 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());
     CHECK(pickGeom != nullptr) << "Colliding geometry is analytical geometry ";
 
+    std::shared_ptr<VecDataArray<double, 3>> vertices   = model->getCurrentState()->getPositions();
+    VecDataArray<double, 3>&                 vertexData = *vertices;
+
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
         [&](const size_t idx) {
@@ -121,12 +126,12 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
             {
                 auto pv  = cd.penetrationVector;
                 auto rot = pickGeom->getRotation().transpose();
-                auto relativePos = rot * (model->getCurrentState()->getVertexPosition(cd.nodeIdx) - pv - pickGeom->getPosition());
+                auto relativePos = rot * (vertexData[cd.nodeIdx] - pv - pickGeom->getPosition());
 
                 lock.lock();
                 m_pickedPtIdxOffset[cd.nodeIdx] = relativePos;
                 model->setFixedPoint(cd.nodeIdx);
-                model->getCurrentState()->setVertexPosition(cd.nodeIdx, pickGeom->getPosition() + rot.transpose() * relativePos);
+                vertexData[cd.nodeIdx] = pickGeom->getPosition() + rot.transpose() * relativePos;
                 lock.unlock();
             }
     });

@@ -40,82 +40,113 @@
 
 namespace imstk
 {
-//static bool neighborNotEqual(const Vec3i& pt, const Vec3i& dim, const float val, const float* imgPtr)
+///
+/// \brief Only works with binary image
+/// returns 0 if neighborhood is equivalent to val
+/// returns 1 if neighborhood is filled with 1's
+/// returns -1 if neighborhood is filled with 0's
+///
+//static int isNeighborhoodEquivalent(const Vec3i& pt, const Vec3i& dim, const double val, const double* imgPtr, const int dilateSize)
 //{
-//    const Vec3i ptc = pt.cwiseMax(0).cwiseMin(dim - Vec3i(1, 1, 1));
-//    const Vec3i minima = (pt - Vec3i(1, 1, 1)).cwiseMax(0).cwiseMin(dim - Vec3i(1, 1, 1));
-//    const Vec3i maxima = (pt + Vec3i(1, 1, 1)).cwiseMax(0).cwiseMin(dim - Vec3i(1, 1, 1));
+//    const Vec3i min = (pt - Vec3i(dilateSize, dilateSize, dilateSize)).cwiseMax(Vec3i(0, 0, 0)).cwiseMin(dim - Vec3i(1, 1, 1));
+//    const Vec3i max = (pt + Vec3i(dilateSize, dilateSize, dilateSize)).cwiseMax(Vec3i(0, 0, 0)).cwiseMin(dim - Vec3i(1, 1, 1));
 //
-//    const size_t xIndex1 = ImageData::getScalarIndex(minima[0], ptc[1], ptc[2], dim, 1);
-//    const size_t xIndex2 = ImageData::getScalarIndex(maxima[0], ptc[1], ptc[2], dim, 1);
-//    const size_t yIndex1 = ImageData::getScalarIndex(ptc[0], minima[1], ptc[2], dim, 1);
-//    const size_t yIndex2 = ImageData::getScalarIndex(ptc[0], maxima[1], ptc[2], dim, 1);
-//    const size_t zIndex1 = ImageData::getScalarIndex(ptc[0], ptc[1], minima[2], dim, 1);
-//    const size_t zIndex2 = ImageData::getScalarIndex(ptc[0], ptc[1], maxima[2], dim, 1);
-//
-//    if (imgPtr[xIndex1] != val)
-//        return true;
-//    if (imgPtr[xIndex2] != val)
-//        return true;
-//    if (imgPtr[yIndex1] != val)
-//        return true;
-//    if (imgPtr[yIndex2] != val)
-//        return true;
-//    if (imgPtr[zIndex1] != val)
-//        return true;
-//    if (imgPtr[zIndex2] == val)
-//        return true;
-//    return false;
-//}
-
-//// Narrow band is WIP, it works but is slow
-//static void
-//computeNarrowBandedDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh, double bandwidth)
-//{
-//    // Rasterize a mask from the polygon
-//    std::shared_ptr<SurfaceMeshImageMask> imageMask = std::make_shared<SurfaceMeshImageMask>();
-//    imageMask->setInputMesh(surfMesh);
-//    imageMask->setReferenceImage(imageData);
-//    imageMask->update();
-//
-//    DataArray<float>& inputScalars = *std::dynamic_pointer_cast<DataArray<float>>(imageMask->getOutputImage()->getScalars());
-//    float* inputImgPtr = inputScalars.getPointer();
-//    DataArray<float>& outputScalars = *std::dynamic_pointer_cast<DataArray<float>>(imageData->getScalars());
-//    float* outputImgPtr = outputScalars.getPointer();
-//
-//    vtkSmartPointer<vtkPolyData> inputPolyData = GeometryUtils::copyToVtkPolyData(surfMesh);
-//    vtkSmartPointer<vtkImplicitPolyDataDistance> polyDataDist = vtkSmartPointer<vtkImplicitPolyDataDistance>::New();
-//    polyDataDist->SetInput(inputPolyData);
-//    std::fill_n(outputImgPtr, outputScalars.size(), VTK_FLOAT_MIN);
-//
-//    // Iterate the image testing for boundary pixels (ie any 0 adjacent to a 1)
-//    const Vec3i& dim = imageData->getDimensions();
-//    const Vec3d shift = imageData->getOrigin() + imageData->getSpacing() * 0.5;
-//    const Vec3d& spacing = imageData->getSpacing();
-//    int i = 0;
-//    for (int z = 0; z < dim[2]; z++)
+//    // Take the max of the neighborhood
+//    for (int z = min[2]; z < max[2] + 1; z++)
 //    {
-//        for (int y = 0; y < dim[1]; y++)
+//        for (int y = min[1]; y < max[1] + 1; y++)
 //        {
-//            for (int x = 0; x < dim[0]; x++, i++)
+//            for (int x = min[0]; x < max[0] + 1; x++)
 //            {
-//                const float val = inputImgPtr[i];
-//                const Vec3i pt = Vec3i(x, y, z);
-//                if (neighborNotEqual(pt, dim, val, inputImgPtr))
+//                const int index = ImageData::getScalarIndex(x, y, z, dim, 1);
+//                if (val != imgPtr[index])
 //                {
-//                    const Vec3d pos = pt.cast<double>().cwiseProduct(spacing) + shift;
-//                    const float dist = polyDataDist->FunctionValue(pos.data());
-//                    //printf("%f\n", dist);
-//                    outputImgPtr[i] = dist;
-//                }
-//                else if (val == 0.0f)
-//                {
-//                    outputImgPtr[i] = VTK_FLOAT_MIN;
+//                    return false;
 //                }
 //            }
 //        }
 //    }
+//    return 0;
 //}
+static bool
+isNeighborhoodEquivalent(const Vec3i& pt, const Vec3i& dim, const float val, const float* imgPtr, const int dilateSize)
+{
+    const Vec3i min = (pt - Vec3i(dilateSize, dilateSize, dilateSize)).cwiseMax(Vec3i(0, 0, 0)).cwiseMin(dim - Vec3i(1, 1, 1));
+    const Vec3i max = (pt + Vec3i(dilateSize, dilateSize, dilateSize)).cwiseMax(Vec3i(0, 0, 0)).cwiseMin(dim - Vec3i(1, 1, 1));
+
+    // Take the max of the neighborhood
+    for (int z = min[2]; z < max[2] + 1; z++)
+    {
+        for (int y = min[1]; y < max[1] + 1; y++)
+        {
+            for (int x = min[0]; x < max[0] + 1; x++)
+            {
+                const int index = ImageData::getScalarIndex(x, y, z, dim, 1);
+                if (val != imgPtr[index])
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+// Narrow band is WIP, it works but is slow
+static void
+computeNarrowBandedDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh, const int dilateSize)
+{
+    // Rasterize a mask from the polygon
+    std::shared_ptr<SurfaceMeshImageMask> imageMask = std::make_shared<SurfaceMeshImageMask>();
+    imageMask->setInputMesh(surfMesh);
+    imageMask->setReferenceImage(imageData);
+    imageMask->update();
+
+    DataArray<float>&  inputScalars  = *std::dynamic_pointer_cast<DataArray<float>>(imageMask->getOutputImage()->getScalars());
+    float*             inputImgPtr   = inputScalars.getPointer();
+    DataArray<double>& outputScalars = *std::dynamic_pointer_cast<DataArray<double>>(imageData->getScalars());
+    double*            outputImgPtr  = outputScalars.getPointer();
+
+    vtkSmartPointer<vtkPolyData>                 inputPolyData = GeometryUtils::copyToVtkPolyData(surfMesh);
+    vtkSmartPointer<vtkImplicitPolyDataDistance> polyDataDist  = vtkSmartPointer<vtkImplicitPolyDataDistance>::New();
+    polyDataDist->SetInput(inputPolyData);
+    std::fill_n(outputImgPtr, outputScalars.size(), 10000.0);
+
+    // Iterate the image testing for boundary pixels (ie any 0 adjacent to a 1)
+    const Vec3i& dim     = imageData->getDimensions();
+    const Vec3d  shift   = imageData->getOrigin() + imageData->getSpacing() * 0.5;
+    const Vec3d& spacing = imageData->getSpacing();
+    int          i       = 0;
+    for (int z = 0; z < dim[2]; z++)
+    {
+        for (int y = 0; y < dim[1]; y++)
+        {
+            for (int x = 0; x < dim[0]; x++, i++)
+            {
+                const float val = inputImgPtr[i];
+                const Vec3i pt  = Vec3i(x, y, z);
+
+                // If neighborhood is homogenous then its not touching the boundary
+                if (!isNeighborhoodEquivalent(pt, dim, val, inputImgPtr, dilateSize))
+                {
+                    const Vec3d pos = pt.cast<double>().cwiseProduct(spacing) + shift;
+                    outputImgPtr[i] = polyDataDist->FunctionValue(pos.data());
+                }
+                // If value is 1 (we are inside)
+                else if (val == 1.0)
+                {
+                    outputImgPtr[i] = -10000.0;
+                }
+
+                if (i % 1000000 == 0)
+                {
+                    double p = static_cast<double>(i) / (dim[0] * dim[1] * dim[2]);
+                    std::cout << "Progress " << p << "\n";
+                }
+            }
+        }
+    }
+}
 
 static void
 computeFullDT(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> surfMesh)
@@ -228,19 +259,19 @@ SurfaceMeshDistanceTransform::requestUpdate()
         bounds[4] = min[2];
         bounds[5] = max[2];
     }
-    Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
-    Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
-    Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);
+    const Vec3d size    = Vec3d(bounds[1] - bounds[0], bounds[3] - bounds[2], bounds[5] - bounds[4]);
+    const Vec3d spacing = size.cwiseQuotient(m_Dimensions.cast<double>());
+    const Vec3d origin  = Vec3d(bounds[0], bounds[2], bounds[4]);
     outputImageData->allocate(IMSTK_DOUBLE, 1, m_Dimensions, spacing, origin);
 
     /* StopWatch timer;
      timer.start();*/
 
-    /*if (NarrowBanded)
+    if (m_NarrowBanded)
     {
-        computeNarrowBandedDT(outputImageData, inputSurfaceMesh, NarrowBandWidth);
+        computeNarrowBandedDT(outputImageData, inputSurfaceMesh, m_DilateSize);
     }
-    else*/
+    else
     {
         computeFullDT(outputImageData, inputSurfaceMesh);
     }

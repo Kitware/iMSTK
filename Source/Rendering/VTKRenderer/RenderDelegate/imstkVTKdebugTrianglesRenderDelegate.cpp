@@ -24,17 +24,17 @@
 #include "imstkVisualModel.h"
 
 #include <thread>
+#include <vtkActor.h>
 #include <vtkDoubleArray.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLVertexBufferObject.h>
 #include <vtkPolyData.h>
-#include <vtkTrivialProducer.h>
 
 namespace imstk
 {
-VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
     m_paddedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_visualModel = visualModel;
-
     // Map vertices in memory
     m_paddedVertexArray->SetNumberOfComponents(3);
 
@@ -50,19 +50,26 @@ VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<Vis
     m_polyData->SetPoints(m_points);
     m_polyData->SetPolys(m_cellArray);
 
-    // Create connection source
-    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(m_polyData);
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputData(m_polyData);
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        //actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        {
+            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+        }
+    }
 
-    // Update Transform, Render Properties
-    updateDataSource();
-    updateActorProperties();
-
-    setUpMapper(source->GetOutputPort(), visualModel);
+    updateRenderProperties();
 }
 
 void
-VTKdbgTrianglesRenderDelegate::updateDataSource()
+VTKdbgTrianglesRenderDelegate::processEvents()
 {
     auto dbgTriangles = std::static_pointer_cast<DebugRenderTriangles>(m_visualModel->getDebugGeometry());
 

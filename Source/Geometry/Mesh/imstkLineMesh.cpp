@@ -21,68 +21,63 @@
 
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
+LineMesh::LineMesh(const std::string& name) : PointSet(Type::LineMesh, name),
+    m_segmentIndices(std::make_shared<VecDataArray<int, 2>>())
+{
+}
+
 void
-LineMesh::initialize(const StdVectorOfVec3d&       vertices,
-                     const std::vector<LineArray>& lines)
+LineMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
+                     std::shared_ptr<VecDataArray<int, 2>> lines)
 {
     this->clear();
 
     PointSet::initialize(vertices);
 
-    this->setLinesVertices(lines);
+    this->setLinesIndices(lines);
 }
 
 void
 LineMesh::clear()
 {
-    m_lines.clear();
+    PointSet::clear();
+    if (m_segmentIndices != nullptr)
+    {
+        m_segmentIndices->clear();
+    }
 }
 
 void
 LineMesh::print() const
 {
     PointSet::print();
-}
-
-double
-LineMesh::getVolume() const
-{
-    return 0.0;
-}
-
-void
-LineMesh::setLinesVertices(const std::vector<LineArray>& lines)
-{
-    if (m_originalNumLines == 0)
+    LOG(INFO) << "Number of lines: " << this->getNumLines();
+    LOG(INFO) << "Lines:";
+    for (auto& segment : *m_segmentIndices)
     {
-        m_originalNumLines = lines.size();
-        m_maxNumLines      = (size_t)(m_originalNumLines * m_loadFactor);
-        m_lines.reserve(m_maxNumLines);
-    }
-
-    if (lines.size() <= m_maxNumLines)
-    {
-        m_topologyChanged = true;
-        m_lines = lines;
-    }
-    else
-    {
-        LOG(WARNING) << "Lines not set, exceeded maximum number of lines";
+        LOG(INFO) << segment[0] << ", " << segment[1];
     }
 }
 
 size_t
-LineMesh::getNumLines()
+LineMesh::getNumLines() const
 {
-    return m_lines.size();
+    return m_segmentIndices->size();
 }
 
-std::vector<LineMesh::LineArray>
-LineMesh::getLinesVertices() const
+const Vec2i&
+LineMesh::getLineIndices(const size_t pos) const
 {
-    return m_lines;
+    return (*m_segmentIndices)[pos];
+}
+
+Vec2i&
+LineMesh::getLineIndices(const size_t pos)
+{
+    return (*m_segmentIndices)[pos];
 }
 } // imstk

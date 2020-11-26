@@ -23,57 +23,54 @@
 #include "imstkCylinder.h"
 #include "imstkVisualModel.h"
 
+#include <vtkActor.h>
 #include <vtkCylinderSource.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {
-VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
+VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
 {
-    m_visualModel = visualModel;
-
     auto geometry = std::static_pointer_cast<Cylinder>(visualModel->getGeometry());
 
-    //Geometry::DataType type = Geometry::DataType::PreTransform;
-    cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
-    cylinderSource->SetCenter(0., 0., 0.);
-    cylinderSource->SetRadius(1.);
+    cylinderSource = vtkSmartPointer<vtkCylinderSource>();
+    cylinderSource->SetCenter(0.0, 0.0, 0.0);
+    cylinderSource->SetRadius(1.0);
     cylinderSource->SetHeight(geometry->getLength());
     cylinderSource->SetResolution(100);
 
-    m_transformFilter->SetInputConnection(cylinderSource->GetOutputPort());
-    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputConnection(cylinderSource->GetOutputPort());
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+    }
 
-    this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKCylinderRenderDelegate::updateDataSource()
+VTKCylinderRenderDelegate::processEvents()
 {
+    VTKRenderDelegate::processEvents();
+
     auto geometry = std::static_pointer_cast<Cylinder>(m_visualModel->getGeometry());
-
-    if (!geometry->m_dataModified)
-    {
-        return;
-    }
-
-    Geometry::DataType type = Geometry::DataType::PreTransform;
 
     cylinderSource->SetRadius(geometry->getRadius());
     cylinderSource->SetHeight(geometry->getLength());
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
+    T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
     T.scale(1.0);
     T.matrix().transposeInPlace();
 
-    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
-    vtkT->SetMatrix(T.data());
-
-    geometry->m_dataModified = false;
+    m_transform->SetMatrix(T.data());
 }
 } // imstk

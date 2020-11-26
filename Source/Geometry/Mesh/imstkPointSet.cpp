@@ -22,22 +22,41 @@
 #include "imstkPointSet.h"
 #include "imstkParallelUtils.h"
 #include "imstkLogger.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
-void
-PointSet::initialize(const StdVectorOfVec3d& vertices)
+PointSet::PointSet(const Type type, const std::string& name) : Geometry(type, name),
+    m_initialVertexPositions(std::make_shared<VecDataArray<double, 3>>()),
+    m_vertexPositions(std::make_shared<VecDataArray<double, 3>>())
 {
-    this->setInitialVertexPositions(vertices);
+}
+
+void
+PointSet::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices)
+{
+    // Copy data to initial
+    this->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*vertices));
+
+    // Use in place as current vertices
     this->setVertexPositions(vertices);
 }
 
 void
 PointSet::clear()
 {
-    m_initialVertexPositions.clear();
-    m_vertexPositions.clear();
-    m_vertexPositionsPostTransform.clear();
+    if (m_initialVertexPositions != nullptr)
+    {
+        m_initialVertexPositions->clear();
+    }
+    if (m_vertexPositions != nullptr)
+    {
+        m_vertexPositions->clear();
+    }
+    for (auto i : m_vertexAttributes)
+    {
+        i.second->clear();
+    }
 }
 
 void
@@ -46,17 +65,22 @@ PointSet::print() const
     Geometry::print();
     LOG(INFO) << "Number of vertices: " << this->getNumVertices();
     LOG(INFO) << "Vertex positions:";
-    for (auto& verts : m_vertexPositions)
+    for (auto& verts : *m_vertexPositions)
     {
-        LOG(INFO) << verts.x() << ", " << verts.y() << ", " << verts.z();
+        LOG(INFO) << "\t" << verts.x() << ", " << verts.y() << ", " << verts.z();
+    }
+    for (auto i : m_vertexAttributes)
+    {
+        LOG(INFO) << i.first;
+        //i.second->print();
     }
 }
 
 void
-PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent) const
+PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent)
 {
     updatePostTransformData();
-    ParallelUtils::findAABB(m_vertexPositions, lowerCorner, upperCorner);
+    ParallelUtils::findAABB(*m_vertexPositions, lowerCorner, upperCorner);
     if (paddingPercent > 0.0)
     {
         const Vec3d range = upperCorner - lowerCorner;
@@ -66,71 +90,56 @@ PointSet::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const doubl
 }
 
 void
-PointSet::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
+PointSet::setInitialVertexPositions(std::shared_ptr<VecDataArray<double, 3>> vertices)
 {
-    if (m_originalNumVertices == 0)
-    {
-        m_initialVertexPositions = vertices;
-        m_originalNumVertices    = vertices.size();
-        m_maxNumVertices = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
-        m_vertexPositions.reserve(m_maxNumVertices);
-    }
-    else
-    {
-        LOG(WARNING) << "Already set initial vertices";
-    }
-}
-
-const StdVectorOfVec3d&
-PointSet::getInitialVertexPositions() const
-{
-    return m_initialVertexPositions;
+    m_initialVertexPositions = vertices;
 }
 
 const Vec3d&
 PointSet::getInitialVertexPosition(const size_t vertNum) const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= m_initialVertexPositions.size())) << "Invalid index";
+    LOG_IF(FATAL, (vertNum >= m_initialVertexPositions->size())) << "Invalid index";
 #endif
-    return m_initialVertexPositions[vertNum];
+    return (*m_initialVertexPositions)[vertNum];
+}
+
+Vec3d&
+PointSet::getInitialVertexPosition(const size_t vertNum)
+{
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (vertNum >= m_initialVertexPositions->size())) << "Invalid index";
+#endif
+    return (*m_initialVertexPositions)[vertNum];
 }
 
 void
-PointSet::setVertexPositions(const StdVectorOfVec3d& vertices)
+PointSet::setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> vertices)
 {
-    if (vertices.size() <= m_maxNumVertices)
-    {
-        m_vertexPositions  = vertices;
-        m_dataModified     = true;
-        m_transformApplied = false;
-        this->updatePostTransformData();
-    }
-    else
-    {
-        LOG(WARNING) << "Vertices not set, exceeded maximum number of vertices";
-    }
+    m_vertexPositions  = vertices;
+    m_transformApplied = false;
+
+    this->updatePostTransformData();
 }
 
-const StdVectorOfVec3d&
-PointSet::getVertexPositions(DataType type /* = DataType::PostTransform */) const
+std::shared_ptr<VecDataArray<double, 3>>
+PointSet::getVertexPositions(DataType type) const
 {
     if (type == DataType::PostTransform)
     {
         this->updatePostTransformData();
-        return m_vertexPositionsPostTransform;
+        return m_vertexPositions;
     }
-    return m_vertexPositions;
+    return m_initialVertexPositions;
 }
 
 void
 PointSet::setVertexPosition(const size_t vertNum, const Vec3d& pos)
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= m_vertexPositions.size())) << "Invalid index";
+    LOG_IF(FATAL, (vertNum >= m_vertexPositions->size())) << "Invalid index";
 #endif
-    m_vertexPositions[vertNum] = pos;
-    m_dataModified     = true;
+    (*m_vertexPositions)[vertNum] = pos;
     m_transformApplied = false;
     this->updatePostTransformData();
 }
@@ -139,123 +148,39 @@ const Vec3d&
 PointSet::getVertexPosition(const size_t vertNum, DataType type) const
 {
 #if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= getVertexPositions().size())) << "Invalid index";
+    LOG_IF(FATAL, (vertNum >= getVertexPositions()->size())) << "Invalid index";
 #endif
-    return this->getVertexPositions(type)[vertNum];
+    return (*this->getVertexPositions(type))[vertNum];
 }
 
-void
-PointSet::setVertexDisplacements(const StdVectorOfVec3d& diff)
+Vec3d&
+PointSet::getVertexPosition(const size_t vertNum, DataType type)
 {
-    assert(diff.size() == m_vertexPositions.size());
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
-        [&](const size_t i)
-        {
-            m_vertexPositions[i] = m_initialVertexPositions[i] + diff[i];
-        });
-    m_dataModified     = true;
-    m_transformApplied = false;
-}
-
-void
-PointSet::setVertexDisplacements(const Vectord& u)
-{
-    assert(static_cast<size_t>(u.size()) == 3 * m_vertexPositions.size());
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
-        [&](const size_t i)
-        {
-            m_vertexPositions[i] = m_initialVertexPositions[i] + Vec3d(u(i * 3), u(i * 3 + 1), u(i * 3 + 2));
-        });
-    m_dataModified     = true;
-    m_transformApplied = false;
-}
-
-void
-PointSet::translateVertices(const Vec3d& t)
-{
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
-        [&](const size_t i)
-        {
-            m_vertexPositions[i] += t;
-        });
-    m_dataModified     = true;
-    m_transformApplied = false;
-}
-
-void
-PointSet::setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData)
-{
-    m_pointDataMap = pointData;
-}
-
-const std::map<std::string, StdVectorOfVectorf>&
-PointSet::getPointDataMap() const
-{
-    return m_pointDataMap;
-}
-
-void
-PointSet::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData)
-{
-    if (arrayData.size() != this->getNumVertices())
-    {
-        LOG(WARNING) << "Specified array should have " << this->getNumVertices()
-                     << " tuples, has " << arrayData.size();
-        return;
-    }
-    m_pointDataMap[arrayName] = arrayData;
-}
-
-const StdVectorOfVectorf*
-PointSet::getPointDataArray(const std::string& arrayName) const
-{
-    auto it = m_pointDataMap.find(arrayName);
-    if (it == m_pointDataMap.end())
-    {
-        LOG(WARNING) << "No array with such name holds any point data.";
-        return nullptr;
-    }
-    return &(it->second);
-}
-
-StdVectorOfVectorf*
-PointSet::getPointDataArray(const std::string& arrayName)
-{
-    auto it = m_pointDataMap.find(arrayName);
-    if (it == m_pointDataMap.end())
-    {
-        LOG(WARNING) << "No array with such name holds any point data.";
-        return nullptr;
-    }
-    return &(it->second);
-}
-
-bool
-PointSet::hasPointDataArray(const std::string& arrayName) const
-{
-    auto it = m_pointDataMap.find(arrayName);
-    if (it == m_pointDataMap.end())
-    {
-        return false;
-    }
-    return true;
+#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
+    LOG_IF(FATAL, (vertNum >= getVertexPositions()->size())) << "Invalid index";
+#endif
+    return (*this->getVertexPositions(type))[vertNum];
 }
 
 size_t
 PointSet::getNumVertices() const
 {
-    return m_vertexPositions.size();
+    return m_vertexPositions->size();
 }
 
 void
 PointSet::applyTranslation(const Vec3d t)
 {
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
+    VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
+    VecDataArray<double, 3>& vertices     = *m_vertexPositions;
+
+    ParallelUtils::parallelFor(vertices.size(),
         [&](const size_t i)
         {
-            m_vertexPositions[i] += t;
-            m_initialVertexPositions[i] += t;
+            vertices[i]     += t;
+            initVertices[i] += t;
         });
+    vertices.modified();
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -263,12 +188,16 @@ PointSet::applyTranslation(const Vec3d t)
 void
 PointSet::applyRotation(const Mat3d r)
 {
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
+    VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
+    VecDataArray<double, 3>& vertices     = *m_vertexPositions;
+
+    ParallelUtils::parallelFor(vertices.size(),
         [&](const size_t i)
         {
-            m_vertexPositions[i] = r * m_vertexPositions[i];
-            m_initialVertexPositions[i] = r * m_initialVertexPositions[i];
+            vertices[i]     = r * vertices[i];
+            initVertices[i] = r * initVertices[i];
         });
+    vertices.modified();
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -276,12 +205,16 @@ PointSet::applyRotation(const Mat3d r)
 void
 PointSet::applyScaling(const double s)
 {
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
+    VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
+    VecDataArray<double, 3>& vertices     = *m_vertexPositions;
+
+    ParallelUtils::parallelFor(vertices.size(),
         [&](const size_t i)
         {
-            m_vertexPositions[i] = s * m_vertexPositions[i];
-            m_initialVertexPositions[i] = s * m_initialVertexPositions[i];
+            vertices[i]     = s * vertices[i];
+            initVertices[i] = s * initVertices[i];
         });
+    vertices.modified();
     m_dataModified     = true;
     m_transformApplied = false;
 }
@@ -294,18 +227,21 @@ PointSet::updatePostTransformData() const
         return;
     }
 
-    if (m_vertexPositionsPostTransform.size() != m_vertexPositions.size())
+    const VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
+    VecDataArray<double, 3>&       vertices     = *m_vertexPositions;
+
+    if (initVertices.size() != vertices.size())
     {
-        m_vertexPositionsPostTransform.resize(m_vertexPositions.size());
+        vertices.resize(initVertices.size());
     }
 
-    ParallelUtils::parallelFor(m_vertexPositions.size(),
+    ParallelUtils::parallelFor(vertices.size(),
         [&](const size_t i)
         {
             // NOTE: Right now scaling is appended on top of the rigid transform
             // for scaling around the mesh center, and not concatenated within
             // the transform, for ease of use.
-            m_vertexPositionsPostTransform[i] = m_transform * (m_vertexPositions[i] * m_scaling);
+            vertices[i] = m_transform * (initVertices[i] * m_scaling);
         });
     m_transformApplied = true;
 }
@@ -314,19 +250,146 @@ void
 PointSet::setLoadFactor(double loadFactor)
 {
     m_loadFactor     = loadFactor;
-    m_maxNumVertices = (size_t)(m_originalNumVertices * m_loadFactor);
-    m_vertexPositions.reserve(m_maxNumVertices);
+    m_maxNumVertices = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
+    m_vertexPositions->reserve(m_maxNumVertices);
 }
 
-double
-PointSet::getLoadFactor()
+bool
+PointSet::hasVertexAttribute(const std::string& arrayName) const
 {
-    return m_loadFactor;
+    return (m_vertexAttributes.find(arrayName) != m_vertexAttributes.end());
 }
 
-size_t
-PointSet::getMaxNumVertices()
+void
+PointSet::setVertexAttribute(const std::string& arrayName, std::shared_ptr<AbstractDataArray> arr)
 {
-    return m_maxNumVertices;
+    m_vertexAttributes[arrayName] = arr;
+}
+
+std::shared_ptr<AbstractDataArray>
+PointSet::getVertexAttribute(const std::string& arrayName) const
+{
+    auto it = m_vertexAttributes.find(arrayName);
+    if (it == m_vertexAttributes.end())
+    {
+        return nullptr;
+    }
+    return it->second;
+}
+
+void
+PointSet::setVertexScalars(const std::string& arrayName, std::shared_ptr<AbstractDataArray> scalars)
+{
+    m_activeVertexScalars = arrayName;
+    m_vertexAttributes[arrayName] = scalars;
+}
+
+void
+PointSet::setVertexScalars(const std::string& arrayName)
+{
+    if (hasVertexAttribute(arrayName))
+    {
+        m_activeVertexScalars = arrayName;
+    }
+}
+
+std::shared_ptr<AbstractDataArray>
+PointSet::getVertexScalars() const
+{
+    if (hasVertexAttribute(m_activeVertexScalars))
+    {
+        return m_vertexAttributes.at(m_activeVertexScalars);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void
+PointSet::setVertexNormals(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> normals)
+{
+    m_activeVertexNormals = arrayName;
+    m_vertexAttributes[arrayName] = normals;
+}
+
+void
+PointSet::setVertexNormals(const std::string& arrayName)
+{
+    if (hasVertexAttribute(arrayName))
+    {
+        m_activeVertexNormals = arrayName;
+    }
+}
+
+std::shared_ptr<VecDataArray<double, 3>>
+PointSet::getVertexNormals() const
+{
+    if (hasVertexAttribute(m_activeVertexNormals))
+    {
+        return std::dynamic_pointer_cast<VecDataArray<double, 3>>(m_vertexAttributes.at(m_activeVertexNormals));
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void
+PointSet::setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents)
+{
+    m_activeVertexTangents = arrayName;
+    m_vertexAttributes[arrayName] = tangents;
+}
+
+void
+PointSet::setVertexTangents(const std::string& arrayName)
+{
+    if (hasVertexAttribute(arrayName))
+    {
+        m_activeVertexTangents = arrayName;
+    }
+}
+
+std::shared_ptr<VecDataArray<double, 3>>
+PointSet::getVertexTangents() const
+{
+    if (hasVertexAttribute(m_activeVertexTangents))
+    {
+        return std::dynamic_pointer_cast<VecDataArray<double, 3>>(m_vertexAttributes.at(m_activeVertexTangents));
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void
+PointSet::setVertexTCoords(const std::string& arrayName, std::shared_ptr<VecDataArray<float, 2>> tcoords)
+{
+    m_activeVertexTCoords = arrayName;
+    m_vertexAttributes[arrayName] = tcoords;
+}
+
+void
+PointSet::setVertexTCoords(const std::string& arrayName)
+{
+    if (hasVertexAttribute(arrayName))
+    {
+        m_activeVertexTCoords = arrayName;
+    }
+}
+
+std::shared_ptr<VecDataArray<float, 2>>
+PointSet::getVertexTCoords() const
+{
+    if (hasVertexAttribute(m_activeVertexTCoords))
+    {
+        return std::dynamic_pointer_cast<VecDataArray<float, 2>>(m_vertexAttributes.at(m_activeVertexTCoords));
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 } // imstk

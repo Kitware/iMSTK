@@ -25,7 +25,7 @@
 namespace imstk
 {
 ThreadObject::ThreadObject(std::string name, ThreadStatus status) :
-    m_name(name), m_requestedStatus(status), m_parent(nullptr)
+    m_requestedStatus(status), m_name(name), m_parent(nullptr)
 {
 }
 

@@ -61,9 +61,10 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
     // Pre-compute the nodal cardinality set
     for (size_t tetId = 0; tetId < boneMesh->getNumTetrahedra(); ++tetId)
     {
-        for (auto& vert : boneMesh->getTetrahedronVertices(tetId))
+        const Vec4i& indices = boneMesh->getTetrahedronIndices(tetId);
+        for (int i = 0; i < 4; i++)
         {
-            m_nodalCardinalSet[vert].push_back(tetId);
+            m_nodalCardinalSet[indices[i]].push_back(tetId);
         }
     }
 }
@@ -96,7 +97,6 @@ BoneDrillingCH::erodeBone()
                 for (auto& tetId : m_nodalCardinalSet[cd.nodeIdx])
                 {
                     boneTetMesh->setTetrahedraAsRemoved(static_cast<unsigned int>(tetId));
-                    boneTetMesh->setTopologyChangedFlag(true);
                 }
             }
         });

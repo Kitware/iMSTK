@@ -22,80 +22,356 @@
 #pragma once
 
 #include "imstkAbstractDataArray.h"
-#include "imstkParallelReduce.h"
-
-#include <vector>
+#include "imstkMath.h"
+#include "imstkMacros.h"
+//#include "imstkParallelReduce.h"
 
 namespace imstk
 {
 ///
 /// \class DataArray
 ///
-/// \brief This class serves as a wrapping to STL vector, it also provides modified callback
-/// \todo: Support tuples/components
+/// \brief Simple dynamic array implementation that also supports
+/// event posting and viewing/facade
 ///
-template<class T>
+template<typename T>
 class DataArray : public AbstractDataArray
 {
 public:
-    using iterator       = typename std::vector<T>::iterator;
-    using const_iterator = typename std::vector<T>::const_iterator;
+    class iterator
+    {
+    public:
+        using self_type  = iterator;
+        using value_type = T;
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using pointer   = T*;
+        using reference = T&;
+
+    public:
+        iterator(pointer ptr) : ptr_(ptr) { }
+
+        self_type operator++()
+        {
+            self_type i = *this;
+            ptr_++;
+            return i;
+        }
+
+        self_type operator++(int junk)
+        {
+            ptr_++;
+            return *this;
+        }
+
+        reference operator*() { return *ptr_; }
+
+        pointer operator->() { return ptr_; }
+
+        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+
+        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+
+    private:
+        pointer ptr_;
+    };
+
+    class const_iterator
+    {
+    public:
+        using self_type  = const_iterator;
+        using value_type = T;
+        using iterator_category = std::forward_iterator_tag;
+        using difference_type   = std::ptrdiff_t;
+        using pointer   = T*;
+        using reference = T&;
+
+    public:
+        const_iterator(pointer ptr) : ptr_(ptr) { }
+
+        self_type operator++()
+        {
+            self_type i = *this;
+            ptr_++;
+            return i;
+        }
+
+        self_type operator++(int junk) { ptr_++; return *this; }
+
+        const reference operator*() { return *ptr_; }
+
+        const pointer operator->() { return ptr_; }
+
+        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+
+        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+
+    private:
+        pointer ptr_;
+    };
 
 public:
     ///
     /// \brief Constructs an empty data array
+    /// DataArray will never have capacity < 1
     ///
-    DataArray() { setType(TypeTemplateMacro(T)); }
+    DataArray() : m_mapped(false), m_data(new T[1])
+    {
+        setType(TypeTemplateMacro(T));
+        m_capacity = 1;
+    }
 
     ///
-    /// \brief Constructs a data array with count elements
+    /// \brief Constructs a data array
     ///
-    DataArray(size_t count) : vec(count) { setType(TypeTemplateMacro(T)); }
+    DataArray(const int size) : AbstractDataArray(size), m_mapped(false), m_data(new T[size])
+    {
+        setType(TypeTemplateMacro(T));
+    }
 
     ///
     /// \brief Constructs from intializer list
     ///
-    DataArray(std::initializer_list<T> list) : vec(list.begin(), list.end()) { setType(TypeTemplateMacro(T)); }
+    template<typename U>
+    DataArray(std::initializer_list<U> list) : AbstractDataArray(size), m_mapped(false), m_data(new T[list.size()])
+    {
+        int j = 0;
+        for (auto i : list)
+        {
+            m_data[j] = i;
+            j++;
+        }
+        setType(TypeTemplateMacro(T));
+        m_size = m_capacity = static_cast<int>(list.size());
+    }
+
+    DataArray(const DataArray& other)
+    {
+        // Copy the buffer instead of the pointer
+        m_mapped     = other.m_mapped;
+        m_size       = other.m_size;
+        m_capacity   = other.m_capacity;
+        m_scalarType = other.m_scalarType;
+        if (m_mapped)
+        {
+            m_data = other.m_data;
+        }
+        else
+        {
+            m_data = new T[m_size];
+            std::copy_n(other.m_data, m_size, m_data);
+        }
+    }
+
+    DataArray(const DataArray&& other)
+    {
+        m_mapped     = other.m_mapped;
+        m_size       = other.m_size;
+        m_capacity   = other.m_capacity;
+        m_scalarType = other.m_scalarType;
+        m_data       = other.m_data; // Take the others buffer
+        // todo: Make sure destructor is not called on other
+    }
+
+    virtual ~DataArray() override
+    {
+        if (!m_mapped)
+        {
+            delete[] m_data;
+            m_data = nullptr;
+        }
+    }
 
 public:
-    inline void resize(const size_t newCount) override { vec.resize(newCount); }
+    ///
+    /// \brief Resize data array to hold exactly size number of values
+    ///
+    inline void resize(const int size) override
+    {
+        // Can't resize a mapped vector
+        if (m_mapped || size == m_size)
+        {
+            return;
+        }
 
-    inline void push_back(const T& val) { vec.push_back(val); }
-    inline void push_back(const T&& val) { vec.push_back(val); }
+        if (size == 0)
+        {
+            delete[] m_data;
+            m_data     = new T[1];
+            m_size     = 0;
+            m_capacity = 1;
+        }
+        else
+        {
+            const T*  oldData = m_data;
+            const int oldSize = m_size;
 
-    inline void erase(const const_iterator& element) { vec.erase(element); }
+            m_data = new T[size];
+            if (oldSize <= size) // If old vector is smaller than new, it will fit
+            {
+                std::copy_n(oldData, oldSize, m_data);
+            }
+            else // If old vector is larger than new, chop it off, only copy up to new size
+            {
+                std::copy_n(oldData, size, m_data);
+            }
+            delete[] oldData;
+            m_size = m_capacity = size;
+        }
+    }
 
-    inline void reserve(const size_t count) override { vec.reserve(count); }
+    ///
+    /// \brief Fill the array with the specified value
+    ///
+    inline void fill(const T& val) { std::fill_n(m_data, m_size, val); }
 
-    inline size_t size() const override { return vec.size(); }
+    ///
+    /// \brief Resize to current size
+    ///
+    virtual inline void squeeze() { resize(m_size); }
 
-    inline T* getPointer() { return vec.data(); }
-    inline void* getVoidPointer() override { return static_cast<void*>(vec.data()); }
+    ///
+    /// \brief Append the data array to hold the new value, resizes if neccesary
+    ///
+    inline void push_back(const T& val)
+    {
+        // Can't push back to a mapped vector
+        if (m_mapped)
+        {
+            return;
+        }
 
-    inline T& operator[](const size_t pos) { return vec[pos]; }
-    inline const T& operator[](const size_t pos) const { return vec[pos]; }
+        const int newSize = m_size + 1;
+        if (newSize > m_capacity) // If the new size exceeds capacity
+        {
+            m_capacity *= 2;
+            resize(m_capacity); // Conservative/copies values
+        }
+        m_size = newSize;
+        m_data[newSize - 1] = val;
+    }
+
+    inline void push_back(const T&& val) // Move
+    {
+        // Can't push back to a mapped vector
+        if (m_mapped)
+        {
+            return;
+        }
+
+        const int newSize = m_size + 1;
+        if (newSize > m_capacity) // If the new size exceeds capacity
+        {
+            m_capacity *= 2;
+            resize(m_capacity); // Conservative/copies values
+        }
+        m_size = newSize;
+        m_data[newSize - 1] = val;
+    }
+
+    iterator begin() { return iterator(m_data); }
+
+    iterator end() { return iterator(m_data + m_size); }
+
+    const_iterator cbegin() const { return const_iterator(m_data); }
+
+    const_iterator cend() const { return const_iterator(m_data + m_size); }
+
+    ///
+    /// \brief Allocates extra capacity, for the number of values, conservative reallocate
+    ///
+    inline void reserve(const int size) override
+    {
+        if (m_mapped)
+        {
+            return;
+        }
+
+        const int currSize = m_size;
+        resize(size);      // Reallocate
+        m_size = currSize; // Keep current size
+    }
+
+    inline T* getPointer() { return m_data; }
+    inline void* getVoidPointer() override { return static_cast<void*>(m_data); }
+
+    inline T& operator[](const size_t pos) { return m_data[pos]; }
+    inline const T& operator[](const size_t pos) const { return m_data[pos]; }
 
     ///
     /// \brief Allow initialization from initializer list, ie: DataArray<int> arr = { 1, 2 }
     ///
     template<typename U>
-    DataArray<U>& operator=(std::initializer_list<U> list)
+    DataArray<T>& operator=(std::initializer_list<U> list)
     {
-        vec = std::vector<U>(list.begin(), list.end());
+        // If previously mapped, don't delete, just overwrite
+        if (!m_mapped)
+        {
+            delete[] m_data;
+        }
+        m_data = new T[list.size()];
+        int j = 0;
+        for (auto i : list)
+        {
+            m_data[j] = i;
+            j++;
+        }
+        m_size   = m_capacity = static_cast<int>(list.size());
+        m_mapped = false;
+        return *this;
+    }
+
+    DataArray& operator=(const DataArray& other)
+    {
+        m_mapped     = other.m_mapped;
+        m_scalarType = other.m_scalarType;
+        m_size       = other.m_size;
+        m_capacity   = other.m_capacity;
+        if (m_mapped)
+        {
+            m_data = other.m_data;
+        }
+        else
+        {
+            delete[] m_data;
+            m_data = new T[m_size];
+            std::copy_n(other.m_data, m_size, m_data);
+        }
         return *this;
     }
 
     ///
-    /// \brief Computes the scalar range
+    /// \brief Computes the range of a component of the vectors elements
     ///
-    inline Vec2d getScalarRange() const
+    /*inline Vec2d getRange(const int component) const
     {
-        ParallelUtils::RangeFunctor<std::vector<T>> pObj(vec);
+        ParallelUtils::RangeFunctor<DataArray<T, N>> pObj(vec);
         tbb::parallel_reduce(tbb::blocked_range<size_t>(0, vec.size()), pObj);
         return pObj.getRange();
+        return Vec2d(0.0, 0.0);
+    }*/
+
+    ///
+    /// \brief: Use the array as a facade to anothers memory
+    /// \param: Pointer to external buffer
+    /// \param: Number of values (per ValueType * number of components)
+    /// \param: If manage is true, the data will be deleted when the array is, default false
+    ///
+    inline void setData(T* ptr, const int size)
+    {
+        if (!m_mapped)
+        {
+            delete[] m_data;
+        }
+        m_mapped = true;
+        m_data   = ptr;
+        m_size   = m_capacity = size;
     }
 
-private:
-    std::vector<T> vec;
+    inline virtual int getNumberOfComponents() const override { return 1; }
+
+protected:
+    bool m_mapped;
+    T*   m_data;
 };
 }

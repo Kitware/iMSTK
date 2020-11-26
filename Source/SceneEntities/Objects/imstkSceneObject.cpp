@@ -20,8 +20,11 @@
 =========================================================================*/
 
 #include "imstkSceneObject.h"
+#include "imstkGeometry.h"
 #include "imstkTaskGraph.h"
 #include "imstkVisualModel.h"
+
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -53,6 +56,15 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
     else
     {
         m_visualModels[0]->setGeometry(geometry);
+    }
+}
+
+void
+SceneObject::updateGeometries()
+{
+    for (auto visualModel : m_visualModels)
+    {
+        visualModel->getGeometry()->modified();
     }
 }
 

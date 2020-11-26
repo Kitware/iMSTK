@@ -57,7 +57,7 @@ NeighborSearch::setSearchRadius(const Real searchRadius)
 }
 
 std::vector<std::vector<size_t>>
-NeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
+NeighborSearch::getNeighbors(const VecDataArray<double, 3>& points)
 {
     std::vector<std::vector<size_t>> result;
     getNeighbors(result, points, points);
@@ -65,13 +65,13 @@ NeighborSearch::getNeighbors(const StdVectorOfVec3r& points)
 }
 
 void
-NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& points)
+NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& points)
 {
     getNeighbors(result, points, points);
 }
 
 void
-NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const StdVectorOfVec3r& setA, const StdVectorOfVec3r& setB)
+NeighborSearch::getNeighbors(std::vector<std::vector<size_t>>& result, const VecDataArray<double, 3>& setA, const VecDataArray<double, 3>& setB)
 {
     if (m_Method == Method::UniformGridBasedSearch)
     {

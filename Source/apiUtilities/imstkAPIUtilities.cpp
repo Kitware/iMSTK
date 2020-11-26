@@ -22,6 +22,7 @@
 #include "imstkGraph.h"
 #include "imstkLinearProjectionConstraint.h"
 #include "imstkLogger.h"
+#include "imstkVecDataArray.h"
 
 // Objects
 #include "imstkCollidingObject.h"
@@ -219,7 +220,7 @@ std::shared_ptr<Graph>
 getMeshGraph(std::shared_ptr<SurfaceMesh> m)
 {
     auto gMesh = std::make_shared<Graph>(m->getNumVertices());
-    for (auto tri : m->getTrianglesVertices())
+    for (auto tri : *m->getTriangleIndices())
     {
         gMesh->addEdge(tri[0], tri[1]);
         gMesh->addEdge(tri[0], tri[2]);
@@ -233,7 +234,7 @@ std::shared_ptr<Graph>
 getMeshGraph(std::shared_ptr<TetrahedralMesh> m)
 {
     auto gMesh = std::make_shared<Graph>(m->getNumVertices());
-    for (auto tet : m->getTetrahedraVertices())
+    for (auto tet : *m->getTetrahedraIndices())
     {
         gMesh->addEdge(tet[0], tet[1]);
         gMesh->addEdge(tet[0], tet[2]);

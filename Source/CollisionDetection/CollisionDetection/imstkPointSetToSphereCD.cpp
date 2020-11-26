@@ -39,11 +39,12 @@ void
 PointSetToSphereCD::computeCollisionData()
 {
     m_colData->clearAll();
-    ParallelUtils::parallelFor(static_cast<unsigned int>(m_pointSet->getVertexPositions().size()),
+    std::shared_ptr<VecDataArray<double, 3>> vertexData = m_pointSet->getVertexPositions();
+    const VecDataArray<double, 3>&           vertices   = *vertexData;
+    ParallelUtils::parallelFor(static_cast<unsigned int>(vertices.size()),
         [&](const unsigned int idx)
         {
-            const auto& point = m_pointSet->getVertexPosition(idx);
-            NarrowPhaseCD::pointToSphere(point, idx, m_sphere.get(), m_colData);
-       });
+            NarrowPhaseCD::pointToSphere(vertices[idx], idx, m_sphere.get(), m_colData);
+        });
 }
 } // imstk

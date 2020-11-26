@@ -35,7 +35,7 @@ namespace imstk
 std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
-    bool isDir;
+    bool isDir = false;
 
     CHECK(MeshIO::fileExists(filePath, isDir)) << "MeshIO::read error: file not found: " << filePath;
 
@@ -191,6 +191,9 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     case MeshFileType::STL:
     case MeshFileType::PLY:
         return VTKMeshIO::write(imstkMesh, filePath, meshType);
+        break;
+    case MeshFileType::UNKNOWN:
+    default:
         break;
     }
 

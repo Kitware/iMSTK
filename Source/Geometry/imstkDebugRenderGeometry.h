@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -33,7 +34,7 @@ namespace imstk
 /// Another way to modify rendering data is to call resizeBuffer(), then fill data by calling to setVertex() function
 /// In both ways, after finishing data modification, setDataModified(true) must be called to notify the render backend
 ///
-class DebugRenderGeometry
+class DebugRenderGeometry : public EventObject
 {
 public:
     ///

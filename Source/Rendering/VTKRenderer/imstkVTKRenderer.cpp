@@ -30,12 +30,10 @@
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 
 #include <vtkAxesActor.h>
-#include <vtkCamera.h>
 #include <vtkCameraActor.h>
 #include <vtkCullerCollection.h>
 #include <vtkLight.h>
 #include <vtkLightActor.h>
-#include <vtkRenderer.h>
 
 #include <vtkAxis.h>
 #include <vtkChartXY.h>
@@ -49,9 +47,6 @@
 
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRCamera.h>
-#include <vtkOpenVRRenderWindow.h>
-#include <vtkOpenVRRenderWindowInteractor.h>
-#include <vtkInteractorStyle3D.h>
 
 namespace imstk
 {
@@ -416,17 +411,17 @@ VTKRenderer::updateRenderDelegates()
             auto geom = visualModel->getGeometry();
             if (visualModel && !visualModel->isRenderDelegateCreated())
             {
-                auto delegate = VTKRenderDelegate::makeDelegate(visualModel);
-                if (delegate == nullptr)
+                auto renderDelegate = VTKRenderDelegate::makeDelegate(visualModel);
+                if (renderDelegate == nullptr)
                 {
                     LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
                                  << obj->getName() << "'.";
                     continue;
                 }
 
-                m_renderDelegates.push_back(delegate);
-                m_objectVtkActors.push_back(delegate->getVtkActor());
-                m_vtkRenderer->AddActor(delegate->getVtkActor());
+                m_renderDelegates.push_back(renderDelegate);
+                m_objectVtkActors.push_back(renderDelegate->getVtkActor());
+                m_vtkRenderer->AddActor(renderDelegate->getVtkActor());
 
                 //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
 

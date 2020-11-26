@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "imstkSpinLock.h"
+
 #include <algorithm>
 #include <functional>
 #include <list>
@@ -28,24 +30,33 @@
 //#include <tbb/concurrent_priority_queue.h>
 #include <tbb/concurrent_queue.h>
 #include <tbb/concurrent_unordered_map.h>
+#include <deque>
 
 namespace imstk
 {
 enum class EventType
 {
     AnyEvent,
+
     Start,
     End,
     Resume,
     Pause,
+
     Modified,
-    KeyPress,
-    DeviceButtonPress,
+
+    KeyEvent,
+    DeviceButtonEvent,
     MouseEvent,
+
     PreUpdate,
     PostUpdate,
-    Configure
+    Configure,
+
+    Contact
 };
+
+class EventObject;
 
 ///
 /// \class Event
@@ -57,8 +68,8 @@ enum class EventType
 class Event
 {
 public:
-    Event() : m_type(EventType::AnyEvent), m_priority(0) { }
-    Event(EventType type, int priority = 0) : m_type(type), m_priority(priority) { }
+    Event() : m_type(EventType::AnyEvent), m_priority(0), m_sender(nullptr) { }
+    Event(EventType type, int priority = 0) : m_type(type), m_priority(priority), m_sender(nullptr) { }
     virtual ~Event() = default;
 
 public:
@@ -73,19 +84,20 @@ public:
     }
 
 public:
-    EventType m_type;
-    int       m_priority;
+    EventType    m_type;
+    int          m_priority;
+    EventObject* m_sender;
 };
 
 ///
 /// \brief Stores everything needed to invoke an event
-/// ie: where and with what
+/// A call may not be present, in which case invoke doesn't do anything
 ///
 class Command
 {
 public:
     Command() : m_call(nullptr), m_event(nullptr) { }
-    Command(std::function<void(Event*)> call, Event* event) : m_call(call), m_event(event) { }
+    Command(std::function<void(Event*)> call, std::shared_ptr<Event> event) : m_call(call), m_event(event) { }
 
 public:
     bool operator<(const Command& other) const
@@ -93,12 +105,25 @@ public:
         return *m_event > *other.m_event;
     }
 
-public:
-    std::function<void(Event*)> m_call;
-    Event* m_event;
-};
+    ///
+    /// \brief Call the underlying function if present
+    /// then delete the event data
+    ///
+    void invoke()
+    {
+        if (m_event != nullptr)
+        {
+            if (m_call != nullptr)
+            {
+                m_call(m_event.get());
+            }
+        }
+    }
 
-class EventObject;
+public:
+    std::function<void(Event*)> m_call  = nullptr;
+    std::shared_ptr<Event>      m_event = nullptr;
+};
 
 template<class T, class RecieverType>
 static void connect(EventObject*, EventType, RecieverType*, void (RecieverType::* func)(T*));
@@ -113,14 +138,14 @@ static void queueConnect(EventObject*, EventType, EventObject*, std::function<vo
 static void disconnect(EventObject*, EventObject*, EventType);
 
 ///
-/// \class imstkEventObject
+/// \class EventObject
 ///
-/// \brief imstkEventObject is the base abstract class for all objects in iMSTK that
+/// \brief EventObject is the base class for all objects in iMSTK that
 /// can recieve and emit events. It supports direct and queued observer functions.
 /// Direct observers recieve events immediately on the same thread
 /// This can either be posted on an object or be a function pointer
 /// Queued observers recieve events within their queue which they can process whenever
-/// they like.
+/// they like. One can implement the type of handling.
 /// These can be connected with the connect/queuedConnect/disconnect functions
 /// \todo ThreadObject affinity
 ///
@@ -142,14 +167,22 @@ public:
     template<typename T>
     void postEvent(const T& e)
     {
+        std::shared_ptr<T> ePtr = std::make_shared<T>(e);
+        // Don't overwrite the sender if the user provided one
+        if (ePtr->m_sender == nullptr)
+        {
+            ePtr->m_sender = this;
+        }
+
         // For every direct observer
+        // Directly call its function
         for (std::list<Observer>::iterator i = directObservers[e.m_type].begin(); i != directObservers[e.m_type].end(); i++)
         {
-            // We don't need an object (i->first) to call
-            // Call its function, if it exists, otherwise remove observer
+            // If function of observer does not exist, remove observer
             if (i->second != nullptr)
             {
-                i->second(new T(e));
+                // Call the function
+                i->second(ePtr.get());
             }
             else
             {
@@ -160,11 +193,14 @@ public:
         // For every queued observer
         for (std::list<Observer>::iterator i = queuedObservers[e.m_type].begin(); i != queuedObservers[e.m_type].end(); i++)
         {
-            // Both object and callback function must be present
-            // Push to its queue, if it exists, otherwise remote observer
-            if (i->first != nullptr && i->second != nullptr)
+            // As long as the object exists
+            // Push to its queue, otherwise remove observer
+            if (i->first != nullptr)
             {
-                i->first->eventQueue.push(Command(i->second, new T(e)));
+                // Queue the command
+                i->first->eventQueueLock.lock();
+                i->first->eventQueue.push_back(Command(i->second, ePtr));
+                i->first->eventQueueLock.unlock();
             }
             else
             {
@@ -174,76 +210,114 @@ public:
     }
 
     ///
-    /// \brief Try to do an event from the priority queue
+    /// \brief Queues event directly to this
+    ///
+    template<typename T>
+    void queueEvent(const T& e)
+    {
+        T* et = new T(e);
+        eventQueueLock.lock();
+        eventQueue.push_back(Command(nullptr, et));
+        eventQueueLock.unlock();
+    }
+
+    ///
+    /// \brief Do an event, if none exists return
     ///
     void doEvent()
     {
-        Command command;
-        if (eventQueue.try_pop(command))
+        // Avoid calling the function within the lock
+        eventQueueLock.lock();
+        if (eventQueue.empty())
         {
-            command.m_call(command.m_event);
-            delete command.m_event;
+            eventQueueLock.unlock();
+            return;
         }
+
+        Command command = eventQueue.front();
+        eventQueue.pop_front();
+
+        eventQueueLock.unlock();
+
+        // Do the calls
+        command.invoke();
     }
 
     ///
-    /// \brief Not thread safe, could run forever if events are constantly
-    /// being posted
-    /// \todo: need lock
+    /// \brief Do all the events in the event queue
     ///
     void doAllEvents()
     {
-        while (!eventQueue.empty())
+        // Avoid calling the function within the lock
+        std::list<Command> cmds;
+        eventQueueLock.lock();
         {
-            doEvent();
+            while (!eventQueue.empty())
+            {
+                cmds.push_back(eventQueue.front());
+                eventQueue.pop_front();
+            }
         }
-        eventQueue.clear();
+        eventQueueLock.unlock();
+
+        // Do the calls
+        for (auto i : cmds)
+        {
+            i.invoke();
+        }
     }
 
     ///
-    /// \brief Pops all events and does the last one
+    /// \brief Thread safe loop over all event commands, one can implement a custom handler
     ///
-    void doLastEvent()
+    void foreachEvent(std::function<void(Command cmd)> func)
     {
-        Command command;
+        eventQueueLock.lock();
+        for (std::deque<Command>::iterator i = eventQueue.begin(); i != eventQueue.end(); i++)
+        {
+            func(*i);
+        }
         while (!eventQueue.empty())
         {
-            eventQueue.try_pop(command);
+            Command command = eventQueue.back();
+            eventQueue.pop_back();
         }
-        if (command.m_call != nullptr)
-        {
-            command.m_call(command.m_event);
-            delete command.m_event;
-            eventQueue.clear();
-        }
+        eventQueueLock.unlock();
     }
 
-protected:
     ///
-    /// \biref Constructor, object must be subclassed
+    /// \brief thread safe reverse loop over all event commands, one can implement a custom handler
     ///
-    EventObject() = default;
+    void rforeachEvent(std::function<void(Command cmd)> func)
+    {
+        eventQueueLock.lock();
+        for (std::deque<Command>::reverse_iterator i = eventQueue.rbegin(); i != eventQueue.rend(); i++)
+        {
+            func(*i);
+        }
+        while (!eventQueue.empty())
+        {
+            Command command = eventQueue.back();
+            eventQueue.pop_back();
+        }
+        eventQueueLock.unlock();
+    }
 
-protected:
     ///
     /// \brief Removes all events from queue
     /// cleans up copies of the event
     ///
     void clearEvents()
     {
-        // Despite empty not being thread safe, it will
-        // still not be able to try_pop, which will only
-        // cause a short delay, whilst another thread is
-        // performing an push/pop from the queue
-        while (!eventQueue.empty())
+        eventQueueLock.lock();
         {
-            Command command;
-            if (eventQueue.try_pop(command))
+            while (!eventQueue.empty())
             {
-                delete command.m_event;
+                Command command = eventQueue.back();
+                eventQueue.pop_back();
             }
         }
-        eventQueue.clear();
+        eventQueueLock.unlock();
     }
 
 public:
@@ -260,7 +334,8 @@ public:
     friend void disconnect(EventObject*, EventObject*, EventType);
 
 private:
-    tbb::concurrent_queue<Command> eventQueue;
+    ParallelUtils::SpinLock eventQueueLock; // Data lock for the event queue
+    std::deque<Command>     eventQueue;
     //tbb::concurrent_priority_queue<Command> eventQueue;
     tbb::concurrent_unordered_map<EventType, std::list<Observer>> queuedObservers;
     tbb::concurrent_unordered_map<EventType, std::list<Observer>> directObservers;
@@ -330,7 +405,7 @@ connect(std::shared_ptr<EventObject> sender, EventType eventType,
 
 ///
 /// \brief Queued connection
-/// When sender emits eventType, func will be queued to reciever in thread safe manner
+/// When sender emits eventType, the function will be queued to reciever in thread safe manner
 /// Reciever function must be member of reciever object
 ///
 template<class T, class RecieverType>
@@ -392,10 +467,10 @@ queueConnect(EventObject* sender, EventType type, std::shared_ptr<EventObject> r
 }
 
 ///
-/// \brief Remove all connections of type
+/// \brief Remove *ALL* connections of type
 /// \todo: It is not possible to tell if a function pointer
-/// is equal to another, without an using a handle, its impossible
-/// to remove
+/// is equal to another, without an using a handle, its currently impossible
+/// to remove a specific one (need to wrap in another object with handle).
 ///
 static void
 disconnect(EventObject* sender, EventObject* reciever, EventType eventType)
