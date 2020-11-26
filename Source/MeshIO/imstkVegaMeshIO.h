@@ -32,6 +32,7 @@ class VolumetricMesh;
 namespace imstk
 {
 class VolumetricMesh;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VegaMeshIO
@@ -81,12 +82,12 @@ protected:
     ///
     /// \brief
     ///
-    static void copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh, StdVectorOfVec3d& vertices);
+    static void copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh, VecDataArray<double, 3>& vertices);
 
     ///
     /// \brief
     ///
     template<size_t dim>
-    static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, std::vector<std::array<size_t, dim>>& cells);
+    static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, VecDataArray<int, dim>& cells);
 };
 } // imstk

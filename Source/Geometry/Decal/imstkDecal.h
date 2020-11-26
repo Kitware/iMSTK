@@ -23,11 +23,6 @@
 
 #include "imstkAnalyticalGeometry.h"
 
-#pragma warning( push )
-#pragma warning( disable : 4201 )
-#include <glm/glm.hpp>
-#pragma warning( pop )
-
 namespace imstk
 {
 class Decal : public AnalyticalGeometry
@@ -43,13 +38,12 @@ public:
     ///
     /// \brief Returns the volume of the cube
     ///
-    double getVolume() const override;
+    double getVolume() override { return m_dimensions[0] * m_dimensions[1] * m_dimensions[2]; }
 
     ///
     /// \brief Update decal transforms
-    /// \todo clear warning C4100
     ///
-    void updateDecal(glm::mat4& viewMatrix);
+    void updateDecal(Mat4d& viewMatrix);
 
 protected:
     friend class VulkanDecalRenderDelegate;
@@ -60,9 +54,7 @@ protected:
 
     void applyScaling(const double s) override;
 
-    glm::vec3 m_dimensions;
-
-    glm::mat4 m_transform;
-    glm::mat4 m_inverse;
+    Vec3d m_dimensions;
+    Mat4d m_inverse;
 };
 }

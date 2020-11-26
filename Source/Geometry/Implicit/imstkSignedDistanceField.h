@@ -32,6 +32,9 @@ template<typename T> class DataArray;
 /// \class SignedDistanceField
 ///
 /// \brief Structured field of signed distances implemented with ImageData
+/// The SDF differs in that when you scale an image via its spacing the
+/// distance samples are then wrong. Here you can isotropically scale as you
+/// wish
 ///
 class SignedDistanceField : public ImplicitGeometry
 {
@@ -59,6 +62,16 @@ public:
     const Vec6d& getBounds() const { return m_bounds; }
 
     ///
+    /// \brief Set the isotropic scale that is used/multplied with samples
+    ///
+    void setScale(const double scale) { m_scale = scale; }
+
+    ///
+    /// \brief Get the isotropic scale
+    ///
+    double getScale() const { return m_scale; }
+
+    ///
     /// \brief Get the SDF as a float image
     ///
     std::shared_ptr<ImageData> getImage() const { return m_imageDataSdf; }
@@ -66,9 +79,10 @@ public:
 protected:
     std::shared_ptr<ImageData> m_imageDataSdf;
 
-    Vec3d m_invSpacing;
-    Vec6d m_bounds;
-    Vec3d m_shift;
+    Vec3d  m_invSpacing;
+    Vec6d  m_bounds;
+    Vec3d  m_shift;
+    double m_scale;
 
     std::shared_ptr<DataArray<double>> m_scalars;
 };

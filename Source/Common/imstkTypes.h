@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #pragma once
+
 #include <limits>
 
 namespace imstk
@@ -63,46 +64,4 @@ using ScalarType = unsigned char;
 #define IMSTK_LONG_LONG_MIN std::numeric_limits<long>::min();
 #define IMSTK_UNSIGNED_LONG_LONG_MAX std::numeric_limits<unsigned long long>::max();
 #define IMSTK_UNSIGNED_LONG_LONG_MIN std::numeric_limits<unsigned long long>::min();
-
-///
-/// \brief Used to quiet compiler warnings of parameters not used
-///
-#define imstkNotUsed(x)
-
-// todo: Switch to template type lists
-///
-/// \brief Maps ScalarType type to templated function call
-///
-#define TemplateMacroCase(typeN, type, call) \
-case typeN: { using IMSTK_TT = type; call; }; break
-#define TemplateMacro(call)                                        \
-    TemplateMacroCase(IMSTK_CHAR, char, call);                     \
-    TemplateMacroCase(IMSTK_UNSIGNED_CHAR, unsigned char, call);   \
-    TemplateMacroCase(IMSTK_SHORT, short, call);                   \
-    TemplateMacroCase(IMSTK_UNSIGNED_SHORT, unsigned short, call); \
-    TemplateMacroCase(IMSTK_INT, int, call);                       \
-    TemplateMacroCase(IMSTK_UNSIGNED_INT, unsigned int, call);     \
-    TemplateMacroCase(IMSTK_LONG, long, call);                     \
-    TemplateMacroCase(IMSTK_UNSIGNED_LONG, unsigned long, call);   \
-    TemplateMacroCase(IMSTK_FLOAT, float, call);                   \
-    TemplateMacroCase(IMSTK_DOUBLE, double, call);                 \
-    TemplateMacroCase(IMSTK_LONG_LONG, long long, call);           \
-    TemplateMacroCase(IMSTK_UNSIGNED_LONG_LONG, unsigned long long, call)
-
-///
-/// \brief Returns scalar type given template
-///
-#define TypeTemplateMacro(templateType)                                              \
-    (std::is_same<templateType, char>::value ? IMSTK_CHAR :                          \
-     (std::is_same<templateType, unsigned char>::value ? IMSTK_UNSIGNED_CHAR :       \
-      (std::is_same<templateType, short>::value ? IMSTK_SHORT :                      \
-       (std::is_same<templateType, unsigned short>::value ? IMSTK_UNSIGNED_SHORT :   \
-        (std::is_same<templateType, int>::value ? IMSTK_INT :                        \
-         (std::is_same<templateType, unsigned int>::value ? IMSTK_UNSIGNED_INT :     \
-          (std::is_same<templateType, long>::value ? IMSTK_LONG :                    \
-           (std::is_same<templateType, unsigned long>::value ? IMSTK_UNSIGNED_LONG : \
-            (std::is_same<templateType, float>::value ? IMSTK_FLOAT :                \
-             (std::is_same<templateType, double>::value ? IMSTK_DOUBLE :             \
-              (std::is_same<templateType, long long>::value ? IMSTK_LONG_LONG :      \
-               (std::is_same<templateType, unsigned long long>::value ? IMSTK_UNSIGNED_LONG_LONG : 0))))))))))))
 }

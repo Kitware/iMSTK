@@ -22,8 +22,10 @@
 #pragma once
 
 #include "imstkCollisionDetection.h"
+#include "DeformModel.h"
 
-class DeformModel;
+#include <vector>
+#include <array>
 
 namespace imstk
 {
@@ -74,5 +76,11 @@ private:
     std::shared_ptr<SurfaceMesh> m_meshB;   ///> Mesh B
     std::shared_ptr<DeformModel> m_modelA;  ///>
     std::shared_ptr<DeformModel> m_modelB;  ///>
+
+    std::vector<std::array<size_t, 3>> m_triangleIndicesA;
+    std::vector<std::array<size_t, 3>> m_triangleIndicesB;
+
+    vec3_list m_positionsA;
+    vec3_list m_positionsB;
 };
 }

@@ -24,6 +24,7 @@
 #include "imstkParallelUtils.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -76,7 +77,7 @@ TetraTriangleMap::compute()
 
             m_verticesEnclosingTetraId[vertexIdx] = closestTetId; // store nearest tetrahedron
             m_verticesWeights[vertexIdx] = weights;               // store weights
-    });
+        });
 
     // Clear result if could not find closest tet
     if (!bValid)
@@ -106,16 +107,17 @@ TetraTriangleMap::apply()
     CHECK(dynamic_cast<TetrahedralMesh*>(m_master.get()) && dynamic_cast<SurfaceMesh*>(m_slave.get()))
         << "Fail to cast from geometry to meshes";
 #endif
-    ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexId) {
-            const auto tetVerts = tetMesh->getTetrahedronVertices(m_verticesEnclosingTetraId[vertexId]);
-            const auto weights  = m_verticesWeights[vertexId];
 
-            m_slaveVerts[vertexId] = tetMesh->getVertexPosition(tetVerts[0]) * weights[0] +
-                                     tetMesh->getVertexPosition(tetVerts[1]) * weights[1] +
-                                     tetMesh->getVertexPosition(tetVerts[2]) * weights[2] +
-                                     tetMesh->getVertexPosition(tetVerts[3]) * weights[3];
-    });
-    triMesh->setVertexPositions(m_slaveVerts);
+    VecDataArray<double, 3>& vertices = *m_slaveVerts;
+    ParallelUtils::parallelFor(triMesh->getNumVertices(), [&](const size_t vertexId) {
+            const Vec4i& tetVerts = tetMesh->getTetrahedronIndices(m_verticesEnclosingTetraId[vertexId]);
+            const auto& weights   = m_verticesWeights[vertexId];
+
+            vertices[vertexId] = tetMesh->getVertexPosition(tetVerts[0]) * weights[0] +
+                                 tetMesh->getVertexPosition(tetVerts[1]) * weights[1] +
+                                 tetMesh->getVertexPosition(tetVerts[2]) * weights[2] +
+                                 tetMesh->getVertexPosition(tetVerts[3]) * weights[3];
+        });
 }
 
 void
@@ -156,7 +158,7 @@ TetraTriangleMap::isValid() const
             {
                 bOK = false;
             }
-    });
+        });
 
     return bOK;
 }
@@ -190,7 +192,7 @@ TetraTriangleMap::findClosestTetrahedron(const Vec3d& pos) const
     for (size_t tetId = 0; tetId < tetMesh->getNumTetrahedra(); ++tetId)
     {
         center = Vec3d::Zero();
-        const auto vert = tetMesh->getTetrahedronVertices(tetId);
+        const Vec4i& vert = tetMesh->getTetrahedronIndices(tetId);
         for (size_t i = 0; i < 4; ++i)
         {
             center += tetMesh->getInitialVertexPosition(vert[i]);
@@ -250,7 +252,7 @@ TetraTriangleMap::updateBoundingBox()
 
     ParallelUtils::parallelFor(tetMesh->getNumTetrahedra(), [&](const size_t tid) {
             tetMesh->computeTetrahedronBoundingBox(tid, m_bBoxMin[tid], m_bBoxMax[tid]);
-                               });
+        });
 
     m_boundingBoxAvailable = true;
 }

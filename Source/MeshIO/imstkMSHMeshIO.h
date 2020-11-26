@@ -59,7 +59,7 @@ protected:
     ///
     enum ElemType
     {
-        line=1,
+        line = 1,
         triangle,
         quadrangle,
         tetrahedron,

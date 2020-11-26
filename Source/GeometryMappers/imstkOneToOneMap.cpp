@@ -182,10 +182,12 @@ OneToOneMap::apply()
         "Failed to cast from geometry to pointset";
 #endif
 
+    VecDataArray<double, 3>&       slaveVertices  = *meshSlave->getVertexPositions();
+    const VecDataArray<double, 3>& masterVertices = *meshMaster->getVertexPositions();
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
         [&](const size_t idx) {
             const auto& mapValue = m_oneToOneMapVector[idx];
-            meshSlave->setVertexPosition(mapValue.first, meshMaster->getVertexPosition(mapValue.second));
+            slaveVertices[mapValue.first] = masterVertices[mapValue.second];
         });
 }
 

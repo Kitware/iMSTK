@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkVecDataArray.h"
 
 #include <tbb/tbb.h>
 
@@ -77,7 +78,7 @@ private:
 class MaxL2NormFunctor
 {
 public:
-    MaxL2NormFunctor(const StdVectorOfVec3r& data) : m_Data(data) {}
+    MaxL2NormFunctor(const VecDataArray<double, 3>& data) : m_Data(data) {}
     MaxL2NormFunctor(MaxL2NormFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     // Prohibit copying
@@ -98,7 +99,7 @@ public:
 
 private:
     Real m_Result = 0;
-    const StdVectorOfVec3r& m_Data;
+    const VecDataArray<double, 3>& m_Data;
 };
 
 ///
@@ -108,7 +109,7 @@ private:
 class AABBFunctor
 {
 public:
-    AABBFunctor(const StdVectorOfVec3r& data) : m_Data(data) { if (data.size() > 0) { m_UpperCorner = data[0]; } }
+    AABBFunctor(const VecDataArray<double, 3>& data) : m_Data(data) { if (data.size() > 0) { m_UpperCorner = data[0]; } }
     AABBFunctor(AABBFunctor& pObj, tbb::split) : m_Data(pObj.m_Data) {}
 
     // Prohibit copying
@@ -159,14 +160,14 @@ private:
     Vec3r m_UpperCorner = Vec3r(-std::numeric_limits<Real>::max(),
                                 -std::numeric_limits<Real>::max(),
                                 -std::numeric_limits<Real>::max());
-    const StdVectorOfVec3r& m_Data;
+    const VecDataArray<double, 3>& m_Data;
 };
 
 ///
 /// \brief Find the maximum value of L2 norm from the input data array
 ///
 inline Real
-findMaxL2Norm(const StdVectorOfVec3r& data)
+findMaxL2Norm(const VecDataArray<double, 3>& data)
 {
     MaxL2NormFunctor pObj(data);
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0, data.size()), pObj);
@@ -177,7 +178,7 @@ findMaxL2Norm(const StdVectorOfVec3r& data)
 /// \brief Find the bounding box of a point set
 ///
 inline void
-findAABB(const StdVectorOfVec3r& points, Vec3r& lowerCorner, Vec3r& upperCorner)
+findAABB(const VecDataArray<double, 3>& points, Vec3r& lowerCorner, Vec3r& upperCorner)
 {
     AABBFunctor pObj(points);
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0, points.size()), pObj);

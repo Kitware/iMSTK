@@ -22,90 +22,178 @@
 #include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkLineMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkRenderMaterial.h"
+#include "imstkGeometryUtilities.h"
 
+#include <vtkActor.h>
 #include <vtkDoubleArray.h>
-#include <vtkLine.h>
 #include <vtkLineSource.h>
-#include <vtkTrivialProducer.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLVertexBufferObject.h>
+#include <vtkPointData.h>
+#include <vtkTransform.h>
 
 namespace imstk
 {
-VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+    m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_visualModel = visualModel;
-
     auto geometry = std::static_pointer_cast<LineMesh>(visualModel->getGeometry());
+    m_vertices = geometry->getVertexPositions();
+    m_indices  = geometry->getLinesIndices();
 
-    // Map vertices
-    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double*           vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
-
-    // Create points
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(geometry->getNumVertices());
-    points->SetData(m_mappedVertexArray);
-
-    // Create index
-    auto lineIndices = vtkSmartPointer<vtkCellArray>::New();
-
-    for (auto line : geometry->getLinesVertices())
+    // Map vertices to VTK point data
+    if (m_vertices != nullptr)
     {
-        auto l = vtkSmartPointer<vtkLine>::New();
-        l->GetPointIds()->SetId(0, line[0]);
-        l->GetPointIds()->SetId(1, line[1]);
-        lineIndices->InsertNextCell(l);
+        m_mappedVertexArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_vertices));
+        auto points = vtkSmartPointer<vtkPoints>::New();
+        points->SetNumberOfPoints(geometry->getNumVertices());
+        points->SetData(m_mappedVertexArray);
+        m_polydata->SetPoints(points);
     }
 
-    // Create line
-    auto lines = vtkSmartPointer<vtkPolyData>::New();
-    lines->SetPoints(points);
-    lines->SetLines(lineIndices);
-
-    // Add colors
-    /*if (geometry->getVertexColors().size() == geometry->getNumVertices())
+    // Map indices to VTK cell data (copied)
+    if (m_indices != nullptr)
     {
-        auto colors = vtkSmartPointer<vtkUnsignedCharArray>::New();
-        colors->SetNumberOfComponents(3);
-        colors->SetName("Colors");
-
-        for (auto color : geometry->getVertexColors())
+        m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+        vtkIdType cell[2];
+        for (const auto& t : *m_indices)
         {
-            unsigned char c[3] = { (unsigned char)(color.r * 255),
-                                   (unsigned char)(color.g * 255),
-                                   (unsigned char)(color.b * 255) };
-            colors->InsertNextTypedTuple(c);
+            for (size_t i = 0; i < 2; ++i)
+            {
+                cell[i] = t[i];
+            }
+            m_cellArray->InsertNextCell(2, cell);
         }
+        m_polydata->SetLines(m_cellArray);
+    }
 
-        lines->GetPointData()->SetScalars(colors);
-    }*/
+    // Map vertex scalars if it has them
+    if (geometry->getVertexScalars() != nullptr)
+    {
+        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(geometry->getVertexScalars());
+        m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
+    }
 
-    // Create connection source
-    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(lines);
-    geometry->m_dataModified = false;
+    // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
+    queueConnect<Event>(geometry, EventType::Modified, this, &VTKLineMeshRenderDelegate::geometryModified);
 
-    // Update Transform, Render Properties
-    this->update();
+    // When the vertex buffer internals are modified, ie: a single or N elements
+    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKLineMeshRenderDelegate::vertexDataModified);
 
-    // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort(), m_visualModel);
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputData(m_polydata);
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        {
+            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+        }
+    }
+
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKLineMeshRenderDelegate::updateDataSource()
+VTKLineMeshRenderDelegate::processEvents()
+{
+    // Custom handling of events
+    std::shared_ptr<LineMesh>                geom     = std::dynamic_pointer_cast<LineMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
+
+    // Only use the most recent event from respective sender
+    std::list<Command> cmds;
+    bool               contains[4] = { false, false, false, false };
+    rforeachEvent([&](Command cmd)
+        {
+            if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
+            {
+                cmds.push_back(cmd);
+                contains[0] = true;
+            }
+            else if (cmd.m_event->m_sender == m_material.get() && !contains[1])
+            {
+                cmds.push_back(cmd);
+                contains[1] = true;
+            }
+            else if (cmd.m_event->m_sender == geom.get() && !contains[2])
+            {
+                cmds.push_back(cmd);
+                contains[2] = true;
+            }
+            else if (cmd.m_event->m_sender == vertices.get() && !contains[3])
+            {
+                cmds.push_back(cmd);
+                contains[3] = true;
+            }
+        });
+
+    // Now do each event in order recieved
+    for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
+    {
+        i->invoke();
+    }
+}
+
+void
+VTKLineMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
-
-    if (!geometry->m_dataModified)
+    m_vertices = geometry->getVertexPositions();
+    if (m_vertices->getVoidPointer() != m_mappedVertexArray->GetVoidPointer(0))
     {
-        return;
+        m_mappedVertexArray->SetNumberOfComponents(3);
+        m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
     }
+    m_mappedVertexArray->Modified();
+}
 
+void
+VTKLineMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
+{
+    // Called when the geometry posts modified
+    auto geometry = std::static_pointer_cast<LineMesh>(m_visualModel->getGeometry());
+
+    // Test if the vertex buffer changed
+    if (m_vertices != geometry->getVertexPositions())
+    {
+        //printf("Vertex data swapped\n");
+        m_vertices = geometry->getVertexPositions();
+        {
+            // Update the pointer of the coupled array
+            m_mappedVertexArray->SetNumberOfComponents(3);
+            m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+        }
+    }
     m_mappedVertexArray->Modified();
 
-    geometry->m_dataModified = false;
+    // Test if the index buffer changed
+    if (m_indices != geometry->getLinesIndices())
+    {
+        //printf("Index data swapped\n");
+        m_indices = geometry->getLinesIndices();
+        {
+            // Copy cells
+            m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+            vtkIdType cell[2];
+            for (const auto& t : *m_indices)
+            {
+                for (size_t i = 0; i < 2; ++i)
+                {
+                    cell[i] = t[i];
+                }
+                m_cellArray->InsertNextCell(2, cell);
+            }
+            m_polydata->SetPolys(m_cellArray);
+            m_polydata->Modified();
+        }
+    }
 }
 } // imstk

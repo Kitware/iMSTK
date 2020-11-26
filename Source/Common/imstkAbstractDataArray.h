@@ -30,13 +30,14 @@ namespace imstk
 /// \class AbstractDataArray
 ///
 /// \brief This class serves as the base class of DataArray, for typeless use
-/// \todo: Component support, AOS/SOA design
 ///
 class AbstractDataArray : public EventObject
 {
 // Users should not be able to construct
 protected:
-    AbstractDataArray() = default;
+    AbstractDataArray() : m_scalarType(IMSTK_VOID), m_size(0), m_capacity(0) { }
+
+    AbstractDataArray(const int size) : m_scalarType(IMSTK_VOID), m_size(size), m_capacity(size) { }
 
     ///
     /// \brief Ensure all observers are disconnected
@@ -47,17 +48,12 @@ public:
     ///
     /// \brief Resizes the array, may reallocate
     ///
-    virtual void resize(const size_t count) = 0;
+    virtual void resize(const int size) = 0;
 
     ///
     /// \brief Reserves a size for the array in memory, may reallocate
     ///
-    virtual void reserve(const size_t count) = 0;
-
-    ///
-    /// \brief Returns the number of elements in the array
-    ///
-    virtual size_t size() const = 0;
+    virtual void reserve(const int size) = 0;
 
     ///
     /// \brief Returns void pointer to data
@@ -65,9 +61,29 @@ public:
     virtual void* getVoidPointer() = 0;
 
     ///
+    /// \brief Resizes to 0
+    ///
+    void clear() { resize(0); };
+
+    ///
+    /// \brief Get number of values/tuples
+    ///
+    inline int size() const { return m_size; }
+
+    ///
     /// \brief Returns the scalar type of this array
     ///
-    inline const ScalarType getScalarType() { return m_scalarType; }
+    inline ScalarType getScalarType() const { return m_scalarType; }
+
+    ///
+    /// \brief Return the capacity of the array
+    ///
+    inline int getCapacity() const { return m_capacity; }
+
+    ///
+    /// \brief Returns the number of components
+    ///
+    inline virtual int getNumberOfComponents() const { return 1; }
 
 public:
     ///
@@ -79,7 +95,9 @@ public:
 protected:
     void setType(const ScalarType type) { this->m_scalarType = type; }
 
-private:
+protected:
     ScalarType m_scalarType;
+    int m_size;     // Number of values
+    int m_capacity; // Capacity of the vector
 };
 }

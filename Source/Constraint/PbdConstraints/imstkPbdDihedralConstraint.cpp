@@ -24,12 +24,12 @@
 namespace  imstk
 {
 void
-PbdDihedralConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                                      const size_t&           pIdx0,
-                                      const size_t&           pIdx1,
-                                      const size_t&           pIdx2,
-                                      const size_t&           pIdx3,
-                                      const double            k)
+PbdDihedralConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+                                      const size_t& pIdx0,
+                                      const size_t& pIdx1,
+                                      const size_t& pIdx2,
+                                      const size_t& pIdx3,
+                                      const double k)
 {
     m_vertexIds[0] = pIdx0;
     m_vertexIds[1] = pIdx1;
@@ -51,9 +51,10 @@ PbdDihedralConstraint::initConstraint(const StdVectorOfVec3d& initVertexPosition
 }
 
 bool
-PbdDihedralConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                               double&                 c,
-                                               StdVectorOfVec3d&       dcdx) const
+PbdDihedralConstraint::computeValueAndGradient(
+    const VecDataArray<double, 3>& currVertexPositions,
+    double& c,
+    std::vector<Vec3d>& dcdx) const
 {
     const auto i0 = m_vertexIds[0];
     const auto i1 = m_vertexIds[1];
@@ -84,7 +85,6 @@ PbdDihedralConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVerte
         return false;
     }
 
-    dcdx.resize(4);
     dcdx[0] = -(l / A1) * n1;
     dcdx[1] = -(l / A2) * n2;
     dcdx[2] = (e.dot(e1) / (A1 * l)) * n1 + (e.dot(e3) / (A2 * l)) * n2;

@@ -313,4 +313,16 @@ operator-=(const Color& color_lhs, const double intensity_rhs)
     results.a = color_lhs.a - intensity_rhs;
     return results;
 }
+
+bool
+operator==(const Color& color_lhs, const Color& color_rhs)
+{
+    return (color_lhs.r == color_rhs.r) && (color_lhs.g == color_rhs.g) && (color_lhs.b == color_rhs.b);
+}
+
+bool
+operator!=(const Color& color_lhs, const Color& color_rhs)
+{
+    return (color_lhs.r != color_rhs.r) || (color_lhs.g != color_rhs.g) || (color_lhs.b != color_rhs.b);
+}
 }

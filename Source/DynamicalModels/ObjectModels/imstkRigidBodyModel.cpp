@@ -25,6 +25,7 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -214,27 +215,27 @@ RigidBodyModel::createMesh()
     const auto numVerts     = meshGeo->getNumVertices();
     const auto numTriangles = meshGeo->getNumTriangles();
 
-    const auto triVerts = meshGeo->getTrianglesVertices();
-    const auto vertData = meshGeo->getVertexPositions();
+    const VecDataArray<int, 3>& triVerts = *meshGeo->getTriangleIndices();
+    const auto                  vertData = *meshGeo->getVertexPositions();
 
     PxVec3* vertices = new PxVec3[numVerts];
     PxU32*  indices  = new PxU32[numTriangles * 3];
 
     for (size_t i = 0; i < numVerts; ++i)
     {
-        auto v = vertData[i];
-        vertices[i] = PxVec3((float)v.x(), (float)v.y(), (float)v.z());
+        const Vec3d& v = vertData[i];
+        vertices[i] = PxVec3(static_cast<float>(v[0]), static_cast<float>(v[1]), static_cast<float>(v[2]));
     }
 
     for (size_t i = 0; i < numTriangles; ++i)
     {
         auto t = triVerts[i];
-        indices[3 * i]     = (PxU32)t[0];
-        indices[3 * i + 1] = (PxU32)t[1];
-        indices[3 * i + 2] = (PxU32)t[2];
+        indices[3 * i]     = static_cast<PxU32>(t[0]);
+        indices[3 * i + 1] = static_cast<PxU32>(t[1]);
+        indices[3 * i + 2] = static_cast<PxU32>(t[2]);
     }
 
-    PxTriangleMesh* triMesh = createBV34TriangleMesh((PxU32)numVerts, vertices, (PxU32)numTriangles, indices, false, false, false, 4);
+    PxTriangleMesh* triMesh = createBV34TriangleMesh(static_cast<PxU32>(numVerts), vertices, static_cast<PxU32>(numTriangles), indices, false, false, false, 4);
     PxTransform     trans(PxIdentity);
     const auto      physxMaterial = PxPhysics->createMaterial((PxReal)m_config->m_staticFriction,
         (PxReal)m_config->m_dynamicFriction,
@@ -310,21 +311,6 @@ RigidBodyModel::addForce(const Vec3d& force, const Vec3d& pos, bool wakeup)
         physx::PxVec3((float)pos[0], (float)pos[1], (float)pos[2]),
         PxForceMode::eFORCE, wakeup);
 }
-
-#ifdef WIN32
-#pragma warning( push )
-#pragma warning( disable : 4100 )
-#endif
-// \todo: updating body states as in
-void
-RigidBodyModel::updateBodyStates(const Vectord& q, const StateUpdateType updateType /* = stateUpdateType::displacement*/)
-{
-    LOG(WARNING) << "RigidBodyModel::updateBodyStates Not implemented!";
-}
-
-#ifdef WIN32
-#pragma warning( pop )
-#endif
 
 void
 RigidBodyModel::configure(const std::shared_ptr<RigidBodyConfig> matProperty)

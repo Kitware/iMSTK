@@ -922,7 +922,7 @@ LooseOctree::computePrimitiveBoundingBox(OctreePrimitive* const pPrimitive, cons
     if (type == OctreePrimitiveType::Triangle)
     {
         const auto surfMesh = static_cast<SurfaceMesh*>(pPrimitive->m_pGeometry);
-        const auto face     = surfMesh->getTrianglesVertices()[pPrimitive->m_Idx];
+        const auto face     = (*surfMesh->getTriangleIndices())[pPrimitive->m_Idx];
 
         lowerCorner = surfMesh->getVertexPosition(face[0]);
         upperCorner = lowerCorner;

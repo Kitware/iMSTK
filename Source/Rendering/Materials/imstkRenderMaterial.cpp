@@ -27,100 +27,60 @@ namespace imstk
 RenderMaterial::RenderMaterial()
 {
     // Instantiating one type of each texture per material
-    for (int i = 0; i < (int)Texture::Type::None; i++)
+    for (int i = 0; i < static_cast<int>(Texture::Type::None); i++)
     {
-        m_textures.emplace_back(std::make_shared<Texture>("", (Texture::Type)i));
+        m_textures.emplace_back(std::make_shared<Texture>("", static_cast<Texture::Type>(i)));
     }
-}
-
-RenderMaterial::DisplayMode
-RenderMaterial::getDisplayMode() const
-{
-    return m_displayMode;
 }
 
 void
 RenderMaterial::setDisplayMode(const DisplayMode displayMode)
 {
-    if (displayMode == m_displayMode)
+    if (displayMode != m_displayMode)
     {
-        return;
+        m_displayMode = displayMode;
+        postEvent(Event(EventType::Modified));
     }
-    m_displayMode   = displayMode;
-    m_stateModified = true;
-    m_modified      = true;
-}
-
-bool
-RenderMaterial::getTessellated() const
-{
-    return m_tessellated;
 }
 
 void
 RenderMaterial::setTessellated(const bool tessellated)
 {
-    if (tessellated == m_tessellated)
+    if (tessellated != m_tessellated)
     {
-        return;
+        m_tessellated = tessellated;
+        postEvent(Event(EventType::Modified));
     }
-    m_tessellated   = tessellated;
-    m_stateModified = true;
-    m_modified      = true;
-}
-
-float
-RenderMaterial::getLineWidth() const
-{
-    return m_lineWidth;
 }
 
 void
 RenderMaterial::setLineWidth(const float width)
 {
-    if (width == m_lineWidth)
+    if (width != m_lineWidth)
     {
-        return;
+        m_lineWidth = width;
+        postEvent(Event(EventType::Modified));
     }
-    m_lineWidth     = width;
-    m_stateModified = true;
-    m_modified      = true;
-}
-
-float
-RenderMaterial::getPointSize() const
-{
-    return m_pointSize;
 }
 
 void
 RenderMaterial::setPointSize(const float size)
 {
-    if (size == m_pointSize)
+    if (size != m_pointSize)
     {
-        return;
+        m_pointSize = size;
+        postEvent(Event(EventType::Modified));
     }
-    m_pointSize     = size;
-    m_stateModified = true;
-    m_modified      = true;
-}
-
-bool
-RenderMaterial::getBackFaceCulling() const
-{
-    return m_backfaceCulling;
 }
 
 void
 RenderMaterial::setBackFaceCulling(const bool culling)
 {
-    if (culling == m_backfaceCulling)
+    if (culling != m_backfaceCulling)
     {
-        return;
+        m_backfaceCulling = culling;
+        postEvent(Event(EventType::Modified));
     }
-    m_backfaceCulling = culling;
-    m_stateModified   = true;
-    m_modified = true;
 }
 
 void
@@ -135,91 +95,70 @@ RenderMaterial::backfaceCullingOff()
     this->setBackFaceCulling(false);
 }
 
-const Color&
-RenderMaterial::getDiffuseColor() const
-{
-    return m_diffuseColor;
-}
-
 void
 RenderMaterial::setDiffuseColor(const Color& color)
 {
-    m_diffuseColor = color;
-    m_modified     = true;
+    if (m_diffuseColor != color)
+    {
+        m_diffuseColor = color;
+        postEvent(Event(EventType::Modified));
+    }
 }
-
-const Color&
-RenderMaterial::getColor() const
-{
-    return this->getDiffuseColor();
-};
 
 void
 RenderMaterial::setColor(const Color& color)
 {
     this->setDiffuseColor(color);
-};
-
-const Color&
-RenderMaterial::getSpecularColor() const
-{
-    return m_specularColor;
 }
 
 void
 RenderMaterial::setSpecularColor(const Color& color)
 {
-    m_specularColor = color;
-    m_modified      = true;
-}
-
-const Color&
-RenderMaterial::getAmbientColor() const
-{
-    return m_ambientColor;
+    if (m_specularColor != color)
+    {
+        m_specularColor = color;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 void
 RenderMaterial::setAmbientColor(const Color& color)
 {
-    m_ambientColor = color;
-    m_modified     = true;
-}
-
-const float&
-RenderMaterial::getMetalness() const
-{
-    return m_metalness;
+    if (m_ambientColor != color)
+    {
+        m_ambientColor = color;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 void
 RenderMaterial::setMetalness(const float metalness)
 {
-    m_metalness = metalness;
-}
-
-const float&
-RenderMaterial::getRoughness() const
-{
-    return m_roughness;
+    if (m_metalness != metalness)
+    {
+        m_metalness = metalness;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 void
 RenderMaterial::setRoughness(const float roughness)
 {
-    m_roughness = roughness;
-}
-
-const float&
-RenderMaterial::getEmissivity() const
-{
-    return m_emissivity;
+    if (roughness != m_roughness)
+    {
+        m_roughness = roughness;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 void
 RenderMaterial::setEmissivity(const float emissivity)
 {
-    m_emissivity = emissivity;
+    if (m_emissivity != emissivity)
+    {
+        m_emissivity = emissivity;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 std::shared_ptr<Texture>
@@ -242,59 +181,126 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
         return;
     }
     m_textures[(unsigned int)texture->getType()] = texture;
+    postEvent(Event(EventType::Modified));
 }
 
 void
 RenderMaterial::setReceivesShadows(const bool receivesShadows)
 {
-    m_receivesShadows = receivesShadows;
-}
-
-bool
-RenderMaterial::getReceivesShadows() const
-{
-    return m_receivesShadows;
+    if (m_receivesShadows != receivesShadows)
+    {
+        m_receivesShadows = receivesShadows;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 void
 RenderMaterial::setCastsShadows(const bool castsShadows)
 {
-    m_castsShadows = castsShadows;
-}
-
-bool
-RenderMaterial::getCastsShadows() const
-{
-    return m_castsShadows;
+    if (m_castsShadows != castsShadows)
+    {
+        m_castsShadows = castsShadows;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
 void
 RenderMaterial::setBlendMode(const RenderMaterial::BlendMode blendMode)
 {
-    m_blendMode = blendMode;
+    if (m_blendMode != blendMode)
+    {
+        m_blendMode = blendMode;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
-const RenderMaterial::BlendMode
-RenderMaterial::getBlendMode()
+void
+RenderMaterial::setShadingModel(const ShadingModel& model)
 {
-    return m_blendMode;
+    if (model != m_shadingModel)
+    {
+        m_shadingModel = model;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
-bool
-RenderMaterial::isDecal()
+void
+RenderMaterial::setOcclusionStrength(const float occlusionStrength)
 {
-    return m_isDecal;
+    if (occlusionStrength != m_occlusionStrength)
+    {
+        m_occlusionStrength = occlusionStrength;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
-bool
-RenderMaterial::isParticle()
+void
+RenderMaterial::setNormalnStrength(const float normalStrength)
 {
-    return m_isParticle;
+    if (normalStrength != m_normalStrength)
+    {
+        m_normalStrength = normalStrength;
+        postEvent(Event(EventType::Modified));
+    }
 }
 
-bool
-RenderMaterial::isLineMesh()
+void
+RenderMaterial::setEdgeColor(const Color& color)
 {
-    return m_isLineMesh;
+    if (color != m_edgeColor)
+    {
+        m_edgeColor = color;
+        postEvent(Event(EventType::Modified));
+    }
+}
+
+void
+RenderMaterial::setVertexColor(const Color& color)
+{
+    if (color != m_vertexColor)
+    {
+        m_vertexColor = color;
+        postEvent(Event(EventType::Modified));
+    }
+}
+
+void
+RenderMaterial::setOpacity(const float opacity)
+{
+    if (m_opacity != opacity)
+    {
+        m_opacity = opacity;
+        postEvent(Event(EventType::Modified));
+    }
+}
+
+void
+RenderMaterial::setBackfaceCulling(const bool culling)
+{
+    if (m_backfaceCulling != culling)
+    {
+        m_backfaceCulling = culling;
+        postEvent(Event(EventType::Modified));
+    }
+}
+
+void
+RenderMaterial::setColorLookupTable(std::shared_ptr<ColorFunction> lut)
+{
+    if (m_lookupTable != lut)
+    {
+        m_lookupTable = lut;
+        postEvent(Event(EventType::Modified));
+    }
+}
+
+void
+RenderMaterial::setScalarVisibility(const bool scalarVisibility)
+{
+    if (m_scalarVisibility != scalarVisibility)
+    {
+        m_scalarVisibility = scalarVisibility;
+        postEvent(Event(EventType::Modified));
+    }
 }
 }

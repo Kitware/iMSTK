@@ -64,10 +64,10 @@ duplicate(std::shared_ptr<TetrahedralMesh> mesh)
 ///
 /// \brief TODO
 ///
-TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
+TEST_F(imstkTetraToTetraCDTest, DISABLED_NoSelfIntersection)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/asianDragon/asianDragon.veg");
-    auto                             b = std::make_shared<TetrahedralMesh>(TetrahedralMesh()); //empty mesh
+    std::shared_ptr<TetrahedralMesh> b = std::make_shared<TetrahedralMesh>(); //empty mesh
 
     auto cd = std::make_shared<CollisionData>();
 
@@ -83,12 +83,12 @@ TEST_F(imstkTetraToTetraCDTest, NoSelfIntersection)
 ///
 /// \brief TODO
 ///
-TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
+TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersection1T)
 {
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/oneTet/oneTet.veg");
     auto                             b = duplicate(a);
 
-    b->translateVertices(imstk::Vec3d(0.0, 1.0, 2.5));
+    b->translate(Vec3d(0.0, 1.0, 2.5));
 
     auto cd = std::make_shared<CollisionData>();
     m_CD = new TetraToTetraCD(a, b, cd);
@@ -106,7 +106,7 @@ TEST_F(imstkTetraToTetraCDTest, IntersectionThenNoIntersection1T)
     EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 0);
 
     //now translate b more so there is no intersection
-    b->translateVertices(imstk::Vec3d(0.0, 2.0, 0.0));
+    b->translate(Vec3d(0.0, 2.0, 0.0));
 
     m_CD = new TetraToTetraCD(b, a, cd);
     m_CD->computeCollisionData();
@@ -125,7 +125,7 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
     std::shared_ptr<TetrahedralMesh> a = loadMesh("/human/human.veg");
     auto                             b = duplicate(a);
 
-    b->translateVertices(imstk::Vec3d(16.0, 0.0, 1.0));
+    b->translate(Vec3d(16.0, 0.0, 1.0));
 
     auto cd = std::make_shared<CollisionData>();
 
@@ -138,7 +138,7 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
     EXPECT_EQ(cd->PTColData.getSize(), 4);
 
     //this additional translation produces a different intersection
-    b->translateVertices(imstk::Vec3d(0.0, 0.0, 0.5));
+    b->translate(Vec3d(0.0, 0.0, 0.5));
 
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
@@ -155,7 +155,7 @@ TEST_F(imstkTetraToTetraCDTest, DISABLED_IntersectionThenNoIntersectionHuman)
     EXPECT_EQ(cd->PTColData[0].tetreahedronIdx, 367);
 
     //now translate b more so there is no intersection
-    b->translateVertices(imstk::Vec3d(0.0, 0.0, 1.0));
+    b->translate(Vec3d(0.0, 0.0, 1.0));
     m_CD = new TetraToTetraCD(a, b, cd);
     m_CD->computeCollisionData();
     EXPECT_EQ(cd->PTColData.getSize(), 0);

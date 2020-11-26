@@ -21,13 +21,15 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 class vtkDoubleArray;
+class vtkPolyData;
 
 namespace imstk
 {
 class PointSet;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VTKPointSetRenderDelegate
@@ -35,7 +37,7 @@ class PointSet;
 /// \brief Render delegate for point set. A 3D glyph of spheres is
 /// created to render each node
 ///
-class VTKPointSetRenderDelegate : public VTKRenderDelegate
+class VTKPointSetRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
@@ -51,11 +53,25 @@ public:
     ///
     /// \brief Update polydata source based on the mesh geometry
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
+    ///
+    /// \brief Callback for when vertex data changes
+    ///
+    void vertexDataModified(Event* e);
 
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
-    vtkSmartPointer<vtkDoubleArray> m_mappedScalarArray; ///> Mapped array of scalars
+    ///
+    /// \brief Callback for when geometry changes
+    ///
+    void geometryModified(Event* e);
+
+protected:
+    std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+
+    vtkSmartPointer<vtkPolyData> m_polydata;
+
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexScalarArray; ///> Mapped array of scalars
 };
 }

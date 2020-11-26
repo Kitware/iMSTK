@@ -31,31 +31,31 @@ using namespace imstk;
 ///
 /// \brief Generate a sphere-shape fluid object
 ///
-StdVectorOfVec3d
+std::shared_ptr<VecDataArray<double, 3>>
 generateSphereShapeFluid(const double particleRadius)
 {
     const double sphereRadius = 2.0;
     const Vec3d  sphereCenter(0, 1, 0);
 
-    const auto  sphereRadiusSqr = sphereRadius * sphereRadius;
-    const auto  spacing         = 2.0 * particleRadius;
-    const auto  N               = static_cast<size_t>(2.0 * sphereRadius / spacing);              // Maximum number of particles in each dimension
-    const Vec3d lcorner         = sphereCenter - Vec3d(sphereRadius, sphereRadius, sphereRadius); // Cannot use auto here, due to Eigen bug
+    const double  sphereRadiusSqr = sphereRadius * sphereRadius;
+    const double  spacing = 2.0 * particleRadius;
+    const int     N = static_cast<int>(2.0 * sphereRadius / spacing);              // Maximum number of particles in each dimension
+    const Vec3d lcorner = sphereCenter - Vec3d(sphereRadius, sphereRadius, sphereRadius); // Cannot use auto here, due to Eigen bug
 
-    StdVectorOfVec3d particles;
-    particles.reserve(N * N * N);
+    std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
+    particles->reserve(N * N * N);
 
-    for (size_t i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        for (size_t j = 0; j < N; ++j)
+        for (int j = 0; j < N; ++j)
         {
-            for (size_t k = 0; k < N; ++k)
+            for (int k = 0; k < N; ++k)
             {
-                Vec3d ppos = lcorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
-                Vec3d cx   = ppos - sphereCenter;
+                Vec3d ppos = lcorner + Vec3d(spacing * static_cast<double>(i), spacing * static_cast<double>(j), spacing * static_cast<double>(k));
+                Vec3d cx = ppos - sphereCenter;
                 if (cx.squaredNorm() < sphereRadiusSqr)
                 {
-                    particles.push_back(ppos);
+                    particles->push_back(ppos);
                 }
             }
         }
@@ -67,26 +67,26 @@ generateSphereShapeFluid(const double particleRadius)
 ///
 /// \brief Generate a box-shape fluid object
 ///
-StdVectorOfVec3d
+std::shared_ptr<VecDataArray<double, 3>>
 generateBoxShapeFluid(const double particleRadius)
 {
     const double boxWidth = 4.0;
     const Vec3d  boxLowerCorner(-2, -3, -2);
 
-    const auto spacing = 2.0 * particleRadius;
-    const auto N       = static_cast<size_t>(boxWidth / spacing);
+    const double spacing = 2.0 * particleRadius;
+    const int N = static_cast<int>(boxWidth / spacing);
 
-    StdVectorOfVec3d particles;
-    particles.reserve(N * N * N);
+    std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
+    particles->reserve(N * N * N);
 
-    for (size_t i = 0; i < N; ++i)
+    for (int i = 0; i < N; ++i)
     {
-        for (size_t j = 0; j < N; ++j)
+        for (int j = 0; j < N; ++j)
         {
-            for (size_t k = 0; k < N; ++k)
+            for (int k = 0; k < N; ++k)
             {
-                Vec3d ppos = boxLowerCorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
-                particles.push_back(ppos);
+                Vec3d ppos = boxLowerCorner + Vec3d(spacing * static_cast<double>(i), spacing * static_cast<double>(j), spacing * static_cast<double>(k));
+                particles->push_back(ppos);
             }
         }
     }
@@ -95,16 +95,16 @@ generateBoxShapeFluid(const double particleRadius)
 }
 
 #if SCENE_ID == 3
-StdVectorOfVec3d getBunny(); // Defined in Bunny.cpp
+std::shared_ptr<VecDataArray<double, 3>> getBunny(); // Defined in Bunny.cpp
 #endif
 ///
 /// \brief Generate a bunny-shape fluid object
 ///
-StdVectorOfVec3d
+std::shared_ptr<VecDataArray<double, 3>>
 generateBunnyShapeFluid(const double particleRadius)
 {
     LOG_IF(FATAL, (std::abs(particleRadius - 0.08) > 1e-6)) << "Particle radius for this scene must be 0.08";
-    StdVectorOfVec3d particles;
+    std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
 #if SCENE_ID == 3
     particles = getBunny();
 #endif
@@ -114,77 +114,71 @@ generateBunnyShapeFluid(const double particleRadius)
 ///
 /// \brief Generate fluid for pipe flow
 ///
-StdVectorOfVec3d
+std::shared_ptr<VecDataArray<double, 3>>
 generatePipeFluid(const double particleRadius)
 {
-  const double pipeRadius = 1.0;
-  const double pipeLength = 5.0;
-  const Vec3d  lcorner(-5, 5, 0);
-  const Vec3d pipeLeftCenter = lcorner + Vec3d(0, pipeRadius, pipeRadius);
+    const double pipeRadius = 1.0;
+    const double pipeLength = 5.0;
+    const Vec3d  lcorner(-5.0, 5.0, 0.0);
+    const Vec3d pipeLeftCenter = lcorner + Vec3d(0.0, pipeRadius, pipeRadius);
 
-  const auto spacing = 2.0 * particleRadius;
-  const auto N_width = static_cast<size_t>(2.0 * pipeRadius / spacing); // Maximum number of particles in width dimension
-  const auto N_length = static_cast<size_t>(pipeLength / spacing); // Maximum number of particles in length dimension
+    const double spacing = 2.0 * particleRadius;
+    const int N_width = static_cast<int>(2.0 * pipeRadius / spacing); // Maximum number of particles in width dimension
+    const int N_length = static_cast<int>(pipeLength / spacing); // Maximum number of particles in length dimension
 
-  StdVectorOfVec3d particles;
-  particles.reserve(N_width * N_width * N_length);
+    imstkNew<VecDataArray<double, 3>> particlesPtr;
+    VecDataArray<double, 3>& particles = *particlesPtr.get();
+    particles.reserve(N_width * N_width * N_length);
 
-  for (size_t i = 0; i < N_length; ++i)
-  {
-    for (size_t j = 0; j < N_width; ++j)
+    for (int i = 0; i < N_length; ++i)
     {
-      for (size_t k = 0; k < N_width; ++k)
-      {
-        Vec3d ppos = lcorner + Vec3d(spacing * double(i), spacing * double(j), spacing * double(k));
-        //const double cx = ppos.x() - pipeBottomCenter.x();
-        //const double cy = ppos.y() - pipeBottomCenter.y();
-        Vec3d cx = ppos - Vec3d(spacing * double(i), 0, 0) - pipeLeftCenter;
-        if (cx.squaredNorm() < pipeRadius)
+        for (int j = 0; j < N_width; ++j)
         {
-          particles.push_back(ppos);
+            for (int k = 0; k < N_width; ++k)
+            {
+                Vec3d ppos = lcorner + Vec3d(spacing * static_cast<double>(i), spacing * static_cast<double>(j), spacing * static_cast<double>(k));
+                //const double cx = ppos.x() - pipeBottomCenter.x();
+                //const double cy = ppos.y() - pipeBottomCenter.y();
+                Vec3d cx = ppos - Vec3d(spacing * static_cast<double>(i), 0.0, 0.0) - pipeLeftCenter;
+                if (cx.squaredNorm() < pipeRadius)
+                {
+                    particles.push_back(ppos);
+                }
+            }
         }
-      }
     }
-  }
 
-   return particles;
+    return particlesPtr;
 }
 
-StdVectorOfVec3d
-initializeNonZeroVelocities(const size_t numParticles)
+std::shared_ptr<VecDataArray<double, 3>>
+initializeNonZeroVelocities(const int numParticles)
 {
-  StdVectorOfVec3d initialVelocities(numParticles, Vec3d(10, 0, 0));
-  return initialVelocities;
+    imstkNew<VecDataArray<double, 3>> initVelocitiesPtr(numParticles);
+    std::fill_n(initVelocitiesPtr->getPointer(), numParticles, Vec3d(10.0, 0.0, 0.0));
+    return initVelocitiesPtr;
 }
 
 std::shared_ptr<SPHObject>
 generateFluid(const double particleRadius)
 {
-    StdVectorOfVec3d particles;
-    StdVectorOfVec3d initialVelocities;
+    std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
     switch (SCENE_ID)
     {
     case 1:
         particles = generateSphereShapeFluid(particleRadius);
-        initialVelocities.resize(particles.size());
         break;
     case 2:
         particles = generateBoxShapeFluid(particleRadius);
-        initialVelocities.resize(particles.size());
         break;
     case 3:
         particles = generateBunnyShapeFluid(particleRadius);
-        initialVelocities.resize(particles.size());
         break;
-    case 4:
-      particles = generatePipeFluid(particleRadius);
-      initialVelocities = initializeNonZeroVelocities(particles.size());
-      break;
     default:
         LOG(FATAL) << "Invalid scene index";
     }
 
-    LOG(INFO) << "Number of particles: " << particles.size();
+    LOG(INFO) << "Number of particles: " << particles->size();
 
     // Create a geometry object
     imstkNew<PointSet> geometry;
@@ -197,14 +191,16 @@ generateFluid(const double particleRadius)
     imstkNew<VisualModel> visualModel(geometry.get());
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
-    material->setVertexColor(Color::Orange);
+    //material->setDisplayMode(RenderMaterial::DisplayMode::Points);
     if (material->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
     {
         material->setPointSize(0.1);
     }
     else
     {
-        material->setPointSize(15.0);
+        material->setPointSize(20.0);
+        material->setRenderPointsAsSpheres(true);
+        material->setColor(Color::Orange);
     }
     visualModel->setRenderMaterial(material);
 
@@ -218,13 +214,12 @@ generateFluid(const double particleRadius)
     if (SCENE_ID == 2)   // highly viscous fluid
     {
         sphParams->m_kernelOverParticleRadiusRatio = 6.0;
-        sphParams->m_dynamicViscosityCoeff         = 0.5;
-        sphParams->m_surfaceTensionStiffness       = 5.0;
+        sphParams->m_surfaceTensionStiffness = 5.0;
     }
 
     if (SCENE_ID == 3)   // bunny-shaped fluid
     {
-        sphParams->m_frictionBoundary= 0.3;
+        sphParams->m_frictionBoundary = 0.3;
     }
 
     sphModel->configure(sphParams);

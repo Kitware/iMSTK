@@ -39,9 +39,9 @@
 namespace imstk
 {
 PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics),
-    m_mass(std::make_shared<StdVectorOfReal>()),
-    m_invMass(std::make_shared<StdVectorOfReal>()),
-    m_fixedNodeInvMass(std::make_shared<std::map<size_t, double>>()),
+    m_mass(std::make_shared<DataArray<double>>()),
+    m_invMass(std::make_shared<DataArray<double>>()),
+    m_fixedNodeInvMass(std::make_shared<std::unordered_map<size_t, double>>()),
     m_constraints(std::make_shared<PBDConstraintVector>()),
     m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_parameters(std::make_shared<PBDModelConfig>())
@@ -103,26 +103,8 @@ bool
 PbdModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
-    m_mesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
 
-    m_initialState  = std::make_shared<PbdState>();
-    m_previousState = std::make_shared<PbdState>();
-    m_currentState  = std::make_shared<PbdState>();
-
-    m_initialState->initialize(m_mesh->getVertexPositions());
-    m_previousState->initialize(m_mesh->getVertexPositions());
-    m_currentState->initialize(m_mesh->getVertexPositions());
-
-    auto numParticles = m_mesh->getNumVertices();
-
-    m_mass->resize(numParticles, 0);
-    m_invMass->resize(numParticles, 0);
-    setUniformMass(m_parameters->m_uniformMassValue);
-
-    for (auto i : m_parameters->m_fixedNodeIds)
-    {
-        setFixedPoint(i);
-    }
+    initState();
 
     bool bOK = true; // Return immediately if some constraint failed to initialize
 
@@ -209,6 +191,62 @@ PbdModel::initialize()
 }
 
 void
+PbdModel::initState()
+{
+    // Get the mesh
+    m_mesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
+    const int numParticles = static_cast<int>(m_mesh->getNumVertices());
+
+    m_initialState  = std::make_shared<PbdState>(numParticles);
+    m_previousState = std::make_shared<PbdState>(numParticles);
+    m_currentState  = std::make_shared<PbdState>(numParticles);
+
+    // Set the positional values (by ptr reference)
+    m_initialState->setPositions(m_mesh->getInitialVertexPositions());
+    m_currentState->setPositions(m_mesh->getVertexPositions());
+    m_previousState->setPositions(std::make_shared<VecDataArray<double, 3>>(*m_mesh->getVertexPositions()));
+
+    // Initialize Mass+InvMass
+    {
+        // If the input mesh has masses defined, use those
+        std::shared_ptr<AbstractDataArray> masses = m_mesh->getVertexAttribute("Mass");
+        if (masses != nullptr && masses->getNumberOfComponents() == 1 && masses->getScalarType() == IMSTK_DOUBLE && masses->size() == numParticles)
+        {
+            m_mass = std::dynamic_pointer_cast<DataArray<double>>(masses);
+            m_invMass->resize(m_mass->size());
+            for (int i = 0; i < m_mass->size(); i++)
+            {
+                (*m_invMass)[i] = ((*m_mass)[i] == 0.0) ? 0.0 : 1.0 / (*m_mass)[i];
+            }
+        }
+        // If not, initialize as uniform and put on mesh
+        else
+        {
+            // Initialize as uniform
+            m_mass->resize(numParticles);
+            m_invMass->resize(numParticles);
+
+            const double uniformMass = m_parameters->m_uniformMassValue;
+            std::fill(m_mass->begin(), m_mass->end(), uniformMass);
+            std::fill(m_invMass->begin(), m_invMass->end(), (uniformMass != 0.0) ? 1.0 / uniformMass : 0.0);
+
+            m_mesh->setVertexAttribute("Mass", m_mass);
+            m_mesh->setVertexAttribute("InvMass", m_invMass);
+        }
+    }
+
+    // Define velocities and accelerations on the geometry
+    m_mesh->setVertexAttribute("Velocities", m_currentState->getVelocities());
+    m_mesh->setVertexAttribute("Accelerations", m_currentState->getAccelerations());
+
+    // Overwrite some masses for specified fixed points
+    for (auto i : m_parameters->m_fixedNodeIds)
+    {
+        setFixedPoint(i);
+    }
+}
+
+void
 PbdModel::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink)
 {
     // Setup graph connectivity
@@ -247,15 +285,15 @@ PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
         << "FEM Tetrahedral constraint should come with tetrahedral mesh";
 
     // Create constraints
-    const auto& tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-    const auto& elements = tetMesh->getTetrahedraVertices();
+    const auto&                 tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+    const VecDataArray<int, 4>& elements = *tetMesh->getTetrahedraIndices();
 
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(elements.size(),
         [&](const size_t k)
         {
-            auto& tet = elements[k];
-            auto c    = std::make_shared<PbdFEMTetConstraint>(type);
+            const Vec4i& tet = elements[k];
+            auto c = std::make_shared<PbdFEMTetConstraint>(type);
             c->initConstraint(*m_initialState->getPositions(),
                 tet[0], tet[1], tet[2], tet[3], m_parameters->m_femParams);
             lock.lock();
@@ -272,8 +310,8 @@ PbdModel::initializeVolumeConstraints(const double stiffness)
     CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh) << "Volume constraint should come with volumetric mesh";
 
     // Create constraints
-    const auto& tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-    const auto& elements = tetMesh->getTetrahedraVertices();
+    const auto&                 tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
+    const VecDataArray<int, 4>& elements = *tetMesh->getTetrahedraIndices();
 
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(elements.size(),
@@ -312,7 +350,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
         const auto&                    tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-        const auto&                    elements = tetMesh->getTetrahedraVertices();
+        const VecDataArray<int, 4>&    elements = *tetMesh->getTetrahedraIndices();
         const auto                     nV       = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
@@ -330,7 +368,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
         const auto&                    triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-        const auto&                    elements = triMesh->getTrianglesVertices();
+        const VecDataArray<int, 3>&    elements = *triMesh->getTriangleIndices();
         const auto                     nV       = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
@@ -345,7 +383,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
     else if (m_mesh->getType() == Geometry::Type::LineMesh)
     {
         const auto&                    lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
-        const auto&                    elements = lineMesh->getLinesVertices();
+        const VecDataArray<int, 2>&    elements = *lineMesh->getLinesIndices();
         const auto&                    nV       = lineMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
@@ -367,8 +405,8 @@ PbdModel::initializeAreaConstraints(const double stiffness)
         << "Area constraint should come with a triangular mesh";
 
     // ok, now create constraints
-    const auto& triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    const auto& elements = triMesh->getTrianglesVertices();
+    const auto&                 triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const VecDataArray<int, 3>& elements = *triMesh->getTriangleIndices();
 
     ParallelUtils::SpinLock lock;
     ParallelUtils::parallelFor(elements.size(),
@@ -409,8 +447,8 @@ PbdModel::initializeBendConstraints(const double stiffness)
         };
 
     // Create constraints
-    const auto& lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
-    const auto& elements = lineMesh->getLinesVertices();
+    const auto&                 lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
+    const VecDataArray<int, 2>& elements = *lineMesh->getLinesIndices();
 
     // Iterate sets of two segments
     for (size_t k = 0; k < elements.size() - 1; k++)
@@ -434,7 +472,7 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
 
     // Create constraints
     const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    const auto&                      elements = triMesh->getTrianglesVertices();
+    const VecDataArray<int, 3>&      elements = *triMesh->getTriangleIndices();
     const auto                       nV       = triMesh->getNumVertices();
     std::vector<std::vector<size_t>> onering(nV);
 
@@ -613,18 +651,6 @@ PbdModel::partitionConstraints(const bool print)
 }
 
 void
-PbdModel::updatePhysicsGeometry()
-{
-    m_mesh->setVertexPositions(*m_currentState->getPositions());
-}
-
-void
-PbdModel::updatePbdStateFromPhysicsGeometry()
-{
-    m_currentState->setPositions(m_mesh->getVertexPositions());
-}
-
-void
 PbdModel::setTimeStepSizeType(const TimeSteppingType type)
 {
     m_timeStepSizeType = type;
@@ -635,25 +661,10 @@ PbdModel::setTimeStepSizeType(const TimeSteppingType type)
 }
 
 void
-PbdModel::setUniformMass(const double val)
-{
-    if (val != 0.0)
-    {
-        std::fill(m_mass->begin(), m_mass->end(), val);
-        std::fill(m_invMass->begin(), m_invMass->end(), 1.0 / val);
-    }
-    else
-    {
-        std::fill(m_invMass->begin(), m_invMass->end(), 0.0);
-        std::fill(m_mass->begin(), m_mass->end(), 0.0);
-    }
-}
-
-void
 PbdModel::setParticleMass(const double val, const size_t idx)
 {
-    StdVectorOfReal& masses    = *m_mass;
-    StdVectorOfReal& invMasses = *m_invMass;
+    DataArray<double>& masses    = *m_mass;
+    DataArray<double>& invMasses = *m_invMass;
     if (idx < m_mesh->getNumVertices())
     {
         masses[idx]    = val;
@@ -664,8 +675,8 @@ PbdModel::setParticleMass(const double val, const size_t idx)
 void
 PbdModel::setFixedPoint(const size_t idx)
 {
-    StdVectorOfReal&          invMasses = *m_invMass;
-    std::map<size_t, double>& fixedNodeInvMass = *m_fixedNodeInvMass;
+    DataArray<double>&                  invMasses = *m_invMass;
+    std::unordered_map<size_t, double>& fixedNodeInvMass = *m_fixedNodeInvMass;
     if (idx < m_mesh->getNumVertices())
     {
         fixedNodeInvMass[idx] = invMasses[idx];
@@ -676,8 +687,8 @@ PbdModel::setFixedPoint(const size_t idx)
 void
 PbdModel::setPointUnfixed(const size_t idx)
 {
-    StdVectorOfReal&          invMasses = *m_invMass;
-    std::map<size_t, double>& fixedNodeInvMass = *m_fixedNodeInvMass;
+    DataArray<double>&                  invMasses = *m_invMass;
+    std::unordered_map<size_t, double>& fixedNodeInvMass = *m_fixedNodeInvMass;
     if (fixedNodeInvMass.find(idx) != fixedNodeInvMass.end())
     {
         invMasses[idx] = fixedNodeInvMass[idx];
@@ -688,11 +699,11 @@ PbdModel::setPointUnfixed(const size_t idx)
 void
 PbdModel::integratePosition()
 {
-    StdVectorOfVec3d&       prevPos   = *m_previousState->getPositions();
-    StdVectorOfVec3d&       pos       = *m_currentState->getPositions();
-    StdVectorOfVec3d&       vel       = *m_currentState->getVelocities();
-    const StdVectorOfVec3d& accn      = *m_currentState->getAccelerations();
-    const StdVectorOfReal&  invMasses = *m_invMass;
+    VecDataArray<double, 3>&       prevPos   = *m_previousState->getPositions();
+    VecDataArray<double, 3>&       pos       = *m_currentState->getPositions();
+    VecDataArray<double, 3>&       vel       = *m_currentState->getVelocities();
+    const VecDataArray<double, 3>& accn      = *m_currentState->getAccelerations();
+    const DataArray<double>&       invMasses = *m_invMass;
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)
@@ -709,10 +720,10 @@ PbdModel::integratePosition()
 void
 PbdModel::updateVelocity()
 {
-    const StdVectorOfVec3d& prevPos   = *m_previousState->getPositions();
-    const StdVectorOfVec3d& pos       = *m_currentState->getPositions();
-    StdVectorOfVec3d&       vel       = *m_currentState->getVelocities();
-    const StdVectorOfReal&  invMasses = *m_invMass;
+    const VecDataArray<double, 3>& prevPos   = *m_previousState->getPositions();
+    const VecDataArray<double, 3>& pos       = *m_currentState->getPositions();
+    VecDataArray<double, 3>&       vel       = *m_currentState->getVelocities();
+    const DataArray<double>&       invMasses = *m_invMass;
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)

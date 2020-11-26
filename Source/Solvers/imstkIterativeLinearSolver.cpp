@@ -21,7 +21,7 @@
 
 #include "imstkIterativeLinearSolver.h"
 #include "imstkLogger.h"
-#include "imstkTypes.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {

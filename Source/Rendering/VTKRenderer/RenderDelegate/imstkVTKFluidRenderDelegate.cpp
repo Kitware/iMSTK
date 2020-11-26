@@ -23,80 +23,144 @@
 #include "imstkPointSet.h"
 #include "imstkVisualModel.h"
 #include "imstkRenderMaterial.h"
+#include "imstkGeometryUtilities.h"
 
 #include <vtkOpenGLFluidMapper.h>
 #include <vtkVertexGlyphFilter.h>
-#include <vtkTrivialProducer.h>
 #include <vtkDoubleArray.h>
 #include <vtkVolume.h>
 
 namespace imstk
 {
-VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
+VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKVolumeRenderDelegate(visualModel),
+    m_polydata(vtkSmartPointer<vtkPolyData>::New()),
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    m_visualModel = visualModel;
-
     auto geometry = std::static_pointer_cast<PointSet>(visualModel->getGeometry());
+    m_vertices = geometry->getVertexPositions();
 
     // Map vertices
-    StdVectorOfVec3d& vertices = geometry->getVertexPositionsNotConst();
-    double*           vertData = reinterpret_cast<double*>(vertices.data());
-    m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(vertData, vertices.size() * 3, 1);
+    if (m_vertices != nullptr)
+    {
+        m_mappedVertexArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_vertices));
+        auto points = vtkSmartPointer<vtkPoints>::New();
+        points->SetNumberOfPoints(geometry->getNumVertices());
+        points->SetData(m_mappedVertexArray);
+        m_polydata->SetPoints(points);
+    }
 
-    // Create points
-    auto points = vtkSmartPointer<vtkPoints>::New();
-    points->SetNumberOfPoints(geometry->getNumVertices());
-    points->SetData(m_mappedVertexArray);
+    // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
+    queueConnect<Event>(geometry, EventType::Modified, this, &VTKFluidRenderDelegate::geometryModified);
 
-    // Create PolyData
-    auto pointsPolydata = vtkSmartPointer<vtkPolyData>::New();
-    pointsPolydata->SetPoints(points);
+    // When the vertex buffer internals are modified, ie: a single or N elements
+    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKFluidRenderDelegate::vertexDataModified);
 
-    // Create fluid mapper
-    vtkNew<vtkOpenGLFluidMapper> fluidMapper;
-    fluidMapper->SetInputData(pointsPolydata);
+    // Setup mapper
+    {
+        vtkNew<vtkOpenGLFluidMapper> mapper;
+        mapper->SetInputData(m_polydata);
+        vtkNew<vtkVolume> volume;
+        volume->SetMapper(mapper);
+        m_mapper = mapper;
+        m_actor  = volume;
+    }
 
-    // set some fluid rendering properties
-    fluidMapper->SetParticleRadius(m_visualModel->getRenderMaterial()->getPointSize());
-    fluidMapper->SetSurfaceFilterIterations(3);
-    fluidMapper->SetSurfaceFilterRadius(5);
-    fluidMapper->SetSurfaceFilterMethod(vtkOpenGLFluidMapper::FluidSurfaceFilterMethod::NarrowRange);
-    fluidMapper->SetDisplayMode(vtkOpenGLFluidMapper::FluidDisplayMode::TransparentFluidVolume);
-    fluidMapper->SetAttenuationColor(0.1f, 0.9f, 0.9f);
-    fluidMapper->SetAttenuationScale(16.0f);
-    fluidMapper->SetOpaqueColor(0.9f, 0.1f, 0.1f);
-    fluidMapper->SetParticleColorPower(0.1f);
-    fluidMapper->SetParticleColorScale(0.57f);
-    fluidMapper->SetAdditionalReflection(0.0f);
-    fluidMapper->SetRefractiveIndex(1.5f);
-    fluidMapper->SetRefractionScale(0.07f);
-
-    m_volume->SetMapper(fluidMapper);
-
-    // Create connection source
-    auto pointDataSource = vtkSmartPointer<vtkTrivialProducer>::New();
-    pointDataSource->SetOutput(pointsPolydata);
-    geometry->m_dataModified = true;
-
-    // Update Transform, Render Properties
-    this->update();
-    this->setUpMapper(pointDataSource->GetOutputPort(), m_visualModel);
-
-    m_isMesh = false;
-    m_modelIsVolume = true;
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKFluidRenderDelegate::updateDataSource()
+VTKFluidRenderDelegate::processEvents()
 {
+    // Custom handling of events
+    std::shared_ptr<PointSet>                geom     = std::dynamic_pointer_cast<PointSet>(m_visualModel->getGeometry());
+    std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
+
+    // Only use the most recent event from respective sender
+    std::list<Command> cmds;
+    bool               contains[4] = { false, false, false, false };
+    rforeachEvent([&](Command cmd)
+        {
+            if (cmd.m_event->m_sender == m_visualModel.get() && !contains[0])
+            {
+                cmds.push_back(cmd);
+                contains[0] = true;
+            }
+            else if (cmd.m_event->m_sender == m_material.get() && !contains[1])
+            {
+                cmds.push_back(cmd);
+                contains[1] = true;
+            }
+            else if (cmd.m_event->m_sender == geom.get() && !contains[2])
+            {
+                cmds.push_back(cmd);
+                contains[2] = true;
+            }
+            else if (cmd.m_event->m_sender == vertices.get() && !contains[3])
+            {
+                cmds.push_back(cmd);
+                contains[3] = true;
+            }
+        });
+
+    // Now do each event in order recieved
+    for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
+    {
+        i->invoke();
+    }
+}
+
+void
+VTKFluidRenderDelegate::geometryModified(Event* imstkNotUsed(e))
+{
+    // Called when the geometry posts modified
     auto geometry = std::static_pointer_cast<PointSet>(m_visualModel->getGeometry());
 
-    if (geometry->m_dataModified)
+    // Test if the vertex buffer changed
+    if (m_vertices != geometry->getVertexPositions())
     {
-        m_mappedVertexArray->Modified();
-        geometry->m_dataModified = false;
+        //printf("Vertex data swapped\n");
+        m_vertices = geometry->getVertexPositions();
+        {
+            // Update the pointer of the coupled array
+            m_mappedVertexArray->SetNumberOfComponents(3);
+            m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+        }
     }
+    m_mappedVertexArray->Modified();
+}
+
+void
+VTKFluidRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<PointSet>(m_visualModel->getGeometry());
+    m_vertices = geometry->getVertexPositions();
+    if (m_vertices->getVoidPointer() != m_mappedVertexArray->GetVoidPointer(0))
+    {
+        m_mappedVertexArray->SetNumberOfComponents(3);
+        m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+    }
+    m_mappedVertexArray->Modified();
+}
+
+void
+VTKFluidRenderDelegate::updateRenderProperties()
+{
+    vtkSmartPointer<vtkOpenGLFluidMapper> mapper = vtkOpenGLFluidMapper::SafeDownCast(m_mapper);
+
+    // todo: Expose in RenderMaterial or subclass
+    mapper->SetParticleRadius(m_material->getPointSize());
+    mapper->SetSurfaceFilterIterations(3);
+    mapper->SetSurfaceFilterRadius(5);
+    mapper->SetSurfaceFilterMethod(vtkOpenGLFluidMapper::FluidSurfaceFilterMethod::NarrowRange);
+    mapper->SetDisplayMode(vtkOpenGLFluidMapper::FluidDisplayMode::TransparentFluidVolume);
+    mapper->SetAttenuationColor(0.1f, 0.9f, 0.9f);
+    mapper->SetAttenuationScale(16.0f);
+    mapper->SetOpaqueColor(0.9f, 0.1f, 0.1f);
+    mapper->SetParticleColorPower(0.1f);
+    mapper->SetParticleColorScale(0.57f);
+    mapper->SetAdditionalReflection(0.0f);
+    mapper->SetRefractiveIndex(1.5f);
+    mapper->SetRefractionScale(0.07f);
 }
 } // imstk

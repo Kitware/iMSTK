@@ -33,12 +33,6 @@ Capsule::print() const
 }
 
 double
-Capsule::getVolume() const
-{
-    return PI * m_radius * m_radius * (m_length + 4.0 / 3.0 * m_radius);
-}
-
-double
 Capsule::getRadius(DataType type /* = DataType::PostTransform */)
 {
     if (type == DataType::PostTransform)
@@ -85,6 +79,7 @@ Capsule::applyScaling(const double s)
 {
     this->setRadius(m_radius * s);
     this->setLength(m_length * s);
+    this->modified();
 }
 
 void

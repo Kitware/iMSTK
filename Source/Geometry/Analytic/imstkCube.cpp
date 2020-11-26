@@ -32,12 +32,6 @@ Cube::print() const
 }
 
 double
-Cube::getVolume() const
-{
-    return m_width * m_width * m_width;
-}
-
-double
 Cube::getWidth(DataType type /* = DataType::PostTransform */)
 {
     if (type == DataType::PostTransform)
@@ -69,6 +63,7 @@ void
 Cube::applyScaling(const double s)
 {
     this->setWidth(m_width * s);
+    this->modified();
 }
 
 void

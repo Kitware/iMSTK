@@ -1,21 +1,21 @@
 /*=========================================================================
 
-   Library: iMSTK
+  Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+  Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+  & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+     http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
 =========================================================================*/
 
@@ -48,7 +48,7 @@ using namespace imstk;
 ///
 /// \brief Generate a volume of fluid with the specified SurfaceMesh
 ///
-static std::shared_ptr<StdVectorOfVec3d>
+static std::shared_ptr<VecDataArray<double, 3>>
 generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> spawnSurfaceVolume)
 {
     Vec3d minima, maxima;
@@ -76,7 +76,7 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
     const Vec3d&                      shift      = makeBinaryMask->getOutputImage()->getOrigin() + spacing * 0.5;
     const double                      threshold  = particleDiameter * 1.0; // How far from the boundary to accept particles
 
-    imstkNew<StdVectorOfVec3d> particles;
+    imstkNew<VecDataArray<double, 3>> particles;
     particles->reserve(dim1[0] * dim1[1] * dim1[2]);
 
     int i = 0;
@@ -93,7 +93,7 @@ generateFluidVolume(const double particleRadius, std::shared_ptr<SurfaceMesh> sp
             }
         }
     }
-    particles->shrink_to_fit();
+    particles->squeeze();
     return particles;
 }
 
@@ -106,17 +106,16 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
     // Setup the Geometry
     auto spawnMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/legs/femoralArteryCut.stl");
     // By spacing them slightly closer we can induce larger compression at the start
-    std::shared_ptr<StdVectorOfVec3d> particles = generateFluidVolume(particleSpacing, spawnMesh);
+    std::shared_ptr<VecDataArray<double, 3>> particles = generateFluidVolume(particleSpacing, spawnMesh);
     LOG(INFO) << "Number of particles: " << particles->size();
     imstkNew<PointSet> fluidGeometry;
-    fluidGeometry->initialize(*particles);
+    fluidGeometry->initialize(particles);
 
     // Setup the Parameters
     imstkNew<SPHModelConfig> sphParams(particleRadius);
     sphParams->m_bNormalizeDensity = true;
     sphParams->m_kernelOverParticleRadiusRatio = 6.0;
-    //sphParams->m_viscosityCoeff = 0.8;
-    sphParams->m_surfaceTensionStiffness = 5.0;
+    sphParams->m_surfaceTensionStiffness       = 5.0;
     sphParams->m_frictionBoundary = 0.1;
 
     // Setup the Model
@@ -130,6 +129,8 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
     imstkNew<RenderMaterial> fluidMaterial;
     fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Fluid);
     fluidMaterial->setPointSize(particleRadius * 2.0f); // For fluids
+    //fluidMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
+    //fluidMaterial->setPointSize(particleRadius * 1200.0f); // For points (todo: remove view dependence)
     fluidVisualModel->setRenderMaterial(fluidMaterial);
 
     // Setup the Object

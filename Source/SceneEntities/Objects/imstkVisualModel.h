@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <memory>
 
 namespace imstk
@@ -28,12 +30,13 @@ namespace imstk
 class Geometry;
 class RenderMaterial;
 class DebugRenderGeometry;
+
 ///
 /// \class VisualModel
 ///
 /// \brief Contains geometric, material, and render information
 ///
-class VisualModel
+class VisualModel : public EventObject
 {
 public:
     ///
@@ -51,32 +54,37 @@ public:
     ///
     /// \brief Get/set geometry
     ///
-    std::shared_ptr<Geometry> getGeometry();
-    void setGeometry(std::shared_ptr<Geometry> geometry);
+    std::shared_ptr<Geometry> getGeometry() const { return m_geometry; }
+    void setGeometry(std::shared_ptr<Geometry> geometry) { m_geometry = geometry; }
 
     ///
     /// \brief Get/set geometry
     ///
-    std::shared_ptr<DebugRenderGeometry> getDebugGeometry();
-    void setDebugGeometry(std::shared_ptr<DebugRenderGeometry> geometry);
+    std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const { return m_DbgGeometry; }
+    void setDebugGeometry(std::shared_ptr<DebugRenderGeometry> geometry) { m_DbgGeometry = geometry; }
 
     ///
     /// \brief Set/Get render material
     ///
-    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial);
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const;
+    void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
+    {
+        m_renderMaterial = renderMaterial;
+        this->postEvent(Event(EventType::Modified));
+    }
+
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_renderMaterial; }
 
     ///
     /// \brief Visibility functions
     ///
-    void show();
-    void hide();
-    bool isVisible() const;
+    void show() { m_isVisible = true; }
+    void hide() { m_isVisible = false; }
+    bool isVisible() const { return m_isVisible; }
 
     ///
     /// \brief Return true if renderer delegate is created
     ///
-    bool isRenderDelegateCreated();
+    bool isRenderDelegateCreated() const { return m_renderDelegateCreated; }
 
 protected:
     friend class VulkanRenderDelegate;

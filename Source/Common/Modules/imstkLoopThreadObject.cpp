@@ -29,8 +29,8 @@ namespace imstk
 LoopThreadObject::LoopThreadObject(std::string name, int loopDelay) :
     ThreadObject(name),
     m_frameCounter(std::make_shared<UPSCounter>()),
-    m_trackFPS(false),
     m_loopDelay(loopDelay),
+    m_trackFPS(false),
     m_isInitialized(false)
 {
 }

@@ -22,22 +22,19 @@
 #pragma once
 
 #include "imstkEventObject.h"
+#include "imstkMacros.h"
 
 #include <vtkSmartPointer.h>
-#include <memory>
 
-class vtkActor;
-class vtkAlgorithmOutput;
-class vtkGPUVolumeRayCastMapper;
-class vtkOpenGLPolyDataMapper;
+class vtkAbstractMapper;
 class vtkProp3D;
 class vtkTransform;
 class vtkTexture;
-class vtkVolume;
 
 namespace imstk
 {
 class Texture;
+class RenderMaterial;
 class VisualModel;
 
 ///
@@ -61,21 +58,14 @@ public:
     static std::shared_ptr<VTKRenderDelegate> makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel);
 
     ///
-    /// \brief Set up normals and mapper
-    /// \param source input data object
-    /// \param vizModel imstk visual model
-    ///
-    void setUpMapper(vtkAlgorithmOutput* source, const std::shared_ptr<VisualModel> vizModel);
-
-    ///
     /// \brief Return geometry to render
     ///
-    std::shared_ptr<VisualModel> getVisualModel() const;
+    std::shared_ptr<VisualModel> getVisualModel() const { return m_visualModel; }
 
     ///
-    /// \brief Get VTK renderered object
+    /// \brief Get VTK actor
     ///
-    vtkProp3D* getVtkActor() const;
+    vtkSmartPointer<vtkProp3D> getVtkActor() { return m_actor; }
 
     ///
     /// \brief Update render delegate
@@ -88,41 +78,42 @@ public:
     void updateActorTransform();
 
     ///
-    /// \brief Update render delegate properties based on the geometry render material
+    /// \brief Process the event queue, default implementation processes
+    /// visualModel events and its RenderMaterial events
     ///
-    void updateActorProperties();
-    void updateActorPropertiesVolumeRendering();
-    void updateActorPropertiesMesh();
-    bool isMesh() { return m_isMesh; }
-    bool isVolume() { return m_modelIsVolume; }
+    virtual void processEvents();
 
     ///
-    /// \brief Update render delegate source based on the geometry internal data
+    /// \brief Updates the actor and mapper properties from the currently set VisualModel
     ///
-    virtual void updateDataSource() = 0;
+    virtual void updateRenderProperties() = 0;
 
 protected:
-
-    vtkSmartPointer<vtkTexture> getVTKTexture(std::shared_ptr<Texture> texture);
-
     ///
     /// \brief Default constructor (protected)
     ///
-    VTKRenderDelegate();
+    VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
+    ///
+    /// \brief Callback for updating render properties
+    ///
+    void materialModified(Event* imstkNotUsed(e)) { updateRenderProperties(); }
+
+    ///
+    /// \brief Callback for visual model modifications
+    ///
+    void visualModelModified(Event* e);
+
+    vtkSmartPointer<vtkTexture> getVTKTexture(std::shared_ptr<Texture> texture);
+
+protected:
     vtkSmartPointer<vtkTransform> m_transform;
 
-    // volume mapping
-    vtkSmartPointer<vtkGPUVolumeRayCastMapper> m_volumeMapper;
-    vtkSmartPointer<vtkVolume> m_volume;
-    bool m_modelIsVolume = false;// remove?
-
-    bool m_isMesh = true;
-
     // VTK data members used to create the rendering pipeline
-    vtkSmartPointer<vtkActor> m_actor;
-    vtkSmartPointer<vtkOpenGLPolyDataMapper> m_mapper;
+    vtkSmartPointer<vtkProp3D> m_actor;
+    vtkSmartPointer<vtkAbstractMapper> m_mapper;
 
-    std::shared_ptr<VisualModel> m_visualModel; ///< imstk visual model (contains data (geometry) and render specification (render material))
+    std::shared_ptr<VisualModel>    m_visualModel; ///< imstk visual model (contains data (geometry) and render specification (render material))
+    std::shared_ptr<RenderMaterial> m_material;
 };
 }

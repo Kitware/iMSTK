@@ -19,10 +19,11 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
-#include "imstkSurfaceMesh.h"
 #include "imstkLooseOctree.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 
@@ -44,8 +45,9 @@ generatePointSet()
     const auto  spacing = Real(2) * PARTICLE_RADIUS;
     const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
-    StdVectorOfVec3r particles;
-    particles.reserve(N * N * N);
+    std::shared_ptr<VecDataArray<double, 3>> particles = std::make_shared<VecDataArray<double, 3>>();
+    VecDataArray<double, 3>&                 vertices  = *particles;
+    vertices.reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
     for (int i = 0; i < N; ++i)
@@ -58,7 +60,7 @@ generatePointSet()
                 const Vec3r d    = ppos - sphereCenter;
                 if (d.squaredNorm() < sphereRadiusSqr)
                 {
-                    particles.push_back(ppos);
+                    vertices.push_back(ppos);
                 }
             }
         }
@@ -75,22 +77,24 @@ generatePointSet()
 std::shared_ptr<SurfaceMesh>
 generateMesh()
 {
-    StdVectorOfVec3r                        vertices;
-    std::vector<SurfaceMesh::TriangleArray> faces;
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = std::make_shared<VecDataArray<double, 3>>();
+    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
+    std::shared_ptr<VecDataArray<int, 3>>    indicesPtr  = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                    indices     = *indicesPtr;
 
     auto randD = [] { return (static_cast<double>(rand()) / static_cast<double>(RAND_MAX) * 2.0 - 1.0) * BOUND; };
 
     vertices.reserve(300);
-    faces.reserve(100);
+    indices.reserve(100);
     for (size_t i = 0; i < 100; ++i)
     {
-        faces.push_back({ i*3, i*3 + 1, i*3 + 2 });
+        indices.push_back(Vec3i(i * 3, i * 3 + 1, i * 3 + 2));
         vertices.push_back(Vec3d(randD(), randD(), randD()));
         vertices.push_back(Vec3d(randD(), randD(), randD()));
         vertices.push_back(Vec3d(randD(), randD(), randD()));
     }
     auto mesh = std::make_shared<SurfaceMesh>();
-    mesh->initialize(vertices, faces);
+    mesh->initialize(verticesPtr, indicesPtr);
     return mesh;
 }
 
@@ -108,6 +112,7 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
             ));
     }
+    pointset->modified();
 }
 
 ///
@@ -123,12 +128,13 @@ randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND,
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
             );
-        const auto face = mesh->getTrianglesVertices()[i];
+        const Vec3i& face = (*mesh->getTriangleIndices())[i];
         for (unsigned int j = 0; j < 3; ++j)
         {
             mesh->setVertexPosition(face[j], mesh->getVertexPosition(face[j]) + translation);
         }
     }
+    mesh->modified();
 }
 
 namespace imstk
@@ -270,8 +276,10 @@ public:
         std::vector<std::shared_ptr<PointSet>> pointsets;
         for (int iter = 0; iter < ITERATIONS; ++iter)
         {
-            const auto pointset = std::make_shared<PointSet>();
-            pointset->initialize({ Vec3d(rand(), rand(), rand() ) * 10.0 / static_cast<double>(RAND_MAX) });
+            const auto                               pointset = std::make_shared<PointSet>();
+            std::shared_ptr<VecDataArray<double, 3>> vertices = std::make_shared<VecDataArray<double, 3>>();
+            vertices->push_back(Vec3d(rand(), rand(), rand()) * 10.0 / static_cast<double>(RAND_MAX));
+            pointset->initialize(vertices);
             m_Octree->addPointSet(pointset);
             pointsets.push_back(std::move(pointset));
 
@@ -294,14 +302,18 @@ public:
                 std::vector<std::shared_ptr<SurfaceMesh>> meshes;
                 for (int iter = 0; iter < ITERATIONS; ++iter)
                 {
-                    StdVectorOfVec3d vertices {
+                    std::shared_ptr<VecDataArray<double, 3>> vertices = std::make_shared<VecDataArray<double, 3>>();
+                    *vertices =
+                    {
                         Vec3d(0, 0, 0),
                         Vec3d(1, 0, 0),
                         Vec3d(1, 1, 1)
                     };
 
-                    const auto surfMesh = std::make_shared<SurfaceMesh>();
-                    surfMesh->initialize(vertices, { { 0, 1, 2 } });
+                    std::shared_ptr<SurfaceMesh>          surfMesh = std::make_shared<SurfaceMesh>();
+                    std::shared_ptr<VecDataArray<int, 3>> indices  = std::make_shared<VecDataArray<int, 3>>();
+                    indices->push_back(Vec3i(0, 1, 2));
+                    surfMesh->initialize(vertices, indices);
                     m_Octree->addTriangleMesh(surfMesh);
                     meshes.push_back(std::move(surfMesh));
 

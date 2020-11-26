@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkMath.h"
+#include "imstkVecDataArray.h"
 
 namespace imstk
 {
@@ -78,11 +79,11 @@ public:
     ///
     /// \param[in] currVertexPositions vector of current positions
     /// \param[inout] c constraint value
-    /// \param[inout] dcdx constraint gradient
     ///
-    virtual bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                         double&                 c,
-                                         StdVectorOfVec3d&       dcdx) const = 0;
+    virtual bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPositions,
+        double& c,
+        std::vector<Vec3d>& dcdx) const = 0;
 
     ///
     /// \brief Get the vertex indices of the constraint
@@ -121,7 +122,7 @@ public:
     ///
     /// \brief Update positions by projecting constraints.
     ///
-    virtual void projectConstraint(const StdVectorOfReal& currInvMasses, const double dt, const SolverType& type, StdVectorOfVec3d& pos);
+    virtual void projectConstraint(const DataArray<double>& currInvMasses, const double dt, const SolverType& type, VecDataArray<double, 3>& pos);
 
 protected:
     std::vector<size_t> m_vertexIds;   ///> index of points for the constraint
@@ -129,6 +130,8 @@ protected:
     double m_stiffness      = 1.0;     ///> used in PBD, [0, 1]
     double m_compliance     = 1e-7;    ///> used in xPBD, inverse of Young's Modulus
     mutable double m_lambda = 0.0;     ///> Lagrange multiplier
+
+    std::vector<Vec3d> m_dcdx;
 };
 
 using PBDConstraintVector = std::vector<std::shared_ptr<PbdConstraint>>;

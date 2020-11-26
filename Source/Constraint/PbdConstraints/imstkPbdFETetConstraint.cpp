@@ -24,7 +24,7 @@
 namespace  imstk
 {
 bool
-PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
+PbdFEMTetConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
                                     const size_t& pIdx0, const size_t& pIdx1,
                                     const size_t& pIdx2, const size_t& pIdx3,
                                     std::shared_ptr<PbdFEMConstraintConfig> config)
@@ -59,9 +59,10 @@ PbdFEMTetConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
 }
 
 bool
-PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                             double&                 cval,
-                                             StdVectorOfVec3d&       dcdx) const
+PbdFEMTetConstraint::computeValueAndGradient(
+    const VecDataArray<double, 3>& currVertexPositions,
+    double& cval,
+    std::vector<Vec3d>& dcdx) const
 {
     const auto i0 = m_vertexIds[0];
     const auto i1 = m_vertexIds[1];
@@ -169,9 +170,8 @@ PbdFEMTetConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexP
     }
 
     Mat3d gradC = m_elementVolume * P * m_invRestMat.transpose();
-    cval  = C;
-    cval *=  m_elementVolume;
-    dcdx.resize(m_vertexIds.size());
+    cval    = C;
+    cval   *=  m_elementVolume;
     dcdx[0] = gradC.col(0);
     dcdx[1] = gradC.col(1);
     dcdx[2] = gradC.col(2);

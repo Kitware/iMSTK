@@ -21,9 +21,8 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 
-class vtkTransformPolyDataFilter;
 class vtkCylinderSource;
 
 namespace imstk
@@ -33,13 +32,13 @@ namespace imstk
 ///
 /// \brief Cylinder object render delegate with VTK backend
 ///
-class VTKCylinderRenderDelegate : public VTKRenderDelegate
+class VTKCylinderRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKCylinderRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -47,13 +46,11 @@ public:
     virtual ~VTKCylinderRenderDelegate() override = default;
 
     ///
-    /// \brief Update cylinder source based on the cylinder geometry
+    /// \brief Process the event queue
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
 protected:
     vtkSmartPointer<vtkCylinderSource> cylinderSource;
-
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter; ///> Source
 };
 } // imstk

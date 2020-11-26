@@ -23,6 +23,7 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkVecDataArray.h"
 
 #include <vtkPolyData.h>
 #include <vtkSelectEnclosedPoints.h>
@@ -78,22 +79,21 @@ SelectEnclosedPoints::requestUpdate()
 
     if (m_UsePruning)
     {
-        StdVectorOfVec3d points;
-        points.reserve(vtkResults->GetNumberOfPoints());
+        std::shared_ptr<VecDataArray<double, 3>> points = std::make_shared<VecDataArray<double, 3>>();
+        points->reserve(vtkResults->GetNumberOfPoints());
         for (vtkIdType i = 0; i < vtkResults->GetNumberOfPoints(); i++)
         {
             if (filter->IsInside(i))
             {
                 double pt[3];
                 vtkResults->GetPoint(i, pt);
-                points.push_back(Vec3d(pt[0], pt[1], pt[2]));
+                points->push_back(Vec3d(pt[0], pt[1], pt[2]));
             }
         }
-        points.shrink_to_fit();
+        points->squeeze();
 
         std::shared_ptr<PointSet> results = std::make_shared<PointSet>();
-        results->setInitialVertexPositions(points);
-        results->setVertexPositions(points);
+        results->initialize(points);
         setOutput(results, 0);
     }
     else

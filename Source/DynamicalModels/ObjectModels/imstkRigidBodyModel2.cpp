@@ -24,6 +24,7 @@
 #include "imstkProjectedGaussSeidelSolver.h"
 #include "imstkRbdConstraint.h"
 #include "imstkTaskGraph.h"
+#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -96,7 +97,12 @@ RigidBodyModel2::initialize()
         // Set the intial state
         isStatic[i]  = body.m_isStatic;
         invMasses[i] = (body.m_mass == 0.0) ? 0.0 : 1.0 / body.m_mass;
-        invInteriaTensors[i] = body.m_intertiaTensor.inverse();         // Is there any easy way to check invertible
+        if (body.m_intertiaTensor.determinant() == 0.0)
+        {
+            LOG(WARNING) << "Inertia tensor provided is not invertible, check that it makes sense";
+            return false;
+        }
+        invInteriaTensors[i] = body.m_intertiaTensor.inverse();
         positions[i]           = body.m_initPos;
         orientations[i]        = body.m_initOrientation;
         velocities[i]          = body.m_initVelocity;
@@ -188,6 +194,12 @@ RigidBodyModel2::solveConstraints()
     {
         return;
     }
+    if (m_config->m_maxNumConstraints != -1 && m_constraints.size() > m_config->m_maxNumConstraints * 2)
+    {
+        m_constraints.resize(m_config->m_maxNumConstraints * 2);
+    }
+
+    //printf("solving\n");
 
     std::shared_ptr<RigidBodyState2> state    = getCurrentState();
     const std::vector<bool>&         isStatic = state->getIsStatic();
@@ -196,7 +208,6 @@ RigidBodyModel2::solveConstraints()
     StdVectorOfVec3d&                forces  = state->getForces();
     StdVectorOfVec3d&                torques = state->getTorques();
 
-    Eigen::VectorXd F;
     Eigen::VectorXd V    = Eigen::VectorXd(state->size() * 6);
     Eigen::VectorXd Fext = Eigen::VectorXd(state->size() * 6);
 
@@ -305,7 +316,8 @@ RigidBodyModel2::solveConstraints()
     m_pgsSolver->setA(&A);
     //pgsSolver.setGuess(F); // Not using warm starting
     m_pgsSolver->setMaxIterations(m_config->m_maxNumIterations);
-    F = J.transpose() * m_pgsSolver->solve(b, cu);
+    m_pgsSolver->setEpsilon(m_config->m_epsilon);
+    Eigen::VectorXd F = J.transpose() * m_pgsSolver->solve(b, cu); // Reaction force,torque
 
     // Apply back
     j = 0;
@@ -368,6 +380,7 @@ RigidBodyModel2::integrate()
                 }
 
                 // Reset
+                //m_bodies[i]->m_prevForce = forces[i];
                 forces[i]  = Vec3d(0.0, 0.0, 0.0);
                 torques[i] = Vec3d(0.0, 0.0, 0.0);
                 tentativeVelocities[i] = velocities[i];

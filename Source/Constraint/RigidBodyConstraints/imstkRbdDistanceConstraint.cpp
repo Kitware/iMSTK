@@ -20,7 +20,7 @@
 =========================================================================*/
 
 #include "imstkRbdDistanceConstraint.h"
-#include "imstkTypes.h"
+#include "imstkMacros.h"
 
 namespace imstk
 {

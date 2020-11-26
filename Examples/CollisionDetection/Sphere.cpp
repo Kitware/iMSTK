@@ -20,12 +20,11 @@
 =========================================================================*/
 
 #include "imstkMath.h"
-
-#include <array>
+#include "imstkVecDataArray.h"
 
 using namespace imstk;
 
-std::pair<StdVectorOfVec3d, std::vector<std::array<size_t, 3>>>
+std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>>
 getSphere()
 {
     std::vector<double> buffVertices
@@ -74,7 +73,7 @@ getSphere()
         -0.249999985, -0.0812300518, 0.425325394
     };
 
-    std::vector<size_t> buffFaces
+    std::vector<int> buffFaces
     {
         3, 1, 2,
         5, 2, 4,
@@ -158,26 +157,24 @@ getSphere()
         42, 39, 33
     };
 
-    StdVectorOfVec3d vertices;
-    vertices.reserve(buffVertices.size() / 3);
+    std::shared_ptr<VecDataArray<double, 3>> verticesPtr = std::make_shared<VecDataArray<double, 3>>();
+    VecDataArray<double, 3>&                 vertices    = *verticesPtr;
+    vertices.reserve(static_cast<int>(buffVertices.size() / 3));
     for (size_t i = 0; i < buffVertices.size() / 3; ++i)
     {
-        vertices.emplace_back(Vec3d(buffVertices[i * 3],
+        vertices.push_back(Vec3d(buffVertices[i * 3],
                                     buffVertices[i * 3 + 1],
                                     buffVertices[i * 3 + 2]));
     }
 
-    std::vector<std::array<size_t, 3>> faces;
-    faces.reserve(buffFaces.size() / 3);
+    std::shared_ptr<VecDataArray<int, 3>> facesPtr = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                 faces    = *facesPtr;
+    faces.reserve(static_cast<int>(buffFaces.size() / 3));
     for (size_t i = 0; i < buffFaces.size() / 3; ++i)
     {
         // Face ID of triangles is 0-based index (data from .obj file is 1-based index)
-        std::array<size_t, 3> tmp;
-        tmp[0] = buffFaces[i * 3] - 1;
-        tmp[1] = buffFaces[i * 3 + 1] - 1;
-        tmp[2] = buffFaces[i * 3 + 2] - 1;
-        faces.push_back(std::move(tmp));
+        faces.push_back(Vec3i(buffFaces[i * 3] - 1, buffFaces[i * 3 + 1] - 1, buffFaces[i * 3 + 2] - 1));
     }
 
-    return { vertices, faces };
+    return { verticesPtr, facesPtr };
 }

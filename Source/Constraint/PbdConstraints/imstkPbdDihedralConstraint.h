@@ -36,7 +36,11 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdDihedralConstraint() : PbdConstraint() { m_vertexIds.resize(4); }
+    PbdDihedralConstraint() : PbdConstraint()
+    {
+        m_vertexIds.resize(4);
+        m_dcdx.resize(4);
+    }
 
     ///
     /// \brief Returns PBD constraint of type Type::Dihedral
@@ -60,7 +64,7 @@ public:
       \param k stiffness
     */
     void initConstraint(
-        const StdVectorOfVec3d& initVertexPositions,
+        const VecDataArray<double, 3>& initVertexPositions,
         const size_t& pIdx0, const size_t& pIdx1,
         const size_t& pIdx2, const size_t& pIdx3,
         const double k);
@@ -70,11 +74,11 @@ public:
     ///
     /// \param[in] currVertexPositions vector of current positions
     /// \param[inout] c constraint value
-    /// \param[inout] dcdx constraint gradient
     ///
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const override;
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPositions,
+        double& c,
+        std::vector<Vec3d>& dcdx) const override;
 
 public:
     double m_restAngle = 0.0; ///> Rest angle

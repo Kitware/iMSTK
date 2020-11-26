@@ -36,7 +36,11 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdAreaConstraint() : PbdConstraint() { m_vertexIds.resize(3); }
+    PbdAreaConstraint() : PbdConstraint()
+    {
+        m_vertexIds.resize(3);
+        m_dcdx.resize(3);
+    }
 
     ///
     /// \brief Returns PBD constraint of type Type::Area
@@ -47,13 +51,14 @@ public:
     /// \brief Initializes the area constraint
     ///
     void initConstraint(
-        const StdVectorOfVec3d& initVertexPositions,
+        const VecDataArray<double, 3>& initVertexPositions,
         const size_t& pIdx1, const size_t& pIdx2, const size_t& pIdx3,
         const double k = 2.5);
 
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const override;
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPositions,
+        double& c,
+        std::vector<Vec3d>& dcdx) const override;
 
 public:
     double m_restArea = 0.;  ///> Area at the rest position

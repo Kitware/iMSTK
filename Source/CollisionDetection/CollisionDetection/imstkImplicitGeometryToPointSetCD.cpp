@@ -49,10 +49,11 @@ ImplicitGeometryToPointSetCD::computeCollisionData()
 {
     m_colData->clearAll();
 
-    ParallelUtils::parallelFor(m_pointSetB->getVertexPositions().size(),
+    const VecDataArray<double, 3>& vertices = *m_pointSetB->getVertexPositions();
+    ParallelUtils::parallelFor(vertices.size(),
         [&](const size_t idx)
         {
-            const Vec3d& pt = m_pointSetB->getVertexPosition(idx);
+            const Vec3d& pt = vertices[idx];
 
             const double signedDistance = m_implicitGeomA->getFunctionValue(pt);
             if (signedDistance < 0.0)

@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+      http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,8 @@
 
 #include "imstkMath.h"
 #include "imstkTypes.h"
+#include "imstkVecDataArray.h"
+
 #include <memory>
 #include <numeric>
 #include <queue>
@@ -40,6 +42,8 @@ class vtkPointData;
 class vtkPoints;
 class vtkPointSet;
 class vtkUnstructuredGrid;
+
+class vtkDataSetAttributes;
 
 namespace imstk
 {
@@ -104,36 +108,31 @@ vtkSmartPointer<vtkImageData> coupleVtkImageData(std::shared_ptr<ImageData> imst
 ///
 /// \brief Copy functions, these copy to/from vtk data objects
 ///
-vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray, int numComps = 1);
+vtkSmartPointer<vtkDataArray> copyToVtkDataArray(std::shared_ptr<AbstractDataArray> imstkArray);
 std::shared_ptr<AbstractDataArray> copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray);
 
-std::unique_ptr<ImageData> copyToImageData(vtkSmartPointer<vtkImageData> imageDataVtk);
+std::shared_ptr<ImageData> copyToImageData(vtkSmartPointer<vtkImageData> imageDataVtk);
 vtkSmartPointer<vtkImageData> copyToVtkImageData(std::shared_ptr<ImageData> imageData);
 
 ///
 /// \brief Converts vtk polydata into a imstk point set
 ///
-std::unique_ptr<PointSet> copyToPointSet(vtkSmartPointer<vtkPointSet> vtkMesh);
+std::shared_ptr<PointSet> copyToPointSet(vtkSmartPointer<vtkPointSet> vtkMesh);
 
 ///
 /// \brief Converts vtk polydata into a imstk surface mesh
 ///
-std::unique_ptr<SurfaceMesh> copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
+std::shared_ptr<SurfaceMesh> copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
 ///
 /// \brief Converts vtk polydata into a imstk surface mesh
 ///
-std::unique_ptr<LineMesh> copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
+std::shared_ptr<LineMesh> copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh);
 
 ///
 /// \brief Get imstk volumetric mesh given vtkUnstructuredGrid as input
 ///
-std::unique_ptr<VolumetricMesh> copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
-
-///
-/// \brief Smart copy will try to tell the type of the input mesh to convert to imstk
-///
-//std::shared_ptr<PointSet> smartCopyToVtkPolyData(vtkSmartPointer<vtkPointSet> vtkMesh);
+std::shared_ptr<VolumetricMesh> copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh);
 
 ///
 /// \brief Converts imstk point set into a vtk polydata
@@ -161,31 +160,37 @@ vtkSmartPointer<vtkUnstructuredGrid> copyToVtkUnstructuredGrid(std::shared_ptr<T
 vtkSmartPointer<vtkUnstructuredGrid> copyToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
 
 ///
-/// \brief Copy from vtk points to a imstk vertices array (StdVectorOfVec3d)
+/// \brief Copy from vtk points to a imstk vertices array
 ///
-void copyVerticesFromVtk(vtkPoints* const points, StdVectorOfVec3d& vertices);
+std::shared_ptr<VecDataArray<double, 3>> copyToVecDataArray(vtkSmartPointer<vtkPoints> points);
 
 ///
 /// \brief Copies vertices from imstk structure to VTK one
 ///
-void copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points);
+vtkSmartPointer<vtkPoints> copyToVtkPoints(std::shared_ptr<VecDataArray<double, 3>> vertices);
 
 ///
 /// \brief Copies cells of the given dimension from imstk structure to VTK one
 ///
 template<size_t dim>
-void copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells);
+vtkSmartPointer<vtkCellArray> copyToVtkCellArray(std::shared_ptr<VecDataArray<int, dim>> cells);
 
 ///
-/// \brief
+/// \brief Copy from vtk cells to an imstk index array
 ///
 template<size_t dim>
-void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t, dim>>& cells);
+std::shared_ptr<VecDataArray<int, dim>> copyToVecDataArray(vtkCellArray* vtkCells);
 
 ///
-/// \brief
+/// \brief Copy vtkPointData to a data map
 ///
-void copyPointDataFromVtk(vtkPointData* const pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
+void copyToDataMap(vtkDataSetAttributes* const pointData, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
+
+///
+/// \brief Copy from a data map to vtkDataAttributes (used for vtkCellData and vtkPointData)
+/// warning: Components are lost and DataArray's presented as single component
+///
+void copyToVtkDataAttributes(vtkDataSetAttributes* pointData, const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
 
 ///
 /// \brief Produces SurfaceMesh cube from imstkCube
@@ -227,12 +232,12 @@ double getVolume(std::shared_ptr<SurfaceMesh> surfMesh);
 ///
 /// \note Refer: Dompierre, Julien & Labbé, Paul & Vallet, Marie-Gabrielle & Camarero, Ricardo. (1999).
 /// How to Subdivide Pyramids, Prisms, and Hexahedra into Tetrahedra.. 195-204.
-std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const size_t nx, const size_t ny, const size_t nz);
+std::shared_ptr<TetrahedralMesh> createUniformMesh(const Vec3d& aabbMin, const Vec3d& aabbMax, const int nx, const int ny, const int nz);
 
 ///
 /// \brief Create a tetrahedral mesh cover
 ///
-std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh, const size_t nx, const size_t ny, size_t nz);
+std::shared_ptr<TetrahedralMesh> createTetrahedralMeshCover(std::shared_ptr<SurfaceMesh> surfMesh, const int nx, const int ny, int nz);
 
 ///
 /// \brief Enumeration for reordering method

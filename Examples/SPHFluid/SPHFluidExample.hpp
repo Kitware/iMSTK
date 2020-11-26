@@ -126,7 +126,7 @@ main(int argc, char* argv[])
             [&](Event*)
             {
                 statusManager->setCustomStatus("Number of particles: " +
-                    std::to_string(fluidObj->getSPHModel()->getState().getNumParticles()) +
+                    std::to_string(fluidObj->getSPHModel()->getCurrentState()->getNumParticles()) +
                     "\nNumber of solids: " + std::to_string(solids.size()));
             });
 
@@ -151,6 +151,8 @@ main(int argc, char* argv[])
         sceneManager->requestStatus(ThreadStatus::Paused);
         viewer->start();
     }
+
+    //MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry()), "fluid.vtk");
 
     return 0;
 }

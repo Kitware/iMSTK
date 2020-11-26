@@ -41,7 +41,16 @@ public:
     ///
     vtkSmartPointer<vtkVolumeProperty> getVolumeProperty();
 
+    bool getUseAutoSample() const { return m_useAutoSample; }
+    void setUseAutoSample(bool useAutoSample) { m_useAutoSample = useAutoSample; }
+
+    double getSampleDistance() const { return m_sampleDistance; }
+    void setSampleDistance(double sampleDistance) { m_sampleDistance = sampleDistance; }
+
 protected:
     vtkSmartPointer<vtkVolumeProperty> m_property;
+
+    bool   m_useAutoSample  = true;
+    double m_sampleDistance = 0.0;
 };
 }

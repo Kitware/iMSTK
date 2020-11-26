@@ -108,14 +108,14 @@ createAndAddPbdObject(const std::string& tetMeshName)
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
     imstkNew<SurfaceMesh> surfMesh;
     tetMesh->extractSurfaceMesh(surfMesh, true);
+    surfMesh->flipNormals();
 
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-    material->setColor(Color(220. / 255.0, 100. / 255.0, 70. / 255.0));
+    material->setColor(Color(220.0 / 255.0, 100.0 / 255.0, 70.0 / 255.0));
     material->setMetalness(100.9f);
-    material->setRoughness(0.5);
+    material->setRoughness(0.5f);
     material->setEdgeColor(Color::Teal);
-    material->setAmbientLightCoeff(50.);
     material->setShadingModel(RenderMaterial::ShadingModel::Phong);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     imstkNew<VisualModel> visualModel(surfMesh.get());
@@ -142,7 +142,7 @@ createAndAddPbdObject(const std::string& tetMeshName)
     // Set the parameters
     pbdModel->configure(pbdParams);
     pbdModel->setDefaultTimeStep(0.02);
-    pbdModel->setTimeStepSizeType(imstk::TimeSteppingType::Fixed);
+    pbdModel->setTimeStepSizeType(TimeSteppingType::Fixed);
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->addVisualModel(visualModel);

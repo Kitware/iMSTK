@@ -23,53 +23,52 @@
 #include "imstkCube.h"
 #include "imstkVisualModel.h"
 
+#include <vtkActor.h>
 #include <vtkCubeSource.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {
-VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
+VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
 {
-    m_visualModel = visualModel;
-
     //auto geometry = std::static_pointer_cast<Cube>(visualModel->getGeometry());
 
-    auto cubeSource = vtkSmartPointer<vtkCubeSource>::New();
+    vtkNew<vtkCubeSource> cubeSource;
     cubeSource->SetCenter(0, 0, 0);
     cubeSource->SetXLength(1.0);
     cubeSource->SetYLength(1.0);
     cubeSource->SetZLength(1.0);
 
-    m_transformFilter->SetInputConnection(cubeSource->GetOutputPort());
-    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputConnection(cubeSource->GetOutputPort());
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+    }
 
-    this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKCubeRenderDelegate::updateDataSource()
+VTKCubeRenderDelegate::processEvents()
 {
+    VTKRenderDelegate::processEvents();
+
+    // Don't use events for primitives, just always update
     auto geometry = std::static_pointer_cast<Cube>(m_visualModel->getGeometry());
 
-    if (!geometry->m_dataModified)
-    {
-        return;
-    }
-
-    Geometry::DataType type = Geometry::DataType::PreTransform;
-
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
-    T.scale(geometry->getWidth(type));
+    T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
+    T.scale(geometry->getWidth(Geometry::DataType::PostTransform));
     T.matrix().transposeInPlace();
 
-    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
-    vtkT->SetMatrix(T.data());
-
-    geometry->m_dataModified = false;
+    m_transform->SetMatrix(T.data());
 }
 } // imstk

@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Returns the volume
     ///
-    double getVolume() const override;
+    double getVolume() override;
 
     ///
     /// \brief Returns the dimensions of the image
@@ -124,6 +124,14 @@ public:
         m_bounds[5] = m_origin.z() + size.z();
 
         return m_bounds;
+    }
+
+    // Can't implement because of const
+    void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double imstkNotUsed(paddingPercent)) override
+    {
+        const Vec6d& bounds = getBounds();
+        lowerCorner = Vec3d(bounds[0], bounds[2], bounds[4]);
+        upperCorner = Vec3d(bounds[1], bounds[3], bounds[5]);
     }
 
     ///

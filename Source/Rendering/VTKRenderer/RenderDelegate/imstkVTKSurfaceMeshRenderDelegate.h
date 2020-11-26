@@ -22,27 +22,32 @@
 #pragma once
 
 #include "imstkTextureManager.h"
-#include "imstkVTKRenderDelegate.h"
+#include "imstkVTKPolyDataRenderDelegate.h"
 #include "imstkVTKTextureDelegate.h"
 
+class vtkCellArray;
+class vtkDataArray;
 class vtkDoubleArray;
+class vtkFloatArray;
+class vtkPolyData;
 
 namespace imstk
 {
 class SurfaceMesh;
+template<typename T, int N> class VecDataArray;
 
 ///
 /// \class VTKSurfaceMeshRenderDelegate
 ///
 /// \brief Surface mesh render delegate with VTK backend
 ///
-class VTKSurfaceMeshRenderDelegate : public VTKRenderDelegate
+class VTKSurfaceMeshRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -50,9 +55,9 @@ public:
     virtual ~VTKSurfaceMeshRenderDelegate() override = default;
 
     ///
-    /// \brief Update polydata source based on the surface mesh geometry
+    /// \brief Event handler
     ///
-    void updateDataSource() override;
+    void processEvents() override;
 
     ///
     /// \brief Initialize textures
@@ -60,9 +65,30 @@ public:
     void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
 
 protected:
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;    ///> Mapped array of vertices
-    vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;    ///> Mapped array of normals
-    vtkSmartPointer<vtkDoubleArray> m_mappedTangentArray;   ///> Mapped array of tangents
-    vtkSmartPointer<vtkDoubleArray> m_mappedScalarArray;    ///> Mapped array of scalars
+    ///
+    /// \brief Callback for when vertex values are modified
+    ///
+    void vertexDataModified(Event* e);
+    //void indexDataModified(Event* e);
+
+    ///
+    /// \brief Callback for when geometry is modified
+    ///
+    void geometryModified(Event* e);
+
+protected:
+    std::shared_ptr<VecDataArray<double, 3>> m_vertices;
+    std::shared_ptr<VecDataArray<double, 3>> m_normals;
+    std::shared_ptr<VecDataArray<int, 3>>    m_indices;
+
+    vtkSmartPointer<vtkPolyData> m_polydata;
+
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
+    vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;       ///> Mapped array of normals
+    vtkSmartPointer<vtkDoubleArray> m_mappedTangentArray;      ///> Mapped array of tangents
+    vtkSmartPointer<vtkFloatArray>  m_mappedTCoordsArray;      ///> Mapped array of tcoords
+    vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
+    vtkSmartPointer<vtkDataArray>   m_mappedCellScalarArray;   ///> Mapped array of scalars
+    vtkSmartPointer<vtkCellArray>   m_cellArray;               ///> Array of cells
 };
 }

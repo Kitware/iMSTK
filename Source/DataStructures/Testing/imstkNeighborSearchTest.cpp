@@ -23,6 +23,7 @@
 
 #include "imstkSpatialHashTableSeparateChaining.h"
 #include "imstkGridBasedNeighborSearch.h"
+#include "imstkVecDataArray.h"
 
 using namespace imstk;
 
@@ -36,7 +37,7 @@ using namespace imstk;
 /// \brief Advance particle positions
 ///
 void
-advancePositions(StdVectorOfVec3r& particles)
+advancePositions(VecDataArray<double, 3>& particles)
 {
     for (auto& pos: particles)
     {
@@ -50,7 +51,7 @@ advancePositions(StdVectorOfVec3r& particles)
 /// \brief Search neighbors using brute-force approach
 ///
 void
-neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
+neighborSearchBruteForce(VecDataArray<double, 3>& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -83,7 +84,7 @@ neighborSearchBruteForce(StdVectorOfVec3r& particles, std::vector<std::vector<si
 /// \brief Search neighbors using grid-based approach
 ///
 void
-neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
+neighborSearchGridBased(VecDataArray<double, 3>& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
     const Real                     radius = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -96,7 +97,7 @@ neighborSearchGridBased(StdVectorOfVec3r& particles, std::vector<std::vector<siz
 /// \brief Search neighbors using spatial hashing approach
 ///
 void
-neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::vector<size_t>>& neighbors)
+neighborSearchSpatialHashing(VecDataArray<double, 3>& particles, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(particles.size());
     for (auto& list : neighbors)
@@ -122,7 +123,7 @@ neighborSearchSpatialHashing(StdVectorOfVec3r& particles, std::vector<std::vecto
 /// \brief For each particle in setA, search neighbors in setB using brute-force approach
 ///
 void
-neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
+neighborSearchBruteForce(VecDataArray<double, 3>& setA, VecDataArray<double, 3>& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
     const Real radius    = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -150,7 +151,7 @@ neighborSearchBruteForce(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::ve
 /// \brief For each particle in setA, search neighbors in setB using grid-based approach
 ///
 void
-neighborSearchGridBased(StdVectorOfVec3r& setA, StdVectorOfVec3r& setB, std::vector<std::vector<size_t>>& neighbors)
+neighborSearchGridBased(VecDataArray<double, 3>& setA, VecDataArray<double, 3>& setB, std::vector<std::vector<size_t>>& neighbors)
 {
     neighbors.resize(setA.size());
     const Real                     radius = Real(4.000000000000001) * PARTICLE_RADIUS;
@@ -211,7 +212,7 @@ TEST_F(dummyClass, CompareGridSearchAndSpatialHashing)
     const auto  spacing = Real(2) * PARTICLE_RADIUS;
     const int   N       = int(2 * SPHERE_RADIUS / spacing);
 
-    StdVectorOfVec3r particles;
+    VecDataArray<double, 3> particles;
     particles.reserve(N * N * N);
     const Vec3r corner = sphereCenter - Vec3r(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS);
 
@@ -277,8 +278,8 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         }
     }
 
-    StdVectorOfVec3r                 setA;
-    StdVectorOfVec3r                 setB;
+    VecDataArray<double, 3>          setA;
+    VecDataArray<double, 3>          setB;
     std::vector<std::vector<size_t>> neighbors0;
     std::vector<std::vector<size_t>> neighbors1;
 
@@ -287,8 +288,8 @@ TEST_F(dummyClass, TestGridSearchFromDifferentPointSet)
         // separate verts into setA and setB randomly
         setA.resize(0);
         setB.resize(0);
-        setA.reserve(particles.size());
-        setB.reserve(particles.size());
+        setA.reserve(static_cast<int>(particles.size()));
+        setB.reserve(static_cast<int>(particles.size()));
 
         for (size_t i = 0; i < particles.size(); ++i)
         {

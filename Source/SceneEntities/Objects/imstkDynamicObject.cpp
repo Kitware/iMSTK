@@ -24,6 +24,7 @@
 #include "imstkGeometryMap.h"
 #include "imstkLogger.h"
 #include "imstkTaskGraph.h"
+#include "imstkVisualModel.h"
 
 namespace imstk
 {
@@ -55,6 +56,8 @@ DynamicObject::updateGeometries()
     {
         CollidingObject::updateGeometries();
     }
+
+    SceneObject::updateGeometries();
 }
 
 void

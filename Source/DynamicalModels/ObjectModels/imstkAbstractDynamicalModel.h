@@ -98,12 +98,6 @@ public:
     const DynamicalModelType& getType() const { return m_type; }
 
     ///
-    /// \brief Update states
-    /// \todo: Fem specific, needs to be moved
-    ///
-    virtual void updateBodyStates(const Vectord& q, const StateUpdateType updateType = StateUpdateType::Displacement) = 0;
-
-    ///
     /// \brief Update the geometry of the model
     ///
     virtual void updatePhysicsGeometry() { }

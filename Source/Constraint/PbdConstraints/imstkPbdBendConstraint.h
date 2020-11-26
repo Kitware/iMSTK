@@ -36,7 +36,11 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdBendConstraint() : PbdConstraint() { m_vertexIds.resize(3); }
+    PbdBendConstraint() : PbdConstraint()
+    {
+        m_vertexIds.resize(3);
+        m_dcdx.resize(3);
+    }
 
     ///
     /// \brief Returns PBD constraint of type Type::Bend
@@ -59,16 +63,17 @@ public:
         \param k stiffness
     */
     void initConstraint(
-        const StdVectorOfVec3d& initVertexPositions,
+        const VecDataArray<double, 3>& initVertexPositions,
         const size_t& pIdx1, const size_t& pIdx2,
         const size_t& pIdx3, const double k);
 
     ///
     /// \brief Compute the value and gradient of constraint
     ///
-    bool computeValueAndGradient(const StdVectorOfVec3d& currVertexPosition,
-                                 double&                 c,
-                                 StdVectorOfVec3d&       dcdx) const override;
+    bool computeValueAndGradient(
+        const VecDataArray<double, 3>& currVertexPosition,
+        double& c,
+        std::vector<Vec3d>& dcdx) const override;
 public:
     double m_restLength = 0.; ///> Rest length
 };

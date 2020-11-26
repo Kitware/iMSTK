@@ -36,7 +36,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const std::string& name = std::string("")) : AnalyticalGeometry(Type::Capsule, name) {}
+    Capsule(const std::string& name = std::string("defaultCapsule")) : AnalyticalGeometry(Type::Capsule, name) {}
 
     ///
     /// \brief Print the capsule info
@@ -46,7 +46,7 @@ public:
     ///
     /// \brief Returns the volume of the capsule
     ///
-    double getVolume() const override;
+    double getVolume() override { return PI * m_radius * m_radius * (m_length + 4.0 / 3.0 * m_radius); }
 
     ///
     /// \brief Returns the radius of the capsule

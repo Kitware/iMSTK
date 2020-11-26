@@ -54,9 +54,6 @@
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
 
-// global variables
-const std::string phantomOmni1Name = "Default Device";
-
 using namespace imstk;
 
 // Parameters to play with
@@ -74,51 +71,47 @@ makeClothGeometry(const double width,
                   const int    nRows,
                   const int    nCols)
 {
-    imstkNew<SurfaceMesh> clothMesh;
+    imstkNew<SurfaceMesh> clothMesh("Cloth_SurfaceMesh");
 
-    StdVectorOfVec3d vertList;
-    vertList.resize(nRows * nCols);
-    const double dy = width / (double)(nCols - 1);
-    const double dx = height / (double)(nRows - 1);
-    for (int i = 0; i < nRows; ++i)
+    imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
+    VecDataArray<double, 3>&          vertices = *verticesPtr.get();
+    const double                      dy       = width / static_cast<double>(nCols - 1);
+    const double                      dx       = height / static_cast<double>(nRows - 1);
+    for (int i = 0; i < nRows; i++)
     {
         for (int j = 0; j < nCols; j++)
         {
-            vertList[i * nCols + j] = Vec3d((double)dx * i, 1.0, (double)dy * j);
+            vertices[i * nCols + j] = Vec3d(dx * static_cast<double>(i), 1.0, dy * static_cast<double>(j));
         }
     }
-    clothMesh->setInitialVertexPositions(vertList);
-    clothMesh->setVertexPositions(vertList);
 
     // Add connectivity data
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    for (std::size_t i = 0; i < nRows - 1; ++i)
+    imstkNew<VecDataArray<int, 3>> indicesPtr;
+    VecDataArray<int, 3>&          indices = *indicesPtr.get();
+    for (int i = 0; i < nRows - 1; i++)
     {
-        for (std::size_t j = 0; j < nCols - 1; j++)
+        for (int j = 0; j < nCols - 1; j++)
         {
-            SurfaceMesh::TriangleArray tri[2];
-            const size_t               index1 = i * nCols + j;
-            const size_t               index2 = index1 + nCols;
-            const size_t               index3 = index1 + 1;
-            const size_t               index4 = index2 + 1;
+            const int index1 = i * nCols + j;
+            const int index2 = index1 + nCols;
+            const int index3 = index1 + 1;
+            const int index4 = index2 + 1;
 
-            // Interleave [/][\]
+            // Interleave [/][\] pattern
             if (i % 2 ^ j % 2)
             {
-                tri[0] = { { index1, index2, index3 } };
-                tri[1] = { { index4, index3, index2 } };
+                indices.push_back(Vec3i(index1, index2, index3));
+                indices.push_back(Vec3i(index4, index3, index2));
             }
             else
             {
-                tri[0] = { { index2, index4, index1 } };
-                tri[1] = { { index4, index3, index1 } };
+                indices.push_back(Vec3i(index2, index4, index1));
+                indices.push_back(Vec3i(index4, index3, index1));
             }
-            triangles.push_back(tri[0]);
-            triangles.push_back(tri[1]);
         }
     }
 
-    clothMesh->setTrianglesVertices(triangles);
+    clothMesh->initialize(verticesPtr, indicesPtr);
 
     return clothMesh;
 }
@@ -182,12 +175,13 @@ main()
 
     // Scene
     imstkNew<Scene> scene("PBDPicking");
+    scene->getConfig()->writeTaskGraph = true;
 
     // Create the virtual coupling object controller
 
     // Device Server
     imstkNew<HapticDeviceManager>       server;
-    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient(phantomOmni1Name);
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
 
     // Load the meshes
     auto upperSurfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/laptool/upper.obj");
@@ -200,7 +194,7 @@ main()
     geomShaft->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 10.0));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(pivotSurfMesh);
+    objShaft->setVisualGeometry(geomShaft);
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
@@ -210,7 +204,7 @@ main()
     geomUpperJaw->setRadius(1.0);
     geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
-    objUpperJaw->setVisualGeometry(upperSurfMesh);
+    objUpperJaw->setVisualGeometry(geomUpperJaw);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
@@ -220,7 +214,7 @@ main()
     geomLowerJaw->setRadius(1.0);
     geomLowerJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(lowerSurfMesh);
+    objLowerJaw->setVisualGeometry(geomLowerJaw);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 
@@ -239,7 +233,7 @@ main()
     scene->getCollisionGraph()->addInteraction(lowerJawPickingPair);
 
     // Camera
-    scene->getActiveCamera()->setPosition(Vec3d(1, 1, 1) * 100.0);
+    scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, -50, 0));
 
     // Light
@@ -286,7 +280,7 @@ main()
                 chLower->activatePickConstraints();
             }
             // Unpick
-            if (client->getButton(0))
+            else if (client->getButton(0))
             {
                 chUpper->removePickConstraints();
                 chLower->removePickConstraints();

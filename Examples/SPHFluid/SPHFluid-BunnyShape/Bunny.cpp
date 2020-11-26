@@ -1,35 +1,38 @@
 /*=========================================================================
 
-   Library: iMSTK
+  Library: iMSTK
 
-   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
-   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+  Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+  & Imaging in Medicine, Rensselaer Polytechnic Institute.
 
-   Licensed under the Apache License, Version 2.0 (the "License",
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+  Licensed under the Apache License, Version 2.0 (the "License",
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+     http://www.apache.org/licenses/LICENSE-2.0.txt
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
 
 =========================================================================*/
 
 #include "imstkMath.h"
+#include "imstkVecDataArray.h"
+
 using namespace imstk;
 
 // Hard-code a point set of particles sampled inside a Stanford bunny
 // Num. particles: 8834
-StdVectorOfVec3d
+std::shared_ptr<VecDataArray<double, 3>>
 getBunny()
 {
-    StdVectorOfVec3d bunny;
+    std::shared_ptr<VecDataArray<double, 3>> bunnyVertices = std::make_shared<VecDataArray<double, 3>>();
+    VecDataArray<double, 3>&                 bunny = *bunnyVertices;
     bunny.resize(8834);
-    double buff[] {
+    double buff[]{
         -1.92681599, -2.64812398, 0.0674370006,
         -1.78630209, -2.74101901, 0.0469290018,
         -1.62241495, -2.74305606, -0.015261,
@@ -8865,6 +8868,8 @@ getBunny()
         -2.04835486, 1.15671599, 1.65011394,
         -1.88642406, 1.09164298, 1.64730597
     };
-    std::memcpy(bunny.data(), buff, sizeof(buff));
-    return bunny;
+
+    std::memcpy(bunny.getPointer(), buff, sizeof(buff));
+
+    return bunnyVertices;
 }

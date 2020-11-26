@@ -24,11 +24,11 @@
 namespace imstk
 {
 void
-PbdAreaConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
-                                  const size_t&           pIdx0,
-                                  const size_t&           pIdx1,
-                                  const size_t&           pIdx2,
-                                  const double            k)
+PbdAreaConstraint::initConstraint(const VecDataArray<double, 3>& initVertexPositions,
+                                  const size_t& pIdx0,
+                                  const size_t& pIdx1,
+                                  const size_t& pIdx2,
+                                  const double k)
 {
     m_vertexIds[0] = pIdx0;
     m_vertexIds[1] = pIdx1;
@@ -45,9 +45,10 @@ PbdAreaConstraint::initConstraint(const StdVectorOfVec3d& initVertexPositions,
 }
 
 bool
-PbdAreaConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositions,
-                                           double&                 c,
-                                           StdVectorOfVec3d&       dcdx) const
+PbdAreaConstraint::computeValueAndGradient(
+    const VecDataArray<double, 3>& currVertexPositions,
+    double& c,
+    std::vector<Vec3d>& dcdx) const
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];
@@ -72,7 +73,6 @@ PbdAreaConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPos
     n /= 2 * c;
     c -= m_restArea;
 
-    dcdx.resize(3);
     dcdx[0] = e1.cross(n);
     dcdx[1] = e2.cross(n);
     dcdx[2] = e0.cross(n);

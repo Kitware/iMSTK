@@ -40,11 +40,11 @@ PbdPointTriangleConstraint::initConstraint(const size_t&                        
 }
 
 bool
-PbdPointTriangleConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
-                                                    const StdVectorOfVec3d& currVertexPositionsB,
-                                                    double&                 c,
-                                                    StdVectorOfVec3d&       dcdxA,
-                                                    StdVectorOfVec3d&       dcdxB) const
+PbdPointTriangleConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
+                                                    const VecDataArray<double, 3>& currVertexPositionsB,
+                                                    double& c,
+                                                    VecDataArray<double, 3>& dcdxA,
+                                                    VecDataArray<double, 3>& dcdxB) const
 {
     const size_t i0 = m_bodiesFirst[0];
     const size_t i1 = m_bodiesSecond[0];

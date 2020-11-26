@@ -74,7 +74,7 @@ main()
         imstkNew<VisualObject>   volObject("VolObj");
         imstkNew<RenderMaterial> tetMaterial;
         tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
-        tetMaterial->setEdgeColor(Color::Teal);
+        tetMaterial->setColor(Color::Teal);
         tetMaterial->setPointSize(7.0);
         tetMaterial->setLineWidth(3.0);
         imstkNew<VisualModel> tetVisualModel(tetMesh, tetMaterial);

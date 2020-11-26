@@ -23,52 +23,52 @@
 #include "imstkCapsule.h"
 #include "imstkVisualModel.h"
 
+#include <vtkActor.h>
 #include <vtkCapsuleSource.h>
+#include <vtkPolyDataMapper.h>
 #include <vtkTransform.h>
-#include <vtkTransformPolyDataFilter.h>
 
 namespace imstk
 {
-VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
-    m_transformFilter(vtkSmartPointer<vtkTransformPolyDataFilter>::New())
+VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
 {
-    m_visualModel = visualModel;
     auto geometry = std::static_pointer_cast<Capsule>(visualModel->getGeometry());
 
-    Geometry::DataType type = Geometry::DataType::PreTransform;
-    auto               capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
-    capsuleSource->SetRadius(geometry->getRadius(type));
-    capsuleSource->SetCylinderLength(geometry->getLength(type));
+    vtkNew<vtkCapsuleSource> capsuleSource;
+    capsuleSource->SetRadius(1.0);
+    capsuleSource->SetCylinderLength(geometry->getLength());
     capsuleSource->SetLatLongTessellation(20);
     capsuleSource->SetPhiResolution(20);
     capsuleSource->SetThetaResolution(20);
 
-    m_transformFilter->SetInputConnection(capsuleSource->GetOutputPort());
-    m_transformFilter->SetTransform(vtkSmartPointer<vtkTransform>::New());
+    // Setup mapper
+    {
+        vtkNew<vtkPolyDataMapper> mapper;
+        mapper->SetInputConnection(capsuleSource->GetOutputPort());
+        vtkNew<vtkActor> actor;
+        actor->SetMapper(mapper);
+        actor->SetUserTransform(m_transform);
+        m_mapper = mapper;
+        m_actor  = actor;
+    }
 
-    this->update();
-    this->setUpMapper(m_transformFilter->GetOutputPort(), m_visualModel);
+    update();
+    updateRenderProperties();
 }
 
 void
-VTKCapsuleRenderDelegate::updateDataSource()
+VTKCapsuleRenderDelegate::processEvents()
 {
-    auto geometry = std::static_pointer_cast<Capsule>(m_visualModel->getGeometry());
-    if (!geometry->m_dataModified)
-    {
-        return;
-    }
+    VTKRenderDelegate::processEvents();
 
-    Geometry::DataType type = Geometry::DataType::PreTransform;
+    // Don't use events for primitives, just always update
+    auto geometry = std::static_pointer_cast<Capsule>(m_visualModel->getGeometry());
 
     AffineTransform3d T = AffineTransform3d::Identity();
-    T.translate(geometry->getPosition(type));
-    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(type)));
+    T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
+    T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
     T.matrix().transposeInPlace();
 
-    auto vtkT = vtkTransform::SafeDownCast(m_transformFilter->GetTransform());
-    vtkT->SetMatrix(T.data());
-
-    geometry->m_dataModified = false;
+    m_transform->SetMatrix(T.data());
 }
 } // imstk

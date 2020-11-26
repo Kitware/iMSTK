@@ -41,7 +41,7 @@
 
 using namespace imstk;
 
-std::shared_ptr<DynamicObject> createAndAddFEDeformable(std::shared_ptr<Scene> scene, std::shared_ptr<TetrahedralMesh> tetMesh);
+std::shared_ptr<FeDeformableObject> makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh);
 
 enum Geom
 {
@@ -76,7 +76,7 @@ main()
     }
     else if (geom == Heart)
     {
-        input.meshFileName = iMSTK_DATA_ROOT "/heart/heart.veg";
+        input.meshFileName = iMSTK_DATA_ROOT "textured_organs/heart_volume.vtk";
         input.fixedNodeIds = { 75, 82, 84, 94, 95, 105, 110, 124, 139, 150, 161, 171, 350 };
     }
 
@@ -88,16 +88,17 @@ main()
         cam->setFocalPoint(0.0, 0.0, 0.0);
 
         // Load a tetrahedral mesh
-        auto tetMesh = MeshIO::read<TetrahedralMesh>(input.meshFileName);
+        std::shared_ptr<TetrahedralMesh> tetMesh = MeshIO::read<TetrahedralMesh>(input.meshFileName);
         CHECK(tetMesh != nullptr) << "Could not read mesh from file.";
 
         // Scene object 1: fe-FeDeformableObject
-        std::shared_ptr<DynamicObject> deformableObj = createAndAddFEDeformable(scene, tetMesh);
+        std::shared_ptr<FeDeformableObject> deformableObj = makeFEDeformableObject(tetMesh);
+        scene->addSceneObject(deformableObj);
 
         // Scene object 2: Plane
         imstkNew<Plane> planeGeom;
-        planeGeom->setWidth(40);
-        planeGeom->setPosition(0, -6, 0);
+        planeGeom->setWidth(40.0);
+        planeGeom->setPosition(0.0, -6.0, 0.0);
         imstkNew<CollidingObject> planeObj("Plane");
         planeObj->setVisualGeometry(planeGeom);
         planeObj->setCollidingGeometry(planeGeom);
@@ -141,12 +142,12 @@ main()
     return 0;
 }
 
-std::shared_ptr<DynamicObject>
-createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
-                         std::shared_ptr<TetrahedralMesh> tetMesh)
+std::shared_ptr<FeDeformableObject>
+makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
 {
     imstkNew<SurfaceMesh> surfMesh;
     tetMesh->extractSurfaceMesh(surfMesh, true);
+    surfMesh->flipNormals();
 
     // Configure dynamic model
     imstkNew<FEMDeformableBodyModel> dynaModel;
@@ -162,8 +163,8 @@ createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
 
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    mat->setPointSize(10.);
-    mat->setLineWidth(4.);
+    mat->setPointSize(10.0);
+    mat->setLineWidth(4.0);
     mat->setEdgeColor(Color::Orange);
     imstkNew<VisualModel> surfMeshModel(surfMesh.get());
     surfMeshModel->setRenderMaterial(mat);
@@ -175,7 +176,6 @@ createAndAddFEDeformable(std::shared_ptr<Scene>           scene,
     // Map simulated geometry to visual
     deformableObj->setPhysicsToVisualMap(std::make_shared<OneToOneMap>(tetMesh, surfMesh));
     deformableObj->setDynamicalModel(dynaModel);
-    scene->addSceneObject(deformableObj);
 
     return deformableObj;
 }

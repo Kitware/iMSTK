@@ -40,11 +40,11 @@ PbdEdgeEdgeConstraint::initConstraint(const size_t&                             
 }
 
 bool
-PbdEdgeEdgeConstraint::computeValueAndGradient(const StdVectorOfVec3d& currVertexPositionsA,
-                                               const StdVectorOfVec3d& currVertexPositionsB,
-                                               double&                 cc,
-                                               StdVectorOfVec3d&       dcdxA,
-                                               StdVectorOfVec3d&       dcdxB) const
+PbdEdgeEdgeConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
+                                               const VecDataArray<double, 3>& currVertexPositionsB,
+                                               double& cc,
+                                               VecDataArray<double, 3>& dcdxA,
+                                               VecDataArray<double, 3>& dcdxB) const
 {
     const auto i0 = m_bodiesFirst[0];
     const auto i1 = m_bodiesFirst[1];

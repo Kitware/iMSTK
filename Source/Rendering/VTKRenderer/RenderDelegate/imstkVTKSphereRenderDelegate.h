@@ -21,25 +21,24 @@
 
 #pragma once
 
-#include "imstkVTKRenderDelegate.h"
-
-class vtkTransformPolyDataFilter;
+#include "imstkVTKPolyDataRenderDelegate.h"
 
 namespace imstk
 {
 class VisualModel;
+
 ///
 /// \class VTKSphereRenderDelegate
 ///
 /// \brief Sphere object render delegate with VTK backend
 ///
-class VTKSphereRenderDelegate : public VTKRenderDelegate
+class VTKSphereRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKSphereRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
@@ -49,9 +48,6 @@ public:
     ///
     /// \brief Update sphere source based on the sphere geometry
     ///
-    void updateDataSource() override;
-
-protected:
-    vtkSmartPointer<vtkTransformPolyDataFilter> m_transformFilter;
+    void processEvents() override;
 };
 } // imstk
