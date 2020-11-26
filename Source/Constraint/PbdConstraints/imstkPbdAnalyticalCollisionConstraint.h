@@ -62,9 +62,9 @@ public:
     ///
     bool computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
                                  const VecDataArray<double, 3>& currVertexPositionsB,
-                                 double&                 c,
-        VecDataArray<double, 3>&       dcdxA,
-        VecDataArray<double, 3>&       dcdxB) const override;
+                                 double& c,
+                                 VecDataArray<double, 3>& dcdxA,
+                                 VecDataArray<double, 3>& dcdxB) const override;
 
 public:
     Vec3d m_penetrationVector = Vec3d::Zero();
