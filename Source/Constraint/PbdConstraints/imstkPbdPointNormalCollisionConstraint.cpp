@@ -27,21 +27,21 @@ namespace imstk
 {
 void
 PbdPointNormalCollisionConstraint::initConstraint(std::shared_ptr<PbdCollisionConstraintConfig> configA,
-                                                 const Vec3d& contactPt, const Vec3d& penetrationVector, const int nodeId)
+                                                  const Vec3d& contactPt, const Vec3d& penetrationVector, const int nodeId)
 {
     m_contactPt = contactPt;
     m_penetrationDepth = penetrationVector.norm();
     m_normal = penetrationVector.normalized();
-    m_bodiesFirst[0]    = nodeId;
+    m_bodiesFirst[0] = nodeId;
     m_configA = configA;
 }
 
 bool
 PbdPointNormalCollisionConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
-                                                          const VecDataArray<double, 3>& currVertexPositionsB,
-                                                          double& c,
-                                                          VecDataArray<double, 3>& dcdxA,
-                                                          VecDataArray<double, 3>& dcdxB) const
+                                                           const VecDataArray<double, 3>& currVertexPositionsB,
+                                                           double& c,
+                                                           VecDataArray<double, 3>& dcdxA,
+                                                           VecDataArray<double, 3>& dcdxB) const
 {
     // Current position during solve
     const Vec3d& x = currVertexPositionsA[m_bodiesFirst[0]];

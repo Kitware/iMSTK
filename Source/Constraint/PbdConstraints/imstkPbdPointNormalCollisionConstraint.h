@@ -40,7 +40,7 @@ public:
 
     ///
     /// \brief Destructor
-    /// 
+    ///
     ~PbdPointNormalCollisionConstraint() override = default;
 
 public:
@@ -74,8 +74,8 @@ public:
 
 public:
     //double m_penetrationDepth = 0.0;
-    Vec3d m_normal = Vec3d::Zero();
-    Vec3d m_contactPt = Vec3d::Zero();
+    Vec3d  m_normal    = Vec3d::Zero();
+    Vec3d  m_contactPt = Vec3d::Zero();
     double m_penetrationDepth = 0.0;
 };
 } // imstk
