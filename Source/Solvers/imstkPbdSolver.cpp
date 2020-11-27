@@ -134,6 +134,7 @@ PbdCollisionSolver::solve()
                 colDataIter++;
             }
         }
+
         m_collisionConstraints->clear();
         m_collisionConstraintsData->clear();
     }

@@ -27,7 +27,7 @@
 namespace imstk
 {
 class CollidingObject;
-class PbdAnalyticalCollisionConstraint;
+class PbdPointNormalCollisionConstraint;
 class PbdCollisionConstraint;
 class PbdCollisionSolver;
 class PbdObject;
@@ -97,6 +97,6 @@ private:
     std::shared_ptr<PbdCollisionSolver> m_pbdCollisionSolver = nullptr;
 
     std::vector<PbdCollisionConstraint*> m_PBDConstraints;              ///> List of PBD constraints
-    std::vector<PbdAnalyticalCollisionConstraint*> m_ACConstraintPool;  ///> PBD analytical constraints
+    std::vector<PbdPointNormalCollisionConstraint*> m_ACConstraintPool; ///> PBD analytical constraints
 };
 }

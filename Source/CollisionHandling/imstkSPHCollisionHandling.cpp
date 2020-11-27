@@ -104,11 +104,11 @@ SPHCollisionHandling::processCollisionData()
             m_colDetect->computeCollisionData();
         }
 
-        ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+        ParallelUtils::parallelFor(m_colData->PColData.getSize(),
             [&](const size_t idx)
             {
                 // Because of const, make some extra copies
-                const MeshToAnalyticalCollisionDataElement& cd = m_colData->MAColData[idx];
+                const PenetrationCollisionDataElement& cd = m_colData->PColData[idx];
                 const uint32_t pidx     = cd.nodeIdx;           // Fluid particle index
                 Vec3d penetrationVector = cd.penetrationVector; // This vector should point into solid object
 

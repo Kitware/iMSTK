@@ -21,30 +21,40 @@
 
 #pragma once
 
-#include "imstkPbdAnalyticalCollisionConstraint.h"
+#include "imstkPbdPointNormalCollisionConstraint.h"
 
 namespace imstk
 {
 void
-PbdAnalyticalCollisionConstraint::initConstraint(std::shared_ptr<PbdCollisionConstraintConfig> configA,
-                                                 const MeshToAnalyticalCollisionDataElement&   MAColData)
+PbdPointNormalCollisionConstraint::initConstraint(std::shared_ptr<PbdCollisionConstraintConfig> configA,
+                                                 const Vec3d& contactPt, const Vec3d& penetrationVector, const int nodeId)
 {
-    m_penetrationVector = MAColData.penetrationVector;
-    m_bodiesFirst[0]    = MAColData.nodeIdx;
+    m_contactPt = contactPt;
+    m_penetrationDepth = penetrationVector.norm();
+    m_normal = penetrationVector.normalized();
+    m_bodiesFirst[0]    = nodeId;
     m_configA = configA;
 }
 
 bool
-PbdAnalyticalCollisionConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
+PbdPointNormalCollisionConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
                                                           const VecDataArray<double, 3>& currVertexPositionsB,
                                                           double& c,
                                                           VecDataArray<double, 3>& dcdxA,
                                                           VecDataArray<double, 3>& dcdxB) const
 {
-    c = m_penetrationVector.norm();
+    // Current position during solve
+    const Vec3d& x = currVertexPositionsA[m_bodiesFirst[0]];
+
+    // Project diff onto normal
+    const Vec3d diff = x - m_contactPt;
+    // Actual penetration depth (thus far in solve)
+    c = std::max(std::min(diff.dot(-m_normal), m_penetrationDepth), 0.0);
+
     dcdxA.resize(1);
     dcdxB.resize(0);
-    dcdxA[0] = m_penetrationVector / c;
+    dcdxA[0] = -m_normal;
+
     return true;
 }
 } // imstk

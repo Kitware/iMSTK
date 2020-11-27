@@ -74,10 +74,10 @@ BoneDrillingCH::erodeBone()
 {
     auto boneTetMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
-    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
         [&](const size_t idx)
         {
-            auto& cd = m_colData->MAColData[idx];
+            auto& cd = m_colData->PColData[idx];
             if (m_nodeRemovalStatus[cd.nodeIdx])
             {
                 return;
@@ -107,7 +107,7 @@ BoneDrillingCH::processCollisionData()
 {
     // Check if any collisions
     const auto devicePosition = m_drill->getCollidingGeometry()->getTranslation();
-    if (m_colData->MAColData.isEmpty())
+    if (m_colData->PColData.isEmpty())
     {
         // Set the visual object position same as the colliding object position
         m_drill->getVisualGeometry()->setTranslation(devicePosition);
@@ -119,9 +119,9 @@ BoneDrillingCH::processCollisionData()
     // Aggregate collision data
     Vec3d  t = Vec3d::Zero();
     double maxDepthSqr = MIN_D;
-    for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
+    for (size_t i = 0; i < m_colData->PColData.getSize(); ++i)
     {
-        const auto& cd = m_colData->MAColData[i];
+        const auto& cd = m_colData->PColData[i];
         if (m_nodeRemovalStatus[cd.nodeIdx])
         {
             continue;

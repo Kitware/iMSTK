@@ -22,24 +22,28 @@
 #pragma once
 
 #include "imstkPbdCollisionConstraint.h"
-#include "imstkCollisionData.h"
 
 namespace imstk
 {
-struct MeshToAnalyticalCollisionDataElement;
 ////
-/// \class PbdAnalyticalCollisionConstraint
+/// \class PbdPointNormalCollisionConstraint
 ///
-/// \brief Area constraint for triangular face
+/// \brief This constraint allows us only to move only along a normal (penetrationVector) direction to try to converge on a contact/target point
 ///
-class PbdAnalyticalCollisionConstraint : public PbdCollisionConstraint
+class PbdPointNormalCollisionConstraint : public PbdCollisionConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    PbdAnalyticalCollisionConstraint() : PbdCollisionConstraint(1, 0) { }
+    PbdPointNormalCollisionConstraint() : PbdCollisionConstraint(1, 0) { }
 
+    ///
+    /// \brief Destructor
+    /// 
+    ~PbdPointNormalCollisionConstraint() override = default;
+
+public:
     ///
     /// \brief Returns the type of the pbd collision constraint
     ///
@@ -47,10 +51,12 @@ public:
 
     ///
     /// \brief initialize constraint
-    /// \param pIdxA1 index of the point from object1
+    /// \param contactPt, the point to resolve too (target point)
+    /// \param penetrationVector, the vector that gets us from current position x to contactPt
+    /// \param nodeId index of the point from object1 that we want to move
     /// \return
     ///
-    void initConstraint(std::shared_ptr<PbdCollisionConstraintConfig> configA, const MeshToAnalyticalCollisionDataElement& MAColData);
+    void initConstraint(std::shared_ptr<PbdCollisionConstraintConfig> configA, const Vec3d& contactPt, const Vec3d& penetrationVector, const int nodeId);
 
     ///
     /// \brief compute value and gradient of constraint function
@@ -67,6 +73,9 @@ public:
                                  VecDataArray<double, 3>& dcdxB) const override;
 
 public:
-    Vec3d m_penetrationVector = Vec3d::Zero();
+    //double m_penetrationDepth = 0.0;
+    Vec3d m_normal = Vec3d::Zero();
+    Vec3d m_contactPt = Vec3d::Zero();
+    double m_penetrationDepth = 0.0;
 };
 } // imstk

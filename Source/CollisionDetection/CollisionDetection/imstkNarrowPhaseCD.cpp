@@ -290,7 +290,7 @@ pointToCapsule(const Vec3r& point, uint32_t pointIdx, Capsule* capsule,
     {
         const auto  direction      = (closestPoint - point) / dist;
         const Vec3d pointOnCapsule = closestPoint - radius * direction;
-        colData->MAColData.safeAppend({ pointIdx, point - pointOnCapsule });
+        colData->PColData.safeAppend({ pointIdx, point - pointOnCapsule });
     }
 }
 
@@ -317,7 +317,7 @@ pointToPlane(const Vec3r& point, uint32_t pointIdx, Plane* plane,
     if (penetrationDist < 0.0)
     {
         const auto penetrationDir = planeNormal * penetrationDist;
-        colData->MAColData.safeAppend({ pointIdx, penetrationDir });
+        colData->PColData.safeAppend({ pointIdx, penetrationDir });
     }
 }
 
@@ -347,7 +347,7 @@ pointToSphere(const Vec3r& point, uint32_t pointIdx, Sphere* sphere,
         const Vec3r direction      = distSqr > Real(1e-12) ? pc / std::sqrt(distSqr) : Vec3r(0, 0, 0);
         const Vec3r pointOnSphere  = sphereCenter - sphereRadius * direction;
         const Vec3r penetrationDir = point - pointOnSphere;
-        colData->MAColData.safeAppend({ pointIdx, penetrationDir });
+        colData->PColData.safeAppend({ pointIdx, penetrationDir });
     }
 }
 
@@ -509,11 +509,11 @@ pointToTriangle(const Vec3r& point, uint32_t pointIdx, uint32_t triIdx, SurfaceM
                 const std::shared_ptr<CollisionData>& colData)
 {
     const Vec3i& face   = triMesh->getTriangleIndices(triIdx);
-    const auto   x1     = triMesh->getVertexPosition(face[0]);
-    const auto   x2     = triMesh->getVertexPosition(face[1]);
-    const auto   x3     = triMesh->getVertexPosition(face[2]);
-    const auto   normal = (x2 - x1).cross(x3 - x1);
-    const auto   pa     = point - x1;
+    const Vec3d& x1     = triMesh->getVertexPosition(face[0]);
+    const Vec3d& x2     = triMesh->getVertexPosition(face[1]);
+    const Vec3d& x3     = triMesh->getVertexPosition(face[2]);
+    const Vec3d  normal = (x2 - x1).cross(x3 - x1);
+    const Vec3d  pa     = point - x1;
     if (pa.dot(normal) > 0)
     {
         return false;

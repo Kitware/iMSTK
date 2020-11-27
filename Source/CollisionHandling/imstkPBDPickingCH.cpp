@@ -21,7 +21,7 @@ limitations under the License.
 
 #include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
-#include "imstkPbdAnalyticalCollisionConstraint.h"
+#include "imstkPbdPointNormalCollisionConstraint.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkPBDPickingCH.h"
@@ -102,7 +102,7 @@ PBDPickingCH::updatePickConstraints()
 void
 PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_ptr<CollidingObject> pickObj)
 {
-    if (m_colData->MAColData.isEmpty())
+    if (m_colData->PColData.isEmpty())
     {
         return;
     }
@@ -119,9 +119,9 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
     VecDataArray<double, 3>&                 vertexData = *vertices;
 
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
         [&](const size_t idx) {
-            const auto& cd = m_colData->MAColData[idx];
+            const auto& cd = m_colData->PColData[idx];
             if (m_pickedPtIdxOffset.find(cd.nodeIdx) == m_pickedPtIdxOffset.end() && model->getInvMass(cd.nodeIdx) != 0.0)
             {
                 auto pv  = cd.penetrationVector;
@@ -152,7 +152,7 @@ PBDPickingCH::removePickConstraints()
 void
 PBDPickingCH::activatePickConstraints()
 {
-    if (!m_colData->MAColData.isEmpty())
+    if (!m_colData->PColData.isEmpty())
     {
         this->addPickConstraints(m_pbdObj, m_pickObj);
         m_isPicking = true;
@@ -164,23 +164,34 @@ PBDPickingCH::generatePBDConstraints()
 {
     std::shared_ptr<PbdCollisionConstraintConfig> config = m_pbdObj->getPbdModel()->getParameters()->collisionParams;
 
-    m_ACConstraintPool.resize(0);
-    m_ACConstraintPool.reserve(m_colData->MAColData.getSize());
-    for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
     {
-        m_ACConstraintPool.push_back(new PbdAnalyticalCollisionConstraint);
+        // \todo: Pool not implemented correctly (see PbdCollisionHandling for proper trick), for now, just delete
+        for (size_t i = 0; i < m_ACConstraintPool.size(); ++i)
+        {
+            delete m_ACConstraintPool[i];
+        }
+    }
+    m_ACConstraintPool.resize(0);
+    m_ACConstraintPool.reserve(m_colData->PColData.getSize());
+    for (size_t i = 0; i < m_colData->PColData.getSize(); ++i)
+    {
+        m_ACConstraintPool.push_back(new PbdPointNormalCollisionConstraint);
     }
 
-    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+    std::shared_ptr<PointSet>      pointSet = std::dynamic_pointer_cast<PointSet>(m_pbdObj->getPhysicsGeometry());
+    const VecDataArray<double, 3>& vertices = *pointSet->getVertexPositions();
+    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
         [&](const size_t idx)
         {
-            m_ACConstraintPool[idx]->initConstraint(config, m_colData->MAColData[idx]);
+            const Vec3d& initPos = vertices[m_colData->PColData[idx].nodeIdx];
+            const Vec3d& penetrationVector = -m_colData->PColData[idx].penetrationVector; // Vector to resolve
+            m_ACConstraintPool[idx]->initConstraint(config, initPos + penetrationVector, penetrationVector, m_colData->PColData[idx].nodeIdx);
         });
 
     // Copy constraints
     m_PBDConstraints.resize(0);
-    m_PBDConstraints.reserve(m_colData->MAColData.getSize());
-    for (size_t i = 0; i < m_colData->MAColData.getSize(); ++i)
+    m_PBDConstraints.reserve(m_colData->PColData.getSize());
+    for (size_t i = 0; i < m_colData->PColData.getSize(); ++i)
     {
         m_PBDConstraints.push_back(static_cast<PbdCollisionConstraint*>(m_ACConstraintPool[i]));
     }

@@ -39,7 +39,7 @@ PbdCollisionConstraint::projectConstraint(const DataArray<double>* invMassA,
     VecDataArray<double, 3> dcdxA;
     VecDataArray<double, 3> dcdxB;
 
-    bool update = this->computeValueAndGradient(*posA, *posB, c, dcdxA, dcdxB);
+    const bool update = this->computeValueAndGradient(*posA, *posB, c, dcdxA, dcdxB);
     if (!update)
     {
         return;
@@ -76,7 +76,5 @@ PbdCollisionConstraint::projectConstraint(const DataArray<double>* invMassA,
             (*posB)[vid] -= (*invMassB)[vid] * lambda * dcdxB[i] * m_configB->m_stiffness;
         }
     }
-
-    return;
 }
 } // imstk
