@@ -59,8 +59,8 @@ using namespace imstk;
 // Parameters to play with
 const double width  = 50.0;
 const double height = 50.0;
-const int    nRows  = 16;
-const int    nCols  = 16;
+const int    nRows  = 31;
+const int    nCols  = 31;
 
 ///
 /// \brief Creates cloth geometry
@@ -201,7 +201,7 @@ main()
     imstkNew<Capsule> geomUpperJaw;
     geomUpperJaw->setLength(25.0);
     geomUpperJaw->setTranslation(Vec3d(0.0, 1.0, -12.5));
-    geomUpperJaw->setRadius(1.0);
+    geomUpperJaw->setRadius(2.0);
     geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
     objUpperJaw->setVisualGeometry(geomUpperJaw);
@@ -211,12 +211,25 @@ main()
     imstkNew<Capsule> geomLowerJaw;
     geomLowerJaw->setLength(25.0);
     geomLowerJaw->setTranslation(Vec3d(0.0, -1.0, -12.5));
-    geomLowerJaw->setRadius(1.0);
+    geomLowerJaw->setRadius(2.0);
     geomLowerJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
     objLowerJaw->setVisualGeometry(geomLowerJaw);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
+
+    /*
+    // big capsule for demonstrating pbd-analytical collision
+    imstkNew<Capsule> bigCapsule;
+    bigCapsule->setLength(25.0);
+    bigCapsule->setTranslation(Vec3d(25, -20.0, 25.0));
+    bigCapsule->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
+    bigCapsule->setRadius(5.0);
+    imstkNew<CollidingObject> objBigCapsule("bigObject");
+    objBigCapsule->setVisualGeometry(bigCapsule);
+    objBigCapsule->setCollidingGeometry(bigCapsule);
+    scene->addSceneObject(objBigCapsule);
+    */
 
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
     scene->addSceneObject(clothObj);
@@ -229,8 +242,22 @@ main()
     // Add interaction pair for pbd picking
     imstkNew<PbdObjectPickingPair> upperJawPickingPair(clothObj, objUpperJaw, CollisionDetection::Type::PointSetToCapsule);
     imstkNew<PbdObjectPickingPair> lowerJawPickingPair(clothObj, objLowerJaw, CollisionDetection::Type::PointSetToCapsule);
+    //imstkNew<PbdObjectPickingPair> bigCapsulePickingPair(clothObj, objBigCapsule, CollisionDetection::Type::PointSetToCapsule);
     scene->getCollisionGraph()->addInteraction(upperJawPickingPair);
     scene->getCollisionGraph()->addInteraction(lowerJawPickingPair);
+    //scene->getCollisionGraph()->addInteraction(bigCapsulePickingPair);
+
+    /*
+    // Move the capsule every frame
+    double t = 0.0;
+    auto   moveCapsule =
+        [&bigCapsule, &t](Event*)
+    {
+
+        bigCapsule->setTranslation(Vec3d(25, -20.0 + 10 * sin(t), 25.0));
+        t += 0.01;
+    };
+    */
 
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);
@@ -254,6 +281,8 @@ main()
         viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
 
         viewer->addChildThread(server);
+
+        //connect<Event>(sceneManager, EventType::PostUpdate, moveCapsule);
 
         // Add mouse and keyboard controls to the viewer
         {

@@ -126,18 +126,15 @@ PbdCollisionSolver::solve()
             for (auto constraintList : *m_collisionConstraints)
             {
                 CollisionConstraintData             colData     = *colDataIter;
-                VecDataArray<double, 3>&            posA        = *colData.m_posA;
-                const DataArray<double>&            invMassA    = *colData.m_invMassA;
-                VecDataArray<double, 3>&            posB        = *colData.m_posB;
-                const DataArray<double>&            invMassB    = *colData.m_invMassB;
                 const PBDCollisionConstraintVector& constraints = *constraintList;
                 for (size_t j = 0; j < constraints.size(); j++)
                 {
-                    constraints[j]->projectConstraint(invMassA, invMassB, posA, posB);
+                    constraints[j]->projectConstraint(colData.m_invMassA.get(), colData.m_invMassB.get(), colData.m_posA.get(), colData.m_posB.get());
                 }
                 colDataIter++;
             }
         }
+
         m_collisionConstraints->clear();
         m_collisionConstraintsData->clear();
     }

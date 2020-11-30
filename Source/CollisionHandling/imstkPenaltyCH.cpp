@@ -85,7 +85,7 @@ PenaltyCH::computeContactForcesAnalyticRigid(const std::shared_ptr<CollidingObje
 void
 PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeformableObject>& deformableObj)
 {
-    if (m_colData->MAColData.isEmpty())
+    if (m_colData->PColData.isEmpty())
     {
         return;
     }
@@ -100,9 +100,9 @@ PenaltyCH::computeContactForcesDiscreteDeformable(const std::shared_ptr<FeDeform
 
     // If collision data, append forces
     ParallelUtils::SpinLock lock;
-    ParallelUtils::parallelFor(m_colData->MAColData.getSize(),
+    ParallelUtils::parallelFor(m_colData->PColData.getSize(),
         [&](const size_t idx) {
-            const auto& cd       = m_colData->MAColData[idx];
+            const auto& cd       = m_colData->PColData[idx];
             const auto nodeDofID = static_cast<Eigen::Index>(3 * cd.nodeIdx);
             const auto unit      = cd.penetrationVector / cd.penetrationVector.norm();
 

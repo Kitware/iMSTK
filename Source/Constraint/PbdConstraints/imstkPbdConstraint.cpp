@@ -72,7 +72,5 @@ PbdConstraint::projectConstraint(const DataArray<double>& invMasses, const doubl
             pos[vid] += invMasses[vid] * lambda * m_dcdx[i];
         }
     }
-
-    return;
 }
 }

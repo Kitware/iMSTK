@@ -102,19 +102,22 @@ CollisionPair::apply()
     std::shared_ptr<TaskGraph> computeGraphB = m_objects.second->getTaskGraph();
 
     // If nothing was added to the input/output list use default collision location
-    if ((m_taskNodeInputs.first.size() == 0) && (m_taskNodeInputs.second.size() == 0)
-        && (m_taskNodeOutputs.first.size() == 0) && (m_taskNodeOutputs.second.size() == 0))
+    if ((m_taskNodeInputs.first.size() == 0)
+        && (m_taskNodeOutputs.first.size() == 0))
     {
         m_taskNodeInputs.first.clear();
-        m_taskNodeInputs.second.clear();
         m_taskNodeOutputs.first.clear();
-        m_taskNodeOutputs.second.clear();
 
         // Default location is inbetween the source->updateNode
         m_taskNodeInputs.first.push_back(computeGraphA->getSource());
-        m_taskNodeInputs.second.push_back(computeGraphB->getSource());
-
         m_taskNodeOutputs.first.push_back(m_objects.first->getUpdateNode());
+    }
+
+    if ((m_taskNodeInputs.second.size() == 0) && (m_taskNodeOutputs.second.size() == 0))
+    {
+        m_taskNodeInputs.second.clear();
+        m_taskNodeOutputs.second.clear();
+        m_taskNodeInputs.second.push_back(computeGraphB->getSource());
         m_taskNodeOutputs.second.push_back(m_objects.second->getUpdateNode());
     }
 

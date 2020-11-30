@@ -30,16 +30,16 @@ PbdCollisionConstraint::PbdCollisionConstraint(const unsigned int& n1, const uns
 }
 
 void
-PbdCollisionConstraint::projectConstraint(const DataArray<double>& invMassA,
-                                          const DataArray<double>& invMassB,
-                                          VecDataArray<double, 3>& posA,
-                                          VecDataArray<double, 3>& posB)
+PbdCollisionConstraint::projectConstraint(const DataArray<double>* invMassA,
+                                          const DataArray<double>* invMassB,
+                                          VecDataArray<double, 3>* posA,
+                                          VecDataArray<double, 3>* posB)
 {
     double                  c;
     VecDataArray<double, 3> dcdxA;
     VecDataArray<double, 3> dcdxB;
 
-    bool update = this->computeValueAndGradient(posA, posB, c, dcdxA, dcdxB);
+    const bool update = this->computeValueAndGradient(*posA, *posB, c, dcdxA, dcdxB);
     if (!update)
     {
         return;
@@ -49,12 +49,12 @@ PbdCollisionConstraint::projectConstraint(const DataArray<double>& invMassA,
 
     for (size_t i = 0; i < m_bodiesFirst.size(); ++i)
     {
-        lambda += invMassA[m_bodiesFirst[i]] * dcdxA[i].squaredNorm();
+        lambda += (*invMassA)[m_bodiesFirst[i]] * dcdxA[i].squaredNorm();
     }
 
     for (size_t i = 0; i < m_bodiesSecond.size(); ++i)
     {
-        lambda += invMassB[m_bodiesSecond[i]] * dcdxB[i].squaredNorm();
+        lambda += (*invMassB)[m_bodiesSecond[i]] * dcdxB[i].squaredNorm();
     }
 
     lambda = c / lambda;
@@ -62,21 +62,19 @@ PbdCollisionConstraint::projectConstraint(const DataArray<double>& invMassA,
     for (size_t i = 0, vid = 0; i < m_bodiesFirst.size(); ++i)
     {
         vid = m_bodiesFirst[i];
-        if (invMassA[vid] > 0.0)
+        if ((*invMassA)[vid] > 0.0)
         {
-            posA[vid] -= invMassA[vid] * lambda * dcdxA[i] * m_configA->m_stiffness;
+            (*posA)[vid] -= (*invMassA)[vid] * lambda * dcdxA[i] * m_configA->m_stiffness;
         }
     }
 
     for (size_t i = 0, vid = 0; i < m_bodiesSecond.size(); ++i)
     {
         vid = m_bodiesSecond[i];
-        if (invMassB[vid] > 0.0)
+        if ((*invMassB)[vid] > 0.0)
         {
-            posB[vid] -= invMassB[vid] * lambda * dcdxB[i] * m_configB->m_stiffness;
+            (*posB)[vid] -= (*invMassB)[vid] * lambda * dcdxB[i] * m_configB->m_stiffness;
         }
     }
-
-    return;
 }
 } // imstk

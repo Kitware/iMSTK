@@ -8,6 +8,7 @@ imstk_add_library( Constraints
     RigidBodyConstraints
   DEPENDS
     Common
+    CollisionDetection
     DataStructures
     Geometry
   )

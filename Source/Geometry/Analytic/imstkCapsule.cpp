@@ -74,6 +74,19 @@ Capsule::setLength(const double l)
     m_transformApplied = false;
 }
 
+double
+Capsule::getFunctionValue(const Vec3d& x) const
+{
+    // Two lines points
+    const Vec3d a = m_positionPostTransform + 0.5 * m_orientationAxisPostTransform * m_lengthPostTransform;
+    const Vec3d b = 2.0 * m_positionPostTransform - a;
+
+    const Vec3d  pa = x - a;
+    const Vec3d  ba = b - a;
+    const double h  = std::min(std::max(pa.dot(ba) / ba.dot(ba), 0.0), 1.0);
+    return (pa - ba * h).norm() - m_radiusPostTransform;
+}
+
 void
 Capsule::applyScaling(const double s)
 {

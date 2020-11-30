@@ -49,7 +49,8 @@ public:
     enum class Type
     {
         EdgeEdge,
-        PointTriangle
+        PointTriangle,
+        Analytical,
     };
 
     ///
@@ -88,10 +89,10 @@ public:
                                          VecDataArray<double, 3>& dcdxA,
                                          VecDataArray<double, 3>& dcdxB) const = 0;
 
-    virtual void projectConstraint(const DataArray<double>& invMassA,
-                                   const DataArray<double>& invMassB,
-                                   VecDataArray<double, 3>& posA,
-                                   VecDataArray<double, 3>& posB);
+    virtual void projectConstraint(const DataArray<double>* invMassA,
+                                   const DataArray<double>* invMassB,
+                                   VecDataArray<double, 3>* posA,
+                                   VecDataArray<double, 3>* posB);
 
 protected:
     std::vector<size_t> m_bodiesFirst;                                 ///> index of points for the first object

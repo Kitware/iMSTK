@@ -335,10 +335,10 @@ public:
 #endif
 
         // Compare result
-        EXPECT_EQ(collisionData->MAColData.getSize(), numPenetrations);
-        for (size_t i = 0; i < collisionData->MAColData.getSize(); ++i)
+        EXPECT_EQ(collisionData->PColData.getSize(), numPenetrations);
+        for (size_t i = 0; i < collisionData->PColData.getSize(); ++i)
         {
-            EXPECT_EQ(pointPenetration[collisionData->MAColData[i].nodeIdx], true);
+            EXPECT_EQ(pointPenetration[collisionData->PColData[i].nodeIdx], true);
         }
     }
 

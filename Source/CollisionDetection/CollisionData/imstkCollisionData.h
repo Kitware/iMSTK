@@ -122,12 +122,12 @@ class PositionDirectionCollisionData : public CollisionDataBase<PositionDirectio
 ///
 /// \brief Mesh to analytical point-penetration depth collision data
 ///
-struct MeshToAnalyticalCollisionDataElement
+struct PenetrationCollisionDataElement
 {
     uint32_t nodeIdx;
     Vec3d penetrationVector;
 };
-class MeshToAnalyticalCollisionData : public CollisionDataBase<MeshToAnalyticalCollisionDataElement>
+class PenetrationCollisionData : public CollisionDataBase<PenetrationCollisionDataElement>
 {
 };
 
@@ -227,17 +227,17 @@ struct CollisionData
         VTColData.clear();
         TVColData.clear();
         EEColData.clear();
-        MAColData.clear();
+        PColData.clear();
         PTColData.clear();
         NodePickData.clear();
     }
 
-    PositionDirectionCollisionData PDColData;           ///< Position Direction collision data
-    VertexTriangleCollisionData VTColData;              ///< Vertex Triangle collision data
-    TriangleVertexCollisionData TVColData;              ///< Triangle Vertex collision data
-    EdgeEdgeCollisionData EEColData;                    ///< Edge Edge collision data
-    MeshToAnalyticalCollisionData MAColData;            ///< Mesh to analytical collision data
-    PointTetrahedronCollisionData PTColData;            ///< Point Tetrahedron collision data
-    PickingCollisionData NodePickData;                  ///< List of points that are picked
+    PositionDirectionCollisionData PDColData; ///< Position Direction collision data
+    PenetrationCollisionData PColData;        ///< Penetration vector collision data
+    VertexTriangleCollisionData VTColData;    ///< Vertex Triangle collision data
+    TriangleVertexCollisionData TVColData;    ///< Triangle Vertex collision data
+    EdgeEdgeCollisionData EEColData;          ///< Edge Edge collision data
+    PointTetrahedronCollisionData PTColData;  ///< Point Tetrahedron collision data
+    PickingCollisionData NodePickData;        ///< List of points that are picked
 };
 }

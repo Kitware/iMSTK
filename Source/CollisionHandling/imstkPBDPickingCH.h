@@ -27,6 +27,9 @@
 namespace imstk
 {
 class CollidingObject;
+class PbdPointNormalCollisionConstraint;
+class PbdCollisionConstraint;
+class PbdCollisionSolver;
 class PbdObject;
 struct CollisionData;
 
@@ -52,7 +55,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~PBDPickingCH() override = default;
+    virtual ~PBDPickingCH() override;
 
     ///
     /// \brief Compute forces based on collision data
@@ -79,10 +82,21 @@ public:
     ///
     void activatePickConstraints();
 
+    ///
+    /// \brief Generate pbd constraints for tool-mesh collision
+    ///
+    void generatePBDConstraints();
+
+    std::shared_ptr<PbdCollisionSolver> getCollisionSolver() const { return m_pbdCollisionSolver; }
+
 private:
     bool m_isPicking;
-    std::map<size_t, Vec3d>          m_pickedPtIdxOffset;    ///> Map for picked nodes.
-    std::shared_ptr<PbdObject>       m_pbdObj;               ///> PBD object
-    std::shared_ptr<CollidingObject> m_pickObj;              ///> Picking tool object
+    std::map<size_t, Vec3d>             m_pickedPtIdxOffset;    ///> Map for picked nodes.
+    std::shared_ptr<PbdObject>          m_pbdObj  = nullptr;    ///> PBD object
+    std::shared_ptr<CollidingObject>    m_pickObj = nullptr;    ///> Picking tool object
+    std::shared_ptr<PbdCollisionSolver> m_pbdCollisionSolver = nullptr;
+
+    std::vector<PbdCollisionConstraint*> m_PBDConstraints;              ///> List of PBD constraints
+    std::vector<PbdPointNormalCollisionConstraint*> m_ACConstraintPool; ///> PBD analytical constraints
 };
 }
