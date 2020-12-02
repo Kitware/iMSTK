@@ -149,5 +149,7 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
         actorProperty->SetVertexVisibility(false);
         break;
     }
+
+    m_actor->SetVisibility(m_visualModel->isVisible());
 }
 }

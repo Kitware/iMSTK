@@ -69,5 +69,7 @@ VTKVolumeRenderDelegate::updateRenderProperties()
             volume->SetProperty(material->getVolumeProperty());
         }
     }
+
+    m_actor->SetVisibility(m_visualModel->isVisible());
 }
 }
