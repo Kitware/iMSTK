@@ -76,6 +76,7 @@ main()
         material->addTexture(headDiffuseTexture);
         material->addTexture(headNormalTexture);
         material->addTexture(headAoTexture);
+        material->setRecomputeVertexNormals(false);
 
         imstkNew<VisualModel> surfMeshModel(surfaceMesh);
         surfMeshModel->setRenderMaterial(material);

@@ -29,5 +29,7 @@ PbdState::setState(std::shared_ptr<PbdState> rhs)
     *m_pos = *rhs->getPositions();
     *m_vel = *rhs->getVelocities();
     *m_acc = *rhs->getAccelerations();
+
+    m_pos->modified();
 }
 } // imstk
