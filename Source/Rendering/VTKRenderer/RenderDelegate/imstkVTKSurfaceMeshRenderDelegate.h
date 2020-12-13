@@ -77,6 +77,7 @@ protected:
     void geometryModified(Event* e);
 
 protected:
+    std::shared_ptr<SurfaceMesh> m_geometry;
     std::shared_ptr<VecDataArray<double, 3>> m_vertices;
     std::shared_ptr<VecDataArray<double, 3>> m_normals;
     std::shared_ptr<VecDataArray<int, 3>>    m_indices;

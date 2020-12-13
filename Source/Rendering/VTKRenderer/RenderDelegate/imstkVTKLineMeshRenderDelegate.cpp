@@ -181,7 +181,7 @@ VTKLineMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         m_indices = geometry->getLinesIndices();
         {
             // Copy cells
-            m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+            m_cellArray->Reset();
             vtkIdType cell[2];
             for (const auto& t : *m_indices)
             {
@@ -191,8 +191,7 @@ VTKLineMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
                 }
                 m_cellArray->InsertNextCell(2, cell);
             }
-            m_polydata->SetPolys(m_cellArray);
-            m_polydata->Modified();
+            m_cellArray->Modified();
         }
     }
 }

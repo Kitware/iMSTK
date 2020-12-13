@@ -44,19 +44,19 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
     m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
-    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
-    geometry->computeVertexNeighborTriangles();
+    m_geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    m_geometry->computeVertexNeighborTriangles();
 
     // Get our own handles to these in case the geometry changes them
-    m_vertices = geometry->getVertexPositions();
-    m_indices  = geometry->getTriangleIndices();
+    m_vertices = m_geometry->getVertexPositions();
+    m_indices  = m_geometry->getTriangleIndices();
 
     // Map vertices to VTK point data
     if (m_vertices != nullptr)
     {
         m_mappedVertexArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_vertices));
         auto points = vtkSmartPointer<vtkPoints>::New();
-        points->SetNumberOfPoints(geometry->getNumVertices());
+        points->SetNumberOfPoints(m_geometry->getNumVertices());
         points->SetData(m_mappedVertexArray);
         m_polydata->SetPoints(points);
     }
@@ -78,32 +78,32 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     }
 
     // Map vertex scalars if it has them
-    if (geometry->getVertexScalars() != nullptr)
+    if (m_geometry->getVertexScalars() != nullptr)
     {
-        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(geometry->getVertexScalars());
+        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getVertexScalars());
         m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
     }
 
     // Map cell scalars if it has them
-    if (geometry->getCellScalars() != nullptr)
+    if (m_geometry->getCellScalars() != nullptr)
     {
-        m_mappedCellScalarArray = GeometryUtils::coupleVtkDataArray(geometry->getCellScalars());
+        m_mappedCellScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getCellScalars());
         m_polydata->GetCellData()->SetScalars(m_mappedCellScalarArray);
     }
 
     // Map normals, if none provided compute per vertex normals
-    if (geometry->getVertexNormals() == nullptr)
+    if (m_geometry->getVertexNormals() == nullptr)
     {
-        geometry->computeVertexNormals();
+        m_geometry->computeVertexNormals();
     }
-    m_mappedNormalArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(geometry->getVertexNormals()));
+    m_mappedNormalArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexNormals()));
     m_polydata->GetPointData()->SetNormals(m_mappedNormalArray);
 
     // Map TCoords
-    if (geometry->getVertexTCoords() != nullptr)
+    if (m_geometry->getVertexTCoords() != nullptr)
     {
-        m_mappedTCoordsArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(geometry->getVertexTCoords()));
-        m_mappedTCoordsArray->SetName(geometry->getActiveVertexTCoords().c_str());
+        m_mappedTCoordsArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTCoords()));
+        m_mappedTCoordsArray->SetName(m_geometry->getActiveVertexTCoords().c_str());
         m_polydata->GetPointData()->SetTCoords(m_mappedTCoordsArray);
 
         // Map Tangents
@@ -117,10 +117,12 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::geometryModified);
+    queueConnect<Event>(m_geometry, EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+    queueConnect<Event>(m_geometry->getVertexPositions(), EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+
+    // When the index buffer internals are modified,
 
     // Setup mapper
     {
@@ -231,6 +233,7 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
             m_mappedVertexArray->SetNumberOfComponents(3);
             m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
         }
+        m_polydata->GetPoints()->SetNumberOfPoints(m_vertices->size());
         //vertexOrIndexBufferChanged = true;
     }
 
@@ -243,7 +246,7 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         m_indices = geometry->getTriangleIndices();
         {
             // Copy cells
-            m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+            m_cellArray->Reset();
             vtkIdType cell[3];
             for (const auto& t : *m_indices)
             {
@@ -253,8 +256,7 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
                 }
                 m_cellArray->InsertNextCell(3, cell);
             }
-            m_polydata->SetPolys(m_cellArray);
-            m_polydata->Modified();
+            m_cellArray->Modified();
         }
         //vertexOrIndexBufferChanged = true;
     }

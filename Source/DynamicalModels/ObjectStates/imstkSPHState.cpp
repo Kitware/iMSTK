@@ -65,6 +65,8 @@ SPHState::setState(std::shared_ptr<SPHState> rhs)
     m_NeighborLists   = rhs->getFluidNeighborLists();
     m_BDNeighborLists = rhs->getBoundaryNeighborLists();
     m_NeighborInfo    = rhs->getNeighborInfo();
+
+    m_positions->modified();
 }
 
 size_t

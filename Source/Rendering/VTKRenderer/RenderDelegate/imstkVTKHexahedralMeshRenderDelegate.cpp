@@ -162,7 +162,7 @@ VTKHexahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         m_indices = geometry->getHexahedraIndices();
         {
             // Copy cells
-            m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+            m_cellArray->Reset();
             vtkIdType cell[8];
             for (const auto& t : *m_indices)
             {
@@ -172,8 +172,7 @@ VTKHexahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
                 }
                 m_cellArray->InsertNextCell(8, cell);
             }
-            m_mesh->SetCells(VTK_HEXAHEDRON, m_cellArray);
-            m_mesh->Modified();
+            m_cellArray->Modified();
         }
         vertexOrIndexBufferChanged = true;
     }

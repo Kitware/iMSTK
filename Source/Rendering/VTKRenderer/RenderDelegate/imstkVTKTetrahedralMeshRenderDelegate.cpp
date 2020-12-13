@@ -181,7 +181,7 @@ VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         m_indices = geometry->getTetrahedraIndices();
         {
             // Copy cells
-            m_cellArray = vtkSmartPointer<vtkCellArray>::New();
+            m_cellArray->Reset();
             vtkIdType cell[3];
             for (const auto& t : *m_indices)
             {
@@ -191,8 +191,7 @@ VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
                 }
                 m_cellArray->InsertNextCell(3, cell);
             }
-            m_mesh->SetCells(VTK_TETRA, m_cellArray);
-            m_mesh->Modified();
+            m_cellArray->Modified();
         }
     }
 }

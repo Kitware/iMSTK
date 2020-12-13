@@ -42,8 +42,6 @@ PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
     m_mass(std::make_shared<DataArray<double>>()),
     m_invMass(std::make_shared<DataArray<double>>()),
     m_fixedNodeInvMass(std::make_shared<std::unordered_map<size_t, double>>()),
-    m_constraints(std::make_shared<PBDConstraintVector>()),
-    m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_parameters(std::make_shared<PBDModelConfig>())
 {
     m_validGeometryTypes = {
@@ -103,10 +101,78 @@ bool
 PbdModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
+    bool bOK = true; // Return immediately if some constraint failed to initialize
 
     initState();
 
-    bool bOK = true; // Return immediately if some constraint failed to initialize
+    // Initialize constraints
+    {
+        m_constraints = std::make_shared<PBDConstraintVector>();
+
+        // Initialize FEM constraints
+        for (auto& constraint : m_parameters->m_FEMConstraints)
+        {
+            computeElasticConstants();
+            if (!initializeFEMConstraints(constraint.second))
+            {
+                return false;
+            }
+        }
+
+        // Initialize other constraints
+        for (auto& constraint : m_parameters->m_regularConstraints)
+        {
+            if (m_parameters->m_solverType == PbdConstraint::SolverType::PBD && constraint.second > 1.0)
+            {
+                LOG(WARNING) << "for PBD, k should be between [0, 1]";
+            }
+            else if (m_parameters->m_solverType == PbdConstraint::SolverType::xPBD && constraint.second <= 1.0)
+            {
+                LOG(WARNING) << "for xPBD, k is Young's Modulu, and should be much larger than 1";
+            }
+
+            if (!bOK)
+            {
+                return false;
+            }
+            switch (constraint.first)
+            {
+            case PbdConstraint::Type::Volume:
+                bOK = initializeVolumeConstraints(constraint.second);
+                break;
+
+            case PbdConstraint::Type::Distance:
+                bOK = initializeDistanceConstraints(constraint.second);
+                break;
+
+            case PbdConstraint::Type::Area:
+                bOK = initializeAreaConstraints(constraint.second);
+                break;
+
+            case PbdConstraint::Type::Bend:
+                bOK = initializeBendConstraints(constraint.second);
+                break;
+
+            case PbdConstraint::Type::Dihedral:
+                bOK = initializeDihedralConstraints(constraint.second);
+                break;
+
+            case PbdConstraint::Type::ConstantDensity:
+                bOK = initializeConstantDensityConstraint(constraint.second);
+                break;
+
+            default:
+                LOG(FATAL) << "Invalid constraint type";
+            }
+        }
+
+        // Partition constraints for parallel computation
+        if (!m_partitioned)
+        {
+            this->partitionConstraints();
+            m_partitioned = true;
+        }
+    }
 
     // Setup the default pbd solver if none exists
     if (m_pbdSolver == nullptr)
@@ -120,70 +186,6 @@ PbdModel::initialize()
     m_pbdSolver->setConstraints(getConstraints());
     m_pbdSolver->setPartitionedConstraints(getPartitionedConstraints());
     m_pbdSolver->setTimeStep(m_parameters->m_dt);
-
-    // Initialize FEM constraints
-    for (auto& constraint: m_parameters->m_FEMConstraints)
-    {
-        computeElasticConstants();
-        if (!initializeFEMConstraints(constraint.second))
-        {
-            return false;
-        }
-    }
-
-    // Initialize other constraints
-    for (auto& constraint: m_parameters->m_regularConstraints)
-    {
-        if (m_parameters->m_solverType == PbdConstraint::SolverType::PBD && constraint.second > 1.0)
-        {
-            LOG(WARNING) << "for PBD, k should be between [0, 1]";
-        }
-        else if (m_parameters->m_solverType == PbdConstraint::SolverType::xPBD && constraint.second <= 1.0)
-        {
-            LOG(WARNING) << "for xPBD, k is Young's Modulu, and should be much larger than 1";
-        }
-
-        if (!bOK)
-        {
-            return false;
-        }
-        switch (constraint.first)
-        {
-        case PbdConstraint::Type::Volume:
-            bOK = initializeVolumeConstraints(constraint.second);
-            break;
-
-        case PbdConstraint::Type::Distance:
-            bOK = initializeDistanceConstraints(constraint.second);
-            break;
-
-        case PbdConstraint::Type::Area:
-            bOK = initializeAreaConstraints(constraint.second);
-            break;
-
-        case PbdConstraint::Type::Bend:
-            bOK = initializeBendConstraints(constraint.second);
-            break;
-
-        case PbdConstraint::Type::Dihedral:
-            bOK = initializeDihedralConstraints(constraint.second);
-            break;
-
-        case PbdConstraint::Type::ConstantDensity:
-            bOK = initializeConstantDensityConstraint(constraint.second);
-            break;
-
-        default:
-            LOG(FATAL) << "Invalid constraint type";
-        }
-    }
-
-    // Partition constraints for parallel computation
-    if (!m_partitioned)
-    {
-        this->partitionConstraints();
-        m_partitioned = true;
-    }
 
     this->setTimeStepSizeType(m_timeStepSizeType);
 
@@ -235,8 +237,23 @@ PbdModel::initState()
         }
     }
 
-    // Define velocities and accelerations on the geometry
-    m_mesh->setVertexAttribute("Velocities", m_currentState->getVelocities());
+    // Initialize Velocities
+    {
+        // If the input mesh has per vertex velocities, use those
+        std::shared_ptr<AbstractDataArray> velocities = m_mesh->getVertexAttribute("Velocities");
+        if (velocities != nullptr && velocities->getNumberOfComponents() == 3 && velocities->getScalarType() == IMSTK_DOUBLE
+            && std::dynamic_pointer_cast<VecDataArray<double, 3>>(velocities)->size() == numParticles)
+        {
+            m_currentState->setVelocities(std::dynamic_pointer_cast<VecDataArray<double, 3>>(velocities));
+        }
+        // If not, put existing (0 initialized velocities) on mesh
+        else
+        {
+            m_mesh->setVertexAttribute("Velocities", m_currentState->getVelocities());
+        }
+    }
+
+    // Define accelerations on the geometry
     m_mesh->setVertexAttribute("Accelerations", m_currentState->getAccelerations());
 
     // Overwrite some masses for specified fixed points
@@ -560,6 +577,8 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
 void
 PbdModel::partitionConstraints(const bool print)
 {
+    m_partitionedConstraints = std::make_shared<std::vector<PBDConstraintVector>>();
+
     // Form the map { vertex : list_of_constraints_involve_vertex }
     PBDConstraintVector& allConstraints = *m_constraints;
 
