@@ -162,11 +162,35 @@ GeometryUtils::copyToDataArray(vtkSmartPointer<vtkDataArray> vtkArray)
 
     std::shared_ptr<AbstractDataArray> arr = nullptr;
 
+    const int numComps = vtkArray->GetNumberOfComponents();
+
     // Create and copy the array
     switch (vtkToImstkScalarType[vtkArray->GetDataType()])
     {
-        TemplateMacro(arr = std::make_shared<DataArray<IMSTK_TT>>(vtkArray->GetNumberOfTuples() * vtkArray->GetNumberOfComponents());
-        std::copy_n(static_cast<IMSTK_TT*>(vtkArray->GetVoidPointer(0)), vtkArray->GetNumberOfValues(), static_cast<IMSTK_TT*>(arr->getVoidPointer())); );
+        TemplateMacro(
+            // We enumerate a number of different common # of components
+            // There's long reasoning but ultimately this is because we use eigen for DataArrays. limiting
+            if (numComps == 1)
+            {
+                arr = std::make_shared<DataArray<IMSTK_TT>>(vtkArray->GetNumberOfTuples() * vtkArray->GetNumberOfComponents());
+                std::copy_n(static_cast<IMSTK_TT*>(vtkArray->GetVoidPointer(0)), vtkArray->GetNumberOfValues(), static_cast<IMSTK_TT*>(arr->getVoidPointer()));
+            }
+            else if (numComps == 2)
+            {
+                arr = (std::make_shared<VecDataArray<IMSTK_TT, 2>>(vtkArray->GetNumberOfTuples()));
+                std::copy_n(static_cast<IMSTK_TT*>(vtkArray->GetVoidPointer(0)), vtkArray->GetNumberOfValues(), static_cast<IMSTK_TT*>(arr->getVoidPointer()));
+            }
+            else if (numComps == 3)
+            {
+                arr = (std::make_shared<VecDataArray<IMSTK_TT, 3>>(vtkArray->GetNumberOfTuples()));
+                std::copy_n(static_cast<IMSTK_TT*>(vtkArray->GetVoidPointer(0)), vtkArray->GetNumberOfValues(), static_cast<IMSTK_TT*>(arr->getVoidPointer()));
+            }
+            else if (numComps == 4)
+            {
+                arr = (std::make_shared<VecDataArray<IMSTK_TT, 4>>(vtkArray->GetNumberOfTuples()));
+                std::copy_n(static_cast<IMSTK_TT*>(vtkArray->GetVoidPointer(0)), vtkArray->GetNumberOfValues(), static_cast<IMSTK_TT*>(arr->getVoidPointer()));
+            }
+            );
     default:
         LOG(WARNING) << "Unknown scalar type";
         break;
@@ -228,10 +252,10 @@ GeometryUtils::copyToPointSet(vtkSmartPointer<vtkPointSet> vtkMesh)
     if (!dataMap.empty())
     {
         mesh->setVertexAttributes(dataMap);
-        mesh->setVertexNormals(std::string(mesh->getActiveVertexNormals()));
-        mesh->setVertexTCoords(std::string(mesh->getActiveVertexTCoords()));
-        mesh->setVertexScalars(std::string(mesh->getActiveVertexScalars()));
-        mesh->setVertexTangents(std::string(mesh->getActiveVertexTangents()));
+        mesh->setVertexNormals(vtkMesh->GetPointData()->GetNormals() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetNormals()->GetName()));
+        mesh->setVertexTCoords(vtkMesh->GetPointData()->GetTCoords() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTCoords()->GetName()));
+        mesh->setVertexScalars(vtkMesh->GetPointData()->GetScalars() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetScalars()->GetName()));
+        mesh->setVertexTangents(vtkMesh->GetPointData()->GetTangents() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTangents()->GetName()));
     }
 
     return mesh;
@@ -254,21 +278,20 @@ GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     if (!vertexDataMap.empty())
     {
         mesh->setVertexAttributes(vertexDataMap);
-        mesh->setVertexNormals(std::string(mesh->getActiveVertexNormals()));
-        mesh->setVertexTCoords(std::string(mesh->getActiveVertexTCoords()));
-        mesh->setVertexScalars(std::string(mesh->getActiveVertexScalars()));
-        mesh->setVertexTangents(std::string(mesh->getActiveVertexTangents()));
+        mesh->setVertexNormals(vtkMesh->GetPointData()->GetNormals() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetNormals()->GetName()));
+        mesh->setVertexTCoords(vtkMesh->GetPointData()->GetTCoords() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTCoords()->GetName()));
+        mesh->setVertexScalars(vtkMesh->GetPointData()->GetScalars() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetScalars()->GetName()));
+        mesh->setVertexTangents(vtkMesh->GetPointData()->GetTangents() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTangents()->GetName()));
     }
     // Cell Data
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> cellDataMap;
     copyToDataMap(vtkMesh->GetPointData(), cellDataMap);
     if (!cellDataMap.empty())
     {
-        mesh->setVertexAttributes(cellDataMap);
-        mesh->setVertexNormals(std::string(mesh->getActiveVertexNormals()));
-        mesh->setVertexTCoords(std::string(mesh->getActiveVertexTCoords()));
-        mesh->setVertexScalars(std::string(mesh->getActiveVertexScalars()));
-        mesh->setVertexTangents(std::string(mesh->getActiveVertexTangents()));
+        mesh->setCellAttributes(cellDataMap);
+        mesh->setCellNormals(vtkMesh->GetCellData()->GetNormals() == nullptr ? "" : std::string(vtkMesh->GetCellData()->GetNormals()->GetName()));
+        mesh->setCellScalars(vtkMesh->GetCellData()->GetScalars() == nullptr ? "" : std::string(vtkMesh->GetCellData()->GetScalars()->GetName()));
+        mesh->setCellTangents(vtkMesh->GetCellData()->GetTangents() == nullptr ? "" : std::string(vtkMesh->GetCellData()->GetTangents()->GetName()));
     }
 
     // Active Texture
@@ -300,10 +323,10 @@ GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     if (!dataMap.empty())
     {
         mesh->setVertexAttributes(dataMap);
-        mesh->setVertexNormals(std::string(mesh->getActiveVertexNormals()));
-        mesh->setVertexTCoords(std::string(mesh->getActiveVertexTCoords()));
-        mesh->setVertexScalars(std::string(mesh->getActiveVertexScalars()));
-        mesh->setVertexTangents(std::string(mesh->getActiveVertexTangents()));
+        mesh->setVertexNormals(vtkMesh->GetPointData()->GetNormals() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetNormals()->GetName()));
+        mesh->setVertexTCoords(vtkMesh->GetPointData()->GetTCoords() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTCoords()->GetName()));
+        mesh->setVertexScalars(vtkMesh->GetPointData()->GetScalars() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetScalars()->GetName()));
+        mesh->setVertexTangents(vtkMesh->GetPointData()->GetTangents() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTangents()->GetName()));
     }
 
     return mesh;
@@ -346,23 +369,22 @@ GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh
     if (!vertexDataMap.empty())
     {
         vMesh->setVertexAttributes(vertexDataMap);
-        vMesh->setVertexNormals(std::string(vMesh->getActiveVertexNormals()));
-        vMesh->setVertexTCoords(std::string(vMesh->getActiveVertexTCoords()));
-        vMesh->setVertexScalars(std::string(vMesh->getActiveVertexScalars()));
-        vMesh->setVertexTangents(std::string(vMesh->getActiveVertexTangents()));
+        vMesh->setVertexNormals(vtkMesh->GetPointData()->GetNormals() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetNormals()->GetName()));
+        vMesh->setVertexTCoords(vtkMesh->GetPointData()->GetTCoords() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTCoords()->GetName()));
+        vMesh->setVertexScalars(vtkMesh->GetPointData()->GetScalars() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetScalars()->GetName()));
+        vMesh->setVertexTangents(vtkMesh->GetPointData()->GetTangents() == nullptr ? "" : std::string(vtkMesh->GetPointData()->GetTangents()->GetName()));
     }
 
     // Cell Data
-    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> cellDataMap;
+    /*std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> cellDataMap;
     copyToDataMap(vtkMesh->GetCellData(), cellDataMap);
     if (!cellDataMap.empty())
     {
-        vMesh->setVertexAttributes(cellDataMap);
-        vMesh->setVertexNormals(std::string(vMesh->getActiveVertexNormals()));
-        vMesh->setVertexTCoords(std::string(vMesh->getActiveVertexTCoords()));
-        vMesh->setVertexScalars(std::string(vMesh->getActiveVertexScalars()));
-        vMesh->setVertexTangents(std::string(vMesh->getActiveVertexTangents()));
-    }
+        vMesh->setCellAttributes(cellDataMap);
+        vMesh->setCellNormals(vtkMesh->GetCellData()->GetNormals() == nullptr ? "" : std::string(vtkMesh->GetCellData()->GetNormals()->GetName()));
+        vMesh->setCellScalars(vtkMesh->GetCellData()->GetScalars() == nullptr ? "" : std::string(vtkMesh->GetCellData()->GetScalars()->GetName()));
+        vMesh->setCellTangents(vtkMesh->GetCellData()->GetTangents() == nullptr ? "" : std::string(vtkMesh->GetCellData()->GetTangents()->GetName()));
+    }*/
 
     return vMesh;
 }

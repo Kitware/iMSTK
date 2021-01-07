@@ -170,7 +170,7 @@ public:
         m_capacity   = other.m_capacity;
         m_scalarType = other.m_scalarType;
         m_data       = other.m_data; // Take the others buffer
-        // todo: Make sure destructor is not called on other
+        other.m_mapped = true; // The others destructor should then not delete
     }
 
     virtual ~DataArray() override
