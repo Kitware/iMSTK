@@ -165,12 +165,12 @@ public:
 
     DataArray(const DataArray&& other)
     {
-        m_mapped     = other.m_mapped;
-        m_size       = other.m_size;
-        m_capacity   = other.m_capacity;
-        m_scalarType = other.m_scalarType;
-        m_data       = other.m_data; // Take the others buffer
-        // todo: Make sure destructor is not called on other
+        m_mapped       = other.m_mapped;
+        m_size         = other.m_size;
+        m_capacity     = other.m_capacity;
+        m_scalarType   = other.m_scalarType;
+        m_data         = other.m_data; // Take the others buffer
+        other.m_mapped = true;         // The others destructor should then not delete
     }
 
     virtual ~DataArray() override
