@@ -60,15 +60,6 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 }
 
 void
-SceneObject::updateGeometries()
-{
-    for (auto visualModel : m_visualModels)
-    {
-        visualModel->getGeometry()->modified();
-    }
-}
-
-void
 SceneObject::initGraphEdges()
 {
     m_taskGraph->clearEdges();
