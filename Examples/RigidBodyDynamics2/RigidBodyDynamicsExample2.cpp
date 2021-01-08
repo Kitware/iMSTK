@@ -66,8 +66,8 @@ main()
     {
         // This model is shared among interacting rigid bodies
         imstkNew<RigidBodyModel2> rbdModel;
-        rbdModel->getConfig()->m_dt = 0.0005;
-        rbdModel->getConfig()->m_maxNumIterations = 20;
+        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -900.0, 0.0);
+        rbdModel->getConfig()->m_maxNumIterations = 40;
 
         // Create the first rbd, plane floor
         imstkNew<RigidObject2> planeObj("Plane");
@@ -143,13 +143,15 @@ main()
             cubeObj->getRigidBody()->m_mass    = 100.0;
             cubeObj->getRigidBody()->m_initPos = Vec3d(0.0, 8.0, 0.0);
             cubeObj->getRigidBody()->m_initOrientation = Quatd(Rotd(0.4, Vec3d(1.0, 0.0, 0.0)));
-            cubeObj->getRigidBody()->setInertiaFromPointSet(subdivide->getOutputMesh(), 0.001, true);
+            cubeObj->getRigidBody()->m_intertiaTensor  = Mat3d::Identity();
 
             scene->addSceneObject(cubeObj);
         }
 
-        auto rbdInteraction = std::make_shared<RigidObjectCollisionPair>(cubeObj, planeObj, CollisionDetection::Type::PointSetToImplicit);
-        std::dynamic_pointer_cast<RigidBodyCH>(rbdInteraction->getCollisionHandlingA())->setUseFriction(false);
+        auto                         rbdInteraction = std::make_shared<RigidObjectCollisionPair>(cubeObj, planeObj, CollisionDetection::Type::PointSetToImplicit);
+        std::shared_ptr<RigidBodyCH> ch = std::dynamic_pointer_cast<RigidBodyCH>(rbdInteraction->getCollisionHandlingA());
+        ch->setUseFriction(false);
+        ch->setStiffness(0.0); // Completely inelastic
         scene->getCollisionGraph()->addInteraction(rbdInteraction);
         scene->getActiveCamera()->setPosition(0.0, 40.0, 40.0);
 
@@ -201,19 +203,19 @@ main()
             // If w down, move forward
             if (keyDevice->getButton('i') == KEY_PRESS)
             {
-                extForce += Vec3d(0.0, 0.0, -40.0);
+                extForce += Vec3d(0.0, 0.0, -900.0);
             }
             if (keyDevice->getButton('k') == KEY_PRESS)
             {
-                extForce += Vec3d(0.0, 0.0, 40.0);
+                extForce += Vec3d(0.0, 0.0, 900.0);
             }
             if (keyDevice->getButton('j') == KEY_PRESS)
             {
-                extForce += Vec3d(-40.0, 0.0, 0.0);
+                extForce += Vec3d(-900.0, 0.0, 0.0);
             }
             if (keyDevice->getButton('l') == KEY_PRESS)
             {
-                extForce += Vec3d(40.0, 0.0, 0.0);
+                extForce += Vec3d(900.0, 0.0, 0.0);
             }
             if (keyDevice->getButton('u') == KEY_PRESS)
             {
@@ -227,6 +229,10 @@ main()
             *cubeObj->getRigidBody()->m_torque = extTorque;
             scene->getActiveCamera()->setFocalPoint(cubeObj->getRigidBody()->getPosition());
             scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
+        });
+        connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
+        {
+            cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getActiveScene()->getElapsedTime();
             });
 
         // Start viewer running, scene as paused

@@ -128,18 +128,17 @@ public:
     {
         if (m_pxDynamicActor)
         {
-            auto p = m_initialState->getPosition();
-            //auto r = m_initialState->getRotation();
-
-            //auto q = Quatd(r);
+            auto        p = m_initialState->getPosition().cast<float>();
+            Quatf       q(m_initialState->getRotation().rotation().cast<float>());
             PxTransform pose;
-            //pose.q = PxQuat(q.x(), q.y(), q.z(), q.w());
-            pose.p = PxVec3((float)p.x(), (float)p.y(), (float)p.z());
+            pose.q = PxQuat(q.x(), q.y(), q.z(), q.w());
+            pose.p = PxVec3(p.x(), p.y(), p.z());
             m_pxDynamicActor->setGlobalPose(pose);
-        }
 
-        //m_currentState->setState(m_initialState);
-        //m_previousState->setState(m_initialState);
+            // PhysX rbd doesn't support init velocities yet
+            m_pxDynamicActor->setLinearVelocity(PxVec3(0.0, 0.0, 0.0));
+            m_pxDynamicActor->setAngularVelocity(PxVec3(0.0, 0.0, 0.0));
+        }
     }
 
 protected:
