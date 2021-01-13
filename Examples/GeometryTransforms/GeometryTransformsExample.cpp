@@ -49,7 +49,6 @@ main()
 
     imstkNew<Scene> scene("GeometryTransforms");
 
-
     auto sceneObj = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj", "Dragon");
 
     CHECK(sceneObj != nullptr) << "ERROR: Unable to create scene object";
@@ -138,7 +137,7 @@ main()
         connect<Event>(sceneManager, EventType::PostUpdate,
             [&](Event*)
         {
-           // surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime(), Geometry::TransformType::ApplyToData);
+            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime(), Geometry::TransformType::ApplyToData);
             });
 
         // Add mouse and keyboard controls to the viewer
