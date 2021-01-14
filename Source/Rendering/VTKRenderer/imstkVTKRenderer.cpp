@@ -233,9 +233,18 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     }
 
     // Prepare screen space ambient occlusion effect
-    vtkNew<vtkRenderStepsPass> basicPasses;
-    ssao->SetDelegatePass(basicPasses);
+    ssao->SetDelegatePass(ssaoBasicPass);
 
+    // Prepare shadow pipeline
+    vtkNew<vtkSequencePass> seq;
+    vtkNew<vtkRenderPassCollection> passes;
+    passes->AddItem(shadows->GetShadowMapBakerPass());
+    passes->AddItem(shadows);
+    seq->SetPasses(passes);
+    shadowCamPass->SetDelegatePass(seq);
+
+    updateSSAOConfig(m_config->m_ssaoConfig);
+    updateShadowConfig(m_config->m_shadowConfig);
 }
 
 void
@@ -396,6 +405,12 @@ ssaoConfig
 VTKRenderer::getSSAOConfig() const
 {
     return m_config->m_ssaoConfig;
+}
+
+shadowConfig
+VTKRenderer::getShadowConfig() const
+{
+    return m_config->m_shadowConfig;
 }
 
 void
@@ -645,10 +660,45 @@ VTKRenderer::updateSSAOConfig(ssaoConfig config)
         ssao->BlurOff(); // do not blur occlusion
     }
 
-    if (config.m_enableSSAO) {
+
+    applyConfigChanges();
+}
+
+
+void
+VTKRenderer::updateShadowConfig(shadowConfig config)
+{
+    m_config->m_shadowConfig= config; // update config
+
+    shadows->GetShadowMapBakerPass()->SetResolution(config.m_shadowResolution);
+    shadows->GetShadowMapBakerPass()->Modified();
+
+    applyConfigChanges();
+
+}
+
+void
+VTKRenderer::applyConfigChanges()
+{
+    bool enableSSAO = m_config->m_ssaoConfig.m_enableSSAO;
+    bool enableShadow = m_config->m_shadowConfig.m_enableShadows;
+
+    if (enableSSAO && enableShadow)
+    {
+        ssao->SetDelegatePass(shadowCamPass);
         m_vtkRenderer->SetPass(ssao);
     }
-    else {
+    else if (enableSSAO)
+    {
+        ssao->SetDelegatePass(ssaoBasicPass);
+        m_vtkRenderer->SetPass(ssao);
+    }
+    else if (enableShadow)
+    {
+        m_vtkRenderer->SetPass(shadowCamPass);
+    }
+    else
+    {
         m_vtkRenderer->SetPass(NULL);
     }
 }

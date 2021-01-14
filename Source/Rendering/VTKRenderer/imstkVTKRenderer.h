@@ -26,9 +26,12 @@
 #include "imstkVTKTextureDelegate.h"
 #include "imstkEventObject.h"
 
+#include <vtkCameraPass.h>
 #include <vtkSmartPointer.h>
-#include <vtkRenderStepsPass.h>
 #include <vtkSSAOPass.h>
+#include <vtkShadowMapPass.h>
+#include <vtkRenderStepsPass.h>
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -105,9 +108,14 @@ public:
     bool getTimeTableVisibility() const;
 
     ///
-    /// \brief Update SSAO options
+    /// \brief Get SSAO options
     ///
     ssaoConfig getSSAOConfig() const;
+
+    ///
+    /// \brief Get Shadow options
+    ///
+    shadowConfig getShadowConfig() const;
 
     ///
     /// \brief Updates the camera
@@ -139,6 +147,11 @@ public:
     ///
     void updateSSAOConfig(ssaoConfig config);
 
+    ///
+    /// \brief Update Sahdow options
+    ///
+    void updateShadowConfig(shadowConfig config);
+
 protected:
     ///
     /// \brief Remove actors (also called props) from the scene
@@ -149,6 +162,11 @@ protected:
     /// \brief Add actors (also called props) from the scene
     ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
+
+    ///
+    /// \brief Apply config changes
+    ///
+    void applyConfigChanges();
 
 protected:
     ///
@@ -225,5 +243,10 @@ protected:
 
     // SSAO Effect
     vtkNew<vtkSSAOPass> ssao;
+    vtkNew<vtkRenderStepsPass> ssaoBasicPass;
+
+    // SSAO Effect
+    vtkNew<vtkShadowMapPass> shadows;
+    vtkNew<vtkCameraPass> shadowCamPass;
 };
 }

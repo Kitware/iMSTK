@@ -28,12 +28,19 @@
 namespace imstk
 {
 
-struct ssaoConfig {
+struct ssaoConfig
+{
     bool m_enableSSAO = false;
     bool m_SSAOBlur = false; // blur occlusion
     double m_SSAORadius = 0.1; // comparison radius
     double m_SSAOBias = 0.001; // comparison bias
     unsigned int m_KernelSize = 128; // number of samples used
+};
+
+struct shadowConfig
+{
+    bool m_enableShadows = false;
+    unsigned int m_shadowResolution = 1024; // Shadow map resolution, not need to be power of 2
 };
 
 struct rendererConfig
@@ -45,6 +52,9 @@ struct rendererConfig
 
     // ScreenSpace Ambient Occlusion
     ssaoConfig m_ssaoConfig;
+
+    // Shadow Settings
+    shadowConfig m_shadowConfig;
 };
 
 ///
