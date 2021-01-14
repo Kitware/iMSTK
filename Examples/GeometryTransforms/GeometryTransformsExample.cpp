@@ -70,24 +70,23 @@ main()
     planeVisualModel->setRenderMaterial(planeMaterial);
 
     imstkNew<VisualObject> planeObj("Plane");
-    //planeObj->setVisualGeometry(planeGeom);
     planeObj->addVisualModel(planeVisualModel);
     scene->addSceneObject(planeObj);
 
     //  Cube
     imstkNew<Cube> cubeGeom;
-    cubeGeom->setWidth(20.0);
+    cubeGeom->setWidth(10.0);
     cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
     cubeGeom->rotate(Vec3d(1.0, 1.0, 0.0), PI_4, Geometry::TransformType::ApplyToData);
+    cubeGeom->translate(Vec3d(0.0, 0.0, 10.0));
 
-    auto                     materialCube = std::make_shared<RenderMaterial>();
-    imstkNew<RenderMaterial> cubeMaterial;
-    cubeMaterial->setColor(Color::Red);
-    cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    cubeMaterial->setPointSize(6.);
-    cubeMaterial->setLineWidth(4.);
+    imstkNew<RenderMaterial> redMaterial;
+    redMaterial->setColor(Color::Red);
+    redMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    redMaterial->setPointSize(6.);
+    redMaterial->setLineWidth(4.);
     imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
-    cubeVisualModel->setRenderMaterial(cubeMaterial);
+    cubeVisualModel->setRenderMaterial(redMaterial);
 
     imstkNew<VisualObject> cubeObj("Cube");
     cubeObj->addVisualModel(cubeVisualModel);
@@ -96,17 +95,13 @@ main()
     //  Cylinder
     imstkNew<Cylinder> cylinderGeom;
     cylinderGeom->setRadius(4.0);
-    cylinderGeom->setLength(8.0);
+    cylinderGeom->setLength(12.0);
     cylinderGeom->scale(0.4, Geometry::TransformType::ConcatenateToTransform);
     cylinderGeom->rotate(Vec3d(1.0, 1.0, 0), PI_2, Geometry::TransformType::ApplyToData);
+    cylinderGeom->translate(Vec3d(0.0, 0.0, -10.0));
 
-    imstkNew<RenderMaterial> cylMaterial;
-    cylMaterial->setColor(Color::Red);
-    cylMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    cylMaterial->setPointSize(6.0);
-    cylMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
-    cylVisualModel->setRenderMaterial(materialCube);
+    cylVisualModel->setRenderMaterial(redMaterial);
 
     imstkNew<VisualObject> cylObj("Cylinder");
     cylObj->addVisualModel(cylVisualModel);
