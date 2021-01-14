@@ -27,12 +27,24 @@
 
 namespace imstk
 {
+
+struct ssaoConfig {
+    bool m_enableSSAO = false;
+    bool m_SSAOBlur = false; // blur occlusion
+    double m_SSAORadius = 0.1; // comparison radius
+    double m_SSAOBias = 0.001; // comparison bias
+    unsigned int m_KernelSize = 128; // number of samples used
+};
+
 struct rendererConfig
 {
     bool m_enableVR = false;
 
     Color m_BGColor1 = Color(0.3285, 0.3285, 0.6525);
     Color m_BGColor2 = Color(0.13836, 0.13836, 0.2748);
+
+    // ScreenSpace Ambient Occlusion
+    ssaoConfig m_ssaoConfig;
 };
 
 ///

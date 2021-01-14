@@ -27,6 +27,8 @@
 #include "imstkEventObject.h"
 
 #include <vtkSmartPointer.h>
+#include <vtkRenderStepsPass.h>
+#include <vtkSSAOPass.h>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -103,6 +105,11 @@ public:
     bool getTimeTableVisibility() const;
 
     ///
+    /// \brief Update SSAO options
+    ///
+    ssaoConfig getSSAOConfig() const;
+
+    ///
     /// \brief Updates the camera
     ///
     void updateCamera();
@@ -126,6 +133,11 @@ public:
     /// \brief Update background colors
     ///
     void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
+
+    ///
+    /// \brief Update SSAO options
+    ///
+    void updateSSAOConfig(ssaoConfig config);
 
 protected:
     ///
@@ -210,5 +222,8 @@ protected:
     vtkSmartPointer<vtkTable> m_timeTable;
     vtkPlotBar* m_timeTablePlot;
     int m_timeTableIter = 0;
+
+    // SSAO Effect
+    vtkNew<vtkSSAOPass> ssao;
 };
 }

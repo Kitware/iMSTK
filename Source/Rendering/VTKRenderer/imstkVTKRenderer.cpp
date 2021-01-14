@@ -48,6 +48,11 @@
 
 #include <vtkOpenVRRenderer.h>
 #include <vtkOpenVRCamera.h>
+#include <vtkShadowMapBakerPass.h>
+#include <vtkShadowMapPass.h>
+#include <vtkSequencePass.h>
+#include <vtkCameraPass.h>
+#include <vtkRenderPassCollection.h>
 
 namespace imstk
 {
@@ -226,6 +231,11 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         axisY->SetGridVisible(false);
         axisY->SetCustomTickPositions(xIndices, labels);
     }
+
+    // Prepare screen space ambient occlusion effect
+    vtkNew<vtkRenderStepsPass> basicPasses;
+    ssao->SetDelegatePass(basicPasses);
+
 }
 
 void
@@ -380,6 +390,12 @@ bool
 VTKRenderer::getTimeTableVisibility() const
 {
     return m_timeTableChartActor->GetVisibility();
+}
+
+ssaoConfig
+VTKRenderer::getSSAOConfig() const
+{
+    return m_config->m_ssaoConfig;
 }
 
 void
@@ -608,6 +624,32 @@ VTKRenderer::updateBackground(const Vec3d backgroundOne, const Vec3d backgroundT
     else
     {
         m_vtkRenderer->GradientBackgroundOff();
+    }
+}
+
+void
+VTKRenderer::updateSSAOConfig(ssaoConfig config)
+{
+    m_config->m_ssaoConfig = config; // update config
+
+    ssao->SetRadius(config.m_SSAORadius); // comparison radius
+    ssao->SetBias(config.m_SSAOBias); // comparison bias
+    ssao->SetKernelSize(config.m_KernelSize); // number of samples used
+
+    if (config.m_SSAOBlur)
+    {
+        ssao->BlurOn(); // blur occlusion
+    }
+    else
+    {
+        ssao->BlurOff(); // do not blur occlusion
+    }
+
+    if (config.m_enableSSAO) {
+        m_vtkRenderer->SetPass(ssao);
+    }
+    else {
+        m_vtkRenderer->SetPass(NULL);
     }
 }
 } // imstk
