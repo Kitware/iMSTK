@@ -34,7 +34,6 @@ VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> 
 {
     auto geometry = std::static_pointer_cast<Capsule>(visualModel->getGeometry());
 
-<<<<<<< HEAD
     m_capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
     m_capsuleSource->SetRadius(geometry->getRadius());
     m_capsuleSource->SetCylinderLength(geometry->getLength());

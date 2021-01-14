@@ -33,28 +33,22 @@
 
 // Geometry
 #include "imstkMeshIO.h"
-#include "imstkCapsule.h"
 #include "imstkPlane.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkSurfaceMeshCut.h"
 
 // Devices and controllers
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
-//#include "imstkLaparoscopicToolController.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkSceneObjectController.h"
 
 // Collisions and Models
-#include "imstkCollisionGraph.h"
-#include "imstkCollisionPair.h"
-#include "imstkCollisionDetection.h"
 #include "imstkPbdModel.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
-
-#include "imstkSurfaceMeshCut.h"
 
 using namespace imstk;
 

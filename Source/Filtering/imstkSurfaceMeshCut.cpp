@@ -68,6 +68,7 @@ SurfaceMeshCut::requestUpdate()
     // vertices on the cutting path and whether they will be split
     std::map<int, bool> cutVerts;
 
+    // generate cut data
     if (std::dynamic_pointer_cast<AnalyticalGeometry>(m_CutGeometry) != nullptr)
     {
         generateAnalyticalCutData(std::static_pointer_cast<AnalyticalGeometry>(m_CutGeometry), outputSurf);
@@ -219,7 +220,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
         }
         else
         {
-            //throw error
+            //do nothing
         }
     }
     outputSurf->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*vertices));

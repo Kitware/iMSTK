@@ -123,8 +123,8 @@ protected:
     bool vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
                           std::set<int>& triSet);
 
-    void generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> plane, std::shared_ptr<SurfaceMesh> inputSurf);
-// void generateCutData(triangle);
+    void generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> inputSurf);
+// void generateCutData(std::shared_ptr<SurfaceMesh> cutSurf, std::shared_ptr<SurfaceMesh> inputSurf);
 
 private:
     std::shared_ptr<std::vector<CutData>> m_CutData = std::make_shared<std::vector<CutData>>();
