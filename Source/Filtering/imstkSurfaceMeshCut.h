@@ -25,7 +25,8 @@
 
 namespace imstk
 {
-class Plane;
+class Geometry;
+class AnalyticalGeometry;
 
 // vertex on the plane (0), positive side (+1), negative side (-1)
 // pt0 and pt1 follows the triangle's indexing order when tri is presented
@@ -102,8 +103,8 @@ public:
 
     imstkGetMacro(CutData, std::shared_ptr<std::vector<CutData>>);
     imstkSetMacro(CutData, std::shared_ptr<std::vector<CutData>>);
-    imstkGetMacro(Plane, std::shared_ptr<Plane>);
-    imstkSetMacro(Plane, std::shared_ptr<Plane>);
+    imstkGetMacro(CutGeometry, std::shared_ptr<Geometry>);
+    imstkSetMacro(CutGeometry, std::shared_ptr<Geometry>);
     imstkGetMacro(Epsilon, double);
     imstkSetMacro(Epsilon, double);
 
@@ -113,17 +114,21 @@ protected:
                     std::map<int, bool>& cutVerts);
 
     void splitVerts(std::shared_ptr<SurfaceMesh> outputSurf,
-                    std::map<int, bool>& cutVerts);
-    int pointOnPlaneSide(Vec3d pt);
+                    std::map<int, bool>& cutVerts,
+                    std::shared_ptr<Geometry> geometry);
+
+    int pointOnGeometrySide(Vec3d pt, std::shared_ptr<Geometry> geometry);
+    int pointOnAnalyticalSide(Vec3d pt, std::shared_ptr<AnalyticalGeometry> geometry);
+
     bool vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
                           std::set<int>& triSet);
 
-    void generateCutData(std::shared_ptr<Plane> plane, std::shared_ptr<SurfaceMesh> inputSurf);
+    void generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> plane, std::shared_ptr<SurfaceMesh> inputSurf);
 // void generateCutData(triangle);
 
 private:
     std::shared_ptr<std::vector<CutData>> m_CutData = std::make_shared<std::vector<CutData>>();
-    std::shared_ptr<Plane> m_Plane = std::make_shared<Plane>();
+    std::shared_ptr<Geometry> m_CutGeometry = nullptr;
     double m_Epsilon = 1;
 };
 }

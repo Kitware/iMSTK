@@ -51,7 +51,6 @@
 #include "imstkCollisionPair.h"
 #include "imstkCollisionDetection.h"
 #include "imstkPbdModel.h"
-#include "imstkPbdObjectCuttingPair.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
 
@@ -252,7 +251,7 @@ main()
                 std::shared_ptr<SurfaceMesh> clothMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
                 imstkNew<SurfaceMeshCut> surfCut;
                 surfCut->setInputMesh(clothMesh);
-                surfCut->setPlane(planeGeom);
+                surfCut->setCutGeometry(planeGeom);
                 surfCut->update();
                 std::shared_ptr<SurfaceMesh> newClothMesh = surfCut->getOutputMesh();
 

@@ -24,6 +24,7 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
 #include "imstkPlane.h"
+#include "imstkAnalyticalGeometry.h"
 
 #include <map>
 #include <set>
@@ -35,6 +36,8 @@ SurfaceMeshCut::SurfaceMeshCut()
     setNumberOfInputPorts(1);
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());
+
+    m_CutGeometry = std::make_shared<Plane>();
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -65,13 +68,26 @@ SurfaceMeshCut::requestUpdate()
     // vertices on the cutting path and whether they will be split
     std::map<int, bool> cutVerts;
 
-    generateCutData(m_Plane, outputSurf);
+    if (std::dynamic_pointer_cast<AnalyticalGeometry>(m_CutGeometry) != nullptr)
+    {
+        generateAnalyticalCutData(std::static_pointer_cast<AnalyticalGeometry>(m_CutGeometry), outputSurf);
+    }
+    else if (std::dynamic_pointer_cast<SurfaceMesh>(m_CutGeometry) != nullptr)
+    {
+        setOutput(outputSurf);
+        return;
+    }
+    else
+    {
+        setOutput(outputSurf);
+        return;
+    }
 
     // refinement
     refinement(outputSurf, cutVerts);
 
     // split cutting vertices
-    splitVerts(outputSurf, cutVerts);
+    splitVerts(outputSurf, cutVerts, m_CutGeometry);
 
     // vtkPolyData to output SurfaceMesh
     setOutput(outputSurf);
@@ -213,7 +229,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
 }
 
 void
-SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int, bool>& cutVerts)
+SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int, bool>& cutVerts, std::shared_ptr<Geometry> geometry)
 {
     auto triangles = outputSurf->getTriangleIndices();
     auto vertices  = outputSurf->getVertexPositions();
@@ -253,7 +269,7 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
                 Vec3d pt1 = (*vertices)[(*triangles)[t][1]];
                 Vec3d pt2 = (*vertices)[(*triangles)[t][2]];
 
-                if (pointOnPlaneSide(pt0) < 0 || pointOnPlaneSide(pt1) < 0 || pointOnPlaneSide(pt2) < 0)
+                if (pointOnGeometrySide(pt0, geometry) < 0 || pointOnGeometrySide(pt1, geometry) < 0 || pointOnGeometrySide(pt2, geometry) < 0)
                 {
                     for (int i = 0; i < 3; i++)
                     {
@@ -274,9 +290,19 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
 }
 
 int
-SurfaceMeshCut::pointOnPlaneSide(Vec3d pt)
+SurfaceMeshCut::pointOnGeometrySide(Vec3d pt, std::shared_ptr<Geometry> geometry)
 {
-    double normalProjection = m_Plane->getNormal().dot(pt - m_Plane->getPosition());
+    if (std::dynamic_pointer_cast<AnalyticalGeometry>(geometry) != nullptr)
+    {
+        return pointOnAnalyticalSide(pt, std::static_pointer_cast<AnalyticalGeometry>(geometry));
+    }
+    return 0;
+}
+
+int
+SurfaceMeshCut::pointOnAnalyticalSide(Vec3d pt, std::shared_ptr<AnalyticalGeometry> geometry)
+{
+    double normalProjection = geometry->getFunctionValue(pt);
     if (normalProjection > m_Epsilon)
     {
         return 1;
@@ -322,7 +348,7 @@ SurfaceMeshCut::vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleI
 }
 
 void
-SurfaceMeshCut::generateCutData(std::shared_ptr<Plane> plane, std::shared_ptr<SurfaceMesh> inputSurf)
+SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> inputSurf)
 {
     auto triangles = inputSurf->getTriangleIndices();
     auto vertices  = inputSurf->getVertexPositions();
@@ -335,9 +361,9 @@ SurfaceMeshCut::generateCutData(std::shared_ptr<Plane> plane, std::shared_ptr<Su
         auto&   tri = (*triangles)[i];
         CutData newCutData;
 
-        auto ptSide = Vec3i(pointOnPlaneSide((*vertices)[tri[0]]),
-                            pointOnPlaneSide((*vertices)[tri[1]]),
-                            pointOnPlaneSide((*vertices)[tri[2]]));
+        auto ptSide = Vec3i(pointOnAnalyticalSide((*vertices)[tri[0]], geometry),
+                            pointOnAnalyticalSide((*vertices)[tri[1]], geometry),
+                            pointOnAnalyticalSide((*vertices)[tri[2]], geometry));
 
         switch (ptSide.squaredNorm())
         {
@@ -377,20 +403,20 @@ SurfaceMeshCut::generateCutData(std::shared_ptr<Plane> plane, std::shared_ptr<Su
                 {
                     if (ptSide[j] == 0)
                     {
-                        int   idx0  = (j + 1) % 3;
-                        int   idx1  = (j + 2) % 3;
-                        int   ptId0 = tri[idx0];
-                        int   ptId1 = tri[idx1];
-                        Vec3d pos0  = (*vertices)[ptId0];
-                        Vec3d pos1  = (*vertices)[ptId1];
-                        Vec3d p     = m_Plane->getPosition();
-                        Vec3d n     = m_Plane->getNormal();
+                        int    idx0  = (j + 1) % 3;
+                        int    idx1  = (j + 2) % 3;
+                        int    ptId0 = tri[idx0];
+                        int    ptId1 = tri[idx1];
+                        Vec3d  pos0  = (*vertices)[ptId0];
+                        Vec3d  pos1  = (*vertices)[ptId1];
+                        double func0 = geometry->getFunctionValue(pos0);
+                        double func1 = geometry->getFunctionValue(pos1);
 
                         newCutData.cutType      = CutType::EDGE_VERT;
                         newCutData.triId        = i;
                         newCutData.ptIds[0]     = ptId0;
                         newCutData.ptIds[1]     = ptId1;
-                        newCutData.cutCoords[0] = (p - pos0).dot(n) / (pos1 - pos0).dot(n) * (pos1 - pos0) + pos0;
+                        newCutData.cutCoords[0] = -func0 / (func1 - func0) * (pos1 - pos0) + pos0;
                         newCutData.cutCoords[1] = (*vertices)[tri[j]];
                         m_CutData->push_back(newCutData);
                     }
@@ -402,56 +428,30 @@ SurfaceMeshCut::generateCutData(std::shared_ptr<Plane> plane, std::shared_ptr<Su
             }
             break;
         case 3:
-            if (ptSide.sum() == 1)
+            if (ptSide.sum() == -1 || ptSide.sum() == 1)
             {
                 for (int j = 0; j < 3; j++)
                 {
-                    if (ptSide[j] < 0)
+                    if (ptSide[j] == -ptSide.sum())
                     {
-                        int   idx0  = (j + 1) % 3;
-                        int   idx1  = (j + 2) % 3;
-                        int   ptId0 = tri[idx0];
-                        int   ptId1 = tri[idx1];
-                        int   ptId2 = tri[j];
-                        Vec3d pos0  = (*vertices)[ptId0];
-                        Vec3d pos1  = (*vertices)[ptId1];
-                        Vec3d pos2  = (*vertices)[ptId2];
-                        Vec3d p     = m_Plane->getPosition();
-                        Vec3d n     = m_Plane->getNormal();
+                        int    idx0  = (j + 1) % 3;
+                        int    idx1  = (j + 2) % 3;
+                        int    ptId0 = tri[idx0];
+                        int    ptId1 = tri[idx1];
+                        int    ptId2 = tri[j];
+                        Vec3d  pos0  = (*vertices)[ptId0];
+                        Vec3d  pos1  = (*vertices)[ptId1];
+                        Vec3d  pos2  = (*vertices)[ptId2];
+                        double func0 = geometry->getFunctionValue(pos0);
+                        double func1 = geometry->getFunctionValue(pos1);
+                        double func2 = geometry->getFunctionValue(pos2);
 
                         newCutData.cutType      = CutType::EDGE_EDGE;
                         newCutData.triId        = i;
                         newCutData.ptIds[0]     = ptId0;
                         newCutData.ptIds[1]     = ptId1;
-                        newCutData.cutCoords[0] = (p - pos0).dot(n) / (pos2 - pos0).dot(n) * (pos2 - pos0) + pos0;
-                        newCutData.cutCoords[1] = (p - pos1).dot(n) / (pos2 - pos1).dot(n) * (pos2 - pos1) + pos1;
-                        m_CutData->push_back(newCutData);
-                    }
-                }
-            }
-            else if (ptSide.sum() == -1)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    if (ptSide[j] > 0)
-                    {
-                        int   idx0  = (j + 1) % 3;
-                        int   idx1  = (j + 2) % 3;
-                        int   ptId0 = tri[idx0];
-                        int   ptId1 = tri[idx1];
-                        int   ptId2 = tri[j];
-                        Vec3d pos0  = (*vertices)[ptId0];
-                        Vec3d pos1  = (*vertices)[ptId1];
-                        Vec3d pos2  = (*vertices)[ptId2];
-                        Vec3d p     = m_Plane->getPosition();
-                        Vec3d n     = m_Plane->getNormal();
-
-                        newCutData.cutType      = CutType::EDGE_EDGE;
-                        newCutData.triId        = i;
-                        newCutData.ptIds[0]     = ptId0;
-                        newCutData.ptIds[1]     = ptId1;
-                        newCutData.cutCoords[0] = (p - pos0).dot(n) / (pos2 - pos0).dot(n) * (pos2 - pos0) + pos0;
-                        newCutData.cutCoords[1] = (p - pos1).dot(n) / (pos2 - pos1).dot(n) * (pos2 - pos1) + pos1;
+                        newCutData.cutCoords[0] = -func0 / (func2 - func0) * (pos2 - pos0) + pos0;
+                        newCutData.cutCoords[1] = -func1 / (func2 - func1) * (pos2 - pos1) + pos1;
                         m_CutData->push_back(newCutData);
                     }
                 }
