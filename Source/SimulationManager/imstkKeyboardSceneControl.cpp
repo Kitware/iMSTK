@@ -28,6 +28,9 @@
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
+#include "imstkSceneObject.h"
+#include "imstkGeometry.h"
+#include "imstkCamera.h"
 
 namespace imstk
 {

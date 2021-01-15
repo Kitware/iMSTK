@@ -142,6 +142,12 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
             LOG(WARNING) << "Light type undefined!";
         }
     }
+    
+    for (const auto& light : m_vtkLights)
+    {
+        m_vtkRenderer->AddLight(light);
+        std::cout << "debugi" << std::endl;
+    }
 
     for (const auto& light : m_vtkLights)
     {
@@ -662,6 +668,12 @@ VTKRenderer::updateSSAOConfig(ssaoConfig config)
 
 
     applyConfigChanges();
+
+    std::cout << "SSAO: " << config.m_enableSSAO ? "On" : "Off";
+    std::cout << " Blur: " << config.m_SSAOBlur ? "On" : "Off";
+    std::cout << " kernel: " << config.m_KernelSize;
+    std::cout << " bias: " << config.m_SSAOBias;
+    std::cout << " radius: " << config.m_SSAORadius << std::endl;
 }
 
 
@@ -675,6 +687,8 @@ VTKRenderer::updateShadowConfig(shadowConfig config)
 
     applyConfigChanges();
 
+    std::cout << "Shadows: " << config.m_enableShadows ? "On" : "Off";
+    std::cout << " Resolution: " << config.m_shadowResolution << std::endl;
 }
 
 void
