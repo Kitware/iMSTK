@@ -86,7 +86,7 @@ generateMesh()
 
     vertices.reserve(300);
     indices.reserve(100);
-    for (size_t i = 0; i < 100; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         indices.push_back(Vec3i(i * 3, i * 3 + 1, i * 3 + 2));
         vertices.push_back(Vec3d(randD(), randD(), randD()));

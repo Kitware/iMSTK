@@ -261,9 +261,9 @@ createCollidingSurfaceMesh()
     }
 
     // c. Add connectivity data
-    for (std::size_t i = 0; i < nRows - 1; ++i)
+    for (int i = 0; i < nRows - 1; ++i)
     {
-        for (std::size_t j = 0; j < nCols - 1; j++)
+        for (int j = 0; j < nCols - 1; j++)
         {
             triangles.push_back(Vec3i((nPointPerSide * 3) + i * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j));
             triangles.push_back(Vec3i((nPointPerSide * 3) + (i + 1) * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1));

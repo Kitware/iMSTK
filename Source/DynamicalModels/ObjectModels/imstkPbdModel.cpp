@@ -371,7 +371,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
         const auto                     nV       = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
-        for (size_t k = 0; k < elements.size(); ++k)
+        for (int k = 0; k < elements.size(); ++k)
         {
             auto& tet = elements[k];
             addConstraint(E, tet[0], tet[1]);
@@ -389,7 +389,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
         const auto                     nV       = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
-        for (size_t k = 0; k < elements.size(); ++k)
+        for (int k = 0; k < elements.size(); ++k)
         {
             auto& tri = elements[k];
             addConstraint(E, tri[0], tri[1]);
@@ -404,7 +404,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
         const auto&                    nV       = lineMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
-        for (size_t k = 0; k < elements.size(); k++)
+        for (int k = 0; k < elements.size(); k++)
         {
             auto& seg = elements[k];
             addConstraint(E, seg[0], seg[1]);
@@ -468,11 +468,11 @@ PbdModel::initializeBendConstraints(const double stiffness)
     const VecDataArray<int, 2>& elements = *lineMesh->getLinesIndices();
 
     // Iterate sets of two segments
-    for (size_t k = 0; k < elements.size() - 1; k++)
+    for (int k = 0; k < elements.size() - 1; k++)
     {
-        auto&  seg1 = elements[k];
-        auto&  seg2 = elements[k + 1];
-        size_t i3   = seg2[0];
+        auto& seg1 = elements[k];
+        auto& seg2 = elements[k + 1];
+        int   i3   = seg2[0];
         if (i3 == seg1[0] || i3 == seg1[1])
         {
             i3 = seg2[1];
@@ -493,7 +493,7 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
     const auto                       nV       = triMesh->getNumVertices();
     std::vector<std::vector<size_t>> onering(nV);
 
-    for (size_t k = 0; k < elements.size(); ++k)
+    for (int k = 0; k < elements.size(); ++k)
     {
         auto& tri = elements[k];
         onering[tri[0]].push_back(k);
@@ -537,7 +537,7 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
             }
         };
 
-    for (size_t k = 0; k < elements.size(); ++k)
+    for (int k = 0; k < elements.size(); ++k)
     {
         auto& tri = elements[k];
 

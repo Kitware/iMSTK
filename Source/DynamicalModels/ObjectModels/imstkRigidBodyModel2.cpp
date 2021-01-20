@@ -197,7 +197,7 @@ RigidBodyModel2::solveConstraints()
     {
         return;
     }
-    if (m_config->m_maxNumConstraints != -1 && m_constraints.size() > m_config->m_maxNumConstraints * 2)
+    if (m_config->m_maxNumConstraints != -1 && static_cast<int>(m_constraints.size()) > m_config->m_maxNumConstraints * 2)
     {
         m_constraints.resize(m_config->m_maxNumConstraints * 2);
     }

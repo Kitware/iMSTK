@@ -57,11 +57,11 @@ MeshToMeshBruteForceCD::computeCollisionData()
         const VecDataArray<double, 3>& mesh1Vertices = *mesh1->getVertexPositions();
 
         // brute force, use BVH or spatial grid would be much better
-        for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
+        for (int i = 0; i < static_cast<int>(mesh1->getNumVertices()); ++i)
         {
             const Vec3d p = mesh1Vertices[i];
 
-            for (size_t j = 0; j < mesh2Cells.size(); ++j)
+            for (int j = 0; j < mesh2Cells.size(); ++j)
             {
                 const Vec3i& e  = mesh2Cells[j];
                 const Vec3d  p0 = mesh2Vertices[e[0]];
@@ -80,11 +80,11 @@ MeshToMeshBruteForceCD::computeCollisionData()
             }
         }
 
-        const auto                     numLines    = mesh1->getNumLines();
-        const auto                     numVertices = mesh2->getNumVertices();
+        const int                      numLines    = static_cast<int>(mesh1->getNumLines());
+        const int                      numVertices = static_cast<int>(mesh2->getNumVertices());
         std::vector<std::vector<bool>> E2(numVertices, std::vector<bool>(numVertices, 1));
 
-        for (size_t k = 0; k < numLines; ++k)
+        for (int k = 0; k < numLines; ++k)
         {
             const Vec2i& nodes = mesh1->getLineIndices(k);
             const size_t i1    = nodes[0];
@@ -93,7 +93,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
             const Vec3d P = mesh1Vertices[i1];
             const Vec3d Q = mesh1Vertices[i2];
 
-            for (size_t j = 0; j < mesh2Cells.size(); ++j)
+            for (int j = 0; j < mesh2Cells.size(); ++j)
             {
                 const Vec3i& e  = mesh2Cells[j];
                 const Vec3d  p0 = mesh2Vertices[e[0]];
@@ -145,11 +145,11 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
         // brute force, use BVH or spatial grid would be much better
         // point
-        for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
+        for (int i = 0; i < static_cast<int>(mesh1->getNumVertices()); ++i)
         {
             const auto p = mesh1Vertices[i];
 
-            for (size_t j = 0; j < mesh2Cells.size(); ++j)
+            for (int j = 0; j < mesh2Cells.size(); ++j)
             {
                 const Vec3i& e  = mesh2Cells[j];
                 const Vec3d  p0 = mesh2Vertices[e[0]];
@@ -174,11 +174,11 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
         // brute force, use BVH or spatial grid would be much better
         // point
-        for (size_t i = 0; i < mesh1->getNumVertices(); ++i)
+        for (int i = 0; i < static_cast<int>(mesh1->getNumVertices()); ++i)
         {
             const Vec3d p = mesh1Vertices[i];
 
-            for (size_t j = 0; j < mesh2Cells.size(); ++j)
+            for (int j = 0; j < mesh2Cells.size(); ++j)
             {
                 const Vec3i& e  = mesh2Cells[j];
                 const Vec3d  p0 = mesh2Vertices[e[0]];
@@ -203,18 +203,18 @@ MeshToMeshBruteForceCD::computeCollisionData()
         const auto                     nV2 = mesh2->getNumVertices();
         std::vector<std::vector<bool>> E2(nV2, std::vector<bool>(nV2, 1));
 
-        for (size_t k = 0; k < mesh1Cells.size(); ++k)
+        for (int k = 0; k < mesh1Cells.size(); ++k)
         {
             const Vec3i& tri = mesh1Cells[k];
 
-            size_t i1 = tri[0];
-            size_t i2 = tri[1];
+            int i1 = tri[0];
+            int i2 = tri[1];
 
             if (E[i1][i2] && E[i2][i1])
             {
                 const Vec3d P = mesh1Vertices[i1];
                 const Vec3d Q = mesh1Vertices[i2];
-                for (size_t j = 0; j < mesh2Cells.size(); ++j)
+                for (int j = 0; j < mesh2Cells.size(); ++j)
                 {
                     const Vec3i& e  = mesh2Cells[j];
                     const Vec3d  p0 = mesh2Vertices[e[0]];
@@ -267,7 +267,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
                 const Vec3d P = mesh1Vertices[i1];
                 const Vec3d Q = mesh1Vertices[i2];
 
-                for (size_t j = 0; j < mesh2Cells.size(); ++j)
+                for (int j = 0; j < mesh2Cells.size(); ++j)
                 {
                     const Vec3i& e  = mesh2Cells[j];
                     const Vec3d  p0 = mesh2Vertices[e[0]];
@@ -319,7 +319,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
             {
                 const Vec3d P = mesh1->getVertexPosition(i1);
                 const Vec3d Q = mesh1->getVertexPosition(i2);
-                for (size_t j = 0; j < mesh2Cells.size(); ++j)
+                for (int j = 0; j < mesh2Cells.size(); ++j)
                 {
                     const Vec3i& e  = mesh2Cells[j];
                     const Vec3d  p0 = mesh2Vertices[e[0]];

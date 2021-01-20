@@ -43,12 +43,12 @@
 namespace imstk
 {
 Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
-    m_activeCamera(nullptr),
-    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>()),
-    m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_config(config),
     m_name(name),
-    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink"))
+    m_activeCamera(nullptr),
+    m_collisionGraph(std::make_shared<CollisionGraph>()),
+    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
+    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
     std::shared_ptr<Camera> defaultCam = std::make_shared<Camera>();
     defaultCam->setPosition(0.0, 2.0, -15.0);

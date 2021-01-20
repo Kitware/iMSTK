@@ -32,7 +32,6 @@ namespace imstk
 class SPHBoundaryConditions
 {
 public:
-
     enum class ParticleType
     {
         Fluid,
@@ -42,11 +41,13 @@ public:
         Buffer
     };
 
+public:
     SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
                           const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
                           StdVectorOfVec3d& mainParticlePositions,
                           const StdVectorOfVec3d& wallParticlePositions);
 
+public:
     bool isInInletDomain(const Vec3d& position);
 
     bool isInOutletDomain(const Vec3d& position);

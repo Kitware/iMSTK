@@ -31,8 +31,8 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
                                std::shared_ptr<CollidingObject>     bone,
                                std::shared_ptr<CollidingObject>     drill) :
     CollisionHandling(Type::BoneDrilling, side, colData),
-    m_drill(drill),
-    m_bone(bone)
+    m_bone(bone),
+    m_drill(drill)
 {
     auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
@@ -40,19 +40,19 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
 
     // Initialize bone density values
     m_nodalDensity.reserve(boneMesh->getNumVertices());
-    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
+    for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         m_nodalDensity.push_back(m_initialBoneDensity);
     }
 
     m_nodeRemovalStatus.reserve(boneMesh->getNumVertices());
-    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
+    for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         m_nodeRemovalStatus.push_back(false);
     }
 
     m_nodalCardinalSet.reserve(boneMesh->getNumVertices());
-    for (int i = 0; i < boneMesh->getNumVertices(); ++i)
+    for (size_t i = 0; i < boneMesh->getNumVertices(); ++i)
     {
         std::vector<size_t> row;
         m_nodalCardinalSet.push_back(row);

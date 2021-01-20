@@ -27,11 +27,11 @@
 namespace imstk
 {
 PbdSolver::PbdSolver() :
+    m_dt(0.0),
     m_partitionedConstraints(std::make_shared<std::vector<PBDConstraintVector>>()),
     m_constraints(std::make_shared<PBDConstraintVector>()),
     m_positions(std::make_shared<VecDataArray<double, 3>>()),
-    m_invMasses(std::make_shared<DataArray<double>>()),
-    m_dt(0.0)
+    m_invMasses(std::make_shared<DataArray<double>>())
 {
 }
 

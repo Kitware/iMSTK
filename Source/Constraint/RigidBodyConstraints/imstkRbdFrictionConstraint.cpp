@@ -34,7 +34,7 @@ RbdFrictionConstraint::RbdFrictionConstraint(
     const double               contactDepth,
     const double               frictionCoefficient,
     const Side                 side) : RbdConstraint(obj1, obj2, side),
-    m_contactN(contactNormal), m_contactPt(contactPt),
+    m_contactPt(contactPt), m_contactN(contactNormal),
     m_contactDepth(contactDepth), m_frictionCoefficient(frictionCoefficient)
 {
 }

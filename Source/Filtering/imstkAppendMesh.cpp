@@ -52,7 +52,7 @@ void
 AppendMesh::requestUpdate()
 {
     vtkNew<vtkAppendPolyData> filter;
-    for (int i = 0; i < getNumberOfInputPorts(); i++)
+    for (size_t i = 0; i < getNumberOfInputPorts(); i++)
     {
         std::shared_ptr<SurfaceMesh> inputMesh = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
         if (inputMesh == nullptr)

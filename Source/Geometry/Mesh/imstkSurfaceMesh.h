@@ -188,13 +188,6 @@ public:
     size_t getNumTriangles() const;
 
     ///
-    /// \brief Set load factor
-    /// \param loadFactor the maximum number of vertices
-    /// a multiple of the original vertex count
-    ///
-    virtual void setLoadFactor(double loadFactor) override;
-
-    ///
     /// \brief Get the maximum number of triangles
     ///
     size_t getMaxNumTriangles() const { return m_maxNumTriangles; }

@@ -24,11 +24,15 @@
 #include "imstkLinearSolver.h"
 #include "imstkMath.h"
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4127 )
+#endif
 #include <Eigen/Sparse>
 #include <Eigen/SparseLU>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 namespace imstk
 {
@@ -46,8 +50,8 @@ public:
     /// \brief Default constructor/destructor.
     ///
     // DirectLinearSolver() = delete;
-    DirectLinearSolver() {}
-    ~DirectLinearSolver() {};
+    DirectLinearSolver() { }
+    ~DirectLinearSolver() override { }
 
     ///
     /// \brief Constructor

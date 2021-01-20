@@ -91,7 +91,7 @@ SubstepModuleDriver::start()
         }
         else if (m_threadType == ThreadingType::STL)
         {
-            for (int i = 0; i < m_asyncModules.size(); i++)
+            for (size_t i = 0; i < m_asyncModules.size(); i++)
             {
                 std::shared_ptr<Module> module = m_asyncModules[i];
                 threads[i] = std::thread(std::bind(&SubstepModuleDriver::runModuleParallel, this, module));
@@ -165,9 +165,9 @@ SubstepModuleDriver::start()
 
             // Actual game loop
             {
-                for (int i = 0; i < m_viewers.size(); i++)
+                for (auto viewer : m_viewers)
                 {
-                    m_viewers[i]->processEvents();
+                    viewer->processEvents();
                 }
 
                 for (auto syncModule : m_syncModules)
@@ -185,9 +185,9 @@ SubstepModuleDriver::start()
                     }
                 }
 
-                for (int i = 0; i < m_viewers.size(); i++)
+                for (auto viewer : m_viewers)
                 {
-                    m_viewers[i]->update();
+                    viewer->update();
                 }
             }
         }
@@ -198,7 +198,7 @@ SubstepModuleDriver::start()
     }
     else if (m_threadType == ThreadingType::STL)
     {
-        for (int i = 0; i < threads.size(); i++)
+        for (size_t i = 0; i < threads.size(); i++)
         {
             threads[i].join();
         }

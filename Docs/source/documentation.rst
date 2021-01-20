@@ -87,7 +87,7 @@ solution file located in the Innerbuild directory.
 
 Offscreen OSMesa/CPU rendering is supported for Linux/MacOSx. This allows one
 to build iMSTK without a screen or GPU. Useful for servers. This can be enabled
-in the build by using the :code:`VTK_USE_OSMESA` flag to ON.
+in the build by using the :code:`iMSTK_USE_VTK_OSMESA` flag to ON.
 
 Running Examples
 ----------------

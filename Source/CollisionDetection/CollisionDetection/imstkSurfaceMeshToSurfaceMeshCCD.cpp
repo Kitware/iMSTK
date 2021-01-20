@@ -38,7 +38,7 @@ SurfaceMeshToSurfaceMeshCCD::SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<Surface
 
     // Copy data A
     const VecDataArray<int, 3>& indicesA = *meshA->getTriangleIndices();
-    for (int i = 0; i < meshA->getNumTriangles(); i++)
+    for (int i = 0; i < static_cast<int>(meshA->getNumTriangles()); i++)
     {
         for (int j = 0; j < 3; j++)
         {
@@ -46,14 +46,14 @@ SurfaceMeshToSurfaceMeshCCD::SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<Surface
         }
     }
     const VecDataArray<double, 3>& positionsA = *meshA->getVertexPositions();
-    for (int i = 0; i < meshA->getNumVertices(); i++)
+    for (int i = 0; i < static_cast<int>(meshA->getNumVertices()); i++)
     {
         m_positionsA[i] = positionsA[i];
     }
 
     // Copy data B
     const VecDataArray<int, 3>& indicesB = *meshB->getTriangleIndices();
-    for (int i = 0; i < meshB->getNumTriangles(); i++)
+    for (int i = 0; i < static_cast<int>(meshB->getNumTriangles()); i++)
     {
         for (int j = 0; j < 3; j++)
         {
@@ -61,7 +61,7 @@ SurfaceMeshToSurfaceMeshCCD::SurfaceMeshToSurfaceMeshCCD(std::shared_ptr<Surface
         }
     }
     const VecDataArray<double, 3>& positionsB = *meshB->getVertexPositions();
-    for (int i = 0; i < meshB->getNumVertices(); i++)
+    for (int i = 0; i < static_cast<int>(meshB->getNumVertices()); i++)
     {
         m_positionsB[i] = positionsB[i];
     }
@@ -86,12 +86,12 @@ SurfaceMeshToSurfaceMeshCCD::computeCollisionData()
     m_colData->clearAll();
 
     const VecDataArray<double, 3>& positionsA = *m_meshA->getVertexPositions();
-    for (int i = 0; i < m_meshA->getNumVertices(); i++)
+    for (int i = 0; i < static_cast<int>(m_meshA->getNumVertices()); i++)
     {
         m_positionsA[i] = positionsA[i];
     }
     const VecDataArray<double, 3>& positionsB = *m_meshB->getVertexPositions();
-    for (int i = 0; i < m_meshB->getNumVertices(); i++)
+    for (int i = 0; i < static_cast<int>(m_meshB->getNumVertices()); i++)
     {
         m_positionsB[i] = positionsB[i];
     }

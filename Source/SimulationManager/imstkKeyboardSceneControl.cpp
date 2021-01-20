@@ -31,13 +31,13 @@
 namespace imstk
 {
 KeyboardSceneControl::KeyboardSceneControl() :
-    m_showFps(false), m_driver(nullptr)
+    m_driver(nullptr), m_showFps(false)
 {
 }
 
 KeyboardSceneControl::KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice) :
     KeyboardControl(keyDevice),
-    m_showFps(false), m_driver(nullptr)
+    m_driver(nullptr), m_showFps(false)
 {
 }
 

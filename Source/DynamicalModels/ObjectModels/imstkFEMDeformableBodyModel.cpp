@@ -634,8 +634,6 @@ FEMDeformableBodyModel::updateMassMatrix()
     // Do nothing for now as topology changes are not supported yet!
 }
 
-static int testing = 0;
-
 void
 FEMDeformableBodyModel::updatePhysicsGeometry()
 {

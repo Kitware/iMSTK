@@ -144,7 +144,7 @@ VTKOpenVRViewer::initModule()
     renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
     // Hide all controllers
-    for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
+    for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
     {
         vtkOpenVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
         if (trackedDeviceModel != nullptr)

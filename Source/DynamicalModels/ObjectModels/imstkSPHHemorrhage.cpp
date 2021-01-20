@@ -24,9 +24,8 @@ limitations under the License.
 namespace imstk
 {
 SPHHemorrhage::SPHHemorrhage(const Vec3d& center, const double radius, const double area, const Vec3d& normal) :
-    m_center(center), m_radius(radius), m_area(area)
+    m_area(area), m_center(center), m_normal(normal.normalized()), m_radius(radius)
 {
-    m_normal = normal.normalized();
 }
 
 bool

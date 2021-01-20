@@ -89,7 +89,8 @@ public:
 
     void uninit()
     {
-        if (!m_init)
+        // Can only uninit if, init'd
+        if (m_init)
         {
             uninitModule();
             m_init = false;
@@ -104,9 +105,9 @@ public:
     virtual void uninitModule() { }
 
 protected:
-    bool   m_init   = false;
-    bool   m_paused = false;
-    double m_dt     = 0.0;
+    tbb::atomic<bool> m_init   = false;
+    tbb::atomic<bool> m_paused = false;
+    double m_dt = 0.0;
     ExecutionType m_executionType = ExecutionType::PARALLEL;     // Defaults to parallel, subclass and set
 };
 }

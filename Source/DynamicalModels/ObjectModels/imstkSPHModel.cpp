@@ -146,7 +146,7 @@ SPHModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
     m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
-    const int numParticles = m_pointSetGeometry->getNumVertices();
+    const int numParticles = static_cast<int>(m_pointSetGeometry->getNumVertices());
 
     // Allocate init and current state
     m_initialState = std::make_shared<SPHState>(numParticles);
@@ -492,7 +492,6 @@ SPHModel::computeViscosity()
     VecDataArray<double, 3>&       neighborVelContr   = *m_neighborVelContr;
     VecDataArray<double, 3>&       particleShift      = *m_particleShift;
     const VecDataArray<double, 3>& halfStepVelocities = *getCurrentState()->getHalfStepVelocities();
-    const DataArray<double>&       densities = *getCurrentState()->getDensities();
 
     const std::vector<std::vector<NeighborInfo>>& neighborInfos = getCurrentState()->getNeighborInfo();
     const std::vector<std::vector<size_t>>&       neighborLists = getCurrentState()->getFluidNeighborLists();
@@ -522,7 +521,6 @@ SPHModel::computeViscosity()
 
             const Vec3d& pvel = halfStepVelocities[p];
             const std::vector<size_t>& fluidNeighborList = neighborLists[p];
-            const double pdensity = densities[p];
 
             Vec3r diffuseFluid(0, 0, 0);
             for (size_t i = 0; i < fluidNeighborList.size(); ++i)
@@ -829,7 +827,7 @@ void
 SPHModel::findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices)
 {
     const VecDataArray<double, 3>& positions = *getCurrentState()->getPositions();
-    for (size_t i = 0; i < points.size(); i++)
+    for (size_t i = 0; i < static_cast<size_t>(points.size()); i++)
     {
         double minDistance = 1e10;
         size_t minIndex    = 0;

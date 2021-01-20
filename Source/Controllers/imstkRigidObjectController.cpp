@@ -76,9 +76,9 @@ RigidObjectController::update(const double dt)
         Vec3d&       currTorque = *m_rigidObject->getRigidBody()->m_torque;
 
         const Vec3d& devicePos = getPosition();
-        const Quatd& deviceOrientation     = getRotation();
-        const Vec3d& deviceVelocity        = getVelocity();
-        const Vec3d& deviceAngularVelocity = getAngularVelocity();
+        const Quatd& deviceOrientation = getRotation();
+        //const Vec3d& deviceVelocity        = getVelocity();
+        //const Vec3d& deviceAngularVelocity = getAngularVelocity();
         const Vec3d& deviceOffset = Vec3d(0.0, 0.0, 0.0);
 
         // Uses non-relative force
