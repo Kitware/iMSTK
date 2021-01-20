@@ -141,7 +141,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
             // search in reverse
             for (int j = surfaceTri.size() - 1; j != -1; j--)
             {
-                const Vec3i& tri = surfaceTri[i];
+                const Vec3i& tri = surfaceTri[j];
                 if (((tri[0] == a)
                      && ((tri[1] == b && tri[2] == c) || (tri[1] == c && tri[2] == b)))
                     || ((tri[1] == a)
