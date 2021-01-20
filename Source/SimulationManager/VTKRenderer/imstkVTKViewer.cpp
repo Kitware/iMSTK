@@ -32,6 +32,12 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkTextActor.h>
+#include <vtkOpenGLRenderWindow.h>
+
+#ifdef WIN32
+#include <vtkWin32HardwareWindow.h>
+#include <vtkWin32RenderWindowInteractor.h>
+#endif
 
 namespace imstk
 {
@@ -43,8 +49,6 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
     // Create the interactor style
     m_interactorStyle    = std::make_shared<VTKInteractorStyle>();
     m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
-    // Bring control back out to the viewer
-    m_interactorStyle->setUpdateFunc([&]() { this->updateThread(); });
 
     // Create the interactor
     vtkNew<vtkRenderWindowInteractor> iren;
@@ -136,12 +140,8 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
 
     // Switch the renderer to the mode
     this->getActiveRenderer()->setMode(mode, false);
-    if (m_status != ThreadStatus::Running)
-    {
-        return;
-    }
 
-    updateThread();
+    updateModule();
 
     if (m_config->m_hideCurzor)
     {
@@ -159,21 +159,30 @@ VTKViewer::setRenderingMode(const Renderer::Mode mode)
     }
 }
 
-void
-VTKViewer::startThread()
+bool
+VTKViewer::initModule()
 {
+    if (!AbstractVTKViewer::initModule())
+    {
+        return false;
+    }
+
     // Print all controls on viewer
     for (auto control : m_controls)
     {
         control->printControls();
     }
 
-    m_vtkRenderWindow->GetInteractor()->Initialize();
-    m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
-
     m_vtkRenderWindow->SetWindowName(m_config->m_windowName.c_str());
-    m_vtkRenderWindow->GetInteractor()->Start();
-    m_vtkRenderWindow->GetInteractor()->DestroyTimer();
+    if (m_vtkRenderWindow->GetInteractor()->HasObserver(vtkCommand::StartEvent))
+    {
+        m_vtkRenderWindow->GetInteractor()->InvokeEvent(vtkCommand::StartEvent, nullptr);
+    }
+
+    m_vtkRenderWindow->GetInteractor()->Initialize();
+    m_vtkRenderWindow->Render();
+
+    return true;
 }
 
 std::shared_ptr<VTKScreenCaptureUtility>
@@ -194,18 +203,37 @@ VTKViewer::getMouseDevice() const
     return std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->getMouseDeviceClient();
 }
 
-void
-VTKViewer::updateThread()
-{
-    this->postEvent(Event(EventType::PreUpdate));
+//double
+//VTKViewer::getDisplayRefreshRate()
+//{
+//#ifdef WIN32
+//    vtkWin32RenderWindowInteractor* iren = vtkWin32RenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
+//    vtkWin32HardwareWindow* hWin = vtkWin32HardwareWindow::SafeDownCast(iren->GetHardwareWindow());
+//   
+//    HMONITOR hMonitor = MonitorFromWindow(hWin->GetWindowId(), MONITOR_DEFAULTTONEAREST);
+//    MONITORINFOEX info;
+//    GetMonitorInfoA(hMonitor, &info);
+//    EnumDisplaySettings(info.szDevice
+//    return 60.0;
+//#else
+//    return 60.0;
+//#endif
+//}
 
+void
+VTKViewer::updateModule()
+{
     // Update all controls
     for (auto control : m_controls)
     {
-        control->update();
+        control->update(m_dt);
     }
 
     std::shared_ptr<VTKRenderer> ren = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
+    if (ren == nullptr)
+    {
+        return;
+    }
 
     // Update Camera
     ren->updateCamera();
@@ -241,12 +269,6 @@ VTKViewer::updateThread()
     }
 
     // Render
-    getVtkRenderWindow()->GetInteractor()->Render();
-    m_post = std::chrono::high_resolution_clock::now();
-
-    this->postEvent(Event(EventType::PostUpdate));
-
-    // Plan next render
-    getVtkRenderWindow()->GetInteractor()->CreateOneShotTimer(0);
+    m_vtkRenderWindow->Render();
 }
 }

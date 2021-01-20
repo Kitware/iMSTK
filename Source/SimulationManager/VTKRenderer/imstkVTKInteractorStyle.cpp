@@ -43,12 +43,6 @@ VTKInteractorStyle::~VTKInteractorStyle()
 }
 
 void
-VTKInteractorStyle::OnTimer()
-{
-    m_updateFunc();
-}
-
-void
 VTKInteractorStyle::OnKeyPress()
 {
     // Submit the change to the keyboard device client

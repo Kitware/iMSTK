@@ -109,9 +109,19 @@ public:
     const Vec3d& getVelocity() const;
 
     ///
+    /// \brief Get the device angular velocity
+    /// 
+    const Vec3d& getAngularVelocity() const;
+
+    ///
     /// \brief Get the device orientation
     ///
     const Quatd& getOrientation() const;
+
+    ///
+    /// \brief Get offset from position for device end effector
+    /// 
+    const Vec3d& getOffset() const { return m_endEffectorOffset; }
 
     ///
     /// \brief Get/Set the device force
@@ -152,8 +162,10 @@ protected:
 
     Vec3d m_position;                        ///< Position of end effector
     Vec3d m_velocity;                        ///< Linear velocity of end effector
+    Vec3d m_angularVelocity;                 ///< Angular velocity of the end effector
     Quatd m_orientation;                     ///< Orientation of the end effector
     Vec3d m_force;                           ///< Force vector
+    Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///> Offset from origin
 
     std::unordered_map<int, int> m_buttons;
 };

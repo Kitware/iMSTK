@@ -73,20 +73,10 @@ public:
     ///
     double getFunctionValue(const Vec3d& pos) const override { return (pos - m_position).norm() - m_radius; }
 
-///
-/// \brief Returns analytical gradient of distances given position
-///
-//Vec3d getFunctionGrad(const Vec3d& pos, const Vec3d& dx) const override { return 2.0 * (pos - m_position).cwiseProduct(dx); }
-
 protected:
     friend class VTKSphereRenderDelegate;
 
-    void applyScaling(const double s) override
-    {
-        this->setRadius(m_radius * s);
-        this->modified();
-    }
-
+    void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the sphere

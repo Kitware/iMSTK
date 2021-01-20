@@ -86,7 +86,7 @@ public:
     ///
     void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
 
-// Accessors
+    // Accessors
 public:
     ///
     /// \brief set the vector of array of IDs for the mesh

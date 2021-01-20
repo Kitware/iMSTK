@@ -129,5 +129,4 @@ vtkInteractorStyleVR::OnButton3D(vtkEventData* eventData)
     default:
         break;
     }
-    ;
 }

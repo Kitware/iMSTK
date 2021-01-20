@@ -22,7 +22,6 @@
 #pragma once
 
 #include "imstkTrackingDeviceControl.h"
-#include "imstkLoopThreadObject.h"
 
 namespace imstk
 {
@@ -48,7 +47,7 @@ public:
     ///
     /// \brief Updates the view of the provided camera
     ///
-    void update() override;
+    void update(const double dt) override;
 
 protected:
 

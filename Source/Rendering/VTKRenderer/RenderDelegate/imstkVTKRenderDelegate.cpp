@@ -174,7 +174,6 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
         return nullptr; // will never be reached
     }
     }
-    return nullptr;
 }
 
 void

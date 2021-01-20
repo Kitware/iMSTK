@@ -58,17 +58,7 @@ public:
 protected:
     explicit AnalyticalGeometry(Type type, const std::string& name = std::string(""));
 
-    ///
-    /// \brief Apply translation vector \p t
-    ///
-    void applyTranslation(const Vec3d t) override;
-    ///
-    /// \brief Apply rotation matrix \p r
-    ///
-    void applyRotation(const Mat3d r) override;
-    ///
-    /// \brief Update point positions
-    ///
+    virtual void applyTransform(const Mat4d& m) override;
     virtual void updatePostTransformData() const override;
 
     Vec3d m_position;                             ///> position

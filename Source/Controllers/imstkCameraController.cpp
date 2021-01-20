@@ -33,13 +33,13 @@ CameraController::CameraController(std::shared_ptr<Camera>       camera,
 }
 
 void
-CameraController::update()
+CameraController::update(const double dt)
 {
-    if (!m_trackingDataUptoDate)
+    if (!isTrackerUpToDate())
     {
-        if (!updateTrackingData())
+        if (!updateTrackingData(dt))
         {
-            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info";
+            LOG(WARNING) << "CameraController::update warning: could not update tracking info.";
             return;
         }
     }
@@ -55,8 +55,6 @@ CameraController::update()
     m_camera->setPosition(p);
     m_camera->setFocalPoint((r * FORWARD_VECTOR) + p);
     m_camera->setViewUp(r * UP_VECTOR);
-
-    m_trackingDataUptoDate = false;
 }
 
 void

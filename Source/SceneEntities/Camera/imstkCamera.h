@@ -93,6 +93,7 @@ public:
     {
         m_viewModified = false;
         m_view = view;
+        m_invView = m_view.inverse();
     }
 
     ///

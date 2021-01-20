@@ -46,7 +46,7 @@ VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> vi
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
         m_mapper = mapper;
-        m_actor  = actor;
+        m_actor = actor;
     }
 
     update();
@@ -63,7 +63,7 @@ VTKSphereRenderDelegate::processEvents()
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
     T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
-    T.scale(geometry->getRadius(Geometry::DataType::PreTransform));
+    T.scale(geometry->getRadius(Geometry::DataType::PostTransform));
     T.matrix().transposeInPlace();
 
     m_transform->SetMatrix(T.data());

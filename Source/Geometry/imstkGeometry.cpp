@@ -26,7 +26,7 @@
 namespace imstk
 {
 Geometry::Geometry(const Geometry::Type type, const std::string& name) :
-    m_type(type), m_geometryIndex(Geometry::getUniqueID()), m_transform(RigidTransform3d::Identity())
+    m_type(type), m_name(name), m_geometryIndex(Geometry::getUniqueID()), m_transform(Mat4d::Identity())
 {
     // If the geometry name is empty, enumerate it by name (which will not be duplicated)
     if (m_name.empty())
@@ -39,12 +39,7 @@ void
 Geometry::print() const
 {
     LOG(INFO) << this->getTypeName();
-
-    Vec3d t = m_transform.translation();
-    Mat3d r = m_transform.rotation();
-    LOG(INFO) << "Scaling: " << m_scaling;
-    LOG(INFO) << "Translation: " << "(" << t.x() << ", " << t.y() << ", " << t.z() << ")";
-    LOG(INFO) << "Rotation:\n" << r;
+    LOG(INFO) << "Transform: " << m_transform;
 }
 
 void
@@ -61,17 +56,7 @@ Geometry::translate(const Vec3d& t, TransformType type)
         return;
     }
 
-    if (type == TransformType::ConcatenateToTransform)
-    {
-        m_transform.translate(t);
-        m_transformModified = true;
-        m_transformApplied  = false;
-    }
-    else
-    {
-        this->applyTranslation(t);
-        m_dataModified = true;
-    }
+    transform(AffineTransform3d(Eigen::Translation3d(t)).matrix(), type);
 }
 
 void
@@ -88,17 +73,9 @@ Geometry::rotate(const Mat3d& r, TransformType type)
         return;
     }
 
-    if (type == TransformType::ConcatenateToTransform)
-    {
-        m_transform.rotate(r);
-        m_transformModified = true;
-        m_transformApplied  = false;
-    }
-    else
-    {
-        this->applyRotation(r);
-        m_dataModified = true;
-    }
+    Mat4d m = Mat4d::Identity();
+    m.block<3, 3>(0, 0) = r;
+    transform(m, type);
 }
 
 void
@@ -114,56 +91,50 @@ Geometry::rotate(const Vec3d& axis, double radians, TransformType type)
 }
 
 void
-Geometry::scale(double s, TransformType type)
+Geometry::scale(const Vec3d& s, TransformType type)
 {
-    CHECK(s > 0) << "Geometry::scale error: invalid scaling constant.";
-
-    if (std::abs(s - 1.0) < 1e-8)
-    {
-        return;
-    }
-
-    if (type == TransformType::ConcatenateToTransform)
-    {
-        m_scaling *= s;
-        m_transformModified = true;
-        m_transformApplied  = false;
-    }
-    else
-    {
-        this->applyScaling(s);
-        m_dataModified = true;
-    }
+    Mat4d m = Mat4d::Identity();
+    m(0, 0) = s[0];
+    m(1, 1) = s[1];
+    m(2, 2) = s[2];
+    transform(m, type);
+}
+void
+Geometry::scale(const double s, TransformType type)
+{
+    Mat4d m = Mat4d::Identity();
+    m(0, 0) = s;
+    m(1, 1) = s;
+    m(2, 2) = s;
+    transform(m, type);
 }
 
 void
-Geometry::transform(RigidTransform3d T, TransformType type)
+Geometry::transform(const Mat4d& T, TransformType type)
 {
     if (type == TransformType::ConcatenateToTransform)
     {
         m_transform = T * m_transform;
-        m_transformModified = true;
-        m_transformApplied  = false;
+        m_transformApplied = false;
     }
     else
     {
-        this->applyTranslation(T.translation());
-        this->applyRotation(T.rotation());
-        m_dataModified = true;
+        applyTransform(T);
+        this->postEvent(Event(EventType::Modified));
     }
+    m_transformApplied = true;
 }
 
 Vec3d
 Geometry::getTranslation() const
 {
-    return m_transform.translation();
+    return m_transform.block<3, 1>(0, 3);
 }
 
 void
-Geometry::setTranslation(const Vec3d t)
+Geometry::setTranslation(const Vec3d& t)
 {
-    m_transform.translation() = t;
-    m_transformModified       = true;
+    m_transform.block<3, 1>(0, 3) = t;
     m_transformApplied = false;
 }
 
@@ -173,49 +144,74 @@ Geometry::setTranslation(const double x, const double y, const double z)
     this->setTranslation(Vec3d(x, y, z));
 }
 
-Mat3d
-Geometry::getRotation() const
+void
+Geometry::setRotation(const Mat3d& m)
 {
-    return m_transform.linear();
+    // Decompose trs, getRotation assumes no shear
+    const Vec3d s = getScaling();
+    const Mat3d r = getRotation();
+    const Vec3d t = getTranslation();
+    m_transform = Mat4d::Identity();
+    m_transform.block<3, 3>(0, 0) = m;
+    m_transform.block<3, 1>(0, 3) = t;
+    m_transform(0, 0) *= s[0];
+    m_transform(1, 1) *= s[1];
+    m_transform(2, 2) *= s[2];
+    m_transformApplied = false;
 }
 
 void
-Geometry::setRotation(const Mat3d m)
-{
-    m_transform.linear() = m;
-    m_transformModified  = true;
-    m_transformApplied   = false;
-}
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/matrix_decompose.hpp>
-#include <glm/gtx/quaternion.hpp>
-
-void
-Geometry::setRotation(const Quatd q)
+Geometry::setRotation(const Quatd& q)
 {
     this->setRotation(q.toRotationMatrix());
 }
 
 void
-Geometry::setRotation(const Vec3d axis, const double angle)
+Geometry::setRotation(const Vec3d& axis, const double angle)
 {
     this->setRotation(Rotd(angle, axis).toRotationMatrix());
 }
 
 void
-Geometry::setScaling(double s)
+Geometry::setScaling(const Vec3d& s)
 {
-    if (s <= 0)
-    {
-        LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
-        return;
-    }
-    m_scaling = s;
-    m_transformModified = true;
-    m_transformApplied  = false;
+    m_transform.block<3, 1>(0, 0) = m_transform.block<3, 1>(0, 0).normalized() * s[0];
+    m_transform.block<3, 1>(0, 1) = m_transform.block<3, 1>(0, 1).normalized() * s[1];
+    m_transform.block<3, 1>(0, 2) = m_transform.block<3, 1>(0, 2).normalized() * s[2];
+    m_transformApplied = false;
+}
+void
+Geometry::setScaling(const double s)
+{
+    m_transform.block<3, 1>(0, 0) = m_transform.block<3, 1>(0, 0).normalized() * s;
+    m_transform.block<3, 1>(0, 1) = m_transform.block<3, 1>(0, 1).normalized() * s;
+    m_transform.block<3, 1>(0, 2) = m_transform.block<3, 1>(0, 2).normalized() * s;
+    m_transformApplied = false;
+}
+
+Mat3d
+Geometry::getRotation() const
+{
+    // Assumes affine, no shear
+    const Vec3d& x = m_transform.block<3, 1>(0, 0);
+    const Vec3d& y = m_transform.block<3, 1>(0, 1);
+    const Vec3d& z = m_transform.block<3, 1>(0, 2);
+
+    Mat3d r;
+    r.block<3, 1>(0, 0) = x.normalized();
+    r.block<3, 1>(0, 1) = y.normalized();
+    r.block<3, 1>(0, 2) = z.normalized();
+
+    return r;
+}
+
+Vec3d
+Geometry::getScaling() const
+{
+    return Vec3d(
+        m_transform.block<3, 1>(0, 0).norm(),
+        m_transform.block<3, 1>(0, 1).norm(),
+        m_transform.block<3, 1>(0, 2).norm());
 }
 
 const std::string

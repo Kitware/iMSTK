@@ -21,43 +21,66 @@
 
 #include "imstkLevelSetCH.h"
 #include "imstkCollisionData.h"
+#include "imstkImageData.h"
 #include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
-#include "imstkImageData.h"
-#include "imstkRigidObject2.h"
 #include "imstkRbdConstraint.h"
+#include "imstkRigidObject2.h"
 
 namespace imstk
 {
 namespace expiremental
 {
-static double gaussianKernel[3][3][3] =
-{
-    {
-        { 1.0, 2.0, 1.0 },
-        { 2.0, 4.0, 2.0 },
-        { 1.0, 2.0, 1.0 }
-    },
-    {
-        { 2.0, 4.0, 2.0 },
-        { 4.0, 8.0, 4.0 },
-        { 2.0, 4.0, 2.0 }
-    },
-    {
-        { 1.0, 2.0, 1.0 },
-        { 2.0, 4.0, 2.0 },
-        { 1.0, 2.0, 1.0 }
-    }
-};
-
 LevelSetCH::LevelSetCH(const Side&                               side,
                        const std::shared_ptr<CollisionData>      colData,
                        std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
                        std::shared_ptr<RigidObject2>             rigidObj) :
-    CollisionHandling(Type::RBD, side, colData),
+    CollisionHandling(Type::LevelSet, side, colData),
     m_lvlSetObj(lvlSetObj),
     m_rigidObj(rigidObj)
 {
+    setKernel(m_kernelSize, m_kernelSigma);
+    maskAllPoints();
+}
+
+LevelSetCH::~LevelSetCH()
+{
+    if (m_kernelWeights != nullptr)
+    {
+        delete[] m_kernelWeights;
+    }
+}
+
+void
+LevelSetCH::setKernel(const int size, const double sigma)
+{
+    m_kernelSize  = size;
+    m_kernelSigma = sigma;
+    if (size % 2 == 0)
+    {
+        LOG(WARNING) << "LevelSetCH kernel size must be odd, increasing by 1";
+        m_kernelSize++;
+    }
+    if (m_kernelWeights != nullptr)
+    {
+        delete[] m_kernelWeights;
+    }
+    m_kernelWeights = new double[size * size * size];
+
+    const double invDiv   = 1.0 / (2.0 * sigma * sigma);
+    const int    halfSize = static_cast<int>(size * 0.5);
+    int          i = 0;
+    for (int z = -halfSize; z < halfSize + 1; z++)
+    {
+        for (int y = -halfSize; y < halfSize + 1; y++)
+        {
+            for (int x = -halfSize; x < halfSize + 1; x++)
+            {
+                const double dist = Vec3i(x, y, z).cast<double>().norm();
+                m_kernelWeights[i++] = std::exp(-dist * invDiv);
+            }
+        }
+    }
 }
 
 void
@@ -66,63 +89,88 @@ LevelSetCH::processCollisionData()
     std::shared_ptr<LevelSetModel> lvlSetModel = m_lvlSetObj->getLevelSetModel();
     std::shared_ptr<ImageData>     grid = std::dynamic_pointer_cast<ImageData>(lvlSetModel->getModelGeometry());
 
+    if (grid == nullptr)
+    {
+        LOG(FATAL) << "LevelSetCH::processCollisionData: level set model geometry is not ImageData";
+        return;
+    }
+
     //const Vec3i& dim = grid->getDimensions();
     const Vec3d& invSpacing = grid->getInvSpacing();
     const Vec3d& origin     = grid->getOrigin();
 
-    //if (m_useProportionalForce)
-    //{
-    //    // Apply impulses at points of contacts
-    //    PositionDirectionCollisionData& pdColData = m_colData->PDColData;
-    //    for (int i = 0; i < pdColData.getSize(); i++)
-    //    {
-    //        const Vec3d& pos = pdColData[i].posB;
-    //        const Vec3d& normal = pdColData[i].dirAtoB;
-    //        const Vec3i  coord = (pos - origin).cwiseProduct(invSpacing).cast<int>();
-
-    //        const double fN = normal.dot(m_rigidObj->getRigidBody()->getForce());
-    //        const double S = m_velocityScaling;
-
-    //        for (int z = 0; z < 3; z++)
-    //        {
-    //            for (int y = 0; y < 3; y++)
-    //            {
-    //                for (int x = 0; x < 3; x++)
-    //                {
-    //                    const Vec3i fCoord = coord + Vec3i(x - 1, y - 1, z - 1);
-    //                    /*float S = 0.05f *
-    //                            glm::max(
-    //                                    glm::dot(-glm::normalize(computeGrad(fCoords[0], fCoords[1], imgPtr, dim, spacing)),
-    //                                            glm::vec2(rigidObj->getForce())), 0.0f);*/
-    //                    lvlSetModel->addImpulse(fCoord, S * gaussianKernel[x][y][z]);
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
-    //else
+    if (m_useProportionalForce)
     {
         // Apply impulses at points of contacts
         PositionDirectionCollisionData& pdColData = m_colData->PDColData;
         for (int i = 0; i < pdColData.getSize(); i++)
         {
-            const Vec3d& pos = pdColData[i].posB;
-            //const Vec3d& normal = pdColData[i].dirAtoB;
-            const Vec3i  coord = (pos - origin).cwiseProduct(invSpacing).cast<int>();
-            const double S     = m_velocityScaling;
-
-            for (int z = 0; z < 3; z++)
+            // If the point is in the mask, let it apply impulses
+            if (m_ptIdMask.count(pdColData[i].nodeIdx) != 0)
             {
-                for (int y = 0; y < 3; y++)
+                const Vec3d& pos    = pdColData[i].posB;
+                const Vec3d& normal = pdColData[i].dirAtoB;
+                const Vec3i  coord  = (pos - origin).cwiseProduct(invSpacing).cast<int>();
+
+                // Scale the applied impulse by the normal force
+                const double fN = normal.normalized().dot(m_rigidObj->getRigidBody()->getForce()) / m_rigidObj->getRigidBody()->getForce().norm();
+                const double S  = std::max(fN, 0.0) * m_velocityScaling;
+
+                const int halfSize = static_cast<int>(m_kernelSize * 0.5);
+                int       j = 0;
+                for (int z = -halfSize; z < halfSize + 1; z++)
                 {
-                    for (int x = 0; x < 3; x++)
+                    for (int y = -halfSize; y < halfSize + 1; y++)
                     {
-                        const Vec3i fCoord = coord + Vec3i(x - 1, y - 1, z - 1);
-                        lvlSetModel->addImpulse(fCoord, S * gaussianKernel[x][y][z]);
+                        for (int x = -halfSize; x < halfSize + 1; x++)
+                        {
+                            const Vec3i fCoord = coord + Vec3i(x, y, z);
+                            lvlSetModel->addImpulse(fCoord, S * m_kernelWeights[j++]);
+                        }
                     }
                 }
             }
         }
+    }
+    else
+    {
+        // Apply impulses at points of contacts
+        PositionDirectionCollisionData& pdColData = m_colData->PDColData;
+        for (int i = 0; i < pdColData.getSize(); i++)
+        {
+            // If the point is in the mask, let it apply impulses
+            if (m_ptIdMask.count(pdColData[i].nodeIdx) != 0)
+            {
+                const Vec3d& pos = pdColData[i].posB;
+                //const Vec3d& normal = pdColData[i].dirAtoB;
+                const Vec3i  coord = (pos - origin).cwiseProduct(invSpacing).cast<int>();
+                const double S     = m_velocityScaling;
+
+                const int halfSize = static_cast<int>(m_kernelSize * 0.5);
+                int       j = 0;
+                for (int z = -halfSize; z < halfSize + 1; z++)
+                {
+                    for (int y = -halfSize; y < halfSize + 1; y++)
+                    {
+                        for (int x = -halfSize; x < halfSize + 1; x++)
+                        {
+                            const Vec3i fCoord = coord + Vec3i(x, y, z);
+                            lvlSetModel->addImpulse(fCoord, S * m_kernelWeights[j++]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+void
+LevelSetCH::maskAllPoints()
+{
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(m_rigidObj->getCollidingGeometry());
+    for (int i = 0; i < static_cast<int>(pointSet->getNumVertices()); i++)
+    {
+        m_ptIdMask.insert(i);
     }
 }
 }

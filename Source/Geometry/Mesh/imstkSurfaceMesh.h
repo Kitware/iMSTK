@@ -168,7 +168,7 @@ public:
     ///
     void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
 
-// Accessors
+    // Accessors
 public:
     ///
     /// \brief Get/Set triangle connectivity
@@ -177,7 +177,7 @@ public:
     std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return m_triangleIndices; }
 
     ///
-    /// \brief Return connectivity of triangle
+    /// \brief Return connectivity of a triangle
     ///
     const Vec3i& getTriangleIndices(const int triangleNum) const;
     Vec3i& getTriangleIndices(const int triangleNum);
@@ -204,7 +204,7 @@ public:
     ///
     double getVolume() override;
 
-// Attributes
+    // Attributes
 public:
     ///
     /// \brief Set a data array holding some per cell data

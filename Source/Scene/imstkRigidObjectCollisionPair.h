@@ -44,9 +44,6 @@ public:
                              CollisionDetection::Type cdType);
 
     virtual ~RigidObjectCollisionPair() override = default;
-
-public:
-    void apply() override;
 };
 }
 }

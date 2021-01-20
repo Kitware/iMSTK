@@ -36,16 +36,5 @@ class InteractorStyle
 public:
     InteractorStyle() = default;
     virtual ~InteractorStyle() = default;
-
-    ///
-    /// \brief Called continously
-    ///
-    void setUpdateFunc(std::function<void()> func)
-    {
-        m_updateFunc = func;
-    }
-
-protected:
-    std::function<void()> m_updateFunc;
 };
 }

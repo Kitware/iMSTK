@@ -46,7 +46,7 @@ namespace apiutils
 std::shared_ptr<SceneObject> createVisualAnalyticalSceneObject(Geometry::Type type,
                                                                std::shared_ptr<Scene> scene,
                                                                const std::string& objName,
-                                                               const double scale = 1.,
+                                                               const Vec3d scale = Vec3d(1.0, 1.0, 1.0),
                                                                const Vec3d t      = Vec3d(0., 0., 0.));
 
 ///
@@ -55,7 +55,7 @@ std::shared_ptr<SceneObject> createVisualAnalyticalSceneObject(Geometry::Type ty
 std::shared_ptr<CollidingObject> createCollidingAnalyticalSceneObject(Geometry::Type type,
                                                                       std::shared_ptr<Scene> scene,
                                                                       const std::string& objName,
-                                                                      const double scale = 1.,
+                                                                      const Vec3d scale = Vec3d(1.0, 1.0, 1.0),
                                                                       const Vec3d t      = Vec3d(0., 0., 0.));
 
 ///
@@ -69,11 +69,6 @@ std::shared_ptr<SceneObject> createAndAddVisualSceneObject(std::shared_ptr<Scene
 /// \brief Create a non-linear system using FEM dynamic model
 ///
 std::shared_ptr<NonLinearSystem<SparseMatrixd>> createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel);
-
-///
-/// \brief Print number of updates for second for a given scene
-///
-void printUPS(std::shared_ptr<SceneManager> sceneManager);
 
 ///
 /// \brief Create a \ref Graph ref

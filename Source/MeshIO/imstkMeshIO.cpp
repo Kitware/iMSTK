@@ -36,9 +36,7 @@ std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
     bool isDir = false;
-
-    CHECK(MeshIO::fileExists(filePath, isDir)) << "MeshIO::read error: file not found: " << filePath;
-
+    
     if (isDir)
     {
         // Assume that the directory is a collection of DICOM files
@@ -177,6 +175,12 @@ MeshIO::getFileType(const std::string& filePath)
 bool
 MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::string& filePath)
 {
+    if (imstkMesh == nullptr)
+    {
+        LOG(WARNING) << "MeshIO::write error: Mesh nullptr";
+        return false;
+    }
+
     MeshFileType meshType = MeshIO::getFileType(filePath);
     switch (meshType)
     {

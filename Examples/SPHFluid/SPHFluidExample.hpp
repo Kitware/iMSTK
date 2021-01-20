@@ -29,6 +29,7 @@
 #include "imstkObjectInteractionFactory.h"
 #include "imstkSceneManager.h"
 #include "imstkSPHObject.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
@@ -114,7 +115,7 @@ main(int argc, char* argv[])
 
     // Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
         viewer->setWindowTitle("SPH Fluid");
@@ -130,10 +131,14 @@ main(int argc, char* argv[])
                     "\nNumber of solids: " + std::to_string(solids.size()));
             });
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->pause();
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -143,13 +148,11 @@ main(int argc, char* argv[])
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     //MeshIO::write(std::dynamic_pointer_cast<PointSet>(fluidObj->getPhysicsGeometry()), "fluid.vtk");

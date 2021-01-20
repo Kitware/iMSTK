@@ -40,16 +40,16 @@
 namespace imstk
 {
 VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
-    m_polydata(vtkSmartPointer<vtkPolyData>::New()),
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
-    m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
+m_polydata(vtkSmartPointer<vtkPolyData>::New()),
+m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New()),
+m_mappedNormalArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     m_geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
     m_geometry->computeVertexNeighborTriangles();
 
     // Get our own handles to these in case the geometry changes them
     m_vertices = m_geometry->getVertexPositions();
-    m_indices  = m_geometry->getTriangleIndices();
+    m_indices = m_geometry->getTriangleIndices();
 
     // Map vertices to VTK point data
     if (m_vertices != nullptr)
@@ -132,7 +132,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
         actor->SetMapper(mapper);
         //actor->SetUserTransform(m_transform);
         m_mapper = mapper;
-        m_actor  = actor;
+        m_actor = actor;
         if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper))
         {
             glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
@@ -147,7 +147,7 @@ void
 VTKSurfaceMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<SurfaceMesh>             geom     = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<SurfaceMesh>             geom = std::dynamic_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
 
     // Only use the most recent event from respective sender
@@ -202,8 +202,8 @@ VTKSurfaceMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
     if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
     {
         geometry->computeVertexNormals();
-        std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();
-        double*                                  normalData = reinterpret_cast<double*>(normals->getPointer());
+        std::shared_ptr<VecDataArray<double, 3>> normals = geometry->getVertexNormals();
+        double* normalData = reinterpret_cast<double*>(normals->getPointer());
         m_mappedNormalArray->SetNumberOfComponents(3);
         m_mappedNormalArray->SetArray(normalData, normals->size() * 3, 1);
         m_mappedNormalArray->Modified();
@@ -264,8 +264,8 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     if (/*vertexOrIndexBufferChanged && */ m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
     {
         geometry->computeVertexNormals();
-        std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();
-        double*                                  normalData = reinterpret_cast<double*>(normals->getPointer());
+        std::shared_ptr<VecDataArray<double, 3>> normals = geometry->getVertexNormals();
+        double* normalData = reinterpret_cast<double*>(normals->getPointer());
         m_mappedNormalArray->SetNumberOfComponents(3);
         m_mappedNormalArray->SetArray(normalData, normals->size() * 3, 1);
         m_mappedNormalArray->Modified();

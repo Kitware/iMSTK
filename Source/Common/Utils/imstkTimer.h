@@ -60,6 +60,7 @@ public:
     ///
     ~StopWatch() = default;
 
+public:
     ///
     /// \brief Start the appropriate timer
     ///

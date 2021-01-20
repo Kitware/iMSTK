@@ -19,10 +19,10 @@
 
 =========================================================================*/
 
-#include "imstkAPIUtilities.h"
 #include "imstkCamera.h"
-#include "imstkConsoleThread.h"
+#include "imstkConsoleModule.h"
 #include "imstkKeyboardDeviceClient.h"
+#include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkNew.h"
@@ -33,12 +33,12 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkViewer.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkLight.h"
 
 using namespace imstk;
 
@@ -228,7 +228,6 @@ createClothScene(std::string sceneName)
         // Adjust camera
         scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
         scene->getActiveCamera()->setPosition(-15.0, -5.0, 25.0);
-        scene->getActiveCamera()->setPosition(-15., -5.0, 15.0);
     }
     return scene;
 }
@@ -286,77 +285,71 @@ void
 testMultipleScenesInRenderMode()
 {
     // Simulation manager defaults to rendering mode
-    auto scene1 = createClothScene("clothScene");
-    auto scene2 = createSoftBodyScene("deformableBodyScene");
-
-    scene1->getConfig()->trackFPS = true;
+    std::shared_ptr<Scene> scene1 = createClothScene("clothScene");
+    std::shared_ptr<Scene> scene2 = createSoftBodyScene("deformableBodyScene");
 
     scene1->initialize();
     scene2->initialize();
 
-    // set to scene 1
-    imstkNew<SceneManager> sceneManager("SceneManager");
-    sceneManager->setActiveScene(scene2);
-
     // Setup a viewer to render in its own thread
     imstkNew<VTKViewer> viewer("Viewer");
     viewer->setActiveScene(scene2);
-    viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+    imstkNew<SceneManager> sceneManager("Scene Manager");
+    sceneManager->setActiveScene(scene2);
+
+    std::shared_ptr<SubstepModuleDriver> driver = std::make_shared<SubstepModuleDriver>();
+    driver->addModule(viewer);
+    driver->addModule(sceneManager);
 
     // Create a call back on key press of 's' to switch scenes
     LOG(INFO) << "s/S followed by enter to switch scenes";
     LOG(INFO) << "q/Q followed by enter to quit";
 
     connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
-        [&](KeyPressEvent* e)
-    {
-        if (e->m_keyPressType == KEY_PRESS)
+        [&, driver](KeyPressEvent* e)
         {
-            if (e->m_key == 's' || e->m_key == 'S')
+            if (e->m_keyPressType == KEY_PRESS)
             {
-                if (sceneManager->getActiveScene() == scene1)
+                if (e->m_key == 's' || e->m_key == 'S')
                 {
-                    sceneManager->setActiveScene(scene2);
-                    viewer->setActiveScene(scene2);
+                    if (sceneManager->getActiveScene() == scene1)
+                    {
+                        LOG(INFO) << "Switching to scene2";
+                        sceneManager->setActiveScene(scene2);
+                        viewer->setActiveScene(scene2);
+                    }
+                    else
+                    {
+                        LOG(INFO) << "Switching to scene1";
+                        sceneManager->setActiveScene(scene1);
+                        viewer->setActiveScene(scene1);
+                    }
                 }
-                else
+                else if (e->m_key == 'q' || e->m_key == 'Q')
                 {
-                    sceneManager->setActiveScene(scene1);
-                    viewer->setActiveScene(scene1);
-                }
-
-                if (!sceneManager->getActiveScene())
-                {
-                    sceneManager->setActiveScene(scene1);
-                    viewer->setActiveScene(scene1);
+                    driver->requestStatus(ModuleDriverStopped);
                 }
             }
-            else if (e->m_key == 'q' || e->m_key == 'Q')
-            {
-                viewer->stop(false);
-            }
-        }
         });
 
-    if (scene1->getConfig()->trackFPS)
-    {
-        apiutils::printUPS(sceneManager);
-    }
-
-    viewer->start();
+    driver->start();
 }
 
 void
 testMultipleScenesInBackgroundMode()
 {
-    imstkNew<ConsoleThread> consoleThread;
+    imstkNew<ConsoleModule> console;
 
     imstkNew<SceneManager> sceneManager("SceneManager");
-    consoleThread->addChildThread(sceneManager); // Start/stop scene with console
     auto scene1 = createClothScene("clothScene");
     auto scene2 = createSoftBodyScene("deformableBodyScene");
     sceneManager->addScene(scene1);
     sceneManager->addScene(scene2);
+
+    imstkNew<SubstepModuleDriver> driver;
+    driver->addModule(console);
+    driver->addModule(sceneManager);
 
     scene1->initialize();
     scene2->initialize();
@@ -371,28 +364,32 @@ testMultipleScenesInBackgroundMode()
                             {
                                 if (e->m_key == 's' || e->m_key == 'S')
                                 {
-                                    if (sceneManager->getActiveScene()->getName() == scene1->getName())
+                                    if (sceneManager->getActiveScene() == scene1)
                                     {
+                                        LOG(INFO) << "Switching to scene2";
                                         sceneManager->setActiveScene(scene2);
                                     }
                                     else
                                     {
+                                        LOG(INFO) << "Switching to scene1";
                                         sceneManager->setActiveScene(scene1);
                                     }
                                 }
                                 else if (e->m_key == 'q' || e->m_key == 'Q')
                                 {
-                                    consoleThread->stop(false);
+                                    LOG(INFO) << "Exiting background mode";
+                                    driver->requestStatus(ModuleDriverStopped);
                                 }
                             }
                         };
-    connect<KeyPressEvent>(consoleThread->getKeyboardDevice(), EventType::KeyEvent, keyPressFunc);
+    connect<KeyPressEvent>(console->getKeyboardDevice(), EventType::KeyEvent, keyPressFunc);
 
-    consoleThread->start();
+    driver->start();
 }
 
 ///
 /// \brief Test multiple scenes
+/// \todo: Move to unit test
 ///
 int
 main()

@@ -27,7 +27,7 @@ namespace imstk
 class SurfaceMesh;
 
 ///
-/// \class CleanMesh
+/// \class AppendMesh
 ///
 /// \brief This filter appends two SurfaceMeshes, no topological connections are made
 ///

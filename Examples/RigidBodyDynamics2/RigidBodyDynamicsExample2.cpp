@@ -37,10 +37,11 @@
 #include "imstkRigidBodyCH.h"
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
-#include "imstkRigidObjectCollisionPair.h"
+#include "imstkRigidObjectCollidingCollisionPair.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSphere.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkSurfaceMeshSubdivide.h"
@@ -70,7 +71,7 @@ main()
         rbdModel->getConfig()->m_maxNumIterations = 40;
 
         // Create the first rbd, plane floor
-        imstkNew<RigidObject2> planeObj("Plane");
+        imstkNew<CollidingObject> planeObj("Plane");
         {
             // Subtract the sphere from the plane to make a crater
             imstkNew<Plane> planeGeom;
@@ -107,11 +108,9 @@ main()
 
             // Create the object
             planeObj->addVisualModel(visualModel);
-            planeObj->setPhysicsGeometry(compGeom);
             planeObj->setCollidingGeometry(compGeom);
-            planeObj->setDynamicalModel(rbdModel);
-            planeObj->getRigidBody()->m_isStatic = true;
-            planeObj->getRigidBody()->m_mass     = 100.0;
+            //planeObj->getRigidBody()->m_isStatic = true;
+            //planeObj->getRigidBody()->m_mass     = 100.0;
 
             scene->addSceneObject(planeObj);
         }
@@ -148,7 +147,7 @@ main()
             scene->addSceneObject(cubeObj);
         }
 
-        auto                         rbdInteraction = std::make_shared<RigidObjectCollisionPair>(cubeObj, planeObj, CollisionDetection::Type::PointSetToImplicit);
+        auto                         rbdInteraction = std::make_shared<RigidObjectCollidingCollisionPair>(cubeObj, planeObj, CollisionDetection::Type::PointSetToImplicit);
         std::shared_ptr<RigidBodyCH> ch = std::dynamic_pointer_cast<RigidBodyCH>(rbdInteraction->getCollisionHandlingA());
         ch->setUseFriction(false);
         ch->setStiffness(0.0); // Completely inelastic
@@ -170,7 +169,13 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
+        sceneManager->pause();
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+        driver->setDesiredDt(0.001);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -180,7 +185,7 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
@@ -231,13 +236,11 @@ main()
             scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
         });
         connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
-        {
-            cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getActiveScene()->getElapsedTime();
+            {
+                cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
             });
 
-        // Start viewer running, scene as paused
-        //sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

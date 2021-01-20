@@ -52,7 +52,7 @@ protected:
     using AnalyticalGeometry::getFunctionValue;
     //using AnalyticalGeometry::getFunctionGrad;
 
-    void applyScaling(const double s) override;
+    void applyTransform(const Mat4d& m) override;
 
     Vec3d m_dimensions;
     Mat4d m_inverse;

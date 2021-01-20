@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "imstkLoopThreadObject.h"
+#include "imstkModule.h"
 
 #include <unordered_map>
 #include <thread>
@@ -36,7 +36,7 @@ class Scene;
 ///
 /// \brief Scene manager module manages multiple scenes and runs the active one
 ///
-class SceneManager : public LoopThreadObject
+class SceneManager : public Module
 {
 public:
     enum class Mode
@@ -106,16 +106,16 @@ public:
     ///
     void removeScene(std::string name);
 
-protected:
+public:
     ///
     /// \brief Initialize the thread
     ///
-    void initThread() override;
+    bool initModule() override;
 
     ///
     /// \brief Run the thread
     ///
-    void updateThread() override;
+    void updateModule() override;
 
 protected:
     std::shared_ptr<Scene> m_activeScene;                               ///> Scene that is being managed

@@ -30,6 +30,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKOpenVRViewer.h"
@@ -126,7 +127,10 @@ main()
         // Add a module to run the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager);         // Start/stop scene with the view
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add a VR controller for the scalpel handle
         imstkNew<SceneObjectController> controller1(scalpelHandle, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
@@ -142,7 +146,6 @@ main()
             [&](ButtonEvent* e)
         {
             // When any button pressed, swap blade
-            // todo: distance metric not working
             if (e->m_buttonState == BUTTON_PRESSED)
             {
                 const Vec3d& posControl = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER)->getPosition();
@@ -189,11 +192,9 @@ main()
                     }
                 }
             }
-                        });
+        });
 
-        // Start running
-        viewer->requestStatus(ThreadStatus::Running);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

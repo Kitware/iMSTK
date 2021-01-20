@@ -35,8 +35,8 @@
 namespace imstk
 {
 VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKVolumeRenderDelegate(visualModel),
-    m_scalarArray(nullptr),
-    imageDataVtk(nullptr)
+m_scalarArray(nullptr),
+imageDataVtk(nullptr)
 {
     auto imageData = std::dynamic_pointer_cast<ImageData>(m_visualModel->getGeometry());
     m_scalarArray = imageData->getScalars();
@@ -58,7 +58,7 @@ VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualMod
         volume->SetMapper(mapper);
         volume->SetUserTransform(m_transform);
         m_mapper = mapper;
-        m_actor  = volume;
+        m_actor = volume;
     }
 
     update();
@@ -107,7 +107,7 @@ VTKImageDataRenderDelegate::processEvents()
 void
 VTKImageDataRenderDelegate::imageDataModified(Event* imstkNotUsed(e))
 {
-    auto                                       imageData    = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
+    auto                                       imageData = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
     vtkSmartPointer<vtkGPUVolumeRayCastMapper> volumeMapper = vtkGPUVolumeRayCastMapper::SafeDownCast(m_mapper);
 
     // If the user swapped scalars on us
@@ -129,18 +129,12 @@ VTKImageDataRenderDelegate::imageDataModified(Event* imstkNotUsed(e))
         imageDataVtk->SetSpacing(imageData->getSpacing().data());
     }
     volumeMapper->GetInput()->Modified();
-
-    // \todo: transforms
-    if (imageData->m_transformModified)
-    {
-        imageData->m_transformModified = false;
-    }
 }
 
 void
 VTKImageDataRenderDelegate::imageScalarsModified(Event* imstkNotUsed(e))
 {
-    auto                                       geometry     = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
+    auto                                       geometry = std::static_pointer_cast<ImageData>(m_visualModel->getGeometry());
     vtkSmartPointer<vtkGPUVolumeRayCastMapper> volumeMapper = vtkGPUVolumeRayCastMapper::SafeDownCast(m_mapper);
     m_scalarArray = geometry->getScalars();
 

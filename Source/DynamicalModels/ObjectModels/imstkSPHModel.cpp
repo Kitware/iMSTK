@@ -25,6 +25,7 @@ limitations under the License.
 #include "imstkTaskGraph.h"
 #include "imstkVTKMeshIO.h"
 
+
 namespace imstk
 {
 SPHModelConfig::SPHModelConfig(const Real particleRadius)
@@ -84,7 +85,7 @@ SPHModelConfig::initialize()
 
     m_particleMass   = Real(std::pow(Real(2.0) * m_particleRadius, 3)) * m_restDensity * m_particleMassScale;
     m_restDensitySqr = m_restDensity * m_restDensity;
-    m_restDensityInv = Real(1) / m_restDensity;
+    m_restDensityInv = Real(1.0) / m_restDensity;
 
     m_kernelRadius    = m_particleRadius * m_kernelOverParticleRadiusRatio;
     m_kernelRadiusSqr = m_kernelRadius * m_kernelRadius;
@@ -575,15 +576,15 @@ SPHModel::computeSurfaceTension()
 
             for (size_t i = 0; i < neighborInfo.size(); ++i)
             {
-                const auto& qInfo   = neighborInfo[i];
-                const auto r        = qInfo.xpq;
+                const auto& qInfo = neighborInfo[i];
+                const auto r = qInfo.xpq;
                 const auto qdensity = qInfo.density;
                 n += (Real(1.0) / qdensity) * m_kernels.gradW(r);
             }
 
             n *= m_modelParameters->m_kernelRadius * m_modelParameters->m_particleMass;
             surfaceNormals[p] = n;
-      });
+        });
 
     VecDataArray<double, 3>& surfaceTensionAccels = *m_surfaceTensionAccels;
     const DataArray<double>& densities = *getCurrentState()->getDensities();
@@ -607,8 +608,8 @@ SPHModel::computeSurfaceTension()
                 return; // the particle has no neighbor
             }
 
-            const auto ni            = surfaceNormals[p];
-            const auto pdensity      = densities[p];
+            const auto ni = surfaceNormals[p];
+            const auto pdensity = densities[p];
             const auto& neighborInfo = neighborInfos[p];
 
             Vec3r accel(0, 0, 0);
@@ -619,14 +620,14 @@ SPHModel::computeSurfaceTension()
                 {
                     continue;
                 }
-                const auto& qInfo   = neighborInfo[i];
+                const auto& qInfo = neighborInfo[i];
                 const auto qdensity = qInfo.density;
 
                 // Correction factor
                 const auto K_ij = Real(2) * m_modelParameters->m_restDensity / (pdensity + qdensity);
 
                 // Cohesion acc
-                const auto r  = qInfo.xpq;
+                const auto r = qInfo.xpq;
                 const auto d2 = r.squaredNorm();
                 if (d2 > Real(1e-20))
                 {
@@ -641,7 +642,8 @@ SPHModel::computeSurfaceTension()
             accel *= m_modelParameters->m_surfaceTensionStiffness;
             //getState().getAccelerations()[p] += accel;
             surfaceTensionAccels[p] = accel;
-      });
+        });
+
 }
 
 void

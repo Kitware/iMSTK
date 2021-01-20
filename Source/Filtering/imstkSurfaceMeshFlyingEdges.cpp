@@ -64,6 +64,6 @@ SurfaceMeshFlyingEdges::requestUpdate()
     filter->SetValue(0, m_IsoValue);
     filter->Update();
 
-    setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
+    std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0))->deepCopy(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
 }
 }

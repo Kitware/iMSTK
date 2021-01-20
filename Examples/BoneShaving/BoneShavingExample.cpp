@@ -19,33 +19,25 @@
 
 =========================================================================*/
 
-#include "imstkLogger.h"
-#include "imstkMath.h"
-#include "imstkNew.h"
-#include "imstkScene.h"
-#include "imstkSceneManager.h"
-#include "imstkVTKViewer.h"
-
-// Objects
 #include "imstkCamera.h"
 #include "imstkCollidingObject.h"
-#include "imstkLight.h"
-
-// Geometry
-#include "imstkMeshIO.h"
-#include "imstkSphere.h"
-#include "imstkTetrahedralMesh.h"
-
-// Devices and controllers
+#include "imstkCollisionGraph.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkSceneObjectController.h"
-
-// Collisions
-#include "imstkCollisionGraph.h"
+#include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkSphere.h"
+#include "imstkSubstepModuleDriver.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -105,15 +97,18 @@ main()
 
     //Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer 1");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-        viewer->addChildThread(server);       // Server starts/stops with viewer
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+        driver->addModule(server);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -123,13 +118,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
     return 0;
 }

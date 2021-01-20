@@ -48,6 +48,7 @@ using namespace physx;
 /// \class RigidBodyWorld
 ///
 /// \brief Interface to the PhysX context for rigid bodies
+/// \todo: Remove this, should not be singleton follow RigidBodyModel2 pattern
 ///
 class RigidBodyWorld
 {

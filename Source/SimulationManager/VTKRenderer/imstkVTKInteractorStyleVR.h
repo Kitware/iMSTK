@@ -39,13 +39,6 @@ public:
 
     void OnMove3D(vtkEventData* edata) override;
     void OnButton3D(vtkEventData* edata) override;
-    void OnTimer() override
-    {
-        if (m_updateFunc != nullptr)
-        {
-            m_updateFunc();
-        }
-    }
 
     std::shared_ptr<imstk::OpenVRDeviceClient> getLeftControllerDeviceClient() const { return m_leftControllerDeviceClient; }
     std::shared_ptr<imstk::OpenVRDeviceClient> getRightControllerDeviceClient() const { return m_rightControllerDeviceClient; }

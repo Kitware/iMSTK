@@ -49,12 +49,6 @@ public:
 
 public:
     ///
-    /// \brief Start rendering
-    ///
-    void startThread() override;
-
-public:
-    ///
     /// \brief Destructor
     ///
     void setRenderingMode(const Renderer::Mode mode) override;
@@ -75,10 +69,11 @@ public:
     const std::list<std::shared_ptr<OpenVRDeviceClient>>& getVRDeviceClients() const { return m_vrDeviceClients; }
 
 protected:
-    void updateThread() override;
+    bool initModule() override;
+
+    void updateModule() override;
 
 protected:
-    vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
 
     ///> The VR controllers are tied to the view

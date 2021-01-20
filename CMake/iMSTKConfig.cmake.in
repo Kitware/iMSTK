@@ -9,7 +9,7 @@ include(CMakeFindDependencyMacro)
 
 # iMSTK settings
 set(iMSTK_ROOT ${PACKAGE_PREFIX_DIR})
-set(iMSTK_ENABLE_VR @iMSTK_ENABLE_VR@)
+set(iMSTK_DATA_DIR ${PACKAGE_PREFIX_DIR}/data)
 set(iMSTK_USE_Vulkan @iMSTK_USE_Vulkan@)
 set(iMSTK_USE_OpenHaptics @iMSTK_USE_OpenHaptics@)
 set(iMSTK_BUILD_TESTING @iMSTK_BUILD_TESTING@)

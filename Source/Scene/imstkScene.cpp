@@ -82,7 +82,6 @@ Scene::initialize()
     // Then init
     initTaskGraph();
 
-    m_isInitialized = true;
     LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
     return true;
 }
@@ -410,7 +409,7 @@ Scene::advance(const double dt)
     // Update objects controlled by the device controllers
     for (auto controller : this->getControllers())
     {
-        controller->updateControlledObjects();
+        controller->update(dt);
     }
 
     CollisionDetection::updateInternalOctreeAndDetectCollision();

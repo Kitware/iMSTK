@@ -39,20 +39,14 @@ protected:
 ///
 TEST_F(imstkGeometryTest, GetSetScaling)
 {
-    m_geometry.setScaling(2);
-    EXPECT_EQ(m_geometry.getScaling(), 2);
+    m_geometry.setScaling(Vec3d(2.0, 2.0, 2.0));
+    EXPECT_EQ(m_geometry.getScaling(), Vec3d(2.0, 2.0, 2.0));
 
-    m_geometry.setScaling(0.003);
-    EXPECT_EQ(m_geometry.getScaling(), 0.003);
+    m_geometry.setScaling(Vec3d(0.003, 0.003, 0.003));
+    EXPECT_EQ(m_geometry.getScaling(), Vec3d(0.003, 0.003, 0.003));
 
-    m_geometry.setScaling(400000000);
-    EXPECT_EQ(m_geometry.getScaling(), 400000000);
-
-    m_geometry.setScaling(0);
-    EXPECT_GT(m_geometry.getScaling(), 0);
-
-    m_geometry.setScaling(-5);
-    EXPECT_GT(m_geometry.getScaling(), 0);
+    m_geometry.setScaling(Vec3d(400000000.0, 400000000.0, 400000000.0));
+    EXPECT_EQ(m_geometry.getScaling(), Vec3d(400000000.0, 400000000.0, 400000000.0));
 }
 
 ///
@@ -60,8 +54,8 @@ TEST_F(imstkGeometryTest, GetSetScaling)
 ///
 TEST_F(imstkGeometryTest, GetSetTranslation)
 {
-    auto p1 = Vec3d(12, 0.0005, -400000);
-    auto p2 = Vec3d(-500, 30, 0.23);
+    auto p1 = Vec3d(12.0, 0.0005, -400000.0);
+    auto p2 = Vec3d(-500.0, 30.0, 0.23);
 
     m_geometry.setTranslation(p1);
     EXPECT_EQ(m_geometry.getTranslation(), p1);

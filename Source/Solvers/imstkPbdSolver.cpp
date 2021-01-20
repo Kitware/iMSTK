@@ -89,11 +89,11 @@ PbdSolver::solve()
                 {
                     constraintPartition[idx]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
                 });
-            // Sequential
-            /*for (size_t k = 0; k < constraintPartition.size(); k++)
-            {
-                constraintPartition[k]->solvePositionConstraint(currPositions, invMasses);
-            }*/
+            //// Sequential
+            //for (size_t k = 0; k < constraintPartition.size(); k++)
+            //{
+            //    constraintPartition[k]->projectConstraint(invMasses, m_dt, m_solverType, currPositions);
+            //}
         }
     }
 }

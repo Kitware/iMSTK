@@ -38,6 +38,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkTetrahedralMesh.h"
@@ -281,7 +282,10 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -291,15 +295,14 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
+    // Write the task graph to later view
     imstkNew<TaskGraphVizWriter> writer;
     writer->setFileName("sphFemPbdInteractionTaskGraph.svg");
     writer->setHighlightCriticalPath(true);

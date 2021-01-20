@@ -102,8 +102,8 @@ OneToOneMap::isValid() const
         "Failed to cast from geometry to pointset";
 #endif
 
-    auto numVertMaster = meshMaster->getNumVertices();
-    auto numVertSlave  = meshSlave->getNumVertices();
+    const size_t numVertMaster = meshMaster->getNumVertices();
+    const size_t numVertSlave  = meshSlave->getNumVertices();
 
     bool valid = true;
     ParallelUtils::parallelFor(m_oneToOneMapVector.size(),
@@ -125,7 +125,7 @@ OneToOneMap::isValid() const
     {
         ParallelUtils::parallelFor(meshSlave->getNumVertices(), [&](const size_t nodeId)
             {
-                const auto p    = meshSlave->getVertexPosition(nodeId);
+                const Vec3d& p    = meshSlave->getVertexPosition(nodeId);
                 bool matchFound = false;
                 for (size_t idx = 0; idx < meshMaster->getNumVertices(); ++idx)
                 {
@@ -189,6 +189,7 @@ OneToOneMap::apply()
             const auto& mapValue = m_oneToOneMapVector[idx];
             slaveVertices[mapValue.first] = masterVertices[mapValue.second];
         });
+    meshSlave->modified();
 }
 
 void

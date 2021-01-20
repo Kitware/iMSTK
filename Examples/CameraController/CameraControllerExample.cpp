@@ -33,6 +33,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVTKViewer.h"
 
@@ -52,9 +53,8 @@ main()
     imstkNew<Scene> scene("CameraController");
 
     // Device Server
-    imstkNew<HapticDeviceManager>       server;
-    const std::string                   deviceName = "";
-    std::shared_ptr<HapticDeviceClient> client     = server->makeDeviceClient(deviceName);
+    imstkNew<HapticDeviceManager> server;
+    std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
 
     // Load Mesh
     auto                   mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
@@ -82,20 +82,23 @@ main()
     light->setIntensity(1.0);
     scene->addLight(light);
 
-    //Run the simulation
+    // Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer 1");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-        viewer->addChildThread(server);
 
         // attach the camera controller to the viewer
         viewer->addControl(camController);
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(server);
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -105,12 +108,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer and its children
-        viewer->start();
+        driver->start();
     }
 
     return 0;

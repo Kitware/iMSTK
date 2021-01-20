@@ -138,9 +138,10 @@ class DebugRenderPoints : public DebugRenderGeometry
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Constructor/Destructor
     ///
     explicit DebugRenderPoints(const std::string& name) : DebugRenderGeometry(name, Type::Points) {}
+    ~DebugRenderPoints() override = default;
 };
 
 ///
@@ -152,9 +153,10 @@ class DebugRenderLines : public DebugRenderGeometry
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Constructor/Destructor
     ///
     explicit DebugRenderLines(const std::string& name) : DebugRenderGeometry(name, Type::Lines) {}
+    ~DebugRenderLines() override = default;
 
     ///
     /// \brief Reserve memory for fast push_back
@@ -171,9 +173,10 @@ class DebugRenderTriangles : public DebugRenderGeometry
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief Constructor/Destructor
     ///
     explicit DebugRenderTriangles(const std::string& name) : DebugRenderGeometry(name, Type::Triangles) {}
+    ~DebugRenderTriangles() override = default;
 
     ///
     /// \brief Reserve memory for fast push_back

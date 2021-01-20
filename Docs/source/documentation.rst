@@ -83,6 +83,12 @@ will checkout, build and link all iMSTK dependencies. When making
 changes to iMSTK base source code, you can then build from the iMSTK.sln
 solution file located in the Innerbuild directory.   
 
+**Offscreen Rendering**
+
+Offscreen OSMesa/CPU rendering is supported for Linux/MacOSx. This allows one
+to build iMSTK without a screen or GPU. Useful for servers. This can be enabled
+in the build by using the :code:`VTK_USE_OSMESA` flag to ON.
+
 Running Examples
 ----------------
 The default CMake configuration builds the examples as part of the inner build.
@@ -134,12 +140,6 @@ The examples that demonstrate the features and the usage of iMSTK API
 can be optionally build. Set :code:`BUILD_EXAMPLES` to ON the examples needs to
 be built.
 
-**Virtual Reality Support**
-
-iMSTK can optionally display the render frames to the HMD instead of the
-default 2D screen. In order to enable VR via openVR, set
-:code:`iMSTK_ENABLE_VR` to ON.
-
 **Audio Support**
 
 iMSTK has the ability to play audio streams at runtime. In order to
@@ -152,6 +152,10 @@ iMSTK follows specific code formatting rules. This is enforced through
 iMSTK provides the option to build uncrustify as a target. To enable
 this set :code:`iMSTK_USE_UNCRUSTIFY` to ON.
 
+**Virtual Reality Support**
+
+VR supported is provided through OpenVR. This support includes support for
+the majority of VR headsets. Notably Oculus and vive headsets.
 
 **Multithreaded build**
 

@@ -25,8 +25,6 @@
 
 namespace imstk
 {
-// SPHKinematicState implementation ===>
-
 SPHState::SPHState(const int numElements) :
     m_positions(std::make_shared<VecDataArray<double, 3>>(numElements)),
     m_fullStepVelocities(std::make_shared<VecDataArray<double, 3>>(numElements)),
@@ -52,19 +50,19 @@ SPHState::SPHState(const int numElements) :
 void
 SPHState::setState(std::shared_ptr<SPHState> rhs)
 {
-    *m_positions  = *rhs->getPositions();
+    *m_positions = *rhs->getPositions();
     *m_velocities = *rhs->getVelocities();
     *m_halfStepVelocities = *rhs->getHalfStepVelocities();
     *m_fullStepVelocities = *rhs->getFullStepVelocities();
-    *m_BDPositions       = *rhs->getBoundaryParticlePositions();
-    *m_Densities         = *rhs->getDensities();
-    *m_Normals           = *rhs->getNormals();
-    *m_Accels            = *rhs->getAccelerations();
+    *m_BDPositions = *rhs->getBoundaryParticlePositions();
+    *m_Densities = *rhs->getDensities();
+    *m_Normals = *rhs->getNormals();
+    *m_Accels = *rhs->getAccelerations();
     *m_DiffuseVelocities = *rhs->getDiffuseVelocities();
 
-    m_NeighborLists   = rhs->getFluidNeighborLists();
+    m_NeighborLists = rhs->getFluidNeighborLists();
     m_BDNeighborLists = rhs->getBoundaryNeighborLists();
-    m_NeighborInfo    = rhs->getNeighborInfo();
+    m_NeighborInfo = rhs->getNeighborInfo();
 
     m_positions->modified();
 }

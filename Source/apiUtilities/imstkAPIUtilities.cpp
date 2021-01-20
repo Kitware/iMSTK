@@ -51,7 +51,7 @@ std::shared_ptr<VisualObject>
 createVisualAnalyticalSceneObject(Geometry::Type         type,
                                   std::shared_ptr<Scene> scene,
                                   const std::string&     objName,
-                                  const double           scale /* = 1.*/,
+                                  const Vec3d            scale /* = 1.*/,
                                   const Vec3d            t /*= Vec3d(0., 0., 0.)*/)
 {
     CHECK(scene != nullptr) << "createVisualAnalyticalSceneObject: Scene is not valid!";
@@ -102,7 +102,7 @@ std::shared_ptr<CollidingObject>
 createCollidingAnalyticalSceneObject(Geometry::Type         type,
                                      std::shared_ptr<Scene> scene,
                                      const std::string&     objName,
-                                     const double           scale /*= 1.*/,
+                                     const Vec3d            scale /*= 1.*/,
                                      const Vec3d            t /*= Vec3d(0., 0., 0.)*/)
 {
     CHECK(scene != nullptr) << "createCollidingSphereSceneObject: Scene is not valid!";
@@ -184,28 +184,6 @@ createNonLinearSystem(std::shared_ptr<FEMDeformableBodyModel> dynaModel)
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     return nlSystem;
-}
-
-///
-/// \brief Print number of updates for second for a given scene
-///
-void
-printUPS(std::shared_ptr<SceneManager> sceneManager)
-{
-    if (!sceneManager)
-    {
-        LOG(WARNING) << "APIUtilities::printUPS - scene manager is not valid! Unable to print UPS";
-        return;
-    }
-
-    sceneManager->enableFrameCount();
-    // When sceneManager emits PreUpdate, cout the ups
-    connect<Event>(sceneManager, EventType::PreUpdate,
-        [&sceneManager](Event*)
-            {
-                std::cout << "\r" << sceneManager->getName() << " running at "
-                          << sceneManager->getUPS() << " ups   " << std::flush;
-        });
 }
 
 std::shared_ptr<Graph>

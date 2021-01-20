@@ -268,11 +268,6 @@ public:
     void addController(std::shared_ptr<TrackingDeviceControl> controller);
 
     ///
-    /// \brief
-    ///
-    bool isInitialized() const { return m_isInitialized; }
-
-    ///
     /// \brief Set/Get the FPS
     ///
     void setFPS(const double fps) { m_fps = fps; }
@@ -333,8 +328,6 @@ protected:
 
     double m_fps = 0.0;
     double m_elapsedTime = 0.0;
-
-    bool m_isInitialized = false;
 
     std::atomic<bool> m_resetRequested = ATOMIC_VAR_INIT(false);
 };

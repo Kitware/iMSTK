@@ -21,10 +21,9 @@
 
 #include "imstkHapticDeviceManager.h"
 #include "imstkHapticDeviceClient.h"
+#include "imstkLogger.h"
 
 #include <HD/hd.h>
-
-#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -36,24 +35,19 @@ HapticDeviceManager::makeDeviceClient(std::string name)
     return deviceClient;
 }
 
-void
-HapticDeviceManager::initialize()
+bool
+HapticDeviceManager::initModule()
 {
     for (const auto& client : m_deviceClients)
     {
         client->initialize();
     }
-}
-
-void
-HapticDeviceManager::startThread()
-{
-    initialize();
     hdStartScheduler();
+    return true;
 }
 
 void
-HapticDeviceManager::stopThread()
+HapticDeviceManager::uninitModule()
 {
     hdStopScheduler();
     for (const auto& client : m_deviceClients)

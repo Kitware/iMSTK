@@ -65,7 +65,7 @@ public:
 
     // Only these classes may provide this object
     friend class VTKInteractorStyle;
-    friend class ConsoleThread;
+    friend class ConsoleModule;
 
 public:
     const std::unordered_map<int, KeyStateType>& getKeyState() const { return m_buttons; }

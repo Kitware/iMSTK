@@ -20,11 +20,9 @@
 =========================================================================*/
 
 #include "imstkMeshIO.h"
+#include "imstkTetrahedralMesh.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkVTKMeshIO.h"
-#include "imstkTetrahedralMesh.h"
-
-#include <string>
 
 using namespace imstk;
 

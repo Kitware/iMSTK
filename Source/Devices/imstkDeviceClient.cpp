@@ -118,6 +118,12 @@ DeviceClient::getVelocity() const
     return m_velocity;
 }
 
+const Vec3d&
+DeviceClient::getAngularVelocity() const
+{
+    return m_angularVelocity;
+}
+
 const Quatd&
 DeviceClient::getOrientation() const
 {

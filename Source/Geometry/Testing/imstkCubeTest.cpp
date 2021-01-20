@@ -19,9 +19,9 @@
 
 =========================================================================*/
 
-#include "gtest/gtest.h"
-
 #include "imstkCube.h"
+
+#include <gtest/gtest.h>
 
 using namespace imstk;
 

@@ -38,6 +38,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
 #include "imstkSphere.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVisualModel.h"
@@ -232,19 +233,21 @@ main()
     light->setIntensity(1.0);
     scene->addLight(light);
 
-    // Run
-    //Run the simulation
+    // Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer 1");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->pause(); // Start simulation paused
 
-        viewer->addChildThread(server);
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(server);
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -254,29 +257,27 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
         Vec3d prevCubePos = rbdModel->getModelGeometry()->getTranslation();
         connect<Event>(sceneManager, EventType::PostUpdate,
             [&](Event*)
-        {
-            const auto devPos = controller->getPosition();
-            const auto devQ   = controller->getRotation();
-            rbdModel->getModelGeometry()->rotate(devQ);
-            auto cubeGeo = std::dynamic_pointer_cast<Cube>(cubeObj->getPhysicsGeometry());
-            const Vec3d cubePos      = rbdModel->getModelGeometry()->getTranslation();
-            const Vec3d cubeVelocity = (cubePos - prevCubePos) / 2.0;
-            const Vec3d damp  = -1000000 * cubeVelocity;
-            const Vec3d force = -1000 * (cubePos - devPos) + damp;
-            rbdModel->addForce(force, Vec3d(0.0, 0.0, 0.0));
-            prevCubePos = cubePos;
+            {
+                const Vec3d& devPos = controller->getPosition();
+                const Quatd& devQ   = controller->getRotation();
+                rbdModel->getModelGeometry()->rotate(devQ);
+                auto cubeGeo = std::dynamic_pointer_cast<Cube>(cubeObj->getPhysicsGeometry());
+                const Vec3d cubePos      = rbdModel->getModelGeometry()->getTranslation();
+                const Vec3d cubeVelocity = (cubePos - prevCubePos) / 2.0;
+                const Vec3d damp  = -1000000 * cubeVelocity;
+                const Vec3d force = -1000 * (cubePos - devPos) + damp;
+                rbdModel->addForce(force, Vec3d(0.0, 0.0, 0.0));
+                prevCubePos = cubePos;
             });
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

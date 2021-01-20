@@ -50,22 +50,6 @@ public:
 
 public:
     ///
-    /// \brief Terminate rendering
-    ///
-    virtual void stopThread() override;
-
-    ///
-    /// \brief Pause is reimplemented for VTK viewers
-    ///
-    void pause(bool sync = false) override;
-
-    ///
-    /// \brief Resume is reimplemented for VTK viewers
-    ///
-    void resume(bool sync = false) override;
-
-public:
-    ///
     /// \brief Get the current renderer mode
     ///
     virtual Renderer::Mode getRenderingMode() const override;
@@ -97,20 +81,19 @@ public:
     ///
     std::shared_ptr<vtkInteractorStyle> getVtkInteractorStyle() const { return m_vtkInteractorStyle; }
 
+    ///
+    /// \brief Processes VTK events, includes OS events
+    /// 
+    void processEvents() override;
+
 protected:
-    ///
-    /// \brief Callback for when the viewer is disabled
-    ///
-    static void viewerDisabled(vtkObject* sender, unsigned long eventId, void* clientData, void* callData);
-    ///
-    /// \brief Callback for when the viewer is enabled
-    ///
-    static void viewerEnabled(vtkObject* sender, unsigned long eventId, void* clientData, void* callData);
+    bool initModule() override;
+
+    void uninitModule() override;
 
 protected:
     vtkSmartPointer<vtkRenderWindow>    m_vtkRenderWindow;
     std::shared_ptr<vtkInteractorStyle> m_vtkInteractorStyle;
-    vtkSmartPointer<vtkCallbackCommand> viewerDisabledCallback;
-    vtkSmartPointer<vtkCallbackCommand> viewerEnabledCallback;
+    vtkSmartPointer<vtkCallbackCommand> exitCallback;
 };
 } // imstk

@@ -39,17 +39,18 @@ Decal::print() const
 }
 
 void
-Decal::applyScaling(const double s)
+Decal::applyTransform(const Mat4d& m)
 {
-    m_dimensions *= s;
+    const Vec3d s = Vec3d(
+        m.block<3, 1>(0, 0).norm(),
+        m.block<3, 1>(0, 1).norm(),
+        m.block<3, 1>(0, 2).norm());
+    m_dimensions = m_dimensions.cwiseProduct(s);
 }
 
 void
 Decal::updateDecal(Mat4d& imstkNotUsed(viewMatrix))
 {
-    Mat4d transform = mat4dScale(Vec3d(getScaling(), getScaling(), getScaling()));
-    transform = mat4dRotation(getRotation()) * transform * mat4dTranslate(getPosition());
-
-    m_inverse = transform.inverse();
+    m_inverse = m_transform.inverse();
 }
 }

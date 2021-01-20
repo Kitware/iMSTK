@@ -38,7 +38,7 @@ HapticDeviceClient::initialize()
     //flush error stack
     HDErrorInfo errorFlush;
     while (HD_DEVICE_ERROR(errorFlush = hdGetError())) {}
-
+    
     // Initialize the device
     if (m_deviceName == "")
     {
@@ -50,8 +50,11 @@ HapticDeviceClient::initialize()
     }
 
     // If failed
-    HDErrorInfo error;
-    LOG_IF(FATAL, HD_DEVICE_ERROR(error = hdGetError())) << "Failed to initialize Phantom Omni \"" << this->getDeviceName() + "\"";
+    HDErrorInfo error = hdGetError();
+    LOG_IF(FATAL, HD_DEVICE_ERROR(error)) <<
+        "Failed to initialize Phantom Omni \"" << this->getDeviceName() + "\"" << "\n"
+        "Error code: " << error.errorCode << "\n"
+        "Internal Error code: " << error.internalErrorCode;
 
     // If initialized as default, set the name
     if (m_deviceName == "")
@@ -75,7 +78,8 @@ HapticDeviceClient::initialize()
 void
 HapticDeviceClient::update()
 {
-    hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
+    //hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
+    hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY); // Call sometime later
 }
 
 void
@@ -102,6 +106,7 @@ HapticDeviceClient::hapticCallback(void* pData)
     hdSetDoublev(HD_CURRENT_FORCE, client->m_force.data());
     hdGetDoublev(HD_CURRENT_POSITION, state.pos);
     hdGetDoublev(HD_CURRENT_VELOCITY, state.vel);
+    hdGetDoublev(HD_CURRENT_ANGULAR_VELOCITY, state.angularVel);
     hdGetDoublev(HD_CURRENT_TRANSFORM, state.trans);
     hdGetIntegerv(HD_CURRENT_BUTTONS, &state.buttons);
 
@@ -109,6 +114,7 @@ HapticDeviceClient::hapticCallback(void* pData)
 
     client->m_position << state.pos[0], state.pos[1], state.pos[2];
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
+    client->m_angularVelocity << state.angularVel[0], state.angularVel[1], state.angularVel[2];
     client->m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(state.trans))).rotation();
 
     for (int i = 0; i < 4; i++)

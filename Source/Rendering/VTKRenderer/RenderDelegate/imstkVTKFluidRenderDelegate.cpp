@@ -33,8 +33,8 @@
 namespace imstk
 {
 VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKVolumeRenderDelegate(visualModel),
-    m_polydata(vtkSmartPointer<vtkPolyData>::New()),
-    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+m_polydata(vtkSmartPointer<vtkPolyData>::New()),
+m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     auto geometry = std::static_pointer_cast<PointSet>(visualModel->getGeometry());
     m_vertices = geometry->getVertexPositions();
@@ -62,7 +62,7 @@ VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visu
         vtkNew<vtkVolume> volume;
         volume->SetMapper(mapper);
         m_mapper = mapper;
-        m_actor  = volume;
+        m_actor = volume;
     }
 
     update();
@@ -73,7 +73,7 @@ void
 VTKFluidRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<PointSet>                geom     = std::dynamic_pointer_cast<PointSet>(m_visualModel->getGeometry());
+    std::shared_ptr<PointSet>                geom = std::dynamic_pointer_cast<PointSet>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
 
     // Only use the most recent event from respective sender

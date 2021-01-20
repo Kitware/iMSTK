@@ -19,21 +19,39 @@
 
 =========================================================================*/
 
-#include "imstkConsoleThread.h"
-#include "imstkKeyboardDeviceClient.h"
+#pragma once
+
+#include "imstkModule.h"
 
 namespace imstk
 {
-ConsoleThread::ConsoleThread(std::string name) :
-    LoopThreadObject(name),
-    m_keyboardDeviceClient(KeyboardDeviceClient::New())
-{
-}
+class KeyboardDeviceClient;
 
-void
-ConsoleThread::updateThread()
+///
+/// \class ConsoleModule
+///
+/// \brief The console thread can run separately or in
+/// sync to provide keyboard events from the console
+/// they should be handled on another thread
+///
+class ConsoleModule : public Module
 {
-    const char c = static_cast<char>(getchar());
-    m_keyboardDeviceClient->emitKeyDown(c);
-}
+public:
+    ConsoleModule(std::string name = "ConsoleModule");
+    ~ConsoleModule() override      = default;
+
+public:
+    std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const { return m_keyboardDeviceClient; }
+
+protected:
+    bool initModule() override { return true; }
+
+    ///
+    /// \brief Awaits input
+    ///
+    void updateModule() override;
+
+protected:
+    std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
+};
 }

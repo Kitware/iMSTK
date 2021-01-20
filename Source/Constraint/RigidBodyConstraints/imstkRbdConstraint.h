@@ -36,38 +36,41 @@ namespace expiremental
 ///
 struct RigidBody
 {
-    public:
-        double m_mass = 1.0;
-        Mat3d m_intertiaTensor = Mat3d::Identity();
-        Vec3d m_initPos = Vec3d(0.0, 0.0, 0.0);
-        Quatd m_initOrientation     = Quatd(1.0, 0.0, 0.0, 0.0);
-        Vec3d m_initVelocity        = Vec3d(0.0, 0.0, 0.0);
-        Vec3d m_initAngularVelocity = Vec3d(0.0, 0.0, 0.0);
-        Vec3d m_initForce  = Vec3d(0.0, 0.0, 0.0);
-        Vec3d m_initTorque = Vec3d(0.0, 0.0, 0.0);
-        bool m_isStatic    = false;
+public:
+    double m_mass = 1.0;
+    Mat3d m_intertiaTensor = Mat3d::Identity();
+    Vec3d m_initPos = Vec3d(0.0, 0.0, 0.0);
+    Quatd m_initOrientation = Quatd(1.0, 0.0, 0.0, 0.0);
+    Vec3d m_initVelocity = Vec3d(0.0, 0.0, 0.0);
+    Vec3d m_initAngularVelocity = Vec3d(0.0, 0.0, 0.0);
+    Vec3d m_initForce = Vec3d(0.0, 0.0, 0.0);
+    Vec3d m_initTorque = Vec3d(0.0, 0.0, 0.0);
+    bool m_isStatic = false;
 
-        // Vec3d m_externalForce;
-        //RigidBodyState2* m_state; // A RigidBody can only belong to one state
-        Vec3d* m_pos;
-        Quatd* m_orientation;
-        Vec3d* m_velocity;
-        Vec3d* m_angularVelocity;
-        Vec3d* m_force;
-        Vec3d* m_torque;
+    Vec3d m_prevForce = Vec3d(0.0, 0.0, 0.0);
 
-        const Vec3d& getPosition() const { return *m_pos; }
-        const Quatd& getOrientation() const { return *m_orientation; }
-        const Vec3d& getVelocity() const { return *m_velocity; }
-        const Vec3d& getAngularVelocity() const { return *m_angularVelocity; }
-        const Vec3d& getForce() const { return *m_force; }
-        const Vec3d& getTorque() const { return *m_torque; }
+    // Vec3d m_externalForce;
+    //RigidBodyState2* m_state; // A RigidBody can only belong to one state
+    Vec3d* m_pos;
+    Quatd* m_orientation;
+    Vec3d* m_velocity;
+    Vec3d* m_angularVelocity;
+    Vec3d* m_force;
+    Vec3d* m_torque;
 
-        ///
-        /// \brief Convience function to set the inertia tensor based off provided geometry
-        /// assuming uniform mass at each point.
-        ///
-        void setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale = 1.0, const bool useBoundingBoxOrigin = true);
+public:
+    const Vec3d& getPosition() const { return *m_pos; }
+    const Quatd& getOrientation() const { return *m_orientation; }
+    const Vec3d& getVelocity() const { return *m_velocity; }
+    const Vec3d& getAngularVelocity() const { return *m_angularVelocity; }
+    const Vec3d& getForce() const { return *m_force; }
+    const Vec3d& getTorque() const { return *m_torque; }
+
+    ///
+    /// \brief Convience function to set the inertia tensor based off provided geometry
+    /// assuming uniform mass at each point.
+    ///
+    void setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale = 1.0, const bool useBoundingBoxOrigin = true);
 };
 
 ///

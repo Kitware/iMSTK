@@ -25,8 +25,8 @@
 
 namespace imstk
 {
+class ModuleDriver;
 class SceneManager;
-class Viewer;
 
 ///
 /// \class KeyboardSceneControl
@@ -45,11 +45,15 @@ public:
     virtual ~KeyboardSceneControl() override = default;
 
 public:
-    void setSceneManager(std::shared_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
-    std::shared_ptr<SceneManager> getSceneManager() const { return m_sceneManager; }
+    ///
+    /// \brief The driver is used to stop the simulation
+    /// 
+    void setModuleDriver(std::shared_ptr<ModuleDriver> driver) { m_driver = driver; }
 
-    void setViewer(std::shared_ptr<Viewer> viewer) { m_viewer = viewer; }
-    std::shared_ptr<Viewer> getViewer() const { return m_viewer; }
+    ///
+    /// \brief Set the scene manager whose fps we should track
+    /// 
+    void setSceneManager(std::shared_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
 public:
     void printControls() override;
@@ -59,8 +63,8 @@ public:
     void OnKeyRelease(const char key) override;
 
 protected:
+    std::shared_ptr<ModuleDriver> m_driver;
     std::shared_ptr<SceneManager> m_sceneManager;
-    std::shared_ptr<Viewer>       m_viewer;
     bool m_showFps;
 };
 }

@@ -84,7 +84,7 @@ public:
 protected:
     friend class VTKPlaneRenderDelegate;
 
-    void applyScaling(const double s) override;
+    void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 
     double m_width = 1.0;                      ///> Width of the plane

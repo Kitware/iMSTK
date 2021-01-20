@@ -115,9 +115,10 @@ protected:
     glm::vec2  m_vertexUVs[4];
     glm::ivec3 m_triangles[2];
 
-    void applyTranslation(const Vec3d t) override;
-    void applyRotation(const Mat3d r) override;
-    void applyScaling(const double s) override;
+#pragma warning( push )
+#pragma warning( disable : 4100 )
+    void applyTransform(const Mat4d& m) override;
+#pragma warning( pop )
 
     virtual void updatePostTransformData() const override {}
 };

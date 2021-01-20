@@ -69,6 +69,11 @@ DynamicObject::updatePhysicsGeometry()
     {
         m_physicsToCollidingGeomMap->apply();
     }
+
+    if (m_physicsGeometry != nullptr)
+    {
+        m_physicsGeometry->modified();
+    }
 }
 
 bool

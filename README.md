@@ -120,6 +120,14 @@ To use the Vulkan renderer, follow these steps:
   * Download your GPU vendor's latest drivers.
   * Enable the `iMSTK_USE_Vulkan` option in CMake.
 
+* ##### Offscreen Rendering
+To render without the usage of a GPU or without the usage of a screen on linux (or WSL), iMSTK's VTK renderer may be built with OSMesa.
+  1. Install osmesa libraries via:
+```bash
+sudo apt install mesa-common-dev libosmesa6-dev libglu1-mesa-dev`
+```
+  2. Set `iMSTK_USE_VTK_OSMESA` to `ON`
+  3. Proceed to build iMSTK
 
 ---
 [NIH-OD]: <https://www.nih.gov/about-nih/what-we-do/nih-almanac/office-director-nih>

@@ -75,11 +75,8 @@ protected:
     std::deque<std::shared_ptr<Decal>> m_orderedDecals;
     std::deque<std::shared_ptr<Decal>> m_freeDecals;
 
-    void applyTranslation(const Vec3d imstkNotUsed(t)) override {}
-    void applyRotation(const Mat3d imstkNotUsed(r)) override {}
-    void applyScaling(const double imstkNotUsed(s)) override {}
-
-    virtual void updatePostTransformData() const override {}
+    void applyTransform(const Mat4d& imstkNotUsed(m)) override { }
+    virtual void updatePostTransformData() const override { }
 
     unsigned int m_maxNumDecals;
     unsigned int m_numDecals = 0;

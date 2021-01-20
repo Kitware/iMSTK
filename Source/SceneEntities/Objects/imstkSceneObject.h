@@ -133,7 +133,7 @@ public:
     ///
     /// \brief Update the geometries
     ///
-    virtual void updateGeometries();
+    virtual void updateGeometries() { }
 
     ///
     /// \brief Initialize the scene object

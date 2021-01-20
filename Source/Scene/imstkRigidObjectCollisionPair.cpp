@@ -71,21 +71,8 @@ RigidObjectCollisionPair::RigidObjectCollisionPair(std::shared_ptr<RigidObject2>
         LOG(WARNING) << "RigidObjectCollisionPair, specified RigidObjects have differing models, one-way constraints not supported yet";
         return;
     }
-    std::shared_ptr<RigidBodyCH> ch = std::make_shared<RigidBodyCH>(side, m_colData, obj1, obj2);
+    auto ch = std::make_shared<RigidBodyCH>(side, m_colData, obj1, obj2);
     setCollisionHandlingAB(ch);
-}
-
-void
-RigidObjectCollisionPair::apply()
-{
-    // Do the normal insertions
-    CollisionPair::apply();
-
-    // But then also insert one above the CD for updating the collision geometry
-    /*m_objects.first->getTaskGraph()->insertBefore(m_colDetect->getTaskNode(),
-        std::make_shared<TaskNode>(std::bind(&DynamicObject::updatePhysicsGeometry, m_objects.first), "UpdateGeometry"));
-    m_objects.second->getTaskGraph()->insertBefore(m_colDetect->getTaskNode(),
-        std::make_shared<TaskNode>(std::bind(&DynamicObject::updatePhysicsGeometry, m_objects.first), "UpdateGeometry"));*/
 }
 }
 }

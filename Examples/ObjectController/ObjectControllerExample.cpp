@@ -32,6 +32,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -78,16 +79,18 @@ main()
 
     //Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer 1");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
 
-        viewer->addChildThread(server);
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+        driver->addModule(server);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -97,12 +100,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start the viewer and its children
-        viewer->start();
+        driver->start();
     }
     return 0;
 }

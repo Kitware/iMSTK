@@ -38,15 +38,17 @@
 #include "imstkRigidObjectLevelSetCollisionPair.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
+#include "imstkSurfaceMeshSubdivide.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVTKOpenVRViewer.h"
+
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkVolumeProperty.h>
-#include "imstkSurfaceMeshSubdivide.h"
 
 using namespace imstk;
 using namespace imstk::expiremental;
@@ -214,15 +216,16 @@ main()
         // Add a module to run the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // Start/stop scene with the view
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add a VR controller for the sceneobject
         imstkNew<RigidObjectController> controller(rbdObj, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
         scene->addController(controller);
 
-        // Start running
-        viewer->requestStatus(ThreadStatus::Running);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

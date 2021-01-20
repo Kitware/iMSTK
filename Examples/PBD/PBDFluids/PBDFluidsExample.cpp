@@ -22,12 +22,12 @@
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 #include "imstkKeyboardSceneControl.h"
-#include "imstkLight.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
+#include "imstkSubstepModuleDriver.h"
 #include "imstkPbdModel.h"
 #include "imstkPbdObject.h"
 #include "imstkRenderMaterial.h"
@@ -81,7 +81,6 @@ main()
         // Configure model
         imstkNew<PBDModelConfig> pbdParams;
         pbdParams->m_uniformMassValue = 0.0;
-        pbdParams->collisionParams->m_proximity = 0.1;
 
         pbdModel->configure(pbdParams);
         floorObj->setDynamicalModel(pbdModel);
@@ -92,24 +91,22 @@ main()
         scene->getCollisionGraph()->addInteraction(makeObjectInteractionPair(deformableObj, floorObj,
             InteractionType::PbdObjToPbdObjCollision,
             CollisionDetection::Type::MeshToMeshBruteForce));
-
-        // Light (white)
-        imstkNew<DirectionalLight> whiteLight("whiteLight");
-        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-        whiteLight->setIntensity(7);
-        scene->addLight(whiteLight);
     }
 
     // Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->pause(); // Start simulation paused
+
+        imstkNew<SubstepModuleDriver> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -119,13 +116,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;
@@ -191,14 +186,14 @@ createCollidingSurfaceMesh()
     int                               nRows    = 2;
     int                               nCols    = 2;
     vertices.resize(nRows * nCols * nSides);
-    const double dy = width / (double)(nCols - 1);
-    const double dx = height / (double)(nRows - 1);
+    const double dy = width / static_cast<double>(nCols - 1);
+    const double dx = height / static_cast<double>(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double y = (double)dy * j;
-            const double x = (double)dx * i;
+            const double y = static_cast<double>(dy * j);
+            const double x = static_cast<double>(dx * i);
             vertices[i * nCols + j] = Vec3d(x - 20, -10.0, y - 20);
         }
     }
@@ -206,9 +201,9 @@ createCollidingSurfaceMesh()
     // c. Add connectivity data
     std::shared_ptr<VecDataArray<int, 3>> trianglesPtr = std::make_shared<VecDataArray<int, 3>>();
     VecDataArray<int, 3>&                 triangles    = *trianglesPtr;
-    for (std::size_t i = 0; i < nRows - 1; ++i)
+    for (int i = 0; i < nRows - 1; ++i)
     {
-        for (std::size_t j = 0; j < nCols - 1; j++)
+        for (int j = 0; j < nCols - 1; j++)
         {
             triangles.push_back(Vec3i(i * nCols + j, i * nCols + j + 1, (i + 1) * nCols + j));
             triangles.push_back(Vec3i((i + 1) * nCols + j + 1, (i + 1) * nCols + j, i * nCols + j + 1));
@@ -221,23 +216,23 @@ createCollidingSurfaceMesh()
     height = 40.0;
     nRows  = 2;
     nCols  = 2;
-    const double dz  = width / (double)(nCols - 1);
-    const double dx1 = height / (double)(nRows - 1);
+    const double dz  = width / static_cast<double>(nCols - 1);
+    const double dx1 = height / static_cast<double>(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double z = (double)dz * j;
-            const double x = (double)dx1 * i;
+            const double z = static_cast<double>(dz * j);
+            const double x = static_cast<double>(dx1 * i);
             vertices[(nPointPerSide) + i * nCols + j]     = Vec3d(x - 20, z - 10.0, 20);
             vertices[(nPointPerSide * 2) + i * nCols + j] = Vec3d(x - 20, z - 10.0, -20);
         }
     }
 
     // c. Add connectivity data
-    for (std::size_t i = 0; i < nRows - 1; ++i)
+    for (int i = 0; i < nRows - 1; ++i)
     {
-        for (std::size_t j = 0; j < nCols - 1; j++)
+        for (int j = 0; j < nCols - 1; j++)
         {
             triangles.push_back(Vec3i((nPointPerSide) + i * nCols + j, (nPointPerSide) + i * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j));
             triangles.push_back(Vec3i((nPointPerSide) + (i + 1) * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j, (nPointPerSide) + i * nCols + j + 1));
@@ -252,14 +247,14 @@ createCollidingSurfaceMesh()
     height = 40.0;
     nRows  = 2;
     nCols  = 2;
-    const double dz1 = width / (double)(nCols - 1);
-    const double dy1 = height / (double)(nRows - 1);
+    const double dz1 = width / static_cast<double>(nCols - 1);
+    const double dy1 = height / static_cast<double>(nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double z = (double)dz1 * j;
-            const double y = (double)dy1 * i;
+            const double z = static_cast<double>(dz1 * j);
+            const double y = static_cast<double>(dy1 * i);
             vertices[(nPointPerSide * 3) + i * nCols + j] = Vec3d(20, z - 10.0, y - 20);
             vertices[(nPointPerSide * 4) + i * nCols + j] = Vec3d(-20, z - 10.0, y - 20);
         }
