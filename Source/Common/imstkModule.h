@@ -36,77 +36,77 @@ namespace imstk
 class Module : public EventObject
 {
 public:
-	///
-	/// \brief Currently 3 execution types are provided.
-	/// These inform the driver on how it should run
-	/// 
-	enum class ExecutionType
-	{
-		SEQUENTIAL, // Should run in sync with other sequential modules
-		PARALLEL, // Should run in parallel
-		ADAPTIVE // Runs governed by module
-	};
+    ///
+    /// \brief Currently 3 execution types are provided.
+    /// These inform the driver on how it should run
+    ///
+    enum class ExecutionType
+    {
+        SEQUENTIAL,      // Should run in sync with other sequential modules
+        PARALLEL,        // Should run in parallel
+        ADAPTIVE         // Runs governed by module
+    };
 
 public:
-	Module() = default;
-	virtual ~Module() override = default;
+    Module() = default;
+    virtual ~Module() override = default;
 
 public:
-	///
-	/// \brief Get/Set the timestep
-	/// 
-	double getDt() const { return m_dt; }
-	void setDt(const double dt) { m_dt = dt; }
+    ///
+    /// \brief Get/Set the timestep
+    ///
+    double getDt() const { return m_dt; }
+    void setDt(const double dt) { m_dt = dt; }
 
-	///
-	/// \brief Get whether the module is initialized yet
-	/// 
-	bool getInit() const { return m_init; }
+    ///
+    /// \brief Get whether the module is initialized yet
+    ///
+    bool getInit() const { return m_init; }
 
-	///
-	/// \brief Get whether the module is currently paused
-	/// 
-	bool getPaused() const { return m_paused; }
+    ///
+    /// \brief Get whether the module is currently paused
+    ///
+    bool getPaused() const { return m_paused; }
 
-	ExecutionType getExecutionType() const { return m_executionType; }
-	void setExecutionType(ExecutionType type) { m_executionType = type; }
+    ExecutionType getExecutionType() const { return m_executionType; }
+    void setExecutionType(ExecutionType type) { m_executionType = type; }
 
-	void pause() { m_paused = true; }
-	void resume() { m_paused = false; }
-
-public:
-	void init() { m_init = initModule(); }
-
-	void update()
-	{
-		if (m_init && !m_paused)
-		{
-			this->postEvent(Event(EventType::PreUpdate));
-			this->updateModule();
-			this->postEvent(Event(EventType::PostUpdate));
-		}
-	}
-
-	void uninit()
-	{
-		if (!m_init)
-		{
-			uninitModule();
-			m_init = false;
-		}
-	}
+    void pause() { m_paused = true; }
+    void resume() { m_paused = false; }
 
 public:
-	virtual bool initModule() = 0;
+    void init() { m_init = initModule(); }
 
-	virtual void updateModule() = 0;
+    void update()
+    {
+        if (m_init && !m_paused)
+        {
+            this->postEvent(Event(EventType::PreUpdate));
+            this->updateModule();
+            this->postEvent(Event(EventType::PostUpdate));
+        }
+    }
 
-	virtual void uninitModule() { }
+    void uninit()
+    {
+        if (!m_init)
+        {
+            uninitModule();
+            m_init = false;
+        }
+    }
+
+public:
+    virtual bool initModule() = 0;
+
+    virtual void updateModule() = 0;
+
+    virtual void uninitModule() { }
 
 protected:
-	bool m_init = false;
-	bool m_paused = false;
-	double m_dt = 0.0;
-	ExecutionType m_executionType = ExecutionType::PARALLEL; // Defaults to parallel, subclass and set
+    bool   m_init   = false;
+    bool   m_paused = false;
+    double m_dt     = 0.0;
+    ExecutionType m_executionType = ExecutionType::PARALLEL;     // Defaults to parallel, subclass and set
 };
 }

@@ -81,13 +81,13 @@ public:
 
     ///
     /// \brief Set/Get the scaling of the force on the device, set to 0 for no force
-    /// 
+    ///
     double getForceScaling() const { return m_forceScaling; }
     void setForceScaling(const double forceScaling) { m_forceScaling = forceScaling; }
 
     ///
     /// \brief Set/Get whether to use spring or not
-    /// 
+    ///
     bool getUseSpring() const { return m_useSpring; }
     void setUseSpring(const bool useSpring) { m_useSpring = useSpring; }
 
@@ -106,7 +106,7 @@ protected:
     std::shared_ptr<RigidObject2> m_rigidObject;
 
     double m_linearKd  = 10000.0;                                ///> Damping coefficient, linear
-    double m_angularKd = 300.0;             ///> Damping coefficient, rotational
+    double m_angularKd = 300.0;                                  ///> Damping coefficient, rotational
     Vec3d  m_linearKs  = Vec3d(8000000.0, 8000000.0, 8000000.0); ///> Spring coefficient, linear
     Vec3d  m_angularKs = Vec3d(10000.0, 10000.0, 10000.0);       ///> Spring coefficient, rotational
 
@@ -114,7 +114,7 @@ protected:
     Vec3d tS = Vec3d(0.0, 0.0, 0.0);
 
     double m_forceScaling = 0.0000075;
-    bool m_useSpring = true; ///> Controller has ability to toggle to from springs
+    bool   m_useSpring    = true; ///> Controller has ability to toggle to from springs
 };
 }
 }

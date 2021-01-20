@@ -38,7 +38,7 @@ HapticDeviceClient::initialize()
     //flush error stack
     HDErrorInfo errorFlush;
     while (HD_DEVICE_ERROR(errorFlush = hdGetError())) {}
-    
+
     // Initialize the device
     if (m_deviceName == "")
     {

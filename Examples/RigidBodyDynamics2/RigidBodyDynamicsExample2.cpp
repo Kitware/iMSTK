@@ -236,8 +236,8 @@ main()
             scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
         });
         connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
-            {
-                cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+        {
+            cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
             });
 
         driver->start();

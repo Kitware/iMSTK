@@ -71,7 +71,7 @@ public:
 
     ///
     /// \brief Unmask all points
-    /// 
+    ///
     void unmaskAllPoints() { m_ptIdMask.clear(); }
 
     ///

@@ -125,7 +125,7 @@ OneToOneMap::isValid() const
     {
         ParallelUtils::parallelFor(meshSlave->getNumVertices(), [&](const size_t nodeId)
             {
-                const Vec3d& p    = meshSlave->getVertexPosition(nodeId);
+                const Vec3d& p  = meshSlave->getVertexPosition(nodeId);
                 bool matchFound = false;
                 for (size_t idx = 0; idx < meshMaster->getNumVertices(); ++idx)
                 {

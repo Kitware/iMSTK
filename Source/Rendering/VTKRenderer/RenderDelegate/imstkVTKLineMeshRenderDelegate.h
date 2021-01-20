@@ -50,7 +50,7 @@ public:
 
     ///
     /// \brief Event handler
-    /// 
+    ///
     void processEvents() override;
 
 protected:

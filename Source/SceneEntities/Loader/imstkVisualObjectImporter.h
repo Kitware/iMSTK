@@ -53,7 +53,7 @@ public:
         const std::string& objName,
         const std::string& modelFilePath,
         const std::string& textureFolderPath,
-        const Mat4d& transform = Mat4d::Identity());
+        const Mat4d&       transform = Mat4d::Identity());
 
 private:
     ///

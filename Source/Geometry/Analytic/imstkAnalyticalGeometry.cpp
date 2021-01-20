@@ -91,7 +91,7 @@ AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
     {
         return;
     }
-    m_orientationAxis = orientation.normalized();
+    m_orientationAxis  = orientation.normalized();
     m_transformApplied = false;
     this->postEvent(Event(EventType::Modified));
 }

@@ -238,12 +238,12 @@ protected:
     ///
     virtual void applyTransform(const Mat4d& imstkNotUsed(m)) { }
 
-    Type m_type;                 ///> Type of geometry
-    std::string m_name;          ///> Unique name for each geometry
-    uint32_t    m_geometryIndex; ///> Unique ID assigned to each geometry upon construction
+    Type m_type;                            ///> Type of geometry
+    std::string m_name;                     ///> Unique name for each geometry
+    uint32_t    m_geometryIndex;            ///> Unique ID assigned to each geometry upon construction
 
     mutable bool m_transformApplied = true; // Internally used for lazy evaluation
 
-    Mat4d m_transform; ///> Transformation matrix
+    Mat4d m_transform;                      ///> Transformation matrix
 };
 } //imstk

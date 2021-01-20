@@ -68,7 +68,7 @@ RigidObject2::setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaMode
 void
 RigidObject2::updatePhysicsGeometry()
 {
-	// Record displacements (useful for CCD)
+    // Record displacements (useful for CCD)
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
     if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
     {

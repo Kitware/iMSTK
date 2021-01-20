@@ -35,12 +35,12 @@
 namespace imstk
 {
 VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
-m_mesh(vtkSmartPointer<vtkUnstructuredGrid>::New()),
-m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_mesh(vtkSmartPointer<vtkUnstructuredGrid>::New()),
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     auto geometry = std::static_pointer_cast<TetrahedralMesh>(visualModel->getGeometry());
     m_vertices = geometry->getVertexPositions();
-    m_indices = geometry->getTetrahedraIndices();
+    m_indices  = geometry->getTetrahedraIndices();
 
     // Map vertices to VTK point data
     if (m_vertices != nullptr)
@@ -87,7 +87,7 @@ m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
-        m_actor = actor;
+        m_actor  = actor;
         m_mapper = mapper;
     }
 
@@ -99,7 +99,7 @@ void
 VTKTetrahedralMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<TetrahedralMesh>         geom = std::dynamic_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<TetrahedralMesh>         geom     = std::dynamic_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
 
     // Only use the most recent event from respective sender

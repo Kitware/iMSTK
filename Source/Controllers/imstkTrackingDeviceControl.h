@@ -92,26 +92,26 @@ public:
     ///
     /// \brief Set/Get whether to compute the velocity from previous and current samples
     /// Useful if a device does not provide the quantity
-    /// 
+    ///
     void setComputeVelocity(const bool computeVelocity) { m_computeVelocity = computeVelocity; }
     bool getComputeVelocity() const { return m_computeVelocity; }
 
     ///
     /// \brief Set/Get whether to compute the anular velocity from previous and current samples
     /// Useful if the device does not provide the quantity
-    /// 
+    ///
     void setComputeAngularVelocity(const bool computeAngularVelocity) { m_computeAngularVelocity = computeAngularVelocity; }
     bool getComputeAngularVelocity() const { return m_computeAngularVelocity; }
 
     ///
     /// \brief Get/Set the angular velocity
-    /// 
+    ///
     const Vec3d& getAngularVelocity() const { return m_currentAngularVelocity; }
     void setAngularVelocity(const Vec3d& angularVelocity) { m_currentAngularVelocity = angularVelocity; }
-    
+
     ///
     /// \brief Get/Set the linear velocity
-    /// 
+    ///
     const Vec3d& getVelocity() const { return m_currentVelocity; }
     void setVelocity(const Vec3d& velocity) { m_currentVelocity = velocity; }
 
@@ -141,7 +141,7 @@ public:
 
     ///
     /// \brief Update tracking data
-    /// 
+    ///
     virtual bool updateTrackingData(const double dt);
 
 protected:

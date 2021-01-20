@@ -33,20 +33,23 @@
 
 namespace imstk
 {
-static void exitCallbackFunc(
+static void
+exitCallbackFunc(
     vtkObject* vtkNotUsed(sender), unsigned long eventId,
     void* clientData, void* vtkNotUsed(callData))
 {
     AbstractVTKViewer* viewer = static_cast<AbstractVTKViewer*>(clientData);
-    if (viewer != nullptr &&
-        eventId == vtkCommand::ExitEvent)
+    if (viewer != nullptr
+        && eventId == vtkCommand::ExitEvent)
     {
         viewer->pause(); // Immediately prevent any updates from running
         viewer->postEvent(Event(EventType::End));
     }
 }
 
-AbstractVTKViewer::AbstractVTKViewer(std::string name) : Viewer(name) { }
+AbstractVTKViewer::AbstractVTKViewer(std::string name) : Viewer(name)
+{
+}
 
 Renderer::Mode
 AbstractVTKViewer::getRenderingMode() const

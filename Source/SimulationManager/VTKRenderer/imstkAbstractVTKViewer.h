@@ -83,7 +83,7 @@ public:
 
     ///
     /// \brief Processes VTK events, includes OS events
-    /// 
+    ///
     void processEvents() override;
 
 protected:

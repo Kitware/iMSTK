@@ -29,7 +29,7 @@ namespace imstk
 SceneManager::SceneManager(std::string name) : m_mode(Mode::Simulation),
     m_prevCamName("default"), m_activeScene(nullptr)
 {
-	// Set the preferred execution mode
+    // Set the preferred execution mode
     m_executionType = ExecutionType::PARALLEL;
 }
 

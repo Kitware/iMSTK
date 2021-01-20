@@ -308,29 +308,29 @@ testMultipleScenesInRenderMode()
 
     connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
         [&, driver](KeyPressEvent* e)
+    {
+        if (e->m_keyPressType == KEY_PRESS)
         {
-            if (e->m_keyPressType == KEY_PRESS)
+            if (e->m_key == 's' || e->m_key == 'S')
             {
-                if (e->m_key == 's' || e->m_key == 'S')
+                if (sceneManager->getActiveScene() == scene1)
                 {
-                    if (sceneManager->getActiveScene() == scene1)
-                    {
-                        LOG(INFO) << "Switching to scene2";
-                        sceneManager->setActiveScene(scene2);
-                        viewer->setActiveScene(scene2);
-                    }
-                    else
-                    {
-                        LOG(INFO) << "Switching to scene1";
-                        sceneManager->setActiveScene(scene1);
-                        viewer->setActiveScene(scene1);
-                    }
+                    LOG(INFO) << "Switching to scene2";
+                    sceneManager->setActiveScene(scene2);
+                    viewer->setActiveScene(scene2);
                 }
-                else if (e->m_key == 'q' || e->m_key == 'Q')
+                else
                 {
-                    driver->requestStatus(ModuleDriverStopped);
+                    LOG(INFO) << "Switching to scene1";
+                    sceneManager->setActiveScene(scene1);
+                    viewer->setActiveScene(scene1);
                 }
             }
+            else if (e->m_key == 'q' || e->m_key == 'Q')
+            {
+                driver->requestStatus(ModuleDriverStopped);
+            }
+        }
         });
 
     driver->start();
@@ -342,8 +342,8 @@ testMultipleScenesInBackgroundMode()
     imstkNew<ConsoleModule> console;
 
     imstkNew<SceneManager> sceneManager("SceneManager");
-    auto scene1 = createClothScene("clothScene");
-    auto scene2 = createSoftBodyScene("deformableBodyScene");
+    auto                   scene1 = createClothScene("clothScene");
+    auto                   scene2 = createSoftBodyScene("deformableBodyScene");
     sceneManager->addScene(scene1);
     sceneManager->addScene(scene2);
 

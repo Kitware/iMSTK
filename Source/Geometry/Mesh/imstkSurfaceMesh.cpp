@@ -621,18 +621,18 @@ SurfaceMesh::computeUVSeamVertexGroups()
 void
 SurfaceMesh::setLoadFactor(double loadFactor)
 {
-   /* m_loadFactor      = loadFactor;
-    m_maxNumVertices  = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
-    m_maxNumTriangles = static_cast<size_t>(m_originalNumTriangles * m_loadFactor);
-    m_triangleIndices->reserve(static_cast<int>(m_maxNumTriangles));
-    for (auto i : m_vertexAttributes)
-    {
-        i.second->reserve(static_cast<int>(m_maxNumVertices));
-    }
-    for (auto i : m_cellAttributes)
-    {
-        i.second->reserve(static_cast<int>(m_maxNumTriangles));
-    }*/
+    /* m_loadFactor      = loadFactor;
+     m_maxNumVertices  = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
+     m_maxNumTriangles = static_cast<size_t>(m_originalNumTriangles * m_loadFactor);
+     m_triangleIndices->reserve(static_cast<int>(m_maxNumTriangles));
+     for (auto i : m_vertexAttributes)
+     {
+         i.second->reserve(static_cast<int>(m_maxNumVertices));
+     }
+     for (auto i : m_cellAttributes)
+     {
+         i.second->reserve(static_cast<int>(m_maxNumTriangles));
+     }*/
 }
 
 void

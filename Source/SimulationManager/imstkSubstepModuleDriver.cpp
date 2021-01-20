@@ -33,6 +33,7 @@ public:
         m_func(func), m_module(module)
     {
     }
+
     task* execute() override
     {
         __TBB_ASSERT(ref_count() == 0, NULL);
@@ -75,7 +76,7 @@ SubstepModuleDriver::start()
     }
 
     // Start parallel modules
-    tbb::task_list taskList;
+    tbb::task_list           taskList;
     std::vector<std::thread> threads(m_asyncModules.size());
     {
         if (m_threadType == ThreadingType::TBB)
@@ -104,7 +105,7 @@ SubstepModuleDriver::start()
     {
         const double desiredDt_ms = m_desiredDt * 1000.0; // ms
         m_numSteps = 0;
-        double accumulator = 0.0;
+        double    accumulator = 0.0;
         StopWatch timer;
         timer.start();
         bool running = true;
@@ -194,7 +195,6 @@ SubstepModuleDriver::start()
 
     if (m_threadType == ThreadingType::TBB)
     {
-        
     }
     else if (m_threadType == ThreadingType::STL)
     {

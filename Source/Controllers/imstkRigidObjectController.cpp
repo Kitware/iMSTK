@@ -69,15 +69,15 @@ RigidObjectController::update(const double dt)
     if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
         const Vec3d& currPos = m_rigidObject->getRigidBody()->getPosition();
-        const Quatd& currOrientation = m_rigidObject->getRigidBody()->getOrientation();
-        const Vec3d& currVelocity = m_rigidObject->getRigidBody()->getVelocity();
+        const Quatd& currOrientation     = m_rigidObject->getRigidBody()->getOrientation();
+        const Vec3d& currVelocity        = m_rigidObject->getRigidBody()->getVelocity();
         const Vec3d& currAngularVelocity = m_rigidObject->getRigidBody()->getAngularVelocity();
-        Vec3d& currForce = *m_rigidObject->getRigidBody()->m_force;
-        Vec3d& currTorque = *m_rigidObject->getRigidBody()->m_torque;
+        Vec3d&       currForce  = *m_rigidObject->getRigidBody()->m_force;
+        Vec3d&       currTorque = *m_rigidObject->getRigidBody()->m_torque;
 
         const Vec3d& devicePos = getPosition();
-        const Quatd& deviceOrientation = getRotation();
-        const Vec3d& deviceVelocity = getVelocity();
+        const Quatd& deviceOrientation     = getRotation();
+        const Vec3d& deviceVelocity        = getVelocity();
         const Vec3d& deviceAngularVelocity = getAngularVelocity();
         const Vec3d& deviceOffset = Vec3d(0.0, 0.0, 0.0);
 
@@ -88,10 +88,10 @@ RigidObjectController::update(const double dt)
 
             //printf("Device velocity %f, %f, %f\n", deviceVelocity[0], deviceVelocity[1], deviceVelocity[2]);
             const Quatd dq = deviceOrientation * currOrientation.inverse();
-            const Rotd angleAxes = Rotd(dq);
+            const Rotd  angleAxes = Rotd(dq);
             tS = deviceOffset.cross(fS) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle()) + m_angularKd * -currAngularVelocity;
 
-            currForce += fS;
+            currForce  += fS;
             currTorque += tS;
         }
         // Uses relative force
@@ -114,7 +114,7 @@ RigidObjectController::update(const double dt)
     else
     {
         // Zero out external force/torque
-        *m_rigidObject->getRigidBody()->m_force = Vec3d(0.0, 0.0, 0.0);
+        *m_rigidObject->getRigidBody()->m_force  = Vec3d(0.0, 0.0, 0.0);
         *m_rigidObject->getRigidBody()->m_torque = Vec3d(0.0, 0.0, 0.0);
         // Directly set position/rotation
         (*m_rigidObject->getRigidBody()->m_pos) = getPosition();

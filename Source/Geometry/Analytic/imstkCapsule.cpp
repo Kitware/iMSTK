@@ -91,10 +91,10 @@ void
 Capsule::applyTransform(const Mat4d& m)
 {
     AnalyticalGeometry::applyTransform(m);
-   /* const Vec3d s = Vec3d(
-        m.block<3, 1>(0, 0).norm(),
-        m.block<3, 1>(0, 1).norm(),
-        m.block<3, 1>(0, 2).norm());*/
+    /* const Vec3d s = Vec3d(
+         m.block<3, 1>(0, 0).norm(),
+         m.block<3, 1>(0, 1).norm(),
+         m.block<3, 1>(0, 2).norm());*/
     const double s0 = m_transform.block<3, 1>(0, 0).norm();
     this->setRadius(m_radius * s0);
     this->setLength(m_length * s0);

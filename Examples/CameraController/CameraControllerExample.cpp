@@ -53,7 +53,7 @@ main()
     imstkNew<Scene> scene("CameraController");
 
     // Device Server
-    imstkNew<HapticDeviceManager> server;
+    imstkNew<HapticDeviceManager>       server;
     std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
 
     // Load Mesh

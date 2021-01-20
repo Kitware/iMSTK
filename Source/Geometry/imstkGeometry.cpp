@@ -99,6 +99,7 @@ Geometry::scale(const Vec3d& s, TransformType type)
     m(2, 2) = s[2];
     transform(m, type);
 }
+
 void
 Geometry::scale(const double s, TransformType type)
 {
@@ -180,6 +181,7 @@ Geometry::setScaling(const Vec3d& s)
     m_transform.block<3, 1>(0, 2) = m_transform.block<3, 1>(0, 2).normalized() * s[2];
     m_transformApplied = false;
 }
+
 void
 Geometry::setScaling(const double s)
 {

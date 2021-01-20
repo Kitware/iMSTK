@@ -143,6 +143,7 @@ PointSet::getVertexPosition(const size_t vertNum, DataType type) const
 #endif
     return (*this->getVertexPositions(type))[vertNum];
 }
+
 Vec3d&
 PointSet::getVertexPosition(const size_t vertNum, DataType type)
 {
@@ -152,7 +153,11 @@ PointSet::getVertexPosition(const size_t vertNum, DataType type)
     return (*this->getVertexPositions(type))[vertNum];
 }
 
-size_t PointSet::getNumVertices() const { return m_vertexPositions->size(); }
+size_t
+PointSet::getNumVertices() const
+{
+    return m_vertexPositions->size();
+}
 
 void
 PointSet::applyTransform(const Mat4d& m)

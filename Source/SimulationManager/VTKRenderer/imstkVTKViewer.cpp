@@ -209,7 +209,7 @@ VTKViewer::getMouseDevice() const
 //#ifdef WIN32
 //    vtkWin32RenderWindowInteractor* iren = vtkWin32RenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
 //    vtkWin32HardwareWindow* hWin = vtkWin32HardwareWindow::SafeDownCast(iren->GetHardwareWindow());
-//   
+//
 //    HMONITOR hMonitor = MonitorFromWindow(hWin->GetWindowId(), MONITOR_DEFAULTTONEAREST);
 //    MONITORINFOEX info;
 //    GetMonitorInfoA(hMonitor, &info);

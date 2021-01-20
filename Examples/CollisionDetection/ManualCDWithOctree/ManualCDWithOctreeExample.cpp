@@ -492,14 +492,14 @@ main()
             // Add an extra control
             connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
                 [&](KeyPressEvent* e)
+            {
+                if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)
                 {
-                    if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)
+                    for (auto& dir : dirs)
                     {
-                        for (auto& dir : dirs)
-                        {
-                            dir = -dir;
-                        }
+                        dir = -dir;
                     }
+                }
                 });
         }
 

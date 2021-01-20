@@ -36,12 +36,12 @@
 namespace imstk
 {
 VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
-m_polydata(vtkSmartPointer<vtkPolyData>::New()),
-m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
+    m_polydata(vtkSmartPointer<vtkPolyData>::New()),
+    m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
 {
     auto geometry = std::static_pointer_cast<LineMesh>(visualModel->getGeometry());
     m_vertices = geometry->getVertexPositions();
-    m_indices = geometry->getLinesIndices();
+    m_indices  = geometry->getLinesIndices();
 
     // Map vertices to VTK point data
     if (m_vertices != nullptr)
@@ -90,7 +90,7 @@ m_mappedVertexArray(vtkSmartPointer<vtkDoubleArray>::New())
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
         m_mapper = mapper;
-        m_actor = actor;
+        m_actor  = actor;
         if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
         {
             glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
@@ -105,7 +105,7 @@ void
 VTKLineMeshRenderDelegate::processEvents()
 {
     // Custom handling of events
-    std::shared_ptr<LineMesh>                geom = std::dynamic_pointer_cast<LineMesh>(m_visualModel->getGeometry());
+    std::shared_ptr<LineMesh>                geom     = std::dynamic_pointer_cast<LineMesh>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
 
     // Only use the most recent event from respective sender

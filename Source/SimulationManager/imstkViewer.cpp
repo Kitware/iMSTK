@@ -41,7 +41,7 @@ Viewer::Viewer(std::string name) :
 #ifdef iMSTK_USE_Vulkan
     m_canvas(std::make_shared<GUIOverlay::Canvas>())
 #endif
-	// Set the preferred execution type
+    // Set the preferred execution type
     m_executionType = ExecutionType::SEQUENTIAL;
 }
 

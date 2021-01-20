@@ -51,7 +51,8 @@ castImage(std::shared_ptr<AbstractDataArray> fromScalars, std::shared_ptr<ImageD
     default:
         LOG(WARNING) << "Unknown scalar type";
         break;
-    };
+    }
+    ;
 }
 
 ImageData::ImageData(const std::string& name)

@@ -92,7 +92,7 @@ public:
     void setView(const Mat4d& view)
     {
         m_viewModified = false;
-        m_view = view;
+        m_view    = view;
         m_invView = m_view.inverse();
     }
 

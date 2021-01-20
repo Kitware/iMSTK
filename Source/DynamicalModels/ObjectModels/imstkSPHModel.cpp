@@ -25,7 +25,6 @@ limitations under the License.
 #include "imstkTaskGraph.h"
 #include "imstkVTKMeshIO.h"
 
-
 namespace imstk
 {
 SPHModelConfig::SPHModelConfig(const Real particleRadius)
@@ -576,8 +575,8 @@ SPHModel::computeSurfaceTension()
 
             for (size_t i = 0; i < neighborInfo.size(); ++i)
             {
-                const auto& qInfo = neighborInfo[i];
-                const auto r = qInfo.xpq;
+                const auto& qInfo   = neighborInfo[i];
+                const auto r        = qInfo.xpq;
                 const auto qdensity = qInfo.density;
                 n += (Real(1.0) / qdensity) * m_kernels.gradW(r);
             }
@@ -608,8 +607,8 @@ SPHModel::computeSurfaceTension()
                 return; // the particle has no neighbor
             }
 
-            const auto ni = surfaceNormals[p];
-            const auto pdensity = densities[p];
+            const auto ni            = surfaceNormals[p];
+            const auto pdensity      = densities[p];
             const auto& neighborInfo = neighborInfos[p];
 
             Vec3r accel(0, 0, 0);
@@ -620,14 +619,14 @@ SPHModel::computeSurfaceTension()
                 {
                     continue;
                 }
-                const auto& qInfo = neighborInfo[i];
+                const auto& qInfo   = neighborInfo[i];
                 const auto qdensity = qInfo.density;
 
                 // Correction factor
                 const auto K_ij = Real(2) * m_modelParameters->m_restDensity / (pdensity + qdensity);
 
                 // Cohesion acc
-                const auto r = qInfo.xpq;
+                const auto r  = qInfo.xpq;
                 const auto d2 = r.squaredNorm();
                 if (d2 > Real(1e-20))
                 {
@@ -643,7 +642,6 @@ SPHModel::computeSurfaceTension()
             //getState().getAccelerations()[p] += accel;
             surfaceTensionAccels[p] = accel;
         });
-
 }
 
 void

@@ -36,7 +36,7 @@ std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
     bool isDir = false;
-    
+
     if (isDir)
     {
         // Assume that the directory is a collection of DICOM files

@@ -110,7 +110,7 @@ public:
 
     ///
     /// \brief Get the device angular velocity
-    /// 
+    ///
     const Vec3d& getAngularVelocity() const;
 
     ///
@@ -120,7 +120,7 @@ public:
 
     ///
     /// \brief Get offset from position for device end effector
-    /// 
+    ///
     const Vec3d& getOffset() const { return m_endEffectorOffset; }
 
     ///
@@ -152,19 +152,19 @@ public:
 protected:
     DeviceClient(const std::string& name, const std::string& ip);
 
-    std::string m_deviceName;                ///< Device Name
-    std::string m_ip;                        ///< Connection device IP
+    std::string m_deviceName;                         ///< Device Name
+    std::string m_ip;                                 ///< Connection device IP
 
-    bool m_trackingEnabled = true;           ///< Tracking enabled if true
-    bool m_analogicEnabled = true;           ///< Analogic enabled if true
-    bool m_buttonsEnabled  = true;           ///< Buttons enabled if true
-    bool m_forceEnabled    = false;          ///< Force enabled if true
+    bool m_trackingEnabled = true;                    ///< Tracking enabled if true
+    bool m_analogicEnabled = true;                    ///< Analogic enabled if true
+    bool m_buttonsEnabled  = true;                    ///< Buttons enabled if true
+    bool m_forceEnabled    = false;                   ///< Force enabled if true
 
-    Vec3d m_position;                        ///< Position of end effector
-    Vec3d m_velocity;                        ///< Linear velocity of end effector
-    Vec3d m_angularVelocity;                 ///< Angular velocity of the end effector
-    Quatd m_orientation;                     ///< Orientation of the end effector
-    Vec3d m_force;                           ///< Force vector
+    Vec3d m_position;                                 ///< Position of end effector
+    Vec3d m_velocity;                                 ///< Linear velocity of end effector
+    Vec3d m_angularVelocity;                          ///< Angular velocity of the end effector
+    Quatd m_orientation;                              ///< Orientation of the end effector
+    Vec3d m_force;                                    ///< Force vector
     Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///> Offset from origin
 
     std::unordered_map<int, int> m_buttons;

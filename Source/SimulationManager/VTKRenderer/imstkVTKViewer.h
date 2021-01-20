@@ -74,10 +74,10 @@ public:
     ///
     std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
 
-    ///
-    /// \brief Returns the refresh rate of the nearest display to window
-    /// 
-    //double getDisplayRefreshRate();
+///
+/// \brief Returns the refresh rate of the nearest display to window
+///
+//double getDisplayRefreshRate();
 
 protected:
     bool initModule() override;
@@ -90,7 +90,7 @@ protected:
     std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
 
     std::shared_ptr<VTKTextStatusManager> m_textStatusManager;      ///> Handle text statuses, including fps status and custom text status
-    
+
     bool   m_displayFps = false;                                    ///> hide or display framerate
     double m_lastFps;                                               ///> last framerate value used for moving average estimate
 };

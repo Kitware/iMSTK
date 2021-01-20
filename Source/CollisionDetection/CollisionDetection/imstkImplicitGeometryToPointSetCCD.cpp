@@ -80,7 +80,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
                 PositionDirectionCollisionDataElement elem;
                 elem.dirAtoB = -centralGrad(currPos).normalized(); // Contact Normal
                 elem.nodeIdx = static_cast<uint32_t>(idx);
-                elem.penetrationDepth = std::abs(currVal); // Could also reverse march in gradient direction
+                elem.penetrationDepth = std::abs(currVal);         // Could also reverse march in gradient direction
                 elem.posB = currPos;
                 m_colData->PDColData.safeAppend(elem);
                 return; // No need to find an other root
@@ -108,7 +108,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
 
                     PositionDirectionCollisionDataElement elem;
                     elem.dirAtoB = -centralGrad(contactPt).normalized(); // Contact Normal
-                    //elem.dirAtoB = dir;
+                                                                         //elem.dirAtoB = dir;
                     elem.nodeIdx = static_cast<uint32_t>(idx);
                     elem.penetrationDepth = (contactPt - pt).norm();
                     elem.posB = contactPt;

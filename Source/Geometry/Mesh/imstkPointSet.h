@@ -97,7 +97,7 @@ public:
     /// \brief Returns the position of a vertex given its index
     ///
     const Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform) const;
-    Vec3d& getVertexPosition(const size_t vertNum, DataType type = DataType::PostTransform);
+    Vec3d& getVertexPosition(const size_t vertNum, DataType type       = DataType::PostTransform);
 
     ///
     /// \brief Returns the number of total vertices in the mesh
@@ -180,11 +180,11 @@ protected:
 
     ///
     /// \brief Applies transformation m directly the initial and post transform data
-    /// 
+    ///
     void applyTransform(const Mat4d& m) override;
     ///
     /// \brief Applies the geometries member transform to produce currPositions
-    /// 
+    ///
     void updatePostTransformData() const override;
 
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;

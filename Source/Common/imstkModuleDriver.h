@@ -38,9 +38,9 @@ class Module;
 
 ///
 /// \class ModuleDriver
-/// 
+///
 /// \brief Defines the control of modules
-/// 
+///
 class ModuleDriver : public EventObject
 {
 protected:
@@ -53,7 +53,7 @@ public:
 
     ///
     /// \brief Add a module to run
-    /// 
+    ///
     virtual void addModule(std::shared_ptr<Module> module)
     {
         m_modules.push_back(module);
@@ -66,7 +66,7 @@ public:
 
     ///
     /// \brief Wait for all modules to init
-    /// 
+    ///
     void waitForInit();
 
 protected:

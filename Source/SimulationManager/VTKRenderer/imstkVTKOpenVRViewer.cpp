@@ -191,6 +191,6 @@ VTKOpenVRViewer::getVRDeviceClient(int deviceType)
         {
             return static_cast<int>(deviceClient->getDeviceType()) == deviceType;
         });
-    return (iter == m_vrDeviceClients.end()) ? nullptr : *iter; 
+    return (iter == m_vrDeviceClients.end()) ? nullptr : *iter;
 }
 }

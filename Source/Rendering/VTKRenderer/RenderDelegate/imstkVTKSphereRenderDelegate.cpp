@@ -46,7 +46,7 @@ VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<VisualModel> vi
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
         m_mapper = mapper;
-        m_actor = actor;
+        m_actor  = actor;
     }
 
     update();

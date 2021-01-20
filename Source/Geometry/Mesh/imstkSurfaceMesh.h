@@ -168,7 +168,7 @@ public:
     ///
     void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
 
-    // Accessors
+// Accessors
 public:
     ///
     /// \brief Get/Set triangle connectivity
@@ -204,7 +204,7 @@ public:
     ///
     double getVolume() override;
 
-    // Attributes
+// Attributes
 public:
     ///
     /// \brief Set a data array holding some per cell data

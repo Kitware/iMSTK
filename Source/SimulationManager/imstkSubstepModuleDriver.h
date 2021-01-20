@@ -31,7 +31,7 @@ class Viewer;
 
 ///
 /// \class SubstepModuleDriver
-/// 
+///
 /// \brief Defines a sequential substepping approach to driving the modules
 /// and rendering. The user provides a desired timestep and as it runs it
 /// accumulates time. It then determines how many simulation steps before
@@ -39,7 +39,7 @@ class Viewer;
 /// is divided out over the substeps.
 /// This is the preferred driver.
 /// todo: Timestep smoothening
-/// 
+///
 class SubstepModuleDriver : public ModuleDriver
 {
 public:
@@ -59,25 +59,25 @@ public:
     ///
     /// \brief Add a module to run
     /// \param The module to run
-    /// 
+    ///
     void addModule(std::shared_ptr<Module> module);
 
     ///
     /// \brief Sets the target fixed timestep (may violate), seconds
     /// This ultimately effects the number of iterations done
     /// default 0.003
-    /// 
+    ///
     void setDesiredDt(const double dt) { m_desiredDt = dt; }
     double getDesiredDt() const { return m_desiredDt; }
 
     ///
     /// \brief Get the current actual timestep
-    /// 
+    ///
     double getDt() const { return m_dt; }
 
     ///
     /// \brief Set the thread type to run the parallel modules with
-    /// 
+    ///
     void setThreadType(ThreadingType threadType) { m_threadType = threadType; }
 
 protected:
@@ -88,15 +88,15 @@ protected:
 protected:
     std::vector<std::shared_ptr<Viewer>> m_viewers;
 
-    std::vector<std::shared_ptr<Module>> m_syncModules; ///> Modules called once per update
-    std::vector<std::shared_ptr<Module>> m_asyncModules; ///> Modules that run on completely other threads without restraint
+    std::vector<std::shared_ptr<Module>> m_syncModules;     ///> Modules called once per update
+    std::vector<std::shared_ptr<Module>> m_asyncModules;    ///> Modules that run on completely other threads without restraint
     std::vector<std::shared_ptr<Module>> m_adaptiveModules; ///> Modules that update adpatively to keep up with real time
 
     std::unordered_map<Module*, bool> m_running;
 
     ThreadingType m_threadType = ThreadingType::STL;
     double m_desiredDt = 0.003; // Desired timestep
-    double m_dt = 0.0; // Actual timestep
+    double m_dt       = 0.0;    // Actual timestep
     double m_numSteps = 0;
 };
 };

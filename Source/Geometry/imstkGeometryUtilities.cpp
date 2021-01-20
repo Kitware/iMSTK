@@ -284,10 +284,10 @@ GeometryUtils::copyToSurfaceMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     {
         mesh->setVertexAttributes(vertexDataMap);
         vtkPointData* pointData = vtkMesh->GetPointData();
-        vtkDataArray* normals = pointData->GetNormals();
-        vtkDataArray* tCoords = pointData->GetTCoords();
-        vtkDataArray* scalars = pointData->GetScalars();
-        vtkDataArray* tangents = pointData->GetTangents();
+        vtkDataArray* normals   = pointData->GetNormals();
+        vtkDataArray* tCoords   = pointData->GetTCoords();
+        vtkDataArray* scalars   = pointData->GetScalars();
+        vtkDataArray* tangents  = pointData->GetTangents();
         mesh->setVertexNormals((normals == nullptr || normals->GetName() == nullptr) ? "" : std::string(normals->GetName()));
         mesh->setVertexTCoords((tCoords == nullptr || tCoords->GetName() == nullptr) ? "" : std::string(tCoords->GetName()));
         mesh->setVertexScalars((scalars == nullptr || scalars->GetName() == nullptr) ? "" : std::string(scalars->GetName()));

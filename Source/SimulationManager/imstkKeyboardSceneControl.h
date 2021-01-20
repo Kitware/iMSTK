@@ -47,12 +47,12 @@ public:
 public:
     ///
     /// \brief The driver is used to stop the simulation
-    /// 
+    ///
     void setModuleDriver(std::shared_ptr<ModuleDriver> driver) { m_driver = driver; }
 
     ///
     /// \brief Set the scene manager whose fps we should track
-    /// 
+    ///
     void setSceneManager(std::shared_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
 public:

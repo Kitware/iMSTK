@@ -72,28 +72,28 @@ main()
 
     StopWatch timer;
     timer.start();
-    
-    int currMatId = 0;
-    int prevMatId = -1;
+
+    int  currMatId  = 0;
+    int  prevMatId  = -1;
     auto updateFunc = [&](Event*)
-    {
-        prevMatId = currMatId;
-        currMatId = static_cast<int>(timer.getTimeElapsed() / 1000.0 / 2.0) % 25;
+                      {
+                          prevMatId = currMatId;
+                          currMatId = static_cast<int>(timer.getTimeElapsed() / 1000.0 / 2.0) % 25;
 
-        if (currMatId != prevMatId)
-        {
-            // Change view background to black every other frame
-            std::cout << "Displaying with volume material preset: " << currMatId << std::endl;
-            // Query for a volume material preset
-            std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(currMatId);
-            // Apply the preset to the visual object
-            volumeObj->getVisualModel(0)->setRenderMaterial(volumeMaterial);
+                          if (currMatId != prevMatId)
+                          {
+                              // Change view background to black every other frame
+                              std::cout << "Displaying with volume material preset: " << currMatId << std::endl;
+                              // Query for a volume material preset
+                              std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(currMatId);
+                              // Apply the preset to the visual object
+                              volumeObj->getVisualModel(0)->setRenderMaterial(volumeMaterial);
 
-            std::ostringstream ss;
-            ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(currMatId);
-            statusManager->setCustomStatus(ss.str());
-        }
-    };
+                              std::ostringstream ss;
+                              ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(currMatId);
+                              statusManager->setCustomStatus(ss.str());
+                          }
+                      };
 
     // Run the simulation
     {
