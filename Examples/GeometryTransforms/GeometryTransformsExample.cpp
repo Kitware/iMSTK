@@ -65,8 +65,8 @@ main()
 
     imstkNew<RenderMaterial> planeMaterial;
     planeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    planeMaterial->setPointSize(6.);
-    planeMaterial->setLineWidth(4.);
+    planeMaterial->setPointSize(6.0);
+    planeMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> planeVisualModel(planeGeom.get());
     planeVisualModel->setRenderMaterial(planeMaterial);
 
@@ -81,11 +81,12 @@ main()
     cubeGeom->rotate(Vec3d(1.0, 1.0, 0.0), PI_4, Geometry::TransformType::ApplyToData);
     cubeGeom->translate(Vec3d(0.0, 0.0, 10.0));
 
-    imstkNew<RenderMaterial> redMaterial;
-    redMaterial->setColor(Color::Red);
-    redMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    redMaterial->setPointSize(6.);
-    redMaterial->setLineWidth(4.);
+    auto                     materialCube = std::make_shared<RenderMaterial>();
+    imstkNew<RenderMaterial> cubeMaterial;
+    cubeMaterial->setColor(Color::Red);
+    cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    cubeMaterial->setPointSize(6.0);
+    cubeMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
     cubeVisualModel->setRenderMaterial(redMaterial);
 
@@ -102,7 +103,7 @@ main()
     cylinderGeom->translate(Vec3d(0.0, 0.0, -10.0));
 
     imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
-    cylVisualModel->setRenderMaterial(redMaterial);
+    cylVisualModel->setRenderMaterial(cubeMaterial);
 
     imstkNew<VisualObject> cylObj("Cylinder");
     cylObj->addVisualModel(cylVisualModel);
@@ -135,8 +136,9 @@ main()
         connect<Event>(sceneManager, EventType::PostUpdate,
             [&](Event*)
         {
-            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime(), Geometry::TransformType::ApplyToData);
-            });
+            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime());
+            surfaceMesh->modified();
+        });
 
         // Add mouse and keyboard controls to the viewer
         {

@@ -35,10 +35,11 @@ VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel
 {
     auto geometry = std::static_pointer_cast<Cylinder>(visualModel->getGeometry());
 
-    m_cylinderSource->SetCenter(0.0, 0.0, 0.0);
-    m_cylinderSource->SetRadius(1.0);
-    m_cylinderSource->SetHeight(geometry->getLength());
-    m_cylinderSource->SetResolution(100);
+    cylinderSource = vtkSmartPointer<vtkCylinderSource>::New();
+    cylinderSource->SetCenter(0.0, 0.0, 0.0);
+    cylinderSource->SetRadius(1.0);
+    cylinderSource->SetHeight(geometry->getLength());
+    cylinderSource->SetResolution(100);
 
     // Setup mapper
     {
