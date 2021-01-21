@@ -49,7 +49,8 @@ public:
     /// \brief Process the event queue
     ///
     void processEvents() override;
+
 protected:
-    vtkNew<vtkCylinderSource> m_cylinderSource;
+    vtkSmartPointer<vtkCylinderSource> m_cylinderSource;
 };
 } // imstk

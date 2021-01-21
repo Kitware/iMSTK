@@ -82,11 +82,11 @@ main()
     cubeGeom->translate(Vec3d(0.0, 0.0, 10.0));
 
     auto                     materialCube = std::make_shared<RenderMaterial>();
-    imstkNew<RenderMaterial> cubeMaterial;
-    cubeMaterial->setColor(Color::Red);
-    cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    cubeMaterial->setPointSize(6.0);
-    cubeMaterial->setLineWidth(4.0);
+    imstkNew<RenderMaterial> redMaterial;
+    redMaterial->setColor(Color::Red);
+    redMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    redMaterial->setPointSize(6.0);
+    redMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
     cubeVisualModel->setRenderMaterial(redMaterial);
 
@@ -103,7 +103,7 @@ main()
     cylinderGeom->translate(Vec3d(0.0, 0.0, -10.0));
 
     imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
-    cylVisualModel->setRenderMaterial(cubeMaterial);
+    cylVisualModel->setRenderMaterial(redMaterial);
 
     imstkNew<VisualObject> cylObj("Cylinder");
     cylObj->addVisualModel(cylVisualModel);
