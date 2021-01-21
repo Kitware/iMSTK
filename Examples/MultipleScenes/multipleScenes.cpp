@@ -33,7 +33,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkViewer.h"
@@ -298,7 +298,7 @@ testMultipleScenesInRenderMode()
     imstkNew<SceneManager> sceneManager("Scene Manager");
     sceneManager->setActiveScene(scene2);
 
-    std::shared_ptr<SubstepModuleDriver> driver = std::make_shared<SubstepModuleDriver>();
+    std::shared_ptr<SimulationManager> driver = std::make_shared<SimulationManager>();
     driver->addModule(viewer);
     driver->addModule(sceneManager);
 
@@ -347,7 +347,7 @@ testMultipleScenesInBackgroundMode()
     sceneManager->addScene(scene1);
     sceneManager->addScene(scene2);
 
-    imstkNew<SubstepModuleDriver> driver;
+    imstkNew<SimulationManager> driver;
     driver->addModule(console);
     driver->addModule(sceneManager);
 

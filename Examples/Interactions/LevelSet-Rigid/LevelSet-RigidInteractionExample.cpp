@@ -42,7 +42,7 @@
 #include "imstkRigidObjectLevelSetCollisionPair.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraph.h"
 #include "imstkVisualModel.h"
@@ -260,7 +260,7 @@ main()
             ghostMesh->modified();
         });
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(hapticManager);

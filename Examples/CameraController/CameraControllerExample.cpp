@@ -33,7 +33,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVTKViewer.h"
 
@@ -95,7 +95,7 @@ main()
         // attach the camera controller to the viewer
         viewer->addControl(camController);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(server);
         driver->addModule(viewer);
         driver->addModule(sceneManager);

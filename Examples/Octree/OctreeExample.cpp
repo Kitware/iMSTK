@@ -31,7 +31,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTimer.h"
 #include "imstkVisualModel.h"
@@ -283,7 +283,7 @@ main()
         sceneManager->pause(); // Start simulation paused
         connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

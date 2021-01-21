@@ -29,7 +29,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKRenderer.h"
@@ -195,7 +195,7 @@ main()
         sceneManager->setActiveScene(scene);
         connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

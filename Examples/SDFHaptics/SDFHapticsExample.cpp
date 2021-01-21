@@ -33,7 +33,7 @@
 #include "imstkNew.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkVTKViewer.h"
@@ -100,7 +100,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(hapticManager);

@@ -28,8 +28,8 @@
 #include "imstkNew.h"
 #include "imstkObjectInteractionFactory.h"
 #include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkSPHObject.h"
-#include "imstkSubstepModuleDriver.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
 
@@ -136,7 +136,7 @@ main(int argc, char* argv[])
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

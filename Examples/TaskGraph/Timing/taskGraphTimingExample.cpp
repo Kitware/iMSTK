@@ -30,7 +30,7 @@ limitations under the License.
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
@@ -213,7 +213,7 @@ main()
         sceneManager->pause();
         connect<Event>(sceneManager, EventType::PostUpdate, movePoints);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

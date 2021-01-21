@@ -30,7 +30,7 @@ namespace imstk
 class Viewer;
 
 ///
-/// \class SubstepModuleDriver
+/// \class SimulationManager
 ///
 /// \brief Defines a sequential substepping approach to driving the modules
 /// and rendering. The user provides a desired timestep and as it runs it
@@ -40,7 +40,7 @@ class Viewer;
 /// This is the preferred driver.
 /// todo: Timestep smoothening
 ///
-class SubstepModuleDriver : public ModuleDriver
+class SimulationManager : public ModuleDriver
 {
 public:
     // Generally STL is better for less interruption
@@ -51,7 +51,7 @@ public:
     };
 
 public:
-    ~SubstepModuleDriver() override = default;
+    ~SimulationManager() override = default;
 
 public:
     void start() override;

@@ -34,8 +34,8 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
-#include "imstkSubstepModuleDriver.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkVTKViewer.h"
 
@@ -105,7 +105,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager 1");
         sceneManager->setActiveScene(scene);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(server);

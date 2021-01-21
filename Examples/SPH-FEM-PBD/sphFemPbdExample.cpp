@@ -36,9 +36,9 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
-#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTaskGraphVizWriter.h"
 #include "imstkTetrahedralMesh.h"
@@ -283,7 +283,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

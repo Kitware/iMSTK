@@ -30,10 +30,10 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSignedDistanceField.h"
+#include "imstkSimulationManager.h"
 #include "imstkSPHModel.h"
 #include "imstkSPHObject.h"
 #include "imstkSphObjectCollisionPair.h"
-#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkViewer.h"
@@ -199,7 +199,7 @@ main()
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

@@ -31,8 +31,8 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
-#include "imstkSubstepModuleDriver.h"
 #include "imstkViewer.h"
 #include "imstkVTKScreenCaptureUtility.h"
 #include "imstkVTKViewer.h"
@@ -110,7 +110,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

@@ -30,7 +30,7 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkSceneObjectController.h"
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVisualObjectImporter.h"
@@ -135,7 +135,7 @@ main()
         sceneManager->setActiveScene(scene);
         sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
 

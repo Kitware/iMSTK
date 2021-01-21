@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkSubstepModuleDriver.h"
+#include "imstkSimulationManager.h"
 #include "imstkViewer.h"
 #include "imstkTimer.h"
 
@@ -51,14 +51,14 @@ protected:
 namespace imstk
 {
 void
-SubstepModuleDriver::start()
+SimulationManager::start()
 {
     // Modules can cause a full exit internally
     // particularly needed for viewers which contain OS event loop, so when the window
     // exit message happens all modules need to stop
     for (auto module : m_modules)
     {
-        connect<Event>(module, EventType::End, this, &SubstepModuleDriver::requestStop);
+        connect<Event>(module, EventType::End, this, &SimulationManager::requestStop);
     }
 
     // Initialization
@@ -84,7 +84,7 @@ SubstepModuleDriver::start()
             for (auto module : m_asyncModules)
             {
                 FuncTask* moduleTask = new(tbb::task::allocate_root())FuncTask(module,
-                    std::bind(&SubstepModuleDriver::runModuleParallel, this, std::placeholders::_1));
+                    std::bind(&SimulationManager::runModuleParallel, this, std::placeholders::_1));
                 taskList.push_back(*moduleTask);
             }
             tbb::task::spawn_root_and_wait(taskList);
@@ -94,7 +94,7 @@ SubstepModuleDriver::start()
             for (size_t i = 0; i < m_asyncModules.size(); i++)
             {
                 std::shared_ptr<Module> module = m_asyncModules[i];
-                threads[i] = std::thread(std::bind(&SubstepModuleDriver::runModuleParallel, this, module));
+                threads[i] = std::thread(std::bind(&SimulationManager::runModuleParallel, this, module));
             }
         }
     }
@@ -212,7 +212,7 @@ SubstepModuleDriver::start()
 }
 
 void
-SubstepModuleDriver::addModule(std::shared_ptr<Module> module)
+SimulationManager::addModule(std::shared_ptr<Module> module)
 {
     ModuleDriver::addModule(module);
 
@@ -237,7 +237,7 @@ SubstepModuleDriver::addModule(std::shared_ptr<Module> module)
 }
 
 void
-SubstepModuleDriver::runModuleParallel(std::shared_ptr<Module> module)
+SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
 {
     module->init();
 
@@ -266,7 +266,7 @@ SubstepModuleDriver::runModuleParallel(std::shared_ptr<Module> module)
 }
 
 void
-SubstepModuleDriver::requestStop(Event* e)
+SimulationManager::requestStop(Event* e)
 {
     Module* module = static_cast<Module*>(e->m_sender);
     if (module != nullptr)

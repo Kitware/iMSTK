@@ -40,8 +40,8 @@
 #include "imstkRigidObjectCollidingCollisionPair.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
-#include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
 #include "imstkSurfaceMeshSubdivide.h"
@@ -172,7 +172,7 @@ main()
         sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause();
 
-        imstkNew<SubstepModuleDriver> driver;
+        imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);
