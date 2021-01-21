@@ -174,6 +174,11 @@ public:
     std::string getActiveVertexTCoords() const { return m_activeVertexTCoords; }
     std::shared_ptr<VecDataArray<float, 2>> getVertexTCoords() const;
 
+    ///
+    /// \brief Applies the geometries member transform to produce currPositions
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     friend class VTKPointSetRenderDelegate;
     friend class VTKFluidRenderDelegate;
@@ -182,10 +187,6 @@ protected:
     /// \brief Applies transformation m directly the initial and post transform data
     ///
     void applyTransform(const Mat4d& m) override;
-    ///
-    /// \brief Applies the geometries member transform to produce currPositions
-    ///
-    void updatePostTransformData() const override;
 
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
     std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;

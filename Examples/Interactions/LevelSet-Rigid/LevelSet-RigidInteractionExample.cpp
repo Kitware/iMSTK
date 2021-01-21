@@ -144,7 +144,6 @@ makeRigidObj(const std::string& name)
         rigidObj->addVisualModel(visualModel);
         rigidObj->setPhysicsGeometry(toolMesh);
         rigidObj->setCollidingGeometry(toolMesh);
-        rigidObj->setVisualGeometry(toolMesh);
         rigidObj->setDynamicalModel(rbdModel);
         rigidObj->getRigidBody()->m_mass = 1000.0;
         //rigidObj->getRigidBody()->setInertiaFromPointSet(toolMesh, 0.01, false);
@@ -171,6 +170,15 @@ main()
 
     std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("RigidObj");
     scene->addSceneObject(rbdObj);
+
+    imstkNew<SceneObject> rbdGhostObj("RigidObjGhost");
+    imstkNew<SurfaceMesh> ghostMesh;
+    ghostMesh->deepCopy(std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getPhysicsGeometry()));
+    rbdGhostObj->setVisualGeometry(ghostMesh);
+    std::shared_ptr<RenderMaterial> ghostMat = std::make_shared<RenderMaterial>(*rbdObj->getVisualModel(0)->getRenderMaterial());
+    ghostMat->setOpacity(0.4);
+    rbdGhostObj->getVisualModel(0)->setRenderMaterial(ghostMat);
+    scene->addSceneObject(rbdGhostObj);
 
     imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, lvlSetObj);
     auto                                       colHandlerA = std::dynamic_pointer_cast<RigidBodyCH>(interaction->getCollisionHandlingA());
@@ -204,25 +212,23 @@ main()
         sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<HapticDeviceManager>       hapticManager;
-        std::shared_ptr<HapticDeviceClient> client = hapticManager->makeDeviceClient("Default Device");
+        std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient("Default Device");
 
-        {
-            imstkNew<RigidObjectController> controller(rbdObj, client);
+        imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
 
-            controller->setLinearKd(100000.0);
-            controller->setAngularKd(550.0);
-            controller->setLinearKs(1000000.0);
-            controller->setAngularKs(10000.0);
-            controller->setForceScaling(0.0001);
+        controller->setLinearKd(100000.0);
+        controller->setAngularKd(550.0);
+        controller->setLinearKs(1000000.0);
+        controller->setAngularKs(10000.0);
+        controller->setForceScaling(0.0001);
 
-            controller->setComputeVelocity(true);        // The device we are using doesn't produce this quantity, with this flag its computed
-            controller->setComputeAngularVelocity(true); // The device we are using doesn't produce this quantity, with this flag its computed
+        controller->setComputeVelocity(true);        // The device we are using doesn't produce this quantity, with this flag its computed
+        controller->setComputeAngularVelocity(true); // The device we are using doesn't produce this quantity, with this flag its computed
 
-            controller->setTranslationScaling(0.0015);
-            controller->setTranslationOffset(Vec3d(0.1, 0.9, 1.8));
+        controller->setTranslationScaling(0.0015);
+        controller->setTranslationOffset(Vec3d(0.1, 0.9, 1.8));
 
-            scene->addController(controller);
-        }
+        scene->addController(controller);
 
         connect<Event>(sceneManager->getActiveScene(), EventType::Configure, [&](Event*)
         {
@@ -237,16 +243,22 @@ main()
                 {
                     isoExtract->setModified(std::get<0>(i.second));
                 }
-                        }, "Isosurface: SetModifiedVoxels"));
-            });
+            }, "Isosurface: SetModifiedVoxels"));
+        });
         connect<Event>(viewer, EventType::PreUpdate, [&](Event*)
         {
             isoExtract->update();
-            });
+        });
         connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
         {
             rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            });
+
+            // Apply the transform back to the geometry
+            ghostMesh->setTranslation(controller->getPosition());
+            ghostMesh->setRotation(controller->getRotation());
+            ghostMesh->updatePostTransformData();
+            ghostMesh->modified();
+        });
 
         imstkNew<SubstepModuleDriver> driver;
         driver->addModule(viewer);
