@@ -73,11 +73,6 @@ public:
     void update();
 
     ///
-    /// \brief Update renderer delegate transform based on the geometry shallow transform
-    ///
-    void updateActorTransform();
-
-    ///
     /// \brief Process the event queue, default implementation processes
     /// visualModel events and its RenderMaterial events
     ///

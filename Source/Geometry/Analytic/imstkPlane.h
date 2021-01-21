@@ -76,10 +76,7 @@ public:
     ///
     double getFunctionValue(const Vec3d& pos) const override { return m_orientationAxis.dot(pos - m_position); }
 
-///
-/// \brief Returns gradient of signed distance field at pos
-///
-//virtual Vec3d getFunctionGrad(const Vec3d& imstkNotUsed(pos), const Vec3d& dx) const override { return dx.cwiseProduct(m_orientationAxis); }
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) override;
 
 protected:
     friend class VTKPlaneRenderDelegate;

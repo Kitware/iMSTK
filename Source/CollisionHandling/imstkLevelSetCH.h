@@ -60,7 +60,7 @@ public:
     void processCollisionData() override;
 
     ///
-    /// \brief Adds point to the mask allowing it to apply an impulse
+    /// \brief Adds point to the mask allowing it to apply an impulse to the levelset
     ///
     void addPoint(int id) { m_ptIdMask.insert(id); }
 

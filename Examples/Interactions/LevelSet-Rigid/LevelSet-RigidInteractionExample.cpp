@@ -253,7 +253,7 @@ main()
         {
             rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
 
-            // Apply the transform back to the geometry
+            // Also apply controller transform to ghost geometry
             ghostMesh->setTranslation(controller->getPosition());
             ghostMesh->setRotation(controller->getRotation());
             ghostMesh->updatePostTransformData();

@@ -85,7 +85,7 @@ Plane::applyTransform(const Mat4d& m)
          m_transform.block<3, 1>(0, 0).norm(),
          m_transform.block<3, 1>(0, 1).norm(),
          m_transform.block<3, 1>(0, 2).norm());*/
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    const double s0 = m.block<3, 1>(0, 0).norm();
     this->setWidth(m_width * s0);
     this->modified();
 }
@@ -101,5 +101,28 @@ Plane::updatePostTransformData() const
     const double s0 = m_transform.block<3, 1>(0, 0).norm();
     m_widthPostTransform = s0 * m_width;
     m_transformApplied   = true;
+}
+
+void
+Plane::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
+{
+    Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxis);
+    Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
+    Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
+
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    m_widthPostTransform = s0 * m_width;
+    Vec3d p1 = m_position + m_widthPostTransform * (i + j);
+    Vec3d p2 = m_position + m_widthPostTransform * (i - j);
+    Vec3d p3 = m_position + m_widthPostTransform * (-i + j);
+    Vec3d p4 = m_position + m_widthPostTransform * (-i - j);
+
+    min = p1.cwiseMin(p2);
+    min = min.cwiseMin(p3);
+    min = min.cwiseMin(p4);
+
+    max = p1.cwiseMax(p2);
+    max = max.cwiseMax(p3);
+    max = max.cwiseMax(p4);
 }
 } // imstk

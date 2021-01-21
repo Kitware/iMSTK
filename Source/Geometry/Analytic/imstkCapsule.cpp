@@ -95,7 +95,7 @@ Capsule::applyTransform(const Mat4d& m)
          m.block<3, 1>(0, 0).norm(),
          m.block<3, 1>(0, 1).norm(),
          m.block<3, 1>(0, 2).norm());*/
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    const double s0 = m.block<3, 1>(0, 0).norm();
     this->setRadius(m_radius * s0);
     this->setLength(m_length * s0);
     this->modified();

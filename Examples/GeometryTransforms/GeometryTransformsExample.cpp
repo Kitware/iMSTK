@@ -65,28 +65,28 @@ main()
 
     imstkNew<RenderMaterial> planeMaterial;
     planeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    planeMaterial->setPointSize(6.);
-    planeMaterial->setLineWidth(4.);
+    planeMaterial->setPointSize(6.0);
+    planeMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> planeVisualModel(planeGeom.get());
     planeVisualModel->setRenderMaterial(planeMaterial);
 
     imstkNew<VisualObject> planeObj("Plane");
-    //planeObj->setVisualGeometry(planeGeom);
     planeObj->addVisualModel(planeVisualModel);
     scene->addSceneObject(planeObj);
 
     //  Cube
     imstkNew<Cube> cubeGeom;
-    cubeGeom->setWidth(20.0);
+    cubeGeom->setWidth(10.0);
     cubeGeom->scale(0.5, Geometry::TransformType::ConcatenateToTransform);
     cubeGeom->rotate(Vec3d(1.0, 1.0, 0.0), PI_4, Geometry::TransformType::ApplyToData);
+    cubeGeom->translate(Vec3d(0.0, 0.0, 10.0));
 
     auto                     materialCube = std::make_shared<RenderMaterial>();
     imstkNew<RenderMaterial> cubeMaterial;
     cubeMaterial->setColor(Color::Red);
     cubeMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    cubeMaterial->setPointSize(6.);
-    cubeMaterial->setLineWidth(4.);
+    cubeMaterial->setPointSize(6.0);
+    cubeMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
     cubeVisualModel->setRenderMaterial(cubeMaterial);
 
@@ -97,17 +97,13 @@ main()
     //  Cylinder
     imstkNew<Cylinder> cylinderGeom;
     cylinderGeom->setRadius(4.0);
-    cylinderGeom->setLength(8.0);
+    cylinderGeom->setLength(12.0);
     cylinderGeom->scale(0.4, Geometry::TransformType::ConcatenateToTransform);
     cylinderGeom->rotate(Vec3d(1.0, 1.0, 0), PI_2, Geometry::TransformType::ApplyToData);
+    cylinderGeom->translate(Vec3d(0.0, 0.0, -10.0));
 
-    imstkNew<RenderMaterial> cylMaterial;
-    cylMaterial->setColor(Color::Red);
-    cylMaterial->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    cylMaterial->setPointSize(6.0);
-    cylMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
-    cylVisualModel->setRenderMaterial(materialCube);
+    cylVisualModel->setRenderMaterial(cubeMaterial);
 
     imstkNew<VisualObject> cylObj("Cylinder");
     cylObj->addVisualModel(cylVisualModel);
@@ -140,8 +136,9 @@ main()
         connect<Event>(sceneManager, EventType::PostUpdate,
             [&](Event*)
         {
-            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime(), Geometry::TransformType::ApplyToData);
-            });
+            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime());
+            surfaceMesh->modified();
+        });
 
         // Add mouse and keyboard controls to the viewer
         {

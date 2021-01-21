@@ -179,22 +179,8 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
 void
 VTKRenderDelegate::update()
 {
-    // Always update the actor transform
-    updateActorTransform();
-
     // Then leave it up to subclasses to implement how to process the events
     processEvents();
-}
-
-void
-VTKRenderDelegate::updateActorTransform()
-{
-    auto              geom = m_visualModel->getGeometry();
-    AffineTransform3d T(geom->m_transform.matrix());
-    T.scale(geom->getScaling());
-    T.matrix().transposeInPlace();
-    m_transform->SetMatrix(T.data());
-    m_transform->Modified();
 }
 
 void

@@ -116,14 +116,13 @@ Geometry::transform(const Mat4d& T, TransformType type)
     if (type == TransformType::ConcatenateToTransform)
     {
         m_transform = T * m_transform;
-        m_transformApplied = false;
     }
     else
     {
         applyTransform(T);
         this->postEvent(Event(EventType::Modified));
     }
-    m_transformApplied = true;
+    m_transformApplied = false;
 }
 
 Vec3d
