@@ -81,7 +81,7 @@ isNeighborhoodEquivalent(const Vec3i& pt, const Vec3i& dim, const float val, con
         {
             for (int x = min[0]; x < max[0] + 1; x++)
             {
-                const int index = ImageData::getScalarIndex(x, y, z, dim, 1);
+                const size_t index = ImageData::getScalarIndex(x, y, z, dim, 1);
                 if (val != imgPtr[index])
                 {
                     return false;

@@ -74,13 +74,13 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
             double currVal = prevVal;
 
             // Check if the starting point of the march is inside
-            // This could happen if the collision wasn't fully resolved by the solver
+            // This could happen if the collision wasn't fully resolved by the solver (common)
             if (currVal < 0.0)
             {
                 PositionDirectionCollisionDataElement elem;
                 elem.dirAtoB = -centralGrad(currPos).normalized(); // Contact Normal
                 elem.nodeIdx = static_cast<uint32_t>(idx);
-                elem.penetrationDepth = currVal;                   // Could also reverse march in gradient direction
+                elem.penetrationDepth = std::abs(currVal);         // Could also reverse march in gradient direction
                 elem.posB = currPos;
                 m_colData->PDColData.safeAppend(elem);
                 return; // No need to find an other root

@@ -31,6 +31,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkSphere.h"
 #include "imstkViewer.h"
 #include "imstkVTKScreenCaptureUtility.h"
@@ -74,14 +75,14 @@ main()
 
     // Light (white)
     imstkNew<PointLight> whiteLight("whiteLight");
-    whiteLight->setIntensity(100.0);
+    whiteLight->setIntensity(1.0);
     whiteLight->setPosition(Vec3d(5.0, 8.0, 5.0));
 
     // Light (red)
     imstkNew<SpotLight> colorLight("colorLight");
     colorLight->setPosition(Vec3d(4.0, -3.0, 1.0));
     colorLight->setFocalPoint(Vec3d(0.0, 0.0, 0.0));
-    colorLight->setIntensity(100.0);
+    colorLight->setIntensity(1.0);
     colorLight->setColor(Color::Red);
     colorLight->setSpotAngle(15.0);
 
@@ -108,7 +109,10 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -118,7 +122,7 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
 
             connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
@@ -134,9 +138,7 @@ main()
                 });
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

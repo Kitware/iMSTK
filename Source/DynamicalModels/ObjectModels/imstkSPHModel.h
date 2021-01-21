@@ -176,8 +176,8 @@ public:
     std::shared_ptr<TaskNode> getComputeDensityNode() const { return m_computeDensityNode; }
     std::shared_ptr<TaskNode> getComputePressureNode() const { return m_computePressureAccelNode; }
     std::shared_ptr<TaskNode> getComputeSurfaceTensionNode() const { return m_computeSurfaceTensionNode; }
-    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { m_computeTimeStepSizeNode; }
-    std::shared_ptr<TaskNode> getSumAccelsNode() const { m_sumAccelsNode; }
+    std::shared_ptr<TaskNode> getComputeTimeStepSizeNode() const { return m_computeTimeStepSizeNode; }
+    std::shared_ptr<TaskNode> getSumAccelsNode() const { return m_sumAccelsNode; }
     std::shared_ptr<TaskNode> getIntegrateNode() const { return m_integrateNode; }
     std::shared_ptr<TaskNode> getComputeViscosityNode() const { return m_computeViscosityNode; }
     std::shared_ptr<TaskNode> getUpdateVelocityNode() const { return m_updateVelocityNode; }

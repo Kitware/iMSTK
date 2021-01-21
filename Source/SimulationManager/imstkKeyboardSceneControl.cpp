@@ -21,6 +21,7 @@
 
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
+#include "imstkModuleDriver.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkVTKRenderer.h"
@@ -30,13 +31,13 @@
 namespace imstk
 {
 KeyboardSceneControl::KeyboardSceneControl() :
-    m_showFps(false), m_sceneManager(nullptr), m_viewer(nullptr)
+    m_driver(nullptr), m_showFps(false)
 {
 }
 
 KeyboardSceneControl::KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice) :
     KeyboardControl(keyDevice),
-    m_showFps(false), m_sceneManager(nullptr), m_viewer(nullptr)
+    m_driver(nullptr), m_showFps(false)
 {
 }
 
@@ -56,84 +57,87 @@ KeyboardSceneControl::printControls()
 void
 KeyboardSceneControl::OnKeyPress(const char key)
 {
+    if (m_sceneManager == nullptr)
+    {
+        LOG(WARNING) << "Keyboard control disabled: No scene manager provided";
+        return;
+    }
+    if (m_driver == nullptr)
+    {
+        LOG(WARNING) << "Keyboard control disabled: No driver provided";
+        return;
+    }
+
     if (key == ' ')
     {
-        if (m_sceneManager != nullptr)
+        // To ensure consistency toggle/invert based of m_sceneManager
+        const bool paused = m_sceneManager->getPaused();
+
+        // Resume or pause all modules
+        for (auto module : m_driver->getModules())
         {
-            ThreadStatus status = m_sceneManager->getStatus();
-            // Pause the active scene
-            if (status == ThreadStatus::Running)
+            if (paused)
             {
-                m_sceneManager->pause(true);
+                module->resume();
             }
-            // Resume the active scene
-            else if (status == ThreadStatus::Paused)
+            else
             {
-                m_sceneManager->resume();
-            }
-            // Launch the active scene if it has yet to start
-            if (status == ThreadStatus::Inactive)
-            {
-                //m_textStatusManager->setStatusVisibility(VTKTextStatusManager::FPS, m_displayFps);
-                m_sceneManager->resume();
+                module->pause();
             }
         }
     }
     else if (key == 'q' || key == 'Q' || key == 'e' || key == 'E') // end Simulation
     {
-        if (m_sceneManager != nullptr && m_viewer != nullptr)
-        {
-            if (m_viewer->getStatus() != ThreadStatus::Inactive)
-            {
-                m_viewer->stop(false);
-            }
-        }
-        else if (m_sceneManager != nullptr && m_viewer == nullptr)
-        {
-            if (m_sceneManager->getStatus() != ThreadStatus::Inactive)
-            {
-                m_sceneManager->stop(false);
-            }
-        }
-        else if (m_sceneManager == nullptr && m_viewer != nullptr)
-        {
-            if (m_viewer->getStatus() != ThreadStatus::Inactive)
-            {
-                m_viewer->stop(false);
-            }
-        }
+        m_driver->requestStatus(ModuleDriverStopped);
     }
     else if (key == 'd' || key == 'D') // switch rendering mode of the modules
     {
-        if (m_sceneManager != nullptr && m_viewer != nullptr)
+        // To ensure consistency toggle/invert based of m_sceneManager
+        const bool simModeOn = m_sceneManager->getMode() == SceneManager::Mode::Simulation ? true : false;
+
+        for (auto module : m_driver->getModules())
         {
-            if (m_viewer->getRenderingMode() != Renderer::Mode::Simulation)
+            std::shared_ptr<SceneManager> sceneManager = std::dynamic_pointer_cast<SceneManager>(module);
+            if (sceneManager != nullptr)
             {
-                m_sceneManager->setMode(SceneManager::Mode::Simulation);
-                m_viewer->setRenderingMode(Renderer::Mode::Simulation);
+                if (simModeOn)
+                {
+                    sceneManager->setMode(SceneManager::Mode::Debug);
+                }
+                else
+                {
+                    sceneManager->setMode(SceneManager::Mode::Simulation);
+                }
             }
-            else
+            std::shared_ptr<VTKViewer> viewer = std::dynamic_pointer_cast<VTKViewer>(module);
+            if (viewer != nullptr)
             {
-                m_sceneManager->setMode(SceneManager::Mode::Debug);
-                m_viewer->setRenderingMode(Renderer::Mode::Debug);
+                if (simModeOn)
+                {
+                    viewer->setRenderingMode(Renderer::Mode::Debug);
+                }
+                else
+                {
+                    viewer->setRenderingMode(Renderer::Mode::Simulation);
+                }
             }
         }
     }
     else if (key == 'p' || key == 'P')  // switch framerate display
     {
-        if (m_sceneManager != nullptr && m_viewer != nullptr)
+        // The designated m_sceneManager framerate is displayed in all views
+        for (auto module : m_driver->getModules())
         {
-            // If we're dealing with a VTK viewer, flip the text visibility for FPS
-            std::shared_ptr<VTKViewer> vtkViewer = std::dynamic_pointer_cast<VTKViewer>(m_viewer);
-            if (vtkViewer != nullptr)
+            std::shared_ptr<VTKViewer> viewer = std::dynamic_pointer_cast<VTKViewer>(module);
+            if (viewer != nullptr)
             {
                 m_showFps = !m_showFps;
-                std::shared_ptr<VTKTextStatusManager> textManager = vtkViewer->getTextStatusManager();
+                std::shared_ptr<VTKTextStatusManager> textManager = viewer->getTextStatusManager();
                 textManager->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, m_showFps);
 
                 std::shared_ptr<Scene> activeScene = m_sceneManager->getActiveScene();
                 activeScene->setEnableTaskTiming(m_showFps);
-                const auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(m_viewer->getActiveRenderer());
+                std::shared_ptr<VTKRenderer> vtkRen = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
                 vtkRen->setTimeTableVisibility(m_showFps);
             }
         }

@@ -45,4 +45,18 @@ VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
     m_renderMaterial(renderMaterial)
 {
 }
+
+bool
+VisualModel::getRenderDelegateCreated(Renderer* ren)
+{
+    if (m_renderDelegateCreated.count(ren) == 0)
+    {
+        m_renderDelegateCreated[ren] = false;
+        return false;
+    }
+    else
+    {
+        return m_renderDelegateCreated[ren];
+    }
+}
 }

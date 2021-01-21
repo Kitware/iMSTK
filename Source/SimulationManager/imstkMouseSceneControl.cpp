@@ -165,7 +165,7 @@ MouseSceneControl::OnMouseMove(const Vec2d& pos)
 }
 
 void
-MouseSceneControl::update()
+MouseSceneControl::update(const double imstkNotUsed(dt))
 {
     // Directly set it
     //m_camera->getView() = m_targetViewTransform;

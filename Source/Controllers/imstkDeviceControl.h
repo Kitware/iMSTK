@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkEventObject.h"
+#include "imstkMacros.h"
 
 #include <memory>
 
@@ -55,9 +56,9 @@ public:
     virtual void printControls() { }
 
     ///
-    /// \brief Updates the state of the control
+    /// \brief Updates control based on current device state
     ///
-    virtual void update() { }
+    virtual void update(const double imstkNotUsed(dt)) { }
 
 public:
     std::shared_ptr<DeviceClient> m_deviceClient;

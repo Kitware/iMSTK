@@ -51,7 +51,7 @@ bidirectionalPlaneToSphere(Plane* planeA, Sphere* sphereB,
 {
     // Get geometry properties
     Vec3d  sphereBPos = sphereB->getPosition();
-    double r = sphereB->getRadius();
+    double r = sphereB->getRadius() * sphereB->getScaling()[0];
     Vec3d  planeAPos = planeA->getPosition();
     Vec3d  n = planeA->getNormal();
 

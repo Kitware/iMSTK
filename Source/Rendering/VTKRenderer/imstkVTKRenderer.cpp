@@ -61,6 +61,8 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     else
     {
         m_vtkRenderer = vtkSmartPointer<vtkOpenVRRenderer>::New();
+        vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetAutomaticLightCreation(false);
+        vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetLightFollowCamera(false);
     }
 
     this->updateRenderDelegates();
@@ -141,6 +143,11 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
 
             LOG(WARNING) << "Light type undefined!";
         }
+    }
+
+    for (const auto& light : m_vtkLights)
+    {
+        m_vtkRenderer->AddLight(light);
     }
 
     // Global Axis
@@ -409,7 +416,7 @@ VTKRenderer::updateRenderDelegates()
         for (auto visualModel : obj->getVisualModels())
         {
             auto geom = visualModel->getGeometry();
-            if (visualModel && !visualModel->isRenderDelegateCreated())
+            if (visualModel && !visualModel->getRenderDelegateCreated(this))
             {
                 auto renderDelegate = VTKRenderDelegate::makeDelegate(visualModel);
                 if (renderDelegate == nullptr)
@@ -425,7 +432,7 @@ VTKRenderer::updateRenderDelegates()
 
                 //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
 
-                visualModel->m_renderDelegateCreated = true;
+                visualModel->setRenderDelegateCreated(this, true);
             }
         }
     }
@@ -434,7 +441,7 @@ VTKRenderer::updateRenderDelegates()
     for (const auto& dbgVizModel : m_scene->getDebugRenderModels())
     {
         auto geom = std::static_pointer_cast<DebugRenderGeometry>(dbgVizModel->getDebugGeometry());
-        if (dbgVizModel && !dbgVizModel->isRenderDelegateCreated())
+        if (dbgVizModel && !dbgVizModel->getRenderDelegateCreated(this))
         {
             auto delegate = VTKRenderDelegate::makeDebugDelegate(dbgVizModel);
             if (delegate == nullptr)
@@ -447,7 +454,7 @@ VTKRenderer::updateRenderDelegates()
             m_debugRenderDelegates.push_back(delegate);
             m_objectVtkActors.push_back(delegate->getVtkActor());
             m_vtkRenderer->AddActor(delegate->getVtkActor());
-            dbgVizModel->m_renderDelegateCreated = true;
+            dbgVizModel->setRenderDelegateCreated(this, true);
         }
     }
 

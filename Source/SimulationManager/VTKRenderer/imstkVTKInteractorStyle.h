@@ -44,11 +44,6 @@ public:
 
 public:
     ///
-    /// \brief Slot for timer tick
-    ///
-    virtual void OnTimer() override;
-
-    ///
     /// \brief Slot for key pressed
     ///
     virtual void OnKeyPress() override;

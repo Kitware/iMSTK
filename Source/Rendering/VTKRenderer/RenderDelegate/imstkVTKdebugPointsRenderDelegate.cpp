@@ -22,6 +22,7 @@
 #include "imstkVTKdebugPointsRenderDelegate.h"
 #include "imstkDebugRenderGeometry.h"
 #include "imstkVisualModel.h"
+#include "imstkTypes.h"
 
 #include <thread>
 #include <vtkActor.h>
@@ -59,9 +60,9 @@ VTKdbgPointsRenderDelegate::VTKdbgPointsRenderDelegate(std::shared_ptr<VisualMod
         //actor->SetUserTransform(m_transform);
         m_mapper = mapper;
         m_actor  = actor;
-        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
         {
-            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+            glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
         }
     }
 
@@ -77,7 +78,7 @@ VTKdbgPointsRenderDelegate::processEvents()
     {
         dbgPoints->setDataModified(false);
         m_mappedVertexArray->SetArray(dbgPoints->getVertexBufferPtr(),
-                                      dbgPoints->getNumVertices() * 3, 1);
+            dbgPoints->getNumVertices() * 3, 1);
 
         // Update points geometry
         // m_Points need to be created from scrach, otherwise program will crash

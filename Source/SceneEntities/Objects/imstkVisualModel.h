@@ -24,12 +24,15 @@
 #include "imstkEventObject.h"
 
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 namespace imstk
 {
 class Geometry;
 class RenderMaterial;
 class DebugRenderGeometry;
+class Renderer;
 
 ///
 /// \class VisualModel
@@ -58,6 +61,12 @@ public:
     void setGeometry(std::shared_ptr<Geometry> geometry) { m_geometry = geometry; }
 
     ///
+    /// \brief Get/Set name
+    ///
+    const std::string& getName() { return m_name; }
+    void setName(std::string name) { m_name = name; }
+
+    ///
     /// \brief Get/set geometry
     ///
     std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const { return m_DbgGeometry; }
@@ -82,19 +91,22 @@ public:
     bool isVisible() const { return m_isVisible; }
 
     ///
-    /// \brief Return true if renderer delegate is created
+    /// \brief Get/Set whether the delegate has been created
     ///
-    bool isRenderDelegateCreated() const { return m_renderDelegateCreated; }
+    bool getRenderDelegateCreated(Renderer* ren);
+    void setRenderDelegateCreated(Renderer* ren, bool created) { m_renderDelegateCreated[ren] = created; }
 
 protected:
     friend class VulkanRenderDelegate;
     friend class VTKRenderer;
+
+    std::string m_name = "";
 
     std::shared_ptr<Geometry> m_geometry = nullptr;
     std::shared_ptr<DebugRenderGeometry> m_DbgGeometry = nullptr;
     std::shared_ptr<RenderMaterial>      m_renderMaterial;
 
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
-    bool m_renderDelegateCreated = false; ///< true if RenderDelegate has been created
+    std::unordered_map<Renderer*, bool> m_renderDelegateCreated;
 };
 }

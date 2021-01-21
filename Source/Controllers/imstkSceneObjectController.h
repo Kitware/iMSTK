@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Update controlled scene object using latest tracking information
     ///
-    void updateControlledObjects() override;
+    void update(const double dt) override;
 
     ///
     /// \brief Apply forces to the haptic-capable device
@@ -55,8 +55,8 @@ public:
     ///
     /// \brief Get/Set controlled scene object
     ///
-    inline std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
-    inline void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
+    std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
+    virtual void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
 
 protected:
     std::shared_ptr<SceneObject> m_sceneObject; ///< SceneObject controlled by the Tracker

@@ -26,11 +26,11 @@ namespace imstk
 {
 DeviceClient::DeviceClient(const std::string& name, const std::string& ip) :
     m_deviceName(name),
+    m_ip(ip),
     m_position(Vec3d::Zero()),
     m_velocity(Vec3d::Zero()),
-    m_force(Vec3d::Zero()),
     m_orientation(Quatd::Identity()),
-    m_ip(ip)
+    m_force(Vec3d::Zero())
 {
 }
 
@@ -116,6 +116,12 @@ const Vec3d&
 DeviceClient::getVelocity() const
 {
     return m_velocity;
+}
+
+const Vec3d&
+DeviceClient::getAngularVelocity() const
+{
+    return m_angularVelocity;
 }
 
 const Quatd&

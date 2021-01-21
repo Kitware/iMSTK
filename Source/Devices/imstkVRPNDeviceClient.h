@@ -22,7 +22,7 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
-#include "imstkLoopThreadObject.h"
+#include "imstkModule.h"
 
 #include <vrpn_Configure.h>
 #include <vrpn_Tracker.h>
@@ -37,16 +37,15 @@ namespace imstk
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
 ///
-class VRPNDeviceClient : public DeviceClient, public LoopThreadObject
+class VRPNDeviceClient : public DeviceClient, public Module
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceClient(const std::string& deviceName, const std::string& ip) :
-        DeviceClient(deviceName, ip),
-        LoopThreadObject(deviceName + "@" + ip)
+    VRPNDeviceClient(const std::string& deviceName, const std::string& ip) : Module(),
+        DeviceClient(deviceName, ip)
     {}
 
     ///
@@ -58,17 +57,17 @@ protected:
     ///
     /// \brief Initialize device client module
     ///
-    void initThread() override;
+    bool initModule() override;
 
     ///
     /// \brief Run the device client
     ///
-    void updateThread() override;
+    void updateModule() override;
 
     ///
     /// \brief Clean the device client
     ///
-    void stopThread() override;
+    void uninitModule() override;
 
 private:
 

@@ -247,8 +247,8 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
     // Read the tet and hex (if any) elements IDs and connectivity in the $Element field in the .msh file
     tetrahedronIDs.resize(elemCountMap[ElemType::tetrahedron]);
     hexahedronIDs.resize(elemCountMap[ElemType::hexahedron]);
-    tetrahedronConnectivity.resize(elemCountMap[ElemType::tetrahedron]);
-    hexahedronConnectivity.resize(elemCountMap[ElemType::hexahedron]);
+    tetrahedronConnectivity.resize(static_cast<int>(elemCountMap[ElemType::tetrahedron]));
+    hexahedronConnectivity.resize(static_cast<int>(elemCountMap[ElemType::hexahedron]));
     size_t tetElemCount = 0;
     size_t hexElemCount = 0;
     Vec4i  tmp_4arr;  // Temp array to store the connectivity of a tet element (if any)
@@ -341,7 +341,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
         {
             for (size_t jNode = 0; jNode < numElemNodes(ElemType::tetrahedron); ++jNode)
             {
-                tetrahedronConnectivity[iTet][jNode] = nodeIDMap[tetrahedronConnectivity[iTet][jNode]];
+                tetrahedronConnectivity[iTet][jNode] = static_cast<int>(nodeIDMap[tetrahedronConnectivity[iTet][jNode]]);
             }
             cells.push_back(tetrahedronConnectivity[iTet]);
         }
@@ -358,7 +358,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
         {
             for (size_t jNode = 0; jNode < numElemNodes(ElemType::hexahedron); ++jNode)
             {
-                hexahedronConnectivity[iHex][jNode] = nodeIDMap[hexahedronConnectivity[iHex][jNode]];
+                hexahedronConnectivity[iHex][jNode] = static_cast<int>(nodeIDMap[hexahedronConnectivity[iHex][jNode]]);
             }
             cells.push_back(hexahedronConnectivity[iHex]);
         }

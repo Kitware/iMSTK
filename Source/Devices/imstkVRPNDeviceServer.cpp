@@ -27,7 +27,7 @@
 #include <vrpn_Tracker_NovintFalcon.h>
 #include <vrpn_Tracker_OSVRHackerDevKit.h>
 #ifdef VRPN_USE_PHANTOM_SERVER
-  #include <vrpn_Phantom.h>
+#include <vrpn_Phantom.h>
 #endif
 
 namespace imstk
@@ -55,8 +55,8 @@ VRPNDeviceServer::addSerialDevice(const std::string& deviceName, DeviceType devi
     m_SerialInfoMap[deviceName] = serialSettings;
 }
 
-void
-VRPNDeviceServer::initThread()
+bool
+VRPNDeviceServer::initModule()
 {
     std::string ip = m_machine + ":" + std::to_string(m_port);
     m_serverConnection = vrpn_create_server_connection(ip.c_str());
@@ -113,20 +113,22 @@ VRPNDeviceServer::initThread()
         {
             LOG(WARNING) << "VRPNDeviceServer::initModule error: can not connect to "
                          << name << ", device type unknown.";
+            return false;
         } break;
         }
     }
+    return true;
 }
 
 void
-VRPNDeviceServer::updateThread()
+VRPNDeviceServer::updateModule()
 {
     m_serverConnection->mainloop();
     m_deviceConnections->mainloop();
 }
 
 void
-VRPNDeviceServer::stopThread()
+VRPNDeviceServer::uninitModule()
 {
     m_deviceConnections->clear();
     delete(m_deviceConnections);

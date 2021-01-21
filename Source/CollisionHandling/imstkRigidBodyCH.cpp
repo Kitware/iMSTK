@@ -101,7 +101,7 @@ RigidBodyCH::processA()
     std::shared_ptr<RigidBodyModel2> rbdModelA = m_rbdObjectA->getRigidBodyModel2();
     // Generate one-way constraints
     PositionDirectionCollisionData& pdColData = m_colData->PDColData;
-    for (int i = 0; i < pdColData.getSize(); i++)
+    for (size_t i = 0; i < pdColData.getSize(); i++)
     {
         {
             std::shared_ptr<RbdContactConstraint> contactConstraint =
@@ -109,7 +109,6 @@ RigidBodyCH::processA()
                     m_rbdObjectA->getRigidBody(), nullptr,
                     pdColData[i].dirAtoB.normalized(),
                     pdColData[i].posB,
-                    //0.0001,
                     pdColData[i].penetrationDepth,
                     m_stiffness,
                     RbdConstraint::Side::A);
@@ -139,7 +138,7 @@ RigidBodyCH::processB()
     std::shared_ptr<RigidBodyModel2> rbdModelB = m_rbdObjectB->getRigidBodyModel2();
     // Generate one-way constraints
     PositionDirectionCollisionData& pdColData = m_colData->PDColData;
-    for (int i = 0; i < pdColData.getSize(); i++)
+    for (size_t i = 0; i < pdColData.getSize(); i++)
     {
         std::shared_ptr<RbdContactConstraint> contactConstraint =
             std::make_shared<RbdContactConstraint>(
@@ -174,7 +173,7 @@ RigidBodyCH::processAB()
     // Generate one two-way constraint
     std::shared_ptr<RigidBodyModel2> rbdModelAB = m_rbdObjectA->getRigidBodyModel2();
     PositionDirectionCollisionData&  pdColData  = m_colData->PDColData;
-    for (int i = 0; i < pdColData.getSize(); i++)
+    for (size_t i = 0; i < pdColData.getSize(); i++)
     {
         std::shared_ptr<RbdContactConstraint> contactConstraint =
             std::make_shared<RbdContactConstraint>(

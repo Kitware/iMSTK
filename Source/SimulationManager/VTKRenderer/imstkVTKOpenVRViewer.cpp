@@ -41,7 +41,6 @@ VTKOpenVRViewer::VTKOpenVRViewer(std::string name) : AbstractVTKViewer(name)
     auto vrInteractorStyle = std::make_shared<vtkInteractorStyleVR>();
     m_interactorStyle    = std::dynamic_pointer_cast<InteractorStyle>(vrInteractorStyle);
     m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
-    m_interactorStyle->setUpdateFunc([&]() { updateThread(); });
 
     // Create the interactor
     vtkNew<vtkOpenVRRenderWindowInteractor> iren;
@@ -108,18 +107,19 @@ VTKOpenVRViewer::setRenderingMode(const Renderer::Mode mode)
 
     // Setup renderer
     this->getActiveRenderer()->setMode(mode, true);
-    if (m_status != ThreadStatus::Running)
-    {
-        return;
-    }
 
     // Render to update displayed actors
     m_vtkRenderWindow->Render();
 }
 
-void
-VTKOpenVRViewer::startThread()
+bool
+VTKOpenVRViewer::initModule()
 {
+    if (!AbstractVTKViewer::initModule())
+    {
+        return false;
+    }
+
     // Print all controls on viewer
     for (auto control : m_controls)
     {
@@ -133,19 +133,18 @@ VTKOpenVRViewer::startThread()
     if (iren->HasObserver(vtkCommand::StartEvent))
     {
         iren->InvokeEvent(vtkCommand::StartEvent, nullptr);
-        return;
+        return true;
     }
     iren->Initialize();
 
     // Hide the device overlays
-    // \todo: put in debug mode
+    // \todo: Display devices in debug mode
     vtkSmartPointer<vtkOpenVRRenderWindow> renWin = vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow);
     renWin->Initialize();
-    renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the controllers
+    renWin->Render(); // Must do one render to initialize vtkOpenVRModel's to then hide the devices
 
-    //renWin->GetTrackedDeviceModel(vr::trackeddevice)
     // Hide all controllers
-    for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
+    for (uint32_t i = 0; i < vr::k_unMaxTrackedDeviceCount; i++)
     {
         vtkOpenVRModel* trackedDeviceModel = renWin->GetTrackedDeviceModel(i);
         if (trackedDeviceModel != nullptr)
@@ -154,12 +153,34 @@ VTKOpenVRViewer::startThread()
         }
     }
 
-    while (!iren->GetDone())
+    return true;
+}
+
+void
+VTKOpenVRViewer::updateModule()
+{
+    // Update all controls
+    for (auto control : m_controls)
     {
-        auto vtkRen = std::dynamic_pointer_cast<VTKRenderer>(getActiveRenderer());
-        iren->DoOneEvent(vtkOpenVRRenderWindow::SafeDownCast(m_vtkRenderWindow), vtkOpenVRRenderer::SafeDownCast(vtkRen->getVtkRenderer()));
-        iren->InvokeEvent(vtkCommand::TimerEvent);
+        control->update(m_dt);
     }
+
+    std::shared_ptr<imstk::VTKRenderer> ren = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
+    if (ren == nullptr)
+    {
+        return;
+    }
+
+    // Update Camera
+    // \todo: No programmatic control over VR camera currently
+    //renderer->updateSceneCamera(getActiveScene()->getCamera());
+
+    // Update render delegates
+    ren->updateRenderDelegates();
+
+    // Render
+    //m_vtkRenderWindow->GetInteractor()->Render();
+    m_vtkRenderWindow->Render();
 }
 
 std::shared_ptr<OpenVRDeviceClient>
@@ -171,38 +192,5 @@ VTKOpenVRViewer::getVRDeviceClient(int deviceType)
             return static_cast<int>(deviceClient->getDeviceType()) == deviceType;
         });
     return (iter == m_vrDeviceClients.end()) ? nullptr : *iter;
-}
-
-void
-VTKOpenVRViewer::updateThread()
-{
-    this->postEvent(Event(EventType::PreUpdate));
-
-    // Update all controls
-    for (auto control : m_controls)
-    {
-        control->update();
-    }
-
-    std::shared_ptr<imstk::VTKRenderer> renderer = std::dynamic_pointer_cast<imstk::VTKRenderer>(getActiveRenderer());
-    if (renderer == nullptr)
-    {
-        return;
-    }
-
-    // Update Camera
-    // \todo: No programmatic control over VR camera currently
-    //renderer->updateSceneCamera(getActiveScene()->getCamera());
-
-    // Update render delegates
-    renderer->updateRenderDelegates();
-
-    // Render
-    m_vtkRenderWindow->GetInteractor()->Render();
-
-    this->postEvent(Event(EventType::PostUpdate));
-
-    // Plan next render
-    m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
 }
 }

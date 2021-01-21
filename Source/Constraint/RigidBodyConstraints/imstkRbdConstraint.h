@@ -47,6 +47,8 @@ struct RigidBody
         Vec3d m_initTorque = Vec3d(0.0, 0.0, 0.0);
         bool m_isStatic    = false;
 
+        Vec3d m_prevForce = Vec3d(0.0, 0.0, 0.0);
+
         // Vec3d m_externalForce;
         //RigidBodyState2* m_state; // A RigidBody can only belong to one state
         Vec3d* m_pos;
@@ -56,6 +58,7 @@ struct RigidBody
         Vec3d* m_force;
         Vec3d* m_torque;
 
+    public:
         const Vec3d& getPosition() const { return *m_pos; }
         const Quatd& getOrientation() const { return *m_orientation; }
         const Vec3d& getVelocity() const { return *m_velocity; }

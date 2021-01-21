@@ -48,9 +48,9 @@ Capsule::setRadius(const double r)
 {
     CHECK(r > 0) << "Capsule::setRadius error: radius should be positive.";
 
-    m_radius           = r;
-    m_dataModified     = true;
+    m_radius = r;
     m_transformApplied = false;
+    this->postEvent(Event(EventType::Modified));
 }
 
 double
@@ -69,9 +69,9 @@ Capsule::setLength(const double l)
 {
     CHECK(l > 0) << "Capsule::setHeight error: height should be positive.";
 
-    m_length           = l;
-    m_dataModified     = true;
+    m_length = l;
     m_transformApplied = false;
+    this->postEvent(Event(EventType::Modified));
 }
 
 double
@@ -88,10 +88,16 @@ Capsule::getFunctionValue(const Vec3d& x) const
 }
 
 void
-Capsule::applyScaling(const double s)
+Capsule::applyTransform(const Mat4d& m)
 {
-    this->setRadius(m_radius * s);
-    this->setLength(m_length * s);
+    AnalyticalGeometry::applyTransform(m);
+    /* const Vec3d s = Vec3d(
+         m.block<3, 1>(0, 0).norm(),
+         m.block<3, 1>(0, 1).norm(),
+         m.block<3, 1>(0, 2).norm());*/
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    this->setRadius(m_radius * s0);
+    this->setLength(m_length * s0);
     this->modified();
 }
 
@@ -103,8 +109,9 @@ Capsule::updatePostTransformData() const
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    m_radiusPostTransform = m_scaling * m_radius;
-    m_lengthPostTransform = m_scaling * m_length;
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    m_radiusPostTransform = s0 * m_radius;
+    m_lengthPostTransform = s0 * m_length;
     m_transformApplied    = true;
 }
 } // imstk

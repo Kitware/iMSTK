@@ -43,12 +43,12 @@
 namespace imstk
 {
 Scene::Scene(const std::string& name, std::shared_ptr<SceneConfig> config) :
-    m_activeCamera(nullptr),
-    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>()),
-    m_collisionGraph(std::make_shared<CollisionGraph>()),
     m_config(config),
     m_name(name),
-    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink"))
+    m_activeCamera(nullptr),
+    m_collisionGraph(std::make_shared<CollisionGraph>()),
+    m_taskGraph(std::make_shared<TaskGraph>("Scene_" + name + "_Source", "Scene_" + name + "_Sink")),
+    m_computeTimesLock(std::make_shared<ParallelUtils::SpinLock>())
 {
     std::shared_ptr<Camera> defaultCam = std::make_shared<Camera>();
     defaultCam->setPosition(0.0, 2.0, -15.0);
@@ -82,7 +82,28 @@ Scene::initialize()
     // Then init
     initTaskGraph();
 
-    m_isInitialized = true;
+    // Init the debug camera to the bounding box of the visual geometries
+    if (m_config->debugCamBoundingBox)
+    {
+        Vec3d globalMin = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
+        Vec3d globalMax = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
+        for (auto i : m_sceneObjectsMap)
+        {
+            std::shared_ptr<SceneObject> obj = i.second;
+            for (auto visualModels : obj->getVisualModels())
+            {
+                Vec3d min, max;
+                visualModels->getGeometry()->computeBoundingBox(min, max);
+                globalMin = min.cwiseMin(globalMin);
+                globalMax = max.cwiseMax(globalMax);
+            }
+        }
+        const Vec3d center = (globalMin + globalMax) * 0.5;
+        const Vec3d size   = globalMax - globalMin;
+        m_cameras["debug"]->setFocalPoint(center);
+        m_cameras["debug"]->setPosition(center + Vec3d(0.0, 1.0, 1.0).normalized() * size.norm());
+    }
+
     LOG(INFO) << "Scene '" << this->getName() << "' initialized!";
     return true;
 }
@@ -410,7 +431,7 @@ Scene::advance(const double dt)
     // Update objects controlled by the device controllers
     for (auto controller : this->getControllers())
     {
-        controller->updateControlledObjects();
+        controller->update(dt);
     }
 
     CollisionDetection::updateInternalOctreeAndDetectCollision();

@@ -45,7 +45,7 @@ public:
         const double               contactDepth,
         const double               beta = 0.05,
         const Side                 side = Side::AB) : RbdConstraint(obj1, obj2, side),
-        m_contactN(contactN), m_contactPt(contactPt),
+        m_contactPt(contactPt), m_contactN(contactN),
         m_contactDepth(contactDepth), m_beta(beta)
     {
     }

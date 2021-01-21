@@ -118,6 +118,6 @@ protected:
     /*ImplicitFunctionForwardGradient  forwardGrad;
     ImplicitFunctionBackwardGradient backwardGrad;*/
 
-    //ImplicitStructuredCurvature m_curvature;
+    ImplicitStructuredCurvature m_curvature;
 };
 }

@@ -35,13 +35,13 @@ SceneObjectController::SceneObjectController(std::shared_ptr<SceneObject>  scene
 }
 
 void
-SceneObjectController::updateControlledObjects()
+SceneObjectController::update(const double dt)
 {
     if (!isTrackerUpToDate())
     {
-        if (!updateTrackingData())
+        if (!updateTrackingData(dt))
         {
-            LOG(WARNING) << "SceneObjectController::updateControlledObjects warning: could not update tracking info.";
+            LOG(WARNING) << "SceneObjectController::update warning: could not update tracking info.";
             return;
         }
     }
@@ -62,6 +62,7 @@ SceneObjectController::updateControlledObjects()
     // \todo revisit this; what if we need to move a group of objects
     m_sceneObject->getMasterGeometry()->setTranslation(getPosition());
     m_sceneObject->getMasterGeometry()->setRotation(getRotation());
+    m_sceneObject->getMasterGeometry()->modified();
 }
 
 void

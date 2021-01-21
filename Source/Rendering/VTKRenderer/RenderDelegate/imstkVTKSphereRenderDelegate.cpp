@@ -63,7 +63,7 @@ VTKSphereRenderDelegate::processEvents()
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
     T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
-    T.scale(geometry->getRadius(Geometry::DataType::PreTransform));
+    T.scale(geometry->getRadius(Geometry::DataType::PostTransform));
     T.matrix().transposeInPlace();
 
     m_transform->SetMatrix(T.data());

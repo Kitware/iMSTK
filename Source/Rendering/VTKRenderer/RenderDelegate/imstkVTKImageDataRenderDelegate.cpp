@@ -129,12 +129,6 @@ VTKImageDataRenderDelegate::imageDataModified(Event* imstkNotUsed(e))
         imageDataVtk->SetSpacing(imageData->getSpacing().data());
     }
     volumeMapper->GetInput()->Modified();
-
-    // \todo: transforms
-    if (imageData->m_transformModified)
-    {
-        imageData->m_transformModified = false;
-    }
 }
 
 void

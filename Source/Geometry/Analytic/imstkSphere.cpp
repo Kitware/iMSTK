@@ -54,9 +54,9 @@ Sphere::setRadius(const double r)
     {
         return;
     }
-    m_radius           = r;
-    m_dataModified     = true;
+    m_radius = r;
     m_transformApplied = false;
+    postEvent(Event(EventType::Modified));
 }
 
 void
@@ -75,6 +75,18 @@ Sphere::computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double 
 }
 
 void
+Sphere::applyTransform(const Mat4d& m)
+{
+    AnalyticalGeometry::applyTransform(m);
+    /*const Vec3d s = Vec3d(
+        m.block<3, 1>(0, 0).norm(),
+        m.block<3, 1>(0, 1).norm(),
+        m.block<3, 1>(0, 2).norm());*/
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    this->setRadius(m_radius * s0);
+}
+
+void
 Sphere::updatePostTransformData() const
 {
     if (m_transformApplied)
@@ -82,7 +94,8 @@ Sphere::updatePostTransformData() const
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    m_radiusPostTransform = m_scaling * m_radius;
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    m_radiusPostTransform = s0 * m_radius;
     m_transformApplied    = true;
 }
 } // imstk

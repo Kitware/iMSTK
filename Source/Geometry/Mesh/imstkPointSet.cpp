@@ -95,15 +95,6 @@ PointSet::setInitialVertexPositions(std::shared_ptr<VecDataArray<double, 3>> ver
     m_initialVertexPositions = vertices;
 }
 
-const Vec3d&
-PointSet::getInitialVertexPosition(const size_t vertNum) const
-{
-#if defined(DEBUG) || defined(_DEBUG) || !defined(NDEBUG)
-    LOG_IF(FATAL, (vertNum >= m_initialVertexPositions->size())) << "Invalid index";
-#endif
-    return (*m_initialVertexPositions)[vertNum];
-}
-
 Vec3d&
 PointSet::getInitialVertexPosition(const size_t vertNum)
 {
@@ -169,54 +160,19 @@ PointSet::getNumVertices() const
 }
 
 void
-PointSet::applyTranslation(const Vec3d t)
+PointSet::applyTransform(const Mat4d& m)
 {
     VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
     VecDataArray<double, 3>& vertices     = *m_vertexPositions;
 
-    ParallelUtils::parallelFor(vertices.size(),
+    ParallelUtils::parallelFor(initVertices.size(),
         [&](const size_t i)
         {
-            vertices[i]     += t;
-            initVertices[i] += t;
+            initVertices[i] = (m * Vec4d(initVertices[i][0], initVertices[i][1], initVertices[i][2], 1.0)).head<3>();
+            vertices[i]     = initVertices[i];
         });
-    vertices.modified();
-    m_dataModified     = true;
     m_transformApplied = false;
-}
-
-void
-PointSet::applyRotation(const Mat3d r)
-{
-    VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
-    VecDataArray<double, 3>& vertices     = *m_vertexPositions;
-
-    ParallelUtils::parallelFor(vertices.size(),
-        [&](const size_t i)
-        {
-            vertices[i]     = r * vertices[i];
-            initVertices[i] = r * initVertices[i];
-        });
-    vertices.modified();
-    m_dataModified     = true;
-    m_transformApplied = false;
-}
-
-void
-PointSet::applyScaling(const double s)
-{
-    VecDataArray<double, 3>& initVertices = *m_initialVertexPositions;
-    VecDataArray<double, 3>& vertices     = *m_vertexPositions;
-
-    ParallelUtils::parallelFor(vertices.size(),
-        [&](const size_t i)
-        {
-            vertices[i]     = s * vertices[i];
-            initVertices[i] = s * initVertices[i];
-        });
-    vertices.modified();
-    m_dataModified     = true;
-    m_transformApplied = false;
+    this->updatePostTransformData();
 }
 
 void
@@ -238,20 +194,17 @@ PointSet::updatePostTransformData() const
     ParallelUtils::parallelFor(vertices.size(),
         [&](const size_t i)
         {
-            // NOTE: Right now scaling is appended on top of the rigid transform
-            // for scaling around the mesh center, and not concatenated within
-            // the transform, for ease of use.
-            vertices[i] = m_transform * (initVertices[i] * m_scaling);
+            vertices[i] = (m_transform * Vec4d(initVertices[i][0], initVertices[i][1], initVertices[i][2], 1.0)).head<3>();
         });
     m_transformApplied = true;
 }
 
 void
-PointSet::setLoadFactor(double loadFactor)
+PointSet::setLoadFactor(const double loadFactor)
 {
     m_loadFactor     = loadFactor;
     m_maxNumVertices = static_cast<size_t>(m_originalNumVertices * m_loadFactor);
-    m_vertexPositions->reserve(m_maxNumVertices);
+    m_vertexPositions->reserve(static_cast<int>(m_maxNumVertices));
 }
 
 bool

@@ -23,24 +23,23 @@
 
 namespace imstk
 {
-void
-VRPNArduinoDeviceClient::initThread()
+bool
+VRPNArduinoDeviceClient::initModule()
 {
-    auto fullDeviceIp = this->getName().c_str();
-
-    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
+    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(getDeviceName().c_str());
     m_vrpnAnalog->register_change_handler(this, analogChangeHandler);
     m_vrpnAnalog->shutup = true;
+    return true;
 }
 
 void
-VRPNArduinoDeviceClient::updateThread()
+VRPNArduinoDeviceClient::updateModule()
 {
     m_vrpnAnalog->mainloop();
 }
 
 void
-VRPNArduinoDeviceClient::stopThread()
+VRPNArduinoDeviceClient::uninitModule()
 {
     //Module cleanup is causing TCP errors - seems to work fine without it
     //m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);

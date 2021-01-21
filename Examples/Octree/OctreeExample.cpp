@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkDebugRenderGeometry.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
@@ -30,6 +31,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTimer.h"
 #include "imstkVisualModel.h"
@@ -170,7 +172,7 @@ main()
     // octree.setAlwaysRebuild(true);
 
     // Create debug geometry for the octree (render up to 8 levels, and render all non-empty nodes)
-    const auto debugOctree = octree.getDebugGeometry(8, true);
+    std::shared_ptr<DebugRenderGeometry> debugOctree = octree.getDebugGeometry(8, true);
 
     imstkNew<RenderMaterial> matDbgViz;
     matDbgViz->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
@@ -245,6 +247,7 @@ main()
 
             // Update debug rendering data
             octree.updateDebugGeometry();
+            debugOctree->setDataModified(true);
             for (auto& delegate : renderer->getDebugRenderDelegates())
             {
                 delegate->processEvents();
@@ -259,18 +262,17 @@ main()
     cam->setPosition(Vec3d(0, 15, 50));
     cam->setFocalPoint(Vec3d(0, 0, 0));
 
-    // Light
+    // Lights
     {
-        imstkNew<DirectionalLight> light("Light 1");
-        light->setFocalPoint(Vec3d(-1.0, -1.0, -1.0));
-        light->setIntensity(1);
-        scene->addLight(light);
-    }
-    {
-        imstkNew<DirectionalLight> light("Light 2");
-        light->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
-        light->setIntensity(1.0);
-        scene->addLight(light);
+        imstkNew<DirectionalLight> light1("Light 1");
+        light1->setFocalPoint(Vec3d(-1.0, -1.0, -1.0));
+        light1->setIntensity(1.0);
+        scene->addLight(light1);
+
+        imstkNew<DirectionalLight> light2("Light 2");
+        light2->setFocalPoint(Vec3d(1.0, -1.0, -1.0));
+        light2->setIntensity(1.0);
+        scene->addLight(light2);
     }
 
     // Run the simulation
@@ -278,8 +280,12 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->pause(); // Start simulation paused
         connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -289,13 +295,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

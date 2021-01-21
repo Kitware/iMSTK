@@ -22,7 +22,7 @@
 #pragma once
 
 #include "imstkRenderer.h"
-#include "imstkThreadObject.h"
+#include "imstkModule.h"
 
 #include <unordered_map>
 
@@ -56,12 +56,11 @@ struct ViewerConfig
 ///
 /// \class Viewer
 ///
-/// \brief Based class for viewer that manages render window and the renderers
+/// \brief Base class for viewer that manages render window and the renderers
 /// Creates backend-specific renderers on a per-scene basis.
 /// Contains user API to configure the rendering with various backends
-/// Manages the keyboard and mouse events
 ///
-class Viewer : public ThreadObject
+class Viewer : public Module
 {
 protected:
     Viewer(std::string name);
@@ -98,7 +97,7 @@ public:
     ///
     /// \brief Retrieve the renderer associated with the current scene
     ///
-    const std::shared_ptr<Renderer>& getActiveRenderer() const;
+    std::shared_ptr<Renderer> getActiveRenderer() const;
 
     ///
     /// \brief Set a string to be the title for the render window
@@ -141,8 +140,10 @@ public:
         }
     }
 
+    virtual void processEvents() = 0;
+
 protected:
-    virtual void updateThread();
+    virtual void updateModule() override;
 
 protected:
     std::vector<std::shared_ptr<DeviceControl>> m_controls; ///> Set of controls updated on the viewer thread

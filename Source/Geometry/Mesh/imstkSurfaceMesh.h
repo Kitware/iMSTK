@@ -177,7 +177,7 @@ public:
     std::shared_ptr<VecDataArray<int, 3>> getTriangleIndices() const { return m_triangleIndices; }
 
     ///
-    /// \brief Return connectivity of triangle
+    /// \brief Return connectivity of a triangle
     ///
     const Vec3i& getTriangleIndices(const int triangleNum) const;
     Vec3i& getTriangleIndices(const int triangleNum);
@@ -186,13 +186,6 @@ public:
     /// \brief Returns the number of triangles
     ///
     size_t getNumTriangles() const;
-
-    ///
-    /// \brief Set load factor
-    /// \param loadFactor the maximum number of vertices
-    /// a multiple of the original vertex count
-    ///
-    virtual void setLoadFactor(double loadFactor) override;
 
     ///
     /// \brief Get the maximum number of triangles

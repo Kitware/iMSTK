@@ -78,7 +78,7 @@ public:
 protected:
     friend class VTKCubeRenderDelegate;
 
-    void applyScaling(const double s) override;
+    void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 
     double m_width = 1.0;                      ///> Width of the cube

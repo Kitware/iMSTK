@@ -21,6 +21,7 @@
 
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkCylinder.h"
+#include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
 
 #include <vtkActor.h>

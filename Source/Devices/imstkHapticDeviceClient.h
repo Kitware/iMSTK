@@ -32,6 +32,7 @@ struct HDstate
     // \todo pos are redundant?
     HDdouble pos[3];
     HDdouble vel[3];
+    HDdouble angularVel[3];
     HDdouble trans[16];
     HDint buttons;
 };
@@ -49,6 +50,11 @@ friend class HapticDeviceManager;
 public:
     virtual ~HapticDeviceClient() {}
 
+    ///
+    /// \brief Use callback to get tracking data from phantom omni
+    ///
+    void update() override;
+
 protected:
     ///
     /// \brief Constructor/Destructor, only the DeviceManager can construct
@@ -60,11 +66,6 @@ protected:
     /// \brief Initialize the phantom omni device
     ///
     void initialize();
-
-    ///
-    /// \brief Use callback to get tracking data from phantom omni
-    ///
-    void update() override;
 
     ///
     /// \brief Disables the phantom omni device

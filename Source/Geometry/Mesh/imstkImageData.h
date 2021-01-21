@@ -126,7 +126,6 @@ public:
         return m_bounds;
     }
 
-    // Can't implement because of const
     void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double imstkNotUsed(paddingPercent)) override
     {
         const Vec6d& bounds = getBounds();

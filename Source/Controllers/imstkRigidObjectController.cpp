@@ -41,65 +41,106 @@ RigidObjectController::RigidObjectController(std::shared_ptr<RigidObject2> rigid
 }
 
 void
-RigidObjectController::updateControlledObjects()
+RigidObjectController::setControlledSceneObject(std::shared_ptr<SceneObject> obj)
+{
+    SceneObjectController::setControlledSceneObject(obj);
+    m_rigidObject = std::dynamic_pointer_cast<RigidObject2>(obj);
+}
+
+void
+RigidObjectController::update(const double dt)
 {
     if (!isTrackerUpToDate())
     {
-        if (!updateTrackingData())
+        if (!updateTrackingData(dt))
         {
-            LOG(WARNING) << "SceneObjectController::updateControlledObjects warning: could not update tracking info.";
+            LOG(WARNING) << "RigidObjectController::update warning: could not update tracking info.";
             return;
         }
     }
 
-    this->postEvent(Event(EventType::Modified));
-
-    // During initialization tracking may not be enabled for a time, in which case, freeze the thing
-    // or else extraneous forces may be applied towards uninitialized position (0, 0, 0) or gravity
-    // pull it down
-    if (!m_deviceClient->getTrackingEnabled())
+    if (m_rigidObject == nullptr)
     {
-        (*m_rigidObject->getRigidBody()->m_pos) = m_rigidObject->getRigidBody()->m_initPos;
-        (*m_rigidObject->getRigidBody()->m_orientation) = m_rigidObject->getRigidBody()->m_initOrientation;
         return;
     }
 
-    // Apply virtual coupling
-    const Vec3d currPos    = m_rigidObject->getRigidBody()->getPosition();
-    const Vec3d desiredPos = getPosition();
+    // Implementation based of otaduy lin's paper eq14
+    // "A Modular Haptic Rendering Algorithm for Stable and Transparent 6 - DOF Manipulation"
+    if (m_deviceClient->getTrackingEnabled() && m_useSpring)
     {
-        const Vec3d diff = desiredPos - currPos;
-        //const double length = diff.norm();
-        //const Vec3d  dir    = diff.normalized();
+        const Vec3d& currPos = m_rigidObject->getRigidBody()->getPosition();
+        const Quatd& currOrientation     = m_rigidObject->getRigidBody()->getOrientation();
+        const Vec3d& currVelocity        = m_rigidObject->getRigidBody()->getVelocity();
+        const Vec3d& currAngularVelocity = m_rigidObject->getRigidBody()->getAngularVelocity();
+        Vec3d&       currForce  = *m_rigidObject->getRigidBody()->m_force;
+        Vec3d&       currTorque = *m_rigidObject->getRigidBody()->m_torque;
 
-        const Vec3d fS = m_linearKs.cwiseProduct(diff);
-        const Vec3d fD = m_rigidObject->getRigidBody()->getVelocity() * -m_linearKd;
+        const Vec3d& devicePos = getPosition();
+        const Quatd& deviceOrientation = getRotation();
+        //const Vec3d& deviceVelocity        = getVelocity();
+        //const Vec3d& deviceAngularVelocity = getAngularVelocity();
+        const Vec3d& deviceOffset = Vec3d(0.0, 0.0, 0.0);
 
-        // Apply spring force and general damper
-        (*m_rigidObject->getRigidBody()->m_force) += (fS + fD);
+        // Uses non-relative force
+        {
+            // Compute linear force
+            fS = m_linearKs.cwiseProduct(devicePos - currPos - deviceOffset) + m_linearKd * (-currVelocity - currAngularVelocity.cross(deviceOffset));
+
+            //printf("Device velocity %f, %f, %f\n", deviceVelocity[0], deviceVelocity[1], deviceVelocity[2]);
+            const Quatd dq = deviceOrientation * currOrientation.inverse();
+            const Rotd  angleAxes = Rotd(dq);
+            tS = deviceOffset.cross(fS) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle()) + m_angularKd * -currAngularVelocity;
+
+            currForce  += fS;
+            currTorque += tS;
+        }
+        // Uses relative force
+        //{
+        //    // Compute force (?? Why does the spring use displacement, while damper uses velocity, these aren't relative, ie: fD could be larger than )
+        //    const Vec3d dx = devicePos - currPos - deviceOffset;
+        //    fS = m_linearKs.cwiseProduct(dx) + m_linearKd * (deviceVelocity - currVelocity - currAngularVelocity.cross(deviceOffset));
+
+        //    // Compute torque
+        //    const Quatd dq = deviceOrientation * currOrientation.inverse();
+        //    const Rotd angleAxes = Rotd(dq);
+        //    tS = deviceOffset.cross(fS) + m_angularKs.cwiseProduct(angleAxes.axis() * angleAxes.angle()); + m_angularKd * (deviceAngularVelocity - currAngularVelocity);
+
+        //    // Apply to body
+        //    currForce += fS;
+        //    //std::cout << "fS: " << fS[0] << ", " << fS[1] << ", " << fS[2] << std::endl;
+        //    currTorque += tS;
+        //}
+    }
+    else
+    {
+        // Zero out external force/torque
+        *m_rigidObject->getRigidBody()->m_force  = Vec3d(0.0, 0.0, 0.0);
+        *m_rigidObject->getRigidBody()->m_torque = Vec3d(0.0, 0.0, 0.0);
+        // Directly set position/rotation
+        (*m_rigidObject->getRigidBody()->m_pos) = getPosition();
+        (*m_rigidObject->getRigidBody()->m_orientation) = getRotation();
     }
 
-    const Quatd currOrientation    = m_rigidObject->getRigidBody()->getOrientation();
-    const Quatd desiredOrientation = getRotation();
-    {
-        // q gives the delta rotation that gets us from curr->desired
-        const Quatd dq = desiredOrientation * currOrientation.inverse();
-        // Get the rotation axes
-        Rotd angleAxes = Rotd(dq);
-        angleAxes.axis().normalize();
-
-        // Because the scale of the *magnitude* of the rotation done is controllable
-        // it doesn't matter if its exact, ksTheta can just be adjusted
-        (*m_rigidObject->getRigidBody()->m_torque) += (angleAxes.axis() * angleAxes.angle()).cwiseProduct(m_rotKs);
-    }
+    this->postEvent(Event(EventType::Modified));
 }
 
 void
 RigidObjectController::applyForces()
 {
-    // Apply force back to device
-    m_deviceClient->setForce(m_rigidObject->getRigidBody()->getForce());
-    //m_deviceClient->setTorque();
+    if (!m_deviceClient->getButton(0))
+    {
+        // Apply force back to device
+        if (m_rigidObject != nullptr && m_useSpring)
+        {
+            // Render only the spring force (not the other forces the body has)
+            const Vec3d force = fS * m_forceScaling;
+            m_deviceClient->setForce(-force);
+        }
+    }
+    else
+    {
+        m_deviceClient->setForce(Vec3d(0.0, 0.0, 0.0));
+    }
 }
 }
 }

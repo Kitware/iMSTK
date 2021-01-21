@@ -40,28 +40,28 @@ using ScalarType = unsigned char;
 #define IMSTK_LONG_LONG 11
 #define IMSTK_UNSIGNED_LONG_LONG 12
 
-#define IMSTK_CHAR_MAX std::numeric_limits<char>::max();
-#define IMSTK_CHAR_MIN std::numeric_limits<char>::min();
-#define IMSTK_UNSIGNED_CHAR_MAX std::numeric_limits<unsigned char>::max();
-#define IMSTK_UNSIGNED_CHAR_MIN std::numeric_limits<unsigned char>::min();
-#define IMSTK_SHORT_MAX std::numeric_limits<short>::max();
-#define IMSTK_SHORT_MIN std::numeric_limits<short>::min();
-#define IMSTK_UNSIGNED_SHORT_MAX std::numeric_limits<unsigned short>::max();
-#define IMSTK_UNSIGNED_SHORT_MIN std::numeric_limits<unsigned short>::min();
-#define IMSTK_INT_MAX std::numeric_limits<int>::max();
-#define IMSTK_INT_MIN std::numeric_limits<int>::min();
-#define IMSTK_UNSIGNED_INT_MAX std::numeric_limits<unsigned int>::max();
-#define IMSTK_UNSIGNED_INT_MIN std::numeric_limits<unsigned int>::min();
-#define IMSTK_LONG_MAX std::numeric_limits<long>::max();
-#define IMSTK_LONG_MIN std::numeric_limits<long>::min();
-#define IMSTK_UNSIGNED_LONG_MAX std::numeric_limits<unsigned long>::max();
-#define IMSTK_UNSIGNED_LONG_MIN std::numeric_limits<unsigned long>::min();
-#define IMSTK_FLOAT_MAX std::numeric_limits<float>::max();
-#define IMSTK_FLOAT_MIN std::numeric_limits<float>::min();
-#define IMSTK_DOUBLE_MAX std::numeric_limits<double>::max();
-#define IMSTK_DOUBLE_MIN std::numeric_limits<double>::min();
-#define IMSTK_LONG_LONG_MAX std::numeric_limits<long>::max();
-#define IMSTK_LONG_LONG_MIN std::numeric_limits<long>::min();
-#define IMSTK_UNSIGNED_LONG_LONG_MAX std::numeric_limits<unsigned long long>::max();
-#define IMSTK_UNSIGNED_LONG_LONG_MIN std::numeric_limits<unsigned long long>::min();
+#define IMSTK_CHAR_MAX std::numeric_limits<char>::max()
+#define IMSTK_CHAR_MIN std::numeric_limits<char>::min()
+#define IMSTK_UNSIGNED_CHAR_MAX std::numeric_limits<unsigned char>::max()
+#define IMSTK_UNSIGNED_CHAR_MIN std::numeric_limits<unsigned char>::min()
+#define IMSTK_SHORT_MAX std::numeric_limits<short>::max()
+#define IMSTK_SHORT_MIN std::numeric_limits<short>::min()
+#define IMSTK_UNSIGNED_SHORT_MAX std::numeric_limits<unsigned short>::max()
+#define IMSTK_UNSIGNED_SHORT_MIN std::numeric_limits<unsigned short>::min()
+#define IMSTK_INT_MAX std::numeric_limits<int>::max()
+#define IMSTK_INT_MIN std::numeric_limits<int>::min()
+#define IMSTK_UNSIGNED_INT_MAX std::numeric_limits<unsigned int>::max()
+#define IMSTK_UNSIGNED_INT_MIN std::numeric_limits<unsigned int>::min()
+#define IMSTK_LONG_MAX std::numeric_limits<long>::max()
+#define IMSTK_LONG_MIN std::numeric_limits<long>::min()
+#define IMSTK_UNSIGNED_LONG_MAX std::numeric_limits<unsigned long>::max()
+#define IMSTK_UNSIGNED_LONG_MIN std::numeric_limits<unsigned long>::min()
+#define IMSTK_FLOAT_MAX std::numeric_limits<float>::max()
+#define IMSTK_FLOAT_MIN std::numeric_limits<float>::min()
+#define IMSTK_DOUBLE_MAX std::numeric_limits<double>::max()
+#define IMSTK_DOUBLE_MIN std::numeric_limits<double>::min()
+#define IMSTK_LONG_LONG_MAX std::numeric_limits<long>::max()
+#define IMSTK_LONG_LONG_MIN std::numeric_limits<long>::min()
+#define IMSTK_UNSIGNED_LONG_LONG_MAX std::numeric_limits<unsigned long long>::max()
+#define IMSTK_UNSIGNED_LONG_LONG_MIN std::numeric_limits<unsigned long long>::min()
 }

@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0.txt
+	  http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -23,6 +23,7 @@
 
 #include "imstkCollisionHandling.h"
 
+#include <unordered_set>
 #include <vector>
 
 namespace imstk
@@ -50,7 +51,7 @@ public:
 
     LevelSetCH() = delete;
 
-    virtual ~LevelSetCH() override = default;
+    virtual ~LevelSetCH() override;
 
 public:
     ///
@@ -59,23 +60,49 @@ public:
     void processCollisionData() override;
 
     ///
+    /// \brief Adds point to the mask allowing it to apply an impulse
+    ///
+    void addPoint(int id) { m_ptIdMask.insert(id); }
+
+    ///
+    /// \brief Allow all points to effect the levelset
+    ///
+    void maskAllPoints();
+
+    ///
+    /// \brief Unmask all points
+    ///
+    void unmaskAllPoints() { m_ptIdMask.clear(); }
+
+    ///
     /// \brief Set/Get Scale of the velocity used for the levelset, default 0.1
     ///
     double getLevelSetVelocityScaling() const { return m_velocityScaling; }
     void setLevelSetVelocityScaling(const double velocityScaling) { m_velocityScaling = velocityScaling; }
 
-///
-/// \brief Set/Get whether the velocity used on the levelset should be proportional to the force of the rigid body
-/// along the normal of the levelset
-///
-/* void setUseProportionalVelocity(const bool useProportionalForce) { m_useProportionalForce = useProportionalForce; }
-    bool getUseProportionalVelocity() const { return m_useProportionalForce; }*/
+    ///
+    /// \brief Set/Get whether the velocity used on the levelset should be proportional to the force of the rigid body
+    /// along the normal of the levelset
+    ///
+    void setUseProportionalVelocity(const bool useProportionalForce) { m_useProportionalForce = useProportionalForce; }
+    bool getUseProportionalVelocity() const { return m_useProportionalForce; }
+
+    ///
+    /// \brief Set/Get the size + sigma of gaussian kernel used to apply impulse in levelset
+    ///
+    void setKernel(const int size, const double sigma = 1.0);
+    int getKernelSize() const { return m_kernelSize; }
+    double getKernelSigma() const { return m_kernelSigma; }
 
 private:
     std::shared_ptr<LevelSetDeformableObject> m_lvlSetObj = nullptr;
     std::shared_ptr<RigidObject2> m_rigidObj = nullptr;
-    double m_velocityScaling = 0.002;
-    //bool m_useProportionalForce = false;
+    std::unordered_set<int>       m_ptIdMask;
+    double  m_velocityScaling      = 0.1;
+    bool    m_useProportionalForce = false;
+    int     m_kernelSize    = 3;
+    double  m_kernelSigma   = 1.0;
+    double* m_kernelWeights = nullptr;
 };
 }
 }

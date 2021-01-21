@@ -20,6 +20,7 @@ limitations under the License.
 =========================================================================*/
 
 #include "imstkSPHBoundaryConditions.h"
+
 #include <numeric>
 
 namespace imstk
@@ -27,12 +28,14 @@ namespace imstk
 SPHBoundaryConditions::SPHBoundaryConditions(std::pair<Vec3d, Vec3d>& inletCoords, std::vector<std::pair<Vec3d, Vec3d>>& outletCoords, std::pair<Vec3d, Vec3d>& fluidCoords,
                                              const Vec3d& inletNormal, const StdVectorOfVec3d& outletNormals, const Real inletRadius, const Vec3d& inletCenterPt, const double inletFlowRate,
                                              StdVectorOfVec3d& mainParticlePositions, const StdVectorOfVec3d& wallParticlePositions) :
-    m_inletDomain(inletCoords), m_outletDomain(outletCoords), m_fluidDomain(fluidCoords), m_inletRadius(inletRadius), m_inletCenterPoint(inletCenterPt)
+    m_inletDomain(inletCoords), m_outletDomain(outletCoords),
+    m_fluidDomain(fluidCoords),
+    m_bufferCoord(Vec3d(100, 0, 0)),
+    m_inletCenterPoint(inletCenterPt),
+    m_inletRadius(inletRadius),
+    m_inletNormal(inletNormal.normalized()),
+    m_inletCrossSectionalArea(PI * m_inletRadius * m_inletRadius)
 {
-    m_bufferCoord = Vec3d(100, 0, 0);
-    m_inletCrossSectionalArea = PI * m_inletRadius * m_inletRadius;
-    m_inletNormal = inletNormal.normalized();
-
     setInletVelocity(inletFlowRate);
     setParticleTypes(mainParticlePositions, wallParticlePositions.size());
 

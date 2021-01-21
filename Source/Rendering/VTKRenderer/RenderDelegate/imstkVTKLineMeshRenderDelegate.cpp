@@ -91,9 +91,9 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<VisualModel
         actor->SetUserTransform(m_transform);
         m_mapper = mapper;
         m_actor  = actor;
-        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
         {
-            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+            glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
         }
     }
 

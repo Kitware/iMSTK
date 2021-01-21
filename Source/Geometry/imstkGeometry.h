@@ -27,6 +27,9 @@
 
 #include <tbb/concurrent_unordered_set.h>
 
+#include <unordered_map>
+#include <string>
+
 namespace imstk
 {
 namespace ParallelUtils
@@ -61,7 +64,8 @@ public:
         RenderParticles,
         ImageData,
         SignedDistanceField,
-        CompositeImplicitGeometry
+        CompositeImplicitGeometry,
+        MultiBlockGeometry
     };
 
     ///
@@ -96,6 +100,7 @@ public:
     ///
     virtual ~Geometry() override = default;
 
+public:
     ///
     /// \brief Print
     ///
@@ -138,32 +143,34 @@ public:
     ///
     /// \brief Scale in Cartesian directions
     ///
-    void scale(double scaling, TransformType type = TransformType::ConcatenateToTransform);
+    void scale(const Vec3d& scaling, TransformType type = TransformType::ConcatenateToTransform);
+    void scale(const double scaling, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Applies a rigid transform to the geometry
     ///
-    void transform(RigidTransform3d T, TransformType type = TransformType::ConcatenateToTransform);
+    void transform(const Mat4d& T, TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Get/Set translation
     ///
     Vec3d getTranslation() const;
-    void setTranslation(const Vec3d t);
-    void setTranslation(double x, double y, double z);
+    void setTranslation(const Vec3d& t);
+    void setTranslation(const double x, const double y, const double z);
 
     ///
     /// \brief Get/Set rotation
     ///
     Mat3d getRotation() const;
-    void setRotation(const Mat3d m);
-    void setRotation(const Quatd q);
-    void setRotation(const Vec3d axis, const double angle);
+    void setRotation(const Mat3d& m);
+    void setRotation(const Quatd& q);
+    void setRotation(const Vec3d& axis, const double angle);
 
     ///
     /// \brief Get/Set scaling
     ///
-    double getScaling() const { return m_scaling; }
+    Vec3d getScaling() const;
+    void setScaling(const Vec3d& s);
     void setScaling(const double s);
 
     ///
@@ -199,7 +206,10 @@ public:
     ///
     /// \brief Post modified event
     ///
-    void modified() { this->postEvent(Event(EventType::Modified)); }
+    void modified()
+    {
+        this->postEvent(Event(EventType::Modified));
+    }
 
     virtual void updatePostTransformData() const { }
 
@@ -223,20 +233,17 @@ protected:
     friend class VulkanRenderDelegate;
     friend class VulkanRenderer;
 
-    virtual void applyTranslation(const Vec3d imstkNotUsed(t)) { }
-    virtual void applyRotation(const Mat3d imstkNotUsed(r)) { }
-    virtual void applyScaling(const double imstkNotUsed(s)) { }
+    ///
+    /// \brief Directly apply transform to data
+    ///
+    virtual void applyTransform(const Mat4d& imstkNotUsed(m)) { }
 
-    Type m_type;                 ///> Type of geometry
-    std::string m_name;          ///> Unique name for each geometry
-    uint32_t    m_geometryIndex; ///> Unique ID assigned to each geometry upon construction
+    Type m_type;                            ///> Type of geometry
+    std::string m_name;                     ///> Unique name for each geometry
+    uint32_t    m_geometryIndex;            ///> Unique ID assigned to each geometry upon construction
 
-    bool m_transformModified = false;
-    mutable bool m_transformApplied = true;
+    mutable bool m_transformApplied = true; // Internally used for lazy evaluation
 
-    RigidTransform3d m_transform; ///> Transformation matrix
-    double m_scaling = 1.0;
-
-    bool m_dataModified = true;
+    Mat4d m_transform;                      ///> Transformation matrix
 };
 } //imstk

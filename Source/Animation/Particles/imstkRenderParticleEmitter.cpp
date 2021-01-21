@@ -30,7 +30,7 @@ RenderParticleEmitter::RenderParticleEmitter(std::shared_ptr<Geometry>   geometr
                                              const float                 time /*= 3000*/,
                                              RenderParticleEmitter::Mode mode /*= Mode::CONTINUOUS*/)
     : AnimationModel(geometry),
-    m_stopWatch(std::make_unique<StopWatch>()), m_time(time), m_emitTime(m_time), m_mode(mode)
+    m_mode(mode), m_time(time), m_emitTime(m_time), m_stopWatch(std::make_unique<StopWatch>())
 {
     this->setGeometry(geometry);
 
@@ -95,7 +95,7 @@ RenderParticleEmitter::setInitialVelocityRange(const Vec3f minDirection,
 bool
 RenderParticleEmitter::addKeyFrame(RenderParticleKeyFrame keyFrame)
 {
-    if (m_keyFrames.size() >= c_maxNumKeyFrames)
+    if (static_cast<int>(m_keyFrames.size()) >= c_maxNumKeyFrames)
     {
         return false;
     }
@@ -107,9 +107,9 @@ RenderParticleEmitter::addKeyFrame(RenderParticleKeyFrame keyFrame)
 RenderParticleKeyFrame*
 RenderParticleEmitter::getStartKeyFrame()
 {
-    unsigned int index = 0;
+    size_t index = 0;
 
-    for (unsigned int i = 0; i < m_keyFrames.size(); i++)
+    for (size_t i = 0; i < m_keyFrames.size(); i++)
     {
         if (m_keyFrames[i].m_time < m_keyFrames[index].m_time)
         {
@@ -123,9 +123,9 @@ RenderParticleEmitter::getStartKeyFrame()
 RenderParticleKeyFrame*
 RenderParticleEmitter::getEndKeyFrame()
 {
-    unsigned int index = 0;
+    size_t index = 0;
 
-    for (unsigned int i = 0; i < m_keyFrames.size(); i++)
+    for (size_t i = 0; i < m_keyFrames.size(); i++)
     {
         if (m_keyFrames[i].m_time > m_keyFrames[index].m_time)
         {
@@ -199,7 +199,7 @@ RenderParticleEmitter::update()
         }
 
         // Search for nearest keyframe
-        for (unsigned int i = 0; i < m_keyFrames.size(); i++)
+        for (size_t i = 0; i < m_keyFrames.size(); i++)
         {
             auto keyFrame = &m_keyFrames[i];
             if (particle->m_age >= keyFrame->m_time

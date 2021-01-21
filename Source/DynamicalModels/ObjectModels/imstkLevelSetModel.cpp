@@ -73,7 +73,7 @@ LevelSetModel::initialize()
     }
     m_forwardGrad.setFunction(m_mesh);
     m_backwardGrad.setFunction(m_mesh);
-    //m_curvature.setFunction(m_mesh);
+    m_curvature.setFunction(m_mesh);
 
     // If dense update, we need a gradient image, which will store forward and backward gradient magnitudes
     if (m_mesh->getType() == Geometry::Type::SignedDistanceField && !m_config->m_sparseUpdate)
@@ -95,7 +95,7 @@ LevelSetModel::initialize()
     m_backwardGrad.setDx(Vec3i(1, 1, 1), std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
     /*forwardGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
     backwardGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());*/
-    //m_curvature.setDx(Vec3i(1, 1, 1), std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
+    m_curvature.setDx(Vec3i(1, 1, 1), std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
 
     return true;
 }
@@ -118,7 +118,7 @@ LevelSetModel::evolveDistanceField()
     //const Vec3d& spacing   = imageData->getSpacing();
     //const Vec3d& origin    = imageData->getOrigin();
     const double dt = m_config->m_dt;
-    const double k  = m_config->m_k;
+    //const double k  = m_config->m_k;
 
     if (m_config->m_sparseUpdate)
     {

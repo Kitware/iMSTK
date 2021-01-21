@@ -31,7 +31,6 @@ namespace imstk
 ///
 /// \brief Base class for all DeviceControls that track
 /// something in space (position and orientation)
-/// ?? rename with 'spacial' in it?
 ///
 class TrackingDeviceControl : public DeviceControl
 {
@@ -46,18 +45,14 @@ public:
         rotZ = 0x20
     };
 
-public:
+protected:
     TrackingDeviceControl();
     TrackingDeviceControl(std::shared_ptr<DeviceClient> device);
+
+public:
     virtual ~TrackingDeviceControl() override = default;
 
 public:
-    ///
-    /// \brief Update controlled scene objects using latest tracking information
-    /// \todo get rid of updateControlledObjects? replace with update (from DeviceControl)
-    ///
-    virtual void updateControlledObjects() {}
-
     ///
     /// \brief Apply forces to the haptic device
     ///
@@ -87,12 +82,38 @@ public:
     ///
     /// \brief Get the latest rotation
     ///
-    const Quatd& getRotation() const { return m_currentRot; };
+    const Quatd& getRotation() const { return m_currentOrientation; };
 
     ///
     /// \brief Set the orientation of the tracker
     ///
-    void setRotation(const Quatd& orientation) { this->m_currentRot = orientation; }
+    void setRotation(const Quatd& orientation) { this->m_currentOrientation = orientation; }
+
+    ///
+    /// \brief Set/Get whether to compute the velocity from previous and current samples
+    /// Useful if a device does not provide the quantity
+    ///
+    void setComputeVelocity(const bool computeVelocity) { m_computeVelocity = computeVelocity; }
+    bool getComputeVelocity() const { return m_computeVelocity; }
+
+    ///
+    /// \brief Set/Get whether to compute the anular velocity from previous and current samples
+    /// Useful if the device does not provide the quantity
+    ///
+    void setComputeAngularVelocity(const bool computeAngularVelocity) { m_computeAngularVelocity = computeAngularVelocity; }
+    bool getComputeAngularVelocity() const { return m_computeAngularVelocity; }
+
+    ///
+    /// \brief Get/Set the angular velocity
+    ///
+    const Vec3d& getAngularVelocity() const { return m_currentAngularVelocity; }
+    void setAngularVelocity(const Vec3d& angularVelocity) { m_currentAngularVelocity = angularVelocity; }
+
+    ///
+    /// \brief Get/Set the linear velocity
+    ///
+    const Vec3d& getVelocity() const { return m_currentVelocity; }
+    void setVelocity(const Vec3d& velocity) { m_currentVelocity = velocity; }
 
     ///
     /// \brief Get/Set the current scaling factor
@@ -119,9 +140,9 @@ public:
     void setInversionFlags(const unsigned char f);
 
     ///
-    /// \brief Compute the world position and orientation
+    /// \brief Update tracking data
     ///
-    bool updateTrackingData();
+    virtual bool updateTrackingData(const double dt);
 
 protected:
     double m_scaling = 1.0;                                ///< Scaling factor for physical to virtual translations
@@ -130,7 +151,17 @@ protected:
     unsigned char m_invertFlags = 0x00;                    ///< Invert flags to be masked with DeviceTracker::InvertFlag
 
     Vec3d m_currentPos;
-    Quatd m_currentRot;
-    bool  m_trackingDataUptoDate = false;
+    Quatd m_currentOrientation;
+    Vec3d m_currentVelocity;
+    Vec3d m_currentAngularVelocity;
+
+    Vec3d m_currentDisplacement;
+    Quatd m_currentRotation;
+
+    bool m_trackingDataUptoDate = false;
+    // If on, will use current and previous positions to produce velocity, if off, will ask device for velocity
+    bool m_computeVelocity = false;
+    // If on, will use current and previous rotations to produce angular velocity, if off, will ask device for angular velocity
+    bool m_computeAngularVelocity = false;
 };
 } // imstk

@@ -21,6 +21,7 @@
 
 #include "imstkVTKdebugTrianglesRenderDelegate.h"
 #include "imstkDebugRenderGeometry.h"
+#include "imstkTypes.h"
 #include "imstkVisualModel.h"
 
 #include <thread>
@@ -59,9 +60,9 @@ VTKdbgTrianglesRenderDelegate::VTKdbgTrianglesRenderDelegate(std::shared_ptr<Vis
         //actor->SetUserTransform(m_transform);
         m_mapper = mapper;
         m_actor  = actor;
-        if (auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
+        if (auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
         {
-            mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+            glMapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
         }
     }
 
@@ -75,9 +76,8 @@ VTKdbgTrianglesRenderDelegate::processEvents()
 
     if (dbgTriangles->isModified())
     {
-        dbgTriangles->setDataModified(false);
         m_paddedVertexArray->SetArray(dbgTriangles->getVertexBufferPtr(),
-                                      dbgTriangles->getNumVertices() * 3, 1);
+            dbgTriangles->getNumVertices() * 3, 1);
 
         // Set point data
         m_points->SetNumberOfPoints(dbgTriangles->getNumVertices());

@@ -189,12 +189,15 @@ RigidBodyModel2::computeTentativeVelocities()
 void
 RigidBodyModel2::solveConstraints()
 {
+    // Clear
+    F = Eigen::VectorXd();
+
     // Solves the current constraints of the system, then discards them
     if (m_constraints.size() == 0)
     {
         return;
     }
-    if (m_config->m_maxNumConstraints != -1 && m_constraints.size() > m_config->m_maxNumConstraints * 2)
+    if (m_config->m_maxNumConstraints != -1 && static_cast<int>(m_constraints.size()) > m_config->m_maxNumConstraints * 2)
     {
         m_constraints.resize(m_config->m_maxNumConstraints * 2);
     }
@@ -305,21 +308,21 @@ RigidBodyModel2::solveConstraints()
     Eigen::SparseMatrix<double> A  = J * m_Minv * J.transpose();
     Eigen::VectorXd             b  = Vu / dt - J * (V / dt + m_Minv * Fext);
 
-    /* std::cout << "Minv: " << std::endl << m_Minv.toDense() << std::endl;
-     std::cout << "J: " << std::endl << J.toDense() << std::endl;
-     std::cout << "A: " << std::endl << A.toDense() << std::endl;
-     std::cout << std::endl;
-     std::cout << "Vu: " << std::endl << Vu << std::endl;
-     std::cout << "V: " << std::endl << V << std::endl;
-     std::cout << "b: " << std::endl << b << std::endl;*/
+    /*std::cout << "Minv: " << std::endl << m_Minv.toDense() << std::endl;
+    std::cout << "J: " << std::endl << J.toDense() << std::endl;
+    std::cout << "A: " << std::endl << A.toDense() << std::endl;
+    std::cout << std::endl;
+    std::cout << "Vu: " << std::endl << Vu << std::endl;
+    std::cout << "V: " << std::endl << V << std::endl;
+    std::cout << "b: " << std::endl << b << std::endl;*/
 
     m_pgsSolver->setA(&A);
     //pgsSolver.setGuess(F); // Not using warm starting
     m_pgsSolver->setMaxIterations(m_config->m_maxNumIterations);
     m_pgsSolver->setEpsilon(m_config->m_epsilon);
-    Eigen::VectorXd F = J.transpose() * m_pgsSolver->solve(b, cu); // Reaction force,torque
+    F = J.transpose() * m_pgsSolver->solve(b, cu); // Reaction force,torque
 
-    // Apply back
+    // Apply reaction impulse
     j = 0;
     for (size_t i = 0; i < state->size(); i++, j += 6)
     {
@@ -380,7 +383,7 @@ RigidBodyModel2::integrate()
                 }
 
                 // Reset
-                //m_bodies[i]->m_prevForce = forces[i];
+                m_bodies[i]->m_prevForce = forces[i];
                 forces[i]  = Vec3d(0.0, 0.0, 0.0);
                 torques[i] = Vec3d(0.0, 0.0, 0.0);
                 tentativeVelocities[i] = velocities[i];

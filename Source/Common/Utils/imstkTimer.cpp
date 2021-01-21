@@ -106,7 +106,7 @@ void
 StopWatch::printLapTimes()
 {
     LOG(INFO) << "Lap times:";
-    for (int i = 0; i < this->lapTimes.size(); ++i)
+    for (size_t i = 0; i < this->lapTimes.size(); ++i)
     {
         LOG(INFO) << "\t" << this->lapNames.at(i) << ": " << this->lapTimes.at(i) << "ms";
     }

@@ -56,9 +56,9 @@ AnalyticalGeometry::setPosition(const Vec3d p)
         return;
     }
 
-    m_position         = p;
-    m_dataModified     = true;
+    m_position = p;
     m_transformApplied = false;
+    this->postEvent(Event(EventType::Modified));
 }
 
 void
@@ -92,27 +92,22 @@ AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
         return;
     }
     m_orientationAxis  = orientation.normalized();
-    m_dataModified     = true;
     m_transformApplied = false;
+    this->postEvent(Event(EventType::Modified));
 }
 
 void
-AnalyticalGeometry::applyTranslation(const Vec3d t)
+AnalyticalGeometry::applyTransform(const Mat4d& m)
 {
-    this->setPosition(m_position + t);
-}
-
-void
-AnalyticalGeometry::applyRotation(const Mat3d r)
-{
-    this->setOrientationAxis(r * m_orientationAxis);
+    this->setPosition((m * Vec4d(m_position[0], m_position[1], m_position[2], 1.0)).head<3>());
+    this->setOrientationAxis((m * Vec4d(m_orientationAxis[0], m_orientationAxis[1], m_orientationAxis[2], 0.0)).head<3>());
 }
 
 void
 AnalyticalGeometry::updatePostTransformData() const
 {
-    m_orientationAxisPostTransform = m_transform.rotation() * m_orientationAxis;
+    m_orientationAxisPostTransform = (m_transform * Vec4d(m_orientationAxis[0], m_orientationAxis[1], m_orientationAxis[2], 0.0)).head<3>();
     m_orientationAxisPostTransform.normalize();
-    m_positionPostTransform = m_position + m_transform.translation();
+    m_positionPostTransform = (m_transform * Vec4d(m_position[0], m_position[1], m_position[2], 1.0)).head<3>();
 }
 } // imstk

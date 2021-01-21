@@ -24,10 +24,14 @@
 #include "imstkGeometry.h"
 #include "imstkMath.h"
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4201 )
+#endif
 #include <glm/glm.hpp>
+#ifdef WIN32
 #pragma warning( pop )
+#endif
 
 namespace imstk
 {
@@ -102,7 +106,6 @@ public:
 
 protected:
     friend class VulkanParticleRenderDelegate;
-    friend class RenderParticles;
 
     unsigned int m_numParticles    = 0;
     unsigned int m_maxNumParticles = 128; ///< Maximum particles
@@ -115,9 +118,7 @@ protected:
     glm::vec2  m_vertexUVs[4];
     glm::ivec3 m_triangles[2];
 
-    void applyTranslation(const Vec3d t) override;
-    void applyRotation(const Mat3d r) override;
-    void applyScaling(const double s) override;
+    void applyTransform(const Mat4d& m) override;
 
     virtual void updatePostTransformData() const override {}
 };

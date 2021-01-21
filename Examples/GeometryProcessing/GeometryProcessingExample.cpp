@@ -31,6 +31,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshDistanceTransform.h"
 #include "imstkSurfaceMeshFlyingEdges.h"
@@ -123,9 +124,11 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
 
-        viewer->start();
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+        driver->start();
     }
 
     return 0;

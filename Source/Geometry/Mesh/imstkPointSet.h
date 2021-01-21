@@ -34,13 +34,11 @@ template<typename T, int N> class VecDataArray;
 /// \class PointSet
 ///
 /// \brief Base class for all geometries represented by discrete points and elements
+/// The pointsets follow a pipeline:
 ///
 class PointSet : public Geometry
 {
 public:
-    ///
-    /// \brief Protected constructor
-    ///
     PointSet(const Type type = Geometry::Type::PointSet, const std::string& name = std::string(""));
 
     ///
@@ -78,7 +76,6 @@ public:
     ///
     /// \brief Returns the initial position of a vertex given its index
     ///
-    const Vec3d& getInitialVertexPosition(const size_t vertNum) const;
     Vec3d& getInitialVertexPosition(const size_t vertNum);
 
     ///
@@ -108,27 +105,16 @@ public:
     size_t getNumVertices() const;
 
     ///
-    /// \brief Set the topologyChanged flag
-    ///
-    void setTopologyChangedFlag(const bool flag) { m_topologyChanged = flag; }
-    bool getTopologyChangedFlag() const { return m_topologyChanged; }
-
-    ///
     /// \brief Set load factor
     /// \param loadFactor the maximum number of vertices; a multiple of the original vertex count
     ///
-    virtual void setLoadFactor(double loadFactor);
+    virtual void setLoadFactor(const double loadFactor);
     virtual double getLoadFactor() const { return m_loadFactor; }
 
     ///
     /// \brief Get the maximum number of vertices
     ///
     size_t getMaxNumVertices() const { return m_maxNumVertices; }
-
-    ///
-    /// \brief Set the name of the geometry
-    ///
-    void setName(std::string name) { m_name = name; }
 
 public:
     ///
@@ -188,14 +174,19 @@ public:
     std::string getActiveVertexTCoords() const { return m_activeVertexTCoords; }
     std::shared_ptr<VecDataArray<float, 2>> getVertexTCoords() const;
 
+    ///
+    /// \brief Applies the geometries member transform to produce currPositions
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     friend class VTKPointSetRenderDelegate;
     friend class VTKFluidRenderDelegate;
 
-    void applyTranslation(const Vec3d t) override;
-    void applyRotation(const Mat3d r) override;
-    void applyScaling(const double s) override;
-    void updatePostTransformData() const override;
+    ///
+    /// \brief Applies transformation m directly the initial and post transform data
+    ///
+    void applyTransform(const Mat4d& m) override;
 
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
     std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;
@@ -206,7 +197,6 @@ protected:
     std::string m_activeVertexTangents = "";
     std::string m_activeVertexTCoords  = "";
 
-    bool   m_topologyChanged     = false;
     double m_loadFactor          = 2.0;
     size_t m_maxNumVertices      = 0;
     size_t m_originalNumVertices = 0;

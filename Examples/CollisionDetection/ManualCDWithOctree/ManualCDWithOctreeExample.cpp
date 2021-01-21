@@ -32,8 +32,8 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkTimer.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKRenderDelegate.h"
 #include "imstkVTKRenderer.h"
@@ -45,7 +45,7 @@ using namespace imstk;
 #define NUM_MESHES 5u
 
 // Uncomment this to render octree
- #define DEBUG_RENDER_OCTREE
+#define DEBUG_RENDER_OCTREE
 
 // Load pre-computed mesh data (vertex positions and triangle faces)
 std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDataArray<int, 3>>> getTriangle();
@@ -203,7 +203,7 @@ main()
 
     imstkNew<Scene> scene("Collision Test");
 
-    // Setup a viewer to render in its own thread
+    // Setup a viewer to render
     imstkNew<VTKViewer> viewer("Viewer");
     viewer->setActiveScene(scene);
     viewer->setWindowTitle("Collision Test");
@@ -468,11 +468,15 @@ main()
 
     // Run the simulation
     {
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->pause();
         connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -482,7 +486,7 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
 
             // Add an extra control
@@ -499,9 +503,7 @@ main()
                 });
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

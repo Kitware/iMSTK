@@ -19,37 +19,25 @@
 
 =========================================================================*/
 
-#pragma once
-
-#include "imstkLoopThreadObject.h"
+#include "imstkModuleDriver.h"
+#include "imstkModule.h"
 
 namespace imstk
 {
-class KeyboardDeviceClient;
-
-///
-/// \class ConsoleThread
-///
-/// \brief The console thread can run separately or in
-/// sync to provide keyboard events from the console
-/// they should be handled on another thread
-///
-class ConsoleThread : public LoopThreadObject
+void
+ModuleDriver::waitForInit()
 {
-public:
-    ConsoleThread(std::string name = "ConsoleThread");
-    ~ConsoleThread() override      = default;
-
-public:
-    std::shared_ptr<KeyboardDeviceClient> getKeyboardDevice() const { return m_keyboardDeviceClient; }
-
-protected:
-    ///
-    /// \brief Awaits input
-    ///
-    void updateThread() override;
-
-protected:
-    std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;
-};
+    bool oneModuleIsNotInitYet = true;
+    while (oneModuleIsNotInitYet)
+    {
+        oneModuleIsNotInitYet = false;
+        for (auto module : m_modules)
+        {
+            if (!module->getInit())
+            {
+                oneModuleIsNotInitYet = true;
+            }
+        }
+    }
+}
 }

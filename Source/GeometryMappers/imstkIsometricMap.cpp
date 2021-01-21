@@ -46,7 +46,7 @@ IsometricMap::apply()
     m_slave->setRotation(m_master->getRotation());
 
     // Apply the offset transform
-    m_slave->transform(m_rigidTransform);
+    m_slave->transform(m_rigidTransform.matrix());
 }
 
 void

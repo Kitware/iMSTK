@@ -91,11 +91,15 @@ TetraToTetraCD::findCollisionsForMeshWithinHashTable(const std::shared_ptr<Tetra
                             && bCoord[2] >= -eps
                             && bCoord[3] >= -eps)
                         {
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4189 )
+#endif
                             auto coordSum = bCoord[0] + bCoord[1] + bCoord[2] + bCoord[3];
                             assert(coordSum <= 1.0 + eps2 && coordSum >= 1.0 - eps2);
+#ifdef WIN32
 #pragma warning( pop )
+#endif
                             m_colData->PTColData.safeAppend({ cType, static_cast<uint32_t>(vId), static_cast<uint32_t>(tId), bCoord });
                         }
                     } //if not this tetrahedron

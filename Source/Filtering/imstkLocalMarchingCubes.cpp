@@ -380,8 +380,9 @@ void
 LocalMarchingCubes::setModified(const Vec3i& coord)
 {
     std::shared_ptr<ImageData> image      = std::dynamic_pointer_cast<ImageData>(getInput(0));
-    const size_t               voxelIndex = image->getScalarIndex(coord);
-    m_modifiedVoxels.push_back(std::pair<int, Vec3i>(static_cast<int>(voxelIndex), coord));
+    const int                  voxelIndex = static_cast<int>(image->getScalarIndex(coord));
+    m_modifiedVoxels[voxelIndex] = coord;
+    //m_modifiedVoxels.push_back(std::pair<int, Vec3i>(static_cast<int>(voxelIndex), coord));
 }
 
 void
@@ -609,10 +610,10 @@ LocalMarchingCubes::requestUpdate()
         return;
     }
 
-    const Vec3d& spacing = imageData->getSpacing();
-    const Vec3d& origin  = imageData->getOrigin();
-    const Vec3d  shift   = origin + spacing * 0.5;
-    const Vec3i& dims    = imageData->getDimensions();
+    //const Vec3d& spacing = imageData->getSpacing();
+    //const Vec3d& origin  = imageData->getOrigin();
+    //const Vec3d  shift   = origin + spacing * 0.5;
+    const Vec3i& dims = imageData->getDimensions();
 
     // The dimensions must be divisible by number of subdivisions
     // Increasingly adjust until divisible
@@ -699,7 +700,7 @@ LocalMarchingCubes::requestUpdate()
         {
             for (auto modifiedBlock : modifiedBlocks)
             {
-                const int    blockIndex = modifiedBlock.first;
+                //const int    blockIndex = modifiedBlock.first;
                 const Vec3i& blockCoord = modifiedBlock.second;
 
                 // Compute the chunk

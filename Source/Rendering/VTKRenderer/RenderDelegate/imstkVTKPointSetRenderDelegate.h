@@ -23,6 +23,7 @@
 
 #include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkDataArray;
 class vtkDoubleArray;
 class vtkPolyData;
 

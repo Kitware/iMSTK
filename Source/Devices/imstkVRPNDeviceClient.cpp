@@ -24,10 +24,10 @@
 
 namespace imstk
 {
-void
-VRPNDeviceClient::initThread()
+bool
+VRPNDeviceClient::initModule()
 {
-    auto fullDeviceIp = this->getName().c_str();
+    const char* fullDeviceIp = (getDeviceName() + "@" + m_ip).c_str();
 
     m_vrpnTracker     = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp);
     m_vrpnAnalog      = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
@@ -43,10 +43,11 @@ VRPNDeviceClient::initThread()
     m_vrpnForceDevice->setFF_Origin(0, 0, 0);
     m_vrpnForceDevice->setFF_Jacobian(0, 0, 0, 0, 0, 0, 0, 0, 0);
     m_vrpnForceDevice->setFF_Radius(2);
+    return true;
 }
 
 void
-VRPNDeviceClient::updateThread()
+VRPNDeviceClient::updateModule()
 {
     if (this->getTrackingEnabled())
     {
@@ -69,7 +70,7 @@ VRPNDeviceClient::updateThread()
 }
 
 void
-VRPNDeviceClient::stopThread()
+VRPNDeviceClient::uninitModule()
 {
     m_vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
     m_vrpnTracker->unregister_change_handler(this, velocityChangeHandler);

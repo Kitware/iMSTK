@@ -23,8 +23,10 @@
 
 #include "imstkMath.h"
 
+#ifdef WIN32
 #pragma warning( push )
 #pragma warning( disable : 4505 ) // Warning C4505 will vanish upon calls to the following functions
+#endif
 namespace imstk
 {
 namespace plotterutils
@@ -51,5 +53,6 @@ void writePlotterVectorMatPlotlib(Vectord& x, const char* fileName);
 void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName);
 } // plotters
 } // imstk
-
+#ifdef WIN32
 #pragma warning( pop )
+#endif

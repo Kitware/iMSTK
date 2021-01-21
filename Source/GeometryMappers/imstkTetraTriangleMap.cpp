@@ -118,6 +118,8 @@ TetraTriangleMap::apply()
                                  tetMesh->getVertexPosition(tetVerts[2]) * weights[2] +
                                  tetMesh->getVertexPosition(tetVerts[3]) * weights[3];
         });
+
+    triMesh->modified();
 }
 
 void

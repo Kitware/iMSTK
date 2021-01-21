@@ -19,40 +19,29 @@
 
 =========================================================================*/
 
-#include "imstkLogger.h"
-#include "imstkNew.h"
-#include "imstkScene.h"
-#include "imstkSceneManager.h"
-#include "imstkVTKViewer.h"
-
-// Objects
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
-#include "imstkLight.h"
-#include "imstkPbdObject.h"
-
-// Geometry
-#include "imstkMeshIO.h"
 #include "imstkCapsule.h"
-#include "imstkSurfaceMesh.h"
-
-// Devices and controllers
+#include "imstkCollisionGraph.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLaparoscopicToolController.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
-
-// Collisions and Models
-#include "imstkCollisionGraph.h"
-#include "imstkCollisionPair.h"
-#include "imstkCollisionDetection.h"
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
 #include "imstkPbdObjectPickingPair.h"
 #include "imstkPBDPickingCH.h"
 #include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
@@ -271,18 +260,21 @@ main()
 
     //Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-
-        viewer->addChildThread(server);
+        sceneManager->pause(); // Start simulation paused
 
         //connect<Event>(sceneManager, EventType::PostUpdate, moveCapsule);
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(server);
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -292,7 +284,7 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
         // Not perfectly thread safe movement lambda, ijkl movement instead of wasd because d is already used
@@ -316,9 +308,7 @@ main()
             }
         });
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

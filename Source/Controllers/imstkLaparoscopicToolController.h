@@ -55,7 +55,7 @@ public:
     ///
     /// \brief Update controlled laparoscopic tool using latest tracking information
     ///
-    void updateControlledObjects() override;
+    void update(const double dt) override;
 
     ///
     /// \brief Apply forces to the haptic device

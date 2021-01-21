@@ -40,7 +40,7 @@ TrackingDeviceControl::TrackingDeviceControl(std::shared_ptr<DeviceClient> devic
 }
 
 bool
-TrackingDeviceControl::updateTrackingData()
+TrackingDeviceControl::updateTrackingData(const double dt)
 {
     if (m_deviceClient == nullptr)
     {
@@ -51,41 +51,68 @@ TrackingDeviceControl::updateTrackingData()
     m_deviceClient->update();
 
     // Retrieve device info
+    const Vec3d prevPos = m_currentPos;
+    const Quatd prevOrientation = m_currentOrientation;
+
     m_currentPos = m_deviceClient->getPosition();
-    m_currentRot = m_deviceClient->getOrientation();
+    m_currentOrientation     = m_deviceClient->getOrientation();
+    m_currentVelocity        = m_deviceClient->getVelocity();
+    m_currentAngularVelocity = m_deviceClient->getAngularVelocity();
 
     // Apply inverse if needed
     if (m_invertFlags & InvertFlag::transX)
     {
-        m_currentPos[0] = -m_currentPos[0];
+        m_currentPos[0]      = -m_currentPos[0];
+        m_currentVelocity[0] = -m_currentVelocity[0];
     }
     if (m_invertFlags & InvertFlag::transY)
     {
-        m_currentPos[1] = -m_currentPos[1];
+        m_currentPos[1]      = -m_currentPos[1];
+        m_currentVelocity[1] = -m_currentVelocity[1];
     }
     if (m_invertFlags & InvertFlag::transZ)
     {
-        m_currentPos[2] = -m_currentPos[2];
+        m_currentPos[2]      = -m_currentPos[2];
+        m_currentVelocity[2] = -m_currentVelocity[2];
     }
     if (m_invertFlags & InvertFlag::rotX)
     {
-        m_currentRot.x() = -m_currentRot.x();
+        m_currentOrientation.x()    = -m_currentOrientation.x();
+        m_currentAngularVelocity[0] = -m_currentAngularVelocity[0];
     }
     if (m_invertFlags & InvertFlag::rotY)
     {
-        m_currentRot.y() = -m_currentRot.y();
+        m_currentOrientation.y()    = -m_currentOrientation.y();
+        m_currentAngularVelocity[1] = -m_currentAngularVelocity[1];
     }
     if (m_invertFlags & InvertFlag::rotZ)
     {
-        m_currentRot.z() = -m_currentRot.z();
+        m_currentOrientation.z()    = -m_currentOrientation.z();
+        m_currentAngularVelocity[2] = -m_currentAngularVelocity[2];
     }
 
     // Apply Offsets
     m_currentPos = m_rotationOffset * m_currentPos * m_scaling + m_translationOffset;
-    m_currentRot = m_rotationOffset * m_currentRot;
+    m_currentOrientation = m_rotationOffset * m_currentOrientation;
+
+    // With simulation substeps this may produce 0 deltas, but its fine
+    // Another option is to divide velocity by number of substeps and then
+    // maintain it for N substeps
+
+    if (m_computeVelocity)
+    {
+        m_currentDisplacement = (m_currentPos - prevPos);
+        m_currentVelocity     = m_currentDisplacement / dt;
+    }
+    if (m_computeAngularVelocity)
+    {
+        m_currentRotation = prevOrientation * m_currentOrientation.inverse();
+        /* Rotd r = Rotd(m_currentRotation);
+         r.angle() /= timestepInfo.m_dt;*/
+        m_currentAngularVelocity = m_currentRotation.toRotationMatrix().eulerAngles(0, 1, 2) /= dt;
+    }
 
     m_trackingDataUptoDate = true;
-
     return true;
 }
 

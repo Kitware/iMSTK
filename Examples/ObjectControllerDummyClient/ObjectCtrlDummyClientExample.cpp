@@ -29,6 +29,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSimulationManager.h"
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
@@ -92,10 +93,13 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
         connect<Event>(sceneManager, EventType::PostUpdate, translateFunc);
 
-        viewer->start();
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
+
+        driver->start();
     }
 
     return 0;

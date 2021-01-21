@@ -333,7 +333,7 @@ public:
 
     friend void disconnect(EventObject*, EventObject*, EventType);
 
-private:
+protected:
     ParallelUtils::SpinLock eventQueueLock; // Data lock for the event queue
     std::deque<Command>     eventQueue;
     //tbb::concurrent_priority_queue<Command> eventQueue;

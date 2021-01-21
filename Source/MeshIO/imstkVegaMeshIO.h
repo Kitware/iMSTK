@@ -23,6 +23,7 @@
 
 #include "imstkMath.h"
 #include "imstkMeshIO.h"
+#include "imstkVecDataArray.h"
 
 namespace vega
 {

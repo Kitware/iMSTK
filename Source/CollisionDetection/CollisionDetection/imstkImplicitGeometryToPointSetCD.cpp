@@ -40,7 +40,7 @@ ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD(std::shared_ptr<Impli
     centralGrad.setFunction(m_implicitGeomA);
     if (m_implicitGeomA->getType() == Geometry::Type::SignedDistanceField)
     {
-        centralGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA)->getImage()->getSpacing());
+        centralGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA)->getImage()->getSpacing() * 0.5);
     }
 }
 

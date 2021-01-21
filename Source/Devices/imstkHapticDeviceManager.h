@@ -21,26 +21,23 @@
 
 #pragma once
 
-#include <vector>
+#include "imstkModule.h"
 
-// imstk
-#include "imstkThreadObject.h"
+#include <vector>
 
 namespace imstk
 {
 class HapticDeviceClient;
+
 ///
 /// \class HDAPIDeviceServer
 /// \brief Devices manager using HDAPI
 /// \todo add the frame rate option for the servo loop
 ///
-class HapticDeviceManager : public ThreadObject
+class HapticDeviceManager : public Module
 {
-friend HapticDeviceClient;
-
 public:
-
-    HapticDeviceManager() : ThreadObject("HapticDeviceManager") {}
+    HapticDeviceManager() : Module() { }
 
     ///
     /// \brief Destructor
@@ -54,23 +51,21 @@ public:
     ///
     std::shared_ptr<HapticDeviceClient> makeDeviceClient(std::string name = "");
 
-    ///
-    /// \brief Initialize the client devices and start the scheduler
-    ///
-    void initialize();
-
 protected:
     ///
     /// \brief
     ///
-    void startThread() override;
+    bool initModule() override;
+
+    void updateModule() override { }
 
     ///
     /// \brief
     ///
-    void stopThread() override;
+    void uninitModule() override;
 
 private:
+    friend HapticDeviceClient;
 
     std::vector<std::shared_ptr<HapticDeviceClient>> m_deviceClients; ///< list of all the device clients
 };

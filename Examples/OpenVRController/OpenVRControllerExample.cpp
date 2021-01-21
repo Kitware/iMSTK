@@ -30,8 +30,10 @@
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
 #include "imstkSceneObjectController.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVisualObjectImporter.h"
 #include "imstkVTKOpenVRViewer.h"
 
 using namespace imstk;
@@ -110,6 +112,11 @@ main()
     scene->addSceneObject(scalpelBlade15);
     scalpelBlade15->getMasterGeometry()->setTranslation(0.2, 1.0, -0.8);
 
+    std::shared_ptr<VisualObject> tableObj = ObjectIO::importSceneObject("Instrument Table",
+        iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/Instrument_Table.dae",
+        iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/");
+    scene->addSceneObject(tableObj);
+
     // Lights
     imstkNew<DirectionalLight> dirLight("DirLight");
     dirLight->setIntensity(4);
@@ -126,7 +133,11 @@ main()
         // Add a module to run the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager);         // Start/stop scene with the view
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add a VR controller for the scalpel handle
         imstkNew<SceneObjectController> controller1(scalpelHandle, viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER));
@@ -142,7 +153,6 @@ main()
             [&](ButtonEvent* e)
         {
             // When any button pressed, swap blade
-            // todo: distance metric not working
             if (e->m_buttonState == BUTTON_PRESSED)
             {
                 const Vec3d& posControl = viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER)->getPosition();
@@ -189,11 +199,9 @@ main()
                     }
                 }
             }
-                        });
+        });
 
-        // Start running
-        viewer->requestStatus(ThreadStatus::Running);
-        viewer->start();
+        driver->start();
     }
 
     return 0;

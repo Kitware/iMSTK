@@ -33,6 +33,8 @@ class SceneManager;
 ///
 /// \brief Controls the camera using trackball controls
 /// Left click rotate, middle click pan
+/// \todo: Make base class to control just a scene, subclass for debug toggle
+/// or remove debug completely
 ///
 class MouseSceneControl : public MouseControl
 {
@@ -84,7 +86,7 @@ public:
 
     // How to handle mouse movements?
     // Mouse movements best done in update func or event? event would still require update for interpolation
-    void update() override;
+    void update(const double dt) override;
 
 protected:
     std::shared_ptr<SceneManager> m_sceneManager;

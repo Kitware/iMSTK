@@ -107,7 +107,7 @@ generateBoxMesh()
         0.5, 0.5, -0.5
     };
 
-    std::vector<size_t> buffFaces
+    std::vector<int> buffFaces
     {
         1, 4, 2,
         1, 3, 4,
@@ -134,8 +134,8 @@ generateBoxMesh()
 
     std::shared_ptr<VecDataArray<int, 3>> facesPtr = std::make_shared<VecDataArray<int, 3>>();
     VecDataArray<int, 3>&                 faces    = *facesPtr;
-    faces.reserve(buffFaces.size() / 3);
-    for (size_t i = 0; i < buffFaces.size() / 3; ++i)
+    faces.reserve(static_cast<int>(buffFaces.size()) / 3);
+    for (int i = 0; i < static_cast<int>(buffFaces.size()) / 3; ++i)
     {
         // Face ID of triangles is 0-based index (data from .obj file is 1-based index)
         faces.push_back(Vec3i(buffFaces[i * 3] - 1, buffFaces[i * 3 + 1] - 1, buffFaces[i * 3 + 2] - 1));
@@ -160,7 +160,7 @@ generateMesh()
 
     vertices->reserve(300);
     faces.reserve(100);
-    for (size_t i = 0; i < 100; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         faces.push_back(Vec3i(i * 3, i * 3 + 1, i * 3 + 2));
         vertices->push_back(Vec3d(randD(), randD(), randD()));

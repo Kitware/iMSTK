@@ -150,6 +150,8 @@ protected:
     std::vector<std::shared_ptr<RigidBody>>      m_bodies;
     std::unordered_map<RigidBody*, StorageIndex> m_locations;
     bool m_modified = true;
+
+    Eigen::VectorXd F; // Reaction forces
 };
 }
 }

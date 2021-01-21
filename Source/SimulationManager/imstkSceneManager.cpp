@@ -26,10 +26,11 @@
 
 namespace imstk
 {
-SceneManager::SceneManager(std::string name) :
-    LoopThreadObject(name), m_mode(Mode::Simulation),
-    m_prevCamName("default"), m_activeScene(nullptr)
+SceneManager::SceneManager(std::string name) : m_mode(Mode::Simulation),
+    m_activeScene(nullptr), m_prevCamName("default")
 {
+    // Set the preferred execution mode
+    m_executionType = ExecutionType::PARALLEL;
 }
 
 void
@@ -74,27 +75,7 @@ SceneManager::setActiveScene(std::string name)
 
     auto newScene = this->getScene(name);
 
-    // If the scene wants to trackFPS enable framecounting in this module
-    // \todo: Figure out why this can't change on the fly
-    if (newScene->getConfig()->trackFPS)
-    {
-        enableFrameCount();
-    }
-
-    // Pause before swapping for thread safety
-    ThreadStatus prevStatus = getStatus();
-    if (prevStatus == ThreadStatus::Inactive
-        || prevStatus == ThreadStatus::Paused)
-    {
-        m_activeScene = newScene;
-    }
-    else if (prevStatus == ThreadStatus::Running)
-    {
-        // \todo: Dangerous to call this function from the thread you're about to pause
-        pause(true);
-        m_activeScene = newScene;
-        resume(true);
-    }
+    m_activeScene = newScene;
 }
 
 void
@@ -110,23 +91,24 @@ SceneManager::setActiveScene(std::shared_ptr<Scene> scene)
     setActiveScene(name);
 }
 
-void
-SceneManager::initThread()
+bool
+SceneManager::initModule()
 {
     if (m_activeScene != nullptr)
     {
-        m_activeScene->initialize();
+        return m_activeScene->initialize();
     }
+    return true;
 }
 
 void
-SceneManager::updateThread()
+SceneManager::updateModule()
 {
     // Advance the scene
     if (m_activeScene != nullptr)
     {
         // Process one event
-        doEvent();
+        this->doEvent();
 
         m_activeScene->advance();
     }
@@ -151,10 +133,7 @@ SceneManager::removeScene(std::string name)
         std::shared_ptr<Scene> scene = m_sceneMap[name];
         if (m_activeScene == scene)
         {
-            // \todo: Dangerous to call this function from the thread you're about to pause
-            pause(true);
             m_activeScene = nullptr;
-            resume(true);
         }
         m_sceneMap.erase(name);
     }

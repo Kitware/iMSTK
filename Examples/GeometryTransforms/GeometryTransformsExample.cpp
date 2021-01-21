@@ -33,6 +33,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 
@@ -125,7 +126,10 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Rotate after every scene update
         connect<Event>(sceneManager, EventType::PostUpdate,
@@ -142,11 +146,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        viewer->start();
+        driver->start();
     }
 
     return 0;

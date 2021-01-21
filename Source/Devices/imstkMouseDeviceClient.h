@@ -43,7 +43,7 @@ class MouseEvent : public Event
 public:
     MouseEvent(const MouseActionType mouseActionType, const MouseButtonType buttonId) :
         Event(EventType::MouseEvent, 1),
-        m_mouseActionType(mouseActionType), m_buttonId(buttonId), m_scrollDx(0.0)
+        m_mouseActionType(mouseActionType), m_scrollDx(0.0), m_buttonId(buttonId)
     {
     }
 
@@ -79,7 +79,7 @@ protected:
     /// This object is only creatable through its New method
     ///
     MouseDeviceClient() : DeviceClient("MouseDevice", ""),
-        m_pos(Vec2d(0.0, 0.0)), m_prevPos(Vec2d(0.0, 0.0)) { }
+        m_prevPos(Vec2d(0.0, 0.0)), m_pos(Vec2d(0.0, 0.0)) { }
 
     ///
     /// This object is only creatable through this method

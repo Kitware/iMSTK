@@ -73,14 +73,20 @@ Plane::setWidth(const double w)
         return;
     }
     m_width = w;
-    m_dataModified     = true;
     m_transformApplied = false;
+    this->postEvent(Event(EventType::Modified));
 }
 
 void
-Plane::applyScaling(const double s)
+Plane::applyTransform(const Mat4d& m)
 {
-    this->setWidth(m_width * s);
+    AnalyticalGeometry::applyTransform(m);
+    /* const Vec3d s = Vec3d(
+         m_transform.block<3, 1>(0, 0).norm(),
+         m_transform.block<3, 1>(0, 1).norm(),
+         m_transform.block<3, 1>(0, 2).norm());*/
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    this->setWidth(m_width * s0);
     this->modified();
 }
 
@@ -92,7 +98,8 @@ Plane::updatePostTransformData() const
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    m_widthPostTransform = m_scaling * m_width;
+    const double s0 = m_transform.block<3, 1>(0, 0).norm();
+    m_widthPostTransform = s0 * m_width;
     m_transformApplied   = true;
 }
 } // imstk

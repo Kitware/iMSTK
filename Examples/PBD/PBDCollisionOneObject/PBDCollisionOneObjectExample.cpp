@@ -34,6 +34,7 @@
 #include "imstkRenderMaterial.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkTetraTriangleMap.h"
@@ -58,7 +59,7 @@ const int    maxIter = 5;
 /// \param nRows number of vertices in x-direction
 /// \param nCols number of vertices in y-direction
 ///
-std::shared_ptr<SurfaceMesh> createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols);
+std::shared_ptr<SurfaceMesh> createUniformSurfaceMesh(const double width, const double height, const int nRows, const int nCols);
 
 ///
 /// \brief This example demonstrates the collision interaction
@@ -167,14 +168,18 @@ main()
 
     // Run the simulation
     {
-        // Setup a viewer to render in its own thread
+        // Setup a viewer to render
         imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
 
-        // Setup a scene manager to advance the scene in its own thread
+        // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->pause(); // Start simulation paused
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -184,20 +189,18 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
 
     return 0;
 }
 
 std::shared_ptr<SurfaceMesh>
-createUniformSurfaceMesh(const double width, const double height, const size_t nRows, const size_t nCols)
+createUniformSurfaceMesh(const double width, const double height, const int nRows, const int nCols)
 {
     const double dy = width / static_cast<double>(nCols - 1);
     const double dx = height / static_cast<double>(nRows - 1);

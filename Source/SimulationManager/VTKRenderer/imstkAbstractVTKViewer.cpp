@@ -33,91 +33,28 @@
 
 namespace imstk
 {
+static void
+exitCallbackFunc(
+    vtkObject* vtkNotUsed(sender), unsigned long eventId,
+    void* clientData, void* vtkNotUsed(callData))
+{
+    AbstractVTKViewer* viewer = static_cast<AbstractVTKViewer*>(clientData);
+    if (viewer != nullptr
+        && eventId == vtkCommand::ExitEvent)
+    {
+        viewer->pause(); // Immediately prevent any updates from running
+        viewer->postEvent(Event(EventType::End));
+    }
+}
+
 AbstractVTKViewer::AbstractVTKViewer(std::string name) : Viewer(name)
 {
-    viewerDisabledCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-    viewerDisabledCallback->SetCallback(viewerDisabled);
-    viewerDisabledCallback->SetClientData(this);
-    viewerEnabledCallback = vtkSmartPointer<vtkCallbackCommand>::New();
-    viewerEnabledCallback->SetCallback(viewerEnabled);
-    viewerEnabledCallback->SetClientData(this);
 }
 
 Renderer::Mode
 AbstractVTKViewer::getRenderingMode() const
 {
     return this->getActiveRenderer()->getMode();
-}
-
-void
-AbstractVTKViewer::stopThread()
-{
-    // close the rendering window
-    m_vtkRenderWindow->Finalize();
-
-    // Terminate the interactor
-    m_vtkRenderWindow->GetInteractor()->TerminateApp();
-}
-
-void
-AbstractVTKViewer::pause(bool sync)
-{
-    // It doesn't actually stop until disable event
-    if (m_status == ThreadStatus::Inactive)
-    {
-        return;
-    }
-
-    this->postEvent(Event(EventType::Pause));
-
-    pauseThread();
-
-    if (m_status == ThreadStatus::Running)
-    {
-        // Request that it disables
-
-        // If sync, wait until the module actually pauses before returning from function
-        if (sync)
-        {
-            m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCallbackCommand::DisableEvent, viewerDisabledCallback);
-            m_vtkRenderWindow->GetInteractor()->Disable();
-            while (m_status != ThreadStatus::Paused) { }
-            m_vtkRenderWindow->GetInteractor()->RemoveObserver(viewerDisabledCallback);
-        }
-        else
-        {
-            m_vtkRenderWindow->GetInteractor()->Disable();
-        }
-    }
-}
-
-void
-AbstractVTKViewer::resume(bool sync)
-{
-    if (m_status == ThreadStatus::Inactive)
-    {
-        return;
-    }
-
-    this->postEvent(Event(EventType::Resume));
-
-    resumeThread();
-    if (m_status == ThreadStatus::Paused)
-    {
-        m_requestedStatus = ThreadStatus::Running;
-        // If sync, wait until the module actually pauses before returning from function
-        if (sync)
-        {
-            m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCallbackCommand::EnableEvent, viewerEnabledCallback);
-            m_vtkRenderWindow->GetInteractor()->Disable();
-            while (m_status != ThreadStatus::Running) { }
-            m_vtkRenderWindow->GetInteractor()->RemoveObserver(viewerEnabledCallback);
-        }
-        else
-        {
-            m_vtkRenderWindow->GetInteractor()->Disable();
-        }
-    }
 }
 
 void
@@ -151,18 +88,28 @@ AbstractVTKViewer::setBackgroundColors(const Vec3d color1, const Vec3d color2 /*
 }
 
 void
-AbstractVTKViewer::viewerDisabled(vtkObject* vtkNotUsed(sender),
-                                  unsigned long vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
+AbstractVTKViewer::processEvents()
 {
-    imstk::AbstractVTKViewer* viewer = static_cast<imstk::AbstractVTKViewer*>(clientData);
-    viewer->m_status = ThreadStatus::Paused;
+    m_vtkRenderWindow->GetInteractor()->ProcessEvents();
+}
+
+bool
+AbstractVTKViewer::initModule()
+{
+    exitCallback = vtkSmartPointer<vtkCallbackCommand>::New();
+    exitCallback->SetCallback(exitCallbackFunc);
+    exitCallback->SetClientData(this);
+    m_vtkRenderWindow->GetInteractor()->AddObserver(vtkCommand::ExitEvent, exitCallback);
+    return true;
 }
 
 void
-AbstractVTKViewer::viewerEnabled(vtkObject* vtkNotUsed(sender),
-                                 unsigned long vtkNotUsed(eventId), void* clientData, void* vtkNotUsed(callData))
+AbstractVTKViewer::uninitModule()
 {
-    imstk::AbstractVTKViewer* viewer = static_cast<imstk::AbstractVTKViewer*>(clientData);
-    viewer->m_status = ThreadStatus::Running;
+    // close the rendering window
+    m_vtkRenderWindow->Finalize();
+
+    // Terminate the interactor
+    m_vtkRenderWindow->GetInteractor()->TerminateApp();
 }
 }

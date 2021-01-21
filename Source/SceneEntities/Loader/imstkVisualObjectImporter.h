@@ -24,58 +24,47 @@
 #include "imstkTexture.h"
 #include "imstkMath.h"
 
+class aiMaterial;
+
 namespace imstk
 {
+class AnimatedObject;
 class RenderMaterial;
 class SceneObject;
 
 ///
-/// \class VisualObjectImporter
+/// \class ObjectIO
 ///
-/// \brief Importer for VisualObject
-/// Meshes often contain multiple materials in the real world, and each
-/// material requires a separate mesh. Since each VisualObject can contain
-/// multiple VisualModels, VisualObjectImporter can import these meshes and
-/// assign them to the same VisualObject. RenderMaterial creation is also done
-/// automatically, with texture searching using common naming conventions.
+/// \brief ObjectIO provides SceneObject reading capabilities
+/// It is used to read complex visual objects or animated objects
 ///
-class VisualObjectImporter
+class ObjectIO
 {
 public:
     ///
-    /// \brief Import visual object
-    /// \param objName Name for scene object
+    /// \brief Import a scene object
+    /// \param objName Name for the object
     /// \param modelFilename File name for visual object to import
     /// \param textureFolderPath Texture folder path
     /// \param scale Scale for visual objects
     /// \param translation Translation for visual objects
-    /// \param fileExtension File extension for texture to load
-    /// By default, fileExtension will load the extension extracted from the
-    /// mesh's texture information. However, this can be inconvenient when
-    /// textures are converted to production-ready formats such as .dds.
-    /// \returns Visual object
     ///
-    static std::shared_ptr<SceneObject> importVisualObject(
+    static std::shared_ptr<SceneObject> importSceneObject(
         const std::string& objName,
         const std::string& modelFilePath,
         const std::string& textureFolderPath,
-        const double scale       = 1.0,
-        const Vec3d& translation = Vec3d(0, 0, 0),
-        const std::string& fileExtension = "");
+        const Mat4d&       transform = Mat4d::Identity());
 
 private:
     ///
-    /// \brief Find and add texture to material
-    /// \param renderMaterial Material to add the texture to
-    /// \param baseFileName Common file name among all textures in the set
-    /// \param textureType Texture type
+    /// \brief Returns texture with file name and type, checks it exists
     ///
-    static void findAndAddTexture(
-        std::shared_ptr<RenderMaterial> renderMaterial,
-        const std::string&              textureFolderPath,
-        const std::string&              textureCoreFileName,
-        const std::string&              textureFileExtension,
-        Texture::Type                   textureType);
+    static std::shared_ptr<Texture> createTexture(std::string textureFolderPath, std::string textureFilePath, Texture::Type textureType);
+
+    ///
+    /// \brief Converts aiMaterial to RenderMaterial
+    ///
+    static std::shared_ptr<RenderMaterial> readMaterial(aiMaterial* mat, std::string textureFolderPath);
 
     ///
     /// \brief Helper function for getting substring
@@ -88,27 +77,5 @@ private:
         const std::string& input,
         const std::string& delimiter,
         const bool         lastInstance = false);
-
-    ///
-    /// \brief Find and add texture to material
-    /// \param renderMaterial Material to add the texture to
-    /// \param textureFolderPath Path to folder containing textures
-    /// \param textureCoreFileName Common file name among all textures in the set
-    /// \param textureFileExtension Extension to file (e.g., ".png")
-    /// \param textureType Texture type
-    /// \param extensionList List of extentions for labeling textures
-    /// This function searches for all files with the following names:
-    /// baseFileName.main + extensionList[i] + baseFileName.fileExtension.
-    /// The extensionList variables are various naming conventions that can
-    /// be interpreted as a specific texture. For example, a texture named
-    /// "texture.png" will be expanded to "texture_Normal.png".
-    ///
-    static void findAndAddTextureWithExtensions(
-        std::shared_ptr<RenderMaterial>    renderMaterial,
-        const std::string&                 textureFolderPath,
-        const std::string&                 textureCoreFileName,
-        const std::string&                 textureFileExtension,
-        Texture::Type                      textureType,
-        std::initializer_list<const char*> extensionList);
 };  // VisualObjectImporter
 } // imstk

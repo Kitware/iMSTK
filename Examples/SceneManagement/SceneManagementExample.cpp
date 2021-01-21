@@ -29,6 +29,7 @@ using namespace imstk;
 
 ///
 /// \brief This example demonstrates scene management features in imstk
+/// \todo: Move to unit test
 ///
 int
 main()
@@ -56,26 +57,22 @@ main()
     LOG(INFO) << "-- Test scene switch";
     int delay = 1;
     sceneManager->setActiveScene(scene1);
-    sceneManager->start(false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sceneManager->setActiveScene(scene2);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sceneManager->setActiveScene(scene1);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sceneManager->stop(true);
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
     sceneManager->setActiveScene(scene2);
-    sceneManager->start(false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sceneManager->pause(true);
+    sceneManager->pause();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sceneManager->resume(true);
+    sceneManager->resume();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sceneManager->pause(true);
+    sceneManager->pause();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sceneManager->stop(true);
 
     return 0;
 }

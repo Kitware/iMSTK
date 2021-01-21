@@ -22,7 +22,7 @@
 #pragma once
 
 #include "imstkDeviceClient.h"
-#include "imstkLoopThreadObject.h"
+#include "imstkModule.h"
 
 #include <vrpn_Configure.h>
 #include <vrpn_Analog.h>
@@ -33,7 +33,7 @@ namespace imstk
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
 ///
-class VRPNArduinoDeviceClient : public DeviceClient, public LoopThreadObject
+class VRPNArduinoDeviceClient : public DeviceClient, public Module
 {
 public:
 
@@ -42,7 +42,6 @@ public:
     ///
     VRPNArduinoDeviceClient(const std::string& deviceName, const std::string& ip) :
         DeviceClient(deviceName, ip),
-        LoopThreadObject(deviceName + "@" + ip),
         m_ypr(Vec3d::Zero()),
         m_accel(Vec3d::Zero()),
         m_roll(0) {}
@@ -71,17 +70,17 @@ protected:
     ///
     /// \brief Initialize device client module
     ///
-    void initThread() override;
+    bool initModule() override;
 
     ///
     /// \brief Run the device client
     ///
-    void updateThread() override;
+    void updateModule() override;
 
     ///
     /// \brief Clean the device client
     ///
-    void stopThread() override;
+    void uninitModule() override;
 
 private:
 

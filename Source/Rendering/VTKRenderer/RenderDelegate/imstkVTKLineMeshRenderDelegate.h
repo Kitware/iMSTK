@@ -49,7 +49,7 @@ public:
     virtual ~VTKLineMeshRenderDelegate() override = default;
 
     ///
-    /// \brief Update line source based on the line mesh
+    /// \brief Event handler
     ///
     void processEvents() override;
 

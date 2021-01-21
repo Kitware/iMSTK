@@ -32,19 +32,20 @@
 namespace imstk
 {
 Viewer::Viewer(std::string name) :
-    ThreadObject(name),
     m_activeScene(nullptr),
-    m_config(std::make_shared<ViewerConfig>()),
     m_debugCamera(std::make_shared<Camera>()),
     m_interactorStyle(nullptr),
-    m_screenCapturer(nullptr)
+    m_screenCapturer(nullptr),
+    m_config(std::make_shared<ViewerConfig>())
 {
 #ifdef iMSTK_USE_Vulkan
     m_canvas(std::make_shared<GUIOverlay::Canvas>())
 #endif
+    // Set the preferred execution type
+    m_executionType = ExecutionType::SEQUENTIAL;
 }
 
-const std::shared_ptr<Renderer>&
+std::shared_ptr<Renderer>
 Viewer::getActiveRenderer() const
 {
     CHECK(m_activeScene != nullptr) << "no active scene!";
@@ -53,12 +54,12 @@ Viewer::getActiveRenderer() const
 }
 
 void
-Viewer::updateThread()
+Viewer::updateModule()
 {
     this->postEvent(Event(EventType::PreUpdate));
     for (auto control : m_controls)
     {
-        control->update();
+        control->update(m_dt);
     }
     this->postEvent(Event(EventType::PostUpdate));
 }

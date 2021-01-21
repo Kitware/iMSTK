@@ -28,6 +28,7 @@
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
 #include "imstkSceneObject.h"
+#include "imstkSimulationManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVolumeRenderMaterialPresets.h"
@@ -58,8 +59,6 @@ main()
     cam->setFocalPoint(Vec3d(0.0, 0.0, -50.0));
     cam->setViewUp(Vec3d(0.02, 0.4, 0.9));
 
-    int count = 0;
-
     // Setup a viewer to render in its own thread
     imstkNew<VTKViewer> viewer("Viewer");
     viewer->setActiveScene(scene);
@@ -71,44 +70,41 @@ main()
     statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
     statusManager->setStatusDisplayCorner(VTKTextStatusManager::StatusType::Custom, VTKTextStatusManager::DisplayCorner::UpperLeft);
 
-    auto updateFunc =
-        [&](Event*) {
-            if (count % 2)
-            {
-                // Change the render material every other frame
-                ++count;
-                return;
-            }
-            // Setting the renderer mode removes vtk actors
-            // renderer->setMode(VTKRenderer::SIMULATION, false);
-            if (count > 50)
-            {
-                // There are a total of 25 presets thus far.
-                count = 0;
-            }
-            // Change view background to black every other frame
-            std::cout << "Displaying with volume material preset: " << count / 2 << std::endl;
-            // Query for a volume material preset
-            std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(count / 2);
-            // Apply the preset to the visual object
-            volumeObj->getVisualModel(0)->setRenderMaterial(volumeMaterial);
+    StopWatch timer;
+    timer.start();
 
-            std::ostringstream ss;
-            ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(count / 2);
-            statusManager->setCustomStatus(ss.str());
+    int  currMatId  = 0;
+    int  prevMatId  = -1;
+    auto updateFunc = [&](Event*)
+                      {
+                          prevMatId = currMatId;
+                          currMatId = static_cast<int>(timer.getTimeElapsed() / 1000.0 / 2.0) % 25;
 
-            ++count;
-            // Delay to show the past frame
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-        };
+                          if (currMatId != prevMatId)
+                          {
+                              // Change view background to black every other frame
+                              std::cout << "Displaying with volume material preset: " << currMatId << std::endl;
+                              // Query for a volume material preset
+                              std::shared_ptr<VolumeRenderMaterial> volumeMaterial = VolumeRenderMaterialPresets::getPreset(currMatId);
+                              // Apply the preset to the visual object
+                              volumeObj->getVisualModel(0)->setRenderMaterial(volumeMaterial);
+
+                              std::ostringstream ss;
+                              ss << "Volume Material Preset: " << imstk::VolumeRenderMaterialPresets::getPresetName(currMatId);
+                              statusManager->setCustomStatus(ss.str());
+                          }
+                      };
 
     // Run the simulation
     {
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
-        connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+        connect<Event>(viewer, EventType::PostUpdate, updateFunc);
+
+        imstkNew<SimulationManager> driver;
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -118,11 +114,11 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
-        viewer->start();
+        driver->start();
     }
 
     return 0;

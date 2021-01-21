@@ -84,7 +84,7 @@ protected:
     using AnalyticalGeometry::getFunctionValue;
     //using AnalyticalGeometry::getFunctionGrad;
 
-    void applyScaling(const double s) override;
+    void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the cylinder

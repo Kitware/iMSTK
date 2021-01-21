@@ -25,8 +25,6 @@
 
 namespace imstk
 {
-// SPHKinematicState implementation ===>
-
 SPHState::SPHState(const int numElements) :
     m_positions(std::make_shared<VecDataArray<double, 3>>(numElements)),
     m_fullStepVelocities(std::make_shared<VecDataArray<double, 3>>(numElements)),

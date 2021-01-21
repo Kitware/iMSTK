@@ -34,7 +34,7 @@ using KeyStateType = int;
 class KeyPressEvent : public Event
 {
 public:
-    KeyPressEvent(const char key, const KeyStateType keyPressType) : Event(EventType::KeyEvent, 1), m_key(key), m_keyPressType(keyPressType) { }
+    KeyPressEvent(const char key, const KeyStateType keyPressType) : Event(EventType::KeyEvent, 1), m_keyPressType(keyPressType), m_key(key) { }
     virtual ~KeyPressEvent() override = default;
 
 public:
@@ -65,7 +65,7 @@ public:
 
     // Only these classes may provide this object
     friend class VTKInteractorStyle;
-    friend class ConsoleThread;
+    friend class ConsoleModule;
 
 public:
     const std::unordered_map<int, KeyStateType>& getKeyState() const { return m_buttons; }

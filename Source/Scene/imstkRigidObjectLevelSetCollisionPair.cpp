@@ -29,6 +29,11 @@ limitations under the License.
 #include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkTaskGraph.h"
+#include "imstkPointSet.h"
+#include "imstkImplicitGeometry.h"
+
+#include "imstkImplicitGeometryToPointSetCD.h"
+#include "imstkImplicitGeometryToPointSetCCD.h"
 
 namespace imstk
 {
@@ -62,7 +67,10 @@ RigidObjectLevelSetCollisionPair::RigidObjectLevelSetCollisionPair(std::shared_p
 
     // Setup the CD
     m_colData = std::make_shared<CollisionData>();
-    setCollisionDetection(makeCollisionDetectionObject(CollisionDetection::Type::PointSetToImplicit, obj1->getCollidingGeometry(), obj2->getCollidingGeometry(), m_colData));
+    std::shared_ptr<ImplicitGeometryToPointSetCCD> cd = std::make_shared<ImplicitGeometryToPointSetCCD>(
+        std::dynamic_pointer_cast<ImplicitGeometry>(obj2->getCollidingGeometry()),
+        std::dynamic_pointer_cast<PointSet>(obj1->getCollidingGeometry()), m_colData);
+    setCollisionDetection(cd);
 
     // Setup the handlers for each side
     setCollisionHandlingA(std::make_shared<RigidBodyCH>(CollisionHandling::Side::A, m_colData, obj1, nullptr, 0.0, 0.0));
