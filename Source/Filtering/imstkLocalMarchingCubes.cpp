@@ -380,7 +380,7 @@ void
 LocalMarchingCubes::setModified(const Vec3i& coord)
 {
     std::shared_ptr<ImageData> image      = std::dynamic_pointer_cast<ImageData>(getInput(0));
-    const int                  voxelIndex = image->getScalarIndex(coord);
+    const int                  voxelIndex = static_cast<int>(image->getScalarIndex(coord));
     m_modifiedVoxels[voxelIndex] = coord;
     //m_modifiedVoxels.push_back(std::pair<int, Vec3i>(static_cast<int>(voxelIndex), coord));
 }

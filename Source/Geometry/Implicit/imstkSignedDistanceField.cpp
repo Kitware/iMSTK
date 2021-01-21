@@ -131,4 +131,10 @@ SignedDistanceField::getFunctionValueCoord(const Vec3i& coord) const
         return std::numeric_limits<double>::min();
     }
 }
+
+void
+SignedDistanceField::computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent)
+{
+    return m_imageDataSdf->computeBoundingBox(min, max, paddingPercent);
+}
 }

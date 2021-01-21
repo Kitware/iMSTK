@@ -73,6 +73,9 @@ struct SceneConfig
 
     // If on, non functional nodes and redundant edges will be removed from final graph
     bool graphReductionEnabled = true;
+
+    // If on, debug camera is positioned at scene bounding box
+    bool debugCamBoundingBox = true;
 };
 
 ///

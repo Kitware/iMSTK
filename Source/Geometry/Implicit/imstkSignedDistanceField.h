@@ -76,6 +76,8 @@ public:
     ///
     std::shared_ptr<ImageData> getImage() const { return m_imageDataSdf; }
 
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent) override;
+
 protected:
     std::shared_ptr<ImageData> m_imageDataSdf;
 

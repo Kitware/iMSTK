@@ -237,8 +237,8 @@ createCollidingSurfaceMesh()
             triangles.push_back(Vec3i((nPointPerSide) + i * nCols + j, (nPointPerSide) + i * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j));
             triangles.push_back(Vec3i((nPointPerSide) + (i + 1) * nCols + j + 1, (nPointPerSide) + (i + 1) * nCols + j, (nPointPerSide) + i * nCols + j + 1));
 
-            triangles.push_back(Vec3i((nPointPerSide * 2) + i * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j));
-            triangles.push_back(Vec3i((nPointPerSide * 2) + (i + 1) * nCols + j + 1, (nPointPerSide * 2) + (i + 1) * nCols + j, (nPointPerSide * 2) + i * nCols + j + 1));
+            triangles.push_back(Vec3i((nPointPerSide * 2) + i * nCols + j + 1, (nPointPerSide * 2) + i * nCols + j, (nPointPerSide * 2) + (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((nPointPerSide * 2) + (i + 1) * nCols + j, (nPointPerSide * 2) + (i + 1) * nCols + j + 1, (nPointPerSide * 2) + i * nCols + j + 1));
         }
     }
 
@@ -265,8 +265,8 @@ createCollidingSurfaceMesh()
     {
         for (int j = 0; j < nCols - 1; j++)
         {
-            triangles.push_back(Vec3i((nPointPerSide * 3) + i * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j));
-            triangles.push_back(Vec3i((nPointPerSide * 3) + (i + 1) * nCols + j + 1, (nPointPerSide * 3) + (i + 1) * nCols + j, (nPointPerSide * 3) + i * nCols + j + 1));
+            triangles.push_back(Vec3i((nPointPerSide * 3) + i * nCols + j + 1, (nPointPerSide * 3) + i * nCols + j, (nPointPerSide * 3) + (i + 1) * nCols + j));
+            triangles.push_back(Vec3i((nPointPerSide * 3) + (i + 1) * nCols + j, (nPointPerSide * 3) + (i + 1) * nCols + j + 1, (nPointPerSide * 3) + i * nCols + j + 1));
 
             triangles.push_back(Vec3i((nPointPerSide * 4) + i * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j));
             triangles.push_back(Vec3i((nPointPerSide * 4) + (i + 1) * nCols + j + 1, (nPointPerSide * 4) + (i + 1) * nCols + j, (nPointPerSide * 4) + i * nCols + j + 1));

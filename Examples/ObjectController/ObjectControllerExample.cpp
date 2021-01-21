@@ -73,7 +73,7 @@ main()
 
     // Light
     imstkNew<DirectionalLight> light("light");
-    light->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
+    light->setDirection(Vec3d(5.0, -8.0, -5.0));
     light->setIntensity(1.0);
     scene->addLight(light);
 

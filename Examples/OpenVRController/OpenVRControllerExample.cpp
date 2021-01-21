@@ -33,6 +33,7 @@
 #include "imstkSubstepModuleDriver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVisualObjectImporter.h"
 #include "imstkVTKOpenVRViewer.h"
 
 using namespace imstk;
@@ -111,6 +112,11 @@ main()
     scene->addSceneObject(scalpelBlade15);
     scalpelBlade15->getMasterGeometry()->setTranslation(0.2, 1.0, -0.8);
 
+    std::shared_ptr<VisualObject> tableObj = ObjectIO::importSceneObject("Instrument Table",
+        iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/Instrument_Table.dae",
+        iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/");
+    scene->addSceneObject(tableObj);
+
     // Lights
     imstkNew<DirectionalLight> dirLight("DirLight");
     dirLight->setIntensity(4);
@@ -127,6 +133,7 @@ main()
         // Add a module to run the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SubstepModuleDriver> driver;
         driver->addModule(viewer);

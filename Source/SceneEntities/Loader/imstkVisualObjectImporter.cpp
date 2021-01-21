@@ -63,31 +63,6 @@ mat4dToAiMat(const Mat4d& m)
     return results;
 }
 
-// \todo: We can't yet use this function as geometry doesn't support Mat4d transforms
-static void
-transformPostSurfaceMesh(std::shared_ptr<SurfaceMesh> mesh, Mat4d m)
-{
-    const VecDataArray<double, 3>& initPositions = *mesh->getVertexPositions(Geometry::DataType::PreTransform);
-    VecDataArray<double, 3>&       currPositions = *mesh->getVertexPositions(Geometry::DataType::PostTransform);
-    for (size_t i = 0; i < mesh->getNumVertices(); i++)
-    {
-        const Vec4d pos = m * Vec4d(initPositions[i][0], initPositions[i][1], initPositions[i][2], 1.0);
-        currPositions[i] = Vec3d(pos[0], pos[1], pos[2]);
-    }
-}
-
-static void
-transformPreSurfaceMesh(std::shared_ptr<SurfaceMesh> mesh, Mat4d m)
-{
-    VecDataArray<double, 3>& initPositions = *mesh->getVertexPositions(Geometry::DataType::PreTransform);
-    VecDataArray<double, 3>& currPositions = *mesh->getVertexPositions(Geometry::DataType::PostTransform);
-    for (size_t i = 0; i < mesh->getNumVertices(); i++)
-    {
-        const Vec4d pos = m * Vec4d(initPositions[i][0], initPositions[i][1], initPositions[i][2], 1.0);
-        currPositions[i] = initPositions[i] = Vec3d(pos[0], pos[1], pos[2]);
-    }
-}
-
 std::shared_ptr<VisualObject>
 ObjectIO::importSceneObject(
     const std::string& objName,
@@ -161,7 +136,7 @@ ObjectIO::importSceneObject(
             auto visualModel = std::make_shared<VisualModel>(surfMesh);
             visualModel->setName(std::string(currNode->mName.C_Str()));
 
-            transformPreSurfaceMesh(surfMesh, currWorldTransform);
+            surfMesh->transform(currWorldTransform, Geometry::TransformType::ApplyToData);
             visualModel->setRenderMaterial(meshMaterials[meshIndex]);
             visualObject->addVisualModel(visualModel);
         }

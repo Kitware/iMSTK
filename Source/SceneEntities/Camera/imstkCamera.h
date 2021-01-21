@@ -23,6 +23,8 @@
 
 #include "imstkMath.h"
 
+#include <iostream>
+
 namespace imstk
 {
 ///
@@ -202,6 +204,16 @@ public:
                    const double z)
     {
         setViewUp(Vec3d(x, y, z));
+    }
+
+    ///
+    /// \brief Utility function to quickly print cam stats
+    ///
+    void print()
+    {
+        std::cout << "CamPos: " << m_position[0] << ", " << m_position[1] << ", " << m_position[2] << std::endl;
+        std::cout << "FocalPoint: " << m_focalPoint[0] << ", " << m_focalPoint[1] << ", " << m_focalPoint[2] << std::endl;
+        std::cout << "Up: " << m_viewUp[0] << ", " << m_viewUp[1] << ", " << m_viewUp[2] << std::endl;
     }
 
 protected:
