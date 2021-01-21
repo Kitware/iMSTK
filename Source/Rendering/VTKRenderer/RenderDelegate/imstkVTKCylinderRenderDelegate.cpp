@@ -44,7 +44,7 @@ VTKCylinderRenderDelegate::VTKCylinderRenderDelegate(std::shared_ptr<VisualModel
     // Setup mapper
     {
         vtkNew<vtkPolyDataMapper> mapper;
-        mapper->SetInputConnection(cylinderSource->GetOutputPort());
+        mapper->SetInputConnection(m_cylinderSource->GetOutputPort());
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
@@ -63,8 +63,8 @@ VTKCylinderRenderDelegate::processEvents()
 
     auto geometry = std::static_pointer_cast<Cylinder>(m_visualModel->getGeometry());
 
-    cylinderSource->SetRadius(geometry->getRadius());
-    cylinderSource->SetHeight(geometry->getLength());
+    m_cylinderSource->SetRadius(geometry->getRadius());
+    m_cylinderSource->SetHeight(geometry->getLength());
 
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));

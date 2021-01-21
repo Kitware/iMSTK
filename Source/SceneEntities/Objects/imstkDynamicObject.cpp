@@ -50,14 +50,13 @@ DynamicObject::updateGeometries()
         if (m_physicsToVisualGeomMap)
         {
             m_physicsToVisualGeomMap->apply();
+            m_physicsToVisualGeomMap->getSlave()->modified();
         }
     }
     else
     {
         CollidingObject::updateGeometries();
     }
-
-    SceneObject::updateGeometries();
 }
 
 void

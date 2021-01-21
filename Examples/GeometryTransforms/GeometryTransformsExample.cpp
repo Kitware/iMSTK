@@ -88,7 +88,7 @@ main()
     cubeMaterial->setPointSize(6.0);
     cubeMaterial->setLineWidth(4.0);
     imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
-    cubeVisualModel->setRenderMaterial(cubeMaterial);
+    cubeVisualModel->setRenderMaterial(redMaterial);
 
     imstkNew<VisualObject> cubeObj("Cube");
     cubeObj->addVisualModel(cubeVisualModel);

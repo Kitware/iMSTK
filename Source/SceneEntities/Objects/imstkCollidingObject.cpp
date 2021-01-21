@@ -100,6 +100,7 @@ CollidingObject::updateGeometries()
     if (m_collidingToVisualMap)
     {
         m_collidingToVisualMap->apply();
+        m_collidingToVisualMap->getSlave()->modified();
     }
     SceneObject::updateGeometries();
 }
