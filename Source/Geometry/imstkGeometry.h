@@ -174,6 +174,16 @@ public:
     void setScaling(const double s);
 
     ///
+    /// \brief Get/Set the transform
+    ///
+    const Mat4d& getTransform() { return m_transform; }
+    void setTransform(const Mat4d& m)
+    {
+        m_transform = m;
+        m_transformApplied = false;
+    }
+
+    ///
     /// \brief Returns the type of the geometry
     ///
     Type getType() const { return m_type; }
