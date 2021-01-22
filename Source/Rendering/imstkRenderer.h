@@ -27,14 +27,13 @@
 
 namespace imstk
 {
-
 struct SSAOConfig
 {
-    bool m_enableSSAO = false;
-    bool m_SSAOBlur = false; // blur occlusion
-    double m_SSAORadius = 0.1; // comparison radius
-    double m_SSAOBias = 0.001; // comparison bias
-    unsigned int m_KernelSize = 128; // number of samples used
+    bool m_enableSSAO         = false;
+    bool m_SSAOBlur           = false; // blur occlusion
+    double m_SSAORadius       = 0.1;   // comparison radius
+    double m_SSAOBias         = 0.001; // comparison bias
+    unsigned int m_KernelSize = 128;   // number of samples used
 };
 
 struct ShadowConfig
@@ -100,7 +99,7 @@ public:
 
     ///
     /// \brief Get the render config
-    /// 
+    ///
     std::shared_ptr<RendererConfig> getRenderConfig() const { return m_config; }
 
     ///

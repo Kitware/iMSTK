@@ -234,7 +234,7 @@ protected:
 
     // Shadow Effect
     vtkSmartPointer<vtkShadowMapPass> m_shadowPass;
-    vtkSmartPointer<vtkCameraPass> m_cameraPass;
+    vtkSmartPointer<vtkCameraPass>    m_cameraPass;
 
     bool m_debugActorsVisible;
 };

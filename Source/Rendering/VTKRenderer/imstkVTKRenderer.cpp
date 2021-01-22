@@ -244,7 +244,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     m_ssaoPass->SetDelegatePass(m_renderStepsPass);
 
     // Prepare shadow pipeline
-    vtkNew<vtkSequencePass> seq;
+    vtkNew<vtkSequencePass>         seq;
     vtkNew<vtkRenderPassCollection> passes;
     passes->AddItem(m_shadowPass->GetShadowMapBakerPass());
     passes->AddItem(m_shadowPass);
@@ -640,7 +640,7 @@ VTKRenderer::updateBackground(const Vec3d backgroundOne, const Vec3d backgroundT
 void
 VTKRenderer::applyConfigChanges(std::shared_ptr<RendererConfig> config)
 {
-    bool enableSSAO = m_config->m_ssaoConfig.m_enableSSAO;
+    bool enableSSAO   = m_config->m_ssaoConfig.m_enableSSAO;
     bool enableShadow = m_config->m_shadowConfig.m_enableShadows;
 
     {
@@ -649,8 +649,8 @@ VTKRenderer::applyConfigChanges(std::shared_ptr<RendererConfig> config)
     }
 
     {
-        m_ssaoPass->SetRadius(config->m_ssaoConfig.m_SSAORadius); // comparison radius
-        m_ssaoPass->SetBias(config->m_ssaoConfig.m_SSAOBias); // comparison bias
+        m_ssaoPass->SetRadius(config->m_ssaoConfig.m_SSAORadius);     // comparison radius
+        m_ssaoPass->SetBias(config->m_ssaoConfig.m_SSAOBias);         // comparison bias
         m_ssaoPass->SetKernelSize(config->m_ssaoConfig.m_KernelSize); // number of samples used
 
         if (config->m_ssaoConfig.m_SSAOBlur)
