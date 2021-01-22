@@ -41,11 +41,11 @@ LaparoscopicToolController::LaparoscopicToolController(
     trackingDevice->setButtonsEnabled(true);
 
     // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws/shaft from controller)
-    m_shaftVisualTransform = m_shaft->getVisualGeometry()->getTransform();
+    m_shaftVisualTransform    = m_shaft->getVisualGeometry()->getTransform();
     m_upperJawVisualTransform = m_upperJaw->getVisualGeometry()->getTransform();
     m_lowerJawVisualTransform = m_lowerJaw->getVisualGeometry()->getTransform();
 
-    m_shaftCollidingTransform = m_shaft->getCollidingGeometry()->getTransform();
+    m_shaftCollidingTransform    = m_shaft->getCollidingGeometry()->getTransform();
     m_upperJawCollidingTransform = m_upperJaw->getCollidingGeometry()->getTransform();
     m_lowerJawCollidingTransform = m_lowerJaw->getCollidingGeometry()->getTransform();
 }
