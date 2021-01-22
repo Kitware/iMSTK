@@ -52,7 +52,6 @@ public:
     void setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
 protected:
-
     VolumetricMesh(Geometry::Type type, const std::string& name = std::string("")) : PointSet(type, name) {}
 
     std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;          ///> Attached surface mesh

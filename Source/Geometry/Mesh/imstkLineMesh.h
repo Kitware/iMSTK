@@ -82,8 +82,6 @@ public:
     Vec2i& getLineIndices(const size_t pos);
 
 private:
-    friend class VTKLineMeshRenderDelegate;
-
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
 

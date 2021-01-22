@@ -105,8 +105,6 @@ public:
     unsigned int getMaxNumParticles();
 
 protected:
-    friend class VulkanParticleRenderDelegate;
-
     unsigned int m_numParticles    = 0;
     unsigned int m_maxNumParticles = 128; ///< Maximum particles
     float m_particleSize = 0.1f;

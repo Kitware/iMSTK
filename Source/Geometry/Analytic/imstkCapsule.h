@@ -38,6 +38,9 @@ public:
     ///
     Capsule(const std::string& name = std::string("defaultCapsule")) : AnalyticalGeometry(Type::Capsule, name) {}
 
+    ~Capsule() override = default;
+
+public:
     ///
     /// \brief Print the capsule info
     ///
@@ -73,9 +76,12 @@ public:
     ///
     double getFunctionValue(const Vec3d& x) const override;
 
-protected:
-    friend class VTKCapsuleRenderDelegate;
+    ///
+    /// \brief Get the min, max of the AABB around the capsule
+    ///
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent);
 
+protected:
     void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 

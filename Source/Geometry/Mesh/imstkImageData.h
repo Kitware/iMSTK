@@ -173,8 +173,6 @@ public:
     void clear() override;
 
 protected:
-    friend class VTKImageDataRenderDelegate;
-
     std::shared_ptr<AbstractDataArray> m_scalarArray = nullptr;
     Vec3i m_dims       = Vec3i(0, 0, 0);
     int   m_numComps   = 1;

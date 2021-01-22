@@ -43,6 +43,9 @@ public:
         setWidth(width);
     }
 
+    ~Cube() override = default;
+
+public:
     ///
     /// \brief Print the cube info
     ///
@@ -75,9 +78,12 @@ public:
         return std::max(std::max(d[0], d[1]), d[2]);
     }
 
-protected:
-    friend class VTKCubeRenderDelegate;
+    ///
+    /// \brief Get the min, max of the AABB around the cube
+    ///
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) override;
 
+protected:
     void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 

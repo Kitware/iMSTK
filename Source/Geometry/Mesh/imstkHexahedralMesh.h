@@ -90,8 +90,6 @@ public:
     double getVolume() override;
 
 protected:
-    friend class VTKHexahedralMeshRenderDelegate;
-
     std::shared_ptr<VecDataArray<int, 8>> m_hexahedraIndices; ///< indices of the hexahedra
 };
 } // imstk

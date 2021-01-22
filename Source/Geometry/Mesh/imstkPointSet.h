@@ -180,9 +180,6 @@ public:
     void updatePostTransformData() const override;
 
 protected:
-    friend class VTKPointSetRenderDelegate;
-    friend class VTKFluidRenderDelegate;
-
     ///
     /// \brief Applies transformation m directly the initial and post transform data
     ///

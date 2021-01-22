@@ -43,6 +43,9 @@ public:
         setRadius(radius);
     }
 
+    ~Sphere() override = default;
+
+public:
     ///
     /// \brief Print the sphere info
     ///
@@ -64,7 +67,7 @@ public:
     void setRadius(const double r);
 
     ///
-    /// \brief Compute the bounding box for the geometry
+    /// \brief Get the min, max of the AABB around the sphere
     ///
     virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
@@ -74,8 +77,6 @@ public:
     double getFunctionValue(const Vec3d& pos) const override { return (pos - m_position).norm() - m_radius; }
 
 protected:
-    friend class VTKSphereRenderDelegate;
-
     void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 
