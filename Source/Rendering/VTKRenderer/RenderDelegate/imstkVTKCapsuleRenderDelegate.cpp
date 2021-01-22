@@ -34,17 +34,17 @@ VTKCapsuleRenderDelegate::VTKCapsuleRenderDelegate(std::shared_ptr<VisualModel> 
 {
     auto geometry = std::static_pointer_cast<Capsule>(visualModel->getGeometry());
 
-    vtkNew<vtkCapsuleSource> capsuleSource;
-    capsuleSource->SetRadius(1.0);
-    capsuleSource->SetCylinderLength(geometry->getLength());
-    capsuleSource->SetLatLongTessellation(20);
-    capsuleSource->SetPhiResolution(20);
-    capsuleSource->SetThetaResolution(20);
+    m_capsuleSource = vtkSmartPointer<vtkCapsuleSource>::New();
+    m_capsuleSource->SetRadius(geometry->getRadius());
+    m_capsuleSource->SetCylinderLength(geometry->getLength());
+    m_capsuleSource->SetLatLongTessellation(20);
+    m_capsuleSource->SetPhiResolution(20);
+    m_capsuleSource->SetThetaResolution(20);
 
     // Setup mapper
     {
         vtkNew<vtkPolyDataMapper> mapper;
-        mapper->SetInputConnection(capsuleSource->GetOutputPort());
+        mapper->SetInputConnection(m_capsuleSource->GetOutputPort());
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
@@ -64,9 +64,13 @@ VTKCapsuleRenderDelegate::processEvents()
     // Don't use events for primitives, just always update
     auto geometry = std::static_pointer_cast<Capsule>(m_visualModel->getGeometry());
 
+    m_capsuleSource->SetRadius(geometry->getRadius());
+    m_capsuleSource->SetCylinderLength(geometry->getLength());
+
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
     T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
+    T.scale(1.0);
     T.matrix().transposeInPlace();
 
     m_transform->SetMatrix(T.data());

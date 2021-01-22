@@ -23,6 +23,8 @@
 
 #include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkCapsuleSource;
+
 namespace imstk
 {
 ///
@@ -47,5 +49,8 @@ public:
     /// \brief Update capsule source based on the capsule geometry
     ///
     void processEvents() override;
+
+protected:
+    vtkSmartPointer<vtkCapsuleSource> m_capsuleSource;
 };
 } // imstk

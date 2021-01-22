@@ -45,6 +45,9 @@ public:
         updatePostTransformData();
     }
 
+    ~Plane() override = default;
+
+public:
     ///
     /// \brief Print the plane info
     ///
@@ -76,11 +79,12 @@ public:
     ///
     double getFunctionValue(const Vec3d& pos) const override { return m_orientationAxis.dot(pos - m_position); }
 
+    ///
+    /// \brief Get the min, max of the AABB around the plane
+    ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) override;
 
 protected:
-    friend class VTKPlaneRenderDelegate;
-
     void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;
 

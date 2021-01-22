@@ -114,4 +114,17 @@ Capsule::updatePostTransformData() const
     m_lengthPostTransform = s0 * m_length;
     m_transformApplied    = true;
 }
+
+void
+Capsule::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
+{
+    updatePostTransformData();
+
+    const Vec3d l  = (m_lengthPostTransform * 0.5 + m_radiusPostTransform) * m_orientationAxisPostTransform;
+    const Vec3d p1 = m_positionPostTransform - l;
+    const Vec3d p2 = m_positionPostTransform + l;
+
+    min = p1.cwiseMin(p2);
+    max = p1.cwiseMax(p2);
+}
 } // imstk

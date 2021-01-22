@@ -121,8 +121,6 @@ public:
     double getVolume() override;
 
 protected:
-    friend class VTKTetrahedralMeshRenderDelegate;
-
     std::shared_ptr<VecDataArray<int, 4>> m_tetrahedraIndices;
 
     std::vector<bool> m_removedMeshElems;

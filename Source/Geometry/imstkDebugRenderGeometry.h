@@ -109,9 +109,6 @@ public:
     void setDataModified(const bool bState) { m_isModified = bState; }
 
 protected:
-    friend class VTKRenderer;
-    friend class VTKRenderDelegate;
-
     ///
     /// \brief Constructor
     ///

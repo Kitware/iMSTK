@@ -106,16 +106,15 @@ Plane::updatePostTransformData() const
 void
 Plane::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
 {
-    Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxis);
-    Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
-    Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
+    updatePostTransformData();
+    const Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxisPostTransform);
+    const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
+    const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
 
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
-    m_widthPostTransform = s0 * m_width;
-    Vec3d p1 = m_position + m_widthPostTransform * (i + j);
-    Vec3d p2 = m_position + m_widthPostTransform * (i - j);
-    Vec3d p3 = m_position + m_widthPostTransform * (-i + j);
-    Vec3d p4 = m_position + m_widthPostTransform * (-i - j);
+    const Vec3d p1 = m_positionPostTransform + m_widthPostTransform * (i + j);
+    const Vec3d p2 = m_positionPostTransform + m_widthPostTransform * (i - j);
+    const Vec3d p3 = m_positionPostTransform + m_widthPostTransform * (-i + j);
+    const Vec3d p4 = m_positionPostTransform + m_widthPostTransform * (-i - j);
 
     min = p1.cwiseMin(p2);
     min = min.cwiseMin(p3);

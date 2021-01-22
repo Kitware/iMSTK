@@ -47,6 +47,9 @@ public:
         updatePostTransformData();
     }
 
+    ~Cylinder() override = default;
+
+public:
     ///
     /// \brief Print the cylinder info
     ///
@@ -77,12 +80,14 @@ public:
     ///
     void setLength(const double r);
 
-protected:
-    friend class VTKCylinderRenderDelegate;
+    ///
+    /// \brief Get the min, max of the AABB around the cylinder
+    ///
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent);
 
+protected:
     // Hide these unimplemented functions
     using AnalyticalGeometry::getFunctionValue;
-    //using AnalyticalGeometry::getFunctionGrad;
 
     void applyTransform(const Mat4d& m) override;
     void updatePostTransformData() const override;

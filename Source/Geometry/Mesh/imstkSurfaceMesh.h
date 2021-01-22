@@ -249,8 +249,6 @@ public:
     std::shared_ptr<VecDataArray<double, 3>> getCellTangents() const;
 
 protected:
-    friend class VTKSurfaceMeshRenderDelegate;
-
     std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices

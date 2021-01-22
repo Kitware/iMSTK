@@ -92,10 +92,11 @@ Scene::initialize()
             std::shared_ptr<SceneObject> obj = i.second;
             for (auto visualModels : obj->getVisualModels())
             {
-                Vec3d min, max;
+                Vec3d min = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
+                Vec3d max = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
                 visualModels->getGeometry()->computeBoundingBox(min, max);
-                globalMin = min.cwiseMin(globalMin);
-                globalMax = max.cwiseMax(globalMax);
+                globalMin = globalMin.cwiseMin(min);
+                globalMax = globalMax.cwiseMax(max);
             }
         }
         const Vec3d center = (globalMin + globalMax) * 0.5;

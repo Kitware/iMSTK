@@ -84,4 +84,34 @@ Cube::updatePostTransformData() const
     m_widthPostTransform = s0 * m_width;
     m_transformApplied   = true;
 }
+
+void
+Cube::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
+{
+    updatePostTransformData();
+
+    const Mat3d r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxisPostTransform).toRotationMatrix();
+
+    const Vec3d a = r.col(0) * m_widthPostTransform * 0.5;
+    const Vec3d b = r.col(1) * m_widthPostTransform * 0.5;
+    const Vec3d c = r.col(2) * m_widthPostTransform * 0.5;
+
+    Vec3d pts[8];
+    pts[0] = m_positionPostTransform + a + b + c;
+    pts[1] = m_positionPostTransform + a + b - c;
+    pts[2] = m_positionPostTransform + a - b + c;
+    pts[3] = m_positionPostTransform + a - b - c;
+    pts[4] = m_positionPostTransform - a + b + c;
+    pts[5] = m_positionPostTransform - a + b - c;
+    pts[6] = m_positionPostTransform - a - b + c;
+    pts[7] = m_positionPostTransform - a - b - c;
+
+    min = pts[0];
+    max = pts[0];
+    for (int i = 1; i < 8; i++)
+    {
+        min = min.cwiseMin(pts[i]);
+        max = max.cwiseMax(pts[i]);
+    }
+}
 } // imstk

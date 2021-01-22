@@ -113,4 +113,20 @@ Cylinder::updatePostTransformData() const
     m_lengthPostTransform = s0 * m_length;
     m_transformApplied    = true;
 }
+
+void
+Cylinder::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
+{
+    updatePostTransformData();
+
+    const Vec3d d  = m_orientationAxisPostTransform * m_lengthPostTransform * 0.5;
+    const Vec3d p1 = m_positionPostTransform - d;
+    const Vec3d p2 = m_positionPostTransform + d;
+
+    const Vec3d  a = p2 - p1;
+    const double qSqrLength = a.dot(a);
+    const Vec3d  e = m_radiusPostTransform * (Vec3d(1.0, 1.0, 1.0) - a.cwiseProduct(a).cwiseQuotient(Vec3d(qSqrLength, qSqrLength, qSqrLength))).cwiseSqrt();
+    min = (p1 - e).cwiseMin(p2 - e);
+    max = (p1 + e).cwiseMax(p2 + e);
+}
 } // imstk
