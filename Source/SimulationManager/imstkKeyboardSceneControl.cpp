@@ -25,12 +25,11 @@
 #include "imstkModuleDriver.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSceneObject.h"
+#include "imstkVisualModel.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKTextStatusManager.h"
 #include "imstkVTKViewer.h"
-#include "imstkSceneObject.h"
-#include "imstkGeometry.h"
-#include "imstkCamera.h"
 
 namespace imstk
 {
@@ -70,6 +69,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
         return;
     }
 
+    // Pause/Resume the simulation
     if (key == ' ')
     {
         // To ensure consistency toggle/invert based of m_sceneManager
@@ -87,10 +87,12 @@ KeyboardSceneControl::OnKeyPress(const char key)
         // In case the SceneManager is not apart of the driver
         paused ? sceneManager->resume() : sceneManager->pause();
     }
+    // Stop the program
     else if (key == 'q' || key == 'Q' || key == 'e' || key == 'E') // end Simulation
     {
         driver->requestStatus(ModuleDriverStopped);
     }
+    // Switch to debug mode
     else if (key == 'd' || key == 'D') // switch rendering mode of the modules
     {
         // To ensure consistency toggle/invert based of m_sceneManager
@@ -124,6 +126,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
 
         simModeOn ? sceneManager->setMode(SceneManager::Mode::Debug) : sceneManager->setMode(SceneManager::Mode::Simulation);
     }
+    // Display framerate and performance graph
     else if (key == 'p' || key == 'P')  // switch framerate display
     {
         // The designated m_sceneManager framerate is displayed in all views
@@ -143,6 +146,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
             }
         }
     }
+    // Reset simulation
     else if (key == 'r' || key == 'R')
     {
         sceneManager->getActiveScene()->reset();

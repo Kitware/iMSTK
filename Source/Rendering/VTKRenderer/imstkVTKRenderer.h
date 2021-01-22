@@ -26,17 +26,13 @@
 #include "imstkVTKTextureDelegate.h"
 #include "imstkEventObject.h"
 
-#include <vtkCameraPass.h>
 #include <vtkSmartPointer.h>
-#include <vtkSSAOPass.h>
-#include <vtkShadowMapPass.h>
-#include <vtkRenderStepsPass.h>
-
 #include <unordered_map>
 #include <unordered_set>
 
 class vtkAxesActor;
 class vtkCamera;
+class vtkCameraPass;
 class vtkChartXY;
 class vtkContextActor;
 class vtkLight;
@@ -44,6 +40,9 @@ class vtkOpenVRCamera;
 class vtkPlotBar;
 class vtkProp;
 class vtkRenderer;
+class vtkRenderStepsPass;
+class vtkShadowMapPass;
+class vtkSSAOPass;
 class vtkTable;
 
 namespace imstk
@@ -108,16 +107,6 @@ public:
     bool getTimeTableVisibility() const;
 
     ///
-    /// \brief Get SSAO options
-    ///
-    ssaoConfig getSSAOConfig() const;
-
-    ///
-    /// \brief Get Shadow options
-    ///
-    shadowConfig getShadowConfig() const;
-
-    ///
     /// \brief Updates the camera
     ///
     void updateCamera();
@@ -142,15 +131,8 @@ public:
     ///
     void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false);
 
-    ///
-    /// \brief Update SSAO options
-    ///
-    void updateSSAOConfig(ssaoConfig config);
-
-    ///
-    /// \brief Update Sahdow options
-    ///
-    void updateShadowConfig(shadowConfig config);
+    void setDebugActorsVisible(const bool debugActorsVisible);
+    bool getDebugActorsVisible() const { return m_debugActorsVisible; }
 
 protected:
     ///
@@ -166,7 +148,7 @@ protected:
     ///
     /// \brief Apply config changes
     ///
-    void applyConfigChanges();
+    void applyConfigChanges(std::shared_ptr<RendererConfig> config) override;
 
 protected:
     ///
@@ -221,7 +203,11 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
     vtkSmartPointer<vtkAxesActor> m_AxesActor;
 
-    // imstk scene
+    // Render delegates for the props
+    std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
+    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
+    
+    // imstk scene    
     std::shared_ptr<Scene> m_scene;
 
     // Rendered Objects, this gives whats currently being rendered
@@ -235,6 +221,7 @@ protected:
     // TextureManager is used to share textures among differing delegates
     std::shared_ptr<TextureManager<VTKTextureDelegate>> m_textureManager;
 
+    // Performance chart overlay
     vtkSmartPointer<vtkChartXY>      m_timeTableChart;
     vtkSmartPointer<vtkContextActor> m_timeTableChartActor;
     vtkSmartPointer<vtkTable> m_timeTable;
@@ -242,11 +229,13 @@ protected:
     int m_timeTableIter = 0;
 
     // SSAO Effect
-    vtkNew<vtkSSAOPass> ssao;
-    vtkNew<vtkRenderStepsPass> ssaoBasicPass;
+    vtkSmartPointer<vtkSSAOPass> m_ssaoPass;
+    vtkSmartPointer<vtkRenderStepsPass> m_renderStepsPass;
 
-    // SSAO Effect
-    vtkNew<vtkShadowMapPass> shadows;
-    vtkNew<vtkCameraPass> shadowCamPass;
+    // Shadow Effect
+    vtkSmartPointer<vtkShadowMapPass> m_shadowPass;
+    vtkSmartPointer<vtkCameraPass> m_cameraPass;
+
+    bool m_debugActorsVisible;
 };
 }

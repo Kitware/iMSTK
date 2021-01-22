@@ -28,7 +28,7 @@
 namespace imstk
 {
 
-struct ssaoConfig
+struct SSAOConfig
 {
     bool m_enableSSAO = false;
     bool m_SSAOBlur = false; // blur occlusion
@@ -37,13 +37,13 @@ struct ssaoConfig
     unsigned int m_KernelSize = 128; // number of samples used
 };
 
-struct shadowConfig
+struct ShadowConfig
 {
     bool m_enableShadows = false;
-    unsigned int m_shadowResolution = 1024; // Shadow map resolution, not need to be power of 2
+    unsigned int m_shadowResolution = 2048; // Shadow map resolution, not need to be power of 2
 };
 
-struct rendererConfig
+struct RendererConfig
 {
     bool m_enableVR = false;
 
@@ -51,10 +51,10 @@ struct rendererConfig
     Color m_BGColor2 = Color(0.13836, 0.13836, 0.2748);
 
     // ScreenSpace Ambient Occlusion
-    ssaoConfig m_ssaoConfig;
+    SSAOConfig m_ssaoConfig;
 
     // Shadow Settings
-    shadowConfig m_shadowConfig;
+    ShadowConfig m_shadowConfig;
 };
 
 ///
@@ -75,7 +75,7 @@ public:
         Simulation
     };
 
-    Renderer() : m_config(std::make_shared<rendererConfig>()) { }
+    Renderer() : m_config(std::make_shared<RendererConfig>()) { }
     virtual ~Renderer() = default;
 
 public:
@@ -98,10 +98,21 @@ public:
     ///
     virtual void updateBackground(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(), const bool gradientBackground = false) = 0;
 
+    ///
+    /// \brief Get the render config
+    /// 
+    std::shared_ptr<RendererConfig> getRenderConfig() const { return m_config; }
+
+    ///
+    /// \brief Apply config changes
+    ///
+    void updateConfig() { applyConfigChanges(m_config); }
+    virtual void applyConfigChanges(std::shared_ptr<RendererConfig> config) = 0;
+
 protected:
     bool m_VrEnabled = false;
     Renderer::Mode m_currentMode = Renderer::Mode::Simulation;
 
-    std::shared_ptr<rendererConfig> m_config;
+    std::shared_ptr<RendererConfig> m_config;
 };
 }

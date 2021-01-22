@@ -155,6 +155,6 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
         break;
     }
 
-    m_actor->SetVisibility(m_visualModel->isVisible());
+    m_actor->SetVisibility(m_visualModel->getVisible());
 }
 }

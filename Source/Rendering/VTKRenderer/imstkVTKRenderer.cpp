@@ -46,18 +46,26 @@
 #include <vtkTable.h>
 #include <vtkTextProperty.h>
 
-#include <vtkOpenVRRenderer.h>
+#include <vtkCameraPass.h>
 #include <vtkOpenVRCamera.h>
+#include <vtkOpenVRRenderer.h>
+#include <vtkRenderPassCollection.h>
+#include <vtkRenderStepsPass.h>
+#include <vtkSequencePass.h>
 #include <vtkShadowMapBakerPass.h>
 #include <vtkShadowMapPass.h>
-#include <vtkSequencePass.h>
-#include <vtkCameraPass.h>
-#include <vtkRenderPassCollection.h>
+#include <vtkSSAOPass.h>
+#include <vtkProperty.h>
 
 namespace imstk
 {
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
-    m_scene(scene), m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>())
+    m_scene(scene), 
+    m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>()),
+    m_ssaoPass(vtkSmartPointer<vtkSSAOPass>::New()),
+    m_renderStepsPass(vtkSmartPointer<vtkRenderStepsPass>::New()),
+    m_shadowPass(vtkSmartPointer<vtkShadowMapPass>::New()),
+    m_cameraPass(vtkSmartPointer<vtkCameraPass>::New())
 {
     // create m_vtkRenderer depending on enableVR
     if (!enableVR)
@@ -141,12 +149,6 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
 
             LOG(WARNING) << "Light type undefined!";
         }
-    }
-    
-    for (const auto& light : m_vtkLights)
-    {
-        m_vtkRenderer->AddLight(light);
-        std::cout << "debugi" << std::endl;
     }
 
     for (const auto& light : m_vtkLights)
@@ -239,18 +241,17 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     }
 
     // Prepare screen space ambient occlusion effect
-    ssao->SetDelegatePass(ssaoBasicPass);
+    m_ssaoPass->SetDelegatePass(m_renderStepsPass);
 
     // Prepare shadow pipeline
     vtkNew<vtkSequencePass> seq;
     vtkNew<vtkRenderPassCollection> passes;
-    passes->AddItem(shadows->GetShadowMapBakerPass());
-    passes->AddItem(shadows);
+    passes->AddItem(m_shadowPass->GetShadowMapBakerPass());
+    passes->AddItem(m_shadowPass);
     seq->SetPasses(passes);
-    shadowCamPass->SetDelegatePass(seq);
+    m_cameraPass->SetDelegatePass(seq);
 
-    updateSSAOConfig(m_config->m_ssaoConfig);
-    updateShadowConfig(m_config->m_shadowConfig);
+    updateConfig();
 }
 
 void
@@ -405,18 +406,6 @@ bool
 VTKRenderer::getTimeTableVisibility() const
 {
     return m_timeTableChartActor->GetVisibility();
-}
-
-ssaoConfig
-VTKRenderer::getSSAOConfig() const
-{
-    return m_config->m_ssaoConfig;
-}
-
-shadowConfig
-VTKRenderer::getShadowConfig() const
-{
-    return m_config->m_shadowConfig;
 }
 
 void
@@ -649,71 +638,58 @@ VTKRenderer::updateBackground(const Vec3d backgroundOne, const Vec3d backgroundT
 }
 
 void
-VTKRenderer::updateSSAOConfig(ssaoConfig config)
-{
-    m_config->m_ssaoConfig = config; // update config
-
-    ssao->SetRadius(config.m_SSAORadius); // comparison radius
-    ssao->SetBias(config.m_SSAOBias); // comparison bias
-    ssao->SetKernelSize(config.m_KernelSize); // number of samples used
-
-    if (config.m_SSAOBlur)
-    {
-        ssao->BlurOn(); // blur occlusion
-    }
-    else
-    {
-        ssao->BlurOff(); // do not blur occlusion
-    }
-
-
-    applyConfigChanges();
-
-    std::cout << "SSAO: " << config.m_enableSSAO ? "On" : "Off";
-    std::cout << " Blur: " << config.m_SSAOBlur ? "On" : "Off";
-    std::cout << " kernel: " << config.m_KernelSize;
-    std::cout << " bias: " << config.m_SSAOBias;
-    std::cout << " radius: " << config.m_SSAORadius << std::endl;
-}
-
-
-void
-VTKRenderer::updateShadowConfig(shadowConfig config)
-{
-    m_config->m_shadowConfig= config; // update config
-
-    shadows->GetShadowMapBakerPass()->SetResolution(config.m_shadowResolution);
-    shadows->GetShadowMapBakerPass()->Modified();
-
-    applyConfigChanges();
-
-    std::cout << "Shadows: " << config.m_enableShadows ? "On" : "Off";
-    std::cout << " Resolution: " << config.m_shadowResolution << std::endl;
-}
-
-void
-VTKRenderer::applyConfigChanges()
+VTKRenderer::applyConfigChanges(std::shared_ptr<RendererConfig> config)
 {
     bool enableSSAO = m_config->m_ssaoConfig.m_enableSSAO;
     bool enableShadow = m_config->m_shadowConfig.m_enableShadows;
 
+    {
+        m_shadowPass->GetShadowMapBakerPass()->SetResolution(config->m_shadowConfig.m_shadowResolution);
+        m_shadowPass->GetShadowMapBakerPass()->Modified();
+    }
+
+    {
+        m_ssaoPass->SetRadius(config->m_ssaoConfig.m_SSAORadius); // comparison radius
+        m_ssaoPass->SetBias(config->m_ssaoConfig.m_SSAOBias); // comparison bias
+        m_ssaoPass->SetKernelSize(config->m_ssaoConfig.m_KernelSize); // number of samples used
+
+        if (config->m_ssaoConfig.m_SSAOBlur)
+        {
+            m_ssaoPass->BlurOn(); // blur occlusion
+        }
+        else
+        {
+            m_ssaoPass->BlurOff(); // do not blur occlusion
+        }
+    }
+
     if (enableSSAO && enableShadow)
     {
-        ssao->SetDelegatePass(shadowCamPass);
-        m_vtkRenderer->SetPass(ssao);
+        m_ssaoPass->SetDelegatePass(m_cameraPass);
+        m_vtkRenderer->SetPass(m_ssaoPass);
     }
     else if (enableSSAO)
     {
-        ssao->SetDelegatePass(ssaoBasicPass);
-        m_vtkRenderer->SetPass(ssao);
+        m_ssaoPass->SetDelegatePass(m_renderStepsPass);
+        m_vtkRenderer->SetPass(m_ssaoPass);
     }
     else if (enableShadow)
     {
-        m_vtkRenderer->SetPass(shadowCamPass);
+        m_vtkRenderer->SetPass(m_cameraPass);
     }
     else
     {
         m_vtkRenderer->SetPass(NULL);
+    }
+}
+
+void
+VTKRenderer::setDebugActorsVisible(const bool debugActorsVisible)
+{
+    m_debugActorsVisible = debugActorsVisible;
+    for (auto debugActors : m_debugVtkActors)
+    {
+        debugActors->SetVisibility(debugActorsVisible);
     }
 }
 } // imstk
