@@ -41,13 +41,13 @@ LaparoscopicToolController::LaparoscopicToolController(
     trackingDevice->setButtonsEnabled(true);
 
     // Record the transforms as 4x4 matrices (this should capture initial displacement/rotation of the jaws/shaft from controller)
-    m_shaftVisualTransform    =  mat4dTranslate(m_shaft->getVisualGeometry()->getTranslation()) * mat4dRotation(m_shaft->getVisualGeometry()->getRotation());
-    m_upperJawVisualTransform = mat4dTranslate(m_upperJaw->getVisualGeometry()->getTranslation()) * mat4dRotation(m_upperJaw->getVisualGeometry()->getRotation());
-    m_lowerJawVisualTransform = mat4dTranslate(m_lowerJaw->getVisualGeometry()->getTranslation()) * mat4dRotation(m_lowerJaw->getVisualGeometry()->getRotation());
+    m_shaftVisualTransform = m_shaft->getVisualGeometry()->getTransform();
+    m_upperJawVisualTransform = m_upperJaw->getVisualGeometry()->getTransform();
+    m_lowerJawVisualTransform = m_lowerJaw->getVisualGeometry()->getTransform();
 
-    m_shaftCollidingTransform    = mat4dTranslate(m_shaft->getCollidingGeometry()->getTranslation()) * mat4dRotation(m_shaft->getCollidingGeometry()->getRotation());
-    m_upperJawCollidingTransform = mat4dTranslate(m_upperJaw->getCollidingGeometry()->getTranslation()) * mat4dRotation(m_upperJaw->getCollidingGeometry()->getRotation());
-    m_lowerJawCollidingTransform = mat4dTranslate(m_lowerJaw->getCollidingGeometry()->getTranslation()) * mat4dRotation(m_lowerJaw->getCollidingGeometry()->getRotation());
+    m_shaftCollidingTransform = m_shaft->getCollidingGeometry()->getTransform();
+    m_upperJawCollidingTransform = m_upperJaw->getCollidingGeometry()->getTransform();
+    m_lowerJawCollidingTransform = m_lowerJaw->getCollidingGeometry()->getTransform();
 }
 
 void
@@ -68,18 +68,10 @@ LaparoscopicToolController::update(const double dt)
     // Controller transform
     m_controllerWorldTransform = mat4dTranslate(controllerPosition) * mat4dRotation(controllerOrientation);
 
-    // TRS decompose and set shaft geometries
+    // Set shaft geometries
     {
-        Vec3d t, s;
-        Mat3d r;
-
-        mat4dTRS(m_controllerWorldTransform * m_shaftVisualTransform, t, r, s);
-        m_shaft->getVisualGeometry()->setRotation(r);
-        m_shaft->getVisualGeometry()->setTranslation(t);
-
-        mat4dTRS(m_controllerWorldTransform * m_shaftCollidingTransform, t, r, s);
-        m_shaft->getCollidingGeometry()->setRotation(r);
-        m_shaft->getCollidingGeometry()->setTranslation(t);
+        m_shaft->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_shaftVisualTransform);
+        m_shaft->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_shaftCollidingTransform);
     }
 
     // Update jaw angles
@@ -99,28 +91,12 @@ LaparoscopicToolController::update(const double dt)
 
     // TRS decompose and set upper/lower jaw geometries
     {
-        Vec3d t, s;
-        Mat3d r;
-
-        mat4dTRS(m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawVisualTransform, t, r, s);
-        m_upperJaw->getVisualGeometry()->setRotation(r);
-        m_upperJaw->getVisualGeometry()->setTranslation(t);
-
-        mat4dTRS(m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawCollidingTransform, t, r, s);
-        m_upperJaw->getCollidingGeometry()->setRotation(r);
-        m_upperJaw->getCollidingGeometry()->setTranslation(t);
+        m_upperJaw->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawVisualTransform);
+        m_upperJaw->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawCollidingTransform);
     }
     {
-        Vec3d t, s;
-        Mat3d r;
-
-        mat4dTRS(m_controllerWorldTransform * m_lowerJawLocalTransform * m_upperJawVisualTransform, t, r, s);
-        m_lowerJaw->getVisualGeometry()->setRotation(r);
-        m_lowerJaw->getVisualGeometry()->setTranslation(t);
-
-        mat4dTRS(m_controllerWorldTransform * m_lowerJawLocalTransform * m_lowerJawCollidingTransform, t, r, s);
-        m_lowerJaw->getCollidingGeometry()->setRotation(r);
-        m_lowerJaw->getCollidingGeometry()->setTranslation(t);
+        m_lowerJaw->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_lowerJawLocalTransform * m_upperJawVisualTransform);
+        m_lowerJaw->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_lowerJawLocalTransform * m_lowerJawCollidingTransform);
     }
 }
 
