@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkAbstractVTKViewer.h"
+#include "imstkDeviceControl.h"
 #include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkVTKInteractorStyle.h"
@@ -91,6 +92,12 @@ void
 AbstractVTKViewer::processEvents()
 {
     m_vtkRenderWindow->GetInteractor()->ProcessEvents();
+
+    // Update all controls
+    for (auto control : m_controls)
+    {
+        control->update(m_dt);
+    }
 }
 
 void
@@ -118,6 +125,12 @@ AbstractVTKViewer::setVtkLoggerMode(VTKLoggerMode loggerMode)
 bool
 AbstractVTKViewer::initModule()
 {
+    // Print all controls on viewer
+    for (auto control : m_controls)
+    {
+        control->printControls();
+    }
+
     exitCallback = vtkSmartPointer<vtkCallbackCommand>::New();
     exitCallback->SetCallback(exitCallbackFunc);
     exitCallback->SetClientData(this);

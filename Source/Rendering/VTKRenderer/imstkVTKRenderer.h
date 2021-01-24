@@ -193,7 +193,7 @@ protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
     // Camera
-    vtkSmartPointer<vtkCamera> m_Camera;
+    vtkSmartPointer<vtkCamera> m_camera;
 
     // lights
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;

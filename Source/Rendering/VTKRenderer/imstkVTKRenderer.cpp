@@ -165,16 +165,16 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     // Camera and camera actor
     if (!enableVR)
     {
-        m_Camera = vtkSmartPointer<vtkCamera>::New();
+        m_camera = vtkSmartPointer<vtkCamera>::New();
     }
     else
     {
-        m_Camera = vtkSmartPointer<vtkOpenVRCamera>::New();
+        m_camera = vtkSmartPointer<vtkOpenVRCamera>::New();
     }
 
     updateCamera();
     vtkNew<vtkCameraActor> camActor;
-    camActor->SetCamera(m_Camera);
+    camActor->SetCamera(m_camera);
     m_debugVtkActors.push_back(camActor);
 
     ///TODO : based on scene properties
@@ -301,7 +301,7 @@ VTKRenderer::setMode(const Renderer::Mode mode, const bool enableVR)
     }
 
     // Reset the camera
-    m_Camera = vtkSmartPointer<vtkCamera>::New();
+    m_camera = vtkSmartPointer<vtkCamera>::New();
 
     Renderer::setMode(mode, enableVR);
 }
@@ -412,7 +412,7 @@ void
 VTKRenderer::updateCamera()
 {
     std::shared_ptr<Camera> cam = m_scene->getActiveCamera();
-    getVtkRenderer()->SetActiveCamera(m_Camera);
+    getVtkRenderer()->SetActiveCamera(m_camera);
 
     // Update the camera to obtain corrected view/proj matrices
     cam->update();
@@ -423,11 +423,13 @@ VTKRenderer::updateCamera()
     const double eyePos[3]  = { invView(0, 3), invView(1, 3), invView(2, 3) };
     const double forward[3] = { invView(0, 2), invView(1, 2), invView(2, 2) };
     const double up[3]      = { invView(0, 1), invView(1, 1), invView(2, 1) };
-    m_Camera->SetPosition(eyePos);
-    m_Camera->SetFocalPoint(eyePos[0] - forward[0], eyePos[1] - forward[1], eyePos[2] - forward[2]);
-    m_Camera->SetViewUp(up[0], up[1], up[2]);
-    m_Camera->SetViewAngle(cam->getFieldOfView());
-    m_Camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
+
+    m_camera->SetPosition(eyePos);
+    m_camera->SetFocalPoint(eyePos[0] - forward[0], eyePos[1] - forward[1], eyePos[2] - forward[2]);
+    m_camera->SetViewUp(up[0], up[1], up[2]);
+    m_camera->SetViewAngle(cam->getFieldOfView());
+    m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
+    m_camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
 }
 
 void
