@@ -29,9 +29,29 @@
 #include "imstkVTKMeshIO.h"
 
 #include <sys/stat.h>
+#include <unordered_map>
 
 namespace imstk
 {
+static std::unordered_map<std::string, MeshFileType> extToType =
+{
+    { "vtk", MeshFileType::VTK },
+    { "vtp", MeshFileType::VTP },
+    { "vtu", MeshFileType::VTU },
+    { "obj", MeshFileType::OBJ },
+    { "stl", MeshFileType::STL },
+    { "ply", MeshFileType::PLY },
+    { "dae", MeshFileType::DAE },
+    { "fbx", MeshFileType::FBX },
+    { "3ds", MeshFileType::_3DS },
+    { "veg", MeshFileType::VEG },
+    { "msh", MeshFileType::MSH },
+    { "dcm", MeshFileType::DCM },
+    { "nrrd", MeshFileType::NRRD },
+    { "nii", MeshFileType::NII },
+    { "mhd", MeshFileType::MHD }
+};
+
 std::shared_ptr<PointSet>
 MeshIO::read(const std::string& filePath)
 {
@@ -54,6 +74,7 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::NRRD:
     case MeshFileType::NII:
     case MeshFileType::DCM:
+    case MeshFileType::MHD:
         return VTKMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::OBJ:
@@ -68,7 +89,7 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::MSH:
         return MSHMeshIO::read(filePath, meshType);
         break;
-    case UNKNOWN:
+    case MeshFileType::UNKNOWN:
     default:
         break;
     }
@@ -102,74 +123,20 @@ MeshIO::fileExists(const std::string& file, bool& isDirectory)
 const MeshFileType
 MeshIO::getFileType(const std::string& filePath)
 {
-    MeshFileType meshType = MeshFileType::UNKNOWN;
-
     std::string extString = filePath.substr(filePath.find_last_of(".") + 1);
 
     CHECK(!extString.empty()) << "MeshIO::getFileType error: invalid file name";
 
-    if (extString == "vtk" || extString == "VTK")
-    {
-        meshType = MeshFileType::VTK;
-    }
-    else if (extString == "vtp" || extString == "VTP")
-    {
-        meshType = MeshFileType::VTP;
-    }
-    else if (extString == "vtu" || extString == "VTU")
-    {
-        meshType = MeshFileType::VTU;
-    }
-    else if (extString == "obj" || extString == "OBJ")
-    {
-        meshType = MeshFileType::OBJ;
-    }
-    else if (extString == "stl" || extString == "STL")
-    {
-        meshType = MeshFileType::STL;
-    }
-    else if (extString == "ply" || extString == "PLY")
-    {
-        meshType = MeshFileType::PLY;
-    }
-    else if (extString == "dae" || extString == "DAE")
-    {
-        meshType = MeshFileType::DAE;
-    }
-    else if (extString == "fbx" || extString == "FBX")
-    {
-        meshType = MeshFileType::FBX;
-    }
-    else if (extString == "3ds" || extString == "3DS")
-    {
-        meshType = MeshFileType::_3DS;
-    }
-    else if (extString == "veg" || extString == "VEG")
-    {
-        meshType = MeshFileType::VEG;
-    }
-    else if (extString == "msh" || extString == "MSH")
-    {
-        meshType = MeshFileType::MSH;
-    }
-    else if (extString == "dcm" || extString == "DCM")
-    {
-        meshType = MeshFileType::DCM;
-    }
-    else if (extString == "nrrd" || extString == "NRRD")
-    {
-        meshType = MeshFileType::NRRD;
-    }
-    else if (extString == "nii" || extString == "NII")
-    {
-        meshType = MeshFileType::NII;
-    }
-    else
+    // To lowercase
+    std::transform(extString.begin(), extString.end(), extString.begin(),
+        [](unsigned char c) { return std::tolower(static_cast<int>(c)); });
+
+    if (extToType.count(extString) == 0)
     {
         LOG(FATAL) << "MeshIO::getFileType error: unknown file extension";
     }
 
-    return meshType;
+    return extToType[extString];
 }
 
 bool
@@ -194,6 +161,7 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     case MeshFileType::VTP:
     case MeshFileType::STL:
     case MeshFileType::PLY:
+    case MeshFileType::MHD:
         return VTKMeshIO::write(imstkMesh, filePath, meshType);
         break;
     case MeshFileType::UNKNOWN:

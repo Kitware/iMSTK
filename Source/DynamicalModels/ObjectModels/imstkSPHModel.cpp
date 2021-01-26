@@ -886,7 +886,7 @@ SPHModel::writeStateToVtk()
 
         VTKMeshIO   vtkWriter;
         std::string filePath = std::string("sph_output_") + std::to_string(m_totalTime) + std::string(".vtu");
-        vtkWriter.write(m_geomUnstructuredGrid, filePath, VTU);
+        vtkWriter.write(m_geomUnstructuredGrid, filePath, MeshFileType::VTU);
 
         m_vtkTimeModulo  += m_writeToOutputModulo;
         m_vtkPreviousTime = m_totalTime;
