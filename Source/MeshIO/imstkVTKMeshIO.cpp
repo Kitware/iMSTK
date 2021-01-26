@@ -32,6 +32,8 @@
 #include <vtkGenericDataObjectReader.h>
 #include <vtkGenericDataObjectWriter.h>
 #include <vtkImageData.h>
+#include <vtkMetaImageReader.h>
+#include <vtkMetaImageWriter.h>
 #include <vtkNIFTIImageReader.h>
 #include <vtkNIFTIImageWriter.h>
 #include <vtkNrrdReader.h>
@@ -91,6 +93,10 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     {
         return VTKMeshIO::readVtkImageDataNIFTI(filePath);
     }
+    case MeshFileType::MHD:
+    {
+        return VTKMeshIO::readVtkImageData<vtkMetaImageReader>(filePath);
+    }
     default:
     {
         LOG(FATAL) << "VTKMeshIO::read error: file type not supported";
@@ -109,6 +115,10 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::NII:
         {
             return VTKMeshIO::writeVtkImageDataNIFTI(imgMesh, filePath);
+        }
+        case MeshFileType::MHD:
+        {
+            return VTKMeshIO::writeMetaImageData(imgMesh, filePath);
         }
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";
@@ -250,7 +260,14 @@ VTKMeshIO::writeVtkImageData(const std::shared_ptr<ImageData> imstkMesh, const s
 
     int* dim    = vtkMesh->GetDimensions();
     auto writer = vtkSmartPointer<WriterType>::New();
-    writer->SetFileDimensionality(3);
+    if (vtkMesh->GetDimensions()[2] == 1)
+    {
+        writer->SetFileDimensionality(2);
+    }
+    else
+    {
+        writer->SetFileDimensionality(3);
+    }
     writer->SetInputData(vtkMesh);
     writer->SetFileName(filePath.c_str());
     writer->Write();
@@ -385,9 +402,6 @@ VTKMeshIO::writeVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> hMesh, const
     return true;
 }
 
-///
-/// \brief Reads vtk image data
-///
 template<typename ReaderType>
 std::shared_ptr<ImageData>
 VTKMeshIO::readVtkImageData(const std::string& filePath)
@@ -400,9 +414,6 @@ VTKMeshIO::readVtkImageData(const std::string& filePath)
     return imageData;
 }
 
-///
-/// \brief Reads nifti/nii format image data
-///
 std::shared_ptr<ImageData>
 VTKMeshIO::readVtkImageDataNIFTI(const std::string& filePath)
 {
@@ -415,9 +426,6 @@ VTKMeshIO::readVtkImageDataNIFTI(const std::string& filePath)
     return imageData;
 }
 
-///
-/// \brief Write nifti/nii format image data
-///
 bool
 VTKMeshIO::writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const std::string& filePath)
 {
@@ -431,9 +439,40 @@ VTKMeshIO::writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const st
 
     auto writer = vtkSmartPointer<vtkNIFTIImageWriter>::New();
     writer->SetFileName(filePath.c_str());
-    writer->SetFileDimensionality(3);
+    if (vtkMesh->GetDimensions()[2] == 1)
+    {
+        writer->SetFileDimensionality(2);
+    }
+    else
+    {
+        writer->SetFileDimensionality(3);
+    }
     writer->SetInputData(vtkMesh);
     writer->Update();
     return true;
+}
+
+bool
+VTKMeshIO::writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::string& filePath)
+{
+    vtkSmartPointer<vtkImageData> vtkMesh = GeometryUtils::copyToVtkImageData(imageData);
+    if (!vtkMesh)
+    {
+        return false;
+    }
+
+    auto writer = vtkSmartPointer<vtkMetaImageWriter>::New();
+    if (vtkMesh->GetDimensions()[2] == 1)
+    {
+        writer->SetFileDimensionality(2);
+    }
+    else
+    {
+        writer->SetFileDimensionality(3);
+    }
+    writer->SetInputData(vtkMesh);
+    writer->SetFileName(filePath.c_str());
+    writer->SetRAWFileName((filePath + ".raw").c_str());
+    writer->Write();
 }
 } // imstk

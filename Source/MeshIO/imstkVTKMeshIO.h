@@ -133,5 +133,10 @@ protected:
     /// \brief Write nifti/nii format image data
     ///
     static bool writeVtkImageDataNIFTI(std::shared_ptr<ImageData> imageData, const std::string& filePath);
+
+    ///
+    /// \brief Write meta/mhd format image data
+    /// 
+    static bool writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::string& filePath);
 };
 } // imstk

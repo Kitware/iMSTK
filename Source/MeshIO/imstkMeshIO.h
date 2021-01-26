@@ -31,7 +31,7 @@ class PointSet;
 ///
 /// \brief Enumeration the mesh file type
 ///
-enum MeshFileType
+enum class MeshFileType
 {
     UNKNOWN,
     VTK,
@@ -47,7 +47,8 @@ enum MeshFileType
     MSH,
     NRRD,
     DCM,
-    NII
+    NII,
+    MHD
 };
 
 ///

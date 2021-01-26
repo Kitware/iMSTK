@@ -22,6 +22,7 @@
 #include "imstkCamera.h"
 #include "imstkImageData.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
@@ -44,6 +45,8 @@ using namespace imstk;
 int
 main()
 {
+    Logger::startLogger();
+
     // SDK and Scene
     imstkNew<Scene> scene("VolumeRendering");
 
