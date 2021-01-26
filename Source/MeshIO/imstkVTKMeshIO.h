@@ -136,7 +136,7 @@ protected:
 
     ///
     /// \brief Write meta/mhd format image data
-    /// 
+    ///
     static bool writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::string& filePath);
 };
 } // imstk
