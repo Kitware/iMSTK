@@ -83,7 +83,7 @@ public:
     ///
     void configure(std::shared_ptr<LevelSetModelConfig> config);
 
-    virtual void evolveDistanceField();
+    virtual void evolve();
 
     void addImpulse(const Vec3i& coord, double f);
     void setImpulse(const Vec3i& coord, double f);

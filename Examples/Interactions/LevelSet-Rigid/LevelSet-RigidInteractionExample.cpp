@@ -56,13 +56,14 @@ using namespace imstk::expiremental;
 /// \brief Creates a level set obj (poly rendering)
 ///
 std::shared_ptr<LevelSetDeformableObject>
-makeLevelsetObj(const std::string& name, std::shared_ptr<LocalMarchingCubes> isoExtract)
+makeLevelsetObj(const std::string& name, std::shared_ptr<LocalMarchingCubes> isoExtract, std::unordered_set<int>& chunksGenerated)
 {
     imstkNew<LevelSetDeformableObject> levelsetObj(name);
 
     std::shared_ptr<ImageData> initLvlsetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBone_SDF.nii")->cast(IMSTK_DOUBLE);
     const Vec3d&               currSpacing     = initLvlsetImage->getSpacing();
-    initLvlsetImage->setSpacing(currSpacing * 0.001); // note: Anisotropic scaling invalidates SDF
+    // Note: Anistropic scaling would invalidate the SDF
+    initLvlsetImage->setSpacing(currSpacing * 0.001);
     initLvlsetImage->setOrigin(Vec3d(0.0, 0.8, 1.5));
 
     // Setup the Parameters
@@ -76,27 +77,35 @@ makeLevelsetObj(const std::string& name, std::shared_ptr<LocalMarchingCubes> iso
     model->setModelGeometry(initLvlsetImage);
     model->configure(lvlSetConfig);
 
+    // Too many chunks and you'll hit memory constraints quickly
+    // Too little chunks and the updates for a chunk will take too long
+    // The chunks must divide the image dimensions (image dim-1 must be divisible by # chunks)
     isoExtract->setInputImage(initLvlsetImage);
     isoExtract->setIsoValue(0.0);
-    isoExtract->setNumberOfChunks(Vec3i(16, 9, 9)); // Image dim-1 must be divisible by # chunks
+    isoExtract->setNumberOfChunks(Vec3i(32, 9, 9));
     isoExtract->update();
 
     srand(time(NULL));
 
-    for (int i = 0; i < 9 * 9 * 16; i++)
+    const Vec3i& numChunks = isoExtract->getNumberOfChunks();
+    for (int i = 0; i < numChunks[0] * numChunks[1] * numChunks[2]; i++)
     {
-        imstkNew<VisualModel>    surfMeshModel(isoExtract->getOutput(i));
-        imstkNew<RenderMaterial> material;
-        material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-        material->setLineWidth(4.0);
-        //material->setPointSize(0.001);
-        const double r = (rand() % 500) / 500.0;
-        const double g = (rand() % 500) / 500.0;
-        const double b = (rand() % 500) / 500.0;
-        material->setColor(Color(r, g, b));
-        material->setEdgeColor(Color::Color::Orange);
-        surfMeshModel->setRenderMaterial(material);
-        levelsetObj->addVisualModel(surfMeshModel);
+        auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(isoExtract->getOutput(i));
+        if (surfMesh->getNumVertices() > 0 && chunksGenerated.count(i) == 0)
+        {
+            imstkNew<VisualModel>    surfMeshModel(isoExtract->getOutput(i));
+            imstkNew<RenderMaterial> material;
+            material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+            material->setLineWidth(4.0);
+            const double r = (rand() % 500) / 500.0;
+            const double g = (rand() % 500) / 500.0;
+            const double b = (rand() % 500) / 500.0;
+            material->setColor(Color(r, g, b));
+            material->setEdgeColor(Color::Color::Orange);
+            surfMeshModel->setRenderMaterial(material);
+            levelsetObj->addVisualModel(surfMeshModel);
+            chunksGenerated.insert(i);
+        }
     }
 
     // Setup the Object
@@ -124,7 +133,7 @@ makeRigidObj(const std::string& name)
     imstkNew<RigidObject2> rigidObj("Cube");
 
     {
-        auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Blade10_Hull.stl");
+        auto toolMesh = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/testMesh.stl");
         toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
         toolMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
         toolMesh->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
@@ -154,7 +163,9 @@ makeRigidObj(const std::string& name)
 }
 
 ///
-/// \brief This example demonstrates evolution of a levelset
+/// \brief This example demonstrates cutting a femur bone with a tool
+/// Some of the example parameters may need to be tweaked for differing
+/// systems
 ///
 int
 main()
@@ -165,7 +176,8 @@ main()
     imstkNew<Scene> scene("FemurCut");
 
     std::shared_ptr<LocalMarchingCubes>       isoExtract = std::make_shared<LocalMarchingCubes>();
-    std::shared_ptr<LevelSetDeformableObject> lvlSetObj  = makeLevelsetObj("LevelSetObj", isoExtract);
+    std::unordered_set<int>                   chunksGenerated; // Lazy generation of chunks
+    std::shared_ptr<LevelSetDeformableObject> lvlSetObj = makeLevelsetObj("LevelSetObj", isoExtract, chunksGenerated);
     scene->addSceneObject(lvlSetObj);
 
     std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("RigidObj");
@@ -186,9 +198,9 @@ main()
     colHandlerA->setStiffness(0.0); // inelastic collision
     auto colHandlerB = std::dynamic_pointer_cast<LevelSetCH>(interaction->getCollisionHandlingB());
     colHandlerB->setLevelSetVelocityScaling(0.1);
-    colHandlerB->setKernel(5, 1.0);
+    colHandlerB->setKernel(3, 1.0);
     //colHandlerB->setLevelSetVelocityScaling(0.0); // Can't push the levelset
-    colHandlerB->setUseProportionalVelocity(false);
+    colHandlerB->setUseProportionalVelocity(true);
     scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light (white)
@@ -247,7 +259,30 @@ main()
         });
         connect<Event>(viewer, EventType::PreUpdate, [&](Event*)
         {
+            // Update any chunks that contain a voxel which was set modified
             isoExtract->update();
+
+            // Create meshes for chunks if they now contain vertices (and weren't already generated)
+            const Vec3i& numChunks = isoExtract->getNumberOfChunks();
+            for (int i = 0; i < numChunks[0] * numChunks[1] * numChunks[2]; i++)
+            {
+                auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(isoExtract->getOutput(i));
+                if (surfMesh->getNumVertices() > 0 && chunksGenerated.count(i) == 0)
+                {
+                    imstkNew<VisualModel> surfMeshModel(isoExtract->getOutput(i));
+                    imstkNew<RenderMaterial> material;
+                    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+                    material->setLineWidth(4.0);
+                    const double r = (rand() % 500) / 500.0;
+                    const double g = (rand() % 500) / 500.0;
+                    const double b = (rand() % 500) / 500.0;
+                    material->setColor(Color(r, g, b));
+                    material->setEdgeColor(Color::Color::Orange);
+                    surfMeshModel->setRenderMaterial(material);
+                    lvlSetObj->addVisualModel(surfMeshModel);
+                    chunksGenerated.insert(i);
+                }
+            }
         });
         connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
         {

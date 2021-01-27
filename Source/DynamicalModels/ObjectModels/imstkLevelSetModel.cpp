@@ -43,7 +43,7 @@ LevelSetModel::LevelSetModel()
     };
 
     // By default the level set defines a function for evolving the distances, this can be removed in subclasses
-    m_evolveQuantitiesNodes.push_back(std::make_shared<TaskNode>(std::bind(&LevelSetModel::evolveDistanceField, this), "Evolve Distances"));
+    m_evolveQuantitiesNodes.push_back(std::make_shared<TaskNode>(std::bind(&LevelSetModel::evolve, this), "Evolve Distances"));
     m_taskGraph->addNode(m_evolveQuantitiesNodes.back());
     /// are all quantities evolved the same but with different force functions?
 }
@@ -109,14 +109,12 @@ LevelSetModel::configure(std::shared_ptr<LevelSetModelConfig> config)
 }
 
 void
-LevelSetModel::evolveDistanceField()
+LevelSetModel::evolve()
 {
     auto         sdf       = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh);
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
     double*      imgPtr    = static_cast<double*>(imageData->getVoidPointer());
     const Vec3i& dim       = imageData->getDimensions();
-    //const Vec3d& spacing   = imageData->getSpacing();
-    //const Vec3d& origin    = imageData->getOrigin();
     const double dt = m_config->m_dt;
     //const double k  = m_config->m_k;
 

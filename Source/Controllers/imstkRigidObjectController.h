@@ -91,6 +91,20 @@ public:
     bool getUseSpring() const { return m_useSpring; }
     void setUseSpring(const bool useSpring) { m_useSpring = useSpring; }
 
+    ///
+    /// \brief Set/Get whether to use force smoothening
+    /// Force smoothening averages the force used on the device over kernel size
+    ///
+    bool getUseForceSmoothening() const { return m_forceSmoothening; }
+    void setUseForceSmoothening(const bool useForceSmoothening) { m_forceSmoothening = useForceSmoothening; }
+
+    ///
+    /// \brief Set/Get the kernel size
+    /// \todo: Vary with dt as performance of program will effect the size/number of samples
+    ///
+    int getSmoothingKernelSize() const { return m_smoothingKernelSize; }
+    void setSmoothingKernelSize(const int kernelSize) { m_smoothingKernelSize = kernelSize; }
+
 public:
     ///
     /// \brief Update controlled scene object using latest tracking information
@@ -104,6 +118,7 @@ public:
 
 protected:
     std::shared_ptr<RigidObject2> m_rigidObject;
+    std::deque<Vec3d> m_forces;
 
     double m_linearKd  = 10000.0;                                ///> Damping coefficient, linear
     double m_angularKd = 300.0;                                  ///> Damping coefficient, rotational
@@ -115,6 +130,9 @@ protected:
 
     double m_forceScaling = 0.0000075;
     bool   m_useSpring    = true; ///> Controller has ability to toggle to from springs
+
+    bool m_forceSmoothening    = true;
+    int  m_smoothingKernelSize = 25;
 };
 }
 }

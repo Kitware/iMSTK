@@ -28,6 +28,7 @@
 #include "imstkVegaMeshIO.h"
 #include "imstkVTKMeshIO.h"
 
+#include <cctype>
 #include <sys/stat.h>
 #include <unordered_map>
 
