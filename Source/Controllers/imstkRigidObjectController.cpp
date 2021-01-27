@@ -132,9 +132,32 @@ RigidObjectController::applyForces()
         // Apply force back to device
         if (m_rigidObject != nullptr && m_useSpring)
         {
-            // Render only the spring force (not the other forces the body has)
-            const Vec3d force = fS * m_forceScaling;
-            m_deviceClient->setForce(-force);
+            const Vec3d force = -fS * m_forceScaling;
+            if (m_forceSmoothening)
+            {
+                m_forces.push_back(force);
+                if (m_forces.size() > m_smoothingKernelSize)
+                {
+                    m_forces.pop_front();
+                }
+
+                Vec3d avgForce = Vec3d(0.0, 0.0, 0.0);
+                int   count    = 0;
+                for (auto i : m_forces)
+                {
+                    avgForce += i;
+                    count++;
+                }
+                avgForce /= count;
+
+                // Render only the spring force (not the other forces the body has)
+                m_deviceClient->setForce(avgForce);
+            }
+            else
+            {
+                // Render only the spring force (not the other forces the body has)
+                m_deviceClient->setForce(force);
+            }
         }
     }
     else
