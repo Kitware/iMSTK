@@ -42,7 +42,7 @@ std::shared_ptr<SceneObject>
 makeHandleObject()
 {
     imstkNew<SceneObject> scalpelHandle("ScalpelHandle");
-    auto                  toolHandleMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Handle.obj");
+    auto                  toolHandleMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Handle.dae");
     toolHandleMesh->translate(0.0, 0.0, 1.0, Geometry::TransformType::ApplyToData);
     toolHandleMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
     toolHandleMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
@@ -68,7 +68,7 @@ std::shared_ptr<SceneObject>
 makeBlade(std::string filename)
 {
     imstkNew<SceneObject> scalpelBlade(filename);
-    auto                  blade10Mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/" + filename + ".obj");
+    auto                  blade10Mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/" + filename + ".dae");
     blade10Mesh->translate(0.0, 0.0, 1.0, Geometry::TransformType::ApplyToData);
     blade10Mesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
     blade10Mesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);

@@ -41,23 +41,6 @@ IsometricMap::apply()
         return;
     }
 
-    // Set the follower mesh configuration to that of master
-    m_slave->setTranslation(m_master->getTranslation());
-    m_slave->setRotation(m_master->getRotation());
-
-    // Apply the offset transform
-    m_slave->transform(m_rigidTransform.matrix());
-}
-
-void
-IsometricMap::setTransform(const RigidTransform3d& affineTransform)
-{
-    m_rigidTransform = affineTransform;
-}
-
-const RigidTransform3d&
-IsometricMap::getTransform() const
-{
-    return m_rigidTransform;
+    m_slave->setTransform(m_master->getTransform());
 }
 } // imstk

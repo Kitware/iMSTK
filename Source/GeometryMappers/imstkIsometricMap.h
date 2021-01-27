@@ -39,22 +39,20 @@ public:
     /// \brief Constructor
     ///
     IsometricMap() :
-        GeometryMap(GeometryMap::Type::Isometric),
-        m_rigidTransform(RigidTransform3d::Identity())
-    {}
+        GeometryMap(GeometryMap::Type::Isometric)
+    { }
 
     ///
     /// \brief Constructor
     ///
     IsometricMap(std::shared_ptr<Geometry> master, std::shared_ptr<Geometry> slave) :
-        GeometryMap(master, slave, GeometryMap::Type::Isometric),
-        m_rigidTransform(RigidTransform3d::Identity())
-    {}
+        GeometryMap(master, slave, GeometryMap::Type::Isometric)
+    { }
 
     ///
     /// \brief Destructor
     ///
-    ~IsometricMap() = default;
+    ~IsometricMap() override = default;
 
     ///
     /// \brief Compute the map
@@ -72,20 +70,6 @@ public:
     inline bool isValid() const override
     {
         return true;
-    };
-
-    ///
-    /// \brief Set the transform
-    ///
-    void setTransform(const RigidTransform3d& affineTransform);
-
-    ///
-    /// \brief Get the transform
-    ///
-    const RigidTransform3d& getTransform() const;
-
-protected:
-
-    RigidTransform3d m_rigidTransform; ///> Rigid transform
+    }
 };
 } // imstk

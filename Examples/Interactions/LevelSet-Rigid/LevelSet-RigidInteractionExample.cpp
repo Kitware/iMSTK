@@ -24,6 +24,7 @@
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkImageData.h"
+#include "imstkIsometricMap.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
 #include "imstkLevelSetDeformableObject.h"
@@ -133,26 +134,44 @@ makeRigidObj(const std::string& name)
     imstkNew<RigidObject2> rigidObj("Cube");
 
     {
-        auto toolMesh = MeshIO::read<SurfaceMesh>("C:/Users/Andx_/Desktop/testMesh.stl");
+        auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided.stl");
         toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
         toolMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
         toolMesh->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
 
-        imstkNew<VisualModel>    visualModel(toolMesh);
-        imstkNew<RenderMaterial> mat;
-        mat->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-        mat->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        mat->setMetalness(0.9f);
-        mat->setRoughness(0.4f);
-        //mat->setDisplayMode(RenderMaterial::DisplayMode::Points);
-        //mat->setPointSize(15.0);
-        mat->setDiffuseColor(Color(0.7, 0.7, 0.7));
-        visualModel->setRenderMaterial(mat);
+        auto toolVisualMeshHandle = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Handle.dae");
+        toolVisualMeshHandle->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
+        toolVisualMeshHandle->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
+        toolVisualMeshHandle->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
+
+        auto toolVisualMeshBlade = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Blade10.dae");
+        toolVisualMeshBlade->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
+        toolVisualMeshBlade->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
+        toolVisualMeshBlade->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
+
+        imstkNew<RenderMaterial> toolMaterial;
+        toolMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+        toolMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
+        toolMaterial->setMetalness(0.9f);
+        toolMaterial->setRoughness(0.4f);
+        //toolMaterial->setDisplayMode(RenderMaterial::DisplayMode::Points);
+        //toolMaterial->setPointSize(15.0);
+        toolMaterial->setDiffuseColor(Color(0.7, 0.7, 0.7));
+
+        imstkNew<VisualModel> visualModel1(toolVisualMeshHandle);
+        visualModel1->setRenderMaterial(toolMaterial);
+        rigidObj->addVisualModel(visualModel1);
+
+        imstkNew<VisualModel> visualModel2(toolVisualMeshBlade);
+        visualModel2->setRenderMaterial(toolMaterial);
+        rigidObj->addVisualModel(visualModel2);
 
         // Create the object
-        rigidObj->addVisualModel(visualModel);
         rigidObj->setPhysicsGeometry(toolMesh);
         rigidObj->setCollidingGeometry(toolMesh);
+        rigidObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolMesh, toolVisualMeshHandle));
+        // Hack to add two maps
+        rigidObj->setPhysicsToCollidingMap(std::make_shared<IsometricMap>(toolMesh, toolVisualMeshBlade));
         rigidObj->setDynamicalModel(rbdModel);
         rigidObj->getRigidBody()->m_mass = 1000.0;
         //rigidObj->getRigidBody()->setInertiaFromPointSet(toolMesh, 0.01, false);
@@ -200,7 +219,7 @@ main()
     colHandlerB->setLevelSetVelocityScaling(0.1);
     colHandlerB->setKernel(3, 1.0);
     //colHandlerB->setLevelSetVelocityScaling(0.0); // Can't push the levelset
-    colHandlerB->setUseProportionalVelocity(true);
+    colHandlerB->setUseProportionalVelocity(false);
     scene->getCollisionGraph()->addInteraction(interaction);
 
     // Light (white)
