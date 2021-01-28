@@ -89,8 +89,8 @@ ObjectIO::importSceneObject(
     const aiScene*   scene = importer.ReadFile(modelFilePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
-    CHECK(scene != nullptr && scene->HasMeshes()) << "AssimpMeshIO::readMeshData error: could not read with reader: " 
-      << modelFilePath;
+    CHECK(scene != nullptr && scene->HasMeshes()) << "AssimpMeshIO::readMeshData error: could not read with reader: "
+                                                  << modelFilePath;
 
     // Iterate over each material
     std::vector<std::shared_ptr<RenderMaterial>> materials(scene->mNumMaterials);
