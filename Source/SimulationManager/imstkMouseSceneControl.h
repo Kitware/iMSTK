@@ -69,9 +69,19 @@ public:
 
     ///
     /// \brief Set the scene manager to be controlled
-    /// The active scene's camera will be controllable depending on SceneManager's mode
+    /// The active scene's camera will be controllable depending on SceneManager's mode, or the
     ///
     void setSceneManager(std::shared_ptr<SceneManager> manager) { m_sceneManager = manager; }
+
+    ///
+    /// \brief Enable the mouse control, independent of the debug mode
+    ///
+    void setEnabled(bool enable);
+
+    ///
+    /// \return true if the controls are enabled, either explicitly or debug is on in the scenecontrol
+    ///
+    bool getEnabled() const;
 
 public:
     void printControls() override;
@@ -83,10 +93,6 @@ public:
     void OnButtonRelease(const int key) override;
     void OnScroll(const double dx) override;
     void OnMouseMove(const Vec2d& pos) override;
-
-    // How to handle mouse movements?
-    // Mouse movements best done in update func or event? event would still require update for interpolation
-    void update(const double dt) override;
 
 protected:
     std::shared_ptr<SceneManager> m_sceneManager;
@@ -103,5 +109,7 @@ protected:
     double m_zoomFactor   = 1.0;
     double m_rotateFactor = 5.0;
     double m_panFactor    = 1.0;
+
+    bool m_enabled = false;
 };
 }

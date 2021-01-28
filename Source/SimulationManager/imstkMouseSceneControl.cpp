@@ -46,7 +46,6 @@ MouseSceneControl::printControls()
 void
 MouseSceneControl::OnButtonPress(const int key)
 {
-    // If no mode currently selected
     if (m_mode == Mode::None)
     {
         // Set the mode
@@ -77,8 +76,7 @@ MouseSceneControl::OnButtonRelease(const int key)
 void
 MouseSceneControl::OnScroll(const double dx)
 {
-    // This control is disabled in simulation mode
-    if (m_sceneManager->getMode() == SceneManager::Mode::Simulation)
+    if (!getEnabled())
     {
         return;
     }
@@ -106,8 +104,7 @@ MouseSceneControl::OnScroll(const double dx)
 void
 MouseSceneControl::OnMouseMove(const Vec2d& pos)
 {
-    // Controls disabled in simulation mode
-    if (m_sceneManager->getMode() == SceneManager::Mode::Simulation)
+    if (!getEnabled())
     {
         return;
     }
@@ -165,15 +162,14 @@ MouseSceneControl::OnMouseMove(const Vec2d& pos)
 }
 
 void
-MouseSceneControl::update(const double imstkNotUsed(dt))
+MouseSceneControl::setEnabled(bool enable)
 {
-    // Directly set it
-    //m_camera->getView() = m_targetViewTransform;
+    m_enabled = enable;
+}
 
-    // Slerp the camera rotation
-    /*const Quatd currOrientation = Quatd(m_camera->getView().block<3, 3>(0, 0)).normalized();
-    const Quatd targetOrientation = Quatd(m_targetViewTransform.block<3, 3>(0, 0)).normalized();
-    const Quatd newOrientation = currOrientation.slerp(0.1, targetOrientation).normalized();
-    m_camera->getView().block<3, 3>(0, 0) = newOrientation.toRotationMatrix();*/
+bool
+MouseSceneControl::getEnabled() const
+{
+    return (m_sceneManager->getMode() == SceneManager::Mode::Debug) || m_enabled;
 }
 }
