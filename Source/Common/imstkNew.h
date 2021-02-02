@@ -98,8 +98,8 @@ public:
     template<typename U>
     operator std::weak_ptr<U>() const
     {
-      static_assert(std::is_base_of<U, T>::value, "Argument U type not compatible with imstkNew<T>'s T");
-      return std::dynamic_pointer_cast<U>(object);
+        static_assert(std::is_base_of<U, T>::value, "Argument U type not compatible with imstkNew<T>'s T");
+        return std::dynamic_pointer_cast<U>(object);
     }
 
 private:
