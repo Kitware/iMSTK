@@ -48,12 +48,12 @@ public:
     ///
     /// \brief The driver is used to stop the simulation
     ///
-    void setModuleDriver(std::shared_ptr<ModuleDriver> driver) { m_driver = driver; }
+    void setModuleDriver(std::weak_ptr<ModuleDriver> driver) { m_driver = driver; }
 
     ///
     /// \brief Set the scene manager whose fps we should track
     ///
-    void setSceneManager(std::shared_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
+    void setSceneManager(std::weak_ptr<SceneManager> sceneManager) { m_sceneManager = sceneManager; }
 
 public:
     void printControls() override;
@@ -63,8 +63,8 @@ public:
     void OnKeyRelease(const char key) override;
 
 protected:
-    std::shared_ptr<ModuleDriver> m_driver;
-    std::shared_ptr<SceneManager> m_sceneManager;
-    bool m_showFps;
+    std::weak_ptr<ModuleDriver> m_driver;
+    std::weak_ptr<SceneManager> m_sceneManager;
+    bool m_showFps = false;
 };
 }
