@@ -74,16 +74,12 @@ KeyboardSceneControl::OnKeyPress(const char key)
         // To ensure consistency toggle/invert based of m_sceneManager
         const bool paused = sceneManager->getPaused();
 
-        // Resume or pause all modules
+        // Resume or pause all modules, expect viewers
         for (auto module : driver->getModules())
         {
-            if (paused)
+            if (std::dynamic_pointer_cast<Viewer>(module) == nullptr)
             {
-                module->resume();
-            }
-            else
-            {
-                module->pause();
+                module->setPaused(!paused);
             }
         }
     }
