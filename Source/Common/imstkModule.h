@@ -64,9 +64,10 @@ public:
     bool getInit() const { return m_init; }
 
     ///
-    /// \brief Get whether the module is currently paused
+    /// \brief Set/Get whether the module is currently paused
     ///
     bool getPaused() const { return m_paused; }
+    void setPaused(const bool paused) { m_paused = paused; }
 
     ExecutionType getExecutionType() const { return m_executionType; }
     void setExecutionType(ExecutionType type) { m_executionType = type; }
