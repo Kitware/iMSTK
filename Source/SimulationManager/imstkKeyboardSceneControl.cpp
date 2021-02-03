@@ -30,14 +30,12 @@
 
 namespace imstk
 {
-KeyboardSceneControl::KeyboardSceneControl() :
-    m_driver(nullptr), m_showFps(false)
+KeyboardSceneControl::KeyboardSceneControl()
 {
 }
 
 KeyboardSceneControl::KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice) :
-    KeyboardControl(keyDevice),
-    m_driver(nullptr), m_showFps(false)
+    KeyboardControl(keyDevice)
 {
 }
 
@@ -57,12 +55,15 @@ KeyboardSceneControl::printControls()
 void
 KeyboardSceneControl::OnKeyPress(const char key)
 {
-    if (m_sceneManager == nullptr)
+    auto sceneManager = m_sceneManager.lock();
+
+    if (sceneManager == nullptr)
     {
         LOG(WARNING) << "Keyboard control disabled: No scene manager provided";
         return;
     }
-    if (m_driver == nullptr)
+    auto driver = m_driver.lock();
+    if (driver == nullptr)
     {
         LOG(WARNING) << "Keyboard control disabled: No driver provided";
         return;
@@ -71,10 +72,10 @@ KeyboardSceneControl::OnKeyPress(const char key)
     if (key == ' ')
     {
         // To ensure consistency toggle/invert based of m_sceneManager
-        const bool paused = m_sceneManager->getPaused();
+        const bool paused = sceneManager->getPaused();
 
         // Resume or pause all modules
-        for (auto module : m_driver->getModules())
+        for (auto module : driver->getModules())
         {
             if (paused)
             {
@@ -88,25 +89,25 @@ KeyboardSceneControl::OnKeyPress(const char key)
     }
     else if (key == 'q' || key == 'Q' || key == 'e' || key == 'E') // end Simulation
     {
-        m_driver->requestStatus(ModuleDriverStopped);
+        driver->requestStatus(ModuleDriverStopped);
     }
     else if (key == 'd' || key == 'D') // switch rendering mode of the modules
     {
         // To ensure consistency toggle/invert based of m_sceneManager
-        const bool simModeOn = m_sceneManager->getMode() == SceneManager::Mode::Simulation ? true : false;
+        const bool simModeOn = sceneManager->getMode() == SceneManager::Mode::Simulation ? true : false;
 
-        for (auto module : m_driver->getModules())
+        for (auto module : driver->getModules())
         {
-            std::shared_ptr<SceneManager> sceneManager = std::dynamic_pointer_cast<SceneManager>(module);
-            if (sceneManager != nullptr)
+            std::shared_ptr<SceneManager> subManager = std::dynamic_pointer_cast<SceneManager>(module);
+            if (subManager != nullptr)
             {
                 if (simModeOn)
                 {
-                    sceneManager->setMode(SceneManager::Mode::Debug);
+                    subManager->setMode(SceneManager::Mode::Debug);
                 }
                 else
                 {
-                    sceneManager->setMode(SceneManager::Mode::Simulation);
+                    subManager->setMode(SceneManager::Mode::Simulation);
                 }
             }
             std::shared_ptr<VTKViewer> viewer = std::dynamic_pointer_cast<VTKViewer>(module);
@@ -126,7 +127,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
     else if (key == 'p' || key == 'P')  // switch framerate display
     {
         // The designated m_sceneManager framerate is displayed in all views
-        for (auto module : m_driver->getModules())
+        for (auto module : driver->getModules())
         {
             std::shared_ptr<VTKViewer> viewer = std::dynamic_pointer_cast<VTKViewer>(module);
             if (viewer != nullptr)
@@ -135,7 +136,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
                 std::shared_ptr<VTKTextStatusManager> textManager = viewer->getTextStatusManager();
                 textManager->setStatusVisibility(VTKTextStatusManager::StatusType::FPS, m_showFps);
 
-                std::shared_ptr<Scene> activeScene = m_sceneManager->getActiveScene();
+                std::shared_ptr<Scene> activeScene = sceneManager->getActiveScene();
                 activeScene->setEnableTaskTiming(m_showFps);
                 std::shared_ptr<VTKRenderer> vtkRen = std::dynamic_pointer_cast<VTKRenderer>(viewer->getActiveRenderer());
                 vtkRen->setTimeTableVisibility(m_showFps);
@@ -144,10 +145,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
     }
     else if (key == 'r' || key == 'R')
     {
-        if (m_sceneManager != nullptr)
-        {
-            m_sceneManager->getActiveScene()->reset();
-        }
+        sceneManager->getActiveScene()->reset();
     }
 }
 

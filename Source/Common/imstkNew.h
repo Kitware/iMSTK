@@ -76,11 +76,27 @@ public:
     operator std::shared_ptr<T>() const { return object; }
 
     ///
+    /// \brief Implicit conversion
+    ///
+    operator std::weak_ptr<T>() const { return object; }
+
+    ///
     /// \brief Hack for multiple implicit conversions, does not work with overloads though
     /// as it won't know what to cast too
     ///
     template<typename U>
     operator std::shared_ptr<U>() const
+    {
+        static_assert(std::is_base_of<U, T>::value, "Argument U type not compatible with imstkNew<T>'s T");
+        return std::dynamic_pointer_cast<U>(object);
+    }
+
+    ///
+    /// \brief Hack for multiple implicit conversions, does not work with overloads though
+    /// as it won't know what to cast too
+    ///
+    template<typename U>
+    operator std::weak_ptr<U>() const
     {
         static_assert(std::is_base_of<U, T>::value, "Argument U type not compatible with imstkNew<T>'s T");
         return std::dynamic_pointer_cast<U>(object);
