@@ -30,14 +30,15 @@ class AnalyticalGeometry;
 
 // vertex on the plane (0), positive side (+1), negative side (-1)
 // pt0 and pt1 follows the triangle's indexing order when tri is presented
+// c0 and c1 are cutting coordinates stored in cutData
 enum class CutType
 {
     NONE = 0,
     /* triangle is not cut through
-    *     pt0 (-+1)
-    *         /  \
-    *        /    \
-    *       / tri  \
+    *       pt0 (-+1)
+    *           /  \
+    *       c0 /    \
+    *         / tri  \
     * pt1 (+-1)------(?)
     */
     EDGE,
@@ -46,31 +47,31 @@ enum class CutType
     *       /  \
     *      /    \
     *     / tri  \
-    *  (-+1)------(0) pt0
+    *  (-+1)------(0) pt0/c0
     */
     VERT,
     /*
     *        (+-1) pt1
     *        /  \
-    *       /    \
+    *    c1 /    \
     *      / tri  \
-    *  (-+1)------(+-1) pt0
+    *  (-+1)--c0--(+-1) pt0
     */
     EDGE_EDGE,
     /*
     *        pt0 (+-1)
     *            /  \
-    *           /    \
+    *        c0 /    \
     *          / tri  \
-    *  pt1 (-+1)------(0)
+    *  pt1 (-+1)------(0) c1
     */
     EDGE_VERT,
     /*
-    *    pt0 (0)-----(+-1)
-    *       /  \      /
-    *      /    \    /
-    *     /      \  /
-    *  (-+1)------(0) pt1
+    * pt0/c0 (0)------(+-1)
+    *        /  \      /
+    *       /    \    /
+    *      /      \  /
+    *   (-+1)------(0) pt1/c1
     */
     VERT_VERT
 };
@@ -122,9 +123,10 @@ protected:
 
     bool vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleIndices,
                           std::set<int>& triSet);
+    bool pointProjectionInSurface(const Vec3d& pt, std::shared_ptr<SurfaceMesh> cutSurf);
 
-    void generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> inputSurf);
-// void generateCutData(std::shared_ptr<SurfaceMesh> cutSurf, std::shared_ptr<SurfaceMesh> inputSurf);
+    void generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> outputSurf);
+    void generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf, std::shared_ptr<SurfaceMesh> outputSurf);
 
 private:
     std::shared_ptr<std::vector<CutData>> m_CutData = std::make_shared<std::vector<CutData>>();

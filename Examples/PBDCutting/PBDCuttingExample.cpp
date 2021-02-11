@@ -23,6 +23,7 @@
 #include "imstkNew.h"
 #include "imstkScene.h"
 #include "imstkSceneManager.h"
+#include "imstkSimulationManager.h"
 #include "imstkVTKViewer.h"
 
 // Objects
@@ -174,14 +175,23 @@ main()
     //scene->getConfig()->writeTaskGraph = true;
 
     // Create a cutting plane object in the scene
-    imstkNew<Plane> planeGeom;
-    planeGeom->setWidth(40.0);
-    planeGeom->setTranslation(Vec3d(0.0, 0.0, 20.0));
-    planeGeom->setOrientationAxis(Vec3d(-1.0, 0.0, 0.0));
-    imstkNew<CollidingObject> planeObj("Plane");
-    planeObj->setVisualGeometry(planeGeom);
-    planeObj->setCollidingGeometry(planeGeom);
-    scene->addSceneObject(planeObj);
+    /*
+    imstkNew<Plane> cutGeom;
+    cutGeom->setWidth(40.0);
+    cutGeom->setTranslation(Vec3d(0.0, 0.0, 20.0));
+    cutGeom->setOrientationAxis(Vec3d(-1.0, 0.0, 0.0));
+    imstkNew<CollidingObject> cutObj("CuttingObject");
+    cutObj->setVisualGeometry(cutGeom);
+    cutObj->setCollidingGeometry(cutGeom);
+    cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    scene->addSceneObject(cutObj);
+    */
+    std::shared_ptr<SurfaceMesh> cutGeom(makeClothGeometry(40, 40, 2, 2));
+    imstkNew<CollidingObject>    cutObj("CuttingObject");
+    cutObj->setVisualGeometry(cutGeom);
+    cutObj->setCollidingGeometry(cutGeom);
+    cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    scene->addSceneObject(cutObj);
 
     // Create a pbd cloth object in the scene
     std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
@@ -194,7 +204,7 @@ main()
     std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
 
     // Create the virtual coupling object controller
-    imstkNew<SceneObjectController> controller(planeObj, client);
+    imstkNew<SceneObjectController> controller(cutObj, client);
     scene->addController(controller);
 
     // Camera
@@ -216,10 +226,13 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        viewer->addChildThread(sceneManager); // SceneManager will start/stop with viewer
+        sceneManager->setExecutionType(Module::ExecutionType::SEQUENTIAL);
+        sceneManager->pause(); // Start simulation paused
 
-        // Add server of haptic device to viewer
-        viewer->addChildThread(server);
+        imstkNew<SimulationManager> driver;
+        driver->addModule(server);
+        driver->addModule(viewer);
+        driver->addModule(sceneManager);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -229,7 +242,7 @@ main()
 
             imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
             keyControl->setSceneManager(sceneManager);
-            keyControl->setViewer(viewer);
+            keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
 
@@ -245,7 +258,7 @@ main()
                 std::shared_ptr<SurfaceMesh> clothMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
                 imstkNew<SurfaceMeshCut> surfCut;
                 surfCut->setInputMesh(clothMesh);
-                surfCut->setCutGeometry(planeGeom);
+                surfCut->setCutGeometry(cutGeom);
                 surfCut->update();
                 std::shared_ptr<SurfaceMesh> newClothMesh = surfCut->getOutputMesh();
 
@@ -263,9 +276,7 @@ main()
             }
             });
 
-        // Start viewer running, scene as paused
-        sceneManager->requestStatus(ThreadStatus::Paused);
-        viewer->start();
+        driver->start();
     }
     return 0;
 }
