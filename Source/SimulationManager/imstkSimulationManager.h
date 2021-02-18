@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-=========================================================================*/
+   =========================================================================*/
 
 #pragma once
 
@@ -40,6 +40,8 @@ class Viewer;
 /// This is the preferred driver.
 /// todo: Timestep smoothening
 ///
+/// Events: Posts `EventType::Start` just before the beginning of the loop,
+/// posts `EventType::Stop` just after the processing loops is being exited
 class SimulationManager : public ModuleDriver
 {
 public:
@@ -67,18 +69,31 @@ public:
     /// This ultimately effects the number of iterations done
     /// default 0.003
     ///
-    void setDesiredDt(const double dt) { m_desiredDt = dt; }
-    double getDesiredDt() const { return m_desiredDt; }
+    void setDesiredDt(const double dt)
+    {
+        m_desiredDt = dt;
+    }
+
+    double getDesiredDt() const
+    {
+        return m_desiredDt;
+    }
 
     ///
     /// \brief Get the current actual timestep
     ///
-    double getDt() const { return m_dt; }
+    double getDt() const
+    {
+        return m_dt;
+    }
 
     ///
     /// \brief Set the thread type to run the parallel modules with
     ///
-    void setThreadType(ThreadingType threadType) { m_threadType = threadType; }
+    void setThreadType(ThreadingType threadType)
+    {
+        m_threadType = threadType;
+    }
 
 protected:
     void requestStop(Event* e);
@@ -88,9 +103,9 @@ protected:
 protected:
     std::vector<std::shared_ptr<Viewer>> m_viewers;
 
-    std::vector<std::shared_ptr<Module>> m_syncModules;     ///> Modules called once per update
-    std::vector<std::shared_ptr<Module>> m_asyncModules;    ///> Modules that run on completely other threads without restraint
-    std::vector<std::shared_ptr<Module>> m_adaptiveModules; ///> Modules that update adpatively to keep up with real time
+    std::vector<std::shared_ptr<Module>> m_syncModules;      ///> Modules called once per update
+    std::vector<std::shared_ptr<Module>> m_asyncModules;     ///> Modules that run on completely other threads without restraint
+    std::vector<std::shared_ptr<Module>> m_adaptiveModules;  ///> Modules that update adpatively to keep up with real time
 
     std::unordered_map<Module*, bool> m_running;
 

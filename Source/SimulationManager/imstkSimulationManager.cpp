@@ -84,7 +84,7 @@ SimulationManager::start()
             for (auto module : m_asyncModules)
             {
                 FuncTask* moduleTask = new(tbb::task::allocate_root())FuncTask(module,
-                    std::bind(&SimulationManager::runModuleParallel, this, std::placeholders::_1));
+                                                                               std::bind(&SimulationManager::runModuleParallel, this, std::placeholders::_1));
                 taskList.push_back(*moduleTask);
             }
             tbb::task::spawn_root_and_wait(taskList);
@@ -100,6 +100,8 @@ SimulationManager::start()
     }
 
     waitForInit();
+
+    postEvent(Event(EventType::Start));
 
     // Start the game loop
     {
@@ -193,6 +195,8 @@ SimulationManager::start()
         }
     }
 
+    postEvent(Event(EventType::End));
+
     if (m_threadType == ThreadingType::TBB)
     {
     }
@@ -243,6 +247,8 @@ SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
 
     waitForInit();
 
+    postEvent(Event(EventType::Start));
+
     m_running[module.get()] = true;
     while (m_running[module.get()])
     {
@@ -263,6 +269,8 @@ SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
             module->update();
         }
     }
+
+    postEvent(Event(EventType::End));
 }
 
 void
