@@ -107,6 +107,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
 
     auto triangles = outputSurf->getTriangleIndices();
     auto vertices  = outputSurf->getVertexPositions();
+    auto initVerts = outputSurf->getInitialVertexPositions();
 
     for (const auto& curCutData : *m_CutData)
     {
@@ -116,6 +117,8 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
         int   ptId1      = curCutData.ptIds[1];
         Vec3d cood0      = curCutData.cutCoords[0];
         Vec3d cood1      = curCutData.cutCoords[1];
+        Vec3d initCood0 = curCutData.initCoords[0];
+        Vec3d initCood1 = curCutData.initCoords[1];
 
         if (curCutType == CutType::EDGE || curCutType == CutType::EDGE_VERT)
         {
@@ -132,6 +135,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             {
                 newPtId = vertices->size();
                 vertices->push_back(cood0);
+                initVerts->push_back(initCood0);
                 edgeVertMap[edge0] = newPtId;
             }
 
@@ -194,6 +198,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             {
                 newPtId0 = vertices->size();
                 vertices->push_back(cood0);
+                initVerts->push_back(initCood0);
                 edgeVertMap[edge00] = newPtId0;
             }
             if (edgeVertMap.find(edge11) != edgeVertMap.end())
@@ -204,6 +209,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             {
                 newPtId1 = vertices->size();
                 vertices->push_back(cood1);
+                initVerts->push_back(initCood1);
                 edgeVertMap[edge10] = newPtId1;
             }
 
@@ -227,7 +233,7 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             //do nothing
         }
     }
-    outputSurf->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*vertices));
+    outputSurf->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*initVerts));
     outputSurf->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*vertices));
     outputSurf->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*triangles));
     outputSurf->modified();
@@ -238,6 +244,7 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
 {
     auto triangles = outputSurf->getTriangleIndices();
     auto vertices  = outputSurf->getVertexPositions();
+    auto initVerts = outputSurf->getInitialVertexPositions();
 
     std::shared_ptr<AnalyticalGeometry> cutGeometry;
     if (std::dynamic_pointer_cast<AnalyticalGeometry>(geometry) != nullptr)
@@ -280,12 +287,15 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
         if (cutVert.second == false && !vertexOnBoundary(triangles, vertexNeighborTriangles[cutVert.first]))
         {
             // do not split vertex since it's the cutting end in surface
+            (*m_CutVertMap)[cutVert.first] = cutVert.first;
         }
         else
         {
             // split vertex
             int newPtId = vertices->size();
             vertices->push_back((*vertices)[cutVert.first]);
+            initVerts->push_back((*initVerts)[cutVert.first]);
+            (*m_CutVertMap)[cutVert.first] = newPtId;
 
             for (const auto& t : vertexNeighborTriangles[cutVert.first])
             {
@@ -310,7 +320,7 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
         }
     }
 
-    outputSurf->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*vertices));
+    outputSurf->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*initVerts));
     outputSurf->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*vertices));
     outputSurf->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*triangles));
     outputSurf->modified();
@@ -376,6 +386,7 @@ SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> ge
 {
     auto triangles = outputSurf->getTriangleIndices();
     auto vertices  = outputSurf->getVertexPositions();
+    auto initVerts = outputSurf->getInitialVertexPositions();
 
     m_CutData->clear();
     std::set<std::pair<int, int>> repeatEdges;  // make sure not boundary edge in vert-vert case
@@ -411,6 +422,8 @@ SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> ge
                         newCutData.ptIds[1]     = ptId1;
                         newCutData.cutCoords[0] = (*vertices)[ptId0];
                         newCutData.cutCoords[1] = (*vertices)[ptId1];
+                        newCutData.initCoords[0] = (*initVerts)[ptId0];
+                        newCutData.initCoords[1] = (*initVerts)[ptId1];
                         m_CutData->push_back(newCutData);
                     }
                     else
@@ -433,15 +446,20 @@ SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> ge
                         int    ptId1 = tri[idx1];
                         Vec3d  pos0  = (*vertices)[ptId0];
                         Vec3d  pos1  = (*vertices)[ptId1];
+                        Vec3d  initPos0 = (*initVerts)[ptId0];
+                        Vec3d  initPos1 = (*initVerts)[ptId1];
                         double func0 = geometry->getFunctionValue(pos0);
                         double func1 = geometry->getFunctionValue(pos1);
+                        double frac = -func0 / (func1 - func0);
 
                         newCutData.cutType      = CutType::EDGE_VERT;
                         newCutData.triId        = i;
                         newCutData.ptIds[0]     = ptId0;
                         newCutData.ptIds[1]     = ptId1;
-                        newCutData.cutCoords[0] = -func0 / (func1 - func0) * (pos1 - pos0) + pos0;
+                        newCutData.cutCoords[0] =  frac * (pos1 - pos0) + pos0;
                         newCutData.cutCoords[1] = (*vertices)[tri[j]];
+                        newCutData.initCoords[0] = frac * (initPos1 - initPos0) + initPos0;
+                        newCutData.initCoords[1] = (*initVerts)[tri[j]];
                         m_CutData->push_back(newCutData);
                     }
                 }
@@ -466,16 +484,23 @@ SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> ge
                         Vec3d  pos0  = (*vertices)[ptId0];
                         Vec3d  pos1  = (*vertices)[ptId1];
                         Vec3d  pos2  = (*vertices)[ptId2];
+                        Vec3d  initPos0 = (*initVerts)[ptId0];
+                        Vec3d  initPos1 = (*initVerts)[ptId1];
+                        Vec3d  initPos2 = (*initVerts)[ptId2];
                         double func0 = geometry->getFunctionValue(pos0);
                         double func1 = geometry->getFunctionValue(pos1);
                         double func2 = geometry->getFunctionValue(pos2);
+                        double frac0 = -func0 / (func2 - func0);
+                        double frac1 = -func1 / (func2 - func1);
 
                         newCutData.cutType      = CutType::EDGE_EDGE;
                         newCutData.triId        = i;
                         newCutData.ptIds[0]     = ptId0;
                         newCutData.ptIds[1]     = ptId1;
-                        newCutData.cutCoords[0] = -func0 / (func2 - func0) * (pos2 - pos0) + pos0;
-                        newCutData.cutCoords[1] = -func1 / (func2 - func1) * (pos2 - pos1) + pos1;
+                        newCutData.cutCoords[0] =  frac0 * (pos2 - pos0) + pos0;
+                        newCutData.cutCoords[1] =  frac1 * (pos2 - pos1) + pos1;
+                        newCutData.initCoords[0] = frac0 * (initPos2 - initPos0) + initPos0;
+                        newCutData.initCoords[1] = frac1 * (initPos2 - initPos1) + initPos1;
                         m_CutData->push_back(newCutData);
                     }
                 }
@@ -578,6 +603,7 @@ SurfaceMeshCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf,
                     }
                 }
                 newCurCutData.cutCoords[0] = newCurCutData.cutCoords[1];
+                newCurCutData.initCoords[0] = newCurCutData.initCoords[1];
                 newCurCutData.cutType      = CutType::EDGE;
                 newCutData->push_back(newCurCutData);
             }
