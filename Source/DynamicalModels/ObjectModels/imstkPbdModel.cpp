@@ -521,17 +521,23 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
                 if (rs.size() > 1)
                 {
                     size_t      idx = (rs[0] == k) ? 1 : 0;
-                    const auto& tri = elements[rs[idx]];
+                    const auto& tri0 = elements[k];
+                    const auto& tri1 = elements[rs[idx]];
+                    size_t idx0 = -1;
+                    size_t idx1 = -1;
                     for (size_t i = 0; i < 3; ++i)
                     {
-                        if (tri[i] != tri[0] && tri[i] != tri[1])
+                        if (tri0[i] != i1 && tri0[i] != i2)
                         {
-                            idx = i;
-                            break;
+                            idx0 = tri0[i];
+                        }
+                        if (tri1[i] != i1 && tri1[i] != i2)
+                        {
+                            idx1 = tri1[i];
                         }
                     }
                     auto c = std::make_shared<PbdDihedralConstraint>();
-                    c->initConstraint(*m_initialState->getPositions(), tri[2], tri[idx], tri[0], tri[1], stiffness);
+                    c->initConstraint(*m_initialState->getPositions(), idx0, idx1, i1, i2, stiffness);
                     m_constraints->push_back(std::move(c));
                 }
             }
