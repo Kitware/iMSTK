@@ -51,8 +51,8 @@ main()
     imstkNew<Scene> scene("VolumeRendering");
 
     // Create a visual object in the scene for the volume
-    imstkNew<VisualObject> volumeObj("VisualVolume");
-    auto                   imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
+    imstkNew<SceneObject> volumeObj("VisualVolume");
+    auto                  imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
     volumeObj->setVisualGeometry(imageData);
     scene->addSceneObject(volumeObj);
 

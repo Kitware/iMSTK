@@ -34,18 +34,11 @@ class AnimationModel;
 class AnimationObject : public SceneObject
 {
 public:
-    ///
-    /// \brief Constructor
-    ///
-    explicit AnimationObject(const std::string& name) : SceneObject(name)
-    {
-        m_type = Type::Animation;
-    }
+    AnimationObject(const std::string& name) : SceneObject(name) { }
+    virtual ~AnimationObject() override = default;
 
-    ///
-    /// \brief Default destructor
-    ///
-    virtual ~AnimationObject() = default;
+public:
+    virtual const std::string getTypeName() const override { return "AnimationObject"; }
 
     ///
     /// \brief Set/get animation model

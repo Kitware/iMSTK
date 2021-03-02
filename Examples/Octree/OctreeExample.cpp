@@ -54,7 +54,7 @@ static std::pair<std::shared_ptr<VecDataArray<double, 3>>, std::shared_ptr<VecDa
 ///
 /// \brief Read a mesh, create a visual scene object and add to the scene
 ///
-std::shared_ptr<VisualObject>
+std::shared_ptr<SceneObject>
 createMeshObject(const std::string& objectName,
                  const Color&       color)
 {
@@ -74,7 +74,7 @@ createMeshObject(const std::string& objectName,
     material->setLineWidth(1.0);
     visualModel->setRenderMaterial(material);
 
-    imstkNew<VisualObject> visualObject(objectName);
+    imstkNew<SceneObject> visualObject(objectName);
     visualObject->addVisualModel(visualModel);
 
     return visualObject;

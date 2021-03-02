@@ -82,7 +82,7 @@ main()
     reduce->update();
 
     // Create the scene object
-    imstkNew<VisualObject> sceneObj("Mesh");
+    imstkNew<SceneObject> sceneObj("Mesh");
     // Create the eroded visual model
     {
         imstkNew<VisualModel>    surfMeshModel(reduce->getOutput());

@@ -26,6 +26,7 @@
 namespace imstk
 {
 class PointSet;
+
 namespace expiremental
 {
 class RigidBodyModel2;
@@ -39,14 +40,12 @@ struct RigidBody;
 class RigidObject2 : public DynamicObject
 {
 public:
-    explicit RigidObject2(const std::string& name) : DynamicObject(name)
-    {
-        m_type = Type::Rigid2;
-    }
-
-    virtual ~RigidObject2() = default;
+    RigidObject2(const std::string& name) : DynamicObject(name) { }
+    virtual ~RigidObject2() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "RigidObject2"; }
+
     ///
     /// \brief Initialize the rigid scene object
     ///

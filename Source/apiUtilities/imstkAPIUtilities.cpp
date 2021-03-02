@@ -47,7 +47,7 @@ namespace apiutils
 ///
 /// \brief Create a analytical visual scene object that and add it to the scene
 ///
-std::shared_ptr<VisualObject>
+std::shared_ptr<SceneObject>
 createVisualAnalyticalSceneObject(Geometry::Type         type,
                                   std::shared_ptr<Scene> scene,
                                   const std::string&     objName,
@@ -88,7 +88,7 @@ createVisualAnalyticalSceneObject(Geometry::Type         type,
     geom->scale(scale, Geometry::TransformType::ApplyToData);
     geom->translate(t, Geometry::TransformType::ApplyToData);
 
-    auto sceneObj = std::make_shared<VisualObject>(objName);
+    auto sceneObj = std::make_shared<SceneObject>(objName);
     sceneObj->setVisualGeometry(geom);
     scene->addSceneObject(sceneObj);
 
@@ -154,7 +154,7 @@ createAndAddVisualSceneObject(std::shared_ptr<Scene> scene,
     auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
 
     // Create object and add to scene
-    auto meshSceneObject = std::make_shared<VisualObject>("meshObject");
+    auto meshSceneObject = std::make_shared<SceneObject>("meshObject");
     meshSceneObject->setVisualGeometry(SurfaceMesh);
     meshSceneObject->setName(objectName);
     scene->addSceneObject(meshSceneObject);

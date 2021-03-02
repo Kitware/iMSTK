@@ -123,7 +123,7 @@ Scene::buildTaskGraph()
     for (auto const& it : m_sceneObjectsMap)
     {
         auto sceneObject = it.second;
-        if (sceneObject->getType() == SceneObject::Type::Rigid)
+        if (sceneObject->getTypeName() == "RigidObject")
         {
             rigidBodies.push_back(sceneObject);
         }

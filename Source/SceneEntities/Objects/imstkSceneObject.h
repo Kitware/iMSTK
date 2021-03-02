@@ -24,7 +24,6 @@
 #include "imstkSceneEntity.h"
 
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace imstk
@@ -44,36 +43,14 @@ class TaskNode;
 class SceneObject : public SceneEntity
 {
 public:
-    enum class Type
-    {
-        Visual,
-        Animation,
-        Colliding,
-        Rigid,
-        Rigid2,
-        FEMDeformable,
-        ReducedFEMDeformable,
-        Pbd,
-        SPH,
-        Physiology,
-        LevelSetDeformable
-    };
-
-    ///
-    /// \brief Constructor
-    ///
-    explicit SceneObject(const std::string& name);
-
-    ///
-    /// \brief Destructor
-    ///
+    SceneObject(const std::string& name);
     virtual ~SceneObject() override = default;
 
 public:
     ///
     /// \brief Get the type of the object
     ///
-    const Type& getType() const { return m_type; }
+    virtual const std::string getTypeName() const { return "SceneObject"; }
 
     ///
     /// \brief Get the computational graph
@@ -157,7 +134,6 @@ protected:
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
 
 protected:
-    Type m_type;                                              ///> Type of the scene object
     std::string m_name;                                       ///> Custom name of the scene object
     std::vector<std::shared_ptr<VisualModel>> m_visualModels; ///> Visual objects for rendering
     std::shared_ptr<TaskGraph> m_taskGraph = nullptr;         ///> Computational Graph
@@ -167,6 +143,4 @@ private:
     std::shared_ptr<TaskNode> m_updateNode = nullptr;
     std::shared_ptr<TaskNode> m_updateGeometryNode = nullptr;
 };
-
-using VisualObject = SceneObject;
 } // imstk

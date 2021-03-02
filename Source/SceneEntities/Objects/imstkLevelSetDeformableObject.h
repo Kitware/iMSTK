@@ -36,16 +36,12 @@ class LevelSetModel;
 class LevelSetDeformableObject : public DynamicObject
 {
 public:
-    explicit LevelSetDeformableObject(const std::string& name) : DynamicObject(name)
-    {
-        m_type = SceneObject::Type::LevelSetDeformable;
-    }
-
-    LevelSetDeformableObject() = delete;
-
+    LevelSetDeformableObject(const std::string& name) : DynamicObject(name) { }
     virtual ~LevelSetDeformableObject() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "LevelSetDeformableObject"; }
+
     ///
     /// \biref Get the Pbd model of the object
     ///

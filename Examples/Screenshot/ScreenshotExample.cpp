@@ -53,7 +53,7 @@ main()
     // Plane
     imstkNew<Plane> planeGeom;
     planeGeom->setWidth(10.0);
-    imstkNew<VisualObject> planeObj("VisualPlane");
+    imstkNew<SceneObject> planeObj("VisualPlane");
     planeObj->setVisualGeometry(planeGeom);
 
     // Cube
@@ -63,14 +63,14 @@ main()
     // rotates could be replaced by cubeGeom->setOrientationAxis(1,1,1) (normalized inside)
     cubeGeom->rotate(UP_VECTOR, PI_4, Geometry::TransformType::ApplyToData);
     cubeGeom->rotate(RIGHT_VECTOR, PI_4, Geometry::TransformType::ApplyToData);
-    imstkNew<VisualObject> cubeObj("VisualCube");
+    imstkNew<SceneObject> cubeObj("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
     // Sphere
     imstkNew<Sphere> sphereGeom;
     sphereGeom->setRadius(0.3);
     sphereGeom->setPosition(0.0, 2.0, 0.0);
-    imstkNew<VisualObject> sphereObj("VisualSphere");
+    imstkNew<SceneObject> sphereObj("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
     // Light (white)

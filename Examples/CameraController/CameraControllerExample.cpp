@@ -57,13 +57,13 @@ main()
     std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
 
     // Load Mesh
-    auto                   mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
-    imstkNew<VisualObject> meshObject("meshObject");
+    auto                  mesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
+    imstkNew<SceneObject> meshObject("meshObject");
     meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);
 
-    imstkNew<VisualObject> planeObject("Plane");
-    imstkNew<Plane>        plane(Vec3d(0.0, -2.0, 0.0));
+    imstkNew<SceneObject> planeObject("Plane");
+    imstkNew<Plane>       plane(Vec3d(0.0, -2.0, 0.0));
     plane->setWidth(1000.0);
     planeObject->setVisualGeometry(plane);
     scene->addSceneObject(planeObject);

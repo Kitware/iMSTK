@@ -36,16 +36,12 @@ class PbdModel;
 class PbdObject : public DynamicObject
 {
 public:
-    explicit PbdObject(const std::string& name) : DynamicObject(name)
-    {
-        m_type = SceneObject::Type::Pbd;
-    }
-
-    PbdObject() = delete;
-
+    PbdObject(const std::string& name) : DynamicObject(name) { }
     virtual ~PbdObject() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "PbdObject"; }
+
     ///
     /// \biref Get the Pbd model of the object
     ///

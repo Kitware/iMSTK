@@ -36,17 +36,16 @@ class SPHModel;
 class SPHObject : public DynamicObject
 {
 public:
-    explicit SPHObject(const std::string& name);
-
+    SPHObject(const std::string& name) : DynamicObject(name) { }
     virtual ~SPHObject() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "SPHObject"; }
+
     ///
-    /// \brief Get the SPH model of the object
+    /// \brief Get the model governing the SPH fluid dynamics of this object
     ///
     std::shared_ptr<SPHModel> getSPHModel();
-
-    std::shared_ptr<SPHModel> getDynamicalSPHModel();
 
     ///
     /// \brief Initialize the SPH scene object

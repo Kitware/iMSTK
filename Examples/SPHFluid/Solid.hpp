@@ -227,7 +227,7 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene4(const std::sh
   std::vector<std::shared_ptr<CollidingObject>> solids;
 
   {
-    auto surfaceObject = std::make_shared<VisualObject>("SurfaceObj");
+    auto surfaceObject = std::make_shared<SceneObject>("SurfaceObj");
     auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(MeshIO::read(iMSTK_DATA_ROOT "/cylinder/cylinder.stl"));
 
     //auto visualModel = std::make_shared<VisualModel>(surfMesh);

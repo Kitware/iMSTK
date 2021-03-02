@@ -204,7 +204,7 @@ main()
 
     // Create a virtual coupling object
     imstkNew<Sphere>         visualGeom(Vec3d(0.0, 0.0, 0.0), 5.0);
-    imstkNew<VisualObject>   obj("virtualCouplingObject");
+    imstkNew<SceneObject>    obj("virtualCouplingObject");
     imstkNew<RenderMaterial> material;
     imstkNew<VisualModel>    visualModel(visualGeom.get());
     visualModel->setRenderMaterial(material);

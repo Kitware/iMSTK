@@ -63,7 +63,7 @@ mat4dToAiMat(const Mat4d& m)
     return results;
 }
 
-std::shared_ptr<VisualObject>
+std::shared_ptr<SceneObject>
 ObjectIO::importSceneObject(
     const std::string& objName,
     const std::string& modelFilePath,
@@ -82,7 +82,7 @@ ObjectIO::importSceneObject(
         return nullptr;
     }
 
-    auto visualObject = std::make_shared<VisualObject>(objName);
+    auto visualObject = std::make_shared<SceneObject>(objName);
 
     // Import mesh(es) and apply some clean-up operations
     Assimp::Importer importer;
