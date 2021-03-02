@@ -22,6 +22,7 @@
 #pragma once
 
 #include <atomic>
+#include <string>
 
 namespace imstk
 {
@@ -36,16 +37,16 @@ class SceneEntity
 public:
     virtual ~SceneEntity() = default;
 
+public:
     ///
     /// \brief Get ID (ALWAYS query the ID in your code, DO NOT hardcode it)
     /// \returns ID of entity
     ///
     EntityID getID() const;
 
+    virtual const std::string getTypeName() const = 0;
+
 protected:
-    ///
-    /// \brief Constructor
-    ///
     SceneEntity();
 
     // Not the best design pattern

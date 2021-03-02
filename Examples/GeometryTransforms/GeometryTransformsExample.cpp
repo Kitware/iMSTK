@@ -70,7 +70,7 @@ main()
     imstkNew<VisualModel> planeVisualModel(planeGeom.get());
     planeVisualModel->setRenderMaterial(planeMaterial);
 
-    imstkNew<VisualObject> planeObj("Plane");
+    imstkNew<SceneObject> planeObj("Plane");
     planeObj->addVisualModel(planeVisualModel);
     scene->addSceneObject(planeObj);
 
@@ -90,7 +90,7 @@ main()
     imstkNew<VisualModel> cubeVisualModel(cubeGeom.get());
     cubeVisualModel->setRenderMaterial(redMaterial);
 
-    imstkNew<VisualObject> cubeObj("Cube");
+    imstkNew<SceneObject> cubeObj("Cube");
     cubeObj->addVisualModel(cubeVisualModel);
     scene->addSceneObject(cubeObj);
 
@@ -105,7 +105,7 @@ main()
     imstkNew<VisualModel> cylVisualModel(cylinderGeom.get());
     cylVisualModel->setRenderMaterial(redMaterial);
 
-    imstkNew<VisualObject> cylObj("Cylinder");
+    imstkNew<SceneObject> cylObj("Cylinder");
     cylObj->addVisualModel(cylVisualModel);
     scene->addSceneObject(cylObj);
 

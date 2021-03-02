@@ -112,7 +112,7 @@ main()
     scene->addSceneObject(scalpelBlade15);
     scalpelBlade15->getMasterGeometry()->setTranslation(0.2, 1.0, -0.8);
 
-    std::shared_ptr<VisualObject> tableObj = ObjectIO::importSceneObject("Instrument Table",
+    std::shared_ptr<SceneObject> tableObj = ObjectIO::importSceneObject("Instrument Table",
         iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/Instrument_Table.dae",
         iMSTK_DATA_ROOT "/Surgical instruments/Instrument Table/");
     scene->addSceneObject(tableObj);

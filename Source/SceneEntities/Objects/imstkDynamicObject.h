@@ -40,7 +40,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~DynamicObject() = default;
+    virtual ~DynamicObject() override = default;
 
     ///
     /// \brief Set/Get the geometry used for Physics computations
@@ -103,11 +103,10 @@ protected:
     virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
-
     ///
     /// \brief Constructor
     ///
-    explicit DynamicObject(const std::string& name) : CollidingObject(name) {}
+    DynamicObject(const std::string& name) : CollidingObject(name) { }
 
     std::shared_ptr<AbstractDynamicalModel> m_dynamicalModel = nullptr; ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry = nullptr;              ///> Geometry used for Physics

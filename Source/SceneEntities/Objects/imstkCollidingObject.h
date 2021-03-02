@@ -29,22 +29,19 @@ namespace imstk
 class Geometry;
 class GeometryMap;
 
-/// \brief TODO
+///
+/// \class CollidingObject
+///
+/// \brief A SceneObject with a geometry for collision
+///
 class CollidingObject : public SceneObject
 {
 public:
-    ///
-    /// \brief
-    ///
-    explicit CollidingObject(const std::string& name) : SceneObject(name)
-    {
-        m_type = Type::Colliding;
-    }
-
-    ///
-    /// \brief
-    ///
+    CollidingObject(const std::string& name) : SceneObject(name) { }
     virtual ~CollidingObject() override = default;
+
+public:
+    virtual const std::string getTypeName() const override { return "CollidingObject"; }
 
     ///
     /// \brief

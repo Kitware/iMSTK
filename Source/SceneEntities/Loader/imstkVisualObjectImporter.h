@@ -24,7 +24,7 @@
 #include "imstkTexture.h"
 #include "imstkMath.h"
 
-class aiMaterial;
+struct aiMaterial;
 
 namespace imstk
 {

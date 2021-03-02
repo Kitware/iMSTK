@@ -53,7 +53,7 @@ main()
         scene->getActiveCamera()->setPosition(0.0, 2.0, 15.0);
 
         // add scene object for surface object
-        imstkNew<VisualObject> surfObj("SurfaceObject");
+        imstkNew<SceneObject> surfObj("SurfaceObject");
 
         auto surfMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.obj");
 
@@ -72,7 +72,7 @@ main()
             GeometryUtils::createTetrahedralMeshCover(surfMesh, nx, ny, nz);
 
         // add scene object for surface object
-        imstkNew<VisualObject>   volObject("VolObj");
+        imstkNew<SceneObject>    volObject("VolObj");
         imstkNew<RenderMaterial> tetMaterial;
         tetMaterial->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
         tetMaterial->setColor(Color::Teal);

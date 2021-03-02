@@ -36,12 +36,12 @@ class FEMDeformableBodyModel;
 class FeDeformableObject : public DynamicObject
 {
 public:
-    explicit FeDeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
-    FeDeformableObject() = delete;
-
-    ~FeDeformableObject() = default;
+    FeDeformableObject(const std::string& name) : DynamicObject(name) { }
+    virtual ~FeDeformableObject() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "FeDeformableObject"; }
+
     ///
     /// \brief Initialize the deformable object
     ///

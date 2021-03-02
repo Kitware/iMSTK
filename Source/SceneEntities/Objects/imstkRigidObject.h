@@ -35,14 +35,12 @@ class RigidBodyModel;
 class RigidObject : public DynamicObject
 {
 public:
-    explicit RigidObject(const std::string& name) : DynamicObject(name)
-    {
-        m_type = Type::Rigid;
-    }
-
-    virtual ~RigidObject() = default;
+    RigidObject(const std::string& name) : DynamicObject(name) { }
+    virtual ~RigidObject() override = default;
 
 public:
+    virtual const std::string getTypeName() const override { return "RigidObject"; }
+
     ///
     /// \brief Initialize the rigid scene object
     ///
@@ -53,6 +51,9 @@ public:
     ///
     void addForce(const Vec3d& force, const Vec3d& pos, bool wakeup = true);
 
+    ///
+    /// \brief Get the model governing the rigid dynamics of this object
+    ///
     std::shared_ptr<RigidBodyModel> getRigidBodyModel();
 
 protected:

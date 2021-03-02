@@ -82,7 +82,7 @@ main()
         imstkNew<VisualModel> surfMeshModel(surfaceMesh);
         surfMeshModel->setRenderMaterial(material);
 
-        imstkNew<VisualObject> headObject("head");
+        imstkNew<SceneObject> headObject("head");
         headObject->addVisualModel(surfMeshModel);
 
         // Head material with textures
