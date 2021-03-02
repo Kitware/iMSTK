@@ -462,6 +462,10 @@ VTKRenderer::updateRenderDelegates()
     {
         delegate->update();
     }
+    for (auto delegate : m_debugRenderDelegates)
+    {
+        delegate->update();
+    }
 }
 
 void
