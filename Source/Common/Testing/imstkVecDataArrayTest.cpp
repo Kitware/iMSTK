@@ -185,13 +185,23 @@ TEST(imstkVecDataArrayTest, ConstructorCast)
 
 TEST(imstkVecDataArrayTest, Erase)
 {
-    VecDataArray<int, 2> a { imstk::Vec2i{ 1, 1 }, { 2, 2 }, { 3, 3 } };
+    VecDataArray<int, 2> a{ imstk::Vec2i{ 1, 1 }, { 2, 2 }, { 3, 3 }, {4,4} };
     a.erase(1);
-    EXPECT_TRUE(isEqualTo(a, { imstk::Vec2i{ 1, 1, }, { 3, 3 } }));
+    EXPECT_EQ(3, a.size());
+    EXPECT_EQ(8, a.getCapacity());
+    EXPECT_TRUE(isEqualTo(a, { imstk::Vec2i{ 1, 1, }, { 3, 3 }, {4,4 } }));
+    EXPECT_EQ(8, a.getCapacity());
+    a.erase(-1);
+    EXPECT_EQ(3, a.size());
+    a.erase(20);
+    EXPECT_EQ(3, a.size());
     a.erase(1);
-    EXPECT_TRUE(isEqualTo(a, { imstk::Vec2i{ 1, 1, } }));
+    a.erase(0);
+    EXPECT_TRUE(isEqualTo(a, { imstk::Vec2i{ 4, 4, } }));
+    EXPECT_EQ(8, a.getCapacity());
     a.erase(0);
     EXPECT_EQ(0, a.size());
+    EXPECT_EQ(2, a.getCapacity());
 }
 
 int

@@ -294,30 +294,15 @@ public:
             return;
         }
 
-        // Allocate data, hold pointer to old data for copying
-        T* oldData = DataArray<T>::m_data;
-        DataArray<T>::m_data = new T[newSize];
-        m_dataCast = reinterpret_cast<VecType*>(DataArray<T>::m_data);
-
         const int pos = vecPos * N; // Position in type T instead of VecType
 
-        // Copy left side, unless deleting far left element
-        if (vecPos != 0)
-        {
-            std::copy_n(oldData, pos, DataArray<T>::m_data);
-        }
-        // Copy right side, unless deleting far right element
         if (vecPos != m_vecSize - 1)
         {
-            std::copy_n(oldData + pos + N, AbstractDataArray::m_size - pos - N, DataArray<T>::m_data + pos);
+            std::copy_n(m_data + pos + N, AbstractDataArray::m_size - pos - N, DataArray<T>::m_data + pos);
         }
 
         m_vecSize--;
         AbstractDataArray::m_size -= N;
-
-        m_vecCapacity = m_vecSize;
-        AbstractDataArray::m_capacity = AbstractDataArray::m_size;
-        delete[] oldData;
     }
 
     ///
