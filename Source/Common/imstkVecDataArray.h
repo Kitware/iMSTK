@@ -181,7 +181,7 @@ public:
     inline void resize(const int size) override
     {
         // Can't resize a mapped vector
-        if (DataArray<T>::m_mapped || size == m_vecSize)
+        if (DataArray<T>::m_mapped || size == m_vecCapacity)
         {
             return;
         }
@@ -219,10 +219,9 @@ public:
         }
 
         const int newVecSize = m_vecSize + 1;
-        if (newVecSize > m_vecCapacity) // If the new size exceeds capacity
+        if (newVecSize > m_vecCapacity)              // If the new size exceeds capacity
         {
-            m_vecCapacity *= 2;
-            VecDataArray::resize(m_vecCapacity); // Conservative/copies values
+            VecDataArray::resize(m_vecCapacity * 2); // Conservative/copies values
         }
         m_vecSize = newVecSize;
         AbstractDataArray::m_size  = newVecSize * N;
@@ -238,10 +237,9 @@ public:
         }
 
         const int newVecSize = m_vecSize + 1;
-        if (newVecSize > m_vecCapacity) // If the new size exceeds capacity
+        if (newVecSize > m_vecCapacity)              // If the new size exceeds capacity
         {
-            m_vecCapacity *= 2;
-            VecDataArray::resize(m_vecCapacity); // Conservative/copies values
+            VecDataArray::resize(m_vecCapacity * 2); // Conservative/copies values
         }
         m_vecSize = newVecSize;
         AbstractDataArray::m_size  = newVecSize * N;
@@ -265,6 +263,8 @@ public:
         {
             return;
         }
+
+        if (size < m_vecCapacity) { return; }
 
         const int currVecSize = m_vecSize;
         const int currSize    = AbstractDataArray::m_size;

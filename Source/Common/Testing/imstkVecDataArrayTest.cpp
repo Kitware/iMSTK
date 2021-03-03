@@ -114,30 +114,44 @@ TEST(imstkVecDataArrayTest, Mapping)
 
 TEST(imstkVecDataArrayTest, CapacityManagement)
 {
-    VecDataArray<int, 2> a;
-    EXPECT_EQ(0, a.size());
-    EXPECT_EQ(2, a.getCapacity());
-    a.push_back({ 0, 0 });
-    EXPECT_EQ(1, a.size());
-    EXPECT_EQ(2, a.getCapacity());
-    for (int i = 1; i < 10; ++i)
     {
-        a.push_back({ i, i });
-        EXPECT_EQ(i + 1, a.size());
+        VecDataArray<int, 2> a;
+        EXPECT_EQ(0, a.size());
+        EXPECT_EQ(2, a.getCapacity());
+        a.push_back({ 0, 0 });
+        EXPECT_EQ(1, a.size());
+        EXPECT_EQ(2, a.getCapacity());
+        for (int i = 1; i < 10; ++i)
+        {
+            a.push_back({ i, i });
+            EXPECT_EQ(i + 1, a.size());
+        }
+        EXPECT_TRUE(isEqualTo(a, { { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, 3 }, { 4, 4 }, { 5, 5 }, { 6, 6 }, { 7, 7 }, { 8, 8 }, { 9, 9 } }));
     }
-    EXPECT_TRUE(isEqualTo(a, { { 0, 0 }, { 1, 1 }, { 2, 2 }, { 3, 3 }, { 4, 4 }, { 5, 5 }, { 6, 6 }, { 7, 7 }, { 8, 8 }, { 9, 9 } }));
-    // Odd ... reserves takes n rather than n * components as input
-    // result capacity is increased to n*components...
-    a.reserve(256);
-    EXPECT_EQ(256 * 2, a.getCapacity());
-    EXPECT_EQ(10, a.size());
-    a.reserve(100);
-    EXPECT_EQ(100 * 2, a.getCapacity());
-    EXPECT_EQ(10, a.size());
-    //     Doesn't work as expected
-    //     a.squeeze();
-    //     EXPECT_EQ(10, a.getCapacity());
-    //     EXPECT_EQ(10, a.size());
+    {
+        VecDataArray<int, 2> a;
+        a.resize(100);
+        EXPECT_EQ(100, a.size());
+        EXPECT_EQ(100 * 2, a.getCapacity());
+        a.resize(50);
+        EXPECT_EQ(50, a.size());
+        EXPECT_EQ(50 * 2, a.getCapacity());
+        a.resize(0);
+        EXPECT_EQ(0, a.size());
+        EXPECT_EQ(1 * 2, a.getCapacity());
+    }
+    {
+        VecDataArray<int, 2> a{ imstk::Vec2i{ 0, 2, }, { 4, 6 } };
+        a.reserve(256);
+        EXPECT_EQ(2, a.size());
+        EXPECT_EQ(256 * 2, a.getCapacity());
+        a.reserve(100);
+        EXPECT_EQ(2, a.size());
+        EXPECT_EQ(256 * 2, a.getCapacity());
+        a.squeeze();
+        EXPECT_EQ(2, a.size());
+        EXPECT_EQ(2 * 2, a.getCapacity());
+    }
 }
 
 TEST(imstkVecDataArrayTest, Iterators)
@@ -163,11 +177,21 @@ TEST(imstkVecDataArrayTest, Iterators)
     }
 }
 
-TEST(imstkVecDataArrayTest, constructorCast)
+TEST(imstkVecDataArrayTest, ConstructorCast)
 {
-    VecDataArray<long, 2> a{ Vec2i{1,2}, {3,4} };
-    EXPECT_EQ(Vec2i(1,2), a[0].cast<int>());
+    VecDataArray<long, 2> a{ Vec2i{ 1, 2 }, { 3, 4 } };
+    EXPECT_EQ(Vec2i(1, 2), a[0].cast<int>());
+}
 
+TEST(imstkVecDataArrayTest, Erase)
+{
+    VecDataArray<int, 2> a { imstk::Vec2i{ 1, 1 }, { 2, 2 }, { 3, 3 } };
+    a.erase(1);
+    EXPECT_TRUE(isEqualTo(a, { imstk::Vec2i{ 1, 1, }, { 3, 3 } }));
+    a.erase(1);
+    EXPECT_TRUE(isEqualTo(a, { imstk::Vec2i{ 1, 1, } }));
+    a.erase(0);
+    EXPECT_EQ(0, a.size());
 }
 
 int
