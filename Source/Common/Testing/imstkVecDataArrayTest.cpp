@@ -163,6 +163,13 @@ TEST(imstkVecDataArrayTest, Iterators)
     }
 }
 
+TEST(imstkVecDataArrayTest, constructorCast)
+{
+    VecDataArray<long, 2> a{ Vec2i{1,2}, {3,4} };
+    EXPECT_EQ(Vec2i(1,2), a[0].cast<int>());
+
+}
+
 int
 imstkVecDataArrayTest(int argc, char* argv[])
 {

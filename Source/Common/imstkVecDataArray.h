@@ -134,7 +134,7 @@ public:
         int j = 0;
         for (auto i : list)
         {
-            m_dataCast[j] = i;
+            m_dataCast[j] = i.cast<T>();
             j++;
         }
     }
