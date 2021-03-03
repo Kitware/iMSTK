@@ -1,0 +1,157 @@
+/*=========================================================================
+
+   Library: iMSTK
+
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+=========================================================================*/
+
+#include "gtest/gtest.h"
+
+#include "imstkDataArray.h"
+
+using namespace imstk;
+
+template<class T>
+bool
+isEqualTo(const DataArray<T>& original, std::initializer_list<T>&& p)
+{
+    DataArray<T> other(p);
+    if (original.size() != other.size())
+    {
+        return false;
+    }
+    for (int i = 0; i < original.size(); ++i)
+    {
+        if (original[i] != other[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+TEST(imstkDataArrayTest, Constructors)
+{
+    EXPECT_NO_THROW(DataArray<int> sample);
+
+    DataArray<int> a;
+    EXPECT_EQ(0, a.size());
+    EXPECT_EQ(1, a.getCapacity());
+
+    DataArray<int> b{ 0, 1, 2, 3 };
+    EXPECT_EQ(4, b.size());
+    EXPECT_EQ(4, b.getCapacity());
+    EXPECT_TRUE(isEqualTo(b, { 0, 1, 2, 3 }));
+
+    DataArray<int> c(128);
+    EXPECT_EQ(128, c.size());
+    EXPECT_EQ(128, c.getCapacity());
+
+    DataArray<int> d(std::move(b));
+    EXPECT_EQ(4, d.size());
+    EXPECT_EQ(4, d.getCapacity());
+    EXPECT_TRUE(isEqualTo(d, { 0, 1, 2, 3 }));
+}
+
+TEST(imstkDataArrayTest, Assignment)
+{
+    DataArray<int> a;
+    a = { 1, 2, 3, 4 };
+    EXPECT_EQ(4, a.size());
+    EXPECT_TRUE(isEqualTo(a, { 1, 2, 3, 4 }));
+
+    DataArray<int> b{ 0, 2, 4, 6 };
+
+    b = a;
+    EXPECT_TRUE(isEqualTo(b, { 1, 2, 3, 4 }));
+}
+
+TEST(imstkDataArrayTest, Mapping)
+{
+    std::vector<int> other{ -1, -2, -3 };
+    {
+        DataArray<int> a{ 1, 2, 3, 4 };
+        a.setData(other.data(), static_cast<int>(other.size()));
+        EXPECT_EQ(3, a.size());
+        EXPECT_TRUE(isEqualTo(a, { -1, -2, -3 }));
+        EXPECT_EQ(other.data(), a.getPointer());
+
+        DataArray<int> b = a;
+        EXPECT_EQ(3, b.size());
+        EXPECT_TRUE(isEqualTo(b, { -1, -2, -3 }));
+        EXPECT_EQ(other.data(), b.getPointer());
+    }
+}
+
+TEST(imstkDataArrayTest, CapacityManagement)
+{
+    DataArray<int> a;
+    EXPECT_EQ(0, a.size());
+    EXPECT_EQ(1, a.getCapacity());
+    a.push_back(0);
+    EXPECT_EQ(1, a.size());
+    EXPECT_EQ(1, a.getCapacity());
+    for (int i = 1; i < 10; ++i)
+    {
+        a.push_back(i);
+        EXPECT_EQ(i + 1, a.size());
+    }
+    EXPECT_TRUE(isEqualTo(a, { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
+    a.reserve(256);
+    EXPECT_EQ(256, a.getCapacity());
+    EXPECT_EQ(10, a.size());
+    a.reserve(100);
+    EXPECT_EQ(100, a.getCapacity());
+    EXPECT_EQ(10, a.size());
+//     Doesn't work as expected
+//     a.squeeze();
+//     EXPECT_EQ(10, a.getCapacity());
+//     EXPECT_EQ(10, a.size());
+}
+
+TEST(imstkDataArrayTest, Iterators)
+{
+    DataArray<int> a;
+    for (const auto& val : a)
+    {
+        GTEST_FAIL() << "Should not enter here";
+    }
+
+    auto itBegin = a.begin();
+    auto itEnd   = a.end();
+    EXPECT_EQ(itBegin, itEnd);
+    a = { 1, 2, 3, 4 };
+    auto it = a.begin();
+    itEnd = a.end();
+    int expected = 1;
+    while (it != itEnd)
+    {
+        EXPECT_EQ(expected, *it);
+        ++it;
+        ++expected;
+    }
+}
+
+int
+imstkDataArrayTest(int argc, char* argv[])
+{
+    // Init Google Test
+    ::testing::InitGoogleTest(&argc, argv);
+
+    // Run tests with gtest
+    return RUN_ALL_TESTS();
+}

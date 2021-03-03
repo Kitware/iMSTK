@@ -69,9 +69,9 @@ public:
 
         pointer operator->() { return ptr_; }
 
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
 
     private:
         pointer ptr_;
@@ -103,9 +103,9 @@ public:
 
         const pointer operator->() { return ptr_; }
 
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
 
     private:
         pointer ptr_;
@@ -126,7 +126,9 @@ public:
     /// \brief Constructs from intializer list
     ///
     template<typename U, int M>
-    VecDataArray(std::initializer_list<Eigen::Matrix<U, M, 1>> list) : DataArray<T>(list.size() * N), m_vecSize(list.size()), m_vecCapacity(list.size()),
+    VecDataArray(std::initializer_list<Eigen::Matrix<U, M, 1>> list) : DataArray<T>(static_cast<int>(list.size() * N)),
+        m_vecSize(static_cast<int>(list.size())),
+        m_vecCapacity(static_cast<int>(list.size())),
         m_dataCast(reinterpret_cast<VecType*>(DataArray<T>::m_data))
     {
         int j = 0;
@@ -139,7 +141,6 @@ public:
 
     VecDataArray(const VecDataArray& other)
     {
-        // Copy the buffer instead of the pointer
         DataArray<T>::m_mapped          = other.m_mapped;
         AbstractDataArray::m_size       = other.m_size;
         AbstractDataArray::m_capacity   = other.m_capacity;
@@ -158,7 +159,7 @@ public:
         m_dataCast    = reinterpret_cast<VecType*>(DataArray<T>::m_data);
     }
 
-    VecDataArray(const VecDataArray&& other)
+    VecDataArray(VecDataArray&& other)
     {
         DataArray<T>::m_mapped        = other.m_mapped;
         AbstractDataArray::m_size     = other.m_size;
@@ -167,8 +168,8 @@ public:
         m_vecCapacity = other.m_vecCapacity;
         AbstractDataArray::m_scalarType = other.m_scalarType;
         DataArray<T>::m_data = other.m_data; // Take the others buffer
-        other.m_data     = new T[N];         // Back to default
-        other.m_dataCast = reinterpret_cast<VecType>(other.m_data);
+        m_dataCast     = other.m_dataCast;
+        other.m_mapped = true;
     }
 
     virtual ~VecDataArray() override = default;

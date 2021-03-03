@@ -68,9 +68,9 @@ public:
 
         pointer operator->() { return ptr_; }
 
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
 
     private:
         pointer ptr_;
@@ -102,9 +102,9 @@ public:
 
         const pointer operator->() { return ptr_; }
 
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
 
     private:
         pointer ptr_;
@@ -133,7 +133,7 @@ public:
     /// \brief Constructs from intializer list
     ///
     template<typename U>
-    DataArray(std::initializer_list<U> list) : AbstractDataArray(size), m_mapped(false), m_data(new T[list.size()])
+    DataArray(std::initializer_list<U> list) : AbstractDataArray(static_cast<int>(list.size())), m_mapped(false), m_data(new T[list.size()])
     {
         int j = 0;
         for (auto i : list)
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    DataArray(const DataArray&& other)
+    DataArray(DataArray&& other)
     {
         m_mapped       = other.m_mapped;
         m_size         = other.m_size;
