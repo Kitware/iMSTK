@@ -306,8 +306,8 @@ testMultipleScenesInRenderMode()
     LOG(INFO) << "s/S followed by enter to switch scenes";
     LOG(INFO) << "q/Q followed by enter to quit";
 
-    connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
-        [&, driver](KeyPressEvent* e)
+    connect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
+        [&, driver](KeyEvent* e)
     {
         if (e->m_keyPressType == KEY_PRESS)
         {
@@ -358,7 +358,7 @@ testMultipleScenesInBackgroundMode()
 
     LOG(INFO) << "s/S followed by enter to switch scenes";
     LOG(INFO) << "q/Q followed by enter to quit";
-    auto keyPressFunc = [&](KeyPressEvent* e)
+    auto keyPressFunc = [&](KeyEvent* e)
                         {
                             if (e->m_keyPressType == KEY_PRESS)
                             {
@@ -382,7 +382,7 @@ testMultipleScenesInBackgroundMode()
                                 }
                             }
                         };
-    connect<KeyPressEvent>(console->getKeyboardDevice(), EventType::KeyEvent, keyPressFunc);
+    connect<KeyEvent>(console->getKeyboardDevice(), EventType::KeyEvent, keyPressFunc);
 
     driver->start();
 }

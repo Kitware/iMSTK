@@ -170,9 +170,11 @@ VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
             // Update the pointer of the coupled array
             m_mappedVertexArray->SetNumberOfComponents(3);
             m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
-            m_mappedVertexArray->Modified();
         }
+        m_mesh->GetPoints()->SetNumberOfPoints(m_vertices->size());
     }
+
+    m_mappedVertexArray->Modified();
 
     // Test if the index buffer changed
     if (m_indices != geometry->getTetrahedraIndices())
@@ -182,15 +184,16 @@ VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
         {
             // Copy cells
             m_cellArray->Reset();
-            vtkIdType cell[3];
+            vtkIdType cell[4];
             for (const auto& t : *m_indices)
             {
-                for (size_t i = 0; i < 3; ++i)
+                for (size_t i = 0; i < 4; i++)
                 {
                     cell[i] = t[i];
                 }
-                m_cellArray->InsertNextCell(3, cell);
+                m_cellArray->InsertNextCell(4, cell);
             }
+            m_mesh->SetCells(VTK_TETRA, m_cellArray);
             m_cellArray->Modified();
         }
     }

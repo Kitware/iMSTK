@@ -58,6 +58,7 @@ class VolumetricMesh;
 
 class Cube;
 class Sphere;
+class Plane;
 
 ///
 /// \brief Contains a set of free functions for processing geometry
@@ -202,6 +203,11 @@ std::shared_ptr<SurfaceMesh> toCubeSurfaceMesh(std::shared_ptr<Cube> cube);
 ///
 std::shared_ptr<SurfaceMesh> toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
                                                    const unsigned int phiDivisions, const unsigned int thetaDivisions);
+
+///
+/// \brief Produces SurfaceMesh cube from imstkPlane
+///
+std::shared_ptr<SurfaceMesh> toQuadSurfaceMesh(std::shared_ptr<Plane> plane);
 
 ///
 /// \brief Returns the number of open edges, use to tell if manifold (==0)

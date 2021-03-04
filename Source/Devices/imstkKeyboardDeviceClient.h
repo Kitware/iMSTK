@@ -31,11 +31,11 @@ using KeyStateType = int;
 #define KEY_RELEASE 0
 #define KEY_PRESS 1
 
-class KeyPressEvent : public Event
+class KeyEvent : public Event
 {
 public:
-    KeyPressEvent(const char key, const KeyStateType keyPressType) : Event(EventType::KeyEvent, 1), m_keyPressType(keyPressType), m_key(key) { }
-    virtual ~KeyPressEvent() override = default;
+    KeyEvent(const char key, const KeyStateType keyPressType) : Event(EventType::KeyEvent, 1), m_keyPressType(keyPressType), m_key(key) { }
+    virtual ~KeyEvent() override = default;
 
 public:
     KeyStateType m_keyPressType;
