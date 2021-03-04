@@ -68,9 +68,9 @@ public:
 
         pointer operator->() { return ptr_; }
 
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
 
     private:
         pointer ptr_;
@@ -102,9 +102,9 @@ public:
 
         const pointer operator->() { return ptr_; }
 
-        bool operator==(const self_type& rhs) { return ptr_ == rhs.ptr_; }
+        bool operator==(const self_type& rhs) const { return ptr_ == rhs.ptr_; }
 
-        bool operator!=(const self_type& rhs) { return ptr_ != rhs.ptr_; }
+        bool operator!=(const self_type& rhs) const { return ptr_ != rhs.ptr_; }
 
     private:
         pointer ptr_;
@@ -133,7 +133,7 @@ public:
     /// \brief Constructs from intializer list
     ///
     template<typename U>
-    DataArray(std::initializer_list<U> list) : AbstractDataArray(size), m_mapped(false), m_data(new T[list.size()])
+    DataArray(std::initializer_list<U> list) : AbstractDataArray(static_cast<int>(list.size())), m_mapped(false), m_data(new T[list.size()])
     {
         int j = 0;
         for (auto i : list)
@@ -163,7 +163,7 @@ public:
         }
     }
 
-    DataArray(const DataArray&& other)
+    DataArray(DataArray&& other)
     {
         m_mapped       = other.m_mapped;
         m_size         = other.m_size;
@@ -189,8 +189,14 @@ public:
     inline void resize(const int size) override
     {
         // Can't resize a mapped vector
-        if (m_mapped || size == m_size)
+        if (m_mapped)
         {
+            return;
+        }
+
+        if (size == m_capacity)
+        {
+            m_size = m_capacity;
             return;
         }
 
@@ -242,10 +248,9 @@ public:
         }
 
         const int newSize = m_size + 1;
-        if (newSize > m_capacity) // If the new size exceeds capacity
+        if (newSize > m_capacity)   // If the new size exceeds capacity
         {
-            m_capacity *= 2;
-            resize(m_capacity); // Conservative/copies values
+            resize(m_capacity * 2); // Conservative/copies values
         }
         m_size = newSize;
         m_data[newSize - 1] = val;
@@ -260,10 +265,9 @@ public:
         }
 
         const int newSize = m_size + 1;
-        if (newSize > m_capacity) // If the new size exceeds capacity
+        if (newSize > m_capacity)   // If the new size exceeds capacity
         {
-            m_capacity *= 2;
-            resize(m_capacity); // Conservative/copies values
+            resize(m_capacity * 2); // Conservative/copies values
         }
         m_size = newSize;
         m_data[newSize - 1] = val;
@@ -280,15 +284,17 @@ public:
     ///
     /// \brief Allocates extra capacity, for the number of values, conservative reallocate
     ///
-    inline void reserve(const int size) override
+    inline void reserve(const int capacity) override
     {
         if (m_mapped)
         {
             return;
         }
 
+        if (capacity <= m_capacity) { return; }
+
         const int currSize = m_size;
-        resize(size);      // Reallocate
+        resize(capacity);  // Reallocate
         m_size = currSize; // Keep current size
     }
 

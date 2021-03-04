@@ -76,6 +76,7 @@ VTKdbgTrianglesRenderDelegate::processEvents()
 
     if (dbgTriangles->isModified())
     {
+        dbgTriangles->setDataModified(false);
         m_paddedVertexArray->SetArray(dbgTriangles->getVertexBufferPtr(),
             dbgTriangles->getNumVertices() * 3, 1);
 
