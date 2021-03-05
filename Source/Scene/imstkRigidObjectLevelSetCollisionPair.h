@@ -27,6 +27,7 @@ limitations under the License.
 namespace imstk
 {
 class LevelSetDeformableObject;
+template<typename T, int N> class VecDataArray;
 
 namespace expiremental
 {
@@ -43,6 +44,15 @@ class RigidObjectLevelSetCollisionPair : public CollisionPair
 public:
     RigidObjectLevelSetCollisionPair(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2);
     virtual ~RigidObjectLevelSetCollisionPair() override = default;
+
+public:
+    void apply() override;
+
+    void copyVertsToPrevious();
+    void measureDisplacementFromPrevious();
+
+public:
+    std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
 };
 }
 }

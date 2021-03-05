@@ -35,13 +35,15 @@ struct RigidBody;
 ///
 /// \class RigidObject2
 ///
-/// \brief Scene objects that are governed by rigid body dynamics
+/// \brief Scene objects that are governed by rigid body dynamics under
+/// the RigidBodyModel2
 ///
 class RigidObject2 : public DynamicObject
 {
 public:
     RigidObject2(const std::string& name) : DynamicObject(name) { }
-    virtual ~RigidObject2() override = default;
+
+    virtual ~RigidObject2() = default;
 
 public:
     virtual const std::string getTypeName() const override { return "RigidObject2"; }

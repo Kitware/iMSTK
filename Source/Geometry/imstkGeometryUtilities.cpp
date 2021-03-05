@@ -20,20 +20,18 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
-#include "imstkVecDataArray.h"
+#include "imstkCube.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkImageData.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
+#include "imstkMacros.h"
 #include "imstkParallelUtils.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkCube.h"
-#include "imstkSphere.h"
-#include "imstkPlane.h"
-
-#include "imstkMacros.h"
 #include "imstkTypes.h"
+#include "imstkVecDataArray.h"
 
 #include <vtkAppendPolyData.h>
 #include <vtkCellData.h>
@@ -45,7 +43,6 @@
 #include <vtkFloatArray.h>
 #include <vtkImageData.h>
 #include <vtkMassProperties.h>
-#include <vtkPlaneSource.h>
 #include <vtkPointData.h>
 #include <vtkShortArray.h>
 #include <vtkSphereSource.h>
@@ -729,7 +726,10 @@ GeometryUtils::toCubeSurfaceMesh(std::shared_ptr<Cube> cube)
     vtkNew<vtkTriangleFilter> triangulate;
     triangulate->SetInputData(transformCube->GetOutput());
     triangulate->Update();
-    return copyToSurfaceMesh(triangulate->GetOutput());
+    vtkNew<vtkCleanPolyData> cleanData;
+    cleanData->SetInputData(triangulate->GetOutput());
+    cleanData->Update();
+    return copyToSurfaceMesh(cleanData->GetOutput());
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -743,33 +743,20 @@ GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
     sphereSource->SetThetaResolution(thetaDivisions);
     sphereSource->Update();
 
-    return copyToSurfaceMesh(sphereSource->GetOutput());
-}
+    vtkNew<vtkTransform> transform;
+    transform->SetMatrix(mat4dTranslate(sphere->getPosition()).data());
 
-std::shared_ptr<SurfaceMesh>
-GeometryUtils::toQuadSurfaceMesh(std::shared_ptr<Plane> plane)
-{
-    const Quatd r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), plane->getOrientationAxis());
-    const Vec3d i = r._transformVector(Vec3d(1.0, 0.0, 0.0));
-    const Vec3d j = r._transformVector(Vec3d(0.0, 0.0, 1.0));
-
-    //Vec3d p1 = plane->getPosition() + plane->getWidth() * (i + j);
-    Vec3d p2 = plane->getPosition() + plane->getWidth() * (i - j);
-    Vec3d p3 = plane->getPosition() + plane->getWidth() * (-i + j);
-    Vec3d p4 = plane->getPosition() + plane->getWidth() * (-i - j);
-
-    vtkNew<vtkPlaneSource> planeSource;
-    planeSource->SetOrigin(p4.data());
-    planeSource->SetPoint1(p3.data());
-    planeSource->SetPoint2(p2.data());
-    planeSource->Update();
-
+    vtkNew<vtkTransformFilter> transformFilter;
+    transformFilter->SetInputData(sphereSource->GetOutput());
+    transformFilter->SetTransform(transform);
+    transformFilter->Update();
     vtkNew<vtkTriangleFilter> triangulate;
-    triangulate->SetInputData(planeSource->GetOutput());
+    triangulate->SetInputData(transformFilter->GetOutput());
     triangulate->Update();
     vtkNew<vtkCleanPolyData> cleanData;
-    cleanData->SetInputConnection(triangulate->GetOutputPort());
+    cleanData->SetInputData(triangulate->GetOutput());
     cleanData->Update();
+
     return copyToSurfaceMesh(cleanData->GetOutput());
 }
 

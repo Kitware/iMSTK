@@ -39,7 +39,7 @@ class KeyEvent;
 class KeyboardControl : public DeviceControl
 {
 public:
-    KeyboardControl() { }
+    KeyboardControl() = default;
     KeyboardControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
     virtual ~KeyboardControl() override = default;
 

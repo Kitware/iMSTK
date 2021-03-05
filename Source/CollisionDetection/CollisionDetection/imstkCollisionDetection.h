@@ -43,6 +43,7 @@ public:
 
     ///
     /// \brief Type of the collision detection
+    /// \todo: Remove and replace with factory names
     ///
     enum class Type
     {
@@ -53,6 +54,7 @@ public:
         PointSetToSpherePicking,
         PointSetToSurfaceMesh,
         PointSetToImplicit,
+        PointSetToImplicitCCD,
 
         // Mesh to mesh (mesh to analytical object = mesh vertices to analytical object)
         SurfaceMeshToSurfaceMesh,

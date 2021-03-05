@@ -67,8 +67,8 @@ main()
     {
         // This model is shared among interacting rigid bodies
         imstkNew<RigidBodyModel2> rbdModel;
-        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -900.0, 0.0);
-        rbdModel->getConfig()->m_maxNumIterations = 40;
+        rbdModel->getConfig()->m_gravity = Vec3d(0.0, -2500.0, 0.0);
+        rbdModel->getConfig()->m_maxNumIterations = 10;
 
         // Create the first rbd, plane floor
         imstkNew<CollidingObject> planeObj("Plane");
@@ -150,7 +150,7 @@ main()
         auto                         rbdInteraction = std::make_shared<RigidObjectCollidingCollisionPair>(cubeObj, planeObj, CollisionDetection::Type::PointSetToImplicit);
         std::shared_ptr<RigidBodyCH> ch = std::dynamic_pointer_cast<RigidBodyCH>(rbdInteraction->getCollisionHandlingA());
         ch->setUseFriction(false);
-        ch->setStiffness(0.0); // Completely inelastic
+        ch->setStiffness(0.05);
         scene->getCollisionGraph()->addInteraction(rbdInteraction);
         scene->getActiveCamera()->setPosition(0.0, 40.0, 40.0);
 

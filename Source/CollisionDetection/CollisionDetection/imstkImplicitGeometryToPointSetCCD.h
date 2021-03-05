@@ -30,15 +30,16 @@ template<typename T, int N> class VecDataArray;
 
 class ImplicitGeometry;
 class PointSet;
-struct CollisionData;
 
 ///
 /// \class ImplicitGeometryToPointSetCCD
 ///
 /// \brief ImplicitGeometry to PointSet continous collision detection.
 /// This CD method marches along the displacement of the points in the pointset
-/// to converge on the zero crossing of the implicit geometry. Does not produce
-/// time of impacts
+/// to converge on the zero crossing of the implicit geometry. This particular
+/// version is suited for levelsets not SDFs as it caches the history of the contact
+/// to avoid sampling the implicit geometry anywhere but at the surface (it will also
+/// work for SDFs, though better alterations/modifications of this exist for SDFs)
 ///
 class ImplicitGeometryToPointSetCCD : public CollisionDetection
 {
@@ -52,7 +53,9 @@ public:
     ImplicitGeometryToPointSetCCD(std::shared_ptr<ImplicitGeometry> implicitGeomA,
                                   std::shared_ptr<PointSet>         pointSetB,
                                   std::shared_ptr<CollisionData>    colData);
+    virtual ~ImplicitGeometryToPointSetCCD() override = default;
 
+public:
     ///
     /// \brief Detect collision and compute collision data
     ///
@@ -63,6 +66,12 @@ private:
     std::shared_ptr<PointSet>       m_pointSetB;
     ImplicitFunctionCentralGradient centralGrad;
 
-    std::shared_ptr<VecDataArray<double, 3>> displacements;
+    std::shared_ptr<VecDataArray<double, 3>> displacementsPtr;
+
+    std::unordered_map<int, Vec3d> prevOuterElement;
+    std::unordered_map<int, int>   prevOuterElementCounter;
+
+    // Penetration depths are clamped to this ratio * displacement of the vertex
+    double m_depthRatioLimit = 0.3;
 };
 }

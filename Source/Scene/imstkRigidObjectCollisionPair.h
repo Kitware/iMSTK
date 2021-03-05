@@ -26,6 +26,8 @@ limitations under the License.
 
 namespace imstk
 {
+template<typename T, int N> class VecDataArray;
+
 namespace expiremental
 {
 class RigidObject2;
@@ -44,6 +46,16 @@ public:
                              CollisionDetection::Type cdType);
 
     virtual ~RigidObjectCollisionPair() override = default;
+
+public:
+    void apply() override;
+
+    void copyVertsToPrevious();
+
+    void measureDisplacementFromPrevious();
+
+public:
+    std::shared_ptr<VecDataArray<double, 3>> m_prevVertices;
 };
 }
 }

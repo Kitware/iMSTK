@@ -62,7 +62,7 @@ ImplicitGeometryToPointSetCD::computeCollisionData()
                 elem.dirAtoB = -centralGrad(pt).normalized(); // Contact Normal
                 elem.nodeIdx = static_cast<uint32_t>(idx);
                 elem.penetrationDepth = std::abs(signedDistance);
-                elem.posB = pt;
+                elem.posB = pt;// +elem.dirAtoB * elem.penetrationDepth;
                 m_colData->PDColData.safeAppend(elem);
             }
         });

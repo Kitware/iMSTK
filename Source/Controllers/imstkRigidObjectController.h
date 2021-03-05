@@ -105,16 +105,6 @@ public:
     int getSmoothingKernelSize() const { return m_smoothingKernelSize; }
     void setSmoothingKernelSize(const int kernelSize) { m_smoothingKernelSize = kernelSize; }
 
-    ///
-    /// \brief Return the currently applied force
-    ///
-    const Vec3d& getForce() const { return fS; }
-
-    ///
-    /// \brief Return the currently applied torque
-    ///
-    const Vec3d& getTorque() const { return tS; }
-
 public:
     ///
     /// \brief Update controlled scene object using latest tracking information
@@ -128,7 +118,6 @@ public:
 
 protected:
     std::shared_ptr<RigidObject2> m_rigidObject;
-    std::deque<Vec3d> m_forces;
 
     double m_linearKd  = 10000.0;                                ///> Damping coefficient, linear
     double m_angularKd = 300.0;                                  ///> Damping coefficient, rotational
@@ -143,6 +132,8 @@ protected:
 
     bool m_forceSmoothening    = true;
     int  m_smoothingKernelSize = 25;
+    std::deque<Vec3d> m_forces;
+    Vec3d m_forceSum = Vec3d::Zero();
 };
 }
 }

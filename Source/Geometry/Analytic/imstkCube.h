@@ -72,8 +72,14 @@ public:
     ///
     double getFunctionValue(const Vec3d& pos) const override
     {
-        const Vec3d dmin = pos - m_position - Vec3d(m_width, m_width, m_width) * 0.5;
-        const Vec3d dmax = m_position - pos - Vec3d(m_width, m_width, m_width) * 0.5;
+        // Unrotate the point and cube to axes align the cube
+        const Mat3d r      = Quatd::FromTwoVectors(m_orientationAxisPostTransform, Vec3d(0.0, 1.0, 0.0)).toRotationMatrix();
+        const Vec3d p      = r * pos;
+        const Vec3d center = r * m_positionPostTransform;
+
+        // Then test
+        const Vec3d dmin = p - center - Vec3d(m_widthPostTransform, m_widthPostTransform, m_widthPostTransform) * 0.5;
+        const Vec3d dmax = center - p - Vec3d(m_widthPostTransform, m_widthPostTransform, m_widthPostTransform) * 0.5;
         const Vec3d d    = dmin.cwiseMax(dmax);
         return std::max(std::max(d[0], d[1]), d[2]);
     }

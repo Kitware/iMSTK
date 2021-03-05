@@ -39,6 +39,7 @@ struct LevelSetModelConfig
     bool m_useCurvature = false;
     double m_k = 0.05;               // Curvature term
     double m_constantVelocity = 0.0; // Constant velocity
+    int m_substeps = 10;             // How many steps to do every iteration
 };
 
 ///
@@ -85,7 +86,14 @@ public:
 
     virtual void evolve();
 
+    ///
+    /// \brief Add an impulse to the velocity field of the levelset
+    /// This actually takes the max of the current and provided
+    ///
     void addImpulse(const Vec3i& coord, double f);
+    ///
+    /// \brief Set the impulse in the velocity field, replaces
+    ///
     void setImpulse(const Vec3i& coord, double f);
 
     std::shared_ptr<TaskNode> getQuantityEvolveNode(size_t i) const { return m_evolveQuantitiesNodes[i]; }
@@ -115,8 +123,6 @@ protected:
     // suspect floating point error
     StructuredForwardGradient  m_forwardGrad;
     StructuredBackwardGradient m_backwardGrad;
-    /*ImplicitFunctionForwardGradient  forwardGrad;
-    ImplicitFunctionBackwardGradient backwardGrad;*/
 
     ImplicitStructuredCurvature m_curvature;
 };
