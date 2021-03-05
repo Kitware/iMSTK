@@ -210,7 +210,7 @@ main()
         }
 
         // Queue keypress to be called after scene thread
-        queueConnect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent, sceneManager, [&](KeyPressEvent* e)
+        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent, sceneManager, [&](KeyEvent* e)
         {
             // When i is pressed replace the PBD cloth with a subdivided one
             if (e->m_key == 'i' && e->m_keyPressType == KEY_PRESS)

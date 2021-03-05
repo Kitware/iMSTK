@@ -17,12 +17,12 @@
 ###########################################################################
 
 if(iMSTK_USE_OpenHaptics)
-	project(Example-LevelSet-RigidInteraction)
+	project(Example-FemurCut)
 
 	#-----------------------------------------------------------------------------
 	# Create executable
 	#-----------------------------------------------------------------------------
-	imstk_add_executable(${PROJECT_NAME} LevelSet-RigidInteractionExample.cpp)
+	imstk_add_executable(${PROJECT_NAME} FemurCutExample.cpp)
 
 	#-----------------------------------------------------------------------------
 	# Add the target to Examples folder

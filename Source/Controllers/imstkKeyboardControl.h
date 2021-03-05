@@ -27,7 +27,7 @@
 namespace imstk
 {
 class KeyboardDeviceClient;
-class KeyPressEvent;
+class KeyEvent;
 
 ///
 /// \class KeyboardSceneController
@@ -55,7 +55,7 @@ public:
     /// \brief Posts key press/release events
     /// override to filter the event, or implement OnkeyDown/OnKeyUp
     ///
-    virtual void keyPressEvent(KeyPressEvent* e);
+    virtual void keyPressEvent(KeyEvent* e);
 
 protected:
     std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;

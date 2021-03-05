@@ -258,10 +258,9 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
             }
             m_cellArray->Modified();
         }
-        //vertexOrIndexBufferChanged = true;
     }
 
-    if (/*vertexOrIndexBufferChanged && */ m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
+    if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
     {
         geometry->computeVertexNormals();
         std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();

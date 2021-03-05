@@ -490,8 +490,8 @@ main()
             viewer->addControl(keyControl);
 
             // Add an extra control
-            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
-                [&](KeyPressEvent* e)
+            connect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
+                [&](KeyEvent* e)
             {
                 if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)
                 {

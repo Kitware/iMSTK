@@ -48,7 +48,7 @@ KeyboardControl::setDevice(std::shared_ptr<DeviceClient> device)
 }
 
 void
-KeyboardControl::keyPressEvent(KeyPressEvent* keyPressEvent)
+KeyboardControl::keyPressEvent(KeyEvent* keyPressEvent)
 {
     // If the key was just pressed
     if (keyPressEvent->m_keyPressType == KEY_PRESS)

@@ -125,8 +125,8 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
 
-            connect<KeyPressEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
-                [&](KeyPressEvent* e)
+            connect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
+                [&](KeyEvent* e)
             {
                 if (e->m_keyPressType == KEY_PRESS)
                 {
