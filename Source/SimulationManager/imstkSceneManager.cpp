@@ -107,10 +107,10 @@ SceneManager::updateModule()
     // Advance the scene
     if (m_activeScene != nullptr)
     {
-        // Process one event
-        this->doEvent();
+        // Process events given to this module
+        this->doAllEvents();
 
-        m_activeScene->advance();
+        m_activeScene->advance(getDt());
     }
 }
 

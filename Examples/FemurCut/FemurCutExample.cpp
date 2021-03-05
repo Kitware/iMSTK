@@ -260,7 +260,8 @@ main()
             controller->setAngularKd(400000.0);
             controller->setForceScaling(0.001);
 
-            // The particular device we are using doesn't produce this quantity, with this flag its computed
+            // The particular device we are using doesn't produce this quantity
+            // with this flag its computed
             // in code
             controller->setComputeVelocity(true);
             controller->setComputeAngularVelocity(true);

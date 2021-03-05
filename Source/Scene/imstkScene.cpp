@@ -403,19 +403,22 @@ Scene::resetSceneObjects()
 }
 
 void
-Scene::advance()
+Scene::advance(const double dt)
 {
     StopWatch wwt;
     wwt.start();
 
-    advance(m_elapsedTime);
+    for (auto obj : this->getSceneObjects())
+    {
+        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
+        {
+            if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
+            {
+                dynaObj->getDynamicalModel()->setTimeStep(dt);
+            }
+        }
+    }
 
-    m_elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
-}
-
-void
-Scene::advance(const double dt)
-{
     // Reset Contact forces to 0
     for (auto obj : this->getSceneObjects())
     {
@@ -452,17 +455,6 @@ Scene::advance(const double dt)
         controller->setTrackerToOutOfDate();
     }
 
-    for (auto obj : this->getSceneObjects())
-    {
-        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
-        {
-            if (dynaObj->getDynamicalModel()->getTimeStepSizeType() == TimeSteppingType::RealTime)
-            {
-                dynaObj->getDynamicalModel()->setTimeStep(dt);
-            }
-        }
-    }
-
     if (m_resetRequested)
     {
         resetSceneObjects();
@@ -470,7 +462,9 @@ Scene::advance(const double dt)
         m_resetRequested = false;
     }
 
-    this->setFPS(1.0 / dt);
+    // FPS of physics is given by the measured time, not the given timestep dt
+    const double elapsedTime = wwt.getTimeElapsed(StopWatch::TimeUnitType::seconds);
+    m_fps = 1.0 / elapsedTime;
 
     // If benchmarking enabled, produce a time table for each step
     if (m_config->taskTimingEnabled)
@@ -481,20 +475,6 @@ Scene::advance(const double dt)
             m_nodeComputeTimes[node->m_name] = node->m_computeTime;
         }
         unlockComputeTimes();
-    }
-}
-
-double
-Scene::getElapsedTime(const std::string& stepName) const
-{
-    if (m_nodeComputeTimes.count(stepName) == 0)
-    {
-        LOG(WARNING) << "Tried to get elapsed time of nonexistent step. Is benchmarking enabled?";
-        return 0.0;
-    }
-    else
-    {
-        return m_nodeComputeTimes.at(stepName);
     }
 }
 

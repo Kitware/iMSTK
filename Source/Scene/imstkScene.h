@@ -89,14 +89,14 @@ template<class T>
 using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
 public:
-    explicit Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
+    Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
     virtual ~Scene() override = default;
 
 public:
     ///
     /// \brief Initialize the scene
     ///
-    bool initialize();
+    virtual bool initialize();
 
     ///
     /// \brief Setup the task graph, this completely rebuilds the graph
@@ -115,14 +115,9 @@ public:
     void resetSceneObjects();
 
     ///
-    /// \brief Advance the scene from current to next frame
-    ///
-    void advance();
-
-    ///
     /// \brief Advance the scene from current to next frame with specified timestep
     ///
-    void advance(const double dt);
+    virtual void advance(const double dt);
 
     ///
     /// \brief Returns true if the object with a given name is registered, else false
@@ -273,18 +268,7 @@ public:
     ///
     /// \brief Set/Get the FPS
     ///
-    void setFPS(const double fps) { m_fps = fps; }
-    double getFPS() { return m_fps; }
-
-    ///
-    /// \brief Get the elapsed time
-    ///
-    double getElapsedTime() { return m_elapsedTime; }
-
-    ///
-    /// \brief Get the elapsed time of a particular step
-    ///
-    double getElapsedTime(const std::string& stepName) const;
+    double getFPS() const { return m_fps; }
 
     ///
     /// \brief Get the map of elapsed times
@@ -304,8 +288,7 @@ public:
     ///
     /// \brief Get the configuration
     ///
-    std::shared_ptr<const SceneConfig> getConfig() const { return m_config; };
-    const std::shared_ptr<SceneConfig> getConfig() { return m_config; };
+    std::shared_ptr<SceneConfig> getConfig() const { return m_config; };
 
 protected:
     std::shared_ptr<SceneConfig> m_config;
@@ -330,7 +313,6 @@ protected:
     std::unordered_map<std::string, double>  m_nodeComputeTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
 
     double m_fps = 0.0;
-    double m_elapsedTime = 0.0;
 
     std::atomic<bool> m_resetRequested = ATOMIC_VAR_INIT(false);
 };
