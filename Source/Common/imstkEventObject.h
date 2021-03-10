@@ -32,30 +32,10 @@
 #include <tbb/concurrent_unordered_map.h>
 #include <deque>
 
+#define SIGNAL(className,signalName) static std::string signalName() { return #className "::"#signalName; }
+
 namespace imstk
 {
-enum class EventType
-{
-    AnyEvent,
-
-    Start,
-    End,
-    Resume,
-    Pause,
-
-    Modified,
-
-    KeyEvent,
-    DeviceButtonEvent,
-    MouseEvent,
-
-    PreUpdate,
-    PostUpdate,
-    Configure,
-
-    Contact
-};
-
 class EventObject;
 
 ///
@@ -68,24 +48,12 @@ class EventObject;
 class Event
 {
 public:
-    Event() : m_type(EventType::AnyEvent), m_priority(0), m_sender(nullptr) { }
-    Event(EventType type, int priority = 0) : m_type(type), m_priority(priority), m_sender(nullptr) { }
-    virtual ~Event() = default;
+    //Event() : m_type(EventType::AnyEvent), m_priority(0), m_sender(nullptr) { }
+    Event(const std::string type) : m_type(type),m_sender(nullptr) { }
+    virtual~Event() = default;
 
 public:
-    bool operator<(const Event& other) const
-    {
-        return m_priority < other.m_priority;
-    }
-
-    bool operator>(const Event& other) const
-    {
-        return m_priority > other.m_priority;
-    }
-
-public:
-    EventType    m_type;
-    int          m_priority;
+    std::string  m_type;
     EventObject* m_sender;
 };
 
@@ -96,15 +64,10 @@ public:
 class Command
 {
 public:
-    Command() : m_call(nullptr), m_event(nullptr) { }
-    Command(std::function<void(Event*)> call, std::shared_ptr<Event> event) : m_call(call), m_event(event) { }
+    Command() : m_call(nullptr),m_event(nullptr) { }
+    Command(std::function<void(Event*)> call,std::shared_ptr<Event> event) : m_call(call),m_event(event) { }
 
 public:
-    bool operator<(const Command& other) const
-    {
-        return *m_event > *other.m_event;
-    }
-
     ///
     /// \brief Call the underlying function if present
     /// then delete the event data
@@ -125,17 +88,17 @@ public:
     std::shared_ptr<Event>      m_event = nullptr;
 };
 
-template<class T, class RecieverType>
-static void connect(EventObject*, EventType, RecieverType*, void (RecieverType::* func)(T*));
+template<class T,class RecieverType>
+static void connect(EventObject*,std::string(*)(),RecieverType*,void(RecieverType::*)(T*));
 template<class T>
-static void connect(EventObject*, EventType, std::function<void(T*)>);
+static void connect(EventObject*, std::string (*)(), std::function<void(T*)>);
 
 template<class T, class RecieverType>
-static void queueConnect(EventObject*, EventType, RecieverType*, void (RecieverType::* func)(T*));
+static void queueConnect(EventObject*, std::string (*)(), RecieverType*, void (RecieverType::*)(T*));
 template<class T>
-static void queueConnect(EventObject*, EventType, EventObject*, std::function<void(T*)>);
+static void queueConnect(EventObject*, std::string (*)(), EventObject*, std::function<void(T*)>);
 
-static void disconnect(EventObject*, EventObject*, EventType);
+static void disconnect(EventObject*, EventObject*, std::string (*)());
 
 ///
 /// \class EventObject
@@ -145,7 +108,7 @@ static void disconnect(EventObject*, EventObject*, EventType);
 /// Direct observers recieve events immediately on the same thread
 /// This can either be posted on an object or be a function pointer
 /// Queued observers recieve events within their queue which they can process whenever
-/// they like. One can implement the type of handling.
+/// they like.
 /// These can be connected with the connect/queuedConnect/disconnect functions
 /// \todo ThreadObject affinity
 ///
@@ -215,9 +178,15 @@ public:
     template<typename T>
     void queueEvent(const T& e)
     {
-        T* et = new T(e);
+        std::shared_ptr<T> ePtr = std::make_shared<T>(e);
+        // Don't overwrite the sender if the user provided one
+        if (ePtr->m_sender == nullptr)
+        {
+            ePtr->m_sender = this;
+        }
+
         eventQueueLock.lock();
-        eventQueue.push_back(Command(nullptr, et));
+        eventQueue.push_back(Command(nullptr, ePtr));
         eventQueueLock.unlock();
     }
 
@@ -322,23 +291,23 @@ public:
 
 public:
     template<class T, class RecieverType>
-    friend void connect(EventObject*, EventType, RecieverType*, void (RecieverType::* func)(T*));
+    friend void connect(EventObject*, std::string (*)(), RecieverType*, void (RecieverType::*)(T*));
     template<typename T>
-    friend void connect(EventObject*, EventType, std::function<void(T*)>);
+    friend void connect(EventObject*, std::string (*)(), std::function<void(T*)>);
 
     template<typename T, class RecieverType>
-    friend void queueConnect(EventObject*, EventType, RecieverType*, void (RecieverType::* func)(T*));
+    friend void queueConnect(EventObject*, std::string (*)(), RecieverType*, void (RecieverType::*)(T*));
     template<class T>
-    friend void queueConnect(EventObject*, EventType, EventObject*, std::function<void(T*)>);
+    friend void queueConnect(EventObject*, std::string (*)(), EventObject*, std::function<void(T*)>);
 
-    friend void disconnect(EventObject*, EventObject*, EventType);
+    friend void disconnect(EventObject*, EventObject*, std::string (*)());
 
 protected:
     ParallelUtils::SpinLock eventQueueLock; // Data lock for the event queue
     std::deque<Command>     eventQueue;
-    //tbb::concurrent_priority_queue<Command> eventQueue;
-    tbb::concurrent_unordered_map<EventType, std::list<Observer>> queuedObservers;
-    tbb::concurrent_unordered_map<EventType, std::list<Observer>> directObservers;
+
+    tbb::concurrent_unordered_map<std::string, std::list<Observer>> queuedObservers;
+    tbb::concurrent_unordered_map<std::string, std::list<Observer>> directObservers;
 };
 
 #ifdef WIN32
@@ -346,164 +315,156 @@ protected:
 #pragma warning(disable: 4505)
 #endif
 ///
-/// \brief Direct connection
-/// When sender emits eventType, func will be called immediately/synchronously/within the same thread
-/// Reciever function must be a member of reciever object
+/// \brief Direct connection for member functions
 ///
 template<class T, class RecieverType>
 static void
-connect(EventObject* sender, EventType eventType,
-        RecieverType* reciever, void (RecieverType::* func)(T*))
+connect(EventObject* sender, std::string (* senderFunc)(),
+        RecieverType* reciever, void (RecieverType::* recieverFunc)(T*))
 {
-    std::function<void(T*)> bindFunc = std::bind(func, reciever, std::placeholders::_1);
-    sender->directObservers[eventType].push_back(EventObject::Observer(nullptr, [ = ](Event* e) { bindFunc(static_cast<T*>(e)); }));
+    static_assert(std::is_base_of<EventObject, RecieverType>::value, "reciever not derived from EventObject");
+
+    std::function<void(T*)> recieverStdFunc = std::bind(recieverFunc, reciever, std::placeholders::_1);
+    sender->directObservers[senderFunc()].push_back(EventObject::Observer(nullptr, [ = ](Event* e) { recieverStdFunc(static_cast<T*>(e)); }));
 }
 
 template<class T, class RecieverType>
 static void
-connect(std::shared_ptr<EventObject> sender, EventType eventType,
-        std::shared_ptr<EventObject> reciever, void (RecieverType::* func)(T*))
+connect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(),
+        std::shared_ptr<EventObject> reciever, void (RecieverType::* recieverFunc)(T*))
 {
-    connect<T>(sender.get(), eventType, reciever.get(), func);
+    connect<T>(sender.get(), senderFunc, reciever.get(), recieverFunc);
 }
 
 template<class T, class RecieverType>
 static void
-connect(std::shared_ptr<EventObject> sender, EventType eventType,
-        RecieverType* reciever, void (RecieverType::* func)(T*))
+connect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(),
+        RecieverType* reciever, void (RecieverType::* recieverFunc)(T*))
 {
-    connect<T>(sender.get(), eventType, reciever, func);
+    connect<T>(sender.get(), senderFunc, reciever, recieverFunc);
 }
 
 template<class T, class RecieverType>
 static void
-connect(EventObject* sender, EventType eventType,
-        std::shared_ptr<RecieverType> reciever, void (RecieverType::* func)(T*))
+connect(EventObject* sender, std::string (* senderFunc)(),
+        std::shared_ptr<RecieverType> reciever, void (RecieverType::* recieverFunc)(T*))
 {
-    connect<T>(sender, eventType, reciever.get(), func);
+    connect<T>(sender, senderFunc, reciever.get(), recieverFunc);
 }
 
 ///
-/// \brief Direct connection (static, no object required)
-/// When sender emits eventType, func will be called immediately/synchronously/within the same thread
+/// \brief Direct connection for lambda functions
 ///
 template<class T>
 static void
-connect(EventObject* sender, EventType eventType,
-        std::function<void(T*)> func)
+connect(EventObject* sender, std::string (* senderFunc)(),
+        std::function<void(T*)> recieverFunc)
 {
-    sender->directObservers[eventType].push_back(EventObject::Observer(nullptr, [ = ](Event* e) { func(static_cast<T*>(e)); }));
-}
-
-template<class T>
-static void
-connect(std::shared_ptr<EventObject> sender, EventType eventType,
-        std::function<void(T*)> func)
-{
-    connect(sender.get(), eventType, func);
-}
-
-///
-/// \brief Queued connection
-/// When sender emits eventType, the function will be queued to reciever in thread safe manner
-/// Reciever function must be member of reciever object
-///
-template<class T, class RecieverType>
-static void
-queueConnect(EventObject* sender, EventType type, RecieverType* reciever, void (RecieverType::* func)(T*))
-{
-    // \todo Concept check that the function exists on reciever obj
-    std::function<void(T*)> bindFunc = std::bind(func, reciever, std::placeholders::_1);
-    sender->queuedObservers[type].push_back(EventObject::Observer(reciever, [ = ](Event* e) { bindFunc(static_cast<T*>(e)); }));
-}
-
-template<class T, class RecieverType>
-static void
-queueConnect(std::shared_ptr<EventObject> sender, EventType type, std::shared_ptr<RecieverType> reciever, void (RecieverType::* func)(T*))
-{
-    queueConnect<T>(sender.get(), type, reciever.get(), func);
-}
-
-template<class T, class RecieverType>
-static void
-queueConnect(std::shared_ptr<EventObject> sender, EventType type, RecieverType* reciever, void (RecieverType::* func)(T*))
-{
-    queueConnect<T>(sender.get(), type, reciever, func);
-}
-
-template<class T, class RecieverType>
-static void
-queueConnect(EventObject* sender, EventType type, std::shared_ptr<RecieverType> reciever, void (RecieverType::* func)(T*))
-{
-    queueConnect<T>(sender, type, reciever.get(), func);
+    sender->directObservers[senderFunc()].push_back(EventObject::Observer(nullptr, [ = ](Event* e) { recieverFunc(static_cast<T*>(e)); }));
 }
 
 template<class T>
 static void
-queueConnect(EventObject* sender, EventType type, EventObject* reciever, std::function<void(T*)> func)
+connect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(),
+        std::function<void(T*)> recieverFunc)
 {
-    sender->queuedObservers[type].push_back(EventObject::Observer(reciever, [ = ](Event* e) { func(static_cast<T*>(e)); }));
-}
-
-template<class T>
-static void
-queueConnect(std::shared_ptr<EventObject> sender, EventType type, std::shared_ptr<EventObject> reciever, std::function<void(T*)> func)
-{
-    queueConnect(sender.get(), type, reciever.get(), func);
-}
-
-template<class T>
-static void
-queueConnect(std::shared_ptr<EventObject> sender, EventType type, EventObject* reciever, std::function<void(T*)> func)
-{
-    queueConnect(sender.get(), type, reciever, func);
-}
-
-template<class T>
-static void
-queueConnect(EventObject* sender, EventType type, std::shared_ptr<EventObject> reciever, std::function<void(T*)> func)
-{
-    queueConnect(sender, type, reciever.get(), func);
+    connect(sender.get(), senderFunc, recieverFunc);
 }
 
 ///
-/// \brief Remove *ALL* connections of type
-/// \todo: It is not possible to tell if a function pointer
-/// is equal to another, without an using a handle, its currently impossible
-/// to remove a specific one (need to wrap in another object with handle).
+/// \brief Queued connection for member functions
+///
+template<class T, class RecieverType>
+static void
+queueConnect(EventObject* sender, std::string (* senderFunc)(), RecieverType* reciever, void (RecieverType::* recieverFunc)(T*))
+{
+    // Ensure sender and reciever are EventObjects
+    static_assert(std::is_base_of<EventObject, RecieverType>::value, "reciever not derived from EventObject");
+
+    std::function<void(T*)> recieverStdFunc = std::bind(recieverFunc, reciever, std::placeholders::_1);
+
+    sender->queuedObservers[senderFunc()].push_back(EventObject::Observer(reciever, [ = ](Event* e) { recieverStdFunc(static_cast<T*>(e)); }));
+}
+
+template<class T, class RecieverType>
+static void
+queueConnect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(), std::shared_ptr<RecieverType> reciever, void (RecieverType::* recieverFunc)(T*))
+{
+    queueConnect<T>(sender.get(), senderFunc, reciever.get(), recieverFunc);
+}
+
+template<class T, class RecieverType>
+static void
+queueConnect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(), RecieverType* reciever, void (RecieverType::* recieverFunc)(T*))
+{
+    queueConnect<T>(sender.get(), senderFunc, reciever, recieverFunc);
+}
+
+template<class T, class RecieverType>
+static void
+queueConnect(EventObject* sender, std::string (* senderFunc)(), std::shared_ptr<RecieverType> reciever, void (RecieverType::* recieverFunc)(T*))
+{
+    queueConnect<T>(sender, senderFunc, reciever.get(), recieverFunc);
+}
+
+///
+/// \brief Queue connection for lambda functions
+///
+template<class T>
+static void
+queueConnect(EventObject* sender, std::string (* senderFunc)(), EventObject* reciever, std::function<void(T*)> recieverFunc)
+{
+    sender->queuedObservers[senderFunc()].push_back(EventObject::Observer(reciever, [ = ](Event* e) { recieverFunc(static_cast<T*>(e)); }));
+}
+
+template<class T>
+static void
+queueConnect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(), std::shared_ptr<EventObject> reciever, std::function<void(T*)> recieverFunc)
+{
+    queueConnect(sender.get(), senderFunc, reciever.get(), recieverFunc);
+}
+
+template<class T>
+static void
+queueConnect(std::shared_ptr<EventObject> sender, std::string (* senderFunc)(), EventObject* reciever, std::function<void(T*)> recieverFunc)
+{
+    queueConnect(sender.get(), senderFunc, reciever, recieverFunc);
+}
+
+template<class T>
+static void
+queueConnect(EventObject* sender, std::string (* senderFunc)(), std::shared_ptr<EventObject> reciever, std::function<void(T*)> recieverFunc)
+{
+    queueConnect(sender, senderFunc, reciever.get(), recieverFunc);
+}
+
+///
+/// \brief Remove an observer from the sender
+/// Note: lambda connections cannot be removed
 ///
 static void
-disconnect(EventObject* sender, EventObject* reciever, EventType eventType)
+disconnect(EventObject* sender, EventObject* reciever, std::string (* senderFunc)())
 {
-    if (sender->queuedObservers.find(eventType) == sender->queuedObservers.end())
-    {
-        return;
-    }
-    std::list<EventObject::Observer>::iterator i =
-        std::find_if(sender->queuedObservers[eventType].begin(), sender->queuedObservers[eventType].end(),
-            [&](const EventObject::Observer& observer) { return observer.first == reciever; });
-    if (i != sender->queuedObservers[eventType].end())
-    {
-        sender->queuedObservers[eventType].erase(i);
-    }
+    sender->directObservers[senderFunc()].remove_if([&](const EventObject::Observer& observer) { return observer.first == reciever; });
+    sender->queuedObservers[senderFunc()].remove_if([&](const EventObject::Observer& observer) { return observer.first == reciever; });
 }
 
 static void
-disconnect(std::shared_ptr<EventObject> sender, std::shared_ptr<EventObject> reciever, EventType eventType)
+disconnect(std::shared_ptr<EventObject> sender, std::shared_ptr<EventObject> reciever, std::string (* senderFunc)())
 {
-    disconnect(sender.get(), reciever.get(), eventType);
+    disconnect(sender.get(), reciever.get(), senderFunc);
 }
 
 static void
-disconnect(std::shared_ptr<EventObject> sender, EventObject* reciever, EventType eventType)
+disconnect(std::shared_ptr<EventObject> sender, EventObject* reciever, std::string (* senderFunc)())
 {
-    disconnect(sender.get(), reciever, eventType);
+    disconnect(sender.get(), reciever, senderFunc);
 }
 
 static void
-disconnect(EventObject* sender, std::shared_ptr<EventObject> reciever, EventType eventType)
+disconnect(EventObject* sender, std::shared_ptr<EventObject> reciever, std::string (* senderFunc)())
 {
-    disconnect(sender, reciever.get(), eventType);
+    disconnect(sender, reciever.get(), senderFunc);
 }
 
 #ifdef WIN32

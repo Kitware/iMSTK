@@ -474,5 +474,6 @@ VTKMeshIO::writeMetaImageData(std::shared_ptr<ImageData> imageData, const std::s
     writer->SetFileName(filePath.c_str());
     writer->SetRAWFileName((filePath + ".raw").c_str());
     writer->Write();
+    return true;
 }
 } // imstk

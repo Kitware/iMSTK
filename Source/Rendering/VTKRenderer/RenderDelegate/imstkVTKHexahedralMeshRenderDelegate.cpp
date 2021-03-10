@@ -74,10 +74,10 @@ VTKHexahedralMeshRenderDelegate::VTKHexahedralMeshRenderDelegate(std::shared_ptr
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, EventType::Modified, this, &VTKHexahedralMeshRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKHexahedralMeshRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKHexahedralMeshRenderDelegate::vertexDataModified);
+    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKHexahedralMeshRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {
@@ -141,7 +141,6 @@ VTKHexahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     auto geometry = std::static_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
 
     // Test if the vertex buffer changed
-    bool vertexOrIndexBufferChanged = false;
     if (m_vertices != geometry->getVertexPositions())
     {
         //printf("Vertex data swapped\n");
@@ -150,10 +149,9 @@ VTKHexahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
             // Update the pointer of the coupled array
             m_mappedVertexArray->SetNumberOfComponents(3);
             m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
-            m_mappedVertexArray->Modified();
         }
-        vertexOrIndexBufferChanged = true;
     }
+    m_mappedVertexArray->Modified();
 
     // Test if the index buffer changed
     if (m_indices != geometry->getHexahedraIndices())
@@ -172,9 +170,9 @@ VTKHexahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
                 }
                 m_cellArray->InsertNextCell(8, cell);
             }
+            m_mesh->SetCells(VTK_TETRA, m_cellArray);
             m_cellArray->Modified();
         }
-        vertexOrIndexBufferChanged = true;
     }
 }
 
@@ -183,8 +181,11 @@ VTKHexahedralMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<HexahedralMesh>(m_visualModel->getGeometry());
     m_vertices = geometry->getVertexPositions();
-    m_mappedVertexArray->SetNumberOfComponents(3);
-    m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+    if (m_vertices->getVoidPointer() != m_mappedVertexArray->GetVoidPointer(0))
+    {
+        m_mappedVertexArray->SetNumberOfComponents(3);
+        m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+    }
     m_mappedVertexArray->Modified();
 }
 } // imstk

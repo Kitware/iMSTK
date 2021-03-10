@@ -29,7 +29,7 @@ void
 FastMarch::solve()
 {
     // Get the scalars (ensure they're single component doubles)
-    std::shared_ptr<AbstractDataArray> abstractScalars = imageData->getScalars();
+    std::shared_ptr<AbstractDataArray> abstractScalars = m_imageData->getScalars();
     if (abstractScalars->getScalarType() != IMSTK_DOUBLE || abstractScalars->getNumberOfComponents() != 1)
     {
         LOG(WARNING) << "fastMarch only works with single component double images";
@@ -37,58 +37,58 @@ FastMarch::solve()
     }
     auto    scalars = std::dynamic_pointer_cast<DataArray<double>>(abstractScalars);
     double* imgPtr  = scalars->getPointer();
-    dim        = imageData->getDimensions();
-    spacing    = imageData->getSpacing();
-    indexShift = dim[0] * dim[1];
+    m_dim        = m_imageData->getDimensions();
+    m_spacing    = m_imageData->getSpacing();
+    m_indexShift = m_dim[0] * m_dim[1];
 
     // We maintain a solution in maps, to keep things sparse
 
     // Sparse container for which nodes are marked visited
-    visited = std::unordered_set<int>();
+    m_visited = std::unordered_set<int>();
     // Sparse container for nodal distances
-    distances = std::unordered_map<int, double>(); // Solved distances
+    m_distances = std::unordered_map<int, double>();   // Solved distances
 
-    queue = std::priority_queue<Node, std::vector<Node>, NodeComparator>();
+    m_queue = std::priority_queue<Node, std::vector<Node>, NodeComparator>();
 
     // Add the initial seeds to the queue
-    for (int i = 0; i < seedVoxels.size(); i++)
+    for (int i = 0; i < m_seedVoxels.size(); i++)
     {
-        Vec3i coord = seedVoxels[i];
-        if (coord[0] < 0 || coord[0] >= dim[0]
-            || coord[1] < 0 || coord[1] >= dim[1]
-            || coord[2] < 0 || coord[2] >= dim[2])
+        Vec3i coord = m_seedVoxels[i];
+        if (coord[0] < 0 || coord[0] >= m_dim[0]
+            || coord[1] < 0 || coord[1] >= m_dim[1]
+            || coord[2] < 0 || coord[2] >= m_dim[2])
         {
             continue;
         }
-        const int index = static_cast<int>(imageData->getScalarIndex(coord));
-        distances[index] = imgPtr[imageData->getScalarIndex(coord)];
-        queue.push(Node(index, 0.0, coord));
+        const int index = static_cast<int>(m_imageData->getScalarIndex(coord));
+        m_distances[index] = imgPtr[m_imageData->getScalarIndex(coord)];
+        m_queue.push(Node(index, 0.0, coord));
     }
 
     // Process every node in order of minimum distance
-    while (!queue.empty())
+    while (!m_queue.empty())
     {
-        Node node = queue.top();
-        queue.pop();
+        Node node = m_queue.top();
+        m_queue.pop();
 
         const Vec3i& coord  = node.m_coord;
         const int&   nodeId = node.m_nodeId;
 
         // Termination conditions
         if (isVisited(nodeId)
-            || getDistance(nodeId) >= distThreshold)
+            || getDistance(nodeId) >= m_distThreshold)
         {
             continue;
         }
 
         // Mark node as visited (to avoid readdition)
-        visited.insert(nodeId);
+        m_visited.insert(nodeId);
 
         // Update all its neighbor cells (diagonals not considered neighbors)
         // Right +x
         int   neighborId    = nodeId + 1;
         Vec3i neighborCoord = coord + Vec3i(1, 0, 0);
-        if (neighborCoord[0] < dim[0] && !isVisited(neighborId))
+        if (neighborCoord[0] < m_dim[0] && !isVisited(neighborId))
         {
             solveNode(neighborCoord, neighborId);
         }
@@ -101,14 +101,14 @@ FastMarch::solve()
         }
 
         // Up +y
-        neighborId    = nodeId + dim[0];
+        neighborId    = nodeId + m_dim[0];
         neighborCoord = coord + Vec3i(0, 1, 0);
-        if (neighborCoord[1] < dim[1] && !isVisited(neighborId))
+        if (neighborCoord[1] < m_dim[1] && !isVisited(neighborId))
         {
             solveNode(neighborCoord, neighborId);
         }
         // Down -y
-        neighborId    = nodeId - dim[0];
+        neighborId    = nodeId - m_dim[0];
         neighborCoord = coord - Vec3i(0, 1, 0);
         if (neighborCoord[1] >= 0 && !isVisited(neighborId))
         {
@@ -116,14 +116,14 @@ FastMarch::solve()
         }
 
         // Forward +z
-        neighborId    = nodeId + indexShift;
+        neighborId    = nodeId + m_indexShift;
         neighborCoord = coord + Vec3i(0, 0, 1);
-        if (neighborCoord[2] < dim[2] && !isVisited(neighborId))
+        if (neighborCoord[2] < m_dim[2] && !isVisited(neighborId))
         {
             solveNode(neighborCoord, neighborId);
         }
         // Backward -z
-        neighborId    = nodeId - indexShift;
+        neighborId    = nodeId - m_indexShift;
         neighborCoord = coord - Vec3i(0, 0, 1);
         if (neighborCoord[2] >= 0 && !isVisited(neighborId))
         {
@@ -132,7 +132,7 @@ FastMarch::solve()
     }
 
     // Write the sparse distances to the image
-    for (auto i : distances)
+    for (auto i : m_distances)
     {
         imgPtr[i.first] = i.second;
     }
@@ -145,11 +145,11 @@ FastMarch::solveNode(Vec3i coord, int index)
     const double dists[6] =
     {
         coord[0] - 1 >= 0 ? getDistance(index - 1) : IMSTK_DOUBLE_MAX,
-        coord[0] + 1 < dim[0] ? getDistance(index + 1) : IMSTK_DOUBLE_MAX,
-        coord[1] - 1 >= 0 ? getDistance(index - dim[0]) : IMSTK_DOUBLE_MAX,
-        coord[1] + 1 < dim[1] ? getDistance(index + dim[0]) : IMSTK_DOUBLE_MAX,
-        coord[2] - 1 >= 0 ? getDistance(index - indexShift) : IMSTK_DOUBLE_MAX,
-        coord[2] + 1 < dim[2] ? getDistance(index + indexShift) : IMSTK_DOUBLE_MAX
+        coord[0] + 1 < m_dim[0] ? getDistance(index + 1) : IMSTK_DOUBLE_MAX,
+        coord[1] - 1 >= 0 ? getDistance(index - m_dim[0]) : IMSTK_DOUBLE_MAX,
+        coord[1] + 1 < m_dim[1] ? getDistance(index + m_dim[0]) : IMSTK_DOUBLE_MAX,
+        coord[2] - 1 >= 0 ? getDistance(index - m_indexShift) : IMSTK_DOUBLE_MAX,
+        coord[2] + 1 < m_dim[2] ? getDistance(index + m_indexShift) : IMSTK_DOUBLE_MAX
     };
     const double minDist[3] =
     {
@@ -186,7 +186,7 @@ FastMarch::solveNode(Vec3i coord, int index)
         const double value = minDist[dimReorder[i]];
         if (solution >= value)
         {
-            const double spaceFactor = std::sqrt(1.0 / spacing[dimReorder[i]]);
+            const double spaceFactor = std::sqrt(1.0 / m_spacing[dimReorder[i]]);
             aa += spaceFactor;
             bb += value * spaceFactor;
             cc += std::pow(value, 2) * spaceFactor;
@@ -209,8 +209,8 @@ FastMarch::solveNode(Vec3i coord, int index)
     if (solution < IMSTK_DOUBLE_MAX)
     {
         // Accept it as the new distance
-        distances[index] = solution;
-        queue.push(Node(index, solution, coord));
+        m_distances[index] = solution;
+        m_queue.push(Node(index, solution, coord));
     }
 }
 }

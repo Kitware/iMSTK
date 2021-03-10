@@ -64,7 +64,7 @@ makeLevelsetObj(const std::string& name, std::shared_ptr<LocalMarchingCubes> iso
 {
     imstkNew<LevelSetDeformableObject> levelsetObj(name);
 
-    std::shared_ptr<ImageData> initLvlSetImage = MeshIO::read<ImageData>("C:/Users/Andx_/Desktop/femurBoneSolid_SDF.nii")->cast(IMSTK_DOUBLE);
+    std::shared_ptr<ImageData> initLvlSetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBoneSolid_SDF.nii")->cast(IMSTK_DOUBLE);
     const Vec3d&               currSpacing     = initLvlSetImage->getSpacing();
 
     // Note: Anistropic scaling would invalidate the SDF
@@ -132,25 +132,13 @@ makeRigidObj(const std::string& name)
     rbdModel->getConfig()->m_maxNumConstraints      = 20;
 
     // Create the first rbd, plane floor
-    imstkNew<RigidObject2> rigidObj("Cube");
+    imstkNew<RigidObject2> rigidObj("Tool");
 
     {
-        auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided3.stl");
+        auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided_Shifted.stl");
         toolMesh->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
         toolMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
         toolMesh->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
-
-        //auto toolVisualMeshHandle = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Handle.dae");
-        auto toolVisualMeshHandle = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided3.stl");
-        toolVisualMeshHandle->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
-        toolVisualMeshHandle->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
-        toolVisualMeshHandle->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
-
-        //auto toolVisualMeshBlade = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Blade10.dae");
-        auto toolVisualMeshBlade = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided3.stl");
-        toolVisualMeshBlade->rotate(Vec3d(0.0, 1.0, 0.0), 3.14, Geometry::TransformType::ApplyToData);
-        toolVisualMeshBlade->rotate(Vec3d(1.0, 0.0, 0.0), -1.57, Geometry::TransformType::ApplyToData);
-        toolVisualMeshBlade->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
 
         imstkNew<RenderMaterial> toolMaterial;
         toolMaterial->setDisplayMode(RenderMaterial::DisplayMode::Surface);
@@ -159,20 +147,10 @@ makeRigidObj(const std::string& name)
         toolMaterial->setRoughness(0.4f);
         toolMaterial->setDiffuseColor(Color(0.7, 0.7, 0.7));
 
-        imstkNew<VisualModel> visualModel1(toolVisualMeshHandle);
-        visualModel1->setRenderMaterial(toolMaterial);
-        rigidObj->addVisualModel(visualModel1);
-
-        imstkNew<VisualModel> visualModel2(toolVisualMeshBlade);
-        visualModel2->setRenderMaterial(toolMaterial);
-        rigidObj->addVisualModel(visualModel2);
-
         // Create the object
+        rigidObj->setVisualGeometry(toolMesh);
         rigidObj->setPhysicsGeometry(toolMesh);
         rigidObj->setCollidingGeometry(toolMesh);
-        rigidObj->setPhysicsToVisualMap(std::make_shared<IsometricMap>(toolMesh, toolVisualMeshHandle));
-        // Hack to add two maps
-        rigidObj->setPhysicsToCollidingMap(std::make_shared<IsometricMap>(toolMesh, toolVisualMeshBlade));
         rigidObj->setDynamicalModel(rbdModel);
         rigidObj->getRigidBody()->m_mass = 1.0;
         rigidObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
@@ -273,7 +251,7 @@ main()
             scene->addController(controller);
         }
 
-        connect<Event>(sceneManager->getActiveScene(), EventType::Configure, [&](Event*)
+        connect<Event>(sceneManager->getActiveScene(), &Scene::configureTaskGraph, [&](Event*)
         {
             std::shared_ptr<TaskGraph> taskGraph = sceneManager->getActiveScene()->getTaskGraph();
 
@@ -288,7 +266,7 @@ main()
                 }
             }, "Isosurface: SetModifiedVoxels"));
         });
-        connect<Event>(viewer, EventType::PreUpdate, [&](Event*)
+        connect<Event>(viewer, &Viewer::preUpdate, [&](Event*)
         {
             // Update any chunks that contain a voxel which was set modified
             isoExtract->update();
@@ -317,7 +295,7 @@ main()
                 }
             }
         });
-        connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             rbdObj->getRigidBodyModel2()->getConfig()->m_dt  = sceneManager->getDt();
             lvlSetObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
@@ -326,7 +304,7 @@ main()
             ghostMesh->setTranslation(controller->getPosition());
             ghostMesh->setRotation(controller->getRotation());
             ghostMesh->updatePostTransformData();
-            ghostMesh->modified();
+            ghostMesh->postModified();
         });
 
         imstkNew<SimulationManager> driver;

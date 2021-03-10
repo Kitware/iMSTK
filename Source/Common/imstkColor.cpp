@@ -102,9 +102,9 @@ operator<<(std::ostream& os, const Color& c)
 void
 Color::darken(const double p_darkFactor)
 {
-    rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor) );
-    rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor) );
-    rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor) );
+    rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor));
+    rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor));
+    rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor));
     rgba[0] = (rgba[0] < 0 ? 0 : rgba[0]);
     rgba[1] = (rgba[1] < 0 ? 0 : rgba[1]);
     rgba[2] = (rgba[2] < 0 ? 0 : rgba[2]);

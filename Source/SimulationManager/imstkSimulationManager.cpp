@@ -58,7 +58,7 @@ SimulationManager::start()
     // exit message happens all modules need to stop
     for (auto module : m_modules)
     {
-        connect<Event>(module, EventType::End, this, &SimulationManager::requestStop);
+        connect<Event>(module, &Module::end, this, &SimulationManager::requestStop);
     }
 
     // Initialization
@@ -101,7 +101,7 @@ SimulationManager::start()
 
     waitForInit();
 
-    postEvent(Event(EventType::Start));
+    postEvent(Event(SimulationManager::starting()));
 
     // Start the game loop
     {
@@ -195,7 +195,7 @@ SimulationManager::start()
         }
     }
 
-    postEvent(Event(EventType::End));
+    postEvent(Event(SimulationManager::ending()));
 
     if (m_threadType == ThreadingType::TBB)
     {
@@ -247,7 +247,7 @@ SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
 
     waitForInit();
 
-    postEvent(Event(EventType::Start));
+    postEvent(Event(SimulationManager::starting()));
 
     m_running[module.get()] = true;
     while (m_running[module.get()])
@@ -270,7 +270,7 @@ SimulationManager::runModuleParallel(std::shared_ptr<Module> module)
         }
     }
 
-    postEvent(Event(EventType::End));
+    postEvent(Event(SimulationManager::ending()));
 }
 
 void

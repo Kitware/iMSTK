@@ -125,9 +125,9 @@ public:
             srcPipelineStage,
             dstPipelineStage,
             0,
-            0, nullptr,   // general memory barriers
-            0, nullptr,   // buffer barriers
-            1, &barrier); // image barriers
+            0, nullptr,     // general memory barriers
+            0, nullptr,     // buffer barriers
+            1, &barrier);   // image barriers
 
         // For keeping track
         image->setImageLayout(newLayout);
@@ -207,9 +207,9 @@ public:
             VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
-            0, nullptr,   // general memory barriers
-            0, nullptr,   // buffer barriers
-            1, &barrier); // image barriers
+            0, nullptr,     // general memory barriers
+            0, nullptr,     // buffer barriers
+            1, &barrier);   // image barriers
     };
 
     /// \brief TODO
@@ -238,9 +238,9 @@ public:
             VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
             VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
             0,
-            0, nullptr,   // general memory barriers
-            0, nullptr,   // buffer barriers
-            1, &barrier); // image barriers
+            0, nullptr,     // general memory barriers
+            0, nullptr,     // buffer barriers
+            1, &barrier);   // image barriers
     };
 };
 

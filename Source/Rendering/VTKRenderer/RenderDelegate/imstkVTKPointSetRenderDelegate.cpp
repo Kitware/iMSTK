@@ -66,10 +66,10 @@ VTKPointSetRenderDelegate::VTKPointSetRenderDelegate(std::shared_ptr<VisualModel
     glyphFilter->Update();
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, EventType::Modified, this, &VTKPointSetRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKPointSetRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKPointSetRenderDelegate::vertexDataModified);
+    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKPointSetRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {

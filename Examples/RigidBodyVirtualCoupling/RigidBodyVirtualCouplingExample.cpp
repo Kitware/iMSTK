@@ -262,7 +262,7 @@ main()
         }
 
         Vec3d prevCubePos = rbdModel->getModelGeometry()->getTranslation();
-        connect<Event>(sceneManager, EventType::PostUpdate,
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
         {
             const Vec3d& devPos = controller->getPosition();

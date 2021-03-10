@@ -79,7 +79,7 @@ void
 HapticDeviceClient::update()
 {
     //hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
-    hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY); // Call sometime later
+    hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);     // Call sometime later
 }
 
 void
@@ -123,13 +123,13 @@ HapticDeviceClient::hapticCallback(void* pData)
         if ((state.buttons & (1 << i)) && !client->m_buttons[i])
         {
             client->m_buttons[i] = true;
-            client->postEvent(ButtonEvent(i, BUTTON_PRESSED));
+            client->postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), i, BUTTON_PRESSED));
         }
         // If button not down, and previously down
         else if (!(state.buttons & (1 << i)) && client->m_buttons[i])
         {
             client->m_buttons[i] = false;
-            client->postEvent(ButtonEvent(i, BUTTON_RELEASED));
+            client->postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), i, BUTTON_RELEASED));
         }
     }
 

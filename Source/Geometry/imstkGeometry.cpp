@@ -120,7 +120,7 @@ Geometry::transform(const Mat4d& T, TransformType type)
     else
     {
         applyTransform(T);
-        this->postEvent(Event(EventType::Modified));
+        this->postModified();
     }
     m_transformApplied = false;
 }

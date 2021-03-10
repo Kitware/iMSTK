@@ -828,10 +828,10 @@ VulkanRenderer::renderFrame()
     renderArea.extent = { m_width, m_height };
 
     std::array<VkClearValue, 4> clearValues;
-    clearValues[0].color = { { (float)m_backgroundColor[0], (float)m_backgroundColor[1], (float)m_backgroundColor[2], 1 } };        // Color
-    clearValues[1].depthStencil = { { 1.0 }, { 0 } };                                                                               // Depth
-    clearValues[2].color = { { 0, 0, 0, 0 } };                                                                                      // Normal
-    clearValues[3].color = { { 0, 0, 0, 0 } };                                                                                      // Specular
+    clearValues[0].color = { { (float)m_backgroundColor[0], (float)m_backgroundColor[1], (float)m_backgroundColor[2], 1 } };          // Color
+    clearValues[1].depthStencil = { { 1.0 }, { 0 } };                                                                                 // Depth
+    clearValues[2].color = { { 0, 0, 0, 0 } };                                                                                        // Normal
+    clearValues[3].color = { { 0, 0, 0, 0 } };                                                                                        // Specular
 
     // Do buffer transfers
     for (unsigned int renderDelegateIndex = 0; renderDelegateIndex < m_renderDelegates.size(); renderDelegateIndex++)
@@ -846,15 +846,15 @@ VulkanRenderer::renderFrame()
     barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT | VK_ACCESS_INDEX_READ_BIT;
 
     vkCmdPipelineBarrier(m_renderCommandBuffer[nextImageIndex],
-        VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
-        0,
-        1,
-        &barrier,
-        0,
-        nullptr,
-        0,
-        nullptr);
+                         VK_PIPELINE_STAGE_TRANSFER_BIT,
+                         VK_PIPELINE_STAGE_VERTEX_INPUT_BIT,
+                         0,
+                         1,
+                         &barrier,
+                         0,
+                         nullptr,
+                         0,
+                         nullptr);
 
     VkDeviceSize deviceSize = { 0 };
 
@@ -1135,18 +1135,18 @@ VulkanRenderer::renderFrame()
     m_HDRImage[1][0]->setImageLayout(VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
     VulkanAttachmentBarriers::changeImageLayout(&m_renderCommandBuffer[nextImageIndex],
-        m_renderQueueFamily,
-        m_HDRImage[0][0],
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        m_numViews);
+                                                m_renderQueueFamily,
+                                                m_HDRImage[0][0],
+                                                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                                m_numViews);
 
     VulkanAttachmentBarriers::changeImageLayout(&m_renderCommandBuffer[nextImageIndex],
-        m_renderQueueFamily,
-        m_HDRImage[1][0],
-        VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
-        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-        m_numViews);
+                                                m_renderQueueFamily,
+                                                m_HDRImage[1][0],
+                                                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL,
+                                                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                                                m_numViews);
 
     vkEndCommandBuffer(m_renderCommandBuffer[nextImageIndex]);
 
@@ -1155,7 +1155,7 @@ VulkanRenderer::renderFrame()
     // Render passes: post processing
     for (unsigned int postProcessIndex = 0; postProcessIndex < m_postProcessingChain->m_postProcesses.size(); postProcessIndex++)
     {
-        clearValues[0].color = { { 1.0, 0.0, 0.0, 1 } }; // Color
+        clearValues[0].color = { { 1.0, 0.0, 0.0, 1 } };       // Color
 
         auto postProcess = m_postProcessingChain->m_postProcesses[postProcessIndex];
 

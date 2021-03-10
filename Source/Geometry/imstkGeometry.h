@@ -101,6 +101,9 @@ public:
     virtual ~Geometry() override = default;
 
 public:
+    SIGNAL(Geometry,modified);
+
+public:
     ///
     /// \brief Print
     ///
@@ -115,48 +118,48 @@ public:
     /// \brief Compute the bounding box for the geometry
     /// \todo Padding should not be here
     ///
-    virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0);
+    virtual void computeBoundingBox(Vec3d& lowerCorner,Vec3d& upperCorner,const double paddingPercent = 0.0);
 
     ///
     /// \brief Returns the bounding box center
     ///
     virtual Vec3d getCenter()
     {
-        Vec3d min, max;
-        computeBoundingBox(min, max);
+        Vec3d min,max;
+        computeBoundingBox(min,max);
         return (min + max) * 0.5;
     }
 
     ///
     /// \brief Translate the geometry in Cartesian space
     ///
-    void translate(const Vec3d& t, TransformType type = TransformType::ConcatenateToTransform);
-    void translate(double x, double y, double z, TransformType type = TransformType::ConcatenateToTransform);
+    void translate(const Vec3d& t,TransformType type = TransformType::ConcatenateToTransform);
+    void translate(double x,double y,double z,TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Rotate the geometry in Cartesian space
     ///
-    void rotate(const Quatd& q, TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Mat3d& m, TransformType type = TransformType::ConcatenateToTransform);
-    void rotate(const Vec3d& axis, double radians, TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Quatd& q,TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Mat3d& m,TransformType type = TransformType::ConcatenateToTransform);
+    void rotate(const Vec3d& axis,double radians,TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Scale in Cartesian directions
     ///
-    void scale(const Vec3d& scaling, TransformType type = TransformType::ConcatenateToTransform);
-    void scale(const double scaling, TransformType type = TransformType::ConcatenateToTransform);
+    void scale(const Vec3d& scaling,TransformType type = TransformType::ConcatenateToTransform);
+    void scale(const double scaling,TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Applies a rigid transform to the geometry
     ///
-    void transform(const Mat4d& T, TransformType type = TransformType::ConcatenateToTransform);
+    void transform(const Mat4d& T,TransformType type = TransformType::ConcatenateToTransform);
 
     ///
     /// \brief Get/Set translation
     ///
     Vec3d getTranslation() const;
     void setTranslation(const Vec3d& t);
-    void setTranslation(const double x, const double y, const double z);
+    void setTranslation(const double x,const double y,const double z);
 
     ///
     /// \brief Get/Set rotation
@@ -164,7 +167,7 @@ public:
     Mat3d getRotation() const;
     void setRotation(const Mat3d& m);
     void setRotation(const Quatd& q);
-    void setRotation(const Vec3d& axis, const double angle);
+    void setRotation(const Vec3d& axis,const double angle);
 
     ///
     /// \brief Get/Set scaling
@@ -186,12 +189,12 @@ public:
     ///
     /// \brief Returns the type of the geometry
     ///
-    Type getType() const { return m_type; }
+    Type getType() const{ return m_type; }
 
     ///
     /// \brief Get name of the geometry
     ///
-    const std::string& getName() const { return m_name; }
+    const std::string& getName() const{ return m_name; }
 
     ///
     /// \brief Returns the string representing the type name of the geometry
@@ -206,7 +209,7 @@ public:
     ///
     /// \brief Get the global (unique) index of the geometry
     ///
-    uint32_t getGlobalIndex() const { return m_geometryIndex; }
+    uint32_t getGlobalIndex() const{ return m_geometryIndex; }
 
     ///
     /// \brief Get a pointer to geometry that has been registered globally
@@ -216,12 +219,9 @@ public:
     ///
     /// \brief Post modified event
     ///
-    void modified()
-    {
-        this->postEvent(Event(EventType::Modified));
-    }
+    void postModified() { this->postEvent(Event(Geometry::modified())); }
 
-    virtual void updatePostTransformData() const { }
+    virtual void updatePostTransformData() const{ }
 
 protected:
     ///

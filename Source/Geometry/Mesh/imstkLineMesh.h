@@ -85,6 +85,6 @@ private:
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
 
-    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices; ///> line connectivity
+    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity
 };
 } // imstk

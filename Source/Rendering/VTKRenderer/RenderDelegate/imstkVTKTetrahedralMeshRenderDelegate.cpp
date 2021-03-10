@@ -75,10 +75,10 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, EventType::Modified, this, &VTKTetrahedralMeshRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKTetrahedralMeshRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
+    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
 
     // Setup the mapper
     {

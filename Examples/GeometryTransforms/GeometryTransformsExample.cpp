@@ -126,6 +126,7 @@ main()
 
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->setActiveScene(scene);
 
         imstkNew<SimulationManager> driver;
@@ -133,11 +134,11 @@ main()
         driver->addModule(sceneManager);
 
         // Rotate after every scene update
-        connect<Event>(sceneManager, EventType::PostUpdate,
+        connect<Event>(sceneManager, &SceneManager::postUpdate,
             [&](Event*)
         {
-            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * scene->getElapsedTime());
-            surfaceMesh->modified();
+            surfaceMesh->rotate(Vec3d(1.0, 0.0, 0.0), PI * sceneManager->getDt());
+            surfaceMesh->postModified();
         });
 
         // Add mouse and keyboard controls to the viewer

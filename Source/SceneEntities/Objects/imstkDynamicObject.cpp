@@ -50,7 +50,7 @@ DynamicObject::updateGeometries()
         if (m_physicsToVisualGeomMap)
         {
             m_physicsToVisualGeomMap->apply();
-            m_physicsToVisualGeomMap->getSlave()->modified();
+            m_physicsToVisualGeomMap->getSlave()->postModified();
         }
     }
     else
@@ -67,12 +67,12 @@ DynamicObject::updatePhysicsGeometry()
     if (m_physicsToCollidingGeomMap)
     {
         m_physicsToCollidingGeomMap->apply();
-        m_physicsToCollidingGeomMap->getSlave()->modified();
+        m_physicsToCollidingGeomMap->getSlave()->postModified();
     }
 
     if (m_physicsGeometry != nullptr)
     {
-        m_physicsGeometry->modified();
+        m_physicsGeometry->postModified();
     }
 }
 

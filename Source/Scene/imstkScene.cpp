@@ -77,7 +77,7 @@ Scene::initialize()
     buildTaskGraph();
 
     // Opportunity for user configuration
-    this->postEvent(Event(EventType::Configure));
+    this->postEvent(Event(Scene::configureTaskGraph()));
 
     // Then init
     initTaskGraph();

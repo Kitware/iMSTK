@@ -56,11 +56,22 @@ public:
 
     virtual void OnMouseMove(const Vec2d& imstkNotUsed(pos)) { }
 
+private:
     ///
-    /// \brief Posts key press/release events
-    /// override to filter the event, or implement OnkeyDown/OnKeyUp
+    /// \brief Recieves button presses
+    virtual void mouseButtonPressEvent(MouseEvent* e);
+
     ///
-    virtual void mouseEvent(MouseEvent* e);
+    /// \brief Recieves button releases
+    virtual void mouseButtonReleaseEvent(MouseEvent* e);
+
+    ///
+    /// \brief Recieves scrolls
+    virtual void mouseScrollEvent(MouseEvent* e);
+
+    ///
+    /// \brief Recieves moves
+    virtual void mouseMoveEvent(MouseEvent* e);
 
 protected:
     std::shared_ptr<MouseDeviceClient> m_mouseDeviceClient;

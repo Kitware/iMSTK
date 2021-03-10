@@ -306,32 +306,29 @@ testMultipleScenesInRenderMode()
     LOG(INFO) << "s/S followed by enter to switch scenes";
     LOG(INFO) << "q/Q followed by enter to quit";
 
-    connect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
+    connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
         [&, driver](KeyEvent* e)
     {
-        if (e->m_keyPressType == KEY_PRESS)
+        if (e->m_key == 's' || e->m_key == 'S')
         {
-            if (e->m_key == 's' || e->m_key == 'S')
+            if (sceneManager->getActiveScene() == scene1)
             {
-                if (sceneManager->getActiveScene() == scene1)
-                {
-                    LOG(INFO) << "Switching to scene2";
-                    sceneManager->setActiveScene(scene2);
-                    viewer->setActiveScene(scene2);
-                }
-                else
-                {
-                    LOG(INFO) << "Switching to scene1";
-                    sceneManager->setActiveScene(scene1);
-                    viewer->setActiveScene(scene1);
-                }
+                LOG(INFO) << "Switching to scene2";
+                sceneManager->setActiveScene(scene2);
+                viewer->setActiveScene(scene2);
             }
-            else if (e->m_key == 'q' || e->m_key == 'Q')
+            else
             {
-                driver->requestStatus(ModuleDriverStopped);
+                LOG(INFO) << "Switching to scene1";
+                sceneManager->setActiveScene(scene1);
+                viewer->setActiveScene(scene1);
             }
         }
-        });
+        else if (e->m_key == 'q' || e->m_key == 'Q')
+        {
+            driver->requestStatus(ModuleDriverStopped);
+        }
+    });
 
     driver->start();
 }
@@ -358,31 +355,29 @@ testMultipleScenesInBackgroundMode()
 
     LOG(INFO) << "s/S followed by enter to switch scenes";
     LOG(INFO) << "q/Q followed by enter to quit";
-    auto keyPressFunc = [&](KeyEvent* e)
-                        {
-                            if (e->m_keyPressType == KEY_PRESS)
-                            {
-                                if (e->m_key == 's' || e->m_key == 'S')
-                                {
-                                    if (sceneManager->getActiveScene() == scene1)
-                                    {
-                                        LOG(INFO) << "Switching to scene2";
-                                        sceneManager->setActiveScene(scene2);
-                                    }
-                                    else
-                                    {
-                                        LOG(INFO) << "Switching to scene1";
-                                        sceneManager->setActiveScene(scene1);
-                                    }
-                                }
-                                else if (e->m_key == 'q' || e->m_key == 'Q')
-                                {
-                                    LOG(INFO) << "Exiting background mode";
-                                    driver->requestStatus(ModuleDriverStopped);
-                                }
-                            }
-                        };
-    connect<KeyEvent>(console->getKeyboardDevice(), EventType::KeyEvent, keyPressFunc);
+    auto keyPressFunc =
+        [&](KeyEvent* e)
+        {
+            if (e->m_key == 's' || e->m_key == 'S')
+            {
+                if (sceneManager->getActiveScene() == scene1)
+                {
+                    LOG(INFO) << "Switching to scene2";
+                    sceneManager->setActiveScene(scene2);
+                }
+                else
+                {
+                    LOG(INFO) << "Switching to scene1";
+                    sceneManager->setActiveScene(scene1);
+                }
+            }
+            else if (e->m_key == 'q' || e->m_key == 'Q')
+            {
+                LOG(INFO) << "Exiting background mode";
+                driver->requestStatus(ModuleDriverStopped);
+            }
+        };
+    connect<KeyEvent>(console->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, keyPressFunc);
 
     driver->start();
 }

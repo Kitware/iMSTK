@@ -62,10 +62,10 @@ VTKRenderDelegate::VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_material(visualModel->getRenderMaterial())
 {
     // When render material is modified call materialModified -> updateRenderProperties()
-    queueConnect<Event>(m_material, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+    queueConnect<Event>(m_material, &RenderMaterial::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
 
     // When the visual model is modified call visualModelModified
-    queueConnect<Event>(m_visualModel, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::visualModelModified);
+    queueConnect<Event>(m_visualModel, &VisualModel::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::visualModelModified);
 }
 
 std::shared_ptr<VTKRenderDelegate>
@@ -215,12 +215,12 @@ void
 VTKRenderDelegate::visualModelModified(Event* imstkNotUsed(e))
 {
     // Remove all modified's from the old material
-    disconnect(m_material, this, EventType::Modified);
+    disconnect(m_material, this, &RenderMaterial::modified);
 
     m_material = m_visualModel->getRenderMaterial(); // Update handle
 
     // Recieve events from new material
-    queueConnect<Event>(m_material, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+    queueConnect<Event>(m_material, &RenderMaterial::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
 
     // Update our render properties
     updateRenderProperties();

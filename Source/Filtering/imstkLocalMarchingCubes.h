@@ -91,7 +91,7 @@ protected:
 
 private:
     // Id + coordinate of the modified voxels
-    std::unordered_map<int, Vec3i> m_modifiedVoxels; // Id + coordinate
+    std::unordered_map<int, Vec3i> m_modifiedVoxels;   // Id + coordinate
 
     bool m_allModified = true;
 

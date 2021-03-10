@@ -210,10 +210,10 @@ main()
         }
 
         // Queue keypress to be called after scene thread
-        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent, sceneManager, [&](KeyEvent* e)
+        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
         {
             // When i is pressed replace the PBD cloth with a subdivided one
-            if (e->m_key == 'i' && e->m_keyPressType == KEY_PRESS)
+            if (e->m_key == 'i')
             {
                 // This has a number of issues that make it not physically realistic
                 // - Mass is not conservative when interpolated from subdivide
@@ -233,7 +233,7 @@ main()
                 clothMesh->setVertexPositions(newClothMesh->getVertexPositions());
                 clothMesh->setTriangleIndices(newClothMesh->getTriangleIndices());
                 clothMesh->setVertexAttribute("Velocities", newClothMesh->getVertexAttribute("Velocities"));
-                clothMesh->modified();
+                clothMesh->postModified();
 
                 // Re-setup the constraints on the object
                 clothObj->initialize();

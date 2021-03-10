@@ -58,7 +58,7 @@ AnalyticalGeometry::setPosition(const Vec3d p)
 
     m_position = p;
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void
@@ -93,7 +93,7 @@ AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
     }
     m_orientationAxis  = orientation.normalized();
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void

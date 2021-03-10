@@ -320,7 +320,7 @@ RigidBodyModel2::solveConstraints()
     //pgsSolver.setGuess(F); // Not using warm starting
     m_pgsSolver->setMaxIterations(m_config->m_maxNumIterations);
     m_pgsSolver->setEpsilon(m_config->m_epsilon);
-    F = J.transpose() * m_pgsSolver->solve(b, cu); // Reaction force,torque
+    F = J.transpose() * m_pgsSolver->solve(b, cu);   // Reaction force,torque
 
     // Apply reaction impulse
     j = 0;

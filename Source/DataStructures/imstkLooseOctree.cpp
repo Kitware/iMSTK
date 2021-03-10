@@ -487,7 +487,7 @@ LooseOctree::addPointSet(const std::shared_ptr<PointSet>& pointset)
     for (uint32_t idx = 0; idx < numNewPrimitives; ++idx)
     {
         const auto pPrimitive = &pPrimitiveBlock[idx];
-        new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, idx); // Placement new
+        new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, idx);     // Placement new
         vPrimitivePtrs.push_back(pPrimitive);
     }
 
@@ -514,7 +514,7 @@ LooseOctree::addTriangleMesh(const std::shared_ptr<SurfaceMesh>& surfMesh)
     for (uint32_t triIdx = 0; triIdx < numNewPrimitives; ++triIdx)
     {
         const auto pPrimitive = &pPrimitiveBlock[triIdx];
-        new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, triIdx); // Placement new
+        new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, triIdx);     // Placement new
         vPrimitivePtrs.push_back(pPrimitive);
     }
 
@@ -536,7 +536,7 @@ LooseOctree::addAnalyticalGeometry(const std::shared_ptr<Geometry>& geometry)
     m_pPrimitiveBlocks[type].push_back(pPrimitiveBlock);
 
     const auto pPrimitive = &pPrimitiveBlock[0];
-    new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, 0); // Placement new
+    new(pPrimitive) OctreePrimitive(pGeometry, geomIdx, 0);     // Placement new
     m_vPrimitivePtrs[type].push_back(pPrimitive);
 
     LOG(INFO) << "Added a new analytical geometry to " << m_Name;

@@ -74,11 +74,11 @@ struct OctreePrimitive
 
     union
     {
-        std::array<Real, 3> m_Position; ///> For a point primitive, store its position
+        std::array<Real, 3> m_Position;   ///> For a point primitive, store its position
         struct
         {
-            std::array<Real, 3> m_LowerCorner; ///> For a non-point primitive, store its AABB's lower corner
-            std::array<Real, 3> m_UpperCorner; ///> For a non-point primitive, store its AABB's upper corner
+            std::array<Real, 3> m_LowerCorner;   ///> For a non-point primitive, store its AABB's lower corner
+            std::array<Real, 3> m_UpperCorner;   ///> For a non-point primitive, store its AABB's upper corner
         };
     };
 

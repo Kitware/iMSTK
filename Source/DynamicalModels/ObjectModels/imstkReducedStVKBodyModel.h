@@ -328,7 +328,7 @@ protected:
     Matrixd m_C;    ///> Damping coefficient matrix
     Matrixd m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
     Matrixd m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time
-                    /// integrator)
+    /// integrator)
 
     // full-space vectors
     Vectord m_Fcontact;          ///> Vector of contact forces

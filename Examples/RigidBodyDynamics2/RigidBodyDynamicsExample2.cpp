@@ -201,7 +201,7 @@ main()
         // Not perfectly thread safe movement lambda, ijkl movement instead of wasd because d is already used
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
         const Vec3d                           dx = scene->getActiveCamera()->getPosition() - scene->getActiveCamera()->getFocalPoint();
-        connect<Event>(sceneManager, EventType::PreUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             Vec3d extForce  = Vec3d(0.0, 0.0, 0.0);
             Vec3d extTorque = Vec3d(0.0, 0.0, 0.0);
@@ -235,10 +235,10 @@ main()
             scene->getActiveCamera()->setFocalPoint(cubeObj->getRigidBody()->getPosition());
             scene->getActiveCamera()->setPosition(cubeObj->getRigidBody()->getPosition() + dx);
         });
-        connect<Event>(sceneManager, EventType::PostUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             cubeObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
-            });
+        });
 
         driver->start();
     }

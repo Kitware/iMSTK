@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+          http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,7 +36,7 @@ OpenVRDeviceClient::emitButtonTouched(const int buttonId)
     m_buttons[buttonId] = BUTTON_TOUCHED;
     if (prevButtonState != BUTTON_TOUCHED)
     {
-        this->postEvent(ButtonEvent(buttonId, BUTTON_TOUCHED));
+        this->postEvent(ButtonEvent(OpenVRDeviceClient::buttonStateChanged(), buttonId, BUTTON_TOUCHED));
     }
 }
 
@@ -47,7 +47,7 @@ OpenVRDeviceClient::emitButtonUntouched(const int buttonId)
     m_buttons[buttonId] = BUTTON_UNTOUCHED;
     if (prevButtonState != BUTTON_UNTOUCHED)
     {
-        this->postEvent(ButtonEvent(buttonId, BUTTON_UNTOUCHED));
+        this->postEvent(ButtonEvent(OpenVRDeviceClient::buttonStateChanged(), buttonId, BUTTON_UNTOUCHED));
     }
 }
 
@@ -58,7 +58,7 @@ OpenVRDeviceClient::emitButtonPress(const int buttonId)
     m_buttons[buttonId] = BUTTON_PRESSED;
     if (prevButtonState != BUTTON_PRESSED)
     {
-        this->postEvent(ButtonEvent(buttonId, BUTTON_PRESSED));
+        this->postEvent(ButtonEvent(OpenVRDeviceClient::buttonStateChanged(), buttonId, BUTTON_PRESSED));
     }
 }
 
@@ -69,7 +69,7 @@ OpenVRDeviceClient::emitButtonRelease(const int buttonId)
     m_buttons[buttonId] = BUTTON_RELEASED;
     if (prevButtonState != BUTTON_RELEASED)
     {
-        this->postEvent(ButtonEvent(buttonId, BUTTON_RELEASED));
+        this->postEvent(ButtonEvent(OpenVRDeviceClient::buttonStateChanged(), buttonId, BUTTON_RELEASED));
     }
 }
 }

@@ -579,7 +579,7 @@ ReducedStVK::getFunction()
                (semiImplicit) ? this->computeSemiImplicitSystemRHS(*m_previousStateReduced,
                                                             *m_currentStateReduced,
                                                             m_updateType)
-                       : this->computeImplicitSystemRHS(*m_previousStateReduced,
+               : this->computeImplicitSystemRHS(*m_previousStateReduced,
                                                         *m_currentStateReduced,
                                                         m_updateType);
                return m_Feff;
@@ -610,7 +610,7 @@ ReducedStVK::getUpdateFunction()
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q, const bool fullyImplicit) -> void {
                (fullyImplicit) ? this->updateBodyIntermediateStates(q, m_updateType)
-                        : this->updateBodyStates(q, m_updateType);
+               : this->updateBodyStates(q, m_updateType);
     };
 }
 

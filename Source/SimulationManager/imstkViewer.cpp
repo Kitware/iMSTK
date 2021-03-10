@@ -56,11 +56,11 @@ Viewer::getActiveRenderer() const
 void
 Viewer::updateModule()
 {
-    this->postEvent(Event(EventType::PreUpdate));
+    this->postEvent(Event(Module::preUpdate()));
     for (auto control : m_controls)
     {
         control->update(m_dt);
     }
-    this->postEvent(Event(EventType::PostUpdate));
+    this->postEvent(Event(Module::postUpdate()));
 }
 }

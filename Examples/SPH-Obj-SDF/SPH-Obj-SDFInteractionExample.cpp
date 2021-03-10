@@ -62,7 +62,8 @@ generateBoxShapeFluid(const double particleRadius, const Vec3d& boxCenter, const
     const Vec3i  dim     = {
         static_cast<int>(boxSize.x() / spacing),
         static_cast<int>(boxSize.y() / spacing),
-        static_cast<int>(boxSize.z() / spacing) };
+        static_cast<int>(boxSize.z() / spacing)
+    };
 
     imstkNew<VecDataArray<double, 3>> particles;
     particles->reserve(dim[0] * dim[1] * dim[2]);

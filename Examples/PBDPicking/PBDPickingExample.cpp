@@ -289,7 +289,7 @@ main()
         }
         // Not perfectly thread safe movement lambda, ijkl movement instead of wasd because d is already used
         std::shared_ptr<KeyboardDeviceClient> keyDevice = viewer->getKeyboardDevice();
-        connect<Event>(sceneManager, EventType::PreUpdate, [&](Event*)
+        connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
             std::shared_ptr<PBDPickingCH> chUpper = std::static_pointer_cast<PBDPickingCH>(upperJawPickingPair->getCollisionHandlingA());
             std::shared_ptr<PBDPickingCH> chLower = std::static_pointer_cast<PBDPickingCH>(lowerJawPickingPair->getCollisionHandlingA());

@@ -68,7 +68,7 @@ struct Color
     ///
     /// \brief Bitwise operator
     ///
-    friend std::ostream& operator<<(std::ostream& os, const Color& c);
+    friend std ::ostream& operator<<(std::ostream& os, const Color& c);
 
     ///
     /// \brief returns the color value given with the index

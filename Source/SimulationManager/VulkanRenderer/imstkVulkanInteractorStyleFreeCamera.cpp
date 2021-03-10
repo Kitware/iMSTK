@@ -118,7 +118,7 @@ VulkanInteractorStyleFreeCamera::OnTimer()
     angleTempOffset[1] = angleOffset.y;
     angleTempOffset[2] = angleOffset.z;
 
-    auto offset = Vec3d(0, 0, 0); // Position offset
+    auto offset = Vec3d(0, 0, 0);     // Position offset
 
     // Controls
     if (glfwGetKey(m_viewer->m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)

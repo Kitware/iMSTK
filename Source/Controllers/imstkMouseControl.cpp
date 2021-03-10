@@ -36,7 +36,10 @@ MouseControl::setDevice(std::shared_ptr<DeviceClient> device)
     // Remove old observer if it exists
     if (m_mouseDeviceClient != nullptr)
     {
-        disconnect(m_mouseDeviceClient, this, EventType::MouseEvent);
+        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseButtonPress);
+        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseButtonRelease);
+        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseScroll);
+        disconnect(m_mouseDeviceClient, this, &MouseDeviceClient::mouseMove);
     }
 
     // Set the new device
@@ -44,28 +47,33 @@ MouseControl::setDevice(std::shared_ptr<DeviceClient> device)
     DeviceControl::setDevice(device);
 
     // Subscribe to the device clients events
-    connect(m_mouseDeviceClient, EventType::MouseEvent, this, &MouseControl::mouseEvent);
+    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseButtonPress, this, &MouseControl::mouseButtonPressEvent);
+    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseButtonRelease, this, &MouseControl::mouseButtonReleaseEvent);
+    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseScroll, this, &MouseControl::mouseScrollEvent);
+    connect(m_mouseDeviceClient, &MouseDeviceClient::mouseMove, this, &MouseControl::mouseMoveEvent);
 }
 
 void
-MouseControl::mouseEvent(MouseEvent* e)
+MouseControl::mouseButtonPressEvent(MouseEvent* e)
 {
-    switch (e->m_mouseActionType)
-    {
-    case MOUSE_PRESS:
-        OnButtonPress(e->m_buttonId);
-        break;
-    case MOUSE_RELEASE:
-        OnButtonRelease(e->m_buttonId);
-        break;
-    case MOUSE_SCROLL:
-        OnScroll(e->m_scrollDx);
-        break;
-    case MOUSE_MOVE:
-        OnMouseMove(m_mouseDeviceClient->getPos());
-    default:
-        break;
-    }
-    ;
+    OnButtonPress(e->m_buttonId);
+}
+
+void
+MouseControl::mouseButtonReleaseEvent(MouseEvent* e)
+{
+    OnButtonRelease(e->m_buttonId);
+}
+
+void
+MouseControl::mouseScrollEvent(MouseEvent* e)
+{
+    OnScroll(e->m_scrollDx);
+}
+
+void
+MouseControl::mouseMoveEvent(MouseEvent* imstkNotUsed(e))
+{
+    OnMouseMove(m_mouseDeviceClient->getPos());
 }
 }

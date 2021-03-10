@@ -49,27 +49,43 @@ public:
 
 public:
     Module() = default;
-    virtual ~Module() override = default;
+    virtual ~Module() override= default;
+
+public:
+    ///
+    /// \brief Posted before updateModule is called
+    ///
+    SIGNAL(Module,preUpdate);
+
+    ///
+    /// \brief Posted after updateModule is called
+    ///
+    SIGNAL(Module,postUpdate);
+
+    ///
+    /// \brief Posted when module wants to end
+    ///
+    SIGNAL(Module,end);
 
 public:
     ///
     /// \brief Get/Set the timestep
     ///
-    double getDt() const { return m_dt; }
+    double getDt() const{ return m_dt; }
     void setDt(const double dt) { m_dt = dt; }
 
     ///
     /// \brief Get whether the module is initialized yet
     ///
-    bool getInit() const { return m_init; }
+    bool getInit() const{ return m_init; }
 
     ///
     /// \brief Set/Get whether the module is currently paused
     ///
-    bool getPaused() const { return m_paused; }
+    bool getPaused() const{ return m_paused; }
     void setPaused(const bool paused) { m_paused = paused; }
 
-    ExecutionType getExecutionType() const { return m_executionType; }
+    ExecutionType getExecutionType() const{ return m_executionType; }
     void setExecutionType(ExecutionType type) { m_executionType = type; }
 
     void pause() { m_paused = true; }
@@ -82,9 +98,9 @@ public:
     {
         if (m_init && !m_paused)
         {
-            this->postEvent(Event(EventType::PreUpdate));
+            this->postEvent(Event(Module::preUpdate()));
             this->updateModule();
-            this->postEvent(Event(EventType::PostUpdate));
+            this->postEvent(Event(Module::postUpdate()));
         }
     }
 

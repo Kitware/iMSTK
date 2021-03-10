@@ -1381,7 +1381,7 @@ markPointsInsideAndOut(std::vector<bool>& isInside,
 
     ParallelUtils::parallelFor(ny * nz, rayTracingLine);
 }
-} // anonymous namespace
+}   // anonymous namespace
 
 std::shared_ptr<TetrahedralMesh>
 GeometryUtils::createUniformMesh(const Vec3d& aabbMin,

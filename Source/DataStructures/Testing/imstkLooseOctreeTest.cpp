@@ -112,7 +112,7 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
             ));
     }
-    pointset->modified();
+    pointset->postModified();
 }
 
 ///
@@ -134,7 +134,7 @@ randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
             mesh->setVertexPosition(face[j], mesh->getVertexPosition(face[j]) + translation);
         }
     }
-    mesh->modified();
+    mesh->postModified();
 }
 
 namespace imstk

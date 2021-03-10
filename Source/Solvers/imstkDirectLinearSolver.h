@@ -126,6 +126,6 @@ public:
     void solve(const Vectord& rhs, Vectord& x);
 
 private:
-    Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;//?
+    Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::StorageIndex>> m_solver;  //?
 };
 } // imstk

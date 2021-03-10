@@ -119,7 +119,7 @@ RigidObjectController::update(const double dt)
         (*m_rigidObject->getRigidBody()->m_orientation) = getRotation();
     }
 
-    this->postEvent(Event(EventType::Modified));
+    this->postEvent(Event(RigidObjectController::modified()));
 }
 
 void

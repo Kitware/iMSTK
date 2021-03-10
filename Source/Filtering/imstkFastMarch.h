@@ -52,35 +52,35 @@ protected:
     };
 
 public:
-    bool isVisited(int nodeId) { return visited.count(nodeId) == 0 ? false : true; }
-    double getDistance(int nodeId) { return distances.count(nodeId) == 0 ? IMSTK_DOUBLE_MAX : distances.at(nodeId); }
+    bool isVisited(int nodeId) { return m_visited.count(nodeId) == 0 ? false : true; }
+    double getDistance(int nodeId) { return m_distances.count(nodeId) == 0 ? IMSTK_DOUBLE_MAX : m_distances.at(nodeId); }
 
     void solve();
 
     void solveNode(Vec3i coord, int index);
 
-    void setSeeds(std::vector<Vec3i> seedVoxels) { this->seedVoxels = seedVoxels; }
-    void setVisited(std::unordered_set<int> visited) { this->visited = visited; }
-    void setDistnaces(std::unordered_map<int, double> distances) { this->distances = distances; }
-    void setImage(std::shared_ptr<ImageData> image) { imageData = image; }
-    void setDistThreshold(double distThreshold) { this->distThreshold = distThreshold; }
+    void setSeeds(std::vector<Vec3i> seedVoxels) { m_seedVoxels = seedVoxels; }
+    void setVisited(std::unordered_set<int> visited) { m_visited = visited; }
+    void setDistnaces(std::unordered_map<int, double> distances) { m_distances = distances; }
+    void setImage(std::shared_ptr<ImageData> image) { m_imageData = image; }
+    void setDistThreshold(double distThreshold) { m_distThreshold = distThreshold; }
 
 protected:
     // The image to operate on
-    std::shared_ptr<ImageData> imageData;
-    Vec3i dim;
-    Vec3d spacing;
-    int   indexShift;
+    std::shared_ptr<ImageData> m_imageData;
+    Vec3i m_dim;
+    Vec3d m_spacing;
+    int   m_indexShift;
 
-    std::unordered_set<int> visited;
-    std::unordered_map<int, double> distances;
+    std::unordered_set<int> m_visited;
+    std::unordered_map<int, double> m_distances;
 
     // The starting voxels
-    std::vector<Vec3i> seedVoxels;
+    std::vector<Vec3i> m_seedVoxels;
 
     // Distance to go too
-    double distThreshold;
+    double m_distThreshold;
 
-    std::priority_queue<Node, std::vector<Node>, NodeComparator> queue;
+    std::priority_queue<Node, std::vector<Node>, NodeComparator> m_queue;
 };
 }

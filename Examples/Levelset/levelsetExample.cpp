@@ -69,7 +69,7 @@ makeLevelsetObj(const std::string& name)
     // Setup the Parameters
     imstkNew<LevelSetModelConfig> lvlsetConfig;
     lvlsetConfig->m_sparseUpdate = false;
-    lvlsetConfig->m_dt = 0.0003;
+    lvlsetConfig->m_dt = 0.003;
     lvlsetConfig->m_constantVelocity = -1.0;
 
     // Setup the Model
@@ -136,11 +136,13 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->pause();
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.015);
 
         // Add mouse and keyboard controls to the viewer
         {
