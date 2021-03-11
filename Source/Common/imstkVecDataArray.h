@@ -125,8 +125,7 @@ public:
     ///
     /// \brief Constructs from intializer list
     ///
-    template<typename U, int M>
-    VecDataArray(std::initializer_list<Eigen::Matrix<U, M, 1>> list) : DataArray<T>(static_cast<int>(list.size() * N)),
+    VecDataArray(std::initializer_list<Eigen::Matrix<T, N, 1>> list) : DataArray<T>(static_cast<int>(list.size() * N)),
         m_vecSize(static_cast<int>(list.size())),
         m_vecCapacity(static_cast<int>(list.size())),
         m_dataCast(reinterpret_cast<VecType*>(DataArray<T>::m_data))
@@ -134,7 +133,7 @@ public:
         int j = 0;
         for (auto i : list)
         {
-            m_dataCast[j] = i.cast<T>();
+            m_dataCast[j] = i;
             j++;
         }
     }
@@ -298,7 +297,7 @@ public:
 
         if (vecPos != m_vecSize - 1)
         {
-            std::copy_n(m_data + pos + N, AbstractDataArray::m_size - pos - N, DataArray<T>::m_data + pos);
+            std::copy_n(DataArray<T>::m_data + pos + N, AbstractDataArray::m_size - pos - N, DataArray<T>::m_data + pos);
         }
 
         m_vecSize--;

@@ -193,7 +193,7 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
-        connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+        connect<Event>(sceneManager, &SceneManager::postUpdate, updateFunc);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

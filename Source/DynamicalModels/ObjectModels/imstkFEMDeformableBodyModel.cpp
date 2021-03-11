@@ -53,10 +53,7 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
 {
     m_fixedNodeIds.reserve(1000);
 
-    m_validGeometryTypes = {
-        Geometry::Type::TetrahedralMesh,
-        Geometry::Type::HexahedralMesh
-    };
+    m_validGeometryTypes = { "TetrahedralMesh", "HexahedralMesh" };
 
     m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }
@@ -276,7 +273,7 @@ FEMDeformableBodyModel::loadBoundaryConditions()
             }
 
             file.close();
-            std::sort(m_fixedNodeIds.begin(), m_fixedNodeIds.end());// for efficiency
+            std::sort(m_fixedNodeIds.begin(), m_fixedNodeIds.end());  // for efficiency
         }
         else
         {
@@ -338,7 +335,7 @@ FEMDeformableBodyModel::initializeMassMatrix()
     CHECK(m_geometry != nullptr) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
 
     vega::SparseMatrix* vegaMatrix;
-    vega::GenerateMassMatrix::computeMassMatrix(m_vegaPhysicsMesh.get(), &vegaMatrix, true);//caveat
+    vega::GenerateMassMatrix::computeMassMatrix(m_vegaPhysicsMesh.get(), &vegaMatrix, true);    //caveat
 
     m_vegaMassMatrix.reset(vegaMatrix);
 
@@ -705,7 +702,7 @@ FEMDeformableBodyModel::getFunction()
 #endif
 
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord& q, const bool semiImplicit)->const Vectord&
+    return [&, this](const Vectord& q, const bool semiImplicit) -> const Vectord&
            {
                (semiImplicit) ?
                this->computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
@@ -729,7 +726,7 @@ FEMDeformableBodyModel::getFunctionGradient()
 #pragma warning( disable : 4100 )
 #endif
     // Gradient of the nonlinear objective function given the current state
-    return [&, this](const Vectord& q)->const SparseMatrixd&
+    return [&, this](const Vectord& q) -> const SparseMatrixd&
            {
                this->computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
 
@@ -748,7 +745,7 @@ NonLinearSystem<SparseMatrixd>::UpdateFunctionType
 FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord& q, const bool fullyImplicit)->void
+    return [&, this](const Vectord& q, const bool fullyImplicit) -> void
            {
                (fullyImplicit) ?
                this->updateBodyIntermediateStates(q, m_updateType) :
@@ -760,7 +757,7 @@ NonLinearSystem<SparseMatrixd>::UpdatePrevStateFunctionType
 FEMDeformableBodyModel::getUpdatePrevStateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this]()->void
+    return [&, this]() -> void
            {
                this->updateBodyPreviousStates();
            };

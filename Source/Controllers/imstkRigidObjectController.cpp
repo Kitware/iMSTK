@@ -20,9 +20,7 @@
 =========================================================================*/
 
 #include "imstkRigidObjectController.h"
-#include "imstkCollidingObject.h"
 #include "imstkDeviceClient.h"
-#include "imstkGeometry.h"
 #include "imstkLogger.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRigidObject2.h"
@@ -121,7 +119,7 @@ RigidObjectController::update(const double dt)
         (*m_rigidObject->getRigidBody()->m_orientation) = getRotation();
     }
 
-    this->postEvent(Event(EventType::Modified));
+    this->postEvent(Event(RigidObjectController::modified()));
 }
 
 void
@@ -136,19 +134,13 @@ RigidObjectController::applyForces()
             if (m_forceSmoothening)
             {
                 m_forces.push_back(force);
-                if (m_forces.size() > m_smoothingKernelSize)
+                m_forceSum += force;
+                if (static_cast<int>(m_forces.size()) > m_smoothingKernelSize)
                 {
+                    m_forceSum -= m_forces.front();
                     m_forces.pop_front();
                 }
-
-                Vec3d avgForce = Vec3d(0.0, 0.0, 0.0);
-                int   count    = 0;
-                for (auto i : m_forces)
-                {
-                    avgForce += i;
-                    count++;
-                }
-                avgForce /= count;
+                const Vec3d avgForce = m_forceSum / m_forces.size();
 
                 // Render only the spring force (not the other forces the body has)
                 m_deviceClient->setForce(avgForce);

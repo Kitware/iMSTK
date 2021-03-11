@@ -56,7 +56,7 @@ Cube::setWidth(const double w)
     }
     m_width = w;
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void
@@ -69,7 +69,7 @@ Cube::applyTransform(const Mat4d& m)
         m_transform.block<3, 1>(0, 2).norm());*/
     const double s0 = m.block<3, 1>(0, 0).norm();
     this->setWidth(m_width * s0);
-    this->modified();
+    this->postModified();
 }
 
 void

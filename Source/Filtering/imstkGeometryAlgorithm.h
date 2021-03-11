@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+          http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,19 +20,10 @@
 =========================================================================*/
 #pragma once
 
+#include "imstkMacros.h"
+
 #include <memory>
 #include <unordered_map>
-
-#define imstkSetMacro(name, dataType)       \
-    virtual void set ## name(dataType _arg) \
-    {                                       \
-        if (this->m_ ## name != _arg)       \
-        {                                   \
-            this->m_ ## name = _arg;        \
-        }                                   \
-    }
-#define imstkGetMacro(name, dataType) \
-    virtual dataType get ## name() { return this->m_ ## name; }
 
 namespace imstk
 {

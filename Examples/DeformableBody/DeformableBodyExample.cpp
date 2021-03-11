@@ -167,7 +167,7 @@ makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setPointSize(10.0);
-    mat->setLineWidth(4.0);
+    mat->setLineWidth(2.0);
     mat->setEdgeColor(Color::Orange);
     imstkNew<VisualModel> surfMeshModel(surfMesh.get());
     surfMeshModel->setRenderMaterial(mat);

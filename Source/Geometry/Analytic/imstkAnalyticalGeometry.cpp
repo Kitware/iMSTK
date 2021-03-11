@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-AnalyticalGeometry::AnalyticalGeometry(Type type, const std::string& name) : ImplicitGeometry(type, name),
+AnalyticalGeometry::AnalyticalGeometry(const std::string& name) : ImplicitGeometry(name),
     m_position(WORLD_ORIGIN), m_positionPostTransform(WORLD_ORIGIN),
     m_orientationAxis(UP_VECTOR), m_orientationAxisPostTransform(UP_VECTOR)
 {
@@ -58,7 +58,7 @@ AnalyticalGeometry::setPosition(const Vec3d p)
 
     m_position = p;
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void
@@ -93,7 +93,7 @@ AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
     }
     m_orientationAxis  = orientation.normalized();
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void

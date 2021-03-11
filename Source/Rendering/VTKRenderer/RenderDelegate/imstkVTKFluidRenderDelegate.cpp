@@ -50,10 +50,10 @@ VTKFluidRenderDelegate::VTKFluidRenderDelegate(std::shared_ptr<VisualModel> visu
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(geometry, EventType::Modified, this, &VTKFluidRenderDelegate::geometryModified);
+    queueConnect<Event>(geometry, &Geometry::modified, this, &VTKFluidRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(geometry->getVertexPositions(), EventType::Modified, this, &VTKFluidRenderDelegate::vertexDataModified);
+    queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKFluidRenderDelegate::vertexDataModified);
 
     // Setup mapper
     {

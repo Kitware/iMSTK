@@ -211,7 +211,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
-        connect<Event>(sceneManager, EventType::PostUpdate, movePoints);
+        connect<Event>(sceneManager, &SceneManager::postUpdate, movePoints);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

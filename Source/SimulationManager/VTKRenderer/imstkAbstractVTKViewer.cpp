@@ -43,7 +43,7 @@ exitCallbackFunc(
         && eventId == vtkCommand::ExitEvent)
     {
         viewer->pause(); // Immediately prevent any updates from running
-        viewer->postEvent(Event(EventType::End));
+        viewer->postEvent(Event(Module::end()));
     }
 }
 

@@ -25,6 +25,17 @@ namespace imstk
 {
 #define imstkNotUsed(x)
 
+#define imstkSetMacro(name, dataType)       \
+    virtual void set ## name(dataType _arg) \
+    {                                       \
+        if (this->m_ ## name != _arg)       \
+        {                                   \
+            this->m_ ## name = _arg;        \
+        }                                   \
+    }
+#define imstkGetMacro(name, dataType) \
+    virtual dataType get ## name() { return this->m_ ## name; }
+
 // \todo Switch to template type lists
 ///
 /// \brief Maps ScalarType type to templated function call

@@ -2,31 +2,31 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-list(APPEND Dependencies
-  Common
-  VRPN)
-  
-include(imstkAddLibrary)
-set(HAPTIC_DEVICE_LIBS)
-if(${PROJECT_NAME}_USE_OpenHaptics)
-  set(HAPTIC_DEVICE_LIBS OpenHapticsSDK)
+list(APPEND Dependencies Common)
+
+if(iMSTK_USE_OpenHaptics)
+  list(APPEND Dependencies OpenHapticsSDK)
+endif()
+if(iMSTK_USE_VRPN)
+  list(APPEND Dependencies VRPN)
 endif()
 
 list(APPEND ExclusionFiles "")
-if(${PROJECT_NAME}_USE_OpenHaptics)
-  list(APPEND Dependencies
-    ${HAPTIC_DEVICE_LIBS})
-else()
+if(NOT iMSTK_USE_OpenHaptics)
   list(APPEND ExclusionFiles
     imstkHapticDeviceClient.h
     imstkHapticDeviceClient.cpp
     imstkHapticDeviceManager.h
     imstkHapticDeviceManager.cpp)
 endif()
-
-set(HAPTIC_DEVICE_LIBS)
-if(${PROJECT_NAME}_USE_OpenHaptics)
-  set(HAPTIC_DEVICE_LIBS OpenHapticsSDK)
+if(NOT iMSTK_USE_VRPN)
+  list(APPEND ExclusionFiles
+    imstkVRPNDeviceServer.h
+    imstkVRPNDeviceServer.cpp
+    imstkVRPNArduinoDeviceClient.h
+    imstkVRPNArduinoDeviceClient.cpp
+    imstkVRPNDeviceClient.h
+    imstkVRPNDeviceClient.cpp)
 endif()
 
 include(imstkAddLibrary)

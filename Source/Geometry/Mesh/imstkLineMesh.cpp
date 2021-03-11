@@ -25,7 +25,7 @@
 
 namespace imstk
 {
-LineMesh::LineMesh(const std::string& name) : PointSet(Type::LineMesh, name),
+LineMesh::LineMesh(const std::string& name) : PointSet(name),
     m_segmentIndices(std::make_shared<VecDataArray<int, 2>>())
 {
 }

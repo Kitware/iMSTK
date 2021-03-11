@@ -227,8 +227,8 @@ main()
         scene->addSceneObject(legsObj);
 
         // Position the camera
-        const Vec6d& bounds = std::dynamic_pointer_cast<SignedDistanceField>(legsObj->getCollidingGeometry())->getBounds();
-        const Vec3d  center = (Vec3d(bounds[0], bounds[2], bounds[4]) + Vec3d(bounds[1], bounds[3], bounds[5])) * 0.5;
+        //const Vec6d& bounds = std::dynamic_pointer_cast<SignedDistanceField>(legsObj->getCollidingGeometry())->getBounds();
+        //const Vec3d  center = (Vec3d(bounds[0], bounds[2], bounds[4]) + Vec3d(bounds[1], bounds[3], bounds[5])) * 0.5;
         scene->getActiveCamera()->setPosition(3.25, 1.6, 3.38);
         scene->getActiveCamera()->setFocalPoint(-2.05, 1.89, -1.32);
         scene->getActiveCamera()->setViewUp(-0.66, 0.01, 0.75);

@@ -25,20 +25,20 @@
 
 namespace imstk
 {
-Geometry::Geometry(const Geometry::Type type, const std::string& name) :
-    m_type(type), m_name(name), m_geometryIndex(Geometry::getUniqueID()), m_transform(Mat4d::Identity())
+Geometry::Geometry(const std::string& name) :
+    m_name(name), m_geometryIndex(Geometry::getUniqueID()), m_transform(Mat4d::Identity())
 {
     // If the geometry name is empty, enumerate it by name (which will not be duplicated)
     if (m_name.empty())
     {
-        m_name = getTypeName() + std::string("-") + std::to_string(m_geometryIndex);
+        m_name = std::string("unnamed_geometry-") + std::to_string(m_geometryIndex);
     }
 }
 
 void
 Geometry::print() const
 {
-    LOG(INFO) << this->getTypeName();
+    LOG(INFO) << getTypeName();
     LOG(INFO) << "Transform: " << m_transform;
 }
 
@@ -120,7 +120,7 @@ Geometry::transform(const Mat4d& T, TransformType type)
     else
     {
         applyTransform(T);
-        this->postEvent(Event(EventType::Modified));
+        this->postModified();
     }
     m_transformApplied = false;
 }
@@ -213,45 +213,6 @@ Geometry::getScaling() const
         m_transform.block<3, 1>(0, 0).norm(),
         m_transform.block<3, 1>(0, 1).norm(),
         m_transform.block<3, 1>(0, 2).norm());
-}
-
-const std::string
-Geometry::getTypeName() const
-{
-    // /todo: create an actual object factory
-    switch (m_type)
-    {
-    case Type::Plane: return "Plane";
-    case Type::Sphere: return "Sphere";
-    case Type::Cylinder: return "Cylinder";
-    case Type::Cube: return "Cube";
-    case Type::Capsule: return "Capsule";
-    case Type::PointSet: return "PointSet";
-    case Type::SurfaceMesh: return "SurfaceMesh";
-    case Type::TetrahedralMesh: return "TetrahedralMesh";
-    case Type::HexahedralMesh: return "HexahedralMesh";
-    case Type::LineMesh: return "LineMesh";
-    case Type::Decal: return "Decal";
-    case Type::DecalPool: return "DecalPool";
-    case Type::RenderParticles: return "RenderParticles";
-    case Type::ImageData: return "ImageData";
-    case Type::SignedDistanceField: return "SignedDistanceField";
-    case Type::CompositeImplicitGeometry: return "CompositeImplicitGeometry";
-    default:
-        LOG(FATAL) << "Mesh type to string has not been completely implemented";
-        return "";
-    }
-}
-
-bool
-Geometry::isMesh() const
-{
-    return (this->m_type == Type::HexahedralMesh
-            || this->m_type == Type::SurfaceMesh
-            || this->m_type == Type::TetrahedralMesh
-            || this->m_type == Type::LineMesh
-            || this->m_type == Type::PointSet
-            ) ? true : false;
 }
 
 // Static mutex lock

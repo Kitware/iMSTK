@@ -39,7 +39,7 @@ class KeyEvent;
 class KeyboardControl : public DeviceControl
 {
 public:
-    KeyboardControl() { }
+    KeyboardControl() = default;
     KeyboardControl(std::shared_ptr<KeyboardDeviceClient> keyDevice);
     virtual ~KeyboardControl() override = default;
 
@@ -52,10 +52,14 @@ public:
     virtual void OnKeyRelease(const char imstkNotUsed(key)) { }
 
     ///
-    /// \brief Posts key press/release events
-    /// override to filter the event, or implement OnkeyDown/OnKeyUp
+    /// \brief Recieves key press event
     ///
     virtual void keyPressEvent(KeyEvent* e);
+
+    ///
+    /// \brief Recieves key release event
+    ///
+    virtual void keyReleaseEvent(KeyEvent* e);
 
 protected:
     std::shared_ptr<KeyboardDeviceClient> m_keyboardDeviceClient;

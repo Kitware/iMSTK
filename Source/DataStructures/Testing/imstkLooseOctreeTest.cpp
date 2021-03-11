@@ -112,7 +112,7 @@ randomizePositions(const std::shared_ptr<PointSet>& pointset)
             (static_cast<Real>(rand()) / static_cast<Real>(RAND_MAX) * 2.0 - 1.0) * BOUND
             ));
     }
-    pointset->modified();
+    pointset->postModified();
 }
 
 ///
@@ -134,7 +134,7 @@ randomizePositions(const std::shared_ptr<SurfaceMesh>& mesh)
             mesh->setVertexPosition(face[j], mesh->getVertexPosition(face[j]) + translation);
         }
     }
-    mesh->modified();
+    mesh->postModified();
 }
 
 namespace imstk
@@ -166,13 +166,13 @@ public:
         m_Octree->addPointSet(m_PointSet);
         EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Point].size(), m_PointSet->getNumVertices());
         EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size(), 0);
-        EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::AnalyticalGeometry].size(), 0);
+        EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Analytical].size(), 0);
 
         m_Mesh = generateMesh();
         m_Octree->addTriangleMesh(m_Mesh);
         EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Point].size(), m_PointSet->getNumVertices());
         EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size(), m_Mesh->getNumTriangles());
-        EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::AnalyticalGeometry].size(), 0);
+        EXPECT_EQ(m_Octree->m_vPrimitivePtrs[OctreePrimitiveType::Analytical].size(), 0);
 
         m_Octree->build();
     }
@@ -252,7 +252,7 @@ public:
                 for (const auto& pPrimitive : m_Octree->m_vPrimitivePtrs[i])
                 {
                     const auto pNode = pPrimitive->m_pNode;
-                    if (pPrimitive->m_pGeometry->getType() == Geometry::Type::PointSet)
+                    if (pPrimitive->m_pGeometry->getTypeName() == "PointSet")
                     {
                         EXPECT_EQ(pNode->looselyContains(pPrimitive->m_Position), true);
                     }

@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+          http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -149,7 +149,7 @@ main()
         // This button event is emitted from the viewer's thread, thus it is queued to the scene so that we do not
         // run it while the scene is updating
         bool blade10InHand = true;
-        queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), EventType::DeviceButtonEvent, sceneManager,
+        queueConnect<ButtonEvent>(viewer->getVRDeviceClient(OPENVR_RIGHT_CONTROLLER), &OpenVRDeviceClient::buttonStateChanged, sceneManager,
             [&](ButtonEvent* e)
         {
             // When any button pressed, swap blade

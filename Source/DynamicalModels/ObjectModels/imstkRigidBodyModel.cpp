@@ -43,30 +43,22 @@ RigidBodyModel::initialize()
         m_initialState->setPosition(m_geometry->getTranslation());
         m_currentState->setPosition(m_geometry->getTranslation());
 
-        switch (m_geometry->getType())
-        {
-        case Geometry::Type::Sphere:
+        const std::string geomType = m_geometry->getTypeName();
+        if (geomType == "Sphere")
         {
             createSphere();
-            break;
         }
-        case Geometry::Type::Cube:
+        else if (geomType == "Cube")
         {
             createCube();
-            break;
         }
-        case Geometry::Type::Plane:
+        else if (geomType == "Plane")
         {
             createPlane();
-            break;
         }
-        case Geometry::Type::SurfaceMesh:
-
+        else if (geomType == "SurfaceMesh")
+        {
             createMesh();
-            break;
-
-        default:
-            break;
         }
 
         /*if (m_pxDynamicActor)

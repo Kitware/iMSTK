@@ -125,15 +125,12 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
 
-            connect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
+            connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
                 [&](KeyEvent* e)
             {
-                if (e->m_keyPressType == KEY_PRESS)
+                if (e->m_key == 'b')
                 {
-                    if (e->m_key == 'b')
-                    {
-                        viewer->getScreenCaptureUtility()->saveScreenShot();
-                    }
+                    viewer->getScreenCaptureUtility()->saveScreenShot();
                 }
                 });
         }

@@ -51,7 +51,7 @@ public:
     imstkNew() : object(std::make_shared<T>()) { }
 
     template<typename ... Args>
-    explicit imstkNew(Args&&... args) : object(std::make_shared<T>(std::forward<Args>(args)...)) { }
+    explicit imstkNew(Args&& ... args) : object(std::make_shared<T>(std::forward<Args>(args) ...)) { }
 
     // Move, reference to old is removed
     imstkNew(imstkNew&& obj) : object(obj.object) { obj.object = nullptr; }

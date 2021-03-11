@@ -56,7 +56,7 @@ castImage(std::shared_ptr<AbstractDataArray> fromScalars, std::shared_ptr<ImageD
 }
 
 ImageData::ImageData(const std::string& name)
-    : PointSet(Geometry::Type::ImageData, name),
+    : PointSet(name),
     m_scalarArray(nullptr)
 {
 }
@@ -143,7 +143,7 @@ ImageData::allocate(const ScalarType type, const int numComps, const Vec3i& dims
         LOG(WARNING) << "Tried to allocate unknown scalar type";
         break;
     }
-    this->modified();
+    this->postModified();
 }
 
 void
@@ -176,6 +176,6 @@ ImageData::clear()
         this->m_scalarArray = nullptr;
     }
     //this->m_dataTransform->Identity();
-    this->modified();
+    this->postModified();
 }
 } // imstk

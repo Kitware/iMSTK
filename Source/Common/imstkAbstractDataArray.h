@@ -45,6 +45,9 @@ protected:
     virtual ~AbstractDataArray() { };
 
 public:
+    SIGNAL(AbstractDataArray,modified);
+
+public:
     ///
     /// \brief Resizes the array, may reallocate
     ///
@@ -68,29 +71,29 @@ public:
     ///
     /// \brief Get number of values/tuples
     ///
-    inline int size() const { return m_size; }
+    inline int size() const{ return m_size; }
 
     ///
     /// \brief Returns the scalar type of this array
     ///
-    inline ScalarType getScalarType() const { return m_scalarType; }
+    inline ScalarType getScalarType() const{ return m_scalarType; }
 
     ///
     /// \brief Return the capacity of the array
     ///
-    inline int getCapacity() const { return m_capacity; }
+    inline int getCapacity() const{ return m_capacity; }
 
     ///
     /// \brief Returns the number of components
     ///
-    inline virtual int getNumberOfComponents() const { return 1; }
+    inline virtual int getNumberOfComponents() const{ return 1; }
 
 public:
     ///
     /// \brief emits signal to all observers, informing them on the current address
     /// in memory and size of array
     ///
-    inline void modified() { this->postEvent(Event(EventType::Modified)); }
+    inline void postModified() { this->postEvent(Event(AbstractDataArray::modified())); }
 
 protected:
     void setType(const ScalarType type) { this->m_scalarType = type; }

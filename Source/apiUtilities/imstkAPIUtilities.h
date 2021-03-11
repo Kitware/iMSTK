@@ -43,7 +43,7 @@ namespace apiutils
 ///
 /// \brief Create a analytical visual scene object that and add it to the scene
 ///
-std::shared_ptr<SceneObject> createVisualAnalyticalSceneObject(Geometry::Type type,
+std::shared_ptr<SceneObject> createVisualAnalyticalSceneObject(std::string type,
                                                                std::shared_ptr<Scene> scene,
                                                                const std::string& objName,
                                                                const Vec3d scale = Vec3d(1.0, 1.0, 1.0),
@@ -52,7 +52,7 @@ std::shared_ptr<SceneObject> createVisualAnalyticalSceneObject(Geometry::Type ty
 ///
 /// \brief Create a analytical colliding scene object that and add it to the scene
 ///
-std::shared_ptr<CollidingObject> createCollidingAnalyticalSceneObject(Geometry::Type type,
+std::shared_ptr<CollidingObject> createCollidingAnalyticalSceneObject(std::string type,
                                                                       std::shared_ptr<Scene> scene,
                                                                       const std::string& objName,
                                                                       const Vec3d scale = Vec3d(1.0, 1.0, 1.0),

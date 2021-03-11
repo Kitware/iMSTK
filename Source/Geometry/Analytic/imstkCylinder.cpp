@@ -66,7 +66,7 @@ Cylinder::setRadius(const double r)
 
     m_radius = r;
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void
@@ -83,7 +83,7 @@ Cylinder::setLength(const double l)
     }
     m_length = l;
     m_transformApplied = false;
-    this->postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void
@@ -97,7 +97,7 @@ Cylinder::applyTransform(const Mat4d& m)
     const double s0 = m.block<3, 1>(0, 0).norm();
     this->setRadius(m_radius * s0);
     this->setLength(m_length * s0);
-    this->modified();
+    this->postModified();
 }
 
 void

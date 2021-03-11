@@ -123,7 +123,7 @@ main(int argc, char* argv[])
         auto statusManager = viewer->getTextStatusManager();
         statusManager->setStatusFontSize(VTKTextStatusManager::StatusType::Custom, 30);
         statusManager->setStatusFontColor(VTKTextStatusManager::StatusType::Custom, Color::Red);
-        connect<Event>(viewer, EventType::PostUpdate,
+        connect<Event>(viewer, &VTKViewer::postUpdate,
             [&](Event*)
             {
                 statusManager->setCustomStatus("Number of particles: " +

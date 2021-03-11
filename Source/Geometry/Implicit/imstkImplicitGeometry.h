@@ -37,7 +37,7 @@ public:
     virtual ~ImplicitGeometry() override = default;
 
 protected:
-    ImplicitGeometry(Type geomType, std::string name = "") : Geometry(geomType, name) { }
+    ImplicitGeometry(std::string name = "") : Geometry(name) { }
 
 public:
     ///

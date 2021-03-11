@@ -94,7 +94,7 @@ SPHModelConfig::initialize()
 
 SPHModel::SPHModel() : DynamicalModel<SPHState>(DynamicalModelType::SmoothedParticleHydrodynamics)
 {
-    m_validGeometryTypes = { Geometry::Type::PointSet };
+    m_validGeometryTypes = { "PointSet" };
 
     m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SPHModel::findParticleNeighbors, this));
     m_computeDensityNode = m_taskGraph->addFunction("SPHModel_ComputeDensity", [&]()
@@ -715,7 +715,7 @@ SPHModel::moveParticles(const Real timestep)
     VecDataArray<double, 3>& halfStepVelocities = *getCurrentState()->getHalfStepVelocities();
     VecDataArray<double, 3>& fullStepVelocities = *getCurrentState()->getFullStepVelocities();
 
-    for (int p = 0; p < getCurrentState()->getNumParticles(); p++)
+    for (int p = 0; p < static_cast<int>(getCurrentState()->getNumParticles()); p++)
     {
         if (m_sphBoundaryConditions
             && (m_sphBoundaryConditions->getParticleTypes()[p] == SPHBoundaryConditions::ParticleType::Buffer

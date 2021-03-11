@@ -44,13 +44,13 @@ using ButtonStateType = int;
 class ButtonEvent : public Event
 {
 public:
-    ButtonEvent(const int button, const ButtonStateType keyPressType) : Event(EventType::DeviceButtonEvent, 1),
+    ButtonEvent(std::string type, const int button, const ButtonStateType keyPressType) : Event(type),
         m_buttonState(keyPressType),
         m_button(button)
     {
     }
 
-    virtual ~ButtonEvent() override = default;
+    virtual ~ButtonEvent() override= default;
 
 public:
     ButtonStateType m_buttonState;
@@ -72,6 +72,9 @@ public:
     /// \brief Destructor
     ///
     virtual ~DeviceClient() = default;
+
+public:
+    SIGNAL(DeviceClient,buttonStateChanged);
 
 public:
     ///
@@ -121,7 +124,7 @@ public:
     ///
     /// \brief Get offset from position for device end effector
     ///
-    const Vec3d& getOffset() const { return m_endEffectorOffset; }
+    const Vec3d& getOffset() const{ return m_endEffectorOffset; }
 
     ///
     /// \brief Get/Set the device force
@@ -129,7 +132,7 @@ public:
     const Vec3d& getForce() const;
     void setForce(Vec3d force);
 
-    const std::unordered_map<int, int>& getButtons() const { return m_buttons; }
+    const std::unordered_map<int,int>& getButtons() const{ return m_buttons; }
 
     ///
     /// \brief Get the state of a button
@@ -150,7 +153,7 @@ public:
     virtual void update() {}
 
 protected:
-    DeviceClient(const std::string& name, const std::string& ip);
+    DeviceClient(const std::string& name,const std::string& ip);
 
     std::string m_deviceName;                         ///< Device Name
     std::string m_ip;                                 ///< Connection device IP
@@ -165,8 +168,8 @@ protected:
     Vec3d m_angularVelocity;                          ///< Angular velocity of the end effector
     Quatd m_orientation;                              ///< Orientation of the end effector
     Vec3d m_force;                                    ///< Force vector
-    Vec3d m_endEffectorOffset = Vec3d(0.0, 0.0, 0.0); ///> Offset from origin
+    Vec3d m_endEffectorOffset = Vec3d(0.0,0.0,0.0);   ///> Offset from origin
 
-    std::unordered_map<int, int> m_buttons;
+    std::unordered_map<int,int> m_buttons;
 };
 }

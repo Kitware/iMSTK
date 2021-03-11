@@ -62,7 +62,6 @@ struct RenderParticle
 class RenderParticles : public Geometry
 {
 public:
-
     ///
     /// \brief Constructor
     /// \param maxNumParticles Number of particles this emitter can produce
@@ -71,6 +70,14 @@ public:
     ///
     RenderParticles(const unsigned int maxNumParticles = 128, const std::string& name = std::string(""));
 
+    virtual ~RenderParticles() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "RenderParticles"; }
+
+public:
     ///
     /// \brief Set size of particle
     /// \param size Particle size, this determines how much each keyframe

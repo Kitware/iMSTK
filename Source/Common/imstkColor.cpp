@@ -44,6 +44,8 @@ Color Color::Orange(1.0, 0.6, 0.0, 1.0);
 Color Color::Pink(1.0, 0.0, 1.0, 1.0);
 Color Color::Teal(0.5, 1.0, 0.8, 1.0);
 Color Color::Marigold(0.9, 0.9, 0.4);
+Color Color::Bone(0.89, 0.86, 0.79);
+Color Color::Blood(0.4, 0.0, 0.0);
 
 Color::Color()
 {
@@ -102,9 +104,9 @@ operator<<(std::ostream& os, const Color& c)
 void
 Color::darken(const double p_darkFactor)
 {
-    rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor) );
-    rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor) );
-    rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor) );
+    rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor));
+    rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor));
+    rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor));
     rgba[0] = (rgba[0] < 0 ? 0 : rgba[0]);
     rgba[1] = (rgba[1] < 0 ? 0 : rgba[1]);
     rgba[2] = (rgba[2] < 0 ? 0 : rgba[2]);

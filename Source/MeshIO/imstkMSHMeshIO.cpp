@@ -266,7 +266,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             mshLineStream >> subString;
             if (!subString.compare("$ELM") || !subString.compare("$Elements"))
             {
-                getline(mshStream, mshLine); // To skipe the line specifying the total number of elements
+                getline(mshStream, mshLine);   // To skipe the line specifying the total number of elements
                 break;
             }
         }

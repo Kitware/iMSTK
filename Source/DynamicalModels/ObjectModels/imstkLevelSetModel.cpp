@@ -20,27 +20,18 @@
 =========================================================================*/
 
 #include "imstkLevelSetModel.h"
-#include "imstkTaskGraph.h"
-#include "imstkGeometryUtilities.h"
-#include "imstkLogger.h"
-#include "imstkSignedDistanceField.h"
-#include "imstkParallelFor.h"
-#include "imstkImplicitGeometry.h"
 #include "imstkDataArray.h"
 #include "imstkImageData.h"
-
-#include <vtkImplicitPolyDataDistance.h>
-#include <vtkPolyData.h>
+#include "imstkLogger.h"
+#include "imstkParallelFor.h"
+#include "imstkTaskGraph.h"
 
 namespace imstk
 {
 LevelSetModel::LevelSetModel()
 {
     // If given an image data
-    m_validGeometryTypes = {
-        Geometry::Type::ImageData,
-        Geometry::Type::SignedDistanceField
-    };
+    m_validGeometryTypes = { "ImageData", "SignedDistanceField" };
 
     // By default the level set defines a function for evolving the distances, this can be removed in subclasses
     m_evolveQuantitiesNodes.push_back(std::make_shared<TaskNode>(std::bind(&LevelSetModel::evolve, this), "Evolve Distances"));
@@ -57,15 +48,15 @@ LevelSetModel::initialize()
         return false;
     }
 
-    if (m_geometry->getType() == Geometry::Type::ImageData)
+    if (auto imageData = std::dynamic_pointer_cast<ImageData>(m_geometry))
     {
-        if (std::dynamic_pointer_cast<ImageData>(m_geometry)->getScalarType() != IMSTK_DOUBLE)
+        if (imageData->getScalarType() != IMSTK_DOUBLE)
         {
             LOG(WARNING) << "Levelset only works with double image types";
             return false;
         }
 
-        m_mesh = std::make_shared<SignedDistanceField>(std::dynamic_pointer_cast<ImageData>(m_geometry));
+        m_mesh = std::make_shared<SignedDistanceField>(imageData);
     }
     else
     {
@@ -75,27 +66,26 @@ LevelSetModel::initialize()
     m_backwardGrad.setFunction(m_mesh);
     m_curvature.setFunction(m_mesh);
 
-    // If dense update, we need a gradient image, which will store forward and backward gradient magnitudes
-    if (m_mesh->getType() == Geometry::Type::SignedDistanceField && !m_config->m_sparseUpdate)
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh))
     {
-        auto sdfImage = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage();
+        std::shared_ptr<ImageData> sdfImage = sdf->getImage();
+        if (!m_config->m_sparseUpdate)
+        {
+            m_gradientMagnitudes = std::make_shared<ImageData>();
+            m_gradientMagnitudes->allocate(IMSTK_DOUBLE, 2, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());
 
-        m_gradientMagnitudes = std::make_shared<ImageData>();
-        m_gradientMagnitudes->allocate(IMSTK_DOUBLE, 2, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());
+            /* m_curvatures = std::make_shared<ImageData>();
+             m_curvatures->allocate(IMSTK_DOUBLE, 1, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());*/
 
-        m_curvatures = std::make_shared<ImageData>();
-        m_curvatures->allocate(IMSTK_DOUBLE, 1, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());
+            m_velocities = std::make_shared<ImageData>();
+            m_velocities->allocate(IMSTK_DOUBLE, 1, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());
+        }
 
-        m_velocities = std::make_shared<ImageData>();
-        m_velocities->allocate(IMSTK_DOUBLE, 1, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());
-        //std::fill_n(static_cast<double*>(m_velocities->getScalars()->getVoidPointer()), m_velocities->get
+        const Vec3d actualSpacing = sdf->getImage()->getSpacing();// *sdf->getScale();
+        m_forwardGrad.setDx(Vec3i(1, 1, 1), actualSpacing);
+        m_backwardGrad.setDx(Vec3i(1, 1, 1), actualSpacing);
+        m_curvature.setDx(Vec3i(1, 1, 1), actualSpacing);
     }
-
-    m_forwardGrad.setDx(Vec3i(1, 1, 1), std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
-    m_backwardGrad.setDx(Vec3i(1, 1, 1), std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
-    /*forwardGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
-    backwardGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());*/
-    m_curvature.setDx(Vec3i(1, 1, 1), std::dynamic_pointer_cast<SignedDistanceField>(m_mesh)->getImage()->getSpacing());
 
     return true;
 }
@@ -115,7 +105,7 @@ LevelSetModel::evolve()
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
     double*      imgPtr    = static_cast<double*>(imageData->getVoidPointer());
     const Vec3i& dim       = imageData->getDimensions();
-    const double dt = m_config->m_dt;
+    const double dt = m_config->m_dt / m_config->m_substeps;
     //const double k  = m_config->m_k;
 
     if (m_config->m_sparseUpdate)
@@ -131,57 +121,58 @@ LevelSetModel::evolve()
         nodeUpdates.reserve(m_nodesToUpdate.size());
 
         // Compute gradients
-        for (std::unordered_map<size_t, std::tuple<Vec3i, double>>::iterator iter = m_nodesToUpdate.begin(); iter != m_nodesToUpdate.end(); iter++)
-        {
-            const size_t index  = iter->first;
-            const Vec3i& coords = std::get<0>(iter->second);
-            const double f      = std::get<1>(iter->second);
-
-            // Gradients
-            const Vec3d gradPos = m_forwardGrad(Vec3d(coords[0], coords[1], coords[2]));
-            const Vec3d gradNeg = m_backwardGrad(Vec3d(coords[0], coords[1], coords[2]));
-
-            const double posMag =
-                std::pow(std::max(gradNeg[0], 0.0), 2) + std::pow(std::min(gradPos[0], 0.0), 2) +
-                std::pow(std::max(gradNeg[1], 0.0), 2) + std::pow(std::min(gradPos[1], 0.0), 2) +
-                std::pow(std::max(gradNeg[2], 0.0), 2) + std::pow(std::min(gradPos[2], 0.0), 2);
-
-            const double negMag =
-                std::pow(std::min(gradNeg[0], 0.0), 2) + std::pow(std::max(gradPos[0], 0.0), 2) +
-                std::pow(std::min(gradNeg[1], 0.0), 2) + std::pow(std::max(gradPos[1], 0.0), 2) +
-                std::pow(std::min(gradNeg[2], 0.0), 2) + std::pow(std::max(gradPos[2], 0.0), 2);
-
-            // Curvature
-            //const double kappa = m_curvature(Vec3d(coords[0], coords[1], coords[2]));
-
-            nodeUpdates.push_back(std::tuple<size_t, Vec3i, double, Vec2d, double>(index, coords, f, Vec2d(negMag, posMag), 0.0));
-        }
-
-        // Update levelset
         const double constantVel = m_config->m_constantVelocity;
-        for (size_t i = 0; i < nodeUpdates.size(); i++)
+        for (int j = 0; j < m_config->m_substeps; j++)
         {
-            const size_t index = std::get<0>(nodeUpdates[i]);
-            //const Vec3i& coords = std::get<1>(nodeUpdates[i]);
-            const double vel = std::get<2>(nodeUpdates[i]) + constantVel;
-            const Vec2d& g   = std::get<3>(nodeUpdates[i]);
-            //const double kappa = std::get<4>(nodeUpdates[i]);
+            nodeUpdates.clear();
+            for (std::unordered_map<size_t, std::tuple<Vec3i, double>>::iterator iter = m_nodesToUpdate.begin(); iter != m_nodesToUpdate.end(); iter++)
+            {
+                const size_t index  = iter->first;
+                const Vec3i& coords = std::get<0>(iter->second);
+                const double f      = std::get<1>(iter->second);
 
-            // If speed function positive use forward difference (posMag)
-            if (vel > 0.0)
-            {
-                imgPtr[index] += dt * (vel * std::sqrt(g[0]) /*+ kappa*/);
+                // Gradients
+                const Vec3d gradPos = m_forwardGrad(Vec3d(coords[0], coords[1], coords[2]));
+                const Vec3d gradNeg = m_backwardGrad(Vec3d(coords[0], coords[1], coords[2]));
+
+                const double posMag =
+                    std::pow(std::max(gradNeg[0], 0.0), 2) + std::pow(std::min(gradPos[0], 0.0), 2) +
+                    std::pow(std::max(gradNeg[1], 0.0), 2) + std::pow(std::min(gradPos[1], 0.0), 2) +
+                    std::pow(std::max(gradNeg[2], 0.0), 2) + std::pow(std::min(gradPos[2], 0.0), 2);
+
+                const double negMag =
+                    std::pow(std::min(gradNeg[0], 0.0), 2) + std::pow(std::max(gradPos[0], 0.0), 2) +
+                    std::pow(std::min(gradNeg[1], 0.0), 2) + std::pow(std::max(gradPos[1], 0.0), 2) +
+                    std::pow(std::min(gradNeg[2], 0.0), 2) + std::pow(std::max(gradPos[2], 0.0), 2);
+
+                // Curvature
+                //const double kappa = m_curvature(Vec3d(coords[0], coords[1], coords[2]));
+
+                nodeUpdates.push_back(std::tuple<size_t, Vec3i, double, Vec2d, double>(index, coords, f, Vec2d(negMag, posMag), 0.0));
             }
-            // If speed function negative use backward difference (negMag)
-            else if (vel < 0.0)
+
+            // Update levelset
+            for (size_t i = 0; i < nodeUpdates.size(); i++)
             {
-                imgPtr[index] += dt * (vel * std::sqrt(g[1]) /*+ kappa * k*/);
+                const size_t index = std::get<0>(nodeUpdates[i]);
+                const double vel   = std::get<2>(nodeUpdates[i]) + constantVel;
+                const Vec2d& g     = std::get<3>(nodeUpdates[i]);
+                //const double kappa = std::get<4>(nodeUpdates[i]);
+
+                // If speed function positive use forward difference (posMag)
+                if (vel > 0.0)
+                {
+                    imgPtr[index] += dt * (vel * std::sqrt(g[0]) /*+ kappa * k*/);
+                }
+                // If speed function negative use backward difference (negMag)
+                else if (vel < 0.0)
+                {
+                    imgPtr[index] += dt * (vel * std::sqrt(g[1]) /*+ kappa * k*/);
+                }
             }
         }
-        if (m_nodesToUpdate.size() > 0)
-        {
-            m_nodesToUpdate.clear();
-        }
+
+        m_nodesToUpdate.clear();
     }
     else
     {
@@ -222,7 +213,6 @@ LevelSetModel::evolve()
                 }
             });
 
-        // Uniform advance
         const double constantVel = m_config->m_constantVelocity;
         ParallelUtils::parallelFor(dim[0] * dim[1] * dim[2],
             [&](const int& i)

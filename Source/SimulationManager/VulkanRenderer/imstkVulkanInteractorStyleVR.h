@@ -108,7 +108,7 @@ protected:
 
     vr::TrackedDevicePose_t m_devicePoses[16];
 
-    std::map<std::string, std::unique_ptr<VulkanVRDevice>> m_devices; ///< Key is unique ID
+    std::map<std::string, std::unique_ptr<VulkanVRDevice>> m_devices;   ///< Key is unique ID
 
     std::map<std::string, vr::RenderModel_t*> m_VRModels;
 

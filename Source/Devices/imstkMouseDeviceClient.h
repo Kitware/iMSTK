@@ -30,8 +30,6 @@ namespace imstk
 using MouseActionType = int;
 #define MOUSE_RELEASE 0
 #define MOUSE_PRESS 1
-#define MOUSE_SCROLL 2
-#define MOUSE_MOVE 3
 
 using MouseButtonType = int;
 #define LEFT_BUTTON 0
@@ -41,28 +39,24 @@ using MouseButtonType = int;
 class MouseEvent : public Event
 {
 public:
-    MouseEvent(const MouseActionType mouseActionType, const MouseButtonType buttonId) :
-        Event(EventType::MouseEvent, 1),
-        m_mouseActionType(mouseActionType), m_scrollDx(0.0), m_buttonId(buttonId)
+    MouseEvent(const std::string type, const MouseButtonType buttonId) :
+        Event(type), m_scrollDx(0.0), m_buttonId(buttonId)
     {
     }
 
-    MouseEvent(const MouseActionType mouseActionType, const double scrollDx) :
-        Event(EventType::MouseEvent, 1),
-        m_mouseActionType(mouseActionType), m_scrollDx(scrollDx), m_buttonId(0)
+    MouseEvent(std::string type, const double scrollDx) :
+        Event(type), m_scrollDx(scrollDx), m_buttonId(0)
     {
     }
 
-    MouseEvent(const MouseActionType mouseActionType) :
-        Event(EventType::MouseEvent, 1),
-        m_mouseActionType(mouseActionType), m_scrollDx(0.0), m_buttonId(0)
+    MouseEvent(std::string type) :
+        Event(type), m_scrollDx(0.0), m_buttonId(0)
     {
     }
 
-    virtual ~MouseEvent() override = default;
+    virtual ~MouseEvent() override= default;
 
 public:
-    MouseActionType m_mouseActionType;
     double m_scrollDx;          ///> Mouse scroll
     MouseButtonType m_buttonId; ///> Button id
 };
@@ -87,21 +81,42 @@ protected:
     static std::shared_ptr<MouseDeviceClient> New();
 
 public:
-    virtual ~MouseDeviceClient() override = default;
+    virtual ~MouseDeviceClient() override= default;
 
     // Only the viewer is allowed to provide these objects
     friend class VTKInteractorStyle;
 
 public:
     ///
+    /// \brief Posted when a button on the mouse is pressed (not continuously)
+    ///
+    SIGNAL(MouseDeviceClient,mouseButtonPress);
+
+    ///
+    /// \brief Posted when a button on the mouse is released (not continuously)
+    ///
+    SIGNAL(MouseDeviceClient,mouseButtonRelease);
+
+    ///
+    /// \brief Posted when mouse scrolls
+    ///
+    SIGNAL(MouseDeviceClient,mouseScroll);
+
+    ///
+    /// \brief Posted when mouse moves
+    ///
+    SIGNAL(MouseDeviceClient,mouseMove);
+
+public:
+    ///
     /// \brief Get the current position of the mouse
     ///
-    const Vec2d& getPos() const { return m_pos; }
+    const Vec2d& getPos() const{ return m_pos; }
 
     ///
     /// \brief Get the previous position of the mouse
     ///
-    const Vec2d& getPrevPos() const { return m_prevPos; }
+    const Vec2d& getPrevPos() const{ return m_prevPos; }
 
     ///
     /// \brief Query if the button is down
@@ -126,7 +141,7 @@ protected:
     {
         m_prevPos = m_pos;
         m_pos     = pos;
-        this->postEvent(MouseEvent(MOUSE_MOVE));
+        this->postEvent(MouseEvent(MouseDeviceClient::mouseMove()));
     }
 
     ///
@@ -135,7 +150,7 @@ protected:
     void emitButtonPress(const MouseButtonType buttonId)
     {
         m_buttons[buttonId] = MOUSE_PRESS;
-        this->postEvent(MouseEvent(MOUSE_PRESS, buttonId));
+        this->postEvent(MouseEvent(MouseDeviceClient::mouseButtonPress(),buttonId));
     }
 
     ///
@@ -144,13 +159,13 @@ protected:
     void emitButtonRelease(const MouseButtonType buttonId)
     {
         m_buttons[buttonId] = MOUSE_RELEASE;
-        this->postEvent(MouseEvent(MOUSE_RELEASE, buttonId));
+        this->postEvent(MouseEvent(MouseDeviceClient::mouseButtonRelease(),buttonId));
     }
 
     ///
     /// \brief Post a mouse scroll event
     ///
-    void emitScroll(const double dx) { this->postEvent(MouseEvent(MOUSE_SCROLL, dx)); }
+    void emitScroll(const double dx) { this->postEvent(MouseEvent(MouseDeviceClient::mouseScroll(),dx)); }
 
 protected:
     Vec2d m_prevPos;

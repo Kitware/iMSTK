@@ -281,7 +281,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
-        connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+        connect<Event>(sceneManager, &SceneManager::postUpdate, updateFunc);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

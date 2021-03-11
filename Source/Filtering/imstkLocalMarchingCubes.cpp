@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+          http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -459,7 +459,7 @@ mcSubImage(std::shared_ptr<ImageData> imageData, std::shared_ptr<SurfaceMesh> ou
                 }
 
                 // Generate the vertices
-                int cubeIndices[12] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };                 // Map of local cube indices -> global vertex indices
+                int cubeIndices[12] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 };                                       // Map of local cube indices -> global vertex indices
                 {
                     const Vec3d min = Vec3d(x1, y1, z1).cwiseProduct(spacing);
                     const Vec3d max = Vec3d(x2, y2, z2).cwiseProduct(spacing);
@@ -717,7 +717,7 @@ LocalMarchingCubes::requestUpdate()
             std::shared_ptr<SurfaceMesh> outputSurf = std::dynamic_pointer_cast<SurfaceMesh>(getOutput(i.first));
             const Vec3i                  coordStart = chunkCoord.cwiseProduct(chunkDimensions);
             mcSubImage(imageData, outputSurf, coordStart, coordStart + chunkDimensions, m_isoValue);
-            outputSurf->modified();
+            outputSurf->postModified();
         }
         m_modifiedVoxels.clear();
     }

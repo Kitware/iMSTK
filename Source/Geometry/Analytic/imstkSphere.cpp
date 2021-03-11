@@ -56,7 +56,7 @@ Sphere::setRadius(const double r)
     }
     m_radius = r;
     m_transformApplied = false;
-    postEvent(Event(EventType::Modified));
+    this->postModified();
 }
 
 void

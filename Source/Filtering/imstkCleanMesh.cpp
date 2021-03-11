@@ -9,7 +9,7 @@
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-	  http://www.apache.org/licenses/LICENSE-2.0.txt
+          http://www.apache.org/licenses/LICENSE-2.0.txt
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
@@ -58,13 +58,13 @@ CleanMesh::requestUpdate()
         return;
     }
     vtkSmartPointer<vtkPolyData> inputMeshVtk = nullptr;
-    if (inputMesh->getType() == Geometry::Type::LineMesh)
+    if (auto lineMesh = std::dynamic_pointer_cast<LineMesh>(inputMesh))
     {
-        inputMeshVtk = GeometryUtils::copyToVtkPolyData(std::dynamic_pointer_cast<LineMesh>(inputMesh));
+        inputMeshVtk = GeometryUtils::copyToVtkPolyData(lineMesh);
     }
-    else if (inputMesh->getType() == Geometry::Type::SurfaceMesh)
+    else if (auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(inputMesh))
     {
-        inputMeshVtk = GeometryUtils::copyToVtkPolyData(std::dynamic_pointer_cast<SurfaceMesh>(inputMesh));
+        inputMeshVtk = GeometryUtils::copyToVtkPolyData(surfMesh);
     }
     else
     {
@@ -79,11 +79,11 @@ CleanMesh::requestUpdate()
     filter->SetToleranceIsAbsolute(m_UseAbsolute);
     filter->Update();
 
-    if (inputMesh->getType() == Geometry::Type::LineMesh)
+    if (std::dynamic_pointer_cast<LineMesh>(inputMesh) != nullptr)
     {
         setOutput(GeometryUtils::copyToLineMesh(filter->GetOutput()));
     }
-    else if (inputMesh->getType() == Geometry::Type::SurfaceMesh)
+    else if (std::dynamic_pointer_cast<SurfaceMesh>(inputMesh) != nullptr)
     {
         setOutput(GeometryUtils::copyToSurfaceMesh(filter->GetOutput()));
     }

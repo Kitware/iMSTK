@@ -117,10 +117,10 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
-    queueConnect<Event>(m_geometry, EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::geometryModified);
+    queueConnect<Event>(m_geometry, &Geometry::modified, this, &VTKSurfaceMeshRenderDelegate::geometryModified);
 
     // When the vertex buffer internals are modified, ie: a single or N elements
-    queueConnect<Event>(m_geometry->getVertexPositions(), EventType::Modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+    queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
 
     // When the index buffer internals are modified,
 
@@ -221,8 +221,6 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
 
-    //bool vertexOrIndexBufferChanged = false;
-
     // If the vertices were reallocated
     if (m_vertices != geometry->getVertexPositions())
     {
@@ -234,7 +232,6 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
             m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
         }
         m_polydata->GetPoints()->SetNumberOfPoints(m_vertices->size());
-        //vertexOrIndexBufferChanged = true;
     }
 
     // Notify VTK that the vertices were changed

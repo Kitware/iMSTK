@@ -22,11 +22,11 @@ limitations under the License.
 #include "imstkRigidObjectCollisionPair.h"
 #include "imstkCDObjectFactory.h"
 #include "imstkCollisionData.h"
+#include "imstkPointSet.h"
 #include "imstkRigidBodyCH.h"
+#include "imstkRigidBodyModel2.h"
 #include "imstkRigidObject2.h"
 #include "imstkTaskGraph.h"
-#include "imstkRigidBodyModel2.h"
-#include "imstkLogger.h"
 
 namespace imstk
 {
@@ -73,6 +73,82 @@ RigidObjectCollisionPair::RigidObjectCollisionPair(std::shared_ptr<RigidObject2>
     }
     auto ch = std::make_shared<RigidBodyCH>(side, m_colData, obj1, obj2);
     setCollisionHandlingAB(ch);
+}
+
+void
+RigidObjectCollisionPair::apply()
+{
+    CollisionPair::apply();
+
+    auto                             obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    std::shared_ptr<RigidBodyModel2> rbdModel = obj1->getRigidBodyModel2();
+    std::shared_ptr<PointSet>        pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
+    const bool                       measureDisplacements = (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"));
+
+    // The tentative body is never actually computed, it should be good to catch the contact
+    // in the next frame
+    if (measureDisplacements)
+    {
+        // 1.) Copy the vertices at the start of the frame
+        obj1->getTaskGraph()->insertBefore(obj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode(),
+            std::make_shared<TaskNode>([ = ]()
+                {
+                    copyVertsToPrevious();
+                }, "CopyVertsToPrevious"));
+
+        // If you were to update to tentative, you'd do it here, then compute displacements
+
+        // 2.) Compute the displacements after updating geometry
+        obj1->getTaskGraph()->insertAfter(obj1->getUpdateGeometryNode(),
+            std::make_shared<TaskNode>([ = ]()
+                {
+                    measureDisplacementFromPrevious();
+                }, "ComputeDisplacements"));
+    }
+}
+
+void
+RigidObjectCollisionPair::copyVertsToPrevious()
+{
+    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
+
+    if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
+    {
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr  = pointSet->getVertexPositions();
+        VecDataArray<double, 3>&                 vertices     = *verticesPtr;
+        VecDataArray<double, 3>&                 prevVertices = *m_prevVertices;
+
+        if (prevVertices.size() != vertices.size())
+        {
+            prevVertices.resize(vertices.size());
+        }
+        std::copy_n(vertices.getPointer(), vertices.size(), prevVertices.getPointer());
+    }
+}
+
+void
+RigidObjectCollisionPair::measureDisplacementFromPrevious()
+{
+    auto                      obj1     = std::dynamic_pointer_cast<RigidObject2>(m_objects.first);
+    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(obj1->getPhysicsGeometry());
+
+    if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
+    {
+        std::shared_ptr<VecDataArray<double, 3>> displacements =
+            std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSet->getVertexAttribute("displacements"));
+        VecDataArray<double, 3>& displacementsArr = *displacements;
+
+        std::shared_ptr<VecDataArray<double, 3>> verticesPtr  = pointSet->getVertexPositions();
+        VecDataArray<double, 3>&                 vertices     = *verticesPtr;
+        VecDataArray<double, 3>&                 prevVertices = *m_prevVertices;
+
+        ParallelUtils::parallelFor(displacements->size(),
+            [&](const int i)
+                {
+                    displacementsArr[i] = vertices[i] - prevVertices[i];
+            });
+    }
 }
 }
 }

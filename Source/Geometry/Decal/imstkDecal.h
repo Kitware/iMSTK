@@ -30,6 +30,14 @@ class Decal : public AnalyticalGeometry
 public:
     Decal(const std::string& name = std::string(""));
 
+    virtual ~Decal() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "Decal"; }
+
+public:
     ///
     /// \brief Print the cube info
     ///
@@ -50,7 +58,6 @@ protected:
 
     // Hide these functions
     using AnalyticalGeometry::getFunctionValue;
-    //using AnalyticalGeometry::getFunctionGrad;
 
     void applyTransform(const Mat4d& m) override;
 

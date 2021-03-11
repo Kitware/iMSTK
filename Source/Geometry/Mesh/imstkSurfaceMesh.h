@@ -83,6 +83,17 @@ public:
     SurfaceMesh(const std::string& name = std::string(""));
 
     ///
+    /// \brief Deconstructor
+    ///
+    virtual ~SurfaceMesh() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "SurfaceMesh"; }
+
+public:
+    ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  triangle connectivity
     ///
@@ -167,6 +178,11 @@ public:
     /// \todo: generalize base classes and implement for every geometry
     ///
     void deepCopy(std::shared_ptr<SurfaceMesh> srcMesh);
+
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    bool isMesh() const override { return true; }
 
 // Accessors
 public:

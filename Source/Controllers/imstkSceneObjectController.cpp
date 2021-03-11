@@ -56,13 +56,13 @@ SceneObjectController::update(const double dt)
         return;
     }
 
-    this->postEvent(Event(EventType::Modified));
+    this->postEvent(Event(SceneObjectController::modified()));
 
     // Update geometry
     // \todo revisit this; what if we need to move a group of objects
     m_sceneObject->getMasterGeometry()->setTranslation(getPosition());
     m_sceneObject->getMasterGeometry()->setRotation(getRotation());
-    m_sceneObject->getMasterGeometry()->modified();
+    m_sceneObject->getMasterGeometry()->postModified();
 }
 
 void

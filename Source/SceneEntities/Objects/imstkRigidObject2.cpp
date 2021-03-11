@@ -23,9 +23,6 @@
 #include "imstkLogger.h"
 #include "imstkRbdConstraint.h"
 #include "imstkRigidBodyModel2.h"
-#include "imstkPointSet.h"
-#include "imstkVecDataArray.h"
-#include "imstkParallelFor.h"
 
 namespace imstk
 {
@@ -68,28 +65,6 @@ RigidObject2::setDynamicalModel(std::shared_ptr<AbstractDynamicalModel> dynaMode
 void
 RigidObject2::updatePhysicsGeometry()
 {
-    // Record displacements (useful for CCD)
-    std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(m_physicsGeometry);
-    if (pointSet != nullptr && pointSet->hasVertexAttribute("displacements"))
-    {
-        const Vec3d& linearVelocity  = m_rigidBody->getVelocity();
-        const Vec3d& angularVelocity = m_rigidBody->getAngularVelocity();
-
-        std::shared_ptr<VecDataArray<double, 3>> displacements =
-            std::dynamic_pointer_cast<VecDataArray<double, 3>>(pointSet->getVertexAttribute("displacements"));
-        VecDataArray<double, 3>& displacementsArr = *displacements;
-
-        ParallelUtils::parallelFor(displacements->size(), [&](const int i)
-                {
-                    const Vec3d diff         = pointSet->getVertexPosition(i) - m_rigidBody->getPosition();
-                    const Vec3d velocity     = linearVelocity + angularVelocity.cross(diff);
-                    const Vec3d displacement = velocity * m_rigidBodyModel2->getConfig()->m_dt;
-                    displacementsArr[i][0]   = displacement[0];
-                    displacementsArr[i][1]   = displacement[1];
-                    displacementsArr[i][2]   = displacement[2];
-            });
-    }
-
     // Apply the transform back to the geometry
     m_physicsGeometry->setTranslation(m_rigidBody->getPosition());
     m_physicsGeometry->setRotation(m_rigidBody->getOrientation());

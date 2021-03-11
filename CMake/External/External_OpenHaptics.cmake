@@ -3,6 +3,13 @@ if(NOT WIN32)
   return()
 endif()
 
+if(NOT DEFINED OPENHAPTICS_ROOT_DIR OR NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
+  set(OPENHAPTICS_ROOT_DIR "$ENV{OH_SDK_BASE}" CACHE PATH "Path to OpenHaptics install directory." FORCE)
+endif()
+if(NOT EXISTS ${OPENHAPTICS_ROOT_DIR})
+  message(FATAL_ERROR "\nCan not support Phantom Omni without OpenHaptics.\nSet OPENHAPTICS_ROOT_DIR to OpenHaptics installation directory.\n\n")
+endif()
+
 #-----------------------------------------------------------------------------
 # Set install commands
 #-----------------------------------------------------------------------------

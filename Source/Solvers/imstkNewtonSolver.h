@@ -83,7 +83,7 @@ public:
     /// \brief Get LinearSolver
     ///
     // std::shared_ptr<LinearSolverType> getLinearSolver() const;
-    auto getLinearSolver() const -> std::shared_ptr<LinearSolverType>;
+    auto getLinearSolver() const->std::shared_ptr<LinearSolverType>;
 
     ///
     /// \brief Update jacobians

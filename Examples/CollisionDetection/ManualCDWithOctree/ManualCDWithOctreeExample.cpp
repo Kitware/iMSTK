@@ -353,7 +353,7 @@ main()
                           const auto numTotalNodes  = octreeCD.getNumAllocatedNodes();
                           const auto numPrimitives  = octreeCD.getPrimitiveCount(OctreePrimitiveType::Point) +
                                                       octreeCD.getPrimitiveCount(OctreePrimitiveType::Triangle) +
-                                                      octreeCD.getPrimitiveCount(OctreePrimitiveType::AnalyticalGeometry);
+                                                      octreeCD.getPrimitiveCount(OctreePrimitiveType::Analytical);
                           const auto maxNumPrimitivesInTree = octreeCD.getMaxNumPrimitivesInNodes();
 
                           // Clear collision debug rendering
@@ -472,7 +472,7 @@ main()
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
         sceneManager->pause();
-        connect<Event>(sceneManager, EventType::PostUpdate, updateFunc);
+        connect<Event>(sceneManager, &SceneManager::postUpdate, updateFunc);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
@@ -490,10 +490,10 @@ main()
             viewer->addControl(keyControl);
 
             // Add an extra control
-            connect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent,
+            connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
                 [&](KeyEvent* e)
             {
-                if (e->m_key == 'b' && e->m_keyPressType == KEY_PRESS)
+                if (e->m_key == 'b')
                 {
                     for (auto& dir : dirs)
                     {

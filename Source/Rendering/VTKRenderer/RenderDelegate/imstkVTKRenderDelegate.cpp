@@ -21,8 +21,8 @@
 
 #include "imstkVTKRenderDelegate.h"
 #include "imstkDebugRenderGeometry.h"
-#include "imstkGeometry.h"
 #include "imstkLogger.h"
+#include "imstkPointSet.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 
@@ -62,76 +62,71 @@ VTKRenderDelegate::VTKRenderDelegate(std::shared_ptr<VisualModel> visualModel) :
     m_material(visualModel->getRenderMaterial())
 {
     // When render material is modified call materialModified -> updateRenderProperties()
-    queueConnect<Event>(m_material, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+    queueConnect<Event>(m_material, &RenderMaterial::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
 
     // When the visual model is modified call visualModelModified
-    queueConnect<Event>(m_visualModel, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::visualModelModified);
+    queueConnect<Event>(m_visualModel, &VisualModel::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::visualModelModified);
 }
 
 std::shared_ptr<VTKRenderDelegate>
 VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
-    if (visualModel->getGeometry()->isMesh())
+    const std::string geomType = visualModel->getGeometry()->getTypeName();
+
+    if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
     {
-        if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
+        if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
         {
             return std::make_shared<VTKFluidRenderDelegate>(visualModel);
         }
+    }
 
-        switch (visualModel->getGeometry()->getType())
-        {
-        case Geometry::Type::PointSet:
+    if (visualModel->getGeometry()->isMesh())
+    {
+        if (geomType == "PointSet")
         {
             return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
         }
-        case Geometry::Type::SurfaceMesh:
+        else if (geomType == "SurfaceMesh")
         {
             return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
         }
-        case Geometry::Type::TetrahedralMesh:
+        else if (geomType == "TetrahedralMesh")
         {
             return std::make_shared<VTKTetrahedralMeshRenderDelegate>(visualModel);
         }
-        case Geometry::Type::LineMesh:
+        else if (geomType == "LineMesh")
         {
             return std::make_shared<VTKLineMeshRenderDelegate>(visualModel);
         }
-        case Geometry::Type::HexahedralMesh:
+        else if (geomType == "HexahedralMesh")
         {
             return std::make_shared<VTKHexahedralMeshRenderDelegate>(visualModel);
-        }
-        default:
-        {
-            LOG(FATAL) << "RenderDelegate::makeDelegate error: Mesh type incorrect.";
-            return nullptr;     // will never be reached
-        }
         }
     }
     else
     {
-        switch (visualModel->getGeometry()->getType())
-        {
-        case Geometry::Type::Plane:
+        if (geomType == "Plane")
         {
             return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
         }
-        case Geometry::Type::Sphere:
+        else if (geomType == "Sphere")
         {
             return std::make_shared<VTKSphereRenderDelegate>(visualModel);
         }
-        case Geometry::Type::Capsule:
+        else if (geomType == "Capsule")
         {
             return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
         }
-        case Geometry::Type::Cube:
+        else if (geomType == "Cube")
         {
             return std::make_shared<VTKCubeRenderDelegate>(visualModel);
         }
-        case Geometry::Type::Cylinder:
+        else if (geomType == "Cylinder")
         {
             return std::make_shared<VTKCylinderRenderDelegate>(visualModel);
         }
-        case Geometry::Type::ImageData:
+        else if (geomType == "ImageData")
         {
             if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Points)
             {
@@ -142,13 +137,9 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
                 return std::make_shared<VTKImageDataRenderDelegate>(visualModel);
             }
         }
-        default:
-        {
-            LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
-            return nullptr;     // will never be reached
-        }
-        }
     }
+    LOG(FATAL) << "RenderDelegate::makeDelegate error: Geometry type incorrect.";
+    return nullptr;
 }
 
 std::shared_ptr<VTKRenderDelegate>
@@ -215,12 +206,12 @@ void
 VTKRenderDelegate::visualModelModified(Event* imstkNotUsed(e))
 {
     // Remove all modified's from the old material
-    disconnect(m_material, this, EventType::Modified);
+    disconnect(m_material, this, &RenderMaterial::modified);
 
     m_material = m_visualModel->getRenderMaterial(); // Update handle
 
     // Recieve events from new material
-    queueConnect<Event>(m_material, EventType::Modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
+    queueConnect<Event>(m_material, &RenderMaterial::modified, static_cast<VTKRenderDelegate*>(this), &VTKRenderDelegate::materialModified);
 
     // Update our render properties
     updateRenderProperties();

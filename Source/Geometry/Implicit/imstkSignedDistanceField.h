@@ -40,10 +40,21 @@ class SignedDistanceField : public ImplicitGeometry
 {
 public:
     ///
-    /// \brief Initialize with an image data SDF
+    /// \brief Constructor
+    /// \param ImageData to utilize
+    /// \param geometry name
     ///
     SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name = "");
+
+    ///
+    /// \brief Deconstructor
+    ///
     virtual ~SignedDistanceField() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "SignedDistanceField"; }
 
 public:
     ///

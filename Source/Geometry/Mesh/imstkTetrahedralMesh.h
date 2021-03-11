@@ -22,6 +22,7 @@
 #pragma once
 
 #include "imstkVolumetricMesh.h"
+
 #include <array>
 
 namespace imstk
@@ -44,6 +45,17 @@ public:
     ///
     TetrahedralMesh(const std::string& name = std::string(""));
 
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~TetrahedralMesh() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "TetrahedralMesh"; }
+
+public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  tetrahedra connectivity
@@ -85,6 +97,11 @@ public:
     /// \brief Compute the bounding box of a given tetrahedron
     ///
     void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
+
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    bool isMesh() const override { return true; }
 
 // Accessors
 public:

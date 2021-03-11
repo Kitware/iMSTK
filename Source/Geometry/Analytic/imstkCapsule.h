@@ -36,9 +36,17 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const std::string& name = std::string("defaultCapsule")) : AnalyticalGeometry(Type::Capsule, name) {}
+    Capsule(const std::string& name = std::string("defaultCapsule")) : AnalyticalGeometry(name) { }
 
-    ~Capsule() override = default;
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~Capsule() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "Capsule"; }
 
 public:
     ///

@@ -45,10 +45,10 @@ VTKImageDataRenderDelegate::VTKImageDataRenderDelegate(std::shared_ptr<VisualMod
     imageDataVtk = GeometryUtils::coupleVtkImageData(imageData);
 
     // When the image is modified
-    queueConnect<Event>(imageData, EventType::Modified, this, &VTKImageDataRenderDelegate::imageDataModified);
+    queueConnect<Event>(imageData, &ImageData::modified, this, &VTKImageDataRenderDelegate::imageDataModified);
 
     // When the image scalars are modified
-    queueConnect<Event>(imageData->getScalars(), EventType::Modified, this, &VTKImageDataRenderDelegate::imageScalarsModified);
+    queueConnect<Event>(imageData->getScalars(), &AbstractDataArray::modified, this, &VTKImageDataRenderDelegate::imageScalarsModified);
 
     // Setup mapper
     {

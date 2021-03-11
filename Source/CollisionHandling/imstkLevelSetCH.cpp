@@ -87,7 +87,7 @@ void
 LevelSetCH::processCollisionData()
 {
     std::shared_ptr<LevelSetModel> lvlSetModel = m_lvlSetObj->getLevelSetModel();
-    std::shared_ptr<ImageData>     grid = std::dynamic_pointer_cast<ImageData>(lvlSetModel->getModelGeometry());
+    std::shared_ptr<ImageData>     grid = std::dynamic_pointer_cast<SignedDistanceField>(lvlSetModel->getModelGeometry())->getImage();
 
     if (grid == nullptr)
     {
@@ -103,7 +103,7 @@ LevelSetCH::processCollisionData()
     {
         // Apply impulses at points of contacts
         PositionDirectionCollisionData& pdColData = m_colData->PDColData;
-        for (int i = 0; i < pdColData.getSize(); i++)
+        for (size_t i = 0; i < pdColData.getSize(); i++)
         {
             // If the point is in the mask, let it apply impulses
             if (m_ptIdMask.count(pdColData[i].nodeIdx) != 0)

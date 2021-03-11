@@ -68,11 +68,13 @@ public:
     /// \brief Constructor
     ///
     ReducedStVK();
+
     ///
     /// \brief Destructor
     ///
-    ~ReducedStVK();
+    virtual ~ReducedStVK() override;
 
+public:
     ///
     /// \brief Configure the force model from external file
     ///
@@ -190,7 +192,7 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType) override;
+    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType);
     void updateBodyIntermediateStates(const Vectord& solution, const StateUpdateType updateType);
 
     ///
@@ -328,7 +330,7 @@ protected:
     Matrixd m_C;    ///> Damping coefficient matrix
     Matrixd m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
     Matrixd m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time
-                    /// integrator)
+    /// integrator)
 
     // full-space vectors
     Vectord m_Fcontact;          ///> Vector of contact forces

@@ -44,11 +44,20 @@ namespace imstk
 {
 namespace apiutils
 {
+std::unordered_map<std::string, std::function<std::shared_ptr<Geometry>()>> geomMakeFunctions =
+{
+    { "Sphere", []() { return std::make_shared<Sphere>(); } },
+    { "Plane", []() { return std::make_shared<Sphere>(); } },
+    { "Cube", []() { return std::make_shared<Sphere>(); } },
+    { "Capsule", []() { return std::make_shared<Sphere>(); } },
+    { "Cylinder", []() { return std::make_shared<Sphere>(); } }
+};
+
 ///
 /// \brief Create a analytical visual scene object that and add it to the scene
 ///
 std::shared_ptr<SceneObject>
-createVisualAnalyticalSceneObject(Geometry::Type         type,
+createVisualAnalyticalSceneObject(std::string            type,
                                   std::shared_ptr<Scene> scene,
                                   const std::string&     objName,
                                   const Vec3d            scale /* = 1.*/,
@@ -57,33 +66,12 @@ createVisualAnalyticalSceneObject(Geometry::Type         type,
     CHECK(scene != nullptr) << "createVisualAnalyticalSceneObject: Scene is not valid!";
     CHECK(!objName.empty()) << "createVisualAnalyticalSceneObject: Name is empty!";
 
-    std::shared_ptr<Geometry> geom;
-    switch (type)
+    if (geomMakeFunctions.count(type) == 0)
     {
-    case Geometry::Type::Sphere:
-        geom = std::make_shared<Sphere>();
-        break;
-
-    case Geometry::Type::Plane:
-        geom = std::make_shared<Plane>();
-        break;
-
-    case Geometry::Type::Cube:
-        geom = std::make_shared<Cube>();
-        break;
-
-    case Geometry::Type::Capsule:
-        geom = std::make_shared<Capsule>();
-        break;
-
-    case Geometry::Type::ImageData:
-        geom = std::make_shared<ImageData>();
-        break;
-
-    default:
         LOG(WARNING) << "createVisualAnalyticalSceneObject: Scene object geometry type is not analytical!";
         return nullptr;
     }
+    std::shared_ptr<Geometry> geom = geomMakeFunctions[type]();
 
     geom->scale(scale, Geometry::TransformType::ApplyToData);
     geom->translate(t, Geometry::TransformType::ApplyToData);
@@ -99,7 +87,7 @@ createVisualAnalyticalSceneObject(Geometry::Type         type,
 /// \brief Create a analytical colliding scene object that and add it to the scene
 ///
 std::shared_ptr<CollidingObject>
-createCollidingAnalyticalSceneObject(Geometry::Type         type,
+createCollidingAnalyticalSceneObject(std::string            type,
                                      std::shared_ptr<Scene> scene,
                                      const std::string&     objName,
                                      const Vec3d            scale /*= 1.*/,
@@ -108,25 +96,12 @@ createCollidingAnalyticalSceneObject(Geometry::Type         type,
     CHECK(scene != nullptr) << "createCollidingSphereSceneObject: Scene is not valid!";
     CHECK(!objName.empty()) << "createCollidingAnalyticalSceneObject: Name is empty!";
 
-    std::shared_ptr<Geometry> geom;
-    switch (type)
+    if (geomMakeFunctions.count(type) == 0)
     {
-    case Geometry::Type::Sphere:
-        geom = std::make_shared<Sphere>();
-        break;
-
-    case Geometry::Type::Plane:
-        geom = std::make_shared<Plane>();
-        break;
-
-    case Geometry::Type::Cube:
-        geom = std::make_shared<Cube>();
-        break;
-
-    default:
         LOG(WARNING) << "createCollidingAnalyticalSceneObject: Scene object geometry type is not analytical!";
         return nullptr;
     }
+    std::shared_ptr<Geometry> geom = geomMakeFunctions[type]();
 
     geom->scale(scale, Geometry::TransformType::ApplyToData);
     geom->translate(t, Geometry::TransformType::ApplyToData);

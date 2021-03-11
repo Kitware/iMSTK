@@ -45,17 +45,17 @@ PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics)
     m_parameters(std::make_shared<PBDModelConfig>())
 {
     m_validGeometryTypes = {
-        Geometry::Type::PointSet,
-        Geometry::Type::LineMesh,
-        Geometry::Type::SurfaceMesh,
-        Geometry::Type::TetrahedralMesh,
-        Geometry::Type::HexahedralMesh
+        "PointSet",
+        "LineMesh",
+        "SurfaceMesh",
+        "TetrahedralMesh",
+        "HexahedralMesh"
     };
 
     // Setup PBD compute nodes
     m_integrationPositionNode     = m_taskGraph->addFunction("PbdModel_IntegratePosition", std::bind(&PbdModel::integratePosition, this));
     m_updateCollisionGeometryNode = m_taskGraph->addFunction("PbdModel_UpdateCollisionGeometry", std::bind(&PbdModel::updatePhysicsGeometry, this));
-    m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); });    // Avoids rebinding on solver swap
+    m_solveConstraintsNode = m_taskGraph->addFunction("PbdModel_SolveConstraints", [&]() { m_pbdSolver->solve(); });      // Avoids rebinding on solver swap
     m_updateVelocityNode   = m_taskGraph->addFunction("PbdModel_UpdateVelocity", std::bind(&PbdModel::updateVelocity, this));
 }
 
@@ -298,7 +298,7 @@ bool
 PbdModel::initializeFEMConstraints(PbdFEMConstraint::MaterialType type)
 {
     // Check if constraint type matches the mesh type
-    CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh)
+    CHECK(m_mesh->getTypeName() == "TetrahedralMesh")
         << "FEM Tetrahedral constraint should come with tetrahedral mesh";
 
     // Create constraints
@@ -324,7 +324,8 @@ bool
 PbdModel::initializeVolumeConstraints(const double stiffness)
 {
     // Check if constraint type matches the mesh type
-    CHECK(m_mesh->getType() == Geometry::Type::TetrahedralMesh) << "Volume constraint should come with volumetric mesh";
+    CHECK(m_mesh->getTypeName() == "TetrahedralMesh")
+        << "Volume constraint should come with volumetric mesh";
 
     // Create constraints
     const auto&                 tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
@@ -364,7 +365,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             }
         };
 
-    if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
+    if (m_mesh->getTypeName() == "TetrahedralMesh")
     {
         const auto&                    tetMesh  = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
         const VecDataArray<int, 4>&    elements = *tetMesh->getTetrahedraIndices();
@@ -382,7 +383,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             addConstraint(E, tet[2], tet[3]);
         }
     }
-    else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
+    else if (m_mesh->getTypeName() == "SurfaceMesh")
     {
         const auto&                    triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
         const VecDataArray<int, 3>&    elements = *triMesh->getTriangleIndices();
@@ -397,7 +398,7 @@ PbdModel::initializeDistanceConstraints(const double stiffness)
             addConstraint(E, tri[1], tri[2]);
         }
     }
-    else if (m_mesh->getType() == Geometry::Type::LineMesh)
+    else if (m_mesh->getTypeName() == "LineMesh")
     {
         const auto&                    lineMesh = std::static_pointer_cast<LineMesh>(m_mesh);
         const VecDataArray<int, 2>&    elements = *lineMesh->getLinesIndices();
@@ -418,7 +419,7 @@ bool
 PbdModel::initializeAreaConstraints(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh)
+    CHECK(m_mesh->getTypeName() == "SurfaceMesh")
         << "Area constraint should come with a triangular mesh";
 
     // ok, now create constraints
@@ -442,7 +443,8 @@ PbdModel::initializeAreaConstraints(const double stiffness)
 bool
 PbdModel::initializeBendConstraints(const double stiffness)
 {
-    CHECK(m_mesh->getType() == Geometry::Type::LineMesh) << "Bend constraint should come with a line mesh";
+    CHECK(m_mesh->getTypeName() == "LineMesh")
+        << "Bend constraint should come with a line mesh";
 
     auto addConstraint =
         [&](const double k, size_t i1, size_t i2, size_t i3)
@@ -485,7 +487,8 @@ PbdModel::initializeBendConstraints(const double stiffness)
 bool
 PbdModel::initializeDihedralConstraints(const double stiffness)
 {
-    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh) << "Dihedral constraint should come with a triangular mesh";
+    CHECK(m_mesh->getTypeName() == "SurfaceMesh")
+        << "Dihedral constraint should come with a triangular mesh";
 
     // Create constraints
     const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
@@ -560,11 +563,7 @@ bool
 PbdModel::initializeConstantDensityConstraint(const double stiffness)
 {
     // check if constraint type matches the mesh type
-    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh
-        || m_mesh->getType() == Geometry::Type::TetrahedralMesh
-        || m_mesh->getType() == Geometry::Type::LineMesh
-        || m_mesh->getType() == Geometry::Type::HexahedralMesh
-        || m_mesh->getType() == Geometry::Type::PointSet)
+    CHECK(std::dynamic_pointer_cast<PointSet>(m_mesh) != nullptr)
         << "Constant constraint should come with a mesh!";
 
     auto c = std::make_shared<PbdConstantDensityConstraint>();

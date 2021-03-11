@@ -177,12 +177,6 @@ TEST(imstkVecDataArrayTest, Iterators)
     }
 }
 
-TEST(imstkVecDataArrayTest, ConstructorCast)
-{
-    VecDataArray<long, 2> a{ Vec2i(1, 2), Vec2i(3, 4) };
-    EXPECT_EQ(Vec2i(1, 2), a[0].cast<int>());
-}
-
 TEST(imstkVecDataArrayTest, Erase)
 {
     VecDataArray<int, 2> a{ Vec2i(1, 1), Vec2i(2, 2), Vec2i(3, 3), Vec2i(4, 4) };

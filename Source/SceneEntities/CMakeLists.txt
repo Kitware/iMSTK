@@ -2,7 +2,7 @@
 # Create target
 #-----------------------------------------------------------------------------
 
-if (NOT ${${PROJECT_NAME}_USE_MODEL_REDUCTION})
+if (NOT iMSTK_USE_MODEL_REDUCTION)
   list(APPEND ExclusionFiles
     Objects/imstkReducedFeDeformableObject.h
     Objects/imstkReducedFeDeformableObject.cpp)

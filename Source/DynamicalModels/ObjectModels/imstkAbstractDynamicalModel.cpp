@@ -42,7 +42,7 @@ AbstractDynamicalModel::isGeometryValid(const std::shared_ptr<Geometry> geometry
         }
 
         // If it exists in the set then it is valid geometry
-        if (m_validGeometryTypes.count(geometry->getType()))
+        if (m_validGeometryTypes.count(geometry->getTypeName()))
         {
             return true;
         }

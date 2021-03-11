@@ -24,7 +24,7 @@
 
 namespace imstk
 {
-Decal::Decal(const std::string& name) : AnalyticalGeometry(Geometry::Type::Decal, name),
+Decal::Decal(const std::string& name) : AnalyticalGeometry(name),
     m_dimensions(Vec3d(1.0, 1.0, 1.0))
 {
 }

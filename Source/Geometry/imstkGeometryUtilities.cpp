@@ -20,22 +20,17 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
-#include "imstkVecDataArray.h"
+#include "imstkCube.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkImageData.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
 #include "imstkParallelUtils.h"
+#include "imstkPlane.h"
+#include "imstkSphere.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
-#include "imstkCube.h"
-#include "imstkSphere.h"
-#include "imstkPlane.h"
 
-#include "imstkMacros.h"
-#include "imstkTypes.h"
-
-#include <vtkAppendPolyData.h>
 #include <vtkCellData.h>
 #include <vtkCharArray.h>
 #include <vtkCleanPolyData.h>
@@ -729,7 +724,10 @@ GeometryUtils::toCubeSurfaceMesh(std::shared_ptr<Cube> cube)
     vtkNew<vtkTriangleFilter> triangulate;
     triangulate->SetInputData(transformCube->GetOutput());
     triangulate->Update();
-    return copyToSurfaceMesh(triangulate->GetOutput());
+    vtkNew<vtkCleanPolyData> cleanData;
+    cleanData->SetInputData(triangulate->GetOutput());
+    cleanData->Update();
+    return copyToSurfaceMesh(cleanData->GetOutput());
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -743,7 +741,21 @@ GeometryUtils::toUVSphereSurfaceMesh(std::shared_ptr<Sphere> sphere,
     sphereSource->SetThetaResolution(thetaDivisions);
     sphereSource->Update();
 
-    return copyToSurfaceMesh(sphereSource->GetOutput());
+    vtkNew<vtkTransform> transform;
+    transform->SetMatrix(mat4dTranslate(sphere->getPosition()).data());
+
+    vtkNew<vtkTransformFilter> transformFilter;
+    transformFilter->SetInputData(sphereSource->GetOutput());
+    transformFilter->SetTransform(transform);
+    transformFilter->Update();
+    vtkNew<vtkTriangleFilter> triangulate;
+    triangulate->SetInputData(transformFilter->GetOutput());
+    triangulate->Update();
+    vtkNew<vtkCleanPolyData> cleanData;
+    cleanData->SetInputData(triangulate->GetOutput());
+    cleanData->Update();
+
+    return copyToSurfaceMesh(cleanData->GetOutput());
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -1369,7 +1381,7 @@ markPointsInsideAndOut(std::vector<bool>& isInside,
 
     ParallelUtils::parallelFor(ny * nz, rayTracingLine);
 }
-} // anonymous namespace
+}   // anonymous namespace
 
 std::shared_ptr<TetrahedralMesh>
 GeometryUtils::createUniformMesh(const Vec3d& aabbMin,

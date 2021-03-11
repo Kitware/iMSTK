@@ -36,14 +36,19 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit Sphere(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const std::string& name = std::string("defaultSphere")) :
-        AnalyticalGeometry(Type::Sphere, name)
+    Sphere(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 1.0, const std::string& name = std::string("defaultSphere")) :
+        AnalyticalGeometry(name)
     {
         setPosition(pos);
         setRadius(radius);
     }
 
-    ~Sphere() override = default;
+    virtual ~Sphere() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "Sphere"; }
 
 public:
     ///

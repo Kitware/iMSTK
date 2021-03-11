@@ -54,10 +54,14 @@ public:
 
     VisualModel() = delete;
 
+public:
+    SIGNAL(VisualModel,modified);
+
+public:
     ///
     /// \brief Get/set geometry
     ///
-    std::shared_ptr<Geometry> getGeometry() const { return m_geometry; }
+    std::shared_ptr<Geometry> getGeometry() const{ return m_geometry; }
     void setGeometry(std::shared_ptr<Geometry> geometry) { m_geometry = geometry; }
 
     ///
@@ -69,7 +73,7 @@ public:
     ///
     /// \brief Get/set geometry
     ///
-    std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const { return m_DbgGeometry; }
+    std::shared_ptr<DebugRenderGeometry> getDebugGeometry() const{ return m_DbgGeometry; }
     void setDebugGeometry(std::shared_ptr<DebugRenderGeometry> geometry) { m_DbgGeometry = geometry; }
 
     ///
@@ -78,23 +82,25 @@ public:
     void setRenderMaterial(std::shared_ptr<RenderMaterial> renderMaterial)
     {
         m_renderMaterial = renderMaterial;
-        this->postEvent(Event(EventType::Modified));
+        this->postModified();
     }
 
-    std::shared_ptr<RenderMaterial> getRenderMaterial() const { return m_renderMaterial; }
+    std::shared_ptr<RenderMaterial> getRenderMaterial() const{ return m_renderMaterial; }
 
     ///
     /// \brief Visibility functions
     ///
     void show() { m_isVisible = true; }
     void hide() { m_isVisible = false; }
-    bool isVisible() const { return m_isVisible; }
+    bool isVisible() const{ return m_isVisible; }
 
     ///
     /// \brief Get/Set whether the delegate has been created
     ///
     bool getRenderDelegateCreated(Renderer* ren);
-    void setRenderDelegateCreated(Renderer* ren, bool created) { m_renderDelegateCreated[ren] = created; }
+    void setRenderDelegateCreated(Renderer* ren,bool created) { m_renderDelegateCreated[ren] = created; }
+
+    void postModified() { this->postEvent(Event(VisualModel::modified())); }
 
 protected:
     friend class VulkanRenderDelegate;
@@ -107,6 +113,6 @@ protected:
     std::shared_ptr<RenderMaterial>      m_renderMaterial;
 
     bool m_isVisible = true;              ///< true if mesh is shown, false if mesh is hidden
-    std::unordered_map<Renderer*, bool> m_renderDelegateCreated;
+    std::unordered_map<Renderer*,bool> m_renderDelegateCreated;
 };
 }

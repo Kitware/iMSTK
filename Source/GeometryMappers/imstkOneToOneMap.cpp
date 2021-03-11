@@ -189,7 +189,7 @@ OneToOneMap::apply()
             const auto& mapValue = m_oneToOneMapVector[idx];
             slaveVertices[mapValue.first] = masterVertices[mapValue.second];
         });
-    meshSlave->modified();
+    meshSlave->postModified();
 }
 
 void

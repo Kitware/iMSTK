@@ -30,10 +30,6 @@
 
 namespace imstk
 {
-KeyboardSceneControl::KeyboardSceneControl()
-{
-}
-
 KeyboardSceneControl::KeyboardSceneControl(std::shared_ptr<KeyboardDeviceClient> keyDevice) :
     KeyboardControl(keyDevice)
 {
@@ -82,6 +78,9 @@ KeyboardSceneControl::OnKeyPress(const char key)
                 module->setPaused(!paused);
             }
         }
+
+        // In case the SceneManager is not apart of the driver
+        paused ? sceneManager->resume() : sceneManager->pause();
     }
     else if (key == 'q' || key == 'Q' || key == 'e' || key == 'E') // end Simulation
     {
@@ -94,8 +93,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
 
         for (auto module : driver->getModules())
         {
-            std::shared_ptr<SceneManager> subManager = std::dynamic_pointer_cast<SceneManager>(module);
-            if (subManager != nullptr)
+            if (auto subManager = std::dynamic_pointer_cast<SceneManager>(module))
             {
                 if (simModeOn)
                 {
@@ -106,8 +104,7 @@ KeyboardSceneControl::OnKeyPress(const char key)
                     subManager->setMode(SceneManager::Mode::Simulation);
                 }
             }
-            std::shared_ptr<VTKViewer> viewer = std::dynamic_pointer_cast<VTKViewer>(module);
-            if (viewer != nullptr)
+            if (auto viewer = std::dynamic_pointer_cast<VTKViewer>(module))
             {
                 if (simModeOn)
                 {
@@ -119,6 +116,8 @@ KeyboardSceneControl::OnKeyPress(const char key)
                 }
             }
         }
+
+        simModeOn ? sceneManager->setMode(SceneManager::Mode::Debug) : sceneManager->setMode(SceneManager::Mode::Simulation);
     }
     else if (key == 'p' || key == 'P')  // switch framerate display
     {

@@ -48,8 +48,9 @@ class HapticDeviceClient : public DeviceClient
 friend class HapticDeviceManager;
 
 public:
-    virtual ~HapticDeviceClient() {}
+    virtual ~HapticDeviceClient() = default;
 
+public:
     ///
     /// \brief Use callback to get tracking data from phantom omni
     ///

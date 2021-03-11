@@ -42,6 +42,16 @@ public:
     ///
     LineMesh(const std::string& name = std::string(""));
 
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~LineMesh() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "LineMesh"; }
+
 public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -59,6 +69,12 @@ public:
     ///
     void print() const override;
 
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    bool isMesh() const override { return true; }
+
+// Accessors
 public:
     ///
     /// \brief Get the number of segments/cells
@@ -85,6 +101,6 @@ private:
     size_t m_originalNumLines = 0;
     size_t m_maxNumLines      = 0;
 
-    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices; ///> line connectivity
+    std::shared_ptr<VecDataArray<int, 2>> m_segmentIndices;   ///> line connectivity
 };
 } // imstk

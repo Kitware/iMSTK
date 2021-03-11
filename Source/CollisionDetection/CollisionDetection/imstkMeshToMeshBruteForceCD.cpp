@@ -47,17 +47,17 @@ MeshToMeshBruteForceCD::computeCollisionData()
     doBroadPhaseCollisionCheck();
 
     // Narrow phase collision
-    const auto                     mesh2         = std::static_pointer_cast<SurfaceMesh>(m_object2);
+    const auto                     mesh2         = std::dynamic_pointer_cast<SurfaceMesh>(m_object2);
     const VecDataArray<int, 3>&    mesh2Cells    = *mesh2->getTriangleIndices();
     const VecDataArray<double, 3>& mesh2Vertices = *mesh2->getVertexPositions();
 
-    if (m_object1->getType() == Geometry::Type::LineMesh)
+    if (m_object1->getTypeName() == "LineMesh")
     {
-        auto                           mesh1 = std::static_pointer_cast<LineMesh>(m_object1);
-        const VecDataArray<double, 3>& mesh1Vertices = *mesh1->getVertexPositions();
+        auto                           lineMesh      = std::dynamic_pointer_cast<LineMesh>(m_object1);
+        const VecDataArray<double, 3>& mesh1Vertices = *lineMesh->getVertexPositions();
 
         // brute force, use BVH or spatial grid would be much better
-        for (int i = 0; i < static_cast<int>(mesh1->getNumVertices()); ++i)
+        for (int i = 0; i < static_cast<int>(lineMesh->getNumVertices()); ++i)
         {
             const Vec3d p = mesh1Vertices[i];
 
@@ -80,13 +80,13 @@ MeshToMeshBruteForceCD::computeCollisionData()
             }
         }
 
-        const int                      numLines    = static_cast<int>(mesh1->getNumLines());
+        const int                      numLines    = static_cast<int>(lineMesh->getNumLines());
         const int                      numVertices = static_cast<int>(mesh2->getNumVertices());
         std::vector<std::vector<bool>> E2(numVertices, std::vector<bool>(numVertices, 1));
 
         for (int k = 0; k < numLines; ++k)
         {
-            const Vec2i& nodes = mesh1->getLineIndices(k);
+            const Vec2i& nodes = lineMesh->getLineIndices(k);
             const size_t i1    = nodes[0];
             const size_t i2    = nodes[1];
 
@@ -138,14 +138,14 @@ MeshToMeshBruteForceCD::computeCollisionData()
             }
         }
     }
-    else if (m_object1->getType() == Geometry::Type::PointSet)
+    else if (m_object1->getTypeName() == "PointSet")
     {
-        const auto                     mesh1 = std::static_pointer_cast<PointSet>(m_object1);
-        const VecDataArray<double, 3>& mesh1Vertices = *mesh1->getVertexPositions();
+        auto                           pointSet      = std::dynamic_pointer_cast<PointSet>(m_object1);
+        const VecDataArray<double, 3>& mesh1Vertices = *pointSet->getVertexPositions();
 
         // brute force, use BVH or spatial grid would be much better
         // point
-        for (int i = 0; i < static_cast<int>(mesh1->getNumVertices()); ++i)
+        for (int i = 0; i < static_cast<int>(pointSet->getNumVertices()); ++i)
         {
             const auto p = mesh1Vertices[i];
 
@@ -166,15 +166,15 @@ MeshToMeshBruteForceCD::computeCollisionData()
             }
         }
     }
-    else
+    else if (m_object1->getTypeName() == "SurfaceMesh")
     {
-        const auto                     mesh1 = std::static_pointer_cast<SurfaceMesh>(m_object1);
-        const VecDataArray<double, 3>& mesh1Vertices = *mesh1->getVertexPositions();
-        const VecDataArray<int, 3>&    mesh1Cells    = *mesh1->getTriangleIndices();
+        auto                           surfMesh      = std::dynamic_pointer_cast<SurfaceMesh>(m_object1);
+        const VecDataArray<double, 3>& mesh1Vertices = *surfMesh->getVertexPositions();
+        const VecDataArray<int, 3>&    mesh1Cells    = *surfMesh->getTriangleIndices();
 
         // brute force, use BVH or spatial grid would be much better
         // point
-        for (int i = 0; i < static_cast<int>(mesh1->getNumVertices()); ++i)
+        for (int i = 0; i < static_cast<int>(surfMesh->getNumVertices()); ++i)
         {
             const Vec3d p = mesh1Vertices[i];
 
@@ -197,7 +197,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
         // edge
         // since we don't have edge structure, the following is not good
-        const auto                     nV = mesh1->getNumVertices();
+        const auto                     nV = surfMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
 
         const auto                     nV2 = mesh2->getNumVertices();
@@ -317,8 +317,8 @@ MeshToMeshBruteForceCD::computeCollisionData()
             i2 = tri[0];
             if (E[i1][i2] && E[i2][i1])
             {
-                const Vec3d P = mesh1->getVertexPosition(i1);
-                const Vec3d Q = mesh1->getVertexPosition(i2);
+                const Vec3d P = surfMesh->getVertexPosition(i1);
+                const Vec3d Q = surfMesh->getVertexPosition(i2);
                 for (int j = 0; j < mesh2Cells.size(); ++j)
                 {
                     const Vec3i& e  = mesh2Cells[j];
