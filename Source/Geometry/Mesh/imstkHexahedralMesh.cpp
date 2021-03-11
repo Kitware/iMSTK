@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-HexahedralMesh::HexahedralMesh(const std::string& name) : VolumetricMesh(Geometry::Type::HexahedralMesh, name),
+HexahedralMesh::HexahedralMesh(const std::string& name) : VolumetricMesh(name),
     m_hexahedraIndices(std::make_shared<VecDataArray<int, 8>>())
 {
 }

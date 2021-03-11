@@ -34,9 +34,9 @@ ImplicitGeometryToPointSetCCD::ImplicitGeometryToPointSetCCD(std::shared_ptr<Imp
     m_pointSetB(pointSetB)
 {
     centralGrad.setFunction(m_implicitGeomA);
-    if (m_implicitGeomA->getType() == Geometry::Type::SignedDistanceField)
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA))
     {
-        centralGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA)->getImage()->getSpacing());
+        centralGrad.setDx(sdf->getImage()->getSpacing());
     }
 
     displacementsPtr = std::make_shared<VecDataArray<double, 3>>(static_cast<int>(m_pointSetB->getNumVertices()));

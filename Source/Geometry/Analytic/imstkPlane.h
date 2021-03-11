@@ -36,16 +36,24 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
-                   const std::string& name = std::string("defaultPlane")) :
-        AnalyticalGeometry(Type::Plane, name)
+    Plane(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const Vec3d& normal = Vec3d(0.0, 1.0, 0.0),
+          const std::string& name = std::string("defaultPlane")) :
+        AnalyticalGeometry(name)
     {
         setPosition(pos);
         setNormal(normal.normalized());
         updatePostTransformData();
     }
 
-    ~Plane() override = default;
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~Plane() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "Plane"; }
 
 public:
     ///

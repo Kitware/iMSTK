@@ -35,15 +35,20 @@ class Cube;
 class Cube : public AnalyticalGeometry
 {
 public:
-    explicit Cube(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double width = 1.0, const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0),
-                  const std::string& name = std::string("defaultCube")) : AnalyticalGeometry(Type::Cube, name)
+    Cube(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double width = 1.0, const Vec3d& orientationAxis = Vec3d(0.0, 1.0, 0.0),
+         const std::string& name = std::string("defaultCube")) : AnalyticalGeometry(name)
     {
         setPosition(pos);
         setOrientationAxis(orientationAxis);
         setWidth(width);
     }
 
-    ~Cube() override = default;
+    virtual ~Cube() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "Cube"; }
 
 public:
     ///

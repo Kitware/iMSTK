@@ -36,8 +36,22 @@ class Decal;
 class DecalPool : public Geometry
 {
 public:
+    ///
+    /// \brief Constructor
+    ///
     DecalPool(unsigned int maxNumDecals = 128, const std::string& name = std::string(""));
 
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~DecalPool() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "DecalPool"; }
+
+public:
     ///
     /// \brief Add a \ref Decal object to this pool
     ///

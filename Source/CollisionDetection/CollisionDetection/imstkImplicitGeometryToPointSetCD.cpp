@@ -38,9 +38,9 @@ ImplicitGeometryToPointSetCD::ImplicitGeometryToPointSetCD(std::shared_ptr<Impli
     m_pointSetB(pointSetB)
 {
     centralGrad.setFunction(m_implicitGeomA);
-    if (m_implicitGeomA->getType() == Geometry::Type::SignedDistanceField)
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA))
     {
-        centralGrad.setDx(std::dynamic_pointer_cast<SignedDistanceField>(m_implicitGeomA)->getImage()->getSpacing() * 0.5);
+        centralGrad.setDx(sdf->getImage()->getSpacing() * 0.5);
     }
 }
 

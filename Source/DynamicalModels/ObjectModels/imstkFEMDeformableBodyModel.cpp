@@ -53,10 +53,7 @@ FEMDeformableBodyModel::FEMDeformableBodyModel() :
 {
     m_fixedNodeIds.reserve(1000);
 
-    m_validGeometryTypes = {
-        Geometry::Type::TetrahedralMesh,
-        Geometry::Type::HexahedralMesh
-    };
+    m_validGeometryTypes = { "TetrahedralMesh", "HexahedralMesh" };
 
     m_solveNode = m_taskGraph->addFunction("FEMModel_Solve", [&]() { getSolver()->solve(); });
 }

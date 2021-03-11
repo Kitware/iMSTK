@@ -117,7 +117,7 @@ main()
 
 #ifdef iMSTK_USE_Vulkan
         // Sphere
-        auto                     sphereObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Sphere, scene, "VisualSphere", 0.025);
+        auto                     sphereObj = apiutils::createVisualAnalyticalSceneObject("Sphere", scene, "VisualSphere", 0.025);
         imstkNew<RenderMaterial> sphereMaterial;
         auto                     sphereMesh = sphereObj->getVisualGeometry();
         sphereMesh->translate(0.1, 0.2, 0.5);
@@ -127,7 +127,7 @@ main()
 #endif
 
         // Plane
-        auto                     planeObj = apiutils::createVisualAnalyticalSceneObject(Geometry::Type::Plane, scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
+        auto                     planeObj = apiutils::createVisualAnalyticalSceneObject("Plane", scene, "VisualPlane", Vec3d(10.0, 10.0, 10.0));
         imstkNew<RenderMaterial> planeMaterial;
         planeMaterial->setColor(Color::LightGray);
         planeObj->getVisualModel(0)->setRenderMaterial(planeMaterial);

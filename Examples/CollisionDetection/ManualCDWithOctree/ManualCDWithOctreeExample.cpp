@@ -353,7 +353,7 @@ main()
                           const auto numTotalNodes  = octreeCD.getNumAllocatedNodes();
                           const auto numPrimitives  = octreeCD.getPrimitiveCount(OctreePrimitiveType::Point) +
                                                       octreeCD.getPrimitiveCount(OctreePrimitiveType::Triangle) +
-                                                      octreeCD.getPrimitiveCount(OctreePrimitiveType::AnalyticalGeometry);
+                                                      octreeCD.getPrimitiveCount(OctreePrimitiveType::Analytical);
                           const auto maxNumPrimitivesInTree = octreeCD.getMaxNumPrimitivesInNodes();
 
                           // Clear collision debug rendering

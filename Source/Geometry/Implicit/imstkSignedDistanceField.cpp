@@ -81,7 +81,7 @@ trilinearSample(const Vec3d& structuredPt, T* imgPtr, const Vec3i& dim, const in
 }
 
 SignedDistanceField::SignedDistanceField(std::shared_ptr<ImageData> imageData, std::string name) :
-    ImplicitGeometry(Type::SignedDistanceField, name),
+    ImplicitGeometry(name),
     m_imageDataSdf(imageData), m_scale(1.0)
 {
     m_invSpacing = m_imageDataSdf->getInvSpacing();

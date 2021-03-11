@@ -25,8 +25,6 @@
 #include "imstkMacros.h"
 #include "imstkMath.h"
 
-#include <tbb/concurrent_unordered_set.h>
-
 #include <unordered_map>
 #include <string>
 
@@ -44,30 +42,6 @@ class SpinLock;
 class Geometry : public EventObject
 {
 public:
-    ///
-    /// \brief Enumeration for the geometry type
-    ///
-    enum class Type
-    {
-        Plane,
-        Sphere,
-        Cylinder,
-        Cube,
-        Capsule,
-        PointSet,
-        SurfaceMesh,
-        TetrahedralMesh,
-        HexahedralMesh,
-        LineMesh,
-        Decal,
-        DecalPool,
-        RenderParticles,
-        ImageData,
-        SignedDistanceField,
-        CompositeImplicitGeometry,
-        MultiBlockGeometry
-    };
-
     ///
     /// \brief Enumeration for the transformation to apply
     /// \params ApplyToTransform to apply the transformation to the data
@@ -90,15 +64,22 @@ public:
         PostTransform
     };
 
+protected:
     ///
     /// \brief Constructor
     ///
-    explicit Geometry(const Geometry::Type type, const std::string& name = std::string(""));
+    Geometry(const std::string& name = std::string(""));
 
+public:
     ///
     /// \brief Destructor
     ///
     virtual ~Geometry() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const = 0;
 
 public:
     SIGNAL(Geometry,modified);
@@ -187,24 +168,9 @@ public:
     }
 
     ///
-    /// \brief Returns the type of the geometry
-    ///
-    Type getType() const{ return m_type; }
-
-    ///
     /// \brief Get name of the geometry
     ///
     const std::string& getName() const{ return m_name; }
-
-    ///
-    /// \brief Returns the string representing the type name of the geometry
-    ///
-    const std::string getTypeName() const;
-
-    ///
-    /// \brief Returns true if the geometry is a mesh, else returns false
-    ///
-    bool isMesh() const;
 
     ///
     /// \brief Get the global (unique) index of the geometry
@@ -215,6 +181,11 @@ public:
     /// \brief Get a pointer to geometry that has been registered globally
     ///
     static uint32_t getTotalNumberGeometries() { return s_NumGeneratedGegometries; }
+
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    virtual bool isMesh() const{ return false; }
 
     ///
     /// \brief Post modified event
@@ -248,7 +219,6 @@ protected:
     ///
     virtual void applyTransform(const Mat4d& imstkNotUsed(m)) { }
 
-    Type m_type;                            ///> Type of geometry
     std::string m_name;                     ///> Unique name for each geometry
     uint32_t    m_geometryIndex;            ///> Unique ID assigned to each geometry upon construction
 

@@ -39,8 +39,22 @@ template<typename T, int N> class VecDataArray;
 class PointSet : public Geometry
 {
 public:
-    PointSet(const Type type = Geometry::Type::PointSet, const std::string& name = std::string(""));
+    ///
+    /// \brief Constructor
+    ///
+    PointSet(const std::string& name = std::string(""));
 
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~PointSet() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "PointSet"; }
+
+public:
     ///
     /// \brief Initializes the data structure given vertex positions
     ///
@@ -61,8 +75,8 @@ public:
     ///
     virtual void computeBoundingBox(Vec3d& lowerCorner, Vec3d& upperCorner, const double paddingPercent = 0.0) override;
 
-    // Accessors
-
+// Accessors
+public:
     ///
     /// \brief Sets initial positions from an array
     ///
@@ -116,6 +130,7 @@ public:
     ///
     size_t getMaxNumVertices() const { return m_maxNumVertices; }
 
+// Attributes
 public:
     ///
     /// \brief Set a data array holding some per vertex data

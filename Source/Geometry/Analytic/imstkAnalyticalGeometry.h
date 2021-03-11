@@ -33,6 +33,9 @@ namespace imstk
 class AnalyticalGeometry : public ImplicitGeometry
 {
 public:
+    virtual ~AnalyticalGeometry() override = default;
+
+public:
     ///
     /// \brief Print
     ///
@@ -56,7 +59,7 @@ public:
     double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const override { return 0.0; }
 
 protected:
-    explicit AnalyticalGeometry(Type type, const std::string& name = std::string(""));
+    AnalyticalGeometry(const std::string& name = std::string(""));
 
     virtual void applyTransform(const Mat4d& m) override;
     virtual void updatePostTransformData() const override;

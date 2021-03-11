@@ -46,6 +46,11 @@ public:
     ///
     virtual ~ImageData() override = default;
 
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "ImageData"; }
+
 public:
     ///
     /// \brief Print the image data info

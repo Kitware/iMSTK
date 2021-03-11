@@ -60,29 +60,29 @@ OctreeBasedCD::addCollisionPair(const std::shared_ptr<Geometry>& geom1, const st
     m_mCollisionPair2AssociatedData[collisionPair] = { collisionType, collisionData };
     m_vCollidingGeomPairs.push_back({ geom1.get(), geom2.get() });
 
-    const auto geomType1 = geom1->getType();
-    const auto geomType2 = geom2->getType();
+    const std::string geomType1 = geom1->getTypeName();
+    const std::string geomType2 = geom2->getTypeName();
 
-    if (geomType1 == Geometry::Type::PointSet
-        || geomType2 == Geometry::Type::PointSet)
+    if (geomType1 == "PointSet"
+        || geomType2 == "PointSet")
     {
         const uint32_t mask = 1 << static_cast<int>(OctreePrimitiveType::Point);
         m_sCollidingPrimitiveTypes |= mask;
     }
 
-    if (geomType1 == Geometry::Type::SurfaceMesh
-        || geomType2 == Geometry::Type::SurfaceMesh)
+    if (geomType1 == "SurfaceMesh"
+        || geomType2 == "SurfaceMesh")
     {
         const uint32_t mask = 1 << static_cast<int>(OctreePrimitiveType::Triangle);
         m_sCollidingPrimitiveTypes |= mask;
     }
 
-    if (geomType1 != Geometry::Type::PointSet
-        || geomType2 != Geometry::Type::PointSet
-        || geomType1 != Geometry::Type::SurfaceMesh
-        || geomType2 != Geometry::Type::SurfaceMesh)
+    if (geomType1 != "PointSet"
+        || geomType2 != "PointSet"
+        || geomType1 != "SurfaceMesh"
+        || geomType2 != "SurfaceMesh")
     {
-        const uint32_t mask = 1 << static_cast<int>(OctreePrimitiveType::AnalyticalGeometry);
+        const uint32_t mask = 1 << static_cast<int>(OctreePrimitiveType::Analytical);
         m_sCollidingPrimitiveTypes |= mask;
     }
 
@@ -145,7 +145,7 @@ OctreeBasedCD::detectCollision()
     for (auto& geoPair: m_vCollidingGeomPairs)
     {
         // Ignore the collision pair if it is not a PointSet-SurfaceMesh pair
-        if (geoPair.first->getType() != Geometry::Type::PointSet || (geoPair.second->getType() != Geometry::Type::SurfaceMesh))
+        if (geoPair.first->getTypeName() != "PointSet" || (geoPair.second->getTypeName() != "SurfaceMesh"))
         {
             continue;
         }

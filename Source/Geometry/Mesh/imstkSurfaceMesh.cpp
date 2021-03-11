@@ -26,7 +26,7 @@
 
 namespace imstk
 {
-SurfaceMesh::SurfaceMesh(const std::string& name) : PointSet(Type::SurfaceMesh, name),
+SurfaceMesh::SurfaceMesh(const std::string& name) : PointSet(name),
     m_triangleIndices(std::make_shared<VecDataArray<int, 3>>())
 {
 }
@@ -658,7 +658,6 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     this->m_originalNumVertices = srcMesh->m_originalNumVertices;
 
     // Geometry members
-    this->m_type = srcMesh->m_type;
     this->m_name = srcMesh->m_name;
     this->m_geometryIndex    = getUniqueID();
     this->m_transformApplied = srcMesh->m_transformApplied;

@@ -56,7 +56,7 @@ castImage(std::shared_ptr<AbstractDataArray> fromScalars, std::shared_ptr<ImageD
 }
 
 ImageData::ImageData(const std::string& name)
-    : PointSet(Geometry::Type::ImageData, name),
+    : PointSet(name),
     m_scalarArray(nullptr)
 {
 }

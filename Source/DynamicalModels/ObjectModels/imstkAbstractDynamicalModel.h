@@ -155,7 +155,7 @@ protected:
     std::size_t m_numDOF;                           ///> Total number of degree of freedom
 
     std::shared_ptr<Geometry> m_geometry = nullptr; ///> Physics geometry of the model
-    std::set<Geometry::Type>  m_validGeometryTypes; ///> Valid geometry types of this model
+    std::set<std::string>     m_validGeometryTypes; ///> Valid geometry types of this model
 
     TimeSteppingType m_timeStepSizeType = TimeSteppingType::Fixed;
 

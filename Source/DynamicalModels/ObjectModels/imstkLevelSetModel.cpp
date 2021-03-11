@@ -31,10 +31,7 @@ namespace imstk
 LevelSetModel::LevelSetModel()
 {
     // If given an image data
-    m_validGeometryTypes = {
-        Geometry::Type::ImageData,
-        Geometry::Type::SignedDistanceField
-    };
+    m_validGeometryTypes = { "ImageData", "SignedDistanceField" };
 
     // By default the level set defines a function for evolving the distances, this can be removed in subclasses
     m_evolveQuantitiesNodes.push_back(std::make_shared<TaskNode>(std::bind(&LevelSetModel::evolve, this), "Evolve Distances"));
@@ -51,15 +48,15 @@ LevelSetModel::initialize()
         return false;
     }
 
-    if (m_geometry->getType() == Geometry::Type::ImageData)
+    if (auto imageData = std::dynamic_pointer_cast<ImageData>(m_geometry))
     {
-        if (std::dynamic_pointer_cast<ImageData>(m_geometry)->getScalarType() != IMSTK_DOUBLE)
+        if (imageData->getScalarType() != IMSTK_DOUBLE)
         {
             LOG(WARNING) << "Levelset only works with double image types";
             return false;
         }
 
-        m_mesh = std::make_shared<SignedDistanceField>(std::dynamic_pointer_cast<ImageData>(m_geometry));
+        m_mesh = std::make_shared<SignedDistanceField>(imageData);
     }
     else
     {
@@ -69,9 +66,8 @@ LevelSetModel::initialize()
     m_backwardGrad.setFunction(m_mesh);
     m_curvature.setFunction(m_mesh);
 
-    if (m_mesh->getType() == Geometry::Type::SignedDistanceField)
+    if (auto sdf = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh))
     {
-        auto                       sdf      = std::dynamic_pointer_cast<SignedDistanceField>(m_mesh);
         std::shared_ptr<ImageData> sdfImage = sdf->getImage();
         if (!m_config->m_sparseUpdate)
         {
@@ -83,7 +79,6 @@ LevelSetModel::initialize()
 
             m_velocities = std::make_shared<ImageData>();
             m_velocities->allocate(IMSTK_DOUBLE, 1, sdfImage->getDimensions(), sdfImage->getSpacing(), sdfImage->getOrigin());
-            //std::fill_n(static_cast<double*>(m_velocities->getScalars()->getVoidPointer()), m_velocities->get
         }
 
         const Vec3d actualSpacing = sdf->getImage()->getSpacing();// *sdf->getScale();
@@ -110,7 +105,6 @@ LevelSetModel::evolve()
     auto         imageData = std::dynamic_pointer_cast<ImageData>(sdf->getImage());
     double*      imgPtr    = static_cast<double*>(imageData->getVoidPointer());
     const Vec3i& dim       = imageData->getDimensions();
-    const Vec3d& spacing   = imageData->getSpacing();
     const double dt = m_config->m_dt / m_config->m_substeps;
     //const double k  = m_config->m_k;
 

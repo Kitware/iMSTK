@@ -155,7 +155,7 @@ std::shared_ptr<VecDataArray<double, 3>>
 initializeNonZeroVelocities(const int numParticles)
 {
     imstkNew<VecDataArray<double, 3>> initVelocitiesPtr(numParticles);
-    std::fill_n(initVelocitiesPtr->getPointer(), numParticles, Vec3d(10.0, 0.0, 0.0));
+    initVelocitiesPtr->fill(Vec3d(10.0, 0.0, 0.0));
     return initVelocitiesPtr;
 }
 

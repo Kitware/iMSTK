@@ -61,14 +61,15 @@ public:
     {
         m_validGeometryTypes =
         {
-            Geometry::Type::Plane,
-            Geometry::Type::Sphere,
-            Geometry::Type::Cube,
-            Geometry::Type::SurfaceMesh
+            "Plane",
+            "Sphere",
+            "Cube",
+            "SurfaceMesh"
         };
     };
     virtual ~RigidBodyModel() override = default;
 
+public:
     ///
     /// \brief Initialize the physx dynamic model
     ///

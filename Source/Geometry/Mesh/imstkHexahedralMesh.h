@@ -38,6 +38,16 @@ public:
     ///
     HexahedralMesh(const std::string& name = std::string(""));
 
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~HexahedralMesh() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "HexahedralMesh"; }
+
 public:
     ///
     /// \brief Initializes the rest of the data structures given vertex positions and
@@ -65,6 +75,11 @@ public:
     ///
     /// \brief Extract surface Mesh
     bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    bool isMesh() const override { return true; }
 
 // Accessors
 public:

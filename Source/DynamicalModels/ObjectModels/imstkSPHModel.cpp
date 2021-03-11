@@ -94,7 +94,7 @@ SPHModelConfig::initialize()
 
 SPHModel::SPHModel() : DynamicalModel<SPHState>(DynamicalModelType::SmoothedParticleHydrodynamics)
 {
-    m_validGeometryTypes = { Geometry::Type::PointSet };
+    m_validGeometryTypes = { "PointSet" };
 
     m_findParticleNeighborsNode = m_taskGraph->addFunction("SPHModel_Partition", std::bind(&SPHModel::findParticleNeighbors, this));
     m_computeDensityNode = m_taskGraph->addFunction("SPHModel_ComputeDensity", [&]()

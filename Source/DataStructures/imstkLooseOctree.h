@@ -48,7 +48,7 @@ enum OctreePrimitiveType
 {
     Point = 0,
     Triangle,
-    AnalyticalGeometry,
+    Analytical,
     NumPrimitiveTypes
 };
 

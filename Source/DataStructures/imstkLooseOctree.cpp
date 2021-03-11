@@ -334,7 +334,7 @@ OctreeNode::updateDebugGeometry()
     // No primitive in this node
     if (m_PrimitiveCounts[OctreePrimitiveType::Point] == 0
         && m_PrimitiveCounts[OctreePrimitiveType::Triangle] == 0
-        && m_PrimitiveCounts[OctreePrimitiveType::AnalyticalGeometry] == 0)
+        && m_PrimitiveCounts[OctreePrimitiveType::Analytical] == 0)
     {
         if (!m_pTree->m_bDrawNonEmptyParent)
         {
@@ -526,7 +526,7 @@ uint32_t
 LooseOctree::addAnalyticalGeometry(const std::shared_ptr<Geometry>& geometry)
 {
     // Type alias, to reduce copy/past errors
-    static const auto type = static_cast<int>(OctreePrimitiveType::AnalyticalGeometry);
+    static const auto type = static_cast<int>(OctreePrimitiveType::Analytical);
 
     const auto pGeometry = geometry.get();
     const auto geomIdx   = pGeometry->getGlobalIndex();
@@ -572,10 +572,10 @@ LooseOctree::build()
     // Compute the minimum bounding box of non-point primitives
     if (m_vPrimitivePtrs[OctreePrimitiveType::Point].size() == 0
         && (m_vPrimitivePtrs[OctreePrimitiveType::Triangle].size() > 0
-            || m_vPrimitivePtrs[OctreePrimitiveType::AnalyticalGeometry].size() > 0))
+            || m_vPrimitivePtrs[OctreePrimitiveType::Analytical].size() > 0))
     {
         Real minWidth = MAX_REAL;
-        for (int type = OctreePrimitiveType::Triangle; type <= OctreePrimitiveType::AnalyticalGeometry; ++type)
+        for (int type = OctreePrimitiveType::Triangle; type <= OctreePrimitiveType::Analytical; ++type)
         {
             const auto& vPrimitivePtrs = m_vPrimitivePtrs[type];
             if (vPrimitivePtrs.size() == 0)
@@ -665,7 +665,7 @@ LooseOctree::rebuild()
     // Populate all primitives to tree nodes in a top-down manner
     populatePointPrimitives();
     populateNonPointPrimitives(OctreePrimitiveType::Triangle);
-    populateNonPointPrimitives(OctreePrimitiveType::AnalyticalGeometry);
+    populateNonPointPrimitives(OctreePrimitiveType::Analytical);
 }
 
 void
@@ -709,7 +709,7 @@ LooseOctree::incrementalUpdate()
     // Then, check their validity (valid primitive = it is still loosely contained in the node's bounding box)
     updatePositionAndCheckValidity();
     updateBoundingBoxAndCheckValidity(OctreePrimitiveType::Triangle);
-    updateBoundingBoxAndCheckValidity(OctreePrimitiveType::AnalyticalGeometry);
+    updateBoundingBoxAndCheckValidity(OctreePrimitiveType::Analytical);
 
     // Remove all invalid primitives from tree nodes
     removeInvalidPrimitivesFromNodes();
@@ -717,7 +717,7 @@ LooseOctree::incrementalUpdate()
     // Insert the invalid primitives back to the tree
     reinsertInvalidPrimitives(OctreePrimitiveType::Point);
     reinsertInvalidPrimitives(OctreePrimitiveType::Triangle);
-    reinsertInvalidPrimitives(OctreePrimitiveType::AnalyticalGeometry);
+    reinsertInvalidPrimitives(OctreePrimitiveType::Analytical);
 
     // Recursively remove all empty nodes, returning them to memory pool for recycling
     m_pRootNode->removeEmptyDescendants();

@@ -22,11 +22,11 @@
 #pragma once
 
 #include "imstkPointSet.h"
-#include <memory>
 
 namespace imstk
 {
 class SurfaceMesh;
+
 ///
 /// \class VolumetricMesh
 ///
@@ -35,7 +35,12 @@ class SurfaceMesh;
 class VolumetricMesh : public PointSet
 {
 public:
+    ///
+    /// \brief Deconstructor
+    ///
+    virtual ~VolumetricMesh() override = default;
 
+public:
     ///
     /// \brief Computes the attached surface mesh
     ///
@@ -52,7 +57,7 @@ public:
     void setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
 protected:
-    VolumetricMesh(Geometry::Type type, const std::string& name = std::string("")) : PointSet(type, name) {}
+    VolumetricMesh(const std::string& name = std::string("")) : PointSet(name) {}
 
     std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;          ///> Attached surface mesh
 };

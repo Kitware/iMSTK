@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCollisionDetection.h"
+#include "imstkAnalyticalGeometry.h"
 #include "imstkCollisionData.h"
 #include "imstkOctreeBasedCD.h"
 #include "imstkSurfaceMesh.h"
@@ -41,18 +42,18 @@ CollisionDetection::addCollisionPairToOctree(const std::shared_ptr<Geometry>&   
                                              const std::shared_ptr<CollisionData>& collisionData)
 {
     auto addToOctree =
-        [&](const std::shared_ptr<Geometry>& geom) {
+        [&](std::shared_ptr<Geometry> geom) {
             if (!s_OctreeCD->hasGeometry(geom->getGlobalIndex()))
             {
-                if (geom->getType() == Geometry::Type::PointSet)
+                if (geom->getTypeName() == "PointSet")
                 {
                     s_OctreeCD->addPointSet(std::dynamic_pointer_cast<PointSet>(geom));
                 }
-                else if (geom->getType() == Geometry::Type::SurfaceMesh)
+                else if (geom->getTypeName() == "SurfaceMesh")
                 {
                     s_OctreeCD->addTriangleMesh(std::dynamic_pointer_cast<SurfaceMesh>(geom));
                 }
-                else
+                else if (std::dynamic_pointer_cast<AnalyticalGeometry>(geom) != nullptr)
                 {
                     s_OctreeCD->addAnalyticalGeometry(geom);
                 }

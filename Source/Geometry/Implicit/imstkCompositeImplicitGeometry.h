@@ -44,8 +44,20 @@ public:
     using GeometryBoolPair = std::pair<std::shared_ptr<ImplicitGeometry>, GeometryBoolType>;
 
 public:
-    CompositeImplicitGeometry(std::string name    = "") : ImplicitGeometry(Type::CompositeImplicitGeometry, name) { }
+    ///
+    /// \brief Constructor
+    ///
+    CompositeImplicitGeometry(std::string name = "") : ImplicitGeometry(name) { }
+
+    ///
+    /// \brief Deconstructor
+    ///
     virtual ~CompositeImplicitGeometry() override = default;
+
+    ///
+    /// \brief Returns the string representing the type name of the geometry
+    ///
+    virtual const std::string getTypeName() const override { return "CompositeImplicitGeometry"; }
 
 public:
     ///
@@ -53,6 +65,11 @@ public:
     ///
     virtual double getFunctionValue(const Vec3d& pos) const override;
 
+    ///
+    /// \brief Add an implicit geometry to have boolean operations done with
+    /// \param geometry to use
+    /// \param boolean function type to use
+    ///
     void addImplicitGeometry(std::shared_ptr<ImplicitGeometry> geometry, const GeometryBoolType type) { geometries.push_back(GeometryBoolPair(geometry, type)); }
 
 protected:
