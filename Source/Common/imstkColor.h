@@ -124,6 +124,8 @@ struct Color
     static Color Yellow;
     static Color Teal;
     static Color Marigold;
+    static Color Bone;
+    static Color Blood;
 };
 #ifdef WIN32
 #pragma warning(default : 4201)

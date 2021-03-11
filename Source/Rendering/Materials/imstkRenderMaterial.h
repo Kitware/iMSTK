@@ -255,6 +255,8 @@ public:
     const bool getRenderPointsAsSpheres() const{ return m_renderPointsAsSpheres; }
     void setRenderPointsAsSpheres(const bool renderPointsAsSpheres) { m_renderPointsAsSpheres = renderPointsAsSpheres; }
 
+    void postModified() { this->postEvent(Event(RenderMaterial::modified())); }
+
 protected:
     friend class VTKRenderDelegate;
     friend class VulkanRenderDelegate;

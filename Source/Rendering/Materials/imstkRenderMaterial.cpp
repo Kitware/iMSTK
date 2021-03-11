@@ -39,7 +39,7 @@ RenderMaterial::setDisplayMode(const DisplayMode displayMode)
     if (displayMode != m_displayMode)
     {
         m_displayMode = displayMode;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -49,7 +49,7 @@ RenderMaterial::setTessellated(const bool tessellated)
     if (tessellated != m_tessellated)
     {
         m_tessellated = tessellated;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -59,7 +59,7 @@ RenderMaterial::setLineWidth(const float width)
     if (width != m_lineWidth)
     {
         m_lineWidth = width;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -69,7 +69,7 @@ RenderMaterial::setPointSize(const float size)
     if (size != m_pointSize)
     {
         m_pointSize = size;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -79,7 +79,7 @@ RenderMaterial::setBackFaceCulling(const bool culling)
     if (culling != m_backfaceCulling)
     {
         m_backfaceCulling = culling;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -101,7 +101,7 @@ RenderMaterial::setDiffuseColor(const Color& color)
     if (m_diffuseColor != color)
     {
         m_diffuseColor = color;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -117,7 +117,7 @@ RenderMaterial::setSpecularColor(const Color& color)
     if (m_specularColor != color)
     {
         m_specularColor = color;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -127,7 +127,7 @@ RenderMaterial::setAmbientColor(const Color& color)
     if (m_ambientColor != color)
     {
         m_ambientColor = color;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -137,7 +137,7 @@ RenderMaterial::setMetalness(const float metalness)
     if (m_metalness != metalness)
     {
         m_metalness = metalness;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -147,7 +147,7 @@ RenderMaterial::setRoughness(const float roughness)
     if (roughness != m_roughness)
     {
         m_roughness = roughness;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -157,7 +157,7 @@ RenderMaterial::setEmissivity(const float emissivity)
     if (m_emissivity != emissivity)
     {
         m_emissivity = emissivity;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -180,8 +180,8 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
         LOG(WARNING) << "RenderMaterial::addTexture: Invalid texture format";
         return;
     }
-    m_textures[(unsigned int)texture->getType()] = texture;
-    postEvent(Event(RenderMaterial::modified()));
+    m_textures[static_cast<size_t>(texture->getType())] = texture;
+    postModified();
 }
 
 void
@@ -190,7 +190,7 @@ RenderMaterial::setReceivesShadows(const bool receivesShadows)
     if (m_receivesShadows != receivesShadows)
     {
         m_receivesShadows = receivesShadows;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -200,7 +200,7 @@ RenderMaterial::setCastsShadows(const bool castsShadows)
     if (m_castsShadows != castsShadows)
     {
         m_castsShadows = castsShadows;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -210,7 +210,7 @@ RenderMaterial::setBlendMode(const RenderMaterial::BlendMode blendMode)
     if (m_blendMode != blendMode)
     {
         m_blendMode = blendMode;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -220,7 +220,7 @@ RenderMaterial::setShadingModel(const ShadingModel& model)
     if (model != m_shadingModel)
     {
         m_shadingModel = model;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -230,7 +230,7 @@ RenderMaterial::setOcclusionStrength(const float occlusionStrength)
     if (occlusionStrength != m_occlusionStrength)
     {
         m_occlusionStrength = occlusionStrength;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -240,7 +240,7 @@ RenderMaterial::setNormalnStrength(const float normalStrength)
     if (normalStrength != m_normalStrength)
     {
         m_normalStrength = normalStrength;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -250,7 +250,7 @@ RenderMaterial::setEdgeColor(const Color& color)
     if (color != m_edgeColor)
     {
         m_edgeColor = color;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -260,7 +260,7 @@ RenderMaterial::setVertexColor(const Color& color)
     if (color != m_vertexColor)
     {
         m_vertexColor = color;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -270,7 +270,7 @@ RenderMaterial::setOpacity(const float opacity)
     if (m_opacity != opacity)
     {
         m_opacity = opacity;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -280,7 +280,7 @@ RenderMaterial::setBackfaceCulling(const bool culling)
     if (m_backfaceCulling != culling)
     {
         m_backfaceCulling = culling;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -290,7 +290,7 @@ RenderMaterial::setColorLookupTable(std::shared_ptr<ColorFunction> lut)
     if (m_lookupTable != lut)
     {
         m_lookupTable = lut;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 
@@ -300,7 +300,7 @@ RenderMaterial::setScalarVisibility(const bool scalarVisibility)
     if (m_scalarVisibility != scalarVisibility)
     {
         m_scalarVisibility = scalarVisibility;
-        postEvent(Event(RenderMaterial::modified()));
+        postModified();
     }
 }
 }

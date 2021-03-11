@@ -95,11 +95,11 @@ makeLevelsetObj(const std::string& name, std::shared_ptr<LocalMarchingCubes> iso
             imstkNew<RenderMaterial> material;
             material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
             material->setLineWidth(4.0);
-            const double r = (rand() % 500) / 500.0;
+            /*const double r = (rand() % 500) / 500.0;
             const double g = (rand() % 500) / 500.0;
             const double b = (rand() % 500) / 500.0;
-            material->setColor(Color(r, g, b));
-            material->setEdgeColor(Color::Color::Orange);
+            material->setColor(Color(r, g, b));*/
+            material->setColor(Color::Bone);
             //material->setOpacity(0.7);
             surfMeshModel->setRenderMaterial(material);
             levelsetObj->addVisualModel(surfMeshModel);
@@ -283,11 +283,11 @@ main()
                     imstkNew<RenderMaterial> material;
                     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
                     material->setLineWidth(4.0);
-                    const double r = (rand() % 500) / 500.0;
+                    /*const double r = (rand() % 500) / 500.0;
                     const double g = (rand() % 500) / 500.0;
                     const double b = (rand() % 500) / 500.0;
-                    material->setColor(Color(r, g, b));
-                    material->setEdgeColor(Color::Color::Orange);
+                    material->setColor(Color(r, g, b));*/
+                    material->setColor(Color::Bone);
                     //material->setOpacity(0.7);
                     surfMeshModel->setRenderMaterial(material);
                     lvlSetObj->addVisualModel(surfMeshModel);
