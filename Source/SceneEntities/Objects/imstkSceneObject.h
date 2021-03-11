@@ -103,9 +103,14 @@ public:
     std::shared_ptr<TaskNode> getUpdateGeometryNode() const { return m_updateGeometryNode; }
 
     ///
-    /// \brief Advance the SceneObject a frame
+    /// \brief Update the SceneObject, called during scene update
     ///
     virtual void update() { }
+
+    ///
+    /// \brief Update the visuals, called before render
+    ///
+    virtual void visualUpdate() { }
 
     ///
     /// \brief Update the geometries
