@@ -68,11 +68,13 @@ public:
     /// \brief Constructor
     ///
     ReducedStVK();
+
     ///
     /// \brief Destructor
     ///
-    ~ReducedStVK();
+    virtual ~ReducedStVK() override;
 
+public:
     ///
     /// \brief Configure the force model from external file
     ///
@@ -190,7 +192,7 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType) override;
+    void updateBodyStates(const Vectord& solution, const StateUpdateType updateType);
     void updateBodyIntermediateStates(const Vectord& solution, const StateUpdateType updateType);
 
     ///

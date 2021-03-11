@@ -80,7 +80,11 @@ set(VegaFEM_DIR "@VegaFEM_DIR@")
 find_dependency( VegaFEM REQUIRED CONFIG )
 
 # VRPN
-find_package( VRPN REQUIRED )
+if (iMSTK_USE_VRPN)
+  find_package( VRPN REQUIRED )
+endif()
+
+# OpenHaptics
 if(iMSTK_USE_OpenHaptics)
   find_package( OpenHapticsSDK REQUIRED )
   add_definitions( -DiMSTK_USE_OPENHAPTICS )

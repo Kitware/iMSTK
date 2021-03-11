@@ -21,12 +21,7 @@
 
 #pragma once
 
-#include <memory>
-#include <string>
-
-// imstk
 #include "imstkDynamicObject.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
@@ -42,17 +37,18 @@ class ReducedStVK;
 class ReducedFeDeformableObject : public DynamicObject
 {
 public:
-
     ///
     /// \brief Constructor
     ///
-    explicit ReducedFeDeformableObject(const std::string& name) : DynamicObject(name) { m_type = Type::ReducedFEMDeformable; }
-    ReducedFeDeformableObject() = delete;
+    ReducedFeDeformableObject(const std::string& name) : DynamicObject(name) { }
 
     ///
     /// \brief Destructor
     ///
-    ~ReducedFeDeformableObject() = default;
+    virtual ~ReducedFeDeformableObject() override = default;
+
+public:
+    virtual const std::string getTypeName() const override { return "ReducedFeDeformableObject"; }
 
     ///
     /// \brief Initialize the deformable object
