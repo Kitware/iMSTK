@@ -91,11 +91,19 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Set compile flags for the target
   #-----------------------------------------------------------------------------  
-  target_compile_options(${target} PRIVATE
-                           $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-                                -Wall -Wno-unused-function>
-                           $<$<CXX_COMPILER_ID:MSVC>:
-                                -W4 -MP>)
+  if (iMSTK_COLOR_OUTPUT)
+    target_compile_options(${target} PRIVATE
+      $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+          -Wall -Wno-unused-function -fdiagnostics-color=always>
+      $<$<CXX_COMPILER_ID:MSVC>:
+          -W4 -MP>)
+  else()
+    target_compile_options(${target} PRIVATE
+    $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
+        -Wall -Wno-unused-function>
+    $<$<CXX_COMPILER_ID:MSVC>:
+        -W4 -MP>)
+  endif()
 
   #-----------------------------------------------------------------------------
   # Install headers

@@ -51,9 +51,9 @@ FastMarch::solve()
     m_queue = std::priority_queue<Node, std::vector<Node>, NodeComparator>();
 
     // Add the initial seeds to the queue
-    for (int i = 0; i < m_seedVoxels.size(); i++)
+    for (size_t i = 0; i < m_seedVoxels.size(); i++)
     {
-        Vec3i coord = m_seedVoxels[i];
+        const Vec3i& coord = m_seedVoxels[i];
         if (coord[0] < 0 || coord[0] >= m_dim[0]
             || coord[1] < 0 || coord[1] >= m_dim[1]
             || coord[2] < 0 || coord[2] >= m_dim[2])

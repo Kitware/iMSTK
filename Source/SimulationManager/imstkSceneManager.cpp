@@ -26,8 +26,8 @@
 
 namespace imstk
 {
-SceneManager::SceneManager(std::string name) : m_mode(Mode::Simulation),
-    m_activeScene(nullptr), m_prevCamName("default")
+SceneManager::SceneManager(std::string name) : m_activeScene(nullptr),
+    m_mode(Mode::Simulation), m_prevCamName("default")
 {
     // Set the preferred execution mode
     m_executionType = ExecutionType::PARALLEL;

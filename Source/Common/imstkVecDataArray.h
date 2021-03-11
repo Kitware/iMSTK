@@ -297,7 +297,7 @@ public:
 
         if (vecPos != m_vecSize - 1)
         {
-            std::copy_n(m_data + pos + N, AbstractDataArray::m_size - pos - N, DataArray<T>::m_data + pos);
+            std::copy_n(DataArray<T>::m_data + pos + N, AbstractDataArray::m_size - pos - N, DataArray<T>::m_data + pos);
         }
 
         m_vecSize--;

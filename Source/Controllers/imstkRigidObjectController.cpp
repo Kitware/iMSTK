@@ -135,7 +135,7 @@ RigidObjectController::applyForces()
             {
                 m_forces.push_back(force);
                 m_forceSum += force;
-                if (m_forces.size() > m_smoothingKernelSize)
+                if (static_cast<int>(m_forces.size()) > m_smoothingKernelSize)
                 {
                     m_forceSum -= m_forces.front();
                     m_forces.pop_front();

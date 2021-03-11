@@ -51,7 +51,7 @@ findFirstRoot(std::shared_ptr<ImplicitGeometry> implicitGeomA, const Vec3d& star
     Vec3d  currPos  = start;
     Vec3d  prevPos  = start;
     double currDist = implicitGeomA->getFunctionValue(start);
-    double prevDist = currDist;
+    //double prevDist = currDist;
 
     // Root find (could be multiple roots, we want the first, so start march from front)
     // Gradient could be used for SDFs to converge faster but not for levelsets
@@ -64,7 +64,7 @@ findFirstRoot(std::shared_ptr<ImplicitGeometry> implicitGeomA, const Vec3d& star
         prevPos = currPos;
         currPos = start + dir * x;
 
-        prevDist = currDist;
+        //prevDist = currDist;
         currDist = implicitGeomA->getFunctionValue(currPos);
 
         if (currDist <= 0.0)
@@ -105,7 +105,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
         const Vec3d  prevPt = pt - displacement;
 
         Vec3d  prevPos      = prevPt;
-        double prevDist     = m_implicitGeomA->getFunctionValue(prevPt);
+        double prevDist     = m_implicitGeomA->getFunctionValue(prevPos);
         bool   prevIsInside = std::signbit(prevDist);
 
         Vec3d  currPos      = pt;
@@ -127,17 +127,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
                 {
                     PositionDirectionCollisionDataElement elem;
                     elem.dirAtoB = -centralGrad(contactPt).normalized(); // -centralGrad gives Outward facing contact normal
-                    //elem.dirAtoB = (contactPt - start).normalized();
-                    /* {
-                         Vec3d gradPos = forwardGrad(contactPt);
-                         Vec3d gradNeg = backwardGrad(contactPt);
-                         elem.dirAtoB[0] = std::min(gradNeg[0], 0.0) + std::max(gradPos[0], 0.0);
-                         elem.dirAtoB[1] = std::min(gradNeg[1], 0.0) + std::max(gradPos[1], 0.0);
-                         elem.dirAtoB[2] = std::min(gradNeg[2], 0.0) + std::max(gradPos[2], 0.0);
-                         elem.dirAtoB.normalize();
-                     }*/
                     elem.nodeIdx = static_cast<uint32_t>(i);
-                    //elem.penetrationDepth = (contactPt - pt).norm();
                     elem.penetrationDepth = std::max(0.0, (contactPt - end).dot(elem.dirAtoB));
                     if (elem.penetrationDepth <= limit)
                     {
@@ -159,17 +149,7 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
             {
                 PositionDirectionCollisionDataElement elem;
                 elem.dirAtoB = -centralGrad(contactPt).normalized(); // -centralGrad gives Outward facing contact normal
-                //elem.dirAtoB = (contactPt - start).normalized();
-                /* {
-                     Vec3d gradPos = forwardGrad(contactPt);
-                     Vec3d gradNeg = backwardGrad(contactPt);
-                     elem.dirAtoB[0] = std::max(gradNeg[0], 0.0) + std::min(gradPos[0], 0.0);
-                     elem.dirAtoB[1] = std::max(gradNeg[1], 0.0) + std::min(gradPos[1], 0.0);
-                     elem.dirAtoB[2] = std::max(gradNeg[2], 0.0) + std::min(gradPos[2], 0.0);
-                     elem.dirAtoB.normalize();
-                 }*/
                 elem.nodeIdx = static_cast<uint32_t>(i);
-                //elem.penetrationDepth = (contactPt - pt).norm();
                 elem.penetrationDepth = std::max(0.0, (contactPt - end).dot(elem.dirAtoB));
                 if (elem.penetrationDepth <= limit)
                 {
@@ -183,7 +163,6 @@ ImplicitGeometryToPointSetCCD::computeCollisionData()
             else
             {
                 prevOuterElementCounter[i] = 0;
-                //printf("Somethings wrong2\n");
             }
         }
         else
