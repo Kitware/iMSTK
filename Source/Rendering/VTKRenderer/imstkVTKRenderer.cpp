@@ -459,10 +459,7 @@ VTKRenderer::updateRenderDelegates()
     }
 
     // Call visual update on every scene object
-    for (const auto& obj : m_scene->getSceneObjects())
-    {
-        obj->visualUpdate();
-    }
+    m_scene->updateVisuals();
 
     // Update their render delegates
     for (auto delegate : m_renderDelegates)

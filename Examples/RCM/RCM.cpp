@@ -90,7 +90,7 @@ testRCM(const VecDataArray<int, N>& conn, const size_t numVerts)
 }
 
 int
-main(int argc, char** argv)
+main()
 {
     // Log to stdout and file
     Logger::startLogger();

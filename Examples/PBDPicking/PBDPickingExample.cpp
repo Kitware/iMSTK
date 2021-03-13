@@ -45,12 +45,6 @@
 
 using namespace imstk;
 
-// Parameters to play with
-const double width  = 50.0;
-const double height = 50.0;
-const int    nRows  = 31;
-const int    nCols  = 31;
-
 ///
 /// \brief Creates cloth geometry
 ///
@@ -220,7 +214,7 @@ main()
     scene->addSceneObject(objBigCapsule);
     */
 
-    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+    std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 50.0, 50.0, 31, 31);
     scene->addSceneObject(clothObj);
 
     // Create and add virtual coupling object controller in the scene

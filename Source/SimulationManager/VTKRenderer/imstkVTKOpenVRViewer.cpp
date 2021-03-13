@@ -58,7 +58,7 @@ VTKOpenVRViewer::VTKOpenVRViewer(std::string name) : AbstractVTKViewer(name)
 }
 
 void
-VTKOpenVRViewer::setActiveScene(const std::shared_ptr<Scene>& scene)
+VTKOpenVRViewer::setActiveScene(std::shared_ptr<Scene> scene)
 {
     // If already current scene
     if (scene == m_activeScene)

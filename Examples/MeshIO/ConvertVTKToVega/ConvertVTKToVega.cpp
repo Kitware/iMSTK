@@ -42,10 +42,7 @@ main(int argc, char** argv)
     auto tetMesh = MeshIO::read<TetrahedralMesh>(vtkFileName);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
     bool converted = VegaMeshIO::write(tetMesh, vegaFileName, MeshFileType::VEG);
-    {
-        std::string vtkFileName = "convertedMesh.vtk";
-        bool        converted   = VTKMeshIO::write(tetMesh, vtkFileName, MeshFileType::VTK);
-    }
+    VTKMeshIO::write(tetMesh, "convertedMesh.vtk", MeshFileType::VTK);
 
     if (converted)
     {

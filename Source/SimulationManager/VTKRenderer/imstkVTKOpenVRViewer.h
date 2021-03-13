@@ -56,7 +56,7 @@ public:
     ///
     /// \brief Set scene to be rendered
     ///
-    void setActiveScene(const std::shared_ptr<Scene>& scene) override;
+    void setActiveScene(std::shared_ptr<Scene> scene) override;
 
     ///
     /// \brief Get one of the device clients for VR

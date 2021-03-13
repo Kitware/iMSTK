@@ -37,11 +37,13 @@ class HapticDeviceClient;
 class HapticDeviceManager : public Module
 {
 public:
-    HapticDeviceManager() : Module() { }
+    HapticDeviceManager() : Module()
+    {
+        muteUpdateEvents = true;
+    }
 
     ///
     /// \brief Destructor
-    /// Stop the scheduler
     ///
     virtual ~HapticDeviceManager() override = default;
 

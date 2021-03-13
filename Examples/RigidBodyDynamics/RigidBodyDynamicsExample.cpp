@@ -81,7 +81,7 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
 }
 
 std::shared_ptr<imstk::RigidObject>
-makeCubeRigidObject(std::string& name, const Vec3d& pos, const bool isStatic = false)
+makeCubeRigidObject(std::string& name, const Vec3d& pos)
 {
     // Create cube object
     imstkNew<RigidObject> cubeObj(name);

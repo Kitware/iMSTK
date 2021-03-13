@@ -28,13 +28,9 @@
 class vtkInteractorStyle;
 class vtkRenderWindow;
 class vtkCallbackCommand;
-class vtkObject;
 
 namespace imstk
 {
-class VTKScreenCaptureUtility;
-class VTKTextStatusManager;
-
 ///
 /// \class AbstractVTKViewer
 ///
@@ -43,6 +39,14 @@ class VTKTextStatusManager;
 ///
 class AbstractVTKViewer : public Viewer
 {
+public:
+    enum class VTKLoggerMode
+    {
+        SHOW,
+        MUTE,
+        WRITE
+    };
+
 protected:
     AbstractVTKViewer(std::string name);
 public:
@@ -85,6 +89,11 @@ public:
     /// \brief Processes VTK events, includes OS events
     ///
     void processEvents() override;
+
+    ///
+    /// \brief Set the logger mode
+    ///
+    void setVtkLoggerMode(VTKLoggerMode loggerMode);
 
 protected:
     bool initModule() override;

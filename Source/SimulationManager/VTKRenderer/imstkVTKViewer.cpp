@@ -67,7 +67,7 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
 }
 
 void
-VTKViewer::setActiveScene(const std::shared_ptr<Scene>& scene)
+VTKViewer::setActiveScene(std::shared_ptr<Scene> scene)
 {
     // If already current scene
     if (scene == m_activeScene)
@@ -202,23 +202,6 @@ VTKViewer::getMouseDevice() const
 {
     return std::dynamic_pointer_cast<VTKInteractorStyle>(m_interactorStyle)->getMouseDeviceClient();
 }
-
-//double
-//VTKViewer::getDisplayRefreshRate()
-//{
-//#ifdef WIN32
-//    vtkWin32RenderWindowInteractor* iren = vtkWin32RenderWindowInteractor::SafeDownCast(m_vtkRenderWindow->GetInteractor());
-//    vtkWin32HardwareWindow* hWin = vtkWin32HardwareWindow::SafeDownCast(iren->GetHardwareWindow());
-//
-//    HMONITOR hMonitor = MonitorFromWindow(hWin->GetWindowId(), MONITOR_DEFAULTTONEAREST);
-//    MONITORINFOEX info;
-//    GetMonitorInfoA(hMonitor, &info);
-//    EnumDisplaySettings(info.szDevice
-//    return 60.0;
-//#else
-//    return 60.0;
-//#endif
-//}
 
 void
 VTKViewer::updateModule()

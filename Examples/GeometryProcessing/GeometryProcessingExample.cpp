@@ -65,7 +65,7 @@ main()
     // Erode
     const double       erosionDist = 0.2;
     DataArray<double>& scalars     = *std::dynamic_pointer_cast<DataArray<double>>(createSdf->getOutputImage()->getScalars());
-    for (size_t i = 0; i < scalars.size(); i++)
+    for (int i = 0; i < scalars.size(); i++)
     {
         scalars[i] += erosionDist;
     }

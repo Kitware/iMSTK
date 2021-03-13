@@ -37,14 +37,12 @@
 
 using namespace imstk;
 
-// Parameters to play with
-const double width  = 10.0;
-const double height = 10.0;
-const int    nRows  = 16;
-const int    nCols  = 16;
-
 ///
 /// \brief Creates cloth geometry
+/// \param cloth width
+/// \param cloth height
+/// \param cloth row count
+/// \param cloth column count
 ///
 static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(const double width,
@@ -56,8 +54,8 @@ makeClothGeometry(const double width,
 
     imstkNew<VecDataArray<double, 3>> verticesPtr(nRows * nCols);
     VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    const double                      dy       = width / static_cast<double>(nCols - 1);
-    const double                      dx       = height / static_cast<double>(nRows - 1);
+    const double                      dy       = width / (nCols - 1);
+    const double                      dx       = height / (nRows - 1);
     for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
@@ -69,7 +67,7 @@ makeClothGeometry(const double width,
     // Add connectivity data
     imstkNew<VecDataArray<int, 3>> indicesPtr;
     VecDataArray<int, 3>&          indices = *indicesPtr.get();
-    for (int i = 0; i < nRows - 1; ++i)
+    for (int i = 0; i < nRows - 1; i++)
     {
         for (int j = 0; j < nCols - 1; j++)
         {
@@ -99,25 +97,30 @@ makeClothGeometry(const double width,
 
 ///
 /// \brief Creates cloth object
+/// \param name
+/// \param cloth width
+/// \param cloth height
+/// \param cloth row count
+/// \param cloth column count
 ///
 static std::shared_ptr<PbdObject>
 makeClothObj(const std::string& name,
              const double       width,
              const double       height,
-             const int          nRows,
-             const int          nCols)
+             const int          rowCount,
+             const int          colCount)
 {
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(width, height, nRows, nCols);
+    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(10.0, 10.0, 16, 16);
 
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;
     pbdParams->enableConstraint(PbdConstraint::Type::Distance, 1.0e2);
     pbdParams->enableConstraint(PbdConstraint::Type::Dihedral, 1.0e1);
-    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(nCols) - 1 };
-    pbdParams->m_uniformMassValue = width * height / ((double)nRows * (double)nCols);
+    pbdParams->m_fixedNodeIds     = { 0, static_cast<size_t>(colCount) - 1 };
+    pbdParams->m_uniformMassValue = width * height / (rowCount * colCount);
     pbdParams->m_gravity    = Vec3d(0.0, -9.8, 0.0);
     pbdParams->m_defaultDt  = 0.005;
     pbdParams->m_iterations = 5;
@@ -156,7 +159,7 @@ main()
     // Setup a scene
     imstkNew<Scene> scene("PBDCloth");
     {
-        std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", width, height, nRows, nCols);
+        std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
         scene->addSceneObject(clothObj);
 
         // Light (white)

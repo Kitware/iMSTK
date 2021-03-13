@@ -479,6 +479,15 @@ Scene::advance(const double dt)
 }
 
 void
+Scene::updateVisuals()
+{
+    for (auto obj : m_sceneObjectsMap)
+    {
+        obj.second->visualUpdate();
+    }
+}
+
+void
 Scene::lockComputeTimes()
 {
     m_computeTimesLock->lock();

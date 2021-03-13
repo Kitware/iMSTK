@@ -24,7 +24,7 @@
 namespace imstk
 {
 Texture::Texture(std::string path, Type type) :
-    m_path(path), m_type(type)
+    m_type(type), m_path(path)
 {
 }
 

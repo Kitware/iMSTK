@@ -52,7 +52,7 @@ public:
     ///
     /// \brief Set scene to be rendered
     ///
-    void setActiveScene(const std::shared_ptr<Scene>& scene) override;
+    void setActiveScene(std::shared_ptr<Scene> scene) override;
 
     ///
     /// \brief Access screen shot utility
@@ -73,11 +73,6 @@ public:
     /// \brief Returns the device that emits mouse events
     ///
     std::shared_ptr<MouseDeviceClient> getMouseDevice() const;
-
-///
-/// \brief Returns the refresh rate of the nearest display to window
-///
-//double getDisplayRefreshRate();
 
 protected:
     bool initModule() override;

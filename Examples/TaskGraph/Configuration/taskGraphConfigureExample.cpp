@@ -194,7 +194,7 @@ main()
             const VecDataArray<double, 3>& velocities =
                 *std::dynamic_pointer_cast<VecDataArray<double, 3>>(clothGeometry->getVertexAttribute("Velocities"));
             DataArray<double>& scalars = *scalarsPtr;
-            for (size_t i = 0; i < velocities.size(); i++)
+            for (int i = 0; i < velocities.size(); i++)
             {
                 scalars[i] = velocities[i].norm();
             }

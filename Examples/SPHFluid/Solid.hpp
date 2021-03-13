@@ -234,7 +234,6 @@ std::vector<std::shared_ptr<CollidingObject>> generateSolidsScene4(const std::sh
     auto material = std::make_shared<RenderMaterial>();
     material->setDisplayMode(RenderMaterial::DisplayMode::Wireframe);
     material->setColor(Color(Color::Red, 0.1));
-    auto color = material->getColor();
     auto surfMeshModel = std::make_shared<VisualModel>(surfMesh);
     surfMeshModel->setRenderMaterial(material);
     surfaceObject->addVisualModel(surfMeshModel);

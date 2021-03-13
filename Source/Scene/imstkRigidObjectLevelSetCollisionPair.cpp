@@ -59,10 +59,10 @@ RigidObjectLevelSetCollisionPair::RigidObjectLevelSetCollisionPair(std::shared_p
 
     // Define where collision interaction happens
     m_taskNodeInputs.first.push_back(rbdModel->getComputeTentativeVelocitiesNode());
-    m_taskNodeInputs.second.push_back(lvlSetModel->getTaskGraph()->getSource());
+    m_taskNodeInputs.second.push_back(lvlSetModel->getGenerateVelocitiesBeginNode());
 
     m_taskNodeOutputs.first.push_back(rbdModel->getSolveNode());
-    m_taskNodeOutputs.second.push_back(lvlSetModel->getQuantityEvolveNode(0));
+    m_taskNodeOutputs.second.push_back(lvlSetModel->getGenerateVelocitiesEndNode());
 
     // Setup the CD
     m_colData = std::make_shared<CollisionData>();

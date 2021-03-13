@@ -144,7 +144,7 @@ makeSPHObject(const std::string& name, const double particleRadius, const double
 }
 
 static std::shared_ptr<CollidingObject>
-makeLegs(const std::string& name, const Vec3d& position)
+makeLegs(const std::string& name)
 {
     // Create the pbd object
     imstkNew<CollidingObject> legsObj(name);
@@ -223,7 +223,7 @@ main()
         //scene->getConfig()->taskTimingEnabled = true;
 
         // Static Dragon object
-        std::shared_ptr<CollidingObject> legsObj = makeLegs("Vessel", Vec3d(0.0, 0.0, 0.0));
+        std::shared_ptr<CollidingObject> legsObj = makeLegs("Legs");
         scene->addSceneObject(legsObj);
 
         // Position the camera
