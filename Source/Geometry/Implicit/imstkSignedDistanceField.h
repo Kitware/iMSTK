@@ -62,13 +62,13 @@ public:
     ///
     /// \brief Returns signed distance to surface at pos, returns clamped/nearest if out of bounds
     ///
-    double SignedDistanceField::getFunctionValue(const Vec3d& pos) const;
+    double getFunctionValue(const Vec3d& pos) const;
 
     ///
     /// \brief Returns signed distance to surface at coordinate
     /// inlined for performance
     ///
-    inline double SignedDistanceField::getFunctionValueCoord(const Vec3i& coord) const
+    inline double getFunctionValueCoord(const Vec3i& coord) const
     {
         if (coord[0] < m_imageDataSdf->getDimensions()[0] && coord[0] > 0
             && coord[1] < m_imageDataSdf->getDimensions()[1] && coord[1] > 0

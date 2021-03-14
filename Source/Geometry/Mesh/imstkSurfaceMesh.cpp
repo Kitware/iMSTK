@@ -287,7 +287,7 @@ SurfaceMesh::computeVertexNormals()
     // Correct for UV seams
     Vec3d                          normal;
     const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-    for (size_t vertexId = 0; vertexId < vertexNormals.size(); ++vertexId)
+    for (int vertexId = 0; vertexId < vertexNormals.size(); ++vertexId)
     {
         NormalGroup group = { vertices[vertexId], vertexNormals[vertexId] };
 
@@ -341,7 +341,7 @@ SurfaceMesh::computeVertexTangents()
         VecDataArray<double, 3>                  temp_tangents(vertexTangents.size());
         std::shared_ptr<VecDataArray<double, 3>> triangleTangentsPtr = getCellTangents();
         const VecDataArray<double, 3>&           triangleTangents    = *triangleTangentsPtr;
-        for (size_t vertexId = 0; vertexId < triangleTangents.size(); ++vertexId)
+        for (int vertexId = 0; vertexId < triangleTangents.size(); ++vertexId)
         {
             temp_tangents[vertexId] = Vec3d(0.0, 0.0, 0.0);
             for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
