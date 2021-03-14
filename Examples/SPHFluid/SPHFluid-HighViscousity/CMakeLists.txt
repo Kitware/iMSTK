@@ -26,7 +26,7 @@ project(Example-SPHFluid-HighViscousity)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} SPHFluid-HighViscousity.cpp)
+imstk_add_executable(${PROJECT_NAME} SPHFluid-HighViscousity.cpp ../Fluid.hpp ../Solid.hpp ../SPHFluidExample.hpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

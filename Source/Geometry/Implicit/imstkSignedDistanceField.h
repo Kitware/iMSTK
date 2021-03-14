@@ -21,12 +21,14 @@
 
 #pragma once
 
+#include "imstkDataArray.h"
+#include "imstkImageData.h"
 #include "imstkImplicitGeometry.h"
 
 namespace imstk
 {
-class ImageData;
-template<typename T> class DataArray;
+//class ImageData;
+//template<typename T> class DataArray;
 
 ///
 /// \class SignedDistanceField
@@ -60,12 +62,25 @@ public:
     ///
     /// \brief Returns signed distance to surface at pos, returns clamped/nearest if out of bounds
     ///
-    double getFunctionValue(const Vec3d& pos) const override;
+    double getFunctionValue(const Vec3d& pos) const;
 
     ///
     /// \brief Returns signed distance to surface at coordinate
+    /// inlined for performance
     ///
-    double getFunctionValueCoord(const Vec3i& coord) const;
+    inline double getFunctionValueCoord(const Vec3i& coord) const
+    {
+        if (coord[0] < m_imageDataSdf->getDimensions()[0] && coord[0] > 0
+            && coord[1] < m_imageDataSdf->getDimensions()[1] && coord[1] > 0
+            && coord[2] < m_imageDataSdf->getDimensions()[2] && coord[2] > 0)
+        {
+            return (*m_scalars)[m_imageDataSdf->getScalarIndex(coord)] * m_scale;
+        }
+        else
+        {
+            return std::numeric_limits<double>::max();
+        }
+    }
 
     ///
     /// \brief Returns the bounds of the field

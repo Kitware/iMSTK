@@ -22,7 +22,7 @@ if(iMSTK_USE_OpenHaptics)
 	#-----------------------------------------------------------------------------
 	# Create executable
 	#-----------------------------------------------------------------------------
-	imstk_add_executable(${PROJECT_NAME} FemurCutExample.cpp)
+	imstk_add_executable(${PROJECT_NAME} FemurCutExample.cpp FemurObject.h FemurObject.cpp)
 
 	#-----------------------------------------------------------------------------
 	# Add the target to Examples folder

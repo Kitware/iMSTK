@@ -50,7 +50,7 @@ std::shared_ptr<imstk::RigidObject>
 makeMeshRigidObject(const std::string& name, const Vec3d& pos)
 {
     // create cube object
-    imstkNew<RigidObject> meshObj("name");
+    imstkNew<RigidObject> meshObj(name);
 
     // Load a tetrahedral mesh
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
@@ -87,7 +87,7 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
 }
 
 std::shared_ptr<imstk::RigidObject>
-makeCubeRigidObject(const std::string& name, const Vec3d& pos, const bool isStatic)
+makeCubeRigidObject(const std::string& name, const Vec3d& pos)
 {
     // create cube object
     imstkNew<RigidObject> cubeObj(name);
@@ -184,7 +184,7 @@ main()
     // Create Scene
     imstkNew<Scene> scene("ControlRB");
 
-    std::shared_ptr<RigidObject> cubeObj = makeCubeRigidObject("cube", Vec3d(0.0, 0.0, 0.0), false);
+    std::shared_ptr<RigidObject> cubeObj = makeCubeRigidObject("cube", Vec3d(0.0, 0.0, 0.0));
     scene->addSceneObject(cubeObj);
 
     std::shared_ptr<RigidObject> planeObj = makePlaneRigidObject(400.0);
@@ -220,7 +220,7 @@ main()
 
     if (!rbdModel.get())
     {
-        std::shared_ptr<RigidObject> cubeObj2 = makeCubeRigidObject("cube", Vec3d(0.0, 40.0, 0.0), false);
+        std::shared_ptr<RigidObject> cubeObj2 = makeCubeRigidObject("cube", Vec3d(0.0, 40.0, 0.0));
         scene->addSceneObject(cubeObj2);
         // throw error
     }

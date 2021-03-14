@@ -38,7 +38,7 @@ PbdPointNormalCollisionConstraint::initConstraint(std::shared_ptr<PbdCollisionCo
 
 bool
 PbdPointNormalCollisionConstraint::computeValueAndGradient(const VecDataArray<double, 3>& currVertexPositionsA,
-                                                           const VecDataArray<double, 3>& currVertexPositionsB,
+                                                           const VecDataArray<double, 3>& imstkNotUsed(currVertexPositionsB),
                                                            double& c,
                                                            VecDataArray<double, 3>& dcdxA,
                                                            VecDataArray<double, 3>& dcdxB) const

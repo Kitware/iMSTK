@@ -97,6 +97,8 @@ public:
     void setImpulse(const Vec3i& coord, double f);
 
     std::shared_ptr<TaskNode> getQuantityEvolveNode(size_t i) const { return m_evolveQuantitiesNodes[i]; }
+    std::shared_ptr<TaskNode> getGenerateVelocitiesBeginNode() const { return m_generateVelocitiesBegin; }
+    std::shared_ptr<TaskNode> getGenerateVelocitiesEndNode() const { return m_generateVelocitiesEnd; }
 
     std::unordered_map<size_t, std::tuple<Vec3i, double>>& getNodesToUpdate() { return m_nodesToUpdate; }
 
@@ -111,9 +113,15 @@ protected:
 
     std::vector<std::shared_ptr<TaskNode>> m_evolveQuantitiesNodes;
 
+    std::shared_ptr<TaskNode> m_generateVelocitiesBegin;
+    std::shared_ptr<TaskNode> m_generateVelocitiesEnd;
+
     std::shared_ptr<LevelSetModelConfig> m_config;
 
     std::unordered_map<size_t, std::tuple<Vec3i, double>> m_nodesToUpdate;
+    std::vector<std::tuple<size_t, Vec3i, double, Vec2d, double>> m_nodeUpdatePool;
+    size_t noteUpdatePoolSize;
+    size_t m_maxVelocitiesParallel = 100;                      // In sparse mode, if surpass this value, switch to parallel
 
     std::shared_ptr<ImageData> m_gradientMagnitudes = nullptr; ///> Gradient magnitude field when using dense
     std::shared_ptr<ImageData> m_velocities = nullptr;

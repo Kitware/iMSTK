@@ -123,6 +123,11 @@ public:
     virtual void advance(const double dt);
 
     ///
+    /// \brief Update visuals of all sceneobjects
+    ///
+    virtual void updateVisuals();
+
+    ///
     /// \brief Returns true if the object with a given name is registered, else false
     ///
     bool isObjectRegistered(const std::string& sceneObjectName) const;

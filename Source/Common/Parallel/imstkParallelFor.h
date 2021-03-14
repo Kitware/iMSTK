@@ -29,18 +29,32 @@ namespace ParallelUtils
 {
 ///
 /// \brief Execute a function in parallel over a range [beginIdx, endIdx) of indices
+/// \param start index
+/// \param end index
+/// \param function to execute that takes index
+/// \param if less than maxN falls back to normal for loop
 ///
 template<class IndexType, class Function>
 void
-parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& function)
+parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& function, const bool doParallel = true)
 {
-    tbb::parallel_for(tbb::blocked_range<IndexType>(beginIdx, endIdx),
-        [&](const tbb::blocked_range<IndexType>& r) {
-                for (IndexType i = r.begin(), iEnd = r.end(); i < iEnd; ++i)
-                {
-                    function(i);
-                }
-        });
+    if (doParallel)
+    {
+        tbb::parallel_for(tbb::blocked_range<IndexType>(beginIdx, endIdx),
+            [&](const tbb::blocked_range<IndexType>& r) {
+                    for (IndexType i = r.begin(), iEnd = r.end(); i < iEnd; ++i)
+                    {
+                        function(i);
+                    }
+            });
+    }
+    else
+    {
+        for (IndexType i = beginIdx; i < endIdx; i++)
+        {
+            function(i);
+        }
+    }
 }
 
 ///
@@ -48,9 +62,9 @@ parallelFor(const IndexType beginIdx, const IndexType endIdx, Function&& functio
 ///
 template<class IndexType, class Function>
 void
-parallelFor(const IndexType endIdx, Function&& function)
+parallelFor(const IndexType endIdx, Function&& function, const bool doParallel = true)
 {
-    parallelFor(IndexType(0), endIdx, std::forward<Function>(function));
+    parallelFor(IndexType(0), endIdx, std::forward<Function>(function), doParallel);
 }
 
 ///

@@ -26,10 +26,10 @@
 #include "imstkVTKRenderer.h"
 
 #include <vtkCallbackCommand.h>
+#include <vtkFileOutputWindow.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkCallbackCommand.h>
 
 namespace imstk
 {
@@ -91,6 +91,28 @@ void
 AbstractVTKViewer::processEvents()
 {
     m_vtkRenderWindow->GetInteractor()->ProcessEvents();
+}
+
+void
+AbstractVTKViewer::setVtkLoggerMode(VTKLoggerMode loggerMode)
+{
+    if (loggerMode == VTKLoggerMode::SHOW)
+    {
+        vtkObject::GlobalWarningDisplayOn();
+    }
+    else if (loggerMode == VTKLoggerMode::MUTE)
+    {
+        vtkObject::GlobalWarningDisplayOff();
+    }
+    else if (loggerMode == VTKLoggerMode::WRITE)
+    {
+        vtkObject::GlobalWarningDisplayOn();
+
+        // Set the VTK output window to log
+        vtkNew<vtkFileOutputWindow> fileOutputWindow;
+        fileOutputWindow->SetFileName("vtkOutput.log");
+        vtkOutputWindow::SetInstance(fileOutputWindow);
+    }
 }
 
 bool

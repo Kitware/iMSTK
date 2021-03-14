@@ -172,10 +172,10 @@ RigidBodyModel2::computeTentativeVelocities()
     const Vec3d&            fG      = m_config->m_gravity;
 
     // Sum gravity to the forces
-    ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const size_t& i)
+    ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const int& i)
             {
                 forces[i] += fG;
-        });
+        }, forces.size() > m_maxBodiesParallel);
 
     // Compute the desired velocites, later we will solve for the proper velocities,
     // adjusted for the constraints
@@ -183,7 +183,7 @@ RigidBodyModel2::computeTentativeVelocities()
             {
                 tentativeVelocities[i] += forces[i] * invMasses[i] * dt;
                 tentativeAngularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
-        });
+        }, tentativeVelocities.size() > m_maxBodiesParallel);
 }
 
 void
@@ -371,9 +371,9 @@ RigidBodyModel2::integrate()
                     positions[i] += velocities[i] * dt;
                     {
                         const Quatd q = Quatd(0.0,
-                        angularVelocities[i][0],
-                        angularVelocities[i][1],
-                        angularVelocities[i][2]) * orientations[i];
+                            angularVelocities[i][0],
+                            angularVelocities[i][1],
+                            angularVelocities[i][2]) * orientations[i];
                         orientations[i].x() += q.x() * dt;
                         orientations[i].y() += q.y() * dt;
                         orientations[i].z() += q.z() * dt;
@@ -388,7 +388,7 @@ RigidBodyModel2::integrate()
                 torques[i] = Vec3d(0.0, 0.0, 0.0);
                 tentativeVelocities[i] = velocities[i];
                 tentativeAngularVelocities[i] = angularVelocities[i];
-        });
+        }, positions.size() > m_maxBodiesParallel);
 }
 
 void

@@ -141,7 +141,7 @@ struct ImplicitFunctionBackwardGradient : public ImplicitFunctionGradient
 struct StructuredForwardGradient : public ImplicitFunctionGradient
 {
     public:
-        Vec3d operator()(const Vec3d& pos) const override
+        inline Vec3d operator()(const Vec3d& pos) const override
         {
             const SignedDistanceField& funcRef      = *static_cast<SignedDistanceField*>(m_func.get());
             const double               centralValue = funcRef.getFunctionValueCoord(Vec3i(static_cast<int>(pos[0]), static_cast<int>(pos[1]), static_cast<int>(pos[2])));
@@ -171,7 +171,7 @@ struct StructuredForwardGradient : public ImplicitFunctionGradient
 struct StructuredBackwardGradient : public ImplicitFunctionGradient
 {
     public:
-        Vec3d operator()(const Vec3d& pos) const override
+        inline Vec3d operator()(const Vec3d& pos) const override
         {
             const SignedDistanceField& funcRef      = *static_cast<SignedDistanceField*>(m_func.get());
             const double               centralValue = funcRef.getFunctionValueCoord(Vec3i(static_cast<int>(pos[0]), static_cast<int>(pos[1]), static_cast<int>(pos[2])));

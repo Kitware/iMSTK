@@ -23,15 +23,10 @@
 #include "imstkCollisionGraph.h"
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
-#include "imstkImageData.h"
-#include "imstkIsometricMap.h"
-#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLevelSetCH.h"
-#include "imstkLevelSetDeformableObject.h"
 #include "imstkLevelSetModel.h"
 #include "imstkLight.h"
-#include "imstkLocalMarchingCubes.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
@@ -46,81 +41,13 @@
 #include "imstkSceneManager.h"
 #include "imstkSimulationManager.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkTaskGraph.h"
 #include "imstkVisualModel.h"
 #include "imstkVolumeRenderMaterial.h"
 #include "imstkVTKViewer.h"
-
-#include <vtkObject.h>
+#include "FemurObject.h"
 
 using namespace imstk;
 using namespace imstk::expiremental;
-
-///
-/// \brief Creates a level set obj (poly rendering)
-///
-std::shared_ptr<LevelSetDeformableObject>
-makeLevelsetObj(const std::string& name, std::shared_ptr<LocalMarchingCubes> isoExtract, std::unordered_set<int>& chunksGenerated)
-{
-    imstkNew<LevelSetDeformableObject> levelsetObj(name);
-
-    std::shared_ptr<ImageData> initLvlSetImage = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/legs/femurBoneSolid_SDF.nii")->cast(IMSTK_DOUBLE);
-    const Vec3d&               currSpacing     = initLvlSetImage->getSpacing();
-
-    // Note: Anistropic scaling would invalidate the SDF
-    initLvlSetImage->setOrigin(Vec3d(0.0, 0.8, 1.5));
-
-    // Setup the Parameters
-    imstkNew<LevelSetModelConfig> lvlSetConfig;
-    lvlSetConfig->m_sparseUpdate = true;
-    lvlSetConfig->m_substeps     = 30;
-
-    // Too many chunks and you'll hit memory constraints quickly
-    // Too little chunks and the updates for a chunk will take too long
-    // The chunks must divide the image dimensions (image dim-1 must be divisible by # chunks)
-    isoExtract->setInputImage(initLvlSetImage);
-    isoExtract->setIsoValue(0.0);
-    isoExtract->setNumberOfChunks(Vec3i(32, 9, 9));
-    isoExtract->update();
-
-    srand(time(NULL));
-
-    const Vec3i& numChunks = isoExtract->getNumberOfChunks();
-    for (int i = 0; i < numChunks[0] * numChunks[1] * numChunks[2]; i++)
-    {
-        auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(isoExtract->getOutput(i));
-        if (surfMesh->getNumVertices() > 0 && chunksGenerated.count(i) == 0)
-        {
-            imstkNew<VisualModel>    surfMeshModel(isoExtract->getOutput(i));
-            imstkNew<RenderMaterial> material;
-            material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-            material->setLineWidth(4.0);
-            /*const double r = (rand() % 500) / 500.0;
-            const double g = (rand() % 500) / 500.0;
-            const double b = (rand() % 500) / 500.0;
-            material->setColor(Color(r, g, b));*/
-            material->setColor(Color::Bone);
-            //material->setOpacity(0.7);
-            surfMeshModel->setRenderMaterial(material);
-            levelsetObj->addVisualModel(surfMeshModel);
-            chunksGenerated.insert(i);
-        }
-    }
-
-    // Setup the Object
-    imstkNew<SignedDistanceField> sdf(initLvlSetImage);
-
-    // Setup the Model
-    imstkNew<LevelSetModel> model;
-    model->setModelGeometry(sdf);
-    model->configure(lvlSetConfig);
-
-    levelsetObj->setPhysicsGeometry(sdf);
-    levelsetObj->setCollidingGeometry(sdf);
-    levelsetObj->setDynamicalModel(model);
-
-    return levelsetObj;
-}
 
 std::shared_ptr<RigidObject2>
 makeRigidObj(const std::string& name)
@@ -129,10 +56,10 @@ makeRigidObj(const std::string& name)
     rbdModel->getConfig()->m_maxNumIterations       = 8;
     rbdModel->getConfig()->m_velocityDamping        = 1.0;
     rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
-    rbdModel->getConfig()->m_maxNumConstraints      = 20;
+    rbdModel->getConfig()->m_maxNumConstraints      = 40;
 
     // Create the first rbd, plane floor
-    imstkNew<RigidObject2> rigidObj("Tool");
+    imstkNew<RigidObject2> rigidObj(name);
 
     {
         auto toolMesh = MeshIO::read<SurfaceMesh>(iMSTK_DATA_ROOT "/Surgical Instruments/Scalpel/Scalpel_Hull_Subdivided_Shifted.stl");
@@ -167,22 +94,19 @@ makeRigidObj(const std::string& name)
 int
 main()
 {
-    vtkObject::GlobalWarningDisplayOff();
-
     // Setup logger (write to file and stdout)
     Logger::startLogger();
 
     imstkNew<Scene> scene("FemurCut");
+    scene->getConfig()->taskParallelizationEnabled = false;
 
-    std::shared_ptr<LocalMarchingCubes>       isoExtract = std::make_shared<LocalMarchingCubes>();
-    std::unordered_set<int>                   chunksGenerated; // Lazy generation of chunks
-    std::shared_ptr<LevelSetDeformableObject> lvlSetObj = makeLevelsetObj("LevelSetObj", isoExtract, chunksGenerated);
-    scene->addSceneObject(lvlSetObj);
+    imstkNew<FemurObject> femurObj;
+    scene->addSceneObject(femurObj);
 
-    std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("RigidObj");
+    std::shared_ptr<RigidObject2> rbdObj = makeRigidObj("ToolObject");
     scene->addSceneObject(rbdObj);
 
-    imstkNew<SceneObject> rbdGhostObj("RigidObjGhost");
+    imstkNew<SceneObject> rbdGhostObj("ToolObjectGhost");
     imstkNew<SurfaceMesh> ghostMesh;
     ghostMesh->deepCopy(std::dynamic_pointer_cast<SurfaceMesh>(rbdObj->getPhysicsGeometry()));
     rbdGhostObj->setVisualGeometry(ghostMesh);
@@ -191,14 +115,14 @@ main()
     rbdGhostObj->getVisualModel(0)->setRenderMaterial(ghostMat);
     scene->addSceneObject(rbdGhostObj);
 
-    imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, lvlSetObj);
+    imstkNew<RigidObjectLevelSetCollisionPair> interaction(rbdObj, femurObj);
     {
         auto colHandlerA = std::dynamic_pointer_cast<RigidBodyCH>(interaction->getCollisionHandlingA());
         colHandlerA->setUseFriction(false);
         colHandlerA->setStiffness(0.05); // inelastic collision
 
         auto colHandlerB = std::dynamic_pointer_cast<LevelSetCH>(interaction->getCollisionHandlingB());
-        colHandlerB->setLevelSetVelocityScaling(0.05);
+        colHandlerB->setLevelSetVelocityScaling(0.01);
         colHandlerB->setKernel(3, 1.0);
         //colHandlerB->setLevelSetVelocityScaling(0.0); // Can't push the levelset
         colHandlerB->setUseProportionalVelocity(true);
@@ -220,6 +144,7 @@ main()
 
     {
         imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setVtkLoggerMode(VTKViewer::VTKLoggerMode::MUTE);
         viewer->setActiveScene(scene);
 
         // Add a module to run the scene
@@ -227,13 +152,14 @@ main()
         sceneManager->setActiveScene(scene);
         sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
-        imstkNew<HapticDeviceManager>       hapticManager;
+        imstkNew<HapticDeviceManager> hapticManager;
+        hapticManager->setSleepDelay(0.5); // Delay for 1/2ms (haptics thread is limited to max 2000hz)
         std::shared_ptr<HapticDeviceClient> hapticDeviceClient = hapticManager->makeDeviceClient();
 
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
         {
-            controller->setLinearKd(1000.0 * 0.9);
-            controller->setLinearKs(100000.0 * 0.9);
+            controller->setLinearKd(1000.0);
+            controller->setLinearKs(100000.0);
             controller->setAngularKs(300000000.0);
             controller->setAngularKd(400000.0);
             controller->setForceScaling(0.001);
@@ -251,67 +177,23 @@ main()
             scene->addController(controller);
         }
 
-        connect<Event>(sceneManager->getActiveScene(), &Scene::configureTaskGraph, [&](Event*)
-        {
-            std::shared_ptr<TaskGraph> taskGraph = sceneManager->getActiveScene()->getTaskGraph();
-
-            // Pipe the changes from the levelset into local marching cubes
-            // Compute this before the levelset is evolved
-            taskGraph->insertBefore(lvlSetObj->getLevelSetModel()->getQuantityEvolveNode(0),
-                    std::make_shared<TaskNode>([&]()
-            {
-                for (auto i : lvlSetObj->getLevelSetModel()->getNodesToUpdate())
-                {
-                    isoExtract->setModified(std::get<0>(i.second));
-                }
-            }, "Isosurface: SetModifiedVoxels"));
-        });
-        connect<Event>(viewer, &Viewer::preUpdate, [&](Event*)
-        {
-            // Update any chunks that contain a voxel which was set modified
-            isoExtract->update();
-
-            // Create meshes for chunks if they now contain vertices (and weren't already generated)
-            // You could just create all the chunks, but this saves some memory for internal/empty ones
-            const Vec3i& numChunks = isoExtract->getNumberOfChunks();
-            for (int i = 0; i < numChunks[0] * numChunks[1] * numChunks[2]; i++)
-            {
-                auto surfMesh = std::dynamic_pointer_cast<SurfaceMesh>(isoExtract->getOutput(i));
-                if (surfMesh->getNumVertices() > 0 && chunksGenerated.count(i) == 0)
-                {
-                    imstkNew<VisualModel> surfMeshModel(isoExtract->getOutput(i));
-                    imstkNew<RenderMaterial> material;
-                    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
-                    material->setLineWidth(4.0);
-                    /*const double r = (rand() % 500) / 500.0;
-                    const double g = (rand() % 500) / 500.0;
-                    const double b = (rand() % 500) / 500.0;
-                    material->setColor(Color(r, g, b));*/
-                    material->setColor(Color::Bone);
-                    //material->setOpacity(0.7);
-                    surfMeshModel->setRenderMaterial(material);
-                    lvlSetObj->addVisualModel(surfMeshModel);
-                    chunksGenerated.insert(i);
-                }
-            }
-        });
         connect<Event>(sceneManager, &SceneManager::postUpdate, [&](Event*)
         {
-            rbdObj->getRigidBodyModel2()->getConfig()->m_dt  = sceneManager->getDt();
-            lvlSetObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
+            rbdObj->getRigidBodyModel2()->getConfig()->m_dt = sceneManager->getDt();
+            femurObj->getLevelSetModel()->getConfig()->m_dt = sceneManager->getDt();
 
             // Also apply controller transform to ghost geometry
             ghostMesh->setTranslation(controller->getPosition());
             ghostMesh->setRotation(controller->getRotation());
             ghostMesh->updatePostTransformData();
             ghostMesh->postModified();
-        });
+            });
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(hapticManager);
-        driver->setDesiredDt(0.001); // Little over 1000ups
+        driver->setDesiredDt(0.001); // Exactly 1000ups
 
         {
             imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());

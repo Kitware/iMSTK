@@ -24,13 +24,12 @@
 #include "imstkSpinLock.h"
 
 #include <algorithm>
+#include <deque>
 #include <functional>
 #include <list>
 #include <memory>
-//#include <tbb/concurrent_priority_queue.h>
-#include <tbb/concurrent_queue.h>
-#include <tbb/concurrent_unordered_map.h>
-#include <deque>
+#include <string>
+#include <vector>
 
 #define SIGNAL(className,signalName) static std::string signalName() { return #className "::"#signalName; }
 
@@ -48,7 +47,6 @@ class EventObject;
 class Event
 {
 public:
-    //Event() : m_type(EventType::AnyEvent), m_priority(0), m_sender(nullptr) { }
     Event(const std::string type) : m_type(type),m_sender(nullptr) { }
     virtual~Event() = default;
 
@@ -139,35 +137,49 @@ public:
 
         // For every direct observer
         // Directly call its function
-        for (std::list<Observer>::iterator i = directObservers[e.m_type].begin(); i != directObservers[e.m_type].end(); i++)
+        for (auto i = directObservers.begin(); i != directObservers.end(); i++)
         {
-            // If function of observer does not exist, remove observer
-            if (i->second != nullptr)
+            if (i->first == e.m_type)
             {
-                // Call the function
-                i->second(ePtr.get());
-            }
-            else
-            {
-                i = directObservers[e.m_type].erase(i);
+                std::vector<Observer>& observers = i->second;
+                for (std::vector<Observer>::iterator j = observers.begin(); j != observers.end(); j++)
+                {
+                    // If function of observer does not exist, remove observer
+                    if (j->second != nullptr)
+                    {
+                        // Call the function
+                        j->second(ePtr.get());
+                    }
+                    else
+                    {
+                        j = i->second.erase(j);
+                    }
+                }
             }
         }
 
         // For every queued observer
-        for (std::list<Observer>::iterator i = queuedObservers[e.m_type].begin(); i != queuedObservers[e.m_type].end(); i++)
+        for (auto i = queuedObservers.begin(); i != queuedObservers.end(); i++)
         {
-            // As long as the object exists
-            // Push to its queue, otherwise remove observer
-            if (i->first != nullptr)
+            if (i->first == e.m_type)
             {
-                // Queue the command
-                i->first->eventQueueLock.lock();
-                i->first->eventQueue.push_back(Command(i->second, ePtr));
-                i->first->eventQueueLock.unlock();
-            }
-            else
-            {
-                i = queuedObservers[e.m_type].erase(i);
+                std::vector<Observer>& observers = i->second;
+                for (std::vector<Observer>::iterator j = observers.begin(); j != observers.end(); j++)
+                {
+                    // As long as the object exists
+                    // Push to its queue, otherwise remove observer
+                    if (j->first != nullptr)
+                    {
+                        // Queue the command
+                        j->first->eventQueueLock.lock();
+                        j->first->eventQueue.push_back(Command(j->second, ePtr));
+                        j->first->eventQueueLock.unlock();
+                    }
+                    else
+                    {
+                        j = i->second.erase(j);
+                    }
+                }
             }
         }
     }
@@ -302,12 +314,51 @@ public:
 
     friend void disconnect(EventObject*, EventObject*, std::string (*)());
 
+// Use the connect functions
+private:
+    void addDirectObserver(std::string eventType, Observer observer)
+    {
+        std::vector<std::pair<std::string, std::vector<Observer>>>::iterator i =
+            std::find_if(directObservers.begin(), directObservers.end(),
+                [eventType](const std::pair<std::string, std::vector<Observer>>& j)
+                { return j.first == eventType; });
+        if (i == directObservers.end())
+        {
+            std::pair<std::string, std::vector<Observer>> test = std::pair<std::string, std::vector<Observer>>(eventType, std::vector<Observer>());
+            test.second.push_back(observer);
+            directObservers.push_back(test);
+        }
+        else
+        {
+            i->second.push_back(observer);
+        }
+    }
+
+    void addQueuedObserver(std::string eventType, Observer observer)
+    {
+        std::vector<std::pair<std::string, std::vector<Observer>>>::iterator i =
+            std::find_if(queuedObservers.begin(), queuedObservers.end(),
+                [eventType](const std::pair<std::string, std::vector<Observer>>& j)
+                { return j.first == eventType; });
+        if (i == queuedObservers.end())
+        {
+            std::pair<std::string, std::vector<Observer>> test = std::pair<std::string, std::vector<Observer>>(eventType, std::vector<Observer>());
+            test.second.push_back(observer);
+            queuedObservers.push_back(test);
+        }
+        else
+        {
+            i->second.push_back(observer);
+        }
+    }
+
 protected:
     ParallelUtils::SpinLock eventQueueLock; // Data lock for the event queue
     std::deque<Command>     eventQueue;
 
-    tbb::concurrent_unordered_map<std::string, std::list<Observer>> queuedObservers;
-    tbb::concurrent_unordered_map<std::string, std::list<Observer>> directObservers;
+    // Vectors used as size is generally small
+    std::vector<std::pair<std::string, std::vector<Observer>>> queuedObservers;
+    std::vector<std::pair<std::string, std::vector<Observer>>> directObservers;
 };
 
 #ifdef WIN32
@@ -325,7 +376,7 @@ connect(EventObject* sender, std::string (* senderFunc)(),
     static_assert(std::is_base_of<EventObject, RecieverType>::value, "reciever not derived from EventObject");
 
     std::function<void(T*)> recieverStdFunc = std::bind(recieverFunc, reciever, std::placeholders::_1);
-    sender->directObservers[senderFunc()].push_back(EventObject::Observer(nullptr, [ = ](Event* e) { recieverStdFunc(static_cast<T*>(e)); }));
+    sender->addDirectObserver(senderFunc(), EventObject::Observer(reciever, [ = ](Event* e) { recieverStdFunc(static_cast<T*>(e)); }));
 }
 
 template<class T, class RecieverType>
@@ -360,7 +411,7 @@ static void
 connect(EventObject* sender, std::string (* senderFunc)(),
         std::function<void(T*)> recieverFunc)
 {
-    sender->directObservers[senderFunc()].push_back(EventObject::Observer(nullptr, [ = ](Event* e) { recieverFunc(static_cast<T*>(e)); }));
+    sender->addDirectObserver(senderFunc(), EventObject::Observer(nullptr, [ = ](Event* e) { recieverFunc(static_cast<T*>(e)); }));
 }
 
 template<class T>
@@ -382,8 +433,7 @@ queueConnect(EventObject* sender, std::string (* senderFunc)(), RecieverType* re
     static_assert(std::is_base_of<EventObject, RecieverType>::value, "reciever not derived from EventObject");
 
     std::function<void(T*)> recieverStdFunc = std::bind(recieverFunc, reciever, std::placeholders::_1);
-
-    sender->queuedObservers[senderFunc()].push_back(EventObject::Observer(reciever, [ = ](Event* e) { recieverStdFunc(static_cast<T*>(e)); }));
+    sender->addQueuedObserver(senderFunc(), EventObject::Observer(reciever, [ = ](Event* e) { recieverStdFunc(static_cast<T*>(e)); }));
 }
 
 template<class T, class RecieverType>
@@ -414,7 +464,7 @@ template<class T>
 static void
 queueConnect(EventObject* sender, std::string (* senderFunc)(), EventObject* reciever, std::function<void(T*)> recieverFunc)
 {
-    sender->queuedObservers[senderFunc()].push_back(EventObject::Observer(reciever, [ = ](Event* e) { recieverFunc(static_cast<T*>(e)); }));
+    sender->addQueuedObserver(senderFunc(), EventObject::Observer(reciever, [ = ](Event* e) { recieverFunc(static_cast<T*>(e)); }));
 }
 
 template<class T>
@@ -445,8 +495,23 @@ queueConnect(EventObject* sender, std::string (* senderFunc)(), std::shared_ptr<
 static void
 disconnect(EventObject* sender, EventObject* reciever, std::string (* senderFunc)())
 {
-    sender->directObservers[senderFunc()].remove_if([&](const EventObject::Observer& observer) { return observer.first == reciever; });
-    sender->queuedObservers[senderFunc()].remove_if([&](const EventObject::Observer& observer) { return observer.first == reciever; });
+    const std::string eventType = senderFunc();
+
+    auto i1 = std::find_if(sender->directObservers.begin(), sender->directObservers.end(),
+        [eventType](const std::pair<std::string, std::vector<EventObject::Observer>>& j) { return j.first == eventType; });
+    if (i1 != sender->directObservers.end())
+    {
+        auto j = std::find_if(i1->second.begin(), i1->second.end(), [reciever](const EventObject::Observer& j) { return j.first == reciever; });
+        i1->second.erase(j);
+    }
+
+    auto i2 = std::find_if(sender->queuedObservers.begin(), sender->queuedObservers.end(),
+        [eventType](const std::pair<std::string, std::vector<EventObject::Observer>>& j) { return j.first == eventType; });
+    if (i2 != sender->queuedObservers.end())
+    {
+        auto j = std::find_if(i2->second.begin(), i2->second.end(), [reciever](const EventObject::Observer& j) { return j.first == reciever; });
+        i2->second.erase(j);
+    }
 }
 
 static void

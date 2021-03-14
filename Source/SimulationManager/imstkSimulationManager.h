@@ -53,7 +53,7 @@ public:
     };
 
 public:
-    ~SimulationManager() override= default;
+    virtual ~SimulationManager() override= default;
 
 public:
     ///
@@ -123,6 +123,6 @@ protected:
     ThreadingType m_threadType = ThreadingType::STL;
     double m_desiredDt = 0.003; // Desired timestep
     double m_dt       = 0.0;    // Actual timestep
-    double m_numSteps = 0;
+    int    m_numSteps = 0;
 };
 };

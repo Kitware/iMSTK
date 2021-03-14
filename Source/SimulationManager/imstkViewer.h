@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Set scene to be rendered
     ///
-    virtual void setActiveScene(const std::shared_ptr<Scene>& scene) = 0;
+    virtual void setActiveScene(std::shared_ptr<Scene> scene) = 0;
 
     ///
     /// \brief Setup the current renderer to render what's needed

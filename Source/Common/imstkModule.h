@@ -24,6 +24,9 @@
 #include "imstkTimer.h"
 #include "imstkEventObject.h"
 
+#include <tbb/atomic.h>
+#include <thread>
+
 namespace imstk
 {
 ///
@@ -86,7 +89,9 @@ public:
     void setPaused(const bool paused) { m_paused = paused; }
 
     ExecutionType getExecutionType() const{ return m_executionType; }
-    void setExecutionType(ExecutionType type) { m_executionType = type; }
+    void setExecutionType(const ExecutionType type) { m_executionType = type; }
+
+    void setSleepDelay(const double ms) { sleepDelay = ms; }
 
     void pause() { m_paused = true; }
     void resume() { m_paused = false; }
@@ -98,9 +103,21 @@ public:
     {
         if (m_init && !m_paused)
         {
-            this->postEvent(Event(Module::preUpdate()));
-            this->updateModule();
-            this->postEvent(Event(Module::postUpdate()));
+            if (sleepDelay != 0.0)
+            {
+                std::this_thread::sleep_for(std::chrono::duration<double,std::milli>(sleepDelay));
+            }
+
+            if (muteUpdateEvents)
+            {
+                this->updateModule();
+            }
+            else
+            {
+                this->postEvent(Event(Module::preUpdate()));
+                this->updateModule();
+                this->postEvent(Event(Module::postUpdate()));
+            }
         }
     }
 
@@ -125,6 +142,8 @@ protected:
     tbb::atomic<bool> m_init   = false;
     tbb::atomic<bool> m_paused = false;
     double m_dt = 0.0;
-    ExecutionType m_executionType = ExecutionType::PARALLEL;     // Defaults to parallel, subclass and set
+    ExecutionType m_executionType = ExecutionType::PARALLEL; // Defaults to parallel, subclass and set
+    bool   muteUpdateEvents       = false;                   // Avoid posting pre/post update, useful when running modules at extremely fast rates
+    double sleepDelay = 0.0;                                 // ms sleep for the module, useful for throttling some modules
 };
 }

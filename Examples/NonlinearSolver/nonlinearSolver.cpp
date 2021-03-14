@@ -33,7 +33,7 @@ using namespace imstk;
 /// \brief This example is for demonstration of how to use a NewtonSolver and its verification
 ///
 int
-main(int argc, char** argv)
+main()
 {
     const int N  = 2;
     auto      x  = Vectord(N);
@@ -46,7 +46,7 @@ main(int argc, char** argv)
     xe[0] = 1.0;
     xe[1] = 10.0;
 
-    auto func = [&y](const Vectord& x, const bool isSemiImplicit) -> const Vectord& {
+    auto func = [&y](const Vectord& x, const bool) -> const Vectord& {
                     // auto y = Vectord(x.size());
                     y[0] = x[0] * x[0] - 1.0;
                     y[1] = x[1] * x[1] - 100.0;
@@ -64,7 +64,7 @@ main(int argc, char** argv)
                    return A;
                };
 
-    auto updateX = [&x](const Vectord& du, const bool isSemiImplicit)
+    auto updateX = [&x](const Vectord& du, const bool)
                    {
                        x -= du;
                        return;

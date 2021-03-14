@@ -26,7 +26,7 @@ project(Example-SPHFluid-BunnyShape)
 #-----------------------------------------------------------------------------
 # Create executable
 #-----------------------------------------------------------------------------
-imstk_add_executable(${PROJECT_NAME} SPHFluid-BunnyShape.cpp Bunny.cpp)
+imstk_add_executable(${PROJECT_NAME} SPHFluid-BunnyShape.cpp Bunny.cpp ../Fluid.hpp ../Solid.hpp ../SPHFluidExample.hpp)
 
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder

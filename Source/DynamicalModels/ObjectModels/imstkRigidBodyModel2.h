@@ -149,9 +149,10 @@ protected:
     std::list<std::shared_ptr<RbdConstraint>>    m_constraints;
     std::vector<std::shared_ptr<RigidBody>>      m_bodies;
     std::unordered_map<RigidBody*, StorageIndex> m_locations;
-    bool m_modified = true;
+    bool   m_modified = true;
+    size_t m_maxBodiesParallel = 10; // After 10 bodies, parallel for's are used
 
-    Eigen::VectorXd F; // Reaction forces
+    Eigen::VectorXd F;               // Reaction forces
 };
 }
 }
