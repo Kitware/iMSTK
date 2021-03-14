@@ -125,70 +125,77 @@ LevelSetModel::evolve()
             return;
         }
 
-        // index, coordinates, force, forward/backward gradient magnitude, curvature
-        //std::vector<std::tuple<size_t, Vec3i, double, Vec2d, double>> nodeUpdates;
-        //nodeUpdates.reserve(m_nodesToUpdate.size());
+        // Setup a map of 0 based index -> image sparse index m_nodesToUpdate to parallelize
+        std::vector<size_t> baseIndexToImageIndex;
+        baseIndexToImageIndex.reserve(m_nodesToUpdate.size());
+        for (std::unordered_map<size_t, std::tuple<Vec3i, double>>::iterator iter = m_nodesToUpdate.begin(); iter != m_nodesToUpdate.end(); iter++)
+        {
+            baseIndexToImageIndex.push_back(iter->first);
+        }
 
         // Compute gradients
-        const double constantVel = m_config->m_constantVelocity;
+        const double                             constantVel = m_config->m_constantVelocity;
+        std::tuple<size_t, Vec3i, double, Vec2d> val;
         for (int j = 0; j < m_config->m_substeps; j++)
         {
-            noteUpdatePoolSize = 0;
-            for (std::unordered_map<size_t, std::tuple<Vec3i, double>>::iterator iter = m_nodesToUpdate.begin(); iter != m_nodesToUpdate.end(); iter++)
-            {
-                const size_t index  = iter->first;
-                const Vec3i& coords = std::get<0>(iter->second);
-                const double f      = std::get<1>(iter->second);
+            ParallelUtils::parallelFor(baseIndexToImageIndex.size(), [&](const size_t i)
+                {
+                    std::tuple<size_t, Vec3i, double, Vec2d, double>& outputVal = m_nodeUpdatePool[i];
+                    const size_t& index = std::get<0>(outputVal) = baseIndexToImageIndex[i];
 
-                // Gradients
-                const Vec3d gradPos = m_forwardGrad(Vec3d(coords[0], coords[1], coords[2]));
-                const Vec3d gradNeg = m_backwardGrad(Vec3d(coords[0], coords[1], coords[2]));
+                    std::tuple<Vec3i, double>& inputVal = m_nodesToUpdate[index];
 
-                Vec3d gradNegMax = gradNeg.cwiseMax(0.0);
-                Vec3d gradNegMin = gradNeg.cwiseMin(0.0);
-                Vec3d gradPosMax = gradPos.cwiseMax(0.0);
-                Vec3d gradPosMin = gradPos.cwiseMin(0.0);
+                    const Vec3i& coords    = std::get<1>(outputVal) = std::get<0>(inputVal);
+                    std::get<2>(outputVal) = std::get<1>(inputVal);
 
-                // Square them
-                gradNegMax = gradNegMax.cwiseProduct(gradNegMax);
-                gradNegMin = gradNegMin.cwiseProduct(gradNegMin);
-                gradPosMax = gradPosMax.cwiseProduct(gradPosMax);
-                gradPosMin = gradPosMin.cwiseProduct(gradPosMin);
+                    // Gradients
+                    const Vec3d gradPos = m_forwardGrad(Vec3d(coords[0], coords[1], coords[2]));
+                    const Vec3d gradNeg = m_backwardGrad(Vec3d(coords[0], coords[1], coords[2]));
 
-                const double posMag =
-                    gradNegMax[0] + gradNegMax[1] + gradNegMax[2] +
-                    gradPosMin[0] + gradPosMin[1] + gradPosMin[2];
+                    Vec3d gradNegMax = gradNeg.cwiseMax(0.0);
+                    Vec3d gradNegMin = gradNeg.cwiseMin(0.0);
+                    Vec3d gradPosMax = gradPos.cwiseMax(0.0);
+                    Vec3d gradPosMin = gradPos.cwiseMin(0.0);
 
-                const double negMag =
-                    gradNegMin[0] + gradNegMin[1] + gradNegMin[2] +
-                    gradPosMax[0] + gradPosMax[1] + gradPosMax[2];
+                    // Square them
+                    gradNegMax = gradNegMax.cwiseProduct(gradNegMax);
+                    gradNegMin = gradNegMin.cwiseProduct(gradNegMin);
+                    gradPosMax = gradPosMax.cwiseProduct(gradPosMax);
+                    gradPosMin = gradPosMin.cwiseProduct(gradPosMin);
 
-                // Curvature
-                //const double kappa = m_curvature(Vec3d(coords[0], coords[1], coords[2]));
+                    const double posMag =
+                        gradNegMax[0] + gradNegMax[1] + gradNegMax[2] +
+                        gradPosMin[0] + gradPosMin[1] + gradPosMin[2];
 
-                m_nodeUpdatePool[noteUpdatePoolSize++] = std::tuple<size_t, Vec3i, double, Vec2d, double>(index, coords, f, Vec2d(negMag, posMag), 0.0);
-            }
+                    const double negMag =
+                        gradNegMin[0] + gradNegMin[1] + gradNegMin[2] +
+                        gradPosMax[0] + gradPosMax[1] + gradPosMax[2];
+
+                    std::get<3>(outputVal) = Vec2d(negMag, posMag);
+
+                    // Curvature
+                    //const double kappa = m_curvature(Vec3d(coords[0], coords[1], coords[2]));
+                }, baseIndexToImageIndex.size() > 50);
 
             // Update levelset
-            for (size_t i = 0; i < noteUpdatePoolSize; i++)
-            //ParallelUtils::parallelFor(noteUpdatePoolSize, [&](const size_t& i)
-            {
-                const size_t index = std::get<0>(m_nodeUpdatePool[i]);
-                const double vel   = std::get<2>(m_nodeUpdatePool[i]) + constantVel;
-                const Vec2d& g     = std::get<3>(m_nodeUpdatePool[i]);
-                //const double kappa = std::get<4>(nodeUpdates[i]);
+            ParallelUtils::parallelFor(baseIndexToImageIndex.size(), [&](const size_t& i)
+                {
+                    const size_t index = std::get<0>(m_nodeUpdatePool[i]);
+                    const double vel   = std::get<2>(m_nodeUpdatePool[i]) + constantVel;
+                    const Vec2d& g     = std::get<3>(m_nodeUpdatePool[i]);
+                    //const double kappa = std::get<4>(nodeUpdates[i]);
 
-                // If speed function positive use forward difference (posMag)
-                if (vel > 0.0)
-                {
-                    imgPtr[index] += dt * (vel * std::sqrt(g[0]) /*+ kappa * k*/);
-                }
-                // If speed function negative use backward difference (negMag)
-                else if (vel < 0.0)
-                {
-                    imgPtr[index] += dt * (vel * std::sqrt(g[1]) /*+ kappa * k*/);
-                }
-            }//);
+                    // If speed function positive use forward difference (posMag)
+                    if (vel > 0.0)
+                    {
+                        imgPtr[index] += dt * (vel * std::sqrt(g[0]) /*+ kappa * k*/);
+                    }
+                    // If speed function negative use backward difference (negMag)
+                    else if (vel < 0.0)
+                    {
+                        imgPtr[index] += dt * (vel * std::sqrt(g[1]) /*+ kappa * k*/);
+                    }
+            }, noteUpdatePoolSize > m_maxVelocitiesParallel);
         }
 
         m_nodesToUpdate.clear();

@@ -56,7 +56,7 @@ makeRigidObj(const std::string& name)
     rbdModel->getConfig()->m_maxNumIterations       = 8;
     rbdModel->getConfig()->m_velocityDamping        = 1.0;
     rbdModel->getConfig()->m_angularVelocityDamping = 1.0;
-    rbdModel->getConfig()->m_maxNumConstraints      = 20;
+    rbdModel->getConfig()->m_maxNumConstraints      = 40;
 
     // Create the first rbd, plane floor
     imstkNew<RigidObject2> rigidObj(name);
@@ -158,8 +158,8 @@ main()
 
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
         {
-            controller->setLinearKd(1000.0 * 0.9);
-            controller->setLinearKs(100000.0 * 0.9);
+            controller->setLinearKd(1000.0);
+            controller->setLinearKs(100000.0);
             controller->setAngularKs(300000000.0);
             controller->setAngularKd(400000.0);
             controller->setForceScaling(0.001);
@@ -187,13 +187,13 @@ main()
             ghostMesh->setRotation(controller->getRotation());
             ghostMesh->updatePostTransformData();
             ghostMesh->postModified();
-        });
+            });
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->addModule(hapticManager);
-        driver->setDesiredDt(0.001); // Little over 1000ups
+        driver->setDesiredDt(0.001); // Exactly 1000ups
 
         {
             imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());

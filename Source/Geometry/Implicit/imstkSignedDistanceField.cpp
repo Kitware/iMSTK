@@ -116,22 +116,6 @@ SignedDistanceField::getFunctionValue(const Vec3d& pos) const
     }
 }
 
-double
-SignedDistanceField::getFunctionValueCoord(const Vec3i& coord) const
-{
-    if (coord[0] < m_imageDataSdf->getDimensions()[0] && coord[0] > 0
-        && coord[1] < m_imageDataSdf->getDimensions()[1] && coord[1] > 0
-        && coord[2] < m_imageDataSdf->getDimensions()[2] && coord[2] > 0)
-    {
-        const Vec3i clampedCoord = coord.cwiseMin(m_imageDataSdf->getDimensions() - Vec3i(1, 1, 1)).cwiseMax(0);
-        return (*m_scalars)[m_imageDataSdf->getScalarIndex(clampedCoord)] * m_scale;
-    }
-    else
-    {
-        return std::numeric_limits<double>::min();
-    }
-}
-
 void
 SignedDistanceField::computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent)
 {

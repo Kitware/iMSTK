@@ -147,21 +147,22 @@ SimulationManager::start()
             accumulator += passedTime;
 
             // Compute number of steps we can take (total time previously took / desired time step)
-            m_numSteps = 0;
-            while (accumulator >= desiredDt_ms)
             {
-                m_numSteps++;
-                accumulator -= desiredDt_ms;
+                // Divided out and floor
+                m_numSteps = static_cast<int>(accumulator / desiredDt_ms);
+                // Set the remainder
+                accumulator = accumulator - m_numSteps * desiredDt_ms;
+                // Flatten out the remainder over our desired dt
+                m_dt = desiredDt_ms;
+                if (m_numSteps != 0)
+                {
+                    m_dt += accumulator / m_numSteps;
+                    accumulator = 0.0;
+                }
+                m_dt *= 0.001; // ms->s
             }
 
-            // Flatten out the leftover accumulation in our chosen dt
-            m_dt = desiredDt_ms;
-            if (m_numSteps != 0)
-            {
-                m_dt += accumulator / m_numSteps;
-                accumulator = 0.0;
-            }
-            m_dt *= 0.001; // ms->s
+            //printf("%d steps at %f\n", m_numSteps, m_dt);
 
             // Optional smoothening + loss here
 
