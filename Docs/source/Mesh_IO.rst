@@ -53,7 +53,7 @@ MeshIO
 
 Example of file with multiple parts and materials:
 
-.. image:: media/meshIO.png
+.. image:: media/MeshIO.png
   :width: 400
   :alt: Alternative text
   :align: center

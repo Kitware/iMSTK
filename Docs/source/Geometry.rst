@@ -115,7 +115,7 @@ For example, you can punch and move a hole or grow a capsule in a signed distanc
     compGeom->addImplicitGeometry(planeGeom, CompositeImplicitGeometry::GeometryBoolType::Union);
     compGeom->addImplicitGeometry(sphereGeom, CompositeImplicitGeometry::GeometryBoolType::Difference);
 
-.. image:: media/CompositeGeo.png
+.. image:: media/compositeGeo.png
     :width: 600
     :alt: Alternative text
     :align: center

@@ -4,7 +4,7 @@ SimulationManager & Modules
 SimulationManager: Usage
 ========================
 
-iMSTK defines a set of Modules. Modules define something that can be init'd, update'd, and uninit'd. These can be used standalone. The 3 major modules given by iMSTK are:
+iMSTK defines a set of Modules. Modules define something that can be initialized, updated, and uninitialized. These can be used standalone. The three major modules given by iMSTK are:
 
 - VTKViewer
 - SceneManager
@@ -29,7 +29,7 @@ ModuleDriver is an abstract class which starts and stops a collection of Modules
     driver->start();
 
 
-Commonly you will also find it useful to start the scene in a paused state.
+Commonly, you will also find it useful to start the scene in a paused state.
 
 ::
 

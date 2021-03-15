@@ -165,7 +165,7 @@ These interactions are meant to keep the API simple. Internally they are quite p
 Interactions Internals
 ----------------------
 
-What the scene interactions in iMSTK provide is intermediate callback between two differing SceneObjects. That is, SceneObjects that have DynamicalModels such as Pbd, Fem, SPH, ... May have a complex pipeline, or set of steps. Certain interactions require intermediate callback that occurs between two steps of these models.
+What the scene interactions in iMSTK provide is intermediate callback between two differing SceneObjects. That is, SceneObjects that have DynamicalModels such as Pbd, Fem, SPH may have a complex pipeline, or set of steps. Certain interactions require intermediate callback that occurs between two steps of these models.
 
 For example take the following steps of PBD:
 
@@ -196,8 +196,7 @@ One might wonder why not just define these steps within the Pbd original set of 
     solve collision constraints
     do steps 3 of all pbd objects
 
-The above is certainly easy if you're system relies only on Pbd. But we don't just have Pbd. We also have 
-SPH, Fem, Levelsets, ... Each with their own respective pipelines. Each with their own places that would be appropriate to do collision (interactions are also not just for collision), some models even have multiple potential spots for collision. With PBD you can clearly see if you want to do collision you need two steps inserted in two spots. Explicitly providing all these permutations of pipelines among objects is next to impossible.
+The above is certainly easy if you're system relies only on Pbd. But we don't just have Pbd. We also have SPH, Fem, Levelsets each with their own respective pipelines. Each with their own places that would be appropriate to do collision (interactions are also not just for collision), some models even have multiple potential spots for collision. With PBD you can clearly see if you want to do collision you need two steps inserted in two spots. Explicitly providing all these permutations of pipelines among objects is next to impossible.
 
 See the below possible explicit SPH and PBD interaction. This is not implemented, but shows how many possible pipeline permutations could happen. This is not the only approach to have PBD and SPH interaction. This particular one has us going back and correcting pressures after collision.
 
