@@ -609,7 +609,7 @@ void
 PbdModel::addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices)
 {
     // check if constraint type matches the mesh type
-    CHECK(m_mesh->getType() == Geometry::Type::SurfaceMesh)
+    CHECK(m_mesh->getTypeName() == "SurfaceMesh")
         << "Add element constraints does not support current mesh type.";
 
     const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);

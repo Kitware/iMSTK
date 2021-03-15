@@ -48,6 +48,7 @@
 
 // Collisions and Models
 #include "imstkPbdModel.h"
+#include "imstkPbdObjectCuttingPair.h"
 #include "imstkPbdSolver.h"
 #include "imstkRenderMaterial.h"
 #include "imstkVisualModel.h"
@@ -201,6 +202,8 @@ main()
     scene->addSceneObject(clothObj);
 
     // Add interaction pair for pbd cutting
+    imstkNew<PbdObjectCuttingPair> cuttingPair(clothObj, cutObj);
+
     /*
     // Device Server
     imstkNew<HapticDeviceManager>       server;
@@ -251,34 +254,12 @@ main()
         }
 
         // Queue keypress to be called after scene thread
-        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), EventType::KeyEvent, sceneManager, [&](KeyEvent* e)
+        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
         {
             // When i is pressed replace the PBD cloth with a cut one
             if (e->m_key == 'i' && e->m_keyPressType == KEY_PRESS)
             {
-                // This has a number of issues that make it not physically realistic
-                // - Mass is not conservative when interpolated from subdivide
-                // - Constraint resting lengths are not correctly reinited
-                std::shared_ptr<SurfaceMesh> clothMesh = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
-                imstkNew<SurfaceMeshCut> surfCut;
-                surfCut->setInputMesh(clothMesh);
-                surfCut->setCutGeometry(cutGeom);
-                surfCut->update();
-                std::shared_ptr<SurfaceMesh> newClothMesh = surfCut->getOutputMesh();
-
-                // RenderDelegates cannot visually have entire geometries swapped yet, so even though we could just set the geometry
-                // on the model, you would not visually see it. Instead we replace the vertex and index buffers of the existing one
-                clothMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newClothMesh->getInitialVertexPositions()));
-                clothMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newClothMesh->getVertexPositions()));
-                clothMesh->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*newClothMesh->getTriangleIndices()));
-                clothMesh->modified();
-
-                // Re-initialize states, vertices, masses and constraints on the object
-                clothObj->getPbdModel()->initState();
-                clothObj->getPbdModel()->removeConstraints(surfCut->getRemoveConstraintVertices());
-                clothObj->getPbdModel()->addConstraints(surfCut->getAddConstraintVertices());
-                clothObj->getPbdModel()->getSolver()->setInvMasses(clothObj->getPbdModel()->getInvMasses());
-                clothObj->getPbdModel()->getSolver()->setPositions(clothObj->getPbdModel()->getCurrentState()->getPositions());
+                cuttingPair->apply();
             }
             });
 
