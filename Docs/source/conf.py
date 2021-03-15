@@ -154,5 +154,9 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
+extensions = [
+    'sphinx.ext.intersphinx'
+]
+
 
 
