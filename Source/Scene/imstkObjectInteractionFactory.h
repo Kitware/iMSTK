@@ -33,6 +33,7 @@ enum class InteractionType
 {
     PbdObjToPbdObjCollision,
     PbdObjToCollidingObjPicking,
+    PbdObjToCollidingObjCutting,
 
     PbdObjToCollidingObjCollision,
     SphObjToCollidingObjCollision,

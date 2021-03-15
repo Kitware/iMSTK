@@ -32,7 +32,7 @@ class PbdSolver;
 ///
 /// \class PbdObjectCollisionPair
 ///
-/// \brief This class defines a collision interaction between two PbdObjects
+/// \brief This class defines a picking interaction between a PbdObject and a CollidingObject with AnalyticalGeometry
 ///
 class PbdObjectPickingPair : public CollisionPair
 {
