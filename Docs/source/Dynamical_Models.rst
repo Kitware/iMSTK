@@ -210,7 +210,7 @@ Usage
 
 With it we are able to achieve very fast collision detection and haptic response (>1000hz) and deformation of "statically deformable" object. This finds its uses for bone sawing, burring, drilling.
 
-.. image:: media/levelSets.png
+.. image:: media/lsmCutting.gif
   :width: 600
   :alt: Level Sets
   :align: center
@@ -276,7 +276,7 @@ Usage
 
 Rigid body simulations in iMSTK mostly find their use with tools.
 
-.. image:: media/rbd2.gif
+.. image:: media/rbd1.gif
   :width: 600
   :alt: Rigid body dynamics 2
   :align: center
