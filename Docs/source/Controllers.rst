@@ -48,7 +48,7 @@ Lets take a look at subclasses of each
 
 Here we can override each of the functions of a MouseControl and implement things we want. Similarly, we can do the same for KeyboardControl.
 
-TrackingDeviceControls are a bit different though. They must be added to the scene. See the :code`LaparoscopicToolController` class which is a subclass of :code`TrackingDeviceControl`.
+TrackingDeviceControls are a bit different though. They must be added to the scene. See the :code:`LaparoscopicToolController` class which is a subclass of :code:`TrackingDeviceControl`.
 
 ::
 

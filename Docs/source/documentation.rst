@@ -59,12 +59,6 @@ Once the superbuild is complete, you may notice that (a) all of iMSTK's dependen
 
 Note that one can create and maintain multiple builds from the same source. For example, as is typical to interactive applications testing typically is performed with the Release build while debugging using the Debug build. Additionally, it is usually recommended to separate the build and source directories for cleaner development and maintenance esp. with git-based workflows.
 
-**Offscreen Rendering**
-
-Offscreen OSMesa/CPU rendering is supported for Linux/MacOSx. This allows one
-to build iMSTK without a screen or GPU. Useful for servers. This can be enabled
-in the build by using the :code:`iMSTK_USE_VTK_OSMESA` flag to ON.
-
 Running Examples
 ----------------
 The default CMake configuration builds the examples as part of the inner build.
@@ -104,6 +98,12 @@ device, follow the steps below:
 The examples that demonstrate the features and the usage of iMSTK API
 can be optionally build. Set :code:`BUILD_EXAMPLES` to ON the examples needs to
 be built.
+
+**Offscreen Rendering**
+
+Offscreen OSMesa/CPU rendering is supported for Linux/MacOSx. This allows one
+to build iMSTK without a screen or GPU. Useful for servers. This can be enabled
+in the build by using the :code:`iMSTK_USE_VTK_OSMESA` flag to ON.
 
 **Audio Support**
 

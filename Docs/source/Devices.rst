@@ -31,7 +31,7 @@ Examples of devices are:
 
 .. |device1| image:: media/TouchDevice.png
     
-.. |device2| image:: media/Falcon.png
+.. |device2| image:: media/falcon.png
     
 .. table:: 
    :align: center
