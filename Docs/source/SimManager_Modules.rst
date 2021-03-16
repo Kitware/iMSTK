@@ -29,11 +29,14 @@ ModuleDriver is an abstract class which starts and stops a collection of Modules
     driver->start();
 
 
-Commonly, you will also find it useful to start the scene in a paused state.
+By default the simulation starts when start is called. You may, however, pause and resume the SceneManager with:
 
 ::
 
     sceneManager->pause();
+    sceneManager->resume();
+
+Some simulators need a pause function, many don't ever pause and just run from the start of the app until closing, others implmenent their own concepts of state.
 
 
 The Update Loop
@@ -53,8 +56,8 @@ There are three execution modes:
 
 Adaptive mode uses something we call sequential substepping. This is important for the update loop of the program. We measure the time a single iteration of physics+rendering takes and then compute how many steps of physics we should take to achieve real time. That is, if 2s pass. And we want 0.5s (desireted delta time/dt) updates. Then we will take 4 steps.
 
-.. image:: media/Render.jpg
-    :width: 600
+.. image:: media/pipeline.png
+    :width: 800
     :alt: Alternative text
     :align: center
 
