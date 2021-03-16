@@ -37,14 +37,15 @@ Here is a comprehensive list of changes made for this release.
 - Topology changes supported
 - New examples. Many fixed haptics and OpenVR examples.
   
-    - FemurCut
-    - PBDPicking
-    - SDFHaptics
-    - FastMarch
-    - RigidBodyDynamics2
-    - PBDCloth-Remap
-    - SPH-Obj-SDFInteraction
-    - Vessel
+  - FemurCut
+  - PBDPicking
+  - SDFHaptics
+  - FastMarch
+  - RigidBodyDynamics2
+  - PBDCloth-Remap
+  - SPH-Obj-SDFInteraction
+  - Vessel
+  
 - imstkNew
 - Refactor geometry base class transforms
 - OpenVR, Keyboard, and Mouse Device Refactoring
@@ -81,66 +82,68 @@ Here is a comprehensive list of changes made for this release.
 
 - OpenVR, Keyboard, and Mouse device refactoring: Mouse and Keyboard now provided under the same DeviceClient API as our haptic devices. You may acquire these from the viewer. They emit events, you can also just ask them about their state.
 
-```cpp
-std::shared_ptr<KeyboardDeviceClient> keyboardDevice = viewer->getKeyboardDevice();
-std::shared_ptr<MouseDeviceClient> mouseDevice = viewer->getMouseDevice();
+::
 
-std::shared_ptr<OpenVRDeviceClient> leftVRController = vrViewer->getVRDevice
-```
+  std::shared_ptr<KeyboardDeviceClient> keyboardDevice = viewer->getKeyboardDevice();
+  std::shared_ptr<MouseDeviceClient> mouseDevice = viewer->getMouseDevice();
+
+  std::shared_ptr<OpenVRDeviceClient> leftVRController = vrViewer->getVRDevice
 
 - Controls: Our controls are now abstracted. Any control simply implements a device. You may subclass KeyboardControl or MouseControl. We also provide our own default controls:
 
-```cpp
-// Add mouse and keyboard controls to the viewer
-imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
-mouseControl->setSceneManager(sceneManager);
-viewer->addControl(mouseControl);
+::
 
-imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
-keyControl->setSceneManager(sceneManager);
-keyControl->setModuleDriver(driver);
-viewer->addControl(keyControl);
-```
+  // Add mouse and keyboard controls to the viewer
+  imstkNew<MouseSceneControl> mouseControl(viewer->getMouseDevice());
+  mouseControl->setSceneManager(sceneManager);
+  viewer->addControl(mouseControl);
+
+  imstkNew<KeyboardSceneControl> keyControl(viewer->getKeyboardDevice());
+  keyControl->setSceneManager(sceneManager);
+  keyControl->setModuleDriver(driver);
+  viewer->addControl(keyControl);
 
 - Event System: Key, mouse, haptic, and openvr device event callback can be done like this now.
-    - You may alternatively use queueConnect as long as you consume it somewhere (sceneManager consumes all events given to it).
-    - Your own custom events may be defined in iMSTK subclasses with the SIGNAL macro. See [KeyboardDeviceClient](https://gitlab.kitware.com/iMSTK/iMSTK/-/blob/master/Source/Devices/imstkKeyboardDeviceClient.h) as an example.
+  
+  - You may alternatively use queueConnect as long as you consume it somewhere (sceneManager consumes all events given to it).
+  - Your own custom events may be defined in iMSTK subclasses with the SIGNAL macro. See [KeyboardDeviceClient](https://gitlab.kitware.com/iMSTK/iMSTK/-/blob/master/Source/Devices/imstkKeyboardDeviceClient.h) as an example.
 
-```cpp
-connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
-	sceneManager, [&](KeyEvent* e)
-	{
-		std::cout << e->m_key << " was pressed" << std::endl;
-	});
-```
+::
+
+  connect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress,
+    sceneManager, [&](KeyEvent* e)
+    {
+      std::cout << e->m_key << " was pressed" << std::endl;
+    });
 
 - Imstk Data Arrays: Data arrays and multi-component data arrays provided. They are still compatible with Eigen vector math.
 
-```cpp
-VecDataArray<double, 3> myVertices(3);
-myVertices[0] = Vec3d(0.0, 1.0, 0.0);
-myVertices[1] = Vec3d(0.0, 1.0, 1.0);
-myVertices[2] = myVertices[0] + myVertices[1];
+::
 
-std::cout << myVertices[2] << std::endl;
-```
+  VecDataArray<double, 3> myVertices(3);
+  myVertices[0] = Vec3d(0.0, 1.0, 0.0);
+  myVertices[1] = Vec3d(0.0, 1.0, 1.0);
+  myVertices[2] = myVertices[0] + myVertices[1];
+
+  std::cout << myVertices[2] << std::endl;
+
 - SimulationManager may now be setup and launched as follows:
 
-```cpp
-// Setup a Viewer to render the scene
-imstkNew<VTKViewer> viewer("Viewer");
-viewer->setActiveScene(scene);
+::
 
-// Setup a SceneManager to advance the scene
-imstkNew<SceneManager> sceneManager("Scene Manager");
-sceneManager->setActiveScene(scene);
-sceneManager->pause(); // Start simulation paused
+  // Setup a Viewer to render the scene
+  imstkNew<VTKViewer> viewer("Viewer");
+  viewer->setActiveScene(scene);
 
-imstkNew<SimulationManager> driver;
-driver->addModule(viewer);
-driver->addModule(sceneManager);
-driver->start();
-```
+  // Setup a SceneManager to advance the scene
+  imstkNew<SceneManager> sceneManager("Scene Manager");
+  sceneManager->setActiveScene(scene);
+  sceneManager->pause(); // Start simulation paused
+
+  imstkNew<SimulationManager> driver;
+  driver->addModule(viewer);
+  driver->addModule(sceneManager);
+  driver->start();
 
 - `VisualObject` typedef removed. Just use `SceneObject`.
 - `HDAPIDeviceServer` renamed to `HapticDeviceManager`
@@ -169,20 +172,21 @@ Here is a comprehensive list of changes made for this release.
 
 **New Features**
 
-* Introduction of configurable task-graph and task-based parallelism.
-* Major upgrade to the rendering module (VTK backend)
+- Introduction of configurable task-graph and task-based parallelism.
+- Major upgrade to the rendering module (VTK backend)
+
+  - Upgrade to VTK 9.0
+  - Realistic fluid rendering using screen space fluids
+  - Faster particular rendering of fluids
+  - Addition of physically based rendering
   
-  * Upgrade to VTK 9.0
-  * Realistic fluid rendering using screen space fluids
-  * Faster particular rendering of fluids
-  * Addition of physically based rendering
-* Addition of 3D image support and volume rendering
-* Improved physics models for particle based dynamics: Addition of extended position based dynamics (xPBD)
-* Addition of support for modeling 1D elastic structures with bending stiffness
-* Addition of faster reduced order deformation models (Linux only)
-* Addition of Reverse Cuthill–McKee algorithm (RCM) for mesh renumbering
-* Major refactoring simulation manager: Improved time stepping policies, multiple scene management and scene controls, addition of async simulation mode
-* Improved capabilities of the geometric utility module: addition of geometric processing filters, New tetrahedral mesh cover generation (based on ray-casting)
+- Addition of 3D image support and volume rendering
+- Improved physics models for particle based dynamics: Addition of extended position based dynamics (xPBD)
+- Addition of support for modeling 1D elastic structures with bending stiffness
+- Addition of faster reduced order deformation models (Linux only)
+- Addition of Reverse Cuthill–McKee algorithm (RCM) for mesh renumbering
+- Major refactoring simulation manager: Improved time stepping policies, multiple scene management and scene controls, addition of async simulation mode
+- Improved capabilities of the geometric utility module: addition of geometric processing filters, New tetrahedral mesh cover generation (based on ray-casting)
 
 **Improvements or Refactoring**
 
