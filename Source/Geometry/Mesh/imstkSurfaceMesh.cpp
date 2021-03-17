@@ -321,10 +321,10 @@ SurfaceMesh::computeVertexTangents()
     if (hasUVs)
     {
         // Avoid reallocating if possible
-        std::shared_ptr<VecDataArray<double, 3>> vertexTangentsPtr = getVertexTangents();
+        std::shared_ptr<VecDataArray<float, 3>> vertexTangentsPtr = getVertexTangents();
         if (vertexTangentsPtr == nullptr)
         {
-            vertexTangentsPtr = std::make_shared<VecDataArray<double, 3>>(m_vertexPositions->size());
+            vertexTangentsPtr = std::make_shared<VecDataArray<float, 3>>(m_vertexPositions->size());
         }
         else
         {
@@ -333,7 +333,7 @@ SurfaceMesh::computeVertexTangents()
                 vertexTangentsPtr->resize(m_vertexPositions->size());
             }
         }
-        VecDataArray<double, 3>& vertexTangents = *vertexTangentsPtr;
+        VecDataArray<float, 3>& vertexTangents = *vertexTangentsPtr;
 
         // First we need per triangle tangents
         this->computeTriangleTangents();
@@ -356,7 +356,7 @@ SurfaceMesh::computeVertexTangents()
         {
             tangent = temp_tangents[vertexId];
             tangent.normalize();
-            vertexTangents[vertexId] = tangent;
+            vertexTangents[vertexId] = tangent.cast<float>();
         }
 
         setVertexTangents("tangents", vertexTangentsPtr);

@@ -29,7 +29,7 @@ VisualModel::VisualModel(std::shared_ptr<Geometry> geometry) : m_geometry(geomet
 }
 
 VisualModel::VisualModel(std::shared_ptr<Geometry>       geometry,
-                         std::shared_ptr<RenderMaterial> renderMaterial) :
+    std::shared_ptr<RenderMaterial> renderMaterial) :
     m_geometry(geometry),
     m_renderMaterial(renderMaterial)
 {
@@ -40,7 +40,7 @@ VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry) : m_DbgG
 }
 
 VisualModel::VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
-                         std::shared_ptr<RenderMaterial>      renderMaterial) :
+    std::shared_ptr<RenderMaterial>      renderMaterial) :
     m_DbgGeometry(geometry),
     m_renderMaterial(renderMaterial)
 {

@@ -229,7 +229,10 @@ public:
     void setOcclusionStrength(const float o);
 
     float getNormalStrength() const{ return m_normalStrength; }
-    void setNormalnStrength(const float n);
+    void setNormalStrength(const float n);
+
+    float getIndexOfRefraction() const { return m_indexOfRefraction; }
+    void setIndexOfRefraction(const float n);
 
     const Color& getEdgeColor() const{ return m_edgeColor; }
     void setEdgeColor(const Color& color);
@@ -298,11 +301,11 @@ protected:
     float m_emissivity    = 0.f;
     Color m_emmisiveColor = Color::White;
 
-    float m_metalness = 0.f;  ///< Value for metalness with range: [0.0, 1.0]
-    float m_roughness = 10.f; ///< Value for roughness with range: [0.0, 1.0]
-
-    float m_occlusionStrength = 10.f;
-    float m_normalStrength    = 1.f;
+    float m_metalness = 1.0f;  ///< Value for metalness with range: [0.0, 1.0]
+    float m_roughness = 1.0f; ///< Value for roughness with range: [0.0, 1.0]
+    float m_occlusionStrength = 1.0f;
+    float m_normalStrength    = 1.0f;
+    float m_indexOfRefraction = 1.0f;
 
     ///---------------------Global states------------------------
     bool m_imageBasedLighting = false;

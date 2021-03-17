@@ -62,7 +62,10 @@ protected:
     ///
     void vertexDataModified(Event* e);
 
-    //void indexDataModified(Event* e);
+    ///
+    /// \brief Callback when indices change
+    /// 
+    void indexDataModified(Event* e);
 
     ///
     /// \brief Callback when geometry changes

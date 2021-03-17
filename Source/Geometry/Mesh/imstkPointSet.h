@@ -176,10 +176,10 @@ public:
     ///
     /// \brief Get/Set the active tangents
     ///
-    void setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents);
+    void setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<float, 3>> tangents);
     void setVertexTangents(const std::string& arrayName);
     std::string getActiveVertexTangents() const { return m_activeVertexTangents; }
-    std::shared_ptr<VecDataArray<double, 3>> getVertexTangents() const;
+    std::shared_ptr<VecDataArray<float, 3>> getVertexTangents() const;
 
     ///
     /// \brief Get/Set the active tcoords

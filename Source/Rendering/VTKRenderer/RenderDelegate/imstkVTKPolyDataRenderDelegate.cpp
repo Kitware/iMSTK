@@ -84,6 +84,7 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
     const Color& vertexColor   = material->getVertexColor();
     const Color& surfaceColor  = material->getColor();
 
+    // Phong
     actorProperty->SetDiffuseColor(diffuseColor.r, diffuseColor.g, diffuseColor.b);
     actorProperty->SetDiffuse(material->getDiffuse());
     actorProperty->SetAmbientColor(ambientColor.r, ambientColor.g, ambientColor.b);
@@ -91,9 +92,14 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
     actorProperty->SetSpecularColor(specularColor.r, specularColor.g, specularColor.b);
     actorProperty->SetSpecularPower(material->getSpecularPower());
     actorProperty->SetSpecular(material->getSpecular());
-    actorProperty->SetMetallic(material->getMetalness());
-    actorProperty->SetRoughness(material->getRoughness());
 
+    // PBR, ORM (occlusion, roughness, metallic)
+    actorProperty->SetOcclusionStrength(material->getOcclusionStrength());
+    actorProperty->SetRoughness(material->getRoughness());
+    actorProperty->SetMetallic(material->getMetalness());
+    actorProperty->SetNormalScale(material->getNormalStrength());
+
+    // Base
     actorProperty->SetColor(surfaceColor.r, surfaceColor.g, surfaceColor.b);
     actorProperty->SetVertexColor(vertexColor.r, vertexColor.g, vertexColor.b);
     actorProperty->SetEdgeColor(edgeColor.r, edgeColor.g, edgeColor.b);
@@ -132,7 +138,6 @@ VTKPolyDataRenderDelegate::updateRenderProperties()
     case RenderMaterial::DisplayMode::Wireframe:
         actorProperty->SetRepresentationToWireframe();
         actorProperty->SetEdgeVisibility(false);
-        // actorProperty->SetRenderLinesAsTubes(true);
         break;
     case RenderMaterial::DisplayMode::Points:
         actorProperty->SetRepresentationToPoints();

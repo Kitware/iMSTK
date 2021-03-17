@@ -235,11 +235,21 @@ RenderMaterial::setOcclusionStrength(const float occlusionStrength)
 }
 
 void
-RenderMaterial::setNormalnStrength(const float normalStrength)
+RenderMaterial::setNormalStrength(const float normalStrength)
 {
     if (normalStrength != m_normalStrength)
     {
         m_normalStrength = normalStrength;
+        postModified();
+    }
+}
+
+void
+RenderMaterial::setIndexOfRefraction(const float indexOfRefraction)
+{
+    if (indexOfRefraction == m_indexOfRefraction)
+    {
+        m_indexOfRefraction = indexOfRefraction;
         postModified();
     }
 }
