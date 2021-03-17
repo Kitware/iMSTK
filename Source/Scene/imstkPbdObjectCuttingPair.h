@@ -22,11 +22,16 @@ limitations under the License.
 #pragma once
 
 #include "imstkObjectInteractionPair.h"
+#include "imstkVecDataArray.h"
+
+#include <unordered_set>
+#include <vector>
 
 namespace imstk
 {
-class PbdObject;
 class CollidingObject;
+class PbdObject;
+class SurfaceMesh;
 
 ///
 /// \class PbdObjectCuttingPair
@@ -42,5 +47,36 @@ public:
     void apply();
 
 protected:
+
+    ///
+    /// \brief Add new vertices to pbdObj
+    ///
+    void addVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
+                     std::shared_ptr<VecDataArray<double, 3>> vertices,
+                     std::shared_ptr<VecDataArray<double, 3>> initialVertices);
+
+    ///
+    /// \brief Modify current vertices of pbdObj
+    ///
+    void modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
+                        std::shared_ptr<std::vector<size_t>> vertexIndices,
+                        std::shared_ptr<VecDataArray<double, 3>> vertices,
+                        std::shared_ptr<VecDataArray<double, 3>> initialVertices);
+
+    ///
+    /// \brief Add new elements to pbdObj
+    ///
+    void addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
+                      std::shared_ptr<VecDataArray<int, 3>> elements);
+
+    ///
+    /// \brief Modify exsiting elements of pbdObj
+    ///
+    void modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
+                         std::shared_ptr<std::vector<size_t>> elementIndices,
+                         std::shared_ptr<VecDataArray<int, 3>> elements);
+
+    std::shared_ptr<std::unordered_set<size_t>> m_removeConstraintVertices = std::make_shared<std::unordered_set<size_t>>();
+    std::shared_ptr<std::unordered_set<size_t>> m_addConstraintVertices    = std::make_shared<std::unordered_set<size_t>>();
 };
 }
