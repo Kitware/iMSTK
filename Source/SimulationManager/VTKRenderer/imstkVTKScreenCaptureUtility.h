@@ -39,6 +39,8 @@ namespace imstk
 class VTKScreenCaptureUtility : public ScreenCaptureUtility
 {
 public:
+    using ScreenCaptureUtility::saveScreenShot;
+
     ///
     /// \brief Constructor
     ///
@@ -52,7 +54,7 @@ public:
     ///
     /// \brief Saves the screenshot as a png file
     ///
-    virtual void saveScreenShot() override;
+    virtual std::string saveScreenShot(const std::string& captureName) override;
 
 protected:
     vtkSmartPointer<vtkWindowToImageFilter> m_windowToImageFilter;

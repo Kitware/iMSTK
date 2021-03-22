@@ -29,24 +29,23 @@
 namespace imstk
 {
 VTKScreenCaptureUtility::VTKScreenCaptureUtility(vtkRenderWindow* const rw, const std::string prefix /*= "Screenshot-"*/) :
+    ScreenCaptureUtility(prefix),
     m_windowToImageFilter(vtkSmartPointer<vtkWindowToImageFilter>::New()),
     m_pngWriter(vtkSmartPointer<vtkPNGWriter>::New())
 {
-    m_screenShotNumber = 0;
-    m_screenShotPrefix = prefix;
     if (rw != nullptr)
     {
         m_renderWindow = rw;
     }
 }
 
-void
-VTKScreenCaptureUtility::saveScreenShot()
+std::string
+VTKScreenCaptureUtility::saveScreenShot(const std::string& captureName)
 {
     if (m_renderWindow == nullptr)
     {
         LOG(WARNING) << "Render window has not been set yet! ";
-        return;
+        return "";
     }
 
     if (m_windowToImageFilter->GetInput() == nullptr)
@@ -63,13 +62,13 @@ VTKScreenCaptureUtility::saveScreenShot()
 
     m_windowToImageFilter->Modified();
 
-    std::string captureName = m_screenShotPrefix + std::to_string(m_screenShotNumber) + ".png";
+    std::string filename = captureName + ".png";
 
-    m_pngWriter->SetFileName(captureName.data());
+    m_pngWriter->SetFileName(filename.data());
     m_pngWriter->Write();
 
     LOG(INFO) << "Screen shot " << m_screenShotNumber << " saved as " << captureName << "\n";
 
-    m_screenShotNumber++;
+    return filename;
 }
 } // imstk

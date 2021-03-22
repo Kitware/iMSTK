@@ -26,16 +26,14 @@
 namespace imstk
 {
 VulkanScreenCaptureUtility::VulkanScreenCaptureUtility(const std::string prefix /*= "Screenshot-"*/)
+ScreenCaptureUtility(prefix)
 {
-    m_screenShotNumber = 0;
-    m_screenShotPrefix = prefix;
 }
 
-void
-VulkanScreenCaptureUtility::saveScreenShot()
+std::string
+VulkanScreenCaptureUtility::saveScreenShot(const std::string)
 {
     LOG(WARNING) << "Screen capture not supported\n";
-
-    m_screenShotNumber++;
+    return "";
 }
 } // imstk
