@@ -34,35 +34,46 @@ class ScreenCaptureUtility
 {
 public:
     ///
-    /// \brief Saves the screenshot as a png file
+    /// \brief Constructor
     ///
-    virtual void saveScreenShot() = 0;
+    ScreenCaptureUtility(std::string prefix = "Screenshot-");
 
     ///
-    /// \brief Returns the number of the screenshot
+    /// \brief Saves a screenshot with a name of <prefix><screenshotNumber>.<implementationImageType>
+    ///        the <ImplementationImageType> is most likely `.png`.
+    /// \return the file name that was actually used to store the file, "" if the file storage failed
+    std::string saveScreenShot();
+
+    ///
+    /// \brief Saves a screenshot with the given name, the implementation will add the image
+    ///        type used to store the file
+    /// \param name base name for the file to store
+    /// \return the file name that was actually used to store the file, "" if the file storage failed
+    virtual std::string saveScreenShot(const std::string& name) = 0;
+
+    ///
+    /// \brief Returns the number of the next screenshot
     ///
     unsigned int getScreenShotNumber() const;
 
     ///
-    /// \brief set/reset the prefix amd the count numbers
+    /// \brief set/reset the prefix and the count numbers
+    ///
     void setScreenShotPrefix(const std::string& newPrefix);
 
     ///
-    /// \brief reset the screenshot number indicator
+    /// \brief reset the screenshot number
+    ///
     void resetScreenShotNumber();
 
 protected:
-    ///
-    /// \brief Constructor
-    ///
-    ScreenCaptureUtility() = default;
 
     ///
     /// \brief Destructor
     ///
     virtual ~ScreenCaptureUtility() = default;
 
-    unsigned int m_screenShotNumber = 0; //> screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
-    std::string  m_screenShotPrefix;     //> the prefix for the screenshots to be saved
+    unsigned int m_screenShotNumber = 0; ///< screen shot number is added to the file prefix, and incremented everytime a screen shot is taken
+    std::string  m_screenShotPrefix;     ///< the prefix for the screenshots to be saved
 };
 } // imstk

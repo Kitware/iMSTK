@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Saves the screenshot as a png file
     ///
-    virtual void saveScreenShot();
+    std::string saveScreenShot(const std::string&) override;
 
 protected:
 };

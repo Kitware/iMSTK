@@ -23,6 +23,18 @@
 
 namespace imstk
 {
+ScreenCaptureUtility::ScreenCaptureUtility(std::string prefix) : m_screenShotPrefix(prefix), m_screenShotNumber(0)
+{
+}
+
+std::string
+ScreenCaptureUtility::saveScreenShot()
+{
+    std::string captureName = m_screenShotPrefix + std::to_string(m_screenShotNumber) + ".png";
+    ++m_screenShotNumber;
+    return saveScreenShot(captureName);
+}
+
 unsigned int
 ScreenCaptureUtility::getScreenShotNumber() const
 {
