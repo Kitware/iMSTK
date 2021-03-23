@@ -105,6 +105,16 @@ public:
     int getSmoothingKernelSize() const { return m_smoothingKernelSize; }
     void setSmoothingKernelSize(const int kernelSize) { m_smoothingKernelSize = kernelSize; }
 
+    ///
+    /// \brief Return the currently applied force
+    ///
+    const Vec3d& getForce() const { return fS; }
+
+    ///
+    /// \brief Return the currently applied torque
+    ///
+    const Vec3d& getTorque() const { return tS; }
+
 public:
     ///
     /// \brief Update controlled scene object using latest tracking information
