@@ -124,6 +124,24 @@ public:
         //m_projModified = true;
     }
 
+    ///
+    /// \brief Set clipping near
+    /// note: You lose depth accuracy as the range between near and far increases
+    /// could cause z fighting
+    /// 
+    void setNearZ(const double nearZ) { m_nearZ = nearZ; }
+
+    const double getNearZ() const { return m_nearZ; }
+
+    ///
+    /// \brief Set clipping near
+    /// note: You lose depth accuracy as the range between near and far increases
+    /// could cause z fighting
+    ///
+    void setFarZ(const double farZ) { m_farZ = farZ; }
+
+    const double getFarZ() const { return m_farZ; }
+
     virtual void update()
     {
         if (m_viewModified)

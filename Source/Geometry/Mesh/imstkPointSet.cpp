@@ -289,7 +289,7 @@ PointSet::getVertexNormals() const
 }
 
 void
-PointSet::setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<double, 3>> tangents)
+PointSet::setVertexTangents(const std::string& arrayName, std::shared_ptr<VecDataArray<float, 3>> tangents)
 {
     m_activeVertexTangents = arrayName;
     m_vertexAttributes[arrayName] = tangents;
@@ -304,12 +304,12 @@ PointSet::setVertexTangents(const std::string& arrayName)
     }
 }
 
-std::shared_ptr<VecDataArray<double, 3>>
+std::shared_ptr<VecDataArray<float, 3>>
 PointSet::getVertexTangents() const
 {
     if (hasVertexAttribute(m_activeVertexTangents))
     {
-        return std::dynamic_pointer_cast<VecDataArray<double, 3>>(m_vertexAttributes.at(m_activeVertexTangents));
+        return std::dynamic_pointer_cast<VecDataArray<float, 3>>(m_vertexAttributes.at(m_activeVertexTangents));
     }
     else
     {

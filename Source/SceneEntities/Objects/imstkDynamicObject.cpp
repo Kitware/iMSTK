@@ -104,8 +104,15 @@ DynamicObject::initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<
 {
     // Copy, sum, and connect the model graph to nest within this graph
     m_taskGraph->addEdge(source, getUpdateNode());
-    m_dynamicalModel->initGraphEdges();
-    m_taskGraph->nestGraph(m_dynamicalModel->getTaskGraph(), getUpdateNode(), getUpdateGeometryNode());
+    if (m_dynamicalModel != nullptr)
+    {
+        m_dynamicalModel->initGraphEdges();
+        m_taskGraph->nestGraph(m_dynamicalModel->getTaskGraph(), getUpdateNode(), getUpdateGeometryNode());
+    }
+    else
+    {
+        m_taskGraph->addEdge(getUpdateNode(), getUpdateGeometryNode());
+    }
     m_taskGraph->addEdge(getUpdateGeometryNode(), sink);
 }
 

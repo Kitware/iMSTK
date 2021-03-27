@@ -77,7 +77,7 @@ public:
     /// \brief Set the coloring of the screen background
     /// If 'gradientBackground' is false or not supplied color1 will fill the entire background
     ///
-    virtual void setBackgroundColors(const Vec3d color1, const Vec3d color2 = Vec3d::Zero(),
+    virtual void setBackgroundColors(const Color color1, const Color color2 = Color(0.0, 0.0, 0.0),
                                      const bool gradientBackground = false) override;
 
     ///
