@@ -270,7 +270,6 @@ protected:
     void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink) override;
 
 protected:
-    bool   m_partitioned = false;                                                         /// \todo this is used in initialize() as a temporary fix to problems on linux
     size_t m_partitionThreshold = 16;                                                     ///> Threshold for constraint partitioning
 
     std::shared_ptr<PbdSolver> m_pbdSolver       = nullptr;                               ///> PBD solver

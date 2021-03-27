@@ -108,6 +108,7 @@ PbdModel::initialize()
     // Initialize constraints
     {
         m_constraints = std::make_shared<PBDConstraintVector>();
+        m_partitionedConstraints = std::make_shared<std::vector<PBDConstraintVector>>();
 
         // Initialize FEM constraints
         for (auto& constraint : m_parameters->m_FEMConstraints)
@@ -167,11 +168,7 @@ PbdModel::initialize()
         }
 
         // Partition constraints for parallel computation
-        if (!m_partitioned)
-        {
-            this->partitionConstraints();
-            m_partitioned = true;
-        }
+        this->partitionConstraints();
     }
 
     // Setup the default pbd solver if none exists
