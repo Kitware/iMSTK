@@ -42,6 +42,9 @@ class Renderer;
 class VisualModel : public EventObject
 {
 public:
+    ///
+    /// \brief Constructor
+    ///
     VisualModel(std::shared_ptr<Geometry> geometry);
     VisualModel(std::shared_ptr<Geometry>       geometry,
                          std::shared_ptr<RenderMaterial> renderMaterial);
@@ -87,9 +90,14 @@ public:
     ///
     /// \brief Visibility functions
     ///
-    void show() { m_isVisible = true; }
-    void hide() { m_isVisible = false; }
+    void show() { setIsVisible(true); }
+    void hide() { setIsVisible(false); }
     bool isVisible() const{ return m_isVisible; }
+    void setIsVisible(const bool visible)
+    {
+        m_isVisible = visible;
+        this->postModified();
+    }
 
     ///
     /// \brief Get/Set whether the delegate has been created

@@ -78,7 +78,7 @@ public:
         }
         else
         {
-            return std::numeric_limits<double>::max();
+            return std::numeric_limits<double>::min();
         }
     }
 
