@@ -107,13 +107,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
         m_polydata->GetPointData()->SetTCoords(m_mappedTCoordsArray);
 
         // Map Tangents
-        //geometry->computeVertexTangents();
-        //if (geometry->getVertexTangents() != nullptr)
-        //{
-        //    // todo: I might need these as float for PBR?
-        //    m_mappedTangentArray = vtkDoubleArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(geometry->getVertexTangents()));
-        //    m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
-        //}
+        //m_geometry->computeVertexTangents();
+        if (m_geometry->getVertexTangents() != nullptr)
+        {
+            // These need to be float for PBR
+            m_mappedTangentArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTangents()));
+            m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
+        }
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
@@ -327,13 +327,12 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
             case Texture::Type::Normal:
             {
                 actor->GetProperty()->SetNormalTexture(currentTexture);
-                actor->GetProperty()->SetNormalScale(material->getNormalStrength());
                 break;
             }
             case Texture::Type::AmbientOcclusion:
+            case Texture::Type::ORM:
             {
                 actor->GetProperty()->SetORMTexture(currentTexture);
-                actor->GetProperty()->SetOcclusionStrength(material->getOcclusionStrength());
                 break;
             }
             default:

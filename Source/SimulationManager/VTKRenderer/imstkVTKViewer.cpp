@@ -34,6 +34,8 @@
 #include <vtkTextActor.h>
 #include <vtkOpenGLRenderWindow.h>
 
+#include <vtkCamera.h>
+
 #ifdef WIN32
 #include <vtkWin32HardwareWindow.h>
 #include <vtkWin32RenderWindowInteractor.h>
@@ -224,8 +226,7 @@ VTKViewer::updateModule()
     // Update render delegates
     ren->updateRenderDelegates();
 
-    // Reset camera clipping range
-    ren->getVtkRenderer()->ResetCameraClippingRange();
+    //ren->getVtkRenderer()->ResetCameraClippingRange();
 
     // If fps status is on, measure it
     if (getTextStatusManager()->getStatusVisibility(VTKTextStatusManager::StatusType::FPS))

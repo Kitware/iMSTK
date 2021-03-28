@@ -216,25 +216,31 @@ LevelSetModel::evolve()
                 {
                     for (int x = 0; x < dim[0]; x++, i++)
                     {
-                        // Center of voxel
-                        //const Vec3d pos = Vec3d(x, y, z).cwiseProduct(spacing) + shift;
-
                         // Gradients
                         const Vec3d gradPos = m_forwardGrad(Vec3d(x, y, z));
                         const Vec3d gradNeg = m_backwardGrad(Vec3d(x, y, z));
                         //curvaturesPtr[i] = m_curvature(Vec3d(x, y, z));
 
-                        // neg
-                        gradientMagPtr[i * 2] =
-                            std::pow(std::min(gradNeg[0], 0.0), 2) + std::pow(std::max(gradPos[0], 0.0), 2) +
-                            std::pow(std::min(gradNeg[1], 0.0), 2) + std::pow(std::max(gradPos[1], 0.0), 2) +
-                            std::pow(std::min(gradNeg[2], 0.0), 2) + std::pow(std::max(gradPos[2], 0.0), 2);
+                        Vec3d gradNegMax = gradNeg.cwiseMax(0.0);
+                        Vec3d gradNegMin = gradNeg.cwiseMin(0.0);
+                        Vec3d gradPosMax = gradPos.cwiseMax(0.0);
+                        Vec3d gradPosMin = gradPos.cwiseMin(0.0);
 
-                        // pos
+                        // Square them
+                        gradNegMax = gradNegMax.cwiseProduct(gradNegMax);
+                        gradNegMin = gradNegMin.cwiseProduct(gradNegMin);
+                        gradPosMax = gradPosMax.cwiseProduct(gradPosMax);
+                        gradPosMin = gradPosMin.cwiseProduct(gradPosMin);
+
+                        // Pos
                         gradientMagPtr[i * 2 + 1] =
-                            std::pow(std::max(gradNeg[0], 0.0), 2) + std::pow(std::min(gradPos[0], 0.0), 2) +
-                            std::pow(std::max(gradNeg[1], 0.0), 2) + std::pow(std::min(gradPos[1], 0.0), 2) +
-                            std::pow(std::max(gradNeg[2], 0.0), 2) + std::pow(std::min(gradPos[2], 0.0), 2);
+                            gradNegMax[0] + gradNegMax[1] + gradNegMax[2] +
+                            gradPosMin[0] + gradPosMin[1] + gradPosMin[2];
+
+                        // Neg
+                        gradientMagPtr[i * 2] =
+                            gradNegMin[0] + gradNegMin[1] + gradNegMin[2] +
+                            gradPosMax[0] + gradPosMax[1] + gradPosMax[2];
                     }
                 }
             });

@@ -278,7 +278,7 @@ main()
         // Setup a viewer to render in its own thread
         imstkNew<VTKViewer> viewer("Viewer");
         viewer->setActiveScene(scene);
-        viewer->setBackgroundColors(Vec3d(0.3285, 0.3285, 0.6525), Vec3d(0.13836, 0.13836, 0.2748), true);
+        viewer->setBackgroundColors(Color(0.3285, 0.3285, 0.6525), Color(0.13836, 0.13836, 0.2748), true);
 
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");

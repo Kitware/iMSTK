@@ -405,6 +405,7 @@ VTKRenderer::updateCamera()
     m_Camera->SetFocalPoint(eyePos[0] - forward[0], eyePos[1] - forward[1], eyePos[2] - forward[2]);
     m_Camera->SetViewUp(up[0], up[1], up[2]);
     m_Camera->SetViewAngle(cam->getFieldOfView());
+    m_Camera->SetClippingRange(cam->getNearZ(), cam->getFarZ());
 }
 
 void

@@ -80,6 +80,8 @@ VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_p
     // When the vertex buffer internals are modified, ie: a single or N elements
     queueConnect<Event>(geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKTetrahedralMeshRenderDelegate::vertexDataModified);
 
+    queueConnect<Event>(geometry->getTetrahedraIndices(), &Geometry::modified, this, &VTKTetrahedralMeshRenderDelegate::indexDataModified);
+
     // Setup the mapper
     {
         vtkNew<vtkDataSetMapper> mapper;
@@ -101,6 +103,7 @@ VTKTetrahedralMeshRenderDelegate::processEvents()
     // Custom handling of events
     std::shared_ptr<TetrahedralMesh>         geom     = std::dynamic_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
+    std::shared_ptr<VecDataArray<int, 4>> indices = geom->getTetrahedraIndices();
 
     // Only use the most recent event from respective sender
     std::list<Command> cmds;
@@ -127,6 +130,11 @@ VTKTetrahedralMeshRenderDelegate::processEvents()
                 cmds.push_back(cmd);
                 contains[3] = true;
             }
+            else if (cmd.m_event->m_sender == indices.get() && !contains[3])
+            {
+                cmds.push_back(cmd);
+                contains[3] = true;
+            }
         });
 
     // Now do each event in order recieved
@@ -149,11 +157,29 @@ VTKTetrahedralMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
     m_mappedVertexArray->Modified();
 }
 
-//void
-//VTKTetrahedralMeshRenderDelegate::indexDataModified(Event* e)
-//{
-//
-//}
+void
+VTKTetrahedralMeshRenderDelegate::indexDataModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
+
+    // When indexDataModified is called user is telling us something HAS changed, do not test
+    m_indices = geometry->getTetrahedraIndices();
+    {
+        // Copy cells
+        m_cellArray->Reset();
+        vtkIdType cell[4];
+        for (const auto& t : *m_indices)
+        {
+            for (size_t i = 0; i < 4; i++)
+            {
+                cell[i] = t[i];
+            }
+            m_cellArray->InsertNextCell(4, cell);
+        }
+        m_mesh->SetCells(VTK_TETRA, m_cellArray);
+    }
+    m_mesh->Modified();
+}
 
 void
 VTKTetrahedralMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))

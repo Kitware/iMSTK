@@ -86,7 +86,7 @@ protected:
 
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;       ///> Mapped array of normals
-    vtkSmartPointer<vtkDoubleArray> m_mappedTangentArray;      ///> Mapped array of tangents
+    vtkSmartPointer<vtkFloatArray> m_mappedTangentArray;      ///> Mapped array of tangents
     vtkSmartPointer<vtkFloatArray>  m_mappedTCoordsArray;      ///> Mapped array of tcoords
     vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
     vtkSmartPointer<vtkDataArray>   m_mappedCellScalarArray;   ///> Mapped array of scalars
