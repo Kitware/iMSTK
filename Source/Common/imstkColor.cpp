@@ -44,6 +44,7 @@ Color Color::Orange(1.0, 0.6, 0.0, 1.0);
 Color Color::Pink(1.0, 0.0, 1.0, 1.0);
 Color Color::Teal(0.5, 1.0, 0.8, 1.0);
 Color Color::Marigold(0.9, 0.9, 0.4);
+Color Color::YellowBone(0.828, 0.785, 0.501);
 Color Color::Bone(0.89, 0.86, 0.79);
 Color Color::Blood(0.4, 0.0, 0.0);
 
@@ -102,29 +103,6 @@ operator<<(std::ostream& os, const Color& c)
 }
 
 void
-Color::darken(const double p_darkFactor)
-{
-    rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor));
-    rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor));
-    rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor));
-    rgba[0] = (rgba[0] < 0 ? 0 : rgba[0]);
-    rgba[1] = (rgba[1] < 0 ? 0 : rgba[1]);
-    rgba[2] = (rgba[2] < 0 ? 0 : rgba[2]);
-}
-
-void
-Color::lighten(const double p_darkFactor)
-{
-    rgba[0] = rgba[1] + rgba[1] * (p_darkFactor);
-    rgba[1] = rgba[2] + rgba[2] * (p_darkFactor);
-    rgba[2] = rgba[3] + rgba[3] * (p_darkFactor);
-
-    rgba[0] = (rgba[0] > 1.0 ? 1.0 : rgba[0]);
-    rgba[1] = (rgba[1] < 1.0 ? 1.0 : rgba[1]);
-    rgba[2] = (rgba[2] < 1.0 ? 1.0 : rgba[2]);
-}
-
-void
 Color::setValue(const double p_red,
                 const double p_green,
                 const double p_blue,
@@ -157,6 +135,28 @@ const double*
 Color::getValue() const
 {
     return rgba;
+}
+
+Color
+Color::darken(const Color color, const double factor)
+{
+    return clamp(color - color * factor, Color::Black, Color::White);
+}
+
+Color
+Color::lighten(const Color color, const double factor)
+{
+    return clamp(color + color * factor, Color::Black, Color::White);
+}
+
+Color
+Color::clamp(const Color color, const Color min, const Color max)
+{
+    return Color(
+        (((color.r < min.r) ? min.r : color.r) > max.r) ? max.r : color.r,
+        (((color.g < min.g) ? min.g : color.g) > max.g) ? max.g : color.g,
+        (((color.b < min.b) ? min.b : color.b) > max.b) ? max.b : color.b,
+        (((color.a < min.a) ? min.a : color.a) > max.a) ? max.a : color.a);
 }
 
 Color

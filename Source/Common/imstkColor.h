@@ -53,7 +53,7 @@ struct Color
     ///
     Color();
     Color(const double r, const double g, const double b, const double a = 1.0);
-    explicit Color(const double* rgba);
+    Color(const double* rgba);
 
     ///
     /// \brief Constructor overwrites the alpha component
@@ -76,16 +76,6 @@ struct Color
     double operator()(const int p_i) const;
 
     ///
-    /// \brief Dark ratio. the value is between 0 and 1.0
-    ///
-    void darken(const double p_darkFactor);
-
-    ///
-    /// \brief lighten the color
-    ///
-    void lighten(const double p_darkFactor);
-
-    ///
     /// \brief set RGB color
     ///
     void setValue(const double p_red,
@@ -103,7 +93,15 @@ struct Color
     ///
     const double* getValue() const;
 
+    ///
+    /// \Get the RGB hex in string format
+    /// 
     std::string rgbHex();
+
+    static Color darken(const Color color, const double factor);
+    static Color lighten(const Color color, const double factor);
+
+    static Color clamp(const Color color, const Color min, const Color max);
 
     ///
     /// \brief interpolate between two colors by ratio t
@@ -125,6 +123,7 @@ struct Color
     static Color Teal;
     static Color Marigold;
     static Color Bone;
+    static Color YellowBone;
     static Color Blood;
 };
 #ifdef WIN32
