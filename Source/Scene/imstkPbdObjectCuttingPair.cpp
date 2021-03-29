@@ -30,6 +30,7 @@ limitations under the License.
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshCut.h"
+//#include "imstkSurfaceMeshIncrementalCut.h"
 #include "imstkVecDataArray.h"
 
 namespace imstk
@@ -57,8 +58,48 @@ PbdObjectCuttingPair::apply()
 {
     auto pbdObj   = std::static_pointer_cast<PbdObject>(m_objects.first);
     auto cutObj   = std::static_pointer_cast<CollidingObject>(m_objects.second);
-    auto pbdMesh  = std::static_pointer_cast<SurfaceMesh>(pbdObj->getPhysicsGeometry());
     auto pbdModel = pbdObj->getPbdModel();
+    auto pbdMesh  = std::static_pointer_cast<SurfaceMesh>(pbdModel->getModelGeometry());
+
+    m_addConstraintVertices->clear();
+    m_removeConstraintVertices->clear();
+
+    /* Incremental cutting
+    // compute cutting increments
+    imstkNew<SurfaceMeshIncrementalCut> surfCut;
+    surfCut->setInputMesh(pbdMesh);
+    surfCut->setCutGeometry(cutObj->getCollidingGeometry());
+    surfCut->update();
+
+    // make topological changes
+    auto addedVertices = surfCut->getAddedVertices();
+    auto addedInitialVertices = surfCut->getAddedInitialVertices();
+    if (addedVertices != nullptr && addedInitialVertices != nullptr)
+    {
+        printf("Add %d vertices.\n", addedVertices->size());
+        addVertices(pbdMesh, addedVertices, addedInitialVertices);
+    }
+    auto addedTriangles = surfCut->getAddedTriangles();
+    if (addedTriangles != nullptr)
+    {
+        printf("Add %d triangles.\n", addedTriangles->size());
+        addTriangles(pbdMesh, addedTriangles);
+    }
+    auto modifiedTriangleIndices = surfCut->getModifiedTriangleIndices();
+    auto modifiedTriangles = surfCut->getModifiedTriangles();
+    if (modifiedTriangleIndices != nullptr && modifiedTriangles != nullptr)
+    {
+        printf("Modify %d triangles.\n", modifiedTriangles->size());
+        modifyTriangles(pbdMesh, modifiedTriangleIndices, modifiedTriangles);
+    }
+    pbdMesh->postModified();
+
+    // update pbd mesh
+    pbdMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*pbdMesh->getInitialVertexPositions()));
+    pbdMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*pbdMesh->getVertexPositions()));
+    pbdMesh->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*pbdMesh->getTriangleIndices()));
+    pbdMesh->modified();
+    */
 
     // perform cutting
     imstkNew<SurfaceMeshCut> surfCut;
@@ -66,6 +107,9 @@ PbdObjectCuttingPair::apply()
     surfCut->setCutGeometry(cutObj->getCollidingGeometry());
     surfCut->update();
     auto newPbdMesh = surfCut->getOutputMesh();
+
+    m_removeConstraintVertices = surfCut->getRemoveConstraintVertices();
+    m_addConstraintVertices    = surfCut->getAddConstraintVertices();
 
     // update pbd mesh
     pbdMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*newPbdMesh->getInitialVertexPositions()));
@@ -75,8 +119,8 @@ PbdObjectCuttingPair::apply()
 
     // update pbd states, constraints and solver
     pbdModel->initState();
-    pbdModel->removeConstraints(surfCut->getRemoveConstraintVertices());
-    pbdModel->addConstraints(surfCut->getAddConstraintVertices());
+    pbdModel->removeConstraints(m_removeConstraintVertices);
+    pbdModel->addConstraints(m_addConstraintVertices);
     pbdModel->getSolver()->setInvMasses(pbdModel->getInvMasses());
     pbdModel->getSolver()->setPositions(pbdModel->getCurrentState()->getPositions());
 }
@@ -91,7 +135,7 @@ PbdObjectCuttingPair::addVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
 
     auto nVertices    = vertices->size();
     auto nNewVertices = newVertices->size();
-    if (nNewVertices != initialVertices->size())
+    if (nNewVertices != newInitialVertices->size())
     {
         LOG(WARNING) << "Number of new vertices does not match number of new initial vertices";
         return;
@@ -104,7 +148,6 @@ PbdObjectCuttingPair::addVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
         vertices->push_back((*newVertices)[i]);
         initialVertices->push_back((*newInitialVertices)[i]);
     }
-    pbdMesh->modified();
 }
 
 void
@@ -116,10 +159,8 @@ PbdObjectCuttingPair::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
     auto vertices = pbdMesh->getVertexPositions();
     auto initialVertices = pbdMesh->getInitialVertexPositions();
 
-    auto nVertices = vertices->size();
     auto nModifiedVertices = modifiedVertices->size();
-    if (nVertices != initialVertices->size()
-        || nModifiedVertices != modifiedInitialVertices->size()
+    if (nModifiedVertices != modifiedInitialVertices->size()
         || nModifiedVertices != modifiedVertexIndices->size())
     {
         LOG(WARNING) << "Numbers of vertices do not match.";
@@ -134,7 +175,6 @@ PbdObjectCuttingPair::modifyVertices(std::shared_ptr<SurfaceMesh> pbdMesh,
         m_removeConstraintVertices->insert(vertexIdx);
         m_addConstraintVertices->insert(vertexIdx);
     }
-    pbdMesh->modified();
 }
 
 void
@@ -154,7 +194,6 @@ PbdObjectCuttingPair::addTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
         m_addConstraintVertices->insert(tri[1]);
         m_addConstraintVertices->insert(tri[2]);
     }
-    pbdMesh->modified();
 }
 
 void
@@ -162,10 +201,8 @@ PbdObjectCuttingPair::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
                                       std::shared_ptr<std::vector<size_t>> modifiedTriangleIndices,
                                       std::shared_ptr<VecDataArray<int, 3>> modifiedTriangles)
 {
-    auto triangles  = pbdMesh->getTriangleIndices();
-    auto nTriangles = triangles->size();
+    auto triangles = pbdMesh->getTriangleIndices();
     auto nModifiedTriangles = modifiedTriangles->size();
-
     if (nModifiedTriangles != modifiedTriangleIndices->size())
     {
         LOG(WARNING) << "Numbers of vertices do not match.";
@@ -174,15 +211,17 @@ PbdObjectCuttingPair::modifyTriangles(std::shared_ptr<SurfaceMesh> pbdMesh,
 
     for (int i = 0; i < nModifiedTriangles; ++i)
     {
-        auto& tri = (*modifiedTriangles)[i];
-        (*triangles)[modifiedTriangleIndices->at(i)] = tri;
-        m_removeConstraintVertices->insert(tri[0]);
-        m_removeConstraintVertices->insert(tri[1]);
-        m_removeConstraintVertices->insert(tri[2]);
-        m_addConstraintVertices->insert(tri[0]);
-        m_addConstraintVertices->insert(tri[1]);
-        m_addConstraintVertices->insert(tri[2]);
+        auto  triId  = (*modifiedTriangleIndices)[i];
+        auto& oldTri = (*triangles)[triId];
+        m_removeConstraintVertices->insert(oldTri[0]);
+        m_removeConstraintVertices->insert(oldTri[1]);
+        m_removeConstraintVertices->insert(oldTri[2]);
+
+        auto& newTri = (*modifiedTriangles)[i];
+        (*triangles)[triId] = newTri;
+        m_addConstraintVertices->insert(newTri[0]);
+        m_addConstraintVertices->insert(newTri[1]);
+        m_addConstraintVertices->insert(newTri[2]);
     }
-    pbdMesh->modified();
 }
 }

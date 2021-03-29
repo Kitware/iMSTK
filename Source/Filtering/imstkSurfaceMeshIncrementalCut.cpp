@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkSurfaceMeshCut.h"
+#include "imstkSurfaceMeshIncrementalCut.h"
 
 #include "imstkGeometryUtilities.h"
 #include "imstkLogger.h"
@@ -30,31 +30,27 @@
 
 namespace imstk
 {
-SurfaceMeshCut::SurfaceMeshCut()
+SurfaceMeshIncrementalCut::SurfaceMeshIncrementalCut()
 {
     setNumberOfInputPorts(1);
-    setNumberOfOutputPorts(1);
-    setOutput(std::make_shared<SurfaceMesh>());
+    setNumberOfOutputPorts(0);
 
-    m_CutGeometry = std::make_shared<Plane>();
-    m_RemoveConstraintVertices = std::make_shared<std::unordered_set<size_t>>();
-    m_AddConstraintVertices    = std::make_shared<std::unordered_set<size_t>>();
-}
-
-std::shared_ptr<SurfaceMesh>
-SurfaceMeshCut::getOutputMesh()
-{
-    return std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0));
+    m_CutGeometry   = std::make_shared<Plane>();
+    m_AddedVertices = std::make_shared<VecDataArray<double, 3>>();
+    m_AddedInitialVertices    = std::make_shared<VecDataArray<double, 3>>();
+    m_ModifiedTriangleIndices = std::make_shared<std::vector<size_t>>();
+    m_ModifiedTriangles       = std::make_shared<VecDataArray<int, 3>>();
+    m_AddedTriangles = std::make_shared<VecDataArray<int, 3>>();
 }
 
 void
-SurfaceMeshCut::setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh)
+SurfaceMeshIncrementalCut::setInputMesh(std::shared_ptr<SurfaceMesh> inputMesh)
 {
     setInput(inputMesh, 0);
 }
 
 void
-SurfaceMeshCut::requestUpdate()
+SurfaceMeshIncrementalCut::requestUpdate()
 {
     // input and output SurfaceMesh
     std::shared_ptr<SurfaceMesh> inputSurf = std::dynamic_pointer_cast<SurfaceMesh>(getInput(0));
@@ -63,55 +59,57 @@ SurfaceMeshCut::requestUpdate()
         LOG(WARNING) << "Missing required SurfaceMesh input";
         return;
     }
-    std::shared_ptr<SurfaceMesh> outputSurf = std::dynamic_pointer_cast<SurfaceMesh>(getOutput(0));
-    outputSurf->deepCopy(inputSurf);
+
+    // clear member variables from last update
+    m_AddedVertices->clear();
+    m_AddedInitialVertices->clear();
+    m_ModifiedTriangleIndices->clear();
+    m_ModifiedTriangles->clear();
+    m_AddedTriangles->clear();
 
     // vertices on the cutting path and whether they will be split
     std::map<int, bool> cutVerts;
 
+    // modified triangle Ids and their corresponding index in the m_ModifiedTriangles
+    std::map<int, int> modifiedTriMap;
+
     // generate cut data
     if (std::dynamic_pointer_cast<AnalyticalGeometry>(m_CutGeometry) != nullptr)
     {
-        generateAnalyticalCutData(std::static_pointer_cast<AnalyticalGeometry>(m_CutGeometry), outputSurf);
+        generateAnalyticalCutData(std::static_pointer_cast<AnalyticalGeometry>(m_CutGeometry), inputSurf);
     }
     else if (std::dynamic_pointer_cast<SurfaceMesh>(m_CutGeometry) != nullptr)
     {
-        generateSurfaceMeshCutData(std::static_pointer_cast<SurfaceMesh>(m_CutGeometry), outputSurf);
+        generateSurfaceMeshCutData(std::static_pointer_cast<SurfaceMesh>(m_CutGeometry), inputSurf);
     }
     else
     {
-        setOutput(outputSurf);
+        LOG(WARNING) << "Unsupported cutting geometry type.";
         return;
     }
 
     if (m_CutData->size() == 0)
     {
-        setOutput(outputSurf);
         return;
     }
 
     // refinement
-    refinement(outputSurf, cutVerts);
+    refinement(inputSurf, cutVerts, modifiedTriMap);
 
     // split cutting vertices
-    splitVerts(outputSurf, cutVerts, m_CutGeometry);
-
-    // vtkPolyData to output SurfaceMesh
-    setOutput(outputSurf);
+    splitVerts(inputSurf, cutVerts, modifiedTriMap, m_CutGeometry);
 }
 
 void
-SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int, bool>& cutVerts)
+SurfaceMeshIncrementalCut::refinement(std::shared_ptr<SurfaceMesh> inputSurf, std::map<int, bool>& cutVerts, std::map<int, int>& modifiedTriMap)
 {
     // map between one exsiting edge to the new vert generated from the cutting
     std::map<std::pair<int, int>, int> edgeVertMap;
 
-    auto triangles = outputSurf->getTriangleIndices();
-    auto vertices  = outputSurf->getVertexPositions();
-    auto initVerts = outputSurf->getInitialVertexPositions();
-    triangles->reserve(triangles->size() * 2);
-    vertices->reserve(vertices->size() * 2);
-    initVerts->reserve(initVerts->size() * 2);
+    auto triangles = inputSurf->getTriangleIndices();
+    auto vertices  = inputSurf->getVertexPositions();
+    auto initVerts = inputSurf->getInitialVertexPositions();
+    auto nVertices = vertices->size();
 
     for (const auto& curCutData : *m_CutData)
     {
@@ -137,9 +135,9 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             }
             else
             {
-                newPtId = vertices->size();
-                vertices->push_back(cood0);
-                initVerts->push_back(initCood0);
+                newPtId = nVertices + m_AddedVertices->size();
+                m_AddedVertices->push_back(cood0);
+                m_AddedInitialVertices->push_back(initCood0);
                 edgeVertMap[edge0] = newPtId;
             }
 
@@ -158,8 +156,11 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             {
                 ptId2 = ptIds[2];
             }
-            (*triangles)[triId] = Vec3i(ptId2, ptId0, newPtId);
-            triangles->push_back(Vec3i(ptId2, newPtId, ptId1));
+
+            modifiedTriMap[triId] = m_ModifiedTriangles->size();
+            m_ModifiedTriangleIndices->push_back(triId);
+            m_ModifiedTriangles->push_back(Vec3i(ptId2, ptId0, newPtId));
+            m_AddedTriangles->push_back(Vec3i(ptId2, newPtId, ptId1));
 
             // add vertices to cutting path
             if (curCutType == CutType::EDGE_VERT)
@@ -167,14 +168,6 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
                 cutVerts[ptId2]   = (cutVerts.find(ptId2) != cutVerts.end()) ? true : false;
                 cutVerts[newPtId] = (cutVerts.find(newPtId) != cutVerts.end()) ? true : false;
             }
-
-            m_RemoveConstraintVertices->insert(ptId0);
-            m_RemoveConstraintVertices->insert(ptId1);
-            m_RemoveConstraintVertices->insert(ptId2);
-            m_AddConstraintVertices->insert(ptId0);
-            m_AddConstraintVertices->insert(ptId1);
-            m_AddConstraintVertices->insert(ptId2);
-            m_AddConstraintVertices->insert(newPtId);
         }
         else if (curCutType == CutType::EDGE_EDGE)
         {
@@ -208,9 +201,9 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             }
             else
             {
-                newPtId0 = vertices->size();
-                vertices->push_back(cood0);
-                initVerts->push_back(initCood0);
+                newPtId0 = nVertices + m_AddedVertices->size();
+                m_AddedVertices->push_back(cood0);
+                m_AddedInitialVertices->push_back(initCood0);
                 edgeVertMap[edge00] = newPtId0;
             }
             if (edgeVertMap.find(edge11) != edgeVertMap.end())
@@ -219,56 +212,44 @@ SurfaceMeshCut::refinement(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
             }
             else
             {
-                newPtId1 = vertices->size();
-                vertices->push_back(cood1);
-                initVerts->push_back(initCood1);
+                newPtId1 = nVertices + m_AddedVertices->size();
+                m_AddedVertices->push_back(cood1);
+                m_AddedInitialVertices->push_back(initCood1);
                 edgeVertMap[edge10] = newPtId1;
             }
 
             // update triangle indices
-            (*triangles)[triId] = Vec3i(ptId2, newPtId0, newPtId1);
-            triangles->push_back(Vec3i(newPtId0, ptId0, ptId1));
-            triangles->push_back(Vec3i(newPtId0, ptId1, newPtId1));
+            modifiedTriMap[triId] = m_ModifiedTriangles->size();
+            m_ModifiedTriangleIndices->push_back(triId);
+            m_ModifiedTriangles->push_back(Vec3i(ptId2, newPtId0, newPtId1));
+            m_AddedTriangles->push_back(Vec3i(newPtId0, ptId0, ptId1));
+            m_AddedTriangles->push_back(Vec3i(newPtId0, ptId1, newPtId1));
 
             // add vertices to cutting path
             cutVerts[newPtId0] = (cutVerts.find(newPtId0) != cutVerts.end()) ? true : false;
             cutVerts[newPtId1] = (cutVerts.find(newPtId1) != cutVerts.end()) ? true : false;
-
-            m_RemoveConstraintVertices->insert(ptId0);
-            m_RemoveConstraintVertices->insert(ptId1);
-            m_RemoveConstraintVertices->insert(ptId2);
-            m_AddConstraintVertices->insert(ptId0);
-            m_AddConstraintVertices->insert(ptId1);
-            m_AddConstraintVertices->insert(ptId2);
-            m_AddConstraintVertices->insert(newPtId0);
-            m_AddConstraintVertices->insert(newPtId1);
         }
         else if (curCutType == CutType::VERT_VERT)
         {
             // add vertices to cutting path
             cutVerts[ptId0] = (cutVerts.find(ptId0) != cutVerts.end()) ? true : false;
             cutVerts[ptId1] = (cutVerts.find(ptId1) != cutVerts.end()) ? true : false;
-
-            m_RemoveConstraintVertices->insert(ptId0);
-            m_RemoveConstraintVertices->insert(ptId1);
-            m_AddConstraintVertices->insert(ptId0);
-            m_AddConstraintVertices->insert(ptId1);
         }
         else
         {
-            //do nothing
+            // do nothing
         }
     }
-
-    outputSurf->modified();
 }
 
 void
-SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int, bool>& cutVerts, std::shared_ptr<Geometry> geometry)
+SurfaceMeshIncrementalCut::splitVerts(std::shared_ptr<SurfaceMesh> inputSurf, std::map<int, bool>& cutVerts, std::map<int, int>& modifiedTriMap, std::shared_ptr<Geometry> geometry)
 {
-    auto triangles = outputSurf->getTriangleIndices();
-    auto vertices  = outputSurf->getVertexPositions();
-    auto initVerts = outputSurf->getInitialVertexPositions();
+    auto triangles  = inputSurf->getTriangleIndices();
+    auto vertices   = inputSurf->getVertexPositions();
+    auto initVerts  = inputSurf->getInitialVertexPositions();
+    auto nTriangles = triangles->size();
+    auto nVertices  = vertices->size();
 
     std::shared_ptr<AnalyticalGeometry> cutGeometry;
     if (std::dynamic_pointer_cast<AnalyticalGeometry>(geometry) != nullptr)
@@ -294,21 +275,36 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
     // build vertexToTriangleListMap
     std::vector<std::set<int>> vertexNeighborTriangles;
     vertexNeighborTriangles.clear();
-    vertexNeighborTriangles.resize(vertices->size());
+    vertexNeighborTriangles.resize((size_t)(nVertices + m_AddedVertices->size()));
 
-    int triangleId = 0;
-    for (const auto& tri : *triangles)
+    for (int triId = 0; triId < nTriangles; ++triId)
     {
-        vertexNeighborTriangles.at(tri[0]).insert(triangleId);
-        vertexNeighborTriangles.at(tri[1]).insert(triangleId);
-        vertexNeighborTriangles.at(tri[2]).insert(triangleId);
-        triangleId++;
+        Vec3i tri;
+        if (modifiedTriMap.find(triId) != modifiedTriMap.end())
+        {
+            tri = (*m_ModifiedTriangles)[modifiedTriMap[triId]];
+        }
+        else
+        {
+            tri = (*triangles)[triId];
+        }
+        vertexNeighborTriangles.at(tri[0]).insert(triId);
+        vertexNeighborTriangles.at(tri[1]).insert(triId);
+        vertexNeighborTriangles.at(tri[2]).insert(triId);
+    }
+    for (int triId = 0; triId < m_AddedTriangles->size(); ++triId)
+    {
+        auto& tri = (*m_AddedTriangles)[triId];
+        vertexNeighborTriangles.at(tri[0]).insert(triId + nTriangles);
+        vertexNeighborTriangles.at(tri[1]).insert(triId + nTriangles);
+        vertexNeighborTriangles.at(tri[2]).insert(triId + nTriangles);
     }
 
     // split cutting vertices
     for (const auto& cutVert : cutVerts)
     {
-        if (cutVert.second == false && !vertexOnBoundary(triangles, vertexNeighborTriangles[cutVert.first]))
+        if (cutVert.second == false
+            && !vertexOnBoundary(triangles, modifiedTriMap, vertexNeighborTriangles[cutVert.first]))
         {
             // do not split vertex since it's the cutting end in surface
             (*m_CutVertMap)[cutVert.first] = cutVert.first;
@@ -316,18 +312,42 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
         else
         {
             // split vertex
-            int newPtId = vertices->size();
-            vertices->push_back((*vertices)[cutVert.first]);
-            initVerts->push_back((*initVerts)[cutVert.first]);
+            int newPtId = nVertices + m_AddedVertices->size();
             (*m_CutVertMap)[cutVert.first] = newPtId;
-            m_AddConstraintVertices->insert(newPtId);
-
-            for (const auto& t : vertexNeighborTriangles[cutVert.first])
+            if (cutVert.first < nVertices)
             {
+                m_AddedVertices->push_back((*vertices)[cutVert.first]);
+                m_AddedInitialVertices->push_back((*initVerts)[cutVert.first]);
+            }
+            else
+            {
+                m_AddedVertices->push_back((*m_AddedVertices)[(size_t)(cutVert.first - nVertices)]);
+                m_AddedInitialVertices->push_back((*m_AddedInitialVertices)[(size_t)(cutVert.first - nVertices)]);
+            }
+
+            for (const auto& triId : vertexNeighborTriangles[cutVert.first])
+            {
+                Vec3i tri;
+                if (triId < nTriangles)
+                {
+                    if (modifiedTriMap.find(triId) == modifiedTriMap.end())
+                    {
+                        tri = (*triangles)[triId];
+                    }
+                    else
+                    {
+                        tri = (*m_ModifiedTriangles)[modifiedTriMap[triId]];
+                    }
+                }
+                else
+                {
+                    tri = (*m_AddedTriangles)[(size_t)(triId - nTriangles)];
+                }
+
                 //if triangle on the negative side
-                Vec3d pt0 = (*vertices)[(*triangles)[t][0]];
-                Vec3d pt1 = (*vertices)[(*triangles)[t][1]];
-                Vec3d pt2 = (*vertices)[(*triangles)[t][2]];
+                Vec3d pt0 = (tri[0] < nVertices ? (*vertices)[tri[0]] : (*m_AddedVertices)[tri[0] - nVertices]);
+                Vec3d pt1 = (tri[1] < nVertices ? (*vertices)[tri[1]] : (*m_AddedVertices)[tri[1] - nVertices]);
+                Vec3d pt2 = (tri[2] < nVertices ? (*vertices)[tri[2]] : (*m_AddedVertices)[tri[2] - nVertices]);
 
                 if (pointOnGeometrySide(pt0, cutGeometry) < 0
                     || pointOnGeometrySide(pt1, cutGeometry) < 0
@@ -335,21 +355,31 @@ SurfaceMeshCut::splitVerts(std::shared_ptr<SurfaceMesh> outputSurf, std::map<int
                 {
                     for (int i = 0; i < 3; i++)
                     {
-                        if ((*triangles)[t][i] == cutVert.first)
+                        if (tri[i] == cutVert.first)
                         {
-                            (*triangles)[t][i] = newPtId;
+                            tri[i] = newPtId;
+                            break;
                         }
+                    }
+
+                    if (modifiedTriMap.find(triId) != modifiedTriMap.end())
+                    {
+                        (*m_ModifiedTriangles)[modifiedTriMap[triId]] = tri;
+                    }
+                    else
+                    {
+                        modifiedTriMap[triId] = m_ModifiedTriangles->size();
+                        m_ModifiedTriangleIndices->push_back(triId);
+                        m_ModifiedTriangles->push_back(tri);
                     }
                 }
             }
         }
     }
-
-    outputSurf->modified();
 }
 
 int
-SurfaceMeshCut::pointOnGeometrySide(Vec3d pt, std::shared_ptr<Geometry> geometry)
+SurfaceMeshIncrementalCut::pointOnGeometrySide(Vec3d pt, std::shared_ptr<Geometry> geometry)
 {
     if (std::dynamic_pointer_cast<AnalyticalGeometry>(geometry) != nullptr)
     {
@@ -363,7 +393,7 @@ SurfaceMeshCut::pointOnGeometrySide(Vec3d pt, std::shared_ptr<Geometry> geometry
 }
 
 int
-SurfaceMeshCut::pointOnAnalyticalSide(Vec3d pt, std::shared_ptr<AnalyticalGeometry> geometry)
+SurfaceMeshIncrementalCut::pointOnAnalyticalSide(Vec3d pt, std::shared_ptr<AnalyticalGeometry> geometry)
 {
     double normalProjection = geometry->getFunctionValue(pt);
     if (normalProjection > m_Epsilon)
@@ -382,14 +412,34 @@ SurfaceMeshCut::pointOnAnalyticalSide(Vec3d pt, std::shared_ptr<AnalyticalGeomet
 }
 
 bool
-SurfaceMeshCut::vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleIndices, std::set<int>& triSet)
+SurfaceMeshIncrementalCut::vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangles,
+                                            std::map<int, int>& modifiedTriMap,
+                                            std::set<int>& triSet)
 {
+    auto          nTriangles = triangles->size();
     std::set<int> nonRepeatNeighborVerts;
-    for (const auto& tri : triSet)
+    for (const auto& triId : triSet)
     {
+        Vec3i tri;
+        if (triId < nTriangles)
+        {
+            if (modifiedTriMap.find(triId) != modifiedTriMap.end())
+            {
+                tri = (*m_ModifiedTriangles)[modifiedTriMap[triId]];
+            }
+            else
+            {
+                tri = (*triangles)[triId];
+            }
+        }
+        else
+        {
+            tri = (*m_AddedTriangles)[(size_t)(triId - nTriangles)];
+        }
+
         for (int i = 0; i < 3; i++)
         {
-            int ptId = (*triangleIndices)[tri][i];
+            int ptId = tri[i];
             if (nonRepeatNeighborVerts.find(ptId) != nonRepeatNeighborVerts.end())
             {
                 nonRepeatNeighborVerts.erase(ptId);
@@ -404,7 +454,7 @@ SurfaceMeshCut::vertexOnBoundary(std::shared_ptr<VecDataArray<int, 3>> triangleI
 }
 
 void
-SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> outputSurf)
+SurfaceMeshIncrementalCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> geometry, std::shared_ptr<SurfaceMesh> outputSurf)
 {
     auto triangles = outputSurf->getTriangleIndices();
     auto vertices  = outputSurf->getVertexPositions();
@@ -539,7 +589,7 @@ SurfaceMeshCut::generateAnalyticalCutData(std::shared_ptr<AnalyticalGeometry> ge
 }
 
 void
-SurfaceMeshCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf, std::shared_ptr<SurfaceMesh> outputSurf)
+SurfaceMeshIncrementalCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf, std::shared_ptr<SurfaceMesh> outputSurf)
 {
     auto cutTriangles = cutSurf->getTriangleIndices();
     auto cutVertices  = cutSurf->getVertexPositions();
@@ -640,7 +690,7 @@ SurfaceMeshCut::generateSurfaceMeshCutData(std::shared_ptr<SurfaceMesh> cutSurf,
 }
 
 bool
-SurfaceMeshCut::pointProjectionInSurface(const Vec3d& pt, std::shared_ptr<SurfaceMesh> cutSurf)
+SurfaceMeshIncrementalCut::pointProjectionInSurface(const Vec3d& pt, std::shared_ptr<SurfaceMesh> cutSurf)
 {
     auto cutTriangles = cutSurf->getTriangleIndices();
     auto cutVertices  = cutSurf->getVertexPositions();
