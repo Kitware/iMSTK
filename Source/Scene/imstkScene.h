@@ -181,14 +181,12 @@ public:
     ///
     const std::vector<std::shared_ptr<Light>> getLights() const;
 
-
-
     ///
     /// \brief Get a light with a given name
     ///
     std::shared_ptr<Light> getLight(const std::string& lightName) const;
 
-    const NamedMap<Camera>& getCameras() const { return m_cameras; }
+    const NamedMap<Camera>& getCameras() const{ return m_cameras; }
 
     ///
     /// \brief Add/remove lights from the scene

@@ -431,6 +431,12 @@ VTKRenderer::updateRenderDelegates()
                 m_objectVtkActors.push_back(renderDelegate->getVtkActor());
                 m_vtkRenderer->AddActor(renderDelegate->getVtkActor());
 
+                auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate);
+                if (smRenderDelegate)
+                {
+                    smRenderDelegate->initializeTextures(m_textureManager);
+                }
+
                 //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
 
                 visualModel->setRenderDelegateCreated(this, true);

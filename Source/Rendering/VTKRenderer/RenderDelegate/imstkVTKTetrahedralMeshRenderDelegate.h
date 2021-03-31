@@ -64,7 +64,7 @@ protected:
 
     ///
     /// \brief Callback when indices change
-    /// 
+    ///
     void indexDataModified(Event* e);
 
     ///

@@ -35,7 +35,6 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkTexture.h>
-#include <vtkVersion.h>
 
 namespace imstk
 {
@@ -107,13 +106,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
         m_polydata->GetPointData()->SetTCoords(m_mappedTCoordsArray);
 
         // Map Tangents
-        //m_geometry->computeVertexTangents();
-        if (m_geometry->getVertexTangents() != nullptr)
+        if (m_geometry->getVertexTangents() == nullptr)
         {
-            // These need to be float for PBR
-            m_mappedTangentArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTangents()));
-            m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
+            m_geometry->computeVertexTangents();
         }
+        // These need to be float for PBR
+        m_mappedTangentArray = vtkFloatArray::SafeDownCast(GeometryUtils::coupleVtkDataArray(m_geometry->getVertexTangents()));
+        m_polydata->GetPointData()->SetTangents(m_mappedTangentArray);
     }
 
     // When geometry is modified, update data source, mostly for when an entirely new array/buffer was set
@@ -121,6 +120,12 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
 
     // When the vertex buffer internals are modified, ie: a single or N elements
     queueConnect<Event>(m_geometry->getVertexPositions(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+
+    // When index buffer internals are modified
+    queueConnect<Event>(m_geometry->getTriangleIndices(), &VecDataArray<int, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::indexDataModified);
+
+    // When index buffer internals are modified
+    queueConnect<Event>(m_geometry->getVertexNormals(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::normalDataModified);
 
     // When the index buffer internals are modified,
 
@@ -188,33 +193,29 @@ void
 VTKSurfaceMeshRenderDelegate::vertexDataModified(Event* imstkNotUsed(e))
 {
     auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
-
-    // Update the pointer of the coupled array
-    m_vertices = geometry->getVertexPositions();
-    if (m_vertices->getVoidPointer() != m_mappedVertexArray->GetVoidPointer(0))
-    {
-        m_mappedVertexArray->SetNumberOfComponents(3);
-        m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
-    }
-    m_mappedVertexArray->Modified();
+    setVertexBuffer(geometry->getVertexPositions());
 
     // If the material says we should recompute normals
     if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
     {
         geometry->computeVertexNormals();
-        std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();
-        double*                                  normalData = reinterpret_cast<double*>(normals->getPointer());
-        m_mappedNormalArray->SetNumberOfComponents(3);
-        m_mappedNormalArray->SetArray(normalData, normals->size() * 3, 1);
-        m_mappedNormalArray->Modified();
+        setNormalBuffer(geometry->getVertexNormals());
     }
 }
 
-//void
-//VTKSurfaceMeshRenderDelegate::indexDataModified(Event* e)
-//{
-//
-//}
+void
+VTKSurfaceMeshRenderDelegate::indexDataModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    setIndexBuffer(geometry->getTriangleIndices());
+}
+
+void
+VTKSurfaceMeshRenderDelegate::normalDataModified(Event* imstkNotUsed(e))
+{
+    auto geometry = std::static_pointer_cast<SurfaceMesh>(m_visualModel->getGeometry());
+    setNormalBuffer(geometry->getVertexNormals());
+}
 
 void
 VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
@@ -224,48 +225,107 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     // If the vertices were reallocated
     if (m_vertices != geometry->getVertexPositions())
     {
-        //printf("Vertex data swapped\n");
-        m_vertices = geometry->getVertexPositions();
-        {
-            // Update the pointer of the coupled array
-            m_mappedVertexArray->SetNumberOfComponents(3);
-            m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
-        }
-        m_polydata->GetPoints()->SetNumberOfPoints(m_vertices->size());
+        setVertexBuffer(geometry->getVertexPositions());
     }
 
-    // Notify VTK that the vertices were changed
+    // Assume vertices are always changed
     m_mappedVertexArray->Modified();
 
     // Only update index buffer when reallocated
     if (m_indices != geometry->getTriangleIndices())
     {
-        m_indices = geometry->getTriangleIndices();
-        {
-            // Copy cells
-            m_cellArray->Reset();
-            vtkIdType cell[3];
-            for (const auto& t : *m_indices)
-            {
-                for (size_t i = 0; i < 3; ++i)
-                {
-                    cell[i] = t[i];
-                }
-                m_cellArray->InsertNextCell(3, cell);
-            }
-            m_cellArray->Modified();
-        }
+        setIndexBuffer(geometry->getTriangleIndices());
+    }
+
+    if (m_normals != geometry->getVertexNormals())
+    {
+        setNormalBuffer(geometry->getVertexNormals());
     }
 
     if (m_visualModel->getRenderMaterial()->getRecomputeVertexNormals())
     {
         geometry->computeVertexNormals();
-        std::shared_ptr<VecDataArray<double, 3>> normals    = geometry->getVertexNormals();
-        double*                                  normalData = reinterpret_cast<double*>(normals->getPointer());
-        m_mappedNormalArray->SetNumberOfComponents(3);
-        m_mappedNormalArray->SetArray(normalData, normals->size() * 3, 1);
-        m_mappedNormalArray->Modified();
+        setNormalBuffer(geometry->getVertexNormals());
     }
+}
+
+void
+VTKSurfaceMeshRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices)
+{
+    // If the buffer changed
+    if (m_vertices != vertices)
+    {
+        // If previous buffer exist
+        if (m_vertices != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_vertices, this, &VecDataArray<double, 3>::modified);
+        }
+        // Set new buffer and observe
+        m_vertices = vertices;
+        queueConnect<Event>(m_vertices, &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::vertexDataModified);
+    }
+
+    // Couple the buffer
+    m_mappedVertexArray->SetNumberOfComponents(3);
+    m_mappedVertexArray->SetArray(reinterpret_cast<double*>(m_vertices->getPointer()), m_vertices->size() * 3, 1);
+    m_mappedVertexArray->Modified();
+    m_polydata->GetPoints()->SetNumberOfPoints(m_vertices->size());
+}
+
+void
+VTKSurfaceMeshRenderDelegate::setNormalBuffer(std::shared_ptr<VecDataArray<double, 3>> normals)
+{
+    // If the buffer changed
+    if (m_normals != normals)
+    {
+        // If previous buffer exist
+        if (m_normals != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_normals, this, &VecDataArray<double, 3>::modified);
+        }
+        // Set new buffer and observe
+        m_normals = normals;
+        queueConnect<Event>(m_normals, &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::normalDataModified);
+    }
+
+    // Couple the buffer
+    m_mappedNormalArray->SetNumberOfComponents(3);
+    m_mappedNormalArray->SetArray(reinterpret_cast<double*>(m_normals->getPointer()), m_normals->size() * 3, 1);
+    m_mappedNormalArray->Modified();
+}
+
+void
+VTKSurfaceMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<int, 3>> indices)
+{
+    // If the buffer changed
+    if (m_indices != indices)
+    {
+        // If previous buffer exist
+        if (m_indices != nullptr)
+        {
+            // stop observing its changes
+            disconnect(m_indices, this, &VecDataArray<int, 3>::modified);
+        }
+        // Set new buffer and observe
+        m_indices = indices;
+        queueConnect<Event>(m_indices, &VecDataArray<int, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::indexDataModified);
+    }
+
+    // Copy the buffer
+    // Copy cells
+    m_cellArray->Reset();
+    vtkIdType cell[3];
+    for (const auto& t : *m_indices)
+    {
+        for (size_t i = 0; i < 3; ++i)
+        {
+            cell[i] = t[i];
+        }
+        m_cellArray->InsertNextCell(3, cell);
+    }
+    m_cellArray->Modified();
 }
 
 void
@@ -311,10 +371,6 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         auto currentTexture = textureDelegate->getTexture();
 
         vtkSmartPointer<vtkActor> actor = vtkActor::SafeDownCast(m_actor);
-
-#if (VTK_MAJOR_VERSION <= 8 && VTK_MINOR_VERSION <= 1)
-        actor->GetProperty()->SetTexture(currentUnit, currentTexture);
-#else
         if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
         {
             switch (texture->getType())
@@ -344,8 +400,6 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         {
             actor->GetProperty()->SetTexture(textureDelegate->getTextureName().c_str(), currentTexture);
         }
-
-#endif
 
         currentUnit++;
     }

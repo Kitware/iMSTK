@@ -103,7 +103,7 @@ VTKTetrahedralMeshRenderDelegate::processEvents()
     // Custom handling of events
     std::shared_ptr<TetrahedralMesh>         geom     = std::dynamic_pointer_cast<TetrahedralMesh>(m_visualModel->getGeometry());
     std::shared_ptr<VecDataArray<double, 3>> vertices = geom->getVertexPositions();
-    std::shared_ptr<VecDataArray<int, 4>> indices = geom->getTetrahedraIndices();
+    std::shared_ptr<VecDataArray<int, 4>>    indices  = geom->getTetrahedraIndices();
 
     // Only use the most recent event from respective sender
     std::list<Command> cmds;

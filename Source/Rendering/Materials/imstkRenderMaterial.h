@@ -231,7 +231,7 @@ public:
     float getNormalStrength() const{ return m_normalStrength; }
     void setNormalStrength(const float n);
 
-    float getIndexOfRefraction() const { return m_indexOfRefraction; }
+    float getIndexOfRefraction() const{ return m_indexOfRefraction; }
     void setIndexOfRefraction(const float n);
 
     const Color& getEdgeColor() const{ return m_edgeColor; }
@@ -301,7 +301,7 @@ protected:
     float m_emissivity    = 0.f;
     Color m_emmisiveColor = Color::White;
 
-    float m_metalness = 1.0f;  ///< Value for metalness with range: [0.0, 1.0]
+    float m_metalness = 1.0f; ///< Value for metalness with range: [0.0, 1.0]
     float m_roughness = 1.0f; ///< Value for roughness with range: [0.0, 1.0]
     float m_occlusionStrength = 1.0f;
     float m_normalStrength    = 1.0f;
