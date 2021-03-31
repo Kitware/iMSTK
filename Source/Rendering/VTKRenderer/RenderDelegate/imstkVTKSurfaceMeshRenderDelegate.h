@@ -64,17 +64,26 @@ public:
     ///
     void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
 
+// Callbacks for modifications, when an element changes the user or API must post the modified event
+// to inform that this happened, if the actual buffer on the geometry is swapped then geometry
+// modified would instead be called
 protected:
     ///
     /// \brief Callback for when vertex values are modified
     ///
     void vertexDataModified(Event* e);
-    //void indexDataModified(Event* e);
+    void indexDataModified(Event* e);
+    void normalDataModified(Event* e);
 
     ///
     /// \brief Callback for when geometry is modified
     ///
     void geometryModified(Event* e);
+
+protected:
+    void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
+    void setNormalBuffer(std::shared_ptr<VecDataArray<double, 3>> normals);
+    void setIndexBuffer(std::shared_ptr<VecDataArray<int, 3>> indices);
 
 protected:
     std::shared_ptr<SurfaceMesh> m_geometry;
@@ -86,7 +95,7 @@ protected:
 
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;       ///> Mapped array of vertices
     vtkSmartPointer<vtkDoubleArray> m_mappedNormalArray;       ///> Mapped array of normals
-    vtkSmartPointer<vtkFloatArray> m_mappedTangentArray;      ///> Mapped array of tangents
+    vtkSmartPointer<vtkFloatArray>  m_mappedTangentArray;      ///> Mapped array of tangents
     vtkSmartPointer<vtkFloatArray>  m_mappedTCoordsArray;      ///> Mapped array of tcoords
     vtkSmartPointer<vtkDataArray>   m_mappedVertexScalarArray; ///> Mapped array of scalars
     vtkSmartPointer<vtkDataArray>   m_mappedCellScalarArray;   ///> Mapped array of scalars

@@ -112,8 +112,8 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
     // Vertex normals, tangents, and bitangents
     std::shared_ptr<VecDataArray<double, 3>> normalsPtr    = std::make_shared<VecDataArray<double, 3>>(numVertices);
     VecDataArray<double, 3>&                 normals       = *normalsPtr;
-    std::shared_ptr<VecDataArray<float, 3>> tangentsPtr   = std::make_shared<VecDataArray<float, 3>>(numVertices);
-    VecDataArray<float, 3>&                 tangents      = *tangentsPtr;
+    std::shared_ptr<VecDataArray<float, 3>>  tangentsPtr   = std::make_shared<VecDataArray<float, 3>>(numVertices);
+    VecDataArray<float, 3>&                  tangents      = *tangentsPtr;
     std::shared_ptr<VecDataArray<double, 3>> bitangentsPtr = std::make_shared<VecDataArray<double, 3>>(numVertices);
     VecDataArray<double, 3>&                 bitangents    = *bitangentsPtr;
 
@@ -127,6 +127,9 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
             normals[i] = Vec3d(normalX, normalY, normalZ);
         }
     }
+
+    mesh->initialize(verticesPtr, trianglesPtr, normalsPtr, false);
+    mesh->setVertexNormals("normals", normalsPtr);
 
     if (importedMesh->HasTangentsAndBitangents() && importedMesh->HasTextureCoords(0))
     {
@@ -142,12 +145,8 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
             auto bitangentZ = importedMesh->mBitangents[i].z;
             bitangents[i] = Vec3d(bitangentX, bitangentY, bitangentZ);
         }
+        mesh->setVertexTangents("tangents", tangentsPtr);
     }
-
-    mesh->initialize(verticesPtr, trianglesPtr, normalsPtr, false);
-
-    mesh->setVertexNormals("normals", normalsPtr);
-    mesh->setVertexTangents("tangents", tangentsPtr);
 
     // UV coordinates
     if (importedMesh->HasTextureCoords(0))

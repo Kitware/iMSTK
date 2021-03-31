@@ -47,10 +47,10 @@ public:
     ///
     VisualModel(std::shared_ptr<Geometry> geometry);
     VisualModel(std::shared_ptr<Geometry>       geometry,
-                         std::shared_ptr<RenderMaterial> renderMaterial);
+                std::shared_ptr<RenderMaterial> renderMaterial);
     VisualModel(std::shared_ptr<DebugRenderGeometry> geometry);
     VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
-                         std::shared_ptr<RenderMaterial>      renderMaterial);
+                std::shared_ptr<RenderMaterial>      renderMaterial);
     VisualModel() = default;
     virtual ~VisualModel() override = default;
 

@@ -70,13 +70,9 @@ main()
         imstkNew<RenderMaterial> material;
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
         material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-        imstkNew<Texture> headDiffuseTexture(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.png", Texture::Type::Diffuse);
-        imstkNew<Texture> headNormalTexture(iMSTK_DATA_ROOT "head/HeadTexture_Normal.png", Texture::Type::Normal);
-        imstkNew<Texture> headAoTexture(iMSTK_DATA_ROOT "head/HeadTexture_AO.png", Texture::Type::AmbientOcclusion);
-
-        material->addTexture(headDiffuseTexture);
-        material->addTexture(headNormalTexture);
-        material->addTexture(headAoTexture);
+        material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.png", Texture::Type::Diffuse));
+        material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.png", Texture::Type::Normal));
+        material->addTexture(std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_AO.png", Texture::Type::AmbientOcclusion));
         material->setRecomputeVertexNormals(false);
 
         imstkNew<VisualModel> surfMeshModel(surfaceMesh);
@@ -84,16 +80,6 @@ main()
 
         imstkNew<SceneObject> headObject("head");
         headObject->addVisualModel(surfMeshModel);
-
-        // Head material with textures
-        /* auto headNormalTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_Normal.jpg", Texture::Type::Normal);
-         auto headDiffuseTexture = std::make_shared<Texture>(iMSTK_DATA_ROOT "head/HeadTexture_BaseColor.jpg", Texture::Type::Diffuse);
-         auto headMaterial      = headObject->getVisualModel()->getRenderMaterial();
-         headMaterial->setShadingModel(RenderMaterial::ShadingModel::PBR);
-         headMaterial->addTexture(headNormalTexture);
-         headMaterial->addTexture(headDiffuseTexture);*/
-
-        //headMaterial->addTexture(headDiffuseTexture);
 #endif
 
         scene->addSceneObject(headObject);
@@ -144,6 +130,7 @@ main()
     {
         // Setup a viewer to render in its own thread
         imstkNew<VTKViewer> viewer("Viewer");
+        viewer->setVtkLoggerMode(AbstractVTKViewer::VTKLoggerMode::MUTE);
         viewer->setActiveScene(scene);
 
         // Setup a scene manager to advance the scene in its own thread

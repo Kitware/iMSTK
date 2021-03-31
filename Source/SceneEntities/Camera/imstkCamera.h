@@ -128,7 +128,7 @@ public:
     /// \brief Set clipping near
     /// note: You lose depth accuracy as the range between near and far increases
     /// could cause z fighting
-    /// 
+    ///
     void setNearZ(const double nearZ) { m_nearZ = nearZ; }
 
     const double getNearZ() const { return m_nearZ; }

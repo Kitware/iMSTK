@@ -95,7 +95,7 @@ struct Color
 
     ///
     /// \Get the RGB hex in string format
-    /// 
+    ///
     std::string rgbHex();
 
     static Color darken(const Color color, const double factor);
