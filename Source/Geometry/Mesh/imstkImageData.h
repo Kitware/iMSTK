@@ -177,6 +177,17 @@ public:
     ///
     void clear() override;
 
+private:
+    // ImageData does not use transform, consider splitting into separate class
+    using Geometry::translate;
+    using Geometry::rotate;
+    using Geometry::scale;
+    using Geometry::transform;
+    using Geometry::setRotation;
+    using Geometry::setScaling;
+    using Geometry::setTranslation;
+    using Geometry::setTransform;
+
 protected:
     std::shared_ptr<AbstractDataArray> m_scalarArray = nullptr;
     Vec3i m_dims       = Vec3i(0, 0, 0);
