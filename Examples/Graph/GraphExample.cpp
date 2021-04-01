@@ -26,8 +26,32 @@
 #include "imstkNew.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkGeometryUtilities.h"
+#include <chrono> 
+using namespace std::chrono; 
 
 using namespace imstk;
+
+bool verifyColoring(const Graph& graph, const std::vector<unsigned short>& colors)
+{
+
+    std::unordered_set<size_t> edges;
+    for (size_t i=0; i<graph.size(); ++i)
+    {
+        unsigned short color_i = colors[i];
+        graph.getEdges(i, edges);
+        for (auto j : edges)
+        {
+            if (color_i == colors[j])
+            {
+                std::cout << "edge(" << i << "," << j << "): same color!" << std::endl;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 
 ///
 /// \brief This example demonstrates the imstk graph usage
@@ -72,7 +96,8 @@ main(int argc, char** argv)
     g1.addEdge(3, 4);
 
     g1.print();
-    auto colorsG1 = g1.doColoring(method, true);
+    auto colorsG1 = g1.doColoring(method, false);
+    verifyColoring(g1, colorsG1.first);
 
     Graph g2(5);
     g2.addEdge(0, 1);
@@ -83,21 +108,38 @@ main(int argc, char** argv)
     g2.addEdge(4, 3);
 
     g2.print();
-    auto colorsG2 = g2.doColoring(method, true);
+    auto colorsG2 = g2.doColoring(method, false);
+    verifyColoring(g2, colorsG2.first);
 
-    auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    // auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    const int nx      = 160;
+    const int ny      = 160;
+    const int nz      = 160;
+    auto      tetMesh = GeometryUtils::createUniformMesh(Vec3d{ -2.5, -2.5, -2.5 }, Vec3d{ 2.5, 2.5, 2.5 }, nx, ny, nz);
     if (!tetMesh)
     {
+        std::cout << "Could not read mesh from file." << std::endl;
         LOG(INFO) << "Could not read mesh from file.";
         return 1;
     }
     else
     {
-        auto colorsGVMesh = apiutils::getMeshGraph(tetMesh)->doColoring(method, true);
+        // auto colorsGVMesh = apiutils::getMeshGraph(tetMesh)->doColoring(method, true);
+        {
+            auto graph = apiutils::getMeshGraph(tetMesh);
+            auto t_start = high_resolution_clock::now(); 
+            auto colorsGVMesh = graph->doColoring(method, false);
+            verifyColoring(*graph, colorsGVMesh.first);
+            std::cout << "number of colors = " << colorsGVMesh.second << std::endl;
+            auto t_end = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(t_end - t_start); 
 
-        imstkNew<SurfaceMesh> surfMesh;
-        tetMesh->extractSurfaceMesh(surfMesh, true);
-        auto colorsGSMesh = apiutils::getMeshGraph(surfMesh.get())->doColoring(method, true);
+            std::cout << "runtime = " << duration.count() << " microseconds" << endl; 
+        }
+
+        // imstkNew<SurfaceMesh> surfMesh;
+        // tetMesh->extractSurfaceMesh(surfMesh, true);
+        // auto colorsGSMesh = apiutils::getMeshGraph(surfMesh.get())->doColoring(method, true);
     }
 
     LOG(INFO) << "Press any key to exit!";
@@ -105,3 +147,5 @@ main(int argc, char** argv)
 
     return 0;
 }
+
+

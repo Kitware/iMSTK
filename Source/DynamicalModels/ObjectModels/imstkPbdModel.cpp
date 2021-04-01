@@ -573,8 +573,6 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
 void
 PbdModel::partitionConstraints(const bool print)
 {
-    m_partitionedConstraints = std::make_shared<std::vector<PBDConstraintVector>>();
-
     // Form the map { vertex : list_of_constraints_involve_vertex }
     PBDConstraintVector& allConstraints = *m_constraints;
 
@@ -607,7 +605,8 @@ PbdModel::partitionConstraints(const bool print)
     vertexConstraints.clear();
 
     // do graph coloring for the constraint graph
-    const auto  coloring = constraintGraph.doColoring(Graph::ColoringMethod::WelshPowell);
+    const auto coloring = constraintGraph.doColoring(Graph::ColoringMethod::WelshPowell);
+    // const auto  coloring = constraintGraph.doColoring(Graph::ColoringMethod::Greedy);
     const auto& partitionIndices = coloring.first;
     const auto  numPartitions    = coloring.second;
     assert(partitionIndices.size() == allConstraints.size());
@@ -619,7 +618,7 @@ PbdModel::partitionConstraints(const bool print)
     for (size_t constrIdx = 0; constrIdx < partitionIndices.size(); ++constrIdx)
     {
         const auto partitionIdx = partitionIndices[constrIdx];
-        partitionedConstraints[partitionIdx].push_back(std::move(allConstraints[constrIdx]));
+        partitionedConstraints[partitionIdx].push_back(allConstraints[constrIdx]);
     }
 
     // If a partition has size smaller than the partition threshold, then move its constraints back
@@ -643,7 +642,11 @@ PbdModel::partitionConstraints(const bool print)
     {
         if (partitionedConstraints[readIdx].size() >= m_partitionThreshold)
         {
-            partitionedConstraints[writeIdx++] = std::move(partitionedConstraints[readIdx]);
+            if (readIdx != writeIdx)
+            {
+                partitionedConstraints[writeIdx] = std::move(partitionedConstraints[readIdx]);
+            }
+            ++writeIdx;
         }
     }
     partitionedConstraints.resize(writeIdx);

@@ -42,6 +42,12 @@ Graph::addEdge(const size_t v, const size_t w)
 }
 
 void
+Graph::getEdges(const size_t v, edgeType& edges) const 
+{
+    edges = m_adjList[v];
+}
+
+void
 Graph::print() const
 {
     std::cout << "Graph: " << "\nTotal nodes: " << m_adjList.size() << "\nAdjacency:" << std::endl;
@@ -71,8 +77,10 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
 {
     const auto numNodes = m_adjList.size();
 
+    using ColorType = unsigned short;
+    const ColorType INVALID = std::numeric_limits<unsigned short>::max();
     // Must initialize colors to inf number
-    std::vector<unsigned short> colors(numNodes, std::numeric_limits<unsigned short>::max());
+    std::vector<ColorType> colors(numNodes, INVALID);
 
     // Count the number of neighbors for each node
     std::vector<size_t> neighborCounts(numNodes);
@@ -82,23 +90,19 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
             neighborCounts[idx] = m_adjList[idx].size();
         });
 
-    std::vector<unsigned short> coloringOrder(numNodes);
-    std::iota(coloringOrder.begin(), coloringOrder.end(), static_cast<unsigned short>(0));
+    std::vector<size_t> coloringOrder(numNodes);
+    std::iota(coloringOrder.begin(), coloringOrder.end(), static_cast<size_t>(0));
 
-    std::vector<bool> coloredNodes;
-    unsigned short    color = 0;
+    // Node with largest number of neighbors is processed first
+    tbb::parallel_sort(coloringOrder.begin(), coloringOrder.end(),
+        [&](const size_t idx0, const size_t idx1) {
+            return neighborCounts[idx0] > neighborCounts[idx1];
+                       });
+
+    ColorType color = 0;
     while (coloringOrder.size() > 0)
     {
-        coloredNodes.resize(coloringOrder.size());
-        coloredNodes.assign(coloringOrder.size(), false);
-        coloredNodes.front() = true;
-
-        // Node with largest number of neighbors is processed first
-        tbb::parallel_sort(coloringOrder.begin(), coloringOrder.end(),
-            [&](const size_t idx0, const size_t idx1) {
-                return neighborCounts[idx0] > neighborCounts[idx1];
-            });
-        colors[coloringOrder.front()] = color; // The first node is colorized
+        colors[coloringOrder[0]] = color;
 
         // Cannot run in parallel
         for (size_t i = 1; i < coloringOrder.size(); ++i)
@@ -116,8 +120,7 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
             }
             if (bOK)
             {
-                colors[u]       = color;
-                coloredNodes[i] = true;
+                colors[u] = color;
             }
         }
 
@@ -128,7 +131,8 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
         size_t writeIdx = 0;
         for (size_t readIdx = 1; readIdx < coloringOrder.size(); ++readIdx)
         {
-            if (!coloredNodes[readIdx])
+            // if (!coloredNodes[readIdx])
+            if (colors[coloringOrder[readIdx]] == INVALID)
             {
                 coloringOrder[writeIdx++] = coloringOrder[readIdx];
             }
@@ -143,7 +147,7 @@ Graph::doColoringWelshPowell(bool print /*= false*/) const
         std::cout << "Num. of nodes: " << numNodes << " | Num. of colors: " << color << std::endl;
         for (size_t i = 0; i < numNodes; ++i)
         {
-            std::cout << "V " << i << "-C " << colors[i] << " | ";
+            // std::cout << "V " << i << "-C " << colors[i] << " | " << std::endl;;
             verticesPerColor[colors[i]]++;
         }
         std::cout << std::endl;

@@ -52,6 +52,11 @@ public:
     void addEdge(const size_t v, const size_t w);
 
     ///
+    /// \brief Get edges surrounding a node
+    ///
+    void getEdges(const size_t v, edgeType& edges) const;
+
+    ///
     /// \brief Get size of the graph
     ///
     size_t size() const { return m_adjList.size(); }
