@@ -30,7 +30,6 @@
 
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
 #include <vtkTextActor.h>
 #include <vtkOpenGLRenderWindow.h>
 
@@ -39,6 +38,8 @@
 #ifdef WIN32
 #include <vtkWin32HardwareWindow.h>
 #include <vtkWin32RenderWindowInteractor.h>
+#else
+#include "imstkVtkXRenderWindowInteractor2.h"
 #endif
 
 namespace imstk
@@ -53,8 +54,13 @@ VTKViewer::VTKViewer(std::string name) : AbstractVTKViewer(name),
     m_vtkInteractorStyle = std::dynamic_pointer_cast<vtkInteractorStyle>(m_interactorStyle);
 
     // Create the interactor
+#ifdef WIN32
     vtkNew<vtkRenderWindowInteractor> iren;
     iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+#else
+    vtkSmartPointer<vtkXRenderWindowInteractor2> iren = vtkSmartPointer<vtkXRenderWindowInteractor2>::New();
+    iren->SetInteractorStyle(m_vtkInteractorStyle.get());
+#endif
 
     // Create the RenderWindow
     m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
