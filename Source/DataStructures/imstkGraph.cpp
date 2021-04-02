@@ -42,7 +42,7 @@ Graph::addEdge(const size_t v, const size_t w)
 }
 
 void
-Graph::getEdges(const size_t v, edgeType& edges) const 
+Graph::getEdges(const size_t v, edgeType& edges) const
 {
     edges = m_adjList[v];
 }

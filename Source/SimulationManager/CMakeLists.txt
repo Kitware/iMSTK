@@ -5,6 +5,12 @@
 file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
 file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
 
+if(WIN32)
+  list(APPEND ExclusionFiles
+    VTKRenderer/imstkVtkXRenderWindowInteractor2.h
+    VTKRenderer/imstkVtkXRenderWindowInteractor2.cpp)
+endif()
+
 file(GLOB VULKAN_H_FILES VulkanRenderer/imstk*.h)
 file(GLOB VULKAN_CPP_FILES VulkanRenderer/imstk*.cpp)
 
@@ -31,6 +37,8 @@ imstk_add_library(SimulationManager
     ${SIMULATIONMANAGER_CPP_FILES}
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}
+  EXCLUDE_FILES
+    ${Exclusion_FILES}
   DEPENDS
     Scene
     Rendering
