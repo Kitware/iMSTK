@@ -21,6 +21,7 @@
 
 #include "imstkCamera.h"
 #include "imstkImageData.h"
+#include "imstkImageReslice.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLogger.h"
 #include "imstkMeshIO.h"
@@ -50,10 +51,19 @@ main()
     // SDK and Scene
     imstkNew<Scene> scene("VolumeRendering");
 
+    // Read an image
+    auto imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
+
+    // Rotate that image
+    imstkNew<ImageReslice> reslice;
+    reslice->setInputImage(imageData);
+    // Rotate 1radian around y
+    reslice->setTransform(mat4dRotation(Rotd(1.0, Vec3d(0.0, 1.0, 0.0))));
+    reslice->update();
+
     // Create a visual object in the scene for the volume
     imstkNew<SceneObject> volumeObj("VisualVolume");
-    auto                  imageData = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "skullVolume.nrrd");
-    volumeObj->setVisualGeometry(imageData);
+    volumeObj->setVisualGeometry(reslice->getOutputImage());
     scene->addSceneObject(volumeObj);
 
     // Update Camera to position volume close to viewer

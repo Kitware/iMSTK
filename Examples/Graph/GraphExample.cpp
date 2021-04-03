@@ -27,16 +27,16 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkGeometryUtilities.h"
-#include <chrono> 
-using namespace std::chrono; 
+#include <chrono>
+using namespace std::chrono;
 
 using namespace imstk;
 
-bool verifyColoring(const Graph& graph, const std::vector<unsigned short>& colors)
+bool
+verifyColoring(const Graph& graph, const std::vector<unsigned short>& colors)
 {
-
     std::unordered_set<size_t> edges;
-    for (size_t i=0; i<graph.size(); ++i)
+    for (size_t i = 0; i < graph.size(); ++i)
     {
         unsigned short color_i = colors[i];
         graph.getEdges(i, edges);
@@ -51,7 +51,6 @@ bool verifyColoring(const Graph& graph, const std::vector<unsigned short>& color
     }
     return true;
 }
-
 
 ///
 /// \brief This example demonstrates the imstk graph usage
@@ -126,15 +125,15 @@ main(int argc, char** argv)
     {
         // auto colorsGVMesh = apiutils::getMeshGraph(tetMesh)->doColoring(method, true);
         {
-            auto graph = apiutils::getMeshGraph(tetMesh);
-            auto t_start = high_resolution_clock::now(); 
+            auto graph        = apiutils::getMeshGraph(tetMesh);
+            auto t_start      = high_resolution_clock::now();
             auto colorsGVMesh = graph->doColoring(method, false);
             verifyColoring(*graph, colorsGVMesh.first);
             std::cout << "number of colors = " << colorsGVMesh.second << std::endl;
-            auto t_end = high_resolution_clock::now();
-            auto duration = duration_cast<microseconds>(t_end - t_start); 
+            auto t_end    = high_resolution_clock::now();
+            auto duration = duration_cast<microseconds>(t_end - t_start);
 
-            std::cout << "runtime = " << duration.count() << " microseconds" << endl; 
+            std::cout << "runtime = " << duration.count() << " microseconds" << endl;
         }
 
         // imstkNew<SurfaceMesh> surfMesh;
@@ -147,5 +146,3 @@ main(int argc, char** argv)
 
     return 0;
 }
-
-

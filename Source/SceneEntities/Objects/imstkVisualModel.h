@@ -52,7 +52,7 @@ public:
     VisualModel(std::shared_ptr<DebugRenderGeometry> geometry,
                 std::shared_ptr<RenderMaterial>      renderMaterial);
     VisualModel() = default;
-    virtual ~VisualModel() override = default;
+    virtual ~VisualModel() override= default;
 
 public:
     SIGNAL(VisualModel,modified);
