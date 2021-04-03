@@ -24,6 +24,15 @@
 
 namespace imstk
 {
+///
+/// \class ProjectedGaussSeidelSolver
+///
+/// \brief Solves a linear system using the projected gauss seidel method.
+/// Only good for diagonally dominant systems, must have elements on diagonals though.
+/// The initial guess (start) is always zero, convergence value may be specified
+/// with epsilon, relaxation decreases the step size (useful when may rows exist in
+/// A)
+///
 template<typename Scalar>
 class ProjectedGaussSeidelSolver
 {
@@ -31,10 +40,27 @@ public:
     // Sets the vector to be used for the solve
     //void setGuess(Matrix<Scalar, -1, 1>& g) { x = g; }
     void setA(Eigen::SparseMatrix<Scalar>* A) { this->m_A = A; }
+
+    ///
+    /// \brief Set the maximum number of iterations
+    ///
     void setMaxIterations(const unsigned int maxIterations) { this->m_maxIterations = maxIterations; }
+
+    ///
+    /// \brief Similar to step size can be used to avoid overshooting the solution
+    ///
     void setRelaxation(const Scalar relaxation) { this->m_relaxation = relaxation; }
+
+    ///
+    /// \brief Stops when energy=(x_i+1-x_i).norm() < epsilon, when the solution isn't
+    /// changing anymore
+    ///
     void setEpsilon(const Scalar epsilon) { this->m_epsilon = epsilon; }
-    const double getEnergy() { return m_conv; } // Get final convergence
+
+    ///
+    /// \brief Energy is defined as energy=(x_i+1-x_i).norm()
+    ///
+    const double getEnergy() const { return m_conv; }
 
     Eigen::Matrix<Scalar, -1, 1>& solve(const Eigen::Matrix<Scalar, -1, 1>& b, const Eigen::Matrix<Scalar, -1, 2>& cu)
     {
@@ -66,6 +92,8 @@ public:
                     delta += A.coeff(r, c) * m_x[c];
                 }
 
+                // PGS can't converge for non-diagonal elements so its assumed
+                // we have these
                 delta = (b[r] - delta) / A.coeff(r, r);
                 // Apply relaxation factor
                 m_x(r) += m_relaxation * (delta - m_x(r));
