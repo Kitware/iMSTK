@@ -5,6 +5,7 @@
 file(GLOB VTK_H_FILES VTKRenderer/imstk*.h)
 file(GLOB VTK_CPP_FILES VTKRenderer/imstk*.cpp)
 
+list(APPEND ExclusionFiles "")
 if(WIN32)
   list(APPEND ExclusionFiles
     VTKRenderer/imstkVtkXRenderWindowInteractor2.h
@@ -38,7 +39,7 @@ imstk_add_library(SimulationManager
   SUBDIR_LIST
     ${SIMULATIONMANAGER_SUBDIR}
   EXCLUDE_FILES
-    ${Exclusion_FILES}
+    ${ExclusionFiles}
   DEPENDS
     Scene
     Rendering
