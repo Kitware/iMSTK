@@ -99,6 +99,7 @@ main()
         // Setup a scene manager to advance the scene in its own thread
         imstkNew<SceneManager> sceneManager("Scene Manager");
         sceneManager->setActiveScene(scene);
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);

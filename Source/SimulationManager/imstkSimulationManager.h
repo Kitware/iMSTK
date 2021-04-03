@@ -114,11 +114,11 @@ protected:
 protected:
     std::vector<std::shared_ptr<Viewer>> m_viewers;
 
+    std::unordered_map<Module*,bool> m_running;
+
     std::vector<std::shared_ptr<Module>> m_syncModules;      ///> Modules called once per update
     std::vector<std::shared_ptr<Module>> m_asyncModules;     ///> Modules that run on completely other threads without restraint
     std::vector<std::shared_ptr<Module>> m_adaptiveModules;  ///> Modules that update adpatively to keep up with real time
-
-    std::unordered_map<Module*,bool> m_running;
 
     ThreadingType m_threadType = ThreadingType::STL;
     double m_desiredDt = 0.003; // Desired timestep

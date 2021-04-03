@@ -36,7 +36,8 @@ class SurfaceMesh;
 ///
 /// \class PbdObjectCuttingPair
 ///
-/// \brief This class defines a cutting pair between a PbdObject and a CollidingObject
+/// \brief This class defines a cutting interaction between a PbdObject and a CollidingObject
+/// call apply to perform the cut given the current states of both objects
 ///
 class PbdObjectCuttingPair : public ObjectInteractionPair
 {

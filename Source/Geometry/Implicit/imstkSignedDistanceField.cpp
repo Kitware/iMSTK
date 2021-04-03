@@ -112,7 +112,8 @@ SignedDistanceField::getFunctionValue(const Vec3d& pos) const
     }
     else
     {
-        return std::numeric_limits<double>::min();
+        // If outside of the bounds, return positive (assume not inside)
+        return IMSTK_DOUBLE_MAX;
     }
 }
 

@@ -19,47 +19,34 @@
 
 =========================================================================*/
 
-#include "imstkLogger.h"
-#include "imstkNew.h"
-#include "imstkScene.h"
-#include "imstkSceneManager.h"
-#include "imstkSimulationManager.h"
-#include "imstkVTKViewer.h"
-
-// Objects
 #include "imstkCamera.h"
-#include "imstkCollidingObject.h"
-#include "imstkLight.h"
-#include "imstkPbdObject.h"
-
-// Geometry
-#include "imstkMeshIO.h"
-#include "imstkPlane.h"
-#include "imstkSurfaceMesh.h"
-#include "imstkSurfaceMeshCut.h"
-
-// Devices and controllers
 #include "imstkHapticDeviceClient.h"
 #include "imstkHapticDeviceManager.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
+#include "imstkLight.h"
+#include "imstkLogger.h"
 #include "imstkMouseSceneControl.h"
-#include "imstkSceneObjectController.h"
-
-// Collisions and Models
+#include "imstkNew.h"
 #include "imstkPbdModel.h"
+#include "imstkPbdObject.h"
 #include "imstkPbdObjectCuttingPair.h"
-#include "imstkPbdSolver.h"
 #include "imstkRenderMaterial.h"
+#include "imstkScene.h"
+#include "imstkSceneManager.h"
+#include "imstkSceneObjectController.h"
+#include "imstkSimulationManager.h"
+#include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
+#include "imstkVTKViewer.h"
 
 using namespace imstk;
 
 // Parameters to play with
 const double width  = 50.0;
 const double height = 50.0;
-const int    nRows  = 6;
-const int    nCols  = 6;
+const int    nRows  = 12;
+const int    nCols  = 12;
 
 ///
 /// \brief Creates cloth geometry
@@ -163,7 +150,7 @@ makeClothObj(const std::string& name,
 }
 
 ///
-/// \brief This example demonstrates the concept of PBD picking
+/// \brief This example demonstrates the concept of PBD cutting
 /// for haptic interaction. NOTE: Requires GeoMagic Touch device
 ///
 int
@@ -174,20 +161,8 @@ main()
 
     // Scene
     imstkNew<Scene> scene("PBDCutting");
-    //scene->getConfig()->writeTaskGraph = true;
 
     // Create a cutting plane object in the scene
-    /*
-    imstkNew<Plane> cutGeom;
-    cutGeom->setWidth(40.0);
-    cutGeom->setTranslation(Vec3d(0.0, 0.0, 20.0));
-    cutGeom->setOrientationAxis(Vec3d(-1.0, 0.0, 0.0));
-    imstkNew<CollidingObject> cutObj("CuttingObject");
-    cutObj->setVisualGeometry(cutGeom);
-    cutObj->setCollidingGeometry(cutGeom);
-    cutObj->getVisualModel(0)->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    scene->addSceneObject(cutObj);
-    */
     std::shared_ptr<SurfaceMesh> cutGeom(makeClothGeometry(40, 40, 2, 2));
     cutGeom->setTranslation(Vec3d(-10, -20, 0));
     cutGeom->updatePostTransformData();
@@ -204,7 +179,6 @@ main()
     // Add interaction pair for pbd cutting
     imstkNew<PbdObjectCuttingPair> cuttingPair(clothObj, cutObj);
 
-    /*
     // Device Server
     imstkNew<HapticDeviceManager>       server;
     std::shared_ptr<HapticDeviceClient> client = server->makeDeviceClient();
@@ -212,7 +186,7 @@ main()
     // Create the virtual coupling object controller
     imstkNew<SceneObjectController> controller(cutObj, client);
     scene->addController(controller);
-    */
+
     // Camera
     scene->getActiveCamera()->setPosition(Vec3d(1.0, 1.0, 1.0) * 100.0);
     scene->getActiveCamera()->setFocalPoint(Vec3d(0, -50, 0));
@@ -236,7 +210,7 @@ main()
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
-        //driver->addModule(server);
+        driver->addModule(server);
         driver->addModule(viewer);
         driver->addModule(sceneManager);
         driver->setDesiredDt(0.001);

@@ -101,13 +101,14 @@ PbdObjectCuttingPair::apply()
     pbdMesh->modified();
     */
 
-    // perform cutting
+    // Perform cutting
     imstkNew<SurfaceMeshCut> surfCut;
     surfCut->setInputMesh(pbdMesh);
     surfCut->setCutGeometry(cutObj->getCollidingGeometry());
     surfCut->update();
     auto newPbdMesh = surfCut->getOutputMesh();
 
+    // Only remove and add constraints related to the topological changes
     m_removeConstraintVertices = surfCut->getRemoveConstraintVertices();
     m_addConstraintVertices    = surfCut->getAddConstraintVertices();
 
