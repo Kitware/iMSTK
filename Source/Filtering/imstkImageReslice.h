@@ -54,9 +54,6 @@ public:
 
     imstkGetMacro(Transform, const Mat4d&);
     imstkGetMacro(InterpolationType, const InterpolateType&);
-    imstkGetMacro(OutputBounds, const Vec6d&);
-    imstkGetMacro(OutputSpacing, const Vec3d&);
-    imstkGetMacro(OutputDimensions, const Vec3i&);
 
     ///
     /// \brief Set the transformation matrix
@@ -68,19 +65,11 @@ public:
     ///
     imstkSetMacro(InterpolationType, const InterpolateType&);
 
-    imstkSetMacro(OutputBounds, const Vec6d&);
-    imstkSetMacro(OutputSpacing, const Vec3d&);
-    imstkSetMacro(OutputDimensions, const Vec3i&);
-
 protected:
     void requestUpdate() override;
 
 private:
     Mat4d m_Transform;
     InterpolateType m_InterpolationType = InterpolateType::Linear;
-
-    Vec6d m_OutputBounds     = Vec6d::Zero();
-    Vec3d m_OutputSpacing    = Vec3d::Zero();
-    Vec3i m_OutputDimensions = Vec3i::Zero();
 };
 }
