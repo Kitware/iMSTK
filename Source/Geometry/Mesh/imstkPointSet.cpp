@@ -107,8 +107,8 @@ PointSet::getInitialVertexPosition(const size_t vertNum)
 void
 PointSet::setVertexPositions(std::shared_ptr<VecDataArray<double, 3>> vertices)
 {
-    m_vertexPositions  = vertices;
-    m_transformApplied = false;
+    m_vertexPositions = vertices;
+    //m_transformApplied = false;
 
     this->updatePostTransformData();
 }

@@ -91,13 +91,19 @@ LaparoscopicToolController::update(const double dt)
 
     // TRS decompose and set upper/lower jaw geometries
     {
-        m_upperJaw->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawVisualTransform);
-        m_upperJaw->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_upperJawLocalTransform * m_upperJawCollidingTransform);
+        const Mat4d upperWorldTransform = m_controllerWorldTransform * m_upperJawLocalTransform;
+        m_upperJaw->getVisualGeometry()->setTransform(upperWorldTransform * m_upperJawVisualTransform);
+        m_upperJaw->getCollidingGeometry()->setTransform(upperWorldTransform * m_upperJawCollidingTransform);
     }
     {
-        m_lowerJaw->getVisualGeometry()->setTransform(m_controllerWorldTransform * m_lowerJawLocalTransform * m_upperJawVisualTransform);
-        m_lowerJaw->getCollidingGeometry()->setTransform(m_controllerWorldTransform * m_lowerJawLocalTransform * m_lowerJawCollidingTransform);
+        const Mat4d lowerWorldTransform = m_controllerWorldTransform * m_lowerJawLocalTransform;
+        m_lowerJaw->getVisualGeometry()->setTransform(lowerWorldTransform * m_upperJawVisualTransform);
+        m_lowerJaw->getCollidingGeometry()->setTransform(lowerWorldTransform * m_lowerJawCollidingTransform);
     }
+
+    m_shaft->getVisualGeometry()->postModified();
+    m_lowerJaw->getVisualGeometry()->postModified();
+    m_upperJaw->getVisualGeometry()->postModified();
 }
 
 void

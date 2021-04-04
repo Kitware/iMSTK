@@ -27,6 +27,7 @@
 #include "imstkPbdState.h"
 
 #include <unordered_map>
+#include <unordered_set>
 
 namespace imstk
 {
@@ -162,6 +163,17 @@ public:
     /// \brief Returns true if there is at least one constraint
     ///
     bool hasConstraints() const { return !m_constraints->empty() || !m_partitionedConstraints->empty(); }
+
+    ///
+    /// \brief Remove constraints related to a set of vertices.
+    ///
+    void removeConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
+
+    ///
+    /// \brief Add constraints related to a set of vertices.
+    /// \brief Does not check for duplicating pre-existed constraints.
+    ///
+    void addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices);
 
     ///
     /// \brief Set the time step size

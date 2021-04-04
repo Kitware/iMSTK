@@ -158,7 +158,6 @@ main()
 
     // Scene
     imstkNew<Scene> scene("PBDPicking");
-    scene->getConfig()->writeTaskGraph = true;
 
     // Create the virtual coupling object controller
 
@@ -177,7 +176,7 @@ main()
     geomShaft->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     geomShaft->setTranslation(Vec3d(0.0, 0.0, 10.0));
     imstkNew<CollidingObject> objShaft("ShaftObject");
-    objShaft->setVisualGeometry(geomShaft);
+    objShaft->setVisualGeometry(pivotSurfMesh);
     objShaft->setCollidingGeometry(geomShaft);
     scene->addSceneObject(objShaft);
 
@@ -187,7 +186,7 @@ main()
     geomUpperJaw->setRadius(2.0);
     geomUpperJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objUpperJaw("UpperJawObject");
-    objUpperJaw->setVisualGeometry(geomUpperJaw);
+    objUpperJaw->setVisualGeometry(upperSurfMesh);
     objUpperJaw->setCollidingGeometry(geomUpperJaw);
     scene->addSceneObject(objUpperJaw);
 
@@ -197,7 +196,7 @@ main()
     geomLowerJaw->setRadius(2.0);
     geomLowerJaw->setOrientationAxis(Vec3d(0.0, 0.0, 1.0));
     imstkNew<CollidingObject> objLowerJaw("LowerJawObject");
-    objLowerJaw->setVisualGeometry(geomLowerJaw);
+    objLowerJaw->setVisualGeometry(lowerSurfMesh);
     objLowerJaw->setCollidingGeometry(geomLowerJaw);
     scene->addSceneObject(objLowerJaw);
 

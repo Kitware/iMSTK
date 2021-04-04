@@ -85,7 +85,7 @@ public:
     ///
     /// \brief Returns signed distance to surface at pos
     ///
-    double getFunctionValue(const Vec3d& pos) const override { return m_orientationAxis.dot(pos - m_position); }
+    double getFunctionValue(const Vec3d& pos) const override { return m_orientationAxisPostTransform.dot(pos - m_positionPostTransform); }
 
     ///
     /// \brief Get the min, max of the AABB around the plane

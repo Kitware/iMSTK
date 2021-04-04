@@ -36,6 +36,9 @@
 #include "imstkTaskGraph.h"
 #include "imstkTetrahedralMesh.h"
 
+#include <map>
+#include <set>
+
 namespace imstk
 {
 PbdModel::PbdModel() : DynamicalModel(DynamicalModelType::PositionBasedDynamics),
@@ -520,18 +523,24 @@ PbdModel::initializeDihedralConstraints(const double stiffness)
                 rs.resize(static_cast<size_t>(it - rs.begin()));
                 if (rs.size() > 1)
                 {
-                    size_t      idx = (rs[0] == k) ? 1 : 0;
-                    const auto& tri = elements[rs[idx]];
+                    size_t      idx  = (rs[0] == k) ? 1 : 0;
+                    const auto& tri0 = elements[k];
+                    const auto& tri1 = elements[rs[idx]];
+                    size_t      idx0 = 0;
+                    size_t      idx1 = 0;
                     for (size_t i = 0; i < 3; ++i)
                     {
-                        if (tri[i] != tri[0] && tri[i] != tri[1])
+                        if (tri0[i] != i1 && tri0[i] != i2)
                         {
-                            idx = i;
-                            break;
+                            idx0 = tri0[i];
+                        }
+                        if (tri1[i] != i1 && tri1[i] != i2)
+                        {
+                            idx1 = tri1[i];
                         }
                     }
                     auto c = std::make_shared<PbdDihedralConstraint>();
-                    c->initConstraint(*m_initialState->getPositions(), tri[2], tri[idx], tri[0], tri[1], stiffness);
+                    c->initConstraint(*m_initialState->getPositions(), idx0, idx1, i1, i2, stiffness);
                     m_constraints->push_back(std::move(c));
                 }
             }
@@ -568,6 +577,199 @@ PbdModel::initializeConstantDensityConstraint(const double stiffness)
     m_constraints->push_back(std::move(c));
 
     return true;
+}
+
+void
+PbdModel::removeConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices)
+{
+    // constraint removal predicate
+    auto removeConstraint =
+        [&](std::shared_ptr<PbdConstraint> constraint)
+        {
+            for (auto i : constraint->getVertexIds())
+            {
+                if (vertices->find(i) != vertices->end())
+                {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+    // remove constraints from constraint-partition maps and constraint vectors.
+    m_constraints->erase(std::remove_if(m_constraints->begin(), m_constraints->end(), removeConstraint),
+                         m_constraints->end());
+    for (auto& pc : *m_partitionedConstraints)
+    {
+        pc.erase(std::remove_if(pc.begin(), pc.end(), removeConstraint), pc.end());
+    }
+}
+
+void
+PbdModel::addConstraints(std::shared_ptr<std::unordered_set<size_t>> vertices)
+{
+    // check if constraint type matches the mesh type
+    CHECK(m_mesh->getTypeName() == "SurfaceMesh")
+        << "Add element constraints does not support current mesh type.";
+
+    const auto&                      triMesh  = std::static_pointer_cast<SurfaceMesh>(m_mesh);
+    const auto                       nV       = triMesh->getNumVertices();
+    const auto                       elements = triMesh->getTriangleIndices();
+    std::vector<std::vector<size_t>> onering(nV);
+
+    // build onering
+    for (auto& vertOnering : onering)
+    {
+        vertOnering.reserve(10);
+    }
+    for (int k = 0; k < elements->size(); ++k)
+    {
+        auto& tri = (*elements)[k];
+        onering[tri[0]].push_back(k);
+        onering[tri[1]].push_back(k);
+        onering[tri[2]].push_back(k);
+    }
+    for (auto& vertOnering : onering)
+    {
+        std::sort(vertOnering.begin(), vertOnering.end());
+    }
+
+    // functions for adding constraints
+    auto addDistanceConstraint =
+        [&](size_t i1, size_t i2, double stiffness)
+        {
+            auto c = std::make_shared<PbdDistanceConstraint>();
+            c->initConstraint(*m_initialState->getPositions(), i1, i2, stiffness);
+            m_constraints->push_back(std::move(c));
+        };
+    auto addAreaConstraint =
+        [&](size_t k, double stiffness)
+        {
+            auto& tri = (*elements)[k];
+            auto  c   = std::make_shared<PbdAreaConstraint>();
+            c->initConstraint(*m_initialState->getPositions(), tri[0], tri[1], tri[2], stiffness);
+            m_constraints->push_back(std::move(c));
+        };
+    auto addDihedralConstraint =
+        [&](size_t t0, size_t t1, size_t i1, size_t i2, double stiffness)
+        {
+            const auto& tri0 = (*elements)[t0];
+            const auto& tri1 = (*elements)[t1];
+            size_t      idx0 = 0;
+            size_t      idx1 = 0;
+            for (size_t i = 0; i < 3; ++i)
+            {
+                if (tri0[i] != i1 && tri0[i] != i2)
+                {
+                    idx0 = tri0[i];
+                }
+                if (tri1[i] != i1 && tri1[i] != i2)
+                {
+                    idx1 = tri1[i];
+                }
+            }
+            auto c = std::make_shared<PbdDihedralConstraint>();
+            c->initConstraint(*m_initialState->getPositions(), idx0, idx1, i1, i2, stiffness);
+            m_constraints->push_back(std::move(c));
+        };
+
+    // count constraints to be added for pre-allocation
+    std::set<std::pair<size_t, size_t>>                            distanceSet;
+    std::unordered_set<size_t>                                     areaSet;
+    std::map<std::pair<size_t, size_t>, std::pair<size_t, size_t>> dihedralSet;
+    for (auto& constraint : m_parameters->m_regularConstraints)
+    {
+        switch (constraint.first)
+        {
+        case PbdConstraint::Type::Distance:
+            for (const auto& vertIdx : *vertices)
+            {
+                for (const auto& triIdx : onering[vertIdx])
+                {
+                    const auto& tri = (*elements)[triIdx];
+                    size_t      i1  = 0;
+                    size_t      i2  = 0;
+                    for (size_t i = 0; i < 3; i++)
+                    {
+                        if (tri[i] == vertIdx)
+                        {
+                            i1 = tri[(i + 1) % 3];
+                            i2 = tri[(i + 2) % 3];
+                            break;
+                        }
+                    }
+                    auto pair1 = std::make_pair(std::min(vertIdx, i1), std::max(vertIdx, i1));
+                    auto pair2 = std::make_pair(std::min(vertIdx, i2), std::max(vertIdx, i2));
+                    distanceSet.insert(pair1);
+                    distanceSet.insert(pair2);
+                }
+            }
+            break;
+        case PbdConstraint::Type::Area:
+            for (const auto& vertIdx : *vertices)
+            {
+                for (const auto& triIdx : onering[vertIdx])
+                {
+                    areaSet.insert(triIdx);
+                }
+            }
+            break;
+        case PbdConstraint::Type::Dihedral:
+            for (const auto& vertIdx : *vertices)
+            {
+                for (const auto& triIdx : onering[vertIdx])
+                {
+                    const auto& tri = (*elements)[triIdx];
+                    for (size_t i = 0; i < 3; i++)
+                    {
+                        size_t j  = (i + 1) % 3;
+                        size_t i0 = tri[i];
+                        size_t i1 = tri[j];
+                        if (i0 > i1)
+                        {
+                            std::swap(i0, i1);
+                        }
+                        auto&               r0 = onering[i0];
+                        auto&               r1 = onering[i1];
+                        std::vector<size_t> rs(2);
+                        auto                it = std::set_intersection(r0.begin(), r0.end(), r1.begin(), r1.end(), rs.begin());
+                        rs.resize(static_cast<size_t>(it - rs.begin()));
+                        if (rs.size() > 1)
+                        {
+                            dihedralSet[std::make_pair(i0, i1)] = std::make_pair(rs[0], rs[1]);
+                        }
+                    }
+                }
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    // add constraints
+    m_constraints->reserve(m_constraints->size() + distanceSet.size() + areaSet.size() + dihedralSet.size());
+    for (auto& constraint : m_parameters->m_regularConstraints)
+    {
+        switch (constraint.first)
+        {
+        case PbdConstraint::Type::Distance:
+            for (auto& c : distanceSet)
+            {
+                addDistanceConstraint(c.first, c.second, constraint.second);
+            }
+        case PbdConstraint::Type::Area:
+            for (auto& c : areaSet)
+            {
+                addAreaConstraint(c, constraint.second);
+            }
+        case PbdConstraint::Type::Dihedral:
+            for (auto& c : dihedralSet)
+            {
+                addDihedralConstraint(c.second.first, c.second.second, c.first.first, c.first.second, constraint.second);
+            }
+        }
+    }
 }
 
 void

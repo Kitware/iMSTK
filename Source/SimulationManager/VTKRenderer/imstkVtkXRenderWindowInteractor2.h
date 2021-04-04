@@ -40,102 +40,102 @@ class vtkXRenderWindowInteractor2Internals;
 class vtkXRenderWindowInteractor2 : public vtkRenderWindowInteractor
 {
 public:
-  static vtkXRenderWindowInteractor2* New();
-  vtkTypeMacro(vtkXRenderWindowInteractor2, vtkRenderWindowInteractor);
-  void PrintSelf(ostream& os, vtkIndent indent) override;
+    static vtkXRenderWindowInteractor2* New();
+    vtkTypeMacro(vtkXRenderWindowInteractor2, vtkRenderWindowInteractor);
+    void PrintSelf(ostream& os, vtkIndent indent) override;
 
-  /**
-   * Initializes the event handlers without an XtAppContext.  This is
-   * good for when you don't have a user interface, but you still
-   * want to have mouse interaction.
-   */
-  void Initialize() override;
+    /**
+     * Initializes the event handlers without an XtAppContext.  This is
+     * good for when you don't have a user interface, but you still
+     * want to have mouse interaction.
+     */
+    void Initialize() override;
 
-  /**
-   * Break the event loop on 'q','e' keypress. Want more ???
-   */
-  void TerminateApp() override;
+    /**
+     * Break the event loop on 'q','e' keypress. Want more ???
+     */
+    void TerminateApp() override;
 
-  /**
-   * Run the event loop and return. This is provided so that you can
-   * implement your own event loop but yet use the vtk event handling as
-   * well.
-   */
-  void ProcessEvents() override;
+    /**
+     * Run the event loop and return. This is provided so that you can
+     * implement your own event loop but yet use the vtk event handling as
+     * well.
+     */
+    void ProcessEvents() override;
 
-  //@{
-  /**
-   * Enable/Disable interactions.  By default interactors are enabled when
-   * initialized.  Initialize() must be called prior to enabling/disabling
-   * interaction. These methods are used when a window/widget is being
-   * shared by multiple renderers and interactors.  This allows a "modal"
-   * display where one interactor is active when its data is to be displayed
-   * and all other interactors associated with the widget are disabled
-   * when their data is not displayed.
-   */
-  void Enable() override;
-  void Disable() override;
-  //@}
+    //@{
+    /**
+     * Enable/Disable interactions.  By default interactors are enabled when
+     * initialized.  Initialize() must be called prior to enabling/disabling
+     * interaction. These methods are used when a window/widget is being
+     * shared by multiple renderers and interactors.  This allows a "modal"
+     * display where one interactor is active when its data is to be displayed
+     * and all other interactors associated with the widget are disabled
+     * when their data is not displayed.
+     */
+    void Enable() override;
+    void Disable() override;
+    //@}
 
-  /**
-   * Update the Size data member and set the associated RenderWindow's
-   * size.
-   */
-  void UpdateSize(int, int) override;
+    /**
+     * Update the Size data member and set the associated RenderWindow's
+     * size.
+     */
+    void UpdateSize(int, int) override;
 
-  /**
-   * Re-defines virtual function to get mouse position by querying X-server.
-   */
-  void GetMousePosition(int* x, int* y) override;
+    /**
+     * Re-defines virtual function to get mouse position by querying X-server.
+     */
+    void GetMousePosition(int* x, int* y) override;
 
-  void DispatchEvent(XEvent*);
+    void DispatchEvent(XEvent*);
 
 protected:
-  vtkXRenderWindowInteractor2();
-  ~vtkXRenderWindowInteractor2() override;
+    vtkXRenderWindowInteractor2();
+    ~vtkXRenderWindowInteractor2() override;
 
-  /**
-   * Update the Size data member and set the associated RenderWindow's
-   * size but do not resize the XWindow.
-   */
-  void UpdateSizeNoXResize(int, int);
+    /**
+     * Update the Size data member and set the associated RenderWindow's
+     * size but do not resize the XWindow.
+     */
+    void UpdateSizeNoXResize(int, int);
 
-  // Using static here to avoid destroying context when many apps are open:
-  static int NumAppInitialized;
+    // Using static here to avoid destroying context when many apps are open:
+    static int NumAppInitialized;
 
-  Display* DisplayId;
-  Window WindowId;
-  Atom KillAtom;
-  int PositionBeforeStereo[2];
-  vtkXRenderWindowInteractor2Internals* Internal;
+    Display* DisplayId;
+    Window   WindowId;
+    Atom     KillAtom;
+    int      PositionBeforeStereo[2];
+    vtkXRenderWindowInteractor2Internals* Internal;
 
-  // Drag and drop related
-  Window XdndSource;
-  Atom XdndPositionAtom;
-  Atom XdndDropAtom;
-  Atom XdndActionCopyAtom;
-  Atom XdndStatusAtom;
-  Atom XdndFinishedAtom;
+    // Drag and drop related
+    Window XdndSource;
+    Atom   XdndPositionAtom;
+    Atom   XdndDropAtom;
+    Atom   XdndActionCopyAtom;
+    Atom   XdndStatusAtom;
+    Atom   XdndFinishedAtom;
 
-  //@{
-  /**
-   * X-specific internal timer methods. See the superclass for detailed
-   * documentation.
-   */
-  int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
-  int InternalDestroyTimer(int platformTimerId) override;
-  //@}
+    //@{
+    /**
+     * X-specific internal timer methods. See the superclass for detailed
+     * documentation.
+     */
+    int InternalCreateTimer(int timerId, int timerType, unsigned long duration) override;
+    int InternalDestroyTimer(int platformTimerId) override;
+    //@}
 
-  void FireTimers();
+    void FireTimers();
 
-  /**
-   * This will start up the X event loop and never return. If you
-   * call this method it will loop processing X events until the
-   * application is exited.
-   */
-  void StartEventLoop() override;
+    /**
+     * This will start up the X event loop and never return. If you
+     * call this method it will loop processing X events until the
+     * application is exited.
+     */
+    void StartEventLoop() override;
 
 private:
-  vtkXRenderWindowInteractor2(const vtkXRenderWindowInteractor2&) = delete;
-  void operator=(const vtkXRenderWindowInteractor2&) = delete;
+    vtkXRenderWindowInteractor2(const vtkXRenderWindowInteractor2&) = delete;
+    void operator=(const vtkXRenderWindowInteractor2&) = delete;
 };
