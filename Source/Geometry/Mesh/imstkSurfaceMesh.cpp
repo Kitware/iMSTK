@@ -338,15 +338,15 @@ SurfaceMesh::computeVertexTangents()
         // First we need per triangle tangents
         this->computeTriangleTangents();
 
-        VecDataArray<double, 3>                  temp_tangents(vertexTangents.size());
+        VecDataArray<double, 3>                  temp_vertex_tangents(vertexTangents.size());
         std::shared_ptr<VecDataArray<double, 3>> triangleTangentsPtr = getCellTangents();
         const VecDataArray<double, 3>&           triangleTangents    = *triangleTangentsPtr;
-        for (int vertexId = 0; vertexId < triangleTangents.size(); ++vertexId)
+        for (int vertexId = 0; vertexId < vertexTangents.size(); ++vertexId)
         {
-            temp_tangents[vertexId] = Vec3d(0.0, 0.0, 0.0);
+            temp_vertex_tangents[vertexId] = Vec3d(0.0, 0.0, 0.0);
             for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
             {
-                temp_tangents[vertexId] += triangleTangents[triangleId];
+                temp_vertex_tangents[vertexId] += triangleTangents[triangleId];
             }
         }
 
@@ -354,7 +354,7 @@ SurfaceMesh::computeVertexTangents()
         Vec3d tangent;
         for (size_t vertexId = 0; vertexId < vertexTangents.size(); ++vertexId)
         {
-            tangent = temp_tangents[vertexId];
+            tangent = temp_vertex_tangents[vertexId];
             tangent.normalize();
             vertexTangents[vertexId] = tangent.cast<float>();
         }

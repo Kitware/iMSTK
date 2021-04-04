@@ -27,6 +27,7 @@
 #include <string>
 #include <thread>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace imstk
@@ -81,7 +82,7 @@ struct SceneConfig
 ///
 /// \class Scene
 ///
-/// \brief
+/// \brief A collection of SceneObjects and interactions
 ///
 class Scene : public EventObject
 {
@@ -94,6 +95,11 @@ public:
 
 public:
     SIGNAL(Scene,configureTaskGraph);
+    ///
+    /// \brief Called when scene is modified, when scene objects
+    /// or interactions are added/removed
+    ///
+    SIGNAL(Scene,modified);
 
 public:
     ///
@@ -112,9 +118,13 @@ public:
     void initTaskGraph();
 
     ///
-    /// \brief Reset the scene
+    /// \brief Async reset the scene, will reset next update
     ///
     void reset();
+
+    ///
+    /// \brief Sync reset, resets immediately
+    ///
     void resetSceneObjects();
 
     ///
@@ -128,21 +138,15 @@ public:
     virtual void updateVisuals();
 
     ///
-    /// \brief Returns true if the object with a given name is registered, else false
-    ///
-    bool isObjectRegistered(const std::string& sceneObjectName) const;
-
-    ///
     /// \brief If true, tasks will be time and a table produced
     /// every scene advance of the times
     ///
     void setEnableTaskTiming(bool enabled);
 
     ///
-    /// \brief Return a vector of shared pointers to the scene objects
-    /// NOTE: A separate list might be efficient as this is called runtime
+    /// \brief Return the SceneObjects of the scene
     ///
-    const std::vector<std::shared_ptr<SceneObject>> getSceneObjects() const;
+    const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const{ return m_sceneObjects; }
 
     ///
     /// \brief Return a vector of shared pointers to the scene objects
@@ -156,15 +160,34 @@ public:
     const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const{ return m_trackingControllers; }
 
     ///
-    /// \brief Get a scene object of a specific name
+    /// \brief Get SceneObject by name, returns nullptr if doesn't exist
     ///
     std::shared_ptr<SceneObject> getSceneObject(const std::string& sceneObjectName) const;
+
+    ///
+    /// \brief Returns true if SceneObject is apart of scene
+    ///
+    bool hasSceneObject(std::shared_ptr<SceneObject> sceneObject);
+
+    ///
+    /// \brief Returns true if a SceneObject with name already exists
+    ///
+    bool hasSceneObjectName(const std::string& name);
 
     ///
     /// \brief Add/remove a scene object
     ///
     void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
-    void removeSceneObject(const std::string& sceneObjectName);
+
+    ///
+    /// \brief Remove scene object by name
+    ///
+    void removeSceneObject(const std::string& name);
+
+    ///
+    /// \brief Remove scene object
+    ///
+    void removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
 
     ///
     /// \brief Add a debug visual model object
@@ -303,8 +326,8 @@ public:
 protected:
     std::shared_ptr<SceneConfig> m_config;
 
-    std::string m_name;                              ///> Name of the scene
-    NamedMap<SceneObject>     m_sceneObjectsMap;
+    std::string m_name; ///> Name of the scene
+    std::unordered_set<std::shared_ptr<SceneObject>> m_sceneObjects;
     NamedMap<VisualModel>     m_DebugRenderModelMap;
     NamedMap<Light>           m_lightsMap;
     std::shared_ptr<IBLProbe> m_globalIBLProbe = nullptr;

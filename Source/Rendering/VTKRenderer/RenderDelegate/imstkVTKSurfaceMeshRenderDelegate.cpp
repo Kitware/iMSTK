@@ -127,8 +127,6 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // When index buffer internals are modified
     queueConnect<Event>(m_geometry->getVertexNormals(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::normalDataModified);
 
-    // When the index buffer internals are modified,
-
     // Setup mapper
     {
         vtkNew<vtkPolyDataMapper> mapper;

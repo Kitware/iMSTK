@@ -20,6 +20,7 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
@@ -34,6 +35,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkMeshIO.h"
 
 using namespace imstk;
 
@@ -90,7 +92,18 @@ makeClothGeometry(const double width,
         }
     }
 
+    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(nRows * nCols);
+    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            uvCoords[i * nCols + j] = Vec2f(static_cast<float>(i) / nRows, static_cast<float>(j) / nCols);
+        }
+    }
+
     clothMesh->initialize(verticesPtr, indicesPtr);
+    clothMesh->setVertexTCoords("uvs", uvCoordsPtr);
 
     return clothMesh;
 }
@@ -133,7 +146,12 @@ makeClothObj(const std::string& name,
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    material->setRoughness(0.5);
+    material->setMetalness(0.1);
+    material->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpet.jpg", Texture::Type::Diffuse));
+    //material->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal));
 
     imstkNew<VisualModel> visualModel(clothMesh);
     visualModel->setRenderMaterial(material);
@@ -157,25 +175,11 @@ main()
     Logger::startLogger();
 
     // Setup a scene
-    imstkNew<Scene> scene("PBDCloth");
+    imstkNew<Scene>            scene("PBDCloth");
+    std::shared_ptr<PbdObject> clothObj = nullptr;
     {
-        std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
+        clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
         scene->addSceneObject(clothObj);
-
-        // Light (white)
-        imstkNew<DirectionalLight> whiteLight("whiteLight");
-        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-        whiteLight->setIntensity(1.0);
-        scene->addLight(whiteLight);
-
-        // Light (red)
-        imstkNew<SpotLight> colorLight("colorLight");
-        colorLight->setPosition(Vec3d(-5.0, -3.0, 5.0));
-        colorLight->setFocalPoint(Vec3d(0.0, -5.0, 5.0));
-        colorLight->setIntensity(100.);
-        colorLight->setColor(Color::Red);
-        colorLight->setSpotAngle(30.0);
-        scene->addLight(colorLight);
 
         // Adjust camera
         scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
@@ -190,12 +194,14 @@ main()
 
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.001);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -208,6 +214,14 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
+
+        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
+        {
+            if (e->m_key == 'i')
+            {
+                clothObj->getVisualModel(0)->getRenderMaterial()->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal));
+            }
+            });
 
         driver->start();
     }

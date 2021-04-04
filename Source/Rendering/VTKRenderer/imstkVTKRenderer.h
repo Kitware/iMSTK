@@ -24,9 +24,11 @@
 #include "imstkRenderer.h"
 #include "imstkTextureManager.h"
 #include "imstkVTKTextureDelegate.h"
+#include "imstkEventObject.h"
 
 #include <vtkSmartPointer.h>
 #include <unordered_map>
+#include <unordered_set>
 
 class vtkAxesActor;
 class vtkCamera;
@@ -42,8 +44,10 @@ class vtkTable;
 namespace imstk
 {
 class Scene;
+class SceneObject;
 class Camera;
 class VTKRenderDelegate;
+class VisualModel;
 
 ///
 /// \class VTKRenderer
@@ -135,6 +139,45 @@ protected:
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
 protected:
+    ///
+    /// \brief Adds a SceneObject to be rendered
+    ///
+    void addSceneObject(std::shared_ptr<SceneObject> sceneObject);
+
+    ///
+    /// \brief Removes a SceneObject to be rendered
+    ///
+    std::unordered_set<std::shared_ptr<SceneObject>>::iterator removeSceneObject(std::shared_ptr<SceneObject> sceneObject);
+
+    ///
+    /// \brief Callback for when the scene this renderer renders is modified
+    /// This involves adding/removing scene objects to render lists
+    ///
+    void sceneModifed(Event* e);
+
+protected:
+    ///
+    /// \brief Add a VisualModel to be rendered, creates a delegate for it
+    ///
+    void addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel);
+
+    ///
+    /// \brief Remove a VisualModel from rendering
+    ///
+    std::unordered_set<std::shared_ptr<VisualModel>>::iterator removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel);
+
+    ///
+    /// \brief Callback for when a SceneObject is modified
+    /// This involves adding/removing visual models to render lists
+    ///
+    void sceneObjectModified(Event* e);
+
+    ///
+    /// \brief Function call for proccessing diffs on a SceneObject
+    ///
+    void sceneObjectModified(std::shared_ptr<SceneObject> sceneObject);
+
+protected:
     vtkSmartPointer<vtkRenderer> m_vtkRenderer;
 
     // Camera
@@ -148,12 +191,16 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
     vtkSmartPointer<vtkAxesActor> m_AxesActor;
 
-    // Render delegates for the props
-    std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
-    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
-
     // imstk scene
     std::shared_ptr<Scene> m_scene;
+
+    // Rendered Objects, this gives whats currently being rendered
+    std::unordered_set<std::shared_ptr<SceneObject>> m_renderedObjects;
+    std::unordered_map<std::shared_ptr<SceneObject>, std::unordered_set<std::shared_ptr<VisualModel>>> m_renderedVisualModels;
+
+    // Render Delegates
+    std::unordered_map<std::shared_ptr<VisualModel>, std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
+    std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
 
     TextureManager<VTKTextureDelegate> m_textureManager;
 

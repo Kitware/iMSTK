@@ -21,8 +21,9 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <atomic>
-#include <string>
 
 namespace imstk
 {
@@ -32,7 +33,7 @@ using EntityID = unsigned long;
 /// \class SceneEntity
 /// \brief Top-level class for iMSTK scene elements (scene objects, lights, camera)
 ///
-class SceneEntity
+class SceneEntity : public EventObject
 {
 public:
     virtual ~SceneEntity() = default;
