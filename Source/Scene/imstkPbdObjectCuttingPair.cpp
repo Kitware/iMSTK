@@ -30,7 +30,6 @@ limitations under the License.
 #include "imstkPbdSolver.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkSurfaceMeshCut.h"
-//#include "imstkSurfaceMeshIncrementalCut.h"
 #include "imstkVecDataArray.h"
 
 namespace imstk
@@ -63,43 +62,6 @@ PbdObjectCuttingPair::apply()
 
     m_addConstraintVertices->clear();
     m_removeConstraintVertices->clear();
-
-    /* Incremental cutting
-    // compute cutting increments
-    imstkNew<SurfaceMeshIncrementalCut> surfCut;
-    surfCut->setInputMesh(pbdMesh);
-    surfCut->setCutGeometry(cutObj->getCollidingGeometry());
-    surfCut->update();
-
-    // make topological changes
-    auto addedVertices = surfCut->getAddedVertices();
-    auto addedInitialVertices = surfCut->getAddedInitialVertices();
-    if (addedVertices != nullptr && addedInitialVertices != nullptr)
-    {
-        printf("Add %d vertices.\n", addedVertices->size());
-        addVertices(pbdMesh, addedVertices, addedInitialVertices);
-    }
-    auto addedTriangles = surfCut->getAddedTriangles();
-    if (addedTriangles != nullptr)
-    {
-        printf("Add %d triangles.\n", addedTriangles->size());
-        addTriangles(pbdMesh, addedTriangles);
-    }
-    auto modifiedTriangleIndices = surfCut->getModifiedTriangleIndices();
-    auto modifiedTriangles = surfCut->getModifiedTriangles();
-    if (modifiedTriangleIndices != nullptr && modifiedTriangles != nullptr)
-    {
-        printf("Modify %d triangles.\n", modifiedTriangles->size());
-        modifyTriangles(pbdMesh, modifiedTriangleIndices, modifiedTriangles);
-    }
-    pbdMesh->postModified();
-
-    // update pbd mesh
-    pbdMesh->setInitialVertexPositions(std::make_shared<VecDataArray<double, 3>>(*pbdMesh->getInitialVertexPositions()));
-    pbdMesh->setVertexPositions(std::make_shared<VecDataArray<double, 3>>(*pbdMesh->getVertexPositions()));
-    pbdMesh->setTriangleIndices(std::make_shared<VecDataArray<int, 3>>(*pbdMesh->getTriangleIndices()));
-    pbdMesh->modified();
-    */
 
     // Perform cutting
     imstkNew<SurfaceMeshCut> surfCut;
