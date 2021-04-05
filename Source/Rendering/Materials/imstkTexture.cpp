@@ -28,6 +28,12 @@ Texture::Texture(std::string path, Type type) :
 {
 }
 
+Texture::Texture(std::shared_ptr<ImageData> imageTex, Type type) :
+    imageTexture(imageTex), m_type(type), m_path("")
+{
+    
+}
+
 Texture::Type
 Texture::getType() const
 {

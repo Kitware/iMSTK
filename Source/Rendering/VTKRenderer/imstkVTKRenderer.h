@@ -202,6 +202,7 @@ protected:
     std::unordered_map<std::shared_ptr<VisualModel>, std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
     std::vector<std::shared_ptr<VTKRenderDelegate>> m_debugRenderDelegates;
 
+    // TextureManager is used to share textures among differing delegates
     TextureManager<VTKTextureDelegate> m_textureManager;
 
     vtkSmartPointer<vtkChartXY>      m_timeTableChart;

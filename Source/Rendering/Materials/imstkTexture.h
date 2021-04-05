@@ -21,15 +21,21 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <string>
 #include <memory>
 
 namespace imstk
 {
+class ImageData;
+
 ///
 /// \class Texture
+/// 
+/// \brief A texture can be defined by file reference or ImageData input
 ///
-class Texture
+class Texture : public EventObject
 {
 public:
     ///
@@ -73,10 +79,23 @@ public:
     Texture(std::string path = "", Type type = Type::Diffuse);
 
     ///
+    /// \brief Constructor
+    /// \param imageTex input texture image
+    /// \param type Type of texture
+    /// 
+    Texture(std::shared_ptr<ImageData> imageTex, Type type = Type::Diffuse);
+
+    ///
     /// \brief Destructor
     ///
     virtual ~Texture() = default;
 
+public:
+    SIGNAL(Texture, modified);
+
+    void postModified() { this->postEvent(Event(modified())); }
+
+public:
     ///
     /// \brief Get type
     ///
@@ -117,9 +136,13 @@ public:
     ///
     float getAnisotropyFactor();
 
+    void setImageData(std::shared_ptr<ImageData> imgData) { imageTexture = imgData; }
+    std::shared_ptr<ImageData> getImageData() const { return imageTexture; }
+
 protected:
-    Type m_type;            ///< Texture type
-    std::string m_path;     ///< Texture file path
+    std::shared_ptr<ImageData> imageTexture = nullptr;
+    Type m_type;             ///< Texture type
+    std::string m_path = ""; ///< Texture file path
 
     // Helps with texture aliasing (and a little with performance)
     bool m_mipmapsEnabled = true;

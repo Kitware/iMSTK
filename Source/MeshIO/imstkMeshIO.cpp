@@ -50,7 +50,11 @@ static std::unordered_map<std::string, MeshFileType> extToType =
     { "dcm", MeshFileType::DCM },
     { "nrrd", MeshFileType::NRRD },
     { "nii", MeshFileType::NII },
-    { "mhd", MeshFileType::MHD }
+    { "mhd", MeshFileType::MHD },
+    { "jpg", MeshFileType::JPG },
+    { "jpeg", MeshFileType::JPG },
+    { "png", MeshFileType::PNG },
+    { "bmp", MeshFileType::BMP },
 };
 
 std::shared_ptr<PointSet>
@@ -76,6 +80,9 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::NII:
     case MeshFileType::DCM:
     case MeshFileType::MHD:
+    case MeshFileType::JPG:
+    case MeshFileType::PNG:
+    case MeshFileType::BMP:
         return VTKMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::OBJ:
@@ -163,6 +170,9 @@ MeshIO::write(const std::shared_ptr<imstk::PointSet> imstkMesh, const std::strin
     case MeshFileType::STL:
     case MeshFileType::PLY:
     case MeshFileType::MHD:
+    case MeshFileType::BMP:
+    case MeshFileType::PNG:
+    case MeshFileType::JPG:
         return VTKMeshIO::write(imstkMesh, filePath, meshType);
         break;
     case MeshFileType::UNKNOWN:

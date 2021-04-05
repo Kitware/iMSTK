@@ -28,6 +28,12 @@
 
 namespace imstk
 {
+///
+/// \class TextureManager
+/// 
+/// \brief The TextureManager provides delegates for textures, it will create new ones
+/// and cache old ones
+/// 
 template<class T>
 class TextureManager
 {
@@ -53,11 +59,10 @@ protected:
 template<class T> std::shared_ptr<T>
 TextureManager<T>::getTextureDelegate(std::shared_ptr<Texture> texture)
 {
+    // If doesn't exist, create new delegate for the texture
     if (m_textureMap.count(texture) == 0)
     {
-        auto textureDelegate = std::make_shared<T>();
-        textureDelegate->loadTexture(texture);
-        m_textureMap[texture] = textureDelegate;
+        m_textureMap[texture] = std::make_shared<T>(texture);
     }
     return m_textureMap[texture];
 }

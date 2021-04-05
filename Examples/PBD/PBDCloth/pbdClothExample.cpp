@@ -36,6 +36,7 @@
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
 #include "imstkMeshIO.h"
+#include "imstkImageData.h"
 
 using namespace imstk;
 
@@ -150,7 +151,8 @@ makeClothObj(const std::string& name,
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
     material->setRoughness(0.5);
     material->setMetalness(0.1);
-    material->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpet.jpg", Texture::Type::Diffuse));
+    auto imageData = MeshIO::read<ImageData>("C:/Users/Andx_/Pictures/MyTextures/carpet.jpg");
+    material->addTexture(std::make_shared<Texture>(imageData, Texture::Type::Diffuse));
     //material->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal));
 
     imstkNew<VisualModel> visualModel(clothMesh);
@@ -215,11 +217,28 @@ main()
             viewer->addControl(keyControl);
         }
 
+        imstkNew<Texture> tex("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal);
+        using Vec3uc = Eigen::Matrix<unsigned char, 3, 1>;
         queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
         {
             if (e->m_key == 'i')
             {
-                clothObj->getVisualModel(0)->getRenderMaterial()->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal));
+                clothObj->getVisualModel(0)->getRenderMaterial()->addTexture(tex);
+            }
+            else if (e->m_key == 'j')
+            {
+                clothObj->getVisualModel(0)->getRenderMaterial()->removeTexture(tex);
+            }
+            else if (e->m_key == 'h')
+            {
+                auto imageData = clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->getImageData();
+                std::shared_ptr<VecDataArray<unsigned char, 3>> scalars = std::dynamic_pointer_cast<VecDataArray<unsigned char, 3>>(imageData->getScalars());
+                Vec3uc* scalarPtr = scalars->getPointer();
+                for (int i = 0; i < scalars->size(); i++)
+                {
+                    scalarPtr[i] = (scalarPtr[i].cast<double>() * 0.8).cast<unsigned char>();
+                }
+                clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->postModified();
             }
             });
 

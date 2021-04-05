@@ -28,10 +28,14 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 
+#include <vtkBMPReader.h>
+#include <vtkBMPWriter.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkGenericDataObjectReader.h>
 #include <vtkGenericDataObjectWriter.h>
 #include <vtkImageData.h>
+#include <vtkJPEGReader.h>
+#include <vtkJPEGWriter.h>
 #include <vtkMetaImageReader.h>
 #include <vtkMetaImageWriter.h>
 #include <vtkNIFTIImageReader.h>
@@ -40,6 +44,8 @@
 #include <vtkOBJReader.h>
 #include <vtkPLYReader.h>
 #include <vtkPLYWriter.h>
+#include <vtkPNGReader.h>
+#include <vtkPNGWriter.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkSTLReader.h>
 #include <vtkSTLWriter.h>
@@ -97,6 +103,18 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     {
         return VTKMeshIO::readVtkImageData<vtkMetaImageReader>(filePath);
     }
+    case MeshFileType::PNG:
+    {
+        return VTKMeshIO::readVtkImageData<vtkPNGReader>(filePath);
+    }
+    case MeshFileType::JPG:
+    {
+        return VTKMeshIO::readVtkImageData<vtkJPEGReader>(filePath);
+    }
+    case MeshFileType::BMP:
+    {
+        return VTKMeshIO::readVtkImageData<vtkBMPReader>(filePath);
+    }
     default:
     {
         LOG(FATAL) << "VTKMeshIO::read error: file type not supported";
@@ -119,6 +137,18 @@ VTKMeshIO::write(const std::shared_ptr<PointSet> imstkMesh, const std::string& f
         case MeshFileType::MHD:
         {
             return VTKMeshIO::writeMetaImageData(imgMesh, filePath);
+        }
+        case MeshFileType::PNG:
+        {
+            return VTKMeshIO::writeVtkImageData<vtkPNGWriter>(imgMesh, filePath);
+        }
+        case MeshFileType::JPG:
+        {
+            return VTKMeshIO::writeVtkImageData<vtkJPEGWriter>(imgMesh, filePath);
+        }
+        case MeshFileType::BMP:
+        {
+            return VTKMeshIO::writeVtkImageData<vtkBMPWriter>(imgMesh, filePath);
         }
         default:
             LOG(WARNING) << "VTKMeshIO::write error: file type not supported for volumetric mesh.";

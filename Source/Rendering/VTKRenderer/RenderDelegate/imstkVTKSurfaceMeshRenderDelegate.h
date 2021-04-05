@@ -80,6 +80,11 @@ protected:
     ///
     void geometryModified(Event* e);
 
+    ///
+    /// \brief Callback for when RenderMaterial textures are modified
+    /// 
+    void texturesModified(Event* e);
+
 protected:
     void setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices);
     void setNormalBuffer(std::shared_ptr<VecDataArray<double, 3>> normals);

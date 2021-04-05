@@ -181,7 +181,33 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
         return;
     }
     m_textures[static_cast<size_t>(texture->getType())] = texture;
-    postModified();
+    postEvent(Event(texturesModified()));
+}
+
+void
+RenderMaterial::removeTexture(std::shared_ptr<Texture> texture)
+{
+    // The texture (object) must exist
+    auto iter = std::find(m_textures.begin(), m_textures.end(), texture);
+    if (iter != m_textures.end())
+    {
+        const size_t type = static_cast<size_t>(texture->getType());
+        m_textures[type] = std::make_shared<Texture>("", static_cast<Texture::Type>(type));
+        postEvent(Event(texturesModified()));
+    }
+}
+
+void
+RenderMaterial::removeTexture(Texture::Type type)
+{
+    // If the texture already has path "" then it is empty
+    const size_t typeInt = static_cast<size_t>(type);
+    std::shared_ptr<Texture> prevTex = m_textures[typeInt];
+    if (prevTex->getPath() != "")
+    {
+        m_textures[typeInt] = std::make_shared<Texture>("", type);
+        postEvent(Event(texturesModified()));
+    }
 }
 
 void

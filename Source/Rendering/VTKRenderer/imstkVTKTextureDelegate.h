@@ -34,40 +34,44 @@ class VTKTextureDelegate;
 ///
 /// \class VTKTextureDelegate
 ///
-/// \brief VTK texture implementation.
+/// \brief couples a imstk texture to a VTK texture
 ///
-class VTKTextureDelegate : TextureDelegate
+class VTKTextureDelegate : public TextureDelegate
 {
 public:
     ///
     /// \brief Default constructor
     ///
-    VTKTextureDelegate() {}
+    VTKTextureDelegate(std::shared_ptr<Texture> texture);
 
-protected:
-    template<class T> friend class TextureManager;
-    friend class VTKSurfaceMeshRenderDelegate;
+    virtual ~VTKTextureDelegate() override = default;
 
+public:
     ///
-    /// \brief Gets the VTK texture
+    /// \brief Gets the VTK texture coupled to the imstk texture
     ///
     /// \returns VTK texture
     ///
-    vtkSmartPointer<vtkTexture> getTexture() const;
+    vtkSmartPointer<vtkTexture> getVtkTexture() const { return m_vtkTexture; }
+
+    ///
+    /// \brief Get the imstk texture
+    /// 
+    std::shared_ptr<Texture> getTexture() const { return m_texture; }
 
     ///
     /// \brief Return the VTK texture name
     ///
     /// \returns VTK texture
     ///
-    const std::string& getTextureName() const;
+    const std::string& getTextureName() const { return m_textureName; }
 
-    ///
-    /// \brief Implementation of texture loading
-    ///
-    virtual void loadTexture(std::shared_ptr<Texture> texture);
+protected:
+    void textureModified(Event* e);
 
-    vtkSmartPointer<vtkTexture> m_sourceTexture; ///< VTK texture
-    std::string m_textureName;                   ///< VTK texture unique name
+protected:
+    vtkSmartPointer<vtkTexture> m_vtkTexture; ///< VTK texture
+    std::shared_ptr<Texture> m_texture; ///< iMSTK texture
+    std::string m_textureName; ///< VTK texture unique name
 };
 }

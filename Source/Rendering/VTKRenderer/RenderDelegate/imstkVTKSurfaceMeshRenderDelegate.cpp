@@ -248,6 +248,17 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 }
 
 void
+VTKSurfaceMeshRenderDelegate::texturesModified(Event* e)
+{
+    RenderMaterial* material = static_cast<RenderMaterial*>(e->m_sender);
+    if (material != nullptr)
+    {
+        // Reload all textures
+        // If texture already present, don't do anything unless name changed
+    }
+}
+
+void
 VTKSurfaceMeshRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices)
 {
     // If the buffer changed
@@ -342,7 +353,8 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     {
         // Get imstk texture
         auto texture = material->getTexture((Texture::Type)unit);
-        if (std::strcmp(texture->getPath().c_str(), "") == 0)
+        // If neither of these are provided, the texture is not filled out
+        if (texture->getImageData() == nullptr && texture->getPath() == "")
         {
             continue;
         }
@@ -366,7 +378,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         */
 
         // Set texture
-        auto currentTexture = textureDelegate->getTexture();
+        auto currentTexture = textureDelegate->getVtkTexture();
 
         vtkSmartPointer<vtkActor> actor = vtkActor::SafeDownCast(m_actor);
         if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
