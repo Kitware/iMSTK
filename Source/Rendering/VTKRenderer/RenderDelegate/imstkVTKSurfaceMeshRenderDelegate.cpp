@@ -184,7 +184,7 @@ VTKSurfaceMeshRenderDelegate::processEvents()
             }
         });
 
-    // Now do each event in order recieved
+    // Now do each event in order received
     for (std::list<Command>::reverse_iterator i = cmds.rbegin(); i != cmds.rend(); i++)
     {
         i->invoke();
@@ -248,6 +248,13 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
     {
         geometry->computeVertexNormals();
         setNormalBuffer(geometry->getVertexNormals());
+    }
+
+    // Map vertex scalars if it has them
+    if (m_geometry->getVertexScalars() != nullptr)
+    {
+        m_mappedVertexScalarArray = GeometryUtils::coupleVtkDataArray(m_geometry->getVertexScalars());
+        m_polydata->GetPointData()->SetScalars(m_mappedVertexScalarArray);
     }
 }
 
