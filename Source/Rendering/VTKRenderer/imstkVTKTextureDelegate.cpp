@@ -50,15 +50,15 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
 
             for (int i = 0; i < 6; i++)
             {
-                auto index = tFileName.find(".");
-                auto tempName = tFileName.substr(0, index);
+                auto index     = tFileName.find(".");
+                auto tempName  = tFileName.substr(0, index);
                 auto extension = tFileName.substr(index);
-                auto sideName = tempName + sideNames[i] + extension;
+                auto sideName  = tempName + sideNames[i] + extension;
 
                 vtkImageReader2* imgReader = readerFactory->CreateImageReader2(sideName.c_str());
 
                 CHECK(imgReader != nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
-                    << sideName;
+                                            << sideName;
 
                 auto imageFlip = vtkSmartPointer<vtkImageFlip>::New();
                 imageFlip->SetFilteredAxis(1);
@@ -73,12 +73,12 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
             vtkImageReader2* imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
 
             CHECK(imgReader != nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
-                << tFileName;
+                                        << tFileName;
 
             imgReader->SetFileName(tFileName.c_str());
             imgReader->Update();
             m_vtkTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
-            m_vtkTexture->RepeatOff();
+            m_vtkTexture->SetRepeat(m_texture->getRepeating());
             m_vtkTexture->SetInputConnection(0, imgReader->GetOutputPort());
 
             if (texture->getType() == Texture::Type::Diffuse)
@@ -92,7 +92,7 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
         // Load by ImageData
         vtkSmartPointer<vtkImageData> vtkImgData = GeometryUtils::coupleVtkImageData(imstkImgData);
         m_vtkTexture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
-        m_vtkTexture->RepeatOff();
+        m_vtkTexture->SetRepeat(m_texture->getRepeating());
         m_vtkTexture->SetInputData(vtkImgData);
 
         if (texture->getType() == Texture::Type::Diffuse)

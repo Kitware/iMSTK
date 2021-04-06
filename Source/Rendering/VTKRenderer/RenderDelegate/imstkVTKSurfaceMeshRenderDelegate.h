@@ -21,9 +21,7 @@
 
 #pragma once
 
-#include "imstkTextureManager.h"
 #include "imstkVTKPolyDataRenderDelegate.h"
-#include "imstkVTKTextureDelegate.h"
 
 class vtkCellArray;
 class vtkDataArray;
@@ -62,7 +60,7 @@ public:
     ///
     /// \brief Initialize textures
     ///
-    void initializeTextures(TextureManager<VTKTextureDelegate>& textureManager);
+    void initializeTextures();
 
 // Callbacks for modifications, when an element changes the user or API must post the modified event
 // to inform that this happened, if the actual buffer on the geometry is swapped then geometry
@@ -82,7 +80,7 @@ protected:
 
     ///
     /// \brief Callback for when RenderMaterial textures are modified
-    /// 
+    ///
     void texturesModified(Event* e);
 
 protected:

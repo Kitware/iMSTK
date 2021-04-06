@@ -24,20 +24,26 @@
 #include "imstkTexture.h"
 #include "imstkTextureDelegate.h"
 
-#include <map>
+#include <unordered_map>
 
 namespace imstk
 {
 ///
 /// \class TextureManager
-/// 
+///
 /// \brief The TextureManager provides delegates for textures, it will create new ones
 /// and cache old ones
-/// 
+///
 template<class T>
 class TextureManager
 {
 static_assert(std::is_base_of<TextureDelegate, T>::value, "T isn't a subclass of TextureDelegate");
+
+public:
+    ///
+    /// \brief Constructor
+    ///
+    TextureManager() = default;
 
 public:
     ///
@@ -46,14 +52,7 @@ public:
     std::shared_ptr<T> getTextureDelegate(std::shared_ptr<Texture> texture);
 
 protected:
-    friend class VTKRenderer;
-
-    ///
-    /// \brief Constructor
-    ///
-    TextureManager() = default;
-
-    std::map<std::shared_ptr<Texture>, std::shared_ptr<T>> m_textureMap;
+    std::unordered_map<std::shared_ptr<Texture>, std::shared_ptr<T>> m_textureMap;
 };
 
 template<class T> std::shared_ptr<T>

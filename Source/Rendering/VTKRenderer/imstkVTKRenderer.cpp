@@ -26,6 +26,7 @@
 #include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
+#include "imstkTextureManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 
@@ -51,7 +52,7 @@
 namespace imstk
 {
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
-    m_scene(scene)
+    m_scene(scene), m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>())
 {
     // create m_vtkRenderer depending on enableVR
     if (!enableVR)
@@ -65,6 +66,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetLightFollowCamera(false);
     }
 
+    // Process all the changes initially (add all the delegates)
     sceneModifed(nullptr);
     this->updateRenderDelegates();
 
@@ -458,15 +460,15 @@ VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::share
                      << sceneObject->getName() << "'.";
         return;
     }
+    renderDelegate->setTextureManager(m_textureManager);
 
     m_renderedVisualModels[sceneObject].insert(visualModel);
     m_objectVtkActors.push_back(renderDelegate->getVtkActor());
     m_vtkRenderer->AddActor(renderDelegate->getVtkActor());
 
-    auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate);
-    if (smRenderDelegate)
+    if (auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate))
     {
-        smRenderDelegate->initializeTextures(m_textureManager);
+        smRenderDelegate->initializeTextures();
     }
 
     visualModel->setRenderDelegateCreated(this, true);

@@ -56,7 +56,7 @@ public:
 
     ///
     /// \brief Get the imstk texture
-    /// 
+    ///
     std::shared_ptr<Texture> getTexture() const { return m_texture; }
 
     ///
@@ -71,7 +71,7 @@ protected:
 
 protected:
     vtkSmartPointer<vtkTexture> m_vtkTexture; ///< VTK texture
-    std::shared_ptr<Texture> m_texture; ///< iMSTK texture
-    std::string m_textureName; ///< VTK texture unique name
+    std::shared_ptr<Texture>    m_texture;    ///< iMSTK texture
+    std::string m_textureName;                ///< VTK texture unique name
 };
 }

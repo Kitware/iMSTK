@@ -82,7 +82,7 @@ public:
 
     ///
     /// \brief Posted when textures are modified
-    /// 
+    ///
     SIGNAL(RenderMaterial,texturesModified);
 
 public:

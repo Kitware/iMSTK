@@ -20,10 +20,12 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkImageData.h"
 #include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -35,10 +37,30 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
-#include "imstkMeshIO.h"
-#include "imstkImageData.h"
 
 using namespace imstk;
+
+static void
+setFabricTextures(std::shared_ptr<RenderMaterial> material)
+{
+    auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fabricDiffuse.jpg");
+    material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
+    auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fabricNormal.jpg");
+    material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
+    auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fabricORM.jpg");
+    material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
+}
+
+static void
+setFleshTextures(std::shared_ptr<RenderMaterial> material)
+{
+    auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
+    material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
+    auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshNormal.jpg");
+    material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
+    auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
+    material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
+}
 
 ///
 /// \brief Creates cloth geometry
@@ -51,7 +73,8 @@ static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(const double width,
                   const double height,
                   const int    nRows,
-                  const int    nCols)
+                  const int    nCols,
+                  const double uvScale)
 {
     imstkNew<SurfaceMesh> clothMesh;
 
@@ -99,7 +122,7 @@ makeClothGeometry(const double width,
     {
         for (int j = 0; j < nCols; j++)
         {
-            uvCoords[i * nCols + j] = Vec2f(static_cast<float>(i) / nRows, static_cast<float>(j) / nCols);
+            uvCoords[i * nCols + j] = Vec2f(static_cast<float>(i) / nRows, static_cast<float>(j) / nCols) * uvScale;
         }
     }
 
@@ -127,7 +150,7 @@ makeClothObj(const std::string& name,
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(10.0, 10.0, 16, 16);
+    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(10.0, 10.0, 16, 16, 2.0);
 
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;
@@ -149,12 +172,7 @@ makeClothObj(const std::string& name,
     material->setBackFaceCulling(false);
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     material->setShadingModel(RenderMaterial::ShadingModel::PBR);
-    material->setRoughness(0.5);
-    material->setMetalness(0.1);
-    auto imageData = MeshIO::read<ImageData>("C:/Users/Andx_/Pictures/MyTextures/carpet.jpg");
-    material->addTexture(std::make_shared<Texture>(imageData, Texture::Type::Diffuse));
-    //material->addTexture(std::make_shared<Texture>("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal));
-
+    setFleshTextures(material);
     imstkNew<VisualModel> visualModel(clothMesh);
     visualModel->setRenderMaterial(material);
 
@@ -217,18 +235,19 @@ main()
             viewer->addControl(keyControl);
         }
 
-        imstkNew<Texture> tex("C:/Users/Andx_/Pictures/MyTextures/carpetN.png", Texture::Type::Normal);
         using Vec3uc = Eigen::Matrix<unsigned char, 3, 1>;
         queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
         {
-            if (e->m_key == 'i')
+            // Set new textures
+            if (e->m_key == '1')
             {
-                clothObj->getVisualModel(0)->getRenderMaterial()->addTexture(tex);
+                setFleshTextures(clothObj->getVisualModel(0)->getRenderMaterial());
             }
-            else if (e->m_key == 'j')
+            else if (e->m_key == '2')
             {
-                clothObj->getVisualModel(0)->getRenderMaterial()->removeTexture(tex);
+                setFabricTextures(clothObj->getVisualModel(0)->getRenderMaterial());
             }
+            // Darken the texture pixel values
             else if (e->m_key == 'h')
             {
                 auto imageData = clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->getImageData();
@@ -240,7 +259,7 @@ main()
                 }
                 clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->postModified();
             }
-            });
+        });
 
         driver->start();
     }

@@ -201,7 +201,7 @@ void
 RenderMaterial::removeTexture(Texture::Type type)
 {
     // If the texture already has path "" then it is empty
-    const size_t typeInt = static_cast<size_t>(type);
+    const size_t             typeInt = static_cast<size_t>(type);
     std::shared_ptr<Texture> prevTex = m_textures[typeInt];
     if (prevTex->getPath() != "")
     {
