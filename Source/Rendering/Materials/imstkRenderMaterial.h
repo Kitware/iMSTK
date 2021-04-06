@@ -80,6 +80,11 @@ public:
     ///
     SIGNAL(RenderMaterial,modified);
 
+    ///
+    /// \brief Posted when textures are modified
+    ///
+    SIGNAL(RenderMaterial,texturesModified);
+
 public:
     ///
     /// \brief Get/Set the material name
@@ -183,9 +188,11 @@ public:
     void setEmissivity(const float emissivity);
 
     ///
-    /// \brief Add/Get texture
+    /// \brief Add/Remove/Get texture
     ///
     void addTexture(std::shared_ptr<Texture> texture);
+    void removeTexture(std::shared_ptr<Texture> texture);
+    void removeTexture(Texture::Type type);
     std::shared_ptr<Texture> getTexture(Texture::Type type);
 
     ///

@@ -28,6 +28,11 @@ Texture::Texture(std::string path, Type type) :
 {
 }
 
+Texture::Texture(std::shared_ptr<ImageData> imageTex, Type type) :
+    imageTexture(imageTex), m_type(type), m_path("")
+{
+}
+
 Texture::Type
 Texture::getType() const
 {
@@ -92,12 +97,6 @@ Texture::getTypeAsString(Type type)
     }
 }
 
-const std::string
-Texture::getPath() const
-{
-    return m_path;
-}
-
 const Texture::FileType
 Texture::getFileType()
 {
@@ -129,23 +128,5 @@ Texture::getFileType()
     }
 
     return textureType;
-}
-
-bool
-Texture::getMipmapsEnabled()
-{
-    return m_mipmapsEnabled;
-}
-
-bool
-Texture::isAnisotropyEnabled()
-{
-    return m_anisotropyEnabled;
-}
-
-float
-Texture::getAnisotropyFactor()
-{
-    return m_anisotropyFactor;
 }
 }

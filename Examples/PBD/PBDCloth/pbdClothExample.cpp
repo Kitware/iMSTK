@@ -20,9 +20,12 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
+#include "imstkImageData.h"
+#include "imstkKeyboardDeviceClient.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
 #include "imstkLogger.h"
+#include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
 #include "imstkPbdModel.h"
@@ -37,6 +40,28 @@
 
 using namespace imstk;
 
+static void
+setFabricTextures(std::shared_ptr<RenderMaterial> material)
+{
+    auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fabricDiffuse.jpg");
+    material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
+    auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fabricNormal.jpg");
+    material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
+    auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fabricORM.jpg");
+    material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
+}
+
+static void
+setFleshTextures(std::shared_ptr<RenderMaterial> material)
+{
+    auto diffuseTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshDiffuse.jpg");
+    material->addTexture(std::make_shared<Texture>(diffuseTex, Texture::Type::Diffuse));
+    auto normalTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshNormal.jpg");
+    material->addTexture(std::make_shared<Texture>(normalTex, Texture::Type::Normal));
+    auto ormTex = MeshIO::read<ImageData>(iMSTK_DATA_ROOT "/textures/fleshORM.jpg");
+    material->addTexture(std::make_shared<Texture>(ormTex, Texture::Type::ORM));
+}
+
 ///
 /// \brief Creates cloth geometry
 /// \param cloth width
@@ -48,7 +73,8 @@ static std::shared_ptr<SurfaceMesh>
 makeClothGeometry(const double width,
                   const double height,
                   const int    nRows,
-                  const int    nCols)
+                  const int    nCols,
+                  const double uvScale)
 {
     imstkNew<SurfaceMesh> clothMesh;
 
@@ -90,7 +116,18 @@ makeClothGeometry(const double width,
         }
     }
 
+    imstkNew<VecDataArray<float, 2>> uvCoordsPtr(nRows * nCols);
+    VecDataArray<float, 2>&          uvCoords = *uvCoordsPtr.get();
+    for (int i = 0; i < nRows; ++i)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            uvCoords[i * nCols + j] = Vec2f(static_cast<float>(i) / nRows, static_cast<float>(j) / nCols) * uvScale;
+        }
+    }
+
     clothMesh->initialize(verticesPtr, indicesPtr);
+    clothMesh->setVertexTCoords("uvs", uvCoordsPtr);
 
     return clothMesh;
 }
@@ -113,7 +150,7 @@ makeClothObj(const std::string& name,
     imstkNew<PbdObject> clothObj(name);
 
     // Setup the Geometry
-    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(10.0, 10.0, 16, 16);
+    std::shared_ptr<SurfaceMesh> clothMesh = makeClothGeometry(10.0, 10.0, 16, 16, 2.0);
 
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;
@@ -133,8 +170,9 @@ makeClothObj(const std::string& name,
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setBackFaceCulling(false);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-
+    material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
+    material->setShadingModel(RenderMaterial::ShadingModel::PBR);
+    setFleshTextures(material);
     imstkNew<VisualModel> visualModel(clothMesh);
     visualModel->setRenderMaterial(material);
 
@@ -157,25 +195,11 @@ main()
     Logger::startLogger();
 
     // Setup a scene
-    imstkNew<Scene> scene("PBDCloth");
+    imstkNew<Scene>            scene("PBDCloth");
+    std::shared_ptr<PbdObject> clothObj = nullptr;
     {
-        std::shared_ptr<PbdObject> clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
+        clothObj = makeClothObj("Cloth", 10.0, 10.0, 16, 16);
         scene->addSceneObject(clothObj);
-
-        // Light (white)
-        imstkNew<DirectionalLight> whiteLight("whiteLight");
-        whiteLight->setFocalPoint(Vec3d(5.0, -8.0, -5.0));
-        whiteLight->setIntensity(1.0);
-        scene->addLight(whiteLight);
-
-        // Light (red)
-        imstkNew<SpotLight> colorLight("colorLight");
-        colorLight->setPosition(Vec3d(-5.0, -3.0, 5.0));
-        colorLight->setFocalPoint(Vec3d(0.0, -5.0, 5.0));
-        colorLight->setIntensity(100.);
-        colorLight->setColor(Color::Red);
-        colorLight->setSpotAngle(30.0);
-        scene->addLight(colorLight);
 
         // Adjust camera
         scene->getActiveCamera()->setFocalPoint(0.0, -5.0, 5.0);
@@ -190,12 +214,14 @@ main()
 
         // Setup a scene manager to advance the scene
         imstkNew<SceneManager> sceneManager("Scene Manager");
+        sceneManager->setExecutionType(Module::ExecutionType::ADAPTIVE);
         sceneManager->setActiveScene(scene);
         sceneManager->pause(); // Start simulation paused
 
         imstkNew<SimulationManager> driver;
         driver->addModule(viewer);
         driver->addModule(sceneManager);
+        driver->setDesiredDt(0.001);
 
         // Add mouse and keyboard controls to the viewer
         {
@@ -208,6 +234,32 @@ main()
             keyControl->setModuleDriver(driver);
             viewer->addControl(keyControl);
         }
+
+        using Vec3uc = Eigen::Matrix<unsigned char, 3, 1>;
+        queueConnect<KeyEvent>(viewer->getKeyboardDevice(), &KeyboardDeviceClient::keyPress, sceneManager, [&](KeyEvent* e)
+        {
+            // Set new textures
+            if (e->m_key == '1')
+            {
+                setFleshTextures(clothObj->getVisualModel(0)->getRenderMaterial());
+            }
+            else if (e->m_key == '2')
+            {
+                setFabricTextures(clothObj->getVisualModel(0)->getRenderMaterial());
+            }
+            // Darken the texture pixel values
+            else if (e->m_key == 'h')
+            {
+                auto imageData = clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->getImageData();
+                std::shared_ptr<VecDataArray<unsigned char, 3>> scalars = std::dynamic_pointer_cast<VecDataArray<unsigned char, 3>>(imageData->getScalars());
+                Vec3uc* scalarPtr = scalars->getPointer();
+                for (int i = 0; i < scalars->size(); i++)
+                {
+                    scalarPtr[i] = (scalarPtr[i].cast<double>() * 0.8).cast<unsigned char>();
+                }
+                clothObj->getVisualModel(0)->getRenderMaterial()->getTexture(Texture::Type::Diffuse)->postModified();
+            }
+        });
 
         driver->start();
     }

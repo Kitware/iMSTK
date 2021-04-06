@@ -23,6 +23,8 @@
 
 #include "imstkEventObject.h"
 #include "imstkMacros.h"
+#include "imstkTextureManager.h"
+#include "imstkVTKTextureDelegate.h"
 
 #include <vtkSmartPointer.h>
 
@@ -47,6 +49,7 @@ class VTKRenderDelegate : public EventObject
 public:
     virtual ~VTKRenderDelegate() override = default;
 
+public:
     ///
     /// \brief Instantiate proper render delegate
     ///
@@ -66,6 +69,11 @@ public:
     /// \brief Get VTK actor
     ///
     vtkSmartPointer<vtkProp3D> getVtkActor() { return m_actor; }
+
+    ///
+    /// \brief Set the TextureManager
+    ///
+    void setTextureManager(std::weak_ptr<TextureManager<VTKTextureDelegate>> textureManager) { m_textureManager = textureManager; }
 
     ///
     /// \brief Update render delegate
@@ -110,5 +118,7 @@ protected:
 
     std::shared_ptr<VisualModel>    m_visualModel; ///< imstk visual model (contains data (geometry) and render specification (render material))
     std::shared_ptr<RenderMaterial> m_material;
+
+    std::weak_ptr<TextureManager<VTKTextureDelegate>> m_textureManager;
 };
 }

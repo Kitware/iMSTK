@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <memory>
 
 namespace imstk
@@ -32,7 +34,7 @@ class Texture;
 ///
 /// \brief iMSTK texture delegate abstract class
 ///
-class TextureDelegate
+class TextureDelegate : public EventObject
 {
 public:
     virtual ~TextureDelegate() = default;
@@ -42,12 +44,6 @@ protected:
     /// \brief Constructor
     /// \param texture The texture
     ///
-    TextureDelegate() { }
-
-    ///
-    /// \brief Abstract function to load textures
-    /// \param texture Texture to load
-    ///
-    virtual void loadTexture(std::shared_ptr<Texture> texture) = 0;
+    TextureDelegate() = default;
 };
 }

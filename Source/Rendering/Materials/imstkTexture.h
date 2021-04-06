@@ -21,15 +21,21 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
+
 #include <string>
 #include <memory>
 
 namespace imstk
 {
+class ImageData;
+
 ///
 /// \class Texture
 ///
-class Texture
+/// \brief A texture can be defined by file reference or ImageData input
+///
+class Texture : public EventObject
 {
 public:
     ///
@@ -73,10 +79,23 @@ public:
     Texture(std::string path = "", Type type = Type::Diffuse);
 
     ///
+    /// \brief Constructor
+    /// \param imageTex input texture image
+    /// \param type Type of texture
+    ///
+    Texture(std::shared_ptr<ImageData> imageTex, Type type = Type::Diffuse);
+
+    ///
     /// \brief Destructor
     ///
     virtual ~Texture() = default;
 
+public:
+    SIGNAL(Texture,modified);
+
+    void postModified() { this->postEvent(Event(modified())); }
+
+public:
     ///
     /// \brief Get type
     ///
@@ -95,7 +114,7 @@ public:
     ///
     /// \brief Get path
     ///
-    const std::string getPath() const;
+    const std::string& getPath() const{ return m_path; }
 
     ///
     /// \brief Get file extension
@@ -105,28 +124,47 @@ public:
     ///
     /// \brief Get if mipmaps are enabled
     ///
-    bool getMipmapsEnabled();
+    const bool getMipmapsEnabled() const{ return m_mipmapsEnabled; }
+
+    ///
+    /// \brief Get if repeat is enabled, if off it clamps
+    ///
+    const bool getRepeating() const{ return m_repeating; }
 
     ///
     /// \brief Get if anisotropic filtering is enabled
     ///
-    bool isAnisotropyEnabled();
+    const bool isAnisotropyEnabled() const{ return m_anisotropyEnabled; }
 
     ///
-    /// brief Get anisotropy factor
+    /// \brief Get anisotropy factor
     ///
-    float getAnisotropyFactor();
+    const double getAnisotropyFactor() const{ return m_anisotropyFactor; }
+
+    ///
+    /// \brief Set the input image data, not required (paths to files can be used instead)
+    ///
+    void setImageData(std::shared_ptr<ImageData> imgData) { imageTexture = imgData; }
+
+    ///
+    /// \brief Get the input image data for the texture, not required (paths to files can be used instead)
+    ///
+    std::shared_ptr<ImageData> getImageData() const{ return imageTexture; }
 
 protected:
-    Type m_type;            ///< Texture type
-    std::string m_path;     ///< Texture file path
+    std::shared_ptr<ImageData> imageTexture = nullptr;
+    Type m_type;             ///< Texture type
+    std::string m_path = ""; ///< Texture file path
 
     // Helps with texture aliasing (and a little with performance)
     bool m_mipmapsEnabled = true;
 
+    // Repeating
+    bool m_repeating = true;
+
     // Helps sharpen mipmapped textures at more extreme angles
-    bool  m_anisotropyEnabled = true;
-    float m_anisotropyFactor  = 1.0;
+    bool   m_anisotropyEnabled = true;
+    double m_anisotropyFactor  = 1.0;
 };
 }
 

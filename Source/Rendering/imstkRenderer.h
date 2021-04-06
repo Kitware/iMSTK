@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "imstkEventObject.h"
 #include "imstkMath.h"
 #include "imstkColor.h"
 
@@ -39,7 +40,7 @@ struct rendererConfig
 ///
 /// \brief Rendering window manager and contains user API to configure the rendering with various backends
 ///
-class Renderer
+class Renderer : public EventObject
 {
 public:
     ///

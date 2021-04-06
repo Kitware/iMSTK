@@ -23,6 +23,8 @@
 #include "imstkGeometryUtilities.h"
 #include "imstkRenderMaterial.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTextureDelegate.h"
+#include "imstkTextureManager.h"
 #include "imstkVisualModel.h"
 
 #include <vtkActor.h>
@@ -127,7 +129,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Visua
     // When index buffer internals are modified
     queueConnect<Event>(m_geometry->getVertexNormals(), &VecDataArray<double, 3>::modified, this, &VTKSurfaceMeshRenderDelegate::normalDataModified);
 
-    // When the index buffer internals are modified,
+    connect<Event>(m_material, &RenderMaterial::texturesModified, this, &VTKSurfaceMeshRenderDelegate::texturesModified);
 
     // Setup mapper
     {
@@ -250,6 +252,19 @@ VTKSurfaceMeshRenderDelegate::geometryModified(Event* imstkNotUsed(e))
 }
 
 void
+VTKSurfaceMeshRenderDelegate::texturesModified(Event* e)
+{
+    // If a texture is set/swapped reinit all textures
+    RenderMaterial* material = static_cast<RenderMaterial*>(e->m_sender);
+    if (material != nullptr)
+    {
+        // Reload all textures
+        // If texture already present, don't do anything unless name changed
+        initializeTextures();
+    }
+}
+
+void
 VTKSurfaceMeshRenderDelegate::setVertexBuffer(std::shared_ptr<VecDataArray<double, 3>> vertices)
 {
     // If the buffer changed
@@ -329,7 +344,7 @@ VTKSurfaceMeshRenderDelegate::setIndexBuffer(std::shared_ptr<VecDataArray<int, 3
 }
 
 void
-VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelegate>& textureManager)
+VTKSurfaceMeshRenderDelegate::initializeTextures()
 {
     auto material = m_visualModel->getRenderMaterial();
     if (material == nullptr)
@@ -340,17 +355,21 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
     unsigned int currentUnit = 0;
 
     // Go through all of the textures
+    vtkSmartPointer<vtkActor> actor = vtkActor::SafeDownCast(m_actor);
+    actor->GetProperty()->RemoveAllTextures();
     for (int unit = 0; unit < (int)Texture::Type::None; unit++)
     {
         // Get imstk texture
         auto texture = material->getTexture((Texture::Type)unit);
-        if (std::strcmp(texture->getPath().c_str(), "") == 0)
+        // If neither of these are provided, the texture is not filled out
+        if (texture->getImageData() == nullptr && texture->getPath() == "")
         {
             continue;
         }
 
         // Get vtk texture
-        auto textureDelegate = textureManager.getTextureDelegate(texture);
+        std::shared_ptr<TextureManager<VTKTextureDelegate>> textureManager  = m_textureManager.lock();
+        auto                                                textureDelegate = textureManager->getTextureDelegate(texture);
 
         /* /!\ VTKTextureWrapMode not yet supported in VTK 7
         * See here for some work that needs to be imported back to upstream:
@@ -368,9 +387,7 @@ VTKSurfaceMeshRenderDelegate::initializeTextures(TextureManager<VTKTextureDelega
         */
 
         // Set texture
-        auto currentTexture = textureDelegate->getTexture();
-
-        vtkSmartPointer<vtkActor> actor = vtkActor::SafeDownCast(m_actor);
+        auto currentTexture = textureDelegate->getVtkTexture();
         if (material->getShadingModel() == RenderMaterial::ShadingModel::PBR)
         {
             switch (texture->getType())

@@ -26,6 +26,7 @@
 #include "imstkLogger.h"
 #include "imstkScene.h"
 #include "imstkSceneObject.h"
+#include "imstkTextureManager.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 
@@ -51,7 +52,7 @@
 namespace imstk
 {
 VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
-    m_scene(scene)
+    m_scene(scene), m_textureManager(std::make_shared<TextureManager<VTKTextureDelegate>>())
 {
     // create m_vtkRenderer depending on enableVR
     if (!enableVR)
@@ -65,17 +66,9 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
         vtkOpenVRRenderer::SafeDownCast(m_vtkRenderer)->SetLightFollowCamera(false);
     }
 
+    // Process all the changes initially (add all the delegates)
+    sceneModifed(nullptr);
     this->updateRenderDelegates();
-
-    // Initialize textures for surface mesh render delegates
-    for (const auto& renderDelegate : m_renderDelegates)
-    {
-        auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate);
-        if (smRenderDelegate)
-        {
-            smRenderDelegate->initializeTextures(m_textureManager);
-        }
-    }
 
     // Lights and light actors
     for (const auto& light : scene->getLights())
@@ -185,6 +178,9 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene, const bool enableVR) :
     {
         m_vtkRenderer->RemoveCuller(culler);
     }
+
+    // Observe changes to the scene
+    connect<Event>(m_scene, &Scene::modified, this, &VTKRenderer::sceneModifed);
 
     {
         // Add the benchmarking chart
@@ -411,36 +407,123 @@ VTKRenderer::updateCamera()
 void
 VTKRenderer::updateRenderDelegates()
 {
-    // Object actors
-    for (const auto& obj : m_scene->getSceneObjects())
+    // Call visual update on every scene object
+    m_scene->updateVisuals();
+
+    // Update their render delegates
+    for (auto delegate : m_renderDelegates)
     {
-        for (auto visualModel : obj->getVisualModels())
+        delegate.second->update();
+    }
+    for (auto delegate : m_debugRenderDelegates)
+    {
+        delegate->update();
+    }
+}
+
+void
+VTKRenderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
+{
+    for (const auto& actor : actorList)
+    {
+        m_vtkRenderer->RemoveActor(actor);
+    }
+}
+
+void
+VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
+{
+    for (const auto& actor : actorList)
+    {
+        m_vtkRenderer->AddActor(actor);
+    }
+}
+
+void
+VTKRenderer::addSceneObject(std::shared_ptr<SceneObject> sceneObject)
+{
+    m_renderedObjects.insert(sceneObject);
+    m_renderedVisualModels[sceneObject] = std::unordered_set<std::shared_ptr<VisualModel>>();
+    sceneObjectModified(sceneObject);
+    // Observe changes on this SceneObject
+    connect<Event>(sceneObject, &SceneObject::modified, this, &VTKRenderer::sceneObjectModified);
+}
+
+void
+VTKRenderer::addVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel)
+{
+    // Create a delegate for the visual m odel
+    auto renderDelegate = m_renderDelegates[visualModel] = VTKRenderDelegate::makeDelegate(visualModel);
+    if (renderDelegate == nullptr)
+    {
+        LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                     << sceneObject->getName() << "'.";
+        return;
+    }
+    renderDelegate->setTextureManager(m_textureManager);
+
+    m_renderedVisualModels[sceneObject].insert(visualModel);
+    m_objectVtkActors.push_back(renderDelegate->getVtkActor());
+    m_vtkRenderer->AddActor(renderDelegate->getVtkActor());
+
+    if (auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate))
+    {
+        smRenderDelegate->initializeTextures();
+    }
+
+    visualModel->setRenderDelegateCreated(this, true);
+}
+
+std::unordered_set<std::shared_ptr<VisualModel>>::iterator
+VTKRenderer::removeVisualModel(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<VisualModel> visualModel)
+{
+    auto renderDelegate = m_renderDelegates[visualModel];
+    auto iter = std::find(m_objectVtkActors.begin(), m_objectVtkActors.end(), renderDelegate->getVtkActor());
+    if (iter != m_objectVtkActors.end())
+    {
+        m_objectVtkActors.erase(iter);
+    }
+    m_vtkRenderer->RemoveActor(renderDelegate->getVtkActor());
+
+    m_renderDelegates.erase(visualModel);
+    return m_renderedVisualModels[sceneObject].erase(m_renderedVisualModels[sceneObject].find(visualModel));
+}
+
+std::unordered_set<std::shared_ptr<SceneObject>>::iterator
+VTKRenderer::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
+{
+    auto iter = m_renderedObjects.erase(m_renderedObjects.find(sceneObject));
+
+    // Remove every delegate associated and remove its actors from the scene
+    for (auto visualModel : sceneObject->getVisualModels())
+    {
+        removeVisualModel(sceneObject, visualModel);
+    }
+
+    m_renderedVisualModels.erase(sceneObject);
+
+    // Stop observing changes on the scene object
+    disconnect(sceneObject, this, &SceneObject::modified);
+    return iter;
+}
+
+void
+VTKRenderer::sceneModifed(Event* imstkNotUsed(e))
+{
+    // If the SceneObject is in the scene but not being rendered
+    for (auto sceneObject : m_scene->getSceneObjects())
+    {
+        if (m_renderedObjects.count(sceneObject) == 0)
         {
-            auto geom = visualModel->getGeometry();
-            if (visualModel && !visualModel->getRenderDelegateCreated(this))
-            {
-                auto renderDelegate = VTKRenderDelegate::makeDelegate(visualModel);
-                if (renderDelegate == nullptr)
-                {
-                    LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
-                                 << obj->getName() << "'.";
-                    continue;
-                }
-
-                m_renderDelegates.push_back(renderDelegate);
-                m_objectVtkActors.push_back(renderDelegate->getVtkActor());
-                m_vtkRenderer->AddActor(renderDelegate->getVtkActor());
-
-                auto smRenderDelegate = std::dynamic_pointer_cast<VTKSurfaceMeshRenderDelegate>(renderDelegate);
-                if (smRenderDelegate)
-                {
-                    smRenderDelegate->initializeTextures(m_textureManager);
-                }
-
-                //((vtkActor*)delegate->getVtkActor())->GetProperty()->PrintSelf(std::cout, vtkIndent());
-
-                visualModel->setRenderDelegateCreated(this, true);
-            }
+            addSceneObject(sceneObject);
+        }
+    }
+    // If the SceneObject is being rendered but not in the scene
+    for (auto i = m_renderedObjects.begin(); i != m_renderedObjects.end(); i++)
+    {
+        if (!m_scene->hasSceneObject(*i))
+        {
+            i = removeSceneObject(*i);
         }
     }
 
@@ -464,36 +547,52 @@ VTKRenderer::updateRenderDelegates()
             dbgVizModel->setRenderDelegateCreated(this, true);
         }
     }
+}
 
-    // Call visual update on every scene object
-    m_scene->updateVisuals();
-
-    // Update their render delegates
-    for (auto delegate : m_renderDelegates)
+void
+VTKRenderer::sceneObjectModified(Event* e)
+{
+    SceneObject* sceneObject = static_cast<SceneObject*>(e->m_sender);
+    if (sceneObject != nullptr)
     {
-        delegate->update();
-    }
-    for (auto delegate : m_debugRenderDelegates)
-    {
-        delegate->update();
+        // Note: All other solutions lead to some ugly variant, I went with this one
+        auto iter = std::find_if(m_renderedObjects.begin(), m_renderedObjects.end(),
+            [sceneObject](const std::shared_ptr<SceneObject>& i) { return i.get() == sceneObject; });
+        if (iter != m_renderedObjects.end())
+        {
+            sceneObjectModified(*iter);
+        }
     }
 }
 
 void
-VTKRenderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
+VTKRenderer::sceneObjectModified(std::shared_ptr<SceneObject> sceneObject)
 {
-    for (const auto& actor : actorList)
+    // Only diff a sceneObject being rendered
+    if (m_renderedObjects.count(sceneObject) == 0 || m_renderedVisualModels.count(sceneObject) == 0)
     {
-        m_vtkRenderer->RemoveActor(actor);
+        return;
     }
-}
 
-void
-VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
-{
-    for (const auto& actor : actorList)
+    // Now check for added/removed VisualModels
+
+    // If the VisualModel of the SceneObject is in the SceneObject but not being rendered
+    for (auto visualModel : sceneObject->getVisualModels())
     {
-        m_vtkRenderer->AddActor(actor);
+        if (m_renderedVisualModels[sceneObject].count(visualModel) == 0)
+        {
+            addVisualModel(sceneObject, visualModel);
+        }
+    }
+    // If the VisualModel of the SceneObject is being rendered but not part of the SceneObject anymore
+    const auto& visualModels = sceneObject->getVisualModels();
+    for (auto i = m_renderedVisualModels[sceneObject].begin(); i != m_renderedVisualModels[sceneObject].end(); i++)
+    {
+        auto iter = std::find(visualModels.begin(), visualModels.end(), *i);
+        if (iter == visualModels.end()) // If end, it is not part of the SceneObject anymore
+        {
+            i = removeVisualModel(sceneObject, *i);
+        }
     }
 }
 

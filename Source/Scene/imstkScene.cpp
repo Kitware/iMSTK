@@ -67,10 +67,9 @@ bool
 Scene::initialize()
 {
     // Initialize all the SceneObjects
-    for (auto const& it : m_sceneObjectsMap)
+    for (const auto& obj : m_sceneObjects)
     {
-        auto sceneObject = it.second;
-        CHECK(sceneObject->initialize()) << "Error initializing scene object: " << sceneObject->getName();
+        CHECK(obj->initialize()) << "Error initializing scene object: " << obj->getName();
     }
 
     // Build the compute graph
@@ -87,9 +86,8 @@ Scene::initialize()
     {
         Vec3d globalMin = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
         Vec3d globalMax = Vec3d(IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN, IMSTK_DOUBLE_MIN);
-        for (auto i : m_sceneObjectsMap)
+        for (const auto& obj : m_sceneObjects)
         {
-            std::shared_ptr<SceneObject> obj = i.second;
             for (auto visualModels : obj->getVisualModels())
             {
                 Vec3d min = Vec3d(IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX, IMSTK_DOUBLE_MAX);
@@ -120,15 +118,14 @@ Scene::buildTaskGraph()
 
     // Setup all SceneObject compute graphs (and segment the rigid bodies)
     std::list<std::shared_ptr<SceneObject>> rigidBodies;
-    for (auto const& it : m_sceneObjectsMap)
+    for (const auto& obj : m_sceneObjects)
     {
-        auto sceneObject = it.second;
-        if (sceneObject->getTypeName() == "RigidObject")
+        if (obj->getTypeName() == "RigidObject")
         {
-            rigidBodies.push_back(sceneObject);
+            rigidBodies.push_back(obj);
         }
 
-        sceneObject->initGraphEdges();
+        obj->initGraphEdges();
     }
 
     // Apply all the interaction graph element operations to the SceneObject graphs
@@ -139,9 +136,9 @@ Scene::buildTaskGraph()
     }
 
     // Nest all the SceneObject graphs within this Scene's ComputeGraph
-    for (auto const& it : m_sceneObjectsMap)
+    for (const auto& obj : m_sceneObjects)
     {
-        std::shared_ptr<TaskGraph> objComputeGraph = it.second->getTaskGraph();
+        std::shared_ptr<TaskGraph> objComputeGraph = obj->getTaskGraph();
         if (objComputeGraph != nullptr)
         {
             // Add edges between any nodes that are marked critical and running simulatenously
@@ -215,12 +212,6 @@ Scene::initTaskGraph()
     m_taskGraphController->initialize();
 }
 
-bool
-Scene::isObjectRegistered(const std::string& sceneObjectName) const
-{
-    return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();
-}
-
 void
 Scene::setEnableTaskTiming(bool enabled)
 {
@@ -232,27 +223,26 @@ Scene::setEnableTaskTiming(bool enabled)
     }
 }
 
-const std::vector<std::shared_ptr<SceneObject>>
-Scene::getSceneObjects() const
+std::shared_ptr<SceneObject>
+Scene::getSceneObject(const std::string& name) const
 {
-    std::vector<std::shared_ptr<SceneObject>> v;
-
-    for (auto it : m_sceneObjectsMap)
-    {
-        v.push_back(it.second);
-    }
-
-    return v;
+    auto iter = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(),
+        [name](const std::shared_ptr<SceneObject>& i) { return i->getName() == name; });
+    return (iter == m_sceneObjects.end()) ? nullptr : *iter;
 }
 
-std::shared_ptr<SceneObject>
-Scene::getSceneObject(const std::string& sceneObjectName) const
+bool
+Scene::hasSceneObject(std::shared_ptr<SceneObject> sceneObject)
 {
-    CHECK(this->isObjectRegistered(sceneObjectName))
-        << "No scene object named '" << sceneObjectName
-        << "' was registered in this scene.";
+    return m_sceneObjects.count(sceneObject) != 0;
+}
 
-    return m_sceneObjectsMap.at(sceneObjectName);
+bool
+Scene::hasSceneObjectName(const std::string& name)
+{
+    auto iter = std::find_if(m_sceneObjects.begin(), m_sceneObjects.end(),
+        [name](const std::shared_ptr<SceneObject>& i) { return i->getName() == name; });
+    return iter != m_sceneObjects.end();
 }
 
 const std::vector<std::shared_ptr<VisualModel>>
@@ -271,17 +261,18 @@ Scene::getDebugRenderModels() const
 void
 Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {
-    std::string newSceneObjectName = newSceneObject->getName();
+    std::string name = newSceneObject->getName();
 
-    if (this->isObjectRegistered(newSceneObjectName))
+    if (this->hasSceneObjectName(name))
     {
-        LOG(WARNING) << "Can not add object: '" << newSceneObjectName
+        LOG(WARNING) << "Can not add object: '" << name
                      << "' is already registered in this scene.";
         return;
     }
 
-    m_sceneObjectsMap[newSceneObjectName] = newSceneObject;
-    LOG(INFO) << newSceneObjectName << " object added to " << m_name;
+    m_sceneObjects.insert(newSceneObject);
+    this->postEvent(Event(modified()));
+    LOG(INFO) << name << " object added to " << m_name;
 }
 
 void
@@ -297,21 +288,37 @@ Scene::addDebugVisualModel(std::shared_ptr<VisualModel> dbgRenderModel)
     }
 
     m_DebugRenderModelMap[name] = dbgRenderModel;
+    this->postEvent(Event(modified()));
     LOG(INFO) << name << " debug model added to " << m_name;
 }
 
 void
-Scene::removeSceneObject(const std::string& sceneObjectName)
+Scene::removeSceneObject(const std::string& name)
 {
-    if (!this->isObjectRegistered(sceneObjectName))
+    std::shared_ptr<SceneObject> obj = getSceneObject(name);
+    if (obj == nullptr)
     {
-        LOG(WARNING) << "No object named '" << sceneObjectName
+        LOG(WARNING) << "No object named '" << name
                      << "' was registered in this scene.";
         return;
     }
+    removeSceneObject(obj);
+}
 
-    m_sceneObjectsMap.erase(sceneObjectName);
-    LOG(INFO) << sceneObjectName << " object removed from " << m_name;
+void
+Scene::removeSceneObject(std::shared_ptr<SceneObject> sceneObject)
+{
+    if (m_sceneObjects.count(sceneObject) != 0)
+    {
+        m_sceneObjects.erase(sceneObject);
+        this->postEvent(Event(modified()));
+        LOG(INFO) << sceneObject->getName() << " object removed from scene " << m_name;
+    }
+    else
+    {
+        LOG(WARNING) << "Could not remove SceneObject '" << sceneObject->getName() << "', does not exist in the scene";
+        return;
+    }
 }
 
 bool
@@ -361,6 +368,7 @@ Scene::addLight(std::shared_ptr<Light> newLight)
     }
 
     m_lightsMap[newlightName] = newLight;
+    this->postEvent(Event(modified()));
     LOG(INFO) << newlightName << " light added to " << m_name;
 }
 
@@ -382,6 +390,7 @@ void
 Scene::addController(std::shared_ptr<TrackingDeviceControl> controller)
 {
     m_trackingControllers.push_back(controller);
+    this->postEvent(Event(modified()));
 }
 
 void
@@ -394,12 +403,10 @@ void
 Scene::resetSceneObjects()
 {
     // Apply the geometry and apply maps to all the objects
-    for (auto obj : this->getSceneObjects())
+    for (auto obj : m_sceneObjects)
     {
         obj->reset();
     }
-
-    //\todo reset the timestep to the fixed default value when paused->run or reset
 }
 
 void
@@ -481,9 +488,9 @@ Scene::advance(const double dt)
 void
 Scene::updateVisuals()
 {
-    for (auto obj : m_sceneObjectsMap)
+    for (auto obj : m_sceneObjects)
     {
-        obj.second->visualUpdate();
+        obj->visualUpdate();
     }
 }
 

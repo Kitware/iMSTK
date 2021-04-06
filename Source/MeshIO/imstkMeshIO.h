@@ -48,7 +48,10 @@ enum class MeshFileType
     NRRD,
     DCM,
     NII,
-    MHD
+    MHD,
+    JPG,
+    PNG,
+    BMP
 };
 
 ///

@@ -44,29 +44,30 @@ class SceneObject : public SceneEntity
 {
 public:
     SceneObject(const std::string& name);
-    virtual ~SceneObject() override = default;
+    virtual ~SceneObject() override= default;
+
+public:
+    SIGNAL(SceneObject,modified);
 
 public:
     ///
     /// \brief Get the type of the object
     ///
-    virtual const std::string getTypeName() const { return "SceneObject"; }
+    virtual const std::string getTypeName() const{ return "SceneObject"; }
 
     ///
     /// \brief Get the computational graph
     ///
-    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
+    std::shared_ptr<TaskGraph> getTaskGraph() const{ return m_taskGraph; }
 
     ///
     /// \brief Get/Set the custom name of the scene object
     ///
-    const std::string& getName() const { return m_name; }
+    const std::string& getName() const{ return m_name; }
     void setName(const std::string& name) { m_name = name; }
 
     ///
-    /// \brief DEPRECATED: Get/Set geometry used for viewing
-    ///
-    /// Use getVisualModel() and addVisualModel() instead
+    /// \brief Sets the visual geometry, adds (sets the first) VisualModel
     ///
     std::shared_ptr<Geometry> getVisualGeometry() const;
     void setVisualGeometry(std::shared_ptr<Geometry> geometry);
@@ -75,7 +76,21 @@ public:
     /// \brief Get/add visual model
     ///
     std::shared_ptr<VisualModel> getVisualModel(unsigned int index) { return m_visualModels[index]; }
-    void addVisualModel(std::shared_ptr<VisualModel> visualModel) { m_visualModels.push_back(visualModel); }
+    void addVisualModel(std::shared_ptr<VisualModel> visualModel)
+    {
+        m_visualModels.push_back(visualModel);
+        this->postEvent(Event(modified()));
+    }
+
+    void removeVisualModel(std::shared_ptr<VisualModel> visualModel)
+    {
+        auto iter = std::find(m_visualModels.begin(),m_visualModels.end(),visualModel);
+        if (iter != m_visualModels.end())
+        {
+            m_visualModels.erase(iter);
+        }
+        this->postEvent(Event(modified()));
+    }
 
     ///
     /// \brief Get all visual models
@@ -90,17 +105,17 @@ public:
     ///
     /// \brief Get the master geometry
     ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const { return this->getVisualGeometry(); }
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const{ return this->getVisualGeometry(); }
 
     ///
     /// \brief Returns the computational node for updating
     ///
-    std::shared_ptr<TaskNode> getUpdateNode() const { return m_updateNode; }
+    std::shared_ptr<TaskNode> getUpdateNode() const{ return m_updateNode; }
 
     ///
     /// \brief Returns the computational node for updating geometry
     ///
-    std::shared_ptr<TaskNode> getUpdateGeometryNode() const { return m_updateGeometryNode; }
+    std::shared_ptr<TaskNode> getUpdateGeometryNode() const{ return m_updateGeometryNode; }
 
     ///
     /// \brief Update the SceneObject, called during scene update
@@ -136,7 +151,7 @@ protected:
     ///
     /// \brief Setup connectivity of the compute graph
     ///
-    virtual void initGraphEdges(std::shared_ptr<TaskNode> source, std::shared_ptr<TaskNode> sink);
+    virtual void initGraphEdges(std::shared_ptr<TaskNode> source,std::shared_ptr<TaskNode> sink);
 
 protected:
     std::string m_name;                                       ///> Custom name of the scene object
