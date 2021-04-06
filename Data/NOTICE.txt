@@ -1,0 +1,6 @@
+This directory contains all the data we have procurred and gives attribution to various authors.
+
+Title: Material Pack 9
+Author: Julio Sillet
+Source: https://gumroad.com/juliosillet?sort=page_layout
+License: CC-BY http://creativecommons.org/licenses/by/4.0/
