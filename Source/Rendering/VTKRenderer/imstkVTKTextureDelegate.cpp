@@ -29,6 +29,7 @@
 #include <vtkImageReader2Factory.h>
 #include <vtkPNGReader.h>
 #include <vtkTexture.h>
+#include <vtksys/SystemTools.hxx>
 
 namespace imstk
 {
@@ -41,6 +42,9 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
     std::shared_ptr<ImageData> imstkImgData = texture->getImageData();
     if (imstkImgData == nullptr)
     {
+        CHECK(vtksys::SystemTools::FileExists(tFileName.c_str()))
+            << "VTKTextureDelegate::loadTexture error: texture file \"" << tFileName << "\" does not exist";
+
         // Load by file name
         vtkNew<vtkImageReader2Factory> readerFactory;
         if (texture->getType() == Texture::Type::Cubemap)
