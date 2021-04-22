@@ -7,6 +7,8 @@ imstk_add_library( Geometry
     Common
     ${VTK_LIBRARIES})
 
+target_compile_options(Geometry PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------

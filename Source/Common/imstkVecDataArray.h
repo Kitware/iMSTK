@@ -173,6 +173,41 @@ public:
 
     virtual ~VecDataArray() override = default;
 
+    ///
+    /// \brief Templated copy the current array with a new internal data type, does not change the number 
+    ///        of components, pass in the new type as a template argument
+    ///
+    template <class U> 
+    VecDataArray<U, N> cast()
+    {
+        if (m_mapped) throw(std::runtime_error("Can't cast a mapped array"));
+        VecDataArray<U, N> other;
+        other.reserve(size());
+        for (auto item : *this)
+        {
+            other.push_back(item.cast<U>());
+        }
+        return other;
+    }
+
+    /// 
+    /// \brief Cast array to the IMSTK type on the abstract interface, does not 
+    ///        change the number of components
+    /// 
+    std::unique_ptr<AbstractDataArray> cast(imstk::ScalarType type) override
+    {
+        if (type == AbstractDataArray::m_scalarType) return (std::make_unique <VecDataArray<T, N>>(*this));
+        switch (type)
+        {
+            case IMSTK_FLOAT:
+                return std::make_unique<VecDataArray<float,N>>(cast<float>());
+            case IMSTK_DOUBLE:
+                return std::make_unique<VecDataArray<double,N>>(cast<double>());
+            default:
+                throw(std::runtime_error("Cast to target type not implemented"));
+        }
+    }
+
 public:
     ///
     /// \brief Resize data array to hold exactly size number of values

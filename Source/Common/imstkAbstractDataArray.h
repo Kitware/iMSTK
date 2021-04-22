@@ -33,8 +33,7 @@ namespace imstk
 ///
 class AbstractDataArray : public EventObject
 {
-// Users should not be able to construct
-protected:
+public:
     AbstractDataArray() : m_scalarType(IMSTK_VOID), m_size(0), m_capacity(0) { }
 
     AbstractDataArray(const int size) : m_scalarType(IMSTK_VOID), m_size(size), m_capacity(size) { }
@@ -44,7 +43,7 @@ protected:
     ///
     virtual ~AbstractDataArray() { };
 
-public:
+
     SIGNAL(AbstractDataArray,modified);
 
 public:
@@ -87,6 +86,12 @@ public:
     /// \brief Returns the number of components
     ///
     inline virtual int getNumberOfComponents() const{ return 1; }
+
+    ///
+    /// \brief cast the content to the given imstk scalar type without
+    ///        having to know the type of the enclosed array
+    /// 
+    virtual std::unique_ptr<AbstractDataArray> cast(imstk::ScalarType) = 0;
 
 public:
     ///

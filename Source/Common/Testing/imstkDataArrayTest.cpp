@@ -162,6 +162,49 @@ TEST(imstkDataArrayTest, Iterators)
     }
 }
 
+TEST(imstkDataArrayTest, ScalarType)
+{
+    DataArray<int> a;
+    EXPECT_EQ(IMSTK_INT, a.getScalarType());
+    DataArray<double> b;
+    EXPECT_EQ(IMSTK_DOUBLE, b.getScalarType());
+}
+
+TEST(imstkDataArrayTest, TypeCast)
+{
+    DataArray<int> a{ 1, 2, 3, 4 };
+
+    auto b = a.cast<double>();
+
+    ASSERT_EQ(IMSTK_DOUBLE, b.getScalarType());
+    ASSERT_EQ(a.size(), b.size());
+
+    for (int i = 0; i < a.size(); ++i)
+    {
+        EXPECT_DOUBLE_EQ(static_cast<double>(a[i]), b[i]);
+    }
+}
+
+TEST(imstkDataArrayTest, ParameterCast)
+{
+    DataArray<int> a{ 1, 2, 3, 4 };
+    AbstractDataArray* abstractA = &a;
+
+    auto b = abstractA->cast(IMSTK_DOUBLE);
+    ASSERT_NE(nullptr, b);
+
+    auto actualB = dynamic_cast<DataArray<double>*>(b.get());
+    ASSERT_NE(nullptr, actualB);
+    ASSERT_EQ(IMSTK_DOUBLE, actualB->getScalarType());
+    ASSERT_EQ(a.size(), actualB->size());
+
+    for (int i = 0; i < a.size(); ++i)
+    {
+        EXPECT_DOUBLE_EQ(static_cast<double>(a[i]), (*actualB)[i]);
+    }
+}
+
+
 int
 imstkDataArrayTest(int argc, char* argv[])
 {

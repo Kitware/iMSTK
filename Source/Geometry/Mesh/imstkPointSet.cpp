@@ -175,6 +175,20 @@ PointSet::applyTransform(const Mat4d& m)
     this->updatePostTransformData();
 }
 
+void PointSet::enforceType(
+    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& attributes,
+    const std::string& name, const std::string& label, ScalarType type, int components)
+{
+    if (attributes[name]->getScalarType() != type)
+    {
+        auto attribute = attributes[name];
+        CHECK(attribute->getNumberOfComponents() == components) << label << "need to have " << components << "components in " << getName();
+        LOG(INFO) << "Geometry: " << getName() << " selected array for " << " not of type " << ", casting.";
+        auto newArray = attribute->cast(type);
+        attributes[name] = std::move(newArray);
+    }
+}
+
 void
 PointSet::updatePostTransformData() const
 {
@@ -272,6 +286,7 @@ PointSet::setVertexNormals(const std::string& arrayName)
     if (hasVertexAttribute(arrayName))
     {
         m_activeVertexNormals = arrayName;
+        enforceType(m_vertexAttributes,arrayName, "Vertex Normals", IMSTK_DOUBLE, 3);
     }
 }
 
@@ -301,6 +316,7 @@ PointSet::setVertexTangents(const std::string& arrayName)
     if (hasVertexAttribute(arrayName))
     {
         m_activeVertexTangents = arrayName;
+        enforceType(m_vertexAttributes, arrayName, "Vertex Tangents", IMSTK_FLOAT, 3);
     }
 }
 
@@ -330,6 +346,7 @@ PointSet::setVertexTCoords(const std::string& arrayName)
     if (hasVertexAttribute(arrayName))
     {
         m_activeVertexTCoords = arrayName;
+        enforceType(m_vertexAttributes, arrayName, "Vertex Texture Coords", IMSTK_FLOAT, 2);
     }
 }
 
