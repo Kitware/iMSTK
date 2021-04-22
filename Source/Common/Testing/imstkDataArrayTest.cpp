@@ -187,7 +187,7 @@ TEST(imstkDataArrayTest, TypeCast)
 
 TEST(imstkDataArrayTest, ParameterCast)
 {
-    DataArray<int> a{ 1, 2, 3, 4 };
+    DataArray<int>     a{ 1, 2, 3, 4 };
     AbstractDataArray* abstractA = &a;
 
     auto b = abstractA->cast(IMSTK_DOUBLE);
@@ -203,7 +203,6 @@ TEST(imstkDataArrayTest, ParameterCast)
         EXPECT_DOUBLE_EQ(static_cast<double>(a[i]), (*actualB)[i]);
     }
 }
-
 
 int
 imstkDataArrayTest(int argc, char* argv[])

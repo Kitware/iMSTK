@@ -175,7 +175,8 @@ PointSet::applyTransform(const Mat4d& m)
     this->updatePostTransformData();
 }
 
-void PointSet::enforceType(
+void
+PointSet::enforceType(
     std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& attributes,
     const std::string& name, const std::string& label, ScalarType type, int components)
 {
@@ -286,7 +287,7 @@ PointSet::setVertexNormals(const std::string& arrayName)
     if (hasVertexAttribute(arrayName))
     {
         m_activeVertexNormals = arrayName;
-        enforceType(m_vertexAttributes,arrayName, "Vertex Normals", IMSTK_DOUBLE, 3);
+        enforceType(m_vertexAttributes, arrayName, "Vertex Normals", IMSTK_DOUBLE, 3);
     }
 }
 

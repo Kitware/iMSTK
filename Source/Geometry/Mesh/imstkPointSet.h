@@ -203,11 +203,11 @@ protected:
 
     ///
     /// \brief Enforce type requirements and check for the number of components
-    /// 
-    /// For the special attributes we require the type and number of components to 
-    /// be correct, when the user uses `setAttribute` or `setAttributes` we cannot 
-    /// enforce this through the interface, this function is used by the `set<Attribute>` 
-    /// functions to coerce the type to the correct type. It will convert the type inside 
+    ///
+    /// For the special attributes we require the type and number of components to
+    /// be correct, when the user uses `setAttribute` or `setAttributes` we cannot
+    /// enforce this through the interface, this function is used by the `set<Attribute>`
+    /// functions to coerce the type to the correct type. It will convert the type inside
     /// of attributes to the type determine by the `type` parameter
     void enforceType(
         std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& attributes,

@@ -28,39 +28,37 @@
 
 using namespace imstk;
 
-namespace {
-
+namespace
+{
 auto floatArray3 = std::make_shared<VecDataArray<float, 3>>(VecDataArray<float, 3>({
-    Vec3f{0.0f, 0.1f, 0.2f},
-    Vec3f{1.0f, 1.1f, 1.2f},
-    Vec3f{2.0f, 2.1f, 2.2f},
+        Vec3f{ 0.0f, 0.1f, 0.2f },
+        Vec3f{ 1.0f, 1.1f, 1.2f },
+        Vec3f{ 2.0f, 2.1f, 2.2f },
 }));
 
 auto doubleArray3 = std::make_shared<VecDataArray<double, 3>>(VecDataArray<double, 3>({
-    Vec3d{0.0, 0.1, 0.2},
-    Vec3d{1.0, 1.1, 1.2},
-    Vec3d{2.0, 2.1, 2.2},
-    Vec3d{3.0, 3.1, 3.2},
+        Vec3d{ 0.0, 0.1, 0.2 },
+        Vec3d{ 1.0, 1.1, 1.2 },
+        Vec3d{ 2.0, 2.1, 2.2 },
+        Vec3d{ 3.0, 3.1, 3.2 },
  }));
 
 auto floatArray2 = std::make_shared<VecDataArray<float, 2>>(VecDataArray<float, 2>({
-    Vec2f{0.0f, 0.1f},
-    Vec2f{1.0f, 1.1f},
-    Vec2f{2.0f, 2.1f},
+        Vec2f{ 0.0f, 0.1f },
+        Vec2f{ 1.0f, 1.1f },
+        Vec2f{ 2.0f, 2.1f },
     }));
 
 auto doubleArray2 = std::make_shared<VecDataArray<double, 2>>(VecDataArray<double, 2>({
-    Vec2d{0.0, 0.1},
-    Vec2d{1.0, 1.1},
-    Vec2d{2.0, 2.1},
+        Vec2d{ 0.0, 0.1 },
+        Vec2d{ 1.0, 1.1 },
+        Vec2d{ 2.0, 2.1 },
     }));
 
-
 std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>> attributes = {
-    {"float3", floatArray3}, {"double3", doubleArray3},
-    {"float2", floatArray2}, {"double2", doubleArray2}
+    { "float3", floatArray3 }, { "double3", doubleArray3 },
+    { "float2", floatArray2 }, { "double2", doubleArray2 }
 };
-
 }
 
 TEST(imstkPointSetTest, VertexNormalAttributes)
@@ -104,7 +102,6 @@ TEST(imstkPointSetTest, VertexTangentAttributes)
     {
         EXPECT_TRUE((*doubleArray3)[i].cast<float>().isApprox((*tangents)[i]));
     }
-
 
     // HS 2021-apr-04 Death tests don't work with the current infrastructure
     //ASSERT_DEATH(p.setVertexTangents("float2"), ".*");
