@@ -73,7 +73,7 @@ IterativeLinearSolver::solve(Vectord& imstkNotUsed(x))
     /*
     if (!m_linearSystem)
     {
-        LOG(WARNING) << "IterativeLinearSolver::solve: The linear system should be assigned before solving!";
+        LOG(WARNING) << "The linear system should be assigned before solving!";
         return;
     }
 

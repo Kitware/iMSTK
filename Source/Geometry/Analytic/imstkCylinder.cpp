@@ -57,7 +57,7 @@ Cylinder::getLength(DataType type /* = DataType::PostTransform */)
 void
 Cylinder::setRadius(const double r)
 {
-    CHECK(r > 0) << "Cylinder::setRadius error: radius should be positive.";
+    CHECK(r > 0) << "error: radius should be positive.";
 
     if (m_radius == r)
     {
@@ -74,7 +74,7 @@ Cylinder::setLength(const double l)
 {
     if (l <= 0)
     {
-        LOG(WARNING) << "Cylinder::setLength error: length should be positive.";
+        LOG(WARNING) << "error: length is negative.";
         return;
     }
     if (m_length == l)

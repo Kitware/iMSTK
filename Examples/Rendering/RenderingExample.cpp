@@ -35,6 +35,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkVisualModel.h"
 #include "imstkVTKViewer.h"
+#include "imstkLogger.h"
 
 using namespace imstk;
 
@@ -45,6 +46,9 @@ using namespace imstk;
 int
 main()
 {
+    // Write log to stdout and file
+    Logger::startLogger();
+
     imstkNew<Scene> scene("Rendering");
     {
         // Add IBL Probe

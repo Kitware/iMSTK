@@ -78,7 +78,7 @@ ObjectIO::importSceneObject(
         && type != MeshFileType::FBX
         && type != MeshFileType::DAE)
     {
-        LOG(FATAL) << "File type not supported";
+        LOG(FATAL) << "Error: File type not supported! Input model file path: " << modelFilePath;
         return nullptr;
     }
 
@@ -89,7 +89,7 @@ ObjectIO::importSceneObject(
     const aiScene*   scene = importer.ReadFile(modelFilePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
-    CHECK(scene != nullptr && scene->HasMeshes()) << "AssimpMeshIO::readMeshData error: could not read with reader: "
+    CHECK(scene != nullptr && scene->HasMeshes()) << "Error: could not read model with Assimp reader! Input model file path: "
                                                   << modelFilePath;
 
     // Iterate over each material

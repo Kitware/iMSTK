@@ -47,7 +47,7 @@ Cube::setWidth(const double w)
 {
     if (w <= 0)
     {
-        LOG(WARNING) << "Cube::setWidth error: width should be positive.";
+        LOG(WARNING) << "error: width should be positive.";
         return;
     }
     if (m_width == w)

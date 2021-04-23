@@ -40,8 +40,7 @@ PickingCH::PickingCH(const CollisionHandling::Side&       side,
 void
 PickingCH::processCollisionData()
 {
-    CHECK(m_object != nullptr) << "PickingCH::handleCollision error: "
-                               << "no picking collision handling available the object";
+    CHECK(m_object != nullptr) << "error: no picking collision handling available the object";
 
     this->addPickConstraints(m_object);
 }
@@ -56,8 +55,7 @@ PickingCH::addPickConstraints(std::shared_ptr<FeDeformableObject> deformableObj)
         return;
     }
 
-    CHECK(deformableObj != nullptr) << "PenaltyRigidCH::addPickConstraints error: "
-                                    << " not a deformable object.";
+    CHECK(deformableObj != nullptr) << "error: not a deformable object.";
 
     std::shared_ptr<FEMDeformableBodyModel> model = deformableObj->getFEMModel();
     const Vectord&                          Uprev = model->getCurrentState()->getQ();

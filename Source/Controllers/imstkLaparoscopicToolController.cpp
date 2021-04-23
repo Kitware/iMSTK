@@ -57,7 +57,7 @@ LaparoscopicToolController::update(const double dt)
     {
         if (!updateTrackingData(dt))
         {
-            LOG(WARNING) << "LaparoscopicToolController::updateControlledObjects warning: could not update tracking info.";
+            LOG(WARNING) << "warning: could not update tracking info.";
             return;
         }
     }
