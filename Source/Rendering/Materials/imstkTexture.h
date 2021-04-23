@@ -91,7 +91,9 @@ public:
     virtual ~Texture() = default;
 
 public:
-    SIGNAL(Texture,modified);
+    // *INDENT-OFF*
+    SIGNAL(Texture, modified);
+    // *INDENT-ON*
 
     void postModified() { this->postEvent(Event(modified())); }
 
@@ -114,7 +116,7 @@ public:
     ///
     /// \brief Get path
     ///
-    const std::string& getPath() const{ return m_path; }
+    const std::string& getPath() const { return m_path; }
 
     ///
     /// \brief Get file extension
@@ -124,22 +126,22 @@ public:
     ///
     /// \brief Get if mipmaps are enabled
     ///
-    const bool getMipmapsEnabled() const{ return m_mipmapsEnabled; }
+    const bool getMipmapsEnabled() const { return m_mipmapsEnabled; }
 
     ///
     /// \brief Get if repeat is enabled, if off it clamps
     ///
-    const bool getRepeating() const{ return m_repeating; }
+    const bool getRepeating() const { return m_repeating; }
 
     ///
     /// \brief Get if anisotropic filtering is enabled
     ///
-    const bool isAnisotropyEnabled() const{ return m_anisotropyEnabled; }
+    const bool isAnisotropyEnabled() const { return m_anisotropyEnabled; }
 
     ///
     /// \brief Get anisotropy factor
     ///
-    const double getAnisotropyFactor() const{ return m_anisotropyFactor; }
+    const double getAnisotropyFactor() const { return m_anisotropyFactor; }
 
     ///
     /// \brief Set the input image data, not required (paths to files can be used instead)
@@ -149,7 +151,7 @@ public:
     ///
     /// \brief Get the input image data for the texture, not required (paths to files can be used instead)
     ///
-    std::shared_ptr<ImageData> getImageData() const{ return imageTexture; }
+    std::shared_ptr<ImageData> getImageData() const { return imageTexture; }
 
 protected:
     std::shared_ptr<ImageData> imageTexture = nullptr;

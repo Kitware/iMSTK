@@ -52,43 +52,45 @@ public:
 
 public:
     Module() = default;
-    virtual ~Module() override= default;
+    virtual ~Module() override = default;
 
 public:
+    // *INDENT-OFF*
     ///
     /// \brief Posted before updateModule is called
     ///
-    SIGNAL(Module,preUpdate);
+    SIGNAL(Module, preUpdate);
 
     ///
     /// \brief Posted after updateModule is called
     ///
-    SIGNAL(Module,postUpdate);
+    SIGNAL(Module, postUpdate);
 
     ///
     /// \brief Posted when module wants to end
     ///
-    SIGNAL(Module,end);
+    SIGNAL(Module, end);
+    // *INDENT-ON*
 
 public:
     ///
     /// \brief Get/Set the timestep
     ///
-    double getDt() const{ return m_dt; }
+    double getDt() const { return m_dt; }
     void setDt(const double dt) { m_dt = dt; }
 
     ///
     /// \brief Get whether the module is initialized yet
     ///
-    bool getInit() const{ return m_init; }
+    bool getInit() const { return m_init; }
 
     ///
     /// \brief Set/Get whether the module is currently paused
     ///
-    bool getPaused() const{ return m_paused; }
+    bool getPaused() const { return m_paused; }
     void setPaused(const bool paused) { m_paused = paused; }
 
-    ExecutionType getExecutionType() const{ return m_executionType; }
+    ExecutionType getExecutionType() const { return m_executionType; }
     void setExecutionType(const ExecutionType type) { m_executionType = type; }
 
     void setSleepDelay(const double ms) { sleepDelay = ms; }
@@ -105,7 +107,7 @@ public:
         {
             if (sleepDelay != 0.0)
             {
-                std::this_thread::sleep_for(std::chrono::duration<double,std::milli>(sleepDelay));
+                std::this_thread::sleep_for(std::chrono::duration<double, std::milli>(sleepDelay));
             }
 
             if (muteUpdateEvents)
