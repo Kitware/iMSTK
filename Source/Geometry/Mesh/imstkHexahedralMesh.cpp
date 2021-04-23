@@ -121,14 +121,14 @@ HexahedralMesh::computeAttachedSurfaceMesh()
     this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
     if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
     {
-        LOG(FATAL) << "HexahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
+        LOG(FATAL) << "error: surface mesh was not extracted.";
     }
 }
 
 bool
 HexahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
-    LOG(FATAL) << "HexahedralMesh::extractSurfaceMesh error: not implemented.";
+    LOG(FATAL) << "error: not implemented.";
     return false;
 }
 

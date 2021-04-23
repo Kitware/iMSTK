@@ -69,7 +69,7 @@ RigidBodyModel::initialize()
     }
     else
     {
-        LOG(WARNING) << "RigidBodyModel::initialize(): - Cannot initialize without valid model geometry";
+        LOG(WARNING) << "Cannot initialize without valid model geometry";
         return false;
     }
 }

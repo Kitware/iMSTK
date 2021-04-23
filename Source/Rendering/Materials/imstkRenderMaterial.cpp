@@ -166,7 +166,7 @@ RenderMaterial::getTexture(Texture::Type type)
 {
     if (type >= Texture::Type::None)
     {
-        LOG(WARNING) << "RenderMaterial::getTexture error: Invalid texture format";
+        LOG(WARNING) << "error: Invalid texture format";
         return nullptr;
     }
     return m_textures[(unsigned int)type];
@@ -177,7 +177,7 @@ RenderMaterial::addTexture(std::shared_ptr<Texture> texture)
 {
     if (texture->getType() >= Texture::Type::None)
     {
-        LOG(WARNING) << "RenderMaterial::addTexture: Invalid texture format";
+        LOG(WARNING) << "Invalid texture format";
         return;
     }
     m_textures[static_cast<size_t>(texture->getType())] = texture;

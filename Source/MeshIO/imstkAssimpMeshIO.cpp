@@ -46,7 +46,7 @@ AssimpMeshIO::read(
         return AssimpMeshIO::readMeshData(filePath);
         break;
     default:
-        LOG(WARNING) << "AssimpMeshIO::read error: file type not supported";
+        LOG(WARNING) << "Error: file type not supported for input " << filePath;
         return nullptr;
         break;
     }
@@ -60,12 +60,18 @@ AssimpMeshIO::readMeshData(const std::string& filePath)
     auto             scene = importer.ReadFile(filePath, AssimpMeshIO::getDefaultPostProcessSteps());
 
     // Check if there is actually a mesh or if the file can be read
-    CHECK(scene != nullptr && scene->HasMeshes()) << "AssimpMeshIO::readMeshData error: could not read with reader.";
+    CHECK(scene != nullptr && scene->HasMeshes()) << "Error: could not read with Assimp reader for input " << filePath;
 
     // Get first mesh
     auto importedMesh = scene->mMeshes[0];
 
-    return AssimpMeshIO::convertAssimpMesh(importedMesh);
+    auto surfMesh = AssimpMeshIO::convertAssimpMesh(importedMesh);
+    if (!surfMesh)
+    {
+        LOG(WARNING) << "Error: Invalid surface mesh. Input: " << filePath;
+    }
+
+    return surfMesh;
 }
 
 std::shared_ptr<SurfaceMesh>
@@ -80,7 +86,7 @@ AssimpMeshIO::convertAssimpMesh(aiMesh* importedMesh)
 
     if (numVertices == 0)
     {
-        LOG(WARNING) << "AssimpMeshIO::readMeshData error: mesh has no vertices.";
+        LOG(WARNING) << "Error: mesh has no vertices.";
         return nullptr;
     }
 

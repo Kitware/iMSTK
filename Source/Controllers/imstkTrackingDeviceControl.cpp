@@ -44,7 +44,7 @@ TrackingDeviceControl::updateTrackingData(const double dt)
 {
     if (m_deviceClient == nullptr)
     {
-        LOG(WARNING) << "DeviceTracker::getTrackingData warning: no controlling device set.";
+        LOG(WARNING) << "warning: no controlling device set.";
         return false;
     }
 

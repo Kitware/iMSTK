@@ -65,7 +65,7 @@ Plane::setWidth(const double w)
 {
     if (w <= 0)
     {
-        LOG(WARNING) << "Plane::setWidth error: width should be positive.";
+        LOG(WARNING) << "error: width is negative.";
         return;
     }
     if (m_width == w)

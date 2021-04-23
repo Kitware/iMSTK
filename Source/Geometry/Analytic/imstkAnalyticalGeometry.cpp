@@ -83,8 +83,7 @@ AnalyticalGeometry::setOrientationAxis(const Vec3d orientation)
 {
     if (orientation == Vec3d::Zero())
     {
-        LOG(WARNING) << "AnalyticalGeometry::setOrientationAxis error: "
-                     << "orientation can not be defined by a null vector.";
+        LOG(WARNING) << "error: orientation can not be defined by a null vector.";
         return;
     }
     if (m_orientationAxis == orientation)

@@ -91,7 +91,7 @@ LevelSetCH::processCollisionData()
 
     if (grid == nullptr)
     {
-        LOG(FATAL) << "LevelSetCH::processCollisionData: level set model geometry is not ImageData";
+        LOG(FATAL) << "Error: level set model geometry is not ImageData";
         return;
     }
 

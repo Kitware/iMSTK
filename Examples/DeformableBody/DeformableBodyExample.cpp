@@ -81,6 +81,8 @@ main()
         input.fixedNodeIds = { 75, 82, 84, 94, 95, 105, 110, 124, 139, 150, 161, 171, 350 };
     }
 
+    LOG(WARNING) << "here";
+
     // Construct the scene
     imstkNew<Scene> scene("DeformableBodyFEM");
     {

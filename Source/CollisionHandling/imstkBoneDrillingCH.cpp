@@ -36,7 +36,7 @@ BoneDrillingCH::BoneDrillingCH(const Side&                          side,
 {
     auto boneMesh = std::dynamic_pointer_cast<TetrahedralMesh>(m_bone->getCollidingGeometry());
 
-    CHECK(boneMesh != nullptr) << "BoneDrillingCH::BoneDrillingCH Error:The bone colliding geometry is not a mesh!";
+    CHECK(boneMesh != nullptr) << "Error:The bone colliding geometry is not a mesh!";
 
     // Initialize bone density values
     m_nodalDensity.reserve(boneMesh->getNumVertices());

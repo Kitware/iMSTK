@@ -43,7 +43,7 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
     if (imstkImgData == nullptr)
     {
         CHECK(vtksys::SystemTools::FileExists(tFileName.c_str()))
-            << "VTKTextureDelegate::loadTexture error: texture file \"" << tFileName << "\" does not exist";
+            << "Error: texture file \"" << tFileName << "\" does not exist";
 
         // Load by file name
         vtkNew<vtkImageReader2Factory> readerFactory;
@@ -61,7 +61,7 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
 
                 vtkImageReader2* imgReader = readerFactory->CreateImageReader2(sideName.c_str());
 
-                CHECK(imgReader != nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+                CHECK(imgReader != nullptr) << "Error: could not find reader for "
                                             << sideName;
 
                 auto imageFlip = vtkSmartPointer<vtkImageFlip>::New();
@@ -76,7 +76,7 @@ VTKTextureDelegate::VTKTextureDelegate(std::shared_ptr<Texture> texture) : m_vtk
         {
             vtkImageReader2* imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
 
-            CHECK(imgReader != nullptr) << "VTKTextureDelegate::loadTexture error: could not find reader for "
+            CHECK(imgReader != nullptr) << "Error: could not find reader for "
                                         << tFileName;
 
             imgReader->SetFileName(tFileName.c_str());
