@@ -200,7 +200,8 @@ public:
     std::unique_ptr<AbstractDataArray> cast(imstk::ScalarType type) override
     {
         if (type == AbstractDataArray::m_scalarType) { return (std::make_unique<VecDataArray<T, N>>(*this)); }
-        switch (type) {
+        switch (type)
+        {
             TemplateMacro(return std::make_unique<TargetType<IMSTK_TT>>(cast<IMSTK_TT>()));
         default:
             throw(std::runtime_error("Unknown scalar type"));

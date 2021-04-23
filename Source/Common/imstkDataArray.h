@@ -388,7 +388,7 @@ public:
         for (auto& i : *this)
         {
             result.push_back(static_cast<N>(i));
-        } 
+        }
         return result;
     }
 
@@ -398,10 +398,11 @@ public:
     std::unique_ptr<AbstractDataArray> cast(ScalarType type) override
     {
         if (type == AbstractDataArray::m_scalarType) { return (std::make_unique<DataArray<T>>(*this)); }
-        switch (type) {
+        switch (type)
+        {
             TemplateMacro(return std::make_unique<DataArray<IMSTK_TT>>(cast<IMSTK_TT>()));
-            default:
-                throw(std::runtime_error("Unknown scalar type"));
+        default:
+            throw(std::runtime_error("Unknown scalar type"));
         }
     }
 
