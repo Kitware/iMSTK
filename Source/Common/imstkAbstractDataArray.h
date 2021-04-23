@@ -45,7 +45,9 @@ protected:
     virtual ~AbstractDataArray() { };
 
 public:
-    SIGNAL(AbstractDataArray,modified);
+    // *INDENT-OFF*
+    SIGNAL(AbstractDataArray, modified);
+    // *INDENT-ON*
 
 public:
     ///
@@ -71,22 +73,22 @@ public:
     ///
     /// \brief Get number of values/tuples
     ///
-    inline int size() const{ return m_size; }
+    inline int size() const { return m_size; }
 
     ///
     /// \brief Returns the scalar type of this array
     ///
-    inline ScalarType getScalarType() const{ return m_scalarType; }
+    inline ScalarType getScalarType() const { return m_scalarType; }
 
     ///
     /// \brief Return the capacity of the array
     ///
-    inline int getCapacity() const{ return m_capacity; }
+    inline int getCapacity() const { return m_capacity; }
 
     ///
     /// \brief Returns the number of components
     ///
-    inline virtual int getNumberOfComponents() const{ return 1; }
+    inline virtual int getNumberOfComponents() const { return 1; }
 
 public:
     ///

@@ -46,10 +46,12 @@ public:
     virtual ~DeviceControl() = default;
 
 public:
-    SIGNAL(TrackingDeviceControl,modified);
+    // *INDENT-OFF*
+    SIGNAL(TrackingDeviceControl, modified);
+    // *INDENT-ON*
 
 public:
-    std::shared_ptr<DeviceClient> getDevice() const{ return m_deviceClient; }
+    std::shared_ptr<DeviceClient> getDevice() const { return m_deviceClient; }
 
     virtual void setDevice(std::shared_ptr<DeviceClient> device) { m_deviceClient = device; }
 

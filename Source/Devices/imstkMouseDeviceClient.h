@@ -54,7 +54,7 @@ public:
     {
     }
 
-    virtual ~MouseEvent() override= default;
+    virtual ~MouseEvent() override = default;
 
 public:
     double m_scrollDx;          ///> Mouse scroll
@@ -81,42 +81,45 @@ protected:
     static std::shared_ptr<MouseDeviceClient> New();
 
 public:
-    virtual ~MouseDeviceClient() override= default;
+    virtual ~MouseDeviceClient() override = default;
 
     // Only the viewer is allowed to provide these objects
     friend class VTKInteractorStyle;
 
 public:
+    // *INDENT-OFF*
+
     ///
     /// \brief Posted when a button on the mouse is pressed (not continuously)
     ///
-    SIGNAL(MouseDeviceClient,mouseButtonPress);
+    SIGNAL(MouseDeviceClient, mouseButtonPress);
 
     ///
     /// \brief Posted when a button on the mouse is released (not continuously)
     ///
-    SIGNAL(MouseDeviceClient,mouseButtonRelease);
+    SIGNAL(MouseDeviceClient, mouseButtonRelease);
 
     ///
     /// \brief Posted when mouse scrolls
     ///
-    SIGNAL(MouseDeviceClient,mouseScroll);
+    SIGNAL(MouseDeviceClient, mouseScroll);
 
     ///
     /// \brief Posted when mouse moves
     ///
-    SIGNAL(MouseDeviceClient,mouseMove);
+    SIGNAL(MouseDeviceClient, mouseMove);
 
+    // *INDENT-ON*
 public:
     ///
     /// \brief Get the current position of the mouse
     ///
-    const Vec2d& getPos() const{ return m_pos; }
+    const Vec2d& getPos() const { return m_pos; }
 
     ///
     /// \brief Get the previous position of the mouse
     ///
-    const Vec2d& getPrevPos() const{ return m_prevPos; }
+    const Vec2d& getPrevPos() const { return m_prevPos; }
 
     ///
     /// \brief Query if the button is down
@@ -150,7 +153,7 @@ protected:
     void emitButtonPress(const MouseButtonType buttonId)
     {
         m_buttons[buttonId] = MOUSE_PRESS;
-        this->postEvent(MouseEvent(MouseDeviceClient::mouseButtonPress(),buttonId));
+        this->postEvent(MouseEvent(MouseDeviceClient::mouseButtonPress(), buttonId));
     }
 
     ///
@@ -159,13 +162,13 @@ protected:
     void emitButtonRelease(const MouseButtonType buttonId)
     {
         m_buttons[buttonId] = MOUSE_RELEASE;
-        this->postEvent(MouseEvent(MouseDeviceClient::mouseButtonRelease(),buttonId));
+        this->postEvent(MouseEvent(MouseDeviceClient::mouseButtonRelease(), buttonId));
     }
 
     ///
     /// \brief Post a mouse scroll event
     ///
-    void emitScroll(const double dx) { this->postEvent(MouseEvent(MouseDeviceClient::mouseScroll(),dx)); }
+    void emitScroll(const double dx) { this->postEvent(MouseEvent(MouseDeviceClient::mouseScroll(), dx)); }
 
 protected:
     Vec2d m_prevPos;
