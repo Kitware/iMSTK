@@ -25,35 +25,6 @@
 
 namespace imstk
 {
-template<typename FROM_TYPE, typename TO_TYPE>
-static void
-castArray(std::shared_ptr<DataArray<FROM_TYPE>> fromArray, std::shared_ptr<DataArray<TO_TYPE>> toArray)
-{
-    const DataArray<FROM_TYPE>& fromArrayRef = *fromArray;
-    DataArray<TO_TYPE>&         toArrayRef   = *toArray;
-    const size_t                numVals      = fromArray->size();
-    for (size_t i = 0; i < numVals; i++)
-    {
-        toArrayRef[i] = static_cast<TO_TYPE>(fromArrayRef[i]);
-    }
-}
-
-template<typename FROM_TYPE>
-static void
-castImage(std::shared_ptr<AbstractDataArray> fromScalars, std::shared_ptr<ImageData> toImage)
-{
-    const ScalarType toType = toImage->getScalars()->getScalarType();
-    switch (toType)
-    {
-        TemplateMacro(castArray(
-            std::dynamic_pointer_cast<DataArray<FROM_TYPE>>(fromScalars),
-            std::dynamic_pointer_cast<DataArray<IMSTK_TT>>(toImage->getScalars())); );
-    default:
-        LOG(WARNING) << "Unknown scalar type";
-        break;
-    }
-    ;
-}
 
 ImageData::ImageData(const std::string& name)
     : PointSet(name),
@@ -95,15 +66,9 @@ ImageData::cast(ScalarType toType)
 {
     // Create image of new type
     std::shared_ptr<ImageData> results = std::make_shared<ImageData>();
-    results->allocate(toType, m_numComps, m_dims, m_spacing, m_origin);
-    switch (m_scalarArray->getScalarType())
-    {
-        TemplateMacro(castImage<IMSTK_TT>(m_scalarArray, results); );
-    default:
-        LOG(WARNING) << "Unknown scalar type";
-        break;
-    }
-    ;
+    results->setOrigin(m_origin);
+    results->setSpacing(m_spacing);
+    results->setScalars(getScalars()->cast(toType), m_numComps, m_dims.data());
     return results;
 }
 
