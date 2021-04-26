@@ -161,7 +161,7 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
     }
     default:
     {
-        LOG(FATAL) << "RenderDelegate::makeDebugDelegate error: Geometry type incorrect.";
+        LOG(FATAL) << "error: Geometry type incorrect/unsupported";
         return nullptr; // will never be reached
     }
     }

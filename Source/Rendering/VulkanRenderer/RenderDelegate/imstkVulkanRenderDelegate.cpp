@@ -100,9 +100,6 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
     }
     case Geometry::Type::HexahedralMesh:
     {
-        /*LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
-        return nullptr;*/
-
         LOG(FATAL) << "No support for HexahedralMesh rendering with Vulkan backend!";
     }
     case Geometry::Type::DecalPool:
@@ -115,7 +112,7 @@ VulkanRenderDelegate::make_delegate(std::shared_ptr<VisualModel> visualModel,
     }
     default:
     {
-        LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
+        LOG(WARNING) << "error: Geometry type incorrect.";
         visualModel->m_renderDelegateCreated = false;
         return nullptr;
     }

@@ -39,7 +39,7 @@ CameraController::update(const double dt)
     {
         if (!updateTrackingData(dt))
         {
-            LOG(WARNING) << "CameraController::update warning: could not update tracking info.";
+            LOG(WARNING) << "warning: could not update tracking info.";
             return;
         }
     }

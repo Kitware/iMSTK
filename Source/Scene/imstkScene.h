@@ -91,16 +91,19 @@ using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
 
 public:
     Scene(const std::string& name, std::shared_ptr<SceneConfig> config = std::make_shared<SceneConfig>());
-    virtual ~Scene() override= default;
+    virtual ~Scene() override = default;
 
 public:
-    SIGNAL(Scene,configureTaskGraph);
+    // *INDENT-OFF*
+
+    SIGNAL(Scene, configureTaskGraph);
     ///
     /// \brief Called when scene is modified, when scene objects
     /// or interactions are added/removed
     ///
-    SIGNAL(Scene,modified);
+    SIGNAL(Scene, modified);
 
+    // *INDENT-ON*
 public:
     ///
     /// \brief Initialize the scene
@@ -146,7 +149,7 @@ public:
     ///
     /// \brief Return the SceneObjects of the scene
     ///
-    const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const{ return m_sceneObjects; }
+    const std::unordered_set<std::shared_ptr<SceneObject>>& getSceneObjects() const { return m_sceneObjects; }
 
     ///
     /// \brief Return a vector of shared pointers to the scene objects
@@ -157,7 +160,7 @@ public:
     ///
     /// \brief Get the scene object controllers
     ///
-    const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const{ return m_trackingControllers; }
+    const std::vector<std::shared_ptr<TrackingDeviceControl>> getControllers() const { return m_trackingControllers; }
 
     ///
     /// \brief Get SceneObject by name, returns nullptr if doesn't exist
@@ -209,7 +212,7 @@ public:
     ///
     std::shared_ptr<Light> getLight(const std::string& lightName) const;
 
-    const NamedMap<Camera>& getCameras() const{ return m_cameras; }
+    const NamedMap<Camera>& getCameras() const { return m_cameras; }
 
     ///
     /// \brief Add/remove lights from the scene
@@ -226,24 +229,24 @@ public:
     ///
     /// \brief Get the name of the scene
     ///
-    const std::string& getName() const{ return m_name; }
+    const std::string& getName() const { return m_name; }
 
     ///
     /// \brief Get the computational graph of the scene
     ///
-    std::shared_ptr<TaskGraph> getTaskGraph() const{ return m_taskGraph; }
+    std::shared_ptr<TaskGraph> getTaskGraph() const { return m_taskGraph; }
 
     ///
     /// \brief Get the camera for the scene
     ///
-    std::shared_ptr<Camera> getActiveCamera() const{ return m_activeCamera; }
+    std::shared_ptr<Camera> getActiveCamera() const { return m_activeCamera; }
 
     ///
     /// \brief Get the name of the camera, if it exists
     ///
     std::string getCameraName(std::shared_ptr<Camera> cam) const
     {
-        auto i = std::find_if(m_cameras.begin(),m_cameras.end(),
+        auto i = std::find_if(m_cameras.begin(), m_cameras.end(),
             [&cam](const NamedMap<Camera>::value_type& j) { return j.second == cam; });
         if (i != m_cameras.end())
         {
@@ -274,7 +277,7 @@ public:
     ///
     /// \brief Set the camera for the scene
     ///
-    void addCamera(std::string name,std::shared_ptr<Camera> cam) { m_cameras[name] = cam; }
+    void addCamera(std::string name, std::shared_ptr<Camera> cam) { m_cameras[name] = cam; }
 
     ///
     /// \brief Set the active camera by name
@@ -291,7 +294,7 @@ public:
     ///
     /// \brief Return the collision graph
     ///
-    std::shared_ptr<CollisionGraph> getCollisionGraph() const{ return m_collisionGraph; }
+    std::shared_ptr<CollisionGraph> getCollisionGraph() const { return m_collisionGraph; }
 
     ///
     /// \brief Add objects controllers
@@ -301,12 +304,12 @@ public:
     ///
     /// \brief Set/Get the FPS
     ///
-    double getFPS() const{ return m_fps; }
+    double getFPS() const { return m_fps; }
 
     ///
     /// \brief Get the map of elapsed times
     ///
-    const std::unordered_map<std::string,double>& getTaskComputeTimes() const{ return m_nodeComputeTimes; }
+    const std::unordered_map<std::string, double>& getTaskComputeTimes() const { return m_nodeComputeTimes; }
 
     ///
     /// \brief Lock the compute times resource
@@ -321,7 +324,7 @@ public:
     ///
     /// \brief Get the configuration
     ///
-    std::shared_ptr<SceneConfig> getConfig() const{ return m_config; };
+    std::shared_ptr<SceneConfig> getConfig() const { return m_config; };
 
 protected:
     std::shared_ptr<SceneConfig> m_config;
@@ -343,7 +346,7 @@ protected:
     std::function<void(Scene*)> m_postTaskGraphConfigureCallback = nullptr;
 
     std::shared_ptr<ParallelUtils::SpinLock> m_computeTimesLock;
-    std::unordered_map<std::string,double>   m_nodeComputeTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
+    std::unordered_map<std::string, double>  m_nodeComputeTimes; ///> Map of ComputeNode names to elapsed times for benchmarking
 
     double m_fps = 0.0;
 

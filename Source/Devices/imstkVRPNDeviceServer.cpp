@@ -39,7 +39,7 @@ VRPNDeviceServer::addDevice(const std::string& deviceName, DeviceType deviceType
 
     if (deviceType == DeviceType::PhantomOmni)
     {
-        LOG(WARNING) << "VRPNDeviceServer::addDevice warning: OpenHaptics support on VRPN "
+        LOG(WARNING) << "warning: OpenHaptics support on VRPN "
                      << "currently unstable for the Phantom Omni (no force feedback implemented).\n"
                      << "Use HDAPIDeviceClient instead of VRPNDeviceServer/Client for ";
     }
@@ -85,7 +85,7 @@ VRPNDeviceServer::initModule()
             m_deviceConnections->add(new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
                                                                    id, "4-button", "stamper"));
 #else
-            LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Novint Falcon in VRPN. "
+            LOG(WARNING) << "error: no support for Novint Falcon in VRPN. "
                          << "Build VRPN with VRPN_USE_LIBNIFALCON.";
 #endif
         } break;
@@ -95,7 +95,7 @@ VRPNDeviceServer::initModule()
             char* deviceName = const_cast<char*>(name.c_str());
             m_deviceConnections->add(new vrpn_Phantom(deviceName, m_serverConnection, 90.0f, deviceName));
 #else
-            LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Phantom Omni in VRPN. "
+            LOG(WARNING) << "error: no support for Phantom Omni in VRPN. "
                          << "Install OpenHaptics SDK, the omni driver, and build VRPN with VRPN_USE_PHANTOM_SERVER.";
 #endif
         } break;
@@ -111,7 +111,7 @@ VRPNDeviceServer::initModule()
         } break;
         default:
         {
-            LOG(WARNING) << "VRPNDeviceServer::initModule error: can not connect to "
+            LOG(WARNING) << "error: can not connect to "
                          << name << ", device type unknown.";
             return false;
         } break;

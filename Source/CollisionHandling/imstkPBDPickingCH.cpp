@@ -56,8 +56,7 @@ void
 PBDPickingCH::processCollisionData()
 {
     CHECK(m_pbdObj != nullptr && m_pickObj != nullptr)
-        << "PBDPickingCH::handleCollision error: "
-        << "no picking collision handling available the object";
+        << "Error: invalid input pbd objects for collision handling";
 
     if (m_isPicking)
     {
@@ -108,8 +107,7 @@ PBDPickingCH::addPickConstraints(std::shared_ptr<PbdObject> pbdObj, std::shared_
     }
 
     CHECK(pbdObj != nullptr && pickObj != nullptr)
-        << "PBDPickingCH:addPickConstraints error: "
-        << "no pdb object or colliding object.";
+        << "Error: no pdb object or colliding object.";
 
     std::shared_ptr<PbdModel>           model    = pbdObj->getPbdModel();
     std::shared_ptr<AnalyticalGeometry> pickGeom = std::dynamic_pointer_cast<AnalyticalGeometry>(pickObj->getCollidingGeometry());

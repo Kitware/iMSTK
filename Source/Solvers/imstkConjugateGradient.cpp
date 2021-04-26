@@ -61,7 +61,7 @@ ConjugateGradient::solve(Vectord& x)
 {
     if (!m_linearSystem)
     {
-        LOG(WARNING) << "ConjugateGradient::solve: Linear system is not supplied for CG solver!";
+        LOG(WARNING) << "Linear system is not supplied for CG solver!";
         return;
     }
 
@@ -127,7 +127,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
         }
         else
         {
-            LOG(WARNING) << "ConjugateGradient::modifiedCGSolve: deniminator zero. Terminating MCG iteation!";
+            LOG(WARNING) << "Warning: denominator zero. Terminating MCG iteration!";
             return;
         }
         x   += alpha * c;

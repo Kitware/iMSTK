@@ -29,7 +29,7 @@ VolumetricMesh::getAttachedSurfaceMesh()
 {
     if (m_attachedSurfaceMesh == nullptr)
     {
-        LOG(WARNING) << "VolumetricMesh::getAttachedSurfaceMesh warning: attachedSurfaceMesh not set.\n"
+        LOG(WARNING) << "warning: attachedSurfaceMesh not set.\n"
                      << "Extract a surface mesh to attach using computeAttachedSurfaceMesh().";
     }
     return m_attachedSurfaceMesh;

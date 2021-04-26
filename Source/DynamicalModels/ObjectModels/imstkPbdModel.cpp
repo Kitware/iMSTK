@@ -94,7 +94,7 @@ PBDModelConfig::setSolverType(const PbdConstraint::SolverType& type)
 void
 PbdModel::configure(std::shared_ptr<PBDModelConfig> params)
 {
-    LOG_IF(FATAL, (!this->getModelGeometry())) << "PbdModel::configure - Set PBD Model geometry before configuration!";
+    LOG_IF(FATAL, (!this->getModelGeometry())) << "Set PBD Model geometry before configuration!";
 
     m_parameters = params;
     this->setNumDegreeOfFreedom(std::dynamic_pointer_cast<PointSet>(m_geometry)->getNumVertices() * 3);

@@ -216,7 +216,7 @@ makeCollisionDetectionObject(const CollisionDetection::Type type,
     }
     default:
     {
-        LOG(FATAL) << "makeCollisionDetectionObject error: type not implemented.";
+        LOG(FATAL) << "error: type not implemented.";
         return nullptr;
     }
     }
