@@ -69,6 +69,21 @@ TEST_F(imstkSphereTest, GetVolume)
 }
 
 ///
+/// \brief test the sphere SDF evaluator
+///
+TEST_F(imstkSphereTest, GetFunctionValue)
+{
+    m_sphere.setRadius(20.);
+    m_sphere.updatePostTransformData();
+
+    EXPECT_EQ(m_sphere.getFunctionValue(Vec3d(0., 0., 0.)), -20.);
+    EXPECT_EQ(m_sphere.getFunctionValue(Vec3d(5., 0., 0.)), -15);
+    EXPECT_EQ(m_sphere.getFunctionValue(Vec3d(1., 1., 1.)), -20.0 + std::sqrt(3));
+    EXPECT_EQ(m_sphere.getFunctionValue(Vec3d(0., 20., 0.)), 0.);
+    EXPECT_EQ(m_sphere.getFunctionValue(Vec3d(0., 0., 50.)), 30.);
+}
+
+///
 /// \brief TODO
 ///
 int

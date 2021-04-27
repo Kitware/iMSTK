@@ -63,9 +63,23 @@ TEST_F(imstkCubeTest, GetVolume)
     m_cube.setWidth(0.003);
     EXPECT_EQ(m_cube.getVolume(), 0.003 * 0.003 * 0.003);
 
-    double w = 400000000;
+    const double w = 400000000;
     m_cube.setWidth(400000000);
     EXPECT_EQ(m_cube.getVolume(), w * w * w);
+}
+
+///
+/// \brief test the cube SDF evaluator
+///
+TEST_F(imstkCubeTest, GetFunctionValue)
+{
+    m_cube.setWidth(2.);
+    m_cube.updatePostTransformData();
+
+    EXPECT_EQ(m_cube.getFunctionValue(Vec3d(0., 0., 0.)), -1.);
+    EXPECT_EQ(m_cube.getFunctionValue(Vec3d(0.5, 0., 0.)), -0.5);
+    EXPECT_EQ(m_cube.getFunctionValue(Vec3d(1., 1., 1.)), 0.);
+    EXPECT_EQ(m_cube.getFunctionValue(Vec3d(0., -10., 0.)), 9.);
 }
 
 ///

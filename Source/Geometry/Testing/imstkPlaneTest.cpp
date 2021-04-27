@@ -86,6 +86,29 @@ TEST_F(imstkPlaneTest, GetVolume)
 }
 
 ///
+/// \brief test the plane SDF evaluator
+///
+TEST_F(imstkPlaneTest, GetFunctionValue)
+{
+    m_plane.setNormal(Vec3d(0., 1., 0.));
+    m_plane.updatePostTransformData();
+
+    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(0., 0., 0.)), 0.);
+    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(0.5, 0., 0.)), 0.);
+    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(1., 1., 1.)), 1.);
+    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(0., -10., 0.)), -10.);
+
+    m_plane.setPosition(Vec3d(1., 1., 1.));
+    m_plane.setNormal(Vec3d(1., 1., 1.));
+    m_plane.updatePostTransformData();
+
+    EXPECT_FLOAT_EQ(m_plane.getFunctionValue(Vec3d(0., 0., 0.)), -std::sqrt(3.0));
+    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(1., 1., 1.)), 0.0);
+    EXPECT_FLOAT_EQ(m_plane.getFunctionValue(Vec3d(1., 0., 0.)), -2.0 / std::sqrt(3.0));
+    EXPECT_FLOAT_EQ(m_plane.getFunctionValue(Vec3d(0., -10., 0.)), -13.0 / std::sqrt(3.0));
+}
+
+///
 /// \brief TODO
 ///
 int
