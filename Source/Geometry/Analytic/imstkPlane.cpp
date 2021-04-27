@@ -44,7 +44,7 @@ Plane::setNormal(const Vec3d n)
 }
 
 void
-Plane::setNormal(double x, double y, double z)
+Plane::setNormal(const double x, const double y, const double z)
 {
     this->setNormal(Vec3d(x, y, z));
 }

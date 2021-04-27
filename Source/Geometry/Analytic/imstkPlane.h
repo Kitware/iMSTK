@@ -70,7 +70,7 @@ public:
     /// \brief Sets the normal to the plane
     ///
     void setNormal(const Vec3d n);
-    void setNormal(double x, double y, double z);
+    void setNormal(const double x, const double y, const double z);
 
     ///
     /// \brief Returns the width of the plane
