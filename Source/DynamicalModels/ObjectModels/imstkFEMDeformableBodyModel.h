@@ -176,6 +176,16 @@ public:
     void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
 
     ///
+    /// \brief Compute the RHS and LHS of the resulting linear system using semi-implicit scheme
+    ///
+    void computeSemiImplicitSystemRHSAndLHS(kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
+
+    ///
+    /// \brief Compute the RHS and LHS of the resulting linear system using fully-implicit scheme
+    ///
+    void computeImplicitSystemRHSAndLHS(kinematicState& prevState, kinematicState& newState, const StateUpdateType updateType);
+
+    ///
     /// \brief Update damping Matrix
     ///
     void updateDampingMatrix();
@@ -225,6 +235,12 @@ public:
     /// function given the state vector
     ///
     System::MatrixFunctionType getFunctionGradient();
+
+    ///
+    /// \brief Returns the "function" that evaluates the nonlinear function and its gradient
+    /// function given the state vector
+    ///
+    System::VectorMatrixFunctionType getFunctionAndGradient();
 
     ///
     /// \brief Get the contact force vector
