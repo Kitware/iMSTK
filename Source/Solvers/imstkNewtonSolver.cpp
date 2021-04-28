@@ -72,7 +72,9 @@ NewtonSolver<SystemMatrix>::solveGivenState(Vectord& x)
 
     Vectord dx = x;
 
-    for (size_t i = 0; i < m_maxIterations; ++i)
+    const int maxIters = this->m_isSemiImplicit ? 1 : m_maxIterations;
+
+    for (size_t i = 0; i < maxIters; ++i)
     {
         if (fnorm < stopTolerance)
         {
@@ -123,6 +125,7 @@ NewtonSolver<SystemMatrix>::solve()
             error0 = error;
         }
 
+        // std::cout << "Num. of Newton Iterations: " << iterNum << "\tError ratio: " << error/error0 << ", " << error << " " << error0 << std::endl;
         if (error / error0 < epsilon && iterNum > 0)
         {
             // std::cout << "Num. of Newton Iterations: " << iterNum << "\tError ratio: " << error/error0 << ", " << error << " " << error0 << std::endl;

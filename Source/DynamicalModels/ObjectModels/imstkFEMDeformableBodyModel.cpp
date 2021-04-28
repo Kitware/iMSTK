@@ -455,13 +455,13 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState&       stateAtT,
     const auto& v     = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
-    m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
     const double dT = m_timeIntegrator->getTimestepSize();
 
     switch (updateType)
     {
     case StateUpdateType::DeltaVelocity:
 
+        m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
         m_Feff = m_K * -(uPrev - u + v * dT);
 
         if (m_damped)
