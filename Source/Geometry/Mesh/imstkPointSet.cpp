@@ -183,7 +183,8 @@ PointSet::enforceType(
     if (attributes[name]->getScalarType() != type)
     {
         auto attribute = attributes[name];
-        CHECK(attribute->getNumberOfComponents() == components) << label << "need to have " << components << "components in " << getName();
+        LOG_IF(WARNING, attribute->getNumberOfComponents() != components) << label << " need to have " << components 
+            << "components in " << getName() << " actual number : " << attribute->getNumberOfComponents();
         LOG(INFO) << "Geometry: " << getName() << " selected array for " << " not of type " << ", casting.";
         auto newArray = attribute->cast(type);
         attributes[name] = std::move(newArray);
