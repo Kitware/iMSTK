@@ -40,19 +40,19 @@ protected:
 TEST_F(imstkPlaneTest, SetGetWidth)
 {
     m_plane.setWidth(2);
-    EXPECT_EQ(m_plane.getWidth(), 2);
+    EXPECT_DOUBLE_EQ(2, m_plane.getWidth());
 
     m_plane.setWidth(0.003);
-    EXPECT_EQ(m_plane.getWidth(), 0.003);
+    EXPECT_DOUBLE_EQ(0.003, m_plane.getWidth());
 
     m_plane.setWidth(400000000);
-    EXPECT_EQ(m_plane.getWidth(), 400000000);
+    EXPECT_DOUBLE_EQ(400000000, m_plane.getWidth());
 
     m_plane.setWidth(0);
-    EXPECT_GT(m_plane.getWidth(), 0);
+    EXPECT_LT(0, m_plane.getWidth());
 
     m_plane.setWidth(-5);
-    EXPECT_GT(m_plane.getWidth(), 0);
+    EXPECT_LT(0, m_plane.getWidth());
 }
 
 ///
@@ -82,7 +82,7 @@ TEST_F(imstkPlaneTest, SetGetNormal)
 ///
 TEST_F(imstkPlaneTest, GetVolume)
 {
-    EXPECT_EQ(m_plane.getVolume(), 0);
+    EXPECT_DOUBLE_EQ(0, m_plane.getVolume());
 }
 
 ///
@@ -93,19 +93,19 @@ TEST_F(imstkPlaneTest, GetFunctionValue)
     m_plane.setNormal(Vec3d(0., 1., 0.));
     m_plane.updatePostTransformData();
 
-    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(0., 0., 0.)), 0.);
-    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(0.5, 0., 0.)), 0.);
-    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(1., 1., 1.)), 1.);
-    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(0., -10., 0.)), -10.);
+    EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0., 0., 0.)), );
+    EXPECT_DOUBLE_EQ(0., m_plane.getFunctionValue(Vec3d(0.5, 0., 0.)));
+    EXPECT_DOUBLE_EQ(1., m_plane.getFunctionValue(Vec3d(1., 1., 1.)));
+    EXPECT_DOUBLE_EQ(-10., m_plane.getFunctionValue(Vec3d(0., -10., 0.)));
 
     m_plane.setPosition(Vec3d(1., 1., 1.));
     m_plane.setNormal(Vec3d(1., 1., 1.));
     m_plane.updatePostTransformData();
 
-    EXPECT_FLOAT_EQ(m_plane.getFunctionValue(Vec3d(0., 0., 0.)), -std::sqrt(3.0));
-    EXPECT_EQ(m_plane.getFunctionValue(Vec3d(1., 1., 1.)), 0.0);
-    EXPECT_FLOAT_EQ(m_plane.getFunctionValue(Vec3d(1., 0., 0.)), -2.0 / std::sqrt(3.0));
-    EXPECT_FLOAT_EQ(m_plane.getFunctionValue(Vec3d(0., -10., 0.)), -13.0 / std::sqrt(3.0));
+    EXPECT_DOUBLE_EQ(-std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(0., 0., 0.)));
+    EXPECT_DOUBLE_EQ(0.0, m_plane.getFunctionValue(Vec3d(1., 1., 1.)));
+    EXPECT_DOUBLE_EQ(-2.0 / std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(1., 0., 0.)));
+    EXPECT_DOUBLE_EQ(-13.0 / std::sqrt(3.0), m_plane.getFunctionValue(Vec3d(0., -10., 0.)));
 }
 
 ///
