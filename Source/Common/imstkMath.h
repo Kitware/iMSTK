@@ -63,22 +63,28 @@ using StdVectorOfVec3r = std::vector<Vec3r, Eigen::aligned_allocator<Vec3r>>;
 using StdVectorOfVec4r = std::vector<Vec4r, Eigen::aligned_allocator<Vec4r>>;
 
 // 2D vector
-using Vec2f = Eigen::Vector2f;
-using Vec2d = Eigen::Vector2d;
+// using Vec2f = Eigen::Vector2f;
+// using Vec2d = Eigen::Vector2d;
+using Vec2f = Eigen::Matrix<float, 2, 1>;
+using Vec2d = Eigen::Matrix<double, 2, 1>;
 using Vec2i = Eigen::Matrix<int, 2, 1>;
 using StdVectorOfVec2f = std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>>;
 using StdVectorOfVec2d = std::vector<Vec2d, Eigen::aligned_allocator<Vec2d>>;
 
 // 3D vector
-using Vec3f = Eigen::Vector3f;
-using Vec3d = Eigen::Vector3d;
+// using Vec3f = Eigen::Vector3f;
+// using Vec3d = Eigen::Vector3d;
+using Vec3f = Eigen::Matrix<float, 3, 1>;
+using Vec3d = Eigen::Matrix<double, 3, 1>;
 using Vec3i = Eigen::Matrix<int, 3, 1>;
 using StdVectorOfVec3f = std::vector<Vec3f, Eigen::aligned_allocator<Vec3f>>;
 using StdVectorOfVec3d = std::vector<Vec3d, Eigen::aligned_allocator<Vec3d>>;
 
 // 4D vector
-using Vec4f = Eigen::Vector4f;
-using Vec4d = Eigen::Vector4d;
+// using Vec4f = Eigen::Vector4f;
+// using Vec4d = Eigen::Vector4d;
+using Vec4f = Eigen::Matrix<float, 4, 1>;
+using Vec4d = Eigen::Matrix<double, 4, 1>;
 using Vec4i = Eigen::Matrix<int, 4, 1>;
 using StdVectorOfVec4f = std::vector<Vec4f, Eigen::aligned_allocator<Vec4f>>;
 using StdVectorOfVec4d = std::vector<Vec4d, Eigen::aligned_allocator<Vec4d>>;
@@ -108,13 +114,13 @@ using Rotf = Eigen::AngleAxisf;
 using Rotd = Eigen::AngleAxisd;
 
 // 3x3 Matrix
-using Mat3f = Eigen::Matrix3f;
-using Mat3d = Eigen::Matrix3d;
+using Mat3f = Eigen::Matrix<float, 3, 3>;
+using Mat3d = Eigen::Matrix<double, 3, 3>;
 using StdVectorOfMat3d = std::vector<Mat3d, Eigen::aligned_allocator<Mat3d>>;
 
 // 4x4 Matrix
-using Mat4f = Eigen::Matrix4f;
-using Mat4d = Eigen::Matrix4d;
+using Mat4f = Eigen::Matrix<float, 4, 4> ;
+using Mat4d = Eigen::Matrix<double, 4, 4>;
 
 /// A dynamic size matrix of floats
 using Matrixf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;

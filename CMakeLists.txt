@@ -61,9 +61,24 @@ if(MSVC)
   endif()
 endif()
 
+
+option(${PROJECT_NAME}_BUILD_CSHARP "Build iMSTK-C#" ON)
+#-----------------------------------------------------------------------------
+# SWIG 
+#-----------------------------------------------------------------------------
+find_package(SWIG REQUIRED)
+include(${SWIG_USE_FILE})
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+set(CMAKE_SWIG_FLAGS "")
+set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/newton_out)
+
+
 #-----------------------------------------------------------------------------
 # Options
 #-----------------------------------------------------------------------------
+
 option(${PROJECT_NAME}_ENABLE_CUDA_BACKEND "Enable iMSTK CUDA backend" OFF)
 if (${PROJECT_NAME}_ENABLE_CUDA_BACKEND)
 	include(CheckLanguage)
@@ -376,6 +391,10 @@ add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/Testing)
 add_subdirectory(Source/Filtering)
 add_subdirectory(Source/FilteringCore)
+
+# if (${PROJECT_NAME}_BUILD_CSHARP)
+    add_subdirectory(Source/csIMSTK)
+# endif()
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories

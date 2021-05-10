@@ -85,7 +85,7 @@ public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = std::ptrdiff_t;
         using pointer   = VecType*;
-        using reference = VecType&;
+        using reference = const VecType&;
 
     public:
         const_iterator(pointer ptr) : ptr_(ptr) { }
@@ -99,7 +99,7 @@ public:
 
         self_type operator++(int junk) { ptr_++; return *this; }
 
-        const reference operator*() { return *ptr_; }
+        reference operator*() { return *ptr_; }
 
         const pointer operator->() { return ptr_; }
 
@@ -414,6 +414,21 @@ public:
         m_dataCast = ptr;
         AbstractDataArray::m_size = AbstractDataArray::m_capacity = size * N;
         m_vecSize = m_vecCapacity = size;
+    }
+
+    inline void setValues(const T* val)
+    {
+        std::copy(val, val+m_vecSize * N, DataArray<T>::m_data);
+    }
+
+    inline void setValues(const T* val, const int n)
+    {
+        std::copy(val, val+n, DataArray<T>::m_data);
+    }
+
+    inline void getValues(T* val)
+    {
+        std::copy(DataArray<T>::m_data, DataArray<T>::m_data+m_vecSize*N, val);
     }
 
     inline int getNumberOfComponents() const override { return N; }

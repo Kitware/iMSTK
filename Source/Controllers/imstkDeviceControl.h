@@ -63,7 +63,7 @@ public:
     ///
     /// \brief Updates control based on current device state
     ///
-    virtual void update(const double imstkNotUsed(dt)) { }
+    virtual void update(const double dt) { }
 
 public:
     std::shared_ptr<DeviceClient> m_deviceClient;

@@ -63,7 +63,7 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Create target (library)
   #-----------------------------------------------------------------------------
-  add_library( ${target} STATIC
+  add_library( ${target} SHARED 
     ${target_H_FILES}
     ${target_CPP_FILES}
     )
