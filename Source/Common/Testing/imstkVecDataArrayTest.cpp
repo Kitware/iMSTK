@@ -198,6 +198,46 @@ TEST(imstkVecDataArrayTest, Erase)
     EXPECT_EQ(2, a.getCapacity());
 }
 
+TEST(imstkVecDataArrayTest, ExplicitCast)
+{
+    {
+        VecDataArray<double, 2> a;
+        VecDataArray<int, 2>    b;
+        EXPECT_NO_THROW(b = a.cast<int>());
+        EXPECT_EQ(a.size(), b.size());
+    }
+
+    {
+        VecDataArray<int, 2> a{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+        auto                 b = a.cast<double>();
+
+        ASSERT_EQ(a.size(), b.size());
+        EXPECT_EQ(IMSTK_DOUBLE, b.getScalarType());
+        for (int i = 0; i < a.size(); ++i)
+        {
+            EXPECT_TRUE(a[i].cast<double>().isApprox(b[i]));
+        }
+    }
+}
+
+TEST(imstkVecDataArrayTest, ParameterCast)
+{
+    VecDataArray<int, 2> a{ Vec2i(1, 2), Vec2i(3, 4), Vec2i(5, 6), Vec2i(7, 8) };
+    AbstractDataArray*   abstractA = &a;
+
+    auto b = abstractA->cast(IMSTK_DOUBLE);
+
+    EXPECT_EQ(IMSTK_DOUBLE, b->getScalarType());
+
+    auto actualB = dynamic_cast<VecDataArray<double, 2>*>(b.get());
+    ASSERT_NE(nullptr, actualB);
+    ASSERT_EQ(a.size(), actualB->size());
+    for (int i = 0; i < a.size(); ++i)
+    {
+        EXPECT_TRUE(a[i].cast<double>().isApprox((*actualB)[i]));
+    }
+}
+
 int
 imstkVecDataArrayTest(int argc, char* argv[])
 {

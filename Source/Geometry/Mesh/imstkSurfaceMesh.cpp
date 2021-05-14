@@ -748,6 +748,7 @@ SurfaceMesh::setCellNormals(const std::string& arrayName)
     if (hasCellAttribute(arrayName))
     {
         m_activeCellNormals = arrayName;
+        enforceType(m_cellAttributes, arrayName, "Cell Normals", IMSTK_DOUBLE, 3);
     }
 }
 
@@ -777,6 +778,7 @@ SurfaceMesh::setCellTangents(const std::string& arrayName)
     if (hasCellAttribute(arrayName))
     {
         m_activeCellTangents = arrayName;
+        enforceType(m_cellAttributes, arrayName, "Cell Tangents", IMSTK_DOUBLE, 3);
     }
 }
 
