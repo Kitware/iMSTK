@@ -23,6 +23,7 @@ project(Example-PBDString)
 #-----------------------------------------------------------------------------
 imstk_add_executable(${PROJECT_NAME} pbdStringExample.cpp)
 
+target_compile_options(${PROJECT_NAME} PRIVATE $<$<CXX_COMPILER_ID:MSVC>:/bigobj>)
 #-----------------------------------------------------------------------------
 # Add the target to Examples folder
 #-----------------------------------------------------------------------------
