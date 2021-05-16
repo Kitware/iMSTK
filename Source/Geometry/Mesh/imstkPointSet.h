@@ -202,16 +202,11 @@ protected:
     void applyTransform(const Mat4d& m) override;
 
     ///
-    /// \brief Enforce type requirements and check for the number of components
-    ///
-    /// For the special attributes we require the type and number of components to
-    /// be correct, when the user uses `setAttribute` or `setAttributes` we cannot
-    /// enforce this through the interface, this function is used by the `set<Attribute>`
-    /// functions to coerce the type to the correct type. It will convert the type inside
-    /// of attributes to the type determine by the `type` parameter
-    void enforceType(
-        std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& attributes,
-        const std::string& name, const std::string& label, imstk::ScalarType type, int components);
+    /// \brief Sets the active vertex attribute name as long as the # components is satisfied.
+    /// Throws message and casts if incorrect scalar type is provided.
+    /// 
+    void setActiveAttribute(std::string& activeAttributeName, const std::string attributeName,
+        const int expectedNumComponents, const ScalarType expectedScalarType);
 
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
     std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;

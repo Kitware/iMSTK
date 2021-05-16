@@ -185,7 +185,7 @@ std::shared_ptr<VecDataArray<int, dim>> copyToVecDataArray(vtkCellArray* vtkCell
 ///
 /// \brief Copy vtkPointData to a data map
 ///
-void copyToDataMap(vtkDataSetAttributes* const pointData, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
+void copyToDataMap(vtkDataSetAttributes* pointData, std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
 
 ///
 /// \brief Copy from a data map to vtkDataAttributes (used for vtkCellData and vtkPointData)
