@@ -204,9 +204,9 @@ protected:
     ///
     /// \brief Sets the active vertex attribute name as long as the # components is satisfied.
     /// Throws message and casts if incorrect scalar type is provided.
-    /// 
-    void setActiveAttribute(std::string& activeAttributeName, const std::string attributeName,
-        const int expectedNumComponents, const ScalarType expectedScalarType);
+    ///
+    void setActiveVertexAttribute(std::string& activeAttributeName, const std::string attributeName,
+                                  const int expectedNumComponents, const ScalarType expectedScalarType);
 
     std::shared_ptr<VecDataArray<double, 3>> m_initialVertexPositions;
     std::shared_ptr<VecDataArray<double, 3>> m_vertexPositions;

@@ -265,6 +265,10 @@ public:
     std::shared_ptr<VecDataArray<double, 3>> getCellTangents() const;
 
 protected:
+    void setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
+                                const int expectedNumComponents, const ScalarType expectedScalarType);
+
+protected:
     std::shared_ptr<VecDataArray<int, 3>> m_triangleIndices;
     std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_vertexNeighborVertices;  ///> Neighbor vertices to vertices
