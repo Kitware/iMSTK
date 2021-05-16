@@ -79,7 +79,7 @@ void
 HapticDeviceClient::update()
 {
     //hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
-    hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);     // Call sometime later
+    hdScheduleAsynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY); // Call sometime later
 }
 
 void
@@ -100,22 +100,30 @@ HapticDeviceClient::hapticCallback(void* pData)
         return HD_CALLBACK_DONE;
     }
 
+    client->m_forceLock.lock();
+    const Vec3d force = client->m_force;
+    client->m_forceLock.unlock();
+
     hdBeginFrame(handle);
 
     hdMakeCurrentDevice(handle);
-    hdSetDoublev(HD_CURRENT_FORCE, client->m_force.data());
+    hdSetDoublev(HD_CURRENT_FORCE, force.data());
     hdGetDoublev(HD_CURRENT_POSITION, state.pos);
     hdGetDoublev(HD_CURRENT_VELOCITY, state.vel);
     hdGetDoublev(HD_CURRENT_ANGULAR_VELOCITY, state.angularVel);
-    hdGetDoublev(HD_CURRENT_TRANSFORM, state.trans);
+    hdGetDoublev(HD_CURRENT_TRANSFORM, state.transform);
     hdGetIntegerv(HD_CURRENT_BUTTONS, &state.buttons);
 
     hdEndFrame(handle);
 
+    // Might be worth locking each part separately
+    const Quatd orientation = Quatd((Eigen::Affine3d(Eigen::Matrix4d(state.transform))).rotation());
+    client->m_transformLock.lock();
     client->m_position << state.pos[0], state.pos[1], state.pos[2];
     client->m_velocity << state.vel[0], state.vel[1], state.vel[2];
     client->m_angularVelocity << state.angularVel[0], state.angularVel[1], state.angularVel[2];
-    client->m_orientation = (Eigen::Affine3d(Eigen::Matrix4d(state.trans))).rotation();
+    client->m_orientation = orientation;
+    client->m_transformLock.unlock();
 
     for (int i = 0; i < 4; i++)
     {
@@ -132,7 +140,6 @@ HapticDeviceClient::hapticCallback(void* pData)
             client->postEvent(ButtonEvent(HapticDeviceClient::buttonStateChanged(), i, BUTTON_RELEASED));
         }
     }
-
     client->m_trackingEnabled = true;
 
     return HD_CALLBACK_DONE;

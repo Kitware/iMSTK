@@ -33,7 +33,7 @@ struct HDstate
     HDdouble pos[3];
     HDdouble vel[3];
     HDdouble angularVel[3];
-    HDdouble trans[16];
+    HDdouble transform[16];
     HDint buttons;
 };
 
