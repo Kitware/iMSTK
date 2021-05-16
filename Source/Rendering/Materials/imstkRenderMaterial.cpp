@@ -54,7 +54,7 @@ RenderMaterial::setTessellated(const bool tessellated)
 }
 
 void
-RenderMaterial::setLineWidth(const float width)
+RenderMaterial::setLineWidth(const double width)
 {
     if (width != m_lineWidth)
     {
@@ -64,7 +64,7 @@ RenderMaterial::setLineWidth(const float width)
 }
 
 void
-RenderMaterial::setPointSize(const float size)
+RenderMaterial::setPointSize(const double size)
 {
     if (size != m_pointSize)
     {
@@ -132,7 +132,7 @@ RenderMaterial::setAmbientColor(const Color& color)
 }
 
 void
-RenderMaterial::setMetalness(const float metalness)
+RenderMaterial::setMetalness(const double metalness)
 {
     if (m_metalness != metalness)
     {
@@ -142,7 +142,7 @@ RenderMaterial::setMetalness(const float metalness)
 }
 
 void
-RenderMaterial::setRoughness(const float roughness)
+RenderMaterial::setRoughness(const double roughness)
 {
     if (roughness != m_roughness)
     {
@@ -152,7 +152,7 @@ RenderMaterial::setRoughness(const float roughness)
 }
 
 void
-RenderMaterial::setEmissivity(const float emissivity)
+RenderMaterial::setEmissivity(const double emissivity)
 {
     if (m_emissivity != emissivity)
     {
@@ -251,7 +251,7 @@ RenderMaterial::setShadingModel(const ShadingModel& model)
 }
 
 void
-RenderMaterial::setOcclusionStrength(const float occlusionStrength)
+RenderMaterial::setOcclusionStrength(const double occlusionStrength)
 {
     if (occlusionStrength != m_occlusionStrength)
     {
@@ -261,7 +261,7 @@ RenderMaterial::setOcclusionStrength(const float occlusionStrength)
 }
 
 void
-RenderMaterial::setNormalStrength(const float normalStrength)
+RenderMaterial::setNormalStrength(const double normalStrength)
 {
     if (normalStrength != m_normalStrength)
     {
@@ -271,7 +271,7 @@ RenderMaterial::setNormalStrength(const float normalStrength)
 }
 
 void
-RenderMaterial::setIndexOfRefraction(const float indexOfRefraction)
+RenderMaterial::setIndexOfRefraction(const double indexOfRefraction)
 {
     if (indexOfRefraction == m_indexOfRefraction)
     {
@@ -301,7 +301,7 @@ RenderMaterial::setVertexColor(const Color& color)
 }
 
 void
-RenderMaterial::setOpacity(const float opacity)
+RenderMaterial::setOpacity(const double opacity)
 {
     if (m_opacity != opacity)
     {
