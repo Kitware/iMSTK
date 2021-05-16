@@ -747,8 +747,7 @@ SurfaceMesh::setCellNormals(const std::string& arrayName)
 {
     if (hasCellAttribute(arrayName))
     {
-        m_activeCellNormals = arrayName;
-        enforceType(m_cellAttributes, arrayName, "Cell Normals", IMSTK_DOUBLE, 3);
+        setCellActiveAttribute(m_activeCellNormals, arrayName, 3, IMSTK_DOUBLE);
     }
 }
 
@@ -777,8 +776,7 @@ SurfaceMesh::setCellTangents(const std::string& arrayName)
 {
     if (hasCellAttribute(arrayName))
     {
-        m_activeCellTangents = arrayName;
-        enforceType(m_cellAttributes, arrayName, "Cell Tangents", IMSTK_DOUBLE, 3);
+        setCellActiveAttribute(m_activeCellTangents, arrayName, 3, IMSTK_DOUBLE);
     }
 }
 
@@ -793,5 +791,27 @@ SurfaceMesh::getCellTangents() const
     {
         return nullptr;
     }
+}
+
+void
+SurfaceMesh::setCellActiveAttribute(std::string& activeAttributeName, std::string attributeName,
+                                    const int expectedNumComponents, const ScalarType expectedScalarType)
+{
+    std::shared_ptr<AbstractDataArray> attribute = m_cellAttributes[attributeName];
+    if (attribute->getNumberOfComponents() != expectedNumComponents)
+    {
+        LOG(WARNING) << "Failed to set cell attribute on " << getName() << " with "
+                     << attribute->getNumberOfComponents() << " components. Expected " <<
+            expectedNumComponents << " components.";
+        return;
+    }
+    else if (attribute->getScalarType() != expectedScalarType)
+    {
+        LOG(INFO) << "Tried to set cell attribute on " << getName() << " with scalar type "
+                  << static_cast<int>(attribute->getScalarType()) << ". Casting to "
+                  << static_cast<int>(expectedScalarType) << " scalar type";
+        m_cellAttributes[attributeName] = attribute->cast(expectedScalarType);
+    }
+    activeAttributeName = attributeName;
 }
 }  // namespace imstk

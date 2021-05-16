@@ -234,4 +234,41 @@ mat4dTRS(const Mat4d& m, Vec3d& t, Mat3d& r, Vec3d& s)
 
     t = m.block<3, 1>(0, 3);
 }
+
+///
+/// \brief Compute bary centric coordinates (u,v,w) given triangle in 2d space (and point p on triangle)
+///
+static Vec3d
+baryCentric(const Vec2d& p, const Vec2d& a, const Vec2d& b, const Vec2d& c)
+{
+    const Vec2d  v0  = b - a;
+    const Vec2d  v1  = c - a;
+    const Vec2d  v2  = p - a;
+    const double den = v0[0] * v1[1] - v1[0] * v0[1];
+    const double v   = (v2[0] * v1[1] - v1[0] * v2[1]) / den;
+    const double w   = (v0[0] * v2[1] - v2[0] * v0[1]) / den;
+    const double u   = 1.0 - v - w;
+    return Vec3d(u, v, w);
+}
+
+///
+/// \brief Compute bary centric coordinates (u,v,w) given triangle in 3d space (and point p on triangle)
+///
+static Vec3d
+baryCentric(const Vec3d& p, const Vec3d& a, const Vec3d& b, const Vec3d& c)
+{
+    const Vec3d  v0    = b - a;
+    const Vec3d  v1    = c - a;
+    const Vec3d  v2    = p - a;
+    const double d00   = v0.dot(v0);
+    const double d01   = v0.dot(v1);
+    const double d11   = v1.dot(v1);
+    const double d20   = v2.dot(v0);
+    const double d21   = v2.dot(v1);
+    const double denom = d00 * d11 - d01 * d01;
+    const double v     = (d11 * d20 - d01 * d21) / denom;
+    const double w     = (d00 * d21 - d01 * d20) / denom;
+    const double u     = 1.0 - v - w;
+    return Vec3d(u, v, w);
+}
 }

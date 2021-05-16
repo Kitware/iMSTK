@@ -5,11 +5,12 @@ file(GLOB hFiles *.h)
 file(GLOB cppFiles *cpp)
 
 include(imstkAddLibrary)
-imstk_add_library( Filtering
+imstk_add_library( FilteringCore
   H_FILES
     ${hFiles}
   CPP_FILES
     ${cppFiles}
   DEPENDS
-    FilteringCore
+    Geometry
+    DataStructures
     ${VTK_LIBRARIES})

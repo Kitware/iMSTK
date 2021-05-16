@@ -18,7 +18,9 @@
    limitations under the License.
 
 =========================================================================*/
+
 #include "imstkGeometryAlgorithm.h"
+#include "imstkGeometry.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -69,5 +71,37 @@ GeometryAlgorithm::setNumberOfOutputPorts(size_t numPorts)
             m_outputs[i] = nullptr;
         }
     }
+}
+
+bool
+GeometryAlgorithm::checkInputRequirements(
+    const std::unordered_map<size_t, std::shared_ptr<Geometry>>& inputs,
+    const std::unordered_map<size_t, PortReq>& inputPortReqs)
+{
+    // Check input types
+    for (auto i : inputs)
+    {
+        const size_t portId = i.first;
+        if (i.second == nullptr)
+        {
+            LOG(WARNING) << "GeometryAlgorithm input " << portId << " missing!";
+            return false;
+        }
+
+        // If the user added a requirement for this port
+        if (inputPortReqs.count(portId) != 0)
+        {
+            // Check if it's valid
+            if (!inputPortReqs.at(portId).isValid(i.second))
+            {
+                LOG(WARNING) << "GeometryAlgorithm recieved invalid geometry type \"" <<
+                    inputs.at(portId)->getTypeName() << "\" in port " << portId;
+                /*LOG(WARNING) << "GeometryAlgorithm required port " << portId; <<
+                    " to be of type " << inputPortReqs.at(portId).validGeomName();*/
+                return false;
+            }
+        }
+    }
+    return true;
 }
 }

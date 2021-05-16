@@ -31,6 +31,8 @@ namespace imstk
 {
 CleanMesh::CleanMesh()
 {
+    setInputPortReq<SurfaceMesh>(0);
+
     setNumberOfInputPorts(1);
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<SurfaceMesh>());

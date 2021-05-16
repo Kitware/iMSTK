@@ -32,6 +32,9 @@ namespace imstk
 {
 SelectEnclosedPoints::SelectEnclosedPoints()
 {
+    setInputPortReq<SurfaceMesh>(0);
+    setInputPortReq<PointSet>(1);
+
     setNumberOfInputPorts(2);
     setNumberOfOutputPorts(1);
     setOutput(std::make_shared<PointSet>());

@@ -176,23 +176,6 @@ PointSet::applyTransform(const Mat4d& m)
 }
 
 void
-PointSet::enforceType(
-    std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& attributes,
-    const std::string& name, const std::string& label, ScalarType type, int components)
-{
-    if (attributes[name]->getScalarType() != type)
-    {
-        auto attribute = attributes[name];
-        LOG_IF(WARNING, attribute->getNumberOfComponents() != components)
-            << label << " need to have " << components
-            << "components in " << getName() << " actual number : " << attribute->getNumberOfComponents();
-        LOG(INFO) << "Geometry: " << getName() << " selected array for " << " not of type " << ", casting.";
-        auto newArray = attribute->cast(type);
-        attributes[name] = std::move(newArray);
-    }
-}
-
-void
 PointSet::updatePostTransformData() const
 {
     if (m_transformApplied)
@@ -288,8 +271,7 @@ PointSet::setVertexNormals(const std::string& arrayName)
 {
     if (hasVertexAttribute(arrayName))
     {
-        m_activeVertexNormals = arrayName;
-        enforceType(m_vertexAttributes, arrayName, "Vertex Normals", IMSTK_DOUBLE, 3);
+        setActiveVertexAttribute(m_activeVertexNormals, arrayName, 3, IMSTK_DOUBLE);
     }
 }
 
@@ -318,8 +300,7 @@ PointSet::setVertexTangents(const std::string& arrayName)
 {
     if (hasVertexAttribute(arrayName))
     {
-        m_activeVertexTangents = arrayName;
-        enforceType(m_vertexAttributes, arrayName, "Vertex Tangents", IMSTK_FLOAT, 3);
+        setActiveVertexAttribute(m_activeVertexTangents, arrayName, 3, IMSTK_FLOAT);
     }
 }
 
@@ -348,8 +329,7 @@ PointSet::setVertexTCoords(const std::string& arrayName)
 {
     if (hasVertexAttribute(arrayName))
     {
-        m_activeVertexTCoords = arrayName;
-        enforceType(m_vertexAttributes, arrayName, "Vertex Texture Coords", IMSTK_FLOAT, 2);
+        setActiveVertexAttribute(m_activeVertexTCoords, arrayName, 2, IMSTK_FLOAT);
     }
 }
 
@@ -364,5 +344,27 @@ PointSet::getVertexTCoords() const
     {
         return nullptr;
     }
+}
+
+void
+PointSet::setActiveVertexAttribute(std::string& activeAttributeName, std::string attributeName,
+                                   const int expectedNumComponents, const ScalarType expectedScalarType)
+{
+    std::shared_ptr<AbstractDataArray> attribute = m_vertexAttributes[attributeName];
+    if (attribute->getNumberOfComponents() != expectedNumComponents)
+    {
+        LOG(WARNING) << "Failed to set vertex attribute on " << getName() << " with "
+                     << attribute->getNumberOfComponents() << " components. Expected " <<
+            expectedNumComponents << " components.";
+        return;
+    }
+    else if (attribute->getScalarType() != expectedScalarType)
+    {
+        LOG(INFO) << "Tried to set vertex attribute on " << getName() << " with scalar type "
+                  << static_cast<int>(attribute->getScalarType()) << ". Casting to "
+                  << static_cast<int>(expectedScalarType) << " scalar type";
+        m_vertexAttributes[attributeName] = attribute->cast(expectedScalarType);
+    }
+    activeAttributeName = attributeName;
 }
 } // imstk
