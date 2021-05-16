@@ -406,6 +406,7 @@ add_subdirectory(Source/SimulationManager)
 add_subdirectory(Source/apiUtilities)
 add_subdirectory(Source/Pulse)
 add_subdirectory(Source/Filtering)
+add_subdirectory(Source/FilteringCore)
 
 #--------------------------------------------------------------------------
 # Add Examples subdirectories
