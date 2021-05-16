@@ -61,8 +61,7 @@ public:
     ///  tetrahedra connectivity
     ///
     void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                    std::shared_ptr<VecDataArray<int, 4>> tetrahedra,
-                    bool computeAttachedSurfaceMesh = false);
+                    std::shared_ptr<VecDataArray<int, 4>> tetrahedra);
 
     ///
     /// \brief Clear all the mesh data
@@ -75,18 +74,9 @@ public:
     void print() const override;
 
     ///
-    /// \brief Compute and set the attached surface mesh
+    /// \brief This method extracts the conforming triangular mesh from the tetrahedral mesh
     ///
-    void computeAttachedSurfaceMesh() override;
-
-    ///
-    /// \brief This method
-    /// (a) Extracts the confirming triangular mesh from the tetrahedral mesh
-    /// (b) Checks and flips the triangle connectivity order if it is not consistent
-    /// (c) Renumbers the vertices
-    /// (d) optionally enforces the consistency of winding of resulting surface triangles
-    ///
-    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const bool enforceWindingConsistency = false);
+    std::shared_ptr<SurfaceMesh> extractSurfaceMesh() override;
 
     ///
     /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra

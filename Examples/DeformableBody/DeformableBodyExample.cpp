@@ -150,9 +150,7 @@ main()
 std::shared_ptr<FeDeformableObject>
 makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
 {
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
-    surfMesh->flipNormals();
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Configure dynamic model
     imstkNew<FEMDeformableBodyModel> dynaModel;
@@ -171,7 +169,7 @@ makeFEDeformableObject(std::shared_ptr<TetrahedralMesh> tetMesh)
     mat->setPointSize(10.0);
     mat->setLineWidth(2.0);
     mat->setEdgeColor(Color::Orange);
-    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
+    imstkNew<VisualModel> surfMeshModel(surfMesh);
     surfMeshModel->setRenderMaterial(mat);
 
     // Scene object 1: Dragon

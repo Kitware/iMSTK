@@ -155,12 +155,11 @@ createSoftBodyScene(std::string sceneName)
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
 
     // Extract the surface mesh
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
+    imstkNew<VisualModel> surfMeshModel(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     imstkNew<PbdObject> deformableObj("Dragon");

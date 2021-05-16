@@ -33,16 +33,10 @@ TetrahedralMesh::TetrahedralMesh(const std::string& name) : VolumetricMesh(name)
 
 void
 TetrahedralMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                            std::shared_ptr<VecDataArray<int, 4>> tetrahedra,
-                            bool computeAttachedSurfaceMesh)
+                            std::shared_ptr<VecDataArray<int, 4>> tetrahedra)
 {
     PointSet::initialize(vertices);
     this->setTetrahedraIndices(tetrahedra);
-
-    if (computeAttachedSurfaceMesh)
-    {
-        this->computeAttachedSurfaceMesh();
-    }
 
     m_removedMeshElems.resize(tetrahedra->size(), false);
 }
@@ -95,41 +89,35 @@ TetrahedralMesh::getVolume()
     return volume;
 }
 
-void
-TetrahedralMesh::computeAttachedSurfaceMesh()
+std::shared_ptr<SurfaceMesh>
+TetrahedralMesh::extractSurfaceMesh()
 {
-    this->m_attachedSurfaceMesh = std::make_shared<SurfaceMesh>();
-
-    CHECK(this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
-        << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
-}
-
-bool
-TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
-                                    const bool                   enforceWindingConsistency /* = false*/)
-{
-    CHECK(surfaceMesh != nullptr)
-        << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
-
-    const std::vector<Vec3i> facePattern = {
+    const std::array<Vec3i, 4> facePattern = {
         Vec3i(0, 1, 2), Vec3i(0, 1, 3), Vec3i(0, 2, 3), Vec3i(1, 2, 3)
     };
+    const std::array<int, 4>   unusedVert = { 3, 2, 1, 0 };
 
     // Find and store the tetrahedral faces that are unique
-    const VecDataArray<int, 4>&           tetraIndices    = *this->getTetrahedraIndices();
-    std::shared_ptr<VecDataArray<int, 3>> triangleIndices = std::make_shared<VecDataArray<int, 3>>();
-    VecDataArray<int, 3>&                 surfaceTri      = *triangleIndices;
-    std::vector<size_t>                   surfaceTriTet;
-    std::vector<size_t>                   tetRemainingVert;
-    bool                                  unique;
-    int                                   foundAt, tetId = 0;
-    int                                   a, b, c;
+    const VecDataArray<int, 4>&              tetraIndices   = *this->getTetrahedraIndices();
+    std::shared_ptr<VecDataArray<double, 3>> tetVerticesPtr = getVertexPositions();
+    const VecDataArray<double, 3>&           tetVertices    = *tetVerticesPtr;
+    std::shared_ptr<VecDataArray<int, 3>>    triIndicesPtr  = std::make_shared<VecDataArray<int, 3>>();
+    VecDataArray<int, 3>&                    triIndices     = *triIndicesPtr;
+    //std::vector<size_t>                   surfaceTriTet;
 
+    // Gives surfaceTri id/faceid -> index of unused vert for face (4 verts per tet, one will be unused)
+    std::vector<size_t> tetRemainingVert;
+
+    bool unique;
+    int  foundAt;
+    int  a, b, c;
+
+    // For every tetrahedron
     for (int i = 0; i < tetraIndices.size(); i++)
     {
         const Vec4i& tet = tetraIndices[i];
-        // std::cout << "tet: " << tetId << std::endl;
 
+        // For every triangle face of the tetrahedron
         for (int t = 0; t < 4; ++t)
         {
             unique  = true;
@@ -138,10 +126,11 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
             b       = tet[facePattern[t][1]];
             c       = tet[facePattern[t][2]];
 
-            // search in reverse
-            for (int j = surfaceTri.size() - 1; j != -1; j--)
+            // Search in reverse for matching face (consider using hash/unordered or ordered binary tree instead)
+            for (int j = triIndices.size() - 1; j != -1; j--)
             {
-                const Vec3i& tri = surfaceTri[j];
+                const Vec3i& tri = triIndices[j];
+                // Checks all equivalence permutations
                 if (((tri[0] == a)
                      && ((tri[1] == b && tri[2] == c) || (tri[1] == c && tri[2] == b)))
                     || ((tri[1] == a)
@@ -155,78 +144,105 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
                 }
             }
 
+            // If not found yet, insert as potentially unique face
             if (unique)
             {
-                surfaceTri.push_back(Vec3i(a, b, c));
-                surfaceTriTet.push_back(tetId);
-                tetRemainingVert.push_back(static_cast<size_t>(3 - t));
+                triIndices.push_back(Vec3i(a, b, c));
+                //surfaceTriTet.push_back(tetId);
+                tetRemainingVert.push_back(tet[unusedVert[t]]);
             }
+            // If found, erase face, it is not unique anymore
             else
             {
-                surfaceTri.erase(foundAt);
-            }
-        }
-        tetId++;
-    }
-
-    // Arrange the surface triangle faces found in order
-    Vec3d v0, v1, v2;
-    Vec3d centroid;
-    Vec3d normal;
-    for (size_t faceId = 0; faceId < surfaceTri.size(); ++faceId)
-    {
-        v0 = this->getVertexPosition(surfaceTri[faceId][0]);
-        v1 = this->getVertexPosition(surfaceTri[faceId][1]);
-        v2 = this->getVertexPosition(surfaceTri[faceId][2]);
-
-        centroid = (v0 + v1 + v2) / 3;
-
-        normal = ((v0 - v1).cross(v0 - v2));
-
-        if (normal.dot(centroid - this->getVertexPosition(tetRemainingVert.at(faceId))) > 0)
-        {
-            std::swap(surfaceTri[faceId][2], surfaceTri[faceId][1]);
-        }
-    }
-
-    // Renumber the vertices
-    std::list<int> uniqueVertIdList;
-    for (const auto& face : surfaceTri)
-    {
-        uniqueVertIdList.push_back(face[0]);
-        uniqueVertIdList.push_back(face[1]);
-        uniqueVertIdList.push_back(face[2]);
-    }
-    uniqueVertIdList.sort();
-    uniqueVertIdList.unique();
-
-    int                                      vertId;
-    std::list<int>::iterator                 it;
-    std::shared_ptr<VecDataArray<double, 3>> vertPositions = std::make_shared<VecDataArray<double, 3>>();
-    for (vertId = 0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
-    {
-        vertPositions->push_back(this->getVertexPosition(static_cast<size_t>(*it)));
-        for (auto& face : surfaceTri)
-        {
-            for (size_t i = 0; i < 3; ++i)
-            {
-                if (face[i] == *it)
-                {
-                    face[i] = vertId;
-                }
+                triIndices.erase(foundAt);
+                tetRemainingVert.erase(tetRemainingVert.begin() + foundAt);
             }
         }
     }
+    // Finally we end up with a set of unique faces, surfaceTri
+
+    // Ensure all faces are have correct windings (such that interior vertex of the tet is inside)
+    for (int i = 0; i < triIndices.size(); i++)
+    {
+        const Vec3d& v0       = tetVertices[triIndices[i][0]];
+        const Vec3d& v1       = tetVertices[triIndices[i][1]];
+        const Vec3d& v2       = tetVertices[triIndices[i][2]];
+        const Vec3d  normal   = ((v1 - v0).cross(v2 - v0));
+        const Vec3d  centroid = (v0 + v1 + v2) / 3.0;
+
+        // Vertex that does not contribute to the face
+        const Vec3d unusedVertex = tetVertices[tetRemainingVert.at(i)];
+
+        // If the normal is correct, it should be pointing in the same direction as the (face centroid-unusedVertex)
+        if (normal.dot(centroid - unusedVertex) < 0)
+        {
+            std::swap(triIndices[i][2], triIndices[i][1]);
+        }
+    }
+
+    // All the existing triangles are still pointing to the old vertex buffer
+    // we need to reindex and make a new vertex buffer
+
+    // Create a map of old to new indices
+    std::unordered_map<int, int> oldToNewVertId;
+    for (int i = 0; i < triIndices.size(); i++)
+    {
+        Vec3i& face = triIndices[i];
+
+        // If the vertex hasn't been reassigned
+        if (oldToNewVertId.count(face[0]) == 0)
+        {
+            // Use size as new index
+            const int newVertexId = oldToNewVertId.size();
+            oldToNewVertId[face[0]] = newVertexId;
+            face[0] = newVertexId; // Relabel the old one
+        }
+        // If the vertex has already been reassigned
+        else
+        {
+            face[0] = oldToNewVertId[face[0]];
+        }
+
+        if (oldToNewVertId.count(face[1]) == 0)
+        {
+            const int newVertexId = oldToNewVertId.size();
+            oldToNewVertId[face[1]] = newVertexId;
+            face[1] = newVertexId;
+        }
+        else
+        {
+            face[1] = oldToNewVertId[face[1]];
+        }
+
+        if (oldToNewVertId.count(face[2]) == 0)
+        {
+            const int newVertexId = oldToNewVertId.size();
+            oldToNewVertId[face[2]] = newVertexId;
+            face[2] = newVertexId;
+        }
+        else
+        {
+            face[2] = oldToNewVertId[face[2]];
+        }
+    }
+
+    auto                     triVerticesPtr = std::make_shared<VecDataArray<double, 3>>(oldToNewVertId.size());
+    VecDataArray<double, 3>& triVertices    = *triVerticesPtr;
+
+    for (auto vertIndexPair : oldToNewVertId)
+    {
+        const int tetVertId = vertIndexPair.first;
+        const int triVertId = vertIndexPair.second;
+        // Copy the vertex over
+        triVertices[triVertId] = tetVertices[tetVertId];
+    }
+
+    // \todo: Copy over attributes (can't be done yet as type copying of data arrays is not possible)
 
     // Create and attach surface mesh
-    surfaceMesh->initialize(vertPositions, triangleIndices);
-
-    if (enforceWindingConsistency)
-    {
-        surfaceMesh->correctWindingOrder();
-    }
-
-    return true;
+    auto surfMesh = std::make_shared<SurfaceMesh>();
+    surfMesh->initialize(triVerticesPtr, triIndicesPtr);
+    return surfMesh;
 }
 
 void

@@ -389,7 +389,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
         }
 
         auto volMesh = std::make_shared<TetrahedralMesh>();
-        volMesh->initialize(vertices, cellsPtr, false);
+        volMesh->initialize(vertices, cellsPtr);
         return volMesh;
     }
     else if (elemCountMap[ElemType::hexahedron] != 0)
@@ -405,7 +405,7 @@ MSHMeshIO::read(const std::string& filePath, const MeshFileType meshType)
             cells.push_back(hexahedronConnectivity[iHex]);
         }
         auto volMesh = std::make_shared<HexahedralMesh>();
-        volMesh->initialize(vertices, cellsPtr, false);
+        volMesh->initialize(vertices, cellsPtr);
         return volMesh;
     }
     else

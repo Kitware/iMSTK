@@ -33,16 +33,10 @@ HexahedralMesh::HexahedralMesh(const std::string& name) : VolumetricMesh(name),
 
 void
 HexahedralMesh::initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                           std::shared_ptr<VecDataArray<int, 8>> hexahedra,
-                           bool computeAttachedSurfaceMesh)
+                           std::shared_ptr<VecDataArray<int, 8>> hexahedra)
 {
     PointSet::initialize(vertices);
     this->setHexahedraIndices(hexahedra);
-
-    if (computeAttachedSurfaceMesh)
-    {
-        this->computeAttachedSurfaceMesh();
-    }
 }
 
 void
@@ -115,21 +109,11 @@ HexahedralMesh::getVolume()
     return volume / 6.0;
 }
 
-void
-HexahedralMesh::computeAttachedSurfaceMesh()
+std::shared_ptr<SurfaceMesh>
+HexahedralMesh::extractSurfaceMesh()
 {
-    this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
-    if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
-    {
-        LOG(FATAL) << "error: surface mesh was not extracted.";
-    }
-}
-
-bool
-HexahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
-{
-    LOG(FATAL) << "error: not implemented.";
-    return false;
+    LOG(WARNING) << "error: not implemented.";
+    return nullptr;
 }
 
 const Vec8i&
