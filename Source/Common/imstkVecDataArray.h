@@ -177,32 +177,31 @@ public:
     /// \brief Templated copy the current array with a new internal data type, does not change the number
     ///        of components, pass in the new type as a template argument
     ///
-    template<class U>
+    template<typename U>
     VecDataArray<U, N> cast()
     {
-        if (m_mapped) { throw(std::runtime_error("Can't cast a mapped array")); }
+        if (DataArray<T>::m_mapped)
+        {
+            throw(std::runtime_error("Can't cast a mapped array"));
+        }
         VecDataArray<U, N> other;
         other.reserve(size());
         for (auto item : *this)
         {
-            other.push_back(item.cast<U>());
+            other.push_back(item.template cast<U>());
         }
         return other;
     }
 
-    ///
-    /// \brief Cast array to the IMSTK type on the abstract interface, does not
-    ///        change the number of components
-    ///
-    template<class Type>
-    using TargetType = VecDataArray<Type, N>;
-
-    std::unique_ptr<AbstractDataArray> cast(imstk::ScalarType type) override
+    std::shared_ptr<AbstractDataArray> cast(ScalarType type) override
     {
-        if (type == AbstractDataArray::m_scalarType) { return (std::make_unique<VecDataArray<T, N>>(*this)); }
+        if (type == AbstractDataArray::m_scalarType)
+        {
+            return std::make_shared<VecDataArray<T, N>>(*this);
+        }
         switch (type)
         {
-            TemplateMacro(return std::make_unique<TargetType<IMSTK_TT>>(cast<IMSTK_TT>()));
+            TemplateMacro(return (std::make_shared<VecDataArray<IMSTK_TT, N>>(cast<IMSTK_TT>())));
         default:
             throw(std::runtime_error("Unknown scalar type"));
         }

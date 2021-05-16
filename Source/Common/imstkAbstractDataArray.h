@@ -92,7 +92,7 @@ public:
     /// \brief cast the content to the given imstk scalar type without
     ///        having to know the type of the enclosed array
     ///
-    virtual std::unique_ptr<AbstractDataArray> cast(imstk::ScalarType) = 0;
+    virtual std::shared_ptr<AbstractDataArray> cast(ScalarType) = 0;
 
 public:
     ///

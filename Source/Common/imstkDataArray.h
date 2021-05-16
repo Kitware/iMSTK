@@ -379,10 +379,13 @@ public:
     ///
     /// \brief Cast array to specific c++ type
     ///
-    template<class N>
+    template<typename N>
     DataArray<N> cast()
     {
-        if (m_mapped) { throw(std::runtime_error("Can't cast a mapped array")); }
+        if (m_mapped)
+        {
+            throw(std::runtime_error("Can't cast a mapped array"));
+        }
         DataArray<N> result;
         result.reserve(size());
         for (auto& i : *this)
@@ -395,12 +398,15 @@ public:
     ///
     /// \brief Cast array to the IMSTK type on the abstract interface
     ///
-    std::unique_ptr<AbstractDataArray> cast(ScalarType type) override
+    std::shared_ptr<AbstractDataArray> cast(ScalarType type) override
     {
-        if (type == AbstractDataArray::m_scalarType) { return (std::make_unique<DataArray<T>>(*this)); }
+        if (type == AbstractDataArray::m_scalarType)
+        {
+            return std::make_shared<DataArray<T>>(*this);
+        }
         switch (type)
         {
-            TemplateMacro(return std::make_unique<DataArray<IMSTK_TT>>(cast<IMSTK_TT>()));
+            TemplateMacro(return std::make_shared<DataArray<IMSTK_TT>>(cast<IMSTK_TT>()));
         default:
             throw(std::runtime_error("Unknown scalar type"));
         }
