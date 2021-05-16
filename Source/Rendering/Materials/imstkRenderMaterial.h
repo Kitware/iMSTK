@@ -288,28 +288,28 @@ protected:
 
     ///-------------------Common properties---------------------
     double m_diffuse      = 1.0;
-    Color m_diffuseColor = Color::LightGray;
+    Color  m_diffuseColor = Color::LightGray;
 
     double m_specularPower = 100.0;
     double m_specular      = 0.0;
-    Color m_specularColor = Color::Red;
+    Color  m_specularColor = Color::Red;
 
     double m_ambient      = 0.1;
-    Color m_ambientColor = Color::White;
+    Color  m_ambientColor = Color::White;
 
     double m_opacity = 1.0;
 
     ///-------------Wireframe specific properties----------------
     double m_lineWidth        = 1.0;
     double m_pointSize        = 2.0;
-    Color m_edgeColor        = Color::Marigold;
-    Color m_vertexColor      = Color::Teal;
-    bool  m_edgeVisibility   = true; ///< \note not used (vtk backend)
-    bool  m_vertexVisibility = true; ///< \note not used (vtk backend)
+    Color  m_edgeColor        = Color::Marigold;
+    Color  m_vertexColor      = Color::Teal;
+    bool   m_edgeVisibility   = true; ///< \note not used (vtk backend)
+    bool   m_vertexVisibility = true; ///< \note not used (vtk backend)
 
     ///----------------PBR specific properties-------------------
     double m_emissivity    = 0.0;
-    Color m_emmisiveColor = Color::White;
+    Color  m_emmisiveColor = Color::White;
 
     double m_metalness = 1.0; ///< Value for metalness with range: [0.0, 1.0]
     double m_roughness = 1.0; ///< Value for roughness with range: [0.0, 1.0]
