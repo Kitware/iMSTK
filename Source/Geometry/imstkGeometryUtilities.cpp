@@ -410,7 +410,7 @@ GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh
 
         std::shared_ptr<TetrahedralMesh> mesh = std::make_unique<TetrahedralMesh>();
         vMesh = mesh;
-        mesh->initialize(vertices, cells, false);
+        mesh->initialize(vertices, cells);
     }
     else if (cellType == VTK_HEXAHEDRON)
     {
@@ -418,7 +418,7 @@ GeometryUtils::copyToVolumetricMesh(vtkSmartPointer<vtkUnstructuredGrid> vtkMesh
 
         std::shared_ptr<HexahedralMesh> mesh = std::make_unique<HexahedralMesh>();
         vMesh = mesh;
-        mesh->initialize(vertices, cells, false);
+        mesh->initialize(vertices, cells);
     }
     else
     {

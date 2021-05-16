@@ -54,8 +54,7 @@ public:
     ///  hexahedra connectivity
     ///
     void initialize(std::shared_ptr<VecDataArray<double, 3>> vertices,
-                    std::shared_ptr<VecDataArray<int, 8>> hexahedra,
-                    bool computeAttachedSurfaceMesh = false);
+                    std::shared_ptr<VecDataArray<int, 8>> hexahedra);
 
     ///
     /// \brief Clear all the mesh data
@@ -68,13 +67,8 @@ public:
     void print() const override;
 
     ///
-    /// \brief Compute and set the attached surface mesh
-    ///
-    void computeAttachedSurfaceMesh() override;
-
-    ///
     /// \brief Extract surface Mesh
-    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+    std::shared_ptr<SurfaceMesh> extractSurfaceMesh() override;
 
     ///
     /// \brief Returns true if the geometry is a mesh, else returns false

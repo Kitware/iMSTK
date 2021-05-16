@@ -78,10 +78,9 @@ main()
         scene->getActiveCamera()->setFocalPoint(0.0, -10.0, 0.0);
 
         // set up the meshes
-        auto                  highResSurfMesh = MeshIO::read<SurfaceMesh>(surfMeshFileName);
-        auto                  coarseTetMesh   = MeshIO::read<TetrahedralMesh>(tetMeshFileName);
-        imstkNew<SurfaceMesh> coarseSurfMesh;
-        coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
+        auto                         highResSurfMesh = MeshIO::read<SurfaceMesh>(surfMeshFileName);
+        auto                         coarseTetMesh   = MeshIO::read<TetrahedralMesh>(tetMeshFileName);
+        std::shared_ptr<SurfaceMesh> coarseSurfMesh  = coarseTetMesh->extractSurfaceMesh();
 
         // set up visual model based on high res mesh
         imstkNew<RenderMaterial> material;

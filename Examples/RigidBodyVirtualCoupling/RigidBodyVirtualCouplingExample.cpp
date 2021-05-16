@@ -60,19 +60,19 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
     }
 
     // Extract the surface mesh
-    imstkNew<SurfaceMesh> surfMesh;
     tetMesh->scale(15.0, Geometry::TransformType::ApplyToData);
     tetMesh->translate(pos, Geometry::TransformType::ApplyToData);
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Add visual model
-    imstkNew<VisualModel>    renderModel(surfMesh.get());
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(surfMesh);
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.0);
     mat->setColor(Color::Green);
-    renderModel->setRenderMaterial(mat);
-    meshObj->addVisualModel(renderModel);
+    visualModel->setRenderMaterial(mat);
+    meshObj->addVisualModel(visualModel);
 
     // add dynamic model
     imstkNew<RigidBodyModel>  rigidModel;

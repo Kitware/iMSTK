@@ -52,9 +52,8 @@ main()
     // simManager and Scene
     imstkNew<Scene> scene("GeometryProcessing");
 
-    auto                  coarseTetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-    imstkNew<SurfaceMesh> coarseSurfMesh;
-    coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
+    auto                         coarseTetMesh  = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
+    std::shared_ptr<SurfaceMesh> coarseSurfMesh = coarseTetMesh->extractSurfaceMesh();
 
     // Compute DT
     imstkNew<SurfaceMeshDistanceTransform> createSdf;
@@ -95,7 +94,7 @@ main()
     }
     // Create the original mesh visual model
     {
-        imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh.get());
+        imstkNew<VisualModel>    surfMeshModel(coarseSurfMesh);
         imstkNew<RenderMaterial> material;
         material->setColor(Color::Red);
         material->setDisplayMode(RenderMaterial::DisplayMode::Surface);

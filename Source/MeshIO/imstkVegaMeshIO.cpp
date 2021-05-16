@@ -97,7 +97,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
         VegaMeshIO::copyCells<4>(vegaMesh, cells);
 
         auto tetMesh = std::make_shared<TetrahedralMesh>();
-        tetMesh->initialize(vertices, cellsPtr, false);
+        tetMesh->initialize(vertices, cellsPtr);
         mesh = tetMesh;
     }
     else if (cellType == vega::VolumetricMesh::CUBIC)
@@ -107,7 +107,7 @@ VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh
         VegaMeshIO::copyCells<8>(vegaMesh, cells);
 
         auto hexMesh = std::make_shared<HexahedralMesh>();
-        hexMesh->initialize(vertices, cellsPtr, false);
+        hexMesh->initialize(vertices, cellsPtr);
         mesh = hexMesh;
     }
     else

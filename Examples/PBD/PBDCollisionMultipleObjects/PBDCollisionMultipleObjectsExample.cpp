@@ -231,10 +231,7 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     const auto positions = tetMesh->getVertexPositions();
     (void)positions;
 
-    static int count = -1;
-    ++count;
-    surfMesh = std::make_shared<SurfaceMesh>("Dragon-" + std::to_string(count));
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+    surfMesh = tetMesh->extractSurfaceMesh();
 
     imstkNew<RenderMaterial> material;
 #if 0
@@ -250,6 +247,8 @@ generateDragon(const std::shared_ptr<imstk::Scene>& scene,
     imstkNew<VisualModel> surfMeshModel(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
+    static int count = -1;
+    ++count;
     deformableObj = std::make_shared<PbdObject>("Dragon-" + std::to_string(count));
     deformableObj->addVisualModel(surfMeshModel);
     deformableObj->setCollidingGeometry(surfMesh);

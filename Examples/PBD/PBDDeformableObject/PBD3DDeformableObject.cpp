@@ -109,9 +109,7 @@ createAndAddPbdObject(const std::string& tetMeshName)
 {
     auto tetMesh = MeshIO::read<TetrahedralMesh>(tetMeshName);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), -1.3, Geometry::TransformType::ApplyToData);
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
-    surfMesh->flipNormals();
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
@@ -121,7 +119,8 @@ createAndAddPbdObject(const std::string& tetMeshName)
     material->setEdgeColor(Color::Teal);
     material->setShadingModel(RenderMaterial::ShadingModel::Phong);
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    imstkNew<VisualModel> visualModel(surfMesh.get());
+    imstkNew<VisualModel> visualModel;
+    visualModel->setGeometry(surfMesh);
     visualModel->setRenderMaterial(material);
 
     imstkNew<PbdObject> deformableObj("DeformableObject");

@@ -154,8 +154,7 @@ makeFEDragonObject(const std::string& name, const Vec3d& position)
     // Setup the Geometry
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     tetMesh->translate(position, Geometry::TransformType::ApplyToData);
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Setup the Parameters
     imstkNew<FEMModelConfig> config;
@@ -170,7 +169,8 @@ makeFEDragonObject(const std::string& name, const Vec3d& position)
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     // Setup the VisualModel
-    imstkNew<VisualModel>    surfMeshModel(surfMesh.get());
+    imstkNew<VisualModel> surfMeshModel;
+    surfMeshModel->setGeometry(surfMesh);
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::Surface);
     surfMeshModel->setRenderMaterial(material);
@@ -200,8 +200,7 @@ makePBDDragonObject(const std::string& name, const Vec3d& position)
     auto coarseTetMesh   = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
     highResSurfMesh->translate(position, Geometry::TransformType::ApplyToData);
     coarseTetMesh->translate(position, Geometry::TransformType::ApplyToData);
-    imstkNew<SurfaceMesh> coarseSurfMesh;
-    coarseTetMesh->extractSurfaceMesh(coarseSurfMesh, true);
+    std::shared_ptr<SurfaceMesh> coarseSurfMesh = coarseTetMesh->extractSurfaceMesh();
 
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;

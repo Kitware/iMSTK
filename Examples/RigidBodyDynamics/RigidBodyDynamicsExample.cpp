@@ -51,16 +51,13 @@ makeMeshRigidObject(const std::string& name, const Vec3d& pos)
 
     // Load a tetrahedral mesh
     auto tetMesh = MeshIO::read<TetrahedralMesh>(iMSTK_DATA_ROOT "/asianDragon/asianDragon.veg");
-
-    // Extract the surface mesh
-    imstkNew<SurfaceMesh> surfMesh;
-
     tetMesh->scale(15., Geometry::TransformType::ApplyToData);
     tetMesh->translate(pos, Geometry::TransformType::ApplyToData);
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // add visual model
-    imstkNew<VisualModel>    renderModel(surfMesh.get());
+    imstkNew<VisualModel>    renderModel(surfMesh);
     imstkNew<RenderMaterial> mat;
     mat->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
     mat->setLineWidth(2.);

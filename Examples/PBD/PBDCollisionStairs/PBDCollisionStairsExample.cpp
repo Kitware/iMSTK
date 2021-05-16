@@ -114,8 +114,7 @@ makeArmadilloPbdObject(const std::string& name)
     tetMesh->scale(Vec3d(0.07, 0.07, 0.07), Geometry::TransformType::ApplyToData);
     tetMesh->rotate(Vec3d(1.0, 0.0, 0.0), 1.3, Geometry::TransformType::ApplyToData);
     tetMesh->translate(Vec3d(0.0f, 10.0f, 0.0f), Geometry::TransformType::ApplyToData);
-    imstkNew<SurfaceMesh> surfMesh;
-    tetMesh->extractSurfaceMesh(surfMesh, true);
+    std::shared_ptr<SurfaceMesh> surfMesh = tetMesh->extractSurfaceMesh();
 
     // Setup the Parameters
     imstkNew<PBDModelConfig> pbdParams;
@@ -138,7 +137,7 @@ makeArmadilloPbdObject(const std::string& name)
     // Setup the VisualModel
     imstkNew<RenderMaterial> material;
     material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
-    imstkNew<VisualModel> surfMeshModel(surfMesh.get());
+    imstkNew<VisualModel> surfMeshModel(surfMesh);
     surfMeshModel->setRenderMaterial(material);
 
     // Setup the Object
