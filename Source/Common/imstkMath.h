@@ -247,7 +247,7 @@ tetVolume(Vec3d p0, Vec3d p1, Vec3d p2, Vec3d p3)
     m.block<1, 3>(2, 0) = p2;
     m.block<1, 3>(3, 0) = p3;
     m(0, 3) = m(1, 3) = m(2, 3) = m(3, 3) = 1.0;
-    return m.determinant();
+    return m.determinant() / 6.0;
 }
 
 ///

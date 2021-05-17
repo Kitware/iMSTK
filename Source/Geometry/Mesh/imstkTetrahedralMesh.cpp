@@ -64,26 +64,16 @@ TetrahedralMesh::print() const
 double
 TetrahedralMesh::getVolume()
 {
-    Vec3d                          v[4];
-    Mat4d                          A;
     double                         volume   = 0.0;
     const VecDataArray<double, 3>& vertices = *m_vertexPositions;
-    for (const Vec4i& tetIndices : *m_tetrahedraIndices)
+    for (const Vec4i& tet : *m_tetrahedraIndices)
     {
-        for (int i = 0; i < 4; ++i)
-        {
-            v[i] = vertices[tetIndices[i]];
-        }
-
-        A << v[0][0], v[0][1], v[0][2], 1, v[1][0], v[1][1], v[1][2], 1, v[2][0], v[2][1], v[2][2], 1, v[3][0], v[3][1], v[3][2], 1;
-
-        const double det = A.determinant();
-        if (det < 0)
+        const double tetVol = tetVolume(vertices[tet[0]], vertices[tet[1]], vertices[tet[2]], vertices[tet[3]]);
+        if (tetVol < 0.0)
         {
             LOG(WARNING) << "Tetrahedron is inverted, has negative volume!";
         }
-
-        volume += std::abs(det) / 6;
+        volume += tetVol;
     }
 
     return volume;
