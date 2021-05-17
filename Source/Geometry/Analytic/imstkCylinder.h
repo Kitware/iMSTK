@@ -90,12 +90,16 @@ public:
     ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent);
 
+    ///
+    /// \brief Update the Cylinder parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     // Hide these unimplemented functions
     using AnalyticalGeometry::getFunctionValue;
 
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the cylinder
     double m_length = 1.0;                      ///> Length of the cylinder

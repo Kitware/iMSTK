@@ -89,9 +89,13 @@ public:
     ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent);
 
+    ///
+    /// \brief Update the Capsule parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_radius = 1.0;                      ///> Radius of the hemispheres at the end of the capsule
     mutable double m_radiusPostTransform = 1.0; ///> Radius after transform

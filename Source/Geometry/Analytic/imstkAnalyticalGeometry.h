@@ -58,11 +58,15 @@ public:
 
     double getFunctionValue(const Vec3d& imstkNotUsed(pos)) const override { return 0.0; }
 
+    ///
+    /// \brief Update the parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     AnalyticalGeometry(const std::string& name = std::string(""));
 
     virtual void applyTransform(const Mat4d& m) override;
-    virtual void updatePostTransformData() const override;
 
     Vec3d m_position;                             ///> position
     mutable Vec3d m_positionPostTransform;        ///> position once transform applied

@@ -70,7 +70,7 @@ public:
     /// \brief Sets the normal to the plane
     ///
     void setNormal(const Vec3d n);
-    void setNormal(double x, double y, double z);
+    void setNormal(const double x, const double y, const double z);
 
     ///
     /// \brief Returns the width of the plane
@@ -92,9 +92,13 @@ public:
     ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) override;
 
+    ///
+    /// \brief Update the Plane parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_width = 1.0;                      ///> Width of the plane
     mutable double m_widthPostTransform = 1.0; ///> Width of the plane once transform applied

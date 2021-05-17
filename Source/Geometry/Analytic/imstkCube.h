@@ -94,9 +94,13 @@ public:
     ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double paddingPercent = 0.0) override;
 
+    ///
+    /// \brief Update the Cube parameters applying the latest transform
+    ///
+    void updatePostTransformData() const override;
+
 protected:
     void applyTransform(const Mat4d& m) override;
-    void updatePostTransformData() const override;
 
     double m_width = 1.0;                      ///> Width of the cube
     mutable double m_widthPostTransform = 1.0; ///> Width of the cube once transform applied

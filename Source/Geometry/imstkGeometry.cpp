@@ -87,7 +87,7 @@ Geometry::rotate(const Quatd& q, TransformType type)
 void
 Geometry::rotate(const Vec3d& axis, double radians, TransformType type)
 {
-    this->rotate(Rotd(radians, axis).toRotationMatrix(), type);
+    this->rotate(Rotd(radians, axis.normalized()).toRotationMatrix(), type);
 }
 
 void
