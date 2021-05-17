@@ -49,7 +49,6 @@
 #include "imstkVTKViewer.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 ///
 /// \brief This example demonstrates a rigid body model. The rigid body model uses

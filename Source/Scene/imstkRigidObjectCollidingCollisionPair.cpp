@@ -29,8 +29,6 @@ limitations under the License.
 
 namespace imstk
 {
-namespace expiremental
-{
 RigidObjectCollidingCollisionPair::RigidObjectCollidingCollisionPair(
     std::shared_ptr<RigidObject2> obj1, std::shared_ptr<CollidingObject> obj2,
     CollisionDetection::Type cdType, const double stiffness, const double frictionalCoefficient) :
@@ -57,6 +55,5 @@ RigidObjectCollidingCollisionPair::RigidObjectCollidingCollisionPair(
 
     // Setup the handlers for each side
     setCollisionHandlingA(std::make_shared<RigidBodyCH>(CollisionHandling::Side::A, m_colData, obj1, nullptr, stiffness, frictionalCoefficient));
-}
 }
 }

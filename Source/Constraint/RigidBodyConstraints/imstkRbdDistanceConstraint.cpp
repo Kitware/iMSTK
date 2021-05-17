@@ -24,8 +24,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 RbdDistanceConstraint::RbdDistanceConstraint(
     std::shared_ptr<RigidBody> obj1,
     std::shared_ptr<RigidBody> obj2,
@@ -59,6 +57,5 @@ RbdDistanceConstraint::compute(double imstkNotUsed(dt))
         J(1, 0) = diff[1]; J(1, 1) = c[1];
         J(2, 0) = diff[2]; J(2, 1) = c[2];
     }
-}
 }
 }

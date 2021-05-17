@@ -28,8 +28,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 RigidBodyCH::RigidBodyCH(const Side&                          side,
                          const std::shared_ptr<CollisionData> colData,
                          std::shared_ptr<RigidObject2>        rbdObjectA,
@@ -199,6 +197,5 @@ RigidBodyCH::processAB()
             rbdModelAB->addConstraint(frictionConstraint);
         }
     }
-}
 }
 }

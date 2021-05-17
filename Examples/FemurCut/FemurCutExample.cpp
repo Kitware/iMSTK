@@ -47,7 +47,6 @@
 #include "FemurObject.h"
 
 using namespace imstk;
-using namespace imstk::expiremental;
 
 std::shared_ptr<RigidObject2>
 makeRigidObj(const std::string& name)
