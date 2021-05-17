@@ -144,7 +144,7 @@ CollisionPair::apply()
         // Connect inputB's->CD
         for (size_t i = 0; i < m_taskNodeInputs.second.size(); i++)
         {
-            computeGraphA->addEdge(m_taskNodeInputs.second[i], m_collisionDetectionNode);
+            computeGraphB->addEdge(m_taskNodeInputs.second[i], m_collisionDetectionNode);
         }
     }
 
