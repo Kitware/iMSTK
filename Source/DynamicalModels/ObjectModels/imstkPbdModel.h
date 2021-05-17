@@ -55,6 +55,8 @@ struct PBDModelConfig
     double m_dt = 0.0;                       ///> Time step size
     double m_defaultDt = 0.01;               ///> Default Time step size
 
+    bool m_doPartitioning = true;
+
     std::vector<std::size_t> m_fixedNodeIds; ///> Nodal IDs of the nodes that are fixed
     Vec3r m_gravity = Vec3r(0, -9.81, 0);    ///> Gravity
 
