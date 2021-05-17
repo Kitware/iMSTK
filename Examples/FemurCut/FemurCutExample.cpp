@@ -79,7 +79,7 @@ makeRigidObj(const std::string& name)
         rigidObj->setPhysicsGeometry(toolMesh);
         rigidObj->setCollidingGeometry(toolMesh);
         rigidObj->setDynamicalModel(rbdModel);
-        rigidObj->getRigidBody()->m_mass = 1.0;
+        rigidObj->getRigidBody()->m_mass = 10.0;
         rigidObj->getRigidBody()->m_intertiaTensor = Mat3d::Identity() * 10000.0;
         rigidObj->getRigidBody()->m_initPos = Vec3d(0.0, 1.0, 2.0);
     }
@@ -159,7 +159,7 @@ main()
         imstkNew<RigidObjectController> controller(rbdObj, hapticDeviceClient);
         {
             controller->setLinearKd(1000.0);
-            controller->setLinearKs(100000.0);
+            controller->setLinearKs(200000.0);
             controller->setAngularKs(300000000.0);
             controller->setAngularKd(400000.0);
             controller->setForceScaling(0.001);
