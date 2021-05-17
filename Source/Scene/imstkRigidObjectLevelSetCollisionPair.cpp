@@ -91,8 +91,8 @@ RigidObjectLevelSetCollisionPair::apply()
         // 1.) Copy the vertices at the start of the frame
         obj1->getTaskGraph()->insertBefore(obj1->getRigidBodyModel2()->getComputeTentativeVelocitiesNode(),
             std::make_shared<TaskNode>([ = ]()
-                {
-                    copyVertsToPrevious();
+            {
+                copyVertsToPrevious();
                 }, "CopyVertsToPrevious"));
 
         // If you were to update to tentative, you'd do it here, then compute displacements
@@ -143,8 +143,8 @@ RigidObjectLevelSetCollisionPair::measureDisplacementFromPrevious()
 
         ParallelUtils::parallelFor(displacements->size(),
             [&](const int i)
-                {
-                    displacementsArr[i] = vertices[i] - prevVertices[i];
+            {
+                displacementsArr[i] = vertices[i] - prevVertices[i];
             });
     }
 }
