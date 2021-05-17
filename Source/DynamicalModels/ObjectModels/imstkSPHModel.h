@@ -26,8 +26,6 @@
 #include "imstkSPHKernels.h"
 #include "imstkNeighborSearch.h"
 #include "imstkSPHBoundaryConditions.h"
-#include "imstkSPHHemorrhage.h"
-#include "imstkTetrahedralMesh.h"
 
 namespace imstk
 {
@@ -157,18 +155,10 @@ public:
     /// \brief Write the state to external file
     /// \todo move this out of this class
     ///
-    void setWriteToOutputModulo(const double modulo) { m_writeToOutputModulo = modulo; }
-    double getTotalTime() const { return m_totalTime; }
-    int getTimeStepCount() const { return m_timeStepCount; }
-    void writeStateToVtk();
-    void setGeometryMesh(std::shared_ptr<TetrahedralMesh>& geometryMesh) { m_geomUnstructuredGrid = geometryMesh; }
     void findNearestParticleToVertex(const VecDataArray<double, 3>& points, const std::vector<std::vector<size_t>>& indices);
 
     void setBoundaryConditions(std::shared_ptr<SPHBoundaryConditions> sphBoundaryConditions) { m_sphBoundaryConditions = sphBoundaryConditions; }
     std::shared_ptr<SPHBoundaryConditions> getBoundaryConditions() { return m_sphBoundaryConditions; }
-
-    void setHemorrhageModel(std::shared_ptr<SPHHemorrhage> sPHHemorrhage) { m_SPHHemorrhage = sPHHemorrhage; }
-    std::shared_ptr<SPHHemorrhage> getHemorrhageModel() { return m_SPHHemorrhage; }
 
     void setRestDensity(const Real restDensity) { m_modelParameters->m_restDensity = restDensity; }
 
@@ -293,19 +283,9 @@ private:
     std::shared_ptr<VecDataArray<double, 3>> m_initialVelocities = nullptr;
     std::shared_ptr<DataArray<double>>       m_initialDensities  = nullptr;
 
-    double m_totalTime           = 0;
-    int    m_timeStepCount       = 0;
-    double m_writeToOutputModulo = 0;
-    double m_vtkPreviousTime     = 0;
-    double m_vtkTimeModulo       = 0;
-    double m_csvPreviousTime     = 0;
-    double m_csvTimeModulo       = 0;
-    Vec3d  m_prevAvgVelThroughHemorrhage = Vec3d(0., 0., 0.);
+    int m_timeStepCount = 0;
 
-    std::shared_ptr<TetrahedralMesh>       m_geomUnstructuredGrid  = nullptr;
     std::shared_ptr<SPHBoundaryConditions> m_sphBoundaryConditions = nullptr;
-    // \todo: Should be refactored out of the base SPHModel
-    std::shared_ptr<SPHHemorrhage> m_SPHHemorrhage = nullptr;
 
     std::vector<size_t> m_minIndices;
 };

@@ -171,16 +171,16 @@ RigidBodyModel2::computeTentativeVelocities()
 
     // Sum gravity to the forces
     ParallelUtils::parallelFor(forces.size(), [&forces, &fG](const int& i)
-            {
-                forces[i] += fG;
+        {
+            forces[i] += fG;
         }, forces.size() > m_maxBodiesParallel);
 
     // Compute the desired velocites, later we will solve for the proper velocities,
     // adjusted for the constraints
     ParallelUtils::parallelFor(tentativeVelocities.size(), [&](const size_t& i)
-            {
-                tentativeVelocities[i] += forces[i] * invMasses[i] * dt;
-                tentativeAngularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
+        {
+            tentativeVelocities[i] += forces[i] * invMasses[i] * dt;
+            tentativeAngularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
         }, tentativeVelocities.size() > m_maxBodiesParallel);
 }
 
@@ -359,33 +359,33 @@ RigidBodyModel2::integrate()
     StdVectorOfVec3d& torques = getCurrentState()->getTorques();
 
     ParallelUtils::parallelFor(positions.size(), [&](const size_t& i)
+        {
+            if (!isStatic[i])
             {
-                if (!isStatic[i])
+                velocities[i] += forces[i] * invMasses[i] * dt;
+                velocities[i] *= velocityDamping;
+                angularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
+                angularVelocities[i] *= angularVelocityDamping;
+                positions[i] += velocities[i] * dt;
                 {
-                    velocities[i] += forces[i] * invMasses[i] * dt;
-                    velocities[i] *= velocityDamping;
-                    angularVelocities[i] += invInteriaTensors[i] * torques[i] * dt;
-                    angularVelocities[i] *= angularVelocityDamping;
-                    positions[i] += velocities[i] * dt;
-                    {
-                        const Quatd q = Quatd(0.0,
+                    const Quatd q = Quatd(0.0,
                             angularVelocities[i][0],
                             angularVelocities[i][1],
                             angularVelocities[i][2]) * orientations[i];
-                        orientations[i].x() += q.x() * dt;
-                        orientations[i].y() += q.y() * dt;
-                        orientations[i].z() += q.z() * dt;
-                        orientations[i].w() += q.w() * dt;
-                        orientations[i].normalize();
-                    }
+                    orientations[i].x() += q.x() * dt;
+                    orientations[i].y() += q.y() * dt;
+                    orientations[i].z() += q.z() * dt;
+                    orientations[i].w() += q.w() * dt;
+                    orientations[i].normalize();
                 }
+            }
 
-                // Reset
-                m_bodies[i]->m_prevForce = forces[i];
-                forces[i]  = Vec3d(0.0, 0.0, 0.0);
-                torques[i] = Vec3d(0.0, 0.0, 0.0);
-                tentativeVelocities[i] = velocities[i];
-                tentativeAngularVelocities[i] = angularVelocities[i];
+            // Reset
+            m_bodies[i]->m_prevForce = forces[i];
+            forces[i]  = Vec3d(0.0, 0.0, 0.0);
+            torques[i] = Vec3d(0.0, 0.0, 0.0);
+            tentativeVelocities[i] = velocities[i];
+            tentativeAngularVelocities[i] = angularVelocities[i];
         }, positions.size() > m_maxBodiesParallel);
 }
 
