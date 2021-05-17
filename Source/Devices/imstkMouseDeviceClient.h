@@ -88,7 +88,6 @@ public:
 
 public:
     // *INDENT-OFF*
-
     ///
     /// \brief Posted when a button on the mouse is pressed (not continuously)
     ///
@@ -108,8 +107,8 @@ public:
     /// \brief Posted when mouse moves
     ///
     SIGNAL(MouseDeviceClient, mouseMove);
-
     // *INDENT-ON*
+
 public:
     ///
     /// \brief Get the current position of the mouse
