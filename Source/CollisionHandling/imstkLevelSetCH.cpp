@@ -29,8 +29,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 LevelSetCH::LevelSetCH(const Side&                               side,
                        const std::shared_ptr<CollisionData>      colData,
                        std::shared_ptr<LevelSetDeformableObject> lvlSetObj,
@@ -172,6 +170,5 @@ LevelSetCH::maskAllPoints()
     {
         m_ptIdMask.insert(i);
     }
-}
 }
 }

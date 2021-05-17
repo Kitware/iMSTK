@@ -28,11 +28,8 @@
 
 namespace imstk
 {
-class LevelSetDeformableObject;
 struct CollisionData;
-
-namespace expiremental
-{
+class LevelSetDeformableObject;
 class RigidObject2;
 
 ///
@@ -104,5 +101,4 @@ private:
     double  m_kernelSigma   = 1.0;
     double* m_kernelWeights = nullptr;
 };
-}
 }

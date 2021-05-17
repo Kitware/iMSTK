@@ -25,8 +25,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 class RigidObject2;
 
 ///
@@ -145,5 +143,4 @@ protected:
     std::deque<Vec3d> m_forces;
     Vec3d m_forceSum = Vec3d::Zero();
 };
-}
 }

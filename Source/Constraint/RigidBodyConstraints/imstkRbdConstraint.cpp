@@ -25,8 +25,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 void
 RigidBody::setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const double scale, const bool useBoundingBoxOrigin)
 {
@@ -56,6 +54,5 @@ RigidBody::setInertiaFromPointSet(std::shared_ptr<PointSet> pointset, const doub
     results(0, 1)    = results(1, 0);
     results(1, 2)    = results(2, 1);
     m_intertiaTensor = results * m_mass * scale;
-}
 }
 }

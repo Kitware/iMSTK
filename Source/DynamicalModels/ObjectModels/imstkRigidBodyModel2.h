@@ -31,9 +31,6 @@ namespace imstk
 {
 template<typename ScalarType>
 class ProjectedGaussSeidelSolver;
-
-namespace expiremental
-{
 class RbdConstraint;
 struct RigidBody;
 
@@ -154,5 +151,4 @@ protected:
 
     Eigen::VectorXd F;               // Reaction forces
 };
-}
 }

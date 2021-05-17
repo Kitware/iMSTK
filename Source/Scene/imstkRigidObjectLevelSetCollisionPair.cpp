@@ -36,8 +36,6 @@ limitations under the License.
 
 namespace imstk
 {
-namespace expiremental
-{
 RigidObjectLevelSetCollisionPair::RigidObjectLevelSetCollisionPair(std::shared_ptr<RigidObject2> obj1, std::shared_ptr<LevelSetDeformableObject> obj2) :
     CollisionPair(obj1, obj2), m_prevVertices(std::make_shared<VecDataArray<double, 3>>())
 {
@@ -149,6 +147,5 @@ RigidObjectLevelSetCollisionPair::measureDisplacementFromPrevious()
                     displacementsArr[i] = vertices[i] - prevVertices[i];
             });
     }
-}
 }
 }

@@ -24,8 +24,6 @@
 
 namespace imstk
 {
-namespace expiremental
-{
 RbdFrictionConstraint::RbdFrictionConstraint(
     std::shared_ptr<RigidBody> obj1,
     std::shared_ptr<RigidBody> obj2,
@@ -97,4 +95,3 @@ RbdFrictionConstraint::compute(double imstkNotUsed(dt))
     }*/
 }
 }
-};
