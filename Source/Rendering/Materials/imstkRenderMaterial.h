@@ -49,7 +49,8 @@ public:
         WireframeSurface,
         VolumeRendering,
         Fluid,               ///< Renders a set of points using a screen-space fluid renderer
-        Image
+        Image,
+        SurfaceNormals
     };
 
     /// surface shading model. Defaults to Phong

@@ -112,17 +112,21 @@ makeClothObj(const std::string& name, double width, double height, int nRows, in
     pbdModel->setModelGeometry(clothMesh);
     pbdModel->configure(pbdParams);
 
-    // Setup the VisualModel
-    imstkNew<RenderMaterial> material;
-    material->setBackFaceCulling(false);
-    material->setColor(Color::LightGray);
-    material->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
+    // Setup visual models
+    imstkNew<VisualModel> clothModel;
+    clothModel->setGeometry(clothMesh);
+    clothModel->getRenderMaterial()->setBackFaceCulling(false);
+    clothModel->getRenderMaterial()->setColor(Color::LightGray);
+    clothModel->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::WireframeSurface);
 
-    auto clothVisualModel = std::make_shared<VisualModel>(clothMesh);
-    clothVisualModel->setRenderMaterial(material);
+    imstkNew<VisualModel> clothSurfaceNormals;
+    clothSurfaceNormals->setGeometry(clothMesh);
+    clothSurfaceNormals->getRenderMaterial()->setDisplayMode(RenderMaterial::DisplayMode::SurfaceNormals);
+    clothSurfaceNormals->getRenderMaterial()->setPointSize(0.5);
 
     // Setup the Object
-    clothObj->addVisualModel(clothVisualModel);
+    clothObj->addVisualModel(clothModel);
+    clothObj->addVisualModel(clothSurfaceNormals);
     clothObj->setPhysicsGeometry(clothMesh);
     clothObj->setDynamicalModel(pbdModel);
 

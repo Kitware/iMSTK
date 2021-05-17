@@ -36,6 +36,7 @@
 #include "imstkVTKCubeRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkVTKFluidRenderDelegate.h"
+#include "imstkVTKSurfaceNormalRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
 #include "imstkVTKImageDataRenderDelegate.h"
 #include "imstkVTKLineMeshRenderDelegate.h"
@@ -73,6 +74,7 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
 {
     const std::string geomType = visualModel->getGeometry()->getTypeName();
 
+    // Two edge cases
     if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::Fluid)
     {
         if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
@@ -80,14 +82,17 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
             return std::make_shared<VTKFluidRenderDelegate>(visualModel);
         }
     }
+    if (visualModel->getRenderMaterial()->getDisplayMode() == RenderMaterial::DisplayMode::SurfaceNormals)
+    {
+        if (std::dynamic_pointer_cast<PointSet>(visualModel->getGeometry()) != nullptr)
+        {
+            return std::make_shared<VTKSurfaceNormalRenderDelegate>(visualModel);
+        }
+    }
 
     if (visualModel->getGeometry()->isMesh())
     {
-        if (geomType == "PointSet")
-        {
-            return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
-        }
-        else if (geomType == "SurfaceMesh")
+        if (geomType == "SurfaceMesh")
         {
             return std::make_shared<VTKSurfaceMeshRenderDelegate>(visualModel);
         }
@@ -106,7 +111,11 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
     }
     else
     {
-        if (geomType == "Plane")
+        if (geomType == "PointSet")
+        {
+            return std::make_shared<VTKPointSetRenderDelegate>(visualModel);
+        }
+        else if (geomType == "Plane")
         {
             return std::make_shared<VTKPlaneRenderDelegate>(visualModel);
         }
@@ -161,7 +170,7 @@ VTKRenderDelegate::makeDebugDelegate(std::shared_ptr<VisualModel> dbgVizModel)
     }
     default:
     {
-        LOG(FATAL) << "error: Geometry type incorrect/unsupported";
+        LOG(FATAL) << "RenderDelegate::makeDebugDelegate error: Geometry type incorrect.";
         return nullptr; // will never be reached
     }
     }
