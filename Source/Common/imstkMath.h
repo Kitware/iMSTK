@@ -236,6 +236,21 @@ mat4dTRS(const Mat4d& m, Vec3d& t, Mat3d& r, Vec3d& s)
 }
 
 ///
+/// \brief Computes tet signed volume/determinant
+///
+static double
+tetVolume(Vec3d p0, Vec3d p1, Vec3d p2, Vec3d p3)
+{
+    Mat4d m;
+    m.block<1, 3>(0, 0) = p0;
+    m.block<1, 3>(1, 0) = p1;
+    m.block<1, 3>(2, 0) = p2;
+    m.block<1, 3>(3, 0) = p3;
+    m(0, 3) = m(1, 3) = m(2, 3) = m(3, 3) = 1.0;
+    return m.determinant() / 6.0;
+}
+
+///
 /// \brief Compute bary centric coordinates (u,v,w) given triangle in 2d space (and point p on triangle)
 ///
 static Vec3d

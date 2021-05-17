@@ -100,6 +100,32 @@ TEST_F(imstkTetrahedralMeshTest, ExtractSurfaceMesh)
 }
 
 ///
+/// \brief Test the computation of volume
+///
+TEST_F(imstkTetrahedralMeshTest, GetVolume)
+{
+    // We use a regular tetrahedron with edge lengths 2
+    // V = (edge length)^3/(6sqrt(2))
+    const double edgeLenth      = 2.0;
+    const double expectedVolume = std::pow(edgeLenth, 3.0) / (6.0 * std::sqrt(2.0));
+
+    auto                     verticesPtr = std::make_shared<VecDataArray<double, 3>>(4);
+    auto                     indicesPtr  = std::make_shared<VecDataArray<int, 4>>(1);
+    VecDataArray<double, 3>& vertices    = *verticesPtr;
+    VecDataArray<int, 4>&    indices     = *indicesPtr;
+
+    vertices[0] = Vec3d(1.0, 0.0, -1.0 / std::sqrt(2.0));
+    vertices[1] = Vec3d(-1.0, 0.0, -1.0 / std::sqrt(2.0));
+    vertices[2] = Vec3d(0.0, 1.0, 1.0 / std::sqrt(2.0));
+    vertices[3] = Vec3d(0.0, -1.0, 1.0 / std::sqrt(2.0));
+
+    indices[0] = Vec4i(0, 1, 2, 3);
+
+    m_tetMesh.initialize(verticesPtr, indicesPtr);
+    EXPECT_NEAR(expectedVolume, m_tetMesh.getVolume(), 0.000001);
+}
+
+///
 /// \brief TODO
 ///
 int
