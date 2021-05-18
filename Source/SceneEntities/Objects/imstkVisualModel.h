@@ -58,6 +58,7 @@ public:
     // *INDENT-OFF*
     SIGNAL(VisualModel, modified);
     // *INDENT-ON*
+
 public:
     ///
     /// \brief Get/set geometry

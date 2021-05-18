@@ -50,6 +50,7 @@ public:
     // *INDENT-OFF*
     SIGNAL(SceneObject, modified);
     // *INDENT-ON*
+
 public:
     ///
     /// \brief Get the type of the object

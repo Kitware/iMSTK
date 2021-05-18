@@ -95,15 +95,14 @@ public:
 
 public:
     // *INDENT-OFF*
-
     SIGNAL(Scene, configureTaskGraph);
     ///
     /// \brief Called when scene is modified, when scene objects
     /// or interactions are added/removed
     ///
     SIGNAL(Scene, modified);
-
     // *INDENT-ON*
+
 public:
     ///
     /// \brief Initialize the scene

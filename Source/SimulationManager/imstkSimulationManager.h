@@ -67,6 +67,7 @@ public:
     ///
     SIGNAL(SimulationManager, ending);
     // *INDENT-ON*
+
 public:
     void start() override;
 

@@ -171,7 +171,14 @@ PbdModel::initialize()
         }
 
         // Partition constraints for parallel computation
-        this->partitionConstraints();
+        if (m_parameters->m_doPartitioning)
+        {
+            this->partitionConstraints();
+        }
+        else
+        {
+            m_partitionedConstraints->clear();
+        }
     }
 
     // Setup the default pbd solver if none exists
@@ -233,8 +240,8 @@ PbdModel::initState()
             std::fill(m_invMass->begin(), m_invMass->end(), (uniformMass != 0.0) ? 1.0 / uniformMass : 0.0);
 
             m_mesh->setVertexAttribute("Mass", m_mass);
-            m_mesh->setVertexAttribute("InvMass", m_invMass);
         }
+        m_mesh->setVertexAttribute("InvMass", m_invMass);
     }
 
     // Initialize Velocities
@@ -919,22 +926,23 @@ PbdModel::setPointUnfixed(const size_t idx)
 void
 PbdModel::integratePosition()
 {
-    VecDataArray<double, 3>&       prevPos   = *m_previousState->getPositions();
-    VecDataArray<double, 3>&       pos       = *m_currentState->getPositions();
-    VecDataArray<double, 3>&       vel       = *m_currentState->getVelocities();
-    const VecDataArray<double, 3>& accn      = *m_currentState->getAccelerations();
-    const DataArray<double>&       invMasses = *m_invMass;
+    VecDataArray<double, 3>& prevPos   = *m_previousState->getPositions();
+    VecDataArray<double, 3>& pos       = *m_currentState->getPositions();
+    VecDataArray<double, 3>& vel       = *m_currentState->getVelocities();
+    VecDataArray<double, 3>& accn      = *m_currentState->getAccelerations();
+    const DataArray<double>& invMasses = *m_invMass;
 
     ParallelUtils::parallelFor(m_mesh->getNumVertices(),
         [&](const size_t i)
         {
-            if (std::abs(invMasses[i]) > MIN_REAL)
+            if (std::abs(invMasses[i]) > 0.0)
             {
                 vel[i]    += (accn[i] + m_parameters->m_gravity) * m_parameters->m_dt;
+                accn[i]    = Vec3d::Zero();
                 prevPos[i] = pos[i];
                 pos[i]    += (1.0 - m_parameters->m_viscousDampingCoeff) * vel[i] * m_parameters->m_dt;
             }
-        });
+        }, m_mesh->getNumVertices() > 50);
 }
 
 void
@@ -945,13 +953,17 @@ PbdModel::updateVelocity()
     VecDataArray<double, 3>&       vel       = *m_currentState->getVelocities();
     const DataArray<double>&       invMasses = *m_invMass;
 
-    ParallelUtils::parallelFor(m_mesh->getNumVertices(),
-        [&](const size_t i)
-        {
-            if (std::abs(invMasses[i]) > MIN_REAL && m_parameters->m_dt > 0.0)
+    if (m_parameters->m_dt > 0.0)
+    {
+        const double invDt = 1.0 / m_parameters->m_dt;
+        ParallelUtils::parallelFor(m_mesh->getNumVertices(),
+            [&](const size_t i)
             {
-                vel[i] = (pos[i] - prevPos[i]) / m_parameters->m_dt;
-            }
-        });
+                if (std::abs(invMasses[i]) > 0.0)
+                {
+                    vel[i] = (pos[i] - prevPos[i]) * invDt;
+                }
+            }, m_mesh->getNumVertices() > 50);
+    }
 }
 } // imstk
