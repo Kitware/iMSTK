@@ -36,7 +36,15 @@ public:
     ///
     /// \brief Constructor
     ///
-    Capsule(const std::string& name = std::string("defaultCapsule")) : AnalyticalGeometry(name) { }
+    Capsule(const Vec3d& pos = Vec3d(0.0, 0.0, 0.0), const double radius = 0.5, const double length = 1.0, const Vec3d orientationAxis = Vec3d(0.0, 1.0, 0.0),
+            const std::string& name = std::string("defaultCapsule")) :
+        AnalyticalGeometry(name)
+    {
+        setPosition(pos);
+        setOrientationAxis(orientationAxis);
+        setRadius(radius);
+        setLength(length);
+    }
 
     ///
     /// \brief Deconstructor
