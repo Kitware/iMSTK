@@ -471,7 +471,7 @@ SurfaceMesh::optimizeForDataLocality()
     this->initialize(optimallyOrderedNodalPos, optConnectivityRenumbered);
 }
 
-size_t
+int
 SurfaceMesh::getNumTriangles() const
 {
     return m_triangleIndices->size();
