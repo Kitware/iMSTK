@@ -204,7 +204,7 @@ PbdModel::initState()
 {
     // Get the mesh
     m_mesh = std::dynamic_pointer_cast<PointSet>(m_geometry);
-    const int numParticles = static_cast<int>(m_mesh->getNumVertices());
+    const int numParticles = m_mesh->getNumVertices();
 
     m_initialState  = std::make_shared<PbdState>(numParticles);
     m_previousState = std::make_shared<PbdState>(numParticles);

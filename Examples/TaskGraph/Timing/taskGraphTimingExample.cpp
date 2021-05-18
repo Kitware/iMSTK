@@ -41,7 +41,7 @@ using namespace imstk;
 /// \brief Create pbd string geometry
 ///
 static std::shared_ptr<LineMesh>
-makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringLength)
+makeStringGeometry(const Vec3d& pos, const int numVerts, const double stringLength)
 {
     const double vertexSpacing = stringLength / numVerts;
 
@@ -50,8 +50,8 @@ makeStringGeometry(const Vec3d& pos, const size_t numVerts, const double stringL
 
     imstkNew<VecDataArray<double, 3>> verticesPtr;
     VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    vertices.resize(static_cast<int>(numVerts));
-    for (size_t j = 0; j < numVerts; j++)
+    vertices.resize(numVerts);
+    for (int j = 0; j < numVerts; j++)
     {
         vertices[j] = pos - Vec3d(0.0, static_cast<double>(j) * vertexSpacing, 0.0);
     }
@@ -121,8 +121,8 @@ makePbdString(
 }
 
 static std::vector<std::shared_ptr<PbdObject>>
-makePbdStrings(const size_t numStrings,
-               const size_t numVerts,
+makePbdStrings(const int    numStrings,
+               const int    numVerts,
                const double stringSpacing,
                const double stringLength,
                const Color& startColor,
@@ -132,7 +132,7 @@ makePbdStrings(const size_t numStrings,
 
     const double size = stringSpacing * (numStrings - 1);
 
-    for (unsigned int i = 0; i < numStrings; i++)
+    for (int i = 0; i < numStrings; i++)
     {
         const Vec3d  tipPos = Vec3d(static_cast<double>(i) * stringSpacing - size * 0.5, stringLength * 0.5, 0.0);
         const double t      = static_cast<double>(i) / (numStrings - 1);
@@ -151,8 +151,8 @@ makePbdStrings(const size_t numStrings,
 
 const double dt            = 0.0005;
 const double radius        = 1.5;
-const size_t numStrings    = 8;                    // Number of strings
-const size_t numVerts      = 30;                   // Number of vertices on each string
+const int    numStrings    = 8;                    // Number of strings
+const int    numVerts      = 30;                   // Number of vertices on each string
 const double stringSpacing = 2.0;                  // How far each string is apart
 const double stringLength  = 10.0;                 // Total length of string
 const Color  startColor    = Color(1.0, 0.0, 0.0); // Color of first string

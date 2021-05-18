@@ -157,7 +157,7 @@ main()
 
     // Setup some scalars
     auto clothGeometry = std::dynamic_pointer_cast<SurfaceMesh>(clothObj->getPhysicsGeometry());
-    auto scalarsPtr    = std::make_shared<DataArray<double>>(static_cast<int>(clothGeometry->getNumVertices()));
+    auto scalarsPtr    = std::make_shared<DataArray<double>>(clothGeometry->getNumVertices());
     std::fill_n(scalarsPtr->getPointer(), scalarsPtr->size(), 0.0);
     clothGeometry->setVertexScalars("scalars", scalarsPtr);
 

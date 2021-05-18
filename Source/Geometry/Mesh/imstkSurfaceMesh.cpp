@@ -175,7 +175,7 @@ SurfaceMesh::computeTrianglesNormals()
     {
         if (m_triangleIndices->size() != triangleNormalsPtr->size())
         {
-            triangleNormalsPtr->resize(static_cast<int>(m_triangleIndices->size()));
+            triangleNormalsPtr->resize(m_triangleIndices->size());
         }
     }
     VecDataArray<double, 3>& triangleNormals = *triangleNormalsPtr;
@@ -210,7 +210,7 @@ SurfaceMesh::computeTriangleTangents()
         {
             if (m_triangleIndices->size() != triangleTangentsPtr->size())
             {
-                triangleTangentsPtr->resize(static_cast<int>(m_triangleIndices->size()));
+                triangleTangentsPtr->resize(m_triangleIndices->size());
             }
         }
         VecDataArray<double, 3>& triangleTangents = *triangleTangentsPtr;
@@ -621,7 +621,7 @@ SurfaceMesh::computeUVSeamVertexGroups()
 void
 SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
 {
-    // todo: Add deep copies to all geometry classes
+    // \todo: Add deep copies to all geometry classes
     // SurfaceMesh members
     this->m_triangleIndices = std::make_shared<VecDataArray<int, 3>>(*srcMesh->m_triangleIndices);
     this->m_vertexNeighborTriangles = srcMesh->m_vertexNeighborTriangles;
@@ -630,7 +630,7 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     {
         this->m_UVSeamVertexGroups[i.first] = std::make_shared<std::vector<size_t>>(*i.second);
     }
-    // todo: abstract DataArray's can't be copied
+    // \todo: abstract DataArray's can't be copied currently
     for (auto i : srcMesh->m_cellAttributes)
     {
         this->m_cellAttributes[i.first] = i.second;
@@ -644,7 +644,7 @@ SurfaceMesh::deepCopy(std::shared_ptr<SurfaceMesh> srcMesh)
     // PointSet members
     this->m_initialVertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_initialVertexPositions);
     this->m_vertexPositions = std::make_shared<VecDataArray<double, 3>>(*srcMesh->m_vertexPositions);
-    // todo: abstract DataArray's can't be copied
+    // \todo: abstract DataArray's can't be copied currently
     for (auto i : srcMesh->m_vertexAttributes)
     {
         this->m_vertexAttributes[i.first] = i.second;
