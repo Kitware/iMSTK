@@ -360,6 +360,12 @@ GeometryUtils::copyToLineMesh(vtkSmartPointer<vtkPolyData> vtkMesh)
     std::shared_ptr<VecDataArray<double, 3>> vertices = copyToVecDataArray(vtkMesh->GetPoints());
     std::shared_ptr<VecDataArray<int, 2>>    cells    = copyToVecDataArray<2>(vtkMesh->GetPolys());
 
+    // If polys is empty use lines instead
+    if (cells->size() == 0)
+    {
+        cells = copyToVecDataArray<2>(vtkMesh->GetLines());
+    }
+
     auto mesh = std::make_unique<LineMesh>();
     mesh->initialize(vertices, cells);
 
