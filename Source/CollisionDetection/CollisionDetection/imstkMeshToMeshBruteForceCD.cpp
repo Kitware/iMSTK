@@ -57,7 +57,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
         const VecDataArray<double, 3>& mesh1Vertices = *lineMesh->getVertexPositions();
 
         // brute force, use BVH or spatial grid would be much better
-        for (int i = 0; i < static_cast<int>(lineMesh->getNumVertices()); ++i)
+        for (int i = 0; i < lineMesh->getNumVertices(); ++i)
         {
             const Vec3d p = mesh1Vertices[i];
 
@@ -145,7 +145,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
         // brute force, use BVH or spatial grid would be much better
         // point
-        for (int i = 0; i < static_cast<int>(pointSet->getNumVertices()); ++i)
+        for (int i = 0; i < pointSet->getNumVertices(); ++i)
         {
             const auto p = mesh1Vertices[i];
 
@@ -174,7 +174,7 @@ MeshToMeshBruteForceCD::computeCollisionData()
 
         // brute force, use BVH or spatial grid would be much better
         // point
-        for (int i = 0; i < static_cast<int>(surfMesh->getNumVertices()); ++i)
+        for (int i = 0; i < surfMesh->getNumVertices(); ++i)
         {
             const Vec3d p = mesh1Vertices[i];
 

@@ -289,7 +289,7 @@ createUniformSurfaceMesh(const double width, const double height, const int nRow
 
     imstkNew<VecDataArray<double, 3>> verticesPtr;
     VecDataArray<double, 3>&          vertices = *verticesPtr.get();
-    vertices.resize(static_cast<int>(nRows * nCols));
+    vertices.resize(nRows * nCols);
     for (int i = 0; i < nRows; i++)
     {
         for (int j = 0; j < nCols; j++)

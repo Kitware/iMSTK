@@ -146,7 +146,7 @@ SPHModel::initialize()
 {
     LOG_IF(FATAL, (!this->getModelGeometry())) << "Model geometry is not yet set! Cannot initialize without model geometry.";
     m_pointSetGeometry = std::dynamic_pointer_cast<PointSet>(m_geometry);
-    const int numParticles = static_cast<int>(m_pointSetGeometry->getNumVertices());
+    const int numParticles = m_pointSetGeometry->getNumVertices();
 
     // Allocate init and current state
     m_initialState = std::make_shared<SPHState>(numParticles);

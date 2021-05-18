@@ -166,7 +166,7 @@ void
 LevelSetCH::maskAllPoints()
 {
     std::shared_ptr<PointSet> pointSet = std::dynamic_pointer_cast<PointSet>(m_rigidObj->getCollidingGeometry());
-    for (int i = 0; i < static_cast<int>(pointSet->getNumVertices()); i++)
+    for (int i = 0; i < pointSet->getNumVertices(); i++)
     {
         m_ptIdMask.insert(i);
     }
