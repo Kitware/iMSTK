@@ -22,9 +22,9 @@
 #pragma once
 
 #include "imstkGeometry.h"
+#include "imstkTypes.h"
 
 #include <unordered_map>
-#include "imstkTypes.h"
 
 namespace imstk
 {
