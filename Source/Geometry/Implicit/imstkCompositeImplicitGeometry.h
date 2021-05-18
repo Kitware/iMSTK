@@ -70,7 +70,11 @@ public:
     /// \param geometry to use
     /// \param boolean function type to use
     ///
-    void addImplicitGeometry(std::shared_ptr<ImplicitGeometry> geometry, const GeometryBoolType type) { geometries.push_back(GeometryBoolPair(geometry, type)); }
+    void addImplicitGeometry(std::shared_ptr<ImplicitGeometry> geometry, const GeometryBoolType type)
+    {
+        geometry->updatePostTransformData();
+        geometries.push_back(GeometryBoolPair(geometry, type));
+    }
 
 protected:
     std::list<GeometryBoolPair> geometries;
