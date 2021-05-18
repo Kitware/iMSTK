@@ -299,7 +299,7 @@ TetrahedralMesh::getTetrahedronIndices(const size_t tetId)
     return (*m_tetrahedraIndices)[tetId];
 }
 
-size_t
+int
 TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraIndices->size();

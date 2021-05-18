@@ -117,7 +117,7 @@ public:
     ///
     /// \brief Returns the number of total vertices in the mesh
     ///
-    size_t getNumVertices() const;
+    int getNumVertices() const;
 
     ///
     /// \brief Set load factor
@@ -129,7 +129,7 @@ public:
     ///
     /// \brief Get the maximum number of vertices
     ///
-    size_t getMaxNumVertices() const { return m_maxNumVertices; }
+    int getMaxNumVertices() const { return m_maxNumVertices; }
 
 // Attributes
 public:
@@ -218,7 +218,7 @@ protected:
     std::string m_activeVertexTCoords  = "";
 
     double m_loadFactor          = 2.0;
-    size_t m_maxNumVertices      = 0;
-    size_t m_originalNumVertices = 0;
+    int    m_maxNumVertices      = 0;
+    int    m_originalNumVertices = 0;
 };
 } // imstk

@@ -122,7 +122,7 @@ HexahedralMesh::getHexahedronIndices(const int hexaNum) const
     return (*m_hexahedraIndices)[hexaNum];
 }
 
-size_t
+int
 HexahedralMesh::getNumHexahedra() const
 {
     return m_hexahedraIndices->size();

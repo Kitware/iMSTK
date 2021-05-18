@@ -114,7 +114,7 @@ public:
     ///
     /// \brief Returns the number of tetrahedra
     ///
-    size_t getNumTetrahedra() const;
+    int getNumTetrahedra() const;
 
     ///
     /// \brief Get/set method for removed elements from the mesh

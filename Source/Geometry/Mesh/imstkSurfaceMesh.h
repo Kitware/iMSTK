@@ -201,12 +201,12 @@ public:
     ///
     /// \brief Returns the number of triangles
     ///
-    size_t getNumTriangles() const;
+    int getNumTriangles() const;
 
     ///
     /// \brief Get the maximum number of triangles
     ///
-    size_t getMaxNumTriangles() const { return m_maxNumTriangles; }
+    int getMaxNumTriangles() const { return m_maxNumTriangles; }
 
     ///
     /// \brief Get the volume enclosed by the surface mesh
@@ -280,7 +280,7 @@ protected:
     std::string m_activeCellTangents = "";
     std::string m_activeCellScalars  = "";
 
-    size_t m_originalNumTriangles = 0;
-    size_t m_maxNumTriangles      = 0;
+    int m_originalNumTriangles = 0;
+    int m_maxNumTriangles      = 0;
 };
 } // imstk

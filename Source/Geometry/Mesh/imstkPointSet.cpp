@@ -153,7 +153,7 @@ PointSet::getVertexPosition(const size_t vertNum, DataType type)
     return (*this->getVertexPositions(type))[vertNum];
 }
 
-size_t
+int
 PointSet::getNumVertices() const
 {
     return m_vertexPositions->size();

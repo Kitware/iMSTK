@@ -91,7 +91,7 @@ public:
     ///
     /// \brief Returns the number of hexahedra
     ///
-    size_t getNumHexahedra() const;
+    int getNumHexahedra() const;
 
     ///
     /// \brief Compute and return the volume of the hexahedral mesh

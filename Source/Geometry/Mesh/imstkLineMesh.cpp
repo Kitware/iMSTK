@@ -63,7 +63,7 @@ LineMesh::print() const
     }
 }
 
-size_t
+int
 LineMesh::getNumLines() const
 {
     return m_segmentIndices->size();
