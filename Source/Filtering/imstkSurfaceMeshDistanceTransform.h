@@ -31,8 +31,9 @@ class SurfaceMesh;
 ///
 /// \class SurfaceMeshDistanceTransform
 ///
-/// \brief This filter computes brute force signed distance field by computing the nearest
-/// point in one dataset to the other
+/// \brief This filter computes exact signed distance fields using octrees
+/// and psuedonormal computations. One might need to adjust the tolerance
+/// depending on dataset scale.
 ///
 class SurfaceMeshDistanceTransform : public GeometryAlgorithm
 {
@@ -53,6 +54,7 @@ public:
     imstkGetMacro(UseBounds, bool);
     imstkGetMacro(NarrowBanded, bool);
     imstkGetMacro(DilateSize, int);
+    imstkGetMacro(Tolerance, double);
 
     ///
     /// \brief Dimensions of distance transform to fill
@@ -77,15 +79,18 @@ public:
     ///
     imstkSetMacro(DilateSize, int);
 
+    imstkSetMacro(Tolerance, double);
+
     void setDimensions(int dimX, int dimY, int dimZ) { setDimensions(Vec3i(dimX, dimY, dimZ)); }
 
 protected:
     void requestUpdate() override;
 
 private:
-    Vec3i m_Dimensions = Vec3i(0, 0, 0);
-    Vec6d m_Bounds;
-    bool  m_UseBounds = false;
+    Vec3i  m_Dimensions = Vec3i(0, 0, 0);
+    Vec6d  m_Bounds;
+    bool   m_UseBounds = false;
+    double m_Tolerance = 1.0e-10;
 
     int  m_DilateSize   = 4; ///> Only for narrow banded
     bool m_NarrowBanded = false;
