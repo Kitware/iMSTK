@@ -23,29 +23,34 @@
 
 #include "imstkVTKPolyDataRenderDelegate.h"
 
+class vtkCubeSource;
+
 namespace imstk
 {
 ///
-/// \class VTKCubeRenderDelegate
+/// \class VTKOrientedCubeRenderDelegate
 ///
-/// \brief Cube render delegate with VTK backend
+/// \brief Oriented box render delegate with VTK backend
 ///
-class VTKCubeRenderDelegate : public VTKPolyDataRenderDelegate
+class VTKOrientedCubeRenderDelegate : public VTKPolyDataRenderDelegate
 {
 public:
     ///
     /// \brief Constructor
     ///
-    VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
+    VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel);
 
     ///
     /// \brief Destructor
     ///
-    virtual ~VTKCubeRenderDelegate() override = default;
+    virtual ~VTKOrientedCubeRenderDelegate() override = default;
 
     ///
     /// \brief Update cube source based on the cube geometry
     ///
     void processEvents() override;
+
+protected:
+    vtkSmartPointer<vtkCubeSource> m_cubeSource;
 };
 } // imstk

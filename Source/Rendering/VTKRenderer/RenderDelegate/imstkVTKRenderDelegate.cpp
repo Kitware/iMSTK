@@ -33,17 +33,17 @@
 
 // VTK render delegates
 #include "imstkVTKCapsuleRenderDelegate.h"
-#include "imstkVTKCubeRenderDelegate.h"
 #include "imstkVTKCylinderRenderDelegate.h"
 #include "imstkVTKFluidRenderDelegate.h"
-#include "imstkVTKSurfaceNormalRenderDelegate.h"
 #include "imstkVTKHexahedralMeshRenderDelegate.h"
 #include "imstkVTKImageDataRenderDelegate.h"
 #include "imstkVTKLineMeshRenderDelegate.h"
+#include "imstkVTKOrientedBoxRenderDelegate.h"
 #include "imstkVTKPlaneRenderDelegate.h"
 #include "imstkVTKPointSetRenderDelegate.h"
 #include "imstkVTKSphereRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkVTKSurfaceNormalRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
 #include <vtkActor.h>
@@ -127,9 +127,9 @@ VTKRenderDelegate::makeDelegate(std::shared_ptr<VisualModel> visualModel)
         {
             return std::make_shared<VTKCapsuleRenderDelegate>(visualModel);
         }
-        else if (geomType == "Cube")
+        else if (geomType == "OrientedBox")
         {
-            return std::make_shared<VTKCubeRenderDelegate>(visualModel);
+            return std::make_shared<VTKOrientedCubeRenderDelegate>(visualModel);
         }
         else if (geomType == "Cylinder")
         {

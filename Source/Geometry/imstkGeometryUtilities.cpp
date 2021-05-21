@@ -20,11 +20,11 @@
 =========================================================================*/
 
 #include "imstkGeometryUtilities.h"
-#include "imstkCube.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkImageData.h"
 #include "imstkLineMesh.h"
 #include "imstkLogger.h"
+#include "imstkOrientedBox.h"
 #include "imstkParallelUtils.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
@@ -775,18 +775,19 @@ GeometryUtils::copyToVtkDataAttributes(vtkDataSetAttributes* pointData, const st
 }
 
 std::shared_ptr<SurfaceMesh>
-GeometryUtils::toCubeSurfaceMesh(std::shared_ptr<Cube> cube)
+GeometryUtils::toSurfaceMesh(std::shared_ptr<OrientedBox> obb)
 {
     vtkNew<vtkCubeSource> cubeSource;
-    cubeSource->SetCenter(cube->getPosition(Geometry::DataType::PreTransform).data());
-    cubeSource->SetXLength(cube->getWidth());
-    cubeSource->SetYLength(cube->getWidth());
-    cubeSource->SetZLength(cube->getWidth());
+    cubeSource->SetCenter(obb->getPosition(Geometry::DataType::PreTransform).data());
+    Vec3d extents = obb->getExtents();
+    cubeSource->SetXLength(extents[0] * 2.0);
+    cubeSource->SetYLength(extents[1] * 2.0);
+    cubeSource->SetZLength(extents[2] * 2.0);
     cubeSource->Update();
 
     Mat4d mat;
     mat.setIdentity();
-    mat.block<3, 3>(0, 0) = cube->getRotation();
+    mat.block<3, 3>(0, 0) = obb->getRotation();
 
     vtkNew<vtkTransform> transform;
     transform->SetMatrix(mat.data());

@@ -19,82 +19,85 @@
 
 =========================================================================*/
 
-#include "imstkCube.h"
+#include "imstkOrientedBox.h"
 #include "imstkLogger.h"
 
 namespace imstk
 {
 void
-Cube::print() const
+OrientedBox::print() const
 {
     Geometry::print();
-    LOG(INFO) << "Width: " << m_width;
+    LOG(INFO) << "Extent0: " << m_extents[0];
+    LOG(INFO) << "Extent1: " << m_extents[1];
+    LOG(INFO) << "Extent2: " << m_extents[2];
 }
 
-double
-Cube::getWidth(DataType type /* = DataType::PostTransform */)
+Vec3d
+OrientedBox::getExtents(DataType type /* = DataType::PostTransform */)
 {
     if (type == DataType::PostTransform)
     {
         this->updatePostTransformData();
-        return m_widthPostTransform;
+        return m_extentsPostTransform;
     }
-    return m_width;
+    return m_extents;
 }
 
 void
-Cube::setWidth(const double w)
+OrientedBox::setExtents(const Vec3d extents)
 {
-    if (w <= 0)
+    if (extents[0] <= 0.0 || extents[1] <= 0.0 || extents[2] <= 0.0)
     {
-        LOG(WARNING) << "error: width should be positive.";
+        LOG(WARNING) << "error: extents should be positive.";
         return;
     }
-    if (m_width == w)
+    if (m_extents == extents)
     {
         return;
     }
-    m_width = w;
+    m_extents = extents;
     m_transformApplied = false;
     this->postModified();
 }
 
 void
-Cube::applyTransform(const Mat4d& m)
+OrientedBox::applyTransform(const Mat4d& m)
 {
     AnalyticalGeometry::applyTransform(m);
-    /*Vec3d s = Vec3d(
-        m_transform.block<3, 1>(0, 0).norm(),
-        m_transform.block<3, 1>(0, 1).norm(),
-        m_transform.block<3, 1>(0, 2).norm());*/
-    const double s0 = m.block<3, 1>(0, 0).norm();
-    this->setWidth(m_width * s0);
+    Vec3d s = Vec3d(
+        m.block<3, 1>(0, 0).norm(),
+        m.block<3, 1>(0, 1).norm(),
+        m.block<3, 1>(0, 2).norm());
+    this->setExtents(m_extents.cwiseProduct(s));
     this->postModified();
 }
 
 void
-Cube::updatePostTransformData() const
+OrientedBox::updatePostTransformData() const
 {
     if (m_transformApplied)
     {
         return;
     }
     AnalyticalGeometry::updatePostTransformData();
-    const double s0 = m_transform.block<3, 1>(0, 0).norm();
-    m_widthPostTransform = s0 * m_width;
-    m_transformApplied   = true;
+    const Vec3d s = getScaling();
+    m_extentsPostTransform = m_extents.cwiseProduct(s);
+    m_transformApplied     = true;
 }
 
 void
-Cube::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
+OrientedBox::computeBoundingBox(Vec3d& min, Vec3d& max, const double imstkNotUsed(paddingPercent))
 {
     updatePostTransformData();
 
     const Mat3d r = Quatd::FromTwoVectors(Vec3d(0.0, 1.0, 0.0), m_orientationAxisPostTransform).toRotationMatrix();
 
-    const Vec3d a = r.col(0) * m_widthPostTransform * 0.5;
-    const Vec3d b = r.col(1) * m_widthPostTransform * 0.5;
-    const Vec3d c = r.col(2) * m_widthPostTransform * 0.5;
+    Vec3d rotatedExtents = r * m_extentsPostTransform;
+
+    const Vec3d a = r.col(0) * m_extentsPostTransform[0];
+    const Vec3d b = r.col(1) * m_extentsPostTransform[1];
+    const Vec3d c = r.col(2) * m_extentsPostTransform[2];
 
     Vec3d pts[8];
     pts[0] = m_positionPostTransform + a + b + c;

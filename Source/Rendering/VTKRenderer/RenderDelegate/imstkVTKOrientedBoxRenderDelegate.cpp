@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#include "imstkVTKCubeRenderDelegate.h"
-#include "imstkCube.h"
+#include "imstkVTKOrientedBoxRenderDelegate.h"
+#include "imstkOrientedBox.h"
 #include "imstkVisualModel.h"
 
 #include <vtkActor.h>
@@ -30,20 +30,21 @@
 
 namespace imstk
 {
-VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel)
+VTKOrientedCubeRenderDelegate::VTKOrientedCubeRenderDelegate(std::shared_ptr<VisualModel> visualModel) : VTKPolyDataRenderDelegate(visualModel),
+    m_cubeSource(vtkSmartPointer<vtkCubeSource>::New())
 {
-    //auto geometry = std::static_pointer_cast<Cube>(visualModel->getGeometry());
+    auto         geometry = std::dynamic_pointer_cast<OrientedBox>(visualModel->getGeometry());
+    const Vec3d& extents  = geometry->getExtents();
 
-    vtkNew<vtkCubeSource> cubeSource;
-    cubeSource->SetCenter(0, 0, 0);
-    cubeSource->SetXLength(1.0);
-    cubeSource->SetYLength(1.0);
-    cubeSource->SetZLength(1.0);
+    m_cubeSource->SetCenter(0.0, 0.0, 0.0);
+    m_cubeSource->SetXLength(extents[0] * 2.0);
+    m_cubeSource->SetYLength(extents[1] * 2.0);
+    m_cubeSource->SetZLength(extents[2] * 2.0);
 
     // Setup mapper
     {
         vtkNew<vtkPolyDataMapper> mapper;
-        mapper->SetInputConnection(cubeSource->GetOutputPort());
+        mapper->SetInputConnection(m_cubeSource->GetOutputPort());
         vtkNew<vtkActor> actor;
         actor->SetMapper(mapper);
         actor->SetUserTransform(m_transform);
@@ -56,17 +57,23 @@ VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<VisualModel> visual
 }
 
 void
-VTKCubeRenderDelegate::processEvents()
+VTKOrientedCubeRenderDelegate::processEvents()
 {
     VTKRenderDelegate::processEvents();
 
     // Don't use events for primitives, just always update
-    auto geometry = std::static_pointer_cast<Cube>(m_visualModel->getGeometry());
+    auto         geometry = std::dynamic_pointer_cast<OrientedBox>(m_visualModel->getGeometry());
+    const Vec3d& extents  = geometry->getExtents();
+
+    m_cubeSource->SetXLength(extents[0] * 2.0);
+    m_cubeSource->SetYLength(extents[1] * 2.0);
+    m_cubeSource->SetZLength(extents[2] * 2.0);
+    m_cubeSource->Modified();
 
     AffineTransform3d T = AffineTransform3d::Identity();
     T.translate(geometry->getPosition(Geometry::DataType::PostTransform));
     T.rotate(Quatd::FromTwoVectors(UP_VECTOR, geometry->getOrientationAxis(Geometry::DataType::PostTransform)));
-    T.scale(geometry->getWidth(Geometry::DataType::PostTransform));
+    T.scale(1.0);
     T.matrix().transposeInPlace();
 
     m_transform->SetMatrix(T.data());

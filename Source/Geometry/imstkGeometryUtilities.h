@@ -56,7 +56,7 @@ class SurfaceMesh;
 class TetrahedralMesh;
 class VolumetricMesh;
 
-class Cube;
+class OrientedBox;
 class Sphere;
 class Plane;
 
@@ -194,9 +194,9 @@ void copyToDataMap(vtkDataSetAttributes* pointData, std::unordered_map<std::stri
 void copyToVtkDataAttributes(vtkDataSetAttributes* pointData, const std::unordered_map<std::string, std::shared_ptr<AbstractDataArray>>& dataMap);
 
 ///
-/// \brief Produces SurfaceMesh cube from imstkCube
+/// \brief Produces SurfaceMesh box from imstkOrientedBox
 ///
-std::shared_ptr<SurfaceMesh> toCubeSurfaceMesh(std::shared_ptr<Cube> cube);
+std::shared_ptr<SurfaceMesh> toSurfaceMesh(std::shared_ptr<OrientedBox> obb);
 
 ///
 /// \brief UV sphere from imstkSphere

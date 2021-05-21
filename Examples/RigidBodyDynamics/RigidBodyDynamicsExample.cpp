@@ -20,7 +20,6 @@
 =========================================================================*/
 
 #include "imstkCamera.h"
-#include "imstkCube.h"
 #include "imstkIsometricMap.h"
 #include "imstkKeyboardSceneControl.h"
 #include "imstkLight.h"
@@ -28,6 +27,7 @@
 #include "imstkMeshIO.h"
 #include "imstkMouseSceneControl.h"
 #include "imstkNew.h"
+#include "imstkOrientedBox.h"
 #include "imstkPlane.h"
 #include "imstkRenderMaterial.h"
 #include "imstkRigidBodyModel.h"
@@ -84,8 +84,7 @@ makeCubeRigidObject(std::string& name, const Vec3d& pos)
     imstkNew<RigidObject> cubeObj(name);
 
     // Create cube geometry
-    imstkNew<Cube> cubeGeom;
-    cubeGeom->setWidth(20.0);
+    imstkNew<OrientedBox> cubeGeom(Vec3d::Zero(), Vec3d(10.0, 10.0, 10.0));
     cubeGeom->translate(pos);
 
     // Create cube VisualModel

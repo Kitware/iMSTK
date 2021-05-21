@@ -19,7 +19,7 @@
 
 =========================================================================*/
 
-#include "imstkCube.h"
+#include "imstkOrientedBox.h"
 #include "imstkGeometryUtilities.h"
 #include "imstkMath.h"
 #include "imstkPointSet.h"
@@ -186,7 +186,7 @@ TEST_F(imstkSurfaceMeshTest, ComputeVertexNormals)
 TEST_F(imstkSurfaceMeshTest, GetVolume)
 {
     std::shared_ptr<SurfaceMesh> cubeSurfMesh =
-        GeometryUtils::toCubeSurfaceMesh(std::make_shared<Cube>(Vec3d(0.0, 0.0, 0.0), 1.0));
+        GeometryUtils::toSurfaceMesh(std::make_shared<OrientedBox>());
     EXPECT_NEAR(1.0, cubeSurfMesh->getVolume(), 0.0000000000001);
 }
 

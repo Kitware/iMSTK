@@ -63,7 +63,7 @@ public:
         {
             "Plane",
             "Sphere",
-            "Cube",
+            "OrientedBox",
             "SurfaceMesh"
         };
     };
@@ -183,7 +183,7 @@ private:
     ///
     /// \brief TODO
     ///
-    void createCube();
+    void createOrientedBox();
     ///
     /// \brief TODO
     ///
